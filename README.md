@@ -5,7 +5,7 @@ necessary to write programs for the RP2040 based devices such as the Raspberry P
 in C, C++ or assembly language.
 
 The Pico SDK  is designed to provide an API and programming environment that is familiar both to non-embedded C developers and embedded C developers alike.
-A single program runs on the device at a time and startrs with a conventional `main()` method. Standard C/C++ libraries are supported along with
+A single program runs on the device at a time and starts with a conventional `main()` method. Standard C/C++ libraries are supported along with
 C level libraries/APIs for accessing all of the RP2040's hardware include PIO (Programmable IO)
 
 Additionally the Pico SDK provides higher level libraries for dealing with timers, synchronization, USB (TinyUSB) and multi-core programming 
