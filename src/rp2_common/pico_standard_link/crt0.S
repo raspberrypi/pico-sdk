@@ -181,6 +181,16 @@ _entry_point:
     msr msp, r1
     bx r2
 
+// Header must be in first 256 bytes of main flash image.
+#if !PICO_NO_BINARY_INFO
+binary_info_header:
+.word BINARY_INFO_MARKER_START
+.word __binary_info_start
+.word __binary_info_end
+.word data_cpy_table // we may need to decode pointers that are in RAM at runtime.
+.word BINARY_INFO_MARKER_END
+#endif
+
 // ----------------------------------------------------------------------------
 // Reset handler:
 // - initialises .data
@@ -246,15 +256,6 @@ data_cpy:
     cmp r2, r3
     blo data_cpy_loop
     bx lr
-
-#if !PICO_NO_BINARY_INFO
-binary_info_header:
-.word BINARY_INFO_MARKER_START
-.word __binary_info_start
-.word __binary_info_end
-.word data_cpy_table // we may need to decode pointers that are in RAM at runtime.
-.word BINARY_INFO_MARKER_END
-#endif
 
 .align 2
 data_cpy_table:
