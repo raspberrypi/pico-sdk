@@ -70,7 +70,7 @@ typedef struct {
 #define dma_debug_hw ((dma_debug_hw_t *const)(DMA_BASE + DMA_CH0_DBG_CTDREQ_OFFSET))
 
 static inline void check_dma_channel_param(uint channel) {
-#if PARAM_ASSERTIONS_ENABLED(DMA)
+#if PARAM_ASSERTIONS_ENABLED_DMA
     // this method is used a lot by inline functions so avoid code bloat by deferring to function
     extern void check_dma_channel_param_impl(uint channel);
     check_dma_channel_param_impl(channel);
