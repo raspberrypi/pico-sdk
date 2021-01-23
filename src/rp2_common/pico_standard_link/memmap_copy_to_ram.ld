@@ -59,12 +59,8 @@ SECTIONS
     */
 
     .flashtext : {
-        __reset_start = .;
-        KEEP (*(.reset))
-        . = ALIGN(256);
-        __reset_end = .;
-        ASSERT(__reset_end - __reset_start == 256, "ERROR: reset section should only be 256 bytes");
         KEEP (*(.vectors))
+        KEEP (*(.reset))
     }
 
     .rodata : {

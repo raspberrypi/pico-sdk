@@ -32,15 +32,13 @@ ENTRY(_entry_point)
 
 SECTIONS
 {
-    /* Watchdog reboot into RAM (via USB MSD will enter) image at the start of .text
+    /* Watchdog reboot into RAM (via USB MSD) will enter image at the start of .text
        The debugger will use the ELF entry point, which is the _entry_point
        symbol if present, otherwise defaults to start of .text.
     */
 
     .text : {
-    __reset_start = .;
-        KEEP (*(.reset))
-        /* reset should come first */
+        __reset_start = .;
         KEEP (*(.reset))
         . = ALIGN(256);
         __reset_end = .;

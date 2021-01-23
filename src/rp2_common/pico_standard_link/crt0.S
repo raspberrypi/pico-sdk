@@ -144,35 +144,39 @@ __unhandled_user_irq:
 unhandled_user_irq_num_in_r0:
     bkpt #0
 
+// ----------------------------------------------------------------------------
+
 .section .reset, "ax"
 
-// This is the beginning of the image, which is entered from stage2 or bootrom USB MSD watchdog reboot
+// On flash builds, the vector table comes first in the image (conventional).
+// On NO_FLASH builds, the reset handler section comes first, as the entry
+// point is at offset 0 (fixed due to bootrom), and VTOR is highly-aligned.
+// Image is entered in various ways:
+//
+// - NO_FLASH builds are entered from beginning by UF2 bootloader
+//
+// - Flash builds vector through the table into _reset_handler from boot2
+//
+// - Either type can be entered via _entry_point by the debugger, and flash builds
+//   must then be sent back round the boot sequence to properly initialise flash
 
-// note if we are NO_FLASH then start: below is currently identical anyway, so save 4 bytes
-#if !PICO_NO_FLASH
-    // We simply install our own vector table and redirect through it
-    ldr r0, =__vectors
-    b __vector_entry
-#endif
-
-// ELF entry point generally called when we load an ELF via debugger
+// ELF entry point:
 .type _entry_point,%function
 .thumb_func
 .global _entry_point
 _entry_point:
 
 #if PICO_NO_FLASH
-    // non flash
+    // Vector through our own table (SP, VTOR will not have been set up at
+    // this point). Same path for debugger entry and bootloader entry.
     ldr r0, =__vectors
 #else
-    // todo clear watchdog?
-    // When using flash, we install and use the ROM vector table to go thru regular bootrom/stage2 flash sequence
+    // Debugger tried to run code after loading, so SSI is in 03h-only mode.
+    // Go back through bootrom + boot2 to properly initialise flash.
     movs r0, #0
 #endif
-
-__vector_entry:
-    ldr r1, =(PPB_BASE + M0PLUS_CPUID_OFFSET)
-    str r0, [r1, #8]
+    ldr r1, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
+    str r0, [r1]
     ldmia r0!, {r1, r2}
     msr msp, r1
     bx r2
