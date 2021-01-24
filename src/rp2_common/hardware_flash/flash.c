@@ -7,7 +7,16 @@
 #include "hardware/flash.h"
 #include "pico/bootrom.h"
 
+#include "hardware/structs/ssi.h"
+#include "hardware/structs/ioqspi.h"
+
 #define FLASH_BLOCK_ERASE_CMD 0xd8
+
+// Standard RUID instruction: 4Bh command prefix, 32 dummy bits, 64 data bits.
+#define FLASH_RUID_CMD 0x4b
+#define FLASH_RUID_DUMMY_BYTES 4
+#define FLASH_RUID_DATA_BYTES 8
+#define FLASH_RUID_TOTAL_BYTES (1 + FLASH_RUID_DUMMY_BYTES + FLASH_RUID_DATA_BYTES)
 
 #define __compiler_barrier() asm volatile("" ::: "memory")
 
@@ -98,4 +107,73 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
     flash_range_program(flash_offs, data, count);
     flash_flush_cache(); // Note this is needed to remove CSn IO force as well as cache flushing
     flash_enable_xip_via_boot2();
+}
+
+//-----------------------------------------------------------------------------
+// Lower-level flash access functions
+
+// Bitbanging the chip select using IO overrides, in case RAM-resident IRQs
+// are still running, and the FIFO bottoms out. (the bootrom does the same)
+static void flash_cs_force(bool high) {
+    uint32_t field_val = high ?
+        IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_HIGH :
+        IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_LOW;
+    hw_write_masked(&ioqspi_hw->io[1].ctrl,
+        field_val << IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_LSB,
+        IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_BITS
+    );
+}
+
+// May want to expose this at some point but this is unlikely to be the right
+// interface to do so. Keep it static
+static void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *rxbuf, size_t count) {
+    void (*connect_internal_flash)(void) = (void(*)(void))rom_func_lookup(rom_table_code('I', 'F'));
+    void (*flash_exit_xip)(void) = (void(*)(void))rom_func_lookup(rom_table_code('E', 'X'));
+    void (*flash_flush_cache)(void) = (void(*)(void))rom_func_lookup(rom_table_code('F', 'C'));
+    assert(connect_internal_flash && flash_exit_xip && flash_flush_cache);
+    flash_init_boot2_copyout();
+    __compiler_barrier();
+    connect_internal_flash();
+    flash_exit_xip();
+
+    flash_cs_force(0);
+    size_t tx_remaining = count;
+    size_t rx_remaining = count;
+    // We may be interrupted -- don't want FIFO to overflow if we're distracted.
+    const size_t max_in_flight = 16 - 2;
+    while (tx_remaining || rx_remaining) {
+        uint32_t flags = ssi_hw->sr;
+        bool can_put = !!(flags & SSI_SR_TFNF_BITS);
+        bool can_get = !!(flags & SSI_SR_RFNE_BITS);
+        if (can_put && tx_remaining && rx_remaining - tx_remaining < max_in_flight) {
+            ssi_hw->dr0 = *txbuf++;
+            --tx_remaining;
+        }
+        if (can_get && rx_remaining) {
+            *rxbuf++ = ssi_hw->dr0;
+            --rx_remaining;
+        }
+    }
+    flash_cs_force(1);
+
+    flash_flush_cache();
+    flash_enable_xip_via_boot2();
+}
+
+// Use standard RUID command to get a unique identifier for the flash (and
+// hence the board)
+
+static_assert(FLASH_UNIQUE_ID_SIZE_BYTES == FLASH_RUID_DATA_BYTES);
+
+void flash_get_unique_id(uint8_t *id_out) {
+#if PICO_NO_FLASH
+    panic_unsupported();
+#else
+    uint8_t txbuf[FLASH_RUID_TOTAL_BYTES] = {0};
+    uint8_t rxbuf[FLASH_RUID_TOTAL_BYTES] = {0};
+    txbuf[0] = 0x4b;
+    flash_do_cmd(txbuf, rxbuf, FLASH_RUID_TOTAL_BYTES);
+    for (int i = 0; i < FLASH_RUID_DATA_BYTES; i++)
+        id_out[i] = rxbuf[i + 1 + FLASH_RUID_DUMMY_BYTES];
+#endif
 }
