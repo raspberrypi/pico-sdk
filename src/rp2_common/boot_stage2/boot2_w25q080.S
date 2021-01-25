@@ -271,63 +271,14 @@ configure_ssi:
 // Bus accesses to the XIP window will now be transparently serviced by the
 // external flash on cache miss. We are ready to run code from flash.
 
-check_return:
-    // If entered from the bootrom, lr (which we earlier pushed) will be 0,
-    // and we vector through the table at the start of the main flash image.
-    // Any regular function call will have a nonzero value for lr.
-    pop {r0}
-    cmp r0, #0
-    beq vector_into_flash
-    bx r0
-vector_into_flash:
-    ldr r0, =(XIP_BASE + 0x100)
-    ldr r1, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
-    str r0, [r1]
-    ldmia r0, {r0, r1}
-    msr msp, r0
-    bx r1
+// Pull in standard exit routine
+#include "boot2_helpers/exit_from_boot2.S"
 
 // Common functions
-
-wait_ssi_ready:
-    push {r0, r1, lr}
-
-    // Command is complete when there is nothing left to send
-    // (TX FIFO empty) and SSI is no longer busy (CSn deasserted)
-1:
-    ldr r1, [r3, #SSI_SR_OFFSET]
-    movs r0, #SSI_SR_TFE_BITS
-    tst r1, r0
-    beq 1b
-    movs r0, #SSI_SR_BUSY_BITS
-    tst r1, r0
-    bne 1b
-
-    pop {r0, r1, pc}
-
+#include "boot2_helpers/wait_ssi_ready.S"
 #ifdef PROGRAM_STATUS_REG
-// Pass status read cmd into r0.
-// Returns status value in r0.
-.global read_flash_sreg
-.type read_flash_sreg,%function
-.thumb_func
-read_flash_sreg:
-    push {r1, lr}
-    str r0, [r3, #SSI_DR0_OFFSET]
-    // Dummy byte:
-    str r0, [r3, #SSI_DR0_OFFSET]
-    
-    bl wait_ssi_ready
-    // Discard first byte and combine the next two
-    ldr r0, [r3, #SSI_DR0_OFFSET]
-    ldr r0, [r3, #SSI_DR0_OFFSET]
-
-    pop {r1, pc}
+#include "boot2_helpers/read_flash_sreg.S"
 #endif
-
-// ----------------------------------------------------------------------------
-// Literal Table
-// ----------------------------------------------------------------------------
 
 .global literals
 literals:
