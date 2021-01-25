@@ -304,7 +304,7 @@ raw_encoding instr_wait::raw_encode(const program &program) {
 raw_encoding instr_irq::raw_encode(const program &program) {
     uint arg2 = num->resolve(program);
     if (arg2 > 7) throw syntax_error(num->location, "irq number must be must be >= 0 and <= 7");
-    if (relative) arg2 |= 0x20u;
+    if (relative) arg2 |= 0x10u;
     return {inst_type::irq, (uint)modifiers, arg2};
 }
 
