@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 // Stub second stage which calls into USB bootcode, with parameters.
 // USB boot takes two parameters:
 // - A GPIO mask for activity LED -- if mask is 0, don't touch GPIOs at all

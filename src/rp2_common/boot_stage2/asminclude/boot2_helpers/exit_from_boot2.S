@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #ifndef _BOOT2_HELPER_EXIT_FROM_BOOT2
 #define _BOOT2_HELPER_EXIT_FROM_BOOT2
 

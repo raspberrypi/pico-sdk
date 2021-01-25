@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #ifndef _BOOT2_HELPER_WAIT_SSI_READY
 #define _BOOT2_HELPER_WAIT_SSI_READY
 

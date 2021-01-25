@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
-// Second stage boot code
-// Copyright (c) 2019 Raspberry Pi (Trading) Ltd.
+// Copyright (c) 2019-2021 Raspberry Pi (Trading) Ltd.
+// SPDX-License-Identifier: BSD-3-Clause
 //
 // Device:      ISSI IS25LP080D
 //              Based on W25Q080 code: main difference is the QE bit being in
