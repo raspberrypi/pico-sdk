@@ -22,6 +22,10 @@
 #include "pico/time.h"
 #include "pico/printf.h"
 
+#if PICO_ENTER_USB_BOOT_ON_EXIT
+#include "pico/bootrom.h"
+#endif
+
 #ifndef PICO_NO_RAM_VECTOR_TABLE
 #define PICO_NO_RAM_VECTOR_TABLE 0
 #endif
