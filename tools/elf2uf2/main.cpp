@@ -74,7 +74,7 @@ const address_ranges rp2040_address_ranges_flash {
 const address_ranges rp2040_address_ranges_ram {
     address_range(MAIN_RAM_START, MAIN_RAM_END, address_range::type::CONTENTS),
     address_range(XIP_SRAM_START, XIP_SRAM_END, address_range::type::CONTENTS),
-    address_range(0x00000000u, 0x00002000u, address_range::type::IGNORE) // for now we ignore the bootrom if present
+    address_range(0x00000000u, 0x00004000u, address_range::type::IGNORE) // for now we ignore the bootrom if present
 };
 
 struct page_fragment {
