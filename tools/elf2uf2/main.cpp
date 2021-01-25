@@ -63,8 +63,8 @@ typedef std::vector<address_range> address_ranges;
 #define MAIN_RAM_END   0x20042000u
 #define FLASH_START    0x10000000u
 #define FLASH_END      0x15000000u
-#define CACHE_START    0x15000000u
-#define CACHE_END      0x15004000u
+#define XIP_SRAM_START 0x15000000u
+#define XIP_SRAM_END   0x15004000u
 
 const address_ranges rp2040_address_ranges_flash {
     address_range(FLASH_START, FLASH_END, address_range::type::CONTENTS),
@@ -73,7 +73,7 @@ const address_ranges rp2040_address_ranges_flash {
 
 const address_ranges rp2040_address_ranges_ram {
     address_range(MAIN_RAM_START, MAIN_RAM_END, address_range::type::CONTENTS),
-    address_range(CACHE_START, CACHE_END, address_range::type::CONTENTS),
+    address_range(XIP_SRAM_START, XIP_SRAM_END, address_range::type::CONTENTS),
     address_range(0x00000000u, 0x00002000u, address_range::type::IGNORE) // for now we ignore the bootrom if present
 };
 
@@ -229,7 +229,7 @@ int elf2uf2(FILE *in, FILE *out) {
     bool ram_style = false;
     address_ranges valid_ranges = {};
     if (!rc) {
-        ram_style = ((eh.entry >= MAIN_RAM_START) && (eh.entry < MAIN_RAM_END)) || ((eh.entry >= CACHE_START) && (eh.entry < CACHE_END));
+        ram_style = ((eh.entry >= MAIN_RAM_START) && (eh.entry < MAIN_RAM_END)) || ((eh.entry >= XIP_SRAM_START) && (eh.entry < XIP_SRAM_END));
         if (verbose) {
             if (ram_style) {
                 printf("Detected RAM binary\n");
