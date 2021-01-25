@@ -1,27 +1,5 @@
 // ----------------------------------------------------------------------------
 //
-//   .d8888b.                888       .d8888b.  888
-//  d88P  Y88b               888      d88P  Y88b 888
-//         888               888      Y88b.      888
-//       .d88P 88888b.   .d88888       "Y888b.   888888  8888b.   .d88b.   .d88b.
-//   .od888P"  888 "88b d88" 888          "Y88b. 888        "88b d88P"88b d8P  Y8b
-//  d88P"      888  888 888  888            "888 888    .d888888 888  888 88888888
-//  888"       888  888 Y88b 888      Y88b  d88P Y88b.  888  888 Y88b 888 Y8b.
-//  888888888  888  888  "Y88888       "Y8888P"   "Y888 "Y888888  "Y88888  "Y8888
-//                                                                    888
-//                                                               Y8b d88P
-//                                                                "Y88P"
-//  888888b.                     888          .d8888b.                888
-//  888  "88b                    888         d88P  Y88b               888
-//  888  .88P                    888         888    888               888
-//  8888888K.   .d88b.   .d88b.  888888      888         .d88b.   .d88888  .d88b.
-//  888  "Y88b d88""88b d88""88b 888         888        d88""88b d88" 888 d8P  Y8b
-//  888    888 888  888 888  888 888         888    888 888  888 888  888 88888888
-//  888   d88P Y88..88P Y88..88P Y88b.       Y88b  d88P Y88..88P Y88b 888 Y8b.
-//  8888888P"   "Y88P"   "Y88P"   "Y888       "Y8888P"   "Y88P"   "Y88888  "Y8888
-//
-// ----------------------------------------------------------------------------
-//
 // Device:      Winbond W25X10CL
 //
 // Description: Configures W25X10CL to run in Dual I/O continuous read XIP mode
@@ -51,7 +29,7 @@
 
 #include "pico/asm_helper.S"
 #include "hardware/regs/addressmap.h"
-#include "ssi.h"
+#include "hardware/regs/ssi.h"
 
 // The serial flash interface will run at clk_sys/PICO_FLASH_SPI_CLKDIV.
 // This must be an even number.
@@ -101,19 +79,19 @@
 .type _stage2_boot,%function
 .thumb_func
 _stage2_boot:
-
-    ldr r5, =XIP_SSI_BASE                // Use as base address where possible
+    push {lr}
+    ldr r3, =XIP_SSI_BASE                // Use as base address where possible
 
 // We are primarily interested in setting up Flash for DSPI XIP w/ continuous read
 
     mov r1, #0
-    str r1, [r5, #SSI_SSIENR_OFFSET] // Disable SSI to allow further config
+    str r1, [r3, #SSI_SSIENR_OFFSET] // Disable SSI to allow further config
 
 // The Boot ROM sets a very conservative SPI clock frequency to be sure it can
 // read the initial 256 bytes from any device.  Here we can be more aggressive.
 
     mov r1, #PICO_FLASH_SPI_CLKDIV
-    str r1, [r5, #SSI_BAUDR_OFFSET]  // Set SSI Clock
+    str r1, [r3, #SSI_BAUDR_OFFSET]  // Set SSI Clock
 
 // First we need to send the initial command to get us in to Fast Read Dual I/O
 // mode.  As this transaction requires a command, we can't send it in XIP mode.
@@ -133,10 +111,10 @@ _stage2_boot:
         << SSI_CTRLR0_TMOD_LSB)
 
     ldr r1, =(CTRLR0_ENTER_XIP)
-    str r1, [r5, #SSI_CTRLR0_OFFSET]
+    str r1, [r3, #SSI_CTRLR0_OFFSET]
 
     mov r1, #0x0                    // NDF=0 (single 32b read)
-    str r1, [r5, #SSI_CTRLR1_OFFSET]
+    str r1, [r3, #SSI_CTRLR1_OFFSET]
 
 #define SPI_CTRLR0_ENTER_XIP \
     (7 << SSI_SPI_CTRLR0_ADDR_L_LSB) |         /* Send 28 bits (24 address + 4 mode) */ \
@@ -151,19 +129,19 @@ _stage2_boot:
     str r1, [r0]
 
     mov r1, #1                      // Re-enable SSI
-    str r1, [r5, #SSI_SSIENR_OFFSET]
+    str r1, [r3, #SSI_SSIENR_OFFSET]
 
     mov r1, #W25X10CL_CMD_READ_DATA_FAST_DUAL_IO    // 8b command = 0xBB
-    str r1, [r5, #SSI_DR0_OFFSET]   // Push SPI command into TX FIFO
+    str r1, [r3, #SSI_DR0_OFFSET]   // Push SPI command into TX FIFO
     mov r1, #0x0000002              // 28-bit Address for dummy read = 0x000000 + 0x2 Mode bits to set M[5:4]=10
-    str r1, [r5, #SSI_DR0_OFFSET]   // Push Address into TX FIFO - this will trigger the transaction
+    str r1, [r3, #SSI_DR0_OFFSET]   // Push Address into TX FIFO - this will trigger the transaction
 
 // Now we wait for the read transaction to complete by monitoring the SSI
 // status register and checking for the "RX FIFO Not Empty" flag to assert.
 
     mov r1, #SSI_SR_RFNE_BITS
 00:
-    ldr r0, [r5, #SSI_SR_OFFSET]    // Read status register
+    ldr r0, [r3, #SSI_SR_OFFSET]    // Read status register
     tst r0, r1                      // RFNE status flag set?
     beq 00b                         // If not then wait
 
@@ -178,7 +156,7 @@ _stage2_boot:
 // to 4'b0000).
 
     mov r1, #0
-    str r1, [r5, #SSI_SSIENR_OFFSET]   // Disable SSI (and clear FIFO) to allow further config
+    str r1, [r3, #SSI_SSIENR_OFFSET]   // Disable SSI (and clear FIFO) to allow further config
 
 // Note that the INST_L field is used to select what XIP data gets pushed into
 // the TX FIFO:
@@ -200,20 +178,16 @@ _stage2_boot:
     str r1, [r0]
 
     mov r1, #1
-    str r1, [r5, #SSI_SSIENR_OFFSET]   // Re-enable SSI
+    str r1, [r3, #SSI_SSIENR_OFFSET]   // Re-enable SSI
 
 // We are now in XIP mode, with all transactions using Dual I/O and only
 // needing to send 24-bit addresses (plus mode bits) for each read transaction.
 
-soft_reset:
-    // Just jump to start of image after this 256-byte boot stage2 (with thumb bit set)
-    ldr r0, =(XIP_BASE + 256 + 1)
-    bx  r0
+// Pull in standard exit routine
+#include "boot2_helpers/exit_from_boot2.S"
 
-// ----------------------------------------------------------------------------
-// Literal Table
-// ----------------------------------------------------------------------------
-
+.global literals
+literals:
 .ltorg
 
 .end

@@ -17,7 +17,7 @@
 
 #include "pico/asm_helper.S"
 #include "hardware/regs/addressmap.h"
-#include "ssi.h"
+#include "hardware/regs/ssi.h"
 
 // ----------------------------------------------------------------------------
 // Config section
@@ -92,58 +92,8 @@ _stage2_boot:
 // translated by the SSI into 03h read commands to the external flash (if cache is missed),
 // and the data will be returned to the bus.
 
-soft_reset:
-    // Jump to exit point provided in lr. Bootrom will pass null, in which
-    // case we use default exit target at a 256 byte offset into XIP region
-    // (immediately after this second stage's flash location)
-    pop {r0}
-    cmp r0, #0
-    bne 1f
-    ldr r0, =(XIP_BASE + 0x101)
-1:
-    bx r0
-
-// Common functions
-
-wait_ssi_ready:
-    push {r0, r1, lr}
-
-    // Command is complete when there is nothing left to send
-    // (TX FIFO empty) and SSI is no longer busy (CSn deasserted)
-1:
-    ldr r1, [r3, #SSI_SR_OFFSET]
-    mov r0, #SSI_SR_TFE_BITS
-    tst r1, r0
-    beq 1b
-    mov r0, #SSI_SR_BUSY_BITS
-    tst r1, r0
-    bne 1b
-
-    pop {r0, r1, pc}
-
-#ifdef PROGRAM_STATUS_REG
-// Pass status read cmd into r0.
-// Returns status value in r0.
-.global read_flash_sreg
-.type read_flash_sreg,%function
-.thumb_func
-read_flash_sreg:
-    push {r1, lr}
-    str r0, [r3, #SSI_DR0_OFFSET]
-    // Dummy byte:
-    str r0, [r3, #SSI_DR0_OFFSET]
-    
-    bl wait_ssi_ready
-    // Discard first byte and combine the next two
-    ldr r0, [r3, #SSI_DR0_OFFSET]
-    ldr r0, [r3, #SSI_DR0_OFFSET]
-
-    pop {r1, pc}
-#endif
-
-// ----------------------------------------------------------------------------
-// Literal Table
-// ----------------------------------------------------------------------------
+// Pull in standard exit routine
+#include "boot2_helpers/exit_from_boot2.S"
 
 .global literals
 literals:

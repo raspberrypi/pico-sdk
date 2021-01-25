@@ -29,7 +29,6 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/ssi.h"
 #include "hardware/regs/pads_qspi.h"
-#include "hardware/regs/m0plus.h"
 
 // ----------------------------------------------------------------------------
 // Config section

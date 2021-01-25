@@ -1,7 +1,7 @@
 #ifndef _BOOT2_HELPER_READ_FLASH_SREG
 #define _BOOT2_HELPER_READ_FLASH_SREG
 
-#include "boot2_helpers/read_flash_sreg.S"
+#include "boot2_helpers/wait_ssi_ready.S"
 
 // Pass status read cmd into r0.
 // Returns status value in r0.
