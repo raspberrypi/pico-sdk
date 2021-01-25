@@ -215,6 +215,15 @@ static bool is_address_valid(const address_ranges& valid_ranges, uint32_t addr) 
     return false;
 }
 
+static bool is_address_initialized(const address_ranges& valid_ranges, uint32_t addr) {
+    for(const auto& range : valid_ranges) {
+        if (range.from <= addr && range.to > addr) {
+            return address_range::type::CONTENTS == range.type;
+        }
+    }
+    return false;
+}
+
 static bool is_address_mapped(const std::map<uint32_t, std::vector<page_fragment>>& pages, uint32_t addr) {
     uint32_t page = addr & ~(PAGE_SIZE - 1);
     if (!pages.count(page)) return false;
@@ -229,7 +238,7 @@ int elf2uf2(FILE *in, FILE *out) {
     bool ram_style = false;
     address_ranges valid_ranges = {};
     if (!rc) {
-        ram_style = ((eh.entry >= MAIN_RAM_START) && (eh.entry < MAIN_RAM_END)) || ((eh.entry >= XIP_SRAM_START) && (eh.entry < XIP_SRAM_END));
+        ram_style = is_address_initialized(rp2040_address_ranges_ram, eh.entry);
         if (verbose) {
             if (ram_style) {
                 printf("Detected RAM binary\n");
