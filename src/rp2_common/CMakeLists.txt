@@ -37,6 +37,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(boot_stage2)
 
     pico_add_subdirectory(pico_multicore)
+    pico_add_subdirectory(pico_unique_id)
 
     pico_add_subdirectory(pico_bit_ops)
     pico_add_subdirectory(pico_divider)
