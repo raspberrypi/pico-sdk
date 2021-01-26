@@ -1,4 +1,4 @@
-PROJECT_NAME           = "Pico SDK"
+PROJECT_NAME           = "Raspberry Pi Pico SDK"
 PROJECT_NUMBER         = @VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@
 
 #STRIP_FROM_PATH        = @PROJECT_SOURCE_DIR@
@@ -20,7 +20,7 @@ LAYOUT_FILE = @PROJECT_SOURCE_DIR@/docs/DoxygenLayout.xml
 HTML_FOOTER = @PROJECT_SOURCE_DIR@/docs/footer.html
 HTML_HEADER = @PROJECT_SOURCE_DIR@/docs/header.html
 
-PROJECT_BRIEF = "Pico SDK documentation"
+PROJECT_BRIEF = "Raspberry Pi Pico SDK documentation"
 PROJECT_NUMBER = 1.0
 OPTIMIZE_OUTPUT_FOR_C = YES
 # HTML_EXTRA_STYLESHEET = @PROJECT_SOURCE_DIR@/docs/customdoxygen.css

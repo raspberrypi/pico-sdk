@@ -18,8 +18,8 @@ if (DEFINED ENV{PICO_SDK_FETCH_FROM_GIT_PATH} AND (NOT PICO_SDK_FETCH_FROM_GIT_P
     message("Using PICO_SDK_FETCH_FROM_GIT_PATH from environment ('${PICO_SDK_FETCH_FROM_GIT_PATH}')")
 endif ()
 
-set(PICO_SDK_PATH "${PICO_SDK_PATH}" CACHE PATH "Path to the PICO SDK")
-set(PICO_SDK_FETCH_FROM_GIT "${PICO_SDK_FETCH_FROM_GIT}" CACHE BOOL "Set to ON to fetch copy of PICO SDK from git if not otherwise locatable")
+set(PICO_SDK_PATH "${PICO_SDK_PATH}" CACHE PATH "Path to the Raspberry Pi Pico SDK")
+set(PICO_SDK_FETCH_FROM_GIT "${PICO_SDK_FETCH_FROM_GIT}" CACHE BOOL "Set to ON to fetch copy of SDK from git if not otherwise locatable")
 set(PICO_SDK_FETCH_FROM_GIT_PATH "${PICO_SDK_FETCH_FROM_GIT_PATH}" CACHE FILEPATH "location to download SDK")
 
 if (NOT PICO_SDK_PATH)
@@ -35,14 +35,14 @@ if (NOT PICO_SDK_PATH)
                 GIT_TAG master
         )
         if (NOT pico_sdk)
-            message("Downloading PICO SDK")
+            message("Downloading Raspberry Pi Pico SDK")
             FetchContent_Populate(pico_sdk)
             set(PICO_SDK_PATH ${pico_sdk_SOURCE_DIR})
         endif ()
         set(FETCHCONTENT_BASE_DIR ${FETCHCONTENT_BASE_DIR_SAVE})
     else ()
         message(FATAL_ERROR
-                "PICO SDK location was not specified. Please set PICO_SDK_PATH or set PICO_SDK_FETCH_FROM_GIT to on to fetch from git."
+                "SDK location was not specified. Please set PICO_SDK_PATH or set PICO_SDK_FETCH_FROM_GIT to on to fetch from git."
                 )
     endif ()
 endif ()
@@ -54,9 +54,9 @@ endif ()
 
 set(PICO_SDK_INIT_CMAKE_FILE ${PICO_SDK_PATH}/pico_sdk_init.cmake)
 if (NOT EXISTS ${PICO_SDK_INIT_CMAKE_FILE})
-    message(FATAL_ERROR "Directory '${PICO_SDK_PATH}' does not appear to contain the PICO SDK")
+    message(FATAL_ERROR "Directory '${PICO_SDK_PATH}' does not appear to contain the Raspberry Pi Pico SDK")
 endif ()
 
-set(PICO_SDK_PATH ${PICO_SDK_PATH} CACHE PATH "Path to the PICO SDK" FORCE)
+set(PICO_SDK_PATH ${PICO_SDK_PATH} CACHE PATH "Path to the Raspberry Pi Pico SDK" FORCE)
 
 include(${PICO_SDK_INIT_CMAKE_FILE})
