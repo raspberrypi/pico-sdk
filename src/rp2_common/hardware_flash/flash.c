@@ -171,7 +171,7 @@ void flash_get_unique_id(uint8_t *id_out) {
 #else
     uint8_t txbuf[FLASH_RUID_TOTAL_BYTES] = {0};
     uint8_t rxbuf[FLASH_RUID_TOTAL_BYTES] = {0};
-    txbuf[0] = 0x4b;
+    txbuf[0] = FLASH_RUID_CMD;
     flash_do_cmd(txbuf, rxbuf, FLASH_RUID_TOTAL_BYTES);
     for (int i = 0; i < FLASH_RUID_DATA_BYTES; i++)
         id_out[i] = rxbuf[i + 1 + FLASH_RUID_DUMMY_BYTES];
