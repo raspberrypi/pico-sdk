@@ -31,7 +31,7 @@ extern "C" {
  * code which uses both fewer CPU cycles and fewer CPU registers in the time critical sections of the
  * code.
  *
- * The interpolators are used heavily to accelerate audio operations within the Pico SDK, but their
+ * The interpolators are used heavily to accelerate audio operations within the SDK, but their
  * flexible configuration make it possible to optimise many other tasks such as quantization and
  * dithering, table lookup address generation, affine texture mapping, decompression and linear feedback.
  *

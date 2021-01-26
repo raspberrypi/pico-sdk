@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 #
-# Script to scan the Raspberry Pi PICO SDK tree searching for configuration items
+# Script to scan the Raspberry Pi Pico SDK tree searching for configuration items
 # Outputs a tab separated file of the configuration item:
 # name	location	description	type	advanced	default	depends	enumvalues	group	max	min
 #

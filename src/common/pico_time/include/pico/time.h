@@ -20,7 +20,7 @@ extern "C" {
  * API for accurate timestamps, sleeping, and time based callbacks
  *
  * \note The functions defined here provide a much more powerful and user friendly wrapping around the
- * low level hardware timer functionality. For these functions (and any other Pico SDK functionality
+ * low level hardware timer functionality. For these functions (and any other SDK functionality
  * e.g. timeouts, that relies on them) to work correctly, the hardware timer should not be modified. i.e. it is expected
  * to be monotonically increasing once per microsecond. Fortunately there is no need to modify the hardware
  * timer as any functionality you can think of that isn't already covered here can easily be modelled
@@ -355,7 +355,7 @@ void alarm_pool_init_default();
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 /*!
  * \brief The default alarm pool used when alarms are added without specifying an alarm pool,
- *        and also used by the Pico SDK to support lower power sleeps and timeouts.
+ *        and also used by the SDK to support lower power sleeps and timeouts.
  *
  * \ingroup alarm
  * \sa #PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM

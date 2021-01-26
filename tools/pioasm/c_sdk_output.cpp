@@ -19,7 +19,7 @@ struct c_sdk_output : public output_format {
     c_sdk_output() : output_format("c-sdk") {}
 
     std::string get_description() override {
-        return "C header suitable for use with the Pico SDK";
+        return "C header suitable for use with the Raspberry Pi Pico SDK";
     }
 
     void output_symbols(FILE *out, std::string prefix, const std::vector<compiled_source::symbol> &symbols) {
