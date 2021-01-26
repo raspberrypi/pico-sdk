@@ -23,7 +23,7 @@
  *
  * This header provides low level macros and inline functions for accessing the hardware dividers directly,
  * and perhaps most usefully performing asynchronous divides. These functions however do not follow the regular
- * Pico SDK conventions for saving/restoring the divider state, so are not generally safe to call from interrupt handlers
+ * SDK conventions for saving/restoring the divider state, so are not generally safe to call from interrupt handlers
  *
  * The pico_divider library provides a more user friendly set of APIs over the divider (and support for
  * 64 bit divides), and of course by default regular C language integer divisions are redirected through that library, meaning

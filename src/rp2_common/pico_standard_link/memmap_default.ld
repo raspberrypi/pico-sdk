@@ -35,7 +35,7 @@ SECTIONS
 {
     /* Second stage bootloader is prepended to the image. It must be 256 bytes big
        and checksummed. It is usually built by the boot_stage2 target
-       in the Pico SDK
+       in the Raspberry Pi Pico SDK
     */
 
     .flash_begin : {
