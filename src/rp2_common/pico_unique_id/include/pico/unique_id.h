@@ -31,7 +31,19 @@ extern "C" {
  * flash-resident interrupt routines to be disabled when called into.
  */
 
-#define PICO_UNIQUE_ID_SIZE_BYTES 8
+#define PICO_UNIQUE_BOARD_ID_SIZE_BYTES 8
+
+/**
+ * \brief Unique board identifier
+ * \ingroup unique_id
+ *
+ * This struct is suitable for holding the unique identifier of a NOR flash
+ * device on an RP2040-based board. It contains an array of
+ * PICO_UNIQUE_BOARD_ID_SIZE_BYTES identifier bytes.
+ */
+typedef struct {
+	uint8_t id[PICO_UNIQUE_BOARD_ID_SIZE_BYTES];
+} pico_unique_board_id_t;
 
 /*! \brief Get unique ID
  *  \ingroup unique_id
@@ -42,9 +54,9 @@ extern "C" {
  *
  * On PICO_NO_FLASH builds the unique identifier is set to all 0xEE.
  *
- * \param id_out an 8-byte buffer to which the identifer will be written.
+ * \param id_out a pointer to a pico_unique_board_id_t struct, to which the identifier will be written
  */
-void pico_get_unique_id(uint8_t *id_out);
+void pico_get_unique_board_id(pico_unique_board_id_t *id_out);
 
 #ifdef __cplusplus
 }
