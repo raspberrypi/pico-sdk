@@ -1,18 +1,16 @@
 # Pico SDK
 
-The Pico SDK provides the headers, libraries and build system
-necessary to write programs for the RP2040 based devices such as the Raspberry Pi Pico
-in C, C++ or assembly language.
+Provides the headers, libraries and build system necessary to write programs for RP2040-based devices such as the Raspberry Pi Pico in C, C++ or assembly language.
 
-The Pico SDK  is designed to provide an API and programming environment that is familiar both to non-embedded C developers and embedded C developers alike.
+The Pico SDK is designed to provide an API and programming environment that is familiar both to non-embedded C developers and embedded C developers alike.
 A single program runs on the device at a time and starts with a conventional `main()` method. Standard C/C++ libraries are supported along with
-C level libraries/APIs for accessing all of the RP2040's hardware include PIO (Programmable IO)
+C level libraries/APIs for accessing all of the RP2040's hardware include PIO (Programmable IO).
 
 Additionally the Pico SDK provides higher level libraries for dealing with timers, synchronization, USB (TinyUSB) and multi-core programming 
 along with various utilities.
 
 The Pico SDK can be used to build anything from simple applications, full fledged runtime environments such as MicroPython, to low level software
-such as RP2040's on chip bootrom itself.
+such as RP2040's on-chip bootrom itself.
 
 Additional libraries/APIs that are not yet ready for inclusion in the Pico SDK can be found in [pico-extras](https://github.com/raspberrypi/pico-extras).   
 
@@ -20,12 +18,12 @@ Additional libraries/APIs that are not yet ready for inclusion in the Pico SDK c
 
 See [Getting Started with the Raspberry Pi Pico](https://rptl.io/pico-get-started) for information on how to setup your
 hardware, IDE/environment and for how to build and debug software for the Raspberry Pi Pico
-and other RP2040 based devices.
+and other RP2040-based devices.
 
 See [Pico C/C++ SDK](https://rptl.io/pico-c-sdk) to learn more about programming using the
-Pico SDK, exploring more advanced features, and complete PDF based API documentation.
+Pico SDK, exploring more advanced features, and complete PDF-based API documentation.
 
-See [Online Pico SDK API docs](https://rptl.io/pico-doxygen) for HTML based API documentation.
+See [Online Pico SDK API docs](https://rptl.io/pico-doxygen) for HTML-based API documentation.
 
 # Example code
 
@@ -33,7 +31,7 @@ See [pico-examples](https://github.com/raspberrypi/pico-examples) for example co
 
 # Quick-start your own project
 
-These instructions are exteremly terse, and Linux based only. For detailed steps,
+These instructions are exteremly terse, and Linux-based only. For detailed steps,
 instructions for other platforms, and just in general, we recommend you see [Pico C/C++ SDK](https://rptl.io/pico-c-sdk)
 
 1. Install CMake (at least version 3.12), and GCC cross compiler
