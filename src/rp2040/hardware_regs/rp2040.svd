@@ -32852,6 +32852,48 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
+          <addressOffset>0x0428</addressOffset>
+          <description>Pacing (X/Y) Fractional Timer\n
+            The pacing timer produces TREQ assertions at a rate set by ((X/Y) * sys_clk). This equation is evaluated every sys_clk cycles and therefore can only generate TREQs at a rate of 1 per sys_clk (i.e. permanent TREQ) or less.</description>
+          <fields>
+            <field>
+              <access>read-write</access>
+              <bitRange>[31:16]</bitRange>
+              <description>Pacing Timer Dividend. Specifies the X value for the (X/Y) fractional timer.</description>
+              <name>X</name>
+            </field>
+            <field>
+              <access>read-write</access>
+              <bitRange>[15:0]</bitRange>
+              <description>Pacing Timer Divisor. Specifies the Y value for the (X/Y) fractional timer.</description>
+              <name>Y</name>
+            </field>
+          </fields>
+          <name>TIMER2</name>
+          <resetValue>0x00000000</resetValue>
+        </register>
+        <register>
+          <addressOffset>0x042c</addressOffset>
+          <description>Pacing (X/Y) Fractional Timer\n
+            The pacing timer produces TREQ assertions at a rate set by ((X/Y) * sys_clk). This equation is evaluated every sys_clk cycles and therefore can only generate TREQs at a rate of 1 per sys_clk (i.e. permanent TREQ) or less.</description>
+          <fields>
+            <field>
+              <access>read-write</access>
+              <bitRange>[31:16]</bitRange>
+              <description>Pacing Timer Dividend. Specifies the X value for the (X/Y) fractional timer.</description>
+              <name>X</name>
+            </field>
+            <field>
+              <access>read-write</access>
+              <bitRange>[15:0]</bitRange>
+              <description>Pacing Timer Divisor. Specifies the Y value for the (X/Y) fractional timer.</description>
+              <name>Y</name>
+            </field>
+          </fields>
+          <name>TIMER3</name>
+          <resetValue>0x00000000</resetValue>
+        </register>
+        <register>
           <addressOffset>0x0430</addressOffset>
           <description>Trigger one or more channels simultaneously</description>
           <fields>
