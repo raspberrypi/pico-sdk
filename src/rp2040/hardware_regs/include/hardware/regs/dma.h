@@ -4826,6 +4826,62 @@
 #define DMA_TIMER1_Y_LSB    0
 #define DMA_TIMER1_Y_ACCESS "RW"
 // =============================================================================
+// Register    : DMA_TIMER2
+// Description : Pacing (X/Y) Fractional Timer
+//               The pacing timer produces TREQ assertions at a rate set by
+//               ((X/Y) * sys_clk). This equation is evaluated every sys_clk
+//               cycles and therefore can only generate TREQs at a rate of 1 per
+//               sys_clk (i.e. permanent TREQ) or less.
+#define DMA_TIMER2_OFFSET 0x00000428
+#define DMA_TIMER2_BITS   0xffffffff
+#define DMA_TIMER2_RESET  0x00000000
+// -----------------------------------------------------------------------------
+// Field       : DMA_TIMER2_X
+// Description : Pacing Timer Dividend. Specifies the X value for the (X/Y)
+//               fractional timer.
+#define DMA_TIMER2_X_RESET  0x0000
+#define DMA_TIMER2_X_BITS   0xffff0000
+#define DMA_TIMER2_X_MSB    31
+#define DMA_TIMER2_X_LSB    16
+#define DMA_TIMER2_X_ACCESS "RW"
+// -----------------------------------------------------------------------------
+// Field       : DMA_TIMER2_Y
+// Description : Pacing Timer Divisor. Specifies the Y value for the (X/Y)
+//               fractional timer.
+#define DMA_TIMER2_Y_RESET  0x0000
+#define DMA_TIMER2_Y_BITS   0x0000ffff
+#define DMA_TIMER2_Y_MSB    15
+#define DMA_TIMER2_Y_LSB    0
+#define DMA_TIMER2_Y_ACCESS "RW"
+// =============================================================================
+// Register    : DMA_TIMER3
+// Description : Pacing (X/Y) Fractional Timer
+//               The pacing timer produces TREQ assertions at a rate set by
+//               ((X/Y) * sys_clk). This equation is evaluated every sys_clk
+//               cycles and therefore can only generate TREQs at a rate of 1 per
+//               sys_clk (i.e. permanent TREQ) or less.
+#define DMA_TIMER3_OFFSET 0x0000042c
+#define DMA_TIMER3_BITS   0xffffffff
+#define DMA_TIMER3_RESET  0x00000000
+// -----------------------------------------------------------------------------
+// Field       : DMA_TIMER3_X
+// Description : Pacing Timer Dividend. Specifies the X value for the (X/Y)
+//               fractional timer.
+#define DMA_TIMER3_X_RESET  0x0000
+#define DMA_TIMER3_X_BITS   0xffff0000
+#define DMA_TIMER3_X_MSB    31
+#define DMA_TIMER3_X_LSB    16
+#define DMA_TIMER3_X_ACCESS "RW"
+// -----------------------------------------------------------------------------
+// Field       : DMA_TIMER3_Y
+// Description : Pacing Timer Divisor. Specifies the Y value for the (X/Y)
+//               fractional timer.
+#define DMA_TIMER3_Y_RESET  0x0000
+#define DMA_TIMER3_Y_BITS   0x0000ffff
+#define DMA_TIMER3_Y_MSB    15
+#define DMA_TIMER3_Y_LSB    0
+#define DMA_TIMER3_Y_ACCESS "RW"
+// =============================================================================
 // Register    : DMA_MULTI_CHAN_TRIGGER
 // Description : Trigger one or more channels simultaneously
 //               Each bit in this register corresponds to a DMA channel. Writing

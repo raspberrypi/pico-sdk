@@ -48,12 +48,11 @@ typedef struct {
     io_rw_32 inte1;
     io_rw_32 intf1;
     io_rw_32 ints1;
-    io_rw_32 timer[2];
-    uint32_t _pad2[2];
+    io_rw_32 timer[4];
     io_wo_32 multi_channel_trigger;
     io_rw_32 sniff_ctrl;
     io_rw_32 sniff_data;
-    uint32_t _pad3[1];
+    uint32_t _pad2[1];
     io_ro_32 fifo_levels;
     io_wo_32 abort;
 } dma_hw_t;
