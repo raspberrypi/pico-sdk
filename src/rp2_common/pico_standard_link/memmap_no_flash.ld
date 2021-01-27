@@ -32,17 +32,21 @@ ENTRY(_entry_point)
 
 SECTIONS
 {
-    /* Watchdog reboot into RAM (via USB MSD) will enter image at the start of .text
-       The debugger will use the ELF entry point, which is the _entry_point
-       symbol if present, otherwise defaults to start of .text.
+    /* Note in NO_FLASH builds the entry point for both the bootrom, and debugger
+       entry (ELF entry point), are *first* in the image, and the vector table
+       follows immediately afterward. This is because the bootrom enters RAM
+       binaries directly at their lowest address (preferring main RAM over XIP
+       cache-as-SRAM if both are used).
     */
 
     .text : {
+        __logical_binary_start = .;
         __reset_start = .;
         KEEP (*(.reset))
-        . = ALIGN(256);
         __reset_end = .;
-        ASSERT(__reset_end - __reset_start == 256, "ERROR: reset section should only be 256 bytes");
+        KEEP (*(.binary_info_header))
+        __binary_info_header_end = .;
+        . = ALIGN(256);
           KEEP (*(.vectors))
         *(.time_critical*)
         *(.text*)
@@ -206,6 +210,8 @@ SECTIONS
 
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed")
+
+    ASSERT( __binary_info_header_end - __logical_binary_start <= 256, "Binary info must be in first 256 bytes of the binary")
     /* todo assert on extra code */
 }
 

@@ -146,6 +146,24 @@ unhandled_user_irq_num_in_r0:
 
 // ----------------------------------------------------------------------------
 
+.section .binary_info_header, "a"
+
+// Header must be in first 256 bytes of main image (i.e. excluding flash boot2).
+// For flash builds we put it immediately after vector table; for NO_FLASH the
+// vectors are at a +0x100 offset because the bootrom enters RAM images directly
+// at their lowest address, so we put the header in the VTOR alignment hole.
+
+#if !PICO_NO_BINARY_INFO
+binary_info_header:
+.word BINARY_INFO_MARKER_START
+.word __binary_info_start
+.word __binary_info_end
+.word data_cpy_table // we may need to decode pointers that are in RAM at runtime.
+.word BINARY_INFO_MARKER_END
+#endif
+
+// ----------------------------------------------------------------------------
+
 .section .reset, "ax"
 
 // On flash builds, the vector table comes first in the image (conventional).
@@ -181,17 +199,6 @@ _entry_point:
     msr msp, r1
     bx r2
 
-// Header must be in first 256 bytes of main flash image.
-#if !PICO_NO_BINARY_INFO
-binary_info_header:
-.word BINARY_INFO_MARKER_START
-.word __binary_info_start
-.word __binary_info_end
-.word data_cpy_table // we may need to decode pointers that are in RAM at runtime.
-.word BINARY_INFO_MARKER_END
-#endif
-
-// ----------------------------------------------------------------------------
 // Reset handler:
 // - initialises .data
 // - clears .bss
@@ -202,11 +209,11 @@ binary_info_header:
 .type _reset_handler,%function
 .thumb_func
 _reset_handler:
-    // Hang all cores except core 0
+    // Only core 0 should run this code (or indeed be able to reach it)
     ldr r0, =(SIO_BASE + SIO_CPUID_OFFSET)
     ldr r0, [r0]
     cmp r0, #0
-    bne wait_for_vector
+    bne send_other_cores_to_bootrom
 
     adr r4, data_cpy_table
 
@@ -289,11 +296,12 @@ runtime_init:
     bx lr
 
 // ----------------------------------------------------------------------------
-// In case core 1's VTOR has already been moved into flash, we need to handle
-// core 1 reset. However, we do so by just jumping back into bootrom version of
-// wait_for_vector
+// If core 1 somehow gets into crt0 due to a spectacular VTOR mishap, we need to
+// catch it and send back to the sleep-and-launch code in the bootrom. Shouldn't
+// happen (it should sleep in the ROM until given an entry point via the
+// cross-core FIFOs) but it's good to be defensive.
 
-wait_for_vector:
+send_other_cores_to_bootrom:
     ldr r0, = 'W' | ('V' << 8)
     bl rom_func_lookup
     bx r0

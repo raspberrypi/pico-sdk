@@ -59,7 +59,10 @@ SECTIONS
     */
 
     .flashtext : {
+        __logical_binary_start = .;
         KEEP (*(.vectors))
+        KEEP (*(.binary_info_header))
+        __binary_info_header_end = .;
         KEEP (*(.reset))
     }
 
@@ -243,6 +246,8 @@ SECTIONS
 
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed")
+
+    ASSERT( __binary_info_header_end - __logical_binary_start <= 256, "Binary info must be in first 256 bytes of the binary")
     /* todo assert on extra code */
 }
 
