@@ -48,7 +48,6 @@ typedef struct {
 /*! \brief Get unique ID
  *  \ingroup unique_id
  *
-
  * Get the unique 64-bit device identifier which was retrieved from the
  * external NOR flash device at boot.
  *
