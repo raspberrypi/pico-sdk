@@ -26,7 +26,7 @@ function(pico_define_boot_stage2 NAME SOURCES)
     endif ()
 
     # boot2_helpers include dir
-    target_include_directories(${NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/asminclude)
+    target_include_directories(${NAME} PRIVATE ${PICO_BOOT_STAGE2_DIR}/asminclude)
 
     target_link_libraries(${NAME} hardware_regs)
     target_link_options(${NAME} PRIVATE "LINKER:--script=${PICO_BOOT_STAGE2_DIR}/boot_stage2.ld")
