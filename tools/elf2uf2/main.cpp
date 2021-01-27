@@ -63,6 +63,8 @@ typedef std::vector<address_range> address_ranges;
 #define MAIN_RAM_END   0x20042000u
 #define FLASH_START    0x10000000u
 #define FLASH_END      0x15000000u
+#define XIP_SRAM_START 0x15000000u
+#define XIP_SRAM_END   0x15004000u
 
 const address_ranges rp2040_address_ranges_flash {
     address_range(FLASH_START, FLASH_END, address_range::type::CONTENTS),
@@ -71,7 +73,8 @@ const address_ranges rp2040_address_ranges_flash {
 
 const address_ranges rp2040_address_ranges_ram {
     address_range(MAIN_RAM_START, MAIN_RAM_END, address_range::type::CONTENTS),
-    address_range(0x00000000u, 0x00002000u, address_range::type::IGNORE) // for now we ignore the bootrom if present
+    address_range(XIP_SRAM_START, XIP_SRAM_END, address_range::type::CONTENTS),
+    address_range(0x00000000u, 0x00004000u, address_range::type::IGNORE) // for now we ignore the bootrom if present
 };
 
 struct page_fragment {
@@ -212,6 +215,15 @@ static bool is_address_valid(const address_ranges& valid_ranges, uint32_t addr) 
     return false;
 }
 
+static bool is_address_initialized(const address_ranges& valid_ranges, uint32_t addr) {
+    for(const auto& range : valid_ranges) {
+        if (range.from <= addr && range.to > addr) {
+            return address_range::type::CONTENTS == range.type;
+        }
+    }
+    return false;
+}
+
 static bool is_address_mapped(const std::map<uint32_t, std::vector<page_fragment>>& pages, uint32_t addr) {
     uint32_t page = addr & ~(PAGE_SIZE - 1);
     if (!pages.count(page)) return false;
@@ -226,7 +238,7 @@ int elf2uf2(FILE *in, FILE *out) {
     bool ram_style = false;
     address_ranges valid_ranges = {};
     if (!rc) {
-        ram_style = 0x2 == eh.entry >> 28u;
+        ram_style = is_address_initialized(rp2040_address_ranges_ram, eh.entry);
         if (verbose) {
             if (ram_style) {
                 printf("Detected RAM binary\n");
