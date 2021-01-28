@@ -16,6 +16,7 @@ enum {
     PICO_ERROR_TIMEOUT = -1,
     PICO_ERROR_GENERIC = -2,
     PICO_ERROR_NO_DATA = -3,
+    PICO_ERROR_OUT_OF_RANGE = -4,
 };
 
 #endif
