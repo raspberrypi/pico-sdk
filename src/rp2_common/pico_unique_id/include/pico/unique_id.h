@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 /** \file pico/unique_id.h
- *  \defgroup unique_id unique_id
+ *  \defgroup pico_unique_id pico_unique_id
  *
  * Unique device ID access API
  *
@@ -35,7 +35,7 @@ extern "C" {
 
 /**
  * \brief Unique board identifier
- * \ingroup unique_id
+ * \ingroup pico_unique_id
  *
  * This struct is suitable for holding the unique identifier of a NOR flash
  * device on an RP2040-based board. It contains an array of
@@ -46,7 +46,7 @@ typedef struct {
 } pico_unique_board_id_t;
 
 /*! \brief Get unique ID
- *  \ingroup unique_id
+ *  \ingroup pico_unique_id
  *
  * Get the unique 64-bit device identifier which was retrieved from the
  * external NOR flash device at boot.
