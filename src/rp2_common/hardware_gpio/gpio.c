@@ -16,7 +16,7 @@ static gpio_irq_callback_t _callbacks[NUM_CORES];
 
 // Get the raw value from the pin, bypassing any muxing or overrides.
 int gpio_get_pad(uint gpio) {
-    invalid_params_if(GPIO, gpio >= N_GPIOS);
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
     hw_set_bits(&padsbank0_hw->io[gpio], PADS_BANK0_GPIO0_IE_BITS);
     return (iobank0_hw->io[gpio].status & IO_BANK0_GPIO0_STATUS_INFROMPAD_BITS)
             >> IO_BANK0_GPIO0_STATUS_INFROMPAD_LSB;
@@ -26,7 +26,7 @@ int gpio_get_pad(uint gpio) {
 // Select function for this GPIO, and ensure input/output are enabled at the pad.
 // This also clears the input/output/irq override bits.
 void gpio_set_function(uint gpio, enum gpio_function fn) {
-    invalid_params_if(GPIO, gpio >= N_GPIOS);
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
     invalid_params_if(GPIO, fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB & ~IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS);
     // Set input enable on, output disable off
     hw_write_masked(&padsbank0_hw->io[gpio],
@@ -40,14 +40,14 @@ void gpio_set_function(uint gpio, enum gpio_function fn) {
 /// \end::gpio_set_function[]
 
 enum gpio_function gpio_get_function(uint gpio) {
-    invalid_params_if(GPIO, gpio >= N_GPIOS);
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
     return (enum gpio_function) ((iobank0_hw->io[gpio].ctrl & IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS) >> IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB);
 }
 
 // Note that, on RP2040, setting both pulls enables a "bus keep" function,
 // i.e. weak pull to whatever is current high/low state of GPIO.
 void gpio_set_pulls(uint gpio, bool up, bool down) {
-    invalid_params_if(GPIO, gpio >= N_GPIOS);
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
     hw_write_masked(
             &padsbank0_hw->io[gpio],
             (!!up << PADS_BANK0_GPIO0_PUE_LSB) | (!!down << PADS_BANK0_GPIO0_PDE_LSB),
@@ -57,7 +57,7 @@ void gpio_set_pulls(uint gpio, bool up, bool down) {
 
 // Direct overrides for pad controls
 void gpio_set_inover(uint gpio, uint value) {
-    invalid_params_if(GPIO, gpio >= N_GPIOS);
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
     hw_write_masked(&iobank0_hw->io[gpio].ctrl,
                    value << IO_BANK0_GPIO0_CTRL_INOVER_LSB,
                    IO_BANK0_GPIO0_CTRL_INOVER_BITS
@@ -65,7 +65,7 @@ void gpio_set_inover(uint gpio, uint value) {
 }
 
 void gpio_set_outover(uint gpio, uint value) {
-    invalid_params_if(GPIO, gpio >= N_GPIOS);
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
     hw_write_masked(&iobank0_hw->io[gpio].ctrl,
                    value << IO_BANK0_GPIO0_CTRL_OUTOVER_LSB,
                    IO_BANK0_GPIO0_CTRL_OUTOVER_BITS
@@ -73,7 +73,7 @@ void gpio_set_outover(uint gpio, uint value) {
 }
 
 void gpio_set_oeover(uint gpio, uint value) {
-    invalid_params_if(GPIO, gpio >= N_GPIOS);
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
     hw_write_masked(&iobank0_hw->io[gpio].ctrl,
                    value << IO_BANK0_GPIO0_CTRL_OEOVER_LSB,
                    IO_BANK0_GPIO0_CTRL_OEOVER_BITS
@@ -83,7 +83,7 @@ void gpio_set_oeover(uint gpio, uint value) {
 static void gpio_irq_handler(void) {
     io_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?
                                            &iobank0_hw->proc1_irq_ctrl : &iobank0_hw->proc0_irq_ctrl;
-    for (uint gpio = 0; gpio < N_GPIOS; gpio++) {
+    for (uint gpio = 0; gpio < NUM_BANK0_GPIOS; gpio++) {
         io_rw_32 *status_reg = &irq_ctrl_base->ints[gpio / 8];
         uint events = (*status_reg >> 4 * (gpio % 8)) & 0xf;
         if (events) {
