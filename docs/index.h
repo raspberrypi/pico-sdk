@@ -41,6 +41,7 @@
  * set of functionality above the basic hardware interfaces
  * @{
  * \defgroup pico_multicore pico_multicore
+ * \defgroup pico_stdlib pico_stdio
  * \defgroup pico_stdlib pico_stdlib
  * \defgroup pico_sync pico_sync
  * \defgroup pico_time pico_time
