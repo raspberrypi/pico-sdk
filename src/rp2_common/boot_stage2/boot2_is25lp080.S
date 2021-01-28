@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
-// Second stage boot code
-// Copyright (c) 2019 Raspberry Pi (Trading) Ltd.
+// Copyright (c) 2019-2021 Raspberry Pi (Trading) Ltd.
+// SPDX-License-Identifier: BSD-3-Clause
 //
 // Device:      ISSI IS25LP080D
 //              Based on W25Q080 code: main difference is the QE bit being in
@@ -29,7 +29,7 @@
 
 #include "pico/asm_helper.S"
 #include "hardware/regs/addressmap.h"
-#include "ssi.h"
+#include "hardware/regs/ssi.h"
 
 // ----------------------------------------------------------------------------
 // Config section
@@ -89,16 +89,17 @@
 .type _stage2_boot,%function
 .thumb_func
 _stage2_boot:
+    push {lr}
 
-    ldr r5, =XIP_SSI_BASE                // Use as base address where possible
+    ldr r3, =XIP_SSI_BASE                // Use as base address where possible
 
     // Disable SSI to allow further config
     mov r1, #0
-    str r1, [r5, #SSI_SSIENR_OFFSET]
+    str r1, [r3, #SSI_SSIENR_OFFSET]
 
     // Set baud rate
     mov r1, #PICO_FLASH_SPI_CLKDIV
-    str r1, [r5, #SSI_BAUDR_OFFSET]
+    str r1, [r3, #SSI_BAUDR_OFFSET]
 
 // On QSPI parts we usually need a 01h SR-write command to enable QSPI mode
 // (i.e. turn WPn and HOLDn into IO2/IO3)
@@ -109,11 +110,11 @@ program_sregs:
     (SSI_CTRLR0_TMOD_VALUE_TX_AND_RX << SSI_CTRLR0_TMOD_LSB)
 
     ldr r1, =(CTRL0_SPI_TXRX)
-    str r1, [r5, #SSI_CTRLR0_OFFSET]
+    str r1, [r3, #SSI_CTRLR0_OFFSET]
 
      // Enable SSI and select slave 0
     mov r1, #1
-    str r1, [r5, #SSI_SSIENR_OFFSET]
+    str r1, [r3, #SSI_SSIENR_OFFSET]
 
     // Check whether SR needs updating
     ldr r0, =CMD_READ_STATUS
@@ -124,21 +125,21 @@ program_sregs:
 
     // Send write enable command
     mov r1, #CMD_WRITE_ENABLE
-    str r1, [r5, #SSI_DR0_OFFSET]
+    str r1, [r3, #SSI_DR0_OFFSET]
 
     // Poll for completion and discard RX
     bl wait_ssi_ready
-    ldr r1, [r5, #SSI_DR0_OFFSET]
+    ldr r1, [r3, #SSI_DR0_OFFSET]
 
     // Send status write command followed by data bytes
     mov r1, #CMD_WRITE_STATUS
-    str r1, [r5, #SSI_DR0_OFFSET]
+    str r1, [r3, #SSI_DR0_OFFSET]
     mov r0, #0
-    str r2, [r5, #SSI_DR0_OFFSET]
+    str r2, [r3, #SSI_DR0_OFFSET]
 
     bl wait_ssi_ready
-    ldr r1, [r5, #SSI_DR0_OFFSET]
-    ldr r1, [r5, #SSI_DR0_OFFSET]
+    ldr r1, [r3, #SSI_DR0_OFFSET]
+    ldr r1, [r3, #SSI_DR0_OFFSET]
 
     // Poll status register for write completion
 1:
@@ -152,12 +153,12 @@ skip_sreg_programming:
 
     // Send a 0xA3 high-performance-mode instruction
 //    ldr r1, =0xa3
-//    str r1, [r5, #SSI_DR0_OFFSET]
+//    str r1, [r3, #SSI_DR0_OFFSET]
 //    bl wait_ssi_ready
 
     // Disable SSI again so that it can be reconfigured
     mov r1, #0
-    str r1, [r5, #SSI_SSIENR_OFFSET]
+    str r1, [r3, #SSI_SSIENR_OFFSET]
 #endif
 
 
@@ -179,10 +180,10 @@ dummy_read:
         << SSI_CTRLR0_TMOD_LSB)
 
     ldr r1, =(CTRLR0_ENTER_XIP)
-    str r1, [r5, #SSI_CTRLR0_OFFSET]
+    str r1, [r3, #SSI_CTRLR0_OFFSET]
 
     mov r1, #0x0                    // NDF=0 (single 32b read)
-    str r1, [r5, #SSI_CTRLR1_OFFSET]
+    str r1, [r3, #SSI_CTRLR1_OFFSET]
 
 #define SPI_CTRLR0_ENTER_XIP \
     (ADDR_L << SSI_SPI_CTRLR0_ADDR_L_LSB) |     /* Address + mode bits */ \
@@ -197,12 +198,12 @@ dummy_read:
     str r1, [r0]
 
     mov r1, #1                      // Re-enable SSI
-    str r1, [r5, #SSI_SSIENR_OFFSET]
+    str r1, [r3, #SSI_SSIENR_OFFSET]
 
     mov r1, #CMD_READ 
-    str r1, [r5, #SSI_DR0_OFFSET]   // Push SPI command into TX FIFO
+    str r1, [r3, #SSI_DR0_OFFSET]   // Push SPI command into TX FIFO
     mov r1, #MODE_CONTINUOUS_READ   // 32-bit: 24 address bits (we don't care, so 0) and M[7:4]=1010
-    str r1, [r5, #SSI_DR0_OFFSET]   // Push Address into TX FIFO - this will trigger the transaction
+    str r1, [r3, #SSI_DR0_OFFSET]   // Push Address into TX FIFO - this will trigger the transaction
 
     // Poll for completion
     bl wait_ssi_ready
@@ -218,7 +219,7 @@ dummy_read:
 // to 4'b0000).
 
     mov r1, #0
-    str r1, [r5, #SSI_SSIENR_OFFSET]   // Disable SSI (and clear FIFO) to allow further config
+    str r1, [r3, #SSI_SSIENR_OFFSET]   // Disable SSI (and clear FIFO) to allow further config
 
 // Note that the INST_L field is used to select what XIP data gets pushed into
 // the TX FIFO:
@@ -240,57 +241,19 @@ configure_ssi:
     str r1, [r0]
 
     mov r1, #1
-    str r1, [r5, #SSI_SSIENR_OFFSET]   // Re-enable SSI
+    str r1, [r3, #SSI_SSIENR_OFFSET]   // Re-enable SSI
 
 // We are now in XIP mode, with all transactions using Dual I/O and only
 // needing to send 24-bit addresses (plus mode bits) for each read transaction.
 
-soft_reset:
-    // Just jump to start of image after this 256-byte boot stage2 (with thumb bit set)
-    ldr r0, =(XIP_BASE + 256 + 1)
-    bx  r0
+// Pull in standard exit routine
+#include "boot2_helpers/exit_from_boot2.S"
 
 // Common functions
-
-wait_ssi_ready:
-    push {r0, r1, lr}
-
-    // Command is complete when there is nothing left to send
-    // (TX FIFO empty) and SSI is no longer busy (CSn deasserted)
-1:
-    ldr r1, [r5, #SSI_SR_OFFSET]
-    mov r0, #SSI_SR_TFE_BITS
-    tst r1, r0
-    beq 1b
-    mov r0, #SSI_SR_BUSY_BITS
-    tst r1, r0
-    bne 1b
-
-    pop {r0, r1, pc}
-
+#include "boot2_helpers/wait_ssi_ready.S"
 #ifdef PROGRAM_STATUS_REG
-// Pass status read cmd into r0.
-// Returns status value in r0.
-.global read_flash_sreg
-.type read_flash_sreg,%function
-.thumb_func
-read_flash_sreg:
-    push {r1, lr}
-    str r0, [r5, #SSI_DR0_OFFSET]
-    // Dummy byte:
-    str r0, [r5, #SSI_DR0_OFFSET]
-    
-    bl wait_ssi_ready
-    // Discard first byte and combine the next two
-    ldr r0, [r5, #SSI_DR0_OFFSET]
-    ldr r0, [r5, #SSI_DR0_OFFSET]
-
-    pop {r1, pc}
+#include "boot2_helpers/read_flash_sreg.S"
 #endif
-
-// ----------------------------------------------------------------------------
-// Literal Table
-// ----------------------------------------------------------------------------
 
 .global literals
 literals:

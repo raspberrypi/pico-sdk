@@ -1,6 +1,7 @@
 // ----------------------------------------------------------------------------
 // Second stage boot code
-// Copyright (c) 2019 Raspberry Pi (Trading) Ltd.
+// Copyright (c) 2019-2021 Raspberry Pi (Trading) Ltd.
+// SPDX-License-Identifier: BSD-3-Clause
 //
 // Device:      Winbond W25Q080
 //              Also supports W25Q16JV (which has some different SR instructions)
@@ -270,58 +271,14 @@ configure_ssi:
 // Bus accesses to the XIP window will now be transparently serviced by the
 // external flash on cache miss. We are ready to run code from flash.
 
-soft_reset:
-    // Jump to exit point provided in lr. Bootrom will pass null, in which
-    // case we use default exit target at a 256 byte offset into XIP region
-    // (immediately after this second stage's flash location)
-    pop {r0}
-    cmp r0, #0
-    bne 1f
-    ldr r0, =(XIP_BASE + 0x101)
-1:
-    bx r0
+// Pull in standard exit routine
+#include "boot2_helpers/exit_from_boot2.S"
 
 // Common functions
-
-wait_ssi_ready:
-    push {r0, r1, lr}
-
-    // Command is complete when there is nothing left to send
-    // (TX FIFO empty) and SSI is no longer busy (CSn deasserted)
-1:
-    ldr r1, [r3, #SSI_SR_OFFSET]
-    movs r0, #SSI_SR_TFE_BITS
-    tst r1, r0
-    beq 1b
-    movs r0, #SSI_SR_BUSY_BITS
-    tst r1, r0
-    bne 1b
-
-    pop {r0, r1, pc}
-
+#include "boot2_helpers/wait_ssi_ready.S"
 #ifdef PROGRAM_STATUS_REG
-// Pass status read cmd into r0.
-// Returns status value in r0.
-.global read_flash_sreg
-.type read_flash_sreg,%function
-.thumb_func
-read_flash_sreg:
-    push {r1, lr}
-    str r0, [r3, #SSI_DR0_OFFSET]
-    // Dummy byte:
-    str r0, [r3, #SSI_DR0_OFFSET]
-    
-    bl wait_ssi_ready
-    // Discard first byte and combine the next two
-    ldr r0, [r3, #SSI_DR0_OFFSET]
-    ldr r0, [r3, #SSI_DR0_OFFSET]
-
-    pop {r1, pc}
+#include "boot2_helpers/read_flash_sreg.S"
 #endif
-
-// ----------------------------------------------------------------------------
-// Literal Table
-// ----------------------------------------------------------------------------
 
 .global literals
 literals:
