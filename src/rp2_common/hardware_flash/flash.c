@@ -115,7 +115,7 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
 #if !PICO_NO_FLASH
 // Bitbanging the chip select using IO overrides, in case RAM-resident IRQs
 // are still running, and the FIFO bottoms out. (the bootrom does the same)
-static void flash_cs_force(bool high) {
+static void __no_inline_not_in_flash_func(flash_cs_force)(bool high) {
     uint32_t field_val = high ?
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_HIGH :
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_LOW;
