@@ -209,11 +209,12 @@ _entry_point:
 .type _reset_handler,%function
 .thumb_func
 _reset_handler:
-    // Only core 0 should run this code (or indeed be able to reach it)
+    // Only core 0 should run the C runtime startup code; core 1 is normally
+    // sleeping in the bootrom at this point but check to be sure
     ldr r0, =(SIO_BASE + SIO_CPUID_OFFSET)
     ldr r0, [r0]
     cmp r0, #0
-    bne send_other_cores_to_bootrom
+    bne hold_non_core0_in_bootrom
 
     adr r4, data_cpy_table
 
@@ -301,7 +302,7 @@ runtime_init:
 // happen (it should sleep in the ROM until given an entry point via the
 // cross-core FIFOs) but it's good to be defensive.
 
-send_other_cores_to_bootrom:
+hold_non_core0_in_bootrom:
     ldr r0, = 'W' | ('V' << 8)
     bl rom_func_lookup
     bx r0
