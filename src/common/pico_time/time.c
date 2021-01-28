@@ -14,7 +14,6 @@
 #include "hardware/gpio.h"
 
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(nil_time, 0);
-// use LONG_MAX not ULONG_MAX so we don't have sign overflow in time diffs
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(at_the_end_of_time, ULONG_MAX);
 
 typedef struct alarm_pool_entry {
