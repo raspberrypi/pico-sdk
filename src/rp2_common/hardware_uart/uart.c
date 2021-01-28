@@ -75,23 +75,25 @@ uint uart_set_baudrate(uart_inst_t *uart, uint baudrate) {
     uint32_t baud_rate_div = (8 * clock_get_hz(clk_peri) / baudrate);
     uint32_t baud_ibrd = baud_rate_div >> 7;
     uint32_t baud_fbrd = ((baud_rate_div & 0x7f) + 1) / 2;
-    invalid_params_if(UART, (baud_ibrd > 65535) || (baud_ibrd == 0));
+
+    if (baud_ibrd == 0) {
+        baud_ibrd = 1;
+        baud_fbrd = 0;
+    } else if (baud_ibrd >= 65535) {
+        baud_ibrd = 65535;
+        baud_fbrd = 0;
+    }
 
     // Load PL011's baud divisor registers
     uart_get_hw(uart)->ibrd = baud_ibrd;
-    if (baud_ibrd == 65535) {
-        uart_get_hw(uart)->fbrd = 0;
-    } else {
-        uart_get_hw(uart)->fbrd = baud_fbrd;
-    }
+    uart_get_hw(uart)->fbrd = baud_fbrd;
 
     // PL011 needs a (dummy) line control register write to latch in the
     // divisors. We don't want to actually change LCR contents here.
     hw_set_bits(&uart_get_hw(uart)->lcr_h, 0);
 
     // See datasheet
-    uint baud = (4 * clock_get_hz(clk_peri)) / (64 * baud_ibrd + baud_fbrd);
-    return baud;
+    return (4 * clock_get_hz(clk_peri)) / (64 * baud_ibrd + baud_fbrd);
 }
 /// \end::uart_set_baudrate[]
 
