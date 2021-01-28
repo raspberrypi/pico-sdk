@@ -1,6 +1,6 @@
 # For boards without their own cmake file, simply include a header
 
-# PICO_CMAKE_CONFIG: PICO_BOARD_HEADER_DIRS, Directors to look for <PICO_BOARD>.h in. This is overridable from the user environment, type=list, default="", group=build
+# PICO_CMAKE_CONFIG: PICO_BOARD_HEADER_DIRS, Directories to look for <PICO_BOARD>.h in. This is overridable from the user environment, type=list, default="", group=build
 if (DEFINED ENV{PICO_BOARD_HEADER_DIRS})
     set(PICO_BOARD_HEADER_DIRS $ENV{PICO_BOARD_HEADER_DIRS})
     message("Using PICO_BOARD_HEADER_DIRS from environment ('${PICO_BOARD_HEADER_DIRS}')")
