@@ -143,9 +143,13 @@ static inline absolute_time_t make_timeout_time_ms(uint32_t ms) {
 /*! \brief Return the difference in microseconds between two timestamps
  * \ingroup timestamp
  *
+ * \note be careful when diffing against large timestamps (e.g. \ref at_the_end_of_time)
+ * as the signed integer may overflow.
+ *
  * \param from the first timestamp
  * \param to the second timestamp
- * \return the number of microseconds between the two timestamps (positive if `to` is after `from`)
+ * \return the number of microseconds between the two timestamps (positive if `to` is after `from` except
+ * in case of overflow)
  */
 static inline int64_t absolute_time_diff_us(absolute_time_t from, absolute_time_t to) {
     return to_us_since_boot(to) - to_us_since_boot(from);
