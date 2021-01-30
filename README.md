@@ -38,7 +38,7 @@ instructions for other platforms, and just in general, we recommend you see [Pic
 
 1. Install CMake (at least version 3.12), and GCC cross compiler
    ```
-   sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi
+   sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi doxygen
    ```
 1. Set up your project to point to use the Pico SDK
    
