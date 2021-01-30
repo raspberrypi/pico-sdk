@@ -252,6 +252,8 @@ int spi_read_blocking(spi_inst_t *spi, uint8_t repeated_tx_data, uint8_t *dst, s
  * Write \p len halfwords from \p src to SPI. Simultaneously read \p len halfwords from SPI to \p dst.
  * Blocks until all data is transferred. No timeout, as SPI hardware always transfers at a known data rate.
  *
+ * \note SPI should be initialised with 16 data_bits using \ref spi_set_format first, otherwise this function will only read/write 8 data_bits.
+ *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \param src Buffer of data to write
  * \param dst Buffer for read data
@@ -265,6 +267,8 @@ int spi_write16_read16_blocking(spi_inst_t *spi, const uint16_t *src, uint16_t *
  *
  * Write \p len halfwords from \p src to SPI. Discard any data received back.
  * Blocks until all data is transferred. No timeout, as SPI hardware always transfers at a known data rate.
+ *
+ * \note SPI should be initialised with 16 data_bits using \ref spi_set_format first, otherwise this function will only write 8 data_bits.
  *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \param src Buffer of data to write
@@ -281,6 +285,8 @@ int spi_write16_blocking(spi_inst_t *spi, const uint16_t *src, size_t len);
  * \p repeated_tx_data is output repeatedly on TX as data is read in from RX.
  * Generally this can be 0, but some devices require a specific value here,
  * e.g. SD cards expect 0xff
+ *
+ * \note SPI should be initialised with 16 data_bits using \ref spi_set_format first, otherwise this function will only read 8 data_bits.
  *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \param repeated_tx_data Buffer of data to write
