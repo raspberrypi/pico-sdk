@@ -124,10 +124,9 @@ uint pio_add_program(PIO pio, const pio_program_t *program) {
     return offset;
 }
 
-void pio_add_program_at_offset(PIO pio, const pio_program_t *program, uint offset)
-{
+void pio_add_program_at_offset(PIO pio, const pio_program_t *program, uint offset) {
     uint32_t save = hw_claim_lock();
-     _pio_add_program_at_offset(pio, program, offset);
+    _pio_add_program_at_offset(pio, program, offset);
     hw_claim_unlock(save);
 }
 
