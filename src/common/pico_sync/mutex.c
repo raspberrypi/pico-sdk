@@ -72,7 +72,7 @@ bool __time_critical_func(mutex_enter_block_until)(mutex_t *mtx, absolute_time_t
 
 void __time_critical_func(mutex_exit)(mutex_t *mtx) {
     uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
-    assert(mtx->owned);
+    assert(mtx->owner >= 0);
     mtx->owner = -1;
     __sev();
     spin_unlock(mtx->core.spin_lock, save);
