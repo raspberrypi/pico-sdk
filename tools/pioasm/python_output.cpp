@@ -215,7 +215,7 @@ struct python_output : public output_format {
                 if (source.empty()) {
                     invalid = true;
                 } else {
-                    op("in");
+                    op("in_");
                     op_guts(source + ", " + std::to_string(arg2 ? arg2 : 32));
                 }
                 break;
