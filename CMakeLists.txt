@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.13)
 if (NOT TARGET _pico_sdk_inclusion_marker)
     add_library(_pico_sdk_inclusion_marker INTERFACE)
     include(pico_sdk_init.cmake)

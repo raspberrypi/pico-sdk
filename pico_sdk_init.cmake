@@ -1,4 +1,4 @@
-# Initialize the PICO SDK
+# Initialize the Raspberry Pi Pico SDK
 # This file must be included prior to the project() call
 
 if (_PICO_SDK_INIT)
@@ -22,14 +22,14 @@ endif ()
 
 get_filename_component(PICO_SDK_PATH "${PICO_SDK_PATH}" REALPATH BASE_DIR "${CMAKE_BINARY_DIR}")
 
-set(PICO_SDK_PATH ${CMAKE_CURRENT_LIST_DIR} CACHE PATH "Path to the Pico SDK" FORCE)
+set(PICO_SDK_PATH ${CMAKE_CURRENT_LIST_DIR} CACHE PATH "Path to the Raspberry Pi Pico SDK" FORCE)
 
 list(APPEND CMAKE_MODULE_PATH ${PICO_SDK_PATH}/cmake)
 
 include(${CMAKE_CURRENT_LIST_DIR}/pico_sdk_version.cmake)
 include(pico_utils)
 
-message("Pico SDK is located at ${CMAKE_CURRENT_LIST_DIR}")
+message("PICO_SDK_PATH is ${CMAKE_CURRENT_LIST_DIR}")
 
 include(pico_pre_load_platform)
 
@@ -41,7 +41,7 @@ macro(pico_sdk_init)
     if (NOT CMAKE_PROJECT_NAME)
         message(WARNING "pico_sdk_init() should be called after the project is created (and languages added)")
     endif()
-    add_subdirectory(${PICO_SDK_PATH} pico_sdk)
+    add_subdirectory(${PICO_SDK_PATH} pico-sdk)
 endmacro()
 
 macro(add_sub_list_dirs var)

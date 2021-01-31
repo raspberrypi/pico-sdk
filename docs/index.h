@@ -44,6 +44,7 @@
  * \defgroup pico_stdlib pico_stdlib
  * \defgroup pico_sync pico_sync
  * \defgroup pico_time pico_time
+ * \defgroup pico_unique_id pico_unique_id
  * \defgroup pico_util pico_util
  * @}
  *

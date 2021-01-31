@@ -10,6 +10,7 @@
 #include "pico.h"
 #include "hardware/structs/dma.h"
 #include "hardware/regs/dreq.h"
+#include "pico/assert.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +36,24 @@ extern "C" {
 
 // this is not defined in generated dreq.h
 #define DREQ_FORCE  63
+
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_DMA, Enable/disable DMA assertions, type=bool, default=0, group=hardware_dma
+#ifndef PARAM_ASSERTIONS_ENABLED_DMA
+#define PARAM_ASSERTIONS_ENABLED_DMA 0
+#endif
+
+static inline void check_dma_channel_param(uint channel) {
+#if PARAM_ASSERTIONS_ENABLED(DMA)
+    // this method is used a lot by inline functions so avoid code bloat by deferring to function
+    extern void check_dma_channel_param_impl(uint channel);
+    check_dma_channel_param_impl(channel);
+#endif
+}
+
+inline static dma_channel_hw_t *dma_channel_hw_addr(uint channel) {
+    check_dma_channel_param(channel);
+    return &dma_hw->ch[channel];
+}
 
 /*! \brief Mark a dma channel as used
  *  \ingroup hardware_dma

@@ -71,7 +71,7 @@ typedef struct {
  * \return The PWM slice number that controls the specified GPIO.
  */
 static inline uint pwm_gpio_to_slice_num(uint gpio) {
-    valid_params_if(PWM, gpio < N_GPIOS);
+    valid_params_if(PWM, gpio < NUM_BANK0_GPIOS);
     return (gpio >> 1u) & 7u;
 }
 
@@ -83,7 +83,7 @@ static inline uint pwm_gpio_to_slice_num(uint gpio) {
  * \return The PWM channel that controls the specified GPIO.
  */
 static inline uint pwm_gpio_to_channel(uint gpio) {
-    valid_params_if(PWM, gpio < N_GPIOS);
+    valid_params_if(PWM, gpio < NUM_BANK0_GPIOS);
     return gpio & 1u;
 }
 
@@ -267,7 +267,7 @@ static inline void pwm_set_both_levels(uint slice_num, uint16_t level_a, uint16_
  * \param level PWM level for this GPIO
  */
 static inline void pwm_set_gpio_level(uint gpio, uint16_t level) {
-    valid_params_if(PWM, gpio < N_GPIOS);
+    valid_params_if(PWM, gpio < NUM_BANK0_GPIOS);
     pwm_set_chan_level(pwm_gpio_to_slice_num(gpio), pwm_gpio_to_channel(gpio), level);
 }
 

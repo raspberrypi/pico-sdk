@@ -144,40 +144,61 @@ __unhandled_user_irq:
 unhandled_user_irq_num_in_r0:
     bkpt #0
 
-.section .reset, "ax"
+// ----------------------------------------------------------------------------
 
-// This is the beginning of the image, which is entered from stage2 or bootrom USB MSD watchdog reboot
+.section .binary_info_header, "a"
 
-// note if we are NO_FLASH then start: below is currently identical anyway, so save 4 bytes
-#if !PICO_NO_FLASH
-    // We simply install our own vector table and redirect through it
-    ldr r0, =__vectors
-    b __vector_entry
+// Header must be in first 256 bytes of main image (i.e. excluding flash boot2).
+// For flash builds we put it immediately after vector table; for NO_FLASH the
+// vectors are at a +0x100 offset because the bootrom enters RAM images directly
+// at their lowest address, so we put the header in the VTOR alignment hole.
+
+#if !PICO_NO_BINARY_INFO
+binary_info_header:
+.word BINARY_INFO_MARKER_START
+.word __binary_info_start
+.word __binary_info_end
+.word data_cpy_table // we may need to decode pointers that are in RAM at runtime.
+.word BINARY_INFO_MARKER_END
 #endif
 
-// ELF entry point generally called when we load an ELF via debugger
+// ----------------------------------------------------------------------------
+
+.section .reset, "ax"
+
+// On flash builds, the vector table comes first in the image (conventional).
+// On NO_FLASH builds, the reset handler section comes first, as the entry
+// point is at offset 0 (fixed due to bootrom), and VTOR is highly-aligned.
+// Image is entered in various ways:
+//
+// - NO_FLASH builds are entered from beginning by UF2 bootloader
+//
+// - Flash builds vector through the table into _reset_handler from boot2
+//
+// - Either type can be entered via _entry_point by the debugger, and flash builds
+//   must then be sent back round the boot sequence to properly initialise flash
+
+// ELF entry point:
 .type _entry_point,%function
 .thumb_func
 .global _entry_point
 _entry_point:
 
 #if PICO_NO_FLASH
-    // non flash
+    // Vector through our own table (SP, VTOR will not have been set up at
+    // this point). Same path for debugger entry and bootloader entry.
     ldr r0, =__vectors
 #else
-    // todo clear watchdog?
-    // When using flash, we install and use the ROM vector table to go thru regular bootrom/stage2 flash sequence
+    // Debugger tried to run code after loading, so SSI is in 03h-only mode.
+    // Go back through bootrom + boot2 to properly initialise flash.
     movs r0, #0
 #endif
-
-__vector_entry:
-    ldr r1, =(PPB_BASE + M0PLUS_CPUID_OFFSET)
-    str r0, [r1, #8]
+    ldr r1, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
+    str r0, [r1]
     ldmia r0!, {r1, r2}
     msr msp, r1
     bx r2
 
-// ----------------------------------------------------------------------------
 // Reset handler:
 // - initialises .data
 // - clears .bss
@@ -188,11 +209,12 @@ __vector_entry:
 .type _reset_handler,%function
 .thumb_func
 _reset_handler:
-    // Hang all cores except core 0
+    // Only core 0 should run the C runtime startup code; core 1 is normally
+    // sleeping in the bootrom at this point but check to be sure
     ldr r0, =(SIO_BASE + SIO_CPUID_OFFSET)
     ldr r0, [r0]
     cmp r0, #0
-    bne wait_for_vector
+    bne hold_non_core0_in_bootrom
 
     adr r4, data_cpy_table
 
@@ -243,15 +265,6 @@ data_cpy:
     blo data_cpy_loop
     bx lr
 
-#if !PICO_NO_BINARY_INFO
-binary_info_header:
-.word BINARY_INFO_MARKER_START
-.word __binary_info_start
-.word __binary_info_end
-.word data_cpy_table // we may need to decode pointers that are in RAM at runtime.
-.word BINARY_INFO_MARKER_END
-#endif
-
 .align 2
 data_cpy_table:
 #if PICO_COPY_TO_RAM
@@ -284,11 +297,12 @@ runtime_init:
     bx lr
 
 // ----------------------------------------------------------------------------
-// In case core 1's VTOR has already been moved into flash, we need to handle
-// core 1 reset. However, we do so by just jumping back into bootrom version of
-// wait_for_vector
+// If core 1 somehow gets into crt0 due to a spectacular VTOR mishap, we need to
+// catch it and send back to the sleep-and-launch code in the bootrom. Shouldn't
+// happen (it should sleep in the ROM until given an entry point via the
+// cross-core FIFOs) but it's good to be defensive.
 
-wait_for_vector:
+hold_non_core0_in_bootrom:
     ldr r0, = 'W' | ('V' << 8)
     bl rom_func_lookup
     bx r0

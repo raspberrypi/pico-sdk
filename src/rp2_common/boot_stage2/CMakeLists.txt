@@ -24,30 +24,31 @@ function(pico_define_boot_stage2 NAME SOURCES)
         target_link_options(${NAME} PRIVATE "--specs=nosys.specs")
         target_link_options(${NAME} PRIVATE "-nostartfiles")
     endif ()
-    
+
+    # boot2_helpers include dir
+    target_include_directories(${NAME} PRIVATE ${PICO_BOOT_STAGE2_DIR}/asminclude)
+
     target_link_libraries(${NAME} hardware_regs)
     target_link_options(${NAME} PRIVATE "LINKER:--script=${PICO_BOOT_STAGE2_DIR}/boot_stage2.ld")
     set_target_properties(${NAME} PROPERTIES LINK_DEPENDS ${PICO_BOOT_STAGE2_DIR}/boot_stage2.ld)
-    
+
     pico_add_dis_output(${NAME})
     pico_add_map_output(${NAME})
     
     set(ORIGINAL_BIN ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.bin)
     set(PADDED_CHECKSUMMED_ASM ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_padded_checksummed.S)
-    
-    add_custom_target(${NAME}_bin DEPENDS ${ORIGINAL_BIN})
-    add_dependencies(${NAME}_bin ${NAME})
-    
-    add_custom_command(OUTPUT ${ORIGINAL_BIN} COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${NAME}> ${ORIGINAL_BIN})
-    
+
     find_package (Python3 REQUIRED COMPONENTS Interpreter)
-    add_custom_command(OUTPUT ${PADDED_CHECKSUMMED_ASM}
-            COMMAND ${Python3_EXECUTABLE} ${PICO_BOOT_STAGE2_DIR}/pad_checksum -s 0xffffffff ${ORIGINAL_BIN} ${PADDED_CHECKSUMMED_ASM}
-            )
+
+    add_custom_target(${NAME}_bin DEPENDS ${ORIGINAL_BIN})
+    add_custom_command(OUTPUT ${ORIGINAL_BIN} DEPENDS ${NAME} COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${NAME}> ${ORIGINAL_BIN})
     
     add_custom_target(${NAME}_padded_checksummed_asm DEPENDS ${PADDED_CHECKSUMMED_ASM})
-    add_dependencies(${NAME}_padded_checksummed_asm ${NAME}_bin)
-    
+    add_custom_command(OUTPUT ${PADDED_CHECKSUMMED_ASM} DEPENDS ${ORIGINAL_BIN}
+            COMMAND ${Python3_EXECUTABLE} ${PICO_BOOT_STAGE2_DIR}/pad_checksum -s 0xffffffff ${ORIGINAL_BIN} ${PADDED_CHECKSUMMED_ASM}
+            )
+
+
     add_library(${NAME}_library INTERFACE)
     add_dependencies(${NAME}_library ${NAME}_padded_checksummed_asm)
     # not strictly (or indeed actually) a link library, but this avoids dependency cycle

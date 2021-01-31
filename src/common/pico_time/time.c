@@ -13,11 +13,7 @@
 #include "hardware/sync.h"
 #include "hardware/gpio.h"
 
-CU_REGISTER_DEBUG_PINS(core)
-CU_SELECT_DEBUG_PINS(core)
-
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(nil_time, 0);
-// use LONG_MAX not ULONG_MAX so we don't have sign overflow in time diffs
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(at_the_end_of_time, ULONG_MAX);
 
 typedef struct alarm_pool_entry {
@@ -92,7 +88,6 @@ static alarm_id_t add_alarm_under_lock(alarm_pool_t *pool, absolute_time_t time,
         entry->target = time;
         entry->callback = callback;
         entry->user_data = user_data;
-        DEBUG_PINS_SET(core, 1);
         if (id == ph_insert(pool->heap, id)) {
             bool is_missed = hardware_alarm_set_target(pool->hardware_alarm_num, time);
             if (is_missed && !create_if_past) {
@@ -137,9 +132,6 @@ static void alarm_pool_alarm_callback(uint alarm_num) {
         }
         spin_unlock(pool->lock, save);
         if (callback) {
-            DEBUG_PINS_SET(core, 4);
-            DEBUG_PINS_CLR(core, 1);
-            DEBUG_PINS_CLR(core, 4);
             int64_t repeat = callback(make_public_id(id_high, next_id), user_data);
             save = spin_lock_blocking(pool->lock);
             // todo think more about whether we want to keep calling

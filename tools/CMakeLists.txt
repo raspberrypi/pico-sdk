@@ -19,7 +19,7 @@ function(pico_generate_pio_header TARGET PIO)
     get_filename_component(HEADER_GEN_TARGET ${PIO} NAME_WE)
     set(HEADER_GEN_TARGET "${TARGET}_${HEADER_GEN_TARGET}_pio_h")
 
-    add_custom_target(${HEADER_GEN_TARGET} DEPENDS ${HEADER} Pioasm)
+    add_custom_target(${HEADER_GEN_TARGET} DEPENDS ${HEADER})
 
     add_custom_command(OUTPUT ${HEADER}
             DEPENDS ${PIO}

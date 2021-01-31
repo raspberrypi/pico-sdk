@@ -31,8 +31,7 @@ extern "C" {
 
 typedef struct __packed_aligned mutex {
     lock_core_t core;
-    bool owned;
-    int8_t owner;
+    int8_t owner; //! core number or -1 for unowned
 } mutex_t;
 
 /*! \brief  Initialise a mutex structure
