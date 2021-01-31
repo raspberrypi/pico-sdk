@@ -159,6 +159,7 @@ void uart_deinit(uart_inst_t *uart);
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param baudrate Baudrate in Hz
+ * \return Actual set baudrate
  */
 uint uart_set_baudrate(uart_inst_t *uart, uint baudrate);
 
