@@ -36,7 +36,7 @@ See [pico-examples](https://github.com/raspberrypi/pico-examples) for example co
 These instructions are exteremly terse, and Linux based only. For detailed steps,
 instructions for other platforms, and just in general, we recommend you see [Raspberry Pi Pico C/C++ SDK](https://rptl.io/pico-c-sdk)
 
-1. Install CMake (at least version 3.12), and GCC cross compiler
+1. Install CMake (at least version 3.13), and GCC cross compiler
    ```
    sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi
    ```
@@ -50,7 +50,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
       3. Setup a `CMakeLists.txt` like:
 
           ```cmake
-          cmake_minimum_required(VERSION 3.12)
+          cmake_minimum_required(VERSION 3.13)
 
           # initialize the SDK based on PICO_SDK_PATH
           # note: this must happen before project()
@@ -70,7 +70,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
       1. Setup a `CMakeLists.txt` like:
 
           ```cmake
-          cmake_minimum_required(VERSION 3.12)
+          cmake_minimum_required(VERSION 3.13)
 
           # initialize pico-sdk from submodule
           # note: this must happen before project()
@@ -91,7 +91,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
       1. Setup a `CMakeLists.txt` like:
 
           ```cmake
-          cmake_minimum_required(VERSION 3.12)
+          cmake_minimum_required(VERSION 3.13)
 
           # initialize pico-sdk from GIT
           # (note this can come from environment, CMake cache etc)
