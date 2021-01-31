@@ -124,6 +124,13 @@ uint pio_add_program(PIO pio, const pio_program_t *program) {
     return offset;
 }
 
+void pio_add_program_at_offset(PIO pio, const pio_program_t *program, uint offset)
+{
+    uint32_t save = hw_claim_lock();
+     _pio_add_program_at_offset(pio, program, offset);
+    hw_claim_unlock(save);
+}
+
 void pio_remove_program(PIO pio, const pio_program_t *program, uint loaded_offset) {
     uint32_t program_mask = (1u << program->length) - 1;
     program_mask <<= loaded_offset;
