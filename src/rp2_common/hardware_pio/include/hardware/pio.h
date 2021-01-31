@@ -457,7 +457,6 @@ uint pio_add_program(PIO pio, const pio_program_t *program);
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param program the program definition
  * \param offset the instruction memory offset wanted for the start of the program
- * \return the instruction memory offset the program is loaded at
  */
 void pio_add_program_at_offset(PIO pio, const pio_program_t *program, uint offset);
 
