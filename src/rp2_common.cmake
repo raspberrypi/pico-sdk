@@ -17,10 +17,15 @@ function(pico_add_dis_output TARGET)
             )
 endfunction()
 
+function(pico_add_thumb_enforcement TARGET)
+    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_READELF} -A ${TARGET}${CMAKE_EXECUTABLE_SUFFIX} | grep Tag_ARM_ISA_use && { echo error, the cross gcc and newlib must be built with thumb multilib support \; exit 1 \; } || exit 0)
+endfunction()
+
 function(pico_add_extra_outputs TARGET)
     pico_add_hex_output(${TARGET})
     pico_add_bin_output(${TARGET})
     pico_add_dis_output(${TARGET})
+    pico_add_thumb_enforcement(${TARGET})
 
     # PICO_CMAKE_CONFIG: PICO_NO_TARGET_NAME, Don't defined PICO_TARGET_NAME, type=bool, default=0, group=build
     # PICO_BUILD_DEFINE: PICO_TARGET_NAME, The name of the build target being compiled (unless PICO_NO_TARGET_NAME set in build), type=string, default=target name, group=build
