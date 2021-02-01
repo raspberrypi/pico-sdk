@@ -15,7 +15,6 @@
 
 using syntax_error = yy::parser::syntax_error;
 
-std::vector<std::shared_ptr<output_format>> output_format::output_formats;
 std::string output_format::default_name = "c-sdk";
 
 pio_assembler::pio_assembler() {
@@ -324,7 +323,7 @@ std::vector<compiled_source::symbol> pio_assembler::public_symbols(program &prog
 
 int pio_assembler::write_output() {
     std::set<std::string> known_output_formats;
-    std::transform(output_format::output_formats.begin(), output_format::output_formats.end(),
+    std::transform(output_format::all().begin(), output_format::all().end(),
                    std::inserter(known_output_formats, known_output_formats.begin()),
                    [&](std::shared_ptr<output_format> &f) {
                        return f->name;
