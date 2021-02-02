@@ -81,7 +81,7 @@ target_compile_definitions(kitchen_sink_libs INTERFACE
 
 add_executable(kitchen_sink)
 target_link_libraries(kitchen_sink kitchen_sink_libs kitchen_sink_options)
-pico_set_program_name(kitchen_sink "Wombat tenticles")
+pico_set_program_name(kitchen_sink "Wombat tentacles")
 pico_add_extra_outputs(kitchen_sink)
 
 add_executable(kitchen_sink_extra_stdio)
