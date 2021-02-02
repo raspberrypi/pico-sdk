@@ -104,7 +104,10 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
 
     add_library(tinyusb_board INTERFACE)
     target_sources(tinyusb_board INTERFACE
-            ${PICO_TINYUSB_PATH}/hw/bsp/raspberry_pi_pico/board_raspberry_pi_pico.c
+        ${PICO_TINYUSB_PATH}/hw/bsp/rp2040/family.c
+    )
+    target_include_directories(tinyusb_board INTERFACE
+        ${PICO_TINYUSB_PATH}/hw/bsp/rp2040/boards/raspberry_pi_pico  
     )
 
 endif()
