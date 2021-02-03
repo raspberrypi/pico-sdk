@@ -22,6 +22,7 @@
     <mpuPresent>true</mpuPresent>
     <fpuPresent>false</fpuPresent>
     <nvicPrioBits>2</nvicPrioBits>
+    <vtorPresent>1</vtorPresent>
     <vendorSystickConfig>false</vendorSystickConfig>
     <deviceNumInterrupts>26</deviceNumInterrupts>
   </cpu>
