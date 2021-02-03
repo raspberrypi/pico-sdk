@@ -63,7 +63,17 @@ void __attribute__((noreturn)) panic_unsupported();
 
 void __attribute__((noreturn)) panic(const char *fmt, ...);
 
+// PICO_CONFIG: PICO_NO_FPGA_CHECK, Remove the FPGA platform check for small code size reduction, type=bool, default=0, advanced=true, group=pico_runtime
+#ifndef PICO_NO_FPGA_CHECK
+#define PICO_NO_FPGA_CHECK 0
+#endif
+
+#if PICO_NO_FPGA_CHECK
+static inline bool running_on_fpga() {return false;}
+#else
 bool running_on_fpga();
+#endif
+
 uint8_t rp2040_chip_version();
 
 static inline uint8_t rp2040_rom_version() {
