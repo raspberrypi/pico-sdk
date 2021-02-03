@@ -22,6 +22,7 @@
     <mpuPresent>true</mpuPresent>
     <fpuPresent>false</fpuPresent>
     <nvicPrioBits>2</nvicPrioBits>
+    <vtorPresent>1</vtorPresent>
     <vendorSystickConfig>false</vendorSystickConfig>
     <deviceNumInterrupts>26</deviceNumInterrupts>
   </cpu>
@@ -1354,7 +1355,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x0008</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            This slice does not have a glitchless mux (only the AUX_SRC field is present, not SRC) so this register is hardwired to 0x1.</description>
           <name>CLK_GPOUT0_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>
@@ -1473,7 +1475,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x0014</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            This slice does not have a glitchless mux (only the AUX_SRC field is present, not SRC) so this register is hardwired to 0x1.</description>
           <name>CLK_GPOUT1_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>
@@ -1592,7 +1595,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x0020</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            This slice does not have a glitchless mux (only the AUX_SRC field is present, not SRC) so this register is hardwired to 0x1.</description>
           <name>CLK_GPOUT2_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>
@@ -1711,7 +1715,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x002c</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            This slice does not have a glitchless mux (only the AUX_SRC field is present, not SRC) so this register is hardwired to 0x1.</description>
           <name>CLK_GPOUT3_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>
@@ -1780,7 +1785,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x0038</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            The glitchless multiplexer does not switch instantaneously (to avoid glitches), so software should poll this register to wait for the switch to complete. This register contains one decoded bit for each of the clock sources enumerated in the CTRL SRC field. At most one of these bits will be set at any time, indicating that clock is currently present at the output of the glitchless mux. Whilst switching is in progress, this register may briefly show all-0s.</description>
           <name>CLK_REF_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>
@@ -1863,7 +1869,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x0044</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            The glitchless multiplexer does not switch instantaneously (to avoid glitches), so software should poll this register to wait for the switch to complete. This register contains one decoded bit for each of the clock sources enumerated in the CTRL SRC field. At most one of these bits will be set at any time, indicating that clock is currently present at the output of the glitchless mux. Whilst switching is in progress, this register may briefly show all-0s.</description>
           <name>CLK_SYS_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>
@@ -1926,7 +1933,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x0050</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            This slice does not have a glitchless mux (only the AUX_SRC field is present, not SRC) so this register is hardwired to 0x1.</description>
           <name>CLK_PERI_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>
@@ -2013,7 +2021,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x005c</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            This slice does not have a glitchless mux (only the AUX_SRC field is present, not SRC) so this register is hardwired to 0x1.</description>
           <name>CLK_USB_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>
@@ -2100,7 +2109,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x0068</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            This slice does not have a glitchless mux (only the AUX_SRC field is present, not SRC) so this register is hardwired to 0x1.</description>
           <name>CLK_ADC_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>
@@ -2193,7 +2203,8 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x0074</addressOffset>
-          <description>Indicates which src is currently selected (one-hot)</description>
+          <description>Indicates which SRC is currently selected by the glitchless mux (one-hot).\n
+            This slice does not have a glitchless mux (only the AUX_SRC field is present, not SRC) so this register is hardwired to 0x1.</description>
           <name>CLK_RTC_SELECTED</name>
           <resetValue>0x00000001</resetValue>
         </register>

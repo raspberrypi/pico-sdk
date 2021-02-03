@@ -115,7 +115,11 @@
 #define CLOCKS_CLK_GPOUT0_DIV_FRAC_ACCESS "RW"
 // =============================================================================
 // Register    : CLOCKS_CLK_GPOUT0_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               This slice does not have a glitchless mux (only the AUX_SRC
+//               field is present, not SRC) so this register is hardwired to
+//               0x1.
 #define CLOCKS_CLK_GPOUT0_SELECTED_OFFSET 0x00000008
 #define CLOCKS_CLK_GPOUT0_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_GPOUT0_SELECTED_RESET  0x00000001
@@ -226,7 +230,11 @@
 #define CLOCKS_CLK_GPOUT1_DIV_FRAC_ACCESS "RW"
 // =============================================================================
 // Register    : CLOCKS_CLK_GPOUT1_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               This slice does not have a glitchless mux (only the AUX_SRC
+//               field is present, not SRC) so this register is hardwired to
+//               0x1.
 #define CLOCKS_CLK_GPOUT1_SELECTED_OFFSET 0x00000014
 #define CLOCKS_CLK_GPOUT1_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_GPOUT1_SELECTED_RESET  0x00000001
@@ -337,7 +345,11 @@
 #define CLOCKS_CLK_GPOUT2_DIV_FRAC_ACCESS "RW"
 // =============================================================================
 // Register    : CLOCKS_CLK_GPOUT2_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               This slice does not have a glitchless mux (only the AUX_SRC
+//               field is present, not SRC) so this register is hardwired to
+//               0x1.
 #define CLOCKS_CLK_GPOUT2_SELECTED_OFFSET 0x00000020
 #define CLOCKS_CLK_GPOUT2_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_GPOUT2_SELECTED_RESET  0x00000001
@@ -448,7 +460,11 @@
 #define CLOCKS_CLK_GPOUT3_DIV_FRAC_ACCESS "RW"
 // =============================================================================
 // Register    : CLOCKS_CLK_GPOUT3_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               This slice does not have a glitchless mux (only the AUX_SRC
+//               field is present, not SRC) so this register is hardwired to
+//               0x1.
 #define CLOCKS_CLK_GPOUT3_SELECTED_OFFSET 0x0000002c
 #define CLOCKS_CLK_GPOUT3_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_GPOUT3_SELECTED_RESET  0x00000001
@@ -506,7 +522,16 @@
 #define CLOCKS_CLK_REF_DIV_INT_ACCESS "RW"
 // =============================================================================
 // Register    : CLOCKS_CLK_REF_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               The glitchless multiplexer does not switch instantaneously (to
+//               avoid glitches), so software should poll this register to wait
+//               for the switch to complete. This register contains one decoded
+//               bit for each of the clock sources enumerated in the CTRL SRC
+//               field. At most one of these bits will be set at any time,
+//               indicating that clock is currently present at the output of the
+//               glitchless mux. Whilst switching is in progress, this register
+//               may briefly show all-0s.
 #define CLOCKS_CLK_REF_SELECTED_OFFSET 0x00000038
 #define CLOCKS_CLK_REF_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_REF_SELECTED_RESET  0x00000001
@@ -576,7 +601,16 @@
 #define CLOCKS_CLK_SYS_DIV_FRAC_ACCESS "RW"
 // =============================================================================
 // Register    : CLOCKS_CLK_SYS_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               The glitchless multiplexer does not switch instantaneously (to
+//               avoid glitches), so software should poll this register to wait
+//               for the switch to complete. This register contains one decoded
+//               bit for each of the clock sources enumerated in the CTRL SRC
+//               field. At most one of these bits will be set at any time,
+//               indicating that clock is currently present at the output of the
+//               glitchless mux. Whilst switching is in progress, this register
+//               may briefly show all-0s.
 #define CLOCKS_CLK_SYS_SELECTED_OFFSET 0x00000044
 #define CLOCKS_CLK_SYS_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_SYS_SELECTED_RESET  0x00000001
@@ -629,7 +663,11 @@
 #define CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_GPIN1   0x6
 // =============================================================================
 // Register    : CLOCKS_CLK_PERI_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               This slice does not have a glitchless mux (only the AUX_SRC
+//               field is present, not SRC) so this register is hardwired to
+//               0x1.
 #define CLOCKS_CLK_PERI_SELECTED_OFFSET 0x00000050
 #define CLOCKS_CLK_PERI_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_PERI_SELECTED_RESET  0x00000001
@@ -714,7 +752,11 @@
 #define CLOCKS_CLK_USB_DIV_INT_ACCESS "RW"
 // =============================================================================
 // Register    : CLOCKS_CLK_USB_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               This slice does not have a glitchless mux (only the AUX_SRC
+//               field is present, not SRC) so this register is hardwired to
+//               0x1.
 #define CLOCKS_CLK_USB_SELECTED_OFFSET 0x0000005c
 #define CLOCKS_CLK_USB_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_USB_SELECTED_RESET  0x00000001
@@ -799,7 +841,11 @@
 #define CLOCKS_CLK_ADC_DIV_INT_ACCESS "RW"
 // =============================================================================
 // Register    : CLOCKS_CLK_ADC_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               This slice does not have a glitchless mux (only the AUX_SRC
+//               field is present, not SRC) so this register is hardwired to
+//               0x1.
 #define CLOCKS_CLK_ADC_SELECTED_OFFSET 0x00000068
 #define CLOCKS_CLK_ADC_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_ADC_SELECTED_RESET  0x00000001
@@ -892,7 +938,11 @@
 #define CLOCKS_CLK_RTC_DIV_FRAC_ACCESS "RW"
 // =============================================================================
 // Register    : CLOCKS_CLK_RTC_SELECTED
-// Description : Indicates which src is currently selected (one-hot)
+// Description : Indicates which SRC is currently selected by the glitchless mux
+//               (one-hot).
+//               This slice does not have a glitchless mux (only the AUX_SRC
+//               field is present, not SRC) so this register is hardwired to
+//               0x1.
 #define CLOCKS_CLK_RTC_SELECTED_OFFSET 0x00000074
 #define CLOCKS_CLK_RTC_SELECTED_BITS   0xffffffff
 #define CLOCKS_CLK_RTC_SELECTED_RESET  0x00000001
