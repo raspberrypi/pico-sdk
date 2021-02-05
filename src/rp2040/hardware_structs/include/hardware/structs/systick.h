@@ -13,7 +13,7 @@
 typedef struct {
     io_rw_32 csr;
     io_rw_32 rvr;
-    io_ro_32 cvr;
+    io_rw_32 cvr;
     io_ro_32 calib;
 } systick_hw_t;
 
