@@ -97,7 +97,7 @@ static void hw_enumeration_fix_force_ls_j(void) {
     // Enable bus keep and force pin to tristate, so USB DP muxing doesn't affect
     // pin state
     gpio_set_pulls(dp, true, true);
-    gpio_set_oeover(dp, GPIO_GPIO_OVERRIDE_LOW);
+    gpio_set_oeover(dp, GPIO_OVERRIDE_LOW);
     // Select function 8 (USB debug muxing) without disturbing other controls
     hw_write_masked(&iobank0_hw->io[dp].ctrl,
         8 << IO_BANK0_GPIO15_CTRL_FUNCSEL_LSB, IO_BANK0_GPIO15_CTRL_FUNCSEL_BITS);
