@@ -51,7 +51,7 @@ typedef struct stdio_driver stdio_driver_t;
  *
  * \see stdio_uart, stdio_usb, stdio_semihosting
  */
-void stdio_init_all();
+void stdio_init_all(void);
 
 /*! \brief Initialize all of the present standard stdio types that are linked into the binary.
  * \ingroup pico_stdio
@@ -61,7 +61,7 @@ void stdio_init_all();
  *
  * \see stdio_uart, stdio_usb, stdio_semihosting
  */
-void stdio_flush();
+void stdio_flush(void);
 
 /*! \brief Return a character from stdin if there is one available within a timeout
  * \ingroup pico_stdio

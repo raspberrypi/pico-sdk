@@ -81,7 +81,7 @@ typedef volatile uint32_t spin_lock_t;
 
  * The SEV (send event) instruction sends an event to both cores.
  */
-inline static void __sev() {
+inline static void __sev(void) {
     __asm volatile ("sev");
 }
 
@@ -91,7 +91,7 @@ inline static void __sev() {
  * The WFE (wait for event) instruction waits until one of a number of
  * events occurs, including events signalled by the SEV instruction on either core.
  */
-inline static void __wfe() {
+inline static void __wfe(void) {
     __asm volatile ("wfe");
 }
 
@@ -100,7 +100,7 @@ inline static void __wfe() {
 *
  * The WFI (wait for interrupt) instruction waits for a interrupt to wake up the core.
  */
-inline static void __wfi() {
+inline static void __wfi(void) {
     __asm volatile ("wfi");
 }
 
@@ -110,7 +110,7 @@ inline static void __wfi() {
  * The DMB (data memory barrier) acts as a memory barrier, all memory accesses prior to this
  * instruction will be observed before any explicit access after the instruction.
  */
-inline static void __dmb() {
+inline static void __dmb(void) {
     __asm volatile ("dmb");
 }
 
@@ -121,14 +121,14 @@ inline static void __dmb() {
  * so that all instructions following the ISB are fetched from cache or memory again, after
  * the ISB instruction has been completed.
  */
-inline static void __isb() {
+inline static void __isb(void) {
     __asm volatile ("isb");
 }
 
 /*! \brief Acquire a memory fence
  *  \ingroup hardware_sync
  */
-inline static void __mem_fence_acquire() {
+inline static void __mem_fence_acquire(void) {
     // the original code below makes it hard for us to be included from C++ via a header
     // which itself is in an extern "C", so just use __dmb instead, which is what
     // is required on Cortex M0+
@@ -144,7 +144,7 @@ inline static void __mem_fence_acquire() {
  *  \ingroup hardware_sync
  *
  */
-inline static void __mem_fence_release() {
+inline static void __mem_fence_release(void) {
     // the original code below makes it hard for us to be included from C++ via a header
     // which itself is in an extern "C", so just use __dmb instead, which is what
     // is required on Cortex M0+
@@ -161,7 +161,7 @@ inline static void __mem_fence_release() {
  *
  * \return The prior interrupt enable status for restoration later via restore_interrupts()
  */
-inline static uint32_t save_and_disable_interrupts() {
+inline static uint32_t save_and_disable_interrupts(void) {
     uint32_t status;
     __asm volatile ("mrs %0, PRIMASK" : "=r" (status)::);
     __asm volatile ("cpsid i");
@@ -266,7 +266,7 @@ inline static void spin_unlock(spin_lock_t *lock, uint32_t saved_irq) {
  *
  * \return The core number the call was made from
  */
-static inline uint get_core_num() {
+static inline uint get_core_num(void) {
     return (*(uint32_t *) (SIO_BASE + SIO_CPUID_OFFSET));
 }
 
@@ -286,7 +286,7 @@ spin_lock_t *spin_lock_init(uint lock_num);
 void spin_locks_reset(void);
 
 // this number is not claimed
-uint next_striped_spin_lock_num();
+uint next_striped_spin_lock_num(void);
 
 /*! \brief Mark a spin lock as used
  *  \ingroup hardware_sync

@@ -167,7 +167,7 @@ inline static uint pio_encode_set(enum pio_src_dest dest, uint value) {
     return _pio_encode_instr_and_src_dest(pio_instr_bits_set, dest, value);
 }
 
-inline static uint pio_encode_nop() {
+inline static uint pio_encode_nop(void) {
     return pio_encode_mov(pio_y, pio_y);
 }
 

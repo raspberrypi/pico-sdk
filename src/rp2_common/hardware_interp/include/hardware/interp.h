@@ -231,7 +231,7 @@ static inline void interp_config_set_force_bits(interp_config *c, uint bits) {
  *
  * \return A default interpolation configuration
  */
-static inline interp_config interp_default_config() {
+static inline interp_config interp_default_config(void) {
     interp_config c = {0};
     // Just pass through everything
     interp_config_set_mask(&c, 0, 31);

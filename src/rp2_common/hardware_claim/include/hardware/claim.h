@@ -87,7 +87,7 @@ void hw_claim_clear(uint8_t *bits, uint bit_index);
  *
  * \return a token to pass to hw_claim_unlock()
  */
-uint32_t hw_claim_lock();
+uint32_t hw_claim_lock(void);
 
 /*! \brief Release the runtime mutual exclusion lock provided by the `hardware_claim` library
  *  \ingroup hardware_claim
