@@ -33,7 +33,7 @@
 static uint32_t boot2_copyout[BOOT2_SIZE_WORDS];
 static bool boot2_copyout_valid = false;
 
-static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)() {
+static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)(void) {
     if (boot2_copyout_valid)
         return;
     for (int i = 0; i < BOOT2_SIZE_WORDS; ++i)
@@ -42,15 +42,15 @@ static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)() {
     boot2_copyout_valid = true;
 }
 
-static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)() {
+static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
     ((void (*)(void))boot2_copyout+1)();
 }
 
 #else
 
-static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)() {}
+static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)(void) {}
 
-static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)() {
+static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
     // Set up XIP for 03h read on bus access (slow but generic)
     void (*flash_enter_cmd_xip)(void) = (void(*)(void))rom_func_lookup(rom_table_code('C', 'X'));
     assert(flash_enter_cmd_xip);

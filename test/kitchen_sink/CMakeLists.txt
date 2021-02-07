@@ -59,6 +59,7 @@ target_compile_options(kitchen_sink_options INTERFACE
         -Wfloat-equal
         -Wmissing-format-attribute
         -Wno-long-long
+        $<$<COMPILE_LANGUAGE:C>:-Wstrict-prototypes>
 
         # todo not sure these are true, but investigate
         #-Wpacked

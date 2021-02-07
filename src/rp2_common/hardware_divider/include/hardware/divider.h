@@ -74,7 +74,7 @@ static inline void hw_divider_divmod_u32_start(uint32_t a, uint32_t b) {
  *
  * Wait for a divide to complete
  */
-static inline void hw_divider_wait_ready() {
+static inline void hw_divider_wait_ready(void) {
     // this is #1 in lsr below
     static_assert(SIO_DIV_CSR_READY_BITS == 1, "");
 
@@ -99,7 +99,7 @@ static inline void hw_divider_wait_ready() {
  *
  * \return Current result. Most significant 32 bits are the remainder, lower 32 bits are the quotient.
  */
-static inline divmod_result_t hw_divider_result_nowait() {
+static inline divmod_result_t hw_divider_result_nowait(void) {
     // as ugly as this looks it is actually quite efficient
     divmod_result_t rc = (((divmod_result_t) sio_hw->div_remainder) << 32u) | sio_hw->div_quotient;
     return rc;
@@ -112,7 +112,7 @@ static inline divmod_result_t hw_divider_result_nowait() {
  *
  * \return Current result. Most significant 32 bits are the remainder, lower 32 bits are the quotient.
  */
-static inline divmod_result_t hw_divider_result_wait() {
+static inline divmod_result_t hw_divider_result_wait(void) {
     hw_divider_wait_ready();
     return hw_divider_result_nowait();
 }
@@ -124,7 +124,7 @@ static inline divmod_result_t hw_divider_result_wait() {
  *
  * \return Current unsigned quotient result.
  */
-static inline uint32_t hw_divider_u32_quotient_wait() {
+static inline uint32_t hw_divider_u32_quotient_wait(void) {
     hw_divider_wait_ready();
     return sio_hw->div_quotient;
 }
@@ -136,7 +136,7 @@ static inline uint32_t hw_divider_u32_quotient_wait() {
  *
  * \return Current signed quotient result.
  */
-static inline int32_t hw_divider_s32_quotient_wait() {
+static inline int32_t hw_divider_s32_quotient_wait(void) {
     hw_divider_wait_ready();
     return sio_hw->div_quotient;
 }
@@ -148,7 +148,7 @@ static inline int32_t hw_divider_s32_quotient_wait() {
  *
  * \return Current unsigned remainder result.
  */
-static inline uint32_t hw_divider_u32_remainder_wait() {
+static inline uint32_t hw_divider_u32_remainder_wait(void) {
     hw_divider_wait_ready();
     int32_t rc = sio_hw->div_remainder;
     sio_hw->div_quotient; // must read quotient to cooperate with other SDK code
@@ -162,7 +162,7 @@ static inline uint32_t hw_divider_u32_remainder_wait() {
  *
  * \return Current remainder results.
  */
-static inline int32_t hw_divider_s32_remainder_wait() {
+static inline int32_t hw_divider_s32_remainder_wait(void) {
     hw_divider_wait_ready();
     int32_t rc = sio_hw->div_remainder;
     sio_hw->div_quotient; // must read quotient to cooperate with other SDK code
@@ -290,7 +290,7 @@ static inline int32_t hw_divider_remainder_s32(int32_t a, int32_t b) {
 /*! \brief Pause for exact amount of time needed for a asynchronous divide to complete
  *  \ingroup hardware_divider
  */
-static inline void hw_divider_pause() {
+static inline void hw_divider_pause(void) {
     asm volatile (
     "b _1_%=\n"
     "_1_%=:\n"

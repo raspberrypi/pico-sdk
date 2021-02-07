@@ -71,14 +71,14 @@ extern "C" {
  *  PICO_DEFAULT_UART_TX_PIN
  *  PICO_DEFAULT_UART_RX_PIN
  */
-void setup_default_uart();
+void setup_default_uart(void);
 
 /*! \brief Initialise the system clock to 48MHz
  *  \ingroup pico_stdlib
  *
  *  Set the system clock to 48MHz, and set the peripheral clock to match.
  */
-void set_sys_clock_48mhz();
+void set_sys_clock_48mhz(void);
 
 /*! \brief Initialise the system clock
  *  \ingroup pico_stdlib

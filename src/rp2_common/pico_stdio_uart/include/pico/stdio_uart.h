@@ -33,21 +33,21 @@ extern stdio_driver_t stdio_uart;
  *
  * \note this method is automatically called by \ref stdio_init_all() if `pico_stdio_uart` is included in the build
  */
-void stdio_uart_init();
+void stdio_uart_init(void);
 
 /*! \brief Explicitly initialize stdout only (no stdin) over UART and add it to the current set of stdout drivers
  *  \ingroup pico_stdio_uart
  *
  * This method sets up PICO_DEFAULT_UART_TX_PIN for UART output (if defined) , and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE
  */
-void stdout_uart_init();
+void stdout_uart_init(void);
 
 /*! \brief Explicitly initialize stdin only (no stdout) over UART and add it to the current set of stdin drivers
  *  \ingroup pico_stdio_uart
  *
  * This method sets up PICO_DEFAULT_UART_RX_PIN for UART input (if defined) , and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE
  */
-void stdin_uart_init();
+void stdin_uart_init(void);
 
 /*! \brief Perform custom initialization initialize stdin/stdout over UART and add it to the current set of stdin/stdout drivers
  *  \ingroup pico_stdio_uart

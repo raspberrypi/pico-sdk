@@ -199,7 +199,7 @@ static inline void pwm_init(uint slice_num, pwm_config *c, bool start) {
  *
  * \return Set of default values.
  */
-static inline pwm_config pwm_get_default_config() {
+static inline pwm_config pwm_get_default_config(void) {
     pwm_config c = {0, 0, 0};
     pwm_config_set_phase_correct(&c, false);
     pwm_config_set_clkdiv_int(&c, 1);
@@ -471,7 +471,7 @@ static inline void pwm_clear_irq(uint slice_num) {
  *
  * \return Bitmask of all PWM interrupts currently set
  */
-static inline int32_t pwm_get_irq_status_mask() {
+static inline int32_t pwm_get_irq_status_mask(void) {
     return pwm_hw->ints;
 }
 

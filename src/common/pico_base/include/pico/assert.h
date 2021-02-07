@@ -36,7 +36,7 @@ extern "C" {
 #define hard_assert_if(x, test) ({if (PARAM_ASSERTIONS_ENABLED(x)) hard_assert(!(test));})
 
 #ifdef NDEBUG
-extern void hard_assertion_failure();
+extern void hard_assertion_failure(void);
 static inline void hard_assert(bool condition, ...) {
     if (!condition)
         hard_assertion_failure();

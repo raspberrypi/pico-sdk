@@ -92,7 +92,7 @@ static inline uint harware_alarm_irq_number(uint alarm_num) {
     return TIMER_IRQ_0 + alarm_num;
 }
 
-static void hardware_alarm_irq_handler() {
+static void hardware_alarm_irq_handler(void) {
     // Determine which timer this IRQ is for
     uint32_t ipsr;
     __asm volatile ("mrs %0, ipsr" : "=r" (ipsr)::);

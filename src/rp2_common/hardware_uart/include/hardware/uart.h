@@ -413,7 +413,7 @@ void uart_set_translate_crlf(uart_inst_t *uart, bool translate);
 /*! \brief Wait for the default UART'S TX fifo to be drained
  *  \ingroup hardware_uart
  */
-static inline void uart_default_tx_wait_blocking() {
+static inline void uart_default_tx_wait_blocking(void) {
     uart_tx_wait_blocking(uart_default);
 }
 

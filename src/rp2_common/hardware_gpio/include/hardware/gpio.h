@@ -335,7 +335,7 @@ static inline bool gpio_get(uint gpio) {
  *
  * \return Bitmask of raw GPIO values, as bits 0-29
  */
-static inline uint32_t gpio_get_all() {
+static inline uint32_t gpio_get_all(void) {
     return sio_hw->gpio_in;
 }
 
@@ -490,7 +490,7 @@ static inline uint gpio_get_dir(uint gpio) {
     return gpio_is_dir_out(gpio); // note GPIO_OUT is 1/true and GPIO_IN is 0/false anyway
 }
 
-extern void gpio_debug_pins_init();
+extern void gpio_debug_pins_init(void);
 
 #ifdef __cplusplus
 }

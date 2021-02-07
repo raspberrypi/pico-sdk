@@ -47,6 +47,6 @@ extern stdio_driver_t stdio_usb;
 /*! \brief Explicitly initialize USB stdio and add it to the current set of stdin drivers
  *  \ingroup pico_stdio_uart
  */
-bool stdio_usb_init();
+bool stdio_usb_init(void);
 
 #endif
