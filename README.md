@@ -38,7 +38,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
 1. Install CMake (at least version 3.13), and GCC cross compiler
    ```
-   sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi
+   sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
    ```
 1. Set up your project to point to use the Raspberry Pi Pico SDK
 
