@@ -99,7 +99,7 @@ extern "C" {
  *
  *  Must be called before any other clock function.
  */
-void clocks_init();
+void clocks_init(void);
 
 /*! \brief Configure the specified clock
  *  \ingroup hardware_clocks

@@ -58,7 +58,7 @@ extern "C" {
  * \sa sleep_until()
  * \sa time_us_64()
  */
-static inline absolute_time_t get_absolute_time() {
+static inline absolute_time_t get_absolute_time(void) {
     absolute_time_t t;
     update_us_since_boot(&t, time_us_64());
     return t;
@@ -350,7 +350,7 @@ typedef struct alarm_pool alarm_pool_t;
  * \brief Create the default alarm pool (if not already created or disabled)
  * \ingroup alarm
  */
-void alarm_pool_init_default();
+void alarm_pool_init_default(void);
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 /*!
@@ -360,7 +360,7 @@ void alarm_pool_init_default();
  * \ingroup alarm
  * \sa #PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM
  */
-alarm_pool_t *alarm_pool_get_default();
+alarm_pool_t *alarm_pool_get_default(void);
 #endif
 
 /**

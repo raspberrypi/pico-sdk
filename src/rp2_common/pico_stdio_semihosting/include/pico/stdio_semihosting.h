@@ -29,6 +29,6 @@ extern stdio_driver_t stdio_semihosting;
  *
  * \note this method is automatically called by \ref stdio_init_all() if `pico_stdio_semihosting` is included in the build
  */
-void stdio_semihosting_init();
+void stdio_semihosting_init(void);
 
 #endif

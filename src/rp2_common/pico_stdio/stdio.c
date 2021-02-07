@@ -33,7 +33,7 @@ static stdio_driver_t *filter;
 #if PICO_STDOUT_MUTEX
 auto_init_mutex(print_mutex);
 
-bool stdout_serialize_begin() {
+bool stdout_serialize_begin(void) {
     int core_num = get_core_num();
     uint32_t owner;
     if (!mutex_try_enter(&print_mutex, &owner)) {
@@ -46,15 +46,15 @@ bool stdout_serialize_begin() {
     return true;
 }
 
-void stdout_serialize_end() {
+void stdout_serialize_end(void) {
     mutex_exit(&print_mutex);
 }
 
 #else
-static bool print_serialize_begin() {
+static bool print_serialize_begin(void) {
     return true;
 }
-static void print_serialize_end() {
+static void print_serialize_end(void) {
 }
 #endif
 
@@ -255,7 +255,7 @@ void stdio_init_all() {
 #endif
 }
 
-int WRAPPER_FUNC(getchar)() {
+int WRAPPER_FUNC(getchar)(void) {
     char buf[1];
     if (0 == stdio_get_until(buf, sizeof(buf), at_the_end_of_time)) {
         return PICO_ERROR_TIMEOUT;

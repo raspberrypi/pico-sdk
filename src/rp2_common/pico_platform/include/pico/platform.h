@@ -50,7 +50,7 @@ extern "C" {
 
 #define __uninitialized_ram(group) __attribute__((section(".uninitialized_ram." #group))) group
 
-inline static void __breakpoint() {
+inline static void __breakpoint(void) {
     __asm__("bkpt #0");
 }
 
@@ -59,7 +59,7 @@ inline static void __breakpoint() {
 // we provide this macro which allows that code to provide a 64->32 bit mapping in host mode
 #define host_safe_hw_ptr(x) ((uintptr_t)(x))
 
-void __attribute__((noreturn)) panic_unsupported();
+void __attribute__((noreturn)) panic_unsupported(void);
 
 void __attribute__((noreturn)) panic(const char *fmt, ...);
 
@@ -69,19 +69,19 @@ void __attribute__((noreturn)) panic(const char *fmt, ...);
 #endif
 
 #if PICO_NO_FPGA_CHECK
-static inline bool running_on_fpga() {return false;}
+static inline bool running_on_fpga(void) {return false;}
 #else
-bool running_on_fpga();
+bool running_on_fpga(void);
 #endif
 
-uint8_t rp2040_chip_version();
+uint8_t rp2040_chip_version(void);
 
-static inline uint8_t rp2040_rom_version() {
+static inline uint8_t rp2040_rom_version(void) {
     return *(uint8_t*)0x13;
 }
 
 // called by any tight hardware polling loop... nominally empty, but can be modified for debugging
-static inline void tight_loop_contents() {}
+static inline void tight_loop_contents(void) {}
 
 // return a 32 bit handle for a raw ptr; DMA chaining for example embeds pointers in 32 bit values
 // which of course does not work if we're running the code natively on a 64 bit platform for testing.

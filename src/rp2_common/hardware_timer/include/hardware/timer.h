@@ -62,7 +62,7 @@ static inline void check_hardware_alarm_num_param(uint alarm_num) {
 *
 * \return the 32 bit timestamp
 */
-static inline uint32_t time_us_32() {
+static inline uint32_t time_us_32(void) {
     return timer_hw->timerawl;
 }
 
@@ -75,7 +75,7 @@ static inline uint32_t time_us_32() {
 *
 * \return the 64 bit timestamp
 */
-uint64_t time_us_64();
+uint64_t time_us_64(void);
 
 /*! \brief Busy wait wasting cycles for the given (32 bit) number of microseconds
  *  \ingroup hardware_timer

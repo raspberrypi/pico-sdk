@@ -595,7 +595,7 @@ inline static void dma_sniffer_set_byte_swap_enabled(bool swap) {
  *  \ingroup hardware_dma
  *
  */
-inline static void dma_sniffer_disable() {
+inline static void dma_sniffer_disable(void) {
     dma_hw->sniff_ctrl = 0;
 }
 

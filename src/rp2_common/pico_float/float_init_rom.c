@@ -19,13 +19,13 @@ static __attribute__((noreturn)) void missing_float_func_shim() {
 }
 #endif
 
-void __aeabi_float_init() {
+void __aeabi_float_init(void) {
     int rom_version = rp2040_rom_version();
     void *rom_table = rom_data_lookup(rom_table_code('S', 'F'));
 #if PICO_FLOAT_SUPPORT_ROM_V1
     if (rom_version == 1) {
         memcpy(&sf_table, rom_table, SF_TABLE_V1_SIZE);
-        extern void float_table_shim_on_use_helper();
+        extern void float_table_shim_on_use_helper(void);
         // todo replace NDEBUG with a more exclusive assertion guard
 #ifndef NDEBUG
         if (*(uint16_t *)0x29ee != 0x0fc4 || // this is packx

@@ -12,10 +12,10 @@
 #include "pico/mutex.h"
 #include "pico/assert.h"
 
-extern void __unhandled_user_irq();
-extern uint __get_current_exception();
+extern void __unhandled_user_irq(void);
+extern uint __get_current_exception(void);
 
-static inline irq_handler_t *get_vtable() {
+static inline irq_handler_t *get_vtable(void) {
     return (irq_handler_t *) scb_hw->vtor;
 }
 
@@ -69,8 +69,8 @@ void irq_set_pending(uint num) {
 static_assert(PICO_MAX_SHARED_IRQ_HANDLERS >= 1 && PICO_MAX_SHARED_IRQ_HANDLERS < 0x7f, "");
 
 // note these are not real functions, they are code fragments (i.e. don't call them)
-extern void irq_handler_chain_first_slot();
-extern void irq_handler_chain_remove_tail();
+extern void irq_handler_chain_first_slot(void);
+extern void irq_handler_chain_remove_tail(void);
 
 extern struct irq_handler_chain_slot {
     // first 3 half words are executable code (raw vtable handler points to one slot, and inst3 will jump to next

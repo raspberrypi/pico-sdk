@@ -354,7 +354,7 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  *
  * \return the default state machine configuration which can then be modified.
  */
-static inline pio_sm_config pio_get_default_sm_config() {
+static inline pio_sm_config pio_get_default_sm_config(void) {
     pio_sm_config c = {0, 0, 0};
     sm_config_set_clkdiv_int_frac(&c, 1, 0);
     sm_config_set_wrap(&c, 0, 31);
