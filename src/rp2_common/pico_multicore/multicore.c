@@ -46,7 +46,7 @@ bool multicore_fifo_push_timeout_us(uint32_t data, uint64_t timeout_us) {
     return true;
 }
 
-static inline uint32_t multicore_fifo_pop_blocking_inline() {
+static inline uint32_t multicore_fifo_pop_blocking_inline(void) {
     // If nothing there yet, we wait for an event first,
     // to try and avoid too much busy waiting
     while (!multicore_fifo_rvalid())
@@ -75,7 +75,7 @@ bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out) {
 // Default stack for core1 ... if multicore_launch_core1 is not included then .stack1 section will be garbage collected
 static uint32_t __attribute__((section(".stack1"))) core1_stack[PICO_CORE1_STACK_SIZE / sizeof(uint32_t)];
 
-static void __attribute__ ((naked)) core1_trampoline() {
+static void __attribute__ ((naked)) core1_trampoline(void) {
     __asm("pop {r0, r1, pc}");
 }
 
@@ -110,7 +110,7 @@ void multicore_sleep_core1() {
     // note we give core1 an invalid stack pointer, as it should not be used
     // note also if we ge simply passed a function that returned immediately, we'd end up in core1_hang anyway
     //  however that would waste 2 bytes for that function (the horror!)
-    extern void core1_hang(); // in crt0.S
+    extern void core1_hang(void); // in crt0.S
     multicore_launch_core1_raw(core1_hang, (uint32_t *) -1, scb_hw->vtor);
 }
 
@@ -161,7 +161,7 @@ static bool lockout_in_progress;
 
 // note this method is in RAM because lockout is used when writing to flash
 // it only makes inline calls
-static void __isr __not_in_flash_func(multicore_lockout_handler)() {
+static void __isr __not_in_flash_func(multicore_lockout_handler)(void) {
     multicore_fifo_clear_irq();
     while (multicore_fifo_rvalid()) {
         if (sio_hw->fifo_rd == LOCKOUT_MAGIC_START) {
@@ -176,7 +176,7 @@ static void __isr __not_in_flash_func(multicore_lockout_handler)() {
     }
 }
 
-static void check_lockout_mutex_init() {
+static void check_lockout_mutex_init(void) {
     // use known available lock - we only need it briefly
     uint32_t save = hw_claim_lock();
     if (!mutex_is_initialzed(&lockout_mutex)) {

@@ -116,7 +116,7 @@ extern "C" {
  *
  * All interrupts handlers should be of this type, and follow normal ARM EABI register saving conventions
  */
-typedef void (*irq_handler_t)();
+typedef void (*irq_handler_t)(void);
 
 /*! \brief Set specified interrupts priority
  *  \ingroup hardware_irq
@@ -255,7 +255,7 @@ void irq_set_pending(uint num);
  *
  * \note This is an internal method and user should generally not call it.
  */
-void irq_init_priorities();
+void irq_init_priorities(void);
 #ifdef __cplusplus
 }
 #endif

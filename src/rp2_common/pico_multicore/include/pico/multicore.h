@@ -36,7 +36,7 @@ extern "C" {
  *  \ingroup pico_multicore
  *
  */
-void multicore_reset_core1();
+void multicore_reset_core1(void);
 
 /*! \brief  Run code on core 1
  *  \ingroup pico_multicore
@@ -58,7 +58,7 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
  *  \ingroup pico_multicore
  *
  */
-void multicore_sleep_core1();
+void multicore_sleep_core1(void);
 
 /*! \brief  Launch code on core 1 with no stack protection
  *  \ingroup pico_multicore
@@ -85,7 +85,7 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
  *
  * \return true if the FIFO has data in it, false otherwise
  */
-static inline bool multicore_fifo_rvalid() {
+static inline bool multicore_fifo_rvalid(void) {
     return !!(sio_hw->fifo_st & SIO_FIFO_ST_VLD_BITS);
 }
 
@@ -94,7 +94,7 @@ static inline bool multicore_fifo_rvalid() {
  *
  *  @return true if the FIFO is full, false otherwise
  */
-static inline bool multicore_fifo_wready() {
+static inline bool multicore_fifo_wready(void) {
     return !!(sio_hw->fifo_st & SIO_FIFO_ST_RDY_BITS);
 }
 
@@ -120,7 +120,7 @@ bool multicore_fifo_push_timeout_us(uint32_t data, uint64_t timeout_us);
  *
  * \return 32 bit unsigned data from the FIFO.
  */
-uint32_t multicore_fifo_pop_blocking();
+uint32_t multicore_fifo_pop_blocking(void);
 
 bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out);
 
@@ -128,7 +128,7 @@ bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out);
  *  \ingroup multicore_fifo
  *
  */
-static inline void multicore_fifo_drain() {
+static inline void multicore_fifo_drain(void) {
     while (multicore_fifo_rvalid())
         (void) sio_hw->fifo_rd;
 }
@@ -136,7 +136,7 @@ static inline void multicore_fifo_drain() {
 /*! \brief Clear FIFO interrupt
  *  \ingroup multicore_fifo
 */
-static inline void multicore_fifo_clear_irq() {
+static inline void multicore_fifo_clear_irq(void) {
     // Write any value to clear any interrupts
     sio_hw->fifo_st = 0xff;
 }
@@ -153,19 +153,19 @@ static inline void multicore_fifo_clear_irq() {
  * 1 | Value is 1 if this core’s TX FIFO is not full (i.e. if FIFO_WR is ready for more data)
  * 0 | Value is 1 if this core’s RX FIFO is not empty (i.e. if FIFO_RD is valid)
 */
-static inline int32_t multicore_fifo_get_status() {
+static inline int32_t multicore_fifo_get_status(void) {
     return sio_hw->fifo_st;
 }
 
 // call this from the lockout victim thread
-void multicore_lockout_victim_init();
+void multicore_lockout_victim_init(void);
 
 // start locking out the other core (it will be
 bool multicore_lockout_start_timeout_us(uint64_t timeout_us);
-void multicore_lockout_start_blocking();
+void multicore_lockout_start_blocking(void);
 
 bool multicore_lockout_end_timeout_us(uint64_t timeout_us);
-void multicore_lockout_end_blocking();
+void multicore_lockout_end_blocking(void);
 
 #ifdef __cplusplus
 }
