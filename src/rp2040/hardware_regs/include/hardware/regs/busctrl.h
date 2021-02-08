@@ -80,13 +80,54 @@
 // =============================================================================
 // Register    : BUSCTRL_PERFSEL0
 // Description : Bus fabric performance event select for PERFCTR0
-//               Select a performance event for PERFCTR0
-#define BUSCTRL_PERFSEL0_OFFSET 0x0000000c
-#define BUSCTRL_PERFSEL0_BITS   0x0000001f
-#define BUSCTRL_PERFSEL0_RESET  0x0000001f
-#define BUSCTRL_PERFSEL0_MSB    4
-#define BUSCTRL_PERFSEL0_LSB    0
-#define BUSCTRL_PERFSEL0_ACCESS "RW"
+//               Select an event for PERFCTR0. Count either contested accesses,
+//               or all accesses, on a downstream port of the main crossbar.
+//               0x00 -> apb_contested
+//               0x01 -> apb
+//               0x02 -> fastperi_contested
+//               0x03 -> fastperi
+//               0x04 -> sram5_contested
+//               0x05 -> sram5
+//               0x06 -> sram4_contested
+//               0x07 -> sram4
+//               0x08 -> sram3_contested
+//               0x09 -> sram3
+//               0x0a -> sram2_contested
+//               0x0b -> sram2
+//               0x0c -> sram1_contested
+//               0x0d -> sram1
+//               0x0e -> sram0_contested
+//               0x0f -> sram0
+//               0x10 -> xip_main_contested
+//               0x11 -> xip_main
+//               0x12 -> rom_contested
+//               0x13 -> rom
+#define BUSCTRL_PERFSEL0_OFFSET                   0x0000000c
+#define BUSCTRL_PERFSEL0_BITS                     0x0000001f
+#define BUSCTRL_PERFSEL0_RESET                    0x0000001f
+#define BUSCTRL_PERFSEL0_MSB                      4
+#define BUSCTRL_PERFSEL0_LSB                      0
+#define BUSCTRL_PERFSEL0_ACCESS                   "RW"
+#define BUSCTRL_PERFSEL0_VALUE_APB_CONTESTED      0x00
+#define BUSCTRL_PERFSEL0_VALUE_APB                0x01
+#define BUSCTRL_PERFSEL0_VALUE_FASTPERI_CONTESTED 0x02
+#define BUSCTRL_PERFSEL0_VALUE_FASTPERI           0x03
+#define BUSCTRL_PERFSEL0_VALUE_SRAM5_CONTESTED    0x04
+#define BUSCTRL_PERFSEL0_VALUE_SRAM5              0x05
+#define BUSCTRL_PERFSEL0_VALUE_SRAM4_CONTESTED    0x06
+#define BUSCTRL_PERFSEL0_VALUE_SRAM4              0x07
+#define BUSCTRL_PERFSEL0_VALUE_SRAM3_CONTESTED    0x08
+#define BUSCTRL_PERFSEL0_VALUE_SRAM3              0x09
+#define BUSCTRL_PERFSEL0_VALUE_SRAM2_CONTESTED    0x0a
+#define BUSCTRL_PERFSEL0_VALUE_SRAM2              0x0b
+#define BUSCTRL_PERFSEL0_VALUE_SRAM1_CONTESTED    0x0c
+#define BUSCTRL_PERFSEL0_VALUE_SRAM1              0x0d
+#define BUSCTRL_PERFSEL0_VALUE_SRAM0_CONTESTED    0x0e
+#define BUSCTRL_PERFSEL0_VALUE_SRAM0              0x0f
+#define BUSCTRL_PERFSEL0_VALUE_XIP_MAIN_CONTESTED 0x10
+#define BUSCTRL_PERFSEL0_VALUE_XIP_MAIN           0x11
+#define BUSCTRL_PERFSEL0_VALUE_ROM_CONTESTED      0x12
+#define BUSCTRL_PERFSEL0_VALUE_ROM                0x13
 // =============================================================================
 // Register    : BUSCTRL_PERFCTR1
 // Description : Bus fabric performance counter 1
@@ -103,13 +144,54 @@
 // =============================================================================
 // Register    : BUSCTRL_PERFSEL1
 // Description : Bus fabric performance event select for PERFCTR1
-//               Select a performance event for PERFCTR1
-#define BUSCTRL_PERFSEL1_OFFSET 0x00000014
-#define BUSCTRL_PERFSEL1_BITS   0x0000001f
-#define BUSCTRL_PERFSEL1_RESET  0x0000001f
-#define BUSCTRL_PERFSEL1_MSB    4
-#define BUSCTRL_PERFSEL1_LSB    0
-#define BUSCTRL_PERFSEL1_ACCESS "RW"
+//               Select an event for PERFCTR1. Count either contested accesses,
+//               or all accesses, on a downstream port of the main crossbar.
+//               0x00 -> apb_contested
+//               0x01 -> apb
+//               0x02 -> fastperi_contested
+//               0x03 -> fastperi
+//               0x04 -> sram5_contested
+//               0x05 -> sram5
+//               0x06 -> sram4_contested
+//               0x07 -> sram4
+//               0x08 -> sram3_contested
+//               0x09 -> sram3
+//               0x0a -> sram2_contested
+//               0x0b -> sram2
+//               0x0c -> sram1_contested
+//               0x0d -> sram1
+//               0x0e -> sram0_contested
+//               0x0f -> sram0
+//               0x10 -> xip_main_contested
+//               0x11 -> xip_main
+//               0x12 -> rom_contested
+//               0x13 -> rom
+#define BUSCTRL_PERFSEL1_OFFSET                   0x00000014
+#define BUSCTRL_PERFSEL1_BITS                     0x0000001f
+#define BUSCTRL_PERFSEL1_RESET                    0x0000001f
+#define BUSCTRL_PERFSEL1_MSB                      4
+#define BUSCTRL_PERFSEL1_LSB                      0
+#define BUSCTRL_PERFSEL1_ACCESS                   "RW"
+#define BUSCTRL_PERFSEL1_VALUE_APB_CONTESTED      0x00
+#define BUSCTRL_PERFSEL1_VALUE_APB                0x01
+#define BUSCTRL_PERFSEL1_VALUE_FASTPERI_CONTESTED 0x02
+#define BUSCTRL_PERFSEL1_VALUE_FASTPERI           0x03
+#define BUSCTRL_PERFSEL1_VALUE_SRAM5_CONTESTED    0x04
+#define BUSCTRL_PERFSEL1_VALUE_SRAM5              0x05
+#define BUSCTRL_PERFSEL1_VALUE_SRAM4_CONTESTED    0x06
+#define BUSCTRL_PERFSEL1_VALUE_SRAM4              0x07
+#define BUSCTRL_PERFSEL1_VALUE_SRAM3_CONTESTED    0x08
+#define BUSCTRL_PERFSEL1_VALUE_SRAM3              0x09
+#define BUSCTRL_PERFSEL1_VALUE_SRAM2_CONTESTED    0x0a
+#define BUSCTRL_PERFSEL1_VALUE_SRAM2              0x0b
+#define BUSCTRL_PERFSEL1_VALUE_SRAM1_CONTESTED    0x0c
+#define BUSCTRL_PERFSEL1_VALUE_SRAM1              0x0d
+#define BUSCTRL_PERFSEL1_VALUE_SRAM0_CONTESTED    0x0e
+#define BUSCTRL_PERFSEL1_VALUE_SRAM0              0x0f
+#define BUSCTRL_PERFSEL1_VALUE_XIP_MAIN_CONTESTED 0x10
+#define BUSCTRL_PERFSEL1_VALUE_XIP_MAIN           0x11
+#define BUSCTRL_PERFSEL1_VALUE_ROM_CONTESTED      0x12
+#define BUSCTRL_PERFSEL1_VALUE_ROM                0x13
 // =============================================================================
 // Register    : BUSCTRL_PERFCTR2
 // Description : Bus fabric performance counter 2
@@ -126,13 +208,54 @@
 // =============================================================================
 // Register    : BUSCTRL_PERFSEL2
 // Description : Bus fabric performance event select for PERFCTR2
-//               Select a performance event for PERFCTR2
-#define BUSCTRL_PERFSEL2_OFFSET 0x0000001c
-#define BUSCTRL_PERFSEL2_BITS   0x0000001f
-#define BUSCTRL_PERFSEL2_RESET  0x0000001f
-#define BUSCTRL_PERFSEL2_MSB    4
-#define BUSCTRL_PERFSEL2_LSB    0
-#define BUSCTRL_PERFSEL2_ACCESS "RW"
+//               Select an event for PERFCTR2. Count either contested accesses,
+//               or all accesses, on a downstream port of the main crossbar.
+//               0x00 -> apb_contested
+//               0x01 -> apb
+//               0x02 -> fastperi_contested
+//               0x03 -> fastperi
+//               0x04 -> sram5_contested
+//               0x05 -> sram5
+//               0x06 -> sram4_contested
+//               0x07 -> sram4
+//               0x08 -> sram3_contested
+//               0x09 -> sram3
+//               0x0a -> sram2_contested
+//               0x0b -> sram2
+//               0x0c -> sram1_contested
+//               0x0d -> sram1
+//               0x0e -> sram0_contested
+//               0x0f -> sram0
+//               0x10 -> xip_main_contested
+//               0x11 -> xip_main
+//               0x12 -> rom_contested
+//               0x13 -> rom
+#define BUSCTRL_PERFSEL2_OFFSET                   0x0000001c
+#define BUSCTRL_PERFSEL2_BITS                     0x0000001f
+#define BUSCTRL_PERFSEL2_RESET                    0x0000001f
+#define BUSCTRL_PERFSEL2_MSB                      4
+#define BUSCTRL_PERFSEL2_LSB                      0
+#define BUSCTRL_PERFSEL2_ACCESS                   "RW"
+#define BUSCTRL_PERFSEL2_VALUE_APB_CONTESTED      0x00
+#define BUSCTRL_PERFSEL2_VALUE_APB                0x01
+#define BUSCTRL_PERFSEL2_VALUE_FASTPERI_CONTESTED 0x02
+#define BUSCTRL_PERFSEL2_VALUE_FASTPERI           0x03
+#define BUSCTRL_PERFSEL2_VALUE_SRAM5_CONTESTED    0x04
+#define BUSCTRL_PERFSEL2_VALUE_SRAM5              0x05
+#define BUSCTRL_PERFSEL2_VALUE_SRAM4_CONTESTED    0x06
+#define BUSCTRL_PERFSEL2_VALUE_SRAM4              0x07
+#define BUSCTRL_PERFSEL2_VALUE_SRAM3_CONTESTED    0x08
+#define BUSCTRL_PERFSEL2_VALUE_SRAM3              0x09
+#define BUSCTRL_PERFSEL2_VALUE_SRAM2_CONTESTED    0x0a
+#define BUSCTRL_PERFSEL2_VALUE_SRAM2              0x0b
+#define BUSCTRL_PERFSEL2_VALUE_SRAM1_CONTESTED    0x0c
+#define BUSCTRL_PERFSEL2_VALUE_SRAM1              0x0d
+#define BUSCTRL_PERFSEL2_VALUE_SRAM0_CONTESTED    0x0e
+#define BUSCTRL_PERFSEL2_VALUE_SRAM0              0x0f
+#define BUSCTRL_PERFSEL2_VALUE_XIP_MAIN_CONTESTED 0x10
+#define BUSCTRL_PERFSEL2_VALUE_XIP_MAIN           0x11
+#define BUSCTRL_PERFSEL2_VALUE_ROM_CONTESTED      0x12
+#define BUSCTRL_PERFSEL2_VALUE_ROM                0x13
 // =============================================================================
 // Register    : BUSCTRL_PERFCTR3
 // Description : Bus fabric performance counter 3
@@ -149,12 +272,53 @@
 // =============================================================================
 // Register    : BUSCTRL_PERFSEL3
 // Description : Bus fabric performance event select for PERFCTR3
-//               Select a performance event for PERFCTR3
-#define BUSCTRL_PERFSEL3_OFFSET 0x00000024
-#define BUSCTRL_PERFSEL3_BITS   0x0000001f
-#define BUSCTRL_PERFSEL3_RESET  0x0000001f
-#define BUSCTRL_PERFSEL3_MSB    4
-#define BUSCTRL_PERFSEL3_LSB    0
-#define BUSCTRL_PERFSEL3_ACCESS "RW"
+//               Select an event for PERFCTR3. Count either contested accesses,
+//               or all accesses, on a downstream port of the main crossbar.
+//               0x00 -> apb_contested
+//               0x01 -> apb
+//               0x02 -> fastperi_contested
+//               0x03 -> fastperi
+//               0x04 -> sram5_contested
+//               0x05 -> sram5
+//               0x06 -> sram4_contested
+//               0x07 -> sram4
+//               0x08 -> sram3_contested
+//               0x09 -> sram3
+//               0x0a -> sram2_contested
+//               0x0b -> sram2
+//               0x0c -> sram1_contested
+//               0x0d -> sram1
+//               0x0e -> sram0_contested
+//               0x0f -> sram0
+//               0x10 -> xip_main_contested
+//               0x11 -> xip_main
+//               0x12 -> rom_contested
+//               0x13 -> rom
+#define BUSCTRL_PERFSEL3_OFFSET                   0x00000024
+#define BUSCTRL_PERFSEL3_BITS                     0x0000001f
+#define BUSCTRL_PERFSEL3_RESET                    0x0000001f
+#define BUSCTRL_PERFSEL3_MSB                      4
+#define BUSCTRL_PERFSEL3_LSB                      0
+#define BUSCTRL_PERFSEL3_ACCESS                   "RW"
+#define BUSCTRL_PERFSEL3_VALUE_APB_CONTESTED      0x00
+#define BUSCTRL_PERFSEL3_VALUE_APB                0x01
+#define BUSCTRL_PERFSEL3_VALUE_FASTPERI_CONTESTED 0x02
+#define BUSCTRL_PERFSEL3_VALUE_FASTPERI           0x03
+#define BUSCTRL_PERFSEL3_VALUE_SRAM5_CONTESTED    0x04
+#define BUSCTRL_PERFSEL3_VALUE_SRAM5              0x05
+#define BUSCTRL_PERFSEL3_VALUE_SRAM4_CONTESTED    0x06
+#define BUSCTRL_PERFSEL3_VALUE_SRAM4              0x07
+#define BUSCTRL_PERFSEL3_VALUE_SRAM3_CONTESTED    0x08
+#define BUSCTRL_PERFSEL3_VALUE_SRAM3              0x09
+#define BUSCTRL_PERFSEL3_VALUE_SRAM2_CONTESTED    0x0a
+#define BUSCTRL_PERFSEL3_VALUE_SRAM2              0x0b
+#define BUSCTRL_PERFSEL3_VALUE_SRAM1_CONTESTED    0x0c
+#define BUSCTRL_PERFSEL3_VALUE_SRAM1              0x0d
+#define BUSCTRL_PERFSEL3_VALUE_SRAM0_CONTESTED    0x0e
+#define BUSCTRL_PERFSEL3_VALUE_SRAM0              0x0f
+#define BUSCTRL_PERFSEL3_VALUE_XIP_MAIN_CONTESTED 0x10
+#define BUSCTRL_PERFSEL3_VALUE_XIP_MAIN           0x11
+#define BUSCTRL_PERFSEL3_VALUE_ROM_CONTESTED      0x12
+#define BUSCTRL_PERFSEL3_VALUE_ROM                0x13
 // =============================================================================
 #endif // HARDWARE_REGS_BUSCTRL_DEFINED

@@ -22556,7 +22556,89 @@
             <field>
               <access>read-write</access>
               <bitRange>[4:0]</bitRange>
-              <description>Select a performance event for PERFCTR0</description>
+              <description>Select an event for PERFCTR0. Count either contested accesses, or all accesses, on a downstream port of the main crossbar.</description>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>apb_contested</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>apb</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>fastperi_contested</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>fastperi</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram5_contested</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram5</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram4_contested</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram4</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram3_contested</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram3</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram2_contested</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram2</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram1_contested</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram0_contested</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram0</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>xip_main_contested</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>xip_main</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>rom_contested</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>rom</name>
+                  <value>19</value>
+                </enumeratedValue>
+              </enumeratedValues>
               <name>PERFSEL0</name>
             </field>
           </fields>
@@ -22587,7 +22669,89 @@
             <field>
               <access>read-write</access>
               <bitRange>[4:0]</bitRange>
-              <description>Select a performance event for PERFCTR1</description>
+              <description>Select an event for PERFCTR1. Count either contested accesses, or all accesses, on a downstream port of the main crossbar.</description>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>apb_contested</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>apb</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>fastperi_contested</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>fastperi</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram5_contested</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram5</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram4_contested</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram4</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram3_contested</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram3</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram2_contested</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram2</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram1_contested</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram0_contested</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram0</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>xip_main_contested</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>xip_main</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>rom_contested</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>rom</name>
+                  <value>19</value>
+                </enumeratedValue>
+              </enumeratedValues>
               <name>PERFSEL1</name>
             </field>
           </fields>
@@ -22618,7 +22782,89 @@
             <field>
               <access>read-write</access>
               <bitRange>[4:0]</bitRange>
-              <description>Select a performance event for PERFCTR2</description>
+              <description>Select an event for PERFCTR2. Count either contested accesses, or all accesses, on a downstream port of the main crossbar.</description>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>apb_contested</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>apb</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>fastperi_contested</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>fastperi</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram5_contested</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram5</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram4_contested</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram4</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram3_contested</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram3</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram2_contested</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram2</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram1_contested</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram0_contested</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram0</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>xip_main_contested</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>xip_main</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>rom_contested</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>rom</name>
+                  <value>19</value>
+                </enumeratedValue>
+              </enumeratedValues>
               <name>PERFSEL2</name>
             </field>
           </fields>
@@ -22649,7 +22895,89 @@
             <field>
               <access>read-write</access>
               <bitRange>[4:0]</bitRange>
-              <description>Select a performance event for PERFCTR3</description>
+              <description>Select an event for PERFCTR3. Count either contested accesses, or all accesses, on a downstream port of the main crossbar.</description>
+              <enumeratedValues>
+                <enumeratedValue>
+                  <name>apb_contested</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>apb</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>fastperi_contested</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>fastperi</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram5_contested</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram5</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram4_contested</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram4</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram3_contested</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram3</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram2_contested</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram2</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram1_contested</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram0_contested</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>sram0</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>xip_main_contested</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>xip_main</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>rom_contested</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <name>rom</name>
+                  <value>19</value>
+                </enumeratedValue>
+              </enumeratedValues>
               <name>PERFSEL3</name>
             </field>
           </fields>
