@@ -1095,7 +1095,7 @@
 #define USB_BUFF_STATUS_EP15_OUT_BITS   0x80000000
 #define USB_BUFF_STATUS_EP15_OUT_MSB    31
 #define USB_BUFF_STATUS_EP15_OUT_LSB    31
-#define USB_BUFF_STATUS_EP15_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP15_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP15_IN
 // Description : None
@@ -1103,7 +1103,7 @@
 #define USB_BUFF_STATUS_EP15_IN_BITS   0x40000000
 #define USB_BUFF_STATUS_EP15_IN_MSB    30
 #define USB_BUFF_STATUS_EP15_IN_LSB    30
-#define USB_BUFF_STATUS_EP15_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP15_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP14_OUT
 // Description : None
@@ -1111,7 +1111,7 @@
 #define USB_BUFF_STATUS_EP14_OUT_BITS   0x20000000
 #define USB_BUFF_STATUS_EP14_OUT_MSB    29
 #define USB_BUFF_STATUS_EP14_OUT_LSB    29
-#define USB_BUFF_STATUS_EP14_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP14_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP14_IN
 // Description : None
@@ -1119,7 +1119,7 @@
 #define USB_BUFF_STATUS_EP14_IN_BITS   0x10000000
 #define USB_BUFF_STATUS_EP14_IN_MSB    28
 #define USB_BUFF_STATUS_EP14_IN_LSB    28
-#define USB_BUFF_STATUS_EP14_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP14_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP13_OUT
 // Description : None
@@ -1127,7 +1127,7 @@
 #define USB_BUFF_STATUS_EP13_OUT_BITS   0x08000000
 #define USB_BUFF_STATUS_EP13_OUT_MSB    27
 #define USB_BUFF_STATUS_EP13_OUT_LSB    27
-#define USB_BUFF_STATUS_EP13_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP13_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP13_IN
 // Description : None
@@ -1135,7 +1135,7 @@
 #define USB_BUFF_STATUS_EP13_IN_BITS   0x04000000
 #define USB_BUFF_STATUS_EP13_IN_MSB    26
 #define USB_BUFF_STATUS_EP13_IN_LSB    26
-#define USB_BUFF_STATUS_EP13_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP13_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP12_OUT
 // Description : None
@@ -1143,7 +1143,7 @@
 #define USB_BUFF_STATUS_EP12_OUT_BITS   0x02000000
 #define USB_BUFF_STATUS_EP12_OUT_MSB    25
 #define USB_BUFF_STATUS_EP12_OUT_LSB    25
-#define USB_BUFF_STATUS_EP12_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP12_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP12_IN
 // Description : None
@@ -1151,7 +1151,7 @@
 #define USB_BUFF_STATUS_EP12_IN_BITS   0x01000000
 #define USB_BUFF_STATUS_EP12_IN_MSB    24
 #define USB_BUFF_STATUS_EP12_IN_LSB    24
-#define USB_BUFF_STATUS_EP12_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP12_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP11_OUT
 // Description : None
@@ -1159,7 +1159,7 @@
 #define USB_BUFF_STATUS_EP11_OUT_BITS   0x00800000
 #define USB_BUFF_STATUS_EP11_OUT_MSB    23
 #define USB_BUFF_STATUS_EP11_OUT_LSB    23
-#define USB_BUFF_STATUS_EP11_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP11_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP11_IN
 // Description : None
@@ -1167,7 +1167,7 @@
 #define USB_BUFF_STATUS_EP11_IN_BITS   0x00400000
 #define USB_BUFF_STATUS_EP11_IN_MSB    22
 #define USB_BUFF_STATUS_EP11_IN_LSB    22
-#define USB_BUFF_STATUS_EP11_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP11_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP10_OUT
 // Description : None
@@ -1175,7 +1175,7 @@
 #define USB_BUFF_STATUS_EP10_OUT_BITS   0x00200000
 #define USB_BUFF_STATUS_EP10_OUT_MSB    21
 #define USB_BUFF_STATUS_EP10_OUT_LSB    21
-#define USB_BUFF_STATUS_EP10_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP10_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP10_IN
 // Description : None
@@ -1183,7 +1183,7 @@
 #define USB_BUFF_STATUS_EP10_IN_BITS   0x00100000
 #define USB_BUFF_STATUS_EP10_IN_MSB    20
 #define USB_BUFF_STATUS_EP10_IN_LSB    20
-#define USB_BUFF_STATUS_EP10_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP10_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP9_OUT
 // Description : None
@@ -1191,7 +1191,7 @@
 #define USB_BUFF_STATUS_EP9_OUT_BITS   0x00080000
 #define USB_BUFF_STATUS_EP9_OUT_MSB    19
 #define USB_BUFF_STATUS_EP9_OUT_LSB    19
-#define USB_BUFF_STATUS_EP9_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP9_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP9_IN
 // Description : None
@@ -1199,7 +1199,7 @@
 #define USB_BUFF_STATUS_EP9_IN_BITS   0x00040000
 #define USB_BUFF_STATUS_EP9_IN_MSB    18
 #define USB_BUFF_STATUS_EP9_IN_LSB    18
-#define USB_BUFF_STATUS_EP9_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP9_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP8_OUT
 // Description : None
@@ -1207,7 +1207,7 @@
 #define USB_BUFF_STATUS_EP8_OUT_BITS   0x00020000
 #define USB_BUFF_STATUS_EP8_OUT_MSB    17
 #define USB_BUFF_STATUS_EP8_OUT_LSB    17
-#define USB_BUFF_STATUS_EP8_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP8_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP8_IN
 // Description : None
@@ -1215,7 +1215,7 @@
 #define USB_BUFF_STATUS_EP8_IN_BITS   0x00010000
 #define USB_BUFF_STATUS_EP8_IN_MSB    16
 #define USB_BUFF_STATUS_EP8_IN_LSB    16
-#define USB_BUFF_STATUS_EP8_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP8_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP7_OUT
 // Description : None
@@ -1223,7 +1223,7 @@
 #define USB_BUFF_STATUS_EP7_OUT_BITS   0x00008000
 #define USB_BUFF_STATUS_EP7_OUT_MSB    15
 #define USB_BUFF_STATUS_EP7_OUT_LSB    15
-#define USB_BUFF_STATUS_EP7_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP7_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP7_IN
 // Description : None
@@ -1231,7 +1231,7 @@
 #define USB_BUFF_STATUS_EP7_IN_BITS   0x00004000
 #define USB_BUFF_STATUS_EP7_IN_MSB    14
 #define USB_BUFF_STATUS_EP7_IN_LSB    14
-#define USB_BUFF_STATUS_EP7_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP7_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP6_OUT
 // Description : None
@@ -1239,7 +1239,7 @@
 #define USB_BUFF_STATUS_EP6_OUT_BITS   0x00002000
 #define USB_BUFF_STATUS_EP6_OUT_MSB    13
 #define USB_BUFF_STATUS_EP6_OUT_LSB    13
-#define USB_BUFF_STATUS_EP6_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP6_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP6_IN
 // Description : None
@@ -1247,7 +1247,7 @@
 #define USB_BUFF_STATUS_EP6_IN_BITS   0x00001000
 #define USB_BUFF_STATUS_EP6_IN_MSB    12
 #define USB_BUFF_STATUS_EP6_IN_LSB    12
-#define USB_BUFF_STATUS_EP6_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP6_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP5_OUT
 // Description : None
@@ -1255,7 +1255,7 @@
 #define USB_BUFF_STATUS_EP5_OUT_BITS   0x00000800
 #define USB_BUFF_STATUS_EP5_OUT_MSB    11
 #define USB_BUFF_STATUS_EP5_OUT_LSB    11
-#define USB_BUFF_STATUS_EP5_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP5_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP5_IN
 // Description : None
@@ -1263,7 +1263,7 @@
 #define USB_BUFF_STATUS_EP5_IN_BITS   0x00000400
 #define USB_BUFF_STATUS_EP5_IN_MSB    10
 #define USB_BUFF_STATUS_EP5_IN_LSB    10
-#define USB_BUFF_STATUS_EP5_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP5_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP4_OUT
 // Description : None
@@ -1271,7 +1271,7 @@
 #define USB_BUFF_STATUS_EP4_OUT_BITS   0x00000200
 #define USB_BUFF_STATUS_EP4_OUT_MSB    9
 #define USB_BUFF_STATUS_EP4_OUT_LSB    9
-#define USB_BUFF_STATUS_EP4_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP4_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP4_IN
 // Description : None
@@ -1279,7 +1279,7 @@
 #define USB_BUFF_STATUS_EP4_IN_BITS   0x00000100
 #define USB_BUFF_STATUS_EP4_IN_MSB    8
 #define USB_BUFF_STATUS_EP4_IN_LSB    8
-#define USB_BUFF_STATUS_EP4_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP4_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP3_OUT
 // Description : None
@@ -1287,7 +1287,7 @@
 #define USB_BUFF_STATUS_EP3_OUT_BITS   0x00000080
 #define USB_BUFF_STATUS_EP3_OUT_MSB    7
 #define USB_BUFF_STATUS_EP3_OUT_LSB    7
-#define USB_BUFF_STATUS_EP3_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP3_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP3_IN
 // Description : None
@@ -1295,7 +1295,7 @@
 #define USB_BUFF_STATUS_EP3_IN_BITS   0x00000040
 #define USB_BUFF_STATUS_EP3_IN_MSB    6
 #define USB_BUFF_STATUS_EP3_IN_LSB    6
-#define USB_BUFF_STATUS_EP3_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP3_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP2_OUT
 // Description : None
@@ -1303,7 +1303,7 @@
 #define USB_BUFF_STATUS_EP2_OUT_BITS   0x00000020
 #define USB_BUFF_STATUS_EP2_OUT_MSB    5
 #define USB_BUFF_STATUS_EP2_OUT_LSB    5
-#define USB_BUFF_STATUS_EP2_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP2_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP2_IN
 // Description : None
@@ -1311,7 +1311,7 @@
 #define USB_BUFF_STATUS_EP2_IN_BITS   0x00000010
 #define USB_BUFF_STATUS_EP2_IN_MSB    4
 #define USB_BUFF_STATUS_EP2_IN_LSB    4
-#define USB_BUFF_STATUS_EP2_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP2_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP1_OUT
 // Description : None
@@ -1319,7 +1319,7 @@
 #define USB_BUFF_STATUS_EP1_OUT_BITS   0x00000008
 #define USB_BUFF_STATUS_EP1_OUT_MSB    3
 #define USB_BUFF_STATUS_EP1_OUT_LSB    3
-#define USB_BUFF_STATUS_EP1_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP1_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP1_IN
 // Description : None
@@ -1327,7 +1327,7 @@
 #define USB_BUFF_STATUS_EP1_IN_BITS   0x00000004
 #define USB_BUFF_STATUS_EP1_IN_MSB    2
 #define USB_BUFF_STATUS_EP1_IN_LSB    2
-#define USB_BUFF_STATUS_EP1_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP1_IN_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP0_OUT
 // Description : None
@@ -1335,7 +1335,7 @@
 #define USB_BUFF_STATUS_EP0_OUT_BITS   0x00000002
 #define USB_BUFF_STATUS_EP0_OUT_MSB    1
 #define USB_BUFF_STATUS_EP0_OUT_LSB    1
-#define USB_BUFF_STATUS_EP0_OUT_ACCESS "RO"
+#define USB_BUFF_STATUS_EP0_OUT_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_BUFF_STATUS_EP0_IN
 // Description : None
@@ -1343,7 +1343,7 @@
 #define USB_BUFF_STATUS_EP0_IN_BITS   0x00000001
 #define USB_BUFF_STATUS_EP0_IN_MSB    0
 #define USB_BUFF_STATUS_EP0_IN_LSB    0
-#define USB_BUFF_STATUS_EP0_IN_ACCESS "RO"
+#define USB_BUFF_STATUS_EP0_IN_ACCESS "WC"
 // =============================================================================
 // Register    : USB_BUFF_CPU_SHOULD_HANDLE
 // Description : Which of the double buffers should be handled. Only valid if
