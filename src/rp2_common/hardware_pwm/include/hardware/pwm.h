@@ -212,7 +212,14 @@ static inline pwm_config pwm_get_default_config(void) {
 /** \brief Set the current PWM counter wrap value
  *  \ingroup hardware_pwm
  *
- * Set the highest value the counter will reach before returning to 0. Also known as TOP.
+ * Set the highest value the counter will reach before returning to 0. Also
+ * known as TOP.
+ *
+ * The counter wrap value is double-buffered in hardware. This means that,
+ * when the PWM is running, a write to the counter wrap value does not take
+ * effect until after the next time the PWM slice wraps (or, in phase-correct
+ * mode, the next time the slice reaches 0). If the PWM is not running, the
+ * write is latched in immediately.
  *
  * \param slice_num PWM slice number
  * \param wrap Value to set wrap to
@@ -226,6 +233,12 @@ static inline void pwm_set_wrap(uint slice_num, uint16_t wrap) {
  *  \ingroup hardware_pwm
  *
  * Set the value of the PWM counter compare value, for either channel A or channel B
+ *
+ * The counter compare register is double-buffered in hardware. This means
+ * that, when the PWM is running, a write to the counter compare values does
+ * not take effect until the next time the PWM slice wraps (or, in
+ * phase-correct mode, the next time the slice reaches 0). If the PWM is not
+ * running, the write is latched in immediately.
  *
  * \param slice_num PWM slice number
  * \param chan Which channel to update. 0 for A, 1 for B.
@@ -245,6 +258,12 @@ static inline void pwm_set_chan_level(uint slice_num, uint chan, uint16_t level)
  *
  * Set the value of the PWM counter compare values, A and B
  *
+ * The counter compare register is double-buffered in hardware. This means
+ * that, when the PWM is running, a write to the counter compare values does
+ * not take effect until the next time the PWM slice wraps (or, in
+ * phase-correct mode, the next time the slice reaches 0). If the PWM is not
+ * running, the write is latched in immediately.
+ *
  * \param slice_num PWM slice number
  * \param level_a Value to set compare A to. When the counter reaches this value the A output is deasserted
  * \param level_b Value to set compare B to. When the counter reaches this value the B output is deasserted
@@ -262,6 +281,12 @@ static inline void pwm_set_both_levels(uint slice_num, uint16_t level_a, uint16_
  *
  * This PWM slice should already have been configured and set running. Also be careful of multiple GPIOs
  * mapping to the same slice and channel (if GPIOs have a difference of 16).
+ *
+ * The counter compare register is double-buffered in hardware. This means
+ * that, when the PWM is running, a write to the counter compare values does
+ * not take effect until the next time the PWM slice wraps (or, in
+ * phase-correct mode, the next time the slice reaches 0). If the PWM is not
+ * running, the write is latched in immediately.
  *
  * \param gpio GPIO to set level of
  * \param level PWM level for this GPIO
