@@ -34507,163 +34507,195 @@
           <description>Buffer status register. A bit set here indicates that a buffer has completed on the endpoint (if the buffer interrupt is enabled). It is possible for 2 buffers to be completed, so clearing the buffer status bit may instantly re set it on the next clock cycle.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[31:31]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP15_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[30:30]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP15_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[29:29]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP14_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[28:28]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP14_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[27:27]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP13_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[26:26]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP13_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[25:25]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP12_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[24:24]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP12_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[23:23]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP11_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[22:22]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP11_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[21:21]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP10_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[20:20]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP10_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[19:19]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP9_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[18:18]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP9_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[17:17]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP8_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[16:16]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP8_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[15:15]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP7_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[14:14]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP7_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[13:13]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP6_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[12:12]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP6_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[11:11]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP5_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[10:10]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP5_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[9:9]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP4_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[8:8]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP4_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[7:7]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP3_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[6:6]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP3_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:5]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP2_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[4:4]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP2_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[3:3]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP1_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[2:2]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP1_IN</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[1:1]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP0_OUT</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[0:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>EP0_IN</name>
             </field>
           </fields>
