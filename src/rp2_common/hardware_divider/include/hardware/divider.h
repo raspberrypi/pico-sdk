@@ -36,6 +36,10 @@
  * \include hello_divider.c
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef uint64_t divmod_result_t;
 
 /*! \brief Start a signed asynchronous divide
@@ -391,5 +395,9 @@ void hw_divider_save_state(hw_divider_state_t *dest);
  */
 
 void hw_divider_restore_state(hw_divider_state_t *src);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _HARDWARE_DIVIDER_H
