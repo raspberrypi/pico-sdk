@@ -28,6 +28,9 @@
  * \include hello_rtc.c
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef void (*rtc_callback_t)(void);
 
@@ -70,5 +73,9 @@ void rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback);
  *  \ingroup hardware_rtc
  */
 void rtc_disable_alarm(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -42,11 +42,19 @@
 #define PICO_STDIO_USB_LOW_PRIORITY_IRQ 31
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern stdio_driver_t stdio_usb;
 
 /*! \brief Explicitly initialize USB stdio and add it to the current set of stdin drivers
  *  \ingroup pico_stdio_uart
  */
 bool stdio_usb_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
