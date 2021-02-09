@@ -174,12 +174,14 @@ static inline void sm_config_set_sideset_pins(pio_sm_config *c, uint sideset_bas
  *  \ingroup sm_config
  *
  * \param c Pointer to the configuration structure to modify
- * \param bit_count Number of bits to steal from delay field in the instruction for use of side set
+ * \param bit_count Number of bits to steal from delay field in the instruction for use of side set (max 5)
  * \param optional True if the topmost side set bit is used as a flag for whether to apply side set on that instruction
  * \param pindirs True if the side set affects pin directions rather than values
  */
 static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool optional, bool pindirs) {
-    assert(bit_count <= 32);
+    assert(bit_count <= 5);
+    if (optional)
+      assert(bit_count >= 1);
     c->pinctrl = (c->pinctrl & ~PIO_SM0_PINCTRL_SIDESET_COUNT_BITS) |
                  (bit_count << PIO_SM0_PINCTRL_SIDESET_COUNT_LSB);
 
