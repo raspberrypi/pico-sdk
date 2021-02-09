@@ -23,6 +23,10 @@
 #define PICO_STDIO_UART_DEFAULT_CRLF PICO_STDIO_DEFAULT_CRLF
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern stdio_driver_t stdio_uart;
 
 /*! \brief Explicitly initialize stdin/stdout over UART and add it to the current set of stdin/stdout drivers
@@ -58,5 +62,9 @@ void stdin_uart_init(void);
  * \param rx_pin the UART pin to use for stdin (or -1 for no stdin)
  */
 void stdio_uart_init_full(uart_inst_t *uart, uint baud_rate, int tx_pin, int rx_pin);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

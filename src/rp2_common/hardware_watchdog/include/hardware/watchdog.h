@@ -25,6 +25,10 @@
  * \include hello_watchdog.c
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief Define actions to perform at watchdog timeout
  *  \ingroup hardware_watchdog
  *
@@ -83,5 +87,9 @@ bool watchdog_caused_reboot(void);
  * @return The number of microseconds before the watchdog will reboot the chip.
  */
 uint32_t watchdog_get_count(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

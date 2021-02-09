@@ -44,6 +44,9 @@
  * \include flash_program.c
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*! \brief  Erase areas of flash
  *  \ingroup hardware_flash
@@ -74,5 +77,9 @@ void flash_range_program(uint32_t flash_offs, const uint8_t *data, size_t count)
  *  \param id_out Pointer to an 8-byte buffer to which the ID will be written
  */
 void flash_get_unique_id(uint8_t *id_out);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
