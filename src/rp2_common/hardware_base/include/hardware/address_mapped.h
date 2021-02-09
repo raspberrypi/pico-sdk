@@ -48,6 +48,10 @@
  *  leaving the other bits unchanged.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define check_hw_layout(type, member, offset) static_assert(offsetof(type, member) == (offset), "hw offset mismatch")
 #define check_hw_size(type, size) static_assert(sizeof(type) == (size), "hw size mismatch")
 
@@ -119,5 +123,9 @@ inline static void hw_xor_bits(io_rw_32 *addr, uint32_t mask) {
 inline static void hw_write_masked(io_rw_32 *addr, uint32_t values, uint32_t write_mask) {
     hw_xor_bits(addr, (*addr ^ values) & write_mask);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

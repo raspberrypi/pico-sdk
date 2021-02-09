@@ -14,6 +14,9 @@
  * Access to functions and data in the RP2040 bootrom
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*! \brief Return a bootrom lookup code based on two ASCII characters
  * \ingroup pico_bootrom
@@ -81,5 +84,9 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
     reset_usb_boot_fn func = (reset_usb_boot_fn) rom_func_lookup(rom_table_code('U', 'B'));
     func(usb_activity_gpio_pin_mask, disable_interface_mask);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

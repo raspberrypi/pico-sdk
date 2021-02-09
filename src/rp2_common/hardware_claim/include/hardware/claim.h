@@ -32,6 +32,10 @@
  * 3. Finding unused resources
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief Atomically claim a resource, panicking if it is already in use
  *  \ingroup hardware_claim
  *
@@ -97,5 +101,9 @@ uint32_t hw_claim_lock(void);
  * \param token the token returned by the corresponding call to hw_claim_lock()
  */
 void hw_claim_unlock(uint32_t token);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
