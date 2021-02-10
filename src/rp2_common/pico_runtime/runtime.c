@@ -67,6 +67,8 @@ void runtime_init(void) {
             RESETS_RESET_IO_QSPI_BITS |
             RESETS_RESET_PADS_QSPI_BITS |
             RESETS_RESET_PLL_USB_BITS |
+            RESETS_RESET_USBCTRL_BITS |
+            RESETS_RESET_SYSCFG_BITS |
             RESETS_RESET_PLL_SYS_BITS
     ));
 

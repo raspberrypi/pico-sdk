@@ -7,7 +7,6 @@
 #include "pico.h"
 #include "hardware/regs/clocks.h"
 #include "hardware/platform_defs.h"
-#include "hardware/resets.h"
 #include "hardware/clocks.h"
 #include "hardware/watchdog.h"
 #include "hardware/pll.h"
@@ -148,9 +147,6 @@ void clocks_init(void) {
     // PLL SYS: 12 / 1 = 12MHz * 125 = 1500MHZ / 6 / 2 = 125MHz
     // PLL USB: 12 / 1 = 12MHz * 40  = 480 MHz / 5 / 2 =  48MHz
     /// \end::pll_settings[]
-
-    reset_block(RESETS_RESET_PLL_SYS_BITS | RESETS_RESET_PLL_USB_BITS);
-    unreset_block_wait(RESETS_RESET_PLL_SYS_BITS | RESETS_RESET_PLL_USB_BITS);
 
     /// \tag::pll_init[]
     pll_init(pll_sys, 1, 1500 * MHZ, 6, 2);
