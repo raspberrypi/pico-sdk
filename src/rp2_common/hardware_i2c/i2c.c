@@ -109,7 +109,8 @@ void i2c_set_slave_mode(i2c_inst_t *i2c, bool slave, uint8_t addr) {
 }
 
 static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
-                                       check_timeout_fn timeout_check, struct timeout_state *ts) {
+                                       check_timeout_fn timeout_check, struct timeout_state *ts, 
+                                       uint16_t memaddr, size_t len_memaddr) {
     invalid_params_if(I2C, addr >= 0x80); // 7-bit addresses
     invalid_params_if(I2C, i2c_reserved_addr(addr));
     // Synopsys hw accepts start/stop flags alongside data items in the same
@@ -126,14 +127,16 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
     uint32_t abort_reason;
     size_t byte_ctr;
 
-    for (byte_ctr = 0; byte_ctr < len; ++byte_ctr) {
+    for (byte_ctr = 0; byte_ctr < len + len_memaddr; ++byte_ctr) {
         bool first = byte_ctr == 0;
-        bool last = byte_ctr == len - 1;
+        bool last = byte_ctr == len + len_memaddr - 1;
+        bool tx_memaddr = byte_ctr < len_memaddr;
 
+        // When byte_ctr is less than len_memaddr, there are memory address bytes to transmit 
         i2c->hw->data_cmd =
                 !!(first && i2c->restart_on_next) << I2C_IC_DATA_CMD_RESTART_LSB |
                 !!(last && !nostop) << I2C_IC_DATA_CMD_STOP_LSB |
-                *src++;
+                (tx_memaddr ? (uint8_t)(memaddr >> 8*byte_ctr) : *src++);
 
         do {
             // Note clearing the abort flag also clears the reason, and this
@@ -182,24 +185,42 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
 }
 
 int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop) {
-    return i2c_write_blocking_internal(i2c, addr, src, len, nostop, NULL, NULL);
+    return i2c_write_blocking_internal(i2c, addr, src, len, nostop, NULL, NULL, 0, 0);
 }
 
 int i2c_write_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
                              absolute_time_t until) {
     timeout_state_t ts;
-    return i2c_write_blocking_internal(i2c, addr, src, len, nostop, init_single_timeout_until(&ts, until), &ts);
+    return i2c_write_blocking_internal(i2c, addr, src, len, nostop, init_single_timeout_until(&ts, until), &ts, 0, 0);
 }
 
 int i2c_write_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
                                   uint timeout_per_char_us) {
     timeout_state_t ts;
     return i2c_write_blocking_internal(i2c, addr, src, len, nostop,
-                                       init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts);
+                                       init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts, 0, 0);
+}
+
+int i2c_write_mem_blocking(i2c_inst_t *i2c, uint8_t addr, uint16_t memaddr, size_t len_memaddr, const uint8_t *src, size_t len, bool nostop) {
+    return i2c_write_blocking_internal(i2c, addr, src, len, nostop, NULL, NULL, memaddr, len_memaddr);
+}
+
+int i2c_write_mem_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint16_t memaddr, size_t len_memaddr, const uint8_t *src, size_t len, bool nostop,
+                             absolute_time_t until) {
+    timeout_state_t ts;
+    return i2c_write_blocking_internal(i2c, addr, src, len, nostop, init_single_timeout_until(&ts, until), &ts, memaddr, len_memaddr);
+}
+
+int i2c_write_mem_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint16_t memaddr, size_t len_memaddr, const uint8_t *src, size_t len, bool nostop,
+                                  uint timeout_per_char_us) {
+    timeout_state_t ts;
+    return i2c_write_blocking_internal(i2c, addr, src, len, nostop,
+                                       init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts, memaddr, len_memaddr);
 }
 
 static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop,
-                               check_timeout_fn timeout_check, timeout_state_t *ts) {
+                               check_timeout_fn timeout_check, timeout_state_t *ts, 
+                               uint16_t memaddr, size_t len_memaddr) {
     invalid_params_if(I2C, addr >= 0x80); // 7-bit addresses
     invalid_params_if(I2C, i2c_reserved_addr(addr));
     invalid_params_if(I2C, len == 0);
@@ -213,16 +234,18 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
     uint32_t abort_reason;
     size_t byte_ctr;
 
-    for (byte_ctr = 0; byte_ctr < len; ++byte_ctr) {
+    for (byte_ctr = 0; byte_ctr < len + len_memaddr; ++byte_ctr) {
         bool first = byte_ctr == 0;
-        bool last = byte_ctr == len - 1;
+        bool last = byte_ctr == len + len_memaddr - 1;
+        bool tx_memaddr = byte_ctr < len_memaddr;
+
         while (!i2c_get_write_available(i2c))
             tight_loop_contents();
 
         i2c->hw->data_cmd =
                 !!(first && i2c->restart_on_next) << I2C_IC_DATA_CMD_RESTART_LSB |
                 !!(last && !nostop) << I2C_IC_DATA_CMD_STOP_LSB |
-                I2C_IC_DATA_CMD_CMD_BITS; // -> 1 for read
+                (tx_memaddr ? (uint8_t)(memaddr >> 8*byte_ctr) : I2C_IC_DATA_CMD_CMD_BITS); // -> 1 for read
 
         do {
             abort_reason = i2c->hw->tx_abrt_source;
@@ -231,12 +254,13 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
                 timeout = timeout_check(ts);
                 abort |= timeout;
             }
-        } while (!abort && !i2c_get_read_available(i2c));
+        } while (!abort && !i2c_get_read_available(i2c) && !(tx_memaddr && (i2c->hw->status & I2C_IC_STATUS_TFE_BITS)));
 
         if (abort)
             break;
 
-        *dst++ = i2c->hw->data_cmd;
+        if(!tx_memaddr)
+            *dst++ = i2c->hw->data_cmd;
     }
 
     int rval;
@@ -261,17 +285,33 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
 }
 
 int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop) {
-    return i2c_read_blocking_internal(i2c, addr, dst, len, nostop, NULL, NULL);
+    return i2c_read_blocking_internal(i2c, addr, dst, len, nostop, NULL, NULL, 0, 0);
 }
 
 int i2c_read_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until) {
     timeout_state_t ts;
-    return i2c_read_blocking_internal(i2c, addr, dst, len, nostop, init_single_timeout_until(&ts, until), &ts);
+    return i2c_read_blocking_internal(i2c, addr, dst, len, nostop, init_single_timeout_until(&ts, until), &ts, 0, 0);
 }
 
 int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop,
                                  uint timeout_per_char_us) {
     timeout_state_t ts;
     return i2c_read_blocking_internal(i2c, addr, dst, len, nostop,
-                                      init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts);
+                                      init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts, 0, 0);
+}
+
+int i2c_read_mem_blocking(i2c_inst_t *i2c, uint8_t addr, uint16_t mem_addr, size_t len_memaddr, uint8_t *dst, size_t len, bool nostop) {
+    return i2c_read_blocking_internal(i2c, addr, dst, len, nostop, NULL, NULL, mem_addr, len_memaddr);
+}
+
+int i2c_read_mem_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint16_t mem_addr, size_t len_memaddr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until) {
+    timeout_state_t ts;
+    return i2c_read_blocking_internal(i2c, addr, dst, len, nostop, init_single_timeout_until(&ts, until), &ts, mem_addr, len_memaddr);
+}
+
+int i2c_read_mem_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint16_t mem_addr, size_t len_memaddr, uint8_t *dst, size_t len, bool nostop,
+                                 uint timeout_per_char_us) {
+    timeout_state_t ts;
+    return i2c_read_blocking_internal(i2c, addr, dst, len, nostop,
+                                      init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts, mem_addr, len_memaddr);
 }
