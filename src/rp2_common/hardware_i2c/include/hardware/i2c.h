@@ -155,7 +155,7 @@ static inline i2c_hw_t *i2c_get_hw(i2c_inst_t *i2c) {
  */
 int i2c_write_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop, absolute_time_t until);
 
-/*! \brief Attempt to write specified number of bytes to address, blocking until the specified absolute time is reached.
+/*! \brief Attempt to write specified number of bytes to address addr with memory address memaddr, blocking until the specified absolute time is reached.
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
@@ -189,7 +189,7 @@ int i2c_write_mem_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint16_t memaddr
  */
 int i2c_read_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until);
 
-/*! \brief  Attempt to read specified number of bytes from address, blocking until the specified absolute time is reached.
+/*! \brief  Attempt to read specified number of bytes from address addr with memory address memaddr, blocking until the specified absolute time is reached.
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
@@ -226,7 +226,7 @@ static inline int i2c_write_timeout_us(i2c_inst_t *i2c, uint8_t addr, const uint
     return i2c_write_blocking_until(i2c, addr, src, len, nostop, t);
 }
 
-/*! \brief Attempt to write specified number of bytes to address, with timeout
+/*! \brief Attempt to write specified number of bytes to address addr with memory address memaddr, with timeout
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
@@ -268,7 +268,7 @@ static inline int i2c_read_timeout_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
     absolute_time_t t = make_timeout_time_us(timeout_us);
     return i2c_read_blocking_until(i2c, addr, dst, len, nostop, t);
 }
-/*! \brief  Attempt to read specified number of bytes from address, with timeout
+/*! \brief  Attempt to read specified number of bytes from address addr with memory address memaddr, with timeout
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
@@ -303,7 +303,7 @@ int i2c_read_mem_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint16_t mem
  */
 int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop);
 
-/*! \brief Attempt to write specified number of bytes to address, blocking
+/*! \brief Attempt to write specified number of bytes to address addr with memory address memaddr, blocking
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
@@ -331,7 +331,7 @@ int i2c_write_mem_blocking(i2c_inst_t *i2c, uint8_t addr, uint16_t memaddr, size
  */
 int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop);
 
-/*! \brief  Attempt to read specified number of bytes from address, blocking
+/*! \brief  Attempt to read specified number of bytes from address addr with memory address memaddr, blocking
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
