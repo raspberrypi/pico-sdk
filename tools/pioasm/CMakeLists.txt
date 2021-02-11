@@ -23,6 +23,7 @@ add_executable(pioasm
 target_sources(pioasm PRIVATE c_sdk_output.cpp)
 target_sources(pioasm PRIVATE python_output.cpp)
 target_sources(pioasm PRIVATE hex_output.cpp)
+target_sources(pioasm PRIVATE binary_output.cpp)
 target_sources(pioasm PRIVATE ${PIOASM_EXTRA_SOURCE_FILES})
 
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND
