@@ -42,8 +42,9 @@ void pio_sm_unclaim(PIO pio, uint sm) {
 }
 
 int pio_claim_unused_sm(PIO pio, bool required) {
-    uint which = pio_get_index(pio);
-    uint base = which * NUM_PIO_STATE_MACHINES;
+    // PIO index is 0 or 1.
+    int which = (int)pio_get_index(pio);
+    int base = which * NUM_PIO_STATE_MACHINES;
     int index = hw_claim_unused_from_range((uint8_t*)&claimed, required, base,
                                       base + NUM_PIO_STATE_MACHINES - 1, "No PIO state machines are available");
     return index >= base ? index - base : -1;
@@ -87,7 +88,7 @@ bool pio_can_add_program(PIO pio, const pio_program_t *program) {
 static bool _pio_can_add_program_at_offset(PIO pio, const pio_program_t *program, uint offset) {
     assert(offset < PIO_INSTRUCTION_COUNT);
     assert(offset + program->length <= PIO_INSTRUCTION_COUNT);
-    if (program->origin >= 0 && program->origin != offset) return false;
+    if (program->origin >= 0 && (uint)program->origin != offset) return false;
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     uint32_t program_mask = (1u << program->length) - 1;
     return !(used_mask & (program_mask << offset));

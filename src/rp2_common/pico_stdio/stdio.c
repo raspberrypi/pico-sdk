@@ -34,7 +34,7 @@ static stdio_driver_t *filter;
 auto_init_mutex(print_mutex);
 
 bool stdout_serialize_begin(void) {
-    int core_num = get_core_num();
+    uint core_num = get_core_num();
     uint32_t owner;
     if (!mutex_try_enter(&print_mutex, &owner)) {
         if (owner == core_num) {
