@@ -180,8 +180,7 @@ static inline void sm_config_set_sideset_pins(pio_sm_config *c, uint sideset_bas
  */
 static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool optional, bool pindirs) {
     assert(bit_count <= 5);
-    if (optional)
-      assert(bit_count >= 1);
+    assert(!optional || bit_count >= 1);
     c->pinctrl = (c->pinctrl & ~PIO_SM0_PINCTRL_SIDESET_COUNT_BITS) |
                  (bit_count << PIO_SM0_PINCTRL_SIDESET_COUNT_LSB);
 
