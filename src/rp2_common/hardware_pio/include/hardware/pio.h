@@ -148,7 +148,7 @@ static inline void sm_config_set_set_pins(pio_sm_config *c, uint set_base, uint 
  * Can overlap with the 'out', ''set' and 'sideset' pins
  *
  * \param c Pointer to the configuration structure to modify
- * \param in_base 0-31 First pin to set as input
+ * \param in_base 0-31 First pin to use as input
  */
 static inline void sm_config_set_in_pins(pio_sm_config *c, uint in_base) {
     assert(in_base < 32);
@@ -162,7 +162,7 @@ static inline void sm_config_set_in_pins(pio_sm_config *c, uint in_base) {
  * Can overlap with the 'in', 'out' and 'set' pins
  *
  * \param c Pointer to the configuration structure to modify
- * \param sideset_base base pin for 'side set'
+ * \param sideset_base 0-31 base pin for 'side set'
  */
 static inline void sm_config_set_sideset_pins(pio_sm_config *c, uint sideset_base) {
     assert(sideset_base < 32);
@@ -191,8 +191,10 @@ static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool 
 /*! \brief Set the state machine clock divider (from a floating point value) in a state machine configuration
  *  \ingroup sm_config
  *
- * The clock divider acts on the system clock to provide a clock for the state machine.
- * See the datasheet for more details.
+ * The clock divider can slow the state machine's execution to some rate below
+ * the system clock frequency, by enabling the state machine on some cycles
+ * but not on others, in a regular pattern. This can be used to generate e.g.
+ * a given UART baud rate. See the datasheet for further detail.
  *
  * \param c Pointer to the configuration structure to modify
  * \param div The fractional divisor to be set. 1 for full speed. An integer clock divisor of n
@@ -211,8 +213,10 @@ static inline void sm_config_set_clkdiv(pio_sm_config *c, float div) {
 /*! \brief Set the state machine clock divider (from integer and fractional parts - 16:8) in a state machine configuration
  *  \ingroup sm_config
  *
- * The clock divider acts on the system clock to provide a clock for the state machine.
- * See the datasheet for more details.
+ * The clock divider can slow the state machine's execution to some rate below
+ * the system clock frequency, by enabling the state machine on some cycles
+ * but not on others, in a regular pattern. This can be used to generate e.g.
+ * a given UART baud rate. See the datasheet for further detail.
  *
  * \param c Pointer to the configuration structure to modify
  * \param div_int Integer part of the divisor
@@ -392,6 +396,12 @@ static inline uint pio_get_index(PIO pio) {
 /*! \brief Setup the function select for a GPIO to use output from the given PIO instance 
  *  \ingroup hardware_pio
  *
+ * PIO appears as an alternate function in the GPIO muxing, just like an SPI
+ * or UART. This function configures that multiplexing to connect a given PIO
+ * instance to a GPIO. Note that this is not necessary for a state machine to
+ * be able to read the *input* value from a GPIO, but only for it to set the
+ * output value or output enable.
+ *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param pin the GPIO pin whose function select to set
  */
@@ -480,13 +490,13 @@ void pio_clear_instruction_memory(PIO pio);
  *  \ingroup hardware_pio
  *
  * This method:
- * - disables the state machine (if running)
- * - clears the FIFOs
- * - applies the configuration
- * - resets any internal state
- * - jumps to the initial program location
+ * - Disables the state machine (if running)
+ * - Clears the FIFOs
+ * - Applies the configuration specified by 'config'
+ * - Resets any internal state e.g. shift counters
+ * - Jumps to the initial program location given by 'initial_pc'
  *
- * The state machine is disabled on return from this call
+ * The state machine is left disabled on return from this call.
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
@@ -549,8 +559,23 @@ static inline void pio_restart_sm_mask(PIO pio, uint32_t mask) {
     pio->ctrl |= (mask << PIO_CTRL_SM_RESTART_LSB) & PIO_CTRL_SM_RESTART_BITS;
 }
 
-/*! \brief Restart a state machine's clock divider (resetting the fractional count)
+/*! \brief Restart a state machine's clock divider from a phase of 0
  *  \ingroup hardware_pio
+ *
+ * Each state machine's clock divider is a free-running piece of hardware,
+ * that generates a pattern of clock enable pulses for the state machine,
+ * based *only* on the configured integer/fractional divisor. The pattern of
+ * enabled/disabled cycles slows the state machine's execution to some
+ * controlled rate.
+ *
+ * This function clears the divider's integer and fractional phase
+ * accumulators so that it restarts this pattern from the beginning. It is
+ * called automatically by pio_sm_init() but can also be called at a later
+ * time, when you enable the state machine, to ensure precisely consistent
+ * timing each time you load and run a given PIO program.
+ *
+ * More commonly this hardware mechanism is used to synchronise the execution
+ * clocks of multiple state machines -- see pio_clkdiv_restart_sm_mask().
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
@@ -559,11 +584,31 @@ static inline void pio_sm_clkdiv_restart(PIO pio, uint sm) {
     pio->ctrl |= 1u << (PIO_CTRL_CLKDIV_RESTART_LSB + sm);
 }
 
-/*! \brief Restart multiple state machines' clock dividers (resetting the fractional count)
+/*! \brief Restart multiple state machines' clock dividers from a phase of 0.
  *  \ingroup hardware_pio
  *
- * This method can be used to guarantee that multiple state machines with fractional clock dividers
- * are exactly in sync
+ * Each state machine's clock divider is a free-running piece of hardware,
+ * that generates a pattern of clock enable pulses for the state machine,
+ * based *only* on the configured integer/fractional divisor. The pattern of
+ * enabled/disabled cycles slows the state machine's execution to some
+ * controlled rate.
+ *
+ * This function simultaneously clears the integer and fractional phase
+ * accumulators of multiple state machines' clock dividers. If these state
+ * machines all have the same integer and fractional divisors configured,
+ * their clock dividers will run in precise deterministic lockstep from this
+ * point.
+ *
+ * With their execution clocks synchronised in this way, it is then safe to
+ * e.g. have multiple state machines performing a 'wait irq' on the same flag,
+ * and all clear it on the same cycle.
+ *
+ * Also note that this function can be called whilst state machines are
+ * running (e.g. if you have just changed the clock divisors of some state
+ * machines and wish to resynchronise them), and that disabling a state
+ * machine does not halt its clock divider: that is, if multiple state
+ * machines have their clocks synchronised, you can safely disable and
+ * reenable one of the state machines without losing synchronisation.
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param mask bit mask of state machine indexes to modify the enabled state of
@@ -574,6 +619,11 @@ static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
 
 /*! \brief Enable multiple PIO state machines synchronizing their clock dividers
  *  \ingroup hardware_pio
+ *
+ * This is equivalent to calling both pio_set_sm_mask_enabled() and
+ * pio_clkdiv_restart_sm_mask() on the *same* clock cycle. All state machines
+ * specified by 'mask' are started simultaneously and, assuming they have the
+ * same clock divisors, their divided clocks will stay precisely synchronised.
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param mask bit mask of state machine indexes to modify the enabled state of
@@ -704,7 +754,7 @@ static inline void pio_sm_set_set_pins(PIO pio, uint sm, uint set_base, uint set
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
- * \param in_base 0-31 First pin to set as input
+ * \param in_base 0-31 First pin to use as input
  */
 static inline void pio_sm_set_in_pins(PIO pio, uint sm, uint in_base) {
     check_sm_param(sm);
@@ -720,7 +770,7 @@ static inline void pio_sm_set_in_pins(PIO pio, uint sm, uint in_base) {
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
- * \param sideset_base base pin for 'side set'
+ * \param sideset_base 0-31 base pin for 'side set'
  */
 static inline void pio_sm_set_sideset_pins(PIO pio, uint sm, uint sideset_base) {
     check_sm_param(sm);
@@ -732,11 +782,16 @@ static inline void pio_sm_set_sideset_pins(PIO pio, uint sm, uint sideset_base) 
 /*! \brief Write a word of data to a state machine's TX FIFO
  *  \ingroup hardware_pio
  *
- * If the FIFO is full, the most recent value will be overwritten
+ * This is a raw FIFO access that does not check for fullness. If the FIFO is
+ * full, the FIFO contents and state are not affected by the write attempt.
+ * Hardware sets the TXOVER sticky flag for this FIFO in FDEBUG, to indicate
+ * that the system attempted to write to a full FIFO.
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
  * \param data the 32 bit data value
+ *
+ * \sa pio_sm_put_blocking
  */
 static inline void pio_sm_put(PIO pio, uint sm, uint32_t data) {
     check_sm_param(sm);
@@ -746,10 +801,17 @@ static inline void pio_sm_put(PIO pio, uint sm, uint32_t data) {
 /*! \brief Read a word of data from a state machine's RX FIFO
  *  \ingroup hardware_pio
  *
- * If the FIFO is empty, the return value is zero.
+ * This is a raw FIFO access that does not check for emptiness. If the FIFO is
+ * empty, the hardware ignores the attempt to read from the FIFO (the FIFO
+ * remains in an empty state following the read) and the sticky RXUNDER flag
+ * for this FIFO is set in FDEBUG to indicate that the system tried to read
+ * from this FIFO when empty. The data returned by this function is undefined
+ * when the FIFO is empty.
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
+ *
+ * \sa pio_sm_get_blocking
  */
 static inline uint32_t pio_sm_get(PIO pio, uint sm) {
     check_sm_param(sm);
@@ -860,10 +922,15 @@ static inline uint32_t pio_sm_get_blocking(PIO pio, uint sm) {
 /*! \brief Empty out a state machine's TX FIFO
  *  \ingroup hardware_pio
  *
- * This method executes `pull` instructions on the state machine until the TX FIFO is empty
+ * This method executes `pull` instructions on the state machine until the TX
+ * FIFO is empty. This disturbs the contents of the OSR, so see also
+ * pio_sm_clear_fifos() which clears both FIFOs but leaves the state machine's
+ * internal state undisturbed.
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
+ *
+ * \sa pio_sm_clear_fifos
  */
 void pio_sm_drain_tx_fifo(PIO pio, uint sm);
 
@@ -898,7 +965,7 @@ static inline void pio_sm_set_clkdiv_int_frac(PIO pio, uint sm, uint16_t div_int
             (div_int << PIO_SM0_CLKDIV_INT_LSB);
 }
 
-/*! \brief Clear a state machine's TX and RX FIFOFs
+/*! \brief Clear a state machine's TX and RX FIFOs
  *  \ingroup hardware_pio
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
