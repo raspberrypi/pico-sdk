@@ -279,7 +279,7 @@ static inline void pwm_set_gpio_level(uint gpio, uint16_t level) {
  * \param slice_num PWM slice number
  * \return Current value of PWM counter
  */
-static inline int16_t pwm_get_counter(uint slice_num) {
+static inline uint16_t pwm_get_counter(uint slice_num) {
     valid_params_if(PWM, slice_num >= 0 && slice_num < NUM_PWM_SLICES);
     return (pwm_hw->slice[slice_num].ctr);
 }
