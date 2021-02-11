@@ -69,7 +69,6 @@ target_compile_options(kitchen_sink_options INTERFACE
         -Wno-shadow
         -Wno-missing-field-initializers
         -Wno-missing-braces
-        -Wno-sign-compare
         -Wno-multichar
 
         # todo useful but fix later
