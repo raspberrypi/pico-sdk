@@ -75,7 +75,7 @@ void stdio_uart_init_full(struct uart_inst *uart, uint baud_rate, int tx_pin, in
 }
 
 static void stdio_uart_out_chars(const char *buf, int length) {
-    for (uint i = 0; i <length; i++) {
+    for (int i = 0; i <length; i++) {
         uart_putc(uart_default, buf[i]);
     }
 }
