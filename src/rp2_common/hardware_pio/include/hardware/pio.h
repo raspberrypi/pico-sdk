@@ -192,10 +192,11 @@ static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool 
 /*! \brief Set the state machine clock divider (from a floating point value) in a state machine configuration
  *  \ingroup sm_config
  *
- * The clock divider can slow the state machine's execution to some rate below
- * the system clock frequency, by enabling the state machine on some cycles
- * but not on others, in a regular pattern. This can be used to generate e.g.
- * a given UART baud rate. See the datasheet for further detail.
+ * The clock divider slows the state machine's execution by masking the
+ * system clock on some cycles, in a repeating pattern, so that the state
+ * machine does not advance. Effectively this produces a slower clock for the
+ * state machine to run from, which can be used to generate e.g. a particular
+ * UART baud rate. See the datasheet for further detail.
  *
  * \param c Pointer to the configuration structure to modify
  * \param div The fractional divisor to be set. 1 for full speed. An integer clock divisor of n
@@ -566,7 +567,7 @@ static inline void pio_restart_sm_mask(PIO pio, uint32_t mask) {
  * Each state machine's clock divider is a free-running piece of hardware,
  * that generates a pattern of clock enable pulses for the state machine,
  * based *only* on the configured integer/fractional divisor. The pattern of
- * enabled/disabled cycles slows the state machine's execution to some
+ * running/halted cycles slows the state machine's execution to some
  * controlled rate.
  *
  * This function clears the divider's integer and fractional phase
@@ -591,7 +592,7 @@ static inline void pio_sm_clkdiv_restart(PIO pio, uint sm) {
  * Each state machine's clock divider is a free-running piece of hardware,
  * that generates a pattern of clock enable pulses for the state machine,
  * based *only* on the configured integer/fractional divisor. The pattern of
- * enabled/disabled cycles slows the state machine's execution to some
+ * running/halted cycles slows the state machine's execution to some
  * controlled rate.
  *
  * This function simultaneously clears the integer and fractional phase
