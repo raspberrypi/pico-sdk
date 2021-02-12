@@ -136,7 +136,7 @@ static inline spi_hw_t *spi_get_hw(spi_inst_t *spi) {
  * \param cpha SSPCLKOUT phase, applicable to Motorola SPI frame format only
  * \param order Must be SPI_MSB_FIRST, no other values supported on the PL022
  */
-static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cpol, spi_cpha_t cpha, spi_order_t order) {
+static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cpol, spi_cpha_t cpha, __unused spi_order_t order) {
     invalid_params_if(SPI, data_bits < 4 || data_bits > 16);
     // LSB-first not supported on PL022:
     invalid_params_if(SPI, order != SPI_MSB_FIRST);

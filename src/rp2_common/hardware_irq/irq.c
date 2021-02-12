@@ -34,7 +34,7 @@ static void set_raw_irq_handler_and_unlock(uint num, irq_handler_t handler, uint
     spin_unlock(spin_lock_instance(PICO_SPINLOCK_ID_IRQ), save);
 }
 
-static inline void check_irq_param(uint num) {
+static inline void check_irq_param(__unused uint num) {
     invalid_params_if(IRQ, num >= NUM_IRQS);
 }
 

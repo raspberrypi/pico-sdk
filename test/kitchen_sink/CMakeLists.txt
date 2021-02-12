@@ -42,6 +42,11 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_unique_id
     pico_util
 )
+# todo this is full of warnings atm
+#if (TARGET tinyusb_device)
+#    target_include_directories(kitchen_sink_libs INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+#    target_link_libraries(kitchen_sink_libs INTERFACE tinyusb_device)
+#endif()
 
 add_library(kitchen_sink_options INTERFACE)
 
@@ -49,23 +54,27 @@ target_compile_options(kitchen_sink_options INTERFACE
         -Werror
         -Wall
         -Wextra
-        -Wno-unused-parameter
-        -Wno-inline
+        #        -pedantic
+
         -Wnull-dereference
-#        -pedantic
+        -Wuninitialized
+        -Wunused
+        -Wcast-align
         -Wall
         -Wcast-qual
-        -Wno-deprecated-declarations
         -Wfloat-equal
         -Wmissing-format-attribute
-        -Wno-long-long
         $<$<COMPILE_LANGUAGE:C>:-Wstrict-prototypes>
 
+        -Wno-inline
         # todo not sure these are true, but investigate
         #-Wpacked
+        # todo requires unsigned register constants
+        #-Wconversion
 
         # todo we have some of these in usb_device_tiny to try to make it more readable.. perhaps doxygen would help here instead
-        #-Wredundant-decls
+        -Wredundant-decls
+
         -Wno-shadow
         -Wno-missing-field-initializers
         -Wno-missing-braces

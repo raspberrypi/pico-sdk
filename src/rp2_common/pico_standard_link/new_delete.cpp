@@ -17,7 +17,7 @@ void *operator new[](std::size_t n) {
     return std::malloc(n);
 }
 
-void operator delete(void *p, std::size_t n) noexcept { std::free(p); }
+void operator delete(void *p, __unused std::size_t n) noexcept { std::free(p); }
 
 void operator delete(void *p) { std::free(p); }
 

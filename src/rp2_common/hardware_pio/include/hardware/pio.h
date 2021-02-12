@@ -104,7 +104,7 @@ typedef struct {
     uint32_t pinctrl;
 } pio_sm_config;
 
-static inline void check_sm_param(uint sm) {
+static inline void check_sm_param(__unused uint sm) {
     valid_params_if(PIO, sm < NUM_PIO_STATE_MACHINES);
 }
 
