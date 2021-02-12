@@ -19,9 +19,24 @@
 #define PIO_CTRL_RESET  0x00000000
 // -----------------------------------------------------------------------------
 // Field       : PIO_CTRL_CLKDIV_RESTART
-// Description : Force clock dividers to restart their count and clear
-//               fractional
-//               accumulators. Restart multiple dividers to synchronise them.
+// Description : Restart a state machine's clock divider from an initial phase
+//               of 0. Clock dividers are free-running, so once started, their
+//               output (including fractional jitter) is completely determined
+//               by the integer/fractional divisor configured in SMx_CLKDIV.
+//               This means that, if multiple clock dividers with the same
+//               divisor are restarted simultaneously, by writing multiple 1
+//               bits to this field, the execution clocks of those state
+//               machines will run in precise lockstep.
+//
+//               Note that setting/clearing SM_ENABLE does not stop the clock
+//               divider from running, so once multiple state machines' clocks
+//               are synchronised, it is safe to disable/reenable a state
+//               machine, whilst keeping the clock dividers in sync.
+//
+//               Note also that CLKDIV_RESTART can be written to whilst the
+//               state machine is running, and this is useful to resynchronise
+//               clock dividers after the divisors (SMx_CLKDIV) have been
+//               changed on-the-fly.
 #define PIO_CTRL_CLKDIV_RESTART_RESET  0x0
 #define PIO_CTRL_CLKDIV_RESTART_BITS   0x00000f00
 #define PIO_CTRL_CLKDIV_RESTART_MSB    11
@@ -29,8 +44,14 @@
 #define PIO_CTRL_CLKDIV_RESTART_ACCESS "SC"
 // -----------------------------------------------------------------------------
 // Field       : PIO_CTRL_SM_RESTART
-// Description : Clear internal SM state which is otherwise difficult to access
-//               (e.g. shift counters). Self-clearing.
+// Description : Write 1 to instantly clear internal SM state which may be
+//               otherwise difficult to access and will affect future execution.
+//
+//               Specifically, the following are cleared: input and output shift
+//               counters; the contents of the input shift register; the delay
+//               counter; the waiting-on-IRQ state; any stalled instruction
+//               written to SMx_INSTR or run by OUT/MOV EXEC; any pin write left
+//               asserted due to OUT_STICKY.
 #define PIO_CTRL_SM_RESTART_RESET  0x0
 #define PIO_CTRL_SM_RESTART_BITS   0x000000f0
 #define PIO_CTRL_SM_RESTART_MSB    7
@@ -38,7 +59,11 @@
 #define PIO_CTRL_SM_RESTART_ACCESS "SC"
 // -----------------------------------------------------------------------------
 // Field       : PIO_CTRL_SM_ENABLE
-// Description : Enable state machine
+// Description : Enable/disable each of the four state machines by writing 1/0
+//               to each of these four bits. When disabled, a state machine will
+//               cease executing instructions, except those written directly to
+//               SMx_INSTR by the system. Multiple bits can be set/cleared at
+//               once to run/halt multiple state machines simultaneously.
 #define PIO_CTRL_SM_ENABLE_RESET  0x0
 #define PIO_CTRL_SM_ENABLE_BITS   0x0000000f
 #define PIO_CTRL_SM_ENABLE_MSB    3
@@ -90,7 +115,8 @@
 #define PIO_FDEBUG_RESET  0x00000000
 // -----------------------------------------------------------------------------
 // Field       : PIO_FDEBUG_TXSTALL
-// Description : State machine has stalled on empty TX FIFO. Write 1 to clear.
+// Description : State machine has stalled on empty TX FIFO during a blocking
+//               PULL, or an OUT with autopull enabled. Write 1 to clear.
 #define PIO_FDEBUG_TXSTALL_RESET  0x0
 #define PIO_FDEBUG_TXSTALL_BITS   0x0f000000
 #define PIO_FDEBUG_TXSTALL_MSB    27
@@ -98,7 +124,12 @@
 #define PIO_FDEBUG_TXSTALL_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PIO_FDEBUG_TXOVER
-// Description : TX FIFO overflow has occurred. Write 1 to clear.
+// Description : TX FIFO overflow (i.e. write-on-full by the system) has
+//               occurred. Write 1 to clear. Note that write-on-full does not
+//               alter the state or contents of the FIFO in any way, but the
+//               data that the system attempted to write is dropped, so if this
+//               flag is set, your software has quite likely dropped some data
+//               on the floor.
 #define PIO_FDEBUG_TXOVER_RESET  0x0
 #define PIO_FDEBUG_TXOVER_BITS   0x000f0000
 #define PIO_FDEBUG_TXOVER_MSB    19
@@ -106,7 +137,11 @@
 #define PIO_FDEBUG_TXOVER_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PIO_FDEBUG_RXUNDER
-// Description : RX FIFO underflow has occurred. Write 1 to clear.
+// Description : RX FIFO underflow (i.e. read-on-empty by the system) has
+//               occurred. Write 1 to clear. Note that read-on-empty does not
+//               perturb the state of the FIFO in any way, but the data returned
+//               by reading from an empty FIFO is undefined, so this flag
+//               generally only becomes set due to some kind of software error.
 #define PIO_FDEBUG_RXUNDER_RESET  0x0
 #define PIO_FDEBUG_RXUNDER_BITS   0x00000f00
 #define PIO_FDEBUG_RXUNDER_MSB    11
@@ -114,7 +149,10 @@
 #define PIO_FDEBUG_RXUNDER_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PIO_FDEBUG_RXSTALL
-// Description : State machine has stalled on full RX FIFO. Write 1 to clear.
+// Description : State machine has stalled on full RX FIFO during a blocking
+//               PUSH, or an IN with autopush enabled. This flag is also set
+//               when a nonblocking PUSH to a full FIFO took place, in which
+//               case the state machine has dropped data. Write 1 to clear.
 #define PIO_FDEBUG_RXSTALL_RESET  0x0
 #define PIO_FDEBUG_RXSTALL_BITS   0x0000000f
 #define PIO_FDEBUG_RXSTALL_MSB    3
@@ -193,7 +231,9 @@
 // =============================================================================
 // Register    : PIO_TXF0
 // Description : Direct write access to the TX FIFO for this state machine. Each
-//               write pushes one word to the FIFO.
+//               write pushes one word to the FIFO. Attempting to write to a
+//               full FIFO has no effect on the FIFO state or contents, and sets
+//               the sticky FDEBUG_TXOVER error flag for this FIFO.
 #define PIO_TXF0_OFFSET 0x00000010
 #define PIO_TXF0_BITS   0xffffffff
 #define PIO_TXF0_RESET  0x00000000
@@ -203,7 +243,9 @@
 // =============================================================================
 // Register    : PIO_TXF1
 // Description : Direct write access to the TX FIFO for this state machine. Each
-//               write pushes one word to the FIFO.
+//               write pushes one word to the FIFO. Attempting to write to a
+//               full FIFO has no effect on the FIFO state or contents, and sets
+//               the sticky FDEBUG_TXOVER error flag for this FIFO.
 #define PIO_TXF1_OFFSET 0x00000014
 #define PIO_TXF1_BITS   0xffffffff
 #define PIO_TXF1_RESET  0x00000000
@@ -213,7 +255,9 @@
 // =============================================================================
 // Register    : PIO_TXF2
 // Description : Direct write access to the TX FIFO for this state machine. Each
-//               write pushes one word to the FIFO.
+//               write pushes one word to the FIFO. Attempting to write to a
+//               full FIFO has no effect on the FIFO state or contents, and sets
+//               the sticky FDEBUG_TXOVER error flag for this FIFO.
 #define PIO_TXF2_OFFSET 0x00000018
 #define PIO_TXF2_BITS   0xffffffff
 #define PIO_TXF2_RESET  0x00000000
@@ -223,7 +267,9 @@
 // =============================================================================
 // Register    : PIO_TXF3
 // Description : Direct write access to the TX FIFO for this state machine. Each
-//               write pushes one word to the FIFO.
+//               write pushes one word to the FIFO. Attempting to write to a
+//               full FIFO has no effect on the FIFO state or contents, and sets
+//               the sticky FDEBUG_TXOVER error flag for this FIFO.
 #define PIO_TXF3_OFFSET 0x0000001c
 #define PIO_TXF3_BITS   0xffffffff
 #define PIO_TXF3_RESET  0x00000000
@@ -233,7 +279,10 @@
 // =============================================================================
 // Register    : PIO_RXF0
 // Description : Direct read access to the RX FIFO for this state machine. Each
-//               read pops one word from the FIFO.
+//               read pops one word from the FIFO. Attempting to read from an
+//               empty FIFO has no effect on the FIFO state, and sets the sticky
+//               FDEBUG_RXUNDER error flag for this FIFO. The data returned to
+//               the system on a read from an empty FIFO is undefined.
 #define PIO_RXF0_OFFSET 0x00000020
 #define PIO_RXF0_BITS   0xffffffff
 #define PIO_RXF0_RESET  "-"
@@ -243,7 +292,10 @@
 // =============================================================================
 // Register    : PIO_RXF1
 // Description : Direct read access to the RX FIFO for this state machine. Each
-//               read pops one word from the FIFO.
+//               read pops one word from the FIFO. Attempting to read from an
+//               empty FIFO has no effect on the FIFO state, and sets the sticky
+//               FDEBUG_RXUNDER error flag for this FIFO. The data returned to
+//               the system on a read from an empty FIFO is undefined.
 #define PIO_RXF1_OFFSET 0x00000024
 #define PIO_RXF1_BITS   0xffffffff
 #define PIO_RXF1_RESET  "-"
@@ -253,7 +305,10 @@
 // =============================================================================
 // Register    : PIO_RXF2
 // Description : Direct read access to the RX FIFO for this state machine. Each
-//               read pops one word from the FIFO.
+//               read pops one word from the FIFO. Attempting to read from an
+//               empty FIFO has no effect on the FIFO state, and sets the sticky
+//               FDEBUG_RXUNDER error flag for this FIFO. The data returned to
+//               the system on a read from an empty FIFO is undefined.
 #define PIO_RXF2_OFFSET 0x00000028
 #define PIO_RXF2_BITS   0xffffffff
 #define PIO_RXF2_RESET  "-"
@@ -263,7 +318,10 @@
 // =============================================================================
 // Register    : PIO_RXF3
 // Description : Direct read access to the RX FIFO for this state machine. Each
-//               read pops one word from the FIFO.
+//               read pops one word from the FIFO. Attempting to read from an
+//               empty FIFO has no effect on the FIFO state, and sets the sticky
+//               FDEBUG_RXUNDER error flag for this FIFO. The data returned to
+//               the system on a read from an empty FIFO is undefined.
 #define PIO_RXF3_OFFSET 0x0000002c
 #define PIO_RXF3_BITS   0xffffffff
 #define PIO_RXF3_RESET  "-"
@@ -272,7 +330,16 @@
 #define PIO_RXF3_ACCESS "RF"
 // =============================================================================
 // Register    : PIO_IRQ
-// Description : Interrupt request register. Write 1 to clear
+// Description : State machine IRQ flags register. Write 1 to clear. There are 8
+//               state machine IRQ flags, which can be set, cleared, and waited
+//               on by the state machines. There's no fixed association between
+//               flags and state machines -- any state machine can use any flag.
+//
+//               Any of the 8 flags can be used for timing synchronisation
+//               between state machines, using IRQ and WAIT instructions. The
+//               lower four of these flags are also routed out to system-level
+//               interrupt requests, alongside FIFO status interrupts -- see
+//               e.g. IRQ0_INTE.
 #define PIO_IRQ_OFFSET 0x00000030
 #define PIO_IRQ_BITS   0x000000ff
 #define PIO_IRQ_RESET  0x00000000
@@ -282,12 +349,10 @@
 // =============================================================================
 // Register    : PIO_IRQ_FORCE
 // Description : Writing a 1 to each of these bits will forcibly assert the
-//               corresponding IRQ.
-//               Note this is different to the INTF register: writing here
-//               affects PIO internal
-//               state. INTF just asserts the processor-facing IRQ signal for
-//               testing ISRs,
-//               and is not visible to the state machines.
+//               corresponding IRQ. Note this is different to the INTF register:
+//               writing here affects PIO internal state. INTF just asserts the
+//               processor-facing IRQ signal for testing ISRs, and is not
+//               visible to the state machines.
 #define PIO_IRQ_FORCE_OFFSET 0x00000034
 #define PIO_IRQ_FORCE_BITS   0x000000ff
 #define PIO_IRQ_FORCE_RESET  0x00000000
@@ -297,12 +362,10 @@
 // =============================================================================
 // Register    : PIO_INPUT_SYNC_BYPASS
 // Description : There is a 2-flipflop synchronizer on each GPIO input, which
-//               protects
-//               PIO logic from metastabilities. This increases input delay, and
-//               for fast
-//               synchronous IO (e.g. SPI) these synchronizers may need to be
-//               bypassed.
-//               Each bit in this register corresponds to one GPIO.
+//               protects PIO logic from metastabilities. This increases input
+//               delay, and for fast synchronous IO (e.g. SPI) these
+//               synchronizers may need to be bypassed. Each bit in this
+//               register corresponds to one GPIO.
 //               0 -> input is synchronized (default)
 //               1 -> synchronizer is bypassed
 //               If in doubt, leave this register as all zeroes.
@@ -659,15 +722,16 @@
 #define PIO_INSTR_MEM31_ACCESS "WO"
 // =============================================================================
 // Register    : PIO_SM0_CLKDIV
-// Description : Clock divider register for state machine 0
+// Description : Clock divisor register for state machine 0
 //               Frequency = clock freq / (CLKDIV_INT + CLKDIV_FRAC / 256)
 #define PIO_SM0_CLKDIV_OFFSET 0x000000c8
 #define PIO_SM0_CLKDIV_BITS   0xffffff00
 #define PIO_SM0_CLKDIV_RESET  0x00010000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_CLKDIV_INT
-// Description : Effective frequency is sysclk/int.
-//               Value of 0 is interpreted as max possible value
+// Description : Effective frequency is sysclk/(int + frac/256).
+//               Value of 0 is interpreted as 65536. If INT is 0, FRAC must also
+//               be 0.
 #define PIO_SM0_CLKDIV_INT_RESET  0x0001
 #define PIO_SM0_CLKDIV_INT_BITS   0xffff0000
 #define PIO_SM0_CLKDIV_INT_MSB    31
@@ -675,7 +739,7 @@
 #define PIO_SM0_CLKDIV_INT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_CLKDIV_FRAC
-// Description : Fractional part of clock divider
+// Description : Fractional part of clock divisor
 #define PIO_SM0_CLKDIV_FRAC_RESET  0x00
 #define PIO_SM0_CLKDIV_FRAC_BITS   0x0000ff00
 #define PIO_SM0_CLKDIV_FRAC_MSB    15
@@ -689,9 +753,9 @@
 #define PIO_SM0_EXECCTRL_RESET  0x0001f000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_EXECCTRL_EXEC_STALLED
-// Description : An instruction written to SMx_INSTR is stalled, and latched by
-//               the
-//               state machine. Will clear once the instruction completes.
+// Description : If 1, an instruction written to SMx_INSTR is stalled, and
+//               latched by the state machine. Will clear to 0 once this
+//               instruction completes.
 #define PIO_SM0_EXECCTRL_EXEC_STALLED_RESET  0x0
 #define PIO_SM0_EXECCTRL_EXEC_STALLED_BITS   0x80000000
 #define PIO_SM0_EXECCTRL_EXEC_STALLED_MSB    31
@@ -699,10 +763,12 @@
 #define PIO_SM0_EXECCTRL_EXEC_STALLED_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_EXECCTRL_SIDE_EN
-// Description : If 1, the delay MSB is used as side-set enable, rather than a
-//               side-set data bit. This allows instructions to perform side-set
-//               optionally,
-//               rather than on every instruction.
+// Description : If 1, the MSB of the Delay/Side-set instruction field is used
+//               as side-set enable, rather than a side-set data bit. This
+//               allows instructions to perform side-set optionally, rather than
+//               on every instruction, but the maximum possible side-set width
+//               is reduced from 5 to 4. Note that the value of
+//               PINCTRL_SIDESET_COUNT is inclusive of this enable bit.
 #define PIO_SM0_EXECCTRL_SIDE_EN_RESET  0x0
 #define PIO_SM0_EXECCTRL_SIDE_EN_BITS   0x40000000
 #define PIO_SM0_EXECCTRL_SIDE_EN_MSB    30
@@ -710,7 +776,8 @@
 #define PIO_SM0_EXECCTRL_SIDE_EN_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_EXECCTRL_SIDE_PINDIR
-// Description : Side-set data is asserted to pin OEs instead of pin values
+// Description : If 1, side-set data is asserted to pin directions, instead of
+//               pin values
 #define PIO_SM0_EXECCTRL_SIDE_PINDIR_RESET  0x0
 #define PIO_SM0_EXECCTRL_SIDE_PINDIR_BITS   0x20000000
 #define PIO_SM0_EXECCTRL_SIDE_PINDIR_MSB    29
@@ -827,8 +894,8 @@
 #define PIO_SM0_SHIFTCTRL_FJOIN_TX_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_SHIFTCTRL_PULL_THRESH
-// Description : Number of bits shifted out of TXSR before autopull or
-//               conditional pull.
+// Description : Number of bits shifted out of OSR before autopull, or
+//               conditional pull (PULL IFEMPTY), will take place.
 //               Write 0 for value of 32.
 #define PIO_SM0_SHIFTCTRL_PULL_THRESH_RESET  0x00
 #define PIO_SM0_SHIFTCTRL_PULL_THRESH_BITS   0x3e000000
@@ -837,8 +904,8 @@
 #define PIO_SM0_SHIFTCTRL_PULL_THRESH_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_SHIFTCTRL_PUSH_THRESH
-// Description : Number of bits shifted into RXSR before autopush or conditional
-//               push.
+// Description : Number of bits shifted into ISR before autopush, or conditional
+//               push (PUSH IFFULL), will take place.
 //               Write 0 for value of 32.
 #define PIO_SM0_SHIFTCTRL_PUSH_THRESH_RESET  0x00
 #define PIO_SM0_SHIFTCTRL_PUSH_THRESH_BITS   0x01f00000
@@ -864,7 +931,9 @@
 #define PIO_SM0_SHIFTCTRL_IN_SHIFTDIR_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_SHIFTCTRL_AUTOPULL
-// Description : Pull automatically when the output shift register is emptied
+// Description : Pull automatically when the output shift register is emptied,
+//               i.e. on or following an OUT instruction which causes the output
+//               shift counter to reach or exceed PULL_THRESH.
 #define PIO_SM0_SHIFTCTRL_AUTOPULL_RESET  0x0
 #define PIO_SM0_SHIFTCTRL_AUTOPULL_BITS   0x00020000
 #define PIO_SM0_SHIFTCTRL_AUTOPULL_MSB    17
@@ -872,7 +941,9 @@
 #define PIO_SM0_SHIFTCTRL_AUTOPULL_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_SHIFTCTRL_AUTOPUSH
-// Description : Push automatically when the input shift register is filled
+// Description : Push automatically when the input shift register is filled,
+//               i.e. on an IN instruction which causes the input shift counter
+//               to reach or exceed PUSH_THRESH.
 #define PIO_SM0_SHIFTCTRL_AUTOPUSH_RESET  0x0
 #define PIO_SM0_SHIFTCTRL_AUTOPUSH_BITS   0x00010000
 #define PIO_SM0_SHIFTCTRL_AUTOPUSH_MSB    16
@@ -889,7 +960,8 @@
 #define PIO_SM0_ADDR_ACCESS "RO"
 // =============================================================================
 // Register    : PIO_SM0_INSTR
-// Description : Instruction currently being executed by state machine 0
+// Description : Read to see the instruction currently addressed by state
+//               machine 0's program counter
 //               Write to execute an instruction immediately (including jumps)
 //               and then resume execution.
 #define PIO_SM0_INSTR_OFFSET 0x000000d8
@@ -906,8 +978,10 @@
 #define PIO_SM0_PINCTRL_RESET  0x14000000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_PINCTRL_SIDESET_COUNT
-// Description : The number of delay bits co-opted for side-set. Inclusive of
-//               the enable bit, if present.
+// Description : The number of MSBs of the Delay/Side-set instruction field
+//               which are used for side-set. Inclusive of the enable bit, if
+//               present. Minimum of 0 (all delay bits, no side-set) and maximum
+//               of 5 (all side-set, no delay).
 #define PIO_SM0_PINCTRL_SIDESET_COUNT_RESET  0x0
 #define PIO_SM0_PINCTRL_SIDESET_COUNT_BITS   0xe0000000
 #define PIO_SM0_PINCTRL_SIDESET_COUNT_MSB    31
@@ -915,7 +989,8 @@
 #define PIO_SM0_PINCTRL_SIDESET_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_PINCTRL_SET_COUNT
-// Description : The number of pins asserted by a SET. Max of 5
+// Description : The number of pins asserted by a SET. In the range 0 to 5
+//               inclusive.
 #define PIO_SM0_PINCTRL_SET_COUNT_RESET  0x5
 #define PIO_SM0_PINCTRL_SET_COUNT_BITS   0x1c000000
 #define PIO_SM0_PINCTRL_SET_COUNT_MSB    28
@@ -923,7 +998,8 @@
 #define PIO_SM0_PINCTRL_SET_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_PINCTRL_OUT_COUNT
-// Description : The number of pins asserted by an OUT. Value of 0 -> 32 pins
+// Description : The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV
+//               PINS instruction. In the range 0 to 32 inclusive.
 #define PIO_SM0_PINCTRL_OUT_COUNT_RESET  0x00
 #define PIO_SM0_PINCTRL_OUT_COUNT_BITS   0x03f00000
 #define PIO_SM0_PINCTRL_OUT_COUNT_MSB    25
@@ -931,7 +1007,10 @@
 #define PIO_SM0_PINCTRL_OUT_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_PINCTRL_IN_BASE
-// Description : The virtual pin corresponding to IN bit 0
+// Description : The pin which is mapped to the least-significant bit of a state
+//               machine's IN data bus. Higher-numbered pins are mapped to
+//               consecutively more-significant data bits, with a modulo of 32
+//               applied to pin number.
 #define PIO_SM0_PINCTRL_IN_BASE_RESET  0x00
 #define PIO_SM0_PINCTRL_IN_BASE_BITS   0x000f8000
 #define PIO_SM0_PINCTRL_IN_BASE_MSB    19
@@ -939,7 +1018,13 @@
 #define PIO_SM0_PINCTRL_IN_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_PINCTRL_SIDESET_BASE
-// Description : The virtual pin corresponding to delay field bit 0
+// Description : The lowest-numbered pin that will be affected by a side-set
+//               operation. The MSBs of an instruction's side-set/delay field
+//               (up to 5, determined by SIDESET_COUNT) are used for side-set
+//               data, with the remaining LSBs used for delay. The
+//               least-significant bit of the side-set portion is the bit
+//               written to this pin, with more-significant bits written to
+//               higher-numbered pins.
 #define PIO_SM0_PINCTRL_SIDESET_BASE_RESET  0x00
 #define PIO_SM0_PINCTRL_SIDESET_BASE_BITS   0x00007c00
 #define PIO_SM0_PINCTRL_SIDESET_BASE_MSB    14
@@ -947,7 +1032,9 @@
 #define PIO_SM0_PINCTRL_SIDESET_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_PINCTRL_SET_BASE
-// Description : The virtual pin corresponding to SET bit 0
+// Description : The lowest-numbered pin that will be affected by a SET PINS or
+//               SET PINDIRS instruction. The data written to this pin is the
+//               least-significant bit of the SET data.
 #define PIO_SM0_PINCTRL_SET_BASE_RESET  0x00
 #define PIO_SM0_PINCTRL_SET_BASE_BITS   0x000003e0
 #define PIO_SM0_PINCTRL_SET_BASE_MSB    9
@@ -955,7 +1042,10 @@
 #define PIO_SM0_PINCTRL_SET_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM0_PINCTRL_OUT_BASE
-// Description : The virtual pin corresponding to OUT bit 0
+// Description : The lowest-numbered pin that will be affected by an OUT PINS,
+//               OUT PINDIRS or MOV PINS instruction. The data written to this
+//               pin will always be the least-significant bit of the OUT or MOV
+//               data.
 #define PIO_SM0_PINCTRL_OUT_BASE_RESET  0x00
 #define PIO_SM0_PINCTRL_OUT_BASE_BITS   0x0000001f
 #define PIO_SM0_PINCTRL_OUT_BASE_MSB    4
@@ -963,15 +1053,16 @@
 #define PIO_SM0_PINCTRL_OUT_BASE_ACCESS "RW"
 // =============================================================================
 // Register    : PIO_SM1_CLKDIV
-// Description : Clock divider register for state machine 1
+// Description : Clock divisor register for state machine 1
 //               Frequency = clock freq / (CLKDIV_INT + CLKDIV_FRAC / 256)
 #define PIO_SM1_CLKDIV_OFFSET 0x000000e0
 #define PIO_SM1_CLKDIV_BITS   0xffffff00
 #define PIO_SM1_CLKDIV_RESET  0x00010000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_CLKDIV_INT
-// Description : Effective frequency is sysclk/int.
-//               Value of 0 is interpreted as max possible value
+// Description : Effective frequency is sysclk/(int + frac/256).
+//               Value of 0 is interpreted as 65536. If INT is 0, FRAC must also
+//               be 0.
 #define PIO_SM1_CLKDIV_INT_RESET  0x0001
 #define PIO_SM1_CLKDIV_INT_BITS   0xffff0000
 #define PIO_SM1_CLKDIV_INT_MSB    31
@@ -979,7 +1070,7 @@
 #define PIO_SM1_CLKDIV_INT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_CLKDIV_FRAC
-// Description : Fractional part of clock divider
+// Description : Fractional part of clock divisor
 #define PIO_SM1_CLKDIV_FRAC_RESET  0x00
 #define PIO_SM1_CLKDIV_FRAC_BITS   0x0000ff00
 #define PIO_SM1_CLKDIV_FRAC_MSB    15
@@ -993,9 +1084,9 @@
 #define PIO_SM1_EXECCTRL_RESET  0x0001f000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_EXECCTRL_EXEC_STALLED
-// Description : An instruction written to SMx_INSTR is stalled, and latched by
-//               the
-//               state machine. Will clear once the instruction completes.
+// Description : If 1, an instruction written to SMx_INSTR is stalled, and
+//               latched by the state machine. Will clear to 0 once this
+//               instruction completes.
 #define PIO_SM1_EXECCTRL_EXEC_STALLED_RESET  0x0
 #define PIO_SM1_EXECCTRL_EXEC_STALLED_BITS   0x80000000
 #define PIO_SM1_EXECCTRL_EXEC_STALLED_MSB    31
@@ -1003,10 +1094,12 @@
 #define PIO_SM1_EXECCTRL_EXEC_STALLED_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_EXECCTRL_SIDE_EN
-// Description : If 1, the delay MSB is used as side-set enable, rather than a
-//               side-set data bit. This allows instructions to perform side-set
-//               optionally,
-//               rather than on every instruction.
+// Description : If 1, the MSB of the Delay/Side-set instruction field is used
+//               as side-set enable, rather than a side-set data bit. This
+//               allows instructions to perform side-set optionally, rather than
+//               on every instruction, but the maximum possible side-set width
+//               is reduced from 5 to 4. Note that the value of
+//               PINCTRL_SIDESET_COUNT is inclusive of this enable bit.
 #define PIO_SM1_EXECCTRL_SIDE_EN_RESET  0x0
 #define PIO_SM1_EXECCTRL_SIDE_EN_BITS   0x40000000
 #define PIO_SM1_EXECCTRL_SIDE_EN_MSB    30
@@ -1014,7 +1107,8 @@
 #define PIO_SM1_EXECCTRL_SIDE_EN_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_EXECCTRL_SIDE_PINDIR
-// Description : Side-set data is asserted to pin OEs instead of pin values
+// Description : If 1, side-set data is asserted to pin directions, instead of
+//               pin values
 #define PIO_SM1_EXECCTRL_SIDE_PINDIR_RESET  0x0
 #define PIO_SM1_EXECCTRL_SIDE_PINDIR_BITS   0x20000000
 #define PIO_SM1_EXECCTRL_SIDE_PINDIR_MSB    29
@@ -1131,8 +1225,8 @@
 #define PIO_SM1_SHIFTCTRL_FJOIN_TX_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_SHIFTCTRL_PULL_THRESH
-// Description : Number of bits shifted out of TXSR before autopull or
-//               conditional pull.
+// Description : Number of bits shifted out of OSR before autopull, or
+//               conditional pull (PULL IFEMPTY), will take place.
 //               Write 0 for value of 32.
 #define PIO_SM1_SHIFTCTRL_PULL_THRESH_RESET  0x00
 #define PIO_SM1_SHIFTCTRL_PULL_THRESH_BITS   0x3e000000
@@ -1141,8 +1235,8 @@
 #define PIO_SM1_SHIFTCTRL_PULL_THRESH_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_SHIFTCTRL_PUSH_THRESH
-// Description : Number of bits shifted into RXSR before autopush or conditional
-//               push.
+// Description : Number of bits shifted into ISR before autopush, or conditional
+//               push (PUSH IFFULL), will take place.
 //               Write 0 for value of 32.
 #define PIO_SM1_SHIFTCTRL_PUSH_THRESH_RESET  0x00
 #define PIO_SM1_SHIFTCTRL_PUSH_THRESH_BITS   0x01f00000
@@ -1168,7 +1262,9 @@
 #define PIO_SM1_SHIFTCTRL_IN_SHIFTDIR_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_SHIFTCTRL_AUTOPULL
-// Description : Pull automatically when the output shift register is emptied
+// Description : Pull automatically when the output shift register is emptied,
+//               i.e. on or following an OUT instruction which causes the output
+//               shift counter to reach or exceed PULL_THRESH.
 #define PIO_SM1_SHIFTCTRL_AUTOPULL_RESET  0x0
 #define PIO_SM1_SHIFTCTRL_AUTOPULL_BITS   0x00020000
 #define PIO_SM1_SHIFTCTRL_AUTOPULL_MSB    17
@@ -1176,7 +1272,9 @@
 #define PIO_SM1_SHIFTCTRL_AUTOPULL_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_SHIFTCTRL_AUTOPUSH
-// Description : Push automatically when the input shift register is filled
+// Description : Push automatically when the input shift register is filled,
+//               i.e. on an IN instruction which causes the input shift counter
+//               to reach or exceed PUSH_THRESH.
 #define PIO_SM1_SHIFTCTRL_AUTOPUSH_RESET  0x0
 #define PIO_SM1_SHIFTCTRL_AUTOPUSH_BITS   0x00010000
 #define PIO_SM1_SHIFTCTRL_AUTOPUSH_MSB    16
@@ -1193,7 +1291,8 @@
 #define PIO_SM1_ADDR_ACCESS "RO"
 // =============================================================================
 // Register    : PIO_SM1_INSTR
-// Description : Instruction currently being executed by state machine 1
+// Description : Read to see the instruction currently addressed by state
+//               machine 1's program counter
 //               Write to execute an instruction immediately (including jumps)
 //               and then resume execution.
 #define PIO_SM1_INSTR_OFFSET 0x000000f0
@@ -1210,8 +1309,10 @@
 #define PIO_SM1_PINCTRL_RESET  0x14000000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_PINCTRL_SIDESET_COUNT
-// Description : The number of delay bits co-opted for side-set. Inclusive of
-//               the enable bit, if present.
+// Description : The number of MSBs of the Delay/Side-set instruction field
+//               which are used for side-set. Inclusive of the enable bit, if
+//               present. Minimum of 0 (all delay bits, no side-set) and maximum
+//               of 5 (all side-set, no delay).
 #define PIO_SM1_PINCTRL_SIDESET_COUNT_RESET  0x0
 #define PIO_SM1_PINCTRL_SIDESET_COUNT_BITS   0xe0000000
 #define PIO_SM1_PINCTRL_SIDESET_COUNT_MSB    31
@@ -1219,7 +1320,8 @@
 #define PIO_SM1_PINCTRL_SIDESET_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_PINCTRL_SET_COUNT
-// Description : The number of pins asserted by a SET. Max of 5
+// Description : The number of pins asserted by a SET. In the range 0 to 5
+//               inclusive.
 #define PIO_SM1_PINCTRL_SET_COUNT_RESET  0x5
 #define PIO_SM1_PINCTRL_SET_COUNT_BITS   0x1c000000
 #define PIO_SM1_PINCTRL_SET_COUNT_MSB    28
@@ -1227,7 +1329,8 @@
 #define PIO_SM1_PINCTRL_SET_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_PINCTRL_OUT_COUNT
-// Description : The number of pins asserted by an OUT. Value of 0 -> 32 pins
+// Description : The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV
+//               PINS instruction. In the range 0 to 32 inclusive.
 #define PIO_SM1_PINCTRL_OUT_COUNT_RESET  0x00
 #define PIO_SM1_PINCTRL_OUT_COUNT_BITS   0x03f00000
 #define PIO_SM1_PINCTRL_OUT_COUNT_MSB    25
@@ -1235,7 +1338,10 @@
 #define PIO_SM1_PINCTRL_OUT_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_PINCTRL_IN_BASE
-// Description : The virtual pin corresponding to IN bit 0
+// Description : The pin which is mapped to the least-significant bit of a state
+//               machine's IN data bus. Higher-numbered pins are mapped to
+//               consecutively more-significant data bits, with a modulo of 32
+//               applied to pin number.
 #define PIO_SM1_PINCTRL_IN_BASE_RESET  0x00
 #define PIO_SM1_PINCTRL_IN_BASE_BITS   0x000f8000
 #define PIO_SM1_PINCTRL_IN_BASE_MSB    19
@@ -1243,7 +1349,13 @@
 #define PIO_SM1_PINCTRL_IN_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_PINCTRL_SIDESET_BASE
-// Description : The virtual pin corresponding to delay field bit 0
+// Description : The lowest-numbered pin that will be affected by a side-set
+//               operation. The MSBs of an instruction's side-set/delay field
+//               (up to 5, determined by SIDESET_COUNT) are used for side-set
+//               data, with the remaining LSBs used for delay. The
+//               least-significant bit of the side-set portion is the bit
+//               written to this pin, with more-significant bits written to
+//               higher-numbered pins.
 #define PIO_SM1_PINCTRL_SIDESET_BASE_RESET  0x00
 #define PIO_SM1_PINCTRL_SIDESET_BASE_BITS   0x00007c00
 #define PIO_SM1_PINCTRL_SIDESET_BASE_MSB    14
@@ -1251,7 +1363,9 @@
 #define PIO_SM1_PINCTRL_SIDESET_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_PINCTRL_SET_BASE
-// Description : The virtual pin corresponding to SET bit 0
+// Description : The lowest-numbered pin that will be affected by a SET PINS or
+//               SET PINDIRS instruction. The data written to this pin is the
+//               least-significant bit of the SET data.
 #define PIO_SM1_PINCTRL_SET_BASE_RESET  0x00
 #define PIO_SM1_PINCTRL_SET_BASE_BITS   0x000003e0
 #define PIO_SM1_PINCTRL_SET_BASE_MSB    9
@@ -1259,7 +1373,10 @@
 #define PIO_SM1_PINCTRL_SET_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM1_PINCTRL_OUT_BASE
-// Description : The virtual pin corresponding to OUT bit 0
+// Description : The lowest-numbered pin that will be affected by an OUT PINS,
+//               OUT PINDIRS or MOV PINS instruction. The data written to this
+//               pin will always be the least-significant bit of the OUT or MOV
+//               data.
 #define PIO_SM1_PINCTRL_OUT_BASE_RESET  0x00
 #define PIO_SM1_PINCTRL_OUT_BASE_BITS   0x0000001f
 #define PIO_SM1_PINCTRL_OUT_BASE_MSB    4
@@ -1267,15 +1384,16 @@
 #define PIO_SM1_PINCTRL_OUT_BASE_ACCESS "RW"
 // =============================================================================
 // Register    : PIO_SM2_CLKDIV
-// Description : Clock divider register for state machine 2
+// Description : Clock divisor register for state machine 2
 //               Frequency = clock freq / (CLKDIV_INT + CLKDIV_FRAC / 256)
 #define PIO_SM2_CLKDIV_OFFSET 0x000000f8
 #define PIO_SM2_CLKDIV_BITS   0xffffff00
 #define PIO_SM2_CLKDIV_RESET  0x00010000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_CLKDIV_INT
-// Description : Effective frequency is sysclk/int.
-//               Value of 0 is interpreted as max possible value
+// Description : Effective frequency is sysclk/(int + frac/256).
+//               Value of 0 is interpreted as 65536. If INT is 0, FRAC must also
+//               be 0.
 #define PIO_SM2_CLKDIV_INT_RESET  0x0001
 #define PIO_SM2_CLKDIV_INT_BITS   0xffff0000
 #define PIO_SM2_CLKDIV_INT_MSB    31
@@ -1283,7 +1401,7 @@
 #define PIO_SM2_CLKDIV_INT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_CLKDIV_FRAC
-// Description : Fractional part of clock divider
+// Description : Fractional part of clock divisor
 #define PIO_SM2_CLKDIV_FRAC_RESET  0x00
 #define PIO_SM2_CLKDIV_FRAC_BITS   0x0000ff00
 #define PIO_SM2_CLKDIV_FRAC_MSB    15
@@ -1297,9 +1415,9 @@
 #define PIO_SM2_EXECCTRL_RESET  0x0001f000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_EXECCTRL_EXEC_STALLED
-// Description : An instruction written to SMx_INSTR is stalled, and latched by
-//               the
-//               state machine. Will clear once the instruction completes.
+// Description : If 1, an instruction written to SMx_INSTR is stalled, and
+//               latched by the state machine. Will clear to 0 once this
+//               instruction completes.
 #define PIO_SM2_EXECCTRL_EXEC_STALLED_RESET  0x0
 #define PIO_SM2_EXECCTRL_EXEC_STALLED_BITS   0x80000000
 #define PIO_SM2_EXECCTRL_EXEC_STALLED_MSB    31
@@ -1307,10 +1425,12 @@
 #define PIO_SM2_EXECCTRL_EXEC_STALLED_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_EXECCTRL_SIDE_EN
-// Description : If 1, the delay MSB is used as side-set enable, rather than a
-//               side-set data bit. This allows instructions to perform side-set
-//               optionally,
-//               rather than on every instruction.
+// Description : If 1, the MSB of the Delay/Side-set instruction field is used
+//               as side-set enable, rather than a side-set data bit. This
+//               allows instructions to perform side-set optionally, rather than
+//               on every instruction, but the maximum possible side-set width
+//               is reduced from 5 to 4. Note that the value of
+//               PINCTRL_SIDESET_COUNT is inclusive of this enable bit.
 #define PIO_SM2_EXECCTRL_SIDE_EN_RESET  0x0
 #define PIO_SM2_EXECCTRL_SIDE_EN_BITS   0x40000000
 #define PIO_SM2_EXECCTRL_SIDE_EN_MSB    30
@@ -1318,7 +1438,8 @@
 #define PIO_SM2_EXECCTRL_SIDE_EN_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_EXECCTRL_SIDE_PINDIR
-// Description : Side-set data is asserted to pin OEs instead of pin values
+// Description : If 1, side-set data is asserted to pin directions, instead of
+//               pin values
 #define PIO_SM2_EXECCTRL_SIDE_PINDIR_RESET  0x0
 #define PIO_SM2_EXECCTRL_SIDE_PINDIR_BITS   0x20000000
 #define PIO_SM2_EXECCTRL_SIDE_PINDIR_MSB    29
@@ -1435,8 +1556,8 @@
 #define PIO_SM2_SHIFTCTRL_FJOIN_TX_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_SHIFTCTRL_PULL_THRESH
-// Description : Number of bits shifted out of TXSR before autopull or
-//               conditional pull.
+// Description : Number of bits shifted out of OSR before autopull, or
+//               conditional pull (PULL IFEMPTY), will take place.
 //               Write 0 for value of 32.
 #define PIO_SM2_SHIFTCTRL_PULL_THRESH_RESET  0x00
 #define PIO_SM2_SHIFTCTRL_PULL_THRESH_BITS   0x3e000000
@@ -1445,8 +1566,8 @@
 #define PIO_SM2_SHIFTCTRL_PULL_THRESH_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_SHIFTCTRL_PUSH_THRESH
-// Description : Number of bits shifted into RXSR before autopush or conditional
-//               push.
+// Description : Number of bits shifted into ISR before autopush, or conditional
+//               push (PUSH IFFULL), will take place.
 //               Write 0 for value of 32.
 #define PIO_SM2_SHIFTCTRL_PUSH_THRESH_RESET  0x00
 #define PIO_SM2_SHIFTCTRL_PUSH_THRESH_BITS   0x01f00000
@@ -1472,7 +1593,9 @@
 #define PIO_SM2_SHIFTCTRL_IN_SHIFTDIR_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_SHIFTCTRL_AUTOPULL
-// Description : Pull automatically when the output shift register is emptied
+// Description : Pull automatically when the output shift register is emptied,
+//               i.e. on or following an OUT instruction which causes the output
+//               shift counter to reach or exceed PULL_THRESH.
 #define PIO_SM2_SHIFTCTRL_AUTOPULL_RESET  0x0
 #define PIO_SM2_SHIFTCTRL_AUTOPULL_BITS   0x00020000
 #define PIO_SM2_SHIFTCTRL_AUTOPULL_MSB    17
@@ -1480,7 +1603,9 @@
 #define PIO_SM2_SHIFTCTRL_AUTOPULL_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_SHIFTCTRL_AUTOPUSH
-// Description : Push automatically when the input shift register is filled
+// Description : Push automatically when the input shift register is filled,
+//               i.e. on an IN instruction which causes the input shift counter
+//               to reach or exceed PUSH_THRESH.
 #define PIO_SM2_SHIFTCTRL_AUTOPUSH_RESET  0x0
 #define PIO_SM2_SHIFTCTRL_AUTOPUSH_BITS   0x00010000
 #define PIO_SM2_SHIFTCTRL_AUTOPUSH_MSB    16
@@ -1497,7 +1622,8 @@
 #define PIO_SM2_ADDR_ACCESS "RO"
 // =============================================================================
 // Register    : PIO_SM2_INSTR
-// Description : Instruction currently being executed by state machine 2
+// Description : Read to see the instruction currently addressed by state
+//               machine 2's program counter
 //               Write to execute an instruction immediately (including jumps)
 //               and then resume execution.
 #define PIO_SM2_INSTR_OFFSET 0x00000108
@@ -1514,8 +1640,10 @@
 #define PIO_SM2_PINCTRL_RESET  0x14000000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_PINCTRL_SIDESET_COUNT
-// Description : The number of delay bits co-opted for side-set. Inclusive of
-//               the enable bit, if present.
+// Description : The number of MSBs of the Delay/Side-set instruction field
+//               which are used for side-set. Inclusive of the enable bit, if
+//               present. Minimum of 0 (all delay bits, no side-set) and maximum
+//               of 5 (all side-set, no delay).
 #define PIO_SM2_PINCTRL_SIDESET_COUNT_RESET  0x0
 #define PIO_SM2_PINCTRL_SIDESET_COUNT_BITS   0xe0000000
 #define PIO_SM2_PINCTRL_SIDESET_COUNT_MSB    31
@@ -1523,7 +1651,8 @@
 #define PIO_SM2_PINCTRL_SIDESET_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_PINCTRL_SET_COUNT
-// Description : The number of pins asserted by a SET. Max of 5
+// Description : The number of pins asserted by a SET. In the range 0 to 5
+//               inclusive.
 #define PIO_SM2_PINCTRL_SET_COUNT_RESET  0x5
 #define PIO_SM2_PINCTRL_SET_COUNT_BITS   0x1c000000
 #define PIO_SM2_PINCTRL_SET_COUNT_MSB    28
@@ -1531,7 +1660,8 @@
 #define PIO_SM2_PINCTRL_SET_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_PINCTRL_OUT_COUNT
-// Description : The number of pins asserted by an OUT. Value of 0 -> 32 pins
+// Description : The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV
+//               PINS instruction. In the range 0 to 32 inclusive.
 #define PIO_SM2_PINCTRL_OUT_COUNT_RESET  0x00
 #define PIO_SM2_PINCTRL_OUT_COUNT_BITS   0x03f00000
 #define PIO_SM2_PINCTRL_OUT_COUNT_MSB    25
@@ -1539,7 +1669,10 @@
 #define PIO_SM2_PINCTRL_OUT_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_PINCTRL_IN_BASE
-// Description : The virtual pin corresponding to IN bit 0
+// Description : The pin which is mapped to the least-significant bit of a state
+//               machine's IN data bus. Higher-numbered pins are mapped to
+//               consecutively more-significant data bits, with a modulo of 32
+//               applied to pin number.
 #define PIO_SM2_PINCTRL_IN_BASE_RESET  0x00
 #define PIO_SM2_PINCTRL_IN_BASE_BITS   0x000f8000
 #define PIO_SM2_PINCTRL_IN_BASE_MSB    19
@@ -1547,7 +1680,13 @@
 #define PIO_SM2_PINCTRL_IN_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_PINCTRL_SIDESET_BASE
-// Description : The virtual pin corresponding to delay field bit 0
+// Description : The lowest-numbered pin that will be affected by a side-set
+//               operation. The MSBs of an instruction's side-set/delay field
+//               (up to 5, determined by SIDESET_COUNT) are used for side-set
+//               data, with the remaining LSBs used for delay. The
+//               least-significant bit of the side-set portion is the bit
+//               written to this pin, with more-significant bits written to
+//               higher-numbered pins.
 #define PIO_SM2_PINCTRL_SIDESET_BASE_RESET  0x00
 #define PIO_SM2_PINCTRL_SIDESET_BASE_BITS   0x00007c00
 #define PIO_SM2_PINCTRL_SIDESET_BASE_MSB    14
@@ -1555,7 +1694,9 @@
 #define PIO_SM2_PINCTRL_SIDESET_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_PINCTRL_SET_BASE
-// Description : The virtual pin corresponding to SET bit 0
+// Description : The lowest-numbered pin that will be affected by a SET PINS or
+//               SET PINDIRS instruction. The data written to this pin is the
+//               least-significant bit of the SET data.
 #define PIO_SM2_PINCTRL_SET_BASE_RESET  0x00
 #define PIO_SM2_PINCTRL_SET_BASE_BITS   0x000003e0
 #define PIO_SM2_PINCTRL_SET_BASE_MSB    9
@@ -1563,7 +1704,10 @@
 #define PIO_SM2_PINCTRL_SET_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM2_PINCTRL_OUT_BASE
-// Description : The virtual pin corresponding to OUT bit 0
+// Description : The lowest-numbered pin that will be affected by an OUT PINS,
+//               OUT PINDIRS or MOV PINS instruction. The data written to this
+//               pin will always be the least-significant bit of the OUT or MOV
+//               data.
 #define PIO_SM2_PINCTRL_OUT_BASE_RESET  0x00
 #define PIO_SM2_PINCTRL_OUT_BASE_BITS   0x0000001f
 #define PIO_SM2_PINCTRL_OUT_BASE_MSB    4
@@ -1571,15 +1715,16 @@
 #define PIO_SM2_PINCTRL_OUT_BASE_ACCESS "RW"
 // =============================================================================
 // Register    : PIO_SM3_CLKDIV
-// Description : Clock divider register for state machine 3
+// Description : Clock divisor register for state machine 3
 //               Frequency = clock freq / (CLKDIV_INT + CLKDIV_FRAC / 256)
 #define PIO_SM3_CLKDIV_OFFSET 0x00000110
 #define PIO_SM3_CLKDIV_BITS   0xffffff00
 #define PIO_SM3_CLKDIV_RESET  0x00010000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_CLKDIV_INT
-// Description : Effective frequency is sysclk/int.
-//               Value of 0 is interpreted as max possible value
+// Description : Effective frequency is sysclk/(int + frac/256).
+//               Value of 0 is interpreted as 65536. If INT is 0, FRAC must also
+//               be 0.
 #define PIO_SM3_CLKDIV_INT_RESET  0x0001
 #define PIO_SM3_CLKDIV_INT_BITS   0xffff0000
 #define PIO_SM3_CLKDIV_INT_MSB    31
@@ -1587,7 +1732,7 @@
 #define PIO_SM3_CLKDIV_INT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_CLKDIV_FRAC
-// Description : Fractional part of clock divider
+// Description : Fractional part of clock divisor
 #define PIO_SM3_CLKDIV_FRAC_RESET  0x00
 #define PIO_SM3_CLKDIV_FRAC_BITS   0x0000ff00
 #define PIO_SM3_CLKDIV_FRAC_MSB    15
@@ -1601,9 +1746,9 @@
 #define PIO_SM3_EXECCTRL_RESET  0x0001f000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_EXECCTRL_EXEC_STALLED
-// Description : An instruction written to SMx_INSTR is stalled, and latched by
-//               the
-//               state machine. Will clear once the instruction completes.
+// Description : If 1, an instruction written to SMx_INSTR is stalled, and
+//               latched by the state machine. Will clear to 0 once this
+//               instruction completes.
 #define PIO_SM3_EXECCTRL_EXEC_STALLED_RESET  0x0
 #define PIO_SM3_EXECCTRL_EXEC_STALLED_BITS   0x80000000
 #define PIO_SM3_EXECCTRL_EXEC_STALLED_MSB    31
@@ -1611,10 +1756,12 @@
 #define PIO_SM3_EXECCTRL_EXEC_STALLED_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_EXECCTRL_SIDE_EN
-// Description : If 1, the delay MSB is used as side-set enable, rather than a
-//               side-set data bit. This allows instructions to perform side-set
-//               optionally,
-//               rather than on every instruction.
+// Description : If 1, the MSB of the Delay/Side-set instruction field is used
+//               as side-set enable, rather than a side-set data bit. This
+//               allows instructions to perform side-set optionally, rather than
+//               on every instruction, but the maximum possible side-set width
+//               is reduced from 5 to 4. Note that the value of
+//               PINCTRL_SIDESET_COUNT is inclusive of this enable bit.
 #define PIO_SM3_EXECCTRL_SIDE_EN_RESET  0x0
 #define PIO_SM3_EXECCTRL_SIDE_EN_BITS   0x40000000
 #define PIO_SM3_EXECCTRL_SIDE_EN_MSB    30
@@ -1622,7 +1769,8 @@
 #define PIO_SM3_EXECCTRL_SIDE_EN_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_EXECCTRL_SIDE_PINDIR
-// Description : Side-set data is asserted to pin OEs instead of pin values
+// Description : If 1, side-set data is asserted to pin directions, instead of
+//               pin values
 #define PIO_SM3_EXECCTRL_SIDE_PINDIR_RESET  0x0
 #define PIO_SM3_EXECCTRL_SIDE_PINDIR_BITS   0x20000000
 #define PIO_SM3_EXECCTRL_SIDE_PINDIR_MSB    29
@@ -1739,8 +1887,8 @@
 #define PIO_SM3_SHIFTCTRL_FJOIN_TX_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_SHIFTCTRL_PULL_THRESH
-// Description : Number of bits shifted out of TXSR before autopull or
-//               conditional pull.
+// Description : Number of bits shifted out of OSR before autopull, or
+//               conditional pull (PULL IFEMPTY), will take place.
 //               Write 0 for value of 32.
 #define PIO_SM3_SHIFTCTRL_PULL_THRESH_RESET  0x00
 #define PIO_SM3_SHIFTCTRL_PULL_THRESH_BITS   0x3e000000
@@ -1749,8 +1897,8 @@
 #define PIO_SM3_SHIFTCTRL_PULL_THRESH_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_SHIFTCTRL_PUSH_THRESH
-// Description : Number of bits shifted into RXSR before autopush or conditional
-//               push.
+// Description : Number of bits shifted into ISR before autopush, or conditional
+//               push (PUSH IFFULL), will take place.
 //               Write 0 for value of 32.
 #define PIO_SM3_SHIFTCTRL_PUSH_THRESH_RESET  0x00
 #define PIO_SM3_SHIFTCTRL_PUSH_THRESH_BITS   0x01f00000
@@ -1776,7 +1924,9 @@
 #define PIO_SM3_SHIFTCTRL_IN_SHIFTDIR_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_SHIFTCTRL_AUTOPULL
-// Description : Pull automatically when the output shift register is emptied
+// Description : Pull automatically when the output shift register is emptied,
+//               i.e. on or following an OUT instruction which causes the output
+//               shift counter to reach or exceed PULL_THRESH.
 #define PIO_SM3_SHIFTCTRL_AUTOPULL_RESET  0x0
 #define PIO_SM3_SHIFTCTRL_AUTOPULL_BITS   0x00020000
 #define PIO_SM3_SHIFTCTRL_AUTOPULL_MSB    17
@@ -1784,7 +1934,9 @@
 #define PIO_SM3_SHIFTCTRL_AUTOPULL_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_SHIFTCTRL_AUTOPUSH
-// Description : Push automatically when the input shift register is filled
+// Description : Push automatically when the input shift register is filled,
+//               i.e. on an IN instruction which causes the input shift counter
+//               to reach or exceed PUSH_THRESH.
 #define PIO_SM3_SHIFTCTRL_AUTOPUSH_RESET  0x0
 #define PIO_SM3_SHIFTCTRL_AUTOPUSH_BITS   0x00010000
 #define PIO_SM3_SHIFTCTRL_AUTOPUSH_MSB    16
@@ -1801,7 +1953,8 @@
 #define PIO_SM3_ADDR_ACCESS "RO"
 // =============================================================================
 // Register    : PIO_SM3_INSTR
-// Description : Instruction currently being executed by state machine 3
+// Description : Read to see the instruction currently addressed by state
+//               machine 3's program counter
 //               Write to execute an instruction immediately (including jumps)
 //               and then resume execution.
 #define PIO_SM3_INSTR_OFFSET 0x00000120
@@ -1818,8 +1971,10 @@
 #define PIO_SM3_PINCTRL_RESET  0x14000000
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_PINCTRL_SIDESET_COUNT
-// Description : The number of delay bits co-opted for side-set. Inclusive of
-//               the enable bit, if present.
+// Description : The number of MSBs of the Delay/Side-set instruction field
+//               which are used for side-set. Inclusive of the enable bit, if
+//               present. Minimum of 0 (all delay bits, no side-set) and maximum
+//               of 5 (all side-set, no delay).
 #define PIO_SM3_PINCTRL_SIDESET_COUNT_RESET  0x0
 #define PIO_SM3_PINCTRL_SIDESET_COUNT_BITS   0xe0000000
 #define PIO_SM3_PINCTRL_SIDESET_COUNT_MSB    31
@@ -1827,7 +1982,8 @@
 #define PIO_SM3_PINCTRL_SIDESET_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_PINCTRL_SET_COUNT
-// Description : The number of pins asserted by a SET. Max of 5
+// Description : The number of pins asserted by a SET. In the range 0 to 5
+//               inclusive.
 #define PIO_SM3_PINCTRL_SET_COUNT_RESET  0x5
 #define PIO_SM3_PINCTRL_SET_COUNT_BITS   0x1c000000
 #define PIO_SM3_PINCTRL_SET_COUNT_MSB    28
@@ -1835,7 +1991,8 @@
 #define PIO_SM3_PINCTRL_SET_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_PINCTRL_OUT_COUNT
-// Description : The number of pins asserted by an OUT. Value of 0 -> 32 pins
+// Description : The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV
+//               PINS instruction. In the range 0 to 32 inclusive.
 #define PIO_SM3_PINCTRL_OUT_COUNT_RESET  0x00
 #define PIO_SM3_PINCTRL_OUT_COUNT_BITS   0x03f00000
 #define PIO_SM3_PINCTRL_OUT_COUNT_MSB    25
@@ -1843,7 +2000,10 @@
 #define PIO_SM3_PINCTRL_OUT_COUNT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_PINCTRL_IN_BASE
-// Description : The virtual pin corresponding to IN bit 0
+// Description : The pin which is mapped to the least-significant bit of a state
+//               machine's IN data bus. Higher-numbered pins are mapped to
+//               consecutively more-significant data bits, with a modulo of 32
+//               applied to pin number.
 #define PIO_SM3_PINCTRL_IN_BASE_RESET  0x00
 #define PIO_SM3_PINCTRL_IN_BASE_BITS   0x000f8000
 #define PIO_SM3_PINCTRL_IN_BASE_MSB    19
@@ -1851,7 +2011,13 @@
 #define PIO_SM3_PINCTRL_IN_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_PINCTRL_SIDESET_BASE
-// Description : The virtual pin corresponding to delay field bit 0
+// Description : The lowest-numbered pin that will be affected by a side-set
+//               operation. The MSBs of an instruction's side-set/delay field
+//               (up to 5, determined by SIDESET_COUNT) are used for side-set
+//               data, with the remaining LSBs used for delay. The
+//               least-significant bit of the side-set portion is the bit
+//               written to this pin, with more-significant bits written to
+//               higher-numbered pins.
 #define PIO_SM3_PINCTRL_SIDESET_BASE_RESET  0x00
 #define PIO_SM3_PINCTRL_SIDESET_BASE_BITS   0x00007c00
 #define PIO_SM3_PINCTRL_SIDESET_BASE_MSB    14
@@ -1859,7 +2025,9 @@
 #define PIO_SM3_PINCTRL_SIDESET_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_PINCTRL_SET_BASE
-// Description : The virtual pin corresponding to SET bit 0
+// Description : The lowest-numbered pin that will be affected by a SET PINS or
+//               SET PINDIRS instruction. The data written to this pin is the
+//               least-significant bit of the SET data.
 #define PIO_SM3_PINCTRL_SET_BASE_RESET  0x00
 #define PIO_SM3_PINCTRL_SET_BASE_BITS   0x000003e0
 #define PIO_SM3_PINCTRL_SET_BASE_MSB    9
@@ -1867,7 +2035,10 @@
 #define PIO_SM3_PINCTRL_SET_BASE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : PIO_SM3_PINCTRL_OUT_BASE
-// Description : The virtual pin corresponding to OUT bit 0
+// Description : The lowest-numbered pin that will be affected by an OUT PINS,
+//               OUT PINDIRS or MOV PINS instruction. The data written to this
+//               pin will always be the least-significant bit of the OUT or MOV
+//               data.
 #define PIO_SM3_PINCTRL_OUT_BASE_RESET  0x00
 #define PIO_SM3_PINCTRL_OUT_BASE_BITS   0x0000001f
 #define PIO_SM3_PINCTRL_OUT_BASE_MSB    4

@@ -36325,23 +36325,24 @@
             <field>
               <access>read-write</access>
               <bitRange>[11:8]</bitRange>
-              <description>Force clock dividers to restart their count and clear fractional\n
-                accumulators. Restart multiple dividers to synchronise them.</description>
+              <description>Restart a state machine's clock divider from an initial phase of 0. Clock dividers are free-running, so once started, their output (including fractional jitter) is completely determined by the integer/fractional divisor configured in SMx_CLKDIV. This means that, if multiple clock dividers with the same divisor are restarted simultaneously, by writing multiple 1 bits to this field, the execution clocks of those state machines will run in precise lockstep.\n\n
+                Note that setting/clearing SM_ENABLE does not stop the clock divider from running, so once multiple state machines' clocks are synchronised, it is safe to disable/reenable a state machine, whilst keeping the clock dividers in sync.\n\n
+                Note also that CLKDIV_RESTART can be written to whilst the state machine is running, and this is useful to resynchronise clock dividers after the divisors (SMx_CLKDIV) have been changed on-the-fly.</description>
               <modifiedWriteValues>clear</modifiedWriteValues>
               <name>CLKDIV_RESTART</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[7:4]</bitRange>
-              <description>Clear internal SM state which is otherwise difficult to access\n
-                (e.g. shift counters). Self-clearing.</description>
+              <description>Write 1 to instantly clear internal SM state which may be otherwise difficult to access and will affect future execution.\n\n
+                Specifically, the following are cleared: input and output shift counters; the contents of the input shift register; the delay counter; the waiting-on-IRQ state; any stalled instruction written to SMx_INSTR or run by OUT/MOV EXEC; any pin write left asserted due to OUT_STICKY.</description>
               <modifiedWriteValues>clear</modifiedWriteValues>
               <name>SM_RESTART</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[3:0]</bitRange>
-              <description>Enable state machine</description>
+              <description>Enable/disable each of the four state machines by writing 1/0 to each of these four bits. When disabled, a state machine will cease executing instructions, except those written directly to SMx_INSTR by the system. Multiple bits can be set/cleared at once to run/halt multiple state machines simultaneously.</description>
               <name>SM_ENABLE</name>
             </field>
           </fields>
@@ -36387,28 +36388,28 @@
             <field>
               <access>read-write</access>
               <bitRange>[27:24]</bitRange>
-              <description>State machine has stalled on empty TX FIFO. Write 1 to clear.</description>
+              <description>State machine has stalled on empty TX FIFO during a blocking PULL, or an OUT with autopull enabled. Write 1 to clear.</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>TXSTALL</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[19:16]</bitRange>
-              <description>TX FIFO overflow has occurred. Write 1 to clear.</description>
+              <description>TX FIFO overflow (i.e. write-on-full by the system) has occurred. Write 1 to clear. Note that write-on-full does not alter the state or contents of the FIFO in any way, but the data that the system attempted to write is dropped, so if this flag is set, your software has quite likely dropped some data on the floor.</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>TXOVER</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[11:8]</bitRange>
-              <description>RX FIFO underflow has occurred. Write 1 to clear.</description>
+              <description>RX FIFO underflow (i.e. read-on-empty by the system) has occurred. Write 1 to clear. Note that read-on-empty does not perturb the state of the FIFO in any way, but the data returned by reading from an empty FIFO is undefined, so this flag generally only becomes set due to some kind of software error.</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>RXUNDER</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[3:0]</bitRange>
-              <description>State machine has stalled on full RX FIFO. Write 1 to clear.</description>
+              <description>State machine has stalled on full RX FIFO during a blocking PUSH, or an IN with autopush enabled. This flag is also set when a nonblocking PUSH to a full FIFO took place, in which case the state machine has dropped data. Write 1 to clear.</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>RXSTALL</name>
             </field>
@@ -36467,62 +36468,63 @@
         <register>
           <access>write-only</access>
           <addressOffset>0x0010</addressOffset>
-          <description>Direct write access to the TX FIFO for this state machine. Each write pushes one word to the FIFO.</description>
+          <description>Direct write access to the TX FIFO for this state machine. Each write pushes one word to the FIFO. Attempting to write to a full FIFO has no effect on the FIFO state or contents, and sets the sticky FDEBUG_TXOVER error flag for this FIFO.</description>
           <name>TXF0</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>write-only</access>
           <addressOffset>0x0014</addressOffset>
-          <description>Direct write access to the TX FIFO for this state machine. Each write pushes one word to the FIFO.</description>
+          <description>Direct write access to the TX FIFO for this state machine. Each write pushes one word to the FIFO. Attempting to write to a full FIFO has no effect on the FIFO state or contents, and sets the sticky FDEBUG_TXOVER error flag for this FIFO.</description>
           <name>TXF1</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>write-only</access>
           <addressOffset>0x0018</addressOffset>
-          <description>Direct write access to the TX FIFO for this state machine. Each write pushes one word to the FIFO.</description>
+          <description>Direct write access to the TX FIFO for this state machine. Each write pushes one word to the FIFO. Attempting to write to a full FIFO has no effect on the FIFO state or contents, and sets the sticky FDEBUG_TXOVER error flag for this FIFO.</description>
           <name>TXF2</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>write-only</access>
           <addressOffset>0x001c</addressOffset>
-          <description>Direct write access to the TX FIFO for this state machine. Each write pushes one word to the FIFO.</description>
+          <description>Direct write access to the TX FIFO for this state machine. Each write pushes one word to the FIFO. Attempting to write to a full FIFO has no effect on the FIFO state or contents, and sets the sticky FDEBUG_TXOVER error flag for this FIFO.</description>
           <name>TXF3</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-only</access>
           <addressOffset>0x0020</addressOffset>
-          <description>Direct read access to the RX FIFO for this state machine. Each read pops one word from the FIFO.</description>
+          <description>Direct read access to the RX FIFO for this state machine. Each read pops one word from the FIFO. Attempting to read from an empty FIFO has no effect on the FIFO state, and sets the sticky FDEBUG_RXUNDER error flag for this FIFO. The data returned to the system on a read from an empty FIFO is undefined.</description>
           <name>RXF0</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-only</access>
           <addressOffset>0x0024</addressOffset>
-          <description>Direct read access to the RX FIFO for this state machine. Each read pops one word from the FIFO.</description>
+          <description>Direct read access to the RX FIFO for this state machine. Each read pops one word from the FIFO. Attempting to read from an empty FIFO has no effect on the FIFO state, and sets the sticky FDEBUG_RXUNDER error flag for this FIFO. The data returned to the system on a read from an empty FIFO is undefined.</description>
           <name>RXF1</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-only</access>
           <addressOffset>0x0028</addressOffset>
-          <description>Direct read access to the RX FIFO for this state machine. Each read pops one word from the FIFO.</description>
+          <description>Direct read access to the RX FIFO for this state machine. Each read pops one word from the FIFO. Attempting to read from an empty FIFO has no effect on the FIFO state, and sets the sticky FDEBUG_RXUNDER error flag for this FIFO. The data returned to the system on a read from an empty FIFO is undefined.</description>
           <name>RXF2</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-only</access>
           <addressOffset>0x002c</addressOffset>
-          <description>Direct read access to the RX FIFO for this state machine. Each read pops one word from the FIFO.</description>
+          <description>Direct read access to the RX FIFO for this state machine. Each read pops one word from the FIFO. Attempting to read from an empty FIFO has no effect on the FIFO state, and sets the sticky FDEBUG_RXUNDER error flag for this FIFO. The data returned to the system on a read from an empty FIFO is undefined.</description>
           <name>RXF3</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <addressOffset>0x0030</addressOffset>
-          <description>Interrupt request register. Write 1 to clear</description>
+          <description>State machine IRQ flags register. Write 1 to clear. There are 8 state machine IRQ flags, which can be set, cleared, and waited on by the state machines. There's no fixed association between flags and state machines -- any state machine can use any flag.\n\n
+            Any of the 8 flags can be used for timing synchronisation between state machines, using IRQ and WAIT instructions. The lower four of these flags are also routed out to system-level interrupt requests, alongside FIFO status interrupts -- see e.g. IRQ0_INTE.</description>
           <fields>
             <field>
               <access>read-write</access>
@@ -36536,10 +36538,7 @@
         </register>
         <register>
           <addressOffset>0x0034</addressOffset>
-          <description>Writing a 1 to each of these bits will forcibly assert the corresponding IRQ.\n
-            Note this is different to the INTF register: writing here affects PIO internal\n
-            state. INTF just asserts the processor-facing IRQ signal for testing ISRs,\n
-            and is not visible to the state machines.</description>
+          <description>Writing a 1 to each of these bits will forcibly assert the corresponding IRQ. Note this is different to the INTF register: writing here affects PIO internal state. INTF just asserts the processor-facing IRQ signal for testing ISRs, and is not visible to the state machines.</description>
           <fields>
             <field>
               <access>write-only</access>
@@ -36553,10 +36552,7 @@
         <register>
           <access>read-write</access>
           <addressOffset>0x0038</addressOffset>
-          <description>There is a 2-flipflop synchronizer on each GPIO input, which protects\n
-            PIO logic from metastabilities. This increases input delay, and for fast\n
-            synchronous IO (e.g. SPI) these synchronizers may need to be bypassed.\n
-            Each bit in this register corresponds to one GPIO.\n
+          <description>There is a 2-flipflop synchronizer on each GPIO input, which protects PIO logic from metastabilities. This increases input delay, and for fast synchronous IO (e.g. SPI) these synchronizers may need to be bypassed. Each bit in this register corresponds to one GPIO.\n
             0 -&gt; input is synchronized (default)\n
             1 -&gt; synchronizer is bypassed\n
             If in doubt, leave this register as all zeroes.</description>
@@ -37024,20 +37020,20 @@
         </register>
         <register>
           <addressOffset>0x00c8</addressOffset>
-          <description>Clock divider register for state machine 0\n
+          <description>Clock divisor register for state machine 0\n
             Frequency = clock freq / (CLKDIV_INT + CLKDIV_FRAC / 256)</description>
           <fields>
             <field>
               <access>read-write</access>
               <bitRange>[31:16]</bitRange>
-              <description>Effective frequency is sysclk/int.\n
-                Value of 0 is interpreted as max possible value</description>
+              <description>Effective frequency is sysclk/(int + frac/256).\n
+                Value of 0 is interpreted as 65536. If INT is 0, FRAC must also be 0.</description>
               <name>INT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[15:8]</bitRange>
-              <description>Fractional part of clock divider</description>
+              <description>Fractional part of clock divisor</description>
               <name>FRAC</name>
             </field>
           </fields>
@@ -37051,22 +37047,19 @@
             <field>
               <access>read-only</access>
               <bitRange>[31:31]</bitRange>
-              <description>An instruction written to SMx_INSTR is stalled, and latched by the\n
-                state machine. Will clear once the instruction completes.</description>
+              <description>If 1, an instruction written to SMx_INSTR is stalled, and latched by the state machine. Will clear to 0 once this instruction completes.</description>
               <name>EXEC_STALLED</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
-              <description>If 1, the delay MSB is used as side-set enable, rather than a\n
-                side-set data bit. This allows instructions to perform side-set optionally,\n
-                rather than on every instruction.</description>
+              <description>If 1, the MSB of the Delay/Side-set instruction field is used as side-set enable, rather than a side-set data bit. This allows instructions to perform side-set optionally, rather than on every instruction, but the maximum possible side-set width is reduced from 5 to 4. Note that the value of PINCTRL_SIDESET_COUNT is inclusive of this enable bit.</description>
               <name>SIDE_EN</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
-              <description>Side-set data is asserted to pin OEs instead of pin values</description>
+              <description>If 1, side-set data is asserted to pin directions, instead of pin values</description>
               <name>SIDE_PINDIR</name>
             </field>
             <field>
@@ -37160,14 +37153,14 @@
             <field>
               <access>read-write</access>
               <bitRange>[29:25]</bitRange>
-              <description>Number of bits shifted out of TXSR before autopull or conditional pull.\n
+              <description>Number of bits shifted out of OSR before autopull, or conditional pull (PULL IFEMPTY), will take place.\n
                 Write 0 for value of 32.</description>
               <name>PULL_THRESH</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[24:20]</bitRange>
-              <description>Number of bits shifted into RXSR before autopush or conditional push.\n
+              <description>Number of bits shifted into ISR before autopush, or conditional push (PUSH IFFULL), will take place.\n
                 Write 0 for value of 32.</description>
               <name>PUSH_THRESH</name>
             </field>
@@ -37186,13 +37179,13 @@
             <field>
               <access>read-write</access>
               <bitRange>[17:17]</bitRange>
-              <description>Pull automatically when the output shift register is emptied</description>
+              <description>Pull automatically when the output shift register is emptied, i.e. on or following an OUT instruction which causes the output shift counter to reach or exceed PULL_THRESH.</description>
               <name>AUTOPULL</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[16:16]</bitRange>
-              <description>Push automatically when the input shift register is filled</description>
+              <description>Push automatically when the input shift register is filled, i.e. on an IN instruction which causes the input shift counter to reach or exceed PUSH_THRESH.</description>
               <name>AUTOPUSH</name>
             </field>
           </fields>
@@ -37214,7 +37207,7 @@
         </register>
         <register>
           <addressOffset>0x00d8</addressOffset>
-          <description>Instruction currently being executed by state machine 0\n
+          <description>Read to see the instruction currently addressed by state machine 0's program counter\n
             Write to execute an instruction immediately (including jumps) and then resume execution.</description>
           <fields>
             <field>
@@ -37233,43 +37226,43 @@
             <field>
               <access>read-write</access>
               <bitRange>[31:29]</bitRange>
-              <description>The number of delay bits co-opted for side-set. Inclusive of the enable bit, if present.</description>
+              <description>The number of MSBs of the Delay/Side-set instruction field which are used for side-set. Inclusive of the enable bit, if present. Minimum of 0 (all delay bits, no side-set) and maximum of 5 (all side-set, no delay).</description>
               <name>SIDESET_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[28:26]</bitRange>
-              <description>The number of pins asserted by a SET. Max of 5</description>
+              <description>The number of pins asserted by a SET. In the range 0 to 5 inclusive.</description>
               <name>SET_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[25:20]</bitRange>
-              <description>The number of pins asserted by an OUT. Value of 0 -&gt; 32 pins</description>
+              <description>The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV PINS instruction. In the range 0 to 32 inclusive.</description>
               <name>OUT_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[19:15]</bitRange>
-              <description>The virtual pin corresponding to IN bit 0</description>
+              <description>The pin which is mapped to the least-significant bit of a state machine's IN data bus. Higher-numbered pins are mapped to consecutively more-significant data bits, with a modulo of 32 applied to pin number.</description>
               <name>IN_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[14:10]</bitRange>
-              <description>The virtual pin corresponding to delay field bit 0</description>
+              <description>The lowest-numbered pin that will be affected by a side-set operation. The MSBs of an instruction's side-set/delay field (up to 5, determined by SIDESET_COUNT) are used for side-set data, with the remaining LSBs used for delay. The least-significant bit of the side-set portion is the bit written to this pin, with more-significant bits written to higher-numbered pins.</description>
               <name>SIDESET_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[9:5]</bitRange>
-              <description>The virtual pin corresponding to SET bit 0</description>
+              <description>The lowest-numbered pin that will be affected by a SET PINS or SET PINDIRS instruction. The data written to this pin is the least-significant bit of the SET data.</description>
               <name>SET_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[4:0]</bitRange>
-              <description>The virtual pin corresponding to OUT bit 0</description>
+              <description>The lowest-numbered pin that will be affected by an OUT PINS, OUT PINDIRS or MOV PINS instruction. The data written to this pin will always be the least-significant bit of the OUT or MOV data.</description>
               <name>OUT_BASE</name>
             </field>
           </fields>
@@ -37278,20 +37271,20 @@
         </register>
         <register>
           <addressOffset>0x00e0</addressOffset>
-          <description>Clock divider register for state machine 1\n
+          <description>Clock divisor register for state machine 1\n
             Frequency = clock freq / (CLKDIV_INT + CLKDIV_FRAC / 256)</description>
           <fields>
             <field>
               <access>read-write</access>
               <bitRange>[31:16]</bitRange>
-              <description>Effective frequency is sysclk/int.\n
-                Value of 0 is interpreted as max possible value</description>
+              <description>Effective frequency is sysclk/(int + frac/256).\n
+                Value of 0 is interpreted as 65536. If INT is 0, FRAC must also be 0.</description>
               <name>INT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[15:8]</bitRange>
-              <description>Fractional part of clock divider</description>
+              <description>Fractional part of clock divisor</description>
               <name>FRAC</name>
             </field>
           </fields>
@@ -37305,22 +37298,19 @@
             <field>
               <access>read-only</access>
               <bitRange>[31:31]</bitRange>
-              <description>An instruction written to SMx_INSTR is stalled, and latched by the\n
-                state machine. Will clear once the instruction completes.</description>
+              <description>If 1, an instruction written to SMx_INSTR is stalled, and latched by the state machine. Will clear to 0 once this instruction completes.</description>
               <name>EXEC_STALLED</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
-              <description>If 1, the delay MSB is used as side-set enable, rather than a\n
-                side-set data bit. This allows instructions to perform side-set optionally,\n
-                rather than on every instruction.</description>
+              <description>If 1, the MSB of the Delay/Side-set instruction field is used as side-set enable, rather than a side-set data bit. This allows instructions to perform side-set optionally, rather than on every instruction, but the maximum possible side-set width is reduced from 5 to 4. Note that the value of PINCTRL_SIDESET_COUNT is inclusive of this enable bit.</description>
               <name>SIDE_EN</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
-              <description>Side-set data is asserted to pin OEs instead of pin values</description>
+              <description>If 1, side-set data is asserted to pin directions, instead of pin values</description>
               <name>SIDE_PINDIR</name>
             </field>
             <field>
@@ -37414,14 +37404,14 @@
             <field>
               <access>read-write</access>
               <bitRange>[29:25]</bitRange>
-              <description>Number of bits shifted out of TXSR before autopull or conditional pull.\n
+              <description>Number of bits shifted out of OSR before autopull, or conditional pull (PULL IFEMPTY), will take place.\n
                 Write 0 for value of 32.</description>
               <name>PULL_THRESH</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[24:20]</bitRange>
-              <description>Number of bits shifted into RXSR before autopush or conditional push.\n
+              <description>Number of bits shifted into ISR before autopush, or conditional push (PUSH IFFULL), will take place.\n
                 Write 0 for value of 32.</description>
               <name>PUSH_THRESH</name>
             </field>
@@ -37440,13 +37430,13 @@
             <field>
               <access>read-write</access>
               <bitRange>[17:17]</bitRange>
-              <description>Pull automatically when the output shift register is emptied</description>
+              <description>Pull automatically when the output shift register is emptied, i.e. on or following an OUT instruction which causes the output shift counter to reach or exceed PULL_THRESH.</description>
               <name>AUTOPULL</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[16:16]</bitRange>
-              <description>Push automatically when the input shift register is filled</description>
+              <description>Push automatically when the input shift register is filled, i.e. on an IN instruction which causes the input shift counter to reach or exceed PUSH_THRESH.</description>
               <name>AUTOPUSH</name>
             </field>
           </fields>
@@ -37468,7 +37458,7 @@
         </register>
         <register>
           <addressOffset>0x00f0</addressOffset>
-          <description>Instruction currently being executed by state machine 1\n
+          <description>Read to see the instruction currently addressed by state machine 1's program counter\n
             Write to execute an instruction immediately (including jumps) and then resume execution.</description>
           <fields>
             <field>
@@ -37487,43 +37477,43 @@
             <field>
               <access>read-write</access>
               <bitRange>[31:29]</bitRange>
-              <description>The number of delay bits co-opted for side-set. Inclusive of the enable bit, if present.</description>
+              <description>The number of MSBs of the Delay/Side-set instruction field which are used for side-set. Inclusive of the enable bit, if present. Minimum of 0 (all delay bits, no side-set) and maximum of 5 (all side-set, no delay).</description>
               <name>SIDESET_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[28:26]</bitRange>
-              <description>The number of pins asserted by a SET. Max of 5</description>
+              <description>The number of pins asserted by a SET. In the range 0 to 5 inclusive.</description>
               <name>SET_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[25:20]</bitRange>
-              <description>The number of pins asserted by an OUT. Value of 0 -&gt; 32 pins</description>
+              <description>The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV PINS instruction. In the range 0 to 32 inclusive.</description>
               <name>OUT_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[19:15]</bitRange>
-              <description>The virtual pin corresponding to IN bit 0</description>
+              <description>The pin which is mapped to the least-significant bit of a state machine's IN data bus. Higher-numbered pins are mapped to consecutively more-significant data bits, with a modulo of 32 applied to pin number.</description>
               <name>IN_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[14:10]</bitRange>
-              <description>The virtual pin corresponding to delay field bit 0</description>
+              <description>The lowest-numbered pin that will be affected by a side-set operation. The MSBs of an instruction's side-set/delay field (up to 5, determined by SIDESET_COUNT) are used for side-set data, with the remaining LSBs used for delay. The least-significant bit of the side-set portion is the bit written to this pin, with more-significant bits written to higher-numbered pins.</description>
               <name>SIDESET_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[9:5]</bitRange>
-              <description>The virtual pin corresponding to SET bit 0</description>
+              <description>The lowest-numbered pin that will be affected by a SET PINS or SET PINDIRS instruction. The data written to this pin is the least-significant bit of the SET data.</description>
               <name>SET_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[4:0]</bitRange>
-              <description>The virtual pin corresponding to OUT bit 0</description>
+              <description>The lowest-numbered pin that will be affected by an OUT PINS, OUT PINDIRS or MOV PINS instruction. The data written to this pin will always be the least-significant bit of the OUT or MOV data.</description>
               <name>OUT_BASE</name>
             </field>
           </fields>
@@ -37532,20 +37522,20 @@
         </register>
         <register>
           <addressOffset>0x00f8</addressOffset>
-          <description>Clock divider register for state machine 2\n
+          <description>Clock divisor register for state machine 2\n
             Frequency = clock freq / (CLKDIV_INT + CLKDIV_FRAC / 256)</description>
           <fields>
             <field>
               <access>read-write</access>
               <bitRange>[31:16]</bitRange>
-              <description>Effective frequency is sysclk/int.\n
-                Value of 0 is interpreted as max possible value</description>
+              <description>Effective frequency is sysclk/(int + frac/256).\n
+                Value of 0 is interpreted as 65536. If INT is 0, FRAC must also be 0.</description>
               <name>INT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[15:8]</bitRange>
-              <description>Fractional part of clock divider</description>
+              <description>Fractional part of clock divisor</description>
               <name>FRAC</name>
             </field>
           </fields>
@@ -37559,22 +37549,19 @@
             <field>
               <access>read-only</access>
               <bitRange>[31:31]</bitRange>
-              <description>An instruction written to SMx_INSTR is stalled, and latched by the\n
-                state machine. Will clear once the instruction completes.</description>
+              <description>If 1, an instruction written to SMx_INSTR is stalled, and latched by the state machine. Will clear to 0 once this instruction completes.</description>
               <name>EXEC_STALLED</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
-              <description>If 1, the delay MSB is used as side-set enable, rather than a\n
-                side-set data bit. This allows instructions to perform side-set optionally,\n
-                rather than on every instruction.</description>
+              <description>If 1, the MSB of the Delay/Side-set instruction field is used as side-set enable, rather than a side-set data bit. This allows instructions to perform side-set optionally, rather than on every instruction, but the maximum possible side-set width is reduced from 5 to 4. Note that the value of PINCTRL_SIDESET_COUNT is inclusive of this enable bit.</description>
               <name>SIDE_EN</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
-              <description>Side-set data is asserted to pin OEs instead of pin values</description>
+              <description>If 1, side-set data is asserted to pin directions, instead of pin values</description>
               <name>SIDE_PINDIR</name>
             </field>
             <field>
@@ -37668,14 +37655,14 @@
             <field>
               <access>read-write</access>
               <bitRange>[29:25]</bitRange>
-              <description>Number of bits shifted out of TXSR before autopull or conditional pull.\n
+              <description>Number of bits shifted out of OSR before autopull, or conditional pull (PULL IFEMPTY), will take place.\n
                 Write 0 for value of 32.</description>
               <name>PULL_THRESH</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[24:20]</bitRange>
-              <description>Number of bits shifted into RXSR before autopush or conditional push.\n
+              <description>Number of bits shifted into ISR before autopush, or conditional push (PUSH IFFULL), will take place.\n
                 Write 0 for value of 32.</description>
               <name>PUSH_THRESH</name>
             </field>
@@ -37694,13 +37681,13 @@
             <field>
               <access>read-write</access>
               <bitRange>[17:17]</bitRange>
-              <description>Pull automatically when the output shift register is emptied</description>
+              <description>Pull automatically when the output shift register is emptied, i.e. on or following an OUT instruction which causes the output shift counter to reach or exceed PULL_THRESH.</description>
               <name>AUTOPULL</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[16:16]</bitRange>
-              <description>Push automatically when the input shift register is filled</description>
+              <description>Push automatically when the input shift register is filled, i.e. on an IN instruction which causes the input shift counter to reach or exceed PUSH_THRESH.</description>
               <name>AUTOPUSH</name>
             </field>
           </fields>
@@ -37722,7 +37709,7 @@
         </register>
         <register>
           <addressOffset>0x0108</addressOffset>
-          <description>Instruction currently being executed by state machine 2\n
+          <description>Read to see the instruction currently addressed by state machine 2's program counter\n
             Write to execute an instruction immediately (including jumps) and then resume execution.</description>
           <fields>
             <field>
@@ -37741,43 +37728,43 @@
             <field>
               <access>read-write</access>
               <bitRange>[31:29]</bitRange>
-              <description>The number of delay bits co-opted for side-set. Inclusive of the enable bit, if present.</description>
+              <description>The number of MSBs of the Delay/Side-set instruction field which are used for side-set. Inclusive of the enable bit, if present. Minimum of 0 (all delay bits, no side-set) and maximum of 5 (all side-set, no delay).</description>
               <name>SIDESET_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[28:26]</bitRange>
-              <description>The number of pins asserted by a SET. Max of 5</description>
+              <description>The number of pins asserted by a SET. In the range 0 to 5 inclusive.</description>
               <name>SET_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[25:20]</bitRange>
-              <description>The number of pins asserted by an OUT. Value of 0 -&gt; 32 pins</description>
+              <description>The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV PINS instruction. In the range 0 to 32 inclusive.</description>
               <name>OUT_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[19:15]</bitRange>
-              <description>The virtual pin corresponding to IN bit 0</description>
+              <description>The pin which is mapped to the least-significant bit of a state machine's IN data bus. Higher-numbered pins are mapped to consecutively more-significant data bits, with a modulo of 32 applied to pin number.</description>
               <name>IN_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[14:10]</bitRange>
-              <description>The virtual pin corresponding to delay field bit 0</description>
+              <description>The lowest-numbered pin that will be affected by a side-set operation. The MSBs of an instruction's side-set/delay field (up to 5, determined by SIDESET_COUNT) are used for side-set data, with the remaining LSBs used for delay. The least-significant bit of the side-set portion is the bit written to this pin, with more-significant bits written to higher-numbered pins.</description>
               <name>SIDESET_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[9:5]</bitRange>
-              <description>The virtual pin corresponding to SET bit 0</description>
+              <description>The lowest-numbered pin that will be affected by a SET PINS or SET PINDIRS instruction. The data written to this pin is the least-significant bit of the SET data.</description>
               <name>SET_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[4:0]</bitRange>
-              <description>The virtual pin corresponding to OUT bit 0</description>
+              <description>The lowest-numbered pin that will be affected by an OUT PINS, OUT PINDIRS or MOV PINS instruction. The data written to this pin will always be the least-significant bit of the OUT or MOV data.</description>
               <name>OUT_BASE</name>
             </field>
           </fields>
@@ -37786,20 +37773,20 @@
         </register>
         <register>
           <addressOffset>0x0110</addressOffset>
-          <description>Clock divider register for state machine 3\n
+          <description>Clock divisor register for state machine 3\n
             Frequency = clock freq / (CLKDIV_INT + CLKDIV_FRAC / 256)</description>
           <fields>
             <field>
               <access>read-write</access>
               <bitRange>[31:16]</bitRange>
-              <description>Effective frequency is sysclk/int.\n
-                Value of 0 is interpreted as max possible value</description>
+              <description>Effective frequency is sysclk/(int + frac/256).\n
+                Value of 0 is interpreted as 65536. If INT is 0, FRAC must also be 0.</description>
               <name>INT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[15:8]</bitRange>
-              <description>Fractional part of clock divider</description>
+              <description>Fractional part of clock divisor</description>
               <name>FRAC</name>
             </field>
           </fields>
@@ -37813,22 +37800,19 @@
             <field>
               <access>read-only</access>
               <bitRange>[31:31]</bitRange>
-              <description>An instruction written to SMx_INSTR is stalled, and latched by the\n
-                state machine. Will clear once the instruction completes.</description>
+              <description>If 1, an instruction written to SMx_INSTR is stalled, and latched by the state machine. Will clear to 0 once this instruction completes.</description>
               <name>EXEC_STALLED</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
-              <description>If 1, the delay MSB is used as side-set enable, rather than a\n
-                side-set data bit. This allows instructions to perform side-set optionally,\n
-                rather than on every instruction.</description>
+              <description>If 1, the MSB of the Delay/Side-set instruction field is used as side-set enable, rather than a side-set data bit. This allows instructions to perform side-set optionally, rather than on every instruction, but the maximum possible side-set width is reduced from 5 to 4. Note that the value of PINCTRL_SIDESET_COUNT is inclusive of this enable bit.</description>
               <name>SIDE_EN</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
-              <description>Side-set data is asserted to pin OEs instead of pin values</description>
+              <description>If 1, side-set data is asserted to pin directions, instead of pin values</description>
               <name>SIDE_PINDIR</name>
             </field>
             <field>
@@ -37922,14 +37906,14 @@
             <field>
               <access>read-write</access>
               <bitRange>[29:25]</bitRange>
-              <description>Number of bits shifted out of TXSR before autopull or conditional pull.\n
+              <description>Number of bits shifted out of OSR before autopull, or conditional pull (PULL IFEMPTY), will take place.\n
                 Write 0 for value of 32.</description>
               <name>PULL_THRESH</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[24:20]</bitRange>
-              <description>Number of bits shifted into RXSR before autopush or conditional push.\n
+              <description>Number of bits shifted into ISR before autopush, or conditional push (PUSH IFFULL), will take place.\n
                 Write 0 for value of 32.</description>
               <name>PUSH_THRESH</name>
             </field>
@@ -37948,13 +37932,13 @@
             <field>
               <access>read-write</access>
               <bitRange>[17:17]</bitRange>
-              <description>Pull automatically when the output shift register is emptied</description>
+              <description>Pull automatically when the output shift register is emptied, i.e. on or following an OUT instruction which causes the output shift counter to reach or exceed PULL_THRESH.</description>
               <name>AUTOPULL</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[16:16]</bitRange>
-              <description>Push automatically when the input shift register is filled</description>
+              <description>Push automatically when the input shift register is filled, i.e. on an IN instruction which causes the input shift counter to reach or exceed PUSH_THRESH.</description>
               <name>AUTOPUSH</name>
             </field>
           </fields>
@@ -37976,7 +37960,7 @@
         </register>
         <register>
           <addressOffset>0x0120</addressOffset>
-          <description>Instruction currently being executed by state machine 3\n
+          <description>Read to see the instruction currently addressed by state machine 3's program counter\n
             Write to execute an instruction immediately (including jumps) and then resume execution.</description>
           <fields>
             <field>
@@ -37995,43 +37979,43 @@
             <field>
               <access>read-write</access>
               <bitRange>[31:29]</bitRange>
-              <description>The number of delay bits co-opted for side-set. Inclusive of the enable bit, if present.</description>
+              <description>The number of MSBs of the Delay/Side-set instruction field which are used for side-set. Inclusive of the enable bit, if present. Minimum of 0 (all delay bits, no side-set) and maximum of 5 (all side-set, no delay).</description>
               <name>SIDESET_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[28:26]</bitRange>
-              <description>The number of pins asserted by a SET. Max of 5</description>
+              <description>The number of pins asserted by a SET. In the range 0 to 5 inclusive.</description>
               <name>SET_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[25:20]</bitRange>
-              <description>The number of pins asserted by an OUT. Value of 0 -&gt; 32 pins</description>
+              <description>The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV PINS instruction. In the range 0 to 32 inclusive.</description>
               <name>OUT_COUNT</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[19:15]</bitRange>
-              <description>The virtual pin corresponding to IN bit 0</description>
+              <description>The pin which is mapped to the least-significant bit of a state machine's IN data bus. Higher-numbered pins are mapped to consecutively more-significant data bits, with a modulo of 32 applied to pin number.</description>
               <name>IN_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[14:10]</bitRange>
-              <description>The virtual pin corresponding to delay field bit 0</description>
+              <description>The lowest-numbered pin that will be affected by a side-set operation. The MSBs of an instruction's side-set/delay field (up to 5, determined by SIDESET_COUNT) are used for side-set data, with the remaining LSBs used for delay. The least-significant bit of the side-set portion is the bit written to this pin, with more-significant bits written to higher-numbered pins.</description>
               <name>SIDESET_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[9:5]</bitRange>
-              <description>The virtual pin corresponding to SET bit 0</description>
+              <description>The lowest-numbered pin that will be affected by a SET PINS or SET PINDIRS instruction. The data written to this pin is the least-significant bit of the SET data.</description>
               <name>SET_BASE</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[4:0]</bitRange>
-              <description>The virtual pin corresponding to OUT bit 0</description>
+              <description>The lowest-numbered pin that will be affected by an OUT PINS, OUT PINDIRS or MOV PINS instruction. The data written to this pin will always be the least-significant bit of the OUT or MOV data.</description>
               <name>OUT_BASE</name>
             </field>
           </fields>
