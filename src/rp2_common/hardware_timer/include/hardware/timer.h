@@ -50,7 +50,7 @@ extern "C" {
 #define PARAM_ASSERTIONS_ENABLED_TIMER 0
 #endif
 
-static inline void check_hardware_alarm_num_param(uint alarm_num) {
+static inline void check_hardware_alarm_num_param(__unused uint alarm_num) {
     invalid_params_if(TIMER, alarm_num >= NUM_TIMERS);
 }
 

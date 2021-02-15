@@ -42,7 +42,7 @@ extern "C" {
 #define PARAM_ASSERTIONS_ENABLED_DMA 0
 #endif
 
-static inline void check_dma_channel_param(uint channel) {
+static inline void check_dma_channel_param(__unused uint channel) {
 #if PARAM_ASSERTIONS_ENABLED(DMA)
     // this method is used a lot by inline functions so avoid code bloat by deferring to function
     extern void check_dma_channel_param_impl(uint channel);

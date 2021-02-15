@@ -50,13 +50,6 @@ int pio_claim_unused_sm(PIO pio, bool required) {
     return index >= base ? index - base : -1;
 }
 
-void pio_load_program(PIO pio, const uint16_t *prog, uint8_t prog_len, uint8_t load_offset) {
-    // instructions are only 16 bits, but instruction memory locations are spaced 32 bits apart
-    // Adjust the addresses of any jump instructions to respect load offset
-    assert(load_offset + prog_len <= PIO_INSTRUCTION_COUNT);
-
-}
-
 static_assert(PIO_INSTRUCTION_COUNT <= 32, "");
 static uint32_t _used_instruction_space[2];
 

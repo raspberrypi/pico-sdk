@@ -169,6 +169,7 @@ static_assert(FLASH_UNIQUE_ID_SIZE_BYTES == FLASH_RUID_DATA_BYTES, "");
 
 void flash_get_unique_id(uint8_t *id_out) {
 #if PICO_NO_FLASH
+    __unused uint8_t *ignore = id_out;
     panic_unsupported();
 #else
     uint8_t txbuf[FLASH_RUID_TOTAL_BYTES] = {0};
