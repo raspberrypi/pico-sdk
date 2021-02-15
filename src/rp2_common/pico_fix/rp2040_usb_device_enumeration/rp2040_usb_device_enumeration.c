@@ -38,7 +38,7 @@ static inline uint8_t hw_line_state(void) {
     return (usb_hw->sie_status & USB_SIE_STATUS_LINE_STATE_BITS) >> USB_SIE_STATUS_LINE_STATE_LSB;
 }
 
-int64_t hw_enumeration_fix_wait_se0_callback(alarm_id_t id, void *user_data) {
+int64_t hw_enumeration_fix_wait_se0_callback(__unused alarm_id_t id, __unused void *user_data) {
     if (hw_line_state() == LS_SE0) {
         // Come back in 1ms and check again
         return 1000;
@@ -71,7 +71,7 @@ static void hw_enumeration_fix_wait_se0(void) {
     hw_enumeration_fix_busy_wait_se0();
 }
 
-int64_t hw_enumeration_fix_force_ls_j_done(alarm_id_t id, void *user_data) {
+int64_t hw_enumeration_fix_force_ls_j_done(__unused alarm_id_t id, __unused void *user_data) {
     hw_enumeration_fix_finish();
     return 0;
 }

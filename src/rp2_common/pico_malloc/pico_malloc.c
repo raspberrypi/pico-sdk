@@ -19,7 +19,7 @@ extern void __real_free(void *mem);
 
 extern char __StackLimit; /* Set by linker.  */
 
-static inline void check_alloc(void *mem, uint8_t size) {
+static inline void check_alloc(__unused void *mem, __unused uint8_t size) {
 #if PICO_MALLOC_PANIC
     if (!mem || (((char *)mem) + size) > &__StackLimit) {
         panic("Out of memory");

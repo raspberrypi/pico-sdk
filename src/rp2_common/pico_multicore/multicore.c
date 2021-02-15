@@ -83,6 +83,8 @@ int core1_wrapper(int (*entry)(void), void *stack_base) {
 #if PICO_USE_STACK_GUARDS
     // install core1 stack guard
     runtime_install_stack_guard(stack_base);
+#else
+    __unused void *ignore = stack_base;
 #endif
     irq_init_priorities();
     return (*entry)();
@@ -126,7 +128,7 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
 }
 
 void multicore_launch_core1(void (*entry)(void)) {
-    extern char __StackOneBottom;
+    extern uint32_t __StackOneBottom;
     uint32_t *stack_limit = (uint32_t *) &__StackOneBottom;
     // hack to reference core1_stack although that pointer is wrong.... core1_stack should always be <= stack_limit, if not boom!
     uint32_t *stack = core1_stack <= stack_limit ? stack_limit : (uint32_t *) -1;
