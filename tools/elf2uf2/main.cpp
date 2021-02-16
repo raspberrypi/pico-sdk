@@ -46,7 +46,8 @@ static int fail_write_error() {
 
 struct address_range {
     enum type {
-        CONTENTS,     // may have contents
+        CONTENTS_ENTRY,    // may have contents *and* allows an entry address
+        CONTENTS_NO_ENTRY, // may have contents but does NOT allow an entry address
         NO_CONTENTS,  // must be uninitialized
         IGNORE        // will be ignored
     };
@@ -67,13 +68,13 @@ typedef std::vector<address_range> address_ranges;
 #define XIP_SRAM_END   0x15004000u
 
 const address_ranges rp2040_address_ranges_flash {
-    address_range(FLASH_START, FLASH_END, address_range::type::CONTENTS),
+    address_range(FLASH_START, FLASH_END, address_range::type::CONTENTS_NO_ENTRY),
     address_range(MAIN_RAM_START, MAIN_RAM_END, address_range::type::NO_CONTENTS)
 };
 
 const address_ranges rp2040_address_ranges_ram {
-    address_range(MAIN_RAM_START, MAIN_RAM_END, address_range::type::CONTENTS),
-    address_range(XIP_SRAM_START, XIP_SRAM_END, address_range::type::CONTENTS),
+    address_range(MAIN_RAM_START, MAIN_RAM_END, address_range::type::CONTENTS_ENTRY),
+    address_range(XIP_SRAM_START, XIP_SRAM_END, address_range::type::CONTENTS_NO_ENTRY),
     address_range(0x00000000u, 0x00004000u, address_range::type::IGNORE) // for now we ignore the bootrom if present
 };
 
@@ -153,7 +154,7 @@ int read_and_check_elf32_ph_entries(FILE *in, const elf32_header &eh, const addr
                     rc = check_address_range(valid_ranges, entry.paddr, entry.vaddr, mapped_size, false, ar);
                     if (rc) return rc;
                     // we don't download uninitialized, generally it is BSS and should be zero-ed by crt0.S, or it may be COPY areas which are undefined
-                    if (ar.type != address_range::type::CONTENTS) {
+                    if ( (ar.type != address_range::type::CONTENTS_ENTRY) && (ar.type != address_range::type::CONTENTS_NO_ENTRY) ) {
                         if (verbose) printf("  ignored\n");
                         continue;
                     }
@@ -218,7 +219,16 @@ static bool is_address_valid(const address_ranges& valid_ranges, uint32_t addr) 
 static bool is_address_initialized(const address_ranges& valid_ranges, uint32_t addr) {
     for(const auto& range : valid_ranges) {
         if (range.from <= addr && range.to > addr) {
-            return address_range::type::CONTENTS == range.type;
+            return (address_range::type::CONTENTS_ENTRY == range.type) || (address_range::type::CONTENTS_NO_ENTRY == range.type);
+        }
+    }
+    return false;
+}
+
+static bool is_address_entry_capable(const address_ranges& valid_ranges, uint32_t addr) {
+    for(const auto& range : valid_ranges) {
+        if (range.from <= addr && range.to > addr) {
+            return (address_range::type::CONTENTS_ENTRY == range.type);
         }
     }
     return false;
@@ -255,7 +265,13 @@ int elf2uf2(FILE *in, FILE *out) {
     }
     uint page_num = 0;
     if (ram_style) {
-        uint32_t expected_ep = pages.begin()->first | 0x1;
+        // the Boot ROM cherry-picks the lowest MAIN_RAM address as the entry point; determine what that will be
+        uint32_t expected_ep = 0xFFFFFFFF;
+        for(auto& page_entry : pages) {
+            if (is_address_entry_capable(valid_ranges, page_entry.first) && (page_entry.first < expected_ep)) {
+                expected_ep = page_entry.first | 0x1;
+            }
+        }
         if (eh.entry != expected_ep) {
             return fail(ERROR_INCOMPATIBLE, "A RAM binary should have an entry point at the beginning: %08x (not %08x)\n", expected_ep, eh.entry);
         }
