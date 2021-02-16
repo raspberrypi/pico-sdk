@@ -62,11 +62,11 @@
 #endif
 
 #ifndef TINY2040_NUM_IO_PINS
-#define TINY2040_NUM_IO_PINS	8
+#define TINY2040_NUM_IO_PINS 8
 #endif
 
 #ifndef TINY2040_NUM_ADC_PINS
-#define TINY2040_NUM_ADC_PINS	4
+#define TINY2040_NUM_ADC_PINS 4
 #endif
 
 #ifndef PICO_FLASH_SPI_CLKDIV
