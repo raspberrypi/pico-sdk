@@ -13,7 +13,6 @@
 #include "pico/assert.h"
 
 extern void __unhandled_user_irq(void);
-extern uint __get_current_exception(void);
 
 static inline irq_handler_t *get_vtable(void) {
     return (irq_handler_t *) scb_hw->vtor;
