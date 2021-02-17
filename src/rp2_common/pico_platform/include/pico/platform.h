@@ -163,6 +163,12 @@ return a;
 
 #define __check_type_compatible(type_a, type_b) static_assert(__builtin_types_compatible_p(type_a, type_b), __STRING(type_a) " is not compatible with " __STRING(type_b));
 
+/**
+ * Get the current exception level on this core
+ * \return the exception number if the CPU is handling an exception, or 0 otherwise
+ */
+extern uint __get_current_exception(void);
+
 #ifdef __cplusplus
 }
 #endif
