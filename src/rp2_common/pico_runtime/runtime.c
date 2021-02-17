@@ -124,9 +124,7 @@ void runtime_init(void) {
 #endif
 
 #ifndef NDEBUG
-    uint32_t xpsr;
-    __asm volatile ("mrs %0, XPSR" : "=r" (xpsr)::);
-    if (xpsr & 0xffu) {
+    if (__get_current_exception()) {
         // crap; started in exception handler
         __asm ("bkpt #0");
     }
