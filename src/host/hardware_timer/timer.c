@@ -51,7 +51,6 @@ uint32_t PICO_WEAK_FUNCTION_IMPL_NAME(timer_us_32)() {
 PICO_WEAK_FUNCTION_DEF(time_reached)
 bool PICO_WEAK_FUNCTION_IMPL_NAME(time_reached)(absolute_time_t t) {
     uint64_t target = to_us_since_boot(t);
-    if (target > 0xffffffffu) return false;
     return time_us_64() >= target;
 }
 

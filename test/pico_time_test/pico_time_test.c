@@ -206,6 +206,15 @@ int main() {
 
     PICOTEST_END_SECTION();
 
+    PICOTEST_START_SECTION("end of time");
+    PICOTEST_CHECK(absolute_time_diff_us(at_the_end_of_time, get_absolute_time()) < 0, "now should be before the end of time")
+    PICOTEST_CHECK(absolute_time_diff_us(get_absolute_time(), at_the_end_of_time) > 0, "the end of time should be after now")
+    PICOTEST_CHECK(absolute_time_diff_us(at_the_end_of_time, at_the_end_of_time) == 0, "the end of time should equal itself")
+    absolute_time_t near_the_end_of_time;
+    update_us_since_boot(&near_the_end_of_time, 0x7ffffeffffffffff);
+    PICOTEST_CHECK(absolute_time_diff_us(near_the_end_of_time, at_the_end_of_time) > 0, "near the end of time should be before the end of time")
+    PICOTEST_END_SECTION();
+
     PICOTEST_END_TEST();
 }
 
