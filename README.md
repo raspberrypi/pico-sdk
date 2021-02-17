@@ -42,7 +42,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
    ```
 1. Set up your project to point to use the Raspberry Pi Pico SDK
 
-   * By cloning the SDK locally (most common)
+   * Either by cloning the SDK locally (most common) :
       1. `git clone` this Raspberry Pi Pico SDK repository
       1. Copy [pico_sdk_import.cmake](https://github.com/raspberrypi/pico-sdk/blob/master/external/pico_sdk_import.cmake)
          from the SDK into your project directory
@@ -65,7 +65,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
           ```
 
-   * With the Raspberry Pi Pico SDK as a submodule
+   * Or with the Raspberry Pi Pico SDK as a submodule :
       1. Clone the SDK as a submodule called `pico-sdk`
       1. Setup a `CMakeLists.txt` like:
 
@@ -85,7 +85,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
           ```
 
-   * With automatic download from github
+   * Or with automatic download from github :
       1. Copy [pico_sdk_import.cmake](https://github.com/raspberrypi/pico-sdk/blob/master/external/pico_sdk_import.cmake)
          from the SDK into your project directory
       1. Setup a `CMakeLists.txt` like:
@@ -110,16 +110,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
           ```
 
-3. Setup a CMake build directory.
-      For example, if not using an IDE:
-      ```
-      $ mkdir build
-      $ cd build
-      $ cmake ..
-      ```
-
-4. Write your code (see [pico-examples](https://github.com/raspberrypi/pico-examples) or the [Raspberry Pi Pico C/C++ SDK](https://rptl.io/pico-c-sdk) documentation
-for more information)
+1. Write your code (see [pico-examples](https://github.com/raspberrypi/pico-examples) or the [Raspberry Pi Pico C/C++ SDK](https://rptl.io/pico-c-sdk) documentation for more information)
 
    About the simplest you can do is a single source file (e.g. hello_world.c)
 
@@ -151,10 +142,17 @@ for more information)
    if you want to use the default USB see the [hello-usb](https://github.com/raspberrypi/pico-examples/tree/master/hello_world/usb) example.
 
 
-5. Make your target from the build directory you created.
+1. Setup a CMake build directory.
+      For example, if not using an IDE:
+      ```
+      $ mkdir build
+      $ cd build
+      $ cmake ..
+      ```
+
+1. Make your target from the build directory you created.
       ```sh
       $ make hello_world
       ```
 
-6. You now have `hello_world.elf` to load via a debugger, or `hello_world.uf2` that can be installed and
-run on your Raspberry Pi Pico via drag and drop.
+1. You now have `hello_world.elf` to load via a debugger, or `hello_world.uf2` that can be installed and run on your Raspberry Pi Pico via drag and drop.
