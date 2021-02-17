@@ -37,7 +37,8 @@ static inline uint64_t to_us_since_boot(absolute_time_t t) {
 /*! fn update_us_since_boot
  * \brief update an absolute_time_t value to represent a given number of microseconds since boot
  * \param t the absolute time value to update
- * \param us_since_boot the number of microseconds since boot to represent
+ * \param us_since_boot the number of microseconds since boot to represent. Note this should be representable
+ *                      as a signed 64 bit integer
  */
 static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
     *t = us_since_boot;
@@ -49,11 +50,23 @@ typedef struct {
     uint64_t _private_us_since_boot;
 } absolute_time_t;
 
+/*! fn to_us_since_boot
+ * \brief convert an absolute_time_t into a number of microseconds since boot.
+ * \param t the number of microseconds since boot
+ * \return an absolute_time_t value equivalent to t
+ */
 static inline uint64_t to_us_since_boot(absolute_time_t t) {
     return t._private_us_since_boot;
 }
 
+/*! fn update_us_since_boot
+ * \brief update an absolute_time_t value to represent a given number of microseconds since boot
+ * \param t the absolute time value to update
+ * \param us_since_boot the number of microseconds since boot to represent. Note this should be representable
+ *                      as a signed 64 bit integer
+ */
 static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
+    assert(us_since_boot <= INT64_MAX);
     t->_private_us_since_boot = us_since_boot;
 }
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = {value}

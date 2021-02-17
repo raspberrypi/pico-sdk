@@ -11,10 +11,9 @@
 #include "pico/time.h"
 #include "pico/util/pheap.h"
 #include "hardware/sync.h"
-#include "hardware/gpio.h"
 
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(nil_time, 0);
-const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(at_the_end_of_time, ULONG_MAX);
+const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(at_the_end_of_time, INT64_MAX);
 
 typedef struct alarm_pool_entry {
     absolute_time_t target;
