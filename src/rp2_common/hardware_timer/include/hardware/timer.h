@@ -157,6 +157,7 @@ void hardware_alarm_set_callback(uint alarm_num, hardware_alarm_callback_t callb
 
 /**
  * \brief Set the current target for the specified hardware alarm
+ * \ingroup hardware_timer
  *
  * This will replace any existing target
  *
@@ -168,6 +169,7 @@ bool hardware_alarm_set_target(uint alarm_num, absolute_time_t t);
 
 /**
  * \brief Cancel an existing target (if any) for a given hardware_alarm
+ * \ingroup hardware_timer
  *
  * @param alarm_num
  */
