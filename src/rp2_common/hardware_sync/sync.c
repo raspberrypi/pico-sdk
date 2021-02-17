@@ -22,7 +22,7 @@ void spin_locks_reset(void) {
 }
 
 spin_lock_t *spin_lock_init(uint lock_num) {
-    assert(lock_num >= 0 && lock_num < NUM_SPIN_LOCKS);
+    assert(lock_num < NUM_SPIN_LOCKS);
     spin_lock_t *lock = spin_lock_instance(lock_num);
     spin_unlock_unsafe(lock);
     return lock;
