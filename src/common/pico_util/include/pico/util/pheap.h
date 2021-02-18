@@ -56,7 +56,7 @@ typedef struct pheap_node {
 /**
  * A user comparator function for nodes in a pairing heap.
  *
- * \return return true if a < b in natural order. Note this relative ordering must be stable from call to call.
+ * \return true if a < b in natural order. Note this relative ordering must be stable from call to call.
  */
 typedef bool (*pheap_comparator)(void *user_data, pheap_node_id_t a, pheap_node_id_t b);
 
@@ -74,7 +74,7 @@ typedef struct pheap {
 /**
  * Create a pairing heap, which effectively maintains an efficient sorted ordering
  * of nodes. The heap itself stores no user per-node state, it is expected
- * that th the user maintains a companion array. A comparator function must
+ * that the user maintains a companion array. A comparator function must
  * be provided so that the heap implementation can determine the relative ordering of nodes
  *
  * \param max_nodes the maximum number of nodes that may be in the heap (this is bounded by
@@ -139,7 +139,7 @@ static pheap_node_id_t ph_merge_nodes(pheap_t *heap, pheap_node_id_t a, pheap_no
  * Allocate a new node from the unused space in the heap
  *
  * \param heap the heap
- * \return and identifier for the node, or 0 if the heap is full
+ * \return an identifier for the node, or 0 if the heap is full
  */
 static inline pheap_node_id_t ph_new_node(pheap_t *heap) {
     if (!heap->free_head_id) return 0;
@@ -175,7 +175,7 @@ static inline pheap_node_id_t ph_insert_node(pheap_t *heap, pheap_node_id_t id) 
  * which compares first, but without removing it from the heap.
  *
  * \param heap the heap
- * \return the
+ * \return the current head node id
  */
 static inline pheap_node_id_t ph_peek_head(pheap_t *heap) {
     return heap->root_id;
@@ -186,7 +186,7 @@ static inline pheap_node_id_t ph_peek_head(pheap_t *heap) {
  * the node which compares first in the logical ordering provided
  * by the comparator.
  *
- * Note that in the case of reserve = false, the returned id is no longer
+ * Note that in the case of free == true, the returned id is no longer
  * allocated and may be re-used by future node allocations, so the caller
  * should retrieve any per node state from the companion array before modifying
  * the heap further.
@@ -219,6 +219,7 @@ static inline pheap_node_id_t ph_remove_and_free_head(pheap_t *heap) {
  * costly operation than removing the head via ph_remove_and_free_head()
  *
  * @param heap the heap
+ * @param id the id of the node to free
  * @return true if the the node was in the heap, false otherwise
  */
 bool ph_remove_and_free_node(pheap_t *heap, pheap_node_id_t id);

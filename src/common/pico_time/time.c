@@ -33,7 +33,7 @@ typedef struct alarm_pool {
 } alarm_pool_t;
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
-// To avoid bringing in calloc, we statically allocate the arrays and he heap
+// To avoid bringing in calloc, we statically allocate the arrays and the heap
 PHEAP_DEFINE_STATIC(default_alarm_pool_heap, PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS);
 static alarm_pool_entry_t default_alarm_pool_entries[PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS];
 static uint8_t default_alarm_pool_entry_ids_high[PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS];
