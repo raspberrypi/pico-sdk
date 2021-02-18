@@ -126,11 +126,13 @@ void *decode_host_safe_hw_ptr(uint32_t ptr);
 
 typedef unsigned int uint;
 
-inline static int32_t __mul_instruction(int32_t a,int32_t b)
+static inline int32_t __mul_instruction(int32_t a,int32_t b)
 {
     return a*b;
 }
 
+static inline void __compiler_memory_barrier() {
+}
 #ifdef __cplusplus
 }
 #endif
