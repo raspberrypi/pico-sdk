@@ -27,8 +27,8 @@ typedef uint64_t absolute_time_t;
 
 /*! fn to_us_since_boot
  * \brief convert an absolute_time_t into a number of microseconds since boot.
- * \param t the number of microseconds since boot
- * \return an absolute_time_t value equivalent to t
+ * \param t the absolute time to convert
+ * \return a number of microseconds since boot, equivalent to t
  */
 static inline uint64_t to_us_since_boot(absolute_time_t t) {
     return t;
@@ -52,8 +52,8 @@ typedef struct {
 
 /*! fn to_us_since_boot
  * \brief convert an absolute_time_t into a number of microseconds since boot.
- * \param t the number of microseconds since boot
- * \return an absolute_time_t value equivalent to t
+ * \param t the absolute time to convert
+ * \return a number of microseconds since boot, equivalent to t
  */
 static inline uint64_t to_us_since_boot(absolute_time_t t) {
     return t._private_us_since_boot;
