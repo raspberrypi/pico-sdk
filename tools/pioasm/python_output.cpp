@@ -203,7 +203,7 @@ struct python_output : public output_format {
                         break;
                 }
                 if (!invalid) {
-                    guts = ((arg1 & 4u) ? "1 " : "0 ") + guts;
+                    guts = ((arg1 & 4u) ? "1, " : "0, ") + guts;
                     op("wait");
                     op_guts(guts);
                 }
