@@ -9,6 +9,10 @@
 
 #include "pico/stdio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \brief Experimental support for stdout using RAM semihosting
  *  \defgroup pico_stdio_semihosting pico_stdio_semihosting
  *  \ingroup pico_stdio
@@ -30,5 +34,9 @@ extern stdio_driver_t stdio_semihosting;
  * \note this method is automatically called by \ref stdio_init_all() if `pico_stdio_semihosting` is included in the build
  */
 void stdio_semihosting_init();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

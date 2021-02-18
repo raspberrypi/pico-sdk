@@ -10,6 +10,10 @@
 #include "pico.h"
 #include "hardware/structs/rtc.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \file hardware/rtc.h
  *  \defgroup hardware_rtc hardware_rtc
  *
@@ -70,5 +74,9 @@ void rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback);
  *  \ingroup hardware_rtc
  */
 void rtc_disable_alarm(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

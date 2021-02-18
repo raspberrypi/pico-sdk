@@ -9,6 +9,10 @@
 
 #include "pico/stdio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \brief Support for stdin/stdout over USB serial (CDC)
  *  \defgroup pico_stdio_usb pico_stdio_usb
  *  \ingroup pico_stdio
@@ -48,5 +52,9 @@ extern stdio_driver_t stdio_usb;
  *  \ingroup pico_stdio_uart
  */
 bool stdio_usb_init();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

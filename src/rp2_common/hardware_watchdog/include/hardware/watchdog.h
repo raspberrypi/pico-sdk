@@ -9,6 +9,10 @@
 
 #include "pico.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \file hardware/watchdog.h
  *  \defgroup hardware_watchdog hardware_watchdog
  *
@@ -83,5 +87,9 @@ bool watchdog_caused_reboot(void);
  * @return The number of microseconds before the watchdog will reboot the chip.
  */
 uint32_t watchdog_get_count(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

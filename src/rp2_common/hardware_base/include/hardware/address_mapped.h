@@ -10,6 +10,10 @@
 #include "pico.h"
 #include "hardware/regs/addressmap.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \file address_mapped.h
  *  \defgroup hardware_base hardware_base
  *
@@ -119,5 +123,9 @@ inline static void hw_xor_bits(io_rw_32 *addr, uint32_t mask) {
 inline static void hw_write_masked(io_rw_32 *addr, uint32_t values, uint32_t write_mask) {
     hw_xor_bits(addr, (*addr ^ values) & write_mask);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -9,6 +9,10 @@
 
 #include "pico.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \file bootrom.h
  * \defgroup pico_bootrom pico_bootrom
  * Access to functions and data in the RP2040 bootrom
@@ -81,5 +85,9 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
     reset_usb_boot_fn func = (reset_usb_boot_fn) rom_func_lookup(rom_table_code('U', 'B'));
     func(usb_activity_gpio_pin_mask, disable_interface_mask);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

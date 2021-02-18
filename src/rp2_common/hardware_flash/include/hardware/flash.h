@@ -9,6 +9,10 @@
 
 #include "pico.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_FLASH, Enable/disable assertions in the flash module, type=bool, default=0, group=hardware_flash
 #ifndef PARAM_ASSERTIONS_ENABLED_FLASH
 #define PARAM_ASSERTIONS_ENABLED_FLASH 0
@@ -74,5 +78,9 @@ void flash_range_program(uint32_t flash_offs, const uint8_t *data, size_t count)
  *  \param id_out Pointer to an 8-byte buffer to which the ID will be written
  */
 void flash_get_unique_id(uint8_t *id_out);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

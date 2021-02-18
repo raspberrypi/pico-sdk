@@ -10,6 +10,10 @@
 #include "pico/stdio.h"
 #include "hardware/uart.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \brief Support for stdin/stdout using UART
  *  \defgroup pico_stdio_uart pico_stdio_uart
  *  \ingroup pico_stdio
@@ -58,5 +62,9 @@ void stdin_uart_init();
  * \param rx_pin the UART pin to use for stdin (or -1 for no stdin)
  */
 void stdio_uart_init_full(uart_inst_t *uart, uint baud_rate, int tx_pin, int rx_pin);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

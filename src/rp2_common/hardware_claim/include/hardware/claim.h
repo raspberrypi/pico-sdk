@@ -10,6 +10,11 @@
 #include "pico.h"
 #include "hardware/sync.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /** \file claim.h
  *  \defgroup hardware_claim hardware_claim
  *
@@ -97,5 +102,9 @@ uint32_t hw_claim_lock();
  * \param token the token returned by the corresponding call to hw_claim_lock()
  */
 void hw_claim_unlock(uint32_t token);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

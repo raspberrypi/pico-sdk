@@ -10,6 +10,11 @@
 #include "pico.h"
 #include "hardware/structs/sio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /** \file hardware/divider.h
  *  \defgroup hardware_divider hardware_divider
  *
@@ -391,5 +396,9 @@ void hw_divider_save_state(hw_divider_state_t *dest);
  */
 
 void hw_divider_restore_state(hw_divider_state_t *src);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _HARDWARE_DIVIDER_H

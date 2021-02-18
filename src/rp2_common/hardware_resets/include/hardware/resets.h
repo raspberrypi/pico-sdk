@@ -10,6 +10,10 @@
 #include "pico.h"
 #include "hardware/structs/resets.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \file hardware/resets.h
  *  \defgroup hardware_resets hardware_resets
  *
@@ -87,5 +91,9 @@ static inline void unreset_block_wait(uint32_t bits) {
         tight_loop_contents();
 }
 /// \end::reset_funcs[]
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
