@@ -34,6 +34,6 @@ uint8_t rp2040_chip_version() {
     assert(manufacturer == MANUFACTURER_RPI);
     assert(part == PART_RP2);
     // Version 1 == B0/B1
-    int version = (chip_id & SYSINFO_CHIP_ID_REVISION_BITS) >> SYSINFO_CHIP_ID_REVISION_LSB;
-    return version;
+    uint version = (chip_id & SYSINFO_CHIP_ID_REVISION_BITS) >> SYSINFO_CHIP_ID_REVISION_LSB;
+    return (uint8_t)version;
 }

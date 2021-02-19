@@ -11,7 +11,7 @@
 pheap_t *ph_create(uint max_nodes, pheap_comparator comparator, void *user_data) {
     invalid_params_if(PHEAP, !max_nodes || max_nodes >= (1u << sizeof(pheap_node_id_t)));
     pheap_t *heap = calloc(1, sizeof(pheap_t));
-    heap->max_nodes = max_nodes;
+    heap->max_nodes = (pheap_node_id_t) max_nodes;
     heap->comparator = comparator;
     heap->nodes = calloc(max_nodes, sizeof(pheap_node_t));
     heap->user_data = user_data;
@@ -23,8 +23,8 @@ void ph_clear(pheap_t *heap) {
     heap->root_id = 0;
     heap->free_head_id = 1;
     heap->free_tail_id = heap->max_nodes;
-    for(uint i = 1; i < heap->max_nodes; i++) {
-        ph_get_node(heap, i)->sibling = i + 1;
+    for(pheap_node_id_t i = 1; i < heap->max_nodes; i++) {
+        ph_get_node(heap, i)->sibling = (pheap_node_id_t)(i + 1);
     }
     ph_get_node(heap, heap->max_nodes)->sibling = 0;
 }

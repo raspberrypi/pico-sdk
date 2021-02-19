@@ -153,7 +153,7 @@ static inline void multicore_fifo_clear_irq(void) {
  * 1 | Value is 1 if this core’s TX FIFO is not full (i.e. if FIFO_WR is ready for more data)
  * 0 | Value is 1 if this core’s RX FIFO is not empty (i.e. if FIFO_RD is valid)
 */
-static inline int32_t multicore_fifo_get_status(void) {
+static inline uint32_t multicore_fifo_get_status(void) {
     return sio_hw->fifo_st;
 }
 

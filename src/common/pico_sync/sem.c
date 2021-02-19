@@ -63,7 +63,7 @@ bool __time_critical_func(sem_release)(semaphore_t *sem) {
     uint32_t save = spin_lock_blocking(sem->core.spin_lock);
     int32_t count = sem->permits;
     if (count < sem->max_permits) {
-        sem->permits = count + 1;
+        sem->permits = (int16_t)(count + 1);
         __sev();
         rc = true;
     } else {
