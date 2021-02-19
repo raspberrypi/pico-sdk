@@ -111,7 +111,18 @@ inline static void __wfi(void) {
  * instruction will be observed before any explicit access after the instruction.
  */
 inline static void __dmb(void) {
-    __asm volatile ("dmb");
+    __asm volatile ("dmb" : : : "memory");
+}
+
+/*! \brief Insert a DSB instruction in to the code path.
+ *  \ingroup hardware_sync
+ *
+ * The DSB (data synchronization barrier) acts as a special kind of data
+ * memory barrier (DMB). The DSB operation completes when all explicit memory
+ * accesses before this instruction complete.
+ */
+inline static void __dsb(void) {
+    __asm volatile ("dsb" : : : "memory");
 }
 
 /*! \brief Insert a ISB instruction in to the code path.
