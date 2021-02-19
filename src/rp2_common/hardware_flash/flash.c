@@ -149,7 +149,7 @@ static void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, ui
             --tx_remaining;
         }
         if (can_get && rx_remaining) {
-            *rxbuf++ = ssi_hw->dr0;
+            *rxbuf++ = (uint8_t)ssi_hw->dr0;
             --rx_remaining;
         }
     }

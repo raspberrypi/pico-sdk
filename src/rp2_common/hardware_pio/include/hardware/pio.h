@@ -185,8 +185,8 @@ static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool 
                  (bit_count << PIO_SM0_PINCTRL_SIDESET_COUNT_LSB);
 
     c->execctrl = (c->execctrl & ~(PIO_SM0_EXECCTRL_SIDE_EN_BITS | PIO_SM0_EXECCTRL_SIDE_PINDIR_BITS)) |
-                  (!!optional << PIO_SM0_EXECCTRL_SIDE_EN_LSB) |
-                  (!!pindirs << PIO_SM0_EXECCTRL_SIDE_PINDIR_LSB);
+                  (bool_to_bit(optional) << PIO_SM0_EXECCTRL_SIDE_EN_LSB) |
+                  (bool_to_bit(pindirs) << PIO_SM0_EXECCTRL_SIDE_PINDIR_LSB);
 }
 
 /*! \brief Set the state machine clock divider (from a floating point value) in a state machine configuration
@@ -205,8 +205,8 @@ static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool 
  *  although it will depend on the use case.
  */
 static inline void sm_config_set_clkdiv(pio_sm_config *c, float div) {
-    uint16_t div_int = (uint16_t) div;
-    uint8_t div_frac = (uint8_t) ((div - div_int) * (1u << 8u));
+    uint div_int = (uint)div;
+    uint div_frac = (uint)((div - (float)div_int) * (1u << 8u));
     c->clkdiv =
             (div_frac << PIO_SM0_CLKDIV_FRAC_LSB) |
             (div_int << PIO_SM0_CLKDIV_INT_LSB);
@@ -227,8 +227,8 @@ static inline void sm_config_set_clkdiv(pio_sm_config *c, float div) {
  */
 static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_int, uint8_t div_frac) {
     c->clkdiv =
-            (div_frac << PIO_SM0_CLKDIV_FRAC_LSB) |
-            (div_int << PIO_SM0_CLKDIV_INT_LSB);
+            (((uint)div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
+            (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
 }
 
 /*! \brief Set the wrap addresses in a state machine configuration
@@ -273,8 +273,8 @@ static inline void sm_config_set_in_shift(pio_sm_config *c, bool shift_right, bo
                     ~(PIO_SM0_SHIFTCTRL_IN_SHIFTDIR_BITS |
                       PIO_SM0_SHIFTCTRL_AUTOPUSH_BITS |
                       PIO_SM0_SHIFTCTRL_PUSH_THRESH_BITS)) |
-                   (!!shift_right << PIO_SM0_SHIFTCTRL_IN_SHIFTDIR_LSB) |
-                   (!!autopush << PIO_SM0_SHIFTCTRL_AUTOPUSH_LSB) |
+                   (bool_to_bit(shift_right) << PIO_SM0_SHIFTCTRL_IN_SHIFTDIR_LSB) |
+                   (bool_to_bit(autopush) << PIO_SM0_SHIFTCTRL_AUTOPUSH_LSB) |
                    ((push_threshold & 0x1fu) << PIO_SM0_SHIFTCTRL_PUSH_THRESH_LSB);
 }
 
@@ -292,8 +292,8 @@ static inline void sm_config_set_out_shift(pio_sm_config *c, bool shift_right, b
                     ~(PIO_SM0_SHIFTCTRL_OUT_SHIFTDIR_BITS |
                       PIO_SM0_SHIFTCTRL_AUTOPULL_BITS |
                       PIO_SM0_SHIFTCTRL_PULL_THRESH_BITS)) |
-                   (!!shift_right << PIO_SM0_SHIFTCTRL_OUT_SHIFTDIR_LSB) |
-                   (!!autopull << PIO_SM0_SHIFTCTRL_AUTOPULL_LSB) |
+                   (bool_to_bit(shift_right) << PIO_SM0_SHIFTCTRL_OUT_SHIFTDIR_LSB) |
+                   (bool_to_bit(autopull) << PIO_SM0_SHIFTCTRL_AUTOPULL_LSB) |
                    ((pull_threshold & 0x1fu) << PIO_SM0_SHIFTCTRL_PULL_THRESH_LSB);
 }
 
@@ -305,8 +305,8 @@ static inline void sm_config_set_out_shift(pio_sm_config *c, bool shift_right, b
  */
 static inline void sm_config_set_fifo_join(pio_sm_config *c, enum pio_fifo_join join) {
     assert(join >= 0 && join <= 2);
-    c->shiftctrl = (c->shiftctrl & ~(PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS)) |
-                   (join << PIO_SM0_SHIFTCTRL_FJOIN_TX_LSB);
+    c->shiftctrl = (c->shiftctrl & (uint)~(PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS)) |
+                   (((uint)join) << PIO_SM0_SHIFTCTRL_FJOIN_TX_LSB);
 }
 
 /*! \brief Set special 'out' operations in a state machine configuration
@@ -317,12 +317,12 @@ static inline void sm_config_set_fifo_join(pio_sm_config *c, enum pio_fifo_join 
  * \param has_enable_pin true to enable auxiliary OUT enable pin 
  * \param enable_pin_index pin index for auxiliary OUT enable
  */
-static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool has_enable_pin, int enable_pin_index) {
+static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool has_enable_pin, uint enable_pin_index) {
     c->execctrl = (c->execctrl &
-                   ~(PIO_SM0_EXECCTRL_OUT_STICKY_BITS | PIO_SM0_EXECCTRL_INLINE_OUT_EN_BITS |
+                   (uint)~(PIO_SM0_EXECCTRL_OUT_STICKY_BITS | PIO_SM0_EXECCTRL_INLINE_OUT_EN_BITS |
                      PIO_SM0_EXECCTRL_OUT_EN_SEL_BITS)) |
-                  (!!sticky << PIO_SM0_EXECCTRL_OUT_STICKY_LSB) |
-                  (!!has_enable_pin << PIO_SM0_EXECCTRL_INLINE_OUT_EN_LSB) |
+                  (bool_to_bit(sticky) << PIO_SM0_EXECCTRL_OUT_STICKY_LSB) |
+                  (bool_to_bit(has_enable_pin) << PIO_SM0_EXECCTRL_INLINE_OUT_EN_LSB) |
                   ((enable_pin_index << PIO_SM0_EXECCTRL_OUT_EN_SEL_LSB) & PIO_SM0_EXECCTRL_OUT_EN_SEL_BITS);
 }
 
@@ -336,7 +336,7 @@ static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool
 static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_status_type status_sel, uint status_n) {
     c->execctrl = (c->execctrl
                    & ~(PIO_SM0_EXECCTRL_STATUS_SEL_BITS | PIO_SM0_EXECCTRL_STATUS_N_BITS))
-                  | ((status_sel << PIO_SM0_EXECCTRL_STATUS_SEL_LSB) & PIO_SM0_EXECCTRL_STATUS_SEL_BITS)
+                  | ((((uint)status_sel) << PIO_SM0_EXECCTRL_STATUS_SEL_LSB) & PIO_SM0_EXECCTRL_STATUS_SEL_BITS)
                   | ((status_n << PIO_SM0_EXECCTRL_STATUS_N_LSB) & PIO_SM0_EXECCTRL_STATUS_N_BITS);
 }
 
@@ -515,7 +515,7 @@ void pio_sm_init(PIO pio, uint sm, uint initial_pc, const pio_sm_config *config)
  * \param enabled true to enable the state machine; false to disable
  */
 static inline void pio_sm_set_enabled(PIO pio, uint sm, bool enabled) {
-    pio->ctrl = (pio->ctrl & ~(1u << sm)) | (!!enabled << sm);
+    pio->ctrl = (pio->ctrl & ~(1u << sm)) | (bool_to_bit(enabled) << sm);
 }
 
 /*! \brief Enable or disable multiple PIO state machines
@@ -853,7 +853,7 @@ static inline bool pio_sm_is_rx_fifo_empty(PIO pio, uint sm) {
  */
 static inline uint pio_sm_get_rx_fifo_level(PIO pio, uint sm) {
     check_sm_param(sm);
-    int bitoffs = PIO_FLEVEL_RX0_LSB + sm * (PIO_FLEVEL_RX1_LSB - PIO_FLEVEL_RX0_LSB);
+    uint bitoffs = PIO_FLEVEL_RX0_LSB + sm * (PIO_FLEVEL_RX1_LSB - PIO_FLEVEL_RX0_LSB);
     const uint32_t mask = PIO_FLEVEL_RX0_BITS >> PIO_FLEVEL_RX0_LSB;
     return (pio->flevel >> bitoffs) & mask;
 }
@@ -945,8 +945,8 @@ void pio_sm_drain_tx_fifo(PIO pio, uint sm);
  */
 static inline void pio_sm_set_clkdiv(PIO pio, uint sm, float div) {
     check_sm_param(sm);
-    uint16_t div_int = (uint16_t) div;
-    uint8_t div_frac = (uint8_t) ((div - div_int) * (1u << 8u));
+    uint div_int = (uint16_t) div;
+    uint div_frac = (uint8_t) ((div - (float)div_int) * (1u << 8u));
     pio->sm[sm].clkdiv =
             (div_frac << PIO_SM0_CLKDIV_FRAC_LSB) |
             (div_int << PIO_SM0_CLKDIV_INT_LSB);
@@ -963,8 +963,8 @@ static inline void pio_sm_set_clkdiv(PIO pio, uint sm, float div) {
 static inline void pio_sm_set_clkdiv_int_frac(PIO pio, uint sm, uint16_t div_int, uint8_t div_frac) {
     check_sm_param(sm);
     pio->sm[sm].clkdiv =
-            (div_frac << PIO_SM0_CLKDIV_FRAC_LSB) |
-            (div_int << PIO_SM0_CLKDIV_INT_LSB);
+            (((uint)div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
+            (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
 }
 
 /*! \brief Clear a state machine's TX and RX FIFOs

@@ -23,7 +23,7 @@ void __time_critical_func(mutex_enter_blocking)(mutex_t *mtx) {
     do {
         uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
         if (mtx->owner < 0) {
-            mtx->owner = get_core_num();
+            mtx->owner = (int8_t)get_core_num();
             block = false;
         }
         spin_unlock(mtx->core.spin_lock, save);
@@ -37,10 +37,10 @@ bool __time_critical_func(mutex_try_enter)(mutex_t *mtx, uint32_t *owner_out) {
     bool entered;
     uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
     if (mtx->owner < 0) {
-        mtx->owner = get_core_num();
+        mtx->owner = (int8_t)get_core_num();
         entered = true;
     } else {
-        if (owner_out) *owner_out = mtx->owner;
+        if (owner_out) *owner_out = (uint32_t) mtx->owner;
         entered = false;
     }
     spin_unlock(mtx->core.spin_lock, save);
@@ -57,7 +57,7 @@ bool __time_critical_func(mutex_enter_block_until)(mutex_t *mtx, absolute_time_t
     do {
         uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
         if (mtx->owner < 0) {
-            mtx->owner = get_core_num();
+            mtx->owner = (int8_t)get_core_num();
             block = false;
         }
         spin_unlock(mtx->core.spin_lock, save);

@@ -69,8 +69,8 @@ void stdin_uart_init() {
 void stdio_uart_init_full(struct uart_inst *uart, uint baud_rate, int tx_pin, int rx_pin) {
     uart_instance = uart;
     uart_init(uart_instance, baud_rate);
-    if (tx_pin != -1) gpio_set_function(tx_pin, GPIO_FUNC_UART);
-    if (rx_pin != -1) gpio_set_function(rx_pin, GPIO_FUNC_UART);
+    if (tx_pin >= 0) gpio_set_function((uint)tx_pin, GPIO_FUNC_UART);
+    if (rx_pin >= 0) gpio_set_function((uint)rx_pin, GPIO_FUNC_UART);
     stdio_set_driver_enabled(&stdio_uart, true);
 }
 

@@ -52,7 +52,7 @@ void runtime_install_stack_guard(void *stack_bottom) {
     // mask is 1 bit per 32 bytes of the 256 byte range... clear the bit for the segment we want
     uint32_t subregion_select = 0xffu ^ (1u << ((addr >> 5u) & 7u));
     mpu_hw->ctrl = 5; // enable mpu with background default map
-    mpu_hw->rbar = (addr & ~0xff) | 0x8 | 0;
+    mpu_hw->rbar = (addr & (uint)~0xff) | 0x8 | 0;
     mpu_hw->rasr = 1 // enable region
                    | (0x7 << 1) // size 2^(7 + 1) = 256
                    | (subregion_select << 8)
@@ -120,7 +120,7 @@ void runtime_init(void) {
 
 #if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH)
     __builtin_memcpy(ram_vector_table, (uint32_t *) scb_hw->vtor, sizeof(ram_vector_table));
-    scb_hw->vtor = (intptr_t) ram_vector_table;
+    scb_hw->vtor = (uintptr_t) ram_vector_table;
 #endif
 
 #ifndef NDEBUG

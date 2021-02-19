@@ -186,7 +186,7 @@ static inline void channel_config_set_chain_to(dma_channel_config *c, uint chain
  */
 static inline void channel_config_set_transfer_data_size(dma_channel_config *c, enum dma_channel_transfer_size size) {
     assert(size == DMA_SIZE_8 || size == DMA_SIZE_16 || size == DMA_SIZE_32);
-    c->ctrl = (c->ctrl & ~DMA_CH0_CTRL_TRIG_DATA_SIZE_BITS) | (size << DMA_CH0_CTRL_TRIG_DATA_SIZE_LSB);
+    c->ctrl = (c->ctrl & ~DMA_CH0_CTRL_TRIG_DATA_SIZE_BITS) | (((uint)size) << DMA_CH0_CTRL_TRIG_DATA_SIZE_LSB);
 }
 
 /*! \brief  Set address wrapping parameters

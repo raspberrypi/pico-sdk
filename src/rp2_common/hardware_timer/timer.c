@@ -75,7 +75,7 @@ void busy_wait_us(uint64_t delay_us) {
 
 void busy_wait_until(absolute_time_t t) {
     uint64_t target = to_us_since_boot(t);
-    uint32_t hi_target = target >> 32u;
+    uint32_t hi_target = (uint32_t)(target >> 32u);
     uint32_t hi = timer_hw->timerawh;
     while (hi < hi_target) {
         hi = timer_hw->timerawh;
@@ -113,7 +113,7 @@ static void hardware_alarm_irq_handler(void) {
         if (timer_hw->timerawh >= target_hi[alarm_num]) {
             // we have reached the right high word as well as low word value
             callback = alarm_callbacks[alarm_num];
-            timer_callbacks_pending &= ~(1u << alarm_num);
+            timer_callbacks_pending &= (uint8_t)~(1u << alarm_num);
         } else {
             // try again in 2^32 us
             timer_hw->alarm[alarm_num] = timer_hw->alarm[alarm_num]; // re-arm the timer
@@ -147,7 +147,7 @@ void hardware_alarm_set_callback(uint alarm_num, hardware_alarm_callback_t callb
         alarm_callbacks[alarm_num] = callback;
     } else {
         alarm_callbacks[alarm_num] = NULL;
-        timer_callbacks_pending &= ~(1u << alarm_num);
+        timer_callbacks_pending &= (uint8_t)~(1u << alarm_num);
         irq_remove_handler(irq_num, hardware_alarm_irq_handler);
         irq_set_enabled(irq_num, false);
     }
@@ -167,10 +167,10 @@ bool hardware_alarm_set_target(uint alarm_num, absolute_time_t target) {
         spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_TIMER);
         uint32_t save = spin_lock_blocking(lock);
         timer_hw->intr = 1u << alarm_num;
-        timer_callbacks_pending |= 1u << alarm_num;
+        timer_callbacks_pending |= (uint8_t)(1u << alarm_num);
         timer_hw->alarm[alarm_num] = (uint32_t) t;
         // Set the alarm. Writing time should arm it
-        target_hi[alarm_num] = t >> 32u;
+        target_hi[alarm_num] = (uint32_t)(t >> 32u);
 
         // 2) check for races
         if (!(timer_hw->armed & 1u << alarm_num)) {
@@ -186,7 +186,7 @@ bool hardware_alarm_set_target(uint alarm_num, absolute_time_t target) {
                 timer_hw->armed = 1u << alarm_num;
                 timer_hw->intr = 1u << alarm_num; // clear the IRQ too
                 // and set flag in case we're already in the IRQ handler waiting on the spinlock (on the other core)
-                timer_callbacks_pending &= ~(1u << alarm_num);
+                timer_callbacks_pending &= (uint8_t)~(1u << alarm_num);
             }
         }
         spin_unlock(lock, save);
@@ -200,7 +200,7 @@ void hardware_alarm_cancel(uint alarm_num) {
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_TIMER);
     uint32_t save = spin_lock_blocking(lock);
     timer_hw->armed = 1u << alarm_num;
-    timer_callbacks_pending &= ~(1u << alarm_num);
+    timer_callbacks_pending &= (uint8_t)~(1u << alarm_num);
     spin_unlock(lock, save);
 }
 

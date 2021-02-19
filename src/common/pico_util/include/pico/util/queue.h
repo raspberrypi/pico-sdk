@@ -71,7 +71,7 @@ static inline uint queue_get_level_unsafe(queue_t *q) {
     if (rc < 0) {
         rc += + q->element_count + 1;
     }
-    return rc;
+    return (uint)rc;
 }
 
 /*! \brief Check of level of the specified queue.

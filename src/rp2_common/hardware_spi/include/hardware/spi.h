@@ -143,9 +143,9 @@ static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cp
     invalid_params_if(SPI, cpol != SPI_CPOL_0 && cpol != SPI_CPOL_1);
     invalid_params_if(SPI, cpha != SPI_CPHA_0 && cpha != SPI_CPHA_1);
     hw_write_masked(&spi_get_hw(spi)->cr0,
-        (data_bits - 1) << SPI_SSPCR0_DSS_LSB |
-        cpol << SPI_SSPCR0_SPO_LSB |
-        cpha << SPI_SSPCR0_SPH_LSB,
+                    ((uint)(data_bits - 1)) << SPI_SSPCR0_DSS_LSB |
+                    ((uint)cpol) << SPI_SSPCR0_SPO_LSB |
+                    ((uint)cpha) << SPI_SSPCR0_SPH_LSB,
         SPI_SSPCR0_DSS_BITS |
         SPI_SSPCR0_SPO_BITS |
         SPI_SSPCR0_SPH_BITS);

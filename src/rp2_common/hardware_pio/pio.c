@@ -43,11 +43,11 @@ void pio_sm_unclaim(PIO pio, uint sm) {
 
 int pio_claim_unused_sm(PIO pio, bool required) {
     // PIO index is 0 or 1.
-    int which = (int)pio_get_index(pio);
-    int base = which * NUM_PIO_STATE_MACHINES;
+    uint which = pio_get_index(pio);
+    uint base = which * NUM_PIO_STATE_MACHINES;
     int index = hw_claim_unused_from_range((uint8_t*)&claimed, required, base,
                                       base + NUM_PIO_STATE_MACHINES - 1, "No PIO state machines are available");
-    return index >= base ? index - base : -1;
+    return index >= (int)base ? index - (int)base : -1;
 }
 
 static_assert(PIO_INSTRUCTION_COUNT <= 32, "");
@@ -113,9 +113,9 @@ uint pio_add_program(PIO pio, const pio_program_t *program) {
     if (offset < 0) {
         panic("No program space");
     }
-    _pio_add_program_at_offset(pio, program, offset);
+    _pio_add_program_at_offset(pio, program, (uint)offset);
     hw_claim_unlock(save);
-    return offset;
+    return (uint)offset;
 }
 
 void pio_add_program_at_offset(PIO pio, const pio_program_t *program, uint offset) {
@@ -166,7 +166,7 @@ void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
 void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pinvals, uint32_t pin_mask) {
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     while (pin_mask) {
-        uint base = __builtin_ctz(pin_mask);
+        uint base = (uint)__builtin_ctz(pin_mask);
         pio->sm[sm].pinctrl =
                 (1u << PIO_SM0_PINCTRL_SET_COUNT_LSB) |
                 (base << PIO_SM0_PINCTRL_SET_BASE_LSB);
@@ -179,7 +179,7 @@ void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pinvals, uint32_t pin_
 void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t pin_mask) {
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     while (pin_mask) {
-        uint base = __builtin_ctz(pin_mask);
+        uint base = (uint)__builtin_ctz(pin_mask);
         pio->sm[sm].pinctrl =
                 (1u << PIO_SM0_PINCTRL_SET_COUNT_LSB) |
                 (base << PIO_SM0_PINCTRL_SET_BASE_LSB);
