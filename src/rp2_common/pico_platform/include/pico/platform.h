@@ -71,7 +71,7 @@ static inline void __breakpoint(void) {
 /**
  * Ensure that the compiler does not move memory access across this method call
  */
-static inline void __compiler_memory_barrier() {
+static inline void __compiler_memory_barrier(void) {
     __asm__ volatile ("" : : : "memory");
 }
 

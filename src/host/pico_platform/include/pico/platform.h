@@ -131,7 +131,7 @@ static inline int32_t __mul_instruction(int32_t a,int32_t b)
     return a*b;
 }
 
-static inline void __compiler_memory_barrier() {
+static inline void __compiler_memory_barrier(void) {
 }
 #ifdef __cplusplus
 }
