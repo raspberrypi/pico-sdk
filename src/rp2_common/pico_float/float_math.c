@@ -8,11 +8,16 @@
 #include "pico/float.h"
 #include "pico/platform.h"
 
+// opened a separate issue https://github.com/raspberrypi/pico-sdk/issues/166 to deal with these warnings if at all
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wconversion\"")
+_Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
+
 typedef uint32_t ui32;
 typedef int32_t i32;
 
-#define PINF ( HUGE_VAL)
-#define MINF (-HUGE_VAL)
+#define FPINF ( HUGE_VALF)
+#define FMINF (-HUGE_VALF)
 #define NANF ((float)NAN)
 #define PZERO (+0.0)
 #define MZERO (-0.0)
@@ -38,7 +43,7 @@ _Pragma("GCC diagnostic push")
 _Pragma("GCC diagnostic ignored \"-Wstrict-aliasing\"")
 
 static inline bool fisnan(float x) {
-    ui32 ix=*(i32*)&x;
+    ui32 ix=*(ui32*)&x;
     return ix * 2 > 0xff000000u;
 }
 
@@ -239,7 +244,7 @@ float WRAPPER_FUNC(asinf)(float x) {
     check_nan_f1(x);
     float u;
     u=(1.0f-x)*(1.0f+x);
-    if(fisstrictneg(u)) return fnan_or(PINF);
+    if(fisstrictneg(u)) return fnan_or(FPINF);
     return atan2f(x,sqrtf(u));
 }
 
@@ -247,7 +252,7 @@ float WRAPPER_FUNC(acosf)(float x) {
     check_nan_f1(x);
     float u;
     u=(1.0f-x)*(1.0f+x);
-    if(fisstrictneg(u)) return fnan_or(PINF);
+    if(fisstrictneg(u)) return fnan_or(FPINF);
     return atan2f(sqrtf(u),x);
 }
 
@@ -368,19 +373,19 @@ float WRAPPER_FUNC(powintf)(float x,int y) {
             if(y&1) return x;
             else    return 0;
         }
-        if((y&1)) return fcopysign(PINF,x);
-        return PINF;
+        if((y&1)) return fcopysign(FPINF,x);
+        return FPINF;
     }
     _Pragma("GCC diagnostic pop")
     check_nan_f1(x);
     if(fispinf(x)) {
         if(y<0) return 0;
-        else    return PINF;
+        else    return FPINF;
     }
     if(fisminf(x)) {
         if(y>0) {
-            if((y&1)) return MINF;
-            else      return PINF;
+            if((y&1)) return FMINF;
+            else      return FPINF;
         }
         if((y&1)) return MZERO;
         else      return PZERO;
@@ -420,31 +425,31 @@ float WRAPPER_FUNC(powf)(float x,float y) {
             if(fisoddint(y)) return x;
             else             return 0;
         }
-        if(fisoddint(y)) return fcopysign(PINF,x);
-        return PINF;
+        if(fisoddint(y)) return fcopysign(FPINF,x);
+        return FPINF;
     }
     if(fispinf(x)) {
         if(fisneg(y)) return 0;
-        else          return PINF;
+        else          return FPINF;
     }
     if(fisminf(x)) {
         if(!fisneg(y)) {
-            if(fisoddint(y)) return MINF;
-            else             return PINF;
+            if(fisoddint(y)) return FMINF;
+            else             return FPINF;
         }
         if(fisoddint(y)) return MZERO;
         else             return PZERO;
     }
     if(fispinf(y)) {
         if(fgetexp(x)<0x7f) return PZERO;
-        else                return PINF;
+        else                return FPINF;
     }
     if(fisminf(y)) {
-        if(fgetexp(x)<0x7f) return PINF;
+        if(fgetexp(x)<0x7f) return FPINF;
         else                return PZERO;
     }
     if(fisint(y)) return fpow_0(x,y);
-    if(fisneg(x)) return PINF;
+    if(fisneg(x)) return FPINF;
     return fpow_1(x,y);
 }
 
@@ -506,9 +511,9 @@ float WRAPPER_FUNC(fmodf)(float x,float y) {
     FUNPACKS(ix,sx,ex,mx);
     FUNPACK(iy,ey,my);
     if(ex==0xff) {
-        return fnan_or(PINF);
+        return fnan_or(FPINF);
     }
-    if(ey==0) return PINF;
+    if(ey==0) return FPINF;
     if(ex==0) {
         if(!fisneg(x)) return PZERO;
         return MZERO;
@@ -527,8 +532,8 @@ float WRAPPER_FUNC(remquof)(float x,float y,int*quo) {
     FUNPACKS(ix,sx,ex,mx);
     FUNPACKS(iy,sy,ey,my);
     if(quo) *quo=0;
-    if(ex==0xff) return PINF;
-    if(ey==0)    return PINF;
+    if(ex==0xff) return FPINF;
+    if(ey==0)    return FPINF;
     if(ex==0)    return PZERO;
     if(ey==0xff) return x;
     if(ex<ey-1)  return x;  // |x|<|y|/2
@@ -563,3 +568,4 @@ float WRAPPER_FUNC(dremf)(float x,float y) { check_nan_f2(x,y); return remquof(x
 float WRAPPER_FUNC(remainderf)(float x,float y) { check_nan_f2(x,y); return remquof(x,y,0); }
 
 _Pragma("GCC diagnostic pop") // strict-aliasing
+_Pragma("GCC diagnostic pop") // conversion

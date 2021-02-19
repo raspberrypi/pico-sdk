@@ -53,8 +53,8 @@ typedef uint64_t divmod_result_t;
  */
 static inline void hw_divider_divmod_s32_start(int32_t a, int32_t b) {
     check_hw_layout( sio_hw_t, div_sdividend, SIO_DIV_SDIVIDEND_OFFSET);
-    sio_hw->div_sdividend = a;
-    sio_hw->div_sdivisor = b;
+    sio_hw->div_sdividend = (uint32_t)a;
+    sio_hw->div_sdivisor = (uint32_t)b;
 }
 
 /*! \brief Start an unsigned asynchronous divide
@@ -142,7 +142,7 @@ static inline uint32_t hw_divider_u32_quotient_wait(void) {
  */
 static inline int32_t hw_divider_s32_quotient_wait(void) {
     hw_divider_wait_ready();
-    return sio_hw->div_quotient;
+    return (int32_t)sio_hw->div_quotient;
 }
 
 /*! \brief Return result of last asynchronous HW divide, unsigned remainder only
@@ -154,7 +154,7 @@ static inline int32_t hw_divider_s32_quotient_wait(void) {
  */
 static inline uint32_t hw_divider_u32_remainder_wait(void) {
     hw_divider_wait_ready();
-    int32_t rc = sio_hw->div_remainder;
+    uint32_t rc = sio_hw->div_remainder;
     sio_hw->div_quotient; // must read quotient to cooperate with other SDK code
     return rc;
 }
@@ -168,7 +168,7 @@ static inline uint32_t hw_divider_u32_remainder_wait(void) {
  */
 static inline int32_t hw_divider_s32_remainder_wait(void) {
     hw_divider_wait_ready();
-    int32_t rc = sio_hw->div_remainder;
+    int32_t rc = (int32_t)sio_hw->div_remainder;
     sio_hw->div_quotient; // must read quotient to cooperate with other SDK code
     return rc;
 }
@@ -334,7 +334,7 @@ static inline uint32_t hw_divider_u32_quotient_inlined(uint32_t a, uint32_t b) {
 static inline uint32_t hw_divider_u32_remainder_inlined(uint32_t a, uint32_t b) {
     hw_divider_divmod_u32_start(a, b);
     hw_divider_pause();
-    int32_t rc = sio_hw->div_remainder;
+    uint32_t rc = sio_hw->div_remainder;
     sio_hw->div_quotient; // must read quotient to cooperate with other SDK code
     return rc;
 }
@@ -351,7 +351,7 @@ static inline uint32_t hw_divider_u32_remainder_inlined(uint32_t a, uint32_t b) 
 static inline int32_t hw_divider_s32_quotient_inlined(int32_t a, int32_t b) {
     hw_divider_divmod_s32_start(a, b);
     hw_divider_pause();
-    return sio_hw->div_quotient;
+    return (int32_t)sio_hw->div_quotient;
 }
 
 /*! \brief Do a hardware signed HW divide, wait for result, return remainder
@@ -366,7 +366,7 @@ static inline int32_t hw_divider_s32_quotient_inlined(int32_t a, int32_t b) {
 static inline int32_t hw_divider_s32_remainder_inlined(int32_t a, int32_t b) {
     hw_divider_divmod_s32_start(a, b);
     hw_divider_pause();
-    int32_t rc = sio_hw->div_remainder;
+    int32_t rc = (int32_t)sio_hw->div_remainder;
     sio_hw->div_quotient; // must read quotient to cooperate with other SDK code
     return rc;
 }

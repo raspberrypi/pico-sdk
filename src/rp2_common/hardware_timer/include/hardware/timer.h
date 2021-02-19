@@ -106,7 +106,7 @@ void busy_wait_until(absolute_time_t t);
  */
 static inline bool time_reached(absolute_time_t t) {
     uint64_t target = to_us_since_boot(t);
-    uint32_t hi_target = target >> 32u;
+    uint32_t hi_target = (uint32_t)(target >> 32u);
     uint32_t hi = timer_hw->timerawh;
     return (hi >= hi_target && (timer_hw->timerawl >= (uint32_t) target || hi != hi_target));
 }

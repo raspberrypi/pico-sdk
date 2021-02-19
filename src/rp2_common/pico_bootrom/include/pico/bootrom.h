@@ -27,8 +27,8 @@ extern "C" {
  * \param c2 the second character
  * \return the 'code' to use in rom_func_lookup() or rom_data_lookup()
  */
-static inline uint32_t rom_table_code(char c1, char c2) {
-    return (c2 << 8u) | c1;
+static inline uint32_t rom_table_code(uint8_t c1, uint8_t c2) {
+    return (((uint)c2) << 8u) | (uint)c1;
 }
 
 /*!

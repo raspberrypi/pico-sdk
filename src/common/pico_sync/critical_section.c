@@ -11,7 +11,7 @@ static_assert(sizeof(critical_section_t) == 8, "");
 #endif
 
 void critical_section_init(critical_section_t *critsec) {
-    critical_section_init_with_lock_num(critsec, spin_lock_claim_unused(true));
+    critical_section_init_with_lock_num(critsec, (uint)spin_lock_claim_unused(true));
 }
 
 void critical_section_init_with_lock_num(critical_section_t *critsec, uint lock_num) {

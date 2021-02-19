@@ -15,7 +15,7 @@
 #if !PICO_NO_FLASH
 #ifndef PICO_NO_BI_BINARY_SIZE
 extern char __flash_binary_end;
-bi_decl_with_attr(bi_binary_end((uintptr_t)&__flash_binary_end), reset_section_attr)
+bi_decl_with_attr(bi_binary_end((intptr_t)&__flash_binary_end), reset_section_attr)
 #endif
 #endif
 

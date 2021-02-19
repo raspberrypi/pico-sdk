@@ -9,6 +9,11 @@
 #include "pico/double.h"
 #include "pico/platform.h"
 
+// opened a separate issue https://github.com/raspberrypi/pico-sdk/issues/166 to deal with these warnings if at all
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wconversion\"")
+_Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
+
 typedef uint64_t ui64;
 typedef uint32_t ui32;
 typedef int64_t i64;
@@ -40,7 +45,7 @@ _Pragma("GCC diagnostic push")
 _Pragma("GCC diagnostic ignored \"-Wstrict-aliasing\"")
 
 static inline bool disnan(double x) {
-    ui64 ix=*(i64*)&x;
+    ui64 ix=*(ui64*)&x;
     // checks the top bit of the low 32 bit of the NAN, but it I think that is ok
     return ((uint32_t)(ix >> 31)) > 0xffe00000u;
 }
@@ -605,3 +610,4 @@ double WRAPPER_FUNC(drem)(double x,double y) { check_nan_d2(x, y); return remquo
 double WRAPPER_FUNC(remainder)(double x,double y) { check_nan_d2(x, y); return remquo(x,y,0); }
 
 _Pragma("GCC diagnostic pop") // strict-aliasing
+_Pragma("GCC diagnostic pop") // conversion

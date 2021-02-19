@@ -40,6 +40,14 @@
 #define PICO_NO_RAM_VECTOR_TABLE 0
 #endif
 
+#ifndef _U
+#ifdef __ASSEMBLER__
+#define _U(x) x
+#else
+#define _U(x) x ## u
+#endif
+#endif
+
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
