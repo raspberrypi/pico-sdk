@@ -372,7 +372,7 @@ static inline void pwm_retard_count(uint slice_num) {
  */
 static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t integer, uint8_t fract) {
     check_slice_num_param(slice_num);
-    valid_params_if(PWM, fract <= 16);
+    valid_params_if(PWM, fract < 16);
     pwm_hw->slice[slice_num].div = (integer << PWM_CH0_DIV_INT_LSB) | (fract << PWM_CH0_DIV_FRAC_LSB);
 }
 
