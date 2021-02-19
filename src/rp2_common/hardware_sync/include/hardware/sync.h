@@ -117,8 +117,9 @@ inline static void __dmb(void) {
 /*! \brief Insert a DSB instruction in to the code path.
  *  \ingroup hardware_sync
  *
- * The DSB (data synchronization barrier) acts as a special kind of. The DSB operation completes when all explicit
- * memory accesses before this instruction complete.
+ * The DSB (data synchronization barrier) acts as a special kind of data
+ * memory barrier (DMB). The DSB operation completes when all explicit memory
+ * accesses before this instruction complete.
  */
 inline static void __dsb(void) {
     __asm volatile ("dsb" : : : "memory");

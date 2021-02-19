@@ -33,11 +33,11 @@ extern "C" {
 
 /**
  * Decorates a function name, such that the function will execute from RAM (assuming it is not inlined
- * into a flash function by the compiler
+ * into a flash function by the compiler)
  */
 #define __not_in_flash_func(func_name) __not_in_flash(__STRING(func_name)) func_name
 /**
- * Histocal synonym for __not_in_flash_func()
+ * Historical synonym for __not_in_flash_func()
  */
 #define __time_critical_func(func_name) __not_in_flash_func(func_name)
 
