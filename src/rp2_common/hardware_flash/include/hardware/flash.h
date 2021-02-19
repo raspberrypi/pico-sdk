@@ -9,17 +9,6 @@
 
 #include "pico.h"
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_FLASH, Enable/disable assertions in the flash module, type=bool, default=0, group=hardware_flash
-#ifndef PARAM_ASSERTIONS_ENABLED_FLASH
-#define PARAM_ASSERTIONS_ENABLED_FLASH 0
-#endif
-
-#define FLASH_PAGE_SIZE (1u << 8)
-#define FLASH_SECTOR_SIZE (1u << 12)
-#define FLASH_BLOCK_SIZE (1u << 16)
-
-#define FLASH_UNIQUE_ID_SIZE_BYTES 8
-
 /** \file flash.h
  *  \defgroup hardware_flash hardware_flash
  *
@@ -43,6 +32,23 @@
  * \subsection flash_example Example
  * \include flash_program.c
  */
+
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_FLASH, Enable/disable assertions in the flash module, type=bool, default=0, group=hardware_flash
+#ifndef PARAM_ASSERTIONS_ENABLED_FLASH
+#define PARAM_ASSERTIONS_ENABLED_FLASH 0
+#endif
+
+#define FLASH_PAGE_SIZE (1u << 8)
+#define FLASH_SECTOR_SIZE (1u << 12)
+#define FLASH_BLOCK_SIZE (1u << 16)
+
+#define FLASH_UNIQUE_ID_SIZE_BYTES 8
+
+// PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes or -1 for unknown, type=int, default=-1, group=hardware_flash
+#ifndef PICO_FLASH_SIZE_BYTES
+#define PICO_FLASH_SIZE_BYTES -1
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
