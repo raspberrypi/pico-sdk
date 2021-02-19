@@ -76,4 +76,6 @@ typedef struct {
     int8_t sec;      ///< 0..59
 } datetime_t;
 
+#define bool_to_bit(x) ((uint)!!(x))
+
 #endif

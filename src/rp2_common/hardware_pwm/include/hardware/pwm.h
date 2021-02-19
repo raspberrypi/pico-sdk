@@ -102,7 +102,7 @@ static inline uint pwm_gpio_to_channel(uint gpio) {
  */
 static inline void pwm_config_set_phase_correct(pwm_config *c, bool phase_correct) {
     c->csr = (c->csr & ~PWM_CH0_CSR_PH_CORRECT_BITS)
-        | (!!phase_correct << PWM_CH0_CSR_PH_CORRECT_LSB);
+        | (bool_to_bit(phase_correct) << PWM_CH0_CSR_PH_CORRECT_LSB);
 }
 
 /** \brief Set clock divider in a PWM configuration
@@ -146,7 +146,7 @@ static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
 static inline void pwm_config_set_clkdiv_mode(pwm_config *c, enum pwm_clkdiv_mode mode) {
     valid_params_if(PWM, mode >= PWM_DIV_FREE_RUNNING && mode <= PWM_DIV_B_FALLING);
     c->csr = (c->csr & ~PWM_CH0_CSR_DIVMODE_BITS)
-        | (mode << PWM_CH0_CSR_DIVMODE_LSB);
+        | (((uint)mode) << PWM_CH0_CSR_DIVMODE_LSB);
 }
 
 /** \brief Set output polarity in a PWM configuration
@@ -158,7 +158,7 @@ static inline void pwm_config_set_clkdiv_mode(pwm_config *c, enum pwm_clkdiv_mod
  */
 static inline void pwm_config_set_output_polarity(pwm_config *c, bool a, bool b) {
     c->csr = (c->csr & ~(PWM_CH0_CSR_A_INV_BITS | PWM_CH0_CSR_B_INV_BITS))
-        | ((!!a << PWM_CH0_CSR_A_INV_LSB) | (!!b << PWM_CH0_CSR_B_INV_LSB));
+        | ((bool_to_bit(a) << PWM_CH0_CSR_A_INV_LSB) | (bool_to_bit(b) << PWM_CH0_CSR_B_INV_LSB));
 }
 
 /** \brief Set PWM counter wrap value in a PWM configuration
@@ -192,7 +192,7 @@ static inline void pwm_init(uint slice_num, pwm_config *c, bool start) {
     pwm_hw->slice[slice_num].cc = PWM_CH0_CC_RESET;
     pwm_hw->slice[slice_num].top = c->top;
     pwm_hw->slice[slice_num].div = c->div;
-    pwm_hw->slice[slice_num].csr = c->csr | (!!start << PWM_CH0_CSR_EN_LSB);
+    pwm_hw->slice[slice_num].csr = c->csr | (bool_to_bit(start) << PWM_CH0_CSR_EN_LSB);
 }
 
 /** \brief Get a set of default values for PWM configuration
@@ -252,7 +252,7 @@ static inline void pwm_set_chan_level(uint slice_num, uint chan, uint16_t level)
     check_slice_num_param(slice_num);
     hw_write_masked(
         &pwm_hw->slice[slice_num].cc,
-        level << (chan ? PWM_CH0_CC_B_LSB : PWM_CH0_CC_A_LSB),
+        ((uint)level) << (chan ? PWM_CH0_CC_B_LSB : PWM_CH0_CC_A_LSB),
         chan ? PWM_CH0_CC_B_BITS : PWM_CH0_CC_A_BITS
     );
 }
@@ -274,7 +274,7 @@ static inline void pwm_set_chan_level(uint slice_num, uint chan, uint16_t level)
  */
 static inline void pwm_set_both_levels(uint slice_num, uint16_t level_a, uint16_t level_b) {
     check_slice_num_param(slice_num);
-    pwm_hw->slice[slice_num].cc = (level_b << PWM_CH0_CC_B_LSB) | (level_a << PWM_CH0_CC_A_LSB);
+    pwm_hw->slice[slice_num].cc = (((uint)level_b) << PWM_CH0_CC_B_LSB) | (((uint)level_a) << PWM_CH0_CC_A_LSB);
 }
 
 /** \brief Helper function to set the PWM level for the slice and channel associated with a GPIO.
@@ -310,7 +310,7 @@ static inline void pwm_set_gpio_level(uint gpio, uint16_t level) {
  */
 static inline uint16_t pwm_get_counter(uint slice_num) {
     check_slice_num_param(slice_num);
-    return (pwm_hw->slice[slice_num].ctr);
+    return (uint16_t)(pwm_hw->slice[slice_num].ctr);
 }
 
 /** \brief Set PWM counter
@@ -373,7 +373,7 @@ static inline void pwm_retard_count(uint slice_num) {
 static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t integer, uint8_t fract) {
     check_slice_num_param(slice_num);
     valid_params_if(PWM, fract < 16);
-    pwm_hw->slice[slice_num].div = (integer << PWM_CH0_DIV_INT_LSB) | (fract << PWM_CH0_DIV_FRAC_LSB);
+    pwm_hw->slice[slice_num].div = (((uint)integer) << PWM_CH0_DIV_INT_LSB) | (((uint)fract) << PWM_CH0_DIV_FRAC_LSB);
 }
 
 /** \brief Set PWM clock divider
@@ -401,7 +401,7 @@ static inline void pwm_set_clkdiv(uint slice_num, float divider) {
  */
 static inline void pwm_set_output_polarity(uint slice_num, bool a, bool b) {
     check_slice_num_param(slice_num);
-    hw_write_masked(&pwm_hw->slice[slice_num].csr, !!a << PWM_CH0_CSR_A_INV_LSB | !!b << PWM_CH0_CSR_B_INV_LSB,
+    hw_write_masked(&pwm_hw->slice[slice_num].csr, bool_to_bit(a) << PWM_CH0_CSR_A_INV_LSB | bool_to_bit(b) << PWM_CH0_CSR_B_INV_LSB,
                      PWM_CH0_CSR_A_INV_BITS | PWM_CH0_CSR_B_INV_BITS);
 }
 
@@ -415,7 +415,7 @@ static inline void pwm_set_output_polarity(uint slice_num, bool a, bool b) {
 static inline void pwm_set_clkdiv_mode(uint slice_num, enum pwm_clkdiv_mode mode) {
     check_slice_num_param(slice_num);
     valid_params_if(PWM, mode >= PWM_DIV_FREE_RUNNING && mode <= PWM_DIV_B_FALLING);
-    hw_write_masked(&pwm_hw->slice[slice_num].csr, mode << PWM_CH0_CSR_DIVMODE_LSB, PWM_CH0_CSR_DIVMODE_BITS);
+    hw_write_masked(&pwm_hw->slice[slice_num].csr, ((uint)mode) << PWM_CH0_CSR_DIVMODE_LSB, PWM_CH0_CSR_DIVMODE_BITS);
 }
 
 /** \brief Set PWM phase correct on/off
@@ -429,7 +429,7 @@ static inline void pwm_set_clkdiv_mode(uint slice_num, enum pwm_clkdiv_mode mode
  */
 static inline void pwm_set_phase_correct(uint slice_num, bool phase_correct) {
     check_slice_num_param(slice_num);
-    hw_write_masked(&pwm_hw->slice[slice_num].csr, phase_correct << PWM_CH0_CSR_PH_CORRECT_LSB, PWM_CH0_CSR_PH_CORRECT_BITS);
+    hw_write_masked(&pwm_hw->slice[slice_num].csr, bool_to_bit(phase_correct) << PWM_CH0_CSR_PH_CORRECT_LSB, PWM_CH0_CSR_PH_CORRECT_BITS);
 }
 
 /** \brief Enable/Disable PWM
@@ -440,7 +440,7 @@ static inline void pwm_set_phase_correct(uint slice_num, bool phase_correct) {
  */
 static inline void pwm_set_enabled(uint slice_num, bool enabled) {
     check_slice_num_param(slice_num);
-    hw_write_masked(&pwm_hw->slice[slice_num].csr, !!enabled << PWM_CH0_CSR_EN_LSB, PWM_CH0_CSR_EN_BITS);
+    hw_write_masked(&pwm_hw->slice[slice_num].csr, bool_to_bit(enabled) << PWM_CH0_CSR_EN_LSB, PWM_CH0_CSR_EN_BITS);
 }
 
 /** \brief Enable/Disable multiple PWM slices simultaneously
@@ -500,7 +500,7 @@ static inline void pwm_clear_irq(uint slice_num) {
  *
  * \return Bitmask of all PWM interrupts currently set
  */
-static inline int32_t pwm_get_irq_status_mask(void) {
+static inline uint32_t pwm_get_irq_status_mask(void) {
     return pwm_hw->ints;
 }
 

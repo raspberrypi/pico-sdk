@@ -15,7 +15,6 @@
 extern "C" {
 #endif
 
-
 /** \file hardware/sync.h
  *  \defgroup hardware_sync hardware_sync
  *
@@ -29,6 +28,11 @@ extern "C" {
  * \note spin locks 0-15 are currently reserved for fixed uses by the SDK - i.e. if you use them other
  * functionality may break or not function optimally
  */
+
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_SYNC, Enable/disable SYNC assertions, type=bool, default=0, group=hardware_SYNC
+#ifndef PARAM_ASSERTIONS_ENABLED_SYNC
+#define PARAM_ASSERTIONS_ENABLED_SYNC 0
+#endif
 
 /** \brief A spin lock identifier
  * \ingroup hardware_sync
@@ -205,7 +209,9 @@ inline static spin_lock_t *spin_lock_instance(uint lock_num) {
  * \return The Spinlock ID
  */
 inline static uint spin_lock_get_num(spin_lock_t *lock) {
-    return lock - (spin_lock_t *) (SIO_BASE + SIO_SPINLOCK0_OFFSET);
+    int lock_num = lock - (spin_lock_t *) (SIO_BASE + SIO_SPINLOCK0_OFFSET);
+    invalid_params_if(SYNC, lock_num < 0 || lock_num >= NUM_SPIN_LOCKS);
+    return (uint) lock_num;
 }
 
 /*! \brief Acquire a spin lock without disabling interrupts (hence unsafe)
@@ -250,9 +256,9 @@ inline static uint32_t spin_lock_blocking(spin_lock_t *lock) {
  *
  * \param lock Spinlock instance
  */
-inline static bool is_spin_locked(const spin_lock_t *lock) {
+inline static bool is_spin_locked(spin_lock_t *lock) {
     check_hw_size(spin_lock_t, 4);
-    uint32_t lock_num = lock - spin_lock_instance(0);
+    uint lock_num = spin_lock_get_num(lock);
     return 0 != (*(io_ro_32 *) (SIO_BASE + SIO_SPINLOCK_ST_OFFSET) & (1u << lock_num));
 }
 

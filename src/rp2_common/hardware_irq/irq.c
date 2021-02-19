@@ -24,7 +24,7 @@ static inline void *add_thumb_bit(void *addr) {
 }
 
 static inline void *remove_thumb_bit(void *addr) {
-    return (void *) (((uintptr_t) addr) & ~0x1);
+    return (void *) (((uintptr_t) addr) & (uint)~0x1);
 }
 
 static void set_raw_irq_handler_and_unlock(uint num, irq_handler_t handler, uint32_t save) {
@@ -139,7 +139,7 @@ static uint16_t make_branch(uint16_t *from, void *to) {
     uint32_t ui_to = (uint32_t)to;
     uint32_t delta = (ui_to - ui_from - 4) / 2;
     assert(!(delta >> 11u));
-    return 0xe000 | (delta & 0x7ff);
+    return (uint16_t)(0xe000 | (delta & 0x7ff));
 }
 
 static void insert_branch_and_link(uint16_t *from, void *to) {
@@ -147,8 +147,8 @@ static void insert_branch_and_link(uint16_t *from, void *to) {
     uint32_t ui_to = (uint32_t)to;
     uint32_t delta = (ui_to - ui_from - 4) / 2;
     assert(!(delta >> 11u));
-    from[0] = 0xf000 | ((delta >> 11u) & 0x7ffu);
-    from[1] = 0xf800 | (delta & 0x7ffu);
+    from[0] = (uint16_t)(0xf000 | ((delta >> 11u) & 0x7ffu));
+    from[1] = (uint16_t)(0xf800 | (delta & 0x7ffu));
 }
 
 static inline void *resolve_branch(uint16_t *inst) {
@@ -174,7 +174,11 @@ static inline int8_t slot_diff(struct irq_handler_chain_slot *to, struct irq_han
         : "l" (from)
         :
         );
-    return result;
+    return (int8_t)result;
+}
+
+static inline int8_t get_slot_index(struct irq_handler_chain_slot *slot) {
+    return slot_diff(slot, irq_handler_chain_slots);
 }
 
 void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_priority) {
@@ -189,7 +193,7 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
     uint32_t save = spin_lock_blocking(lock);
     hard_assert(irq_hander_chain_free_slot_head >= 0);
     struct irq_handler_chain_slot *slot = &irq_handler_chain_slots[irq_hander_chain_free_slot_head];
-    int slot_index = irq_hander_chain_free_slot_head;
+    int8_t slot_index = irq_hander_chain_free_slot_head;
     irq_hander_chain_free_slot_head = slot->link;
     irq_handler_t vtable_handler = get_vtable()[16 + num];
     if (!is_shared_irq_raw_handler(vtable_handler)) {
@@ -237,7 +241,7 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
                     .inst1 = 0xa100,                                                    // add r1, pc, #0
                     .inst2 = make_branch(&slot->inst2, irq_handler_chain_first_slot),   // b irq_handler_chain_first_slot
                     .inst3 = make_branch(&slot->inst3, existing_vtable_slot),           // b existing_slot
-                    .link = slot_diff(existing_vtable_slot, irq_handler_chain_slots),
+                    .link = get_slot_index(existing_vtable_slot),
                     .priority = order_priority,
                     .handler = handler
             };
@@ -286,14 +290,14 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
             struct irq_handler_chain_slot *prev_slot = NULL;
             struct irq_handler_chain_slot *existing_vtable_slot = remove_thumb_bit(vtable_handler);
             struct irq_handler_chain_slot *to_free_slot = existing_vtable_slot;
-            int to_free_slot_index = to_free_slot - irq_handler_chain_slots;
+            int8_t to_free_slot_index = get_slot_index(to_free_slot);
             while (to_free_slot->handler != handler) {
                 prev_slot = to_free_slot;
                 if (to_free_slot->link < 0) break;
                 to_free_slot = &irq_handler_chain_slots[to_free_slot->link];
             }
             if (to_free_slot->handler == handler) {
-                int next_slot_index = to_free_slot->link;
+                int8_t next_slot_index = to_free_slot->link;
                 if (next_slot_index >= 0) {
                     // There is another slot in the chain, so copy that over us, so that our inst3 points at something valid
                     // Note this only matters in the exception case anyway, and it that case, we will skip the next handler,
@@ -365,11 +369,11 @@ void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot) {
     irq_handler_t slot_handler = (irq_handler_t) add_thumb_bit(slot);
     assert(is_shared_irq_raw_handler(slot_handler));
 
-    int exception = __get_current_exception();
+    uint exception = __get_current_exception();
     assert(exception);
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_IRQ);
     uint32_t save = spin_lock_blocking(lock);
-    int slot_index = slot - irq_handler_chain_slots;
+    int8_t slot_index = get_slot_index(slot);
     if (slot_handler == get_vtable()[exception]) {
         get_vtable()[exception] = __unhandled_user_irq;
     } else {

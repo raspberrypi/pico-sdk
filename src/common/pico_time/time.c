@@ -71,12 +71,12 @@ bool timer_pool_entry_comparator(void *user_data, pheap_node_id_t a, pheap_node_
 }
 
 static inline alarm_id_t make_public_id(uint8_t id_high, pheap_node_id_t id) {
-    return ((uint)id_high << 8u * sizeof(id)) | id;
+    return (alarm_id_t)(((uint)id_high << 8u * sizeof(id)) | id);
 }
 
-static alarm_id_t add_alarm_under_lock(alarm_pool_t *pool, absolute_time_t time, alarm_callback_t callback,
-                                       void *user_data, alarm_id_t reuse_id, bool create_if_past, bool *missed) {
-    alarm_id_t id;
+static pheap_node_id_t add_alarm_under_lock(alarm_pool_t *pool, absolute_time_t time, alarm_callback_t callback,
+                                       void *user_data, pheap_node_id_t reuse_id, bool create_if_past, bool *missed) {
+    pheap_node_id_t id;
     if (reuse_id) {
         assert(!ph_contains(pool->heap, reuse_id));
         id = reuse_id;
@@ -137,10 +137,10 @@ static void alarm_pool_alarm_callback(uint alarm_num) {
             // todo think more about whether we want to keep calling
             if (repeat < 0 && pool->alarm_in_progress) {
                 assert(pool->alarm_in_progress == make_public_id(id_high, next_id));
-                add_alarm_under_lock(pool, delayed_by_us(target, -repeat), callback, user_data, next_id, true, NULL);
+                add_alarm_under_lock(pool, delayed_by_us(target, (uint64_t)-repeat), callback, user_data, next_id, true, NULL);
             } else if (repeat > 0 && pool->alarm_in_progress) {
                 assert(pool->alarm_in_progress == make_public_id(id_high, next_id));
-                add_alarm_under_lock(pool, delayed_by_us(get_absolute_time(), repeat), callback, user_data, next_id,
+                add_alarm_under_lock(pool, delayed_by_us(get_absolute_time(), (uint64_t)repeat), callback, user_data, next_id,
                                      true, NULL);
             } else {
                 // need to return the id to the heap
@@ -164,7 +164,7 @@ alarm_pool_t *alarm_pool_create(uint hardware_alarm_num, uint max_timers) {
     pool->heap = ph_create(max_timers, timer_pool_entry_comparator, pool);
     pool->entries = (alarm_pool_entry_t *)calloc(max_timers, sizeof(alarm_pool_entry_t));
     pool->entry_ids_high = (uint8_t *)calloc(max_timers, sizeof(uint8_t));
-    pool->hardware_alarm_num = hardware_alarm_num;
+    pool->hardware_alarm_num = (uint8_t)hardware_alarm_num;
     pools[hardware_alarm_num] = pool;
     return pool;
 }
@@ -185,7 +185,7 @@ alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, ala
                                    void *user_data, bool fire_if_past) {
     bool missed = false;
 
-    uint public_id;
+    alarm_id_t public_id;
     do {
         uint8_t id_high = 0;
         uint32_t save = spin_lock_blocking(pool->lock);
@@ -205,9 +205,9 @@ alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, ala
                 public_id = 0;
                 break;
             } else if (repeat < 0) {
-                time = delayed_by_us(time, -repeat);
+                time = delayed_by_us(time, (uint64_t)-repeat);
             } else {
-                time = delayed_by_us(get_absolute_time(), repeat);
+                time = delayed_by_us(get_absolute_time(), (uint64_t)repeat);
             }
         } else {
             break;
@@ -270,7 +270,8 @@ bool alarm_pool_add_repeating_timer_us(alarm_pool_t *pool, int64_t delay_us, rep
     out->callback = callback;
     out->delay_us = delay_us;
     out->user_data = user_data;
-    out->alarm_id = alarm_pool_add_alarm_at(pool, make_timeout_time_us(delay_us >= 0 ? delay_us : -delay_us), repeating_timer_callback, out, true);
+    out->alarm_id = alarm_pool_add_alarm_at(pool, make_timeout_time_us((uint64_t)(delay_us >= 0 ? delay_us : -delay_us)),
+                                            repeating_timer_callback, out, true);
     return out->alarm_id > 0;
 }
 

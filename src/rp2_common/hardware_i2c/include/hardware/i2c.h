@@ -293,7 +293,7 @@ static inline void i2c_read_raw_blocking(i2c_inst_t *i2c, uint8_t *dst, size_t l
     for (size_t i = 0; i < len; ++i) {
         while (!i2c_get_read_available(i2c))
             tight_loop_contents();
-        *dst++ = i2c_get_hw(i2c)->data_cmd;
+        *dst++ = (uint8_t)i2c_get_hw(i2c)->data_cmd;
     }
 }
 

@@ -152,7 +152,7 @@ static inline absolute_time_t make_timeout_time_ms(uint32_t ms) {
  * in case of overflow)
  */
 static inline int64_t absolute_time_diff_us(absolute_time_t from, absolute_time_t to) {
-    return to_us_since_boot(to) - to_us_since_boot(from);
+    return (int64_t)(to_us_since_boot(to) - to_us_since_boot(from));
 }
 
 /*! \brief The timestamp representing the end of time; no timestamp is after this

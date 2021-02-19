@@ -204,13 +204,13 @@ static bool multicore_lockout_handshake(uint32_t magic, absolute_time_t until) {
         if (next_timeout_us < 0) {
             break;
         }
-        multicore_fifo_push_timeout_us(magic, next_timeout_us);
+        multicore_fifo_push_timeout_us(magic, (uint64_t)next_timeout_us);
         next_timeout_us = absolute_time_diff_us(get_absolute_time(), until);
         if (next_timeout_us < 0) {
             break;
         }
         uint32_t word = 0;
-        if (!multicore_fifo_pop_timeout_us(next_timeout_us, &word)) {
+        if (!multicore_fifo_pop_timeout_us((uint64_t)next_timeout_us, &word)) {
             break;
         }
         if (word == magic) {

@@ -94,7 +94,7 @@ static bool stdio_put_string(const char *s, int len, bool newline) {
         return false;
 #endif
     }
-    if (len == -1) len = strlen(s);
+    if (len == -1) len = (int)strlen(s);
     for (stdio_driver_t *driver = drivers; driver; driver = driver->next) {
         if (!driver->out_chars) continue;
         if (filter && filter != driver) continue;
@@ -129,13 +129,13 @@ static int stdio_get_until(char *buf, int len, absolute_time_t until) {
 }
 
 int WRAPPER_FUNC(putchar)(int c) {
-    char cc = c;
+    char cc = (char)c;
     stdio_put_string(&cc, 1, false);
     return c;
 }
 
 int WRAPPER_FUNC(puts)(const char *s) {
-    int len = strlen(s);
+    int len = (int)strlen(s);
     stdio_put_string(s, len, true);
     stdio_flush();
     return len;
@@ -181,7 +181,7 @@ void stdio_flush() {
 }
 
 typedef struct stdio_stack_buffer {
-    uint used;
+    int used;
     char buf[PICO_STDIO_STACK_BUFFER_SIZE];
 } stdio_stack_buffer_t;
 

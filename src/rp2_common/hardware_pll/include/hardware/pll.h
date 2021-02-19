@@ -39,7 +39,7 @@ typedef pll_hw_t *PLL;
  * \param post_div1 Post Divider 1 - range 1-7. Must be >= post_div2
  * \param post_div2 Post Divider 2 - range 1-7
  */
-void pll_init(PLL pll, uint32_t ref_div, uint32_t vco_freq, uint32_t post_div1, uint8_t post_div2);
+void pll_init(PLL pll, uint ref_div, uint vco_freq, uint post_div1, uint post_div2);
 
 /*! \brief Release/uninitialise specified PLL.
  *  \ingroup hardware_pll

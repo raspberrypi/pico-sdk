@@ -65,13 +65,12 @@ target_compile_options(kitchen_sink_options INTERFACE
         -Wcast-qual
         -Wfloat-equal
         -Wmissing-format-attribute
+        -Wconversion
         $<$<COMPILE_LANGUAGE:C>:-Wstrict-prototypes>
 
         -Wno-inline
         # todo not sure these are true, but investigate
         #-Wpacked
-        # todo requires unsigned register constants
-        #-Wconversion
 
         # todo we have some of these in usb_device_tiny to try to make it more readable.. perhaps doxygen would help here instead
         -Wredundant-decls

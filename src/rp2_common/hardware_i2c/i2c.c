@@ -115,6 +115,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
     // Synopsys hw accepts start/stop flags alongside data items in the same
     // FIFO word, so no 0 byte transfers.
     invalid_params_if(I2C, len == 0);
+    invalid_params_if(I2C, ((int)len) < 0);
 
     i2c->hw->enable = 0;
     i2c->hw->tar = addr;
@@ -124,15 +125,16 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
     bool timeout = false;
 
     uint32_t abort_reason;
-    size_t byte_ctr;
+    int byte_ctr;
 
-    for (byte_ctr = 0; byte_ctr < len; ++byte_ctr) {
+    int ilen = (int)len;
+    for (byte_ctr = 0; byte_ctr < ilen; ++byte_ctr) {
         bool first = byte_ctr == 0;
-        bool last = byte_ctr == len - 1;
+        bool last = byte_ctr == ilen - 1;
 
         i2c->hw->data_cmd =
-                !!(first && i2c->restart_on_next) << I2C_IC_DATA_CMD_RESTART_LSB |
-                !!(last && !nostop) << I2C_IC_DATA_CMD_STOP_LSB |
+                bool_to_bit(first && i2c->restart_on_next) << I2C_IC_DATA_CMD_RESTART_LSB |
+                bool_to_bit(last && !nostop) << I2C_IC_DATA_CMD_STOP_LSB |
                 *src++;
 
         do {
@@ -203,6 +205,7 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
     invalid_params_if(I2C, addr >= 0x80); // 7-bit addresses
     invalid_params_if(I2C, i2c_reserved_addr(addr));
     invalid_params_if(I2C, len == 0);
+    invalid_params_if(I2C, ((int)len) < 0);
 
     i2c->hw->enable = 0;
     i2c->hw->tar = addr;
@@ -211,17 +214,17 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
     bool abort = false;
     bool timeout = false;
     uint32_t abort_reason;
-    size_t byte_ctr;
-
-    for (byte_ctr = 0; byte_ctr < len; ++byte_ctr) {
+    int byte_ctr;
+    int ilen = (int)len;
+    for (byte_ctr = 0; byte_ctr < ilen; ++byte_ctr) {
         bool first = byte_ctr == 0;
-        bool last = byte_ctr == len - 1;
+        bool last = byte_ctr == ilen - 1;
         while (!i2c_get_write_available(i2c))
             tight_loop_contents();
 
         i2c->hw->data_cmd =
-                !!(first && i2c->restart_on_next) << I2C_IC_DATA_CMD_RESTART_LSB |
-                !!(last && !nostop) << I2C_IC_DATA_CMD_STOP_LSB |
+                bool_to_bit(first && i2c->restart_on_next) << I2C_IC_DATA_CMD_RESTART_LSB |
+                bool_to_bit(last && !nostop) << I2C_IC_DATA_CMD_STOP_LSB |
                 I2C_IC_DATA_CMD_CMD_BITS; // -> 1 for read
 
         do {
@@ -236,7 +239,7 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
         if (abort)
             break;
 
-        *dst++ = i2c->hw->data_cmd;
+        *dst++ = (uint8_t) i2c->hw->data_cmd;
     }
 
     int rval;
