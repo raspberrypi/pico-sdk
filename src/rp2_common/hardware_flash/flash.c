@@ -18,8 +18,6 @@
 #define FLASH_RUID_DATA_BYTES 8
 #define FLASH_RUID_TOTAL_BYTES (1 + FLASH_RUID_DUMMY_BYTES + FLASH_RUID_DATA_BYTES)
 
-#define __compiler_barrier() asm volatile("" ::: "memory")
-
 //-----------------------------------------------------------------------------
 // Infrastructure for reentering XIP mode after exiting for programming (take
 // a copy of boot2 before XIP exit). Calling boot2 as a function works because
@@ -38,7 +36,7 @@ static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)(void) {
         return;
     for (int i = 0; i < BOOT2_SIZE_WORDS; ++i)
         boot2_copyout[i] = ((uint32_t *)XIP_BASE)[i];
-    __compiler_barrier();
+    __compiler_memory_barrier();
     boot2_copyout_valid = true;
 }
 
@@ -77,7 +75,7 @@ void __no_inline_not_in_flash_func(flash_range_erase)(uint32_t flash_offs, size_
     flash_init_boot2_copyout();
 
     // No flash accesses after this point
-    __compiler_barrier();
+    __compiler_memory_barrier();
 
     connect_internal_flash();
     flash_exit_xip();
@@ -100,7 +98,7 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
     assert(connect_internal_flash && flash_exit_xip && flash_range_program && flash_flush_cache);
     flash_init_boot2_copyout();
 
-    __compiler_barrier();
+    __compiler_memory_barrier();
 
     connect_internal_flash();
     flash_exit_xip();
@@ -133,7 +131,7 @@ static void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, ui
     void (*flash_flush_cache)(void) = (void(*)(void))rom_func_lookup(rom_table_code('F', 'C'));
     assert(connect_internal_flash && flash_exit_xip && flash_flush_cache);
     flash_init_boot2_copyout();
-    __compiler_barrier();
+    __compiler_memory_barrier();
     connect_internal_flash();
     flash_exit_xip();
 

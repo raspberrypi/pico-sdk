@@ -540,6 +540,8 @@ inline static bool dma_channel_is_busy(uint channel) {
  */
 inline static void dma_channel_wait_for_finish_blocking(uint channel) {
     while (dma_channel_is_busy(channel)) tight_loop_contents();
+    // stop the compiler hoisting a non volatile buffer access above the DMA completion.
+    __compiler_memory_barrier();
 }
 
 /*! \brief Enable the DMA sniffing targeting the specified channel
