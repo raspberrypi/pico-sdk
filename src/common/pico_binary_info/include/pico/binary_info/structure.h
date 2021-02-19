@@ -54,6 +54,7 @@ typedef struct _binary_info_core binary_info_t;
 #define BINARY_INFO_ID_RP_PROGRAM_BUILD_ATTRIBUTE 0x4275f0d3
 #define BINARY_INFO_ID_RP_SDK_VERSION 0x5360b3ab
 #define BINARY_INFO_ID_RP_PICO_BOARD 0xb63cffbb
+#define BINARY_INFO_ID_RP_BOOT2_NAME 0x7f8882e1
 
 #if PICO_ON_DEVICE
 #define bi_ptr_of(x) x *
