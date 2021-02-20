@@ -677,7 +677,7 @@ double_wrapper_section sincos
     bl sincostan_remainder
     pop {r2}
     mov lr, r2
-    b 1f
+    b 1f // continue with sincos
 
 wrapper_func sincos
     push {r2-r5, lr}
@@ -688,8 +688,7 @@ wrapper_func sincos
     cmp r2, #9
     bge 2b
 1:
-
-    bl 2f
+    bl 2f // call the shim
     pop {r4-r5}
     stmia r4!, {r0, r1}
     stmia r5!, {r2, r3}
@@ -697,16 +696,7 @@ wrapper_func sincos
 
 2:
     shimmable_table_tail_call SF_TABLE_V3_FSINCOS sincos_shim_bootstrap
-#if PICO_DOUBLE_PROPAGATE_NANS
-.align 2
-1:
-    pop {r2, r3}
-    stmia r2!, {r0, r1}
-    mov lr, r3
-    pop {r3}
-    stmia r3!, {r0, r1}
-    bx lr
-#endif
+
 .thumb_func
 sincos_shim_bootstrap:
     push {r2, r3, r4}

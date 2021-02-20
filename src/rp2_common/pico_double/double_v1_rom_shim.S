@@ -1630,19 +1630,19 @@ double_section dsin_shim
  pop {r4-r7,r15}
 
 double_section dsincos_shim
+
+ @ Note that this function returns in r0-r3
  regular_func dsincos_shim
+
  push {r4-r7,r14}
  bl push_r8_r11
- push {r2-r3}
  bl dsincos_internal
  mov r12,r0                    @ save ε
  bl dcos_finish
  push {r0,r1}
  mov r0,r12
  bl dsin_finish
- pop {r2,r3,r4,r5}
- stmia r4!, {r0, r1}
- stmia r5!, {r2, r3}
+ pop {r2,r3}
  bl pop_r8_r11
  pop {r4-r7,r15}
 
