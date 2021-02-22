@@ -258,9 +258,9 @@ int elf2uf2(FILE *in, FILE *out) {
         uint32_t expected_ep_main_ram = UINT32_MAX;
         uint32_t expected_ep_xip_sram = UINT32_MAX;
         for(auto& page_entry : pages) {
-            if ( ((page_entry.first >= MAIN_RAM_START) && (page_entry.first < (MAIN_RAM_START + MAIN_RAM_END))) && (page_entry.first < expected_ep_main_ram) ) {
+            if ( ((page_entry.first >= MAIN_RAM_START) && (page_entry.first < MAIN_RAM_END)) && (page_entry.first < expected_ep_main_ram) ) {
                 expected_ep_main_ram = page_entry.first | 0x1;
-            } else if ( ((page_entry.first >= XIP_SRAM_START) && (page_entry.first < (XIP_SRAM_START + XIP_SRAM_END))) && (page_entry.first < expected_ep_xip_sram) ) { 
+            } else if ( ((page_entry.first >= XIP_SRAM_START) && (page_entry.first < XIP_SRAM_END)) && (page_entry.first < expected_ep_xip_sram) ) { 
                 expected_ep_xip_sram = page_entry.first | 0x1;
             }
         }
