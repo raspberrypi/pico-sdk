@@ -20,9 +20,8 @@
 
 #include "pico/binary_info/defs.h"
 #include "pico/binary_info/structure.h"
-#if PICO_ON_DEVICE
-#include "pico/binary_info/code.h"
+#if !PICO_ON_DEVICE && !defined(PICO_NO_BINARY_INFO)
+#define PICO_NO_BINARY_INFO 1
 #endif
-
-
+#include "pico/binary_info/code.h"
 #endif
