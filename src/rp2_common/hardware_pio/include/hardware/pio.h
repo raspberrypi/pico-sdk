@@ -58,6 +58,9 @@ enum pio_fifo_join {
     PIO_FIFO_JOIN_RX = 2,
 };
 
+/** \brief MOV status types
+ *  \ingroup hardware_pio
+ */
 enum pio_mov_status_type {
     STATUS_TX_LESSTHAN = 0,
     STATUS_RX_LESSTHAN = 1
@@ -308,7 +311,7 @@ static inline void sm_config_set_out_shift(pio_sm_config *c, bool shift_right, b
  * \param join Specifies the join type. \see enum pio_fifo_join
  */
 static inline void sm_config_set_fifo_join(pio_sm_config *c, enum pio_fifo_join join) {
-    valid_params_if(PIO, join >= 0 && join <= 2);
+    valid_params_if(PIO, join >= PIO_FIFO_JOIN_NONE && join <= PIO_FIFO_JOIN_RX);
     c->shiftctrl = (c->shiftctrl & (uint)~(PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS)) |
                    (((uint)join) << PIO_SM0_SHIFTCTRL_FJOIN_TX_LSB);
 }
@@ -334,10 +337,11 @@ static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool
  *  \ingroup sm_config
  *
  * \param c Pointer to the configuration structure to modify
- * \param status_sel the status operation selector 
+ * \param status_sel the status operation selector. \see enum pio_mov_status_type
  * \param status_n parameter for the mov status operation (currently a bit count)
  */
 static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_status_type status_sel, uint status_n) {
+    valid_params_if(PIO, join >= STATUS_TX_LESSTHAN && join <= STATUS_RX_LESSTHAN);
     c->execctrl = (c->execctrl
                    & ~(PIO_SM0_EXECCTRL_STATUS_SEL_BITS | PIO_SM0_EXECCTRL_STATUS_N_BITS))
                   | ((((uint)status_sel) << PIO_SM0_EXECCTRL_STATUS_SEL_LSB) & PIO_SM0_EXECCTRL_STATUS_SEL_BITS)
