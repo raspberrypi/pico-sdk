@@ -108,6 +108,10 @@ static inline void check_sm_param(__unused uint sm) {
     valid_params_if(PIO, sm < NUM_PIO_STATE_MACHINES);
 }
 
+static inline void check_pio_param(__unused PIO pio) {
+    valid_params_if(PIO, pio == pio0 || pio == pio1);
+}
+
 /*! \brief Set the 'out' pins in a state machine configuration
  *  \ingroup sm_config
  *
@@ -118,8 +122,8 @@ static inline void check_sm_param(__unused uint sm) {
  * \param out_count 0-32 Number of pins to set.
  */
 static inline void sm_config_set_out_pins(pio_sm_config *c, uint out_base, uint out_count) {
-    assert(out_base < 32);
-    assert(out_count <= 32);
+    valid_params_if(PIO, out_base < 32);
+    valid_params_if(PIO, out_count <= 32);
     c->pinctrl = (c->pinctrl & ~(PIO_SM0_PINCTRL_OUT_BASE_BITS | PIO_SM0_PINCTRL_OUT_COUNT_BITS)) |
                  (out_base << PIO_SM0_PINCTRL_OUT_BASE_LSB) |
                  (out_count << PIO_SM0_PINCTRL_OUT_COUNT_LSB);
@@ -135,8 +139,8 @@ static inline void sm_config_set_out_pins(pio_sm_config *c, uint out_base, uint 
  * \param set_count 0-5 Number of pins to set.
  */
 static inline void sm_config_set_set_pins(pio_sm_config *c, uint set_base, uint set_count) {
-    assert(set_base < 32);
-    assert(set_count <= 5);
+    valid_params_if(PIO, set_base < 32);
+    valid_params_if(PIO, set_count <= 5);
     c->pinctrl = (c->pinctrl & ~(PIO_SM0_PINCTRL_SET_BASE_BITS | PIO_SM0_PINCTRL_SET_COUNT_BITS)) |
                  (set_base << PIO_SM0_PINCTRL_SET_BASE_LSB) |
                  (set_count << PIO_SM0_PINCTRL_SET_COUNT_LSB);
@@ -151,7 +155,7 @@ static inline void sm_config_set_set_pins(pio_sm_config *c, uint set_base, uint 
  * \param in_base 0-31 First pin to use as input
  */
 static inline void sm_config_set_in_pins(pio_sm_config *c, uint in_base) {
-    assert(in_base < 32);
+    valid_params_if(PIO, in_base < 32);
     c->pinctrl = (c->pinctrl & ~PIO_SM0_PINCTRL_IN_BASE_BITS) |
                  (in_base << PIO_SM0_PINCTRL_IN_BASE_LSB);
 }
@@ -165,7 +169,7 @@ static inline void sm_config_set_in_pins(pio_sm_config *c, uint in_base) {
  * \param sideset_base 0-31 base pin for 'side set'
  */
 static inline void sm_config_set_sideset_pins(pio_sm_config *c, uint sideset_base) {
-    assert(sideset_base < 32);
+    valid_params_if(PIO, sideset_base < 32);
     c->pinctrl = (c->pinctrl & ~PIO_SM0_PINCTRL_SIDESET_BASE_BITS) |
                  (sideset_base << PIO_SM0_PINCTRL_SIDESET_BASE_LSB);
 }
@@ -179,8 +183,8 @@ static inline void sm_config_set_sideset_pins(pio_sm_config *c, uint sideset_bas
  * \param pindirs True if the side set affects pin directions rather than values
  */
 static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool optional, bool pindirs) {
-    assert(bit_count <= 5);
-    assert(!optional || bit_count >= 1);
+    valid_params_if(PIO, bit_count <= 5);
+    valid_params_if(PIO, !optional || bit_count >= 1);
     c->pinctrl = (c->pinctrl & ~PIO_SM0_PINCTRL_SIDESET_COUNT_BITS) |
                  (bit_count << PIO_SM0_PINCTRL_SIDESET_COUNT_LSB);
 
@@ -240,8 +244,8 @@ static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_
  *                    if the instruction does not itself update the program_counter
  */
 static inline void sm_config_set_wrap(pio_sm_config *c, uint wrap_target, uint wrap) {
-    assert(wrap < PIO_INSTRUCTION_COUNT);
-    assert(wrap_target < PIO_INSTRUCTION_COUNT);
+    valid_params_if(PIO, wrap < PIO_INSTRUCTION_COUNT);
+    valid_params_if(PIO, wrap_target < PIO_INSTRUCTION_COUNT);
     c->execctrl = (c->execctrl & ~(PIO_SM0_EXECCTRL_WRAP_TOP_BITS | PIO_SM0_EXECCTRL_WRAP_BOTTOM_BITS)) |
                   (wrap_target << PIO_SM0_EXECCTRL_WRAP_BOTTOM_LSB) |
                   (wrap << PIO_SM0_EXECCTRL_WRAP_TOP_LSB);
@@ -254,7 +258,7 @@ static inline void sm_config_set_wrap(pio_sm_config *c, uint wrap_target, uint w
  * \param pin The raw GPIO pin number to use as the source for a `jmp pin` instruction 
  */
 static inline void sm_config_set_jmp_pin(pio_sm_config *c, uint pin) {
-    assert(pin < 32);
+    valid_params_if(PIO, pin < 32);
     c->execctrl = (c->execctrl & ~PIO_SM0_EXECCTRL_JMP_PIN_BITS) |
                   (pin << PIO_SM0_EXECCTRL_JMP_PIN_LSB);
 }
@@ -304,7 +308,7 @@ static inline void sm_config_set_out_shift(pio_sm_config *c, bool shift_right, b
  * \param join Specifies the join type. \see enum pio_fifo_join
  */
 static inline void sm_config_set_fifo_join(pio_sm_config *c, enum pio_fifo_join join) {
-    assert(join >= 0 && join <= 2);
+    valid_params_if(PIO, join >= 0 && join <= 2);
     c->shiftctrl = (c->shiftctrl & (uint)~(PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS)) |
                    (((uint)join) << PIO_SM0_SHIFTCTRL_FJOIN_TX_LSB);
 }
@@ -377,6 +381,7 @@ static inline pio_sm_config pio_get_default_sm_config(void) {
  * \param config the configuration to apply
 */
 static inline void pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *config) {
+    check_pio_param(pio);
     check_sm_param(sm);
     pio->sm[sm].clkdiv = config->clkdiv;
     pio->sm[sm].execctrl = config->execctrl;
@@ -391,7 +396,7 @@ static inline void pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *conf
  * \return the PIO instance number (either 0 or 1)
  */
 static inline uint pio_get_index(PIO pio) {
-    assert(pio == pio0 || pio == pio1);
+    check_pio_param(pio);
     return pio == pio1 ? 1 : 0;
 }
 
@@ -408,7 +413,8 @@ static inline uint pio_get_index(PIO pio) {
  * \param pin the GPIO pin whose function select to set
  */
 static inline void pio_gpio_init(PIO pio, uint pin) {
-    assert(pio == pio0 || pio == pio1);
+    check_pio_param(pio);
+    valid_params_if(PIO, pin < 32);
     gpio_set_function(pin, pio == pio0 ? GPIO_FUNC_PIO0 : GPIO_FUNC_PIO1);
 }
 
@@ -420,7 +426,7 @@ static inline void pio_gpio_init(PIO pio, uint pin) {
  * \param is_tx true for sending data to the state machine, false for received data from the state machine
  */
 static inline uint pio_get_dreq(PIO pio, uint sm, bool is_tx) {
-    assert(pio == pio0 || pio == pio1);
+    check_pio_param(pio);
     check_sm_param(sm);
     return sm + (is_tx ? 0 : NUM_PIO_STATE_MACHINES) + (pio == pio0 ? DREQ_PIO0_TX0 : DREQ_PIO1_TX0);
 }
@@ -515,6 +521,8 @@ void pio_sm_init(PIO pio, uint sm, uint initial_pc, const pio_sm_config *config)
  * \param enabled true to enable the state machine; false to disable
  */
 static inline void pio_sm_set_enabled(PIO pio, uint sm, bool enabled) {
+    check_pio_param(pio);
+    check_sm_param(sm);
     pio->ctrl = (pio->ctrl & ~(1u << sm)) | (bool_to_bit(enabled) << sm);
 }
 
@@ -532,6 +540,7 @@ static inline void pio_sm_set_enabled(PIO pio, uint sm, bool enabled) {
  * \param enabled true to enable the state machines; false to disable
  */
 static inline void pio_set_sm_mask_enabled(PIO pio, uint32_t mask, bool enabled) {
+    check_pio_param(pio);
     pio->ctrl = (pio->ctrl & ~mask) | (enabled ? mask : 0u);
 }
 
@@ -545,6 +554,8 @@ static inline void pio_set_sm_mask_enabled(PIO pio, uint32_t mask, bool enabled)
  * \param sm State machine index (0..3)
  */
 static inline void pio_sm_restart(PIO pio, uint sm) {
+    check_pio_param(pio);
+    check_sm_param(sm);
     pio->ctrl |= 1u << (PIO_CTRL_SM_RESTART_LSB + sm);
 }
 
@@ -558,6 +569,7 @@ static inline void pio_sm_restart(PIO pio, uint sm) {
  * \param mask bit mask of state machine indexes to modify the enabled state of
  */
 static inline void pio_restart_sm_mask(PIO pio, uint32_t mask) {
+    check_pio_param(pio);
     pio->ctrl |= (mask << PIO_CTRL_SM_RESTART_LSB) & PIO_CTRL_SM_RESTART_BITS;
 }
 
@@ -583,6 +595,8 @@ static inline void pio_restart_sm_mask(PIO pio, uint32_t mask) {
  * \param sm State machine index (0..3)
  */
 static inline void pio_sm_clkdiv_restart(PIO pio, uint sm) {
+    check_pio_param(pio);
+    check_sm_param(sm);
     pio->ctrl |= 1u << (PIO_CTRL_CLKDIV_RESTART_LSB + sm);
 }
 
@@ -616,6 +630,7 @@ static inline void pio_sm_clkdiv_restart(PIO pio, uint sm) {
  * \param mask bit mask of state machine indexes to modify the enabled state of
  */
 static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
+    check_pio_param(pio);
     pio->ctrl |= (mask << PIO_CTRL_CLKDIV_RESTART_LSB) & PIO_CTRL_CLKDIV_RESTART_BITS;
 }
 
@@ -631,6 +646,7 @@ static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
  * \param mask bit mask of state machine indexes to modify the enabled state of
  */
 static inline void pio_enable_sm_mask_in_sync(PIO pio, uint32_t mask) {
+    check_pio_param(pio);
     pio->ctrl |= ((mask << PIO_CTRL_CLKDIV_RESTART_LSB) & PIO_CTRL_CLKDIV_RESTART_BITS) |
                  ((mask << PIO_CTRL_SM_ENABLE_LSB) & PIO_CTRL_SM_ENABLE_BITS);
 }
@@ -643,6 +659,7 @@ static inline void pio_enable_sm_mask_in_sync(PIO pio, uint32_t mask) {
  * \return the program counter
  */
 static inline uint8_t pio_sm_get_pc(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     return (uint8_t) pio->sm[sm].addr;
 }
@@ -660,6 +677,7 @@ static inline uint8_t pio_sm_get_pc(PIO pio, uint sm) {
  * \param instr the encoded PIO instruction
  */
 inline static void pio_sm_exec(PIO pio, uint sm, uint instr) {
+    check_pio_param(pio);
     check_sm_param(sm);
     pio->sm[sm].instr = instr;
 }
@@ -672,6 +690,7 @@ inline static void pio_sm_exec(PIO pio, uint sm, uint instr) {
  * \return true if the executed instruction is still running (stalled)
  */
 static inline bool pio_sm_is_exec_stalled(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     return !!(pio->sm[sm].execctrl & PIO_SM0_EXECCTRL_EXEC_STALLED_BITS);
 }
@@ -689,6 +708,8 @@ static inline bool pio_sm_is_exec_stalled(PIO pio, uint sm) {
  * \param instr the encoded PIO instruction
  */
 static inline void pio_sm_exec_wait_blocking(PIO pio, uint sm, uint instr) {
+    check_pio_param(pio);
+    check_sm_param(sm);
     pio_sm_exec(pio, sm, instr);
     while (pio_sm_is_exec_stalled(pio, sm)) tight_loop_contents();
 }
@@ -703,7 +724,10 @@ static inline void pio_sm_exec_wait_blocking(PIO pio, uint sm, uint instr) {
  *                    if the instruction does not itself update the program_counter
  */
 static inline void pio_sm_set_wrap(PIO pio, uint sm, uint wrap_target, uint wrap) {
+    check_pio_param(pio);
     check_sm_param(sm);
+    valid_params_if(PIO, wrap < PIO_INSTRUCTION_COUNT);
+    valid_params_if(PIO, wrap_target < PIO_INSTRUCTION_COUNT);
     pio->sm[sm].execctrl =
             (pio->sm[sm].execctrl & ~(PIO_SM0_EXECCTRL_WRAP_TOP_BITS | PIO_SM0_EXECCTRL_WRAP_BOTTOM_BITS)) |
             (wrap_target << PIO_SM0_EXECCTRL_WRAP_BOTTOM_LSB) |
@@ -721,9 +745,10 @@ static inline void pio_sm_set_wrap(PIO pio, uint sm, uint wrap_target, uint wrap
  * \param out_count 0-32 Number of pins to set.
  */
 static inline void pio_sm_set_out_pins(PIO pio, uint sm, uint out_base, uint out_count) {
+    check_pio_param(pio);
     check_sm_param(sm);
-    assert(out_base < 32);
-    assert(out_count <= 32);
+    valid_params_if(PIO, out_base < 32);
+    valid_params_if(PIO, out_count <= 32);
     pio->sm[sm].pinctrl = (pio->sm[sm].pinctrl & ~(PIO_SM0_PINCTRL_OUT_BASE_BITS | PIO_SM0_PINCTRL_OUT_COUNT_BITS)) |
                  (out_base << PIO_SM0_PINCTRL_OUT_BASE_LSB) |
                  (out_count << PIO_SM0_PINCTRL_OUT_COUNT_LSB);
@@ -741,9 +766,10 @@ static inline void pio_sm_set_out_pins(PIO pio, uint sm, uint out_base, uint out
  * \param set_count 0-5 Number of pins to set.
  */
 static inline void pio_sm_set_set_pins(PIO pio, uint sm, uint set_base, uint set_count) {
+    check_pio_param(pio);
     check_sm_param(sm);
-    assert(set_base < 32);
-    assert(set_count <= 5);
+    valid_params_if(PIO, set_base < 32);
+    valid_params_if(PIO, set_count <= 5);
     pio->sm[sm].pinctrl = (pio->sm[sm].pinctrl & ~(PIO_SM0_PINCTRL_SET_BASE_BITS | PIO_SM0_PINCTRL_SET_COUNT_BITS)) |
                  (set_base << PIO_SM0_PINCTRL_SET_BASE_LSB) |
                  (set_count << PIO_SM0_PINCTRL_SET_COUNT_LSB);
@@ -759,8 +785,9 @@ static inline void pio_sm_set_set_pins(PIO pio, uint sm, uint set_base, uint set
  * \param in_base 0-31 First pin to use as input
  */
 static inline void pio_sm_set_in_pins(PIO pio, uint sm, uint in_base) {
+    check_pio_param(pio);
     check_sm_param(sm);
-    assert(in_base < 32);
+    valid_params_if(PIO, in_base < 32);
     pio->sm[sm].pinctrl = (pio->sm[sm].pinctrl & ~PIO_SM0_PINCTRL_IN_BASE_BITS) |
                  (in_base << PIO_SM0_PINCTRL_IN_BASE_LSB);
 }
@@ -775,8 +802,9 @@ static inline void pio_sm_set_in_pins(PIO pio, uint sm, uint in_base) {
  * \param sideset_base 0-31 base pin for 'side set'
  */
 static inline void pio_sm_set_sideset_pins(PIO pio, uint sm, uint sideset_base) {
+    check_pio_param(pio);
     check_sm_param(sm);
-    assert(sideset_base < 32);
+    valid_params_if(PIO, sideset_base < 32);
     pio->sm[sm].pinctrl = (pio->sm[sm].pinctrl & ~PIO_SM0_PINCTRL_SIDESET_BASE_BITS) |
                  (sideset_base << PIO_SM0_PINCTRL_SIDESET_BASE_LSB);
 }
@@ -796,6 +824,7 @@ static inline void pio_sm_set_sideset_pins(PIO pio, uint sm, uint sideset_base) 
  * \sa pio_sm_put_blocking
  */
 static inline void pio_sm_put(PIO pio, uint sm, uint32_t data) {
+    check_pio_param(pio);
     check_sm_param(sm);
     pio->txf[sm] = data;
 }
@@ -816,6 +845,7 @@ static inline void pio_sm_put(PIO pio, uint sm, uint32_t data) {
  * \sa pio_sm_get_blocking
  */
 static inline uint32_t pio_sm_get(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     return pio->rxf[sm];
 }
@@ -828,6 +858,7 @@ static inline uint32_t pio_sm_get(PIO pio, uint sm) {
  * \return true if the RX FIFO is full
  */
 static inline bool pio_sm_is_rx_fifo_full(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     return (pio->fstat & (1u << (PIO_FSTAT_RXFULL_LSB + sm))) != 0;
 }
@@ -840,6 +871,7 @@ static inline bool pio_sm_is_rx_fifo_full(PIO pio, uint sm) {
  * \return true if the RX FIFO is empty
  */
 static inline bool pio_sm_is_rx_fifo_empty(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     return (pio->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + sm))) != 0;
 }
@@ -852,6 +884,7 @@ static inline bool pio_sm_is_rx_fifo_empty(PIO pio, uint sm) {
  * \return the number of elements in the RX FIFO
  */
 static inline uint pio_sm_get_rx_fifo_level(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     uint bitoffs = PIO_FLEVEL_RX0_LSB + sm * (PIO_FLEVEL_RX1_LSB - PIO_FLEVEL_RX0_LSB);
     const uint32_t mask = PIO_FLEVEL_RX0_BITS >> PIO_FLEVEL_RX0_LSB;
@@ -866,6 +899,7 @@ static inline uint pio_sm_get_rx_fifo_level(PIO pio, uint sm) {
  * \return true if the TX FIFO is full
  */
 static inline bool pio_sm_is_tx_fifo_full(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     return (pio->fstat & (1u << (PIO_FSTAT_TXFULL_LSB + sm))) != 0;
 }
@@ -878,6 +912,7 @@ static inline bool pio_sm_is_tx_fifo_full(PIO pio, uint sm) {
  * \return true if the TX FIFO is empty
  */
 static inline bool pio_sm_is_tx_fifo_empty(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     return (pio->fstat & (1u << (PIO_FSTAT_TXEMPTY_LSB + sm))) != 0;
 }
@@ -890,6 +925,7 @@ static inline bool pio_sm_is_tx_fifo_empty(PIO pio, uint sm) {
  * \return the number of elements in the TX FIFO
  */
 static inline uint pio_sm_get_tx_fifo_level(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     unsigned int bitoffs = PIO_FLEVEL_TX0_LSB + sm * (PIO_FLEVEL_TX1_LSB - PIO_FLEVEL_TX0_LSB);
     const uint32_t mask = PIO_FLEVEL_TX0_BITS >> PIO_FLEVEL_TX0_LSB;
@@ -904,6 +940,7 @@ static inline uint pio_sm_get_tx_fifo_level(PIO pio, uint sm) {
  * \param data the 32 bit data value
  */
 static inline void pio_sm_put_blocking(PIO pio, uint sm, uint32_t data) {
+    check_pio_param(pio);
     check_sm_param(sm);
     while (pio_sm_is_tx_fifo_full(pio, sm)) tight_loop_contents();
     pio_sm_put(pio, sm, data);
@@ -916,6 +953,7 @@ static inline void pio_sm_put_blocking(PIO pio, uint sm, uint32_t data) {
  * \param sm State machine index (0..3)
  */
 static inline uint32_t pio_sm_get_blocking(PIO pio, uint sm) {
+    check_pio_param(pio);
     check_sm_param(sm);
     while (pio_sm_is_rx_fifo_empty(pio, sm)) tight_loop_contents();
     return pio_sm_get(pio, sm);
@@ -944,6 +982,7 @@ void pio_sm_drain_tx_fifo(PIO pio, uint sm);
  * \param div the floating point clock divider
  */
 static inline void pio_sm_set_clkdiv(PIO pio, uint sm, float div) {
+    check_pio_param(pio);
     check_sm_param(sm);
     uint div_int = (uint16_t) div;
     uint div_frac = (uint8_t) ((div - (float)div_int) * (1u << 8u));
@@ -961,6 +1000,7 @@ static inline void pio_sm_set_clkdiv(PIO pio, uint sm, float div) {
  * \param div_frac the fractional part of the clock divider in 1/256s
  */
 static inline void pio_sm_set_clkdiv_int_frac(PIO pio, uint sm, uint16_t div_int, uint8_t div_frac) {
+    check_pio_param(pio);
     check_sm_param(sm);
     pio->sm[sm].clkdiv =
             (((uint)div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
@@ -975,6 +1015,7 @@ static inline void pio_sm_set_clkdiv_int_frac(PIO pio, uint sm, uint16_t div_int
  */
 static inline void pio_sm_clear_fifos(PIO pio, uint sm) {
     // changing the FIFO join state clears the fifo
+    check_pio_param(pio);
     check_sm_param(sm);
     hw_xor_bits(&pio->sm[sm].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS);
     hw_xor_bits(&pio->sm[sm].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS);

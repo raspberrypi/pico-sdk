@@ -79,8 +79,8 @@ bool pio_can_add_program(PIO pio, const pio_program_t *program) {
 }
 
 static bool _pio_can_add_program_at_offset(PIO pio, const pio_program_t *program, uint offset) {
-    assert(offset < PIO_INSTRUCTION_COUNT);
-    assert(offset + program->length <= PIO_INSTRUCTION_COUNT);
+    valid_params_if(PIO, offset < PIO_INSTRUCTION_COUNT);
+    valid_params_if(PIO, offset + program->length <= PIO_INSTRUCTION_COUNT);
     if (program->origin >= 0 && (uint)program->origin != offset) return false;
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     uint32_t program_mask = (1u << program->length) - 1;
@@ -147,6 +147,8 @@ void pio_clear_instruction_memory(PIO pio) {
 // which is not currently running a program. This is intended for one-time
 // setup of initial pin states.
 void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
+    check_pio_param(pio);
+    check_sm_param(sm);
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint remaining = 32;
     uint base = 0;
@@ -164,6 +166,8 @@ void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
 }
 
 void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pinvals, uint32_t pin_mask) {
+    check_pio_param(pio);
+    check_sm_param(sm);
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     while (pin_mask) {
         uint base = (uint)__builtin_ctz(pin_mask);
@@ -177,6 +181,8 @@ void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pinvals, uint32_t pin_
 }
 
 void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t pin_mask) {
+    check_pio_param(pio);
+    check_sm_param(sm);
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     while (pin_mask) {
         uint base = (uint)__builtin_ctz(pin_mask);
@@ -190,7 +196,9 @@ void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t p
 }
 
 void pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pin, uint count, bool is_out) {
-    assert(pin < 32u);
+    check_pio_param(pio);
+    check_sm_param(sm);
+    valid_params_if(PIO, pin < 32u);
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint pindir_val = is_out ? 0x1f : 0;
     while (count > 5) {
@@ -205,6 +213,7 @@ void pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pin, uint count, bool
 }
 
 void pio_sm_init(PIO pio, uint sm, uint initial_pc, const pio_sm_config *config) {
+    valid_params_if(PIO, initial_pc < PIO_INSTRUCTION_COUNT);
     // Halt the machine, set some sensible defaults
     pio_sm_set_enabled(pio, sm, false);
 
