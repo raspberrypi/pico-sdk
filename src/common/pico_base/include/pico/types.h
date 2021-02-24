@@ -7,13 +7,14 @@
 #ifndef _PICO_TYPES_H
 #define _PICO_TYPES_H
 
+#include "pico/assert.h"
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 
 typedef unsigned int uint;
 
-#ifdef NDEBUG
 /*! \typedef absolute_time_t
     \brief An opaque 64 bit timestamp in microseconds
 
@@ -23,32 +24,13 @@ typedef unsigned int uint;
     \see to_us_since_boot
     \see update_us_since_boot
 */
+#ifndef NDEBUG
 typedef uint64_t absolute_time_t;
-
-/*! fn to_us_since_boot
- * \brief convert an absolute_time_t into a number of microseconds since boot.
- * \param t the absolute time to convert
- * \return a number of microseconds since boot, equivalent to t
- */
-static inline uint64_t to_us_since_boot(absolute_time_t t) {
-    return t;
-}
-
-/*! fn update_us_since_boot
- * \brief update an absolute_time_t value to represent a given number of microseconds since boot
- * \param t the absolute time value to update
- * \param us_since_boot the number of microseconds since boot to represent. Note this should be representable
- *                      as a signed 64 bit integer
- */
-static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
-    *t = us_since_boot;
-}
-
-#define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = value
 #else
 typedef struct {
     uint64_t _private_us_since_boot;
 } absolute_time_t;
+#endif
 
 /*! fn to_us_since_boot
  * \brief convert an absolute_time_t into a number of microseconds since boot.
@@ -56,7 +38,11 @@ typedef struct {
  * \return a number of microseconds since boot, equivalent to t
  */
 static inline uint64_t to_us_since_boot(absolute_time_t t) {
+#ifndef NDEBUG
+    return t;
+#else
     return t._private_us_since_boot;
+#endif
 }
 
 /*! fn update_us_since_boot
@@ -66,9 +52,17 @@ static inline uint64_t to_us_since_boot(absolute_time_t t) {
  *                      as a signed 64 bit integer
  */
 static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
+#ifndef NDEBUG
+    *t = us_since_boot;
+#else
     assert(us_since_boot <= INT64_MAX);
     t->_private_us_since_boot = us_since_boot;
+#endif
 }
+
+#ifndef NDEBUG
+#define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = value
+#else
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = {value}
 #endif
 

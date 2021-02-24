@@ -17,7 +17,6 @@
 #include "pico/version.h"
 #include "pico/config.h"
 #include "pico/platform.h"
-#include "pico/assert.h"
 #include "pico/error.h"
 
 #endif
