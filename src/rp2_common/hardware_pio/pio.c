@@ -24,7 +24,7 @@ void pio_sm_claim(PIO pio, uint sm) {
     check_sm_param(sm);
     uint which = pio_get_index(pio);
     if (which) {
-        hw_claim_or_assert(&claimed, NUM_PIO_STATE_MACHINES + sm, "PIO 1 SM %d already claimed");
+        hw_claim_or_assert(&claimed, NUM_PIO_STATE_MACHINES + sm, "PIO 1 SM (%d - 4) already claimed");
     } else {
         hw_claim_or_assert(&claimed, sm, "PIO 0 SM %d already claimed");
     }
