@@ -7,7 +7,7 @@
 #ifndef _PICO_ASSERT_H
 #define _PICO_ASSERT_H
 
-#include "pico/types.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 
