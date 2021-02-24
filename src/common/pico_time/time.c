@@ -325,9 +325,9 @@ static int64_t sev_callback(__unused alarm_id_t id, __unused void *user_data) {
 #endif
 
 void sleep_until(absolute_time_t t) {
-#if PICO_ON_DEVICE && !PICO_ALLOW_SLEEP_IN_EXCEPTION && !defined(NDEBUG)
+#if PICO_ON_DEVICE && !defined(NDEBUG)
     if (__get_current_exception()) {
-        panic("Attempted to sleep inside of an exception handler");
+        panic("Attempted to sleep inside of an exception handler; use busy_wait if you must");
     }
 #endif
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
