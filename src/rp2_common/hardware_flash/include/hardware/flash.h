@@ -44,11 +44,10 @@
 
 #define FLASH_UNIQUE_ID_SIZE_BYTES 8
 
-// PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes or -1 for unknown, type=int, default=-1, group=hardware_flash
+// PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, default=-1, group=hardware_flash
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES -1
+#warning PICO_FLASH_SIZE_BYTES is not set
 #endif
-
 
 #ifdef __cplusplus
 extern "C" {
