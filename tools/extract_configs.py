@@ -29,7 +29,7 @@ scandir = sys.argv[1]
 outfile = sys.argv[2] if len(sys.argv) > 2 else 'pico_configs.tsv'
 
 CONFIG_RE = re.compile(r'//\s+PICO_CONFIG:\s+(\w+),\s+([^,]+)(?:,\s+(.*))?$')
-DEFINE_RE = re.compile(r'#define\s+(\w+)\s+(\w+)$')
+DEFINE_RE = re.compile(r'#define\s+(\w+)\s+(.+?)(\s*///.*)?$')
 
 all_configs = {}
 all_attrs = set()
@@ -186,11 +186,17 @@ for config_name in all_configs:
 
     ValidateAttrs(all_configs[config_name]['attrs'])
 
-    if 'default' in all_configs[config_name]['attrs'] and config_name in all_defines:
-        if all_configs[config_name]['attrs']['default'] not in all_defines[config_name] and (all_configs[config_name]['attrs'].get('type', 'int') != 'bool'):
-            if config_name in ['USB_DPRAM_MAX'] or '/' in all_configs[config_name]['attrs']['default']:
-                continue
-            raise Exception('Found {} at {}:{} with a default of {}, but #define says {}'.format(config_name, all_configs[config_name]['filename'], all_configs[config_name]['line_number'], all_configs[config_name]['attrs']['default'], all_defines[config_name]))
+    # Check that default values match up
+    if 'default' in all_configs[config_name]['attrs']:
+        if config_name in all_defines:
+            if all_configs[config_name]['attrs']['default'] not in all_defines[config_name] and (all_configs[config_name]['attrs'].get('type', 'int') != 'bool'):
+                if config_name in ['USB_DPRAM_MAX'] or '/' in all_configs[config_name]['attrs']['default']:
+                    continue
+                # There _may_ be multiple matching defines, but arbitrarily display just one in the error message
+                first_define_value = list(all_defines[config_name].keys())[0]
+                raise Exception('Found {} at {}:{} with a default of {}, but #define says {} (at {}:{})'.format(config_name, os.path.join(scandir, all_configs[config_name]['filename']), all_configs[config_name]['line_number'], all_configs[config_name]['attrs']['default'], first_define_value, all_defines[config_name][first_define_value][0], all_defines[config_name][first_define_value][1]))
+        else:
+            raise Exception('Found {} at {}:{} with a default of {}, but no matching #define found'.format(config_name, os.path.join(scandir, all_configs[config_name]['filename']), all_configs[config_name]['line_number'], all_configs[config_name]['attrs']['default']))
 
 with open(outfile, 'w', newline='') as csvfile:
     fieldnames = ('name', 'location', 'description', 'type') + tuple(sorted(all_attrs - set(['type'])))
