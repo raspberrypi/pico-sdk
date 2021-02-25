@@ -12,6 +12,9 @@
 #ifndef _BOARDS_PIMORONI_TINY2040_H
 #define _BOARDS_PIMORONI_TINY2040_H
 
+// For board detection
+#define PIMORONI_TINY2040
+
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
 #endif
@@ -45,20 +48,20 @@
 #define TINY2040_USER_SW_PIN 23
 #endif
 
-#ifndef TINY2040_ADC0_PIN
-#define TINY2040_ADC0_PIN 26
+#ifndef TINY2040_A0_PIN
+#define TINY2040_A0_PIN 26
 #endif
 
-#ifndef TINY2040_ADC1_PIN
-#define TINY2040_ADC1_PIN 27
+#ifndef TINY2040_A1_PIN
+#define TINY2040_A1_PIN 27
 #endif
 
-#ifndef TINY2040_ADC2_PIN
-#define TINY2040_ADC2_PIN 28
+#ifndef TINY2040_A2_PIN
+#define TINY2040_A2_PIN 28
 #endif
 
-#ifndef TINY2040_ADC3_PIN
-#define TINY2040_ADC3_PIN 29
+#ifndef TINY2040_A3_PIN
+#define TINY2040_A3_PIN 29
 #endif
 
 #ifndef TINY2040_NUM_IO_PINS
@@ -78,13 +81,11 @@
 #endif
 
 #ifndef PICO_FLOAT_SUPPORT_ROM_V1
-#define PICO_FLOAT_SUPPORT_ROM_V1 1
+#define PICO_FLOAT_SUPPORT_ROM_V1 0
 #endif
 
 #ifndef PICO_DOUBLE_SUPPORT_ROM_V1
-#define PICO_DOUBLE_SUPPORT_ROM_V1 1
+#define PICO_DOUBLE_SUPPORT_ROM_V1 0
 #endif
-
-#define PIMORONI_TINY2040
 
 #endif
