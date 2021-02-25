@@ -29,7 +29,7 @@ extern "C" {
  * functionality may break or not function optimally
  */
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_SYNC, Enable/disable SYNC assertions, type=bool, default=0, group=hardware_SYNC
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_SYNC, Enable/disable assertions in the HW sync module, type=bool, default=0, group=hardware_sync
 #ifndef PARAM_ASSERTIONS_ENABLED_SYNC
 #define PARAM_ASSERTIONS_ENABLED_SYNC 0
 #endif
@@ -72,11 +72,6 @@ typedef volatile uint32_t spin_lock_t;
 // PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_END, Spinlock ID for claim free end, min=16, max=31, default=31, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_CLAIM_FREE_END
 #define PICO_SPINLOCK_ID_CLAIM_FREE_END 31
-#endif
-
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_SYNC, Enable/disable assertions in the HW sync module, type=bool, default=0, group=hardware_sync
-#ifndef PARAM_ASSERTIONS_ENABLED_SYNC
-#define PARAM_ASSERTIONS_ENABLED_SYNC 0
 #endif
 
 
