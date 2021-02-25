@@ -9,8 +9,6 @@
 
 // This header is included from C and assembler - only define macros
 
-#include "hardware/regs/addressmap.h"
-
 #define NUM_CORES 2u
 #define NUM_DMA_CHANNELS 12u
 #define NUM_IRQS 32u
@@ -40,11 +38,11 @@
 #define PICO_NO_RAM_VECTOR_TABLE 0
 #endif
 
-#ifndef _U
+#ifndef _u
 #ifdef __ASSEMBLER__
-#define _U(x) x
+#define _u(x) x
 #else
-#define _U(x) x ## u
+#define _u(x) x ## u
 #endif
 #endif
 

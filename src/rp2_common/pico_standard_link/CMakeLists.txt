@@ -83,7 +83,7 @@ if (NOT TARGET pico_standard_link)
     #target_link_options(pico_standard_link INTERFACE "LINKER:--build-id=none")
 
     # this line occasionally useful for debugging ... todo maybe make a PICO_ var
-#    target_compile_options(pico_standard_link INTERFACE --save-temps) #debugging only
+    # target_compile_options(pico_standard_link INTERFACE --save-temps) #debugging only
 
     # PICO_CMAKE_CONFIG: PICO_NO_GC_SECTIONS, Disable -ffunction-sections -fdata-sections, and --gc-sections, type=bool, default=0, advanced=true, group=pico_standard_link
     if (NOT PICO_NO_GC_SECTIONS)
