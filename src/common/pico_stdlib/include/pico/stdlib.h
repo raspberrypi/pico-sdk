@@ -56,6 +56,10 @@ extern "C" {
 #include "pico/stdio_semihosting.h"
 #endif
 
+// PICO_CONFIG: PICO_DEFAULT_LED_PIN, Optionally defined a pin that drives a regular LED on the board, default=undefined, group=pico_stdlib
+// PICO_CONFIG: PICO_DEFAULT_WS2812_PIN, Optionally defined a pin that controls data to a WS2812 compatible LED on the board, default=undefined, group=pico_stdlib
+// PICO_CONFIG: PICO_DEFAULT_WS2812_POWER_PIN, Optionally defined a pin that controls power to a WS2812 compatible LED on the board, default=undefined, group=pico_stdlib
+
 /*! \brief Set up the default UART and assign it to the default GPIO's
  *  \ingroup pico_stdlib
  *
