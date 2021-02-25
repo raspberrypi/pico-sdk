@@ -1,5 +1,4 @@
 /*
- *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -11,38 +10,55 @@
 //------------------------------------------------------------------------------------------
 // Board definition for the SparkFun rp2040 MicroMod processor board
 //
-// This header may be included by other board headers as "boards/sparkfun_promicro.h"
+// This header may be included by other board headers as "boards/sparkfun_micromod.h"
 
 #ifndef _BOARDS_SPARKFUN_MICROMOD_H
 #define _BOARDS_SPARKFUN_MICROMOD_H
 
+#ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
+#define
 
+#ifndef PICO_DEFAULT_UART_TX_PIN
 #define PICO_DEFAULT_UART_TX_PIN 0
+#endif
 
+#ifndef PICO_DEFAULT_UART_RX_PIN
 #define PICO_DEFAULT_UART_RX_PIN 1
+#endif
 
+#ifndef PICO_DEFAULT_LED_PIN
 #define PICO_DEFAULT_LED_PIN 25
-
+#endif
 
 // Default I2C - for qwiic connector
-#define PICO_DEFAULT_I2C_SDA   4
-#define PICO_DEFAULT_I2C_SCL   5
-#define PICO_DEFAULT_I2C_PORT  i2c0
+#ifndef PICO_DEFAULT_I2C
+#define PICO_DEFAULT_I2C       0
+#endif
+
+#ifndef PICO_DEFAULT_I2C_SDA_PIN
+#define PICO_DEFAULT_I2C_SDA_PIN   4
+#endif
+
+#ifndef PICO_DEFAULT_I2C_SCL_PIN
+#define PICO_DEFAULT_I2C_SCL_PIN   5
+#endif
 
 // spi flash
+#ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
+#endif
 
+#ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
+#endif
 
-//////////////////////////
-// brining over from pico.h  - need to verify...
-
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-#define PICO_SMPS_MODE_PIN 23
-
-#define PICO_FLOAT_SUPPORT_ROM_V1 1
-
-#define PICO_DOUBLE_SUPPORT_ROM_V1 1
+// All boards are B1
+#ifndef PICO_FLOAT_SUPPORT_ROM_V1
+#define PICO_FLOAT_SUPPORT_ROM_V1 0
+#endif
+#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
+#define PICO_DOUBLE_SUPPORT_ROM_V1 0
+#endif
 
 #endif

@@ -18,11 +18,12 @@ static uart_inst_t *uart_instance;
 #endif
 
 void stdio_uart_init() {
+#ifdef uart_default
     int tx_pin = -1;
     int rx_pin = -1;
-#if defined(PICO_DEFAULT_UART_TX_PIN) && PICO_DEFAULT_UART_TX_PIN != -1
+#ifdef PICO_DEFAULT_UART_TX_PIN
     tx_pin = PICO_DEFAULT_UART_TX_PIN;
-#if defined(PICO_DEFAULT_UART_RX_PIN) && PICO_DEFAULT_UART_RX_PIN != -1
+#ifdef PICO_DEFAULT_UART_RX_PIN
     rx_pin = PICO_DEFAULT_UART_RX_PIN;
     stdio_bi_decl_if_func_used(bi_program_feature("UART stdin / stdout"));
     bi_decl_if_func_used(bi_2pins_with_func(PICO_DEFAULT_UART_RX_PIN, PICO_DEFAULT_UART_TX_PIN, GPIO_FUNC_UART));
@@ -30,20 +31,21 @@ void stdio_uart_init() {
     stdio_bi_decl_if_func_used(bi_program_feature("UART stdout"));
     bi_decl_if_func_used(bi_1pin_with_func(PICO_DEFAULT_UART_TX_PIN, GPIO_FUNC_UART));
 #endif
-#elif defined(PICO_DEFAULT_UART_RX_PIN) && PICO_DEFAULT_UART_RX_PIN != -1
+#elif defined(PICO_DEFAULT_UART_RX_PIN)
     rx_pin = PICO_DEFAULT_UART_RX_PIN;
     stdio_bi_decl_if_func_used(bi_program_feature("UART stdin"));
     bi_decl_if_func_used(bi_1pin_with_func(PICO_DEFAULT_UART_RX_PIN, GPIO_FUNC_UART));
 #endif
-#if !defined(PICO_DEFAULT_UART_BAUD_RATE) || !defined(uart_default)
+#if !defined(PICO_DEFAULT_UART_BAUD_RATE)
     panic("UART baud rate undefined");
 #else
     stdio_uart_init_full(uart_default, PICO_DEFAULT_UART_BAUD_RATE, tx_pin, rx_pin);
 #endif
+#endif
 }
 
 void stdout_uart_init() {
-#ifdef PICO_DEFAULT_UART_TX_PIN
+#if defined(uart_default) && defined(PICO_DEFAULT_UART_TX_PIN)
     bi_decl_if_func_used(bi_1pin_with_func(PICO_DEFAULT_UART_TX_PIN, GPIO_FUNC_UART));
 #if !defined(PICO_DEFAULT_UART_BAUD_RATE) || !defined(uart_default)
     panic("UART baud rate undefined");
@@ -55,7 +57,7 @@ void stdout_uart_init() {
 }
 
 void stdin_uart_init() {
-#ifdef PICO_DEFAULT_UART_RX_PIN
+#if defined(uart_default) && defined(PICO_DEFAULT_UART_RX_PIN)
     bi_decl_if_func_used(bi_1pin_with_func(PICO_DEFAULT_UART_RX_PIN, GPIO_FUNC_UART));
 #if !defined(PICO_DEFAULT_UART_BAUD_RATE) || !defined(uart_default)
     panic("UART baud rate undefined");
@@ -76,14 +78,14 @@ void stdio_uart_init_full(struct uart_inst *uart, uint baud_rate, int tx_pin, in
 
 static void stdio_uart_out_chars(const char *buf, int length) {
     for (int i = 0; i <length; i++) {
-        uart_putc(uart_default, buf[i]);
+        uart_putc(uart_instance, buf[i]);
     }
 }
 
 int stdio_uart_in_chars(char *buf, int length) {
     int i=0;
-    while (i<length && uart_is_readable(uart_default)) {
-        buf[i++] = uart_getc(uart_default);
+    while (i<length && uart_is_readable(uart_instance)) {
+        buf[i++] = uart_getc(uart_instance);
     }
     return i ? i : PICO_ERROR_NO_DATA;
 }

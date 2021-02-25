@@ -1,5 +1,4 @@
 /*
- *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -16,47 +15,57 @@
 #ifndef _BOARDS_SPARKFUN_THINGPLUS_H
 #define _BOARDS_SPARKFUN_THINGPLUS_H
 
+#ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
-
+#endif
+#ifndef PICO_DEFAULT_UART_TX_PIN
 #define PICO_DEFAULT_UART_TX_PIN 0
-
+#endif
+#ifndef PICO_DEFAULT_UART_RX_PIN
 #define PICO_DEFAULT_UART_RX_PIN 1
+#endif
 
+#ifndef PICO_DEFAULT_LED_PIN
 #define PICO_DEFAULT_LED_PIN 25
-
+#endif
 
 // Default I2C - for qwiic connector
-#define PICO_DEFAULT_I2C_SDA   6
-#define PICO_DEFAULT_I2C_SCL   7
-#define PICO_DEFAULT_I2C_PORT  i2c1
+#ifndef PICO_DEFAULT_I2C
+#define PICO_DEFAULT_I2C       1
+#endif
+#ifndef PICO_DEFAULT_I2C_SDA_PIN
+#define PICO_DEFAULT_I2C_SDA_PIN   6
+#endif
+#ifndef PICO_DEFAULT_I2C_SCL_PIN
+#define PICO_DEFAULT_I2C_SCL_PIN   7
+#endif
 
 // spi flash
+#ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
+#endif
+
+#ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
+#endif
 
 // The thing plus has a SD Card. 
-//
-// Note: The current configuration for the PICO boards with SD support 
-// 	     like the vga board is to define the DATA0 pin, and the SD 
-//       support library counts up (DATA1 = DATA0++, ..etc). The Thing Plus
-//       has the pins in reverse order. So the SD card support in the pico SDK
-//       needs updating. Defining all pins in this file for now. 
-
 #define PICO_SD_CLK_PIN   14
 #define PICO_SD_CMD_PIN   15
-#define PICO_SD_DATA0_PIN 12
-#define PICO_SD_DATA1_PIN 11
-#define PICO_SD_DATA2_PIN 10
-#define PICO_SD_DATA3_PIN 09
+#define PICO_SD_DAT0_PIN  12
+// DAT pins count down
+#define PICO_SD_DAT_PIN_INCREMENT -1
 
-//////////////////////////
-// brining over from pico.h 
+#ifndef PICO_SD_DAT_PIN_COUNT
+#define PICO_SD_DAT_PIN_COUNT 4
+#endif
 
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-#define PICO_SMPS_MODE_PIN 23
-
-#define PICO_FLOAT_SUPPORT_ROM_V1 1
-
-#define PICO_DOUBLE_SUPPORT_ROM_V1 1
+// All boards are B1
+#ifndef PICO_FLOAT_SUPPORT_ROM_V1
+#define PICO_FLOAT_SUPPORT_ROM_V1 0
+#endif
+#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
+#define PICO_DOUBLE_SUPPORT_ROM_V1 0
+#endif
 
 #endif
