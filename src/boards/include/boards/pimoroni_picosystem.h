@@ -27,6 +27,11 @@
 #define PICO_DEFAULT_UART_RX_PIN 1
 #endif
 
+// Included so basic examples will work, and set it to the green LED
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN 13
+#endif
+
 #ifndef PICOSYSTEM_VBUS_DETECT_PIN
 #define PICOSYSTEM_VBUS_DETECT_PIN 2
 #endif
