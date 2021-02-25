@@ -1,5 +1,4 @@
 /*
- *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -16,33 +15,50 @@
 #ifndef _BOARDS_SPARKFUN_PROMICRO_H
 #define _BOARDS_SPARKFUN_PROMICRO_H
 
+#ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
-
+#endif
+#ifndef PICO_DEFAULT_UART_TX_PIN
 #define PICO_DEFAULT_UART_TX_PIN 0
-
+#endif
+#ifndef PICO_DEFAULT_UART_RX_PIN
 #define PICO_DEFAULT_UART_RX_PIN 1
+#endif
 
-// The PRO Micro doesnt have a plain LED, but a WS2812. This is the PIN for the WS2812
-#define PICO_DEFAULT_LED_PIN 25
-
+// The PRO Micro doesnt have a plain LED, but a WS2812
+//#ifndef PICO_DEFAULT_LED_PIN
+//#define PICO_DEFAULT_LED_PIN   25
+//#endif
+#ifndef PICO_DEFAULT_WS2812_PIN
+#define PICO_DEFAULT_WS2812_PIN 25
+#endif
 
 // Default I2C - for the onboard qwiic connector
-#define PICO_DEFAULT_I2C_SDA   16
-#define PICO_DEFAULT_I2C_SCL   17
-#define PICO_DEFAULT_I2C_PORT  i2c0
+#ifndef PICO_DEFAULT_I2C
+#define PICO_DEFAULT_I2C       0
+#endif
+#ifndef PICO_DEFAULT_I2C_SDA_PIN
+#define PICO_DEFAULT_I2C_SDA_PIN   16
+#endif
+#ifndef PICO_DEFAULT_I2C_SCL_PIN
+#define PICO_DEFAULT_I2C_SCL_PIN   17
+#endif
 
+#ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
+#endif
 
 // board has 16M onboard flash
+#ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
+#endif
 
-// Bringing over from pico.h 
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-
-#define PICO_SMPS_MODE_PIN 23
-
-#define PICO_FLOAT_SUPPORT_ROM_V1 1
-
-#define PICO_DOUBLE_SUPPORT_ROM_V1 1
+// All boards are B1
+#ifndef PICO_FLOAT_SUPPORT_ROM_V1
+#define PICO_FLOAT_SUPPORT_ROM_V1 0
+#endif
+#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
+#define PICO_DOUBLE_SUPPORT_ROM_V1 0
+#endif
 
 #endif

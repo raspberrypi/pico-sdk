@@ -48,6 +48,10 @@ extern "C" {
 
 typedef struct i2c_inst i2c_inst_t;
 
+// PICO_CONFIG: PICO_DEFAULT_I2C, Define the default I2C for a board, default=undefined, group=hardware_i2c
+// PICO_CONFIG: PICO_DEFAULT_I2C_SDA_PIN, Define the default I2C TX SDA, min=0, max=29, default=undefined, group=hardware_i2c
+// PICO_CONFIG: PICO_DEFAULT_I2C_SCL_PIN, Define the default I2C SCL pin, min=0, max=29, default=undefined, group=hardware_i2c
+
 /** The I2C identifiers for use in I2C functions.
  *
  * e.g. i2c_init(i2c0, 48000)
@@ -60,6 +64,14 @@ extern i2c_inst_t i2c1_inst;
 
 #define i2c0 (&i2c0_inst) ///< Identifier for I2C HW Block 0
 #define i2c1 (&i2c1_inst) ///< Identifier for I2C HW Block 1
+
+#if !defined(PICO_DEFAULT_I2C_INSTANCE) && defined(PICO_DEFAULT_I2C)
+#define PICO_DEFAULT_I2C_INSTANCE (__CONCAT(i2c,PICO_DEFAULT_I2C))
+#endif
+
+#ifdef PICO_DEFAULT_I2C_INSTANCE
+#define i2c_default PICO_DEFAULT_I2C_INSTANCE
+#endif
 
 /** @} */
 
@@ -126,7 +138,7 @@ struct i2c_inst {
  *  \ingroup hardware_i2c
  *
  * \param i2c I2C instance
- * \return Number of UART, 0 or 1.
+ * \return Number of I2C, 0 or 1.
  */
 static inline uint i2c_hw_index(i2c_inst_t *i2c) {
     invalid_params_if(I2C, i2c != i2c0 && i2c != i2c1);
