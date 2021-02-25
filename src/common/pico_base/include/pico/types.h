@@ -23,6 +23,7 @@ typedef unsigned int uint;
 
     \see to_us_since_boot
     \see update_us_since_boot
+    \ingroup timestamp
 */
 #ifndef NDEBUG
 typedef uint64_t absolute_time_t;
@@ -36,6 +37,7 @@ typedef struct {
  * \brief convert an absolute_time_t into a number of microseconds since boot.
  * \param t the absolute time to convert
  * \return a number of microseconds since boot, equivalent to t
+ * \ingroup timestamp
  */
 static inline uint64_t to_us_since_boot(absolute_time_t t) {
 #ifndef NDEBUG
@@ -50,6 +52,7 @@ static inline uint64_t to_us_since_boot(absolute_time_t t) {
  * \param t the absolute time value to update
  * \param us_since_boot the number of microseconds since boot to represent. Note this should be representable
  *                      as a signed 64 bit integer
+ * \ingroup timestamp
  */
 static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
 #ifndef NDEBUG
