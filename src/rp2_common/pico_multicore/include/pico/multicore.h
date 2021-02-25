@@ -9,6 +9,7 @@
 
 #include "pico/types.h"
 #include "pico/sync.h"
+#include "hardware/structs/sio.h"
 
 #ifdef __cplusplus
 extern "C" {
