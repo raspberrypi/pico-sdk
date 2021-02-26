@@ -79,7 +79,7 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
             uint delay_cyc = configured_freq[clk_sys] / configured_freq[clk_index] + 1;
             asm volatile (
                 "1: \n\t"
-                "sub %0, #1 \n\t"
+                "subs %0, #1 \n\t"
                 "bne 1b"
                 : "+r" (delay_cyc)
             );
