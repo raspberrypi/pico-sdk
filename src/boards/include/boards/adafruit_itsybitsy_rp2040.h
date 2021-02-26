@@ -34,7 +34,11 @@
 #endif
 
 #ifndef PICO_DEFAULT_WS2812_PIN
-#define PICO_DEFAULT_WS2812_PIN 17 // power enable is pin 16
+#define PICO_DEFAULT_WS2812_PIN 17
+#endif
+
+#ifndef PICO_DEFAULT_WS2812_POWER_PIN
+#define PICO_DEFAULT_WS2812_POWER_PIN 16
 #endif
 
 //------------- I2C -------------//

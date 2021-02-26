@@ -33,7 +33,11 @@
 // #define PICO_DEFAULT_LED_PIN 13
 
 #ifndef PICO_DEFAULT_WS2812_PIN
-#define PICO_DEFAULT_WS2812_PIN 12 // power enable is pin 11
+#define PICO_DEFAULT_WS2812_PIN 12
+#endif
+
+#ifndef PICO_DEFAULT_WS2812_POWER_PIN
+#define PICO_DEFAULT_WS2812_POWER_PIN 11
 #endif
 
 //------------- I2C -------------//
