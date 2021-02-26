@@ -8,7 +8,7 @@
 // -----------------------------------------------------
 //
 //------------------------------------------------------------------------------------------
-// Board definition for the SparkFun rp2040 Thing Plus
+// Board definition for the SparkFun RP2040 Thing Plus
 //
 // This header may be included by other board headers as "boards/sparkfun_thingplus.h"
 
@@ -60,10 +60,12 @@
 #define PICO_SD_DAT_PIN_COUNT 4
 #endif
 
-// All boards are B1
+// All boards have B1 RP2040
+
 #ifndef PICO_FLOAT_SUPPORT_ROM_V1
 #define PICO_FLOAT_SUPPORT_ROM_V1 0
 #endif
+
 #ifndef PICO_DOUBLE_SUPPORT_ROM_V1
 #define PICO_DOUBLE_SUPPORT_ROM_V1 0
 #endif

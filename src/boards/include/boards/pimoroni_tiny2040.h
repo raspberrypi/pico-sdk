@@ -27,11 +27,6 @@
 #define PICO_DEFAULT_UART_RX_PIN 1
 #endif
 
-// Included so basic examples will work, and set it to the green LED
-#ifndef PICO_DEFAULT_LED_PIN
-#define PICO_DEFAULT_LED_PIN 19
-#endif
-
 #ifndef TINY2040_LED_R_PIN
 #define TINY2040_LED_R_PIN 18
 #endif
@@ -72,6 +67,15 @@
 #define TINY2040_NUM_ADC_PINS 4
 #endif
 
+// Included so basic examples will work, and set it to the green LED
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN TINY2040_LED_G_PIN
+#endif
+
+#ifndef PICO_DEFAULT_LED_PIN_INVERTED
+#define PICO_DEFAULT_LED_PIN_INVERTED 1
+#endif
+
 #ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
@@ -80,6 +84,7 @@
 #define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
 #endif
 
+// All boards have B1 RP2040
 #ifndef PICO_FLOAT_SUPPORT_ROM_V1
 #define PICO_FLOAT_SUPPORT_ROM_V1 0
 #endif

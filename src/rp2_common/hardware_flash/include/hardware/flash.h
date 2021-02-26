@@ -45,7 +45,6 @@
 #define FLASH_UNIQUE_ID_SIZE_BYTES 8
 
 // PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, default=undefined, group=hardware_flash
-
 #ifdef __cplusplus
 extern "C" {
 #endif
