@@ -58,7 +58,7 @@ extern "C" {
 
 // PICO_CONFIG: PICO_DEFAULT_LED_PIN, Optionally defined a pin that drives a regular LED on the board, default=undefined, group=pico_stdlib
 
-// PICO_CONFIG: PICO_DEFAULT_LED_PIN_PICO_DEFAULT_LED_PIN_INVERTED, 1 if LED is inverted, 0 otherwise, type=int, default=0, group=pico_stdlib
+// PICO_CONFIG: PICO_DEFAULT_LED_PIN_INVERTED, 1 if LED is inverted, 0 otherwise, type=int, default=0, group=pico_stdlib
 #ifndef PICO_DEFAULT_LED_PIN_INVERTED
 #define PICO_DEFAULT_LED_PIN_INVERTED 0
 #endif

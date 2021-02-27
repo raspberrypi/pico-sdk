@@ -49,7 +49,7 @@ extern "C" {
 typedef struct i2c_inst i2c_inst_t;
 
 // PICO_CONFIG: PICO_DEFAULT_I2C, Define the default I2C for a board, default=undefined, group=hardware_i2c
-// PICO_CONFIG: PICO_DEFAULT_I2C_SDA_PIN, Define the default I2C TX SDA, min=0, max=29, default=undefined, group=hardware_i2c
+// PICO_CONFIG: PICO_DEFAULT_I2C_SDA_PIN, Define the default I2C SDA, min=0, max=29, default=undefined, group=hardware_i2c
 // PICO_CONFIG: PICO_DEFAULT_I2C_SCL_PIN, Define the default I2C SCL pin, min=0, max=29, default=undefined, group=hardware_i2c
 
 /** The I2C identifiers for use in I2C functions.

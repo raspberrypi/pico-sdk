@@ -55,18 +55,17 @@
 #define PICO_DEFAULT_SPI 0
 #endif
 
-#ifndef PICO_DEFAULT_SPI_MOSI_PIN
-#define PICO_DEFAULT_SPI_MOSI_PIN 19
+#ifndef PICO_DEFAULT_SPI_TX_PIN
+#define PICO_DEFAULT_SPI_TX_PIN 19
 #endif
 
-#ifndef PICO_DEFAULT_SPI_MISO_PIN
-#define PICO_DEFAULT_SPI_MISO_PIN 20
+#ifndef PICO_DEFAULT_SPI_RX_PIN
+#define PICO_DEFAULT_SPI_RX_PIN 20
 #endif
 
 #ifndef PICO_DEFAULT_SPI_SCK_PIN
 #define PICO_DEFAULT_SPI_SCK_PIN 18
 #endif
-
 
 //------------- FLASH -------------//
 #ifndef PICO_FLASH_SPI_CLKDIV

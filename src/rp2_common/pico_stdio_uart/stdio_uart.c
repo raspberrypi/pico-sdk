@@ -47,7 +47,7 @@ void stdio_uart_init() {
 void stdout_uart_init() {
 #if defined(uart_default) && defined(PICO_DEFAULT_UART_TX_PIN)
     bi_decl_if_func_used(bi_1pin_with_func(PICO_DEFAULT_UART_TX_PIN, GPIO_FUNC_UART));
-#if !defined(PICO_DEFAULT_UART_BAUD_RATE) || !defined(uart_default)
+#if !defined(PICO_DEFAULT_UART_BAUD_RATE)
     panic("UART baud rate undefined");
 #else
     stdio_bi_decl_if_func_used(bi_program_feature("UART stdout"));
@@ -59,7 +59,7 @@ void stdout_uart_init() {
 void stdin_uart_init() {
 #if defined(uart_default) && defined(PICO_DEFAULT_UART_RX_PIN)
     bi_decl_if_func_used(bi_1pin_with_func(PICO_DEFAULT_UART_RX_PIN, GPIO_FUNC_UART));
-#if !defined(PICO_DEFAULT_UART_BAUD_RATE) || !defined(uart_default)
+#if !defined(PICO_DEFAULT_UART_BAUD_RATE)
     panic("UART baud rate undefined");
 #else
     stdio_bi_decl_if_func_used(bi_program_feature("UART stdin"));

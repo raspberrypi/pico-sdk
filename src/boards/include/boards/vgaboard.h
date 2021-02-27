@@ -12,9 +12,6 @@
 #ifndef _BOARDS_VGABOARD_H
 #define _BOARDS_VGABOARD_H
 
-// vgaboard has a Pico on it.
-#include "boards/pico.h"
-
 // Audio pins. I2S BCK, LRCK are on the same pins as PWM L/R.
 // - When outputting I2S, PWM sees BCK and LRCK, which should sound silent as
 //   they are constant duty cycle, and above the filter cutoff
@@ -41,6 +38,18 @@
 #define VGABOARD_BUTTON_B_PIN 6
 #define VGABOARD_BUTTON_C_PIN 11
 
+#ifndef PICO_DEFAULT_UART
+#define PICO_DEFAULT_UART 1
+#endif
+
+#ifndef PICO_DEFAULT_UART_TX_PIN
+#define PICO_DEFAULT_UART_TX_PIN 20
+#endif
+
+#ifndef PICO_DEFAULT_UART_RX_PIN
+#define PICO_DEFAULT_UART_RX_PIN 21
+#endif
+
 #define PICO_SCANVIDEO_COLOR_PIN_BASE VGABOARD_VGA_COLOR_PIN_BASE
 #define PICO_SCANVIDEO_SYNC_PIN_BASE VGABOARD_VGA_SYNC_PIN_BASE
 
@@ -64,5 +73,8 @@
 #define PICO_SMPS_MODE_PIN 23
 
 #define PICO_VGA_BOARD
+
+// vgaboard has a Pico on it, so default anything we haven't set above
+#include "boards/pico.h"
 
 #endif
