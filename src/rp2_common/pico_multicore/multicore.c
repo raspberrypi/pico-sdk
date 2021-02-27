@@ -107,15 +107,6 @@ void multicore_reset_core1() {
     *power_off_clr = PSM_FRCE_OFF_PROC1_BITS;
 }
 
-void multicore_sleep_core1() {
-    multicore_reset_core1();
-    // note we give core1 an invalid stack pointer, as it should not be used
-    // note also if we ge simply passed a function that returned immediately, we'd end up in core1_hang anyway
-    //  however that would waste 2 bytes for that function (the horror!)
-    extern void core1_hang(void); // in crt0.S
-    multicore_launch_core1_raw(core1_hang, (uint32_t *) -1, scb_hw->vtor);
-}
-
 void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bottom, size_t stack_size_bytes) {
     assert(!(stack_size_bytes & 3u));
     uint32_t *stack_ptr = stack_bottom + stack_size_bytes / sizeof(uint32_t);
