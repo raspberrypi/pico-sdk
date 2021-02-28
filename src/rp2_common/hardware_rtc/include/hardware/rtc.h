@@ -69,6 +69,11 @@ bool rtc_running(void);
  */
 void rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback);
 
+/*! \brief Enable the RTC alarm (if inactive)
+ *  \ingroup hardware_rtc
+ */
+void rtc_enable_alarm(void);
+
 /*! \brief Disable the RTC alarm (if active)
  *  \ingroup hardware_rtc
  */
