@@ -103,7 +103,7 @@ bool rtc_get_datetime(datetime_t *t) {
     return true;
 }
 
-static void rtc_enable_alarm(void) {
+void rtc_enable_alarm(void) {
     // Set matching and wait for it to be enabled
     hw_set_bits(&rtc_hw->irq_setup_0, RTC_IRQ_SETUP_0_MATCH_ENA_BITS);
     while(!(rtc_hw->irq_setup_0 & RTC_IRQ_SETUP_0_MATCH_ACTIVE_BITS)) {
