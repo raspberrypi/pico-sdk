@@ -7,6 +7,7 @@
 #include "pico.h"
 #include "pico/time.h"
 #include "pico/bootrom.h"
+#include "pico/binary_info.h"
 
 // PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_TIMEOUT_MS, Window of opportunity for a second press of a reset button to enter BOOTSEL mode (milliseconds), type=int, default=200, group=pico_bootsel_via_double_reset
 #ifndef PICO_BOOTSEL_VIA_DOUBLE_RESET_TIMEOUT_MS
@@ -32,6 +33,10 @@
  * development board to be used to enter the ROM bootloader, provided this
  * library is always linked.
  */
+
+#if !PICO_NO_BI_BOOTSEL_VIA_DOUBLE_RESET
+bi_decl(bi_program_feature("double reset -> BOOTSEL"));
+#endif
 
 // Doesn't make any sense for a RAM only binary
 #if !PICO_NO_FLASH
