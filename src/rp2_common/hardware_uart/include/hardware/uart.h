@@ -29,24 +29,13 @@ extern "C" {
 #define PICO_UART_DEFAULT_CRLF 0
 #endif
 
-// PICO_CONFIG: PICO_DEFAULT_UART, Define the default UART used for printf etc, default=0, group=hardware_uart
-#ifndef PICO_DEFAULT_UART
-#define PICO_DEFAULT_UART 0     ///< Default UART instance
-#endif
+// PICO_CONFIG: PICO_DEFAULT_UART, Define the default UART used for printf etc, default=undefined, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=29, default=undefined, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=29, default=undefined, group=hardware_uart
 
 // PICO_CONFIG: PICO_DEFAULT_UART_BAUD_RATE, Define the default UART baudrate, max=921600, default=115200, group=hardware_uart
 #ifndef PICO_DEFAULT_UART_BAUD_RATE
 #define PICO_DEFAULT_UART_BAUD_RATE 115200   ///< Default baud rate
-#endif
-
-// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=29, default=0, group=hardware_uart
-#ifndef PICO_DEFAULT_UART_TX_PIN
-#define PICO_DEFAULT_UART_TX_PIN 0           ///< Default TX pin
-#endif
-
-// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=29, default=1, group=hardware_uart
-#ifndef PICO_DEFAULT_UART_RX_PIN
-#define PICO_DEFAULT_UART_RX_PIN 1           ///< Default RX pin
 #endif
 
 /** \file hardware/uart.h
@@ -93,11 +82,13 @@ typedef struct uart_inst uart_inst_t;
 
 /** @} */
 
-#ifndef PICO_DEFAULT_UART_INSTANCE
+#if !defined(PICO_DEFAULT_UART_INSTANCE) && defined(PICO_DEFAULT_UART)
 #define PICO_DEFAULT_UART_INSTANCE (__CONCAT(uart,PICO_DEFAULT_UART))
 #endif
 
+#ifdef PICO_DEFAULT_UART_INSTANCE
 #define uart_default PICO_DEFAULT_UART_INSTANCE
+#endif
 
 /*! \brief Convert UART instance to hardware instance number
  *  \ingroup hardware_uart
@@ -414,7 +405,11 @@ void uart_set_translate_crlf(uart_inst_t *uart, bool translate);
  *  \ingroup hardware_uart
  */
 static inline void uart_default_tx_wait_blocking(void) {
+#ifdef uart_default
     uart_tx_wait_blocking(uart_default);
+#else
+    assert(false);
+#endif
 }
 
 /*! \brief Wait for up to a certain number of microseconds for the RX FIFO to be non empty
