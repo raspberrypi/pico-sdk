@@ -27,7 +27,7 @@ void multicore_fifo_clear_irq(void);
 int32_t multicore_fifo_get_status(void);
 
 // call this from the lockout victim thread
-void multicore_lockout_victim_init();
+void multicore_lockout_victim_init(void);
 
 // start locking out the other core (it will be
 bool multicore_lockout_start_timeout_us(uint64_t timeout_us);
