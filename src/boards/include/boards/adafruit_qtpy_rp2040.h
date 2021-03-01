@@ -17,7 +17,7 @@
 
 //------------- UART -------------//
 #ifndef PICO_DEFAULT_UART
-#define PICO_DEFAULT_UART 0
+#define PICO_DEFAULT_UART 1
 #endif
 
 #ifndef PICO_DEFAULT_UART_TX_PIN
