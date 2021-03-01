@@ -54,7 +54,7 @@
 #define PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE 1200
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE, Enable/disable resetting into BOOTSEL mode via an additional VENDOR USB interface - enables picotool based reset, type=bool, default=1, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE, Enable/disable resetting into BOOTSEL mode via an additional VENDOR USB interface - enables picotool based reset, type=bool, default=1, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
 #define PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE 1
 #endif
