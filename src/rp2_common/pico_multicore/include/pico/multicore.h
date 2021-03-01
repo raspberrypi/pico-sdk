@@ -55,12 +55,6 @@ void multicore_launch_core1(void (*entry)(void));
  */
 void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bottom, size_t stack_size_bytes);
 
-/*! \brief  Send core 1 to sleep.
- *  \ingroup pico_multicore
- *
- */
-void multicore_sleep_core1(void);
-
 /*! \brief  Launch code on core 1 with no stack protection
  *  \ingroup pico_multicore
  *
