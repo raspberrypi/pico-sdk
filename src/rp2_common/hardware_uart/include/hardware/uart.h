@@ -29,9 +29,9 @@ extern "C" {
 #define PICO_UART_DEFAULT_CRLF 0
 #endif
 
-// PICO_CONFIG: PICO_DEFAULT_UART, Define the default UART used for printf etc, default=undefined, group=hardware_uart
-// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=29, default=undefined, group=hardware_uart
-// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=29, default=undefined, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART, Define the default UART used for printf etc, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=29, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=29, group=hardware_uart
 
 // PICO_CONFIG: PICO_DEFAULT_UART_BAUD_RATE, Define the default UART baudrate, max=921600, default=115200, group=hardware_uart
 #ifndef PICO_DEFAULT_UART_BAUD_RATE
