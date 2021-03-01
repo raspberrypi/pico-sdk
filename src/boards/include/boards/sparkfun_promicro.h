@@ -8,13 +8,15 @@
 // NOTE: THIS HEADER IS ALSO INCLUDED BY ASSEMBLER SO
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
+//
+//------------------------------------------------------------------------------------------
+// Board definition for the SparkFun RP2040 ProMicro
+//
+// This header may be included by other board headers as "boards/sparkfun_promicro.h"
 
-// This header may be included by other board headers as "boards/pico.h"
+#ifndef _BOARDS_SPARKFUN_PROMICRO_H
+#define _BOARDS_SPARKFUN_PROMICRO_H
 
-#ifndef _BOARDS_PICO_H
-#define _BOARDS_PICO_H
-
-// --- UART ---
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
 #endif
@@ -25,42 +27,42 @@
 #define PICO_DEFAULT_UART_RX_PIN 1
 #endif
 
-// --- LED ---
-#ifndef PICO_DEFAULT_LED_PIN
-#define PICO_DEFAULT_LED_PIN 25
+// The PRO Micro doesnt have a plain LED, but a WS2812
+//#ifndef PICO_DEFAULT_LED_PIN
+//#define PICO_DEFAULT_LED_PIN   25
+//#endif
+#ifndef PICO_DEFAULT_WS2812_PIN
+#define PICO_DEFAULT_WS2812_PIN 25
 #endif
-// no PICO_DEFAULT_WS2812_PIN
 
-// --- I2C ---
+// Default I2C - for the onboard qwiic connector
 #ifndef PICO_DEFAULT_I2C
-#define PICO_DEFAULT_I2C 0
+#define PICO_DEFAULT_I2C       0
 #endif
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
-#define PICO_DEFAULT_I2C_SDA_PIN 4
+#define PICO_DEFAULT_I2C_SDA_PIN   16
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
-#define PICO_DEFAULT_I2C_SCL_PIN 5
+#define PICO_DEFAULT_I2C_SCL_PIN   17
 #endif
-
-// --- FLASH ---
 
 #ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
+// board has 16M onboard flash
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
+#define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
 
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-#define PICO_SMPS_MODE_PIN 23
+// All boards have B1 RP2040
 
 #ifndef PICO_FLOAT_SUPPORT_ROM_V1
-#define PICO_FLOAT_SUPPORT_ROM_V1 1
+#define PICO_FLOAT_SUPPORT_ROM_V1 0
 #endif
 
 #ifndef PICO_DOUBLE_SUPPORT_ROM_V1
-#define PICO_DOUBLE_SUPPORT_ROM_V1 1
+#define PICO_DOUBLE_SUPPORT_ROM_V1 0
 #endif
 
 #endif

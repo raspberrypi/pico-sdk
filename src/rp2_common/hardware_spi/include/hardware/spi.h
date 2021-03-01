@@ -35,6 +35,12 @@ extern "C" {
  * Each controller can be connected to a number of GPIO pins, see the datasheet GPIO function selection table for more information.
  */
 
+// PICO_CONFIG: PICO_DEFAULT_SPI, Define the default SPI for a board, default=undefined, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_SCK_PIN, Define the default SPI SCK pin, min=0, max=29, default=undefined, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_TX_PIN, Define the default SPI TX pin, min=0, max=29, default=undefined, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_RX_PIN, Define the default SPI RX pin, min=0, max=29, default=undefined, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_CSN_PIN, Define the default SPI CSN pin, min=0, max=29, default=undefined, group=hardware_spi
+
 /**
  * Opaque type representing an SPI instance.
  */
@@ -55,6 +61,14 @@ typedef struct spi_inst spi_inst_t;
  *  \ingroup hardware_spi
  */
 #define spi1 ((spi_inst_t * const)spi1_hw)
+
+#if !defined(PICO_DEFAULT_SPI_INSTANCE) && defined(PICO_DEFAULT_SPI)
+#define PICO_DEFAULT_SPI_INSTANCE (__CONCAT(spi,PICO_DEFAULT_SPI))
+#endif
+
+#ifdef PICO_DEFAULT_SPI_INSTANCE
+#define spi_default PICO_DEFAULT_SPI_INSTANCE
+#endif
 
 typedef enum {
     SPI_CPHA_0 = 0,
