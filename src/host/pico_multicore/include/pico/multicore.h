@@ -22,7 +22,7 @@ bool multicore_fifo_rvalid(void);
 bool multicore_fifo_wready(void);
 void multicore_fifo_push(uint32_t data);
 uint32_t multicore_fifo_pop_blocking();
-void multicore_fifo_drain();
+void multicore_fifo_drain(void);
 void multicore_fifo_clear_irq(void);
 int32_t multicore_fifo_get_status(void);
 
