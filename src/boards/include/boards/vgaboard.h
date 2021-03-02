@@ -69,9 +69,6 @@
 #define PICO_AUDIO_PWM_L_PIN VGABOARD_PWM_L_PIN
 #define PICO_AUDIO_PWM_R_PIN VGABOARD_PWM_R_PIN
 
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-#define PICO_SMPS_MODE_PIN 23
-
 #define PICO_VGA_BOARD
 
 // vgaboard has a Pico on it, so default anything we haven't set above
