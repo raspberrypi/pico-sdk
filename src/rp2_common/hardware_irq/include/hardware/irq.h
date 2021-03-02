@@ -166,7 +166,7 @@ void irq_set_mask_enabled(uint32_t mask, bool enabled);
  *
  * \param num Interrupt number \ref interrupt_nums
  * \param handler The handler to set. See \ref irq_handler_t
- * \see irq_add_shared_handler
+ * \see irq_add_shared_handler()
  */
 void irq_set_exclusive_handler(uint num, irq_handler_t handler);
 
@@ -177,7 +177,7 @@ void irq_set_exclusive_handler(uint num, irq_handler_t handler);
  * by irq_set_exclusive_handler if there is one.
  *
  * \param num Interrupt number \ref interrupt_nums
- * \see irq_set_exclusive_handler
+ * \see irq_set_exclusive_handler()
  * \return handler The handler if an exclusive handler is set for the IRQ,
  *                 NULL if no handler is set or shared/shareable handlers are installed
  */
@@ -202,7 +202,7 @@ irq_handler_t irq_get_exclusive_handler(uint num);
  * rule of thumb is to use PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY if you don't much care, as it is in the middle of
  * the priority range by default.
  *
- * \see irq_set_exclusive_handler
+ * \see irq_set_exclusive_handler()
  */
 void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_priority);
 
@@ -219,8 +219,8 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
  *
  * \param num Interrupt number \ref interrupt_nums
  * \param handler The handler to removed.
- * \see irq_set_exclusive_handler
- * \see irq_add_shared_handler
+ * \see irq_set_exclusive_handler()
+ * \see irq_add_shared_handler()
  */
 void irq_remove_handler(uint num, irq_handler_t handler);
 

@@ -32,6 +32,11 @@
 extern "C" {
 #endif
 
+/*! Callback function type for RTC alarms
+ *  \ingroup hardware_rtc
+ *
+ * \sa rtc_set_alarm()
+ */
 typedef void (*rtc_callback_t)(void);
 
 /*! \brief Initialise the RTC system

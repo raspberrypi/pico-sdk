@@ -140,7 +140,7 @@ uint32_t frequency_count_khz(uint src);
 /*! \brief Set the "current frequency" of the clock as reported by clock_get_hz without actually changing the clock
  *  \ingroup hardware_clocks
  *
- * \see clock_get_hz
+ * \see clock_get_hz()
  */
 void clock_set_reported_hz(enum clock_index clk_index, uint hz);
 

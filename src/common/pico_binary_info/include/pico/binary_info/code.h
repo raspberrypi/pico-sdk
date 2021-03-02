@@ -25,12 +25,14 @@
 #endif
 /**
  * Declare some binary information that will be included if the contain source file/line is compiled into the binary
+ * \ingroup pico_binary_info
  */
 #define bi_decl(_decl) __bi_mark_enclosure _decl; __bi_decl(__bi_ptr_lineno_var_name, &__bi_lineno_var_name.core, ".binary_info.keep.", __used);
 /**
  * Declare some binary information that will be included if the function containing the decl is linked into the binary.
  * The SDK uses --gc-sections, so functions that are never called will be removed by the linker, and any associated
  * binary information declared this way will also be stripped
+ * \ingroup pico_binary_info
  */
 #define bi_decl_if_func_used(_decl) ({__bi_mark_enclosure _decl; __bi_decl(__bi_ptr_lineno_var_name, &__bi_lineno_var_name.core, ".binary_info.", ); *(volatile uint8_t *)&__bi_ptr_lineno_var_name;});
 
