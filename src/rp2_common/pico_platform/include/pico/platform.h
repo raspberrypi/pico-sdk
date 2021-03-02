@@ -119,7 +119,7 @@ static inline uint8_t rp2040_rom_version(void) {
 
 /**
  * Empty function intended to be called by any tight hardware polling loop. using this ubiquitously
- * makes it much easier to find tight loops, but also in the future #ifdef-ed support for lockup
+ * makes it much easier to find tight loops, but also in the future \#ifdef-ed support for lockup
  * debugging might be added
  */
 static inline void tight_loop_contents(void) {}

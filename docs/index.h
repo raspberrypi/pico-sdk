@@ -62,8 +62,10 @@
  * @{
  * \defgroup boot_stage2 boot_stage2
  * \defgroup pico_base pico_base
+ * \defgroup pico_binary_info pico_binary_info
  * \defgroup pico_bit_ops pico_bit_ops
  * \defgroup pico_bootrom pico_bootrom
+ * \defgroup pico_bootsel_via_double_reset pico_bootsel_via_double_reset
  * \defgroup pico_cxx_options pico_cxx_options
  * \defgroup pico_divider pico_divider
  * \defgroup pico_double pico_double

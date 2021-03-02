@@ -115,7 +115,7 @@ static inline bool time_reached(absolute_time_t t) {
  *  \ingroup hardware_timer
  *
  * \param alarm_num the hardware alarm number
- * \sa hardware_alarm_set_callback
+ * \sa hardware_alarm_set_callback()
  */
 typedef void (*hardware_alarm_callback_t)(uint alarm_num);
 
@@ -151,7 +151,7 @@ void hardware_alarm_unclaim(uint alarm_num);
  * \param alarm_num the hardware alarm number
  * \param callback the callback to install, or NULL to unset
  *
- * \sa hardware_alarm_set_target
+ * \sa hardware_alarm_set_target()
  */
 void hardware_alarm_set_callback(uint alarm_num, hardware_alarm_callback_t callback);
 

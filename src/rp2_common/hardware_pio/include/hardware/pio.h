@@ -230,7 +230,7 @@ static inline void sm_config_set_clkdiv(pio_sm_config *c, float div) {
  * \param c Pointer to the configuration structure to modify
  * \param div_int Integer part of the divisor
  * \param div_frac Fractional part in 1/256ths
- * \sa sm_config_set_clkdiv
+ * \sa sm_config_set_clkdiv()
  */
 static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_int, uint8_t div_frac) {
     c->clkdiv =
@@ -463,7 +463,7 @@ bool pio_can_add_program_at_offset(PIO pio, const pio_program_t *program, uint o
 /*! \brief Attempt to load the program, panicking if not possible
  *  \ingroup hardware_pio
  *
- * \see pico_can_add_program if you need to check whether the program can be loaded
+ * \see pio_can_add_program() if you need to check whether the program can be loaded
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param program the program definition
@@ -474,7 +474,7 @@ uint pio_add_program(PIO pio, const pio_program_t *program);
 /*! \brief Attempt to load the program at the specified instruction memory offset, panicking if not possible
  *  \ingroup hardware_pio
  *
- * \see pico_can_add_program_at_offset if you need to check whether the program can be loaded
+ * \see pio_can_add_program_at_offset() if you need to check whether the program can be loaded
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param program the program definition
@@ -536,7 +536,7 @@ static inline void pio_sm_set_enabled(PIO pio, uint sm, bool enabled) {
  * Note that this method just sets the enabled state of the state machine;
  * if now enabled they continue exactly from where they left off.
  *
- * \see pio_enable_sm_mask_in_sync if you wish to enable multiple state machines
+ * \see pio_enable_sm_mask_in_sync() if you wish to enable multiple state machines
  * and ensure their clock dividers are in sync.
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
@@ -673,7 +673,7 @@ static inline uint8_t pio_sm_get_pc(PIO pio, uint sm) {
  *
  * This instruction is executed instead of the next instruction in the normal control flow on the state machine.
  * Subsequent calls to this method replace the previous executed
- * instruction if it is still running. \see pio_sm_is_exec_stalled to see if an executed instruction
+ * instruction if it is still running. \see pio_sm_is_exec_stalled() to see if an executed instruction
  * is still running (i.e. it is stalled on some condition)
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
@@ -704,7 +704,7 @@ static inline bool pio_sm_is_exec_stalled(PIO pio, uint sm) {
  *
  * This instruction is executed instead of the next instruction in the normal control flow on the state machine.
  * Subsequent calls to this method replace the previous executed
- * instruction if it is still running. \see pio_sm_is_exec_stalled to see if an executed instruction
+ * instruction if it is still running. \see pio_sm_is_exec_stalled() to see if an executed instruction
  * is still running (i.e. it is stalled on some condition)
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
@@ -825,7 +825,7 @@ static inline void pio_sm_set_sideset_pins(PIO pio, uint sm, uint sideset_base) 
  * \param sm State machine index (0..3)
  * \param data the 32 bit data value
  *
- * \sa pio_sm_put_blocking
+ * \sa pio_sm_put_blocking()
  */
 static inline void pio_sm_put(PIO pio, uint sm, uint32_t data) {
     check_pio_param(pio);
@@ -846,7 +846,7 @@ static inline void pio_sm_put(PIO pio, uint sm, uint32_t data) {
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
  *
- * \sa pio_sm_get_blocking
+ * \sa pio_sm_get_blocking()
  */
 static inline uint32_t pio_sm_get(PIO pio, uint sm) {
     check_pio_param(pio);
@@ -974,7 +974,7 @@ static inline uint32_t pio_sm_get_blocking(PIO pio, uint sm) {
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
  *
- * \sa pio_sm_clear_fifos
+ * \sa pio_sm_clear_fifos()
  */
 void pio_sm_drain_tx_fifo(PIO pio, uint sm);
 

@@ -32,7 +32,7 @@ extern "C" {
 /*! \brief Define actions to perform at watchdog timeout
  *  \ingroup hardware_watchdog
  *
- * \note If \ref watchdog_start_tick value does not give a 1MHz clock to the watchdog system, then the \ref delay_ms
+ * \note If \ref watchdog_start_tick value does not give a 1MHz clock to the watchdog system, then the \p delay_ms
  * parameter will not be in microseconds. See the datasheet for more details.
  *
  * By default the SDK assumes a 12MHz XOSC and sets the \ref watchdog_start_tick appropriately.
@@ -61,7 +61,7 @@ void watchdog_update(void);
  * \brief Enable the watchdog
  * \ingroup hardware_watchdog
  *
- * \note If \ref watchdog_start_tick value does not give a 1MHz clock to the watchdog system, then the \ref delay_ms
+ * \note If \ref watchdog_start_tick value does not give a 1MHz clock to the watchdog system, then the \p delay_ms
  * parameter will not be in microseconds. See the datasheet for more details.
  *
  * By default the SDK assumes a 12MHz XOSC and sets the \ref watchdog_start_tick appropriately.
