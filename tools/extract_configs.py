@@ -149,7 +149,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                                 k, v = (i.strip() for i in item.split('='))
                             except ValueError:
                                 raise Exception('{} at {}:{} has malformed value {}'.format(config_name, file_path, linenum, item))
-                            config_attrs[k] = v.replace('\0', ',') if v != 'undefined' else None
+                            config_attrs[k] = v.replace('\0', ',')
                             all_attrs.add(k)
                             prev = item
                         #print(file_path, config_name, config_attrs)
@@ -178,9 +178,14 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                             all_defines[name][value] = (file_path, linenum)
 
 # Check for defines with missing PICO_CONFIG entries
+resolved_defines = dict()
 for d in all_defines:
     if d not in all_configs and d.startswith("PICO_"):
         logger.warning("Potential unmarked PICO define {}".format(d))
+    # resolve "nested defines" - this allows e.g. USB_DPRAM_MAX to resolve to USB_DPRAM_SIZE which is set to 4096 (which then matches the relevant PICO_CONFIG entry)
+    for val in all_defines[d]:
+        if val in all_defines:
+            resolved_defines[d] = all_defines[val]
 
 for config_name in all_configs:
 
@@ -189,8 +194,8 @@ for config_name in all_configs:
     # Check that default values match up
     if 'default' in all_configs[config_name]['attrs']:
         if config_name in all_defines:
-            if all_configs[config_name]['attrs']['default'] not in all_defines[config_name] and (all_configs[config_name]['attrs'].get('type', 'int') != 'bool'):
-                if config_name in ['USB_DPRAM_MAX'] or '/' in all_configs[config_name]['attrs']['default']:
+            if all_configs[config_name]['attrs']['default'] not in all_defines[config_name] and (config_name not in resolved_defines or all_configs[config_name]['attrs']['default'] not in resolved_defines[config_name]):
+                if '/' in all_configs[config_name]['attrs']['default'] or ' ' in all_configs[config_name]['attrs']['default']:
                     continue
                 # There _may_ be multiple matching defines, but arbitrarily display just one in the error message
                 first_define_value = list(all_defines[config_name].keys())[0]
