@@ -3,11 +3,12 @@
 The full documentation for the RP2040 and Raspberry Pi Pico board can be found at the following links
 
  - [RP2040 Datasheet](https://rptl.io/rp2040-datasheet)
- - [Raspberry Pi Pico datasheet](https://rptl.io/pico-datasheet)
- - [Hardware Design with the RP2040](https://rptl.io/rp2040-design)
+ - [Raspberry Pi Pico Datasheet](https://rptl.io/pico-datasheet)
+ - [Hardware design with the RP2040](https://rptl.io/rp2040-design)
  - [Raspberry Pi Pico C/C++ SDK](https://rptl.io/pico-c-sdk)
  - [Raspberry Pi Pico Python SDK](https://rptl.io/pico-micropython)
- - [Getting Started with Raspberry Pi Pico](https://rptl.io/pico-get-started)
+ - [Getting started with Raspberry Pi Pico](https://rptl.io/pico-get-started)
+ - [Raspberry Pi Pico FAQ](https://rptl.io/pico-faq)
 
 ### Weblinks
 
@@ -19,9 +20,9 @@ For the main Raspberry Pi website, [see here](https://www.raspberrypi.org)
 
 For the Raspberry Pi Pico page, [see here](https://rptl.io/rp2040-get-started)
 
-### Github
+### GitHub
 
-All the source code for the Raspberry Pi Pico SDK, examples and other libraries can be found on Github.
+All the source code for the Raspberry Pi Pico SDK, examples and other libraries can be found on GitHub.
 
  - [Raspberry Pi Pico SDK](https://github.com/raspberrypi/pico-sdk)
  - [Pico Examples](https://github.com/raspberrypi/pico-examples)

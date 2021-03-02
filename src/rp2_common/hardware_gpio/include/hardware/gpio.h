@@ -124,6 +124,13 @@ enum gpio_irq_level {
     GPIO_IRQ_EDGE_RISE = 0x8u,
 };
 
+/*! Callback function type for GPIO events
+ *  \ingroup hardware_gpio
+ *
+ * \param gpio Which GPIO caused this interrupt
+ * \param events Which events caused this interrupt. See \ref gpio_set_irq_enabled for details.
+ * \sa gpio_set_irq_enabled_with_callback()
+ */
 typedef void (*gpio_irq_callback_t)(uint gpio, uint32_t events);
 
 enum gpio_override {
@@ -267,7 +274,7 @@ void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled);
  * the processor that calls the function.
  *
  * \param gpio GPIO number
- * \param events Which events will cause an interrupt See \ref gpio_set_irq_enabled for details.
+ * \param events Which events will cause an interrupt. See \ref gpio_set_irq_enabled for details.
  * \param enabled Enable or disable flag
  * \param callback user function to call on GPIO irq. Note only one of these can be set per processor.
  *

@@ -21,8 +21,8 @@ typedef unsigned int uint;
     The type is used instead of a raw uint64_t to prevent accidentally passing relative times or times in the wrong
     time units where an absolute time is required. It is equivalent to uint64_t in release builds.
 
-    \see to_us_since_boot
-    \see update_us_since_boot
+    \see to_us_since_boot()
+    \see update_us_since_boot()
     \ingroup timestamp
 */
 #ifndef NDEBUG
