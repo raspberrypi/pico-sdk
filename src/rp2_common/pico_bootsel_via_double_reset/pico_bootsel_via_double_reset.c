@@ -24,7 +24,7 @@
 #define PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK 0u
 #endif
 
-/** \defgroup pico_bootsel_via_double_reset
+/** \defgroup pico_bootsel_via_double_reset pico_bootsel_via_double_reset
  *
  * When the 'pico_bootsel_via_double_reset' library is linked, a function is
  * injected before main() which will detect when the system has been reset

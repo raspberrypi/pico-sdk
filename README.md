@@ -85,7 +85,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
           ```
 
-   * Or with automatic download from github :
+   * Or with automatic download from GitHub :
       1. Copy [pico_sdk_import.cmake](https://github.com/raspberrypi/pico-sdk/blob/master/external/pico_sdk_import.cmake)
          from the SDK into your project directory
       1. Setup a `CMakeLists.txt` like:

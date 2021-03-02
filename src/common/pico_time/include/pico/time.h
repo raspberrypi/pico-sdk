@@ -77,7 +77,7 @@ static inline uint32_t us_to_ms(uint64_t us) {
  * \brief Convert a timestamp into a number of milliseconds since boot.
  * \param t an absolute_time_t value to convert
  * \return the number of microseconds since boot represented by t
- * \sa to_us_since_boot
+ * \sa to_us_since_boot()
  */
 static inline uint32_t to_ms_since_boot(absolute_time_t t) {
     uint64_t us = to_us_since_boot(t);
@@ -171,7 +171,7 @@ extern const absolute_time_t nil_time;
  * \ingroup timestamp
  *  \param t the timestamp
  *  \return true if the timestamp is nil
- *  \sa nil_time()
+ *  \sa nil_time
  */
 static inline bool is_nil_time(absolute_time_t t) {
     return !to_us_since_boot(t);
@@ -230,7 +230,7 @@ void sleep_ms(uint32_t ms);
 /*! \brief Helper method for blocking on a timeout
  * \ingroup sleep
  *
- * This method will return in response to a an event (as per __wfe) or
+ * This method will return in response to an event (as per __wfe) or
  * when the target time is reached, or at any point before.
  *
  * This method can be used to implement a lower power polling loop waiting on
