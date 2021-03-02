@@ -49,7 +49,7 @@
 #define PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE 1
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE, baud rate that if selected causes a reset into BOOTSEL mode (if PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE==1), default=1200, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE, baud rate that if selected causes a reset into BOOTSEL mode (if PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE is set), default=1200, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE
 #define PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE 1200
 #endif
