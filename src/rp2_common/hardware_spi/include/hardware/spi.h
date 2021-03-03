@@ -70,16 +70,25 @@ typedef struct spi_inst spi_inst_t;
 #define spi_default PICO_DEFAULT_SPI_INSTANCE
 #endif
 
+/** \brief Enumeration of SPI CPHA (clock phase) values.
+ *  \ingroup hardware_spi
+ */
 typedef enum {
     SPI_CPHA_0 = 0,
     SPI_CPHA_1 = 1
 } spi_cpha_t;
 
+/** \brief Enumeration of SPI CPOL (clock polarity) values.
+ *  \ingroup hardware_spi
+ */
 typedef enum {
     SPI_CPOL_0 = 0,
     SPI_CPOL_1 = 1
 } spi_cpol_t;
 
+/** \brief Enumeration of SPI bit-order values.
+ *  \ingroup hardware_spi
+ */
 typedef enum {
     SPI_LSB_FIRST = 0,
     SPI_MSB_FIRST = 1
@@ -123,7 +132,7 @@ void spi_deinit(spi_inst_t *spi);
  */
 uint spi_set_baudrate(spi_inst_t *spi, uint baudrate);
 
-/*! \brief Convert I2c instance to hardware instance number
+/*! \brief Convert SPI instance to hardware instance number
  *  \ingroup hardware_spi
  *
  * \param spi SPI instance
@@ -272,7 +281,7 @@ int spi_read_blocking(spi_inst_t *spi, uint8_t repeated_tx_data, uint8_t *dst, s
  * \param src Buffer of data to write
  * \param dst Buffer for read data
  * \param len Length of BOTH buffers in halfwords
- * \return Number of bytes written/read
+ * \return Number of halfwords written/read
 */
 int spi_write16_read16_blocking(spi_inst_t *spi, const uint16_t *src, uint16_t *dst, size_t len);
 
@@ -287,7 +296,7 @@ int spi_write16_read16_blocking(spi_inst_t *spi, const uint16_t *src, uint16_t *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \param src Buffer of data to write
  * \param len Length of buffers
- * \return Number of bytes written/read
+ * \return Number of halfwords written/read
 */
 int spi_write16_blocking(spi_inst_t *spi, const uint16_t *src, size_t len);
 
@@ -305,8 +314,8 @@ int spi_write16_blocking(spi_inst_t *spi, const uint16_t *src, size_t len);
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \param repeated_tx_data Buffer of data to write
  * \param dst Buffer for read data
- * \param len Length of buffer \p dst  in halfwords
- * \return Number of bytes written/read
+ * \param len Length of buffer \p dst in halfwords
+ * \return Number of halfwords written/read
  */
 int spi_read16_blocking(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *dst, size_t len);
 

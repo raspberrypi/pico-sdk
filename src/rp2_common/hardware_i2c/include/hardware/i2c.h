@@ -134,7 +134,7 @@ struct i2c_inst {
     bool restart_on_next;
 };
 
-/*! \brief Convert I2c instance to hardware instance number
+/*! \brief Convert I2C instance to hardware instance number
  *  \ingroup hardware_i2c
  *
  * \param i2c I2C instance
