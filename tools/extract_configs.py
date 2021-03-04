@@ -171,6 +171,11 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                             m = re.match(r'^((0x)?\d+)u$', value.lower())
                             if m:
                                 value = m.group(1)
+                            else:
+                                # discard any '_u(X)' macro
+                                m = re.match(r'^_u\(((0x)?\d+)\)$', value.lower())
+                                if m:
+                                    value = m.group(1)
                             if name not in all_defines:
                                 all_defines[name] = dict()
                             if value not in all_defines[name]:
