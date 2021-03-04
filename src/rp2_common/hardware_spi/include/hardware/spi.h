@@ -35,7 +35,7 @@ extern "C" {
  * Each controller can be connected to a number of GPIO pins, see the datasheet GPIO function selection table for more information.
  */
 
-// PICO_CONFIG: PICO_DEFAULT_SPI, Define the default SPI for a board, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI, Define the default SPI for a board, min=0, max=1, group=hardware_spi
 // PICO_CONFIG: PICO_DEFAULT_SPI_SCK_PIN, Define the default SPI SCK pin, min=0, max=29, group=hardware_spi
 // PICO_CONFIG: PICO_DEFAULT_SPI_TX_PIN, Define the default SPI TX pin, min=0, max=29, group=hardware_spi
 // PICO_CONFIG: PICO_DEFAULT_SPI_RX_PIN, Define the default SPI RX pin, min=0, max=29, group=hardware_spi
