@@ -25,6 +25,11 @@
 #define NUM_PWM_SLICES _u(8)
 #define NUM_SPIN_LOCKS _u(32)
 #define NUM_UARTS _u(2)
+#define NUM_I2CS _u(2)
+#define NUM_SPIS _u(2)
+
+#define NUM_ADC_CHANNELS _u(5)
+
 #define NUM_BANK0_GPIOS _u(30)
 
 #define PIO_INSTRUCTION_COUNT _u(32)
