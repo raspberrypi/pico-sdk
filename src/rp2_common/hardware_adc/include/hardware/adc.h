@@ -84,7 +84,7 @@ static inline void adc_gpio_init(uint gpio) {
  * \param input Input to select.
  */
 static inline void adc_select_input(uint input) {
-    invalid_params_if(ADC, input > 4);
+    valid_params_if(ADC, input < NUM_ADC_CHANNELS);
     hw_write_masked(&adc_hw->cs, input << ADC_CS_AINSEL_LSB, ADC_CS_AINSEL_BITS);
 }
 
