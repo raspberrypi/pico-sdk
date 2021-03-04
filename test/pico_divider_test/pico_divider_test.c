@@ -30,11 +30,12 @@ void hwdiv_sim() {
 //  o8hex(hwdiv_data[1]); osp();
 //  o8hex(hwdiv_data[2]); osp();
 //  o8hex(hwdiv_data[3]); onl();
-  }
+}
 
 ui64 ntests=0;
 
 
+#ifdef uart_default
 void o1ch(int c) {
     uart_putc(uart_default, c);
 }
@@ -73,6 +74,7 @@ void odec(int u) {
     zf=odig(&v,10,zf);
     zf=odig(&v,1,0);
 }
+#endif
 
 
 int xdigval(int c) {
@@ -80,7 +82,7 @@ int xdigval(int c) {
   if(c>='A'&&c<='F') return c-'A'+10;
   if(c>='a'&&c<='f') return c-'a'+10;
   return -1;
-  }
+}
 
 ui64 seed;
 
@@ -92,11 +94,13 @@ ui64 rnd64() {
 
 unsigned int rnd32() {
   return rnd64();
-  }
+}
 
 //#define RANDOMISE
 //#define rfn "/dev/random"
 
+
+#ifdef uart_default
 void test_divu64u64(ui64 y,ui64 x) {
   ui64 q,r;
   test_mulib_divu64u64(&y,&x,&q,&r);
@@ -115,7 +119,7 @@ void test_divu64u64(ui64 y,ui64 x) {
     o16hex(y%x); onl();
     }
   ntests++;
-  }
+}
 
 void test_divs64s64(i64 y,i64 x) {
   i64 q,r;
@@ -138,7 +142,7 @@ void test_divs64s64(i64 y,i64 x) {
     o16hex(y%x); onl();
     }
   ntests++;
-  }
+}
 
 
 // for all x and y consisting of a single run of 1:s, test a region around (x,y)
@@ -185,7 +189,8 @@ void test_random() {
       }
     odec(i+1); ostr("M\n");
     }
-  }
+}
+#endif
 
 uint32_t __attribute__((naked)) time_32(uint32_t a, uint32_t b, uint32_t (*func)(uint32_t a, uint32_t b)) {
     asm(
@@ -323,6 +328,9 @@ void perf_test() {
 }
 
 int main() {
+#ifndef uart_default
+#warning test/pico_divider requires a default uart
+#else
 #ifdef TURBO
     vreg_set_voltage(VREG_VOLTAGE_MAX);
     set_sys_clock_khz(48000*8, true);
@@ -372,5 +380,6 @@ int main() {
 
   ostr("END\n");
   return 0;
-  }
+#endif
+}
 
