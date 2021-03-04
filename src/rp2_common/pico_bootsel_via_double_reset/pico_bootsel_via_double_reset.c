@@ -14,12 +14,12 @@
 #define PICO_BOOTSEL_VIA_DOUBLE_RESET_TIMEOUT_MS 200
 #endif
 
-// PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED, GPIO to use as bootloader activity LED when BOOTSEL mode is entered via reset double tap (or -1 for none), type=int, default=-1, group=pico_bootsel_via_double_reset
+// PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED, GPIO to use as bootloader activity LED when BOOTSEL mode is entered via reset double tap (or -1 for none), type=int, max=29, default=-1, group=pico_bootsel_via_double_reset
 #ifndef PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED
 #define PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED -1
 #endif
 
-// PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK, Optionally disable either the mass storage interface (bit 0) or the PICOBOOT interface (bit 1) when entering BOOTSEL mode via double reset, type=int, default=0, group=pico_bootsel_via_double_reset
+// PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK, Optionally disable either the mass storage interface (bit 0) or the PICOBOOT interface (bit 1) when entering BOOTSEL mode via double reset, type=int, min=0, max=3, default=0, group=pico_bootsel_via_double_reset
 #ifndef PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK
 #define PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK 0u
 #endif
