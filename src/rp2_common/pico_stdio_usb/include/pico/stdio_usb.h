@@ -54,10 +54,11 @@
 #define PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE 1200
 #endif
 
-// Setting this to something other than -1 will prevent picotool specifying an activity LED via VENDOR_INTERFACE. Set to -2 to specify none whilst also preventing picotool from specifying an activity LED.
-// PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED, GPIO to use as bootloader activity LED (or -1 for none) when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE), type=int, default=-1, max=29, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED
-#define PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED -1
+// PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED, Optionally define a pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE), type=int, min=0, max=29, group=pico_stdio_usb
+
+// PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED, Whether the pin specified by PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED is fixed or can be modified by picotool over the VENDOR USB interface, type=bool, default=0, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED
+#define PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED 0
 #endif
 
 // Any modes disabled here can't be re-enabled by picotool via VENDOR_INTERFACE.
