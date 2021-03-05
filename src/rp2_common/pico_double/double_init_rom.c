@@ -13,7 +13,7 @@
 uint32_t sd_table[SF_TABLE_V2_SIZE / 2];
 
 #if !PICO_DOUBLE_SUPPORT_ROM_V1
-static __attribute__((noreturn)) void missing_double_func_shim() {
+static __attribute__((noreturn)) void missing_double_func_shim(void) {
     panic("missing double function");
 }
 #endif
