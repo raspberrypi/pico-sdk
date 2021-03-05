@@ -12,11 +12,12 @@ endif()
 # needed by function below
 set(PICO_BOOT_STAGE2_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
 
+# by convention the first source file name without extension is used for the binary info name
 function(pico_define_boot_stage2 NAME SOURCES)
     add_executable(${NAME}
             ${SOURCES}
     )
-    
+
     # todo bit of an abstraction failure - revisit for Clang support anyway
     if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
         target_link_options(${NAME} PRIVATE "-nostdlib")
@@ -53,6 +54,12 @@ function(pico_define_boot_stage2 NAME SOURCES)
     add_dependencies(${NAME}_library ${NAME}_padded_checksummed_asm)
     # not strictly (or indeed actually) a link library, but this avoids dependency cycle
     target_link_libraries(${NAME}_library INTERFACE ${PADDED_CHECKSUMMED_ASM})
+
+    list(GET SOURCES 0 FIRST_SOURCE)
+    get_filename_component(BOOT2_BI_NAME ${FIRST_SOURCE} NAME_WE)
+
+    target_compile_definitions(${NAME}_library INTERFACE
+            -DPICO_BOOT2_NAME="${BOOT2_BI_NAME}")
 endfunction()
 
 macro(pico_set_boot_stage2 TARGET NAME)

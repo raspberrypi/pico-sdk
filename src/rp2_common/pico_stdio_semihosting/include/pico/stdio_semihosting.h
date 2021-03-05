@@ -22,6 +22,10 @@
 #define PICO_STDIO_SEMIHOSTING_DEFAULT_CRLF PICO_STDIO_DEFAULT_CRLF
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern stdio_driver_t stdio_semihosting;
 
 /*! \brief Explicitly initialize stdout over semihosting and add it to the current set of stdout targets
@@ -29,6 +33,10 @@ extern stdio_driver_t stdio_semihosting;
  *
  * \note this method is automatically called by \ref stdio_init_all() if `pico_stdio_semihosting` is included in the build
  */
-void stdio_semihosting_init();
+void stdio_semihosting_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

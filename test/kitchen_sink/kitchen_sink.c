@@ -27,10 +27,6 @@ bi_decl(bi_block_device(
                            BINARY_INFO_BLOCK_DEV_FLAG_READ | BINARY_INFO_BLOCK_DEV_FLAG_WRITE |
                                    BINARY_INFO_BLOCK_DEV_FLAG_PT_UNKNOWN));
 
-void my_timer(uint i) {
-    puts("XXXX timer");
-}
-
 //#pragma GCC push_options
 //#pragma GCC optimize ("O3")
 
@@ -39,7 +35,7 @@ uint32_t *foo = (uint32_t *) 200;
 uint32_t dma_to = 0;
 uint32_t dma_from = 0xaaaa5555;
 
-void spiggle() {
+void spiggle(void) {
     dma_channel_config c = dma_channel_get_default_config(1);
     channel_config_set_bswap(&c, true);
     channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
@@ -48,7 +44,7 @@ void spiggle() {
     dma_channel_transfer_from_buffer_now(1, foo, 23);
 }
 
-void __isr dma_handler_a() {
+void __isr dma_handler_a(void) {
     printf("HELLO A\n");
     if (dma_hw->ints1 & 1) {
         dma_hw->ints1 = 1;
@@ -57,7 +53,7 @@ void __isr dma_handler_a() {
     }
 }
 
-void __isr dma_handler_b() {
+void __isr dma_handler_b(void) {
     printf("HELLO B\n");
     if (dma_hw->ints1 & 1) {
         dma_hw->ints1 = 1;
@@ -68,7 +64,7 @@ void __isr dma_handler_b() {
 
 //#pragma GCC pop_options
 
-int main() {
+int main(void) {
     spiggle();
 
     stdio_init_all();
@@ -87,7 +83,6 @@ int main() {
     dma_channel_configure(0, &config, &dma_to, &dma_from, 1, true);
     dma_channel_set_config(0, &config, false);
 
-//    timer_start_ms(2, 2000, my_timer);
     for (int i = 0; i < 20; i++) {
         puts("sleepy");
         sleep_ms(1000);

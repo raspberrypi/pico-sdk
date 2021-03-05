@@ -50,7 +50,7 @@ void gpio_set_pulls(uint gpio, bool up, bool down) {
     invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
     hw_write_masked(
             &padsbank0_hw->io[gpio],
-            (!!up << PADS_BANK0_GPIO0_PUE_LSB) | (!!down << PADS_BANK0_GPIO0_PDE_LSB),
+            (bool_to_bit(up) << PADS_BANK0_GPIO0_PUE_LSB) | (bool_to_bit(down) << PADS_BANK0_GPIO0_PDE_LSB),
             PADS_BANK0_GPIO0_PUE_BITS | PADS_BANK0_GPIO0_PDE_BITS
     );
 }

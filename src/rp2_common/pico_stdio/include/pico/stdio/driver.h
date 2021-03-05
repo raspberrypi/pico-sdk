@@ -12,7 +12,7 @@
 
 struct stdio_driver {
     void (*out_chars)(const char *buf, int len);
-    void (*out_flush)();
+    void (*out_flush)(void);
     int (*in_chars)(char *buf, int len);
     stdio_driver_t *next;
 #if PICO_STDIO_ENABLE_CRLF_SUPPORT

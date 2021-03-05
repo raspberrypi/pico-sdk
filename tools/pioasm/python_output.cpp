@@ -203,7 +203,7 @@ struct python_output : public output_format {
                         break;
                 }
                 if (!invalid) {
-                    guts = ((arg1 & 4u) ? "1 " : "0 ") + guts;
+                    guts = ((arg1 & 4u) ? "1, " : "0, ") + guts;
                     op("wait");
                     op_guts(guts);
                 }
@@ -260,11 +260,14 @@ struct python_output : public output_format {
                     op("mov");
                     std::string guts = dest + ", ";
                     if (operation == 1) {
-                        guts += "not ";
+                        guts += "invert(";
                     } else if (operation == 2) {
-                        guts += "reverse ";
+                        guts += "reverse(";
                     }
                     guts += source;
+                    if (operation == 1 || operation == 2) {
+                        guts += ")";
+                    }
                     op_guts(guts);
                 }
                 break;

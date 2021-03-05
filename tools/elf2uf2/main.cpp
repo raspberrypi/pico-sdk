@@ -255,8 +255,19 @@ int elf2uf2(FILE *in, FILE *out) {
     }
     uint page_num = 0;
     if (ram_style) {
-        uint32_t expected_ep = pages.begin()->first | 0x1;
-        if (eh.entry != expected_ep) {
+        uint32_t expected_ep_main_ram = UINT32_MAX;
+        uint32_t expected_ep_xip_sram = UINT32_MAX;
+        for(auto& page_entry : pages) {
+            if ( ((page_entry.first >= MAIN_RAM_START) && (page_entry.first < MAIN_RAM_END)) && (page_entry.first < expected_ep_main_ram) ) {
+                expected_ep_main_ram = page_entry.first | 0x1;
+            } else if ( ((page_entry.first >= XIP_SRAM_START) && (page_entry.first < XIP_SRAM_END)) && (page_entry.first < expected_ep_xip_sram) ) { 
+                expected_ep_xip_sram = page_entry.first | 0x1;
+            }
+        }
+        uint32_t expected_ep = (UINT32_MAX != expected_ep_main_ram) ? expected_ep_main_ram : expected_ep_xip_sram;
+        if (eh.entry == expected_ep_xip_sram) {
+            return fail(ERROR_INCOMPATIBLE, "B0/B1 Boot ROM does not support direct entry into XIP_SRAM\n");
+        } else if (eh.entry != expected_ep) {
             return fail(ERROR_INCOMPATIBLE, "A RAM binary should have an entry point at the beginning: %08x (not %08x)\n", expected_ep, eh.entry);
         }
         static_assert(0 == (MAIN_RAM_START & (PAGE_SIZE - 1)), "");

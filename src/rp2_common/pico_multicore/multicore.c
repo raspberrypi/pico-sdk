@@ -46,7 +46,7 @@ bool multicore_fifo_push_timeout_us(uint32_t data, uint64_t timeout_us) {
     return true;
 }
 
-static inline uint32_t multicore_fifo_pop_blocking_inline() {
+static inline uint32_t multicore_fifo_pop_blocking_inline(void) {
     // If nothing there yet, we wait for an event first,
     // to try and avoid too much busy waiting
     while (!multicore_fifo_rvalid())
@@ -75,7 +75,7 @@ bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out) {
 // Default stack for core1 ... if multicore_launch_core1 is not included then .stack1 section will be garbage collected
 static uint32_t __attribute__((section(".stack1"))) core1_stack[PICO_CORE1_STACK_SIZE / sizeof(uint32_t)];
 
-static void __attribute__ ((naked)) core1_trampoline() {
+static void __attribute__ ((naked)) core1_trampoline(void) {
     __asm("pop {r0, r1, pc}");
 }
 
@@ -83,13 +83,15 @@ int core1_wrapper(int (*entry)(void), void *stack_base) {
 #if PICO_USE_STACK_GUARDS
     // install core1 stack guard
     runtime_install_stack_guard(stack_base);
+#else
+    __unused void *ignore = stack_base;
 #endif
     irq_init_priorities();
     return (*entry)();
 }
 
 void multicore_reset_core1() {
-    // Use atomic aliases just in case core 1 is also manipulating some posm state
+    // Use atomic aliases just in case core 1 is also manipulating some PSM state
     io_rw_32 *power_off = (io_rw_32 *) (PSM_BASE + PSM_FRCE_OFF_OFFSET);
     io_rw_32 *power_off_set = hw_set_alias(power_off);
     io_rw_32 *power_off_clr = hw_clear_alias(power_off);
@@ -105,15 +107,6 @@ void multicore_reset_core1() {
     *power_off_clr = PSM_FRCE_OFF_PROC1_BITS;
 }
 
-void multicore_sleep_core1() {
-    multicore_reset_core1();
-    // note we give core1 an invalid stack pointer, as it should not be used
-    // note also if we ge simply passed a function that returned immediately, we'd end up in core1_hang anyway
-    //  however that would waste 2 bytes for that function (the horror!)
-    extern void core1_hang(); // in crt0.S
-    multicore_launch_core1_raw(core1_hang, (uint32_t *) -1, scb_hw->vtor);
-}
-
 void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bottom, size_t stack_size_bytes) {
     assert(!(stack_size_bytes & 3u));
     uint32_t *stack_ptr = stack_bottom + stack_size_bytes / sizeof(uint32_t);
@@ -126,7 +119,7 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
 }
 
 void multicore_launch_core1(void (*entry)(void)) {
-    extern char __StackOneBottom;
+    extern uint32_t __StackOneBottom;
     uint32_t *stack_limit = (uint32_t *) &__StackOneBottom;
     // hack to reference core1_stack although that pointer is wrong.... core1_stack should always be <= stack_limit, if not boom!
     uint32_t *stack = core1_stack <= stack_limit ? stack_limit : (uint32_t *) -1;
@@ -151,8 +144,8 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
     } while (seq < count_of(cmd_sequence));
 }
 
-#define LOCKOUT_MAGIC_START 0x73a8831e
-#define LOCKOUT_MAGIC_END (LOCKOUT_MAGIC_START ^ -1)
+#define LOCKOUT_MAGIC_START 0x73a8831eu
+#define LOCKOUT_MAGIC_END (~LOCKOUT_MAGIC_START)
 
 static_assert(SIO_IRQ_PROC1 == SIO_IRQ_PROC0 + 1, "");
 
@@ -161,7 +154,7 @@ static bool lockout_in_progress;
 
 // note this method is in RAM because lockout is used when writing to flash
 // it only makes inline calls
-static void __isr __not_in_flash_func(multicore_lockout_handler)() {
+static void __isr __not_in_flash_func(multicore_lockout_handler)(void) {
     multicore_fifo_clear_irq();
     while (multicore_fifo_rvalid()) {
         if (sio_hw->fifo_rd == LOCKOUT_MAGIC_START) {
@@ -176,7 +169,7 @@ static void __isr __not_in_flash_func(multicore_lockout_handler)() {
     }
 }
 
-static void check_lockout_mutex_init() {
+static void check_lockout_mutex_init(void) {
     // use known available lock - we only need it briefly
     uint32_t save = hw_claim_lock();
     if (!mutex_is_initialzed(&lockout_mutex)) {
@@ -202,13 +195,13 @@ static bool multicore_lockout_handshake(uint32_t magic, absolute_time_t until) {
         if (next_timeout_us < 0) {
             break;
         }
-        multicore_fifo_push_timeout_us(magic, next_timeout_us);
+        multicore_fifo_push_timeout_us(magic, (uint64_t)next_timeout_us);
         next_timeout_us = absolute_time_diff_us(get_absolute_time(), until);
         if (next_timeout_us < 0) {
             break;
         }
         uint32_t word = 0;
-        if (!multicore_fifo_pop_timeout_us(next_timeout_us, &word)) {
+        if (!multicore_fifo_pop_timeout_us((uint64_t)next_timeout_us, &word)) {
             break;
         }
         if (word == magic) {

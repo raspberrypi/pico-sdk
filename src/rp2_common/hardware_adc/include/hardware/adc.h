@@ -84,7 +84,7 @@ static inline void adc_gpio_init(uint gpio) {
  * \param input Input to select.
  */
 static inline void adc_select_input(uint input) {
-    invalid_params_if(ADC, input > 4);
+    valid_params_if(ADC, input < NUM_ADC_CHANNELS);
     hw_write_masked(&adc_hw->cs, input << ADC_CS_AINSEL_LSB, ADC_CS_AINSEL_BITS);
 }
 
@@ -127,7 +127,7 @@ static inline uint16_t adc_read(void) {
     while (!(adc_hw->cs & ADC_CS_READY_BITS))
         tight_loop_contents();
 
-    return adc_hw->result;
+    return (uint16_t) adc_hw->result;
 }
 
 /*! \brief Enable or disable free-running sampling mode
@@ -166,13 +166,13 @@ static inline void adc_set_clkdiv(float clkdiv) {
  * \param err_in_fifo If enabled, bit 15 of the FIFO contains error flag for each sample
  * \param byte_shift Shift FIFO contents to be one byte in size (for byte DMA) - enables DMA to byte buffers.
  */
-static inline void adc_fifo_setup(bool en, bool dreq_en, uint16_t dreq_thresh, bool err_in_fifo, bool byte_shift) {
+ static inline void adc_fifo_setup(bool en, bool dreq_en, uint16_t dreq_thresh, bool err_in_fifo, bool byte_shift) {
     hw_write_masked(&adc_hw->fcs,
-                   (!!en << ADC_FCS_EN_LSB) |
-                   (!!dreq_en << ADC_FCS_DREQ_EN_LSB) |
-                   (dreq_thresh << ADC_FCS_THRESH_LSB) |
-                   (!!err_in_fifo << ADC_FCS_ERR_LSB) |
-                   (!!byte_shift << ADC_FCS_SHIFT_LSB),
+                   (bool_to_bit(en) << ADC_FCS_EN_LSB) |
+                   (bool_to_bit(dreq_en) << ADC_FCS_DREQ_EN_LSB) |
+                   (((uint)dreq_thresh) << ADC_FCS_THRESH_LSB) |
+                   (bool_to_bit(err_in_fifo) << ADC_FCS_ERR_LSB) |
+                   (bool_to_bit(byte_shift) << ADC_FCS_SHIFT_LSB),
                    ADC_FCS_EN_BITS |
                    ADC_FCS_DREQ_EN_BITS |
                    ADC_FCS_THRESH_BITS |
@@ -205,7 +205,7 @@ static inline uint8_t adc_fifo_get_level(void) {
  * Pops the latest result from the ADC FIFO.
  */
 static inline uint16_t adc_fifo_get(void) {
-    return adc_hw->fifo;
+    return (uint16_t)adc_hw->fifo;
 }
 
 /*! \brief Wait for the ADC FIFO to have data.
@@ -216,7 +216,7 @@ static inline uint16_t adc_fifo_get(void) {
 static inline uint16_t adc_fifo_get_blocking(void) {
     while (adc_fifo_is_empty())
         tight_loop_contents();
-    return adc_hw->fifo;
+    return (uint16_t)adc_hw->fifo;
 }
 
 /*! \brief Drain the ADC FIFO

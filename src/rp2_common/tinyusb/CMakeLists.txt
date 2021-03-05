@@ -8,7 +8,7 @@ if (NOT PICO_TINYUSB_PATH)
     set(PICO_TINYUSB_PATH ${PROJECT_SOURCE_DIR}/lib/tinyusb)
     if (NOT EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
         message(WARNING "TinyUSB submodule has not been initialized; USB support will be unavailable
-         hint: try 'git submodule update --init'.")
+hint: try 'git submodule update --init' from your SDK directory (${PICO_SDK_PATH}).")
     endif()
 elseif (NOT EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     message(WARNING "PICO_TINYUSB_PATH specified but content not present.")

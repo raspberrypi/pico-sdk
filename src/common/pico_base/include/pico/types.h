@@ -7,55 +7,65 @@
 #ifndef _PICO_TYPES_H
 #define _PICO_TYPES_H
 
+#include "pico/assert.h"
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 
 typedef unsigned int uint;
 
-#ifdef NDEBUG
 /*! \typedef absolute_time_t
     \brief An opaque 64 bit timestamp in microseconds
 
     The type is used instead of a raw uint64_t to prevent accidentally passing relative times or times in the wrong
     time units where an absolute time is required. It is equivalent to uint64_t in release builds.
 
-    \see to_us_since_boot
-    \see update_us_since_boot
+    \see to_us_since_boot()
+    \see update_us_since_boot()
+    \ingroup timestamp
 */
+#ifndef NDEBUG
 typedef uint64_t absolute_time_t;
+#else
+typedef struct {
+    uint64_t _private_us_since_boot;
+} absolute_time_t;
+#endif
 
 /*! fn to_us_since_boot
  * \brief convert an absolute_time_t into a number of microseconds since boot.
- * \param t the number of microseconds since boot
- * \return an absolute_time_t value equivalent to t
+ * \param t the absolute time to convert
+ * \return a number of microseconds since boot, equivalent to t
+ * \ingroup timestamp
  */
 static inline uint64_t to_us_since_boot(absolute_time_t t) {
+#ifndef NDEBUG
     return t;
+#else
+    return t._private_us_since_boot;
+#endif
 }
 
 /*! fn update_us_since_boot
  * \brief update an absolute_time_t value to represent a given number of microseconds since boot
  * \param t the absolute time value to update
- * \param us_since_boot the number of microseconds since boot to represent
+ * \param us_since_boot the number of microseconds since boot to represent. Note this should be representable
+ *                      as a signed 64 bit integer
+ * \ingroup timestamp
  */
 static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
+#ifndef NDEBUG
     *t = us_since_boot;
+#else
+    assert(us_since_boot <= INT64_MAX);
+    t->_private_us_since_boot = us_since_boot;
+#endif
 }
 
+#ifndef NDEBUG
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = value
 #else
-typedef struct {
-    uint64_t _private_us_since_boot;
-} absolute_time_t;
-
-static inline uint64_t to_us_since_boot(absolute_time_t t) {
-    return t._private_us_since_boot;
-}
-
-static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
-    t->_private_us_since_boot = us_since_boot;
-}
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = {value}
 #endif
 
@@ -75,5 +85,7 @@ typedef struct {
     int8_t min;      ///< 0..59
     int8_t sec;      ///< 0..59
 } datetime_t;
+
+#define bool_to_bit(x) ((uint)!!(x))
 
 #endif

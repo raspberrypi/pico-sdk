@@ -23,6 +23,10 @@
 #define PICO_STDIO_UART_DEFAULT_CRLF PICO_STDIO_DEFAULT_CRLF
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern stdio_driver_t stdio_uart;
 
 /*! \brief Explicitly initialize stdin/stdout over UART and add it to the current set of stdin/stdout drivers
@@ -33,21 +37,21 @@ extern stdio_driver_t stdio_uart;
  *
  * \note this method is automatically called by \ref stdio_init_all() if `pico_stdio_uart` is included in the build
  */
-void stdio_uart_init();
+void stdio_uart_init(void);
 
 /*! \brief Explicitly initialize stdout only (no stdin) over UART and add it to the current set of stdout drivers
  *  \ingroup pico_stdio_uart
  *
  * This method sets up PICO_DEFAULT_UART_TX_PIN for UART output (if defined) , and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE
  */
-void stdout_uart_init();
+void stdout_uart_init(void);
 
 /*! \brief Explicitly initialize stdin only (no stdout) over UART and add it to the current set of stdin drivers
  *  \ingroup pico_stdio_uart
  *
  * This method sets up PICO_DEFAULT_UART_RX_PIN for UART input (if defined) , and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE
  */
-void stdin_uart_init();
+void stdin_uart_init(void);
 
 /*! \brief Perform custom initialization initialize stdin/stdout over UART and add it to the current set of stdin/stdout drivers
  *  \ingroup pico_stdio_uart
@@ -58,5 +62,9 @@ void stdin_uart_init();
  * \param rx_pin the UART pin to use for stdin (or -1 for no stdin)
  */
 void stdio_uart_init_full(uart_inst_t *uart, uint baud_rate, int tx_pin, int rx_pin);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

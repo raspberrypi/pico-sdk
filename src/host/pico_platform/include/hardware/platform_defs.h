@@ -21,4 +21,8 @@
 
 #define NUM_SPIN_LOCKS 32u
 
+#ifndef _u
+#define _u(x) x ## u
+#endif
+
 #endif

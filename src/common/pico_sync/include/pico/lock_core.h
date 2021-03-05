@@ -10,6 +10,11 @@
 #include "pico.h"
 #include "hardware/sync.h"
 
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_LOCK_CORE, Enable/disable assertions in the lock core, type=bool, default=0, group=pico_sync
+#ifndef PARAM_ASSERTIONS_ENABLED_LOCK_CORE
+#define PARAM_ASSERTIONS_ENABLED_LOCK_CORE 0
+#endif
+
 /** \file lock_core.h
  *  \ingroup pico_sync
  *

@@ -56,6 +56,16 @@ extern "C" {
 #include "pico/stdio_semihosting.h"
 #endif
 
+// PICO_CONFIG: PICO_DEFAULT_LED_PIN, Optionally define a pin that drives a regular LED on the board, group=pico_stdlib
+
+// PICO_CONFIG: PICO_DEFAULT_LED_PIN_INVERTED, 1 if LED is inverted or 0 if not, type=int, default=0, group=pico_stdlib
+#ifndef PICO_DEFAULT_LED_PIN_INVERTED
+#define PICO_DEFAULT_LED_PIN_INVERTED 0
+#endif
+
+// PICO_CONFIG: PICO_DEFAULT_WS2812_PIN, Optionally define a pin that controls data to a WS2812 compatible LED on the board, group=pico_stdlib
+// PICO_CONFIG: PICO_DEFAULT_WS2812_POWER_PIN, Optionally define a pin that controls power to a WS2812 compatible LED on the board, group=pico_stdlib
+
 /*! \brief Set up the default UART and assign it to the default GPIO's
  *  \ingroup pico_stdlib
  *
@@ -71,14 +81,14 @@ extern "C" {
  *  PICO_DEFAULT_UART_TX_PIN
  *  PICO_DEFAULT_UART_RX_PIN
  */
-void setup_default_uart();
+void setup_default_uart(void);
 
 /*! \brief Initialise the system clock to 48MHz
  *  \ingroup pico_stdlib
  *
  *  Set the system clock to 48MHz, and set the peripheral clock to match.
  */
-void set_sys_clock_48mhz();
+void set_sys_clock_48mhz(void);
 
 /*! \brief Initialise the system clock
  *  \ingroup pico_stdlib

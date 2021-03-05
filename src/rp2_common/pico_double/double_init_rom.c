@@ -13,13 +13,13 @@
 uint32_t sd_table[SF_TABLE_V2_SIZE / 2];
 
 #if !PICO_DOUBLE_SUPPORT_ROM_V1
-static __attribute__((noreturn)) void missing_double_func_shim() {
+static __attribute__((noreturn)) void missing_double_func_shim(void) {
     panic("missing double function");
 }
 #endif
-extern void double_table_shim_on_use_helper();
+extern void double_table_shim_on_use_helper(void);
 
-void __aeabi_double_init() {
+void __aeabi_double_init(void) {
     int rom_version = rp2040_rom_version();
 #if PICO_DOUBLE_SUPPORT_ROM_V1
     if (rom_version == 1) {

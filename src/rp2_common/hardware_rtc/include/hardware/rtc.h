@@ -28,7 +28,15 @@
  * \include hello_rtc.c
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+/*! Callback function type for RTC alarms
+ *  \ingroup hardware_rtc
+ *
+ * \sa rtc_set_alarm()
+ */
 typedef void (*rtc_callback_t)(void);
 
 /*! \brief Initialise the RTC system
@@ -66,9 +74,18 @@ bool rtc_running(void);
  */
 void rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback);
 
+/*! \brief Enable the RTC alarm (if inactive)
+ *  \ingroup hardware_rtc
+ */
+void rtc_enable_alarm(void);
+
 /*! \brief Disable the RTC alarm (if active)
  *  \ingroup hardware_rtc
  */
 void rtc_disable_alarm(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

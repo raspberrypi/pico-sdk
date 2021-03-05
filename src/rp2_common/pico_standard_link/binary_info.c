@@ -15,7 +15,7 @@
 #if !PICO_NO_FLASH
 #ifndef PICO_NO_BI_BINARY_SIZE
 extern char __flash_binary_end;
-bi_decl_with_attr(bi_binary_end((uintptr_t)&__flash_binary_end), reset_section_attr)
+bi_decl_with_attr(bi_binary_end((intptr_t)&__flash_binary_end), reset_section_attr)
 #endif
 #endif
 
@@ -66,7 +66,13 @@ bi_decl(bi_program_url(PICO_PROGRAM_URL))
 #endif
 #endif
 
-#if !PICO_NO_BUILD_TYPE_FEATURE
+#if !PICO_NO_BI_BOOT2_NAME
+#ifdef PICO_BOOT2_NAME
+bi_decl(bi_string(BINARY_INFO_TAG_RASPBERRY_PI, BINARY_INFO_ID_RP_BOOT2_NAME, PICO_BOOT2_NAME))
+#endif
+#endif
+
+#if !PICO_NO_BI_BUILD_TYPE
 #ifdef PICO_CMAKE_BUILD_TYPE
 bi_decl(bi_program_build_attribute(PICO_CMAKE_BUILD_TYPE))
 #else

@@ -290,7 +290,7 @@ static size_t _ntoa_long(out_fct_type out, char *buffer, size_t idx, size_t maxl
     if (!(flags & FLAGS_PRECISION) || value) {
         do {
             const char digit = (char) (value % base);
-            buf[len++] = digit < 10 ? '0' + digit : (flags & FLAGS_UPPERCASE ? 'A' : 'a') + digit - 10;
+            buf[len++] = (char)(digit < 10 ? '0' + digit : (flags & FLAGS_UPPERCASE ? 'A' : 'a') + digit - 10);
             value /= base;
         } while (value && (len < PICO_PRINTF_NTOA_BUFFER_SIZE));
     }
@@ -317,7 +317,7 @@ static size_t _ntoa_long_long(out_fct_type out, char *buffer, size_t idx, size_t
     if (!(flags & FLAGS_PRECISION) || value) {
         do {
             const char digit = (char) (value % base);
-            buf[len++] = digit < 10 ? '0' + digit : (flags & FLAGS_UPPERCASE ? 'A' : 'a') + digit - 10;
+            buf[len++] = (char)(digit < 10 ? '0' + digit : (flags & FLAGS_UPPERCASE ? 'A' : 'a') + digit - 10);
             value /= base;
         } while (value && (len < PICO_PRINTF_NTOA_BUFFER_SIZE));
     }
@@ -490,21 +490,26 @@ static size_t _etoa(out_fct_type out, char *buffer, size_t idx, size_t maxlen, d
     } conv;
 
     conv.F = value;
-    int exp2 = (int) ((conv.U >> 52U) & 0x07FFU) - 1023;           // effectively log2
-    conv.U = (conv.U & ((1ULL << 52U) - 1U)) | (1023ULL << 52U);  // drop the exponent so conv.F is now in [1,2)
-    // now approximate log10 from the log2 integer part and an expansion of ln around 1.5
-    int expval = (int) (0.1760912590558 + exp2 * 0.301029995663981 + (conv.F - 1.5) * 0.289529654602168);
-    // now we want to compute 10^expval but we want to be sure it won't overflow
-    exp2 = (int) (expval * 3.321928094887362 + 0.5);
-    const double z = expval * 2.302585092994046 - exp2 * 0.6931471805599453;
-    const double z2 = z * z;
-    conv.U = (uint64_t) (exp2 + 1023) << 52U;
-    // compute exp(z) using continued fractions, see https://en.wikipedia.org/wiki/Exponential_function#Continued_fractions_for_ex
-    conv.F *= 1 + 2 * z / (2 - z + (z2 / (6 + (z2 / (10 + z2 / 14)))));
-    // correct for rounding errors
-    if (value < conv.F) {
-        expval--;
-        conv.F /= 10;
+    int expval;
+    if (conv.U) {
+        int exp2 = (int) ((conv.U >> 52U) & 0x07FFU) - 1023;           // effectively log2
+        conv.U = (conv.U & ((1ULL << 52U) - 1U)) | (1023ULL << 52U);  // drop the exponent so conv.F is now in [1,2)
+        // now approximate log10 from the log2 integer part and an expansion of ln around 1.5
+        expval = (int) (0.1760912590558 + exp2 * 0.301029995663981 + (conv.F - 1.5) * 0.289529654602168);
+        // now we want to compute 10^expval but we want to be sure it won't overflow
+        exp2 = (int) (expval * 3.321928094887362 + 0.5);
+        const double z = expval * 2.302585092994046 - exp2 * 0.6931471805599453;
+        const double z2 = z * z;
+        conv.U = (uint64_t) (exp2 + 1023) << 52U;
+        // compute exp(z) using continued fractions, see https://en.wikipedia.org/wiki/Exponential_function#Continued_fractions_for_ex
+        conv.F *= 1 + 2 * z / (2 - z + (z2 / (6 + (z2 / (10 + z2 / 14)))));
+        // correct for rounding errors
+        if (value < conv.F) {
+            expval--;
+            conv.F /= 10;
+        }
+    } else {
+        expval = 0;
     }
 
     // the exponent format is "%+03d" and largest value is "307", so set aside 4-5 characters
@@ -513,7 +518,7 @@ static size_t _etoa(out_fct_type out, char *buffer, size_t idx, size_t maxlen, d
     // in "%g" mode, "prec" is the number of *significant figures* not decimals
     if (flags & FLAGS_ADAPT_EXP) {
         // do we want to fall-back to "%f" mode?
-        if ((value >= 1e-4) && (value < 1e6)) {
+        if ((conv.U == 0) || ((value >= 1e-4) && (value < 1e6))) {
             if ((int) prec > expval) {
                 prec = (unsigned) ((int) prec - expval - 1);
             } else {
@@ -559,7 +564,7 @@ static size_t _etoa(out_fct_type out, char *buffer, size_t idx, size_t maxlen, d
         // output the exponential symbol
         out((flags & FLAGS_UPPERCASE) ? 'E' : 'e', buffer, idx++, maxlen);
         // output the exponent value
-        idx = _ntoa_long(out, buffer, idx, maxlen, (expval < 0) ? -expval : expval, expval < 0, 10, 0, minwidth - 1,
+        idx = _ntoa_long(out, buffer, idx, maxlen, (uint)((expval < 0) ? -expval : expval), expval < 0, 10, 0, minwidth - 1,
                          FLAGS_ZEROPAD | FLAGS_PLUS);
         // might need to right-pad spaces
         if (flags & FLAGS_LEFT) {

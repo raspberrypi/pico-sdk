@@ -35,6 +35,12 @@ extern "C" {
  * Each controller can be connected to a number of GPIO pins, see the datasheet GPIO function selection table for more information.
  */
 
+// PICO_CONFIG: PICO_DEFAULT_SPI, Define the default SPI for a board, min=0, max=1, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_SCK_PIN, Define the default SPI SCK pin, min=0, max=29, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_TX_PIN, Define the default SPI TX pin, min=0, max=29, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_RX_PIN, Define the default SPI RX pin, min=0, max=29, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_CSN_PIN, Define the default SPI CSN pin, min=0, max=29, group=hardware_spi
+
 /**
  * Opaque type representing an SPI instance.
  */
@@ -56,16 +62,33 @@ typedef struct spi_inst spi_inst_t;
  */
 #define spi1 ((spi_inst_t * const)spi1_hw)
 
+#if !defined(PICO_DEFAULT_SPI_INSTANCE) && defined(PICO_DEFAULT_SPI)
+#define PICO_DEFAULT_SPI_INSTANCE (__CONCAT(spi,PICO_DEFAULT_SPI))
+#endif
+
+#ifdef PICO_DEFAULT_SPI_INSTANCE
+#define spi_default PICO_DEFAULT_SPI_INSTANCE
+#endif
+
+/** \brief Enumeration of SPI CPHA (clock phase) values.
+ *  \ingroup hardware_spi
+ */
 typedef enum {
     SPI_CPHA_0 = 0,
     SPI_CPHA_1 = 1
 } spi_cpha_t;
 
+/** \brief Enumeration of SPI CPOL (clock polarity) values.
+ *  \ingroup hardware_spi
+ */
 typedef enum {
     SPI_CPOL_0 = 0,
     SPI_CPOL_1 = 1
 } spi_cpol_t;
 
+/** \brief Enumeration of SPI bit-order values.
+ *  \ingroup hardware_spi
+ */
 typedef enum {
     SPI_LSB_FIRST = 0,
     SPI_MSB_FIRST = 1
@@ -109,7 +132,7 @@ void spi_deinit(spi_inst_t *spi);
  */
 uint spi_set_baudrate(spi_inst_t *spi, uint baudrate);
 
-/*! \brief Convert I2c instance to hardware instance number
+/*! \brief Convert SPI instance to hardware instance number
  *  \ingroup hardware_spi
  *
  * \param spi SPI instance
@@ -136,16 +159,16 @@ static inline spi_hw_t *spi_get_hw(spi_inst_t *spi) {
  * \param cpha SSPCLKOUT phase, applicable to Motorola SPI frame format only
  * \param order Must be SPI_MSB_FIRST, no other values supported on the PL022
  */
-static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cpol, spi_cpha_t cpha, spi_order_t order) {
+static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cpol, spi_cpha_t cpha, __unused spi_order_t order) {
     invalid_params_if(SPI, data_bits < 4 || data_bits > 16);
     // LSB-first not supported on PL022:
     invalid_params_if(SPI, order != SPI_MSB_FIRST);
     invalid_params_if(SPI, cpol != SPI_CPOL_0 && cpol != SPI_CPOL_1);
     invalid_params_if(SPI, cpha != SPI_CPHA_0 && cpha != SPI_CPHA_1);
     hw_write_masked(&spi_get_hw(spi)->cr0,
-        (data_bits - 1) << SPI_SSPCR0_DSS_LSB |
-        cpol << SPI_SSPCR0_SPO_LSB |
-        cpha << SPI_SSPCR0_SPH_LSB,
+                    ((uint)(data_bits - 1)) << SPI_SSPCR0_DSS_LSB |
+                    ((uint)cpol) << SPI_SSPCR0_SPO_LSB |
+                    ((uint)cpha) << SPI_SSPCR0_SPH_LSB,
         SPI_SSPCR0_DSS_BITS |
         SPI_SSPCR0_SPO_BITS |
         SPI_SSPCR0_SPH_BITS);
@@ -258,7 +281,7 @@ int spi_read_blocking(spi_inst_t *spi, uint8_t repeated_tx_data, uint8_t *dst, s
  * \param src Buffer of data to write
  * \param dst Buffer for read data
  * \param len Length of BOTH buffers in halfwords
- * \return Number of bytes written/read
+ * \return Number of halfwords written/read
 */
 int spi_write16_read16_blocking(spi_inst_t *spi, const uint16_t *src, uint16_t *dst, size_t len);
 
@@ -273,7 +296,7 @@ int spi_write16_read16_blocking(spi_inst_t *spi, const uint16_t *src, uint16_t *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \param src Buffer of data to write
  * \param len Length of buffers
- * \return Number of bytes written/read
+ * \return Number of halfwords written/read
 */
 int spi_write16_blocking(spi_inst_t *spi, const uint16_t *src, size_t len);
 
@@ -291,8 +314,8 @@ int spi_write16_blocking(spi_inst_t *spi, const uint16_t *src, size_t len);
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \param repeated_tx_data Buffer of data to write
  * \param dst Buffer for read data
- * \param len Length of buffer \p dst  in halfwords
- * \return Number of bytes written/read
+ * \param len Length of buffer \p dst in halfwords
+ * \return Number of halfwords written/read
  */
 int spi_read16_blocking(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *dst, size_t len);
 

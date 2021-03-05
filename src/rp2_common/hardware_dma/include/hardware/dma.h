@@ -42,7 +42,7 @@ extern "C" {
 #define PARAM_ASSERTIONS_ENABLED_DMA 0
 #endif
 
-static inline void check_dma_channel_param(uint channel) {
+static inline void check_dma_channel_param(__unused uint channel) {
 #if PARAM_ASSERTIONS_ENABLED(DMA)
     // this method is used a lot by inline functions so avoid code bloat by deferring to function
     extern void check_dma_channel_param_impl(uint channel);
@@ -186,7 +186,7 @@ static inline void channel_config_set_chain_to(dma_channel_config *c, uint chain
  */
 static inline void channel_config_set_transfer_data_size(dma_channel_config *c, enum dma_channel_transfer_size size) {
     assert(size == DMA_SIZE_8 || size == DMA_SIZE_16 || size == DMA_SIZE_32);
-    c->ctrl = (c->ctrl & ~DMA_CH0_CTRL_TRIG_DATA_SIZE_BITS) | (size << DMA_CH0_CTRL_TRIG_DATA_SIZE_LSB);
+    c->ctrl = (c->ctrl & ~DMA_CH0_CTRL_TRIG_DATA_SIZE_BITS) | (((uint)size) << DMA_CH0_CTRL_TRIG_DATA_SIZE_LSB);
 }
 
 /*! \brief  Set address wrapping parameters
@@ -540,6 +540,8 @@ inline static bool dma_channel_is_busy(uint channel) {
  */
 inline static void dma_channel_wait_for_finish_blocking(uint channel) {
     while (dma_channel_is_busy(channel)) tight_loop_contents();
+    // stop the compiler hoisting a non volatile buffer access above the DMA completion.
+    __compiler_memory_barrier();
 }
 
 /*! \brief Enable the DMA sniffing targeting the specified channel
@@ -595,7 +597,7 @@ inline static void dma_sniffer_set_byte_swap_enabled(bool swap) {
  *  \ingroup hardware_dma
  *
  */
-inline static void dma_sniffer_disable() {
+inline static void dma_sniffer_disable(void) {
     dma_hw->sniff_ctrl = 0;
 }
 

@@ -288,6 +288,8 @@ double bb = 1;
 int main() {
     setup_default_uart();
 
+    bool fail = false;
+
     printf("%d\n", aa < bb);
     for(double a = -1; a <= 1; a++) {
         for(double b = -1; b <= 1; b++) {
@@ -314,6 +316,10 @@ int main() {
         double s, c;
         sincos(x, &s, &c);
         printf("SINCOS %10.18f %10.18f\n", s, c);
+        if (s != sin(x) || c != cos(x)) {
+            printf("SINCOS mismatch\n");
+            fail = true;
+        }
     }
 
 #if PICO_DOUBLE_PROPAGATE_NANS
@@ -412,23 +418,18 @@ int main() {
         printf("%g %10.18g %10.18g, %10.18g, %10.18g %10.18g\n", x, f, x + 0.37777777777777777777777777777,
                x - 0.377777777777777777777777777777, g, 123456789.0 / x);
     }
-    if (test_cdcmpeq() || test_cdcmple() ||
-        test_dcmpun() || test_cmple_gt() || test_cmplt_ge()) {
+
+    if (fail ||
+        test_cdcmpeq() ||
+        test_cdcmple() ||
+        test_dcmpun() ||
+        test_cmple_gt() ||
+        test_cmplt_ge()) {
         printf("FAILED\n");
         return 1;
     } else {
         printf("PASSED\n");
         return 0;
     }
-
-    if (test_cdcmpeq() || test_cdcmple() ||
-        test_dcmpun() || test_cmple_gt() || test_cmplt_ge()) {
-        printf("FAILED\n");
-        return 1;
-    } else {
-        printf("PASSED\n");
-        return 0;
-    }
-
 #endif
 }

@@ -9,7 +9,7 @@
 #include "hardware/pll.h"
 
 /// \tag::pll_init_calculations[]
-void pll_init(PLL pll, uint32_t refdiv, uint32_t vco_freq, uint32_t post_div1, uint8_t post_div2) {
+void pll_init(PLL pll, uint refdiv, uint vco_freq, uint post_div1, uint post_div2) {
     // Turn off PLL in case it is already running
     pll->pwr = 0xffffffff;
     pll->fbdiv_int = 0;
