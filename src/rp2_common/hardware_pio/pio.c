@@ -60,7 +60,7 @@ static_assert(PIO_INSTRUCTION_COUNT <= 32, "");
 static uint32_t _used_instruction_space[2];
 
 static int _pio_find_offset_for_program(PIO pio, const pio_program_t *program) {
-    assert(program->length < PIO_INSTRUCTION_COUNT);
+    assert(program->length <= PIO_INSTRUCTION_COUNT);
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     uint32_t program_mask = (1u << program->length) - 1;
     if (program->origin >= 0) {
