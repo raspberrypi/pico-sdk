@@ -44,17 +44,3 @@ function(pico_add_uf2_output TARGET)
                 COMMAND ELF2UF2 ${TARGET}${CMAKE_EXECUTABLE_SUFFIX} ${TARGET}.uf2)
     endif()
 endfunction()
-
-if (NOT DEFINED PICO_BUILD_PICOFLASH)
-    if (DEFINED ENV{PICO_BUILD_PICOFLASH})
-        set(PICO_BUILD_PICOFLASH $ENV{PICO_BUILD_PICOFLASH})
-    else()
-        # for now
-        set(PICO_BUILD_PICOFLASH 1)
-    endif()
-endif()
-
-if (PICO_BUILD_PICOTOOL)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PICO_SDK_PATH}/tools)
-    find_package(Picotool REQUIRED)
-endif()
