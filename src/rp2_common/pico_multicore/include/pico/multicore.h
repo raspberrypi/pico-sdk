@@ -84,10 +84,10 @@ static inline bool multicore_fifo_rvalid(void) {
     return !!(sio_hw->fifo_st & SIO_FIFO_ST_VLD_BITS);
 }
 
-/*! \brief Check the FIFO to see if the write FIFO is full
+/*! \brief Check the write FIFO to see if it is ready for more data
  *  \ingroup multicore_fifo
  *
- *  @return true if the FIFO is full, false otherwise
+ *  @return true if the FIFO has room for more data, false otherwise
  */
 static inline bool multicore_fifo_wready(void) {
     return !!(sio_hw->fifo_st & SIO_FIFO_ST_RDY_BITS);
