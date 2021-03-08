@@ -194,6 +194,7 @@ inline static void restore_interrupts(uint32_t status) {
  * \return The spinlock instance
  */
 inline static spin_lock_t *spin_lock_instance(uint lock_num) {
+    invalid_params_if(SYNC, lock_num >= NUM_SPIN_LOCKS);
     return (spin_lock_t *) (SIO_BASE + SIO_SPINLOCK0_OFFSET + lock_num * 4);
 }
 
