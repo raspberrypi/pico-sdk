@@ -71,11 +71,11 @@ void queue_free(queue_t *q);
  * spin lock is not externally locked
  */
 static inline uint queue_get_level_unsafe(queue_t *q) {
-    int32_t rc = (int32_t) q->wptr - (int32_t) q->rptr;
+    int32_t rc = (int32_t)q->wptr - (int32_t)q->rptr;
     if (rc < 0) {
-        rc += +q->element_count + 1;
+        rc += q->element_count + 1;
     }
-    return (uint) rc;
+    return (uint)rc;
 }
 
 /*! \brief Check of level of the specified queue.
