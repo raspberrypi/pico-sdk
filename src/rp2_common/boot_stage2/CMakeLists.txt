@@ -6,7 +6,7 @@ endif()
 set(PICO_DEFAULT_BOOT_STAGE2_FILE "${PICO_DEFAULT_BOOT_STAGE2_FILE}" CACHE STRING "boot_stage2 source file" FORCE)
 
 if (NOT EXISTS ${PICO_DEFAULT_BOOT_STAGE2_FILE})
-    message(FATAL_ERROR "Specified boot_stage2 source '${PICO_BOOT_STAGE2_FILE}' does not exist.")
+    message(FATAL_ERROR "Specified boot_stage2 source '${PICO_DEFAULT_BOOT_STAGE2_FILE}' does not exist.")
 endif()
 
 # needed by function below
