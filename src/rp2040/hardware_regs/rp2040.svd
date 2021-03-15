@@ -29321,7 +29321,7 @@
               <description>set to 0xaa0 + div where\n
                 div = 0 divides by 32\n
                 div = 1-31 divides by div\n
-                any other value sets div=0 and therefore divides by 32\n
+                any other value sets div=31\n
                 this register resets to div=16</description>
               <enumeratedValues>
                 <enumeratedValue>
@@ -29342,7 +29342,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[11:4]</bitRange>
-              <description>set to 0xaa0\n
+              <description>set to 0xaa\n
                 any other value enables the output with shift=0</description>
               <name>PASSWD</name>
             </field>
@@ -29385,7 +29385,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[24:24]</bitRange>
-              <description>An invalid value has been written to CTRL_ENABLE or CTRL_FREQ_RANGE or FRFEQA or FREQB or DORMANT</description>
+              <description>An invalid value has been written to CTRL_ENABLE or CTRL_FREQ_RANGE or FREQA or FREQB or DORMANT</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>BADWRITE</name>
             </field>
