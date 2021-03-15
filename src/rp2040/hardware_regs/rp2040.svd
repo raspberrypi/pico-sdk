@@ -29342,7 +29342,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[11:4]</bitRange>
-              <description>set to 0xaa0\n
+              <description>set to 0xaa\n
                 any other value enables the output with shift=0</description>
               <name>PASSWD</name>
             </field>

@@ -208,7 +208,7 @@
 #define ROSC_PHASE_RESET  _u(0x00000008)
 // -----------------------------------------------------------------------------
 // Field       : ROSC_PHASE_PASSWD
-// Description : set to 0xaa0
+// Description : set to 0xaa
 //               any other value enables the output with shift=0
 #define ROSC_PHASE_PASSWD_RESET  _u(0x00)
 #define ROSC_PHASE_PASSWD_BITS   _u(0x00000ff0)
