@@ -190,7 +190,7 @@
 //               set to 0xaa0 + div where
 //               div = 0 divides by 32
 //               div = 1-31 divides by div
-//               any other value sets div=0 and therefore divides by 32
+//               any other value sets div=31
 //               this register resets to div=16
 //               0xaa0 -> PASS
 #define ROSC_DIV_OFFSET     _u(0x00000010)
@@ -260,7 +260,7 @@
 // -----------------------------------------------------------------------------
 // Field       : ROSC_STATUS_BADWRITE
 // Description : An invalid value has been written to CTRL_ENABLE or
-//               CTRL_FREQ_RANGE or FRFEQA or FREQB or DORMANT
+//               CTRL_FREQ_RANGE or FREQA or FREQB or DORMANT
 #define ROSC_STATUS_BADWRITE_RESET  _u(0x0)
 #define ROSC_STATUS_BADWRITE_BITS   _u(0x01000000)
 #define ROSC_STATUS_BADWRITE_MSB    _u(24)
