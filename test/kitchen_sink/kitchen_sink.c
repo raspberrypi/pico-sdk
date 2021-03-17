@@ -83,6 +83,7 @@ int main(void) {
     dma_channel_configure(0, &config, &dma_to, &dma_from, 1, true);
     dma_channel_set_config(0, &config, false);
 
+    // note this loop expects to cause a breakpoint!!
     for (int i = 0; i < 20; i++) {
         puts("sleepy");
         sleep_ms(1000);
@@ -94,4 +95,6 @@ int main(void) {
             irq_remove_handler(DMA_IRQ_1, dma_handler_b);
         }
     }
+    // this should compile as we are Cortex M0+
+    __asm volatile("SVC #3");
 }

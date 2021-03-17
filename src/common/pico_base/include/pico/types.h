@@ -25,7 +25,7 @@ typedef unsigned int uint;
     \see update_us_since_boot()
     \ingroup timestamp
 */
-#ifndef NDEBUG
+#ifdef NDEBUG
 typedef uint64_t absolute_time_t;
 #else
 typedef struct {
@@ -40,7 +40,7 @@ typedef struct {
  * \ingroup timestamp
  */
 static inline uint64_t to_us_since_boot(absolute_time_t t) {
-#ifndef NDEBUG
+#ifdef NDEBUG
     return t;
 #else
     return t._private_us_since_boot;
@@ -55,7 +55,7 @@ static inline uint64_t to_us_since_boot(absolute_time_t t) {
  * \ingroup timestamp
  */
 static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
-#ifndef NDEBUG
+#ifdef NDEBUG
     *t = us_since_boot;
 #else
     assert(us_since_boot <= INT64_MAX);
@@ -63,7 +63,7 @@ static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_bo
 #endif
 }
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = value
 #else
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = {value}

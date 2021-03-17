@@ -52,8 +52,9 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 option(PICO_DEOPTIMIZED_DEBUG "Build debug builds with -O0" 0)
 
 # todo move to platform/Generix-xxx
-set(ARM_GCC_COMMON_FLAGS " -march=armv6-m -mcpu=cortex-m0plus -mthumb")
-#set(ARM_GCC_COMMON_FLAGS " -mcpu=cortex-m0plus -mthumb")
+
+# on ARM -mcpu should not be mixed with -march
+set(ARM_GCC_COMMON_FLAGS " -mcpu=cortex-m0plus -mthumb")
 foreach(LANG IN ITEMS C CXX ASM)
     set(CMAKE_${LANG}_FLAGS_INIT "${ARM_GCC_COMMON_FLAGS}")
     if (PICO_DEOPTIMIZED_DEBUG)
