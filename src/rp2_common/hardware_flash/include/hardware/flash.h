@@ -85,7 +85,7 @@ void flash_get_unique_id(uint8_t *id_out);
  *
  * Execute a bidirectional command to the flash. Bytes are simultaneously
  * transmitted and received. Therefore, both buffers must be the same length,
- * count, which is the lenght of the overall transaction. This is useful for
+ * count, which is the length of the overall transaction. This is useful for
  * reading metadata from the flash chip. Do *NOT* use it to mutate the data
  * stored on the flash because it will not flush the cache.
  *
