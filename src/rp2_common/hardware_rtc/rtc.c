@@ -92,13 +92,16 @@ bool rtc_get_datetime(datetime_t *t) {
     }
 
     // Note: RTC_0 should be read before RTC_1
-    t->dotw  = (rtc_hw->rtc_0 & RTC_RTC_0_DOTW_BITS ) >> RTC_RTC_0_DOTW_LSB;
-    t->hour  = (rtc_hw->rtc_0 & RTC_RTC_0_HOUR_BITS ) >> RTC_RTC_0_HOUR_LSB;
-    t->min   = (rtc_hw->rtc_0 & RTC_RTC_0_MIN_BITS  ) >> RTC_RTC_0_MIN_LSB;
-    t->sec   = (rtc_hw->rtc_0 & RTC_RTC_0_SEC_BITS  ) >> RTC_RTC_0_SEC_LSB;
-    t->year  = (rtc_hw->rtc_1 & RTC_RTC_1_YEAR_BITS ) >> RTC_RTC_1_YEAR_LSB;
-    t->month = (rtc_hw->rtc_1 & RTC_RTC_1_MONTH_BITS) >> RTC_RTC_1_MONTH_LSB;
-    t->day   = (rtc_hw->rtc_1 & RTC_RTC_1_DAY_BITS  ) >> RTC_RTC_1_DAY_LSB;
+    uint32_t rtc_0 = rtc_hw->rtc_0;
+    uint32_t rtc_1 = rtc_hw->rtc_1;
+
+    t->dotw  = (rtc_0 & RTC_RTC_0_DOTW_BITS ) >> RTC_RTC_0_DOTW_LSB;
+    t->hour  = (rtc_0 & RTC_RTC_0_HOUR_BITS ) >> RTC_RTC_0_HOUR_LSB;
+    t->min   = (rtc_0 & RTC_RTC_0_MIN_BITS  ) >> RTC_RTC_0_MIN_LSB;
+    t->sec   = (rtc_0 & RTC_RTC_0_SEC_BITS  ) >> RTC_RTC_0_SEC_LSB;
+    t->year  = (rtc_1 & RTC_RTC_1_YEAR_BITS ) >> RTC_RTC_1_YEAR_LSB;
+    t->month = (rtc_1 & RTC_RTC_1_MONTH_BITS) >> RTC_RTC_1_MONTH_LSB;
+    t->day   = (rtc_1 & RTC_RTC_1_DAY_BITS  ) >> RTC_RTC_1_DAY_LSB;
 
     return true;
 }
