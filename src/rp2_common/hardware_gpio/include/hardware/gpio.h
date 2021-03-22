@@ -432,7 +432,7 @@ static inline void gpio_put(uint gpio, bool value) {
  * \return true if the GPIO output level is high, false if low.
  */
 static inline bool gpio_get_out_level(uint gpio) {
-    return !!(sio_hw->gpio_out & 1u << gpio);
+    return !!(sio_hw->gpio_out & (1u << gpio));
 }
 
 // ----------------------------------------------------------------------------
