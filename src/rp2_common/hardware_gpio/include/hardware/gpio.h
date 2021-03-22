@@ -415,6 +415,26 @@ static inline void gpio_put(uint gpio, bool value) {
         gpio_clr_mask(mask);
 }
 
+/*! \brief Determine whether a GPIO is currently driven high or low
+ *  \ingroup hardware_gpio
+ *
+ * This function returns the high/low output level most recently assigned to a
+ * GPIO via gpio_put() or similar. This is the value that is presented outward
+ * to the IO muxing, *not* the input level back from the pad (which can be
+ * read using gpio_get()).
+ *
+ * To avoid races, this function must not be used for read-modify-write
+ * sequences when driving GPIOs -- instead functions like gpio_put() should be
+ * used to atomically update GPIOs. This accessor is intended for debug use
+ * only.
+ *
+ * \param gpio GPIO number
+ * \return true if the GPIO output level is high, false if low.
+ */
+static inline bool gpio_get_out_level(uint gpio) {
+    return !!(sio_hw->gpio_out & (1u << gpio));
+}
+
 // ----------------------------------------------------------------------------
 // Direction
 // ----------------------------------------------------------------------------

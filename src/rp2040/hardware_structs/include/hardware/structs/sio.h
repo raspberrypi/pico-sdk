@@ -17,7 +17,7 @@ typedef struct {
     io_ro_32 gpio_hi_in;
     uint32_t _pad;
 
-    io_wo_32 gpio_out;
+    io_rw_32 gpio_out;
     io_wo_32 gpio_set;
     io_wo_32 gpio_clr;
     io_wo_32 gpio_togl;
@@ -27,7 +27,7 @@ typedef struct {
     io_wo_32 gpio_oe_clr;
     io_wo_32 gpio_oe_togl;
 
-    io_wo_32 gpio_hi_out;
+    io_rw_32 gpio_hi_out;
     io_wo_32 gpio_hi_set;
     io_wo_32 gpio_hi_clr;
     io_wo_32 gpio_hi_togl;
