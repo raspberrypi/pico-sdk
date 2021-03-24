@@ -196,29 +196,6 @@ static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool 
                   (bool_to_bit(pindirs) << PIO_SM0_EXECCTRL_SIDE_PINDIR_LSB);
 }
 
-/*! \brief Set the state machine clock divider (from a floating point value) in a state machine configuration
- *  \ingroup sm_config
- *
- * The clock divider slows the state machine's execution by masking the
- * system clock on some cycles, in a repeating pattern, so that the state
- * machine does not advance. Effectively this produces a slower clock for the
- * state machine to run from, which can be used to generate e.g. a particular
- * UART baud rate. See the datasheet for further detail.
- *
- * \param c Pointer to the configuration structure to modify
- * \param div The fractional divisor to be set. 1 for full speed. An integer clock divisor of n
- *  will cause the state machine to run 1 cycle in every n.
- *  Note that for small n, the jitter introduced by a fractional divider (e.g. 2.5) may be unacceptable
- *  although it will depend on the use case.
- */
-static inline void sm_config_set_clkdiv(pio_sm_config *c, float div) {
-    uint div_int = (uint)div;
-    uint div_frac = (uint)((div - (float)div_int) * (1u << 8u));
-    c->clkdiv =
-            (div_frac << PIO_SM0_CLKDIV_FRAC_LSB) |
-            (div_int << PIO_SM0_CLKDIV_INT_LSB);
-}
-
 /*! \brief Set the state machine clock divider (from integer and fractional parts - 16:8) in a state machine configuration
  *  \ingroup sm_config
  *
@@ -236,6 +213,38 @@ static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_
     c->clkdiv =
             (((uint)div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
             (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
+}
+
+static inline void pio_calculate_clkdiv_from_float(float div, uint16_t *div_int, uint8_t *div_frac) {
+    valid_params_if(PIO, div >= 1 && div <= 65536);
+    *div_int = (uint16_t)div;
+    if (*div_int == 0) {
+        *div_frac = 0;
+    } else {
+        *div_frac = (uint8_t)((div - (float)*div_int) * (1u << 8u));
+    }
+}
+
+/*! \brief Set the state machine clock divider (from a floating point value) in a state machine configuration
+ *  \ingroup sm_config
+ *
+ * The clock divider slows the state machine's execution by masking the
+ * system clock on some cycles, in a repeating pattern, so that the state
+ * machine does not advance. Effectively this produces a slower clock for the
+ * state machine to run from, which can be used to generate e.g. a particular
+ * UART baud rate. See the datasheet for further detail.
+ *
+ * \param c Pointer to the configuration structure to modify
+ * \param div The fractional divisor to be set. 1 for full speed. An integer clock divisor of n
+ *  will cause the state machine to run 1 cycle in every n.
+ *  Note that for small n, the jitter introduced by a fractional divider (e.g. 2.5) may be unacceptable
+ *  although it will depend on the use case.
+ */
+static inline void sm_config_set_clkdiv(pio_sm_config *c, float div) {
+    uint16_t div_int;
+    uint8_t div_frac;
+    pio_calculate_clkdiv_from_float(div, &div_int, &div_frac);
+    sm_config_set_clkdiv_int_frac(c, div_int, div_frac);
 }
 
 /*! \brief Set the wrap addresses in a state machine configuration
@@ -978,23 +987,6 @@ static inline uint32_t pio_sm_get_blocking(PIO pio, uint sm) {
  */
 void pio_sm_drain_tx_fifo(PIO pio, uint sm);
 
-/*! \brief set the current clock divider for a state machine
- *  \ingroup hardware_pio
- *
- * \param pio The PIO instance; either \ref pio0 or \ref pio1
- * \param sm State machine index (0..3)
- * \param div the floating point clock divider
- */
-static inline void pio_sm_set_clkdiv(PIO pio, uint sm, float div) {
-    check_pio_param(pio);
-    check_sm_param(sm);
-    uint div_int = (uint16_t) div;
-    uint div_frac = (uint8_t) ((div - (float)div_int) * (1u << 8u));
-    pio->sm[sm].clkdiv =
-            (div_frac << PIO_SM0_CLKDIV_FRAC_LSB) |
-            (div_int << PIO_SM0_CLKDIV_INT_LSB);
-}
-
 /*! \brief set the current clock divider for a state machine using a 16:8 fraction
  *  \ingroup hardware_pio
  *
@@ -1009,6 +1001,22 @@ static inline void pio_sm_set_clkdiv_int_frac(PIO pio, uint sm, uint16_t div_int
     pio->sm[sm].clkdiv =
             (((uint)div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
             (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
+}
+
+/*! \brief set the current clock divider for a state machine
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param sm State machine index (0..3)
+ * \param div the floating point clock divider
+ */
+static inline void pio_sm_set_clkdiv(PIO pio, uint sm, float div) {
+    check_pio_param(pio);
+    check_sm_param(sm);
+    uint16_t div_int;
+    uint8_t div_frac;
+    pio_calculate_clkdiv_from_float(div, &div_int, &div_frac);
+    pio_sm_set_clkdiv_int_frac(pio, sm, div_int, div_frac);
 }
 
 /*! \brief Clear a state machine's TX and RX FIFOs
