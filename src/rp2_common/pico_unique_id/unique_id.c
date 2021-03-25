@@ -26,3 +26,17 @@ static void __attribute__((constructor)) _retrieve_unique_id_on_boot(void) {
 void pico_get_unique_board_id(pico_unique_board_id_t *id_out) {
     *id_out = retrieved_id;
 }
+
+void pico_get_unique_board_id_string(char *id_out, size_t len) {
+    pico_unique_board_id_t temp = retrieved_id;
+    int i;
+    // Generate hex one nibble at a time
+    for (i = 0; (i < len - 1) && (i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES * 2); i++) {
+        int bi = i / 2;
+        uint8_t nibble = (temp.id[bi] >> 4) & 0x0F;
+        temp.id[bi] <<= 4;
+        id_out[i] = nibble < 10 ? nibble + '0' : nibble + 'A' - 10;
+    }
+    id_out[i] = 0;
+}
+

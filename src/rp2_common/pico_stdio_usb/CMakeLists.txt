@@ -13,6 +13,7 @@ if (TARGET tinyusb_device_unmarked)
         tinyusb_device_unmarked
         pico_stdio
         pico_time
+        pico_unique_id
     )
 
     target_compile_definitions(pico_stdio_usb INTERFACE
