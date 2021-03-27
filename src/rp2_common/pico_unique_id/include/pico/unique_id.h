@@ -69,7 +69,7 @@ void pico_get_unique_board_id(pico_unique_board_id_t *id_out);
  * \param id_out a pointer to a char buffer of size len, to which the identifier will be written
  * \param len the size of id_out. For full serial, len >= 2 * PICO_UNIQUE_BOARD_ID_SIZE_BYTES + 1
  */
-void pico_get_unique_board_id_string(char *id_out, size_t len);
+void pico_get_unique_board_id_string(char *id_out, uint len);
 
 
 #ifdef __cplusplus

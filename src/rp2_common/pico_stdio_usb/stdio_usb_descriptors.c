@@ -125,8 +125,9 @@ const uint16_t *tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
     static uint16_t desc_str[DESC_STR_MAX];
 
     // Assign the SN using the unique flash id
-    if (!usbd_serial_str[0])
+    if (!usbd_serial_str[0]) {
         pico_get_unique_board_id_string(usbd_serial_str, sizeof(usbd_serial_str));
+    }
 
     uint8_t len;
     if (index == 0) {

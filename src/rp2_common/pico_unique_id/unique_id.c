@@ -27,14 +27,12 @@ void pico_get_unique_board_id(pico_unique_board_id_t *id_out) {
     *id_out = retrieved_id;
 }
 
-void pico_get_unique_board_id_string(char *id_out, size_t len) {
-    pico_unique_board_id_t temp = retrieved_id;
+void pico_get_unique_board_id_string(char *id_out, uint len) {
+    assert(len > 0);
     size_t i;
     // Generate hex one nibble at a time
     for (i = 0; (i < len - 1) && (i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES * 2); i++) {
-        size_t bi = i / 2;
-        int nibble = (temp.id[bi] >> 4) & 0x0F;
-        temp.id[bi] = (uint8_t)(temp.id[bi] << 4);
+        int nibble = (retrieved_id.id[i/2] >> (4 - 4 * (i&1))) & 0xf;
         id_out[i] = (char)(nibble < 10 ? nibble + '0' : nibble + 'A' - 10);
     }
     id_out[i] = 0;
