@@ -279,7 +279,7 @@ static inline size_t i2c_get_read_available(i2c_inst_t *i2c) {
  * \param src Data to send
  * \param len Number of bytes to send
  *
- * Writes directly to the to I2C TX FIFO which is mainly useful for
+ * Writes directly to the I2C TX FIFO which is mainly useful for
  * slave-mode operation.
  */
 static inline void i2c_write_raw_blocking(i2c_inst_t *i2c, const uint8_t *src, size_t len) {
