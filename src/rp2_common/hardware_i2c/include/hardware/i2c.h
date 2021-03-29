@@ -279,7 +279,7 @@ static inline size_t i2c_get_read_available(i2c_inst_t *i2c) {
  * \param src Data to send
  * \param len Number of bytes to send
  *
- * Writes directly to the to I2C TX FIFO which us mainly useful for
+ * Writes directly to the I2C TX FIFO which is mainly useful for
  * slave-mode operation.
  */
 static inline void i2c_write_raw_blocking(i2c_inst_t *i2c, const uint8_t *src, size_t len) {
@@ -291,14 +291,14 @@ static inline void i2c_write_raw_blocking(i2c_inst_t *i2c, const uint8_t *src, s
     }
 }
 
-/*! \brief Write direct to TX FIFO
+/*! \brief Read direct from RX FIFO
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
  * \param dst Buffer to accept data
- * \param len Number of bytes to send
+ * \param len Number of bytes to read
  *
- * Reads directly from the I2C RX FIFO which us mainly useful for
+ * Reads directly from the I2C RX FIFO which is mainly useful for
  * slave-mode operation.
  */
 static inline void i2c_read_raw_blocking(i2c_inst_t *i2c, uint8_t *dst, size_t len) {
