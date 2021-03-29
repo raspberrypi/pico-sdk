@@ -75,6 +75,13 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
     invalid_params_if(I2C, hcnt < 8);
     invalid_params_if(I2C, lcnt < 8);
 
+    // The SDA hold time should be at least 300 ns, per the I2C standard.
+    // sda_hold_count [cycles] = freq_in [cycles/s] * 300ns * (1s / 1e9ns)
+    // Reduce 300/1e9 to 3/1e7 to avoid numbers that don't fit in uint.
+    // Add 1 to avoid division truncation.
+    uint sda_hold_count = ((freq_in * 3) / 10000000) + 1;
+    invalid_params_if(I2C, sda_hold_count > lcnt - 2);
+
     i2c->hw->enable = 0;
     // Always use "fast" mode (<= 400 kHz, works fine for standard mode too)
     hw_write_masked(&i2c->hw->con,
@@ -84,10 +91,9 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
     i2c->hw->fs_scl_hcnt = hcnt;
     i2c->hw->fs_scl_lcnt = lcnt;
     i2c->hw->fs_spklen = lcnt < 16 ? 1 : lcnt / 16;
-    // Set hold time of SDA during transmit to 2 for TCS34725 color sensor
-    i2c->hw->sda_hold =
-            I2C_IC_SDA_HOLD_IC_SDA_RX_HOLD_RESET << I2C_IC_SDA_HOLD_IC_SDA_RX_HOLD_LSB |
-            2 << I2C_IC_SDA_HOLD_IC_SDA_TX_HOLD_LSB;
+    hw_write_masked(&i2c->hw->sda_hold,
+                    sda_hold_count,
+                    I2C_IC_SDA_HOLD_IC_SDA_TX_HOLD_BITS);
 
     i2c->hw->enable = 1;
     return freq_in / period;
