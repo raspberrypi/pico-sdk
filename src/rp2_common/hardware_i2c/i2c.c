@@ -76,11 +76,11 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
     invalid_params_if(I2C, lcnt < 8);
 
     // The SDA hold time should be at least 300 ns, per the I2C standard.
-    // sda_hold_count [cycles] = freq_in [cycles/s] * 300ns * (1s / 1e9ns)
+    // sda_tx_hold_count [cycles] = freq_in [cycles/s] * 300ns * (1s / 1e9ns)
     // Reduce 300/1e9 to 3/1e7 to avoid numbers that don't fit in uint.
     // Add 1 to avoid division truncation.
-    uint sda_hold_count = ((freq_in * 3) / 10000000) + 1;
-    invalid_params_if(I2C, sda_hold_count > lcnt - 2);
+    uint sda_tx_hold_count = ((freq_in * 3) / 10000000) + 1;
+    invalid_params_if(I2C, sda_tx_hold_count > lcnt - 2);
 
     i2c->hw->enable = 0;
     // Always use "fast" mode (<= 400 kHz, works fine for standard mode too)
@@ -92,7 +92,7 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
     i2c->hw->fs_scl_lcnt = lcnt;
     i2c->hw->fs_spklen = lcnt < 16 ? 1 : lcnt / 16;
     hw_write_masked(&i2c->hw->sda_hold,
-                    sda_hold_count,
+                    sda_tx_hold_count,
                     I2C_IC_SDA_HOLD_IC_SDA_TX_HOLD_BITS);
 
     i2c->hw->enable = 1;
