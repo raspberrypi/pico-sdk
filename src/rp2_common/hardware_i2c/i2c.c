@@ -80,7 +80,7 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
     // Reduce 300/1e9 to 3/1e7 to avoid numbers that don't fit in uint.
     // Add 1 to avoid division truncation.
     uint sda_tx_hold_count = ((freq_in * 3) / 10000000) + 1;
-    invalid_params_if(I2C, sda_tx_hold_count > lcnt - 2);
+    assert(sda_tx_hold_count <= lcnt - 2);
 
     i2c->hw->enable = 0;
     // Always use "fast" mode (<= 400 kHz, works fine for standard mode too)
