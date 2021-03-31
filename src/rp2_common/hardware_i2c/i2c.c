@@ -87,9 +87,9 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
         sda_tx_hold_count = ((freq_in * 3) / 10000000) + 1;
     } else {
         // sda_tx_hold_count = freq_in [cycles/s] * 120ns * (1s / 1e9ns)
-        // Reduce 120/1e9 to 12/1e8 to avoid numbers that don't fit in uint.
+        // Reduce 120/1e9 to 3/25e6 to avoid numbers that don't fit in uint.
         // Add 1 to avoid division truncation.
-        sda_tx_hold_count = ((freq_in * 12) / 100000000) + 1;
+        sda_tx_hold_count = ((freq_in * 3) / 25000000) + 1;
     }
     assert(sda_tx_hold_count <= lcnt - 2);
 
