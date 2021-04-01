@@ -102,14 +102,14 @@ typedef enum {
  * Puts the SPI into a known state, and enable it. Must be called before other
  * functions.
  *
- * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
- * \param baudrate Baudrate required in Hz
+ * \note There is no guarantee that the baudrate requested can be achieved exactly; the nearest will be chosen
+ * and returned
  *
- * \note There is no guarantee that the baudrate requested will be possible, the nearest will be chosen,
- * and this function does not return any indication of this. You can use the \ref spi_set_baudrate function
- * which will return the actual baudrate selected if this is important.
+ * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
+ * \param baudrate Baudrate requested in Hz
+ * \return the actual baud rate set
  */
-void spi_init(spi_inst_t *spi, uint baudrate);
+uint spi_init(spi_inst_t *spi, uint baudrate);
 
 /*! \brief Deinitialise SPI instances
  *  \ingroup hardware_spi
