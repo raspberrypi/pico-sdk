@@ -70,7 +70,7 @@
 //------------- FLASH -------------//
 
 // Use slower generic flash access
-#define PICO_BOOT_STAGE2_GENERIC_03H 1
+#define PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H 1
 
 #ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 4

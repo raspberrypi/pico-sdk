@@ -21,7 +21,7 @@
         #include "boot2_w28q080.S"
     #elif PICO_BOOT_STAGE2_CHOOSE_W25X10CL
         #include "boot2_w25x10cl.S"
-    #elif PICO_BOOT_STAGE2_CHOOSE_BOOT2_GENERIC_03H
+    #elif PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H
         #include "boot2_generic_03h.S"
     #else
         #error unknown boot stage2 choice

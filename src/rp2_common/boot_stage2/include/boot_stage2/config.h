@@ -13,7 +13,7 @@
 // PICO_CONFIG: PICO_BOOT_STAGE2_CHOOSE_IS25LP080, Select boot2_is25lp080 as the boot stage 2 when no boot stage2 selection is made by the CMake build, type=bool, default=false, group=boot_stage2
 // PICO_CONFIG: PICO_BOOT_STAGE2_CHOOSE_W25Q080, Select boot2_w28q080 as the boot stage 2 when no boot stage2 selection is made by the CMake build, type=bool, default=false, group=boot_stage2
 // PICO_CONFIG: PICO_BOOT_STAGE2_CHOOSE_W25X10CL, Select boot2_is25lp080 as the boot stage 2 when no boot stage2 selection is made by the CMake build, type=bool, default=false, group=boot_stage2
-// PICO_CONFIG: PICO_BOOT_STAGE2_CHOOSE_BOOT2_GENERIC_03H, Select boot2_generic_03h as the boot stage 2 when no boot stage2 selection is made by the CMake build, type=bool, default=true, group=boot_stage2
+// PICO_CONFIG: PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H, Select boot2_generic_03h as the boot stage 2 when no boot stage2 selection is made by the CMake build, type=bool, default=true, group=boot_stage2
 
 #ifdef PICO_BUILD_BOOT_STAGE2_NAME
     // boot stage2 is configured by cmake, so use the name specified there
@@ -27,12 +27,12 @@
         #define PICO_BOOT_STAGE2_NAME "boot2_w28q080"
     #elif PICO_BOOT_STAGE2_CHOOSE_W25X10CL
         #define PICO_BOOT_STAGE2_NAME "boot2_w25x10cl"
-    #elif PICO_BOOT_STAGE2_CHOOSE_BOOT2_GENERIC_03H || !defined(PICO_BOOT_STAGE2_CHOOSE_BOOT2_GENERIC_03H)
-        #undef PICO_BOOT_STAGE2_CHOOSE_BOOT2_GENERIC_03H
-        #define PICO_BOOT_STAGE2_CHOOSE_BOOT2_GENERIC_03H 1
+    #elif PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H || !defined(PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H)
+        #undef PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H
+        #define PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H 1
         #define PICO_BOOT_STAGE2_NAME "boot2_generic_03h"
     #else
-        #error no bootstage2 is defined by PICO_BOOT_STAGE2 macro
+        #error no bootstage2 is defined by PICO_BOOT_STAGE2_CHOOSE_ macro
     #endif
 #endif
 #endif
