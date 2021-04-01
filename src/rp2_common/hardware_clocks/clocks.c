@@ -322,7 +322,7 @@ void clock_gpio_init(uint gpio, uint src, uint div) {
     if      (gpio == 21) gpclk = clk_gpout0;
     else if (gpio == 23) gpclk = clk_gpout1;
     else if (gpio == 24) gpclk = clk_gpout2;
-    else if (gpio == 26) gpclk = clk_gpout3;
+    else if (gpio == 25) gpclk = clk_gpout3;
     else {
         invalid_params_if(CLOCKS, true);
     }

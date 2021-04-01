@@ -19,7 +19,7 @@
 
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
-#define
+#endif
 
 #ifndef PICO_DEFAULT_UART_TX_PIN
 #define PICO_DEFAULT_UART_TX_PIN 0
@@ -47,6 +47,8 @@
 #endif
 
 // spi flash
+#define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
+
 #ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif

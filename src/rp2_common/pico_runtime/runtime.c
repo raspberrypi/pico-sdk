@@ -175,9 +175,9 @@ void *_sbrk(int incr) {
     prev_heap_end = heap_end;
     char *next_heap_end = heap_end + incr;
 
-    if (__builtin_expect(next_heap_end >= (&__StackLimit), false)) {
+    if (__builtin_expect(next_heap_end > (&__StackLimit), false)) {
 #if PICO_USE_OPTIMISTIC_SBRK
-        if (next_heap_end == &__StackLimit) {
+        if (heap_end == &__StackLimit) {
 //        errno = ENOMEM;
             return (char *) -1;
         }
