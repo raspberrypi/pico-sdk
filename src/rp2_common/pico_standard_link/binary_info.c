@@ -6,6 +6,7 @@
 
 #if !PICO_NO_BINARY_INFO && !PICO_NO_PROGRAM_INFO
 #include "pico/binary_info.h"
+#include "boot_stage2/config.h"
 
 // Note we put at most 4 pieces of binary info in the reset section because that's how much spare space we had
 // (picked the most common ones)... if there is a link failure because of .reset section overflow then move
@@ -66,9 +67,9 @@ bi_decl(bi_program_url(PICO_PROGRAM_URL))
 #endif
 #endif
 
-#if !PICO_NO_BI_BOOT2_NAME
-#ifdef PICO_BOOT2_NAME
-bi_decl(bi_string(BINARY_INFO_TAG_RASPBERRY_PI, BINARY_INFO_ID_RP_BOOT2_NAME, PICO_BOOT2_NAME))
+#if !PICO_NO_BI_BOOT_STAGE2_NAME
+#ifdef PICO_BOOT_STAGE2_NAME
+bi_decl(bi_string(BINARY_INFO_TAG_RASPBERRY_PI, BINARY_INFO_ID_RP_BOOT2_NAME, PICO_BOOT_STAGE2_NAME))
 #endif
 #endif
 

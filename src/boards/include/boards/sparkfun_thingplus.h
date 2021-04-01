@@ -43,6 +43,9 @@
 #endif
 
 // spi flash
+
+#define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
+
 #ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
