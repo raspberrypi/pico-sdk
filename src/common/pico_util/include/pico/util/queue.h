@@ -10,6 +10,10 @@
 #include "pico.h"
 #include "hardware/sync.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \file queue.h
  * \defgroup queue queue
  * Multi-core and IRQ safe queue implementation.
@@ -180,5 +184,9 @@ void queue_remove_blocking(queue_t *q, void *data);
  * If the queue is empty function will block until a value is added
  */
 void queue_peek_blocking(queue_t *q, void *data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
