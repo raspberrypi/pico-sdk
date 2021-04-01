@@ -166,8 +166,9 @@ bool hardware_alarm_set_target(uint alarm_num, absolute_time_t target) {
         // 1) actually set the hardware timer
         spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_TIMER);
         uint32_t save = spin_lock_blocking(lock);
-        timer_hw->intr = 1u << alarm_num;
+        uint8_t old_timer_callbacks_pending = timer_callbacks_pending;
         timer_callbacks_pending |= (uint8_t)(1u << alarm_num);
+        timer_hw->intr = 1u << alarm_num; // clear any IRQ
         timer_hw->alarm[alarm_num] = (uint32_t) t;
         // Set the alarm. Writing time should arm it
         target_hi[alarm_num] = (uint32_t)(t >> 32u);
@@ -178,18 +179,26 @@ bool hardware_alarm_set_target(uint alarm_num, absolute_time_t target) {
             assert(timer_hw->ints & 1u << alarm_num);
         } else {
             if (time_us_64() >= t) {
-                // ok well it is time now; the irq isn't being handled yet because of the spin lock
-                // however the other core might be in the IRQ handler itself about to do a callback
-                // we do the firing ourselves (and indicate to the IRQ handler if any that it shouldn't
+                // we are already at or past the right time; there is no point in us racing against the IRQ
+                // we are about to generate. note however that, if there was already a timer pending before,
+                // then we still let the IRQ fire, as whatever it was, is not handled by our setting missed=true here
                 missed = true;
-                // disarm the timer
-                timer_hw->armed = 1u << alarm_num;
-                timer_hw->intr = 1u << alarm_num; // clear the IRQ too
-                // and set flag in case we're already in the IRQ handler waiting on the spinlock (on the other core)
-                timer_callbacks_pending &= (uint8_t)~(1u << alarm_num);
+                if (timer_callbacks_pending != old_timer_callbacks_pending) {
+                    // disarm the timer
+                    timer_hw->armed = 1u << alarm_num;
+                    // clear the IRQ...
+                    timer_hw->intr = 1u << alarm_num;
+                    // ... including anything pending on the processor - perhaps unnecessary, but
+                    // our timer flag says we aren't expecting anything.
+                    irq_clear(harware_alarm_irq_number(alarm_num));
+                    // and clear our flag so that if the IRQ handler is already active (because it is on
+                    // the other core) it will also skip doing anything
+                    timer_callbacks_pending = old_timer_callbacks_pending;
+                }
             }
         }
         spin_unlock(lock, save);
+        // note at this point any pending timer IRQ can likely run
     }
     return missed;
 }

@@ -68,12 +68,16 @@
 #endif
 
 //------------- FLASH -------------//
+
+// Use slower generic flash access
+#define PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H 1
+
 #ifndef PICO_FLASH_SPI_CLKDIV
-#define PICO_FLASH_SPI_CLKDIV 2
+#define PICO_FLASH_SPI_CLKDIV 4
 #endif
 
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
+#define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
 #endif
 
 // All boards have B1 RP2040

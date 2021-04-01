@@ -18,6 +18,10 @@
  * \ingroup pico_util
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     spin_lock_t *lock;
     uint8_t *data;
@@ -69,7 +73,7 @@ void queue_free(queue_t *q);
 static inline uint queue_get_level_unsafe(queue_t *q) {
     int32_t rc = (int32_t)q->wptr - (int32_t)q->rptr;
     if (rc < 0) {
-        rc += + q->element_count + 1;
+        rc += q->element_count + 1;
     }
     return (uint)rc;
 }
@@ -181,4 +185,7 @@ void queue_remove_blocking(queue_t *q, void *data);
  */
 void queue_peek_blocking(queue_t *q, void *data);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

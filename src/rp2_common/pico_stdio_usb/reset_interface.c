@@ -60,7 +60,7 @@ static bool resetd_control_request_cb(uint8_t __unused rhport, tusb_control_requ
 
 #if PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT
         if (request->bRequest == RESET_REQUEST_FLASH) {
-            watchdog_reboot(0, SRAM_END, PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS);
+            watchdog_reboot(0, 0, PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS);
             return true;
         }
 #endif

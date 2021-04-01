@@ -170,7 +170,7 @@ void clocks_enable_resus(resus_callback_t resus_callback);
 /*! \brief Output an optionally divided clock to the specified gpio pin.
  *  \ingroup hardware_clocks
  *
- * \param gpio The GPIO pin to output the clock to. Valid GPIOs are: 21, 23, 24, 26. These GPIOs are connected to the GPOUT0-3 clock generators.
+ * \param gpio The GPIO pin to output the clock to. Valid GPIOs are: 21, 23, 24, 25. These GPIOs are connected to the GPOUT0-3 clock generators.
  * \param src  The source clock. See the register field CLOCKS_CLK_GPOUT0_CTRL_AUXSRC for a full list. The list is the same for each GPOUT clock generator.
  * \param div  The amount to divide the source clock by. This is useful to not overwhelm the GPIO pin with a fast clock.
  */

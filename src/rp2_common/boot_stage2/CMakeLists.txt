@@ -1,16 +1,33 @@
-# PICO_CMAKE_CONFIG: PICO_DEFAULT_BOOT_STAGE2_FILE, Default stage2 file to use unless overridden by pico_set_boot_stage2 on the TARGET, type=bool, default=.../boot2_w25q080.S, group=build
-if (NOT PICO_DEFAULT_BOOT_STAGE2_FILE)
-    set(PICO_DEFAULT_BOOT_STAGE2_FILE "${CMAKE_CURRENT_LIST_DIR}/boot2_w25q080.S")
+# PICO_CMAKE_CONFIG: PICO_DEFAULT_BOOT_STAGE2_FILE, Default stage2 file to use unless overridden by pico_set_boot_stage2 on the TARGET; this setting is useful when explicitly setting the default build from a per board CMake file, group=build
+# PICO_CMAKE_CONFIG: PICO_DEFAULT_BOOT_STAGE2, Simpler alternative to specifying PICO_DEFAULT_BOOT_STAGE2_FILE where the file is src/boards/{PICO_DEFAULT_BOOT_STAGE2_FILE}.S, default=compile_time_choice, group=build
+if (DEFINED ENV{PICO_DEFAULT_BOOT_STAGE2_FILE})
+    set(PICO_DEFAULT_BOOT_STAGE2_FILE $ENV{PICO_DEFAULT_BOOT_STAGE2_FILE})
+    message("Using PICO_DEFAULT_BOOT_STAGE2_FILE from environment ('${PICO_DEFAULT_BOOT_STAGE2_FILE}')")
 endif()
-
 set(PICO_DEFAULT_BOOT_STAGE2_FILE "${PICO_DEFAULT_BOOT_STAGE2_FILE}" CACHE STRING "boot_stage2 source file" FORCE)
 
+set(PICO_BOOT_STAGE2_COMPILE_TIME_CHOICE_NAME compile_time_choice) # local var
+if (NOT PICO_DEFAULT_BOOT_STAGE2_FILE)
+    if (DEFINED ENV{PICO_DEFAULT_BOOT_STAGE2})
+        set(PICO_DEFAULT_BOOT_STAGE2 $ENV{PICO_DEFAULT_BOOT_STAGE2})
+        message("Using PICO_DEFAULT_BOOT_STAGE2 from environment ('${PICO_DEFAULT_BOOT_STAGE2}')")
+    endif()
+    if (NOT DEFINED PICO_DEFAULT_BOOT_STAGE2)
+        set(PICO_DEFAULT_BOOT_STAGE2 ${PICO_BOOT_STAGE2_COMPILE_TIME_CHOICE_NAME})
+    endif()
+    set(PICO_DEFAULT_BOOT_STAGE2 "${PICO_DEFAULT_BOOT_STAGE2}" CACHE STRING "boot_stage2 short name" FORCE)
+    set(PICO_DEFAULT_BOOT_STAGE2_FILE "${CMAKE_CURRENT_LIST_DIR}/${PICO_DEFAULT_BOOT_STAGE2}.S")
+endif()
+
 if (NOT EXISTS ${PICO_DEFAULT_BOOT_STAGE2_FILE})
-    message(FATAL_ERROR "Specified boot_stage2 source '${PICO_BOOT_STAGE2_FILE}' does not exist.")
+    message(FATAL_ERROR "Specified boot_stage2 source '${PICO_DEFAULT_BOOT_STAGE2_FILE}' does not exist.")
 endif()
 
 # needed by function below
 set(PICO_BOOT_STAGE2_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
+
+add_library(boot_stage2_headers INTERFACE)
+target_include_directories(boot_stage2_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 # by convention the first source file name without extension is used for the binary info name
 function(pico_define_boot_stage2 NAME SOURCES)
@@ -29,7 +46,7 @@ function(pico_define_boot_stage2 NAME SOURCES)
     # boot2_helpers include dir
     target_include_directories(${NAME} PRIVATE ${PICO_BOOT_STAGE2_DIR}/asminclude)
 
-    target_link_libraries(${NAME} hardware_regs)
+    target_link_libraries(${NAME} hardware_regs boot_stage2_headers)
     target_link_options(${NAME} PRIVATE "LINKER:--script=${PICO_BOOT_STAGE2_DIR}/boot_stage2.ld")
     set_target_properties(${NAME} PROPERTIES LINK_DEPENDS ${PICO_BOOT_STAGE2_DIR}/boot_stage2.ld)
 
@@ -49,17 +66,22 @@ function(pico_define_boot_stage2 NAME SOURCES)
             COMMAND ${Python3_EXECUTABLE} ${PICO_BOOT_STAGE2_DIR}/pad_checksum -s 0xffffffff ${ORIGINAL_BIN} ${PADDED_CHECKSUMMED_ASM}
             )
 
-
     add_library(${NAME}_library INTERFACE)
     add_dependencies(${NAME}_library ${NAME}_padded_checksummed_asm)
     # not strictly (or indeed actually) a link library, but this avoids dependency cycle
     target_link_libraries(${NAME}_library INTERFACE ${PADDED_CHECKSUMMED_ASM})
+    target_link_libraries(${NAME}_library INTERFACE boot_stage2_headers)
 
     list(GET SOURCES 0 FIRST_SOURCE)
-    get_filename_component(BOOT2_BI_NAME ${FIRST_SOURCE} NAME_WE)
+    get_filename_component(BOOT_STAGE2_BI_NAME ${FIRST_SOURCE} NAME_WE)
 
-    target_compile_definitions(${NAME}_library INTERFACE
-            -DPICO_BOOT2_NAME="${BOOT2_BI_NAME}")
+    # we only set the PICO_BUILD_STAGE2_NAME if it isn't 'compile_time_choice'
+    if (NOT BOOT_STAGE2_BI_NAME STREQUAL PICO_BOOT_STAGE2_COMPILE_TIME_CHOICE_NAME)
+        target_compile_definitions(${NAME} INTERFACE
+                -DPICO_BUILD_BOOT_STAGE2_NAME="${BOOT_STAGE2_BI_NAME}")
+        target_compile_definitions(${NAME}_library INTERFACE
+                -DPICO_BUILD_BOOT_STAGE2_NAME="${BOOT_STAGE2_BI_NAME}")
+    endif()
 endfunction()
 
 macro(pico_set_boot_stage2 TARGET NAME)
