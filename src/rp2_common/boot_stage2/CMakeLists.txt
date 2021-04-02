@@ -1,5 +1,10 @@
 # PICO_CMAKE_CONFIG: PICO_DEFAULT_BOOT_STAGE2_FILE, Default boot stage 2 file to use unless overridden by pico_set_boot_stage2 on the TARGET; this setting is useful when explicitly setting the default build from a per board CMake file, group=build
-# PICO_CMAKE_CONFIG: PICO_DEFAULT_BOOT_STAGE2, Simpler alternative to specifying PICO_DEFAULT_BOOT_STAGE2_FILE where the file is src/boards/{PICO_DEFAULT_BOOT_STAGE2_FILE}.S, default=compile_time_choice, group=build
+# PICO_CMAKE_CONFIG: PICO_DEFAULT_BOOT_STAGE2, Simpler alternative to specifying PICO_DEFAULT_BOOT_STAGE2_FILE where the file is src/rp2_common/boot_stage2/{PICO_DEFAULT_BOOT_STAGE2}.S, default=compile_time_choice, group=build
+
+if (((DEFINED PICO_DEFAULT_BOOT_STAGE2_FILE) OR (DEFINED ENV{PICO_DEFAULT_BOOT_STAGE2_FILE})) AND ((DEFINED PICO_DEFAULT_BOOT_STAGE2) OR (DEFINED ENV{PICO_DEFAULT_BOOT_STAGE2})))
+    message(FATAL_ERROR "Both PICO_DEFAULT_BOOT_STAGE2_FILE and PICO_DEFAULT_BOOT_STAGE2 defined.")
+endif()
+
 if (DEFINED ENV{PICO_DEFAULT_BOOT_STAGE2_FILE})
     set(PICO_DEFAULT_BOOT_STAGE2_FILE $ENV{PICO_DEFAULT_BOOT_STAGE2_FILE})
     message("Using PICO_DEFAULT_BOOT_STAGE2_FILE from environment ('${PICO_DEFAULT_BOOT_STAGE2_FILE}')")
