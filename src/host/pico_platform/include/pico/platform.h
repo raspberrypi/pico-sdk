@@ -135,5 +135,21 @@ static inline void __compiler_memory_barrier(void) {
 }
 #ifdef __cplusplus
 }
+
+template<typename T> struct stored_little_endian {
+  uint8_t v[sizeof(T)];
+  inline stored_little_endian& operator= (const T& x) {
+    for (unsigned i = 0; i < sizeof(T); i++)
+      v[i] = x >> 8*i;
+    return *this;
+  };
+  inline operator T() const {
+    T x = v[0];
+    for (unsigned i = 1; i < sizeof(T); i++)
+      x |= v[i] << 8*i;
+    return x;
+  }
+};
+
 #endif
 #endif
