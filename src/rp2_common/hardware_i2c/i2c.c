@@ -75,6 +75,24 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
     invalid_params_if(I2C, hcnt < 8);
     invalid_params_if(I2C, lcnt < 8);
 
+    // Per I2C-bus specification a device in standard or fast mode must
+    // internally provide a hold time of at least 300ns for the SDA signal to
+    // bridge the undefined region of the falling edge of SCL. A smaller hold
+    // time of 120ns is used for fast mode plus.
+    uint sda_tx_hold_count;
+    if (baudrate < 1000000) {
+        // sda_tx_hold_count = freq_in [cycles/s] * 300ns * (1s / 1e9ns)
+        // Reduce 300/1e9 to 3/1e7 to avoid numbers that don't fit in uint.
+        // Add 1 to avoid division truncation.
+        sda_tx_hold_count = ((freq_in * 3) / 10000000) + 1;
+    } else {
+        // sda_tx_hold_count = freq_in [cycles/s] * 120ns * (1s / 1e9ns)
+        // Reduce 120/1e9 to 3/25e6 to avoid numbers that don't fit in uint.
+        // Add 1 to avoid division truncation.
+        sda_tx_hold_count = ((freq_in * 3) / 25000000) + 1;
+    }
+    assert(sda_tx_hold_count <= lcnt - 2);
+
     i2c->hw->enable = 0;
     // Always use "fast" mode (<= 400 kHz, works fine for standard mode too)
     hw_write_masked(&i2c->hw->con,
@@ -84,6 +102,9 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
     i2c->hw->fs_scl_hcnt = hcnt;
     i2c->hw->fs_scl_lcnt = lcnt;
     i2c->hw->fs_spklen = lcnt < 16 ? 1 : lcnt / 16;
+    hw_write_masked(&i2c->hw->sda_hold,
+                    sda_tx_hold_count << I2C_IC_SDA_HOLD_IC_SDA_TX_HOLD_LSB,
+                    I2C_IC_SDA_HOLD_IC_SDA_TX_HOLD_BITS);
 
     i2c->hw->enable = 1;
     return freq_in / period;
