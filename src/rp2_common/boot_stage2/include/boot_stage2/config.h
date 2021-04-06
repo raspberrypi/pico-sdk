@@ -59,19 +59,24 @@
     #define PICO_BOOT_STAGE2_NAME PICO_BUILD_BOOT_STAGE2_NAME
 #else
     // boot stage 2 is selected by board config header, so we have to do some work
-    // NOTE: this switch is mirrored in compile_time_choice.S
     #if PICO_BOOT_STAGE2_CHOOSE_IS25LP080
-        #define PICO_BOOT_STAGE2_NAME "boot2_is25lp080"
+        #define _BOOT_STAGE2 boot2_is25lp080
     #elif PICO_BOOT_STAGE2_CHOOSE_W25Q080
-        #define PICO_BOOT_STAGE2_NAME "boot2_w25q080"
+        #define _BOOT_STAGE2 boot2_w25q080
     #elif PICO_BOOT_STAGE2_CHOOSE_W25X10CL
-        #define PICO_BOOT_STAGE2_NAME "boot2_w25x10cl"
+        #define _BOOT_STAGE2 boot2_w25x10cl
     #elif !defined(PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H) || PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H
         #undef PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H
         #define PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H 1
-        #define PICO_BOOT_STAGE2_NAME "boot2_generic_03h"
+        #define _BOOT_STAGE2 boot2_generic_03h
     #else
         #error no boot stage 2 is defined by PICO_BOOT_STAGE2_CHOOSE_ macro
     #endif
+    // pre-processor trickery, to avoid repetition in compile_time_choice.S
+    #define Q(x) #x
+    #define QUOTE(x) Q(x)
+    #define JOIN(x, y) x ## y
+    #define PICO_BOOT_STAGE2_NAME QUOTE(_BOOT_STAGE2)
+    #define PICO_BOOT_STAGE2_ASM QUOTE(JOIN(_BOOT_STAGE2,.S))
 #endif
 #endif
