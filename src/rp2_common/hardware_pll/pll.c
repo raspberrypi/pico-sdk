@@ -50,13 +50,8 @@ void pll_init(PLL pll, uint refdiv, uint vco_freq, uint post_div1, uint post_div
     reset_block(pll_reset);
     unreset_block_wait(pll_reset);
 
-    // Turn off PLL in case it is already running
-    pll->pwr = 0xffffffff;
-    pll->fbdiv_int = 0;
-
+    // Load VCO-related dividers before starting VCO
     pll->cs = refdiv;
-
-    // Put calculated value into feedback divider
     pll->fbdiv_int = fbdiv;
 
     // Turn on PLL
