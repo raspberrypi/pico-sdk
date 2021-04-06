@@ -103,7 +103,7 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
     i2c->hw->fs_scl_lcnt = lcnt;
     i2c->hw->fs_spklen = lcnt < 16 ? 1 : lcnt / 16;
     hw_write_masked(&i2c->hw->sda_hold,
-                    sda_tx_hold_count,
+                    sda_tx_hold_count << I2C_IC_SDA_HOLD_IC_SDA_TX_HOLD_LSB,
                     I2C_IC_SDA_HOLD_IC_SDA_TX_HOLD_BITS);
 
     i2c->hw->enable = 1;
