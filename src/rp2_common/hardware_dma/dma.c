@@ -60,9 +60,10 @@ void print_dma_ctrl(dma_channel_hw_t *channel) {
            ctrl & DMA_CH0_CTRL_TRIG_HIGH_PRIORITY_BITS ? 1 : 0,
            ctrl & DMA_CH0_CTRL_TRIG_EN_BITS ? 1 : 0);
 }
+#endif
 
-void check_dma_channel_param_impl(uint channel) {
+#if PARAM_ASSERTIONS_ENABLED(DMA)
+void check_dma_channel_param_impl(uint __unused channel) {
     valid_params_if(DMA, channel < NUM_DMA_CHANNELS);
 }
-
 #endif

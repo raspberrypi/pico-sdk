@@ -47,10 +47,10 @@ extern "C" {
  */
 enum pwm_clkdiv_mode
 {
-    PWM_DIV_FREE_RUNNING, ///< Free-running counting at rate dictated by fractional divider
-    PWM_DIV_B_HIGH,       ///< Fractional divider is gated by the PWM B pin
-    PWM_DIV_B_RISING,     ///< Fractional divider advances with each rising edge of the PWM B pin
-    PWM_DIV_B_FALLING     ///< Fractional divider advances with each falling edge of the PWM B pin
+    PWM_DIV_FREE_RUNNING = 0, ///< Free-running counting at rate dictated by fractional divider
+    PWM_DIV_B_HIGH = 1,       ///< Fractional divider is gated by the PWM B pin
+    PWM_DIV_B_RISING = 2,     ///< Fractional divider advances with each rising edge of the PWM B pin
+    PWM_DIV_B_FALLING = 3    ///< Fractional divider advances with each falling edge of the PWM B pin
 };
 
 enum pwm_chan
@@ -144,7 +144,10 @@ static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
  * high level, rising edge or falling edge of the B pin input.
  */
 static inline void pwm_config_set_clkdiv_mode(pwm_config *c, enum pwm_clkdiv_mode mode) {
-    valid_params_if(PWM, mode >= PWM_DIV_FREE_RUNNING && mode <= PWM_DIV_B_FALLING);
+    valid_params_if(PWM, mode == PWM_DIV_FREE_RUNNING ||
+            mode == PWM_DIV_B_RISING ||
+            mode == PWM_DIV_B_HIGH ||
+            mode == PWM_DIV_B_FALLING);
     c->csr = (c->csr & ~PWM_CH0_CSR_DIVMODE_BITS)
         | (((uint)mode) << PWM_CH0_CSR_DIVMODE_LSB);
 }
@@ -414,7 +417,10 @@ static inline void pwm_set_output_polarity(uint slice_num, bool a, bool b) {
  */
 static inline void pwm_set_clkdiv_mode(uint slice_num, enum pwm_clkdiv_mode mode) {
     check_slice_num_param(slice_num);
-    valid_params_if(PWM, mode >= PWM_DIV_FREE_RUNNING && mode <= PWM_DIV_B_FALLING);
+    valid_params_if(PWM, mode == PWM_DIV_FREE_RUNNING ||
+                         mode == PWM_DIV_B_RISING ||
+                         mode == PWM_DIV_B_HIGH ||
+                         mode == PWM_DIV_B_FALLING);
     hw_write_masked(&pwm_hw->slice[slice_num].csr, ((uint)mode) << PWM_CH0_CSR_DIVMODE_LSB, PWM_CH0_CSR_DIVMODE_BITS);
 }
 
