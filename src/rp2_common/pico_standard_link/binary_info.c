@@ -6,7 +6,10 @@
 
 #if !PICO_NO_BINARY_INFO && !PICO_NO_PROGRAM_INFO
 #include "pico/binary_info.h"
+
+#if !PICO_NO_FLASH
 #include "boot_stage2/config.h"
+#endif
 
 // Note we put at most 4 pieces of binary info in the reset section because that's how much spare space we had
 // (picked the most common ones)... if there is a link failure because of .reset section overflow then move

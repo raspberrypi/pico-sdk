@@ -205,9 +205,10 @@ inline static spin_lock_t *spin_lock_instance(uint lock_num) {
  * \return The Spinlock ID
  */
 inline static uint spin_lock_get_num(spin_lock_t *lock) {
-    int lock_num = lock - (spin_lock_t *) (SIO_BASE + SIO_SPINLOCK0_OFFSET);
-    invalid_params_if(SYNC, lock_num < 0 || lock_num >= NUM_SPIN_LOCKS);
-    return (uint) lock_num;
+    invalid_params_if(SYNC, (uint) lock < SIO_BASE + SIO_SPINLOCK0_OFFSET ||
+                            (uint) lock >= NUM_SPIN_LOCKS * sizeof(spin_lock_t) + SIO_BASE + SIO_SPINLOCK0_OFFSET ||
+                            ((uint) lock - SIO_BASE + SIO_SPINLOCK0_OFFSET) % sizeof(spin_lock_t) != 0);
+    return (uint) (lock - (spin_lock_t *) (SIO_BASE + SIO_SPINLOCK0_OFFSET));
 }
 
 /*! \brief Acquire a spin lock without disabling interrupts (hence unsafe)
