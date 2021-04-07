@@ -104,8 +104,46 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
 
     add_library(tinyusb_board INTERFACE)
     target_sources(tinyusb_board INTERFACE
-            ${PICO_TINYUSB_PATH}/hw/bsp/raspberry_pi_pico/board_raspberry_pi_pico.c
+            ${PICO_TINYUSB_PATH}/hw/bsp/rp2040/family.c
     )
+    target_include_directories(tinyusb_board INTERFACE ${PICO_TINYUSB_PATH}/hw/bsp/rp2040/boards/sdk_selected)
 
+    set(PICO_TINYUSB_PATH_INTERNAL ${PICO_TINYUSB_PATH} CACHE INTERNAL "")
+    add_library(tinyusb_example_support INTERFACE)
+    target_compile_definitions(tinyusb_example_support INTERFACE
+            CFG_TUSB_OS=OPT_OS_PICO
+            BOARD=pants
+    )
+    target_link_libraries(tinyusb_example_support INTERFACE tinyusb_board)
 endif()
+
+# SHORT_TYPE is 'dev' or 'host'; LONG_TYPE is 'device' or 'host'
+macro(internal_add_tinyusb_example SHORT_TYPE LONG_TYPE NAME )
+    if (TARGET tinyusb_${LONG_TYPE})
+        set(TARGET_NAME "usb_${SHORT_TYPE}_${NAME}")
+        # todo we ought to be able to include the examples, but we can't because they are very standalone
+        # todo maybe allow passing file names if necessary - doesn't seem to be right now
+        set(EXAMPLE_SOURCE_PATH ${PICO_TINYUSB_PATH_INTERNAL}/examples/${LONG_TYPE}/${NAME}/src)
+        file(GLOB EXAMPLE_SOURCE ${EXAMPLE_SOURCE_PATH}/*.c)
+        add_executable(${TARGET_NAME}
+                ${EXAMPLE_SOURCE}
+        )
+
+        target_include_directories(${TARGET_NAME} PRIVATE ${EXAMPLE_SOURCE_PATH})
+        target_link_libraries(${TARGET_NAME} PRIVATE pico_stdlib tinyusb_${LONG_TYPE} tinyusb_example_support)
+        pico_add_extra_outputs(${TARGET_NAME})
+
+    # add url via pico_set_program_url
+    # todo lets point at the right place
+    #example_auto_set_url(${NAME})
+    endif()
+endmacro()
+
+function(add_tinyusb_device_example NAME)
+    internal_add_tinyusb_example(dev device ${NAME})
+endfunction()
+
+function(add_tinyusb_host_example NAME)
+    internal_add_tinyusb_example(host host ${NAME})
+endfunction()
 
