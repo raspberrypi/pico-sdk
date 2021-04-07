@@ -96,7 +96,7 @@ enum gpio_function {
     GPIO_FUNC_PIO1 = 7,
     GPIO_FUNC_GPCK = 8,
     GPIO_FUNC_USB = 9,
-    GPIO_FUNC_NULL = 0xf,
+    GPIO_FUNC_NULL = 0x1f,
 };
 
 #define GPIO_OUT 1
