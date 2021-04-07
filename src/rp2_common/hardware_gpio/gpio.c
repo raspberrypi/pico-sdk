@@ -27,7 +27,7 @@ int gpio_get_pad(uint gpio) {
 // This also clears the input/output/irq override bits.
 void gpio_set_function(uint gpio, enum gpio_function fn) {
     invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
-    invalid_params_if(GPIO, fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB & ~IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS);
+    invalid_params_if(GPIO, ((uint32_t)fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB) & ~IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS);
     // Set input enable on, output disable off
     hw_write_masked(&padsbank0_hw->io[gpio],
                    PADS_BANK0_GPIO0_IE_BITS,
