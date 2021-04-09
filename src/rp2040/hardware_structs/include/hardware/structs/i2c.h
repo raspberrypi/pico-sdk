@@ -68,7 +68,7 @@ typedef struct {
 // IC_UFM_SCL_HIGH_COUNT ............. 0x0006
 // IC_TX_TL .......................... 0x0
 // IC_TX_CMD_BLOCK ................... 0x1
-// IC_HAS_DMA ........................ 0x0
+// IC_HAS_DMA ........................ 0x1
 // IC_HAS_ASYNC_FIFO ................. 0x0
 // IC_SMBUS_ARP ...................... 0x0
 // IC_FIRST_DATA_BYTE_STATUS ......... 0x1
