@@ -67,8 +67,8 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
 
     // TODO there are some subtleties to I2C timing which we are completely ignoring here
     uint period = (freq_in + baudrate / 2) / baudrate;
-    uint hcnt = period * 3 / 5; // oof this one hurts
-    uint lcnt = period - hcnt;
+    uint lcnt = period * 3 / 5; // oof this one hurts
+    uint hcnt = period - lcnt;
     // Check for out-of-range divisors:
     invalid_params_if(I2C, hcnt > I2C_IC_FS_SCL_HCNT_IC_FS_SCL_HCNT_BITS);
     invalid_params_if(I2C, lcnt > I2C_IC_FS_SCL_LCNT_IC_FS_SCL_LCNT_BITS);
