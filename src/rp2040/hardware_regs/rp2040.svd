@@ -24675,25 +24675,6 @@
           <fields>
             <field>
               <access>read-only</access>
-              <bitRange>[13:13]</bitRange>
-              <description>See IC_RAW_INTR_STAT for a detailed description of R_MASTER_ON_HOLD bit.\n\n
-                Reset value: 0x0</description>
-              <enumeratedValues>
-                <enumeratedValue>
-                  <description>R_MASTER_ON_HOLD interrupt is inactive</description>
-                  <name>INACTIVE</name>
-                  <value>0</value>
-                </enumeratedValue>
-                <enumeratedValue>
-                  <description>R_MASTER_ON_HOLD interrupt is active</description>
-                  <name>ACTIVE</name>
-                  <value>1</value>
-                </enumeratedValue>
-              </enumeratedValues>
-              <name>R_MASTER_ON_HOLD</name>
-            </field>
-            <field>
-              <access>read-only</access>
               <bitRange>[12:12]</bitRange>
               <description>See IC_RAW_INTR_STAT for a detailed description of R_RESTART_DET bit.\n\n
                 Reset value: 0x0</description>
@@ -24948,25 +24929,6 @@
           <description>I2C Interrupt Mask Register.\n\n
             These bits mask their corresponding interrupt status bits. This register is active low; a value of 0 masks the interrupt, whereas a value of 1 unmasks the interrupt.</description>
           <fields>
-            <field>
-              <access>read-only</access>
-              <bitRange>[13:13]</bitRange>
-              <description>This M_MASTER_ON_HOLD_read_only bit masks the R_MASTER_ON_HOLD interrupt in IC_INTR_STAT register.\n\n
-                Reset value: 0x0</description>
-              <enumeratedValues>
-                <enumeratedValue>
-                  <description>MASTER_ON_HOLD interrupt is masked</description>
-                  <name>ENABLED</name>
-                  <value>0</value>
-                </enumeratedValue>
-                <enumeratedValue>
-                  <description>MASTER_ON_HOLD interrupt is unmasked</description>
-                  <name>DISABLED</name>
-                  <value>1</value>
-                </enumeratedValue>
-              </enumeratedValues>
-              <name>M_MASTER_ON_HOLD_READ_ONLY</name>
-            </field>
             <field>
               <access>read-write</access>
               <bitRange>[12:12]</bitRange>
@@ -25223,25 +25185,6 @@
           <description>I2C Raw Interrupt Status Register\n\n
             Unlike the IC_INTR_STAT register, these bits are not masked so they always show the true status of the DW_apb_i2c.</description>
           <fields>
-            <field>
-              <access>read-only</access>
-              <bitRange>[13:13]</bitRange>
-              <description>Indicates whether master is holding the bus and TX FIFO is empty. Enabled only when I2C_DYNAMIC_TAR_UPDATE=1 and IC_EMPTYFIFO_HOLD_MASTER_EN=1.\n\n
-                Reset value: 0x0</description>
-              <enumeratedValues>
-                <enumeratedValue>
-                  <description>MASTER_ON_HOLD interrupt is inactive</description>
-                  <name>INACTIVE</name>
-                  <value>0</value>
-                </enumeratedValue>
-                <enumeratedValue>
-                  <description>MASTER_ON_HOLD interrupt is active</description>
-                  <name>ACTIVE</name>
-                  <value>1</value>
-                </enumeratedValue>
-              </enumeratedValues>
-              <name>MASTER_ON_HOLD</name>
-            </field>
             <field>
               <access>read-only</access>
               <bitRange>[12:12]</bitRange>
@@ -25931,7 +25874,7 @@
             The bits [15:0] of this register are used to control the hold time of SDA during transmit in both slave and master mode (after SCL goes from HIGH to LOW).\n\n
             The bits [23:16] of this register are used to extend the SDA transition (if any) whenever SCL is HIGH in the receiver in either master or slave mode.\n\n
             Writes to this register succeed only when IC_ENABLE[0]=0.\n\n
-            The values in this register are in units of ic_clk period. The value programmed in IC_SDA_TX_HOLD must be greater than the minimum hold time in each mode one cycle in master mode, seven cycles in slave mode for the value to be implemented.\n\n
+            The values in this register are in units of ic_clk period. The value programmed in IC_SDA_TX_HOLD must be greater than the minimum hold time in each mode (one cycle in master mode, seven cycles in slave mode) for the value to be implemented.\n\n
             The programmed SDA hold time during transmit (IC_SDA_TX_HOLD) cannot exceed at any time the duration of the low part of scl. Therefore the programmed value cannot be larger than N_SCL_LOW-2, where N_SCL_LOW is the duration of the low part of the scl period measured in ic_clk cycles.</description>
           <fields>
             <field>
@@ -29385,7 +29328,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[24:24]</bitRange>
-              <description>An invalid value has been written to CTRL_ENABLE or CTRL_FREQ_RANGE or FREQA or FREQB or DORMANT</description>
+              <description>An invalid value has been written to CTRL_ENABLE or CTRL_FREQ_RANGE or FREQA or FREQB or DIV or PHASE or DORMANT</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>BADWRITE</name>
             </field>

@@ -585,23 +585,8 @@
 //               matching interrupt clear register. The unmasked raw versions of
 //               these bits are available in the IC_RAW_INTR_STAT register.
 #define I2C_IC_INTR_STAT_OFFSET _u(0x0000002c)
-#define I2C_IC_INTR_STAT_BITS   _u(0x00003fff)
+#define I2C_IC_INTR_STAT_BITS   _u(0x00001fff)
 #define I2C_IC_INTR_STAT_RESET  _u(0x00000000)
-// -----------------------------------------------------------------------------
-// Field       : I2C_IC_INTR_STAT_R_MASTER_ON_HOLD
-// Description : See IC_RAW_INTR_STAT for a detailed description of
-//               R_MASTER_ON_HOLD bit.
-//
-//               Reset value: 0x0
-//               0x0 -> R_MASTER_ON_HOLD interrupt is inactive
-//               0x1 -> R_MASTER_ON_HOLD interrupt is active
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_RESET          _u(0x0)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_BITS           _u(0x00002000)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_MSB            _u(13)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_LSB            _u(13)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_ACCESS         "RO"
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_VALUE_INACTIVE _u(0x0)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_VALUE_ACTIVE   _u(0x1)
 // -----------------------------------------------------------------------------
 // Field       : I2C_IC_INTR_STAT_R_RESTART_DET
 // Description : See IC_RAW_INTR_STAT for a detailed description of
@@ -805,23 +790,8 @@
 //               register is active low; a value of 0 masks the interrupt,
 //               whereas a value of 1 unmasks the interrupt.
 #define I2C_IC_INTR_MASK_OFFSET _u(0x00000030)
-#define I2C_IC_INTR_MASK_BITS   _u(0x00003fff)
+#define I2C_IC_INTR_MASK_BITS   _u(0x00001fff)
 #define I2C_IC_INTR_MASK_RESET  _u(0x000008ff)
-// -----------------------------------------------------------------------------
-// Field       : I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY
-// Description : This M_MASTER_ON_HOLD_read_only bit masks the R_MASTER_ON_HOLD
-//               interrupt in IC_INTR_STAT register.
-//
-//               Reset value: 0x0
-//               0x0 -> MASTER_ON_HOLD interrupt is masked
-//               0x1 -> MASTER_ON_HOLD interrupt is unmasked
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_RESET          _u(0x0)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_BITS           _u(0x00002000)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_MSB            _u(13)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_LSB            _u(13)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_ACCESS         "RO"
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_VALUE_ENABLED  _u(0x0)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_VALUE_DISABLED _u(0x1)
 // -----------------------------------------------------------------------------
 // Field       : I2C_IC_INTR_MASK_M_RESTART_DET
 // Description : This bit masks the R_RESTART_DET interrupt in IC_INTR_STAT
@@ -1023,24 +993,8 @@
 //               Unlike the IC_INTR_STAT register, these bits are not masked so
 //               they always show the true status of the DW_apb_i2c.
 #define I2C_IC_RAW_INTR_STAT_OFFSET _u(0x00000034)
-#define I2C_IC_RAW_INTR_STAT_BITS   _u(0x00003fff)
+#define I2C_IC_RAW_INTR_STAT_BITS   _u(0x00001fff)
 #define I2C_IC_RAW_INTR_STAT_RESET  _u(0x00000000)
-// -----------------------------------------------------------------------------
-// Field       : I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD
-// Description : Indicates whether master is holding the bus and TX FIFO is
-//               empty. Enabled only when I2C_DYNAMIC_TAR_UPDATE=1 and
-//               IC_EMPTYFIFO_HOLD_MASTER_EN=1.
-//
-//               Reset value: 0x0
-//               0x0 -> MASTER_ON_HOLD interrupt is inactive
-//               0x1 -> MASTER_ON_HOLD interrupt is active
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_RESET          _u(0x0)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_BITS           _u(0x00002000)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_MSB            _u(13)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_LSB            _u(13)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_ACCESS         "RO"
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_VALUE_INACTIVE _u(0x0)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_VALUE_ACTIVE   _u(0x1)
 // -----------------------------------------------------------------------------
 // Field       : I2C_IC_RAW_INTR_STAT_RESTART_DET
 // Description : Indicates whether a RESTART condition has occurred on the I2C
@@ -1839,8 +1793,8 @@
 //
 //               The values in this register are in units of ic_clk period. The
 //               value programmed in IC_SDA_TX_HOLD must be greater than the
-//               minimum hold time in each mode one cycle in master mode, seven
-//               cycles in slave mode for the value to be implemented.
+//               minimum hold time in each mode (one cycle in master mode, seven
+//               cycles in slave mode) for the value to be implemented.
 //
 //               The programmed SDA hold time during transmit (IC_SDA_TX_HOLD)
 //               cannot exceed at any time the duration of the low part of scl.
