@@ -46,6 +46,7 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
             ${PICO_TINYUSB_PATH}/src
             ${PICO_TINYUSB_PATH}/src/common
             ${PICO_TINYUSB_PATH}/hw
+            ${PICO_TINYUSB_PATH}/lib/networking
     )
 
     add_library(tinyusb_device_unmarked INTERFACE)
@@ -91,6 +92,13 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
             ${PICO_TINYUSB_PATH}/src/class/hid/hid_host.c
             ${PICO_TINYUSB_PATH}/src/class/msc/msc_host.c
             ${PICO_TINYUSB_PATH}/src/class/vendor/vendor_host.c
+            )
+
+    add_library(tinyusb_net INTERFACE)
+    target_sources(tinyusb_host INTERFACE
+            ${PICO_TINYUSB_PATH}/lib/networking/dhserver.c
+            ${PICO_TINYUSB_PATH}/lib/networking/dnserver.c
+            ${PICO_TINYUSB_PATH}/lib/networking/rndis_reports.c
             )
 
     # Sometimes have to do host specific actions in mostly
