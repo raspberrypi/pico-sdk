@@ -80,19 +80,20 @@ inline static uint _pio_encode_instr_and_src_dest(enum pio_instr_bits instr_bits
 }
 
 inline static uint pio_encode_delay(uint cycles) {
+    // note that the maximum cycles will be smaller if sideset_bit_count > 0
     valid_params_if(PIO_INSTRUCTIONS, cycles <= 0x1f);
     return cycles << 8u;
 }
 
 inline static uint pio_encode_sideset(uint sideset_bit_count, uint value) {
     valid_params_if(PIO_INSTRUCTIONS, sideset_bit_count >= 1 && sideset_bit_count <= 5);
-    valid_params_if(PIO_INSTRUCTIONS, value <= (0x1fu >> sideset_bit_count));
+    valid_params_if(PIO_INSTRUCTIONS, value <= ((1u << sideset_bit_count) - 1));
     return value << (13u - sideset_bit_count);
 }
 
 inline static uint pio_encode_sideset_opt(uint sideset_bit_count, uint value) {
-    valid_params_if(PIO_INSTRUCTIONS, sideset_bit_count >= 2 && sideset_bit_count <= 5);
-    valid_params_if(PIO_INSTRUCTIONS, value <= (0x1fu >> sideset_bit_count));
+    valid_params_if(PIO_INSTRUCTIONS, sideset_bit_count >= 1 && sideset_bit_count <= 4);
+    valid_params_if(PIO_INSTRUCTIONS, value <= ((1u << sideset_bit_count) - 1));
     return 0x1000u | value << (12u - sideset_bit_count);
 }
 
