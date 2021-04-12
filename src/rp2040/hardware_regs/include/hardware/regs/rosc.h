@@ -260,7 +260,7 @@
 // -----------------------------------------------------------------------------
 // Field       : ROSC_STATUS_BADWRITE
 // Description : An invalid value has been written to CTRL_ENABLE or
-//               CTRL_FREQ_RANGE or FREQA or FREQB or DORMANT
+//               CTRL_FREQ_RANGE or FREQA or FREQB or DIV or PHASE or DORMANT
 #define ROSC_STATUS_BADWRITE_RESET  _u(0x0)
 #define ROSC_STATUS_BADWRITE_BITS   _u(0x01000000)
 #define ROSC_STATUS_BADWRITE_MSB    _u(24)
