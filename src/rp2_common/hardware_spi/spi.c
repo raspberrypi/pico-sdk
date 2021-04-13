@@ -76,7 +76,7 @@ int __not_in_flash_func(spi_write_read_blocking)(spi_inst_t *spi, const uint8_t 
     size_t rx_remaining = len, tx_remaining = len;
 
     while (rx_remaining || tx_remaining) {
-        if (tx_remaining && spi_is_writable(spi) && rx_remaining - tx_remaining < fifo_depth) {
+        if (tx_remaining && spi_is_writable(spi) && rx_remaining < tx_remaining + fifo_depth) {
             spi_get_hw(spi)->dr = (uint32_t) *src++;
             --tx_remaining;
         }
@@ -125,7 +125,7 @@ int __not_in_flash_func(spi_read_blocking)(spi_inst_t *spi, uint8_t repeated_tx_
     size_t rx_remaining = len, tx_remaining = len;
 
     while (rx_remaining || tx_remaining) {
-        if (tx_remaining && spi_is_writable(spi) && rx_remaining - tx_remaining < fifo_depth) {
+        if (tx_remaining && spi_is_writable(spi) && rx_remaining < tx_remaining + fifo_depth) {
             spi_get_hw(spi)->dr = (uint32_t) repeated_tx_data;
             --tx_remaining;
         }
@@ -147,7 +147,7 @@ int __not_in_flash_func(spi_write16_read16_blocking)(spi_inst_t *spi, const uint
     size_t rx_remaining = len, tx_remaining = len;
 
     while (rx_remaining || tx_remaining) {
-        if (tx_remaining && spi_is_writable(spi) && rx_remaining - tx_remaining < fifo_depth) {
+        if (tx_remaining && spi_is_writable(spi) && rx_remaining < tx_remaining + fifo_depth) {
             spi_get_hw(spi)->dr = (uint32_t) *src++;
             --tx_remaining;
         }
@@ -192,7 +192,7 @@ int __not_in_flash_func(spi_read16_blocking)(spi_inst_t *spi, uint16_t repeated_
     size_t rx_remaining = len, tx_remaining = len;
 
     while (rx_remaining || tx_remaining) {
-        if (tx_remaining && spi_is_writable(spi) && rx_remaining - tx_remaining < fifo_depth) {
+        if (tx_remaining && spi_is_writable(spi) && rx_remaining < tx_remaining + fifo_depth) {
             spi_get_hw(spi)->dr = (uint32_t) repeated_tx_data;
             --tx_remaining;
         }
