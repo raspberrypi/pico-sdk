@@ -42,6 +42,21 @@
 #define PICO_DEFAULT_I2C_SCL_PIN   7
 #endif
 
+// --- SPI ---
+#ifndef PICO_DEFAULT_SPI
+#define PICO_DEFAULT_SPI 0
+#endif
+#ifndef PICO_DEFAULT_SPI_SCK_PIN
+#define PICO_DEFAULT_SPI_SCK_PIN 2
+#endif
+#ifndef PICO_DEFAULT_SPI_TX_PIN
+#define PICO_DEFAULT_SPI_TX_PIN 3
+#endif
+#ifndef PICO_DEFAULT_SPI_RX_PIN
+#define PICO_DEFAULT_SPI_RX_PIN 4
+#endif
+
+
 // spi flash
 
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
