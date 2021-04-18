@@ -119,7 +119,7 @@ uint32_t multicore_fifo_pop_blocking(void);
 
 bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out);
 
-/*! \brief Flush any data in the outgoing FIFO
+/*! \brief Flush any data in the incoming FIFO
  *  \ingroup multicore_fifo
  *
  */
@@ -130,9 +130,12 @@ static inline void multicore_fifo_drain(void) {
 
 /*! \brief Clear FIFO interrupt
  *  \ingroup multicore_fifo
+ *
+ * Note that this only clears an interrupt that was caused by the ROE or WOF flags.
+ * To clear the VLD flag you need to use one of the 'pop' or 'drain' functions.
 */
 static inline void multicore_fifo_clear_irq(void) {
-    // Write any value to clear any interrupts
+    // Write any value to clear the error flags
     sio_hw->fifo_st = 0xff;
 }
 
