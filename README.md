@@ -1,4 +1,4 @@
-# Raspberry Pi Pico SDK
+ex# Raspberry Pi Pico SDK
 
 The Raspberry Pi Pico SDK (henceforth the SDK) provides the headers, libraries and build system
 necessary to write programs for the RP2040-based devices such as the Raspberry Pi Pico
@@ -74,7 +74,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
           # initialize pico-sdk from submodule
           # note: this must happen before project()
-          include(pico-sdk/external/pico_sdk_init.cmake)
+          include(pico-sdk/pico_sdk_init.cmake)
 
           project(my_project)
 
