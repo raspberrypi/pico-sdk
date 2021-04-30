@@ -1,4 +1,4 @@
-ex# Raspberry Pi Pico SDK
+# Raspberry Pi Pico SDK
 
 The Raspberry Pi Pico SDK (henceforth the SDK) provides the headers, libraries and build system
 necessary to write programs for the RP2040-based devices such as the Raspberry Pi Pico
