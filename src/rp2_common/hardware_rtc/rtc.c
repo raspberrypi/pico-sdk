@@ -137,7 +137,7 @@ static void rtc_irq_handler(void) {
 
     if (_alarm_repeats) {
         // If it is a repeatable alarm, re enable the alarm.
-        if(_alarm_repeats == -1) {
+        if(_alarm_repeats == CONTINUOUS_REPEAT_ON_SEC) {
           datetime_t t;
           rtc_get_datetime(&t);
           rtc_hw->irq_setup_1 = RTC_IRQ_SETUP_1_SEC_ENA_BITS | ((((uint)t.sec + 1) % 60) << RTC_IRQ_SETUP_1_SEC_LSB);
