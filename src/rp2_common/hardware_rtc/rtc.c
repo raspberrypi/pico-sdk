@@ -39,7 +39,7 @@ void rtc_init(void) {
     rtc_hw->clkdiv_m1 = rtc_freq;
 }
 
-static bool valid_datetime(datetime_t *t) {
+static bool valid_datetime(const datetime_t *t) {
     // Valid ranges taken from RTC doc. Note when setting an RTC alarm
     // these values are allowed to be -1 to say "don't match this value"
     if (!(t->year >= 0 && t->year <= 4095)) return false;
@@ -52,7 +52,7 @@ static bool valid_datetime(datetime_t *t) {
     return true;
 }
 
-bool rtc_set_datetime(datetime_t *t) {
+bool rtc_set_datetime(const datetime_t *t) {
     if (!valid_datetime(t)) {
         return false;
     }
@@ -114,6 +114,14 @@ void rtc_enable_alarm(void) {
     }
 }
 
+void rtc_disable_alarm(void) {
+  // Disable matching and wait for it to stop being active
+  hw_clear_bits(&rtc_hw->irq_setup_0, RTC_IRQ_SETUP_0_MATCH_ENA_BITS);
+  while (rtc_hw->irq_setup_0 & RTC_IRQ_SETUP_0_MATCH_ACTIVE_BITS) {
+    tight_loop_contents();
+  }
+}
+
 static void rtc_irq_handler(void) {
     // Always disable the alarm to clear the current IRQ.
     // Even if it is a repeatable alarm, we don't want it to keep firing.
@@ -131,7 +139,7 @@ static void rtc_irq_handler(void) {
     }
 }
 
-static bool rtc_alarm_repeats(datetime_t *t) {
+static bool rtc_alarm_repeats(const datetime_t *t) {
     // If any value is set to -1 then we don't match on that value
     // hence the alarm will eventually repeat
     if (t->year  < 0) return true;
@@ -144,8 +152,14 @@ static bool rtc_alarm_repeats(datetime_t *t) {
     return false;
 }
 
-void rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback) {
+bool rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback) {
     rtc_disable_alarm();
+
+    // Does it repeat? I.e. do we not match on any of the bits
+    _alarm_repeats = rtc_alarm_repeats(t);
+
+    if( (!valid_datetime(t) && !_alarm_repeats) || !user_callback)	// none of the parameters is valid
+        return false;
 
     // Only add to setup if it isn't -1
     rtc_hw->irq_setup_0 = ((t->year  < 0) ? 0 : (((uint)t->year)  << RTC_IRQ_SETUP_0_YEAR_LSB )) |
@@ -180,12 +194,5 @@ void rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback) {
     irq_set_enabled(RTC_IRQ, true);
 
     rtc_enable_alarm();
-}
-
-void rtc_disable_alarm(void) {
-    // Disable matching and wait for it to stop being active
-    hw_clear_bits(&rtc_hw->irq_setup_0, RTC_IRQ_SETUP_0_MATCH_ENA_BITS);
-    while(rtc_hw->irq_setup_0 & RTC_IRQ_SETUP_0_MATCH_ACTIVE_BITS) {
-        tight_loop_contents();
-    }
+    return true;
 }
