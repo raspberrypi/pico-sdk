@@ -13,7 +13,14 @@
 
 // Set this when setting an alarm
 static rtc_callback_t _callback = NULL;
-static int8_t _alarm_repeats = 0;
+
+typedef enum {
+    NO_REPEAT                =  0,
+    CONTINUOUS_REPEAT        =  1,
+    CONTINUOUS_REPEAT_ON_SEC =  2,
+} repeat_type;
+
+static repeat_type _alarm_repeats = NO_REPEAT;
 
 bool rtc_running(void) {
     return (rtc_hw->ctrl & RTC_CTRL_RTC_ACTIVE_BITS);
@@ -115,11 +122,11 @@ void rtc_enable_alarm(void) {
 }
 
 void rtc_disable_alarm(void) {
-  // Disable matching and wait for it to stop being active
-  hw_clear_bits(&rtc_hw->irq_setup_0, RTC_IRQ_SETUP_0_MATCH_ENA_BITS);
-  while (rtc_hw->irq_setup_0 & RTC_IRQ_SETUP_0_MATCH_ACTIVE_BITS) {
-    tight_loop_contents();
-  }
+    // Disable matching and wait for it to stop being active
+    hw_clear_bits(&rtc_hw->irq_setup_0, RTC_IRQ_SETUP_0_MATCH_ENA_BITS);
+    while (rtc_hw->irq_setup_0 & RTC_IRQ_SETUP_0_MATCH_ACTIVE_BITS) {
+        tight_loop_contents();
+    }
 }
 
 static void rtc_irq_handler(void) {
@@ -131,9 +138,9 @@ static void rtc_irq_handler(void) {
     if (_alarm_repeats) {
         // If it is a repeatable alarm, re enable the alarm.
         if(_alarm_repeats == -1) {
-          datetime_t tNew;
-          rtc_get_datetime(&tNew);
-          rtc_hw->irq_setup_1 = RTC_IRQ_SETUP_1_SEC_ENA_BITS | ((((uint)tNew.sec + 1) % 60) << RTC_IRQ_SETUP_1_SEC_LSB);
+          datetime_t t;
+          rtc_get_datetime(&t);
+          rtc_hw->irq_setup_1 = RTC_IRQ_SETUP_1_SEC_ENA_BITS | ((((uint)t.sec + 1) % 60) << RTC_IRQ_SETUP_1_SEC_LSB);
         }
         rtc_enable_alarm();
     }
@@ -148,9 +155,11 @@ static void rtc_irq_handler(void) {
 static int8_t rtc_alarm_repeats(const datetime_t *t) {
   // If any value is set to -1 then we don't match on that value
   // hence the alarm will eventually repeat
-    if(t->year & t->month & t->day & t->dotw & t->hour & t->min & t->sec < 0)
-      return - 1;
-    return ((t->year | t->month | t->day | t->dotw | t->hour | t->min | t->sec) < 0);
+    if((t->year & t->month & t->day & t->dotw & t->hour & t->min & t->sec) < 0) return CONTINUOUS_REPEAT_ON_SEC;
+
+    return (t->year < 0 || t->month < 0 || t->day < 0 || t->dotw < 0
+            || t->hour < 0 || t->min < 0 || t->sec < 0)
+        ? CONTINUOUS_REPEAT : NO_REPEAT;
 }
 
 bool rtc_set_alarm(const datetime_t *t, rtc_callback_t user_callback) {
@@ -165,22 +174,15 @@ bool rtc_set_alarm(const datetime_t *t, rtc_callback_t user_callback) {
         return false;
 
     // Set the match enable bits for things we care about
-    if (t->year  >= 0)
-        s0 |= RTC_IRQ_SETUP_0_YEAR_ENA_BITS  | (((uint)t->year)  << RTC_IRQ_SETUP_0_YEAR_LSB );
-    if (t->month >= 1)
-        s0 |= RTC_IRQ_SETUP_0_MONTH_ENA_BITS | (((uint)t->month) << RTC_IRQ_SETUP_0_MONTH_LSB);
-    if (t->day   >= 1)
-        s0 |= RTC_IRQ_SETUP_0_DAY_ENA_BITS   | (((uint)t->day)   << RTC_IRQ_SETUP_0_DAY_LSB  );
-    if (t->dotw  >= 0)
-        s1 |= RTC_IRQ_SETUP_1_DOTW_ENA_BITS  | (((uint)t->dotw)  << RTC_IRQ_SETUP_1_DOTW_LSB);
-    if (t->hour  >= 0)
-       s1 |= RTC_IRQ_SETUP_1_HOUR_ENA_BITS   | (((uint)t->hour)  << RTC_IRQ_SETUP_1_HOUR_LSB);
-    if (t->min   >= 0)
-        s1 |= RTC_IRQ_SETUP_1_MIN_ENA_BITS   | (((uint)t->min)   << RTC_IRQ_SETUP_1_MIN_LSB);
-    if (t->sec   >= 0)
-        s1 |= RTC_IRQ_SETUP_1_SEC_ENA_BITS   | (((uint)t->sec)   << RTC_IRQ_SETUP_1_SEC_LSB);
-    else if (_alarm_repeats == -1) // repeatable every second! All entries are -1
-    {
+    if (t->year  >= 0) s0 |= RTC_IRQ_SETUP_0_YEAR_ENA_BITS  | (((uint)t->year)  << RTC_IRQ_SETUP_0_YEAR_LSB );
+    if (t->month >= 1) s0 |= RTC_IRQ_SETUP_0_MONTH_ENA_BITS | (((uint)t->month) << RTC_IRQ_SETUP_0_MONTH_LSB);
+    if (t->day   >= 1) s0 |= RTC_IRQ_SETUP_0_DAY_ENA_BITS   | (((uint)t->day)   << RTC_IRQ_SETUP_0_DAY_LSB  );
+    if (t->dotw  >= 0) s1 |= RTC_IRQ_SETUP_1_DOTW_ENA_BITS  | (((uint)t->dotw)  << RTC_IRQ_SETUP_1_DOTW_LSB);
+    if (t->hour  >= 0) s1 |= RTC_IRQ_SETUP_1_HOUR_ENA_BITS  | (((uint)t->hour)  << RTC_IRQ_SETUP_1_HOUR_LSB);
+    if (t->min   >= 0) s1 |= RTC_IRQ_SETUP_1_MIN_ENA_BITS   | (((uint)t->min)   << RTC_IRQ_SETUP_1_MIN_LSB);
+    if (t->sec   >= 0) s1 |= RTC_IRQ_SETUP_1_SEC_ENA_BITS   | (((uint)t->sec)   << RTC_IRQ_SETUP_1_SEC_LSB);
+    else if (_alarm_repeats == CONTINUOUS_REPEAT_ON_SEC) {
+        // repeatable every second! All entries are -1
         datetime_t tNew;
         rtc_get_datetime(&tNew);
         s1 = RTC_IRQ_SETUP_1_SEC_ENA_BITS | ((((uint)tNew.sec + 1) % 60) << RTC_IRQ_SETUP_1_SEC_LSB);
