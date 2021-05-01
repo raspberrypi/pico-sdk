@@ -183,9 +183,9 @@ bool rtc_set_alarm(const datetime_t *t, rtc_callback_t user_callback) {
     if (t->sec   >= 0) s1 |= RTC_IRQ_SETUP_1_SEC_ENA_BITS   | (((uint)t->sec)   << RTC_IRQ_SETUP_1_SEC_LSB);
     else if (_alarm_repeats == CONTINUOUS_REPEAT_ON_SEC) {
         // repeatable every second! All entries are -1
-        datetime_t tNew;
-        rtc_get_datetime(&tNew);
-        s1 = RTC_IRQ_SETUP_1_SEC_ENA_BITS | ((((uint)tNew.sec + 1) % 60) << RTC_IRQ_SETUP_1_SEC_LSB);
+        datetime_t new_dt;
+        rtc_get_datetime(&new_dt);
+        s1 = RTC_IRQ_SETUP_1_SEC_ENA_BITS | ((((uint)new_dt.sec + 1) % 60) << RTC_IRQ_SETUP_1_SEC_LSB);
     }
 
     rtc_hw->irq_setup_0 = s0;
