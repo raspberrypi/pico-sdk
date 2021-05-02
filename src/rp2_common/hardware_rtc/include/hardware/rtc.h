@@ -32,6 +32,10 @@
 extern "C" {
 #endif
 
+#ifndef PARAM_ASSERTIONS_ENABLED_RTC
+#define PARAM_ASSERTIONS_ENABLED_RTC 0
+#endif
+
 /*! Callback function type for RTC alarms
  *  \ingroup hardware_rtc
  *
@@ -84,6 +88,11 @@ void rtc_enable_alarm(void);
  *  \ingroup hardware_rtc
  */
 void rtc_disable_alarm(void);
+
+/*! \brief Deletes the alarm previously set with \see rtc_set_alarm
+ *  \ingroup hardware_rtc
+ */
+void rtc_delete_alarm(void);
 
 #ifdef __cplusplus
 }
