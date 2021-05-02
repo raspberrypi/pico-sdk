@@ -198,21 +198,22 @@ bool rtc_set_alarm(const datetime_t *t, rtc_callback_t user_callback) {
         return false;
 
     // Set the match enable bits for things we care about
-    if (RANGE_CHECK_YEAR(t))  s0 |= RTC_IRQ_SETUP_0_YEAR_ENA_BITS  | (((uint)t->year)  << RTC_IRQ_SETUP_0_YEAR_LSB );
-    if (RANGE_CHECK_MONTH(t)) s0 |= RTC_IRQ_SETUP_0_MONTH_ENA_BITS | (((uint)t->month) << RTC_IRQ_SETUP_0_MONTH_LSB);
-    if (RANGE_CHECK_DAY(t))   s0 |= RTC_IRQ_SETUP_0_DAY_ENA_BITS   | (((uint)t->day)   << RTC_IRQ_SETUP_0_DAY_LSB  );
-    if (RANGE_CHECK_DOTW(t))  s1 |= RTC_IRQ_SETUP_1_DOTW_ENA_BITS  | (((uint)t->dotw)  << RTC_IRQ_SETUP_1_DOTW_LSB);
-    if (RANGE_CHECK_HOUR(t))  s1 |= RTC_IRQ_SETUP_1_HOUR_ENA_BITS  | (((uint)t->hour)  << RTC_IRQ_SETUP_1_HOUR_LSB);
-    if (RANGE_CHECK_MIN(t))   s1 |= RTC_IRQ_SETUP_1_MIN_ENA_BITS   | (((uint)t->min)   << RTC_IRQ_SETUP_1_MIN_LSB);
-    if (RANGE_CHECK_SEC(t))   s1 |= RTC_IRQ_SETUP_1_SEC_ENA_BITS   | (((uint)t->sec)   << RTC_IRQ_SETUP_1_SEC_LSB);
-    else if (_alarm_repeats == CONTINUOUS_REPEAT_EVERY_SEC) {
-      // repeatable every second! All entries are -1
-      datetime_t new_dt;
-      _rtc_get_datetime(&new_dt);
-      s1 = ADD_AND_ENABLE_REPEATABLE_SECOND(new_dt.sec);
+    if(_alarm_repeats == CONTINUOUS_REPEAT_EVERY_SEC) {
+        // repeatable every second! All entries are -1
+        datetime_t new_dt;
+        _rtc_get_datetime(&new_dt);
+        s1 = ADD_AND_ENABLE_REPEATABLE_SECOND(new_dt.sec);
     }
     else {
-        return false; // out of range datetime_t input
+        if (RANGE_CHECK_YEAR(t))  s0 |= RTC_IRQ_SETUP_0_YEAR_ENA_BITS  | (((uint)t->year)  << RTC_IRQ_SETUP_0_YEAR_LSB);
+        if (RANGE_CHECK_MONTH(t)) s0 |= RTC_IRQ_SETUP_0_MONTH_ENA_BITS | (((uint)t->month) << RTC_IRQ_SETUP_0_MONTH_LSB);
+        if (RANGE_CHECK_DAY(t))   s0 |= RTC_IRQ_SETUP_0_DAY_ENA_BITS   | (((uint)t->day)   << RTC_IRQ_SETUP_0_DAY_LSB);
+        if (RANGE_CHECK_DOTW(t))  s1 |= RTC_IRQ_SETUP_1_DOTW_ENA_BITS  | (((uint)t->dotw)  << RTC_IRQ_SETUP_1_DOTW_LSB);
+        if (RANGE_CHECK_HOUR(t))  s1 |= RTC_IRQ_SETUP_1_HOUR_ENA_BITS  | (((uint)t->hour)  << RTC_IRQ_SETUP_1_HOUR_LSB);
+        if (RANGE_CHECK_MIN(t))   s1 |= RTC_IRQ_SETUP_1_MIN_ENA_BITS   | (((uint)t->min)   << RTC_IRQ_SETUP_1_MIN_LSB);
+        if (RANGE_CHECK_SEC(t))   s1 |= RTC_IRQ_SETUP_1_SEC_ENA_BITS   | (((uint)t->sec)   << RTC_IRQ_SETUP_1_SEC_LSB);
+
+        if(!s0 && !s1) return false; // out of range datetime_t input
     }
 
     rtc_hw->irq_setup_0 = s0;
