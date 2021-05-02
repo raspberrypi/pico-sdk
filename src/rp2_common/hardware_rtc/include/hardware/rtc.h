@@ -32,6 +32,7 @@
 extern "C" {
 #endif
 
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_RTC, Enable/disable assertions in the RTC module, type=bool, default=0, group=hardware_rtc
 #ifndef PARAM_ASSERTIONS_ENABLED_RTC
 #define PARAM_ASSERTIONS_ENABLED_RTC 0
 #endif

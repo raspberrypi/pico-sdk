@@ -13,7 +13,7 @@
 
 #define RANGE_CHECK_YEAR(t)  (t->year >= 0 && t->year <= 4095)
 #define RANGE_CHECK_MONTH(t) (t->month >= 1 && t->month <= 12)
-#define RANGE_CHECK_DAY(t)   (t->day >= 1 && t->day <= 32)
+#define RANGE_CHECK_DAY(t)   (t->day >= 1 && t->day <= 31)
 #define RANGE_CHECK_DOTW(t)  (t->dotw >= 0 && t->dotw <= 6)
 #define RANGE_CHECK_HOUR(t)  (t->hour >= 0 && t->hour <= 23)
 #define RANGE_CHECK_MIN(t)   (t->min >= 0 && t->min <= 59)
@@ -163,7 +163,8 @@ static void __no_inline_not_in_flash_func(rtc_irq_handler)(void) {
     }
 
     // Call user callback function
-    _callback();
+    if (_callback)
+        _callback();
 
   // If it is a repeatable alarm, re enable the alarm.
   if(_alarm_repeats) {
@@ -193,7 +194,7 @@ bool rtc_set_alarm(const datetime_t *t, rtc_callback_t user_callback) {
     // Does it repeat? I.e. do we not match on any of the bits
     _alarm_repeats = rtc_alarm_repeats(t);
 
-    bool check_params = (is_valid_datetime(t) || _alarm_repeats != NO_REPEAT) && user_callback;
+    bool check_params = (is_valid_datetime(t) || _alarm_repeats != NO_REPEAT);
     valid_params_if(RTC, check_params);
     if(!check_params)	// none of the parameters is valid
         return false;
@@ -238,10 +239,6 @@ bool rtc_set_alarm(const datetime_t *t, rtc_callback_t user_callback) {
 
 void rtc_delete_alarm(void)
 {
-    if (_callback == NULL) {
-        return; // rtc_set_alarm was not called or not successful
-    }
-
     // first disable the alarm
     rtc_disable_alarm();
 
