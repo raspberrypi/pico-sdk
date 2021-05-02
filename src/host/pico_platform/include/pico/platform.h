@@ -137,6 +137,12 @@ static inline void __compiler_memory_barrier(void) {
 }
 
 template<typename T> struct stored_little_endian {
+#if defined(_MSC_VER) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+  // Use identity functions if the system is natively little endian
+  T v;
+  inline stored_little_endian& operator= (const T& x) { v = x; return *this; }
+  inline operator T() const { return v; }
+#else
   uint8_t v[sizeof(T)];
   inline stored_little_endian& operator= (const T& x) {
     for (unsigned i = 0; i < sizeof(T); i++)
@@ -149,6 +155,7 @@ template<typename T> struct stored_little_endian {
       x |= v[i] << 8*i;
     return x;
   }
+#endif
 };
 
 #ifndef le_uint16_t
