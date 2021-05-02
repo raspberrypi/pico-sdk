@@ -22,6 +22,9 @@
 
 // Set this when setting an alarm
 static rtc_callback_t _callback = NULL;
+static uint8_t _seconds_increment = 1;
+
+#define ADD_AND_ENABLE_REPEATABLE_SECOND(s) (RTC_IRQ_SETUP_1_SEC_ENA_BITS | ((((uint)s + _seconds_increment) % 60) << RTC_IRQ_SETUP_1_SEC_LSB))
 
 typedef enum {
     NO_REPEAT                   =  0,
@@ -144,8 +147,6 @@ void rtc_disable_alarm(void) {
     }
 }
 
-#define ADD_AND_ENABLE_REPEATABLE_SECOND(s) (RTC_IRQ_SETUP_1_SEC_ENA_BITS | ((((uint)s + 1) % 60) << RTC_IRQ_SETUP_1_SEC_LSB))
-
 static void __no_inline_not_in_flash_func(rtc_irq_handler)(void) {
     // Always disable the alarm to clear the current IRQ.
     // Even if it is a repeatable alarm, we don't want it to keep firing.
@@ -202,6 +203,7 @@ bool rtc_set_alarm(const datetime_t *t, rtc_callback_t user_callback) {
         // repeatable every second! All entries are -1
         datetime_t new_dt;
         _rtc_get_datetime(&new_dt);
+        _seconds_increment = (-t->sec) % 60;
         s1 = ADD_AND_ENABLE_REPEATABLE_SECOND(new_dt.sec);
     }
     else {

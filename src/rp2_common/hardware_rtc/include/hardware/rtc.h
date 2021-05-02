@@ -73,7 +73,8 @@ bool rtc_running(void);
 /*! \brief Set a time in the future for the RTC to call a user provided callback
  *  \ingroup hardware_rtc
  *
- *  \param t Pointer to a \ref datetime_t structure containing a time in the future to fire the alarm. Any values set to -1 will not be matched on.
+ *  \param t Pointer to a \ref datetime_t structure containing a time in the future to fire the alarm. Any values set to a negative value will not be matched on.
+ *  With one exception: If all values are negative, it will be matched on every step of abs(datetime_t::sec).
  *  \param user_callback pointer to a \ref rtc_callback_t to call when the alarm fires
  *  \return false if parameters aren't valid
  */
