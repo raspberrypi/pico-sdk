@@ -246,8 +246,7 @@ void rtc_delete_alarm(void)
     rtc_hw->inte = RTC_INTE_RESET;
 
     // disable IRQ and remove handler
-    irq_set_enabled(RTC_IRQ, false);
-    irq_remove_handler(RTC_IRQ, _callback);
+    irq_remove_handler(RTC_IRQ, rtc_irq_handler);
 
     _callback = NULL;
 }
