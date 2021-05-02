@@ -151,5 +151,15 @@ template<typename T> struct stored_little_endian {
   }
 };
 
+#ifndef le_uint16_t
+#define le_uint16_t stored_little_endian<uint16_t>
+#endif
+#ifndef le_uint32_t
+#define le_uint32_t stored_little_endian<uint32_t>
+#endif
+#ifndef le_int32_t
+#define le_int32_t stored_little_endian<int32_t>
+#endif
+
 #endif
 #endif
