@@ -15,15 +15,15 @@
 #include "pico/stdio/driver.h"
 #include "pico/time.h"
 
-#if PICO_STDIO_UART
+#if LIB_PICO_STDIO_UART
 #include "pico/stdio_uart.h"
 #endif
 
-#if PICO_STDIO_USB
+#if LIB_PICO_STDIO_USB
 #include "pico/stdio_usb.h"
 #endif
 
-#if PICO_STDIO_SEMIHOSTING
+#if LIB_PICO_STDIO_SEMIHOSTING
 #include "pico/stdio_semihosting.h"
 #endif
 
@@ -212,12 +212,12 @@ int WRAPPER_FUNC(vprintf)(const char *format, va_list va) {
 #endif
     }
     int ret;
-#if PICO_PRINTF_PICO
+#if LIB_PICO_PRINTF_PICO
     struct stdio_stack_buffer buffer = {.used = 0};
     ret = vfctprintf(stdio_buffered_printer, &buffer, format, va);
     stdio_stack_buffer_flush(&buffer);
     stdio_flush();
-#elif PICO_PRINTF_NONE
+#elif LIB_PICO_PRINTF_NONE
     extern void printf_none_assert();
     printf_none_assert();
 #else
@@ -242,15 +242,15 @@ int __printflike(1, 0) WRAPPER_FUNC(printf)(const char* format, ...)
 void stdio_init_all() {
     // todo add explicit custom, or registered although you can call stdio_enable_driver explicitly anyway
     // These are well known ones
-#if PICO_STDIO_UART
+#if LIB_PICO_STDIO_UART
     stdio_uart_init();
 #endif
 
-#if PICO_STDIO_SEMIHOSTING
+#if LIB_PICO_STDIO_SEMIHOSTING
     stdio_semihosting_init();
 #endif
 
-#if PICO_STDIO_USB
+#if LIB_PICO_STDIO_USB
     stdio_usb_init();
 #endif
 }

@@ -1,5 +1,5 @@
 if (NOT TARGET pico_stdio)
-    add_library(pico_stdio INTERFACE)
+    pico_add_impl_library(pico_stdio)
 
     target_include_directories(pico_stdio INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 

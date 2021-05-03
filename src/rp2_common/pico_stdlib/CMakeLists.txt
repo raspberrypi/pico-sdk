@@ -6,7 +6,7 @@ option(PICO_STDIO_USB "Globablly enable stdio USB" 0)
 option(PICO_STDIO_USB "Globablly enable stdio semihosting " 0)
 
 if (NOT TARGET pico_stdlib)
-    add_library(pico_stdlib INTERFACE)
+    pico_add_impl_library(pico_stdlib)
     target_sources(pico_stdlib INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/stdlib.c
     )
