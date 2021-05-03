@@ -34,8 +34,12 @@ extern "C" {
  * * Memory to memory
  */
 
-// this is not defined in generated dreq.h
-#define DREQ_FORCE  63
+// these are not defined in generated dreq.h
+#define DREQ_DMA_TIMER0 0x3b
+#define DREQ_DMA_TIMER1 0x3c
+#define DREQ_DMA_TIMER2 0x3d
+#define DREQ_DMA_TIMER3 0x3e
+#define DREQ_FORCE      0x3f
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_DMA, Enable/disable DMA assertions, type=bool, default=0, group=hardware_dma
 #ifndef PARAM_ASSERTIONS_ENABLED_DMA
