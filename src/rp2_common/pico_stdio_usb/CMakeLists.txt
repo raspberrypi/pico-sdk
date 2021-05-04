@@ -1,5 +1,5 @@
 if (TARGET tinyusb_device_unmarked)
-    add_library(pico_stdio_usb INTERFACE)
+    pico_add_impl_library(pico_stdio_usb)
 
     target_include_directories(pico_stdio_usb INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
@@ -14,9 +14,5 @@ if (TARGET tinyusb_device_unmarked)
         pico_stdio
         pico_time
         pico_unique_id
-    )
-
-    target_compile_definitions(pico_stdio_usb INTERFACE
-            PICO_STDIO_USB=1
     )
 endif()

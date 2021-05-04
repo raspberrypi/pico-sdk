@@ -225,7 +225,7 @@ void __attribute__((noreturn)) panic_unsupported() {
 void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
     puts("\n*** PANIC ***\n");
     if (fmt) {
-#if PICO_PRINTF_NONE
+#if LIB_PICO_PRINTF_NONE
         puts(fmt);
 #else
         va_list args;

@@ -2,7 +2,7 @@ add_library(pico_binary_info_headers INTERFACE)
 
 target_include_directories(pico_binary_info_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
-add_library(pico_binary_info INTERFACE)
+pico_add_impl_library(pico_binary_info)
 
 target_link_libraries(pico_binary_info INTERFACE pico_binary_info_headers)
 
