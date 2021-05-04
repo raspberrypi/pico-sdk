@@ -28,7 +28,7 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
 
     # allow customization
     add_sub_list_dirs(PICO_SDK_PRE_LIST_DIRS)
-    add_sub_list_dirs(PICO_SDK_PRE_LIST_FILES)
+    add_sub_list_files(PICO_SDK_PRE_LIST_FILES)
 
     add_subdirectory(tools)
     add_subdirectory(src)
