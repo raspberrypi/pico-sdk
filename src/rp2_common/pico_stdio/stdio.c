@@ -123,7 +123,9 @@ static int stdio_get_until(char *buf, int len, absolute_time_t until) {
                 }
             }
         }
-        // todo maybe a little sleep here?
+        // we sleep here in case the in_chars methods acquire mutexes or disable IRQs and
+        // potentially starve out what they are waiting on (have seen this with USB)
+        busy_wait_us(1);
     } while (!time_reached(until));
     return PICO_ERROR_TIMEOUT;
 }
@@ -257,9 +259,9 @@ void stdio_init_all() {
 
 int WRAPPER_FUNC(getchar)(void) {
     char buf[1];
-    if (0 == stdio_get_until(buf, sizeof(buf), at_the_end_of_time)) {
-        return PICO_ERROR_TIMEOUT;
-    }
+    int len = stdio_get_until(buf, 1, at_the_end_of_time);
+    if (len < 0) return len;
+    assert(len == 1);
     return (uint8_t)buf[0];
 }
 

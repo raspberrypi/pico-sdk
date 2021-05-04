@@ -11,6 +11,7 @@ if (NOT TARGET pico_stdio)
     pico_wrap_function(pico_stdio vprintf)
     pico_wrap_function(pico_stdio puts)
     pico_wrap_function(pico_stdio putchar)
+    pico_wrap_function(pico_stdio getchar)
 
     if (TARGET pico_printf)
         target_link_libraries(pico_stdio INTERFACE pico_printf)
