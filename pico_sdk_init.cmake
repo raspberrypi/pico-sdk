@@ -40,7 +40,6 @@ if (NOT TARGET _pico_sdk_pre_init_marker)
     include(pico_pre_load_toolchain)
 
     macro(pico_sdk_init)
-        message("SDK INIT ${PICO_SDK_PATH}")
         if (NOT CMAKE_PROJECT_NAME)
             message(WARNING "pico_sdk_init() should be called after the project is created (and languages added)")
         endif()
