@@ -35,8 +35,8 @@ if (NOT TARGET _pico_sdk_pre_init_marker)
 
     include(pico_pre_load_platform)
 
-    # todo perhaps this should be included by the platform instead?
     # We want to configure correct toolchain prior to project load
+    # todo perhaps this should be included by the platform instead?
     include(pico_pre_load_toolchain)
 
     macro(pico_sdk_init)

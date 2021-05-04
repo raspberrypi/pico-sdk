@@ -49,6 +49,7 @@ void spin_lock_claim_mask(uint32_t mask) {
 
 void spin_lock_unclaim(uint lock_num) {
     check_lock_num(lock_num);
+    spin_unlock_unsafe(spin_lock_instance(lock_num));
     hw_claim_clear((uint8_t *) &claimed, lock_num);
 }
 
