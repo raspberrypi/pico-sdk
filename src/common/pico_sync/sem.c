@@ -6,7 +6,6 @@
 
 #include "pico/sem.h"
 #include "pico/time.h"
-#include "sys/select.h"
 
 void sem_init(semaphore_t *sem, int16_t initial_permits, int16_t max_permits) {
     lock_init(&sem->core, next_striped_spin_lock_num());
