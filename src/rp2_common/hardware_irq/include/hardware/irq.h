@@ -255,7 +255,7 @@ static inline void irq_clear(uint int_num) {
 void irq_set_pending(uint num);
 
 
-/*! \brief Perform IRQ priority intiialization for the current core
+/*! \brief Perform IRQ priority initialization for the current core
  *
  * \note This is an internal method and user should generally not call it.
  */
