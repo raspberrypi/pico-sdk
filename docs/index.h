@@ -17,6 +17,7 @@
  * \defgroup hardware_clocks hardware_clocks
  * \defgroup hardware_divider hardware_divider
  * \defgroup hardware_dma hardware_dma
+ * \defgroup hardware_exception hardware_exception
  * \defgroup hardware_flash hardware_flash
  * \defgroup hardware_gpio hardware_gpio
  * \defgroup hardware_i2c hardware_i2c
