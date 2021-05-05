@@ -9,6 +9,7 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 #include "pico/binary_info/defs.h"
+#include "pico/config.h"
 
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS
@@ -23,7 +24,8 @@
 .section .vectors, "ax"
 .align 2
 
-.global __vectors
+.global __vectors, __VECTOR_TABLE
+__VECTOR_TABLE:
 __vectors:
 .word __StackTop
 .word _reset_handler
