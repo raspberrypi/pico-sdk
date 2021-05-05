@@ -28,11 +28,16 @@ extern "C" {
  *
  * See \ref critical_section.h for protecting access between multiple cores AND IRQ handlers
  */
-
 typedef struct __packed_aligned mutex {
     lock_core_t core;
-    int8_t owner; //! core number or -1 for unowned
+    lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
+    uint8_t recursion_state;    //! 0 means non recursive (owner or unowned)
+                                //! 1 is a maxed out recursive lock
+                                //! 2-254 is an owned lock
+                                //! 255 is an un-owned lock
 } mutex_t;
+
+#define MAX_RECURSION_STATE ((uint8_t)255)
 
 /*! \brief  Initialise a mutex structure
  *  \ingroup mutex
@@ -40,6 +45,15 @@ typedef struct __packed_aligned mutex {
  * \param mtx Pointer to mutex structure
  */
 void mutex_init(mutex_t *mtx);
+
+/*! \brief  Initialise a recursive mutex structure
+ *  \ingroup mutex
+ *
+ * A recursive mutex may be entered in a nested fashion by the same owner
+ *
+ * \param mtx Pointer to mutex structure
+ */
+void recursive_mutex_init(mutex_t *mtx);
 
 /*! \brief  Take ownership of a mutex
  *  \ingroup mutex
@@ -128,6 +142,29 @@ static inline bool mutex_is_initialzed(mutex_t *mtx) {
  * But the initialization of the mutex is performed automatically during runtime initialization
  */
 #define auto_init_mutex(name) static __attribute__((section(".mutex_array"))) mutex_t name
+
+/*! \brief Helper macro for static definition of recursive mutexes
+ *  \ingroup mutex
+ *
+ * A recursive mutex defined as follows:
+ *
+ * ```c
+ * auto_init_recursive_mutex(my_mutex);
+ * ```
+ *
+ * Is equivalent to doing
+ *
+ * ```c
+ * static mutex_t my_mutex;
+ *
+ * void my_init_function() {
+ *    recursive_mutex_init(&my_mutex);
+ * }
+ * ```
+ *
+ * But the initialization of the mutex is performed automatically during runtime initialization
+ */
+#define auto_init_recursive_mutex(name) static __attribute__((section(".mutex_array"))) mutex_t name = { .recursion_state = MAX_RECURSION_STATE }
 
 #ifdef __cplusplus
 }
