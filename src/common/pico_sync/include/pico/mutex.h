@@ -65,13 +65,15 @@ void recursive_mutex_init(mutex_t *mtx);
  */
 void mutex_enter_blocking(mutex_t *mtx);
 
-/*! \brief Check to see if a mutex is available
+/*! \brief Attempt to take ownership of a mutex
  *  \ingroup mutex
  *
- * Will return true if the mutex is unowned, false otherwise
+ * If the mutex wasn't owned, this will claim the mutex and return true.
+ * Otherwise (if the mutex was already owned) this will return false and the
+ * calling core will *NOT* own the mutex.
  *
  * \param mtx Pointer to mutex structure
- * \param owner_out If mutex is owned, and this pointer is non-zero, it will be filled in with the core number of the current owner of the mutex
+ * \param owner_out If mutex was already owned, and this pointer is non-zero, it will be filled in with the core number of the current owner of the mutex
  */
 bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
 
