@@ -98,7 +98,7 @@ bool mutex_enter_timeout_ms(mutex_t *mtx, uint32_t timeout_ms);
  * core will *NOT* own the mutex.
  *
  * \param mtx Pointer to mutex structure
- * \param until The time after which to return if the core cannot take owner ship of the mutex
+ * \param until The time after which to return if the core cannot take ownership of the mutex
  * \return true if mutex now owned, false if timeout occurred before mutex became available
  */
 bool mutex_enter_block_until(mutex_t *mtx, absolute_time_t until);

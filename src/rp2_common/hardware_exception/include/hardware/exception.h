@@ -59,7 +59,7 @@ enum exception_number {
 /*! \brief Exception handler function type
  *  \ingroup hardware_exception
  *
- * All exceptions handlers should be of this type, and follow normal ARM EABI register saving conventions
+ * All exception handlers should be of this type, and follow normal ARM EABI register saving conventions
  */
 typedef void (*exception_handler_t)(void);
 
