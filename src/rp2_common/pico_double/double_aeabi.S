@@ -6,6 +6,7 @@
 
 #include "pico/asm_helper.S"
 #include "pico/bootrom/sf_table.h"
+#include "hardware/divider_helper.S"
 
 __pre_init __aeabi_double_init, 00020
 
@@ -131,16 +132,16 @@ regular_func pop_r8_r11
  mov r11,r7
  bx r14
 
-# note generally each function is in a separate section unless there is fall thru or branching between them
-# note fadd, fsub, fmul, fdiv are so tiny and just defer to rom so are lumped together so they can share constant pool
+// note generally each function is in a separate section unless there is fall thru or branching between them
+// note fadd, fsub, fmul, fdiv are so tiny and just defer to rom so are lumped together so they can share constant pool
 
-# note functions are word aligned except where they are an odd number of linear instructions
+// note functions are word aligned except where they are an odd number of linear instructions
 
 // double FUNC_NAME(__aeabi_dadd)(double, double)         double-precision addition
 double_wrapper_section __aeabi_darithmetic
 // double FUNC_NAME(__aeabi_drsub)(double x, double y)    double-precision reverse subtraction, y - x
 
-# frsub first because it is the only one that needs alignment
+// frsub first because it is the only one that needs alignment
 .align 2
 wrapper_func __aeabi_drsub
     eors r0, r1
@@ -177,7 +178,35 @@ wrapper_func_d2 __aeabi_ddiv
     b ddiv_dsub_nan_helper
 1:
 #endif
-   shimmable_table_tail_call SF_TABLE_FDIV ddiv_shim
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
+    // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
+    mov ip, r2
+    ldr r2, =(SIO_BASE)
+    ldr r2, [r2, #SIO_DIV_CSR_OFFSET]
+    lsrs r2, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
+    bcs ddiv_save_state
+    mov r2, ip
+#else
+    // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
+    push {r4, lr}
+    mrs r4, PRIMASK
+    cpsid i
+    bl ddiv_shim_call
+    msr PRIMASK, r4
+    pop {r4, pc}
+#endif
+ddiv_shim_call:
+    shimmable_table_tail_call SF_TABLE_FDIV ddiv_shim
+
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
+ddiv_save_state:
+    ldr r2, =(SIO_BASE)
+    save_div_state_and_lr
+    mov r2, ip
+    bl ddiv_shim_call
+    ldr r2, =(SIO_BASE)
+    restore_div_state_and_return
+#endif
 
 ddiv_dsub_nan_helper:
 #if PICO_DOUBLE_PROPAGATE_NANS
@@ -592,6 +621,8 @@ regular_func sincostan_remainder
     ldr r2, =0x54442D18 // 2 * M_PI
     ldr r3, =0x401921FB
     push {lr}
+    // note remainder only uses the divider thru integer divider functions
+    // which save and restore themselves
     bl remainder
     pop {pc}
 
@@ -752,13 +783,40 @@ double_wrapper_section tan
 wrapper_func tan
     // rom version only works for -1024 < angle < 1024
     lsls r2, r1, #2
-    bcc 1f
+    bcc dtan_in_range
     lsrs r2, #22
     cmp r2, #9
-    bge 2f
-1:
+    bge dtan_angle_out_of_range
+dtan_in_range:
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
+    // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
+    mov ip, r2
+    ldr r2, =(SIO_BASE)
+    ldr r2, [r2, #SIO_DIV_CSR_OFFSET]
+    lsrs r2, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
+    bcs dtan_save_state
+    mov r2, ip
+#else
+    // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
+    push {r4, lr}
+    mrs r4, PRIMASK
+    cpsid i
+    bl dtan_shim_call
+    msr PRIMASK, r4
+    pop {r4, pc}
+#endif
+dtan_shim_call:
     shimmable_table_tail_call SF_TABLE_FTAN dtan_shim
-2:
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
+dtan_save_state:
+    ldr r2, =(SIO_BASE)
+    save_div_state_and_lr
+    mov r2, ip
+    bl dtan_shim_call
+    ldr r2, =(SIO_BASE)
+    restore_div_state_and_return
+#endif
+dtan_angle_out_of_range:
 #if PICO_DOUBLE_PROPAGATE_NANS
     lsls r2, r1, #1
     asrs r2, #21
@@ -775,7 +833,7 @@ wrapper_func tan
     bl sincostan_remainder
     pop {r2}
     mov lr, r2
-    b 1b
+    b dtan_in_range
 
 double_wrapper_section atan2
 wrapper_func_d2 atan2

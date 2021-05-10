@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "hardware/regs/sio.h"
 #include "hardware/regs/addressmap.h"
+#include "hardware/divider_helper.S"
 
 .syntax unified
 .cpu cortex-m0plus
@@ -34,17 +34,6 @@
 #endif
 .endm
 
-#if SIO_DIV_CSR_READY_LSB == 0
-.equ SIO_DIV_CSR_READY_SHIFT_FOR_CARRY, 1
-#else
-need to change SHIFT above
-#endif
-#if SIO_DIV_CSR_DIRTY_LSB == 1
-.equ SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY, 2
-#else
-need to change SHIFT above
-#endif
-
 @ wait 8-n cycles for the hardware divider
 .macro wait_div n
 .rept (8-\n) / 2
@@ -56,58 +45,17 @@ need to change SHIFT above
 .endif
 .endm
 
-
 #if (SIO_DIV_SDIVISOR_OFFSET != SIO_DIV_SDIVIDEND_OFFSET + 4) || (SIO_DIV_QUOTIENT_OFFSET != SIO_DIV_SDIVISOR_OFFSET + 4) || (SIO_DIV_REMAINDER_OFFSET != SIO_DIV_QUOTIENT_OFFSET + 4)
 #error register layout has changed - we rely on this order to make sure we save/restore in the right order
 #endif
 
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
-
-# SIO_BASE ptr in r2
-.macro save_div_state_and_lr
-    ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
-    # wait for results as we can't save signed-ness of operation
-1:
-    lsrs r3, #SIO_DIV_CSR_READY_SHIFT_FOR_CARRY
-    bcc 1b
-    push {r4, r5, r6, r7, lr}
-    // note we must read quotient last, and since it isn't the last reg, we'll not use ldmia!
-    ldr r4, [r2, #SIO_DIV_SDIVIDEND_OFFSET]
-    ldr r5, [r2, #SIO_DIV_SDIVISOR_OFFSET]
-    ldr r7, [r2, #SIO_DIV_REMAINDER_OFFSET]
-    ldr r6, [r2, #SIO_DIV_QUOTIENT_OFFSET]
-.endm
-
-.macro restore_div_state_and_return
-    // writing sdividend (r4), sdivisor (r5), quotient (r6), remainder (r7) in that order
-    //
-    // it is worth considering what happens if we are interrupted
-    //
-    // after writing r4: we are DIRTY and !READY
-    //    ... interruptor using div will complete based on incorrect inputs, but dividend at least will be
-    //        saved/restored correctly and we'll restore the rest ourselves
-    // after writing r4, r5: we are DIRTY and !READY
-    //    ... interruptor using div will complete based on possibly wrongly signed inputs, but dividend, divisor
-    //        at least will be saved/restored correctly and and we'll restore the rest ourselves
-    // after writing r4, r5, r6: we are DIRTY and READY
-    //    ... interruptor using div will dividend, divisor, quotient registers as is (what we just restored ourselves),
-    //        and we'll restore the remainder after the fact
-
-    // note we are not use STM not because it can be restarted due to interrupt which is harmless, more because this is 1 cycle IO space
-    // and so 4 reads is cheaper (and we don't have to adjust r2)
-    str r4, [r2, #SIO_DIV_SDIVIDEND_OFFSET]
-    str r5, [r2, #SIO_DIV_SDIVISOR_OFFSET]
-    str r7, [r2, #SIO_DIV_REMAINDER_OFFSET]
-    str r6, [r2, #SIO_DIV_QUOTIENT_OFFSET]
-    pop {r4, r5, r6, r7, pc}
-.endm
-
 .macro save_div_state_and_lr_64
     push {r4, r5, r6, r7, lr}
     ldr r6, =SIO_BASE
 1:
     ldr r5, [r6, #SIO_DIV_CSR_OFFSET]
-    # wait for results as we can't save signed-ness of operation
+    // wait for results as we can't save signed-ness of operation
     lsrs r5, #SIO_DIV_CSR_READY_SHIFT_FOR_CARRY
     bcc 1b
     // note we must read quotient last, and since it isn't the last reg, we'll not use ldmia!
@@ -154,17 +102,18 @@ wrapper_func __aeabi_idivmod
 regular_func div_s32s32
 regular_func divmod_s32s32
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
+    // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
     ldr r2, =(SIO_BASE)
-    # to support IRQ usage we must save/restore
     ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_s32s32_savestate
 regular_func divmod_s32s32_unsafe
 #else
-# to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
-# in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
-# are the hardware_divider functions that can be used instead anyway
+// to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
+// in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
+// are the hardware_divider functions that can be used instead anyway
 regular_func divmod_s32s32_unsafe
+    // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
     ldr r2, =(SIO_BASE)
     mrs r3, PRIMASK
     cpsid i
@@ -203,6 +152,8 @@ regular_func divmod_s32s32_unsafe
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
 .align 2
 regular_func divmod_s32s32_savestate
+    // note that we must be at least 2 cycles into division at this point,
+    // which we are because of the firty check before getting here (and of course the function call before that)
     save_div_state_and_lr
     bl divmod_s32s32_unsafe
     restore_div_state_and_return
@@ -215,17 +166,18 @@ regular_func divmod_u32u32
 wrapper_func __aeabi_uidiv
 wrapper_func __aeabi_uidivmod
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
+    // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
     ldr r2, =(SIO_BASE)
-    # to support IRQ usage we must save/restore
     ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_u32u32_savestate
 regular_func divmod_u32u32_unsafe
 #else
-# to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
-# in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
-# are the hardware_divider functions that can be used instead anyway
+// to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
+// in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
+// are the hardware_divider functions that can be used instead anyway
 regular_func divmod_u32u32_unsafe
+    // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
     ldr r2, =(SIO_BASE)
     mrs r3, PRIMASK
     cpsid i
@@ -273,9 +225,9 @@ wrapper_func __aeabi_ldivmod
 regular_func div_s64s64
 regular_func divmod_s64s64
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
+    // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
     mov ip, r2
     ldr r2, =(SIO_BASE)
-    # to support IRQ usage we must save/restore
     ldr r2, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r2, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     mov r2, ip
@@ -287,6 +239,7 @@ divmod_s64s64_savestate:
     bl divmod_s64s64_unsafe
     restore_div_state_and_return_64
 #else
+    // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
     push {r4, lr}
     mrs r4, PRIMASK
     cpsid i
@@ -300,9 +253,9 @@ wrapper_func __aeabi_uldivmod
 regular_func div_u64u64
 regular_func divmod_u64u64
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
+    // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
     mov ip, r2
     ldr r2, =(SIO_BASE)
-    # to support IRQ usage we must save/restore
     ldr r2, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r2, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     mov r2, ip
@@ -314,6 +267,7 @@ regular_func divmod_u64u64_savestate
     bl divmod_u64u64_unsafe
     restore_div_state_and_return_64
 #else
+    // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
     push {r4, lr}
     mrs r4, PRIMASK
     cpsid i

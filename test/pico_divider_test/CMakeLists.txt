@@ -12,7 +12,7 @@ if (PICO_ON_DEVICE)
     pico_add_extra_outputs(pico_divider_test)
 
     target_compile_definitions(pico_divider_test PRIVATE
-            PICO_DIVIDER_DISABLE_INTERRUPTS=1
+#            PICO_DIVIDER_DISABLE_INTERRUPTS=1
 #            TURBO
     )
 
