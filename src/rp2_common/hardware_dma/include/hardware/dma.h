@@ -353,7 +353,7 @@ static inline void dma_channel_set_read_addr(uint channel, const volatile void *
     }
 }
 
-/*! \brief  Set the DMA initial read address
+/*! \brief  Set the DMA initial write address
  *  \ingroup hardware_dma
  *
  * \param channel DMA channel

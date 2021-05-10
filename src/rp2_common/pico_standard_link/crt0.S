@@ -75,7 +75,7 @@ __vectors:
 .word isr_irq31
 
 // all default exception handlers do nothing, and we can check for them being set to our
-// default values by them pointing to between __defaults_isrs_start and __default_isrs_end
+// default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
 .global __default_isrs_start
 __default_isrs_start:
 

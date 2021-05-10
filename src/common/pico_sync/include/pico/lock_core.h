@@ -20,7 +20,7 @@
  * lock which is used only to protect the contents of the rest of the structure as part of implementing the synchronization
  * primitive. As such, the spin_lock member of lock core is never still held on return from any function for the primitive.
  *
- * \ref critical_section is an exceptional case in that it does not have a lock_core_t and simply wraps a pin lock, providing
+ * \ref critical_section is an exceptional case in that it does not have a lock_core_t and simply wraps a spin lock, providing
  * methods to lock and unlock said spin lock.
  *
  * lock_core based structures work by locking the spin lock, checking state, and then deciding whether they additionally need to block
@@ -28,11 +28,11 @@
  *
  * By default the SDK just uses the processors' events via SEV and WEV for notification and blocking as these are sufficient for
  * cross core, and notification from interrupt handlers. However macros are defined in this file that abstract the wait
- * and notify mechanisms to allow the SDK locking functions to effectively be used within an RTOS on other environment.
+ * and notify mechanisms to allow the SDK locking functions to effectively be used within an RTOS or other environment.
  *
  * When implementing an RTOS, it is desirable for the SDK synchronization primitives that wait, to block the calling task (and immediately yield),
  * and those that notify, to wake a blocked task which isn't on processor. At least the wait macro implementation needs to be atomic with the protecting
- * spin_lock unlock from the callers point of view; i.e. the task should unlock the spin lock when as it starts its wait. Such implementation is
+ * spin_lock unlock from the callers point of view; i.e. the task should unlock the spin lock when it starts its wait. Such implementation is
  * up to the RTOS integration, however the macros are defined such that such operations are always combined into a single call
  * (so they can be perfomed atomically) even though the default implementation does not need this, as a WFE which starts
  * following the corresponding SEV is not missed.
@@ -178,7 +178,7 @@ void lock_init(lock_core_t *core, uint lock_num);
  * This method is provided for cases where the caller has no useful work to do
  * until the specified time.
  *
- * By default this method does nothing, however if can be overridden (for example by an
+ * By default this method does nothing, however it can be overridden (for example by an
  * RTOS which is able to block the current task until the scheduler tick before
  * the given time)
  *
