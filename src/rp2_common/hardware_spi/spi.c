@@ -22,11 +22,10 @@ void spi_init(spi_inst_t *spi, uint baudrate) {
     spi_reset(spi);
     spi_unreset(spi);
 
-    (void) spi_set_baudrate(spi, baudrate);
+    spi_set_baudrate(spi, baudrate);
     spi_set_format(spi, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
     // Always enable DREQ signals -- harmless if DMA is not listening
     hw_set_bits(&spi_get_hw(spi)->dmacr, SPI_SSPDMACR_TXDMAE_BITS | SPI_SSPDMACR_RXDMAE_BITS);
-    spi_set_format(spi, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
 
     // Finally enable the SPI
     hw_set_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
@@ -65,9 +64,15 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
     return freq_in / (prescale * postdiv);
 }
 
+uint spi_get_baudrate(const spi_inst_t *spi) {
+    uint prescale = spi_get_hw(spi)->cpsr;
+    uint postdiv = ((spi_get_hw(spi)->cr0  & SPI_SSPCR0_SCR_BITS) >> SPI_SSPCR0_SCR_LSB) + 1;
+    return clock_get_hz(clk_peri) / (prescale * postdiv);
+}
+
 // Write len bytes from src to SPI. Simultaneously read len bytes from SPI to dst.
 // Note this function is guaranteed to exit in a known amount of time (bits sent * time per bit)
-int __not_in_flash_func(spi_write_read_blocking)(spi_inst_t *spi, const uint8_t *src, uint8_t *dst, size_t len) {
+size_t __not_in_flash_func(spi_write_read_blocking)(spi_inst_t *spi, const uint8_t *src, uint8_t *dst, size_t len) {
     invalid_params_if(SPI, 0 > (int)len);
 
     // Never have more transfers in flight than will fit into the RX FIFO,
@@ -86,11 +91,11 @@ int __not_in_flash_func(spi_write_read_blocking)(spi_inst_t *spi, const uint8_t 
         }
     }
 
-    return (int)len;
+    return len;
 }
 
 // Write len bytes directly from src to the SPI, and discard any data received back
-int __not_in_flash_func(spi_write_blocking)(spi_inst_t *spi, const uint8_t *src, size_t len) {
+size_t __not_in_flash_func(spi_write_blocking)(spi_inst_t *spi, const uint8_t *src, size_t len) {
     invalid_params_if(SPI, 0 > (int)len);
     // Write to TX FIFO whilst ignoring RX, then clean up afterward. When RX
     // is full, PL022 inhibits RX pushes, and sets a sticky flag on
@@ -112,14 +117,14 @@ int __not_in_flash_func(spi_write_blocking)(spi_inst_t *spi, const uint8_t *src,
     // Don't leave overrun flag set
     spi_get_hw(spi)->icr = SPI_SSPICR_RORIC_BITS;
 
-    return (int)len;
+    return len;
 }
 
 // Read len bytes directly from the SPI to dst.
 // repeated_tx_data is output repeatedly on SO as data is read in from SI.
 // Generally this can be 0, but some devices require a specific value here,
 // e.g. SD cards expect 0xff
-int __not_in_flash_func(spi_read_blocking)(spi_inst_t *spi, uint8_t repeated_tx_data, uint8_t *dst, size_t len) {
+size_t __not_in_flash_func(spi_read_blocking)(spi_inst_t *spi, uint8_t repeated_tx_data, uint8_t *dst, size_t len) {
     invalid_params_if(SPI, 0 > (int)len);
     const size_t fifo_depth = 8;
     size_t rx_remaining = len, tx_remaining = len;
@@ -135,11 +140,11 @@ int __not_in_flash_func(spi_read_blocking)(spi_inst_t *spi, uint8_t repeated_tx_
         }
     }
 
-    return (int)len;
+    return len;
 }
 
 // Write len halfwords from src to SPI. Simultaneously read len halfwords from SPI to dst.
-int __not_in_flash_func(spi_write16_read16_blocking)(spi_inst_t *spi, const uint16_t *src, uint16_t *dst, size_t len) {
+size_t __not_in_flash_func(spi_write16_read16_blocking)(spi_inst_t *spi, const uint16_t *src, uint16_t *dst, size_t len) {
     invalid_params_if(SPI, 0 > (int)len);
     // Never have more transfers in flight than will fit into the RX FIFO,
     // else FIFO will overflow if this code is heavily interrupted.
@@ -157,11 +162,11 @@ int __not_in_flash_func(spi_write16_read16_blocking)(spi_inst_t *spi, const uint
         }
     }
 
-    return (int)len;
+    return len;
 }
 
 // Write len bytes directly from src to the SPI, and discard any data received back
-int __not_in_flash_func(spi_write16_blocking)(spi_inst_t *spi, const uint16_t *src, size_t len) {
+size_t __not_in_flash_func(spi_write16_blocking)(spi_inst_t *spi, const uint16_t *src, size_t len) {
     invalid_params_if(SPI, 0 > (int)len);
     // Deliberately overflow FIFO, then clean up afterward, to minimise amount
     // of APB polling required per halfword
@@ -181,12 +186,12 @@ int __not_in_flash_func(spi_write16_blocking)(spi_inst_t *spi, const uint16_t *s
     // Don't leave overrun flag set
     spi_get_hw(spi)->icr = SPI_SSPICR_RORIC_BITS;
 
-    return (int)len;
+    return len;
 }
 
 // Read len halfwords directly from the SPI to dst.
 // repeated_tx_data is output repeatedly on SO as data is read in from SI.
-int __not_in_flash_func(spi_read16_blocking)(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *dst, size_t len) {
+size_t __not_in_flash_func(spi_read16_blocking)(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *dst, size_t len) {
     invalid_params_if(SPI, 0 > (int)len);
     const size_t fifo_depth = 8;
     size_t rx_remaining = len, tx_remaining = len;
@@ -202,5 +207,5 @@ int __not_in_flash_func(spi_read16_blocking)(spi_inst_t *spi, uint16_t repeated_
         }
     }
 
-    return (int)len;
+    return len;
 }
