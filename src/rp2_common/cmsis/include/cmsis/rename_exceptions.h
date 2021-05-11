@@ -7,9 +7,9 @@
 #ifndef _CMSIS_RENAME_EXCEPTIONS_H
 #define _CMSIS_RENAME_EXCEPTIONS_H
 
-// PICO_CONFIG: PICO_CMSIS_RENAME_EXCEPTIONS, Whether to rename SDK exceptions such as isr_nmi to their CMSIS equivalent i.e. NMI_Handler, type=bool, default=0, group=cmsis_core
+// PICO_CONFIG: PICO_CMSIS_RENAME_EXCEPTIONS, Whether to rename SDK exceptions such as isr_nmi to their CMSIS equivalent i.e. NMI_Handler, type=bool, default=1, group=cmsis_core
 
-// Note that since this header is included at the config stage, if you wish to override this you should do via build compiler define
+// Note that since this header is included at the config stage, if you wish to override this you should do so via build compiler define
 #ifndef PICO_CMSIS_RENAME_EXCEPTIONS
 #define PICO_CMSIS_RENAME_EXCEPTIONS 1
 #endif
