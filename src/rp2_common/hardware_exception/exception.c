@@ -46,7 +46,7 @@ exception_handler_t exception_set_exclusive_handler(enum exception_number num, e
 #if !PICO_NO_RAM_VECTOR_TABLE
     uint32_t save = save_and_disable_interrupts();
     exception_handler_t current = exception_get_vtable_handler(num);
-    hard_assert(exception_is_compile_time_default(current));
+    hard_assert(handler == current || exception_is_compile_time_default(current));
     set_raw_exception_handler_and_restore_interrupts(num, handler, save);
 #else
     panic_unsupported();
