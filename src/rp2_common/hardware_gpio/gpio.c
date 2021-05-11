@@ -10,7 +10,9 @@
 #include "hardware/structs/iobank0.h"
 #include "hardware/irq.h"
 
+#if LIB_PICO_BINARY_INFO
 #include "pico/binary_info.h"
+#endif
 
 static gpio_irq_callback_t _callbacks[NUM_CORES];
 
@@ -141,7 +143,9 @@ void gpio_acknowledge_irq(uint gpio, uint32_t events) {
 void gpio_debug_pins_init() {
     gpio_init_mask(DEBUG_PIN_MASK);
     gpio_set_dir_masked(DEBUG_PIN_MASK, DEBUG_PIN_MASK);
+#if LIB_PICO_BINARY_INFO
     bi_decl_if_func_used(bi_pin_mask_with_names(DEBUG_PIN_MASK, "Debug"));
+#endif
 }
 
 void gpio_set_input_enabled(uint gpio, bool enabled) {
