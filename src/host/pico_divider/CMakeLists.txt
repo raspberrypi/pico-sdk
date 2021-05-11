@@ -1,4 +1,4 @@
-add_library(pico_divider INTERFACE)
+pico_add_impl_library(pico_divider)
 
 target_sources(pico_divider INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/divider.c)

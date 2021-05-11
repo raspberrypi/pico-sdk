@@ -43,7 +43,8 @@ uint i2c_init(i2c_inst_t *i2c, uint baudrate) {
             I2C_IC_CON_SPEED_VALUE_FAST << I2C_IC_CON_SPEED_LSB |
             I2C_IC_CON_MASTER_MODE_BITS |
             I2C_IC_CON_IC_SLAVE_DISABLE_BITS |
-            I2C_IC_CON_IC_RESTART_EN_BITS;
+            I2C_IC_CON_IC_RESTART_EN_BITS |
+            I2C_IC_CON_TX_EMPTY_CTRL_BITS;
 
     // Set FIFO watermarks to 1 to make things simpler. This is encoded by a register value of 0.
     i2c->hw->tx_tl = 0;
@@ -145,7 +146,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
     bool abort = false;
     bool timeout = false;
 
-    uint32_t abort_reason;
+    uint32_t abort_reason = 0;
     int byte_ctr;
 
     int ilen = (int)len;
@@ -158,17 +159,50 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
                 bool_to_bit(last && !nostop) << I2C_IC_DATA_CMD_STOP_LSB |
                 *src++;
 
+        // Wait until the transmission of the address/data from the internal
+        // shift register has completed. For this to function correctly, the
+        // TX_EMPTY_CTRL flag in IC_CON must be set. The TX_EMPTY_CTRL flag
+        // was set in i2c_init.
         do {
-            // Note clearing the abort flag also clears the reason, and this
-            // instance of flag is clear-on-read!
-            abort_reason = i2c->hw->tx_abrt_source;
-            abort = (bool) i2c->hw->clr_tx_abrt;
             if (timeout_check) {
                 timeout = timeout_check(ts);
                 abort |= timeout;
             }
             tight_loop_contents();
-        } while (!abort && !(i2c->hw->status & I2C_IC_STATUS_TFE_BITS));
+        } while (!timeout && !(i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_EMPTY_BITS));
+
+        // If there was a timeout, don't attempt to do anything else.
+        if (!timeout) {
+            abort_reason = i2c->hw->tx_abrt_source;
+            if (abort_reason) {
+                // Note clearing the abort flag also clears the reason, and
+                // this instance of flag is clear-on-read! Note also the
+                // IC_CLR_TX_ABRT register always reads as 0.
+                i2c->hw->clr_tx_abrt;
+                abort = true;
+            }
+
+            if (abort || (last && !nostop)) {
+                // If the transaction was aborted or if it completed
+                // successfully wait until the STOP condition has occured.
+
+                // TODO Could there be an abort while waiting for the STOP
+                // condition here? If so, additional code would be needed here
+                // to take care of the abort.
+                do {
+                    if (timeout_check) {
+                        timeout = timeout_check(ts);
+                        abort |= timeout;
+                    }
+                    tight_loop_contents();
+                } while (!timeout && !(i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS));
+
+                // If there was a timeout, don't attempt to do anything else.
+                if (!timeout) {
+                    i2c->hw->clr_stop_det;
+                }
+            }
+        }
 
         // Note the hardware issues a STOP automatically on an abort condition.
         // Note also the hardware clears RX FIFO as well as TX on abort,

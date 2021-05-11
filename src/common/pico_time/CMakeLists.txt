@@ -7,7 +7,7 @@ if (NOT TARGET pico_time_headers)
 endif()
 
 if (NOT TARGET pico_time)
-    add_library(pico_time INTERFACE)
+    pico_add_impl_library(pico_time)
 
     target_sources(pico_time INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/time.c

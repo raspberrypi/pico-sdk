@@ -918,7 +918,7 @@ int vfctprintf(void (*out)(char character, void *arg), void *arg, const char *fo
     return _vsnprintf(_out_fct, (char *) (uintptr_t) &out_fct_wrap, (size_t) -1, format, va);
 }
 
-#if PICO_PRINTF_PICO
+#if LIB_PICO_PRINTF_PICO
 #if !PICO_PRINTF_ALWAYS_INCLUDED
 bool weak_raw_printf(const char *fmt, ...) {
     va_list va;

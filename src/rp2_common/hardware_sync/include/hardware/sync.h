@@ -80,7 +80,7 @@ typedef volatile uint32_t spin_lock_t;
 
  * The SEV (send event) instruction sends an event to both cores.
  */
-inline static void __sev(void) {
+__force_inline static void __sev(void) {
     __asm volatile ("sev");
 }
 
@@ -90,7 +90,7 @@ inline static void __sev(void) {
  * The WFE (wait for event) instruction waits until one of a number of
  * events occurs, including events signalled by the SEV instruction on either core.
  */
-inline static void __wfe(void) {
+__force_inline static void __wfe(void) {
     __asm volatile ("wfe");
 }
 
@@ -99,7 +99,7 @@ inline static void __wfe(void) {
 *
  * The WFI (wait for interrupt) instruction waits for a interrupt to wake up the core.
  */
-inline static void __wfi(void) {
+__force_inline static void __wfi(void) {
     __asm volatile ("wfi");
 }
 
@@ -109,7 +109,7 @@ inline static void __wfi(void) {
  * The DMB (data memory barrier) acts as a memory barrier, all memory accesses prior to this
  * instruction will be observed before any explicit access after the instruction.
  */
-inline static void __dmb(void) {
+__force_inline static void __dmb(void) {
     __asm volatile ("dmb" : : : "memory");
 }
 
@@ -120,7 +120,7 @@ inline static void __dmb(void) {
  * memory barrier (DMB). The DSB operation completes when all explicit memory
  * accesses before this instruction complete.
  */
-inline static void __dsb(void) {
+__force_inline static void __dsb(void) {
     __asm volatile ("dsb" : : : "memory");
 }
 
@@ -131,14 +131,14 @@ inline static void __dsb(void) {
  * so that all instructions following the ISB are fetched from cache or memory again, after
  * the ISB instruction has been completed.
  */
-inline static void __isb(void) {
+__force_inline static void __isb(void) {
     __asm volatile ("isb");
 }
 
 /*! \brief Acquire a memory fence
  *  \ingroup hardware_sync
  */
-inline static void __mem_fence_acquire(void) {
+__force_inline static void __mem_fence_acquire(void) {
     // the original code below makes it hard for us to be included from C++ via a header
     // which itself is in an extern "C", so just use __dmb instead, which is what
     // is required on Cortex M0+
@@ -154,7 +154,7 @@ inline static void __mem_fence_acquire(void) {
  *  \ingroup hardware_sync
  *
  */
-inline static void __mem_fence_release(void) {
+__force_inline static void __mem_fence_release(void) {
     // the original code below makes it hard for us to be included from C++ via a header
     // which itself is in an extern "C", so just use __dmb instead, which is what
     // is required on Cortex M0+
@@ -171,7 +171,7 @@ inline static void __mem_fence_release(void) {
  *
  * \return The prior interrupt enable status for restoration later via restore_interrupts()
  */
-inline static uint32_t save_and_disable_interrupts(void) {
+__force_inline static uint32_t save_and_disable_interrupts(void) {
     uint32_t status;
     __asm volatile ("mrs %0, PRIMASK" : "=r" (status)::);
     __asm volatile ("cpsid i");
@@ -183,7 +183,7 @@ inline static uint32_t save_and_disable_interrupts(void) {
  *
  * \param status Previous interrupt status from save_and_disable_interrupts()
   */
-inline static void restore_interrupts(uint32_t status) {
+__force_inline static void restore_interrupts(uint32_t status) {
     __asm volatile ("msr PRIMASK,%0"::"r" (status) : );
 }
 
@@ -193,7 +193,7 @@ inline static void restore_interrupts(uint32_t status) {
  * \param lock_num Spinlock ID
  * \return The spinlock instance
  */
-inline static spin_lock_t *spin_lock_instance(uint lock_num) {
+__force_inline static spin_lock_t *spin_lock_instance(uint lock_num) {
     invalid_params_if(SYNC, lock_num >= NUM_SPIN_LOCKS);
     return (spin_lock_t *) (SIO_BASE + SIO_SPINLOCK0_OFFSET + lock_num * 4);
 }
@@ -204,7 +204,7 @@ inline static spin_lock_t *spin_lock_instance(uint lock_num) {
  * \param lock The Spinlock instance
  * \return The Spinlock ID
  */
-inline static uint spin_lock_get_num(spin_lock_t *lock) {
+__force_inline static uint spin_lock_get_num(spin_lock_t *lock) {
     invalid_params_if(SYNC, (uint) lock < SIO_BASE + SIO_SPINLOCK0_OFFSET ||
                             (uint) lock >= NUM_SPIN_LOCKS * sizeof(spin_lock_t) + SIO_BASE + SIO_SPINLOCK0_OFFSET ||
                             ((uint) lock - SIO_BASE + SIO_SPINLOCK0_OFFSET) % sizeof(spin_lock_t) != 0);
@@ -216,7 +216,7 @@ inline static uint spin_lock_get_num(spin_lock_t *lock) {
  *
  * \param lock Spinlock instance
  */
-inline static void spin_lock_unsafe_blocking(spin_lock_t *lock) {
+__force_inline static void spin_lock_unsafe_blocking(spin_lock_t *lock) {
     // Note we don't do a wfe or anything, because by convention these spin_locks are VERY SHORT LIVED and NEVER BLOCK and run
     // with INTERRUPTS disabled (to ensure that)... therefore nothing on our core could be blocking us, so we just need to wait on another core
     // anyway which should be finished soon
@@ -229,7 +229,7 @@ inline static void spin_lock_unsafe_blocking(spin_lock_t *lock) {
  *
  * \param lock Spinlock instance
  */
-inline static void spin_unlock_unsafe(spin_lock_t *lock) {
+__force_inline static void spin_unlock_unsafe(spin_lock_t *lock) {
     __mem_fence_release();
     *lock = 0;
 }
@@ -242,7 +242,7 @@ inline static void spin_unlock_unsafe(spin_lock_t *lock) {
  * \param lock Spinlock instance
  * \return interrupt status to be used when unlocking, to restore to original state
  */
-inline static uint32_t spin_lock_blocking(spin_lock_t *lock) {
+__force_inline static uint32_t spin_lock_blocking(spin_lock_t *lock) {
     uint32_t save = save_and_disable_interrupts();
     spin_lock_unsafe_blocking(lock);
     return save;
@@ -270,7 +270,7 @@ inline static bool is_spin_locked(spin_lock_t *lock) {
  *
  * \sa spin_lock_blocking()
  */
-inline static void spin_unlock(spin_lock_t *lock, uint32_t saved_irq) {
+__force_inline static void spin_unlock(spin_lock_t *lock, uint32_t saved_irq) {
     spin_unlock_unsafe(lock);
     restore_interrupts(saved_irq);
 }
@@ -280,7 +280,7 @@ inline static void spin_unlock(spin_lock_t *lock, uint32_t saved_irq) {
  *
  * \return The core number the call was made from
  */
-static inline uint get_core_num(void) {
+__force_inline static uint get_core_num(void) {
     return (*(uint32_t *) (SIO_BASE + SIO_CPUID_OFFSET));
 }
 

@@ -118,7 +118,11 @@ void runtime_init(void) {
 
     // the first function pointer, not the address of it.
     for (mutex_t *m = &__mutex_array_start; m < &__mutex_array_end; m++) {
-        mutex_init(m);
+        if (m->recursion_state) {
+            recursive_mutex_init(m);
+        } else {
+            mutex_init(m);
+        }
     }
 
 #if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH)
@@ -225,7 +229,7 @@ void __attribute__((noreturn)) panic_unsupported() {
 void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
     puts("\n*** PANIC ***\n");
     if (fmt) {
-#if PICO_PRINTF_NONE
+#if LIB_PICO_PRINTF_NONE
         puts(fmt);
 #else
         va_list args;

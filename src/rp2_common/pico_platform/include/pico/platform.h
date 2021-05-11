@@ -45,10 +45,15 @@ extern "C" {
  * Decorates a function name, such that the function will execute from RAM, explicitly marking it as
  * noinline to prevent it being inlined into a flash function by the compiler
  */
-#define __no_inline_not_in_flash_func(func_name) __attribute__((noinline)) __not_in_flash_func(func_name)
+#define __no_inline_not_in_flash_func(func_name) __noinline __not_in_flash_func(func_name)
 
 #define __packed_aligned __packed __aligned(4)
 
+#if defined(__GNUC__) && __GNUC__ < 7
+#define __force_inline inline __always_inline
+#else
+#define __force_inline __always_inline
+#endif
 #ifndef count_of
 #define count_of(a) (sizeof(a)/sizeof((a)[0]))
 #endif
@@ -71,7 +76,7 @@ static inline void __breakpoint(void) {
 /**
  * Ensure that the compiler does not move memory access across this method call
  */
-static inline void __compiler_memory_barrier(void) {
+__force_inline static void __compiler_memory_barrier(void) {
     __asm__ volatile ("" : : : "memory");
 }
 
@@ -140,9 +145,9 @@ static inline void tight_loop_contents(void) {}
  * \param b the second operand
  * \return a * b
  */
-inline static int32_t __mul_instruction(int32_t a, int32_t b) {
-asm ("mul %0, %1" : "+l" (a) : "l" (b) : );
-return a;
+__force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
+    asm ("mul %0, %1" : "+l" (a) : "l" (b) : );
+    return a;
 }
 
 /**
@@ -167,7 +172,7 @@ return a;
  * Get the current exception level on this core
  * \return the exception number if the CPU is handling an exception, or 0 otherwise
  */
-extern uint __get_current_exception(void);
+uint __get_current_exception(void);
 
 #ifdef __cplusplus
 }
