@@ -1,4 +1,4 @@
-# This file may be included directly by a build to get common SDK macros and types */
+# This file may be included directly by a build to get common SDK macros and types
 
 if (NOT TARGET pico_platform_headers)
     add_library(pico_platform_headers INTERFACE)
