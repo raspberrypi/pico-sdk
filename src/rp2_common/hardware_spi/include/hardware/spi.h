@@ -136,7 +136,6 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate);
  *  \ingroup hardware_spi
  *
  * Get SPI baudrate which was set by \see spi_set_baudrate
- * achieved rate.
  *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \return The actual baudrate set
