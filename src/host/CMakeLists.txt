@@ -33,3 +33,5 @@ set(PICO_HOST_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
 function(pico_define_boot_stage2 NAME)
     add_executable(${NAME} ${PICO_HOST_DIR}/boot_stage2.c)
 endfunction()
+
+pico_promote_common_scope_vars()

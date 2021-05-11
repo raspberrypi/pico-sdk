@@ -24,6 +24,7 @@ function(pico_add_subdirectory subdir)
     else ()
         message("Not including ${subdir} because ${replace_flag} defined.")
     endif ()
+    pico_promote_common_scope_vars()
 endfunction()
 
 # add a link option to wrap the given function name; i.e. -Wl:wrap=FUNCNAME for gcc
@@ -116,3 +117,5 @@ function(pico_add_doxygen_exclude SOURCE_DIR)
 endfunction()
 
 include(${PICO_PLATFORM_CMAKE_FILE})
+
+pico_promote_common_scope_vars()
