@@ -209,11 +209,8 @@ static inline void spi_set_slave(spi_inst_t *spi, bool slave) {
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \return false if no space is available to write. True if a write is possible
  *
- * \note Although the controllers each have a 8 deep TX FIFO, the current HW implementation can only return 0 or 1
- * rather than the space available.
  */
 static inline bool spi_is_writable(const spi_inst_t *spi) {
-    // PL022 doesn't expose levels directly, so return values are only 0 or 1
     return (spi_get_hw(spi)->sr & SPI_SSPSR_TNF_BITS);
 }
 
