@@ -108,14 +108,14 @@ bool sem_acquire_timeout_ms(semaphore_t *sem, uint32_t timeout_ms);
  */
 bool sem_acquire_timeout_us(semaphore_t *sem, uint32_t timeout_us);
 
-/*! \brief Wait for acquire a permit from a semaphore until a specific time
+/*! \brief Wait to acquire a permit from a semaphore until a specific time
  *  \ingroup sem
  *
  * This function will block and wait if no permits are available, until the
- * the specified timeout time. If the timeout is reached the function will
+ * specified timeout time. If the timeout is reached the function will
  * return false, otherwise it will return true.
  *
- * \param mtx Pointer to mutex structure
+ * \param sem Pointer to semaphore structure
  * \param until The time after which to return if the sem is not available.
  * \return true if permit was acquired, false if the until time was reached before
  * acquiring.
