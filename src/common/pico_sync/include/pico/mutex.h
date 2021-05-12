@@ -91,6 +91,20 @@ bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
  */
 bool mutex_enter_timeout_ms(mutex_t *mtx, uint32_t timeout_ms);
 
+/*! \brief Wait for mutex with timeout
+ *  \ingroup mutex
+ *
+ * Wait for up to the specific time to take ownership of the mutex. If the calling
+ * core can take ownership of the mutex before the timeout expires, then true will be returned
+ * and the calling core will own the mutex, otherwise false will be returned and the calling
+ * core will *NOT* own the mutex.
+ *
+ * \param mtx Pointer to mutex structure
+ * \param timeout_us The timeout in microseconds.
+ * \return true if mutex now owned, false if timeout occurred before mutex became available
+ */
+bool mutex_enter_timeout_us(mutex_t *mtx, uint32_t timeout_us);
+
 /*! \brief Wait for mutex until a specific time
  *  \ingroup mutex
  *

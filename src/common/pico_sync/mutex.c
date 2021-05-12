@@ -67,6 +67,10 @@ bool __time_critical_func(mutex_enter_timeout_ms)(mutex_t *mtx, uint32_t timeout
     return mutex_enter_block_until(mtx, make_timeout_time_ms(timeout_ms));
 }
 
+bool __time_critical_func(mutex_enter_timeout_us)(mutex_t *mtx, uint32_t timeout_us) {
+    return mutex_enter_block_until(mtx, make_timeout_time_us(timeout_us));
+}
+
 bool __time_critical_func(mutex_enter_block_until)(mutex_t *mtx, absolute_time_t until) {
     assert(mtx->core.spin_lock);
     do {
