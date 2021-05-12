@@ -22,8 +22,10 @@
 extern "C" {
 #endif
 
+#include "pico/lock_core.h"
+
 typedef struct {
-    spin_lock_t *lock;
+    lock_core_t core;
     uint8_t *data;
     uint16_t wptr;
     uint16_t rptr;
@@ -85,9 +87,9 @@ static inline uint queue_get_level_unsafe(queue_t *q) {
  * \return Number of entries in the queue
  */
 static inline uint queue_get_level(queue_t *q) {
-    uint32_t save = spin_lock_blocking(q->lock);
+    uint32_t save = spin_lock_blocking(q->core.spin_lock);
     uint level = queue_get_level_unsafe(q);
-    spin_unlock(q->lock, save);
+    spin_unlock(q->core.spin_lock, save);
     return level;
 }
 

@@ -11,16 +11,21 @@
 .cpu cortex-m0plus
 .thumb
 
+// PICO_CONFIG: PICO_DIVIDER_DISABLE_INTERRUPTS, Disable interrupts around division such that divider state need not be saved/restored in exception handlers, default=0, group=pico_divider
+
 #include "pico/asm_helper.S"
 
+// PICO_CONFIG: PICO_DIVIDER_CALL_IDIV0, Whether 32 bit division by zero should call __aeabi_idiv0, default=1, group=pico_divider
 #ifndef PICO_DIVIDER_CALL_IDIV0
 #define PICO_DIVIDER_CALL_IDIV0 1
 #endif
 
+// PICO_CONFIG: PICO_DIVIDER_CALL_IDIV0, Whether 64 bit division by zero should call __aeabi_ldiv0, default=1, group=pico_divider
 #ifndef PICO_DIVIDER_CALL_LDIV0
 #define PICO_DIVIDER_CALL_LDIV0 1
 #endif
 
+// PICO_CONFIG: PICO_DIVIDER_IN_RAM, Whether divider functions should be placed in RAM, default=0, group=pico_divider
 .macro div_section name
 #if PICO_DIVIDER_IN_RAM
 .section RAM_SECTION_NAME(\name), "ax"
@@ -55,6 +60,8 @@ need to change SHIFT above
 #if (SIO_DIV_SDIVISOR_OFFSET != SIO_DIV_SDIVIDEND_OFFSET + 4) || (SIO_DIV_QUOTIENT_OFFSET != SIO_DIV_SDIVISOR_OFFSET + 4) || (SIO_DIV_REMAINDER_OFFSET != SIO_DIV_QUOTIENT_OFFSET + 4)
 #error register layout has changed - we rely on this order to make sure we save/restore in the right order
 #endif
+
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
 
 # SIO_BASE ptr in r2
 .macro save_div_state_and_lr
@@ -137,6 +144,7 @@ need to change SHIFT above
     pop {r4, r5, r6, r7, pc}
 .endm
 
+#endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
 
 // since idiv and idivmod only differ by a cycle, we'll make them the same!
 div_section WRAPPER_FUNC_NAME(__aeabi_idiv)
@@ -145,12 +153,22 @@ wrapper_func __aeabi_idiv
 wrapper_func __aeabi_idivmod
 regular_func div_s32s32
 regular_func divmod_s32s32
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
     ldr r2, =(SIO_BASE)
     # to support IRQ usage we must save/restore
     ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_s32s32_savestate
 regular_func divmod_s32s32_unsafe
+#else
+# to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
+# in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
+# are the hardware_divider functions that can be used instead anyway
+regular_func divmod_s32s32_unsafe
+    ldr r2, =(SIO_BASE)
+    mrs r3, PRIMASK
+    cpsid i
+#endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
     str r0, [r2, #SIO_DIV_SDIVIDEND_OFFSET]
     str r1, [r2, #SIO_DIV_SDIVISOR_OFFSET]
     cmp r1, #0
@@ -159,8 +177,14 @@ regular_func divmod_s32s32_unsafe
     // return 64 bit value so we can efficiently return both (note read order is important since QUOTIENT must be read last)
     ldr r1, [r2, #SIO_DIV_REMAINDER_OFFSET]
     ldr r0, [r2, #SIO_DIV_QUOTIENT_OFFSET]
+#if PICO_DIVIDER_DISABLE_INTERRUPTS
+    msr PRIMASK, r3
+#endif /* PICO_DIVIDER_DISABLE_INTERRUPTS */
     bx lr
 1:
+#if PICO_DIVIDER_DISABLE_INTERRUPTS
+    msr PRIMASK, r3
+#endif /* PICO_DIVIDER_DISABLE_INTERRUPTS */
     push {r2, lr}
     movs r1, #0x80
     lsls r1, #24
@@ -176,11 +200,13 @@ regular_func divmod_s32s32_unsafe
     movs r1, #0 // remainder 0
     // need to restore saved r2 as it hold SIO ptr
     pop {r2, pc}
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
 .align 2
 regular_func divmod_s32s32_savestate
     save_div_state_and_lr
     bl divmod_s32s32_unsafe
     restore_div_state_and_return
+#endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
 
 // since uidiv and uidivmod only differ by a cycle, we'll make them the same!
 div_section WRAPPER_FUNC_NAME(__aeabi_uidiv)
@@ -188,12 +214,22 @@ regular_func div_u32u32
 regular_func divmod_u32u32
 wrapper_func __aeabi_uidiv
 wrapper_func __aeabi_uidivmod
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
     ldr r2, =(SIO_BASE)
     # to support IRQ usage we must save/restore
     ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_u32u32_savestate
 regular_func divmod_u32u32_unsafe
+#else
+# to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
+# in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
+# are the hardware_divider functions that can be used instead anyway
+regular_func divmod_u32u32_unsafe
+    ldr r2, =(SIO_BASE)
+    mrs r3, PRIMASK
+    cpsid i
+#endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
     str r0, [r2, #SIO_DIV_UDIVIDEND_OFFSET]
     str r1, [r2, #SIO_DIV_UDIVISOR_OFFSET]
     cmp r1, #0
@@ -202,8 +238,14 @@ regular_func divmod_u32u32_unsafe
     // return 64 bit value so we can efficiently return both (note read order is important since QUOTIENT must be read last)
     ldr r1, [r2, #SIO_DIV_REMAINDER_OFFSET]
     ldr r0, [r2, #SIO_DIV_QUOTIENT_OFFSET]
+#if PICO_DIVIDER_DISABLE_INTERRUPTS
+    msr PRIMASK, r3
+#endif /* PICO_DIVIDER_DISABLE_INTERRUPTS */
     bx lr
 1:
+#if PICO_DIVIDER_DISABLE_INTERRUPTS
+    msr PRIMASK, r3
+#endif /* PICO_DIVIDER_DISABLE_INTERRUPTS */
     push {r2, lr}
     cmp r0, #0
     beq 1f
@@ -216,11 +258,13 @@ regular_func divmod_u32u32_unsafe
     movs r1, #0 // remainder 0
     // need to restore saved r2 as it hold SIO ptr
     pop {r2, pc}
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
 .align 2
 regular_func divmod_u32u32_savestate
     save_div_state_and_lr
     bl divmod_u32u32_unsafe
     restore_div_state_and_return
+#endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
 
 div_section WRAPPER_FUNC_NAME(__aeabi_ldiv)
 
@@ -228,6 +272,7 @@ div_section WRAPPER_FUNC_NAME(__aeabi_ldiv)
 wrapper_func __aeabi_ldivmod
 regular_func div_s64s64
 regular_func divmod_s64s64
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
     mov ip, r2
     ldr r2, =(SIO_BASE)
     # to support IRQ usage we must save/restore
@@ -241,11 +286,20 @@ divmod_s64s64_savestate:
     save_div_state_and_lr_64
     bl divmod_s64s64_unsafe
     restore_div_state_and_return_64
+#else
+    push {r4, lr}
+    mrs r4, PRIMASK
+    cpsid i
+    bl divmod_s64s64_unsafe
+    msr PRIMASK, r4
+    pop {r4, pc}
+#endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
 
 .align 2
 wrapper_func __aeabi_uldivmod
 regular_func div_u64u64
 regular_func divmod_u64u64
+#if !PICO_DIVIDER_DISABLE_INTERRUPTS
     mov ip, r2
     ldr r2, =(SIO_BASE)
     # to support IRQ usage we must save/restore
@@ -259,6 +313,15 @@ regular_func divmod_u64u64_savestate
     save_div_state_and_lr_64
     bl divmod_u64u64_unsafe
     restore_div_state_and_return_64
+#else
+    push {r4, lr}
+    mrs r4, PRIMASK
+    cpsid i
+    bl divmod_u64u64_unsafe
+    msr PRIMASK, r4
+    pop {r4, pc}
+#endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
+
 .macro dneg lo,hi
  mvns \hi,\hi
  rsbs \lo,#0

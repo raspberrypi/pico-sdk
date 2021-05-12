@@ -84,7 +84,7 @@ typedef ioptr const const_ioptr;
  * \param addr Address of writable register
  * \param mask Bit-mask specifying bits to set
  */
-inline static void hw_set_bits(io_rw_32 *addr, uint32_t mask) {
+__force_inline static void hw_set_bits(io_rw_32 *addr, uint32_t mask) {
     *(io_rw_32 *) hw_set_alias_untyped((volatile void *) addr) = mask;
 }
 
@@ -94,7 +94,7 @@ inline static void hw_set_bits(io_rw_32 *addr, uint32_t mask) {
  * \param addr Address of writable register
  * \param mask Bit-mask specifying bits to clear
  */
-inline static void hw_clear_bits(io_rw_32 *addr, uint32_t mask) {
+__force_inline static void hw_clear_bits(io_rw_32 *addr, uint32_t mask) {
     *(io_rw_32 *) hw_clear_alias_untyped((volatile void *) addr) = mask;
 }
 
@@ -104,7 +104,7 @@ inline static void hw_clear_bits(io_rw_32 *addr, uint32_t mask) {
  * \param addr Address of writable register
  * \param mask Bit-mask specifying bits to invert
  */
-inline static void hw_xor_bits(io_rw_32 *addr, uint32_t mask) {
+__force_inline static void hw_xor_bits(io_rw_32 *addr, uint32_t mask) {
     *(io_rw_32 *) hw_xor_alias_untyped((volatile void *) addr) = mask;
 }
 
@@ -120,7 +120,7 @@ inline static void hw_xor_bits(io_rw_32 *addr, uint32_t mask) {
  * \param values Bits values
  * \param write_mask Mask of bits to change
  */
-inline static void hw_write_masked(io_rw_32 *addr, uint32_t values, uint32_t write_mask) {
+__force_inline static void hw_write_masked(io_rw_32 *addr, uint32_t values, uint32_t write_mask) {
     hw_xor_bits(addr, (*addr ^ values) & write_mask);
 }
 

@@ -7,7 +7,7 @@
 #include "pico/stdlib.h"
 #include "hardware/pll.h"
 #include "hardware/clocks.h"
-#if PICO_STDIO_UART
+#if LIB_PICO_STDIO_UART
 #include "pico/stdio_uart.h"
 #else
 #include "pico/binary_info.h"
@@ -90,7 +90,7 @@ bool check_sys_clock_khz(uint32_t freq_khz, uint *vco_out, uint *postdiv1_out, u
 }
 
 void setup_default_uart() {
-#if PICO_STDIO_UART
+#if LIB_PICO_STDIO_UART
     stdio_uart_init();
 #elif defined(PICO_DEFAULT_UART_BAUD_RATE) && defined(PICO_DEFAULT_UART_TX_PIN) && defined(PICO_DEFAULT_UART_RX_PIN)
     // this is mostly for backwards compatibility - stdio_uart_init is a bit more nuanced, and usually likely to be present

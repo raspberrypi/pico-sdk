@@ -5,7 +5,7 @@ if (NOT TARGET pico_util_headers)
 endif()
 
 if (NOT TARGET pico_util)
-    add_library(pico_util INTERFACE)
+    pico_add_impl_library(pico_util)
     target_sources(pico_util INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/datetime.c
             ${CMAKE_CURRENT_LIST_DIR}/pheap.c

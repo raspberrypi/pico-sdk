@@ -257,7 +257,7 @@ int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, b
  * least that many bytes can be written without blocking.
  */
 static inline size_t i2c_get_write_available(i2c_inst_t *i2c) {
-    const size_t IC_TX_BUFFER_DEPTH = 32;
+    const size_t IC_TX_BUFFER_DEPTH = 16;
     return IC_TX_BUFFER_DEPTH - i2c_get_hw(i2c)->txflr;
 }
 

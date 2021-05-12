@@ -55,7 +55,7 @@ extern "C" {
 #endif
 #endif
 
-#if PICO_PRINTF_PICO
+#if LIB_PICO_PRINTF_PICO
 // weak raw printf may be a puts if printf has not been called,
 // so that we can support gc of printf when it isn't called
 //

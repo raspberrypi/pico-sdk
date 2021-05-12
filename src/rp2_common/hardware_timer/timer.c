@@ -73,6 +73,15 @@ void busy_wait_us(uint64_t delay_us) {
     busy_wait_until(t);
 }
 
+void busy_wait_ms(uint32_t delay_ms)
+{
+    if (delay_ms <= 0x7fffffffu / 1000) {
+        busy_wait_us_32(delay_ms * 1000);
+    } else {
+        busy_wait_us(delay_ms * 1000ull);
+    }
+}
+
 void busy_wait_until(absolute_time_t t) {
     uint64_t target = to_us_since_boot(t);
     uint32_t hi_target = (uint32_t)(target >> 32u);

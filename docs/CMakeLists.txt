@@ -1,4 +1,4 @@
-find_package(Doxygen)
+find_package(Doxygen QUIET)
 if (PICO_SDK_TOP_LEVEL_PROJECT AND ${DOXYGEN_FOUND})
     set(PICO_BUILD_DOCS_DEFAULT 1)
 endif()

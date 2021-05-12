@@ -80,16 +80,23 @@ uint64_t time_us_64(void);
 /*! \brief Busy wait wasting cycles for the given (32 bit) number of microseconds
  *  \ingroup hardware_timer
  *
- * \param delay_us delay amount
+ * \param delay_us delay amount in microseconds
  */
 void busy_wait_us_32(uint32_t delay_us);
 
 /*! \brief Busy wait wasting cycles for the given (64 bit) number of microseconds
  *  \ingroup hardware_timer
  *
- * \param delay_us delay amount
+ * \param delay_us delay amount in microseconds
  */
 void busy_wait_us(uint64_t delay_us);
+
+/*! \brief Busy wait wasting cycles for the given number of milliseconds
+ *  \ingroup hardware_timer
+ *
+ * \param delay_ms delay amount in milliseconds
+ */
+void busy_wait_ms(uint32_t delay_ms);
 
 /*! \brief Busy wait wasting cycles until after the specified timestamp
  *  \ingroup hardware_timer

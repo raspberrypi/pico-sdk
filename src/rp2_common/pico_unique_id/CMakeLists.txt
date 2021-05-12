@@ -1,4 +1,4 @@
-add_library(pico_unique_id INTERFACE)
+pico_add_impl_library(pico_unique_id)
 
 target_sources(pico_unique_id INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/unique_id.c

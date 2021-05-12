@@ -18,17 +18,18 @@ static inline void spi_unreset(spi_inst_t *spi) {
     unreset_block_wait(spi == spi0 ? RESETS_RESET_SPI0_BITS : RESETS_RESET_SPI1_BITS);
 }
 
-void spi_init(spi_inst_t *spi, uint baudrate) {
+uint spi_init(spi_inst_t *spi, uint baudrate) {
     spi_reset(spi);
     spi_unreset(spi);
 
-    spi_set_baudrate(spi, baudrate);
+    uint baud = spi_set_baudrate(spi, baudrate);
     spi_set_format(spi, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
     // Always enable DREQ signals -- harmless if DMA is not listening
     hw_set_bits(&spi_get_hw(spi)->dmacr, SPI_SSPDMACR_TXDMAE_BITS | SPI_SSPDMACR_RXDMAE_BITS);
 
     // Finally enable the SPI
     hw_set_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
+    return baud;
 }
 
 void spi_deinit(spi_inst_t *spi) {

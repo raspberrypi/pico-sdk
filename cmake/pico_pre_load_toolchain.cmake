@@ -36,8 +36,8 @@ if (DEFINED PICO_COMPILER)
                 select one from \"cmake/toolchains\" folder.")
         endif ()
     endif ()
+    message("PICO compiler is ${PICO_COMPILER}")
 endif ()
 
-message("PICO compiler is ${PICO_COMPILER}")
 unset(PICO_COMPILER CACHE)
 

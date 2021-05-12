@@ -95,8 +95,8 @@
 #define PICO_DEFAULT_IRQ_PRIORITY 0x80
 #endif
 
-#define PICO_LOWEST_IRQ_PRIORITY 0x01
-#define PICO_HIGHEST_IRQ_PRIORITY 0xff
+#define PICO_LOWEST_IRQ_PRIORITY 0xff
+#define PICO_HIGHEST_IRQ_PRIORITY 0x00
 
 // PICO_CONFIG: PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY, Set default shared IRQ order priority, default=0x80, group=hardware_irq
 #ifndef PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY
@@ -255,7 +255,7 @@ static inline void irq_clear(uint int_num) {
 void irq_set_pending(uint num);
 
 
-/*! \brief Perform IRQ priority intiialization for the current core
+/*! \brief Perform IRQ priority initialization for the current core
  *
  * \note This is an internal method and user should generally not call it.
  */
