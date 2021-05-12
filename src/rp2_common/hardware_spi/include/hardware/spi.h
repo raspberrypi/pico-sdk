@@ -220,8 +220,6 @@ static inline bool spi_is_writable(const spi_inst_t *spi) {
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \return true if a read is possible i.e. data is present
  *
- * \note Although the controllers each have a 8 deep RX FIFO, the current HW implementation can only return 0 or 1
- * rather than the data available.
  */
 static inline bool spi_is_readable(const spi_inst_t *spi) {
     return (spi_get_hw(spi)->sr & SPI_SSPSR_RNE_BITS);
