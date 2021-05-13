@@ -537,6 +537,48 @@ static inline void dma_set_irq1_channel_mask_enabled(uint32_t channel_mask, bool
     }
 }
 
+/*! \brief  Determine if a particular channel is a cause of DMA_IRQ_0
+ *  \ingroup hardware_dma
+ *
+ * \param channel DMA channel
+ * \return true if the channel is a cause of DMA_IRQ_0, false otherwise
+ */
+static inline bool dma_channel_get_irq0_status(uint channel) {
+    check_dma_channel_param(channel);
+    return dma_hw->ints0 & (1u << channel);
+}
+
+/*! \brief  Determine if a particular channel is a cause of DMA_IRQ_1
+ *  \ingroup hardware_dma
+ *
+ * \param channel DMA channel
+ * \return true if the channel is a cause of DMA_IRQ_1, false otherwise
+ */
+static inline bool dma_channel_get_irq1_status(uint channel) {
+    check_dma_channel_param(channel);
+    return dma_hw->ints0 & (1u << channel);
+}
+
+/*! \brief  Acknowledge a channel IRQ, resetting it as the cause of DMA_IRQ_0
+ *  \ingroup hardware_dma
+ *
+ * \param channel DMA channel
+ */
+static inline void dma_channel_acknowledge_irq0(uint channel) {
+    check_dma_channel_param(channel);
+    hw_set_bits(&dma_hw->ints0, (1u << channel));
+}
+
+/*! \brief  Acknowledge a channel IRQ, resetting it as the cause of DMA_IRQ_0
+ *  \ingroup hardware_dma
+ *
+ * \param channel DMA channel
+ */
+static inline void dma_channel_acknowledge_irq1(uint channel) {
+    check_dma_channel_param(channel);
+    hw_set_bits(&dma_hw->ints1, (1u << channel));
+}
+
 /*! \brief  Check if DMA channel is busy
  *  \ingroup hardware_dma
  *
