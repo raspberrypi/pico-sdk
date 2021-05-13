@@ -74,7 +74,7 @@ uint uart_set_baudrate(uart_inst_t *uart, uint baudrate) {
     invalid_params_if(UART, baudrate == 0);
     uint32_t baud_rate_div = (8 * clock_get_hz(clk_peri) / baudrate);
     uint32_t baud_ibrd = baud_rate_div >> 7;
-    uint32_t baud_fbrd = ((baud_rate_div & 0x7f) + 1) / 2;
+    uint32_t baud_fbrd;
 
     if (baud_ibrd == 0) {
         baud_ibrd = 1;
@@ -82,6 +82,8 @@ uint uart_set_baudrate(uart_inst_t *uart, uint baudrate) {
     } else if (baud_ibrd >= 65535) {
         baud_ibrd = 65535;
         baud_fbrd = 0;
+    }  else {
+        baud_fbrd = ((baud_rate_div & 0x7f) + 1) / 2;
     }
 
     // Load PL011's baud divisor registers

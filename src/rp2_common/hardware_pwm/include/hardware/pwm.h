@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PWM, Enable/disable assertions in the PWM module, type=bool, default=0, group=hadrware_pwm
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PWM, Enable/disable assertions in the PWM module, type=bool, default=0, group=hardware_pwm
 #ifndef PARAM_ASSERTIONS_ENABLED_PWM
 #define PARAM_ASSERTIONS_ENABLED_PWM 0
 #endif

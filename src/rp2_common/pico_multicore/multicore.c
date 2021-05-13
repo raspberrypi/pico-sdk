@@ -127,7 +127,7 @@ void multicore_launch_core1(void (*entry)(void)) {
 }
 
 void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vector_table) {
-    uint32_t cmd_sequence[] = {0, 0, 1, (uintptr_t) vector_table, (uintptr_t) sp, (uintptr_t) entry};
+    const uint32_t cmd_sequence[] = {0, 0, 1, (uintptr_t) vector_table, (uintptr_t) sp, (uintptr_t) entry};
 
     bool enabled = irq_is_enabled(SIO_IRQ_PROC0);
     irq_set_enabled(SIO_IRQ_PROC0, false);
