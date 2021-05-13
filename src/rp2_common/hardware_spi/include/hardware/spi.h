@@ -153,8 +153,13 @@ static inline uint spi_get_index(const spi_inst_t *spi) {
     return spi == spi1 ? 1 : 0;
 }
 
-static inline spi_hw_t *spi_get_hw(const spi_inst_t *spi) {
+static inline spi_hw_t *spi_get_hw(spi_inst_t *spi) {
     spi_get_index(spi); // check it is a hw spi
+    return (spi_hw_t *)spi;
+}
+
+static inline const spi_hw_t *spi_get_const_hw(const spi_inst_t *spi) {
+    spi_get_index(spi);  // check it is a hw spi
     return (spi_hw_t *)spi;
 }
 
@@ -208,10 +213,9 @@ static inline void spi_set_slave(spi_inst_t *spi, bool slave) {
  *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \return false if no space is available to write. True if a write is possible
- *
  */
 static inline bool spi_is_writable(const spi_inst_t *spi) {
-    return (spi_get_hw(spi)->sr & SPI_SSPSR_TNF_BITS);
+    return (spi_get_const_hw(spi)->sr & SPI_SSPSR_TNF_BITS);
 }
 
 /*! \brief Check whether a read can be done on SPI device
@@ -219,10 +223,9 @@ static inline bool spi_is_writable(const spi_inst_t *spi) {
  *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \return true if a read is possible i.e. data is present
- *
  */
 static inline bool spi_is_readable(const spi_inst_t *spi) {
-    return (spi_get_hw(spi)->sr & SPI_SSPSR_RNE_BITS);
+    return (spi_get_const_hw(spi)->sr & SPI_SSPSR_RNE_BITS);
 }
 
 /*! \brief Check whether SPI is busy
@@ -232,7 +235,7 @@ static inline bool spi_is_readable(const spi_inst_t *spi) {
  * \return true if SPI is busy
  */
 static inline bool spi_is_busy(const spi_inst_t *spi) {
-    return (spi_get_hw(spi)->sr & SPI_SSPSR_BSY_BITS);
+    return (spi_get_const_hw(spi)->sr & SPI_SSPSR_BSY_BITS);
 }
 
 /*! \brief Write/Read to/from an SPI device
