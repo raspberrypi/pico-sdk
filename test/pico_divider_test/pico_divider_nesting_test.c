@@ -15,6 +15,9 @@ volatile bool failed;
 volatile uint32_t count[3];
 volatile bool done;
 
+#define FAILED() ({ failed = true; })
+//#define FAILED() ({ failed = true; __breakpoint(); })
+
 bool timer_callback(repeating_timer_t *t) {
     count[0]++;
     static int z;
@@ -23,9 +26,27 @@ bool timer_callback(repeating_timer_t *t) {
         int a = z / 7;
         int b = z % 7;
         if (z != a * 7 + b) {
-            failed = true;
+            FAILED();
+        }
+        a = z / -7;
+        b = z % -7;
+        if (z != a * -7 + b) {
+            FAILED();
         }
     }
+    float fz = z;
+    float fa = fz / 11.0f;
+    float fb = fmodf(fz, 11.0f);
+    if (fabsf(fz - (fa * 11.0 + fb) > 1e-9)) {
+        FAILED();
+    }
+    double dz = z;
+    double da = dz / 11.0;
+    double db = fmod(dz, 11.0);
+    if (fabsf(dz - (da * 11.0 + db) > 1e-9)) {
+        FAILED();
+    }
+
     return !done;
 }
 
@@ -41,16 +62,20 @@ void do_dma_start(uint ch) {
     dma_channel_configure(ch, &c, &word[ch], &word[ch], 513 + ch * 23, true);
 }
 
+double d0c, d0s, d0t, dz;
+float f0c, f0s, f0t, fz;
+
 void test_irq_handler0() {
     count[1]++;
     dma_hw->ints0 |= 1u;
     static uint z;
+    static uint dz;
     for (int i=0; i<80;i++) {
         z += 31;
         uint a = z / 11;
         uint b = z % 11;
         if (z != a * 11 + b) {
-            failed = true;
+            FAILED();
         }
     }
     if (done) dma_channel_abort(0);
@@ -66,16 +91,17 @@ void test_irq_handler1() {
         uint a = z / -13;
         uint b = z % -13;
         if (z != a * -13 + b) {
-            failed = true;
+            FAILED();
         }
         static uint64_t z64;
         z64 -= 47;
         uint64_t a64 = z64 / -13;
         uint64_t b64 = z64 % -13;
         if (z64 != a64 * -13 + b64) {
-            failed = true;
+            FAILED();
         }
     }
+
     if (done) dma_channel_abort(1);
     else      do_dma_start(1);
 }
@@ -89,7 +115,7 @@ void test_nesting() {
     // They all busily make use of the dividers, to expose any issues with nested use
 
     repeating_timer_t timer;
-    add_repeating_timer_us(529, timer_callback, NULL, &timer);
+    add_repeating_timer_us(929, timer_callback, NULL, &timer);
     irq_set_exclusive_handler(DMA_IRQ_0, test_irq_handler0);
     irq_set_exclusive_handler(DMA_IRQ_1, test_irq_handler1);
 
@@ -101,7 +127,7 @@ void test_nesting() {
     irq_set_enabled(DMA_IRQ_1, 1);
     do_dma_start(0);
     do_dma_start(1);
-    absolute_time_t end = delayed_by_ms(get_absolute_time(), 2000);
+    absolute_time_t end = delayed_by_ms(get_absolute_time(), 10000);
     int count_local=0;
     while (!time_reached(end)) {
         for(uint i=0;i<100;i++) {
@@ -109,8 +135,39 @@ void test_nesting() {
             uint a = z / 11;
             uint b = z % 11;
             if (z != a * 11 + b) {
-                failed = true;
+                FAILED();
             }
+            int zz = (int)z;
+            int aa = zz / -11;
+            int bb = zz % -11;
+            if (zz != aa * -11 + bb) {
+                FAILED();
+            }
+            aa = -zz / -11;
+            bb = -zz % -11;
+            if (-zz != aa * -11 + bb) {
+                FAILED();
+            }
+            aa = -zz / 11;
+            bb = -zz % 11;
+            if (-zz != aa * 11 + bb) {
+                FAILED();
+            }
+            a = 0xffffffffu / 11;
+            b = 0xffffffffu % 11;
+            if (0xffffffffu != a * 11 + b) {
+                FAILED();
+            }
+        }
+        // these use the divider
+        for(uint i=0;i<=100;i+=20) {
+            // both in and out bootrom range (we perform mod in wrapper code if necessarry)
+            f0t = tanf(i * 50);
+            f0c = cosf(i * 50);
+            f0s = sinf(i * 50);
+            d0t = tan(i * 1000);
+            d0c = cos(i * 1000);
+            d0s = sin(i * 1000);
         }
         count_local++;
     }
