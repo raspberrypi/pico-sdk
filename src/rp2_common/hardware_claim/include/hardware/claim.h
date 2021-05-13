@@ -65,10 +65,10 @@ int hw_claim_unused_from_range(uint8_t *bits, bool required, uint bit_lsb, uint 
  * The resource ownership is indicated by the bit_index bit in an array of bits.
  *
  * \param bits pointer to an array of bits (8 bits per byte)
- * \param bit_index resource to unclaim (bit index into array of bits)
+ * \param bit_index resource to check (bit index into array of bits)
  * \return true if the resource is claimed
  */
-bool hw_is_claimed(uint8_t *bits, uint bit_index);
+bool hw_is_claimed(const uint8_t *bits, uint bit_index);
 
 /*! \brief Atomically unclaim a resource
  *  \ingroup hardware_claim
