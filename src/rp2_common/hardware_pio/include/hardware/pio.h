@@ -677,10 +677,10 @@ static inline void pio_enable_sm_mask_in_sync(PIO pio, uint32_t mask) {
  * \ingroup hardware_pio
  */
 enum pio_interrupt_source {
-    pis_irq0 = PIO_INTR_SM0_LSB,
-    pis_irq1 = PIO_INTR_SM1_LSB,
-    pis_irq2 = PIO_INTR_SM2_LSB,
-    pis_irq3 = PIO_INTR_SM3_LSB,
+    pis_interrupt0 = PIO_INTR_SM0_LSB,
+    pis_interrupt1 = PIO_INTR_SM1_LSB,
+    pis_interrupt2 = PIO_INTR_SM2_LSB,
+    pis_interrupt3 = PIO_INTR_SM3_LSB,
     pis_sm0_tx_fifo_not_full = PIO_INTR_SM0_TXNFULL_LSB,
     pis_sm1_tx_fifo_not_full = PIO_INTR_SM1_TXNFULL_LSB,
     pis_sm2_tx_fifo_not_full = PIO_INTR_SM2_TXNFULL_LSB,
@@ -755,62 +755,29 @@ static inline void pio_set_irq1_source_mask_enabled(PIO pio, uint32_t source_mas
     }
 }
 
-/*! \brief  Determine if a particular source is the cause of IRQ0 on a PIO
+/*! \brief  Determine if a particular PIO interrupt is set
  *  \ingroup hardware_pio
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
- * \param source the source number (see \ref pio_interrupt_source)
+ * \param pio_interrupt_num the PIO interrupt number 0-7
  * \return true if the source a cause of an IRQ, false otherwise
  */
-static inline bool pio_get_irq0_source_status(PIO pio, enum pio_interrupt_source source) {
+static inline bool pio_interrupt_get(PIO pio, uint pio_interrupt_num) {
     check_pio_param(pio);
-    invalid_params_if(PIO, source >= 12);
-    return pio->inte0 & (1u << source);
+    invalid_params_if(PIO, pio_interrupt_num >= 8);
+    return pio->irq & (1u << pio_interrupt_num);
 }
 
-/*! \brief  Determine if a particular source is the cause of IRQ1 on a PIO
+/*! \brief  Clear a particular PIO interrupt
  *  \ingroup hardware_pio
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
- * \param source the source number (see \ref pio_interrupt_source)
- * \return true if the source a cause of an IRQ, false otherwise
+ * \param pio_interrupt_num the PIO interrupt number 0-7
  */
-static inline bool pio_get_irq1_source_status(PIO pio, enum pio_interrupt_source source) {
+static inline void pio_interrupt_clear(PIO pio, uint pio_interrupt_num) {
     check_pio_param(pio);
-    invalid_params_if(PIO, source >= 12);
-    return pio->inte1 & (1u << source);
-}
-
-/*! \brief  Acknowledge a particular source causing IRQ0 on a PIO
- *  \ingroup hardware_pio
- *
- * Note that this method only has any affect for pis_irq0 thru ppis_irq3 (for which the underlying interrupt is cleared),
- * whereas the other other PIO interrupt sources are reflections of the states of the FIFO, so the only way to clear
- * the status is for the FIFO contents to change appropriately.
- *
- * \param pio The PIO instance; either \ref pio0 or \ref pio1
- * \param source the source number (see \ref pio_interrupt_source)
- */
-static inline void pio_acknowledge_irq0_source(PIO pio, enum pio_interrupt_source source) {
-    check_pio_param(pio);
-    invalid_params_if(PIO, source != pis_irq0 && source != pis_irq1 && source != pis_irq2 && source != pis_irq3);
-    hw_set_bits(&pio->inte0, (1u << source));
-}
-
-/*! \brief  Acknowledge a particular source causing IRQ1 on a PIO
- *  \ingroup hardware_pio
- *
- * Note that this method only has any affect for pis_irq0 thru ppis_irq3 (for which the underlying interrupt is cleared),
- * whereas the other other PIO interrupt sources are reflections of the states of the FIFO, so the only way to clear
- * the status is for the FIFO contents to change appropriately.
- *
- * \param pio The PIO instance; either \ref pio0 or \ref pio1
- * \param source the source number (see \ref pio_interrupt_source)
- */
-static inline void pio_acknowledge_irq1_source(PIO pio, enum pio_interrupt_source source) {
-    check_pio_param(pio);
-    invalid_params_if(PIO, source != pis_irq0 && source != pis_irq1 && source != pis_irq2 && source != pis_irq3);
-    hw_set_bits(&pio->inte1, (1u << source));
+    invalid_params_if(PIO, pio_interrupt_num >= 8);
+    hw_set_bits(&pio->irq, (1u << pio_interrupt_num));
 }
 
 /*! \brief Return the current program counter for a state machine
