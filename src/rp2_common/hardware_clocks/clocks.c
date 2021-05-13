@@ -112,7 +112,7 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
     clock->div = div;
 
     // Store the configured frequency
-    configured_freq[clk_index] = freq;
+    configured_freq[clk_index] = (uint32_t)(((uint64_t) src_freq << 8) / div);
 
     return true;
 }
