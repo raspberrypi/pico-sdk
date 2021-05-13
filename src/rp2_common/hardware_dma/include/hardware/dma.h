@@ -102,6 +102,7 @@ int dma_claim_unused_channel(bool required);
  *  \ingroup hardware_dma
  *
  * \param channel the dma channel
+ * \return true if the channel is claimed, false otherwise
  * \see dma_channel_claim
  * \see dma_channel_claim_mask
  */
