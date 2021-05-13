@@ -144,6 +144,15 @@ void hardware_alarm_claim(uint alarm_num);
  */
 void hardware_alarm_unclaim(uint alarm_num);
 
+/*! \brief Determine if a hardware alarm has been claimed
+ *  \ingroup hardware_timer
+ *
+ * \param alarm_num the hardware alarm number
+ * \return true if claimed, false otherwise
+ * \see hardware_alarm_claim
+ */
+bool hardware_alarm_is_claimed(uint alarm_num);
+
 /*! \brief Enable/Disable a callback for a hardware timer on this core
  *  \ingroup hardware_timer
  *

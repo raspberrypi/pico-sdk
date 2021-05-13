@@ -341,6 +341,16 @@ void spin_lock_unclaim(uint lock_num);
  */
 int spin_lock_claim_unused(bool required);
 
+/*! \brief Determine if a spin lock is claimed
+ *  \ingroup hardware_sync
+ *
+ * \param lock_num the spin lock number
+ * \return true if claimed, false otherwise
+ * \see spin_lock_claim
+ * \see spin_lock_claim_mask
+ */
+bool spin_lock_is_claimed(uint lock_num);
+
 #define remove_volatile_cast(t, x) ({__mem_fence_acquire(); (t)(x); })
 
 #ifdef __cplusplus

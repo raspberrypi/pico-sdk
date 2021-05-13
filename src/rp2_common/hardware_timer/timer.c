@@ -28,6 +28,11 @@ void hardware_alarm_unclaim(uint alarm_num) {
     hw_claim_clear(&claimed, alarm_num);
 }
 
+bool hardware_alarm_is_claimed(uint alarm_num) {
+    check_hardware_alarm_num_param(alarm_num);
+    return hw_is_claimed(&claimed, alarm_num);
+}
+
 /// tag::time_us_64[]
 uint64_t time_us_64() {
     // Need to make sure that the upper 32 bits of the timer

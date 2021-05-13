@@ -1136,6 +1136,17 @@ void pio_sm_unclaim(PIO pio, uint sm);
  */
 int pio_claim_unused_sm(PIO pio, bool required);
 
+/*! \brief Determine if a PIO state machine is claimed
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param sm State machine index (0..3)
+ * \return true if claimed, false otherwise
+ * \see pio_sm_claim
+ * \see pio_claim_sm_mask
+ */
+bool pio_sm_is_claimed(PIO pio, uint sm);
+
 #ifdef __cplusplus
 }
 #endif

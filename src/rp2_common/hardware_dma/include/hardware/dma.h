@@ -98,6 +98,15 @@ void dma_channel_unclaim(uint channel);
  */
 int dma_claim_unused_channel(bool required);
 
+/*! \brief Determine if a dma channel is claimed
+ *  \ingroup hardware_dma
+ *
+ * \param channel the dma channel
+ * \see dma_channel_claim
+ * \see dma_channel_claim_mask
+ */
+bool dma_channel_is_claimed(uint channel);
+
 /** \brief DMA channel configuration
  *  \defgroup channel_config channel_config
  *  \ingroup hardware_dma
