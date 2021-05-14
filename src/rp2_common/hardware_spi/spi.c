@@ -66,8 +66,8 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
 }
 
 uint spi_get_baudrate(const spi_inst_t *spi) {
-    uint prescale = spi_get_hw(spi)->cpsr;
-    uint postdiv = ((spi_get_hw(spi)->cr0  & SPI_SSPCR0_SCR_BITS) >> SPI_SSPCR0_SCR_LSB) + 1;
+    uint prescale = spi_get_const_hw(spi)->cpsr;
+    uint postdiv = ((spi_get_const_hw(spi)->cr0  & SPI_SSPCR0_SCR_BITS) >> SPI_SSPCR0_SCR_LSB) + 1;
     return clock_get_hz(clk_peri) / (prescale * postdiv);
 }
 

@@ -160,7 +160,7 @@ static inline spi_hw_t *spi_get_hw(spi_inst_t *spi) {
 
 static inline const spi_hw_t *spi_get_const_hw(const spi_inst_t *spi) {
     spi_get_index(spi);  // check it is a hw spi
-    return (spi_hw_t *)spi;
+    return (const spi_hw_t *)spi;
 }
 
 /*! \brief Configure SPI
