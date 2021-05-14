@@ -250,7 +250,7 @@ static inline bool spi_is_busy(const spi_inst_t *spi) {
  * \param len Length of BOTH buffers
  * \return Number of bytes written/read
 */
-size_t spi_write_read_blocking(spi_inst_t *spi, const uint8_t *src, uint8_t *dst, size_t len);
+int spi_write_read_blocking(spi_inst_t *spi, const uint8_t *src, uint8_t *dst, size_t len);
 
 /*! \brief Write to an SPI device, blocking
  *  \ingroup hardware_spi
@@ -263,7 +263,7 @@ size_t spi_write_read_blocking(spi_inst_t *spi, const uint8_t *src, uint8_t *dst
  * \param len Length of \p src
  * \return Number of bytes written/read
  */
-size_t spi_write_blocking(spi_inst_t *spi, const uint8_t *src, size_t len);
+int spi_write_blocking(spi_inst_t *spi, const uint8_t *src, size_t len);
 
 /*! \brief Read from an SPI device
  *  \ingroup hardware_spi
@@ -280,7 +280,7 @@ size_t spi_write_blocking(spi_inst_t *spi, const uint8_t *src, size_t len);
  * \param len Length of buffer \p dst
  * \return Number of bytes written/read
  */
-size_t spi_read_blocking(spi_inst_t *spi, uint8_t repeated_tx_data, uint8_t *dst, size_t len);
+int spi_read_blocking(spi_inst_t *spi, uint8_t repeated_tx_data, uint8_t *dst, size_t len);
 
 // ----------------------------------------------------------------------------
 // SPI-specific operations and aliases
@@ -301,7 +301,7 @@ size_t spi_read_blocking(spi_inst_t *spi, uint8_t repeated_tx_data, uint8_t *dst
  * \param len Length of BOTH buffers in halfwords
  * \return Number of halfwords written/read
 */
-size_t spi_write16_read16_blocking(spi_inst_t *spi, const uint16_t *src, uint16_t *dst, size_t len);
+int spi_write16_read16_blocking(spi_inst_t *spi, const uint16_t *src, uint16_t *dst, size_t len);
 
 /*! \brief Write to an SPI device
  *  \ingroup hardware_spi
@@ -316,7 +316,7 @@ size_t spi_write16_read16_blocking(spi_inst_t *spi, const uint16_t *src, uint16_
  * \param len Length of buffers
  * \return Number of halfwords written/read
 */
-size_t spi_write16_blocking(spi_inst_t *spi, const uint16_t *src, size_t len);
+int spi_write16_blocking(spi_inst_t *spi, const uint16_t *src, size_t len);
 
 /*! \brief Read from an SPI device
  *  \ingroup hardware_spi
@@ -335,7 +335,7 @@ size_t spi_write16_blocking(spi_inst_t *spi, const uint16_t *src, size_t len);
  * \param len Length of buffer \p dst in halfwords
  * \return Number of halfwords written/read
  */
-size_t spi_read16_blocking(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *dst, size_t len);
+int spi_read16_blocking(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *dst, size_t len);
 
 #ifdef __cplusplus
 }
