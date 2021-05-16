@@ -70,6 +70,8 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
     // propagating when changing aux mux. Note it would be a really bad idea
     // to do this on one of the glitchless clocks (clk_sys, clk_ref).
     else {
+        // Disable clock. On clk_ref and clk_sys this does nothing,
+        // all other clocks have the ENABLE bit in the same position.
         hw_clear_bits(&clock->ctrl, CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS);
         if (configured_freq[clk_index] > 0) {
             // Delay for 3 cycles of the target clock, for ENABLE propagation.
@@ -101,6 +103,8 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
             tight_loop_contents();
     }
 
+    // Enable clock. On clk_ref and clk_sys this does nothing,
+    // all other clocks have the ENABLE bit in the same position.
     hw_set_bits(&clock->ctrl, CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS);
 
     // Now that the source is configured, we can trust that the user-supplied
