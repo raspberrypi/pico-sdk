@@ -6,7 +6,7 @@ if (NOT TARGET pico_multicore)
 
     target_include_directories(pico_multicore INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
-    target_link_libraries(pico_multicore INTERFACE pico_sync)
+    target_link_libraries(pico_multicore INTERFACE pico_sync hardware_irq)
 endif()
 
 

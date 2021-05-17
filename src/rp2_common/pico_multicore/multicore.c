@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "pico/stdlib.h"
 #include "pico/multicore.h"
 #include "hardware/sync.h"
 #include "hardware/irq.h"
