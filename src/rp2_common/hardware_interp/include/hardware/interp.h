@@ -285,9 +285,9 @@ static inline void interp_set_force_bits(interp_hw_t *interp, uint lane, uint bi
 }
 
 typedef struct {
-    io_rw_32 accum[2];
-    io_rw_32 base[3];
-    io_rw_32 ctrl[2];
+    uint32_t accum[2];
+    uint32_t base[3];
+    uint32_t ctrl[2];
 } interp_hw_save_t;
 
 /*! \brief Save the specified interpolator state
