@@ -18,6 +18,7 @@ function(pico_add_dis_output TARGET)
 endfunction()
 
 function(pico_add_extra_outputs TARGET)
+    pico_add_map_output(${TARGET})
     pico_add_hex_output(${TARGET})
     pico_add_bin_output(${TARGET})
     pico_add_dis_output(${TARGET})
