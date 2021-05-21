@@ -23,4 +23,6 @@ void operator delete(void *p) { std::free(p); }
 
 void operator delete[](void *p) noexcept { std::free(p); }
 
+void operator delete[](void *p, __unused std::size_t n) noexcept { std::free(p); }
+
 #endif
