@@ -44,6 +44,16 @@
     #endif
     #define _BOOT_STAGE2_SELECTED
 #endif
+// PICO_CONFIG: PICO_BOOT_STAGE2_CHOOSE_AT25SF128A, Select boot2_at25sf128a as the boot stage 2 when no boot stage 2 selection is made by the CMake build, type=bool, default=0, group=boot_stage2
+#ifndef PICO_BOOT_STAGE2_CHOOSE_AT25SF128A
+    #define PICO_BOOT_STAGE2_CHOOSE_AT25SF128A 0
+#elif PICO_BOOT_STAGE2_CHOOSE_AT25SF128A
+    #ifdef _BOOT_STAGE2_SELECTED
+        #error multiple boot stage 2 options chosen
+    #endif
+    #define _BOOT_STAGE2_SELECTED
+#endif
+
 // PICO_CONFIG: PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H, Select boot2_generic_03h as the boot stage 2 when no boot stage 2 selection is made by the CMake build, type=bool, default=1, group=boot_stage2
 #if defined(PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H) && PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H
     #ifdef _BOOT_STAGE2_SELECTED
@@ -65,6 +75,8 @@
         #define _BOOT_STAGE2 boot2_w25q080
     #elif PICO_BOOT_STAGE2_CHOOSE_W25X10CL
         #define _BOOT_STAGE2 boot2_w25x10cl
+    #elif PICO_BOOT_STAGE2_CHOOSE_AT25SF128A
+        #define _BOOT_STAGE2 boot2_at25sf128a
     #elif !defined(PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H) || PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H
         #undef PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H
         #define PICO_BOOT_STAGE2_CHOOSE_GENERIC_03H 1
