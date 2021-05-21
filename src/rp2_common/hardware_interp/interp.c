@@ -16,9 +16,13 @@ static_assert(NUM_DMA_CHANNELS <= 16, "");
 
 static uint8_t _claimed;
 
+static inline uint interp_get_bit(interp_hw_t *interp, uint lane) {
+  return 1u << ((interp_index(interp) << 1u) | lane);
+}
+
 void interp_claim_lane(interp_hw_t *interp, uint lane) {
     valid_params_if(INTERP, lane < 2);
-    uint bit = (interp_index(interp) << 1u) | lane;
+    uint bit = interp_get_bit(interp, lane);
     hw_claim_or_assert((uint8_t *) &_claimed, bit, "Lane is already claimed");
 }
 
@@ -30,8 +34,14 @@ void interp_claim_lane_mask(interp_hw_t *interp, uint lane_mask) {
 
 void interp_unclaim_lane(interp_hw_t *interp, uint lane) {
     valid_params_if(INTERP, lane < 2);
-    uint bit = (interp_index(interp) << 1u) | lane;
-    hw_claim_clear((uint8_t *) &_claimed, bit);
+    uint bit = interp_get_bit(interp, lane);
+    hw_claim_clear(&_claimed, bit);
+}
+
+void interp_unclaim_lane_mask(interp_hw_t *interp, uint lane_mask) {
+    valid_params_if(INTERP, lane_mask && lane_mask <= 0x3);
+    if (lane_mask & 1u) interp_unclaim_lane(interp, 0);
+    if (lane_mask & 2u) interp_unclaim_lane(interp, 1);
 }
 
 void interp_save(interp_hw_t *interp, interp_hw_save_t *saver) {
