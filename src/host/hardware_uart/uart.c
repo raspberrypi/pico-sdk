@@ -88,10 +88,18 @@ size_t uart_is_readable(uart_inst_t *uart) {
 }
 
 // Write len bytes directly from src to the UART
-//void uart_write_blocking(uart_inst_t uart, const uint8_t *src, size_t len);
+void uart_write_blocking(uart_inst_t *uart, const uint8_t *src, size_t len) {
+    for (size_t i = 0; i < len; i++) {
+        uart_putc(uart, src[i]);
+    }
+}
 
 // Read len bytes directly from the UART to dst
-//void uart_read_blocking(uart_inst_t uart, uint8_t *dst, size_t len);
+void uart_read_blocking(uart_inst_t *uart, uint8_t *dst, size_t len) {
+    for (size_t i = 0; i < len; i++) {
+        dst[i] = uart_getc(uart);
+    }
+}
 
 // ----------------------------------------------------------------------------
 // UART-specific operations and aliases
