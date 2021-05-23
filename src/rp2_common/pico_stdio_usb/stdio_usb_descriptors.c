@@ -116,8 +116,7 @@ const uint8_t *tud_descriptor_device_cb(void) {
     return (const uint8_t *)&usbd_desc_device;
 }
 
-const uint8_t *tud_descriptor_configuration_cb(uint8_t index) {
-    (void)index;
+const uint8_t *tud_descriptor_configuration_cb(__unused uint8_t index) {
     return usbd_desc_cfg;
 }
 
