@@ -5,6 +5,7 @@
  */
 
 #include <limits.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "pico.h"
@@ -278,7 +279,7 @@ static void alarm_pool_dump_key(pheap_node_id_t id, void *user_data) {
 #if PICO_ON_DEVICE
     printf("%lld (hi %02x)", to_us_since_boot(get_entry(pool, id)->target), *get_entry_id_high(pool, id));
 #else
-    printf("%ld", to_us_since_boot(get_entry(pool, id)->target));
+    printf(PRIu64, to_us_since_boot(get_entry(pool, id)->target));
 #endif
 }
 
