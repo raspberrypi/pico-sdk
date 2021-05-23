@@ -29,7 +29,6 @@
 #if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
 
 #include "tusb.h"
-#include "pico/platform.h"
 #include "pico/stdio_usb/reset_interface.h"
 #include "pico/unique_id.h"
 
