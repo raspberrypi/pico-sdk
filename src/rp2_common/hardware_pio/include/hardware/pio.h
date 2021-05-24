@@ -267,7 +267,7 @@ static inline void sm_config_set_wrap(pio_sm_config *c, uint wrap_target, uint w
  *  \ingroup sm_config
  *
  * \param c Pointer to the configuration structure to modify
- * \param pin The raw GPIO pin number to use as the source for a `jmp pin` instruction 
+ * \param pin The raw GPIO pin number to use as the source for a `jmp pin` instruction
  */
 static inline void sm_config_set_jmp_pin(pio_sm_config *c, uint pin) {
     valid_params_if(PIO, pin < 32);
@@ -281,7 +281,7 @@ static inline void sm_config_set_jmp_pin(pio_sm_config *c, uint pin) {
  * \param c Pointer to the configuration structure to modify
  * \param shift_right true to shift ISR to right, false to shift ISR to left
  * \param autopush whether autopush is enabled
- * \param push_threshold threshold in bits to shift in before auto/conditional re-pushing of the ISR  
+ * \param push_threshold threshold in bits to shift in before auto/conditional re-pushing of the ISR
  */
 static inline void sm_config_set_in_shift(pio_sm_config *c, bool shift_right, bool autopush, uint push_threshold) {
     valid_params_if(PIO, push_threshold <= 32);
@@ -300,7 +300,7 @@ static inline void sm_config_set_in_shift(pio_sm_config *c, bool shift_right, bo
  * \param c Pointer to the configuration structure to modify
  * \param shift_right true to shift OSR to right, false to shift OSR to left
  * \param autopull whether autopull is enabled
- * \param pull_threshold threshold in bits to shift out before auto/conditional re-pulling of the OSR  
+ * \param pull_threshold threshold in bits to shift out before auto/conditional re-pulling of the OSR
  */
 static inline void sm_config_set_out_shift(pio_sm_config *c, bool shift_right, bool autopull, uint pull_threshold) {
     valid_params_if(PIO, pull_threshold <= 32);
@@ -330,7 +330,7 @@ static inline void sm_config_set_fifo_join(pio_sm_config *c, enum pio_fifo_join 
  *
  * \param c Pointer to the configuration structure to modify
  * \param sticky to enable 'sticky' output (i.e. re-asserting most recent OUT/SET pin values on subsequent cycles)
- * \param has_enable_pin true to enable auxiliary OUT enable pin 
+ * \param has_enable_pin true to enable auxiliary OUT enable pin
  * \param enable_pin_index pin index for auxiliary OUT enable
  */
 static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool has_enable_pin, uint enable_pin_index) {
@@ -352,7 +352,7 @@ static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool
 static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_status_type status_sel, uint status_n) {
     valid_params_if(PIO, status_sel == STATUS_TX_LESSTHAN || status_sel == STATUS_RX_LESSTHAN);
     c->execctrl = (c->execctrl
-                   & ~(PIO_SM0_EXECCTRL_STATUS_SEL_BITS | PIO_SM0_EXECCTRL_STATUS_N_BITS))
+                  & ~(PIO_SM0_EXECCTRL_STATUS_SEL_BITS | PIO_SM0_EXECCTRL_STATUS_N_BITS))
                   | ((((uint)status_sel) << PIO_SM0_EXECCTRL_STATUS_SEL_LSB) & PIO_SM0_EXECCTRL_STATUS_SEL_BITS)
                   | ((status_n << PIO_SM0_EXECCTRL_STATUS_N_LSB) & PIO_SM0_EXECCTRL_STATUS_N_BITS);
 }
@@ -372,7 +372,7 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  * In Shift | shift_direction=right, autopush=false, push_thrshold=32
  * Out Shift | shift_direction=right, autopull=false, pull_thrshold=32
  * Jmp Pin | 0
- * Out Special | sticky=false, has_enable_pin=false, enable_pin_index=0 
+ * Out Special | sticky=false, has_enable_pin=false, enable_pin_index=0
  * Mov Status | status_sel=STATUS_TX_LESSTHAN, n=0
  *
  * \return the default state machine configuration which can then be modified.
@@ -413,7 +413,7 @@ static inline uint pio_get_index(PIO pio) {
     return pio == pio1 ? 1 : 0;
 }
 
-/*! \brief Setup the function select for a GPIO to use output from the given PIO instance 
+/*! \brief Setup the function select for a GPIO to use output from the given PIO instance
  *  \ingroup hardware_pio
  *
  * PIO appears as an alternate function in the GPIO muxing, just like an SPI
