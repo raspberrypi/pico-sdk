@@ -10,6 +10,11 @@
 #include "pico.h"
 #include "hardware/sync.h"
 
+// PICO_CONFIG: PICO_QUEUE_MAX_LEVEL, Maintain a field for the highest level that has been reached by a queue, type=bool, default=0, advanced=true, group=queue
+#ifndef PICO_QUEUE_MAX_LEVEL
+#define PICO_QUEUE_MAX_LEVEL 0
+#endif
+
 /** \file queue.h
  * \defgroup queue queue
  * Multi-core and IRQ safe queue implementation.
@@ -31,6 +36,9 @@ typedef struct {
     uint16_t rptr;
     uint16_t element_size;
     uint16_t element_count;
+#if PICO_QUEUE_MAX_LEVEL
+    uint16_t max_level;
+#endif
 } queue_t;
 
 /*! \brief Initialise a queue with a specific spinlock for concurrency protection
@@ -92,6 +100,32 @@ static inline uint queue_get_level(queue_t *q) {
     spin_unlock(q->core.spin_lock, save);
     return level;
 }
+
+/*! \brief Returns the highest level reached by the specified queue since it was created
+ *         or since the max level was reset
+ *  \ingroup queue
+ *
+ * \param q Pointer to a queue_t structure, used as a handle
+ * \return Maximum level of the queue
+ */
+#if PICO_QUEUE_MAX_LEVEL
+static inline uint queue_get_max_level(queue_t *q) {
+    return q->max_level;
+}
+#endif
+
+/*! \brief Reset the highest level reached of the specified queue.
+ *  \ingroup queue
+ *
+ * \param q Pointer to a queue_t structure, used as a handle
+ */
+#if PICO_QUEUE_MAX_LEVEL
+static inline void queue_reset_max_level(queue_t *q) {
+    uint32_t save = spin_lock_blocking(q->core.spin_lock);
+    q->max_level = queue_get_level_unsafe(q);
+    spin_unlock(q->core.spin_lock, save);
+}
+#endif
 
 /*! \brief Check if queue is empty
  *  \ingroup queue
