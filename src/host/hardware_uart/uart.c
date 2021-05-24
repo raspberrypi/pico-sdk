@@ -24,7 +24,7 @@ struct termios _tty;
 static tcflag_t _res_oflg = 0;
 static tcflag_t _res_lflg = 0;
 
-void _resetty(void) {
+void _resettty(void) {
     if (!isatty(STDIN_FILENO))
         return;
 
@@ -49,7 +49,7 @@ void _inittty(void) {
     tcsetattr(STDIN_FILENO, TCSANOW, &_tty);
 
     fcntl(STDIN_FILENO, F_SETFL, FNONBLOCK);
-    atexit(_resetty);
+    atexit(_resettty);
 }
 
 #else
