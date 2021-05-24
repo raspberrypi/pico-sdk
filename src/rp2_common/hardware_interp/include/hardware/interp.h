@@ -87,6 +87,14 @@ void interp_claim_lane_mask(interp_hw_t *interp, uint lane_mask);
  */
 void interp_unclaim_lane(interp_hw_t *interp, uint lane);
 
+/*! \brief Release previously claimed interpolator lanes \see interp_claim_lane_mask
+ *  \ingroup hardware_interp
+ *
+ * \param interp Interpolator on which to release lanes. interp0 or interp1
+ * \param lane_mask Bit pattern of lanes to unclaim (only bits 0 and 1 are valid)
+ */
+void interp_unclaim_lane_mask(interp_hw_t *interp, uint lane_mask);
+
 /*! \brief Set the interpolator shift value
  *  \ingroup interp_config
  *
@@ -277,9 +285,9 @@ static inline void interp_set_force_bits(interp_hw_t *interp, uint lane, uint bi
 }
 
 typedef struct {
-    io_rw_32 accum[2];
-    io_rw_32 base[3];
-    io_rw_32 ctrl[2];
+    uint32_t accum[2];
+    uint32_t base[3];
+    uint32_t ctrl[2];
 } interp_hw_save_t;
 
 /*! \brief Save the specified interpolator state
