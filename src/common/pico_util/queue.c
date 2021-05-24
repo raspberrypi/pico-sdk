@@ -41,7 +41,7 @@ static inline uint16_t inc_index(queue_t *q, uint16_t index) {
     return index;
 }
 
-static bool queue_add_internal(queue_t *q, void *data, bool block) {
+static bool queue_add_internal(queue_t *q, const void *data, bool block) {
     do {
         uint32_t save = spin_lock_blocking(q->core.spin_lock);
         if (queue_get_level_unsafe(q) != q->element_count) {
@@ -94,7 +94,7 @@ static bool queue_peek_internal(queue_t *q, void *data, bool block) {
     } while (true);
 }
 
-bool queue_try_add(queue_t *q, void *data) {
+bool queue_try_add(queue_t *q, const void *data) {
     return queue_add_internal(q, data, false);
 }
 
@@ -106,7 +106,7 @@ bool queue_try_peek(queue_t *q, void *data) {
     return queue_peek_internal(q, data, false);
 }
 
-void queue_add_blocking(queue_t *q, void *data) {
+void queue_add_blocking(queue_t *q, const void *data) {
     queue_add_internal(q, data, true);
 }
 

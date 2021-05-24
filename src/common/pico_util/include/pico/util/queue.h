@@ -163,7 +163,7 @@ static inline bool queue_is_full(queue_t *q) {
  * If the queue is full this function will return immediately with false, otherwise
  * the data is copied into a new value added to the queue, and this function will return true.
  */
-bool queue_try_add(queue_t *q, void *data);
+bool queue_try_add(queue_t *q, const void *data);
 
 /*! \brief Non-blocking removal of entry from the queue if non empty
  *  \ingroup queue
@@ -199,7 +199,7 @@ bool queue_try_peek(queue_t *q, void *data);
  *
  * If the queue is full this function will block, until a removal happens on the queue
  */
-void queue_add_blocking(queue_t *q, void *data);
+void queue_add_blocking(queue_t *q, const void *data);
 
 /*! \brief Blocking remove entry from queue
  *  \ingroup queue
