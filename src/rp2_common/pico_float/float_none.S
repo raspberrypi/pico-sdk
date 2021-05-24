@@ -34,6 +34,7 @@ wrapper_func __aeabi_f2iz
 wrapper_func __aeabi_f2lz
 wrapper_func __aeabi_f2uiz
 wrapper_func __aeabi_f2ulz
+wrapper_func __aeabi_f2d
 wrapper_func sqrtf
 wrapper_func cosf
 wrapper_func sinf
