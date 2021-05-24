@@ -30,6 +30,14 @@ static inline uint16_t inc_index(queue_t *q, uint16_t index) {
     if (++index > q->element_count) { // > because we have element_count + 1 elements
         index = 0;
     }
+
+#if PICO_QUEUE_MAX_LEVEL
+    uint16_t level = queue_get_level_unsafe(q);
+    if (level > q->max_level) {
+        q->max_level = level;
+    }
+#endif
+
     return index;
 }
 
