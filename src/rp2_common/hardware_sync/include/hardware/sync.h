@@ -18,15 +18,31 @@ extern "C" {
 /** \file hardware/sync.h
  *  \defgroup hardware_sync hardware_sync
  *
- * Low level hardware spin-lock, barrier and processor event API
+ * Low level hardware spim locks, barrier and processor event APIs
  *
- * Functions for synchronisation between core's, HW, etc
+ * Spin Locks
+ * ----------
  *
  * The RP2040 provides 32 hardware spin locks, which can be used to manage mutually-exclusive access to shared software
- * resources.
+ * and hardware resources.
  *
- * \note spin locks 0-15 are currently reserved for fixed uses by the SDK - i.e. if you use them other
- * functionality may break or not function optimally
+ * Generally each spin lock itself is a shared resource,
+ * i.e. the same hardware spin lock can be used by multiple higher level primitives (as long as the spin locks are neither held for long periods, nor
+ * held concurrently with other spin locks by the same core - which could lead to deadlock). A hardware spin lock that is exclusively owned can be used
+ * individually without more flexibility and without regard to other software. Note that no hardware spin lock may
+ * be acquired re-entrantly (i.e. hardware spin locks are not on their own safe for use by both thread code and IRQs) however the default spinlock related
+ * methods here (e.g. \ref spin_lock_blocking) always disable interrupts while the lock is held as use by IRQ handlers and user code is common/desirable,
+ * and spin locks are only expected to be held for brief periods.
+ *
+ * The SDK uses the following default spin lock assignments, classifying which spin locks are reserved for exclusive/special purposes
+ * vs those suitable for more general shared use:
+ *
+ * Number (ID) | Description
+ * :---------: | -----------
+ * 0-13        | Currently reserved for exclusive use by the SDK and other libraries. If you use these spin locks, you risk breaking SDK or other library functionality. Each reserved spin lock use individually has its own PICO_SPINLOCK_ID so you can search for those).
+ * 14,15       | (\ref PICO_SPINLOCK_ID_OS1 and \ref PICO_SPINLOCK_ID_OS2). Currently reserved for exclusive use by an operating system (or other system level software) co-existing with the SDK.
+ * 16-23       | (\ref PICO_SPINLOCK_ID_STRIPED_FIRST - \ref PICO_SPINLOCK_ID_STRIPED_LAST). Spin locks from this range are assigned in a round-robin fashion via next_striped_spin_lock_num(). These spin locks are share, but assigning numbers from a range reduces the probability that two higher level locking primitives using _striped_ spin locks will actually be using the same spin lock.
+ * 24-31       | (\ref PICO_SPINLOCK_ID_CLAIM_FREE_FIRST - \ref PICO_SPINLOCK_ID_CLAIM_FREE_LAST). These are reserved for exclusive used and are allocated on a first come first serve basis at runtime via \ref spin_lock_claim_unused()
  */
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_SYNC, Enable/disable assertions in the HW sync module, type=bool, default=0, group=hardware_sync
@@ -54,22 +70,32 @@ typedef volatile uint32_t spin_lock_t;
 #define PICO_SPINLOCK_ID_HARDWARE_CLAIM 11
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_FIRST, Spinlock ID for striped first, min=16, max=31, default=16, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS1, Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=12, group=hardware_sync
+#ifndef PICO_SPINLOCK_ID_OS1
+#define PICO_SPINLOCK_ID_OS1 14
+#endif
+
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS2, Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=13, group=hardware_sync
+#ifndef PICO_SPINLOCK_ID_OS2
+#define PICO_SPINLOCK_ID_OS2 15
+#endif
+
+// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_FIRST, Lowest Spinlock ID in the 'striped' range, min=0, max=31, default=16, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_STRIPED_FIRST
 #define PICO_SPINLOCK_ID_STRIPED_FIRST 16
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_LAST, Spinlock ID for striped last, min=16, max=31, default=23, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_LAST, Highest Spinlock ID in the 'striped' range, min=0, max=31, default=23, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_STRIPED_LAST
 #define PICO_SPINLOCK_ID_STRIPED_LAST 23
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, Spinlock ID for claim free first, min=16, max=31, default=24, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, Lowest Spinlock ID in the 'claim free' range, min=0, max=31, default=24, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_CLAIM_FREE_FIRST
 #define PICO_SPINLOCK_ID_CLAIM_FREE_FIRST 24
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_END, Spinlock ID for claim free end, min=16, max=31, default=31, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_END, Highest Spinlock ID in the 'claim free' range, min=0, max=31, default=31, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_CLAIM_FREE_END
 #define PICO_SPINLOCK_ID_CLAIM_FREE_END 31
 #endif
@@ -299,7 +325,21 @@ spin_lock_t *spin_lock_init(uint lock_num);
  */
 void spin_locks_reset(void);
 
-// this number is not claimed
+/*! \brief Return a spin lock number from the _striped_ range
+ *  \ingroup hardware_sync
+ *
+ * Returns a spin lock number in the range PICO_SPINLOCK_ID_STRIPED_FIRST to PICO_SPINLOCK_ID_STRIPED_LAST
+ * in a round robin fashion. This does not grant the caller exclusive access to the spin lock, so the caller
+ * must:
+ *
+ * -# Abide (with other callers) by the contract of only holding this spin lock briefly (and with IRQs disabled - the default via \ref spin_lock_blocking()),
+ * and not whilst holding other spin locks.
+ * -# Be OK with any contention caused by the - brief due to the above requirement - contention with other possible users of the spin lock.
+ *
+ * \return lock_num a spin lock number the caller may use (non exclusively)
+ * \see PICO_SPINLOCK_ID_STRIPED_FIRST
+ * \see PICO_SPINLOCK_ID_STRIPED_LAST
+ */
 uint next_striped_spin_lock_num(void);
 
 /*! \brief Mark a spin lock as used
