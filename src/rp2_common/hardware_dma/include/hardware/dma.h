@@ -409,7 +409,8 @@ static inline void dma_channel_configure(uint channel, const dma_channel_config 
  * \param read_addr Sets the initial read address
  * \param transfer_count Number of transfers to make. Not bytes, but the number of transfers of channel_config_set_transfer_data_size() to be sent.
  */
-inline static void __attribute__((always_inline)) dma_channel_transfer_from_buffer_now(uint channel, void *read_addr,
+inline static void __attribute__((always_inline)) dma_channel_transfer_from_buffer_now(uint channel, 
+                                                                                       const volatile void *read_addr,
                                                                                        uint32_t transfer_count) {
 //    check_dma_channel_param(channel);
     dma_channel_hw_t *hw = dma_channel_hw_addr(channel);
@@ -424,7 +425,7 @@ inline static void __attribute__((always_inline)) dma_channel_transfer_from_buff
  * \param write_addr Sets the initial write address
  * \param transfer_count Number of transfers to make. Not bytes, but the number of transfers of channel_config_set_transfer_data_size() to be sent.
  */
-inline static void dma_channel_transfer_to_buffer_now(uint channel, void *write_addr, uint32_t transfer_count) {
+inline static void dma_channel_transfer_to_buffer_now(uint channel, volatile void *write_addr, uint32_t transfer_count) {
     dma_channel_hw_t *hw = dma_channel_hw_addr(channel);
     hw->write_addr = (uintptr_t) write_addr;
     hw->al1_transfer_count_trig = transfer_count;
