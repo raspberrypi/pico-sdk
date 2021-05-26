@@ -17,6 +17,9 @@
 #ifndef _BOARDS_SPARKFUN_MICROMOD_H
 #define _BOARDS_SPARKFUN_MICROMOD_H
 
+// For board detection
+#define SPARKFUN_MICROMOD
+
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
 #endif
