@@ -12,6 +12,9 @@
 #ifndef _BOARDS_VGABOARD_H
 #define _BOARDS_VGABOARD_H
 
+// For board detection
+#define RASPBERRYPI_VGABOARD
+
 // Audio pins. I2S BCK, LRCK are on the same pins as PWM L/R.
 // - When outputting I2S, PWM sees BCK and LRCK, which should sound silent as
 //   they are constant duty cycle, and above the filter cutoff
