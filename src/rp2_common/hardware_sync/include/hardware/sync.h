@@ -99,7 +99,7 @@ typedef volatile uint32_t spin_lock_t;
 #warning PICO_SPINLOCK_ID_CLAIM_FREE_END has been renamed to PICO_SPINLOCK_ID_CLAIM_FREE_LAST
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_END, Highest Spinlock ID in the 'claim free' range, min=0, max=31, default=31, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_LAST, Highest Spinlock ID in the 'claim free' range, min=0, max=31, default=31, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_CLAIM_FREE_LAST
 #define PICO_SPINLOCK_ID_CLAIM_FREE_LAST 31
 #endif
