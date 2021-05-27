@@ -726,8 +726,9 @@ static inline void pio_set_irq1_source_enabled(PIO pio, enum pio_interrupt_sourc
 /*! \brief  Enable/Disable multiple sources on a PIO's IRQ 0
  *  \ingroup hardware_pio
  *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param source_mask Mask of bits, one for each source number (see \ref pio_interrupt_source) to affect
- * \param enabled true to enable all the source specified in the mask on IRQ 0, false to disable all the source specified in the mask on IRQ 0
+ * \param enabled true to enable all the sources specified in the mask on IRQ 0, false to disable all the sources specified in the mask on IRQ 0
  */
 static inline void pio_set_irq0_source_mask_enabled(PIO pio, uint32_t source_mask, bool enabled) {
     check_pio_param(pio);
@@ -742,8 +743,9 @@ static inline void pio_set_irq0_source_mask_enabled(PIO pio, uint32_t source_mas
 /*! \brief  Enable/Disable multiple sources on a PIO's IRQ 1
  *  \ingroup hardware_pio
  *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param source_mask Mask of bits, one for each source number (see \ref pio_interrupt_source) to affect
- * \param enabled true to enable all the source specified in the mask on IRQ 1, false to disable all the source specified in the mask on IRQ 1
+ * \param enabled true to enable all the sources specified in the mask on IRQ 1, false to disable all the source specified in the mask on IRQ 1
  */
 static inline void pio_set_irq1_source_mask_enabled(PIO pio, uint32_t source_mask, bool enabled) {
     check_pio_param(pio);
@@ -755,12 +757,46 @@ static inline void pio_set_irq1_source_mask_enabled(PIO pio, uint32_t source_mas
     }
 }
 
+/*! \brief  Enable/Disable a single source PIO's specified (0/1) IRQ index
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param irq_index the IRQ index; either 0 or 1
+ * \param source the source number (see \ref pio_interrupt_source)
+ * \param enabled true to enable IRQ 0 for the source, false to disable.
+ */
+static inline void pio_set_irqn_source_enabled(PIO pio, uint irq_index, enum pio_interrupt_source source, bool enabled) {
+    invalid_params_if(PIO, irq_index > 1);
+    if (irq_index) {
+        pio_set_irq1_source_enabled(pio, source, enabled);
+    } else {
+        pio_set_irq0_source_enabled(pio, source, enabled);
+    }
+}
+
+/*! \brief  Enable/Disable multiple sources on a PIO's specified (0/1) IRQ index
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param irq_index the IRQ index; either 0 or 1
+ * \param source_mask Mask of bits, one for each source number (see \ref pio_interrupt_source) to affect
+ * \param enabled true to enable all the source specified in the mask on IRQ 1, false to disable all the source specified in the mask on IRQ 1
+ */
+static inline void pio_set_irqn_source_mask_enabled(PIO pio, uint irq_index, uint32_t source_mask, bool enabled) {
+    invalid_params_if(PIO, irq_index > 1);
+    if (irq_index) {
+        pio_set_irq0_source_mask_enabled(pio, source_mask, enabled);
+    } else {
+        pio_set_irq1_source_mask_enabled(pio, source_mask, enabled);
+    }
+}
+
 /*! \brief  Determine if a particular PIO interrupt is set
  *  \ingroup hardware_pio
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param pio_interrupt_num the PIO interrupt number 0-7
- * \return true if the source a cause of an IRQ, false otherwise
+ * \return true if corresponding PIO interrupt is currently set
  */
 static inline bool pio_interrupt_get(PIO pio, uint pio_interrupt_num) {
     check_pio_param(pio);
