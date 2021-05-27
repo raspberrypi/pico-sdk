@@ -54,6 +54,6 @@ void spin_lock_unclaim(uint lock_num) {
 }
 
 int spin_lock_claim_unused(bool required) {
-    return hw_claim_unused_from_range((uint8_t*)&claimed, required, PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, PICO_SPINLOCK_ID_CLAIM_FREE_END, "No spinlocks are available");
+    return hw_claim_unused_from_range((uint8_t*)&claimed, required, PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, PICO_SPINLOCK_ID_CLAIM_FREE_LAST, "No spinlocks are available");
 }
 

@@ -18,7 +18,7 @@ extern "C" {
 /** \file hardware/sync.h
  *  \defgroup hardware_sync hardware_sync
  *
- * Low level hardware spim locks, barrier and processor event APIs
+ * Low level hardware spin locks, barrier and processor event APIs
  *
  * Spin Locks
  * ----------
@@ -39,10 +39,10 @@ extern "C" {
  *
  * Number (ID) | Description
  * :---------: | -----------
- * 0-13        | Currently reserved for exclusive use by the SDK and other libraries. If you use these spin locks, you risk breaking SDK or other library functionality. Each reserved spin lock use individually has its own PICO_SPINLOCK_ID so you can search for those).
+ * 0-13        | Currently reserved for exclusive use by the SDK and other libraries. If you use these spin locks, you risk breaking SDK or other library functionality. Each reserved spin lock used individually has its own PICO_SPINLOCK_ID so you can search for those.
  * 14,15       | (\ref PICO_SPINLOCK_ID_OS1 and \ref PICO_SPINLOCK_ID_OS2). Currently reserved for exclusive use by an operating system (or other system level software) co-existing with the SDK.
- * 16-23       | (\ref PICO_SPINLOCK_ID_STRIPED_FIRST - \ref PICO_SPINLOCK_ID_STRIPED_LAST). Spin locks from this range are assigned in a round-robin fashion via next_striped_spin_lock_num(). These spin locks are share, but assigning numbers from a range reduces the probability that two higher level locking primitives using _striped_ spin locks will actually be using the same spin lock.
- * 24-31       | (\ref PICO_SPINLOCK_ID_CLAIM_FREE_FIRST - \ref PICO_SPINLOCK_ID_CLAIM_FREE_LAST). These are reserved for exclusive used and are allocated on a first come first serve basis at runtime via \ref spin_lock_claim_unused()
+ * 16-23       | (\ref PICO_SPINLOCK_ID_STRIPED_FIRST - \ref PICO_SPINLOCK_ID_STRIPED_LAST). Spin locks from this range are assigned in a round-robin fashion via \ref next_striped_spin_lock_num(). These spin locks are shared, but assigning numbers from a range reduces the probability that two higher level locking primitives using _striped_ spin locks will actually be using the same spin lock.
+ * 24-31       | (\ref PICO_SPINLOCK_ID_CLAIM_FREE_FIRST - \ref PICO_SPINLOCK_ID_CLAIM_FREE_LAST). These are reserved for exclusive use and are allocated on a first come first served basis at runtime via \ref spin_lock_claim_unused()
  */
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_SYNC, Enable/disable assertions in the HW sync module, type=bool, default=0, group=hardware_sync
@@ -70,12 +70,12 @@ typedef volatile uint32_t spin_lock_t;
 #define PICO_SPINLOCK_ID_HARDWARE_CLAIM 11
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_OS1, Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=12, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS1, Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=14, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_OS1
 #define PICO_SPINLOCK_ID_OS1 14
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_OS2, Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=13, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS2, Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=15, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_OS2
 #define PICO_SPINLOCK_ID_OS2 15
 #endif
@@ -95,11 +95,14 @@ typedef volatile uint32_t spin_lock_t;
 #define PICO_SPINLOCK_ID_CLAIM_FREE_FIRST 24
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_END, Highest Spinlock ID in the 'claim free' range, min=0, max=31, default=31, group=hardware_sync
-#ifndef PICO_SPINLOCK_ID_CLAIM_FREE_END
-#define PICO_SPINLOCK_ID_CLAIM_FREE_END 31
+#ifdef PICO_SPINLOCK_ID_CLAIM_FREE_END
+#warning PICO_SPINLOCK_ID_CLAIM_FREE_END has been renamed to PICO_SPINLOCK_ID_CLAIM_FREE_LAST
 #endif
 
+// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_END, Highest Spinlock ID in the 'claim free' range, min=0, max=31, default=31, group=hardware_sync
+#ifndef PICO_SPINLOCK_ID_CLAIM_FREE_LAST
+#define PICO_SPINLOCK_ID_CLAIM_FREE_LAST 31
+#endif
 
 /*! \brief Insert a SEV instruction in to the code path.
  *  \ingroup hardware_sync
