@@ -88,6 +88,15 @@ static inline void adc_select_input(uint input) {
     hw_write_masked(&adc_hw->cs, input << ADC_CS_AINSEL_LSB, ADC_CS_AINSEL_BITS);
 }
 
+/*! \brief  Get the currently selected ADC input channel
+ *  \ingroup hardware_adc
+ *
+ * \return The currently selected input channel. 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
+ */
+static inline uint adc_get_selected_input(void) {
+    return (adc_hw->cs & ADC_CS_AINSEL_BITS) >> ADC_CS_AINSEL_LSB;
+}
+
 /*! \brief  Round Robin sampling selector
  *  \ingroup hardware_adc
  *
