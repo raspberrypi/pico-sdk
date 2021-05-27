@@ -14,6 +14,9 @@
 #ifndef _BOARDS_PICO_H
 #define _BOARDS_PICO_H
 
+// For board detection
+#define RASPBERRYPI_PICO
+
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
