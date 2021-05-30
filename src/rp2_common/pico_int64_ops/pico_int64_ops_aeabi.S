@@ -10,7 +10,11 @@
 
 #include "pico/asm_helper.S"
 
+#if PICO_INT64_OPS_IN_RAM
+.section RAM_SECTION_NAME(__aeabi_lmul)
+#else
 .section SECTION_NAME(__aeabi_lmul)
+#endif
 wrapper_func __aeabi_lmul
     muls   r1, r2
     muls   r3, r0
