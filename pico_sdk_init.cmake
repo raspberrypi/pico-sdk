@@ -44,6 +44,7 @@ if (NOT TARGET _pico_sdk_pre_init_marker)
             message(WARNING "pico_sdk_init() should be called after the project is created (and languages added)")
         endif()
         add_subdirectory(${PICO_SDK_PATH} pico-sdk)
+        pico_is_top_level_project(ISTOP)
     endmacro()
 
     macro(add_sub_list_dirs var)
@@ -61,11 +62,24 @@ if (NOT TARGET _pico_sdk_pre_init_marker)
         endforeach()
     endmacro()
 
+    macro(pico_register_common_scope_var NAME)
+        if (NOT ${NAME} IN_LIST PICO_PROMOTE_COMMON_SCOPE_VARS)
+            list(APPEND PICO_PROMOTE_COMMON_SCOPE_VARS ${NAME})
+        endif()
+    endmacro()
+
+    set(PICO_PROMOTE_COMMON_SCOPE_VARS
+            PICO_INCLUDE_DIRS
+            PICO_SDK_POST_LIST_DIRS
+            PICO_SDK_POST_LIST_FILES
+            PICO_CONFIG_HEADER_FILES
+            PICO_RP2040_CONFIG_HEADER_FILES
+    )
+
     macro(pico_promote_common_scope_vars)
-        set(PICO_INCLUDE_DIRS ${PICO_INCLUDE_DIRS} PARENT_SCOPE)
-        set(PICO_SDK_POST_LIST_DIRS ${PICO_SDK_POST_LIST_DIRS} PARENT_SCOPE)
-        set(PICO_SDK_POST_LIST_FILES ${PICO_SDK_POST_LIST_FILES} PARENT_SCOPE)
-        set(PICO_CONFIG_HEADER_FILES ${PICO_CONFIG_HEADER_FILES} PARENT_SCOPE)
-        set(PICO_RP2040_CONFIG_HEADER_FILES ${PICO_RP2040_CONFIG_HEADER_FILES} PARENT_SCOPE)
+        set(PICO_PROMOTE_COMMON_SCOPE_VARS ${PICO_PROMOTE_COMMON_SCOPE_VARS} PARENT_SCOPE)
+        foreach(VAR IN LISTS PICO_PROMOTE_COMMON_SCOPE_VARS)
+            SET(${VAR} ${${VAR}} PARENT_SCOPE)
+        endforeach()
     endmacro()
 endif()

@@ -50,5 +50,9 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
 
     # add docs at the end, as we gather documentation dirs as we go
     add_subdirectory(docs)
+
+    if (NOT PICO_SDK_TOP_LEVEL_PROJECT)
+        pico_promote_common_scope_vars()
+    endif()
 endif()
 
