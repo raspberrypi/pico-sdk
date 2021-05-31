@@ -70,12 +70,12 @@ typedef volatile uint32_t spin_lock_t;
 #define PICO_SPINLOCK_ID_HARDWARE_CLAIM 11
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_OS1, Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=14, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS1, First Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=14, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_OS1
 #define PICO_SPINLOCK_ID_OS1 14
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_OS2, Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=15, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS2, Second Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=15, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_OS2
 #define PICO_SPINLOCK_ID_OS2 15
 #endif
