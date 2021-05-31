@@ -17,6 +17,10 @@ endif()
 if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     message("TinyUSB available at ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH}; adding USB support.")
 
+    # todo some of this functionality now overlaps tinyusb/hw/bsp/rp2040/family.cmake and some of this
+    #  should be moved there in the future
+
+    pico_register_common_scope_var(PICO_TINYUSB_PATH)
     add_library(tinyusb_common INTERFACE)
     target_link_libraries(tinyusb_common INTERFACE
             hardware_structs
@@ -56,6 +60,7 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
             ${PICO_TINYUSB_PATH}/src/device/usbd_control.c
             ${PICO_TINYUSB_PATH}/src/class/audio/audio_device.c
             ${PICO_TINYUSB_PATH}/src/class/cdc/cdc_device.c
+            ${PICO_TINYUSB_PATH}/src/class/dfu/dfu_device.c
             ${PICO_TINYUSB_PATH}/src/class/dfu/dfu_rt_device.c
             ${PICO_TINYUSB_PATH}/src/class/hid/hid_device.c
             ${PICO_TINYUSB_PATH}/src/class/midi/midi_device.c
@@ -102,8 +107,10 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
 
     pico_add_impl_library(tinyusb_board)
     target_sources(tinyusb_board INTERFACE
-            ${PICO_TINYUSB_PATH}/hw/bsp/raspberry_pi_pico/board_raspberry_pi_pico.c
+            ${PICO_TINYUSB_PATH}/hw/bsp/rp2040/family.c
     )
 
-endif()
+    target_include_directories(tinyusb_board INTERFACE ${PICO_TINYUSB_PATH}/hw/bsp/rp2040/boards/sdk_selected)
 
+    pico_promote_common_scope_vars()
+endif()

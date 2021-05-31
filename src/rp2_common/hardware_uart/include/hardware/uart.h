@@ -101,6 +101,12 @@ static inline uint uart_get_index(uart_inst_t *uart) {
     return uart == uart1 ? 1 : 0;
 }
 
+static inline uart_inst_t *uart_get_instance(uint instance) {
+    static_assert(NUM_UARTS == 2, "");
+    invalid_params_if(UART, instance >= NUM_UARTS);
+    return instance ? uart1 : uart0;
+}
+
 static inline uart_hw_t *uart_get_hw(uart_inst_t *uart) {
     uart_get_index(uart); // check it is a hw uart
     return (uart_hw_t *)uart;
