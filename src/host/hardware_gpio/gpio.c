@@ -39,6 +39,31 @@ void gpio_set_oeover(uint gpio, uint value) {
 
 }
 
+void gpio_set_input_hysteresis_enabled(uint gpio, bool enabled){
+
+}
+
+bool gpio_is_input_hysteresis_enabled(uint gpio){
+    return true;
+}
+
+void gpio_set_slew_rate(uint gpio, enum gpio_slew_rate slew){
+
+}
+
+enum gpio_slew_rate gpio_get_slew_rate(uint gpio){
+    return GPIO_SLEW_RATE_FAST;
+}
+
+void gpio_set_drive_strength(uint gpio, enum gpio_drive_strength drive){
+
+}
+
+enum gpio_drive_strength gpio_get_drive_strength(uint gpio){
+    return GPIO_DRIVE_STRENGTH_4MA;
+}
+
+
 void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enable) {
 
 }

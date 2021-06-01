@@ -82,6 +82,53 @@ void gpio_set_oeover(uint gpio, uint value) {
     );
 }
 
+void gpio_set_input_hysteresis_enabled(uint gpio, bool enabled) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    if (enabled)
+        hw_set_bits(&padsbank0_hw->io[gpio], PADS_BANK0_GPIO0_SCHMITT_BITS);
+    else
+        hw_clear_bits(&padsbank0_hw->io[gpio], PADS_BANK0_GPIO0_SCHMITT_BITS);
+}
+
+
+bool gpio_is_input_hysteresis_enabled(uint gpio) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    return (padsbank0_hw->io[gpio] & PADS_BANK0_GPIO0_SCHMITT_BITS) != 0;
+}
+
+void gpio_set_slew_rate(uint gpio, enum gpio_slew_rate slew) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    hw_write_masked(&padsbank0_hw->io[gpio],
+                    (uint)slew << PADS_BANK0_GPIO0_SLEWFAST_LSB,
+                    PADS_BANK0_GPIO0_SLEWFAST_BITS
+    );
+}
+
+enum gpio_slew_rate gpio_get_slew_rate(uint gpio) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    return (enum gpio_slew_rate)((padsbank0_hw->io[gpio]
+            & PADS_BANK0_GPIO0_SLEWFAST_BITS)
+            >> PADS_BANK0_GPIO0_SLEWFAST_LSB);
+}
+
+
+// Enum encoding should match hardware encoding on RP2040
+static_assert(PADS_BANK0_GPIO0_DRIVE_VALUE_8MA == GPIO_DRIVE_STRENGTH_8MA, "");
+void gpio_set_drive_strength(uint gpio, enum gpio_drive_strength drive) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    hw_write_masked(&padsbank0_hw->io[gpio],
+                    (uint)drive << PADS_BANK0_GPIO0_DRIVE_LSB,
+                    PADS_BANK0_GPIO0_DRIVE_BITS
+    );
+}
+
+enum gpio_drive_strength gpio_get_drive_strength(uint gpio) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    return (enum gpio_drive_strength)((padsbank0_hw->io[gpio]
+            & PADS_BANK0_GPIO0_DRIVE_BITS)
+            >> PADS_BANK0_GPIO0_DRIVE_LSB);
+}
+
 static void gpio_irq_handler(void) {
     io_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?
                                            &iobank0_hw->proc1_irq_ctrl : &iobank0_hw->proc0_irq_ctrl;
