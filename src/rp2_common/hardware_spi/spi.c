@@ -26,7 +26,6 @@ uint spi_init(spi_inst_t *spi, uint baudrate) {
     spi_set_format(spi, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
     // Always enable DREQ signals -- harmless if DMA is not listening
     hw_set_bits(&spi_get_hw(spi)->dmacr, SPI_SSPDMACR_TXDMAE_BITS | SPI_SSPDMACR_RXDMAE_BITS);
-    spi_set_format(spi, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
 
     // Finally enable the SPI
     hw_set_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
@@ -64,6 +63,12 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
 
     // Return the frequency we were able to achieve
     return freq_in / (prescale * postdiv);
+}
+
+uint spi_get_baudrate(const spi_inst_t *spi) {
+    uint prescale = spi_get_const_hw(spi)->cpsr;
+    uint postdiv = ((spi_get_const_hw(spi)->cr0  & SPI_SSPCR0_SCR_BITS) >> SPI_SSPCR0_SCR_LSB) + 1;
+    return clock_get_hz(clk_peri) / (prescale * postdiv);
 }
 
 // Write len bytes from src to SPI. Simultaneously read len bytes from SPI to dst.
