@@ -11,14 +11,7 @@
 
 #include "hardware/platform_defs.h"
 #include "hardware/regs/xosc.h"
-#include "hardware/structs/xosc.h"
-
-// Allow lengthening startup delay to accommodate slow-starting oscillators
-
-// PICO_CONFIG: PICO_XOSC_STARTUP_DELAY_MULTIPLIER, Multiplier to lengthen xosc startup delay to accommodate slow-starting oscillators, type=int, min=1, default=1, group=hardware_xosc
-#ifndef PICO_XOSC_STARTUP_DELAY_MULTIPLIER
-#define PICO_XOSC_STARTUP_DELAY_MULTIPLIER 1
-#endif
+#include "hardware/xosc.h"
 
 #if XOSC_MHZ < 1 || XOSC_MHZ > 15
 #error XOSC_MHZ must be in the range 1-15
