@@ -560,7 +560,7 @@ static inline void dma_irqn_set_channel_enabled(uint irq_index, uint channel, bo
  * \param channel_mask Bitmask of all the channels to enable/disable. Channel 0 = bit 0, channel 1 = bit 1 etc.
  * \param enabled true to enable all the interrupts specified in the mask, false to disable all the interrupts specified in the mask.
  */
-static inline void dma_set_irqn_channel_mask_enabled(uint irq_index, uint32_t channel_mask,  bool enabled) {
+static inline void dma_irqn_set_channel_mask_enabled(uint irq_index, uint32_t channel_mask,  bool enabled) {
     invalid_params_if(DMA, irq_index > 1);
     if (irq_index) {
         dma_set_irq1_channel_mask_enabled(channel_mask, enabled);
