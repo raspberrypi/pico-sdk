@@ -50,7 +50,7 @@ set(PICO_CMSIS_VENDOR RaspberryPi)
 set(PICO_CMSIS_DEVICE RP2040)
 
 if (PICO_CMSIS_CORE_PATH)
-    add_library(cmsis_core INTERFACE)
+    pico_add_impl_library(cmsis_core)
     target_sources(cmsis_core INTERFACE
             ${PICO_CMSIS_CORE_PATH}/CMSIS/Device/${PICO_CMSIS_VENDOR}/${PICO_CMSIS_DEVICE}/Source/system_${PICO_CMSIS_DEVICE}.c
     )

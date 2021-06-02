@@ -55,7 +55,7 @@ typedef struct {
 } interp_config;
 
 static inline uint interp_index(interp_hw_t *interp) {
-    assert(interp == interp0 || interp == interp1);
+    valid_params_if(INTERP, interp == interp0 || interp == interp1);
     return interp == interp1 ? 1 : 0;
 }
 
@@ -70,6 +70,8 @@ static inline uint interp_index(interp_hw_t *interp) {
  * \param lane The lane number, 0 or 1.
  */
 void interp_claim_lane(interp_hw_t *interp, uint lane);
+// The above really should be called this for consistency
+#define interp_lane_claim interp_claim_lane
 
 /*! \brief Claim the interpolator lanes specified in the mask
  *  \ingroup hardware_interp
@@ -86,6 +88,19 @@ void interp_claim_lane_mask(interp_hw_t *interp, uint lane_mask);
  * \param lane The lane number, 0 or 1
  */
 void interp_unclaim_lane(interp_hw_t *interp, uint lane);
+// The above really should be called this for consistency
+#define interp_lane_unclaim interp_unclaim_lane
+
+/*! \brief Determine if an interpolator lane is claimed
+ *  \ingroup hardware_interp
+ *
+ * \param interp Interpolator whose lane to check
+ * \param lane The lane number, 0 or 1
+ * \return true if claimed, false otherwise
+ * \see interp_claim_lane
+ * \see interp_claim_lane_mask
+ */
+bool interp_lane_is_claimed(interp_hw_t *interp, uint lane);
 
 /*! \brief Release previously claimed interpolator lanes \see interp_claim_lane_mask
  *  \ingroup hardware_interp

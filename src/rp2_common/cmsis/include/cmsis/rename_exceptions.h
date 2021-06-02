@@ -7,6 +7,7 @@
 #ifndef _CMSIS_RENAME_EXCEPTIONS_H
 #define _CMSIS_RENAME_EXCEPTIONS_H
 
+#if LIB_CMSIS_CORE
 // PICO_CONFIG: PICO_CMSIS_RENAME_EXCEPTIONS, Whether to rename SDK exceptions such as isr_nmi to their CMSIS equivalent i.e. NMI_Handler, type=bool, default=1, group=cmsis_core
 
 // Note that since this header is included at the config stage, if you wish to override this you should do so via build compiler define
@@ -48,4 +49,5 @@
 #define isr_irq25 RTC_IRQ_Handler
 #endif
 
+#endif
 #endif /* _CMSIS_RENAME_EXCEPTIONS_H */
