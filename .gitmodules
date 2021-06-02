@@ -1,4 +1,3 @@
 [submodule "tinyusb"]
 	path = lib/tinyusb
-	url = https://github.com/raspberrypi/tinyusb.git
-	branch = pico
+	url = https://github.com/hathach/tinyusb.git
