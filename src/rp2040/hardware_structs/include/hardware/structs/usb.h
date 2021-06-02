@@ -79,6 +79,7 @@ typedef struct {
 } usb_device_dpram_t;
 
 static_assert(sizeof(usb_device_dpram_t) == USB_DPRAM_MAX, "");
+static_assert(offsetof(usb_device_dpram_t, epx_data) == 0x180, "");
 
 typedef struct {
     // 4K of DPSRAM at beginning. Note this supports 8, 16, and 32 bit accesses
@@ -108,6 +109,7 @@ typedef struct {
 } usb_host_dpram_t;
 
 static_assert(sizeof(usb_host_dpram_t) == USB_DPRAM_MAX, "");
+static_assert(offsetof(usb_host_dpram_t, epx_data) == 0x180, "");
 
 typedef struct {
     io_rw_32 dev_addr_ctrl;
