@@ -220,12 +220,34 @@ void __attribute__((noreturn)) panic_unsupported() {
     panic("not supported");
 }
 
+// PICO_CONFIG: PICO_PANIC_FUNCTION, Name of a function to use in place of the stock panic function or empty string to simply breakpoint on panic, default=panic, group=pico_runtime
+// note the default is not "panic" it is undefined
+#ifdef PICO_PANIC_FUNCTION
+#define PICO_PANIC_FUNCTION_EMPTY (__CONCAT(PICO_PANIC_FUNCTION, 1) == 1)
+#if !PICO_PANIC_FUNCTION_EMPTY
+extern void __attribute__((noreturn)) __printflike(1, 0) PICO_PANIC_FUNCTION(__unused const char *fmt, ...);
+#endif
+// Use a forwarding method here as it is a little simpler than renaming the symbol as it is used from assembler
+void __attribute__((naked, noreturn)) __printflike(1, 0) panic(__unused const char *fmt, ...) {
+    // if you get an undefined reference here, you didn't define your PICO_PANIC_FUNCTION!
+    asm (
+            "push {lr}\n"
+#if !PICO_PANIC_FUNCTION_EMPTY
+            "bl " __XSTRING(PICO_PANIC_FUNCTION) "\n"
+#endif
+            "bkpt #0\n"
+            "1: b 1b\n" // loop for ever as we are no return
+        :
+        :
+        :
+    );
+}
+#else
 // todo consider making this try harder to output if we panic early
 //  right now, print mutex may be uninitialised (in which case it deadlocks - although after printing "PANIC")
 //  more importantly there may be no stdout/UART initialized yet
 // todo we may want to think about where we print panic messages to; writing to USB appears to work
 //  though it doesn't seem like we can expect it to... fine for now
-//
 void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
     puts("\n*** PANIC ***\n");
     if (fmt) {
@@ -246,6 +268,7 @@ void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
 
     _exit(1);
 }
+#endif
 
 void hard_assertion_failure(void) {
     panic("Hard assert");
