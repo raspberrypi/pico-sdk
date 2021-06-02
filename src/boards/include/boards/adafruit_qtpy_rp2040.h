@@ -30,7 +30,7 @@
 #endif
 
 #ifndef PICO_DEFAULT_UART_RX_PIN
-#define PICO_DEFAULT_UART_RX_PIN 9
+#define PICO_DEFAULT_UART_RX_PIN 5
 #endif
 
 //------------- LED -------------//
