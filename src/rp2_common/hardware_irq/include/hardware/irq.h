@@ -95,8 +95,8 @@
 #define PICO_DEFAULT_IRQ_PRIORITY 0x80
 #endif
 
-#define PICO_LOWEST_IRQ_PRIORITY 0x01
-#define PICO_HIGHEST_IRQ_PRIORITY 0xff
+#define PICO_LOWEST_IRQ_PRIORITY 0xff
+#define PICO_HIGHEST_IRQ_PRIORITY 0x00
 
 // PICO_CONFIG: PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY, Set default shared IRQ order priority, default=0x80, group=hardware_irq
 #ifndef PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY
@@ -123,9 +123,12 @@ typedef void (*irq_handler_t)(void);
  *  \ingroup hardware_irq
  *
  * \param num Interrupt number
- * \param hardware_priority Priority to set. Hardware priorities range from 0 (lowest) to 255 (highest) though only
- * the top 2 bits are significant on ARM Cortex M0+. To make it easier to specify higher or lower priorities
- * than the default, all IRQ priorities are initialized to PICO_DEFAULT_IRQ_PRIORITY by the SDK runtime at startup.
+ * \param hardware_priority Priority to set.
+ * Numerically-lower values indicate a higher priority. Hardware priorities
+ * range from 0 (highest priority) to 255 (lowest priority) though only the
+ * top 2 bits are significant on ARM Cortex-M0+. To make it easier to specify
+ * higher or lower priorities than the default, all IRQ priorities are
+ * initialized to PICO_DEFAULT_IRQ_PRIORITY by the SDK runtime at startup.
  * PICO_DEFAULT_IRQ_PRIORITY defaults to 0x80
  */
 void irq_set_priority(uint num, uint8_t hardware_priority);
@@ -252,7 +255,7 @@ static inline void irq_clear(uint int_num) {
 void irq_set_pending(uint num);
 
 
-/*! \brief Perform IRQ priority intiialization for the current core
+/*! \brief Perform IRQ priority initialization for the current core
  *
  * \note This is an internal method and user should generally not call it.
  */

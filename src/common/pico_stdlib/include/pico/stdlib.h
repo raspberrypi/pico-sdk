@@ -44,15 +44,15 @@ extern "C" {
 // respective INTERFACE libraries, so these defines are set if the library
 // is included for the target executable
 
-#if PICO_STDIO_UART
+#if LIB_PICO_STDIO_UART
 #include "pico/stdio_uart.h"
 #endif
 
-#if PICO_STDIO_USB
+#if LIB_PICO_STDIO_USB
 #include "pico/stdio_usb.h"
 #endif
 
-#if PICO_STDIO_SEMIHOSTING
+#if LIB_PICO_STDIO_SEMIHOSTING
 #include "pico/stdio_semihosting.h"
 #endif
 

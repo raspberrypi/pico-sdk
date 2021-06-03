@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.13)
+
+# Note: this CMakeLists.txt can be used as a top-level CMakeLists.txt for the SDK itself. For all other uses
+# it is included as a subdirectory via the pico_sdk_init() method provided by pico_sdk_init.cmake
 if (NOT TARGET _pico_sdk_inclusion_marker)
     add_library(_pico_sdk_inclusion_marker INTERFACE)
+    # This is a no-op unless we are the top-level CMakeLists.txt
     include(pico_sdk_init.cmake)
 
     project(pico_sdk C CXX ASM)
@@ -24,6 +28,7 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
 
     # allow customization
     add_sub_list_dirs(PICO_SDK_PRE_LIST_DIRS)
+    add_sub_list_files(PICO_SDK_PRE_LIST_FILES)
 
     add_subdirectory(tools)
     add_subdirectory(src)
@@ -32,6 +37,7 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
 
     # allow customization
     add_sub_list_dirs(PICO_SDK_POST_LIST_DIRS)
+    add_sub_list_files(PICO_SDK_POST_LIST_FILES)
 
     if (PICO_SDK_TOP_LEVEL_PROJECT AND NOT DEFINED PICO_SDK_TESTS_ENABLED)
         set(PICO_SDK_TESTS_ENABLED 1)
@@ -44,5 +50,9 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
 
     # add docs at the end, as we gather documentation dirs as we go
     add_subdirectory(docs)
+
+    if (NOT PICO_SDK_TOP_LEVEL_PROJECT)
+        pico_promote_common_scope_vars()
+    endif()
 endif()
 

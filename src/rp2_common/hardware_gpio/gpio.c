@@ -10,7 +10,9 @@
 #include "hardware/structs/iobank0.h"
 #include "hardware/irq.h"
 
+#if LIB_PICO_BINARY_INFO
 #include "pico/binary_info.h"
+#endif
 
 static gpio_irq_callback_t _callbacks[NUM_CORES];
 
@@ -55,6 +57,15 @@ void gpio_set_pulls(uint gpio, bool up, bool down) {
     );
 }
 
+// Direct override for per-GPIO IRQ signal
+void gpio_set_irqover(uint gpio, uint value) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    hw_write_masked(&iobank0_hw->io[gpio].ctrl,
+                   value << IO_BANK0_GPIO0_CTRL_IRQOVER_LSB,
+                   IO_BANK0_GPIO0_CTRL_IRQOVER_BITS
+    );
+}
+
 // Direct overrides for pad controls
 void gpio_set_inover(uint gpio, uint value) {
     invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
@@ -78,6 +89,53 @@ void gpio_set_oeover(uint gpio, uint value) {
                    value << IO_BANK0_GPIO0_CTRL_OEOVER_LSB,
                    IO_BANK0_GPIO0_CTRL_OEOVER_BITS
     );
+}
+
+void gpio_set_input_hysteresis_enabled(uint gpio, bool enabled) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    if (enabled)
+        hw_set_bits(&padsbank0_hw->io[gpio], PADS_BANK0_GPIO0_SCHMITT_BITS);
+    else
+        hw_clear_bits(&padsbank0_hw->io[gpio], PADS_BANK0_GPIO0_SCHMITT_BITS);
+}
+
+
+bool gpio_is_input_hysteresis_enabled(uint gpio) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    return (padsbank0_hw->io[gpio] & PADS_BANK0_GPIO0_SCHMITT_BITS) != 0;
+}
+
+void gpio_set_slew_rate(uint gpio, enum gpio_slew_rate slew) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    hw_write_masked(&padsbank0_hw->io[gpio],
+                    (uint)slew << PADS_BANK0_GPIO0_SLEWFAST_LSB,
+                    PADS_BANK0_GPIO0_SLEWFAST_BITS
+    );
+}
+
+enum gpio_slew_rate gpio_get_slew_rate(uint gpio) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    return (enum gpio_slew_rate)((padsbank0_hw->io[gpio]
+            & PADS_BANK0_GPIO0_SLEWFAST_BITS)
+            >> PADS_BANK0_GPIO0_SLEWFAST_LSB);
+}
+
+
+// Enum encoding should match hardware encoding on RP2040
+static_assert(PADS_BANK0_GPIO0_DRIVE_VALUE_8MA == GPIO_DRIVE_STRENGTH_8MA, "");
+void gpio_set_drive_strength(uint gpio, enum gpio_drive_strength drive) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    hw_write_masked(&padsbank0_hw->io[gpio],
+                    (uint)drive << PADS_BANK0_GPIO0_DRIVE_LSB,
+                    PADS_BANK0_GPIO0_DRIVE_BITS
+    );
+}
+
+enum gpio_drive_strength gpio_get_drive_strength(uint gpio) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    return (enum gpio_drive_strength)((padsbank0_hw->io[gpio]
+            & PADS_BANK0_GPIO0_DRIVE_BITS)
+            >> PADS_BANK0_GPIO0_DRIVE_LSB);
 }
 
 static void gpio_irq_handler(void) {
@@ -141,7 +199,9 @@ void gpio_acknowledge_irq(uint gpio, uint32_t events) {
 void gpio_debug_pins_init() {
     gpio_init_mask(DEBUG_PIN_MASK);
     gpio_set_dir_masked(DEBUG_PIN_MASK, DEBUG_PIN_MASK);
+#if LIB_PICO_BINARY_INFO
     bi_decl_if_func_used(bi_pin_mask_with_names(DEBUG_PIN_MASK, "Debug"));
+#endif
 }
 
 void gpio_set_input_enabled(uint gpio, bool enabled) {

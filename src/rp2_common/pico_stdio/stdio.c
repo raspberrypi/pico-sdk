@@ -15,15 +15,15 @@
 #include "pico/stdio/driver.h"
 #include "pico/time.h"
 
-#if PICO_STDIO_UART
+#if LIB_PICO_STDIO_UART
 #include "pico/stdio_uart.h"
 #endif
 
-#if PICO_STDIO_USB
+#if LIB_PICO_STDIO_USB
 #include "pico/stdio_usb.h"
 #endif
 
-#if PICO_STDIO_SEMIHOSTING
+#if LIB_PICO_STDIO_SEMIHOSTING
 #include "pico/stdio_semihosting.h"
 #endif
 
@@ -34,13 +34,15 @@ static stdio_driver_t *filter;
 auto_init_mutex(print_mutex);
 
 bool stdout_serialize_begin(void) {
-    uint core_num = get_core_num();
+    lock_owner_id_t caller = lock_get_caller_owner_id();
+    // not using lock_owner_id_t to avoid backwards incompatibility change to mutex_try_enter API
+    static_assert(sizeof(lock_owner_id_t) <= 4, "");
     uint32_t owner;
     if (!mutex_try_enter(&print_mutex, &owner)) {
-        if (owner == core_num) {
+        if (owner == (uint32_t)caller) {
             return false;
         }
-        // other core owns the mutex, so lets wait
+        // we are not a nested call, so lets wait
         mutex_enter_blocking(&print_mutex);
     }
     return true;
@@ -88,8 +90,8 @@ static void stdio_out_chars_crlf(stdio_driver_t *driver, const char *s, int len)
 }
 
 static bool stdio_put_string(const char *s, int len, bool newline) {
-    bool serialzed = stdout_serialize_begin();
-    if (!serialzed) {
+    bool serialized = stdout_serialize_begin();
+    if (!serialized) {
 #if PICO_STDIO_IGNORE_NESTED_STDOUT
         return false;
 #endif
@@ -104,7 +106,7 @@ static bool stdio_put_string(const char *s, int len, bool newline) {
             stdio_out_chars_crlf(driver, &c, 1);
         }
     }
-    if (serialzed) {
+    if (serialized) {
         stdout_serialize_end();
     }
     return len;
@@ -123,7 +125,9 @@ static int stdio_get_until(char *buf, int len, absolute_time_t until) {
                 }
             }
         }
-        // todo maybe a little sleep here?
+        // we sleep here in case the in_chars methods acquire mutexes or disable IRQs and
+        // potentially starve out what they are waiting on (have seen this with USB)
+        busy_wait_us(1);
     } while (!time_reached(until));
     return PICO_ERROR_TIMEOUT;
 }
@@ -212,12 +216,12 @@ int WRAPPER_FUNC(vprintf)(const char *format, va_list va) {
 #endif
     }
     int ret;
-#if PICO_PRINTF_PICO
+#if LIB_PICO_PRINTF_PICO
     struct stdio_stack_buffer buffer = {.used = 0};
     ret = vfctprintf(stdio_buffered_printer, &buffer, format, va);
     stdio_stack_buffer_flush(&buffer);
     stdio_flush();
-#elif PICO_PRINTF_NONE
+#elif LIB_PICO_PRINTF_NONE
     extern void printf_none_assert();
     printf_none_assert();
 #else
@@ -242,24 +246,24 @@ int __printflike(1, 0) WRAPPER_FUNC(printf)(const char* format, ...)
 void stdio_init_all() {
     // todo add explicit custom, or registered although you can call stdio_enable_driver explicitly anyway
     // These are well known ones
-#if PICO_STDIO_UART
+#if LIB_PICO_STDIO_UART
     stdio_uart_init();
 #endif
 
-#if PICO_STDIO_SEMIHOSTING
+#if LIB_PICO_STDIO_SEMIHOSTING
     stdio_semihosting_init();
 #endif
 
-#if PICO_STDIO_USB
+#if LIB_PICO_STDIO_USB
     stdio_usb_init();
 #endif
 }
 
 int WRAPPER_FUNC(getchar)(void) {
     char buf[1];
-    if (0 == stdio_get_until(buf, sizeof(buf), at_the_end_of_time)) {
-        return PICO_ERROR_TIMEOUT;
-    }
+    int len = stdio_get_until(buf, 1, at_the_end_of_time);
+    if (len < 0) return len;
+    assert(len == 1);
     return (uint8_t)buf[0];
 }
 

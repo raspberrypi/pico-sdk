@@ -24,7 +24,7 @@ extern "C" {
  * \include multicore.c
 */
 
-// PICO_CONFIG: PICO_CORE1_STACK_SIZE, Stack size for core 1, min=0x100, max=0x10000, default=PICO_STACK_SIZE/0x800, group=pico_multicore
+// PICO_CONFIG: PICO_CORE1_STACK_SIZE, Stack size for core 1, min=0x100, max=0x10000, default=PICO_STACK_SIZE (0x800), group=pico_multicore
 #ifndef PICO_CORE1_STACK_SIZE
 #ifdef PICO_STACK_SIZE
 #define PICO_CORE1_STACK_SIZE PICO_STACK_SIZE
@@ -84,10 +84,10 @@ static inline bool multicore_fifo_rvalid(void) {
     return !!(sio_hw->fifo_st & SIO_FIFO_ST_VLD_BITS);
 }
 
-/*! \brief Check the FIFO to see if the write FIFO is full
+/*! \brief Check the write FIFO to see if it is ready for more data
  *  \ingroup multicore_fifo
  *
- *  @return true if the FIFO is full, false otherwise
+ *  @return true if the FIFO has room for more data, false otherwise
  */
 static inline bool multicore_fifo_wready(void) {
     return !!(sio_hw->fifo_st & SIO_FIFO_ST_RDY_BITS);
@@ -119,7 +119,7 @@ uint32_t multicore_fifo_pop_blocking(void);
 
 bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out);
 
-/*! \brief Flush any data in the outgoing FIFO
+/*! \brief Flush any data in the incoming FIFO
  *  \ingroup multicore_fifo
  *
  */
@@ -130,9 +130,12 @@ static inline void multicore_fifo_drain(void) {
 
 /*! \brief Clear FIFO interrupt
  *  \ingroup multicore_fifo
+ *
+ * Note that this only clears an interrupt that was caused by the ROE or WOF flags.
+ * To clear the VLD flag you need to use one of the 'pop' or 'drain' functions.
 */
 static inline void multicore_fifo_clear_irq(void) {
-    // Write any value to clear any interrupts
+    // Write any value to clear the error flags
     sio_hw->fifo_st = 0xff;
 }
 

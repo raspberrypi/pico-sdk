@@ -14,3 +14,5 @@ if (NOT PICO_BARE_METAL)
 endif()
 
 pico_add_doxygen(${CMAKE_CURRENT_LIST_DIR})
+
+pico_promote_common_scope_vars()

@@ -39,6 +39,11 @@ int dma_claim_unused_channel(bool required) {
     return hw_claim_unused_from_range((uint8_t*)&_claimed, required, 0, NUM_DMA_CHANNELS-1, "No DMA channels are available");
 }
 
+bool dma_channel_is_claimed(uint channel) {
+    check_dma_channel_param(channel);
+    return hw_is_claimed((uint8_t *) &_claimed, channel);
+}
+
 #ifndef NDEBUG
 
 void print_dma_ctrl(dma_channel_hw_t *channel) {

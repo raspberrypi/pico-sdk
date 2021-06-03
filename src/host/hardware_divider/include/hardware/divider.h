@@ -78,7 +78,7 @@ static inline int32_t hw_divider_s32_remainder_wait() {
 }
 
 static inline uint32_t hw_divider_u32_quotient(uint32_t a, uint32_t b) {
-    return b ? (a / b) : -1;
+    return b ? (a / b) : (uint32_t)(-1);
 }
 
 static inline uint32_t hw_divider_u32_remainder(uint32_t a, uint32_t b) {

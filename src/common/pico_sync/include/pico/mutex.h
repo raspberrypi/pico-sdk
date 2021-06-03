@@ -28,11 +28,16 @@ extern "C" {
  *
  * See \ref critical_section.h for protecting access between multiple cores AND IRQ handlers
  */
-
 typedef struct __packed_aligned mutex {
     lock_core_t core;
-    int8_t owner; //! core number or -1 for unowned
+    lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
+    uint8_t recursion_state;    //! 0 means non recursive (owner or unowned)
+                                //! 1 is a maxed out recursive lock
+                                //! 2-254 is an owned lock
+                                //! 255 is an un-owned lock
 } mutex_t;
+
+#define MAX_RECURSION_STATE ((uint8_t)255)
 
 /*! \brief  Initialise a mutex structure
  *  \ingroup mutex
@@ -40,6 +45,15 @@ typedef struct __packed_aligned mutex {
  * \param mtx Pointer to mutex structure
  */
 void mutex_init(mutex_t *mtx);
+
+/*! \brief  Initialise a recursive mutex structure
+ *  \ingroup mutex
+ *
+ * A recursive mutex may be entered in a nested fashion by the same owner
+ *
+ * \param mtx Pointer to mutex structure
+ */
+void recursive_mutex_init(mutex_t *mtx);
 
 /*! \brief  Take ownership of a mutex
  *  \ingroup mutex
@@ -51,13 +65,15 @@ void mutex_init(mutex_t *mtx);
  */
 void mutex_enter_blocking(mutex_t *mtx);
 
-/*! \brief Check to see if a mutex is available
+/*! \brief Attempt to take ownership of a mutex
  *  \ingroup mutex
  *
- * Will return true if the mutex is unowned, false otherwise
+ * If the mutex wasn't owned, this will claim the mutex and return true.
+ * Otherwise (if the mutex was already owned) this will return false and the
+ * calling core will *NOT* own the mutex.
  *
  * \param mtx Pointer to mutex structure
- * \param owner_out If mutex is owned, and this pointer is non-zero, it will be filled in with the core number of the current owner of the mutex
+ * \param owner_out If mutex was already owned, and this pointer is non-zero, it will be filled in with the core number of the current owner of the mutex
  */
 bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
 
@@ -75,6 +91,20 @@ bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
  */
 bool mutex_enter_timeout_ms(mutex_t *mtx, uint32_t timeout_ms);
 
+/*! \brief Wait for mutex with timeout
+ *  \ingroup mutex
+ *
+ * Wait for up to the specific time to take ownership of the mutex. If the calling
+ * core can take ownership of the mutex before the timeout expires, then true will be returned
+ * and the calling core will own the mutex, otherwise false will be returned and the calling
+ * core will *NOT* own the mutex.
+ *
+ * \param mtx Pointer to mutex structure
+ * \param timeout_us The timeout in microseconds.
+ * \return true if mutex now owned, false if timeout occurred before mutex became available
+ */
+bool mutex_enter_timeout_us(mutex_t *mtx, uint32_t timeout_us);
+
 /*! \brief Wait for mutex until a specific time
  *  \ingroup mutex
  *
@@ -84,7 +114,7 @@ bool mutex_enter_timeout_ms(mutex_t *mtx, uint32_t timeout_ms);
  * core will *NOT* own the mutex.
  *
  * \param mtx Pointer to mutex structure
- * \param until The time after which to return if the core cannot take owner ship of the mutex
+ * \param until The time after which to return if the core cannot take ownership of the mutex
  * \return true if mutex now owned, false if timeout occurred before mutex became available
  */
 bool mutex_enter_block_until(mutex_t *mtx, absolute_time_t until);
@@ -128,6 +158,29 @@ static inline bool mutex_is_initialzed(mutex_t *mtx) {
  * But the initialization of the mutex is performed automatically during runtime initialization
  */
 #define auto_init_mutex(name) static __attribute__((section(".mutex_array"))) mutex_t name
+
+/*! \brief Helper macro for static definition of recursive mutexes
+ *  \ingroup mutex
+ *
+ * A recursive mutex defined as follows:
+ *
+ * ```c
+ * auto_init_recursive_mutex(my_mutex);
+ * ```
+ *
+ * Is equivalent to doing
+ *
+ * ```c
+ * static mutex_t my_mutex;
+ *
+ * void my_init_function() {
+ *    recursive_mutex_init(&my_mutex);
+ * }
+ * ```
+ *
+ * But the initialization of the mutex is performed automatically during runtime initialization
+ */
+#define auto_init_recursive_mutex(name) static __attribute__((section(".mutex_array"))) mutex_t name = { .recursion_state = MAX_RECURSION_STATE }
 
 #ifdef __cplusplus
 }

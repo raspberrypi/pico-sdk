@@ -19,64 +19,61 @@ int __time_critical_func(sem_available)(semaphore_t *sem) {
 }
 
 void __time_critical_func(sem_acquire_blocking)(semaphore_t *sem) {
-    bool block = true;
     do {
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);
         if (sem->permits > 0) {
             sem->permits--;
-            __sev();
-            block = false;
+            lock_internal_spin_unlock_with_notify(&sem->core, save);
+            break;
         }
-        spin_unlock(sem->core.spin_lock, save);
-        if (block) {
-            __wfe();
-        }
-    } while (block);
+        lock_internal_spin_unlock_with_wait(&sem->core, save);
+    } while (true);
 }
 
 bool __time_critical_func(sem_acquire_timeout_ms)(semaphore_t *sem, uint32_t timeout_ms) {
-    bool block = true;
-    absolute_time_t target = nil_time;
+    return sem_acquire_block_until(sem, make_timeout_time_ms(timeout_ms));
+}
+
+bool __time_critical_func(sem_acquire_timeout_us)(semaphore_t *sem, uint32_t timeout_us) {
+    return sem_acquire_block_until(sem, make_timeout_time_us(timeout_us));
+}
+
+bool __time_critical_func(sem_acquire_block_until)(semaphore_t *sem, absolute_time_t until) {
     do {
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);
         if (sem->permits > 0) {
             sem->permits--;
-            __sev();
-            block = false;
+            lock_internal_spin_unlock_with_notify(&sem->core, save);
+            return true;
         }
-        spin_unlock(sem->core.spin_lock, save);
-        if (block) {
-            if (is_nil_time(target)) {
-                target = make_timeout_time_ms(timeout_ms);
-            }
-            if (best_effort_wfe_or_timeout(target)) {
-                return false;
-            }
+        if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&sem->core, save, until)) {
+            return false;
         }
-    } while (block);
-    return true;
+    } while (true);
 }
 
 // todo this should really have a blocking variant for when permits are maxed out
 bool __time_critical_func(sem_release)(semaphore_t *sem) {
-    bool rc;
     uint32_t save = spin_lock_blocking(sem->core.spin_lock);
     int32_t count = sem->permits;
     if (count < sem->max_permits) {
         sem->permits = (int16_t)(count + 1);
-        __sev();
-        rc = true;
+        lock_internal_spin_unlock_with_notify(&sem->core, save);
+        return true;
     } else {
-        rc = false;
+        spin_unlock(sem->core.spin_lock, save);
+        return false;
     }
-    spin_unlock(sem->core.spin_lock, save);
-    return rc;
 }
 
 void __time_critical_func(sem_reset)(semaphore_t *sem, int16_t permits) {
     assert(permits >= 0 && permits <= sem->max_permits);
     uint32_t save = spin_lock_blocking(sem->core.spin_lock);
-    if (permits > sem->permits) __sev();
-    sem->permits = permits;
-    spin_unlock(sem->core.spin_lock, save);
+    if (permits > sem->permits) {
+        sem->permits = permits;
+        lock_internal_spin_unlock_with_notify(&sem->core, save);
+    } else {
+        sem->permits = permits;
+        spin_unlock(sem->core.spin_lock, save);
+    }
 }

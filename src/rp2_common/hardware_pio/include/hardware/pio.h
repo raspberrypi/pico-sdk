@@ -111,6 +111,11 @@ static inline void check_sm_param(__unused uint sm) {
     valid_params_if(PIO, sm < NUM_PIO_STATE_MACHINES);
 }
 
+static inline void check_sm_mask(__unused uint mask) {
+    valid_params_if(PIO, mask < (1u << NUM_PIO_STATE_MACHINES));
+}
+
+
 static inline void check_pio_param(__unused PIO pio) {
     valid_params_if(PIO, pio == pio0 || pio == pio1);
 }
@@ -267,7 +272,7 @@ static inline void sm_config_set_wrap(pio_sm_config *c, uint wrap_target, uint w
  *  \ingroup sm_config
  *
  * \param c Pointer to the configuration structure to modify
- * \param pin The raw GPIO pin number to use as the source for a `jmp pin` instruction 
+ * \param pin The raw GPIO pin number to use as the source for a `jmp pin` instruction
  */
 static inline void sm_config_set_jmp_pin(pio_sm_config *c, uint pin) {
     valid_params_if(PIO, pin < 32);
@@ -281,7 +286,7 @@ static inline void sm_config_set_jmp_pin(pio_sm_config *c, uint pin) {
  * \param c Pointer to the configuration structure to modify
  * \param shift_right true to shift ISR to right, false to shift ISR to left
  * \param autopush whether autopush is enabled
- * \param push_threshold threshold in bits to shift in before auto/conditional re-pushing of the ISR  
+ * \param push_threshold threshold in bits to shift in before auto/conditional re-pushing of the ISR
  */
 static inline void sm_config_set_in_shift(pio_sm_config *c, bool shift_right, bool autopush, uint push_threshold) {
     valid_params_if(PIO, push_threshold <= 32);
@@ -300,7 +305,7 @@ static inline void sm_config_set_in_shift(pio_sm_config *c, bool shift_right, bo
  * \param c Pointer to the configuration structure to modify
  * \param shift_right true to shift OSR to right, false to shift OSR to left
  * \param autopull whether autopull is enabled
- * \param pull_threshold threshold in bits to shift out before auto/conditional re-pulling of the OSR  
+ * \param pull_threshold threshold in bits to shift out before auto/conditional re-pulling of the OSR
  */
 static inline void sm_config_set_out_shift(pio_sm_config *c, bool shift_right, bool autopull, uint pull_threshold) {
     valid_params_if(PIO, pull_threshold <= 32);
@@ -330,7 +335,7 @@ static inline void sm_config_set_fifo_join(pio_sm_config *c, enum pio_fifo_join 
  *
  * \param c Pointer to the configuration structure to modify
  * \param sticky to enable 'sticky' output (i.e. re-asserting most recent OUT/SET pin values on subsequent cycles)
- * \param has_enable_pin true to enable auxiliary OUT enable pin 
+ * \param has_enable_pin true to enable auxiliary OUT enable pin
  * \param enable_pin_index pin index for auxiliary OUT enable
  */
 static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool has_enable_pin, uint enable_pin_index) {
@@ -352,7 +357,7 @@ static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool
 static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_status_type status_sel, uint status_n) {
     valid_params_if(PIO, status_sel == STATUS_TX_LESSTHAN || status_sel == STATUS_RX_LESSTHAN);
     c->execctrl = (c->execctrl
-                   & ~(PIO_SM0_EXECCTRL_STATUS_SEL_BITS | PIO_SM0_EXECCTRL_STATUS_N_BITS))
+                  & ~(PIO_SM0_EXECCTRL_STATUS_SEL_BITS | PIO_SM0_EXECCTRL_STATUS_N_BITS))
                   | ((((uint)status_sel) << PIO_SM0_EXECCTRL_STATUS_SEL_LSB) & PIO_SM0_EXECCTRL_STATUS_SEL_BITS)
                   | ((status_n << PIO_SM0_EXECCTRL_STATUS_N_LSB) & PIO_SM0_EXECCTRL_STATUS_N_BITS);
 }
@@ -372,7 +377,7 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  * In Shift | shift_direction=right, autopush=false, push_thrshold=32
  * Out Shift | shift_direction=right, autopull=false, pull_thrshold=32
  * Jmp Pin | 0
- * Out Special | sticky=false, has_enable_pin=false, enable_pin_index=0 
+ * Out Special | sticky=false, has_enable_pin=false, enable_pin_index=0
  * Mov Status | status_sel=STATUS_TX_LESSTHAN, n=0
  *
  * \return the default state machine configuration which can then be modified.
@@ -413,7 +418,7 @@ static inline uint pio_get_index(PIO pio) {
     return pio == pio1 ? 1 : 0;
 }
 
-/*! \brief Setup the function select for a GPIO to use output from the given PIO instance 
+/*! \brief Setup the function select for a GPIO to use output from the given PIO instance
  *  \ingroup hardware_pio
  *
  * PIO appears as an alternate function in the GPIO muxing, just like an SPI
@@ -554,6 +559,7 @@ static inline void pio_sm_set_enabled(PIO pio, uint sm, bool enabled) {
  */
 static inline void pio_set_sm_mask_enabled(PIO pio, uint32_t mask, bool enabled) {
     check_pio_param(pio);
+    check_sm_mask(mask);
     pio->ctrl = (pio->ctrl & ~mask) | (enabled ? mask : 0u);
 }
 
@@ -583,6 +589,7 @@ static inline void pio_sm_restart(PIO pio, uint sm) {
  */
 static inline void pio_restart_sm_mask(PIO pio, uint32_t mask) {
     check_pio_param(pio);
+    check_sm_mask(mask);
     pio->ctrl |= (mask << PIO_CTRL_SM_RESTART_LSB) & PIO_CTRL_SM_RESTART_BITS;
 }
 
@@ -644,6 +651,7 @@ static inline void pio_sm_clkdiv_restart(PIO pio, uint sm) {
  */
 static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
     check_pio_param(pio);
+    check_sm_mask(mask);
     pio->ctrl |= (mask << PIO_CTRL_CLKDIV_RESTART_LSB) & PIO_CTRL_CLKDIV_RESTART_BITS;
 }
 
@@ -660,8 +668,152 @@ static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
  */
 static inline void pio_enable_sm_mask_in_sync(PIO pio, uint32_t mask) {
     check_pio_param(pio);
+    check_sm_mask(mask);
     pio->ctrl |= ((mask << PIO_CTRL_CLKDIV_RESTART_LSB) & PIO_CTRL_CLKDIV_RESTART_BITS) |
                  ((mask << PIO_CTRL_SM_ENABLE_LSB) & PIO_CTRL_SM_ENABLE_BITS);
+}
+
+/*! \brief PIO interrupt source numbers for pio related IRQs
+ * \ingroup hardware_pio
+ */
+enum pio_interrupt_source {
+    pis_interrupt0 = PIO_INTR_SM0_LSB,
+    pis_interrupt1 = PIO_INTR_SM1_LSB,
+    pis_interrupt2 = PIO_INTR_SM2_LSB,
+    pis_interrupt3 = PIO_INTR_SM3_LSB,
+    pis_sm0_tx_fifo_not_full = PIO_INTR_SM0_TXNFULL_LSB,
+    pis_sm1_tx_fifo_not_full = PIO_INTR_SM1_TXNFULL_LSB,
+    pis_sm2_tx_fifo_not_full = PIO_INTR_SM2_TXNFULL_LSB,
+    pis_sm3_tx_fifo_not_full = PIO_INTR_SM3_TXNFULL_LSB,
+    pis_sm0_rx_fifo_not_empty = PIO_INTR_SM0_RXNEMPTY_LSB,
+    pis_sm1_rx_fifo_not_empty = PIO_INTR_SM1_RXNEMPTY_LSB,
+    pis_sm2_rx_fifo_not_empty = PIO_INTR_SM2_RXNEMPTY_LSB,
+    pis_sm3_rx_fifo_not_empty = PIO_INTR_SM3_RXNEMPTY_LSB,
+};
+
+/*! \brief  Enable/Disable a single source on a PIO's IRQ 0
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param source the source number (see \ref pio_interrupt_source)
+ * \param enabled true to enable IRQ 0 for the source, false to disable.
+ */
+static inline void pio_set_irq0_source_enabled(PIO pio, enum pio_interrupt_source source, bool enabled) {
+    check_pio_param(pio);
+    invalid_params_if(PIO, source >= 12);
+    if (enabled)
+        hw_set_bits(&pio->inte0, 1u << source);
+    else
+        hw_clear_bits(&pio->inte0, 1u << source);
+}
+
+/*! \brief  Enable/Disable a single source on a PIO's IRQ 1
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param source the source number (see \ref pio_interrupt_source)
+ * \param enabled true to enable IRQ 0 for the source, false to disable.
+ */
+static inline void pio_set_irq1_source_enabled(PIO pio, enum pio_interrupt_source source, bool enabled) {
+    check_pio_param(pio);
+    invalid_params_if(PIO, source >= 12);
+    if (enabled)
+        hw_set_bits(&pio->inte1, 1u << source);
+    else
+        hw_clear_bits(&pio->inte1, 1u << source);
+}
+
+/*! \brief  Enable/Disable multiple sources on a PIO's IRQ 0
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param source_mask Mask of bits, one for each source number (see \ref pio_interrupt_source) to affect
+ * \param enabled true to enable all the sources specified in the mask on IRQ 0, false to disable all the sources specified in the mask on IRQ 0
+ */
+static inline void pio_set_irq0_source_mask_enabled(PIO pio, uint32_t source_mask, bool enabled) {
+    check_pio_param(pio);
+    invalid_params_if(PIO, source_mask > PIO_INTR_BITS);
+    if (enabled) {
+        hw_set_bits(&pio->inte0, source_mask);
+    } else {
+        hw_clear_bits(&pio->inte0, source_mask);
+    }
+}
+
+/*! \brief  Enable/Disable multiple sources on a PIO's IRQ 1
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param source_mask Mask of bits, one for each source number (see \ref pio_interrupt_source) to affect
+ * \param enabled true to enable all the sources specified in the mask on IRQ 1, false to disable all the source specified in the mask on IRQ 1
+ */
+static inline void pio_set_irq1_source_mask_enabled(PIO pio, uint32_t source_mask, bool enabled) {
+    check_pio_param(pio);
+    invalid_params_if(PIO, source_mask > PIO_INTR_BITS);
+    if (enabled) {
+        hw_set_bits(&pio->inte1, source_mask);
+    } else {
+        hw_clear_bits(&pio->inte1, source_mask);
+    }
+}
+
+/*! \brief  Enable/Disable a single source on a PIO's specified (0/1) IRQ index
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param irq_index the IRQ index; either 0 or 1
+ * \param source the source number (see \ref pio_interrupt_source)
+ * \param enabled true to enable the source on the specified IRQ, false to disable.
+ */
+static inline void pio_set_irqn_source_enabled(PIO pio, uint irq_index, enum pio_interrupt_source source, bool enabled) {
+    invalid_params_if(PIO, irq_index > 1);
+    if (irq_index) {
+        pio_set_irq1_source_enabled(pio, source, enabled);
+    } else {
+        pio_set_irq0_source_enabled(pio, source, enabled);
+    }
+}
+
+/*! \brief  Enable/Disable multiple sources on a PIO's specified (0/1) IRQ index
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param irq_index the IRQ index; either 0 or 1
+ * \param source_mask Mask of bits, one for each source number (see \ref pio_interrupt_source) to affect
+ * \param enabled true to enable all the sources specified in the mask on the specified IRQ, false to disable all the sources specified in the mask on the specified IRQ
+ */
+static inline void pio_set_irqn_source_mask_enabled(PIO pio, uint irq_index, uint32_t source_mask, bool enabled) {
+    invalid_params_if(PIO, irq_index > 1);
+    if (irq_index) {
+        pio_set_irq0_source_mask_enabled(pio, source_mask, enabled);
+    } else {
+        pio_set_irq1_source_mask_enabled(pio, source_mask, enabled);
+    }
+}
+
+/*! \brief  Determine if a particular PIO interrupt is set
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param pio_interrupt_num the PIO interrupt number 0-7
+ * \return true if corresponding PIO interrupt is currently set
+ */
+static inline bool pio_interrupt_get(PIO pio, uint pio_interrupt_num) {
+    check_pio_param(pio);
+    invalid_params_if(PIO, pio_interrupt_num >= 8);
+    return pio->irq & (1u << pio_interrupt_num);
+}
+
+/*! \brief  Clear a particular PIO interrupt
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param pio_interrupt_num the PIO interrupt number 0-7
+ */
+static inline void pio_interrupt_clear(PIO pio, uint pio_interrupt_num) {
+    check_pio_param(pio);
+    invalid_params_if(PIO, pio_interrupt_num >= 8);
+    hw_set_bits(&pio->irq, (1u << pio_interrupt_num));
 }
 
 /*! \brief Return the current program counter for a state machine
@@ -1135,6 +1287,17 @@ void pio_sm_unclaim(PIO pio, uint sm);
  * \return the state machine index or -1 if required was false, and none were free
  */
 int pio_claim_unused_sm(PIO pio, bool required);
+
+/*! \brief Determine if a PIO state machine is claimed
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; either \ref pio0 or \ref pio1
+ * \param sm State machine index (0..3)
+ * \return true if claimed, false otherwise
+ * \see pio_sm_claim
+ * \see pio_claim_sm_mask
+ */
+bool pio_sm_is_claimed(PIO pio, uint sm);
 
 #ifdef __cplusplus
 }

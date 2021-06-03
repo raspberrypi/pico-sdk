@@ -38,7 +38,10 @@ static uint16_t resetd_open(uint8_t __unused rhport, tusb_desc_interface_t const
 }
 
 // Support for parameterized reset via vendor interface control request
-static bool resetd_control_request_cb(uint8_t __unused rhport, tusb_control_request_t const *request) {
+static bool resetd_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const * request) {
+    // nothing to do with DATA & ACK stage
+    if (stage != CONTROL_STAGE_SETUP) return true;
+
     if (request->wIndex == itf_num) {
 
 #if PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL
@@ -69,10 +72,6 @@ static bool resetd_control_request_cb(uint8_t __unused rhport, tusb_control_requ
     return false;
 }
 
-static bool resetd_control_complete_cb(uint8_t __unused rhport, tusb_control_request_t __unused const *request) {
-    return true;
-}
-
 static bool resetd_xfer_cb(uint8_t __unused rhport, uint8_t __unused ep_addr, xfer_result_t __unused result, uint32_t __unused xferred_bytes) {
     return true;
 }
@@ -85,8 +84,7 @@ static usbd_class_driver_t const _resetd_driver =
     .init             = resetd_init,
     .reset            = resetd_reset,
     .open             = resetd_open,
-    .control_request  = resetd_control_request_cb,
-    .control_complete = resetd_control_complete_cb,
+    .control_xfer_cb  = resetd_control_xfer_cb,
     .xfer_cb          = resetd_xfer_cb,
     .sof              = NULL
 };
@@ -100,7 +98,7 @@ usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count) {
 
 #if PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE
 // Support for default BOOTSEL reset by changing baud rate
-void tud_cdc_line_coding_cb(uint8_t itf, cdc_line_coding_t const* p_line_coding) {
+void tud_cdc_line_coding_cb(__unused uint8_t itf, cdc_line_coding_t const* p_line_coding) {
     if (p_line_coding->bit_rate == PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE) {
 #ifdef PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED
         const uint gpio_mask = 1u << PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED;

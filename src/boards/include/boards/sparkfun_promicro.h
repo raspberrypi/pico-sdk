@@ -17,6 +17,9 @@
 #ifndef _BOARDS_SPARKFUN_PROMICRO_H
 #define _BOARDS_SPARKFUN_PROMICRO_H
 
+// For board detection
+#define SPARKFUN_PROMICRO
+
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
 #endif
@@ -44,6 +47,23 @@
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
 #define PICO_DEFAULT_I2C_SCL_PIN   17
+#endif
+
+// --- SPI ---
+#ifndef PICO_DEFAULT_SPI
+#define PICO_DEFAULT_SPI 0
+#endif
+#ifndef PICO_DEFAULT_SPI_SCK_PIN
+#define PICO_DEFAULT_SPI_SCK_PIN 22
+#endif
+#ifndef PICO_DEFAULT_SPI_TX_PIN
+#define PICO_DEFAULT_SPI_TX_PIN 23
+#endif
+#ifndef PICO_DEFAULT_SPI_RX_PIN
+#define PICO_DEFAULT_SPI_RX_PIN 20
+#endif
+#ifndef PICO_DEFAULT_SPI_CSN_PIN
+#define PICO_DEFAULT_SPI_CSN_PIN 21
 #endif
 
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1

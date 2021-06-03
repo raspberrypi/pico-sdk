@@ -96,7 +96,7 @@ enum gpio_function {
     GPIO_FUNC_PIO1 = 7,
     GPIO_FUNC_GPCK = 8,
     GPIO_FUNC_USB = 9,
-    GPIO_FUNC_NULL = 0xf,
+    GPIO_FUNC_NULL = 0x1f,
 };
 
 #define GPIO_OUT 1
@@ -138,6 +138,31 @@ enum gpio_override {
     GPIO_OVERRIDE_INVERT = 1,      ///< invert peripheral signal selected via \ref gpio_set_function
     GPIO_OVERRIDE_LOW = 2,         ///< drive low/disable output
     GPIO_OVERRIDE_HIGH = 3,        ///< drive high/enable output
+};
+
+/*! \brief Slew rate limiting levels for GPIO outputs
+ *  \ingroup hardware_gpio
+ *
+ * Slew rate limiting increases the minimum rise/fall time when a GPIO output
+ * is lightly loaded, which can help to reduce electromagnetic emissions.
+ * \sa gpio_set_slew_rate
+ */
+enum gpio_slew_rate {
+    GPIO_SLEW_RATE_SLOW = 0,  ///< Slew rate limiting enabled
+    GPIO_SLEW_RATE_FAST = 1   ///< Slew rate limiting disabled
+};
+
+/*! \brief Drive strength levels for GPIO outputs
+ *  \ingroup hardware_gpio
+ *
+ * Drive strength levels for GPIO outputs.
+ * \sa gpio_set_drive_strength
+ */
+enum gpio_drive_strength {
+    GPIO_DRIVE_STRENGTH_2MA = 0, ///< 2 mA nominal drive strength
+    GPIO_DRIVE_STRENGTH_4MA = 1, ///< 4 mA nominal drive strength
+    GPIO_DRIVE_STRENGTH_8MA = 2, ///< 8 mA nominal drive strength
+    GPIO_DRIVE_STRENGTH_12MA = 3 ///< 12 mA nominal drive strength
 };
 
 // ----------------------------------------------------------------------------
@@ -214,6 +239,16 @@ static inline void gpio_disable_pulls(uint gpio) {
     gpio_set_pulls(gpio, false, false);
 }
 
+/*! \brief Set GPIO IRQ override
+ *  \ingroup hardware_gpio
+ *
+ * Optionally invert a GPIO IRQ signal, or drive it high or low
+ *
+ * \param gpio GPIO number
+ * \param value See \ref gpio_override
+ */
+void gpio_set_irqover(uint gpio, uint value);
+
 /*! \brief Set GPIO output override
  *  \ingroup hardware_gpio
  *
@@ -245,6 +280,65 @@ void gpio_set_oeover(uint gpio, uint value);
  * \param enabled true to enable input on specified GPIO
  */
 void gpio_set_input_enabled(uint gpio, bool enabled);
+
+/*! \brief Enable/disable GPIO input hysteresis (Schmitt trigger)
+ *  \ingroup hardware_gpio
+ *
+ * Enable or disable the Schmitt trigger hysteresis on a given GPIO. This is
+ * enabled on all GPIOs by default. Disabling input hysteresis can lead to
+ * inconsistent readings when the input signal has very long rise or fall
+ * times, but slightly reduces the GPIO's input delay.
+ *
+ * \sa gpio_is_input_hysteresis_enabled
+ * \param gpio GPIO number
+ * \param enabled true to enable input hysteresis on specified GPIO
+ */
+void gpio_set_input_hysteresis_enabled(uint gpio, bool enabled);
+
+/*! \brief Determine whether input hysteresis is enabled on a specified GPIO
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_set_input_hysteresis_enabled
+ * \param gpio GPIO number
+ */
+bool gpio_is_input_hysteresis_enabled(uint gpio);
+
+
+/*! \brief Set slew rate for a specified GPIO
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_get_slew_rate
+ * \param gpio GPIO number
+ * \param slew GPIO output slew rate
+ */
+void gpio_set_slew_rate(uint gpio, enum gpio_slew_rate slew);
+
+/*! \brief Determine current slew rate for a specified GPIO
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_set_slew_rate
+ * \param gpio GPIO number
+ * \return Current slew rate of that GPIO
+ */
+enum gpio_slew_rate gpio_get_slew_rate(uint gpio);
+
+/*! \brief Set drive strength for a specified GPIO
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_get_drive_strength
+ * \param gpio GPIO number
+ * \param drive GPIO output drive strength
+ */
+void gpio_set_drive_strength(uint gpio, enum gpio_drive_strength drive);
+
+/*! \brief Determine current slew rate for a specified GPIO
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_set_drive_strength
+ * \param gpio GPIO number
+ * \return Current drive strength of that GPIO
+ */
+enum gpio_drive_strength gpio_get_drive_strength(uint gpio);
 
 /*! \brief Enable or disable interrupts for specified GPIO
  *  \ingroup hardware_gpio
@@ -413,6 +507,26 @@ static inline void gpio_put(uint gpio, bool value) {
         gpio_set_mask(mask);
     else
         gpio_clr_mask(mask);
+}
+
+/*! \brief Determine whether a GPIO is currently driven high or low
+ *  \ingroup hardware_gpio
+ *
+ * This function returns the high/low output level most recently assigned to a
+ * GPIO via gpio_put() or similar. This is the value that is presented outward
+ * to the IO muxing, *not* the input level back from the pad (which can be
+ * read using gpio_get()).
+ *
+ * To avoid races, this function must not be used for read-modify-write
+ * sequences when driving GPIOs -- instead functions like gpio_put() should be
+ * used to atomically update GPIOs. This accessor is intended for debug use
+ * only.
+ *
+ * \param gpio GPIO number
+ * \return true if the GPIO output level is high, false if low.
+ */
+static inline bool gpio_get_out_level(uint gpio) {
+    return !!(sio_hw->gpio_out & (1u << gpio));
 }
 
 // ----------------------------------------------------------------------------

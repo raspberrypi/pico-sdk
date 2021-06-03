@@ -15,6 +15,11 @@
 // For board detection
 #define ADAFRUIT_QTPY_RP2040
 
+// On some samples, the xosc can take longer to stabilize than is usual
+#ifndef PICO_XOSC_STARTUP_DELAY_MULTIPLIER
+#define PICO_XOSC_STARTUP_DELAY_MULTIPLIER 64
+#endif
+
 //------------- UART -------------//
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 1
@@ -25,7 +30,7 @@
 #endif
 
 #ifndef PICO_DEFAULT_UART_RX_PIN
-#define PICO_DEFAULT_UART_RX_PIN 9
+#define PICO_DEFAULT_UART_RX_PIN 5
 #endif
 
 //------------- LED -------------//
@@ -79,7 +84,7 @@
 #endif
 
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
+#define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
 #endif
 
 // All boards have B1 RP2040

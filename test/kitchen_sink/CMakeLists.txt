@@ -6,6 +6,7 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     hardware_adc
     hardware_clocks
     hardware_divider
+    hardware_exception
     hardware_dma
     hardware_flash
     hardware_gpio

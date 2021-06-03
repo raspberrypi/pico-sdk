@@ -9,6 +9,7 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 #include "pico/binary_info/defs.h"
+#include "pico/config.h"
 
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS
@@ -23,7 +24,8 @@
 .section .vectors, "ax"
 .align 2
 
-.global __vectors
+.global __vectors, __VECTOR_TABLE
+__VECTOR_TABLE:
 __vectors:
 .word __StackTop
 .word _reset_handler
@@ -74,6 +76,11 @@ __vectors:
 .word isr_irq30
 .word isr_irq31
 
+// all default exception handlers do nothing, and we can check for them being set to our
+// default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
+.global __default_isrs_start
+__default_isrs_start:
+
 // Declare a weak symbol for each ISR.
 // By default, they will fall through to the undefined IRQ handler below (breakpoint),
 // but can be overridden by C functions with correct name.
@@ -93,6 +100,9 @@ decl_isr_bkpt isr_hardfault
 decl_isr_bkpt isr_svcall
 decl_isr_bkpt isr_pendsv
 decl_isr_bkpt isr_systick
+
+.global __default_isrs_end
+__default_isrs_end:
 
 .macro decl_isr name
 .weak \name

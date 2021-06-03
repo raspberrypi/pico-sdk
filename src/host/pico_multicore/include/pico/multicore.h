@@ -20,11 +20,13 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
 
 bool multicore_fifo_rvalid(void);
 bool multicore_fifo_wready(void);
-void multicore_fifo_push(uint32_t data);
+void multicore_fifo_push_blocking(uint32_t data);
+bool multicore_fifo_push_timeout_us(uint32_t data, uint64_t timeout_us);
 uint32_t multicore_fifo_pop_blocking();
+bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out);
 void multicore_fifo_drain(void);
 void multicore_fifo_clear_irq(void);
-int32_t multicore_fifo_get_status(void);
+uint32_t multicore_fifo_get_status(void);
 
 // call this from the lockout victim thread
 void multicore_lockout_victim_init(void);

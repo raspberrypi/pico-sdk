@@ -10,6 +10,11 @@
 #include "pico.h"
 #include "hardware/sync.h"
 
+// PICO_CONFIG: PICO_QUEUE_MAX_LEVEL, Maintain a field for the highest level that has been reached by a queue, type=bool, default=0, advanced=true, group=queue
+#ifndef PICO_QUEUE_MAX_LEVEL
+#define PICO_QUEUE_MAX_LEVEL 0
+#endif
+
 /** \file queue.h
  * \defgroup queue queue
  * Multi-core and IRQ safe queue implementation.
@@ -22,13 +27,18 @@
 extern "C" {
 #endif
 
+#include "pico/lock_core.h"
+
 typedef struct {
-    spin_lock_t *lock;
+    lock_core_t core;
     uint8_t *data;
     uint16_t wptr;
     uint16_t rptr;
     uint16_t element_size;
     uint16_t element_count;
+#if PICO_QUEUE_MAX_LEVEL
+    uint16_t max_level;
+#endif
 } queue_t;
 
 /*! \brief Initialise a queue with a specific spinlock for concurrency protection
@@ -85,11 +95,37 @@ static inline uint queue_get_level_unsafe(queue_t *q) {
  * \return Number of entries in the queue
  */
 static inline uint queue_get_level(queue_t *q) {
-    uint32_t save = spin_lock_blocking(q->lock);
+    uint32_t save = spin_lock_blocking(q->core.spin_lock);
     uint level = queue_get_level_unsafe(q);
-    spin_unlock(q->lock, save);
+    spin_unlock(q->core.spin_lock, save);
     return level;
 }
+
+/*! \brief Returns the highest level reached by the specified queue since it was created
+ *         or since the max level was reset
+ *  \ingroup queue
+ *
+ * \param q Pointer to a queue_t structure, used as a handle
+ * \return Maximum level of the queue
+ */
+#if PICO_QUEUE_MAX_LEVEL
+static inline uint queue_get_max_level(queue_t *q) {
+    return q->max_level;
+}
+#endif
+
+/*! \brief Reset the highest level reached of the specified queue.
+ *  \ingroup queue
+ *
+ * \param q Pointer to a queue_t structure, used as a handle
+ */
+#if PICO_QUEUE_MAX_LEVEL
+static inline void queue_reset_max_level(queue_t *q) {
+    uint32_t save = spin_lock_blocking(q->core.spin_lock);
+    q->max_level = queue_get_level_unsafe(q);
+    spin_unlock(q->core.spin_lock, save);
+}
+#endif
 
 /*! \brief Check if queue is empty
  *  \ingroup queue
@@ -127,7 +163,7 @@ static inline bool queue_is_full(queue_t *q) {
  * If the queue is full this function will return immediately with false, otherwise
  * the data is copied into a new value added to the queue, and this function will return true.
  */
-bool queue_try_add(queue_t *q, void *data);
+bool queue_try_add(queue_t *q, const void *data);
 
 /*! \brief Non-blocking removal of entry from the queue if non empty
  *  \ingroup queue
@@ -163,7 +199,7 @@ bool queue_try_peek(queue_t *q, void *data);
  *
  * If the queue is full this function will block, until a removal happens on the queue
  */
-void queue_add_blocking(queue_t *q, void *data);
+void queue_add_blocking(queue_t *q, const void *data);
 
 /*! \brief Blocking remove entry from queue
  *  \ingroup queue

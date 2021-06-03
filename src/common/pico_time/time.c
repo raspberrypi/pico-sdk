@@ -5,12 +5,13 @@
  */
 
 #include <limits.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "pico.h"
 #include "pico/time.h"
 #include "pico/util/pheap.h"
-#include "hardware/sync.h"
+#include "pico/sync.h"
 
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(nil_time, 0);
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(at_the_end_of_time, INT64_MAX);
@@ -37,6 +38,7 @@ typedef struct alarm_pool {
 PHEAP_DEFINE_STATIC(default_alarm_pool_heap, PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS);
 static alarm_pool_entry_t default_alarm_pool_entries[PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS];
 static uint8_t default_alarm_pool_entry_ids_high[PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS];
+static lock_core_t sleep_notifier;
 
 static alarm_pool_t default_alarm_pool = {
         .heap = &default_alarm_pool_heap,
@@ -81,6 +83,7 @@ void alarm_pool_init_default() {
         alarm_pool_post_alloc_init(&default_alarm_pool,
                                    PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM);
     }
+    lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
 #endif
 }
 
@@ -276,11 +279,11 @@ static void alarm_pool_dump_key(pheap_node_id_t id, void *user_data) {
 #if PICO_ON_DEVICE
     printf("%lld (hi %02x)", to_us_since_boot(get_entry(pool, id)->target), *get_entry_id_high(pool, id));
 #else
-    printf("%ld", to_us_since_boot(get_entry(pool, id)->target));
+    printf(PRIu64, to_us_since_boot(get_entry(pool, id)->target));
 #endif
 }
 
-static int64_t repeating_timer_callback(__unused alarm_id_t id, __unused void *user_data) {
+static int64_t repeating_timer_callback(__unused alarm_id_t id, void *user_data) {
     repeating_timer_t *rt = (repeating_timer_t *)user_data;
     assert(rt->alarm_id == id);
     if (rt->callback(rt)) {
@@ -318,8 +321,9 @@ void alarm_pool_dump(alarm_pool_t *pool) {
 }
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
-static int64_t sev_callback(__unused alarm_id_t id, __unused void *user_data) {
-    __sev();
+static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
+    uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
+    lock_internal_spin_unlock_with_notify(&sleep_notifier, save);
     return 0;
 }
 #endif
@@ -338,13 +342,17 @@ void sleep_until(absolute_time_t t) {
     absolute_time_t t_before;
     update_us_since_boot(&t_before, t_before_us);
     if (absolute_time_diff_us(get_absolute_time(), t_before) > 0) {
-        if (add_alarm_at(t_before, sev_callback, NULL, false) >= 0) {
+        if (add_alarm_at(t_before, sleep_until_callback, NULL, false) >= 0) {
             // able to add alarm for just before the time
             while (!time_reached(t_before)) {
-                __wfe();
+                uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
+                lock_internal_spin_unlock_with_wait(&sleep_notifier, save);
             }
         }
     }
+#else
+    // hook in case we're in RTOS; note we assume using the alarm pool is better always if available.
+    sync_internal_yield_until_before(t);
 #endif
     // now wait until the exact time
     busy_wait_until(t);
@@ -354,13 +362,17 @@ void sleep_us(uint64_t us) {
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
     sleep_until(make_timeout_time_us(us));
 #else
-    if (us >> 32u) {
-        busy_wait_until(make_timeout_time_us(us));
+    if (us < PICO_TIME_SLEEP_OVERHEAD_ADJUST_US) {
+        busy_wait_us(us);
     } else {
-        busy_wait_us_32(us);
+        // hook in case we're in RTOS; note we assume using the alarm pool is better always if available.
+        absolute_time_t t = make_timeout_time_us(us - PICO_TIME_SLEEP_OVERHEAD_ADJUST_US);
+        sync_internal_yield_until_before(t);
+
+        // then wait the rest of thw way
+        busy_wait_until(t);
     }
 #endif
-
 }
 
 void sleep_ms(uint32_t ms) {
@@ -370,7 +382,7 @@ void sleep_ms(uint32_t ms) {
 bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
     alarm_id_t id;
-    id = add_alarm_at(timeout_timestamp, sev_callback, NULL, false);
+    id = add_alarm_at(timeout_timestamp, sleep_until_callback, NULL, false);
     if (id <= 0) {
         tight_loop_contents();
         return time_reached(timeout_timestamp);

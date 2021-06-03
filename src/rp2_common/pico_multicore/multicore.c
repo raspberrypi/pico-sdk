@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "pico/stdlib.h"
 #include "pico/multicore.h"
 #include "hardware/sync.h"
 #include "hardware/irq.h"
@@ -127,7 +126,10 @@ void multicore_launch_core1(void (*entry)(void)) {
 }
 
 void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vector_table) {
-    uint32_t cmd_sequence[] = {0, 0, 1, (uintptr_t) vector_table, (uintptr_t) sp, (uintptr_t) entry};
+    const uint32_t cmd_sequence[] = {0, 0, 1, (uintptr_t) vector_table, (uintptr_t) sp, (uintptr_t) entry};
+
+    bool enabled = irq_is_enabled(SIO_IRQ_PROC0);
+    irq_set_enabled(SIO_IRQ_PROC0, false);
 
     uint seq = 0;
     do {
@@ -142,6 +144,8 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
         // move to next state on correct response otherwise start over
         seq = cmd == response ? seq + 1 : 0;
     } while (seq < count_of(cmd_sequence));
+
+    irq_set_enabled(SIO_IRQ_PROC0, enabled);
 }
 
 #define LOCKOUT_MAGIC_START 0x73a8831eu

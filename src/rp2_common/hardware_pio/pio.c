@@ -35,6 +35,7 @@ void pio_claim_sm_mask(PIO pio, uint sm_mask) {
         if (sm_mask & 1u) pio_sm_claim(pio, i);
     }
 }
+
 void pio_sm_unclaim(PIO pio, uint sm) {
     check_sm_param(sm);
     uint which = pio_get_index(pio);
@@ -50,11 +51,17 @@ int pio_claim_unused_sm(PIO pio, bool required) {
     return index >= (int)base ? index - (int)base : -1;
 }
 
+bool pio_sm_is_claimed(PIO pio, uint sm) {
+    check_sm_param(sm);
+    uint which = pio_get_index(pio);
+    return hw_is_claimed(&claimed, which * NUM_PIO_STATE_MACHINES + sm);
+}
+
 static_assert(PIO_INSTRUCTION_COUNT <= 32, "");
 static uint32_t _used_instruction_space[2];
 
 static int _pio_find_offset_for_program(PIO pio, const pio_program_t *program) {
-    assert(program->length < PIO_INSTRUCTION_COUNT);
+    assert(program->length <= PIO_INSTRUCTION_COUNT);
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     uint32_t program_mask = (1u << program->length) - 1;
     if (program->origin >= 0) {

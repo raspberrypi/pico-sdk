@@ -11,6 +11,7 @@
 #include "hardware/clocks.h"
 #include "hardware/divider.h"
 #include "hardware/dma.h"
+#include "hardware/exception.h"
 #include "hardware/flash.h"
 #include "hardware/gpio.h"
 #include "hardware/i2c.h"

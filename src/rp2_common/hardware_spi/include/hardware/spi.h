@@ -102,14 +102,14 @@ typedef enum {
  * Puts the SPI into a known state, and enable it. Must be called before other
  * functions.
  *
- * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
- * \param baudrate Baudrate required in Hz
+ * \note There is no guarantee that the baudrate requested can be achieved exactly; the nearest will be chosen
+ * and returned
  *
- * \note There is no guarantee that the baudrate requested will be possible, the nearest will be chosen,
- * and this function does not return any indication of this. You can use the \ref spi_set_baudrate function
- * which will return the actual baudrate selected if this is important.
+ * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
+ * \param baudrate Baudrate requested in Hz
+ * \return the actual baud rate set
  */
-void spi_init(spi_inst_t *spi, uint baudrate);
+uint spi_init(spi_inst_t *spi, uint baudrate);
 
 /*! \brief Deinitialise SPI instances
  *  \ingroup hardware_spi
@@ -132,13 +132,23 @@ void spi_deinit(spi_inst_t *spi);
  */
 uint spi_set_baudrate(spi_inst_t *spi, uint baudrate);
 
+/*! \brief Get SPI baudrate
+ *  \ingroup hardware_spi
+ *
+ * Get SPI baudrate which was set by \see spi_set_baudrate
+ *
+ * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
+ * \return The actual baudrate set
+ */
+uint spi_get_baudrate(const spi_inst_t *spi);
+
 /*! \brief Convert SPI instance to hardware instance number
  *  \ingroup hardware_spi
  *
  * \param spi SPI instance
  * \return Number of SPI, 0 or 1.
  */
-static inline uint spi_get_index(spi_inst_t *spi) {
+static inline uint spi_get_index(const spi_inst_t *spi) {
     invalid_params_if(SPI, spi != spi0 && spi != spi1);
     return spi == spi1 ? 1 : 0;
 }
@@ -146,6 +156,11 @@ static inline uint spi_get_index(spi_inst_t *spi) {
 static inline spi_hw_t *spi_get_hw(spi_inst_t *spi) {
     spi_get_index(spi); // check it is a hw spi
     return (spi_hw_t *)spi;
+}
+
+static inline const spi_hw_t *spi_get_const_hw(const spi_inst_t *spi) {
+    spi_get_index(spi);  // check it is a hw spi
+    return (const spi_hw_t *)spi;
 }
 
 /*! \brief Configure SPI
@@ -197,27 +212,30 @@ static inline void spi_set_slave(spi_inst_t *spi, bool slave) {
  *  \ingroup hardware_spi
  *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
- * \return 0 if no space is available to write. Non-zero if a write is possible
- *
- * \note Although the controllers each have a 8 deep TX FIFO, the current HW implementation can only return 0 or 1
- * rather than the space available.
+ * \return false if no space is available to write. True if a write is possible
  */
-static inline size_t spi_is_writable(spi_inst_t *spi) {
-    // PL022 doesn't expose levels directly, so return values are only 0 or 1
-    return (spi_get_hw(spi)->sr & SPI_SSPSR_TNF_BITS) >> SPI_SSPSR_TNF_LSB;
+static inline bool spi_is_writable(const spi_inst_t *spi) {
+    return (spi_get_const_hw(spi)->sr & SPI_SSPSR_TNF_BITS);
 }
 
 /*! \brief Check whether a read can be done on SPI device
  *  \ingroup hardware_spi
  *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
- * \return Non-zero if a read is possible i.e. data is present
- *
- * \note Although the controllers each have a 8 deep RX FIFO, the current HW implementation can only return 0 or 1
- * rather than the data available.
+ * \return true if a read is possible i.e. data is present
  */
-static inline size_t spi_is_readable(spi_inst_t *spi) {
-    return (spi_get_hw(spi)->sr & SPI_SSPSR_RNE_BITS) >> SPI_SSPSR_RNE_LSB;
+static inline bool spi_is_readable(const spi_inst_t *spi) {
+    return (spi_get_const_hw(spi)->sr & SPI_SSPSR_RNE_BITS);
+}
+
+/*! \brief Check whether SPI is busy
+ *  \ingroup hardware_spi
+ *
+ * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
+ * \return true if SPI is busy
+ */
+static inline bool spi_is_busy(const spi_inst_t *spi) {
+    return (spi_get_const_hw(spi)->sr & SPI_SSPSR_BSY_BITS);
 }
 
 /*! \brief Write/Read to/from an SPI device

@@ -26,10 +26,11 @@
  * THE SOFTWARE.
  */
 
-#if !defined(TINYUSB_HOST_LINKED) && !defined(TINYUSB_DEVICE_LINKED)
+#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
 
 #include "tusb.h"
 #include "pico/stdio_usb/reset_interface.h"
+#include "pico/unique_id.h"
 
 #define USBD_VID (0x2E8A) // Raspberry Pi
 #define USBD_PID (0x000a) // Raspberry Pi Pico SDK CDC
@@ -98,10 +99,12 @@ static const uint8_t usbd_desc_cfg[USBD_DESC_LEN] = {
 #endif
 };
 
+static char usbd_serial_str[PICO_UNIQUE_BOARD_ID_SIZE_BYTES * 2 + 1];
+
 static const char *const usbd_desc_str[] = {
     [USBD_STR_MANUF] = "Raspberry Pi",
     [USBD_STR_PRODUCT] = "Pico",
-    [USBD_STR_SERIAL] = "000000000000", // TODO
+    [USBD_STR_SERIAL] = usbd_serial_str,
     [USBD_STR_CDC] = "Board CDC",
 #if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
     [USBD_STR_RPI_RESET] = "Reset",
@@ -112,14 +115,18 @@ const uint8_t *tud_descriptor_device_cb(void) {
     return (const uint8_t *)&usbd_desc_device;
 }
 
-const uint8_t *tud_descriptor_configuration_cb(uint8_t index) {
-    (void)index;
+const uint8_t *tud_descriptor_configuration_cb(__unused uint8_t index) {
     return usbd_desc_cfg;
 }
 
-const uint16_t *tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
+const uint16_t *tud_descriptor_string_cb(uint8_t index, __unused uint16_t langid) {
     #define DESC_STR_MAX (20)
     static uint16_t desc_str[DESC_STR_MAX];
+
+    // Assign the SN using the unique flash id
+    if (!usbd_serial_str[0]) {
+        pico_get_unique_board_id_string(usbd_serial_str, sizeof(usbd_serial_str));
+    }
 
     uint8_t len;
     if (index == 0) {

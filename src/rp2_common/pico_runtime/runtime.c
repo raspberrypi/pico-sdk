@@ -63,10 +63,13 @@ void runtime_init(void) {
     // Reset all peripherals to put system into a known state,
     // - except for QSPI pads and the XIP IO bank, as this is fatal if running from flash
     // - and the PLLs, as this is fatal if clock muxing has not been reset on this boot
+    // - and USB, syscfg, as this disturbs USB-to-SWD on core 1
     reset_block(~(
             RESETS_RESET_IO_QSPI_BITS |
             RESETS_RESET_PADS_QSPI_BITS |
             RESETS_RESET_PLL_USB_BITS |
+            RESETS_RESET_USBCTRL_BITS |
+            RESETS_RESET_SYSCFG_BITS |
             RESETS_RESET_PLL_SYS_BITS
     ));
 
@@ -115,7 +118,11 @@ void runtime_init(void) {
 
     // the first function pointer, not the address of it.
     for (mutex_t *m = &__mutex_array_start; m < &__mutex_array_end; m++) {
-        mutex_init(m);
+        if (m->recursion_state) {
+            recursive_mutex_init(m);
+        } else {
+            mutex_init(m);
+        }
     }
 
 #if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH)
@@ -213,16 +220,38 @@ void __attribute__((noreturn)) panic_unsupported() {
     panic("not supported");
 }
 
+// PICO_CONFIG: PICO_PANIC_FUNCTION, Name of a function to use in place of the stock panic function or empty string to simply breakpoint on panic, group=pico_runtime
+// note the default is not "panic" it is undefined
+#ifdef PICO_PANIC_FUNCTION
+#define PICO_PANIC_FUNCTION_EMPTY (__CONCAT(PICO_PANIC_FUNCTION, 1) == 1)
+#if !PICO_PANIC_FUNCTION_EMPTY
+extern void __attribute__((noreturn)) __printflike(1, 0) PICO_PANIC_FUNCTION(__unused const char *fmt, ...);
+#endif
+// Use a forwarding method here as it is a little simpler than renaming the symbol as it is used from assembler
+void __attribute__((naked, noreturn)) __printflike(1, 0) panic(__unused const char *fmt, ...) {
+    // if you get an undefined reference here, you didn't define your PICO_PANIC_FUNCTION!
+    asm (
+            "push {lr}\n"
+#if !PICO_PANIC_FUNCTION_EMPTY
+            "bl " __XSTRING(PICO_PANIC_FUNCTION) "\n"
+#endif
+            "bkpt #0\n"
+            "1: b 1b\n" // loop for ever as we are no return
+        :
+        :
+        :
+    );
+}
+#else
 // todo consider making this try harder to output if we panic early
 //  right now, print mutex may be uninitialised (in which case it deadlocks - although after printing "PANIC")
 //  more importantly there may be no stdout/UART initialized yet
 // todo we may want to think about where we print panic messages to; writing to USB appears to work
 //  though it doesn't seem like we can expect it to... fine for now
-//
 void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
     puts("\n*** PANIC ***\n");
     if (fmt) {
-#if PICO_PRINTF_NONE
+#if LIB_PICO_PRINTF_NONE
         puts(fmt);
 #else
         va_list args;
@@ -239,6 +268,7 @@ void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
 
     _exit(1);
 }
+#endif
 
 void hard_assertion_failure(void) {
     panic("Hard assert");

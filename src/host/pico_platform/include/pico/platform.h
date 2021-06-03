@@ -36,6 +36,10 @@ extern "C" {
 //int running_on_fpga() { return false; }
 extern void tight_loop_contents();
 
+#ifndef __STRING
+#define __STRING(x) #x
+#endif
+
 #ifndef _MSC_VER
 #ifndef __noreturn
 #define __noreturn __attribute((noreturn))
@@ -76,10 +80,6 @@ extern void tight_loop_contents();
 #ifndef __CONCAT
 #define __CONCAT(x,y) x ## y
 #endif
-
-#ifndef __STRING
-#define __STRING(x) #x
-#endif()
 
 #define __thread __declspec( thread )
 

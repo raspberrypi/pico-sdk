@@ -17,6 +17,9 @@
 #ifndef _BOARDS_SPARKFUN_THINGPLUS_H
 #define _BOARDS_SPARKFUN_THINGPLUS_H
 
+// For board detection
+#define SPARKFUN_THINGPLUS
+
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
 #endif
@@ -42,6 +45,21 @@
 #define PICO_DEFAULT_I2C_SCL_PIN   7
 #endif
 
+// --- SPI ---
+#ifndef PICO_DEFAULT_SPI
+#define PICO_DEFAULT_SPI 0
+#endif
+#ifndef PICO_DEFAULT_SPI_SCK_PIN
+#define PICO_DEFAULT_SPI_SCK_PIN 2
+#endif
+#ifndef PICO_DEFAULT_SPI_TX_PIN
+#define PICO_DEFAULT_SPI_TX_PIN 3
+#endif
+#ifndef PICO_DEFAULT_SPI_RX_PIN
+#define PICO_DEFAULT_SPI_RX_PIN 4
+#endif
+
+
 // spi flash
 
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
@@ -54,7 +72,7 @@
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
 
-// The thing plus has a SD Card. 
+// The thing plus has a SD Card.
 #define PICO_SD_CLK_PIN   14
 #define PICO_SD_CMD_PIN   15
 #define PICO_SD_DAT0_PIN  12

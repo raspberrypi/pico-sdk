@@ -22,7 +22,7 @@ if (NOT Pioasm_FOUND)
     set(Pioasm_TARGET Pioasm)
 
     if (NOT TARGET ${PioasmBuild_TARGET})
-        message("PIOASM will need to be built")
+        pico_message_debug("PIOASM will need to be built")
 #        message("Adding external project ${PioasmBuild_Target} in ${CMAKE_CURRENT_LIST_DIR}}")
         ExternalProject_Add(${PioasmBuild_TARGET}
                 PREFIX pioasm SOURCE_DIR ${PIOASM_SOURCE_DIR}

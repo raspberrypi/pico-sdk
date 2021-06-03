@@ -15,16 +15,21 @@
 // For board detection
 #define PIMORONI_PICOSYSTEM
 
+// --- BOARD SPECIFIC ---
 #ifndef PICOSYSTEM_VBUS_DETECT_PIN
 #define PICOSYSTEM_VBUS_DETECT_PIN 2
+#endif
+
+#ifndef PICOSYSTEM_LCD_SPI
+#define PICOSYSTEM_LCD_SPI 0
 #endif
 
 #ifndef PICOSYSTEM_LCD_RESET_PIN
 #define PICOSYSTEM_LCD_RESET_PIN 4
 #endif
 
-#ifndef PICOSYSTEM_LCD_CS_PIN
-#define PICOSYSTEM_LCD_CS_PIN 5
+#ifndef PICOSYSTEM_LCD_CSN_PIN
+#define PICOSYSTEM_LCD_CSN_PIN 5
 #endif
 
 #ifndef PICOSYSTEM_LCD_SCLK_PIN
@@ -103,6 +108,7 @@
 #define PICOSYSTEM_BAT_SENSE_PIN 26
 #endif
 
+// --- UART ---
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
 #endif
@@ -115,15 +121,30 @@
 #define PICO_DEFAULT_UART_RX_PIN 1
 #endif
 
+// --- LED ---
 // Included so basic examples will work, and set it to the green LED
 #ifndef PICO_DEFAULT_LED_PIN
 #define PICO_DEFAULT_LED_PIN PICOSYSTEM_LED_G_PIN
 #endif
+// no PICO_DEFAULT_WS2812_PIN
 
 #ifndef PICO_DEFAULT_LED_PIN_INVERTED
 #define PICO_DEFAULT_LED_PIN_INVERTED 1
 #endif
 
+// --- I2C ---
+//no PICO_DEFAULT_I2C
+//no PICO_DEFAULT_I2C_SDA_PIN
+//no PICO_DEFAULT_I2C_SCL_PIN
+
+// --- SPI ---
+// no PICO_DEFAULT_SPI
+// no PICO_DEFAULT_SPI_SCK_PIN
+// no PICO_DEFAULT_SPI_TX_PIN
+// no PICO_DEFAULT_SPI_RX_PIN
+// no PICO_DEFAULT_SPI_CSN_PIN
+
+// --- FLASH ---
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
 
 #ifndef PICO_FLASH_SPI_CLKDIV
@@ -135,7 +156,6 @@
 #endif
 
 // All boards have B1 RP2040
-
 #ifndef PICO_FLOAT_SUPPORT_ROM_V1
 #define PICO_FLOAT_SUPPORT_ROM_V1 0
 #endif
