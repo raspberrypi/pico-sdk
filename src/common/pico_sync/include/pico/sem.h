@@ -120,7 +120,7 @@ bool sem_acquire_timeout_us(semaphore_t *sem, uint32_t timeout_us);
  * \return true if permit was acquired, false if the until time was reached before
  * acquiring.
  */
-bool sem_acquire_until(semaphore_t *sem, absolute_time_t until);
+bool sem_acquire_block_until(semaphore_t *sem, absolute_time_t until);
 
 #ifdef __cplusplus
 }
