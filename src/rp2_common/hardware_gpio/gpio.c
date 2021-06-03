@@ -57,6 +57,15 @@ void gpio_set_pulls(uint gpio, bool up, bool down) {
     );
 }
 
+// Direct override for per-GPIO IRQ signal
+void gpio_set_irqover(uint gpio, uint value) {
+    invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
+    hw_write_masked(&iobank0_hw->io[gpio].ctrl,
+                   value << IO_BANK0_GPIO0_CTRL_IRQOVER_LSB,
+                   IO_BANK0_GPIO0_CTRL_IRQOVER_BITS
+    );
+}
+
 // Direct overrides for pad controls
 void gpio_set_inover(uint gpio, uint value) {
     invalid_params_if(GPIO, gpio >= NUM_BANK0_GPIOS);
