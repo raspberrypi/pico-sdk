@@ -220,7 +220,7 @@ void __attribute__((noreturn)) panic_unsupported() {
     panic("not supported");
 }
 
-// PICO_CONFIG: PICO_PANIC_FUNCTION, Name of a function to use in place of the stock panic function or empty string to simply breakpoint on panic, default=panic, group=pico_runtime
+// PICO_CONFIG: PICO_PANIC_FUNCTION, Name of a function to use in place of the stock panic function or empty string to simply breakpoint on panic, group=pico_runtime
 // note the default is not "panic" it is undefined
 #ifdef PICO_PANIC_FUNCTION
 #define PICO_PANIC_FUNCTION_EMPTY (__CONCAT(PICO_PANIC_FUNCTION, 1) == 1)
