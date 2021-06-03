@@ -239,6 +239,16 @@ static inline void gpio_disable_pulls(uint gpio) {
     gpio_set_pulls(gpio, false, false);
 }
 
+/*! \brief Set GPIO IRQ override
+ *  \ingroup hardware_gpio
+ *
+ * Optionally invert a GPIO IRQ signal, or drive it high or low
+ *
+ * \param gpio GPIO number
+ * \param value See \ref gpio_override
+ */
+void gpio_set_irqover(uint gpio, uint value);
+
 /*! \brief Set GPIO output override
  *  \ingroup hardware_gpio
  *

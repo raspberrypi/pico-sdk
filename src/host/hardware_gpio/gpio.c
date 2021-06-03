@@ -27,6 +27,10 @@ void gpio_set_pulls(uint gpio, bool up, bool down) {
 
 }
 
+void gpio_set_irqover(uint gpio, uint value) {
+
+}
+
 void gpio_set_outover(uint gpio, uint value) {
 
 }

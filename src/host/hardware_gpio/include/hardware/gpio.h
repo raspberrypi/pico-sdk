@@ -61,6 +61,8 @@ void gpio_disable_pulls(uint gpio);
 
 void gpio_set_pulls(uint gpio, bool up, bool down);
 
+void gpio_set_irqover(uint gpio, uint value);
+
 void gpio_set_outover(uint gpio, uint value);
 
 void gpio_set_inover(uint gpio, uint value);
