@@ -27,7 +27,7 @@ void pico_get_unique_board_id(pico_unique_board_id_t *id_out) {
     *id_out = retrieved_id;
 }
 
-void pico_get_unique_board_id_string(char *id_out, uint len) {
+void pico_get_unique_board_id_string(char *id_out, uint32_t len) {
     assert(len > 0);
     size_t i;
     // Generate hex one nibble at a time
