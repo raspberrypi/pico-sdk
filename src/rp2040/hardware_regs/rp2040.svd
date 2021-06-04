@@ -22320,13 +22320,13 @@
             <field>
               <access>read-write</access>
               <bitRange>[20:20]</bitRange>
-              <description>Multiplies the startup_delay by 4. This is of little value to the user given that the delay can be programmed directly</description>
+              <description>Multiplies the startup_delay by 4. This is of little value to the user given that the delay can be programmed directly. Set to 0 at reset.</description>
               <name>X4</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[13:0]</bitRange>
-              <description>in multiples of 256*xtal_period</description>
+              <description>in multiples of 256*xtal_period. Set to 0xc4 at reset (approx 50 000 cycles)</description>
               <name>DELAY</name>
             </field>
           </fields>
@@ -42112,14 +42112,14 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x003c</addressOffset>
-          <description>Read to sample the pad output values PIO is currently driving to the GPIOs.</description>
+          <description>Read to sample the pad output values PIO is currently driving to the GPIOs. On RP2040 there are 30 GPIOs, so the two most significant bits are hardwired to 0.</description>
           <name>DBG_PADOUT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-only</access>
           <addressOffset>0x0040</addressOffset>
-          <description>Read to sample the pad output enables (direction) PIO is currently driving to the GPIOs.</description>
+          <description>Read to sample the pad output enables (direction) PIO is currently driving to the GPIOs. On RP2040 there are 30 GPIOs, so the two most significant bits are hardwired to 0.</description>
           <name>DBG_PADOE</name>
           <resetValue>0x00000000</resetValue>
         </register>
