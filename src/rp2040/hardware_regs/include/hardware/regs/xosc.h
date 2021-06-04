@@ -128,7 +128,8 @@
 // -----------------------------------------------------------------------------
 // Field       : XOSC_STARTUP_X4
 // Description : Multiplies the startup_delay by 4. This is of little value to
-//               the user given that the delay can be programmed directly
+//               the user given that the delay can be programmed directly. Set
+//               to 0 at reset.
 #define XOSC_STARTUP_X4_RESET  "-"
 #define XOSC_STARTUP_X4_BITS   _u(0x00100000)
 #define XOSC_STARTUP_X4_MSB    _u(20)
@@ -136,7 +137,8 @@
 #define XOSC_STARTUP_X4_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : XOSC_STARTUP_DELAY
-// Description : in multiples of 256*xtal_period
+// Description : in multiples of 256*xtal_period. Set to 0xc4 at reset (approx
+//               50 000 cycles)
 #define XOSC_STARTUP_DELAY_RESET  "-"
 #define XOSC_STARTUP_DELAY_BITS   _u(0x00003fff)
 #define XOSC_STARTUP_DELAY_MSB    _u(13)
