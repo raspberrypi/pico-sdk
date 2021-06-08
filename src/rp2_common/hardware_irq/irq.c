@@ -63,7 +63,7 @@ void irq_set_pending(uint num) {
     *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ISPR_OFFSET)) = 1u << num;
 }
 
-#if PICO_MAX_SHARED_IRQ_HANDLERS
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
 // limited by 8 bit relative links (and reality)
 static_assert(PICO_MAX_SHARED_IRQ_HANDLERS >= 1 && PICO_MAX_SHARED_IRQ_HANDLERS < 0x7f, "");
 
@@ -133,6 +133,7 @@ irq_handler_t irq_get_exclusive_handler(uint num) {
 }
 
 
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
 static uint16_t make_branch(uint16_t *from, void *to) {
     uint32_t ui_from = (uint32_t)from;
     uint32_t ui_to = (uint32_t)to;
@@ -179,13 +180,11 @@ static inline int8_t slot_diff(struct irq_handler_chain_slot *to, struct irq_han
 static inline int8_t get_slot_index(struct irq_handler_chain_slot *slot) {
     return slot_diff(slot, irq_handler_chain_slots);
 }
+#endif
 
 void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_priority) {
     check_irq_param(num);
-#if PICO_DISABLE_SHARED_IRQ_HANDLERS
-
-#endif
-#if PICO_NO_RAM_VECTOR_TABLE || !PICO_MAX_SHARED_IRQ_HANDLERS
+#if PICO_NO_RAM_VECTOR_TABLE || PICO_DISABLE_SHARED_IRQ_HANDLERS
     panic_unsupported()
 #else
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_IRQ);
@@ -261,7 +260,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
     uint32_t save = spin_lock_blocking(lock);
     irq_handler_t vtable_handler = get_vtable()[16 + num];
     if (vtable_handler != __unhandled_user_irq && vtable_handler != handler) {
-#if !PICO_DISABLE_SHARED_IRQ_HANDLERS && PICO_MAX_SHARED_IRQ_HANDLERS
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
         if (is_shared_irq_raw_handler(vtable_handler)) {
             // This is a bit tricky, as an executing IRQ handler doesn't take a lock.
 
@@ -361,7 +360,7 @@ void irq_set_priority(uint num, uint8_t hardware_priority) {
     *p = (*p & ~(0xffu << (8 * (num & 3u)))) | (((uint32_t) hardware_priority) << (8 * (num & 3u)));
 }
 
-#if !PICO_DISABLE_SHARED_IRQ_HANDLERS && PICO_MAX_SHARED_IRQ_HANDLERS
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
 // used by irq_handler_chain.S to remove the last link in a handler chain after it executes
 // note this must be called only with the last slot in a chain (and during the exception)
 void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot) {
