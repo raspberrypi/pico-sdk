@@ -195,9 +195,12 @@ struct python_output : public output_format {
                         if (arg2 & 0x8u) {
                             invalid = true;
                         } else {
-                            guts = "irq, " + std::to_string(arg2 & 7u);
+                            guts = "irq, ";
+                            auto irq = std::to_string(arg2 & 7u);
                             if (arg2 & 0x10u) {
-                                guts += " rel";
+                                guts += "rel(" + irq + ")";
+                            } else {
+                                guts += irq;
                             }
                         }
                         break;
@@ -233,12 +236,11 @@ struct python_output : public output_format {
                     std::string guts = "";
                     if (arg1 & 4u) {
                         op("pull");
-                        if (arg1 & 2u) guts = "ifempty";
+                        if (arg1 & 2u) guts = "ifempty, ";
                     } else {
                         op("push");
-                        if (arg1 & 2u) guts = "iffull";
+                        if (arg1 & 2u) guts = "iffull, ";
                     }
-                    guts += ", ";
                     guts += ((arg1 & 0x1u) ? "block" : "noblock");
                     op_guts(guts);
                 }
@@ -279,15 +281,17 @@ struct python_output : public output_format {
                     op("irq");
                     std::string guts;
                     if (arg1 & 0x2u) {
-                        guts += "clear ";
+                        guts += "clear, ";
                     } else if (arg1 & 0x1u) {
-                        guts += "wait ";
+                        guts += "wait, ";
                     } else {
-                        guts += "nowait ";
+                        guts += "nowait, ";
                     }
-                    guts += std::to_string(arg2 & 7u);
+                    auto irq = std::to_string(arg2 & 7u);
                     if (arg2 & 0x10u) {
-                        guts += " rel";
+                        guts += "rel(" + irq + ")";
+                    } else {
+                        guts += irq;
                     }
                     op_guts(guts);
                 }
