@@ -19,8 +19,9 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
 
     pico_register_common_scope_var(PICO_TINYUSB_PATH)
 
+    set(FAMILY rp2040)
     set(BOARD pico_sdk)
-    include(${PICO_TINYUSB_PATH}/hw/bsp/rp2040/family.cmake)
+    include(${PICO_TINYUSB_PATH}/hw/bsp/family_support.cmake)
 
     add_library(tinyusb_common INTERFACE)
     target_link_libraries(tinyusb_common INTERFACE tinyusb_common_base)
@@ -33,7 +34,7 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     )
 
     # unmarked version used by stdio USB
-    target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_common pico_fix_rp2040_usb_device_enumeration tinyusb_device_base)
+    target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_device_base tinyusb_common pico_fix_rp2040_usb_device_enumeration)
 
     pico_add_impl_library(tinyusb_device)
     target_link_libraries(tinyusb_device INTERFACE tinyusb_device_unmarked)
