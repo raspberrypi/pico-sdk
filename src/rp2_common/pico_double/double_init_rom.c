@@ -19,6 +19,8 @@ static __attribute__((noreturn)) void missing_double_func_shim(void) {
 #endif
 extern void double_table_shim_on_use_helper(void);
 
+void __attribute__((weak)) *sf_clz_func;
+
 void __aeabi_double_init(void) {
     int rom_version = rp2040_rom_version();
 #if PICO_DOUBLE_SUPPORT_ROM_V1
@@ -63,4 +65,6 @@ void __aeabi_double_init(void) {
         // we use the unused entry for SINCOS
         sd_table[SF_TABLE_V3_FSINCOS / 4] = (uintptr_t) double_table_shim_on_use_helper;
     }
+
+    sf_clz_func = rom_func_lookup(rom_table_code('L', '3'));
 }
