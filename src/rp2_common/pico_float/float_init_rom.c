@@ -11,7 +11,7 @@
 // NOTE THIS FUNCTION TABLE IS NOT PUBLIC OR NECESSARILY COMPLETE...
 // IT IS ***NOT*** SAFE TO CALL THESE FUNCTION POINTERS FROM ARBITRARY CODE
 uint32_t sf_table[SF_TABLE_V2_SIZE / 2];
-void *sf_clz_func;
+void __attribute__((weak)) *sf_clz_func;
 
 #if !PICO_FLOAT_SUPPORT_ROM_V1
 static __attribute__((noreturn)) void missing_float_func_shim(void) {
