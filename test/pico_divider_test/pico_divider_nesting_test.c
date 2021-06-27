@@ -158,6 +158,23 @@ void test_nesting() {
             if (0xffffffffu != a * 11 + b) {
                 FAILED();
             }
+            static uint64_t z64;
+            z64 -= 47;
+            uint64_t a64 = z64 / -13635;
+            uint64_t b64 = z64 % -13635;
+            if (z64 != a64 * -13635 + b64) {
+                FAILED();
+            }
+            // specifically check 64/32 divide
+            static uint64_t c64 = 0x13ffffffffull;
+            static uint32_t cd = 1;
+            a64 = c64 / cd;
+            b64 = c64 % cd;
+            if (c64 != a64 * cd + b64) {
+                FAILED();
+            }
+            cd++;
+
         }
         // these use the divider
         for(uint i=0;i<=100;i+=20) {
