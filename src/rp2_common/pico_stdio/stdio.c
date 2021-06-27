@@ -53,10 +53,10 @@ void stdout_serialize_end(void) {
 }
 
 #else
-static bool print_serialize_begin(void) {
+static bool stdout_serialize_begin(void) {
     return true;
 }
-static void print_serialize_end(void) {
+static void stdout_serialize_end(void) {
 }
 #endif
 
