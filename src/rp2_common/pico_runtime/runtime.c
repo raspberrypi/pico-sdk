@@ -118,7 +118,7 @@ void runtime_init(void) {
 
     // the first function pointer, not the address of it.
     for (mutex_t *m = &__mutex_array_start; m < &__mutex_array_end; m++) {
-        if (m->recursion_state) {
+        if (m->recursive) {
             recursive_mutex_init(m);
         } else {
             mutex_init(m);

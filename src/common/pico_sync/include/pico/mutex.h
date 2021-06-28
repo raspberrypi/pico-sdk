@@ -31,10 +31,8 @@ extern "C" {
 typedef struct __packed_aligned mutex {
     lock_core_t core;
     lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
-    uint8_t recursion_state;    //! 0 means non recursive (owner or unowned)
-                                //! 1 is a maxed out recursive lock
-                                //! 2-254 is an owned lock
-                                //! 255 is an un-owned lock
+    bool recursive;             //! whether the mutex is recursive
+    uint8_t enter_count;        //! for recursive mutex an ownership count
 } mutex_t;
 
 #define MAX_RECURSION_STATE ((uint8_t)255)
@@ -64,6 +62,71 @@ void recursive_mutex_init(mutex_t *mtx);
  * \param mtx Pointer to mutex structure
  */
 void mutex_enter_blocking(mutex_t *mtx);
+
+/*! \brief  Take ownership of a recursive mutex
+ *  \ingroup mutex
+ *
+ * This function will block until the calling core can claim ownership of the mutex.
+ * On return the caller core owns the mutex
+ *
+ * This is a slightly faster specialization of \ref mutex_enter_blocking for recursive mutexes only
+ *
+ * \param mtx Pointer to mutex structure
+ */
+void mutex_enter_blocking_r(mutex_t *mtx);
+
+/*! \brief  Take ownership of a non recursive mutex
+ *  \ingroup mutex
+ *
+ * This function will block until the calling core can claim ownership of the mutex.
+ * On return the caller core owns the mutex
+ *
+ * This is a slightly faster specialization of \ref mutex_enter_blocking for non recursive mutexes only
+ *
+ * \param mtx Pointer to mutex structure
+ */
+void mutex_enter_blocking_nr(mutex_t *mtx);
+
+/*! \brief Attempt to take ownership of a mutex
+ *  \ingroup mutex
+ *
+ * If the mutex wasn't owned, this will claim the mutex and return true.
+ * Otherwise (if the mutex was already owned) this will return false and the
+ * calling core will *NOT* own the mutex.
+ *
+ * \param mtx Pointer to mutex structure
+ * \param owner_out If mutex was already owned, and this pointer is non-zero, it will be filled in with the core number of the current owner of the mutex
+ */
+bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
+
+/*! \brief Attempt to take ownership of a recursive mutex
+ *  \ingroup mutex
+ *
+ * If the mutex wasn't owned, this will claim the mutex and return true.
+ * Otherwise (if the mutex was already owned) this will return false and the
+ * calling core will *NOT* own the mutex.
+ *
+ * This is a slightly faster specialization of \ref mutex_try_enter for recursive mutexes only
+ *
+ * \param mtx Pointer to mutex structure
+ * \param owner_out If mutex was already owned, and this pointer is non-zero, it will be filled in with the core number of the current owner of the mutex
+ */
+bool mutex_try_enter_r(mutex_t *mtx, uint32_t *owner_out);
+
+/*! \brief Attempt to take ownership of a non-recursive mutex
+ *  \ingroup mutex
+ *
+ * If the mutex wasn't owned, this will claim the mutex and return true.
+ * Otherwise (if the mutex was already owned) this will return false and the
+ * calling core will *NOT* own the mutex.
+ *
+ * This is a slightly faster specialization of \ref mutex_try_enter for non-recursive mutexes only
+ *
+ * \param mtx Pointer to mutex structure
+ * \param owner_out If mutex was already owned, and this pointer is non-zero, it will be filled in with the core number of the current owner of the mutex
+ */
+bool mutex_try_enter_nr(mutex_t *mtx, uint32_t *owner_out);
+
 
 /*! \brief Attempt to take ownership of a mutex
  *  \ingroup mutex
@@ -126,13 +189,31 @@ bool mutex_enter_block_until(mutex_t *mtx, absolute_time_t until);
  */
 void mutex_exit(mutex_t *mtx);
 
-/*! \brief Test for mutex initialised state
+/*! \brief  Release ownership of a recursive mutex
+ *  \ingroup mutex
+ *
+ * This is a slightly faster specialization of \ref mutex_exit for recursive mutexes only
+ *
+ * \param mtx Pointer to mutex structure
+ */
+void mutex_exit_r(mutex_t *mtx);
+
+/*! \brief  Release ownership of a non-recursive mutex
+ *  \ingroup mutex
+ *
+ * This is a slightly faster specialization of \ref mutex_exit for non-recursive mutexes only
+ *
+ * \param mtx Pointer to mutex structure
+ */
+void mutex_exit_nr(mutex_t *mtx);
+
+/*! \brief Test for mutex initialized state
  *  \ingroup mutex
  *
  * \param mtx Pointer to mutex structure
  * \return true if the mutex is initialised, false otherwise
  */
-static inline bool mutex_is_initialzed(mutex_t *mtx) {
+static inline bool mutex_is_initialized(mutex_t *mtx) {
     return mtx->core.spin_lock != 0;
 }
 
