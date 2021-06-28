@@ -8,12 +8,12 @@
 #define _HARDWARE_IRQ_H_
 
 // These two config items are also used by assembler, so keeping separate
-// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum Number of shared IRQ handers, default=4, advanced=true, group=hardware_irq
+// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum number of shared IRQ handlers, default=4, advanced=true, group=hardware_irq
 #ifndef PICO_MAX_SHARED_IRQ_HANDLERS
 #define PICO_MAX_SHARED_IRQ_HANDLERS 4u
 #endif
 
-// PICO_CONFIG: PICO_DISABLE_SHARED_IRQ_HANDLERS, Disable shared IRQ handers, type=bool, default=0, group=hardware_irq
+// PICO_CONFIG: PICO_DISABLE_SHARED_IRQ_HANDLERS, Disable shared IRQ handlers, type=bool, default=0, group=hardware_irq
 #ifndef PICO_DISABLE_SHARED_IRQ_HANDLERS
 #define PICO_DISABLE_SHARED_IRQ_HANDLERS 0
 #endif
