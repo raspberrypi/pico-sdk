@@ -150,7 +150,7 @@ bool __time_critical_func(mutex_enter_block_until)(mutex_t *mtx, absolute_time_t
 
 static void __time_critical_func(mutex_exit_nr_guts)(mutex_t *mtx) {
     uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
-    assert(lock_is_valid_owner_id(mtx->owner));
+    assert(lock_is_owner_id_valid(mtx->owner));
     mtx->owner = LOCK_INVALID_OWNER_ID;
     lock_internal_spin_unlock_with_notify(&mtx->core, save);
 }

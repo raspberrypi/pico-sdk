@@ -127,19 +127,6 @@ bool mutex_try_enter_r(mutex_t *mtx, uint32_t *owner_out);
  */
 bool mutex_try_enter_nr(mutex_t *mtx, uint32_t *owner_out);
 
-
-/*! \brief Attempt to take ownership of a mutex
- *  \ingroup mutex
- *
- * If the mutex wasn't owned, this will claim the mutex and return true.
- * Otherwise (if the mutex was already owned) this will return false and the
- * calling core will *NOT* own the mutex.
- *
- * \param mtx Pointer to mutex structure
- * \param owner_out If mutex was already owned, and this pointer is non-zero, it will be filled in with the core number of the current owner of the mutex
- */
-bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
-
 /*! \brief Wait for mutex with timeout
  *  \ingroup mutex
  *
