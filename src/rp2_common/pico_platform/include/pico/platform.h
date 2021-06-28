@@ -49,7 +49,7 @@ extern "C" {
 
 #define __packed_aligned __packed __aligned(4)
 
-#if defined(__GNUC__) && __GNUC__ < 7
+#if defined(__GNUC__) && __GNUC__ <= 7
 #define __force_inline inline __always_inline
 #else
 #define __force_inline __always_inline
