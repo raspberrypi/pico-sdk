@@ -193,7 +193,7 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
 #else
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_IRQ);
     uint32_t save = spin_lock_blocking(lock);
-    hard_assert(irq_hander_chain_free_slot_head >= 0); // we must have a alsot
+    hard_assert(irq_hander_chain_free_slot_head >= 0); // we must have a slot
     struct irq_handler_chain_slot *slot = &irq_handler_chain_slots[irq_hander_chain_free_slot_head];
     int8_t slot_index = irq_hander_chain_free_slot_head;
     irq_hander_chain_free_slot_head = slot->link;
