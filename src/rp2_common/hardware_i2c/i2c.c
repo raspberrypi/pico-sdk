@@ -115,16 +115,18 @@ void i2c_set_slave_mode(i2c_inst_t *i2c, bool slave, uint8_t addr) {
     invalid_params_if(I2C, addr >= 0x80); // 7-bit addresses
     invalid_params_if(I2C, i2c_reserved_addr(addr));
     i2c->hw->enable = 0;
+    uint32_t ctrl_set_if_master = I2C_IC_CON_MASTER_MODE_BITS | I2C_IC_CON_IC_SLAVE_DISABLE_BITS;
+    uint32_t ctrl_set_if_slave = I2C_IC_CON_RX_FIFO_FULL_HLD_CTRL_BITS;
     if (slave) {
-        hw_clear_bits(&i2c->hw->con,
-                      I2C_IC_CON_MASTER_MODE_BITS |
-                      I2C_IC_CON_IC_SLAVE_DISABLE_BITS
+        hw_write_masked(&i2c->hw->con,
+            ctrl_set_if_slave,
+            ctrl_set_if_master | ctrl_set_if_slave
         );
         i2c->hw->sar = addr;
     } else {
-        hw_set_bits(&i2c->hw->con,
-                    I2C_IC_CON_MASTER_MODE_BITS |
-                    I2C_IC_CON_IC_SLAVE_DISABLE_BITS
+        hw_write_masked(&i2c->hw->con,
+            ctrl_set_if_master,
+            ctrl_set_if_master | ctrl_set_if_slave
         );
     }
     i2c->hw->enable = 1;
