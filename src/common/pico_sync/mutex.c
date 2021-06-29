@@ -159,6 +159,7 @@ static void __time_critical_func(mutex_exit_r_guts)(mutex_t *mtx) {
     uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
     assert(mtx->enter_count);
     if (!--mtx->enter_count) {
+        mtx->owner = LOCK_INVALID_OWNER_ID;
         lock_internal_spin_unlock_with_notify(&mtx->core, save);
     } else {
         spin_unlock(mtx->core.spin_lock, save);

@@ -35,8 +35,6 @@ typedef struct __packed_aligned mutex {
     uint8_t enter_count;        //! for recursive mutex an ownership count
 } mutex_t;
 
-#define MAX_RECURSION_STATE ((uint8_t)255)
-
 /*! \brief  Initialise a mutex structure
  *  \ingroup mutex
  *
@@ -248,7 +246,7 @@ static inline bool mutex_is_initialized(mutex_t *mtx) {
  *
  * But the initialization of the mutex is performed automatically during runtime initialization
  */
-#define auto_init_recursive_mutex(name) static __attribute__((section(".mutex_array"))) mutex_t name = { .recursion_state = MAX_RECURSION_STATE }
+#define auto_init_recursive_mutex(name) static __attribute__((section(".mutex_array"))) mutex_t name = { .recursive = true }
 
 #ifdef __cplusplus
 }
