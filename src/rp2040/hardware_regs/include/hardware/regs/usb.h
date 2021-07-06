@@ -2965,7 +2965,7 @@
 #define USB_INTR_BUS_RESET_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : USB_INTR_VBUS_DETECT
-// Description : Source: SIE_STATUS.VBUS_DETECT
+// Description : Source: SIE_STATUS.VBUS_DETECTED
 #define USB_INTR_VBUS_DETECT_RESET  _u(0x0)
 #define USB_INTR_VBUS_DETECT_BITS   _u(0x00000800)
 #define USB_INTR_VBUS_DETECT_MSB    _u(11)
@@ -3143,7 +3143,7 @@
 #define USB_INTE_BUS_RESET_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_INTE_VBUS_DETECT
-// Description : Source: SIE_STATUS.VBUS_DETECT
+// Description : Source: SIE_STATUS.VBUS_DETECTED
 #define USB_INTE_VBUS_DETECT_RESET  _u(0x0)
 #define USB_INTE_VBUS_DETECT_BITS   _u(0x00000800)
 #define USB_INTE_VBUS_DETECT_MSB    _u(11)
@@ -3321,7 +3321,7 @@
 #define USB_INTF_BUS_RESET_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_INTF_VBUS_DETECT
-// Description : Source: SIE_STATUS.VBUS_DETECT
+// Description : Source: SIE_STATUS.VBUS_DETECTED
 #define USB_INTF_VBUS_DETECT_RESET  _u(0x0)
 #define USB_INTF_VBUS_DETECT_BITS   _u(0x00000800)
 #define USB_INTF_VBUS_DETECT_MSB    _u(11)
@@ -3499,7 +3499,7 @@
 #define USB_INTS_BUS_RESET_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : USB_INTS_VBUS_DETECT
-// Description : Source: SIE_STATUS.VBUS_DETECT
+// Description : Source: SIE_STATUS.VBUS_DETECTED
 #define USB_INTS_VBUS_DETECT_RESET  _u(0x0)
 #define USB_INTS_VBUS_DETECT_BITS   _u(0x00000800)
 #define USB_INTS_VBUS_DETECT_MSB    _u(11)

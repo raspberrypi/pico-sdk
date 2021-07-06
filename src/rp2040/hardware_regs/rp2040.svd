@@ -41389,7 +41389,7 @@
             <field>
               <access>read-only</access>
               <bitRange>[11:11]</bitRange>
-              <description>Source: SIE_STATUS.VBUS_DETECT</description>
+              <description>Source: SIE_STATUS.VBUS_DETECTED</description>
               <name>VBUS_DETECT</name>
             </field>
             <field>
@@ -41517,7 +41517,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[11:11]</bitRange>
-              <description>Source: SIE_STATUS.VBUS_DETECT</description>
+              <description>Source: SIE_STATUS.VBUS_DETECTED</description>
               <name>VBUS_DETECT</name>
             </field>
             <field>
@@ -41645,7 +41645,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[11:11]</bitRange>
-              <description>Source: SIE_STATUS.VBUS_DETECT</description>
+              <description>Source: SIE_STATUS.VBUS_DETECTED</description>
               <name>VBUS_DETECT</name>
             </field>
             <field>
@@ -41773,7 +41773,7 @@
             <field>
               <access>read-only</access>
               <bitRange>[11:11]</bitRange>
-              <description>Source: SIE_STATUS.VBUS_DETECT</description>
+              <description>Source: SIE_STATUS.VBUS_DETECTED</description>
               <name>VBUS_DETECT</name>
             </field>
             <field>
