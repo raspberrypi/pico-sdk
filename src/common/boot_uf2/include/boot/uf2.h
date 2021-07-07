@@ -29,16 +29,16 @@
 
 struct uf2_block {
     // 32 byte header
-    uint32_t magic_start0;
-    uint32_t magic_start1;
-    uint32_t flags;
-    uint32_t target_addr;
-    uint32_t payload_size;
-    uint32_t block_no;
-    uint32_t num_blocks;
-    uint32_t file_size; // or familyID;
-    uint8_t  data[476];
-    uint32_t magic_end;
+    le_uint32_t magic_start0;
+    le_uint32_t magic_start1;
+    le_uint32_t flags;
+    le_uint32_t target_addr;
+    le_uint32_t payload_size;
+    le_uint32_t block_no;
+    le_uint32_t num_blocks;
+    le_uint32_t file_size; // or familyID;
+    uint8_t     data[476];
+    le_uint32_t magic_end;
 };
 
 static_assert(sizeof(struct uf2_block) == 512, "uf2_block not sector sized");

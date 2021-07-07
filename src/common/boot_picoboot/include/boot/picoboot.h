@@ -67,20 +67,20 @@ enum picoboot_status {
 };
 
 struct __packed picoboot_reboot_cmd {
-    uint32_t dPC; // 0 means reset into bootrom
-    uint32_t dSP;
-    uint32_t dDelayMS;
+    le_uint32_t dPC; // 0 means reset into bootrom
+    le_uint32_t dSP;
+    le_uint32_t dDelayMS;
 };
 
 // used for EXEC, VECTORIZE_FLASH
 struct __packed picoboot_address_only_cmd {
-    uint32_t dAddr;
+    le_uint32_t dAddr;
 };
 
 // used for READ, WRITE, FLASH_ERASE
 struct __packed picoboot_range_cmd {
-    uint32_t dAddr;
-    uint32_t dSize;
+    le_uint32_t dAddr;
+    le_uint32_t dSize;
 };
 
 enum picoboot_exclusive_type {
@@ -95,12 +95,12 @@ struct __packed picoboot_exclusive_cmd {
 
 // little endian
 struct __packed __aligned(4) picoboot_cmd {
-    uint32_t dMagic;
-    uint32_t dToken; // an identifier for this token to correlate with a status response
+    le_uint32_t dMagic;
+    le_uint32_t dToken; // an identifier for this token to correlate with a status response
     uint8_t bCmdId; // top bit set for IN
     uint8_t bCmdSize; // bytes of actual data in the arg part of this structure
-    uint16_t _unused;
-    uint32_t dTransferLength; // length of IN/OUT transfer (or 0) if none
+    le_uint16_t _unused;
+    le_uint32_t dTransferLength; // length of IN/OUT transfer (or 0) if none
     union {
         uint8_t args[16];
         struct picoboot_reboot_cmd reboot_cmd;
@@ -113,8 +113,8 @@ struct __packed __aligned(4) picoboot_cmd {
 static_assert(32 == sizeof(struct picoboot_cmd), "picoboot_cmd must be 32 bytes big");
 
 struct __packed __aligned(4) picoboot_cmd_status {
-    uint32_t dToken;
-    uint32_t dStatusCode;
+    le_uint32_t dToken;
+    le_uint32_t dStatusCode;
     uint8_t bCmdId;
     uint8_t bInProgress;
     uint8_t _pad[6];
