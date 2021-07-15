@@ -119,7 +119,7 @@ extern "C" {
  */
 typedef void (*irq_handler_t)(void);
 
-/*! \brief Set specified interrupts priority
+/*! \brief Set specified interrupt's priority
  *  \ingroup hardware_irq
  *
  * \param num Interrupt number
@@ -245,7 +245,7 @@ static inline void irq_clear(uint int_num) {
     *((volatile uint32_t *) (PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = (1u << ((uint32_t) (int_num & 0x1F)));
 }
 
-/*! \brief Force an interrupt to pending on the executing core
+/*! \brief Force an interrupt to be pending on the executing core
  *  \ingroup hardware_irq
  *
  * This should generally not be used for IRQs connected to hardware.
