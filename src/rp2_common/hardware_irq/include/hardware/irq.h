@@ -37,13 +37,13 @@
  * On the RP2040, only the lower 26 IRQ signals are connected on the NVIC; IRQs 26 to 31 are tied to zero (never firing).
  *
  * There is one NVIC per core, and each core's NVIC has the same hardware interrupt lines routed to it, with the exception of the IO interrupts
- * where there is one IO interrupt per bank, per core. These are completely independent, so for example, processor 0 can be
+ * where there is one IO interrupt per bank, per core. These are completely independent, so, for example, processor 0 can be
  * interrupted by GPIO 0 in bank 0, and processor 1 by GPIO 1 in the same bank.
  *
  * \note That all IRQ APIs affect the executing core only (i.e. the core calling the function).
  *
  * \note You should not enable the same (shared) IRQ number on both cores, as this will lead to race conditions
- * or starvation of one of the cores. Additionally don't forget that disabling interrupts on one core does not disable interrupts
+ * or starvation of one of the cores. Additionally, don't forget that disabling interrupts on one core does not disable interrupts
  * on the other core.
  *
  * There are three different ways to set handlers for an IRQ:
@@ -53,7 +53,7 @@
  *    you will not be able to change it using the above APIs at runtime). Using this method can cause link conflicts at runtime, and offers no runtime performance benefit (i.e, it should not generally be used).
  *
  * \note If an IRQ is enabled and fires with no handler installed, a breakpoint will be hit and the IRQ number will
- * be in r0.
+ * be in register r0.
  *
  * \section interrupt_nums Interrupt Numbers
  *
