@@ -11,7 +11,7 @@
 #
 # Usage:
 #
-# ./extract_configs.py <root of source tree> [output file]
+# tools/extract_configs.py <root of source tree> [output file]
 #
 # If not specified, output file will be `pico_configs.tsv`
 
