@@ -25,7 +25,7 @@
  * Programmable I/O (PIO) API
  *
  * A programmable input/output block (PIO) is a versatile hardware interface which
- * can support a number of different IO standards. There are two PIO blocks in the RP2040
+ * can support a number of different IO standards. There are two PIO blocks in the RP2040.
  *
  * Each PIO is programmable in the same sense as a processor: the four state machines independently
  * execute short, sequential programs, to manipulate GPIOs and transfer data. Unlike a general
