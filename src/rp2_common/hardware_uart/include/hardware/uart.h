@@ -205,12 +205,17 @@ static inline void uart_set_format(uart_inst_t *uart, uint data_bits, uint stop_
  * this function.
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
- * \param rx_has_data If true an interrupt will be fired when the RX FIFO contain data.
+ * \param rx_has_data If true an interrupt will be fired when the RX FIFO contains data.
  * \param tx_needs_data If true an interrupt will be fired when the TX FIFO needs data.
  */
 static inline void uart_set_irq_enables(uart_inst_t *uart, bool rx_has_data, bool tx_needs_data) {
+    // Both UARTRXINTR (RX) and UARTRTINTR (RX timeout) interrupts are
+    // required for rx_has_data. RX asserts when >=4 characters are in the RX
+    // FIFO (for RXIFLSEL=0). RT asserts when there are >=1 characters and no
+    // more have been received for 32 bit periods.
     uart_get_hw(uart)->imsc = (bool_to_bit(tx_needs_data) << UART_UARTIMSC_TXIM_LSB) |
-                              (bool_to_bit(rx_has_data) << UART_UARTIMSC_RXIM_LSB);
+                              (bool_to_bit(rx_has_data) << UART_UARTIMSC_RXIM_LSB) |
+                              (bool_to_bit(rx_has_data) << UART_UARTIMSC_RTIM_LSB);
     if (rx_has_data) {
         // Set minimum threshold
         hw_write_masked(&uart_get_hw(uart)->ifls, 0 << UART_UARTIFLS_RXIFLSEL_LSB,
