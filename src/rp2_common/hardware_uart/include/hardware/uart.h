@@ -321,7 +321,7 @@ static inline void uart_read_blocking(uart_inst_t *uart, uint8_t *dst, size_t le
 /*! \brief  Write single character to UART for transmission.
  *  \ingroup hardware_uart
  *
- * This function will block until all the character has been sent
+ * This function will block until the entire character has been sent
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param c The character  to send

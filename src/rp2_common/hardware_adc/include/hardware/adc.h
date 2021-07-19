@@ -28,7 +28,7 @@
  * - DMA interface
  *
  * Although there is only one ADC you can specify the input to it using the adc_select_input() function.
- * In round robin mode (adc_rrobin()) will use that input and move to the next one after a read.
+ * In round robin mode (adc_set_round_robin()), the ADC will use that input and move to the next one after a read.
  *
  * User ADC inputs are on 0-3 (GPIO 26-29), the temperature sensor is on input 4.
  *
