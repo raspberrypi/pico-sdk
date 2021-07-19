@@ -441,8 +441,28 @@ static inline void pwm_set_phase_correct(uint slice_num, bool phase_correct) {
 /** \brief Enable/Disable PWM
  *  \ingroup hardware_pwm
  *
+ * When a PWM is disabled, it halts its counter, and the output pins are left
+ * high or low depending on exactly when the counter is halted. When
+ * re-enabled the PWM resumes immediately from where it left off.
+ *
+ * If the PWM's output pins need to be low when halted:
+ *
+ * - The counter compare can be set to zero whilst the PWM is enabled, and
+ *   then the PWM disabled once both pins are seen to be low
+ *
+ * - The GPIO output overrides can be used to force the actual pins low
+ *
+ * - The PWM can be run for one cycle (i.e. enabled then immediately disabled)
+ *   with a TOP of 0, count of 0 and counter compare of 0, to force the pins
+ *   low when the PWM has already been halted. The same method can be used
+ *   with a counter compare value of 1 to force a pin high.
+ *
+ * Note that, when disabled, the PWM can still be advanced one count at a time
+ * by pulsing the PH_ADV bit in its CSR. The output pins transition as though
+ * the PWM were enabled.
+ *
  * \param slice_num PWM slice number
- * \param enabled true to enable the specified PWM, false to disable
+ * \param enabled true to enable the specified PWM, false to disable.
  */
 static inline void pwm_set_enabled(uint slice_num, bool enabled) {
     check_slice_num_param(slice_num);
