@@ -176,7 +176,7 @@ static void __isr __not_in_flash_func(multicore_lockout_handler)(void) {
 static void check_lockout_mutex_init(void) {
     // use known available lock - we only need it briefly
     uint32_t save = hw_claim_lock();
-    if (!mutex_is_initialzed(&lockout_mutex)) {
+    if (!mutex_is_initialized(&lockout_mutex)) {
         mutex_init(&lockout_mutex);
     }
     hw_claim_unlock(save);
@@ -237,7 +237,7 @@ void multicore_lockout_start_blocking() {
 }
 
 static bool multicore_lockout_end_block_until(absolute_time_t until) {
-    assert(mutex_is_initialzed(&lockout_mutex));
+    assert(mutex_is_initialized(&lockout_mutex));
     if (!mutex_enter_block_until(&lockout_mutex, until)) {
         return false;
     }
