@@ -26,10 +26,12 @@ extern "C" {
  * I2C Controller API
  *
  * The I2C bus is a two-wire serial interface, consisting of a serial data line SDA and a serial clock SCL. These wires carry
- * information between the devices connected to the bus. Each device is recognized by a unique address and can operate as
+ * information between the devices connected to the bus. Each device is recognized by a unique 7-bit address and can operate as
  * either a “transmitter” or “receiver”, depending on the function of the device. Devices can also be considered as masters or
  * slaves when performing data transfers. A master is a device that initiates a data transfer on the bus and generates the
- * clock signals to permit that transfer. At that time, any device addressed is considered a slave.
+ * clock signals to permit that transfer. The first byte in the data transfer always contains the 7-bit address and
+ * a read/write bit in the LSB position. This API takes care of toggling the read/write bit. After this, any device addressed
+ * is considered a slave. 
  *
  * This API allows the controller to be set up as a master or a slave using the \ref i2c_set_slave_mode function.
  *
@@ -154,7 +156,7 @@ static inline i2c_hw_t *i2c_get_hw(i2c_inst_t *i2c) {
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
- * \param addr Address of device to write to
+ * \param addr 7-bit address of device to write to
  * \param src Pointer to data to send
  * \param len Length of data in bytes to send
  * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
@@ -171,7 +173,7 @@ int i2c_write_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, 
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
- * \param addr Address of device to read from
+ * \param addr 7-bit address of device to read from
  * \param dst Pointer to buffer to receive data
  * \param len Length of data in bytes to receive
  * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
@@ -185,7 +187,7 @@ int i2c_read_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t 
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
- * \param addr Address of device to write to
+ * \param addr 7-bit address of device to write to
  * \param src Pointer to data to send
  * \param len Length of data in bytes to send
  * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
@@ -207,7 +209,7 @@ int i2c_write_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
- * \param addr Address of device to read from
+ * \param addr 7-bit address of device to read from
  * \param dst Pointer to buffer to receive data
  * \param len Length of data in bytes to receive
  * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
@@ -226,7 +228,7 @@ int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, si
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
- * \param addr Address of device to write to
+ * \param addr 7-bit address of device to write to
  * \param src Pointer to data to send
  * \param len Length of data in bytes to send
  * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
@@ -239,7 +241,7 @@ int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
- * \param addr Address of device to read from
+ * \param addr 7-bit address of device to read from
  * \param dst Pointer to buffer to receive data
  * \param len Length of data in bytes to receive
  * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
