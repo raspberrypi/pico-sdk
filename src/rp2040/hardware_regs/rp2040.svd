@@ -39992,7 +39992,7 @@
               <name>SETUP_REC</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[16:16]</bitRange>
               <description>Device: connected</description>
               <name>CONNECTED</name>

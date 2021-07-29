@@ -1012,7 +1012,7 @@
 #define USB_SIE_STATUS_CONNECTED_BITS   _u(0x00010000)
 #define USB_SIE_STATUS_CONNECTED_MSB    _u(16)
 #define USB_SIE_STATUS_CONNECTED_LSB    _u(16)
-#define USB_SIE_STATUS_CONNECTED_ACCESS "RO"
+#define USB_SIE_STATUS_CONNECTED_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_SIE_STATUS_RESUME
 // Description : Host: Device has initiated a remote resume. Device: host has
