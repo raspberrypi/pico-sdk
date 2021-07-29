@@ -45037,7 +45037,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0100</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45049,7 +45049,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0104</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45061,7 +45061,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0108</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45073,7 +45073,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x010c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45085,7 +45085,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0110</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45097,7 +45097,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0114</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45109,7 +45109,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0118</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45121,7 +45121,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x011c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45133,7 +45133,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0120</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45145,7 +45145,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0124</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45157,7 +45157,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0128</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45169,7 +45169,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x012c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45181,7 +45181,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0130</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45193,7 +45193,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0134</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45205,7 +45205,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0138</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45217,7 +45217,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x013c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45229,7 +45229,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0140</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45241,7 +45241,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0144</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45253,7 +45253,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0148</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45265,7 +45265,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x014c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45277,7 +45277,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0150</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45289,7 +45289,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0154</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45301,7 +45301,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0158</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45313,7 +45313,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x015c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45325,7 +45325,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0160</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45337,7 +45337,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0164</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45349,7 +45349,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0168</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45361,7 +45361,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x016c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45373,7 +45373,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0170</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45385,7 +45385,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0174</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45397,7 +45397,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0178</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45409,7 +45409,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x017c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
