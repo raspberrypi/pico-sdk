@@ -1,4 +1,4 @@
-# PICO_CMAKE_CONFIG: PICO_BOARD, The board name being built for. This is overridable from the user environment, type=string, default=rp2040, group=build
+# PICO_CMAKE_CONFIG: PICO_BOARD, The board name being built for. This is overridable from the user environment, type=string, default=pico, group=build
 if (DEFINED ENV{PICO_BOARD})
     set(PICO_BOARD $ENV{PICO_BOARD})
     message("Using PICO_BOARD from environment ('${PICO_BOARD}')")
