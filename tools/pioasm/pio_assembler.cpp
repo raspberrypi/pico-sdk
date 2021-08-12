@@ -127,7 +127,7 @@ void program::set_wrap(const yy::location &l) {
         throw syntax_error(l, msg.str());
     }
     if (instructions.empty()) {
-        throw syntax_error(l, ".wrap cannot be pleaced before the first program instruction");
+        throw syntax_error(l, ".wrap cannot be placed before the first program instruction");
     }
     wrap = resolvable_int(l, instructions.size() - 1);
 }
