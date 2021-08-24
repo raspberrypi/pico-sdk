@@ -78,6 +78,10 @@ typedef ioptr const const_ioptr;
 #define hw_clear_alias(p) ((typeof(p))hw_clear_alias_untyped(p))
 #define hw_xor_alias(p) ((typeof(p))hw_xor_alias_untyped(p))
 
+// Used in the hardware structs to link to the associated hardware register
+// Expands to nothing, but maks the enclosed register name parameter, `x`, navigable in IDEs
+#define _REG_(x)
+
 /*! \brief Atomically set the specified bits to 1 in a HW register
  *  \ingroup hardware_base
  *
