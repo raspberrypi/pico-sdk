@@ -13,7 +13,10 @@
 #include "hardware/regs/xosc.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_xosc
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/xosc.h.
 
 /// \tag::xosc_hw[]
 typedef struct {
@@ -41,14 +44,12 @@ typedef struct {
     // 0x00003fff [0-13]  : DELAY (0): in multiples of 256*xtal_period
     io_rw_32 startup;
 
-    _REG_(XOSC__OFFSET)
     uint32_t _pad0[3];
 
     _REG_(XOSC_COUNT_OFFSET)
     // A down counter running at the xosc frequency which counts to zero and stops
     // 0x000000ff [0-7]   : COUNT (0)
     io_rw_32 count;
-
 } xosc_hw_t;
 
 #define xosc_hw ((xosc_hw_t *const)XOSC_BASE)

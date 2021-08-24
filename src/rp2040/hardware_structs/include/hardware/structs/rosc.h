@@ -13,7 +13,10 @@
 #include "hardware/regs/rosc.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_rosc
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/rosc.h.
 
 typedef struct {
     _REG_(ROSC_CTRL_OFFSET)
@@ -74,7 +77,6 @@ typedef struct {
     // A down counter running at the ROSC frequency which counts to zero and stops
     // 0x000000ff [0-7]   : COUNT (0)
     io_rw_32 count;
-
 } rosc_hw_t;
 
 #define rosc_hw ((rosc_hw_t *const)ROSC_BASE)

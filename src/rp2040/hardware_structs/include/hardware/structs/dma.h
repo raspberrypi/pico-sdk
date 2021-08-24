@@ -13,7 +13,10 @@
 #include "hardware/regs/dma.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_dma
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/dma.h.
 
 typedef struct {
     _REG_(DMA_CH0_READ_ADDR_OFFSET)
@@ -95,13 +98,11 @@ typedef struct {
     _REG_(DMA_CH0_AL3_READ_ADDR_TRIG_OFFSET)
     // Alias for channel 0 READ_ADDR register
     io_ro_32 al3_read_addr_trig;
-
 } dma_channel_hw_t;
 
 typedef struct {
     dma_channel_hw_t ch[12];
 
-    _REG_(DMA__OFFSET)
     uint32_t _pad0[64];
 
     _REG_(DMA_INTR_OFFSET)
@@ -124,7 +125,6 @@ typedef struct {
     // 0x0000ffff [0-15]  : INTS0 (0): Indicates active channel interrupt requests which are currently...
     io_rw_32 ints0;
 
-    _REG_(DMA__OFFSET)
     uint32_t _pad1;
 
     _REG_(DMA_INTE1_OFFSET)
@@ -142,7 +142,7 @@ typedef struct {
     // 0x0000ffff [0-15]  : INTS1 (0): Indicates active channel interrupt requests which are currently...
     io_rw_32 ints1;
 
-    _REG_(DMA_None_OFFSET)
+    _REG_(DMA_TIMER0_OFFSET)
     io_rw_32 timer[4];
 
     _REG_(DMA_MULTI_CHAN_TRIGGER_OFFSET)
@@ -164,7 +164,6 @@ typedef struct {
     // Data accumulator for sniff hardware
     io_rw_32 sniff_data;
 
-    _REG_(DMA__OFFSET)
     uint32_t _pad2;
 
     _REG_(DMA_FIFO_LEVELS_OFFSET)
@@ -178,7 +177,6 @@ typedef struct {
     // Abort an in-progress transfer sequence on one or more channels
     // 0x0000ffff [0-15]  : CHAN_ABORT (0): Each bit corresponds to a channel
     io_rw_32 abort;
-
 } dma_hw_t;
 
 typedef struct {

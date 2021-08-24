@@ -13,7 +13,10 @@
 #include "hardware/regs/vreg_and_chip_reset.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_vreg_and_chip_reset
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/vreg_and_chip_reset.h.
 
 typedef struct {
     _REG_(VREG_AND_CHIP_RESET_VREG_OFFSET)
@@ -37,7 +40,6 @@ typedef struct {
     // 0x00010000 [16]    : HAD_RUN (0): Last reset was from the RUN pin
     // 0x00000100 [8]     : HAD_POR (0): Last reset was from the power-on reset or brown-out detection blocks
     io_rw_32 chip_reset;
-
 } vreg_and_chip_reset_hw_t;
 
 #define vreg_and_chip_reset_hw ((vreg_and_chip_reset_hw_t *const)VREG_AND_CHIP_RESET_BASE)

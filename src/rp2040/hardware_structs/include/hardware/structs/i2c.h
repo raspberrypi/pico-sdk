@@ -13,7 +13,10 @@
 #include "hardware/regs/i2c.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_i2c
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/i2c.h.
 
 typedef struct {
     _REG_(I2C_IC_CON_OFFSET)
@@ -42,7 +45,6 @@ typedef struct {
     // 0x000003ff [0-9]   : IC_SAR (0x55): The IC_SAR holds the slave address when the I2C is operating...
     io_rw_32 sar;
 
-    _REG_(I2C__OFFSET)
     uint32_t _pad0;
 
     _REG_(I2C_IC_DATA_CMD_OFFSET)
@@ -74,7 +76,6 @@ typedef struct {
     // 0x0000ffff [0-15]  : IC_FS_SCL_LCNT (0xd): This register must be set before any I2C bus...
     io_rw_32 fs_scl_lcnt;
 
-    _REG_(I2C__OFFSET)
     uint32_t _pad1[2];
 
     _REG_(I2C_IC_INTR_STAT_OFFSET)
@@ -292,7 +293,6 @@ typedef struct {
     // 0x000000ff [0-7]   : IC_FS_SPKLEN (0x7): This register must be set before any I2C bus...
     io_rw_32 fs_spklen;
 
-    _REG_(I2C__OFFSET)
     uint32_t _pad2;
 
     _REG_(I2C_IC_CLR_RESTART_DET_OFFSET)
@@ -300,7 +300,6 @@ typedef struct {
     // 0x00000001 [0]     : CLR_RESTART_DET (0): Read this register to clear the RESTART_DET interrupt...
     io_ro_32 clr_restart_det;
 
-    _REG_(I2C__OFFSET)
     uint32_t _pad3[18];
 
     _REG_(I2C_IC_COMP_PARAM_1_OFFSET)
@@ -324,7 +323,6 @@ typedef struct {
     // I2C Component Type Register
     // 0xffffffff [0-31]  : IC_COMP_TYPE (0x44570140): Designware Component Type number = 0x44_57_01_40
     io_ro_32 comp_type;
-
 } i2c_hw_t;
 
 #define i2c0_hw ((i2c_hw_t *const)I2C0_BASE)

@@ -13,7 +13,10 @@
 #include "hardware/regs/pio.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pio
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/pio.h.
 
 typedef struct pio_sm_hw {
     _REG_(PIO_SM0_CLKDIV_OFFSET)
@@ -69,7 +72,6 @@ typedef struct pio_sm_hw {
     // 0x000003e0 [5-9]   : SET_BASE (0): The lowest-numbered pin that will be affected by a SET PINS...
     // 0x0000001f [0-4]   : OUT_BASE (0): The lowest-numbered pin that will be affected by an OUT PINS,...
     io_rw_32 pinctrl;
-
 } pio_sm_hw_t;
 
 typedef struct {
@@ -108,10 +110,10 @@ typedef struct {
     // 0x0000000f [0-3]   : TX0 (0)
     io_ro_32 flevel;
 
-    _REG_(PIO_None_OFFSET)
+    _REG_(PIO_TXF0_OFFSET)
     io_wo_32 txf[4];
 
-    _REG_(PIO_None_OFFSET)
+    _REG_(PIO_RXF0_OFFSET)
     io_ro_32 rxf[4];
 
     _REG_(PIO_IRQ_OFFSET)
@@ -143,7 +145,7 @@ typedef struct {
     // 0x0000003f [0-5]   : FIFO_DEPTH (0): The depth of the state machine TX/RX FIFOs, measured in words
     io_ro_32 dbg_cfginfo;
 
-    _REG_(PIO_None_OFFSET)
+    _REG_(PIO_INSTR_MEM0_OFFSET)
     io_rw_32 instr_mem[32];
 
     pio_sm_hw_t sm[4];
@@ -259,7 +261,6 @@ typedef struct {
     // 0x00000002 [1]     : SM1_RXNEMPTY (0)
     // 0x00000001 [0]     : SM0_RXNEMPTY (0)
     io_ro_32 ints1;
-
 } pio_hw_t;
 
 #define pio0_hw ((pio_hw_t *const)PIO0_BASE)

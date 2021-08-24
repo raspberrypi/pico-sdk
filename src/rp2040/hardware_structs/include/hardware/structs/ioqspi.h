@@ -13,7 +13,10 @@
 #include "hardware/regs/io_qspi.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_io_qspi
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/io_qspi.h.
 
 typedef struct {
     _REG_(IO_QSPI_GPIO_QSPI_SCLK_STATUS_OFFSET)
@@ -36,7 +39,6 @@ typedef struct {
     // 0x00000300 [8-9]   : OUTOVER (0)
     // 0x0000001f [0-4]   : FUNCSEL (0x1f): 0-31 -> selects pin function according to the gpio table
     io_rw_32 ctrl;
-
 } io_status_ctrl_hw_t;
 
 typedef struct {
@@ -123,7 +125,6 @@ typedef struct {
     // 0x00000002 [1]     : GPIO_QSPI_SCLK_LEVEL_HIGH (0)
     // 0x00000001 [0]     : GPIO_QSPI_SCLK_LEVEL_LOW (0)
     io_ro_32 ints;
-
 } io_qspi_ctrl_hw_t;
 
 typedef struct {
@@ -162,9 +163,8 @@ typedef struct {
     io_qspi_ctrl_hw_t proc1_qspi_ctrl;
 
     io_qspi_ctrl_hw_t dormant_wake_qspi_ctrl;
-
 } ioqspi_hw_t;
 
-#define io_qspi_hw ((ioqspi_hw_t *const)IO_QSPI_BASE)
+#define ioqspi_hw ((ioqspi_hw_t *const)IO_QSPI_BASE)
 
 #endif

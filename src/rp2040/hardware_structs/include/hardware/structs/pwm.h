@@ -13,7 +13,10 @@
 #include "hardware/regs/pwm.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pwm
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/pwm.h.
 
 typedef struct pwm_slice_hw {
     _REG_(PWM_CH0_CSR_OFFSET)
@@ -48,7 +51,6 @@ typedef struct pwm_slice_hw {
     // Counter wrap value
     // 0x0000ffff [0-15]  : CH0_TOP (0xffff)
     io_rw_32 top;
-
 } pwm_slice_hw_t;
 
 typedef struct {
@@ -113,7 +115,6 @@ typedef struct {
     // 0x00000002 [1]     : CH1 (0)
     // 0x00000001 [0]     : CH0 (0)
     io_ro_32 ints;
-
 } pwm_hw_t;
 
 #define pwm_hw ((pwm_hw_t *const)PWM_BASE)

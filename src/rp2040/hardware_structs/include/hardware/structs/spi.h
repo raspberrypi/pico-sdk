@@ -13,7 +13,10 @@
 #include "hardware/regs/spi.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_spi
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/spi.h.
 
 typedef struct {
     _REG_(SPI_SSPCR0_OFFSET)
@@ -88,15 +91,13 @@ typedef struct {
     // 0x00000001 [0]     : RXDMAE (0): Receive DMA Enable
     io_rw_32 dmacr;
 
-    _REG_(SPI__OFFSET)
     uint32_t _pad0[1006];
 
-    _REG_(SPI_None_OFFSET)
+    _REG_(SPI_SSPPERIPHID0_OFFSET)
     io_ro_32 periphid[4];
 
-    _REG_(SPI_None_OFFSET)
+    _REG_(SPI_SSPPCELLID0_OFFSET)
     io_ro_32 pcellid[4];
-
 } spi_hw_t;
 
 #define spi0_hw ((spi_hw_t *const)SPI0_BASE)

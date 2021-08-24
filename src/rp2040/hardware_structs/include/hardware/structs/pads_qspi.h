@@ -13,7 +13,10 @@
 #include "hardware/regs/pads_qspi.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pads_qspi
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/pads_qspi.h.
 
 typedef struct {
     _REG_(PADS_QSPI_VOLTAGE_SELECT_OFFSET)
@@ -23,7 +26,6 @@ typedef struct {
 
     _REG_(PADS_QSPI_GPIO_QSPI_SCLK_OFFSET)
     io_rw_32 io[6];
-
 } pads_qspi_hw_t;
 
 #define pads_qspi_hw ((pads_qspi_hw_t *const)PADS_QSPI_BASE)

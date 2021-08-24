@@ -13,7 +13,10 @@
 #include "hardware/regs/io_bank0.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_io_bank0
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/io_bank0.h.
 
 typedef struct {
     _REG_(IO_BANK0_GPIO0_STATUS_OFFSET)
@@ -36,26 +39,24 @@ typedef struct {
     // 0x00000300 [8-9]   : OUTOVER (0)
     // 0x0000001f [0-4]   : FUNCSEL (0x1f): 0-31 -> selects pin function according to the gpio table
     io_rw_32 ctrl;
-
 } io_status_ctrl_hw_t;
 
 typedef struct {
-    _REG_(IO_BANK0_None_OFFSET)
+    _REG_(IO_BANK0_PROC0_INTE0_OFFSET)
     io_rw_32 inte[4];
 
-    _REG_(IO_BANK0_None_OFFSET)
+    _REG_(IO_BANK0_PROC0_INTF0_OFFSET)
     io_rw_32 intf[4];
 
-    _REG_(IO_BANK0_None_OFFSET)
+    _REG_(IO_BANK0_PROC0_INTS0_OFFSET)
     io_ro_32 ints[4];
-
 } io_irq_ctrl_hw_t;
 
 /// \tag::iobank0_hw[]
 typedef struct {
     io_status_ctrl_hw_t io[30];
 
-    _REG_(IO_BANK0_None_OFFSET)
+    _REG_(IO_BANK0_INTR0_OFFSET)
     io_rw_32 intr[4];
 
     io_irq_ctrl_hw_t proc0_irq_ctrl;
@@ -63,7 +64,6 @@ typedef struct {
     io_irq_ctrl_hw_t proc1_irq_ctrl;
 
     io_irq_ctrl_hw_t dormant_wake_irq_ctrl;
-
 } iobank0_hw_t;
 
 #define iobank0_hw ((iobank0_hw_t *const)IO_BANK0_BASE)

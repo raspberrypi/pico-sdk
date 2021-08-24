@@ -13,7 +13,10 @@
 #include "hardware/regs/m0plus.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_m0plus
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/m0plus.h.
 
 typedef struct {
     _REG_(M0PLUS_CPUID_OFFSET)
@@ -57,7 +60,6 @@ typedef struct {
     // 0x00000004 [2]     : SLEEPDEEP (0): Controls whether the processor uses sleep or deep sleep as...
     // 0x00000002 [1]     : SLEEPONEXIT (0): Indicates sleep-on-exit when returning from Handler mode...
     io_rw_32 scr;
-
 } armv6m_scb_t;
 
 #define scb_hw ((armv6m_scb_t *const)(PPB_BASE + M0PLUS_CPUID_OFFSET))

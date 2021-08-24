@@ -13,7 +13,10 @@
 #include "hardware/regs/ssi.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_ssi
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/ssi.h.
 
 typedef struct {
     _REG_(SSI_CTRLR0_OFFSET)
@@ -175,7 +178,6 @@ typedef struct {
     // 0xffffffff [0-31]  : DR (0): First data register of 36
     io_rw_32 dr0;
 
-    _REG_(SSI__OFFSET)
     uint32_t _pad0[35];
 
     _REG_(SSI_RX_SAMPLE_DLY_OFFSET)
@@ -199,7 +201,6 @@ typedef struct {
     // TX drive edge
     // 0x000000ff [0-7]   : TDE (0): TXD drive edge
     io_rw_32 txd_drive_edge;
-
 } ssi_hw_t;
 
 #define ssi_hw ((ssi_hw_t *const)XIP_SSI_BASE)

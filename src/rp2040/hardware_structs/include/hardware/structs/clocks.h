@@ -13,7 +13,10 @@
 #include "hardware/regs/clocks.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_clocks
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/clocks.h.
 
 /*! \brief Enumeration identifying a hardware clock
  *  \ingroup hardware_clocks
@@ -55,7 +58,6 @@ typedef struct {
     _REG_(CLOCKS_CLK_GPOUT0_SELECTED_OFFSET)
     // Indicates which SRC is currently selected by the glitchless mux (one-hot)
     io_ro_32 selected;
-
 } clock_hw_t;
 /// \end::clock_hw[]
 
@@ -70,7 +72,6 @@ typedef struct {
     _REG_(CLOCKS_CLK_SYS_RESUS_STATUS_OFFSET)
     // 0x00000001 [0]     : RESUSSED (0): Clock has been resuscitated, correct the error then send ctrl_clear=1
     io_ro_32 status;
-
 } clock_resus_hw_t;
 
 typedef struct {
@@ -121,7 +122,6 @@ typedef struct {
     // 0x3fffffe0 [5-29]  : KHZ (0)
     // 0x0000001f [0-4]   : FRAC (0)
     io_ro_32 result;
-
 } fc_hw_t;
 
 typedef struct {
@@ -315,7 +315,6 @@ typedef struct {
     // Interrupt status after masking & forcing
     // 0x00000001 [0]     : CLK_SYS_RESUS (0)
     io_ro_32 ints;
-
 } clocks_hw_t;
 
 #define clocks_hw ((clocks_hw_t *const)CLOCKS_BASE)

@@ -13,7 +13,10 @@
 #include "hardware/regs/psm.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_psm
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/psm.h.
 
 typedef struct {
     _REG_(PSM_FRCE_ON_OFFSET)
@@ -99,7 +102,6 @@ typedef struct {
     // 0x00000002 [1]     : xosc (0)
     // 0x00000001 [0]     : rosc (0)
     io_ro_32 done;
-
 } psm_hw_t;
 
 #define psm_hw ((psm_hw_t *const)PSM_BASE)

@@ -14,7 +14,10 @@
 #include "hardware/structs/interp.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_sio
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/sio.h.
 
 typedef struct {
     _REG_(SIO_CPUID_OFFSET)
@@ -31,7 +34,6 @@ typedef struct {
     // 0x0000003f [0-5]   : GPIO_HI_IN (0): Input value on QSPI IO in order 0
     io_ro_32 gpio_hi_in;
 
-    _REG_(SIO__OFFSET)
     uint32_t _pad0;
 
     _REG_(SIO_GPIO_OUT_OFFSET)
@@ -163,8 +165,7 @@ typedef struct {
     // 0x00000002 [1]     : DIRTY (0): Changes to 1 when any register is written, and back to 0 when...
     // 0x00000001 [0]     : READY (1): Reads as 0 when a calculation is in progress, 1 otherwise
     io_ro_32 div_csr;
-
-uint32_t _pad1;
+    uint32_t _pad1;
     interp_hw_t interp[2];
 } sio_hw_t;
 

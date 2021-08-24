@@ -13,7 +13,10 @@
 #include "hardware/regs/busctrl.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_busctrl
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/busctrl.h.
 
 enum bus_ctrl_perf_counter {
     arbiter_rom_perf_event_access = 19,
@@ -48,7 +51,6 @@ typedef struct {
     // Bus fabric performance event select for PERFCTR0
     // 0x0000001f [0-4]   : PERFSEL0 (0x1f): Select an event for PERFCTR0
     io_rw_32 sel;
-
 } bus_ctrl_perf_hw_t;
 
 typedef struct {
@@ -66,7 +68,6 @@ typedef struct {
     io_ro_32 priority_ack;
 
     bus_ctrl_perf_hw_t counter[4];
-
 } bus_ctrl_hw_t;
 
 #define bus_ctrl_hw ((bus_ctrl_hw_t *const)BUSCTRL_BASE)

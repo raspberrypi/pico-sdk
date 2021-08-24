@@ -13,7 +13,10 @@
 #include "hardware/regs/resets.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_resets
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/resets.h.
 
 /// \tag::resets_hw[]
 typedef struct {
@@ -103,7 +106,6 @@ typedef struct {
     // 0x00000002 [1]     : busctrl (0)
     // 0x00000001 [0]     : adc (0)
     io_ro_32 reset_done;
-
 } resets_hw_t;
 
 #define resets_hw ((resets_hw_t *const)RESETS_BASE)

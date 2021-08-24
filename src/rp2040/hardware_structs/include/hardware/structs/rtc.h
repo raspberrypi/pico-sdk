@@ -13,7 +13,10 @@
 #include "hardware/regs/rtc.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_rtc
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/rtc.h.
 
 typedef struct {
     _REG_(RTC_CLKDIV_M1_OFFSET)
@@ -102,7 +105,6 @@ typedef struct {
     // Interrupt status after masking & forcing
     // 0x00000001 [0]     : RTC (0)
     io_ro_32 ints;
-
 } rtc_hw_t;
 
 #define rtc_hw ((rtc_hw_t *const)RTC_BASE)

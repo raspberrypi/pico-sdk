@@ -13,7 +13,10 @@
 #include "hardware/regs/uart.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_uart
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/uart.h.
 
 typedef struct {
     _REG_(UART_UARTDR_OFFSET)
@@ -33,7 +36,6 @@ typedef struct {
     // 0x00000001 [0]     : FE (0): Framing error
     io_rw_32 rsr;
 
-    _REG_(UART__OFFSET)
     uint32_t _pad0[4];
 
     _REG_(UART_UARTFR_OFFSET)
@@ -49,7 +51,6 @@ typedef struct {
     // 0x00000001 [0]     : CTS (0): Clear to send
     io_ro_32 fr;
 
-    _REG_(UART__OFFSET)
     uint32_t _pad1;
 
     _REG_(UART_UARTILPR_OFFSET)
@@ -167,15 +168,13 @@ typedef struct {
     // 0x00000001 [0]     : RXDMAE (0): Receive DMA enable
     io_rw_32 dmacr;
 
-    _REG_(UART__OFFSET)
     uint32_t _pad2[997];
 
-    _REG_(UART_None_OFFSET)
+    _REG_(UART_UARTPERIPHID0_OFFSET)
     io_ro_32 periphid[4];
 
-    _REG_(UART_None_OFFSET)
+    _REG_(UART_UARTPCELLID0_OFFSET)
     io_ro_32 pcellid[4];
-
 } uart_hw_t;
 
 #define uart0_hw ((uart_hw_t *const)UART0_BASE)

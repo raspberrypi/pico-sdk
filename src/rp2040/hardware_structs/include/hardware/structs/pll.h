@@ -13,7 +13,10 @@
 #include "hardware/regs/pll.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pll
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/pll.h.
 
 /// \tag::pll_hw[]
 typedef struct {
@@ -42,7 +45,6 @@ typedef struct {
     // 0x00070000 [16-18] : POSTDIV1 (0x7): divide by 1-7
     // 0x00007000 [12-14] : POSTDIV2 (0x7): divide by 1-7
     io_rw_32 prim;
-
 } pll_hw_t;
 
 #define pll_sys_hw ((pll_hw_t *const)PLL_SYS_BASE)

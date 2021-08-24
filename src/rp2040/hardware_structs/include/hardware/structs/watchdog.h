@@ -13,7 +13,10 @@
 #include "hardware/regs/watchdog.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_watchdog
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/watchdog.h.
 
 typedef struct {
     _REG_(WATCHDOG_CTRL_OFFSET)
@@ -37,7 +40,7 @@ typedef struct {
     // 0x00000001 [0]     : TIMER (0)
     io_ro_32 reason;
 
-    _REG_(WATCHDOG_None_OFFSET)
+    _REG_(WATCHDOG_SCRATCH0_OFFSET)
     io_rw_32 scratch[8];
 
     _REG_(WATCHDOG_TICK_OFFSET)
@@ -47,7 +50,6 @@ typedef struct {
     // 0x00000200 [9]     : ENABLE (1): start / stop tick generation
     // 0x000001ff [0-8]   : CYCLES (0): Total number of clk_tick cycles before the next tick
     io_rw_32 tick;
-
 } watchdog_hw_t;
 
 #define watchdog_hw ((watchdog_hw_t *const)WATCHDOG_BASE)

@@ -13,7 +13,10 @@
 #include "hardware/regs/usb.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_usb
-// BITMASK : FIELDNAME [BITRANGE] (RESETVALUE): DESCRIPTION
+
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// _REG_(x) will link to the corresponding register in hardware/regs/usb.h.
 
 // 0-15
 #define USB_NUM_ENDPOINTS 16
@@ -123,7 +126,7 @@ typedef struct {
     // 0x0000007f [0-6]   : ADDRESS (0): In device mode, the address that the device should respond to
     io_rw_32 dev_addr_ctrl;
 
-    _REG_(USB_None_OFFSET)
+    _REG_(USB_ADDR_ENDP1_OFFSET)
     io_rw_32 int_ep_addr_ctrl[15];
 
     _REG_(USB_MAIN_CTRL_OFFSET)
@@ -457,7 +460,6 @@ typedef struct {
     // 0x0000001f [0-4]   : DP_PULLDN_TRIM (0x1f): Value to drive to USB PHY
     io_rw_32 phy_trim;
 
-    _REG_(USB__OFFSET)
     uint32_t _pad0;
 
     _REG_(USB_INTR_OFFSET)
@@ -555,7 +557,6 @@ typedef struct {
     // 0x00000002 [1]     : HOST_RESUME (0): Host: raised when a device wakes up the host
     // 0x00000001 [0]     : HOST_CONN_DIS (0): Host: raised when a device is connected or disconnected (i
     io_ro_32 ints;
-
 } usb_hw_t;
 
 #define usb_hw ((usb_hw_t *const)USBCTRL_REGS_BASE)
