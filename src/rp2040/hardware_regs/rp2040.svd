@@ -42157,7 +42157,7 @@
           <description>Write-only access to instruction memory location 0</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM0</name>
             </field>
@@ -42170,7 +42170,7 @@
           <description>Write-only access to instruction memory location 1</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM1</name>
             </field>
@@ -42183,7 +42183,7 @@
           <description>Write-only access to instruction memory location 2</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM2</name>
             </field>
@@ -42196,7 +42196,7 @@
           <description>Write-only access to instruction memory location 3</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM3</name>
             </field>
@@ -42209,7 +42209,7 @@
           <description>Write-only access to instruction memory location 4</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM4</name>
             </field>
@@ -42222,7 +42222,7 @@
           <description>Write-only access to instruction memory location 5</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM5</name>
             </field>
@@ -42235,7 +42235,7 @@
           <description>Write-only access to instruction memory location 6</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM6</name>
             </field>
@@ -42248,7 +42248,7 @@
           <description>Write-only access to instruction memory location 7</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM7</name>
             </field>
@@ -42261,7 +42261,7 @@
           <description>Write-only access to instruction memory location 8</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM8</name>
             </field>
@@ -42274,7 +42274,7 @@
           <description>Write-only access to instruction memory location 9</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM9</name>
             </field>
@@ -42287,7 +42287,7 @@
           <description>Write-only access to instruction memory location 10</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM10</name>
             </field>
@@ -42300,7 +42300,7 @@
           <description>Write-only access to instruction memory location 11</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM11</name>
             </field>
@@ -42313,7 +42313,7 @@
           <description>Write-only access to instruction memory location 12</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM12</name>
             </field>
@@ -42326,7 +42326,7 @@
           <description>Write-only access to instruction memory location 13</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM13</name>
             </field>
@@ -42339,7 +42339,7 @@
           <description>Write-only access to instruction memory location 14</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM14</name>
             </field>
@@ -42352,7 +42352,7 @@
           <description>Write-only access to instruction memory location 15</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM15</name>
             </field>
@@ -42365,7 +42365,7 @@
           <description>Write-only access to instruction memory location 16</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM16</name>
             </field>
@@ -42378,7 +42378,7 @@
           <description>Write-only access to instruction memory location 17</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM17</name>
             </field>
@@ -42391,7 +42391,7 @@
           <description>Write-only access to instruction memory location 18</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM18</name>
             </field>
@@ -42404,7 +42404,7 @@
           <description>Write-only access to instruction memory location 19</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM19</name>
             </field>
@@ -42417,7 +42417,7 @@
           <description>Write-only access to instruction memory location 20</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM20</name>
             </field>
@@ -42430,7 +42430,7 @@
           <description>Write-only access to instruction memory location 21</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM21</name>
             </field>
@@ -42443,7 +42443,7 @@
           <description>Write-only access to instruction memory location 22</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM22</name>
             </field>
@@ -42456,7 +42456,7 @@
           <description>Write-only access to instruction memory location 23</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM23</name>
             </field>
@@ -42469,7 +42469,7 @@
           <description>Write-only access to instruction memory location 24</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM24</name>
             </field>
@@ -42482,7 +42482,7 @@
           <description>Write-only access to instruction memory location 25</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM25</name>
             </field>
@@ -42495,7 +42495,7 @@
           <description>Write-only access to instruction memory location 26</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM26</name>
             </field>
@@ -42508,7 +42508,7 @@
           <description>Write-only access to instruction memory location 27</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM27</name>
             </field>
@@ -42521,7 +42521,7 @@
           <description>Write-only access to instruction memory location 28</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM28</name>
             </field>
@@ -42534,7 +42534,7 @@
           <description>Write-only access to instruction memory location 29</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM29</name>
             </field>
@@ -42547,7 +42547,7 @@
           <description>Write-only access to instruction memory location 30</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM30</name>
             </field>
@@ -42560,7 +42560,7 @@
           <description>Write-only access to instruction memory location 31</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM31</name>
             </field>
@@ -44767,7 +44767,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-write</access>
+          <access>write-only</access>
           <addressOffset>0x00bc</addressOffset>
           <description>On write, the lower 16 bits go to BASE0, upper bits to BASE1 simultaneously.\n
             Each half is sign-extended to 32 bits if that lane's SIGNED flag is set.</description>
@@ -45029,7 +45029,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-write</access>
+          <access>write-only</access>
           <addressOffset>0x00fc</addressOffset>
           <description>On write, the lower 16 bits go to BASE0, upper bits to BASE1 simultaneously.\n
             Each half is sign-extended to 32 bits if that lane's SIGNED flag is set.</description>
