@@ -87,7 +87,7 @@
 // -----------------------------------------------------------------------------
 // Field       : I2C_IC_CON_IC_SLAVE_DISABLE
 // Description : This bit controls whether I2C has its slave disabled, which
-//               means once the presetn signal is applied, then this bit is set
+//               means once the present signal is applied, then this bit is set
 //               and the slave is disabled.
 //
 //               If this bit is set (slave is disabled), DW_apb_i2c functions
