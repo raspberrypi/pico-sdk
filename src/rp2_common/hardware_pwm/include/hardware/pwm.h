@@ -116,7 +116,7 @@ static inline void pwm_config_set_phase_correct(pwm_config *c, bool phase_correc
  * before passing them on to the PWM counter.
  */
 static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
-    c->div = (uint32_t)(div * (float)(1u << PWM_CH1_DIV_INT_LSB));
+    c->div = (uint32_t)(div * (float)(1u << PWM_CH0_DIV_INT_LSB));
 }
 
 /** \brief Set PWM clock divider in a PWM configuration
@@ -130,7 +130,7 @@ static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
  * before passing them on to the PWM counter.
  */
 static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
-    c->div = div << PWM_CH1_DIV_INT_LSB;
+    c->div = div << PWM_CH0_DIV_INT_LSB;
 }
 
 /** \brief Set PWM counting mode in a PWM configuration
