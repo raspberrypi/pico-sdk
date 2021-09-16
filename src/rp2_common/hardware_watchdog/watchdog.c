@@ -49,18 +49,19 @@ void _watchdog_enable(uint32_t delay_ms, bool pause_on_debug) {
         hw_clear_bits(&watchdog_hw->ctrl, dbg_bits);
     }
 
-    if (!delay_ms) delay_ms = 50;
+    if (!delay_ms) {
+        hw_set_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_TRIGGER_BITS);
+    } else {
+        // Note, we have x2 here as the watchdog HW currently decrements twice per tick
+        load_value = delay_ms * 1000 * 2;
 
-    // Note, we have x2 here as the watchdog HW currently decrements twice per tick
-    load_value = delay_ms * 1000 * 2;
+        if (load_value > 0xffffffu)
+            load_value = 0xffffffu;
 
-    if (load_value > 0xffffffu)
-        load_value = 0xffffffu;
+        watchdog_update();
 
-
-    watchdog_update();
-
-    hw_set_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_ENABLE_BITS);
+        hw_set_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_ENABLE_BITS);
+    }
 }
 // end::watchdog_enable[]
 
