@@ -17,15 +17,15 @@
 
 //------------- UART -------------//
 #ifndef PICO_DEFAULT_UART
-#define PICO_DEFAULT_UART 0
+#define PICO_DEFAULT_UART 1
 #endif
 
 #ifndef PICO_DEFAULT_UART_TX_PIN
-#define PICO_DEFAULT_UART_TX_PIN 0
+#define PICO_DEFAULT_UART_TX_PIN 8
 #endif
 
 #ifndef PICO_DEFAULT_UART_RX_PIN
-#define PICO_DEFAULT_UART_RX_PIN 1
+#define PICO_DEFAULT_UART_RX_PIN 9
 #endif
 
 //------------- LED -------------//
