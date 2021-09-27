@@ -127,7 +127,7 @@ static int stdio_get_until(char *buf, int len, absolute_time_t until) {
         }
         // we sleep here in case the in_chars methods acquire mutexes or disable IRQs and
         // potentially starve out what they are waiting on (have seen this with USB)
-        busy_wait_us(1);
+        busy_wait_us(10);
     } while (!time_reached(until));
     return PICO_ERROR_TIMEOUT;
 }
