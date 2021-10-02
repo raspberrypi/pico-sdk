@@ -147,7 +147,7 @@
 
 //------------- SPI -------------//
 #ifndef PICO_DEFAULT_SPI
-#define PICO_DEFAULT_SPI 0
+#define PICO_DEFAULT_SPI 1
 #endif
 
 #ifndef PICO_DEFAULT_SPI_TX_PIN
