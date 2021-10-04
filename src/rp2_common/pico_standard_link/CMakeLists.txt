@@ -79,6 +79,10 @@ if (NOT TARGET pico_standard_link)
     # boot_stage2 will be linked if PICO_NO_FLASH would be defined to 0
     target_link_libraries(pico_standard_link INTERFACE $<$<NOT:$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,no_flash>,1,$<AND:$<BOOL:${PICO_NO_FLASH}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>>:$<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_BOOT_STAGE2>>,$<TARGET_PROPERTY:PICO_TARGET_BOOT_STAGE2>,bs2_default>_library>)
 
+    # PICO_CMAKE_CONFIG: PICO_USE_DEFAULT_MAX_PAGE_SIZE, Don't shrink linker max page to 4096, type=bool, default=0, advanced=true, group=pico_standard_link
+    if (NOT PICO_USE_DEFAULT_MAX_PAGE_SIZE)
+        target_link_options(pico_standard_link INTERFACE "LINKER:-z,max-page-size=4096")
+    endif()
     # done in compiler now
     #target_link_options(pico_standard_link INTERFACE "LINKER:--build-id=none")
 
