@@ -50,7 +50,7 @@ static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)(void) {}
 
 static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
     // Set up XIP for 03h read on bus access (slow but generic)
-    void (*flash_enter_cmd_xip)(void) = (void(*)(void))rom_func_lookup(rom_table_code('C', 'X'));
+    rom_flash_enter_cmd_xip_fn flash_enter_cmd_xip = (rom_flash_enter_cmd_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_ENTER_CMD_XIP);
     assert(flash_enter_cmd_xip);
     flash_enter_cmd_xip();
 }
@@ -66,11 +66,10 @@ void __no_inline_not_in_flash_func(flash_range_erase)(uint32_t flash_offs, size_
 #endif
     invalid_params_if(FLASH, flash_offs & (FLASH_SECTOR_SIZE - 1));
     invalid_params_if(FLASH, count & (FLASH_SECTOR_SIZE - 1));
-    void (*connect_internal_flash)(void) = (void(*)(void))rom_func_lookup(rom_table_code('I', 'F'));
-    void (*flash_exit_xip)(void) = (void(*)(void))rom_func_lookup(rom_table_code('E', 'X'));
-    void (*flash_range_erase)(uint32_t, size_t, uint32_t, uint8_t) =
-        (void(*)(uint32_t, size_t, uint32_t, uint8_t))rom_func_lookup(rom_table_code('R', 'E'));
-    void (*flash_flush_cache)(void) = (void(*)(void))rom_func_lookup(rom_table_code('F', 'C'));
+    rom_connect_internal_flash_fn connect_internal_flash = (rom_connect_internal_flash_fn)rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
+    rom_flash_exit_xip_fn flash_exit_xip = (rom_flash_exit_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
+    rom_flash_range_erase_fn flash_range_erase = (rom_flash_range_erase_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_RANGE_ERASE);
+    rom_flash_flush_cache_fn flash_flush_cache = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     assert(connect_internal_flash && flash_exit_xip && flash_range_erase && flash_flush_cache);
     flash_init_boot2_copyout();
 
@@ -90,11 +89,10 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
 #endif
     invalid_params_if(FLASH, flash_offs & (FLASH_PAGE_SIZE - 1));
     invalid_params_if(FLASH, count & (FLASH_PAGE_SIZE - 1));
-    void (*connect_internal_flash)(void) = (void(*)(void))rom_func_lookup(rom_table_code('I', 'F'));
-    void (*flash_exit_xip)(void) = (void(*)(void))rom_func_lookup(rom_table_code('E', 'X'));
-    void (*flash_range_program)(uint32_t, const uint8_t*, size_t) =
-        (void(*)(uint32_t, const uint8_t*, size_t))rom_func_lookup(rom_table_code('R', 'P'));
-    void (*flash_flush_cache)(void) = (void(*)(void))rom_func_lookup(rom_table_code('F', 'C'));
+    rom_connect_internal_flash_fn connect_internal_flash = (rom_connect_internal_flash_fn)rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
+    rom_flash_exit_xip_fn flash_exit_xip = (rom_flash_exit_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
+    rom_flash_range_program_fn flash_range_program = (rom_flash_range_program_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_RANGE_PROGRAM);
+    rom_flash_flush_cache_fn flash_flush_cache = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     assert(connect_internal_flash && flash_exit_xip && flash_range_program && flash_flush_cache);
     flash_init_boot2_copyout();
 
@@ -124,9 +122,9 @@ static void __no_inline_not_in_flash_func(flash_cs_force)(bool high) {
 }
 
 void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *rxbuf, size_t count) {
-    void (*connect_internal_flash)(void) = (void(*)(void))rom_func_lookup(rom_table_code('I', 'F'));
-    void (*flash_exit_xip)(void) = (void(*)(void))rom_func_lookup(rom_table_code('E', 'X'));
-    void (*flash_flush_cache)(void) = (void(*)(void))rom_func_lookup(rom_table_code('F', 'C'));
+    rom_connect_internal_flash_fn connect_internal_flash = (rom_connect_internal_flash_fn)rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
+    rom_flash_exit_xip_fn flash_exit_xip = (rom_flash_exit_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
+    rom_flash_flush_cache_fn flash_flush_cache = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     assert(connect_internal_flash && flash_exit_xip && flash_flush_cache);
     flash_init_boot2_copyout();
     __compiler_memory_barrier();

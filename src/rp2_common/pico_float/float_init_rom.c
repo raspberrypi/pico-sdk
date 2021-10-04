@@ -66,5 +66,5 @@ void __aeabi_float_init(void) {
         assert(*((uint8_t *)(rom_table-2)) * 4 >= SF_TABLE_V2_SIZE);
         memcpy(&sf_table, rom_table, SF_TABLE_V2_SIZE);
     }
-    sf_clz_func = rom_func_lookup(rom_table_code('L', '3'));
+    sf_clz_func = rom_func_lookup(ROM_FUNC_CLZ32);
 }
