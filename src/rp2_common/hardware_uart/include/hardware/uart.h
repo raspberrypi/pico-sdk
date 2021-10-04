@@ -326,7 +326,7 @@ static inline void uart_read_blocking(uart_inst_t *uart, uint8_t *dst, size_t le
 /*! \brief  Write single character to UART for transmission.
  *  \ingroup hardware_uart
  *
- * This function will block until all the character has been sent
+ * This function will block until the entire character has been sent
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param c The character  to send
@@ -412,7 +412,7 @@ static inline void uart_set_break(uart_inst_t *uart, bool en) {
  */
 void uart_set_translate_crlf(uart_inst_t *uart, bool translate);
 
-/*! \brief Wait for the default UART'S TX fifo to be drained
+/*! \brief Wait for the default UART's TX FIFO to be drained
  *  \ingroup hardware_uart
  */
 static inline void uart_default_tx_wait_blocking(void) {

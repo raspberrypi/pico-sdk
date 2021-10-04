@@ -26,7 +26,7 @@ extern "C" {
  *
  * The RP2040 PWM block has 8 identical slices. Each slice can drive two PWM output signals, or
  * measure the frequency or duty cycle of an input signal. This gives a total of up to 16 controllable
- * PWM outputs. All 30 GPIOs can be driven by the PWM block
+ * PWM outputs. All 30 GPIOs can be driven by the PWM block.
  *
  * The PWM hardware functions by continuously comparing the input value to a free-running counter. This produces a
  * toggling output where the amount of time spent at the high output level is proportional to the input value. The fraction of
@@ -123,7 +123,7 @@ static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
  *  \ingroup hardware_pwm
  *
  * \param c PWM configuration struct to modify
- * \param div integer value to reduce counting rate by. Must be greater than or equal to 1.
+ * \param div Integer value to reduce counting rate by. Must be greater than or equal to 1.
  *
  * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
  * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
@@ -201,7 +201,7 @@ static inline void pwm_init(uint slice_num, pwm_config *c, bool start) {
 /** \brief Get a set of default values for PWM configuration
  *  \ingroup hardware_pwm
  *
- * PWM config is free running at system clock speed, no phase correction, wrapping at 0xffff,
+ * PWM config is free-running at system clock speed, no phase correction, wrapping at 0xffff,
  * with standard polarities for channels A and B.
  *
  * \return Set of default values.
@@ -239,7 +239,7 @@ static inline void pwm_set_wrap(uint slice_num, uint16_t wrap) {
 /** \brief Set the current PWM counter compare value for one channel
  *  \ingroup hardware_pwm
  *
- * Set the value of the PWM counter compare value, for either channel A or channel B
+ * Set the value of the PWM counter compare value, for either channel A or channel B.
  *
  * The counter compare register is double-buffered in hardware. This means
  * that, when the PWM is running, a write to the counter compare values does
@@ -263,7 +263,7 @@ static inline void pwm_set_chan_level(uint slice_num, uint chan, uint16_t level)
 /** \brief Set PWM counter compare values
  *  \ingroup hardware_pwm
  *
- * Set the value of the PWM counter compare values, A and B
+ * Set the value of the PWM counter compare values, A and B.
  *
  * The counter compare register is double-buffered in hardware. This means
  * that, when the PWM is running, a write to the counter compare values does
@@ -284,7 +284,7 @@ static inline void pwm_set_both_levels(uint slice_num, uint16_t level_a, uint16_
  *  \ingroup hardware_pwm
  *
  * Look up the correct slice (0 to 7) and channel (A or B) for a given GPIO, and update the corresponding
- * counter-compare field.
+ * counter compare field.
  *
  * This PWM slice should already have been configured and set running. Also be careful of multiple GPIOs
  * mapping to the same slice and channel (if GPIOs have a difference of 16).
@@ -309,7 +309,7 @@ static inline void pwm_set_gpio_level(uint gpio, uint16_t level) {
  * Get current value of PWM counter
  *
  * \param slice_num PWM slice number
- * \return Current value of PWM counter
+ * \return Current value of the PWM counter
  */
 static inline uint16_t pwm_get_counter(uint slice_num) {
     check_slice_num_param(slice_num);
@@ -367,7 +367,7 @@ static inline void pwm_retard_count(uint slice_num) {
 /** \brief Set PWM clock divider using an 8:4 fractional value
  *  \ingroup hardware_pwm
  *
- * Set the clock divider. Counter increment will be on sysclock divided by this value, taking in to account the gating.
+ * Set the clock divider. Counter increment will be on sysclock divided by this value, taking into account the gating.
  *
  * \param slice_num PWM slice number
  * \param integer  8 bit integer part of the clock divider
@@ -382,7 +382,7 @@ static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t integer, uint
 /** \brief Set PWM clock divider
  *  \ingroup hardware_pwm
  *
- * Set the clock divider. Counter increment will be on sysclock divided by this value, taking in to account the gating.
+ * Set the clock divider. Counter increment will be on sysclock divided by this value, taking into account the gating.
  *
  * \param slice_num PWM slice number
  * \param divider Floating point clock divider,  1.f <= value < 256.f
@@ -481,7 +481,7 @@ static inline void pwm_set_mask_enabled(uint32_t mask) {
 /*! \brief  Enable PWM instance interrupt
  *  \ingroup hardware_pwm
  *
- * Used to enable a single PWM instance interrupt
+ * Used to enable a single PWM instance interrupt.
  *
  * \param slice_num PWM block to enable/disable
  * \param enabled true to enable, false to disable
@@ -512,7 +512,7 @@ static inline void pwm_set_irq_mask_enabled(uint32_t slice_mask, bool enabled) {
     }
 }
 
-/*! \brief  Clear single PWM channel interrupt
+/*! \brief  Clear a single PWM channel interrupt
  *  \ingroup hardware_pwm
  *
  * \param slice_num PWM slice number

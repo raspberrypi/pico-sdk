@@ -246,7 +246,7 @@ int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t
  * \param len Length of data in bytes to receive
  * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
  *           and the next transfer will begin with a Restart rather than a Start.
- * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged, no device present.
+ * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
  */
 int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop);
 
