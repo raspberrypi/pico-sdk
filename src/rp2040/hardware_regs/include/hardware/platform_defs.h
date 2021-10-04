@@ -27,7 +27,7 @@
 #define NUM_UARTS _u(2)
 #define NUM_I2CS _u(2)
 #define NUM_SPIS _u(2)
-
+#define NUM_TIMERS _u(4)
 #define NUM_ADC_CHANNELS _u(5)
 
 #define NUM_BANK0_GPIOS _u(30)
