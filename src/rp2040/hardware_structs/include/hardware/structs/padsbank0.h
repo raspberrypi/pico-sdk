@@ -15,7 +15,7 @@
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pads_bank0
 
 // BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
-// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/pads_bank0.h.
 
 typedef struct {
@@ -25,9 +25,11 @@ typedef struct {
     io_rw_32 voltage_select;
 
     _REG_(PADS_BANK0_GPIO0_OFFSET)
-    io_rw_32 io[30];
+    io_rw_32 io[NUM_BANK0_GPIOS]; // 30
 } padsbank0_hw_t;
 
 #define padsbank0_hw ((padsbank0_hw_t *const)PADS_BANK0_BASE)
+
+static_assert( NUM_BANK0_GPIOS == 30, "");
 
 #endif

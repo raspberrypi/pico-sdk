@@ -15,7 +15,7 @@
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_clocks
 
 // BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
-// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/clocks.h.
 
 /*! \brief Enumeration identifying a hardware clock
@@ -125,7 +125,7 @@ typedef struct {
 } fc_hw_t;
 
 typedef struct {
-    clock_hw_t clk[10];
+    clock_hw_t clk[CLK_COUNT]; // 10
 
     clock_resus_hw_t resus;
 
@@ -318,5 +318,7 @@ typedef struct {
 } clocks_hw_t;
 
 #define clocks_hw ((clocks_hw_t *const)CLOCKS_BASE)
+
+static_assert( CLK_COUNT == 10, "");
 
 #endif

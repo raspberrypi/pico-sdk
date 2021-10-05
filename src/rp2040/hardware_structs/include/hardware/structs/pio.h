@@ -15,7 +15,7 @@
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pio
 
 // BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
-// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/pio.h.
 
 typedef struct pio_sm_hw {
@@ -111,10 +111,10 @@ typedef struct {
     io_ro_32 flevel;
 
     _REG_(PIO_TXF0_OFFSET)
-    io_wo_32 txf[4];
+    io_wo_32 txf[NUM_PIO_STATE_MACHINES]; // 4
 
     _REG_(PIO_RXF0_OFFSET)
-    io_ro_32 rxf[4];
+    io_ro_32 rxf[NUM_PIO_STATE_MACHINES]; // 4
 
     _REG_(PIO_IRQ_OFFSET)
     // State machine IRQ flags register
@@ -146,9 +146,9 @@ typedef struct {
     io_ro_32 dbg_cfginfo;
 
     _REG_(PIO_INSTR_MEM0_OFFSET)
-    io_wo_32 instr_mem[32];
+    io_wo_32 instr_mem[PIO_INSTRUCTION_COUNT]; // 32
 
-    pio_sm_hw_t sm[4];
+    pio_sm_hw_t sm[NUM_PIO_STATE_MACHINES]; // 4
 
     _REG_(PIO_INTR_OFFSET)
     // Raw Interrupts
@@ -265,5 +265,8 @@ typedef struct {
 
 #define pio0_hw ((pio_hw_t *const)PIO0_BASE)
 #define pio1_hw ((pio_hw_t *const)PIO1_BASE)
+
+static_assert( NUM_PIO_STATE_MACHINES == 4, "");
+static_assert( PIO_INSTRUCTION_COUNT == 32, "");
 
 #endif

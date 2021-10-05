@@ -15,7 +15,7 @@
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_io_bank0
 
 // BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
-// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/io_bank0.h.
 
 typedef struct {

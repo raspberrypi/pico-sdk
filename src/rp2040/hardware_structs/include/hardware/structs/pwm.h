@@ -15,7 +15,7 @@
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pwm
 
 // BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
-// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/pwm.h.
 
 typedef struct pwm_slice_hw {
@@ -54,7 +54,7 @@ typedef struct pwm_slice_hw {
 } pwm_slice_hw_t;
 
 typedef struct {
-    pwm_slice_hw_t slice[8];
+    pwm_slice_hw_t slice[NUM_PWM_SLICES]; // 8
 
     _REG_(PWM_EN_OFFSET)
     // This register aliases the CSR_EN bits for all channels
@@ -118,5 +118,7 @@ typedef struct {
 } pwm_hw_t;
 
 #define pwm_hw ((pwm_hw_t *const)PWM_BASE)
+
+static_assert( NUM_PWM_SLICES == 8, "");
 
 #endif

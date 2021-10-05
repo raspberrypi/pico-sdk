@@ -15,7 +15,7 @@
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_dma
 
 // BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
-// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/dma.h.
 
 typedef struct {
@@ -101,7 +101,7 @@ typedef struct {
 } dma_channel_hw_t;
 
 typedef struct {
-    dma_channel_hw_t ch[12];
+    dma_channel_hw_t ch[NUM_DMA_CHANNELS]; // 12
 
     uint32_t _pad0[64];
 
@@ -143,7 +143,7 @@ typedef struct {
     io_rw_32 ints1;
 
     _REG_(DMA_TIMER0_OFFSET)
-    io_rw_32 timer[4];
+    io_rw_32 timer[NUM_DMA_TIMERS]; // 4
 
     _REG_(DMA_MULTI_CHAN_TRIGGER_OFFSET)
     // Trigger one or more channels simultaneously
@@ -189,5 +189,8 @@ typedef struct {
 
 #define dma_hw ((dma_hw_t *const)DMA_BASE)
 #define dma_debug_hw ((dma_debug_hw_t *const)(DMA_BASE + DMA_CH0_DBG_CTDREQ_OFFSET))
+
+static_assert( NUM_DMA_TIMERS == 4, "");
+static_assert( NUM_DMA_CHANNELS == 12, "");
 
 #endif

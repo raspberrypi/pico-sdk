@@ -15,7 +15,7 @@
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_timer
 
 // BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
-// The REG macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
+// The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/timer.h.
 
 typedef struct {
@@ -36,7 +36,7 @@ typedef struct {
     io_ro_32 timelr;
 
     _REG_(TIMER_ALARM0_OFFSET)
-    io_rw_32 alarm[4];
+    io_rw_32 alarm[NUM_TIMERS]; // 4
 
     _REG_(TIMER_ARMED_OFFSET)
     // Indicates the armed/disarmed status of each alarm
@@ -96,5 +96,7 @@ typedef struct {
 } timer_hw_t;
 
 #define timer_hw ((timer_hw_t *const)TIMER_BASE)
+
+static_assert( NUM_TIMERS == 4, "");
 
 #endif
