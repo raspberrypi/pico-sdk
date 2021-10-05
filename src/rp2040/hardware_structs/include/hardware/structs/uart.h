@@ -167,14 +167,6 @@ typedef struct {
     // 0x00000002 [1]     : TXDMAE (0): Transmit DMA enable
     // 0x00000001 [0]     : RXDMAE (0): Receive DMA enable
     io_rw_32 dmacr;
-
-    uint32_t _pad2[997];
-
-    _REG_(UART_UARTPERIPHID0_OFFSET)
-    io_ro_32 periphid[4];
-
-    _REG_(UART_UARTPCELLID0_OFFSET)
-    io_ro_32 pcellid[4];
 } uart_hw_t;
 
 #define uart0_hw ((uart_hw_t *const)UART0_BASE)
