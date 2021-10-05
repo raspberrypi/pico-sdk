@@ -13,10 +13,12 @@
 #include "hardware/regs/usb.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_usb
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/usb.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 // 0-15
 #define USB_NUM_ENDPOINTS 16
@@ -120,33 +122,33 @@ static_assert(sizeof(usb_host_dpram_t) == USB_DPRAM_MAX, "");
 static_assert(offsetof(usb_host_dpram_t, epx_data) == 0x180, "");
 
 typedef struct {
-    _REG_(USB_ADDR_ENDP_OFFSET)
+    _REG_(USB_ADDR_ENDP_OFFSET) // USB_ADDR_ENDP
     // Device address and endpoint control
     // 0x000f0000 [16-19] : ENDPOINT (0): Device endpoint to send data to
     // 0x0000007f [0-6]   : ADDRESS (0): In device mode, the address that the device should respond to
     io_rw_32 dev_addr_ctrl;
 
-    _REG_(USB_ADDR_ENDP1_OFFSET)
+    _REG_(USB_ADDR_ENDP1_OFFSET) // USB_ADDR_ENDP1
     io_rw_32 int_ep_addr_ctrl[15];
 
-    _REG_(USB_MAIN_CTRL_OFFSET)
+    _REG_(USB_MAIN_CTRL_OFFSET) // USB_MAIN_CTRL
     // Main control register
     // 0x80000000 [31]    : SIM_TIMING (0): Reduced timings for simulation
     // 0x00000002 [1]     : HOST_NDEVICE (0): Device mode = 0, Host mode = 1
     // 0x00000001 [0]     : CONTROLLER_EN (0): Enable controller
     io_rw_32 main_ctrl;
 
-    _REG_(USB_SOF_WR_OFFSET)
+    _REG_(USB_SOF_WR_OFFSET) // USB_SOF_WR
     // Set the SOF (Start of Frame) frame number in the host controller
     // 0x000007ff [0-10]  : COUNT (0)
     io_wo_32 sof_wr;
 
-    _REG_(USB_SOF_RD_OFFSET)
+    _REG_(USB_SOF_RD_OFFSET) // USB_SOF_RD
     // Read the last SOF (Start of Frame) frame number seen
     // 0x000007ff [0-10]  : COUNT (0)
     io_ro_32 sof_rd;
 
-    _REG_(USB_SIE_CTRL_OFFSET)
+    _REG_(USB_SIE_CTRL_OFFSET) // USB_SIE_CTRL
     // SIE control register
     // 0x80000000 [31]    : EP0_INT_STALL (0): Device: Set bit in EP_STATUS_STALL_NAK when EP0 sends a STALL
     // 0x40000000 [30]    : EP0_DOUBLE_BUF (0): Device: EP0 single buffered = 0, double buffered = 1
@@ -174,7 +176,7 @@ typedef struct {
     // 0x00000001 [0]     : START_TRANS (0): Host: Start transaction
     io_rw_32 sie_ctrl;
 
-    _REG_(USB_SIE_STATUS_OFFSET)
+    _REG_(USB_SIE_STATUS_OFFSET) // USB_SIE_STATUS
     // SIE status register
     // 0x80000000 [31]    : DATA_SEQ_ERROR (0): Data Sequence Error
     // 0x40000000 [30]    : ACK_REC (0): ACK received
@@ -196,12 +198,12 @@ typedef struct {
     // 0x00000001 [0]     : VBUS_DETECTED (0): Device: VBUS Detected
     io_rw_32 sie_status;
 
-    _REG_(USB_INT_EP_CTRL_OFFSET)
+    _REG_(USB_INT_EP_CTRL_OFFSET) // USB_INT_EP_CTRL
     // interrupt endpoint control register
     // 0x0000fffe [1-15]  : INT_EP_ACTIVE (0): Host: Enable interrupt endpoint 1 -> 15
     io_rw_32 int_ep_ctrl;
 
-    _REG_(USB_BUFF_STATUS_OFFSET)
+    _REG_(USB_BUFF_STATUS_OFFSET) // USB_BUFF_STATUS
     // Buffer status register
     // 0x80000000 [31]    : EP15_OUT (0)
     // 0x40000000 [30]    : EP15_IN (0)
@@ -237,7 +239,7 @@ typedef struct {
     // 0x00000001 [0]     : EP0_IN (0)
     io_rw_32 buf_status;
 
-    _REG_(USB_BUFF_CPU_SHOULD_HANDLE_OFFSET)
+    _REG_(USB_BUFF_CPU_SHOULD_HANDLE_OFFSET) // USB_BUFF_CPU_SHOULD_HANDLE
     // Which of the double buffers should be handled
     // 0x80000000 [31]    : EP15_OUT (0)
     // 0x40000000 [30]    : EP15_IN (0)
@@ -273,7 +275,7 @@ typedef struct {
     // 0x00000001 [0]     : EP0_IN (0)
     io_ro_32 buf_cpu_should_handle;
 
-    _REG_(USB_EP_ABORT_OFFSET)
+    _REG_(USB_EP_ABORT_OFFSET) // USB_EP_ABORT
     // Device only: Can be set to ignore the buffer control register for this endpoint in case you would like to revoke a buffer
     // 0x80000000 [31]    : EP15_OUT (0)
     // 0x40000000 [30]    : EP15_IN (0)
@@ -309,7 +311,7 @@ typedef struct {
     // 0x00000001 [0]     : EP0_IN (0)
     io_rw_32 abort;
 
-    _REG_(USB_EP_ABORT_DONE_OFFSET)
+    _REG_(USB_EP_ABORT_DONE_OFFSET) // USB_EP_ABORT_DONE
     // Device only: Used in conjunction with `EP_ABORT`
     // 0x80000000 [31]    : EP15_OUT (0)
     // 0x40000000 [30]    : EP15_IN (0)
@@ -345,19 +347,19 @@ typedef struct {
     // 0x00000001 [0]     : EP0_IN (0)
     io_rw_32 abort_done;
 
-    _REG_(USB_EP_STALL_ARM_OFFSET)
+    _REG_(USB_EP_STALL_ARM_OFFSET) // USB_EP_STALL_ARM
     // Device: this bit must be set in conjunction with the `STALL` bit in the buffer control register to send a STALL on EP0
     // 0x00000002 [1]     : EP0_OUT (0)
     // 0x00000001 [0]     : EP0_IN (0)
     io_rw_32 ep_stall_arm;
 
-    _REG_(USB_NAK_POLL_OFFSET)
+    _REG_(USB_NAK_POLL_OFFSET) // USB_NAK_POLL
     // Used by the host controller
     // 0x03ff0000 [16-25] : DELAY_FS (0x10): NAK polling interval for a full speed device
     // 0x000003ff [0-9]   : DELAY_LS (0x10): NAK polling interval for a low speed device
     io_rw_32 nak_poll;
 
-    _REG_(USB_EP_STATUS_STALL_NAK_OFFSET)
+    _REG_(USB_EP_STATUS_STALL_NAK_OFFSET) // USB_EP_STATUS_STALL_NAK
     // Device: bits are set when the `IRQ_ON_NAK` or `IRQ_ON_STALL` bits are set
     // 0x80000000 [31]    : EP15_OUT (0)
     // 0x40000000 [30]    : EP15_IN (0)
@@ -393,7 +395,7 @@ typedef struct {
     // 0x00000001 [0]     : EP0_IN (0)
     io_rw_32 ep_nak_stall_status;
 
-    _REG_(USB_USB_MUXING_OFFSET)
+    _REG_(USB_USB_MUXING_OFFSET) // USB_USB_MUXING
     // Where to connect the USB controller
     // 0x00000008 [3]     : SOFTCON (0)
     // 0x00000004 [2]     : TO_DIGITAL_PAD (0)
@@ -401,7 +403,7 @@ typedef struct {
     // 0x00000001 [0]     : TO_PHY (0)
     io_rw_32 muxing;
 
-    _REG_(USB_USB_PWR_OFFSET)
+    _REG_(USB_USB_PWR_OFFSET) // USB_USB_PWR
     // Overrides for the power signals in the event that the VBUS signals are not hooked up to GPIO
     // 0x00000020 [5]     : OVERCURR_DETECT_EN (0)
     // 0x00000010 [4]     : OVERCURR_DETECT (0)
@@ -411,7 +413,7 @@ typedef struct {
     // 0x00000001 [0]     : VBUS_EN (0)
     io_rw_32 pwr;
 
-    _REG_(USB_USBPHY_DIRECT_OFFSET)
+    _REG_(USB_USBPHY_DIRECT_OFFSET) // USB_USBPHY_DIRECT
     // This register allows for direct control of the USB phy
     // 0x00400000 [22]    : DM_OVV (0): DM over voltage
     // 0x00200000 [21]    : DP_OVV (0): DP over voltage
@@ -436,7 +438,7 @@ typedef struct {
     // 0x00000001 [0]     : DP_PULLUP_HISEL (0): Enable the second DP pull up resistor
     io_rw_32 phy_direct;
 
-    _REG_(USB_USBPHY_DIRECT_OVERRIDE_OFFSET)
+    _REG_(USB_USBPHY_DIRECT_OVERRIDE_OFFSET) // USB_USBPHY_DIRECT_OVERRIDE
     // Override enable for each control in usbphy_direct
     // 0x00008000 [15]    : TX_DIFFMODE_OVERRIDE_EN (0)
     // 0x00001000 [12]    : DM_PULLUP_OVERRIDE_EN (0)
@@ -454,7 +456,7 @@ typedef struct {
     // 0x00000001 [0]     : DP_PULLUP_HISEL_OVERRIDE_EN (0)
     io_rw_32 phy_direct_override;
 
-    _REG_(USB_USBPHY_TRIM_OFFSET)
+    _REG_(USB_USBPHY_TRIM_OFFSET) // USB_USBPHY_TRIM
     // Used to adjust trim values of USB phy pull down resistors
     // 0x00001f00 [8-12]  : DM_PULLDN_TRIM (0x1f): Value to drive to USB PHY
     // 0x0000001f [0-4]   : DP_PULLDN_TRIM (0x1f): Value to drive to USB PHY
@@ -462,7 +464,7 @@ typedef struct {
 
     uint32_t _pad0;
 
-    _REG_(USB_INTR_OFFSET)
+    _REG_(USB_INTR_OFFSET) // USB_INTR
     // Raw Interrupts
     // 0x00080000 [19]    : EP_STALL_NAK (0): Raised when any bit in EP_STATUS_STALL_NAK is set
     // 0x00040000 [18]    : ABORT_DONE (0): Raised when any bit in ABORT_DONE is set
@@ -486,7 +488,7 @@ typedef struct {
     // 0x00000001 [0]     : HOST_CONN_DIS (0): Host: raised when a device is connected or disconnected (i
     io_ro_32 intr;
 
-    _REG_(USB_INTE_OFFSET)
+    _REG_(USB_INTE_OFFSET) // USB_INTE
     // Interrupt Enable
     // 0x00080000 [19]    : EP_STALL_NAK (0): Raised when any bit in EP_STATUS_STALL_NAK is set
     // 0x00040000 [18]    : ABORT_DONE (0): Raised when any bit in ABORT_DONE is set
@@ -510,7 +512,7 @@ typedef struct {
     // 0x00000001 [0]     : HOST_CONN_DIS (0): Host: raised when a device is connected or disconnected (i
     io_rw_32 inte;
 
-    _REG_(USB_INTF_OFFSET)
+    _REG_(USB_INTF_OFFSET) // USB_INTF
     // Interrupt Force
     // 0x00080000 [19]    : EP_STALL_NAK (0): Raised when any bit in EP_STATUS_STALL_NAK is set
     // 0x00040000 [18]    : ABORT_DONE (0): Raised when any bit in ABORT_DONE is set
@@ -534,7 +536,7 @@ typedef struct {
     // 0x00000001 [0]     : HOST_CONN_DIS (0): Host: raised when a device is connected or disconnected (i
     io_rw_32 intf;
 
-    _REG_(USB_INTS_OFFSET)
+    _REG_(USB_INTS_OFFSET) // USB_INTS
     // Interrupt status after masking & forcing
     // 0x00080000 [19]    : EP_STALL_NAK (0): Raised when any bit in EP_STATUS_STALL_NAK is set
     // 0x00040000 [18]    : ABORT_DONE (0): Raised when any bit in ABORT_DONE is set

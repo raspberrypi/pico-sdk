@@ -13,13 +13,15 @@
 #include "hardware/regs/psm.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_psm
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/psm.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(PSM_FRCE_ON_OFFSET)
+    _REG_(PSM_FRCE_ON_OFFSET) // PSM_FRCE_ON
     // Force block out of reset (i
     // 0x00010000 [16]    : proc1 (0)
     // 0x00008000 [15]    : proc0 (0)
@@ -40,7 +42,7 @@ typedef struct {
     // 0x00000001 [0]     : rosc (0)
     io_rw_32 frce_on;
 
-    _REG_(PSM_FRCE_OFF_OFFSET)
+    _REG_(PSM_FRCE_OFF_OFFSET) // PSM_FRCE_OFF
     // Force into reset (i
     // 0x00010000 [16]    : proc1 (0)
     // 0x00008000 [15]    : proc0 (0)
@@ -61,7 +63,7 @@ typedef struct {
     // 0x00000001 [0]     : rosc (0)
     io_rw_32 frce_off;
 
-    _REG_(PSM_WDSEL_OFFSET)
+    _REG_(PSM_WDSEL_OFFSET) // PSM_WDSEL
     // Set to 1 if this peripheral should be reset when the watchdog fires
     // 0x00010000 [16]    : proc1 (0)
     // 0x00008000 [15]    : proc0 (0)
@@ -82,7 +84,7 @@ typedef struct {
     // 0x00000001 [0]     : rosc (0)
     io_rw_32 wdsel;
 
-    _REG_(PSM_DONE_OFFSET)
+    _REG_(PSM_DONE_OFFSET) // PSM_DONE
     // Indicates the peripheral's registers are ready to access
     // 0x00010000 [16]    : proc1 (0)
     // 0x00008000 [15]    : proc0 (0)

@@ -13,13 +13,15 @@
 #include "hardware/regs/vreg_and_chip_reset.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_vreg_and_chip_reset
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/vreg_and_chip_reset.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(VREG_AND_CHIP_RESET_VREG_OFFSET)
+    _REG_(VREG_AND_CHIP_RESET_VREG_OFFSET) // VREG_AND_CHIP_RESET_VREG
     // Voltage regulator control and status
     // 0x00001000 [12]    : ROK (0): regulation status
     // 0x000000f0 [4-7]   : VSEL (0xb): output voltage select
@@ -27,13 +29,13 @@ typedef struct {
     // 0x00000001 [0]     : EN (1): enable
     io_rw_32 vreg;
 
-    _REG_(VREG_AND_CHIP_RESET_BOD_OFFSET)
+    _REG_(VREG_AND_CHIP_RESET_BOD_OFFSET) // VREG_AND_CHIP_RESET_BOD
     // brown-out detection control
     // 0x000000f0 [4-7]   : VSEL (0x9): threshold select
     // 0x00000001 [0]     : EN (1): enable
     io_rw_32 bod;
 
-    _REG_(VREG_AND_CHIP_RESET_CHIP_RESET_OFFSET)
+    _REG_(VREG_AND_CHIP_RESET_CHIP_RESET_OFFSET) // VREG_AND_CHIP_RESET_CHIP_RESET
     // Chip reset control and status
     // 0x01000000 [24]    : PSM_RESTART_FLAG (0): This is set by psm_restart from the debugger
     // 0x00100000 [20]    : HAD_PSM_RESTART (0): Last reset was from the debug port

@@ -32,6 +32,7 @@
 #define NUM_ADC_CHANNELS _u(5)
 
 #define NUM_BANK0_GPIOS _u(30)
+#define NUM_QSPI_GPIOS _u(6)
 
 #define PIO_INSTRUCTION_COUNT _u(32)
 

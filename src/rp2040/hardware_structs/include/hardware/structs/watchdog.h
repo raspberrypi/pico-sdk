@@ -13,13 +13,15 @@
 #include "hardware/regs/watchdog.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_watchdog
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/watchdog.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(WATCHDOG_CTRL_OFFSET)
+    _REG_(WATCHDOG_CTRL_OFFSET) // WATCHDOG_CTRL
     // Watchdog control
     // 0x80000000 [31]    : TRIGGER (0): Trigger a watchdog reset
     // 0x40000000 [30]    : ENABLE (0): When not enabled the watchdog timer is paused
@@ -29,21 +31,21 @@ typedef struct {
     // 0x00ffffff [0-23]  : TIME (0): Indicates the number of ticks / 2 (see errata RP2040-E1) before a watchdog reset will...
     io_rw_32 ctrl;
 
-    _REG_(WATCHDOG_LOAD_OFFSET)
+    _REG_(WATCHDOG_LOAD_OFFSET) // WATCHDOG_LOAD
     // Load the watchdog timer
     // 0x00ffffff [0-23]  : LOAD (0)
     io_wo_32 load;
 
-    _REG_(WATCHDOG_REASON_OFFSET)
+    _REG_(WATCHDOG_REASON_OFFSET) // WATCHDOG_REASON
     // Logs the reason for the last reset
     // 0x00000002 [1]     : FORCE (0)
     // 0x00000001 [0]     : TIMER (0)
     io_ro_32 reason;
 
-    _REG_(WATCHDOG_SCRATCH0_OFFSET)
+    _REG_(WATCHDOG_SCRATCH0_OFFSET) // WATCHDOG_SCRATCH0
     io_rw_32 scratch[8];
 
-    _REG_(WATCHDOG_TICK_OFFSET)
+    _REG_(WATCHDOG_TICK_OFFSET) // WATCHDOG_TICK
     // Controls the tick generator
     // 0x000ff800 [11-19] : COUNT (0): Count down timer: the remaining number clk_tick cycles before the next tick is generated
     // 0x00000400 [10]    : RUNNING (0): Is the tick generator running?

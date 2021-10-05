@@ -13,25 +13,27 @@
 #include "hardware/regs/rtc.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_rtc
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/rtc.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(RTC_CLKDIV_M1_OFFSET)
+    _REG_(RTC_CLKDIV_M1_OFFSET) // RTC_CLKDIV_M1
     // Divider minus 1 for the 1 second counter
     // 0x0000ffff [0-15]  : CLKDIV_M1 (0)
     io_rw_32 clkdiv_m1;
 
-    _REG_(RTC_SETUP_0_OFFSET)
+    _REG_(RTC_SETUP_0_OFFSET) // RTC_SETUP_0
     // RTC setup register 0
     // 0x00fff000 [12-23] : YEAR (0): Year
     // 0x00000f00 [8-11]  : MONTH (0): Month (1
     // 0x0000001f [0-4]   : DAY (0): Day of the month (1
     io_rw_32 setup_0;
 
-    _REG_(RTC_SETUP_1_OFFSET)
+    _REG_(RTC_SETUP_1_OFFSET) // RTC_SETUP_1
     // RTC setup register 1
     // 0x07000000 [24-26] : DOTW (0): Day of the week: 1-Monday
     // 0x001f0000 [16-20] : HOUR (0): Hours
@@ -39,7 +41,7 @@ typedef struct {
     // 0x0000003f [0-5]   : SEC (0): Seconds
     io_rw_32 setup_1;
 
-    _REG_(RTC_CTRL_OFFSET)
+    _REG_(RTC_CTRL_OFFSET) // RTC_CTRL
     // RTC Control and status
     // 0x00000100 [8]     : FORCE_NOTLEAPYEAR (0): If set, leapyear is forced off
     // 0x00000010 [4]     : LOAD (0): Load RTC
@@ -47,7 +49,7 @@ typedef struct {
     // 0x00000001 [0]     : RTC_ENABLE (0): Enable RTC
     io_rw_32 ctrl;
 
-    _REG_(RTC_IRQ_SETUP_0_OFFSET)
+    _REG_(RTC_IRQ_SETUP_0_OFFSET) // RTC_IRQ_SETUP_0
     // Interrupt setup register 0
     // 0x20000000 [29]    : MATCH_ACTIVE (0)
     // 0x10000000 [28]    : MATCH_ENA (0): Global match enable
@@ -59,7 +61,7 @@ typedef struct {
     // 0x0000001f [0-4]   : DAY (0): Day of the month (1
     io_rw_32 irq_setup_0;
 
-    _REG_(RTC_IRQ_SETUP_1_OFFSET)
+    _REG_(RTC_IRQ_SETUP_1_OFFSET) // RTC_IRQ_SETUP_1
     // Interrupt setup register 1
     // 0x80000000 [31]    : DOTW_ENA (0): Enable day of the week matching
     // 0x40000000 [30]    : HOUR_ENA (0): Enable hour matching
@@ -71,14 +73,14 @@ typedef struct {
     // 0x0000003f [0-5]   : SEC (0): Seconds
     io_rw_32 irq_setup_1;
 
-    _REG_(RTC_RTC_1_OFFSET)
+    _REG_(RTC_RTC_1_OFFSET) // RTC_RTC_1
     // RTC register 1
     // 0x00fff000 [12-23] : YEAR (0): Year
     // 0x00000f00 [8-11]  : MONTH (0): Month (1
     // 0x0000001f [0-4]   : DAY (0): Day of the month (1
     io_ro_32 rtc_1;
 
-    _REG_(RTC_RTC_0_OFFSET)
+    _REG_(RTC_RTC_0_OFFSET) // RTC_RTC_0
     // RTC register 0
     // 0x07000000 [24-26] : DOTW (0): Day of the week
     // 0x001f0000 [16-20] : HOUR (0): Hours
@@ -86,22 +88,22 @@ typedef struct {
     // 0x0000003f [0-5]   : SEC (0): Seconds
     io_ro_32 rtc_0;
 
-    _REG_(RTC_INTR_OFFSET)
+    _REG_(RTC_INTR_OFFSET) // RTC_INTR
     // Raw Interrupts
     // 0x00000001 [0]     : RTC (0)
     io_ro_32 intr;
 
-    _REG_(RTC_INTE_OFFSET)
+    _REG_(RTC_INTE_OFFSET) // RTC_INTE
     // Interrupt Enable
     // 0x00000001 [0]     : RTC (0)
     io_rw_32 inte;
 
-    _REG_(RTC_INTF_OFFSET)
+    _REG_(RTC_INTF_OFFSET) // RTC_INTF
     // Interrupt Force
     // 0x00000001 [0]     : RTC (0)
     io_rw_32 intf;
 
-    _REG_(RTC_INTS_OFFSET)
+    _REG_(RTC_INTS_OFFSET) // RTC_INTS
     // Interrupt status after masking & forcing
     // 0x00000001 [0]     : RTC (0)
     io_ro_32 ints;

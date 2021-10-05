@@ -13,13 +13,15 @@
 #include "hardware/regs/io_bank0.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_io_bank0
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/io_bank0.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(IO_BANK0_GPIO0_STATUS_OFFSET)
+    _REG_(IO_BANK0_GPIO0_STATUS_OFFSET) // IO_BANK0_GPIO0_STATUS
     // GPIO status
     // 0x04000000 [26]    : IRQTOPROC (0): interrupt to processors, after override is applied
     // 0x01000000 [24]    : IRQFROMPAD (0): interrupt from pad before override is applied
@@ -31,7 +33,7 @@ typedef struct {
     // 0x00000100 [8]     : OUTFROMPERI (0): output signal from selected peripheral, before register override is applied
     io_ro_32 status;
 
-    _REG_(IO_BANK0_GPIO0_CTRL_OFFSET)
+    _REG_(IO_BANK0_GPIO0_CTRL_OFFSET) // IO_BANK0_GPIO0_CTRL
     // GPIO control including function select and overrides
     // 0x30000000 [28-29] : IRQOVER (0)
     // 0x00030000 [16-17] : INOVER (0)
@@ -42,21 +44,21 @@ typedef struct {
 } io_status_ctrl_hw_t;
 
 typedef struct {
-    _REG_(IO_BANK0_PROC0_INTE0_OFFSET)
+    _REG_(IO_BANK0_PROC0_INTE0_OFFSET) // IO_BANK0_PROC0_INTE0
     io_rw_32 inte[4];
 
-    _REG_(IO_BANK0_PROC0_INTF0_OFFSET)
+    _REG_(IO_BANK0_PROC0_INTF0_OFFSET) // IO_BANK0_PROC0_INTF0
     io_rw_32 intf[4];
 
-    _REG_(IO_BANK0_PROC0_INTS0_OFFSET)
+    _REG_(IO_BANK0_PROC0_INTS0_OFFSET) // IO_BANK0_PROC0_INTS0
     io_ro_32 ints[4];
 } io_irq_ctrl_hw_t;
 
 /// \tag::iobank0_hw[]
 typedef struct {
-    io_status_ctrl_hw_t io[30];
+    io_status_ctrl_hw_t io[NUM_BANK0_GPIOS]; // 30
 
-    _REG_(IO_BANK0_INTR0_OFFSET)
+    _REG_(IO_BANK0_INTR0_OFFSET) // IO_BANK0_INTR0
     io_rw_32 intr[4];
 
     io_irq_ctrl_hw_t proc0_irq_ctrl;
@@ -68,5 +70,7 @@ typedef struct {
 
 #define iobank0_hw ((iobank0_hw_t *const)IO_BANK0_BASE)
 /// \end::iobank0_hw[]
+
+static_assert( NUM_BANK0_GPIOS == 30, "");
 
 #endif

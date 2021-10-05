@@ -13,13 +13,15 @@
 #include "hardware/regs/adc.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_adc
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/adc.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(ADC_CS_OFFSET)
+    _REG_(ADC_CS_OFFSET) // ADC_CS
     // ADC Control and Status
     // 0x001f0000 [16-20] : RROBIN (0): Round-robin sampling
     // 0x00007000 [12-14] : AINSEL (0): Select analog mux input
@@ -32,12 +34,12 @@ typedef struct {
     // 0x00000001 [0]     : EN (0): Power on ADC and enable its clock
     io_rw_32 cs;
 
-    _REG_(ADC_RESULT_OFFSET)
+    _REG_(ADC_RESULT_OFFSET) // ADC_RESULT
     // Result of most recent ADC conversion
     // 0x00000fff [0-11]  : RESULT (0)
     io_ro_32 result;
 
-    _REG_(ADC_FCS_OFFSET)
+    _REG_(ADC_FCS_OFFSET) // ADC_FCS
     // FIFO control and status
     // 0x0f000000 [24-27] : THRESH (0): DREQ/IRQ asserted when level >= threshold
     // 0x000f0000 [16-19] : LEVEL (0): The number of conversion results currently waiting in the FIFO
@@ -51,34 +53,34 @@ typedef struct {
     // 0x00000001 [0]     : EN (0): If 1: write result to the FIFO after each conversion
     io_rw_32 fcs;
 
-    _REG_(ADC_FIFO_OFFSET)
+    _REG_(ADC_FIFO_OFFSET) // ADC_FIFO
     // Conversion result FIFO
     // 0x00008000 [15]    : ERR (0): 1 if this particular sample experienced a conversion error
     // 0x00000fff [0-11]  : VAL (0)
     io_ro_32 fifo;
 
-    _REG_(ADC_DIV_OFFSET)
+    _REG_(ADC_DIV_OFFSET) // ADC_DIV
     // Clock divider
     // 0x00ffff00 [8-23]  : INT (0): Integer part of clock divisor
     // 0x000000ff [0-7]   : FRAC (0): Fractional part of clock divisor
     io_rw_32 div;
 
-    _REG_(ADC_INTR_OFFSET)
+    _REG_(ADC_INTR_OFFSET) // ADC_INTR
     // Raw Interrupts
     // 0x00000001 [0]     : FIFO (0): Triggered when the sample FIFO reaches a certain level
     io_ro_32 intr;
 
-    _REG_(ADC_INTE_OFFSET)
+    _REG_(ADC_INTE_OFFSET) // ADC_INTE
     // Interrupt Enable
     // 0x00000001 [0]     : FIFO (0): Triggered when the sample FIFO reaches a certain level
     io_rw_32 inte;
 
-    _REG_(ADC_INTF_OFFSET)
+    _REG_(ADC_INTF_OFFSET) // ADC_INTF
     // Interrupt Force
     // 0x00000001 [0]     : FIFO (0): Triggered when the sample FIFO reaches a certain level
     io_rw_32 intf;
 
-    _REG_(ADC_INTS_OFFSET)
+    _REG_(ADC_INTS_OFFSET) // ADC_INTS
     // Interrupt status after masking & forcing
     // 0x00000001 [0]     : FIFO (0): Triggered when the sample FIFO reaches a certain level
     io_ro_32 ints;

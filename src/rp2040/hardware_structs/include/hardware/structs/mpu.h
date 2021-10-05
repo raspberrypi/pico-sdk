@@ -13,39 +13,41 @@
 #include "hardware/regs/m0plus.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_m0plus
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/m0plus.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(M0PLUS_MPU_TYPE_OFFSET)
+    _REG_(M0PLUS_MPU_TYPE_OFFSET) // M0PLUS_MPU_TYPE
     // Read the MPU Type Register to determine if the processor implements an MPU, and how many regions the MPU supports
     // 0x00ff0000 [16-23] : IREGION (0): Instruction region
     // 0x0000ff00 [8-15]  : DREGION (0x8): Number of regions supported by the MPU
     // 0x00000001 [0]     : SEPARATE (0): Indicates support for separate instruction and data address maps
     io_ro_32 type;
 
-    _REG_(M0PLUS_MPU_CTRL_OFFSET)
+    _REG_(M0PLUS_MPU_CTRL_OFFSET) // M0PLUS_MPU_CTRL
     // Use the MPU Control Register to enable and disable the MPU, and to control whether the default memory map is enabled...
     // 0x00000004 [2]     : PRIVDEFENA (0): Controls whether the default memory map is enabled as a background region for...
     // 0x00000002 [1]     : HFNMIENA (0): Controls the use of the MPU for HardFaults and NMIs
     // 0x00000001 [0]     : ENABLE (0): Enables the MPU
     io_rw_32 ctrl;
 
-    _REG_(M0PLUS_MPU_RNR_OFFSET)
+    _REG_(M0PLUS_MPU_RNR_OFFSET) // M0PLUS_MPU_RNR
     // Use the MPU Region Number Register to select the region currently accessed by MPU_RBAR and MPU_RASR
     // 0x0000000f [0-3]   : REGION (0): Indicates the MPU region referenced by the MPU_RBAR and MPU_RASR registers
     io_rw_32 rnr;
 
-    _REG_(M0PLUS_MPU_RBAR_OFFSET)
+    _REG_(M0PLUS_MPU_RBAR_OFFSET) // M0PLUS_MPU_RBAR
     // Read the MPU Region Base Address Register to determine the base address of the region identified by MPU_RNR
     // 0xffffff00 [8-31]  : ADDR (0): Base address of the region
     // 0x00000010 [4]     : VALID (0): On writes, indicates whether the write must update the base address of the region...
     // 0x0000000f [0-3]   : REGION (0): On writes, specifies the number of the region whose base address to update provided...
     io_rw_32 rbar;
 
-    _REG_(M0PLUS_MPU_RASR_OFFSET)
+    _REG_(M0PLUS_MPU_RASR_OFFSET) // M0PLUS_MPU_RASR
     // Use the MPU Region Attribute and Size Register to define the size, access behaviour and memory type of the region...
     // 0xffff0000 [16-31] : ATTRS (0): The MPU Region Attribute field
     // 0x0000ff00 [8-15]  : SRD (0): Subregion Disable

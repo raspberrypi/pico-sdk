@@ -13,20 +13,22 @@
 #include "hardware/regs/xosc.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_xosc
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/xosc.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 /// \tag::xosc_hw[]
 typedef struct {
-    _REG_(XOSC_CTRL_OFFSET)
+    _REG_(XOSC_CTRL_OFFSET) // XOSC_CTRL
     // Crystal Oscillator Control
     // 0x00fff000 [12-23] : ENABLE (0): On power-up this field is initialised to DISABLE and the chip runs from the ROSC
     // 0x00000fff [0-11]  : FREQ_RANGE (0): Frequency range
     io_rw_32 ctrl;
 
-    _REG_(XOSC_STATUS_OFFSET)
+    _REG_(XOSC_STATUS_OFFSET) // XOSC_STATUS
     // Crystal Oscillator Status
     // 0x80000000 [31]    : STABLE (0): Oscillator is running and stable
     // 0x01000000 [24]    : BADWRITE (0): An invalid value has been written to CTRL_ENABLE or CTRL_FREQ_RANGE or DORMANT
@@ -34,11 +36,11 @@ typedef struct {
     // 0x00000003 [0-1]   : FREQ_RANGE (0): The current frequency range setting, always reads 0
     io_rw_32 status;
 
-    _REG_(XOSC_DORMANT_OFFSET)
+    _REG_(XOSC_DORMANT_OFFSET) // XOSC_DORMANT
     // Crystal Oscillator pause control
     io_rw_32 dormant;
 
-    _REG_(XOSC_STARTUP_OFFSET)
+    _REG_(XOSC_STARTUP_OFFSET) // XOSC_STARTUP
     // Controls the startup delay
     // 0x00100000 [20]    : X4 (0): Multiplies the startup_delay by 4
     // 0x00003fff [0-13]  : DELAY (0xc4): in multiples of 256*xtal_period
@@ -46,7 +48,7 @@ typedef struct {
 
     uint32_t _pad0[3];
 
-    _REG_(XOSC_COUNT_OFFSET)
+    _REG_(XOSC_COUNT_OFFSET) // XOSC_COUNT
     // A down counter running at the xosc frequency which counts to zero and stops
     // 0x000000ff [0-7]   : COUNT (0)
     io_rw_32 count;

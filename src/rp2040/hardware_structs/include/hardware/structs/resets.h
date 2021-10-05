@@ -13,14 +13,16 @@
 #include "hardware/regs/resets.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_resets
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/resets.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 /// \tag::resets_hw[]
 typedef struct {
-    _REG_(RESETS_RESET_OFFSET)
+    _REG_(RESETS_RESET_OFFSET) // RESETS_RESET
     // Reset control
     // 0x01000000 [24]    : usbctrl (1)
     // 0x00800000 [23]    : uart1 (1)
@@ -49,7 +51,7 @@ typedef struct {
     // 0x00000001 [0]     : adc (1)
     io_rw_32 reset;
 
-    _REG_(RESETS_WDSEL_OFFSET)
+    _REG_(RESETS_WDSEL_OFFSET) // RESETS_WDSEL
     // Watchdog select
     // 0x01000000 [24]    : usbctrl (0)
     // 0x00800000 [23]    : uart1 (0)
@@ -78,7 +80,7 @@ typedef struct {
     // 0x00000001 [0]     : adc (0)
     io_rw_32 wdsel;
 
-    _REG_(RESETS_RESET_DONE_OFFSET)
+    _REG_(RESETS_RESET_DONE_OFFSET) // RESETS_RESET_DONE
     // Reset done
     // 0x01000000 [24]    : usbctrl (0)
     // 0x00800000 [23]    : uart1 (0)

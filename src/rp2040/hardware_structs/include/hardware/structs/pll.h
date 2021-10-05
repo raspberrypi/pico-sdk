@@ -13,21 +13,23 @@
 #include "hardware/regs/pll.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pll
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/pll.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 /// \tag::pll_hw[]
 typedef struct {
-    _REG_(PLL_CS_OFFSET)
+    _REG_(PLL_CS_OFFSET) // PLL_CS
     // Control and Status
     // 0x80000000 [31]    : LOCK (0): PLL is locked
     // 0x00000100 [8]     : BYPASS (0): Passes the reference clock to the output instead of the divided VCO
     // 0x0000003f [0-5]   : REFDIV (1): Divides the PLL input reference clock
     io_rw_32 cs;
 
-    _REG_(PLL_PWR_OFFSET)
+    _REG_(PLL_PWR_OFFSET) // PLL_PWR
     // Controls the PLL power modes
     // 0x00000020 [5]     : VCOPD (1): PLL VCO powerdown
     // 0x00000008 [3]     : POSTDIVPD (1): PLL post divider powerdown
@@ -35,12 +37,12 @@ typedef struct {
     // 0x00000001 [0]     : PD (1): PLL powerdown
     io_rw_32 pwr;
 
-    _REG_(PLL_FBDIV_INT_OFFSET)
+    _REG_(PLL_FBDIV_INT_OFFSET) // PLL_FBDIV_INT
     // Feedback divisor
     // 0x00000fff [0-11]  : FBDIV_INT (0): see ctrl reg description for constraints
     io_rw_32 fbdiv_int;
 
-    _REG_(PLL_PRIM_OFFSET)
+    _REG_(PLL_PRIM_OFFSET) // PLL_PRIM
     // Controls the PLL post dividers for the primary output
     // 0x00070000 [16-18] : POSTDIV1 (0x7): divide by 1-7
     // 0x00007000 [12-14] : POSTDIV2 (0x7): divide by 1-7

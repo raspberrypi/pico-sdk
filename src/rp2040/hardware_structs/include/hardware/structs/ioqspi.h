@@ -13,13 +13,15 @@
 #include "hardware/regs/io_qspi.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_io_qspi
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/io_qspi.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(IO_QSPI_GPIO_QSPI_SCLK_STATUS_OFFSET)
+    _REG_(IO_QSPI_GPIO_QSPI_SCLK_STATUS_OFFSET) // IO_QSPI_GPIO_QSPI_SCLK_STATUS
     // GPIO status
     // 0x04000000 [26]    : IRQTOPROC (0): interrupt to processors, after override is applied
     // 0x01000000 [24]    : IRQFROMPAD (0): interrupt from pad before override is applied
@@ -31,7 +33,7 @@ typedef struct {
     // 0x00000100 [8]     : OUTFROMPERI (0): output signal from selected peripheral, before register override is applied
     io_ro_32 status;
 
-    _REG_(IO_QSPI_GPIO_QSPI_SCLK_CTRL_OFFSET)
+    _REG_(IO_QSPI_GPIO_QSPI_SCLK_CTRL_OFFSET) // IO_QSPI_GPIO_QSPI_SCLK_CTRL
     // GPIO control including function select and overrides
     // 0x30000000 [28-29] : IRQOVER (0)
     // 0x00030000 [16-17] : INOVER (0)
@@ -42,7 +44,7 @@ typedef struct {
 } io_status_ctrl_hw_t;
 
 typedef struct {
-    _REG_(IO_QSPI_PROC0_INTE_OFFSET)
+    _REG_(IO_QSPI_PROC0_INTE_OFFSET) // IO_QSPI_PROC0_INTE
     // Interrupt Enable for proc0
     // 0x00800000 [23]    : GPIO_QSPI_SD3_EDGE_HIGH (0)
     // 0x00400000 [22]    : GPIO_QSPI_SD3_EDGE_LOW (0)
@@ -70,7 +72,7 @@ typedef struct {
     // 0x00000001 [0]     : GPIO_QSPI_SCLK_LEVEL_LOW (0)
     io_rw_32 inte;
 
-    _REG_(IO_QSPI_PROC0_INTF_OFFSET)
+    _REG_(IO_QSPI_PROC0_INTF_OFFSET) // IO_QSPI_PROC0_INTF
     // Interrupt Force for proc0
     // 0x00800000 [23]    : GPIO_QSPI_SD3_EDGE_HIGH (0)
     // 0x00400000 [22]    : GPIO_QSPI_SD3_EDGE_LOW (0)
@@ -98,7 +100,7 @@ typedef struct {
     // 0x00000001 [0]     : GPIO_QSPI_SCLK_LEVEL_LOW (0)
     io_rw_32 intf;
 
-    _REG_(IO_QSPI_PROC0_INTS_OFFSET)
+    _REG_(IO_QSPI_PROC0_INTS_OFFSET) // IO_QSPI_PROC0_INTS
     // Interrupt status after masking & forcing for proc0
     // 0x00800000 [23]    : GPIO_QSPI_SD3_EDGE_HIGH (0)
     // 0x00400000 [22]    : GPIO_QSPI_SD3_EDGE_LOW (0)
@@ -128,9 +130,9 @@ typedef struct {
 } io_qspi_ctrl_hw_t;
 
 typedef struct {
-    io_status_ctrl_hw_t io[6];
+    io_status_ctrl_hw_t io[NUM_QSPI_GPIOS]; // 6
 
-    _REG_(IO_QSPI_INTR_OFFSET)
+    _REG_(IO_QSPI_INTR_OFFSET) // IO_QSPI_INTR
     // Raw Interrupts
     // 0x00800000 [23]    : GPIO_QSPI_SD3_EDGE_HIGH (0)
     // 0x00400000 [22]    : GPIO_QSPI_SD3_EDGE_LOW (0)
@@ -166,5 +168,7 @@ typedef struct {
 } ioqspi_hw_t;
 
 #define ioqspi_hw ((ioqspi_hw_t *const)IO_QSPI_BASE)
+
+static_assert( NUM_QSPI_GPIOS == 6, "");
 
 #endif

@@ -13,13 +13,15 @@
 #include "hardware/regs/uart.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_uart
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/uart.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(UART_UARTDR_OFFSET)
+    _REG_(UART_UARTDR_OFFSET) // UART_UARTDR
     // Data Register, UARTDR
     // 0x00000800 [11]    : OE (0): Overrun error
     // 0x00000400 [10]    : BE (0): Break error
@@ -28,7 +30,7 @@ typedef struct {
     // 0x000000ff [0-7]   : DATA (0): Receive (read) data character
     io_rw_32 dr;
 
-    _REG_(UART_UARTRSR_OFFSET)
+    _REG_(UART_UARTRSR_OFFSET) // UART_UARTRSR
     // Receive Status Register/Error Clear Register, UARTRSR/UARTECR
     // 0x00000008 [3]     : OE (0): Overrun error
     // 0x00000004 [2]     : BE (0): Break error
@@ -38,7 +40,7 @@ typedef struct {
 
     uint32_t _pad0[4];
 
-    _REG_(UART_UARTFR_OFFSET)
+    _REG_(UART_UARTFR_OFFSET) // UART_UARTFR
     // Flag Register, UARTFR
     // 0x00000100 [8]     : RI (0): Ring indicator
     // 0x00000080 [7]     : TXFE (1): Transmit FIFO empty
@@ -53,22 +55,22 @@ typedef struct {
 
     uint32_t _pad1;
 
-    _REG_(UART_UARTILPR_OFFSET)
+    _REG_(UART_UARTILPR_OFFSET) // UART_UARTILPR
     // IrDA Low-Power Counter Register, UARTILPR
     // 0x000000ff [0-7]   : ILPDVSR (0): 8-bit low-power divisor value
     io_rw_32 ilpr;
 
-    _REG_(UART_UARTIBRD_OFFSET)
+    _REG_(UART_UARTIBRD_OFFSET) // UART_UARTIBRD
     // Integer Baud Rate Register, UARTIBRD
     // 0x0000ffff [0-15]  : BAUD_DIVINT (0): The integer baud rate divisor
     io_rw_32 ibrd;
 
-    _REG_(UART_UARTFBRD_OFFSET)
+    _REG_(UART_UARTFBRD_OFFSET) // UART_UARTFBRD
     // Fractional Baud Rate Register, UARTFBRD
     // 0x0000003f [0-5]   : BAUD_DIVFRAC (0): The fractional baud rate divisor
     io_rw_32 fbrd;
 
-    _REG_(UART_UARTLCR_H_OFFSET)
+    _REG_(UART_UARTLCR_H_OFFSET) // UART_UARTLCR_H
     // Line Control Register, UARTLCR_H
     // 0x00000080 [7]     : SPS (0): Stick parity select
     // 0x00000060 [5-6]   : WLEN (0): Word length
@@ -79,7 +81,7 @@ typedef struct {
     // 0x00000001 [0]     : BRK (0): Send break
     io_rw_32 lcr_h;
 
-    _REG_(UART_UARTCR_OFFSET)
+    _REG_(UART_UARTCR_OFFSET) // UART_UARTCR
     // Control Register, UARTCR
     // 0x00008000 [15]    : CTSEN (0): CTS hardware flow control enable
     // 0x00004000 [14]    : RTSEN (0): RTS hardware flow control enable
@@ -95,13 +97,13 @@ typedef struct {
     // 0x00000001 [0]     : UARTEN (0): UART enable: 0 = UART is disabled
     io_rw_32 cr;
 
-    _REG_(UART_UARTIFLS_OFFSET)
+    _REG_(UART_UARTIFLS_OFFSET) // UART_UARTIFLS
     // Interrupt FIFO Level Select Register, UARTIFLS
     // 0x00000038 [3-5]   : RXIFLSEL (0x2): Receive interrupt FIFO level select
     // 0x00000007 [0-2]   : TXIFLSEL (0x2): Transmit interrupt FIFO level select
     io_rw_32 ifls;
 
-    _REG_(UART_UARTIMSC_OFFSET)
+    _REG_(UART_UARTIMSC_OFFSET) // UART_UARTIMSC
     // Interrupt Mask Set/Clear Register, UARTIMSC
     // 0x00000400 [10]    : OEIM (0): Overrun error interrupt mask
     // 0x00000200 [9]     : BEIM (0): Break error interrupt mask
@@ -116,7 +118,7 @@ typedef struct {
     // 0x00000001 [0]     : RIMIM (0): nUARTRI modem interrupt mask
     io_rw_32 imsc;
 
-    _REG_(UART_UARTRIS_OFFSET)
+    _REG_(UART_UARTRIS_OFFSET) // UART_UARTRIS
     // Raw Interrupt Status Register, UARTRIS
     // 0x00000400 [10]    : OERIS (0): Overrun error interrupt status
     // 0x00000200 [9]     : BERIS (0): Break error interrupt status
@@ -131,7 +133,7 @@ typedef struct {
     // 0x00000001 [0]     : RIRMIS (0): nUARTRI modem interrupt status
     io_ro_32 ris;
 
-    _REG_(UART_UARTMIS_OFFSET)
+    _REG_(UART_UARTMIS_OFFSET) // UART_UARTMIS
     // Masked Interrupt Status Register, UARTMIS
     // 0x00000400 [10]    : OEMIS (0): Overrun error masked interrupt status
     // 0x00000200 [9]     : BEMIS (0): Break error masked interrupt status
@@ -146,7 +148,7 @@ typedef struct {
     // 0x00000001 [0]     : RIMMIS (0): nUARTRI modem masked interrupt status
     io_ro_32 mis;
 
-    _REG_(UART_UARTICR_OFFSET)
+    _REG_(UART_UARTICR_OFFSET) // UART_UARTICR
     // Interrupt Clear Register, UARTICR
     // 0x00000400 [10]    : OEIC (0): Overrun error interrupt clear
     // 0x00000200 [9]     : BEIC (0): Break error interrupt clear
@@ -161,7 +163,7 @@ typedef struct {
     // 0x00000001 [0]     : RIMIC (0): nUARTRI modem interrupt clear
     io_rw_32 icr;
 
-    _REG_(UART_UARTDMACR_OFFSET)
+    _REG_(UART_UARTDMACR_OFFSET) // UART_UARTDMACR
     // DMA Control Register, UARTDMACR
     // 0x00000004 [2]     : DMAONERR (0): DMA on error
     // 0x00000002 [1]     : TXDMAE (0): Transmit DMA enable

@@ -13,10 +13,12 @@
 #include "hardware/regs/busctrl.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_busctrl
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/busctrl.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 enum bus_ctrl_perf_counter {
     arbiter_rom_perf_event_access = 19,
@@ -42,19 +44,19 @@ enum bus_ctrl_perf_counter {
 };
 
 typedef struct {
-    _REG_(BUSCTRL_PERFCTR0_OFFSET)
+    _REG_(BUSCTRL_PERFCTR0_OFFSET) // BUSCTRL_PERFCTR0
     // Bus fabric performance counter 0
     // 0x00ffffff [0-23]  : PERFCTR0 (0): Busfabric saturating performance counter 0
     io_rw_32 value;
 
-    _REG_(BUSCTRL_PERFSEL0_OFFSET)
+    _REG_(BUSCTRL_PERFSEL0_OFFSET) // BUSCTRL_PERFSEL0
     // Bus fabric performance event select for PERFCTR0
     // 0x0000001f [0-4]   : PERFSEL0 (0x1f): Select an event for PERFCTR0
     io_rw_32 sel;
 } bus_ctrl_perf_hw_t;
 
 typedef struct {
-    _REG_(BUSCTRL_BUS_PRIORITY_OFFSET)
+    _REG_(BUSCTRL_BUS_PRIORITY_OFFSET) // BUSCTRL_BUS_PRIORITY
     // Set the priority of each master for bus arbitration
     // 0x00001000 [12]    : DMA_W (0): 0 - low priority, 1 - high priority
     // 0x00000100 [8]     : DMA_R (0): 0 - low priority, 1 - high priority
@@ -62,7 +64,7 @@ typedef struct {
     // 0x00000001 [0]     : PROC0 (0): 0 - low priority, 1 - high priority
     io_rw_32 priority;
 
-    _REG_(BUSCTRL_BUS_PRIORITY_ACK_OFFSET)
+    _REG_(BUSCTRL_BUS_PRIORITY_ACK_OFFSET) // BUSCTRL_BUS_PRIORITY_ACK
     // Bus priority acknowledge
     // 0x00000001 [0]     : BUS_PRIORITY_ACK (0): Goes to 1 once all arbiters have registered the new global priority levels
     io_ro_32 priority_ack;

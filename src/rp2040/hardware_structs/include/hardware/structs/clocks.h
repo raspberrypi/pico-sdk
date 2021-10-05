@@ -13,10 +13,12 @@
 #include "hardware/regs/clocks.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_clocks
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/clocks.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 /*! \brief Enumeration identifying a hardware clock
  *  \ingroup hardware_clocks
@@ -39,7 +41,7 @@ enum clock_index {
 
 /// \tag::clock_hw[]
 typedef struct {
-    _REG_(CLOCKS_CLK_GPOUT0_CTRL_OFFSET)
+    _REG_(CLOCKS_CLK_GPOUT0_CTRL_OFFSET) // CLOCKS_CLK_GPOUT0_CTRL
     // Clock control, can be changed on-the-fly (except for auxsrc)
     // 0x00100000 [20]    : NUDGE (0): An edge on this signal shifts the phase of the output by 1 cycle of the input clock
     // 0x00030000 [16-17] : PHASE (0): This delays the enable signal by up to 3 cycles of the input clock
@@ -49,63 +51,63 @@ typedef struct {
     // 0x000001e0 [5-8]   : AUXSRC (0): Selects the auxiliary clock source, will glitch when switching
     io_rw_32 ctrl;
 
-    _REG_(CLOCKS_CLK_GPOUT0_DIV_OFFSET)
+    _REG_(CLOCKS_CLK_GPOUT0_DIV_OFFSET) // CLOCKS_CLK_GPOUT0_DIV
     // Clock divisor, can be changed on-the-fly
     // 0xffffff00 [8-31]  : INT (1): Integer component of the divisor, 0 -> divide by 2^16
     // 0x000000ff [0-7]   : FRAC (0): Fractional component of the divisor
     io_rw_32 div;
 
-    _REG_(CLOCKS_CLK_GPOUT0_SELECTED_OFFSET)
+    _REG_(CLOCKS_CLK_GPOUT0_SELECTED_OFFSET) // CLOCKS_CLK_GPOUT0_SELECTED
     // Indicates which SRC is currently selected by the glitchless mux (one-hot)
     io_ro_32 selected;
 } clock_hw_t;
 /// \end::clock_hw[]
 
 typedef struct {
-    _REG_(CLOCKS_CLK_SYS_RESUS_CTRL_OFFSET)
+    _REG_(CLOCKS_CLK_SYS_RESUS_CTRL_OFFSET) // CLOCKS_CLK_SYS_RESUS_CTRL
     // 0x00010000 [16]    : CLEAR (0): For clearing the resus after the fault that triggered it has been corrected
     // 0x00001000 [12]    : FRCE (0): Force a resus, for test purposes only
     // 0x00000100 [8]     : ENABLE (0): Enable resus
     // 0x000000ff [0-7]   : TIMEOUT (0xff): This is expressed as a number of clk_ref cycles
     io_rw_32 ctrl;
 
-    _REG_(CLOCKS_CLK_SYS_RESUS_STATUS_OFFSET)
+    _REG_(CLOCKS_CLK_SYS_RESUS_STATUS_OFFSET) // CLOCKS_CLK_SYS_RESUS_STATUS
     // 0x00000001 [0]     : RESUSSED (0): Clock has been resuscitated, correct the error then send ctrl_clear=1
     io_ro_32 status;
 } clock_resus_hw_t;
 
 typedef struct {
-    _REG_(CLOCKS_FC0_REF_KHZ_OFFSET)
+    _REG_(CLOCKS_FC0_REF_KHZ_OFFSET) // CLOCKS_FC0_REF_KHZ
     // Reference clock frequency in kHz
     // 0x000fffff [0-19]  : FC0_REF_KHZ (0)
     io_rw_32 ref_khz;
 
-    _REG_(CLOCKS_FC0_MIN_KHZ_OFFSET)
+    _REG_(CLOCKS_FC0_MIN_KHZ_OFFSET) // CLOCKS_FC0_MIN_KHZ
     // Minimum pass frequency in kHz
     // 0x01ffffff [0-24]  : FC0_MIN_KHZ (0)
     io_rw_32 min_khz;
 
-    _REG_(CLOCKS_FC0_MAX_KHZ_OFFSET)
+    _REG_(CLOCKS_FC0_MAX_KHZ_OFFSET) // CLOCKS_FC0_MAX_KHZ
     // Maximum pass frequency in kHz
     // 0x01ffffff [0-24]  : FC0_MAX_KHZ (0x1ffffff)
     io_rw_32 max_khz;
 
-    _REG_(CLOCKS_FC0_DELAY_OFFSET)
+    _REG_(CLOCKS_FC0_DELAY_OFFSET) // CLOCKS_FC0_DELAY
     // Delays the start of frequency counting to allow the mux to settle
     // 0x00000007 [0-2]   : FC0_DELAY (1)
     io_rw_32 delay;
 
-    _REG_(CLOCKS_FC0_INTERVAL_OFFSET)
+    _REG_(CLOCKS_FC0_INTERVAL_OFFSET) // CLOCKS_FC0_INTERVAL
     // The test interval is 0
     // 0x0000000f [0-3]   : FC0_INTERVAL (0x8)
     io_rw_32 interval;
 
-    _REG_(CLOCKS_FC0_SRC_OFFSET)
+    _REG_(CLOCKS_FC0_SRC_OFFSET) // CLOCKS_FC0_SRC
     // Clock sent to frequency counter, set to 0 when not required
     // 0x000000ff [0-7]   : FC0_SRC (0)
     io_rw_32 src;
 
-    _REG_(CLOCKS_FC0_STATUS_OFFSET)
+    _REG_(CLOCKS_FC0_STATUS_OFFSET) // CLOCKS_FC0_STATUS
     // Frequency counter status
     // 0x10000000 [28]    : DIED (0): Test clock stopped during test
     // 0x01000000 [24]    : FAST (0): Test clock faster than expected, only valid when status_done=1
@@ -117,7 +119,7 @@ typedef struct {
     // 0x00000001 [0]     : PASS (0): Test passed
     io_ro_32 status;
 
-    _REG_(CLOCKS_FC0_RESULT_OFFSET)
+    _REG_(CLOCKS_FC0_RESULT_OFFSET) // CLOCKS_FC0_RESULT
     // Result of frequency measurement, only valid when status_done=1
     // 0x3fffffe0 [5-29]  : KHZ (0)
     // 0x0000001f [0-4]   : FRAC (0)
@@ -131,7 +133,7 @@ typedef struct {
 
     fc_hw_t fc0;
 
-    _REG_(CLOCKS_WAKE_EN0_OFFSET)
+    _REG_(CLOCKS_WAKE_EN0_OFFSET) // CLOCKS_WAKE_EN0
     // enable clock in wake mode
     // 0x80000000 [31]    : clk_sys_sram3 (1)
     // 0x40000000 [30]    : clk_sys_sram2 (1)
@@ -167,7 +169,7 @@ typedef struct {
     // 0x00000001 [0]     : clk_sys_clocks (1)
     io_rw_32 wake_en0;
 
-    _REG_(CLOCKS_WAKE_EN1_OFFSET)
+    _REG_(CLOCKS_WAKE_EN1_OFFSET) // CLOCKS_WAKE_EN1
     // enable clock in wake mode
     // 0x00004000 [14]    : clk_sys_xosc (1)
     // 0x00002000 [13]    : clk_sys_xip (1)
@@ -186,7 +188,7 @@ typedef struct {
     // 0x00000001 [0]     : clk_sys_sram4 (1)
     io_rw_32 wake_en1;
 
-    _REG_(CLOCKS_SLEEP_EN0_OFFSET)
+    _REG_(CLOCKS_SLEEP_EN0_OFFSET) // CLOCKS_SLEEP_EN0
     // enable clock in sleep mode
     // 0x80000000 [31]    : clk_sys_sram3 (1)
     // 0x40000000 [30]    : clk_sys_sram2 (1)
@@ -222,7 +224,7 @@ typedef struct {
     // 0x00000001 [0]     : clk_sys_clocks (1)
     io_rw_32 sleep_en0;
 
-    _REG_(CLOCKS_SLEEP_EN1_OFFSET)
+    _REG_(CLOCKS_SLEEP_EN1_OFFSET) // CLOCKS_SLEEP_EN1
     // enable clock in sleep mode
     // 0x00004000 [14]    : clk_sys_xosc (1)
     // 0x00002000 [13]    : clk_sys_xip (1)
@@ -241,7 +243,7 @@ typedef struct {
     // 0x00000001 [0]     : clk_sys_sram4 (1)
     io_rw_32 sleep_en1;
 
-    _REG_(CLOCKS_ENABLED0_OFFSET)
+    _REG_(CLOCKS_ENABLED0_OFFSET) // CLOCKS_ENABLED0
     // indicates the state of the clock enable
     // 0x80000000 [31]    : clk_sys_sram3 (0)
     // 0x40000000 [30]    : clk_sys_sram2 (0)
@@ -277,7 +279,7 @@ typedef struct {
     // 0x00000001 [0]     : clk_sys_clocks (0)
     io_ro_32 enabled0;
 
-    _REG_(CLOCKS_ENABLED1_OFFSET)
+    _REG_(CLOCKS_ENABLED1_OFFSET) // CLOCKS_ENABLED1
     // indicates the state of the clock enable
     // 0x00004000 [14]    : clk_sys_xosc (0)
     // 0x00002000 [13]    : clk_sys_xip (0)
@@ -296,22 +298,22 @@ typedef struct {
     // 0x00000001 [0]     : clk_sys_sram4 (0)
     io_ro_32 enabled1;
 
-    _REG_(CLOCKS_INTR_OFFSET)
+    _REG_(CLOCKS_INTR_OFFSET) // CLOCKS_INTR
     // Raw Interrupts
     // 0x00000001 [0]     : CLK_SYS_RESUS (0)
     io_ro_32 intr;
 
-    _REG_(CLOCKS_INTE_OFFSET)
+    _REG_(CLOCKS_INTE_OFFSET) // CLOCKS_INTE
     // Interrupt Enable
     // 0x00000001 [0]     : CLK_SYS_RESUS (0)
     io_rw_32 inte;
 
-    _REG_(CLOCKS_INTF_OFFSET)
+    _REG_(CLOCKS_INTF_OFFSET) // CLOCKS_INTF
     // Interrupt Force
     // 0x00000001 [0]     : CLK_SYS_RESUS (0)
     io_rw_32 intf;
 
-    _REG_(CLOCKS_INTS_OFFSET)
+    _REG_(CLOCKS_INTS_OFFSET) // CLOCKS_INTS
     // Interrupt status after masking & forcing
     // 0x00000001 [0]     : CLK_SYS_RESUS (0)
     io_ro_32 ints;

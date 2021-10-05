@@ -13,13 +13,15 @@
 #include "hardware/regs/m0plus.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_m0plus
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/m0plus.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(M0PLUS_CPUID_OFFSET)
+    _REG_(M0PLUS_CPUID_OFFSET) // M0PLUS_CPUID
     // Read the CPU ID Base Register to determine: the ID number of the processor core, the version number of the processor...
     // 0xff000000 [24-31] : IMPLEMENTER (0x41): Implementor code: 0x41 = ARM
     // 0x00f00000 [20-23] : VARIANT (0): Major revision number n in the rnpm revision status:
@@ -28,7 +30,7 @@ typedef struct {
     // 0x0000000f [0-3]   : REVISION (1): Minor revision number m in the rnpm revision status:
     io_ro_32 cpuid;
 
-    _REG_(M0PLUS_ICSR_OFFSET)
+    _REG_(M0PLUS_ICSR_OFFSET) // M0PLUS_ICSR
     // Use the Interrupt Control State Register to set a pending Non-Maskable Interrupt (NMI), set or clear a pending...
     // 0x80000000 [31]    : NMIPENDSET (0): Setting this bit will activate an NMI
     // 0x10000000 [28]    : PENDSVSET (0): PendSV set-pending bit
@@ -41,12 +43,12 @@ typedef struct {
     // 0x000001ff [0-8]   : VECTACTIVE (0): Active exception number field
     io_rw_32 icsr;
 
-    _REG_(M0PLUS_VTOR_OFFSET)
+    _REG_(M0PLUS_VTOR_OFFSET) // M0PLUS_VTOR
     // The VTOR holds the vector table offset address
     // 0xffffff00 [8-31]  : TBLOFF (0): Bits [31:8] of the indicate the vector table offset address
     io_rw_32 vtor;
 
-    _REG_(M0PLUS_AIRCR_OFFSET)
+    _REG_(M0PLUS_AIRCR_OFFSET) // M0PLUS_AIRCR
     // Use the Application Interrupt and Reset Control Register to: determine data endianness, clear all active state...
     // 0xffff0000 [16-31] : VECTKEY (0): Register key:
     // 0x00008000 [15]    : ENDIANESS (0): Data endianness implemented:
@@ -54,7 +56,7 @@ typedef struct {
     // 0x00000002 [1]     : VECTCLRACTIVE (0): Clears all active state information for fixed and configurable exceptions
     io_rw_32 aircr;
 
-    _REG_(M0PLUS_SCR_OFFSET)
+    _REG_(M0PLUS_SCR_OFFSET) // M0PLUS_SCR
     // System Control Register
     // 0x00000010 [4]     : SEVONPEND (0): Send Event on Pending bit:
     // 0x00000004 [2]     : SLEEPDEEP (0): Controls whether the processor uses sleep or deep sleep as its low power mode:

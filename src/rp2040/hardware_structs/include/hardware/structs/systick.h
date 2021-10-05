@@ -13,13 +13,15 @@
 #include "hardware/regs/m0plus.h"
 
 // reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_m0plus
-
-// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
+//
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/m0plus.h.
+//
+// Bit-field descriptions are of the form:
+// BITMASK [BITRANGE]: FIELDNAME (RESETVALUE): DESCRIPTION
 
 typedef struct {
-    _REG_(M0PLUS_SYST_CSR_OFFSET)
+    _REG_(M0PLUS_SYST_CSR_OFFSET) // M0PLUS_SYST_CSR
     // Use the SysTick Control and Status Register to enable the SysTick features
     // 0x00010000 [16]    : COUNTFLAG (0): Returns 1 if timer counted to 0 since last time this was read
     // 0x00000004 [2]     : CLKSOURCE (0): SysTick clock source
@@ -27,17 +29,17 @@ typedef struct {
     // 0x00000001 [0]     : ENABLE (0): Enable SysTick counter:
     io_rw_32 csr;
 
-    _REG_(M0PLUS_SYST_RVR_OFFSET)
+    _REG_(M0PLUS_SYST_RVR_OFFSET) // M0PLUS_SYST_RVR
     // Use the SysTick Reload Value Register to specify the start value to load into the current value register when the...
     // 0x00ffffff [0-23]  : RELOAD (0): Value to load into the SysTick Current Value Register when the counter reaches 0
     io_rw_32 rvr;
 
-    _REG_(M0PLUS_SYST_CVR_OFFSET)
+    _REG_(M0PLUS_SYST_CVR_OFFSET) // M0PLUS_SYST_CVR
     // Use the SysTick Current Value Register to find the current value in the register
     // 0x00ffffff [0-23]  : CURRENT (0): Reads return the current value of the SysTick counter
     io_rw_32 cvr;
 
-    _REG_(M0PLUS_SYST_CALIB_OFFSET)
+    _REG_(M0PLUS_SYST_CALIB_OFFSET) // M0PLUS_SYST_CALIB
     // Use the SysTick Calibration Value Register to enable software to scale to any required speed using divide and multiply
     // 0x80000000 [31]    : NOREF (0): If reads as 1, the Reference clock is not provided - the CLKSOURCE bit of the...
     // 0x40000000 [30]    : SKEW (0): If reads as 1, the calibration value for 10ms is inexact (due to clock frequency)
