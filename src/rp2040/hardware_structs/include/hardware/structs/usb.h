@@ -129,7 +129,7 @@ typedef struct {
     io_rw_32 dev_addr_ctrl;
 
     _REG_(USB_ADDR_ENDP1_OFFSET) // USB_ADDR_ENDP1
-    io_rw_32 int_ep_addr_ctrl[15];
+    io_rw_32 int_ep_addr_ctrl[USB_HOST_INTERRUPT_ENDPOINTS]; // 15
 
     _REG_(USB_MAIN_CTRL_OFFSET) // USB_MAIN_CTRL
     // Main control register
@@ -141,7 +141,7 @@ typedef struct {
     _REG_(USB_SOF_WR_OFFSET) // USB_SOF_WR
     // Set the SOF (Start of Frame) frame number in the host controller
     // 0x000007ff [0-10]  : COUNT (0)
-    io_wo_32 sof_wr;
+    io_wo_32 sof_rw;
 
     _REG_(USB_SOF_RD_OFFSET) // USB_SOF_RD
     // Read the last SOF (Start of Frame) frame number seen
@@ -565,5 +565,7 @@ typedef struct {
 
 #define usb_dpram ((usb_device_dpram_t *)USBCTRL_DPRAM_BASE)
 #define usbh_dpram ((usb_host_dpram_t *)USBCTRL_DPRAM_BASE)
+
+static_assert( USB_HOST_INTERRUPT_ENDPOINTS == 15, "");
 
 #endif
