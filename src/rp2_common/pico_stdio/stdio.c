@@ -10,7 +10,9 @@
 
 #include "pico.h"
 #include "pico/mutex.h"
+#if LIB_PICO_PRINTF_PICO
 #include "pico/printf.h"
+#endif
 #include "pico/stdio.h"
 #include "pico/stdio/driver.h"
 #include "pico/time.h"
