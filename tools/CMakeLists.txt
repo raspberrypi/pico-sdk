@@ -41,6 +41,6 @@ function(pico_add_uf2_output TARGET)
     endif()
     if (ELF2UF2_FOUND)
         add_custom_command(TARGET ${TARGET} POST_BUILD
-                COMMAND ELF2UF2 ${TARGET}${CMAKE_EXECUTABLE_SUFFIX} ${TARGET}.uf2)
+                COMMAND ELF2UF2 $<TARGET_FILE:${TARGET}> $<TARGET_FILE_BASE_NAME:${TARGET}>.uf2)
     endif()
 endfunction()
