@@ -50,7 +50,7 @@ typedef struct stdio_driver stdio_driver_t;
  * and semihosting based on the presence of the respective libraries in the binary.
  *
  * When stdio_usb is configured, this method can be optionally made to block, waiting for a connection
- * via the variables specified in \ref stdio_usb_init (i.e. \ref PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS)
+ * via the variables specified in \ref stdio_usb_init (i.e. \ref PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS)
  *
  * \see stdio_uart, stdio_usb, stdio_semihosting
  */

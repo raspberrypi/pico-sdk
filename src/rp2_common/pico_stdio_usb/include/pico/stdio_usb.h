@@ -59,7 +59,7 @@
 #define PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS 0
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS, number of milliseconds to wait during initialization after a host CDC connection is detected before returning (some host terminals seem to sometimes lose transmissions sent right after connection), default=50, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS, Number of milliseconds to wait during initialization after a host CDC connection is detected before returning (some host terminals seem to sometimes lose transmissions sent right after connection), default=50, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS
 #define PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS 50
 #endif
@@ -106,9 +106,9 @@ extern stdio_driver_t stdio_usb;
 /*! \brief Explicitly initialize USB stdio and add it to the current set of stdin drivers
  *  \ingroup pico_stdio_usb
  *
- *  \ref PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS can be set to cause this method to wait for a CDC connection
+ *  \ref PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS can be set to cause this method to wait for a CDC connection
  *  from the host before returning, which is useful if you don't want any initial stdout output to be discarded
- *  before the connections is established.
+ *  before the connection is established.
  *
  *  \return true if the USB CDC was initialized, false if an error occurred
  */
@@ -116,13 +116,6 @@ bool stdio_usb_init(void);
 
 /*! \brief Check if there is an active stdio CDC connection to a host
  *  \ingroup pico_stdio_usb
- *
- *  This method can be used in a loop to wait for a connection to be established with the host
- *  before starting to write to stdout (otherwise output is discarded).
- *
- *  Note that some host side terminal emulators seem to occasionally miss the first output
- *  even though the connection is established, so you may also want to sleep a few milliseconds after this
- *  method returns true.
  *
  *  \return true if stdio is connected over CDC
  */
