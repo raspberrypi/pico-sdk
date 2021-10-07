@@ -8,6 +8,7 @@
 #define _HARDWARE_WATCHDOG_H
 
 #include "pico.h"
+#include "hardware/structs/watchdog.h"
 
 /** \file hardware/watchdog.h
  *  \defgroup hardware_watchdog hardware_watchdog
@@ -66,6 +67,11 @@ void watchdog_update(void);
  *
  * By default the SDK assumes a 12MHz XOSC and sets the \ref watchdog_start_tick appropriately.
  *
+ * This method sets a marker in the watchdog scratch register 4 that is checked by \ref watchdog_enable_caused_reboot.
+ * If the device is subsequently reset via a call to watchdog_reboot (including for example by dragging a UF2
+ * onto the RPI-RP2), then this value will be cleared, and so \ref watchdog_enable_caused_reboot will
+ * return false.
+ *
  * \param delay_ms Number of milliseconds before watchdog will reboot without watchdog_update being called. Maximum of 0x7fffff, which is approximately 8.3 seconds
  * \param pause_on_debug If the watchdog should be paused when the debugger is stepping through code
  */
@@ -79,6 +85,17 @@ void watchdog_enable(uint32_t delay_ms, bool pause_on_debug);
  * @return false there has been no watchdog reboot since run has been
  */
 bool watchdog_caused_reboot(void);
+
+/**
+ * \brief Did watchdog_enable cause the last reboot?
+ * \ingroup hardware_watchdog
+ *
+ * This method checks watchdog scratch register 4 for a magic number set by \ref watchdog_enable. This will not be present
+ * if the watchdog reset is initiated by \ref watchdog_reboot or by the RP2040 bootrom (e.g. dragging a UF2 onto the RPI-RP2 drive)
+ * @return true if the watchdog timer or a watchdog force caused the last reboot and the watchdog was initiated by \ref watchdog_enable
+ * @return false there has been no watchdog reboot since run has been
+ */
+bool watchdog_enable_caused_reboot(void);
 
 /**
  * @brief Returns the number of microseconds before the watchdog will reboot the chip.
