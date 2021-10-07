@@ -103,8 +103,28 @@ bool stdio_usb_init(void) {
     bool rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
     if (rc) {
         stdio_set_driver_enabled(&stdio_usb, true);
+#if PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
+#if PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS > 0
+        absolute_time_t until = make_timeout_time_ms(PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS);
+#else
+        absolute_time_t until = at_the_end_of_time;
+#endif
+        do {
+            if (stdio_usb_connected()) {
+#if PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS != 0
+                sleep_ms(PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS);
+#endif
+                break;
+            }
+            sleep_ms(10);
+        } while (!time_reached(until));
+#endif
     }
     return rc;
+}
+
+bool stdio_usb_connected(void) {
+    return tud_cdc_connected();
 }
 #else
 #include "pico/stdio_usb.h"

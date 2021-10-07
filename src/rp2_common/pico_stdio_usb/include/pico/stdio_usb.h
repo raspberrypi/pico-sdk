@@ -54,6 +54,16 @@
 #define PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE 1200
 #endif
 
+// PICO_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) before returning, default=0, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
+#define PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS 0
+#endif
+
+// PICO_CONFIG: PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS, number of milliseconds to wait during initialization after a host CDC connection is detected before returning (some host terminals seem to sometimes lose transmissions sent right after connection), default=50, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS
+#define PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS 50
+#endif
+
 // PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED, Optionally define a pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE), type=int, min=0, max=29, group=pico_stdio_usb
 
 // PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED, Whether the pin specified by PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED is fixed or can be modified by picotool over the VENDOR USB interface, type=bool, default=0, group=pico_stdio_usb
@@ -94,10 +104,29 @@ extern "C" {
 extern stdio_driver_t stdio_usb;
 
 /*! \brief Explicitly initialize USB stdio and add it to the current set of stdin drivers
- *  \ingroup pico_stdio_uart
+ *  \ingroup pico_stdio_usb
+ *
+ *  \ref PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS can be set to cause this method to wait for a CDC connection
+ *  from the host before returning, which is useful if you don't want any initial stdout output to be discarded
+ *  before the connections is established.
+ *
+ *  \return true if the USB CDC was initialized, false if an error occurred
  */
 bool stdio_usb_init(void);
 
+/*! \brief Check if there is an active stdio CDC connection to a host
+ *  \ingroup pico_stdio_usb
+ *
+ *  This method can be used in a loop to wait for a connection to be established with the host
+ *  before starting to write to stdout (otherwise output is discarded).
+ *
+ *  Note that some host side terminal emulators seem to occasionally miss the first output
+ *  even though the connection is established, so you may also want to sleep a few milliseconds after this
+ *  method returns true.
+ *
+ *  \return true if stdio is connected over CDC
+ */
+bool stdio_usb_connected(void);
 #ifdef __cplusplus
 }
 #endif
