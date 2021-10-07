@@ -42,13 +42,13 @@ typedef struct {
     // 0x00800000 [23]    : SNIFF_EN (0): If 1, this channel's data transfers are visible to the sniff hardware, and each...
     // 0x00400000 [22]    : BSWAP (0): Apply byte-swap transformation to DMA data
     // 0x00200000 [21]    : IRQ_QUIET (0): In QUIET mode, the channel does not generate IRQs at the end of every transfer block
-    // 0x001f8000 [15-20] : TREQ_SEL (0): Select a Transfer Request signal
-    // 0x00007800 [11-14] : CHAIN_TO (0): When this channel completes, it will trigger the channel indicated by CHAIN_TO
+    // 0x001f8000 [20:15] : TREQ_SEL (0): Select a Transfer Request signal
+    // 0x00007800 [14:11] : CHAIN_TO (0): When this channel completes, it will trigger the channel indicated by CHAIN_TO
     // 0x00000400 [10]    : RING_SEL (0): Select whether RING_SIZE applies to read or write addresses
-    // 0x000003c0 [6-9]   : RING_SIZE (0): Size of address wrap region
+    // 0x000003c0 [9:6]   : RING_SIZE (0): Size of address wrap region
     // 0x00000020 [5]     : INCR_WRITE (0): If 1, the write address increments with each transfer
     // 0x00000010 [4]     : INCR_READ (0): If 1, the read address increments with each transfer
-    // 0x0000000c [2-3]   : DATA_SIZE (0): Set the size of each bus transfer (byte/halfword/word)
+    // 0x0000000c [3:2]   : DATA_SIZE (0): Set the size of each bus transfer (byte/halfword/word)
     // 0x00000002 [1]     : HIGH_PRIORITY (0): HIGH_PRIORITY gives a channel preferential treatment in issue scheduling: in...
     // 0x00000001 [0]     : EN (0): DMA Channel Enable
     io_rw_32 ctrl_trig;
@@ -109,39 +109,39 @@ typedef struct {
 
     _REG_(DMA_INTR_OFFSET) // DMA_INTR
     // Interrupt Status (raw)
-    // 0x0000ffff [0-15]  : INTR (0): Raw interrupt status for DMA Channels 0
+    // 0x0000ffff [15:0]  : INTR (0): Raw interrupt status for DMA Channels 0
     io_ro_32 intr;
 
     _REG_(DMA_INTE0_OFFSET) // DMA_INTE0
     // Interrupt Enables for IRQ 0
-    // 0x0000ffff [0-15]  : INTE0 (0): Set bit n to pass interrupts from channel n to DMA IRQ 0
+    // 0x0000ffff [15:0]  : INTE0 (0): Set bit n to pass interrupts from channel n to DMA IRQ 0
     io_rw_32 inte0;
 
     _REG_(DMA_INTF0_OFFSET) // DMA_INTF0
     // Force Interrupts
-    // 0x0000ffff [0-15]  : INTF0 (0): Write 1s to force the corresponding bits in INTE0
+    // 0x0000ffff [15:0]  : INTF0 (0): Write 1s to force the corresponding bits in INTE0
     io_rw_32 intf0;
 
     _REG_(DMA_INTS0_OFFSET) // DMA_INTS0
     // Interrupt Status for IRQ 0
-    // 0x0000ffff [0-15]  : INTS0 (0): Indicates active channel interrupt requests which are currently causing IRQ 0 to be asserted
+    // 0x0000ffff [15:0]  : INTS0 (0): Indicates active channel interrupt requests which are currently causing IRQ 0 to be asserted
     io_rw_32 ints0;
 
     uint32_t _pad1;
 
     _REG_(DMA_INTE1_OFFSET) // DMA_INTE1
     // Interrupt Enables for IRQ 1
-    // 0x0000ffff [0-15]  : INTE1 (0): Set bit n to pass interrupts from channel n to DMA IRQ 1
+    // 0x0000ffff [15:0]  : INTE1 (0): Set bit n to pass interrupts from channel n to DMA IRQ 1
     io_rw_32 inte1;
 
     _REG_(DMA_INTF1_OFFSET) // DMA_INTF1
     // Force Interrupts for IRQ 1
-    // 0x0000ffff [0-15]  : INTF1 (0): Write 1s to force the corresponding bits in INTE0
+    // 0x0000ffff [15:0]  : INTF1 (0): Write 1s to force the corresponding bits in INTE0
     io_rw_32 intf1;
 
     _REG_(DMA_INTS1_OFFSET) // DMA_INTS1
     // Interrupt Status (masked) for IRQ 1
-    // 0x0000ffff [0-15]  : INTS1 (0): Indicates active channel interrupt requests which are currently causing IRQ 1 to be asserted
+    // 0x0000ffff [15:0]  : INTS1 (0): Indicates active channel interrupt requests which are currently causing IRQ 1 to be asserted
     io_rw_32 ints1;
 
     _REG_(DMA_TIMER0_OFFSET) // DMA_TIMER0
@@ -149,7 +149,7 @@ typedef struct {
 
     _REG_(DMA_MULTI_CHAN_TRIGGER_OFFSET) // DMA_MULTI_CHAN_TRIGGER
     // Trigger one or more channels simultaneously
-    // 0x0000ffff [0-15]  : MULTI_CHAN_TRIGGER (0): Each bit in this register corresponds to a DMA channel
+    // 0x0000ffff [15:0]  : MULTI_CHAN_TRIGGER (0): Each bit in this register corresponds to a DMA channel
     io_rw_32 multi_channel_trigger;
 
     _REG_(DMA_SNIFF_CTRL_OFFSET) // DMA_SNIFF_CTRL
@@ -157,8 +157,8 @@ typedef struct {
     // 0x00000800 [11]    : OUT_INV (0): If set, the result appears inverted (bitwise complement) when read
     // 0x00000400 [10]    : OUT_REV (0): If set, the result appears bit-reversed when read
     // 0x00000200 [9]     : BSWAP (0): Locally perform a byte reverse on the sniffed data, before feeding into checksum
-    // 0x000001e0 [5-8]   : CALC (0)
-    // 0x0000001e [1-4]   : DMACH (0): DMA channel for Sniffer to observe
+    // 0x000001e0 [8:5]   : CALC (0)
+    // 0x0000001e [4:1]   : DMACH (0): DMA channel for Sniffer to observe
     // 0x00000001 [0]     : EN (0): Enable sniffer
     io_rw_32 sniff_ctrl;
 
@@ -170,14 +170,14 @@ typedef struct {
 
     _REG_(DMA_FIFO_LEVELS_OFFSET) // DMA_FIFO_LEVELS
     // Debug RAF, WAF, TDF levels
-    // 0x00ff0000 [16-23] : RAF_LVL (0): Current Read-Address-FIFO fill level
-    // 0x0000ff00 [8-15]  : WAF_LVL (0): Current Write-Address-FIFO fill level
-    // 0x000000ff [0-7]   : TDF_LVL (0): Current Transfer-Data-FIFO fill level
+    // 0x00ff0000 [23:16] : RAF_LVL (0): Current Read-Address-FIFO fill level
+    // 0x0000ff00 [15:8]  : WAF_LVL (0): Current Write-Address-FIFO fill level
+    // 0x000000ff [7:0]   : TDF_LVL (0): Current Transfer-Data-FIFO fill level
     io_ro_32 fifo_levels;
 
     _REG_(DMA_CHAN_ABORT_OFFSET) // DMA_CHAN_ABORT
     // Abort an in-progress transfer sequence on one or more channels
-    // 0x0000ffff [0-15]  : CHAN_ABORT (0): Each bit corresponds to a channel
+    // 0x0000ffff [15:0]  : CHAN_ABORT (0): Each bit corresponds to a channel
     io_rw_32 abort;
 } dma_hw_t;
 

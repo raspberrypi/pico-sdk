@@ -23,22 +23,22 @@
 typedef struct {
     _REG_(RTC_CLKDIV_M1_OFFSET) // RTC_CLKDIV_M1
     // Divider minus 1 for the 1 second counter
-    // 0x0000ffff [0-15]  : CLKDIV_M1 (0)
+    // 0x0000ffff [15:0]  : CLKDIV_M1 (0)
     io_rw_32 clkdiv_m1;
 
     _REG_(RTC_SETUP_0_OFFSET) // RTC_SETUP_0
     // RTC setup register 0
-    // 0x00fff000 [12-23] : YEAR (0): Year
-    // 0x00000f00 [8-11]  : MONTH (0): Month (1
-    // 0x0000001f [0-4]   : DAY (0): Day of the month (1
+    // 0x00fff000 [23:12] : YEAR (0): Year
+    // 0x00000f00 [11:8]  : MONTH (0): Month (1
+    // 0x0000001f [4:0]   : DAY (0): Day of the month (1
     io_rw_32 setup_0;
 
     _REG_(RTC_SETUP_1_OFFSET) // RTC_SETUP_1
     // RTC setup register 1
-    // 0x07000000 [24-26] : DOTW (0): Day of the week: 1-Monday
-    // 0x001f0000 [16-20] : HOUR (0): Hours
-    // 0x00003f00 [8-13]  : MIN (0): Minutes
-    // 0x0000003f [0-5]   : SEC (0): Seconds
+    // 0x07000000 [26:24] : DOTW (0): Day of the week: 1-Monday
+    // 0x001f0000 [20:16] : HOUR (0): Hours
+    // 0x00003f00 [13:8]  : MIN (0): Minutes
+    // 0x0000003f [5:0]   : SEC (0): Seconds
     io_rw_32 setup_1;
 
     _REG_(RTC_CTRL_OFFSET) // RTC_CTRL
@@ -56,9 +56,9 @@ typedef struct {
     // 0x04000000 [26]    : YEAR_ENA (0): Enable year matching
     // 0x02000000 [25]    : MONTH_ENA (0): Enable month matching
     // 0x01000000 [24]    : DAY_ENA (0): Enable day matching
-    // 0x00fff000 [12-23] : YEAR (0): Year
-    // 0x00000f00 [8-11]  : MONTH (0): Month (1
-    // 0x0000001f [0-4]   : DAY (0): Day of the month (1
+    // 0x00fff000 [23:12] : YEAR (0): Year
+    // 0x00000f00 [11:8]  : MONTH (0): Month (1
+    // 0x0000001f [4:0]   : DAY (0): Day of the month (1
     io_rw_32 irq_setup_0;
 
     _REG_(RTC_IRQ_SETUP_1_OFFSET) // RTC_IRQ_SETUP_1
@@ -67,25 +67,25 @@ typedef struct {
     // 0x40000000 [30]    : HOUR_ENA (0): Enable hour matching
     // 0x20000000 [29]    : MIN_ENA (0): Enable minute matching
     // 0x10000000 [28]    : SEC_ENA (0): Enable second matching
-    // 0x07000000 [24-26] : DOTW (0): Day of the week
-    // 0x001f0000 [16-20] : HOUR (0): Hours
-    // 0x00003f00 [8-13]  : MIN (0): Minutes
-    // 0x0000003f [0-5]   : SEC (0): Seconds
+    // 0x07000000 [26:24] : DOTW (0): Day of the week
+    // 0x001f0000 [20:16] : HOUR (0): Hours
+    // 0x00003f00 [13:8]  : MIN (0): Minutes
+    // 0x0000003f [5:0]   : SEC (0): Seconds
     io_rw_32 irq_setup_1;
 
     _REG_(RTC_RTC_1_OFFSET) // RTC_RTC_1
     // RTC register 1
-    // 0x00fff000 [12-23] : YEAR (0): Year
-    // 0x00000f00 [8-11]  : MONTH (0): Month (1
-    // 0x0000001f [0-4]   : DAY (0): Day of the month (1
+    // 0x00fff000 [23:12] : YEAR (0): Year
+    // 0x00000f00 [11:8]  : MONTH (0): Month (1
+    // 0x0000001f [4:0]   : DAY (0): Day of the month (1
     io_ro_32 rtc_1;
 
     _REG_(RTC_RTC_0_OFFSET) // RTC_RTC_0
     // RTC register 0
-    // 0x07000000 [24-26] : DOTW (0): Day of the week
-    // 0x001f0000 [16-20] : HOUR (0): Hours
-    // 0x00003f00 [8-13]  : MIN (0): Minutes
-    // 0x0000003f [0-5]   : SEC (0): Seconds
+    // 0x07000000 [26:24] : DOTW (0): Day of the week
+    // 0x001f0000 [20:16] : HOUR (0): Hours
+    // 0x00003f00 [13:8]  : MIN (0): Minutes
+    // 0x0000003f [5:0]   : SEC (0): Seconds
     io_ro_32 rtc_0;
 
     _REG_(RTC_INTR_OFFSET) // RTC_INTR

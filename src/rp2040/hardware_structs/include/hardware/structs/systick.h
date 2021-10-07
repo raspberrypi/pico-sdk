@@ -31,19 +31,19 @@ typedef struct {
 
     _REG_(M0PLUS_SYST_RVR_OFFSET) // M0PLUS_SYST_RVR
     // Use the SysTick Reload Value Register to specify the start value to load into the current value register when the...
-    // 0x00ffffff [0-23]  : RELOAD (0): Value to load into the SysTick Current Value Register when the counter reaches 0
+    // 0x00ffffff [23:0]  : RELOAD (0): Value to load into the SysTick Current Value Register when the counter reaches 0
     io_rw_32 rvr;
 
     _REG_(M0PLUS_SYST_CVR_OFFSET) // M0PLUS_SYST_CVR
     // Use the SysTick Current Value Register to find the current value in the register
-    // 0x00ffffff [0-23]  : CURRENT (0): Reads return the current value of the SysTick counter
+    // 0x00ffffff [23:0]  : CURRENT (0): Reads return the current value of the SysTick counter
     io_rw_32 cvr;
 
     _REG_(M0PLUS_SYST_CALIB_OFFSET) // M0PLUS_SYST_CALIB
     // Use the SysTick Calibration Value Register to enable software to scale to any required speed using divide and multiply
     // 0x80000000 [31]    : NOREF (0): If reads as 1, the Reference clock is not provided - the CLKSOURCE bit of the...
     // 0x40000000 [30]    : SKEW (0): If reads as 1, the calibration value for 10ms is inexact (due to clock frequency)
-    // 0x00ffffff [0-23]  : TENMS (0): An optional Reload value to be used for 10ms (100Hz) timing, subject to system clock...
+    // 0x00ffffff [23:0]  : TENMS (0): An optional Reload value to be used for 10ms (100Hz) timing, subject to system clock...
     io_ro_32 calib;
 } systick_hw_t;
 

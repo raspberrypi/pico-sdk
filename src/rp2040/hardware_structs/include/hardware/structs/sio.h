@@ -28,94 +28,94 @@ typedef struct {
 
     _REG_(SIO_GPIO_IN_OFFSET) // SIO_GPIO_IN
     // Input value for GPIO pins
-    // 0x3fffffff [0-29]  : GPIO_IN (0): Input value for GPIO0
+    // 0x3fffffff [29:0]  : GPIO_IN (0): Input value for GPIO0
     io_ro_32 gpio_in;
 
     _REG_(SIO_GPIO_HI_IN_OFFSET) // SIO_GPIO_HI_IN
     // Input value for QSPI pins
-    // 0x0000003f [0-5]   : GPIO_HI_IN (0): Input value on QSPI IO in order 0
+    // 0x0000003f [5:0]   : GPIO_HI_IN (0): Input value on QSPI IO in order 0
     io_ro_32 gpio_hi_in;
 
     uint32_t _pad0;
 
     _REG_(SIO_GPIO_OUT_OFFSET) // SIO_GPIO_OUT
     // GPIO output value
-    // 0x3fffffff [0-29]  : GPIO_OUT (0): Set output level (1/0 -> high/low) for GPIO0
+    // 0x3fffffff [29:0]  : GPIO_OUT (0): Set output level (1/0 -> high/low) for GPIO0
     io_rw_32 gpio_out;
 
     _REG_(SIO_GPIO_OUT_SET_OFFSET) // SIO_GPIO_OUT_SET
     // GPIO output value set
-    // 0x3fffffff [0-29]  : GPIO_OUT_SET (0): Perform an atomic bit-set on GPIO_OUT, i
+    // 0x3fffffff [29:0]  : GPIO_OUT_SET (0): Perform an atomic bit-set on GPIO_OUT, i
     io_rw_32 gpio_set;
 
     _REG_(SIO_GPIO_OUT_CLR_OFFSET) // SIO_GPIO_OUT_CLR
     // GPIO output value clear
-    // 0x3fffffff [0-29]  : GPIO_OUT_CLR (0): Perform an atomic bit-clear on GPIO_OUT, i
+    // 0x3fffffff [29:0]  : GPIO_OUT_CLR (0): Perform an atomic bit-clear on GPIO_OUT, i
     io_rw_32 gpio_clr;
 
     _REG_(SIO_GPIO_OUT_XOR_OFFSET) // SIO_GPIO_OUT_XOR
     // GPIO output value XOR
-    // 0x3fffffff [0-29]  : GPIO_OUT_XOR (0): Perform an atomic bitwise XOR on GPIO_OUT, i
+    // 0x3fffffff [29:0]  : GPIO_OUT_XOR (0): Perform an atomic bitwise XOR on GPIO_OUT, i
     io_rw_32 gpio_togl;
 
     _REG_(SIO_GPIO_OE_OFFSET) // SIO_GPIO_OE
     // GPIO output enable
-    // 0x3fffffff [0-29]  : GPIO_OE (0): Set output enable (1/0 -> output/input) for GPIO0
+    // 0x3fffffff [29:0]  : GPIO_OE (0): Set output enable (1/0 -> output/input) for GPIO0
     io_rw_32 gpio_oe;
 
     _REG_(SIO_GPIO_OE_SET_OFFSET) // SIO_GPIO_OE_SET
     // GPIO output enable set
-    // 0x3fffffff [0-29]  : GPIO_OE_SET (0): Perform an atomic bit-set on GPIO_OE, i
+    // 0x3fffffff [29:0]  : GPIO_OE_SET (0): Perform an atomic bit-set on GPIO_OE, i
     io_rw_32 gpio_oe_set;
 
     _REG_(SIO_GPIO_OE_CLR_OFFSET) // SIO_GPIO_OE_CLR
     // GPIO output enable clear
-    // 0x3fffffff [0-29]  : GPIO_OE_CLR (0): Perform an atomic bit-clear on GPIO_OE, i
+    // 0x3fffffff [29:0]  : GPIO_OE_CLR (0): Perform an atomic bit-clear on GPIO_OE, i
     io_rw_32 gpio_oe_clr;
 
     _REG_(SIO_GPIO_OE_XOR_OFFSET) // SIO_GPIO_OE_XOR
     // GPIO output enable XOR
-    // 0x3fffffff [0-29]  : GPIO_OE_XOR (0): Perform an atomic bitwise XOR on GPIO_OE, i
+    // 0x3fffffff [29:0]  : GPIO_OE_XOR (0): Perform an atomic bitwise XOR on GPIO_OE, i
     io_rw_32 gpio_oe_togl;
 
     _REG_(SIO_GPIO_HI_OUT_OFFSET) // SIO_GPIO_HI_OUT
     // QSPI output value
-    // 0x0000003f [0-5]   : GPIO_HI_OUT (0): Set output level (1/0 -> high/low) for QSPI IO0
+    // 0x0000003f [5:0]   : GPIO_HI_OUT (0): Set output level (1/0 -> high/low) for QSPI IO0
     io_rw_32 gpio_hi_out;
 
     _REG_(SIO_GPIO_HI_OUT_SET_OFFSET) // SIO_GPIO_HI_OUT_SET
     // QSPI output value set
-    // 0x0000003f [0-5]   : GPIO_HI_OUT_SET (0): Perform an atomic bit-set on GPIO_HI_OUT, i
+    // 0x0000003f [5:0]   : GPIO_HI_OUT_SET (0): Perform an atomic bit-set on GPIO_HI_OUT, i
     io_rw_32 gpio_hi_set;
 
     _REG_(SIO_GPIO_HI_OUT_CLR_OFFSET) // SIO_GPIO_HI_OUT_CLR
     // QSPI output value clear
-    // 0x0000003f [0-5]   : GPIO_HI_OUT_CLR (0): Perform an atomic bit-clear on GPIO_HI_OUT, i
+    // 0x0000003f [5:0]   : GPIO_HI_OUT_CLR (0): Perform an atomic bit-clear on GPIO_HI_OUT, i
     io_rw_32 gpio_hi_clr;
 
     _REG_(SIO_GPIO_HI_OUT_XOR_OFFSET) // SIO_GPIO_HI_OUT_XOR
     // QSPI output value XOR
-    // 0x0000003f [0-5]   : GPIO_HI_OUT_XOR (0): Perform an atomic bitwise XOR on GPIO_HI_OUT, i
+    // 0x0000003f [5:0]   : GPIO_HI_OUT_XOR (0): Perform an atomic bitwise XOR on GPIO_HI_OUT, i
     io_rw_32 gpio_hi_togl;
 
     _REG_(SIO_GPIO_HI_OE_OFFSET) // SIO_GPIO_HI_OE
     // QSPI output enable
-    // 0x0000003f [0-5]   : GPIO_HI_OE (0): Set output enable (1/0 -> output/input) for QSPI IO0
+    // 0x0000003f [5:0]   : GPIO_HI_OE (0): Set output enable (1/0 -> output/input) for QSPI IO0
     io_rw_32 gpio_hi_oe;
 
     _REG_(SIO_GPIO_HI_OE_SET_OFFSET) // SIO_GPIO_HI_OE_SET
     // QSPI output enable set
-    // 0x0000003f [0-5]   : GPIO_HI_OE_SET (0): Perform an atomic bit-set on GPIO_HI_OE, i
+    // 0x0000003f [5:0]   : GPIO_HI_OE_SET (0): Perform an atomic bit-set on GPIO_HI_OE, i
     io_rw_32 gpio_hi_oe_set;
 
     _REG_(SIO_GPIO_HI_OE_CLR_OFFSET) // SIO_GPIO_HI_OE_CLR
     // QSPI output enable clear
-    // 0x0000003f [0-5]   : GPIO_HI_OE_CLR (0): Perform an atomic bit-clear on GPIO_HI_OE, i
+    // 0x0000003f [5:0]   : GPIO_HI_OE_CLR (0): Perform an atomic bit-clear on GPIO_HI_OE, i
     io_rw_32 gpio_hi_oe_clr;
 
     _REG_(SIO_GPIO_HI_OE_XOR_OFFSET) // SIO_GPIO_HI_OE_XOR
     // QSPI output enable XOR
-    // 0x0000003f [0-5]   : GPIO_HI_OE_XOR (0): Perform an atomic bitwise XOR on GPIO_HI_OE, i
+    // 0x0000003f [5:0]   : GPIO_HI_OE_XOR (0): Perform an atomic bitwise XOR on GPIO_HI_OE, i
     io_rw_32 gpio_hi_oe_togl;
 
     _REG_(SIO_FIFO_ST_OFFSET) // SIO_FIFO_ST

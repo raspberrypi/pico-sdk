@@ -44,17 +44,17 @@ typedef struct {
     _REG_(CLOCKS_CLK_GPOUT0_CTRL_OFFSET) // CLOCKS_CLK_GPOUT0_CTRL
     // Clock control, can be changed on-the-fly (except for auxsrc)
     // 0x00100000 [20]    : NUDGE (0): An edge on this signal shifts the phase of the output by 1 cycle of the input clock
-    // 0x00030000 [16-17] : PHASE (0): This delays the enable signal by up to 3 cycles of the input clock
+    // 0x00030000 [17:16] : PHASE (0): This delays the enable signal by up to 3 cycles of the input clock
     // 0x00001000 [12]    : DC50 (0): Enables duty cycle correction for odd divisors
     // 0x00000800 [11]    : ENABLE (0): Starts and stops the clock generator cleanly
     // 0x00000400 [10]    : KILL (0): Asynchronously kills the clock generator
-    // 0x000001e0 [5-8]   : AUXSRC (0): Selects the auxiliary clock source, will glitch when switching
+    // 0x000001e0 [8:5]   : AUXSRC (0): Selects the auxiliary clock source, will glitch when switching
     io_rw_32 ctrl;
 
     _REG_(CLOCKS_CLK_GPOUT0_DIV_OFFSET) // CLOCKS_CLK_GPOUT0_DIV
     // Clock divisor, can be changed on-the-fly
-    // 0xffffff00 [8-31]  : INT (1): Integer component of the divisor, 0 -> divide by 2^16
-    // 0x000000ff [0-7]   : FRAC (0): Fractional component of the divisor
+    // 0xffffff00 [31:8]  : INT (1): Integer component of the divisor, 0 -> divide by 2^16
+    // 0x000000ff [7:0]   : FRAC (0): Fractional component of the divisor
     io_rw_32 div;
 
     _REG_(CLOCKS_CLK_GPOUT0_SELECTED_OFFSET) // CLOCKS_CLK_GPOUT0_SELECTED
@@ -68,7 +68,7 @@ typedef struct {
     // 0x00010000 [16]    : CLEAR (0): For clearing the resus after the fault that triggered it has been corrected
     // 0x00001000 [12]    : FRCE (0): Force a resus, for test purposes only
     // 0x00000100 [8]     : ENABLE (0): Enable resus
-    // 0x000000ff [0-7]   : TIMEOUT (0xff): This is expressed as a number of clk_ref cycles
+    // 0x000000ff [7:0]   : TIMEOUT (0xff): This is expressed as a number of clk_ref cycles
     io_rw_32 ctrl;
 
     _REG_(CLOCKS_CLK_SYS_RESUS_STATUS_OFFSET) // CLOCKS_CLK_SYS_RESUS_STATUS
@@ -79,32 +79,32 @@ typedef struct {
 typedef struct {
     _REG_(CLOCKS_FC0_REF_KHZ_OFFSET) // CLOCKS_FC0_REF_KHZ
     // Reference clock frequency in kHz
-    // 0x000fffff [0-19]  : FC0_REF_KHZ (0)
+    // 0x000fffff [19:0]  : FC0_REF_KHZ (0)
     io_rw_32 ref_khz;
 
     _REG_(CLOCKS_FC0_MIN_KHZ_OFFSET) // CLOCKS_FC0_MIN_KHZ
     // Minimum pass frequency in kHz
-    // 0x01ffffff [0-24]  : FC0_MIN_KHZ (0)
+    // 0x01ffffff [24:0]  : FC0_MIN_KHZ (0)
     io_rw_32 min_khz;
 
     _REG_(CLOCKS_FC0_MAX_KHZ_OFFSET) // CLOCKS_FC0_MAX_KHZ
     // Maximum pass frequency in kHz
-    // 0x01ffffff [0-24]  : FC0_MAX_KHZ (0x1ffffff)
+    // 0x01ffffff [24:0]  : FC0_MAX_KHZ (0x1ffffff)
     io_rw_32 max_khz;
 
     _REG_(CLOCKS_FC0_DELAY_OFFSET) // CLOCKS_FC0_DELAY
     // Delays the start of frequency counting to allow the mux to settle
-    // 0x00000007 [0-2]   : FC0_DELAY (1)
+    // 0x00000007 [2:0]   : FC0_DELAY (1)
     io_rw_32 delay;
 
     _REG_(CLOCKS_FC0_INTERVAL_OFFSET) // CLOCKS_FC0_INTERVAL
     // The test interval is 0
-    // 0x0000000f [0-3]   : FC0_INTERVAL (0x8)
+    // 0x0000000f [3:0]   : FC0_INTERVAL (0x8)
     io_rw_32 interval;
 
     _REG_(CLOCKS_FC0_SRC_OFFSET) // CLOCKS_FC0_SRC
     // Clock sent to frequency counter, set to 0 when not required
-    // 0x000000ff [0-7]   : FC0_SRC (0)
+    // 0x000000ff [7:0]   : FC0_SRC (0)
     io_rw_32 src;
 
     _REG_(CLOCKS_FC0_STATUS_OFFSET) // CLOCKS_FC0_STATUS
@@ -121,8 +121,8 @@ typedef struct {
 
     _REG_(CLOCKS_FC0_RESULT_OFFSET) // CLOCKS_FC0_RESULT
     // Result of frequency measurement, only valid when status_done=1
-    // 0x3fffffe0 [5-29]  : KHZ (0)
-    // 0x0000001f [0-4]   : FRAC (0)
+    // 0x3fffffe0 [29:5]  : KHZ (0)
+    // 0x0000001f [4:0]   : FRAC (0)
     io_ro_32 result;
 } fc_hw_t;
 

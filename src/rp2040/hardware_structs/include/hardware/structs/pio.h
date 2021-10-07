@@ -23,8 +23,8 @@
 typedef struct pio_sm_hw {
     _REG_(PIO_SM0_CLKDIV_OFFSET) // PIO_SM0_CLKDIV
     // Clock divisor register for state machine 0
-    // 0xffff0000 [16-31] : INT (1): Effective frequency is sysclk/(int + frac/256)
-    // 0x0000ff00 [8-15]  : FRAC (0): Fractional part of clock divisor
+    // 0xffff0000 [31:16] : INT (1): Effective frequency is sysclk/(int + frac/256)
+    // 0x0000ff00 [15:8]  : FRAC (0): Fractional part of clock divisor
     io_rw_32 clkdiv;
 
     _REG_(PIO_SM0_EXECCTRL_OFFSET) // PIO_SM0_EXECCTRL
@@ -32,22 +32,22 @@ typedef struct pio_sm_hw {
     // 0x80000000 [31]    : EXEC_STALLED (0): If 1, an instruction written to SMx_INSTR is stalled, and latched by the state machine
     // 0x40000000 [30]    : SIDE_EN (0): If 1, the MSB of the Delay/Side-set instruction field is used as side-set enable,...
     // 0x20000000 [29]    : SIDE_PINDIR (0): If 1, side-set data is asserted to pin directions, instead of pin values
-    // 0x1f000000 [24-28] : JMP_PIN (0): The GPIO number to use as condition for JMP PIN
-    // 0x00f80000 [19-23] : OUT_EN_SEL (0): Which data bit to use for inline OUT enable
+    // 0x1f000000 [28:24] : JMP_PIN (0): The GPIO number to use as condition for JMP PIN
+    // 0x00f80000 [23:19] : OUT_EN_SEL (0): Which data bit to use for inline OUT enable
     // 0x00040000 [18]    : INLINE_OUT_EN (0): If 1, use a bit of OUT data as an auxiliary write enable
     // 0x00020000 [17]    : OUT_STICKY (0): Continuously assert the most recent OUT/SET to the pins
-    // 0x0001f000 [12-16] : WRAP_TOP (0x1f): After reaching this address, execution is wrapped to wrap_bottom
-    // 0x00000f80 [7-11]  : WRAP_BOTTOM (0): After reaching wrap_top, execution is wrapped to this address
+    // 0x0001f000 [16:12] : WRAP_TOP (0x1f): After reaching this address, execution is wrapped to wrap_bottom
+    // 0x00000f80 [11:7]  : WRAP_BOTTOM (0): After reaching wrap_top, execution is wrapped to this address
     // 0x00000010 [4]     : STATUS_SEL (0): Comparison used for the MOV x, STATUS instruction
-    // 0x0000000f [0-3]   : STATUS_N (0): Comparison level for the MOV x, STATUS instruction
+    // 0x0000000f [3:0]   : STATUS_N (0): Comparison level for the MOV x, STATUS instruction
     io_rw_32 execctrl;
 
     _REG_(PIO_SM0_SHIFTCTRL_OFFSET) // PIO_SM0_SHIFTCTRL
     // Control behaviour of the input/output shift registers for state machine 0
     // 0x80000000 [31]    : FJOIN_RX (0): When 1, RX FIFO steals the TX FIFO's storage, and becomes twice as deep
     // 0x40000000 [30]    : FJOIN_TX (0): When 1, TX FIFO steals the RX FIFO's storage, and becomes twice as deep
-    // 0x3e000000 [25-29] : PULL_THRESH (0): Number of bits shifted out of OSR before autopull, or conditional pull (PULL...
-    // 0x01f00000 [20-24] : PUSH_THRESH (0): Number of bits shifted into ISR before autopush, or conditional push (PUSH...
+    // 0x3e000000 [29:25] : PULL_THRESH (0): Number of bits shifted out of OSR before autopull, or conditional pull (PULL...
+    // 0x01f00000 [24:20] : PUSH_THRESH (0): Number of bits shifted into ISR before autopush, or conditional push (PUSH...
     // 0x00080000 [19]    : OUT_SHIFTDIR (1): 1 = shift out of output shift register to right
     // 0x00040000 [18]    : IN_SHIFTDIR (1): 1 = shift input shift register to right (data enters from left)
     // 0x00020000 [17]    : AUTOPULL (0): Pull automatically when the output shift register is emptied, i
@@ -56,60 +56,60 @@ typedef struct pio_sm_hw {
 
     _REG_(PIO_SM0_ADDR_OFFSET) // PIO_SM0_ADDR
     // Current instruction address of state machine 0
-    // 0x0000001f [0-4]   : SM0_ADDR (0)
+    // 0x0000001f [4:0]   : SM0_ADDR (0)
     io_ro_32 addr;
 
     _REG_(PIO_SM0_INSTR_OFFSET) // PIO_SM0_INSTR
     // Read to see the instruction currently addressed by state machine 0's program counter
-    // 0x0000ffff [0-15]  : SM0_INSTR (0)
+    // 0x0000ffff [15:0]  : SM0_INSTR (0)
     io_rw_32 instr;
 
     _REG_(PIO_SM0_PINCTRL_OFFSET) // PIO_SM0_PINCTRL
     // State machine pin control
-    // 0xe0000000 [29-31] : SIDESET_COUNT (0): The number of MSBs of the Delay/Side-set instruction field which are used...
-    // 0x1c000000 [26-28] : SET_COUNT (0x5): The number of pins asserted by a SET
-    // 0x03f00000 [20-25] : OUT_COUNT (0): The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV PINS instruction
-    // 0x000f8000 [15-19] : IN_BASE (0): The pin which is mapped to the least-significant bit of a state machine's IN data bus
-    // 0x00007c00 [10-14] : SIDESET_BASE (0): The lowest-numbered pin that will be affected by a side-set operation
-    // 0x000003e0 [5-9]   : SET_BASE (0): The lowest-numbered pin that will be affected by a SET PINS or SET PINDIRS instruction
-    // 0x0000001f [0-4]   : OUT_BASE (0): The lowest-numbered pin that will be affected by an OUT PINS, OUT PINDIRS or MOV...
+    // 0xe0000000 [31:29] : SIDESET_COUNT (0): The number of MSBs of the Delay/Side-set instruction field which are used...
+    // 0x1c000000 [28:26] : SET_COUNT (0x5): The number of pins asserted by a SET
+    // 0x03f00000 [25:20] : OUT_COUNT (0): The number of pins asserted by an OUT PINS, OUT PINDIRS or MOV PINS instruction
+    // 0x000f8000 [19:15] : IN_BASE (0): The pin which is mapped to the least-significant bit of a state machine's IN data bus
+    // 0x00007c00 [14:10] : SIDESET_BASE (0): The lowest-numbered pin that will be affected by a side-set operation
+    // 0x000003e0 [9:5]   : SET_BASE (0): The lowest-numbered pin that will be affected by a SET PINS or SET PINDIRS instruction
+    // 0x0000001f [4:0]   : OUT_BASE (0): The lowest-numbered pin that will be affected by an OUT PINS, OUT PINDIRS or MOV...
     io_rw_32 pinctrl;
 } pio_sm_hw_t;
 
 typedef struct {
     _REG_(PIO_CTRL_OFFSET) // PIO_CTRL
     // PIO control register
-    // 0x00000f00 [8-11]  : CLKDIV_RESTART (0): Restart a state machine's clock divider from an initial phase of 0
-    // 0x000000f0 [4-7]   : SM_RESTART (0): Write 1 to instantly clear internal SM state which may be otherwise difficult...
-    // 0x0000000f [0-3]   : SM_ENABLE (0): Enable/disable each of the four state machines by writing 1/0 to each of these four bits
+    // 0x00000f00 [11:8]  : CLKDIV_RESTART (0): Restart a state machine's clock divider from an initial phase of 0
+    // 0x000000f0 [7:4]   : SM_RESTART (0): Write 1 to instantly clear internal SM state which may be otherwise difficult...
+    // 0x0000000f [3:0]   : SM_ENABLE (0): Enable/disable each of the four state machines by writing 1/0 to each of these four bits
     io_rw_32 ctrl;
 
     _REG_(PIO_FSTAT_OFFSET) // PIO_FSTAT
     // FIFO status register
-    // 0x0f000000 [24-27] : TXEMPTY (0xf): State machine TX FIFO is empty
-    // 0x000f0000 [16-19] : TXFULL (0): State machine TX FIFO is full
-    // 0x00000f00 [8-11]  : RXEMPTY (0xf): State machine RX FIFO is empty
-    // 0x0000000f [0-3]   : RXFULL (0): State machine RX FIFO is full
+    // 0x0f000000 [27:24] : TXEMPTY (0xf): State machine TX FIFO is empty
+    // 0x000f0000 [19:16] : TXFULL (0): State machine TX FIFO is full
+    // 0x00000f00 [11:8]  : RXEMPTY (0xf): State machine RX FIFO is empty
+    // 0x0000000f [3:0]   : RXFULL (0): State machine RX FIFO is full
     io_ro_32 fstat;
 
     _REG_(PIO_FDEBUG_OFFSET) // PIO_FDEBUG
     // FIFO debug register
-    // 0x0f000000 [24-27] : TXSTALL (0): State machine has stalled on empty TX FIFO during a blocking PULL, or an OUT with...
-    // 0x000f0000 [16-19] : TXOVER (0): TX FIFO overflow (i
-    // 0x00000f00 [8-11]  : RXUNDER (0): RX FIFO underflow (i
-    // 0x0000000f [0-3]   : RXSTALL (0): State machine has stalled on full RX FIFO during a blocking PUSH, or an IN with...
+    // 0x0f000000 [27:24] : TXSTALL (0): State machine has stalled on empty TX FIFO during a blocking PULL, or an OUT with...
+    // 0x000f0000 [19:16] : TXOVER (0): TX FIFO overflow (i
+    // 0x00000f00 [11:8]  : RXUNDER (0): RX FIFO underflow (i
+    // 0x0000000f [3:0]   : RXSTALL (0): State machine has stalled on full RX FIFO during a blocking PUSH, or an IN with...
     io_rw_32 fdebug;
 
     _REG_(PIO_FLEVEL_OFFSET) // PIO_FLEVEL
     // FIFO levels
-    // 0xf0000000 [28-31] : RX3 (0)
-    // 0x0f000000 [24-27] : TX3 (0)
-    // 0x00f00000 [20-23] : RX2 (0)
-    // 0x000f0000 [16-19] : TX2 (0)
-    // 0x0000f000 [12-15] : RX1 (0)
-    // 0x00000f00 [8-11]  : TX1 (0)
-    // 0x000000f0 [4-7]   : RX0 (0)
-    // 0x0000000f [0-3]   : TX0 (0)
+    // 0xf0000000 [31:28] : RX3 (0)
+    // 0x0f000000 [27:24] : TX3 (0)
+    // 0x00f00000 [23:20] : RX2 (0)
+    // 0x000f0000 [19:16] : TX2 (0)
+    // 0x0000f000 [15:12] : RX1 (0)
+    // 0x00000f00 [11:8]  : TX1 (0)
+    // 0x000000f0 [7:4]   : RX0 (0)
+    // 0x0000000f [3:0]   : TX0 (0)
     io_ro_32 flevel;
 
     _REG_(PIO_TXF0_OFFSET) // PIO_TXF0
@@ -120,12 +120,12 @@ typedef struct {
 
     _REG_(PIO_IRQ_OFFSET) // PIO_IRQ
     // State machine IRQ flags register
-    // 0x000000ff [0-7]   : IRQ (0)
+    // 0x000000ff [7:0]   : IRQ (0)
     io_rw_32 irq;
 
     _REG_(PIO_IRQ_FORCE_OFFSET) // PIO_IRQ_FORCE
     // Writing a 1 to each of these bits will forcibly assert the corresponding IRQ
-    // 0x000000ff [0-7]   : IRQ_FORCE (0)
+    // 0x000000ff [7:0]   : IRQ_FORCE (0)
     io_wo_32 irq_force;
 
     _REG_(PIO_INPUT_SYNC_BYPASS_OFFSET) // PIO_INPUT_SYNC_BYPASS
@@ -142,9 +142,9 @@ typedef struct {
 
     _REG_(PIO_DBG_CFGINFO_OFFSET) // PIO_DBG_CFGINFO
     // The PIO hardware has some free parameters that may vary between chip products
-    // 0x003f0000 [16-21] : IMEM_SIZE (0): The size of the instruction memory, measured in units of one instruction
-    // 0x00000f00 [8-11]  : SM_COUNT (0): The number of state machines this PIO instance is equipped with
-    // 0x0000003f [0-5]   : FIFO_DEPTH (0): The depth of the state machine TX/RX FIFOs, measured in words
+    // 0x003f0000 [21:16] : IMEM_SIZE (0): The size of the instruction memory, measured in units of one instruction
+    // 0x00000f00 [11:8]  : SM_COUNT (0): The number of state machines this PIO instance is equipped with
+    // 0x0000003f [5:0]   : FIFO_DEPTH (0): The depth of the state machine TX/RX FIFOs, measured in words
     io_ro_32 dbg_cfginfo;
 
     _REG_(PIO_INSTR_MEM0_OFFSET) // PIO_INSTR_MEM0

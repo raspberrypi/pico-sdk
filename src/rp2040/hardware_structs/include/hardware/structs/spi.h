@@ -23,11 +23,11 @@
 typedef struct {
     _REG_(SPI_SSPCR0_OFFSET) // SPI_SSPCR0
     // Control register 0, SSPCR0 on page 3-4
-    // 0x0000ff00 [8-15]  : SCR (0): Serial clock rate
+    // 0x0000ff00 [15:8]  : SCR (0): Serial clock rate
     // 0x00000080 [7]     : SPH (0): SSPCLKOUT phase, applicable to Motorola SPI frame format only
     // 0x00000040 [6]     : SPO (0): SSPCLKOUT polarity, applicable to Motorola SPI frame format only
-    // 0x00000030 [4-5]   : FRF (0): Frame format: 00 Motorola SPI frame format
-    // 0x0000000f [0-3]   : DSS (0): Data Size Select: 0000 Reserved, undefined operation
+    // 0x00000030 [5:4]   : FRF (0): Frame format: 00 Motorola SPI frame format
+    // 0x0000000f [3:0]   : DSS (0): Data Size Select: 0000 Reserved, undefined operation
     io_rw_32 cr0;
 
     _REG_(SPI_SSPCR1_OFFSET) // SPI_SSPCR1
@@ -40,7 +40,7 @@ typedef struct {
 
     _REG_(SPI_SSPDR_OFFSET) // SPI_SSPDR
     // Data register, SSPDR on page 3-6
-    // 0x0000ffff [0-15]  : DATA (0): Transmit/Receive FIFO: Read Receive FIFO
+    // 0x0000ffff [15:0]  : DATA (0): Transmit/Receive FIFO: Read Receive FIFO
     io_rw_32 dr;
 
     _REG_(SPI_SSPSR_OFFSET) // SPI_SSPSR
@@ -54,7 +54,7 @@ typedef struct {
 
     _REG_(SPI_SSPCPSR_OFFSET) // SPI_SSPCPSR
     // Clock prescale register, SSPCPSR on page 3-8
-    // 0x000000ff [0-7]   : CPSDVSR (0): Clock prescale divisor
+    // 0x000000ff [7:0]   : CPSDVSR (0): Clock prescale divisor
     io_rw_32 cpsr;
 
     _REG_(SPI_SSPIMSC_OFFSET) // SPI_SSPIMSC

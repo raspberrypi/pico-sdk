@@ -31,20 +31,20 @@ typedef struct {
 
     _REG_(SYSCFG_PROC_CONFIG_OFFSET) // SYSCFG_PROC_CONFIG
     // Configuration for processors
-    // 0xf0000000 [28-31] : PROC1_DAP_INSTID (1): Configure proc1 DAP instance ID
-    // 0x0f000000 [24-27] : PROC0_DAP_INSTID (0): Configure proc0 DAP instance ID
+    // 0xf0000000 [31:28] : PROC1_DAP_INSTID (1): Configure proc1 DAP instance ID
+    // 0x0f000000 [27:24] : PROC0_DAP_INSTID (0): Configure proc0 DAP instance ID
     // 0x00000002 [1]     : PROC1_HALTED (0): Indication that proc1 has halted
     // 0x00000001 [0]     : PROC0_HALTED (0): Indication that proc0 has halted
     io_rw_32 proc_config;
 
     _REG_(SYSCFG_PROC_IN_SYNC_BYPASS_OFFSET) // SYSCFG_PROC_IN_SYNC_BYPASS
     // For each bit, if 1, bypass the input synchronizer between that GPIO
-    // 0x3fffffff [0-29]  : PROC_IN_SYNC_BYPASS (0)
+    // 0x3fffffff [29:0]  : PROC_IN_SYNC_BYPASS (0)
     io_rw_32 proc_in_sync_bypass;
 
     _REG_(SYSCFG_PROC_IN_SYNC_BYPASS_HI_OFFSET) // SYSCFG_PROC_IN_SYNC_BYPASS_HI
     // For each bit, if 1, bypass the input synchronizer between that GPIO
-    // 0x0000003f [0-5]   : PROC_IN_SYNC_BYPASS_HI (0)
+    // 0x0000003f [5:0]   : PROC_IN_SYNC_BYPASS_HI (0)
     io_rw_32 proc_in_sync_bypass_hi;
 
     _REG_(SYSCFG_DBGFORCE_OFFSET) // SYSCFG_DBGFORCE

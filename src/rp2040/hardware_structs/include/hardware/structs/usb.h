@@ -124,8 +124,8 @@ static_assert(offsetof(usb_host_dpram_t, epx_data) == 0x180, "");
 typedef struct {
     _REG_(USB_ADDR_ENDP_OFFSET) // USB_ADDR_ENDP
     // Device address and endpoint control
-    // 0x000f0000 [16-19] : ENDPOINT (0): Device endpoint to send data to
-    // 0x0000007f [0-6]   : ADDRESS (0): In device mode, the address that the device should respond to
+    // 0x000f0000 [19:16] : ENDPOINT (0): Device endpoint to send data to
+    // 0x0000007f [6:0]   : ADDRESS (0): In device mode, the address that the device should respond to
     io_rw_32 dev_addr_ctrl;
 
     _REG_(USB_ADDR_ENDP1_OFFSET) // USB_ADDR_ENDP1
@@ -140,12 +140,12 @@ typedef struct {
 
     _REG_(USB_SOF_WR_OFFSET) // USB_SOF_WR
     // Set the SOF (Start of Frame) frame number in the host controller
-    // 0x000007ff [0-10]  : COUNT (0)
+    // 0x000007ff [10:0]  : COUNT (0)
     io_wo_32 sof_rw;
 
     _REG_(USB_SOF_RD_OFFSET) // USB_SOF_RD
     // Read the last SOF (Start of Frame) frame number seen
-    // 0x000007ff [0-10]  : COUNT (0)
+    // 0x000007ff [10:0]  : COUNT (0)
     io_ro_32 sof_rd;
 
     _REG_(USB_SIE_CTRL_OFFSET) // USB_SIE_CTRL
@@ -192,15 +192,15 @@ typedef struct {
     // 0x00010000 [16]    : CONNECTED (0): Device: connected
     // 0x00000800 [11]    : RESUME (0): Host: Device has initiated a remote resume
     // 0x00000400 [10]    : VBUS_OVER_CURR (0): VBUS over current detected
-    // 0x00000300 [8-9]   : SPEED (0): Host: device speed
+    // 0x00000300 [9:8]   : SPEED (0): Host: device speed
     // 0x00000010 [4]     : SUSPENDED (0): Bus in suspended state
-    // 0x0000000c [2-3]   : LINE_STATE (0): USB bus line state
+    // 0x0000000c [3:2]   : LINE_STATE (0): USB bus line state
     // 0x00000001 [0]     : VBUS_DETECTED (0): Device: VBUS Detected
     io_rw_32 sie_status;
 
     _REG_(USB_INT_EP_CTRL_OFFSET) // USB_INT_EP_CTRL
     // interrupt endpoint control register
-    // 0x0000fffe [1-15]  : INT_EP_ACTIVE (0): Host: Enable interrupt endpoint 1 -> 15
+    // 0x0000fffe [15:1]  : INT_EP_ACTIVE (0): Host: Enable interrupt endpoint 1 -> 15
     io_rw_32 int_ep_ctrl;
 
     _REG_(USB_BUFF_STATUS_OFFSET) // USB_BUFF_STATUS
@@ -355,8 +355,8 @@ typedef struct {
 
     _REG_(USB_NAK_POLL_OFFSET) // USB_NAK_POLL
     // Used by the host controller
-    // 0x03ff0000 [16-25] : DELAY_FS (0x10): NAK polling interval for a full speed device
-    // 0x000003ff [0-9]   : DELAY_LS (0x10): NAK polling interval for a low speed device
+    // 0x03ff0000 [25:16] : DELAY_FS (0x10): NAK polling interval for a full speed device
+    // 0x000003ff [9:0]   : DELAY_LS (0x10): NAK polling interval for a low speed device
     io_rw_32 nak_poll;
 
     _REG_(USB_EP_STATUS_STALL_NAK_OFFSET) // USB_EP_STATUS_STALL_NAK
@@ -458,8 +458,8 @@ typedef struct {
 
     _REG_(USB_USBPHY_TRIM_OFFSET) // USB_USBPHY_TRIM
     // Used to adjust trim values of USB phy pull down resistors
-    // 0x00001f00 [8-12]  : DM_PULLDN_TRIM (0x1f): Value to drive to USB PHY
-    // 0x0000001f [0-4]   : DP_PULLDN_TRIM (0x1f): Value to drive to USB PHY
+    // 0x00001f00 [12:8]  : DM_PULLDN_TRIM (0x1f): Value to drive to USB PHY
+    // 0x0000001f [4:0]   : DP_PULLDN_TRIM (0x1f): Value to drive to USB PHY
     io_rw_32 phy_trim;
 
     uint32_t _pad0;

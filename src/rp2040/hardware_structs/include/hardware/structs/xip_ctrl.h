@@ -50,12 +50,12 @@ typedef struct {
 
     _REG_(XIP_STREAM_ADDR_OFFSET) // XIP_STREAM_ADDR
     // FIFO stream address
-    // 0xfffffffc [2-31]  : STREAM_ADDR (0): The address of the next word to be streamed from flash to the streaming FIFO
+    // 0xfffffffc [31:2]  : STREAM_ADDR (0): The address of the next word to be streamed from flash to the streaming FIFO
     io_rw_32 stream_addr;
 
     _REG_(XIP_STREAM_CTR_OFFSET) // XIP_STREAM_CTR
     // FIFO stream control
-    // 0x003fffff [0-21]  : STREAM_CTR (0): Write a nonzero value to start a streaming read
+    // 0x003fffff [21:0]  : STREAM_CTR (0): Write a nonzero value to start a streaming read
     io_rw_32 stream_ctr;
 
     _REG_(XIP_STREAM_FIFO_OFFSET) // XIP_STREAM_FIFO

@@ -25,7 +25,7 @@ typedef struct pwm_slice_hw {
     // Control and status register
     // 0x00000080 [7]     : PH_ADV (0): Advance the phase of the counter by 1 count, while it is running
     // 0x00000040 [6]     : PH_RET (0): Retard the phase of the counter by 1 count, while it is running
-    // 0x00000030 [4-5]   : DIVMODE (0)
+    // 0x00000030 [5:4]   : DIVMODE (0)
     // 0x00000008 [3]     : B_INV (0): Invert output B
     // 0x00000004 [2]     : A_INV (0): Invert output A
     // 0x00000002 [1]     : PH_CORRECT (0): 1: Enable phase-correct modulation
@@ -34,24 +34,24 @@ typedef struct pwm_slice_hw {
 
     _REG_(PWM_CH0_DIV_OFFSET) // PWM_CH0_DIV
     // INT and FRAC form a fixed-point fractional number
-    // 0x00000ff0 [4-11]  : INT (1)
-    // 0x0000000f [0-3]   : FRAC (0)
+    // 0x00000ff0 [11:4]  : INT (1)
+    // 0x0000000f [3:0]   : FRAC (0)
     io_rw_32 div;
 
     _REG_(PWM_CH0_CTR_OFFSET) // PWM_CH0_CTR
     // Direct access to the PWM counter
-    // 0x0000ffff [0-15]  : CH0_CTR (0)
+    // 0x0000ffff [15:0]  : CH0_CTR (0)
     io_rw_32 ctr;
 
     _REG_(PWM_CH0_CC_OFFSET) // PWM_CH0_CC
     // Counter compare values
-    // 0xffff0000 [16-31] : B (0)
-    // 0x0000ffff [0-15]  : A (0)
+    // 0xffff0000 [31:16] : B (0)
+    // 0x0000ffff [15:0]  : A (0)
     io_rw_32 cc;
 
     _REG_(PWM_CH0_TOP_OFFSET) // PWM_CH0_TOP
     // Counter wrap value
-    // 0x0000ffff [0-15]  : CH0_TOP (0xffff)
+    // 0x0000ffff [15:0]  : CH0_TOP (0xffff)
     io_rw_32 top;
 } pwm_slice_hw_t;
 

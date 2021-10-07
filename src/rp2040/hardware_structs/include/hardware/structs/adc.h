@@ -23,8 +23,8 @@
 typedef struct {
     _REG_(ADC_CS_OFFSET) // ADC_CS
     // ADC Control and Status
-    // 0x001f0000 [16-20] : RROBIN (0): Round-robin sampling
-    // 0x00007000 [12-14] : AINSEL (0): Select analog mux input
+    // 0x001f0000 [20:16] : RROBIN (0): Round-robin sampling
+    // 0x00007000 [14:12] : AINSEL (0): Select analog mux input
     // 0x00000400 [10]    : ERR_STICKY (0): Some past ADC conversion encountered an error
     // 0x00000200 [9]     : ERR (0): The most recent ADC conversion encountered an error; result is undefined or noisy
     // 0x00000100 [8]     : READY (0): 1 if the ADC is ready to start a new conversion
@@ -36,13 +36,13 @@ typedef struct {
 
     _REG_(ADC_RESULT_OFFSET) // ADC_RESULT
     // Result of most recent ADC conversion
-    // 0x00000fff [0-11]  : RESULT (0)
+    // 0x00000fff [11:0]  : RESULT (0)
     io_ro_32 result;
 
     _REG_(ADC_FCS_OFFSET) // ADC_FCS
     // FIFO control and status
-    // 0x0f000000 [24-27] : THRESH (0): DREQ/IRQ asserted when level >= threshold
-    // 0x000f0000 [16-19] : LEVEL (0): The number of conversion results currently waiting in the FIFO
+    // 0x0f000000 [27:24] : THRESH (0): DREQ/IRQ asserted when level >= threshold
+    // 0x000f0000 [19:16] : LEVEL (0): The number of conversion results currently waiting in the FIFO
     // 0x00000800 [11]    : OVER (0): 1 if the FIFO has been overflowed
     // 0x00000400 [10]    : UNDER (0): 1 if the FIFO has been underflowed
     // 0x00000200 [9]     : FULL (0)
@@ -56,13 +56,13 @@ typedef struct {
     _REG_(ADC_FIFO_OFFSET) // ADC_FIFO
     // Conversion result FIFO
     // 0x00008000 [15]    : ERR (0): 1 if this particular sample experienced a conversion error
-    // 0x00000fff [0-11]  : VAL (0)
+    // 0x00000fff [11:0]  : VAL (0)
     io_ro_32 fifo;
 
     _REG_(ADC_DIV_OFFSET) // ADC_DIV
     // Clock divider
-    // 0x00ffff00 [8-23]  : INT (0): Integer part of clock divisor
-    // 0x000000ff [0-7]   : FRAC (0): Fractional part of clock divisor
+    // 0x00ffff00 [23:8]  : INT (0): Integer part of clock divisor
+    // 0x000000ff [7:0]   : FRAC (0): Fractional part of clock divisor
     io_rw_32 div;
 
     _REG_(ADC_INTR_OFFSET) // ADC_INTR

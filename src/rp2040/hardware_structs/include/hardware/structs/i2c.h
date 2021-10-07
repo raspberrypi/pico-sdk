@@ -31,7 +31,7 @@ typedef struct {
     // 0x00000020 [5]     : IC_RESTART_EN (1): Determines whether RESTART conditions may be sent when acting as a master
     // 0x00000010 [4]     : IC_10BITADDR_MASTER (0): Controls whether the DW_apb_i2c starts its transfers in 7- or 10-bit...
     // 0x00000008 [3]     : IC_10BITADDR_SLAVE (0): When acting as a slave, this bit controls whether the DW_apb_i2c...
-    // 0x00000006 [1-2]   : SPEED (0x2): These bits control at which speed the DW_apb_i2c operates; its setting is relevant...
+    // 0x00000006 [2:1]   : SPEED (0x2): These bits control at which speed the DW_apb_i2c operates; its setting is relevant...
     // 0x00000001 [0]     : MASTER_MODE (1): This bit controls whether the DW_apb_i2c master is enabled
     io_rw_32 con;
 
@@ -39,12 +39,12 @@ typedef struct {
     // I2C Target Address Register
     // 0x00000800 [11]    : SPECIAL (0): This bit indicates whether software performs a Device-ID or General Call or START...
     // 0x00000400 [10]    : GC_OR_START (0): If bit 11 (SPECIAL) is set to 1 and bit 13(Device-ID) is set to 0, then this...
-    // 0x000003ff [0-9]   : IC_TAR (0x55): This is the target address for any master transaction
+    // 0x000003ff [9:0]   : IC_TAR (0x55): This is the target address for any master transaction
     io_rw_32 tar;
 
     _REG_(I2C_IC_SAR_OFFSET) // I2C_IC_SAR
     // I2C Slave Address Register
-    // 0x000003ff [0-9]   : IC_SAR (0x55): The IC_SAR holds the slave address when the I2C is operating as a slave
+    // 0x000003ff [9:0]   : IC_SAR (0x55): The IC_SAR holds the slave address when the I2C is operating as a slave
     io_rw_32 sar;
 
     uint32_t _pad0;
@@ -55,27 +55,27 @@ typedef struct {
     // 0x00000400 [10]    : RESTART (0): This bit controls whether a RESTART is issued before the byte is sent or received
     // 0x00000200 [9]     : STOP (0): This bit controls whether a STOP is issued after the byte is sent or received
     // 0x00000100 [8]     : CMD (0): This bit controls whether a read or a write is performed
-    // 0x000000ff [0-7]   : DAT (0): This register contains the data to be transmitted or received on the I2C bus
+    // 0x000000ff [7:0]   : DAT (0): This register contains the data to be transmitted or received on the I2C bus
     io_rw_32 data_cmd;
 
     _REG_(I2C_IC_SS_SCL_HCNT_OFFSET) // I2C_IC_SS_SCL_HCNT
     // Standard Speed I2C Clock SCL High Count Register
-    // 0x0000ffff [0-15]  : IC_SS_SCL_HCNT (0x28): This register must be set before any I2C bus transaction can take place...
+    // 0x0000ffff [15:0]  : IC_SS_SCL_HCNT (0x28): This register must be set before any I2C bus transaction can take place...
     io_rw_32 ss_scl_hcnt;
 
     _REG_(I2C_IC_SS_SCL_LCNT_OFFSET) // I2C_IC_SS_SCL_LCNT
     // Standard Speed I2C Clock SCL Low Count Register
-    // 0x0000ffff [0-15]  : IC_SS_SCL_LCNT (0x2f): This register must be set before any I2C bus transaction can take place...
+    // 0x0000ffff [15:0]  : IC_SS_SCL_LCNT (0x2f): This register must be set before any I2C bus transaction can take place...
     io_rw_32 ss_scl_lcnt;
 
     _REG_(I2C_IC_FS_SCL_HCNT_OFFSET) // I2C_IC_FS_SCL_HCNT
     // Fast Mode or Fast Mode Plus I2C Clock SCL High Count Register
-    // 0x0000ffff [0-15]  : IC_FS_SCL_HCNT (0x6): This register must be set before any I2C bus transaction can take place...
+    // 0x0000ffff [15:0]  : IC_FS_SCL_HCNT (0x6): This register must be set before any I2C bus transaction can take place...
     io_rw_32 fs_scl_hcnt;
 
     _REG_(I2C_IC_FS_SCL_LCNT_OFFSET) // I2C_IC_FS_SCL_LCNT
     // Fast Mode or Fast Mode Plus I2C Clock SCL Low Count Register
-    // 0x0000ffff [0-15]  : IC_FS_SCL_LCNT (0xd): This register must be set before any I2C bus transaction can take place...
+    // 0x0000ffff [15:0]  : IC_FS_SCL_LCNT (0xd): This register must be set before any I2C bus transaction can take place...
     io_rw_32 fs_scl_lcnt;
 
     uint32_t _pad1[2];
@@ -133,12 +133,12 @@ typedef struct {
 
     _REG_(I2C_IC_RX_TL_OFFSET) // I2C_IC_RX_TL
     // I2C Receive FIFO Threshold Register
-    // 0x000000ff [0-7]   : RX_TL (0): Receive FIFO Threshold Level
+    // 0x000000ff [7:0]   : RX_TL (0): Receive FIFO Threshold Level
     io_rw_32 rx_tl;
 
     _REG_(I2C_IC_TX_TL_OFFSET) // I2C_IC_TX_TL
     // I2C Transmit FIFO Threshold Register
-    // 0x000000ff [0-7]   : TX_TL (0): Transmit FIFO Threshold Level
+    // 0x000000ff [7:0]   : TX_TL (0): Transmit FIFO Threshold Level
     io_rw_32 tx_tl;
 
     _REG_(I2C_IC_CLR_INTR_OFFSET) // I2C_IC_CLR_INTR
@@ -216,23 +216,23 @@ typedef struct {
 
     _REG_(I2C_IC_TXFLR_OFFSET) // I2C_IC_TXFLR
     // I2C Transmit FIFO Level Register This register contains the number of valid data entries in the transmit FIFO buffer
-    // 0x0000001f [0-4]   : TXFLR (0): Transmit FIFO Level
+    // 0x0000001f [4:0]   : TXFLR (0): Transmit FIFO Level
     io_ro_32 txflr;
 
     _REG_(I2C_IC_RXFLR_OFFSET) // I2C_IC_RXFLR
     // I2C Receive FIFO Level Register This register contains the number of valid data entries in the receive FIFO buffer
-    // 0x0000001f [0-4]   : RXFLR (0): Receive FIFO Level
+    // 0x0000001f [4:0]   : RXFLR (0): Receive FIFO Level
     io_ro_32 rxflr;
 
     _REG_(I2C_IC_SDA_HOLD_OFFSET) // I2C_IC_SDA_HOLD
     // I2C SDA Hold Time Length Register
-    // 0x00ff0000 [16-23] : IC_SDA_RX_HOLD (0): Sets the required SDA hold time in units of ic_clk period, when DW_apb_i2c...
-    // 0x0000ffff [0-15]  : IC_SDA_TX_HOLD (1): Sets the required SDA hold time in units of ic_clk period, when DW_apb_i2c...
+    // 0x00ff0000 [23:16] : IC_SDA_RX_HOLD (0): Sets the required SDA hold time in units of ic_clk period, when DW_apb_i2c...
+    // 0x0000ffff [15:0]  : IC_SDA_TX_HOLD (1): Sets the required SDA hold time in units of ic_clk period, when DW_apb_i2c...
     io_rw_32 sda_hold;
 
     _REG_(I2C_IC_TX_ABRT_SOURCE_OFFSET) // I2C_IC_TX_ABRT_SOURCE
     // I2C Transmit Abort Source Register
-    // 0xff800000 [23-31] : TX_FLUSH_CNT (0): This field indicates the number of Tx FIFO Data Commands which are flushed...
+    // 0xff800000 [31:23] : TX_FLUSH_CNT (0): This field indicates the number of Tx FIFO Data Commands which are flushed...
     // 0x00010000 [16]    : ABRT_USER_ABRT (0): This is a master-mode-only bit
     // 0x00008000 [15]    : ABRT_SLVRD_INTX (0): 1: When the processor side responds to a slave mode request for data to be...
     // 0x00004000 [14]    : ABRT_SLV_ARBLOST (0): This field indicates that a Slave has lost the bus while transmitting...
@@ -265,17 +265,17 @@ typedef struct {
 
     _REG_(I2C_IC_DMA_TDLR_OFFSET) // I2C_IC_DMA_TDLR
     // DMA Transmit Data Level Register
-    // 0x0000000f [0-3]   : DMATDL (0): Transmit Data Level
+    // 0x0000000f [3:0]   : DMATDL (0): Transmit Data Level
     io_rw_32 dma_tdlr;
 
     _REG_(I2C_IC_DMA_RDLR_OFFSET) // I2C_IC_DMA_RDLR
     // I2C Receive Data Level Register
-    // 0x0000000f [0-3]   : DMARDL (0): Receive Data Level
+    // 0x0000000f [3:0]   : DMARDL (0): Receive Data Level
     io_rw_32 dma_rdlr;
 
     _REG_(I2C_IC_SDA_SETUP_OFFSET) // I2C_IC_SDA_SETUP
     // I2C SDA Setup Register
-    // 0x000000ff [0-7]   : SDA_SETUP (0x64): SDA Setup
+    // 0x000000ff [7:0]   : SDA_SETUP (0x64): SDA Setup
     io_rw_32 sda_setup;
 
     _REG_(I2C_IC_ACK_GENERAL_CALL_OFFSET) // I2C_IC_ACK_GENERAL_CALL
@@ -292,7 +292,7 @@ typedef struct {
 
     _REG_(I2C_IC_FS_SPKLEN_OFFSET) // I2C_IC_FS_SPKLEN
     // I2C SS, FS or FM+ spike suppression limit
-    // 0x000000ff [0-7]   : IC_FS_SPKLEN (0x7): This register must be set before any I2C bus transaction can take place to...
+    // 0x000000ff [7:0]   : IC_FS_SPKLEN (0x7): This register must be set before any I2C bus transaction can take place to...
     io_rw_32 fs_spklen;
 
     uint32_t _pad2;
@@ -306,24 +306,24 @@ typedef struct {
 
     _REG_(I2C_IC_COMP_PARAM_1_OFFSET) // I2C_IC_COMP_PARAM_1
     // Component Parameter Register 1
-    // 0x00ff0000 [16-23] : TX_BUFFER_DEPTH (0): TX Buffer Depth = 16
-    // 0x0000ff00 [8-15]  : RX_BUFFER_DEPTH (0): RX Buffer Depth = 16
+    // 0x00ff0000 [23:16] : TX_BUFFER_DEPTH (0): TX Buffer Depth = 16
+    // 0x0000ff00 [15:8]  : RX_BUFFER_DEPTH (0): RX Buffer Depth = 16
     // 0x00000080 [7]     : ADD_ENCODED_PARAMS (0): Encoded parameters not visible
     // 0x00000040 [6]     : HAS_DMA (0): DMA handshaking signals are enabled
     // 0x00000020 [5]     : INTR_IO (0): COMBINED Interrupt outputs
     // 0x00000010 [4]     : HC_COUNT_VALUES (0): Programmable count values for each mode
-    // 0x0000000c [2-3]   : MAX_SPEED_MODE (0): MAX SPEED MODE = FAST MODE
-    // 0x00000003 [0-1]   : APB_DATA_WIDTH (0): APB data bus width is 32 bits
+    // 0x0000000c [3:2]   : MAX_SPEED_MODE (0): MAX SPEED MODE = FAST MODE
+    // 0x00000003 [1:0]   : APB_DATA_WIDTH (0): APB data bus width is 32 bits
     io_ro_32 comp_param_1;
 
     _REG_(I2C_IC_COMP_VERSION_OFFSET) // I2C_IC_COMP_VERSION
     // I2C Component Version Register
-    // 0xffffffff [0-31]  : IC_COMP_VERSION (0x3230312a)
+    // 0xffffffff [31:0]  : IC_COMP_VERSION (0x3230312a)
     io_ro_32 comp_version;
 
     _REG_(I2C_IC_COMP_TYPE_OFFSET) // I2C_IC_COMP_TYPE
     // I2C Component Type Register
-    // 0xffffffff [0-31]  : IC_COMP_TYPE (0x44570140): Designware Component Type number = 0x44_57_01_40
+    // 0xffffffff [31:0]  : IC_COMP_TYPE (0x44570140): Designware Component Type number = 0x44_57_01_40
     io_ro_32 comp_type;
 } i2c_hw_t;
 

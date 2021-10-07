@@ -24,21 +24,21 @@ typedef struct {
     _REG_(SSI_CTRLR0_OFFSET) // SSI_CTRLR0
     // Control register 0
     // 0x01000000 [24]    : SSTE (0): Slave select toggle enable
-    // 0x00600000 [21-22] : SPI_FRF (0): SPI frame format
-    // 0x001f0000 [16-20] : DFS_32 (0): Data frame size in 32b transfer mode
-    // 0x0000f000 [12-15] : CFS (0): Control frame size
+    // 0x00600000 [22:21] : SPI_FRF (0): SPI frame format
+    // 0x001f0000 [20:16] : DFS_32 (0): Data frame size in 32b transfer mode
+    // 0x0000f000 [15:12] : CFS (0): Control frame size
     // 0x00000800 [11]    : SRL (0): Shift register loop (test mode)
     // 0x00000400 [10]    : SLV_OE (0): Slave output enable
-    // 0x00000300 [8-9]   : TMOD (0): Transfer mode
+    // 0x00000300 [9:8]   : TMOD (0): Transfer mode
     // 0x00000080 [7]     : SCPOL (0): Serial clock polarity
     // 0x00000040 [6]     : SCPH (0): Serial clock phase
-    // 0x00000030 [4-5]   : FRF (0): Frame format
-    // 0x0000000f [0-3]   : DFS (0): Data frame size
+    // 0x00000030 [5:4]   : FRF (0): Frame format
+    // 0x0000000f [3:0]   : DFS (0): Data frame size
     io_rw_32 ctrlr0;
 
     _REG_(SSI_CTRLR1_OFFSET) // SSI_CTRLR1
     // Master Control register 1
-    // 0x0000ffff [0-15]  : NDF (0): Number of data frames
+    // 0x0000ffff [15:0]  : NDF (0): Number of data frames
     io_rw_32 ctrlr1;
 
     _REG_(SSI_SSIENR_OFFSET) // SSI_SSIENR
@@ -60,27 +60,27 @@ typedef struct {
 
     _REG_(SSI_BAUDR_OFFSET) // SSI_BAUDR
     // Baud rate
-    // 0x0000ffff [0-15]  : SCKDV (0): SSI clock divider
+    // 0x0000ffff [15:0]  : SCKDV (0): SSI clock divider
     io_rw_32 baudr;
 
     _REG_(SSI_TXFTLR_OFFSET) // SSI_TXFTLR
     // TX FIFO threshold level
-    // 0x000000ff [0-7]   : TFT (0): Transmit FIFO threshold
+    // 0x000000ff [7:0]   : TFT (0): Transmit FIFO threshold
     io_rw_32 txftlr;
 
     _REG_(SSI_RXFTLR_OFFSET) // SSI_RXFTLR
     // RX FIFO threshold level
-    // 0x000000ff [0-7]   : RFT (0): Receive FIFO threshold
+    // 0x000000ff [7:0]   : RFT (0): Receive FIFO threshold
     io_rw_32 rxftlr;
 
     _REG_(SSI_TXFLR_OFFSET) // SSI_TXFLR
     // TX FIFO level
-    // 0x000000ff [0-7]   : TFTFL (0): Transmit FIFO level
+    // 0x000000ff [7:0]   : TFTFL (0): Transmit FIFO level
     io_ro_32 txflr;
 
     _REG_(SSI_RXFLR_OFFSET) // SSI_RXFLR
     // RX FIFO level
-    // 0x000000ff [0-7]   : RXTFL (0): Receive FIFO level
+    // 0x000000ff [7:0]   : RXTFL (0): Receive FIFO level
     io_ro_32 rxflr;
 
     _REG_(SSI_SR_OFFSET) // SSI_SR
@@ -157,51 +157,51 @@ typedef struct {
 
     _REG_(SSI_DMATDLR_OFFSET) // SSI_DMATDLR
     // DMA TX data level
-    // 0x000000ff [0-7]   : DMATDL (0): Transmit data watermark level
+    // 0x000000ff [7:0]   : DMATDL (0): Transmit data watermark level
     io_rw_32 dmatdlr;
 
     _REG_(SSI_DMARDLR_OFFSET) // SSI_DMARDLR
     // DMA RX data level
-    // 0x000000ff [0-7]   : DMARDL (0): Receive data watermark level (DMARDLR+1)
+    // 0x000000ff [7:0]   : DMARDL (0): Receive data watermark level (DMARDLR+1)
     io_rw_32 dmardlr;
 
     _REG_(SSI_IDR_OFFSET) // SSI_IDR
     // Identification register
-    // 0xffffffff [0-31]  : IDCODE (0x51535049): Peripheral dentification code
+    // 0xffffffff [31:0]  : IDCODE (0x51535049): Peripheral dentification code
     io_ro_32 idr;
 
     _REG_(SSI_SSI_VERSION_ID_OFFSET) // SSI_SSI_VERSION_ID
     // Version ID
-    // 0xffffffff [0-31]  : SSI_COMP_VERSION (0x3430312a): SNPS component version (format X
+    // 0xffffffff [31:0]  : SSI_COMP_VERSION (0x3430312a): SNPS component version (format X
     io_ro_32 ssi_version_id;
 
     _REG_(SSI_DR0_OFFSET) // SSI_DR0
     // Data Register 0 (of 36)
-    // 0xffffffff [0-31]  : DR (0): First data register of 36
+    // 0xffffffff [31:0]  : DR (0): First data register of 36
     io_rw_32 dr0;
 
     uint32_t _pad0[35];
 
     _REG_(SSI_RX_SAMPLE_DLY_OFFSET) // SSI_RX_SAMPLE_DLY
     // RX sample delay
-    // 0x000000ff [0-7]   : RSD (0): RXD sample delay (in SCLK cycles)
+    // 0x000000ff [7:0]   : RSD (0): RXD sample delay (in SCLK cycles)
     io_rw_32 rx_sample_dly;
 
     _REG_(SSI_SPI_CTRLR0_OFFSET) // SSI_SPI_CTRLR0
     // SPI control
-    // 0xff000000 [24-31] : XIP_CMD (0x3): SPI Command to send in XIP mode (INST_L = 8-bit) or to append to Address (INST_L = 0-bit)
+    // 0xff000000 [31:24] : XIP_CMD (0x3): SPI Command to send in XIP mode (INST_L = 8-bit) or to append to Address (INST_L = 0-bit)
     // 0x00040000 [18]    : SPI_RXDS_EN (0): Read data strobe enable
     // 0x00020000 [17]    : INST_DDR_EN (0): Instruction DDR transfer enable
     // 0x00010000 [16]    : SPI_DDR_EN (0): SPI DDR transfer enable
-    // 0x0000f800 [11-15] : WAIT_CYCLES (0): Wait cycles between control frame transmit and data reception (in SCLK cycles)
-    // 0x00000300 [8-9]   : INST_L (0): Instruction length (0/4/8/16b)
-    // 0x0000003c [2-5]   : ADDR_L (0): Address length (0b-60b in 4b increments)
-    // 0x00000003 [0-1]   : TRANS_TYPE (0): Address and instruction transfer format
+    // 0x0000f800 [15:11] : WAIT_CYCLES (0): Wait cycles between control frame transmit and data reception (in SCLK cycles)
+    // 0x00000300 [9:8]   : INST_L (0): Instruction length (0/4/8/16b)
+    // 0x0000003c [5:2]   : ADDR_L (0): Address length (0b-60b in 4b increments)
+    // 0x00000003 [1:0]   : TRANS_TYPE (0): Address and instruction transfer format
     io_rw_32 spi_ctrlr0;
 
     _REG_(SSI_TXD_DRIVE_EDGE_OFFSET) // SSI_TXD_DRIVE_EDGE
     // TX drive edge
-    // 0x000000ff [0-7]   : TDE (0): TXD drive edge
+    // 0x000000ff [7:0]   : TDE (0): TXD drive edge
     io_rw_32 txd_drive_edge;
 } ssi_hw_t;
 

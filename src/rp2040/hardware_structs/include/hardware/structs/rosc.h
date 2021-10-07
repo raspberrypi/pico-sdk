@@ -23,26 +23,26 @@
 typedef struct {
     _REG_(ROSC_CTRL_OFFSET) // ROSC_CTRL
     // Ring Oscillator control
-    // 0x00fff000 [12-23] : ENABLE (0): On power-up this field is initialised to ENABLE
-    // 0x00000fff [0-11]  : FREQ_RANGE (0xaa0): Controls the number of delay stages in the ROSC ring
+    // 0x00fff000 [23:12] : ENABLE (0): On power-up this field is initialised to ENABLE
+    // 0x00000fff [11:0]  : FREQ_RANGE (0xaa0): Controls the number of delay stages in the ROSC ring
     io_rw_32 ctrl;
 
     _REG_(ROSC_FREQA_OFFSET) // ROSC_FREQA
     // The FREQA & FREQB registers control the frequency by controlling the drive strength of each stage
-    // 0xffff0000 [16-31] : PASSWD (0): Set to 0x9696 to apply the settings
-    // 0x00007000 [12-14] : DS3 (0): Stage 3 drive strength
-    // 0x00000700 [8-10]  : DS2 (0): Stage 2 drive strength
-    // 0x00000070 [4-6]   : DS1 (0): Stage 1 drive strength
-    // 0x00000007 [0-2]   : DS0 (0): Stage 0 drive strength
+    // 0xffff0000 [31:16] : PASSWD (0): Set to 0x9696 to apply the settings
+    // 0x00007000 [14:12] : DS3 (0): Stage 3 drive strength
+    // 0x00000700 [10:8]  : DS2 (0): Stage 2 drive strength
+    // 0x00000070 [6:4]   : DS1 (0): Stage 1 drive strength
+    // 0x00000007 [2:0]   : DS0 (0): Stage 0 drive strength
     io_rw_32 freqa;
 
     _REG_(ROSC_FREQB_OFFSET) // ROSC_FREQB
     // For a detailed description see freqa register
-    // 0xffff0000 [16-31] : PASSWD (0): Set to 0x9696 to apply the settings
-    // 0x00007000 [12-14] : DS7 (0): Stage 7 drive strength
-    // 0x00000700 [8-10]  : DS6 (0): Stage 6 drive strength
-    // 0x00000070 [4-6]   : DS5 (0): Stage 5 drive strength
-    // 0x00000007 [0-2]   : DS4 (0): Stage 4 drive strength
+    // 0xffff0000 [31:16] : PASSWD (0): Set to 0x9696 to apply the settings
+    // 0x00007000 [14:12] : DS7 (0): Stage 7 drive strength
+    // 0x00000700 [10:8]  : DS6 (0): Stage 6 drive strength
+    // 0x00000070 [6:4]   : DS5 (0): Stage 5 drive strength
+    // 0x00000007 [2:0]   : DS4 (0): Stage 4 drive strength
     io_rw_32 freqb;
 
     _REG_(ROSC_DORMANT_OFFSET) // ROSC_DORMANT
@@ -51,15 +51,15 @@ typedef struct {
 
     _REG_(ROSC_DIV_OFFSET) // ROSC_DIV
     // Controls the output divider
-    // 0x00000fff [0-11]  : DIV (0): set to 0xaa0 + div where
+    // 0x00000fff [11:0]  : DIV (0): set to 0xaa0 + div where
     io_rw_32 div;
 
     _REG_(ROSC_PHASE_OFFSET) // ROSC_PHASE
     // Controls the phase shifted output
-    // 0x00000ff0 [4-11]  : PASSWD (0): set to 0xaa
+    // 0x00000ff0 [11:4]  : PASSWD (0): set to 0xaa
     // 0x00000008 [3]     : ENABLE (1): enable the phase-shifted output
     // 0x00000004 [2]     : FLIP (0): invert the phase-shifted output
-    // 0x00000003 [0-1]   : SHIFT (0): phase shift the phase-shifted output by SHIFT input clocks
+    // 0x00000003 [1:0]   : SHIFT (0): phase shift the phase-shifted output by SHIFT input clocks
     io_rw_32 phase;
 
     _REG_(ROSC_STATUS_OFFSET) // ROSC_STATUS
@@ -77,7 +77,7 @@ typedef struct {
 
     _REG_(ROSC_COUNT_OFFSET) // ROSC_COUNT
     // A down counter running at the ROSC frequency which counts to zero and stops
-    // 0x000000ff [0-7]   : COUNT (0)
+    // 0x000000ff [7:0]   : COUNT (0)
     io_rw_32 count;
 } rosc_hw_t;
 

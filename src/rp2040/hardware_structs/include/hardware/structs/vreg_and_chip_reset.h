@@ -24,14 +24,14 @@ typedef struct {
     _REG_(VREG_AND_CHIP_RESET_VREG_OFFSET) // VREG_AND_CHIP_RESET_VREG
     // Voltage regulator control and status
     // 0x00001000 [12]    : ROK (0): regulation status
-    // 0x000000f0 [4-7]   : VSEL (0xb): output voltage select
+    // 0x000000f0 [7:4]   : VSEL (0xb): output voltage select
     // 0x00000002 [1]     : HIZ (0): high impedance mode select
     // 0x00000001 [0]     : EN (1): enable
     io_rw_32 vreg;
 
     _REG_(VREG_AND_CHIP_RESET_BOD_OFFSET) // VREG_AND_CHIP_RESET_BOD
     // brown-out detection control
-    // 0x000000f0 [4-7]   : VSEL (0x9): threshold select
+    // 0x000000f0 [7:4]   : VSEL (0x9): threshold select
     // 0x00000001 [0]     : EN (1): enable
     io_rw_32 bod;
 

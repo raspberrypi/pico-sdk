@@ -46,12 +46,12 @@ enum bus_ctrl_perf_counter {
 typedef struct {
     _REG_(BUSCTRL_PERFCTR0_OFFSET) // BUSCTRL_PERFCTR0
     // Bus fabric performance counter 0
-    // 0x00ffffff [0-23]  : PERFCTR0 (0): Busfabric saturating performance counter 0
+    // 0x00ffffff [23:0]  : PERFCTR0 (0): Busfabric saturating performance counter 0
     io_rw_32 value;
 
     _REG_(BUSCTRL_PERFSEL0_OFFSET) // BUSCTRL_PERFSEL0
     // Bus fabric performance event select for PERFCTR0
-    // 0x0000001f [0-4]   : PERFSEL0 (0x1f): Select an event for PERFCTR0
+    // 0x0000001f [4:0]   : PERFSEL0 (0x1f): Select an event for PERFCTR0
     io_rw_32 sel;
 } bus_ctrl_perf_hw_t;
 

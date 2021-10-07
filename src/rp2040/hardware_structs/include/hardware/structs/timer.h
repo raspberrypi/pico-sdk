@@ -42,7 +42,7 @@ typedef struct {
 
     _REG_(TIMER_ARMED_OFFSET) // TIMER_ARMED
     // Indicates the armed/disarmed status of each alarm
-    // 0x0000000f [0-3]   : ARMED (0)
+    // 0x0000000f [3:0]   : ARMED (0)
     io_rw_32 armed;
 
     _REG_(TIMER_TIMERAWH_OFFSET) // TIMER_TIMERAWH

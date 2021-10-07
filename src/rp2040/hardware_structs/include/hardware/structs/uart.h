@@ -27,7 +27,7 @@ typedef struct {
     // 0x00000400 [10]    : BE (0): Break error
     // 0x00000200 [9]     : PE (0): Parity error
     // 0x00000100 [8]     : FE (0): Framing error
-    // 0x000000ff [0-7]   : DATA (0): Receive (read) data character
+    // 0x000000ff [7:0]   : DATA (0): Receive (read) data character
     io_rw_32 dr;
 
     _REG_(UART_UARTRSR_OFFSET) // UART_UARTRSR
@@ -57,23 +57,23 @@ typedef struct {
 
     _REG_(UART_UARTILPR_OFFSET) // UART_UARTILPR
     // IrDA Low-Power Counter Register, UARTILPR
-    // 0x000000ff [0-7]   : ILPDVSR (0): 8-bit low-power divisor value
+    // 0x000000ff [7:0]   : ILPDVSR (0): 8-bit low-power divisor value
     io_rw_32 ilpr;
 
     _REG_(UART_UARTIBRD_OFFSET) // UART_UARTIBRD
     // Integer Baud Rate Register, UARTIBRD
-    // 0x0000ffff [0-15]  : BAUD_DIVINT (0): The integer baud rate divisor
+    // 0x0000ffff [15:0]  : BAUD_DIVINT (0): The integer baud rate divisor
     io_rw_32 ibrd;
 
     _REG_(UART_UARTFBRD_OFFSET) // UART_UARTFBRD
     // Fractional Baud Rate Register, UARTFBRD
-    // 0x0000003f [0-5]   : BAUD_DIVFRAC (0): The fractional baud rate divisor
+    // 0x0000003f [5:0]   : BAUD_DIVFRAC (0): The fractional baud rate divisor
     io_rw_32 fbrd;
 
     _REG_(UART_UARTLCR_H_OFFSET) // UART_UARTLCR_H
     // Line Control Register, UARTLCR_H
     // 0x00000080 [7]     : SPS (0): Stick parity select
-    // 0x00000060 [5-6]   : WLEN (0): Word length
+    // 0x00000060 [6:5]   : WLEN (0): Word length
     // 0x00000010 [4]     : FEN (0): Enable FIFOs: 0 = FIFOs are disabled (character mode) that is, the FIFOs become...
     // 0x00000008 [3]     : STP2 (0): Two stop bits select
     // 0x00000004 [2]     : EPS (0): Even parity select
@@ -99,8 +99,8 @@ typedef struct {
 
     _REG_(UART_UARTIFLS_OFFSET) // UART_UARTIFLS
     // Interrupt FIFO Level Select Register, UARTIFLS
-    // 0x00000038 [3-5]   : RXIFLSEL (0x2): Receive interrupt FIFO level select
-    // 0x00000007 [0-2]   : TXIFLSEL (0x2): Transmit interrupt FIFO level select
+    // 0x00000038 [5:3]   : RXIFLSEL (0x2): Receive interrupt FIFO level select
+    // 0x00000007 [2:0]   : TXIFLSEL (0x2): Transmit interrupt FIFO level select
     io_rw_32 ifls;
 
     _REG_(UART_UARTIMSC_OFFSET) // UART_UARTIMSC
