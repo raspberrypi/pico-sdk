@@ -71,7 +71,7 @@
 #define SIO_GPIO_OUT_SET_RESET  _u(0x00000000)
 #define SIO_GPIO_OUT_SET_MSB    _u(29)
 #define SIO_GPIO_OUT_SET_LSB    _u(0)
-#define SIO_GPIO_OUT_SET_ACCESS "RW"
+#define SIO_GPIO_OUT_SET_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OUT_CLR
 // Description : GPIO output value clear
@@ -82,7 +82,7 @@
 #define SIO_GPIO_OUT_CLR_RESET  _u(0x00000000)
 #define SIO_GPIO_OUT_CLR_MSB    _u(29)
 #define SIO_GPIO_OUT_CLR_LSB    _u(0)
-#define SIO_GPIO_OUT_CLR_ACCESS "RW"
+#define SIO_GPIO_OUT_CLR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OUT_XOR
 // Description : GPIO output value XOR
@@ -93,7 +93,7 @@
 #define SIO_GPIO_OUT_XOR_RESET  _u(0x00000000)
 #define SIO_GPIO_OUT_XOR_MSB    _u(29)
 #define SIO_GPIO_OUT_XOR_LSB    _u(0)
-#define SIO_GPIO_OUT_XOR_ACCESS "RW"
+#define SIO_GPIO_OUT_XOR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OE
 // Description : GPIO output enable
@@ -119,7 +119,7 @@
 #define SIO_GPIO_OE_SET_RESET  _u(0x00000000)
 #define SIO_GPIO_OE_SET_MSB    _u(29)
 #define SIO_GPIO_OE_SET_LSB    _u(0)
-#define SIO_GPIO_OE_SET_ACCESS "RW"
+#define SIO_GPIO_OE_SET_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OE_CLR
 // Description : GPIO output enable clear
@@ -130,7 +130,7 @@
 #define SIO_GPIO_OE_CLR_RESET  _u(0x00000000)
 #define SIO_GPIO_OE_CLR_MSB    _u(29)
 #define SIO_GPIO_OE_CLR_LSB    _u(0)
-#define SIO_GPIO_OE_CLR_ACCESS "RW"
+#define SIO_GPIO_OE_CLR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OE_XOR
 // Description : GPIO output enable XOR
@@ -141,7 +141,7 @@
 #define SIO_GPIO_OE_XOR_RESET  _u(0x00000000)
 #define SIO_GPIO_OE_XOR_MSB    _u(29)
 #define SIO_GPIO_OE_XOR_LSB    _u(0)
-#define SIO_GPIO_OE_XOR_ACCESS "RW"
+#define SIO_GPIO_OE_XOR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OUT
 // Description : QSPI output value
@@ -169,7 +169,7 @@
 #define SIO_GPIO_HI_OUT_SET_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OUT_SET_MSB    _u(5)
 #define SIO_GPIO_HI_OUT_SET_LSB    _u(0)
-#define SIO_GPIO_HI_OUT_SET_ACCESS "RW"
+#define SIO_GPIO_HI_OUT_SET_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OUT_CLR
 // Description : QSPI output value clear
@@ -180,7 +180,7 @@
 #define SIO_GPIO_HI_OUT_CLR_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OUT_CLR_MSB    _u(5)
 #define SIO_GPIO_HI_OUT_CLR_LSB    _u(0)
-#define SIO_GPIO_HI_OUT_CLR_ACCESS "RW"
+#define SIO_GPIO_HI_OUT_CLR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OUT_XOR
 // Description : QSPI output value XOR
@@ -191,7 +191,7 @@
 #define SIO_GPIO_HI_OUT_XOR_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OUT_XOR_MSB    _u(5)
 #define SIO_GPIO_HI_OUT_XOR_LSB    _u(0)
-#define SIO_GPIO_HI_OUT_XOR_ACCESS "RW"
+#define SIO_GPIO_HI_OUT_XOR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OE
 // Description : QSPI output enable
@@ -218,7 +218,7 @@
 #define SIO_GPIO_HI_OE_SET_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OE_SET_MSB    _u(5)
 #define SIO_GPIO_HI_OE_SET_LSB    _u(0)
-#define SIO_GPIO_HI_OE_SET_ACCESS "RW"
+#define SIO_GPIO_HI_OE_SET_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OE_CLR
 // Description : QSPI output enable clear
@@ -229,7 +229,7 @@
 #define SIO_GPIO_HI_OE_CLR_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OE_CLR_MSB    _u(5)
 #define SIO_GPIO_HI_OE_CLR_LSB    _u(0)
-#define SIO_GPIO_HI_OE_CLR_ACCESS "RW"
+#define SIO_GPIO_HI_OE_CLR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OE_XOR
 // Description : QSPI output enable XOR
@@ -240,7 +240,7 @@
 #define SIO_GPIO_HI_OE_XOR_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OE_XOR_MSB    _u(5)
 #define SIO_GPIO_HI_OE_XOR_LSB    _u(0)
-#define SIO_GPIO_HI_OE_XOR_ACCESS "RW"
+#define SIO_GPIO_HI_OE_XOR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_FIFO_ST
 // Description : Status register for inter-core FIFOs (mailboxes).
