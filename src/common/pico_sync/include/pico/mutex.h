@@ -30,13 +30,13 @@ extern "C" {
  * (and associated recursive_mutex_ functions) is a recursive mutex that can be recursively obtained by
  * the same caller, at the expense of some more overhead when acquiring and releasing.
  *
- * Because they are not re-entrant on the same core, blocking on a regular mutex \ref mutex_t should never be done
- * in an IRQ handler. It is valid to call \ref mutex_try_enter from within an IRQ handler, if the operation
+ * It is generally a bad idea to call blocking mutex_ or recursive_mutex_ functions from within an IRQ handler
+ . It is valid to call \ref mutex_try_enter or \ref recursive_mutex_try_enter from within an IRQ handler, if the operation
  * that would be conducted under lock can be skipped if the mutex is locked (at least by the same core).
  *
  * NOTE: For backwards compatibility with version 1.2.0 of the SDK, if the define
  * PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY is set to 1, then the the regular mutex_ functions
- * may also be used with recursive mutexes. This facility will be removed in a future version of the SDK.
+ * may also be used for recursive mutexes. This flag will be removed in a future version of the SDK.
  *
  * See \ref critical_section.h for protecting access between multiple cores AND IRQ handlers
  */
