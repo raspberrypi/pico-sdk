@@ -38,18 +38,18 @@ bool stdout_serialize_begin(void) {
     // not using lock_owner_id_t to avoid backwards incompatibility change to mutex_try_enter API
     static_assert(sizeof(lock_owner_id_t) <= 4, "");
     uint32_t owner;
-    if (!mutex_try_enter_nr(&print_mutex, &owner)) {
+    if (!mutex_try_enter(&print_mutex, &owner)) {
         if (owner == (uint32_t)caller) {
             return false;
         }
         // we are not a nested call, so lets wait
-        mutex_enter_blocking_nr(&print_mutex);
+        mutex_enter_blocking(&print_mutex);
     }
     return true;
 }
 
 void stdout_serialize_end(void) {
-    mutex_exit_nr(&print_mutex);
+    mutex_exit(&print_mutex);
 }
 
 #else
