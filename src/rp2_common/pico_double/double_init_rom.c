@@ -66,5 +66,5 @@ void __aeabi_double_init(void) {
         sd_table[SF_TABLE_V3_FSINCOS / 4] = (uintptr_t) double_table_shim_on_use_helper;
     }
 
-    sf_clz_func = rom_func_lookup(rom_table_code('L', '3'));
+    sf_clz_func = rom_func_lookup(ROM_FUNC_CLZ32);
 }
