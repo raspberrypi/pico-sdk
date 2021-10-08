@@ -23,7 +23,7 @@ extern "C" {
  * required/expected to complete quickly, as no other sytem wide locks are held on account of an acquired mutex.
  *
  * When acquired, the mutex has an owner (see \ref lock_get_caller_owner_id) which with the plain SDK is just
- * the acquiring core, but in an RTOS it could be a task, or an IRQ handler.
+ * the acquiring core, but in an RTOS it could be a task, or an IRQ handler context.
  *
  * Two variants of mutex are provided; \ref mutex_t (and associated mutex_ functions) is a regular mutex that cannot
  * be acquired recursively by the same owner (a deadlock will occur if you try). \ref recursive_mutex
