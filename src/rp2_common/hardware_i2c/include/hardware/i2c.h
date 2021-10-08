@@ -10,6 +10,7 @@
 #include "pico.h"
 #include "pico/time.h"
 #include "hardware/structs/i2c.h"
+#include "hardware/regs/dreq.h"
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_I2C, Enable/disable assertions in the I2C module, type=bool, default=0, group=hardware_i2c
 #ifndef PARAM_ASSERTIONS_ENABLED_I2C
@@ -309,6 +310,19 @@ static inline void i2c_read_raw_blocking(i2c_inst_t *i2c, uint8_t *dst, size_t l
             tight_loop_contents();
         *dst++ = (uint8_t)i2c_get_hw(i2c)->data_cmd;
     }
+}
+
+/*! \brief Return the DREQ to use for pacing transfers to/from a particular I2C instance
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param is_tx true for sending data to the I2C instance, false for received data from the I2C instance
+ */
+static inline uint i2c_get_dreq(i2c_inst_t *i2c, bool is_tx) {
+    static_assert(DREQ_I2C0_RX == DREQ_I2C0_TX + 1, "");
+    static_assert(DREQ_I2C1_RX == DREQ_I2C1_TX + 1, "");
+    static_assert(DREQ_I2C1_TX == DREQ_I2C0_TX + 2, "");
+    return DREQ_I2C0_TX + i2c_hw_index(i2c) * 2 + !is_tx;
 }
 
 #ifdef __cplusplus

@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include "hardware/structs/pwm.h"
+#include "hardware/regs/dreq.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -537,6 +538,18 @@ static inline uint32_t pwm_get_irq_status_mask(void) {
  */
 static inline void pwm_force_irq(uint slice_num) {
     pwm_hw->intf = 1u << slice_num;
+}
+
+/*! \brief Return the DREQ to use for pacing transfers to a particular PWM slice
+ *  \ingroup hardware_pwm
+ *
+ * \param slice_num PWM slice number
+ */
+static inline uint pwm_get_dreq(uint slice_num) {
+    static_assert(DREQ_PWM_WRAP1 == DREQ_PWM_WRAP0 + 1, "");
+    static_assert(DREQ_PWM_WRAP7 == DREQ_PWM_WRAP0 + 7, "");
+    check_slice_num_param(slice_num);
+    return DREQ_PWM_WRAP0 + slice_num;
 }
 
 #ifdef __cplusplus
