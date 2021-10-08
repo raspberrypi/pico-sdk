@@ -45098,7 +45098,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-write</access>
+          <access>write-only</access>
           <addressOffset>0x00fc</addressOffset>
           <description>On write, the lower 16 bits go to BASE0, upper bits to BASE1 simultaneously.\n
             Each half is sign-extended to 32 bits if that lane's SIGNED flag is set.</description>

@@ -46,17 +46,17 @@ typedef struct {
     _REG_(SIO_GPIO_OUT_SET_OFFSET) // SIO_GPIO_OUT_SET
     // GPIO output value set
     // 0x3fffffff [29:0]  : GPIO_OUT_SET (0): Perform an atomic bit-set on GPIO_OUT, i
-    io_rw_32 gpio_set;
+    io_wo_32 gpio_set;
 
     _REG_(SIO_GPIO_OUT_CLR_OFFSET) // SIO_GPIO_OUT_CLR
     // GPIO output value clear
     // 0x3fffffff [29:0]  : GPIO_OUT_CLR (0): Perform an atomic bit-clear on GPIO_OUT, i
-    io_rw_32 gpio_clr;
+    io_wo_32 gpio_clr;
 
     _REG_(SIO_GPIO_OUT_XOR_OFFSET) // SIO_GPIO_OUT_XOR
     // GPIO output value XOR
     // 0x3fffffff [29:0]  : GPIO_OUT_XOR (0): Perform an atomic bitwise XOR on GPIO_OUT, i
-    io_rw_32 gpio_togl;
+    io_wo_32 gpio_togl;
 
     _REG_(SIO_GPIO_OE_OFFSET) // SIO_GPIO_OE
     // GPIO output enable
@@ -66,17 +66,17 @@ typedef struct {
     _REG_(SIO_GPIO_OE_SET_OFFSET) // SIO_GPIO_OE_SET
     // GPIO output enable set
     // 0x3fffffff [29:0]  : GPIO_OE_SET (0): Perform an atomic bit-set on GPIO_OE, i
-    io_rw_32 gpio_oe_set;
+    io_wo_32 gpio_oe_set;
 
     _REG_(SIO_GPIO_OE_CLR_OFFSET) // SIO_GPIO_OE_CLR
     // GPIO output enable clear
     // 0x3fffffff [29:0]  : GPIO_OE_CLR (0): Perform an atomic bit-clear on GPIO_OE, i
-    io_rw_32 gpio_oe_clr;
+    io_wo_32 gpio_oe_clr;
 
     _REG_(SIO_GPIO_OE_XOR_OFFSET) // SIO_GPIO_OE_XOR
     // GPIO output enable XOR
     // 0x3fffffff [29:0]  : GPIO_OE_XOR (0): Perform an atomic bitwise XOR on GPIO_OE, i
-    io_rw_32 gpio_oe_togl;
+    io_wo_32 gpio_oe_togl;
 
     _REG_(SIO_GPIO_HI_OUT_OFFSET) // SIO_GPIO_HI_OUT
     // QSPI output value
@@ -86,17 +86,17 @@ typedef struct {
     _REG_(SIO_GPIO_HI_OUT_SET_OFFSET) // SIO_GPIO_HI_OUT_SET
     // QSPI output value set
     // 0x0000003f [5:0]   : GPIO_HI_OUT_SET (0): Perform an atomic bit-set on GPIO_HI_OUT, i
-    io_rw_32 gpio_hi_set;
+    io_wo_32 gpio_hi_set;
 
     _REG_(SIO_GPIO_HI_OUT_CLR_OFFSET) // SIO_GPIO_HI_OUT_CLR
     // QSPI output value clear
     // 0x0000003f [5:0]   : GPIO_HI_OUT_CLR (0): Perform an atomic bit-clear on GPIO_HI_OUT, i
-    io_rw_32 gpio_hi_clr;
+    io_wo_32 gpio_hi_clr;
 
     _REG_(SIO_GPIO_HI_OUT_XOR_OFFSET) // SIO_GPIO_HI_OUT_XOR
     // QSPI output value XOR
     // 0x0000003f [5:0]   : GPIO_HI_OUT_XOR (0): Perform an atomic bitwise XOR on GPIO_HI_OUT, i
-    io_rw_32 gpio_hi_togl;
+    io_wo_32 gpio_hi_togl;
 
     _REG_(SIO_GPIO_HI_OE_OFFSET) // SIO_GPIO_HI_OE
     // QSPI output enable
@@ -106,17 +106,17 @@ typedef struct {
     _REG_(SIO_GPIO_HI_OE_SET_OFFSET) // SIO_GPIO_HI_OE_SET
     // QSPI output enable set
     // 0x0000003f [5:0]   : GPIO_HI_OE_SET (0): Perform an atomic bit-set on GPIO_HI_OE, i
-    io_rw_32 gpio_hi_oe_set;
+    io_wo_32 gpio_hi_oe_set;
 
     _REG_(SIO_GPIO_HI_OE_CLR_OFFSET) // SIO_GPIO_HI_OE_CLR
     // QSPI output enable clear
     // 0x0000003f [5:0]   : GPIO_HI_OE_CLR (0): Perform an atomic bit-clear on GPIO_HI_OE, i
-    io_rw_32 gpio_hi_oe_clr;
+    io_wo_32 gpio_hi_oe_clr;
 
     _REG_(SIO_GPIO_HI_OE_XOR_OFFSET) // SIO_GPIO_HI_OE_XOR
     // QSPI output enable XOR
     // 0x0000003f [5:0]   : GPIO_HI_OE_XOR (0): Perform an atomic bitwise XOR on GPIO_HI_OE, i
-    io_rw_32 gpio_hi_oe_togl;
+    io_wo_32 gpio_hi_oe_togl;
 
     _REG_(SIO_FIFO_ST_OFFSET) // SIO_FIFO_ST
     // Status register for inter-core FIFOs (mailboxes)
