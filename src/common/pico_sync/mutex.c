@@ -173,6 +173,7 @@ void __time_critical_func(mutex_exit)(mutex_t *mtx) {
 
 void __time_critical_func(recursive_mutex_exit)(recursive_mutex_t *mtx) {
     uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
+    assert(lock_is_owner_id_valid(mtx->owner));
     assert(mtx->enter_count);
     if (!--mtx->enter_count) {
         mtx->owner = LOCK_INVALID_OWNER_ID;
