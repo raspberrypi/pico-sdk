@@ -19,20 +19,20 @@ extern "C" {
  * \brief Mutex API for non IRQ mutual exclusion between cores
  *
  * Mutexes are application level locks usually used protecting data structures that might be used by
- * multiple threads of executions. Unlike critical sections, the mutex protected code is not necessarily
+ * multiple threads of execution. Unlike critical sections, the mutex protected code is not necessarily
  * required/expected to complete quickly, as no other sytem wide locks are held on account of an acquired mutex.
  *
  * When acquired, the mutex has an owner (see \ref lock_get_caller_owner_id) which with the plain SDK is just
  * the acquiring core, but in an RTOS it could be a task, or an IRQ handler context.
  *
  * Two variants of mutex are provided; \ref mutex_t (and associated mutex_ functions) is a regular mutex that cannot
- * be acquired recursively by the same owner (a deadlock will occur if you try). \ref recursive_mutex
+ * be acquired recursively by the same owner (a deadlock will occur if you try). \ref recursive_mutex_t
  * (and associated recursive_mutex_ functions) is a recursive mutex that can be recursively obtained by
  * the same caller, at the expense of some more overhead when acquiring and releasing.
  *
- * It is generally a bad idea to call blocking mutex_ or recursive_mutex_ functions from within an IRQ handler
- . It is valid to call \ref mutex_try_enter or \ref recursive_mutex_try_enter from within an IRQ handler, if the operation
- * that would be conducted under lock can be skipped if the mutex is locked (at least by the same core).
+ * It is generally a bad idea to call blocking mutex_ or recursive_mutex_ functions from within an IRQ handler.
+ * It is valid to call \ref mutex_try_enter or \ref recursive_mutex_try_enter from within an IRQ handler, if the operation
+ * that would be conducted under lock can be skipped if the mutex is locked (at least by the same owner).
  *
  * NOTE: For backwards compatibility with version 1.2.0 of the SDK, if the define
  * PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY is set to 1, then the the regular mutex_ functions
@@ -121,7 +121,7 @@ bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
  * caller will *NOT* own the mutex.
  *
  * \param mtx Pointer to recursive mutex structure
- * \param owner_out If mutex was already owned, and this pointer is non-zero, it will be filled in with the core number of the current owner of the mutex
+ * \param owner_out If mutex was already owned, and this pointer is non-zero, it will be filled in with the owner id of the current owner of the mutex
  */
 bool recursive_mutex_try_enter(recursive_mutex_t *mtx, uint32_t *owner_out);
 
@@ -130,8 +130,7 @@ bool recursive_mutex_try_enter(recursive_mutex_t *mtx, uint32_t *owner_out);
  *
  * Wait for up to the specific time to take ownership of the mutex. If the caller
  * can be granted ownership of the mutex before the timeout expires, then true will be returned
- * and the caller will own the mutex, otherwise false will be returned and the calling
- * core will *NOT* own the mutex.
+ * and the caller will own the mutex, otherwise false will be returned and the caller will *NOT* own the mutex.
  *
  * \param mtx Pointer to mutex structure
  * \param timeout_ms The timeout in milliseconds.
@@ -144,8 +143,8 @@ bool mutex_enter_timeout_ms(mutex_t *mtx, uint32_t timeout_ms);
  *
  * Wait for up to the specific time to take ownership of the recursive mutex. If the caller
  * already has ownership of the mutex or can be granted ownership of the mutex before the timeout expires,
- * then true will be returned and the caller will own the mutex, otherwise false will be returned and the calling
- * core will *NOT* own the mutex.
+ * then true will be returned and the caller will own the mutex, otherwise false will be returned and the caller
+ * will *NOT* own the mutex.
  *
  * \param mtx Pointer to recursive mutex structure
  * \param timeout_ms The timeout in milliseconds.
@@ -185,7 +184,7 @@ bool recursive_mutex_enter_timeout_us(recursive_mutex_t *mtx, uint32_t timeout_u
  *  \ingroup mutex
  *
  * Wait until the specific time to take ownership of the mutex. If the caller
- * core can be granted ownership of the mutex before the timeout expires, then true will be returned
+ * can be granted ownership of the mutex before the timeout expires, then true will be returned
  * and the calling core will own the mutex, otherwise false will be returned and the calling
  * core will *NOT* own the mutex.
  *
@@ -204,7 +203,7 @@ bool mutex_enter_block_until(mutex_t *mtx, absolute_time_t until);
  * core will *NOT* own the mutex.
  *
  * \param mtx Pointer to recursive mutex structure
- * \param until The time after which to return if the core cannot take ownership of the mutex
+ * \param until The time after which to return if the caller cannot be granted ownership of the mutex
  * \return true if mutex now owned, false if timeout occurred before mutex became available
  */
 bool recursive_mutex_enter_block_until(recursive_mutex_t *mtx, absolute_time_t until);
@@ -227,7 +226,7 @@ void recursive_mutex_exit(recursive_mutex_t *mtx);
  *  \ingroup mutex
  *
  * \param mtx Pointer to mutex structure
- * \return true if the mutex is initialised, false otherwise
+ * \return true if the mutex is initialized, false otherwise
  */
 static inline bool mutex_is_initialized(mutex_t *mtx) {
     return mtx->core.spin_lock != 0;
@@ -237,7 +236,7 @@ static inline bool mutex_is_initialized(mutex_t *mtx) {
  *  \ingroup mutex
  *
  * \param mtx Pointer to recursive mutex structure
- * \return true if the mutex is initialised, false otherwise
+ * \return true if the mutex is initialized, false otherwise
  */
 static inline bool recursive_mutex_is_initialized(recursive_mutex_t *mtx) {
     return mtx->core.spin_lock != 0;
@@ -272,16 +271,16 @@ static inline bool recursive_mutex_is_initialized(recursive_mutex_t *mtx) {
  * A recursive mutex defined as follows:
  *
  * ```c
- * auto_init_recursive_mutex(my_mutex);
+ * auto_init_recursive_mutex(my_recursive_mutex);
  * ```
  *
  * Is equivalent to doing
  *
  * ```c
- * static mutex_t my_mutex;
+ * static recursive_mutex_t my_recursive_mutex;
  *
  * void my_init_function() {
- *    recursive_mutex_init(&my_mutex);
+ *    recursive_mutex_init(&my_recursive_mutex);
  * }
  * ```
  *

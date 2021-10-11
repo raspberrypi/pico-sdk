@@ -116,7 +116,7 @@ bool __time_critical_func(recursive_mutex_enter_timeout_us)(recursive_mutex_t *m
 bool __time_critical_func(mutex_enter_block_until)(mutex_t *mtx, absolute_time_t until) {
 #if PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY
     if (mtx->recursive) {
-        return mutex_enter_block_until(mtx, until);
+        return recursive_mutex_enter_block_until(mtx, until);
     }
 #endif
     assert(mtx->core.spin_lock);
