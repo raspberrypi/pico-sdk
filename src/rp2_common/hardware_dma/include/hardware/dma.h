@@ -769,7 +769,7 @@ bool dma_timer_is_claimed(uint timer);
  */
 static inline void dma_timer_set_fraction(uint timer, uint16_t numerator, uint16_t denominator) {
     check_dma_timer_param(timer);
-    dma_hw->timer[timer] = (numerator << DMA_TIMER0_X_LSB) | (denominator << DMA_TIMER0_Y_LSB);
+    dma_hw->timer[timer] = (((uint32_t)numerator) << DMA_TIMER0_X_LSB) | (((uint32_t)denominator) << DMA_TIMER0_Y_LSB);
 }
 
 /*! \brief Return the DREQ number for a given DMA timer
