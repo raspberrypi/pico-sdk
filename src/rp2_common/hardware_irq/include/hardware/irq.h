@@ -119,6 +119,10 @@ extern "C" {
  */
 typedef void (*irq_handler_t)(void);
 
+static inline void check_irq_param(__unused uint num) {
+    invalid_params_if(IRQ, num >= NUM_IRQS);
+}
+
 /*! \brief Set specified interrupt's priority
  *  \ingroup hardware_irq
  *
@@ -132,6 +136,21 @@ typedef void (*irq_handler_t)(void);
  * PICO_DEFAULT_IRQ_PRIORITY defaults to 0x80
  */
 void irq_set_priority(uint num, uint8_t hardware_priority);
+
+/*! \brief Get specified interrupt's priority
+ *  \ingroup hardware_irq
+ *
+ * Numerically-lower values indicate a higher priority. Hardware priorities
+ * range from 0 (highest priority) to 255 (lowest priority) though only the
+ * top 2 bits are significant on ARM Cortex-M0+. To make it easier to specify
+ * higher or lower priorities than the default, all IRQ priorities are
+ * initialized to PICO_DEFAULT_IRQ_PRIORITY by the SDK runtime at startup.
+ * PICO_DEFAULT_IRQ_PRIORITY defaults to 0x80
+ *
+ * \param num Interrupt number
+ * \return the IRQ priority
+ */
+uint irq_get_priority(uint num);
 
 /*! \brief Enable or disable a specific interrupt on the executing core
  *  \ingroup hardware_irq
