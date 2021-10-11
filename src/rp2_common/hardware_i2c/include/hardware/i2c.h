@@ -316,7 +316,7 @@ static inline void i2c_read_raw_blocking(i2c_inst_t *i2c, uint8_t *dst, size_t l
  *  \ingroup hardware_i2c
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
- * \param is_tx true for sending data to the I2C instance, false for received data from the I2C instance
+ * \param is_tx true for sending data to the I2C instance, false for receiving data from the I2C instance
  */
 static inline uint i2c_get_dreq(i2c_inst_t *i2c, bool is_tx) {
     static_assert(DREQ_I2C0_RX == DREQ_I2C0_TX + 1, "");
