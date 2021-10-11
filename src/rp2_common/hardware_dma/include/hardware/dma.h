@@ -753,7 +753,6 @@ int dma_claim_unused_timer(bool required);
  * \param timer the dma timer
  * \return true if the timer is claimed, false otherwise
  * \see dma_timer_claim
- * \see dma_timer_claim_mask
  */
 bool dma_timer_is_claimed(uint timer);
 
