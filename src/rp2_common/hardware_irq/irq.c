@@ -407,7 +407,7 @@ void irq_init_priorities() {
     static_assert(!(NUM_IRQS & 3), "");
     uint32_t prio4 = (PICO_DEFAULT_IRQ_PRIORITY & 0xff) * 0x1010101u;
     io_rw_32 * p = (io_rw_32 *)(PPB_BASE + M0PLUS_NVIC_IPR0_OFFSET);
-    for (int i = 0; i < NUM_IRQS / 4; i++) {
+    for (uint i = 0; i < NUM_IRQS / 4; i++) {
         *p++ = prio4;
     }
 #endif
