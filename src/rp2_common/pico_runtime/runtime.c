@@ -20,7 +20,13 @@
 
 #include "pico/mutex.h"
 #include "pico/time.h"
+
+#if LIB_PICO_PRINTF_PICO
 #include "pico/printf.h"
+#else
+#define weak_raw_printf printf
+#define weak_raw_vprintf vprintf
+#endif
 
 #if PICO_ENTER_USB_BOOT_ON_EXIT
 #include "pico/bootrom.h"
