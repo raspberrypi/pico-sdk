@@ -43,6 +43,9 @@ typedef struct {
     io_ro_32 reason;
 
     _REG_(WATCHDOG_SCRATCH0_OFFSET) // WATCHDOG_SCRATCH0
+    // (Description copied from WATCHDOG_SCRATCH0 applies similarly all array members)
+    //
+    // Scratch register
     io_rw_32 scratch[8];
 
     _REG_(WATCHDOG_TICK_OFFSET) // WATCHDOG_TICK
