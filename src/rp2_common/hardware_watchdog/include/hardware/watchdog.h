@@ -90,9 +90,15 @@ bool watchdog_caused_reboot(void);
  * \brief Did watchdog_enable cause the last reboot?
  * \ingroup hardware_watchdog
  *
- * This method checks watchdog scratch register 4 for a magic number set by \ref watchdog_enable. This will not be present
- * if the watchdog reset is initiated by \ref watchdog_reboot or by the RP2040 bootrom (e.g. dragging a UF2 onto the RPI-RP2 drive)
- * @return true if the watchdog timer or a watchdog force caused the last reboot and the watchdog was initiated by \ref watchdog_enable
+ * Perform additional checking along with \ref watchdog_cuased_reboot to determin if a watchdog time out initiated by
+ * \ref watchdog_enable caused the last reboot.
+ *
+ * This method checks for a special value in watchdog scratch register 4 placed there by \ref watchdog_enable.
+ * This would not be present if a watchdog reset is initiated by \ref watchdog_reboot or by the RP2040 bootrom
+ * (e.g. dragging a UF2 onto the RPI-RP2 drive).
+ *
+ * @return true if the watchdog timer or a watchdog force caused (see \reg watchdog_caused_reboot) the last reboot
+ *              and the watchdog reboot happened after \ref watchdog_enable was called
  * @return false there has been no watchdog reboot since run has been
  */
 bool watchdog_enable_caused_reboot(void);
