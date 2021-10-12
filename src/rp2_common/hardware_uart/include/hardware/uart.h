@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include "hardware/structs/uart.h"
+#include "hardware/regs/dreq.h"
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_UART, Enable/disable assertions in the UART module, type=bool, default=0, group=hardware_uart
 #ifndef PARAM_ASSERTIONS_ENABLED_UART
@@ -431,6 +432,19 @@ static inline void uart_default_tx_wait_blocking(void) {
  * \return true if the RX FIFO became non empty before the timeout, false otherwise
  */
 bool uart_is_readable_within_us(uart_inst_t *uart, uint32_t us);
+
+/*! \brief Return the DREQ to use for pacing transfers to/from a particular UART instance
+ *  \ingroup hardware_uart
+ *
+ * \param uart UART instance. \ref uart0 or \ref uart1
+ * \param is_tx true for sending data to the UART instance, false for receiving data from the UART instance
+ */
+static inline uint uart_get_dreq(uart_inst_t *uart, bool is_tx) {
+    static_assert(DREQ_UART0_RX == DREQ_UART0_TX + 1, "");
+    static_assert(DREQ_UART1_RX == DREQ_UART1_TX + 1, "");
+    static_assert(DREQ_UART1_TX == DREQ_UART0_TX + 2, "");
+    return DREQ_UART0_TX + uart_get_index(uart) * 2 + !is_tx;
+}
 
 #ifdef __cplusplus
 }

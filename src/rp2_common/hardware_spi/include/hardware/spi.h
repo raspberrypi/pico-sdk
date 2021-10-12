@@ -10,6 +10,7 @@
 #include "pico.h"
 #include "pico/time.h"
 #include "hardware/structs/spi.h"
+#include "hardware/regs/dreq.h"
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_SPI, Enable/disable assertions in the SPI module, type=bool, default=0, group=hardware_spi
 #ifndef PARAM_ASSERTIONS_ENABLED_SPI
@@ -336,6 +337,19 @@ int spi_write16_blocking(spi_inst_t *spi, const uint16_t *src, size_t len);
  * \return Number of halfwords written/read
  */
 int spi_read16_blocking(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *dst, size_t len);
+
+/*! \brief Return the DREQ to use for pacing transfers to/from a particular SPI instance
+ *  \ingroup hardware_spi
+ *
+ * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
+ * \param is_tx true for sending data to the SPI instance, false for receiving data from the SPI instance
+ */
+static inline uint spi_get_dreq(spi_inst_t *spi, bool is_tx) {
+    static_assert(DREQ_SPI0_RX == DREQ_SPI0_TX + 1, "");
+    static_assert(DREQ_SPI1_RX == DREQ_SPI1_TX + 1, "");
+    static_assert(DREQ_SPI1_TX == DREQ_SPI0_TX + 2, "");
+    return DREQ_SPI0_TX + spi_get_index(spi) * 2 + !is_tx;
+}
 
 #ifdef __cplusplus
 }
