@@ -90,7 +90,7 @@ bool watchdog_caused_reboot(void);
  * \brief Did watchdog_enable cause the last reboot?
  * \ingroup hardware_watchdog
  *
- * Perform additional checking along with \ref watchdog_cuased_reboot to determin if a watchdog time out initiated by
+ * Perform additional checking along with \ref watchdog_cuased_reboot to determine if a watchdog timeout initiated by
  * \ref watchdog_enable caused the last reboot.
  *
  * This method checks for a special value in watchdog scratch register 4 placed there by \ref watchdog_enable.
