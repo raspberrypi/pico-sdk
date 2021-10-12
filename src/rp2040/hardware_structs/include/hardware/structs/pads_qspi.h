@@ -27,6 +27,16 @@ typedef struct {
     io_rw_32 voltage_select;
 
     _REG_(PADS_QSPI_GPIO_QSPI_SCLK_OFFSET) // PADS_QSPI_GPIO_QSPI_SCLK
+    // (Description copied from PADS_QSPI_GPIO_QSPI_SCLK applies similarly all array members)
+    //
+    // Pad control register
+    // 0x00000080 [7]     : OD (0): Output disable
+    // 0x00000040 [6]     : IE (1): Input enable
+    // 0x00000030 [5:4]   : DRIVE (1): Drive strength
+    // 0x00000008 [3]     : PUE (0): Pull up enable
+    // 0x00000004 [2]     : PDE (1): Pull down enable
+    // 0x00000002 [1]     : SCHMITT (1): Enable schmitt trigger
+    // 0x00000001 [0]     : SLEWFAST (0): Slew rate control
     io_rw_32 io[NUM_QSPI_GPIOS]; // 6
 } pads_qspi_hw_t;
 
