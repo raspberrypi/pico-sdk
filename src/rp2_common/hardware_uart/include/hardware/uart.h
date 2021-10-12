@@ -437,7 +437,7 @@ bool uart_is_readable_within_us(uart_inst_t *uart, uint32_t us);
  *  \ingroup hardware_uart
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
- * \param is_tx true for sending data to the UART instance, false for received data from the SPI instance
+ * \param is_tx true for sending data to the UART instance, false for receiving data from the UART instance
  */
 static inline uint uart_get_dreq(uart_inst_t *uart, bool is_tx) {
     static_assert(DREQ_UART0_RX == DREQ_UART0_TX + 1, "");

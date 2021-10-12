@@ -441,7 +441,7 @@ static inline void pio_gpio_init(PIO pio, uint pin) {
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
- * \param is_tx true for sending data to the state machine, false for received data from the state machine
+ * \param is_tx true for sending data to the state machine, false for receiving data from the state machine
  */
 static inline uint pio_get_dreq(PIO pio, uint sm, bool is_tx) {
     static_assert(DREQ_PIO0_TX1 == DREQ_PIO0_TX0 + 1, "");

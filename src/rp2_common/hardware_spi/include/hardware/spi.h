@@ -342,7 +342,7 @@ int spi_read16_blocking(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *ds
  *  \ingroup hardware_spi
  *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
- * \param is_tx true for sending data to the SPI instance, false for received data from the SPI instance
+ * \param is_tx true for sending data to the SPI instance, false for receiving data from the SPI instance
  */
 static inline uint spi_get_dreq(spi_inst_t *spi, bool is_tx) {
     static_assert(DREQ_SPI0_RX == DREQ_SPI0_TX + 1, "");
