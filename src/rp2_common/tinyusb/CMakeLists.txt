@@ -15,7 +15,7 @@ elseif (NOT EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
 endif()
 
 if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
-    message("TinyUSB available at ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH}; adding USB support.")
+    message("TinyUSB available at ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH}; enabling build support for USB.")
 
     pico_register_common_scope_var(PICO_TINYUSB_PATH)
 
