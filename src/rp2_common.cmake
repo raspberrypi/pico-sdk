@@ -37,7 +37,7 @@ function(pico_add_extra_outputs TARGET)
         add_custom_command(TARGET ${TARGET}_symlinked POST_BUILD
                 COMMAND rm -f "${PICO_SYMLINK_ELF_AS_FILENAME}"
                 COMMAND ln -s -r $<TARGET_FILE:${TARGET}> "${PICO_SYMLINK_ELF_AS_FILENAME}"
-                COMMENT "Symlinking from ${PICO_SYMLINK_ELF_AS_FILENAME} to $<TARGET_FILE:${TARGET}>"
+                COMMENT "Symlinking from ${PICO_SYMLINK_ELF_AS_FILENAME} to ${TARGET}"
                 )
     endif ()
     # PICO_CMAKE_CONFIG: PICO_NO_UF2, Disable UF2 output, type=bool, default=0, group=build

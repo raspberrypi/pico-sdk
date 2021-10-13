@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "hardware/platform_defs.h"
-#include "pico/config.h"
+#include "pico.h"
 
 #define WRAPPER_FUNC_NAME(x) __wrap_##x
 #define SECTION_NAME(x) .text.##x

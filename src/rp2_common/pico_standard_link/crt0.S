@@ -10,6 +10,7 @@
 #include "hardware/regs/sio.h"
 #include "pico/binary_info/defs.h"
 #include "pico/config.h"
+#include "pico/platform_asm.h"
 
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS

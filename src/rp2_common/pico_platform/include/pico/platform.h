@@ -9,89 +9,226 @@
 
 #include <sys/cdefs.h>
 #include "pico/types.h"
-#include "hardware/platform_defs.h"
+#include "pico/platform_asm.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /** \file platform.h
-*  \defgroup pico_platform pico_platform
-* Compiler definitions for the selected PICO_PLATFORM
-*/
+ *  \defgroup pico_platform pico_platform
+ *
+ * Compiler definitions/macros for the RP2 family device / architecture to provide a common abstraction
+ * over low level compiler / platform specifics
+ */
 
+/*! \brief Marker for an interrupt handler
+ *  \ingroup pico_platform
+ * For example an IRQ handler function called my_interrupt_handler:
+ *
+ *     void __isr my_interrupt_handler(void) {
+ */
 #define __isr
 
-// Section naming macros
+/*! \brief Section attribute macro for placement in RAM after the `.data` section
+ *  \ingroup pico_platform
+ *
+ * For example a 400 element `uint32_t` array placed after the .data section
+ *
+ *     uint32_t __after_data("my_group_name") a_big_array[400];
+ *
+ * The section attribute is `.after_data.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage collected independently
+ */
 #define __after_data(group) __attribute__((section(".after_data." group)))
+
+/*! \brief Section attribute macro for placement not in flash (i.e in RAM)
+ *  \ingroup pico_platform
+ *
+ * For example a 3 element `uint32_t` array placed in RAM (even though it is `static const`)
+ *
+ *     static const uint32_t __not_in_flash("my_group_name") an_array[3];
+ *
+ * The section attribute is `.time_critical.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage collected independently
+ */
 #define __not_in_flash(group) __attribute__((section(".time_critical." group)))
+
+/*! \brief Section attribute macro for placement in the SRAM bank 4 (known as "scratch X")
+ *  \ingroup pico_platform
+ *
+ * Scratch X is commonly used for critical data and functions accessed only by one core (when only
+ * one core is accessing the RAM bank, there is no opportunity for stalls)
+ *
+ * For example a `uint32_t` variable placed in "scratch X"
+ *
+ *     uint32_t __scratch_x("my_group_name") foo = 23;
+ *
+ * The section attribute is `.scratch_x.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage collected independently
+ */
 #define __scratch_x(group) __attribute__((section(".scratch_x." group)))
+
+/*! \brief Section attribute macro for placement in the SRAM bank 5 (known as "scratch Y")
+ *  \ingroup pico_platform
+ *
+ * Scratch T is commonly used for critical data and functions accessed only by one core (when only
+ * one core is accessing the RAM bank, there is no opportunity for stalls)
+ *
+ * For example a `uint32_t` variable placed in "scratch Y"
+ *
+ *     uint32_t __scratch_y("my_group_name") foo = 23;
+ *
+ * The section attribute is `.scratch_y.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage collected independently
+ */
 #define __scratch_y(group) __attribute__((section(".scratch_y." group)))
+
 #define __uninitialized_ram(group) __attribute__((section(".uninitialized_ram." #group))) group
-// For use with PICO_COPY_TO_RAM:
+
+/*! \brief Section attribute macro for placement in flash even in a COPY_TO_RAM binary
+ *  \ingroup pico_platform
+ *
+ * Scratch T is commonly used for critical data and functions accessed only by one core (when only
+ * one core is accessing the RAM bank, there is no opportunity for stalls)
+ *
+ * For example a `uint32_t` variable explicitly placed in flash (it will hard fault if you attempt to write it!)
+ *
+ *     uint32_t __in_flash("my_group_name") foo = 23;
+ *
+ * The section attribute is `.flashdata.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage collected independently
+ */
 #define __in_flash(group) __attribute__((section(".flashdata" group)))
 
-/**
+/*! \brief Indicates a function should not be stored in flash
+ *  \ingroup pico_platform
+ *
  * Decorates a function name, such that the function will execute from RAM (assuming it is not inlined
  * into a flash function by the compiler)
+ *
+ * For example a function called my_func taking an int parameter:
+ *
+ *     void __not_in_flash_func(my_func)(int some_arg) {
+ *
+ * The function is placed in the `.time_critical.<func_name>` linker section
+ *
+ * \see __no_inline_not_in_flash_func
  */
 #define __not_in_flash_func(func_name) __not_in_flash(__STRING(func_name)) func_name
-/**
- * Historical synonym for __not_in_flash_func()
+
+/*! \brief Historical synonym for \ref __not_in_flash_func
+ *  \ingroup pico_platform
+ *  \see __not_in_flash_func
  */
 #define __time_critical_func(func_name) __not_in_flash_func(func_name)
 
-/**
+/*! \brief Indicate a function should not be stored in flash and should not be inlined
+ *  \ingroup pico_platform
+ *
  * Decorates a function name, such that the function will execute from RAM, explicitly marking it as
  * noinline to prevent it being inlined into a flash function by the compiler
+ *
+ * For example a function called my_func taking an int parameter:
+ *
+ *     void __not_in_flash_func(my_func)(int some_arg) {
+ *
+ * The function is placed in the `.time_critical.<func_name>` linker section
  */
 #define __no_inline_not_in_flash_func(func_name) __noinline __not_in_flash_func(func_name)
 
 #define __packed_aligned __packed __aligned(4)
 
+/*! \brief Attribute to force inlining of a function regardless of optimization level
+ *  \ingroup pico_platform
+ *
+ *  For example my_function here will always be inlined:
+ *
+ *      int __force_inline my_function(int x) {
+ *
+ */
 #if defined(__GNUC__) && __GNUC__ <= 7
 #define __force_inline inline __always_inline
 #else
 #define __force_inline __always_inline
 #endif
+
+/*! \brief Macro to determine the number of elements in an array
+ *  \ingroup pico_platform
+ */
 #ifndef count_of
 #define count_of(a) (sizeof(a)/sizeof((a)[0]))
 #endif
 
+/*! \brief Macro to return the maximum of two comparable values
+ *  \ingroup pico_platform
+ */
 #ifndef MAX
 #define MAX(a, b) ((a)>(b)?(a):(b))
 #endif
 
+/*! \brief Macro to return the minimum of two comparable values
+ *  \ingroup pico_platform
+ */
 #ifndef MIN
 #define MIN(a, b) ((b)>(a)?(a):(b))
 #endif
 
-/**
- * Execute a breakpoint instruction
+/*! \brief Execute a breakpoint instruction
+ *  \ingroup pico_platform
  */
 static inline void __breakpoint(void) {
     __asm__("bkpt #0");
 }
 
-/**
- * Ensure that the compiler does not move memory access across this method call
+/*! \brief Ensure that the compiler does not move memory access across this method call
+ *  \ingroup pico_platform
+ *
+ *  For example in the following code:
+ *
+ *      *some_memory_location = var_a;
+ *      __compiler_memory_barrier();
+ *      uint32_t var_b = *some_other_memory_location
+ *
+ * The compiler will not move the load from `some_other_memory_location` above the memory barrier (which it otherwise
+ * might - even above the memory store!)
  */
 __force_inline static void __compiler_memory_barrier(void) {
     __asm__ volatile ("" : : : "memory");
 }
 
-// return a 32 bit handle for a raw ptr; DMA chaining for example embeds pointers in 32 bit values
-// which of course does not work if we're running the code natively on a 64 bit platforms. Therefore
-// we provide this macro which allows that code to provide a 64->32 bit mapping in host mode
+/*! \brief Macro for converting memory addresses to 32 bit addresses suitable for DMA
+ *  \ingroup pico_platform
+ *
+ *  This is just a cast to `uintptr_t` on the RP2040, however you may want to use this when developing code
+ *  that also runs in "host" mode. If the host mode is 64 bit and you are embedding data pointers
+ *  in other data (e.g. DMA chaining), then there is a need in "host" mode to convert a 64 bit native
+ *  pointer to a 32 bit value for storage, which can be done using this macro.
+ */
 #define host_safe_hw_ptr(x) ((uintptr_t)(x))
+#define native_safe_hw_ptr(x) host_safe_hw_ptr(x)
 
-/**
- * Panic (see panic()) with the message "Unsupported".
+
+/*! \brief Panics with the message "Unsupported"
+ *  \ingroup pico_platform
+ *  \see panic
  */
 void __attribute__((noreturn)) panic_unsupported(void);
 
-/**
- * Panic with a message. An attempt is made to output the message to all registered STDOUT drivers
+/*! \brief Displays a panic message halting execution.
+ *  \ingroup pico_platform
+ *
+ * An attempt is made to output the message to all registered STDOUT drivers
  * after which this method executes a BKPT instruction.
  *
  * @param fmt format string (printf-like)
@@ -110,36 +247,34 @@ static inline bool running_on_fpga(void) {return false;}
 bool running_on_fpga(void);
 #endif
 
-/**
- * @return the RP2040 chip revision number
+/*! \brief Returns the RP2040 chip revision number
+ *  \ingroup pico_platform
+ * @return the RP2040 chip revision number (1 for B0/B1, 2 for B2)
  */
 uint8_t rp2040_chip_version(void);
 
-/**
+/*! \brief Returns the RP2040 rom version number
+ *  \ingroup pico_platform
  * @return the RP2040 rom version number
  */
 static inline uint8_t rp2040_rom_version(void) {
     return *(uint8_t*)0x13;
 }
 
-/**
- * Empty function intended to be called by any tight hardware polling loop. using this ubiquitously
+/*! \brief No-op function for the body of tight loops
+ *  \ingroup pico_platform
+ *
+ * Np-op function intended to be called by any tight hardware polling loop. Using this ubiquitously
  * makes it much easier to find tight loops, but also in the future \#ifdef-ed support for lockup
  * debugging might be added
  */
-static inline void tight_loop_contents(void) {}
+static __force_inline void tight_loop_contents(void) {}
 
-/**
- * Helper macro for making chain DMA code portable to PICO_PLATFORM=host. The problem here is
- * that embedded pointers in the data are only 32 bit, which is a problem if the host
- * system is 64 bit. This macro is zero cost on the actual device, but in host mode
- * it provides a 64->32 bit mapping
- */
-#define native_safe_hw_ptr(x) ((uintptr_t)(x))
-
-/**
- * Multiplies a by b using multiply instruction using the ARM mul instruction regardless of values;
- * i.e. this is a 1 cycle operation.
+/*! \brief Multiply two integers using an assembly `MUL` instruction
+ *  \ingroup pico_platform
+ *
+ * This multiplies a by b using multiply instruction using the ARM mul instruction regardless of values (the compiler
+ * might otherwise choose to perform shifts/adds), i.e. this is a 1 cycle operation.
  *
  * \param a the first operand
  * \param b the second operand
@@ -150,10 +285,14 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
     return a;
 }
 
-/**
+/*! \brief multiply two integer values using the fastest method possible
+ *  \ingroup pico_platform
+ *
  * Efficiently Multiplies value a by possibly constant value b.
+ *
  * If b is known to be constant and not zero or a power of 2, then a mul instruction is used rather than gcc's default
- * which is often a slow combination of shifts and adds
+ * which is often a slow combination of shifts and adds. If b is a power of 2 then a single shift is of course preferable
+ * and will be used
  *
  * \param a the first operand
  * \param b the second operand
@@ -163,16 +302,23 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
 (__builtin_popcount(b) >= 2 ? __mul_instruction(a,b) : (a)*(b)), \
 (a)*(b))
 
-#define WRAPPER_FUNC(x) __wrap_ ## x
-#define REAL_FUNC(x) __real_ ## x
-
+/*! \brief Utility macro to assert two types are equivalent.
+ *  \ingroup pico_platform
+ *
+ *  This macros can be useful in other macros along with `typeof` to assert that two parameters are of equivalent type
+ *  (or that a single parameter is of an expected type)
+ */
 #define __check_type_compatible(type_a, type_b) static_assert(__builtin_types_compatible_p(type_a, type_b), __STRING(type_a) " is not compatible with " __STRING(type_b));
 
-/**
- * Get the current exception level on this core
+/*! \brief Get the current exception level on this core
+ *  \ingroup pico_platform
+ *
  * \return the exception number if the CPU is handling an exception, or 0 otherwise
  */
 uint __get_current_exception(void);
+
+#define WRAPPER_FUNC(x) __wrap_ ## x
+#define REAL_FUNC(x) __real_ ## x
 
 #ifdef __cplusplus
 }
