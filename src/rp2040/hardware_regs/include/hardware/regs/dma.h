@@ -5056,7 +5056,7 @@
 #define DMA_CH0_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH0_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH0_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH0_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH0_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH0_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5078,7 +5078,7 @@
 #define DMA_CH1_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH1_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH1_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH1_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH1_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH1_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5100,7 +5100,7 @@
 #define DMA_CH2_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH2_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH2_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH2_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH2_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH2_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5122,7 +5122,7 @@
 #define DMA_CH3_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH3_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH3_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH3_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH3_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH3_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5144,7 +5144,7 @@
 #define DMA_CH4_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH4_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH4_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH4_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH4_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH4_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5166,7 +5166,7 @@
 #define DMA_CH5_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH5_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH5_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH5_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH5_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH5_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5188,7 +5188,7 @@
 #define DMA_CH6_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH6_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH6_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH6_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH6_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH6_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5210,7 +5210,7 @@
 #define DMA_CH7_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH7_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH7_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH7_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH7_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH7_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5232,7 +5232,7 @@
 #define DMA_CH8_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH8_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH8_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH8_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH8_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH8_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5254,7 +5254,7 @@
 #define DMA_CH9_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH9_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH9_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH9_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH9_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH9_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5276,7 +5276,7 @@
 #define DMA_CH10_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH10_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH10_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH10_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH10_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH10_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5298,7 +5298,7 @@
 #define DMA_CH11_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH11_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH11_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH11_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH11_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH11_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
