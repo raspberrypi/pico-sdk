@@ -313,7 +313,7 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
 /*! \brief multiply two integer values using the fastest method possible
  *  \ingroup pico_platform
  *
- * Efficiently Multiplies value a by possibly constant value b.
+ * Efficiently multiplies value a by possibly constant value b.
  *
  * If b is known to be constant and not zero or a power of 2, then a mul instruction is used rather than gcc's default
  * which is often a slow combination of shifts and adds. If b is a power of 2 then a single shift is of course preferable
