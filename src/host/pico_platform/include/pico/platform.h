@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-#define __not_in_flash(grup)
+#define __not_in_flash(grpup)
 #define __not_in_flash_func(func) func
 #define __no_inline_not_in_flash_func(func)
 #define __in_flash(group)

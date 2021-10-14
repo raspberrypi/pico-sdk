@@ -78,7 +78,7 @@ extern "C" {
 /*! \brief Section attribute macro for placement in the SRAM bank 5 (known as "scratch Y")
  *  \ingroup pico_platform
  *
- * Scratch T is commonly used for critical data and functions accessed only by one core (when only
+ * Scratch Y is commonly used for critical data and functions accessed only by one core (when only
  * one core is accessing the RAM bank, there is no opportunity for stalls)
  *
  * For example a `uint32_t` variable placed in "scratch Y"
@@ -92,13 +92,25 @@ extern "C" {
  */
 #define __scratch_y(group) __attribute__((section(".scratch_y." group)))
 
+/*! \brief Section attribute macro for data that is to be left uninitialized
+ *  \ingroup pico_platform
+ *
+ * Data marked this way will retain its value across a reset (normally uninitialized data - in the .bss
+ * section) is initialized to zero during runtime initialization
+ *
+ * For example a `uint32_t` foo will retain its value if the program is restarted
+ *
+ *     uint32_t __uninitialized_ram("my_group_name") foo;
+ *
+ * The section attribute is `.uninitialized_ram.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage collected independently
+ */
 #define __uninitialized_ram(group) __attribute__((section(".uninitialized_ram." #group))) group
 
 /*! \brief Section attribute macro for placement in flash even in a COPY_TO_RAM binary
  *  \ingroup pico_platform
- *
- * Scratch T is commonly used for critical data and functions accessed only by one core (when only
- * one core is accessing the RAM bank, there is no opportunity for stalls)
  *
  * For example a `uint32_t` variable explicitly placed in flash (it will hard fault if you attempt to write it!)
  *
@@ -127,9 +139,22 @@ extern "C" {
  */
 #define __not_in_flash_func(func_name) __not_in_flash(__STRING(func_name)) func_name
 
-/*! \brief Historical synonym for \ref __not_in_flash_func
+/*! \brief Indicates a function is time/latency critical and should not run from flash
  *  \ingroup pico_platform
- *  \see __not_in_flash_func
+ *
+ * Decorates a function name, such that the function will execute from RAM (assuming it is not inlined
+ * into a flash function by the compiler) to avoid possible flash latency. Currently this macro is identical
+ * in implementation to `__not_in_flash_func`, however the semantics are distinct and a `__time_critical_func`
+ * may in the future be treated more specially to reduce the overhead when calling such function from a flash
+ * function.
+ *
+ * For example a function called my_func taking an int parameter:
+ *
+ *     void __time_critical(my_func)(int some_arg) {
+ *
+ * The function is placed in the `.time_critical.<func_name>` linker section
+ *
+ * \see __not_in_flash_func
  */
 #define __time_critical_func(func_name) __not_in_flash_func(func_name)
 
@@ -141,7 +166,7 @@ extern "C" {
  *
  * For example a function called my_func taking an int parameter:
  *
- *     void __not_in_flash_func(my_func)(int some_arg) {
+ *     void __no_inline_not_in_flash_func(my_func)(int some_arg) {
  *
  * The function is placed in the `.time_critical.<func_name>` linker section
  */
@@ -255,7 +280,7 @@ uint8_t rp2040_chip_version(void);
 
 /*! \brief Returns the RP2040 rom version number
  *  \ingroup pico_platform
- * @return the RP2040 rom version number
+ * @return the RP2040 rom version number (1 for RP2040-B0, 2 for RP2040-B1, 3 for RP2040-B2)
  */
 static inline uint8_t rp2040_rom_version(void) {
     return *(uint8_t*)0x13;
@@ -305,7 +330,7 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
 /*! \brief Utility macro to assert two types are equivalent.
  *  \ingroup pico_platform
  *
- *  This macros can be useful in other macros along with `typeof` to assert that two parameters are of equivalent type
+ *  This macro can be useful in other macros along with `typeof` to assert that two parameters are of equivalent type
  *  (or that a single parameter is of an expected type)
  */
 #define __check_type_compatible(type_a, type_b) static_assert(__builtin_types_compatible_p(type_a, type_b), __STRING(type_a) " is not compatible with " __STRING(type_b));
