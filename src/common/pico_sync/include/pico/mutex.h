@@ -124,7 +124,7 @@ bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
  * \param mtx Pointer to recursive mutex structure
  * \param owner_out If mutex was already owned by another owner, and this pointer is non-zero,
  *                  it will be filled in with the owner id of the current owner of the mutex
- * \return true if mutex now owned, false otherwise
+ * \return true if the recursive mutex (now) owned, false otherwise
  */
 bool recursive_mutex_try_enter(recursive_mutex_t *mtx, uint32_t *owner_out);
 
