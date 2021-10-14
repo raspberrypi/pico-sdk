@@ -33403,8 +33403,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH0_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33423,8 +33424,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH1_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33443,8 +33445,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH2_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33463,8 +33466,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH3_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33483,8 +33487,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH4_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33503,8 +33508,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH5_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33523,8 +33529,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH6_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33543,8 +33550,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH7_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33563,8 +33571,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH8_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33583,8 +33592,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH9_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33603,8 +33613,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH10_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33623,8 +33634,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH11_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -40061,9 +40073,10 @@
               <name>SETUP_REC</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[16:16]</bitRange>
               <description>Device: connected</description>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CONNECTED</name>
             </field>
             <field>
@@ -40080,15 +40093,17 @@
               <name>VBUS_OVER_CURR</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[9:8]</bitRange>
               <description>Host: device speed. Disconnected = 00, LS = 01, FS = 10</description>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>SPEED</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[4:4]</bitRange>
               <description>Bus in suspended state. Valid for device and host. Host and device will go into suspend if neither Keep Alive / SOF frames are enabled.</description>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>SUSPENDED</name>
             </field>
             <field>
