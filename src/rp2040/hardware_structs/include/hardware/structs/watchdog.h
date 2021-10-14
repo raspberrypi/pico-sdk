@@ -43,7 +43,7 @@ typedef struct {
     io_ro_32 reason;
 
     _REG_(WATCHDOG_SCRATCH0_OFFSET) // WATCHDOG_SCRATCH0
-    // (Description copied from index 0 register WATCHDOG_SCRATCH0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register WATCHDOG_SCRATCH0 applies similarly to other array indexes)
     //
     // Scratch register
     io_rw_32 scratch[8];

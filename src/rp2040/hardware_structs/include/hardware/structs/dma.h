@@ -145,7 +145,7 @@ typedef struct {
     io_rw_32 ints1;
 
     _REG_(DMA_TIMER0_OFFSET) // DMA_TIMER0
-    // (Description copied from index 0 register DMA_TIMER0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register DMA_TIMER0 applies similarly to other array indexes)
     //
     // Pacing (X/Y) Fractional Timer
     // 0xffff0000 [31:16] : X (0): Pacing Timer Dividend

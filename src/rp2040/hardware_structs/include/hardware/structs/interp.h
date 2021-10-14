@@ -22,31 +22,31 @@
 
 typedef struct {
     _REG_(SIO_INTERP0_ACCUM0_OFFSET) // SIO_INTERP0_ACCUM0
-    // (Description copied from index 0 register SIO_INTERP0_ACCUM0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register SIO_INTERP0_ACCUM0 applies similarly to other array indexes)
     //
     // Read/write access to accumulator 0
     io_rw_32 accum[2];
 
     _REG_(SIO_INTERP0_BASE0_OFFSET) // SIO_INTERP0_BASE0
-    // (Description copied from index 0 register SIO_INTERP0_BASE0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register SIO_INTERP0_BASE0 applies similarly to other array indexes)
     //
     // Read/write access to BASE0 register
     io_rw_32 base[3];
 
     _REG_(SIO_INTERP0_POP_LANE0_OFFSET) // SIO_INTERP0_POP_LANE0
-    // (Description copied from index 0 register SIO_INTERP0_POP_LANE0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register SIO_INTERP0_POP_LANE0 applies similarly to other array indexes)
     //
     // Read LANE0 result, and simultaneously write lane results to both accumulators (POP)
     io_ro_32 pop[3];
 
     _REG_(SIO_INTERP0_PEEK_LANE0_OFFSET) // SIO_INTERP0_PEEK_LANE0
-    // (Description copied from index 0 register SIO_INTERP0_PEEK_LANE0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register SIO_INTERP0_PEEK_LANE0 applies similarly to other array indexes)
     //
     // Read LANE0 result, without altering any internal state (PEEK)
     io_ro_32 peek[3];
 
     _REG_(SIO_INTERP0_CTRL_LANE0_OFFSET) // SIO_INTERP0_CTRL_LANE0
-    // (Description copied from index 0 register SIO_INTERP0_CTRL_LANE0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register SIO_INTERP0_CTRL_LANE0 applies similarly to other array indexes)
     //
     // Control register for lane 0
     // 0x02000000 [25]    : OVERF (0): Set if either OVERF0 or OVERF1 is set
@@ -64,7 +64,7 @@ typedef struct {
     io_rw_32 ctrl[2];
 
     _REG_(SIO_INTERP0_ACCUM0_ADD_OFFSET) // SIO_INTERP0_ACCUM0_ADD
-    // (Description copied from index 0 register SIO_INTERP0_ACCUM0_ADD applies similarly to other array indexes)
+    // (Description copied from array index 0 register SIO_INTERP0_ACCUM0_ADD applies similarly to other array indexes)
     //
     // Values written here are atomically added to ACCUM0
     // 0x00ffffff [23:0]  : INTERP0_ACCUM0_ADD (0)

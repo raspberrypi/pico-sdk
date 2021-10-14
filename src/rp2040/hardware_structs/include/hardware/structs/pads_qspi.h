@@ -27,7 +27,7 @@ typedef struct {
     io_rw_32 voltage_select;
 
     _REG_(PADS_QSPI_GPIO_QSPI_SCLK_OFFSET) // PADS_QSPI_GPIO_QSPI_SCLK
-    // (Description copied from index 0 register PADS_QSPI_GPIO_QSPI_SCLK applies similarly to other array indexes)
+    // (Description copied from array index 0 register PADS_QSPI_GPIO_QSPI_SCLK applies similarly to other array indexes)
     //
     // Pad control register
     // 0x00000080 [7]     : OD (0): Output disable

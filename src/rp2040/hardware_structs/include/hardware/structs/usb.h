@@ -129,7 +129,7 @@ typedef struct {
     io_rw_32 dev_addr_ctrl;
 
     _REG_(USB_ADDR_ENDP1_OFFSET) // USB_ADDR_ENDP1
-    // (Description copied from index 0 register USB_ADDR_ENDP1 applies similarly to other array indexes)
+    // (Description copied from array index 0 register USB_ADDR_ENDP1 applies similarly to other array indexes)
     //
     // Interrupt endpoint 1
     // 0x04000000 [26]    : INTEP_PREAMBLE (0): Interrupt EP requires preamble (is a low speed device on a full speed hub)

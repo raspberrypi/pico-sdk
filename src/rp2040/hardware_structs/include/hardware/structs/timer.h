@@ -38,7 +38,7 @@ typedef struct {
     io_ro_32 timelr;
 
     _REG_(TIMER_ALARM0_OFFSET) // TIMER_ALARM0
-    // (Description copied from index 0 register TIMER_ALARM0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register TIMER_ALARM0 applies similarly to other array indexes)
     //
     // Arm alarm 0, and configure the time it will fire
     io_rw_32 alarm[NUM_TIMERS]; // 4

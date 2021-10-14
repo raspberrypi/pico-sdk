@@ -45,7 +45,7 @@ typedef struct {
 
 typedef struct {
     _REG_(IO_BANK0_PROC0_INTE0_OFFSET) // IO_BANK0_PROC0_INTE0
-    // (Description copied from index 0 register IO_BANK0_PROC0_INTE0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register IO_BANK0_PROC0_INTE0 applies similarly to other array indexes)
     //
     // Interrupt Enable for proc0
     // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
@@ -83,7 +83,7 @@ typedef struct {
     io_rw_32 inte[4];
 
     _REG_(IO_BANK0_PROC0_INTF0_OFFSET) // IO_BANK0_PROC0_INTF0
-    // (Description copied from index 0 register IO_BANK0_PROC0_INTF0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register IO_BANK0_PROC0_INTF0 applies similarly to other array indexes)
     //
     // Interrupt Force for proc0
     // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
@@ -121,7 +121,7 @@ typedef struct {
     io_rw_32 intf[4];
 
     _REG_(IO_BANK0_PROC0_INTS0_OFFSET) // IO_BANK0_PROC0_INTS0
-    // (Description copied from index 0 register IO_BANK0_PROC0_INTS0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register IO_BANK0_PROC0_INTS0 applies similarly to other array indexes)
     //
     // Interrupt status after masking & forcing for proc0
     // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
@@ -164,7 +164,7 @@ typedef struct {
     io_status_ctrl_hw_t io[NUM_BANK0_GPIOS]; // 30
 
     _REG_(IO_BANK0_INTR0_OFFSET) // IO_BANK0_INTR0
-    // (Description copied from index 0 register IO_BANK0_INTR0 applies similarly to other array indexes)
+    // (Description copied from array index 0 register IO_BANK0_INTR0 applies similarly to other array indexes)
     //
     // Raw Interrupts
     // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
