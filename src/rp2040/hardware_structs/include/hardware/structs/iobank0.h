@@ -12,7 +12,7 @@
 #include "hardware/address_mapped.h"
 #include "hardware/regs/io_bank0.h"
 
-// Reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_io_bank0
+// Reference to datasheet: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_io_bank0
 //
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/io_bank0.h.
@@ -45,7 +45,7 @@ typedef struct {
 
 typedef struct {
     _REG_(IO_BANK0_PROC0_INTE0_OFFSET) // IO_BANK0_PROC0_INTE0
-    // (Description copied from IO_BANK0_PROC0_INTE0 applies similarly all array members)
+    // (Description copied from index 0 register IO_BANK0_PROC0_INTE0 applies similarly to other array indexes)
     //
     // Interrupt Enable for proc0
     // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
@@ -83,7 +83,7 @@ typedef struct {
     io_rw_32 inte[4];
 
     _REG_(IO_BANK0_PROC0_INTF0_OFFSET) // IO_BANK0_PROC0_INTF0
-    // (Description copied from IO_BANK0_PROC0_INTF0 applies similarly all array members)
+    // (Description copied from index 0 register IO_BANK0_PROC0_INTF0 applies similarly to other array indexes)
     //
     // Interrupt Force for proc0
     // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
@@ -121,7 +121,7 @@ typedef struct {
     io_rw_32 intf[4];
 
     _REG_(IO_BANK0_PROC0_INTS0_OFFSET) // IO_BANK0_PROC0_INTS0
-    // (Description copied from IO_BANK0_PROC0_INTS0 applies similarly all array members)
+    // (Description copied from index 0 register IO_BANK0_PROC0_INTS0 applies similarly to other array indexes)
     //
     // Interrupt status after masking & forcing for proc0
     // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
@@ -164,7 +164,7 @@ typedef struct {
     io_status_ctrl_hw_t io[NUM_BANK0_GPIOS]; // 30
 
     _REG_(IO_BANK0_INTR0_OFFSET) // IO_BANK0_INTR0
-    // (Description copied from IO_BANK0_INTR0 applies similarly all array members)
+    // (Description copied from index 0 register IO_BANK0_INTR0 applies similarly to other array indexes)
     //
     // Raw Interrupts
     // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)

@@ -12,7 +12,7 @@
 #include "hardware/address_mapped.h"
 #include "hardware/regs/pads_qspi.h"
 
-// Reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pads_qspi
+// Reference to datasheet: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_pads_qspi
 //
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/pads_qspi.h.
@@ -27,7 +27,7 @@ typedef struct {
     io_rw_32 voltage_select;
 
     _REG_(PADS_QSPI_GPIO_QSPI_SCLK_OFFSET) // PADS_QSPI_GPIO_QSPI_SCLK
-    // (Description copied from PADS_QSPI_GPIO_QSPI_SCLK applies similarly all array members)
+    // (Description copied from index 0 register PADS_QSPI_GPIO_QSPI_SCLK applies similarly to other array indexes)
     //
     // Pad control register
     // 0x00000080 [7]     : OD (0): Output disable

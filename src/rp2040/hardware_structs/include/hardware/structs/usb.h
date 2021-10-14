@@ -12,7 +12,7 @@
 #include "hardware/address_mapped.h"
 #include "hardware/regs/usb.h"
 
-// Reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_usb
+// Reference to datasheet: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_usb
 //
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/usb.h.
@@ -129,7 +129,7 @@ typedef struct {
     io_rw_32 dev_addr_ctrl;
 
     _REG_(USB_ADDR_ENDP1_OFFSET) // USB_ADDR_ENDP1
-    // (Description copied from USB_ADDR_ENDP1 applies similarly all array members)
+    // (Description copied from index 0 register USB_ADDR_ENDP1 applies similarly to other array indexes)
     //
     // Interrupt endpoint 1
     // 0x04000000 [26]    : INTEP_PREAMBLE (0): Interrupt EP requires preamble (is a low speed device on a full speed hub)
