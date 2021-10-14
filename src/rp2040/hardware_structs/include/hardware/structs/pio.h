@@ -12,7 +12,7 @@
 #include "hardware/address_mapped.h"
 #include "hardware/regs/pio.h"
 
-// Reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_pio
+// Reference to datasheet: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_pio
 //
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/pio.h.
@@ -113,9 +113,15 @@ typedef struct {
     io_ro_32 flevel;
 
     _REG_(PIO_TXF0_OFFSET) // PIO_TXF0
+    // (Description copied from array index 0 register PIO_TXF0 applies similarly to other array indexes)
+    //
+    // Direct write access to the TX FIFO for this state machine
     io_wo_32 txf[NUM_PIO_STATE_MACHINES]; // 4
 
     _REG_(PIO_RXF0_OFFSET) // PIO_RXF0
+    // (Description copied from array index 0 register PIO_RXF0 applies similarly to other array indexes)
+    //
+    // Direct read access to the RX FIFO for this state machine
     io_ro_32 rxf[NUM_PIO_STATE_MACHINES]; // 4
 
     _REG_(PIO_IRQ_OFFSET) // PIO_IRQ
@@ -148,6 +154,10 @@ typedef struct {
     io_ro_32 dbg_cfginfo;
 
     _REG_(PIO_INSTR_MEM0_OFFSET) // PIO_INSTR_MEM0
+    // (Description copied from array index 0 register PIO_INSTR_MEM0 applies similarly to other array indexes)
+    //
+    // Write-only access to instruction memory location 0
+    // 0x0000ffff [15:0]  : INSTR_MEM0 (0)
     io_wo_32 instr_mem[PIO_INSTRUCTION_COUNT]; // 32
 
     pio_sm_hw_t sm[NUM_PIO_STATE_MACHINES]; // 4

@@ -12,7 +12,7 @@
 #include "hardware/address_mapped.h"
 #include "hardware/regs/watchdog.h"
 
-// Reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_watchdog
+// Reference to datasheet: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_watchdog
 //
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/watchdog.h.
@@ -43,6 +43,9 @@ typedef struct {
     io_ro_32 reason;
 
     _REG_(WATCHDOG_SCRATCH0_OFFSET) // WATCHDOG_SCRATCH0
+    // (Description copied from array index 0 register WATCHDOG_SCRATCH0 applies similarly to other array indexes)
+    //
+    // Scratch register
     io_rw_32 scratch[8];
 
     _REG_(WATCHDOG_TICK_OFFSET) // WATCHDOG_TICK

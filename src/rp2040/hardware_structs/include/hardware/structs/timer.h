@@ -12,7 +12,7 @@
 #include "hardware/address_mapped.h"
 #include "hardware/regs/timer.h"
 
-// Reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_timer
+// Reference to datasheet: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_timer
 //
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/timer.h.
@@ -38,6 +38,9 @@ typedef struct {
     io_ro_32 timelr;
 
     _REG_(TIMER_ALARM0_OFFSET) // TIMER_ALARM0
+    // (Description copied from array index 0 register TIMER_ALARM0 applies similarly to other array indexes)
+    //
+    // Arm alarm 0, and configure the time it will fire
     io_rw_32 alarm[NUM_TIMERS]; // 4
 
     _REG_(TIMER_ARMED_OFFSET) // TIMER_ARMED

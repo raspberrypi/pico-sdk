@@ -12,7 +12,7 @@
 #include "hardware/address_mapped.h"
 #include "hardware/regs/dma.h"
 
-// Reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_dma
+// Reference to datasheet: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_dma
 //
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/dma.h.
@@ -145,6 +145,11 @@ typedef struct {
     io_rw_32 ints1;
 
     _REG_(DMA_TIMER0_OFFSET) // DMA_TIMER0
+    // (Description copied from array index 0 register DMA_TIMER0 applies similarly to other array indexes)
+    //
+    // Pacing (X/Y) Fractional Timer
+    // 0xffff0000 [31:16] : X (0): Pacing Timer Dividend
+    // 0x0000ffff [15:0]  : Y (0): Pacing Timer Divisor
     io_rw_32 timer[NUM_DMA_TIMERS]; // 4
 
     _REG_(DMA_MULTI_CHAN_TRIGGER_OFFSET) // DMA_MULTI_CHAN_TRIGGER
@@ -183,7 +188,7 @@ typedef struct {
 
 typedef struct {
     struct dma_debug_hw_channel {
-        io_ro_32 ctrdeq;
+        io_rw_32 ctrdeq;
         io_ro_32 tcr;
         uint32_t pad[14];
     } ch[NUM_DMA_CHANNELS];

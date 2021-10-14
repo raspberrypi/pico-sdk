@@ -12,7 +12,7 @@
 #include "hardware/address_mapped.h"
 #include "hardware/regs/io_bank0.h"
 
-// Reference to datasheet: https://datasheets.raspberrypi.org/rp2040/rp2040-datasheet.pdf#tab-registerlist_io_bank0
+// Reference to datasheet: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf#tab-registerlist_io_bank0
 //
 // The _REG_ macro is intended to help make the register navigable in your IDE (for example, using the "Go to Definition" feature)
 // _REG_(x) will link to the corresponding register in hardware/regs/io_bank0.h.
@@ -45,12 +45,117 @@ typedef struct {
 
 typedef struct {
     _REG_(IO_BANK0_PROC0_INTE0_OFFSET) // IO_BANK0_PROC0_INTE0
+    // (Description copied from array index 0 register IO_BANK0_PROC0_INTE0 applies similarly to other array indexes)
+    //
+    // Interrupt Enable for proc0
+    // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
+    // 0x40000000 [30]    : GPIO7_EDGE_LOW (0)
+    // 0x20000000 [29]    : GPIO7_LEVEL_HIGH (0)
+    // 0x10000000 [28]    : GPIO7_LEVEL_LOW (0)
+    // 0x08000000 [27]    : GPIO6_EDGE_HIGH (0)
+    // 0x04000000 [26]    : GPIO6_EDGE_LOW (0)
+    // 0x02000000 [25]    : GPIO6_LEVEL_HIGH (0)
+    // 0x01000000 [24]    : GPIO6_LEVEL_LOW (0)
+    // 0x00800000 [23]    : GPIO5_EDGE_HIGH (0)
+    // 0x00400000 [22]    : GPIO5_EDGE_LOW (0)
+    // 0x00200000 [21]    : GPIO5_LEVEL_HIGH (0)
+    // 0x00100000 [20]    : GPIO5_LEVEL_LOW (0)
+    // 0x00080000 [19]    : GPIO4_EDGE_HIGH (0)
+    // 0x00040000 [18]    : GPIO4_EDGE_LOW (0)
+    // 0x00020000 [17]    : GPIO4_LEVEL_HIGH (0)
+    // 0x00010000 [16]    : GPIO4_LEVEL_LOW (0)
+    // 0x00008000 [15]    : GPIO3_EDGE_HIGH (0)
+    // 0x00004000 [14]    : GPIO3_EDGE_LOW (0)
+    // 0x00002000 [13]    : GPIO3_LEVEL_HIGH (0)
+    // 0x00001000 [12]    : GPIO3_LEVEL_LOW (0)
+    // 0x00000800 [11]    : GPIO2_EDGE_HIGH (0)
+    // 0x00000400 [10]    : GPIO2_EDGE_LOW (0)
+    // 0x00000200 [9]     : GPIO2_LEVEL_HIGH (0)
+    // 0x00000100 [8]     : GPIO2_LEVEL_LOW (0)
+    // 0x00000080 [7]     : GPIO1_EDGE_HIGH (0)
+    // 0x00000040 [6]     : GPIO1_EDGE_LOW (0)
+    // 0x00000020 [5]     : GPIO1_LEVEL_HIGH (0)
+    // 0x00000010 [4]     : GPIO1_LEVEL_LOW (0)
+    // 0x00000008 [3]     : GPIO0_EDGE_HIGH (0)
+    // 0x00000004 [2]     : GPIO0_EDGE_LOW (0)
+    // 0x00000002 [1]     : GPIO0_LEVEL_HIGH (0)
+    // 0x00000001 [0]     : GPIO0_LEVEL_LOW (0)
     io_rw_32 inte[4];
 
     _REG_(IO_BANK0_PROC0_INTF0_OFFSET) // IO_BANK0_PROC0_INTF0
+    // (Description copied from array index 0 register IO_BANK0_PROC0_INTF0 applies similarly to other array indexes)
+    //
+    // Interrupt Force for proc0
+    // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
+    // 0x40000000 [30]    : GPIO7_EDGE_LOW (0)
+    // 0x20000000 [29]    : GPIO7_LEVEL_HIGH (0)
+    // 0x10000000 [28]    : GPIO7_LEVEL_LOW (0)
+    // 0x08000000 [27]    : GPIO6_EDGE_HIGH (0)
+    // 0x04000000 [26]    : GPIO6_EDGE_LOW (0)
+    // 0x02000000 [25]    : GPIO6_LEVEL_HIGH (0)
+    // 0x01000000 [24]    : GPIO6_LEVEL_LOW (0)
+    // 0x00800000 [23]    : GPIO5_EDGE_HIGH (0)
+    // 0x00400000 [22]    : GPIO5_EDGE_LOW (0)
+    // 0x00200000 [21]    : GPIO5_LEVEL_HIGH (0)
+    // 0x00100000 [20]    : GPIO5_LEVEL_LOW (0)
+    // 0x00080000 [19]    : GPIO4_EDGE_HIGH (0)
+    // 0x00040000 [18]    : GPIO4_EDGE_LOW (0)
+    // 0x00020000 [17]    : GPIO4_LEVEL_HIGH (0)
+    // 0x00010000 [16]    : GPIO4_LEVEL_LOW (0)
+    // 0x00008000 [15]    : GPIO3_EDGE_HIGH (0)
+    // 0x00004000 [14]    : GPIO3_EDGE_LOW (0)
+    // 0x00002000 [13]    : GPIO3_LEVEL_HIGH (0)
+    // 0x00001000 [12]    : GPIO3_LEVEL_LOW (0)
+    // 0x00000800 [11]    : GPIO2_EDGE_HIGH (0)
+    // 0x00000400 [10]    : GPIO2_EDGE_LOW (0)
+    // 0x00000200 [9]     : GPIO2_LEVEL_HIGH (0)
+    // 0x00000100 [8]     : GPIO2_LEVEL_LOW (0)
+    // 0x00000080 [7]     : GPIO1_EDGE_HIGH (0)
+    // 0x00000040 [6]     : GPIO1_EDGE_LOW (0)
+    // 0x00000020 [5]     : GPIO1_LEVEL_HIGH (0)
+    // 0x00000010 [4]     : GPIO1_LEVEL_LOW (0)
+    // 0x00000008 [3]     : GPIO0_EDGE_HIGH (0)
+    // 0x00000004 [2]     : GPIO0_EDGE_LOW (0)
+    // 0x00000002 [1]     : GPIO0_LEVEL_HIGH (0)
+    // 0x00000001 [0]     : GPIO0_LEVEL_LOW (0)
     io_rw_32 intf[4];
 
     _REG_(IO_BANK0_PROC0_INTS0_OFFSET) // IO_BANK0_PROC0_INTS0
+    // (Description copied from array index 0 register IO_BANK0_PROC0_INTS0 applies similarly to other array indexes)
+    //
+    // Interrupt status after masking & forcing for proc0
+    // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
+    // 0x40000000 [30]    : GPIO7_EDGE_LOW (0)
+    // 0x20000000 [29]    : GPIO7_LEVEL_HIGH (0)
+    // 0x10000000 [28]    : GPIO7_LEVEL_LOW (0)
+    // 0x08000000 [27]    : GPIO6_EDGE_HIGH (0)
+    // 0x04000000 [26]    : GPIO6_EDGE_LOW (0)
+    // 0x02000000 [25]    : GPIO6_LEVEL_HIGH (0)
+    // 0x01000000 [24]    : GPIO6_LEVEL_LOW (0)
+    // 0x00800000 [23]    : GPIO5_EDGE_HIGH (0)
+    // 0x00400000 [22]    : GPIO5_EDGE_LOW (0)
+    // 0x00200000 [21]    : GPIO5_LEVEL_HIGH (0)
+    // 0x00100000 [20]    : GPIO5_LEVEL_LOW (0)
+    // 0x00080000 [19]    : GPIO4_EDGE_HIGH (0)
+    // 0x00040000 [18]    : GPIO4_EDGE_LOW (0)
+    // 0x00020000 [17]    : GPIO4_LEVEL_HIGH (0)
+    // 0x00010000 [16]    : GPIO4_LEVEL_LOW (0)
+    // 0x00008000 [15]    : GPIO3_EDGE_HIGH (0)
+    // 0x00004000 [14]    : GPIO3_EDGE_LOW (0)
+    // 0x00002000 [13]    : GPIO3_LEVEL_HIGH (0)
+    // 0x00001000 [12]    : GPIO3_LEVEL_LOW (0)
+    // 0x00000800 [11]    : GPIO2_EDGE_HIGH (0)
+    // 0x00000400 [10]    : GPIO2_EDGE_LOW (0)
+    // 0x00000200 [9]     : GPIO2_LEVEL_HIGH (0)
+    // 0x00000100 [8]     : GPIO2_LEVEL_LOW (0)
+    // 0x00000080 [7]     : GPIO1_EDGE_HIGH (0)
+    // 0x00000040 [6]     : GPIO1_EDGE_LOW (0)
+    // 0x00000020 [5]     : GPIO1_LEVEL_HIGH (0)
+    // 0x00000010 [4]     : GPIO1_LEVEL_LOW (0)
+    // 0x00000008 [3]     : GPIO0_EDGE_HIGH (0)
+    // 0x00000004 [2]     : GPIO0_EDGE_LOW (0)
+    // 0x00000002 [1]     : GPIO0_LEVEL_HIGH (0)
+    // 0x00000001 [0]     : GPIO0_LEVEL_LOW (0)
     io_ro_32 ints[4];
 } io_irq_ctrl_hw_t;
 
@@ -59,6 +164,41 @@ typedef struct {
     io_status_ctrl_hw_t io[NUM_BANK0_GPIOS]; // 30
 
     _REG_(IO_BANK0_INTR0_OFFSET) // IO_BANK0_INTR0
+    // (Description copied from array index 0 register IO_BANK0_INTR0 applies similarly to other array indexes)
+    //
+    // Raw Interrupts
+    // 0x80000000 [31]    : GPIO7_EDGE_HIGH (0)
+    // 0x40000000 [30]    : GPIO7_EDGE_LOW (0)
+    // 0x20000000 [29]    : GPIO7_LEVEL_HIGH (0)
+    // 0x10000000 [28]    : GPIO7_LEVEL_LOW (0)
+    // 0x08000000 [27]    : GPIO6_EDGE_HIGH (0)
+    // 0x04000000 [26]    : GPIO6_EDGE_LOW (0)
+    // 0x02000000 [25]    : GPIO6_LEVEL_HIGH (0)
+    // 0x01000000 [24]    : GPIO6_LEVEL_LOW (0)
+    // 0x00800000 [23]    : GPIO5_EDGE_HIGH (0)
+    // 0x00400000 [22]    : GPIO5_EDGE_LOW (0)
+    // 0x00200000 [21]    : GPIO5_LEVEL_HIGH (0)
+    // 0x00100000 [20]    : GPIO5_LEVEL_LOW (0)
+    // 0x00080000 [19]    : GPIO4_EDGE_HIGH (0)
+    // 0x00040000 [18]    : GPIO4_EDGE_LOW (0)
+    // 0x00020000 [17]    : GPIO4_LEVEL_HIGH (0)
+    // 0x00010000 [16]    : GPIO4_LEVEL_LOW (0)
+    // 0x00008000 [15]    : GPIO3_EDGE_HIGH (0)
+    // 0x00004000 [14]    : GPIO3_EDGE_LOW (0)
+    // 0x00002000 [13]    : GPIO3_LEVEL_HIGH (0)
+    // 0x00001000 [12]    : GPIO3_LEVEL_LOW (0)
+    // 0x00000800 [11]    : GPIO2_EDGE_HIGH (0)
+    // 0x00000400 [10]    : GPIO2_EDGE_LOW (0)
+    // 0x00000200 [9]     : GPIO2_LEVEL_HIGH (0)
+    // 0x00000100 [8]     : GPIO2_LEVEL_LOW (0)
+    // 0x00000080 [7]     : GPIO1_EDGE_HIGH (0)
+    // 0x00000040 [6]     : GPIO1_EDGE_LOW (0)
+    // 0x00000020 [5]     : GPIO1_LEVEL_HIGH (0)
+    // 0x00000010 [4]     : GPIO1_LEVEL_LOW (0)
+    // 0x00000008 [3]     : GPIO0_EDGE_HIGH (0)
+    // 0x00000004 [2]     : GPIO0_EDGE_LOW (0)
+    // 0x00000002 [1]     : GPIO0_LEVEL_HIGH (0)
+    // 0x00000001 [0]     : GPIO0_LEVEL_LOW (0)
     io_rw_32 intr[4];
 
     io_irq_ctrl_hw_t proc0_irq_ctrl;
