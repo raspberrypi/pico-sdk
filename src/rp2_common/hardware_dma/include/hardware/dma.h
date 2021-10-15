@@ -774,7 +774,7 @@ static inline void dma_timer_set_fraction(uint timer, uint16_t numerator, uint16
 /*! \brief Return the DREQ number for a given DMA timer
  *  \ingroup hardware_dma
  *
- * \param timer DMA timer number 0-3
+ * \param timer_num DMA timer number 0-3
  */
 static inline uint dma_get_timer_dreq(uint timer_num) {
     static_assert(DREQ_DMA_TIMER1 == DREQ_DMA_TIMER0 + 1, "");
