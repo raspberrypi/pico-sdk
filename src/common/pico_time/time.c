@@ -236,9 +236,9 @@ alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, ala
         if (missed && fire_if_past) {
             // ... so if fire_if_past == true we call the callback
             int64_t repeat = callback(public_id, user_data);
-            // if not repeated we have no id to return so set public_id to 0, otherwise
+            // if not repeated we have no id to return so set public_id to 0,
             // otherwise we need to repeat, but will assign a new id next time
-            // todo arguably this is does mean that the id passed to the first callback may differ from subsequent calls
+            // todo arguably this does mean that the id passed to the first callback may differ from subsequent calls
             if (!repeat) {
                 public_id = 0;
                 break;
@@ -314,7 +314,7 @@ bool alarm_pool_add_repeating_timer_us(alarm_pool_t *pool, int64_t delay_us, rep
     out->user_data = user_data;
     out->alarm_id = alarm_pool_add_alarm_at(pool, make_timeout_time_us((uint64_t)(delay_us >= 0 ? delay_us : -delay_us)),
                                             repeating_timer_callback, out, true);
-    // note that is out->alarm_id is 0, then the callback was called during the above call (fire_if_past == true)
+    // note that if out->alarm_id is 0, then the callback was called during the above call (fire_if_past == true)
     // and then the callback removed itself.
     return out->alarm_id >= 0;
 }

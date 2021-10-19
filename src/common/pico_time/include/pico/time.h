@@ -416,7 +416,8 @@ void alarm_pool_destroy(alarm_pool_t *pool);
  * @param time the timestamp when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
- * @param fire_if_past if true, this method will call the callback itself before returning if the timestamp happens before or during this method call
+ * @param fire_if_past if true, and the timestamp falls before or during this call before the alarm can be set, 
+ *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id for an active (at the time of return) alarm
  * @return 0 if the alarm timestamp happened before or during the call AND there is no active alarm to return the id of.
  *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
@@ -440,7 +441,8 @@ alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, ala
  * @param us the delay (from now) in microseconds when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
- * @param fire_if_past if true, this method will call the callback itself before returning 0 if the timestamp happens before or during this method call
+ * @param fire_if_past if true, and the timeout falls during this call before the alarm can be set, 
+ *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id
  * @return 0 if the alarm timestamp happened before or during the call AND there is no active alarm to return the id of.
  *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
@@ -466,8 +468,9 @@ static inline alarm_id_t alarm_pool_add_alarm_in_us(alarm_pool_t *pool, uint64_t
  * @param ms the delay (from now) in milliseconds when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
- * @param fire_if_past if true, this method will call the callback itself before returning 0 if the timestamp happens before or during this method call
- * @return >0 the alarm id
+ * @param fire_if_past if true, and the timestamp falls before or during this call before the alarm can be set, 
+ *                     then the callback should be called during (by) this function instead 
+* @return >0 the alarm id
  * @return 0 if the alarm timestamp happened before or during the call AND there is no active alarm to return the id of.
  *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
  *           or if the callback <i>was</i> called during this method but the callback cancelled itself by returning 0
@@ -502,7 +505,8 @@ bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id);
  * @param time the timestamp when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
- * @param fire_if_past if true, this method will call the callback itself before returning 0 if the timestamp happens before or during this method call
+ * @param fire_if_past if true, and the timestamp falls before or during this call before the alarm can be set, 
+ *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id
  * @return 0 if the alarm timestamp happened before or during the call AND there is no active alarm to return the id of.
  *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
@@ -527,7 +531,8 @@ static inline alarm_id_t add_alarm_at(absolute_time_t time, alarm_callback_t cal
  * @param us the delay (from now) in microseconds when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
- * @param fire_if_past if true, this method will call the callback itself before returning 0 if the timestamp happens before or during this method call
+ * @param fire_if_past if true, and the timeout falls during this call before the alarm can be set, 
+ *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id
  * @return 0 if the alarm timestamp happened before or during the call AND there is no active alarm to return the id of.
  *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
@@ -552,7 +557,8 @@ static inline alarm_id_t add_alarm_in_us(uint64_t us, alarm_callback_t callback,
  * @param ms the delay (from now) in milliseconds when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
- * @param fire_if_past if true, this method will call the callback itself before returning 0 if the timestamp happens before or during this method call
+ * @param fire_if_past if true, and the timeout falls during this call before the alarm can be set, 
+ *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id
  * @return 0 if the alarm timestamp happened before or during the call AND there is no active alarm to return the id of.
  *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
