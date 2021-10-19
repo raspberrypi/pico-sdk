@@ -37,6 +37,8 @@ extern "C" {
  *  \ingroup pico_multicore
  *
  * This function can be used to reset core 1 into its initial state (ready for launching code against via \ref multicore_launch_core1 and similar methods)
+ *
+ * \note this function should only be called from core 0
  */
 void multicore_reset_core1(void);
 
@@ -73,15 +75,16 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
 /*! \brief  Launch code on core 1 with no stack protection
  *  \ingroup pico_multicore
  *
- * Wake up (a previously reset) core 1 and enter the given function using the passed sp as the initial stack pointer.
+ * Wake up (a previously reset) core 1 and start it executing with a specific entry point, stack pointer
+ * and vector table.
+ *
+ * This is a low level function that does not provide a stack guard even if USE_STACK_GUARDS is defined
  *
  * core 1 must previously have been reset either as a result of a system reset or by calling \ref multicore_reset_core1
  *
- * This is a bare bones functions that does not provide a stack guard even if USE_STACK_GUARDS is defined
- *
  * \param entry Function entry point
  * \param sp Pointer to the top of the core 1 stack
- * \param vector_Table address of the vector table to use for core 1
+ * \param vector_table address of the vector table to use for core 1
  * \see multicore_reset_core1
  */
 void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vector_table);
@@ -96,13 +99,13 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
  * by core 1, and read by core 0.
  *
  * \note The inter-core FIFOs are a very precious resource and are frequently used for SDK functionality (e.g. during
- * core 1 launch or by the \ref multicore_lockout functions). Additionally they are often required for the exclusive used by
- * an RTOS (e.g. FreeRTOS SMP). For these reasons it is suggested that you do not use the FIFO for your own purposes
+ * core 1 launch or by the \ref multicore_lockout functions). Additionally they are often required for the exclusive use
+ * of an RTOS (e.g. FreeRTOS SMP). For these reasons it is suggested that you do not use the FIFO for your own purposes
  * unless none of the above concerns apply; the majority of cases for transferring data between cores can be eqaully
  * well handled  by using a \ref queue
  */
 
-/*! \brief Check the read FIFO to see if there is data waiting sent by the other core
+/*! \brief Check the read FIFO to see if there is data available (sent by the other core)
  *  \ingroup multicore_fifo
  *
  * See the note in the \ref multicore_fifo section for considerations regarding use of the inter-core FIFOs
@@ -145,7 +148,7 @@ void multicore_fifo_push_blocking(uint32_t data);
  *
  * \param data A 32 bit value to push on to the FIFO
  * \param timeout_us the timeout in microseconds
- * \return true if the data wash pushed, false if the timeout occurred before data could be pushed
+ * \return true if the data was pushed, false if the timeout occurred before data could be pushed
  */
 bool multicore_fifo_push_timeout_us(uint32_t data, uint64_t timeout_us);
 
@@ -158,24 +161,24 @@ bool multicore_fifo_push_timeout_us(uint32_t data, uint64_t timeout_us);
  *
  * See the note in the \ref multicore_fifo section for considerations regarding use of the inter-core FIFOs
  *
- * \return 32 bit unsigned data from the read FIFO.
+ * \return 32 bit data from the read FIFO.
  */
 uint32_t multicore_fifo_pop_blocking(void);
 
 /*! \brief Pop data from the read FIFO (data to the other core) with timeout.
  *  \ingroup multicore_fifo
  *
- * This function will block until there is data ready to be read or there timeout is reached
+ * This function will block until there is data ready to be read or the timeout is reached
  *
  * See the note in the \ref multicore_fifo section for considerations regarding use of the inter-core FIFOs
  *
  * \param timeout_us the timeout in microseconds
  * \param out the location to store the popped data if available
- * \return true if the data wash popped and a value copied into `out`, false if the timeout occurred before data could be pushed
+ * \return true if the data was popped and a value copied into `out`, false if the timeout occurred before data could be pushed
  */
 bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out);
 
-/*! \brief Discard any data in the incoming FIFO
+/*! \brief Discard any data in the read FIFO
  *  \ingroup multicore_fifo
  *
  * See the note in the \ref multicore_fifo section for considerations regarding use of the inter-core FIFOs
@@ -193,6 +196,7 @@ static inline void multicore_fifo_drain(void) {
  *
  * See the note in the \ref multicore_fifo section for considerations regarding use of the inter-core FIFOs
  *
+ * \see multicore_fifo_get_status
 */
 static inline void multicore_fifo_clear_irq(void) {
     // Write any value to clear the error flags
@@ -206,8 +210,8 @@ static inline void multicore_fifo_clear_irq(void) {
  *
  * Bit | Description
  * ----|------------
- * 3 | Sticky flag indicating the RX FIFO was read when empty. This read was ignored by the FIFO.
- * 2 | Sticky flag indicating the TX FIFO was written when full. This write was ignored by the FIFO.
+ * 3 | Sticky flag indicating the RX FIFO was read when empty (ROE). This read was ignored by the FIFO.
+ * 2 | Sticky flag indicating the TX FIFO was written when full (WOF). This write was ignored by the FIFO.
  * 1 | Value is 1 if this core’s TX FIFO is not full (i.e. if FIFO_WR is ready for more data)
  * 0 | Value is 1 if this core’s RX FIFO is not empty (i.e. if FIFO_RD is valid)
  *
@@ -224,18 +228,18 @@ static inline uint32_t multicore_fifo_get_status(void) {
  * \brief Functions to enable one core to force the other core to pause execution in a known state.
  *
  * Sometimes it is useful to enter a critical section on both cores at once. On a single
- * core system, this can easily be done by simply disabling interrupts, however on a multi-core
- * system that is not sufficient, and unless the other core is polling, then it will need to be interrupted
+ * core system a critical section can trivially be entered by disabling interrupts, however on a multi-core
+ * system that is not sufficient, and unless the other core is polling in some way, then it will need to be interrupted
  * in order to cooperatively enter a blocked state.
  *
  * These "lockout" functions use the inter process FIFOs to cause an interrupt on one core from the other, and manage
  * waiting for the other core to enter the "locked out" state.
  *
- * The usage is that the "victim" core ... i.e the core that cna be "locked out" by the other core calls
- * /ref multicore_lockout_victim_init to hook the FIFO interrupt. Note that either or both cores may do this.
+ * The usage is that the "victim" core ... i.e the core that can be "locked out" by the other core calls
+ * \ref multicore_lockout_victim_init to hook the FIFO interrupt. Note that either or both cores may do this.
  *
- * \note When "locked out" the victim core is executing code from RAM and has interrupts disabled. This allows
- * the lockout functions to be used by code that wants to write to flash (at which point no code must be executing
+ * \note When "locked out" the victim core is paused (it is actually executing a tight loop with code in RAM) and has interrupts disabled.
+ * This makes the lockout functions suitable for use by code that wants to write to flash (at which point no code may be executing
  * from flash)
  *
  * The core which wishes to lockout the other core calls \ref multicore_lockout_start_blocking or
@@ -246,24 +250,30 @@ static inline uint32_t multicore_fifo_get_status(void) {
  * \note Because multicore lockout uses the intercore FIFOs, the FIFOs <b>cannot</b> be used for any other purpose
  */
 
-/*! \brief Initialize the current core such that it can be a "victim" of lockout (i.e. force to pause in a known state by the other core)
+/*! \brief Initialize the current core such that it can be a "victim" of lockout (i.e. forced to pause in a known state by the other core)
  *  \ingroup multicore_lockout
  *
  * This code hooks the multicore FIFO IRQ, and the FIFO may not be used for any other purpose after this.
  */
 void multicore_lockout_victim_init(void);
 
-/*! \brief Request the other core to paused in a known state and wait for it to do so
+/*! \brief Request the other core to pause in a known state and wait for it to do so
  *  \ingroup multicore_lockout
  *
  * The other (victim) core must have previously executed \ref multicore_lockout_victim_init()
+ *
+ * \note multicore_lockout_start_ functions are not nestable, and must be paired with a call to a corresponding
+ * \ref multicore_lockout_end_blocking
  */
 void multicore_lockout_start_blocking(void);
 
-/*! \brief Request the other core to paused in a known state and wait up to a time limit for it to do so
+/*! \brief Request the other core to pause in a known state and wait up to a time limit for it to do so
  *  \ingroup multicore_lockout
  *
  * The other core must have previously executed \ref multicore_lockout_victim_init()
+ *
+ * \note multicore_lockout_start_ functions are not nestable, and must be paired with a call to a corresponding
+ * \ref multicore_lockout_end_blocking
  *
  * \param timeout_us the timeout in microseconds
  * \return true if the other core entered the locked out state within the timeout, false otherwise
@@ -284,7 +294,7 @@ void multicore_lockout_end_blocking(void);
  * The other core must previously have been "locked out" by calling a `multicore_lockout_start_` function
  * from this core
  *
- * \note be very careful using small timeout values, as a timout here will leave these "lockout" functionality
+ * \note be very careful using small timeout values, as a timeout here will leave the "lockout" functionality
  * in a bad state. It is probably preferable to use \ref multicore_lockout_end_blocking anyway as if you have
  * already waited for the victim core to enter the lockout state, then the victim core will be ready to exit
  * the lockout state very quickly.
