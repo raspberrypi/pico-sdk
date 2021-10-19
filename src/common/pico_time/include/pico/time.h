@@ -416,9 +416,11 @@ void alarm_pool_destroy(alarm_pool_t *pool);
  * @param time the timestamp when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
- * @param fire_if_past if true, this method will call the callback itself before returning 0 if the timestamp happens before or during this method call
- * @return >0 the alarm id
- * @return 0 the target timestamp was during or before this method call (whether the callback was called depends on fire_if_past)
+ * @param fire_if_past if true, this method will call the callback itself before returning if the timestamp happens before or during this method call
+ * @return >0 the alarm id for an active (at the time of return) alarm
+ * @return 0 if the alarm timestamp happened before or during the call AND there is no active alarm to return the id of.
+ *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
+ *           or if the callback <i>was</i> called during this method but the callback cancelled itself by returning 0
  * @return -1 if there were no alarm slots available
  */
 alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, alarm_callback_t callback, void *user_data, bool fire_if_past);
