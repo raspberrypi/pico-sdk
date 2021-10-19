@@ -236,7 +236,7 @@ alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, ala
         if (missed && fire_if_past) {
             // ... so if fire_if_past == true we call the callback
             int64_t repeat = callback(public_id, user_data);
-            // if not repeated we have no id to return so set public_id ot 0, otherwise
+            // if not repeated we have no id to return so set public_id to 0, otherwise
             // otherwise we need to repeat, but will assign a new id next time
             // todo arguably this is does mean that the id passed to the first callback may differ from subsequent calls
             if (!repeat) {
