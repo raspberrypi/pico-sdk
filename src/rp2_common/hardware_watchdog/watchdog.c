@@ -65,10 +65,12 @@ void _watchdog_enable(uint32_t delay_ms, bool pause_on_debug) {
 }
 // end::watchdog_enable[]
 
+#define WATCHDOG_NON_REBOOT_MAGIC 0x6ab73121
+
 void watchdog_enable(uint32_t delay_ms, bool pause_on_debug) {
-    // This watchdog enable doesn't reboot so clear scratch register
-    // with magic word to jump into code
-    watchdog_hw->scratch[4] = 0;
+    // update scratch[4] to distinguish from magic used for reboot to specific address, or 0 used to reboot
+    // into regular flash path
+    watchdog_hw->scratch[4] = WATCHDOG_NON_REBOOT_MAGIC;
     _watchdog_enable(delay_ms, pause_on_debug);
 }
 
@@ -97,4 +99,8 @@ void watchdog_reboot(uint32_t pc, uint32_t sp, uint32_t delay_ms) {
 bool watchdog_caused_reboot(void) {
     // If any reason bits are set this is true
     return watchdog_hw->reason;
+}
+
+bool watchdog_enable_caused_reboot(void) {
+    return watchdog_hw->reason && watchdog_hw->scratch[4] == WATCHDOG_NON_REBOOT_MAGIC;
 }
