@@ -12,7 +12,59 @@
 /** \file bootrom.h
  * \defgroup pico_bootrom pico_bootrom
  * Access to functions and data in the RP2040 bootrom
+ *
+ * This header may be included by assembler code
  */
+
+// ROM FUNCTIONS
+
+#define ROM_FUNC_POPCOUNT32             ROM_TABLE_CODE('P', '3')
+#define ROM_FUNC_REVERSE32              ROM_TABLE_CODE('R', '3')
+#define ROM_FUNC_CLZ32                  ROM_TABLE_CODE('L', '3')
+#define ROM_FUNC_CTZ32                  ROM_TABLE_CODE('T', '3')
+#define ROM_FUNC_MEMSET                 ROM_TABLE_CODE('M', 'S')
+#define ROM_FUNC_MEMSET4                ROM_TABLE_CODE('S', '4')
+#define ROM_FUNC_MEMCPY                 ROM_TABLE_CODE('M', 'C')
+#define ROM_FUNC_MEMCPY44               ROM_TABLE_CODE('C', '4')
+#define ROM_FUNC_RESET_USB_BOOT         ROM_TABLE_CODE('U', 'B')
+#define ROM_FUNC_CONNECT_INTERNAL_FLASH ROM_TABLE_CODE('I', 'F')
+#define ROM_FUNC_FLASH_EXIT_XIP         ROM_TABLE_CODE('E', 'X')
+#define ROM_FUNC_FLASH_RANGE_ERASE      ROM_TABLE_CODE('R', 'E')
+#define ROM_FUNC_FLASH_RANGE_PROGRAM    ROM_TABLE_CODE('R', 'P')
+#define ROM_FUNC_FLASH_FLUSH_CACHE      ROM_TABLE_CODE('F', 'C')
+#define ROM_FUNC_FLASH_ENTER_CMD_XIP    ROM_TABLE_CODE('C', 'X')
+
+/*! \brief Return a bootrom lookup code based on two ASCII characters
+ * \ingroup pico_bootrom
+ *
+ * These codes are uses to lookup data or function addresses in the bootrom
+ *
+ * \param c1 the first character
+ * \param c2 the second character
+ * \return the 'code' to use in rom_func_lookup() or rom_data_lookup()
+ */
+#define ROM_TABLE_CODE(c1, c2) ((c1) | ((c2) << 8))
+
+#ifndef __ASSEMBLER__
+
+// ROM FUNCTION SIGNATURES
+
+typedef uint32_t (*rom_popcount32_fn)(uint32_t);
+typedef uint32_t (*rom_reverse32_fn)(uint32_t);
+typedef uint32_t (*rom_clz32_fn)(uint32_t);
+typedef uint32_t (*rom_ctz32_fn)(uint32_t);
+typedef uint8_t *(*rom_memset_fn)(uint8_t *, uint8_t, uint32_t);
+typedef uint32_t *(*rom_memset4_fn)(uint32_t *, uint8_t, uint32_t);
+typedef uint32_t *(*rom_memcpy_fn)(uint8_t *, const uint8_t *, uint32_t);
+typedef uint32_t *(*rom_memcpy44_fn)(uint32_t *, const uint32_t *, uint32_t);
+typedef void __attribute__((noreturn)) (*rom_reset_usb_boot_fn)(uint32_t, uint32_t);
+typedef rom_reset_usb_boot_fn reset_usb_boot_fn; // kept for backwards compatibility
+typedef void (*rom_connect_internal_flash_fn)(void);
+typedef void (*rom_flash_exit_xip_fn)(void);
+typedef void (*rom_flash_range_erase_fn)(uint32_t, size_t, uint32_t, uint8_t);
+typedef void (*rom_flash_range_program_fn)(uint32_t, const uint8_t*, size_t);
+typedef void (*rom_flash_flush_cache_fn)(void);
+typedef void (*rom_flash_enter_cmd_xip_fn)(void);
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,9 +80,8 @@ extern "C" {
  * \return the 'code' to use in rom_func_lookup() or rom_data_lookup()
  */
 static inline uint32_t rom_table_code(uint8_t c1, uint8_t c2) {
-    return (((uint)c2) << 8u) | (uint)c1;
+    return ROM_TABLE_CODE((uint32_t) c1, (uint32_t) c2);
 }
-
 
 /*!
  * \brief Lookup a bootrom function by code
@@ -60,54 +111,6 @@ void *rom_data_lookup(uint32_t code);
  * \return true if all the codes were found, and converted to function pointers, false otherwise
  */
 bool rom_funcs_lookup(uint32_t *table, unsigned int count);
-
-// The following is a list of bootrom functions available via rom_func_lookup and their signature
-
-typedef uint32_t (*rom_popcount32_fn)(uint32_t);
-#define ROM_FUNC_POPCOUNT32             rom_table_code('P', '3')
-
-typedef uint32_t (*rom_reverse32_fn)(uint32_t);
-#define ROM_FUNC_REVERSE32              rom_table_code('R', '3')
-
-typedef uint32_t (*rom_clz32_fn)(uint32_t);
-#define ROM_FUNC_CLZ32                  rom_table_code('L', '3')
-
-typedef uint32_t (*rom_ctz32_fn)(uint32_t);
-#define ROM_FUNC_CTZ32                  rom_table_code('T', '3')
-
-typedef uint8_t *(*rom_memset_fn)(uint8_t *, uint8_t, uint32_t);
-#define ROM_FUNC_MEMSET                 rom_table_code('M', 'S')
-
-typedef uint32_t *(*rom_memset4_fn)(uint32_t *, uint8_t, uint32_t);
-#define ROM_FUNC_MEMSET4                rom_table_code('S', '4')
-
-typedef uint32_t *(*rom_memcpy_fn)(uint8_t *, const uint8_t *, uint32_t);
-#define ROM_FUNC_MEMCPY                 rom_table_code('M', 'C')
-
-typedef uint32_t *(*rom_memcpy44_fn)(uint32_t *, const uint32_t *, uint32_t);
-#define ROM_FUNC_MEMCPY44               rom_table_code('C', '4')
-
-typedef void __attribute__((noreturn)) (*rom_reset_usb_boot_fn)(uint32_t, uint32_t);
-typedef rom_reset_usb_boot_fn reset_usb_boot_fn; // kept for backwards compatibility
-#define ROM_FUNC_RESET_USB_BOOT         rom_table_code('U', 'B')
-
-typedef void (*rom_connect_internal_flash_fn)(void);
-#define ROM_FUNC_CONNECT_INTERNAL_FLASH rom_table_code('I', 'F')
-
-typedef void (*rom_flash_exit_xip_fn)(void);
-#define ROM_FUNC_FLASH_EXIT_XIP         rom_table_code('E', 'X')
-
-typedef void (*rom_flash_range_erase_fn)(uint32_t, size_t, uint32_t, uint8_t);
-#define ROM_FUNC_FLASH_RANGE_ERASE      rom_table_code('R', 'E')
-
-typedef void (*rom_flash_range_program_fn)(uint32_t, const uint8_t*, size_t);
-#define ROM_FUNC_FLASH_RANGE_PROGRAM    rom_table_code('R', 'P')
-
-typedef void (*rom_flash_flush_cache_fn)(void);
-#define ROM_FUNC_FLASH_FLUSH_CACHE      rom_table_code('F', 'C')
-
-typedef void (*rom_flash_enter_cmd_xip_fn)(void);
-#define ROM_FUNC_FLASH_ENTER_CMD_XIP    rom_table_code('C', 'X')
 
 // Bootrom function: rom_table_lookup
 // Returns the 32 bit pointer into the ROM if found or NULL otherwise.
@@ -155,4 +158,5 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
 }
 #endif
 
+#endif // !__ASSEMBLER__
 #endif

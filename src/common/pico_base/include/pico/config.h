@@ -8,7 +8,7 @@
 #define PICO_CONFIG_H_
 
 // -----------------------------------------------------
-// NOTE: THIS HEADER IS ALSO INCLUDED BY ASSEMBLER SO
+// NOTE: THIS HEADER IS ALSO INCLUDED BY ASSEMBLY CODE SO
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 //       OR USE #ifndef __ASSEMBLER__ guards
 // -------------
