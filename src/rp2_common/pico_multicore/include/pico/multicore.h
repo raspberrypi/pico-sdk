@@ -165,7 +165,7 @@ bool multicore_fifo_push_timeout_us(uint32_t data, uint64_t timeout_us);
  */
 uint32_t multicore_fifo_pop_blocking(void);
 
-/*! \brief Pop data from the read FIFO (data to the other core) with timeout.
+/*! \brief Pop data from the read FIFO (data from the other core) with timeout.
  *  \ingroup multicore_fifo
  *
  * This function will block until there is data ready to be read or the timeout is reached
@@ -174,7 +174,7 @@ uint32_t multicore_fifo_pop_blocking(void);
  *
  * \param timeout_us the timeout in microseconds
  * \param out the location to store the popped data if available
- * \return true if the data was popped and a value copied into `out`, false if the timeout occurred before data could be pushed
+ * \return true if the data was popped and a value copied into `out`, false if the timeout occurred before data could be popped
  */
 bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out);
 
@@ -232,7 +232,7 @@ static inline uint32_t multicore_fifo_get_status(void) {
  * system that is not sufficient, and unless the other core is polling in some way, then it will need to be interrupted
  * in order to cooperatively enter a blocked state.
  *
- * These "lockout" functions use the inter process FIFOs to cause an interrupt on one core from the other, and manage
+ * These "lockout" functions use the inter core FIFOs to cause an interrupt on one core from the other, and manage
  * waiting for the other core to enter the "locked out" state.
  *
  * The usage is that the "victim" core ... i.e the core that can be "locked out" by the other core calls
@@ -253,7 +253,7 @@ static inline uint32_t multicore_fifo_get_status(void) {
 /*! \brief Initialize the current core such that it can be a "victim" of lockout (i.e. forced to pause in a known state by the other core)
  *  \ingroup multicore_lockout
  *
- * This code hooks the multicore FIFO IRQ, and the FIFO may not be used for any other purpose after this.
+ * This code hooks the intercore FIFO IRQ, and the FIFO may not be used for any other purpose after this.
  */
 void multicore_lockout_victim_init(void);
 
