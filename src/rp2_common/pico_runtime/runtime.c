@@ -119,15 +119,27 @@ void runtime_init(void) {
             hw_clear_alias(padsbank0_hw)->io[28] = hw_clear_alias(padsbank0_hw)->io[29] = PADS_BANK0_GPIO0_IE_BITS;
 #endif
 
-    extern mutex_t __mutex_array_start;
-    extern mutex_t __mutex_array_end;
+    // this is an array of either mutex_t or recursive_mutex_t (i.e. not necessarily the same size)
+    // however each starts with a lock_core_t, and the spin_lock is initialized to address 1 for a recursive
+    // spinlock and 0 for a regular one.
 
-    // the first function pointer, not the address of it.
-    for (mutex_t *m = &__mutex_array_start; m < &__mutex_array_end; m++) {
-        if (m->recursion_state) {
-            recursive_mutex_init(m);
+    static_assert(!(sizeof(mutex_t)&3), "");
+    static_assert(!(sizeof(recursive_mutex_t)&3), "");
+    static_assert(!offsetof(mutex_t, core), "");
+    static_assert(!offsetof(recursive_mutex_t, core), "");
+    extern lock_core_t __mutex_array_start;
+    extern lock_core_t __mutex_array_end;
+
+    for (lock_core_t *l = &__mutex_array_start; l < &__mutex_array_end; ) {
+        if (l->spin_lock) {
+            assert(1 == (uintptr_t)l->spin_lock); // indicator for a recursive mutex
+            recursive_mutex_t *rm = (recursive_mutex_t *)l;
+            recursive_mutex_init(rm);
+            l = &rm[1].core; // next
         } else {
+            mutex_t *m = (mutex_t *)l;
             mutex_init(m);
+            l = &m[1].core; // next
         }
     }
 
