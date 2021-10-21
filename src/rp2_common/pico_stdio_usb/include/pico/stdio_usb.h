@@ -54,12 +54,12 @@
 #define PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE 1200
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) before returning, default=0, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) during initialization, default=0, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
 #define PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS 0
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS, Number of milliseconds to wait during initialization after a host CDC connection is detected before returning (some host terminals seem to sometimes lose transmissions sent right after connection), default=50, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS, Number of extra milliseconds to wait when using PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS after a host CDC connection is detected (some host terminals seem to sometimes lose transmissions sent right after connection), default=50, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS
 #define PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS 50
 #endif
