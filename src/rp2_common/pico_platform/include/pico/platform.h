@@ -290,7 +290,7 @@ __force_inline static void __compiler_memory_barrier(void) {
  */
 void __attribute__((noreturn)) panic_unsupported(void);
 
-/*! \brief Displays a panic message halting execution.
+/*! \brief Displays a panic message and halts execution
  *  \ingroup pico_platform
  *
  * An attempt is made to output the message to all registered STDOUT drivers
