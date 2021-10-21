@@ -80,7 +80,7 @@ extern "C" {
  * The section attribute is `.after_data.<group>`
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
- *              garbage collected independently
+ *              garbage-collected independently
  */
 #define __after_data(group) __attribute__((section(".after_data." group)))
 
@@ -94,7 +94,7 @@ extern "C" {
  * The section attribute is `.time_critical.<group>`
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
- *              garbage collected independently
+ *              garbage-collected independently
  */
 #define __not_in_flash(group) __attribute__((section(".time_critical." group)))
 
@@ -111,7 +111,7 @@ extern "C" {
  * The section attribute is `.scratch_x.<group>`
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
- *              garbage collected independently
+ *              garbage-collected independently
  */
 #define __scratch_x(group) __attribute__((section(".scratch_x." group)))
 
@@ -128,7 +128,7 @@ extern "C" {
  * The section attribute is `.scratch_y.<group>`
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
- *              garbage collected independently
+ *              garbage-collected independently
  */
 #define __scratch_y(group) __attribute__((section(".scratch_y." group)))
 
