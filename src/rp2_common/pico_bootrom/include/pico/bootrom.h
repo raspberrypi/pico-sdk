@@ -13,7 +13,7 @@
  * \defgroup pico_bootrom pico_bootrom
  * Access to functions and data in the RP2040 bootrom
  *
- * This header may be included by assembler code
+ * This header may be included by assembly code
  */
 
 // ROM FUNCTIONS

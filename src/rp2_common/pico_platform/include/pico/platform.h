@@ -10,10 +10,10 @@
 /** \file platform.h
  *  \defgroup pico_platform pico_platform
  *
- * Macros and definitions (and when included by C/C++ code functions) for the RP2 family device / architecture
+ * Macros and definitions (and functions when included by non assembly code) for the RP2 family device / architecture
  * to provide a common abstraction over low level compiler / platform specifics.
  *
- * This header may be included by assembler code
+ * This header may be included by assembly code
  */
 
 #include "hardware/platform_defs.h"
@@ -51,7 +51,7 @@
 #define PICO_RP2040_B2_SUPPORTED 1
 #endif
 
-// --- remainder of file is not included by assembly ---
+// --- remainder of file is not included by assembly code ---
 
 #ifndef __ASSEMBLER__
 
@@ -138,14 +138,14 @@ extern "C" {
  * Data marked this way will retain its value across a reset (normally uninitialized data - in the .bss
  * section) is initialized to zero during runtime initialization
  *
- * For example a `uint32_t` foo will retain its value if the program is restarted
+ * For example a `uint32_t` foo that will retain its value if the program is restarted by reset.
  *
  *     uint32_t __uninitialized_ram("my_group_name") foo;
  *
  * The section attribute is `.uninitialized_ram.<group>`
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
- *              garbage collected independently
+ *              garbage-collected independently
  */
 #define __uninitialized_ram(group) __attribute__((section(".uninitialized_ram." #group))) group
 
@@ -159,7 +159,7 @@ extern "C" {
  * The section attribute is `.flashdata.<group>`
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
- *              garbage collected independently
+ *              garbage-collected independently
  */
 #define __in_flash(group) __attribute__((section(".flashdata" group)))
 
