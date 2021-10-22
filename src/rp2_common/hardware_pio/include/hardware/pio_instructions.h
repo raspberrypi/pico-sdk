@@ -13,9 +13,9 @@
  *  \defgroup pio_instructions pio_instructions
  *  \ingroup hardware_pio
  * 
- * Functions for generating PIO instruction encodings programmatically. In debug mode
- * `PARAM_ASSERTIONS_ENABLED_PIO_INSTRUCTIONS` can be set to 1 to enable validation of encoding function
- * parameters in debug builds.
+ * Functions for generating PIO instruction encodings programmatically. In debug builds
+ *`PARAM_ASSERTIONS_ENABLED_PIO_INSTRUCTIONS` can be set to 1 to enable validation of encoding function
+ * parameters.
  *
  * For fuller descriptions of the instructions in question see the "RP2040 Datasheet"
  */
@@ -58,7 +58,7 @@ enum pio_instr_bits {
 /*! \brief Enumeration of values to pass for source/destination args for instruction encoding functions
  *  \ingroup pio_instructions
  *
- * \note Not all value are suitable for all functions. Validity is only checked in debug mode when
+ * \note Not all values are suitable for all functions. Validity is only checked in debug mode when
  * `PARAM_ASSERTIONS_ENABLED_PIO_INSTRUCTIONS` is 1
  */
 enum pio_src_dest {
@@ -101,8 +101,8 @@ static inline uint _pio_encode_instr_and_src_dest(enum pio_instr_bits instr_bits
  *
  * \note This function does not return a valid instruction encoding; instead it returns an encoding of the delay
  * slot suitable for `OR`ing with the result of an encoding function for an actual instruction. Care should be taken when
- * combining the results of this function with the results of \ref pico_encode_sideset and \ref pico_encode_sideset_opt
- * as they share the same bits within the instruction encoding)
+ * combining the results of this function with the results of \ref pio_encode_sideset and \ref pio_encode_sideset_opt
+ * as they share the same bits within the instruction encoding.
  *
  * \param cycles the number of cycles 0-31 (or less if side set is being used)
  * \return the delay slot bits to be ORed with an instruction encoding
@@ -117,9 +117,9 @@ static inline uint pio_encode_delay(uint cycles) {
  *  \ingroup pio_instructions
  *
  * \note This function does not return a valid instruction encoding; instead it returns an encoding of the side set bits
- * slot suitable for `OR`ing with the result of an encoding function for an actual instruction. Care should be taken when
- * combining the results of this function with the results of \ref pico_encode_delay as they share the same bits
- * within the instruction encoding)
+ * suitable for `OR`ing with the result of an encoding function for an actual instruction. Care should be taken when
+ * combining the results of this function with the results of \ref pio_encode_delay as they share the same bits
+ * within the instruction encoding.
  *
  * \param sideset_bit_count number of side set bits as would be specified via `.sideset` in pioasm
  * \param value the value to sideset on the pins
@@ -135,9 +135,9 @@ static inline uint pio_encode_sideset(uint sideset_bit_count, uint value) {
  *  \ingroup pio_instructions
  *
  * \note This function does not return a valid instruction encoding; instead it returns an encoding of the side set bits
- * slot suitable for `OR`ing with the result of an encoding function for an actual instruction. Care should be taken when
- * combining the results of this function with the results of \ref pico_encode_delay as they share the same bits
- * within the instruction encoding)
+ * suitable for `OR`ing with the result of an encoding function for an actual instruction. Care should be taken when
+ * combining the results of this function with the results of \ref pio_encode_delay as they share the same bits
+ * within the instruction encoding.
  *
  * \param sideset_bit_count number of side set bits as would be specified via `.sideset <n> opt` in pioasm
  * \param value the value to sideset on the pins
@@ -229,7 +229,7 @@ static inline uint pio_encode_in(enum pio_src_dest src, uint count) {
  *
  * This is the equivalent of `OUT <src>, <count>`
  *
- * \param src The source to take data from
+ * \param src The destination to write data to
  * \param count The number of bits 1-32
  * \return The instruction encoding with 0 delay and no side set value
  * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
@@ -258,8 +258,8 @@ static inline uint pio_encode_push(bool if_full, bool block) {
  *
  * This is the equivalent of `PULL <if_empty>, <block>`
  *
- * \param if_empty true for `PUSH IF_EMPTY ...`, false for `PUSH ...`
- * \param block true for `PUSH ... BLOCK`, false for `PUSH ...`
+ * \param if_empty true for `PULL IF_EMPTY ...`, false for `PUSH ...`
+ * \param block true for `PULL ... BLOCK`, false for `PUSH ...`
  * \return The instruction encoding with 0 delay and no side set value
  * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
  */
