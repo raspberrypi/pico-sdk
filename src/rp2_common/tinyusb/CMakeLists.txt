@@ -20,7 +20,8 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     pico_register_common_scope_var(PICO_TINYUSB_PATH)
 
     set(BOARD pico_sdk)
-    include(${PICO_TINYUSB_PATH}/hw/bsp/rp2040/family.cmake)
+    set(FAMILY rp2040)
+    include(${PICO_TINYUSB_PATH}/hw/bsp/family_support.cmake)
 
     add_library(tinyusb_common INTERFACE)
     target_link_libraries(tinyusb_common INTERFACE tinyusb_common_base)
