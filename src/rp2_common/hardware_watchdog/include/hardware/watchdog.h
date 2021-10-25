@@ -81,8 +81,8 @@ void watchdog_enable(uint32_t delay_ms, bool pause_on_debug);
  * \brief Did the watchdog cause the last reboot?
  * \ingroup hardware_watchdog
  *
- * @return true if the watchdog timer or a watchdog force caused the last reboot
- * @return false there has been no watchdog reboot since run has been
+ * @return true If the watchdog timer or a watchdog force caused the last reboot
+ * @return false If there has been no watchdog reboot since the last power on reset. A power on reset is typically caused by a power cycle or the run pin (reset button) being toggled.
  */
 bool watchdog_caused_reboot(void);
 
@@ -97,9 +97,11 @@ bool watchdog_caused_reboot(void);
  * This would not be present if a watchdog reset is initiated by \ref watchdog_reboot or by the RP2040 bootrom
  * (e.g. dragging a UF2 onto the RPI-RP2 drive).
  *
- * @return true if the watchdog timer or a watchdog force caused (see \reg watchdog_caused_reboot) the last reboot
+ * @return true If the watchdog timer or a watchdog force caused (see \reg watchdog_caused_reboot) the last reboot
  *              and the watchdog reboot happened after \ref watchdog_enable was called
- * @return false there has been no watchdog reboot since run has been
+ * @return false If there has been no watchdog reboot since the last power on reset, or the watchdog reboot was not caused
+ *               by a watchdog timeout after \ref watchdog_enable was called.
+ *               A power on reset is typically caused by a power cycle or the run pin (reset button) being toggled.
  */
 bool watchdog_enable_caused_reboot(void);
 
