@@ -1,6 +1,4 @@
-# Contributing to Raspberry Pico Pico C/C++ SDK
-
-The Raspberry Pico Pico C/C++ SDK is a collection of libraries and tools for C and C++ development on RP2040 microcontrollers. Full details of the SDK can be found in the [SDK documentation](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf).
+# Contributing to Raspberry Pico C/C++ SDK
 
 ## How to Report a Bug
 
@@ -12,16 +10,16 @@ In order to contribute new or updated code, you must first create a GitHub accou
 
 **NOTE:** Development takes place on the `develop` branch in this repository. Please open your https://github.com/raspberrypi/pico-sdk/pulls[pull request] (PR) against the [`develop`](https://github.com/raspberrypi/pico-sdk/tree/develop) branch, pull requests against the `master` branch will automatically CI fail checks and will not be accepted. You will be asked to rebase your PR against `develop` and if you do not do so, your PR will be closed.
 
-While we are happy to take contributions, big or small, changes in the toolchain may have knock-on effects in other places so it is possible that apparently benign pull requests that make seemingly small changes could be refused for fairly opaque reasons. 
+While we are happy to take contributions, big or small, changes in the SDK may have knock-on effects in other places so it is possible that apparently benign pull requests that make seemingly small changes could be refused. 
 
-## Code Style
+### Code Style
 
-If you are contributing new or updated code please make an effort to match the existing code style, particularly:
+If you are contributing new or updated code please match the existing code style, particularly:
 
 * Use 4 spaces for indentation rather than tabs.
 * Braces are required for everything except single line `if` statements.
 * Opening braces should not be placed on a new line.
 
-## Licensing 
+### Licensing 
 
 Code in this repository is lisensed under the [BSD-3 License](LICENSE.TXT). By contributing content to this repository you are agreeing to place your contributions under this licence.
