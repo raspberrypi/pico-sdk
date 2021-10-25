@@ -172,6 +172,7 @@ static inline uint _pio_encode_irq(bool relative, uint irq) {
  *
  * This is the equivalent of `WAIT <polarity> GPIO <gpio>`
  *
+ * \param polarity true for `WAIT 1`, false for `WAIT 0`
  * \param gpio The real GPIO number 0-31
  * \return The instruction encoding with 0 delay and no side set value
  * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
@@ -185,6 +186,7 @@ static inline uint pio_encode_wait_gpio(bool polarity, uint gpio) {
  *
  * This is the equivalent of `WAIT <polarity> PIN <pin>`
  *
+ * \param polarity true for `WAIT 1`, false for `WAIT 0`
  * \param pin The pin number 0-31 relative to the executing SM's input pin mapping
  * \return The instruction encoding with 0 delay and no side set value
  * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
@@ -229,7 +231,7 @@ static inline uint pio_encode_in(enum pio_src_dest src, uint count) {
  *
  * This is the equivalent of `OUT <src>, <count>`
  *
- * \param src The destination to write data to
+ * \param dest The destination to write data to
  * \param count The number of bits 1-32
  * \return The instruction encoding with 0 delay and no side set value
  * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
@@ -258,8 +260,8 @@ static inline uint pio_encode_push(bool if_full, bool block) {
  *
  * This is the equivalent of `PULL <if_empty>, <block>`
  *
- * \param if_empty true for `PULL IF_EMPTY ...`, false for `PUSH ...`
- * \param block true for `PULL ... BLOCK`, false for `PUSH ...`
+ * \param if_empty true for `PULL IF_EMPTY ...`, false for `PULL ...`
+ * \param block true for `PULL ... BLOCK`, false for `PULL ...`
  * \return The instruction encoding with 0 delay and no side set value
  * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
  */
