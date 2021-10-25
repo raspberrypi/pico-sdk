@@ -36,17 +36,28 @@
 #define PICO_NO_RAM_VECTOR_TABLE 0
 #endif
 
-// PICO_CONFIG: PICO_RP2040_B0_SUPPORTED, Include support for RP2040 B0 revision, type=bool, default=1, advanced=true, group=pico_platform
+// PICO_CONFIG: PICO_RP2040_B0_SUPPORTED, Whether to include any specific software support for RP2040 B0 revision, type=bool, default=1, advanced=true, group=pico_platform
 #ifndef PICO_RP2040_B0_SUPPORTED
 #define PICO_RP2040_B0_SUPPORTED 1
 #endif
 
-// PICO_CONFIG: PICO_RP2040_B1_SUPPORTED, Include support for RP2040 B1 revision, type=bool, default=1, advanced=true, group=pico_platform
+// PICO_CONFIG: PICO_FLOAT_SUPPORT_ROM_V1, Include float support code for RP2040 B0 when that chip revision is supported , type=bool, default=1, advanced=true, group=pico_platform
+#ifndef PICO_FLOAT_SUPPORT_ROM_V1
+#define PICO_FLOAT_SUPPORT_ROM_V1 1
+#endif
+
+// PICO_CONFIG: PICO_DOUBLE_SUPPORT_ROM_V1, Include double support code for RP2040 B0 when that chip revision is supported , type=bool, default=1, advanced=true, group=pico_platform
+#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
+#define PICO_DOUBLE_SUPPORT_ROM_V1 1
+#endif
+
+
+// PICO_CONFIG: PICO_RP2040_B1_SUPPORTED, Whether to include any specific software support for RP2040 B1 revision, type=bool, default=1, advanced=true, group=pico_platform
 #ifndef PICO_RP2040_B1_SUPPORTED
 #define PICO_RP2040_B1_SUPPORTED 1
 #endif
 
-// PICO_CONFIG: PICO_RP2040_B2_SUPPORTED, Include support for RP2040 B2 revision, type=bool, default=1, advanced=true, group=pico_platform
+// PICO_CONFIG: PICO_RP2040_B2_SUPPORTED, Whether to include any specific software support for RP2040 B2 revision, type=bool, default=1, advanced=true, group=pico_platform
 #ifndef PICO_RP2040_B2_SUPPORTED
 #define PICO_RP2040_B2_SUPPORTED 1
 #endif
