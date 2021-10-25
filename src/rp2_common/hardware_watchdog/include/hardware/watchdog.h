@@ -100,7 +100,7 @@ bool watchdog_caused_reboot(void);
  * @return true If the watchdog timer or a watchdog force caused (see \reg watchdog_caused_reboot) the last reboot
  *              and the watchdog reboot happened after \ref watchdog_enable was called
  * @return false If there has been no watchdog reboot since the last power on reset, or the watchdog reboot was not caused
- *               by a watchdog timeout after \ref watchdog_enabled was called.
+ *               by a watchdog timeout after \ref watchdog_enable was called.
  *               A power on reset is typically caused by a power cycle or the run pin (reset button) being toggled.
  */
 bool watchdog_enable_caused_reboot(void);
