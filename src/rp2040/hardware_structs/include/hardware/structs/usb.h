@@ -49,10 +49,10 @@
 #define EP_CTRL_INTERRUPT_PER_DOUBLE_BUFFER (1u << 28)
 #define EP_CTRL_INTERRUPT_ON_NAK (1u << 16)
 #define EP_CTRL_INTERRUPT_ON_STALL (1u << 17)
-#define EP_CTRL_BUFFER_TYPE_LSB 26
-#define EP_CTRL_HOST_INTERRUPT_INTERVAL_LSB 16
+#define EP_CTRL_BUFFER_TYPE_LSB 26u
+#define EP_CTRL_HOST_INTERRUPT_INTERVAL_LSB 16u
 
-#define USB_DPRAM_SIZE 4096
+#define USB_DPRAM_SIZE 4096u
 
 // PICO_CONFIG: USB_DPRAM_MAX, Set amount of USB RAM used by USB system, min=0, max=4096, default=4096, group=hardware_usb
 // Allow user to claim some of the USB RAM for themselves

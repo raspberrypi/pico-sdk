@@ -97,7 +97,8 @@ pico_set_program_name(kitchen_sink "Wombat tentacles")
 pico_add_extra_outputs(kitchen_sink)
 
 add_executable(kitchen_sink_extra_stdio)
-target_link_libraries(kitchen_sink_extra_stdio kitchen_sink_libs) # no kitchen_sink_options as TinyUSB has warnings
+suppress_tinyusb_warnings() # suppress warnings explicitly in TinyUSB files which have them
+target_link_libraries(kitchen_sink_extra_stdio kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_extra_stdio)
 pico_enable_stdio_usb(kitchen_sink_extra_stdio 1)
 pico_enable_stdio_semihosting(kitchen_sink_extra_stdio 1)
@@ -111,3 +112,4 @@ add_executable(kitchen_sink_no_flash)
 pico_set_binary_type(kitchen_sink_no_flash no_flash)
 target_link_libraries(kitchen_sink_no_flash kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_no_flash)
+

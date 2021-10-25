@@ -38,7 +38,7 @@ static uint16_t resetd_open(uint8_t __unused rhport, tusb_desc_interface_t const
 }
 
 // Support for parameterized reset via vendor interface control request
-static bool resetd_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const * request) {
+static bool resetd_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_control_request_t const * request) {
     // nothing to do with DATA & ACK stage
     if (stage != CONTROL_STAGE_SETUP) return true;
 
