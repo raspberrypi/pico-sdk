@@ -32,10 +32,6 @@
 #include "pico/bootrom.h"
 #endif
 
-#ifndef PICO_NO_RAM_VECTOR_TABLE
-#define PICO_NO_RAM_VECTOR_TABLE 0
-#endif
-
 extern char __StackLimit; /* Set by linker.  */
 
 uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[48];

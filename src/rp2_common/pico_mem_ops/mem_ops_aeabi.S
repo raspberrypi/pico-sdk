@@ -9,6 +9,7 @@
 .thumb
 
 #include "pico/asm_helper.S"
+#include "pico/bootrom.h"
 
 __pre_init __aeabi_mem_init, 00001
 
@@ -34,10 +35,10 @@ __pre_init __aeabi_mem_init, 00001
 
 .align 2
 aeabi_mem_funcs:
-    .word rom_table_code('M','S')
-    .word rom_table_code('M','C')
-    .word rom_table_code('S','4')
-    .word rom_table_code('C','4')
+    .word ROM_FUNC_MEMSET
+    .word ROM_FUNC_MEMCPY
+    .word ROM_FUNC_MEMSET4
+    .word ROM_FUNC_MEMCPY44
 aeabi_mem_funcs_end:
 
 .section .text

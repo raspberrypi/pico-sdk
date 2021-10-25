@@ -22,16 +22,21 @@ static void hw_enumeration_fix_force_ls_j(void);
 static void hw_enumeration_fix_finish(void);
 
 void rp2040_usb_device_enumeration_fix(void) {
-    // After coming out of reset, the hardware expects 800us of LS_J (linestate J) time
-    // before it will move to the connected state. However on a hub that broadcasts packets
-    // for other devices this isn't the case. The plan here is to wait for the end of the bus
-    // reset, force an LS_J for 1ms and then switch control back to the USB phy. Unfortunately
-    // this requires us to use GPIO15 as there is no other way to force the input path.
-    // We only need to force DP as DM can be left at zero. It will be gated off by GPIO
-    // logic if it isn't func selected.
+#if PICO_RP2040_B0_SUPPORTED || PICO_RP2040_B1_SUPPORTED
+    // Actually check for B0/B1 h/w
+    if (rp2040_chip_version() == 1) {
+        // After coming out of reset, the hardware expects 800us of LS_J (linestate J) time
+        // before it will move to the connected state. However on a hub that broadcasts packets
+        // for other devices this isn't the case. The plan here is to wait for the end of the bus
+        // reset, force an LS_J for 1ms and then switch control back to the USB phy. Unfortunately
+        // this requires us to use GPIO15 as there is no other way to force the input path.
+        // We only need to force DP as DM can be left at zero. It will be gated off by GPIO
+        // logic if it isn't func selected.
 
-    // Wait SE0 phase will call force ls_j phase which will call finish phase
-    hw_enumeration_fix_wait_se0();
+        // Wait SE0 phase will call force ls_j phase which will call finish phase
+        hw_enumeration_fix_wait_se0();
+    }
+#endif
 }
 
 static inline uint8_t hw_line_state(void) {
