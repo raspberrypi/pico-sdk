@@ -6,7 +6,7 @@ We use GitHub to host code, track issues and feature requests, and to accept pul
 ## Report bugs using GitHub's [issues](https://github.com/raspberrypi/pico-sdk/issues)
 We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/raspberrypi/pico-sdk/issues/new).
 
-Please include as much detail as possible, and ideally a some code to reproduce the problem.
+Please include as much detail as possible, and ideally some code to reproduce the problem.
 
 ## Contributing code
 
