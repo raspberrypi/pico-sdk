@@ -97,7 +97,12 @@ pico_set_program_name(kitchen_sink "Wombat tentacles")
 pico_add_extra_outputs(kitchen_sink)
 
 add_executable(kitchen_sink_extra_stdio)
-suppress_tinyusb_warnings() # suppress warnings explicitly in TinyUSB files which have them
+if (COMMAND suppress_tinyusb_warnings)
+    # Explicitly suppress warnings in TinyUSB files which have them (this has to be done
+    # from the project that uses them per CMake "feature"). Note the function comes from
+    # TinyUSB itself, so we have to guard against TinyUSB not being present with the above if
+    suppress_tinyusb_warnings()
+endif()
 target_link_libraries(kitchen_sink_extra_stdio kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_extra_stdio)
 pico_enable_stdio_usb(kitchen_sink_extra_stdio 1)
