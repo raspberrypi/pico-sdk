@@ -178,6 +178,12 @@ enum gpio_drive_strength {
  */
 void gpio_set_function(uint gpio, enum gpio_function fn);
 
+/*! \brief Determine current GPIO function
+ *  \ingroup hardware_gpio
+ *
+ * \param gpio GPIO number
+ * \return Which GPIO function is currently selected from list \ref gpio_function
+ */
 enum gpio_function gpio_get_function(uint gpio);
 
 /*! \brief Select up and down pulls on specific GPIO
