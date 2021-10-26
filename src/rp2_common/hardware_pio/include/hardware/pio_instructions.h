@@ -162,6 +162,97 @@ static inline uint pio_encode_jmp(uint addr) {
     return _pio_encode_instr_and_args(pio_instr_bits_jmp, 0, addr);
 }
 
+/*! \brief Encode a conditional JMP if scratch X zero instruction
+ *  \ingroup pio_instructions
+ *
+ * This is the equivalent of `JMP !X <addr>`
+ *
+ * \param addr The target address 0-31 (an absolute address within the PIO instruction memory)
+ * \return The instruction encoding with 0 delay and no side set value
+ * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
+ */
+static inline uint pio_encode_jmp_not_x(uint addr) {
+    return _pio_encode_instr_and_args(pio_instr_bits_jmp, 1, addr);
+}
+
+/*! \brief Encode a conditional JMP if scratch X non-zero (and post-decrement X) instruction
+ *  \ingroup pio_instructions
+ *
+ * This is the equivalent of `JMP X-- <addr>`
+ *
+ * \param addr The target address 0-31 (an absolute address within the PIO instruction memory)
+ * \return The instruction encoding with 0 delay and no side set value
+ * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
+ */
+static inline uint pio_encode_jmp_x_dec(uint addr) {
+    return _pio_encode_instr_and_args(pio_instr_bits_jmp, 2, addr);
+}
+
+/*! \brief Encode a conditional JMP if scratch Y zero instruction
+ *  \ingroup pio_instructions
+ *
+ * This is the equivalent of `JMP !Y <addr>`
+ *
+ * \param addr The target address 0-31 (an absolute address within the PIO instruction memory)
+ * \return The instruction encoding with 0 delay and no side set value
+ * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
+ */
+static inline uint pio_encode_jmp_not_y(uint addr) {
+    return _pio_encode_instr_and_args(pio_instr_bits_jmp, 3, addr);
+}
+
+/*! \brief Encode a conditional JMP if scratch Y non-zero (and post-decrement Y) instruction
+ *  \ingroup pio_instructions
+ *
+ * This is the equivalent of `JMP Y-- <addr>`
+ *
+ * \param addr The target address 0-31 (an absolute address within the PIO instruction memory)
+ * \return The instruction encoding with 0 delay and no side set value
+ * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
+ */
+static inline uint pio_encode_jmp_y_dec(uint addr) {
+    return _pio_encode_instr_and_args(pio_instr_bits_jmp, 4, addr);
+}
+
+/*! \brief Encode a conditional JMP if scratch X not equal scratch Y instruction
+ *  \ingroup pio_instructions
+ *
+ * This is the equivalent of `JMP X!=Y <addr>`
+ *
+ * \param addr The target address 0-31 (an absolute address within the PIO instruction memory)
+ * \return The instruction encoding with 0 delay and no side set value
+ * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
+ */
+static inline uint pio_encode_jmp_x_ne_y(uint addr) {
+    return _pio_encode_instr_and_args(pio_instr_bits_jmp, 5, addr);
+}
+
+/*! \brief Encode a conditional JMP if input pin high instruction
+ *  \ingroup pio_instructions
+ *
+ * This is the equivalent of `JMP PIN <addr>`
+ *
+ * \param addr The target address 0-31 (an absolute address within the PIO instruction memory)
+ * \return The instruction encoding with 0 delay and no side set value
+ * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
+ */
+static inline uint pio_encode_jmp_pin(uint addr) {
+    return _pio_encode_instr_and_args(pio_instr_bits_jmp, 6, addr);
+}
+
+/*! \brief Encode a conditional JMP if output shift register not empty instruction
+ *  \ingroup pio_instructions
+ *
+ * This is the equivalent of `JMP !OSRE <addr>`
+ *
+ * \param addr The target address 0-31 (an absolute address within the PIO instruction memory)
+ * \return The instruction encoding with 0 delay and no side set value
+ * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
+ */
+static inline uint pio_encode_jmp_not_osre(uint addr) {
+    return _pio_encode_instr_and_args(pio_instr_bits_jmp, 7, addr);
+}
+
 static inline uint _pio_encode_irq(bool relative, uint irq) {
     valid_params_if(PIO_INSTRUCTIONS, irq <= 7);
     return (relative ? 0x10u : 0x0u) | irq;
