@@ -244,7 +244,7 @@ extern void __attribute__((noreturn)) __printflike(1, 0) PICO_PANIC_FUNCTION(__u
 // Use a forwarding method here as it is a little simpler than renaming the symbol as it is used from assembler
 void __attribute__((naked, noreturn)) __printflike(1, 0) panic(__unused const char *fmt, ...) {
     // if you get an undefined reference here, you didn't define your PICO_PANIC_FUNCTION!
-    asm (
+    __asm (
             "push {lr}\n"
 #if !PICO_PANIC_FUNCTION_EMPTY
             "bl " __XSTRING(PICO_PANIC_FUNCTION) "\n"
