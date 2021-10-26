@@ -1,4 +1,4 @@
-# Contributing to Raspberry Pico C/C++ SDK
+# Contributing to Raspberry Pi Pico C/C++ SDK
 
 ## How to Report a Bug
 
