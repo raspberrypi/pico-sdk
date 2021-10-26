@@ -82,7 +82,7 @@ typedef ioptr const const_ioptr;
 
 // Helper method used by hw_alias macros to optionally check input validity
 #define hw_alias_check_addr(addr) ((uintptr_t)(addr))
-// can't use the following impl as it breaks static declarations with hw_alias
+// can't use the following impl as it breaks existing static declarations using hw_alias, so would be a backwards incompatibility
 //static __force_inline uint32_t hw_alias_check_addr(volatile void *addr) {
 //    uint32_t rc = (uintptr_t)addr;
 //    invalid_params_if(ADDRESS_ALIAS, rc < 0x40000000); // catch likely non HW pointer types
