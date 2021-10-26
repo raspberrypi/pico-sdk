@@ -59,20 +59,20 @@ regular_func __aeabi_mem_init
 mem_section aeabi_memset_memcpy
 
 wrapper_func __aeabi_memset
-    // args are backwards
-    eors r0, r1
-    eors r1, r0
-    eors r0, r1
+    // 2nd/3rd args are reversed
+    eors r2, r1
+    eors r1, r2
+    eors r2, r1
     ldr r3, =aeabi_mem_funcs
     ldr r3, [r3, #MEMSET]
     bx r3
 
 wrapper_func __aeabi_memset4
 wrapper_func __aeabi_memset8
-    // args are backwards
-    eors r0, r1
-    eors r1, r0
-    eors r0, r1
+    // 2nd/3rd args are reversed
+    eors r2, r1
+    eors r1, r2
+    eors r2, r1
     ldr r3, =aeabi_mem_funcs
     ldr r3, [r3, #MEMSET4]
     bx r3
