@@ -95,12 +95,9 @@
 // Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
 #define PICO_SMPS_MODE_PIN 23
 
-#ifndef PICO_FLOAT_SUPPORT_ROM_V1
-#define PICO_FLOAT_SUPPORT_ROM_V1 1
-#endif
-
-#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
-#define PICO_DOUBLE_SUPPORT_ROM_V1 1
+// All boards have B1 RP2040
+#ifndef PICO_RP2040_B0_SUPPORTED 
+#define PICO_RP2040_B0_SUPPORTED  0
 #endif
 
 #endif

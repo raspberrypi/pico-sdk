@@ -71,12 +71,9 @@
 #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
 
-#ifndef PICO_FLOAT_SUPPORT_ROM_V1
-#define PICO_FLOAT_SUPPORT_ROM_V1 1
-#endif
-
-#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
-#define PICO_DOUBLE_SUPPORT_ROM_V1 1
+// All boards have B1 RP2040
+#ifndef PICO_RP2040_B0_SUPPORTED 
+#define PICO_RP2040_B0_SUPPORTED  0
 #endif
 
 #endif
