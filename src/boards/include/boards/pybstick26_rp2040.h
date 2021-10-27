@@ -9,7 +9,7 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/pico.h"
+// This header may be included by other board headers as "boards/pybstick26_rp2040.h"
 
 #ifndef _BOARDS_PYBSTICK26_RP2040_H
 #define _BOARDS_PYBSTICK26_RP2040_H
@@ -78,12 +78,7 @@
 // Linear regulator on Pybstick26
 //#define PICO_SMPS_MODE_PIN 23
 
-#ifndef PICO_FLOAT_SUPPORT_ROM_V1
-#define PICO_FLOAT_SUPPORT_ROM_V1 1
-#endif
-
-#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
-#define PICO_DOUBLE_SUPPORT_ROM_V1 1
-#endif
-
+// All boards have B1 RP2040
+#ifndef PICO_RP2040_B0_SUPPORTED 
+#define PICO_RP2040_B0_SUPPORTED  0
 #endif
