@@ -18,6 +18,7 @@
 #include "hardware/interp.h"
 #include "hardware/irq.h"
 #include "hardware/pio.h"
+#include "hardware/pio_instructions.h"
 #include "hardware/pll.h"
 #include "hardware/pwm.h"
 #include "hardware/resets.h"
@@ -40,10 +41,15 @@
 #include "pico/malloc.h"
 #include "pico/multicore.h"
 #include "pico/printf.h"
+#include "pico/runtime.h"
+#include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/sync.h"
 #include "pico/time.h"
 #include "pico/unique_id.h"
+
+#include "hardware/structs/iobank0.h"
+#include "hardware/structs/ioqspi.h"
 
 bi_decl(bi_block_device(
                            BINARY_INFO_MAKE_TAG('K', 'S'),
