@@ -84,7 +84,7 @@ void __isr dma_handler_b(void) {
     printf("HELLO B\n");
     if (dma_hw->ints1 & 1) {
         dma_hw->ints1 = 1;
-        printf("B WINS DNA_TO %08x\n", (uint) dma_to);
+        printf("B WINS DMA_TO %08x\n", (uint) dma_to);
 //        irq_remove_handler(DMA_IRQ_1, dma_handler_b);
     }
 }
