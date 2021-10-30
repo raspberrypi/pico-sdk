@@ -19,7 +19,7 @@
  * The RP2040 has an internal analogue-digital converter (ADC) with the following features:
  * - SAR ADC
  * - 500 kS/s (Using an independent 48MHz clock)
- * - 12 bit (9.5 ENOB)
+ * - 12 bit (8.7 ENOB)
  * - 5 input mux:
  *  - 4 inputs that are available on package pins shared with GPIO[29:26]
  *  - 1 input is dedicated to the internal temperature sensor
