@@ -41,7 +41,7 @@ typedef struct {
     // 0x00000300 [9:8]   : OUTOVER (0)
     // 0x0000001f [4:0]   : FUNCSEL (0x1f): 0-31 -> selects pin function according to the gpio table
     io_rw_32 ctrl;
-} io_status_ctrl_hw_t;
+} iobank0_status_ctrl_hw_t;
 
 typedef struct {
     _REG_(IO_BANK0_PROC0_INTE0_OFFSET) // IO_BANK0_PROC0_INTE0
@@ -161,7 +161,7 @@ typedef struct {
 
 /// \tag::iobank0_hw[]
 typedef struct {
-    io_status_ctrl_hw_t io[NUM_BANK0_GPIOS]; // 30
+    iobank0_status_ctrl_hw_t io[NUM_BANK0_GPIOS]; // 30
 
     _REG_(IO_BANK0_INTR0_OFFSET) // IO_BANK0_INTR0
     // (Description copied from array index 0 register IO_BANK0_INTR0 applies similarly to other array indexes)

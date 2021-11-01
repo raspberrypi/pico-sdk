@@ -41,7 +41,7 @@ typedef struct {
     // 0x00000300 [9:8]   : OUTOVER (0)
     // 0x0000001f [4:0]   : FUNCSEL (0x1f): 0-31 -> selects pin function according to the gpio table
     io_rw_32 ctrl;
-} io_status_ctrl_hw_t;
+} ioqspi_status_ctrl_hw_t;
 
 typedef struct {
     _REG_(IO_QSPI_PROC0_INTE_OFFSET) // IO_QSPI_PROC0_INTE
@@ -130,7 +130,7 @@ typedef struct {
 } io_qspi_ctrl_hw_t;
 
 typedef struct {
-    io_status_ctrl_hw_t io[NUM_QSPI_GPIOS]; // 6
+    ioqspi_status_ctrl_hw_t io[NUM_QSPI_GPIOS]; // 6
 
     _REG_(IO_QSPI_INTR_OFFSET) // IO_QSPI_INTR
     // Raw Interrupts
