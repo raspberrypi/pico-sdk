@@ -27,8 +27,14 @@ extern "C" {
 #define __scratch_x(group)
 #define __scratch_y(group)
 
+#ifndef _MSC_VER
 #define __packed __attribute__((packed))
 #define __packed_aligned __packed __attribute((aligned))
+#else
+// MSVC requires #pragma pack which isn't compatible with a single attribute style define
+#define __packed
+#define __packed_aligned
+#endif
 
 #define __time_critical_func(x) x
 #define __after_data(group)
