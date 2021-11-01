@@ -14,9 +14,9 @@ The full documentation for the RP2040 and Raspberry Pi Pico board can be found a
 
 At Raspberry Pi we have a very community-based attitude to help. We run a very popular and busy forum where you can ask questions about any aspect of the Raspberry Pi ecosystem, including the Raspberry Pi Pico.
 
-You can find our forums at the [following link](https://www.raspberrypi.org/forums).
+You can find our forums at the [following link](https://forums.raspberrypi.com/).
 
-For the main Raspberry Pi website, [see here](https://www.raspberrypi.org)
+For the main Raspberry Pi website, [see here](https://www.raspberrypi.com)
 
 For the Raspberry Pi Pico page, [see here](https://rptl.io/rp2040-get-started)
 

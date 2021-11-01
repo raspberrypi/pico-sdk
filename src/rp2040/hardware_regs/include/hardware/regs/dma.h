@@ -294,7 +294,7 @@
 #define DMA_CH0_AL1_CTRL_RESET  "-"
 #define DMA_CH0_AL1_CTRL_MSB    _u(31)
 #define DMA_CH0_AL1_CTRL_LSB    _u(0)
-#define DMA_CH0_AL1_CTRL_ACCESS "RO"
+#define DMA_CH0_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL1_READ_ADDR
 // Description : Alias for channel 0 READ_ADDR register
@@ -303,7 +303,7 @@
 #define DMA_CH0_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH0_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH0_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH0_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH0_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL1_WRITE_ADDR
 // Description : Alias for channel 0 WRITE_ADDR register
@@ -312,7 +312,7 @@
 #define DMA_CH0_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH0_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH0_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH0_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH0_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 0 TRANS_COUNT register
@@ -323,7 +323,7 @@
 #define DMA_CH0_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH0_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH0_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH0_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH0_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL2_CTRL
 // Description : Alias for channel 0 CTRL register
@@ -332,7 +332,7 @@
 #define DMA_CH0_AL2_CTRL_RESET  "-"
 #define DMA_CH0_AL2_CTRL_MSB    _u(31)
 #define DMA_CH0_AL2_CTRL_LSB    _u(0)
-#define DMA_CH0_AL2_CTRL_ACCESS "RO"
+#define DMA_CH0_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL2_TRANS_COUNT
 // Description : Alias for channel 0 TRANS_COUNT register
@@ -341,7 +341,7 @@
 #define DMA_CH0_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH0_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH0_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH0_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH0_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL2_READ_ADDR
 // Description : Alias for channel 0 READ_ADDR register
@@ -350,7 +350,7 @@
 #define DMA_CH0_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH0_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH0_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH0_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH0_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 0 WRITE_ADDR register
@@ -361,7 +361,7 @@
 #define DMA_CH0_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH0_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH0_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH0_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH0_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL3_CTRL
 // Description : Alias for channel 0 CTRL register
@@ -370,7 +370,7 @@
 #define DMA_CH0_AL3_CTRL_RESET  "-"
 #define DMA_CH0_AL3_CTRL_MSB    _u(31)
 #define DMA_CH0_AL3_CTRL_LSB    _u(0)
-#define DMA_CH0_AL3_CTRL_ACCESS "RO"
+#define DMA_CH0_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL3_WRITE_ADDR
 // Description : Alias for channel 0 WRITE_ADDR register
@@ -379,7 +379,7 @@
 #define DMA_CH0_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH0_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH0_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH0_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH0_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL3_TRANS_COUNT
 // Description : Alias for channel 0 TRANS_COUNT register
@@ -388,7 +388,7 @@
 #define DMA_CH0_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH0_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH0_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH0_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH0_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH0_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 0 READ_ADDR register
@@ -399,7 +399,7 @@
 #define DMA_CH0_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH0_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH0_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH0_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH0_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_READ_ADDR
 // Description : DMA Channel 1 Read Address pointer
@@ -683,7 +683,7 @@
 #define DMA_CH1_AL1_CTRL_RESET  "-"
 #define DMA_CH1_AL1_CTRL_MSB    _u(31)
 #define DMA_CH1_AL1_CTRL_LSB    _u(0)
-#define DMA_CH1_AL1_CTRL_ACCESS "RO"
+#define DMA_CH1_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL1_READ_ADDR
 // Description : Alias for channel 1 READ_ADDR register
@@ -692,7 +692,7 @@
 #define DMA_CH1_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH1_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH1_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH1_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH1_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL1_WRITE_ADDR
 // Description : Alias for channel 1 WRITE_ADDR register
@@ -701,7 +701,7 @@
 #define DMA_CH1_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH1_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH1_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH1_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH1_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 1 TRANS_COUNT register
@@ -712,7 +712,7 @@
 #define DMA_CH1_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH1_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH1_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH1_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH1_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL2_CTRL
 // Description : Alias for channel 1 CTRL register
@@ -721,7 +721,7 @@
 #define DMA_CH1_AL2_CTRL_RESET  "-"
 #define DMA_CH1_AL2_CTRL_MSB    _u(31)
 #define DMA_CH1_AL2_CTRL_LSB    _u(0)
-#define DMA_CH1_AL2_CTRL_ACCESS "RO"
+#define DMA_CH1_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL2_TRANS_COUNT
 // Description : Alias for channel 1 TRANS_COUNT register
@@ -730,7 +730,7 @@
 #define DMA_CH1_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH1_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH1_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH1_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH1_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL2_READ_ADDR
 // Description : Alias for channel 1 READ_ADDR register
@@ -739,7 +739,7 @@
 #define DMA_CH1_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH1_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH1_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH1_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH1_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 1 WRITE_ADDR register
@@ -750,7 +750,7 @@
 #define DMA_CH1_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH1_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH1_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH1_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH1_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL3_CTRL
 // Description : Alias for channel 1 CTRL register
@@ -759,7 +759,7 @@
 #define DMA_CH1_AL3_CTRL_RESET  "-"
 #define DMA_CH1_AL3_CTRL_MSB    _u(31)
 #define DMA_CH1_AL3_CTRL_LSB    _u(0)
-#define DMA_CH1_AL3_CTRL_ACCESS "RO"
+#define DMA_CH1_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL3_WRITE_ADDR
 // Description : Alias for channel 1 WRITE_ADDR register
@@ -768,7 +768,7 @@
 #define DMA_CH1_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH1_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH1_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH1_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH1_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL3_TRANS_COUNT
 // Description : Alias for channel 1 TRANS_COUNT register
@@ -777,7 +777,7 @@
 #define DMA_CH1_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH1_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH1_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH1_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH1_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH1_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 1 READ_ADDR register
@@ -788,7 +788,7 @@
 #define DMA_CH1_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH1_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH1_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH1_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH1_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_READ_ADDR
 // Description : DMA Channel 2 Read Address pointer
@@ -1072,7 +1072,7 @@
 #define DMA_CH2_AL1_CTRL_RESET  "-"
 #define DMA_CH2_AL1_CTRL_MSB    _u(31)
 #define DMA_CH2_AL1_CTRL_LSB    _u(0)
-#define DMA_CH2_AL1_CTRL_ACCESS "RO"
+#define DMA_CH2_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL1_READ_ADDR
 // Description : Alias for channel 2 READ_ADDR register
@@ -1081,7 +1081,7 @@
 #define DMA_CH2_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH2_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH2_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH2_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH2_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL1_WRITE_ADDR
 // Description : Alias for channel 2 WRITE_ADDR register
@@ -1090,7 +1090,7 @@
 #define DMA_CH2_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH2_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH2_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH2_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH2_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 2 TRANS_COUNT register
@@ -1101,7 +1101,7 @@
 #define DMA_CH2_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH2_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH2_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH2_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH2_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL2_CTRL
 // Description : Alias for channel 2 CTRL register
@@ -1110,7 +1110,7 @@
 #define DMA_CH2_AL2_CTRL_RESET  "-"
 #define DMA_CH2_AL2_CTRL_MSB    _u(31)
 #define DMA_CH2_AL2_CTRL_LSB    _u(0)
-#define DMA_CH2_AL2_CTRL_ACCESS "RO"
+#define DMA_CH2_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL2_TRANS_COUNT
 // Description : Alias for channel 2 TRANS_COUNT register
@@ -1119,7 +1119,7 @@
 #define DMA_CH2_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH2_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH2_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH2_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH2_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL2_READ_ADDR
 // Description : Alias for channel 2 READ_ADDR register
@@ -1128,7 +1128,7 @@
 #define DMA_CH2_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH2_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH2_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH2_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH2_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 2 WRITE_ADDR register
@@ -1139,7 +1139,7 @@
 #define DMA_CH2_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH2_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH2_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH2_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH2_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL3_CTRL
 // Description : Alias for channel 2 CTRL register
@@ -1148,7 +1148,7 @@
 #define DMA_CH2_AL3_CTRL_RESET  "-"
 #define DMA_CH2_AL3_CTRL_MSB    _u(31)
 #define DMA_CH2_AL3_CTRL_LSB    _u(0)
-#define DMA_CH2_AL3_CTRL_ACCESS "RO"
+#define DMA_CH2_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL3_WRITE_ADDR
 // Description : Alias for channel 2 WRITE_ADDR register
@@ -1157,7 +1157,7 @@
 #define DMA_CH2_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH2_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH2_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH2_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH2_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL3_TRANS_COUNT
 // Description : Alias for channel 2 TRANS_COUNT register
@@ -1166,7 +1166,7 @@
 #define DMA_CH2_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH2_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH2_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH2_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH2_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH2_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 2 READ_ADDR register
@@ -1177,7 +1177,7 @@
 #define DMA_CH2_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH2_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH2_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH2_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH2_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_READ_ADDR
 // Description : DMA Channel 3 Read Address pointer
@@ -1461,7 +1461,7 @@
 #define DMA_CH3_AL1_CTRL_RESET  "-"
 #define DMA_CH3_AL1_CTRL_MSB    _u(31)
 #define DMA_CH3_AL1_CTRL_LSB    _u(0)
-#define DMA_CH3_AL1_CTRL_ACCESS "RO"
+#define DMA_CH3_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL1_READ_ADDR
 // Description : Alias for channel 3 READ_ADDR register
@@ -1470,7 +1470,7 @@
 #define DMA_CH3_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH3_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH3_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH3_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH3_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL1_WRITE_ADDR
 // Description : Alias for channel 3 WRITE_ADDR register
@@ -1479,7 +1479,7 @@
 #define DMA_CH3_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH3_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH3_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH3_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH3_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 3 TRANS_COUNT register
@@ -1490,7 +1490,7 @@
 #define DMA_CH3_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH3_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH3_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH3_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH3_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL2_CTRL
 // Description : Alias for channel 3 CTRL register
@@ -1499,7 +1499,7 @@
 #define DMA_CH3_AL2_CTRL_RESET  "-"
 #define DMA_CH3_AL2_CTRL_MSB    _u(31)
 #define DMA_CH3_AL2_CTRL_LSB    _u(0)
-#define DMA_CH3_AL2_CTRL_ACCESS "RO"
+#define DMA_CH3_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL2_TRANS_COUNT
 // Description : Alias for channel 3 TRANS_COUNT register
@@ -1508,7 +1508,7 @@
 #define DMA_CH3_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH3_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH3_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH3_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH3_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL2_READ_ADDR
 // Description : Alias for channel 3 READ_ADDR register
@@ -1517,7 +1517,7 @@
 #define DMA_CH3_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH3_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH3_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH3_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH3_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 3 WRITE_ADDR register
@@ -1528,7 +1528,7 @@
 #define DMA_CH3_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH3_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH3_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH3_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH3_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL3_CTRL
 // Description : Alias for channel 3 CTRL register
@@ -1537,7 +1537,7 @@
 #define DMA_CH3_AL3_CTRL_RESET  "-"
 #define DMA_CH3_AL3_CTRL_MSB    _u(31)
 #define DMA_CH3_AL3_CTRL_LSB    _u(0)
-#define DMA_CH3_AL3_CTRL_ACCESS "RO"
+#define DMA_CH3_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL3_WRITE_ADDR
 // Description : Alias for channel 3 WRITE_ADDR register
@@ -1546,7 +1546,7 @@
 #define DMA_CH3_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH3_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH3_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH3_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH3_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL3_TRANS_COUNT
 // Description : Alias for channel 3 TRANS_COUNT register
@@ -1555,7 +1555,7 @@
 #define DMA_CH3_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH3_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH3_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH3_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH3_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH3_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 3 READ_ADDR register
@@ -1566,7 +1566,7 @@
 #define DMA_CH3_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH3_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH3_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH3_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH3_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_READ_ADDR
 // Description : DMA Channel 4 Read Address pointer
@@ -1850,7 +1850,7 @@
 #define DMA_CH4_AL1_CTRL_RESET  "-"
 #define DMA_CH4_AL1_CTRL_MSB    _u(31)
 #define DMA_CH4_AL1_CTRL_LSB    _u(0)
-#define DMA_CH4_AL1_CTRL_ACCESS "RO"
+#define DMA_CH4_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL1_READ_ADDR
 // Description : Alias for channel 4 READ_ADDR register
@@ -1859,7 +1859,7 @@
 #define DMA_CH4_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH4_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH4_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH4_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH4_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL1_WRITE_ADDR
 // Description : Alias for channel 4 WRITE_ADDR register
@@ -1868,7 +1868,7 @@
 #define DMA_CH4_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH4_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH4_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH4_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH4_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 4 TRANS_COUNT register
@@ -1879,7 +1879,7 @@
 #define DMA_CH4_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH4_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH4_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH4_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH4_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL2_CTRL
 // Description : Alias for channel 4 CTRL register
@@ -1888,7 +1888,7 @@
 #define DMA_CH4_AL2_CTRL_RESET  "-"
 #define DMA_CH4_AL2_CTRL_MSB    _u(31)
 #define DMA_CH4_AL2_CTRL_LSB    _u(0)
-#define DMA_CH4_AL2_CTRL_ACCESS "RO"
+#define DMA_CH4_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL2_TRANS_COUNT
 // Description : Alias for channel 4 TRANS_COUNT register
@@ -1897,7 +1897,7 @@
 #define DMA_CH4_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH4_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH4_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH4_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH4_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL2_READ_ADDR
 // Description : Alias for channel 4 READ_ADDR register
@@ -1906,7 +1906,7 @@
 #define DMA_CH4_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH4_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH4_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH4_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH4_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 4 WRITE_ADDR register
@@ -1917,7 +1917,7 @@
 #define DMA_CH4_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH4_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH4_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH4_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH4_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL3_CTRL
 // Description : Alias for channel 4 CTRL register
@@ -1926,7 +1926,7 @@
 #define DMA_CH4_AL3_CTRL_RESET  "-"
 #define DMA_CH4_AL3_CTRL_MSB    _u(31)
 #define DMA_CH4_AL3_CTRL_LSB    _u(0)
-#define DMA_CH4_AL3_CTRL_ACCESS "RO"
+#define DMA_CH4_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL3_WRITE_ADDR
 // Description : Alias for channel 4 WRITE_ADDR register
@@ -1935,7 +1935,7 @@
 #define DMA_CH4_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH4_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH4_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH4_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH4_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL3_TRANS_COUNT
 // Description : Alias for channel 4 TRANS_COUNT register
@@ -1944,7 +1944,7 @@
 #define DMA_CH4_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH4_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH4_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH4_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH4_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH4_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 4 READ_ADDR register
@@ -1955,7 +1955,7 @@
 #define DMA_CH4_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH4_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH4_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH4_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH4_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_READ_ADDR
 // Description : DMA Channel 5 Read Address pointer
@@ -2239,7 +2239,7 @@
 #define DMA_CH5_AL1_CTRL_RESET  "-"
 #define DMA_CH5_AL1_CTRL_MSB    _u(31)
 #define DMA_CH5_AL1_CTRL_LSB    _u(0)
-#define DMA_CH5_AL1_CTRL_ACCESS "RO"
+#define DMA_CH5_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL1_READ_ADDR
 // Description : Alias for channel 5 READ_ADDR register
@@ -2248,7 +2248,7 @@
 #define DMA_CH5_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH5_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH5_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH5_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH5_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL1_WRITE_ADDR
 // Description : Alias for channel 5 WRITE_ADDR register
@@ -2257,7 +2257,7 @@
 #define DMA_CH5_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH5_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH5_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH5_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH5_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 5 TRANS_COUNT register
@@ -2268,7 +2268,7 @@
 #define DMA_CH5_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH5_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH5_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH5_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH5_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL2_CTRL
 // Description : Alias for channel 5 CTRL register
@@ -2277,7 +2277,7 @@
 #define DMA_CH5_AL2_CTRL_RESET  "-"
 #define DMA_CH5_AL2_CTRL_MSB    _u(31)
 #define DMA_CH5_AL2_CTRL_LSB    _u(0)
-#define DMA_CH5_AL2_CTRL_ACCESS "RO"
+#define DMA_CH5_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL2_TRANS_COUNT
 // Description : Alias for channel 5 TRANS_COUNT register
@@ -2286,7 +2286,7 @@
 #define DMA_CH5_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH5_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH5_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH5_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH5_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL2_READ_ADDR
 // Description : Alias for channel 5 READ_ADDR register
@@ -2295,7 +2295,7 @@
 #define DMA_CH5_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH5_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH5_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH5_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH5_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 5 WRITE_ADDR register
@@ -2306,7 +2306,7 @@
 #define DMA_CH5_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH5_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH5_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH5_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH5_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL3_CTRL
 // Description : Alias for channel 5 CTRL register
@@ -2315,7 +2315,7 @@
 #define DMA_CH5_AL3_CTRL_RESET  "-"
 #define DMA_CH5_AL3_CTRL_MSB    _u(31)
 #define DMA_CH5_AL3_CTRL_LSB    _u(0)
-#define DMA_CH5_AL3_CTRL_ACCESS "RO"
+#define DMA_CH5_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL3_WRITE_ADDR
 // Description : Alias for channel 5 WRITE_ADDR register
@@ -2324,7 +2324,7 @@
 #define DMA_CH5_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH5_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH5_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH5_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH5_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL3_TRANS_COUNT
 // Description : Alias for channel 5 TRANS_COUNT register
@@ -2333,7 +2333,7 @@
 #define DMA_CH5_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH5_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH5_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH5_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH5_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH5_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 5 READ_ADDR register
@@ -2344,7 +2344,7 @@
 #define DMA_CH5_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH5_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH5_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH5_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH5_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_READ_ADDR
 // Description : DMA Channel 6 Read Address pointer
@@ -2628,7 +2628,7 @@
 #define DMA_CH6_AL1_CTRL_RESET  "-"
 #define DMA_CH6_AL1_CTRL_MSB    _u(31)
 #define DMA_CH6_AL1_CTRL_LSB    _u(0)
-#define DMA_CH6_AL1_CTRL_ACCESS "RO"
+#define DMA_CH6_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL1_READ_ADDR
 // Description : Alias for channel 6 READ_ADDR register
@@ -2637,7 +2637,7 @@
 #define DMA_CH6_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH6_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH6_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH6_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH6_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL1_WRITE_ADDR
 // Description : Alias for channel 6 WRITE_ADDR register
@@ -2646,7 +2646,7 @@
 #define DMA_CH6_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH6_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH6_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH6_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH6_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 6 TRANS_COUNT register
@@ -2657,7 +2657,7 @@
 #define DMA_CH6_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH6_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH6_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH6_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH6_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL2_CTRL
 // Description : Alias for channel 6 CTRL register
@@ -2666,7 +2666,7 @@
 #define DMA_CH6_AL2_CTRL_RESET  "-"
 #define DMA_CH6_AL2_CTRL_MSB    _u(31)
 #define DMA_CH6_AL2_CTRL_LSB    _u(0)
-#define DMA_CH6_AL2_CTRL_ACCESS "RO"
+#define DMA_CH6_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL2_TRANS_COUNT
 // Description : Alias for channel 6 TRANS_COUNT register
@@ -2675,7 +2675,7 @@
 #define DMA_CH6_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH6_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH6_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH6_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH6_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL2_READ_ADDR
 // Description : Alias for channel 6 READ_ADDR register
@@ -2684,7 +2684,7 @@
 #define DMA_CH6_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH6_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH6_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH6_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH6_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 6 WRITE_ADDR register
@@ -2695,7 +2695,7 @@
 #define DMA_CH6_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH6_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH6_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH6_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH6_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL3_CTRL
 // Description : Alias for channel 6 CTRL register
@@ -2704,7 +2704,7 @@
 #define DMA_CH6_AL3_CTRL_RESET  "-"
 #define DMA_CH6_AL3_CTRL_MSB    _u(31)
 #define DMA_CH6_AL3_CTRL_LSB    _u(0)
-#define DMA_CH6_AL3_CTRL_ACCESS "RO"
+#define DMA_CH6_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL3_WRITE_ADDR
 // Description : Alias for channel 6 WRITE_ADDR register
@@ -2713,7 +2713,7 @@
 #define DMA_CH6_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH6_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH6_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH6_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH6_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL3_TRANS_COUNT
 // Description : Alias for channel 6 TRANS_COUNT register
@@ -2722,7 +2722,7 @@
 #define DMA_CH6_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH6_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH6_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH6_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH6_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH6_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 6 READ_ADDR register
@@ -2733,7 +2733,7 @@
 #define DMA_CH6_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH6_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH6_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH6_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH6_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_READ_ADDR
 // Description : DMA Channel 7 Read Address pointer
@@ -3017,7 +3017,7 @@
 #define DMA_CH7_AL1_CTRL_RESET  "-"
 #define DMA_CH7_AL1_CTRL_MSB    _u(31)
 #define DMA_CH7_AL1_CTRL_LSB    _u(0)
-#define DMA_CH7_AL1_CTRL_ACCESS "RO"
+#define DMA_CH7_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL1_READ_ADDR
 // Description : Alias for channel 7 READ_ADDR register
@@ -3026,7 +3026,7 @@
 #define DMA_CH7_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH7_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH7_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH7_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH7_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL1_WRITE_ADDR
 // Description : Alias for channel 7 WRITE_ADDR register
@@ -3035,7 +3035,7 @@
 #define DMA_CH7_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH7_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH7_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH7_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH7_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 7 TRANS_COUNT register
@@ -3046,7 +3046,7 @@
 #define DMA_CH7_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH7_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH7_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH7_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH7_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL2_CTRL
 // Description : Alias for channel 7 CTRL register
@@ -3055,7 +3055,7 @@
 #define DMA_CH7_AL2_CTRL_RESET  "-"
 #define DMA_CH7_AL2_CTRL_MSB    _u(31)
 #define DMA_CH7_AL2_CTRL_LSB    _u(0)
-#define DMA_CH7_AL2_CTRL_ACCESS "RO"
+#define DMA_CH7_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL2_TRANS_COUNT
 // Description : Alias for channel 7 TRANS_COUNT register
@@ -3064,7 +3064,7 @@
 #define DMA_CH7_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH7_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH7_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH7_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH7_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL2_READ_ADDR
 // Description : Alias for channel 7 READ_ADDR register
@@ -3073,7 +3073,7 @@
 #define DMA_CH7_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH7_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH7_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH7_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH7_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 7 WRITE_ADDR register
@@ -3084,7 +3084,7 @@
 #define DMA_CH7_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH7_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH7_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH7_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH7_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL3_CTRL
 // Description : Alias for channel 7 CTRL register
@@ -3093,7 +3093,7 @@
 #define DMA_CH7_AL3_CTRL_RESET  "-"
 #define DMA_CH7_AL3_CTRL_MSB    _u(31)
 #define DMA_CH7_AL3_CTRL_LSB    _u(0)
-#define DMA_CH7_AL3_CTRL_ACCESS "RO"
+#define DMA_CH7_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL3_WRITE_ADDR
 // Description : Alias for channel 7 WRITE_ADDR register
@@ -3102,7 +3102,7 @@
 #define DMA_CH7_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH7_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH7_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH7_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH7_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL3_TRANS_COUNT
 // Description : Alias for channel 7 TRANS_COUNT register
@@ -3111,7 +3111,7 @@
 #define DMA_CH7_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH7_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH7_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH7_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH7_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH7_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 7 READ_ADDR register
@@ -3122,7 +3122,7 @@
 #define DMA_CH7_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH7_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH7_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH7_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH7_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_READ_ADDR
 // Description : DMA Channel 8 Read Address pointer
@@ -3406,7 +3406,7 @@
 #define DMA_CH8_AL1_CTRL_RESET  "-"
 #define DMA_CH8_AL1_CTRL_MSB    _u(31)
 #define DMA_CH8_AL1_CTRL_LSB    _u(0)
-#define DMA_CH8_AL1_CTRL_ACCESS "RO"
+#define DMA_CH8_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL1_READ_ADDR
 // Description : Alias for channel 8 READ_ADDR register
@@ -3415,7 +3415,7 @@
 #define DMA_CH8_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH8_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH8_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH8_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH8_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL1_WRITE_ADDR
 // Description : Alias for channel 8 WRITE_ADDR register
@@ -3424,7 +3424,7 @@
 #define DMA_CH8_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH8_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH8_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH8_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH8_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 8 TRANS_COUNT register
@@ -3435,7 +3435,7 @@
 #define DMA_CH8_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH8_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH8_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH8_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH8_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL2_CTRL
 // Description : Alias for channel 8 CTRL register
@@ -3444,7 +3444,7 @@
 #define DMA_CH8_AL2_CTRL_RESET  "-"
 #define DMA_CH8_AL2_CTRL_MSB    _u(31)
 #define DMA_CH8_AL2_CTRL_LSB    _u(0)
-#define DMA_CH8_AL2_CTRL_ACCESS "RO"
+#define DMA_CH8_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL2_TRANS_COUNT
 // Description : Alias for channel 8 TRANS_COUNT register
@@ -3453,7 +3453,7 @@
 #define DMA_CH8_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH8_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH8_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH8_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH8_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL2_READ_ADDR
 // Description : Alias for channel 8 READ_ADDR register
@@ -3462,7 +3462,7 @@
 #define DMA_CH8_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH8_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH8_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH8_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH8_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 8 WRITE_ADDR register
@@ -3473,7 +3473,7 @@
 #define DMA_CH8_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH8_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH8_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH8_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH8_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL3_CTRL
 // Description : Alias for channel 8 CTRL register
@@ -3482,7 +3482,7 @@
 #define DMA_CH8_AL3_CTRL_RESET  "-"
 #define DMA_CH8_AL3_CTRL_MSB    _u(31)
 #define DMA_CH8_AL3_CTRL_LSB    _u(0)
-#define DMA_CH8_AL3_CTRL_ACCESS "RO"
+#define DMA_CH8_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL3_WRITE_ADDR
 // Description : Alias for channel 8 WRITE_ADDR register
@@ -3491,7 +3491,7 @@
 #define DMA_CH8_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH8_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH8_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH8_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH8_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL3_TRANS_COUNT
 // Description : Alias for channel 8 TRANS_COUNT register
@@ -3500,7 +3500,7 @@
 #define DMA_CH8_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH8_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH8_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH8_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH8_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH8_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 8 READ_ADDR register
@@ -3511,7 +3511,7 @@
 #define DMA_CH8_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH8_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH8_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH8_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH8_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_READ_ADDR
 // Description : DMA Channel 9 Read Address pointer
@@ -3795,7 +3795,7 @@
 #define DMA_CH9_AL1_CTRL_RESET  "-"
 #define DMA_CH9_AL1_CTRL_MSB    _u(31)
 #define DMA_CH9_AL1_CTRL_LSB    _u(0)
-#define DMA_CH9_AL1_CTRL_ACCESS "RO"
+#define DMA_CH9_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL1_READ_ADDR
 // Description : Alias for channel 9 READ_ADDR register
@@ -3804,7 +3804,7 @@
 #define DMA_CH9_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH9_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH9_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH9_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH9_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL1_WRITE_ADDR
 // Description : Alias for channel 9 WRITE_ADDR register
@@ -3813,7 +3813,7 @@
 #define DMA_CH9_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH9_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH9_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH9_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH9_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 9 TRANS_COUNT register
@@ -3824,7 +3824,7 @@
 #define DMA_CH9_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH9_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH9_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH9_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH9_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL2_CTRL
 // Description : Alias for channel 9 CTRL register
@@ -3833,7 +3833,7 @@
 #define DMA_CH9_AL2_CTRL_RESET  "-"
 #define DMA_CH9_AL2_CTRL_MSB    _u(31)
 #define DMA_CH9_AL2_CTRL_LSB    _u(0)
-#define DMA_CH9_AL2_CTRL_ACCESS "RO"
+#define DMA_CH9_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL2_TRANS_COUNT
 // Description : Alias for channel 9 TRANS_COUNT register
@@ -3842,7 +3842,7 @@
 #define DMA_CH9_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH9_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH9_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH9_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH9_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL2_READ_ADDR
 // Description : Alias for channel 9 READ_ADDR register
@@ -3851,7 +3851,7 @@
 #define DMA_CH9_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH9_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH9_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH9_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH9_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 9 WRITE_ADDR register
@@ -3862,7 +3862,7 @@
 #define DMA_CH9_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH9_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH9_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH9_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH9_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL3_CTRL
 // Description : Alias for channel 9 CTRL register
@@ -3871,7 +3871,7 @@
 #define DMA_CH9_AL3_CTRL_RESET  "-"
 #define DMA_CH9_AL3_CTRL_MSB    _u(31)
 #define DMA_CH9_AL3_CTRL_LSB    _u(0)
-#define DMA_CH9_AL3_CTRL_ACCESS "RO"
+#define DMA_CH9_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL3_WRITE_ADDR
 // Description : Alias for channel 9 WRITE_ADDR register
@@ -3880,7 +3880,7 @@
 #define DMA_CH9_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH9_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH9_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH9_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH9_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL3_TRANS_COUNT
 // Description : Alias for channel 9 TRANS_COUNT register
@@ -3889,7 +3889,7 @@
 #define DMA_CH9_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH9_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH9_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH9_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH9_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH9_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 9 READ_ADDR register
@@ -3900,7 +3900,7 @@
 #define DMA_CH9_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH9_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH9_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH9_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH9_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_READ_ADDR
 // Description : DMA Channel 10 Read Address pointer
@@ -4184,7 +4184,7 @@
 #define DMA_CH10_AL1_CTRL_RESET  "-"
 #define DMA_CH10_AL1_CTRL_MSB    _u(31)
 #define DMA_CH10_AL1_CTRL_LSB    _u(0)
-#define DMA_CH10_AL1_CTRL_ACCESS "RO"
+#define DMA_CH10_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL1_READ_ADDR
 // Description : Alias for channel 10 READ_ADDR register
@@ -4193,7 +4193,7 @@
 #define DMA_CH10_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH10_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH10_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH10_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH10_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL1_WRITE_ADDR
 // Description : Alias for channel 10 WRITE_ADDR register
@@ -4202,7 +4202,7 @@
 #define DMA_CH10_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH10_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH10_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH10_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH10_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 10 TRANS_COUNT register
@@ -4213,7 +4213,7 @@
 #define DMA_CH10_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH10_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH10_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH10_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH10_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL2_CTRL
 // Description : Alias for channel 10 CTRL register
@@ -4222,7 +4222,7 @@
 #define DMA_CH10_AL2_CTRL_RESET  "-"
 #define DMA_CH10_AL2_CTRL_MSB    _u(31)
 #define DMA_CH10_AL2_CTRL_LSB    _u(0)
-#define DMA_CH10_AL2_CTRL_ACCESS "RO"
+#define DMA_CH10_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL2_TRANS_COUNT
 // Description : Alias for channel 10 TRANS_COUNT register
@@ -4231,7 +4231,7 @@
 #define DMA_CH10_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH10_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH10_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH10_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH10_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL2_READ_ADDR
 // Description : Alias for channel 10 READ_ADDR register
@@ -4240,7 +4240,7 @@
 #define DMA_CH10_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH10_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH10_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH10_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH10_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 10 WRITE_ADDR register
@@ -4251,7 +4251,7 @@
 #define DMA_CH10_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH10_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH10_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH10_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH10_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL3_CTRL
 // Description : Alias for channel 10 CTRL register
@@ -4260,7 +4260,7 @@
 #define DMA_CH10_AL3_CTRL_RESET  "-"
 #define DMA_CH10_AL3_CTRL_MSB    _u(31)
 #define DMA_CH10_AL3_CTRL_LSB    _u(0)
-#define DMA_CH10_AL3_CTRL_ACCESS "RO"
+#define DMA_CH10_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL3_WRITE_ADDR
 // Description : Alias for channel 10 WRITE_ADDR register
@@ -4269,7 +4269,7 @@
 #define DMA_CH10_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH10_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH10_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH10_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH10_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL3_TRANS_COUNT
 // Description : Alias for channel 10 TRANS_COUNT register
@@ -4278,7 +4278,7 @@
 #define DMA_CH10_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH10_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH10_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH10_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH10_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH10_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 10 READ_ADDR register
@@ -4289,7 +4289,7 @@
 #define DMA_CH10_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH10_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH10_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH10_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH10_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_READ_ADDR
 // Description : DMA Channel 11 Read Address pointer
@@ -4573,7 +4573,7 @@
 #define DMA_CH11_AL1_CTRL_RESET  "-"
 #define DMA_CH11_AL1_CTRL_MSB    _u(31)
 #define DMA_CH11_AL1_CTRL_LSB    _u(0)
-#define DMA_CH11_AL1_CTRL_ACCESS "RO"
+#define DMA_CH11_AL1_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL1_READ_ADDR
 // Description : Alias for channel 11 READ_ADDR register
@@ -4582,7 +4582,7 @@
 #define DMA_CH11_AL1_READ_ADDR_RESET  "-"
 #define DMA_CH11_AL1_READ_ADDR_MSB    _u(31)
 #define DMA_CH11_AL1_READ_ADDR_LSB    _u(0)
-#define DMA_CH11_AL1_READ_ADDR_ACCESS "RO"
+#define DMA_CH11_AL1_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL1_WRITE_ADDR
 // Description : Alias for channel 11 WRITE_ADDR register
@@ -4591,7 +4591,7 @@
 #define DMA_CH11_AL1_WRITE_ADDR_RESET  "-"
 #define DMA_CH11_AL1_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH11_AL1_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH11_AL1_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH11_AL1_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL1_TRANS_COUNT_TRIG
 // Description : Alias for channel 11 TRANS_COUNT register
@@ -4602,7 +4602,7 @@
 #define DMA_CH11_AL1_TRANS_COUNT_TRIG_RESET  "-"
 #define DMA_CH11_AL1_TRANS_COUNT_TRIG_MSB    _u(31)
 #define DMA_CH11_AL1_TRANS_COUNT_TRIG_LSB    _u(0)
-#define DMA_CH11_AL1_TRANS_COUNT_TRIG_ACCESS "RO"
+#define DMA_CH11_AL1_TRANS_COUNT_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL2_CTRL
 // Description : Alias for channel 11 CTRL register
@@ -4611,7 +4611,7 @@
 #define DMA_CH11_AL2_CTRL_RESET  "-"
 #define DMA_CH11_AL2_CTRL_MSB    _u(31)
 #define DMA_CH11_AL2_CTRL_LSB    _u(0)
-#define DMA_CH11_AL2_CTRL_ACCESS "RO"
+#define DMA_CH11_AL2_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL2_TRANS_COUNT
 // Description : Alias for channel 11 TRANS_COUNT register
@@ -4620,7 +4620,7 @@
 #define DMA_CH11_AL2_TRANS_COUNT_RESET  "-"
 #define DMA_CH11_AL2_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH11_AL2_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH11_AL2_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH11_AL2_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL2_READ_ADDR
 // Description : Alias for channel 11 READ_ADDR register
@@ -4629,7 +4629,7 @@
 #define DMA_CH11_AL2_READ_ADDR_RESET  "-"
 #define DMA_CH11_AL2_READ_ADDR_MSB    _u(31)
 #define DMA_CH11_AL2_READ_ADDR_LSB    _u(0)
-#define DMA_CH11_AL2_READ_ADDR_ACCESS "RO"
+#define DMA_CH11_AL2_READ_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL2_WRITE_ADDR_TRIG
 // Description : Alias for channel 11 WRITE_ADDR register
@@ -4640,7 +4640,7 @@
 #define DMA_CH11_AL2_WRITE_ADDR_TRIG_RESET  "-"
 #define DMA_CH11_AL2_WRITE_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH11_AL2_WRITE_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH11_AL2_WRITE_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH11_AL2_WRITE_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL3_CTRL
 // Description : Alias for channel 11 CTRL register
@@ -4649,7 +4649,7 @@
 #define DMA_CH11_AL3_CTRL_RESET  "-"
 #define DMA_CH11_AL3_CTRL_MSB    _u(31)
 #define DMA_CH11_AL3_CTRL_LSB    _u(0)
-#define DMA_CH11_AL3_CTRL_ACCESS "RO"
+#define DMA_CH11_AL3_CTRL_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL3_WRITE_ADDR
 // Description : Alias for channel 11 WRITE_ADDR register
@@ -4658,7 +4658,7 @@
 #define DMA_CH11_AL3_WRITE_ADDR_RESET  "-"
 #define DMA_CH11_AL3_WRITE_ADDR_MSB    _u(31)
 #define DMA_CH11_AL3_WRITE_ADDR_LSB    _u(0)
-#define DMA_CH11_AL3_WRITE_ADDR_ACCESS "RO"
+#define DMA_CH11_AL3_WRITE_ADDR_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL3_TRANS_COUNT
 // Description : Alias for channel 11 TRANS_COUNT register
@@ -4667,7 +4667,7 @@
 #define DMA_CH11_AL3_TRANS_COUNT_RESET  "-"
 #define DMA_CH11_AL3_TRANS_COUNT_MSB    _u(31)
 #define DMA_CH11_AL3_TRANS_COUNT_LSB    _u(0)
-#define DMA_CH11_AL3_TRANS_COUNT_ACCESS "RO"
+#define DMA_CH11_AL3_TRANS_COUNT_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_CH11_AL3_READ_ADDR_TRIG
 // Description : Alias for channel 11 READ_ADDR register
@@ -4678,7 +4678,7 @@
 #define DMA_CH11_AL3_READ_ADDR_TRIG_RESET  "-"
 #define DMA_CH11_AL3_READ_ADDR_TRIG_MSB    _u(31)
 #define DMA_CH11_AL3_READ_ADDR_TRIG_LSB    _u(0)
-#define DMA_CH11_AL3_READ_ADDR_TRIG_ACCESS "RO"
+#define DMA_CH11_AL3_READ_ADDR_TRIG_ACCESS "RW"
 // =============================================================================
 // Register    : DMA_INTR
 // Description : Interrupt Status (raw)
@@ -5056,7 +5056,7 @@
 #define DMA_CH0_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH0_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH0_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH0_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH0_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH0_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5078,7 +5078,7 @@
 #define DMA_CH1_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH1_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH1_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH1_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH1_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH1_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5100,7 +5100,7 @@
 #define DMA_CH2_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH2_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH2_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH2_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH2_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH2_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5122,7 +5122,7 @@
 #define DMA_CH3_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH3_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH3_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH3_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH3_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH3_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5144,7 +5144,7 @@
 #define DMA_CH4_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH4_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH4_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH4_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH4_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH4_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5166,7 +5166,7 @@
 #define DMA_CH5_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH5_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH5_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH5_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH5_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH5_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5188,7 +5188,7 @@
 #define DMA_CH6_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH6_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH6_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH6_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH6_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH6_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5210,7 +5210,7 @@
 #define DMA_CH7_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH7_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH7_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH7_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH7_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH7_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5232,7 +5232,7 @@
 #define DMA_CH8_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH8_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH8_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH8_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH8_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH8_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5254,7 +5254,7 @@
 #define DMA_CH9_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH9_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH9_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH9_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH9_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH9_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5276,7 +5276,7 @@
 #define DMA_CH10_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH10_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH10_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH10_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH10_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH10_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length
@@ -5298,7 +5298,7 @@
 #define DMA_CH11_DBG_CTDREQ_RESET  _u(0x00000000)
 #define DMA_CH11_DBG_CTDREQ_MSB    _u(5)
 #define DMA_CH11_DBG_CTDREQ_LSB    _u(0)
-#define DMA_CH11_DBG_CTDREQ_ACCESS "RO"
+#define DMA_CH11_DBG_CTDREQ_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_CH11_DBG_TCR
 // Description : Read to get channel TRANS_COUNT reload value, i.e. the length

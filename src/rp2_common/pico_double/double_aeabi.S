@@ -83,7 +83,7 @@ __check_nan_d2:
 
 .macro table_tail_call SF_TABLE_OFFSET
     push {r3, r4}
-#if PICO_DOUBLE_SUPPORT_ROM_V1
+#if PICO_DOUBLE_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
 #ifndef NDEBUG
     movs r3, #0
     mov ip, r3
@@ -99,12 +99,12 @@ __check_nan_d2:
     push {r3, r4}
     ldr r3, =sd_table
     ldr r3, [r3, #\SF_TABLE_OFFSET]
-#if PICO_DOUBLE_SUPPORT_ROM_V1
+#if PICO_DOUBLE_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
     mov ip, pc
 #endif
     str r3, [sp, #4]
     pop {r3, pc}
-#if PICO_DOUBLE_SUPPORT_ROM_V1
+#if PICO_DOUBLE_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
 .byte \SF_TABLE_OFFSET, 0xdf
 .word \shim
 #endif
@@ -733,7 +733,7 @@ sincos_shim_bootstrap:
     push {r2, r3, r4}
     movs r3, #0x13
     ldrb r3, [r3]
-#if PICO_DOUBLE_SUPPORT_ROM_V1
+#if PICO_DOUBLE_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
     cmp r3, #1
     bne 1f
     ldr r3, =dsincos_shim

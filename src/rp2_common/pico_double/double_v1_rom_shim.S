@@ -63,7 +63,7 @@ regular_func double_table_shim_on_use_helper
     str r0, [sp, #12]
     pop {r0-r2, pc}
 
-#if PICO_DOUBLE_SUPPORT_ROM_V1
+#if PICO_DOUBLE_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
 // Note that the V1 ROM has no double support, so this is basically the identical
 // library, and shim inter-function calls do not bother to redirect back thru the
 // wrapper functions
@@ -1218,11 +1218,6 @@ double_section dcordic_rot_step
  mov r9,r3
  bx r14
 
-ret_dzero:
- movs r0,#0
- movs r1,#0
- bx r14
-
 @ convert packed double in r0:r1 to signed/unsigned 32/64-bit integer/fixed-point value in r0:r1 [with r2 places after point], with rounding towards -Inf
 @ fixed-point versions only work with reasonable values in r2 because of the way dunpacks works
 
@@ -1264,7 +1259,7 @@ regular_func double2fix64_shim
  eors r1,r1,r0                 @ generate extreme fixed-point values
  pop {r15}
 
-double_section double2uint64_shim
+double_section double2uint64_shim 
  regular_func double2uint64_shim
  movs r2,#0                    @ and fall through
 regular_func double2ufix64_shim
@@ -1288,7 +1283,12 @@ d2fix:
  asrs r3,r1,#31
  ldr r4, =d2fix_a
  bx r4
-
+ 
+ret_dzero:
+ movs r0,#0
+ movs r1,#0
+ bx r14
+ 
 .weak d2fix_a // weak because it exists in float code too
 regular_func d2fix_a
 @ here

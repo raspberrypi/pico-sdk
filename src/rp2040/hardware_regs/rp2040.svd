@@ -22320,18 +22320,18 @@
             <field>
               <access>read-write</access>
               <bitRange>[20:20]</bitRange>
-              <description>Multiplies the startup_delay by 4. This is of little value to the user given that the delay can be programmed directly</description>
+              <description>Multiplies the startup_delay by 4. This is of little value to the user given that the delay can be programmed directly.</description>
               <name>X4</name>
             </field>
             <field>
               <access>read-write</access>
               <bitRange>[13:0]</bitRange>
-              <description>in multiples of 256*xtal_period</description>
+              <description>in multiples of 256*xtal_period. The reset value of 0xc4 corresponds to approx 50 000 cycles.</description>
               <name>DELAY</name>
             </field>
           </fields>
           <name>STARTUP</name>
-          <resetValue>0x00000000</resetValue>
+          <resetValue>0x000000c4</resetValue>
         </register>
         <register>
           <addressOffset>0x001c</addressOffset>
@@ -24228,7 +24228,76 @@
         <usage>registers</usage>
       </addressBlock>
       <baseAddress>0x40044000</baseAddress>
-      <description>DW_apb_i2c address block</description>
+      <description>DW_apb_i2c address block\n\n
+        List of configuration constants for the Synopsys I2C hardware (you may see references to these in I2C register header; these are *fixed* values, set at hardware design time):\n\n
+        IC_ULTRA_FAST_MODE ................ 0x0\n
+        IC_UFM_TBUF_CNT_DEFAULT ........... 0x8\n
+        IC_UFM_SCL_LOW_COUNT .............. 0x0008\n
+        IC_UFM_SCL_HIGH_COUNT ............. 0x0006\n
+        IC_TX_TL .......................... 0x0\n
+        IC_TX_CMD_BLOCK ................... 0x1\n
+        IC_HAS_DMA ........................ 0x1\n
+        IC_HAS_ASYNC_FIFO ................. 0x0\n
+        IC_SMBUS_ARP ...................... 0x0\n
+        IC_FIRST_DATA_BYTE_STATUS ......... 0x1\n
+        IC_INTR_IO ........................ 0x1\n
+        IC_MASTER_MODE .................... 0x1\n
+        IC_DEFAULT_ACK_GENERAL_CALL ....... 0x1\n
+        IC_INTR_POL ....................... 0x1\n
+        IC_OPTIONAL_SAR ................... 0x0\n
+        IC_DEFAULT_TAR_SLAVE_ADDR ......... 0x055\n
+        IC_DEFAULT_SLAVE_ADDR ............. 0x055\n
+        IC_DEFAULT_HS_SPKLEN .............. 0x1\n
+        IC_FS_SCL_HIGH_COUNT .............. 0x0006\n
+        IC_HS_SCL_LOW_COUNT ............... 0x0008\n
+        IC_DEVICE_ID_VALUE ................ 0x0\n
+        IC_10BITADDR_MASTER ............... 0x0\n
+        IC_CLK_FREQ_OPTIMIZATION .......... 0x0\n
+        IC_DEFAULT_FS_SPKLEN .............. 0x7\n
+        IC_ADD_ENCODED_PARAMS ............. 0x0\n
+        IC_DEFAULT_SDA_HOLD ............... 0x000001\n
+        IC_DEFAULT_SDA_SETUP .............. 0x64\n
+        IC_AVOID_RX_FIFO_FLUSH_ON_TX_ABRT . 0x0\n
+        IC_CLOCK_PERIOD ................... 100\n
+        IC_EMPTYFIFO_HOLD_MASTER_EN ....... 1\n
+        IC_RESTART_EN ..................... 0x1\n
+        IC_TX_CMD_BLOCK_DEFAULT ........... 0x0\n
+        IC_BUS_CLEAR_FEATURE .............. 0x0\n
+        IC_CAP_LOADING .................... 100\n
+        IC_FS_SCL_LOW_COUNT ............... 0x000d\n
+        APB_DATA_WIDTH .................... 32\n
+        IC_SDA_STUCK_TIMEOUT_DEFAULT ...... 0xffffffff\n
+        IC_SLV_DATA_NACK_ONLY ............. 0x1\n
+        IC_10BITADDR_SLAVE ................ 0x0\n
+        IC_CLK_TYPE ....................... 0x0\n
+        IC_SMBUS_UDID_MSB ................. 0x0\n
+        IC_SMBUS_SUSPEND_ALERT ............ 0x0\n
+        IC_HS_SCL_HIGH_COUNT .............. 0x0006\n
+        IC_SLV_RESTART_DET_EN ............. 0x1\n
+        IC_SMBUS .......................... 0x0\n
+        IC_OPTIONAL_SAR_DEFAULT ........... 0x0\n
+        IC_PERSISTANT_SLV_ADDR_DEFAULT .... 0x0\n
+        IC_USE_COUNTS ..................... 0x0\n
+        IC_RX_BUFFER_DEPTH ................ 16\n
+        IC_SCL_STUCK_TIMEOUT_DEFAULT ...... 0xffffffff\n
+        IC_RX_FULL_HLD_BUS_EN ............. 0x1\n
+        IC_SLAVE_DISABLE .................. 0x1\n
+        IC_RX_TL .......................... 0x0\n
+        IC_DEVICE_ID ...................... 0x0\n
+        IC_HC_COUNT_VALUES ................ 0x0\n
+        I2C_DYNAMIC_TAR_UPDATE ............ 0\n
+        IC_SMBUS_CLK_LOW_MEXT_DEFAULT ..... 0xffffffff\n
+        IC_SMBUS_CLK_LOW_SEXT_DEFAULT ..... 0xffffffff\n
+        IC_HS_MASTER_CODE ................. 0x1\n
+        IC_SMBUS_RST_IDLE_CNT_DEFAULT ..... 0xffff\n
+        IC_SMBUS_UDID_LSB_DEFAULT ......... 0xffffffff\n
+        IC_SS_SCL_HIGH_COUNT .............. 0x0028\n
+        IC_SS_SCL_LOW_COUNT ............... 0x002f\n
+        IC_MAX_SPEED_MODE ................. 0x2\n
+        IC_STAT_FOR_CLK_STRETCH ........... 0x0\n
+        IC_STOP_DET_IF_MASTER_ACTIVE ...... 0x0\n
+        IC_DEFAULT_UFM_SPKLEN ............. 0x1\n
+        IC_TX_BUFFER_DEPTH ................ 16</description>
       <interrupt>
         <name>I2C0_IRQ</name>
         <value>23</value>
@@ -29762,28 +29831,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0010</addressOffset>
           <description>Alias for channel 0 CTRL register</description>
           <name>CH0_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0014</addressOffset>
           <description>Alias for channel 0 READ_ADDR register</description>
           <name>CH0_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0018</addressOffset>
           <description>Alias for channel 0 WRITE_ADDR register</description>
           <name>CH0_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x001c</addressOffset>
           <description>Alias for channel 0 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -29792,28 +29861,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0020</addressOffset>
           <description>Alias for channel 0 CTRL register</description>
           <name>CH0_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0024</addressOffset>
           <description>Alias for channel 0 TRANS_COUNT register</description>
           <name>CH0_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0028</addressOffset>
           <description>Alias for channel 0 READ_ADDR register</description>
           <name>CH0_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x002c</addressOffset>
           <description>Alias for channel 0 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -29822,28 +29891,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0030</addressOffset>
           <description>Alias for channel 0 CTRL register</description>
           <name>CH0_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0034</addressOffset>
           <description>Alias for channel 0 WRITE_ADDR register</description>
           <name>CH0_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0038</addressOffset>
           <description>Alias for channel 0 TRANS_COUNT register</description>
           <name>CH0_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x003c</addressOffset>
           <description>Alias for channel 0 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30047,28 +30116,28 @@
           <resetValue>0x00000800</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0050</addressOffset>
           <description>Alias for channel 1 CTRL register</description>
           <name>CH1_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0054</addressOffset>
           <description>Alias for channel 1 READ_ADDR register</description>
           <name>CH1_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0058</addressOffset>
           <description>Alias for channel 1 WRITE_ADDR register</description>
           <name>CH1_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x005c</addressOffset>
           <description>Alias for channel 1 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30077,28 +30146,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0060</addressOffset>
           <description>Alias for channel 1 CTRL register</description>
           <name>CH1_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0064</addressOffset>
           <description>Alias for channel 1 TRANS_COUNT register</description>
           <name>CH1_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0068</addressOffset>
           <description>Alias for channel 1 READ_ADDR register</description>
           <name>CH1_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x006c</addressOffset>
           <description>Alias for channel 1 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30107,28 +30176,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0070</addressOffset>
           <description>Alias for channel 1 CTRL register</description>
           <name>CH1_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0074</addressOffset>
           <description>Alias for channel 1 WRITE_ADDR register</description>
           <name>CH1_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0078</addressOffset>
           <description>Alias for channel 1 TRANS_COUNT register</description>
           <name>CH1_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x007c</addressOffset>
           <description>Alias for channel 1 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30332,28 +30401,28 @@
           <resetValue>0x00001000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0090</addressOffset>
           <description>Alias for channel 2 CTRL register</description>
           <name>CH2_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0094</addressOffset>
           <description>Alias for channel 2 READ_ADDR register</description>
           <name>CH2_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0098</addressOffset>
           <description>Alias for channel 2 WRITE_ADDR register</description>
           <name>CH2_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x009c</addressOffset>
           <description>Alias for channel 2 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30362,28 +30431,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00a0</addressOffset>
           <description>Alias for channel 2 CTRL register</description>
           <name>CH2_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00a4</addressOffset>
           <description>Alias for channel 2 TRANS_COUNT register</description>
           <name>CH2_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00a8</addressOffset>
           <description>Alias for channel 2 READ_ADDR register</description>
           <name>CH2_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00ac</addressOffset>
           <description>Alias for channel 2 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30392,28 +30461,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00b0</addressOffset>
           <description>Alias for channel 2 CTRL register</description>
           <name>CH2_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00b4</addressOffset>
           <description>Alias for channel 2 WRITE_ADDR register</description>
           <name>CH2_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00b8</addressOffset>
           <description>Alias for channel 2 TRANS_COUNT register</description>
           <name>CH2_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00bc</addressOffset>
           <description>Alias for channel 2 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30617,28 +30686,28 @@
           <resetValue>0x00001800</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00d0</addressOffset>
           <description>Alias for channel 3 CTRL register</description>
           <name>CH3_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00d4</addressOffset>
           <description>Alias for channel 3 READ_ADDR register</description>
           <name>CH3_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00d8</addressOffset>
           <description>Alias for channel 3 WRITE_ADDR register</description>
           <name>CH3_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00dc</addressOffset>
           <description>Alias for channel 3 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30647,28 +30716,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00e0</addressOffset>
           <description>Alias for channel 3 CTRL register</description>
           <name>CH3_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00e4</addressOffset>
           <description>Alias for channel 3 TRANS_COUNT register</description>
           <name>CH3_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00e8</addressOffset>
           <description>Alias for channel 3 READ_ADDR register</description>
           <name>CH3_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00ec</addressOffset>
           <description>Alias for channel 3 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30677,28 +30746,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00f0</addressOffset>
           <description>Alias for channel 3 CTRL register</description>
           <name>CH3_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00f4</addressOffset>
           <description>Alias for channel 3 WRITE_ADDR register</description>
           <name>CH3_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00f8</addressOffset>
           <description>Alias for channel 3 TRANS_COUNT register</description>
           <name>CH3_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x00fc</addressOffset>
           <description>Alias for channel 3 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30902,28 +30971,28 @@
           <resetValue>0x00002000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0110</addressOffset>
           <description>Alias for channel 4 CTRL register</description>
           <name>CH4_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0114</addressOffset>
           <description>Alias for channel 4 READ_ADDR register</description>
           <name>CH4_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0118</addressOffset>
           <description>Alias for channel 4 WRITE_ADDR register</description>
           <name>CH4_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x011c</addressOffset>
           <description>Alias for channel 4 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30932,28 +31001,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0120</addressOffset>
           <description>Alias for channel 4 CTRL register</description>
           <name>CH4_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0124</addressOffset>
           <description>Alias for channel 4 TRANS_COUNT register</description>
           <name>CH4_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0128</addressOffset>
           <description>Alias for channel 4 READ_ADDR register</description>
           <name>CH4_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x012c</addressOffset>
           <description>Alias for channel 4 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -30962,28 +31031,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0130</addressOffset>
           <description>Alias for channel 4 CTRL register</description>
           <name>CH4_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0134</addressOffset>
           <description>Alias for channel 4 WRITE_ADDR register</description>
           <name>CH4_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0138</addressOffset>
           <description>Alias for channel 4 TRANS_COUNT register</description>
           <name>CH4_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x013c</addressOffset>
           <description>Alias for channel 4 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -31187,28 +31256,28 @@
           <resetValue>0x00002800</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0150</addressOffset>
           <description>Alias for channel 5 CTRL register</description>
           <name>CH5_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0154</addressOffset>
           <description>Alias for channel 5 READ_ADDR register</description>
           <name>CH5_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0158</addressOffset>
           <description>Alias for channel 5 WRITE_ADDR register</description>
           <name>CH5_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x015c</addressOffset>
           <description>Alias for channel 5 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -31217,28 +31286,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0160</addressOffset>
           <description>Alias for channel 5 CTRL register</description>
           <name>CH5_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0164</addressOffset>
           <description>Alias for channel 5 TRANS_COUNT register</description>
           <name>CH5_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0168</addressOffset>
           <description>Alias for channel 5 READ_ADDR register</description>
           <name>CH5_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x016c</addressOffset>
           <description>Alias for channel 5 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -31247,28 +31316,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0170</addressOffset>
           <description>Alias for channel 5 CTRL register</description>
           <name>CH5_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0174</addressOffset>
           <description>Alias for channel 5 WRITE_ADDR register</description>
           <name>CH5_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0178</addressOffset>
           <description>Alias for channel 5 TRANS_COUNT register</description>
           <name>CH5_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x017c</addressOffset>
           <description>Alias for channel 5 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -31472,28 +31541,28 @@
           <resetValue>0x00003000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0190</addressOffset>
           <description>Alias for channel 6 CTRL register</description>
           <name>CH6_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0194</addressOffset>
           <description>Alias for channel 6 READ_ADDR register</description>
           <name>CH6_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0198</addressOffset>
           <description>Alias for channel 6 WRITE_ADDR register</description>
           <name>CH6_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x019c</addressOffset>
           <description>Alias for channel 6 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -31502,28 +31571,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01a0</addressOffset>
           <description>Alias for channel 6 CTRL register</description>
           <name>CH6_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01a4</addressOffset>
           <description>Alias for channel 6 TRANS_COUNT register</description>
           <name>CH6_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01a8</addressOffset>
           <description>Alias for channel 6 READ_ADDR register</description>
           <name>CH6_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01ac</addressOffset>
           <description>Alias for channel 6 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -31532,28 +31601,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01b0</addressOffset>
           <description>Alias for channel 6 CTRL register</description>
           <name>CH6_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01b4</addressOffset>
           <description>Alias for channel 6 WRITE_ADDR register</description>
           <name>CH6_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01b8</addressOffset>
           <description>Alias for channel 6 TRANS_COUNT register</description>
           <name>CH6_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01bc</addressOffset>
           <description>Alias for channel 6 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -31757,28 +31826,28 @@
           <resetValue>0x00003800</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01d0</addressOffset>
           <description>Alias for channel 7 CTRL register</description>
           <name>CH7_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01d4</addressOffset>
           <description>Alias for channel 7 READ_ADDR register</description>
           <name>CH7_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01d8</addressOffset>
           <description>Alias for channel 7 WRITE_ADDR register</description>
           <name>CH7_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01dc</addressOffset>
           <description>Alias for channel 7 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -31787,28 +31856,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01e0</addressOffset>
           <description>Alias for channel 7 CTRL register</description>
           <name>CH7_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01e4</addressOffset>
           <description>Alias for channel 7 TRANS_COUNT register</description>
           <name>CH7_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01e8</addressOffset>
           <description>Alias for channel 7 READ_ADDR register</description>
           <name>CH7_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01ec</addressOffset>
           <description>Alias for channel 7 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -31817,28 +31886,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01f0</addressOffset>
           <description>Alias for channel 7 CTRL register</description>
           <name>CH7_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01f4</addressOffset>
           <description>Alias for channel 7 WRITE_ADDR register</description>
           <name>CH7_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01f8</addressOffset>
           <description>Alias for channel 7 TRANS_COUNT register</description>
           <name>CH7_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x01fc</addressOffset>
           <description>Alias for channel 7 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32042,28 +32111,28 @@
           <resetValue>0x00004000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0210</addressOffset>
           <description>Alias for channel 8 CTRL register</description>
           <name>CH8_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0214</addressOffset>
           <description>Alias for channel 8 READ_ADDR register</description>
           <name>CH8_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0218</addressOffset>
           <description>Alias for channel 8 WRITE_ADDR register</description>
           <name>CH8_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x021c</addressOffset>
           <description>Alias for channel 8 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32072,28 +32141,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0220</addressOffset>
           <description>Alias for channel 8 CTRL register</description>
           <name>CH8_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0224</addressOffset>
           <description>Alias for channel 8 TRANS_COUNT register</description>
           <name>CH8_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0228</addressOffset>
           <description>Alias for channel 8 READ_ADDR register</description>
           <name>CH8_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x022c</addressOffset>
           <description>Alias for channel 8 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32102,28 +32171,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0230</addressOffset>
           <description>Alias for channel 8 CTRL register</description>
           <name>CH8_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0234</addressOffset>
           <description>Alias for channel 8 WRITE_ADDR register</description>
           <name>CH8_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0238</addressOffset>
           <description>Alias for channel 8 TRANS_COUNT register</description>
           <name>CH8_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x023c</addressOffset>
           <description>Alias for channel 8 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32327,28 +32396,28 @@
           <resetValue>0x00004800</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0250</addressOffset>
           <description>Alias for channel 9 CTRL register</description>
           <name>CH9_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0254</addressOffset>
           <description>Alias for channel 9 READ_ADDR register</description>
           <name>CH9_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0258</addressOffset>
           <description>Alias for channel 9 WRITE_ADDR register</description>
           <name>CH9_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x025c</addressOffset>
           <description>Alias for channel 9 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32357,28 +32426,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0260</addressOffset>
           <description>Alias for channel 9 CTRL register</description>
           <name>CH9_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0264</addressOffset>
           <description>Alias for channel 9 TRANS_COUNT register</description>
           <name>CH9_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0268</addressOffset>
           <description>Alias for channel 9 READ_ADDR register</description>
           <name>CH9_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x026c</addressOffset>
           <description>Alias for channel 9 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32387,28 +32456,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0270</addressOffset>
           <description>Alias for channel 9 CTRL register</description>
           <name>CH9_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0274</addressOffset>
           <description>Alias for channel 9 WRITE_ADDR register</description>
           <name>CH9_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0278</addressOffset>
           <description>Alias for channel 9 TRANS_COUNT register</description>
           <name>CH9_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x027c</addressOffset>
           <description>Alias for channel 9 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32612,28 +32681,28 @@
           <resetValue>0x00005000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0290</addressOffset>
           <description>Alias for channel 10 CTRL register</description>
           <name>CH10_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0294</addressOffset>
           <description>Alias for channel 10 READ_ADDR register</description>
           <name>CH10_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0298</addressOffset>
           <description>Alias for channel 10 WRITE_ADDR register</description>
           <name>CH10_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x029c</addressOffset>
           <description>Alias for channel 10 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32642,28 +32711,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02a0</addressOffset>
           <description>Alias for channel 10 CTRL register</description>
           <name>CH10_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02a4</addressOffset>
           <description>Alias for channel 10 TRANS_COUNT register</description>
           <name>CH10_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02a8</addressOffset>
           <description>Alias for channel 10 READ_ADDR register</description>
           <name>CH10_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02ac</addressOffset>
           <description>Alias for channel 10 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32672,28 +32741,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02b0</addressOffset>
           <description>Alias for channel 10 CTRL register</description>
           <name>CH10_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02b4</addressOffset>
           <description>Alias for channel 10 WRITE_ADDR register</description>
           <name>CH10_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02b8</addressOffset>
           <description>Alias for channel 10 TRANS_COUNT register</description>
           <name>CH10_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02bc</addressOffset>
           <description>Alias for channel 10 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32897,28 +32966,28 @@
           <resetValue>0x00005800</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02d0</addressOffset>
           <description>Alias for channel 11 CTRL register</description>
           <name>CH11_AL1_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02d4</addressOffset>
           <description>Alias for channel 11 READ_ADDR register</description>
           <name>CH11_AL1_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02d8</addressOffset>
           <description>Alias for channel 11 WRITE_ADDR register</description>
           <name>CH11_AL1_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02dc</addressOffset>
           <description>Alias for channel 11 TRANS_COUNT register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32927,28 +32996,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02e0</addressOffset>
           <description>Alias for channel 11 CTRL register</description>
           <name>CH11_AL2_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02e4</addressOffset>
           <description>Alias for channel 11 TRANS_COUNT register</description>
           <name>CH11_AL2_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02e8</addressOffset>
           <description>Alias for channel 11 READ_ADDR register</description>
           <name>CH11_AL2_READ_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02ec</addressOffset>
           <description>Alias for channel 11 WRITE_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -32957,28 +33026,28 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02f0</addressOffset>
           <description>Alias for channel 11 CTRL register</description>
           <name>CH11_AL3_CTRL</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02f4</addressOffset>
           <description>Alias for channel 11 WRITE_ADDR register</description>
           <name>CH11_AL3_WRITE_ADDR</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02f8</addressOffset>
           <description>Alias for channel 11 TRANS_COUNT register</description>
           <name>CH11_AL3_TRANS_COUNT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x02fc</addressOffset>
           <description>Alias for channel 11 READ_ADDR register\n
             This is a trigger register (0xc). Writing a nonzero value will\n
@@ -33334,8 +33403,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH0_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33354,8 +33424,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH1_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33374,8 +33445,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH2_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33394,8 +33466,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH3_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33414,8 +33487,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH4_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33434,8 +33508,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH5_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33454,8 +33529,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH6_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33474,8 +33550,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH7_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33494,8 +33571,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH8_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33514,8 +33592,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH9_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33534,8 +33613,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH10_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -33554,8 +33634,9 @@
           <description>Read: get channel DREQ counter (i.e. how many accesses the DMA expects it can perform on the peripheral without overflow/underflow. Write any value: clears the counter, and cause channel to re-initiate DREQ handshake.</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[5:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CH11_DBG_CTDREQ</name>
             </field>
           </fields>
@@ -35883,7 +35964,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -35989,7 +36070,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -36095,7 +36176,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -36201,7 +36282,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -36307,7 +36388,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -36413,7 +36494,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -36519,7 +36600,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -36625,7 +36706,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -36731,7 +36812,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -36837,7 +36918,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -36943,7 +37024,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -37049,7 +37130,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -37155,7 +37236,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -37261,7 +37342,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -37367,7 +37448,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -37473,7 +37554,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -37579,7 +37660,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -37685,7 +37766,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -37791,7 +37872,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -37897,7 +37978,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38003,7 +38084,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38109,7 +38190,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38215,7 +38296,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38321,7 +38402,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38427,7 +38508,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38533,7 +38614,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38639,7 +38720,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38745,7 +38826,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38851,7 +38932,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -38957,7 +39038,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -39063,7 +39144,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -39169,7 +39250,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[9:0]</bitRange>
-              <description>The length of the data in buffer 1.</description>
+              <description>The length of the data in buffer 0.</description>
               <name>LENGTH_0</name>
             </field>
           </fields>
@@ -39992,9 +40073,10 @@
               <name>SETUP_REC</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[16:16]</bitRange>
               <description>Device: connected</description>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>CONNECTED</name>
             </field>
             <field>
@@ -40011,15 +40093,17 @@
               <name>VBUS_OVER_CURR</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[9:8]</bitRange>
               <description>Host: device speed. Disconnected = 00, LS = 01, FS = 10</description>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>SPEED</name>
             </field>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[4:4]</bitRange>
               <description>Bus in suspended state. Valid for device and host. Host and device will go into suspend if neither Keep Alive / SOF frames are enabled.</description>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>SUSPENDED</name>
             </field>
             <field>
@@ -41389,7 +41473,7 @@
             <field>
               <access>read-only</access>
               <bitRange>[11:11]</bitRange>
-              <description>Source: SIE_STATUS.VBUS_DETECT</description>
+              <description>Source: SIE_STATUS.VBUS_DETECTED</description>
               <name>VBUS_DETECT</name>
             </field>
             <field>
@@ -41517,7 +41601,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[11:11]</bitRange>
-              <description>Source: SIE_STATUS.VBUS_DETECT</description>
+              <description>Source: SIE_STATUS.VBUS_DETECTED</description>
               <name>VBUS_DETECT</name>
             </field>
             <field>
@@ -41645,7 +41729,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[11:11]</bitRange>
-              <description>Source: SIE_STATUS.VBUS_DETECT</description>
+              <description>Source: SIE_STATUS.VBUS_DETECTED</description>
               <name>VBUS_DETECT</name>
             </field>
             <field>
@@ -41773,7 +41857,7 @@
             <field>
               <access>read-only</access>
               <bitRange>[11:11]</bitRange>
-              <description>Source: SIE_STATUS.VBUS_DETECT</description>
+              <description>Source: SIE_STATUS.VBUS_DETECTED</description>
               <name>VBUS_DETECT</name>
             </field>
             <field>
@@ -42112,14 +42196,14 @@
         <register>
           <access>read-only</access>
           <addressOffset>0x003c</addressOffset>
-          <description>Read to sample the pad output values PIO is currently driving to the GPIOs.</description>
+          <description>Read to sample the pad output values PIO is currently driving to the GPIOs. On RP2040 there are 30 GPIOs, so the two most significant bits are hardwired to 0.</description>
           <name>DBG_PADOUT</name>
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-only</access>
           <addressOffset>0x0040</addressOffset>
-          <description>Read to sample the pad output enables (direction) PIO is currently driving to the GPIOs.</description>
+          <description>Read to sample the pad output enables (direction) PIO is currently driving to the GPIOs. On RP2040 there are 30 GPIOs, so the two most significant bits are hardwired to 0.</description>
           <name>DBG_PADOE</name>
           <resetValue>0x00000000</resetValue>
         </register>
@@ -42157,7 +42241,7 @@
           <description>Write-only access to instruction memory location 0</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM0</name>
             </field>
@@ -42170,7 +42254,7 @@
           <description>Write-only access to instruction memory location 1</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM1</name>
             </field>
@@ -42183,7 +42267,7 @@
           <description>Write-only access to instruction memory location 2</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM2</name>
             </field>
@@ -42196,7 +42280,7 @@
           <description>Write-only access to instruction memory location 3</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM3</name>
             </field>
@@ -42209,7 +42293,7 @@
           <description>Write-only access to instruction memory location 4</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM4</name>
             </field>
@@ -42222,7 +42306,7 @@
           <description>Write-only access to instruction memory location 5</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM5</name>
             </field>
@@ -42235,7 +42319,7 @@
           <description>Write-only access to instruction memory location 6</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM6</name>
             </field>
@@ -42248,7 +42332,7 @@
           <description>Write-only access to instruction memory location 7</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM7</name>
             </field>
@@ -42261,7 +42345,7 @@
           <description>Write-only access to instruction memory location 8</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM8</name>
             </field>
@@ -42274,7 +42358,7 @@
           <description>Write-only access to instruction memory location 9</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM9</name>
             </field>
@@ -42287,7 +42371,7 @@
           <description>Write-only access to instruction memory location 10</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM10</name>
             </field>
@@ -42300,7 +42384,7 @@
           <description>Write-only access to instruction memory location 11</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM11</name>
             </field>
@@ -42313,7 +42397,7 @@
           <description>Write-only access to instruction memory location 12</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM12</name>
             </field>
@@ -42326,7 +42410,7 @@
           <description>Write-only access to instruction memory location 13</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM13</name>
             </field>
@@ -42339,7 +42423,7 @@
           <description>Write-only access to instruction memory location 14</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM14</name>
             </field>
@@ -42352,7 +42436,7 @@
           <description>Write-only access to instruction memory location 15</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM15</name>
             </field>
@@ -42365,7 +42449,7 @@
           <description>Write-only access to instruction memory location 16</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM16</name>
             </field>
@@ -42378,7 +42462,7 @@
           <description>Write-only access to instruction memory location 17</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM17</name>
             </field>
@@ -42391,7 +42475,7 @@
           <description>Write-only access to instruction memory location 18</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM18</name>
             </field>
@@ -42404,7 +42488,7 @@
           <description>Write-only access to instruction memory location 19</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM19</name>
             </field>
@@ -42417,7 +42501,7 @@
           <description>Write-only access to instruction memory location 20</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM20</name>
             </field>
@@ -42430,7 +42514,7 @@
           <description>Write-only access to instruction memory location 21</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM21</name>
             </field>
@@ -42443,7 +42527,7 @@
           <description>Write-only access to instruction memory location 22</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM22</name>
             </field>
@@ -42456,7 +42540,7 @@
           <description>Write-only access to instruction memory location 23</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM23</name>
             </field>
@@ -42469,7 +42553,7 @@
           <description>Write-only access to instruction memory location 24</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM24</name>
             </field>
@@ -42482,7 +42566,7 @@
           <description>Write-only access to instruction memory location 25</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM25</name>
             </field>
@@ -42495,7 +42579,7 @@
           <description>Write-only access to instruction memory location 26</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM26</name>
             </field>
@@ -42508,7 +42592,7 @@
           <description>Write-only access to instruction memory location 27</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM27</name>
             </field>
@@ -42521,7 +42605,7 @@
           <description>Write-only access to instruction memory location 28</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM28</name>
             </field>
@@ -42534,7 +42618,7 @@
           <description>Write-only access to instruction memory location 29</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM29</name>
             </field>
@@ -42547,7 +42631,7 @@
           <description>Write-only access to instruction memory location 30</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM30</name>
             </field>
@@ -42560,7 +42644,7 @@
           <description>Write-only access to instruction memory location 31</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[15:0]</bitRange>
               <name>INSTR_MEM31</name>
             </field>
@@ -44142,7 +44226,7 @@
           <description>GPIO output value set</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[29:0]</bitRange>
               <description>Perform an atomic bit-set on GPIO_OUT, i.e. `GPIO_OUT |= wdata`</description>
               <name>GPIO_OUT_SET</name>
@@ -44156,7 +44240,7 @@
           <description>GPIO output value clear</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[29:0]</bitRange>
               <description>Perform an atomic bit-clear on GPIO_OUT, i.e. `GPIO_OUT &amp;= ~wdata`</description>
               <name>GPIO_OUT_CLR</name>
@@ -44170,7 +44254,7 @@
           <description>GPIO output value XOR</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[29:0]</bitRange>
               <description>Perform an atomic bitwise XOR on GPIO_OUT, i.e. `GPIO_OUT ^= wdata`</description>
               <name>GPIO_OUT_XOR</name>
@@ -44202,7 +44286,7 @@
           <description>GPIO output enable set</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[29:0]</bitRange>
               <description>Perform an atomic bit-set on GPIO_OE, i.e. `GPIO_OE |= wdata`</description>
               <name>GPIO_OE_SET</name>
@@ -44216,7 +44300,7 @@
           <description>GPIO output enable clear</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[29:0]</bitRange>
               <description>Perform an atomic bit-clear on GPIO_OE, i.e. `GPIO_OE &amp;= ~wdata`</description>
               <name>GPIO_OE_CLR</name>
@@ -44230,7 +44314,7 @@
           <description>GPIO output enable XOR</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[29:0]</bitRange>
               <description>Perform an atomic bitwise XOR on GPIO_OE, i.e. `GPIO_OE ^= wdata`</description>
               <name>GPIO_OE_XOR</name>
@@ -44262,7 +44346,7 @@
           <description>QSPI output value set</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[5:0]</bitRange>
               <description>Perform an atomic bit-set on GPIO_HI_OUT, i.e. `GPIO_HI_OUT |= wdata`</description>
               <name>GPIO_HI_OUT_SET</name>
@@ -44276,7 +44360,7 @@
           <description>QSPI output value clear</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[5:0]</bitRange>
               <description>Perform an atomic bit-clear on GPIO_HI_OUT, i.e. `GPIO_HI_OUT &amp;= ~wdata`</description>
               <name>GPIO_HI_OUT_CLR</name>
@@ -44290,7 +44374,7 @@
           <description>QSPI output value XOR</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[5:0]</bitRange>
               <description>Perform an atomic bitwise XOR on GPIO_HI_OUT, i.e. `GPIO_HI_OUT ^= wdata`</description>
               <name>GPIO_HI_OUT_XOR</name>
@@ -44322,7 +44406,7 @@
           <description>QSPI output enable set</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[5:0]</bitRange>
               <description>Perform an atomic bit-set on GPIO_HI_OE, i.e. `GPIO_HI_OE |= wdata`</description>
               <name>GPIO_HI_OE_SET</name>
@@ -44336,7 +44420,7 @@
           <description>QSPI output enable clear</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[5:0]</bitRange>
               <description>Perform an atomic bit-clear on GPIO_HI_OE, i.e. `GPIO_HI_OE &amp;= ~wdata`</description>
               <name>GPIO_HI_OE_CLR</name>
@@ -44350,7 +44434,7 @@
           <description>QSPI output enable XOR</description>
           <fields>
             <field>
-              <access>read-write</access>
+              <access>write-only</access>
               <bitRange>[5:0]</bitRange>
               <description>Perform an atomic bitwise XOR on GPIO_HI_OE, i.e. `GPIO_HI_OE ^= wdata`</description>
               <name>GPIO_HI_OE_XOR</name>
@@ -44767,7 +44851,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-write</access>
+          <access>write-only</access>
           <addressOffset>0x00bc</addressOffset>
           <description>On write, the lower 16 bits go to BASE0, upper bits to BASE1 simultaneously.\n
             Each half is sign-extended to 32 bits if that lane's SIGNED flag is set.</description>
@@ -45029,7 +45113,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-write</access>
+          <access>write-only</access>
           <addressOffset>0x00fc</addressOffset>
           <description>On write, the lower 16 bits go to BASE0, upper bits to BASE1 simultaneously.\n
             Each half is sign-extended to 32 bits if that lane's SIGNED flag is set.</description>
@@ -45037,7 +45121,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0100</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45049,7 +45133,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0104</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45061,7 +45145,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0108</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45073,7 +45157,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x010c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45085,7 +45169,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0110</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45097,7 +45181,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0114</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45109,7 +45193,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0118</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45121,7 +45205,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x011c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45133,7 +45217,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0120</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45145,7 +45229,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0124</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45157,7 +45241,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0128</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45169,7 +45253,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x012c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45181,7 +45265,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0130</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45193,7 +45277,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0134</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45205,7 +45289,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0138</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45217,7 +45301,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x013c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45229,7 +45313,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0140</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45241,7 +45325,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0144</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45253,7 +45337,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0148</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45265,7 +45349,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x014c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45277,7 +45361,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0150</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45289,7 +45373,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0154</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45301,7 +45385,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0158</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45313,7 +45397,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x015c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45325,7 +45409,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0160</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45337,7 +45421,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0164</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45349,7 +45433,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0168</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45361,7 +45445,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x016c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45373,7 +45457,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0170</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45385,7 +45469,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0174</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45397,7 +45481,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x0178</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n
@@ -45409,7 +45493,7 @@
           <resetValue>0x00000000</resetValue>
         </register>
         <register>
-          <access>read-only</access>
+          <access>read-write</access>
           <addressOffset>0x017c</addressOffset>
           <description>Reading from a spinlock address will:\n
             - Return 0 if lock is already locked\n

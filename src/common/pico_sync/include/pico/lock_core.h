@@ -93,6 +93,13 @@ void lock_init(lock_core_t *core, uint lock_num);
  * By default this returns the calling core number, but may be overridden (e.g. to return an RTOS task id)
  */
 #define lock_get_caller_owner_id() ((lock_owner_id_t)get_core_num())
+#ifndef lock_is_owner_id_valid
+#define lock_is_owner_id_valid(id) ((id)>=0)
+#endif
+#endif
+
+#ifndef lock_is_owner_id_valid
+#define lock_is_owner_id_valid(id) ((id) != LOCK_INVALID_OWNER_ID)
 #endif
 
 #ifndef lock_internal_spin_unlock_with_wait

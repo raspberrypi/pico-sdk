@@ -49,6 +49,9 @@ typedef struct stdio_driver stdio_driver_t;
  * Call this method once you have set up your clocks to enable the stdio support for UART, USB
  * and semihosting based on the presence of the respective libraries in the binary.
  *
+ * When stdio_usb is configured, this method can be optionally made to block, waiting for a connection
+ * via the variables specified in \ref stdio_usb_init (i.e. \ref PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS)
+ *
  * \see stdio_uart, stdio_usb, stdio_semihosting
  */
 void stdio_init_all(void);
@@ -74,7 +77,7 @@ int getchar_timeout_us(uint32_t timeout_us);
 /*! \brief Adds or removes a driver from the list of active drivers used for input/output
  * \ingroup pico_stdio
  *
- * \note this method should always be called on an initialized driver
+ * \note this method should always be called on an initialized driver and is not re-entrant
  * \param driver the driver
  * \param enabled true to add, false to remove
  */
@@ -99,6 +102,16 @@ void stdio_filter_driver(stdio_driver_t *driver);
  * \param translate If true, convert line feeds to carriage return on transmissions
  */
 void stdio_set_translate_crlf(stdio_driver_t *driver, bool translate);
+
+/*! \brief putchar variant that skips any CR/LF conversion if enabled
+ * \ingroup pico_stdio
+ */
+int putchar_raw(int c);
+
+/*! \brief puts variant that skips any CR/LF conversion if enabled
+ * \ingroup pico_stdio
+ */
+int puts_raw(const char *s);
 
 #ifdef __cplusplus
 }

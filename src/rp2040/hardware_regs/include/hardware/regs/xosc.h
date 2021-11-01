@@ -124,20 +124,21 @@
 // Description : Controls the startup delay
 #define XOSC_STARTUP_OFFSET _u(0x0000000c)
 #define XOSC_STARTUP_BITS   _u(0x00103fff)
-#define XOSC_STARTUP_RESET  _u(0x00000000)
+#define XOSC_STARTUP_RESET  _u(0x000000c4)
 // -----------------------------------------------------------------------------
 // Field       : XOSC_STARTUP_X4
 // Description : Multiplies the startup_delay by 4. This is of little value to
-//               the user given that the delay can be programmed directly
-#define XOSC_STARTUP_X4_RESET  "-"
+//               the user given that the delay can be programmed directly.
+#define XOSC_STARTUP_X4_RESET  _u(0x0)
 #define XOSC_STARTUP_X4_BITS   _u(0x00100000)
 #define XOSC_STARTUP_X4_MSB    _u(20)
 #define XOSC_STARTUP_X4_LSB    _u(20)
 #define XOSC_STARTUP_X4_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : XOSC_STARTUP_DELAY
-// Description : in multiples of 256*xtal_period
-#define XOSC_STARTUP_DELAY_RESET  "-"
+// Description : in multiples of 256*xtal_period. The reset value of 0xc4
+//               corresponds to approx 50 000 cycles.
+#define XOSC_STARTUP_DELAY_RESET  _u(0x00c4)
 #define XOSC_STARTUP_DELAY_BITS   _u(0x00003fff)
 #define XOSC_STARTUP_DELAY_MSB    _u(13)
 #define XOSC_STARTUP_DELAY_LSB    _u(0)

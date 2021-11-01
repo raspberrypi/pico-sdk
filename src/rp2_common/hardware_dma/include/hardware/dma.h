@@ -54,6 +54,10 @@ static inline void check_dma_channel_param(__unused uint channel) {
 #endif
 }
 
+static inline void check_dma_timer_param(__unused uint timer_num) {
+    valid_params_if(DMA, timer_num < NUM_DMA_TIMERS);
+}
+
 inline static dma_channel_hw_t *dma_channel_hw_addr(uint channel) {
     check_dma_channel_param(channel);
     return &dma_hw->ch[channel];
@@ -713,6 +717,71 @@ inline static void dma_sniffer_set_byte_swap_enabled(bool swap) {
  */
 inline static void dma_sniffer_disable(void) {
     dma_hw->sniff_ctrl = 0;
+}
+
+/*! \brief Mark a dma timer as used
+ *  \ingroup hardware_dma
+ *
+ * Method for cooperative claiming of hardware. Will cause a panic if the timer
+ * is already claimed. Use of this method by libraries detects accidental
+ * configurations that would fail in unpredictable ways.
+ *
+ * \param timer the dma timer
+ */
+void dma_timer_claim(uint timer);
+
+/*! \brief Mark a dma timer as no longer used
+ *  \ingroup hardware_dma
+ *
+ * Method for cooperative claiming of hardware.
+ *
+ * \param timer the dma timer to release
+ */
+void dma_timer_unclaim(uint timer);
+
+/*! \brief Claim a free dma timer
+ *  \ingroup hardware_dma
+ *
+ * \param required if true the function will panic if none are available
+ * \return the dma timer number or -1 if required was false, and none were free
+ */
+int dma_claim_unused_timer(bool required);
+
+/*! \brief Determine if a dma timer is claimed
+ *  \ingroup hardware_dma
+ *
+ * \param timer the dma timer
+ * \return true if the timer is claimed, false otherwise
+ * \see dma_timer_claim
+ */
+bool dma_timer_is_claimed(uint timer);
+
+/*! \brief Set the divider for the given DMA timer
+ *  \ingroup hardware_dma
+ *
+ * The timer will run at the system_clock_freq * numerator / denominator, so this is the speed
+ * that data elements will be transferred at via a DMA channel using this timer as a DREQ
+ *
+ * \param timer the dma timer
+ * \param numerator the fraction's numerator
+ * \param denominator the fraction's denominator
+ */
+static inline void dma_timer_set_fraction(uint timer, uint16_t numerator, uint16_t denominator) {
+    check_dma_timer_param(timer);
+    dma_hw->timer[timer] = (((uint32_t)numerator) << DMA_TIMER0_X_LSB) | (((uint32_t)denominator) << DMA_TIMER0_Y_LSB);
+}
+
+/*! \brief Return the DREQ number for a given DMA timer
+ *  \ingroup hardware_dma
+ *
+ * \param timer_num DMA timer number 0-3
+ */
+static inline uint dma_get_timer_dreq(uint timer_num) {
+    static_assert(DREQ_DMA_TIMER1 == DREQ_DMA_TIMER0 + 1, "");
+    static_assert(DREQ_DMA_TIMER2 == DREQ_DMA_TIMER0 + 2, "");
+    static_assert(DREQ_DMA_TIMER3 == DREQ_DMA_TIMER0 + 3, "");
+    check_dma_timer_param(timer_num);
+    return DREQ_DMA_TIMER0 + timer_num;
 }
 
 #ifndef NDEBUG

@@ -4,13 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "hardware/platform_defs.h"
-#include "pico/config.h"
-
-#define WRAPPER_FUNC_NAME(x) __wrap_##x
-#define SECTION_NAME(x) .text.##x
-#define RAM_SECTION_NAME(x) .time_critical.##x
-#define rom_table_code(c1, c2) ((c1) | ((c2) << 8))
+#include "pico.h"
 
 // do not put align in here as it is used mid function sometimes
 .macro regular_func x

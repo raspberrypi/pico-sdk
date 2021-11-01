@@ -25,7 +25,7 @@
  * Programmable I/O (PIO) API
  *
  * A programmable input/output block (PIO) is a versatile hardware interface which
- * can support a number of different IO standards. There are two PIO blocks in the RP2040
+ * can support a number of different IO standards. There are two PIO blocks in the RP2040.
  *
  * Each PIO is programmable in the same sense as a processor: the four state machines independently
  * execute short, sequential programs, to manipulate GPIOs and transfer data. Unlike a general
@@ -436,14 +436,19 @@ static inline void pio_gpio_init(PIO pio, uint pin) {
     gpio_set_function(pin, pio == pio0 ? GPIO_FUNC_PIO0 : GPIO_FUNC_PIO1);
 }
 
-/*! \brief Return the DREQ to use for pacing transfers to a particular state machine
+/*! \brief Return the DREQ to use for pacing transfers to/from a particular state machine FIFO
  *  \ingroup hardware_pio
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
- * \param is_tx true for sending data to the state machine, false for received data from the state machine
+ * \param is_tx true for sending data to the state machine, false for receiving data from the state machine
  */
 static inline uint pio_get_dreq(PIO pio, uint sm, bool is_tx) {
+    static_assert(DREQ_PIO0_TX1 == DREQ_PIO0_TX0 + 1, "");
+    static_assert(DREQ_PIO0_TX2 == DREQ_PIO0_TX0 + 2, "");
+    static_assert(DREQ_PIO0_TX3 == DREQ_PIO0_TX0 + 3, "");
+    static_assert(DREQ_PIO0_RX0 == DREQ_PIO0_TX0 + NUM_PIO_STATE_MACHINES, "");
+    static_assert(DREQ_PIO1_RX0 == DREQ_PIO1_TX0 + NUM_PIO_STATE_MACHINES, "");
     check_pio_param(pio);
     check_sm_param(sm);
     return sm + (is_tx ? 0 : NUM_PIO_STATE_MACHINES) + (pio == pio0 ? DREQ_PIO0_TX0 : DREQ_PIO1_TX0);

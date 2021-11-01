@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include "hardware/structs/uart.h"
+#include "hardware/regs/dreq.h"
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_UART, Enable/disable assertions in the UART module, type=bool, default=0, group=hardware_uart
 #ifndef PARAM_ASSERTIONS_ENABLED_UART
@@ -205,12 +206,17 @@ static inline void uart_set_format(uart_inst_t *uart, uint data_bits, uint stop_
  * this function.
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
- * \param rx_has_data If true an interrupt will be fired when the RX FIFO contain data.
+ * \param rx_has_data If true an interrupt will be fired when the RX FIFO contains data.
  * \param tx_needs_data If true an interrupt will be fired when the TX FIFO needs data.
  */
 static inline void uart_set_irq_enables(uart_inst_t *uart, bool rx_has_data, bool tx_needs_data) {
+    // Both UARTRXINTR (RX) and UARTRTINTR (RX timeout) interrupts are
+    // required for rx_has_data. RX asserts when >=4 characters are in the RX
+    // FIFO (for RXIFLSEL=0). RT asserts when there are >=1 characters and no
+    // more have been received for 32 bit periods.
     uart_get_hw(uart)->imsc = (bool_to_bit(tx_needs_data) << UART_UARTIMSC_TXIM_LSB) |
-                              (bool_to_bit(rx_has_data) << UART_UARTIMSC_RXIM_LSB);
+                              (bool_to_bit(rx_has_data) << UART_UARTIMSC_RXIM_LSB) |
+                              (bool_to_bit(rx_has_data) << UART_UARTIMSC_RTIM_LSB);
     if (rx_has_data) {
         // Set minimum threshold
         hw_write_masked(&uart_get_hw(uart)->ifls, 0 << UART_UARTIFLS_RXIFLSEL_LSB,
@@ -321,7 +327,7 @@ static inline void uart_read_blocking(uart_inst_t *uart, uint8_t *dst, size_t le
 /*! \brief  Write single character to UART for transmission.
  *  \ingroup hardware_uart
  *
- * This function will block until all the character has been sent
+ * This function will block until the entire character has been sent
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param c The character  to send
@@ -407,7 +413,7 @@ static inline void uart_set_break(uart_inst_t *uart, bool en) {
  */
 void uart_set_translate_crlf(uart_inst_t *uart, bool translate);
 
-/*! \brief Wait for the default UART'S TX fifo to be drained
+/*! \brief Wait for the default UART's TX FIFO to be drained
  *  \ingroup hardware_uart
  */
 static inline void uart_default_tx_wait_blocking(void) {
@@ -426,6 +432,19 @@ static inline void uart_default_tx_wait_blocking(void) {
  * \return true if the RX FIFO became non empty before the timeout, false otherwise
  */
 bool uart_is_readable_within_us(uart_inst_t *uart, uint32_t us);
+
+/*! \brief Return the DREQ to use for pacing transfers to/from a particular UART instance
+ *  \ingroup hardware_uart
+ *
+ * \param uart UART instance. \ref uart0 or \ref uart1
+ * \param is_tx true for sending data to the UART instance, false for receiving data from the UART instance
+ */
+static inline uint uart_get_dreq(uart_inst_t *uart, bool is_tx) {
+    static_assert(DREQ_UART0_RX == DREQ_UART0_TX + 1, "");
+    static_assert(DREQ_UART1_RX == DREQ_UART1_TX + 1, "");
+    static_assert(DREQ_UART1_TX == DREQ_UART0_TX + 2, "");
+    return DREQ_UART0_TX + uart_get_index(uart) * 2 + !is_tx;
+}
 
 #ifdef __cplusplus
 }

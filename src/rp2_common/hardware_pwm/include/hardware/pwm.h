@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include "hardware/structs/pwm.h"
+#include "hardware/regs/dreq.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +27,7 @@ extern "C" {
  *
  * The RP2040 PWM block has 8 identical slices. Each slice can drive two PWM output signals, or
  * measure the frequency or duty cycle of an input signal. This gives a total of up to 16 controllable
- * PWM outputs. All 30 GPIOs can be driven by the PWM block
+ * PWM outputs. All 30 GPIOs can be driven by the PWM block.
  *
  * The PWM hardware functions by continuously comparing the input value to a free-running counter. This produces a
  * toggling output where the amount of time spent at the high output level is proportional to the input value. The fraction of
@@ -116,21 +117,21 @@ static inline void pwm_config_set_phase_correct(pwm_config *c, bool phase_correc
  * before passing them on to the PWM counter.
  */
 static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
-    c->div = (uint32_t)(div * (float)(1u << PWM_CH1_DIV_INT_LSB));
+    c->div = (uint32_t)(div * (float)(1u << PWM_CH0_DIV_INT_LSB));
 }
 
 /** \brief Set PWM clock divider in a PWM configuration
  *  \ingroup hardware_pwm
  *
  * \param c PWM configuration struct to modify
- * \param div integer value to reduce counting rate by. Must be greater than or equal to 1.
+ * \param div Integer value to reduce counting rate by. Must be greater than or equal to 1.
  *
  * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
  * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
  * before passing them on to the PWM counter.
  */
 static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
-    c->div = div << PWM_CH1_DIV_INT_LSB;
+    c->div = div << PWM_CH0_DIV_INT_LSB;
 }
 
 /** \brief Set PWM counting mode in a PWM configuration
@@ -201,7 +202,7 @@ static inline void pwm_init(uint slice_num, pwm_config *c, bool start) {
 /** \brief Get a set of default values for PWM configuration
  *  \ingroup hardware_pwm
  *
- * PWM config is free running at system clock speed, no phase correction, wrapping at 0xffff,
+ * PWM config is free-running at system clock speed, no phase correction, wrapping at 0xffff,
  * with standard polarities for channels A and B.
  *
  * \return Set of default values.
@@ -239,7 +240,7 @@ static inline void pwm_set_wrap(uint slice_num, uint16_t wrap) {
 /** \brief Set the current PWM counter compare value for one channel
  *  \ingroup hardware_pwm
  *
- * Set the value of the PWM counter compare value, for either channel A or channel B
+ * Set the value of the PWM counter compare value, for either channel A or channel B.
  *
  * The counter compare register is double-buffered in hardware. This means
  * that, when the PWM is running, a write to the counter compare values does
@@ -263,7 +264,7 @@ static inline void pwm_set_chan_level(uint slice_num, uint chan, uint16_t level)
 /** \brief Set PWM counter compare values
  *  \ingroup hardware_pwm
  *
- * Set the value of the PWM counter compare values, A and B
+ * Set the value of the PWM counter compare values, A and B.
  *
  * The counter compare register is double-buffered in hardware. This means
  * that, when the PWM is running, a write to the counter compare values does
@@ -284,7 +285,7 @@ static inline void pwm_set_both_levels(uint slice_num, uint16_t level_a, uint16_
  *  \ingroup hardware_pwm
  *
  * Look up the correct slice (0 to 7) and channel (A or B) for a given GPIO, and update the corresponding
- * counter-compare field.
+ * counter compare field.
  *
  * This PWM slice should already have been configured and set running. Also be careful of multiple GPIOs
  * mapping to the same slice and channel (if GPIOs have a difference of 16).
@@ -309,7 +310,7 @@ static inline void pwm_set_gpio_level(uint gpio, uint16_t level) {
  * Get current value of PWM counter
  *
  * \param slice_num PWM slice number
- * \return Current value of PWM counter
+ * \return Current value of the PWM counter
  */
 static inline uint16_t pwm_get_counter(uint slice_num) {
     check_slice_num_param(slice_num);
@@ -367,7 +368,7 @@ static inline void pwm_retard_count(uint slice_num) {
 /** \brief Set PWM clock divider using an 8:4 fractional value
  *  \ingroup hardware_pwm
  *
- * Set the clock divider. Counter increment will be on sysclock divided by this value, taking in to account the gating.
+ * Set the clock divider. Counter increment will be on sysclock divided by this value, taking into account the gating.
  *
  * \param slice_num PWM slice number
  * \param integer  8 bit integer part of the clock divider
@@ -382,7 +383,7 @@ static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t integer, uint
 /** \brief Set PWM clock divider
  *  \ingroup hardware_pwm
  *
- * Set the clock divider. Counter increment will be on sysclock divided by this value, taking in to account the gating.
+ * Set the clock divider. Counter increment will be on sysclock divided by this value, taking into account the gating.
  *
  * \param slice_num PWM slice number
  * \param divider Floating point clock divider,  1.f <= value < 256.f
@@ -441,8 +442,28 @@ static inline void pwm_set_phase_correct(uint slice_num, bool phase_correct) {
 /** \brief Enable/Disable PWM
  *  \ingroup hardware_pwm
  *
+ * When a PWM is disabled, it halts its counter, and the output pins are left
+ * high or low depending on exactly when the counter is halted. When
+ * re-enabled the PWM resumes immediately from where it left off.
+ *
+ * If the PWM's output pins need to be low when halted:
+ *
+ * - The counter compare can be set to zero whilst the PWM is enabled, and
+ *   then the PWM disabled once both pins are seen to be low
+ *
+ * - The GPIO output overrides can be used to force the actual pins low
+ *
+ * - The PWM can be run for one cycle (i.e. enabled then immediately disabled)
+ *   with a TOP of 0, count of 0 and counter compare of 0, to force the pins
+ *   low when the PWM has already been halted. The same method can be used
+ *   with a counter compare value of 1 to force a pin high.
+ *
+ * Note that, when disabled, the PWM can still be advanced one count at a time
+ * by pulsing the PH_ADV bit in its CSR. The output pins transition as though
+ * the PWM were enabled.
+ *
  * \param slice_num PWM slice number
- * \param enabled true to enable the specified PWM, false to disable
+ * \param enabled true to enable the specified PWM, false to disable.
  */
 static inline void pwm_set_enabled(uint slice_num, bool enabled) {
     check_slice_num_param(slice_num);
@@ -461,7 +482,7 @@ static inline void pwm_set_mask_enabled(uint32_t mask) {
 /*! \brief  Enable PWM instance interrupt
  *  \ingroup hardware_pwm
  *
- * Used to enable a single PWM instance interrupt
+ * Used to enable a single PWM instance interrupt.
  *
  * \param slice_num PWM block to enable/disable
  * \param enabled true to enable, false to disable
@@ -492,7 +513,7 @@ static inline void pwm_set_irq_mask_enabled(uint32_t slice_mask, bool enabled) {
     }
 }
 
-/*! \brief  Clear single PWM channel interrupt
+/*! \brief  Clear a single PWM channel interrupt
  *  \ingroup hardware_pwm
  *
  * \param slice_num PWM slice number
@@ -517,6 +538,18 @@ static inline uint32_t pwm_get_irq_status_mask(void) {
  */
 static inline void pwm_force_irq(uint slice_num) {
     pwm_hw->intf = 1u << slice_num;
+}
+
+/*! \brief Return the DREQ to use for pacing transfers to a particular PWM slice
+ *  \ingroup hardware_pwm
+ *
+ * \param slice_num PWM slice number
+ */
+static inline uint pwm_get_dreq(uint slice_num) {
+    static_assert(DREQ_PWM_WRAP1 == DREQ_PWM_WRAP0 + 1, "");
+    static_assert(DREQ_PWM_WRAP7 == DREQ_PWM_WRAP0 + 7, "");
+    check_slice_num_param(slice_num);
+    return DREQ_PWM_WRAP0 + slice_num;
 }
 
 #ifdef __cplusplus

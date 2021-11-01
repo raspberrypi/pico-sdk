@@ -413,6 +413,7 @@ y64:
  lsls r3,#16
  orrs r3,r4
  str r3,[r7,#SIO_DIV_UDIVIDEND_OFFSET] @ y1=(r0<<16)+(((ui32)y)>>16);
+ str r2,[r7,#SIO_DIV_UDIVISOR_OFFSET]  @ must set divisor again, as we do not save/restore regs at all in IRQs if not dirty
  wait_div 1
  uxth r4,r0
  ldr r3,[r7,#SIO_DIV_REMAINDER_OFFSET] @ r1=y1-q1*x; 0<=r1<x
@@ -420,6 +421,7 @@ y64:
  lsls r3,#16
  orrs r3,r4
  str r3,[r7,#SIO_DIV_UDIVIDEND_OFFSET] @ y1=(r0<<16)+(((ui32)y)>>16);
+ str r2,[r7,#SIO_DIV_UDIVISOR_OFFSET]  @ must set divisor again, as we do not save/restore regs at all in IRQs if not dirty
  wait_div 3
  movs r3,#0
  lsls r4,r5,#16             @ quotient=(q0<<32)+(q1<<16)+q2

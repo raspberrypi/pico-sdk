@@ -37,14 +37,14 @@ int main(int argc, char *argv[]) {
     for (; !res && i < argc; i++) {
         if (argv[i][0] != '-') break;
         if (argv[i] == std::string("-o")) {
-            if (i++ < argc) {
+            if (++i < argc) {
                 format = argv[i];
             } else {
                 std::cerr << "error: -o requires format value" << std::endl;
                 res = 1;
             }
         } else if (argv[i] == std::string("-p")) {
-            if (i++ < argc) {
+            if (++i < argc) {
                 options.emplace_back(argv[i]);
             } else {
                 std::cerr << "error: -p requires parameter value" << std::endl;

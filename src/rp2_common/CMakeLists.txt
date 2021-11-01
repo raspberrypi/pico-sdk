@@ -72,5 +72,6 @@ endif()
 set(CMAKE_EXECUTABLE_SUFFIX "${CMAKE_EXECUTABLE_SUFFIX}" PARENT_SCOPE)
 
 pico_add_doxygen(${CMAKE_CURRENT_LIST_DIR})
+pico_add_doxygen_exclude(${CMAKE_CURRENT_LIST_DIR}/cmsis)
 
 pico_promote_common_scope_vars()

@@ -143,6 +143,9 @@ int read_and_check_elf32_ph_entries(FILE *in, const elf32_header &eh, const addr
     }
     if (eh.ph_num) {
         std::vector<elf32_ph_entry> entries(eh.ph_num);
+        if (fseek(in, eh.ph_offset, SEEK_SET)) {
+            return fail_read_error();
+        }
         if (eh.ph_num != fread(&entries[0], sizeof(struct elf32_ph_entry), eh.ph_num, in)) {
             return fail_read_error();
         }
