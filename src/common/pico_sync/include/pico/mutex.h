@@ -175,7 +175,7 @@ bool mutex_enter_timeout_us(mutex_t *mtx, uint32_t timeout_us);
  * Wait for up to the specific time to take ownership of the recursive mutex. If the caller
  * already has ownership of the mutex or can be granted ownership of the mutex before the timeout expires,
  * then true will be returned and the caller will own the mutex, otherwise false will be returned and the caller
- * will <b>NOT</b> own the mutex.
+ * will NOT own the mutex.
  *
  * \param mtx Pointer to mutex structure
  * \param timeout_us The timeout in microseconds.
@@ -189,7 +189,7 @@ bool recursive_mutex_enter_timeout_us(recursive_mutex_t *mtx, uint32_t timeout_u
  * Wait until the specific time to take ownership of the mutex. If the caller
  * can be granted ownership of the mutex before the timeout expires, then true will be returned
  * and the caller will own the mutex, otherwise false will be returned and the caller
- * will <b>NOT</b> own the mutex.
+ * will NOT own the mutex.
  *
  * \param mtx Pointer to mutex structure
  * \param until The time after which to return if the caller cannot be granted ownership of the mutex
