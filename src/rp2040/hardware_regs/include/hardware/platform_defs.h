@@ -36,7 +36,10 @@
 
 #define PIO_INSTRUCTION_COUNT _u(32)
 
+// PICO_CONFIG: XOSC_MHZ, The crystal oscillator frequency in Mhz, type=int, default=12, advanced=true, group=hardware_base
+#ifndef XOSC_MHZ
 #define XOSC_MHZ _u(12)
+#endif
 
 #endif
 
