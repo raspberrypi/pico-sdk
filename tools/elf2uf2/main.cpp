@@ -59,14 +59,16 @@ struct address_range {
 
 typedef std::vector<address_range> address_ranges;
 
-#define MAIN_RAM_START        0x20000000u
-#define MAIN_RAM_END          0x20042000u
-#define FLASH_START           0x10000000u
+#define MAIN_RAM_START        0x20000000u // same as SRAM_BASE in addressmap.h
+#define MAIN_RAM_END          0x20042000u // same as SRAM_END in addressmap.h
+#define FLASH_START           0x10000000u // same as XIP_MAIN_BASE in addressmap.h
 #define FLASH_END             0x15000000u
-#define XIP_SRAM_START        0x15000000u
-#define XIP_SRAM_END          0x15004000u
-#define MAIN_RAM_BANKED_START 0x21000000u
+#define XIP_SRAM_START        0x15000000u // same as XIP_SRAM_BASE in addressmap.h
+#define XIP_SRAM_END          0x15004000u // same as XIP_SRAM_END in addressmap.h
+#define MAIN_RAM_BANKED_START 0x21000000u // same as SRAM0_BASE in addressmap.h
 #define MAIN_RAM_BANKED_END   0x21040000u
+#define ROM_START             0x00000000u // same as ROM_BASE in addressmap.h
+#define ROM_END               0x00004000u
 
 const address_ranges rp2040_address_ranges_flash {
     address_range(FLASH_START, FLASH_END, address_range::type::CONTENTS),
@@ -77,7 +79,7 @@ const address_ranges rp2040_address_ranges_flash {
 const address_ranges rp2040_address_ranges_ram {
     address_range(MAIN_RAM_START, MAIN_RAM_END, address_range::type::CONTENTS),
     address_range(XIP_SRAM_START, XIP_SRAM_END, address_range::type::CONTENTS),
-    address_range(0x00000000u, 0x00004000u, address_range::type::IGNORE) // for now we ignore the bootrom if present
+    address_range(ROM_START, ROM_END, address_range::type::IGNORE) // for now we ignore the bootrom if present
 };
 
 struct page_fragment {
