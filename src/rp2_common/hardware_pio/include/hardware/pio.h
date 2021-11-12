@@ -790,9 +790,9 @@ static inline void pio_set_irqn_source_enabled(PIO pio, uint irq_index, enum pio
 static inline void pio_set_irqn_source_mask_enabled(PIO pio, uint irq_index, uint32_t source_mask, bool enabled) {
     invalid_params_if(PIO, irq_index > 1);
     if (irq_index) {
-        pio_set_irq0_source_mask_enabled(pio, source_mask, enabled);
-    } else {
         pio_set_irq1_source_mask_enabled(pio, source_mask, enabled);
+    } else {
+        pio_set_irq0_source_mask_enabled(pio, source_mask, enabled);
     }
 }
 
