@@ -234,7 +234,7 @@ extern "C" {
  *
  */
 #if defined(__GNUC__) && __GNUC__ <= 7
-#define __force_inline inline __always_inline
+#define __force_inline inline
 #else
 #define __force_inline __always_inline
 #endif
