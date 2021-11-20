@@ -9,11 +9,11 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-#ifndef _BOARDS_PYBSTICK26_RP2040_H
-#define _BOARDS_PYBSTICK26_RP2040_H
+#ifndef _BOARDS_GARATRONIC_PYBSTICK26_RP2040_H
+#define _BOARDS_GARATRONIC_PYBSTICK26_RP2040_H
 
 // For board detection
-#define PYBSTICK26_RP2040
+#define GARATRONIC_PYBSTICK26_RP2040
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
@@ -82,4 +82,4 @@
 #endif
 
 #endif
-// of #define _BOARDS_PYBSTICK26_RP2040_H
+// of #define _BOARDS_GARATRONIC_PYBSTICK26_RP2040_H
