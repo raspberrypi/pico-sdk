@@ -16,6 +16,32 @@
 
 // For board detection
 #define WIZNET_W5100S_EVB_PICO
+// --- BOARD SPECIFIC ---
+#ifndef W5100S_EVB_PICO_INTN_PIN
+#define W5100S_EVB_PICO_INTN_PIN 20
+#endif
+
+#ifndef W5100S_EVB_PICO_RSTN_PIN
+#define W5100S_EVB_PICO_RSTN_PIN 21
+#endif
+
+#ifndef W5100S_EVB_PICO_LED_PIN
+#define W5100S_EVB_PICO_LED_PIN 25
+#endif
+
+#ifndef W5100S_EVB_PICO_ADC_VREF_PIN
+#define W5100S_EVB_PICO_ADC_VREF_PIN 29
+#endif
+
+#ifndef W5100S_EVB_PICO_A0_PIN
+#define W5100S_EVB_PICO_A0_PIN 26
+#endif
+#ifndef W5100S_EVB_PICO_A1_PIN
+#define W5100S_EVB_PICO_A1_PIN 27
+#endif
+#ifndef W5100S_EVB_PICO_A2_PIN
+#define W5100S_EVB_PICO_A2_PIN 28
+#endif
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
