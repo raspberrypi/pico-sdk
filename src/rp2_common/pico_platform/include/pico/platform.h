@@ -233,7 +233,7 @@ extern "C" {
  *      int __force_inline my_function(int x) {
  *
  */
-#if defined(__GNUC__) && __GNUC__ <= 7
+#if defined(__GNUC__) && (__GNUC__ <= 6 || (__GNUC__ == 7 && (__GNUC_MINOR__ < 3 || !defined(__cplusplus))))
 #define __force_inline inline __always_inline
 #else
 #define __force_inline __always_inline

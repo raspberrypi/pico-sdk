@@ -54,7 +54,7 @@ typedef struct {
     io_rw_32 count;
 } xosc_hw_t;
 
-#define xosc_hw ((xosc_hw_t *const)XOSC_BASE)
+#define xosc_hw ((xosc_hw_t *)XOSC_BASE)
 /// \end::xosc_hw[]
 
 #endif

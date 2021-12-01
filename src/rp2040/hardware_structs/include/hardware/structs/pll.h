@@ -49,8 +49,8 @@ typedef struct {
     io_rw_32 prim;
 } pll_hw_t;
 
-#define pll_sys_hw ((pll_hw_t *const)PLL_SYS_BASE)
-#define pll_usb_hw ((pll_hw_t *const)PLL_USB_BASE)
+#define pll_sys_hw ((pll_hw_t *)PLL_SYS_BASE)
+#define pll_usb_hw ((pll_hw_t *)PLL_USB_BASE)
 /// \end::pll_hw[]
 
 #endif

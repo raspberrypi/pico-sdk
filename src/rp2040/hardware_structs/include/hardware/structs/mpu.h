@@ -56,6 +56,6 @@ typedef struct {
     io_rw_32 rasr;
 } mpu_hw_t;
 
-#define mpu_hw ((mpu_hw_t *const)(PPB_BASE + M0PLUS_MPU_TYPE_OFFSET))
+#define mpu_hw ((mpu_hw_t *)(PPB_BASE + M0PLUS_MPU_TYPE_OFFSET))
 
 #endif

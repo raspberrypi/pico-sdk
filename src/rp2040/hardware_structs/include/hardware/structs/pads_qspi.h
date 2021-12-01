@@ -40,7 +40,7 @@ typedef struct {
     io_rw_32 io[NUM_QSPI_GPIOS]; // 6
 } pads_qspi_hw_t;
 
-#define pads_qspi_hw ((pads_qspi_hw_t *const)PADS_QSPI_BASE)
+#define pads_qspi_hw ((pads_qspi_hw_t *)PADS_QSPI_BASE)
 
 static_assert( NUM_QSPI_GPIOS == 6, "");
 
