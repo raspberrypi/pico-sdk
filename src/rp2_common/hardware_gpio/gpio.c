@@ -142,7 +142,7 @@ static void gpio_irq_handler(void) {
     io_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?
                                            &iobank0_hw->proc1_irq_ctrl : &iobank0_hw->proc0_irq_ctrl;
     for (uint gpio = 0; gpio < NUM_BANK0_GPIOS; gpio++) {
-        io_rw_32 *status_reg = &irq_ctrl_base->ints[gpio / 8];
+        io_ro_32 *status_reg = &irq_ctrl_base->ints[gpio / 8];
         uint events = (*status_reg >> 4 * (gpio % 8)) & 0xf;
         if (events) {
             // TODO: If both cores care about this event then the second core won't get the irq?

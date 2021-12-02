@@ -18,6 +18,7 @@
 #include "hardware/interp.h"
 #include "hardware/irq.h"
 #include "hardware/pio.h"
+#include "hardware/pio_instructions.h"
 #include "hardware/pll.h"
 #include "hardware/pwm.h"
 #include "hardware/resets.h"
@@ -40,11 +41,45 @@
 #include "pico/malloc.h"
 #include "pico/multicore.h"
 #include "pico/printf.h"
+#include "pico/runtime.h"
+#include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/sync.h"
 #include "pico/time.h"
 #include "pico/unique_id.h"
 
+#include "hardware/structs/adc.h"
+#include "hardware/structs/bus_ctrl.h"
+#include "hardware/structs/clocks.h"
+#include "hardware/structs/dma.h"
+#include "hardware/structs/i2c.h"
+#include "hardware/structs/interp.h"
+#include "hardware/structs/iobank0.h"
+#include "hardware/structs/ioqspi.h"
+#include "hardware/structs/mpu.h"
+#include "hardware/structs/padsbank0.h"
+#include "hardware/structs/pads_qspi.h"
+#include "hardware/structs/pio.h"
+#include "hardware/structs/pll.h"
+#include "hardware/structs/psm.h"
+#include "hardware/structs/pwm.h"
+#include "hardware/structs/resets.h"
+#include "hardware/structs/rosc.h"
+#include "hardware/structs/rtc.h"
+#include "hardware/structs/scb.h"
+#include "hardware/structs/sio.h"
+#include "hardware/structs/spi.h"
+#include "hardware/structs/ssi.h"
+#include "hardware/structs/syscfg.h"
+#include "hardware/structs/systick.h"
+#include "hardware/structs/timer.h"
+#include "hardware/structs/uart.h"
+#include "hardware/structs/usb.h"
+#include "hardware/structs/vreg_and_chip_reset.h"
+#include "hardware/structs/watchdog.h"
+#include "hardware/structs/xip_ctrl.h"
+#include "hardware/structs/xosc.h"
+        
 bi_decl(bi_block_device(
                            BINARY_INFO_MAKE_TAG('K', 'S'),
                            "foo",
@@ -84,7 +119,7 @@ void __isr dma_handler_b(void) {
     printf("HELLO B\n");
     if (dma_hw->ints1 & 1) {
         dma_hw->ints1 = 1;
-        printf("B WINS DNA_TO %08x\n", (uint) dma_to);
+        printf("B WINS DMA_TO %08x\n", (uint) dma_to);
 //        irq_remove_handler(DMA_IRQ_1, dma_handler_b);
     }
 }

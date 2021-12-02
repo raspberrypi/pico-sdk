@@ -33,8 +33,6 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
     add_subdirectory(tools)
     add_subdirectory(src)
 
-    add_compile_options(-Winline)
-
     # allow customization
     add_sub_list_dirs(PICO_SDK_POST_LIST_DIRS)
     add_sub_list_files(PICO_SDK_POST_LIST_FILES)

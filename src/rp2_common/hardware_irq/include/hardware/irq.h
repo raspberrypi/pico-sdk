@@ -8,12 +8,12 @@
 #define _HARDWARE_IRQ_H_
 
 // These two config items are also used by assembler, so keeping separate
-// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum Number of shared IRQ handers, default=4, advanced=true, group=hardware_irq
+// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum number of shared IRQ handlers, default=4, advanced=true, group=hardware_irq
 #ifndef PICO_MAX_SHARED_IRQ_HANDLERS
 #define PICO_MAX_SHARED_IRQ_HANDLERS 4u
 #endif
 
-// PICO_CONFIG: PICO_DISABLE_SHARED_IRQ_HANDLERS, Disable shared IRQ handers, type=bool, default=0, group=hardware_irq
+// PICO_CONFIG: PICO_DISABLE_SHARED_IRQ_HANDLERS, Disable shared IRQ handlers, type=bool, default=0, group=hardware_irq
 #ifndef PICO_DISABLE_SHARED_IRQ_HANDLERS
 #define PICO_DISABLE_SHARED_IRQ_HANDLERS 0
 #endif
@@ -37,13 +37,13 @@
  * On the RP2040, only the lower 26 IRQ signals are connected on the NVIC; IRQs 26 to 31 are tied to zero (never firing).
  *
  * There is one NVIC per core, and each core's NVIC has the same hardware interrupt lines routed to it, with the exception of the IO interrupts
- * where there is one IO interrupt per bank, per core. These are completely independent, so for example, processor 0 can be
+ * where there is one IO interrupt per bank, per core. These are completely independent, so, for example, processor 0 can be
  * interrupted by GPIO 0 in bank 0, and processor 1 by GPIO 1 in the same bank.
  *
  * \note That all IRQ APIs affect the executing core only (i.e. the core calling the function).
  *
  * \note You should not enable the same (shared) IRQ number on both cores, as this will lead to race conditions
- * or starvation of one of the cores. Additionally don't forget that disabling interrupts on one core does not disable interrupts
+ * or starvation of one of the cores. Additionally, don't forget that disabling interrupts on one core does not disable interrupts
  * on the other core.
  *
  * There are three different ways to set handlers for an IRQ:
@@ -53,7 +53,7 @@
  *    you will not be able to change it using the above APIs at runtime). Using this method can cause link conflicts at runtime, and offers no runtime performance benefit (i.e, it should not generally be used).
  *
  * \note If an IRQ is enabled and fires with no handler installed, a breakpoint will be hit and the IRQ number will
- * be in r0.
+ * be in register r0.
  *
  * \section interrupt_nums Interrupt Numbers
  *
@@ -119,7 +119,11 @@ extern "C" {
  */
 typedef void (*irq_handler_t)(void);
 
-/*! \brief Set specified interrupts priority
+static inline void check_irq_param(__unused uint num) {
+    invalid_params_if(IRQ, num >= NUM_IRQS);
+}
+
+/*! \brief Set specified interrupt's priority
  *  \ingroup hardware_irq
  *
  * \param num Interrupt number
@@ -132,6 +136,21 @@ typedef void (*irq_handler_t)(void);
  * PICO_DEFAULT_IRQ_PRIORITY defaults to 0x80
  */
 void irq_set_priority(uint num, uint8_t hardware_priority);
+
+/*! \brief Get specified interrupt's priority
+ *  \ingroup hardware_irq
+ *
+ * Numerically-lower values indicate a higher priority. Hardware priorities
+ * range from 0 (highest priority) to 255 (lowest priority) though only the
+ * top 2 bits are significant on ARM Cortex-M0+. To make it easier to specify
+ * higher or lower priorities than the default, all IRQ priorities are
+ * initialized to PICO_DEFAULT_IRQ_PRIORITY by the SDK runtime at startup.
+ * PICO_DEFAULT_IRQ_PRIORITY defaults to 0x80
+ *
+ * \param num Interrupt number
+ * \return the IRQ priority
+ */
+uint irq_get_priority(uint num);
 
 /*! \brief Enable or disable a specific interrupt on the executing core
  *  \ingroup hardware_irq
@@ -245,7 +264,7 @@ static inline void irq_clear(uint int_num) {
     *((volatile uint32_t *) (PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = (1u << ((uint32_t) (int_num & 0x1F)));
 }
 
-/*! \brief Force an interrupt to pending on the executing core
+/*! \brief Force an interrupt to be pending on the executing core
  *  \ingroup hardware_irq
  *
  * This should generally not be used for IRQs connected to hardware.

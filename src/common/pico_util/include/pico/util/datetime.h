@@ -9,6 +9,10 @@
 
 #include "pico.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \file datetime.h
  * \defgroup util_datetime datetime
  * \brief Date/Time formatting
@@ -24,4 +28,7 @@
  */
 void datetime_to_str(char *buf, uint buf_size, const datetime_t *t);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

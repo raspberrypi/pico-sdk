@@ -41,10 +41,10 @@ static void stdio_usb_out_chars(const char *buf, int length) {
     if (tud_cdc_connected()) {
         for (int i = 0; i < length;) {
             int n = length - i;
-            int avail = tud_cdc_write_available();
+            int avail = (int) tud_cdc_write_available();
             if (n > avail) n = avail;
             if (n) {
-                int n2 = tud_cdc_write(buf + i, n);
+                int n2 = (int) tud_cdc_write(buf + i, (uint32_t)n);
                 tud_task();
                 tud_cdc_write_flush();
                 i += n2;
@@ -73,7 +73,7 @@ int stdio_usb_in_chars(char *buf, int length) {
     }
     int rc = PICO_ERROR_NO_DATA;
     if (tud_cdc_connected() && tud_cdc_available()) {
-        int count = tud_cdc_read(buf, length);
+        int count = (int) tud_cdc_read(buf, (uint32_t) length);
         rc =  count ? count : PICO_ERROR_NO_DATA;
     }
     mutex_exit(&stdio_usb_mutex);
@@ -103,8 +103,28 @@ bool stdio_usb_init(void) {
     bool rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
     if (rc) {
         stdio_set_driver_enabled(&stdio_usb, true);
+#if PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
+#if PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS > 0
+        absolute_time_t until = make_timeout_time_ms(PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS);
+#else
+        absolute_time_t until = at_the_end_of_time;
+#endif
+        do {
+            if (stdio_usb_connected()) {
+#if PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS != 0
+                sleep_ms(PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS);
+#endif
+                break;
+            }
+            sleep_ms(10);
+        } while (!time_reached(until));
+#endif
     }
     return rc;
+}
+
+bool stdio_usb_connected(void) {
+    return tud_cdc_connected();
 }
 #else
 #include "pico/stdio_usb.h"

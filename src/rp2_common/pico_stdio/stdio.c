@@ -10,7 +10,9 @@
 
 #include "pico.h"
 #include "pico/mutex.h"
+#if LIB_PICO_PRINTF_PICO
 #include "pico/printf.h"
+#endif
 #include "pico/stdio.h"
 #include "pico/stdio/driver.h"
 #include "pico/time.h"
@@ -53,12 +55,15 @@ void stdout_serialize_end(void) {
 }
 
 #else
-static bool print_serialize_begin(void) {
+static bool stdout_serialize_begin(void) {
     return true;
 }
-static void print_serialize_end(void) {
+static void stdout_serialize_end(void) {
 }
 #endif
+static void stdio_out_chars_no_crlf(stdio_driver_t *driver, const char *s, int len) {
+    driver->out_chars(s, len);
+}
 
 static void stdio_out_chars_crlf(stdio_driver_t *driver, const char *s, int len) {
 #if PICO_STDIO_ENABLE_CRLF_SUPPORT
@@ -89,7 +94,7 @@ static void stdio_out_chars_crlf(stdio_driver_t *driver, const char *s, int len)
 #endif
 }
 
-static bool stdio_put_string(const char *s, int len, bool newline) {
+static bool stdio_put_string(const char *s, int len, bool newline, bool no_cr) {
     bool serialized = stdout_serialize_begin();
     if (!serialized) {
 #if PICO_STDIO_IGNORE_NESTED_STDOUT
@@ -97,13 +102,14 @@ static bool stdio_put_string(const char *s, int len, bool newline) {
 #endif
     }
     if (len == -1) len = (int)strlen(s);
+    void (*out_func)(stdio_driver_t *, const char *, int) = no_cr ? stdio_out_chars_no_crlf : stdio_out_chars_crlf;
     for (stdio_driver_t *driver = drivers; driver; driver = driver->next) {
         if (!driver->out_chars) continue;
         if (filter && filter != driver) continue;
-        stdio_out_chars_crlf(driver, s, len);
+        out_func(driver, s, len);
         if (newline) {
             const char c = '\n';
-            stdio_out_chars_crlf(driver, &c, 1);
+            out_func(driver, &c, 1);
         }
     }
     if (serialized) {
@@ -134,13 +140,26 @@ static int stdio_get_until(char *buf, int len, absolute_time_t until) {
 
 int WRAPPER_FUNC(putchar)(int c) {
     char cc = (char)c;
-    stdio_put_string(&cc, 1, false);
+    stdio_put_string(&cc, 1, false, false);
     return c;
 }
 
 int WRAPPER_FUNC(puts)(const char *s) {
     int len = (int)strlen(s);
-    stdio_put_string(s, len, true);
+    stdio_put_string(s, len, true, false);
+    stdio_flush();
+    return len;
+}
+
+int putchar_raw(int c) {
+    char cc = (char)c;
+    stdio_put_string(&cc, 1, false, true);
+    return c;
+}
+
+int puts_raw(const char *s) {
+    int len = (int)strlen(s);
+    stdio_put_string(s, len, true, true);
     stdio_flush();
     return len;
 }
@@ -154,7 +173,7 @@ int _read(int handle, char *buffer, int length) {
 
 int _write(int handle, char *buffer, int length) {
     if (handle == 1) {
-        stdio_put_string(buffer, length, false);
+        stdio_put_string(buffer, length, false, false);
         return length;
     }
     return -1;
@@ -243,7 +262,7 @@ int __printflike(1, 0) WRAPPER_FUNC(printf)(const char* format, ...)
     return ret;
 }
 
-void stdio_init_all() {
+void stdio_init_all(void) {
     // todo add explicit custom, or registered although you can call stdio_enable_driver explicitly anyway
     // These are well known ones
 #if LIB_PICO_STDIO_UART

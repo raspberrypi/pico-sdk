@@ -143,7 +143,7 @@ const uint16_t *tud_descriptor_string_cb(uint8_t index, __unused uint16_t langid
     }
 
     // first byte is length (including header), second byte is string type
-    desc_str[0] = (TUSB_DESC_STRING << 8) | (2 * len + 2);
+    desc_str[0] = (uint16_t) ((TUSB_DESC_STRING << 8) | (2 * len + 2));
 
     return desc_str;
 }

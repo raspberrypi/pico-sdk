@@ -2621,7 +2621,7 @@
 #define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -2756,7 +2756,7 @@
 #define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -2890,7 +2890,7 @@
 #define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -3025,7 +3025,7 @@
 #define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -3159,7 +3159,7 @@
 #define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -3294,7 +3294,7 @@
 #define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -3428,7 +3428,7 @@
 #define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -3563,7 +3563,7 @@
 #define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -3697,7 +3697,7 @@
 #define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -3832,7 +3832,7 @@
 #define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -3966,7 +3966,7 @@
 #define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -4101,7 +4101,7 @@
 #define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -4235,7 +4235,7 @@
 #define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -4370,7 +4370,7 @@
 #define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -4504,7 +4504,7 @@
 #define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -4639,7 +4639,7 @@
 #define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -4773,7 +4773,7 @@
 #define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -4908,7 +4908,7 @@
 #define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -5042,7 +5042,7 @@
 #define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -5177,7 +5177,7 @@
 #define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -5312,7 +5312,7 @@
 #define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -5447,7 +5447,7 @@
 #define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -5582,7 +5582,7 @@
 #define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -5717,7 +5717,7 @@
 #define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -5852,7 +5852,7 @@
 #define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -5987,7 +5987,7 @@
 #define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -6122,7 +6122,7 @@
 #define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -6257,7 +6257,7 @@
 #define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -6392,7 +6392,7 @@
 #define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -6527,7 +6527,7 @@
 #define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -6662,7 +6662,7 @@
 #define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)
@@ -6797,7 +6797,7 @@
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_AVAILABLE_0_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_LENGTH_0
-// Description : The length of the data in buffer 1.
+// Description : The length of the data in buffer 0.
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_LENGTH_0_RESET  _u(0x000)
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_LENGTH_0_BITS   _u(0x000003ff)
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_LENGTH_0_MSB    _u(9)

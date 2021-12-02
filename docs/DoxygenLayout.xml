@@ -15,9 +15,9 @@
       <tab type="user" url="https://rptl.io/pico-faq" visible="yes" title="Raspberry Pi Pico FAQ" intro=""/>
     </tab>
     <tab type="usergroup" url="@ref weblinks_page" visible="yes" title="Web" intro="useful weblinks">
-      <tab type="user" url="https://www.raspberrypi.org/" visible="yes" title="Raspberry Pi Site" intro=""/>
+      <tab type="user" url="https://www.raspberrypi.com/" visible="yes" title="Raspberry Pi Site" intro=""/>
       <tab type="user" url="https://rptl.io/rp2040-get-started" visible="yes" title="Raspberry Pi Pico Page" intro=""/>
-      <tab type="user" url="https://www.raspberrypi.org/forums" visible="yes" title="Raspberry Pi Forums" intro=""/>
+      <tab type="user" url="https://forums.raspberrypi.com/" visible="yes" title="Raspberry Pi Forums" intro=""/>
       <tab type="user" url="https://github.com/raspberrypi/pico-sdk" visible="yes" title="Raspberry Pi Pico SDK on GitHub" intro=""/>
       <tab type="user" url="https://github.com/raspberrypi/pico-examples" visible="yes" title="Pico Examples on GitHub" intro=""/>
       <tab type="user" url="https://github.com/raspberrypi/pico-extras" visible="yes" title="Pico Extras on GitHub" intro=""/>

@@ -219,18 +219,26 @@ alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, ala
     do {
         uint8_t id_high = 0;
         uint32_t save = spin_lock_blocking(pool->lock);
+
         pheap_node_id_t id = add_alarm_under_lock(pool, time, callback, user_data, 0, false, &missed);
         if (id) id_high = *get_entry_id_high(pool, id);
 
         spin_unlock(pool->lock, save);
 
         if (!id) {
+            // no space in pheap to allocate an alarm
             return -1;
         }
 
+        // note that if missed was true, then the id was never added to the pheap (because we
+        // passed false for create_if_past arg above)
         public_id = missed ? 0 : make_public_id(id_high, id);
         if (missed && fire_if_past) {
+            // ... so if fire_if_past == true we call the callback
             int64_t repeat = callback(public_id, user_data);
+            // if not repeated we have no id to return so set public_id to 0,
+            // otherwise we need to repeat, but will assign a new id next time
+            // todo arguably this does mean that the id passed to the first callback may differ from subsequent calls
             if (!repeat) {
                 public_id = 0;
                 break;
@@ -240,6 +248,10 @@ alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, ala
                 time = delayed_by_us(get_absolute_time(), (uint64_t)repeat);
             }
         } else {
+            // either:
+            // a) missed == false && public_id is > 0
+            // b) missed == true && fire_if_past == false && public_id = 0
+            // but we are done in either case
             break;
         }
     } while (true);
@@ -279,7 +291,7 @@ static void alarm_pool_dump_key(pheap_node_id_t id, void *user_data) {
 #if PICO_ON_DEVICE
     printf("%lld (hi %02x)", to_us_since_boot(get_entry(pool, id)->target), *get_entry_id_high(pool, id));
 #else
-    printf(PRIu64, to_us_since_boot(get_entry(pool, id)->target));
+    printf("%"PRIu64, to_us_since_boot(get_entry(pool, id)->target));
 #endif
 }
 
@@ -302,7 +314,9 @@ bool alarm_pool_add_repeating_timer_us(alarm_pool_t *pool, int64_t delay_us, rep
     out->user_data = user_data;
     out->alarm_id = alarm_pool_add_alarm_at(pool, make_timeout_time_us((uint64_t)(delay_us >= 0 ? delay_us : -delay_us)),
                                             repeating_timer_callback, out, true);
-    return out->alarm_id > 0;
+    // note that if out->alarm_id is 0, then the callback was called during the above call (fire_if_past == true)
+    // and then the callback removed itself.
+    return out->alarm_id >= 0;
 }
 
 bool cancel_repeating_timer(repeating_timer_t *timer) {
