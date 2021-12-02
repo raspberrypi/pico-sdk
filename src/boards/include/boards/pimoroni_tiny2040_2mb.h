@@ -9,12 +9,12 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-#ifndef _BOARDS_PIMORONI_TINY2040_H
-#define _BOARDS_PIMORONI_TINY2040_H
+#ifndef _BOARDS_PIMORONI_TINY2040_2MB_H
+#define _BOARDS_PIMORONI_TINY2040_2MB_H
 
 // For board detection
 #define PIMORONI_TINY2040
-#define PIMORONI_TINY2040_8MB
+#define PIMORONI_TINY2040_2MB
 
 // --- BOARD SPECIFIC ---
 #ifndef TINY2040_LED_R_PIN
@@ -117,7 +117,7 @@
 #endif
 
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
+#define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
 
 // All boards have B1 RP2040
