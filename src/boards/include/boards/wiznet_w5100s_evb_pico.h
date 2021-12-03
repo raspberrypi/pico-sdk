@@ -16,6 +16,7 @@
 
 // For board detection
 #define WIZNET_W5100S_EVB_PICO
+
 // --- BOARD SPECIFIC ---
 #ifndef W5100S_EVB_PICO_INTN_PIN
 #define W5100S_EVB_PICO_INTN_PIN 21
