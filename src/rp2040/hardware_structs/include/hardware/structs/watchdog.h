@@ -57,6 +57,6 @@ typedef struct {
     io_rw_32 tick;
 } watchdog_hw_t;
 
-#define watchdog_hw ((watchdog_hw_t *const)WATCHDOG_BASE)
+#define watchdog_hw ((watchdog_hw_t *)WATCHDOG_BASE)
 
 #endif

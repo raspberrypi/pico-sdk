@@ -119,7 +119,7 @@ typedef struct {
     io_ro_32 ints;
 } pwm_hw_t;
 
-#define pwm_hw ((pwm_hw_t *const)PWM_BASE)
+#define pwm_hw ((pwm_hw_t *)PWM_BASE)
 
 static_assert( NUM_PWM_SLICES == 8, "");
 

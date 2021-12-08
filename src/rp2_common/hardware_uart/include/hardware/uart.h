@@ -78,8 +78,8 @@ typedef struct uart_inst uart_inst_t;
  *  \ingroup hardware_uart
  * @{
  */
-#define uart0 ((uart_inst_t * const)uart0_hw) ///< Identifier for UART instance 0
-#define uart1 ((uart_inst_t * const)uart1_hw) ///< Identifier for UART instance 1
+#define uart0 ((uart_inst_t *)uart0_hw) ///< Identifier for UART instance 0
+#define uart1 ((uart_inst_t *)uart1_hw) ///< Identifier for UART instance 1
 
 /** @} */
 

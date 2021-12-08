@@ -167,7 +167,7 @@ typedef struct {
     io_qspi_ctrl_hw_t dormant_wake_qspi_ctrl;
 } ioqspi_hw_t;
 
-#define ioqspi_hw ((ioqspi_hw_t *const)IO_QSPI_BASE)
+#define ioqspi_hw ((ioqspi_hw_t *)IO_QSPI_BASE)
 
 static_assert( NUM_QSPI_GPIOS == 6, "");
 

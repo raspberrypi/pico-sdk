@@ -100,7 +100,7 @@ typedef struct {
     io_ro_32 ints;
 } timer_hw_t;
 
-#define timer_hw ((timer_hw_t *const)TIMER_BASE)
+#define timer_hw ((timer_hw_t *)TIMER_BASE)
 
 static_assert( NUM_TIMERS == 4, "");
 

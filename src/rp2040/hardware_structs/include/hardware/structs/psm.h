@@ -106,6 +106,6 @@ typedef struct {
     io_ro_32 done;
 } psm_hw_t;
 
-#define psm_hw ((psm_hw_t *const)PSM_BASE)
+#define psm_hw ((psm_hw_t *)PSM_BASE)
 
 #endif

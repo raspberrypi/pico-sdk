@@ -86,6 +86,6 @@ typedef struct {
     io_ro_32 ints;
 } adc_hw_t;
 
-#define adc_hw ((adc_hw_t *const)ADC_BASE)
+#define adc_hw ((adc_hw_t *)ADC_BASE)
 
 #endif

@@ -97,13 +97,17 @@ uint32_t *foo = (uint32_t *) 200;
 uint32_t dma_to = 0;
 uint32_t dma_from = 0xaaaa5555;
 
-void spiggle(void) {
+void __noinline spiggle(void) {
     dma_channel_config c = dma_channel_get_default_config(1);
     channel_config_set_bswap(&c, true);
     channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
     channel_config_set_ring(&c, true, 13);
     dma_channel_set_config(1, &c, false);
     dma_channel_transfer_from_buffer_now(1, foo, 23);
+}
+
+__force_inline int something_inlined(int x) {
+    return x * 2;
 }
 
 void __isr dma_handler_a(void) {
@@ -131,7 +135,7 @@ int main(void) {
 
     stdio_init_all();
 
-    printf("HI %d\n", (int)time_us_32());
+    printf("HI %d\n", something_inlined((int)time_us_32()));
     puts("Hello Everything!");
     puts("Hello Everything2!");
 
