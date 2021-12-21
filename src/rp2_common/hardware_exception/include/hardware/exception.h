@@ -16,7 +16,7 @@
  *
  * Methods for setting processor exception handlers
  *
- * Exceptions are identified by a \ref exception_num which is a number from -15 to -1; these are the numbers relative to
+ * Exceptions are identified by a \ref exception_number which is a number from -15 to -1; these are the numbers relative to
  * the index of the first IRQ vector in the vector table. (i.e. vector table index is exception_num plus 16)
  *
  * There is one set of exception handlers per core, so the exception handlers for each core as set by these methods are independent.
@@ -85,11 +85,11 @@ exception_handler_t exception_set_exclusive_handler(enum exception_number num, e
  * prior to the call to exception_set_exclusive_handler(), so that exception_set_exclusive_handler()
  * may be called again in the future.
  *
- * \param num Exception number \ref exception_nums
+ * \param num Exception number \ref exception_number
  * \param original_handler The original handler returned from \ref exception_set_exclusive_handler
  * \see exception_set_exclusive_handler()
  */
-void exception_restore_handler(enum exception_number, exception_handler_t original_handler);
+void exception_restore_handler(enum exception_number num, exception_handler_t original_handler);
 
 /*! \brief Get the current exception handler for the specified exception from the currently installed vector table
  * of the execution core

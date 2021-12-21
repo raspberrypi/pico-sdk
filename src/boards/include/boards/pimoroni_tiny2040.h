@@ -14,6 +14,7 @@
 
 // For board detection
 #define PIMORONI_TINY2040
+#define PIMORONI_TINY2040_8MB
 
 // --- BOARD SPECIFIC ---
 #ifndef TINY2040_LED_R_PIN
@@ -120,12 +121,8 @@
 #endif
 
 // All boards have B1 RP2040
-#ifndef PICO_FLOAT_SUPPORT_ROM_V1
-#define PICO_FLOAT_SUPPORT_ROM_V1 0
-#endif
-
-#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
-#define PICO_DOUBLE_SUPPORT_ROM_V1 0
+#ifndef PICO_RP2040_B0_SUPPORTED
+#define PICO_RP2040_B0_SUPPORTED 0
 #endif
 
 #endif

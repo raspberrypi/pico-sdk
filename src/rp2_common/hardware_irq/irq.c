@@ -33,10 +33,6 @@ static void set_raw_irq_handler_and_unlock(uint num, irq_handler_t handler, uint
     spin_unlock(spin_lock_instance(PICO_SPINLOCK_ID_IRQ), save);
 }
 
-static inline void check_irq_param(__unused uint num) {
-    invalid_params_if(IRQ, num >= NUM_IRQS);
-}
-
 void irq_set_enabled(uint num, bool enabled) {
     check_irq_param(num);
     irq_set_mask_enabled(1u << num, enabled);
@@ -163,19 +159,18 @@ static inline void *resolve_branch(uint16_t *inst) {
 // GCC produces horrible code for subtraction of pointers here, and it was bugging me
 static inline int8_t slot_diff(struct irq_handler_chain_slot *to, struct irq_handler_chain_slot *from) {
     static_assert(sizeof(struct irq_handler_chain_slot) == 12, "");
-    int32_t result;
+    int32_t result = 0xaaaa;
     // return (to - from);
     // note this implementation has limited range, but is fine for plenty more than -128->127 result
     asm (".syntax unified\n"
          "subs %1, %2\n"
          "adcs %1, %1\n" // * 2 (and + 1 if negative for rounding)
-         "ldr  %0, =0xaaaa\n"
          "muls %0, %1\n"
          "lsrs %0, 20\n"
-        : "=l" (result), "+l" (to)
-        : "l" (from)
-        :
-        );
+         : "+l" (result), "+l" (to)
+         : "l" (from)
+         :
+         );
     return (int8_t)result;
 }
 
@@ -364,6 +359,14 @@ void irq_set_priority(uint num, uint8_t hardware_priority) {
     *p = (*p & ~(0xffu << (8 * (num & 3u)))) | (((uint32_t) hardware_priority) << (8 * (num & 3u)));
 }
 
+uint irq_get_priority(uint num) {
+    check_irq_param(num);
+
+    // note that only 32 bit reads are supported
+    io_rw_32 *p = (io_rw_32 *)((PPB_BASE + M0PLUS_NVIC_IPR0_OFFSET) + (num & ~3u));
+    return (uint8_t)(*p >> (8 * (num & 3u)));
+}
+
 #if !PICO_DISABLE_SHARED_IRQ_HANDLERS
 // used by irq_handler_chain.S to remove the last link in a handler chain after it executes
 // note this must be called only with the last slot in a chain (and during the exception)
@@ -400,8 +403,11 @@ void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot) {
 
 void irq_init_priorities() {
 #if PICO_DEFAULT_IRQ_PRIORITY != 0
-    for (uint irq = 0; irq < NUM_IRQS; irq++) {
-        irq_set_priority(irq, PICO_DEFAULT_IRQ_PRIORITY);
+    static_assert(!(NUM_IRQS & 3), "");
+    uint32_t prio4 = (PICO_DEFAULT_IRQ_PRIORITY & 0xff) * 0x1010101u;
+    io_rw_32 * p = (io_rw_32 *)(PPB_BASE + M0PLUS_NVIC_IPR0_OFFSET);
+    for (uint i = 0; i < NUM_IRQS / 4; i++) {
+        *p++ = prio4;
     }
 #endif
 }

@@ -13,8 +13,8 @@
 #include "hardware/regs/xosc.h"
 #include "hardware/xosc.h"
 
-#if XOSC_MHZ < 1 || XOSC_MHZ > 15
-#error XOSC_MHZ must be in the range 1-15
+#if XOSC_MHZ < 1 || XOSC_MHZ > 50
+#error XOSC_MHZ must be in the range 1-50
 #endif
 
 #define STARTUP_DELAY (((((XOSC_MHZ * MHZ) / 1000) + 128) / 256) * PICO_XOSC_STARTUP_DELAY_MULTIPLIER)

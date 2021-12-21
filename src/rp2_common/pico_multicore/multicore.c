@@ -126,22 +126,32 @@ void multicore_launch_core1(void (*entry)(void)) {
 }
 
 void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vector_table) {
-    const uint32_t cmd_sequence[] = {0, 0, 1, (uintptr_t) vector_table, (uintptr_t) sp, (uintptr_t) entry};
-
+    // Allow for the fact that the caller may have already enabled the FIFO IRQ for their
+    // own purposes (expecting FIFO content after core 1 is launched). We must disable
+    // the IRQ during the handshake, then restore afterwards.
     bool enabled = irq_is_enabled(SIO_IRQ_PROC0);
     irq_set_enabled(SIO_IRQ_PROC0, false);
+
+    // Values to be sent in order over the FIFO from core 0 to core 1
+    //
+    // vector_table is value for VTOR register
+    // sp is initial stack pointer (SP)
+    // entry is the initial program counter (PC) (don't forget to set the thumb bit!)
+    const uint32_t cmd_sequence[] =
+            {0, 0, 1, (uintptr_t) vector_table, (uintptr_t) sp, (uintptr_t) entry};
 
     uint seq = 0;
     do {
         uint cmd = cmd_sequence[seq];
-        // we drain before sending a 0
+        // Always drain the READ FIFO (from core 1) before sending a 0
         if (!cmd) {
             multicore_fifo_drain();
-            __sev(); // core 1 may be waiting for fifo space
+            // Execute a SEV as core 1 may be waiting for FIFO space via WFE
+            __sev();
         }
         multicore_fifo_push_blocking(cmd);
         uint32_t response = multicore_fifo_pop_blocking();
-        // move to next state on correct response otherwise start over
+        // Move to next state on correct response (echo-d value) otherwise start over
         seq = cmd == response ? seq + 1 : 0;
     } while (seq < count_of(cmd_sequence));
 
@@ -176,7 +186,7 @@ static void __isr __not_in_flash_func(multicore_lockout_handler)(void) {
 static void check_lockout_mutex_init(void) {
     // use known available lock - we only need it briefly
     uint32_t save = hw_claim_lock();
-    if (!mutex_is_initialzed(&lockout_mutex)) {
+    if (!mutex_is_initialized(&lockout_mutex)) {
         mutex_init(&lockout_mutex);
     }
     hw_claim_unlock(save);
@@ -237,7 +247,7 @@ void multicore_lockout_start_blocking() {
 }
 
 static bool multicore_lockout_end_block_until(absolute_time_t until) {
-    assert(mutex_is_initialzed(&lockout_mutex));
+    assert(mutex_is_initialized(&lockout_mutex));
     if (!mutex_enter_block_until(&lockout_mutex, until)) {
         return false;
     }

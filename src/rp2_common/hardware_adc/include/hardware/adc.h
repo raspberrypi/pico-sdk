@@ -19,7 +19,7 @@
  * The RP2040 has an internal analogue-digital converter (ADC) with the following features:
  * - SAR ADC
  * - 500 kS/s (Using an independent 48MHz clock)
- * - 12 bit (9.5 ENOB)
+ * - 12 bit (8.7 ENOB)
  * - 5 input mux:
  *  - 4 inputs that are available on package pins shared with GPIO[29:26]
  *  - 1 input is dedicated to the internal temperature sensor
@@ -28,7 +28,7 @@
  * - DMA interface
  *
  * Although there is only one ADC you can specify the input to it using the adc_select_input() function.
- * In round robin mode (adc_rrobin()) will use that input and move to the next one after a read.
+ * In round robin mode (adc_set_round_robin()), the ADC will use that input and move to the next one after a read.
  *
  * User ADC inputs are on 0-3 (GPIO 26-29), the temperature sensor is on input 4.
  *
@@ -62,7 +62,7 @@ void adc_init(void);
 /*! \brief  Initialise the gpio for use as an ADC pin
  *  \ingroup hardware_adc
  *
- * Prepare a GPIO for use with ADC, by disabling all digital functions.
+ * Prepare a GPIO for use with ADC by disabling all digital functions.
  *
  * \param gpio The GPIO number to use. Allowable GPIO numbers are 26 to 29 inclusive.
  */
@@ -167,7 +167,7 @@ static inline void adc_set_clkdiv(float clkdiv) {
 /*! \brief Setup the ADC FIFO
  *  \ingroup hardware_adc
  *
- * FIFO is 4 samples long, if a conversion is completed and the FIFO is full the result is dropped.
+ * FIFO is 4 samples long, if a conversion is completed and the FIFO is full, the result is dropped.
  *
  * \param en Enables write each conversion result to the FIFO
  * \param dreq_en Enable DMA requests when FIFO contains data
@@ -193,7 +193,7 @@ static inline void adc_set_clkdiv(float clkdiv) {
 /*! \brief Check FIFO empty state
  *  \ingroup hardware_adc
  *
- * \return Returns true if the fifo is empty
+ * \return Returns true if the FIFO is empty
  */
 static inline bool adc_fifo_is_empty(void) {
     return !!(adc_hw->fcs & ADC_FCS_EMPTY_BITS);
@@ -231,7 +231,7 @@ static inline uint16_t adc_fifo_get_blocking(void) {
 /*! \brief Drain the ADC FIFO
  *  \ingroup hardware_adc
  *
- * Will wait for any conversion to complete then drain the FIFO discarding any results.
+ * Will wait for any conversion to complete then drain the FIFO, discarding any results.
  */
 static inline void adc_fifo_drain(void) {
     // Potentially there is still a conversion in progress -- wait for this to complete before draining

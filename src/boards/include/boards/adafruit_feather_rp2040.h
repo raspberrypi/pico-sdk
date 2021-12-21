@@ -44,7 +44,7 @@
 
 //------------- I2C -------------//
 #ifndef PICO_DEFAULT_I2C
-#define PICO_DEFAULT_I2C 0
+#define PICO_DEFAULT_I2C 1
 #endif
 
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
@@ -86,12 +86,8 @@
 #endif
 
 // All boards have B1 RP2040
-#ifndef PICO_FLOAT_SUPPORT_ROM_V1
-#define PICO_FLOAT_SUPPORT_ROM_V1 0
-#endif
-
-#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
-#define PICO_DOUBLE_SUPPORT_ROM_V1 0
+#ifndef PICO_RP2040_B0_SUPPORTED
+#define PICO_RP2040_B0_SUPPORTED 0
 #endif
 
 #endif

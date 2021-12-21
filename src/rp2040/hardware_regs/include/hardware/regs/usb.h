@@ -1012,7 +1012,7 @@
 #define USB_SIE_STATUS_CONNECTED_BITS   _u(0x00010000)
 #define USB_SIE_STATUS_CONNECTED_MSB    _u(16)
 #define USB_SIE_STATUS_CONNECTED_LSB    _u(16)
-#define USB_SIE_STATUS_CONNECTED_ACCESS "RO"
+#define USB_SIE_STATUS_CONNECTED_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_SIE_STATUS_RESUME
 // Description : Host: Device has initiated a remote resume. Device: host has
@@ -1037,7 +1037,7 @@
 #define USB_SIE_STATUS_SPEED_BITS   _u(0x00000300)
 #define USB_SIE_STATUS_SPEED_MSB    _u(9)
 #define USB_SIE_STATUS_SPEED_LSB    _u(8)
-#define USB_SIE_STATUS_SPEED_ACCESS "RO"
+#define USB_SIE_STATUS_SPEED_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_SIE_STATUS_SUSPENDED
 // Description : Bus in suspended state. Valid for device and host. Host and
@@ -1047,7 +1047,7 @@
 #define USB_SIE_STATUS_SUSPENDED_BITS   _u(0x00000010)
 #define USB_SIE_STATUS_SUSPENDED_MSB    _u(4)
 #define USB_SIE_STATUS_SUSPENDED_LSB    _u(4)
-#define USB_SIE_STATUS_SUSPENDED_ACCESS "RO"
+#define USB_SIE_STATUS_SUSPENDED_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : USB_SIE_STATUS_LINE_STATE
 // Description : USB bus line state

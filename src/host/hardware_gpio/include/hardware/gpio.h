@@ -152,7 +152,9 @@ void gpio_set_dir_all_bits(uint32_t value);
 void gpio_set_dir(uint gpio, bool out);
 
 // debugging
+#ifndef PICO_DEBUG_PIN_BASE
 #define PICO_DEBUG_PIN_BASE 19u
+#endif
 
 // note these two macros may only be used once per compilation unit
 #define CU_REGISTER_DEBUG_PINS(p, ...)

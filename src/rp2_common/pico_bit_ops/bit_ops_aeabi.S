@@ -9,6 +9,8 @@
 .thumb
 
 #include "pico/asm_helper.S"
+#include "pico/bootrom.h"
+
 __pre_init __aeabi_bits_init, 00010
 
 .macro bits_section name
@@ -24,10 +26,10 @@ __pre_init __aeabi_bits_init, 00010
 .equ BITS_FUNC_COUNT, 4
 .align 4
 aeabi_bits_funcs:
-    .word rom_table_code('P','3') // popcount32
-    .word rom_table_code('L','3') // clz32
-    .word rom_table_code('T','3') // ctz32
-    .word rom_table_code('R','3') // reverse32
+    .word ROM_FUNC_POPCOUNT32
+    .word ROM_FUNC_CLZ32
+    .word ROM_FUNC_CTZ32
+    .word ROM_FUNC_REVERSE32
 aeabi_bits_funcs_end:
 
 .section .text

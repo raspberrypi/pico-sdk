@@ -63,7 +63,7 @@ regular_func double_table_shim_on_use_helper
     str r0, [sp, #12]
     pop {r0-r2, pc}
 
-#if PICO_DOUBLE_SUPPORT_ROM_V1
+#if PICO_DOUBLE_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
 // Note that the V1 ROM has no double support, so this is basically the identical
 // library, and shim inter-function calls do not bother to redirect back thru the
 // wrapper functions
