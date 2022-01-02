@@ -25,7 +25,5 @@
 #if !PICO_ON_DEVICE && !defined(PICO_NO_BINARY_INFO)
 #define PICO_NO_BINARY_INFO 1
 #endif
-#if !PICO_NO_BINARY_INFO
 #include "pico/binary_info/code.h"
-#endif
 #endif
