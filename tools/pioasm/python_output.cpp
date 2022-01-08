@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -283,9 +283,7 @@ struct python_output : public output_format {
                     if (arg1 & 0x2u) {
                         guts += "clear, ";
                     } else if (arg1 & 0x1u) {
-                        guts += "wait, ";
-                    } else {
-                        guts += "nowait, ";
+                        guts += "block, ";
                     }
                     auto irq = std::to_string(arg2 & 7u);
                     if (arg2 & 0x10u) {
