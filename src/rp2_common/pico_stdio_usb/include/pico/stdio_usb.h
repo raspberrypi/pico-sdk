@@ -13,8 +13,8 @@
  *  \defgroup pico_stdio_usb pico_stdio_usb
  *  \ingroup pico_stdio
  *
- *  Linking this library or calling `pico_enable_stdio_usb(TARGET)` in the CMake (which
- *  achieves the same thing) will add USB CDC to the drivers used for standard output
+ *  Linking this library or calling `pico_enable_stdio_usb(TARGET ENABLED)` in the CMake (which
+ *  achieves the same thing) will add USB CDC to the drivers used for standard input/output
  *
  *  Note this library is a developer convenience. It is not applicable in all cases; for one it takes full control of the USB device precluding your
  *  use of the USB in device or host mode. For this reason, this library will automatically disengage if you try to using it alongside \ref tinyusb_device or
