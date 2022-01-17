@@ -4,34 +4,31 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <stdlib.h>
+#include <string.h>
 #include "pico/stdio/driver.h"
 #include "pico/stdio_semihosting.h"
 #include "pico/binary_info.h"
 
-//static void __attribute__((naked)) semihosting_puts(const char *s) {
-//    __asm (
-//
-//    "mov r1, r0\n"
-//    "mov r0, #4\n"
-//    "bkpt 0xab\n"
-//    "bx lr\n"
-//    );
-//}
+static void __attribute__((naked)) semihosting_puts(__unused const char *s) {
+   __asm (
 
-static void __attribute__((naked)) semihosting_putc(__unused const char *c) {
-    __asm (
-
-    "mov r1, r0\n"
-    "mov r0, #3\n"
-    "bkpt 0xab\n"
-    "bx lr\n"
-    );
+   "mov r1, r0\n"
+   "mov r0, #4\n"
+   "bkpt 0xab\n"
+   "bx lr\n"
+   );
 }
 
-
 static void stdio_semihosting_out_chars(const char *buf, int length) {
-    for (int i = 0; i < length; i++) {
-        semihosting_putc(&buf[i]);
+    // Add \n and zero terminate the buffer
+    char *msg = (char *) malloc(length + 2);
+    if (msg != NULL) {
+        memcpy(msg, buf, length);
+        msg[length] = '\n';
+        msg[length + 1] = 0;
+        semihosting_puts(msg);
+        free(msg);
     }
 }
 
