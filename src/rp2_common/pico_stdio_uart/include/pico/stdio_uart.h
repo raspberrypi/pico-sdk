@@ -14,8 +14,8 @@
  *  \defgroup pico_stdio_uart pico_stdio_uart
  *  \ingroup pico_stdio
  *
- *  Linking this library or calling `pico_enable_stdio_uart(TARGET)` in the CMake (which
- *  achieves the same thing) will add UART to the drivers used for standard output
+ *  Linking this library or calling `pico_enable_stdio_uart(TARGET ENABLED)` in the CMake (which
+ *  achieves the same thing) will add UART to the drivers used for standard input/output
  */
 
 // PICO_CONFIG: PICO_STDIO_UART_DEFAULT_CRLF, Default state of CR/LF translation for UART output, type=bool, default=PICO_STDIO_DEFAULT_CRLF, group=pico_stdio_uart
