@@ -76,7 +76,7 @@ static inline uint32_t us_to_ms(uint64_t us) {
  * \ingroup timestamp
  * \brief Convert a timestamp into a number of milliseconds since boot.
  * \param t an absolute_time_t value to convert
- * \return the number of microseconds since boot represented by t
+ * \return the number of milliseconds since boot represented by t
  * \sa to_us_since_boot()
  */
 static inline uint32_t to_ms_since_boot(absolute_time_t t) {
