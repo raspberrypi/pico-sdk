@@ -358,12 +358,14 @@ enum gpio_drive_strength gpio_get_drive_strength(uint gpio);
  *
  * Events is a bitmask of the following:
  *
- * bit | interrupt
- * ----|----------
- *   0 | Low level
- *   1 | High level
- *   2 | Edge low
- *   3 | Edge high
+ * bit | mask |interrupt
+ * ----|------|----------
+ *   0 |    1 | Low level
+ *   1 |    2 | High level
+ *   2 |    4 | Edge low
+ *   3 |    8 | Edge high
+ *
+ * See also \ref gpio_irq_level which defines the mask values.
  */
 void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled);
 
