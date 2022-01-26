@@ -14,7 +14,6 @@ if (NOT TARGET pico_stdlib)
         pico_stdlib_headers
         pico_platform
         pico_runtime
-        pico_stdio
         pico_time
     )
 

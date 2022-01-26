@@ -8,7 +8,6 @@
 #define _PICO_STDLIB_H
 
 #include "pico.h"
-#include "pico/stdio.h"
 #include "pico/time.h"
 #include "hardware/gpio.h"
 #include "hardware/uart.h"
