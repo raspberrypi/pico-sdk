@@ -619,8 +619,8 @@ double WRAPPER_FUNC(remquo)(double x,double y,int*quo) {
     return fix642double(mx,0x3ff-ey+52);
 }
 
-double WRAPPER_FUNC(drem)(double x,double y) { check_nan_d2(x, y); return remquo(x,y,0); }
+double WRAPPER_FUNC(drem)(double x,double y) { check_nan_d2(x, y); return __wrap_remquo(x,y,0); }
 
-double WRAPPER_FUNC(remainder)(double x,double y) { check_nan_d2(x, y); return remquo(x,y,0); }
+double WRAPPER_FUNC(remainder)(double x,double y) { check_nan_d2(x, y); return __wrap_remquo(x,y,0); }
 
 _Pragma("GCC diagnostic pop") // conversion

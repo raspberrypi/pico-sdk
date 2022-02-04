@@ -577,8 +577,8 @@ float WRAPPER_FUNC(remquof)(float x,float y,int*quo) {
     return fix2float(mx,0x7f-ey+23);
 }
 
-float WRAPPER_FUNC(dremf)(float x,float y) { check_nan_f2(x,y); return remquof(x,y,0); }
+float WRAPPER_FUNC(dremf)(float x,float y) { check_nan_f2(x,y); return __wrap_remquof(x,y,0); }
 
-float WRAPPER_FUNC(remainderf)(float x,float y) { check_nan_f2(x,y); return remquof(x,y,0); }
+float WRAPPER_FUNC(remainderf)(float x,float y) { check_nan_f2(x,y); return __wrap_remquof(x,y,0); }
 
 _Pragma("GCC diagnostic pop") // conversion
