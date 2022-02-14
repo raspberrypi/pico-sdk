@@ -374,8 +374,8 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  * Side Set Pins (base) | 0
  * Side Set | disabled
  * Wrap | wrap=31, wrap_to=0
- * In Shift | shift_direction=right, autopush=false, push_thrshold=32
- * Out Shift | shift_direction=right, autopull=false, pull_thrshold=32
+ * In Shift | shift_direction=right, autopush=false, push_threshold=32
+ * Out Shift | shift_direction=right, autopull=false, pull_threshold=32
  * Jmp Pin | 0
  * Out Special | sticky=false, has_enable_pin=false, enable_pin_index=0
  * Mov Status | status_sel=STATUS_TX_LESSTHAN, n=0
