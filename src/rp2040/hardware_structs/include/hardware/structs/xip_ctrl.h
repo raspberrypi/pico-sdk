@@ -63,7 +63,7 @@ typedef struct {
     io_ro_32 stream_fifo;
 } xip_ctrl_hw_t;
 
-#define xip_ctrl_hw ((xip_ctrl_hw_t *const)XIP_CTRL_BASE)
+#define xip_ctrl_hw ((xip_ctrl_hw_t *)XIP_CTRL_BASE)
 
 #define XIP_STAT_FIFO_FULL XIP_STAT_FIFO_FULL_BITS
 #define XIP_STAT_FIFO_EMPTY XIP_STAT_FIFO_EMPTY_BITS

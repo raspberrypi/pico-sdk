@@ -44,6 +44,6 @@ typedef struct {
     io_rw_32 chip_reset;
 } vreg_and_chip_reset_hw_t;
 
-#define vreg_and_chip_reset_hw ((vreg_and_chip_reset_hw_t *const)VREG_AND_CHIP_RESET_BASE)
+#define vreg_and_chip_reset_hw ((vreg_and_chip_reset_hw_t *)VREG_AND_CHIP_RESET_BASE)
 
 #endif

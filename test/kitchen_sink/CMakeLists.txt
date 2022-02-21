@@ -1,7 +1,4 @@
 add_library(kitchen_sink_libs INTERFACE)
-target_sources(kitchen_sink_libs INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c
-)
 target_link_libraries(kitchen_sink_libs INTERFACE
     hardware_adc
     hardware_clocks
@@ -91,12 +88,12 @@ target_compile_definitions(kitchen_sink_libs INTERFACE
         PICO_AUDIO_DMA_IRQ=1
 )
 
-add_executable(kitchen_sink)
+add_executable(kitchen_sink ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 target_link_libraries(kitchen_sink kitchen_sink_libs kitchen_sink_options)
 pico_set_program_name(kitchen_sink "Wombat tentacles")
 pico_add_extra_outputs(kitchen_sink)
 
-add_executable(kitchen_sink_extra_stdio)
+add_executable(kitchen_sink_extra_stdio ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 if (COMMAND suppress_tinyusb_warnings)
     # Explicitly suppress warnings in TinyUSB files which have them (this has to be done
     # from the project that uses them per CMake "feature"). Note the function comes from
@@ -108,13 +105,17 @@ pico_add_extra_outputs(kitchen_sink_extra_stdio)
 pico_enable_stdio_usb(kitchen_sink_extra_stdio 1)
 pico_enable_stdio_semihosting(kitchen_sink_extra_stdio 1)
 
-add_executable(kitchen_sink_copy_to_ram)
+add_executable(kitchen_sink_copy_to_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 pico_set_binary_type(kitchen_sink_copy_to_ram copy_to_ram)
 target_link_libraries(kitchen_sink_copy_to_ram kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_copy_to_ram)
 
-add_executable(kitchen_sink_no_flash)
+add_executable(kitchen_sink_no_flash ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 pico_set_binary_type(kitchen_sink_no_flash no_flash)
 target_link_libraries(kitchen_sink_no_flash kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_no_flash)
 
+add_executable(kitchen_sink_cpp ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_cpp.cpp)
+target_link_libraries(kitchen_sink_cpp kitchen_sink_libs kitchen_sink_options)
+pico_set_program_name(kitchen_sink_cpp "Wombat tentacles CPP")
+pico_add_extra_outputs(kitchen_sink_cpp)

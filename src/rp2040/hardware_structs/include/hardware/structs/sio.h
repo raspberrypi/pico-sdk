@@ -171,6 +171,6 @@ typedef struct {
     interp_hw_t interp[2];
 } sio_hw_t;
 
-#define sio_hw ((sio_hw_t *const)SIO_BASE)
+#define sio_hw ((sio_hw_t *)SIO_BASE)
 
 #endif

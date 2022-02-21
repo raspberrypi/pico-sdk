@@ -40,7 +40,7 @@ typedef struct {
     io_rw_32 io[NUM_BANK0_GPIOS]; // 30
 } padsbank0_hw_t;
 
-#define padsbank0_hw ((padsbank0_hw_t *const)PADS_BANK0_BASE)
+#define padsbank0_hw ((padsbank0_hw_t *)PADS_BANK0_BASE)
 
 static_assert( NUM_BANK0_GPIOS == 30, "");
 

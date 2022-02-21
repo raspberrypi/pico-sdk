@@ -327,7 +327,7 @@ typedef struct {
     io_ro_32 comp_type;
 } i2c_hw_t;
 
-#define i2c0_hw ((i2c_hw_t *const)I2C0_BASE)
-#define i2c1_hw ((i2c_hw_t *const)I2C1_BASE)
+#define i2c0_hw ((i2c_hw_t *)I2C0_BASE)
+#define i2c1_hw ((i2c_hw_t *)I2C1_BASE)
 
 #endif

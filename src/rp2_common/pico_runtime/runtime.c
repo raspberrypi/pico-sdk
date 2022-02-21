@@ -175,7 +175,7 @@ void runtime_init(void) {
 
 }
 
-void _exit(__unused int status) {
+void __attribute__((noreturn)) _exit(__unused int status) {
 #if PICO_ENTER_USB_BOOT_ON_EXIT
     reset_usb_boot(0,0);
 #else

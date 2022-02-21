@@ -47,6 +47,6 @@ typedef struct {
     io_ro_32 calib;
 } systick_hw_t;
 
-#define systick_hw ((systick_hw_t *const)(PPB_BASE + M0PLUS_SYST_CSR_OFFSET))
+#define systick_hw ((systick_hw_t *)(PPB_BASE + M0PLUS_SYST_CSR_OFFSET))
 
 #endif

@@ -568,7 +568,7 @@ typedef struct {
     io_ro_32 ints;
 } usb_hw_t;
 
-#define usb_hw ((usb_hw_t *const)USBCTRL_REGS_BASE)
+#define usb_hw ((usb_hw_t *)USBCTRL_REGS_BASE)
 
 #define usb_dpram ((usb_device_dpram_t *)USBCTRL_DPRAM_BASE)
 #define usbh_dpram ((usb_host_dpram_t *)USBCTRL_DPRAM_BASE)

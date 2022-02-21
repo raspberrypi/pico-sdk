@@ -72,6 +72,6 @@ typedef struct {
     bus_ctrl_perf_hw_t counter[4];
 } bus_ctrl_hw_t;
 
-#define bus_ctrl_hw ((bus_ctrl_hw_t *const)BUSCTRL_BASE)
+#define bus_ctrl_hw ((bus_ctrl_hw_t *)BUSCTRL_BASE)
 
 #endif

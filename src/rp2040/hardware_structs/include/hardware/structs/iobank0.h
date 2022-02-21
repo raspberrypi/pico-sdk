@@ -208,7 +208,7 @@ typedef struct {
     io_irq_ctrl_hw_t dormant_wake_irq_ctrl;
 } iobank0_hw_t;
 
-#define iobank0_hw ((iobank0_hw_t *const)IO_BANK0_BASE)
+#define iobank0_hw ((iobank0_hw_t *)IO_BANK0_BASE)
 /// \end::iobank0_hw[]
 
 static_assert( NUM_BANK0_GPIOS == 30, "");

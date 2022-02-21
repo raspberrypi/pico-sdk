@@ -22,7 +22,7 @@ extern "C" {
 
 #define __not_in_flash(group)
 #define __not_in_flash_func(func) func
-#define __no_inline_not_in_flash_func(func)
+#define __no_inline_not_in_flash_func(func) func
 #define __in_flash(group)
 #define __scratch_x(group)
 #define __scratch_y(group)
