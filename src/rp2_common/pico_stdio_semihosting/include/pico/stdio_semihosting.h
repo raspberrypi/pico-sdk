@@ -13,7 +13,7 @@
  *  \defgroup pico_stdio_semihosting pico_stdio_semihosting
  *  \ingroup pico_stdio
  *
- *  Linking this library or calling `pico_enable_stdio_semihosting(TARGET)` in the CMake (which
+ *  Linking this library or calling `pico_enable_stdio_semihosting(TARGET ENABLED)` in the CMake (which
  *  achieves the same thing) will add semihosting to the drivers used for standard output
  */
 

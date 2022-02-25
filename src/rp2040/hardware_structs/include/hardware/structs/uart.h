@@ -171,7 +171,7 @@ typedef struct {
     io_rw_32 dmacr;
 } uart_hw_t;
 
-#define uart0_hw ((uart_hw_t *const)UART0_BASE)
-#define uart1_hw ((uart_hw_t *const)UART1_BASE)
+#define uart0_hw ((uart_hw_t *)UART0_BASE)
+#define uart1_hw ((uart_hw_t *)UART1_BASE)
 
 #endif

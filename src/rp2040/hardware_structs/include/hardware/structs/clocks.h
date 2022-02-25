@@ -319,7 +319,7 @@ typedef struct {
     io_ro_32 ints;
 } clocks_hw_t;
 
-#define clocks_hw ((clocks_hw_t *const)CLOCKS_BASE)
+#define clocks_hw ((clocks_hw_t *)CLOCKS_BASE)
 
 static_assert( CLK_COUNT == 10, "");
 

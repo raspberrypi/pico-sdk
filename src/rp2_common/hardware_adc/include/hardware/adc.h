@@ -106,7 +106,7 @@ static inline uint adc_get_selected_input(void) {
  * \param input_mask A bit pattern indicating which of the 5 inputs are to be sampled. Write a value of 0 to disable round robin sampling.
  */
 static inline void adc_set_round_robin(uint input_mask) {
-    invalid_params_if(ADC, input_mask & ~ADC_CS_RROBIN_BITS);
+    valid_params_if(ADC, input_mask < (1 << NUM_ADC_CHANNELS));
     hw_write_masked(&adc_hw->cs, input_mask << ADC_CS_RROBIN_LSB, ADC_CS_RROBIN_BITS);
 }
 

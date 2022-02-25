@@ -53,7 +53,7 @@ typedef struct spi_inst spi_inst_t;
  *
  *  \ingroup hardware_spi
  */
-#define spi0 ((spi_inst_t * const)spi0_hw)
+#define spi0 ((spi_inst_t *)spi0_hw)
 
 /** Identifier for the second (SPI 1) hardware SPI instance (for use in SPI functions).
  *
@@ -61,7 +61,7 @@ typedef struct spi_inst spi_inst_t;
  *
  *  \ingroup hardware_spi
  */
-#define spi1 ((spi_inst_t * const)spi1_hw)
+#define spi1 ((spi_inst_t *)spi1_hw)
 
 #if !defined(PICO_DEFAULT_SPI_INSTANCE) && defined(PICO_DEFAULT_SPI)
 #define PICO_DEFAULT_SPI_INSTANCE (__CONCAT(spi,PICO_DEFAULT_SPI))

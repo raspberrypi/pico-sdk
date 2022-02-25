@@ -110,7 +110,7 @@ typedef struct {
     io_ro_32 reset_done;
 } resets_hw_t;
 
-#define resets_hw ((resets_hw_t *const)RESETS_BASE)
+#define resets_hw ((resets_hw_t *)RESETS_BASE)
 /// \end::resets_hw[]
 
 #endif

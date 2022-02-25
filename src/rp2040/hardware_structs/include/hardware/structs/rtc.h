@@ -109,6 +109,6 @@ typedef struct {
     io_ro_32 ints;
 } rtc_hw_t;
 
-#define rtc_hw ((rtc_hw_t *const)RTC_BASE)
+#define rtc_hw ((rtc_hw_t *)RTC_BASE)
 
 #endif

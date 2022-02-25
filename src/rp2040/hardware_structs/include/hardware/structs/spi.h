@@ -94,7 +94,7 @@ typedef struct {
     io_rw_32 dmacr;
 } spi_hw_t;
 
-#define spi0_hw ((spi_hw_t *const)SPI0_BASE)
-#define spi1_hw ((spi_hw_t *const)SPI1_BASE)
+#define spi0_hw ((spi_hw_t *)SPI0_BASE)
+#define spi1_hw ((spi_hw_t *)SPI1_BASE)
 
 #endif

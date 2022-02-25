@@ -44,4 +44,6 @@ typedef struct {
 
 static_assert( NUM_BANK0_GPIOS == 30, "");
 
+static_assert( NUM_BANK0_GPIOS == 30, "");
+
 #endif
