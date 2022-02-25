@@ -29,31 +29,31 @@
       <tab type="namespacelist" visible="yes" title="" intro=""/>
       <tab type="namespacemembers" visible="yes" title="" intro=""/>
     </tab>
-    <tab type="interfaces" visible="yes" title="">
+    <!--<tab type="interfaces" visible="yes" title="">
       <tab type="interfacelist" visible="yes" title="" intro=""/>
       <tab type="interfaceindex" visible="$ALPHABETICAL_INDEX" title=""/>
       <tab type="interfacehierarchy" visible="yes" title="" intro=""/>
-    </tab>
-    <tab type="classes" visible="no" title="">
+    </tab>-->
+    <!--<tab type="classes" visible="no" title="">
       <tab type="classlist" visible="yes" title="" intro=""/>
       <tab type="classindex" visible="$ALPHABETICAL_INDEX" title=""/>
       <tab type="hierarchy" visible="yes" title="" intro=""/>
       <tab type="classmembers" visible="yes" title="" intro=""/>
-    </tab>
-    <tab type="structs" visible="yes" title="">
+    </tab>-->
+    <!--<tab type="structs" visible="yes" title="">
       <tab type="structlist" visible="yes" title="" intro=""/>
       <tab type="structindex" visible="$ALPHABETICAL_INDEX" title=""/>
-    </tab>
-    <tab type="exceptions" visible="yes" title="">
+    </tab>-->
+    <!--<tab type="exceptions" visible="yes" title="">
       <tab type="exceptionlist" visible="yes" title="" intro=""/>
       <tab type="exceptionindex" visible="$ALPHABETICAL_INDEX" title=""/>
       <tab type="exceptionhierarchy" visible="yes" title="" intro=""/>
-    </tab>
-    <tab type="files" visible="no" title="">
+    </tab>-->
+    <tab type="files" visible="yes" title="Files">
       <tab type="filelist" visible="yes" title="" intro=""/>
       <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
-    <tab type="examples" visible="yes" title="" intro=""/>
+    <!--<tab type="examples" visible="yes" title="" intro=""/>-->
   </navindex>
 
   <!-- Layout definition for a class page -->
@@ -66,7 +66,7 @@
       <nestedclasses visible="yes" title=""/>
       <publictypes title=""/>
       <services title=""/>
-      <interfaces title=""/>
+      <!--<interfaces title=""/>-->
       <publicslots title=""/>
       <signals title=""/>
       <publicmethods title=""/>
@@ -102,7 +102,7 @@
       <typedefs title=""/>
       <enums title=""/>
       <services title=""/>
-      <interfaces title=""/>
+      <!--<interfaces title=""/>-->
       <constructors title=""/>
       <functions title=""/>
       <related title=""/>
@@ -121,13 +121,13 @@
     <memberdecl>
       <nestednamespaces visible="yes" title=""/>
       <constantgroups visible="yes" title=""/>
-      <interfaces visible="yes" title=""/>
+      <!--<interfaces visible="yes" title=""/>-->
       <classes visible="yes" title=""/>
-      <structs visible="yes" title=""/>
-      <exceptions visible="yes" title=""/>
+      <!--<structs visible="yes" title=""/>-->
+      <!--<exceptions visible="yes" title=""/>-->
       <typedefs title=""/>
-      <sequences title=""/>
-      <dictionaries title=""/>
+      <!--<sequences title=""/>-->
+      <!--<dictionaries title=""/>-->
       <enums title=""/>
       <functions title=""/>
       <variables title=""/>
@@ -137,8 +137,8 @@
     <memberdef>
       <inlineclasses title=""/>
       <typedefs title=""/>
-      <sequences title=""/>
-      <dictionaries title=""/>
+      <!--<sequences title=""/>-->
+      <!--<dictionaries title=""/>-->
       <enums title=""/>
       <functions title=""/>
       <variables title=""/>
@@ -154,16 +154,16 @@
     <includedbygraph visible="$INCLUDED_BY_GRAPH"/>
     <sourcelink visible="yes"/>
     <memberdecl>
-      <interfaces visible="yes" title=""/>
+        <!--<interfaces visible="yes" title=""/>-->
       <classes visible="yes" title=""/>
-      <structs visible="yes" title=""/>
-      <exceptions visible="yes" title=""/>
+      <!--<structs visible="yes" title=""/>-->
+      <!--<exceptions visible="yes" title=""/>-->
       <namespaces visible="yes" title=""/>
       <constantgroups visible="yes" title=""/>
       <defines title=""/>
       <typedefs title=""/>
-      <sequences title=""/>
-      <dictionaries title=""/>
+      <!--<sequences title=""/>-->
+      <!--<dictionaries title=""/>-->
       <enums title=""/>
       <functions title=""/>
       <variables title=""/>
@@ -174,8 +174,8 @@
       <inlineclasses title=""/>
       <defines title=""/>
       <typedefs title=""/>
-      <sequences title=""/>
-      <dictionaries title=""/>
+      <!--<sequences title=""/>-->
+      <!--<dictionaries title=""/>-->
       <enums title=""/>
       <functions title=""/>
       <variables title=""/>
@@ -195,8 +195,8 @@
       <classes visible="yes" title=""/>
       <defines title=""/>
       <typedefs title=""/>
-      <sequences title=""/>
-      <dictionaries title=""/>
+      <!--<sequences title=""/>-->
+      <!--<dictionaries title=""/>-->
       <enums title=""/>
       <enumvalues title=""/>
       <functions title=""/>
@@ -216,8 +216,8 @@
       <inlineclasses title=""/>
       <defines title=""/>
       <typedefs title=""/>
-      <sequences title=""/>
-      <dictionaries title=""/>
+      <!--<sequences title=""/>-->
+      <!--<dictionaries title=""/>-->
       <enums title=""/>
       <enumvalues title=""/>
       <functions title=""/>
