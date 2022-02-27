@@ -61,3 +61,18 @@ PREDEFINED             = __not_in_flash_func(x) \
                          __not_in_flash(x)= \
                          __no_inline_not_in_flash(x)= \
                          __attribute__(x)=
+
+
+# Additional configuration.
+WARN_LOGFILE           = Doxygen-warnings.log
+
+HAVE_DOT               = YES
+DOT_GRAPH_MAX_NODES    = 75    # default 50 is too small for pico.h
+CALL_GRAPH             = YES   # requires HAVE_DOT = YES
+CALLER_GRAPH           = YES   # requires HAVE_DOT = YES
+
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = YES
+STRIP_CODE_COMMENTS    = NO
+EXTRACT_STATIC         = YES
+
