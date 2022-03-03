@@ -29754,8 +29754,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (0).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -30039,8 +30038,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (1).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -30113,7 +30111,7 @@
             </field>
           </fields>
           <name>CH1_CTRL_TRIG</name>
-          <resetValue>0x00000800</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -30324,8 +30322,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (2).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -30398,7 +30395,7 @@
             </field>
           </fields>
           <name>CH2_CTRL_TRIG</name>
-          <resetValue>0x00001000</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -30609,8 +30606,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (3).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -30683,7 +30679,7 @@
             </field>
           </fields>
           <name>CH3_CTRL_TRIG</name>
-          <resetValue>0x00001800</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -30894,8 +30890,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (4).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -30968,7 +30963,7 @@
             </field>
           </fields>
           <name>CH4_CTRL_TRIG</name>
-          <resetValue>0x00002000</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -31179,8 +31174,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (5).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -31253,7 +31247,7 @@
             </field>
           </fields>
           <name>CH5_CTRL_TRIG</name>
-          <resetValue>0x00002800</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -31464,8 +31458,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (6).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -31538,7 +31531,7 @@
             </field>
           </fields>
           <name>CH6_CTRL_TRIG</name>
-          <resetValue>0x00003000</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -31749,8 +31742,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (7).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -31823,7 +31815,7 @@
             </field>
           </fields>
           <name>CH7_CTRL_TRIG</name>
-          <resetValue>0x00003800</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -32034,8 +32026,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (8).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -32108,7 +32099,7 @@
             </field>
           </fields>
           <name>CH8_CTRL_TRIG</name>
-          <resetValue>0x00004000</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -32319,8 +32310,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (9).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -32393,7 +32383,7 @@
             </field>
           </fields>
           <name>CH9_CTRL_TRIG</name>
-          <resetValue>0x00004800</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -32604,8 +32594,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (10).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -32678,7 +32667,7 @@
             </field>
           </fields>
           <name>CH10_CTRL_TRIG</name>
-          <resetValue>0x00005000</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
@@ -32889,8 +32878,7 @@
             <field>
               <access>read-write</access>
               <bitRange>[14:11]</bitRange>
-              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.\n
-                Reset value is equal to channel number (11).</description>
+              <description>When this channel completes, it will trigger the channel indicated by CHAIN_TO. Disable by setting CHAIN_TO = _(this channel)_.</description>
               <name>CHAIN_TO</name>
             </field>
             <field>
@@ -32963,7 +32951,7 @@
             </field>
           </fields>
           <name>CH11_CTRL_TRIG</name>
-          <resetValue>0x00005800</resetValue>
+          <resetValue>0x00000000</resetValue>
         </register>
         <register>
           <access>read-write</access>
