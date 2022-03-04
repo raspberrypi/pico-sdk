@@ -135,9 +135,9 @@ irq_handler_t irq_get_exclusive_handler(uint num) {
 static uint16_t make_branch(uint16_t *from, void *to) {
     uint32_t ui_from = (uint32_t)from;
     uint32_t ui_to = (uint32_t)to;
-    uint32_t delta = (ui_to - ui_from - 4) / 2;
-    assert(!(delta >> 11u));
-    return (uint16_t)(0xe000 | (delta & 0x7ff));
+    int32_t delta = (int32_t)(ui_to - ui_from - 4);
+    assert(delta >= -2048 && delta <= 2046 && !(delta & 1));
+    return (uint16_t)(0xe000 | ((delta >> 1) & 0x7ff));
 }
 
 static void insert_branch_and_link(uint16_t *from, void *to) {
