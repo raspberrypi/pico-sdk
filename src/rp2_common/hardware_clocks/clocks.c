@@ -118,7 +118,8 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
 }
 /// \end::clock_configure[]
 
-void clocks_init(void) {
+// Weak so that user can replace with their own custom version, e.g. if they are not using XOSC
+void __attribute__((weak)) clocks_init(void) {
     // Start tick in watchdog
     watchdog_start_tick(XOSC_MHZ);
 
