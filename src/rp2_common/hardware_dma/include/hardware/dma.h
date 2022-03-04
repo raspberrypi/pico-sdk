@@ -477,10 +477,28 @@ static inline void dma_channel_start(uint channel) {
  */
 static inline void dma_channel_abort(uint channel) {
     check_dma_channel_param(channel);
+    // Due to errata RP2040-E13, when aborting a channel which has transfers
+    // in-flight (i.e. read has taken place but write has not), the ABORT
+    // status bit will clear prematurely, and subsequently the in-flight
+    // transfers will trigger a completion interrupt once they complete.
+    //
+    // As a workaround, temporarily mask the aborted channel's interrupt, and
+    // clear any spurious interrupt once the channel has become inactive.
+    uint32_t irq0_save = dma_hw->inte0 & (1u << channel);
+    uint32_t irq1_save = dma_hw->inte1 & (1u << channel);
+    hw_clear_bits(&dma_hw->inte0, irq0_save);
+    hw_clear_bits(&dma_hw->inte1, irq1_save);
+
     dma_hw->abort = 1u << channel;
-    // Bit will go 0 once channel has reached safe state
-    // (i.e. any in-flight transfers have retired)
-    while (dma_hw->abort & (1ul << channel)) tight_loop_contents();
+
+    // To fence off on in-flight transfers, the BUSY bit should be polled
+    // rather than the ABORT bit, because the ABORT bit can clear prematurely.
+    while (dma_hw->ch[channel].ctrl_trig & DMA_CH0_CTRL_TRIG_BUSY_BITS) tight_loop_contents();
+
+    // Clear the interrupt (if any) and restore the interrupt masks.
+    dma_hw->ints0 = 1u << channel;
+    hw_set_bits(&dma_hw->inte0, irq0_save);
+    hw_set_bits(&dma_hw->inte1, irq1_save);
 }
 
 /*! \brief  Enable single DMA channel's interrupt via DMA_IRQ_0
