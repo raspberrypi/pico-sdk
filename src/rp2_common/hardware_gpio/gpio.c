@@ -14,7 +14,7 @@
 #include "pico/binary_info.h"
 #endif
 
-static gpio_irq_callback_t _callbacks[NUM_CORES];
+static gpio_irq_callback_entry_t _callbacks[NUM_CORES];
 
 // Get the raw value from the pin, bypassing any muxing or overrides.
 int gpio_get_pad(uint gpio) {
@@ -147,9 +147,9 @@ static void gpio_irq_handler(void) {
         if (events) {
             // TODO: If both cores care about this event then the second core won't get the irq?
             gpio_acknowledge_irq(gpio, events);
-            gpio_irq_callback_t callback = _callbacks[get_core_num()];
-            if (callback) {
-                callback(gpio, events);
+            gpio_irq_callback_entry_t callback = _callbacks[get_core_num()];
+            if (callback.fn) {
+                callback.fn(gpio, events, callback.user_data);
             }
         }
     }
@@ -176,12 +176,15 @@ void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled) {
     _gpio_set_irq_enabled(gpio, events, enabled, irq_ctrl_base);
 }
 
-void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback) {
+void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback, void *user_data) {
     gpio_set_irq_enabled(gpio, events, enabled);
 
     // TODO: Do we want to support a callback per GPIO pin?
     // Install IRQ handler
-    _callbacks[get_core_num()] = callback;
+    gpio_irq_callback_entry_t cb;
+    cb.fn = callback;
+    cb.user_data = user_data;
+    _callbacks[get_core_num()] = cb;
     irq_set_exclusive_handler(IO_IRQ_BANK0, gpio_irq_handler);
     irq_set_enabled(IO_IRQ_BANK0, true);
 }

@@ -129,9 +129,16 @@ enum gpio_irq_level {
  *
  * \param gpio Which GPIO caused this interrupt
  * \param events Which events caused this interrupt. See \ref gpio_set_irq_enabled for details.
+ * \param user_data User data
  * \sa gpio_set_irq_enabled_with_callback()
  */
-typedef void (*gpio_irq_callback_t)(uint gpio, uint32_t events);
+typedef void (*gpio_irq_callback_t)(uint gpio, uint32_t events, void* user_data);
+
+typedef struct {
+    gpio_irq_callback_t fn;
+    void* user_data;
+
+} gpio_irq_callback_entry_t;
 
 enum gpio_override {
     GPIO_OVERRIDE_NORMAL = 0,      ///< peripheral signal selected via \ref gpio_set_function
@@ -377,11 +384,12 @@ void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled);
  * \param events Which events will cause an interrupt. See \ref gpio_set_irq_enabled for details.
  * \param enabled Enable or disable flag
  * \param callback user function to call on GPIO irq. Note only one of these can be set per processor.
+ * \param user_data user_data for callback function.
  *
  * \note Currently the GPIO parameter is ignored, and this callback will be called for any enabled GPIO IRQ on any pin.
  *
  */
-void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback);
+void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback, void* user_data);
 
 /*! \brief Enable dormant wake up interrupt for specified GPIO
  *  \ingroup hardware_gpio
