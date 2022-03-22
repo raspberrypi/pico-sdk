@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <map>
+#include <set>
 #include <vector>
 #include <cstring>
 #include <cstdarg>
@@ -20,6 +21,8 @@ typedef unsigned int uint;
 #define ERROR_INCOMPATIBLE -3
 #define ERROR_READ_FAILED -4
 #define ERROR_WRITE_FAILED -5
+
+#define FLASH_SECTOR_ERASE_SIZE 4096u
 
 static char error_msg[512];
 static bool verbose;
@@ -293,6 +296,23 @@ int elf2uf2(FILE *in, FILE *out) {
                         MAIN_RAM_START, sp);
         }
 #endif
+    } else {
+        // Fill in empty dummy uf2 pages to align the binary to flash sectors.
+        // That workaround is required because the bootrom uses the block number for erase sector calculations:
+        // https://github.com/raspberrypi/pico-bootrom/blob/c09c7f08550e8a36fc38dc74f8873b9576de99eb/bootrom/virtual_disk.c#L205
+
+        std::set<uint32_t> touched_sectors;
+        for (auto& page_entry : pages) {
+            uint32_t sector = page_entry.first / FLASH_SECTOR_ERASE_SIZE;
+            touched_sectors.insert(sector);
+        }
+
+        for (uint32_t sector : touched_sectors) {
+            for (uint32_t off = 0; off < FLASH_SECTOR_ERASE_SIZE; off += PAGE_SIZE) {
+                // Create an empty page, if it does not exist yet.
+                auto& dummy = pages[(sector * FLASH_SECTOR_ERASE_SIZE) + off];
+            }
+        }
     }
     uf2_block block;
     block.magic_start0 = UF2_MAGIC_START0;
