@@ -139,7 +139,6 @@
 #endif
 
 // --- LED ---
-// Included so basic examples will work, and set it to the green LED
 #ifndef PICO_DEFAULT_LED_PIN
 #define PICO_DEFAULT_LED_PIN BADGER2040_USER_LED_PIN
 #endif
