@@ -146,6 +146,7 @@ static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
  * before passing them on to the PWM counter.
  */
 static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t integer, uint8_t fract) {
+    valid_params_if(PWM, fract < 16);
     c->div = (((uint)integer) << PWM_CH0_DIV_INT_LSB) | (((uint)fract) << PWM_CH0_DIV_FRAC_LSB);
 }
 
