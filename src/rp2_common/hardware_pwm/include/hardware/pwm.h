@@ -139,7 +139,7 @@ static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
  *
  * \param c PWM configuration struct to modify
  * \param integer 8 bit integer part of the clock divider. Must be greater than or equal to 1.
- * \param fract 4 bit the fractional part of the clock divider
+ * \param fract 4 bit fractional part of the clock divider
  *
  * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
  * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
