@@ -55,6 +55,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(pico_stdio)
     pico_add_subdirectory(pico_stdio_semihosting)
     pico_add_subdirectory(pico_stdio_uart)
+    pico_add_subdirectory(pico_stdio_rtt)
 
     pico_add_subdirectory(cmsis)
     pico_add_subdirectory(tinyusb)

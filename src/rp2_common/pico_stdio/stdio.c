@@ -36,6 +36,10 @@
 #define STDIO_HANDLE_STDOUT 1
 #define STDIO_HANDLE_STDERR 2
 
+#if LIB_PICO_STDIO_RTT
+#include "pico/stdio_rtt.h"
+#endif
+
 static stdio_driver_t *drivers;
 static stdio_driver_t *filter;
 
@@ -298,6 +302,11 @@ bool stdio_init_all(void) {
 #if LIB_PICO_STDIO_USB
     rc |= stdio_usb_init();
 #endif
+
+#if LIB_PICO_STDIO_RTT
+    stdio_rtt_init();
+#endif
+
     return rc;
 }
 
