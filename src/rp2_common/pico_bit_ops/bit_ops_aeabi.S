@@ -85,7 +85,7 @@ wrapper_func __ctzdi2
     ldr r3, =aeabi_bits_funcs
     ldr r3, [r3, #CTZ32]
     cmp r0, #0
-    bne 1f
+    beq 1f
     bx r3
 1:
     push {lr}
