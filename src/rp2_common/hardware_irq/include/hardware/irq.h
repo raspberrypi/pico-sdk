@@ -258,6 +258,10 @@ irq_handler_t irq_get_vtable_handler(uint num);
 /*! \brief Clear a specific interrupt on the executing core
  *  \ingroup hardware_irq
  *
+ * This method is only useful for "software" IRQs that are not connected to hardware (i.e. IRQs 26-31)
+ * as the the NVIC always reflects the current state of the IRQ state of the hardware for hardware IRQs, and clearing
+ * of the IRQ state of the hardware is performed via the hardware's registers instead.
+ *
  * \param int_num Interrupt number \ref interrupt_nums
  */
 static inline void irq_clear(uint int_num) {
