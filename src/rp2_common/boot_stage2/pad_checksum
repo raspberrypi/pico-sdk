@@ -31,7 +31,7 @@ try:
 except:
     sys.exit("Could not open input file '{}'".format(args.ifile))
 
-if len(idata) >= args.pad - 4:
+if len(idata) > args.pad - 4:
     sys.exit("Input file size ({} bytes) too large for final size ({} bytes)".format(len(idata), args.pad))
 
 idata_padded = idata + bytes(args.pad - 4 - len(idata))
