@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -344,7 +344,7 @@
 //               q`.
 //               Any operand write starts a new calculation. The results appear
 //               in QUOTIENT, REMAINDER.
-//               UDIVIDEND/SDIVIDEND are aliases of the same internal register.
+//               UDIVISOR/SDIVISOR are aliases of the same internal register.
 //               The U alias starts an
 //               unsigned calculation, and the S alias starts a signed
 //               calculation.

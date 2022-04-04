@@ -44509,7 +44509,7 @@
           <description>Divider unsigned divisor\n
             Write to the DIVISOR operand of the divider, i.e. the q in `p / q`.\n
             Any operand write starts a new calculation. The results appear in QUOTIENT, REMAINDER.\n
-            UDIVIDEND/SDIVIDEND are aliases of the same internal register. The U alias starts an\n
+            UDIVISOR/SDIVISOR are aliases of the same internal register. The U alias starts an\n
             unsigned calculation, and the S alias starts a signed calculation.</description>
           <name>DIV_UDIVISOR</name>
           <resetValue>0x00000000</resetValue>
