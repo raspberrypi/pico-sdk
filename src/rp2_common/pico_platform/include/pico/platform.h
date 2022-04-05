@@ -340,7 +340,7 @@ static inline uint8_t rp2040_rom_version(void) {
 /*! \brief No-op function for the body of tight loops
  *  \ingroup pico_platform
  *
- * Np-op function intended to be called by any tight hardware polling loop. Using this ubiquitously
+ * No-op function intended to be called by any tight hardware polling loop. Using this ubiquitously
  * makes it much easier to find tight loops, but also in the future \#ifdef-ed support for lockup
  * debugging might be added
  */
