@@ -73,20 +73,16 @@ typedef pio_hw_t *PIO;
  * e.g. pio_gpio_init(pio0, 5)
  *
  *  \ingroup hardware_pio
- * @{
  */
 #define pio0 pio0_hw
-/** @} */
 
 /** Identifier for the second (PIO 1) hardware PIO instance (for use in PIO functions).
  *
  * e.g. pio_gpio_init(pio1, 5)
  *
  *  \ingroup hardware_pio
- * @{
  */
 #define pio1 pio1_hw
-/** @} */
 
 /** \brief PIO state machine configuration
  *  \defgroup sm_config sm_config
