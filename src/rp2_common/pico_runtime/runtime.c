@@ -111,8 +111,9 @@ void runtime_init(void) {
 
 #if !PICO_IE_26_29_UNCHANGED_ON_RESET
     // after resetting BANK0 we should disable IE on 26-29
-    hw_clear_alias(padsbank0_hw)->io[26] = hw_clear_alias(padsbank0_hw)->io[27] =
-            hw_clear_alias(padsbank0_hw)->io[28] = hw_clear_alias(padsbank0_hw)->io[29] = PADS_BANK0_GPIO0_IE_BITS;
+    padsbank0_hw_t *padsbank0_hw_clear = hw_clear_alias(padsbank0_hw);
+    padsbank0_hw_clear->io[26] = padsbank0_hw_clear->io[27] =
+            padsbank0_hw_clear->io[28] = padsbank0_hw_clear->io[29] = PADS_BANK0_GPIO0_IE_BITS;
 #endif
 
     // this is an array of either mutex_t or recursive_mutex_t (i.e. not necessarily the same size)
