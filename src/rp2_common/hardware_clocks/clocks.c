@@ -79,7 +79,9 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
             // necessarily running, nor is timer... so, 3 cycles per loop:
             uint delay_cyc = configured_freq[clk_sys] / configured_freq[clk_index] + 1;
             __asm volatile (
+#ifdef __GNUC__
                 ".syntax unified \n\t"
+#endif
                 "1: \n\t"
                 "subs %0, #1 \n\t"
                 "bne 1b"

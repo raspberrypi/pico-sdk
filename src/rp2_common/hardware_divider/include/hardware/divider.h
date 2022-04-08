@@ -86,9 +86,12 @@ static inline void hw_divider_wait_ready(void) {
 
     uint32_t tmp; // allow compiler to pick scratch register
     __asm volatile (
+#ifdef __GNUC__
+    ".syntax unified\n"
+#endif
     "hw_divider_result_loop_%=:"
     "ldr %0, [%1, %2]\n\t"
-    "lsr %0, #1\n\t"
+    "lsrs %0, #1\n\t"
     "bcc hw_divider_result_loop_%=\n\t"
     : "=&l" (tmp)
     : "l" (sio_hw), "I" (SIO_DIV_CSR_OFFSET)

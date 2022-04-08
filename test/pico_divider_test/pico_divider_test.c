@@ -194,7 +194,9 @@ void test_random() {
 
 uint32_t __attribute__((naked)) time_32(uint32_t a, uint32_t b, uint32_t (*func)(uint32_t a, uint32_t b)) {
     __asm(
+#ifdef __GNUC__
         ".syntax unified\n"
+#endif
         "push {r4, r5, lr}\n"
         "ldr r4, =#0xe000e018\n"
         "ldr r5, [r4]\n"
@@ -209,7 +211,9 @@ uint32_t __attribute__((naked)) time_32(uint32_t a, uint32_t b, uint32_t (*func)
 
 uint32_t __attribute__((naked)) time_64(uint64_t a, uint64_t b, uint64_t (*func64)(uint64_t a, uint64_t b)) {
     __asm(
+#ifdef __GNUC__
     ".syntax unified\n"
+#endif
     "push {r4-r6, lr}\n"
     "ldr r6, [sp, #16]\n"
     "ldr r4, =#0xe000e018\n"
