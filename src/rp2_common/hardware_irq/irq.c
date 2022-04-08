@@ -183,7 +183,7 @@ static inline int8_t slot_diff(struct irq_handler_chain_slot *to, struct irq_han
          "subs %1, %2\n"
          "adcs %1, %1\n" // * 2 (and + 1 if negative for rounding)
          "muls %0, %1\n"
-         "lsrs %0, 20\n"
+         "lsrs %0, %0, #20\n"
          : "+l" (result), "+l" (to)
          : "l" (from)
          :
