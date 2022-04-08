@@ -21,7 +21,7 @@
 #define __bi_ptr_lineno_var_name __CONCAT(__bi_ptr, __LINE__)
 #define __bi_enclosure_check_lineno_var_name __CONCAT(_error_bi_is_missing_enclosing_decl_,__LINE__)
 #define __bi_mark_enclosure static const __unused int __bi_enclosure_check_lineno_var_name=0;
-#if !defined(__GNUC__) || __cplusplus || __GNUC__ >= 8
+#if __cplusplus || __GNUC__ >= 8
 #define __bi_enclosure_check(x) (x + __bi_enclosure_check_lineno_var_name)
 #else
 // skip the version check on older GCC non C++, as it doesn't compile.. this is only here to catch the
