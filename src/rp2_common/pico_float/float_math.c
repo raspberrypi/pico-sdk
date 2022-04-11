@@ -58,10 +58,12 @@ static inline ui32 float2ui32(float f) {
     return tmp.ix;
 }
 
+#if 0
 static inline bool fisnan(float x) {
     ui32 ix=float2ui32(x);
     return ix * 2 > 0xff000000u;
 }
+#endif
 
 #if PICO_FLOAT_PROPAGATE_NANS
 #define check_nan_f1(x) if (fisnan((x))) return (x)
@@ -110,8 +112,10 @@ float WRAPPER_FUNC(copysignf)(float x, float y) {
 }
 
 static inline int fiszero(float x)  { return fgetexp    (x)==0; }
+#if 0
 static inline int fispzero(float x) { return fgetsignexp(x)==0; }
 static inline int fismzero(float x) { return fgetsignexp(x)==0x100; }
+#endif
 static inline int fisinf(float x)   { return fgetexp    (x)==0xff; }
 static inline int fispinf(float x)  { return fgetsignexp(x)==0xff; }
 static inline int fisminf(float x)  { return fgetsignexp(x)==0x1ff; }

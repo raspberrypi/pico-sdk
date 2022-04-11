@@ -25,11 +25,13 @@ static inline void i2c_unreset(i2c_inst_t *i2c) {
     unreset_block_wait(i2c == i2c0 ? RESETS_RESET_I2C0_BITS : RESETS_RESET_I2C1_BITS);
 }
 
+#ifndef NDEBUG
 // Addresses of the form 000 0xxx or 111 1xxx are reserved. No slave should
 // have these addresses.
 static inline bool i2c_reserved_addr(uint8_t addr) {
     return (addr & 0x78) == 0 || (addr & 0x78) == 0x78;
 }
+#endif
 
 uint i2c_init(i2c_inst_t *i2c, uint baudrate) {
     i2c_reset(i2c);
