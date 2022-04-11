@@ -33,6 +33,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "pico/platform.h"
 #include "pico/printf.h"
@@ -336,7 +337,13 @@ static size_t _etoa(out_fct_type out, char *buffer, size_t idx, size_t maxlen, d
                     unsigned int width, unsigned int flags);
 #endif
 
+#if defined __GNUC__
 #define is_nan __builtin_isnan
+#elif defined __ICCARM__
+#define is_nan __iar_isnan
+#else
+#error Unsupported toolchain
+#endif
 
 // internal ftoa for fixed decimal floating point
 static size_t _ftoa(out_fct_type out, char *buffer, size_t idx, size_t maxlen, double value, unsigned int prec,
