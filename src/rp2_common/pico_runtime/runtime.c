@@ -230,9 +230,11 @@ void exit(int status) {
     _exit(status);
 }
 
+#ifdef __GNUC__
 // incorrect warning from GCC 6
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
+#endif
 void __assert_func(const char *file, int line, const char *func, const char *failedexpr) {
     weak_raw_printf("assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
            failedexpr, file, line, func ? ", function: " : "",
@@ -241,7 +243,9 @@ void __assert_func(const char *file, int line, const char *func, const char *fai
     _exit(1);
 }
 
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 
 void __attribute__((noreturn)) panic_unsupported() {
     panic("not supported");

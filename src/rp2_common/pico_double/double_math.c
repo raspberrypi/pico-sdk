@@ -9,10 +9,12 @@
 #include "pico/double.h"
 #include "pico/platform.h"
 
+#ifdef __GNUC__
 // opened a separate issue https://github.com/raspberrypi/pico-sdk/issues/166 to deal with these warnings if at all
 _Pragma("GCC diagnostic push")
 _Pragma("GCC diagnostic ignored \"-Wconversion\"")
 _Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
+#endif
 
 typedef uint64_t ui64;
 typedef uint32_t ui32;
@@ -421,10 +423,14 @@ static double dpowint_0(double x,int y) {
 }
 
 double WRAPPER_FUNC(powint)(double x,int y) {
+#ifdef __GNUC__
     _Pragma("GCC diagnostic push")
     _Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
+#endif
     if(x==1.0||y==0) return 1;
+#ifdef __GNUC__
     _Pragma("GCC diagnostic pop")
+#endif
     check_nan_d1(x);
     if(diszero(x)) {
         if(y>0) {
@@ -470,13 +476,17 @@ static double dpow_0(double x,double y) {
 }
 
 double WRAPPER_FUNC(pow)(double x,double y) {
+#ifdef __GNUC__
     _Pragma("GCC diagnostic push")
     _Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
+#endif
 
     if(x==1.0||diszero(y)) return 1;
     check_nan_d2(x, y);
     if(x==-1.0&&disinf(y)) return 1;
+#ifdef __GNUC__
     _Pragma("GCC diagnostic pop")
+#endif
 
     if(diszero(x)) {
         if(!disneg(y)) {
@@ -623,4 +633,6 @@ double WRAPPER_FUNC(drem)(double x,double y) { check_nan_d2(x, y); return remquo
 
 double WRAPPER_FUNC(remainder)(double x,double y) { check_nan_d2(x, y); return remquo(x,y,0); }
 
+#ifdef __GNUC__
 _Pragma("GCC diagnostic pop") // conversion
+#endif

@@ -8,10 +8,12 @@
 #include "pico/float.h"
 #include "pico/platform.h"
 
+#ifdef __GNUC__
 // opened a separate issue https://github.com/raspberrypi/pico-sdk/issues/166 to deal with these warnings if at all
 _Pragma("GCC diagnostic push")
 _Pragma("GCC diagnostic ignored \"-Wconversion\"")
 _Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
+#endif
 
 typedef uint32_t ui32;
 typedef int32_t i32;
@@ -379,8 +381,10 @@ static float fpowint_0(float x,int y) {
 }
 
 float WRAPPER_FUNC(powintf)(float x,int y) {
+#ifdef __GNUC__
     _Pragma("GCC diagnostic push")
     _Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
+#endif
     if(x==1.0f||y==0) return 1;
     if(x==0.0f) {
         if(y>0) {
@@ -390,7 +394,9 @@ float WRAPPER_FUNC(powintf)(float x,int y) {
         if((y&1)) return fcopysign(FPINF,x);
         return FPINF;
     }
+#ifdef __GNUC__
     _Pragma("GCC diagnostic pop")
+#endif
     check_nan_f1(x);
     if(fispinf(x)) {
         if(y<0) return 0;
@@ -428,12 +434,16 @@ static float fpow_0(float x,float y) {
 }
 
 float WRAPPER_FUNC(powf)(float x,float y) {
+#ifdef __GNUC__
     _Pragma("GCC diagnostic push")
     _Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
+#endif
     if(x==1.0f||fiszero(y)) return 1;
     check_nan_f2(x,y);
     if(x==-1.0f&&fisinf(y)) return 1;
+#ifdef __GNUC__
     _Pragma("GCC diagnostic pop")
+#endif
     if(fiszero(x)) {
         if(!fisneg(y)) {
             if(fisoddint(y)) return x;
@@ -581,4 +591,6 @@ float WRAPPER_FUNC(dremf)(float x,float y) { check_nan_f2(x,y); return remquof(x
 
 float WRAPPER_FUNC(remainderf)(float x,float y) { check_nan_f2(x,y); return remquof(x,y,0); }
 
+#ifdef __GNUC__
 _Pragma("GCC diagnostic pop") // conversion
+#endif

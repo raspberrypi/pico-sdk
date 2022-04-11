@@ -386,10 +386,14 @@ uint8_t rp2040_chip_version(void);
  * @return the RP2040 rom version number (1 for RP2040-B0, 2 for RP2040-B1, 3 for RP2040-B2)
  */
 static inline uint8_t rp2040_rom_version(void) {
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
     return *(uint8_t*)0x13;
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 }
 
 /*! \brief No-op function for the body of tight loops
