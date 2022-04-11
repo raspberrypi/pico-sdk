@@ -316,7 +316,7 @@ extern "C" {
  *  \ingroup pico_platform
  */
 static inline void __breakpoint(void) {
-    __asm__("bkpt #0");
+    __asm ("bkpt #0");
 }
 
 /*! \brief Ensure that the compiler does not move memory access across this method call
@@ -332,7 +332,7 @@ static inline void __breakpoint(void) {
  * might - even above the memory store!)
  */
 __force_inline static void __compiler_memory_barrier(void) {
-    __asm__ volatile ("" : : : "memory");
+    __asm volatile ("" : : : "memory");
 }
 
 /*! \brief Macro for converting memory addresses to 32 bit addresses suitable for DMA
@@ -412,7 +412,7 @@ static __force_inline void tight_loop_contents(void) {}
  * \return a * b
  */
 __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
-    asm ("mul %0, %1" : "+l" (a) : "l" (b) : );
+    __asm ("mul %0, %1" : "+l" (a) : "l" (b) : );
     return a;
 }
 

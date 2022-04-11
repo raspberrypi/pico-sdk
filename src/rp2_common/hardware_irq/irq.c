@@ -176,7 +176,7 @@ static inline int8_t slot_diff(struct irq_handler_chain_slot *to, struct irq_han
     int32_t result = 0xaaaa;
     // return (to - from);
     // note this implementation has limited range, but is fine for plenty more than -128->127 result
-    asm (".syntax unified\n"
+    __asm (".syntax unified\n"
          "subs %1, %2\n"
          "adcs %1, %1\n" // * 2 (and + 1 if negative for rounding)
          "muls %0, %1\n"
