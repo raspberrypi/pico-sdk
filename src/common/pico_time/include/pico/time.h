@@ -162,6 +162,16 @@ static inline int64_t absolute_time_diff_us(absolute_time_t from, absolute_time_
  */
 extern const absolute_time_t at_the_end_of_time;
 
+/*! \brief Determine if the given timestamp is "at_the_end_of_time"
+ * \ingroup timestamp
+ *  \param t the timestamp
+ *  \return true if the timestamp is at_the_end_of_time
+ *  \sa at_the_end_of_time
+ */
+static inline bool is_at_the_end_of_time(absolute_time_t t) {
+    return to_us_since_boot(t) == to_us_since_boot(at_the_end_of_time);
+}
+
 /*! \brief The timestamp representing a null timestamp
  * \ingroup timestamp
  */
