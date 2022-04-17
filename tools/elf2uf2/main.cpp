@@ -9,7 +9,9 @@
 #include <vector>
 #include <cstring>
 #include <cstdarg>
+#include <cstdint>
 #include <algorithm>
+#include "pico/platform.h"
 #include "boot/uf2.h"
 #include "elf.h"
 
@@ -306,7 +308,7 @@ int elf2uf2(FILE *in, FILE *out) {
         block.target_addr = page_entry.first;
         block.block_no = page_num++;
         if (verbose) {
-            printf("Page %d / %d %08x\n", block.block_no, block.num_blocks, block.target_addr);
+            printf("Page %d / %d %08x\n", static_cast<int>(block.block_no), static_cast<int>(block.num_blocks), static_cast<unsigned>(block.target_addr));
         }
         memset(block.data, 0, sizeof(block.data));
         rc = realize_page(in, page_entry.second, block.data, sizeof(block.data));

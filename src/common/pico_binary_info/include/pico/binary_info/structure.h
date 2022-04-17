@@ -21,6 +21,27 @@ extern "C" {
 #define __packed __attribute__((packed))
 #endif
 
+#if !defined(le_uint16_t) || !defined(le_uint32_t) || !defined(le_int32_t)
+
+#if defined(_MSC_VER) || __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+
+#ifndef le_uint16_t
+#define le_uint16_t uint16_t
+#endif
+#ifndef le_uint32_t
+#define le_uint32_t uint32_t
+#endif
+#ifndef le_int32_t
+#define le_int32_t int32_t
+#endif
+
+#else
+#error Must define le_uint16_t, le_uint32_t, and le_int32_t when compiling for big endian
+#endif
+
+#endif
+
+
 typedef struct _binary_info_core binary_info_t;
 
 #define BINARY_INFO_TYPE_RAW_DATA 1
@@ -59,11 +80,11 @@ typedef struct _binary_info_core binary_info_t;
 #if PICO_ON_DEVICE
 #define bi_ptr_of(x) x *
 #else
-#define bi_ptr_of(x) uint32_t
+#define bi_ptr_of(x) le_uint32_t
 #endif
 typedef struct __packed _binary_info_core {
-        uint16_t type;
-        uint16_t tag;
+        le_uint16_t type;
+        le_uint16_t tag;
 } binary_info_core_t;
 
 typedef struct __packed _binary_info_raw_data {
@@ -73,7 +94,7 @@ typedef struct __packed _binary_info_raw_data {
 
 typedef struct __packed _binary_info_sized_data {
         struct _binary_info_core core;
-        uint32_t length;
+        le_uint32_t length;
         uint8_t bytes[1];
 } binary_info_sized_data_t;
 
@@ -84,23 +105,23 @@ typedef struct __packed _binary_info_list_zero_terminated {
 
 typedef struct __packed _binary_info_id_and_int {
         struct _binary_info_core core;
-        uint32_t id;
-        int32_t value;
+        le_uint32_t id;
+        le_int32_t value;
 } binary_info_id_and_int_t;
 
 typedef struct __packed _binary_info_id_and_string {
         struct _binary_info_core core;
-        uint32_t id;
+        le_uint32_t id;
         bi_ptr_of(const char) value;
 } binary_info_id_and_string_t;
 
 typedef struct __packed _binary_info_block_device {
         struct _binary_info_core core;
         bi_ptr_of(const char) name; // optional static name (independent of what is formatted)
-        uint32_t address;
-        uint32_t size;
+        le_uint32_t address;
+        le_uint32_t size;
         bi_ptr_of(binary_info_t) extra; // additional info
-        uint16_t flags;
+        le_uint16_t flags;
 } binary_info_block_device_t;
 
 #define BI_PINS_ENCODING_RANGE 1
@@ -110,12 +131,12 @@ typedef struct __packed _binary_info_pins_with_func {
     struct _binary_info_core core;
     // p4_5 : p3_5 : p2_5 : p1_5 : p0_5 : func_4 : 001_3 //individual pins p0,p1,p2,p3,p4 ... if fewer than 5 then duplicate p
     //                    phi_5 : plo_5 : func_4 : 010_3 // pin range plo-phi inclusive
-    uint32_t pin_encoding;
+    le_uint32_t pin_encoding;
 } binary_info_pins_with_func_t;
 
 typedef struct __packed _binary_info_pins_with_name {
     struct _binary_info_core core;
-    uint32_t pin_mask;
+    le_uint32_t pin_mask;
     bi_ptr_of(const char) label;
 } binary_info_pins_with_name_t;
 
@@ -126,10 +147,10 @@ typedef struct __packed _binary_info_pins_with_name {
 
 typedef struct __packed _binary_info_named_group {
     struct _binary_info_core core;
-    uint32_t parent_id;
-    uint16_t flags;
-    uint16_t group_tag;
-    uint32_t group_id;
+    le_uint32_t parent_id;
+    le_uint16_t flags;
+    le_uint16_t group_tag;
+    le_uint32_t group_id;
     bi_ptr_of(const char) label;
 } binary_info_named_group_t;
 
