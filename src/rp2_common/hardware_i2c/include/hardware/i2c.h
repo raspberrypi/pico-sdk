@@ -89,7 +89,7 @@ extern i2c_inst_t i2c1_inst;
  * master.
  *
  * The I2C bus frequency is set as close as possible to requested, and
- * the return actual rate set is returned
+ * the actual rate set is returned
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
  * \param baudrate Baudrate in Hz (e.g. 100kHz is 100000)
