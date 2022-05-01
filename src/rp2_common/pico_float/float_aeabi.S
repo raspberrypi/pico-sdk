@@ -378,7 +378,7 @@ wrapper_func __aeabi_i2f
         lsrs r1, r0, #31
         lsls r1, #31
         bpl 1f
-        rsbs r0, #0
+        negs r0, r0
 1:
         cmp r0, #0
         beq 7f
@@ -392,7 +392,7 @@ __aeabi_i2f_main:
         pop {r1, r2}
         lsls r1, r0
         subs r0, #158
-        rsbs r0, #0
+        negs r0, r0
 
         adds r1,#0x80  @ rounding
         bcs 5f         @ tripped carry? then have leading 1 in C as required (and result is even so can ignore sticky bits)
@@ -459,7 +459,7 @@ regular_func float2int_z
     bl __aeabi_f2uiz
     cmp r0, #0
     bmi 1f
-    rsbs r0, #0
+    negs r0, r0
     pop {pc}
 1:
     movs r0, #128
@@ -534,7 +534,7 @@ regular_func float2int64_z
     cmp r1, #0
     bmi 1f
     movs r2, #0
-    rsbs r0, #0
+    negs r0, r0
     sbcs r2, r1
     mov r1, r2
     pop {pc}
