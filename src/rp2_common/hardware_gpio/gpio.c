@@ -217,6 +217,10 @@ void gpio_init(uint gpio) {
     gpio_set_function(gpio, GPIO_FUNC_SIO);
 }
 
+void gpio_deinit(uint gpio) {
+    gpio_set_function(gpio, GPIO_FUNC_NULL);
+}
+
 void gpio_init_mask(uint gpio_mask) {
     for(uint i=0;i<32;i++) {
         if (gpio_mask & 1) {

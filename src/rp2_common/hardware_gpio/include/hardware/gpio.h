@@ -414,6 +414,13 @@ void gpio_acknowledge_irq(uint gpio, uint32_t events);
  */
 void gpio_init(uint gpio);
 
+/*! \brief Resets a GPIO back to the NULL function, i.e. disables it.
+ *  \ingroup hardware_gpio
+ *
+ * \param gpio GPIO number
+ */
+void gpio_deinit(uint gpio);
+
 /*! \brief Initialise multiple GPIOs (enabled I/O and set func to GPIO_FUNC_SIO)
  *  \ingroup hardware_gpio
  *
