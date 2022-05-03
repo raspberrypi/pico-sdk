@@ -134,6 +134,22 @@ static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
     c->div = div << PWM_CH0_DIV_INT_LSB;
 }
 
+/** \brief Set PWM clock divider in a PWM configuration using an 8:4 fractional value
+ *  \ingroup hardware_pwm
+ *
+ * \param c PWM configuration struct to modify
+ * \param integer 8 bit integer part of the clock divider. Must be greater than or equal to 1.
+ * \param fract 4 bit fractional part of the clock divider
+ *
+ * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
+ * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
+ * before passing them on to the PWM counter.
+ */
+static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t integer, uint8_t fract) {
+    valid_params_if(PWM, fract < 16);
+    c->div = (((uint)integer) << PWM_CH0_DIV_INT_LSB) | (((uint)fract) << PWM_CH0_DIV_FRAC_LSB);
+}
+
 /** \brief Set PWM counting mode in a PWM configuration
  *  \ingroup hardware_pwm
  *
