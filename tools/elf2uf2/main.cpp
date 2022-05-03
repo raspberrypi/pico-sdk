@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <map>
+#include <set>
 #include <vector>
 #include <cstring>
 #include <cstdarg>
@@ -20,6 +21,8 @@ typedef unsigned int uint;
 #define ERROR_INCOMPATIBLE -3
 #define ERROR_READ_FAILED -4
 #define ERROR_WRITE_FAILED -5
+
+#define FLASH_SECTOR_ERASE_SIZE 4096u
 
 static char error_msg[512];
 static bool verbose;
@@ -293,6 +296,28 @@ int elf2uf2(FILE *in, FILE *out) {
                         MAIN_RAM_START, sp);
         }
 #endif
+    } else {
+        // Fill in empty dummy uf2 pages to align the binary to flash sectors (except for the last sector which we don't
+        // need to pad, and choose not to to avoid making all SDK UF2s bigger)
+        // That workaround is required because the bootrom uses the block number for erase sector calculations:
+        // https://github.com/raspberrypi/pico-bootrom/blob/c09c7f08550e8a36fc38dc74f8873b9576de99eb/bootrom/virtual_disk.c#L205
+
+        std::set<uint32_t> touched_sectors;
+        uint32_t last_sector = pages.rbegin()->first / FLASH_SECTOR_ERASE_SIZE;
+        for (auto& page_entry : pages) {
+            uint32_t sector = page_entry.first / FLASH_SECTOR_ERASE_SIZE;
+            if (sector != last_sector) {
+                touched_sectors.insert(sector);
+            }
+        }
+
+        for (uint32_t sector : touched_sectors) {
+            for (uint32_t off = 0; off < FLASH_SECTOR_ERASE_SIZE; off += PAGE_SIZE) {
+                // Create a dummy page, if it does not exist yet. note that all present pages are first
+                // zeroed before they are filled with any contents, so a dummy page will be all zeros.
+                auto& dummy = pages[(sector * FLASH_SECTOR_ERASE_SIZE) + off];
+            }
+        }
     }
     uf2_block block;
     block.magic_start0 = UF2_MAGIC_START0;
@@ -306,7 +331,8 @@ int elf2uf2(FILE *in, FILE *out) {
         block.target_addr = page_entry.first;
         block.block_no = page_num++;
         if (verbose) {
-            printf("Page %d / %d %08x\n", block.block_no, block.num_blocks, block.target_addr);
+            printf("xPage %d / %d %08x%s\n", block.block_no, block.num_blocks, block.target_addr,
+               page_entry.second.empty() ? " (padding)": "");
         }
         memset(block.data, 0, sizeof(block.data));
         rc = realize_page(in, page_entry.second, block.data, sizeof(block.data));
