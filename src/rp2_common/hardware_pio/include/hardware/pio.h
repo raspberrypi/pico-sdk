@@ -157,7 +157,7 @@ static inline void sm_config_set_set_pins(pio_sm_config *c, uint set_base, uint 
 /*! \brief Set the 'in' pins in a state machine configuration
  *  \ingroup sm_config
  *
- * Can overlap with the 'out', ''set' and 'sideset' pins
+ * Can overlap with the 'out', 'set' and 'sideset' pins
  *
  * \param c Pointer to the configuration structure to modify
  * \param in_base 0-31 First pin to use as input
@@ -948,7 +948,7 @@ static inline void pio_sm_set_set_pins(PIO pio, uint sm, uint set_base, uint set
 /*! \brief Set the current 'in' pins for a state machine
  *  \ingroup sm_config
  *
- * Can overlap with the 'out', ''set' and 'sideset' pins
+ * Can overlap with the 'out', 'set' and 'sideset' pins
  *
  * \param pio The PIO instance; either \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
