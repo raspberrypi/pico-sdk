@@ -16,73 +16,29 @@
 #define PIMORONI_PLASMA2040
 
 // --- BOARD SPECIFIC ---
-#ifndef PLASMA2040_SW_A_PIN
 #define PLASMA2040_SW_A_PIN 12
-#endif
-
-#ifndef PLASMA2040_SW_B_PIN
 #define PLASMA2040_SW_B_PIN 13
-#endif
 
-#ifndef PLASMA2040_CLK_PIN
 #define PLASMA2040_CLK_PIN 14
-#endif
-
-#ifndef PLASMA2040_DATA_PIN
 #define PLASMA2040_DATA_PIN 15
-#endif
 
-#ifndef PLASMA2040_LED_R_PIN
 #define PLASMA2040_LED_R_PIN 16
-#endif
-
-#ifndef PLASMA2040_LED_G_PIN
 #define PLASMA2040_LED_G_PIN 17
-#endif
-
-#ifndef PLASMA2040_LED_B_PIN
 #define PLASMA2040_LED_B_PIN 18
-#endif
 
-#ifndef PLASMA2040_I2C
 #define PLASMA2040_I2C 0
-#endif
-
-#ifndef PLASMA2040_INT_PIN
 #define PLASMA2040_INT_PIN 19
-#endif
-
-#ifndef PLASMA2040_SDA_PIN
 #define PLASMA2040_SDA_PIN 20
-#endif
-
-#ifndef PLASMA2040_SCL_PIN
 #define PLASMA2040_SCL_PIN 21
-#endif
 
-#ifndef PLASMA2040_USER_SW_PIN
 #define PLASMA2040_USER_SW_PIN 23
-#endif
 
-#ifndef PLASMA2040_A0_PIN
 #define PLASMA2040_A0_PIN 26
-#endif
-
-#ifndef PLASMA2040_A1_PIN
 #define PLASMA2040_A1_PIN 27
-#endif
-
-#ifndef PLASMA2040_A2_PIN
 #define PLASMA2040_A2_PIN 28
-#endif
-
-#ifndef PLASMA2040_NUM_ADC_PINS
 #define PLASMA2040_NUM_ADC_PINS 3
-#endif
 
-#ifndef PLASMA2040_CURRENT_SENSE_PIN
 #define PLASMA2040_CURRENT_SENSE_PIN 29
-#endif
 
 // --- UART ---
 // no PICO_DEFAULT_UART
