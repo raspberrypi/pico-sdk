@@ -180,21 +180,30 @@ int _write(int handle, char *buffer, int length) {
 }
 
 void stdio_set_driver_enabled(stdio_driver_t *driver, bool enable) {
-    stdio_driver_t *prev = drivers;
-    for (stdio_driver_t *d = drivers; d; d = d->next) {
+    for (stdio_driver_t *d = drivers, *prev = NULL; d; d = d->next) {
         if (d == driver) {
-            if (!enable) {
+            // enabling but enabled already
+            if (enable)
+                return;
+            // disabling and previously enabled
+            if (d == drivers)
+                drivers = d->next;
+            if (prev != NULL)
                 prev->next = d->next;
-                driver->next = NULL;
-            }
+            driver->next = NULL;
             return;
         }
         prev = d;
     }
+
+    // enabling and not yet previously enabled
     if (enable) {
-        if (prev) prev->next = driver;
-        else drivers = driver;
+        // insert at the head
+        driver->next = drivers;
+        drivers = driver;
     }
+
+    // disabling but never enabled in the first place.
 }
 
 void stdio_flush() {
