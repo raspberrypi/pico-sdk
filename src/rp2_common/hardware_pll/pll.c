@@ -41,7 +41,7 @@ void pll_init(PLL pll, uint refdiv, uint vco_freq, uint post_div1, uint post_div
     if ((pll->cs & PLL_CS_LOCK_BITS) &&
         (refdiv == (pll->cs & PLL_CS_REFDIV_BITS)) &&
         (fbdiv  == (pll->fbdiv_int & PLL_FBDIV_INT_BITS)) &&
-        (pdiv   == (pll->prim & (PLL_PRIM_POSTDIV1_BITS & PLL_PRIM_POSTDIV2_BITS)))) {
+        (pdiv   == (pll->prim & (PLL_PRIM_POSTDIV1_BITS | PLL_PRIM_POSTDIV2_BITS)))) {
         // do not disrupt PLL that is already correctly configured and operating
         return;
     }
