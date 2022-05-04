@@ -16,7 +16,7 @@
 #include "pico/binary_info/structure.h"
 
 #if !PICO_NO_BINARY_INFO
-#define __bi_decl(name, bi, section_prefix, attr) static const attr __attribute__((section(section_prefix __STRING(name)))) struct _binary_info_core *name = bi
+#define __bi_decl(name, bi, section_prefix, attr) static const attr __attribute__((section(section_prefix __STRING(name)))) struct _binary_info_core *const name = bi
 #define __bi_lineno_var_name __CONCAT(__bi_, __LINE__)
 #define __bi_ptr_lineno_var_name __CONCAT(__bi_ptr, __LINE__)
 #define __bi_enclosure_check_lineno_var_name __CONCAT(_error_bi_is_missing_enclosing_decl_,__LINE__)
