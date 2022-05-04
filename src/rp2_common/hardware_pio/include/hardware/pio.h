@@ -211,6 +211,7 @@ static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool 
  * \sa sm_config_set_clkdiv()
  */
 static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_int, uint8_t div_frac) {
+    invalid_params_if(PIO, div_int == 0 && div_frac != 0);
     c->clkdiv =
             (((uint)div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
             (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
@@ -1151,6 +1152,7 @@ void pio_sm_drain_tx_fifo(PIO pio, uint sm);
 static inline void pio_sm_set_clkdiv_int_frac(PIO pio, uint sm, uint16_t div_int, uint8_t div_frac) {
     check_pio_param(pio);
     check_sm_param(sm);
+    invalid_params_if(PIO, div_int == 0 && div_frac != 0);
     pio->sm[sm].clkdiv =
             (((uint)div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
             (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
