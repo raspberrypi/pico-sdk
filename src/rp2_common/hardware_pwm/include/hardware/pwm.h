@@ -106,7 +106,7 @@ static inline void pwm_config_set_phase_correct(pwm_config *c, bool phase_correc
         | (bool_to_bit(phase_correct) << PWM_CH0_CSR_PH_CORRECT_LSB);
 }
 
-/** \brief Set clock divider in a PWM configuration
+/** \brief Set PWM clock divider in a PWM configuration
  *  \ingroup hardware_pwm
  *
  * \param c PWM configuration struct to modify
@@ -117,21 +117,8 @@ static inline void pwm_config_set_phase_correct(pwm_config *c, bool phase_correc
  * before passing them on to the PWM counter.
  */
 static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
+    valid_params_if(PWM, div >= 1.f && div < 256.f);
     c->div = (uint32_t)(div * (float)(1u << PWM_CH0_DIV_INT_LSB));
-}
-
-/** \brief Set PWM clock divider in a PWM configuration
- *  \ingroup hardware_pwm
- *
- * \param c PWM configuration struct to modify
- * \param div Integer value to reduce counting rate by. Must be greater than or equal to 1.
- *
- * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
- * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
- * before passing them on to the PWM counter.
- */
-static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
-    c->div = div << PWM_CH0_DIV_INT_LSB;
 }
 
 /** \brief Set PWM clock divider in a PWM configuration using an 8:4 fractional value
@@ -146,8 +133,24 @@ static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
  * before passing them on to the PWM counter.
  */
 static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t integer, uint8_t fract) {
+    valid_params_if(PWM, integer >= 1);
     valid_params_if(PWM, fract < 16);
     c->div = (((uint)integer) << PWM_CH0_DIV_INT_LSB) | (((uint)fract) << PWM_CH0_DIV_FRAC_LSB);
+}
+
+/** \brief Set PWM clock divider in a PWM configuration
+ *  \ingroup hardware_pwm
+ *
+ * \param c PWM configuration struct to modify
+ * \param div Integer value to reduce counting rate by. Must be greater than or equal to 1.
+ *
+ * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
+ * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
+ * before passing them on to the PWM counter.
+ */
+static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
+    valid_params_if(PWM, div >= 1 && div < 256);
+    pwm_config_set_clkdiv_int_frac(c, (uint8_t)div, 0);
 }
 
 /** \brief Set PWM counting mode in a PWM configuration
@@ -392,6 +395,7 @@ static inline void pwm_retard_count(uint slice_num) {
  */
 static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t integer, uint8_t fract) {
     check_slice_num_param(slice_num);
+    valid_params_if(PWM, integer >= 1);
     valid_params_if(PWM, fract < 16);
     pwm_hw->slice[slice_num].div = (((uint)integer) << PWM_CH0_DIV_INT_LSB) | (((uint)fract) << PWM_CH0_DIV_FRAC_LSB);
 }
