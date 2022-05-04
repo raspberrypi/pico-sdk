@@ -10,6 +10,7 @@
 #include "pico.h"
 #include "hardware/structs/sio.h"
 #include "hardware/structs/padsbank0.h"
+#include "hardware/structs/iobank0.h"
 
 #ifdef __cplusplus
 extern "C" {
