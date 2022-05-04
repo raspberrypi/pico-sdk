@@ -16,7 +16,7 @@
 #define PIMORONI_MOTOR2040
 
 #ifndef MOTOR2040_USE_DISTANCE_SENSOR
-// default to 0, unless explicitly set to 1
+// default to 0, if not explicitly set
 #define MOTOR2040_USE_DISTANCE_SENSOR 0
 #endif
 
@@ -63,9 +63,9 @@
 #define MOTOR2040_ADC_ADDR_1_PIN 24
 #define MOTOR2040_ADC_ADDR_2_PIN 25
 
-#define MOTOR2040_ADC0_PIN 26
-#define MOTOR2040_ADC1_PIN 27
-#define MOTOR2040_ADC2_PIN 28
+#define MOTOR2040_A0_PIN 26
+#define MOTOR2040_A1_PIN 27
+#define MOTOR2040_A2_PIN 28
 #define MOTOR2040_NUM_ADC_PINS 3
 
 #define MOTOR2040_SHARED_ADC_PIN 29
