@@ -63,6 +63,13 @@ void stdin_uart_init(void);
  */
 void stdio_uart_init_full(uart_inst_t *uart, uint baud_rate, int tx_pin, int rx_pin);
 
+/*! \brief Disables the UART driver and resets UART.
+ *  \ingroup pico_stdio_uart
+ *
+ * Does not touch the pins passed to stdio_uart_init_full(). You should reset those yourself.
+ */
+void stdio_uart_deinit();
+
 #ifdef __cplusplus
 }
 #endif

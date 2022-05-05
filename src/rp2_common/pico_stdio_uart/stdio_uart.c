@@ -9,7 +9,7 @@
 #include "pico/binary_info.h"
 #include "hardware/gpio.h"
 
-static uart_inst_t *uart_instance;
+static uart_inst_t *uart_instance = NULL;
 
 #if PICO_NO_BI_STDIO_UART
 #define stdio_bi_decl_if_func_used(x)
@@ -74,6 +74,15 @@ void stdio_uart_init_full(struct uart_inst *uart, uint baud_rate, int tx_pin, in
     if (tx_pin >= 0) gpio_set_function((uint)tx_pin, GPIO_FUNC_UART);
     if (rx_pin >= 0) gpio_set_function((uint)rx_pin, GPIO_FUNC_UART);
     stdio_set_driver_enabled(&stdio_uart, true);
+}
+
+void stdio_uart_deinit() {
+    if (uart_instance != NULL)
+    {
+        stdio_set_driver_enabled(&stdio_uart, false);
+        uart_deinit(uart_instance);
+        uart_instance = NULL;
+    }
 }
 
 static void stdio_uart_out_chars(const char *buf, int length) {
