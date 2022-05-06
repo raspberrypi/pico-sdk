@@ -68,7 +68,7 @@ void stdio_uart_init_full(uart_inst_t *uart, uint baud_rate, int tx_pin, int rx_
  *
  * Does not touch the pins passed to stdio_uart_init_full(). You should reset those yourself.
  */
-void stdio_uart_deinit();
+void stdio_uart_deinit(void);
 
 #ifdef __cplusplus
 }
