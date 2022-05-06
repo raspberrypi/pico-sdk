@@ -357,14 +357,14 @@ enum gpio_drive_strength gpio_get_drive_strength(uint gpio);
  * \param events Which events will cause an interrupt
  * \param enabled Enable or disable flag
  *
- * Events is a bitmask of the following:
+ * Events is a bitmask of the following \ref gpio_irq_level values:
  *
- * bit | interrupt
- * ----|----------
- *   0 | Low level
- *   1 | High level
- *   2 | Edge low
- *   3 | Edge high
+ * bit | constant            | interrupt
+ * ----|----------------------------------------------------------
+ *   0 | GPIO_IRQ_LEVEL_LOW  | Continuously while level is low
+ *   1 | GPIO_IRQ_LEVEL_HIGH | Continuously while level is high
+ *   2 | GPIO_IRQ_EDGE_FALL  | On each transition from high to low
+ *   3 | GPIO_IRQ_EDGE_RISE  | On each transition from low to high
  */
 void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled);
 
@@ -401,7 +401,8 @@ void gpio_set_dormant_irq_enabled(uint gpio, uint32_t events, bool enabled);
  *
  * \param gpio GPIO number
  * \param events Bitmask of events to clear. See \ref gpio_set_irq_enabled for details.
-  *
+ *
+ * \note For callbacks set with \ref gpio_set_irq_enabled_with_callback, this function is called automatically.
  */
 void gpio_acknowledge_irq(uint gpio, uint32_t events);
 
