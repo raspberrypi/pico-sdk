@@ -403,7 +403,7 @@ int main() {
         printf("FMODF %10.18f\n", check_close2(fmodf, x, 3.0f));
         sincosf(x, &s, &c);
         printf("SINCOS %10.18f %10.18f\n", s, c);
-        if (s != sin(x) || c != cos(x)) {
+        if (s != sinf(x) || c != cosf(x)) {
             printf("SINCOS mismatch\n");
             fail = true;
         }
