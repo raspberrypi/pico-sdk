@@ -485,7 +485,7 @@ static inline void dma_channel_start(uint channel) {
  * not require any additional work, as aborting a channel which may be about to complete, when you have a completion
  * IRQ handler registered, is inherently race-prone, and so code is likely needed to disambiguate the two occurrences.
  *
- * If that is not the case, but you do have an channel completion IRQ handler registered, you can simply
+ * If that is not the case, but you do have a channel completion IRQ handler registered, you can simply
  * disable/re-enable the IRQ around the call to this method as shown by this code fragment (using DMA IRQ0).
  *
  * \code
