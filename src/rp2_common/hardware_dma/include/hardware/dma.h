@@ -506,7 +506,7 @@ static inline void dma_channel_abort(uint channel) {
     dma_hw->abort = 1u << channel;
     // Bit will go 0 once channel has reached safe state
     // (i.e. any in-flight transfers have retired)
-    while (dma_hw->abort & (1ul << channel)) tight_loop_contents();
+    while (dma_hw->ch[channel].ctrl_trig & DMA_CH0_CTRL_TRIG_BUSY_BITS) tight_loop_contents();
 }
 
 /*! \brief  Enable single DMA channel's interrupt via DMA_IRQ_0
