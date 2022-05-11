@@ -97,10 +97,10 @@ void stdio_uart_deinit_full(int tx_pin, int rx_pin)
         uart_deinit(uart_instance);
         uart_instance = NULL;
 
-        if (tx_pin != -1)
-            gpio_deinit(tx_pin);
-        if (rx_pin != -1)
-            gpio_deinit(rx_pin);
+        if (tx_pin >= 0)
+            gpio_deinit((uint)tx_pin);
+        if (rx_pin >= 0)
+            gpio_deinit((uint)rx_pin);
     }
 }
 
