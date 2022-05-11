@@ -180,20 +180,19 @@ int _write(int handle, char *buffer, int length) {
 }
 
 void stdio_set_driver_enabled(stdio_driver_t *driver, bool enable) {
-    stdio_driver_t *prev = drivers;
-    for (stdio_driver_t *d = drivers; d; d = d->next) {
-        if (d == driver) {
+    stdio_driver_t **prev = &drivers;
+    while (*prev) {
+        if (*prev == driver) {
             if (!enable) {
-                prev->next = d->next;
+                *prev = driver->next;
                 driver->next = NULL;
             }
             return;
         }
-        prev = d;
+        prev = &(*prev)->next;
     }
     if (enable) {
-        if (prev) prev->next = driver;
-        else drivers = driver;
+        *prev = driver;
     }
 }
 
