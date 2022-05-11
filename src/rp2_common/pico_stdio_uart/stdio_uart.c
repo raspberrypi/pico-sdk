@@ -80,6 +80,7 @@ void stdio_uart_deinit() {
     if (uart_instance != NULL)
     {
         stdio_set_driver_enabled(&stdio_uart, false);
+        uart_tx_wait_blocking(uart_instance);
         uart_deinit(uart_instance);
         uart_instance = NULL;
     }
