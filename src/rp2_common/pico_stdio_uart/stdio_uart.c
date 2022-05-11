@@ -77,12 +77,30 @@ void stdio_uart_init_full(struct uart_inst *uart, uint baud_rate, int tx_pin, in
 }
 
 void stdio_uart_deinit() {
+    int tx_pin = -1;
+    int rx_pin = -1;
+#ifdef PICO_DEFAULT_UART_TX_PIN
+    tx_pin = PICO_DEFAULT_UART_TX_PIN;
+#endif
+#ifdef PICO_DEFAULT_UART_RX_PIN
+    rx_pin = PICO_DEFAULT_UART_RX_PIN;
+#endif
+    stdio_uart_deinit_full(tx_pin, rx_pin);
+}
+
+void stdio_uart_deinit_full(int tx_pin, int rx_pin)
+{
     if (uart_instance != NULL)
     {
         stdio_set_driver_enabled(&stdio_uart, false);
         uart_tx_wait_blocking(uart_instance);
         uart_deinit(uart_instance);
         uart_instance = NULL;
+
+        if (tx_pin != -1)
+            gpio_deinit(tx_pin);
+        if (rx_pin != -1)
+            gpio_deinit(rx_pin);
     }
 }
 
