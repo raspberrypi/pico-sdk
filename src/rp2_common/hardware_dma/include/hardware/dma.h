@@ -473,7 +473,7 @@ static inline void dma_channel_start(uint channel) {
  *
  * Function will only return once the DMA has stopped.
  *
- * Note that due to to errata RP2040-E13, aborting a channel which has transfers
+ * Note that due to errata RP2040-E13, aborting a channel which has transfers
  * in-flight (i.e. an individual read has taken place but the corresponding write has not), the ABORT
  * status bit will clear prematurely, and subsequently the in-flight
  * transfers will trigger a completion interrupt once they complete.
