@@ -287,7 +287,6 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
             struct irq_handler_chain_slot *prev_slot = NULL;
             struct irq_handler_chain_slot *existing_vtable_slot = remove_thumb_bit(vtable_handler);
             struct irq_handler_chain_slot *to_free_slot = existing_vtable_slot;
-            int8_t to_free_slot_index = get_slot_index(to_free_slot);
             while (to_free_slot->handler != handler) {
                 prev_slot = to_free_slot;
                 if (to_free_slot->link < 0) break;
@@ -325,7 +324,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
                         }
                         // add slot back to free list
                         to_free_slot->link = irq_hander_chain_free_slot_head;
-                        irq_hander_chain_free_slot_head = to_free_slot_index;
+                        irq_hander_chain_free_slot_head = get_slot_index(to_free_slot);
                     } else {
                         // since we are the last slot we know that our inst3 hasn't executed yet, so we change
                         // it to bl to irq_handler_chain_remove_tail which will remove the slot.
