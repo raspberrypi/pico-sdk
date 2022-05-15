@@ -10,6 +10,8 @@ function(pico_generate_pio_header TARGET PIO)
 
     if (pico_generate_pio_header_OUTPUT_FORMAT)
         set(OUTPUT_FORMAT "${pico_generate_pio_header_OUTPUT_FORMAT}")
+    elseif(DEFINED PIOASM_DEFAULT_OUTPUT_FORMAT)
+        set(OUTPUT_FORMAT "${PIOASM_DEFAULT_OUTPUT_FORMAT}")
     else()
         set(OUTPUT_FORMAT "c-sdk")
     endif()
