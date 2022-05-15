@@ -90,9 +90,7 @@ static void hw_enumeration_fix_force_ls_j(void) {
     // DM must be 0 for this to work. This is true if it is selected
     // to any other function. fn 8 on this pin is only for debug so shouldn't
     // be selected
-    if (gpio_get_function(dm) == 8) {
-        panic("Not expecting DM to be function 8");
-    }
+    hard_assert(gpio_get_function(dm) != 8);
 
     // Before changing any pin state, take a copy of the current gpio control register
     gpio_ctrl_prev = iobank0_hw->io[dp].ctrl;
