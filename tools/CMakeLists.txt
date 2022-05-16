@@ -4,9 +4,18 @@ function(_pico_init_pioasm)
     find_package(Pioasm REQUIRED)
 endfunction()
 
+# PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, default output format used by pioasm when using pico_generate_pio_header, default=c-sdk, group=build
 function(pico_generate_pio_header TARGET PIO)
     _pico_init_pioasm()
-    cmake_parse_arguments(pico_generate_pio_header "" "OUTPUT_DIR" "" ${ARGN} )
+    cmake_parse_arguments(pico_generate_pio_header "" "OUTPUT_FORMAT;OUTPUT_DIR" "" ${ARGN} )
+
+    if (pico_generate_pio_header_OUTPUT_FORMAT)
+        set(OUTPUT_FORMAT "${pico_generate_pio_header_OUTPUT_FORMAT}")
+    elseif(DEFINED PICO_DEFAULT_PIOASM_OUTPUT_FORMAT)
+        set(OUTPUT_FORMAT "${PICO_DEFAULT_PIOASM_OUTPUT_FORMAT}")
+    else()
+        set(OUTPUT_FORMAT "c-sdk")
+    endif()
 
     if (pico_generate_pio_header_OUTPUT_DIR)
         get_filename_component(HEADER_DIR ${pico_generate_pio_header_OUTPUT_DIR} ABSOLUTE)
@@ -23,7 +32,7 @@ function(pico_generate_pio_header TARGET PIO)
 
     add_custom_command(OUTPUT ${HEADER}
             DEPENDS ${PIO}
-            COMMAND Pioasm -o c-sdk ${PIO} ${HEADER}
+            COMMAND Pioasm -o ${OUTPUT_FORMAT} ${PIO} ${HEADER}
             )
     add_dependencies(${TARGET} ${HEADER_GEN_TARGET})
     get_target_property(target_type ${TARGET} TYPE)
