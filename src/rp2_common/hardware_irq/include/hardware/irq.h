@@ -103,6 +103,9 @@
 #define PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY 0x80
 #endif
 
+#define PICO_SHARED_IRQ_HANDLER_HIGHEST_ORDER_PRIORITY 0xff
+#define PICO_SHARED_IRQ_HANDLER_LOWEST_ORDER_PRIORITY 0x00
+
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_IRQ, Enable/disable assertions in the IRQ module, type=bool, default=0, group=hardware_irq
 #ifndef PARAM_ASSERTIONS_ENABLED_IRQ
 #define PARAM_ASSERTIONS_ENABLED_IRQ 0
@@ -223,6 +226,9 @@ irq_handler_t irq_get_exclusive_handler(uint num);
  * on the order_priority (higher priorities are called first, identical priorities are called in undefined order). A good
  * rule of thumb is to use PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY if you don't much care, as it is in the middle of
  * the priority range by default.
+ *
+ * \note The order_priority uses \em higher values for higher priorities which is the \em opposite of the CPU interrupt priorities passed
+ * to irq_set_priority() which use lower values for higher priorities.
  *
  * \see irq_set_exclusive_handler()
  */

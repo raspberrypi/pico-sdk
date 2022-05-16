@@ -110,26 +110,6 @@ __force_inline int something_inlined(int x) {
     return x * 2;
 }
 
-void __isr dma_handler_a(void) {
-    printf("HELLO A\n");
-    if (dma_hw->ints1 & 1) {
-        dma_hw->ints1 = 1;
-        printf("A WINS DMA_TO %08x\n", (uint) dma_to);
-        irq_remove_handler(DMA_IRQ_1, dma_handler_a);
-    }
-}
-
-void __isr dma_handler_b(void) {
-    printf("HELLO B\n");
-    if (dma_hw->ints1 & 1) {
-        dma_hw->ints1 = 1;
-        printf("B WINS DMA_TO %08x\n", (uint) dma_to);
-//        irq_remove_handler(DMA_IRQ_1, dma_handler_b);
-    }
-}
-
-//#pragma GCC pop_options
-
 int main(void) {
     spiggle();
 
@@ -138,29 +118,6 @@ int main(void) {
     printf("HI %d\n", something_inlined((int)time_us_32()));
     puts("Hello Everything!");
     puts("Hello Everything2!");
-
-    irq_add_shared_handler(DMA_IRQ_1, dma_handler_a, 0x80);
-    irq_add_shared_handler(DMA_IRQ_1, dma_handler_b, 0xC0);
-
-    dma_channel_config config = dma_channel_get_default_config(0);
-//    set_exclusive_irq_handler(DMA_IRQ_1, dma_handler_a);
-    dma_channel_set_irq1_enabled(0, true);
-    irq_set_enabled(DMA_IRQ_1, true);
-    dma_channel_configure(0, &config, &dma_to, &dma_from, 1, true);
-    dma_channel_set_config(0, &config, false);
-
-    // note this loop expects to cause a breakpoint!!
-    for (int i = 0; i < 20; i++) {
-        puts("sleepy");
-        sleep_ms(1000);
-        dma_channel_configure(0, &config, &dma_to, &dma_from, 1, true);
-        if (i==3) {
-            irq_remove_handler(DMA_IRQ_1, dma_handler_a);
-        }
-        if (i==2) {
-            irq_remove_handler(DMA_IRQ_1, dma_handler_b);
-        }
-    }
     // this should compile as we are Cortex M0+
     __asm volatile("SVC #3");
 }
