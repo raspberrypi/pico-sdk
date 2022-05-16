@@ -54,17 +54,18 @@ irq_handler_chain_slots:
 .endr
 
 irq_handler_chain_first_slot:
-    push {lr}
-    ldr  r0, [r1, #4]
-    adds r1, #1
-    mov  lr, r1
-    bx   r0
+    push {lr}         // Save EXC_RETURN token, so `pop {pc}` will return from interrupt
+    ldr  r0, [r1, #4] // Get `handler` field of irq_handler_chain_slot
+    adds r1, #1       // r1 points to `inst3` field of slot struct. Set Thumb bit on r1,
+    mov  lr, r1       // and copy to lr, so `inst3` is executed on return from handler
+    bx   r0           // Enter handler
+
 irq_handler_chain_remove_tail:
-    mov  r0, lr
-    subs r0, #9
+    mov  r0, lr       // Get start of struct. This function was called by a bl at offset +4,
+    subs r0, #9       // so lr points to offset +8. Note also lr has its Thumb bit set!
     ldr  r1, =irq_add_tail_to_free_list
     blx  r1
-    pop  {pc}
+    pop  {pc}         // Top of stack is EXC_RETURN
 
 
 #endif
