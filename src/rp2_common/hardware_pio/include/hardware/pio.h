@@ -96,8 +96,8 @@ typedef pio_hw_t *PIO;
 /** \brief PIO Configuration structure
  *  \ingroup sm_config
  *
- * This structure is an in memory representation of the configuration that can be later applied to a PIO
- * state machine using pio_sm_set_config() or pio_sm_init()
+ * This structure is an in-memory representation of the configuration that can be applied to a PIO
+ * state machine later using pio_sm_set_config() or pio_sm_init().
  */
 typedef struct {
     uint32_t clkdiv;
