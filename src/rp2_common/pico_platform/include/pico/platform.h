@@ -405,12 +405,12 @@ uint __get_current_exception(void);
  *
  * This method is useful for introducing very short delays.
  *
- * This method busy-waits in a tight loop for the give number of system clock cycles. The total wait time is only accurate to within 2 cycles,
+ * This method busy-waits in a tight loop for the given number of system clock cycles. The total wait time is only accurate to within 2 cycles,
  * and this method uses a loop counter rather than a hardware timer, so the method will always take longer than expected if an
- * interrupt is handled on the calling core when during the busy-wait; you can of course disable interrupts to prevent this.
+ * interrupt is handled on the calling core during the busy-wait; you can of course disable interrupts to prevent this.
  *
- * You can use \ref clock_get_hz(clk_sys) to determine the number of clock cycles per second if you want to convert to cycles
- * from an actual time duration.
+ * You can use \ref clock_get_hz(clk_sys) to determine the number of clock cycles per second if you want to convert an actual
+ * time duration to a number of cycles.
  *
  * \param minimum_cycles the minimum number of system clock cycles to delay for
  */
