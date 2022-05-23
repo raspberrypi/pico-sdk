@@ -42,8 +42,8 @@
 #endif
 
 // --- On-Stamp Neopixel ---
-#ifndef PICO_STAMP_WS2812_PIN
-#define PICO_STAMP_WS2812_PIN 21
+#ifndef SOLDERPARTY_RP2040_STAMP_WS2812_PIN
+#define SOLDERPARTY_RP2040_STAMP_WS2812_PIN 21
 #endif
 
 // --- I2C ---
