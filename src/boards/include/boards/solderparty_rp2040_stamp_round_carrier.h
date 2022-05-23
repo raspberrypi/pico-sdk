@@ -36,9 +36,14 @@
 #define PICO_DEFAULT_UART_RX_PIN 17
 #endif
 
-// --- Neopixel ---
+// --- Neopixel Ring ---
 #ifndef PICO_DEFAULT_WS2812_PIN
 #define PICO_DEFAULT_WS2812_PIN 24
+#endif
+
+// --- On-Stamp Neopixel ---
+#ifndef PICO_STAMP_WS2812_PIN
+#define PICO_STAMP_WS2812_PIN 21
 #endif
 
 // --- I2C ---
