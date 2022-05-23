@@ -26,6 +26,9 @@
 #endif
 
 // --- UART ---
+#ifndef PICO_DEFAULT_UART
+#define PICO_DEFAULT_UART 0
+#endif
 #ifndef PICO_DEFAULT_UART_TX_PIN
 #define PICO_DEFAULT_UART_TX_PIN 16
 #endif
@@ -39,6 +42,9 @@
 #endif
 
 // --- I2C ---
+#ifndef PICO_DEFAULT_I2C
+#define PICO_DEFAULT_I2C       0
+#endif
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
 #define PICO_DEFAULT_I2C_SDA_PIN   0
 #endif
