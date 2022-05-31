@@ -15,10 +15,9 @@
 auto_init_mutex(malloc_mutex);
 #endif
 
-extern void *REAL_FUNC(malloc)(size_t size);
-extern void *REAL_FUNC(calloc)(size_t count, size_t size);
-extern void *REAL_FUNC(realloc)(void *mem, size_t size);
-extern void REAL_FUNC(free)(void *mem);
+/* We need macros that will expand their arguments before concatenating */
+#define REAL_FUNC_EXP(x)    REAL_FUNC(x)
+#define WRAPPER_FUNC_EXP(x) WRAPPER_FUNC(x)
 
 extern char __StackLimit; /* Set by linker.  */
 
@@ -30,63 +29,29 @@ static inline void check_alloc(__unused void *mem, __unused uint size) {
 #endif
 }
 
-void *WRAPPER_FUNC(malloc)(size_t size) {
-#if PICO_USE_MALLOC_MUTEX
-    mutex_enter_blocking(&malloc_mutex);
-#endif
-    void *rc = REAL_FUNC(malloc)(size);
-#if PICO_USE_MALLOC_MUTEX
-    mutex_exit(&malloc_mutex);
-#endif
-#if PICO_DEBUG_MALLOC
-    if (!rc || ((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) {
-        printf("malloc %d %p->%p\n", (uint) size, rc, ((uint8_t *) rc) + size);
-    }
-#endif
-    check_alloc(rc, size);
-    return rc;
-}
+#ifdef __GNUC__
 
-void *WRAPPER_FUNC(calloc)(size_t count, size_t size) {
-#if PICO_USE_MALLOC_MUTEX
-    mutex_enter_blocking(&malloc_mutex);
-#endif
-    void *rc = REAL_FUNC(calloc)(count, size);
-#if PICO_USE_MALLOC_MUTEX
-    mutex_exit(&malloc_mutex);
-#endif
-#if PICO_DEBUG_MALLOC
-    if (!rc || ((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) {
-        printf("calloc %d %p->%p\n", (uint) (count * size), rc, ((uint8_t *) rc) + size);
-    }
-#endif
-    check_alloc(rc, size);
-    return rc;
-}
+/* Just the one heap implementation */
+#define PREFIX
+#include "pico_malloc.h"
 
-void *WRAPPER_FUNC(realloc)(void *mem, size_t size) {
-#if PICO_USE_MALLOC_MUTEX
-    mutex_enter_blocking(&malloc_mutex);
-#endif
-    void *rc = REAL_FUNC(realloc)(mem, size);
-#if PICO_USE_MALLOC_MUTEX
-    mutex_exit(&malloc_mutex);
-#endif
-#if PICO_DEBUG_MALLOC
-    if (!rc || ((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) {
-        printf("realloc %p %d->%p\n", mem, (uint) size, rc);
-    }
-#endif
-    check_alloc(rc, size);
-    return rc;
-}
+#elif defined __ICCARM__
 
-void WRAPPER_FUNC(free)(void *mem) {
-#if PICO_USE_MALLOC_MUTEX
-    mutex_enter_blocking(&malloc_mutex);
+/* Used when you select "No-free heap" in Project > Options... > General options > Library options 2 */
+#define PREFIX __no_free_
+#include "pico_malloc.h"
+#undef PREFIX
+/* Used when you select "Basic heap" in Project > Options... > General options > Library options 2 */
+#define PREFIX __basic_
+#include "pico_malloc.h"
+#undef PREFIX
+/* Used when you select "Advanced heap" in Project > Options... > General options > Library options 2 */
+#define PREFIX __iar_dl
+#include "pico_malloc.h"
+#undef PREFIX
+
+#else
+
+#error Unsupported toolchain
+
 #endif
-    REAL_FUNC(free)(mem);
-#if PICO_USE_MALLOC_MUTEX
-    mutex_exit(&malloc_mutex);
-#endif
-}
