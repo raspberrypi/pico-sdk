@@ -16,9 +16,18 @@
  * This header may be included by assembly code
 */
 
+#define	__PICO_STRING(x)	#x
+#define	__PICO_XSTRING(x)	__PICO_STRING(x)
+
 #include "pico/types.h"
 #include "pico/version.h"
+
+// PICO_CONFIG: PICO_CONFIG_HEADER, path to header include in place of the default pico/config.h which may be desirable for build systems which can't easily generate the config_autogen header, type=string, default=none, group=pico_base
+#ifdef PICO_CONFIG_HEADER
+#include __PICO_XSTRING(PICO_CONFIG_HEADER)
+#else
 #include "pico/config.h"
+#endif
 #include "pico/platform.h"
 #include "pico/error.h"
 
