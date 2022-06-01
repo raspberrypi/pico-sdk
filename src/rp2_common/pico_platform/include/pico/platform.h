@@ -17,6 +17,8 @@
  */
 
 #include "hardware/platform_defs.h"
+#include "hardware/regs/addressmap.h"
+#include "hardware/regs/sio.h"
 
 // Marker for builds targeting the RP2040
 #define PICO_RP2040 1
@@ -421,6 +423,15 @@ static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
         "bcs 1b\n"
         : "+r" (minimum_cycles) : : "memory"
     );
+}
+
+/*! \brief Get the current core number
+ *  \ingroup hardware_sync
+ *
+ * \return The core number the call was made from
+ */
+__force_inline static uint get_core_num(void) {
+    return (*(uint32_t *) (SIO_BASE + SIO_CPUID_OFFSET));
 }
 
 #else // __ASSEMBLER__
