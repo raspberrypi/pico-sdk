@@ -52,6 +52,17 @@ bool __time_critical_func(sem_acquire_block_until)(semaphore_t *sem, absolute_ti
     } while (true);
 }
 
+bool __time_critical_func(sem_try_acquire)(semaphore_t *sem) {
+    uint32_t save = spin_lock_blocking(sem->core.spin_lock);
+    if (sem->permits == 0) {
+        spin_unlock(sem->core.spin_lock, save);
+        return false;
+    }
+    sem->permits--;
+    lock_internal_spin_unlock_with_notify(&sem->core, save);
+    return true;
+}
+
 // todo this should really have a blocking variant for when permits are maxed out
 bool __time_critical_func(sem_release)(semaphore_t *sem) {
     uint32_t save = spin_lock_blocking(sem->core.spin_lock);
