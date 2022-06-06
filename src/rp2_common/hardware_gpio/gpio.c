@@ -182,7 +182,6 @@ void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled) {
 }
 
 void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback) {
-    // this is the original behavior
     gpio_set_irq_enabled(gpio, events, enabled);
     gpio_set_irq_callback(callback);
     if (enabled) irq_set_enabled(IO_IRQ_BANK0, true);
@@ -197,9 +196,7 @@ void gpio_set_irq_callback(gpio_irq_callback_t callback) {
         callbacks[core] = callback;
     } else if (callback) {
         callbacks[core] = callback;
-        // todo - remove comment; note we could have added a #define to resort to the old exclusive handler, but since the
-        //  new handler is likely faster anyway, i don't think there is much point (it's only a few cycles for a shared one)
-        irq_add_shared_handler(IO_IRQ_BANK0, gpio_default_irq_handler, GPIO_CALLBACK_IRQ_ORDER_PRIORITY);
+        irq_add_shared_handler(IO_IRQ_BANK0, gpio_default_irq_handler, GPIO_IRQ_CALLBACK_ORDER_PRIORITY);
     }
 }
 
@@ -209,7 +206,7 @@ void gpio_add_raw_irq_handler_with_order_priority_masked(uint gpio_mask, irq_han
 }
 
 void gpio_add_raw_irq_handler_masked(uint gpio_mask, irq_handler_t handler) {
-    gpio_add_raw_irq_handler_with_order_priority_masked(gpio_mask, handler, PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY);
+    gpio_add_raw_irq_handler_with_order_priority_masked(gpio_mask, handler, GPIO_RAW_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY);
 }
 
 void gpio_remove_raw_irq_handler_masked(uint gpio_mask, irq_handler_t handler) {

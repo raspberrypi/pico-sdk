@@ -356,7 +356,7 @@ enum gpio_drive_strength gpio_get_drive_strength(uint gpio);
 /*! \brief Enable or disable specific interrupt events for specified GPIO
  *  \ingroup hardware_gpio
  *
- * This function sets which GPIO events cause an GPIO interrupt on the calling core. See
+ * This function sets which GPIO events cause a GPIO interrupt on the calling core. See
  * \ref gpio_set_irq_callback, \ref gpio_set_irq_enabled_with_callback and
  * \ref gpio_add_raw_irq_handler to set up a GPIO interrupt handler to handle the events.
  *
@@ -364,7 +364,7 @@ enum gpio_drive_strength gpio_get_drive_strength(uint gpio);
  * the processor that calls the function.
  *
  * \param gpio GPIO number
- * \param events Which events will cause an interrupt
+ * \param event_mask Which events will cause an interrupt
  * \param enabled Enable or disable flag
  *
  * Events is a bitmask of the following:
@@ -376,22 +376,28 @@ enum gpio_drive_strength gpio_get_drive_strength(uint gpio);
  *   2 | Edge low
  *   3 | Edge high
  *
- *  Which are specified in \ref gpio_irq_level
+ * which are specified in \ref gpio_irq_level
  */
-void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled);
+void gpio_set_irq_enabled(uint gpio, uint32_t event_mask, bool enabled);
 
-#ifndef GPIO_CALLBACK_IRQ_ORDER_PRIORITY
-#define GPIO_CALLBACK_IRQ_ORDER_PRIORITY PICO_SHARED_IRQ_HANDLER_LOWEST_ORDER_PRIORITY
+// PICO_CONFIG: GPIO_IRQ_CALLBACK_ORDER_PRIORITY, the irq priority order of the default IRQ callback, min=0, max=255, default=PICO_SHARED_IRQ_HANDLER_LOWEST_ORDER_PRIORITY, group=hardware_gpio
+#ifndef GPIO_IRQ_CALLBACK_ORDER_PRIORITY
+#define GPIO_IRQ_CALLBACK_ORDER_PRIORITY PICO_SHARED_IRQ_HANDLER_LOWEST_ORDER_PRIORITY
 #endif
 
-/*! \brief Set the generic callback used for GPIO IRQs events for the current core
+// PICO_CONFIG: GPIO_RAW_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY, the irq priority order of raw IRQ handlers if the priortiy is not specified, min=0, max=255, default=PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY, group=hardware_gpio
+#ifndef GPIO_RAW_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY
+#define GPIO_RAW_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY
+#endif
+
+/*! \brief Set the generic callback used for GPIO IRQ events for the current core
  *  \ingroup hardware_gpio
  *
  * This function sets the callback used for all GPIO IRQs on the current core that are not explicitly
  * hooked via \ref gpio_add_raw_irq_handler or other gpio_add_raw_irq_handler_ functions.
  *
  * This function is called with the GPIO number and event mask for each of the (not explicitly hooked)
- * GPIOs that have events enabled and that are pending (see \ref gpio_get_irq_events).
+ * GPIOs that have events enabled and that are pending (see \ref gpio_get_irq_event_mask).
  *
  * \note The IO IRQs are independent per-processor. This function affects
  * the processor that calls the function.
@@ -405,10 +411,10 @@ void gpio_set_irq_callback(gpio_irq_callback_t callback);
  *
  * This method is a slightly eclectic mix of initialization, that:
  *
- * \li Updates whether the specified events for the specified GPIOs cause an interrupt on the calling core bease
- * on the enable flag
+ * \li Updates whether the specified events for the specified GPIO causes an interrupt on the calling core based
+ * on the enable flag.
  *
- * \li Sets the callback handler for the calling core to callback (or clears the handler it callback is NULL)
+ * \li Sets the callback handler for the calling core to callback (or clears the handler if the callback is NULL)
  *
  * \li Enables GPIO IRQs on the current core if enabled is true.
  *
@@ -417,20 +423,20 @@ void gpio_set_irq_callback(gpio_irq_callback_t callback);
  * independent handlers for different GPIOs you should use \ref gpio_add_raw_irq_handler and related functions.
  *
  * This method is equivalent to.
- * \code{/c}
- * gpio_set_irq_enabled(gpio, events, enabled);
+ * \code{.c}
+ * gpio_set_irq_enabled(gpio, event_mask, enabled);
  * gpio_set_irq_callback(callback);
  * if (enabled) irq_set_enabled(IO_IRQ_BANK0, true);
- * \endocde
+ * \endcode
  *
- * \note The IO IRQs are independent per-processor. This configures affects the processor that calls the function.
+ * \note The IO IRQs are independent per-processor. This method affects only the processor that calls the function.
  *
  * \param gpio GPIO number
- * \param events Which events will cause an interrupt. See \ref gpio_irq_level for details.
+ * \param event_mask Which events will cause an interrupt. See \ref gpio_irq_level for details.
  * \param enabled Enable or disable flag
  * \param callback user function to call on GPIO irq. if NULL, the callback is removed
  */
-void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback);
+void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t event_mask, bool enabled, gpio_irq_callback_t callback);
 
 /*! \brief Enable dormant wake up interrupt for specified GPIO and events
  *  \ingroup hardware_gpio
@@ -439,19 +445,20 @@ void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled
  * disabled in dormant mode
  *
  * \param gpio GPIO number
- * \param events Which events will cause an interrupt. See \ref gpio_irq_level for details.
+ * \param event_mask Which events will cause an interrupt. See \ref gpio_irq_level for details.
  * \param enabled Enable/disable flag
  */
-void gpio_set_dormant_irq_enabled(uint gpio, uint32_t events, bool enabled);
+void gpio_set_dormant_irq_enabled(uint gpio, uint32_t event_mask, bool enabled);
 
 /*! \brief Return the current interrupt status (pending events) for the given GPIO
  *  \ingroup hardware_gpio
  *
  * \param gpio GPIO number
- * \return events Bitmask of events that are currently pending for the GPIO. See \ref gpio_irq_level for details.
+ * \return Bitmask of events that are currently pending for the GPIO. See \ref gpio_irq_level for details.
  * \sa gpio_acknowledge_irq
  */
-static inline uint32_t gpio_get_irq_events(uint gpio) {
+static inline uint32_t gpio_get_irq_event_mask(uint gpio) {
+    check_gpio_param(gpio);
     io_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?
                                       &iobank0_hw->proc1_irq_ctrl : &iobank0_hw->proc0_irq_ctrl;
     io_ro_32 *status_reg = &irq_ctrl_base->ints[gpio >> 3u];
@@ -462,34 +469,34 @@ static inline uint32_t gpio_get_irq_events(uint gpio) {
  *  \ingroup hardware_gpio
  *
  * \param gpio GPIO number
- * \param events Bitmask of events to clear. See \ref gpio_irq_level for details.
+ * \param event_mask Bitmask of events to clear. See \ref gpio_irq_level for details.
  */
-void gpio_acknowledge_irq(uint gpio, uint32_t events);
+void gpio_acknowledge_irq(uint gpio, uint32_t event_mask);
 
 /*! \brief Adds a raw GPIO IRQ handler for the specified GPIOs on the current core
  *  \ingroup hardware_gpio
  *
  * In addition to the default mechanism of a single GPIO IRQ event callback per core (see \ref gpio_set_irq_callback),
  * it is possible to add explicit GPIO IRQ handlers which are called independent of the default callback. The order
- * relative to the default callback can be controller via the order_priority parameter. (The default callback has the priority
- * \ref GPIO_CALLBACK_IRQ_ORDER_PRIORITY)
+ * relative to the default callback can be controlled via the order_priority parameter (the default callback has the priority
+ * \ref GPIO_IRQ_CALLBACK_ORDER_PRIORITY which defaults to the lowest priority with the intention of it running last).
  *
- * This method adds such a explicit GPIO IRQ handler, and disables the "default" callback for the specified GPIOs.
+ * This method adds such an explicit GPIO IRQ handler, and disables the "default" callback for the specified GPIOs.
  *
  * A raw handler should check for whichever GPIOs and events it handles, and acknowledge them itself; it might look something like:
  *
  * \code{.c}
  * void my_irq_handler(void) {
- *     if (gpio_get_irq_events(my_gpio_num) & my_gpio_events) {
- *        gpio_acknowledge_irq(my_gpio_num, my_gpio_events);
+ *     if (gpio_get_irq_event_mask(my_gpio_num) & my_gpio_event_mask) {
+ *        gpio_acknowledge_irq(my_gpio_num, my_gpio_event_mask);
  *       // handle the IRQ
  *     }
- *     if (gpio_get_irq_events(my_gpio_num2) & my_gpio_events2) {
- *        gpio_acknowledge_irq(my_gpio_num2, my_gpio_events2);
+ *     if (gpio_get_irq_event_mask(my_gpio_num2) & my_gpio_event_mask2) {
+ *        gpio_acknowledge_irq(my_gpio_num2, my_gpio_event_mask2);
  *       // handle the IRQ
  *     }
  * }
- * \code
+ * \endcode
  *
  * @param gpio_mask a bit mask of the GPIO numbers that will no longer be passed to the default callback for this core
  * @param handler the handler to add to the list of GPIO IRQ handlers for this core
@@ -502,8 +509,8 @@ void gpio_add_raw_irq_handler_with_order_priority_masked(uint gpio_mask, irq_han
  *
  * In addition to the default mechanism of a single GPIO IRQ event callback per core (see \ref gpio_set_irq_callback),
  * it is possible to add explicit GPIO IRQ handlers which are called independent of the default callback. The order
- * relative to the default callback can be controller via the order_priority parameter. (The default callback has the priority
- * \ref GPIO_CALLBACK_IRQ_ORDER_PRIORITY)
+ * relative to the default callback can be controlled via the order_priority parameter(the default callback has the priority
+ * \ref GPIO_IRQ_CALLBACK_ORDER_PRIORITY which defaults to the lowest priority with the intention of it running last).
  *
  * This method adds such a callback, and disables the "default" callback for the specified GPIO.
  *
@@ -511,12 +518,12 @@ void gpio_add_raw_irq_handler_with_order_priority_masked(uint gpio_mask, irq_han
  *
  * \code{.c}
  * void my_irq_handler(void) {
- *     if (gpio_get_irq_events(my_gpio_num) & my_gpio_events) {
- *        gpio_acknowledge_irq(my_gpio_num, my_gpio_events);
+ *     if (gpio_get_irq_event_mask(my_gpio_num) & my_gpio_event_mask) {
+ *        gpio_acknowledge_irq(my_gpio_num, my_gpio_event_mask);
  *       // handle the IRQ
  *     }
  * }
- * \code
+ * \endcode
  *
  * @param gpio the GPIO number that will no longer be passed to the default callback for this core
  * @param handler the handler to add to the list of GPIO IRQ handlers for this core
@@ -539,16 +546,16 @@ static inline void gpio_add_raw_irq_handler_with_order_priority(uint gpio, irq_h
  *
  * \code{.c}
  * void my_irq_handler(void) {
- *     if (gpio_get_irq_events(my_gpio_num) & my_gpio_events) {
- *        gpio_acknowledge_irq(my_gpio_num, my_gpio_events);
+ *     if (gpio_get_irq_event_mask(my_gpio_num) & my_gpio_event_mask) {
+ *        gpio_acknowledge_irq(my_gpio_num, my_gpio_event_mask);
  *       // handle the IRQ
  *     }
- *     if (gpio_get_irq_events(my_gpio_num2) & my_gpio_events2) {
- *        gpio_acknowledge_irq(my_gpio_num2, my_gpio_events2);
+ *     if (gpio_get_irq_event_mask(my_gpio_num2) & my_gpio_event_mask2) {
+ *        gpio_acknowledge_irq(my_gpio_num2, my_gpio_event_mask2);
  *       // handle the IRQ
  *     }
  * }
- * \code
+ * \endcode
  *
  * @param gpio_mask a bit mask of the GPIO numbers that will no longer be passed to the default callback for this core
  * @param handler the handler to add to the list of GPIO IRQ handlers for this core
@@ -567,12 +574,12 @@ void gpio_add_raw_irq_handler_masked(uint gpio_mask, irq_handler_t handler);
  *
  * \code{.c}
  * void my_irq_handler(void) {
- *     if (gpio_get_irq_events(my_gpio_num) & my_gpio_events) {
- *        gpio_acknowledge_irq(my_gpio_num, my_gpio_events);
+ *     if (gpio_get_irq_event_mask(my_gpio_num) & my_gpio_event_mask) {
+ *        gpio_acknowledge_irq(my_gpio_num, my_gpio_event_mask);
  *       // handle the IRQ
  *     }
  * }
- * \code
+ * \endcode
  *
  * @param gpio the GPIO number that will no longer be passed to the default callback for this core
  * @param handler the handler to add to the list of GPIO IRQ handlers for this core
