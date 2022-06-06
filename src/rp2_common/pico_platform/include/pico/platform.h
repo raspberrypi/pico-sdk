@@ -426,7 +426,7 @@ static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
 }
 
 /*! \brief Get the current core number
- *  \ingroup hardware_sync
+ *  \ingroup pico_platform
  *
  * \return The core number the call was made from
  */
