@@ -13,7 +13,13 @@
 #include "pico/mutex.h"
 #include "hardware/irq.h"
 
-static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ > RTC_IRQ, ""); // note RTC_IRQ is currently the last one
+#ifdef PICO_STDIO_USB_LOW_PRIORITY_IRQ
+static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
+#define low_priority_irq_num PICO_STDIO_USB_LOW_PRIORITY_IRQ
+#else
+static uint8_t low_priority_irq_num;
+#endif
+
 static mutex_t stdio_usb_mutex;
 
 static void low_priority_worker_irq(void) {
@@ -27,7 +33,7 @@ static void low_priority_worker_irq(void) {
 }
 
 static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
-    irq_set_pending(PICO_STDIO_USB_LOW_PRIORITY_IRQ);
+    irq_set_pending(low_priority_irq_num);
     return PICO_STDIO_USB_TASK_INTERVAL_US;
 }
 
@@ -96,8 +102,13 @@ bool stdio_usb_init(void) {
     // initialize TinyUSB
     tusb_init();
 
-    irq_set_exclusive_handler(PICO_STDIO_USB_LOW_PRIORITY_IRQ, low_priority_worker_irq);
-    irq_set_enabled(PICO_STDIO_USB_LOW_PRIORITY_IRQ, true);
+#ifdef PICO_STDIO_USB_LOW_PRIORITY_IRQ
+    user_irq_claim(PICO_STDIO_USB_LOW_PRIORITY_IRQ);
+#else
+    low_priority_irq_num = (uint8_t) user_irq_claim_unused(true);
+#endif
+    irq_set_exclusive_handler(low_priority_irq_num, low_priority_worker_irq);
+    irq_set_enabled(low_priority_irq_num, true);
 
     mutex_init(&stdio_usb_mutex);
     bool rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
