@@ -8,11 +8,14 @@
 #include "hardware/regs/m0plus.h"
 #include "hardware/platform_defs.h"
 #include "hardware/structs/scb.h"
+#include "hardware/claim.h"
 
 #include "pico/mutex.h"
 #include "pico/assert.h"
 
 extern void __unhandled_user_irq(void);
+
+static uint8_t user_irq_claimed[NUM_CORES];
 
 static inline irq_handler_t *get_vtable(void) {
     return (irq_handler_t *) scb_hw->vtor;
@@ -410,3 +413,31 @@ void irq_init_priorities() {
     }
 #endif
 }
+
+#define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
+
+static uint get_user_irq_claim_index(uint irq_num) {
+    invalid_params_if(IRQ, irq_num < FIRST_USER_IRQ || irq_num >= NUM_IRQS);
+    // we count backwards from the last, to match the existing hard coded uses of user IRQs in the SDK which were previously using 31
+    static_assert(NUM_IRQS - FIRST_USER_IRQ <= 8, ""); // we only use a single byte's worth of claim bits today.
+    return NUM_IRQS - irq_num  - 1u;
+}
+
+void user_irq_claim(uint irq_num) {
+    hw_claim_or_assert(&user_irq_claimed[get_core_num()], get_user_irq_claim_index(irq_num), "User IRQ is already claimed");
+}
+
+void user_irq_unclaim(uint irq_num) {
+    hw_claim_clear(&user_irq_claimed[get_core_num()], get_user_irq_claim_index(irq_num));
+}
+
+int user_irq_claim_unused(bool required) {
+    int bit = hw_claim_unused_from_range(&user_irq_claimed[get_core_num()], required, 0, NUM_USER_IRQS - 1, "No user IRQs are available");
+    if (bit >= 0) bit =  (int)NUM_IRQS - bit - 1;
+    return bit;
+}
+
+bool user_irq_is_claimed(uint irq_num) {
+    return hw_is_claimed(&user_irq_claimed[get_core_num()], get_user_irq_claim_index(irq_num));
+}
+

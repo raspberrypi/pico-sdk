@@ -289,6 +289,69 @@ void irq_set_pending(uint num);
  * \note This is an internal method and user should generally not call it.
  */
 void irq_init_priorities(void);
+
+/*! \brief Claim ownership of a user IRQ on the calling core
+ *  \ingroup hardware_irq
+ *  
+ * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
+ *
+ * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therfore all functions
+ * dealing with Uer IRQs affect only the calling core
+ * 
+ * This method explicitly claims ownership of a user IRQ, so other code can know it is being used.
+ *
+ * \param irq_num the user IRQ to claim
+ */
+void user_irq_claim(uint irq_num);
+
+/*! \brief Mark a user IRQ as no longer used on the calling core
+ *  \ingroup hardware_irq
+ *
+ * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
+ *
+ * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therfore all functions
+ * dealing with Uer IRQs affect only the calling core
+ * 
+ * This method explicitly releases ownership of a user IRQ, so other code can know it is free to use.
+ * 
+ * \note it is customary to have disabled the irq and removed the handler prior to calling this method.
+ *
+ * \param irq_num the irq irq_num to unclaim
+ */
+void user_irq_unclaim(uint irq_num);
+
+/*! \brief Claim ownership of a free user IRQ on the calling core
+ *  \ingroup hardware_irq
+ *  
+ * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
+ *
+ * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therfore all functions
+ * dealing with Uer IRQs affect only the calling core
+ * 
+ * This method explicitly claims ownership of an unused user IRQ if there is one, so other code can know it is being used.
+ *
+ * \param required if true the function will panic if none are available
+ * \return the user IRQ number or -1 if required was false, and none were free
+ */
+int user_irq_claim_unused(bool required);
+
+/*
+*! \brief Check if a user IRQ is in use on the calling core
+ *  \ingroup hardware_irq
+ *  
+ * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
+ *
+ * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therfore all functions
+ * dealing with Uer IRQs affect only the calling core
+ *
+ * \param irq_num the irq irq_num
+ * \return true if the irq_num is claimed, false otherwise
+ * \sa user_irq_claim
+ * \sa user_irq_unclaim
+ * \sa user_irq_claim_unused
+ */
+bool user_irq_is_claimed(uint irq_num);
+
 #ifdef __cplusplus
 }
 #endif
