@@ -148,7 +148,6 @@ static void gpio_default_irq_handler(void) {
         uint32_t events8 = irq_ctrl_base->ints[gpio >> 3u];
         // note we assume events8 is 0 for non-existent GPIO
         for(uint i=gpio;events8 && i<gpio+8;i++) {
-            events8 >>= 4;
             uint32_t events = events8 & 0xfu;
             if (events && !(raw_irq_mask[core] & (1u << i))) {
                 gpio_acknowledge_irq(i, events);
@@ -156,6 +155,7 @@ static void gpio_default_irq_handler(void) {
                     callback(gpio, events);
                 }
             }
+            events8 >>= 4;
         }
     }
 }
@@ -201,6 +201,7 @@ void gpio_set_irq_callback(gpio_irq_callback_t callback) {
 }
 
 void gpio_add_raw_irq_handler_with_order_priority_masked(uint gpio_mask, irq_handler_t handler, uint8_t order_priority) {
+    hard_assert(!(raw_irq_mask[get_core_num()] & gpio_mask)); // should not add multiple handlers for the same event
     raw_irq_mask[get_core_num()] |= gpio_mask;
     irq_add_shared_handler(IO_IRQ_BANK0, handler, order_priority);
 }
@@ -210,6 +211,7 @@ void gpio_add_raw_irq_handler_masked(uint gpio_mask, irq_handler_t handler) {
 }
 
 void gpio_remove_raw_irq_handler_masked(uint gpio_mask, irq_handler_t handler) {
+    assert(raw_irq_mask[get_core_num()] & gpio_mask); // should not remove handlers that are not added
     irq_remove_handler(IO_IRQ_BANK0, handler);
     raw_irq_mask[get_core_num()] &= ~gpio_mask;
 }
