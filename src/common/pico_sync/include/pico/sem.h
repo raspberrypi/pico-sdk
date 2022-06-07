@@ -129,6 +129,7 @@ bool sem_acquire_block_until(semaphore_t *sem, absolute_time_t until);
  * available, otherwise it will acquire a permit and return true.
  *
  * \param sem Pointer to semaphore structure
+ * \return true if permit was acquired.
  */
 bool sem_try_acquire(semaphore_t *sem);
 
