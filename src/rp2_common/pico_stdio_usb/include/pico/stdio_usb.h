@@ -39,7 +39,7 @@
 #define PICO_STDIO_USB_TASK_INTERVAL_US 1000
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_LOW_PRIORITY_IRQ, low priority (non hardware) IRQ number to claim for tud_task() background execution, advanced=true, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_LOW_PRIORITY_IRQ, Explicit User IRQ number to claim for tud_task() background execution instead of letting the implementation pick a free one dynamically (deprecated), advanced=true, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_LOW_PRIORITY_IRQ
 // this variable is no longer set by default (one is claimed dynamically), but will be respected if specified
 #endif

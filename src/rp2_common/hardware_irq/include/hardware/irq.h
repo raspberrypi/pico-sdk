@@ -295,7 +295,8 @@ void irq_init_priorities(void);
  *  
  * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
- * \note User IRQs are entirely core local.
+ * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therfore all functions
+ * dealing with Uer IRQs affect only the calling core
  * 
  * This method explicitly claims ownership of a user IRQ, so other code can know it is being used.
  *
@@ -308,7 +309,8 @@ void user_irq_claim(uint irq_num);
  *
  * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
- * \note User IRQs are entirely core local.
+ * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therfore all functions
+ * dealing with Uer IRQs affect only the calling core
  * 
  * This method explicitly releases ownership of a user IRQ, so other code can know it is free to use.
  * 
@@ -323,7 +325,8 @@ void user_irq_unclaim(uint irq_num);
  *  
  * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
- * \note User IRQs are entirely core local.
+ * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therfore all functions
+ * dealing with Uer IRQs affect only the calling core
  * 
  * This method explicitly claims ownership of an unused user IRQ if there is one, so other code can know it is being used.
  *
@@ -338,7 +341,8 @@ int user_irq_claim_unused(bool required);
  *  
  * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
- * \note User IRQs are entirely core local.
+ * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therfore all functions
+ * dealing with Uer IRQs affect only the calling core
  *
  * \param irq_num the irq irq_num
  * \return true if the irq_num is claimed, false otherwise
