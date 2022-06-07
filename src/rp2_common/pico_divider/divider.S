@@ -103,7 +103,7 @@ regular_func div_s32s32
 regular_func divmod_s32s32
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
     // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
-    ldr r2, =(SIO_BASE)
+    ldr r2, =SIO_BASE
     ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_s32s32_savestate
@@ -114,7 +114,7 @@ regular_func divmod_s32s32_unsafe
 // are the hardware_divider functions that can be used instead anyway
 regular_func divmod_s32s32_unsafe
     // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
-    ldr r2, =(SIO_BASE)
+    ldr r2, =SIO_BASE
     mrs r3, PRIMASK
     cpsid i
 #endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
@@ -167,7 +167,7 @@ wrapper_func __aeabi_uidiv
 wrapper_func __aeabi_uidivmod
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
     // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
-    ldr r2, =(SIO_BASE)
+    ldr r2, =SIO_BASE
     ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_u32u32_savestate
@@ -178,7 +178,7 @@ regular_func divmod_u32u32_unsafe
 // are the hardware_divider functions that can be used instead anyway
 regular_func divmod_u32u32_unsafe
     // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
-    ldr r2, =(SIO_BASE)
+    ldr r2, =SIO_BASE
     mrs r3, PRIMASK
     cpsid i
 #endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
@@ -227,7 +227,7 @@ regular_func divmod_s64s64
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
     // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
     mov ip, r2
-    ldr r2, =(SIO_BASE)
+    ldr r2, =SIO_BASE
     ldr r2, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r2, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     mov r2, ip
@@ -255,7 +255,7 @@ regular_func divmod_u64u64
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
     // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
     mov ip, r2
-    ldr r2, =(SIO_BASE)
+    ldr r2, =SIO_BASE
     ldr r2, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r2, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     mov r2, ip
@@ -278,7 +278,7 @@ regular_func divmod_u64u64_savestate
 
 .macro dneg lo,hi
  mvns \hi,\hi
- rsbs \lo,#0
+ negs \lo,\lo
  bne l\@_1
  adds \hi,#1
 l\@_1:
@@ -352,7 +352,7 @@ regular_func divmod_u64u64_unsafe
  cmp r2,#0
  beq 2f                    @ x==0?
  mov r12,r7
- ldr r7,=#SIO_BASE
+ ldr r7,=SIO_BASE
  str r0,[r7,#SIO_DIV_UDIVIDEND_OFFSET]
  str r2,[r7,#SIO_DIV_UDIVISOR_OFFSET]
  movs r1,#0
@@ -367,7 +367,7 @@ regular_func divmod_u64u64_unsafe
  cmp r0,#0                 @ y==0?
  beq 3f                    @ then pass 0 to __aeabi_ldiv0
 udiv0:
- ldr r0,=#0xffffffff
+ ldr r0,=0xffffffff
  movs r1,r0                @ pass 2^64-1 to __aeabi_ldiv0
 3:
  push {r14}
@@ -402,7 +402,7 @@ y64:
  cmp r2,#0
  beq udiv0                 @ x==0? exit as with y!=0 case above
  push {r7}
- ldr r7,=#SIO_BASE
+ ldr r7,=SIO_BASE
  str r1,[r7,#SIO_DIV_UDIVIDEND_OFFSET]
  str r2,[r7,#SIO_DIV_UDIVISOR_OFFSET]
  wait_div 4
@@ -464,9 +464,9 @@ y64_x32:
  lsrs r4,r2,#15
  adds r4,#1                @ x1=(x0>>15)+1; 2^16<x1<=2^17
 
- ldr r7,=#SIO_BASE
+ ldr r7,=SIO_BASE
  str r4,[r7,#SIO_DIV_UDIVISOR_OFFSET]
- ldr r4,=#0xffffffff
+ ldr r4,=0xffffffff
  str r4,[r7,#SIO_DIV_UDIVIDEND_OFFSET]
  lsrs r6,r1,#16
  uxth r3,r2                @ x0l
@@ -687,9 +687,9 @@ y64_x48:
  adcs r4,r4
  adds r4,#1                @ x1=(ui32)(x0>>31)+1; // 2^16<x1<=2^17
 
- ldr r7,=#SIO_BASE
+ ldr r7,=SIO_BASE
  str r4,[r7,#SIO_DIV_UDIVISOR_OFFSET]
- ldr r4,=#0xffffffff
+ ldr r4,=0xffffffff
  str r4,[r7,#SIO_DIV_UDIVIDEND_OFFSET]
  lsrs r6,r1,#16
  wait_div 1
@@ -821,7 +821,7 @@ y64_x64:
  adds r5,r3,#1
  beq 1f
 
- ldr r7,=#SIO_BASE
+ ldr r7,=SIO_BASE
  str r5,[r7,#SIO_DIV_UDIVISOR_OFFSET]
  str r1,[r7,#SIO_DIV_UDIVIDEND_OFFSET]
  wait_div 0

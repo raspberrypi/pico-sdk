@@ -473,6 +473,32 @@ static inline void dma_channel_start(uint channel) {
  *
  * Function will only return once the DMA has stopped.
  *
+ * Note that due to errata RP2040-E13, aborting a channel which has transfers
+ * in-flight (i.e. an individual read has taken place but the corresponding write has not), the ABORT
+ * status bit will clear prematurely, and subsequently the in-flight
+ * transfers will trigger a completion interrupt once they complete.
+ *
+ * The effect of this is that you \em may see a spurious completion interrupt
+ * on the channel as a result of calling this method.
+ *
+ * The calling code should be sure to ignore a completion IRQ as a result of this method. This may
+ * not require any additional work, as aborting a channel which may be about to complete, when you have a completion
+ * IRQ handler registered, is inherently race-prone, and so code is likely needed to disambiguate the two occurrences.
+ *
+ * If that is not the case, but you do have a channel completion IRQ handler registered, you can simply
+ * disable/re-enable the IRQ around the call to this method as shown by this code fragment (using DMA IRQ0).
+ *
+ * \code
+ *  // disable the channel on IRQ0
+ *  dma_channel_set_irq0_enabled(channel, false);
+ *  // abort the channel
+ *  dma_channel_abort(channel);
+ *  // clear the spurious IRQ (if there was one)
+ *  dma_channel_acknowledge_irq0(channel);
+ *  // re-enable the channel on IRQ0
+ *  dma_channel_set_irq0_enabled(channel, true);
+ *\endcode
+ *
  * \param channel DMA channel
  */
 static inline void dma_channel_abort(uint channel) {
@@ -480,7 +506,7 @@ static inline void dma_channel_abort(uint channel) {
     dma_hw->abort = 1u << channel;
     // Bit will go 0 once channel has reached safe state
     // (i.e. any in-flight transfers have retired)
-    while (dma_hw->abort & (1ul << channel)) tight_loop_contents();
+    while (dma_hw->ch[channel].ctrl_trig & DMA_CH0_CTRL_TRIG_BUSY_BITS) tight_loop_contents();
 }
 
 /*! \brief  Enable single DMA channel's interrupt via DMA_IRQ_0

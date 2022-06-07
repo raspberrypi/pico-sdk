@@ -9,6 +9,7 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
 
     project(pico_sdk C CXX ASM)
 
+    message("Build type is ${CMAKE_BUILD_TYPE}")
     if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
         if (PICO_DEOPTIMIZED_DEBUG)
             message("Using fully de-optimized debug build (set PICO_DEOPTIMIZED_DEBUG=0 to optimize)")

@@ -29,6 +29,7 @@ if (NOT Pioasm_FOUND)
                 BINARY_DIR ${PIOASM_BINARY_DIR}
                 BUILD_ALWAYS 1 # force dependency checking
                 INSTALL_COMMAND ""
+                CMAKE_CACHE_ARGS "-DPIOASM_EXTRA_SOURCE_FILES:STRING=${PIOASM_EXTRA_SOURCE_FILES}"
                 )
     endif()
 

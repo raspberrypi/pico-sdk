@@ -139,6 +139,9 @@ static inline int32_t __mul_instruction(int32_t a,int32_t b)
 
 static inline void __compiler_memory_barrier(void) {
 }
+
+uint get_core_num();
+
 #ifdef __cplusplus
 }
 #endif

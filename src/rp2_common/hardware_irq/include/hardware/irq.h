@@ -103,6 +103,9 @@
 #define PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY 0x80
 #endif
 
+#define PICO_SHARED_IRQ_HANDLER_HIGHEST_ORDER_PRIORITY 0xff
+#define PICO_SHARED_IRQ_HANDLER_LOWEST_ORDER_PRIORITY 0x00
+
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_IRQ, Enable/disable assertions in the IRQ module, type=bool, default=0, group=hardware_irq
 #ifndef PARAM_ASSERTIONS_ENABLED_IRQ
 #define PARAM_ASSERTIONS_ENABLED_IRQ 0
@@ -126,7 +129,7 @@ static inline void check_irq_param(__unused uint num) {
 /*! \brief Set specified interrupt's priority
  *  \ingroup hardware_irq
  *
- * \param num Interrupt number
+ * \param num Interrupt number \ref interrupt_nums
  * \param hardware_priority Priority to set.
  * Numerically-lower values indicate a higher priority. Hardware priorities
  * range from 0 (highest priority) to 255 (lowest priority) though only the
@@ -147,7 +150,7 @@ void irq_set_priority(uint num, uint8_t hardware_priority);
  * initialized to PICO_DEFAULT_IRQ_PRIORITY by the SDK runtime at startup.
  * PICO_DEFAULT_IRQ_PRIORITY defaults to 0x80
  *
- * \param num Interrupt number
+ * \param num Interrupt number \ref interrupt_nums
  * \return the IRQ priority
  */
 uint irq_get_priority(uint num);
@@ -171,7 +174,7 @@ bool irq_is_enabled(uint num);
 /*! \brief Enable/disable multiple interrupts on the executing core
  *  \ingroup hardware_irq
  *
- * \param mask 32-bit mask with one bits set for the interrupts to enable/disable
+ * \param mask 32-bit mask with one bits set for the interrupts to enable/disable \ref interrupt_nums
  * \param enabled true to enable the interrupts, false to disable them.
  */
 void irq_set_mask_enabled(uint32_t mask, bool enabled);
@@ -216,13 +219,16 @@ irq_handler_t irq_get_exclusive_handler(uint num);
  * the (total across all IRQs on both cores) maximum (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) number of shared handlers
  * would be exceeded.
  *
- * \param num Interrupt number
+ * \param num Interrupt number \ref interrupt_nums
  * \param handler The handler to set. See \ref irq_handler_t
  * \param order_priority The order priority controls the order that handlers for the same IRQ number on the core are called.
  * The shared irq handlers for an interrupt are all called when an IRQ fires, however the order of the calls is based
  * on the order_priority (higher priorities are called first, identical priorities are called in undefined order). A good
  * rule of thumb is to use PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY if you don't much care, as it is in the middle of
  * the priority range by default.
+ *
+ * \note The order_priority uses \em higher values for higher priorities which is the \em opposite of the CPU interrupt priorities passed
+ * to irq_set_priority() which use lower values for higher priorities.
  *
  * \see irq_set_exclusive_handler()
  */

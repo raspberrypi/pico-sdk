@@ -7,7 +7,12 @@
 #ifndef _PICO_BINARY_INFO_CODE_H
 #define _PICO_BINARY_INFO_CODE_H
 
+// pico.h is not available when PICO_NO_BINARY_INFO=1 is used for builds outside of the SDK (e.g. picotool)
+// and only needed anyway (because of macro definitions) in PICO_NO_BINARY_INFO=0 builds
+#if !PICO_NO_BINARY_INFO
 #include "pico.h"
+#endif
+
 #include "pico/binary_info/structure.h"
 
 #if !PICO_NO_BINARY_INFO

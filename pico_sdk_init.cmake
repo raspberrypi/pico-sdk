@@ -53,7 +53,6 @@ if (NOT TARGET _pico_sdk_pre_init_marker)
             message(WARNING "pico_sdk_init() should be called after the project is created (and languages added)")
         endif()
         add_subdirectory(${PICO_SDK_PATH} pico-sdk)
-        pico_is_top_level_project(ISTOP)
     endmacro()
 
     macro(add_sub_list_dirs var)

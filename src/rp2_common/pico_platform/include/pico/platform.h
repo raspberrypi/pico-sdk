@@ -17,6 +17,8 @@
  */
 
 #include "hardware/platform_defs.h"
+#include "hardware/regs/addressmap.h"
+#include "hardware/regs/sio.h"
 
 // Marker for builds targeting the RP2040
 #define PICO_RP2040 1
@@ -399,6 +401,38 @@ uint __get_current_exception(void);
 #ifdef __cplusplus
 }
 #endif
+
+/*! \brief Helper method to busy-wait for at least the given number of cycles
+ *  \ingroup pico_platform
+ *
+ * This method is useful for introducing very short delays.
+ *
+ * This method busy-waits in a tight loop for the given number of system clock cycles. The total wait time is only accurate to within 2 cycles,
+ * and this method uses a loop counter rather than a hardware timer, so the method will always take longer than expected if an
+ * interrupt is handled on the calling core during the busy-wait; you can of course disable interrupts to prevent this.
+ *
+ * You can use \ref clock_get_hz(clk_sys) to determine the number of clock cycles per second if you want to convert an actual
+ * time duration to a number of cycles.
+ *
+ * \param minimum_cycles the minimum number of system clock cycles to delay for
+ */
+static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
+    __asm volatile (
+        ".syntax unified\n"
+        "1: subs %0, #3\n"
+        "bcs 1b\n"
+        : "+r" (minimum_cycles) : : "memory"
+    );
+}
+
+/*! \brief Get the current core number
+ *  \ingroup pico_platform
+ *
+ * \return The core number the call was made from
+ */
+__force_inline static uint get_core_num(void) {
+    return (*(uint32_t *) (SIO_BASE + SIO_CPUID_OFFSET));
+}
 
 #else // __ASSEMBLER__
 
