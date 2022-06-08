@@ -23,7 +23,7 @@ void __time_critical_func(sem_acquire_blocking)(semaphore_t *sem) {
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);
         if (sem->permits > 0) {
             sem->permits--;
-            lock_internal_spin_unlock_with_notify(&sem->core, save);
+            spin_unlock(sem->core.spin_lock, save);
             break;
         }
         lock_internal_spin_unlock_with_wait(&sem->core, save);
@@ -43,7 +43,7 @@ bool __time_critical_func(sem_acquire_block_until)(semaphore_t *sem, absolute_ti
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);
         if (sem->permits > 0) {
             sem->permits--;
-            lock_internal_spin_unlock_with_notify(&sem->core, save);
+            spin_unlock(sem->core.spin_lock, save);
             return true;
         }
         if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&sem->core, save, until)) {
@@ -56,7 +56,7 @@ bool __time_critical_func(sem_try_acquire)(semaphore_t *sem) {
     uint32_t save = spin_lock_blocking(sem->core.spin_lock);
     if (sem->permits > 0) {
         sem->permits--;
-        lock_internal_spin_unlock_with_notify(&sem->core, save);
+        spin_unlock(sem->core.spin_lock, save);
         return true;
     }
     spin_unlock(sem->core.spin_lock, save);
