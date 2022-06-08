@@ -122,6 +122,17 @@ bool sem_acquire_timeout_us(semaphore_t *sem, uint32_t timeout_us);
  */
 bool sem_acquire_block_until(semaphore_t *sem, absolute_time_t until);
 
+/*! \brief Attempt to acquire a permit from a semaphore without blocking
+ *  \ingroup sem
+ *
+ * This function will return false without blocking if no permits are
+ * available, otherwise it will acquire a permit and return true.
+ *
+ * \param sem Pointer to semaphore structure
+ * \return true if permit was acquired.
+ */
+bool sem_try_acquire(semaphore_t *sem);
+
 #ifdef __cplusplus
 }
 #endif
