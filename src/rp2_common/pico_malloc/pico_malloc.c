@@ -16,6 +16,7 @@ auto_init_mutex(malloc_mutex);
 
 extern void *__real_malloc(size_t size);
 extern void *__real_calloc(size_t count, size_t size);
+extern void *__real_realloc(void *mem, size_t size);
 extern void __real_free(void *mem);
 
 extern char __StackLimit; /* Set by linker.  */
@@ -56,6 +57,23 @@ void *__wrap_calloc(size_t count, size_t size) {
 #if PICO_DEBUG_MALLOC
     if (!rc || ((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) {
         printf("calloc %d %p->%p\n", (uint) (count * size), rc, ((uint8_t *) rc) + size);
+    }
+#endif
+    check_alloc(rc, size);
+    return rc;
+}
+
+void *__wrap_realloc(void *mem, size_t size) {
+#if PICO_USE_MALLOC_MUTEX
+    mutex_enter_blocking(&malloc_mutex);
+#endif
+    void *rc = __real_realloc(mem, size);
+#if PICO_USE_MALLOC_MUTEX
+    mutex_exit(&malloc_mutex);
+#endif
+#if PICO_DEBUG_MALLOC
+    if (!rc || ((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) {
+        printf("realloc %p %d->%p\n", mem, (uint) size, rc);
     }
 #endif
     check_alloc(rc, size);

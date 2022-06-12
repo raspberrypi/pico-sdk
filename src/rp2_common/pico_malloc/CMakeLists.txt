@@ -10,6 +10,7 @@ if (NOT TARGET pico_malloc)
 
     pico_wrap_function(pico_malloc malloc)
     pico_wrap_function(pico_malloc calloc)
+    pico_wrap_function(pico_malloc realloc)
     pico_wrap_function(pico_malloc free)
 
     target_link_libraries(pico_malloc INTERFACE pico_sync)
