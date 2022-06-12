@@ -32,6 +32,11 @@
 extern "C" {
 #endif
 
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_RTC, Enable/disable assertions in the RTC module, type=bool, default=0, group=hardware_rtc
+#ifndef PARAM_ASSERTIONS_ENABLED_RTC
+#define PARAM_ASSERTIONS_ENABLED_RTC 0
+#endif
+
 /*! Callback function type for RTC alarms
  *  \ingroup hardware_rtc
  *
@@ -54,7 +59,7 @@ void rtc_init(void);
  * \param t Pointer to a \ref datetime_t structure contains time to set
  * \return true if set, false if the passed in datetime was invalid.
  */
-bool rtc_set_datetime(datetime_t *t);
+bool rtc_set_datetime(const datetime_t *t);
 
 /*! \brief Get the current time from the RTC
  *  \ingroup hardware_rtc
@@ -73,10 +78,12 @@ bool rtc_running(void);
 /*! \brief Set a time in the future for the RTC to call a user provided callback
  *  \ingroup hardware_rtc
  *
- *  \param t Pointer to a \ref datetime_t structure containing a time in the future to fire the alarm. Any values set to -1 will not be matched on.
+ *  \param t Pointer to a \ref datetime_t structure containing a time in the future to fire the alarm. Any values set to a negative value will not be matched on.
+ *  With one exception: If all values are negative, it will be matched on every step of abs(datetime_t::sec).
  *  \param user_callback pointer to a \ref rtc_callback_t to call when the alarm fires
+ *  \return false if parameters aren't valid
  */
-void rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback);
+bool rtc_set_alarm(const datetime_t *t, rtc_callback_t user_callback);
 
 /*! \brief Enable the RTC alarm (if inactive)
  *  \ingroup hardware_rtc
@@ -87,6 +94,11 @@ void rtc_enable_alarm(void);
  *  \ingroup hardware_rtc
  */
 void rtc_disable_alarm(void);
+
+/*! \brief Deletes the alarm previously set with \see rtc_set_alarm
+ *  \ingroup hardware_rtc
+ */
+void rtc_delete_alarm(void);
 
 #ifdef __cplusplus
 }
