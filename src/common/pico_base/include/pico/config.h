@@ -18,7 +18,7 @@
 
 #include "pico/config_autogen.h"
 
-// PICO_CONFIG: PICO_CONFIG_RTOS_ADAPTER_HEADER, unquoted path to header include in the default pico/config.h for RTOS integration defines that must be included in all sources, default=none, group=pico_base
+// PICO_CONFIG: PICO_CONFIG_RTOS_ADAPTER_HEADER, unquoted path to header include in the default pico/config.h for RTOS integration defines that must be included in all sources, group=pico_base
 #ifdef PICO_CONFIG_RTOS_ADAPTER_HEADER
 #include __PICO_XSTRING(PICO_CONFIG_RTOS_ADAPTER_HEADER)
 #endif
