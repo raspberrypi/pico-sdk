@@ -45,6 +45,8 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     pico_add_impl_library(tinyusb_board)
     target_link_libraries(tinyusb_board INTERFACE tinyusb_bsp)
 
+    # Target tinyusb_pico_pio_usb will be generated if the submodule exists in tinysub
+
     # Override suppress_tinyusb_warnings to add suppression of (falsely) reported GCC 11.2 warnings
     function(suppress_tinyusb_warnings)
         _suppress_tinyusb_warnings()
