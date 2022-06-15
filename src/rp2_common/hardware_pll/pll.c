@@ -14,7 +14,7 @@ void pll_init(PLL pll, uint refdiv, uint vco_freq, uint post_div1, uint post_div
     uint32_t ref_mhz = XOSC_MHZ / refdiv;
 
     // Check vco freq is in an acceptable range
-    assert(vco_freq >= (750 * MHZ) && vco_freq <= (1600 * MHZ));
+    assert(vco_freq >= (PICO_PLL_VCO_MIN_FREQ_MHZ * MHZ) && vco_freq <= (PICO_PLL_VCO_MAX_FREQ_MHZ * MHZ));
 
     // What are we multiplying the reference clock by to get the vco freq
     // (The regs are called div, because you divide the vco output and compare it to the refclk)
