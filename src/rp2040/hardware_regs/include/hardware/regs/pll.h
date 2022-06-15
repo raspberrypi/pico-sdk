@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,7 +17,7 @@
 //               GENERAL CONSTRAINTS:
 //               Reference clock frequency min=5MHz, max=800MHz
 //               Feedback divider min=16, max=320
-//               VCO frequency min=400MHz, max=1600MHz
+//               VCO frequency min=750MHz, max=1600MHz
 #define PLL_CS_OFFSET _u(0x00000000)
 #define PLL_CS_BITS   _u(0x8000013f)
 #define PLL_CS_RESET  _u(0x00000001)

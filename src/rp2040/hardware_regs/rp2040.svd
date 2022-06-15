@@ -22367,7 +22367,7 @@
             GENERAL CONSTRAINTS:\n
             Reference clock frequency min=5MHz, max=800MHz\n
             Feedback divider min=16, max=320\n
-            VCO frequency min=400MHz, max=1600MHz</description>
+            VCO frequency min=750MHz, max=1600MHz</description>
           <fields>
             <field>
               <access>read-only</access>
