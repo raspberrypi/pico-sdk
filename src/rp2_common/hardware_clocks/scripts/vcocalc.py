@@ -10,6 +10,8 @@ parser.add_argument("--low-vco", "-l", action="store_true", help="Use a lower VC
 parser.add_argument("output", help="Output frequency in MHz.", type=float)
 args = parser.parse_args()
 
+assert((args.vco_min >= 750) and (args.vco_max <= 1600))
+
 # Fixed hardware parameters
 fbdiv_range = range(16, 320 + 1)
 postdiv_range = range(1, 7 + 1)
