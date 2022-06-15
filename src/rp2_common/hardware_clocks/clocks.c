@@ -148,13 +148,13 @@ void clocks_init(void) {
     /// \tag::pll_settings[]
     // Configure PLLs
     //                   REF     FBDIV VCO            POSTDIV
-    // PLL SYS: 12 / 1 = 12MHz * 125 = 1500MHZ / 6 / 2 = 125MHz
-    // PLL USB: 12 / 1 = 12MHz * 40  = 480 MHz / 5 / 2 =  48MHz
+    // PLL SYS: 12 / 1 = 12MHz * 125 = 1500MHz / 6 / 2 = 125MHz
+    // PLL USB: 12 / 1 = 12MHz * 100 = 1200MHz / 5 / 5 =  48MHz
     /// \end::pll_settings[]
 
     /// \tag::pll_init[]
     pll_init(pll_sys, 1, 1500 * MHZ, 6, 2);
-    pll_init(pll_usb, 1, 480 * MHZ, 5, 2);
+    pll_init(pll_usb, 1, 1200 * MHZ, 5, 5);
     /// \end::pll_init[]
 
     // Configure clocks
