@@ -21,6 +21,9 @@ static uint8_t low_priority_irq_num;
 #endif
 
 static mutex_t stdio_usb_mutex;
+#if PICO_STDIO_USB_LOW_PRIORITY_IRQ || !NDEBUG
+static uint8_t stdio_usb_core_num;
+#endif
 
 static void low_priority_worker_irq(void) {
     // if the mutex is already owned, then we are in user code
@@ -32,10 +35,13 @@ static void low_priority_worker_irq(void) {
     }
 }
 
+#if !TUD_QUEUE_SEND_CB_SUPPORTED
 static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
+    assert(stdio_usb_core_num == get_core_num()); // if this fails, you have initialized stdio_usb on the wrong core
     irq_set_pending(low_priority_irq_num);
     return PICO_STDIO_USB_TASK_INTERVAL_US;
 }
+#endif
 
 static void stdio_usb_out_chars(const char *buf, int length) {
     static uint64_t last_avail_time;
@@ -94,7 +100,19 @@ stdio_driver_t stdio_usb = {
 #endif
 };
 
+#ifdef TUD_QUEUE_SEND_CB_SUPPORTED
+void tud_queue_send_cb(bool in_isr) {
+    // this should always be correct as TinyUSB is initialized on the same core that sets
+    // stdio_usb_core_num
+    assert(stdio_usb_core_num == get_core_num());
+    irq_set_pending(low_priority_irq_num);
+}
+#endif
+
 bool stdio_usb_init(void) {
+#if TUD_QUEUE_SEND_CB_SUPPORTED || !NDEBUG
+    stdio_usb_core_num = get_core_num();
+#endif
 #if !PICO_NO_BI_STDIO_USB
     bi_decl_if_func_used(bi_program_feature("USB stdin / stdout"));
 #endif
@@ -111,7 +129,11 @@ bool stdio_usb_init(void) {
     irq_set_enabled(low_priority_irq_num, true);
 
     mutex_init(&stdio_usb_mutex);
+#if TUD_QUEUE_SEND_CB_SUPPORTED
+    bool rc = true;
+#else
     bool rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
+#endif
     if (rc) {
         stdio_set_driver_enabled(&stdio_usb, true);
 #if PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
