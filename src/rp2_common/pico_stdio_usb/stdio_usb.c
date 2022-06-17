@@ -4,23 +4,33 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
+#ifndef LIB_TINYUSB_HOST
 #include "tusb.h"
+#include "pico/stdio_usb.h"
 
+// these may not be set if the user is providing tud support (i.e. LIB_TINYUSB_DEVICE is 1 because
+// the user linked in tinyusb_device) but they haven't selected CDC
+#if CFG_TUD_ENABLED && CFG_TUD_CDC
+
+#include "pico/binary_info.h"
 #include "pico/time.h"
 #include "pico/stdio/driver.h"
-#include "pico/binary_info.h"
 #include "pico/mutex.h"
 #include "hardware/irq.h"
 
+static mutex_t stdio_usb_mutex;
+#ifndef NDEBUG
+static uint8_t stdio_usb_core_num;
+#endif
+
+// when tinyusb_device is explicitly linked we do no background tud processing
+#if !LIB_TINYUSB_DEVICE
 #ifdef PICO_STDIO_USB_LOW_PRIORITY_IRQ
 static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 #define low_priority_irq_num PICO_STDIO_USB_LOW_PRIORITY_IRQ
 #else
 static uint8_t low_priority_irq_num;
 #endif
-
-static mutex_t stdio_usb_mutex;
 
 static void low_priority_worker_irq(void) {
     // if the mutex is already owned, then we are in user code
@@ -32,10 +42,16 @@ static void low_priority_worker_irq(void) {
     }
 }
 
+static void usb_irq(void) {
+    irq_set_pending(low_priority_irq_num);
+}
+
 static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
+    assert(stdio_usb_core_num == get_core_num()); // if this fails, you have initialized stdio_usb on the wrong core
     irq_set_pending(low_priority_irq_num);
     return PICO_STDIO_USB_TASK_INTERVAL_US;
 }
+#endif
 
 static void stdio_usb_out_chars(const char *buf, int length) {
     static uint64_t last_avail_time;
@@ -95,13 +111,23 @@ stdio_driver_t stdio_usb = {
 };
 
 bool stdio_usb_init(void) {
+#ifndef NDEBUG
+    stdio_usb_core_num = get_core_num();
+#endif
 #if !PICO_NO_BI_STDIO_USB
     bi_decl_if_func_used(bi_program_feature("USB stdin / stdout"));
 #endif
 
-    // initialize TinyUSB
+#if !defined(LIB_TINYUSB_DEVICE)
+    // initialize TinyUSB, as user hasn't explicitly linked it
     tusb_init();
+#else
+    assert(tud_inited()); // we expect the caller to have initialized if they are using TinyUSB
+#endif
 
+    mutex_init(&stdio_usb_mutex);
+    bool rc = true;
+#if !LIB_TINYUSB_DEVICE
 #ifdef PICO_STDIO_USB_LOW_PRIORITY_IRQ
     user_irq_claim(PICO_STDIO_USB_LOW_PRIORITY_IRQ);
 #else
@@ -110,8 +136,13 @@ bool stdio_usb_init(void) {
     irq_set_exclusive_handler(low_priority_irq_num, low_priority_worker_irq);
     irq_set_enabled(low_priority_irq_num, true);
 
-    mutex_init(&stdio_usb_mutex);
-    bool rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
+    if (irq_has_shared_handler(USBCTRL_IRQ)) {
+        // we can use a shared handler to notice when there may be work to do
+        irq_add_shared_handler(USBCTRL_IRQ, usb_irq, PICO_SHARED_IRQ_HANDLER_LOWEST_ORDER_PRIORITY);
+    } else {
+        rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
+    }
+#endif
     if (rc) {
         stdio_set_driver_enabled(&stdio_usb, true);
 #if PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
@@ -138,9 +169,15 @@ bool stdio_usb_connected(void) {
     return tud_cdc_connected();
 }
 #else
-#include "pico/stdio_usb.h"
-#warning stdio USB was configured, but is being disabled as TinyUSB is explicitly linked
+#warning stdio USB was configured along with user use of TinyUSB device mode, but CDC is not enabled
 bool stdio_usb_init(void) {
     return false;
 }
-#endif
+#endif // CFG_TUD_ENABLED && CFG_TUD_CDC
+#else
+#warning stdio USB was configured, but is being disabled as TinyUSB host is explicitly linked
+bool stdio_usb_init(void) {
+    return false;
+}
+#endif // !LIB_TINYUSB_HOST
+

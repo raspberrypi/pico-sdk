@@ -252,6 +252,14 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
  */
 void irq_remove_handler(uint num, irq_handler_t handler);
 
+/*! \brief Determine if the current handler for the given number is shared
+ *  \ingroup hardware_irq
+ *
+ * \param num Interrupt number \ref interrupt_nums
+ * \param return true if the specified IRQ has a shared handler
+ */
+bool irq_has_shared_handler(uint num);
+
 /*! \brief Get the current IRQ handler for the specified IRQ from the currently installed hardware vector table (VTOR)
  * of the execution core
  *  \ingroup hardware_irq
