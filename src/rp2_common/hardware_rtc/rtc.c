@@ -148,13 +148,13 @@ void rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback) {
     rtc_disable_alarm();
 
     // Only add to setup if it isn't -1
-    rtc_hw->irq_setup_0 = ((t->year  < 0) ? 0 : (((uint)t->year)  << RTC_IRQ_SETUP_0_YEAR_LSB )) |
-                          ((t->month < 0) ? 0 : (((uint)t->month) << RTC_IRQ_SETUP_0_MONTH_LSB)) |
-                          ((t->day   < 0) ? 0 : (((uint)t->day)   << RTC_IRQ_SETUP_0_DAY_LSB  ));
-    rtc_hw->irq_setup_1 = ((t->dotw  < 0) ? 0 : (((uint)t->dotw)  << RTC_IRQ_SETUP_1_DOTW_LSB)) |
-                          ((t->hour  < 0) ? 0 : (((uint)t->hour)  << RTC_IRQ_SETUP_1_HOUR_LSB)) |
-                          ((t->min   < 0) ? 0 : (((uint)t->min)   << RTC_IRQ_SETUP_1_MIN_LSB )) |
-                          ((t->sec   < 0) ? 0 : (((uint)t->sec)   << RTC_IRQ_SETUP_1_SEC_LSB ));
+    rtc_hw->irq_setup_0 = ((t->year  < 0) ? 0 : (((uint32_t)t->year)  << RTC_IRQ_SETUP_0_YEAR_LSB )) |
+                          ((t->month < 0) ? 0 : (((uint32_t)t->month) << RTC_IRQ_SETUP_0_MONTH_LSB)) |
+                          ((t->day   < 0) ? 0 : (((uint32_t)t->day)   << RTC_IRQ_SETUP_0_DAY_LSB  ));
+    rtc_hw->irq_setup_1 = ((t->dotw  < 0) ? 0 : (((uint32_t)t->dotw)  << RTC_IRQ_SETUP_1_DOTW_LSB)) |
+                          ((t->hour  < 0) ? 0 : (((uint32_t)t->hour)  << RTC_IRQ_SETUP_1_HOUR_LSB)) |
+                          ((t->min   < 0) ? 0 : (((uint32_t)t->min)   << RTC_IRQ_SETUP_1_MIN_LSB )) |
+                          ((t->sec   < 0) ? 0 : (((uint32_t)t->sec)   << RTC_IRQ_SETUP_1_SEC_LSB ));
 
     // Set the match enable bits for things we care about
     if (t->year  >= 0) hw_set_bits(&rtc_hw->irq_setup_0, RTC_IRQ_SETUP_0_YEAR_ENA_BITS);
