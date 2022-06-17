@@ -65,13 +65,13 @@ bool rtc_set_datetime(datetime_t *t) {
     }
 
     // Write to setup registers
-    rtc_hw->setup_0 = (((uint)t->year)  << RTC_SETUP_0_YEAR_LSB ) |
-                      (((uint)t->month) << RTC_SETUP_0_MONTH_LSB) |
-                      (((uint)t->day)   << RTC_SETUP_0_DAY_LSB);
-    rtc_hw->setup_1 = (((uint)t->dotw)  << RTC_SETUP_1_DOTW_LSB) |
-                      (((uint)t->hour)  << RTC_SETUP_1_HOUR_LSB) |
-                      (((uint)t->min)   << RTC_SETUP_1_MIN_LSB)  |
-                      (((uint)t->sec)   << RTC_SETUP_1_SEC_LSB);
+    rtc_hw->setup_0 = (((uint32_t)t->year)  << RTC_SETUP_0_YEAR_LSB ) |
+                      (((uint32_t)t->month) << RTC_SETUP_0_MONTH_LSB) |
+                      (((uint32_t)t->day)   << RTC_SETUP_0_DAY_LSB);
+    rtc_hw->setup_1 = (((uint32_t)t->dotw)  << RTC_SETUP_1_DOTW_LSB) |
+                      (((uint32_t)t->hour)  << RTC_SETUP_1_HOUR_LSB) |
+                      (((uint32_t)t->min)   << RTC_SETUP_1_MIN_LSB)  |
+                      (((uint32_t)t->sec)   << RTC_SETUP_1_SEC_LSB);
 
     // Load setup values into rtc clock domain
     rtc_hw->ctrl = RTC_CTRL_LOAD_BITS;
