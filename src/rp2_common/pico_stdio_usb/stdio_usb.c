@@ -10,7 +10,7 @@
 
 // these may not be set if the user is providing tud support (i.e. LIB_TINYUSB_DEVICE is 1 because
 // the user linked in tinyusb_device) but they haven't selected CDC
-#if CFG_TUD_ENABLED && CFG_TUD_CDC
+#if (CFG_TUD_ENABLED | TUSB_OPT_DEVICE_ENABLED) && CFG_TUD_CDC
 
 #include "pico/binary_info.h"
 #include "pico/time.h"
