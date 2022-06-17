@@ -112,7 +112,7 @@ stdio_driver_t stdio_usb = {
 
 bool stdio_usb_init(void) {
 #ifndef NDEBUG
-    stdio_usb_core_num = get_core_num();
+    stdio_usb_core_num = (uint8_t)get_core_num();
 #endif
 #if !PICO_NO_BI_STDIO_USB
     bi_decl_if_func_used(bi_program_feature("USB stdin / stdout"));
