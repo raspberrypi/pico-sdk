@@ -122,10 +122,10 @@ int main(void) {
     puts("Hello Everything!");
     puts("Hello Everything2!");
 
-    assert(mutex_try_enter(&mutex, NULL));
-    assert(!mutex_try_enter(&mutex, NULL));
-    assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
-    assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
+    hard_assert(mutex_try_enter(&mutex, NULL));
+    hard_assert(!mutex_try_enter(&mutex, NULL));
+    hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
+    hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     // this should compile as we are Cortex M0+
     __asm volatile("SVC #3");
 
