@@ -110,6 +110,9 @@ __force_inline int something_inlined(int x) {
     return x * 2;
 }
 
+auto_init_mutex(mutex);
+auto_init_recursive_mutex(recursive_mutex);
+
 int main(void) {
     spiggle();
 
@@ -118,6 +121,12 @@ int main(void) {
     printf("HI %d\n", something_inlined((int)time_us_32()));
     puts("Hello Everything!");
     puts("Hello Everything2!");
+
+    assert(mutex_try_enter(&mutex, NULL));
+    assert(!mutex_try_enter(&mutex, NULL));
+    assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
+    assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     // this should compile as we are Cortex M0+
     __asm volatile("SVC #3");
+
 }
