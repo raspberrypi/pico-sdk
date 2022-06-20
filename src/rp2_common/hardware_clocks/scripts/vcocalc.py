@@ -5,7 +5,7 @@ import argparse
 parser = argparse.ArgumentParser(description="PLL parameter calculator")
 parser.add_argument("--input", "-i", default=12, help="Input (reference) frequency. Default 12 MHz", type=float)
 parser.add_argument("--vco-max", default=1600, help="Override maximum VCO frequency. Default 1600 MHz", type=float)
-parser.add_argument("--vco-min", default=400, help="Override minimum VCO frequency. Default 400 MHz", type=float)
+parser.add_argument("--vco-min", default=750, help="Override minimum VCO frequency. Default 750 MHz", type=float)
 parser.add_argument("--low-vco", "-l", action="store_true", help="Use a lower VCO frequency when possible. This reduces power consumption, at the cost of increased jitter")
 parser.add_argument("output", help="Output frequency in MHz.", type=float)
 args = parser.parse_args()
