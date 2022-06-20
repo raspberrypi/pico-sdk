@@ -289,7 +289,11 @@ static inline bool recursive_mutex_is_initialized(recursive_mutex_t *mtx) {
  *
  * But the initialization of the mutex is performed automatically during runtime initialization
  */
+#ifdef __cplusplus
+#define auto_init_recursive_mutex(name) static __attribute__((section(".mutex_array"))) recursive_mutex_t name = { (spin_lock_t *)1 };
+#else
 #define auto_init_recursive_mutex(name) static __attribute__((section(".mutex_array"))) recursive_mutex_t name = { .core.spin_lock = (spin_lock_t *)1 /* marker for runtime_init */ }
+#endif
 
 #ifdef __cplusplus
 }
