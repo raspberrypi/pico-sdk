@@ -152,7 +152,7 @@ static void gpio_default_irq_handler(void) {
             if (events && !(raw_irq_mask[core] & (1u << i))) {
                 gpio_acknowledge_irq(i, events);
                 if (callback) {
-                    callback(gpio, events);
+                    callback(i, events);
                 }
             }
             events8 >>= 4;
