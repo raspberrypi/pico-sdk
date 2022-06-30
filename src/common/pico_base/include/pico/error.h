@@ -10,14 +10,18 @@
 #ifndef __ASSEMBLER__
 
 /*!
- * Common return codes from pico_sdk methods that return a status
+ * \brief Common return codes from pico_sdk methods that return a status
+ * \ingroup pico_base
  */
-enum {
+enum pico_error_codes {
     PICO_OK = 0,
     PICO_ERROR_NONE = 0,
     PICO_ERROR_TIMEOUT = -1,
     PICO_ERROR_GENERIC = -2,
     PICO_ERROR_NO_DATA = -3,
+    PICO_ERROR_NOT_PERMITTED = -4,
+    PICO_ERROR_INVALID_ARG = -5,
+    PICO_ERROR_IO = -6,
 };
 
 #endif // !__ASSEMBLER__

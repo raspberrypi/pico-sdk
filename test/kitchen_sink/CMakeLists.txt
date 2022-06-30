@@ -41,11 +41,6 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_unique_id
     pico_util
 )
-# todo this is full of warnings atm
-#if (TARGET tinyusb_device)
-#    target_include_directories(kitchen_sink_libs INTERFACE ${CMAKE_CURRENT_LIST_DIR})
-#    target_link_libraries(kitchen_sink_libs INTERFACE tinyusb_device)
-#endif()
 
 add_library(kitchen_sink_options INTERFACE)
 
@@ -63,7 +58,7 @@ target_compile_options(kitchen_sink_options INTERFACE
         -Wcast-qual
         -Wfloat-equal
         -Wmissing-format-attribute
-        -Wconversion
+        #-Wconversion
         -Wsign-compare
         $<$<COMPILE_LANGUAGE:C>:-Wstrict-prototypes>
 
@@ -100,6 +95,13 @@ if (COMMAND suppress_tinyusb_warnings)
     # TinyUSB itself, so we have to guard against TinyUSB not being present with the above if
     suppress_tinyusb_warnings()
 endif()
+if (TARGET pico_lwip)
+    set_source_files_properties(
+            ${PICO_LWIP_PATH}/src/core/ipv4/ip4_frag.c
+            PROPERTIES
+            COMPILE_FLAGS "-Wno-null-dereference")
+
+endif()
 target_link_libraries(kitchen_sink_extra_stdio kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_extra_stdio)
 pico_enable_stdio_usb(kitchen_sink_extra_stdio 1)
@@ -119,3 +121,25 @@ add_executable(kitchen_sink_cpp ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_cpp.cpp)
 target_link_libraries(kitchen_sink_cpp kitchen_sink_libs kitchen_sink_options)
 pico_set_program_name(kitchen_sink_cpp "Wombat tentacles CPP")
 pico_add_extra_outputs(kitchen_sink_cpp)
+
+if (TARGET pico_cyw43_arch)
+    # for lwipopts.h
+    add_executable(kitchen_sink_lwip_poll ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    target_link_libraries(kitchen_sink_lwip_poll kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_lwip_poll)
+    target_link_libraries(kitchen_sink_lwip_poll
+            pico_cyw43_arch_lwip_poll)
+    # for lwipopts.h
+    target_include_directories(kitchen_sink_lwip_poll PRIVATE
+            ${CMAKE_CURRENT_LIST_DIR})
+
+    add_executable(kitchen_sink_lwip_background ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    target_link_libraries(kitchen_sink_lwip_background kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_lwip_background)
+    target_link_libraries(kitchen_sink_lwip_background
+            pico_cyw43_arch_lwip_threadsafe_background)
+    # for lwipopts.h
+    target_include_directories(kitchen_sink_lwip_background PRIVATE
+            ${CMAKE_CURRENT_LIST_DIR})
+
+endif()

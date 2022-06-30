@@ -56,6 +56,13 @@
  * \defgroup tinyusb_host tinyusb_host
  * @}
  *
+ * \defgroup networking Networking Libraries
+ * Functions for implementing networking
+ * @{
+ * \defgroup pico_lwip pico_lwip
+ * \defgroup pico_cyw43_arch pico_cyw43_arch
+ * @}
+ *
  * \defgroup runtime Runtime Infrastructure
  * Libraries that are used to provide efficient implementation of certain
  * language level and C library functions, as well as CMake INTERFACE libraries

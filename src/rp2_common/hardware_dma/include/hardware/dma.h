@@ -88,11 +88,16 @@ void dma_claim_mask(uint32_t channel_mask);
 /*! \brief Mark a dma channel as no longer used
  *  \ingroup hardware_dma
  *
- * Method for cooperative claiming of hardware.
- *
  * \param channel the dma channel to release
  */
 void dma_channel_unclaim(uint channel);
+
+/*! \brief Mark multiple dma channels as no longer used
+ *  \ingroup hardware_dma
+ *
+ * \param channel_mask Bitfield of all channels to unclaim (bit 0 == channel 0, bit 1 == channel 1 etc)
+ */
+void dma_unclaim_mask(uint32_t channel_mask);
 
 /*! \brief Claim a free dma channel
  *  \ingroup hardware_dma

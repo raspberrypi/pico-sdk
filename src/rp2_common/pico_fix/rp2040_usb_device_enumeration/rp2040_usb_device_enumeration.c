@@ -17,12 +17,12 @@
 #define LS_K   0b10
 #define LS_SE1 0b11
 
+#if PICO_RP2040_B0_SUPPORTED || PICO_RP2040_B1_SUPPORTED
 static void hw_enumeration_fix_wait_se0(void);
 static void hw_enumeration_fix_force_ls_j(void);
 static void hw_enumeration_fix_finish(void);
 
 void rp2040_usb_device_enumeration_fix(void) {
-#if PICO_RP2040_B0_SUPPORTED || PICO_RP2040_B1_SUPPORTED
     // Actually check for B0/B1 h/w
     if (rp2040_chip_version() == 1) {
         // After coming out of reset, the hardware expects 800us of LS_J (linestate J) time
@@ -36,7 +36,6 @@ void rp2040_usb_device_enumeration_fix(void) {
         // Wait SE0 phase will call force ls_j phase which will call finish phase
         hw_enumeration_fix_wait_se0();
     }
-#endif
 }
 
 static inline uint8_t hw_line_state(void) {
@@ -146,3 +145,9 @@ static void hw_enumeration_fix_finish(void) {
     // Restore the pad ctrl value
     padsbank0_hw->io[dp] = pad_ctrl_prev;
 }
+
+#else
+void rp2040_usb_device_enumeration_fix(void) {
+    // nothing to do
+}
+#endif

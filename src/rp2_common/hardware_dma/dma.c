@@ -36,6 +36,12 @@ void dma_channel_unclaim(uint channel) {
     hw_claim_clear((uint8_t *) &_claimed, channel);
 }
 
+void dma_unclaim_mask(uint32_t mask) {
+    for(uint i = 0; mask; i++, mask >>= 1u) {
+        if (mask & 1u) dma_channel_unclaim(i);
+    }
+}
+
 int dma_claim_unused_channel(bool required) {
     return hw_claim_unused_from_range((uint8_t*)&_claimed, required, 0, NUM_DMA_CHANNELS-1, "No DMA channels are available");
 }

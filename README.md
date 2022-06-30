@@ -110,6 +110,24 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
           ```
 
+   * Or by cloning the SDK locally, but without copying `pico_sdk_import.cmake`:
+       1. `git clone` this Raspberry Pi Pico SDK repository
+       2. Setup a `CMakeLists.txt` like:
+
+           ```cmake
+           cmake_minimum_required(VERSION 3.13)
+ 
+           # initialize the SDK directly
+           include(/path/to/pico-sdk/pico_sdk_init.cmake)
+ 
+           project(my_project)
+ 
+           # initialize the Raspberry Pi Pico SDK
+           pico_sdk_init()
+ 
+           # rest of your project
+ 
+           ```
 1. Write your code (see [pico-examples](https://github.com/raspberrypi/pico-examples) or the [Raspberry Pi Pico C/C++ SDK](https://rptl.io/pico-c-sdk) documentation for more information)
 
    About the simplest you can do is a single source file (e.g. hello_world.c)

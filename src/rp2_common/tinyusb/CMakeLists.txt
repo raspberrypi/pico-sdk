@@ -53,5 +53,6 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
                 PROPERTIES
                 COMPILE_FLAGS "-Wno-stringop-overflow -Wno-array-bounds")
     endfunction()
+
     pico_promote_common_scope_vars()
 endif()
