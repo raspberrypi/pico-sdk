@@ -259,7 +259,7 @@ static inline void channel_config_set_irq_quiet(dma_channel_config *c, bool irq_
  *  \brief Set the channel priority in a channel configuration object
  *  \ingroup channel_config
  *
- * When ture, gives a channel preferential treatment in issue scheduling: in each scheduling round,
+ * When true, gives a channel preferential treatment in issue scheduling: in each scheduling round,
  * all high priority channels are considered first, and then only a single low
  * priority channel, before returning to the high priority channels.
  *
