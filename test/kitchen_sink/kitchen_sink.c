@@ -82,7 +82,13 @@
 #include "hardware/structs/watchdog.h"
 #include "hardware/structs/xip_ctrl.h"
 #include "hardware/structs/xosc.h"
-        
+
+#if LIB_PICO_MBEDTLS
+#include "mbedtls/ssl.h"
+#include "lwip/altcp_tcp.h"
+#include "lwip/altcp_tls.h"
+#endif
+
 bi_decl(bi_block_device(
                            BINARY_INFO_MAKE_TAG('K', 'S'),
                            "foo",

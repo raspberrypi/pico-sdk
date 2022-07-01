@@ -61,6 +61,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(cyw43_driver)
     pico_add_subdirectory(pico_lwip)
     pico_add_subdirectory(pico_cyw43_arch)
+    pico_add_subdirectory(pico_mbedtls)
 
     pico_add_subdirectory(pico_stdlib)
 
