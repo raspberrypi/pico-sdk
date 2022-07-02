@@ -14,6 +14,8 @@ along with various utilities.
 The SDK can be used to build anything from simple applications, to fully fledged runtime environments such as MicroPython, to low level software
 such as RP2040's on-chip bootrom itself.
 
+The hardware specific capabilities of distinct devices such as the Pico and Pico W (known as 'boards') must be explicitly supported by compiling against a target board.
+
 Additional libraries/APIs that are not yet ready for inclusion in the SDK can be found in [pico-extras](https://github.com/raspberrypi/pico-extras).
 
 # Documentation
@@ -159,6 +161,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
    Note this example uses the default UART for _stdout_;
    if you want to use the default USB see the [hello-usb](https://github.com/raspberrypi/pico-examples/tree/master/hello_world/usb) example.
 
+1. If no target is specified the code will be built to run on the Raspberry Pi Pico. To target other boards such as the Pico W add a suitable define to the cmake command below. eg: ```cmake -DPICO_BOARD=pico_w ..```
 
 1. Setup a CMake build directory.
       For example, if not using an IDE:
