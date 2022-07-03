@@ -40,7 +40,7 @@
 
 #define FLASH_PAGE_SIZE (1u << 8)
 #define FLASH_SECTOR_SIZE (1u << 12)
-#define FLASH_BLOCK_SIZE (1u << 16)
+#define PICO_FLASH_BLOCK_SIZE (1u << 16)
 
 #define FLASH_UNIQUE_ID_SIZE_BYTES 8
 

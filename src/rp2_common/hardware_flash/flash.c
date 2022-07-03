@@ -78,7 +78,7 @@ void __no_inline_not_in_flash_func(flash_range_erase)(uint32_t flash_offs, size_
 
     connect_internal_flash();
     flash_exit_xip();
-    flash_range_erase(flash_offs, count, FLASH_BLOCK_SIZE, FLASH_BLOCK_ERASE_CMD);
+    flash_range_erase(flash_offs, count, PICO_FLASH_BLOCK_SIZE, FLASH_BLOCK_ERASE_CMD);
     flash_flush_cache(); // Note this is needed to remove CSn IO force as well as cache flushing
     flash_enable_xip_via_boot2();
 }
