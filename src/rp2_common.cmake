@@ -22,7 +22,7 @@ function(pico_add_extra_outputs TARGET)
     pico_add_bin_output(${TARGET})
     pico_add_dis_output(${TARGET})
 
-    # PICO_CMAKE_CONFIG: PICO_NO_TARGET_NAME, Don't defined PICO_TARGET_NAME, type=bool, default=0, group=build
+    # PICO_CMAKE_CONFIG: PICO_NO_TARGET_NAME, Don't define PICO_TARGET_NAME, type=bool, default=0, group=build
     # PICO_BUILD_DEFINE: PICO_TARGET_NAME, The name of the build target being compiled (unless PICO_NO_TARGET_NAME set in build), type=string, default=target name, group=build
     if (NOT PICO_NO_TARGET_NAME)
         target_compile_definitions(${TARGET} PRIVATE
