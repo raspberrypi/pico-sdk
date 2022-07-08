@@ -49,11 +49,11 @@ endfunction()
 add_subdirectory(common)
 add_subdirectory(rp2_common)
 
-# PICO_CMAKE_CONFIG: PICO_NO_HARDWARE, OPTION: Whether the build is not targeting an RP2040 device,  type=bool, default=1 for PICO_PLATFORM=host 0 otherwise, group=build
-# PICO_BUILD_DEFINE: PICO_NO_HARDWARE, Whether the build is not targeting an RP2040 device,  type=bool, default=1 for PICO_PLATFORM=host 0 otherwise, group=build
+# PICO_CMAKE_CONFIG: PICO_NO_HARDWARE, OPTION: Whether the build is not targeting an RP2040 device, type=bool, default=1 when PICO_PLATFORM is host, 0 otherwise, group=build
+# PICO_BUILD_DEFINE: PICO_NO_HARDWARE, Whether the build is not targeting an RP2040 device, type=bool, default=1 when PICO_PLATFORM is host, 0 otherwise, group=build
 set(PICO_NO_HARDWARE "0" CACHE INTERNAL "")
-# PICO_CMAKE_CONFIG: PICO_ON_DEVICE, OPTION: Whether the build is targeting an RP2040 device,  type=bool, default=0 for PICO_PLATFORM=host 1 otherwise, group=build
-# PICO_BUILD_DEFIN: PICO_ON_DEVICE, Whether the build is targeting an RP2040 device,  type=bool, default=0 for PICO_PLATFORM=host 1 otherwise, group=build
+# PICO_CMAKE_CONFIG: PICO_ON_DEVICE, OPTION: Whether the build is targeting an RP2040 device, type=bool, default=0 when PICO_PLATFORM is host, 1 otherwise, group=build
+# PICO_BUILD_DEFINE: PICO_ON_DEVICE, Whether the build is targeting an RP2040 device, type=bool, default=0 when PICO_PLATFORM is host, 1 otherwise, group=build
 set(PICO_ON_DEVICE "1" CACHE INTERNAL "")
 
 set(CMAKE_EXECUTABLE_SUFFIX .elf PARENT_SCOPE)

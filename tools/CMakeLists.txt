@@ -4,7 +4,7 @@ function(_pico_init_pioasm)
     find_package(Pioasm REQUIRED)
 endfunction()
 
-# PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, default output format used by pioasm when using pico_generate_pio_header, default=c-sdk, group=build
+# PICO_CMAKE_CONFIG: PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, default output format used by pioasm when using pico_generate_pio_header, default=c-sdk, group=build
 function(pico_generate_pio_header TARGET PIO)
     _pico_init_pioasm()
     cmake_parse_arguments(pico_generate_pio_header "" "OUTPUT_FORMAT;OUTPUT_DIR" "" ${ARGN} )
