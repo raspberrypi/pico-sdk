@@ -32,6 +32,8 @@
 #ifndef __CC_H__
 #define __CC_H__
 
+#include <stdint.h>
+
 #if NO_SYS
 // todo really we should just not allow SYS_LIGHTWEIGHT_PROT for nosys mode (it doesn't do anything anyway)
 typedef int sys_prot_t;
@@ -76,4 +78,22 @@ unsigned int pico_lwip_rand(void);
 // Use ROSC based random number generation, more for the fact that rand() may not be seeded, than anything else
 #define LWIP_RAND pico_lwip_rand
 #endif
+
+static inline uint16_t rp2040_htons(uint16_t x) {
+    __asm ("rev16 %0, %0" : "+l" (x) : : );
+    return x;
+}
+
+static inline uint32_t rp2040_htonl(uint32_t x) {
+    __asm ("rev %0, %0" : "+l" (x) : : );
+    return x;
+}
+
+#define lwip_htons(x) (rp2040_htons(x))
+#define lwip_htonl(x) (rp2040_htonl(x))
+#define htons(x)      (rp2040_htons(x))
+#define htonl(x)      (rp2040_htonl(x))
+
+#define LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
+
 #endif /* __CC_H__ */
