@@ -20,6 +20,7 @@
 #include "lwip/timeouts.h"
 #endif
 
+
 // note same code
 #if PICO_CYW43_ARCH_THREADSAFE_BACKGROUND
 
@@ -68,6 +69,10 @@ static low_prio_irq_dispatch_t low_priority_irq_dispatch_slots[CYW43_DISPATCH_SL
 static recursive_mutex_t cyw43_mutex;
 semaphore_t cyw43_irq_sem;
 
+#if !CYW43_LWIP
+void nolwip_periodic_cb();
+#endif
+
 // Called in low priority pendsv interrupt only to do lwip processing and check cyw43 sleep
 static void periodic_worker(void)
 {
@@ -81,7 +86,10 @@ static void periodic_worker(void)
     CYW43_STAT_INC(LWIP_RUN_COUNT);
 #if CYW43_LWIP
     sys_check_timeouts();
+#else
+    nolwip_periodic_cb();
 #endif
+
     if (cyw43_poll) {
         if (cyw43_sleep > 0) {
             if (--cyw43_sleep == 0) {
@@ -301,18 +309,30 @@ void cyw43_arch_poll() {
 static void no_lwip_fail() {
     panic("You cannot use IP with pico_cyw43_arch_none");
 }
+void __attribute__((weak)) cyw43_cb_tcpip_init(cyw43_t *self, int itf);
 void cyw43_cb_tcpip_init(cyw43_t *self, int itf) {
 }
+void __attribute__((weak)) cyw43_cb_tcpip_deinit(cyw43_t *self, int itf);
 void cyw43_cb_tcpip_deinit(cyw43_t *self, int itf) {
 }
+void __attribute__((weak)) cyw43_cb_tcpip_set_link_up(cyw43_t *self, int itf);
 void cyw43_cb_tcpip_set_link_up(cyw43_t *self, int itf) {
     no_lwip_fail();
 }
+void __attribute__((weak)) cyw43_cb_tcpip_set_link_down(cyw43_t *self, int itf);
 void cyw43_cb_tcpip_set_link_down(cyw43_t *self, int itf) {
     no_lwip_fail();
 }
+void __attribute__((weak)) cyw43_cb_process_ethernet(void *cb_data, int itf, size_t len, const uint8_t *buf);
 void cyw43_cb_process_ethernet(void *cb_data, int itf, size_t len, const uint8_t *buf) {
     no_lwip_fail();
+}
+void __attribute__((weak)) nolwip_periodic_cb();
+void nolwip_periodic_cb() {
+    // In applicaitions which use NO_LWIP define but implement their own LWIP wrapper, this
+    // can be overwritten with a strong function which calls sys_check_timeouts()
+
+    // By default, this weak function is a no-op
 }
 #endif
 
