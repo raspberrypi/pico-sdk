@@ -31,6 +31,13 @@ static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 #else
 static uint8_t low_priority_irq_num;
 #endif
+static bool using_periodic_timer;
+
+static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
+    assert(stdio_usb_core_num == get_core_num()); // if this fails, you have initialized stdio_usb on the wrong core
+    irq_set_pending(low_priority_irq_num);
+    return using_periodic_timer ? PICO_STDIO_USB_TASK_INTERVAL_US : 0;
+}
 
 static void low_priority_worker_irq(void) {
     // if the mutex is already owned, then we are in user code
@@ -39,6 +46,11 @@ static void low_priority_worker_irq(void) {
     if (mutex_try_enter(&stdio_usb_mutex, NULL)) {
         tud_task();
         mutex_exit(&stdio_usb_mutex);
+    } else {
+        // if we don't have a periodic timer, then we need to make sure the tud_task is tried again later
+        if (!using_periodic_timer) {
+            add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
+        }
     }
 }
 
@@ -46,11 +58,6 @@ static void usb_irq(void) {
     irq_set_pending(low_priority_irq_num);
 }
 
-static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
-    assert(stdio_usb_core_num == get_core_num()); // if this fails, you have initialized stdio_usb on the wrong core
-    irq_set_pending(low_priority_irq_num);
-    return PICO_STDIO_USB_TASK_INTERVAL_US;
-}
 #endif
 
 static void stdio_usb_out_chars(const char *buf, int length) {
@@ -142,8 +149,10 @@ bool stdio_usb_init(void) {
     if (irq_has_shared_handler(USBCTRL_IRQ)) {
         // we can use a shared handler to notice when there may be work to do
         irq_add_shared_handler(USBCTRL_IRQ, usb_irq, PICO_SHARED_IRQ_HANDLER_LOWEST_ORDER_PRIORITY);
+        using_periodic_timer = false;
     } else {
-        rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
+        rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true) >= 0;
+        using_periodic_timer = rc;
     }
 #endif
     if (rc) {
