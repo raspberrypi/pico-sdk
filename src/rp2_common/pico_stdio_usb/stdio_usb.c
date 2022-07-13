@@ -97,6 +97,9 @@ int stdio_usb_in_chars(char *buf, int length) {
     if (tud_cdc_connected() && tud_cdc_available()) {
         int count = (int) tud_cdc_read(buf, (uint32_t) length);
         rc =  count ? count : PICO_ERROR_NO_DATA;
+    } else {
+        // because our mutex use may starve out the background task, run tud_task here (we own the mutex)
+        tud_task();
     }
     mutex_exit(&stdio_usb_mutex);
     return rc;
