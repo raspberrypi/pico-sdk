@@ -108,7 +108,8 @@ static inline void hw_divider_wait_ready(void) {
  */
 static inline divmod_result_t hw_divider_result_nowait(void) {
     // as ugly as this looks it is actually quite efficient
-    divmod_result_t rc = (((divmod_result_t) sio_hw->div_remainder) << 32u) | sio_hw->div_quotient;
+    divmod_result_t rc = ((divmod_result_t) sio_hw->div_remainder) << 32u;
+    rc |= sio_hw->div_quotient;
     return rc;
 }
 
