@@ -103,7 +103,11 @@ static char usbd_serial_str[PICO_UNIQUE_BOARD_ID_SIZE_BYTES * 2 + 1];
 
 static const char *const usbd_desc_str[] = {
     [USBD_STR_MANUF] = "Raspberry Pi",
+#if defined(PICO_USBD_STR_PRODUCT)
+    [USBD_STR_PRODUCT] = PICO_USBD_STR_PRODUCT,
+#else
     [USBD_STR_PRODUCT] = "Pico",
+#endif
     [USBD_STR_SERIAL] = usbd_serial_str,
     [USBD_STR_CDC] = "Board CDC",
 #if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
