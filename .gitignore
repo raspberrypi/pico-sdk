@@ -3,3 +3,4 @@
 cmake-*
 .DS_Store
 build
+examples
