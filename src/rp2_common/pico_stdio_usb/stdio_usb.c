@@ -32,6 +32,8 @@ static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 static uint8_t low_priority_irq_num;
 #endif
 
+bool tud_dtr_check(void);
+
 static void low_priority_worker_irq(void) {
     // if the mutex is already owned, then we are in user code
     // in this file which will do a tud_task itself, so we'll just do nothing
