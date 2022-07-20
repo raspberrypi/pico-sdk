@@ -53,14 +53,20 @@ static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
 }
 
 static void low_priority_worker_irq(void) {
-    // if the mutex is already owned, then we are in user code
-    // in this file which will do a tud_task itself, so we'll just do nothing
-    // until the next tick; we won't starve
     if (mutex_try_enter(&stdio_usb_mutex, NULL)) {
         tud_task();
         mutex_exit(&stdio_usb_mutex);
     } else {
-        // if we don't have a periodic timer, then we need to make sure the tud_task is tried again later
+        // if the mutex is already owned, then we are in non IRQ code in this file.
+        //
+        // it would seem simplest to just let that code call tud_task() at the end, however this
+        // code might run during the call to tud_task() and we might miss a necessary tud_task() call
+        //
+        // if we are using a periodic timer (crit_sec is not initialzied in this case),
+        // then we are happy just to wait until the next tick, however when we are not using a periodic timer,
+        // we must kick off a one-shot timer to make sure the tud_task() DOES run (this method
+        // will be called again as a result, and will try the mutex_try_enter again, and if that fails
+        // create another one shot timer again, and so on).
         if (critical_section_is_initialized(&one_shot_timer_crit_sec)) {
             bool need_timer;
             critical_section_enter_blocking(&one_shot_timer_crit_sec);
