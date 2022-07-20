@@ -19,17 +19,17 @@
 #include "hardware/irq.h"
 
 static mutex_t stdio_usb_mutex;
-// if this crit_sec is initialized, we are not in periodic timer mode, and must make sure
-// we don't either create multiple one shot timers, or miss creating one. this crit_sec
-// is used to protect the one_shot_timer_pending flag
-static critical_section_t one_shot_timer_crit_sec;
-static volatile bool one_shot_timer_pending;
 #ifndef NDEBUG
 static uint8_t stdio_usb_core_num;
 #endif
 
 // when tinyusb_device is explicitly linked we do no background tud processing
 #if !LIB_TINYUSB_DEVICE
+// if this crit_sec is initialized, we are not in periodic timer mode, and must make sure
+// we don't either create multiple one shot timers, or miss creating one. this crit_sec
+// is used to protect the one_shot_timer_pending flag
+static critical_section_t one_shot_timer_crit_sec;
+static volatile bool one_shot_timer_pending;
 #ifdef PICO_STDIO_USB_LOW_PRIORITY_IRQ
 static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 #define low_priority_irq_num PICO_STDIO_USB_LOW_PRIORITY_IRQ
@@ -62,7 +62,7 @@ static void low_priority_worker_irq(void) {
         // it would seem simplest to just let that code call tud_task() at the end, however this
         // code might run during the call to tud_task() and we might miss a necessary tud_task() call
         //
-        // if we are using a periodic timer (crit_sec is not initialzied in this case),
+        // if we are using a periodic timer (crit_sec is not initialized in this case),
         // then we are happy just to wait until the next tick, however when we are not using a periodic timer,
         // we must kick off a one-shot timer to make sure the tud_task() DOES run (this method
         // will be called again as a result, and will try the mutex_try_enter again, and if that fails
