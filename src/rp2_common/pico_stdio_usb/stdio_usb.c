@@ -32,8 +32,6 @@ static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 static uint8_t low_priority_irq_num;
 #endif
 
-bool tud_dtr_check(void);
-
 static void low_priority_worker_irq(void) {
     // if the mutex is already owned, then we are in user code
     // in this file which will do a tud_task itself, so we'll just do nothing
@@ -62,7 +60,7 @@ static void stdio_usb_out_chars(const char *buf, int length) {
         if (owner == get_core_num()) return; // would deadlock otherwise
         mutex_enter_blocking(&stdio_usb_mutex);
     }
-    if (tud_dtr_check()) {
+    if (stdio_usb_connected()) {
         for (int i = 0; i < length;) {
             int n = length - i;
             int avail = (int) tud_cdc_write_available();
@@ -168,22 +166,14 @@ bool stdio_usb_init(void) {
 }
 
 bool stdio_usb_connected(void) {
-#if PICO_STDIO_USB_CONNECTION_CHECK_WITH_DTR
+#if PICO_STDIO_USB_CONNECTION_WITHOUT_DTR
+    return tud_ready();
+#else
     // this actually checks DTR
     return tud_cdc_connected();
-#else
-    return true;
 #endif
 }
 
-bool tud_dtr_check(void) {
-#if PICO_STDIO_USB_CONNECTION_CHECK_WITH_DTR
-    // this actually checks DTR
-    return tud_cdc_connected();
-#else
-    return true;
-#endif
-}
 #else
 #warning stdio USB was configured along with user use of TinyUSB device mode, but CDC is not enabled
 bool stdio_usb_init(void) {
