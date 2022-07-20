@@ -74,7 +74,7 @@ static void stdio_usb_out_chars(const char *buf, int length) {
             } else {
                 tud_task();
                 tud_cdc_write_flush();
-                if (!tud_dtr_check() ||
+                if (!stdio_usb_connected() ||
                     (!tud_cdc_write_available() && time_us_64() > last_avail_time + PICO_STDIO_USB_STDOUT_TIMEOUT_US)) {
                     break;
                 }
@@ -94,7 +94,7 @@ int stdio_usb_in_chars(char *buf, int length) {
         mutex_enter_blocking(&stdio_usb_mutex);
     }
     int rc = PICO_ERROR_NO_DATA;
-    if (tud_dtr_check() && tud_cdc_available()) {
+    if (stdio_usb_connected() && tud_cdc_available()) {
         int count = (int) tud_cdc_read(buf, (uint32_t) length);
         rc =  count ? count : PICO_ERROR_NO_DATA;
     }
