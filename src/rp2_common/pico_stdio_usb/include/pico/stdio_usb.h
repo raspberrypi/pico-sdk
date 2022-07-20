@@ -97,9 +97,9 @@
 #define PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS 100
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_CONNECTION_CHECK_WITH_DTR, Enable/disable connection check made with DTR checking, type=bool, default=1, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_CONNECTION_CHECK_WITH_DTR
-#define PICO_STDIO_USB_CONNECTION_CHECK_WITH_DTR 1
+// PICO_CONFIG: PICO_STDIO_USB_CONNECTION_WITHOOUT_DTR, Disable use of DTR for connection checking meaning connection is assumed to be valid, type=bool, default=0, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_CONNECTION_WITHOUT_DTR
+#define PICO_STDIO_USB_CONNECTION_WITHOUT_DTR 1
 #endif
 
 #ifdef __cplusplus
