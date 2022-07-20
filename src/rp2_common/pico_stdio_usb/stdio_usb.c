@@ -56,7 +56,6 @@ static void low_priority_worker_irq(void) {
     // if the mutex is already owned, then we are in user code
     // in this file which will do a tud_task itself, so we'll just do nothing
     // until the next tick; we won't starve
-    static int foo;
     if (mutex_try_enter(&stdio_usb_mutex, NULL)) {
         tud_task();
         mutex_exit(&stdio_usb_mutex);
