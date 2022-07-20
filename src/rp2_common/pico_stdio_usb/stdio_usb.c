@@ -19,6 +19,11 @@
 #include "hardware/irq.h"
 
 static mutex_t stdio_usb_mutex;
+// if this crit_sec is initialized, we are not in periodic timer mode, and must make sure
+// we don't either create multiple one shot timers, or miss creating one. this crit_sec
+// is used to protect the one_shot_timer_pending flag
+static critical_section_t one_shot_timer_crit_sec;
+static volatile bool one_shot_timer_pending;
 #ifndef NDEBUG
 static uint8_t stdio_usb_core_num;
 #endif
@@ -31,25 +36,41 @@ static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 #else
 static uint8_t low_priority_irq_num;
 #endif
-static bool using_periodic_timer;
 
 static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
     assert(stdio_usb_core_num == get_core_num()); // if this fails, you have initialized stdio_usb on the wrong core
+    int64_t repeat_time;
+    if (critical_section_is_initialized(&one_shot_timer_crit_sec)) {
+        critical_section_enter_blocking(&one_shot_timer_crit_sec);
+        one_shot_timer_pending = false;
+        critical_section_exit(&one_shot_timer_crit_sec);
+        repeat_time = 0; // don't repeat
+    } else {
+        repeat_time = PICO_STDIO_USB_TASK_INTERVAL_US;
+    }
     irq_set_pending(low_priority_irq_num);
-    return using_periodic_timer ? PICO_STDIO_USB_TASK_INTERVAL_US : 0;
+    return repeat_time;
 }
 
 static void low_priority_worker_irq(void) {
     // if the mutex is already owned, then we are in user code
     // in this file which will do a tud_task itself, so we'll just do nothing
     // until the next tick; we won't starve
+    static int foo;
     if (mutex_try_enter(&stdio_usb_mutex, NULL)) {
         tud_task();
         mutex_exit(&stdio_usb_mutex);
     } else {
         // if we don't have a periodic timer, then we need to make sure the tud_task is tried again later
-        if (!using_periodic_timer) {
-            add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
+        if (critical_section_is_initialized(&one_shot_timer_crit_sec)) {
+            bool need_timer;
+            critical_section_enter_blocking(&one_shot_timer_crit_sec);
+            need_timer = !one_shot_timer_pending;
+            one_shot_timer_pending = true;
+            critical_section_exit(&one_shot_timer_crit_sec);
+            if (need_timer) {
+                add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
+            }
         }
     }
 }
@@ -149,10 +170,11 @@ bool stdio_usb_init(void) {
     if (irq_has_shared_handler(USBCTRL_IRQ)) {
         // we can use a shared handler to notice when there may be work to do
         irq_add_shared_handler(USBCTRL_IRQ, usb_irq, PICO_SHARED_IRQ_HANDLER_LOWEST_ORDER_PRIORITY);
-        using_periodic_timer = false;
+        critical_section_init_with_lock_num(&one_shot_timer_crit_sec, next_striped_spin_lock_num());
     } else {
         rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true) >= 0;
-        using_periodic_timer = rc;
+        // we use initialization state of the one_shot_timer_critsec as a flag
+        memset(&one_shot_timer_crit_sec, 0, sizeof(one_shot_timer_crit_sec));
     }
 #endif
     if (rc) {
