@@ -258,13 +258,13 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
 
         dma_channel_config out_config = dma_channel_get_default_config(bus_data->dma_out);
         channel_config_set_bswap(&out_config, true);
-        channel_config_set_dreq(&out_config, pio_get_dreq(bus_data->pio, 0, true));
+        channel_config_set_dreq(&out_config, pio_get_dreq(bus_data->pio, bus_data->pio_sm, true));
 
         dma_channel_configure(bus_data->dma_out, &out_config, &bus_data->pio->txf[0], tx, tx_length / 4, true);
 
         dma_channel_config in_config = dma_channel_get_default_config(bus_data->dma_in);
         channel_config_set_bswap(&in_config, true);
-        channel_config_set_dreq(&in_config, pio_get_dreq(bus_data->pio, 0, false));
+        channel_config_set_dreq(&in_config, pio_get_dreq(bus_data->pio, bus_data->pio_sm, false));
         channel_config_set_write_increment(&in_config, true);
         channel_config_set_read_increment(&in_config, false);
         dma_channel_configure(bus_data->dma_in, &in_config, rx + tx_length, &bus_data->pio->rxf[0], rx_length / 4 - tx_length / 4, true);
@@ -299,12 +299,12 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
 
         dma_channel_config out_config = dma_channel_get_default_config(bus_data->dma_out);
         channel_config_set_bswap(&out_config, true);
-        channel_config_set_dreq(&out_config, pio_get_dreq(bus_data->pio, 0, true));
+        channel_config_set_dreq(&out_config, pio_get_dreq(bus_data->pio, bus_data->pio_sm, true));
 
         dma_channel_configure(bus_data->dma_out, &out_config, &bus_data->pio->txf[0], tx, tx_length / 4, true);
 
         bus_data->pio->fdebug = 1u << PIO_FDEBUG_TXSTALL_LSB;
-        pio_sm_set_enabled(bus_data->pio, 0, true);
+        pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, true);
         while (!(bus_data->pio->fdebug & (1u << PIO_FDEBUG_TXSTALL_LSB))) {
             tight_loop_contents(); // todo timeout
         }
