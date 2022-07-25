@@ -85,7 +85,7 @@ extern "C" {
  * selected on one GPIO at a time. If the same peripheral input is connected to multiple GPIOs, the peripheral sees the logical
  * OR of these GPIO inputs.
  *
- * Please refer to the datsheet for more information on GPIO function selection.
+ * Please refer to the datasheet for more information on GPIO function selection.
  */
 enum gpio_function {
     GPIO_FUNC_XIP = 0,
