@@ -223,7 +223,7 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             ${PICO_LWIP_PATH}/src/apps/tftp/tftp.c
             )
 
-    # MQTT client files
+    # Mbed TLS files
     add_library(pico_lwip_mbedtls INTERFACE)
     target_sources(pico_lwip_mbedtls INTERFACE
             ${PICO_LWIP_PATH}/src/apps/altcp_tls/altcp_tls_mbedtls.c
