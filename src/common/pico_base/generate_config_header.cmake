@@ -13,8 +13,8 @@ endmacro()
 # PICO_CMAKE_CONFIG: PICO_CONFIG_HEADER_FILES, List of extra header files to include from pico/config.h for all platforms, type=list, default="", group=pico_base
 add_header_content_from_var(PICO_CONFIG_HEADER_FILES)
 
-# PICO_CMAKE_CONFIG: PICO_CONFIG_RP2040_HEADER_FILES, List of extra header files to include from pico/config.h for rp2040 platform, type=list, default="", group=pico_base
-# PICO_CMAKE_CONFIG: PICO_CONFIG_HOST_HEADER_FILES, List of extra header files to include from pico/config.h for host platform, type=list, default="", group=pico_base
+# PICO_CMAKE_CONFIG: PICO_RP2040_CONFIG_HEADER_FILES, List of extra header files to include from pico/config.h for rp2040 platform, type=list, default="", group=pico_base
+# PICO_CMAKE_CONFIG: PICO_HOST_CONFIG_HEADER_FILES, List of extra header files to include from pico/config.h for host platform, type=list, default="", group=pico_base
 add_header_content_from_var(PICO_${PICO_PLATFORM_UPPER}_CONFIG_HEADER_FILES)
 
 file(GENERATE

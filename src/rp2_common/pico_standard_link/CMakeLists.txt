@@ -62,7 +62,7 @@ if (NOT TARGET pico_standard_link)
     # PICO_BUILD_DEFINE: PICO_NO_FLASH, whether this is a 'no_flash' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
     target_compile_definitions(pico_standard_link INTERFACE PICO_NO_FLASH=$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,no_flash>,1,$<AND:$<BOOL:${PICO_NO_FLASH}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
     # PICO_USE_BLOCKED_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being equal to use_blocked_ram if set, otherwise to the value of the PICO_USE_BLOCKED_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
-    # PICO_BUILD_DEFINE: PICO_USE_BLOCKS_RAM, whether this is a 'blocked_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+    # PICO_BUILD_DEFINE: PICO_USE_BLOCKED_RAM, whether this is a 'blocked_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
     target_compile_definitions(pico_standard_link INTERFACE PICO_USE_BLOCKED_RAM=$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,use_blocked_ram>,1,$<AND:$<BOOL:${PICO_USE_BLOCKED_RAM}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
     # PICO_COPY_TO_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being equal to copy_to_ram if set, otherwise to the value of the PICO_COPY_TO_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
     # PICO_BUILD_DEFINE: PICO_COPY_TO_RAM, whether this is a 'copy_to_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
@@ -89,7 +89,7 @@ if (NOT TARGET pico_standard_link)
     # this line occasionally useful for debugging ... todo maybe make a PICO_ var
     # target_compile_options(pico_standard_link INTERFACE --save-temps) #debugging only
 
-    # PICO_CMAKE_CONFIG: PICO_NO_GC_SECTIONS, Disable -ffunction-sections -fdata-sections, and --gc-sections, type=bool, default=0, advanced=true, group=pico_standard_link
+    # PICO_CMAKE_CONFIG: PICO_NO_GC_SECTIONS, Disable -ffunction-sections -fdata-sections and --gc-sections, type=bool, default=0, advanced=true, group=pico_standard_link
     if (NOT PICO_NO_GC_SECTIONS)
         target_compile_options(pico_standard_link INTERFACE -ffunction-sections -fdata-sections)
         target_link_options(pico_standard_link INTERFACE "LINKER:--gc-sections")
