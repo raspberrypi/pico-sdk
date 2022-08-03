@@ -58,7 +58,7 @@ endfunction()
 
 # create an INTERFACE library named hardware_NAME_headers INTERFACE library if it doesn't already exist,
 #        and add include/ relative to the calling directory to the includes.
-#        and hardware_structs and hardware_claim as dependencies of the library
+#        and hardware_structs and hardware_claim_headers as dependencies of the library
 macro(pico_simple_hardware_headers_target NAME)
     if (NOT TARGET hardware_${NAME}_headers)
         add_library(hardware_${NAME}_headers INTERFACE)
@@ -66,14 +66,14 @@ macro(pico_simple_hardware_headers_target NAME)
         target_include_directories(hardware_${NAME}_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
         target_link_libraries(hardware_${NAME}_headers INTERFACE pico_base_headers)
         if (NOT PICO_NO_HARDWARE)
-            target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs hardware_claim)
+            target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs hardware_claim_headers)
         endif()
     endif()
 endmacro()
 
 # create an INTERFACE library named hardware_NAME if it doesn't exist, along with a hardware_NAME_headers
 #        INTERFACE library that it depends on. The hardware_NAME_headers library add include/ relative to
-#        and pico_base_headers, and harddware_structs as a dependency of the library
+#        and pico_base_headers, and hardware_structs as a dependency of the library
 macro(pico_simple_hardware_headers_only_target NAME)
     if (NOT TARGET hardware_${NAME})
         # Choosing not to add LIB_HARDWARE_ defines to avoid command line bloat pending a need (they aren't
@@ -91,7 +91,8 @@ macro(pico_simple_hardware_headers_only_target NAME)
 endmacro()
 
 # create an INTERFACE library named hardware_NAME if it doesn't exist, dependent on a pre-existing  hardware_NAME_headers
-#        INTERFACE library and pico_platform. The file NAME.c relative to the caller is added to the C sources for the hardware_NAME
+#        INTERFACE library and hardware_claim and pico_platform. The file NAME.c relative to the caller is added to the C
+#        sources for the hardware_NAME
 macro(pico_simple_hardware_impl_target NAME)
     if (NOT TARGET hardware_${NAME})
         # Choosing not to add LIB_HARDWARE_ defines to avoid command line bloat pending a need (they aren't
@@ -104,7 +105,7 @@ macro(pico_simple_hardware_impl_target NAME)
                 ${CMAKE_CURRENT_LIST_DIR}/${NAME}.c
                 )
 
-        target_link_libraries(hardware_${NAME} INTERFACE hardware_${NAME}_headers pico_platform)
+        target_link_libraries(hardware_${NAME} INTERFACE hardware_${NAME}_headers hardware_claim pico_platform)
     endif()
 endmacro()
 
