@@ -101,6 +101,7 @@ static void cyw43_task(__unused void *param) {
         xSemaphoreGive(cyw43_worker_ran_sem);
         __sev(); // it is possible regular code is waiting on a WFE on the other core
     } while (true);
+    vTaskDelete(NULL);
 }
 
 static void tcpip_init_done(void *param) {
