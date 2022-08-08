@@ -95,8 +95,9 @@ static inline absolute_time_t delayed_by_us(const absolute_time_t t, uint64_t us
     absolute_time_t t2;
     uint64_t base = to_us_since_boot(t);
     uint64_t delayed = base + us;
-    if (delayed < base) {
-        delayed = (uint64_t)-1;
+    if ((int64_t)delayed < 0) {
+        // absolute_time_t (to allow for signed time deltas) is never greater than INT64_MAX which == at_the_end_of_time
+        delayed = INT64_MAX;
     }
     update_us_since_boot(&t2, delayed);
     return t2;
@@ -113,8 +114,9 @@ static inline absolute_time_t delayed_by_ms(const absolute_time_t t, uint32_t ms
     absolute_time_t t2;
     uint64_t base = to_us_since_boot(t);
     uint64_t delayed = base + ms * 1000ull;
-    if (delayed < base) {
-        delayed = (uint64_t)-1;
+    if ((int64_t)delayed < 0) {
+        // absolute_time_t (to allow for signed time deltas) is never greater than INT64_MAX which == at_the_end_of_time
+        delayed = INT64_MAX;
     }
     update_us_since_boot(&t2, delayed);
     return t2;
