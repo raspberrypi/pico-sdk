@@ -25,6 +25,11 @@ static uint8_t stdio_usb_core_num;
 
 // when tinyusb_device is explicitly linked we do no background tud processing
 #if !LIB_TINYUSB_DEVICE
+// if this crit_sec is initialized, we are not in periodic timer mode, and must make sure
+// we don't either create multiple one shot timers, or miss creating one. this crit_sec
+// is used to protect the one_shot_timer_pending flag
+static critical_section_t one_shot_timer_crit_sec;
+static volatile bool one_shot_timer_pending;
 #ifdef PICO_STDIO_USB_LOW_PRIORITY_IRQ
 static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 #define low_priority_irq_num PICO_STDIO_USB_LOW_PRIORITY_IRQ
@@ -32,13 +37,45 @@ static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 static uint8_t low_priority_irq_num;
 #endif
 
+static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
+    int64_t repeat_time;
+    if (critical_section_is_initialized(&one_shot_timer_crit_sec)) {
+        critical_section_enter_blocking(&one_shot_timer_crit_sec);
+        one_shot_timer_pending = false;
+        critical_section_exit(&one_shot_timer_crit_sec);
+        repeat_time = 0; // don't repeat
+    } else {
+        repeat_time = PICO_STDIO_USB_TASK_INTERVAL_US;
+    }
+    irq_set_pending(low_priority_irq_num);
+    return repeat_time;
+}
+
 static void low_priority_worker_irq(void) {
-    // if the mutex is already owned, then we are in user code
-    // in this file which will do a tud_task itself, so we'll just do nothing
-    // until the next tick; we won't starve
     if (mutex_try_enter(&stdio_usb_mutex, NULL)) {
         tud_task();
         mutex_exit(&stdio_usb_mutex);
+    } else {
+        // if the mutex is already owned, then we are in non IRQ code in this file.
+        //
+        // it would seem simplest to just let that code call tud_task() at the end, however this
+        // code might run during the call to tud_task() and we might miss a necessary tud_task() call
+        //
+        // if we are using a periodic timer (crit_sec is not initialized in this case),
+        // then we are happy just to wait until the next tick, however when we are not using a periodic timer,
+        // we must kick off a one-shot timer to make sure the tud_task() DOES run (this method
+        // will be called again as a result, and will try the mutex_try_enter again, and if that fails
+        // create another one shot timer again, and so on).
+        if (critical_section_is_initialized(&one_shot_timer_crit_sec)) {
+            bool need_timer;
+            critical_section_enter_blocking(&one_shot_timer_crit_sec);
+            need_timer = !one_shot_timer_pending;
+            one_shot_timer_pending = true;
+            critical_section_exit(&one_shot_timer_crit_sec);
+            if (need_timer) {
+                add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
+            }
+        }
     }
 }
 
@@ -46,11 +83,6 @@ static void usb_irq(void) {
     irq_set_pending(low_priority_irq_num);
 }
 
-static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
-    assert(stdio_usb_core_num == get_core_num()); // if this fails, you have initialized stdio_usb on the wrong core
-    irq_set_pending(low_priority_irq_num);
-    return PICO_STDIO_USB_TASK_INTERVAL_US;
-}
 #endif
 
 static void stdio_usb_out_chars(const char *buf, int length) {
@@ -97,6 +129,9 @@ int stdio_usb_in_chars(char *buf, int length) {
     if (tud_cdc_connected() && tud_cdc_available()) {
         int count = (int) tud_cdc_read(buf, (uint32_t) length);
         rc =  count ? count : PICO_ERROR_NO_DATA;
+    } else {
+        // because our mutex use may starve out the background task, run tud_task here (we own the mutex)
+        tud_task();
     }
     mutex_exit(&stdio_usb_mutex);
     return rc;
@@ -111,6 +146,12 @@ stdio_driver_t stdio_usb = {
 };
 
 bool stdio_usb_init(void) {
+    if (get_core_num() != alarm_pool_core_num(alarm_pool_get_default())) {
+        // included an assertion here rather than just returning false, as this is likely
+        // a coding bug, rather than anything else.
+        assert(false);
+        return false;
+    }
 #ifndef NDEBUG
     stdio_usb_core_num = (uint8_t)get_core_num();
 #endif
@@ -139,8 +180,11 @@ bool stdio_usb_init(void) {
     if (irq_has_shared_handler(USBCTRL_IRQ)) {
         // we can use a shared handler to notice when there may be work to do
         irq_add_shared_handler(USBCTRL_IRQ, usb_irq, PICO_SHARED_IRQ_HANDLER_LOWEST_ORDER_PRIORITY);
+        critical_section_init_with_lock_num(&one_shot_timer_crit_sec, next_striped_spin_lock_num());
     } else {
-        rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true);
+        rc = add_alarm_in_us(PICO_STDIO_USB_TASK_INTERVAL_US, timer_task, NULL, true) >= 0;
+        // we use initialization state of the one_shot_timer_critsec as a flag
+        memset(&one_shot_timer_crit_sec, 0, sizeof(one_shot_timer_crit_sec));
     }
 #endif
     if (rc) {

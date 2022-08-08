@@ -31,6 +31,7 @@ typedef struct alarm_pool {
     uint8_t *entry_ids_high;
     alarm_id_t alarm_in_progress; // this is set during a callback from the IRQ handler... it can be cleared by alarm_cancel to prevent repeats
     uint8_t hardware_alarm_num;
+    uint8_t core_num;
 } alarm_pool_t;
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
@@ -190,6 +191,7 @@ void alarm_pool_post_alloc_init(alarm_pool_t *pool, uint hardware_alarm_num) {
     hardware_alarm_set_callback(hardware_alarm_num, alarm_pool_alarm_callback);
     pool->lock = spin_lock_instance(next_striped_spin_lock_num());
     pool->hardware_alarm_num = (uint8_t) hardware_alarm_num;
+    pool->core_num = get_core_num();
     pools[hardware_alarm_num] = pool;
 }
 
@@ -284,6 +286,10 @@ bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id) {
 
 uint alarm_pool_hardware_alarm_num(alarm_pool_t *pool) {
     return pool->hardware_alarm_num;
+}
+
+uint alarm_pool_core_num(alarm_pool_t *pool) {
+    return pool->core_num;
 }
 
 static void alarm_pool_dump_key(pheap_node_id_t id, void *user_data) {
