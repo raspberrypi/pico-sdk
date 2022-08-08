@@ -267,20 +267,25 @@ int __printflike(1, 0) WRAPPER_FUNC(printf)(const char* format, ...)
     return ret;
 }
 
-void stdio_init_all(void) {
+bool stdio_init_all(void) {
     // todo add explicit custom, or registered although you can call stdio_enable_driver explicitly anyway
     // These are well known ones
+
+    bool rc = false;
 #if LIB_PICO_STDIO_UART
     stdio_uart_init();
+    rc = true;
 #endif
 
 #if LIB_PICO_STDIO_SEMIHOSTING
     stdio_semihosting_init();
+    rc = true;
 #endif
 
 #if LIB_PICO_STDIO_USB
-    stdio_usb_init();
+    rc |= stdio_usb_init();
 #endif
+    return rc;
 }
 
 int WRAPPER_FUNC(getchar)(void) {

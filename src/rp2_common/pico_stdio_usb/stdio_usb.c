@@ -38,7 +38,6 @@ static uint8_t low_priority_irq_num;
 #endif
 
 static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
-    assert(stdio_usb_core_num == get_core_num()); // if this fails, you have initialized stdio_usb on the wrong core
     int64_t repeat_time;
     if (critical_section_is_initialized(&one_shot_timer_crit_sec)) {
         critical_section_enter_blocking(&one_shot_timer_crit_sec);
@@ -147,6 +146,12 @@ stdio_driver_t stdio_usb = {
 };
 
 bool stdio_usb_init(void) {
+    if (get_core_num() != alarm_pool_core_num(alarm_pool_get_default())) {
+        // included an assertion here rather than just returning false, as this is likely
+        // a coding bug, rather than anything else.
+        assert(false);
+        return false;
+    }
 #ifndef NDEBUG
     stdio_usb_core_num = (uint8_t)get_core_num();
 #endif

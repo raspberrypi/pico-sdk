@@ -404,6 +404,14 @@ alarm_pool_t *alarm_pool_create(uint hardware_alarm_num, uint max_timers);
 uint alarm_pool_hardware_alarm_num(alarm_pool_t *pool);
 
 /**
+ * \brief Return the core number the alarm pool was initialized on (and hence callbacks are called on)
+ * \ingroup alarm
+ * \param pool the pool
+ * \return the core used by the pool
+ */
+uint alarm_pool_core_num(alarm_pool_t *pool);
+
+/**
  * \brief Destroy the alarm pool, cancelling all alarms and freeing up the underlying hardware alarm
  * \ingroup alarm
  * \param pool the pool

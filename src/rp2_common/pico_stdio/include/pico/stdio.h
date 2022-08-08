@@ -52,9 +52,10 @@ typedef struct stdio_driver stdio_driver_t;
  * When stdio_usb is configured, this method can be optionally made to block, waiting for a connection
  * via the variables specified in \ref stdio_usb_init (i.e. \ref PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS)
  *
+ * \return true if at least one output was successfully initialized, false otherwise.
  * \see stdio_uart, stdio_usb, stdio_semihosting
  */
-void stdio_init_all(void);
+bool stdio_init_all(void);
 
 /*! \brief Initialize all of the present standard stdio types that are linked into the binary.
  * \ingroup pico_stdio
