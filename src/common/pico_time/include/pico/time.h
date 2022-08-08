@@ -198,7 +198,7 @@ static inline bool is_nil_time(absolute_time_t t) {
  * \note  These functions should not be called from an IRQ handler.
  *
  * \note  Lower powered sleep requires use of the \link alarm_pool_get_default default alarm pool\endlink which may
- * be disabled by the #PICO_TIME_DEFAULT_ALARM_POOL_DISABLED define or currently full in which case these functions
+ * be disabled by the PICO_TIME_DEFAULT_ALARM_POOL_DISABLED #define or currently full in which case these functions
  * become busy waits instead.
  *
  * \note  Whilst \a sleep_ functions are preferable to \a busy_wait functions from a power perspective, the \a busy_wait equivalent function
