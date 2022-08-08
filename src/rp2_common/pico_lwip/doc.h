@@ -24,6 +24,7 @@
  * * \c \b pico_lwip_netbios - 
  * * \c \b pico_lwip_tftp - 
  * * \c \b pico_lwip_mbedtls -
+ * * \c \b pico_lwip_mqtt -
  *
  * The SDK Provides a common set of functionality in \c \p pico_lwip which aggregates:
  *
