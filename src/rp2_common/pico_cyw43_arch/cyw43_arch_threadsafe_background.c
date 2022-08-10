@@ -192,7 +192,11 @@ int cyw43_arch_init(void) {
     irq_set_enabled(IO_IRQ_BANK0, true);
 
 #if CYW43_LWIP
-    lwip_init();
+    static bool lwip_init_called = false;
+    if (!lwip_init_called) {
+      lwip_init_called = true;
+      lwip_init();
+    }
 #endif
     // start low priority handler (no background work is done before this)
     bool ok = low_prio_irq_init(PICO_LOWEST_IRQ_PRIORITY);
