@@ -92,7 +92,7 @@ static void stdio_usb_out_chars(const char *buf, int length) {
         if (owner == get_core_num()) return; // would deadlock otherwise
         mutex_enter_blocking(&stdio_usb_mutex);
     }
-    if (tud_cdc_connected()) {
+    if (stdio_usb_connected()) {
         for (int i = 0; i < length;) {
             int n = length - i;
             int avail = (int) tud_cdc_write_available();
@@ -106,7 +106,7 @@ static void stdio_usb_out_chars(const char *buf, int length) {
             } else {
                 tud_task();
                 tud_cdc_write_flush();
-                if (!tud_cdc_connected() ||
+                if (!stdio_usb_connected() ||
                     (!tud_cdc_write_available() && time_us_64() > last_avail_time + PICO_STDIO_USB_STDOUT_TIMEOUT_US)) {
                     break;
                 }
@@ -126,7 +126,7 @@ int stdio_usb_in_chars(char *buf, int length) {
         mutex_enter_blocking(&stdio_usb_mutex);
     }
     int rc = PICO_ERROR_NO_DATA;
-    if (tud_cdc_connected() && tud_cdc_available()) {
+    if (stdio_usb_connected() && tud_cdc_available()) {
         int count = (int) tud_cdc_read(buf, (uint32_t) length);
         rc =  count ? count : PICO_ERROR_NO_DATA;
     } else {
@@ -210,8 +210,14 @@ bool stdio_usb_init(void) {
 }
 
 bool stdio_usb_connected(void) {
+#if PICO_STDIO_USB_CONNECTION_WITHOUT_DTR
+    return tud_ready();
+#else
+    // this actually checks DTR
     return tud_cdc_connected();
+#endif
 }
+
 #else
 #warning stdio USB was configured along with user use of TinyUSB device mode, but CDC is not enabled
 bool stdio_usb_init(void) {
