@@ -123,9 +123,13 @@ int cyw43_arch_init(void) {
     cyw43_worker_ran_sem = xSemaphoreCreateBinary();
 
 #if CYW43_LWIP
-    SemaphoreHandle_t init_sem = xSemaphoreCreateBinary();
-    tcpip_init(tcpip_init_done, init_sem);
-    xSemaphoreTake(init_sem, portMAX_DELAY);
+    static bool tcpip_init_called = false;
+    if (!tcpip_init_called) {
+      tcpip_init_called = true;
+      SemaphoreHandle_t init_sem = xSemaphoreCreateBinary();
+      tcpip_init(tcpip_init_done, init_sem);
+      xSemaphoreTake(init_sem, portMAX_DELAY);
+    }
 #endif
 
     timer_handle = xTimerCreate(    "cyw43_sleep_timer",       // Just a text name, not used by the kernel.
