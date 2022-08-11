@@ -213,7 +213,7 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
         struct irq_handler_chain_slot slot_data = {
                 .inst1 = 0xa100,                                                    // add r1, pc, #0
                 .inst2 = make_branch(&slot->inst2, irq_handler_chain_first_slot),   // b irq_handler_chain_first_slot
-                .inst3 = 0xbd00,                                                    // pop {pc}
+                .inst3 = 0xbd01,                                                    // pop {r0, pc}
                 .link = -1,
                 .priority = order_priority,
                 .handler = handler
@@ -237,7 +237,7 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
                     .inst2 = 0x4780,                                                        // blx r0
                     .inst3 = prev_slot->link >= 0 ?
                             make_branch(&slot->inst3, resolve_branch(&prev_slot->inst3)) : // b next_slot
-                            0xbd00,                                                        // pop {pc}
+                            0xbd01,                                                        // pop {r0, pc}
                     .link = prev_slot->link,
                     .priority = order_priority,
                     .handler = handler
@@ -319,7 +319,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
                     to_free_slot->link = next_slot->link;
                     to_free_slot->inst3 = next_slot->link >= 0 ?
                             make_branch(&to_free_slot->inst3, resolve_branch(&next_slot->inst3)) : // b mext_>slot->next_slot
-                            0xbd00;                                                                // pop {pc}
+                            0xbd01;                                                                // pop {r0, pc}
 
                     // add old next slot back to free list
                     next_slot->link = irq_hander_chain_free_slot_head;
@@ -331,7 +331,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
                         if (prev_slot) {
                             // chain is not empty
                             prev_slot->link = -1;
-                            prev_slot->inst3 = 0xbd00; // pop {pc}
+                            prev_slot->inst3 = 0xbd01; // pop {r0, pc}
                         } else {
                             // chain is not empty
                             vtable_handler = __unhandled_user_irq;
@@ -400,7 +400,7 @@ void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot) {
         for(uint i=0;i<count_of(irq_handler_chain_slots);i++) {
             if (irq_handler_chain_slots[i].link == slot_index) {
                 irq_handler_chain_slots[i].link = -1;
-                irq_handler_chain_slots[i].inst3 = 0xbd00; // pop {pc}
+                irq_handler_chain_slots[i].inst3 = 0xbd01; // pop {r0, pc}
                 found = true;
                 break;
             }
