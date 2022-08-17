@@ -54,7 +54,9 @@ irq_handler_chain_slots:
 .endr
 
 irq_handler_chain_first_slot:
-    push {lr}         // Save EXC_RETURN token, so `pop {pc}` will return from interrupt
+    push {r0, lr}     // Save EXC_RETURN token, so `pop {r0, pc}` will return from interrupt
+                      // Note that r0 does not NEED to be saved, however we must maintain
+                      // an 8 byte stack alignment, and this is the cheapest way to do so
     ldr  r0, [r1, #4] // Get `handler` field of irq_handler_chain_slot
     adds r1, #1       // r1 points to `inst3` field of slot struct. Set Thumb bit on r1,
     mov  lr, r1       // and copy to lr, so `inst3` is executed on return from handler
@@ -65,7 +67,7 @@ irq_handler_chain_remove_tail:
     subs r0, #9       // so lr points to offset +8. Note also lr has its Thumb bit set!
     ldr  r1, =irq_add_tail_to_free_list
     blx  r1
-    pop  {pc}         // Top of stack is EXC_RETURN
+    pop  {r0, pc}     // Top of stack is EXC_RETURN
 
 
 #endif
