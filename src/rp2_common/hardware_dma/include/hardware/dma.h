@@ -665,7 +665,7 @@ static inline bool dma_irqn_get_channel_status(uint irq_index, uint channel) {
  */
 static inline void dma_channel_acknowledge_irq0(uint channel) {
     check_dma_channel_param(channel);
-    hw_set_bits(&dma_hw->ints0, (1u << channel));
+    dma_hw->ints0 = 1u << channel;
 }
 
 /*! \brief  Acknowledge a channel IRQ, resetting it as the cause of DMA_IRQ_1
@@ -675,7 +675,7 @@ static inline void dma_channel_acknowledge_irq0(uint channel) {
  */
 static inline void dma_channel_acknowledge_irq1(uint channel) {
     check_dma_channel_param(channel);
-    hw_set_bits(&dma_hw->ints1, (1u << channel));
+    dma_hw->ints1 = 1u << channel;
 }
 
 /*! \brief  Acknowledge a channel IRQ, resetting it as the cause of DMA_IRQ_N
@@ -687,7 +687,10 @@ static inline void dma_channel_acknowledge_irq1(uint channel) {
 static inline void dma_irqn_acknowledge_channel(uint irq_index, uint channel) {
     invalid_params_if(DMA, irq_index > 1);
     check_dma_channel_param(channel);
-    hw_set_bits(irq_index ? &dma_hw->ints1 : &dma_hw->ints0, (1u << channel));
+    if (irq_index)
+        dma_hw->ints1 = 1u << channel;
+    else
+        dma_hw->ints0 = 1u << channel;
 }
 
 /*! \brief  Check if DMA channel is busy
