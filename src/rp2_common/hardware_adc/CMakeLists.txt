@@ -2,3 +2,5 @@ pico_simple_hardware_target(adc)
 
 # additional library
 target_link_libraries(hardware_adc INTERFACE hardware_resets)
+target_link_libraries(hardware_adc INTERFACE hardware_gpio)
+target_link_libraries(hardware_adc_headers INTERFACE hardware_gpio_headers)
