@@ -818,7 +818,7 @@ static inline bool pio_interrupt_get(PIO pio, uint pio_interrupt_num) {
 static inline void pio_interrupt_clear(PIO pio, uint pio_interrupt_num) {
     check_pio_param(pio);
     invalid_params_if(PIO, pio_interrupt_num >= 8);
-    hw_set_bits(&pio->irq, (1u << pio_interrupt_num));
+    pio->irq = (1u << pio_interrupt_num);
 }
 
 /*! \brief Return the current program counter for a state machine
