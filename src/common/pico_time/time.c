@@ -191,7 +191,7 @@ void alarm_pool_post_alloc_init(alarm_pool_t *pool, uint hardware_alarm_num) {
     hardware_alarm_set_callback(hardware_alarm_num, alarm_pool_alarm_callback);
     pool->lock = spin_lock_instance(next_striped_spin_lock_num());
     pool->hardware_alarm_num = (uint8_t) hardware_alarm_num;
-    pool->core_num = get_core_num();
+    pool->core_num = (uint8_t) get_core_num();
     pools[hardware_alarm_num] = pool;
 }
 
