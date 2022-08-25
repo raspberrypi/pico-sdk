@@ -9,7 +9,9 @@
 #include <stdarg.h>
 
 #include "pico.h"
+#if PICO_STDOUT_MUTEX
 #include "pico/mutex.h"
+#endif
 #if LIB_PICO_PRINTF_PICO
 #include "pico/printf.h"
 #endif
