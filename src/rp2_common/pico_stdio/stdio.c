@@ -241,7 +241,8 @@ int WRAPPER_FUNC(vprintf)(const char *format, va_list va) {
     }
     int ret;
 #if LIB_PICO_PRINTF_PICO
-    struct stdio_stack_buffer buffer = {.used = 0};
+    struct stdio_stack_buffer buffer;
+    buffer.used = 0;
     ret = vfctprintf(stdio_buffered_printer, &buffer, format, va);
     stdio_stack_buffer_flush(&buffer);
     stdio_flush();
