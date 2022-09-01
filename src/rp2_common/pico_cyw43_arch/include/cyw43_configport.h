@@ -70,4 +70,8 @@
 #define CYW43_SPI_PIO 1
 #endif
 
+#ifndef CYW43_WIFI_NVRAM_INCLUDE_FILE
+#define CYW43_WIFI_NVRAM_INCLUDE_FILE "wifi_nvram_43439.h"
+#endif
+
 #endif
