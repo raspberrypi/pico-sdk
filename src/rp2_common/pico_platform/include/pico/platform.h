@@ -205,12 +205,12 @@ extern "C" {
  *
  *     uint32_t __uninitialized_ram("my_group_name") foo;
  *
- * The section attribute is `.uninitialized_ram.<group>`
+ * The section attribute is `.uninitialized_data.<group>`
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
  *              garbage-collected independently
  */
-#define __uninitialized_ram(group) __attribute__((section(".uninitialized_ram." #group))) group
+#define __uninitialized_ram(group) __attribute__((section(".uninitialized_data." #group))) group
 
 /*! \brief Section attribute macro for placement in flash even in a COPY_TO_RAM binary
  *  \ingroup pico_platform
