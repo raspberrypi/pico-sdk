@@ -315,6 +315,10 @@ void stdio_set_translate_crlf(stdio_driver_t *driver, bool enabled) {
     }
     driver->crlf_enabled = enabled;
 #else
+    // Suppress -Wunused-parameter
+    (void)driver;
+    (void)enabled;
+    
     panic_unsupported();
 #endif
 }
