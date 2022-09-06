@@ -9,13 +9,15 @@
 #include <stdarg.h>
 
 #include "pico.h"
-#include "pico/mutex.h"
 #if LIB_PICO_PRINTF_PICO
 #include "pico/printf.h"
 #endif
 #include "pico/stdio.h"
 #include "pico/stdio/driver.h"
 #include "pico/time.h"
+#if PICO_STDOUT_MUTEX
+#include "pico/mutex.h"
+#endif
 
 #if LIB_PICO_STDIO_UART
 #include "pico/stdio_uart.h"
