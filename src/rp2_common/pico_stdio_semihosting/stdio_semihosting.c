@@ -34,7 +34,7 @@ static void stdio_semihosting_out_chars(const char *buf, int length) {
     "bkpt 0xab\n"
     :
     : [args] "r" (&args)
-    );
+    : "r0", "r1");
 }
 
 stdio_driver_t stdio_semihosting = {
