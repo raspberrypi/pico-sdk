@@ -93,5 +93,7 @@ void tls_init(void) {
 }
 
 void* __wrap___emutls_get_address(tls_object* object) {
+    // TLS storage is not allocated for exceptions.
+    assert(!__get_current_exception());
     return object->u.lookup[get_core_num()];
 }

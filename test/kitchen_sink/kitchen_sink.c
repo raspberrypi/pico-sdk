@@ -116,8 +116,12 @@ __force_inline int something_inlined(int x) {
 auto_init_mutex(mutex);
 auto_init_recursive_mutex(recursive_mutex);
 
-__thread int initialized_tls_var = 7;
-__thread int uninitialized_tls_var;
+#ifndef __cplusplus
+#define thread_local __thread
+#endif
+
+thread_local int initialized_tls_var = 7;
+thread_local int uninitialized_tls_var;
 
 int main(void) {
     spiggle();
