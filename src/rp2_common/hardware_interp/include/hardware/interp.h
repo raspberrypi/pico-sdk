@@ -296,7 +296,7 @@ static inline void interp_set_config(interp_hw_t *interp, uint lane, interp_conf
  */
 static inline void interp_set_force_bits(interp_hw_t *interp, uint lane, uint bits) {
     // note cannot use hw_set_bits on SIO
-    interp->ctrl[lane] |= (bits << SIO_INTERP0_CTRL_LANE0_FORCE_MSB_LSB);
+    interp->ctrl[lane] = interp->ctrl[lane] | (bits << SIO_INTERP0_CTRL_LANE0_FORCE_MSB_LSB);
 }
 
 typedef struct {
