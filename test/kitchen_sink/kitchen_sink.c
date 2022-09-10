@@ -116,6 +116,9 @@ __force_inline int something_inlined(int x) {
 auto_init_mutex(mutex);
 auto_init_recursive_mutex(recursive_mutex);
 
+__thread int initialized_tls_var = 7;
+__thread int uninitialized_tls_var;
+
 int main(void) {
     spiggle();
 
@@ -129,6 +132,12 @@ int main(void) {
     hard_assert(!mutex_try_enter(&mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
+
+    hard_assert(initialized_tls_var == 7);
+    hard_assert(uninitialized_tls_var == 0);
+    initialized_tls_var = 8;
+    hard_assert(initialized_tls_var == 8);
+
     // this should compile as we are Cortex M0+
     __asm volatile("SVC #3");
 
