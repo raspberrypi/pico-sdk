@@ -147,7 +147,7 @@ decl_isr isr_irq31
 .global __unhandled_user_irq
 .thumb_func
 __unhandled_user_irq:
-    bl __get_current_exception
+    mrs  r0, ipsr
     subs r0, #16
 .global unhandled_user_irq_num_in_r0
 unhandled_user_irq_num_in_r0:
@@ -325,12 +325,6 @@ hold_non_core0_in_bootrom:
     bl rom_func_lookup
     bx r0
 
-.global __get_current_exception
-.thumb_func
-__get_current_exception:
-    mrs  r0, ipsr
-    uxtb r0, r0
-    bx   lr
 
 // ----------------------------------------------------------------------------
 // Stack/heap dummies to set size
