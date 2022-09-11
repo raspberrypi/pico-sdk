@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #include "pico.h"
 
 #include <stdlib.h>
@@ -21,15 +27,15 @@
 
 // Same layout as libgcc __emutls_object. Unfortunately, __emutls_object doesn't appear in any header files.
 typedef struct {
-	uint size;
-	uint align;
-  union {
-      struct {
-          uint offset;
-          void *template;
-      } s;
-      void* lookup[NUM_CORES];
-  } u;
+    uint size;
+    uint align;
+    union {
+        struct {
+            uint offset;
+            void *template;
+        } s;
+        void* lookup[NUM_CORES];
+    } u;
 } tls_object;
 
 extern tls_object __emutls_array_start;
@@ -40,7 +46,7 @@ static char* tls_storage[NUM_CORES];
 void tls_init(void);
 void* __wrap___emutls_get_address(tls_object*);
 
-// Must be called after it is safe to call memcpy.
+// Must be called after it is safe to call memcpy & memset.
 void tls_init(void) {
     // Three passes:
     // 1) Calculate the offset of each thread local variable and the total storage to be allocated for each thread.
@@ -69,7 +75,7 @@ void tls_init(void) {
         // the mutex so this works, though not for a satisfying reason.
         //
         // What I would like to do here, since malloc and friends ought not to be called at this point in
-        // initialization, is decrement the heap limit buy the TLS storage size. At time of writing, the
+        // initialization, is decrement the heap limit by the TLS storage size. At time of writing, the
         // heap limit is &__StackLimit, i.e. static. It could be dynamic though.
         char* storage = tls_storage[i] = (char*) aligned_alloc(max_align, offset);
 
