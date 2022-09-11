@@ -326,10 +326,6 @@ hold_non_core0_in_bootrom:
     bl rom_func_lookup
     bx r0
 
-regular_func_with_section __get_current_exception
-    mrs r0, ipsr
-    bx lr
-
 // ----------------------------------------------------------------------------
 // Stack/heap dummies to set size
 
