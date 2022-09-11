@@ -138,7 +138,7 @@ SECTIONS
         . = ALIGN(4);
         /* emutls objects */
         PROVIDE_HIDDEN (__emutls_array_start = .);
-        KEEP(*(.data.__emutls_v.*))
+        *(.*.__emutls_v.*)
         PROVIDE_HIDDEN (__emutls_array_end = .);
 
         . = ALIGN(4);
