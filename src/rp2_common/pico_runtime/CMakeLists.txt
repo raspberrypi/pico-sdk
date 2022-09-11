@@ -38,9 +38,6 @@ endif()
 if (TARGET pico_standard_link)
     target_link_libraries(pico_runtime INTERFACE pico_standard_link)
 endif()
-if (TARGET pico_tls)
-    target_link_libraries(pico_runtime INTERFACE pico_tls)
-endif()
 
 # todo is this correct/needed?
 target_link_options(pico_runtime INTERFACE "--specs=nosys.specs")
