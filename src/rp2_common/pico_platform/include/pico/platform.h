@@ -396,7 +396,11 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
  *
  * \return the exception number if the CPU is handling an exception, or 0 otherwise
  */
-uint __get_current_exception(void);
+inline uint __get_current_exception(void) {
+    uint exception;
+    asm ("mrs %0, ipsr" : "=l" (exception));
+    return exception;
+}
 
 #define WRAPPER_FUNC(x) __wrap_ ## x
 #define REAL_FUNC(x) __real_ ## x
