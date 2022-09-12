@@ -582,7 +582,7 @@ wrapper_func __aeabi_f2d
 #endif
     shimmable_table_tail_call SF_TABLE_FLOAT2DOUBLE float2double_shim
 
-float_wrapper_section srqtf
+float_wrapper_section sqrtf
 wrapper_func_f1 sqrtf
 #if PICO_FLOAT_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
     // check for negative
