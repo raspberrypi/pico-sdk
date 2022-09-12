@@ -158,7 +158,7 @@ void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
     check_sm_param(sm);
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
-    pio->sm[sm].execctrl = pio->sm[sm].execctrl & ~(1 << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
+    hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
     uint remaining = 32;
     uint base = 0;
     while (remaining) {
@@ -180,7 +180,7 @@ void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pinvals, uint32_t pin_
     check_sm_param(sm);
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
-    pio->sm[sm].execctrl = pio->sm[sm].execctrl & ~(1 << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
+    hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
     while (pin_mask) {
         uint base = (uint)__builtin_ctz(pin_mask);
         pio->sm[sm].pinctrl =
@@ -198,7 +198,7 @@ void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t p
     check_sm_param(sm);
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
-    pio->sm[sm].execctrl = pio->sm[sm].execctrl & ~(1 << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
+    hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
     while (pin_mask) {
         uint base = (uint)__builtin_ctz(pin_mask);
         pio->sm[sm].pinctrl =
@@ -217,7 +217,7 @@ void pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pin, uint count, bool
     valid_params_if(PIO, pin < 32u);
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
-    pio->sm[sm].execctrl = pio->sm[sm].execctrl & ~(1 << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
+    hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
     uint pindir_val = is_out ? 0x1f : 0;
     while (count > 5) {
         pio->sm[sm].pinctrl = (5u << PIO_SM0_PINCTRL_SET_COUNT_LSB) | (pin << PIO_SM0_PINCTRL_SET_BASE_LSB);
