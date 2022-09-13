@@ -31,13 +31,13 @@
 
 // --- I2C ---
 #ifndef PICO_DEFAULT_I2C
-#define PICO_DEFAULT_I2C 0
+#define PICO_DEFAULT_I2C 1
 #endif
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
-#define PICO_DEFAULT_I2C_SDA_PIN 4
+#define PICO_DEFAULT_I2C_SDA_PIN 6
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
-#define PICO_DEFAULT_I2C_SCL_PIN 5
+#define PICO_DEFAULT_I2C_SCL_PIN 7
 #endif
 
 // --- SPI ---
