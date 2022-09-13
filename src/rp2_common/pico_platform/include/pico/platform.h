@@ -111,6 +111,20 @@
 extern "C" {
 #endif
 
+// Support for inline functions which we want to be inlinable by any file
+// that #includes this header, but where we need a definition to be emitted
+// in one object file (for example because it might have been called from
+// assembly). The rules for this differ between default GCC and vanilla C99
+// compilers. The macro is namespaced so that we can use the same trick for
+// different header/object file combinations if necessary.
+#ifndef __INLINE_PICO_PLATFORM
+#if __GNUC__ && !__GNUC_STDC_INLINE__
+#define __INLINE_PICO_PLATFORM extern inline
+#else
+#define __INLINE_PICO_PLATFORM inline
+#endif
+#endif
+
 /*! \brief Marker for an interrupt handler
  *  \ingroup pico_platform
  * For example an IRQ handler function called my_interrupt_handler:
@@ -432,7 +446,7 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
  *
  * \return the exception number if the CPU is handling an exception, or 0 otherwise
  */
-inline uint __get_current_exception(void) {
+__INLINE_PICO_PLATFORM uint __get_current_exception(void) {
     uint exception;
     asm ("mrs %0, ipsr" : "=l" (exception));
     return exception;

@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#define __INLINE_PICO_PLATFORM
+#include "pico/platform.h"
+
 #include "pico.h"
 #include "hardware/address_mapped.h"
 #include "hardware/regs/tbman.h"
