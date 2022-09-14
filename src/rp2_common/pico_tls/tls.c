@@ -41,8 +41,6 @@ typedef struct {
 extern tls_object __emutls_array_start;
 extern tls_object __emutls_array_end;
 
-static char* tls_storage[NUM_CORES];
-
 void tls_init(void);
 void* __wrap___emutls_get_address(tls_object*);
 
@@ -69,6 +67,7 @@ void tls_init(void) {
     }
 
     // 2) Allocate storage for each thread and initialize the thread local variables to their initial value.
+    char* stores[NUM_CORES];
     for (uint i = 0; i < NUM_CORES; ++i) {
         // TODO: tls_init is invoked before pico_malloc's auto-initialized mutex has been initialized.
         // However, aligned_alloc and memalign are not wrapped by pico_malloc so don't acquire or release
@@ -77,7 +76,7 @@ void tls_init(void) {
         // What I would like to do here, since malloc and friends ought not to be called at this point in
         // initialization, is decrement the heap limit by the TLS storage size. At time of writing, the
         // heap limit is &__StackLimit, i.e. static. It could be dynamic though.
-        char* storage = tls_storage[i] = (char*) aligned_alloc(max_align, offset);
+        char* storage = stores[i] = (char*) aligned_alloc(max_align, offset);
 
         for (tls_object* object = &__emutls_array_start; object < &__emutls_array_end; ++object) {
             if (object->u.s.template) {
@@ -93,7 +92,7 @@ void tls_init(void) {
     for (tls_object* object = &__emutls_array_start; object < &__emutls_array_end; ++object) {
         uint offset = object->u.s.offset;
         for (uint i = 0; i < NUM_CORES; ++i) {
-            object->u.lookup[i] = tls_storage[i] + offset;
+            object->u.lookup[i] = stores[i] + offset;
         }
     }
 }
