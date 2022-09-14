@@ -42,6 +42,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(pico_unique_id)
 
     pico_add_subdirectory(pico_bit_ops)
+    pico_add_subdirectory(pico_debug)
     pico_add_subdirectory(pico_divider)
     pico_add_subdirectory(pico_double)
     pico_add_subdirectory(pico_int64_ops)
