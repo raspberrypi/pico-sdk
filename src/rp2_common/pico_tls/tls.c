@@ -7,13 +7,9 @@
 #include "pico.h"
 
 #include <assert.h>
+#include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
-
-#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 201112)
-#include <malloc.h>
-#define aligned_alloc memalign
-#endif
 
 // From emutls.c:
 // 'For every TLS variable xyz, there is one __emutls_control variable named __emutls_v.xyz. If xyz has
@@ -77,7 +73,7 @@ void tls_init(void) {
         // What I would like to do here, since malloc and friends ought not to be called at this point in
         // initialization, is decrement the heap limit by the TLS storage size. At time of writing, the
         // heap limit is &__StackLimit, i.e. static. It could be dynamic though.
-        char* storage = stores[i] = (char*) aligned_alloc(max_align, offset);
+        char* storage = stores[i] = (char*) memalign(max_align, offset);
 
         for (tls_object* object = &__emutls_array_start; object < &__emutls_array_end; ++object) {
             if (object->u.s.template) {
