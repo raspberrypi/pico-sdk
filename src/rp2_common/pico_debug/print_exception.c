@@ -90,8 +90,6 @@ static const char* const exception_names[] = {
     "USER_IRQ_5",
 };
 
-static_assert(count_of(exception_names) == 16 + 32);
-
 static bool verify_stack_address(uint address) {
     if ((address & 3) != 0) return false;
 
