@@ -106,7 +106,7 @@ static uint safe_read_stack(const volatile uint* address) {
 }
 
 void debug_print_exception(uint exc_return, uint ipsr, const struct sw_saved_regs_t* sw_saved_regs) {
-    static const char* const separator = "***********************************************************\r\n";
+    static const char* const separator = "-----------------------------------------------------------\r\n";
 
     // Stack bounds are unknown - an RTOS might have put it anywhere in static RAM - so there is a danger of accidentally hitting an
     // MPU region. It might be worth verifying stack addresses against each enabled MPU region but not clear why. Until someone
@@ -141,7 +141,7 @@ void debug_print_exception(uint exc_return, uint ipsr, const struct sw_saved_reg
     printf("  R8: %08x   R9: %08x  R10: %08x  R11: %08x\r\n", sw_saved_regs->r8, sw_saved_regs->r9, sw_saved_regs->r10, sw_saved_regs->r11);
     printf(" R12: %08x   SP: %08x   LR: %08x   PC: %08x\r\n", safe_read_stack(&hw_saved_regs->r12), sp,
                                                               safe_read_stack(&hw_saved_regs->lr), safe_read_stack(&hw_saved_regs->pc));
-    printf("               XPSR: %08x  PSP: %08x  MSP: %08x\r\n", safe_read_stack(&hw_saved_regs->xpsr), psp, msp);
+    printf("                MSP: %08x  PSP: %08x XPSR: %08x\r\n", msp, psp, safe_read_stack(&hw_saved_regs->xpsr));
     printf("         EXC_RETURN: %08x             PRIMASK: %08x\r\n", exc_return, sw_saved_regs->primask);
     printf(separator);
 
@@ -151,7 +151,7 @@ void debug_print_exception(uint exc_return, uint ipsr, const struct sw_saved_reg
             if (verify_stack_address(sp)) {
                 printf(" %08x", *(uint*)sp);
             } else {
-                printf(" BAD ADDR");
+                printf("         ");
             }
             sp += 4;
         }
