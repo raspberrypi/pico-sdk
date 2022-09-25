@@ -7,25 +7,11 @@
 .thumb
 
 // tag::hw_div_s32[]
-
-.macro __divider_delay
-    // delay 8 cycles
-    b 1f
-1:  b 1f
-1:  b 1f
-1:  b 1f
-1:
-.endm
-
 regular_func_with_section hw_divider_divmod_s32
     ldr r3, =(SIO_BASE)
     str r0, [r3, #SIO_DIV_SDIVIDEND_OFFSET]
     str r1, [r3, #SIO_DIV_SDIVISOR_OFFSET]
-    __divider_delay
-    // return 64 bit value so we can efficiently return both (note quotient must be read last)
-    ldr r1, [r3, #SIO_DIV_REMAINDER_OFFSET]
-    ldr r0, [r3, #SIO_DIV_QUOTIENT_OFFSET]
-    bx lr
+    b hw_divider_divmod_return
 // end::hw_div_s32[]
 
 // tag::hw_div_u32[]
@@ -33,12 +19,20 @@ regular_func_with_section hw_divider_divmod_u32
     ldr r3, =(SIO_BASE)
     str r0, [r3, #SIO_DIV_UDIVIDEND_OFFSET]
     str r1, [r3, #SIO_DIV_UDIVISOR_OFFSET]
-    __divider_delay
-    // return 64 bit value so we can efficiently return both (note quotient must be read last)
+    b hw_divider_divmod_return
+// end::hw_div_u32[]
+
+// Common delay and return section for s32 and u32
+.section .text.hw_divider_divmod_return
+hw_divider_divmod_return:
+    // Branching here is 2 cycles, delay another 6
+    b 1f
+1:  b 1f
+1:  b 1f
+1:  // return 64 bit value so we can efficiently return both (note quotient must be read last)
     ldr r1, [r3, #SIO_DIV_REMAINDER_OFFSET]
     ldr r0, [r3, #SIO_DIV_QUOTIENT_OFFSET]
     bx lr
-// end::hw_div_u32[]
 
 regular_func_with_section hw_divider_save_state
     ldr r3, =SIO_BASE
