@@ -17,8 +17,6 @@
 1:
 .endm
 
-.align 2
-
 regular_func_with_section hw_divider_divmod_s32
     ldr r3, =(SIO_BASE)
     str r0, [r3, #SIO_DIV_SDIVIDEND_OFFSET]
@@ -29,8 +27,6 @@ regular_func_with_section hw_divider_divmod_s32
     ldr r0, [r3, #SIO_DIV_QUOTIENT_OFFSET]
     bx lr
 // end::hw_div_s32[]
-
-.align 2
 
 // tag::hw_div_u32[]
 regular_func_with_section hw_divider_divmod_u32
