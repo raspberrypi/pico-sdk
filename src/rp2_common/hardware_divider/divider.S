@@ -44,33 +44,24 @@ regular_func_with_section hw_divider_divmod_u32
     bx lr
 // end::hw_div_u32[]
 
-#if SIO_DIV_CSR_READY_LSB == 0
-.equ SIO_DIV_CSR_READY_SHIFT_FOR_CARRY, 1
-#else
-#error need to change SHIFT above
-#endif
-
 regular_func_with_section hw_divider_save_state
-    push {r4, r5, lr}
-    ldr r5, =SIO_BASE
-    ldr r4, [r5, #SIO_DIV_CSR_OFFSET]
-    # wait for results as we can't save signed-ness of operation
-1:
-    lsrs r4, #SIO_DIV_CSR_READY_SHIFT_FOR_CARRY
-    bcc 1b
-    ldr r1, [r5, #SIO_DIV_UDIVIDEND_OFFSET]
-    ldr r2, [r5, #SIO_DIV_UDIVISOR_OFFSET]
-    ldr r3, [r5, #SIO_DIV_REMAINDER_OFFSET]
-    ldr r4, [r5, #SIO_DIV_QUOTIENT_OFFSET]
-    stmia r0!, {r1-r4}
-    pop {r4, r5, pc}
+    ldr r3, =SIO_BASE
+    ldr r1, [r3, #SIO_DIV_UDIVIDEND_OFFSET]
+    ldr r2, [r3, #SIO_DIV_UDIVISOR_OFFSET]
+    stmia r0!, {r1-r2}
+    // The 8 cycles needed to guarantee that the result is ready is ensured by the preceeding
+    // code of 7 cycles together with any branch to it taking at least 2 cycles.
+    ldr r1, [r3, #SIO_DIV_REMAINDER_OFFSET]
+    ldr r2, [r3, #SIO_DIV_QUOTIENT_OFFSET]
+    stmia r0!, {r1-r2}
+    bx lr
 
 regular_func_with_section hw_divider_restore_state
-    push {r4, r5, lr}
-    ldr r5, =SIO_BASE
-    ldmia r0!, {r1-r4}
-    str r1, [r5, #SIO_DIV_UDIVIDEND_OFFSET]
-    str r2, [r5, #SIO_DIV_UDIVISOR_OFFSET]
-    str r3, [r5, #SIO_DIV_REMAINDER_OFFSET]
-    str r4, [r5, #SIO_DIV_QUOTIENT_OFFSET]
-    pop {r4, r5, pc}
+    ldr r3, =SIO_BASE
+    ldmia r0!, {r1-r2}
+    str r1, [r3, #SIO_DIV_UDIVIDEND_OFFSET]
+    str r2, [r3, #SIO_DIV_UDIVISOR_OFFSET]
+    ldmia r0!, {r1-r2}
+    str r1, [r3, #SIO_DIV_REMAINDER_OFFSET]
+    str r2, [r3, #SIO_DIV_QUOTIENT_OFFSET]
+    bx lr
