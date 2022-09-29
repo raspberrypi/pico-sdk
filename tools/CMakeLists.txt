@@ -44,12 +44,17 @@ function(pico_generate_pio_header TARGET PIO)
 endfunction()
 
 function(pico_add_uf2_output TARGET)
+    get_target_property(${TARGET}_archive_directory ${TARGET} ARCHIVE_OUTPUT_DIRECTORY)
+    if ((NOT ${${TARGET}_archive_directory} STREQUAL ${TARGET}_archive_directory-NOTFOUND) AND (NOT IS_DIRECTORY ${${TARGET}_archive_directory}))
+        add_custom_target(${TARGET}-make-archive-directory ALL
+            COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_PROPERTY:${TARGET},ARCHIVE_OUTPUT_DIRECTORY>)
+    endif()
     if (NOT ELF2UF2_FOUND)
         set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PICO_SDK_PATH}/tools)
         find_package(ELF2UF2)
     endif()
     if (ELF2UF2_FOUND)
         add_custom_command(TARGET ${TARGET} POST_BUILD
-                COMMAND ELF2UF2 $<TARGET_FILE:${TARGET}> $<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2)
+            COMMAND ELF2UF2 $<TARGET_FILE:${TARGET}> $<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},ARCHIVE_OUTPUT_DIRECTORY>>,$<TARGET_PROPERTY:${TARGET},ARCHIVE_OUTPUT_DIRECTORY>/,>$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2)
     endif()
 endfunction()
