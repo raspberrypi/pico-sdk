@@ -41,6 +41,10 @@ static stdio_driver_t *filter;
 #if PICO_STDOUT_MUTEX
 auto_init_mutex(print_mutex);
 
+#ifndef PICO_STDOUT_SERIALIZE_DELAY_MS
+#define PICO_STDOUT_SERIALIZE_DELAY_MS 15
+#endif
+
 bool stdout_serialize_begin(void) {
     lock_owner_id_t caller = lock_get_caller_owner_id();
     // not using lock_owner_id_t to avoid backwards incompatibility change to mutex_try_enter API
@@ -51,7 +55,7 @@ bool stdout_serialize_begin(void) {
             return false;
         }
         // we are not a nested call, so lets wait
-        mutex_enter_blocking(&print_mutex);
+        return mutex_enter_timeout_ms(&print_mutex, PICO_STDOUT_SERIALIZE_DELAY_MS);
     }
     return true;
 }
