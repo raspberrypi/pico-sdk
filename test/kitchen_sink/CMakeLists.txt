@@ -42,6 +42,7 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_time
     pico_unique_id
     pico_util
+    pico_uzlib
 )
 
 add_library(kitchen_sink_options INTERFACE)
@@ -176,4 +177,8 @@ endif()
 
 if (TARGET pico_btstack_base AND COMMAND suppress_btstack_warnings)
     suppress_btstack_warnings()
+endif()
+
+if (TARGET pico_uzlib AND COMMAND suppress_uzlib_warnings)
+    suppress_uzlib_warnings()
 endif()
