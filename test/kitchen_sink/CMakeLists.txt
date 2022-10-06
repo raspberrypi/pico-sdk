@@ -40,6 +40,7 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_time
     pico_unique_id
     pico_util
+    pico_uzlib
 )
 
 add_library(kitchen_sink_options INTERFACE)
@@ -151,4 +152,8 @@ if (TARGET pico_cyw43_arch)
         target_link_libraries(kitchen_sink_lwip_background pico_mbedtls)
         suppress_mbedtls_warnings()
     endif()
+endif()
+
+if (TARGET pico_uzlib AND COMMAND suppress_uzlib_warnings)
+    suppress_uzlib_warnings()
 endif()

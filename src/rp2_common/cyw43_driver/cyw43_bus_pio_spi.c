@@ -477,10 +477,6 @@ int cyw43_write_reg_u8(cyw43_int_t *self, uint32_t fn, uint32_t reg, uint32_t va
     return _cyw43_write_reg(self, fn, reg, val, 1);
 }
 
-#if MAX_BLOCK_SIZE > 0x7f8
-#error Block size is wrong for SPI
-#endif
-
 // Assumes we're reading into spid_buf
 int cyw43_read_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len, uint8_t *buf) {
     assert(fn != BACKPLANE_FUNCTION || (len <= 64 && (addr + len) <= 0x8000));
@@ -535,9 +531,14 @@ int cyw43_write_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len,
         int res = cyw43_spi_transfer(self, (uint8_t *)&self->spi_header[1], aligned_len + 4, NULL, 0);
         logic_debug_set(pin_WIFI_TX, 0);
         return res;
+    } else if (src > self->spid_buf + sizeof(uint32_t) && src < (self->spid_buf + sizeof(self->spid_buf))) {
+        assert(src + len <= (self->spid_buf + sizeof(self->spid_buf))); // don't go over the end of the buffer
+        uint32_t *spi_header = (void*)(self->spid_buf + (src - self->spid_buf) - sizeof(uint32_t));
+        *spi_header = make_cmd(true, true, fn, addr, len);
+        return cyw43_spi_transfer(self, (uint8_t *)spi_header, aligned_len + 4, NULL, 0);
     } else {
         // todo: would be nice to get rid of this. Only used for firmware download?
-        assert(src < self->spid_buf || src >= (self->spid_buf + sizeof(self->spid_buf)));
+        assert(src < self->spid_buf || src >= (self->spid_buf + sizeof(self->spid_buf))); // check we're not using self->spid_buf
         self->spi_header[1] = make_cmd(true, true, fn, addr, len);
         memcpy(self->spid_buf, src, len);
         return cyw43_spi_transfer(self, (uint8_t *)&self->spi_header[1], aligned_len + 4, NULL, 0);
