@@ -10,3 +10,6 @@
 [submodule "lib/mbedtls"]
 	path = lib/mbedtls
 	url = https://github.com/Mbed-TLS/mbedtls.git
+[submodule "lib/uzlib"]
+	path = lib/uzlib
+	url = git@github.com:pfalcon/uzlib.git
