@@ -13,3 +13,6 @@
 [submodule "lib/btstack"]
 	path = lib/btstack
 	url = https://github.com/bluekitchen/btstack.git
+[submodule "lib/uzlib"]
+	path = lib/uzlib
+	url = git@github.com:pfalcon/uzlib.git
