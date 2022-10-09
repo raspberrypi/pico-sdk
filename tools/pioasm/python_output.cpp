@@ -255,7 +255,7 @@ struct python_output : public output_format {
                 if (source.empty() || dest.empty() || operation == 3) {
                     invalid = true;
                 }
-                if (dest == source && (arg1 == 1 || arg2 == 2)) {
+                if (dest == source && (arg1 == 1 || arg2 == 2) && operation == 0) {
                     op("nop");
                     op_guts("");
                 } else {
