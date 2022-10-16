@@ -69,8 +69,6 @@ typedef int sys_prot_t;
 
 #endif
 
-#define LWIP_PLATFORM_ASSERT(x) do { if(!(x)) while(1); } while(0)
-
 unsigned int pico_lwip_rand(void);
 #ifndef LWIP_RAND
 // Use ROSC based random number generation, more for the fact that rand() may not be seeded, than anything else
