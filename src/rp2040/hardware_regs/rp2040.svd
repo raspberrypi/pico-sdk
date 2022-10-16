@@ -29724,6 +29724,206 @@
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
                 <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
+                <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
                   <value>59</value>
@@ -30007,6 +30207,206 @@
                 The channel uses the transfer request signal to pace its data transfer rate. Sources for TREQ signals are internal (TIMERS) or external (DREQ, a Data Request from the system).\n
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
                 <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
@@ -30292,6 +30692,206 @@
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
                 <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
+                <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
                   <value>59</value>
@@ -30575,6 +31175,206 @@
                 The channel uses the transfer request signal to pace its data transfer rate. Sources for TREQ signals are internal (TIMERS) or external (DREQ, a Data Request from the system).\n
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
                 <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
@@ -30860,6 +31660,206 @@
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
                 <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
+                <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
                   <value>59</value>
@@ -31143,6 +32143,206 @@
                 The channel uses the transfer request signal to pace its data transfer rate. Sources for TREQ signals are internal (TIMERS) or external (DREQ, a Data Request from the system).\n
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
                 <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
@@ -31428,6 +32628,206 @@
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
                 <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
+                <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
                   <value>59</value>
@@ -31711,6 +33111,206 @@
                 The channel uses the transfer request signal to pace its data transfer rate. Sources for TREQ signals are internal (TIMERS) or external (DREQ, a Data Request from the system).\n
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
                 <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
@@ -31996,6 +33596,206 @@
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
                 <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
+                <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
                   <value>59</value>
@@ -32279,6 +34079,206 @@
                 The channel uses the transfer request signal to pace its data transfer rate. Sources for TREQ signals are internal (TIMERS) or external (DREQ, a Data Request from the system).\n
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
                 <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
@@ -32564,6 +34564,206 @@
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
                 <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
+                <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
                   <value>59</value>
@@ -32847,6 +35047,206 @@
                 The channel uses the transfer request signal to pace its data transfer rate. Sources for TREQ signals are internal (TIMERS) or external (DREQ, a Data Request from the system).\n
                 0x0 to 0x3a -&gt; select DREQ n as TREQ</description>
               <enumeratedValues>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 0 as TREQ</description>
+                  <name>PIO0_TX0</name>
+                  <value>0</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 1 as TREQ</description>
+                  <name>PIO0_TX1</name>
+                  <value>1</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 2 as TREQ</description>
+                  <name>PIO0_TX2</name>
+                  <value>2</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's TX FIFO 3 as TREQ</description>
+                  <name>PIO0_TX3</name>
+                  <value>3</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 0 as TREQ</description>
+                  <name>PIO0_RX0</name>
+                  <value>4</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 1 as TREQ</description>
+                  <name>PIO0_RX1</name>
+                  <value>5</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 2 as TREQ</description>
+                  <name>PIO0_RX2</name>
+                  <value>6</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO0's RX FIFO 3 as TREQ</description>
+                  <name>PIO0_RX3</name>
+                  <value>7</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 0 as TREQ</description>
+                  <name>PIO1_TX0</name>
+                  <value>8</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 1 as TREQ</description>
+                  <name>PIO1_TX1</name>
+                  <value>9</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 2 as TREQ</description>
+                  <name>PIO1_TX2</name>
+                  <value>10</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's TX FIFO 3 as TREQ</description>
+                  <name>PIO1_TX3</name>
+                  <value>11</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 0 as TREQ</description>
+                  <name>PIO1_RX0</name>
+                  <value>12</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 1 as TREQ</description>
+                  <name>PIO1_RX1</name>
+                  <value>13</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 2 as TREQ</description>
+                  <name>PIO1_RX2</name>
+                  <value>14</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PIO1's RX FIFO 3 as TREQ</description>
+                  <name>PIO1_RX3</name>
+                  <value>15</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's TX FIFO as TREQ</description>
+                  <name>SPI0_TX</name>
+                  <value>16</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI0's RX FIFO as TREQ</description>
+                  <name>SPI0_RX</name>
+                  <value>17</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's TX FIFO as TREQ</description>
+                  <name>SPI1_TX</name>
+                  <value>18</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select SPI1's RX FIFO as TREQ</description>
+                  <name>SPI1_RX</name>
+                  <value>19</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's TX FIFO as TREQ</description>
+                  <name>UART0_TX</name>
+                  <value>20</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART0's RX FIFO as TREQ</description>
+                  <name>UART0_RX</name>
+                  <value>21</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's TX FIFO as TREQ</description>
+                  <name>UART1_TX</name>
+                  <value>22</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select UART1's RX FIFO as TREQ</description>
+                  <name>UART1_RX</name>
+                  <value>23</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 0's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP0</name>
+                  <value>24</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 1's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP1</name>
+                  <value>25</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 2's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP2</name>
+                  <value>26</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 3's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP3</name>
+                  <value>27</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 4's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP4</name>
+                  <value>28</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 5's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP5</name>
+                  <value>29</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 6's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP6</name>
+                  <value>30</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select PWM Counter 7's Wrap Value as TREQ</description>
+                  <name>PWM_WRAP7</name>
+                  <value>31</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's TX FIFO as TREQ</description>
+                  <name>I2C0_TX</name>
+                  <value>32</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C0's RX FIFO as TREQ</description>
+                  <name>I2C0_RX</name>
+                  <value>33</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's TX FIFO as TREQ</description>
+                  <name>I2C1_TX</name>
+                  <value>34</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select I2C1's RX FIFO as TREQ</description>
+                  <name>I2C1_RX</name>
+                  <value>35</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the ADC as TREQ</description>
+                  <name>ADC</name>
+                  <value>36</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP Streaming FIFO as TREQ</description>
+                  <name>XIP_STREAM</name>
+                  <value>37</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI TX FIFO as TREQ</description>
+                  <name>XIP_SSITX</name>
+                  <value>38</value>
+                </enumeratedValue>
+                <enumeratedValue>
+                  <description>Select the XIP SSI RX FIFO as TREQ</description>
+                  <name>XIP_SSIRX</name>
+                  <value>39</value>
+                </enumeratedValue>
                 <enumeratedValue>
                   <description>Select Timer 0 as TREQ</description>
                   <name>TIMER0</name>
