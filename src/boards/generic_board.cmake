@@ -21,5 +21,3 @@ else()
     string(CONCAT msg ${msg} "   Looked for ${PICO_BOARD}.cmake in ${DIRS} (additional paths specified by PICO_BOARD_CMAKE_DIRS)")
     message(FATAL_ERROR ${msg})
 endif()
-
-set(PICO_CYW43_SUPPORTED "0" CACHE INTERNAL "Exclude support for PICO_CYW43")
