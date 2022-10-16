@@ -19,11 +19,10 @@ need to change SHIFT above
 #endif
 
 // SIO_BASE ptr in r2; pushes r4-r7, lr to stack
-// requires that division started at least 2 cycles prior to the start of the macro
 .macro save_div_state_and_lr
-// originally we did this, however a) it uses r3, and b) the push takes 6 cycles, b)
-// any IRQ which uses the divider will necessarily put the data back, which will
-// immediately make it ready
+// originally we did this, however a) it uses r3, and b) the push and dividend/divisor
+// readout takes 8 cycles, c) any IRQ which uses the divider will necessarily put the
+// data back, which will immediately make it ready
 //
 //    // ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
 //    // // wait for results as we can't save signed-ness of operation
@@ -31,7 +30,7 @@ need to change SHIFT above
 //    //     lsrs r3, #SIO_DIV_CSR_READY_SHIFT_FOR_CARRY
 //    //     bcc 1b
 
-// 6 cycles
+// 6 cycle push + 2 ldr ensures the 8 cycle delay before remainder and quotient are ready
 push {r4, r5, r6, r7, lr}
 // note we must read quotient last, and since it isn't the last reg, we'll not use ldmia!
 ldr r4, [r2, #SIO_DIV_UDIVIDEND_OFFSET]

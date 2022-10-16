@@ -53,14 +53,10 @@
 .macro save_div_state_and_lr_64
     push {r4, r5, r6, r7, lr}
     ldr r6, =SIO_BASE
-1:
-    ldr r5, [r6, #SIO_DIV_CSR_OFFSET]
-    // wait for results as we can't save signed-ness of operation
-    lsrs r5, #SIO_DIV_CSR_READY_SHIFT_FOR_CARRY
-    bcc 1b
     // note we must read quotient last, and since it isn't the last reg, we'll not use ldmia!
     ldr r4, [r6, #SIO_DIV_UDIVIDEND_OFFSET]
     ldr r5, [r6, #SIO_DIV_UDIVISOR_OFFSET]
+    // No need to wait before reading result as long as preceeding code takes more than 8 cycles
     ldr r7, [r6, #SIO_DIV_REMAINDER_OFFSET]
     ldr r6, [r6, #SIO_DIV_QUOTIENT_OFFSET]
 .endm
@@ -152,8 +148,6 @@ regular_func divmod_s32s32_unsafe
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
 .align 2
 regular_func divmod_s32s32_savestate
-    // note that we must be at least 2 cycles into division at this point,
-    // which we are because of the firty check before getting here (and of course the function call before that)
     save_div_state_and_lr
     bl divmod_s32s32_unsafe
     restore_div_state_and_return
