@@ -69,6 +69,11 @@ typedef int sys_prot_t;
 
 #endif
 
+#ifndef LWIP_PLATFORM_ASSERT
+void panic(const char *fmt, ...);
+#define LWIP_PLATFORM_ASSERT(x) panic(x)
+#endif
+
 unsigned int pico_lwip_rand(void);
 #ifndef LWIP_RAND
 // Use ROSC based random number generation, more for the fact that rand() may not be seeded, than anything else
