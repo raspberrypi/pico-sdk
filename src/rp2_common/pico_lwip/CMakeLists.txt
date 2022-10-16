@@ -53,7 +53,6 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
 
     add_library(pico_lwip_core4 INTERFACE)
     target_sources(pico_lwip_core4 INTERFACE
-            ${PICO_LWIP_PATH}/src/core/ipv4/acd.c
             ${PICO_LWIP_PATH}/src/core/ipv4/autoip.c
             ${PICO_LWIP_PATH}/src/core/ipv4/dhcp.c
             ${PICO_LWIP_PATH}/src/core/ipv4/etharp.c
@@ -63,6 +62,13 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             ${PICO_LWIP_PATH}/src/core/ipv4/ip4.c
             ${PICO_LWIP_PATH}/src/core/ipv4/ip4_addr.c
             )
+
+    # Doesn't exists in version earlier than 2.1.3
+    if (EXISTS ${PICO_LWIP_PATH}/src/core/ipv4/acd.c)
+        target_sources(pico_lwip_core4 INTERFACE
+            ${PICO_LWIP_PATH}/src/core/ipv4/acd.c
+            )
+    endif()
 
     add_library(pico_lwip_core6 INTERFACE)
     target_sources(pico_lwip_core6 INTERFACE
@@ -207,9 +213,15 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
     add_library(pico_lwip_mdns INTERFACE)
     target_sources(pico_lwip_mdns INTERFACE
             ${PICO_LWIP_PATH}/src/apps/mdns/mdns.c
-            ${PICO_LWIP_PATH}/src/apps/mdns/mdns_out.c
-            ${PICO_LWIP_PATH}/src/apps/mdns/mdns_domain.c
             )
+
+    # Old versions of lwip had everything in mdns.c
+    if (EXISTS ${PICO_LWIP_PATH}/src/apps/mdns/mdns_out.c)
+        target_sources(pico_lwip_mdns INTERFACE
+                ${PICO_LWIP_PATH}/src/apps/mdns/mdns_out.c
+                ${PICO_LWIP_PATH}/src/apps/mdns/mdns_domain.c
+                )
+    endif()
 
     # NetBIOS name server
     add_library(pico_lwip_netbios INTERFACE)
