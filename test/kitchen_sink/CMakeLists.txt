@@ -142,11 +142,13 @@ if (TARGET pico_cyw43_arch)
     target_include_directories(kitchen_sink_lwip_background PRIVATE
             ${CMAKE_CURRENT_LIST_DIR})
 
-    target_link_libraries(kitchen_sink_lwip_poll
-        pico_lwip_mbedtls
-        pico_mbedtls)
-    target_link_libraries(kitchen_sink_lwip_background
-        pico_lwip_mbedtls
-        pico_mbedtls)
-    suppress_mbedtls_warnings()
+    if (TARGET pico_lwip_mbedtls)
+        target_link_libraries(kitchen_sink_lwip_poll pico_lwip_mbedtls)
+        target_link_libraries(kitchen_sink_lwip_background pico_lwip_mbedtls)
+    endif()
+    if (TARGET pico_mbedtls)
+        target_link_libraries(kitchen_sink_lwip_poll pico_mbedtls)
+        target_link_libraries(kitchen_sink_lwip_background pico_mbedtls)
+        suppress_mbedtls_warnings()
+    endif()
 endif()
