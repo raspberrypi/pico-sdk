@@ -108,8 +108,8 @@ typedef struct __packed _binary_info_block_device {
 
 typedef struct __packed _binary_info_pins_with_func {
     struct _binary_info_core core;
-    // p4_5 : p3_5 : p2_5 : p1_5 : p0_5 : func_4 : 001_3 //individual pins p0,p1,p2,p3,p4 ... if fewer than 5 then duplicate p
-    //                    phi_5 : plo_5 : func_4 : 010_3 // pin range plo-phi inclusive
+    // p4_5 : p3_5 : p2_5 : p1_5 : p0_5 : func_4 : 010_3 //individual pins p0,p1,p2,p3,p4 ... if fewer than 5 then duplicate p
+    //                    phi_5 : plo_5 : func_4 : 001_3 // pin range plo-phi inclusive
     uint32_t pin_encoding;
 } binary_info_pins_with_func_t;
 
