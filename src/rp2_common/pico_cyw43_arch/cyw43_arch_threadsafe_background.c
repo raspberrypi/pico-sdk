@@ -209,7 +209,7 @@ void cyw43_arch_deinit(void) {
         periodic_alarm = -1;
     }
     gpio_set_irq_enabled(CYW43_PIN_WL_HOST_WAKE, GPIO_IRQ_LEVEL_HIGH, false);
-    gpio_remove_raw_irq_handler(IO_IRQ_BANK0, gpio_irq_handler);
+    gpio_remove_raw_irq_handler(CYW43_PIN_WL_HOST_WAKE, gpio_irq_handler);
     low_prio_irq_deinit();
     cyw43_deinit(&cyw43_state);
 }
