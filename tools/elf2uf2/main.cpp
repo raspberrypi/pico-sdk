@@ -26,6 +26,7 @@ typedef unsigned int uint;
 
 static char error_msg[512];
 static bool verbose;
+static bool binary;
 
 static int fail(int code, const char *format, ...) {
     va_list args;
@@ -93,7 +94,7 @@ struct page_fragment {
 };
 
 static int usage() {
-    fprintf(stderr, "Usage: elf2uf2 (-v) <input ELF file> <output UF2 file>\n");
+    fprintf(stderr, "Usage: elf2uf2 (-v) (-b <addr>) <input ELF file> <output UF2 file>\n");
     return ERROR_ARGS;
 }
 
@@ -242,6 +243,34 @@ static bool is_address_mapped(const std::map<uint32_t, std::vector<page_fragment
     return true;
 }
 
+static int generate_uf2(FILE *in, FILE *out, const std::map<uint32_t, std::vector<page_fragment>>& pages)
+{
+    uf2_block block;
+    block.magic_start0 = UF2_MAGIC_START0;
+    block.magic_start1 = UF2_MAGIC_START1;
+    block.flags = UF2_FLAG_FAMILY_ID_PRESENT;
+    block.payload_size = PAGE_SIZE;
+    block.num_blocks = (uint32_t)pages.size();
+    block.file_size = RP2040_FAMILY_ID;
+    block.magic_end = UF2_MAGIC_END;
+    uint page_num = 0;
+    for(auto& page_entry : pages) {
+        block.target_addr = page_entry.first;
+        block.block_no = page_num++;
+        if (verbose) {
+            printf("Page %d / %d %08x%s\n", block.block_no, block.num_blocks, block.target_addr,
+                   page_entry.second.empty() ? " (padding)": "");
+        }
+        memset(block.data, 0, sizeof(block.data));
+        int rc = realize_page(in, page_entry.second, block.data, sizeof(block.data));
+        if (rc) return rc;
+        if (1 != fwrite(&block, sizeof(uf2_block), 1, out)) {
+            return fail_write_error();
+        }
+    }
+	return 0;
+}
+
 int elf2uf2(FILE *in, FILE *out) {
     elf32_header eh;
     std::map<uint32_t, std::vector<page_fragment>> pages;
@@ -264,7 +293,6 @@ int elf2uf2(FILE *in, FILE *out) {
     if (pages.empty()) {
         return fail(ERROR_INCOMPATIBLE, "The input file has no memory pages");
     }
-    uint page_num = 0;
     if (ram_style) {
         uint32_t expected_ep_main_ram = UINT32_MAX;
         uint32_t expected_ep_xip_sram = UINT32_MAX;
@@ -321,29 +349,43 @@ int elf2uf2(FILE *in, FILE *out) {
             }
         }
     }
-    uf2_block block;
-    block.magic_start0 = UF2_MAGIC_START0;
-    block.magic_start1 = UF2_MAGIC_START1;
-    block.flags = UF2_FLAG_FAMILY_ID_PRESENT;
-    block.payload_size = PAGE_SIZE;
-    block.num_blocks = (uint32_t)pages.size();
-    block.file_size = RP2040_FAMILY_ID;
-    block.magic_end = UF2_MAGIC_END;
-    for(auto& page_entry : pages) {
-        block.target_addr = page_entry.first;
-        block.block_no = page_num++;
-        if (verbose) {
-            printf("Page %d / %d %08x%s\n", block.block_no, block.num_blocks, block.target_addr,
-                   page_entry.second.empty() ? " (padding)": "");
-        }
-        memset(block.data, 0, sizeof(block.data));
-        rc = realize_page(in, page_entry.second, block.data, sizeof(block.data));
-        if (rc) return rc;
-        if (1 != fwrite(&block, sizeof(uf2_block), 1, out)) {
-            return fail_write_error();
-        }
-    }
+	return generate_uf2(in, out, pages);
+}
+
+int read_bin(FILE *in, std::map<uint32_t, std::vector<page_fragment>>& pages, unsigned addr) {
+	fseek(in, 0, SEEK_END);
+	uint remaining = ftell(in);
+	uint file_offset = 0;
+	while (remaining) {
+		uint off = addr & (PAGE_SIZE - 1);
+		uint len = std::min(remaining, PAGE_SIZE - off);
+		auto &fragments = pages[addr - off]; // list of fragments
+		// note if filesz is zero, we want zero init which is handled because the
+		// statement above creates an empty page fragment list
+		// check overlap with any existing fragments
+		for (const auto &fragment : fragments) {
+			if ((off < fragment.page_offset + fragment.bytes) !=
+				((off + len) <= fragment.page_offset)) {
+				fail(ERROR_FORMAT, "In memory segments overlap");
+			}
+		}
+		fragments.push_back(
+				page_fragment{file_offset,off,len});
+		addr += len;
+		file_offset += len;
+		remaining -= len;
+	}
     return 0;
+}
+
+int bin2uf2(FILE *in, FILE *out, unsigned addr) {
+    std::map<uint32_t, std::vector<page_fragment>> pages;
+    int rc = read_bin(in, pages, addr);
+    if (rc) return rc;
+    if (pages.empty()) {
+        return fail(ERROR_INCOMPATIBLE, "The input file has no memory pages");
+    }
+	return generate_uf2(in, out, pages);
 }
 
 int main(int argc, char **argv) {
@@ -352,9 +394,29 @@ int main(int argc, char **argv) {
         verbose = true;
         arg++;
     }
-    if (argc < arg + 2) {
+    if (arg < argc && !strcmp(argv[arg], "-b")) {
+        binary = true;
+        arg++;
+    }
+    if (argc < arg + 2 + binary) {
         return usage();
     }
+	
+	unsigned addr;
+	if (binary)
+	{
+		const char* addr_arg = argv[arg++];
+		char* end;
+		addr = std::strtoul(addr_arg, &end, 16);
+		if (*end != '\0') {
+			fprintf(stderr, "Invalid address '%s'\n", addr_arg);
+			return ERROR_ARGS;
+		}
+		if (addr & (PAGE_SIZE - 1)) {
+			fprintf(stderr, "Address must be multiple of page size %d (0x%04x)\n", PAGE_SIZE, PAGE_SIZE);
+			return ERROR_ARGS;
+		}
+	}
     const char *in_filename = argv[arg++];
     FILE *in = fopen(in_filename, "rb");
     if (!in) {
@@ -368,7 +430,10 @@ int main(int argc, char **argv) {
         return ERROR_ARGS;
     }
 
-    int rc = elf2uf2(in, out);
+    int rc = binary
+		? bin2uf2(in, out, addr)
+		: elf2uf2(in, out);
+		
     fclose(in);
     fclose(out);
     if (rc) {
