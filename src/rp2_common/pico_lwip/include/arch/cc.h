@@ -69,7 +69,10 @@ typedef int sys_prot_t;
 
 #endif
 
-#define LWIP_PLATFORM_ASSERT(x) do { if(!(x)) while(1); } while(0)
+#ifndef LWIP_PLATFORM_ASSERT
+void panic(const char *fmt, ...);
+#define LWIP_PLATFORM_ASSERT(x) panic(x)
+#endif
 
 unsigned int pico_lwip_rand(void);
 #ifndef LWIP_RAND
