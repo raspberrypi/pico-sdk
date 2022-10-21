@@ -10,11 +10,11 @@
 // -----------------------------------------------------
 
 
-#ifndef _BOARDS_WAVESHARE_RP2040_LCD_0_96_H
-#define _BOARDS_WAVESHARE_RP2040_LCD_0_96_H
+#ifndef _BOARDS_WAVESHARE_RP2040_LCD_1_28_H
+#define _BOARDS_WAVESHARE_RP2040_LCD_1_28_H
 
 // For board detection
-#define WAVESHARE_RP2040_LCD_0_96
+#define WAVESHARE_RP2040_LCD_1_28
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
@@ -79,7 +79,10 @@
 #ifndef WAVESHARE_RP2040_LCD_BL_PIN
 #define WAVESHARE_RP2040_LCD_BL_PIN 25
 #endif
-
+// --- ADC ---
+#ifndef WAVESHARE_RP2040_BAT_ADC_PIN
+#define WAVESHARE_RP2040_BAT_ADC_PIN 29
+#endif
 // --- FLASH ---
 
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
@@ -91,9 +94,6 @@
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
-
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-#define PICO_SMPS_MODE_PIN 23
 
 // All boards have B1 RP2040
 #ifndef PICO_RP2040_B0_SUPPORTED 
