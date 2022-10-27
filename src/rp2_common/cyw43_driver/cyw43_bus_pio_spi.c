@@ -303,10 +303,10 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
 
         dma_channel_configure(bus_data->dma_out, &out_config, &bus_data->pio->txf[bus_data->pio_sm], tx, tx_length / 4, true);
 
-        const uint32_t fDebugTxStall = 1u << (PIO_FDEBUG_TXSTALL_LSB + bus_data->pio_sm);
-        bus_data->pio->fdebug = fDebugTxStall;
+        uint32_t fdebug_tx_stall = 1u << (PIO_FDEBUG_TXSTALL_LSB + bus_data->pio_sm);
+        bus_data->pio->fdebug = fdebug_tx_stall;
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, true);
-        while (!(bus_data->pio->fdebug & fDebugTxStall)) {
+        while (!(bus_data->pio->fdebug & fdebug_tx_stall)) {
             tight_loop_contents(); // todo timeout
         }
         __compiler_memory_barrier();
