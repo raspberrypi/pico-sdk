@@ -768,9 +768,10 @@ inline static void dma_sniffer_set_byte_swap_enabled(bool swap) {
 /*! \brief Enable the Sniffer output invert function
  *  \ingroup hardware_dma
  *
- * Perform a bit inversion on the sniffed data output
+ * If enabled, the sniff data result appears bit-inverted when read.
+ * This does not affect the way the checksum is calculated.
  *
- * \param invert Set true to enable output inversion
+ * \param invert Set true to enable output bit inversion
  */
 inline static void dma_sniffer_set_output_invert_enabled(bool invert) {
     if (invert)
@@ -782,7 +783,8 @@ inline static void dma_sniffer_set_output_invert_enabled(bool invert) {
 /*! \brief Enable the Sniffer output bit reversal function
  *  \ingroup hardware_dma
  *
- * Perform a bit inversion on the sniffed data output
+ * If enabled, the sniff data result appears bit-reversed when read.
+ * This does not affect the way the checksum is calculated.
  *
  * \param reverse Set true to enable output bit reversal
  */
@@ -805,7 +807,7 @@ inline static void dma_sniffer_disable(void) {
  *  \ingroup hardware_dma
  *
  * Generally, CRC algorithms are used with the data accumulator initially
- * seeded with 0xFFFF or 0xFFFFFFFF (for ccrc16 and crc32 algorithms)
+ * seeded with 0xFFFF or 0xFFFFFFFF (for crc16 and crc32 algorithms)
  *
  * \param seed_value value to set data accumulator
  */
