@@ -190,6 +190,20 @@ void cyw43_arch_deinit(void);
 int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t auth);
 
 /*!
+ * \brief Attempt to connect to a wireless access point specified by SSID and BSSID, blocking until the network is joined or a failure is detected.
+ * \ingroup pico_cyw43_arch
+ *
+ * \param ssid the network name to connect to
+ * \param bssid the network BSSID to connect to or NULL if ignored
+ * \param password the network password or NULL if there is no password required
+ * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
+ *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ *
+ * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
+ */
+int cyw43_arch_wifi_connect_bssid_blocking(const char *ssid, const char *bssid, const char *pw, uint32_t auth);
+
+/*!
  * \brief Attempt to connect to a wireless access point, blocking until the network is joined, a failure is detected or a timeout occurs
  * \ingroup pico_cyw43_arch
  *
@@ -201,6 +215,20 @@ int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t 
  * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
  */
 int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_t auth, uint32_t timeout_ms);
+
+/*!
+ * \brief Attempt to connect to a wireless access point specified by SSID and BSSID, blocking until the network is joined, a failure is detected or a timeout occurs
+ * \ingroup pico_cyw43_arch
+ *
+ * \param ssid the network name to connect to
+ * \param bssid the network BSSID to connect to or NULL if ignored
+ * \param password the network password or NULL if there is no password required
+ * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
+ *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ *
+ * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
+ */
+int cyw43_arch_wifi_connect_bssid_timeout_ms(const char *ssid, const char *bssid, const char *pw, uint32_t auth, uint32_t timeout);
 
 /*!
  * \brief Start attempting to connect to a wireless access point
@@ -217,6 +245,23 @@ int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_
  * \return 0 if the scan was started successfully, an error code otherwise \see pico_error_codes
  */
 int cyw43_arch_wifi_connect_async(const char *ssid, const char *pw, uint32_t auth);
+
+/*!
+ * \brief Start attempting to connect to a wireless access point specified by SSID and BSSID
+ * \ingroup pico_cyw43_arch
+ *
+ * This method tells the CYW43 driver to start connecting to an access point. You should subsequently check the
+ * status by calling \ref cyw43_wifi_link_status.
+ *
+ * \param ssid the network name to connect to
+ * \param bssid the network BSSID to connect to or NULL if ignored
+ * \param password the network password or NULL if there is no password required
+ * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
+ *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ *
+ * \return 0 if the scan was started successfully, an error code otherwise \see pico_error_codes
+ */
+int cyw43_arch_wifi_connect_bssid_async(const char *ssid, const char *bssid, const char *pw, uint32_t auth);
 
 /*!
  * \brief Return the country code used to initialize cyw43_arch

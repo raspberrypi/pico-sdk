@@ -64,14 +64,22 @@ static const char* status_name(int status)
 #endif
 
 int cyw43_arch_wifi_connect_async(const char *ssid, const char *pw, uint32_t auth) {
+    return cyw43_arch_wifi_connect_bssid_async(ssid, NULL, pw, auth);
+}
+
+int cyw43_arch_wifi_connect_bssid_async(const char *ssid, const char *bssid, const char *pw, uint32_t auth) {
     if (!pw) auth = CYW43_AUTH_OPEN;
     // Connect to wireless
-    return cyw43_wifi_join(&cyw43_state, strlen(ssid), (const uint8_t *)ssid, pw ? strlen(pw) : 0, (const uint8_t *)pw, auth, NULL, CYW43_ITF_STA);
+    return cyw43_wifi_join(&cyw43_state, strlen(ssid), (const uint8_t *)ssid, pw ? strlen(pw) : 0, (const uint8_t *)pw, auth, bssid, CYW43_ITF_STA);
 }
 
 // Connect to wireless, return with success when an IP address has been assigned
 int cyw43_arch_wifi_connect_until(const char *ssid, const char *pw, uint32_t auth, absolute_time_t until) {
-    int err = cyw43_arch_wifi_connect_async(ssid, pw, auth);
+    return cyw43_arch_wifi_connect_bssid_until(ssid, NULL, pw, auth, until);
+}
+
+int cyw43_arch_wifi_connect_bssid_until(const char *ssid, const char *bssid, const char *pw, uint32_t auth, absolute_time_t until) {
+    int err = cyw43_arch_wifi_connect_bssid_async(ssid, bssid, pw, auth);
     if (err) return err;
 
     int status = CYW43_LINK_UP + 1;
@@ -95,8 +103,16 @@ int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t 
     return cyw43_arch_wifi_connect_until(ssid, pw, auth, at_the_end_of_time);
 }
 
+int cyw43_arch_wifi_connect_bssid_blocking(const char *ssid, const char *bssid, const char *pw, uint32_t auth) {
+    return cyw43_arch_wifi_connect_bssid_until(ssid, bssid, pw, auth, at_the_end_of_time);
+}
+
 int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_t auth, uint32_t timeout_ms) {
     return cyw43_arch_wifi_connect_until(ssid, pw, auth, make_timeout_time_ms(timeout_ms));
+}
+
+int cyw43_arch_wifi_connect_bssid_timeout_ms(const char *ssid, const char *bssid, const char *pw, uint32_t auth, uint32_t timeout_ms) {
+    return cyw43_arch_wifi_connect_until(ssid, bssid, pw, auth, make_timeout_time_ms(timeout_ms));
 }
 
 // todo maybe add an #ifdef in cyw43_driver
