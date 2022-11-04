@@ -124,7 +124,7 @@ extern "C" {
  *
  * This method initializes the `cyw43_driver` code and initializes the lwIP stack (if it
  * was enabled at build time). This method must be called prior to using any other \c pico_cyw43_arch,
- * \cyw43_driver or lwIP functions.
+ * \c cyw43_driver or lwIP functions.
  *
  * \note this method initializes wireless with a country code of \c PICO_CYW43_ARCH_DEFAULT_COUNTRY_CODE
  * which defaults to \c CYW43_COUNTRY_WORLDWIDE. Worldwide settings may not give the best performance; consider
@@ -139,7 +139,7 @@ int cyw43_arch_init(void);
  *
  * This method initializes the `cyw43_driver` code and initializes the lwIP stack (if it
  * was enabled at build time). This method must be called prior to using any other \c pico_cyw43_arch,
- * \cyw43_driver or lwIP functions.
+ * \c cyw43_driver or lwIP functions.
  *
  * \param country the country code to use (see \ref CYW43_COUNTRY_)
  * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
@@ -150,7 +150,7 @@ int cyw43_arch_init_with_country(uint32_t country);
  * \brief Enables Wi-Fi STA (Station) mode.
  * \ingroup pico_cyw43_arch
  *
- * This enables the Wi-Fi in \emStation mode such that connections can be made to other Wi-Fi Access Points
+ * This enables the Wi-Fi in \em Station mode such that connections can be made to other Wi-Fi Access Points
  */
 void cyw43_arch_enable_sta_mode(void);
 
@@ -181,7 +181,7 @@ void cyw43_arch_deinit(void);
  * \ingroup pico_cyw43_arch
  *
  * \param ssid the network name to connect to
- * \param password the network password or NULL if there is no password required
+ * \param pw the network password or NULL if there is no password required
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  *
@@ -194,13 +194,13 @@ int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t 
  * \ingroup pico_cyw43_arch
  *
  * \param ssid the network name to connect to
- * \param password the network password or NULL if there is no password required
+ * \param pw the network password or NULL if there is no password required
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  *
  * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
  */
-int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_t auth, uint32_t timeout);
+int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_t auth, uint32_t timeout_ms);
 
 /*!
  * \brief Start attempting to connect to a wireless access point
@@ -210,7 +210,7 @@ int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_
  * status by calling \ref cyw43_wifi_link_status.
  *
  * \param ssid the network name to connect to
- * \param password the network password or NULL if there is no password required
+ * \param pw the network password or NULL if there is no password required
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  *

@@ -256,7 +256,7 @@ void irq_remove_handler(uint num, irq_handler_t handler);
  *  \ingroup hardware_irq
  *
  * \param num Interrupt number \ref interrupt_nums
- * \param return true if the specified IRQ has a shared handler
+ * \return true if the specified IRQ has a shared handler
  */
 bool irq_has_shared_handler(uint num);
 
