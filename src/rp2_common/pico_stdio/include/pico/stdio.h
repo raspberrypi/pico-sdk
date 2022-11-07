@@ -57,13 +57,8 @@ typedef struct stdio_driver stdio_driver_t;
  */
 bool stdio_init_all(void);
 
-/*! \brief Initialize all of the present standard stdio types that are linked into the binary.
+/*! \brief Flushes any buffered output.
  * \ingroup pico_stdio
- *
- * Call this method once you have set up your clocks to enable the stdio support for UART, USB
- * and semihosting based on the presence of the respective libraries in the binary.
- *
- * \see stdio_uart, stdio_usb, stdio_semihosting
  */
 void stdio_flush(void);
 
