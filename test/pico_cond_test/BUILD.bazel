@@ -1,0 +1,16 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_cond_test",
+    testonly = True,
+    srcs = ["pico_cond_test.c"],
+    # Host doesn't support multicore
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_multicore",
+        "//src/rp2_common/pico_stdlib",
+        "//test/pico_test",
+    ],
+)

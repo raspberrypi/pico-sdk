@@ -5,6 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "pico_sync_headers",
     hdrs = [
+        "include/pico/cond.h",
         "include/pico/critical_section.h",
         "include/pico/lock_core.h",
         "include/pico/mutex.h",
@@ -21,6 +22,7 @@ cc_library(
 cc_library(
     name = "pico_sync",
     srcs = [
+        "cond.c",
         "critical_section.c",
         "lock_core.c",
         "mutex.c",
