@@ -102,6 +102,11 @@
 #define PICO_STDIO_USB_CONNECTION_WITHOUT_DTR 0
 #endif
 
+// PICO_CONFIG: PICO_STDIO_USB_DEVICE_SELF_POWERED, Set USB device as self powered device, type=bool, default=0, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_DEVICE_SELF_POWERED
+#define PICO_STDIO_USB_DEVICE_SELF_POWERED 0
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
