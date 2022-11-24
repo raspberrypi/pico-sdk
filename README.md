@@ -170,7 +170,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
    When building for a board other than the Raspberry Pi Pico, you should pass `-DPICO_BOARD=board_name` to the `cmake` command above, e.g. `cmake -DPICO_BOARD=pico_w ..`
    to configure the SDK and build options accordingly for that particular board.
 
-   Doing so sets up various compiler defines (e.g. default pin numbers for UART and other hardware), and in certain 
+   Doing so sets up various compiler defines (e.g. default pin numbers for UART and other hardware) and in certain 
    cases also enables the use of additional libraries (e.g. wireless support when building for `PICO_BOARD=pico_w`) which cannot
    be built without a board which provides the requisite functionality.
 
