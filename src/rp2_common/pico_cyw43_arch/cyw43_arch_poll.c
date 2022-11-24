@@ -59,7 +59,7 @@ int cyw43_arch_init(void) {
         lwip_init();
         done_lwip_init = true;
     }
-    gpio_add_raw_irq_handler_with_order_priority(IO_IRQ_BANK0, gpio_irq_handler, CYW43_GPIO_IRQ_HANDLER_PRIORITY);
+    gpio_add_raw_irq_handler_with_order_priority(CYW43_PIN_WL_HOST_WAKE, gpio_irq_handler, CYW43_GPIO_IRQ_HANDLER_PRIORITY);
     gpio_set_irq_enabled(CYW43_PIN_WL_HOST_WAKE, GPIO_IRQ_LEVEL_HIGH, true);
     irq_set_enabled(IO_IRQ_BANK0, true);
     return 0;
@@ -67,7 +67,7 @@ int cyw43_arch_init(void) {
 
 void cyw43_arch_deinit(void) {
     gpio_set_irq_enabled(CYW43_PIN_WL_HOST_WAKE, GPIO_IRQ_LEVEL_HIGH, false);
-    gpio_remove_raw_irq_handler(IO_IRQ_BANK0, gpio_irq_handler);
+    gpio_remove_raw_irq_handler(CYW43_PIN_WL_HOST_WAKE, gpio_irq_handler);
     cyw43_deinit(&cyw43_state);
 }
 
