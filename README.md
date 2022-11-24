@@ -14,8 +14,6 @@ along with various utilities.
 The SDK can be used to build anything from simple applications, to fully fledged runtime environments such as MicroPython, to low level software
 such as RP2040's on-chip bootrom itself.
 
-The hardware specific capabilities of distinct devices such as the Pico and Pico W (known as 'boards') must be explicitly supported by compiling against a target board.
-
 Additional libraries/APIs that are not yet ready for inclusion in the SDK can be found in [pico-extras](https://github.com/raspberrypi/pico-extras).
 
 # Documentation
@@ -161,15 +159,23 @@ instructions for other platforms, and just in general, we recommend you see [Ras
    Note this example uses the default UART for _stdout_;
    if you want to use the default USB see the [hello-usb](https://github.com/raspberrypi/pico-examples/tree/master/hello_world/usb) example.
 
-1. If no target is specified the code will be built to run on the Raspberry Pi Pico. To target other boards such as the Pico W add a suitable define to the cmake command below. eg: ```cmake -DPICO_BOARD=pico_w ..```
-
 1. Setup a CMake build directory.
       For example, if not using an IDE:
       ```
       $ mkdir build
       $ cd build
       $ cmake ..
-      ```
+      ```   
+   
+   When building for a board other than the Raspberry Pi Pico, you should pass `-DPICO_BOARD=board_name` to the `cmake` command above, e.g. `cmake -DPICO_BOARD=pico_w ..`
+   to configure the SDK and build options accordingly for that particular board.
+
+   Doing so sets up various compiler defines (e.g. default pin numbers for UART and other hardware), and in certain 
+   cases also enables the use of additional libraries (e.g. wireless support when building for `PICO_BOARD=pico_w`) which cannot
+   be built without a board which provides the requisite functionality.
+
+   For a list of boards defined in the SDK itself, look in [this directory](src/boards/include/boards) which has a 
+   header for each named board.
 
 1. Make your target from the build directory you created.
       ```sh
