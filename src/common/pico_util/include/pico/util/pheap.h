@@ -248,6 +248,7 @@ static inline void ph_free_node(pheap_t *heap, pheap_node_id_t id) {
         ph_get_node(heap, heap->free_tail_id)->sibling = id;
     }
     heap->free_tail_id = id;
+    if (!heap->free_head_id) heap->free_head_id = heap->free_tail_id;
 }
 
 /**
