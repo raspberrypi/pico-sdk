@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -52,6 +52,9 @@
 //               counter; the waiting-on-IRQ state; any stalled instruction
 //               written to SMx_INSTR or run by OUT/MOV EXEC; any pin write left
 //               asserted due to OUT_STICKY.
+//
+//               The program counter, the contents of the output shift register
+//               and the X/Y scratch registers are not affected.
 #define PIO_CTRL_SM_RESTART_RESET  _u(0x0)
 #define PIO_CTRL_SM_RESTART_BITS   _u(0x000000f0)
 #define PIO_CTRL_SM_RESTART_MSB    _u(7)

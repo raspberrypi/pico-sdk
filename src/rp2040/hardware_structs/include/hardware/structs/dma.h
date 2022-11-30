@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /*
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -110,7 +110,7 @@ typedef struct {
     _REG_(DMA_INTR_OFFSET) // DMA_INTR
     // Interrupt Status (raw)
     // 0x0000ffff [15:0]  : INTR (0): Raw interrupt status for DMA Channels 0
-    io_ro_32 intr;
+    io_rw_32 intr;
 
     _REG_(DMA_INTE0_OFFSET) // DMA_INTE0
     // Interrupt Enables for IRQ 0
