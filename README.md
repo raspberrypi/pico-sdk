@@ -159,14 +159,23 @@ instructions for other platforms, and just in general, we recommend you see [Ras
    Note this example uses the default UART for _stdout_;
    if you want to use the default USB see the [hello-usb](https://github.com/raspberrypi/pico-examples/tree/master/hello_world/usb) example.
 
-
 1. Setup a CMake build directory.
       For example, if not using an IDE:
       ```
       $ mkdir build
       $ cd build
       $ cmake ..
-      ```
+      ```   
+   
+   When building for a board other than the Raspberry Pi Pico, you should pass `-DPICO_BOARD=board_name` to the `cmake` command above, e.g. `cmake -DPICO_BOARD=pico_w ..`
+   to configure the SDK and build options accordingly for that particular board.
+
+   Doing so sets up various compiler defines (e.g. default pin numbers for UART and other hardware) and in certain 
+   cases also enables the use of additional libraries (e.g. wireless support when building for `PICO_BOARD=pico_w`) which cannot
+   be built without a board which provides the requisite functionality.
+
+   For a list of boards defined in the SDK itself, look in [this directory](src/boards/include/boards) which has a 
+   header for each named board.
 
 1. Make your target from the build directory you created.
       ```sh
