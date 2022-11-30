@@ -22,6 +22,9 @@ See [Getting Started with the Raspberry Pi Pico](https://rptl.io/pico-get-starte
 hardware, IDE/environment and for how to build and debug software for the Raspberry Pi Pico
 and other RP2040-based devices.
 
+See [Connecting to the Internet with Raspberry Pi Pico W](https://rptl.io/picow-connect) to learn more about writing
+applications for your Raspberry Pi Pico W that connect to the internet.
+
 See [Raspberry Pi Pico C/C++ SDK](https://rptl.io/pico-c-sdk) to learn more about programming using the
 SDK, to explore more advanced features, and for complete PDF-based API documentation.
 
