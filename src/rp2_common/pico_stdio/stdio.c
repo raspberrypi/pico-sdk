@@ -170,6 +170,7 @@ int puts_raw(const char *s) {
     return len;
 }
 
+__attribute__((weak))
 int _read(int handle, char *buffer, int length) {
     if (handle == STDIO_HANDLE_STDIN) {
         return stdio_get_until(buffer, length, at_the_end_of_time);
@@ -177,6 +178,7 @@ int _read(int handle, char *buffer, int length) {
     return -1;
 }
 
+__attribute__((weak))
 int _write(int handle, char *buffer, int length) {
     if (handle == STDIO_HANDLE_STDOUT || handle == STDIO_HANDLE_STDERR) {
         stdio_put_string(buffer, length, false, false);
