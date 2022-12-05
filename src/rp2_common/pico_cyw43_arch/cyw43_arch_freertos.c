@@ -39,6 +39,11 @@
 
 #define CYW43_GPIO_IRQ_HANDLER_PRIORITY 0x40
 
+// PICO_CONFIG: CYW43_TASK_STACK_SIZE, Stack size for the cyw43_task thread in words, type=int, default=1024, group=pico_cyw43_arch
+#ifndef CYW43_TASK_STACK_SIZE
+#define CYW43_TASK_STACK_SIZE 1024
+#endif
+
 static void signal_cyw43_task(void);
 
 #if !LWIP_TCPIP_CORE_LOCKING_INPUT
@@ -143,7 +148,7 @@ int cyw43_arch_init(void) {
     irq_set_enabled(IO_IRQ_BANK0, true);
 
     cyw43_task_should_exit = false;
-    xTaskCreate(cyw43_task, "CYW43 Worker", configMINIMAL_STACK_SIZE, NULL, CYW43_TASK_PRIORITY, &cyw43_task_handle);
+    xTaskCreate(cyw43_task, "CYW43 Worker", CYW43_TASK_STACK_SIZE, NULL, CYW43_TASK_PRIORITY, &cyw43_task_handle);
 #if configUSE_CORE_AFFINITY && configNUM_CORES > 1
     // the cyw43 task mus tbe on the same core so it can restore IRQs
     vTaskCoreAffinitySet(cyw43_task_handle, 1 << portGET_CORE_ID());
