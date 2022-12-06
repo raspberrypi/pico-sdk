@@ -58,7 +58,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             --redefine-sym _binary_${CYW43_FIRMWARE_BIN_}_end=${CYW43_FIRMWARE_PRETTY}_end
             --redefine-sym _binary_${CYW43_FIRMWARE_BIN_}_size=${CYW43_FIRMWARE_PRETTY}_size
             ${CYW43_FIRMWARE_BIN} ${CYW43_FIRMWARE_OBJ}
-    )
+            VERBATIM)
 
     add_library(cyw43_driver_picow INTERFACE)
     target_sources(cyw43_driver_picow INTERFACE

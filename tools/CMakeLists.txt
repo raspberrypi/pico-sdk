@@ -33,7 +33,7 @@ function(pico_generate_pio_header TARGET PIO)
     add_custom_command(OUTPUT ${HEADER}
             DEPENDS ${PIO}
             COMMAND Pioasm -o ${OUTPUT_FORMAT} ${PIO} ${HEADER}
-            )
+            VERBATIM)
     add_dependencies(${TARGET} ${HEADER_GEN_TARGET})
     get_target_property(target_type ${TARGET} TYPE)
     if ("INTERFACE_LIBRARY" STREQUAL "${target_type}")
@@ -59,6 +59,7 @@ function(pico_add_uf2_output TARGET)
     endif()
     if (ELF2UF2_FOUND)
         add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ELF2UF2 $<TARGET_FILE:${TARGET}> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2)
+            COMMAND ELF2UF2 $<TARGET_FILE:${TARGET}> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2
+            VERBATIM)
     endif()
 endfunction()

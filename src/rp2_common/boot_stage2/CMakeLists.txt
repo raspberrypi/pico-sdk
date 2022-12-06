@@ -63,12 +63,13 @@ function(pico_define_boot_stage2 NAME SOURCES)
     find_package (Python3 REQUIRED COMPONENTS Interpreter)
 
     add_custom_target(${NAME}_bin DEPENDS ${ORIGINAL_BIN})
-    add_custom_command(OUTPUT ${ORIGINAL_BIN} DEPENDS ${NAME} COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${NAME}> ${ORIGINAL_BIN})
+    add_custom_command(OUTPUT ${ORIGINAL_BIN} DEPENDS ${NAME} COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${NAME}> ${ORIGINAL_BIN}
+        VERBATIM)
 
     add_custom_target(${NAME}_padded_checksummed_asm DEPENDS ${PADDED_CHECKSUMMED_ASM})
     add_custom_command(OUTPUT ${PADDED_CHECKSUMMED_ASM} DEPENDS ${ORIGINAL_BIN}
             COMMAND ${Python3_EXECUTABLE} ${PICO_BOOT_STAGE2_DIR}/pad_checksum -s 0xffffffff ${ORIGINAL_BIN} ${PADDED_CHECKSUMMED_ASM}
-            )
+            VERBATIM)
 
     add_library(${NAME}_library INTERFACE)
     add_dependencies(${NAME}_library ${NAME}_padded_checksummed_asm)
