@@ -1,4 +1,4 @@
 pico_simple_hardware_target(pio)
 
 # additional libraries
-target_link_libraries(hardware_pio INTERFACE hardware_gpio hardware_claim)
+pico_add_header_aware_library_dependency(hardware_pio hardware_gpio hardware_claim)

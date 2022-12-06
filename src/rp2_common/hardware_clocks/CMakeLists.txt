@@ -1,6 +1,6 @@
 pico_simple_hardware_target(clocks)
 
-target_link_libraries(hardware_clocks INTERFACE
+pico_add_header_aware_library_dependency(hardware_clocks
         hardware_gpio
         hardware_irq
         hardware_resets

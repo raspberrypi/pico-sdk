@@ -1,2 +1,2 @@
 pico_simple_hardware_target(gpio)
-target_link_libraries(hardware_gpio INTERFACE hardware_irq)
+pico_add_header_aware_library_dependency(hardware_gpio hardware_irq)

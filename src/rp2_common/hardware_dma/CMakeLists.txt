@@ -1,2 +1,2 @@
 pico_simple_hardware_target(dma)
-target_link_libraries(hardware_dma INTERFACE hardware_claim)
+pico_add_header_aware_library_dependency(hardware_dma hardware_claim)

@@ -1,2 +1,2 @@
 pico_simple_hardware_target(timer)
-target_link_libraries(hardware_timer INTERFACE hardware_claim)
+pico_add_header_aware_library_dependency(hardware_timer hardware_claim)

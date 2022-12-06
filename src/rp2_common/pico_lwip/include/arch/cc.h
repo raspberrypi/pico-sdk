@@ -70,7 +70,7 @@ typedef int sys_prot_t;
 #endif
 
 #ifndef LWIP_PLATFORM_ASSERT
-void panic(const char *fmt, ...);
+#include "pico/platform.h"
 #define LWIP_PLATFORM_ASSERT(x) panic(x)
 #endif
 

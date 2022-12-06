@@ -1,2 +1,3 @@
 pico_simple_hardware_target(claim)
-target_link_libraries(hardware_claim INTERFACE hardware_sync)
+
+pico_add_header_aware_library_dependency(hardware_claim hardware_sync)

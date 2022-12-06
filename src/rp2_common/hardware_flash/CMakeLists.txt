@@ -1,2 +1,2 @@
 pico_simple_hardware_target(flash)
-target_link_libraries(hardware_flash INTERFACE pico_bootrom)
+pico_add_header_aware_library_dependency(hardware_flash pico_bootrom)

@@ -10,12 +10,19 @@ if (NOT TARGET pico_stdlib)
     target_sources(pico_stdlib INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/stdlib.c
     )
+    pico_add_header_aware_library_dependency(pico_stdlib
+            hardware_gpio
+            hardware_uart
+            hardware_divider
+            pico_time
+            pico_util
+            pico_platform
+            )
+
+    # these do not have _headers atm
     target_link_libraries(pico_stdlib INTERFACE
-        pico_stdlib_headers
-        pico_platform
         pico_runtime
         pico_stdio
-        pico_time
     )
 
     function(pico_enable_stdio_uart TARGET ENABLED)
