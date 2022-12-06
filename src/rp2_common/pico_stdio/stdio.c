@@ -146,13 +146,13 @@ static int stdio_get_until(char *buf, int len, absolute_time_t until) {
 
 int WRAPPER_FUNC(putchar)(int c) {
     char cc = (char)c;
-    stdio_put_string(&cc, 1, false, false);
+    _write(STDIO_HANDLE_STDOUT, &cc, 1);
     return c;
 }
 
 int WRAPPER_FUNC(puts)(const char *s) {
     int len = (int)strlen(s);
-    stdio_put_string(s, len, true, false);
+    _write(STDIO_HANDLE_STDOUT, s, len);
     stdio_flush();
     return len;
 }
