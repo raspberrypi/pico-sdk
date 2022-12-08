@@ -62,6 +62,10 @@ static pheap_node_id_t ph_remove_any_head(pheap_t *heap, pheap_node_id_t root_id
         if (heap->free_tail_id) {
             ph_get_node(heap, heap->free_tail_id)->sibling = root_id;
         }
+        if (!heap->free_head_id) {
+            assert(!heap->free_tail_id);
+            heap->free_head_id = root_id;
+        }
         heap->free_tail_id = root_id;
     }
     if (new_root_id) ph_get_node(heap, new_root_id)->parent = 0;

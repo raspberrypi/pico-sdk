@@ -18,7 +18,11 @@ PICOTEST_MODULE_NAME("pico_time_test", "pico_time test harness");
 static_assert(PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS >= MAX_TIMERS_PER_POOL, "");
 #define TEST_LENGTH_US 2000000
 
+#ifndef NDEBUG
+#define NUM_REPEATING_TIMERS 30
+#else
 #define NUM_REPEATING_TIMERS 50
+#endif
 static struct repeating_timer repeating_timers[NUM_REPEATING_TIMERS];
 static uint repeating_timer_callback_count[NUM_REPEATING_TIMERS];
 
