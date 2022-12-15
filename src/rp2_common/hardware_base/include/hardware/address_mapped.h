@@ -90,7 +90,7 @@ typedef ioptr const const_ioptr;
 //}
 
 // Helper method used by xip_alias macros to optionally check input validity
-static __force_inline uint32_t xip_alias_check_addr(const void *addr) {
+__force_inline static uint32_t xip_alias_check_addr(const void *addr) {
     uint32_t rc = (uintptr_t)addr;
     valid_params_if(ADDRESS_ALIAS, rc >= XIP_MAIN_BASE && rc < XIP_NOALLOC_BASE);
     return rc;
