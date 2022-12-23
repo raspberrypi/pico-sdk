@@ -3,7 +3,7 @@ if (NOT TARGET pico_time_headers)
 
     target_include_directories(pico_time_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
-    target_link_libraries(pico_time_headers INTERFACE hardware_timer)
+    target_link_libraries(pico_time_headers INTERFACE hardware_timer_headers)
 endif()
 
 if (NOT TARGET pico_time)
