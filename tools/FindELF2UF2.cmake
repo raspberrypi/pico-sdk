@@ -26,7 +26,6 @@ if (NOT ELF2UF2_FOUND)
         ExternalProject_Add(${ELF2UF2_BUILD_TARGET}
                 PREFIX elf2uf2 SOURCE_DIR ${ELF2UF2_SOURCE_DIR}
                 BINARY_DIR ${ELF2UF2_BINARY_DIR}
-                BUILD_ALWAYS 1 # force dependency checking
                 INSTALL_COMMAND ""
                 )
     endif()
