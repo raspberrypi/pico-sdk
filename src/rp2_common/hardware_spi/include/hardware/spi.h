@@ -183,7 +183,7 @@ static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cp
     invalid_params_if(SPI, cpha != SPI_CPHA_0 && cpha != SPI_CPHA_1);
 
     // Disable the SPI
-    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS);
+    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
     hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
 
     hw_write_masked(&spi_get_hw(spi)->cr0,
@@ -209,7 +209,7 @@ static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cp
  */
 static inline void spi_set_slave(spi_inst_t *spi, bool slave) {
     // Disable the SPI
-    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS);
+    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
     hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
 
     if (slave)

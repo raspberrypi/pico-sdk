@@ -29,7 +29,7 @@ uint spi_init(spi_inst_t *spi, uint baudrate) {
 
     // Finally enable the SPI
     hw_set_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
-    
+
     return baud;
 }
 
@@ -45,7 +45,7 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
     invalid_params_if(SPI, baudrate > freq_in);
 
     // Disable the SPI
-    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS);
+    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
     hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
 
     // Find smallest prescale value which puts output frequency in range of
