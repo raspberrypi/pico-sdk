@@ -70,7 +70,13 @@ typedef int sys_prot_t;
 #endif
 
 #ifndef LWIP_PLATFORM_ASSERT
+#ifdef __cplusplus
+extern "C" {
+#endif
 void panic(const char *fmt, ...);
+#ifdef __cplusplus
+}
+#endif
 #define LWIP_PLATFORM_ASSERT(x) panic(x)
 #endif
 
