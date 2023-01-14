@@ -261,6 +261,8 @@ alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, ala
 }
 
 bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id) {
+    if (alarm_id == 0)
+        return false;
     bool rc = false;
     uint32_t save = spin_lock_blocking(pool->lock);
     pheap_node_id_t id = (pheap_node_id_t) alarm_id;
