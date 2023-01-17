@@ -87,6 +87,13 @@ void hardware_alarm_unclaim(uint alarm_num) {
     claimed_alarms &= ~(1u <<alarm_num);
 }
 
+int hardware_alarm_claim_unused(bool required) {
+    int alarm_id = claimed_alarms ? __builtin_clz(~claimed_alarms) : 1;
+    if (alarm_id >= NUM_TIMERS) return -1;
+    claimed_alarms |= 1u << alarm_id;
+    return alarm_id;
+}
+
 PICO_WEAK_FUNCTION_DEF(hardware_alarm_set_callback)
 void PICO_WEAK_FUNCTION_IMPL_NAME(hardware_alarm_set_callback)(uint alarm_num, hardware_alarm_callback_t callback) {
     panic_unsupported();
@@ -99,5 +106,10 @@ bool PICO_WEAK_FUNCTION_IMPL_NAME(hardware_alarm_set_target)(uint alarm_num, abs
 
 PICO_WEAK_FUNCTION_DEF(hardware_alarm_cancel)
 void PICO_WEAK_FUNCTION_IMPL_NAME(hardware_alarm_cancel)(uint alarm_num) {
+    panic_unsupported();
+}
+
+PICO_WEAK_FUNCTION_DEF(hardware_alarm_force_irq)
+void PICO_WEAK_FUNCTION_IMPL_NAME(hardware_alarm_force_irq)(uint alarm_num) {
     panic_unsupported();
 }
