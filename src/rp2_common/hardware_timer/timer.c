@@ -33,6 +33,10 @@ bool hardware_alarm_is_claimed(uint alarm_num) {
     return hw_is_claimed(&claimed, alarm_num);
 }
 
+int hardware_alarm_claim_unused(bool required) {
+    return hw_claim_unused_from_range(&claimed, required, 0, NUM_TIMERS - 1, "No timers available");
+}
+
 /// tag::time_us_64[]
 uint64_t time_us_64() {
     // Need to make sure that the upper 32 bits of the timer
@@ -108,9 +112,7 @@ static inline uint harware_alarm_irq_number(uint alarm_num) {
 
 static void hardware_alarm_irq_handler(void) {
     // Determine which timer this IRQ is for
-    uint32_t ipsr;
-    __asm volatile ("mrs %0, ipsr" : "=r" (ipsr)::);
-    uint alarm_num = (ipsr & 0x3fu) - 16 - TIMER_IRQ_0;
+    uint alarm_num = __get_current_exception() - 16 - TIMER_IRQ_0;
     check_hardware_alarm_num_param(alarm_num);
 
     hardware_alarm_callback_t callback = NULL;
@@ -119,6 +121,8 @@ static void hardware_alarm_irq_handler(void) {
     uint32_t save = spin_lock_blocking(lock);
     // Clear the timer IRQ (inside lock, because we check whether we have handled the IRQ yet in alarm_set by looking at the interrupt status
     timer_hw->intr = 1u << alarm_num;
+    // Clear any forced IRQ
+    hw_clear_bits(&timer_hw->intf, 1u << alarm_num);
 
     // make sure the IRQ is still valid
     if (timer_callbacks_pending & (1u << alarm_num)) {
@@ -227,4 +231,11 @@ void hardware_alarm_cancel(uint alarm_num) {
     spin_unlock(lock, save);
 }
 
-
+void hardware_alarm_force_irq(uint alarm_num) {
+    check_hardware_alarm_num_param(alarm_num);
+    spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_TIMER);
+    uint32_t save = spin_lock_blocking(lock);
+    timer_callbacks_pending |= (uint8_t)(1u << alarm_num);
+    spin_unlock(lock, save);
+    hw_set_bits(&timer_hw->intf, 1u << alarm_num);
+}

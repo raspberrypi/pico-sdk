@@ -157,6 +157,17 @@ static inline int64_t absolute_time_diff_us(absolute_time_t from, absolute_time_
     return (int64_t)(to_us_since_boot(to) - to_us_since_boot(from));
 }
 
+/*! \brief Return the earlier of two timestamps
+ * \ingroup timestamp
+ *
+ * \param a the first timestamp
+ * \param b the second timestamp
+ * \return the earlier of the two timestamps
+ */
+static inline absolute_time_t absolute_time_min(absolute_time_t a, absolute_time_t b) {
+    return to_us_since_boot(a) < to_us_since_boot(b) ? a : b;
+}
+
 /*! \brief The timestamp representing the end of time; this is actually not the maximum possible
  * timestamp, but is set to 0x7fffffff_ffffffff microseconds to avoid sign overflows with time
  * arithmetic. This is almost 300,000 years, so should be sufficient.
@@ -398,6 +409,25 @@ alarm_pool_t *alarm_pool_get_default(void);
 alarm_pool_t *alarm_pool_create(uint hardware_alarm_num, uint max_timers);
 
 /**
+ * \brief Create an alarm pool, claiming an used hardware alarm to back it.
+ *
+ * The alarm pool will call callbacks from an alarm IRQ Handler on the core of this function is called from.
+ *
+ * In many situations there is never any need for anything other than the default alarm pool, however you
+ * might want to create another if you want alarm callbacks on core 1 or require alarm pools of
+ * different priority (IRQ priority based preemption of callbacks)
+ *
+ * \note This method will hard assert if the there is no free hardware to claim.
+ *
+ * \ingroup alarm
+ * \param max_timers the maximum number of timers
+ *        \note For implementation reasons this is limited to PICO_PHEAP_MAX_ENTRIES which defaults to 255
+ * \sa alarm_pool_get_default()
+ * \sa hardware_claiming
+ */
+alarm_pool_t *alarm_pool_create_with_unused_hardware_alarm(uint max_timers);
+
+/**
  * \brief Return the hardware alarm used by an alarm pool
  * \ingroup alarm
  * \param pool the pool
@@ -446,6 +476,25 @@ void alarm_pool_destroy(alarm_pool_t *pool);
  */
 alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, alarm_callback_t callback, void *user_data, bool fire_if_past);
 
+/*!
+ * \brief Add an alarm callback to be called at or after a specific time
+ * \ingroup alarm
+ *
+ * The callback is called as soon as possible after the time specified from an IRQ handler
+ * on the core the alarm pool was created on. Unlike \ref alarm_pool_add_alarm_at, this method
+ * guarantees to call the callback from that core even if the time is during this method call or in the past.
+ *
+ * \note It is safe to call this method from an IRQ handler (including alarm callbacks), and from either core.
+ *
+ * @param pool the alarm pool to use for scheduling the callback (this determines which hardware alarm is used, and which core calls the callback)
+ * @param time the timestamp when (after which) the callback should fire
+ * @param callback the callback function
+ * @param user_data user data to pass to the callback function
+ * @return >0 the alarm id for an active (at the time of return) alarm
+ * @return -1 if there were no alarm slots available
+ */
+alarm_id_t alarm_pool_add_alarm_at_force_in_context(alarm_pool_t *pool, absolute_time_t time, alarm_callback_t callback,
+                                                    void *user_data);
 /*!
  * \brief Add an alarm callback to be called after a delay specified in microseconds
  * \ingroup alarm
