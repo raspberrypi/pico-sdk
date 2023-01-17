@@ -130,7 +130,7 @@ static inline void *rom_hword_as_ptr(uint16_t rom_address) {
 #endif
 
 /*!
- * \brief Lookup a bootrom function by code. This method is forceably inlined into the caller for FLASH/RAM sensitive code usage
+ * \brief Lookup a bootrom function by code. This method is forcibly inlined into the caller for FLASH/RAM sensitive code usage
  * \ingroup pico_bootrom
  * \param code the code
  * \return a pointer to the function, or NULL if the code does not match any bootrom function

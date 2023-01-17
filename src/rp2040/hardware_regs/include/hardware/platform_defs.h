@@ -42,5 +42,7 @@
 #define XOSC_MHZ _u(12)
 #endif
 
+#define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
+
 #endif
 
