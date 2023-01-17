@@ -314,6 +314,12 @@ void __attribute__((noreturn)) panic_unsupported(void);
  */
 void __attribute__((noreturn)) panic(const char *fmt, ...);
 
+#ifdef NDEBUG
+#define panic_compact(...) panic(__VA_ARGS__)
+#else
+#define panic_compact(...) panic("")
+#endif
+
 // PICO_CONFIG: PICO_NO_FPGA_CHECK, Remove the FPGA platform check for small code size reduction, type=bool, default=0, advanced=true, group=pico_runtime
 #ifndef PICO_NO_FPGA_CHECK
 #define PICO_NO_FPGA_CHECK 0
