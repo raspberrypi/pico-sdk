@@ -174,7 +174,7 @@ void clocks_enable_resus(resus_callback_t resus_callback);
  * \param src  The source clock. See the register field CLOCKS_CLK_GPOUT0_CTRL_AUXSRC for a full list. The list is the same for each GPOUT clock generator.
  * \param div  The amount to divide the source clock by. This is useful to not overwhelm the GPIO pin with a fast clock.
  */
-void clock_gpio_init(uint gpio, uint src, uint div);
+void clock_gpio_init(uint gpio, uint src, float div);
 
 /*! \brief Configure a clock to come from a gpio input
  *  \ingroup hardware_clocks
