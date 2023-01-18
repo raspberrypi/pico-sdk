@@ -41,6 +41,7 @@
  * This group of libraries provide higher level functionality that isn't hardware related or provides a richer
  * set of functionality above the basic hardware interfaces
  * @{
+ * \defgroup pico_async_context pico_async_context
  * \defgroup pico_multicore pico_multicore
  * \defgroup pico_stdlib pico_stdlib
  * \defgroup pico_sync pico_sync
@@ -59,6 +60,7 @@
  * \defgroup networking Networking Libraries
  * Functions for implementing networking
  * @{
+ * \defgroup pico_cyw43_driver pico_cyw43_driver
  * \defgroup pico_lwip pico_lwip
  * \defgroup pico_cyw43_arch pico_cyw43_arch
  * @}
