@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _BOOT_STAGE2_CONFIG_H_
-#define _BOOT_STAGE2_CONFIG_H_
+#ifndef _BOOT_STAGE2_CONFIG_H
+#define _BOOT_STAGE2_CONFIG_H
 
 // NOTE THIS HEADER IS INCLUDED FROM ASSEMBLY
 

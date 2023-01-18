@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef PICO_CONFIG_H_
-#define PICO_CONFIG_H_
+#ifndef _PICO_CONFIG_H
+#define _PICO_CONFIG_H
 
 // -----------------------------------------------------
 // NOTE: THIS HEADER IS ALSO INCLUDED BY ASSEMBLY CODE SO

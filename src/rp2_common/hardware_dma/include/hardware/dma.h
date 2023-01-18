@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _HARDWARE_DMA_H_
-#define _HARDWARE_DMA_H_
+#ifndef _HARDWARE_DMA_H
+#define _HARDWARE_DMA_H
 
 #include "pico.h"
 #include "hardware/structs/dma.h"

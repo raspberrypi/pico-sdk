@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef PICO_H_
-#define PICO_H_
+#ifndef _PICO_H
+#define _PICO_H
 
 /** \file pico.h
  *  \defgroup pico_base pico_base
