@@ -134,8 +134,14 @@ SECTIONS
         *(.text*)
         . = ALIGN(4);
         *(.rodata*)
-        . = ALIGN(4);
 
+        . = ALIGN(4);
+        /* emutls objects */
+        PROVIDE_HIDDEN (__emutls_array_start = .);
+        *(.*.__emutls_v.*)
+        PROVIDE_HIDDEN (__emutls_array_end = .);
+
+        . = ALIGN(4);
         *(.data*)
 
         . = ALIGN(4);

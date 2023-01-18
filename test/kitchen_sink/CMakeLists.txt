@@ -37,6 +37,7 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_platform
     pico_stdlib
     pico_sync
+    pico_tls
     pico_time
     pico_unique_id
     pico_util
