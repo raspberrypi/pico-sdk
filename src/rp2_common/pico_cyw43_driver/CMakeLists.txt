@@ -33,7 +33,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             ${PICO_CYW43_DRIVER_PATH}/firmware
             )
 
-    # pico_cyw43_driver adds async_context integration
+    # pico_cyw43_driver adds async_context integration to cyw43_driver
     add_library(pico_cyw43_driver INTERFACE)
     target_sources(pico_cyw43_driver INTERFACE
             cyw43_driver.c)
@@ -65,17 +65,18 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             ${CYW43_FIRMWARE_BIN} ${CYW43_FIRMWARE_OBJ}
             VERBATIM)
 
-    add_library(pico_cyw43_driver_picow INTERFACE)
-    target_sources(pico_cyw43_driver_picow INTERFACE
+    # cyw43_driver_picow is cyw43_driver plus Pico W specific bus implementation, and Pico W firmware
+    add_library(cyw43_driver_picow INTERFACE)
+    target_sources(cyw43_driver_picow INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/cyw43_bus_pio_spi.c
             )
-    pico_generate_pio_header(pico_cyw43_driver_picow ${CMAKE_CURRENT_LIST_DIR}/cyw43_bus_pio_spi.pio)
-    add_dependencies(pico_cyw43_driver_picow INTERFACE cyw43_firmware_package)
-    target_link_libraries(pico_cyw43_driver_picow INTERFACE
+    pico_generate_pio_header(cyw43_driver_picow ${CMAKE_CURRENT_LIST_DIR}/cyw43_bus_pio_spi.pio)
+    add_dependencies(cyw43_driver_picow INTERFACE cyw43_firmware_package)
+    target_link_libraries(cyw43_driver_picow INTERFACE
             ${CYW43_FIRMWARE_OBJ}
             )
-    target_link_libraries(pico_cyw43_driver_picow INTERFACE
-            pico_cyw43_driver
+    target_link_libraries(cyw43_driver_picow INTERFACE
+            cyw43_driver
             hardware_pio
             hardware_dma
             hardware_exception
