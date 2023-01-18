@@ -29,8 +29,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef PICO_PRINTF_H_
-#define PICO_PRINTF_H_
+#ifndef _PICO_PRINTF_H
+#define _PICO_PRINTF_H
 
 /** \file printf.h
  *  \defgroup pico_printf pico_printf

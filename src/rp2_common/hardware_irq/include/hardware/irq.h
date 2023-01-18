@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _HARDWARE_IRQ_H_
-#define _HARDWARE_IRQ_H_
+#ifndef _HARDWARE_IRQ_H
+#define _HARDWARE_IRQ_H
 
 // These two config items are also used by assembler, so keeping separate
 // PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum number of shared IRQ handlers, default=4, advanced=true, group=hardware_irq

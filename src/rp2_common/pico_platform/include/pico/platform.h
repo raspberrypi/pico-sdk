@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _PICO_PLATFORM_H_
-#define _PICO_PLATFORM_H_
+#ifndef _PICO_PLATFORM_H
+#define _PICO_PLATFORM_H
 
 /** \file platform.h
  *  \defgroup pico_platform pico_platform

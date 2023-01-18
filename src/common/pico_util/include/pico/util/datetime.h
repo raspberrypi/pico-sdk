@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _PICO_DATETIME_H
-#define _PICO_DATETIME_H
+#ifndef _PICO_UTIL_DATETIME_H
+#define _PICO_UTIL_DATETIME_H
 
 #include "pico.h"
 

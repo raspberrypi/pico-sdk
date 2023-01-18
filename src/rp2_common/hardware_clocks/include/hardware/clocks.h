@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _HARDWARE_CLOCKS_H_
-#define _HARDWARE_CLOCKS_H_
+#ifndef _HARDWARE_CLOCKS_H
+#define _HARDWARE_CLOCKS_H
 
 #include "pico.h"
 #include "hardware/structs/clocks.h"

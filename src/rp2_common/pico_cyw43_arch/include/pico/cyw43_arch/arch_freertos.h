@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _EXAMPLE_CYW43_ARCH_ARCH_FREERTOS_SYS_H
-#define _EXAMPLE_CYW43_ARCH_ARCH_FREERTOS_SYS_H
+#ifndef _PICO_CYW43_ARCH_ARCH_FREERTOS_H
+#define _PICO_CYW43_ARCH_ARCH_FREERTOS_H
 
 #include "pico/cyw43_arch/arch_common.h"
 

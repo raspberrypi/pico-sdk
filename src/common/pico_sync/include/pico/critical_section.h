@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _PLATFORM_CRITICAL_SECTION_H
-#define _PLATFORM_CRITICAL_SECTION_H
+#ifndef _PICO_CRITICAL_SECTION_H
+#define _PICO_CRITICAL_SECTION_H
 
 #include "pico/lock_core.h"
 

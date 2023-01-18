@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _UTIL_QUEUE_H
-#define _UTIL_QUEUE_H
+#ifndef _PICO_UTIL_QUEUE_H
+#define _PICO_UTIL_QUEUE_H
 
 #include "pico.h"
 #include "hardware/sync.h"
