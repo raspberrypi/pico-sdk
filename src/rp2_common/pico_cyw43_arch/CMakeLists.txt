@@ -1,5 +1,5 @@
 if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
-    if (TARGET pico_cyw43_driver_picow)
+    if (TARGET cyw43_driver_picow)
         pico_add_impl_library(pico_cyw43_arch)
         target_sources(pico_cyw43_arch INTERFACE
                 ${CMAKE_CURRENT_LIST_DIR}/cyw43_arch.c
@@ -13,7 +13,9 @@ if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
 
         target_link_libraries(pico_cyw43_arch INTERFACE
                 pico_unique_id
-                pico_cyw43_driver_picow)
+                cyw43_driver_picow # driver for pico w
+                pico_cyw43_driver # integration with async_context
+                )
 
         if (NOT TARGET pico_lwip)
             message(WARNING "lwIP is not available; Full Pico W wireless support will be unavailable")
