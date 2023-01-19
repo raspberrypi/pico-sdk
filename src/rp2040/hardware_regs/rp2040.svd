@@ -29676,7 +29676,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -29684,7 +29684,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -29960,7 +29960,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -29968,7 +29968,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -30244,7 +30244,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -30252,7 +30252,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -30528,7 +30528,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -30536,7 +30536,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -30812,7 +30812,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -30820,7 +30820,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -31096,7 +31096,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -31104,7 +31104,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -31380,7 +31380,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -31388,7 +31388,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -31664,7 +31664,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -31672,7 +31672,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -31948,7 +31948,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -31956,7 +31956,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -32232,7 +32232,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -32240,7 +32240,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -32516,7 +32516,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -32524,7 +32524,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -32800,7 +32800,7 @@
               <access>read-write</access>
               <bitRange>[30:30]</bitRange>
               <description>If 1, the channel received a read bus error. Write one to clear.\n
-                READ_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 3 transfers later)</description>
+                READ_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 3 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>READ_ERROR</name>
             </field>
@@ -32808,7 +32808,7 @@
               <access>read-write</access>
               <bitRange>[29:29]</bitRange>
               <description>If 1, the channel received a write bus error. Write one to clear.\n
-                WRITE_ADDR shows the approximate address where the bus error was encountered (will not to be earlier, or more than 5 transfers later)</description>
+                WRITE_ADDR shows the approximate address where the bus error was encountered (will not be earlier, or more than 5 transfers later)</description>
               <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>WRITE_ERROR</name>
             </field>
@@ -33048,12 +33048,13 @@
           <description>Interrupt Status (raw)</description>
           <fields>
             <field>
-              <access>read-only</access>
+              <access>read-write</access>
               <bitRange>[15:0]</bitRange>
               <description>Raw interrupt status for DMA Channels 0..15. Bit n corresponds to channel n. Ignores any masking or forcing. Channel interrupts can be cleared by writing a bit mask to INTR, INTS0 or INTS1.\n\n
                 Channel interrupts can be routed to either of two system-level IRQs based on INTE0 and INTE1.\n\n
                 This can be used vector different channel interrupts to different ISRs: this might be done to allow NVIC IRQ preemption for more time-critical channels, or to spread IRQ load across different cores.\n\n
                 It is also valid to ignore this behaviour and just use INTE0/INTS0/IRQ 0.</description>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
               <name>INTR</name>
             </field>
           </fields>
@@ -41957,7 +41958,8 @@
               <access>read-write</access>
               <bitRange>[7:4]</bitRange>
               <description>Write 1 to instantly clear internal SM state which may be otherwise difficult to access and will affect future execution.\n\n
-                Specifically, the following are cleared: input and output shift counters; the contents of the input shift register; the delay counter; the waiting-on-IRQ state; any stalled instruction written to SMx_INSTR or run by OUT/MOV EXEC; any pin write left asserted due to OUT_STICKY.</description>
+                Specifically, the following are cleared: input and output shift counters; the contents of the input shift register; the delay counter; the waiting-on-IRQ state; any stalled instruction written to SMx_INSTR or run by OUT/MOV EXEC; any pin write left asserted due to OUT_STICKY.\n\n
+                The program counter, the contents of the output shift register and the X/Y scratch registers are not affected.</description>
               <modifiedWriteValues>clear</modifiedWriteValues>
               <name>SM_RESTART</name>
             </field>

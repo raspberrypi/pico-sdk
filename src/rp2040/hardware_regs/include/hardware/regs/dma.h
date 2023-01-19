@@ -84,7 +84,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH0_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH0_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -96,8 +96,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH0_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH0_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH0_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -472,7 +472,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH1_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH1_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -484,8 +484,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH1_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH1_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH1_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -860,7 +860,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH2_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH2_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -872,8 +872,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH2_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH2_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH2_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -1248,7 +1248,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH3_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH3_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -1260,8 +1260,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH3_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH3_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH3_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -1636,7 +1636,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH4_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH4_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -1648,8 +1648,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH4_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH4_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH4_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -2024,7 +2024,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH5_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH5_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -2036,8 +2036,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH5_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH5_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH5_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -2412,7 +2412,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH6_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH6_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -2424,8 +2424,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH6_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH6_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH6_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -2800,7 +2800,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH7_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH7_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -2812,8 +2812,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH7_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH7_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH7_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -3188,7 +3188,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH8_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH8_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -3200,8 +3200,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH8_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH8_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH8_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -3576,7 +3576,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH9_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH9_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -3588,8 +3588,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH9_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH9_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH9_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -3964,7 +3964,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH10_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH10_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -3976,8 +3976,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH10_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH10_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH10_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -4352,7 +4352,7 @@
 // Description : If 1, the channel received a read bus error. Write one to
 //               clear.
 //               READ_ADDR shows the approximate address where the bus error was
-//               encountered (will not to be earlier, or more than 3 transfers
+//               encountered (will not be earlier, or more than 3 transfers
 //               later)
 #define DMA_CH11_CTRL_TRIG_READ_ERROR_RESET  _u(0x0)
 #define DMA_CH11_CTRL_TRIG_READ_ERROR_BITS   _u(0x40000000)
@@ -4364,8 +4364,8 @@
 // Description : If 1, the channel received a write bus error. Write one to
 //               clear.
 //               WRITE_ADDR shows the approximate address where the bus error
-//               was encountered (will not to be earlier, or more than 5
-//               transfers later)
+//               was encountered (will not be earlier, or more than 5 transfers
+//               later)
 #define DMA_CH11_CTRL_TRIG_WRITE_ERROR_RESET  _u(0x0)
 #define DMA_CH11_CTRL_TRIG_WRITE_ERROR_BITS   _u(0x20000000)
 #define DMA_CH11_CTRL_TRIG_WRITE_ERROR_MSB    _u(29)
@@ -4690,7 +4690,7 @@
 #define DMA_INTR_RESET  _u(0x00000000)
 #define DMA_INTR_MSB    _u(15)
 #define DMA_INTR_LSB    _u(0)
-#define DMA_INTR_ACCESS "RO"
+#define DMA_INTR_ACCESS "WC"
 // =============================================================================
 // Register    : DMA_INTE0
 // Description : Interrupt Enables for IRQ 0
