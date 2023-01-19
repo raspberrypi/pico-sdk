@@ -7,12 +7,13 @@
     <tab type="user" url="@ref examples_page" visible="yes" title="Examples" intro="Links to SDK examples"/>
     <tab type="usergroup" url="@ref weblinks_page" visible="yes" title="Additional Documentation" intro="Links to datasheets and documentation">
       <tab type="user" url="https://rptl.io/pico-datasheet" visible="yes" title="Raspberry Pi Pico Datasheet" intro=""/>
+      <tab type="user" url="https://rptl.io/picow-datasheet" visible="yes" title="Raspberry Pi Pico W Datasheet" intro=""/>
       <tab type="user" url="https://rptl.io/rp2040-datasheet" visible="yes" title="RP2040 Datasheet" intro=""/>
       <tab type="user" url="https://rptl.io/rp2040-design" visible="yes" title="Hardware design with RP2040" intro=""/>
       <tab type="user" url="https://rptl.io/pico-c-sdk" visible="yes" title="Raspberry Pi Pico C/C++ SDK" intro=""/>
       <tab type="user" url="https://rptl.io/pico-micropython" visible="yes" title="Raspberry Pi Pico Python SDK" intro=""/>
       <tab type="user" url="https://rptl.io/pico-get-started" visible="yes" title="Getting started with Raspberry Pi Pico" intro=""/>
-      <tab type="user" url="https://rptl.io/pico-faq" visible="yes" title="Raspberry Pi Pico FAQ" intro=""/>
+      <tab type="user" url="https://rptl.io/picow-connect" visible="yes" title="Connecting to the Internet with Raspberry Pi Pico W" intro=""/>
     </tab>
     <tab type="usergroup" url="@ref weblinks_page" visible="yes" title="Web" intro="useful weblinks">
       <tab type="user" url="https://www.raspberrypi.com/" visible="yes" title="Raspberry Pi Site" intro=""/>
