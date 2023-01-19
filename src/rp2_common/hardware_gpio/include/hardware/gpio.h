@@ -476,9 +476,8 @@ static inline uint32_t gpio_get_irq_event_mask(uint gpio) {
  * the opposite level).
  *
  * \param gpio GPIO number
- * \param events Bitmask of events to clear. See \ref gpio_set_irq_enabled for details.
  *
- * \note For callbacks set with \ref gpio_set_irq_enabled_with_callback, or \ref gpio_set_irq_callback,this function is called automatically.
+ * \note For callbacks set with \ref gpio_set_irq_enabled_with_callback, or \ref gpio_set_irq_callback, this function is called automatically.
  * \param event_mask Bitmask of events to clear. See \ref gpio_irq_level for details.
  */
 void gpio_acknowledge_irq(uint gpio, uint32_t event_mask);
