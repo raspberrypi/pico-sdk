@@ -184,14 +184,6 @@ void cyw43_await_background_or_timeout_us(uint32_t timeout_us) {
     async_context_wait_for_work_until(async_context, make_timeout_time_us(timeout_us));
 }
 
-void pico_lwip_custom_lock_tcpip_core(void) {
-    cyw43_thread_enter();
-}
-
-void pico_lwip_custom_unlock_tcpip_core(void) {
-    cyw43_thread_exit();
-}
-
 void cyw43_delay_ms(uint32_t ms) {
     async_context_wait_until(async_context, make_timeout_time_ms(ms));
 }
