@@ -43,6 +43,7 @@
  * @{
  * \defgroup pico_async_context pico_async_context
  * \defgroup pico_multicore pico_multicore
+ * \defgroup pico_rand pico_rand
  * \defgroup pico_stdlib pico_stdlib
  * \defgroup pico_sync pico_sync
  * \defgroup pico_time pico_time
