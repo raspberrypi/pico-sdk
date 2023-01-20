@@ -47,7 +47,6 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             ${PICO_LWIP_PATH}/src/core/timeouts.c
             ${PICO_LWIP_PATH}/src/core/udp.c
             ${CMAKE_CURRENT_LIST_DIR}/lwip_random.c
-            ${CMAKE_CURRENT_LIST_DIR}/lwip_panic.c
             )
     target_include_directories(pico_lwip_core INTERFACE
             ${PICO_LWIP_PATH}/src/include)
