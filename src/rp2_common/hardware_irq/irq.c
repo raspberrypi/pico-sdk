@@ -17,12 +17,12 @@ extern void __unhandled_user_irq(void);
 
 #if PICO_VTABLE_PER_CORE
 static uint8_t user_irq_claimed[NUM_CORES];
-static inline uint8_t *user_irq_claimed_ptr() {
+static inline uint8_t *user_irq_claimed_ptr(void) {
     return &user_irq_claimed[get_core_num()];
 }
 #else
 static uint8_t user_irq_claimed;
-static inline uint8_t *user_irq_claimed_ptr() {
+static inline uint8_t *user_irq_claimed_ptr(void) {
     return &user_irq_claimed;
 }
 #endif
