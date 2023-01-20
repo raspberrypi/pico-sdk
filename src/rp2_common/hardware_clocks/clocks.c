@@ -314,7 +314,7 @@ void clocks_enable_resus(resus_callback_t resus_callback) {
     clocks_hw->resus.ctrl = CLOCKS_CLK_SYS_RESUS_CTRL_ENABLE_BITS | timeout;
 }
 
-void clock_gpio_init(uint gpio, uint src, uint div) {
+void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_int, uint8_t div_frac) {
     // Bit messy but it's as much code to loop through a lookup
     // table. The sources for each gpout generators are the same
     // so just call with the sources from GP0
@@ -330,7 +330,7 @@ void clock_gpio_init(uint gpio, uint src, uint div) {
     // Set up the gpclk generator
     clocks_hw->clk[gpclk].ctrl = (src << CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_LSB) |
                                  CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS;
-    clocks_hw->clk[gpclk].div = div << CLOCKS_CLK_GPOUT0_DIV_INT_LSB;
+    clocks_hw->clk[gpclk].div = (div_int << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) | div_frac;
 
     // Set gpio pin to gpclock function
     gpio_set_function(gpio, GPIO_FUNC_GPCK);

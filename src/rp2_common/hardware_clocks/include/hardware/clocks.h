@@ -172,9 +172,24 @@ void clocks_enable_resus(resus_callback_t resus_callback);
  *
  * \param gpio The GPIO pin to output the clock to. Valid GPIOs are: 21, 23, 24, 25. These GPIOs are connected to the GPOUT0-3 clock generators.
  * \param src  The source clock. See the register field CLOCKS_CLK_GPOUT0_CTRL_AUXSRC for a full list. The list is the same for each GPOUT clock generator.
- * \param div  The amount to divide the source clock by. This is useful to not overwhelm the GPIO pin with a fast clock.
+ * \param div_int  The integer part of the value to divide the source clock by. This is useful to not overwhelm the GPIO pin with a fast clock. this is in range of 1..2^24-1.
+ * \param div_frac The fractional part of the value to divide the source clock by. This is in range of 0..255 (/256).
  */
-void clock_gpio_init(uint gpio, uint src, uint div);
+void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_int, uint8_t div_frac);
+
+/*! \brief Output an optionally divided clock to the specified gpio pin.
+ *  \ingroup hardware_clocks
+ *
+ * \param gpio The GPIO pin to output the clock to. Valid GPIOs are: 21, 23, 24, 25. These GPIOs are connected to the GPOUT0-3 clock generators.
+ * \param src  The source clock. See the register field CLOCKS_CLK_GPOUT0_CTRL_AUXSRC for a full list. The list is the same for each GPOUT clock generator.
+ * \param div  The float amount to divide the source clock by. This is useful to not overwhelm the GPIO pin with a fast clock.
+ */
+static inline void clock_gpio_init(uint gpio, uint src, float div)
+{
+    uint div_int = (uint)div;
+    uint8_t frac = (uint8_t)((div - (float)div_int) * (1u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB));
+    clock_gpio_init_int_frac(gpio, src, div_int, frac);
+}
 
 /*! \brief Configure a clock to come from a gpio input
  *  \ingroup hardware_clocks
