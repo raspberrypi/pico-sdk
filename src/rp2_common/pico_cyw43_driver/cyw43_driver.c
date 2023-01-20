@@ -119,9 +119,10 @@ bool cyw43_driver_init(async_context_t *context) {
 
 void cyw43_driver_deinit(async_context_t *context) {
     assert(context == cyw43_async_context);
+    async_context_remove_at_time_worker(context, &sleep_timeout_worker);
     async_context_remove_when_pending_worker(context, &cyw43_poll_worker);
     // the IRQ IS on the same core as the context, so must be de-initialized there
     async_context_execute_sync(context, cyw43_irq_deinit, NULL);
-    cyw43_async_context = NULL;
     cyw43_deinit(&cyw43_state);
+    cyw43_async_context = NULL;
 }
