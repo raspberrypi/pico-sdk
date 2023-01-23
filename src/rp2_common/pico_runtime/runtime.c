@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/time.h>
+#include <sys/times.h>
 #include <unistd.h>
 #include "pico.h"
 
@@ -230,6 +231,18 @@ __attribute((weak)) int settimeofday(__unused const struct timeval *tv, __unused
         int64_t us_since_epoch = tv->tv_sec * 1000000 + tv->tv_usec;
         epoch_time_us_since_boot = (int64_t)to_us_since_boot(get_absolute_time()) - us_since_epoch;
     }
+    return 0;
+}
+
+__attribute((weak)) int _times(struct tms *tms) {
+#if CLOCKS_PER_SEC >= 1000000
+    tms->tms_utime = to_us_since_boot(get_absolute_time()) * (CLOCKS_PER_SEC / 1000000);
+#else
+    tms->tms_utime = to_us_since_boot(get_absolute_time()) / (1000000 / CLOCKS_PER_SEC);
+#endif
+    tms->tms_stime = 0;
+    tms->tms_cutime = 0;
+    tms->tms_cstime = 0;
     return 0;
 }
 
