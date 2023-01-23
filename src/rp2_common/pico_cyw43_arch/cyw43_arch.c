@@ -76,13 +76,19 @@ int cyw43_arch_wifi_connect_async(const char *ssid, const char *pw, uint32_t aut
 }
 
 // Connect to wireless, return with success when an IP address has been assigned
-int cyw43_arch_wifi_connect_until(const char *ssid, const char *pw, uint32_t auth, absolute_time_t until) {
+static int cyw43_arch_wifi_connect_until(const char *ssid, const char *pw, uint32_t auth, absolute_time_t until) {
     int err = cyw43_arch_wifi_connect_async(ssid, pw, auth);
     if (err) return err;
 
     int status = CYW43_LINK_UP + 1;
     while(status >= 0 && status != CYW43_LINK_UP) {
         int new_status = cyw43_tcpip_link_status(&cyw43_state, CYW43_ITF_STA);
+        // If there was no network, keep trying
+        if (new_status == CYW43_LINK_NONET) {
+            new_status = CYW43_LINK_JOIN;
+            int err = cyw43_arch_wifi_connect_async(ssid, pw, auth);
+            if (err) return err;
+        }
         if (new_status != status) {
             status = new_status;
             CYW43_ARCH_DEBUG("connect status: %s\n", cyw43_tcpip_link_status_name(status));
@@ -94,7 +100,15 @@ int cyw43_arch_wifi_connect_until(const char *ssid, const char *pw, uint32_t aut
         cyw43_arch_poll();
         cyw43_arch_wait_for_work_until(until);
     }
-    return status == CYW43_LINK_UP ? 0 : status;
+    // Turn status into a pico_error_codes
+    assert(status == CYW43_LINK_UP || (status < 0 && status != CYW43_LINK_NONET));
+    if (status == CYW43_LINK_UP) {
+        return PICO_OK; // success
+    } else if (status == CYW43_LINK_BADAUTH) {
+        return PICO_ERROR_BADAUTH;
+    } else {
+        return PICO_ERROR_CONNECT_FAILED;
+    }
 }
 
 int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t auth) {
