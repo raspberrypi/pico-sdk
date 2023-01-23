@@ -32,6 +32,8 @@
 #ifndef __CC_H__
 #define __CC_H__
 
+#include <sys/time.h>
+
 #if NO_SYS
 // todo really we should just not allow SYS_LIGHTWEIGHT_PROT for nosys mode (it doesn't do anything anyway)
 typedef int sys_prot_t;

@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <sys/time.h>
+#include <unistd.h>
 #include "pico.h"
 
 #include "hardware/regs/m0plus.h"
@@ -175,7 +177,7 @@ void runtime_init(void) {
 
 }
 
-void __attribute__((noreturn)) _exit(__unused int status) {
+void __attribute__((noreturn)) __attribute__((weak)) _exit(__unused int status) {
 #if PICO_ENTER_USB_BOOT_ON_EXIT
     reset_usb_boot(0,0);
 #else
@@ -185,7 +187,7 @@ void __attribute__((noreturn)) _exit(__unused int status) {
 #endif
 }
 
-void *_sbrk(int incr) {
+__attribute__((weak)) void *_sbrk(int incr) {
     extern char end; /* Set by linker.  */
     static char *heap_end;
     char *prev_heap_end;
@@ -210,6 +212,33 @@ void *_sbrk(int incr) {
 
     heap_end = next_heap_end;
     return (void *) prev_heap_end;
+}
+
+static int64_t epoch_time_us_since_boot;
+
+__attribute__((weak)) int _gettimeofday (struct timeval *__restrict tv, __unused void *__restrict tz) {
+    if (tv) {
+        int64_t us_since_epoch = ((int64_t)to_us_since_boot(get_absolute_time())) - epoch_time_us_since_boot;
+        tv->tv_sec = (time_t)(us_since_epoch / 1000000);
+        tv->tv_usec = (suseconds_t)(us_since_epoch % 1000000);
+    }
+    return 0;
+}
+
+__attribute((weak)) int settimeofday(__unused const struct timeval *tv, __unused const struct timezone *tz) {
+    if (tv) {
+        int64_t us_since_epoch = tv->tv_sec * 1000000 + tv->tv_usec;
+        epoch_time_us_since_boot = (int64_t)to_us_since_boot(get_absolute_time()) - us_since_epoch;
+    }
+    return 0;
+}
+
+__attribute((weak)) pid_t _getpid(void) {
+    return 0;
+}
+
+__attribute((weak)) int _kill(__unused pid_t pid, __unused int sig) {
+    return -1;
 }
 
 // exit is not useful... no desire to pull in __call_exitprocs

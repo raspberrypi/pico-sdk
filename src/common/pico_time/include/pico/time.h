@@ -159,7 +159,7 @@ static inline int64_t absolute_time_diff_us(absolute_time_t from, absolute_time_
 
 /*! \brief The timestamp representing the end of time; this is actually not the maximum possible
  * timestamp, but is set to 0x7fffffff_ffffffff microseconds to avoid sign overflows with time
- * arithmetic. This is still over 7 million years, so should be sufficient.
+ * arithmetic. This is almost 300,000 years, so should be sufficient.
  * \ingroup timestamp
  */
 extern const absolute_time_t at_the_end_of_time;

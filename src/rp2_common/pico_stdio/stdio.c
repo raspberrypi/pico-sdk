@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <sys/stat.h>
 
 #include "pico.h"
 #if LIB_PICO_PRINTF_PICO
@@ -172,19 +173,39 @@ int puts_raw(const char *s) {
     return len;
 }
 
-int _read(int handle, char *buffer, int length) {
+int __attribute__((weak)) _read(int handle, char *buffer, int length) {
     if (handle == STDIO_HANDLE_STDIN) {
         return stdio_get_until(buffer, length, at_the_end_of_time);
     }
     return -1;
 }
 
-int _write(int handle, char *buffer, int length) {
+int __attribute__((weak)) _write(int handle, char *buffer, int length) {
     if (handle == STDIO_HANDLE_STDOUT || handle == STDIO_HANDLE_STDERR) {
         stdio_put_string(buffer, length, false, false);
         return length;
     }
     return -1;
+}
+
+int __attribute__((weak)) _open(__unused const char *fn, __unused int oflag, ...) {
+    return -1;
+}
+
+int __attribute__((weak)) _close(__unused int fd) {
+    return -1;
+}
+
+off_t __attribute__((weak)) _lseek(__unused int fd, __unused off_t pos, __unused int whence) {
+    return -1;
+}
+
+int __attribute__((weak)) _fstat(__unused int fd, __unused struct stat *buf) {
+    return -1;
+}
+
+int __attribute__((weak)) _isatty(int fd) {
+    return fd == STDIO_HANDLE_STDIN || fd == STDIO_HANDLE_STDOUT || fd == STDIO_HANDLE_STDERR;
 }
 
 void stdio_set_driver_enabled(stdio_driver_t *driver, bool enable) {
