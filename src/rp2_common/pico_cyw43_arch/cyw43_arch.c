@@ -73,7 +73,7 @@ const char* cyw43_tcpip_link_status_name(int status)
 int cyw43_arch_wifi_connect_bssid_async(const char *ssid, const uint8_t *bssid, const char *pw, uint32_t auth) {
     if (!pw) auth = CYW43_AUTH_OPEN;
     // Connect to wireless
-    return cyw43_wifi_join(&cyw43_state, strlen(ssid), (const uint8_t *)ssid, pw ? strlen(pw) : 0, (const uint8_t *)pw, auth, bssid, CYW43_ITF_STA);
+    return cyw43_wifi_join(&cyw43_state, strlen(ssid), (const uint8_t *)ssid, pw ? strlen(pw) : 0, (const uint8_t *)pw, auth, bssid, CYW43_CHANNEL_NONE);
 }
 
 int cyw43_arch_wifi_connect_async(const char *ssid, const char *pw, uint32_t auth) {
