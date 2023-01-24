@@ -114,6 +114,10 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
     stack_ptr[0] = (uintptr_t) entry;
     stack_ptr[1] = (uintptr_t) stack_bottom;
     stack_ptr[2] = (uintptr_t) core1_wrapper;
+#if PICO_VTABLE_PER_CORE
+#warning PICO_VTABLE_PER_CORE==1 is not currently supported in pico_multicore
+    panic_unsupported();
+#endif
     multicore_launch_core1_raw(core1_trampoline, stack_ptr, scb_hw->vtor);
 }
 
