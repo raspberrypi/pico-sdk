@@ -272,9 +272,7 @@ static void process_under_lock(async_context_threadsafe_background_t *self) {
         if (self->alarm_id > 0) alarm_pool_cancel_alarm(self->alarm_pool, self->alarm_id);
         self->last_set_alarm_time = next_time;
         self->alarm_pending = true;
-//        graham_gpio_set_mask(32);
         self->alarm_id = alarm_pool_add_alarm_at(self->alarm_pool, next_time, alarm_handler, self, false);
-//        graham_gpio_clr_mask(32);
         if (self->alarm_id > 0) break;
         self->alarm_pending = false;
     } while (true);

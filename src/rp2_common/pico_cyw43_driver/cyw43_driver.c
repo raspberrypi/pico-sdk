@@ -51,12 +51,6 @@ uint32_t cyw43_irq_init(__unused void *param) {
 #ifndef NDEBUG
     assert(get_core_num() == async_context_core_num(cyw43_async_context));
 #endif
-#if GRAHAM_DEBUG
-    for(int i=0;i<8;i++) {
-        gpio_init(i);
-        gpio_set_dir(i, true);
-    }
-#endif
     gpio_add_raw_irq_handler_with_order_priority(CYW43_PIN_WL_HOST_WAKE, cyw43_gpio_irq_handler, CYW43_GPIO_IRQ_HANDLER_PRIORITY);
     cyw43_set_irq_enabled(true);
     irq_set_enabled(IO_IRQ_BANK0, true);
