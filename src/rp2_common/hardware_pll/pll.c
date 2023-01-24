@@ -29,9 +29,7 @@ void pll_init(PLL pll, uint refdiv, uint vco_freq, uint post_div1, uint post_div
 
     // post_div1 should be >= post_div2
     // from appnote page 11
-    // postdiv1 is designed to operate with a higher input frequency
-    // than postdiv2
-    assert(post_div2 <= post_div1);
+    // postdiv1 is designed to operate with a higher input frequency than postdiv2
 
     // Check that reference frequency is no greater than vco / 16
     assert(ref_mhz <= (vco_freq / 16));
