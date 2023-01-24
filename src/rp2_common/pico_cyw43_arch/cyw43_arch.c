@@ -14,13 +14,19 @@
 #include "cyw43_ll.h"
 #include "cyw43_stats.h"
 
-#if CYW43_ARCH_DEBUG_ENABLED
+#if PICO_CYW43_ARCH_DEBUG_ENABLED
 #define CYW43_ARCH_DEBUG(...) printf(__VA_ARGS__)
 #else
 #define CYW43_ARCH_DEBUG(...) ((void)0)
 #endif
 
 static uint32_t country_code = PICO_CYW43_ARCH_DEFAULT_COUNTRY_CODE;
+
+static async_context_t *async_context;
+
+void cyw43_arch_set_async_context(async_context_t *context) {
+    async_context = context;
+}
 
 void cyw43_arch_enable_sta_mode() {
     assert(cyw43_is_initialized(&cyw43_state));
@@ -39,9 +45,9 @@ void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t 
     cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_AP, true, cyw43_arch_get_country_code());
 }
 
-#if CYW43_ARCH_DEBUG_ENABLED
+#if PICO_CYW43_ARCH_DEBUG_ENABLED
 // Return a string for the wireless state
-static const char* status_name(int status)
+const char* cyw43_tcpip_link_status_name(int status)
 {
     switch (status) {
     case CYW43_LINK_DOWN:
@@ -79,14 +85,14 @@ int cyw43_arch_wifi_connect_until(const char *ssid, const char *pw, uint32_t aut
         int new_status = cyw43_tcpip_link_status(&cyw43_state, CYW43_ITF_STA);
         if (new_status != status) {
             status = new_status;
-            CYW43_ARCH_DEBUG("connect status: %s\n", status_name(status));
+            CYW43_ARCH_DEBUG("connect status: %s\n", cyw43_tcpip_link_status_name(status));
         }
-        // in case polling is required
-        cyw43_arch_poll();
-        best_effort_wfe_or_timeout(until);
         if (time_reached(until)) {
             return PICO_ERROR_TIMEOUT;
         }
+        // Do polling
+        cyw43_arch_poll();
+        cyw43_arch_wait_for_work_until(until);
     }
     return status == CYW43_LINK_UP ? 0 : status;
 }
@@ -143,3 +149,64 @@ bool cyw43_arch_gpio_get(uint wl_gpio) {
     cyw43_gpio_get(&cyw43_state, (int)wl_gpio, &value);
     return value;
 }
+
+async_context_t *cyw43_arch_async_context(void) {
+    return async_context;
+}
+
+void cyw43_arch_poll(void)
+{
+    async_context_poll(async_context);
+}
+
+void cyw43_arch_wait_for_work_until(absolute_time_t until) {
+    async_context_wait_for_work_until(async_context, until);
+}
+
+// Prevent background processing in pensv and access by the other core
+// These methods are called in pensv context and on either core
+// They can be called recursively
+void cyw43_thread_enter(void) {
+    async_context_acquire_lock_blocking(async_context);
+}
+
+void cyw43_thread_exit(void) {
+    async_context_release_lock(async_context);
+}
+
+#ifndef NDEBUG
+void cyw43_thread_lock_check(void) {
+    async_context_lock_check(async_context);
+}
+#endif
+
+void cyw43_await_background_or_timeout_us(uint32_t timeout_us) {
+    async_context_wait_for_work_until(async_context, make_timeout_time_us(timeout_us));
+}
+
+void cyw43_delay_ms(uint32_t ms) {
+    async_context_wait_until(async_context, make_timeout_time_ms(ms));
+}
+
+void cyw43_delay_us(uint32_t us) {
+    async_context_wait_until(async_context, make_timeout_time_us(us));
+}
+
+#if !CYW43_LWIP
+static void no_lwip_fail() {
+    panic("cyw43 has no ethernet interface");
+}
+void __attribute__((weak)) cyw43_cb_tcpip_init(cyw43_t *self, int itf) {
+}
+void __attribute__((weak)) cyw43_cb_tcpip_deinit(cyw43_t *self, int itf) {
+}
+void __attribute__((weak)) cyw43_cb_tcpip_set_link_up(cyw43_t *self, int itf) {
+    no_lwip_fail();
+}
+void __attribute__((weak)) cyw43_cb_tcpip_set_link_down(cyw43_t *self, int itf) {
+    no_lwip_fail();
+}
+void __attribute__((weak)) cyw43_cb_process_ethernet(void *cb_data, int itf, size_t len, const uint8_t *buf) {
+    no_lwip_fail();
+}
+#endif

@@ -104,12 +104,12 @@ extern "C" {
 #define PARAM_ASSERTIONS_ENABLED_CYW43_ARCH 0
 #endif
 
-// PICO_CONFIG: CYW43_ARCH_DEBUG_ENABLED, Enable/disable some debugging output in the pico_cyw43_arch module, type=bool, default=1 in debug builds, group=pico_cyw43_arch
-#ifndef CYW43_ARCH_DEBUG_ENABLED
+// PICO_CONFIG: PICO_CYW43_ARCH_DEBUG_ENABLED, Enable/disable some debugging output in the pico_cyw43_arch module, type=bool, default=1 in debug builds, group=pico_cyw43_arch
+#ifndef PICO_CYW43_ARCH_DEBUG_ENABLED
 #ifndef NDEBUG
-#define CYW43_ARCH_DEBUG_ENABLED 1
+#define PICO_CYW43_ARCH_DEBUG_ENABLED 1
 #else
-#define CYW43_ARCH_DEBUG_ENABLED 0
+#define PICO_CYW43_ARCH_DEBUG_ENABLED 0
 #endif
 #endif
 
@@ -129,6 +129,11 @@ extern "C" {
  * \note this method initializes wireless with a country code of \c PICO_CYW43_ARCH_DEFAULT_COUNTRY_CODE
  * which defaults to \c CYW43_COUNTRY_WORLDWIDE. Worldwide settings may not give the best performance; consider
  * setting PICO_CYW43_ARCH_DEFAULT_COUNTRY_CODE to a different value or calling \ref cyw43_arch_init_with_country
+ *
+ * By default this method initializes the cyw43_arch code's own \ref async_context by calling
+ * \ref cyw43_arch_init_default_async_context, however the user can specify use of their own async_context
+ * by calling \ref cyw43_arch_set_async_context() before calling this method
+ *
  * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
  */
 int cyw43_arch_init(void);
@@ -141,30 +146,14 @@ int cyw43_arch_init(void);
  * was enabled at build time). This method must be called prior to using any other \c pico_cyw43_arch,
  * \c cyw43_driver or lwIP functions.
  *
+ * By default this method initializes the cyw43_arch code's own \ref async_context by calling
+ * \ref cyw43_arch_init_default_async_context, however the user can specify use of their own async_context
+ * by calling \ref cyw43_arch_set_async_context() before calling this method
+ *
  * \param country the country code to use (see \ref CYW43_COUNTRY_)
  * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
  */
 int cyw43_arch_init_with_country(uint32_t country);
-
-/*!
- * \brief Enables Wi-Fi STA (Station) mode.
- * \ingroup pico_cyw43_arch
- *
- * This enables the Wi-Fi in \em Station mode such that connections can be made to other Wi-Fi Access Points
- */
-void cyw43_arch_enable_sta_mode(void);
-
-/*!
- * \brief Enables Wi-Fi AP (Access point) mode.
- * \ingroup pico_cyw43_arch
- *
- * This enables the Wi-Fi in \em Access \em Point mode such that connections can be made to the device by  other Wi-Fi clients
- * \param ssid the name for the access point
- * \param password the password to use or NULL for no password.
- * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
- *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
- */
-void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t auth);
 
 /*!
  * \brief De-initialize the CYW43 architecture
@@ -173,80 +162,41 @@ void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t 
  * This method de-initializes the `cyw43_driver` code and de-initializes the lwIP stack (if it
  * was enabled at build time). Note this method should always be called from the same core (or RTOS
  * task, depending on the environment) as \ref cyw43_arch_init.
+ *
+ * Additionally if the cyw43_arch is using its own async_context instance, then that instance is de-initialized.
  */
 void cyw43_arch_deinit(void);
 
 /*!
- * \brief Attempt to connect to a wireless access point, blocking until the network is joined or a failure is detected.
+ * \brief Return the current async_context currently in use by the cyw43_arch code
  * \ingroup pico_cyw43_arch
  *
- * \param ssid the network name to connect to
- * \param pw the network password or NULL if there is no password required
- * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
- *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
- *
- * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
+ * \return the async_context.
  */
-int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t auth);
+async_context_t *cyw43_arch_async_context(void);
 
 /*!
- * \brief Attempt to connect to a wireless access point, blocking until the network is joined, a failure is detected or a timeout occurs
+ * \brief Set the async_context to be used by the cyw43_arch_init
  * \ingroup pico_cyw43_arch
  *
- * \param ssid the network name to connect to
- * \param pw the network password or NULL if there is no password required
- * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
- *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ * \note This method must be called before calling cyw43_arch_init or cyw43_arch_init_with_country
+ * if you wish to use a custom async_context instance.
  *
- * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
+ * \param context the async_context to be used
  */
-int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_t auth, uint32_t timeout_ms);
+void cyw43_arch_set_async_context(async_context_t *context);
 
 /*!
- * \brief Start attempting to connect to a wireless access point
+ * \brief Initialize the default \ref async_context for the current cyw43_arch type
  * \ingroup pico_cyw43_arch
  *
- * This method tells the CYW43 driver to start connecting to an access point. You should subsequently check the
- * status by calling \ref cyw43_wifi_link_status.
+ * This method initializes and returns a pointer to the static async_context associated
+ * with cyw43_arch. This method is called by \ref cyw43_arch_init automatically
+ * if a different async_context has not been set by \ref cyw43_arch_set_async_context
  *
- * \param ssid the network name to connect to
- * \param pw the network password or NULL if there is no password required
- * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
- *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
- *
- * \return 0 if the scan was started successfully, an error code otherwise \see pico_error_codes
+ * \return the context or NULL if initialization failed.
  */
-int cyw43_arch_wifi_connect_async(const char *ssid, const char *pw, uint32_t auth);
-
-/*!
- * \brief Return the country code used to initialize cyw43_arch
- * \ingroup pico_cyw43_arch
- *
- * \return the country code (see \ref CYW43_COUNTRY_)
- */
-uint32_t cyw43_arch_get_country_code(void);
-
-/*!
- * \brief Set a GPIO pin on the wireless chip to a given value
- * \ingroup pico_cyw43_arch
- * \note this method does not check for errors setting the GPIO. You can use the lower level \ref cyw43_gpio_set instead if you wish
- * to check for errors.
- *
- * \param wl_gpio the GPIO number on the wireless chip
- * \param value true to set the GPIO, false to clear it.
- */
-void cyw43_arch_gpio_put(uint wl_gpio, bool value);
-
-/*!
- * \brief Read the value of a GPIO pin on the wireless chip
- * \ingroup pico_cyw43_arch
- * \note this method does not check for errors setting the GPIO. You can use the lower level \ref cyw43_gpio_get instead if you wish
- * to check for errors.
- *
- * \param wl_gpio the GPIO number on the wireless chip
- * \return true if the GPIO is high, false otherwise
- */
-bool cyw43_arch_gpio_get(uint wl_gpio);
+async_context_t *cyw43_arch_init_default_async_context(void);
 
 /*!
  * \brief Perform any processing required by the \c cyw43_driver or the TCP/IP stack
@@ -257,6 +207,18 @@ bool cyw43_arch_gpio_get(uint wl_gpio);
  * may be called in other styles, but it is unnecessary to do so.
  */
 void cyw43_arch_poll(void);
+
+/*!
+ * \brief Sleep until there is cyw43_driver work to be done
+ * \ingroup pico_cyw43_arch
+ *
+ * This method may be called by code that is waiting for an event to
+ * come from the cyw43_driver, and has no work to do, but would like
+ * to sleep without blocking any background work associated with the cyw43_driver.
+ *
+ * \param until the time to wait until if there is no work to do.
+ */
+void cyw43_arch_wait_for_work_until(absolute_time_t until);
 
 /*!
  * \fn cyw43_arch_lwip_begin
@@ -320,6 +282,98 @@ void cyw43_arch_poll(void);
  * \sa cyw43_arch_lwip_begin
  * \sa cyw43_arch_lwip_protect
  */
+
+/*!
+ * \brief Return the country code used to initialize cyw43_arch
+ * \ingroup pico_cyw43_arch
+ *
+ * \return the country code (see \ref CYW43_COUNTRY_)
+ */
+uint32_t cyw43_arch_get_country_code(void);
+
+/*!
+ * \brief Enables Wi-Fi STA (Station) mode.
+ * \ingroup pico_cyw43_arch
+ *
+ * This enables the Wi-Fi in \emStation mode such that connections can be made to other Wi-Fi Access Points
+ */
+void cyw43_arch_enable_sta_mode(void);
+
+/*!
+ * \brief Enables Wi-Fi AP (Access point) mode.
+ * \ingroup pico_cyw43_arch
+ *
+ * This enables the Wi-Fi in \em Access \em Point mode such that connections can be made to the device by  other Wi-Fi clients
+ * \param ssid the name for the access point
+ * \param password the password to use or NULL for no password.
+ * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
+ *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ */
+void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t auth);
+
+/*!
+ * \brief Attempt to connect to a wireless access point, blocking until the network is joined or a failure is detected.
+ * \ingroup pico_cyw43_arch
+ *
+ * \param ssid the network name to connect to
+ * \param pw the network password or NULL if there is no password required
+ * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
+ *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ *
+ * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
+ */
+int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t auth);
+
+/*!
+ * \brief Attempt to connect to a wireless access point, blocking until the network is joined, a failure is detected or a timeout occurs
+ * \ingroup pico_cyw43_arch
+ *
+ * \param ssid the network name to connect to
+ * \param pw the network password or NULL if there is no password required
+ * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
+ *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ *
+ * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
+ */
+int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_t auth, uint32_t timeout);
+
+/*!
+ * \brief Start attempting to connect to a wireless access point
+ * \ingroup pico_cyw43_arch
+ *
+ * This method tells the CYW43 driver to start connecting to an access point. You should subsequently check the
+ * status by calling \ref cyw43_wifi_link_status.
+ *
+ * \param ssid the network name to connect to
+ * \param pw the network password or NULL if there is no password required
+ * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
+ *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ *
+ * \return 0 if the scan was started successfully, an error code otherwise \see pico_error_codes
+ */
+int cyw43_arch_wifi_connect_async(const char *ssid, const char *pw, uint32_t auth);
+
+/*!
+ * \brief Set a GPIO pin on the wireless chip to a given value
+ * \ingroup pico_cyw43_arch
+ * \note this method does not check for errors setting the GPIO. You can use the lower level \ref cyw43_gpio_set instead if you wish
+ * to check for errors.
+ *
+ * \param wl_gpio the GPIO number on the wireless chip
+ * \param value true to set the GPIO, false to clear it.
+ */
+void cyw43_arch_gpio_put(uint wl_gpio, bool value);
+
+/*!
+ * \brief Read the value of a GPIO pin on the wireless chip
+ * \ingroup pico_cyw43_arch
+ * \note this method does not check for errors setting the GPIO. You can use the lower level \ref cyw43_gpio_get instead if you wish
+ * to check for errors.
+ *
+ * \param wl_gpio the GPIO number on the wireless chip
+ * \return true if the GPIO is high, false otherwise
+ */
+bool cyw43_arch_gpio_get(uint wl_gpio);
 
 #ifdef __cplusplus
 }

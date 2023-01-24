@@ -34,9 +34,18 @@
 
 #include <sys/time.h>
 
+#ifndef PICO_LWIP_CUSTOM_LOCK_TCPIP_CORE
+#define PICO_LWIP_CUSTOM_LOCK_TCPIP_CORE 1
+#endif
+
 #if NO_SYS
 // todo really we should just not allow SYS_LIGHTWEIGHT_PROT for nosys mode (it doesn't do anything anyway)
 typedef int sys_prot_t;
+#elif PICO_LWIP_CUSTOM_LOCK_TCPIP_CORE
+void pico_lwip_custom_lock_tcpip_core(void);
+void pico_lwip_custom_unlock_tcpip_core(void);
+#define LOCK_TCPIP_CORE() pico_lwip_custom_lock_tcpip_core()
+#define UNLOCK_TCPIP_CORE() pico_lwip_custom_unlock_tcpip_core()
 #endif
 
 /* define compiler specific symbols */
@@ -76,8 +85,14 @@ typedef int sys_prot_t;
 #define LWIP_PLATFORM_ASSERT(x) panic(x)
 #endif
 
-unsigned int pico_lwip_rand(void);
 #ifndef LWIP_RAND
+#ifdef __cplusplus
+extern "C" {
+#endif
+unsigned int pico_lwip_rand(void);
+#ifdef __cplusplus
+}
+#endif
 // Use ROSC based random number generation, more for the fact that rand() may not be seeded, than anything else
 #define LWIP_RAND pico_lwip_rand
 #endif

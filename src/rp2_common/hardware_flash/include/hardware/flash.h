@@ -14,10 +14,11 @@
  *
  * Low level flash programming and erase API
  *
- * Note these functions are *unsafe* if you have two cores concurrently
- * executing from flash. In this case you must perform your own
- * synchronisation to make sure no XIP accesses take place during flash
- * programming.
+ * Note these functions are *unsafe* if you are using both cores, and the other 
+ * is executing from flash concurrently with the operation. In this could be the 
+ * case, you must perform your own synchronisation to make sure that no XIP
+ * accesses take place during flash programming. One option is to use the
+ * \ref multicore_lockout functions.
  *
  * Likewise they are *unsafe* if you have interrupt handlers or an interrupt
  * vector table in flash, so you must disable interrupts before calling in

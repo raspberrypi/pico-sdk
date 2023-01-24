@@ -6,10 +6,10 @@ endif ()
 set(LWIP_TEST_PATH "src/Filelists.cmake")
 if (NOT PICO_LWIP_PATH)
     set(PICO_LWIP_PATH ${PROJECT_SOURCE_DIR}/lib/lwip)
-#    if (NOT EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
-#        message(WARNING "LWIP submodule has not been initialized; Pico W wireless support will be unavailable
+    if (PICO_CYW43_SUPPORTED AND NOT EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
+        message(WARNING "LWIP submodule has not been initialized; Pico W wireless support will be unavailable
 #hint: try 'git submodule update --init' from your SDK directory (${PICO_SDK_PATH}).")
-#    endif()
+    endif()
 elseif (NOT EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
     message(WARNING "PICO_LWIP_PATH specified but content not present.")
 endif()
@@ -46,7 +46,7 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             ${PICO_LWIP_PATH}/src/core/tcp_out.c
             ${PICO_LWIP_PATH}/src/core/timeouts.c
             ${PICO_LWIP_PATH}/src/core/udp.c
-            ${CMAKE_CURRENT_LIST_DIR}/random.c
+            ${CMAKE_CURRENT_LIST_DIR}/lwip_random.c
             )
     target_include_directories(pico_lwip_core INTERFACE
             ${PICO_LWIP_PATH}/src/include)
@@ -269,11 +269,12 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
     # our nosys impl
     add_library(pico_lwip_nosys INTERFACE)
     target_sources(pico_lwip_nosys INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/nosys.c
+            ${CMAKE_CURRENT_LIST_DIR}/lwip_nosys.c
             )
     target_link_libraries(pico_lwip_nosys INTERFACE
-            pico_lwip_arch)
-
+            pico_async_context_base
+            pico_lwip_arch
+            pico_lwip)
 
     if (NOT PICO_LWIP_CONTRIB_PATH)
         set(PICO_LWIP_CONTRIB_PATH ${PICO_LWIP_PATH}/contrib)
@@ -290,6 +291,15 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             )
     target_link_libraries(pico_lwip_contrib_freertos INTERFACE
             pico_lwip_arch)
+
+    add_library(pico_lwip_freertos INTERFACE)
+    target_sources(pico_lwip_freertos INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/lwip_freertos.c
+            )
+    target_link_libraries(pico_lwip_freertos INTERFACE
+            pico_async_context_base
+            pico_lwip
+            pico_lwip_contrib_freertos)
 
     pico_promote_common_scope_vars()
 endif()

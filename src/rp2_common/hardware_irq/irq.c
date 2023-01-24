@@ -435,8 +435,6 @@ void irq_init_priorities() {
 #endif
 }
 
-#define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
-
 static uint get_user_irq_claim_index(uint irq_num) {
     invalid_params_if(IRQ, irq_num < FIRST_USER_IRQ || irq_num >= NUM_IRQS);
     // we count backwards from the last, to match the existing hard coded uses of user IRQs in the SDK which were previously using 31

@@ -136,6 +136,16 @@ typedef void (*hardware_alarm_callback_t)(uint alarm_num);
  */
 void hardware_alarm_claim(uint alarm_num);
 
+/*! \brief cooperatively claim the use of this hardware alarm_num
+ *  \ingroup hardware_timer
+ *
+ * This method attempts to claim an unused hardware alarm
+ *
+ * \return alarm_num the hardware alarm claimed or -1 if requires was false, and none are available
+ * \sa hardware_claiming
+ */
+int hardware_alarm_claim_unused(bool required);
+
 /*! \brief cooperatively release the claim on use of this hardware alarm_num
  *  \ingroup hardware_timer
  *
@@ -187,11 +197,23 @@ bool hardware_alarm_set_target(uint alarm_num, absolute_time_t t);
  * \brief Cancel an existing target (if any) for a given hardware_alarm
  * \ingroup hardware_timer
  *
- * @param alarm_num
+ * @param alarm_num the hardware alarm number
  */
-
 void hardware_alarm_cancel(uint alarm_num);
 
+/**
+ * \brief Force and IRQ for a specific hardware alarm
+ * \ingroup hardware_timer
+ *
+ * This method will forcibly make sure the current alarm callback (if present) for the hardware
+ * alarm is called from an IRQ context after this call. If an actual callback is due at the same
+ * time then the callback may only be called once.
+ *
+ * Calling this method does not otherwise interfere with regular callback operations.
+ *
+ * @param alarm_num the hardware alarm number
+ */
+void hardware_alarm_force_irq(uint alarm_num);
 #ifdef __cplusplus
 }
 #endif
