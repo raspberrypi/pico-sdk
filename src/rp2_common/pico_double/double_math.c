@@ -5,9 +5,7 @@
  */
 
 #include <math.h>
-#include "pico/types.h"
 #include "pico/double.h"
-#include "pico/platform.h"
 
 // opened a separate issue https://github.com/raspberrypi/pico-sdk/issues/166 to deal with these warnings if at all
 _Pragma("GCC diagnostic push")

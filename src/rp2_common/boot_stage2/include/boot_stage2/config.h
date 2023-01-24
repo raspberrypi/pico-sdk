@@ -9,7 +9,7 @@
 
 // NOTE THIS HEADER IS INCLUDED FROM ASSEMBLY
 
-#include "pico/config.h"
+#include "pico.h"
 
 // PICO_CONFIG: PICO_BUILD_BOOT_STAGE2_NAME, The name of the boot stage 2 if selected by the build, group=boot_stage2
 #ifdef PICO_BUILD_BOOT_STAGE2_NAME
@@ -85,10 +85,7 @@
         #error no boot stage 2 is defined by PICO_BOOT_STAGE2_CHOOSE_ macro
     #endif
     // we can't include cdefs in assembly, so define our own, but avoid conflict with real ones for c inclusion
-    #define _PICO__STRING(x) #x
-    #define _PICO__XSTRING(x) _PICO__STRING(x)
-    #define _PICO__CONCAT1(x, y) x ## y
-    #define PICO_BOOT_STAGE2_NAME _PICO__XSTRING(_BOOT_STAGE2)
-    #define PICO_BOOT_STAGE2_ASM _PICO__XSTRING(_PICO__CONCAT1(_BOOT_STAGE2,.S))
+    #define PICO_BOOT_STAGE2_NAME __PICO_XSTRING(_BOOT_STAGE2)
+    #define PICO_BOOT_STAGE2_ASM __PICO_XSTRING(__PICO_CONCAT1(_BOOT_STAGE2,.S))
 #endif
 #endif
