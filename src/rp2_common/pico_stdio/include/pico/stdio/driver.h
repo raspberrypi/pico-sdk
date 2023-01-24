@@ -8,7 +8,6 @@
 #define _PICO_STDIO_DRIVER_H
 
 #include "pico/stdio.h"
-#include "pico/platform.h"
 
 struct stdio_driver {
     void (*out_chars)(const char *buf, int len);

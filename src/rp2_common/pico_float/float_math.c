@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "pico/types.h"
 #include "pico/float.h"
-#include "pico/platform.h"
 
 // opened a separate issue https://github.com/raspberrypi/pico-sdk/issues/166 to deal with these warnings if at all
 _Pragma("GCC diagnostic push")

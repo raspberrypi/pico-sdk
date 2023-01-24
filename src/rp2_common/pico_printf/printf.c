@@ -34,7 +34,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "pico/platform.h"
+#include "pico.h"
 #include "pico/printf.h"
 
 // PICO_CONFIG: PICO_PRINTF_NTOA_BUFFER_SIZE, Define printf ntoa buffer size, min=0, max=128, default=32, group=pico_printf
