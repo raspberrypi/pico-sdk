@@ -35,7 +35,12 @@ gcc_versions_sorted = OrderedDict(sorted(gcc_versions.items(), key=lambda item: 
 # Create output
 output = '''
 name: Multi GCC
-on: [workflow_dispatch, push, pull_request]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'develop'
+      - 'master'
 
 jobs:
   build:
