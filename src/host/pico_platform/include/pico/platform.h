@@ -20,21 +20,31 @@
 extern "C" {
 #endif
 
-#define __not_in_flash(grup)
+#define __not_in_flash(group)
 #define __not_in_flash_func(func) func
-#define __no_inline_not_in_flash_func(func)
+#define __no_inline_not_in_flash_func(func) func
 #define __in_flash(group)
 #define __scratch_x(group)
 #define __scratch_y(group)
 
-#define __packed_aligned
+#ifndef _MSC_VER
+#define __packed __attribute__((packed))
+#define __packed_aligned __packed __attribute((aligned))
+#else
+// MSVC requires #pragma pack which isn't compatible with a single attribute style define
 #define __packed
+#define __packed_aligned
+#endif
 
 #define __time_critical_func(x) x
 #define __after_data(group)
 
 //int running_on_fpga() { return false; }
 extern void tight_loop_contents();
+
+#ifndef __STRING
+#define __STRING(x) #x
+#endif
 
 #ifndef _MSC_VER
 #ifndef __noreturn
@@ -76,10 +86,6 @@ extern void tight_loop_contents();
 #ifndef __CONCAT
 #define __CONCAT(x,y) x ## y
 #endif
-
-#ifndef __STRING
-#define __STRING(x) #x
-#endif()
 
 #define __thread __declspec( thread )
 
@@ -133,6 +139,9 @@ static inline int32_t __mul_instruction(int32_t a,int32_t b)
 
 static inline void __compiler_memory_barrier(void) {
 }
+
+uint get_core_num();
+
 #ifdef __cplusplus
 }
 #endif

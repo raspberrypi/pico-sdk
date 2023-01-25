@@ -12,7 +12,7 @@ if (NOT PICO_GCC_TRIPLE)
         message("PICO_GCC_TRIPLE set from environment: $ENV{PICO_GCC_TRIPLE}")
     else()
         set(PICO_GCC_TRIPLE arm-none-eabi)
-        message("PICO_GCC_TRIPLE defaulted to arm-none-eabi")
+        #pico_message_debug("PICO_GCC_TRIPLE defaulted to arm-none-eabi")
     endif()
 endif()
 

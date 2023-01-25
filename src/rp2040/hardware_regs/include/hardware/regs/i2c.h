@@ -8,6 +8,80 @@
 // Version        : 1
 // Bus type       : apb
 // Description    : DW_apb_i2c address block
+//
+//                  List of configuration constants for the Synopsys I2C
+//                  hardware (you may see references to these in I2C register
+//                  header; these are *fixed* values, set at hardware design
+//                  time):
+//
+//                  IC_ULTRA_FAST_MODE ................ 0x0
+//                  IC_UFM_TBUF_CNT_DEFAULT ........... 0x8
+//                  IC_UFM_SCL_LOW_COUNT .............. 0x0008
+//                  IC_UFM_SCL_HIGH_COUNT ............. 0x0006
+//                  IC_TX_TL .......................... 0x0
+//                  IC_TX_CMD_BLOCK ................... 0x1
+//                  IC_HAS_DMA ........................ 0x1
+//                  IC_HAS_ASYNC_FIFO ................. 0x0
+//                  IC_SMBUS_ARP ...................... 0x0
+//                  IC_FIRST_DATA_BYTE_STATUS ......... 0x1
+//                  IC_INTR_IO ........................ 0x1
+//                  IC_MASTER_MODE .................... 0x1
+//                  IC_DEFAULT_ACK_GENERAL_CALL ....... 0x1
+//                  IC_INTR_POL ....................... 0x1
+//                  IC_OPTIONAL_SAR ................... 0x0
+//                  IC_DEFAULT_TAR_SLAVE_ADDR ......... 0x055
+//                  IC_DEFAULT_SLAVE_ADDR ............. 0x055
+//                  IC_DEFAULT_HS_SPKLEN .............. 0x1
+//                  IC_FS_SCL_HIGH_COUNT .............. 0x0006
+//                  IC_HS_SCL_LOW_COUNT ............... 0x0008
+//                  IC_DEVICE_ID_VALUE ................ 0x0
+//                  IC_10BITADDR_MASTER ............... 0x0
+//                  IC_CLK_FREQ_OPTIMIZATION .......... 0x0
+//                  IC_DEFAULT_FS_SPKLEN .............. 0x7
+//                  IC_ADD_ENCODED_PARAMS ............. 0x0
+//                  IC_DEFAULT_SDA_HOLD ............... 0x000001
+//                  IC_DEFAULT_SDA_SETUP .............. 0x64
+//                  IC_AVOID_RX_FIFO_FLUSH_ON_TX_ABRT . 0x0
+//                  IC_CLOCK_PERIOD ................... 100
+//                  IC_EMPTYFIFO_HOLD_MASTER_EN ....... 1
+//                  IC_RESTART_EN ..................... 0x1
+//                  IC_TX_CMD_BLOCK_DEFAULT ........... 0x0
+//                  IC_BUS_CLEAR_FEATURE .............. 0x0
+//                  IC_CAP_LOADING .................... 100
+//                  IC_FS_SCL_LOW_COUNT ............... 0x000d
+//                  APB_DATA_WIDTH .................... 32
+//                  IC_SDA_STUCK_TIMEOUT_DEFAULT ...... 0xffffffff
+//                  IC_SLV_DATA_NACK_ONLY ............. 0x1
+//                  IC_10BITADDR_SLAVE ................ 0x0
+//                  IC_CLK_TYPE ....................... 0x0
+//                  IC_SMBUS_UDID_MSB ................. 0x0
+//                  IC_SMBUS_SUSPEND_ALERT ............ 0x0
+//                  IC_HS_SCL_HIGH_COUNT .............. 0x0006
+//                  IC_SLV_RESTART_DET_EN ............. 0x1
+//                  IC_SMBUS .......................... 0x0
+//                  IC_OPTIONAL_SAR_DEFAULT ........... 0x0
+//                  IC_PERSISTANT_SLV_ADDR_DEFAULT .... 0x0
+//                  IC_USE_COUNTS ..................... 0x0
+//                  IC_RX_BUFFER_DEPTH ................ 16
+//                  IC_SCL_STUCK_TIMEOUT_DEFAULT ...... 0xffffffff
+//                  IC_RX_FULL_HLD_BUS_EN ............. 0x1
+//                  IC_SLAVE_DISABLE .................. 0x1
+//                  IC_RX_TL .......................... 0x0
+//                  IC_DEVICE_ID ...................... 0x0
+//                  IC_HC_COUNT_VALUES ................ 0x0
+//                  I2C_DYNAMIC_TAR_UPDATE ............ 0
+//                  IC_SMBUS_CLK_LOW_MEXT_DEFAULT ..... 0xffffffff
+//                  IC_SMBUS_CLK_LOW_SEXT_DEFAULT ..... 0xffffffff
+//                  IC_HS_MASTER_CODE ................. 0x1
+//                  IC_SMBUS_RST_IDLE_CNT_DEFAULT ..... 0xffff
+//                  IC_SMBUS_UDID_LSB_DEFAULT ......... 0xffffffff
+//                  IC_SS_SCL_HIGH_COUNT .............. 0x0028
+//                  IC_SS_SCL_LOW_COUNT ............... 0x002f
+//                  IC_MAX_SPEED_MODE ................. 0x2
+//                  IC_STAT_FOR_CLK_STRETCH ........... 0x0
+//                  IC_STOP_DET_IF_MASTER_ACTIVE ...... 0x0
+//                  IC_DEFAULT_UFM_SPKLEN ............. 0x1
+//                  IC_TX_BUFFER_DEPTH ................ 16
 // =============================================================================
 #ifndef HARDWARE_REGS_I2C_DEFINED
 #define HARDWARE_REGS_I2C_DEFINED
@@ -585,23 +659,8 @@
 //               matching interrupt clear register. The unmasked raw versions of
 //               these bits are available in the IC_RAW_INTR_STAT register.
 #define I2C_IC_INTR_STAT_OFFSET _u(0x0000002c)
-#define I2C_IC_INTR_STAT_BITS   _u(0x00003fff)
+#define I2C_IC_INTR_STAT_BITS   _u(0x00001fff)
 #define I2C_IC_INTR_STAT_RESET  _u(0x00000000)
-// -----------------------------------------------------------------------------
-// Field       : I2C_IC_INTR_STAT_R_MASTER_ON_HOLD
-// Description : See IC_RAW_INTR_STAT for a detailed description of
-//               R_MASTER_ON_HOLD bit.
-//
-//               Reset value: 0x0
-//               0x0 -> R_MASTER_ON_HOLD interrupt is inactive
-//               0x1 -> R_MASTER_ON_HOLD interrupt is active
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_RESET          _u(0x0)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_BITS           _u(0x00002000)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_MSB            _u(13)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_LSB            _u(13)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_ACCESS         "RO"
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_VALUE_INACTIVE _u(0x0)
-#define I2C_IC_INTR_STAT_R_MASTER_ON_HOLD_VALUE_ACTIVE   _u(0x1)
 // -----------------------------------------------------------------------------
 // Field       : I2C_IC_INTR_STAT_R_RESTART_DET
 // Description : See IC_RAW_INTR_STAT for a detailed description of
@@ -805,23 +864,8 @@
 //               register is active low; a value of 0 masks the interrupt,
 //               whereas a value of 1 unmasks the interrupt.
 #define I2C_IC_INTR_MASK_OFFSET _u(0x00000030)
-#define I2C_IC_INTR_MASK_BITS   _u(0x00003fff)
+#define I2C_IC_INTR_MASK_BITS   _u(0x00001fff)
 #define I2C_IC_INTR_MASK_RESET  _u(0x000008ff)
-// -----------------------------------------------------------------------------
-// Field       : I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY
-// Description : This M_MASTER_ON_HOLD_read_only bit masks the R_MASTER_ON_HOLD
-//               interrupt in IC_INTR_STAT register.
-//
-//               Reset value: 0x0
-//               0x0 -> MASTER_ON_HOLD interrupt is masked
-//               0x1 -> MASTER_ON_HOLD interrupt is unmasked
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_RESET          _u(0x0)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_BITS           _u(0x00002000)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_MSB            _u(13)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_LSB            _u(13)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_ACCESS         "RO"
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_VALUE_ENABLED  _u(0x0)
-#define I2C_IC_INTR_MASK_M_MASTER_ON_HOLD_READ_ONLY_VALUE_DISABLED _u(0x1)
 // -----------------------------------------------------------------------------
 // Field       : I2C_IC_INTR_MASK_M_RESTART_DET
 // Description : This bit masks the R_RESTART_DET interrupt in IC_INTR_STAT
@@ -1023,24 +1067,8 @@
 //               Unlike the IC_INTR_STAT register, these bits are not masked so
 //               they always show the true status of the DW_apb_i2c.
 #define I2C_IC_RAW_INTR_STAT_OFFSET _u(0x00000034)
-#define I2C_IC_RAW_INTR_STAT_BITS   _u(0x00003fff)
+#define I2C_IC_RAW_INTR_STAT_BITS   _u(0x00001fff)
 #define I2C_IC_RAW_INTR_STAT_RESET  _u(0x00000000)
-// -----------------------------------------------------------------------------
-// Field       : I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD
-// Description : Indicates whether master is holding the bus and TX FIFO is
-//               empty. Enabled only when I2C_DYNAMIC_TAR_UPDATE=1 and
-//               IC_EMPTYFIFO_HOLD_MASTER_EN=1.
-//
-//               Reset value: 0x0
-//               0x0 -> MASTER_ON_HOLD interrupt is inactive
-//               0x1 -> MASTER_ON_HOLD interrupt is active
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_RESET          _u(0x0)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_BITS           _u(0x00002000)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_MSB            _u(13)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_LSB            _u(13)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_ACCESS         "RO"
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_VALUE_INACTIVE _u(0x0)
-#define I2C_IC_RAW_INTR_STAT_MASTER_ON_HOLD_VALUE_ACTIVE   _u(0x1)
 // -----------------------------------------------------------------------------
 // Field       : I2C_IC_RAW_INTR_STAT_RESTART_DET
 // Description : Indicates whether a RESTART condition has occurred on the I2C
@@ -1839,8 +1867,8 @@
 //
 //               The values in this register are in units of ic_clk period. The
 //               value programmed in IC_SDA_TX_HOLD must be greater than the
-//               minimum hold time in each mode one cycle in master mode, seven
-//               cycles in slave mode for the value to be implemented.
+//               minimum hold time in each mode (one cycle in master mode, seven
+//               cycles in slave mode) for the value to be implemented.
 //
 //               The programmed SDA hold time during transmit (IC_SDA_TX_HOLD)
 //               cannot exceed at any time the duration of the low part of scl.

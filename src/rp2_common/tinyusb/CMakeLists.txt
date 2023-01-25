@@ -15,14 +15,22 @@ elseif (NOT EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
 endif()
 
 if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
-    message("TinyUSB available at ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH}; adding USB support.")
+    message("TinyUSB available at ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH}; enabling build support for USB.")
+
+    pico_register_common_scope_var(PICO_TINYUSB_PATH)
+
+    set(BOARD pico_sdk)
+    set(FAMILY rp2040)
+    include(${PICO_TINYUSB_PATH}/hw/bsp/family_support.cmake)
 
     add_library(tinyusb_common INTERFACE)
+
     target_link_libraries(tinyusb_common INTERFACE
             hardware_structs
             hardware_irq
             hardware_resets
             pico_sync
+            tinyusb_common_base
     )
 
     target_sources(tinyusb_common INTERFACE
@@ -50,49 +58,20 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     )
 
     add_library(tinyusb_device_unmarked INTERFACE)
-    target_sources(tinyusb_device_unmarked INTERFACE
-            ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/rp2040/dcd_rp2040.c
-            ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/rp2040/rp2040_usb.c
-            ${PICO_TINYUSB_PATH}/src/device/usbd.c
-            ${PICO_TINYUSB_PATH}/src/device/usbd_control.c
-            ${PICO_TINYUSB_PATH}/src/class/audio/audio_device.c
-            ${PICO_TINYUSB_PATH}/src/class/cdc/cdc_device.c
-            ${PICO_TINYUSB_PATH}/src/class/dfu/dfu_rt_device.c
-            ${PICO_TINYUSB_PATH}/src/class/hid/hid_device.c
-            ${PICO_TINYUSB_PATH}/src/class/midi/midi_device.c
-            ${PICO_TINYUSB_PATH}/src/class/msc/msc_device.c
-            ${PICO_TINYUSB_PATH}/src/class/net/net_device.c
-            ${PICO_TINYUSB_PATH}/src/class/usbtmc/usbtmc_device.c
-            ${PICO_TINYUSB_PATH}/src/class/vendor/vendor_device.c
-    )
-
+    target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_device_base)
     target_compile_definitions(tinyusb_device_unmarked INTERFACE
             # off by default note TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX defaults from PICO_RP2040_USB_DEVICE_ENUMERATION_FIX
 #            TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX=1
     )
 
     # unmarked version used by stdio USB
-    target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_common pico_fix_rp2040_usb_device_enumeration)
+    target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_common pico_fix_rp2040_usb_device_enumeration tinyusb_device_base)
 
-    add_library(tinyusb_device INTERFACE)
+    pico_add_impl_library(tinyusb_device)
     target_link_libraries(tinyusb_device INTERFACE tinyusb_device_unmarked)
-    target_compile_definitions(tinyusb_device INTERFACE
-            RP2040_USB_DEVICE_MODE=1
-            TINYUSB_DEVICE_LINKED=1
-            )
 
-    add_library(tinyusb_host INTERFACE)
-    target_sources(tinyusb_host INTERFACE
-            ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/rp2040/hcd_rp2040.c
-            ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/rp2040/rp2040_usb.c
-            ${PICO_TINYUSB_PATH}/src/host/usbh.c
-            ${PICO_TINYUSB_PATH}/src/host/usbh_control.c
-            ${PICO_TINYUSB_PATH}/src/host/hub.c
-            ${PICO_TINYUSB_PATH}/src/class/cdc/cdc_host.c
-            ${PICO_TINYUSB_PATH}/src/class/hid/hid_host.c
-            ${PICO_TINYUSB_PATH}/src/class/msc/msc_host.c
-            ${PICO_TINYUSB_PATH}/src/class/vendor/vendor_host.c
-            )
+    pico_add_impl_library(tinyusb_host)
+    target_link_libraries(tinyusb_host INTERFACE tinyusb_host_base tinyusb_common)
 
     add_library(tinyusb_net INTERFACE)
     target_sources(tinyusb_host INTERFACE
@@ -108,12 +87,17 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
             TINYUSB_HOST_LINKED=1
             )
 
-    target_link_libraries(tinyusb_host INTERFACE tinyusb_common)
+    pico_add_impl_library(tinyusb_board)
+    target_link_libraries(tinyusb_board INTERFACE tinyusb_bsp)
 
-    add_library(tinyusb_board INTERFACE)
-    target_sources(tinyusb_board INTERFACE
-            ${PICO_TINYUSB_PATH}/hw/bsp/raspberry_pi_pico/board_raspberry_pi_pico.c
-    )
+    # Override suppress_tinyusb_warnings to add suppression of (falsely) reported GCC 11.2 warnings
+    function(suppress_tinyusb_warnings)
+        _suppress_tinyusb_warnings()
+        set_source_files_properties(
+                ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/rp2040/rp2040_usb.c
+                PROPERTIES
+                COMPILE_FLAGS "-Wno-stringop-overflow -Wno-array-bounds")
+    endfunction()
 
+    pico_promote_common_scope_vars()
 endif()
-

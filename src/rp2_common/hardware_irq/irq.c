@@ -8,11 +8,14 @@
 #include "hardware/regs/m0plus.h"
 #include "hardware/platform_defs.h"
 #include "hardware/structs/scb.h"
+#include "hardware/claim.h"
 
 #include "pico/mutex.h"
 #include "pico/assert.h"
 
 extern void __unhandled_user_irq(void);
+
+static uint8_t user_irq_claimed[NUM_CORES];
 
 static inline irq_handler_t *get_vtable(void) {
     return (irq_handler_t *) scb_hw->vtor;
@@ -31,10 +34,6 @@ static void set_raw_irq_handler_and_unlock(uint num, irq_handler_t handler, uint
     get_vtable()[16 + num] = handler;
     __dmb();
     spin_unlock(spin_lock_instance(PICO_SPINLOCK_ID_IRQ), save);
-}
-
-static inline void check_irq_param(__unused uint num) {
-    invalid_params_if(IRQ, num >= NUM_IRQS);
 }
 
 void irq_set_enabled(uint num, bool enabled) {
@@ -63,7 +62,7 @@ void irq_set_pending(uint num) {
     *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ISPR_OFFSET)) = 1u << num;
 }
 
-#if PICO_MAX_SHARED_IRQ_HANDLERS
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
 // limited by 8 bit relative links (and reality)
 static_assert(PICO_MAX_SHARED_IRQ_HANDLERS >= 1 && PICO_MAX_SHARED_IRQ_HANDLERS < 0x7f, "");
 
@@ -92,11 +91,24 @@ extern struct irq_handler_chain_slot {
 } irq_handler_chain_slots[PICO_MAX_SHARED_IRQ_HANDLERS];
 
 static int8_t irq_hander_chain_free_slot_head;
-#endif
 
 static inline bool is_shared_irq_raw_handler(irq_handler_t raw_handler) {
     return (uintptr_t)raw_handler - (uintptr_t)irq_handler_chain_slots < sizeof(irq_handler_chain_slots);
 }
+
+bool irq_has_shared_handler(uint irq_num) {
+    check_irq_param(irq_num);
+    irq_handler_t handler = irq_get_vtable_handler(irq_num);
+    return handler && is_shared_irq_raw_handler(handler);
+}
+
+#else
+#define is_shared_irq_raw_handler(h) false
+bool irq_has_shared_handler(uint irq_num) {
+    return false;
+}
+#endif
+
 
 irq_handler_t irq_get_vtable_handler(uint num) {
     check_irq_param(num);
@@ -133,12 +145,13 @@ irq_handler_t irq_get_exclusive_handler(uint num) {
 }
 
 
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
 static uint16_t make_branch(uint16_t *from, void *to) {
     uint32_t ui_from = (uint32_t)from;
     uint32_t ui_to = (uint32_t)to;
-    uint32_t delta = (ui_to - ui_from - 4) / 2;
-    assert(!(delta >> 11u));
-    return (uint16_t)(0xe000 | (delta & 0x7ff));
+    int32_t delta = (int32_t)(ui_to - ui_from - 4);
+    assert(delta >= -2048 && delta <= 2046 && !(delta & 1));
+    return (uint16_t)(0xe000 | ((delta >> 1) & 0x7ff));
 }
 
 static void insert_branch_and_link(uint16_t *from, void *to) {
@@ -160,37 +173,36 @@ static inline void *resolve_branch(uint16_t *inst) {
 // GCC produces horrible code for subtraction of pointers here, and it was bugging me
 static inline int8_t slot_diff(struct irq_handler_chain_slot *to, struct irq_handler_chain_slot *from) {
     static_assert(sizeof(struct irq_handler_chain_slot) == 12, "");
-    int32_t result;
+    int32_t result = 0xaaaa;
     // return (to - from);
     // note this implementation has limited range, but is fine for plenty more than -128->127 result
     asm (".syntax unified\n"
          "subs %1, %2\n"
          "adcs %1, %1\n" // * 2 (and + 1 if negative for rounding)
-         "ldr  %0, =0xaaaa\n"
          "muls %0, %1\n"
          "lsrs %0, 20\n"
-        : "=l" (result), "+l" (to)
-        : "l" (from)
-        :
-        );
+         : "+l" (result), "+l" (to)
+         : "l" (from)
+         :
+         );
     return (int8_t)result;
 }
 
 static inline int8_t get_slot_index(struct irq_handler_chain_slot *slot) {
     return slot_diff(slot, irq_handler_chain_slots);
 }
+#endif
 
 void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_priority) {
     check_irq_param(num);
-#if PICO_DISABLE_SHARED_IRQ_HANDLERS
-
-#endif
-#if PICO_NO_RAM_VECTOR_TABLE || !PICO_MAX_SHARED_IRQ_HANDLERS
+#if PICO_NO_RAM_VECTOR_TABLE
     panic_unsupported()
+#elif PICO_DISABLE_SHARED_IRQ_HANDLERS
+    irq_set_exclusive_handler(num, handler);
 #else
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_IRQ);
     uint32_t save = spin_lock_blocking(lock);
-    hard_assert(irq_hander_chain_free_slot_head >= 0);
+    hard_assert(irq_hander_chain_free_slot_head >= 0); // we must have a slot
     struct irq_handler_chain_slot *slot = &irq_handler_chain_slots[irq_hander_chain_free_slot_head];
     int8_t slot_index = irq_hander_chain_free_slot_head;
     irq_hander_chain_free_slot_head = slot->link;
@@ -261,7 +273,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
     uint32_t save = spin_lock_blocking(lock);
     irq_handler_t vtable_handler = get_vtable()[16 + num];
     if (vtable_handler != __unhandled_user_irq && vtable_handler != handler) {
-#if !PICO_DISABLE_SHARED_IRQ_HANDLERS && PICO_MAX_SHARED_IRQ_HANDLERS
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
         if (is_shared_irq_raw_handler(vtable_handler)) {
             // This is a bit tricky, as an executing IRQ handler doesn't take a lock.
 
@@ -289,7 +301,6 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
             struct irq_handler_chain_slot *prev_slot = NULL;
             struct irq_handler_chain_slot *existing_vtable_slot = remove_thumb_bit(vtable_handler);
             struct irq_handler_chain_slot *to_free_slot = existing_vtable_slot;
-            int8_t to_free_slot_index = get_slot_index(to_free_slot);
             while (to_free_slot->handler != handler) {
                 prev_slot = to_free_slot;
                 if (to_free_slot->link < 0) break;
@@ -327,7 +338,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
                         }
                         // add slot back to free list
                         to_free_slot->link = irq_hander_chain_free_slot_head;
-                        irq_hander_chain_free_slot_head = to_free_slot_index;
+                        irq_hander_chain_free_slot_head = get_slot_index(to_free_slot);
                     } else {
                         // since we are the last slot we know that our inst3 hasn't executed yet, so we change
                         // it to bl to irq_handler_chain_remove_tail which will remove the slot.
@@ -361,7 +372,15 @@ void irq_set_priority(uint num, uint8_t hardware_priority) {
     *p = (*p & ~(0xffu << (8 * (num & 3u)))) | (((uint32_t) hardware_priority) << (8 * (num & 3u)));
 }
 
-#if !PICO_DISABLE_SHARED_IRQ_HANDLERS && PICO_MAX_SHARED_IRQ_HANDLERS
+uint irq_get_priority(uint num) {
+    check_irq_param(num);
+
+    // note that only 32 bit reads are supported
+    io_rw_32 *p = (io_rw_32 *)((PPB_BASE + M0PLUS_NVIC_IPR0_OFFSET) + (num & ~3u));
+    return (uint8_t)(*p >> (8 * (num & 3u)));
+}
+
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
 // used by irq_handler_chain.S to remove the last link in a handler chain after it executes
 // note this must be called only with the last slot in a chain (and during the exception)
 void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot) {
@@ -397,8 +416,39 @@ void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot) {
 
 void irq_init_priorities() {
 #if PICO_DEFAULT_IRQ_PRIORITY != 0
-    for (uint irq = 0; irq < NUM_IRQS; irq++) {
-        irq_set_priority(irq, PICO_DEFAULT_IRQ_PRIORITY);
+    static_assert(!(NUM_IRQS & 3), "");
+    uint32_t prio4 = (PICO_DEFAULT_IRQ_PRIORITY & 0xff) * 0x1010101u;
+    io_rw_32 * p = (io_rw_32 *)(PPB_BASE + M0PLUS_NVIC_IPR0_OFFSET);
+    for (uint i = 0; i < NUM_IRQS / 4; i++) {
+        *p++ = prio4;
     }
 #endif
 }
+
+#define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
+
+static uint get_user_irq_claim_index(uint irq_num) {
+    invalid_params_if(IRQ, irq_num < FIRST_USER_IRQ || irq_num >= NUM_IRQS);
+    // we count backwards from the last, to match the existing hard coded uses of user IRQs in the SDK which were previously using 31
+    static_assert(NUM_IRQS - FIRST_USER_IRQ <= 8, ""); // we only use a single byte's worth of claim bits today.
+    return NUM_IRQS - irq_num  - 1u;
+}
+
+void user_irq_claim(uint irq_num) {
+    hw_claim_or_assert(&user_irq_claimed[get_core_num()], get_user_irq_claim_index(irq_num), "User IRQ is already claimed");
+}
+
+void user_irq_unclaim(uint irq_num) {
+    hw_claim_clear(&user_irq_claimed[get_core_num()], get_user_irq_claim_index(irq_num));
+}
+
+int user_irq_claim_unused(bool required) {
+    int bit = hw_claim_unused_from_range(&user_irq_claimed[get_core_num()], required, 0, NUM_USER_IRQS - 1, "No user IRQs are available");
+    if (bit >= 0) bit =  (int)NUM_IRQS - bit - 1;
+    return bit;
+}
+
+bool user_irq_is_claimed(uint irq_num) {
+    return hw_is_claimed(&user_irq_claimed[get_core_num()], get_user_irq_claim_index(irq_num));
+}
+

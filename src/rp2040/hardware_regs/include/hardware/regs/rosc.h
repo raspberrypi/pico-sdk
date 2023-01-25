@@ -190,7 +190,7 @@
 //               set to 0xaa0 + div where
 //               div = 0 divides by 32
 //               div = 1-31 divides by div
-//               any other value sets div=0 and therefore divides by 32
+//               any other value sets div=31
 //               this register resets to div=16
 //               0xaa0 -> PASS
 #define ROSC_DIV_OFFSET     _u(0x00000010)
@@ -208,7 +208,7 @@
 #define ROSC_PHASE_RESET  _u(0x00000008)
 // -----------------------------------------------------------------------------
 // Field       : ROSC_PHASE_PASSWD
-// Description : set to 0xaa0
+// Description : set to 0xaa
 //               any other value enables the output with shift=0
 #define ROSC_PHASE_PASSWD_RESET  _u(0x00)
 #define ROSC_PHASE_PASSWD_BITS   _u(0x00000ff0)
@@ -260,7 +260,7 @@
 // -----------------------------------------------------------------------------
 // Field       : ROSC_STATUS_BADWRITE
 // Description : An invalid value has been written to CTRL_ENABLE or
-//               CTRL_FREQ_RANGE or FRFEQA or FREQB or DORMANT
+//               CTRL_FREQ_RANGE or FREQA or FREQB or DIV or PHASE or DORMANT
 #define ROSC_STATUS_BADWRITE_RESET  _u(0x0)
 #define ROSC_STATUS_BADWRITE_BITS   _u(0x01000000)
 #define ROSC_STATUS_BADWRITE_MSB    _u(24)

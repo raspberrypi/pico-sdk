@@ -3,17 +3,17 @@
 enable_language(ASM)
 
 function(pico_add_hex_output TARGET)
-    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Oihex ${TARGET}${CMAKE_EXECUTABLE_SUFFIX} ${TARGET}.hex)
+    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${TARGET}> $<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.hex)
 endfunction()
 
 function(pico_add_bin_output TARGET)
-    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Obinary ${TARGET}${CMAKE_EXECUTABLE_SUFFIX} ${TARGET}.bin)
+    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${TARGET}> $<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.bin)
 endfunction()
 
 function(pico_add_dis_output TARGET)
     add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_OBJDUMP} -h ${TARGET}${CMAKE_EXECUTABLE_SUFFIX} >${TARGET}.dis
-            COMMAND ${CMAKE_OBJDUMP} -d ${TARGET}${CMAKE_EXECUTABLE_SUFFIX} >>${TARGET}.dis
+            COMMAND ${CMAKE_OBJDUMP} -h $<TARGET_FILE:${TARGET}> >$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.dis
+            COMMAND ${CMAKE_OBJDUMP} -d $<TARGET_FILE:${TARGET}> >>$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.dis
             )
 endfunction()
 
@@ -36,8 +36,8 @@ function(pico_add_extra_outputs TARGET)
 
         add_custom_command(TARGET ${TARGET}_symlinked POST_BUILD
                 COMMAND rm -f "${PICO_SYMLINK_ELF_AS_FILENAME}"
-                COMMAND ln -s -r ${TARGET}${CMAKE_EXECUTABLE_SUFFIX} "${PICO_SYMLINK_ELF_AS_FILENAME}"
-                COMMENT "Symlinking from ${PICO_SYMLINK_ELF_AS_FILENAME} to ${TARGET}${CMAKE_EXECUTABLE_SUFFIX}"
+                COMMAND ln -s -r $<TARGET_FILE:${TARGET}> "${PICO_SYMLINK_ELF_AS_FILENAME}"
+                COMMENT "Symlinking from ${PICO_SYMLINK_ELF_AS_FILENAME} to ${TARGET}"
                 )
     endif ()
     # PICO_CMAKE_CONFIG: PICO_NO_UF2, Disable UF2 output, type=bool, default=0, group=build

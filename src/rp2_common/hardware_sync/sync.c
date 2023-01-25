@@ -49,10 +49,16 @@ void spin_lock_claim_mask(uint32_t mask) {
 
 void spin_lock_unclaim(uint lock_num) {
     check_lock_num(lock_num);
+    spin_unlock_unsafe(spin_lock_instance(lock_num));
     hw_claim_clear((uint8_t *) &claimed, lock_num);
 }
 
 int spin_lock_claim_unused(bool required) {
-    return hw_claim_unused_from_range((uint8_t*)&claimed, required, PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, PICO_SPINLOCK_ID_CLAIM_FREE_END, "No spinlocks are available");
+    return hw_claim_unused_from_range((uint8_t*)&claimed, required, PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, PICO_SPINLOCK_ID_CLAIM_FREE_LAST, "No spinlocks are available");
+}
+
+bool spin_lock_is_claimed(uint lock_num) {
+    check_lock_num(lock_num);
+    return hw_is_claimed((uint8_t *) &claimed, lock_num);
 }
 

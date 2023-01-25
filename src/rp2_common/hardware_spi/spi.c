@@ -18,18 +18,18 @@ static inline void spi_unreset(spi_inst_t *spi) {
     unreset_block_wait(spi == spi0 ? RESETS_RESET_SPI0_BITS : RESETS_RESET_SPI1_BITS);
 }
 
-void spi_init(spi_inst_t *spi, uint baudrate) {
+uint spi_init(spi_inst_t *spi, uint baudrate) {
     spi_reset(spi);
     spi_unreset(spi);
 
-    (void) spi_set_baudrate(spi, baudrate);
+    uint baud = spi_set_baudrate(spi, baudrate);
     spi_set_format(spi, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
     // Always enable DREQ signals -- harmless if DMA is not listening
     hw_set_bits(&spi_get_hw(spi)->dmacr, SPI_SSPDMACR_TXDMAE_BITS | SPI_SSPDMACR_RXDMAE_BITS);
-    spi_set_format(spi, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
 
     // Finally enable the SPI
     hw_set_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
+    return baud;
 }
 
 void spi_deinit(spi_inst_t *spi) {
@@ -65,6 +65,12 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
     return freq_in / (prescale * postdiv);
 }
 
+uint spi_get_baudrate(const spi_inst_t *spi) {
+    uint prescale = spi_get_const_hw(spi)->cpsr;
+    uint postdiv = ((spi_get_const_hw(spi)->cr0  & SPI_SSPCR0_SCR_BITS) >> SPI_SSPCR0_SCR_LSB) + 1;
+    return clock_get_hz(clk_peri) / (prescale * postdiv);
+}
+
 // Write len bytes from src to SPI. Simultaneously read len bytes from SPI to dst.
 // Note this function is guaranteed to exit in a known amount of time (bits sent * time per bit)
 int __not_in_flash_func(spi_write_read_blocking)(spi_inst_t *spi, const uint8_t *src, uint8_t *dst, size_t len) {
@@ -76,7 +82,7 @@ int __not_in_flash_func(spi_write_read_blocking)(spi_inst_t *spi, const uint8_t 
     size_t rx_remaining = len, tx_remaining = len;
 
     while (rx_remaining || tx_remaining) {
-        if (tx_remaining && spi_is_writable(spi) && rx_remaining - tx_remaining < fifo_depth) {
+        if (tx_remaining && spi_is_writable(spi) && rx_remaining < tx_remaining + fifo_depth) {
             spi_get_hw(spi)->dr = (uint32_t) *src++;
             --tx_remaining;
         }
@@ -125,7 +131,7 @@ int __not_in_flash_func(spi_read_blocking)(spi_inst_t *spi, uint8_t repeated_tx_
     size_t rx_remaining = len, tx_remaining = len;
 
     while (rx_remaining || tx_remaining) {
-        if (tx_remaining && spi_is_writable(spi) && rx_remaining - tx_remaining < fifo_depth) {
+        if (tx_remaining && spi_is_writable(spi) && rx_remaining < tx_remaining + fifo_depth) {
             spi_get_hw(spi)->dr = (uint32_t) repeated_tx_data;
             --tx_remaining;
         }
@@ -147,7 +153,7 @@ int __not_in_flash_func(spi_write16_read16_blocking)(spi_inst_t *spi, const uint
     size_t rx_remaining = len, tx_remaining = len;
 
     while (rx_remaining || tx_remaining) {
-        if (tx_remaining && spi_is_writable(spi) && rx_remaining - tx_remaining < fifo_depth) {
+        if (tx_remaining && spi_is_writable(spi) && rx_remaining < tx_remaining + fifo_depth) {
             spi_get_hw(spi)->dr = (uint32_t) *src++;
             --tx_remaining;
         }
@@ -192,7 +198,7 @@ int __not_in_flash_func(spi_read16_blocking)(spi_inst_t *spi, uint16_t repeated_
     size_t rx_remaining = len, tx_remaining = len;
 
     while (rx_remaining || tx_remaining) {
-        if (tx_remaining && spi_is_writable(spi) && rx_remaining - tx_remaining < fifo_depth) {
+        if (tx_remaining && spi_is_writable(spi) && rx_remaining < tx_remaining + fifo_depth) {
             spi_get_hw(spi)->dr = (uint32_t) repeated_tx_data;
             --tx_remaining;
         }

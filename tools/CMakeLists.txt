@@ -4,9 +4,18 @@ function(_pico_init_pioasm)
     find_package(Pioasm REQUIRED)
 endfunction()
 
+# PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, default output format used by pioasm when using pico_generate_pio_header, default=c-sdk, group=build
 function(pico_generate_pio_header TARGET PIO)
     _pico_init_pioasm()
-    cmake_parse_arguments(pico_generate_pio_header "" "OUTPUT_DIR" "" ${ARGN} )
+    cmake_parse_arguments(pico_generate_pio_header "" "OUTPUT_FORMAT;OUTPUT_DIR" "" ${ARGN} )
+
+    if (pico_generate_pio_header_OUTPUT_FORMAT)
+        set(OUTPUT_FORMAT "${pico_generate_pio_header_OUTPUT_FORMAT}")
+    elseif(DEFINED PICO_DEFAULT_PIOASM_OUTPUT_FORMAT)
+        set(OUTPUT_FORMAT "${PICO_DEFAULT_PIOASM_OUTPUT_FORMAT}")
+    else()
+        set(OUTPUT_FORMAT "c-sdk")
+    endif()
 
     if (pico_generate_pio_header_OUTPUT_DIR)
         get_filename_component(HEADER_DIR ${pico_generate_pio_header_OUTPUT_DIR} ABSOLUTE)
@@ -23,14 +32,14 @@ function(pico_generate_pio_header TARGET PIO)
 
     add_custom_command(OUTPUT ${HEADER}
             DEPENDS ${PIO}
-            COMMAND Pioasm -o c-sdk ${PIO} ${HEADER}
+            COMMAND Pioasm -o ${OUTPUT_FORMAT} ${PIO} ${HEADER}
             )
     add_dependencies(${TARGET} ${HEADER_GEN_TARGET})
     get_target_property(target_type ${TARGET} TYPE)
-    if ("EXECUTABLE" STREQUAL "${target_type}")
-        target_include_directories(${TARGET} PRIVATE ${HEADER_DIR})
-    else()
+    if ("INTERFACE_LIBRARY" STREQUAL "${target_type}")
         target_include_directories(${TARGET} INTERFACE ${HEADER_DIR})
+    else()
+        target_include_directories(${TARGET} PUBLIC ${HEADER_DIR})
     endif()
 endfunction()
 
@@ -41,20 +50,6 @@ function(pico_add_uf2_output TARGET)
     endif()
     if (ELF2UF2_FOUND)
         add_custom_command(TARGET ${TARGET} POST_BUILD
-                COMMAND ELF2UF2 ${TARGET}${CMAKE_EXECUTABLE_SUFFIX} ${TARGET}.uf2)
+                COMMAND ELF2UF2 $<TARGET_FILE:${TARGET}> $<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2)
     endif()
 endfunction()
-
-if (NOT DEFINED PICO_BUILD_PICOFLASH)
-    if (DEFINED ENV{PICO_BUILD_PICOFLASH})
-        set(PICO_BUILD_PICOFLASH $ENV{PICO_BUILD_PICOFLASH})
-    else()
-        # for now
-        set(PICO_BUILD_PICOFLASH 1)
-    endif()
-endif()
-
-if (PICO_BUILD_PICOTOOL)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PICO_SDK_PATH}/tools)
-    find_package(Picotool REQUIRED)
-endif()

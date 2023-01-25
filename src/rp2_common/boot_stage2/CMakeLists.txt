@@ -4,7 +4,7 @@
 if (DEFINED ENV{PICO_DEFAULT_BOOT_STAGE2_FILE})
     set(PICO_DEFAULT_BOOT_STAGE2_FILE $ENV{PICO_DEFAULT_BOOT_STAGE2_FILE})
     message("Using PICO_DEFAULT_BOOT_STAGE2_FILE from environment ('${PICO_DEFAULT_BOOT_STAGE2_FILE}')")
-elif (PICO_DEFAULT_BOOT_STAGE2_FILE)
+elseif (PICO_DEFAULT_BOOT_STAGE2_FILE)
     # explicitly set, so cache it
     set(PICO_DEFAULT_BOOT_STAGE2_FILE "${PICO_DEFAULT_BOOT_STAGE2_FILE}" CACHE STRING "boot stage 2 source file" FORCE)
 endif()
@@ -25,6 +25,7 @@ endif()
 if (NOT EXISTS ${PICO_DEFAULT_BOOT_STAGE2_FILE})
     message(FATAL_ERROR "Specified boot stage 2 source '${PICO_DEFAULT_BOOT_STAGE2_FILE}' does not exist.")
 endif()
+pico_register_common_scope_var(PICO_DEFAULT_BOOT_STAGE2_FILE)
 
 # needed by function below
 set(PICO_BOOT_STAGE2_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
@@ -98,3 +99,9 @@ endmacro()
 
 pico_define_boot_stage2(bs2_default ${PICO_DEFAULT_BOOT_STAGE2_FILE})
 
+# Create a new boot stage 2 target using the default implementation for the current build (PICO_BOARD derived)
+function(pico_clone_default_boot_stage2 NAME)
+    pico_define_boot_stage2(${NAME} ${PICO_DEFAULT_BOOT_STAGE2_FILE})
+endfunction()
+
+pico_promote_common_scope_vars()

@@ -17,6 +17,7 @@
  * \defgroup hardware_clocks hardware_clocks
  * \defgroup hardware_divider hardware_divider
  * \defgroup hardware_dma hardware_dma
+ * \defgroup hardware_exception hardware_exception
  * \defgroup hardware_flash hardware_flash
  * \defgroup hardware_gpio hardware_gpio
  * \defgroup hardware_i2c hardware_i2c
@@ -53,6 +54,13 @@
  * @{
  * \defgroup tinyusb_device tinyusb_device
  * \defgroup tinyusb_host tinyusb_host
+ * @}
+ *
+ * \defgroup networking Networking Libraries
+ * Functions for implementing networking
+ * @{
+ * \defgroup pico_lwip pico_lwip
+ * \defgroup pico_cyw43_arch pico_cyw43_arch
  * @}
  *
  * \defgroup runtime Runtime Infrastructure

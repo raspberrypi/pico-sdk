@@ -4,7 +4,7 @@ The Raspberry Pi Pico SDK (henceforth the SDK) provides the headers, libraries a
 necessary to write programs for the RP2040-based devices such as the Raspberry Pi Pico
 in C, C++ or assembly language.
 
-The SDK  is designed to provide an API and programming environment that is familiar both to non-embedded C developers and embedded C developers alike.
+The SDK is designed to provide an API and programming environment that is familiar both to non-embedded C developers and embedded C developers alike.
 A single program runs on the device at a time and starts with a conventional `main()` method. Standard C/C++ libraries are supported along with
 C level libraries/APIs for accessing all of the RP2040's hardware include PIO (Programmable IO).
 
@@ -38,7 +38,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
 1. Install CMake (at least version 3.13), and GCC cross compiler
    ```
-   sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi
+   sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
    ```
 1. Set up your project to point to use the Raspberry Pi Pico SDK
 
@@ -110,6 +110,24 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
           ```
 
+   * Or by cloning the SDK locally, but without copying `pico_sdk_import.cmake`:
+       1. `git clone` this Raspberry Pi Pico SDK repository
+       2. Setup a `CMakeLists.txt` like:
+
+           ```cmake
+           cmake_minimum_required(VERSION 3.13)
+ 
+           # initialize the SDK directly
+           include(/path/to/pico-sdk/pico_sdk_init.cmake)
+ 
+           project(my_project)
+ 
+           # initialize the Raspberry Pi Pico SDK
+           pico_sdk_init()
+ 
+           # rest of your project
+ 
+           ```
 1. Write your code (see [pico-examples](https://github.com/raspberrypi/pico-examples) or the [Raspberry Pi Pico C/C++ SDK](https://rptl.io/pico-c-sdk) documentation for more information)
 
    About the simplest you can do is a single source file (e.g. hello_world.c)

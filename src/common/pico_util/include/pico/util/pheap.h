@@ -24,13 +24,12 @@ extern "C" {
  * Pairing Heap Implementation
  * \ingroup pico_util
  *
- * pheap defines a simple pairing heap. the implementation simply tracks array indexes, it is up to
+ * pheap defines a simple pairing heap. The implementation simply tracks array indexes, it is up to
  * the user to provide storage for heap entries and a comparison function.
  *
- * NOTE: this class is not safe for concurrent usage. It should be externally protected. Furthermore
+ * NOTE: This class is not safe for concurrent usage. It should be externally protected. Furthermore
  * if used concurrently, the caller needs to protect around their use of the returned id.
- * for example, ph_remove_and_free_head returns the id of an element that is no longer in the heap.
- *
+ * For example, ph_remove_and_free_head returns the id of an element that is no longer in the heap.
  * The user can still use this to look at the data in their companion array, however obviously further operations
  * on the heap may cause them to overwrite that data as the id may be reused on subsequent operations
  *

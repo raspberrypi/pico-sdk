@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -71,7 +71,7 @@
 #define SIO_GPIO_OUT_SET_RESET  _u(0x00000000)
 #define SIO_GPIO_OUT_SET_MSB    _u(29)
 #define SIO_GPIO_OUT_SET_LSB    _u(0)
-#define SIO_GPIO_OUT_SET_ACCESS "RW"
+#define SIO_GPIO_OUT_SET_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OUT_CLR
 // Description : GPIO output value clear
@@ -82,7 +82,7 @@
 #define SIO_GPIO_OUT_CLR_RESET  _u(0x00000000)
 #define SIO_GPIO_OUT_CLR_MSB    _u(29)
 #define SIO_GPIO_OUT_CLR_LSB    _u(0)
-#define SIO_GPIO_OUT_CLR_ACCESS "RW"
+#define SIO_GPIO_OUT_CLR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OUT_XOR
 // Description : GPIO output value XOR
@@ -93,7 +93,7 @@
 #define SIO_GPIO_OUT_XOR_RESET  _u(0x00000000)
 #define SIO_GPIO_OUT_XOR_MSB    _u(29)
 #define SIO_GPIO_OUT_XOR_LSB    _u(0)
-#define SIO_GPIO_OUT_XOR_ACCESS "RW"
+#define SIO_GPIO_OUT_XOR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OE
 // Description : GPIO output enable
@@ -119,7 +119,7 @@
 #define SIO_GPIO_OE_SET_RESET  _u(0x00000000)
 #define SIO_GPIO_OE_SET_MSB    _u(29)
 #define SIO_GPIO_OE_SET_LSB    _u(0)
-#define SIO_GPIO_OE_SET_ACCESS "RW"
+#define SIO_GPIO_OE_SET_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OE_CLR
 // Description : GPIO output enable clear
@@ -130,7 +130,7 @@
 #define SIO_GPIO_OE_CLR_RESET  _u(0x00000000)
 #define SIO_GPIO_OE_CLR_MSB    _u(29)
 #define SIO_GPIO_OE_CLR_LSB    _u(0)
-#define SIO_GPIO_OE_CLR_ACCESS "RW"
+#define SIO_GPIO_OE_CLR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_OE_XOR
 // Description : GPIO output enable XOR
@@ -141,7 +141,7 @@
 #define SIO_GPIO_OE_XOR_RESET  _u(0x00000000)
 #define SIO_GPIO_OE_XOR_MSB    _u(29)
 #define SIO_GPIO_OE_XOR_LSB    _u(0)
-#define SIO_GPIO_OE_XOR_ACCESS "RW"
+#define SIO_GPIO_OE_XOR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OUT
 // Description : QSPI output value
@@ -169,7 +169,7 @@
 #define SIO_GPIO_HI_OUT_SET_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OUT_SET_MSB    _u(5)
 #define SIO_GPIO_HI_OUT_SET_LSB    _u(0)
-#define SIO_GPIO_HI_OUT_SET_ACCESS "RW"
+#define SIO_GPIO_HI_OUT_SET_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OUT_CLR
 // Description : QSPI output value clear
@@ -180,7 +180,7 @@
 #define SIO_GPIO_HI_OUT_CLR_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OUT_CLR_MSB    _u(5)
 #define SIO_GPIO_HI_OUT_CLR_LSB    _u(0)
-#define SIO_GPIO_HI_OUT_CLR_ACCESS "RW"
+#define SIO_GPIO_HI_OUT_CLR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OUT_XOR
 // Description : QSPI output value XOR
@@ -191,7 +191,7 @@
 #define SIO_GPIO_HI_OUT_XOR_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OUT_XOR_MSB    _u(5)
 #define SIO_GPIO_HI_OUT_XOR_LSB    _u(0)
-#define SIO_GPIO_HI_OUT_XOR_ACCESS "RW"
+#define SIO_GPIO_HI_OUT_XOR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OE
 // Description : QSPI output enable
@@ -218,7 +218,7 @@
 #define SIO_GPIO_HI_OE_SET_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OE_SET_MSB    _u(5)
 #define SIO_GPIO_HI_OE_SET_LSB    _u(0)
-#define SIO_GPIO_HI_OE_SET_ACCESS "RW"
+#define SIO_GPIO_HI_OE_SET_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OE_CLR
 // Description : QSPI output enable clear
@@ -229,7 +229,7 @@
 #define SIO_GPIO_HI_OE_CLR_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OE_CLR_MSB    _u(5)
 #define SIO_GPIO_HI_OE_CLR_LSB    _u(0)
-#define SIO_GPIO_HI_OE_CLR_ACCESS "RW"
+#define SIO_GPIO_HI_OE_CLR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_GPIO_HI_OE_XOR
 // Description : QSPI output enable XOR
@@ -240,7 +240,7 @@
 #define SIO_GPIO_HI_OE_XOR_RESET  _u(0x00000000)
 #define SIO_GPIO_HI_OE_XOR_MSB    _u(5)
 #define SIO_GPIO_HI_OE_XOR_LSB    _u(0)
-#define SIO_GPIO_HI_OE_XOR_ACCESS "RW"
+#define SIO_GPIO_HI_OE_XOR_ACCESS "WO"
 // =============================================================================
 // Register    : SIO_FIFO_ST
 // Description : Status register for inter-core FIFOs (mailboxes).
@@ -344,7 +344,7 @@
 //               q`.
 //               Any operand write starts a new calculation. The results appear
 //               in QUOTIENT, REMAINDER.
-//               UDIVIDEND/SDIVIDEND are aliases of the same internal register.
+//               UDIVISOR/SDIVISOR are aliases of the same internal register.
 //               The U alias starts an
 //               unsigned calculation, and the S alias starts a signed
 //               calculation.
@@ -1155,7 +1155,7 @@
 #define SIO_SPINLOCK0_RESET  _u(0x00000000)
 #define SIO_SPINLOCK0_MSB    _u(31)
 #define SIO_SPINLOCK0_LSB    _u(0)
-#define SIO_SPINLOCK0_ACCESS "RO"
+#define SIO_SPINLOCK0_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK1
 // Description : Reading from a spinlock address will:
@@ -1171,7 +1171,7 @@
 #define SIO_SPINLOCK1_RESET  _u(0x00000000)
 #define SIO_SPINLOCK1_MSB    _u(31)
 #define SIO_SPINLOCK1_LSB    _u(0)
-#define SIO_SPINLOCK1_ACCESS "RO"
+#define SIO_SPINLOCK1_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK2
 // Description : Reading from a spinlock address will:
@@ -1187,7 +1187,7 @@
 #define SIO_SPINLOCK2_RESET  _u(0x00000000)
 #define SIO_SPINLOCK2_MSB    _u(31)
 #define SIO_SPINLOCK2_LSB    _u(0)
-#define SIO_SPINLOCK2_ACCESS "RO"
+#define SIO_SPINLOCK2_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK3
 // Description : Reading from a spinlock address will:
@@ -1203,7 +1203,7 @@
 #define SIO_SPINLOCK3_RESET  _u(0x00000000)
 #define SIO_SPINLOCK3_MSB    _u(31)
 #define SIO_SPINLOCK3_LSB    _u(0)
-#define SIO_SPINLOCK3_ACCESS "RO"
+#define SIO_SPINLOCK3_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK4
 // Description : Reading from a spinlock address will:
@@ -1219,7 +1219,7 @@
 #define SIO_SPINLOCK4_RESET  _u(0x00000000)
 #define SIO_SPINLOCK4_MSB    _u(31)
 #define SIO_SPINLOCK4_LSB    _u(0)
-#define SIO_SPINLOCK4_ACCESS "RO"
+#define SIO_SPINLOCK4_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK5
 // Description : Reading from a spinlock address will:
@@ -1235,7 +1235,7 @@
 #define SIO_SPINLOCK5_RESET  _u(0x00000000)
 #define SIO_SPINLOCK5_MSB    _u(31)
 #define SIO_SPINLOCK5_LSB    _u(0)
-#define SIO_SPINLOCK5_ACCESS "RO"
+#define SIO_SPINLOCK5_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK6
 // Description : Reading from a spinlock address will:
@@ -1251,7 +1251,7 @@
 #define SIO_SPINLOCK6_RESET  _u(0x00000000)
 #define SIO_SPINLOCK6_MSB    _u(31)
 #define SIO_SPINLOCK6_LSB    _u(0)
-#define SIO_SPINLOCK6_ACCESS "RO"
+#define SIO_SPINLOCK6_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK7
 // Description : Reading from a spinlock address will:
@@ -1267,7 +1267,7 @@
 #define SIO_SPINLOCK7_RESET  _u(0x00000000)
 #define SIO_SPINLOCK7_MSB    _u(31)
 #define SIO_SPINLOCK7_LSB    _u(0)
-#define SIO_SPINLOCK7_ACCESS "RO"
+#define SIO_SPINLOCK7_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK8
 // Description : Reading from a spinlock address will:
@@ -1283,7 +1283,7 @@
 #define SIO_SPINLOCK8_RESET  _u(0x00000000)
 #define SIO_SPINLOCK8_MSB    _u(31)
 #define SIO_SPINLOCK8_LSB    _u(0)
-#define SIO_SPINLOCK8_ACCESS "RO"
+#define SIO_SPINLOCK8_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK9
 // Description : Reading from a spinlock address will:
@@ -1299,7 +1299,7 @@
 #define SIO_SPINLOCK9_RESET  _u(0x00000000)
 #define SIO_SPINLOCK9_MSB    _u(31)
 #define SIO_SPINLOCK9_LSB    _u(0)
-#define SIO_SPINLOCK9_ACCESS "RO"
+#define SIO_SPINLOCK9_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK10
 // Description : Reading from a spinlock address will:
@@ -1315,7 +1315,7 @@
 #define SIO_SPINLOCK10_RESET  _u(0x00000000)
 #define SIO_SPINLOCK10_MSB    _u(31)
 #define SIO_SPINLOCK10_LSB    _u(0)
-#define SIO_SPINLOCK10_ACCESS "RO"
+#define SIO_SPINLOCK10_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK11
 // Description : Reading from a spinlock address will:
@@ -1331,7 +1331,7 @@
 #define SIO_SPINLOCK11_RESET  _u(0x00000000)
 #define SIO_SPINLOCK11_MSB    _u(31)
 #define SIO_SPINLOCK11_LSB    _u(0)
-#define SIO_SPINLOCK11_ACCESS "RO"
+#define SIO_SPINLOCK11_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK12
 // Description : Reading from a spinlock address will:
@@ -1347,7 +1347,7 @@
 #define SIO_SPINLOCK12_RESET  _u(0x00000000)
 #define SIO_SPINLOCK12_MSB    _u(31)
 #define SIO_SPINLOCK12_LSB    _u(0)
-#define SIO_SPINLOCK12_ACCESS "RO"
+#define SIO_SPINLOCK12_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK13
 // Description : Reading from a spinlock address will:
@@ -1363,7 +1363,7 @@
 #define SIO_SPINLOCK13_RESET  _u(0x00000000)
 #define SIO_SPINLOCK13_MSB    _u(31)
 #define SIO_SPINLOCK13_LSB    _u(0)
-#define SIO_SPINLOCK13_ACCESS "RO"
+#define SIO_SPINLOCK13_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK14
 // Description : Reading from a spinlock address will:
@@ -1379,7 +1379,7 @@
 #define SIO_SPINLOCK14_RESET  _u(0x00000000)
 #define SIO_SPINLOCK14_MSB    _u(31)
 #define SIO_SPINLOCK14_LSB    _u(0)
-#define SIO_SPINLOCK14_ACCESS "RO"
+#define SIO_SPINLOCK14_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK15
 // Description : Reading from a spinlock address will:
@@ -1395,7 +1395,7 @@
 #define SIO_SPINLOCK15_RESET  _u(0x00000000)
 #define SIO_SPINLOCK15_MSB    _u(31)
 #define SIO_SPINLOCK15_LSB    _u(0)
-#define SIO_SPINLOCK15_ACCESS "RO"
+#define SIO_SPINLOCK15_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK16
 // Description : Reading from a spinlock address will:
@@ -1411,7 +1411,7 @@
 #define SIO_SPINLOCK16_RESET  _u(0x00000000)
 #define SIO_SPINLOCK16_MSB    _u(31)
 #define SIO_SPINLOCK16_LSB    _u(0)
-#define SIO_SPINLOCK16_ACCESS "RO"
+#define SIO_SPINLOCK16_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK17
 // Description : Reading from a spinlock address will:
@@ -1427,7 +1427,7 @@
 #define SIO_SPINLOCK17_RESET  _u(0x00000000)
 #define SIO_SPINLOCK17_MSB    _u(31)
 #define SIO_SPINLOCK17_LSB    _u(0)
-#define SIO_SPINLOCK17_ACCESS "RO"
+#define SIO_SPINLOCK17_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK18
 // Description : Reading from a spinlock address will:
@@ -1443,7 +1443,7 @@
 #define SIO_SPINLOCK18_RESET  _u(0x00000000)
 #define SIO_SPINLOCK18_MSB    _u(31)
 #define SIO_SPINLOCK18_LSB    _u(0)
-#define SIO_SPINLOCK18_ACCESS "RO"
+#define SIO_SPINLOCK18_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK19
 // Description : Reading from a spinlock address will:
@@ -1459,7 +1459,7 @@
 #define SIO_SPINLOCK19_RESET  _u(0x00000000)
 #define SIO_SPINLOCK19_MSB    _u(31)
 #define SIO_SPINLOCK19_LSB    _u(0)
-#define SIO_SPINLOCK19_ACCESS "RO"
+#define SIO_SPINLOCK19_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK20
 // Description : Reading from a spinlock address will:
@@ -1475,7 +1475,7 @@
 #define SIO_SPINLOCK20_RESET  _u(0x00000000)
 #define SIO_SPINLOCK20_MSB    _u(31)
 #define SIO_SPINLOCK20_LSB    _u(0)
-#define SIO_SPINLOCK20_ACCESS "RO"
+#define SIO_SPINLOCK20_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK21
 // Description : Reading from a spinlock address will:
@@ -1491,7 +1491,7 @@
 #define SIO_SPINLOCK21_RESET  _u(0x00000000)
 #define SIO_SPINLOCK21_MSB    _u(31)
 #define SIO_SPINLOCK21_LSB    _u(0)
-#define SIO_SPINLOCK21_ACCESS "RO"
+#define SIO_SPINLOCK21_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK22
 // Description : Reading from a spinlock address will:
@@ -1507,7 +1507,7 @@
 #define SIO_SPINLOCK22_RESET  _u(0x00000000)
 #define SIO_SPINLOCK22_MSB    _u(31)
 #define SIO_SPINLOCK22_LSB    _u(0)
-#define SIO_SPINLOCK22_ACCESS "RO"
+#define SIO_SPINLOCK22_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK23
 // Description : Reading from a spinlock address will:
@@ -1523,7 +1523,7 @@
 #define SIO_SPINLOCK23_RESET  _u(0x00000000)
 #define SIO_SPINLOCK23_MSB    _u(31)
 #define SIO_SPINLOCK23_LSB    _u(0)
-#define SIO_SPINLOCK23_ACCESS "RO"
+#define SIO_SPINLOCK23_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK24
 // Description : Reading from a spinlock address will:
@@ -1539,7 +1539,7 @@
 #define SIO_SPINLOCK24_RESET  _u(0x00000000)
 #define SIO_SPINLOCK24_MSB    _u(31)
 #define SIO_SPINLOCK24_LSB    _u(0)
-#define SIO_SPINLOCK24_ACCESS "RO"
+#define SIO_SPINLOCK24_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK25
 // Description : Reading from a spinlock address will:
@@ -1555,7 +1555,7 @@
 #define SIO_SPINLOCK25_RESET  _u(0x00000000)
 #define SIO_SPINLOCK25_MSB    _u(31)
 #define SIO_SPINLOCK25_LSB    _u(0)
-#define SIO_SPINLOCK25_ACCESS "RO"
+#define SIO_SPINLOCK25_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK26
 // Description : Reading from a spinlock address will:
@@ -1571,7 +1571,7 @@
 #define SIO_SPINLOCK26_RESET  _u(0x00000000)
 #define SIO_SPINLOCK26_MSB    _u(31)
 #define SIO_SPINLOCK26_LSB    _u(0)
-#define SIO_SPINLOCK26_ACCESS "RO"
+#define SIO_SPINLOCK26_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK27
 // Description : Reading from a spinlock address will:
@@ -1587,7 +1587,7 @@
 #define SIO_SPINLOCK27_RESET  _u(0x00000000)
 #define SIO_SPINLOCK27_MSB    _u(31)
 #define SIO_SPINLOCK27_LSB    _u(0)
-#define SIO_SPINLOCK27_ACCESS "RO"
+#define SIO_SPINLOCK27_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK28
 // Description : Reading from a spinlock address will:
@@ -1603,7 +1603,7 @@
 #define SIO_SPINLOCK28_RESET  _u(0x00000000)
 #define SIO_SPINLOCK28_MSB    _u(31)
 #define SIO_SPINLOCK28_LSB    _u(0)
-#define SIO_SPINLOCK28_ACCESS "RO"
+#define SIO_SPINLOCK28_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK29
 // Description : Reading from a spinlock address will:
@@ -1619,7 +1619,7 @@
 #define SIO_SPINLOCK29_RESET  _u(0x00000000)
 #define SIO_SPINLOCK29_MSB    _u(31)
 #define SIO_SPINLOCK29_LSB    _u(0)
-#define SIO_SPINLOCK29_ACCESS "RO"
+#define SIO_SPINLOCK29_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK30
 // Description : Reading from a spinlock address will:
@@ -1635,7 +1635,7 @@
 #define SIO_SPINLOCK30_RESET  _u(0x00000000)
 #define SIO_SPINLOCK30_MSB    _u(31)
 #define SIO_SPINLOCK30_LSB    _u(0)
-#define SIO_SPINLOCK30_ACCESS "RO"
+#define SIO_SPINLOCK30_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_SPINLOCK31
 // Description : Reading from a spinlock address will:
@@ -1651,6 +1651,6 @@
 #define SIO_SPINLOCK31_RESET  _u(0x00000000)
 #define SIO_SPINLOCK31_MSB    _u(31)
 #define SIO_SPINLOCK31_LSB    _u(0)
-#define SIO_SPINLOCK31_ACCESS "RO"
+#define SIO_SPINLOCK31_ACCESS "RW"
 // =============================================================================
 #endif // HARDWARE_REGS_SIO_DEFINED

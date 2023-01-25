@@ -15,6 +15,11 @@
 // For board detection
 #define ADAFRUIT_ITSYBITSY_RP2040
 
+// On some samples, the xosc can take longer to stabilize than is usual
+#ifndef PICO_XOSC_STARTUP_DELAY_MULTIPLIER
+#define PICO_XOSC_STARTUP_DELAY_MULTIPLIER 64
+#endif
+
 //------------- UART -------------//
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0
@@ -80,16 +85,12 @@
 #endif
 
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
+#define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
 #endif
 
 // All boards have B1 RP2040
-#ifndef PICO_FLOAT_SUPPORT_ROM_V1
-#define PICO_FLOAT_SUPPORT_ROM_V1 0
-#endif
-
-#ifndef PICO_DOUBLE_SUPPORT_ROM_V1
-#define PICO_DOUBLE_SUPPORT_ROM_V1 0
+#ifndef PICO_RP2040_B0_SUPPORTED
+#define PICO_RP2040_B0_SUPPORTED 0
 #endif
 
 #endif

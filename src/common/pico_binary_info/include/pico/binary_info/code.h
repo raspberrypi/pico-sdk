@@ -7,7 +7,12 @@
 #ifndef _PICO_BINARY_INFO_CODE_H
 #define _PICO_BINARY_INFO_CODE_H
 
+// pico.h is not available when PICO_NO_BINARY_INFO=1 is used for builds outside of the SDK (e.g. picotool)
+// and only needed anyway (because of macro definitions) in PICO_NO_BINARY_INFO=0 builds
+#if !PICO_NO_BINARY_INFO
 #include "pico.h"
+#endif
+
 #include "pico/binary_info/structure.h"
 
 #if !PICO_NO_BINARY_INFO
@@ -131,7 +136,7 @@ static const struct _binary_info_named_group __bi_lineno_var_name = { \
 #define bi_pin_range_with_func(plo, phi, func)       __bi_encoded_pins_with_func(BI_PINS_ENCODING_RANGE | ((func << 3)) | ((plo) << 7) | ((phi) << 12))
 
 #define bi_pin_mask_with_name(pmask, label)          __bi_pins_with_name((pmask), (label))
-// names are sperated by | ... i.e. "name1|name2|name3"
+// names are separated by | ... i.e. "name1|name2|name3"
 #define bi_pin_mask_with_names(pmask, label)          __bi_pins_with_name((pmask), (label))
 #define bi_1pin_with_name(p0, name)                   bi_pin_mask_with_name(1u << (p0), name)
 #define bi_2pins_with_names(p0, name0, p1, name1)     bi_pin_mask_with_names((1u << (p0)) | (1u << (p1)), name0 "|" name1)

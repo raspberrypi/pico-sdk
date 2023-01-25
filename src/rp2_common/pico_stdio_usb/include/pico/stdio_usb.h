@@ -13,8 +13,8 @@
  *  \defgroup pico_stdio_usb pico_stdio_usb
  *  \ingroup pico_stdio
  *
- *  Linking this library or calling `pico_enable_stdio_usb(TARGET)` in the CMake (which
- *  achieves the same thing) will add USB CDC to the drivers used for standard output
+ *  Linking this library or calling `pico_enable_stdio_usb(TARGET ENABLED)` in the CMake (which
+ *  achieves the same thing) will add USB CDC to the drivers used for standard input/output
  *
  *  Note this library is a developer convenience. It is not applicable in all cases; for one it takes full control of the USB device precluding your
  *  use of the USB in device or host mode. For this reason, this library will automatically disengage if you try to using it alongside \ref tinyusb_device or
@@ -39,9 +39,9 @@
 #define PICO_STDIO_USB_TASK_INTERVAL_US 1000
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_LOW_PRIORITY_IRQ, low priority (non hardware) IRQ number to claim for tud_task() background execution, default=31, advanced=true, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_LOW_PRIORITY_IRQ, Explicit User IRQ number to claim for tud_task() background execution instead of letting the implementation pick a free one dynamically (deprecated), advanced=true, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_LOW_PRIORITY_IRQ
-#define PICO_STDIO_USB_LOW_PRIORITY_IRQ 31
+// this variable is no longer set by default (one is claimed dynamically), but will be respected if specified
 #endif
 
 // PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE, Enable/disable resetting into BOOTSEL mode if the host sets the baud rate to a magic value (PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE), type=bool, default=1, group=pico_stdio_usb
@@ -52,6 +52,16 @@
 // PICO_CONFIG: PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE, baud rate that if selected causes a reset into BOOTSEL mode (if PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE is set), default=1200, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE
 #define PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE 1200
+#endif
+
+// PICO_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) during initialization, default=0, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
+#define PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS 0
+#endif
+
+// PICO_CONFIG: PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS, Number of extra milliseconds to wait when using PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS after a host CDC connection is detected (some host terminals seem to sometimes lose transmissions sent right after connection), default=50, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS
+#define PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS 50
 #endif
 
 // PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED, Optionally define a pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE), type=int, min=0, max=29, group=pico_stdio_usb
@@ -94,10 +104,22 @@ extern "C" {
 extern stdio_driver_t stdio_usb;
 
 /*! \brief Explicitly initialize USB stdio and add it to the current set of stdin drivers
- *  \ingroup pico_stdio_uart
+ *  \ingroup pico_stdio_usb
+ *
+ *  \ref PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS can be set to cause this method to wait for a CDC connection
+ *  from the host before returning, which is useful if you don't want any initial stdout output to be discarded
+ *  before the connection is established.
+ *
+ *  \return true if the USB CDC was initialized, false if an error occurred
  */
 bool stdio_usb_init(void);
 
+/*! \brief Check if there is an active stdio CDC connection to a host
+ *  \ingroup pico_stdio_usb
+ *
+ *  \return true if stdio is connected over CDC
+ */
+bool stdio_usb_connected(void);
 #ifdef __cplusplus
 }
 #endif

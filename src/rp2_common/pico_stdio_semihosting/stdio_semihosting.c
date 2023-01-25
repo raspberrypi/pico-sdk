@@ -18,7 +18,7 @@
 //    );
 //}
 
-static void __attribute__((naked)) semihosting_putc(char c) {
+static void __attribute__((naked)) semihosting_putc(__unused const char *c) {
     __asm (
 
     "mov r1, r0\n"
@@ -30,8 +30,8 @@ static void __attribute__((naked)) semihosting_putc(char c) {
 
 
 static void stdio_semihosting_out_chars(const char *buf, int length) {
-    for (uint i = 0; i <length; i++) {
-        semihosting_putc(buf[i]);
+    for (int i = 0; i < length; i++) {
+        semihosting_putc(&buf[i]);
     }
 }
 

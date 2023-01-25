@@ -1,4 +1,4 @@
-add_library(pico_fix_rp2040_usb_device_enumeration INTERFACE)
+pico_add_impl_library(pico_fix_rp2040_usb_device_enumeration)
 
 target_sources(pico_fix_rp2040_usb_device_enumeration INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/rp2040_usb_device_enumeration.c

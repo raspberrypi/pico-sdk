@@ -51,13 +51,13 @@
 #define PICO_PRINTF_FTOA_BUFFER_SIZE    32U
 #endif
 
-// PICO_CONFIG: PICO_PRINTF_SUPPORT_FLOAT, Enable floating point printing, default=1, group=pico_printf
+// PICO_CONFIG: PICO_PRINTF_SUPPORT_FLOAT, Enable floating point printing, type=bool, default=1, group=pico_printf
 // support for the floating point type (%f)
 #ifndef PICO_PRINTF_SUPPORT_FLOAT
 #define PICO_PRINTF_SUPPORT_FLOAT 1
 #endif
 
-// PICO_CONFIG: PICO_PRINTF_SUPPORT_EXPONENTIAL, Enable exponential floating point printing, default=1, group=pico_printf
+// PICO_CONFIG: PICO_PRINTF_SUPPORT_EXPONENTIAL, Enable exponential floating point printing, type=bool, default=1, group=pico_printf
 // support for exponential floating point notation (%e/%g)
 #ifndef PICO_PRINTF_SUPPORT_EXPONENTIAL
 #define PICO_PRINTF_SUPPORT_EXPONENTIAL 1
@@ -73,12 +73,12 @@
 #define PICO_PRINTF_MAX_FLOAT  1e9
 #endif
 
-// PICO_CONFIG: PICO_PRINTF_SUPPORT_LONG_LONG, Enable support for long long types (%llu or %p), default=1, group=pico_printf
+// PICO_CONFIG: PICO_PRINTF_SUPPORT_LONG_LONG, Enable support for long long types (%llu or %p), type=bool, default=1, group=pico_printf
 #ifndef PICO_PRINTF_SUPPORT_LONG_LONG
 #define PICO_PRINTF_SUPPORT_LONG_LONG 1
 #endif
 
-// PICO_CONFIG: PICO_PRINTF_SUPPORT_PTRDIFF_T, Enable support for the ptrdiff_t type (%t), default=1, group=pico_printf
+// PICO_CONFIG: PICO_PRINTF_SUPPORT_PTRDIFF_T, Enable support for the ptrdiff_t type (%t), type=bool, default=1, group=pico_printf
 // ptrdiff_t is normally defined in <stddef.h> as long or long long type
 #ifndef PICO_PRINTF_SUPPORT_PTRDIFF_T
 #define PICO_PRINTF_SUPPORT_PTRDIFF_T 1
@@ -918,7 +918,7 @@ int vfctprintf(void (*out)(char character, void *arg), void *arg, const char *fo
     return _vsnprintf(_out_fct, (char *) (uintptr_t) &out_fct_wrap, (size_t) -1, format, va);
 }
 
-#if PICO_PRINTF_PICO
+#if LIB_PICO_PRINTF_PICO
 #if !PICO_PRINTF_ALWAYS_INCLUDED
 bool weak_raw_printf(const char *fmt, ...) {
     va_list va;

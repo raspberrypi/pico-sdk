@@ -7,6 +7,8 @@
 #ifndef _PICO_UNIQUE_ID_H_
 #define _PICO_UNIQUE_ID_H_
 
+#include "pico.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -56,6 +58,21 @@ typedef struct {
  * \param id_out a pointer to a pico_unique_board_id_t struct, to which the identifier will be written
  */
 void pico_get_unique_board_id(pico_unique_board_id_t *id_out);
+
+/*! \brief Get unique ID in string format
+ *  \ingroup pico_unique_id
+ *
+ * Get the unique 64-bit device identifier which was retrieved from the
+ * external NOR flash device at boot, formatted as an ASCII hex string.
+ * Will always 0-terminate.
+ *
+ * On PICO_NO_FLASH builds the unique identifier is set to all 0xEE.
+ *
+ * \param id_out a pointer to a char buffer of size len, to which the identifier will be written
+ * \param len the size of id_out. For full serial, len >= 2 * PICO_UNIQUE_BOARD_ID_SIZE_BYTES + 1
+ */
+void pico_get_unique_board_id_string(char *id_out, uint len);
+
 
 #ifdef __cplusplus
 }

@@ -11,12 +11,14 @@
 #include "hardware/clocks.h"
 #include "hardware/divider.h"
 #include "hardware/dma.h"
+#include "hardware/exception.h"
 #include "hardware/flash.h"
 #include "hardware/gpio.h"
 #include "hardware/i2c.h"
 #include "hardware/interp.h"
 #include "hardware/irq.h"
 #include "hardware/pio.h"
+#include "hardware/pio_instructions.h"
 #include "hardware/pll.h"
 #include "hardware/pwm.h"
 #include "hardware/resets.h"
@@ -39,11 +41,48 @@
 #include "pico/malloc.h"
 #include "pico/multicore.h"
 #include "pico/printf.h"
+#include "pico/runtime.h"
+#include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/sync.h"
 #include "pico/time.h"
 #include "pico/unique_id.h"
+#if LIB_PICO_CYW43_ARCH
+#include "pico/cyw43_arch.h"
+#endif
 
+#include "hardware/structs/adc.h"
+#include "hardware/structs/bus_ctrl.h"
+#include "hardware/structs/clocks.h"
+#include "hardware/structs/dma.h"
+#include "hardware/structs/i2c.h"
+#include "hardware/structs/interp.h"
+#include "hardware/structs/iobank0.h"
+#include "hardware/structs/ioqspi.h"
+#include "hardware/structs/mpu.h"
+#include "hardware/structs/padsbank0.h"
+#include "hardware/structs/pads_qspi.h"
+#include "hardware/structs/pio.h"
+#include "hardware/structs/pll.h"
+#include "hardware/structs/psm.h"
+#include "hardware/structs/pwm.h"
+#include "hardware/structs/resets.h"
+#include "hardware/structs/rosc.h"
+#include "hardware/structs/rtc.h"
+#include "hardware/structs/scb.h"
+#include "hardware/structs/sio.h"
+#include "hardware/structs/spi.h"
+#include "hardware/structs/ssi.h"
+#include "hardware/structs/syscfg.h"
+#include "hardware/structs/systick.h"
+#include "hardware/structs/timer.h"
+#include "hardware/structs/uart.h"
+#include "hardware/structs/usb.h"
+#include "hardware/structs/vreg_and_chip_reset.h"
+#include "hardware/structs/watchdog.h"
+#include "hardware/structs/xip_ctrl.h"
+#include "hardware/structs/xosc.h"
+        
 bi_decl(bi_block_device(
                            BINARY_INFO_MAKE_TAG('K', 'S'),
                            "foo",
@@ -61,7 +100,7 @@ uint32_t *foo = (uint32_t *) 200;
 uint32_t dma_to = 0;
 uint32_t dma_from = 0xaaaa5555;
 
-void spiggle(void) {
+void __noinline spiggle(void) {
     dma_channel_config c = dma_channel_get_default_config(1);
     channel_config_set_bswap(&c, true);
     channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
@@ -70,57 +109,27 @@ void spiggle(void) {
     dma_channel_transfer_from_buffer_now(1, foo, 23);
 }
 
-void __isr dma_handler_a(void) {
-    printf("HELLO A\n");
-    if (dma_hw->ints1 & 1) {
-        dma_hw->ints1 = 1;
-        printf("A WINS DMA_TO %08x\n", (uint) dma_to);
-        irq_remove_handler(DMA_IRQ_1, dma_handler_a);
-    }
+__force_inline int something_inlined(int x) {
+    return x * 2;
 }
 
-void __isr dma_handler_b(void) {
-    printf("HELLO B\n");
-    if (dma_hw->ints1 & 1) {
-        dma_hw->ints1 = 1;
-        printf("B WINS DNA_TO %08x\n", (uint) dma_to);
-//        irq_remove_handler(DMA_IRQ_1, dma_handler_b);
-    }
-}
-
-//#pragma GCC pop_options
+auto_init_mutex(mutex);
+auto_init_recursive_mutex(recursive_mutex);
 
 int main(void) {
     spiggle();
 
     stdio_init_all();
 
-    printf("HI %d\n", (int)time_us_32());
+    printf("HI %d\n", something_inlined((int)time_us_32()));
     puts("Hello Everything!");
     puts("Hello Everything2!");
 
-    irq_add_shared_handler(DMA_IRQ_1, dma_handler_a, 0x80);
-    irq_add_shared_handler(DMA_IRQ_1, dma_handler_b, 0xC0);
-
-    dma_channel_config config = dma_channel_get_default_config(0);
-//    set_exclusive_irq_handler(DMA_IRQ_1, dma_handler_a);
-    dma_channel_set_irq1_enabled(0, true);
-    irq_set_enabled(DMA_IRQ_1, true);
-    dma_channel_configure(0, &config, &dma_to, &dma_from, 1, true);
-    dma_channel_set_config(0, &config, false);
-
-    // note this loop expects to cause a breakpoint!!
-    for (int i = 0; i < 20; i++) {
-        puts("sleepy");
-        sleep_ms(1000);
-        dma_channel_configure(0, &config, &dma_to, &dma_from, 1, true);
-        if (i==3) {
-            irq_remove_handler(DMA_IRQ_1, dma_handler_a);
-        }
-        if (i==2) {
-            irq_remove_handler(DMA_IRQ_1, dma_handler_b);
-        }
-    }
+    hard_assert(mutex_try_enter(&mutex, NULL));
+    hard_assert(!mutex_try_enter(&mutex, NULL));
+    hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
+    hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     // this should compile as we are Cortex M0+
     __asm volatile("SVC #3");
+
 }

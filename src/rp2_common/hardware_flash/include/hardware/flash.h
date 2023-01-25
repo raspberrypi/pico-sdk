@@ -80,6 +80,32 @@ void flash_range_program(uint32_t flash_offs, const uint8_t *data, size_t count)
  */
 void flash_get_unique_id(uint8_t *id_out);
 
+/*! \brief Execute bidirectional flash command
+ *  \ingroup hardware_flash
+ *
+ * Low-level function to execute a serial command on a flash device attached
+ * to the QSPI interface. Bytes are simultaneously transmitted and received
+ * from txbuf and to rxbuf. Therefore, both buffers must be the same length,
+ * count, which is the length of the overall transaction. This is useful for
+ * reading metadata from the flash chip, such as device ID or SFDP
+ * parameters.
+ *
+ * The XIP cache is flushed following each command, in case flash state
+ * has been modified. Like other hardware_flash functions, the flash is not
+ * accessible for execute-in-place transfers whilst the command is in
+ * progress, so entering a flash-resident interrupt handler or executing flash
+ * code on the second core concurrently will be fatal. To avoid these pitfalls
+ * it is recommended that this function only be used to extract flash metadata
+ * during startup, before the main application begins to run: see the
+ * implementation of pico_get_unique_id() for an example of this.
+ *
+ *  \param txbuf Pointer to a byte buffer which will be transmitted to the flash
+ *  \param rxbuf Pointer to a byte buffer where data received from the flash will be written. txbuf and rxbuf may be the same buffer.
+ *  \param count Length in bytes of txbuf and of rxbuf
+ */
+void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count);
+
+
 #ifdef __cplusplus
 }
 #endif
