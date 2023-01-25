@@ -1,5 +1,5 @@
 name: Multi GCC
-on: [workflow_dispatch, push, pull_request]
+on: [workflow_dispatch]
 
 jobs:
   build:
