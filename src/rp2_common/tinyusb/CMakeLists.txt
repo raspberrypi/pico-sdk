@@ -29,8 +29,9 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     add_library(tinyusb_device_unmarked INTERFACE)
     target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_device_base)
     target_compile_definitions(tinyusb_device_unmarked INTERFACE
-            # off by default note TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX defaults from PICO_RP2040_USB_DEVICE_ENUMERATION_FIX
-#            TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX=1
+        # off by default note TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX defaults from PICO_RP2040_USB_DEVICE_ENUMERATION_FIX
+        # TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX=1
+        PICO_RP2040_USB_DEVICE_UFRAME_FIX=1
     )
 
     # unmarked version used by stdio USB
