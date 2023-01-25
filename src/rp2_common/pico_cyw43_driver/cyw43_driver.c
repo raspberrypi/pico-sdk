@@ -95,10 +95,10 @@ static void cyw43_do_poll(async_context_t *context, __unused async_when_pending_
     }
 }
 
-static void cyw43_sleep_timeout_reached(async_context_t *context, async_at_time_worker_t *worker) {
+static void cyw43_sleep_timeout_reached(async_context_t *context, __unused async_at_time_worker_t *worker) {
     assert(context == cyw43_async_context);
     assert(worker == &sleep_timeout_worker);
-    async_context_set_work_pending(cyw43_async_context, &cyw43_poll_worker);
+    async_context_set_work_pending(context, &cyw43_poll_worker);
 }
 
 bool cyw43_driver_init(async_context_t *context) {
