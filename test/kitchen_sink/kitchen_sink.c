@@ -47,6 +47,7 @@
 #include "pico/sync.h"
 #include "pico/time.h"
 #include "pico/unique_id.h"
+#include "pico/rand.h"
 #if LIB_PICO_CYW43_ARCH
 #include "pico/cyw43_arch.h"
 #endif

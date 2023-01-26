@@ -46,7 +46,6 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             ${PICO_LWIP_PATH}/src/core/tcp_out.c
             ${PICO_LWIP_PATH}/src/core/timeouts.c
             ${PICO_LWIP_PATH}/src/core/udp.c
-            ${CMAKE_CURRENT_LIST_DIR}/lwip_random.c
             )
     target_include_directories(pico_lwip_core INTERFACE
             ${PICO_LWIP_PATH}/src/include)
@@ -274,7 +273,8 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
     target_link_libraries(pico_lwip_nosys INTERFACE
             pico_async_context_base
             pico_lwip_arch
-            pico_lwip)
+            pico_lwip
+            pico_rand)
 
     if (NOT PICO_LWIP_CONTRIB_PATH)
         set(PICO_LWIP_CONTRIB_PATH ${PICO_LWIP_PATH}/contrib)
