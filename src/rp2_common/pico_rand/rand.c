@@ -26,52 +26,28 @@
 
 #include "pico/rand.h"
 #include "pico/unique_id.h"
-#include "hardware/timer.h"
+#include "pico/time.h"
 #include "hardware/clocks.h"
 #include "hardware/structs/rosc.h"
+#include "hardware/structs/bus_ctrl.h"
 #include "hardware/sync.h"
-
-// Hashing the selected area of RAM is done the first time
-// a random number is requested. If there is any chance the first RN will be
-// requested from interrupt context only a small amount of RAM should be hashed
-// hence the 1k default here which will take ~100us on RP2040 at 125Mhz
-
-// PICO_CONFIG: PICO_RAND_DISABLE_ROSC_CHECKS, Disable assertions that the ROSC is running when generating random numbers which will drastically reduce randomness, type=bool, default=0, group=pico_rand
-
-// Note that by default we hash the last 1K of SRAM which usually has the core0 stack, so is not only as good as any place to hash on power
-// up, it is quite unpredictable in contexts on warm resets.
-
-// PICO_CONFIG: PICO_RAND_RAM_HASH_END, end of address in RAM (non-inclusive) to hash during pico_rand initialization, default=SRAM_END, group=pico_rand
-#ifndef PICO_RAND_RAM_HASH_END
-#define PICO_RAND_RAM_HASH_END     SRAM_END
-#endif
-// PICO_CONFIG: PICO_RAND_RAM_HASH_START, start of address in RAM (inclusive) to hash during pico_rand initialization, default=PICO_RAND_RAM_HASH_END-1024, group=pico_rand
-#ifndef PICO_RAND_RAM_HASH_START
-#define PICO_RAND_RAM_HASH_START   (PICO_RAND_RAM_HASH_END - 1024u)
-#endif
-
-// PICO_CONFIG: PICO_RAND_MIN_ROSC_SAMPLE_TIME_US, Define a default minimum time between sampling the ROSC random bit, min=5, max=20, group=pico_rand
-#ifndef PICO_RAND_MIN_ROSC_SAMPLE_TIME_US
-// (Arbitrary / tested) minimum time between sampling the ROSC random bit
-#define PICO_RAND_MIN_ROSC_SAMPLE_TIME_US 10u
-#endif
-
-static_assert(PICO_UNIQUE_BOARD_ID_SIZE_BYTES == sizeof(uint64_t),
-              "Code below requires that 'board_id' is 64-bits in size");
-
-// Note! The safety of the length assumption here is protected by a 'static_assert' above
-union unique_id_u {
-    pico_unique_board_id_t board_id_native;
-    uint64_t board_id_u64;
-};
 
 static bool rng_initialised = false;
 
 // Note: By design, do not initialise any of the variables that hold entropy,
 // they may have useful junk in them, either from power-up or a previous boot.
+static rng_128_t __uninitialized_ram(rng_state);
+#if PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH
 static uint64_t __uninitialized_ram(ram_hash);
+#endif
+
+#if PICO_RAND_ENTROPY_SRC_ROSC | PICO_RAND_SEED_ENTROPY_SRC_ROSC
 static uint64_t __uninitialized_ram(rosc_samples);
-static rng_128_t __uninitialized_ram(rand_storage);
+#endif
+
+#if PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
+static uint8_t bus_counter_idx;
+#endif
 
 /* From the original source:
 
@@ -112,9 +88,9 @@ static inline uint64_t rotl(const uint64_t x, int k) {
     return (x << k) | (x >> (64 - k));
 }
 
-static __noinline uint64_t xoroshiro128ss(void) {
-    const uint64_t s0 = rand_storage.r[0];
-    uint64_t s1 = rand_storage.r[1];
+static __noinline uint64_t xoroshiro128ss(rng_128_t *local_rng_state) {
+    const uint64_t s0 = local_rng_state->r[0];
+    uint64_t s1 = local_rng_state->r[1];
 
     // Because the state is *modified* outside of this function, there is a
     // 1 in 2^128 chance that it could be all zeroes (which is not allowed).
@@ -125,13 +101,13 @@ static __noinline uint64_t xoroshiro128ss(void) {
     const uint64_t result = rotl(s0 * 5, 7) * 9;
 
     s1 ^= s0;
-    rand_storage.r[0] = rotl(s0, 24) ^ s1 ^ (s1 << 16); // a, b
-    rand_storage.r[1] = rotl(s1, 37); // c
+    local_rng_state->r[0] = rotl(s0, 24) ^ s1 ^ (s1 << 16); // a, b
+    local_rng_state->r[1] = rotl(s1, 37); // c
 
     return result;
 }
 
-// Note: This can take many tens of milliseconds to execute
+#if PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH
 static uint64_t sdbm_hash64_sram(uint64_t hash) {
     // save some time by hashing a word at a time
     for (uint i = (PICO_RAND_RAM_HASH_START + 3) & ~3; i < PICO_RAND_RAM_HASH_END; i+=4) {
@@ -140,90 +116,178 @@ static uint64_t sdbm_hash64_sram(uint64_t hash) {
     }
     return hash;
 }
-
-// check that the ROSC is running but that the processors are NOT running from it
-static inline void check_rosc_asserts(void) {
-#if !PICO_RAND_DISABLE_ROSC_CHECKS
-    hard_assert(rosc_hw->status & ROSC_STATUS_ENABLED_BITS);
-    hard_assert((clocks_hw->clk[clk_sys].ctrl & CLOCKS_CLK_SYS_CTRL_AUXSRC_BITS) !=
-                (CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_ROSC_CLKSRC << CLOCKS_CLK_SYS_CTRL_AUXSRC_LSB));
 #endif
-}
 
-static void update_rosc_samples_under_lock(void) {
-    static uint32_t previous_sample_time_us = 0;
+#if PICO_RAND_SEED_ENTROPY_SRC_ROSC | PICO_RAND_ENTROPY_SRC_ROSC
+/* gather an additional n bits of entropy, and shift them into the 64 bit entropy counter */
+static uint64_t capture_additional_rosc_samples(uint n) {
+    static absolute_time_t next_sample_time;
 
-    check_rosc_asserts();
+    // provide an override if someone really wants it, but disabling ROSC as an entroy source makes more sense
+#if !PICO_RAND_DISABLE_ROSC_CHECK
+    // check that the ROSC is running but that the processors are NOT running from it
+    hard_assert((rosc_hw->status & ROSC_STATUS_ENABLED_BITS) &&
+                ((clocks_hw->clk[clk_sys].ctrl & CLOCKS_CLK_SYS_CTRL_AUXSRC_BITS) != (CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_ROSC_CLKSRC << CLOCKS_CLK_SYS_CTRL_AUXSRC_LSB)));
+#endif
 
-    // Ensure that the ROSC random bit is not sampled too quickly,
-    // ROSC may be ticking only a few times a microsecond.
-    // Note: In general (i.e. sporadic) use, very often there will be no delay here.
-    while ((time_us_32() - previous_sample_time_us) < PICO_RAND_MIN_ROSC_SAMPLE_TIME_US) {
-        tight_loop_contents();
+    bool in_exception = __get_current_exception();
+    assert(n); // save us having to special case samples for this
+    uint64_t samples = 0;
+    for(uint i=0; i<n; i++) {
+        bool bit_done = false;
+        do {
+            // Ensure that the ROSC random bit is not sampled too quickly,
+            // ROSC may be ticking only a few times a microsecond.
+            // Note: In general (i.e. sporadic) use, very often there will be no delay here.
+
+            // note this is not read under lock, so the two 32 bit halves could be skewed, but in that
+            // case we'll fail the check later, which is fine in this rare case
+            absolute_time_t cached_next_sample_time = next_sample_time;
+            // we support being called from IRQ, so be careful about sleeping... still not
+            // ideal, but not much that can be done
+            if (in_exception) {
+                busy_wait_until(next_sample_time);
+            } else {
+                sleep_until(next_sample_time);
+            }
+            spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_RAND);
+            uint32_t save = spin_lock_blocking(lock);
+            if (!absolute_time_diff_us(cached_next_sample_time, next_sample_time)) {
+                // we won the race (if any) for the bit, so we collect it locally
+                samples <<= 1;
+                samples |= rosc_hw->randombit & 1u;
+                // use of relative time to now, rather than offset from before makes things
+                // a bit less predictable at the cost of some speed.
+                next_sample_time = make_timeout_time_us(PICO_RAND_MIN_ROSC_BIT_SAMPLE_TIME_US);
+                bit_done = true;
+                if (i == n - 1) {
+                    // samples has our random bits, so let's mix them in now
+                    samples = rosc_samples = (rosc_samples << n) | samples;
+                }
+            }
+            spin_unlock(lock, save);
+        } while (!bit_done);
     }
-    previous_sample_time_us = time_us_32();
-
-    rosc_samples <<= 1;
-    rosc_samples |= rosc_hw->randombit & 1u;
+    return samples;
 }
+#endif
 
-static void initialise_rand_under_lock(void) {
-    union unique_id_u unique_id;
-
+static void initialise_rand(void) {
+    rng_128_t local_rng_state = local_rng_state;
+    uint which = 0;
+#if PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH
     ram_hash = sdbm_hash64_sram(ram_hash);
-    rand_storage.r[0] ^= splitmix64(ram_hash);
+    local_rng_state.r[which] ^= splitmix64(ram_hash);
+    which ^= 1;
+#endif
+
+#if PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID
+    static_assert(PICO_UNIQUE_BOARD_ID_SIZE_BYTES == sizeof(uint64_t),
+                  "Code below requires that 'board_id' is 64-bits in size");
 
     // Note! The safety of the length assumption here is protected by a 'static_assert' above
+    union unique_id_u {
+        pico_unique_board_id_t board_id_native;
+        uint64_t board_id_u64;
+    } unique_id;
+    // Note! The safety of the length assumption here is protected by a 'static_assert' above
     pico_get_unique_board_id(&unique_id.board_id_native);
-    rand_storage.r[0] ^= splitmix64(unique_id.board_id_u64);
+    local_rng_state.r[which] ^= splitmix64(unique_id.board_id_u64);
+    which ^= 1;
+#endif
 
-    uint ref_khz = clock_get_hz(clk_ref) / 100;
-    for (int i = 0; i < 5; i++) {
-        // Apply hash of the rosc frequency, limited but still 'extra' entropy
-        uint measurement = frequency_count_raw(CLOCKS_FC0_SRC_VALUE_ROSC_CLKSRC, ref_khz);
-        rand_storage.r[0] ^= splitmix64(measurement);
-        (void) xoroshiro128ss();  //churn to mix seed sources
-    }
+#if PICO_RAND_SEED_ENTROPY_SRC_ROSC
+    // this is really quite slow (10ms per iteration), and I'm not sure that it adds value over the 64 random bits
+//    uint ref_khz = clock_get_hz(clk_ref) / 100;
+//    for (int i = 0; i < 5; i++) {
+//        // Apply hash of the rosc frequency, limited but still 'extra' entropy
+//        uint measurement = frequency_count_raw(CLOCKS_FC0_SRC_VALUE_ROSC_CLKSRC, ref_khz);
+//        local_rng_state.r[which] ^= splitmix64(measurement);
+//        (void) xoroshiro128ss(&local_rng_state);  //churn to mix seed sources
+//    }
 
-    // Completely fill local ROSC sample array with sample bits
-    for (uint i = 0; i < (8 * sizeof(rosc_samples)); i++) {
-        update_rosc_samples_under_lock();
-    }
-    // Apply hashed ROSC samples value
-    rand_storage.r[1] ^= splitmix64(rosc_samples);
+    // Gather a full ROSC sample array with sample bits
+    local_rng_state.r[which] ^= splitmix64(capture_additional_rosc_samples(8 * sizeof(rosc_samples)));
+    which ^= 1;
+#endif
 
+#if PICO_RAND_SEED_ENTROPY_SRC_TIME
     // Mix in hashed time.  This is [possibly] predictable boot-to-boot
     // but will vary application-to-application.
-    rand_storage.r[1] ^= splitmix64(time_us_64());
-
-    (void) xoroshiro128ss();
-}
-
-uint64_t get_rand_64(void) {
-    uint64_t rand64;
+    local_rng_state.r[which] ^= splitmix64(time_us_64());
+    which ^= 1;
+#endif
 
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_RAND);
     uint32_t save = spin_lock_blocking(lock);
+    if (!rng_initialised) {
+#if PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
+#if !PICO_RAND_BUSCTRL_COUNTER_INDEX
+        int idx = -1;
+        for(uint i = 0; i < count_of(bus_ctrl_hw->counter); i++) {
+            if (bus_ctrl_hw->counter[i].sel == BUSCTRL_PERFSEL0_RESET) {
+                idx = (int)i;
+                break;
+            }
+        }
+        hard_assert(idx != -1);
+        bus_counter_idx = (uint8_t)idx;
+#else
+        bus_counter_idx = (uint8_t)PICO_RAND_BUSCTRL_COUNTER_INDEX;
+#endif
+        bus_ctrl_hw->counter[bus_counter_idx].sel = PICO_RAND_BUS_PERF_COUNTER_EVENT;
+#endif
+        (void) xoroshiro128ss(&local_rng_state);
+        rng_state = local_rng_state;
+        rng_initialised = true;
+    }
+    spin_unlock(lock, save);
+}
 
+uint64_t get_rand_64(void) {
     if (!rng_initialised) {
         // Do not provide 'RNs' until the system has been initialised.  Note:
         // The first initialisation can be quite time-consuming depending on
         // the amount of RAM hashed, see RAM_HASH_START and RAM_HASH_END
-        initialise_rand_under_lock();
-        rng_initialised = true;
+        initialise_rand();
     }
 
-    update_rosc_samples_under_lock();
-
+    static volatile uint16_t check_word;
+    rng_128_t local_rng_state = rng_state;
+    uint16_t local_check_word = check_word;
     // Modify PRNG state with the two run-time entropy sources,
     // hashed to reduce correlation with previous modifications.
-    rand_storage.r[0] ^= splitmix64(rosc_samples);
-    rand_storage.r[1] ^= splitmix64(time_us_64());
+    uint which = 0;
+#if PICO_RAND_ENTROPY_SRC_TIME
+    local_rng_state.r[which] ^= splitmix64(time_us_64());
+    which ^= 1;
+#endif
+#if PICO_RAND_ENTROPY_SRC_ROSC
+    local_rng_state.r[which] ^= splitmix64(capture_additional_rosc_samples(PICO_RAND_ROSC_BIT_SAMPLE_COUNT));
+    which ^= 1;
+#endif
+#if PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
+    uint32_t bus_counter_value = bus_ctrl_hw->counter[bus_counter_idx].value;
+    // counter is saturating, so clear it if it has reached saturation
+    if (bus_counter_value == BUSCTRL_PERFCTR0_BITS) {
+        bus_ctrl_hw->counter[bus_counter_idx].value = 0;
+    }
+    local_rng_state.r[which] &= splitmix64(bus_counter_value);
+    which ^= 1;
+#endif
 
+    spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_RAND);
+    uint32_t save = spin_lock_blocking(lock);
+    if (local_check_word != check_word) {
+        // someone got a random number in the interim, so mix it in
+        local_rng_state.r[0] ^= rng_state.r[0];
+        local_rng_state.r[1] ^= rng_state.r[1];
+    }
     // Generate a 64-bit RN from the modified PRNG state.
     // Note: This also "churns" the 128-bit state for next time.
-    rand64 = xoroshiro128ss();
-
+    uint64_t rand64 = xoroshiro128ss(&local_rng_state);
+    rng_state = local_rng_state;
+    check_word++;
     spin_unlock(lock, save);
 
     return rand64;
