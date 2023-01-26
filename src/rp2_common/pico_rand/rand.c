@@ -252,9 +252,9 @@ uint64_t get_rand_64(void) {
         initialise_rand();
     }
 
-    static volatile uint16_t check_word;
+    static volatile uint16_t check_byte;
     rng_128_t local_rng_state = rng_state;
-    uint16_t local_check_word = check_word;
+    uint8_t local_check_byte = check_byte;
     // Modify PRNG state with the two run-time entropy sources,
     // hashed to reduce correlation with previous modifications.
     uint which = 0;
@@ -278,7 +278,7 @@ uint64_t get_rand_64(void) {
 
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_RAND);
     uint32_t save = spin_lock_blocking(lock);
-    if (local_check_word != check_word) {
+    if (local_check_byte != check_byte) {
         // someone got a random number in the interim, so mix it in
         local_rng_state.r[0] ^= rng_state.r[0];
         local_rng_state.r[1] ^= rng_state.r[1];
@@ -287,17 +287,15 @@ uint64_t get_rand_64(void) {
     // Note: This also "churns" the 128-bit state for next time.
     uint64_t rand64 = xoroshiro128ss(&local_rng_state);
     rng_state = local_rng_state;
-    check_word++;
+    check_byte++;
     spin_unlock(lock, save);
 
     return rand64;
 }
 
 void get_rand_128(rng_128_t *ptr128) {
-    if (ptr128 != NULL) {
-        ptr128->r[0] = get_rand_64();
-        ptr128->r[1] = get_rand_64();
-    }
+    ptr128->r[0] = get_rand_64();
+    ptr128->r[1] = get_rand_64();
 }
 
 uint32_t get_rand_32(void) {
