@@ -123,7 +123,7 @@ static uint64_t sdbm_hash64_sram(uint64_t hash) {
 static uint64_t capture_additional_rosc_samples(uint n) {
     static absolute_time_t next_sample_time;
 
-    // provide an override if someone really wants it, but disabling ROSC as an entroy source makes more sense
+    // provide an override if someone really wants it, but disabling ROSC as an entropy source makes more sense
 #if !PICO_RAND_DISABLE_ROSC_CHECK
     // check that the ROSC is running but that the processors are NOT running from it
     hard_assert((rosc_hw->status & ROSC_STATUS_ENABLED_BITS) &&
@@ -252,10 +252,10 @@ uint64_t get_rand_64(void) {
         initialise_rand();
     }
 
-    static volatile uint16_t check_byte;
+    static volatile uint8_t check_byte;
     rng_128_t local_rng_state = rng_state;
     uint8_t local_check_byte = check_byte;
-    // Modify PRNG state with the two run-time entropy sources,
+    // Modify PRNG state with the run-time entropy sources,
     // hashed to reduce correlation with previous modifications.
     uint which = 0;
 #if PICO_RAND_ENTROPY_SRC_TIME

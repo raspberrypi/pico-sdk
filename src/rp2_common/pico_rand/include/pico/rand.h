@@ -37,7 +37,7 @@ extern "C" {
  *  - Bus Performance Counter (\ref PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER == 1): One of the bus fabric's performance
  *    counters is mixed in each time.
  *
- * \note all entropy sources are hashed before application to the PRNG state machine.
+ * \note All entropy sources are hashed before application to the PRNG state machine.
  *
  * \note The \em first time a random number is requested, the 128-bit PRNG state
  * must be seeded. Multiple entropy sources are also available for the seeding operation:
@@ -45,9 +45,9 @@ extern "C" {
  *  - The Ring Oscillator (ROSC) (\ref PICO_RAND_SEED_ENTROPY_SRC_ROSC == 1):
  *    64 bits are gathered from the ring oscillator "random bit" and mixed into the seed.
  *  - Time (\ref PICO_RAND_SEED_ENTROPY_SRC_TIME == 1): The 64-bit microsecond timer is mixed into the seed.
- *  - Board Identifier (PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID == 1): The board idea via \ref pico_get_unique_board_id
+ *  - Board Identifier (PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID == 1): The board id via \ref pico_get_unique_board_id
  *    is mixed into the seed.
- *  - RAM has (\ref PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH (\ref PICO_RAND_SEED_ENTROPY_SRC_RAM_HAS): The hashed contents of a
+ *  - RAM hash (\ref PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH (\ref PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH): The hashed contents of a
  *    subset of RAM are mixed in. Initial RAM contents are undefined on power up, so provide a reasonable source of entropy.
  *    By default the last 1K of RAM (which usually contains the core 0 stack) is hashed, which may also provide for differences
  *    after each warm reset.
@@ -89,7 +89,7 @@ extern "C" {
 #define PICO_RAND_SEED_ENTROPY_SRC_TIME PICO_RAND_ENTROPY_SRC_TIME
 #endif
 
-// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID, Enable/disable use of as part of the random seed, type=bool, default=1, group=pico_rand
+// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID, Enable/disable use of board id as part of the random seed, type=bool, default=1, group=pico_rand
 #ifndef PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID
 #define PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID 1
 #endif
@@ -108,7 +108,7 @@ extern "C" {
 #define PICO_RAND_ROSC_BIT_SAMPLE_COUNT 1
 #endif
 
-// PICO_CONFIG: PICO_RAND_MIN_ROSC_BIT_SAMPLE_TIME_US, Define a default minimum time between sampling the ROSC random bit, min=5, max=20, group=pico_rand
+// PICO_CONFIG: PICO_RAND_MIN_ROSC_BIT_SAMPLE_TIME_US, Define a default minimum time between sampling the ROSC random bit, min=5, max=20, default=10, group=pico_rand
 #ifndef PICO_RAND_MIN_ROSC_BIT_SAMPLE_TIME_US
 // (Arbitrary / tested) minimum time between sampling the ROSC random bit
 #define PICO_RAND_MIN_ROSC_BIT_SAMPLE_TIME_US 10u
@@ -118,7 +118,7 @@ extern "C" {
 // PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER CONFIG
 // ---------------------------------------------
 
-// PICO_CONFIG: PICO_RAND_BUS_PERF_COUNTER_INDEX, Bus performance counter index to use for sourcing entropy, group=pico_rand
+// PICO_CONFIG: PICO_RAND_BUS_PERF_COUNTER_INDEX, Bus performance counter index to use for sourcing entropy, min=0, max=3, group=pico_rand
 // this is deliberately undefined by default, meaning the code will pick that appears unused
 //#define PICO_RAND_BUS_PERF_COUNTER_INDEX 0
 
@@ -131,11 +131,11 @@ extern "C" {
 // PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH CONFIG
 // ------------------------------------------
 
-// PICO_CONFIG: PICO_RAND_RAM_HASH_END, end of address in RAM (non-inclusive) to hash during pico_rand SEEDization, default=SRAM_END, group=pico_rand
+// PICO_CONFIG: PICO_RAND_RAM_HASH_END, end of address in RAM (non-inclusive) to hash during pico_rand seed initialization, default=SRAM_END, group=pico_rand
 #ifndef PICO_RAND_RAM_HASH_END
 #define PICO_RAND_RAM_HASH_END     SRAM_END
 #endif
-// PICO_CONFIG: PICO_RAND_RAM_HASH_START, start of address in RAM (inclusive) to hash during pico_rand SEEDization, default=PICO_RAND_RAM_HASH_END-1024, group=pico_rand
+// PICO_CONFIG: PICO_RAND_RAM_HASH_START, start of address in RAM (inclusive) to hash during pico_rand seed initialization, default=PICO_RAND_RAM_HASH_END-1024, group=pico_rand
 #ifndef PICO_RAND_RAM_HASH_START
 #define PICO_RAND_RAM_HASH_START   (PICO_RAND_RAM_HASH_END - 1024u)
 #endif
