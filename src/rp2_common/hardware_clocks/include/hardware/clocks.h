@@ -137,15 +137,6 @@ uint32_t clock_get_hz(enum clock_index clk_index);
  */
 uint32_t frequency_count_khz(uint src);
 
-/*! \brief Measure a clocks frequency using the Frequency counter, returning the raw register value
- *  \ingroup hardware_clocks
- *
- * Uses the inbuilt frequency counter to measure the specified clocks frequency.
- *
- * \return the value of the CLOCKS_FC0_RESULT register
- */
-uint32_t frequency_count_raw(uint src, uint ref_khz);
-
 /*! \brief Set the "current frequency" of the clock as reported by clock_get_hz without actually changing the clock
  *  \ingroup hardware_clocks
  *

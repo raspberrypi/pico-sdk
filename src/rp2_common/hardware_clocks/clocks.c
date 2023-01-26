@@ -216,10 +216,6 @@ void clock_set_reported_hz(enum clock_index clk_index, uint hz) {
 
 /// \tag::frequency_count_khz[]
 uint32_t frequency_count_khz(uint src) {
-    return frequency_count_raw(src, clock_get_hz(clk_ref) / 1000) >> CLOCKS_FC0_RESULT_KHZ_LSB;
-}
-
-uint32_t frequency_count_raw(uint src, uint ref_khz) {
     fc_hw_t *fc = &clocks_hw->fc0;
 
     // If frequency counter is running need to wait for it. It runs even if the source is NULL
@@ -228,7 +224,7 @@ uint32_t frequency_count_raw(uint src, uint ref_khz) {
     }
 
     // Set reference freq
-    fc->ref_khz = ref_khz;
+    fc->ref_khz = clock_get_hz(clk_ref) / 1000;
 
     // FIXME: Don't pick random interval. Use best interval
     fc->interval = 10;
@@ -245,10 +241,9 @@ uint32_t frequency_count_raw(uint src, uint ref_khz) {
     }
 
     // Return the result
-    return fc->result;
+    return fc->result >> CLOCKS_FC0_RESULT_KHZ_LSB;
 }
 /// \end::frequency_count_khz[]
-
 
 static void clocks_handle_resus(void) {
     // Set clk_sys back to the ref clock rather than it being forced to clk_ref
