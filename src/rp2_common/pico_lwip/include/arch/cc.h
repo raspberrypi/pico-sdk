@@ -86,14 +86,8 @@ void pico_lwip_custom_unlock_tcpip_core(void);
 #endif
 
 #ifndef LWIP_RAND
-#ifdef __cplusplus
-extern "C" {
-#endif
-unsigned int pico_lwip_rand(void);
-#ifdef __cplusplus
-}
-#endif
-// Use ROSC based random number generation, more for the fact that rand() may not be seeded, than anything else
-#define LWIP_RAND pico_lwip_rand
+#include "pico/rand.h"
+// Use the pico_rand library which goes to reasonable lengths to try to provide good entropy
+#define LWIP_RAND() get_rand_32()
 #endif
 #endif /* __CC_H__ */

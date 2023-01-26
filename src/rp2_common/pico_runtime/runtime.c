@@ -236,9 +236,9 @@ __attribute((weak)) int settimeofday(__unused const struct timeval *tv, __unused
 
 __attribute((weak)) int _times(struct tms *tms) {
 #if CLOCKS_PER_SEC >= 1000000
-    tms->tms_utime = to_us_since_boot(get_absolute_time()) * (CLOCKS_PER_SEC / 1000000);
+    tms->tms_utime = (clock_t)(to_us_since_boot(get_absolute_time()) * (CLOCKS_PER_SEC / 1000000));
 #else
-    tms->tms_utime = (clock_t)to_us_since_boot(get_absolute_time()) / (1000000 / CLOCKS_PER_SEC);
+    tms->tms_utime = (clock_t)(to_us_since_boot(get_absolute_time()) / (1000000 / CLOCKS_PER_SEC));
 #endif
     tms->tms_stime = 0;
     tms->tms_cutime = 0;

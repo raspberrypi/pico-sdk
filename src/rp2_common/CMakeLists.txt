@@ -49,6 +49,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(pico_mem_ops)
     pico_add_subdirectory(pico_malloc)
     pico_add_subdirectory(pico_printf)
+    pico_add_subdirectory(pico_rand)
 
     pico_add_subdirectory(pico_stdio)
     pico_add_subdirectory(pico_stdio_semihosting)
