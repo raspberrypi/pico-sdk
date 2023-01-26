@@ -346,3 +346,9 @@ void stdio_set_translate_crlf(stdio_driver_t *driver, bool enabled) {
     panic_unsupported();
 #endif
 }
+
+void stdio_set_chars_available_callback(void (*fn)(void*), void *param) {
+    for (stdio_driver_t *s = drivers; s; s = s->next) {
+        if (s->set_chars_available_callback) s->set_chars_available_callback(fn, param);
+    }
+}
