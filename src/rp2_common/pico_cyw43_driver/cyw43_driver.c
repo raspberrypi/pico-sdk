@@ -6,6 +6,7 @@
 
 #include "hardware/gpio.h"
 #include "hardware/irq.h"
+#include "pico/unique_id.h"
 #include "cyw43.h"
 #include "pico/cyw43_driver.h"
 
@@ -120,3 +121,75 @@ void cyw43_driver_deinit(async_context_t *context) {
     cyw43_deinit(&cyw43_state);
     cyw43_async_context = NULL;
 }
+
+// todo maybe add an #ifdef in cyw43_driver
+uint32_t storage_read_blocks(__unused uint8_t *dest, __unused uint32_t block_num, __unused uint32_t num_blocks) {
+    // shouldn't be used
+    panic_unsupported();
+}
+
+// Generate a mac address if one is not set in otp
+void __attribute__((weak)) cyw43_hal_generate_laa_mac(__unused int idx, uint8_t buf[6]) {
+    CYW43_DEBUG("Warning. No mac in otp. Generating mac from board id\n");
+    pico_unique_board_id_t board_id;
+    pico_get_unique_board_id(&board_id);
+    memcpy(buf, &board_id.id[2], 6);
+    buf[0] &= (uint8_t)~0x1; // unicast
+    buf[0] |= 0x2; // locally administered
+}
+
+// Return mac address
+void cyw43_hal_get_mac(__unused int idx, uint8_t buf[6]) {
+    // The mac should come from cyw43 otp.
+    // This is loaded into the state after the driver is initialised
+    // cyw43_hal_generate_laa_mac is called by the driver to generate a mac if otp is not set
+    memcpy(buf, cyw43_state.mac, 6);
+}
+
+// Prevent background processing in pensv and access by the other core
+// These methods are called in pensv context and on either core
+// They can be called recursively
+void cyw43_thread_enter(void) {
+    async_context_acquire_lock_blocking(cyw43_async_context);
+}
+
+void cyw43_thread_exit(void) {
+    async_context_release_lock(cyw43_async_context);
+}
+
+#ifndef NDEBUG
+void cyw43_thread_lock_check(void) {
+    async_context_lock_check(cyw43_async_context);
+}
+#endif
+
+void cyw43_await_background_or_timeout_us(uint32_t timeout_us) {
+    async_context_wait_for_work_until(cyw43_async_context, make_timeout_time_us(timeout_us));
+}
+
+void cyw43_delay_ms(uint32_t ms) {
+    async_context_wait_until(cyw43_async_context, make_timeout_time_ms(ms));
+}
+
+void cyw43_delay_us(uint32_t us) {
+    async_context_wait_until(cyw43_async_context, make_timeout_time_us(us));
+}
+
+#if !CYW43_LWIP
+static void no_lwip_fail() {
+    panic("cyw43 has no ethernet interface");
+}
+void __attribute__((weak)) cyw43_cb_tcpip_init(cyw43_t *self, int itf) {
+}
+void __attribute__((weak)) cyw43_cb_tcpip_deinit(cyw43_t *self, int itf) {
+}
+void __attribute__((weak)) cyw43_cb_tcpip_set_link_up(cyw43_t *self, int itf) {
+    no_lwip_fail();
+}
+void __attribute__((weak)) cyw43_cb_tcpip_set_link_down(cyw43_t *self, int itf) {
+    no_lwip_fail();
+}
+void __attribute__((weak)) cyw43_cb_process_ethernet(void *cb_data, int itf, size_t len, const uint8_t *buf) {
+    no_lwip_fail();
+}
+#endif

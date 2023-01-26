@@ -15,6 +15,21 @@ extern "C" {
 
 #include "cyw43.h"
 #include "cyw43_country.h"
+#include "pico/async_context.h"
+
+#ifdef PICO_CYW43_ARCH_HEADER
+#include __XSTRING(PICO_CYW43_ARCH_HEADER)
+#else
+#if PICO_CYW43_ARCH_POLL
+#include "pico/cyw43_arch/arch_poll.h"
+#elif PICO_CYW43_ARCH_THREADSAFE_BACKGROUND
+#include "pico/cyw43_arch/arch_threadsafe_background.h"
+#elif PICO_CYW43_ARCH_FREERTOS
+#include "pico/cyw43_arch/arch_freertos.h"
+#else
+#error must specify support pico_cyw43_arch architecture type or set PICO_CYW43_ARCH_HEADER
+#endif
+#endif
 
 /**
  * \defgroup cyw43_driver cyw43_driver
@@ -234,6 +249,9 @@ void cyw43_arch_wait_for_work_until(absolute_time_t until);
  * \sa cyw43_arch_lwip_end
  * \sa cyw43_arch_lwip_protect
  */
+static inline void cyw43_arch_lwip_begin(void) {
+    cyw43_thread_enter();
+}
 
 /*!
  * \fn void cyw43_arch_lwip_end(void)
@@ -249,6 +267,9 @@ void cyw43_arch_wait_for_work_until(absolute_time_t until);
  * \sa cyw43_arch_lwip_begin
  * \sa cyw43_arch_lwip_protect
  */
+static inline void cyw43_arch_lwip_end(void) {
+    cyw43_thread_exit();
+}
 
 /*!
  * \fn int cyw43_arch_lwip_protect(int (*func)(void *param), void *param)
@@ -266,6 +287,12 @@ void cyw43_arch_wait_for_work_until(absolute_time_t until);
  * \sa cyw43_arch_lwip_begin
  * \sa cyw43_arch_lwip_end
  */
+static inline int cyw43_arch_lwip_protect(int (*func)(void *param), void *param) {
+    cyw43_arch_lwip_begin();
+    int rc = func(param);
+    cyw43_arch_lwip_end();
+    return rc;
+}
 
 /*!
  * \fn void cyw43_arch_lwip_check(void)

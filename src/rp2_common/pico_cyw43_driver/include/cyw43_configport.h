@@ -4,17 +4,66 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _PICO_CYW43_ARCH_ARCH_COMMON_H
-#define _PICO_CYW43_ARCH_ARCH_COMMON_H
+// This header is included by cyw43_driver to setup its environment
+
+#ifndef _CYW43_CONFIGPORT_H
+#define _CYW43_CONFIGPORT_H
 
 #include "pico.h"
-#include "pico/time.h"
 #include "hardware/gpio.h"
-#include "pico/error.h"
-#include "pico/async_context.h"
+#include "pico/time.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef CYW43_HOST_NAME
+#define CYW43_HOST_NAME "PicoW"
+#endif
+
+#ifndef CYW43_GPIO
+#define CYW43_GPIO 1
+#endif
+
+#ifndef CYW43_LOGIC_DEBUG
+#define CYW43_LOGIC_DEBUG 0
+#endif
+
+#ifndef CYW43_USE_OTP_MAC
+#define CYW43_USE_OTP_MAC 1
+#endif
+
+#ifndef CYW43_NO_NETUTILS
+#define CYW43_NO_NETUTILS 1
+#endif
+
+#ifndef CYW43_IOCTL_TIMEOUT_US
+#define CYW43_IOCTL_TIMEOUT_US 1000000
+#endif
+
+#ifndef CYW43_USE_STATS
+#define CYW43_USE_STATS 0
+#endif
+
+// todo should this be user settable?
+#ifndef CYW43_HAL_MAC_WLAN0
+#define CYW43_HAL_MAC_WLAN0 0
+#endif
+
+#ifndef STATIC
+#define STATIC static
+#endif
+
+#ifndef CYW43_USE_SPI
+#define CYW43_USE_SPI 1
+#endif
+
+#ifndef CYW43_SPI_PIO
+#define CYW43_SPI_PIO 1
+#endif
+
+#ifndef CYW43_WIFI_NVRAM_INCLUDE_FILE
+#define CYW43_WIFI_NVRAM_INCLUDE_FILE "wifi_nvram_43439.h"
 #endif
 
 // Note, these are negated, because cyw43_driver negates them before returning!
@@ -69,12 +118,15 @@ void cyw43_hal_generate_laa_mac(int idx, uint8_t buf[6]);
 
 
 void cyw43_thread_enter(void);
+
 void cyw43_thread_exit(void);
 
 #define CYW43_THREAD_ENTER cyw43_thread_enter();
 #define CYW43_THREAD_EXIT cyw43_thread_exit();
 #ifndef NDEBUG
+
 void cyw43_thread_lock_check(void);
+
 #define cyw43_arch_lwip_check() cyw43_thread_lock_check()
 #define CYW43_THREAD_LOCK_CHECK cyw43_arch_lwip_check();
 #else
@@ -88,44 +140,18 @@ void cyw43_await_background_or_timeout_us(uint32_t timeout_us);
 #define CYW43_DO_IOCTL_WAIT cyw43_await_background_or_timeout_us(1000);
 
 void cyw43_delay_ms(uint32_t ms);
+
 void cyw43_delay_us(uint32_t us);
 
 void cyw43_schedule_internal_poll_dispatch(void (*func)(void));
 
 void cyw43_post_poll_hook(void);
+
 #define CYW43_POST_POLL_HOOK cyw43_post_poll_hook();
-
-static inline void cyw43_arch_lwip_begin(void) {
-    cyw43_thread_enter();
-}
-
-static inline void cyw43_arch_lwip_end(void) {
-    cyw43_thread_exit();
-}
-
-static inline int cyw43_arch_lwip_protect(int (*func)(void *param), void *param) {
-    cyw43_arch_lwip_begin();
-    int rc = func(param);
-    cyw43_arch_lwip_end();
-    return rc;
-}
-
-#if CYW43_USE_BTSTACK
-static inline int cyw43_bt_init(void) { return 0; }
-static inline void cyw43_bt_deinit(void) {}
-
-static inline void cyw43_arch_btstack_begin(void) {
-    cyw43_thread_enter();
-}
-
-static inline void cyw43_arch_btstack_end(void) {
-    cyw43_thread_exit();
-}
-#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
 
+#endif
