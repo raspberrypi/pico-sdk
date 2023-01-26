@@ -22,6 +22,8 @@ enum pico_error_codes {
     PICO_ERROR_NOT_PERMITTED = -4,
     PICO_ERROR_INVALID_ARG = -5,
     PICO_ERROR_IO = -6,
+    PICO_ERROR_BADAUTH = -7,
+    PICO_ERROR_CONNECT_FAILED = -8,
 };
 
 #endif // !__ASSEMBLER__
