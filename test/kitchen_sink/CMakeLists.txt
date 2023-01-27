@@ -35,6 +35,7 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_mem_ops
     pico_multicore
     pico_platform
+    pico_rand
     pico_stdlib
     pico_sync
     pico_time
