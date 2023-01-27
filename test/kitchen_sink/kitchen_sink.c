@@ -33,6 +33,9 @@
 #include "pico/binary_info.h"
 #include "pico/bit_ops.h"
 #include "pico/bootrom.h"
+#if LIB_PICO_CYW43_ARCH
+#include "pico/cyw43_arch.h"
+#endif
 #include "pico/divider.h"
 #include "pico/double.h"
 #include "pico/fix/rp2040_usb_device_enumeration.h"
@@ -48,10 +51,6 @@
 #include "pico/sync.h"
 #include "pico/time.h"
 #include "pico/unique_id.h"
-#include "pico/rand.h"
-#if LIB_PICO_CYW43_ARCH
-#include "pico/cyw43_arch.h"
-#endif
 
 #include "hardware/structs/adc.h"
 #include "hardware/structs/bus_ctrl.h"

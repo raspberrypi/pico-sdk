@@ -41,7 +41,6 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_time
     pico_unique_id
     pico_util
-    pico_rand
 )
 
 add_library(kitchen_sink_options INTERFACE)
