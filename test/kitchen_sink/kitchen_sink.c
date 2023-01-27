@@ -38,6 +38,7 @@
 #include "pico/fix/rp2040_usb_device_enumeration.h"
 #include "pico/float.h"
 #include "pico/int64_ops.h"
+#include "pico/i2c_slave.h"
 #include "pico/malloc.h"
 #include "pico/multicore.h"
 #include "pico/printf.h"

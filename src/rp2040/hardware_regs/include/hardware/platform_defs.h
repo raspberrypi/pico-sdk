@@ -43,6 +43,7 @@
 #endif
 
 #define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
+#define VTABLE_FIRST_IRQ 16
 
 #endif
 
