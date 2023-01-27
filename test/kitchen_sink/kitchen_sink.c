@@ -41,6 +41,7 @@
 #include "pico/malloc.h"
 #include "pico/multicore.h"
 #include "pico/printf.h"
+#include "pico/rand.h"
 #include "pico/runtime.h"
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
