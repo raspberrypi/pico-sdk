@@ -299,7 +299,8 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
     target_link_libraries(pico_lwip_freertos INTERFACE
             pico_async_context_base
             pico_lwip
-            pico_lwip_contrib_freertos)
+            pico_lwip_contrib_freertos
+            pico_rand)
 
     pico_promote_common_scope_vars()
 endif()
