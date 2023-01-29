@@ -36,7 +36,7 @@ See [pico-examples](https://github.com/raspberrypi/pico-examples) for example co
 
 # Getting the latest SDK code
 
-The [master](https://github.com/raspberrypi/pico-sdk/tree/master/) branch of `pico-sdk` on github contains the 
+The [master](https://github.com/raspberrypi/pico-sdk/tree/master/) branch of `pico-sdk` on GitHub contains the 
 _latest stable release_ of the SDK. If you need or want to test upcoming features, you can try the
 [develop](https://github.com/raspberrypi/pico-sdk/tree/develop/) branch instead.
 
