@@ -14,6 +14,7 @@ if (NOT TARGET pico_stdlib)
             pico_printf
             pico_stdio
             hardware_gpio
+            hardware_uart
     )
 endif()
 

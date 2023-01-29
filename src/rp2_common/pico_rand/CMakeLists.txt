@@ -1,12 +1,12 @@
-pico_add_impl_library(pico_rand)
+pico_add_library(pico_rand)
 
 target_sources(pico_rand INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/rand.c
 )
 
-target_include_directories(pico_rand INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(pico_rand_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
-target_link_libraries(pico_rand INTERFACE
+pico_mirrored_target_link_libraries(pico_rand INTERFACE
         pico_unique_id
         hardware_clocks
         hardware_timer

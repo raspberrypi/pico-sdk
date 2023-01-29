@@ -1,11 +1,10 @@
 if (NOT TARGET pico_float)
     # library to be depended on - we make this depend on particular implementations using per target generator expressions
-    pico_add_impl_library(pico_float)
+    pico_add_library(pico_float NOFLAG)
 
     # no custom implementation; falls thru to compiler
-    pico_add_impl_library(pico_float_compiler)
+    pico_add_library(pico_float_compiler)
 
-    add_library(pico_float_headers INTERFACE)
     target_include_directories(pico_float_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
     # add alias "default" which is just rom.
@@ -17,7 +16,7 @@ if (NOT TARGET pico_float)
     target_link_libraries(pico_float INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_FLOAT_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_FLOAT_IMPL>,${PICO_DEFAULT_FLOAT_IMPL}>)
 
-    pico_add_impl_library(pico_float_pico)
+    pico_add_library(pico_float_pico)
     target_sources(pico_float_pico INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/float_aeabi.S
             ${CMAKE_CURRENT_LIST_DIR}/float_init_rom.c
@@ -25,9 +24,9 @@ if (NOT TARGET pico_float)
             ${CMAKE_CURRENT_LIST_DIR}/float_v1_rom_shim.S
     )
 
-    target_link_libraries(pico_float_pico INTERFACE pico_bootrom pico_float_headers)
+    target_link_libraries(pico_float_pico INTERFACE pico_bootrom pico_float_headers hardware_divider)
 
-    pico_add_impl_library(pico_float_none)
+    pico_add_library(pico_float_none)
     target_sources(pico_float_none INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/float_none.S
             )

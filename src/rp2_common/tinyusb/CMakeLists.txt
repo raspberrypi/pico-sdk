@@ -37,13 +37,13 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     # unmarked version used by stdio USB
     target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_common pico_fix_rp2040_usb_device_enumeration tinyusb_device_base)
 
-    pico_add_impl_library(tinyusb_device)
+    pico_add_library(tinyusb_device)
     target_link_libraries(tinyusb_device INTERFACE tinyusb_device_unmarked)
 
-    pico_add_impl_library(tinyusb_host)
+    pico_add_library(tinyusb_host)
     target_link_libraries(tinyusb_host INTERFACE tinyusb_host_base tinyusb_common)
 
-    pico_add_impl_library(tinyusb_board)
+    pico_add_library(tinyusb_board)
     target_link_libraries(tinyusb_board INTERFACE tinyusb_bsp)
 
     # Override suppress_tinyusb_warnings to add suppression of (falsely) reported GCC 11.2 warnings

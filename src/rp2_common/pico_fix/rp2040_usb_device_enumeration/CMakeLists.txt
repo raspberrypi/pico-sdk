@@ -1,9 +1,9 @@
-pico_add_impl_library(pico_fix_rp2040_usb_device_enumeration)
+pico_add_library(pico_fix_rp2040_usb_device_enumeration NOFLAG)
 
 target_sources(pico_fix_rp2040_usb_device_enumeration INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/rp2040_usb_device_enumeration.c
         )
 
-target_include_directories(pico_fix_rp2040_usb_device_enumeration INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(pico_fix_rp2040_usb_device_enumeration_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
-target_link_libraries(pico_fix_rp2040_usb_device_enumeration INTERFACE hardware_structs pico_time)
+pico_mirrored_target_link_libraries(pico_fix_rp2040_usb_device_enumeration INTERFACE hardware_structs hardware_gpio pico_time)

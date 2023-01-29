@@ -1,10 +1,10 @@
 if (NOT TARGET pico_int64_ops)
 
     #shims for ROM functions for -lgcc functions  (listed below)
-    pico_add_impl_library(pico_int64_ops)
+    pico_add_library(pico_int64_ops NOFLAG)
 
     # no custom implementation; falls thru to compiler
-    pico_add_impl_library(pico_int64_ops_compiler)
+    pico_add_library(pico_int64_ops_compiler)
 
     # add alias "default" which is just pico.
     add_library(pico_int64_ops_default INTERFACE)
@@ -15,8 +15,9 @@ if (NOT TARGET pico_int64_ops)
     target_link_libraries(pico_int64_ops INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_INT64_OPS_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_INT64_OPS_IMPL>,${PICO_DEFAULT_INT64_OPS_IMPL}>)
 
-    pico_add_impl_library(pico_int64_ops_pico)
+    pico_add_library(pico_int64_ops_pico)
     target_include_directories(pico_int64_ops_pico INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    pico_mirrored_target_link_libraries(pico_int64_ops_pico INTERFACE pico_base)
 
     target_sources(pico_int64_ops_pico INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/pico_int64_ops_aeabi.S

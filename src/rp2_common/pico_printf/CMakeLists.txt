@@ -1,11 +1,10 @@
 if (NOT TARGET pico_printf)
     # library to be depended on - we make this depend on particular implementations using per target generator expressions
-    pico_add_impl_library(pico_printf)
+    pico_add_library(pico_printf NOFLAG)
 
     # no custom implementation; falls thru to compiler
-    pico_add_impl_library(pico_printf_compiler)
+    pico_add_library(pico_printf_compiler)
 
-    add_library(pico_printf_headers INTERFACE)
     target_include_directories(pico_printf_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
     # add alias "default" which is just pico.
@@ -17,18 +16,16 @@ if (NOT TARGET pico_printf)
     target_link_libraries(pico_printf INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_PRINTF_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_PRINTF_IMPL>,${PICO_DEFAULT_PRINTF_IMPL}>)
 
-    pico_add_impl_library(pico_printf_pico)
+    pico_add_library(pico_printf_pico)
     target_sources(pico_printf_pico INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/printf.c
     )
-
     target_link_libraries(pico_printf_pico INTERFACE pico_printf_headers)
 
-    pico_add_impl_library(pico_printf_none)
+    pico_add_library(pico_printf_none)
     target_sources(pico_printf_none INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/printf_none.S
     )
-
     target_link_libraries(pico_printf_none INTERFACE pico_printf_headers)
 
     function(wrap_printf_functions TARGET)
