@@ -3,8 +3,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'develop'
       - 'master'
+      - 'test_workflow'
 
 jobs:
   build:
@@ -157,3 +157,13 @@ jobs:
       if: always()
       shell: bash
       run: cd ${{github.workspace}}; mkdir -p build; rm -rf build/*; cd build; cmake ../ -DPICO_SDK_TESTS_ENABLED=1 -DCMAKE_BUILD_TYPE=Release -DPICO_TOOLCHAIN_PATH=/opt/arm/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi -DPICO_BOARD=pico_w; make -j ${{steps.core_count.outputs.output}}
+
+    - name: Native Debug
+      if: always()
+      shell: bash
+      run: cd ${{github.workspace}}; mkdir -p build; rm -rf build/*; cd build; cmake ../ -DPICO_SDK_TESTS_ENABLED=1 -DCMAKE_BUILD_TYPE=Debug -DPICO_PLATFORM=host; make -j ${{steps.core_count.outputs.output}}
+
+    - name: Native Release
+      if: always()
+      shell: bash
+      run: cd ${{github.workspace}}; mkdir -p build; rm -rf build/*; cd build; cmake ../ -DPICO_SDK_TESTS_ENABLED=1 -DCMAKE_BUILD_TYPE=Release -DPICO_PLATFORM=host; make -j ${{steps.core_count.outputs.output}}

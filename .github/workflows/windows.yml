@@ -1,9 +1,21 @@
 name: Build on Windows
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'develop'
+      - 'master'
+      - 'test_workflow'
+
 jobs:
   build:
     runs-on: windows-2022
     steps:
+      - name: Clean workspace
+        shell: bash
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf "${{ github.workspace }}/pico-sdk"
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: Checkout submodules
