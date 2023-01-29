@@ -90,7 +90,7 @@ static int cyw43_arch_wifi_connect_bssid_until(const char *ssid, const uint8_t *
         // If there was no network, keep trying
         if (new_status == CYW43_LINK_NONET) {
             new_status = CYW43_LINK_JOIN;
-            err = cyw43_arch_wifi_connect_async(ssid, pw, auth);
+            err = cyw43_arch_wifi_connect_bssid_async(ssid, bssid, pw, auth);
             if (err) return err;
         }
         if (new_status != status) {
