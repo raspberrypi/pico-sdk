@@ -34,6 +34,12 @@ See [Online Raspberry Pi Pico SDK API docs](https://rptl.io/pico-doxygen) for HT
 
 See [pico-examples](https://github.com/raspberrypi/pico-examples) for example code you can build.
 
+# Getting the latest SDK code
+
+The [master](https://github.com/raspberrypi/pico-sdk/tree/master/) branch of `pico-sdk` on GitHub contains the 
+_latest stable release_ of the SDK. If you need or want to test upcoming features, you can try the
+[develop](https://github.com/raspberrypi/pico-sdk/tree/develop/) branch instead.
+
 # Quick-start your own project
 
 These instructions are extremely terse, and Linux-based only. For detailed steps,
