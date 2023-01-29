@@ -1,5 +1,5 @@
 name: Build on Windows
-on: push
+on: workflow_dispatch
 jobs:
   build:
     runs-on: windows-2022
