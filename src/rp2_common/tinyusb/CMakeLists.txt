@@ -24,7 +24,38 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     include(${PICO_TINYUSB_PATH}/hw/bsp/family_support.cmake)
 
     add_library(tinyusb_common INTERFACE)
-    target_link_libraries(tinyusb_common INTERFACE tinyusb_common_base)
+
+    target_link_libraries(tinyusb_common INTERFACE
+            hardware_structs
+            hardware_irq
+            hardware_resets
+            pico_sync
+            tinyusb_common_base
+    )
+
+    target_sources(tinyusb_common INTERFACE
+            ${PICO_TINYUSB_PATH}/src/tusb.c
+            ${PICO_TINYUSB_PATH}/src/common/tusb_fifo.c
+    )
+
+    set(TINYUSB_DEBUG_LEVEL 0)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message("Compiling TinyUSB with CFG_TUSB_DEBUG=1")
+        set(TINYUSB_DEBUG_LEVEL 1)
+    endif ()
+
+    target_compile_definitions(tinyusb_common INTERFACE
+            CFG_TUSB_MCU=OPT_MCU_RP2040
+            CFG_TUSB_OS=OPT_OS_PICO #seems examples are hard coded to OPT_OS_NONE
+            CFG_TUSB_DEBUG=${TINYUSB_DEBUG_LEVEL}
+    )
+
+    target_include_directories(tinyusb_common INTERFACE
+            ${PICO_TINYUSB_PATH}/src
+            ${PICO_TINYUSB_PATH}/src/common
+            ${PICO_TINYUSB_PATH}/hw
+            ${PICO_TINYUSB_PATH}/lib/networking
+    )
 
     add_library(tinyusb_device_unmarked INTERFACE)
     target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_device_base)
@@ -42,6 +73,20 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
 
     pico_add_impl_library(tinyusb_host)
     target_link_libraries(tinyusb_host INTERFACE tinyusb_host_base tinyusb_common)
+
+    add_library(tinyusb_net INTERFACE)
+    target_sources(tinyusb_host INTERFACE
+            ${PICO_TINYUSB_PATH}/lib/networking/dhserver.c
+            ${PICO_TINYUSB_PATH}/lib/networking/dnserver.c
+            ${PICO_TINYUSB_PATH}/lib/networking/rndis_reports.c
+            )
+
+    # Sometimes have to do host specific actions in mostly
+    # common functions
+    target_compile_definitions(tinyusb_host INTERFACE
+            RP2040_USB_HOST_MODE=1
+            TINYUSB_HOST_LINKED=1
+            )
 
     pico_add_impl_library(tinyusb_board)
     target_link_libraries(tinyusb_board INTERFACE tinyusb_bsp)
