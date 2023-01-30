@@ -1,12 +1,12 @@
-pico_add_impl_library(pico_runtime)
+pico_add_library(pico_runtime NOFLAG)
 
 target_sources(pico_runtime INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/runtime.c
 )
 
-target_include_directories(pico_runtime INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(pico_runtime_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
-target_link_libraries(pico_runtime INTERFACE
+pico_mirrored_target_link_libraries(pico_runtime INTERFACE
         hardware_uart
         hardware_clocks
         hardware_irq
@@ -15,28 +15,28 @@ target_link_libraries(pico_runtime INTERFACE
         )
 
 if (TARGET pico_bit_ops)
-    target_link_libraries(pico_runtime INTERFACE pico_bit_ops)
+    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_bit_ops)
 endif()
 if (TARGET pico_divider)
-    target_link_libraries(pico_runtime INTERFACE pico_divider)
+    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_divider)
 endif()
 if (TARGET pico_double)
-    target_link_libraries(pico_runtime INTERFACE pico_double)
+    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_double)
 endif()
 if (TARGET pico_int64_ops)
-    target_link_libraries(pico_runtime INTERFACE pico_int64_ops)
+    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_int64_ops)
 endif()
 if (TARGET pico_float)
-    target_link_libraries(pico_runtime INTERFACE pico_float)
+    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_float)
 endif()
 if (TARGET pico_malloc)
-    target_link_libraries(pico_runtime INTERFACE pico_malloc)
+    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_malloc)
 endif()
 if (TARGET pico_mem_ops)
-    target_link_libraries(pico_runtime INTERFACE pico_mem_ops)
+    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_mem_ops)
 endif()
 if (TARGET pico_standard_link)
-    target_link_libraries(pico_runtime INTERFACE pico_standard_link)
+    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_standard_link)
 endif()
 
 # todo is this correct/needed?

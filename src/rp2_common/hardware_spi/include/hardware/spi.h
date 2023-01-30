@@ -8,7 +8,6 @@
 #define _HARDWARE_SPI_H
 
 #include "pico.h"
-#include "pico/time.h"
 #include "hardware/structs/spi.h"
 #include "hardware/regs/dreq.h"
 

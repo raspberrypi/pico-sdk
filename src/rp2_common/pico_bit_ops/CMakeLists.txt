@@ -3,7 +3,7 @@ if (NOT TARGET pico_bit_ops)
     pico_add_impl_library(pico_bit_ops)
 
     # no custom implementation; falls thru to compiler
-    pico_add_impl_library(pico_bit_ops_compiler)
+    pico_add_library(pico_bit_ops_compiler)
 
     # add alias "default" which is just pico.
     add_library(pico_bit_ops_default INTERFACE)
@@ -11,7 +11,7 @@ if (NOT TARGET pico_bit_ops)
 
     set(PICO_DEFAULT_BIT_OPS_IMPL pico_bit_ops_default)
 
-    pico_add_impl_library(pico_bit_ops_pico)
+    pico_add_library(pico_bit_ops_pico)
     target_link_libraries(pico_bit_ops INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_BIT_OPS_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_BIT_OPS_IMPL>,${PICO_DEFAULT_BIT_OPS_IMPL}>)
 

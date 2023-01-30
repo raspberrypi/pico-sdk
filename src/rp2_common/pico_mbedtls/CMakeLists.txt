@@ -94,7 +94,7 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         xtea.c
     )
     list(TRANSFORM src_crypto PREPEND ${PICO_MBEDTLS_PATH}/library/)
-    add_library(pico_mbedtls_crypto INTERFACE)
+    pico_add_library(pico_mbedtls_crypto NOFLAG)
     target_sources(pico_mbedtls_crypto INTERFACE ${src_crypto})
 
     set(src_x509
@@ -109,7 +109,7 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         x509write_csr.c
     )
     list(TRANSFORM src_x509 PREPEND ${PICO_MBEDTLS_PATH}/library/)
-    add_library(pico_mbedtls_x509 INTERFACE)
+    pico_add_library(pico_mbedtls_x509 NOFLAG)
     target_sources(pico_mbedtls_x509 INTERFACE ${src_x509})
 
     set(src_tls
@@ -126,18 +126,18 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         ssl_tls13_keys.c
     )
     list(TRANSFORM src_tls PREPEND ${PICO_MBEDTLS_PATH}/library/)
-    add_library(pico_mbedtls_tls INTERFACE)
+    pico_add_library(pico_mbedtls_tls NOFLAG)
     target_sources(pico_mbedtls_tls INTERFACE ${src_tls})
 
-    pico_add_impl_library(pico_mbedtls)
-    target_link_libraries(pico_mbedtls INTERFACE pico_mbedtls_crypto pico_mbedtls_x509 pico_mbedtls_tls pico_rand)
+    pico_add_library(pico_mbedtls NOFLAG)
+    pico_mirrored_target_link_libraries(pico_mbedtls INTERFACE pico_mbedtls_crypto pico_mbedtls_x509 pico_mbedtls_tls pico_rand)
     if (DEFINED PICO_MBEDTLS_CONFIG_FILE)
-        target_compile_definitions(pico_mbedtls INTERFACE MBEDTLS_CONFIG_FILE="${PICO_MBEDTLS_CONFIG_FILE}")
+        target_compile_definitions(pico_mbedtls_headers INTERFACE MBEDTLS_CONFIG_FILE="${PICO_MBEDTLS_CONFIG_FILE}")
     else()
-        target_compile_definitions(pico_mbedtls INTERFACE MBEDTLS_CONFIG_FILE="mbedtls_config.h")
+        target_compile_definitions(pico_mbedtls_headers INTERFACE MBEDTLS_CONFIG_FILE="mbedtls_config.h")
     endif()
     target_sources(pico_mbedtls INTERFACE ${CMAKE_CURRENT_LIST_DIR}/pico_mbedtls.c)
-    target_include_directories(pico_mbedtls INTERFACE ${PICO_MBEDTLS_PATH}/include/ ${PICO_MBEDTLS_PATH}/library/)
+    target_include_directories(pico_mbedtls_headers INTERFACE ${PICO_MBEDTLS_PATH}/include/ ${PICO_MBEDTLS_PATH}/library/)
 
     function(suppress_mbedtls_warnings)
         set_source_files_properties(

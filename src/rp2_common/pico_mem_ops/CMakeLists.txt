@@ -1,9 +1,9 @@
 if (NOT TARGET pico_mem_ops)
     #shims for ROM functions for -lgcc functions  (listed below)
-    pico_add_impl_library(pico_mem_ops)
+    pico_add_library(pico_mem_ops)
 
     # no custom implementation; falls thru to compiler
-    pico_add_impl_library(pico_mem_ops_compiler)
+    add_library(pico_mem_ops_compiler INTERFACE)
 
     # add alias "default" which is just pico.
     add_library(pico_mem_ops_default INTERFACE)
@@ -11,14 +11,15 @@ if (NOT TARGET pico_mem_ops)
 
     set(PICO_DEFAULT_MEM_OPS_IMPL pico_mem_ops_default)
 
-    pico_add_impl_library(pico_mem_ops_pico)
+    pico_add_library(pico_mem_ops_pico)
     target_link_libraries(pico_mem_ops INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_MEM_OPS_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_MEM_OPS_IMPL>,${PICO_DEFAULT_MEM_OPS_IMPL}>)
 
     target_sources(pico_mem_ops_pico INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/mem_ops_aeabi.S
             )
-
+    target_include_directories(pico_mem_ops_pico_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    pico_mirrored_target_link_libraries(pico_mem_ops_pico INTERFACE pico_base)
 
     target_link_libraries(pico_mem_ops INTERFACE pico_bootrom)
 

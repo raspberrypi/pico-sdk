@@ -27,6 +27,29 @@ function(pico_add_subdirectory subdir)
     pico_promote_common_scope_vars()
 endfunction()
 
+# takes dependencies after the target
+function(pico_mirrored_target_link_libraries TARGET SCOPE)
+    if (${ARGC} LESS 3)
+        message(FATAL_ERROR "expected a target, scope and at least one dependency")
+    endif()
+    if (NOT TARGET ${TARGET}_headers)
+        message(FATAL_ERROR "${TARGET} does not have headers")
+    endif()
+    # library should depend on its own header
+    target_link_libraries(${TARGET} ${SCOPE} ${TARGET}_headers)
+    foreach(DEPENDENCY IN LISTS ARGN)
+        if (DEPENDENCY MATCHES ".*_headers")
+            message(FATAL_ERROR "should not use headers with pico_mirrored_target_link_libraries")
+        endif()
+        # note, it would be nice to only add the dependency if it exists, but we do
+        # not necessarily add libraries in reverse dependency order, so we do this
+        # unconditionally, so this function should only be passed dependencies that
+        # have headers, or link will fail with a missing library -lfoo_headers
+        target_link_libraries(${TARGET}_headers ${SCOPE} ${DEPENDENCY}_headers)
+        target_link_libraries(${TARGET} ${SCOPE} ${DEPENDENCY})
+    endforeach()
+endfunction()
+
 # add a link option to wrap the given function name; i.e. -Wl:wrap=FUNCNAME for gcc
 function(pico_wrap_function TARGET FUNCNAME)
     target_link_options(${TARGET} INTERFACE "LINKER:--wrap=${FUNCNAME}")
@@ -42,18 +65,34 @@ function(pico_add_map_output TARGET)
     endif ()
 endfunction()
 
-# create a hardware_NAME_headers target (see pico_pico_simple_hardware_headers_target)
-# create a hardware_NAME target (see pico_pico_simple_hardware_target)
+# create a hardware_NAME_headers target (see pico_simple_hardware_headers_target)
+# create a hardware_NAME target (see pico_simple_hardware_target)
 macro(pico_simple_hardware_target NAME)
     pico_simple_hardware_headers_target(${NAME})
     pico_simple_hardware_impl_target(${NAME})
 endmacro()
 
 # create an INTERFACE library named target, and define LIB_TARGET=1 (upper case) as a compile option
+# and make it dependent on a pre-existing corresponding _headers library
+# optional arg NOFLAG will skip the LIB_TARGET definition
 function(pico_add_impl_library target)
     add_library(${target} INTERFACE)
     string(TOUPPER ${target} TARGET_UPPER)
-    target_compile_definitions(${target} INTERFACE LIB_${TARGET_UPPER}=1)
+    if (${ARGC} GREATER 1)
+        if (NOT "${ARGV1}" STREQUAL "NOFLAG")
+            message(FATAL_ERROR "Unknown parameter ${ARGV1}")
+        endif()
+    else()
+        target_compile_definitions(${target} INTERFACE LIB_${TARGET_UPPER}=1)
+    endif()
+    target_link_libraries(${target} INTERFACE ${target}_headers)
+endfunction()
+
+# create an INTERFACE library named target along with associated header, and define LIB_TARGET=1 (upper case) as a compile option
+# optional arg NOFLAG will skip the LIB_TARGET definition
+function(pico_add_library target)
+    add_library(${target}_headers INTERFACE)
+    pico_add_impl_library(${target} ${ARGN})
 endfunction()
 
 # create an INTERFACE library named hardware_NAME_headers INTERFACE library if it doesn't already exist,
@@ -66,7 +105,7 @@ macro(pico_simple_hardware_headers_target NAME)
         target_include_directories(hardware_${NAME}_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
         target_link_libraries(hardware_${NAME}_headers INTERFACE pico_base_headers)
         if (NOT PICO_NO_HARDWARE)
-            target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs hardware_claim)
+            target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs hardware_claim_headers)
         endif()
     endif()
 endmacro()
@@ -80,13 +119,17 @@ macro(pico_simple_hardware_headers_only_target NAME)
         #   super interesting except to determine functionality as they are mostly passive accessors, however
         #   they could be useful to determine if the header is available.
         # pico_add_sdk_impl_library(hardware_${NAME})
-        add_library(hardware_${NAME} INTERFACE)
+        add_library(hardware_${NAME}_headers INTERFACE)
 
-        target_include_directories(hardware_${NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-        target_link_libraries(hardware_${NAME} INTERFACE pico_base_headers)
+        # a headers only target should still have an explicit _headers library for consistency
+        target_include_directories(hardware_${NAME}_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+        target_link_libraries(hardware_${NAME}_headers INTERFACE pico_base_headers)
         if (NOT PICO_NO_HARDWARE)
-            target_link_libraries(hardware_${NAME} INTERFACE hardware_structs)
+            target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs)
         endif()
+
+        add_library(hardware_${NAME} INTERFACE)
+        target_link_libraries(hardware_${NAME} INTERFACE hardware_${NAME}_headers)
     endif()
 endmacro()
 
@@ -104,7 +147,10 @@ macro(pico_simple_hardware_impl_target NAME)
                 ${CMAKE_CURRENT_LIST_DIR}/${NAME}.c
                 )
 
-        target_link_libraries(hardware_${NAME} INTERFACE hardware_${NAME}_headers pico_platform)
+        pico_mirrored_target_link_libraries(hardware_${NAME} INTERFACE pico_platform)
+        if (NOT PICO_NO_HARDWARE)
+            target_link_libraries(hardware_${NAME} INTERFACE hardware_claim)
+        endif()
     endif()
 endmacro()
 

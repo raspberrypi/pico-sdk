@@ -3,7 +3,7 @@ if (NOT TARGET pico_divider)
     pico_add_impl_library(pico_divider)
 
     # no custom implementation; falls thru to compiler
-    pico_add_impl_library(pico_divider_compiler)
+    add_library(pico_divider_compiler INTERFACE)
 
     # add alias "default" which is just hardware.
     add_library(pico_divider_default INTERFACE)
@@ -25,7 +25,7 @@ if (NOT TARGET pico_divider)
             hardware_regs
             )
 
-    pico_add_impl_library(pico_divider_hardware)
+    add_library(pico_divider_hardware INTERFACE)
 
     target_link_libraries(pico_divider_hardware INTERFACE pico_divider_hardware_explicit)
 

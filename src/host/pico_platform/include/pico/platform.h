@@ -8,6 +8,7 @@
 #define _PICO_PLATFORM_H
 
 #include "hardware/platform_defs.h"
+#include <stdint.h>
 #include <stddef.h>
 
 #ifdef __unix__

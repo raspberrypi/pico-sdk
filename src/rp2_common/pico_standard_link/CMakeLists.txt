@@ -1,5 +1,5 @@
 if (NOT TARGET pico_standard_link)
-    pico_add_impl_library(pico_standard_link)
+    pico_add_library(pico_standard_link NOFLAG)
 
     target_sources(pico_standard_link INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/crt0.S
@@ -14,7 +14,8 @@ if (NOT TARGET pico_standard_link)
         target_link_options(pico_standard_link INTERFACE "LINKER:-nostdlib")
     endif ()
 
-    target_link_libraries(pico_standard_link INTERFACE hardware_regs boot_stage2_headers pico_bootrom pico_binary_info pico_cxx_options)
+    pico_mirrored_target_link_libraries(pico_standard_link INTERFACE hardware_regs pico_bootrom pico_binary_info)
+    target_link_libraries(pico_standard_link INTERFACE pico_cxx_options  boot_stage2_headers)
 
     function(pico_add_link_depend TARGET dependency)
         get_target_property(target_type ${TARGET} TYPE)

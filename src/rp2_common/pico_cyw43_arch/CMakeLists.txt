@@ -1,6 +1,6 @@
 if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
     if (TARGET cyw43_driver_picow)
-        pico_add_impl_library(pico_cyw43_arch)
+        pico_add_library(pico_cyw43_arch NOFLAG)
         target_sources(pico_cyw43_arch INTERFACE
                 ${CMAKE_CURRENT_LIST_DIR}/cyw43_arch.c
                 ${CMAKE_CURRENT_LIST_DIR}/cyw43_arch_poll.c
@@ -8,10 +8,10 @@ if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
                 ${CMAKE_CURRENT_LIST_DIR}/cyw43_arch_freertos.c
                 )
 
-        target_include_directories(pico_cyw43_arch INTERFACE
+        target_include_directories(pico_cyw43_arch_headers INTERFACE
                 ${CMAKE_CURRENT_LIST_DIR}/include)
 
-        target_link_libraries(pico_cyw43_arch INTERFACE
+        pico_mirrored_target_link_libraries(pico_cyw43_arch INTERFACE
                 pico_unique_id
                 cyw43_driver_picow # driver for pico w
                 pico_cyw43_driver # integration with async_context
@@ -21,51 +21,51 @@ if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
             message(WARNING "lwIP is not available; Full Pico W wireless support will be unavailable")
         else()
             message("Pico W wireless build support available.")
-            add_library(pico_cyw43_arch_poll INTERFACE)
-            target_link_libraries(pico_cyw43_arch_poll INTERFACE
-                    pico_cyw43_arch
-                    pico_async_context_poll)
-            target_compile_definitions(pico_cyw43_arch_poll INTERFACE
+            pico_add_library(pico_cyw43_arch_poll NOFLAG)
+            target_compile_definitions(pico_cyw43_arch_poll_headers INTERFACE
                     PICO_CYW43_ARCH_POLL=1
                     )
+            pico_mirrored_target_link_libraries(pico_cyw43_arch_poll INTERFACE
+                    pico_cyw43_arch
+                    pico_async_context_poll)
 
-            add_library(pico_cyw43_arch_lwip_poll INTERFACE)
-            target_link_libraries(pico_cyw43_arch_lwip_poll INTERFACE
+            pico_add_library(pico_cyw43_arch_lwip_poll NOFLAG)
+            pico_mirrored_target_link_libraries(pico_cyw43_arch_lwip_poll INTERFACE
                     pico_lwip_nosys
                     pico_cyw43_arch_poll)
-            target_compile_definitions(pico_cyw43_arch_lwip_poll INTERFACE
+            target_compile_definitions(pico_cyw43_arch_lwip_poll_headers INTERFACE
                     CYW43_LWIP=1
                     )
 
-            add_library(pico_cyw43_arch_threadsafe_background INTERFACE)
-            target_link_libraries(pico_cyw43_arch_threadsafe_background INTERFACE
+            pico_add_library(pico_cyw43_arch_threadsafe_background NOFLAG)
+            pico_mirrored_target_link_libraries(pico_cyw43_arch_threadsafe_background INTERFACE
                     pico_cyw43_arch
                     pico_async_context_threadsafe_background)
-            target_compile_definitions(pico_cyw43_arch_threadsafe_background INTERFACE
+            target_compile_definitions(pico_cyw43_arch_threadsafe_background_headers INTERFACE
                     PICO_CYW43_ARCH_THREADSAFE_BACKGROUND=1
                     )
-            add_library(pico_cyw43_arch_lwip_threadsafe_background INTERFACE)
 
-            target_link_libraries(pico_cyw43_arch_lwip_threadsafe_background INTERFACE
+            pico_add_library(pico_cyw43_arch_lwip_threadsafe_background NOFLAG)
+            pico_mirrored_target_link_libraries(pico_cyw43_arch_lwip_threadsafe_background INTERFACE
                     pico_lwip_nosys
                     pico_cyw43_arch_threadsafe_background)
-            target_compile_definitions(pico_cyw43_arch_lwip_threadsafe_background INTERFACE
+            target_compile_definitions(pico_cyw43_arch_lwip_threadsafe_background_headers INTERFACE
                     CYW43_LWIP=1
                     )
 
-            add_library(pico_cyw43_arch_sys_freertos INTERFACE)
-            target_link_libraries(pico_cyw43_arch_sys_freertos INTERFACE
+            pico_add_library(pico_cyw43_arch_sys_freertos NOFLAG)
+            pico_mirrored_target_link_libraries(pico_cyw43_arch_sys_freertos INTERFACE
                     pico_cyw43_arch
                     pico_async_context_freertos)
-            target_compile_definitions(pico_cyw43_arch_sys_freertos INTERFACE
+            target_compile_definitions(pico_cyw43_arch_sys_freertos_headers INTERFACE
                     PICO_CYW43_ARCH_FREERTOS=1
                     )
 
-            add_library(pico_cyw43_arch_lwip_sys_freertos INTERFACE)
-            target_link_libraries(pico_cyw43_arch_lwip_sys_freertos INTERFACE
+            pico_add_library(pico_cyw43_arch_lwip_sys_freertos NOFLAG)
+            pico_mirrored_target_link_libraries(pico_cyw43_arch_lwip_sys_freertos INTERFACE
                     pico_lwip_freertos
                     pico_cyw43_arch_sys_freertos)
-            target_compile_definitions(pico_cyw43_arch_lwip_sys_freertos INTERFACE
+            target_compile_definitions(pico_cyw43_arch_lwip_sys_freertos_headers INTERFACE
                     CYW43_LWIP=1
                     LWIP_PROVIDE_ERRNO=1
                     # now the default
@@ -73,11 +73,11 @@ if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
                     )
         endif()
 
-        add_library(pico_cyw43_arch_none INTERFACE)
-        target_link_libraries(pico_cyw43_arch_none INTERFACE
+        pico_add_library(pico_cyw43_arch_none NOFLAG)
+        pico_mirrored_target_link_libraries(pico_cyw43_arch_none INTERFACE
                 pico_cyw43_arch
                 pico_async_context_threadsafe_background)
-        target_compile_definitions(pico_cyw43_arch_none INTERFACE
+        target_compile_definitions(pico_cyw43_arch_none_headers INTERFACE
                 CYW43_LWIP=0
                 PICO_CYW43_ARCH_THREADSAFE_BACKGROUND=1 # none still uses threadsafe_background to make gpio use easy
                 )

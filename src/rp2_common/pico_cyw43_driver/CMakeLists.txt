@@ -21,24 +21,24 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     pico_register_common_scope_var(PICO_CYW43_DRIVER_PATH)
 
     # base driver without our bus
-    add_library(cyw43_driver INTERFACE)
+    pico_add_library(cyw43_driver NOFLAG)
     target_sources(cyw43_driver INTERFACE
             ${PICO_CYW43_DRIVER_PATH}/src/cyw43_ll.c
             ${PICO_CYW43_DRIVER_PATH}/src/cyw43_stats.c
             ${PICO_CYW43_DRIVER_PATH}/src/cyw43_lwip.c
             ${PICO_CYW43_DRIVER_PATH}/src/cyw43_ctrl.c
             )
-    target_include_directories(cyw43_driver INTERFACE
+    target_include_directories(cyw43_driver_headers INTERFACE
             ${PICO_CYW43_DRIVER_PATH}/src
             ${PICO_CYW43_DRIVER_PATH}/firmware
             )
 
     # pico_cyw43_driver adds async_context integration to cyw43_driver
-    add_library(pico_cyw43_driver INTERFACE)
+    pico_add_library(pico_cyw43_driver NOFLAG)
     target_sources(pico_cyw43_driver INTERFACE
             cyw43_driver.c)
-    target_include_directories(pico_cyw43_driver INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-    target_link_libraries(pico_cyw43_driver INTERFACE cyw43_driver)
+    target_include_directories(pico_cyw43_driver_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    pico_mirrored_target_link_libraries(pico_cyw43_driver INTERFACE cyw43_driver)
 
     # Firmware stuff
     set(CYW43_FIRMWARE_BIN 43439A0-7.95.49.00.combined)
@@ -66,16 +66,16 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             VERBATIM)
 
     # cyw43_driver_picow is cyw43_driver plus Pico W specific bus implementation, and Pico W firmware
-    add_library(cyw43_driver_picow INTERFACE)
+    pico_add_library(cyw43_driver_picow NOFLAG)
     target_sources(cyw43_driver_picow INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/cyw43_bus_pio_spi.c
             )
-    pico_generate_pio_header(cyw43_driver_picow ${CMAKE_CURRENT_LIST_DIR}/cyw43_bus_pio_spi.pio)
+    pico_generate_pio_header(cyw43_driver_picow_headers ${CMAKE_CURRENT_LIST_DIR}/cyw43_bus_pio_spi.pio)
     add_dependencies(cyw43_driver_picow INTERFACE cyw43_firmware_package)
     target_link_libraries(cyw43_driver_picow INTERFACE
             ${CYW43_FIRMWARE_OBJ}
             )
-    target_link_libraries(cyw43_driver_picow INTERFACE
+    pico_mirrored_target_link_libraries(cyw43_driver_picow INTERFACE
             cyw43_driver
             hardware_pio
             hardware_dma

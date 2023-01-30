@@ -1,11 +1,10 @@
 if (NOT TARGET pico_double)
     # library to be depended on - we make this depend on particular implementations using per target generator expressions
-    pico_add_impl_library(pico_double)
+    pico_add_library(pico_double)
 
     # no custom implementation; falls thru to compiler
-    pico_add_impl_library(pico_double_compiler)
+    pico_add_library(pico_double_compiler)
 
-    add_library(pico_double_headers INTERFACE)
     target_include_directories(pico_double_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
     # add alias "default" which is just pico.
@@ -17,7 +16,7 @@ if (NOT TARGET pico_double)
     target_link_libraries(pico_double INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>,${PICO_DEFAULT_DOUBLE_IMPL}>)
 
-    pico_add_impl_library(pico_double_pico)
+    pico_add_library(pico_double_pico)
     target_sources(pico_double_pico INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/double_aeabi.S
             ${CMAKE_CURRENT_LIST_DIR}/double_init_rom.c
@@ -25,16 +24,16 @@ if (NOT TARGET pico_double)
             ${CMAKE_CURRENT_LIST_DIR}/double_v1_rom_shim.S
     )
 
-    target_link_libraries(pico_double_pico INTERFACE pico_bootrom pico_double_headers)
+    target_link_libraries(pico_double_pico INTERFACE pico_bootrom pico_double_headers hardware_divider)
 
-    pico_add_impl_library(pico_double_none)
+    pico_add_library(pico_double_none)
     target_sources(pico_double_none INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/double_none.S
             )
 
     target_link_libraries(pico_double_none INTERFACE pico_double_headers)
 
-    target_compile_definitions(pico_double_none INTERFACE
+    target_compile_definitions(pico_double_none_headers INTERFACE
             PICO_PRINTF_SUPPORT_FLOAT=0 # printing floats/doubles won't work, so we can save space by removing it
     )
 

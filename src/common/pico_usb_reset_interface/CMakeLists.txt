@@ -1,2 +1,2 @@
-add_library(pico_usb_reset_interface_headers INTERFACE)
+pico_add_library(pico_usb_reset_interface NOFLAG)
 target_include_directories(pico_usb_reset_interface_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
