@@ -109,6 +109,14 @@ int putchar_raw(int c);
  */
 int puts_raw(const char *s);
 
+/*! \brief get notified when there are input characters available
+ * \ingroup pico_stdio
+ *
+ * \param fn Callback function to be called when characters are available. Pass NULL to cancel any existing callback
+ * \param param Pointer to pass to the callback
+ */
+void stdio_set_chars_available_callback(void (*fn)(void*), void *param);
+
 #ifdef __cplusplus
 }
 #endif

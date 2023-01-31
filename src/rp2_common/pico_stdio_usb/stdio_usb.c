@@ -17,6 +17,7 @@
 #include "pico/stdio/driver.h"
 #include "pico/mutex.h"
 #include "hardware/irq.h"
+#include "device/usbd_pvt.h" // for usbd_defer_func
 
 static mutex_t stdio_usb_mutex;
 #ifndef NDEBUG
@@ -35,6 +36,10 @@ static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 #define low_priority_irq_num PICO_STDIO_USB_LOW_PRIORITY_IRQ
 #else
 static uint8_t low_priority_irq_num;
+#endif
+#if PICO_STDIO_USB_SUPPORT_CHARS_AVAILABLE_CALLBACK
+static void (*chars_available_callback)(void*);
+static void *chars_available_param;
 #endif
 
 static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
@@ -137,12 +142,29 @@ int stdio_usb_in_chars(char *buf, int length) {
     return rc;
 }
 
+#if PICO_STDIO_USB_SUPPORT_CHARS_AVAILABLE_CALLBACK
+void tud_cdc_rx_cb(__unused uint8_t itf) {
+    if (chars_available_callback) {
+        usbd_defer_func(chars_available_callback, chars_available_param, false);
+    }
+}
+
+void stdio_usb_set_chars_available_callback(void (*fn)(void*), void *param) {
+    chars_available_callback = fn;
+    chars_available_param = param;
+}
+#endif
+
 stdio_driver_t stdio_usb = {
     .out_chars = stdio_usb_out_chars,
     .in_chars = stdio_usb_in_chars,
+#if PICO_STDIO_USB_SUPPORT_CHARS_AVAILABLE_CALLBACK
+    .set_chars_available_callback = stdio_usb_set_chars_available_callback,
+#endif
 #if PICO_STDIO_ENABLE_CRLF_SUPPORT
     .crlf_enabled = PICO_STDIO_USB_DEFAULT_CRLF
 #endif
+
 };
 
 bool stdio_usb_init(void) {
