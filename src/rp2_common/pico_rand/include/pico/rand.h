@@ -18,14 +18,14 @@ extern "C" {
  *
  * Random Number Generator API
  *
- * This module generates random numbers at runtime via a number of possible entropy
+ * This module generates random numbers at runtime utilizing a number of possible entropy
  * sources and uses those sources to modify the state of a 128-bit 'Pseudo
  * Random Number Generator' implemented in software.
  *
  * The random numbers (32 to 128 bit) to be supplied are read from the PRNG which is used
  * to help provide a large number space.
  *
- * The following (multiple) sources of entropy are available of varying quality, each enabled by a #define:
+ * The following (multiple) sources of entropy are available (of varying quality), each enabled by a #define:
  *
  *  - The Ring Oscillator (ROSC) (\ref PICO_RAND_ENTROPY_SRC_ROSC == 1):
  *    \ref PICO_RAND_ROSC_BIT_SAMPLE_COUNT bits are gathered from the ring oscillator "random bit" and mixed in each
@@ -54,6 +54,9 @@ extern "C" {
  *
  * With default settings, the seed generation takes approximately 1 millisecond while
  * subsequent random numbers generally take between 10 and 20 microseconds to generate.
+ *
+ * pico_rand methods may be safely called from either core or from an IRQ, but be careful in the latter case as the
+ * the calls may block for a number of microseconds waiting on more entropy.
  */
 
 // ---------------
@@ -148,12 +151,18 @@ typedef struct rng_128 {
 /*! \brief Get 128-bit random number
  *  \ingroup pico_rand
  *
- * \param rand128  Pointer to storage to accept a 128-bit random number
+ * This method may be safely called from either core or from an IRQ, but be careful in the latter case as
+ * the call may block for a number of microseconds waiting on more entropy.
+ *
+ * \param rand128 Pointer to storage to accept a 128-bit random number
  */
 void get_rand_128(rng_128_t *rand128);
 
 /*! \brief Get 64-bit random number
  *  \ingroup pico_rand
+ *
+ * This method may be safely called from either core or from an IRQ, but be careful in the latter case as
+ * the call may block for a number of microseconds waiting on more entropy.
  *
  * \return 64-bit random number
  */
@@ -161,6 +170,9 @@ uint64_t get_rand_64(void);
 
 /*! \brief Get 32-bit random number
  *  \ingroup pico_rand
+ *
+ * This method may be safely called from either core or from an IRQ, but be careful in the latter case as
+ * the call may block for a number of microseconds waiting on more entropy.
  *
  * \return 32-bit random number
  */
