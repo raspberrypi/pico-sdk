@@ -151,7 +151,7 @@ typedef struct rng_128 {
 /*! \brief Get 128-bit random number
  *  \ingroup pico_rand
  *
- * This method may be safely called from either core or from an IRQ, but be careful in the latter case as the
+ * This method may be safely called from either core or from an IRQ, but be careful in the latter case as
  * the call may block for a number of microseconds waiting on more entropy.
  *
  * \param rand128 Pointer to storage to accept a 128-bit random number
@@ -161,7 +161,7 @@ void get_rand_128(rng_128_t *rand128);
 /*! \brief Get 64-bit random number
  *  \ingroup pico_rand
  *
- * This method may be safely called from either core or from an IRQ, but be careful in the latter case as the
+ * This method may be safely called from either core or from an IRQ, but be careful in the latter case as
  * the call may block for a number of microseconds waiting on more entropy.
  *
  * \return 64-bit random number
@@ -171,7 +171,7 @@ uint64_t get_rand_64(void);
 /*! \brief Get 32-bit random number
  *  \ingroup pico_rand
  *
- * This method may be safely called from either core or from an IRQ, but be careful in the latter case as the
+ * This method may be safely called from either core or from an IRQ, but be careful in the latter case as
  * the call may block for a number of microseconds waiting on more entropy.
  *
  * \return 32-bit random number
