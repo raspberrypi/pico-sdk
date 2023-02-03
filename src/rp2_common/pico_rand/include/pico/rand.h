@@ -55,7 +55,7 @@ extern "C" {
  * With default settings, the seed generation takes approximately 1 millisecond while
  * subsequent random numbers generally take between 10 and 20 microseconds to generate.
  *
- * pico_rand methods may be safely called from either core or from an IRQ, but be careful in the latter case as the
+ * pico_rand methods may be safely called from either core or from an IRQ, but be careful in the latter case as
  * the calls may block for a number of microseconds waiting on more entropy.
  */
 
