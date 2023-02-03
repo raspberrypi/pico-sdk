@@ -24,6 +24,11 @@ static mutex_t stdio_usb_mutex;
 static uint8_t stdio_usb_core_num;
 #endif
 
+#if PICO_STDIO_USB_SUPPORT_CHARS_AVAILABLE_CALLBACK
+static void (*chars_available_callback)(void*);
+static void *chars_available_param;
+#endif
+
 // when tinyusb_device is explicitly linked we do no background tud processing
 #if !LIB_TINYUSB_DEVICE
 // if this crit_sec is initialized, we are not in periodic timer mode, and must make sure
@@ -36,10 +41,6 @@ static_assert(PICO_STDIO_USB_LOW_PRIORITY_IRQ >= NUM_IRQS - NUM_USER_IRQS, "");
 #define low_priority_irq_num PICO_STDIO_USB_LOW_PRIORITY_IRQ
 #else
 static uint8_t low_priority_irq_num;
-#endif
-#if PICO_STDIO_USB_SUPPORT_CHARS_AVAILABLE_CALLBACK
-static void (*chars_available_callback)(void*);
-static void *chars_available_param;
 #endif
 
 static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
