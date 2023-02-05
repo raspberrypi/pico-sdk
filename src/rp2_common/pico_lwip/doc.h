@@ -20,7 +20,7 @@
  * * \c \b pico_lwip_core4 -
  * * \c \b pico_lwip_core6 -
  * * \c \b pico_lwip_netif -
- * * \c \b pico_lwip_sixlowpan - 
+ * * \c \b pico_lwip_sixlowpan -
  * * \c \b pico_lwip_ppp -
  * * \c \b pico_lwip_api -
  *
@@ -28,13 +28,13 @@
  *
  * * \c \b pico_lwip_snmp -
  * * \c \b pico_lwip_http -
- * * \c \b pico_lwip_makefsdata - 
- * * \c \b pico_lwip_iperf - 
- * * \c \b pico_lwip_smtp - 
- * * \c \b pico_lwip_sntp - 
- * * \c \b pico_lwip_mdns - 
- * * \c \b pico_lwip_netbios - 
- * * \c \b pico_lwip_tftp - 
+ * * \c \b pico_lwip_makefsdata -
+ * * \c \b pico_lwip_iperf -
+ * * \c \b pico_lwip_smtp -
+ * * \c \b pico_lwip_sntp -
+ * * \c \b pico_lwip_mdns -
+ * * \c \b pico_lwip_netbios -
+ * * \c \b pico_lwip_tftp -
  * * \c \b pico_lwip_mbedtls -
  * * \c \b pico_lwip_mqtt -
  *
@@ -42,5 +42,5 @@
 
 /** \defgroup pico_lwip_arch pico_lwip_arch
  * \ingroup pico_lwip
- * \brief lwIP compiler adapters. This is not included in \c \b pico_lwip in case you wish to replace them.
+ * \brief lwIP compiler adapters. This is not included by default in \c \b pico_lwip in case you wish to implement your own.
  */
