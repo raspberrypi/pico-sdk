@@ -16,8 +16,7 @@ extern "C" {
 
 /** \file pico/i2c_slave.h
  * \defgrup pico_i2c_slave pico_i2c_slave
- * \brief I2C slave helper library, which takes care of hooking the I2C IRQ and calling bcak the user with I2C events.
- * TODO MORE DOCS
+ * \brief I2C slave helper library, which takes care of hooking the I2C IRQ and calling back the user with I2C events.
  */
 
 /**
