@@ -278,9 +278,8 @@ static inline void uart_tx_wait_blocking(uart_inst_t *uart) {
  *  \ingroup hardware_uart
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
- * \return 0 if no data available, otherwise the number of bytes, at least, that can be read
+ * \return true if the RX FIFO is not empty, otherwise false.
  *
- * \note HW limitations mean this function will return either 0 or 1.
  */
 static inline bool uart_is_readable(uart_inst_t *uart) {
     // PL011 doesn't expose levels directly, so return values are only 0 or 1
@@ -307,7 +306,7 @@ static inline void uart_write_blocking(uart_inst_t *uart, const uint8_t *src, si
 /*! \brief  Read from the UART
  *  \ingroup hardware_uart
  *
- * This function will block until all the data has been received from the UART
+ * This function blocks until len characters have been read from the UART
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param dst Buffer to accept received bytes
@@ -378,10 +377,10 @@ static inline void uart_puts(uart_inst_t *uart, const char *s) {
 #endif
 }
 
-/*! \brief  Read a single character to UART
+/*! \brief  Read a single character from the UART
  *  \ingroup hardware_uart
  *
- * This function will block until the character has been read
+ * This function will block until a character has been read
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \return The character read.
