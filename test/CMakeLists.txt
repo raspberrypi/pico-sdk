@@ -1,6 +1,7 @@
 add_subdirectory(pico_test)
 
 add_subdirectory(pico_stdlib_test)
+add_subdirectory(pico_stdio_test)
 add_subdirectory(pico_time_test)
 add_subdirectory(pico_divider_test)
 if (PICO_ON_DEVICE)

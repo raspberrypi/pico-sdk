@@ -93,10 +93,8 @@ static void usb_irq(void) {
 
 static void stdio_usb_out_chars(const char *buf, int length) {
     static uint64_t last_avail_time;
-    uint32_t owner;
-    if (!mutex_try_enter(&stdio_usb_mutex, &owner)) {
-        if (owner == get_core_num()) return; // would deadlock otherwise
-        mutex_enter_blocking(&stdio_usb_mutex);
+    if (!mutex_try_enter_block_until(&stdio_usb_mutex, make_timeout_time_ms(PICO_STDIO_DEADLOCK_TIMEOUT_MS))) {
+        return;
     }
     if (stdio_usb_connected()) {
         for (int i = 0; i < length;) {
@@ -126,20 +124,28 @@ static void stdio_usb_out_chars(const char *buf, int length) {
 }
 
 int stdio_usb_in_chars(char *buf, int length) {
-    uint32_t owner;
-    if (!mutex_try_enter(&stdio_usb_mutex, &owner)) {
-        if (owner == get_core_num()) return PICO_ERROR_NO_DATA; // would deadlock otherwise
-        mutex_enter_blocking(&stdio_usb_mutex);
-    }
+    // note we perform this check outside the lock, to try and prevent possible deadlock conditions
+    // with printf in IRQs (which we will escape through timeouts elsewhere, but that would be less graceful).
+    //
+    // these are just checks of state, so we can call them while not holding the lock.
+    // they may be wrong, but only if we are in the middle of a tud_task call, in which case at worst
+    // we will mistakenly think we have data available when we do not (we will check again), or
+    // tud_task will complete running and we will check the right values the next time.
+    //
     int rc = PICO_ERROR_NO_DATA;
     if (stdio_usb_connected() && tud_cdc_available()) {
-        int count = (int) tud_cdc_read(buf, (uint32_t) length);
-        rc =  count ? count : PICO_ERROR_NO_DATA;
-    } else {
-        // because our mutex use may starve out the background task, run tud_task here (we own the mutex)
-        tud_task();
+        if (!mutex_try_enter_block_until(&stdio_usb_mutex, make_timeout_time_ms(PICO_STDIO_DEADLOCK_TIMEOUT_MS))) {
+            return PICO_ERROR_NO_DATA; // would deadlock otherwise
+        }
+        if (stdio_usb_connected() && tud_cdc_available()) {
+            int count = (int) tud_cdc_read(buf, (uint32_t) length);
+            rc = count ? count : PICO_ERROR_NO_DATA;
+        } else {
+            // because our mutex use may starve out the background task, run tud_task here (we own the mutex)
+            tud_task();
+        }
+        mutex_exit(&stdio_usb_mutex);
     }
-    mutex_exit(&stdio_usb_mutex);
     return rc;
 }
 

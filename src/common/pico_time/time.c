@@ -431,16 +431,21 @@ void sleep_ms(uint32_t ms) {
 
 bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
-    alarm_id_t id;
-    id = add_alarm_at(timeout_timestamp, sleep_until_callback, NULL, false);
-    if (id <= 0) {
+    if (__get_current_exception()) {
         tight_loop_contents();
         return time_reached(timeout_timestamp);
     } else {
-        __wfe();
-        // we need to clean up if it wasn't us that caused the wfe; if it was this will be a noop.
-        cancel_alarm(id);
-        return time_reached(timeout_timestamp);
+        alarm_id_t id;
+        id = add_alarm_at(timeout_timestamp, sleep_until_callback, NULL, false);
+        if (id <= 0) {
+            tight_loop_contents();
+            return time_reached(timeout_timestamp);
+        } else {
+            __wfe();
+            // we need to clean up if it wasn't us that caused the wfe; if it was this will be a noop.
+            cancel_alarm(id);
+            return time_reached(timeout_timestamp);
+        }
     }
 #else
     tight_loop_contents();
