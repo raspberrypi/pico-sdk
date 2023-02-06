@@ -124,7 +124,6 @@ static void stdio_usb_out_chars(const char *buf, int length) {
 }
 
 int stdio_usb_in_chars(char *buf, int length) {
-    uint32_t owner;
     // note we perform this check outside the lock, to try and prevent possible deadlock conditions
     // with printf in IRQs (which we will escape through timeouts elsewhere, but that would be less graceful).
     //
@@ -134,7 +133,7 @@ int stdio_usb_in_chars(char *buf, int length) {
     // tud_task will complete running and we will check the right values the next time.
     //
     int rc = PICO_ERROR_NO_DATA;
-//    if (stdio_usb_connected() && tud_cdc_available()) {
+    if (stdio_usb_connected() && tud_cdc_available()) {
         if (!mutex_try_enter_block_until(&stdio_usb_mutex, make_timeout_time_ms(PICO_STDIO_DEADLOCK_TIMEOUT_MS))) {
             return PICO_ERROR_NO_DATA; // would deadlock otherwise
         }
@@ -146,7 +145,7 @@ int stdio_usb_in_chars(char *buf, int length) {
             tud_task();
         }
         mutex_exit(&stdio_usb_mutex);
-//    }
+    }
     return rc;
 }
 
