@@ -180,6 +180,11 @@ static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cp
     invalid_params_if(SPI, order != SPI_MSB_FIRST);
     invalid_params_if(SPI, cpol != SPI_CPOL_0 && cpol != SPI_CPOL_1);
     invalid_params_if(SPI, cpha != SPI_CPHA_0 && cpha != SPI_CPHA_1);
+
+    // Disable the SPI
+    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
+    hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
+
     hw_write_masked(&spi_get_hw(spi)->cr0,
                     ((uint)(data_bits - 1)) << SPI_SSPCR0_DSS_LSB |
                     ((uint)cpol) << SPI_SSPCR0_SPO_LSB |
@@ -187,6 +192,9 @@ static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cp
         SPI_SSPCR0_DSS_BITS |
         SPI_SSPCR0_SPO_BITS |
         SPI_SSPCR0_SPH_BITS);
+
+    // Re-enable the SPI
+    hw_set_bits(&spi_get_hw(spi)->cr1, enable_mask);
 }
 
 /*! \brief Set SPI master/slave
@@ -199,10 +207,17 @@ static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cp
  * \param slave true to set SPI device as a slave device, false for master.
  */
 static inline void spi_set_slave(spi_inst_t *spi, bool slave) {
+    // Disable the SPI
+    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
+    hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
+
     if (slave)
         hw_set_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_MS_BITS);
     else
         hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_MS_BITS);
+
+    // Re-enable the SPI
+    hw_set_bits(&spi_get_hw(spi)->cr1, enable_mask);
 }
 
 // ----------------------------------------------------------------------------
