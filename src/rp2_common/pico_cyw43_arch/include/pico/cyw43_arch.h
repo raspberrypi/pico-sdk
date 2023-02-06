@@ -307,9 +307,6 @@ static inline void cyw43_arch_lwip_end(void) {
  * single-core polling only (pico_cyw43_arch_poll) then there are no
  * locks to required, but it is still good practice to use this function.
  *
- * \note as of SDK release 1.5.0, this is now equivalent to calling \ref async_context_lock_check
- * on the async_context associated with cyw43_arch and lwIP.
- *
  * \param func the function ta call with any required locks held
  * \param param parameter to pass to \c func
  * \return the return value from \c func
