@@ -114,6 +114,20 @@ void recursive_mutex_enter_blocking(recursive_mutex_t *mtx);
  */
 bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
 
+/*! \brief Attempt to take ownership of a mutex until the specified time
+ *  \ingroup mutex
+ *
+ * If the mutex wasn't owned, this method will immediately claim the mutex for the caller and return true.
+ * If the mutex is owned by the caller, this method will immediately return false,
+ * If the mutex is owned by someone else, this method will try to claim it until the specified time, returning
+ * true if it succeeds, or false on timeout
+ *
+ * \param mtx Pointer to mutex structure
+ * \param until The time after which to return if the caller cannot be granted ownership of the mutex
+ * \return true if mutex now owned, false otherwise
+ */
+bool mutex_try_enter_block_until(mutex_t *mtx, absolute_time_t until);
+
 /*! \brief Attempt to take ownership of a recursive mutex
  *  \ingroup mutex
  *

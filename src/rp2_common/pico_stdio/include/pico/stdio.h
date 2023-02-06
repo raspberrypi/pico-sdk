@@ -36,6 +36,11 @@
 #define PICO_STDIO_STACK_BUFFER_SIZE 128
 #endif
 
+// PICO_CONFIG: PICO_STDIO_DEADLOCK_TIMEOUT_MS, Time after which to assume stdio_usb is deadlocked by use in IRQ and give up, type=int, default=1000, group=pico_stdio
+#ifndef PICO_STDIO_DEADLOCK_TIMEOUT_MS
+#define PICO_STDIO_DEADLOCK_TIMEOUT_MS 1000
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

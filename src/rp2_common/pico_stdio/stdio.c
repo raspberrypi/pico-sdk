@@ -43,18 +43,7 @@ static stdio_driver_t *filter;
 auto_init_mutex(print_mutex);
 
 bool stdout_serialize_begin(void) {
-    lock_owner_id_t caller = lock_get_caller_owner_id();
-    // not using lock_owner_id_t to avoid backwards incompatibility change to mutex_try_enter API
-    static_assert(sizeof(lock_owner_id_t) <= 4, "");
-    uint32_t owner;
-    if (!mutex_try_enter(&print_mutex, &owner)) {
-        if (owner == (uint32_t)caller) {
-            return false;
-        }
-        // we are not a nested call, so lets wait
-        mutex_enter_blocking(&print_mutex);
-    }
-    return true;
+    return mutex_try_enter_block_until(&print_mutex, make_timeout_time_ms(PICO_STDIO_DEADLOCK_TIMEOUT_MS));
 }
 
 void stdout_serialize_end(void) {
