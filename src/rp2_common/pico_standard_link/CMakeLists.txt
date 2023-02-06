@@ -96,19 +96,20 @@ if (NOT TARGET pico_standard_link)
         target_link_options(pico_standard_link INTERFACE "LINKER:--gc-sections")
     endif()
 
-    # Ignore warnings about rwx segments introduced in binutils 2.39
-    execute_process(COMMAND ${CMAKE_C_COMPILER} -print-prog-name=ld RESULT_VARIABLE RUN_C_RESULT OUTPUT_VARIABLE FULL_LD_PATH
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (${RUN_C_RESULT} EQUAL 0)
-        execute_process(COMMAND ${FULL_LD_PATH} --help RESULT_VARIABLE RUN_LD_RESULT OUTPUT_VARIABLE LD_HELP_OUTPUT
+    if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+        # Ignore warnings about rwx segments introduced in binutils 2.39
+        execute_process(COMMAND ${CMAKE_C_COMPILER} -print-prog-name=ld RESULT_VARIABLE RUN_C_RESULT OUTPUT_VARIABLE FULL_LD_PATH
             OUTPUT_STRIP_TRAILING_WHITESPACE)
-        if (${RUN_LD_RESULT} EQUAL 0)
-                set(RWX_WARNING "no-warn-rwx-segments")
-                string(FIND "${LD_HELP_OUTPUT}" "${RWX_WARNING}" LD_RWX_WARNING_SUPPORTED)
-                if (${LD_RWX_WARNING_SUPPORTED} GREATER -1)
-                    target_link_options(pico_standard_link INTERFACE "LINKER:--${RWX_WARNING}")
-                endif()
+        if (${RUN_C_RESULT} EQUAL 0)
+            execute_process(COMMAND ${FULL_LD_PATH} --help RESULT_VARIABLE RUN_LD_RESULT OUTPUT_VARIABLE LD_HELP_OUTPUT
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+            if (${RUN_LD_RESULT} EQUAL 0)
+                    set(RWX_WARNING "no-warn-rwx-segments")
+                    string(FIND "${LD_HELP_OUTPUT}" "${RWX_WARNING}" LD_RWX_WARNING_SUPPORTED)
+                    if (${LD_RWX_WARNING_SUPPORTED} GREATER -1)
+                        target_link_options(pico_standard_link INTERFACE "LINKER:--${RWX_WARNING}")
+                    endif()
+            endif()
         endif()
     endif()
-
 endif()
