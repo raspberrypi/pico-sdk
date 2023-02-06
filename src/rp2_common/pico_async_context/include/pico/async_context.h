@@ -145,7 +145,7 @@ typedef struct async_when_pending_worker {
 #define ASYNC_CONTEXT_FLAG_POLLED 0x4
 
 /*!
- * \brief Implementation of an async_context
+ * \brief Implementation of an async_context type, providing methods common to that type
  * \ingroup pico_async_context
  */
 typedef struct async_context_type {
@@ -166,6 +166,12 @@ typedef struct async_context_type {
     void (*deinit)(async_context_t *self);
 } async_context_type_t;
 
+/*!
+ * \brief Base structure type of all async_contexts. For details about its use, see \ref pico_async_context.
+ * \ingroup pico_async_context
+ *
+ * Individual async_context_types with additional state, should contain this structure at the start.
+ */
 struct async_context {
     const async_context_type_t *type;
     async_when_pending_worker_t *when_pending_list;

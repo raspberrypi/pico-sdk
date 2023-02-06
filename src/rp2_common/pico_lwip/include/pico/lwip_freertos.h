@@ -14,8 +14,15 @@
 extern "C" {
 #endif
 
+/** \file pico/lwip_freertos.h
+* \defgroup pico_lwip_freertos pico_lwip_freertos
+* \ingroup pico_lwip
+* \brief Glue library for integration lwIP in \c NO_SYS=0 mode with the SDK. Simple \c init and \c deinit
+* are all that is required to hook up lwIP (with full blocking API support) via an \ref async_context instance.
+*/
+
 /*! \brief Initializes lwIP (NO_SYS=0 mode) support support for FreeRTOS using the provided async_context
- *  \ingroup pico_lwip
+ *  \ingroup pico_lwip_freertos
  *
  * If the initialization succeeds, \ref lwip_freertos_deinit() can be called to shutdown lwIP support
  *
@@ -27,7 +34,7 @@ extern "C" {
 bool lwip_freertos_init(async_context_t *context);
 
 /*! \brief De-initialize lwIP (NO_SYS=0 mode) support for FreeRTOS
- *  \ingroup pico_lwip
+ *  \ingroup pico_lwip_freertos
  *
  * Note that since lwIP may only be initialized once, and doesn't itself provide a shutdown mechanism, lwIP
  * itself may still consume resources.

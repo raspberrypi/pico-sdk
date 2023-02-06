@@ -55,12 +55,28 @@ extern "C" {
  *
  * * \em 'poll' - This not multi-core/IRQ safe, and requires the user to call \ref cyw43_arch_poll periodically from their main loop
  * * \em 'thread_safe_background' - This is multi-core/thread/task safe, and maintenance of the driver and TCP/IP stack is handled automatically in the background
+ * * \em 'freertos' - This is multi-core/thread/task safe, and uses a separate FreeRTOS task to handle lwIP and and driver work.
  *
  * As of right now, lwIP is the only supported TCP/IP stack, however the use of \c pico_cyw43_arch is intended to be independent of
  * the particular TCP/IP stack used (and possibly Bluetooth stack used) in the future. For this reason, the integration of lwIP
  * is handled in the base (\c pico_cyw43_arch) library based on the #define \ref CYW43_LWIP used by the \c cyw43_driver.
  *
- * Whilst you can use the \c pico_cyw43_arch library directly and  specify \ref CYW$#_LWIP (and other defines) yourself, several
+ * \note As of version 1.5.0 of the Raspberry Pi Pico SDK, the \c pico_cyw43_arch library no longer directly implements
+ * the distinct behavioral abstractions. This is now handled by the more general \ref pico_async_context library. The
+ * user facing behavior of pico_cyw43_arch has not changed as a result of this implementation detail, however pico_cyw43_arch
+ * is now just a thin wrapper which creates an appropriate async_context and makes a simple call to add lwIP or cyw43_driver support
+ * as appropriate. You are free to perform this context creation and adding of lwIP, cyw43_driver or indeed any other additional
+ * future protocol/driver support to your async_context, however for now pico_cyw43_arch does still provide a few cyw43_ specific (i.e. Pico W)
+ * APIs still for connection management, locking and GPIO interaction.
+ *
+ * \note The connection management APIs at least may be moved
+ * to a more generic library in a future release. The locking methods are now backed by their \ref pico_async_context equivalents, and
+ * those methods may be used interchangeably (see \ref cyw43_arch_lwip_begin, \ref cyw43_arch_lwip_end and \ref cyw43_arch_lwip_check for more details).
+ *
+ * \note For examples of creating of your own async_context and addition of \c cyw43_driver and \c lwIP support, please
+ * refer to the specific source files \c cyw43_arch_poll.c, \c cyw43_arch_threadsafe_background.c and \c cyw43_arch_freertos.c.
+ *
+ * Whilst you can use the \c pico_cyw43_arch library directly and specify \ref CYW$#_LWIP (and other defines) yourself, several
  * other libraries are made available to the build which aggregate the defines and other dependencies for you:
  *
  * * \b pico_cyw43_arch_lwip_poll - For using the RAW lwIP API (in `NO_SYS=1` mode) without any background processing or multi-core/thread safety.
@@ -145,7 +161,7 @@ extern "C" {
  * which defaults to \c CYW43_COUNTRY_WORLDWIDE. Worldwide settings may not give the best performance; consider
  * setting PICO_CYW43_ARCH_DEFAULT_COUNTRY_CODE to a different value or calling \ref cyw43_arch_init_with_country
  *
- * By default this method initializes the cyw43_arch code's own \ref async_context by calling
+ * By default this method initializes the cyw43_arch code's own async_context by calling
  * \ref cyw43_arch_init_default_async_context, however the user can specify use of their own async_context
  * by calling \ref cyw43_arch_set_async_context() before calling this method
  *
@@ -161,7 +177,7 @@ int cyw43_arch_init(void);
  * was enabled at build time). This method must be called prior to using any other \c pico_cyw43_arch,
  * \c cyw43_driver or lwIP functions.
  *
- * By default this method initializes the cyw43_arch code's own \ref async_context by calling
+ * By default this method initializes the cyw43_arch code's own async_context by calling
  * \ref cyw43_arch_init_default_async_context, however the user can specify use of their own async_context
  * by calling \ref cyw43_arch_set_async_context() before calling this method
  *
@@ -202,7 +218,7 @@ async_context_t *cyw43_arch_async_context(void);
 void cyw43_arch_set_async_context(async_context_t *context);
 
 /*!
- * \brief Initialize the default \ref async_context for the current cyw43_arch type
+ * \brief Initialize the default async_context for the current cyw43_arch type
  * \ingroup pico_cyw43_arch
  *
  * This method initializes and returns a pointer to the static async_context associated
@@ -246,8 +262,13 @@ void cyw43_arch_wait_for_work_until(absolute_time_t until);
  * If you are using single-core polling only (pico_cyw43_arch_poll) then these calls are no-ops
  * anyway it is good practice to call them anyway where they are necessary.
  *
+ * \note as of SDK release 1.5.0, this is now equivalent to calling \ref pico_async_context_acquire_lock_blocking
+ * on the async_context associated with cyw43_arch and lwIP.
+ *
  * \sa cyw43_arch_lwip_end
  * \sa cyw43_arch_lwip_protect
+ * \sa async_context_acquire_lock_blocking
+ * \sa cyw43_arch_async_context
  */
 static inline void cyw43_arch_lwip_begin(void) {
     cyw43_thread_enter();
@@ -264,8 +285,13 @@ static inline void cyw43_arch_lwip_begin(void) {
  * If you are using single-core polling only (pico_cyw43_arch_poll) then these calls are no-ops
  * anyway it is good practice to call them anyway where they are necessary.
  *
+ * \note as of SDK release 1.5.0, this is now equivalent to calling \ref async_context_release_lock
+ * on the async_context associated with cyw43_arch and lwIP.
+ *
  * \sa cyw43_arch_lwip_begin
  * \sa cyw43_arch_lwip_protect
+ * \sa async_context_release_lock
+ * \sa cyw43_arch_async_context
  */
 static inline void cyw43_arch_lwip_end(void) {
     cyw43_thread_exit();
@@ -306,8 +332,13 @@ static inline int cyw43_arch_lwip_protect(int (*func)(void *param), void *param)
  * This method will assert in debug mode, if the above conditions are not met (i.e. it is not safe to
  * call into the lwIP API)
  *
+ * \note as of SDK release 1.5.0, this is now equivalent to calling \ref async_context_lock_check
+ * on the async_context associated with cyw43_arch and lwIP.
+ *
  * \sa cyw43_arch_lwip_begin
  * \sa cyw43_arch_lwip_protect
+ * \sa async_context_lock_check
+ * \sa cyw43_arch_async_context
  */
 
 /*!
