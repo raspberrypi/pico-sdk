@@ -143,6 +143,9 @@ static inline void __compiler_memory_barrier(void) {
 
 uint get_core_num();
 
+static inline uint __get_current_exception(void) {
+    return 0;
+}
 #ifdef __cplusplus
 }
 #endif

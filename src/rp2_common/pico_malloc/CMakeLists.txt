@@ -1,6 +1,6 @@
 if (NOT TARGET pico_malloc)
     #shims for ROM functions for -lgcc functions  (listed below)
-    pico_add_library(pico_malloc NOFLAG)
+    pico_add_library(pico_malloc)
 
     target_sources(pico_malloc INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/pico_malloc.c

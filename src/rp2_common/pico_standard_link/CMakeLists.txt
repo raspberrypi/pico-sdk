@@ -1,5 +1,5 @@
 if (NOT TARGET pico_standard_link)
-    pico_add_library(pico_standard_link NOFLAG)
+    pico_add_library(pico_standard_link)
 
     target_sources(pico_standard_link INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/crt0.S

@@ -1,7 +1,7 @@
 if (NOT TARGET pico_int64_ops)
 
     #shims for ROM functions for -lgcc functions  (listed below)
-    pico_add_library(pico_int64_ops NOFLAG)
+    pico_add_library(pico_int64_ops)
 
     # no custom implementation; falls thru to compiler
     pico_add_library(pico_int64_ops_compiler)

@@ -1,6 +1,6 @@
 if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
     if (TARGET cyw43_driver_picow)
-        pico_add_library(pico_cyw43_arch NOFLAG)
+        pico_add_library(pico_cyw43_arch)
         target_sources(pico_cyw43_arch INTERFACE
                 ${CMAKE_CURRENT_LIST_DIR}/cyw43_arch.c
                 ${CMAKE_CURRENT_LIST_DIR}/cyw43_arch_poll.c

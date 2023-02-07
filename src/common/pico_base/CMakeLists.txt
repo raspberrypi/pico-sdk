@@ -11,4 +11,3 @@ if (NOT TARGET pico_base_headers)
     list(APPEND PICO_SDK_POST_LIST_FILES ${CMAKE_CURRENT_LIST_DIR}/generate_config_header.cmake)
     pico_promote_common_scope_vars()
 endif()
-
