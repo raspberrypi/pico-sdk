@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _I2C_SLAVE_H_
-#define _I2C_SLAVE_H_
+#ifndef _PICO_I2C_SLAVE_H_
+#define _PICO_I2C_SLAVE_H_
 
 #include "hardware/i2c.h"
 
@@ -63,4 +63,4 @@ void i2c_slave_deinit(i2c_inst_t *i2c);
 }
 #endif
 
-#endif // _I2C_SLAVE_H_
+#endif // _PICO_I2C_SLAVE_H_
