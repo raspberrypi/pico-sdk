@@ -1,6 +1,6 @@
 if (NOT TARGET pico_float)
     # library to be depended on - we make this depend on particular implementations using per target generator expressions
-    pico_add_library(pico_float NOFLAG)
+    pico_add_library(pico_float)
 
     # no custom implementation; falls thru to compiler
     pico_add_library(pico_float_compiler)

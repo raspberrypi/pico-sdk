@@ -1,6 +1,6 @@
 if (NOT TARGET pico_printf)
     # library to be depended on - we make this depend on particular implementations using per target generator expressions
-    pico_add_library(pico_printf NOFLAG)
+    pico_add_library(pico_printf)
 
     # no custom implementation; falls thru to compiler
     pico_add_library(pico_printf_compiler)

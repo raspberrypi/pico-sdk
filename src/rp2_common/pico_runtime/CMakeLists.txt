@@ -1,4 +1,4 @@
-pico_add_library(pico_runtime NOFLAG)
+pico_add_library(pico_runtime)
 
 target_sources(pico_runtime INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/runtime.c

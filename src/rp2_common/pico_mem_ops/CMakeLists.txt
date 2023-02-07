@@ -3,7 +3,7 @@ if (NOT TARGET pico_mem_ops)
     pico_add_library(pico_mem_ops)
 
     # no custom implementation; falls thru to compiler
-    add_library(pico_mem_ops_compiler INTERFACE)
+    pico_add_library(pico_mem_ops_compiler)
 
     # add alias "default" which is just pico.
     add_library(pico_mem_ops_default INTERFACE)
