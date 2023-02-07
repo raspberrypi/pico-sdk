@@ -67,7 +67,7 @@ extern "C" {
  * is now just a thin wrapper which creates an appropriate async_context and makes a simple call to add lwIP or cyw43_driver support
  * as appropriate. You are free to perform this context creation and adding of lwIP, cyw43_driver or indeed any other additional
  * future protocol/driver support to your async_context, however for now pico_cyw43_arch does still provide a few cyw43_ specific (i.e. Pico W)
- * APIs still for connection management, locking and GPIO interaction.
+ * APIs for connection management, locking and GPIO interaction.
  *
  * \note The connection management APIs at least may be moved
  * to a more generic library in a future release. The locking methods are now backed by their \ref pico_async_context equivalents, and
@@ -76,7 +76,7 @@ extern "C" {
  * \note For examples of creating of your own async_context and addition of \c cyw43_driver and \c lwIP support, please
  * refer to the specific source files \c cyw43_arch_poll.c, \c cyw43_arch_threadsafe_background.c and \c cyw43_arch_freertos.c.
  *
- * Whilst you can use the \c pico_cyw43_arch library directly and specify \ref CYW$#_LWIP (and other defines) yourself, several
+ * Whilst you can use the \c pico_cyw43_arch library directly and specify \ref CYW43_LWIP (and other defines) yourself, several
  * other libraries are made available to the build which aggregate the defines and other dependencies for you:
  *
  * * \b pico_cyw43_arch_lwip_poll - For using the RAW lwIP API (in `NO_SYS=1` mode) without any background processing or multi-core/thread safety.
