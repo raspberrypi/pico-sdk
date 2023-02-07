@@ -41,7 +41,7 @@ static inline void *remove_thumb_bit(void *addr) {
 
 static void set_raw_irq_handler_and_unlock(uint num, irq_handler_t handler, uint32_t save) {
     // update vtable (vtable_handler may be same or updated depending on cases, but we do it anyway for compactness)
-    get_vtable()[16 + num] = handler;
+    get_vtable()[VTABLE_FIRST_IRQ + num] = handler;
     __dmb();
     spin_unlock(spin_lock_instance(PICO_SPINLOCK_ID_IRQ), save);
 }
@@ -306,7 +306,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
             // Sadly this is not something we can detect.
 
             uint exception = __get_current_exception();
-            hard_assert(!exception || exception == num + 16);
+            hard_assert(!exception || exception == num + VTABLE_FIRST_IRQ);
 
             struct irq_handler_chain_slot *prev_slot = NULL;
             struct irq_handler_chain_slot *existing_vtable_slot = remove_thumb_bit(vtable_handler);

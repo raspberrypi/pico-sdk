@@ -280,7 +280,7 @@ static void process_under_lock(async_context_threadsafe_background_t *self) {
 
 // Low priority interrupt handler to perform background processing
 static void low_priority_irq_handler(void) {
-    uint index = __get_current_exception() - 16 - FIRST_USER_IRQ;
+    uint index = __get_current_exception() - VTABLE_FIRST_IRQ - FIRST_USER_IRQ;
     assert(index < count_of(async_contexts_by_user_irq));
     async_context_threadsafe_background_t *self = async_contexts_by_user_irq[index];
     if (!self) return;

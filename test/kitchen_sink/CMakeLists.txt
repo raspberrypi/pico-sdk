@@ -30,6 +30,7 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_double
     pico_fix_rp2040_usb_device_enumeration
     pico_float
+    pico_i2c_slave
     pico_int64_ops
     pico_malloc
     pico_mem_ops
