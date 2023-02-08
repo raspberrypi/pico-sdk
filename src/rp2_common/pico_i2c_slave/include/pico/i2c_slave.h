@@ -23,7 +23,7 @@ extern "C" {
  * so that a user supplied handler is called with enumerated I2C events.
  *
  * An example application \c slave_mem_i2c, which makes use of this library, can be found in 
- * <a href="https://github.com/raspberrypi/pico-examples/blob/master/i2c/slave_mem_i2c/slave_mem_i2c.c>pico_examples</a>.
+ * <a href="https://github.com/raspberrypi/pico-examples/blob/master/i2c/slave_mem_i2c/slave_mem_i2c.c">pico_examples</a>.
  */
 
 /**
