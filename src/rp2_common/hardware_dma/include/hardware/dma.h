@@ -157,7 +157,6 @@ static inline void channel_config_set_read_increment(dma_channel_config *c, bool
  * \param c Pointer to channel configuration object
  * \param incr True to enable write address increments, if false, each write will be to the same address
  *             Usually disabled for memory to peripheral transfers
- * Usually disabled for memory to peripheral transfers
  */
 static inline void channel_config_set_write_increment(dma_channel_config *c, bool incr) {
     c->ctrl = incr ? (c->ctrl | DMA_CH0_CTRL_TRIG_INCR_WRITE_BITS) : (c->ctrl & ~DMA_CH0_CTRL_TRIG_INCR_WRITE_BITS);
