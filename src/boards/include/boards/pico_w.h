@@ -99,4 +99,19 @@
 #define CYW43_WL_GPIO_LED_PIN 0
 #endif
 
+// CYW43 GPIO to get VBUS
+#ifndef CYW43_WL_GPIO_VBUS_PIN
+#define CYW43_WL_GPIO_VBUS_PIN 2
+#endif
+
+// VSYS pin is shared with CYW43
+#ifndef CYW43_USES_VSYS_PIN
+#define CYW43_USES_VSYS_PIN 1
+#endif
+
+// Pin used to monitor VSYS using ADC
+#ifndef PICO_VSYS_PIN
+#define PICO_VSYS_PIN 29
+#endif
+
 #endif
