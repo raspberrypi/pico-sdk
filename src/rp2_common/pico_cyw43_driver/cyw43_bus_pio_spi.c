@@ -140,7 +140,6 @@ int cyw43_spi_init(cyw43_int_t *self) {
     pio_sm_set_config(bus_data->pio, bus_data->pio_sm, &config);
     pio_sm_set_consecutive_pindirs(bus_data->pio, bus_data->pio_sm, CLOCK_PIN, 1, true);
     gpio_set_function(DATA_OUT_PIN, bus_data->pio_func_sel);
-    gpio_set_function(CLOCK_PIN, bus_data->pio_func_sel);
 
     // Set data pin to pull down and schmitt
     gpio_set_pulls(DATA_IN_PIN, false, true);
@@ -189,9 +188,11 @@ static __noinline void ns_delay(uint32_t ns) {
 
 static void start_spi_comms(cyw43_int_t *self) {
     bus_data_t *bus_data = (bus_data_t *)self->bus_data;
+    gpio_set_function(DATA_OUT_PIN, bus_data->pio_func_sel);
+    gpio_set_function(CLOCK_PIN, bus_data->pio_func_sel);
+    gpio_pull_down(CLOCK_PIN);
     // Pull CS low
     cs_set(false);
-    gpio_set_function(DATA_OUT_PIN, bus_data->pio_func_sel);
 }
 
 // we need to atomically de-assert CS and enable IRQ
