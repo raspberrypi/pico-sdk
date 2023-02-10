@@ -482,12 +482,12 @@ int cyw43_write_reg_u8(cyw43_int_t *self, uint32_t fn, uint32_t reg, uint32_t va
 #error Block size is wrong for SPI
 #endif
 
-// Assumes we're reading into spid_buf
 int cyw43_read_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len, uint8_t *buf) {
     assert(fn != BACKPLANE_FUNCTION || (len <= 64 && (addr + len) <= 0x8000));
     const uint32_t padding = (fn == BACKPLANE_FUNCTION) ? 4 : 0; // Add response delay
     size_t aligned_len = (len + 3) & ~3;
     assert(aligned_len > 0 && aligned_len <= 0x7f8);
+    assert(buf == self->spid_buf || buf < self->spid_buf || buf >= (self->spid_buf + sizeof(self->spid_buf)));
     self->spi_header[padding > 0 ? 0 : 1] = make_cmd(false, true, fn, addr, len + padding);
     if (fn == WLAN_FUNCTION) {
         logic_debug_set(pin_WIFI_RX, 1);

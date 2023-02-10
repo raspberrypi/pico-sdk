@@ -168,10 +168,12 @@ void async_context_freertos_acquire_lock_blocking(async_context_t *self_base) {
     self->nesting++;
 }
 
-void async_context_freertos_lock_check(async_context_t *self_base) {
+void async_context_freertos_lock_check(__unused async_context_t *self_base) {
+#ifndef NDEBUG
     async_context_freertos_t *self = (async_context_freertos_t *)self_base;
     // Lock the other core and stop low_prio_irq running
     assert(xSemaphoreGetMutexHolder(self->lock_mutex) == xTaskGetCurrentTaskHandle());
+#endif
 }
 
 typedef struct sync_func_call{

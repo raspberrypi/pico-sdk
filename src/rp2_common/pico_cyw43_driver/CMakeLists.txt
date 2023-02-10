@@ -18,6 +18,8 @@ endif()
 if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     message("cyw43-driver available at ${PICO_CYW43_DRIVER_PATH}")
 
+    add_subdirectory(cybt_shared_bus)
+
     pico_register_common_scope_var(PICO_CYW43_DRIVER_PATH)
 
     # base driver without our bus
@@ -40,47 +42,51 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     target_include_directories(pico_cyw43_driver_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
     pico_mirrored_target_link_libraries(pico_cyw43_driver INTERFACE cyw43_driver)
 
-    # Firmware stuff
-    set(CYW43_FIRMWARE_BIN 43439A0-7.95.49.00.combined)
-    string(REGEX REPLACE [\\\.\-] _ CYW43_FIRMWARE_BIN_ ${CYW43_FIRMWARE_BIN})
-    string(REGEX MATCH [^_]+_?[^_]*_?[^_]*_?[^_]*_?[^_]* CYW43_FIRMWARE_PRETTY ${CYW43_FIRMWARE_BIN_})
-    set(CYW43_FIRMWARE_PRETTY fw_${CYW43_FIRMWARE_PRETTY})
-    set(RESOURCE_SECNAME .big_const)
-    set(RESOURCE_SECFLAGS contents,alloc,load,readonly,data)
-    set(CYW43_FIRMWARE_OBJ ${CMAKE_CURRENT_BINARY_DIR}/cyw43_resource.o)
-
-    add_custom_target(cyw43_firmware_package DEPENDS ${CYW43_FIRMWARE_OBJ})
-
-    # cyw43_resource.o contains the WiFi and BT firmware as a binary blob
-    add_custom_command(
-            OUTPUT ${CYW43_FIRMWARE_OBJ}
-            DEPENDS ${PICO_CYW43_DRIVER_PATH}/firmware/${CYW43_FIRMWARE_BIN}
-            WORKING_DIRECTORY ${PICO_CYW43_DRIVER_PATH}/firmware
-            COMMAND ${CMAKE_OBJCOPY} -I binary -O elf32-littlearm -B arm
-            --readonly-text
-            --rename-section .data=${RESOURCE_SECNAME},${RESOURCE_SECFLAGS}
-            --redefine-sym _binary_${CYW43_FIRMWARE_BIN_}_start=${CYW43_FIRMWARE_PRETTY}_start
-            --redefine-sym _binary_${CYW43_FIRMWARE_BIN_}_end=${CYW43_FIRMWARE_PRETTY}_end
-            --redefine-sym _binary_${CYW43_FIRMWARE_BIN_}_size=${CYW43_FIRMWARE_PRETTY}_size
-            ${CYW43_FIRMWARE_BIN} ${CYW43_FIRMWARE_OBJ}
-            VERBATIM)
-
-    # cyw43_driver_picow is cyw43_driver plus Pico W specific bus implementation, and Pico W firmware
+    # cyw43_driver_picow is cyw43_driver plus Pico W specific bus implementation
     pico_add_library(cyw43_driver_picow NOFLAG)
     target_sources(cyw43_driver_picow INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/cyw43_bus_pio_spi.c
             )
-    pico_generate_pio_header(cyw43_driver_picow_headers ${CMAKE_CURRENT_LIST_DIR}/cyw43_bus_pio_spi.pio)
-    add_dependencies(cyw43_driver_picow INTERFACE cyw43_firmware_package)
-    target_link_libraries(cyw43_driver_picow INTERFACE
-            ${CYW43_FIRMWARE_OBJ}
-            )
+    pico_generate_pio_header(cyw43_driver_picow ${CMAKE_CURRENT_LIST_DIR}/cyw43_bus_pio_spi.pio)
     pico_mirrored_target_link_libraries(cyw43_driver_picow INTERFACE
             cyw43_driver
+            cybt_shared_bus
             hardware_pio
             hardware_dma
             hardware_exception
             )
+
+    # Note: This is used by MP, so check for issues when making changes
+    # e.g. Don't add new depenedences
+    pico_add_library(pico_btstack_hci_transport_cyw43 NOFLAG)
+    target_sources(pico_btstack_hci_transport_cyw43 INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/btstack_hci_transport_cyw43.c
+            )
+    target_include_directories(pico_btstack_hci_transport_cyw43_headers INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/include
+            )
+    target_compile_definitions(pico_btstack_hci_transport_cyw43_headers INTERFACE
+            CYW43_ENABLE_BLUETOOTH=1
+            )
+
+    if (TARGET pico_btstack_base)
+        message("Pico W Bluetooth build support available.")
+
+        pico_add_library(pico_btstack_cyw43)
+        target_sources(pico_btstack_cyw43 INTERFACE
+                ${CMAKE_CURRENT_LIST_DIR}/btstack_cyw43.c
+                )
+        target_include_directories(pico_btstack_cyw43_headers INTERFACE
+                ${CMAKE_CURRENT_LIST_DIR}/include
+                )
+        pico_mirrored_target_link_libraries(pico_btstack_cyw43 INTERFACE
+                pico_btstack_base
+                pico_btstack_flash_bank
+                pico_btstack_run_loop_async_context
+                pico_cyw43_arch
+                pico_btstack_hci_transport_cyw43
+                )
+    endif()
 
     pico_promote_common_scope_vars()
 endif()

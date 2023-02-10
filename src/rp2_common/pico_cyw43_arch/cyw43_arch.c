@@ -47,7 +47,7 @@ void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t 
 
 #if PICO_CYW43_ARCH_DEBUG_ENABLED
 // Return a string for the wireless state
-const char* cyw43_tcpip_link_status_name(int status)
+static const char* cyw43_tcpip_link_status_name(int status)
 {
     switch (status) {
     case CYW43_LINK_DOWN:

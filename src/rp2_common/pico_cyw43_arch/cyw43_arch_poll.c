@@ -13,6 +13,10 @@
 #include "pico/lwip_nosys.h"
 #endif
 
+#if CYW43_ENABLE_BLUETOOTH
+#include "pico/btstack_cyw43.h"
+#endif
+
 #if CYW43_LWIP && !NO_SYS
 #error PICO_CYW43_ARCH_POLL requires lwIP NO_SYS=1
 #endif
@@ -36,6 +40,9 @@ int cyw43_arch_init(void) {
 #if CYW43_LWIP
     ok &= lwip_nosys_init(context);
 #endif
+#if CYW43_ENABLE_BLUETOOTH
+    ok &= btstack_cyw43_init(context);
+#endif
     if (!ok) {
         cyw43_arch_deinit();
         return PICO_ERROR_GENERIC;
@@ -46,6 +53,9 @@ int cyw43_arch_init(void) {
 
 void cyw43_arch_deinit(void) {
     async_context_t *context = cyw43_arch_async_context();
+#if CYW43_ENABLE_BLUETOOTH
+    btstack_cyw43_deinit(context);
+#endif
     // there is a bit of a circular dependency here between lwIP and cyw43_driver. We
     // shut down cyw43_driver first as it has IRQs calling back into lwIP. Also lwIP itself
     // does not actually get shut down.

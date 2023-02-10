@@ -62,8 +62,9 @@
  * \defgroup networking Networking Libraries
  * Functions for implementing networking
  * @{
- * \defgroup pico_cyw43_driver pico_cyw43_driver
+ * \defgroup pico_btstack pico_btstack
  * \defgroup pico_lwip pico_lwip
+ * \defgroup pico_cyw43_driver pico_cyw43_driver
  * \defgroup pico_cyw43_arch pico_cyw43_arch
  * @}
  *

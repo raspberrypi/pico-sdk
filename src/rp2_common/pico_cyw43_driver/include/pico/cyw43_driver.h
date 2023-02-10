@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _PICO_CYW43_DRIVER_ASYNC_CONTEXT_H
-#define _PICO_CYW43_DRIVER_ASYNC_CONTEXT_H
+#ifndef _PICO_CYW43_DRIVER_H
+#define _PICO_CYW43_DRIVER_H
 
 /** \file pico/cyw43_driver.h
  *  \defgroup pico_cyw43_driver pico_cyw43_driver

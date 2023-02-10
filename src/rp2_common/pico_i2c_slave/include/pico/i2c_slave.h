@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _PICO_I2C_SLAVE_H_
-#define _PICO_I2C_SLAVE_H_
+#ifndef _PICO_I2C_SLAVE_H
+#define _PICO_I2C_SLAVE_H
 
 #include "hardware/i2c.h"
 

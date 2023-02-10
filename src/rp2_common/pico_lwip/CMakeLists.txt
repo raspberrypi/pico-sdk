@@ -264,6 +264,7 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
     pico_add_library(pico_lwip_arch NOFLAG)
     target_include_directories(pico_lwip_arch_headers INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_link_libraries(pico_lwip_arch INTERFACE pico_rand)
 
     # our nosys impl
     pico_add_library(pico_lwip_nosys NOFLAG)
@@ -273,8 +274,7 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
     pico_mirrored_target_link_libraries(pico_lwip_nosys INTERFACE
             pico_async_context_base
             pico_lwip_arch
-            pico_lwip
-            pico_rand)
+            pico_lwip)
 
     if (NOT PICO_LWIP_CONTRIB_PATH)
         set(PICO_LWIP_CONTRIB_PATH ${PICO_LWIP_PATH}/contrib)
