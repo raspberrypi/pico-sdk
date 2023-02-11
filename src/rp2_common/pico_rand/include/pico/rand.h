@@ -138,7 +138,7 @@ extern "C" {
 #ifndef PICO_RAND_RAM_HASH_END
 #define PICO_RAND_RAM_HASH_END     SRAM_END
 #endif
-// PICO_CONFIG: PICO_RAND_RAM_HASH_START, start of address in RAM (inclusive) to hash during pico_rand seed initialization, default=PICO_RAND_RAM_HASH_END-1024, group=pico_rand
+// PICO_CONFIG: PICO_RAND_RAM_HASH_START, start of address in RAM (inclusive) to hash during pico_rand seed initialization, default=PICO_RAND_RAM_HASH_END - 1024, group=pico_rand
 #ifndef PICO_RAND_RAM_HASH_START
 #define PICO_RAND_RAM_HASH_START   (PICO_RAND_RAM_HASH_END - 1024u)
 #endif
