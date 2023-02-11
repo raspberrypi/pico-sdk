@@ -29,6 +29,7 @@ uint spi_init(spi_inst_t *spi, uint baudrate) {
 
     // Finally enable the SPI
     hw_set_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
+
     return baud;
 }
 
@@ -42,6 +43,10 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
     uint freq_in = clock_get_hz(clk_peri);
     uint prescale, postdiv;
     invalid_params_if(SPI, baudrate > freq_in);
+
+    // Disable the SPI
+    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
+    hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
 
     // Find smallest prescale value which puts output frequency in range of
     // post-divide. Prescale is an even number from 2 to 254 inclusive.
@@ -60,6 +65,9 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
 
     spi_get_hw(spi)->cpsr = prescale;
     hw_write_masked(&spi_get_hw(spi)->cr0, (postdiv - 1) << SPI_SSPCR0_SCR_LSB, SPI_SSPCR0_SCR_BITS);
+
+    // Re-enable the SPI
+    hw_set_bits(&spi_get_hw(spi)->cr1, enable_mask);
 
     // Return the frequency we were able to achieve
     return freq_in / (prescale * postdiv);
