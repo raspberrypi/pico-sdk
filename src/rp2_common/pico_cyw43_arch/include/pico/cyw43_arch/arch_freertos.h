@@ -12,7 +12,7 @@
 #define CYW43_TASK_STACK_SIZE 1024
 #endif
 
-// PICO_CONFIG: CYW43_TASK_PRIORITY, Priority for the CYW43 FreeRTOS task, type=int default=4, group=pico_cyw43_arch
+// PICO_CONFIG: CYW43_TASK_PRIORITY, Priority for the CYW43 FreeRTOS task, type=int, default=tskIDLE_PRIORITY + 4, group=pico_cyw43_arch
 #ifndef CYW43_TASK_PRIORITY
 #define CYW43_TASK_PRIORITY (tskIDLE_PRIORITY + 4)
 #endif

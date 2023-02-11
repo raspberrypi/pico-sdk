@@ -23,7 +23,7 @@
 #define PICO_STDIO_UART_DEFAULT_CRLF PICO_STDIO_DEFAULT_CRLF
 #endif
 
-// PICO_CONFIG: PICO_STDIO_UART_SUPPORT_CHARS_AVAILABLE_CALLBACK, Enable UART STDIO support for stdio_set_chars_available_callback. Can be disabled to make use of the uart elsewhere, type=bool default=1, group=pico_stdio_uart
+// PICO_CONFIG: PICO_STDIO_UART_SUPPORT_CHARS_AVAILABLE_CALLBACK, Enable UART STDIO support for stdio_set_chars_available_callback. Can be disabled to make use of the uart elsewhere, type=bool, default=1, group=pico_stdio_uart
 #ifndef PICO_STDIO_UART_SUPPORT_CHARS_AVAILABLE_CALLBACK
 #define PICO_STDIO_UART_SUPPORT_CHARS_AVAILABLE_CALLBACK 1
 #endif
