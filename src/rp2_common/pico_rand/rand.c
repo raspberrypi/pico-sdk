@@ -272,7 +272,7 @@ uint64_t get_rand_64(void) {
     if (bus_counter_value == BUSCTRL_PERFCTR0_BITS) {
         bus_ctrl_hw->counter[bus_counter_idx].value = 0;
     }
-    local_rng_state.r[which] &= splitmix64(bus_counter_value);
+    local_rng_state.r[which] ^= splitmix64(bus_counter_value);
     which ^= 1;
 #endif
 
