@@ -32,7 +32,7 @@ extern "C" {
  * slaves when performing data transfers. A master is a device that initiates a data transfer on the bus and generates the
  * clock signals to permit that transfer. The first byte in the data transfer always contains the 7-bit address and
  * a read/write bit in the LSB position. This API takes care of toggling the read/write bit. After this, any device addressed
- * is considered a slave. 
+ * is considered a slave.
  *
  * This API allows the controller to be set up as a master or a slave using the \ref i2c_set_slave_mode function.
  *
@@ -97,6 +97,22 @@ extern i2c_inst_t i2c1_inst;
  */
 uint i2c_init(i2c_inst_t *i2c, uint baudrate);
 
+/*! \brief   Initialise the I2C HW block with 10-bit addressing
+ *  \ingroup hardware_i2c
+ *
+ * Put the I2C hardware into a known state, and enable it. Must be called
+ * before other functions. By default, the I2C is configured to operate as a
+ * master.
+ *
+ * The I2C bus frequency is set as close as possible to requested, and
+ * the return actual rate set is returned
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param baudrate Baudrate in Hz (e.g. 100kHz is 100000)
+ * \return Actual set baudrate
+ */
+uint i2c_init_10bit(i2c_inst_t *i2c, uint baudrate);
+
 /*! \brief   Disable the I2C HW block
  *  \ingroup hardware_i2c
  *
@@ -128,6 +144,15 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate);
  * \param addr If \p slave is true, set the slave address to this value
  */
 void i2c_set_slave_mode(i2c_inst_t *i2c, bool slave, uint8_t addr);
+
+/*! \brief  Set I2C port to slave mode with 10-bit addressing
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param slave true to use slave mode, false to use master mode
+ * \param addr If \p slave is true, set the slave address to this value
+ */
+void i2c_set_slave_mode_10bit(i2c_inst_t *i2c, bool slave, uint16_t addr);
 
 // ----------------------------------------------------------------------------
 // Generic input/output
@@ -176,6 +201,23 @@ static inline i2c_inst_t *i2c_get_instance(uint instance) {
  */
 int i2c_write_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop, absolute_time_t until);
 
+/*! \brief Attempt to write specified number of bytes to address, blocking until the specified absolute time is reached with 10-bit addressing.
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param addr 10-bit address of device to write to
+ * \param src Pointer to data to send
+ * \param len Length of data in bytes to send
+ * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
+ *           and the next transfer will begin with a Restart rather than a Start.
+ * \param until The absolute time that the block will wait until the entire transaction is complete. Note, an individual timeout of
+ *           this value divided by the length of data is applied for each byte transfer, so if the first or subsequent
+ *           bytes fails to transfer within that sub timeout, the function will return with an error.
+ *
+ * \return Number of bytes written, or PICO_ERROR_GENERIC if address not acknowledged, no device present, or PICO_ERROR_TIMEOUT if a timeout occurred.
+ */
+int i2c_write_blocking_until_10bit(i2c_inst_t *i2c, uint16_t addr, const uint8_t *src, size_t len, bool nostop, absolute_time_t until);
+
 /*! \brief  Attempt to read specified number of bytes from address, blocking until the specified absolute time is reached.
  *  \ingroup hardware_i2c
  *
@@ -189,6 +231,20 @@ int i2c_write_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, 
  * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged, no device present, or PICO_ERROR_TIMEOUT if a timeout occurred.
  */
 int i2c_read_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until);
+
+/*! \brief  Attempt to read specified number of bytes from address, blocking until the specified absolute time is reached with 10-bit addressing.
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param addr 10-bit address of device to read from
+ * \param dst Pointer to buffer to receive data
+ * \param len Length of data in bytes to receive
+ * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
+ *           and the next transfer will begin with a Restart rather than a Start.
+ * \param until The absolute time that the block will wait until the entire transaction is complete.
+ * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged, no device present, or PICO_ERROR_TIMEOUT if a timeout occurred.
+ */
+int i2c_read_blocking_until_10bit(i2c_inst_t *i2c, uint16_t addr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until);
 
 /*! \brief Attempt to write specified number of bytes to address, with timeout
  *  \ingroup hardware_i2c
@@ -210,7 +266,29 @@ static inline int i2c_write_timeout_us(i2c_inst_t *i2c, uint8_t addr, const uint
     return i2c_write_blocking_until(i2c, addr, src, len, nostop, t);
 }
 
+/*! \brief Attempt to write specified number of bytes to address, with timeout, with 10-bit addressing.
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param addr 10-bit address of device to write to
+ * \param src Pointer to data to send
+ * \param len Length of data in bytes to send
+ * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
+ *           and the next transfer will begin with a Restart rather than a Start.
+ * \param timeout_us The time that the function will wait for the entire transaction to complete. Note, an individual timeout of
+ *           this value divided by the length of data is applied for each byte transfer, so if the first or subsequent
+ *           bytes fails to transfer within that sub timeout, the function will return with an error.
+ *
+ * \return Number of bytes written, or PICO_ERROR_GENERIC if address not acknowledged, no device present, or PICO_ERROR_TIMEOUT if a timeout occurred.
+ */
+static inline int i2c_write_timeout_us_10bit(i2c_inst_t *i2c, uint16_t addr, const uint8_t *src, size_t len, bool nostop, uint timeout_us) {
+    absolute_time_t t = make_timeout_time_us(timeout_us);
+    return i2c_write_blocking_until_10bit(i2c, addr, src, len, nostop, t);
+}
+
 int i2c_write_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop, uint timeout_per_char_us);
+
+int i2c_write_timeout_per_char_us_10bit(i2c_inst_t *i2c, uint16_t addr, const uint8_t *src, size_t len, bool nostop, uint timeout_per_char_us);
 
 /*! \brief  Attempt to read specified number of bytes from address, with timeout
  *  \ingroup hardware_i2c
@@ -229,7 +307,26 @@ static inline int i2c_read_timeout_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
     return i2c_read_blocking_until(i2c, addr, dst, len, nostop, t);
 }
 
+/*! \brief  Attempt to read specified number of bytes from address, with timeout, with 10-bit addressing
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param addr 10-bit address of device to read from
+ * \param dst Pointer to buffer to receive data
+ * \param len Length of data in bytes to receive
+ * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
+ *           and the next transfer will begin with a Restart rather than a Start.
+ * \param timeout_us The time that the function will wait for the entire transaction to complete
+ * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged, no device present, or PICO_ERROR_TIMEOUT if a timeout occurred.
+ */
+static inline int i2c_read_timeout_us_10bit(i2c_inst_t *i2c, uint16_t addr, uint8_t *dst, size_t len, bool nostop, uint timeout_us) {
+    absolute_time_t t = make_timeout_time_us(timeout_us);
+    return i2c_read_blocking_until_10bit(i2c, addr, dst, len, nostop, t);
+}
+
 int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, uint timeout_per_char_us);
+
+int i2c_read_timeout_per_char_us_10bit(i2c_inst_t *i2c, uint16_t addr, uint8_t *dst, size_t len, bool nostop, uint timeout_per_char_us);
 
 /*! \brief Attempt to write specified number of bytes to address, blocking
  *  \ingroup hardware_i2c
@@ -244,6 +341,19 @@ int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, si
  */
 int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop);
 
+/*! \brief Attempt to write specified number of bytes to address, blocking
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param addr 10-bit address of device to write to
+ * \param src Pointer to data to send
+ * \param len Length of data in bytes to send
+ * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
+ *           and the next transfer will begin with a Restart rather than a Start.
+ * \return Number of bytes written, or PICO_ERROR_GENERIC if address not acknowledged, no device present.
+ */
+int i2c_write_blocking_10bit(i2c_inst_t *i2c, uint16_t addr, const uint8_t *src, size_t len, bool nostop);
+
 /*! \brief  Attempt to read specified number of bytes from address, blocking
  *  \ingroup hardware_i2c
  *
@@ -256,6 +366,19 @@ int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t
  * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
  */
 int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop);
+
+/*! \brief  Attempt to read specified number of bytes from address, blocking
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param addr 10-bit address of device to read from
+ * \param dst Pointer to buffer to receive data
+ * \param len Length of data in bytes to receive
+ * \param nostop  If true, master retains control of the bus at the end of the transfer (no Stop is issued),
+ *           and the next transfer will begin with a Restart rather than a Start.
+ * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
+ */
+int i2c_read_blocking_10bit(i2c_inst_t *i2c, uint16_t addr, uint8_t *dst, size_t len, bool nostop);
 
 
 /*! \brief Determine non-blocking write space available
