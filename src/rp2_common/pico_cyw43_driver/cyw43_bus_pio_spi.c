@@ -8,11 +8,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
-#include "hardware/structs/iobank0.h"
 #include "hardware/sync.h"
 #include "hardware/dma.h"
 #include "cyw43_bus_pio_spi.pio.h"
