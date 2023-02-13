@@ -11,7 +11,7 @@
  *
  * For more details, see <a href="https://bluekitchen-gmbh.com/btstack/develop/#how_to/">How to configure BTstack</a> and the relevant <a href="https://github.com/raspberrypi/pico-examples#pico-w-bluetooth">pico-examples</a>.
  *
- * The follow ibraries provided for you to link.
+ * The follow libraries are provided for you to link.
  * * \c \b pico_btstack_ble - Adds Bluetooth Low Energy (LE) support.
  * * \c \b pico_btstack_classic - Adds Bluetooth Classic support.
  * * \c \b pico_btstack_sbc_encoder - Adds Bluetooth Sub Band Coding (SBC) encoder support.
