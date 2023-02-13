@@ -13,7 +13,7 @@
 #endif
 
 // in our case not a busy wait
-PICO_WEAK_FUNCTION_DEF(busy_wait_us)
+PICO_WEAK_FUNCTION_DEF(busy_wait_us_32)
 void PICO_WEAK_FUNCTION_IMPL_NAME(busy_wait_us_32)(uint32_t delay_us) {
 #if defined(__unix__) || defined(__APPLE__)
     usleep(delay_us);
@@ -21,11 +21,21 @@ void PICO_WEAK_FUNCTION_IMPL_NAME(busy_wait_us_32)(uint32_t delay_us) {
     assert(false);
 #endif
 }
+
 PICO_WEAK_FUNCTION_DEF(busy_wait_us)
 void PICO_WEAK_FUNCTION_IMPL_NAME(busy_wait_us)(uint64_t delay_us) {
     absolute_time_t t;
     update_us_since_boot(&t, time_us_64() + delay_us);
     busy_wait_until(t);
+}
+
+PICO_WEAK_FUNCTION_DEF(busy_wait_ms)
+void PICO_WEAK_FUNCTION_IMPL_NAME(busy_wait_ms)(uint32_t delay_ms) {
+#if defined(__unix__) || defined(__APPLE__)
+    usleep(delay_ms * 1000);
+#else
+    assert(false);
+#endif
 }
 
 // this may or may not wrap
