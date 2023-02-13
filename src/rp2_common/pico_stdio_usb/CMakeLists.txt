@@ -18,4 +18,10 @@ if (TARGET tinyusb_device_unmarked)
     target_link_libraries(pico_stdio_usb INTERFACE
         tinyusb_device_unmarked
     )
+    # PICO_CMAKE_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) during initialization, default=0, group=pico_stdio_usb
+    if (PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS)
+        target_compile_definitions(pico_stdio_usb INTERFACE
+            PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS=${PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS}
+        )
+    endif()
 endif()
