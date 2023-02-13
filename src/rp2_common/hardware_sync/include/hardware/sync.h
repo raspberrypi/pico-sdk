@@ -300,7 +300,6 @@ inline static bool is_spin_locked(spin_lock_t *lock) {
  *
  * \param lock Spinlock instance
  * \param saved_irq Return value from the \ref spin_lock_blocking() function.
- * \return interrupt status to be used when unlocking, to restore to original state
  *
  * \sa spin_lock_blocking()
  */

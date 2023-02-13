@@ -83,7 +83,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
  * \brief Return a copy of the default configuration object used by \ref async_context_freertos_init_with_defaults() 
  * \ingroup async_context_freertos
  *
- * The caller can then modify just the settings it cares about, and call \ref async_context_threasafe_background_init()
+ * The caller can then modify just the settings it cares about, and call \ref async_context_freertos_init()
  * \return the default configuration object
  */
  static inline async_context_freertos_config_t async_context_freertos_default_config(void) {
