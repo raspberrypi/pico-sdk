@@ -432,7 +432,6 @@ static inline uint32_t interp_peek_full_result(interp_hw_t *interp) {
  * \param interp Interpolator instance, interp0 or interp1.
  * \param lane The lane number, 0 or 1
  * \param val Value to add
- * \return The content of the FULL register
  */
 static inline void interp_add_accumulater(interp_hw_t *interp, uint lane, uint32_t val) {
     interp->add_raw[lane] = val;

@@ -81,7 +81,7 @@ extern "C" {
  *
  * * \b pico_cyw43_arch_lwip_poll - For using the RAW lwIP API (in `NO_SYS=1` mode) without any background processing or multi-core/thread safety.
  *
- *    The user must call \ref pico_cyw43_poll periodically from their main loop.
+ *    The user must call \ref cyw43_arch_poll periodically from their main loop.
  *
  *    This wrapper library:
  *    - Sets \c CYW43_LWIP=1 to enable lwIP support in \c pico_cyw43_arch and \c cyw43_driver.
@@ -262,7 +262,7 @@ void cyw43_arch_wait_for_work_until(absolute_time_t until);
  * If you are using single-core polling only (pico_cyw43_arch_poll) then these calls are no-ops
  * anyway it is good practice to call them anyway where they are necessary.
  *
- * \note as of SDK release 1.5.0, this is now equivalent to calling \ref pico_async_context_acquire_lock_blocking
+ * \note as of SDK release 1.5.0, this is now equivalent to calling \ref async_context_acquire_lock_blocking
  * on the async_context associated with cyw43_arch and lwIP.
  *
  * \sa cyw43_arch_lwip_end
@@ -353,7 +353,7 @@ uint32_t cyw43_arch_get_country_code(void);
  * \brief Enables Wi-Fi STA (Station) mode.
  * \ingroup pico_cyw43_arch
  *
- * This enables the Wi-Fi in \emStation mode such that connections can be made to other Wi-Fi Access Points
+ * This enables the Wi-Fi in \em Station mode such that connections can be made to other Wi-Fi Access Points
  */
 void cyw43_arch_enable_sta_mode(void);
 
@@ -388,7 +388,7 @@ int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t 
  *
  * \param ssid the network name to connect to
  * \param bssid the network BSSID to connect to or NULL if ignored
- * \param password the network password or NULL if there is no password required
+ * \param pw the network password or NULL if there is no password required
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  *
@@ -404,6 +404,7 @@ int cyw43_arch_wifi_connect_bssid_blocking(const char *ssid, const uint8_t *bssi
  * \param pw the network password or NULL if there is no password required
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ * \param timeout how long to wait in milliseconds for a connection to succeed before giving up
  *
  * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
  */
@@ -415,9 +416,10 @@ int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_
  *
  * \param ssid the network name to connect to
  * \param bssid the network BSSID to connect to or NULL if ignored
- * \param password the network password or NULL if there is no password required
+ * \param pw the network password or NULL if there is no password required
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ * \param timeout how long to wait in milliseconds for a connection to succeed before giving up
  *
  * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
  */
@@ -448,7 +450,7 @@ int cyw43_arch_wifi_connect_async(const char *ssid, const char *pw, uint32_t aut
  *
  * \param ssid the network name to connect to
  * \param bssid the network BSSID to connect to or NULL if ignored
- * \param password the network password or NULL if there is no password required
+ * \param pw the network password or NULL if there is no password required
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  *

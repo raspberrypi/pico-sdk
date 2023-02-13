@@ -85,7 +85,7 @@ bool async_context_threadsafe_background_init(async_context_threadsafe_backgroun
  * \brief Return a copy of the default configuration object used by \ref async_context_threadsafe_background_init_with_defaults() 
  * \ingroup async_context_threadsafe_background
  *
- * The caller can then modify just the settings it cares about, and call \ref async_context_threasafe_background_init()
+ * The caller can then modify just the settings it cares about, and call \ref async_context_threadsafe_background_init()
  * \return the default configuration object
  */
 async_context_threadsafe_background_config_t async_context_threadsafe_background_default_config(void);

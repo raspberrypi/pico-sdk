@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 /** \file pico/btstack_cyw43.h
- * \defgroup pico_btstack_cyw43
+ * \defgroup pico_btstack_cyw43 pico_btstack_cyw43
  * \ingroup pico_cyw43_driver
  *
  * \brief Low-level Bluetooth HCI support.

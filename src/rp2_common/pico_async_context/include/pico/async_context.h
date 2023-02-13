@@ -31,7 +31,7 @@
  * Note: "when pending" workers with work pending are executed before "at time" workers.
  *
  * The async_context provides locking mechanisms, see \ref async_context_acquire_lock_blocking,
- * \ref async_context_release_lock and \ref async_context_check_lock which can be used by
+ * \ref async_context_release_lock and \ref async_context_lock_check which can be used by
  * external code to ensure execution of external code does not happen concurrently with worker code.
  * Locked code runs on the calling core, however \ref async_context_execute_sync is provided to
  * synchronously run a function from the core of the async_context.
@@ -245,7 +245,7 @@ static inline void async_context_lock_check(async_context_t *context) {
  *
  * \param context the async_context
  * \param func the function to call
- * \param parm the paramter to pass to the function
+ * \param param the paramter to pass to the function
  * \return the return value from func
  */
 static inline uint32_t async_context_execute_sync(async_context_t *context, uint32_t (*func)(void *param), void *param) {
@@ -455,7 +455,6 @@ static inline uint async_context_core_num(const async_context_t *context) {
  * callback is being called once this method returns.
  *
  * \param context the async_context
- * \return the physical core number
  */
 static inline void async_context_deinit(async_context_t *context) {
     context->type->deinit(context);

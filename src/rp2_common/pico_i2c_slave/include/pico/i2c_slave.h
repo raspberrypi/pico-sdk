@@ -44,7 +44,7 @@ typedef enum i2c_slave_event_t
  * The event handler will run from the I2C ISR, so it should return quickly (under 25 us at 400 kb/s).
  * Avoid blocking inside the handler and split large data transfers across multiple calls for best results.
  * When sending data to master, up to \ref i2c_get_write_available()  bytes can be written without blocking.
- * When receiving data from master, up to \ref 2c_get_read_available() bytes can be read without blocking.
+ * When receiving data from master, up to \ref i2c_get_read_available() bytes can be read without blocking.
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
  * \param event Event type.
