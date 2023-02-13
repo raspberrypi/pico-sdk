@@ -404,7 +404,7 @@ int cyw43_arch_wifi_connect_bssid_blocking(const char *ssid, const uint8_t *bssi
  * \param pw the network password or NULL if there is no password required
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
- * \param timeout
+ * \param timeout how long to wait in milliseconds for a connection to succeed before giving up
  *
  * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
  */
@@ -419,7 +419,7 @@ int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_
  * \param pw the network password or NULL if there is no password required
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
- * \param timeout
+ * \param timeout how long to wait in milliseconds for a connection to succeed before giving up
  *
  * \return 0 if the initialization is successful, an error code otherwise \see pico_error_codes
  */
