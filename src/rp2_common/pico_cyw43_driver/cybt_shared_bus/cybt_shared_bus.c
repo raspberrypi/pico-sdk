@@ -13,8 +13,7 @@
 #include "cyw43_ll.h"
 #include "cyw43_config.h"
 #include "cybt_shared_bus_driver.h"
-
-#include "cyw43_btfw_43439.h"
+#include "cyw43_firmware_defs.h"
 
 #if CYW43_USE_HEX_BTFW
 extern const char    brcm_patch_version[];
@@ -134,14 +133,24 @@ int cyw43_btbus_init(cyw43_ll_t *self) {
     fw_data_len = brcm_patch_ram_length;
     fw_data_buf = brcm_patchram_buf;
 #else
-    fw_data_len = cyw43_btfw_43439_len;
-    fw_data_buf = cyw43_btfw_43439;
+    const cyw43_firmware_details_t *firmware_details = cyw43_get_firmware_funcs()->firmware_details();
+    fw_data_len = firmware_details->bt_fw_len;
+    fw_data_buf = firmware_details->bt_fw_addr;
+    if (cyw43_get_firmware_funcs()->start_bt_fw && cyw43_get_firmware_funcs()->start_bt_fw(firmware_details) != 0) {
+        assert(false);
+        return CYW43_EIO;
+    }
 #endif
     ret = cybt_fw_download(fw_data_buf,
                            fw_data_len,
                            p_write_buf,
-                           p_hex_buf
-    );
+                           p_hex_buf);
+
+#if !CYW43_USE_HEX_BTFW
+    if (cyw43_get_firmware_funcs()->end) {
+        cyw43_get_firmware_funcs()->end();
+    }
+#endif
 
     cybt_debug("cybt_fw_download_finish\n");
     cybt_fw_download_finish(p_write_buf, p_hex_buf);

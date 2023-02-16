@@ -11,6 +11,7 @@
 
 #include "cyw43_ll.h"
 #include "cybt_shared_bus_driver.h"
+#include "cyw43_firmware_defs.h"
 
 // Bluetooth register corruption occurs if both wifi and bluetooth are fully utilised.
 #define CYBT_CORRUPTION_TEST 1
@@ -111,7 +112,6 @@ cybt_fw_membuf_info_t buf_info;
 
 typedef struct cybt_fw_cb
 {
-    const uint8_t *p_fw_mem_start;
     uint32_t fw_len;
     const uint8_t *p_next_line_start;
 } cybt_fw_cb_t;
@@ -261,21 +261,37 @@ static uint32_t cybt_fw_get_data(cybt_fw_cb_t *p_btfw_cb,
 }
 #else
 
+static void cybt_fw_get_bytes(uint8_t *dst, const uint8_t **addr, uint8_t count) {
+#if CYW43_USE_HEX_BTFW
+    memcpy(dst, *addr, count);
+#else
+    const uint8_t *data = cyw43_get_firmware_funcs()->get_bt_fw(*addr, count, dst, count);
+    if (data != dst) {
+        memcpy(dst, data, count);
+    }
+#endif
+    *addr += count;
+}
+
 static uint32_t cybt_fw_get_data(cybt_fw_cb_t *p_btfw_cb, hex_file_data_t *hfd) {
     uint32_t abs_base_addr32 = 0;
     while (true) {
         // 4 byte header
-        uint8_t num_bytes = *(p_btfw_cb->p_next_line_start)++;
-        uint16_t addr = *(p_btfw_cb->p_next_line_start)++ << 8;
-        addr |= *(p_btfw_cb->p_next_line_start)++;
-        uint8_t type = *(p_btfw_cb->p_next_line_start)++;
+        uint8_t num_bytes;
+        cybt_fw_get_bytes(&num_bytes, &p_btfw_cb->p_next_line_start, 1);
+
+        uint16_t addr;
+        cybt_fw_get_bytes((uint8_t*)&addr, &p_btfw_cb->p_next_line_start, 2);
+        addr = (((addr >> 8) & 0xff) | ((addr & 0xff) << 8));
+
+        uint8_t type;
+        cybt_fw_get_bytes(&type, &p_btfw_cb->p_next_line_start, 1);
 
         // No data?
         if (num_bytes == 0) break;
 
         // Copy the data
-        memcpy(hfd->p_ds, p_btfw_cb->p_next_line_start, num_bytes);
-        p_btfw_cb->p_next_line_start += num_bytes;
+        cybt_fw_get_bytes(hfd->p_ds, &p_btfw_cb->p_next_line_start, num_bytes);
 
         // Adjust address based on type
         if (type == BTFW_HEX_LINE_TYPE_EXTENDED_ADDRESS) {
@@ -324,13 +340,16 @@ cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware,
 
     // BT firmware starts with length of version string including a null terminator
 #if !CYW43_USE_HEX_BTFW
-    uint8_t version_len = *p_bt_firmware;
-    assert(*(p_bt_firmware + version_len) == 0);
+    uint8_t version_len;
+    cybt_fw_get_bytes(&version_len, &p_bt_firmware, 1);
+    cybt_fw_get_bytes(p_hex_buf, &p_bt_firmware, version_len);
+    assert(*(p_hex_buf + version_len - 1) == 0);
 #ifndef NDEBUG
-    cybt_printf("BT FW download, version = %s\n", p_bt_firmware + 1);
+    cybt_printf("BT FW download, version = %s\n", p_hex_buf);
 #endif
-    p_bt_firmware += version_len + 1; // skip over version
-    p_bt_firmware += 1; // skip over record count
+    uint8_t record_count;
+    cybt_fw_get_bytes(&record_count, &p_bt_firmware, 1);
+    (void)record_count;
 #endif
 
     p_mem_ptr = p_write_buf;
@@ -340,7 +359,6 @@ cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware,
 
     hfd.p_ds = p_hex_buf;
 
-    btfw_cb.p_fw_mem_start = p_bt_firmware;
     btfw_cb.fw_len = bt_firmware_len;
     btfw_cb.p_next_line_start = p_bt_firmware;
 
@@ -395,7 +413,6 @@ cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware,
                            write_data_len - first_write_len);
         }
     }
-
     return CYBT_SUCCESS;
 }
 

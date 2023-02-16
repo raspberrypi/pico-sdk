@@ -15,6 +15,10 @@ elseif (NOT EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     message(WARNING "PICO_CYW43_DRIVER_PATH specified but content not present.")
 endif()
 
+if (NOT DEFINED PICO_CYW43_DRIVER_USES_UZLIB)
+    set(PICO_CYW43_DRIVER_USES_UZLIB 1)
+endif()
+
 if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     message("cyw43-driver available at ${PICO_CYW43_DRIVER_PATH}")
 
@@ -29,6 +33,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             ${PICO_CYW43_DRIVER_PATH}/src/cyw43_stats.c
             ${PICO_CYW43_DRIVER_PATH}/src/cyw43_lwip.c
             ${PICO_CYW43_DRIVER_PATH}/src/cyw43_ctrl.c
+            ${PICO_CYW43_DRIVER_PATH}/src/cyw43_gz_read.c
             )
     target_include_directories(cyw43_driver_headers INTERFACE
             ${PICO_CYW43_DRIVER_PATH}/src
@@ -55,7 +60,12 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             hardware_dma
             hardware_exception
             )
-
+    # MP has its own uzlib driver that's used for firmware decompression
+    if (PICO_CYW43_DRIVER_USES_UZLIB)
+        pico_mirrored_target_link_libraries(cyw43_driver_picow INTERFACE
+                pico_uzlib
+                )
+    endif()
     # Note: This is used by MP, so check for issues when making changes
     # e.g. Don't add new depenedences
     pico_add_library(pico_btstack_hci_transport_cyw43 NOFLAG)

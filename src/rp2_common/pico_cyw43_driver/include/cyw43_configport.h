@@ -12,6 +12,7 @@
 #include "pico.h"
 #include "hardware/gpio.h"
 #include "pico/time.h"
+#include "hardware/flash.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,16 +63,37 @@ extern "C" {
 #define CYW43_SPI_PIO 1
 #endif
 
+// Compress firmware by default
+#ifndef CYW43_ENABLE_FIRMWARE_COMPRESSION
+#define CYW43_ENABLE_FIRMWARE_COMPRESSION 1
+#endif
+
 #ifndef CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE
 #if CYW43_ENABLE_BLUETOOTH
+#if CYW43_ENABLE_FIRMWARE_COMPRESSION
+#define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "wb43439A0_7_95_49_00_combined.gz.h"
+#else
 #define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "wb43439A0_7_95_49_00_combined.h"
+#endif
+#else
+#if CYW43_ENABLE_FIRMWARE_COMPRESSION
+#define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "w43439A0_7_95_49_00_combined.gz.h"
 #else
 #define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "w43439A0_7_95_49_00_combined.h"
+#endif
 #endif
 #endif
 
 #ifndef CYW43_WIFI_NVRAM_INCLUDE_FILE
 #define CYW43_WIFI_NVRAM_INCLUDE_FILE "wifi_nvram_43439.h"
+#endif
+
+#ifndef CYW43_BT_FIRMWARE_INCLUDE_FILE
+#if CYW43_ENABLE_FIRMWARE_COMPRESSION
+#define CYW43_BT_FIRMWARE_INCLUDE_FILE "cyw43_btfw_43439.gz.h"
+#else
+#define CYW43_BT_FIRMWARE_INCLUDE_FILE "cyw43_btfw_43439.h"
+#endif
 #endif
 
 // Note, these are negated, because cyw43_driver negates them before returning!
