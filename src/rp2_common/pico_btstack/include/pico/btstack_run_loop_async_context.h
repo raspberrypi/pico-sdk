@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 /**
- * \brief Initialize and eturn the singleton BTstack run loop instance that integrates with the async_context API
+ * \brief Initialize and return the singleton BTstack run loop instance that integrates with the async_context API
  * \ingroup pico_btstack
  *
  * \param context the async_context instance that provides the abstraction for handling asynchronous work.
