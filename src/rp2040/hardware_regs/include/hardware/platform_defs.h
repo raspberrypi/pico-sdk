@@ -37,9 +37,39 @@
 
 #define PIO_INSTRUCTION_COUNT _u(32)
 
-// PICO_CONFIG: XOSC_MHZ, The crystal oscillator frequency in Mhz, type=int, default=12, advanced=true, group=hardware_base
+// For USB operation this *has* to be 48 MHz
+#define USB_CLK_MHZ _u(48)
+
+// PICO_CONFIG: SYS_CLK_MHZ, The system operating frequency in MHz, type=int, default=125, advanced=true, group=hardware_base
+#ifndef SYS_CLK_MHZ
+#define SYS_CLK_MHZ _u(125)
+#endif
+
+// PICO_CONFIG: XOSC_MHZ, The crystal oscillator frequency in MHz, type=int, default=12, advanced=true, group=hardware_base
 #ifndef XOSC_MHZ
 #define XOSC_MHZ _u(12)
+#endif
+
+ // Check for standard set-up
+#if (XOSC_MHZ == 12 && SYS_CLK_MHZ == 125)
+/// \tag::pll_settings[]
+// Configure PLLs
+//                   REF     FBDIV VCO            POSTDIV
+// PLL SYS: 12 / 1 = 12MHz * 125 = 1500MHz / 6 / 2 = 125MHz
+// PLL USB: 12 / 1 = 12MHz * 100 = 1200MHz / 5 / 5 =  48MHz
+/// \end::pll_settings[]
+#define PLL_SYS_VCO_FREQ_MHZ                1500
+#define PLL_SYS_POSTDIV1                    6
+#define PLL_SYS_POSTDIV2                    2
+
+#define PLL_USB_VCO_FREQ_MHZ                1200
+#define PLL_USB_POSTDIV1                    5
+#define PLL_USB_POSTDIV2                    5
+
+// Note: Do not trivially change this
+#define PLL_COMMON_REFDIV                   1
+#else
+#error Use vcocalc.py to calculate correct values for the revised XOSC and/or system clock frequencies and define here.
 #endif
 
 #define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)

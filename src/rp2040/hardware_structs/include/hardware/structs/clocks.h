@@ -29,7 +29,7 @@ enum clock_index {
     clk_gpout1,         ///< GPIO Muxing 1
     clk_gpout2,         ///< GPIO Muxing 2
     clk_gpout3,         ///< GPIO Muxing 3
-    clk_ref,            ///< Watchdog and timers reference clock
+    clk_ref,            ///< PLLs, Watchdog and timers reference clock
     clk_sys,            ///< Processors, bus fabric, memory, memory mapped registers
     clk_peri,           ///< Peripheral clock for UART and SPI
     clk_usb,            ///< USB clock

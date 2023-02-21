@@ -105,7 +105,7 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2);
  *  \ingroup pico_stdlib
  *
  * \param freq_khz Requested frequency
- * \param vco_freq_out On success, the voltage controller oscillator frequeucny to be used by the SYS PLL
+ * \param vco_freq_out On success, the voltage controlled oscillator frequency to be used by the SYS PLL
  * \param post_div1_out On success, The first post divider for the SYS PLL
  * \param post_div2_out On success, The second post divider for the SYS PLL.
  * @return true if the frequency is possible and the output parameters have been written.

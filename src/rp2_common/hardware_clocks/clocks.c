@@ -122,6 +122,9 @@ void clocks_init(void) {
     // Start tick in watchdog
     watchdog_start_tick(XOSC_MHZ);
 
+    // The PLL set-up further down requires the reference clock frequency to be known
+    configured_freq[clk_ref] = XOSC_MHZ * MHZ;
+
     // Everything is 48MHz on FPGA apart from RTC. Otherwise set to 0 and will be set in clock configure
     if (running_on_fpga()) {
         for (uint i = 0; i < CLK_COUNT; i++) {
@@ -145,54 +148,47 @@ void clocks_init(void) {
     while (clocks_hw->clk[clk_ref].selected != 0x1)
         tight_loop_contents();
 
-    /// \tag::pll_settings[]
-    // Configure PLLs
-    //                   REF     FBDIV VCO            POSTDIV
-    // PLL SYS: 12 / 1 = 12MHz * 125 = 1500MHz / 6 / 2 = 125MHz
-    // PLL USB: 12 / 1 = 12MHz * 100 = 1200MHz / 5 / 5 =  48MHz
-    /// \end::pll_settings[]
-
     /// \tag::pll_init[]
-    pll_init(pll_sys, 1, 1500 * MHZ, 6, 2);
-    pll_init(pll_usb, 1, 1200 * MHZ, 5, 5);
+    pll_init(pll_sys, PLL_COMMON_REFDIV, PLL_SYS_VCO_FREQ_MHZ * MHZ, PLL_SYS_POSTDIV1, PLL_SYS_POSTDIV2);
+    pll_init(pll_usb, PLL_COMMON_REFDIV, PLL_USB_VCO_FREQ_MHZ * MHZ, PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
     /// \end::pll_init[]
 
     // Configure clocks
-    // CLK_REF = XOSC (12MHz) / 1 = 12MHz
+    // CLK_REF = XOSC (usually) 12MHz / 1 = 12MHz
     clock_configure(clk_ref,
                     CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC,
                     0, // No aux mux
-                    12 * MHZ,
-                    12 * MHZ);
+                    XOSC_MHZ * MHZ,
+                    XOSC_MHZ * MHZ);
 
     /// \tag::configure_clk_sys[]
-    // CLK SYS = PLL SYS (125MHz) / 1 = 125MHz
+    // CLK SYS = PLL SYS (usually) 125MHz / 1 = 125MHz
     clock_configure(clk_sys,
                     CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
                     CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
-                    125 * MHZ,
-                    125 * MHZ);
+                    SYS_CLK_MHZ * MHZ,
+                    SYS_CLK_MHZ * MHZ);
     /// \end::configure_clk_sys[]
 
-    // CLK USB = PLL USB (48MHz) / 1 = 48MHz
+    // CLK USB = PLL USB 48MHz / 1 = 48MHz
     clock_configure(clk_usb,
                     0, // No GLMUX
                     CLOCKS_CLK_USB_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
-                    48 * MHZ,
-                    48 * MHZ);
+                    USB_CLK_MHZ * MHZ,
+                    USB_CLK_MHZ * MHZ);
 
-    // CLK ADC = PLL USB (48MHZ) / 1 = 48MHz
+    // CLK ADC = PLL USB 48MHZ / 1 = 48MHz
     clock_configure(clk_adc,
                     0, // No GLMUX
                     CLOCKS_CLK_ADC_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
-                    48 * MHZ,
-                    48 * MHZ);
+                    USB_CLK_MHZ * MHZ,
+                    USB_CLK_MHZ * MHZ);
 
-    // CLK RTC = PLL USB (48MHz) / 1024 = 46875Hz
+    // CLK RTC = PLL USB 48MHz / 1024 = 46875Hz
     clock_configure(clk_rtc,
                     0, // No GLMUX
                     CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
-                    48 * MHZ,
+                    USB_CLK_MHZ * MHZ,
                     46875);
 
     // CLK PERI = clk_sys. Used as reference clock for Peripherals. No dividers so just select and enable
@@ -200,8 +196,8 @@ void clocks_init(void) {
     clock_configure(clk_peri,
                     0,
                     CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLK_SYS,
-                    125 * MHZ,
-                    125 * MHZ);
+                    SYS_CLK_MHZ * MHZ,
+                    SYS_CLK_MHZ * MHZ);
 }
 
 /// \tag::clock_get_hz[]
