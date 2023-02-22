@@ -122,9 +122,6 @@ void clocks_init(void) {
     // Start tick in watchdog
     watchdog_start_tick(XOSC_MHZ);
 
-    // The PLL set-up further down requires the reference clock frequency to be known
-    configured_freq[clk_ref] = XOSC_MHZ * MHZ;
-
     // Everything is 48MHz on FPGA apart from RTC. Otherwise set to 0 and will be set in clock configure
     if (running_on_fpga()) {
         for (uint i = 0; i < CLK_COUNT; i++) {

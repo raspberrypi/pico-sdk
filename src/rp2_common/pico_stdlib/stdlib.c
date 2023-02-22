@@ -70,10 +70,9 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
 }
 
 bool check_sys_clock_khz(uint32_t freq_khz, uint *vco_out, uint *postdiv1_out, uint *postdiv2_out) {
-    static_assert(PLL_COMMON_REFDIV == 1, " This function implicitly assumes a 'refdiv' value of 1");
-    uint crystal_freq_khz = clock_get_hz(clk_ref) / KHZ;
+    uint reference_freq_khz = XOSC_MHZ * KHZ / PLL_COMMON_REFDIV;
     for (uint fbdiv = 320; fbdiv >= 16; fbdiv--) {
-        uint vco = fbdiv * crystal_freq_khz;
+        uint vco = fbdiv * reference_freq_khz;
         if (vco < PICO_PLL_VCO_MIN_FREQ_MHZ * KHZ  || vco > PICO_PLL_VCO_MAX_FREQ_MHZ * KHZ) continue;
         for (uint postdiv1 = 7; postdiv1 >= 1; postdiv1--) {
             for (uint postdiv2 = postdiv1; postdiv2 >= 1; postdiv2--) {

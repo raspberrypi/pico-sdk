@@ -50,28 +50,6 @@
 #define XOSC_MHZ _u(12)
 #endif
 
- // Check for standard set-up
-#if (XOSC_MHZ == 12 && SYS_CLK_MHZ == 125)
-/// \tag::pll_settings[]
-// Configure PLLs
-//                   REF     FBDIV VCO            POSTDIV
-// PLL SYS: 12 / 1 = 12MHz * 125 = 1500MHz / 6 / 2 = 125MHz
-// PLL USB: 12 / 1 = 12MHz * 100 = 1200MHz / 5 / 5 =  48MHz
-/// \end::pll_settings[]
-#define PLL_SYS_VCO_FREQ_MHZ                1500
-#define PLL_SYS_POSTDIV1                    6
-#define PLL_SYS_POSTDIV2                    2
-
-#define PLL_USB_VCO_FREQ_MHZ                1200
-#define PLL_USB_POSTDIV1                    5
-#define PLL_USB_POSTDIV2                    5
-
-// Note: Do not trivially change this
-#define PLL_COMMON_REFDIV                   1
-#else
-#error Use vcocalc.py to calculate correct values for the revised XOSC and/or system clock frequencies and define here.
-#endif
-
 #define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
 #define VTABLE_FIRST_IRQ 16
 
