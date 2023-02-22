@@ -82,7 +82,7 @@ typedef struct async_context async_context_t;
  *  \ingroup pico_async_context
  *
  *  A "timeout" represents some future action that must be taken at a specific time.
- *  It's methods are called from the async_context under lock at the given time
+ *  Its methods are called from the async_context under lock at the given time
  *
  * \see async_context_add_worker_at
  * \see async_context_add_worker_in_ms
@@ -117,7 +117,7 @@ typedef struct async_work_on_timeout {
  *
  *  A "worker" represents some external entity that must do work in response
  *  to some external stimulus (usually an IRQ).
- *  It's methods are called from the async_context under lock at the given time
+ *  Its methods are called from the async_context under lock at the given time
  *
  * \see async_context_add_worker_at
  * \see async_context_add_worker_in_ms

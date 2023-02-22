@@ -66,7 +66,7 @@ extern "C" {
 // PICO_CONFIG: PICO_DEFAULT_WS2812_PIN, Optionally define a pin that controls data to a WS2812 compatible LED on the board, group=pico_stdlib
 // PICO_CONFIG: PICO_DEFAULT_WS2812_POWER_PIN, Optionally define a pin that controls power to a WS2812 compatible LED on the board, group=pico_stdlib
 
-/*! \brief Set up the default UART and assign it to the default GPIO's
+/*! \brief Set up the default UART and assign it to the default GPIOs
  *  \ingroup pico_stdlib
  *
  * By default this will use UART 0, with TX to pin GPIO 0,

@@ -321,7 +321,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
                 if (next_slot_index >= 0) {
                     // There is another slot in the chain, so copy that over us, so that our inst3 points at something valid
                     // Note this only matters in the exception case anyway, and it that case, we will skip the next handler,
-                    // however in that case it's IRQ cause should immediately cause re-entry of the IRQ and the only side
+                    // however in that case its IRQ cause should immediately cause re-entry of the IRQ and the only side
                     // effect will be that there was potentially brief out of priority order execution of the handlers
                     struct irq_handler_chain_slot *next_slot = &irq_handler_chain_slots[next_slot_index];
                     to_free_slot->handler = next_slot->handler;
