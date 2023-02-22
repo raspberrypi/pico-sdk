@@ -14,6 +14,12 @@
 #include "hardware/irq.h"
 #include "hardware/gpio.h"
 
+// The RTC clock frequency is 48MHz divided by power of 2 (to ensure an integer
+// division ratio will be used in the clocks block).  A divisor of 1024 generates
+// an RTC clock tick of 46875Hz.  This frequency is relatively close to the
+// customary 32 or 32.768kHz 'slow clock' crystals and provides good timing resolution.
+#define RTC_CLOCK_FREQ_HZ       (USB_CLK_MHZ * MHZ / 1024)
+
 check_hw_layout(clocks_hw_t, clk[clk_adc].selected, CLOCKS_CLK_ADC_SELECTED_OFFSET);
 check_hw_layout(clocks_hw_t, fc0.result, CLOCKS_FC0_RESULT_OFFSET);
 check_hw_layout(clocks_hw_t, ints, CLOCKS_INTS_OFFSET);
@@ -127,7 +133,7 @@ void clocks_init(void) {
         for (uint i = 0; i < CLK_COUNT; i++) {
             configured_freq[i] = 48 * MHZ;
         }
-        configured_freq[clk_rtc] = 46875;
+        configured_freq[clk_rtc] = RTC_CLOCK_FREQ_HZ;
         return;
     }
 
@@ -186,7 +192,7 @@ void clocks_init(void) {
                     0, // No GLMUX
                     CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
                     USB_CLK_MHZ * MHZ,
-                    46875);
+                    RTC_CLOCK_FREQ_HZ);
 
     // CLK PERI = clk_sys. Used as reference clock for Peripherals. No dividers so just select and enable
     // Normally choose clk_sys or clk_usb
