@@ -4,17 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-// For MHZ definitions etc
+// For frequency and PLL definitions etc.
 #include "hardware/clocks.h"
 #include "hardware/pll.h"
 #include "hardware/resets.h"
 
 /// \tag::pll_init_calculations[]
 void pll_init(PLL pll, uint refdiv, uint vco_freq, uint post_div1, uint post_div2) {
-    uint32_t ref_freq = XOSC_MHZ * MHZ / refdiv;
+    uint32_t ref_freq = XOSC_KHZ * KHZ / refdiv;
 
     // Check vco freq is in an acceptable range
-    assert(vco_freq >= (PICO_PLL_VCO_MIN_FREQ_MHZ * MHZ) && vco_freq <= (PICO_PLL_VCO_MAX_FREQ_MHZ * MHZ));
+    assert(vco_freq >= (PICO_PLL_VCO_MIN_FREQ_KHZ * KHZ) && vco_freq <= (PICO_PLL_VCO_MAX_FREQ_KHZ * KHZ));
 
     // What are we multiplying the reference clock by to get the vco freq
     // (The regs are called div, because you divide the vco output and compare it to the refclk)

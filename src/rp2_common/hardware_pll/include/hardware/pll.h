@@ -31,12 +31,12 @@ typedef pll_hw_t *PLL;
 #define pll_sys pll_sys_hw
 #define pll_usb pll_usb_hw
 
-#ifndef PICO_PLL_VCO_MIN_FREQ_MHZ
-#define PICO_PLL_VCO_MIN_FREQ_MHZ 750
+#ifndef PICO_PLL_VCO_MIN_FREQ_KHZ
+#define PICO_PLL_VCO_MIN_FREQ_KHZ (750 * KHZ)
 #endif
 
-#ifndef PICO_PLL_VCO_MAX_FREQ_MHZ
-#define PICO_PLL_VCO_MAX_FREQ_MHZ 1600
+#ifndef PICO_PLL_VCO_MAX_FREQ_KHZ
+#define PICO_PLL_VCO_MAX_FREQ_KHZ (1600 * KHZ)
 #endif
 
 /*! \brief Initialise specified PLL.

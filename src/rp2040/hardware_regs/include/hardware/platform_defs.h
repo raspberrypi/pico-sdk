@@ -37,18 +37,22 @@
 
 #define PIO_INSTRUCTION_COUNT _u(32)
 
-// For USB operation this *has* to be 48 MHz
-#define USB_CLK_MHZ _u(48)
-
-// PICO_CONFIG: SYS_CLK_MHZ, The system operating frequency in MHz, type=int, default=125, advanced=true, group=hardware_base
-#ifndef SYS_CLK_MHZ
-#define SYS_CLK_MHZ _u(125)
+// PICO_CONFIG: XOSC_KHZ, The crystal oscillator frequency in kHz, type=int, default=12000, advanced=true, group=hardware_base
+// NOTE:  The system and USB clocks are generated from the frequency using two PLLs.
+// If you override this define, or SYS_CLK_KHZ below, you will *also* need to add your own adjusted PLL set-up defines to
+// overide the defaults which live in src/rp2_common/hardware_clocks/include/hardware/clocks.h
+// Please see the comments there about calculating the new PLL setting values.
+#ifndef XOSC_KHZ
+#define XOSC_KHZ _u(12000)
 #endif
 
-// PICO_CONFIG: XOSC_MHZ, The crystal oscillator frequency in MHz, type=int, default=12, advanced=true, group=hardware_base
-#ifndef XOSC_MHZ
-#define XOSC_MHZ _u(12)
+// PICO_CONFIG: SYS_CLK_KHZ, The system operating frequency in kHz, type=int, default=125000, advanced=true, group=hardware_base
+#ifndef SYS_CLK_KHZ
+#define SYS_CLK_KHZ _u(125000)
 #endif
+
+// For USB operation this *has* to be 48MHz
+#define USB_CLK_KHZ _u(48000)
 
 #define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
 #define VTABLE_FIRST_IRQ 16

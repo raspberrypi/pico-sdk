@@ -89,36 +89,45 @@ extern "C" {
 #define KHZ 1000
 #define MHZ 1000000
 
-#if (XOSC_MHZ == 12)
+/// \tag::pll_settings[]
+// There are two PLLs in RP2040:
+// The 'SYS PLL' generates the 125MHz system clock.
+// The 'USB PLL' generates the 48MHz USB clock.
+// The defines below are correct for the above two frequencies and a 12MHz crystal
+// frequency, defined as `XOSC_KHZ`.
+//
+// If you override `XOSC_KHZ`, the settings below will need to be checked and possibly
+// revised.  If you override `SYS_CLK_KHZ`, the settings below will need revised!
+// Use `vcocalc.py` to check and calculate new values if you change any of these frequencies.
+/// \end::pll_settings[]
+
 #ifndef PLL_COMMON_REFDIV
 // Software requires that the same 'reference divider' setting is used for both PLLs (although each has its own register).
-// In general, this is not an issue and 1 is the best setting - change with caution!
 #define PLL_COMMON_REFDIV                   1
 #endif
 
- // Pll settings for 48 MHz USB clock are based on being able to get an exact
- // 1200 MHz VCO, they _may_ need revising with a different reference frequency.
-#define PLL_USB_VCO_FREQ_MHZ                1200
+// NOTE:  PLL settings for a USB clock of 48MHz  are based on being able to get an
+// exact 1200MHz VCO, they may need revising with a different reference frequency.
+#ifndef PLL_USB_VCO_FREQ_KHZ
+#define PLL_USB_VCO_FREQ_KHZ                (1200 * KHZ)
+#endif
+#ifndef PLL_USB_POSTDIV1
 #define PLL_USB_POSTDIV1                    5
+#endif
+#ifndef PLL_USB_POSTDIV2
 #define PLL_USB_POSTDIV2                    5
-#else
-#error Use vcocalc.py to calculate correct values for the revised reference clock frequency and define here.
-#endif // XOSC_MHZ == 12
+#endif
 
- // Pll settings for standard system clock
-#if (SYS_CLK_MHZ == 125)
-/// \tag::pll_settings[]
-// Configure PLLs
-//          VCO        POSTDIV 1 & 2
-// PLL SYS: 1500MHz    / 6 / 2 = 125MHz
-// PLL USB: 1200MHz    / 5 / 5 =  48MHz
-/// \end::pll_settings[]
-#define PLL_SYS_VCO_FREQ_MHZ                1500
+// PLL settings for standard system clock with SYS_CLK_KHZ == 125,000
+#ifndef PLL_SYS_VCO_FREQ_KHZ
+#define PLL_SYS_VCO_FREQ_KHZ                (1500 * KHZ)
+#endif
+#ifndef PLL_SYS_POSTDIV1
 #define PLL_SYS_POSTDIV1                    6
+#endif
+#ifndef PLL_SYS_POSTDIV2
 #define PLL_SYS_POSTDIV2                    2
-#else
-#error Use vcocalc.py to calculate correct values for the revised system clock frequency and define here.
-#endif // SYS_CLK_MHZ == 125
+#endif
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_CLOCKS, Enable/disable assertions in the clocks module, type=bool, default=0, group=hardware_clocks
 #ifndef PARAM_ASSERTIONS_ENABLED_CLOCKS

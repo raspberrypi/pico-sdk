@@ -21,8 +21,8 @@ void set_sys_clock_48mhz() {
         clock_configure(clk_sys,
                         CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
                         CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
-                        USB_CLK_MHZ * MHZ,
-                        USB_CLK_MHZ * MHZ);
+                        USB_CLK_KHZ * KHZ,
+                        USB_CLK_KHZ * KHZ);
 
         // Turn off PLL sys for good measure
         pll_deinit(pll_sys);
@@ -31,8 +31,8 @@ void set_sys_clock_48mhz() {
         clock_configure(clk_peri,
                         0,
                         CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLK_SYS,
-                        USB_CLK_MHZ * MHZ,
-                        USB_CLK_MHZ * MHZ);
+                        USB_CLK_KHZ * KHZ,
+                        USB_CLK_KHZ * KHZ);
     }
 }
 
@@ -41,8 +41,8 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
         clock_configure(clk_sys,
                         CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
                         CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
-                        USB_CLK_MHZ * MHZ,
-                        USB_CLK_MHZ * MHZ);
+                        USB_CLK_KHZ * KHZ,
+                        USB_CLK_KHZ * KHZ);
 
         pll_init(pll_sys, PLL_COMMON_REFDIV, vco_freq, post_div1, post_div2);
         uint32_t freq = vco_freq / (post_div1 * post_div2);
@@ -52,8 +52,8 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
         clock_configure(clk_ref,
                         CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC,
                         0, // No aux mux
-                        XOSC_MHZ * MHZ,
-                        XOSC_MHZ * MHZ);
+                        XOSC_KHZ * KHZ,
+                        XOSC_KHZ * KHZ);
 
         // CLK SYS = PLL SYS (usually) 125MHz / 1 = 125MHz
         clock_configure(clk_sys,
@@ -64,16 +64,16 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
         clock_configure(clk_peri,
                         0, // Only AUX mux on ADC
                         CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
-                        USB_CLK_MHZ * MHZ,
-                        USB_CLK_MHZ * MHZ);
+                        USB_CLK_KHZ * KHZ,
+                        USB_CLK_KHZ * KHZ);
     }
 }
 
 bool check_sys_clock_khz(uint32_t freq_khz, uint *vco_out, uint *postdiv1_out, uint *postdiv2_out) {
-    uint reference_freq_khz = XOSC_MHZ * KHZ / PLL_COMMON_REFDIV;
+    uint reference_freq_khz = XOSC_KHZ / PLL_COMMON_REFDIV;
     for (uint fbdiv = 320; fbdiv >= 16; fbdiv--) {
         uint vco = fbdiv * reference_freq_khz;
-        if (vco < PICO_PLL_VCO_MIN_FREQ_MHZ * KHZ  || vco > PICO_PLL_VCO_MAX_FREQ_MHZ * KHZ) continue;
+        if (vco < PICO_PLL_VCO_MIN_FREQ_KHZ  || vco > PICO_PLL_VCO_MAX_FREQ_KHZ) continue;
         for (uint postdiv1 = 7; postdiv1 >= 1; postdiv1--) {
             for (uint postdiv2 = postdiv1; postdiv2 >= 1; postdiv2--) {
                 uint out = vco / (postdiv1 * postdiv2);

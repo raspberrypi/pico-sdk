@@ -17,7 +17,7 @@
 
 #define NUM_SPIN_LOCKS 32u
 
-#define XOSC_MHZ 12
+#define XOSC_KHZ 12000u
 
 #define NUM_SPIN_LOCKS 32u
 
