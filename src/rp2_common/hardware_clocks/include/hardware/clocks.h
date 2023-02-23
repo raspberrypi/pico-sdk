@@ -89,7 +89,6 @@ extern "C" {
 #define KHZ 1000
 #define MHZ 1000000
 
-/// \tag::pll_settings[]
 // There are two PLLs in RP2040:
 // The 'SYS PLL' generates the 125MHz system clock.
 // The 'USB PLL' generates the 48MHz USB clock.
@@ -99,7 +98,6 @@ extern "C" {
 // If you override `XOSC_KHZ`, the settings below will need to be checked and possibly
 // revised.  If you override `SYS_CLK_KHZ`, the settings below will need revised!
 // Use `vcocalc.py` to check and calculate new values if you change any of these frequencies.
-/// \end::pll_settings[]
 
 #ifndef PLL_COMMON_REFDIV
 // Software requires that the same 'reference divider' setting is used for both PLLs (although each has its own register).
@@ -118,6 +116,9 @@ extern "C" {
 #define PLL_USB_POSTDIV2                    5
 #endif
 
+static_assert(0 == (PLL_USB_VCO_FREQ_KHZ % XOSC_KHZ), "see use of `vcocal.py` above");
+static_assert(USB_CLK_KHZ == PLL_USB_VCO_FREQ_KHZ / PLL_USB_POSTDIV1 / PLL_USB_POSTDIV2, "see use of `vcocal.py` above");
+
 // PLL settings for standard system clock with SYS_CLK_KHZ == 125,000
 #ifndef PLL_SYS_VCO_FREQ_KHZ
 #define PLL_SYS_VCO_FREQ_KHZ                (1500 * KHZ)
@@ -128,6 +129,8 @@ extern "C" {
 #ifndef PLL_SYS_POSTDIV2
 #define PLL_SYS_POSTDIV2                    2
 #endif
+
+static_assert(SYS_CLK_KHZ == PLL_SYS_VCO_FREQ_KHZ / PLL_SYS_POSTDIV1 / PLL_SYS_POSTDIV2, "see use of `vcocal.py` above");
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_CLOCKS, Enable/disable assertions in the clocks module, type=bool, default=0, group=hardware_clocks
 #ifndef PARAM_ASSERTIONS_ENABLED_CLOCKS
