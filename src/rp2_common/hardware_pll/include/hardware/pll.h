@@ -23,7 +23,7 @@ extern "C" {
  *   - pll_sys - Used to generate up to a 133MHz system clock
  *   - pll_usb - Used to generate a 48MHz USB reference clock
  *
- * For details on how the PLL's are calculated, please refer to the RP2040 datasheet.
+ * For details on how the PLLs are calculated, please refer to the RP2040 datasheet.
  */
 
 typedef pll_hw_t *PLL;
