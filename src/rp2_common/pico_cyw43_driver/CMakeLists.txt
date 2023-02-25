@@ -61,6 +61,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     pico_add_library(pico_btstack_hci_transport_cyw43 NOFLAG)
     target_sources(pico_btstack_hci_transport_cyw43 INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/btstack_hci_transport_cyw43.c
+            ${CMAKE_CURRENT_LIST_DIR}/btstack_chipset_cyw43.c
             )
     target_include_directories(pico_btstack_hci_transport_cyw43_headers INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/include
