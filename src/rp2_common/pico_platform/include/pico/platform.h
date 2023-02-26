@@ -77,6 +77,7 @@ extern "C" {
 
 /*! \brief Marker for an interrupt handler
  *  \ingroup pico_platform
+ *
  * For example an IRQ handler function called my_interrupt_handler:
  *
  *     void __isr my_interrupt_handler(void) {
