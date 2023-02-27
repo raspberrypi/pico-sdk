@@ -9,6 +9,7 @@
 #include "hci_transport.h"
 #include "hci.h"
 #include "pico/btstack_hci_transport_cyw43.h"
+#include "pico/btstack_chipset_cyw43.h"
 
 // assert outgoing pre-buffer for cyw43 header is available
 #if !defined(HCI_OUTGOING_PRE_BUFFER_SIZE) || (HCI_OUTGOING_PRE_BUFFER_SIZE < 4)
@@ -58,6 +59,15 @@ static int hci_transport_cyw43_open(void) {
         CYW43_PRINTF("Failed to open cyw43 hci controller: %d\n", err);
         return err;
     }
+
+    // OTP should be set in which case BT gets an address of wifi mac + 1
+    // If OTP is not set for some reason BT gets set to 43:43:A2:12:1F:AC.
+    // So for safety, set the bluetooth device address here.
+    bd_addr_t addr;
+    cyw43_hal_get_mac(0, (uint8_t*)&addr);
+    addr[BD_ADDR_LEN - 1]++;
+    hci_set_chipset(btstack_chipset_cyw43_instance());
+    hci_set_bd_addr(addr);
 
     btstack_run_loop_set_data_source_handler(&transport_data_source, &hci_transport_data_source_process);
     btstack_run_loop_enable_data_source_callbacks(&transport_data_source, DATA_SOURCE_CALLBACK_POLL);

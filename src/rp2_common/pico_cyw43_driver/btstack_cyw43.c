@@ -59,7 +59,7 @@ bool btstack_cyw43_init(async_context_t *context) {
 #endif
 #endif
 
-	hci_init(hci_transport_cyw43_instance(), NULL);
+    hci_init(hci_transport_cyw43_instance(), NULL);
 
     // setup TLV storage
     setup_tlv();
