@@ -186,11 +186,11 @@ static inline int8_t slot_diff(struct irq_handler_chain_slot *to, struct irq_han
     int32_t result = 0xaaaa;
     // return (to - from);
     // note this implementation has limited range, but is fine for plenty more than -128->127 result
-    asm (".syntax unified\n"
+    unified_asm (
          "subs %1, %2\n"
          "adcs %1, %1\n" // * 2 (and + 1 if negative for rounding)
          "muls %0, %1\n"
-         "lsrs %0, 20\n"
+         "lsrs %0, %0, #20\n"
          : "+l" (result), "+l" (to)
          : "l" (from)
          :
@@ -221,9 +221,9 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
         // start new chain
         hard_assert(vtable_handler == __unhandled_user_irq);
         struct irq_handler_chain_slot slot_data = {
-                .inst1 = 0xa100,                                                    // add r1, pc, #0
-                .inst2 = make_branch(&slot->inst2, irq_handler_chain_first_slot),   // b irq_handler_chain_first_slot
-                .inst3 = 0xbd01,                                                    // pop {r0, pc}
+                .inst1 = 0xa100,                                                             // add r1, pc, #0
+                .inst2 = make_branch(&slot->inst2, (void *) irq_handler_chain_first_slot),   // b irq_handler_chain_first_slot
+                .inst3 = 0xbd01,                                                             // pop {r0, pc}
                 .link = -1,
                 .priority = order_priority,
                 .handler = handler
@@ -233,7 +233,7 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
     } else {
         assert(!((((uintptr_t)vtable_handler) - ((uintptr_t)irq_handler_chain_slots) - 1)%sizeof(struct irq_handler_chain_slot)));
         struct irq_handler_chain_slot *prev_slot = NULL;
-        struct irq_handler_chain_slot *existing_vtable_slot = remove_thumb_bit(vtable_handler);
+        struct irq_handler_chain_slot *existing_vtable_slot = remove_thumb_bit((void *) vtable_handler);
         struct irq_handler_chain_slot *cur_slot = existing_vtable_slot;
         while (cur_slot->priority > order_priority) {
             prev_slot = cur_slot;
@@ -259,9 +259,9 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
         } else {
             // update with new chain head
             struct irq_handler_chain_slot slot_data = {
-                    .inst1 = 0xa100,                                                    // add r1, pc, #0
-                    .inst2 = make_branch(&slot->inst2, irq_handler_chain_first_slot),   // b irq_handler_chain_first_slot
-                    .inst3 = make_branch(&slot->inst3, existing_vtable_slot),           // b existing_slot
+                    .inst1 = 0xa100,                                                             // add r1, pc, #0
+                    .inst2 = make_branch(&slot->inst2, (void *) irq_handler_chain_first_slot),   // b irq_handler_chain_first_slot
+                    .inst3 = make_branch(&slot->inst3, existing_vtable_slot),                    // b existing_slot
                     .link = get_slot_index(existing_vtable_slot),
                     .priority = order_priority,
                     .handler = handler
@@ -309,7 +309,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
             hard_assert(!exception || exception == num + VTABLE_FIRST_IRQ);
 
             struct irq_handler_chain_slot *prev_slot = NULL;
-            struct irq_handler_chain_slot *existing_vtable_slot = remove_thumb_bit(vtable_handler);
+            struct irq_handler_chain_slot *existing_vtable_slot = remove_thumb_bit((void *) vtable_handler);
             struct irq_handler_chain_slot *to_free_slot = existing_vtable_slot;
             while (to_free_slot->handler != handler) {
                 prev_slot = to_free_slot;
@@ -354,7 +354,7 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
                         // it to bl to irq_handler_chain_remove_tail which will remove the slot.
                         // NOTE THAT THIS TRASHES PRIORITY AND LINK SINCE THIS IS A 4 BYTE INSTRUCTION
                         //      BUT THEY ARE NOT NEEDED NOW
-                        insert_branch_and_link(&to_free_slot->inst3, irq_handler_chain_remove_tail);
+                        insert_branch_and_link(&to_free_slot->inst3, (void *) irq_handler_chain_remove_tail);
                     }
                 }
             } else {

@@ -16,12 +16,12 @@
 #include "pico/binary_info/structure.h"
 
 #if !PICO_NO_BINARY_INFO
-#define __bi_decl(name, bi, section_prefix, attr) static const attr __attribute__((section(section_prefix __STRING(name)))) struct _binary_info_core *name = bi
+#define __bi_decl(name, bi, section_prefix, attr) static const attr __attribute__((section(section_prefix __STRING(name)))) struct _binary_info_core *const name = bi
 #define __bi_lineno_var_name __CONCAT(__bi_, __LINE__)
 #define __bi_ptr_lineno_var_name __CONCAT(__bi_ptr, __LINE__)
 #define __bi_enclosure_check_lineno_var_name __CONCAT(_error_bi_is_missing_enclosing_decl_,__LINE__)
 #define __bi_mark_enclosure static const __unused int __bi_enclosure_check_lineno_var_name=0;
-#if !defined(__GNUC__) || __cplusplus || __GNUC__ >= 8
+#if __cplusplus || __GNUC__ >= 8
 #define __bi_enclosure_check(x) (x + __bi_enclosure_check_lineno_var_name)
 #else
 // skip the version check on older GCC non C++, as it doesn't compile.. this is only here to catch the
@@ -39,10 +39,10 @@
  * binary information declared this way will also be stripped
  * \ingroup pico_binary_info
  */
-#define bi_decl_if_func_used(_decl) ({__bi_mark_enclosure _decl; __bi_decl(__bi_ptr_lineno_var_name, &__bi_lineno_var_name.core, ".binary_info.", ); *(volatile uint8_t *)&__bi_ptr_lineno_var_name;});
+#define bi_decl_if_func_used(_decl) ({__bi_mark_enclosure _decl; __bi_decl(__bi_ptr_lineno_var_name, &__bi_lineno_var_name.core, ".binary_info.", ); *(const volatile uint8_t *)&__bi_ptr_lineno_var_name;});
 
 #define bi_decl_with_attr(_decl, _attr) __bi_mark_enclosure _attr _decl; __bi_decl(__bi_ptr_lineno_var_name, &__bi_lineno_var_name.core, ".binary_info.keep.", __used);
-#define bi_decl_if_func_used_with_attr(_decl, _attr) ({__bi_mark_enclosure _attr _decl; __bi_decl(__bi_ptr_lineno_var_name, &__bi_lineno_var_name.core, ".binary_info.", ); *(volatile uint8_t *)&__bi_ptr_lineno_var_name;});
+#define bi_decl_if_func_used_with_attr(_decl, _attr) ({__bi_mark_enclosure _attr _decl; __bi_decl(__bi_ptr_lineno_var_name, &__bi_lineno_var_name.core, ".binary_info.", ); *(const volatile uint8_t *)&__bi_ptr_lineno_var_name;});
 #else
 #define __bi_decl(bi, name, attr)
 #define bi_decl_with_attr(_decl, _attr)

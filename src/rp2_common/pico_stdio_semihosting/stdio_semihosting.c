@@ -25,11 +25,11 @@ static void stdio_semihosting_out_chars(const char *buf, int length) {
     args.buf = buf;
     args.len = length;
 
-    __asm (
+    unified_asm (
     // r1 must contain a pointer to the arguments
-    "mov r1, %[args]\n"
+    "movs r1, %[args]\n"
     // semihosting call number 0x05 = SYS_WRITE
-    "mov r0, #5\n"
+    "movs r0, #5\n"
     // make the semihosting call: https://developer.arm.com/documentation/dui0375/g/What-is-Semihosting-/The-semihosting-interface
     "bkpt 0xab\n"
     :

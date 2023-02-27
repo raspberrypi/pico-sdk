@@ -116,7 +116,7 @@ bool rom_funcs_lookup(uint32_t *table, unsigned int count);
 // Returns the 32 bit pointer into the ROM if found or NULL otherwise.
 typedef void *(*rom_table_lookup_fn)(uint16_t *table, uint32_t code);
 
-#if defined(__GNUC__) && (__GNUC__ >= 12)
+#if PICO_C_COMPILER_IS_GNU && (__GNUC__ >= 12)
 // Convert a 16 bit pointer stored at the given rom address into a 32 bit pointer
 static inline void *rom_hword_as_ptr(uint16_t rom_address) {
 #pragma GCC diagnostic push

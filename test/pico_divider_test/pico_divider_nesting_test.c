@@ -34,16 +34,16 @@ bool timer_callback(repeating_timer_t *t) {
             FAILED();
         }
     }
-    float fz = z;
+    float fz = (float)z;
     float fa = fz / 11.0f;
     float fb = fmodf(fz, 11.0f);
-    if (fabsf(fz - (fa * 11.0 + fb) > 1e-9)) {
+    if (fabs(fz - (fa * 11.0 + fb)) > 1e-9) {
         FAILED();
     }
     double dz = z;
     double da = dz / 11.0;
     double db = fmod(dz, 11.0);
-    if (fabsf(dz - (da * 11.0 + db) > 1e-9)) {
+    if (fabs(dz - (da * 11.0 + db)) > 1e-9) {
         FAILED();
     }
 

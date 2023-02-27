@@ -49,10 +49,12 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     # Override suppress_tinyusb_warnings to add suppression of (falsely) reported GCC 11.2 warnings
     function(suppress_tinyusb_warnings)
         _suppress_tinyusb_warnings()
-        set_source_files_properties(
-                ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/rp2040/rp2040_usb.c
-                PROPERTIES
-                COMPILE_FLAGS "-Wno-stringop-overflow -Wno-array-bounds")
+        if (PICO_C_COMPILER_IS_GNU)
+            set_source_files_properties(
+                    ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/rp2040/rp2040_usb.c
+                    PROPERTIES
+                    COMPILE_FLAGS "-Wno-stringop-overflow -Wno-array-bounds")
+        endif()
     endfunction()
 
     pico_promote_common_scope_vars()

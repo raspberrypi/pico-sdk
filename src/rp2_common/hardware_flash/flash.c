@@ -41,7 +41,7 @@ static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)(void) {
 }
 
 static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
-    ((void (*)(void))boot2_copyout+1)();
+    ((void (*)(void))((intptr_t)boot2_copyout+1))();
 }
 
 #else

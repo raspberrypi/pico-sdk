@@ -63,7 +63,7 @@ static uint32_t counter = 0;
 
 //#define SWAP32(A) ((((A) & 0xff000000U) >> 8) | (((A) & 0xff0000U) << 8) | (((A) & 0xff00U) >> 8) | (((A) & 0xffU) << 8))
 __force_inline static uint32_t __swap16x2(uint32_t a) {
-    __asm ("rev16 %0, %0" : "+l" (a) : : );
+    unified_asm ("rev16 %0, %0" : "+l" (a) : : );
     return a;
 }
 #define SWAP32(a) __swap16x2(a)

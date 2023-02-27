@@ -9,6 +9,7 @@
 
 #if !PICO_CXX_DISABLE_ALLOCATION_OVERRIDES // Let user override
 #include <cstdlib>
+#include "pico.h"
 
 void *operator new(std::size_t n) {
     return std::malloc(n);

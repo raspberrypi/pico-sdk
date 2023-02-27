@@ -6,7 +6,7 @@
 
 #include "hardware/claim.h"
 
-uint32_t hw_claim_lock() {
+uint32_t hw_claim_lock(void) {
     return spin_lock_blocking(spin_lock_instance(PICO_SPINLOCK_ID_HARDWARE_CLAIM));
 }
 

@@ -107,15 +107,6 @@
 
 #endif
 
-/**
- * Output a character to a custom device like UART, used by the printf() function
- * This function is declared here only. You have to write your custom implementation somewhere
- * \param character Character to output
- */
-static void _putchar(char character) {
-    putchar(character);
-}
-
 // output function type
 typedef void (*out_fct_type)(char character, void *buffer, size_t idx, size_t maxlen);
 
@@ -147,17 +138,6 @@ static inline void _out_null(char character, void *buffer, size_t idx, size_t ma
     (void) idx;
     (void) maxlen;
 }
-
-// internal _putchar wrapper
-static inline void _out_char(char character, void *buffer, size_t idx, size_t maxlen) {
-    (void) buffer;
-    (void) idx;
-    (void) maxlen;
-    if (character) {
-        _putchar(character);
-    }
-}
-
 
 // internal output function wrapper
 static inline void _out_fct(char character, void *buffer, size_t idx, size_t maxlen) {
@@ -920,6 +900,25 @@ int vfctprintf(void (*out)(char character, void *arg), void *arg, const char *fo
 
 #if LIB_PICO_PRINTF_PICO
 #if !PICO_PRINTF_ALWAYS_INCLUDED
+/**
+ * Output a character to a custom device like UART, used by the printf() function
+ * This function is declared here only. You have to write your custom implementation somewhere
+ * \param character Character to output
+ */
+static void _putchar(char character) {
+    putchar(character);
+}
+
+// internal _putchar wrapper
+static inline void _out_char(char character, void *buffer, size_t idx, size_t maxlen) {
+    (void) buffer;
+    (void) idx;
+    (void) maxlen;
+    if (character) {
+        _putchar(character);
+    }
+}
+
 bool weak_raw_printf(const char *fmt, ...) {
     va_list va;
     va_start(va, fmt);
