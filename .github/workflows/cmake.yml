@@ -4,8 +4,6 @@ on:
     branches-ignore:
       - 'iar/**'
   pull_request:
-    branches-ignore:
-      - 'iar/**'
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -13,7 +11,8 @@ env:
 
 jobs:
   build:
-    if: github.repository_owner == 'raspberrypi'
+    # cannot specify filter for pull_request in on: above, so do it here
+    if: github.repository_owner == 'raspberrypi' && (github.event_name != 'pull_request' || !startsWith(github.head_ref, 'iar/'))
     runs-on: [self-hosted, Linux, X64]
 
     steps:
@@ -39,8 +38,8 @@ jobs:
       # access regardless of the host operating system
       shell: bash
       working-directory: ${{github.workspace}}/build
-      # Note the current convention is to use the -S and -B options here to specify source 
-      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # Note the current convention is to use the -S and -B options here to specify source
+      # and build directories, but this is only available with CMake 3.13 and higher.
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPICO_SDK_TESTS_ENABLED=1
 
