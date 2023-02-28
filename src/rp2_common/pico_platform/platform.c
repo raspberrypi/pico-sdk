@@ -18,7 +18,7 @@
 #if !PICO_NO_FPGA_CHECK
 // Inline stub provided in header if this code is unused (so folding can be
 // done in each TU instead of relying on LTO)
-bool running_on_fpga() {
+bool running_on_fpga(void) {
     return !!((*(io_ro_32 *)TBMAN_BASE) & TBMAN_PLATFORM_FPGA_BITS);
 }
 #endif
@@ -26,7 +26,7 @@ bool running_on_fpga() {
 #define MANUFACTURER_RPI 0x927
 #define PART_RP2 0x2
 
-uint8_t rp2040_chip_version() {
+uint8_t rp2040_chip_version(void) {
     // First register of sysinfo is chip id
     uint32_t chip_id = *((io_ro_32*)(SYSINFO_BASE + SYSINFO_CHIP_ID_OFFSET));
     uint32_t __unused manufacturer = chip_id & SYSINFO_CHIP_ID_MANUFACTURER_BITS;

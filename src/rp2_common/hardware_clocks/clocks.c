@@ -78,8 +78,7 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
             // Note XOSC_COUNT is not helpful here because XOSC is not
             // necessarily running, nor is timer... so, 3 cycles per loop:
             uint delay_cyc = configured_freq[clk_sys] / configured_freq[clk_index] + 1;
-            asm volatile (
-                ".syntax unified \n\t"
+            unified_asm (
                 "1: \n\t"
                 "subs %0, #1 \n\t"
                 "bne 1b"

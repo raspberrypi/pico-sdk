@@ -325,13 +325,13 @@ hold_non_core0_in_bootrom:
 // ----------------------------------------------------------------------------
 // Stack/heap dummies to set size
 
-.section .stack
+.section .stack, "a"
 // align to allow for memory protection (although this alignment is pretty much ignored by linker script)
 .align 5
     .equ StackSize, PICO_STACK_SIZE
 .space StackSize
 
-.section .heap
+.section .heap, "a"
 .align 2
     .equ HeapSize, PICO_HEAP_SIZE
 .space HeapSize

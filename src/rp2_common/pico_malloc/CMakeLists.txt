@@ -3,7 +3,7 @@ if (NOT TARGET pico_malloc)
     pico_add_library(pico_malloc)
 
     target_sources(pico_malloc INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/pico_malloc.c
+            ${CMAKE_CURRENT_LIST_DIR}/pico_malloc_iar.c
             )
 
     target_include_directories(pico_malloc_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)

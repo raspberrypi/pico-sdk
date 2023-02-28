@@ -15,10 +15,6 @@ typedef struct i2c_slave {
 
 static i2c_slave_t i2c_slaves[2];
 
-static inline i2c_inst_t *get_hw_instance(const i2c_slave_t *slave) {
-    return i2c_get_instance(slave - i2c_slaves);
-}
-
 static void __isr __not_in_flash_func(i2c_slave_irq_handler)(void) {
     uint i2c_index = __get_current_exception() - VTABLE_FIRST_IRQ - I2C0_IRQ;
     i2c_slave_t *slave = &i2c_slaves[i2c_index];

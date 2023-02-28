@@ -8,9 +8,9 @@
 #include "pico/double.h"
 
 // opened a separate issue https://github.com/raspberrypi/pico-sdk/issues/166 to deal with these warnings if at all
-_Pragma("GCC diagnostic push")
-_Pragma("GCC diagnostic ignored \"-Wconversion\"")
-_Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
+GCC_Pragma("GCC diagnostic push")
+GCC_Pragma("GCC diagnostic ignored \"-Wconversion\"")
+GCC_Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
 
 typedef uint64_t ui64;
 typedef uint32_t ui32;
@@ -56,13 +56,13 @@ static inline ui64 double2ui64(double d) {
     return tmp.ix;
 }
 
+#if PICO_DOUBLE_PROPAGATE_NANS
 static inline bool disnan(double x) {
     ui64 ix= double2ui64(x);
     // checks the top bit of the low 32 bit of the NAN, but it I think that is ok
     return ((uint32_t)(ix >> 31)) > 0xffe00000u;
 }
 
-#if PICO_DOUBLE_PROPAGATE_NANS
 #define check_nan_d1(x) if (disnan((x))) return (x)
 #define check_nan_d2(x,y) if (disnan((x))) return (x); else if (disnan((y))) return (y);
 #else
@@ -109,8 +109,8 @@ double WRAPPER_FUNC(copysign)(double x, double y) {
     return dcopysign(x, y);
 }
 static inline int diszero(double x)  { return dgetexp    (x)==0; }
-static inline int dispzero(double x) { return dgetsignexp(x)==0; }
-static inline int dismzero(double x) { return dgetsignexp(x)==0x800; }
+//static inline int dispzero(double x) { return dgetsignexp(x)==0; }
+//static inline int dismzero(double x) { return dgetsignexp(x)==0x800; }
 static inline int disinf(double x)   { return dgetexp    (x)==0x7ff; }
 static inline int dispinf(double x)  { return dgetsignexp(x)==0x7ff; }
 static inline int disminf(double x)  { return dgetsignexp(x)==0xfff; }
@@ -419,10 +419,10 @@ static double dpowint_0(double x,int y) {
 }
 
 double WRAPPER_FUNC(powint)(double x,int y) {
-    _Pragma("GCC diagnostic push")
-    _Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
+    GCC_Like_Pragma("GCC diagnostic push")
+    GCC_Like_Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
     if(x==1.0||y==0) return 1;
-    _Pragma("GCC diagnostic pop")
+    GCC_Like_Pragma("GCC diagnostic pop")
     check_nan_d1(x);
     if(diszero(x)) {
         if(y>0) {
@@ -468,13 +468,13 @@ static double dpow_0(double x,double y) {
 }
 
 double WRAPPER_FUNC(pow)(double x,double y) {
-    _Pragma("GCC diagnostic push")
-    _Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
+    GCC_Like_Pragma("GCC diagnostic push")
+    GCC_Like_Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
 
     if(x==1.0||diszero(y)) return 1;
     check_nan_d2(x, y);
     if(x==-1.0&&disinf(y)) return 1;
-    _Pragma("GCC diagnostic pop")
+    GCC_Like_Pragma("GCC diagnostic pop")
 
     if(diszero(x)) {
         if(!disneg(y)) {
@@ -621,4 +621,4 @@ double WRAPPER_FUNC(drem)(double x,double y) { check_nan_d2(x, y); return remquo
 
 double WRAPPER_FUNC(remainder)(double x,double y) { check_nan_d2(x, y); return remquo(x,y,0); }
 
-_Pragma("GCC diagnostic pop") // conversion
+GCC_Pragma("GCC diagnostic pop") // conversion

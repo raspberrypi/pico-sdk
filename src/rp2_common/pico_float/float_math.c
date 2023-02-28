@@ -7,9 +7,9 @@
 #include "pico/float.h"
 
 // opened a separate issue https://github.com/raspberrypi/pico-sdk/issues/166 to deal with these warnings if at all
-_Pragma("GCC diagnostic push")
-_Pragma("GCC diagnostic ignored \"-Wconversion\"")
-_Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
+GCC_Pragma("GCC diagnostic push")
+GCC_Pragma("GCC diagnostic ignored \"-Wconversion\"")
+GCC_Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
 
 typedef uint32_t ui32;
 typedef int32_t i32;
@@ -54,12 +54,12 @@ static inline ui32 float2ui32(float f) {
     return tmp.ix;
 }
 
+#if PICO_FLOAT_PROPAGATE_NANS
 static inline bool fisnan(float x) {
     ui32 ix=float2ui32(x);
     return ix * 2 > 0xff000000u;
 }
 
-#if PICO_FLOAT_PROPAGATE_NANS
 #define check_nan_f1(x) if (fisnan((x))) return (x)
 #define check_nan_f2(x,y) if (fisnan((x))) return (x); else if (fisnan((y))) return (y);
 #else
@@ -106,8 +106,8 @@ float WRAPPER_FUNC(copysignf)(float x, float y) {
 }
 
 static inline int fiszero(float x)  { return fgetexp    (x)==0; }
-static inline int fispzero(float x) { return fgetsignexp(x)==0; }
-static inline int fismzero(float x) { return fgetsignexp(x)==0x100; }
+//static inline int fispzero(float x) { return fgetsignexp(x)==0; }
+//static inline int fismzero(float x) { return fgetsignexp(x)==0x100; }
 static inline int fisinf(float x)   { return fgetexp    (x)==0xff; }
 static inline int fispinf(float x)  { return fgetsignexp(x)==0xff; }
 static inline int fisminf(float x)  { return fgetsignexp(x)==0x1ff; }
@@ -377,8 +377,8 @@ static float fpowint_0(float x,int y) {
 }
 
 float WRAPPER_FUNC(powintf)(float x,int y) {
-    _Pragma("GCC diagnostic push")
-    _Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
+    GCC_Pragma("GCC diagnostic push")
+    GCC_Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
     if(x==1.0f||y==0) return 1;
     if(x==0.0f) {
         if(y>0) {
@@ -388,7 +388,7 @@ float WRAPPER_FUNC(powintf)(float x,int y) {
         if((y&1)) return fcopysign(FPINF,x);
         return FPINF;
     }
-    _Pragma("GCC diagnostic pop")
+    GCC_Pragma("GCC diagnostic pop")
     check_nan_f1(x);
     if(fispinf(x)) {
         if(y<0) return 0;
@@ -426,12 +426,12 @@ static float fpow_0(float x,float y) {
 }
 
 float WRAPPER_FUNC(powf)(float x,float y) {
-    _Pragma("GCC diagnostic push")
-    _Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
+    GCC_Like_Pragma("GCC diagnostic push")
+    GCC_Like_Pragma("GCC diagnostic ignored \"-Wfloat-equal\"")
     if(x==1.0f||fiszero(y)) return 1;
     check_nan_f2(x,y);
     if(x==-1.0f&&fisinf(y)) return 1;
-    _Pragma("GCC diagnostic pop")
+    GCC_Like_Pragma("GCC diagnostic pop")
     if(fiszero(x)) {
         if(!fisneg(y)) {
             if(fisoddint(y)) return x;
@@ -579,4 +579,4 @@ float WRAPPER_FUNC(dremf)(float x,float y) { check_nan_f2(x,y); return remquof(x
 
 float WRAPPER_FUNC(remainderf)(float x,float y) { check_nan_f2(x,y); return remquof(x,y,0); }
 
-_Pragma("GCC diagnostic pop") // conversion
+GCC_Pragma("GCC diagnostic pop") // conversion

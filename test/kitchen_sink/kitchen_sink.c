@@ -100,9 +100,6 @@ bi_decl(bi_block_device(
                            BINARY_INFO_BLOCK_DEV_FLAG_READ | BINARY_INFO_BLOCK_DEV_FLAG_WRITE |
                                    BINARY_INFO_BLOCK_DEV_FLAG_PT_UNKNOWN));
 
-//#pragma GCC push_options
-//#pragma GCC optimize ("O3")
-
 uint32_t *foo = (uint32_t *) 200;
 
 uint32_t dma_to = 0;
@@ -133,11 +130,14 @@ int main(void) {
     puts("Hello Everything!");
     puts("Hello Everything2!");
 
+    printf("main at %p\n", (void *)main);
+    static uint x[2];
+    printf("x[0] = %p, x[1] = %p\n", x, x+1);
     hard_assert(mutex_try_enter(&mutex, NULL));
     hard_assert(!mutex_try_enter(&mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     // this should compile as we are Cortex M0+
-    __asm volatile("SVC #3");
+    unified_asm ("SVC #3");
 
 }

@@ -47,7 +47,7 @@ void __aeabi_double_init(void) {
 #endif
     if (rom_version >= 2) {
         void *rom_table = rom_data_lookup(rom_table_code('S', 'D'));
-        assert(*((uint8_t *)(((void *)rom_data_lookup(rom_table_code('S', 'F')))-2)) * 4 >= SF_TABLE_V2_SIZE);
+        assert(*((uint8_t *)rom_data_lookup(rom_table_code('S', 'F'))-2) * 4 >= SF_TABLE_V2_SIZE);
         memcpy(&sd_table, rom_table, SF_TABLE_V2_SIZE);
         if (rom_version == 2) {
 #ifndef NDEBUG

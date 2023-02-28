@@ -13,8 +13,8 @@ check_hw_size(dma_channel_hw_t, DMA_CHAN_STRIDE);
 check_hw_layout(dma_hw_t, abort, DMA_CHAN_ABORT_OFFSET);
 
 // sanity check
-static_assert(__builtin_offsetof(dma_hw_t, ch[0].ctrl_trig) == DMA_CH0_CTRL_TRIG_OFFSET, "hw mismatch");
-static_assert(__builtin_offsetof(dma_hw_t, ch[1].ctrl_trig) == DMA_CH1_CTRL_TRIG_OFFSET, "hw mismatch");
+static_assert(offsetof(dma_hw_t, ch[0].ctrl_trig) == DMA_CH0_CTRL_TRIG_OFFSET, "hw mismatch");
+static_assert(offsetof(dma_hw_t, ch[1].ctrl_trig) == DMA_CH1_CTRL_TRIG_OFFSET, "hw mismatch");
 
 static_assert(NUM_DMA_CHANNELS <= 16, "");
 static uint16_t _claimed;

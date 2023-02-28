@@ -110,8 +110,9 @@ static void hw_enumeration_fix_force_ls_j(void) {
     gpio_set_inover(dp, GPIO_OVERRIDE_HIGH);
 
     // Force PHY pull up to stay before switching away from the phy
-    hw_set_alias(usb_hw)->phy_direct = USB_USBPHY_DIRECT_DP_PULLUP_EN_BITS;
-    hw_set_alias(usb_hw)->phy_direct_override = USB_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_BITS;
+    usb_hw_t *usb_hw_set = (usb_hw_t *)hw_set_alias_untyped(usb_hw);
+    usb_hw_set->phy_direct = USB_USBPHY_DIRECT_DP_PULLUP_EN_BITS;
+    usb_hw_set->phy_direct_override = USB_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_BITS;
 
     // Switch to GPIO phy with LS_J forced
     usb_hw->muxing = USB_USB_MUXING_TO_DIGITAL_PAD_BITS | USB_USB_MUXING_SOFTCON_BITS;
@@ -138,7 +139,7 @@ static void hw_enumeration_fix_finish(void) {
     usb_hw->muxing = USB_USB_MUXING_TO_PHY_BITS | USB_USB_MUXING_SOFTCON_BITS;
 
     // Get rid of DP pullup override
-    hw_clear_alias(usb_hw)->phy_direct_override = USB_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_BITS;
+    hw_clear_bits(&usb_hw->phy_direct_override, USB_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_BITS);
 
     // Finally, restore the gpio ctrl value back to GPIO15
     iobank0_hw->io[dp].ctrl = gpio_ctrl_prev;
