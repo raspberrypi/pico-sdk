@@ -1,5 +1,11 @@
 name: CMake
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - 'iar/**'
+  pull_request:
+    branches-ignore:
+      - 'iar/**'
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
