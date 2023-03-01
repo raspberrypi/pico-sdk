@@ -94,7 +94,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     pico_mirrored_target_link_libraries(pico_btstack_ble INTERFACE
         pico_btstack_base
     )
-    target_compile_definitions(pico_btstack_ble INTERFACE
+    target_compile_definitions(pico_btstack_ble_headers INTERFACE
             ENABLE_BLE=1
             )
 
@@ -147,7 +147,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     pico_mirrored_target_link_libraries(pico_btstack_classic INTERFACE
         pico_btstack_base
     )
-    target_compile_definitions(pico_btstack_classic INTERFACE
+    target_compile_definitions(pico_btstack_classic_headers INTERFACE
             ENABLE_CLASSIC=1
             )
 
@@ -156,6 +156,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             ${CMAKE_CURRENT_LIST_DIR}/btstack_flash_bank.c
     )
     target_include_directories(pico_btstack_flash_bank_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    pico_mirrored_target_link_libraries(pico_btstack_flash_bank INTERFACE pico_btstack_base)
 
     pico_add_library(pico_btstack_run_loop_async_context NOFLAG)
     target_sources(pico_btstack_run_loop_async_context INTERFACE
