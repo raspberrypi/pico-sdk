@@ -129,16 +129,13 @@ uint32_t storage_read_blocks(__unused uint8_t *dest, __unused uint32_t block_num
 }
 
 // Generate a mac address if one is not set in otp
-void __attribute__((weak)) cyw43_hal_generate_laa_mac(int idx, uint8_t buf[6]) {
+void __attribute__((weak)) cyw43_hal_generate_laa_mac(__unused int idx, uint8_t buf[6]) {
     CYW43_DEBUG("Warning. No mac in otp. Generating mac from board id\n");
-    pico_unique_board_id_t pid;
-    pico_get_unique_board_id(&pid);
-    buf[0] = 0x02; // LAA range
-    buf[1] = (pid.id[7] << 4) | (pid.id[6] & 0xf);
-    buf[2] = (pid.id[5] << 4) | (pid.id[4] & 0xf);
-    buf[3] = (pid.id[3] << 4) | (pid.id[2] & 0xf);
-    buf[4] = pid.id[1];
-    buf[5] = (pid.id[0] << 2) | idx;
+    pico_unique_board_id_t board_id;
+    pico_get_unique_board_id(&board_id);
+    memcpy(buf, &board_id.id[2], 6);
+    buf[0] &= (uint8_t)~0x1; // unicast
+    buf[0] |= 0x2; // locally administered
 }
 
 // Return mac address
