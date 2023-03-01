@@ -85,10 +85,10 @@ static inline void hw_divider_wait_ready(void) {
     // we use one less register and instruction than gcc which uses a TST instruction
 
     uint32_t tmp; // allow compiler to pick scratch register
-    asm volatile (
+    unified_asm (
     "hw_divider_result_loop_%=:"
     "ldr %0, [%1, %2]\n\t"
-    "lsr %0, #1\n\t"
+    "lsrs %0, %0, #1\n\t"
     "bcc hw_divider_result_loop_%=\n\t"
     : "=&l" (tmp)
     : "l" (sio_hw), "I" (SIO_DIV_CSR_OFFSET)
@@ -105,7 +105,8 @@ static inline void hw_divider_wait_ready(void) {
  */
 static inline divmod_result_t hw_divider_result_nowait(void) {
     // as ugly as this looks it is actually quite efficient
-    divmod_result_t rc = (((divmod_result_t) sio_hw->div_remainder) << 32u) | sio_hw->div_quotient;
+    divmod_result_t rc = ((divmod_result_t) sio_hw->div_remainder) << 32u;
+    rc |= sio_hw->div_quotient;
     return rc;
 }
 
@@ -295,7 +296,7 @@ static inline int32_t hw_divider_remainder_s32(int32_t a, int32_t b) {
  *  \ingroup hardware_divider
  */
 static inline void hw_divider_pause(void) {
-    asm volatile (
+    unified_asm (
     "b _1_%=\n"
     "_1_%=:\n"
     "b _2_%=\n"

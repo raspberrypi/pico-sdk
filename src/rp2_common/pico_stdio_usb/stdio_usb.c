@@ -20,9 +20,6 @@
 #include "device/usbd_pvt.h" // for usbd_defer_func
 
 static mutex_t stdio_usb_mutex;
-#ifndef NDEBUG
-static uint8_t stdio_usb_core_num;
-#endif
 
 #if PICO_STDIO_USB_SUPPORT_CHARS_AVAILABLE_CALLBACK
 static void (*chars_available_callback)(void*);
@@ -181,9 +178,6 @@ bool stdio_usb_init(void) {
         assert(false);
         return false;
     }
-#ifndef NDEBUG
-    stdio_usb_core_num = (uint8_t)get_core_num();
-#endif
 #if !PICO_NO_BI_STDIO_USB
     bi_decl_if_func_used(bi_program_feature("USB stdin / stdout"));
 #endif

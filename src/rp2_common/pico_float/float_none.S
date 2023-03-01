@@ -29,7 +29,6 @@ wrapper_func __aeabi_i2f
 wrapper_func __aeabi_l2f
 wrapper_func __aeabi_ui2f
 wrapper_func __aeabi_ul2f
-wrapper_func __aeabi_i2f
 wrapper_func __aeabi_f2iz
 wrapper_func __aeabi_f2lz
 wrapper_func __aeabi_f2uiz

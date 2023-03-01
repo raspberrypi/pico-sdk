@@ -75,7 +75,7 @@ bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out) {
 static uint32_t __attribute__((section(".stack1"))) core1_stack[PICO_CORE1_STACK_SIZE / sizeof(uint32_t)];
 
 static void __attribute__ ((naked)) core1_trampoline(void) {
-    __asm("pop {r0, r1, pc}");
+    unified_asm ("pop {r0, r1, pc}");
 }
 
 int core1_wrapper(int (*entry)(void), void *stack_base) {

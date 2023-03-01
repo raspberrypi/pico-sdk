@@ -8,10 +8,6 @@
 
 /// \tag::table_lookup[]
 
-// Bootrom function: rom_table_lookup
-// Returns the 32 bit pointer into the ROM if found or NULL otherwise.
-typedef void *(*rom_table_lookup_fn)(uint16_t *table, uint32_t code);
-
 void *rom_func_lookup(uint32_t code) {
     return rom_func_lookup_inline(code);
 }

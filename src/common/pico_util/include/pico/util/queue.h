@@ -59,7 +59,7 @@ void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count,
  * \param element_count Maximum number of entries in the queue
  */
 static inline void queue_init(queue_t *q, uint element_size, uint element_count) {
-    return queue_init_with_spinlock(q, element_size, element_count, next_striped_spin_lock_num());
+    queue_init_with_spinlock(q, element_size, element_count, next_striped_spin_lock_num());
 }
 
 /*! \brief Destroy the specified queue.

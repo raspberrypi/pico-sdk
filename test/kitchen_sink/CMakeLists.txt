@@ -80,6 +80,14 @@ target_compile_options(kitchen_sink_options INTERFACE
         #-Wundef
         )
 
+if (PICO_C_COMPILER_IS_CLANG)
+    # todo fix up clang warnings
+    target_compile_options(kitchen_sink_options INTERFACE
+            -Wno-cast-qual
+            -Wno-unused-function
+            -Wno-format)
+endif()
+
 target_compile_definitions(kitchen_sink_libs INTERFACE
         PARAM_ASSERTIONS_ENABLE_ALL=1 # want to check all the assertions for compilation warnings
         PICO_AUDIO_DMA_IRQ=1
@@ -97,6 +105,8 @@ if (COMMAND suppress_tinyusb_warnings)
     # TinyUSB itself, so we have to guard against TinyUSB not being present with the above if
     suppress_tinyusb_warnings()
 endif()
+target_compile_definitions(kitchen_sink_extra_stdio PRIVATE
+        TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX=1)
 if (TARGET pico_lwip)
     set_source_files_properties(
             ${PICO_LWIP_PATH}/src/core/ipv4/ip4_frag.c
@@ -118,6 +128,11 @@ add_executable(kitchen_sink_no_flash ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 pico_set_binary_type(kitchen_sink_no_flash no_flash)
 target_link_libraries(kitchen_sink_no_flash kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_no_flash)
+
+add_executable(kitchen_sink_blocked_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+pico_set_binary_type(kitchen_sink_blocked_ram blocked_ram)
+target_link_libraries(kitchen_sink_blocked_ram kitchen_sink_libs kitchen_sink_options)
+pico_add_extra_outputs(kitchen_sink_blocked_ram)
 
 add_executable(kitchen_sink_cpp ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_cpp.cpp)
 target_link_libraries(kitchen_sink_cpp kitchen_sink_libs kitchen_sink_options)

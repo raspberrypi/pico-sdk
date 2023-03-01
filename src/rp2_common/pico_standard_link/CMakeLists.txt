@@ -10,8 +10,8 @@ if (NOT TARGET pico_standard_link)
     pico_add_map_output(pico_standard_link)
 
     # todo revisit when we do Clang
-    if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
-        target_link_options(pico_standard_link INTERFACE "LINKER:-nostdlib")
+    if (PICO_C_COMPILER_IS_CLANG)
+#        target_link_options(pico_standard_link INTERFACE "LINKER:-fuse-ld=lld")
     endif ()
 
     pico_mirrored_target_link_libraries(pico_standard_link INTERFACE hardware_regs pico_bootrom pico_binary_info)
@@ -74,9 +74,11 @@ if (NOT TARGET pico_standard_link)
         target_compile_definitions(pico_standard_link INTERFACE PICO_DEOPTIMIZED_DEBUG=1)
     endif()
 
-    # todo revisit/recall reasoning for why not -nostartfiles always?
-    # -nostartfiles will be added if PICO_NO_FLASH would be defined to 1
-    target_link_options(pico_standard_link INTERFACE $<$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,no_flash>,1,$<AND:$<BOOL:${PICO_NO_FLASH}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>:-nostartfiles>)
+    # -nostartfiles will be added if not using C++ exceptions (which is the only thing that seems to need it)
+    if (PICO_C_COMPILER_IS_GNU AND NOT PICO_CXX_ENABLE_EXCEPTIONS)
+#        target_link_options(pico_standard_link INTERFACE $<$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,no_flash>,1,$<AND:$<BOOL:${PICO_NO_FLASH}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>:-nostartfiles>)
+        target_link_options(pico_standard_link INTERFACE -nostartfiles)
+    endif()
     # boot_stage2 will be linked if PICO_NO_FLASH would be defined to 0
     target_link_libraries(pico_standard_link INTERFACE $<$<NOT:$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,no_flash>,1,$<AND:$<BOOL:${PICO_NO_FLASH}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>>:$<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_BOOT_STAGE2>>,$<TARGET_PROPERTY:PICO_TARGET_BOOT_STAGE2>,bs2_default>_library>)
 
@@ -96,7 +98,7 @@ if (NOT TARGET pico_standard_link)
         target_link_options(pico_standard_link INTERFACE "LINKER:--gc-sections")
     endif()
 
-    if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+    if (PICO_C_COMPILER_IS_GNU)
         # Ignore warnings about rwx segments introduced in binutils 2.39
         execute_process(COMMAND ${CMAKE_C_COMPILER} -print-prog-name=ld RESULT_VARIABLE RUN_C_RESULT OUTPUT_VARIABLE FULL_LD_PATH
             OUTPUT_STRIP_TRAILING_WHITESPACE)

@@ -114,8 +114,9 @@ void runtime_init(void) {
 
 #if !PICO_IE_26_29_UNCHANGED_ON_RESET
     // after resetting BANK0 we should disable IE on 26-29
-    hw_clear_alias(padsbank0_hw)->io[26] = hw_clear_alias(padsbank0_hw)->io[27] =
-            hw_clear_alias(padsbank0_hw)->io[28] = hw_clear_alias(padsbank0_hw)->io[29] = PADS_BANK0_GPIO0_IE_BITS;
+    padsbank0_hw_t *padsbank0_hw_clear = (padsbank0_hw_t *)hw_clear_alias_untyped(padsbank0_hw);
+    padsbank0_hw_clear->io[26] = padsbank0_hw_clear->io[27] =
+            padsbank0_hw_clear->io[28] = padsbank0_hw_clear->io[29] = PADS_BANK0_GPIO0_IE_BITS;
 #endif
 
     // this is an array of either mutex_t or recursive_mutex_t (i.e. not necessarily the same size)
@@ -150,7 +151,7 @@ void runtime_init(void) {
 #ifndef NDEBUG
     if (__get_current_exception()) {
         // crap; started in exception handler
-        __asm ("bkpt #0");
+        unified_asm ("bkpt #0");
     }
 #endif
 
@@ -260,8 +261,8 @@ void exit(int status) {
 }
 
 // incorrect warning from GCC 6
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
+GCC_Pragma("GCC diagnostic push")
+GCC_Pragma("GCC diagnostic ignored \"-Wsuggest-attribute=format\"")
 void __assert_func(const char *file, int line, const char *func, const char *failedexpr) {
     weak_raw_printf("assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
            failedexpr, file, line, func ? ", function: " : "",
@@ -269,10 +270,9 @@ void __assert_func(const char *file, int line, const char *func, const char *fai
 
     _exit(1);
 }
+GCC_Pragma("GCC diagnostic pop")
 
-#pragma GCC diagnostic pop
-
-void __attribute__((noreturn)) panic_unsupported() {
+void __attribute__((noreturn)) panic_unsupported(void) {
     panic("not supported");
 }
 
@@ -286,7 +286,7 @@ extern void __attribute__((noreturn)) __printflike(1, 0) PICO_PANIC_FUNCTION(__u
 // Use a forwarding method here as it is a little simpler than renaming the symbol as it is used from assembler
 void __attribute__((naked, noreturn)) __printflike(1, 0) panic(__unused const char *fmt, ...) {
     // if you get an undefined reference here, you didn't define your PICO_PANIC_FUNCTION!
-    __asm (
+    unified_asm (
             "push {lr}\n"
 #if !PICO_PANIC_FUNCTION_EMPTY
             "bl " __XSTRING(PICO_PANIC_FUNCTION) "\n"
