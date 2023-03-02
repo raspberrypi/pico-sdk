@@ -51,8 +51,10 @@
 #define SYS_CLK_KHZ _u(125000)
 #endif
 
-// For USB operation this *has* to be 48MHz
+#ifndef USB_CLK_KHZ
+// Note:  For USB operation this has to be 48MHz
 #define USB_CLK_KHZ _u(48000)
+#endif
 
 #define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
 #define VTABLE_FIRST_IRQ 16
