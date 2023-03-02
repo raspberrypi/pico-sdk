@@ -518,7 +518,7 @@ int main() {
     }
     for(float x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
         printf("f2i64 %f->%lld\n", x, (int64_t)x);
-        if (x >= INT64_MAX) {
+        if ((double)x >= (double)INT64_MAX) {
             // seems like there is a bug in the gcc version!
             assert(__aeabi_f2lz(x) == INT64_MAX);
         } else {

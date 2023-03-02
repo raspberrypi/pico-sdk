@@ -477,7 +477,7 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
  *
  * \return the exception number if the CPU is handling an exception, or 0 otherwise
  */
-static inline uint __get_current_exception(void) {
+static __force_inline uint __get_current_exception(void) {
     uint exception;
     unified_asm ("mrs %0, ipsr" : "=l" (exception));
     return exception;
@@ -485,10 +485,6 @@ static inline uint __get_current_exception(void) {
 
 #define WRAPPER_FUNC(x) __wrap_ ## x
 #define REAL_FUNC(x) __real_ ## x
-
-#ifdef __cplusplus
-}
-#endif
 
 /*! \brief Helper method to busy-wait for at least the given number of cycles
  *  \ingroup pico_platform
@@ -520,6 +516,10 @@ static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
 __force_inline static uint get_core_num(void) {
     return (*(uint32_t *) (SIO_BASE + SIO_CPUID_OFFSET));
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #else // __ASSEMBLER__
 

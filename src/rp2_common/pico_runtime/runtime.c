@@ -151,7 +151,7 @@ void runtime_init(void) {
 #ifndef NDEBUG
     if (__get_current_exception()) {
         // crap; started in exception handler
-        unified_asm ("bkpt #0");
+        __breakpoint();
     }
 #endif
 

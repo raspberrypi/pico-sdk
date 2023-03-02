@@ -6,6 +6,14 @@
 
 #include "pico.h"
 
+# note we don'tdo this by default in this file for backwards comaptibility with user code
+# that may include this file, but not use unified syntax
+.macro pico_asm_setup
+.syntax unified
+.cpu cortex-m0plus
+.thumb
+.endm
+
 // do not put align in here as it is used mid function sometimes
 .macro regular_func x
 .global \x

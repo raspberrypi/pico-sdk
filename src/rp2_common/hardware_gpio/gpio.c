@@ -244,8 +244,8 @@ void gpio_set_input_enabled(uint gpio, bool enabled) {
 }
 
 void gpio_init(uint gpio) {
-    sio_hw->gpio_oe_clr = 1ul << gpio;
-    sio_hw->gpio_clr = 1ul << gpio;
+    gpio_set_dir(gpio, GPIO_IN);
+    gpio_put(gpio, 0);
     gpio_set_function(gpio, GPIO_FUNC_SIO);
 }
 
