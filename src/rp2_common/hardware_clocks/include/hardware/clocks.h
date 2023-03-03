@@ -130,6 +130,7 @@ static_assert(USB_CLK_KHZ == PLL_USB_VCO_FREQ_KHZ / PLL_USB_POSTDIV1 / PLL_USB_P
 #define PLL_SYS_POSTDIV2                    2
 #endif
 
+static_assert(0 == (PLL_SYS_VCO_FREQ_KHZ % XOSC_KHZ), "see use of `vcocal.py` above");
 static_assert(SYS_CLK_KHZ == PLL_SYS_VCO_FREQ_KHZ / PLL_SYS_POSTDIV1 / PLL_SYS_POSTDIV2, "see use of `vcocal.py` above");
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_CLOCKS, Enable/disable assertions in the clocks module, type=bool, default=0, group=hardware_clocks
