@@ -6,7 +6,7 @@
 
 #include "pico.h"
 
-# note we don'tdo this by default in this file for backwards comaptibility with user code
+# note we don't do this by default in this file for backwards comaptibility with user code
 # that may include this file, but not use unified syntax
 .macro pico_asm_setup
 .syntax unified
