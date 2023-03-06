@@ -51,8 +51,8 @@
 #define SYS_CLK_KHZ _u(125000)
 #endif
 
+// PICO_CONFIG: USB_CLK_KHZ, USB clock frequency. Must be 48MHz for the USB interface to operate, type=int, default=48000, advanced=true, group=hardware_base
 #ifndef USB_CLK_KHZ
-// Note:  For USB operation this has to be 48MHz
 #define USB_CLK_KHZ _u(48000)
 #endif
 
