@@ -14,7 +14,7 @@
 
 #include "pico/asm_helper.S"
 
-pico_asm_setup
+pico_default_asm_setup
 
 .align 2
 

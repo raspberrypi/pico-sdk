@@ -7,7 +7,7 @@
 #include "pico/asm_helper.S"
 #include "pico/bootrom.h"
 
-pico_asm_setup
+pico_default_asm_setup
 
 __pre_init __aeabi_mem_init, 00001
 

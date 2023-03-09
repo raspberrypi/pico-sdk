@@ -21,7 +21,7 @@
 #define ACTIVITY_LED 0
 #define BOOT_MODE USB_BOOT_MSD_AND_PICOBOOT
 
-pico_asm_setup
+pico_default_asm_setup
 
 .section .text
 

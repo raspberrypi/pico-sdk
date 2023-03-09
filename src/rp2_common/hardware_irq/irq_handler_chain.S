@@ -8,7 +8,7 @@
 #include "hardware/irq.h"
 #include "pico/asm_helper.S"
 
-pico_asm_setup
+pico_default_asm_setup
 
 #if !PICO_DISABLE_SHARED_IRQ_HANDLERS
 

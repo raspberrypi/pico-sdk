@@ -7,7 +7,7 @@
 #include "pico/asm_helper.S"
 #include "pico/bootrom.h"
 
-pico_asm_setup
+pico_default_asm_setup
 
 .macro bits_section name
 #if PICO_BITS_IN_RAM

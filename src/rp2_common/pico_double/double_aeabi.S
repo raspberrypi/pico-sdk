@@ -8,7 +8,7 @@
 #include "pico/bootrom/sf_table.h"
 #include "hardware/divider_helper.S"
 
-pico_asm_setup
+pico_default_asm_setup
 
 __pre_init __aeabi_double_init, 00020
 

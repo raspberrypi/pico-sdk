@@ -10,7 +10,7 @@
 
 __pre_init __aeabi_float_init, 00020
 
-pico_asm_setup
+pico_default_asm_setup
 
 .macro float_section name
 #if PICO_FLOAT_IN_RAM

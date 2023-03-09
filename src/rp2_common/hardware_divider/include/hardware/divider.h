@@ -85,7 +85,7 @@ static inline void hw_divider_wait_ready(void) {
     // we use one less register and instruction than gcc which uses a TST instruction
 
     uint32_t tmp; // allow compiler to pick scratch register
-    unified_asm (
+    pico_default_asm (
     "hw_divider_result_loop_%=:"
     "ldr %0, [%1, %2]\n\t"
     "lsrs %0, %0, #1\n\t"
@@ -296,7 +296,7 @@ static inline int32_t hw_divider_remainder_s32(int32_t a, int32_t b) {
  *  \ingroup hardware_divider
  */
 static inline void hw_divider_pause(void) {
-    unified_asm (
+    pico_default_asm (
     "b _1_%=\n"
     "_1_%=:\n"
     "b _2_%=\n"

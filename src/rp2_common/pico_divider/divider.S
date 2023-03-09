@@ -20,7 +20,7 @@
 #define PICO_DIVIDER_CALL_LDIV0 1
 #endif
 
-pico_asm_setup
+pico_default_asm_setup
 
 // PICO_CONFIG: PICO_DIVIDER_IN_RAM, Whether divider functions should be placed in RAM, default=0, group=pico_divider
 .macro div_section name

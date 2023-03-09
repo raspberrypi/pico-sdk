@@ -40,7 +40,7 @@
 #define PICO_FLASH_SPI_CLKDIV 4
 #endif
 
-pico_asm_setup
+pico_default_asm_setup
 
 // ----------------------------------------------------------------------------
 // The "System Control Block" is a set of internal Cortex-M0+ control registers

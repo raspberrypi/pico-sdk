@@ -6,7 +6,7 @@
 
 #include "pico/asm_helper.S"
 
-pico_asm_setup
+pico_default_asm_setup
 
 .macro int64_section name
 #if PICO_INT64_OPS_IN_RAM

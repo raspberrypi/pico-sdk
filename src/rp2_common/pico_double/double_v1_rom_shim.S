@@ -17,7 +17,7 @@
 
 #include "pico/asm_helper.S"
 
-pico_asm_setup
+pico_default_asm_setup
 
 .macro double_section name
 // todo separate flag for shims?

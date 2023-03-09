@@ -12,7 +12,7 @@
 #define PICO_FLOAT_IN_RAM 0
 #endif
 
-pico_asm_setup
+pico_default_asm_setup
 
 .macro float_section name
 // todo separate flag for shims?

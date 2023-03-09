@@ -86,7 +86,7 @@
 // Start of 2nd Stage Boot Code
 // ----------------------------------------------------------------------------
 
-pico_asm_setup
+pico_default_asm_setup
 
 .section .text
 

@@ -2,7 +2,7 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 
-pico_asm_setup
+pico_default_asm_setup
 
 // tag::hw_div_s32[]
 regular_func_with_section hw_divider_divmod_s32

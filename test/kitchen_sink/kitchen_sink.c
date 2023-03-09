@@ -138,6 +138,6 @@ int main(void) {
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     // this should compile as we are Cortex M0+
-    unified_asm ("SVC #3");
+    pico_default_asm ("SVC #3");
 
 }

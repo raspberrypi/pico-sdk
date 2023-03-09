@@ -116,7 +116,7 @@ typedef volatile uint32_t spin_lock_t;
  */
 #if !__has_builtin(__sev)
 __force_inline static void __sev(void) {
-    unified_asm ("sev");
+    pico_default_asm ("sev");
 }
 #endif
 
@@ -128,7 +128,7 @@ __force_inline static void __sev(void) {
  */
 #if !__has_builtin(__wfe)
 __force_inline static void __wfe(void) {
-    unified_asm ("wfe");
+    pico_default_asm ("wfe");
 }
 #endif
 
@@ -139,7 +139,7 @@ __force_inline static void __wfe(void) {
  */
 #if !__has_builtin(__wfi)
 __force_inline static void __wfi(void) {
-    unified_asm ("wfi");
+    pico_default_asm ("wfi");
 }
 #endif
 
@@ -150,7 +150,7 @@ __force_inline static void __wfi(void) {
  * instruction will be observed before any explicit access after the instruction.
  */
 __force_inline static void __dmb(void) {
-    unified_asm ("dmb" : : : "memory");
+    pico_default_asm ("dmb" : : : "memory");
 }
 
 /*! \brief Insert a DSB instruction in to the code path.
@@ -161,7 +161,7 @@ __force_inline static void __dmb(void) {
  * accesses before this instruction complete.
  */
 __force_inline static void __dsb(void) {
-    unified_asm ("dsb" : : : "memory");
+    pico_default_asm ("dsb" : : : "memory");
 }
 
 /*! \brief Insert a ISB instruction in to the code path.
@@ -172,7 +172,7 @@ __force_inline static void __dsb(void) {
  * the ISB instruction has been completed.
  */
 __force_inline static void __isb(void) {
-    unified_asm ("isb");
+    pico_default_asm ("isb");
 }
 
 /*! \brief Acquire a memory fence
@@ -213,8 +213,8 @@ __force_inline static void __mem_fence_release(void) {
  */
 __force_inline static uint32_t save_and_disable_interrupts(void) {
     uint32_t status;
-    unified_asm ("mrs %0, PRIMASK" : "=r" (status)::);
-    unified_asm ("cpsid i");
+    pico_default_asm ("mrs %0, PRIMASK" : "=r" (status)::);
+    pico_default_asm ("cpsid i");
     return status;
 }
 
@@ -224,7 +224,7 @@ __force_inline static uint32_t save_and_disable_interrupts(void) {
  * \param status Previous interrupt status from save_and_disable_interrupts()
   */
 __force_inline static void restore_interrupts(uint32_t status) {
-    unified_asm ("msr PRIMASK,%0"::"r" (status) : );
+    pico_default_asm ("msr PRIMASK,%0"::"r" (status) : );
 }
 
 /*! \brief Get HW Spinlock instance from number

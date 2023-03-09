@@ -20,7 +20,7 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/ssi.h"
 
-pico_asm_setup
+pico_default_asm_setup
 
 // ----------------------------------------------------------------------------
 // Config section

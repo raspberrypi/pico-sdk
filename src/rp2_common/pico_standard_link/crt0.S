@@ -18,7 +18,7 @@
 #endif
 #endif
 
-pico_asm_setup
+pico_default_asm_setup
 
 .section .vectors, "ax"
 .align 2
