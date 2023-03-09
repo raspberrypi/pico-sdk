@@ -48,7 +48,7 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
         return false;
 
     // Div register is 24.8 int.frac divider so multiply by 2^8 (left shift by 8)
-    div = (uint32_t) (((uint64_t) src_freq << 8) / freq);
+    div = (uint32_t) (((uint64_t) src_freq << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / freq);
 
     clock_hw_t *clock = &clocks_hw->clk[clk_index];
 
@@ -76,14 +76,9 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
         if (configured_freq[clk_index] > 0) {
             // Delay for 3 cycles of the target clock, for ENABLE propagation.
             // Note XOSC_COUNT is not helpful here because XOSC is not
-            // necessarily running, nor is timer... so, 3 cycles per loop:
+            // necessarily running, nor is timer...:
             uint delay_cyc = configured_freq[clk_sys] / configured_freq[clk_index] + 1;
-            unified_asm (
-                "1: \n\t"
-                "subs %0, #1 \n\t"
-                "bne 1b"
-                : "+r" (delay_cyc)
-            );
+            busy_wait_at_least_cycles(delay_cyc * 3);
         }
     }
 

@@ -6,6 +6,15 @@
 
 #include "pico.h"
 
+# note we don't do this by default in this file for backwards comaptibility with user code
+# that may include this file, but not use unified syntax. Note that this macro does equivalent
+# setup to the pico_default_asm macro for inline assembly in C code.
+.macro pico_default_asm_setup
+.syntax unified
+.cpu cortex-m0plus
+.thumb
+.endm
+
 // do not put align in here as it is used mid function sometimes
 .macro regular_func x
 .global \x

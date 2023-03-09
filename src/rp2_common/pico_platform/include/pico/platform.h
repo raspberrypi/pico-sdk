@@ -335,13 +335,13 @@ extern "C" {
 #define MIN(a, b) ((b)>(a)?(a):(b))
 #endif
 
-#define unified_asm(...) __asm volatile (".syntax unified\n" __VA_ARGS__)
+#define pico_default_asm(...) __asm volatile (".syntax unified\n" __VA_ARGS__)
 
 /*! \brief Execute a breakpoint instruction
  *  \ingroup pico_platform
  */
 static inline void __breakpoint(void) {
-    unified_asm ("bkpt #0");
+    pico_default_asm ("bkpt #0");
 }
 
 /*! \brief Ensure that the compiler does not move memory access across this method call
@@ -357,7 +357,7 @@ static inline void __breakpoint(void) {
  * might - even above the memory store!)
  */
 __force_inline static void __compiler_memory_barrier(void) {
-    unified_asm ("" : : : "memory");
+    pico_default_asm ("" : : : "memory");
 }
 
 /*! \brief Macro for converting memory addresses to 32 bit addresses suitable for DMA
@@ -443,7 +443,7 @@ static __force_inline void tight_loop_contents(void) {}
  * \return a * b
  */
 __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
-    unified_asm ("muls %0, %1" : "+l" (a) : "l" (b) : );
+    pico_default_asm ("muls %0, %1" : "+l" (a) : "l" (b) : );
     return a;
 }
 
@@ -477,18 +477,14 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
  *
  * \return the exception number if the CPU is handling an exception, or 0 otherwise
  */
-static inline uint __get_current_exception(void) {
+static __force_inline uint __get_current_exception(void) {
     uint exception;
-    unified_asm ("mrs %0, ipsr" : "=l" (exception));
+    pico_default_asm ("mrs %0, ipsr" : "=l" (exception));
     return exception;
 }
 
 #define WRAPPER_FUNC(x) __wrap_ ## x
 #define REAL_FUNC(x) __real_ ## x
-
-#ifdef __cplusplus
-}
-#endif
 
 /*! \brief Helper method to busy-wait for at least the given number of cycles
  *  \ingroup pico_platform
@@ -505,7 +501,7 @@ static inline uint __get_current_exception(void) {
  * \param minimum_cycles the minimum number of system clock cycles to delay for
  */
 static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
-    unified_asm (
+    pico_default_asm (
         "1: subs %0, #3\n"
         "bcs 1b\n"
         : "+r" (minimum_cycles) : : "memory"
@@ -520,6 +516,10 @@ static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
 __force_inline static uint get_core_num(void) {
     return (*(uint32_t *) (SIO_BASE + SIO_CPUID_OFFSET));
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #else // __ASSEMBLER__
 

@@ -5,7 +5,7 @@
  */
 
 #include "hardware/exception.h"
-#include "hardware/regs/m0plus.h"
+#include "hardware/platform_defs.h"
 #include "hardware/structs/scb.h"
 #include "hardware/sync.h"
 #include "pico/assert.h"

@@ -7,13 +7,12 @@
 #include "pico/asm_helper.S"
 
 #if PICO_FLOAT_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
-.syntax unified
-.cpu cortex-m0plus
-.thumb
 
 #ifndef PICO_FLOAT_IN_RAM
 #define PICO_FLOAT_IN_RAM 0
 #endif
+
+pico_default_asm_setup
 
 .macro float_section name
 // todo separate flag for shims?

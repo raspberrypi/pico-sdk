@@ -151,7 +151,7 @@ void runtime_init(void) {
 #ifndef NDEBUG
     if (__get_current_exception()) {
         // crap; started in exception handler
-        unified_asm ("bkpt #0");
+        __breakpoint();
     }
 #endif
 
@@ -286,7 +286,7 @@ extern void __attribute__((noreturn)) __printflike(1, 0) PICO_PANIC_FUNCTION(__u
 // Use a forwarding method here as it is a little simpler than renaming the symbol as it is used from assembler
 void __attribute__((naked, noreturn)) __printflike(1, 0) panic(__unused const char *fmt, ...) {
     // if you get an undefined reference here, you didn't define your PICO_PANIC_FUNCTION!
-    unified_asm (
+    pico_default_asm (
             "push {lr}\n"
 #if !PICO_PANIC_FUNCTION_EMPTY
             "bl " __XSTRING(PICO_PANIC_FUNCTION) "\n"

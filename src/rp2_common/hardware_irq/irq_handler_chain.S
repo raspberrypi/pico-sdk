@@ -6,11 +6,11 @@
 
 #include "pico.h"
 #include "hardware/irq.h"
+#include "pico/asm_helper.S"
+
+pico_default_asm_setup
 
 #if !PICO_DISABLE_SHARED_IRQ_HANDLERS
-.syntax unified
-.cpu cortex-m0plus
-.thumb
 
 .data
 .align 2

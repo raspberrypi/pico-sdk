@@ -8,11 +8,9 @@
 #include "pico/bootrom/sf_table.h"
 #include "hardware/divider_helper.S"
 
-__pre_init __aeabi_double_init, 00020
+pico_default_asm_setup
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
+__pre_init __aeabi_double_init, 00020
 
 .macro double_section name
 #if PICO_DOUBLE_IN_RAM

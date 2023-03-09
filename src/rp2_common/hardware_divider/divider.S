@@ -2,9 +2,7 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
+pico_default_asm_setup
 
 // tag::hw_div_s32[]
 regular_func_with_section hw_divider_divmod_s32

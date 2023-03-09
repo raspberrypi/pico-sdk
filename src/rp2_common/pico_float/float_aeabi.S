@@ -10,9 +10,7 @@
 
 __pre_init __aeabi_float_init, 00020
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
+pico_default_asm_setup
 
 .macro float_section name
 #if PICO_FLOAT_IN_RAM

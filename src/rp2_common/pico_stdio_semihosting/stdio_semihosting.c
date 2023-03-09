@@ -25,7 +25,7 @@ static void stdio_semihosting_out_chars(const char *buf, int length) {
     args.buf = buf;
     args.len = length;
 
-    unified_asm (
+    pico_default_asm (
     // r1 must contain a pointer to the arguments
     "movs r1, %[args]\n"
     // semihosting call number 0x05 = SYS_WRITE

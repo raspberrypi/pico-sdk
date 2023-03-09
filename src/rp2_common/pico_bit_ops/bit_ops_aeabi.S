@@ -4,14 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
-
 #include "pico/asm_helper.S"
 #include "pico/bootrom.h"
 
-__pre_init __aeabi_bits_init, 00010
+pico_default_asm_setup
 
 .macro bits_section name
 #if PICO_BITS_IN_RAM
@@ -20,6 +16,8 @@ __pre_init __aeabi_bits_init, 00010
 .section SECTION_NAME(\name), "ax"
 #endif
 .endm
+
+__pre_init __aeabi_bits_init, 00010
 
 .section .data.aeabi_bits_funcs
 .global aeabi_bits_funcs, aeabi_bits_funcs_end
