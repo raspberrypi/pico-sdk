@@ -39,8 +39,9 @@ static inline void uart_unreset(uart_inst_t *uart) {
 uint uart_init(uart_inst_t *uart, uint baudrate) {
     invalid_params_if(UART, uart != uart0 && uart != uart1);
 
-    if (clock_get_hz(clk_peri) == 0)
+    if (clock_get_hz(clk_peri) == 0) {
         return 0;
+    }
 
     uart_reset(uart);
     uart_unreset(uart);
@@ -97,7 +98,7 @@ uint32_t uart_disable_before_lcr_write(uart_inst_t *uart) {
 
     uint32_t current_ibrd = uart_get_hw(uart)->ibrd;
     uint32_t current_fbrd = uart_get_hw(uart)->fbrd;
-    uint64_t baud_period_usec = 1u + 
+    uint64_t baud_period_usec = 1u +
         ((uint64_t)64 * current_ibrd + current_fbrd) /
         (4u * clock_get_hz(clk_peri));
 
@@ -125,8 +126,9 @@ uint uart_set_baudrate(uart_inst_t *uart, uint baudrate) {
     // Need to cleanly disable UART before touching LCR
     bool was_enabled = uart_is_enabled(uart);
     uint32_t cr_save;
-    if (was_enabled)
+    if (was_enabled) {
         cr_save = uart_disable_before_lcr_write(uart);
+    }
 
     uart_get_hw(uart)->ibrd = baud_ibrd;
     uart_get_hw(uart)->fbrd = baud_fbrd;
@@ -135,8 +137,9 @@ uint uart_set_baudrate(uart_inst_t *uart, uint baudrate) {
     hw_set_bits(&uart_get_hw(uart)->lcr_h, 0);
 
     // Re-enable using saved control register value
-    if (was_enabled)
+    if (was_enabled) {
         uart_get_hw(uart)->cr = cr_save;
+    }
 
     // See datasheet
     return (4 * clock_get_hz(clk_peri)) / (64 * baud_ibrd + baud_fbrd);
@@ -150,8 +153,9 @@ void uart_set_format(uart_inst_t *uart, uint data_bits, uint stop_bits, uart_par
 
     bool was_enabled = uart_is_enabled(uart);
     uint32_t cr_save;
-    if (was_enabled)
+    if (was_enabled) {
         cr_save = uart_disable_before_lcr_write(uart);
+    }
 
     hw_write_masked(&uart_get_hw(uart)->lcr_h,
                    ((data_bits - 5u) << UART_UARTLCR_H_WLEN_LSB) |
@@ -163,37 +167,42 @@ void uart_set_format(uart_inst_t *uart, uint data_bits, uint stop_bits, uart_par
                    UART_UARTLCR_H_PEN_BITS |
                    UART_UARTLCR_H_EPS_BITS);
 
-    if (was_enabled)
+    if (was_enabled) {
         uart_get_hw(uart)->cr = cr_save;
+    }
 }
 
 void uart_set_fifo_enabled(uart_inst_t *uart, bool enabled) {
     bool was_enabled = uart_is_enabled(uart);
     uint32_t cr_save;
-    if (was_enabled)
+    if (was_enabled) {
         cr_save = uart_disable_before_lcr_write(uart);
-
+    }
     hw_write_masked(&uart_get_hw(uart)->lcr_h,
                    (bool_to_bit(enabled) << UART_UARTLCR_H_FEN_LSB),
                    UART_UARTLCR_H_FEN_BITS);
 
-    if (was_enabled)
+    if (was_enabled) {
         uart_get_hw(uart)->cr = cr_save;
+    }
 }
 
 void uart_set_break(uart_inst_t *uart, bool en) {
     bool was_enabled = uart_is_enabled(uart);
-    uint32_t cr_save;
-    if (was_enabled)
+    uint32_t cr_save = 0;  // stifle warning
+    if (was_enabled) {
         cr_save = uart_disable_before_lcr_write(uart);
+    }
 
-    if (en)
+    if (en) {
         hw_set_bits(&uart_get_hw(uart)->lcr_h, UART_UARTLCR_H_BRK_BITS);
-    else
+    } else {
         hw_clear_bits(&uart_get_hw(uart)->lcr_h, UART_UARTLCR_H_BRK_BITS);
+    }
 
-    if (was_enabled)
+    if (was_enabled) {
         uart_get_hw(uart)->cr = cr_save;
+    }
 }
 
 void uart_set_translate_crlf(uart_inst_t *uart, bool crlf) {
@@ -207,7 +216,9 @@ void uart_set_translate_crlf(uart_inst_t *uart, bool crlf) {
 bool uart_is_readable_within_us(uart_inst_t *uart, uint32_t us) {
     uint32_t t = time_us_32();
     do {
-        if (uart_is_readable(uart)) return true;
+        if (uart_is_readable(uart)) {
+             return true;
+        }
     } while ((time_us_32() - t) <= us);
     return false;
 }
