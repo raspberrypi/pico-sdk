@@ -89,19 +89,22 @@ extern "C" {
 #define KHZ 1000
 #define MHZ 1000000
 
+/// \tag::pll_settings[]
+//
 // There are two PLLs in RP2040:
-// The 'SYS PLL' generates the 125MHz system clock, the frequency is defined by `SYS_CLK_KHZ`.
-// The 'USB PLL' generates the 48MHz USB clock, the frequency is defined by `USB_CLK_KHZ`.
-// The two PLLs use the crystal oscillator output directly as their reference frequency input;
-// the PLLs reference frequency cannot be reduced by the dividers present in the clocks block.
-// The crystal frequency is defined by `XOSC_KHZ`.
+// 1. The 'SYS PLL' generates the 125MHz system clock, the frequency is defined by `SYS_CLK_KHZ`.
+// 2. The 'USB PLL' generates the 48MHz USB clock, the frequency is defined by `USB_CLK_KHZ`.
+//
+// The two PLLs use the crystal oscillator output directly as their reference frequency input; the PLLs reference
+// frequency cannot be reduced by the dividers present in the clocks block. The crystal frequency is defined by `XOSC_KHZ` or
+// `XOSC_MKHZ`.
+//
 // The system's default definitions are correct for the above frequencies with a 12MHz
 // crystal frequency.  If different frequencies are required, these must be defined in
 // the board configuration file together with the revised PLL settings
 // Use `vcocalc.py` to check and calculate new PLL settings if you change any of these frequencies.
-
-/// \tag::pll_settings[]
-// Configure PLLs
+//
+// Default PLL configuration:
 //                   REF     FBDIV VCO            POSTDIV
 // PLL SYS: 12 / 1 = 12MHz * 125 = 1500MHz / 6 / 2 = 125MHz
 // PLL USB: 12 / 1 = 12MHz * 100 = 1200MHz / 5 / 5 =  48MHz
@@ -127,6 +130,9 @@ extern "C" {
 #define PLL_SYS_POSTDIV2                    2
 #endif
 #endif // SYS_CLK_KHZ == 125000 && XOSC_KHZ == 12000 && PLL_COMMON_REFDIV == 1
+#if !defined(PLL_SYS_VCO_FREQ_KHZ) || !defined(PLL_SYS_POSTDIV1) || !defined(PLL_SYS_POSTDIV2)
+#error PLL_SYS_VCO_FREQ_KHZ, PLL_SYS_POSTDIV1 and PLL_SYS_POSTDIV2 must all be specified when using custom clock setup
+#endif
 
 #if (USB_CLK_KHZ == 48000) && (XOSC_KHZ == 12000) && (PLL_COMMON_REFDIV == 1)
 // PLL settings for a USB clock of 48MHz.
@@ -143,6 +149,9 @@ extern "C" {
 #define PLL_USB_POSTDIV2                    5
 #endif
 #endif // USB_CLK_KHZ == 48000 && XOSC_KHZ == 12000 && PLL_COMMON_REFDIV == 1
+#if !defined(PLL_USB_VCO_FREQ_KHZ) || !defined(PLL_USB_POSTDIV1) || !defined(PLL_USB_POSTDIV2)
+#error PLL_USB_VCO_FREQ_KHZ, PLL_USB_POSTDIV1 and PLL_USB_POSTDIV2 must all be specified when using custom clock setup.
+#endif
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_CLOCKS, Enable/disable assertions in the clocks module, type=bool, default=0, group=hardware_clocks
 #ifndef PARAM_ASSERTIONS_ENABLED_CLOCKS

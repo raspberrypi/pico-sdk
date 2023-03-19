@@ -72,13 +72,13 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
 bool check_sys_clock_khz(uint32_t freq_khz, uint *vco_out, uint *postdiv1_out, uint *postdiv2_out) {
     uint reference_freq_khz = XOSC_KHZ / PLL_COMMON_REFDIV;
     for (uint fbdiv = 320; fbdiv >= 16; fbdiv--) {
-        uint vco = fbdiv * reference_freq_khz;
-        if (vco < PICO_PLL_VCO_MIN_FREQ_KHZ  || vco > PICO_PLL_VCO_MAX_FREQ_KHZ) continue;
+        uint vco_khz = fbdiv * reference_freq_khz;
+        if (vco_khz < PICO_PLL_VCO_MIN_FREQ_KHZ  || vco_khz > PICO_PLL_VCO_MAX_FREQ_KHZ) continue;
         for (uint postdiv1 = 7; postdiv1 >= 1; postdiv1--) {
             for (uint postdiv2 = postdiv1; postdiv2 >= 1; postdiv2--) {
-                uint out = vco / (postdiv1 * postdiv2);
-                if (out == freq_khz && !(vco % (postdiv1 * postdiv2))) {
-                    *vco_out = vco * KHZ;
+                uint out = vco_khz / (postdiv1 * postdiv2);
+                if (out == freq_khz && !(vco_khz % (postdiv1 * postdiv2))) {
+                    *vco_out = vco_khz * KHZ;
                     *postdiv1_out = postdiv1;
                     *postdiv2_out = postdiv2;
                     return true;
