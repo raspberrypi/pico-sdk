@@ -34,6 +34,10 @@
 #define PICO_DEFAULT_LED_PIN 25
 #endif
 
+#ifndef PICO_DEFAULT_WS2812_PIN
+#define PICO_DEFAULT_WS2812_PIN 8
+#endif
+
 // Default I2C - for qwiic connector
 #ifndef PICO_DEFAULT_I2C
 #define PICO_DEFAULT_I2C       1
