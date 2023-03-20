@@ -39,8 +39,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'develop'
       - 'master'
+      - 'test_workflow'
 
 jobs:
   build:
@@ -59,10 +59,6 @@ jobs:
 
     - name: Checkout submodules
       run: git submodule update --init
-
-    - name: Get core count
-      id: core_count
-      run : cat /proc/cpuinfo  | grep processor | wc -l
 '''
 
 for gcc_version, toolchain_path in gcc_versions_sorted.items():
@@ -71,6 +67,6 @@ for gcc_version, toolchain_path in gcc_versions_sorted.items():
         output += "    - name: GCC {} {}\n".format(gcc_version, build_type)
         output += "      if: always()\n"
         output += "      shell: bash\n"
-        output += "      run: cd ${{{{github.workspace}}}}; mkdir -p build; rm -rf build/*; cd build; cmake ../ -DPICO_SDK_TESTS_ENABLED=1 -DCMAKE_BUILD_TYPE={} -DPICO_TOOLCHAIN_PATH={} -DPICO_BOARD=pico_w; make -j ${{{{steps.core_count.outputs.output}}}}\n".format(build_type, toolchain_path)
+        output += "      run: cd ${{{{github.workspace}}}}; mkdir -p build; rm -rf build/*; cd build; cmake ../ -DPICO_SDK_TESTS_ENABLED=1 -DCMAKE_BUILD_TYPE={} -DPICO_TOOLCHAIN_PATH={} -DPICO_BOARD=pico_w; make --output-sync=target --no-builtin-rules --no-builtin-variables -j$(nproc)\n".format(build_type, toolchain_path)
 
 print(output)
