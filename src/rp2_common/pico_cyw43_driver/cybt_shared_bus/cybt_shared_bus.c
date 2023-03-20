@@ -62,14 +62,14 @@ static cybt_result_t cybt_fw_download_prepare(uint8_t **p_write_buf, uint8_t **p
     *p_write_buf = NULL;
     *p_hex_buf = NULL;
 
-    *p_write_buf = malloc(BTFW_DOWNLOAD_BLK_SIZE + BTFW_SD_ALIGN);
+    *p_write_buf = cyw43_malloc(BTFW_DOWNLOAD_BLK_SIZE + BTFW_SD_ALIGN);
     if (NULL == *p_write_buf) {
         return CYBT_ERR_OUT_OF_MEMORY;
     }
 
-    *p_hex_buf = malloc(BTFW_MAX_STR_LEN);
+    *p_hex_buf = cyw43_malloc(BTFW_MAX_STR_LEN);
     if (NULL == *p_hex_buf) {
-        free(*p_write_buf);
+        cyw43_free(*p_write_buf);
         return CYBT_ERR_OUT_OF_MEMORY;
     }
 
@@ -78,11 +78,11 @@ static cybt_result_t cybt_fw_download_prepare(uint8_t **p_write_buf, uint8_t **p
 
 static cybt_result_t cybt_fw_download_finish(uint8_t *p_write_buf, uint8_t *p_hex_buf) {
     if (p_write_buf) {
-        free(p_write_buf);
+        cyw43_free(p_write_buf);
     }
 
     if (p_hex_buf) {
-        free(p_hex_buf);
+        cyw43_free(p_hex_buf);
     }
 
     return CYBT_SUCCESS;
