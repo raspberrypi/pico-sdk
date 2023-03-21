@@ -89,6 +89,70 @@ extern "C" {
 #define KHZ 1000
 #define MHZ 1000000
 
+/// \tag::pll_settings[]
+//
+// There are two PLLs in RP2040:
+// 1. The 'SYS PLL' generates the 125MHz system clock, the frequency is defined by `SYS_CLK_KHZ`.
+// 2. The 'USB PLL' generates the 48MHz USB clock, the frequency is defined by `USB_CLK_KHZ`.
+//
+// The two PLLs use the crystal oscillator output directly as their reference frequency input; the PLLs reference
+// frequency cannot be reduced by the dividers present in the clocks block. The crystal frequency is defined by `XOSC_KHZ` or
+// `XOSC_MHZ`.
+//
+// The system's default definitions are correct for the above frequencies with a 12MHz
+// crystal frequency.  If different frequencies are required, these must be defined in
+// the board configuration file together with the revised PLL settings
+// Use `vcocalc.py` to check and calculate new PLL settings if you change any of these frequencies.
+//
+// Default PLL configuration:
+//                   REF     FBDIV VCO            POSTDIV
+// PLL SYS: 12 / 1 = 12MHz * 125 = 1500MHz / 6 / 2 = 125MHz
+// PLL USB: 12 / 1 = 12MHz * 100 = 1200MHz / 5 / 5 =  48MHz
+/// \end::pll_settings[]
+
+// PICO_CONFIG: PLL_COMMON_REFDIV, PLL reference divider setting - used for both PLLs, type=int, default=1, advanced=true, group=hardware_clocks
+#ifndef PLL_COMMON_REFDIV
+#define PLL_COMMON_REFDIV                   1
+#endif
+
+#if (SYS_CLK_KHZ == 125000) && (XOSC_KHZ == 12000) && (PLL_COMMON_REFDIV == 1)
+// PLL settings for standard 125 MHz system clock.
+// PICO_CONFIG: PLL_SYS_VCO_FREQ_KHZ, System clock PLL frequency, type=int, default=1500 * KHZ, advanced=true, group=hardware_clocks
+#ifndef PLL_SYS_VCO_FREQ_KHZ
+#define PLL_SYS_VCO_FREQ_KHZ                (1500 * KHZ)
+#endif
+// PICO_CONFIG: PLL_SYS_POSTDIV1, System clock PLL post divider 1 setting, type=int, default=6, advanced=true, group=hardware_clocks
+#ifndef PLL_SYS_POSTDIV1
+#define PLL_SYS_POSTDIV1                    6
+#endif
+// PICO_CONFIG: PLL_SYS_POSTDIV2, System clock PLL post divider 2 setting, type=int, default=2, advanced=true, group=hardware_clocks
+#ifndef PLL_SYS_POSTDIV2
+#define PLL_SYS_POSTDIV2                    2
+#endif
+#endif // SYS_CLK_KHZ == 125000 && XOSC_KHZ == 12000 && PLL_COMMON_REFDIV == 1
+#if !defined(PLL_SYS_VCO_FREQ_KHZ) || !defined(PLL_SYS_POSTDIV1) || !defined(PLL_SYS_POSTDIV2)
+#error PLL_SYS_VCO_FREQ_KHZ, PLL_SYS_POSTDIV1 and PLL_SYS_POSTDIV2 must all be specified when using custom clock setup
+#endif
+
+#if (USB_CLK_KHZ == 48000) && (XOSC_KHZ == 12000) && (PLL_COMMON_REFDIV == 1)
+// PLL settings for a USB clock of 48MHz.
+// PICO_CONFIG: PLL_USB_VCO_FREQ_KHZ, USB clock PLL frequency, type=int, default=1200 * KHZ, advanced=true, group=hardware_clocks
+#ifndef PLL_USB_VCO_FREQ_KHZ
+#define PLL_USB_VCO_FREQ_KHZ                (1200 * KHZ)
+#endif
+// PICO_CONFIG: PLL_USB_POSTDIV1, USB clock PLL post divider 1 setting, type=int, default=5, advanced=true, group=hardware_clocks
+#ifndef PLL_USB_POSTDIV1
+#define PLL_USB_POSTDIV1                    5
+#endif
+// PICO_CONFIG: PLL_USB_POSTDIV2, USB clock PLL post divider 2 setting, type=int, default=5, advanced=true, group=hardware_clocks
+#ifndef PLL_USB_POSTDIV2
+#define PLL_USB_POSTDIV2                    5
+#endif
+#endif // USB_CLK_KHZ == 48000 && XOSC_KHZ == 12000 && PLL_COMMON_REFDIV == 1
+#if !defined(PLL_USB_VCO_FREQ_KHZ) || !defined(PLL_USB_POSTDIV1) || !defined(PLL_USB_POSTDIV2)
+#error PLL_USB_VCO_FREQ_KHZ, PLL_USB_POSTDIV1 and PLL_USB_POSTDIV2 must all be specified when using custom clock setup.
+#endif
+
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_CLOCKS, Enable/disable assertions in the clocks module, type=bool, default=0, group=hardware_clocks
 #ifndef PARAM_ASSERTIONS_ENABLED_CLOCKS
 #define PARAM_ASSERTIONS_ENABLED_CLOCKS 0

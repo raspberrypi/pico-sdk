@@ -37,9 +37,38 @@
 
 #define PIO_INSTRUCTION_COUNT _u(32)
 
-// PICO_CONFIG: XOSC_MHZ, The crystal oscillator frequency in Mhz, type=int, default=12, advanced=true, group=hardware_base
-#ifndef XOSC_MHZ
-#define XOSC_MHZ _u(12)
+// PICO_CONFIG: XOSC_KHZ, The crystal oscillator frequency in kHz, type=int, default=12000, advanced=true, group=hardware_base
+// NOTE:  The system and USB clocks are generated from the frequency using two PLLs.
+// If you override this define, or SYS_CLK_KHZ/USB_CLK_KHZ below, you will *also* need to add your own adjusted PLL set-up defines to
+// override the defaults which live in src/rp2_common/hardware_clocks/include/hardware/clocks.h
+// Please see the comments there about calculating the new PLL setting values.
+#ifndef XOSC_KHZ
+#define XOSC_KHZ _u(12000)
+#endif
+
+// PICO_CONFIG: SYS_CLK_KHZ, The system operating frequency in kHz, type=int, default=125000, advanced=true, group=hardware_base
+#ifndef SYS_CLK_KHZ
+#define SYS_CLK_KHZ _u(125000)
+#endif
+
+// PICO_CONFIG: USB_CLK_KHZ, USB clock frequency. Must be 48MHz for the USB interface to operate correctly, type=int, default=48000, advanced=true, group=hardware_base
+#ifndef USB_CLK_KHZ
+#define USB_CLK_KHZ _u(48000)
+#endif
+
+// For backwards compatibility define XOSC_MHZ if the frequency is indeed an integer number of Mhz.
+#if defined(XOSC_KHZ) && !defined(XOSC_MHZ) && (XOSC_KHZ % 1000 == 0)
+#define XOSC_MHZ (XOSC_KHZ / 1000)
+#endif
+
+// For backwards compatibility define SYS_CLK_MHZ if the frequency is indeed an integer number of Mhz.
+#if defined(SYS_CLK_KHZ) && !defined(SYS_CLK_MHZ) && (SYS_CLK_KHZ % 1000 == 0)
+#define SYS_CLK_MHZ (SYS_CLK_KHZ / 1000)
+#endif
+
+// For backwards compatibility define USB_CLK_MHZ if the frequency is indeed an integer number of Mhz.
+#if defined(USB_CLK_KHZ) && !defined(USB_CLK_MHZ) && (USB_CLK_KHZ % 1000 == 0)
+#define USB_CLK_MHZ (USB_CLK_KHZ / 1000)
 #endif
 
 #define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)

@@ -6,18 +6,20 @@
 
 #include "pico.h"
 
-// For MHZ definitions etc
+// For frequency related definitions etc
 #include "hardware/clocks.h"
 
 #include "hardware/platform_defs.h"
 #include "hardware/regs/xosc.h"
 #include "hardware/xosc.h"
 
-#if XOSC_MHZ < 1 || XOSC_MHZ > 50
-#error XOSC_MHZ must be in the range 1-50
+#if XOSC_KHZ < (1 * KHZ) || XOSC_KHZ > (50 * KHZ)
+// Note: Although an external clock can be supplied up to 50 MHz, the maximum frequency the
+// XOSC cell is specified to work with a crystal is less, please see the RP2040 Datasheet.
+#error XOSC_KHZ must be in the range 1,000-50,000KHz i.e. 1-50MHz XOSC frequency
 #endif
 
-#define STARTUP_DELAY (((((XOSC_MHZ * MHZ) / 1000) + 128) / 256) * PICO_XOSC_STARTUP_DELAY_MULTIPLIER)
+#define STARTUP_DELAY (((XOSC_KHZ + 128) / 256) * PICO_XOSC_STARTUP_DELAY_MULTIPLIER)
 
 // The DELAY field in xosc_hw->startup is 14 bits wide.
 #if STARTUP_DELAY >= (1 << 13)
