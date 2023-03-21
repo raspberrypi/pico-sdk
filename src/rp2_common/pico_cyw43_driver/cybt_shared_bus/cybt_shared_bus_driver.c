@@ -81,7 +81,7 @@ typedef struct
     uint32_t bt2host_out_addr;
 } cybt_fw_membuf_info_t;
 
-cybt_fw_membuf_info_t buf_info;
+static cybt_fw_membuf_info_t buf_info;
 
 #define BTFW_ADDR_MODE_UNKNOWN      (0)
 #define BTFW_ADDR_MODE_EXTENDED     (1)
@@ -131,6 +131,7 @@ typedef struct hex_file_data
 #endif
 
 static cyw43_ll_t *cyw43_ll = NULL;
+static void *streaming_context;
 
 static cybt_result_t cybt_reg_write(uint32_t reg_addr, uint32_t value);
 static cybt_result_t cybt_reg_read(uint32_t reg_addr, uint32_t *p_value);
@@ -265,7 +266,7 @@ static void cybt_fw_get_bytes(uint8_t *dst, const uint8_t **addr, uint8_t count)
 #if CYW43_USE_HEX_BTFW
     memcpy(dst, *addr, count);
 #else
-    const uint8_t *data = cyw43_get_firmware_funcs()->get_bt_fw(*addr, count, dst, count);
+    const uint8_t *data = cyw43_get_firmware_funcs()->stream_fw(streaming_context, count, dst);
     if (data != dst) {
         memcpy(dst, data, count);
     }
@@ -334,12 +335,19 @@ cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware,
         return CYBT_ERR_BADARG;
     }
 
-    if (NULL == p_bt_firmware || 0 == bt_firmware_len || NULL == p_write_buf || NULL == p_hex_buf) {
+    if (NULL == p_write_buf || NULL == p_hex_buf) {
         return CYBT_ERR_BADARG;
     }
-
+#if CYW43_USE_HEX_BTFW
+    if (NULL == p_bt_firmware || 0 == bt_firmware_len) {
+        return CYBT_ERR_BADARG;
+    }
+#else
+    if (cyw43_get_firmware_funcs()->start_fw_stream(cyw43_get_firmware_funcs()->firmware_details(), CYW43_FIRMWARE_BLUETOOTH, &streaming_context) != 0) {
+        assert(false);
+        return CYW43_EIO;
+    }
     // BT firmware starts with length of version string including a null terminator
-#if !CYW43_USE_HEX_BTFW
     uint8_t version_len;
     cybt_fw_get_bytes(&version_len, &p_bt_firmware, 1);
     cybt_fw_get_bytes(p_hex_buf, &p_bt_firmware, version_len);
@@ -413,6 +421,9 @@ cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware,
                            write_data_len - first_write_len);
         }
     }
+#if !CYW43_USE_HEX_BTFW
+    cyw43_get_firmware_funcs()->end_fw_stream(streaming_context, CYW43_FIRMWARE_BLUETOOTH);
+#endif
     return CYBT_SUCCESS;
 }
 
