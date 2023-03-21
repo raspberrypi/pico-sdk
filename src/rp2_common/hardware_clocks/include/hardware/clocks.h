@@ -97,7 +97,7 @@ extern "C" {
 //
 // The two PLLs use the crystal oscillator output directly as their reference frequency input; the PLLs reference
 // frequency cannot be reduced by the dividers present in the clocks block. The crystal frequency is defined by `XOSC_KHZ` or
-// `XOSC_MKHZ`.
+// `XOSC_MHZ`.
 //
 // The system's default definitions are correct for the above frequencies with a 12MHz
 // crystal frequency.  If different frequencies are required, these must be defined in
