@@ -81,4 +81,14 @@
 #define PICO_RP2040_B0_SUPPORTED 1
 #endif
 
+// Pin get VBUS
+#ifndef PICO_VBUS_PIN
+#define PICO_VBUS_PIN 24
+#endif
+
+// Pin used to monitor VSYS using ADC
+#ifndef PICO_VSYS_PIN
+#define PICO_VSYS_PIN 29
+#endif
+
 #endif
