@@ -163,10 +163,12 @@ void cyw43_spi_deinit(cyw43_int_t *self) {
             pio_sm_unclaim(bus_data->pio, bus_data->pio_sm);
         }
         if (bus_data->dma_out >= 0) {
+            dma_channel_cleanup(bus_data->dma_out);
             dma_channel_unclaim(bus_data->dma_out);
             bus_data->dma_out = -1;
         }
         if (bus_data->dma_in >= 0) {
+            dma_channel_cleanup(bus_data->dma_in);
             dma_channel_unclaim(bus_data->dma_in);
             bus_data->dma_in = -1;
         }
