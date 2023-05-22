@@ -302,5 +302,15 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             pico_lwip_contrib_freertos
             pico_rand)
 
+    pico_add_library(pico_lwip_http_util NOFLAG)
+    target_sources(pico_lwip_http_util INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/http_client_util.c
+            )
+    pico_mirrored_target_link_libraries(pico_lwip_http_util INTERFACE
+            pico_lwip_http
+            pico_lwip_mbedtls
+            pico_mbedtls
+            )
+
     pico_promote_common_scope_vars()
 endif()
