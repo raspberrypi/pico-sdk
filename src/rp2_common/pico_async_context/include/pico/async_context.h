@@ -138,6 +138,10 @@ typedef struct async_when_pending_worker {
      * True if the worker need do_work called
      */
     bool work_pending;
+    /*!
+     * User data associated with the worker instance
+     */
+    void *user_data;
 } async_when_pending_worker_t;
 
 #define ASYNC_CONTEXT_FLAG_CALLBACK_FROM_NON_IRQ 0x1
