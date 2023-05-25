@@ -325,7 +325,7 @@ hold_non_core0_in_bootrom:
 // Stack/heap dummies to set size
 
 // Prior to SDK 1.5.1 these were `.section .stack` without the `, "a"`... Clang linker gives a warning about this,
-// however setting it eplxicityl to `, "a"` makes GCC *now* discard the section unless it is also KEEP. This
+// however setting it explicitly to `, "a"` makes GCC *now* discard the section unless it is also KEEP. This
 // seems like very surprising behavior!
 //
 // Strictly the most correct thing to do (as .stack and .heap are unreferenced) is to mark them as "a", and also KEEP, which
