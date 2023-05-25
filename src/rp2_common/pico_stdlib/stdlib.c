@@ -36,15 +36,12 @@ void set_sys_clock_48mhz() {
     }
 }
 
-// When the System clock PLL setup is changed from the initial setting made
-// during system initialisation, the code automatically switches the peripheral
-// clock to the 48MHz USB clock to ensure continuity of peripheral operation.
-// The Pico config option below allows a user to change this default behaviour,
-// if required, by defining the Pico config option below as 1 in their board file.
-// If this option is selected, the peripheral clock will remain connected to the
-// system PLL clock and so will change frequency with that.
 // PICO_CONFIG: PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK, When the SYS clock PLL is changed keep the peripheral clock attached to it, type=bool, default=0, advanced=true, group=hardware_clocks
 #ifndef PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+// By default, when reconfiguring the system clock PLL settings after runtime initialization,
+// the peripheral clock is switched to the 48MHz USB clock to ensure continuity of peripheral operation. 
+// Setting this value to 1 changes the behavior to have the peripheral clock re-configured
+// to the system clock at it's new frequency.
 #define PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK 0
 #endif
 
