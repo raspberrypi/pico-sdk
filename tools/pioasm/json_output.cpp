@@ -92,7 +92,7 @@ struct json_output : public output_format {
             }
             fprintf(out, "\t\t{\n");
 
-            fprintf(out, "%s\"name\": %s,\n", tabs, program.name.c_str());
+            fprintf(out, "%s\"name\": \"%s\",\n", tabs, program.name.c_str());
             fprintf(out, "%s\"wrapTarget\": %d,\n", tabs, program.wrap_target);
             fprintf(out, "%s\"wrap\": %d,\n", tabs, program.wrap);
             fprintf(out, "%s\"origin\": %d,\n", tabs, program.origin.get());
