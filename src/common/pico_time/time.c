@@ -291,6 +291,7 @@ alarm_id_t alarm_pool_add_alarm_at_force_in_context(alarm_pool_t *pool, absolute
 }
 
 bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id) {
+    if (!alarm_id) return false;
     bool rc = false;
     uint32_t save = spin_lock_blocking(pool->lock);
     pheap_node_id_t id = (pheap_node_id_t) alarm_id;
