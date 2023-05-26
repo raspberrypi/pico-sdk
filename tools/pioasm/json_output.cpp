@@ -22,6 +22,46 @@ struct json_output : public output_format {
         return "Machine-formatted output for integrating with external tools";
     }
 
+    void output_symbols(FILE *out, bool output_labels, std::string prefix, const std::vector<compiled_source::symbol> &symbols) {
+
+        fprintf(out, "%s\"publicSymbols\": {\n", prefix.c_str());
+        bool first = true;
+        for (const auto &s : symbols) {
+            if (!s.is_label) {
+                // output trailing comma if necessary
+                if (!first) {
+                    fprintf(out, ",\n");
+                } else {
+                    first = false;
+                }
+                fprintf(out, "%s\t\"%s\": %d", prefix.c_str(), s.name.c_str(), s.value);
+            }
+        }
+        if (!first)
+            fprintf(out, "\n");
+        fprintf(out, "%s},\n", prefix.c_str());
+
+        if (!output_labels)
+            return;
+
+        fprintf(out, "%s\"publicLabels\": {\n", prefix.c_str());
+        first = true;
+        for (const auto &s : symbols) {
+            if (s.is_label) {
+                // output trailing comma if necessary
+                if (!first) {
+                    fprintf(out, ",\n");
+                } else {
+                    first = false;
+                }
+                fprintf(out, "%s\t\"%s\": %d", prefix.c_str(), s.name.c_str(), s.value);
+            }
+        }
+        if (!first)
+            fprintf(out, "\n");
+        fprintf(out, "%s},\n", prefix.c_str());
+    }
+
     int output(std::string destination, std::vector<std::string> output_options,
                const compiled_source &source) override {
 
@@ -37,7 +77,11 @@ struct json_output : public output_format {
 
         fprintf(out, "{\n");
         bool first = true;
-        // TODO: output symbols?
+
+        output_symbols(out, false, "\t", source.global_symbols);
+
+        const char* tabs = "\t\t\t";
+        fprintf(out, "\t\"programs\": [\n");
 
         for (const auto &program : source.programs) {
             // output trailing comma if necessary
@@ -46,21 +90,24 @@ struct json_output : public output_format {
             } else {
                 first = false;
             }
+            fprintf(out, "\t\t{\n");
 
-            fprintf(out, "\t\"%s\": {\n", program.name.c_str());
-            fprintf(out, "\t\t\"wrap_target\": %d,\n", program.wrap_target);
-            fprintf(out, "\t\t\"wrap\": %d,\n", program.wrap);
-            fprintf(out, "\t\t\"origin\": %d,\n", program.origin.get());
+            fprintf(out, "%s\"name\": %s,\n", tabs, program.name.c_str());
+            fprintf(out, "%s\"wrapTarget\": %d,\n", tabs, program.wrap_target);
+            fprintf(out, "%s\"wrap\": %d,\n", tabs, program.wrap);
+            fprintf(out, "%s\"origin\": %d,\n", tabs, program.origin.get());
 
             if (program.sideset_bits_including_opt.is_specified()) {
-                fprintf(out, "\t\t\"sideset\": {\"size\": %d, \"optional\": %s, \"pindirs\": %s},\n", program.sideset_bits_including_opt.get(),
+                fprintf(out, "%s\"sideset\": {\"size\": %d, \"optional\": %s, \"pindirs\": %s},\n", tabs, program.sideset_bits_including_opt.get(),
                         program.sideset_opt ? "true" : "false",
                         program.sideset_pindirs ? "true" : "false");
             } else {
-                fprintf(out, "\t\t\"sideset\": {\"size\": 0, \"optional\": false, \"pindirs\": false},\n", program.origin.get());
+                fprintf(out, "%s\"sideset\": {\"size\": 0, \"optional\": false, \"pindirs\": false},\n", tabs, program.origin.get());
             }
 
-            fprintf(out, "\t\t\"instructions\": [\n");
+            output_symbols(out, true, tabs, program.symbols);
+
+            fprintf(out, "%s\"instructions\": [\n", tabs);
             bool first_inst = true;
             for (int i = 0; i < (int)program.instructions.size(); i++) {
                 const auto &inst = program.instructions[i];
@@ -70,14 +117,20 @@ struct json_output : public output_format {
                 } else {
                     first_inst = false;
                 }
-                fprintf(out, "\t\t\t{\"hex\": \"%04x\", \"index\": %d, \"disassembly\": \"%s\"}", inst, i,
-                        disassemble(inst, program.sideset_bits_including_opt.get(), program.sideset_opt).c_str());
+                // TODO: find a nice, supportable, output format for instruction disassembly.
+                // Note that may require tearing apart pio_disassembler to return to us something
+                // that we could output as {"instr":"mov", args: ["x", "~y"], side: 3, delay: 1}
+                // but that will likely wait for now
+                fprintf(out, "%s\t{\"hex\": \"%04X\"}",// \"disassembly\": \"%s\"}",
+                        tabs, inst
+                        //, disassemble(inst, program.sideset_bits_including_opt.get(), program.sideset_opt).c_str()
+                        );
             }
             fprintf(out, "\n");
-            fprintf(out, "\t\t]\n");
-            fprintf(out, "\t}");
+            fprintf(out, "%s]\n", tabs);
+            fprintf(out, "\t\t}");
         }
-        fprintf(out, "\n}\n");
+        fprintf(out, "\n\t]\n}\n");
         if (out != stdout) { fclose(out); }
         return 0;
     }
