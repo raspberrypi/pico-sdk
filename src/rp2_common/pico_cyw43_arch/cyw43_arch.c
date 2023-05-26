@@ -45,7 +45,7 @@ void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t 
     cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_AP, true, cyw43_arch_get_country_code());
 }
 
-void cyw43_arch_disable_ap_mode() {
+void cyw43_arch_disable_ap_mode(void) {
     assert(cyw43_is_initialized(&cyw43_state));
     cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_AP, false, cyw43_arch_get_country_code());
 }
