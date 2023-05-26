@@ -375,7 +375,7 @@ void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t 
  *
  * This Disbles the Wi-Fi in \em Access \em Point mode.
  */
-void cyw43_arch_disable_ap_mode();
+void cyw43_arch_disable_ap_mode(void);
 
 /*!
  * \brief Attempt to connect to a wireless access point, blocking until the network is joined or a failure is detected.
