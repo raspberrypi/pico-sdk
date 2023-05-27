@@ -38,8 +38,13 @@ void *__wrap_malloc(size_t size) {
     mutex_exit(&malloc_mutex);
 #endif
 #if PICO_DEBUG_MALLOC
-    if (!rc || ((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) {
-        printf("malloc %d %p->%p\n", (uint) size, rc, ((uint8_t *) rc) + size);
+    if (!rc) 
+    {
+        printf("malloc %d failed to allocate memory\n", (uint) (count * size));
+    } 
+    else if (((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) 
+    {
+        printf("malloc %d %p->%p\n", (uint) (count * size), rc, ((uint8_t *) rc) + size);
     }
 #endif
     check_alloc(rc, size);
@@ -55,9 +60,14 @@ void *__wrap_calloc(size_t count, size_t size) {
     mutex_exit(&malloc_mutex);
 #endif
 #if PICO_DEBUG_MALLOC
-    if (!rc || ((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) {
+    if (!rc) 
+    {
+        printf("calloc %d failed to allocate memory\n", (uint) (count * size));
+    } 
+    else if (((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) 
+    {
         printf("calloc %d %p->%p\n", (uint) (count * size), rc, ((uint8_t *) rc) + size);
-    }
+    }   
 #endif
     check_alloc(rc, size);
     return rc;
@@ -72,8 +82,13 @@ void *__wrap_realloc(void *mem, size_t size) {
     mutex_exit(&malloc_mutex);
 #endif
 #if PICO_DEBUG_MALLOC
-    if (!rc || ((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) {
-        printf("realloc %p %d->%p\n", mem, (uint) size, rc);
+    if (!rc) 
+    {
+        printf("realloc %d failed to allocate memory\n", (uint) (count * size));
+    } 
+    else if (((uint8_t *)rc) + size > (uint8_t*)PICO_DEBUG_MALLOC_LOW_WATER) 
+    {
+        printf("realloc %d %p->%p\n", (uint) (count * size), rc, ((uint8_t *) rc) + size);
     }
 #endif
     check_alloc(rc, size);
