@@ -504,7 +504,7 @@ static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
     pico_default_asm (
         "1: subs %0, #3\n"
         "bcs 1b\n"
-        : "+r" (minimum_cycles) : : "memory"
+        : "+l" (minimum_cycles) : : "memory"
     );
 }
 
