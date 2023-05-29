@@ -139,8 +139,14 @@ const uint8_t *tud_descriptor_configuration_cb(__unused uint8_t index) {
 }
 
 const uint16_t *tud_descriptor_string_cb(uint8_t index, __unused uint16_t langid) {
-    #define DESC_STR_MAX (20)
-    static uint16_t desc_str[DESC_STR_MAX];
+#ifndef USBD_DESC_STR_MAX
+#define USBD_DESC_STR_MAX (20)
+#elif USBD_DESC_STR_MAX > 127
+#error USBD_DESC_STR_MAX too high (max is 127).
+#elif USBD_DESC_STR_MAX < 17
+#error USBD_DESC_STR_MAX too low (min is 17).
+#endif
+    static uint16_t desc_str[USBD_DESC_STR_MAX];
 
     // Assign the SN using the unique flash id
     if (!usbd_serial_str[0]) {
@@ -156,7 +162,7 @@ const uint16_t *tud_descriptor_string_cb(uint8_t index, __unused uint16_t langid
             return NULL;
         }
         const char *str = usbd_desc_str[index];
-        for (len = 0; len < DESC_STR_MAX - 1 && str[len]; ++len) {
+        for (len = 0; len < USBD_DESC_STR_MAX - 1 && str[len]; ++len) {
             desc_str[1 + len] = str[len];
         }
     }
