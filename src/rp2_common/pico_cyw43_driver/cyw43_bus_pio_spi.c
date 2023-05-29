@@ -393,11 +393,12 @@ uint32_t read_reg_u32_swap(cyw43_int_t *self, uint32_t fn, uint32_t reg) {
 
 static inline uint32_t _cyw43_read_reg(cyw43_int_t *self, uint32_t fn, uint32_t reg, uint size) {
     // Padding plus max read size of 32 bits + another 4?
-    static_assert(WHD_BUS_SPI_BACKPLANE_READ_PADD_SIZE % 4 == 0, "");
-    uint32_t buf32[WHD_BUS_SPI_BACKPLANE_READ_PADD_SIZE/4 + 1 + 1];
+    static_assert(CYW43_BACKPLANE_READ_PAD_LEN_BYTES % 4 == 0, "");
+    int index = (CYW43_BACKPLANE_READ_PAD_LEN_BYTES / 4) + 1 + 1;
+    uint32_t buf32[index];
     uint8_t *buf = (uint8_t *)buf32;
-    const uint32_t padding = (fn == BACKPLANE_FUNCTION) ? WHD_BUS_SPI_BACKPLANE_READ_PADD_SIZE : 0; // Add response delay
-    buf32[0] = make_cmd(false, true, fn, reg, size + padding);
+    const uint32_t padding = (fn == BACKPLANE_FUNCTION) ? CYW43_BACKPLANE_READ_PAD_LEN_BYTES : 0; // Add response delay
+    buf32[0] = make_cmd(false, true, fn, reg, size);
 
     if (fn == BACKPLANE_FUNCTION) {
         logic_debug_set(pin_BACKPLANE_READ, 1);
@@ -410,7 +411,7 @@ static inline uint32_t _cyw43_read_reg(cyw43_int_t *self, uint32_t fn, uint32_t 
     if (ret != 0) {
         return ret;
     }
-    uint32_t result = buf32[padding > 0 ? 2 : 1];
+    uint32_t result = buf32[padding > 0 ? index - 1 : 1];
     CYW43_VDEBUG("cyw43_read_reg_u%d %s 0x%lx=0x%lx\n", size * 8, func_name(fn), reg, result);
     return result;
 }
@@ -476,21 +477,21 @@ int cyw43_write_reg_u8(cyw43_int_t *self, uint32_t fn, uint32_t reg, uint32_t va
     return _cyw43_write_reg(self, fn, reg, val, 1);
 }
 
-#if MAX_BLOCK_SIZE > 0x7f8
+#if CYW43_BUS_MAX_BLOCK_SIZE > 0x7f8
 #error Block size is wrong for SPI
 #endif
 
 int cyw43_read_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len, uint8_t *buf) {
-    assert(fn != BACKPLANE_FUNCTION || (len <= 64 && (addr + len) <= 0x8000));
-    const uint32_t padding = (fn == BACKPLANE_FUNCTION) ? 4 : 0; // Add response delay
+    assert(fn != BACKPLANE_FUNCTION || (len <= CYW43_BUS_MAX_BLOCK_SIZE));
+    const uint32_t padding = (fn == BACKPLANE_FUNCTION) ? CYW43_BACKPLANE_READ_PAD_LEN_BYTES : 0; // Add response delay
     size_t aligned_len = (len + 3) & ~3;
     assert(aligned_len > 0 && aligned_len <= 0x7f8);
     assert(buf == self->spid_buf || buf < self->spid_buf || buf >= (self->spid_buf + sizeof(self->spid_buf)));
-    self->spi_header[padding > 0 ? 0 : 1] = make_cmd(false, true, fn, addr, len + padding);
+    self->spi_header[padding > 0 ? 0 : (CYW43_BACKPLANE_READ_PAD_LEN_BYTES / 4)] = make_cmd(false, true, fn, addr, len);
     if (fn == WLAN_FUNCTION) {
         logic_debug_set(pin_WIFI_RX, 1);
     }
-    int ret = cyw43_spi_transfer(self, NULL, 4, (uint8_t *)&self->spi_header[padding > 0 ? 0 : 1], aligned_len + 4 + padding);
+    int ret = cyw43_spi_transfer(self, NULL, 4, (uint8_t *)&self->spi_header[padding > 0 ? 0 : (CYW43_BACKPLANE_READ_PAD_LEN_BYTES / 4)], aligned_len + 4 + padding);
     if (fn == WLAN_FUNCTION) {
         logic_debug_set(pin_WIFI_RX, 0);
     }
@@ -508,8 +509,8 @@ int cyw43_read_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len, 
 // Note, uses spid_buf if src isn't using it already
 // Apart from firmware download this appears to only be used for wlan functions?
 int cyw43_write_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len, const uint8_t *src) {
-    assert(fn != BACKPLANE_FUNCTION || (len <= 64 && (addr + len) <= 0x8000));
-    size_t aligned_len = (len + 3) & ~3u;
+    assert(fn != BACKPLANE_FUNCTION || (len <= CYW43_BUS_MAX_BLOCK_SIZE));
+    const size_t aligned_len = (len + 3) & ~3u;
     assert(aligned_len > 0 && aligned_len <= 0x7f8);
     if (fn == WLAN_FUNCTION) {
         // Wait for FIFO to be ready to accept data
@@ -529,17 +530,17 @@ int cyw43_write_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len,
         }
     }
     if (src == self->spid_buf) { // avoid a copy in the usual case just to add the header
-        self->spi_header[1] = make_cmd(true, true, fn, addr, len);
+        self->spi_header[(CYW43_BACKPLANE_READ_PAD_LEN_BYTES / 4)] = make_cmd(true, true, fn, addr, len);
         logic_debug_set(pin_WIFI_TX, 1);
-        int res = cyw43_spi_transfer(self, (uint8_t *)&self->spi_header[1], aligned_len + 4, NULL, 0);
+        int res = cyw43_spi_transfer(self, (uint8_t *)&self->spi_header[(CYW43_BACKPLANE_READ_PAD_LEN_BYTES / 4)], aligned_len + 4, NULL, 0);
         logic_debug_set(pin_WIFI_TX, 0);
         return res;
     } else {
         // todo: would be nice to get rid of this. Only used for firmware download?
         assert(src < self->spid_buf || src >= (self->spid_buf + sizeof(self->spid_buf)));
-        self->spi_header[1] = make_cmd(true, true, fn, addr, len);
+        self->spi_header[(CYW43_BACKPLANE_READ_PAD_LEN_BYTES / 4)] = make_cmd(true, true, fn, addr, len);
         memcpy(self->spid_buf, src, len);
-        return cyw43_spi_transfer(self, (uint8_t *)&self->spi_header[1], aligned_len + 4, NULL, 0);
+        return cyw43_spi_transfer(self, (uint8_t *)&self->spi_header[(CYW43_BACKPLANE_READ_PAD_LEN_BYTES / 4)], aligned_len + 4, NULL, 0);
     }
 }
 #endif

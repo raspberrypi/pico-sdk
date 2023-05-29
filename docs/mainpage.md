@@ -24,5 +24,5 @@ The SDK builds an executable which is bare-metal, i.e. it includes the entirety 
 
 ## Examples
 
-This SDK documentation contains a number of example code fragments. An index of these examples can be found [here](@ref examples_page). These examples, and any other source code included in this documentation, is Copyright &copy; 2020 Raspberry Pi (Trading) Ltd. and licensed under the [3-Clause BSD](https://opensource.org/licenses/BSD-3-Clause) license.
+This SDK documentation contains a number of example code fragments. An index of these examples can be found [here](@ref examples_page). These examples, and any other source code included in this documentation, is Copyright &copy; 2020 Raspberry Pi Ltd and licensed under the [3-Clause BSD](https://opensource.org/licenses/BSD-3-Clause) license.
 

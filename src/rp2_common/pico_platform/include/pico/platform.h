@@ -523,6 +523,18 @@ __force_inline static uint get_core_num(void) {
 
 #else // __ASSEMBLER__
 
+#if defined __GNUC__
+// note LLVM defines __GNUC__
+#ifdef __clang__
+#define PICO_ASSEMBLER_IS_CLANG 1
+#else
+#define PICO_ASSEMBLER_IS_GNU 1
+#endif
+#elif defined __ICCARM__
+#else
+#error Unsupported toolchain
+#endif
+
 #define WRAPPER_FUNC_NAME(x) __wrap_##x
 #define SECTION_NAME(x) .text.##x
 #define RAM_SECTION_NAME(x) .time_critical.##x

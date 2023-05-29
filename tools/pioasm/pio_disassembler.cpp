@@ -7,7 +7,6 @@
 #include <array>
 #include <sstream>
 #include <iomanip>
-#include <cstdint>
 #include "pio_disassembler.h"
 
 extern "C" void disassemble(char *buf, int buf_len, uint16_t inst, uint sideset_bits, bool sideset_opt) {

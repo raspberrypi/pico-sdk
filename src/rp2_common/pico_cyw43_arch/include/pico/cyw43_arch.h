@@ -358,16 +358,33 @@ uint32_t cyw43_arch_get_country_code(void);
 void cyw43_arch_enable_sta_mode(void);
 
 /*!
+ * \brief Disables Wi-Fi STA (Station) mode.
+ * \ingroup pico_cyw43_arch
+ *
+ * This disables the Wi-Fi in \em Station mode, disconnecting any active connection.
+ * You should subsequently check the status by calling \ref cyw43_wifi_link_status.
+ */
+void cyw43_arch_disable_sta_mode(void);
+
+/*!
  * \brief Enables Wi-Fi AP (Access point) mode.
  * \ingroup pico_cyw43_arch
  *
- * This enables the Wi-Fi in \em Access \em Point mode such that connections can be made to the device by  other Wi-Fi clients
+ * This enables the Wi-Fi in \em Access \em Point mode such that connections can be made to the device by other Wi-Fi clients
  * \param ssid the name for the access point
  * \param password the password to use or NULL for no password.
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  */
 void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t auth);
+    
+/*!
+ * \brief Disables Wi-Fi AP (Access point) mode.
+ * \ingroup pico_cyw43_arch
+ *
+ * This Disbles the Wi-Fi in \em Access \em Point mode.
+ */
+void cyw43_arch_disable_ap_mode(void);
 
 /*!
  * \brief Attempt to connect to a wireless access point, blocking until the network is joined or a failure is detected.

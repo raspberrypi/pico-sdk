@@ -28,9 +28,20 @@ void cyw43_arch_set_async_context(async_context_t *context) {
     async_context = context;
 }
 
-void cyw43_arch_enable_sta_mode() {
+void cyw43_arch_enable_sta_mode(void) {
     assert(cyw43_is_initialized(&cyw43_state));
     cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_STA, true, cyw43_arch_get_country_code());
+}
+
+void cyw43_arch_disable_sta_mode(void) {
+    assert(cyw43_is_initialized(&cyw43_state));
+    if (cyw43_state.itf_state & (1 << CYW43_ITF_STA)) {
+        cyw43_cb_tcpip_deinit(&cyw43_state, CYW43_ITF_STA);
+        cyw43_state.itf_state &= ~(1 << CYW43_ITF_STA);
+    }
+    if (cyw43_state.wifi_join_state) {
+        cyw43_wifi_leave(&cyw43_state, CYW43_ITF_STA);
+    }
 }
 
 void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t auth) {
@@ -43,6 +54,12 @@ void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t 
         cyw43_wifi_ap_set_auth(&cyw43_state, CYW43_AUTH_OPEN);
     }
     cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_AP, true, cyw43_arch_get_country_code());
+}
+
+void cyw43_arch_disable_ap_mode(void) {
+    assert(cyw43_is_initialized(&cyw43_state));
+    cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_AP, false, cyw43_arch_get_country_code());
+    cyw43_state.itf_state &= ~(1 << CYW43_ITF_AP);
 }
 
 #if PICO_CYW43_ARCH_DEBUG_ENABLED

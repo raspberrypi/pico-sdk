@@ -63,6 +63,7 @@ static uint32_t last_bt_ctrl_reg;
 #define B2H_BUF_OUT_ADDR            (buf_info.bt2host_out_addr)
 
 static uint32_t wlan_ram_base_addr;
+volatile uint32_t host_ctrl_cache_reg = 0;
 #define WLAN_RAM_BASE_ADDR            (wlan_ram_base_addr)
 
 // In wifi host driver these are all constants
@@ -70,8 +71,7 @@ static uint32_t wlan_ram_base_addr;
 #define HOST_CTRL_REG_ADDR          ((uint32_t)0x18000d6c)
 #define WLAN_RAM_BASE_REG_ADDR      ((uint32_t)0x18000d68)
 
-typedef struct
-{
+typedef struct {
     uint32_t host2bt_buf_addr;
     uint32_t host2bt_in_addr;
     uint32_t host2bt_out_addr;
@@ -109,26 +109,18 @@ cybt_fw_membuf_info_t buf_info;
 #define ROUNDDN(x, a)               ((x) & ~((a) - 1))
 #define ISALIGNED(a, x)             (((uint32_t)(a) & ((x) - 1)) == 0)
 
-typedef struct cybt_fw_cb
-{
+typedef struct cybt_fw_cb {
     const uint8_t *p_fw_mem_start;
     uint32_t fw_len;
     const uint8_t *p_next_line_start;
 } cybt_fw_cb_t;
 
-typedef struct hex_file_data
-{
+typedef struct hex_file_data {
     int addr_mode;
     uint16_t hi_addr;
     uint32_t dest_addr;
     uint8_t *p_ds;
 } hex_file_data_t;
-
-#if USE_SDIO
-#define MAX_BLOCK_SIZE 16384
-#else
-#define MAX_BLOCK_SIZE 64
-#endif
 
 static cyw43_ll_t *cyw43_ll = NULL;
 
@@ -174,7 +166,7 @@ static uint32_t cybt_fw_hex_read_line(cybt_fw_cb_t *p_btfw_cb,
     return str_len;
 }
 
-static inline uint8_t nibble_for_char(char c){
+static inline uint8_t nibble_for_char(char c) {
     if ((c >= '0') && (c <= '9')) return c - '0';
     if ((c >= 'A') && (c <= 'F')) return c - 'A' + 10;
     return -1;
@@ -559,10 +551,17 @@ cybt_result_t cybt_get_bt_buf_index(cybt_fw_membuf_index_t *p_buf_index) {
 static cybt_result_t cybt_reg_write(uint32_t reg_addr, uint32_t value) {
     cybt_debug("cybt_reg_write 0x%08lx 0x%08lx\n", reg_addr, value);
     cyw43_ll_write_backplane_reg(cyw43_ll, reg_addr, value);
+    if (reg_addr == HOST_CTRL_REG_ADDR) {
+        host_ctrl_cache_reg = value;
+    }
     return CYBT_SUCCESS;
 }
 
 static cybt_result_t cybt_reg_read(uint32_t reg_addr, uint32_t *p_value) {
+    if (reg_addr == HOST_CTRL_REG_ADDR) {
+        *p_value = host_ctrl_cache_reg;
+        return CYBT_SUCCESS;
+    }
     *p_value = cyw43_ll_read_backplane_reg(cyw43_ll, reg_addr);
     cybt_debug("cybt_reg_read 0x%08lx == 0x%08lx\n", reg_addr, *p_value);
     return CYBT_SUCCESS;
@@ -579,7 +578,6 @@ static void dump_bytes(const uint8_t *bptr, uint32_t len) {
         cybt_debug("0x%02x", bptr[i]);
         if (i != (len - 1)) {
             cybt_debug(", ");
-        } else {
         }
     }
     cybt_debug("\n");
@@ -592,7 +590,10 @@ static void dump_bytes(const uint8_t *bptr, uint32_t len) {
 static cybt_result_t cybt_mem_write(uint32_t mem_addr, const uint8_t *p_data, uint32_t data_len) {
     cybt_debug("cybt_mem_write addr 0x%08lx len %ld\n", mem_addr, data_len);
     do {
-        uint32_t transfer_size = (data_len > MAX_BLOCK_SIZE) ? MAX_BLOCK_SIZE : data_len;
+        uint32_t transfer_size = (data_len > CYW43_BUS_MAX_BLOCK_SIZE) ? CYW43_BUS_MAX_BLOCK_SIZE : data_len;
+        if ((mem_addr & 0xFFF) + transfer_size > 0x1000) {
+            transfer_size = 0x1000 - (mem_addr & 0xFFF);
+        }
         cyw43_ll_write_backplane_mem(cyw43_ll, mem_addr, transfer_size, p_data);
         cybt_debug("  write_mem addr 0x%08lx len %ld\n", mem_addr, transfer_size);
         DUMP_BYTES(p_data, transfer_size);
@@ -607,8 +608,10 @@ static cybt_result_t cybt_mem_read(uint32_t mem_addr, uint8_t *p_data, uint32_t 
     assert(data_len >= 4);
     cybt_debug("cybt_mem_read addr 0x%08lx len %ld\n", mem_addr, data_len);
     do {
-        uint32_t transfer_size = (data_len > MAX_BLOCK_SIZE) ? MAX_BLOCK_SIZE : data_len;
-        /* this limitation from BT, we need to read twice when spi clock setting is more than 25MHz */
+        uint32_t transfer_size = (data_len > CYW43_BUS_MAX_BLOCK_SIZE) ? CYW43_BUS_MAX_BLOCK_SIZE : data_len;
+        if ((mem_addr & 0xFFF) + transfer_size > 0x1000) {
+            transfer_size = 0x1000 - (mem_addr & 0xFFF);
+        }
         cyw43_ll_read_backplane_mem(cyw43_ll, mem_addr, transfer_size, p_data);
         cybt_debug("  read_mem addr 0x%08lx len %ld\n", transfer_size, mem_addr);
         DUMP_BYTES(p_data, transfer_size);
@@ -645,7 +648,6 @@ static uint32_t cybt_get_addr(cybt_addr_idx_t addr_idx) {
             assert(0);
             break;
     }
-
     return addr;
 }
 
