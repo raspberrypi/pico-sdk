@@ -894,8 +894,8 @@ static inline uint dma_get_timer_dreq(uint timer_num) {
 /*! \brief Performs DMA channel cleanup after use
  *  \ingroup hardware_dma
  *
- * This can be used to cleanup dma channels when they're no longer needed.
- * IRQ's for this channel are disabled, DMA transfers are stopped and any outstanding interrupts are cleared.
+ * This can be used to cleanup dma channels when they're no longer needed, such that they are in a clean state for reuse.
+ * IRQ's for the channel are disabled, any in flight-transfer is aborted and any outstanding interrupts are cleared.
  * The channel is then clear to be reused for other purposes.
  *
  * \code
@@ -909,9 +909,16 @@ static inline uint dma_get_timer_dreq(uint timer_num) {
  * \param channel DMA channel
  */
 static inline void dma_channel_cleanup(uint channel) {
+    check_dma_channel_param(channel);
+    // we definitely want to disable chaining, because that could cause a restart
+    // during abort. Sicne we're doing that, it's just as easy to reset to default config!
+    uint32_t cfg = dma_channel_default_config(channel);
+    dma_channel_set_config(channel, &cfg, false);
+    // disable IRQs first as abort can cause spurious IRQs
     dma_channel_set_irq0_enabled(channel, false);
     dma_channel_set_irq1_enabled(channel, false);
     dma_channel_abort(channel);
+    // finally clear the IRQ status, which may have been set during abort
     dma_hw->intr = 1u << channel;
 }
 
