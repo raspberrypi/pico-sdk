@@ -70,6 +70,20 @@ bool dma_timer_is_claimed(uint timer) {
     return hw_is_claimed(&_timer_claimed, timer);
 }
 
+void dma_channel_cleanup(uint channel) {
+    check_dma_channel_param(channel);
+    // we definitely want to disable chaining, because that could cause a restart
+    // during abort. Sicne we're doing that, it's just as easy to reset to default config!
+    const dma_channel_config config = dma_channel_get_default_config(channel);
+    dma_channel_set_config(channel, &config, false);
+    // disable IRQs first as abort can cause spurious IRQs
+    dma_channel_set_irq0_enabled(channel, false);
+    dma_channel_set_irq1_enabled(channel, false);
+    dma_channel_abort(channel);
+    // finally clear the IRQ status, which may have been set during abort
+    dma_hw->intr = 1u << channel;
+}
+
 #ifndef NDEBUG
 
 void print_dma_ctrl(dma_channel_hw_t *channel) {
