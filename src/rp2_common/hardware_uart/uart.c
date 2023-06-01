@@ -98,11 +98,15 @@ static uint32_t uart_disable_before_lcr_write(uart_inst_t *uart) {
 
     uint32_t current_ibrd = uart_get_hw(uart)->ibrd;
     uint32_t current_fbrd = uart_get_hw(uart)->fbrd;
-    uint64_t baud_period_usec = 1u +
-        ((uint64_t)64 * current_ibrd + current_fbrd) /
-        (4u * clock_get_hz(clk_peri));
 
-    busy_wait_us(15 * baud_period_usec);
+    // Note: Maximise precision here. Show working, the compiler will mop this up.
+    // Create a 16.6 fixed-point fractional division ratio; then scale to 32-bits.
+    uint32_t brdiv_ratio = 64u * current_ibrd + current_fbrd;
+    brdiv_ratio <<= 10;
+    // 3662 is ~(15 * 244.14) where 244.14 is 16e6 / 2^16
+    uint32_t scaled_freq = clock_get_hz(clk_peri) / 3662ul;
+    uint32_t wait_time_us = brdiv_ratio / scaled_freq;
+    busy_wait_us(wait_time_us);
 
     return cr_save;
 }
