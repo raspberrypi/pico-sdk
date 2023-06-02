@@ -10,7 +10,7 @@ else()
         message("PICO target board is ${PICO_BOARD}.")
     endif()
 endif()
-set(PICO_BOARD ${PICO_BOARD} CACHE STRING "PICO target board (e.g. pico)")
+set(PICO_BOARD ${PICO_BOARD} CACHE STRING "PICO target board (e.g. pico)" FORCE)
 
 # PICO_CMAKE_CONFIG: PICO_BOARD_CMAKE_DIRS, Directories to look for <PICO_BOARD>.cmake in. This is overridable from the user environment, type=list, default="", group=build
 if (DEFINED ENV{PICO_BOARD_CMAKE_DIRS})
