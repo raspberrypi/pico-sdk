@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#if PICO_CYW43_ARCH_POLL
+
 #include "pico/cyw43_arch.h"
 #include "pico/cyw43_driver.h"
 
-#if PICO_CYW43_ARCH_POLL
 #include "pico/async_context_poll.h"
 #if CYW43_LWIP
 #include "pico/lwip_nosys.h"
