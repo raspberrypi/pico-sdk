@@ -891,6 +891,25 @@ static inline uint dma_get_timer_dreq(uint timer_num) {
     return DREQ_DMA_TIMER0 + timer_num;
 }
 
+/*! \brief Performs DMA channel cleanup after use
+ *  \ingroup hardware_dma
+ *
+ * This can be used to cleanup dma channels when they're no longer needed, such that they are in a clean state for reuse.
+ * IRQ's for the channel are disabled, any in flight-transfer is aborted and any outstanding interrupts are cleared.
+ * The channel is then clear to be reused for other purposes.
+ *
+ * \code
+ * if (dma_channel >= 0) {
+ *     dma_channel_cleanup(dma_channel);
+ *     dma_channel_unclaim(dma_channel);
+ *     dma_channel = -1;
+ * }
+ * \endcode
+ *
+ * \param channel DMA channel
+ */
+void dma_channel_cleanup(uint channel);
+
 #ifndef NDEBUG
 void print_dma_ctrl(dma_channel_hw_t *channel);
 #endif
