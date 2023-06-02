@@ -72,10 +72,8 @@ bool dma_timer_is_claimed(uint timer) {
 
 void dma_channel_cleanup(uint channel) {
     check_dma_channel_param(channel);
-    // we definitely want to disable chaining, because that could cause a restart
-    // during abort. Sicne we're doing that, it's just as easy to reset to default config!
-    const dma_channel_config config = dma_channel_get_default_config(channel);
-    dma_channel_set_config(channel, &config, false);
+    // Disable CHAIN_TO, and disable channel, so that it ignores any further triggers 
+    hw_write_masked( &dma_hw->ch[channel].al1_ctrl, (channel << DMA_CH0_CTRL_TRIG_CHAIN_TO_LSB) | (0u << DMA_CH0_CTRL_TRIG_EN_LSB), DMA_CH0_CTRL_TRIG_CHAIN_TO_BITS | DMA_CH0_CTRL_TRIG_EN_BITS );
     // disable IRQs first as abort can cause spurious IRQs
     dma_channel_set_irq0_enabled(channel, false);
     dma_channel_set_irq1_enabled(channel, false);
