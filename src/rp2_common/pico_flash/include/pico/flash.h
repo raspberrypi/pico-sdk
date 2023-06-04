@@ -35,7 +35,7 @@
  * Using the default settings, flash_safe_execute will only call the callback function if the state is safe
  * otherwise returning an error (or an assert depending on \ref PICO_FLASH_ASSERT_ON_UNSAFE).
  *
- * There are conditions where safety would not be guaranteed
+ * There are conditions where safety would not be guaranteed:
  *
  * 1. FreeRTOS smp with `configNUM_CORES=1` - FreeRTOS still uses pico_multicore in this case, so \ref flash_safe_execute
  * cannot know what the other core is doing, and there is no way to force code execution between a FreeRTOS core
@@ -71,10 +71,11 @@ bool flash_safe_execute_core_init(void);
 bool flash_safe_execute_core_deinit(void);
 
 /**
+ * Execute a function with IRQs disabled and with the other core also not executing/reading flash
  *
- * \param func
- * \param param
- * \param enter_exit_timeout_ms
+ * \param func the function to call
+ * \param param the parameter to pass to the function
+ * \param enter_exit_timeout_ms the timeout for each of the enter/exit phases when coordinating with the other core
  *
  * \return PICO_OK on success (the function will have been called).
  *         PICO_TIMEOUT on timeout (the function may have been called).
