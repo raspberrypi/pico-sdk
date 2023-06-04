@@ -5,7 +5,7 @@
  */
 
 #include "pico/btstack_flash_bank.h"
-#include "hardware/flash.h"
+#include "pico/flash.h"
 #include "hardware/sync.h"
 #include <string.h>
 
@@ -33,12 +33,30 @@ static uint32_t pico_flash_bank_get_alignment(void * context) {
     return 1;
 }
 
+typedef struct {
+    bool op_is_erase;
+    uintptr_t p0;
+    uintptr_t p1;
+} mutation_operation_t;
+
+static void pico_flash_bank_perform_flash_mutation_operation(void *param) {
+    const mutation_operation_t *mop = (const mutation_operation_t *)param;
+    if (mop->op_is_erase) {
+        flash_range_erase(mop->p0, PICO_FLASH_BANK_SIZE);
+    } else {
+        flash_range_program(mop->p0, (const uint8_t *)mop->p1, FLASH_PAGE_SIZE);
+    }
+}
+
 static void pico_flash_bank_erase(void * context, int bank) {
     (void)(context);
     DEBUG_PRINT("erase: bank %d\n", bank);
-    uint32_t status = save_and_disable_interrupts();
-    flash_range_erase(PICO_FLASH_BANK_STORAGE_OFFSET + (PICO_FLASH_BANK_SIZE * bank), PICO_FLASH_BANK_SIZE);
-    restore_interrupts(status);
+    mutation_operation_t mop = {
+            .op_is_erase = true,
+            .p0 = PICO_FLASH_BANK_STORAGE_OFFSET + (PICO_FLASH_BANK_SIZE * bank),
+    };
+    // todo better timeout
+    flash_safe_execute(pico_flash_bank_perform_flash_mutation_operation, &mop, UINT32_MAX);
 }
 
 static void pico_flash_bank_read(void *context, int bank, uint32_t offset, uint8_t *buffer, uint32_t size) {
@@ -118,9 +136,13 @@ static void pico_flash_bank_write(void * context, int bank, uint32_t offset, con
         offset = 0;
 
         // Now program the entire page
-        uint32_t status = save_and_disable_interrupts();
-        flash_range_program(bank_start_pos + (page * FLASH_PAGE_SIZE), page_data, FLASH_PAGE_SIZE);
-        restore_interrupts(status);
+        mutation_operation_t mop = {
+                .op_is_erase = false,
+                .p0 = bank_start_pos + (page * FLASH_PAGE_SIZE),
+                .p1 = (uintptr_t)page_data
+        };
+        // todo better timeout
+        flash_safe_execute(pico_flash_bank_perform_flash_mutation_operation, &mop, UINT32_MAX);
     }
 }
 
