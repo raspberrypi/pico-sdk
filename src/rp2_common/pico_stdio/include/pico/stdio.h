@@ -51,14 +51,14 @@ typedef struct stdio_driver stdio_driver_t;
 /*! \brief Initialize all of the present standard stdio types that are linked into the binary.
  * \ingroup pico_stdio
  *
- * Call this method once you have set up your clocks to enable the stdio support for UART, USB
- * and semihosting based on the presence of the respective libraries in the binary.
+ * Call this method once you have set up your clocks to enable the stdio support for UART, USB,
+ * semihosting, and RTT based on the presence of the respective libraries in the binary.
  *
  * When stdio_usb is configured, this method can be optionally made to block, waiting for a connection
  * via the variables specified in \ref stdio_usb_init (i.e. \ref PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS)
  *
  * \return true if at least one output was successfully initialized, false otherwise.
- * \see stdio_uart, stdio_usb, stdio_semihosting
+ * \see stdio_uart, stdio_usb, stdio_semihosting, stdio_rtt
  */
 bool stdio_init_all(void);
 

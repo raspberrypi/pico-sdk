@@ -13,3 +13,6 @@
 [submodule "lib/btstack"]
 	path = lib/btstack
 	url = https://github.com/bluekitchen/btstack.git
+[submodule "lib/rtt"]
+	path = lib/rtt
+	url = git@github.com:adfernandes/segger-rtt.git
