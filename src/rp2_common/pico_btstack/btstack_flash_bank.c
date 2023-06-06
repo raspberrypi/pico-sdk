@@ -12,7 +12,6 @@
 // Check sizes
 static_assert(PICO_FLASH_BANK_TOTAL_SIZE % (FLASH_SECTOR_SIZE * 2) == 0, "PICO_FLASH_BANK_TOTAL_SIZE invalid");
 static_assert(PICO_FLASH_BANK_TOTAL_SIZE <= PICO_FLASH_SIZE_BYTES, "PICO_FLASH_BANK_TOTAL_SIZE too big");
-static_assert(PICO_FLASH_BANK_STORAGE_OFFSET + PICO_FLASH_BANK_TOTAL_SIZE <= PICO_FLASH_SIZE_BYTES, "PICO_FLASH_BANK_TOTAL_SIZE too big");
 
 // Size of one bank
 #define PICO_FLASH_BANK_SIZE (PICO_FLASH_BANK_TOTAL_SIZE / 2)
@@ -48,12 +47,27 @@ static void pico_flash_bank_perform_flash_mutation_operation(void *param) {
     }
 }
 
+#ifndef pico_flash_bank_get_storage_offset_func
+static inline uint32_t pico_flash_bank_get_fixed_storage_offset(void) {
+    static_assert(PICO_FLASH_BANK_STORAGE_OFFSET + PICO_FLASH_BANK_TOTAL_SIZE <= PICO_FLASH_SIZE_BYTES, "PICO_FLASH_BANK_TOTAL_SIZE too big");
+#ifndef NDEBUG
+    // Check we're not overlapping the binary in flash
+    extern char __flash_binary_end;
+    assert(((uintptr_t)&__flash_binary_end - XIP_BASE <= PICO_FLASH_BANK_STORAGE_OFFSET));
+#endif
+    return PICO_FLASH_BANK_STORAGE_OFFSET;
+}
+#define pico_flash_bank_get_storage_offset_func pico_flash_bank_get_fixed_storage_offset
+#else
+extern uint32_t pico_flash_bank_get_storage_offset_func(void);
+#endif
+
 static void pico_flash_bank_erase(void * context, int bank) {
     (void)(context);
     DEBUG_PRINT("erase: bank %d\n", bank);
     mutation_operation_t mop = {
             .op_is_erase = true,
-            .p0 = PICO_FLASH_BANK_STORAGE_OFFSET + (PICO_FLASH_BANK_SIZE * bank),
+            .p0 = pico_flash_bank_get_storage_offset_func() + (PICO_FLASH_BANK_SIZE * bank),
     };
     // todo choice of timeout and check return code... currently we have no way to return an error
     //      to the caller anyway. flash_safe_execute asserts by default on problem other than timeout,
@@ -75,7 +89,7 @@ static void pico_flash_bank_read(void *context, int bank, uint32_t offset, uint8
     if ((offset + size) > PICO_FLASH_BANK_SIZE) return;
 
     // Flash is xip
-    memcpy(buffer, (void *)(XIP_BASE + PICO_FLASH_BANK_STORAGE_OFFSET + (PICO_FLASH_BANK_SIZE * bank) + offset), size);
+    memcpy(buffer, (void *)(XIP_BASE + pico_flash_bank_get_storage_offset_func() + (PICO_FLASH_BANK_SIZE * bank) + offset), size);
 }
 
 static void pico_flash_bank_write(void * context, int bank, uint32_t offset, const uint8_t *data, uint32_t size) {
@@ -94,7 +108,7 @@ static void pico_flash_bank_write(void * context, int bank, uint32_t offset, con
     if (size == 0) return;
 
     // calc bank start position
-    const uint32_t bank_start_pos = PICO_FLASH_BANK_STORAGE_OFFSET + (PICO_FLASH_BANK_SIZE * bank);
+    const uint32_t bank_start_pos = pico_flash_bank_get_storage_offset_func() + (PICO_FLASH_BANK_SIZE * bank);
 
     // Calculate first and last page in the bank
     const uint32_t first_page = offset / FLASH_PAGE_SIZE;
@@ -159,12 +173,5 @@ static const hal_flash_bank_t pico_flash_bank_instance_obj = {
 };
 
 const hal_flash_bank_t *pico_flash_bank_instance(void) {
-
-#ifndef NDEBUG
-    // Check we're not overlapping the binary in flash
-    extern char __flash_binary_end;
-    assert((uintptr_t)&__flash_binary_end - XIP_BASE <= PICO_FLASH_BANK_STORAGE_OFFSET);
-#endif
-
     return &pico_flash_bank_instance_obj;
 }
