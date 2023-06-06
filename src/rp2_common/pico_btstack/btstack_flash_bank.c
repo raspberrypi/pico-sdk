@@ -55,7 +55,9 @@ static void pico_flash_bank_erase(void * context, int bank) {
             .op_is_erase = true,
             .p0 = PICO_FLASH_BANK_STORAGE_OFFSET + (PICO_FLASH_BANK_SIZE * bank),
     };
-    // todo better timeout
+    // todo choice of timeout and check return code... currently we have no way to return an error
+    //      to the caller anyway. flash_safe_execute asserts by default on problem other than timeout,
+    //      so that's fine for now, and UINT32_MAX is a timeout of 49 days which seems long enough
     flash_safe_execute(pico_flash_bank_perform_flash_mutation_operation, &mop, UINT32_MAX);
 }
 
@@ -141,7 +143,9 @@ static void pico_flash_bank_write(void * context, int bank, uint32_t offset, con
                 .p0 = bank_start_pos + (page * FLASH_PAGE_SIZE),
                 .p1 = (uintptr_t)page_data
         };
-        // todo better timeout
+        // todo choice of timeout and check return code... currently we have no way to return an error
+        //      to the caller anyway. flash_safe_execute asserts by default on problem other than timeout,
+        //      so that's fine for now, and UINT32_MAX is a timeout of 49 days which seems long enough
         flash_safe_execute(pico_flash_bank_perform_flash_mutation_operation, &mop, UINT32_MAX);
     }
 }

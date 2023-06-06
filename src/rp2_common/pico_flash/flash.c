@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2023 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -149,7 +149,7 @@ static int default_enter_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
 #if PICO_FLASH_SAFE_EXECUTE_USE_FREERTOS_SMP
         // Note that whilst taskENTER_CRITICAL sounds promising (and on non SMP it disabled IRQs), on SMP
         // it only prevents the other core from also entering a critical section.
-        // Therefore, we must do our own handshake which starts a task on the other core and has it disable interrupts
+        // Therefore, we must do our own handshake which starts a task on the other core and have it disable interrupts
         uint core_num = get_core_num();
         // create at low priority
         TaskHandle_t task_handle;
