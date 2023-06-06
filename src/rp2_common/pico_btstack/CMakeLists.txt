@@ -156,7 +156,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             ${CMAKE_CURRENT_LIST_DIR}/btstack_flash_bank.c
     )
     target_include_directories(pico_btstack_flash_bank_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-    pico_mirrored_target_link_libraries(pico_btstack_flash_bank INTERFACE pico_btstack_base)
+    pico_mirrored_target_link_libraries(pico_btstack_flash_bank INTERFACE pico_btstack_base pico_flash)
 
     pico_add_library(pico_btstack_run_loop_async_context NOFLAG)
     target_sources(pico_btstack_run_loop_async_context INTERFACE

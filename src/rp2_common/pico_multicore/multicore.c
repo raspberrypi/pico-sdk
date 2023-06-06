@@ -196,7 +196,7 @@ static void check_lockout_mutex_init(void) {
     hw_claim_unlock(save);
 }
 
-void multicore_lockout_victim_init() {
+void multicore_lockout_victim_init(void) {
     check_lockout_mutex_init();
     uint core_num = get_core_num();
     irq_set_exclusive_handler(SIO_IRQ_PROC0 + core_num, multicore_lockout_handler);
@@ -246,7 +246,7 @@ bool multicore_lockout_start_timeout_us(uint64_t timeout_us) {
     return multicore_lockout_start_block_until(make_timeout_time_us(timeout_us));
 }
 
-void multicore_lockout_start_blocking() {
+void multicore_lockout_start_blocking(void) {
     multicore_lockout_start_block_until(at_the_end_of_time);
 }
 
