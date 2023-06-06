@@ -73,8 +73,8 @@ void uart_deinit(uart_inst_t *uart) {
 static uint32_t uart_disable_before_lcr_write(uart_inst_t *uart) {
     // Notes from PL011 reference manual:
     //
-    // - Before writing LCR, must disable UART and wait for current TX + RX
-    //   char to finish
+    // - Before writing the LCR, if the UART is enabled it needs to be
+    //   disabled and any current TX + RX activity has to be completed
     //
     // - There is a BUSY flag which waits for the current TX char, but this is
     //   OR'd with TX FIFO !FULL, so not usable when FIFOs are enabled and
@@ -87,46 +87,41 @@ static uint32_t uart_disable_before_lcr_write(uart_inst_t *uart) {
     // end of TX character, if FIFOs may be enabled. Either way, there is no
     // way to poll for end of RX character.
     //
-    // So... we're going to insert a 15 baud period delay before changing
-    // settings (comfortably higher than max data + start + stop + parity).
+    // So, insert a 15 Baud period delay before changing the settings.
+    // 15 Baud is comfortably higher than start + max data + parity + stop.
     // Anything else would require API changes to permit a non-enabled UART
     // state after init() where settings can be changed safely.
-
     uint32_t cr_save = uart_get_hw(uart)->cr;
-    hw_clear_bits(&uart_get_hw(uart)->cr,
-        UART_UARTCR_UARTEN_BITS | UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS);
 
-    uint32_t current_ibrd = uart_get_hw(uart)->ibrd;
-    uint32_t current_fbrd = uart_get_hw(uart)->fbrd;
+    if (cr_save & UART_UARTCR_UARTEN_BITS) {
+        hw_clear_bits(&uart_get_hw(uart)->cr,
+            UART_UARTCR_UARTEN_BITS | UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS);
 
-    // Note: Maximise precision here. Show working, the compiler will mop this up.
-    // Create a 16.6 fixed-point fractional division ratio; then scale to 32-bits.
-    uint32_t brdiv_ratio = 64u * current_ibrd + current_fbrd;
-    brdiv_ratio <<= 10;
-    // 3662 is ~(15 * 244.14) where 244.14 is 16e6 / 2^16
-    uint32_t scaled_freq = clock_get_hz(clk_peri) / 3662ul;
-    uint32_t wait_time_us = brdiv_ratio / scaled_freq;
-    busy_wait_us(wait_time_us);
+        uint32_t current_ibrd = uart_get_hw(uart)->ibrd;
+        uint32_t current_fbrd = uart_get_hw(uart)->fbrd;
+
+        // Note: Maximise precision here. Show working, the compiler will mop this up.
+        // Create a 16.6 fixed-point fractional division ratio; then scale to 32-bits.
+        uint32_t brdiv_ratio = 64u * current_ibrd + current_fbrd;
+        brdiv_ratio <<= 10;
+        // 3662 is ~(15 * 244.14) where 244.14 is 16e6 / 2^16
+        uint32_t scaled_freq = clock_get_hz(clk_peri) / 3662ul;
+        uint32_t wait_time_us = brdiv_ratio / scaled_freq;
+        busy_wait_us(wait_time_us);
+    }
 
     return cr_save;
 }
 
 static void uart_write_lcr_bits_masked(uart_inst_t *uart, uint32_t values, uint32_t write_mask) {
     invalid_params_if(UART, uart != uart0 && uart != uart1);
-    uint32_t cr_save;
-    bool enabled = uart_is_enabled(uart);
 
-    if (enabled) {
-        // Need to cleanly disable UART before touching LCR
-        cr_save = uart_disable_before_lcr_write(uart);
-    }
+    // (Potentially) Cleanly handle disabling the UART before touching LCR
+    uint32_t cr_save = uart_disable_before_lcr_write(uart);
 
     hw_write_masked(&uart_get_hw(uart)->lcr_h, values, write_mask);
 
-    // Re-enable using saved control register value
-    if (enabled) {
-        uart_get_hw(uart)->cr = cr_save;
-    }
+    uart_get_hw(uart)->cr = cr_save;
 }
 
 /// \tag::uart_set_baudrate[]
