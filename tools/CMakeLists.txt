@@ -1,11 +1,14 @@
 function(_pico_init_pioasm)
-    # Assemble the version string from components instead of using PICO_SDK_VERSION_STRING, because the version string
-    # potentially has a PRE_RELEASE_ID suffix, which will trip up the find_package call.
-    find_package(pico-sdk-tools "${PICO_SDK_VERSION_MAJOR}.${PICO_SDK_VERSION_MINOR}.${PICO_SDK_VERSION_REVISION}" QUIET CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
     if (NOT Pioasm_FOUND)
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PICO_SDK_PATH}/tools)
-        # todo CMAKE_CURRENT_FUNCTION_LIST_DIR ... what version?
-        find_package(Pioasm REQUIRED)
+        # Assemble the version string from components instead of using PICO_SDK_VERSION_STRING, because the version string
+        # potentially has a PRE_RELEASE_ID suffix, which will trip up the find_package call.
+        find_package(pico-sdk-tools "${PICO_SDK_VERSION_MAJOR}.${PICO_SDK_VERSION_MINOR}.${PICO_SDK_VERSION_REVISION}" QUIET CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
+
+        if (NOT Pioasm_FOUND)
+            set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PICO_SDK_PATH}/tools)
+            # todo CMAKE_CURRENT_FUNCTION_LIST_DIR ... what version?
+            find_package(Pioasm REQUIRED)
+        endif()
     endif()
 endfunction()
 
@@ -58,10 +61,12 @@ function(pico_add_uf2_output TARGET)
     else()
         set(output_path "")
     endif()
-    find_package(pico-sdk-tools "${PICO_SDK_VERSION_MAJOR}.${PICO_SDK_VERSION_MINOR}.${PICO_SDK_VERSION_REVISION}" QUIET CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
     if (NOT ELF2UF2_FOUND)
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PICO_SDK_PATH}/tools)
-        find_package(ELF2UF2)
+        find_package(pico-sdk-tools "${PICO_SDK_VERSION_MAJOR}.${PICO_SDK_VERSION_MINOR}.${PICO_SDK_VERSION_REVISION}" QUIET CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
+        if (NOT ELF2UF2_FOUND)
+            set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PICO_SDK_PATH}/tools)
+            find_package(ELF2UF2)
+        endif()
     endif()
     if (ELF2UF2_FOUND)
         add_custom_command(TARGET ${TARGET} POST_BUILD
