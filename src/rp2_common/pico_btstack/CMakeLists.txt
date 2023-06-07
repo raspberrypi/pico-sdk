@@ -34,6 +34,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/platform/embedded/hci_dump_embedded_stdout.c
         ${PICO_BTSTACK_PATH}/platform/embedded/hci_dump_segger_rtt_stdout.c
         ${PICO_BTSTACK_PATH}/src/ad_parser.c
+        ${PICO_BTSTACK_PATH}/src/btstack_audio.c
         ${PICO_BTSTACK_PATH}/src/btstack_base64_decoder.c
         ${PICO_BTSTACK_PATH}/src/btstack_crypto.c
         ${PICO_BTSTACK_PATH}/src/btstack_hid_parser.c
@@ -51,6 +52,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/src/hci.c
         ${PICO_BTSTACK_PATH}/src/hci_cmd.c
         ${PICO_BTSTACK_PATH}/src/hci_dump.c
+        ${PICO_BTSTACK_PATH}/src/hci_event.c
         ${PICO_BTSTACK_PATH}/src/l2cap.c
         ${PICO_BTSTACK_PATH}/src/l2cap_signaling.c
         ${PICO_BTSTACK_PATH}/src/mesh/gatt-service/mesh_provisioning_service_server.c
@@ -114,6 +116,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_browsing_controller.c
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_browsing_target.c
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_controller.c
+        ${PICO_BTSTACK_PATH}/src/classic/avrcp_cover_art_client.c
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_media_item_iterator.c
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_target.c
         ${PICO_BTSTACK_PATH}/src/classic/btstack_cvsd_plc.c
