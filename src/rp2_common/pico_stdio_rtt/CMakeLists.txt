@@ -14,8 +14,7 @@ target_include_directories(pico_stdio_rtt_headers INTERFACE
         ${PICO_STDIO_RTT_PATH}
 )
 
-target_link_libraries(pico_stdio_rtt INTERFACE pico_stdio)
-
+pico_mirrored_target_link_libraries(pico_stdio_rtt INTERFACE pico_stdio)
 
 set_source_files_properties(
         ${PICO_STDIO_RTT_PATH}/SEGGER_RTT.c
