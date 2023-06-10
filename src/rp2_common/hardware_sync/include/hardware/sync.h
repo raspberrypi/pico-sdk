@@ -116,7 +116,7 @@ typedef volatile uint32_t spin_lock_t;
  */
 #if !__has_builtin(__sev)
 __force_inline static void __sev(void) {
-    pico_default_asm ("sev");
+    pico_default_asm_volatile ("sev");
 }
 #endif
 
@@ -128,7 +128,7 @@ __force_inline static void __sev(void) {
  */
 #if !__has_builtin(__wfe)
 __force_inline static void __wfe(void) {
-    pico_default_asm ("wfe");
+    pico_default_asm_volatile ("wfe");
 }
 #endif
 
