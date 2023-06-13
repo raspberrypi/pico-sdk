@@ -92,7 +92,14 @@ int flash_safe_execute(void (*func)(void *), void *param, uint32_t enter_exit_ti
 #endif
 
 // PICO_CONFIG: PICO_FLASH_ASSUME_CORE0_SAFE, Assume that core 0 will never be accessing flash and so doesn't need to be considered during flash_safe_execute, type=bool, default=0, group=pico_flash
+#ifndef PICO_FLASH_ASSUME_CORE0_SAFE
+#define PICO_FLASH_ASSUME_CORE0_SAFE 0
+#endif
+
 // PICO_CONFIG: PICO_FLASH_ASSUME_CORE1_SAFE, Assume that core 1 will never be accessing flash and so doesn't need to be considered during flash_safe_execute, type=bool, default=0, group=pico_flash
+#ifndef PICO_FLASH_ASSUME_CORE1_SAFE
+#define PICO_FLASH_ASSUME_CORE1_SAFE 0
+#endif
 
 // PICO_CONFIG: PICO_FLASH_SAFE_EXECUTE_SUPPORT_FREERTOS_SMP, Support using FreeRTOS SMP to make the other core safe during flash_safe_execute, type=bool, default=1 when using FreeRTOS SMP, group=pico_flash
 #ifndef PICO_FLASH_SAFE_EXECUTE_SUPPORT_FREERTOS_SMP
