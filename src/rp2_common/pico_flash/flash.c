@@ -46,13 +46,6 @@ static flash_safety_helper_t default_flash_safety_helper = {
         .exit_safe_zone_timeout_ms = default_exit_safe_zone_timeout_ms
 };
 
-#if PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
-// note that these are not reset by core reset, however for now, I think people resetting cores
-// and then doing this again without re-initializing pico_flash for that core, is probably
-// something we can live with breaking.
-static bool core_initialized[NUM_CORES];
-#endif
-
 #if PICO_FLASH_SAFE_EXECUTE_USE_FREERTOS_SMP
 enum {
     FREERTOS_LOCKOUT_NONE = 0,
@@ -105,7 +98,6 @@ static bool default_core_init_deinit(__unused bool init) {
         return false;
     }
     multicore_lockout_victim_init();
-    core_initialized[get_core_num()] = init;
 #endif
     return true;
 }
@@ -182,7 +174,7 @@ static int default_enter_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
 #endif
         rc = PICO_ERROR_NOT_PERMITTED;
 #else // !LIB_FREERTOS_KERNEL
-        if (core_initialized[get_core_num()^1]) {
+        if (multicore_lockout_victim_is_initialized(get_core_num()^1)) {
             if (!multicore_lockout_start_timeout_us(timeout_ms * 1000ull)) {
                 rc = PICO_ERROR_TIMEOUT;
             }
