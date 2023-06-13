@@ -58,6 +58,7 @@ extern "C" {
 
 /**
  * Initialize a core such that the other core can lock it out during \ref flash_safe_execute.
+ * \ingroup pico_flash
  *
  * \note This is not necessary for FreeRTOS SMP, but should be used when launching via \ref multicore_launch_core1
  * \return true on success; there is no need to call \ref flash_safe_execute_core_deinit() on failure.
@@ -66,12 +67,14 @@ bool flash_safe_execute_core_init(void);
 
 /**
  * De-initialize work done by \ref flash_safe_execute_core_init
+ * \ingroup pico_flash
  * \return true on success
  */
 bool flash_safe_execute_core_deinit(void);
 
 /**
  * Execute a function with IRQs disabled and with the other core also not executing/reading flash
+ * \ingroup pico_flash
  *
  * \param func the function to call
  * \param param the parameter to pass to the function
@@ -116,6 +119,7 @@ typedef struct {
 
 /**
  * Internal method to return the flash safety helper implementation.
+ * \ingroup pico_flash
  *
  * Advanced users can provide their own implementation of this function to perform
  * different inter-core coordination before disabling XIP mode.
