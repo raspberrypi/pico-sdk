@@ -16,7 +16,7 @@
 #endif
 
 // note that these are not reset by core reset, however for now, I think people resetting cores
-// and then doing this again without re-initializing pico_flash for that core, is probably
+// and then relying on multicore_lockout for that core without re-initializing, is probably
 // something we can live with breaking.
 //
 // whilst we could clear this in core 1 reset path, that doesn't necessarily catch all,
