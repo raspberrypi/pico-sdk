@@ -333,8 +333,12 @@ hold_non_core0_in_bootrom:
 // the KEEP. Therefore we will only add the "a" on Clang, but will also use KEEP to our own linker scripts.
 
 .macro spacer_section name
+#ifdef PICO_ASSEMBLER_IS_CLANG
 #if PICO_ASSEMBLER_IS_CLANG
 .section \name, "a"
+#else
+.section \name
+#endif
 #else
 .section \name
 #endif
