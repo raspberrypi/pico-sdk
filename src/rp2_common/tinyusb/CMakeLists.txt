@@ -23,28 +23,46 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     set(FAMILY rp2040)
     include(${PICO_TINYUSB_PATH}/hw/bsp/family_support.cmake)
 
-    add_library(tinyusb_common INTERFACE)
-    target_link_libraries(tinyusb_common INTERFACE tinyusb_common_base)
+    function(add_tinyusb_library RTOS)
+        if (RTOS STREQUAL noos)
+            set(RTOS pico)
+            set(SUFFIX "")
+        else()
+            set(SUFFIX _${RTOS})
+        endif()
+        string(TOUPPER ${RTOS} RTOS_UPPER)
 
-    add_library(tinyusb_device_unmarked INTERFACE)
-    target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_device_base)
-    target_compile_definitions(tinyusb_device_unmarked INTERFACE
-        # off by default note TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX defaults from PICO_RP2040_USB_DEVICE_ENUMERATION_FIX
-        # TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX=1
-        PICO_RP2040_USB_DEVICE_UFRAME_FIX=1
-    )
+        add_library(tinyusb_common${SUFFIX} INTERFACE)
+        target_compile_definitions(tinyusb_common${SUFFIX} INTERFACE CFG_TUSB_OS=OPT_OS_${RTOS_UPPER})
+        target_link_libraries(tinyusb_common${SUFFIX} INTERFACE tinyusb_common_base)
 
-    # unmarked version used by stdio USB
-    target_link_libraries(tinyusb_device_unmarked INTERFACE tinyusb_common pico_fix_rp2040_usb_device_enumeration tinyusb_device_base)
+        add_library(tinyusb_device_unmarked${SUFFIX} INTERFACE)
+        target_link_libraries(tinyusb_device_unmarked${SUFFIX} INTERFACE tinyusb_device_base)
+        target_compile_definitions(tinyusb_device_unmarked${SUFFIX} INTERFACE
+            # off by default note TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX defaults from PICO_RP2040_USB_DEVICE_ENUMERATION_FIX
+            # TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX=1
+            PICO_RP2040_USB_DEVICE_UFRAME_FIX=1
+        )
 
-    pico_add_library(tinyusb_device)
-    target_link_libraries(tinyusb_device INTERFACE tinyusb_device_unmarked)
+        # unmarked version used by stdio USB
+        target_link_libraries(tinyusb_device_unmarked${SUFFIX} INTERFACE tinyusb_common${SUFFIX} pico_fix_rp2040_usb_device_enumeration tinyusb_device_base)
 
-    pico_add_library(tinyusb_host)
-    target_link_libraries(tinyusb_host INTERFACE tinyusb_host_base tinyusb_common)
+        pico_add_library(tinyusb_device${SUFFIX})
+        target_link_libraries(tinyusb_device${SUFFIX} INTERFACE tinyusb_device_unmarked${SUFFIX})
 
-    pico_add_library(tinyusb_board)
-    target_link_libraries(tinyusb_board INTERFACE tinyusb_bsp)
+        pico_add_library(tinyusb_host${SUFFIX})
+        target_link_libraries(tinyusb_host${SUFFIX} INTERFACE tinyusb_host_base tinyusb_common${SUFFIX})
+
+        pico_add_library(tinyusb_board${SUFFIX})
+        target_link_libraries(tinyusb_board${SUFFIX} INTERFACE tinyusb_bsp)
+    endfunction()
+
+    # no RTOS: tinyusb_device, tinyusb_host
+    add_tinyusb_library(noos)
+
+    # FreeRTOS: tinyusb_device_freertos, tinyusb_host_freertos
+    add_tinyusb_library(freertos)
+    #target_link_libraries(tinyusb_common_freertos INTERFACE freertos_kernel)
 
     # Override suppress_tinyusb_warnings to add suppression of (falsely) reported GCC 11.2 warnings
     function(suppress_tinyusb_warnings)
