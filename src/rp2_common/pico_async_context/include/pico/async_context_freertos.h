@@ -90,7 +90,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
     async_context_freertos_config_t config = {
             .task_priority = ASYNC_CONTEXT_DEFAULT_FREERTOS_TASK_PRIORITY,
             .task_stack_size = ASYNC_CONTEXT_DEFAULT_FREERTOS_TASK_STACK_SIZE,
-#if configUSE_CORE_AFFINITY
+#if configUSE_CORE_AFFINITY && configNUM_CORES > 1
             .task_core_id = (UBaseType_t)-1, // none
 #endif
     };

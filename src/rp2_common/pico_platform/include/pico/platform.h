@@ -335,7 +335,8 @@ extern "C" {
 #define MIN(a, b) ((b)>(a)?(a):(b))
 #endif
 
-#define pico_default_asm(...) __asm volatile (".syntax unified\n" __VA_ARGS__)
+#define pico_default_asm(...) __asm (".syntax unified\n" __VA_ARGS__)
+#define pico_default_asm_volatile(...) __asm volatile (".syntax unified\n" __VA_ARGS__)
 
 /*! \brief Execute a breakpoint instruction
  *  \ingroup pico_platform
@@ -357,7 +358,7 @@ static inline void __breakpoint(void) {
  * might - even above the memory store!)
  */
 __force_inline static void __compiler_memory_barrier(void) {
-    pico_default_asm ("" : : : "memory");
+    pico_default_asm_volatile ("" : : : "memory");
 }
 
 /*! \brief Macro for converting memory addresses to 32 bit addresses suitable for DMA
@@ -479,7 +480,7 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
  */
 static __force_inline uint __get_current_exception(void) {
     uint exception;
-    pico_default_asm ("mrs %0, ipsr" : "=l" (exception));
+    pico_default_asm( "mrs %0, ipsr" : "=l" (exception));
     return exception;
 }
 
@@ -501,10 +502,10 @@ static __force_inline uint __get_current_exception(void) {
  * \param minimum_cycles the minimum number of system clock cycles to delay for
  */
 static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
-    pico_default_asm (
+    pico_default_asm_volatile(
         "1: subs %0, #3\n"
         "bcs 1b\n"
-        : "+r" (minimum_cycles) : : "memory"
+        : "+l" (minimum_cycles) : : "memory"
     );
 }
 

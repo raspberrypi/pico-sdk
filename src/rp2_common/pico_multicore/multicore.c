@@ -15,6 +15,14 @@
 #include "pico/runtime.h"
 #endif
 
+// note that these are not reset by core reset, however for now, I think people resetting cores
+// and then relying on multicore_lockout for that core without re-initializing, is probably
+// something we can live with breaking.
+//
+// whilst we could clear this in core 1 reset path, that doesn't necessarily catch all,
+// and means pulling in this array even if multicore_lockout is not used.
+static bool lockout_victim_initialized[NUM_CORES];
+
 static inline void multicore_fifo_push_blocking_inline(uint32_t data) {
     // We wait for the fifo to have some space
     while (!multicore_fifo_wready())
@@ -196,11 +204,12 @@ static void check_lockout_mutex_init(void) {
     hw_claim_unlock(save);
 }
 
-void multicore_lockout_victim_init() {
+void multicore_lockout_victim_init(void) {
     check_lockout_mutex_init();
     uint core_num = get_core_num();
     irq_set_exclusive_handler(SIO_IRQ_PROC0 + core_num, multicore_lockout_handler);
     irq_set_enabled(SIO_IRQ_PROC0 + core_num, true);
+    lockout_victim_initialized[core_num] = true;
 }
 
 static bool multicore_lockout_handshake(uint32_t magic, absolute_time_t until) {
@@ -246,7 +255,7 @@ bool multicore_lockout_start_timeout_us(uint64_t timeout_us) {
     return multicore_lockout_start_block_until(make_timeout_time_us(timeout_us));
 }
 
-void multicore_lockout_start_blocking() {
+void multicore_lockout_start_blocking(void) {
     multicore_lockout_start_block_until(at_the_end_of_time);
 }
 
@@ -268,6 +277,10 @@ bool multicore_lockout_end_timeout_us(uint64_t timeout_us) {
     return multicore_lockout_end_block_until(make_timeout_time_us(timeout_us));
 }
 
-void multicore_lockout_end_blocking() {
+void multicore_lockout_end_blocking(void) {
     multicore_lockout_end_block_until(at_the_end_of_time);
+}
+
+bool multicore_lockout_victim_is_initialized(uint core_num) {
+    return lockout_victim_initialized[core_num];
 }

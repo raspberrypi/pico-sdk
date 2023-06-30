@@ -257,6 +257,18 @@ static inline uint32_t multicore_fifo_get_status(void) {
  */
 void multicore_lockout_victim_init(void);
 
+/*! \brief Determine if \ref multicore_victim_init() has been called on the specified core.
+ *  \ingroup multicore_lockout
+ *
+ * \note this state persists even if the core is subsequently reset; therefore you are advised to
+ * always call \ref multicore_lockout_victim_init() again after resetting a core, which had previously
+ * been initialized.
+ *
+ * \param core_num the core number (0 or 1)
+ * \return true if \ref multicore_victim_init() has been called on the specified core, false otherwise.
+ */
+bool multicore_lockout_victim_is_initialized(uint core_num);
+
 /*! \brief Request the other core to pause in a known state and wait for it to do so
  *  \ingroup multicore_lockout
  *
