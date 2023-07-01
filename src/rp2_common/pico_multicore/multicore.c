@@ -109,9 +109,22 @@ void multicore_reset_core1() {
     *power_off_set = PSM_FRCE_OFF_PROC1_BITS;
     while (!(*power_off & PSM_FRCE_OFF_PROC1_BITS)) tight_loop_contents();
 
+    // Allow for the fact that the caller may have already enabled the FIFO IRQ for their
+    // own purposes (expecting FIFO content after core 1 is launched). We must disable
+    // the IRQ during the handshake, then restore afterwards.
+    bool enabled = irq_is_enabled(SIO_IRQ_PROC0);
+    irq_set_enabled(SIO_IRQ_PROC0, false);
+
     // Bring core 1 back out of reset. It will drain its own mailbox FIFO, then push
     // a 0 to our mailbox to tell us it has done this.
     *power_off_clr = PSM_FRCE_OFF_PROC1_BITS;
+
+    // check the pushed value
+    uint32_t value = multicore_fifo_pop_blocking();
+    assert(value == 0);
+
+    // restore interrupt state
+    irq_set_enabled(SIO_IRQ_PROC0, enabled);
 }
 
 void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bottom, size_t stack_size_bytes) {
