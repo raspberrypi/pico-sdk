@@ -122,6 +122,7 @@ void multicore_reset_core1() {
     // check the pushed value
     uint32_t value = multicore_fifo_pop_blocking();
     assert(value == 0);
+    (void) value; // silence warning
 
     // restore interrupt state
     irq_set_enabled(SIO_IRQ_PROC0, enabled);
