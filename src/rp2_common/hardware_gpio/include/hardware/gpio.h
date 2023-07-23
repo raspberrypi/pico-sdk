@@ -185,6 +185,15 @@ static inline void check_gpio_param(__unused uint gpio) {
  */
 void gpio_set_function(uint gpio, enum gpio_function fn);
 
+/*! \brief Select the function for multiple GPIOs
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_set_function
+ * \param gpio_mask Mask with 1 bit per GPIO number to set the function for
+ * \param fn Which GPIO function select to use from list \ref gpio_function 
+*/
+void gpio_set_function_mask(uint gpio_mask, enum gpio_function fn);
+
 /*! \brief Determine current GPIO function
  *  \ingroup hardware_gpio
  *
