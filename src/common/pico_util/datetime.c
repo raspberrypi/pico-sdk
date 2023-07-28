@@ -30,7 +30,7 @@ static const char *DATETIME_DOWS[7] = {
 void datetime_to_str(char *buf, uint buf_size, const datetime_t *t) {
     snprintf(buf,
              buf_size,
-             "%s %d %s %d:%02d:%02d %d",
+             "%s %d %s %02d:%02d:%02d %d",
              DATETIME_DOWS[t->dotw],
              t->day,
              DATETIME_MONTHS[t->month - 1],
