@@ -370,7 +370,7 @@ enum gpio_drive_strength gpio_get_drive_strength(uint gpio);
  * Events is a bitmask of the following \ref gpio_irq_level values:
  *
  * bit | constant            | interrupt
- * ----|----------------------------------------------------------
+ * ----|---------------------|------------------------------------
  *   0 | GPIO_IRQ_LEVEL_LOW  | Continuously while level is low
  *   1 | GPIO_IRQ_LEVEL_HIGH | Continuously while level is high
  *   2 | GPIO_IRQ_EDGE_FALL  | On each transition from high to low
