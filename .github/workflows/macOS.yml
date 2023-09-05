@@ -23,8 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           brew install cmake
-          brew tap ArmMbed/homebrew-formulae
-          brew install arm-none-eabi-gcc
+          brew install --cask gcc-arm-embedded
 
       - name: Build Project
         # bash required otherwise this mysteriously (no error) fails at "Generating cyw43_bus_pio_spi.pio.h"
