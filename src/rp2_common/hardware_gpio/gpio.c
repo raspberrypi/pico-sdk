@@ -174,6 +174,13 @@ static void _gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled, io_i
 }
 
 void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled) {
+    // either this call disables the interrupt
+    // or callback should already be set (raw or using gpio_set_irq_callback)
+    // this protects against enabling the interrupt without callback set
+    assert(!enabled
+                || (raw_irq_mask[get_core_num()] & (1u<<gpio))
+                || callbacks[get_core_num()]);
+
     // Separate mask/force/status per-core, so check which core called, and
     // set the relevant IRQ controls.
     io_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?
@@ -182,8 +189,9 @@ void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled) {
 }
 
 void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback) {
-    gpio_set_irq_enabled(gpio, events, enabled);
+    // first set callback, then enable the interrupt
     gpio_set_irq_callback(callback);
+    gpio_set_irq_enabled(gpio, events, enabled);
     if (enabled) irq_set_enabled(IO_IRQ_BANK0, true);
 }
 
