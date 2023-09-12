@@ -6,6 +6,8 @@
 # same directory)
 
 if (NOT TARGET _pico_sdk_pre_init_marker)
+    cmake_policy(SET CMP0057 NEW) # allow use of if() IN_LIST
+    
     add_library(_pico_sdk_pre_init_marker INTERFACE)
 
     function(pico_is_top_level_project VAR)
