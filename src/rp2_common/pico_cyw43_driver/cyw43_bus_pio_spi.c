@@ -84,6 +84,16 @@ typedef struct {
 
 static bus_data_t bus_data_instance;
 
+int cyw43_spi_clock_div_int = CLOCK_DIV;
+int cyw43_spi_clock_div_frac = CLOCK_DIV_MINOR;
+
+// Allow the user to adjust the SPI clock speed 
+// prior to initialization.
+void cyw43_spi_set_clock_divisor(int clock_div_int, int clock_div_frac) {
+    cyw43_spi_clock_div_int = clock_div_int;
+    cyw43_spi_clock_div_frac = clock_div_frac;
+}
+
 int cyw43_spi_init(cyw43_int_t *self) {
     // Only does something if CYW43_LOGIC_DEBUG=1
     logic_debug_init();
@@ -117,7 +127,8 @@ int cyw43_spi_init(cyw43_int_t *self) {
     bus_data->pio_offset = pio_add_program(bus_data->pio, &SPI_PROGRAM_FUNC);
     pio_sm_config config = SPI_PROGRAM_GET_DEFAULT_CONFIG_FUNC(bus_data->pio_offset);
 
-    sm_config_set_clkdiv_int_frac(&config, CLOCK_DIV, CLOCK_DIV_MINOR);
+    sm_config_set_clkdiv_int_frac(&config, cyw43_spi_clock_div_int, cyw43_spi_clock_div_frac);
+    
     hw_write_masked(&padsbank0_hw->io[CLOCK_PIN],
                     (uint)PADS_DRIVE_STRENGTH << PADS_BANK0_GPIO0_DRIVE_LSB,
                     PADS_BANK0_GPIO0_DRIVE_BITS

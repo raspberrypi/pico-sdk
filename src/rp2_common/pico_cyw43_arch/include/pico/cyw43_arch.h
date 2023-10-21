@@ -497,6 +497,25 @@ void cyw43_arch_gpio_put(uint wl_gpio, bool value);
  */
 bool cyw43_arch_gpio_get(uint wl_gpio);
 
+#if CYW43_USE_SPI
+/*!
+ * \brief Adjust the SPI clock divisor to support over/underclocking the RP2040
+ * \ingroup pico_cyw43_arch
+ * 
+ * Altering the RP2040 system clock can cause glitches or outright failure in SPI
+ * communication with the WiFi/Bluetooth processor.  This method allows the user to
+ * alter to default SPI clock divisor of 2.0 to something that will allow proper communication
+ * of the CYW43 chip i.e. (1,0) for underclocking or (4,0) for overclocking.
+ * 
+ * \note The default SPI clock divisor is (2,0).  This method does not check for validity 
+ * of the supplied parameters.
+ *
+ * \param divisor the integer part of the SPI clock divisor
+ * \param divisor the fractional part of the SPI clock divisor
+ */
+void cyw43_spi_set_clock_divisor(int divisor,int fraction);
+#endif 
+
 #ifdef __cplusplus
 }
 #endif
