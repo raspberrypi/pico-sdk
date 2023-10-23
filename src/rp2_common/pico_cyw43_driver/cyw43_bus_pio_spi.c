@@ -84,8 +84,8 @@ typedef struct {
 
 static bus_data_t bus_data_instance;
 
-int cyw43_spi_clock_div_int = CLOCK_DIV;
-int cyw43_spi_clock_div_frac = CLOCK_DIV_MINOR;
+static int cyw43_spi_clock_div_int = CLOCK_DIV;
+static int cyw43_spi_clock_div_frac = CLOCK_DIV_MINOR;
 
 // Allow the user to adjust the SPI clock speed 
 // prior to initialization.
