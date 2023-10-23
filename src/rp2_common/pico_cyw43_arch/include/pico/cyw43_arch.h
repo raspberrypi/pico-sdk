@@ -513,7 +513,7 @@ bool cyw43_arch_gpio_get(uint wl_gpio);
  * \param divisor the integer part of the SPI clock divisor
  * \param divisor the fractional part of the SPI clock divisor
  */
-void cyw43_spi_set_clock_divisor(int divisor,int fraction);
+void cyw43_set_pio_clock_divisor(int divisor,int fraction);
 #endif 
 
 #ifdef __cplusplus
