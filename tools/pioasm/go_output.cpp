@@ -117,7 +117,7 @@ struct go_output : public output_format {
             fprintf(out, "\tcfg.SetWrap(offset+%sWrapTarget, offset+%sWrap)\n", prefix.c_str(),
                     prefix.c_str());
             if (program.sideset_bits_including_opt.is_specified()) {
-                fprintf(out, "\tcfg.SetSideSet(%d, %s, %s)\n", program.sideset_bits_including_opt.get(),
+                fprintf(out, "\tcfg.SetSidesetParams(%d, %s, %s)\n", program.sideset_bits_including_opt.get(),
                         program.sideset_opt ? "true" : "false",
                         program.sideset_pindirs ? "true" : "false");
             }
