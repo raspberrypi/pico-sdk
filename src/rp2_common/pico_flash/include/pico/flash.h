@@ -37,7 +37,7 @@
  *
  * There are conditions where safety would not be guaranteed:
  *
- * 1. FreeRTOS smp with `configNUM_CORES=1` - FreeRTOS still uses pico_multicore in this case, so \ref flash_safe_execute
+ * 1. FreeRTOS smp with `configNUMBER_OF_CORES=1` - FreeRTOS still uses pico_multicore in this case, so \ref flash_safe_execute
  * cannot know what the other core is doing, and there is no way to force code execution between a FreeRTOS core
  * and a non FreeRTOS core.
  * 2. FreeRTOS non SMP with pico_multicore - Again, there is no way to force code execution between a FreeRTOS core and

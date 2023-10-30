@@ -15,7 +15,7 @@
 #include "task.h"
 // now we have FreeRTOS header we can check core count... we can only use FreeRTOS SMP mechanism
 // with two cores
-#if configNUM_CORES == 2
+#if configNUMBER_OF_CORES == 2
 #if configUSE_CORE_AFFINITY
 #define PICO_FLASH_SAFE_EXECUTE_USE_FREERTOS_SMP 1
 #else
