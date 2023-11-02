@@ -64,7 +64,7 @@ struct go_output : public output_format {
         
         // First we give priority to user's code blocks since 
         //  1. In Go our imports always precede our code.
-        //  2. We give users freedom to use their own PIO implementation.
+        //  2. We give users the freedom to use their own PIO implementation.
         for (const auto &program : source.programs) {
             for(const auto& o : program.code_blocks) {
                 if (o.first == name) {
