@@ -39,6 +39,18 @@ if (NOT TARGET pico_standard_link)
         pico_add_link_depend(${TARGET} ${LDSCRIPT})
     endfunction()
 
+    function(pico_customize_linker_script TARGET LDSCRIPT_INCLUDE)
+        set(LDSCRIPT_INPUT ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/memmap.ld.in)
+        set(LDSCRIPT_GENERATED ${TARGET}.ld)
+        message("generating linker script at ${LDSCRIPT_GENERATED} from ${LDSCRIPT_INPUT} and ${LDSCRIPT_INCLUDE}")
+
+        add_custom_command(TARGET ${TARGET} DEPENDS ${LDSCRIPT_INCLUDE} PRE_BUILD
+            COMMAND ${CMAKE_C_COMPILER} -E -x c -CC ${CFLAGS} -DLD_INCLUDE=\"${LDSCRIPT_INCLUDE}\" ${LDSCRIPT_INPUT} | sed -e "s@^#.*@/*&*/@" | tr "\\\\" "\\n" > ${LDSCRIPT_GENERATED}
+            VERBATIM
+        )
+        set_target_properties(${TARGET} PROPERTIES PICO_TARGET_LINKER_SCRIPT ${LDSCRIPT_GENERATED})
+    endfunction()
+
     function(pico_set_binary_type TARGET TYPE)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()
