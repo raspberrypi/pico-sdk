@@ -55,9 +55,9 @@ static int64_t timer_task(__unused alarm_id_t id, __unused void *user_data) {
 }
 
 static void low_priority_worker_irq(void) {
-    if (mutex_try_enter(&stdio_usb_mutex, NULL)) {
+    if (mutex_try_enter_isr(&stdio_usb_mutex, NULL)) {
         tud_task();
-        mutex_exit(&stdio_usb_mutex);
+        mutex_exit_isr(&stdio_usb_mutex);
     } else {
         // if the mutex is already owned, then we are in non IRQ code in this file.
         //

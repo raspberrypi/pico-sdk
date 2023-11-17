@@ -47,6 +47,7 @@ extern "C" {
 typedef struct __packed_aligned  {
     lock_core_t core;
     lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
+    uint32_t save;
     uint8_t enter_count;        //! ownership count
 #if PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY
     bool recursive;
@@ -60,6 +61,7 @@ typedef struct __packed_aligned  {
 typedef struct __packed_aligned mutex {
     lock_core_t core;
     lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
+    uint32_t save;
 } mutex_t;
 #else
 typedef recursive_mutex_t mutex_t; // they are one and the same when backwards compatible with SDK1.2.0
@@ -114,6 +116,19 @@ void recursive_mutex_enter_blocking(recursive_mutex_t *mtx);
  */
 bool mutex_try_enter(mutex_t *mtx, uint32_t *owner_out);
 
+/*! \brief Attempt to take ownership of a mutex
+ *  \ingroup mutex
+ *
+ * If the mutex wasn't owned, this will claim the mutex for the caller and return true.
+ * Otherwise (if the mutex was already owned) this will return false and the
+ * caller will NOT own the mutex.
+ *
+ * \param mtx Pointer to mutex structure
+ * \param owner_out If mutex was already owned, and this pointer is non-zero, it will be filled in with the owner id of the current owner of the mutex
+ * \return true if mutex now owned, false otherwise
+ */
+bool mutex_try_enter_isr(mutex_t *mtx, uint32_t *owner_out);
+
 /*! \brief Attempt to take ownership of a mutex until the specified time
  *  \ingroup mutex
  *
@@ -141,6 +156,20 @@ bool mutex_try_enter_block_until(mutex_t *mtx, absolute_time_t until);
  * \return true if the recursive mutex (now) owned, false otherwise
  */
 bool recursive_mutex_try_enter(recursive_mutex_t *mtx, uint32_t *owner_out);
+
+/*! \brief Attempt to take ownership of a recursive mutex
+ *  \ingroup mutex
+ *
+ * If the mutex wasn't owned or was owned by the caller, this will claim the mutex and return true.
+ * Otherwise (if the mutex was already owned by another owner) this will return false and the
+ * caller will NOT own the mutex.
+ *
+ * \param mtx Pointer to recursive mutex structure
+ * \param owner_out If mutex was already owned by another owner, and this pointer is non-zero,
+ *                  it will be filled in with the owner id of the current owner of the mutex
+ * \return true if the recursive mutex (now) owned, false otherwise
+ */
+bool recursive_mutex_try_enter_isr(recursive_mutex_t *mtx, uint32_t *owner_out);
 
 /*! \brief Wait for mutex with timeout
  *  \ingroup mutex
@@ -232,12 +261,26 @@ bool recursive_mutex_enter_block_until(recursive_mutex_t *mtx, absolute_time_t u
  */
 void mutex_exit(mutex_t *mtx);
 
+/*! \brief  Release ownership of a mutex
+ *  \ingroup mutex
+ *
+ * \param mtx Pointer to mutex structure
+ */
+void mutex_exit_isr(mutex_t *mtx);
+
 /*! \brief  Release ownership of a recursive mutex
  *  \ingroup mutex
  *
  * \param mtx Pointer to recursive mutex structure
  */
 void recursive_mutex_exit(recursive_mutex_t *mtx);
+
+/*! \brief  Release ownership of a recursive mutex
+ *  \ingroup mutex
+ *
+ * \param mtx Pointer to recursive mutex structure
+ */
+void recursive_mutex_exit_isr(recursive_mutex_t *mtx);
 
 /*! \brief Test for mutex initialized state
  *  \ingroup mutex
