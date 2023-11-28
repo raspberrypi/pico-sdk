@@ -52,6 +52,9 @@ EXTRACT_ALL            = NO
 ALWAYS_DETAILED_SEC    = NO
 #REPEAT_BRIEF           = NO
 
+# Needed to automatically extract implicit brief descriptions in recent versions of Doxygen
+JAVADOC_AUTOBRIEF      = YES
+
 # Need these next options to ensure that functions with modifiers do not confuse the Doxygen parser.
 # And any further function modifiers here.
 MACRO_EXPANSION        = YES
