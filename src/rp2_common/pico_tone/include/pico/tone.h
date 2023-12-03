@@ -51,7 +51,7 @@ void tone_init(uint gpio);
  *  \param freq The frequency of the tone in Hz
  *  \param duration_ms The duration of the tone in milliseconds
  */
-void tone(uint gpio, uint freq, float duration_ms);
+void tone(uint gpio, uint freq, uint32_t duration_ms);
 
 /*! \brief Do not play any tone.
  *  \ingroup pico_tone

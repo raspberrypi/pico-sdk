@@ -21,7 +21,7 @@ void no_tone(uint gpio) {
     pwm_set_gpio_level(gpio, 0);
 }
 
-void tone(uint gpio, uint freq, float duration_ms) {
+void tone(uint gpio, uint freq, uint32_t duration_ms) {
     // Calculate and cofigure new clock divider according to the frequency
     // This formula is assuming we are running at 125MHz.
     // TODO: Make this work for any frequency
