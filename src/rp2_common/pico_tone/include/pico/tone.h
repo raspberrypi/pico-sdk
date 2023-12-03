@@ -13,8 +13,19 @@ extern "C" {
 
 /** \file tone.h
  *  \defgroup pico_tone pico_tone
- *  Adds support for playing tones using PWM.
+ *
+ *   Adds support for playing tones using PWM.
  *  
+ *   Every sound humans encounter consists of one or more frequencies, and the
+ *   way the ear interprets those sounds  is called pitch.
+ *
+ *   In order to produce a variety of pitches, a digital signal needs to convey
+ *   the frequency of sound it is trying to reproduce. The simplest approach is
+ *   to generate a 50% duty cycle pulse stream and set the frequency to the
+ *   desired pitch.
+ *
+ *   References:
+ *       - https://www.hackster.io/106958/pwm-sound-synthesis-9596f0#overview
  */
 
 // PICO_TONE_SILENCE_DELAY_MS, Default delay between tones in milliseconds
