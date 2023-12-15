@@ -9,12 +9,13 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
+// This header may be included by other board headers as "boards/weact_studio_rp2040_16mb.h"
 
-#ifndef _BOARDS_WAVESHARE_RP2040_ZERO_H
-#define _BOARDS_WAVESHARE_RP2040_ZERO_H
+#ifndef _BOARDS_WEACT_STUDIO_RP2040_16MB_H
+#define _BOARDS_WEACT_STUDIO_RP2040_16MB_H
 
 // For board detection
-#define WAVESHARE_RP2040_ZERO
+#define WEACT_STUDIO_RP2040_16MB
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
@@ -27,53 +28,53 @@
 #define PICO_DEFAULT_UART_RX_PIN 1
 #endif
 
-// --- WS2812 ---
-#ifndef PICO_DEFAULT_WS2812_PIN
-#define PICO_DEFAULT_WS2812_PIN 16
+// --- LED ---
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN 25
 #endif
 
 // --- I2C ---
 #ifndef PICO_DEFAULT_I2C
-#define PICO_DEFAULT_I2C 1
+#define PICO_DEFAULT_I2C 0
 #endif
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
-#define PICO_DEFAULT_I2C_SDA_PIN 6
+#define PICO_DEFAULT_I2C_SDA_PIN 4
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
-#define PICO_DEFAULT_I2C_SCL_PIN 7
+#define PICO_DEFAULT_I2C_SCL_PIN 5
 #endif
 
 // --- SPI ---
 #ifndef PICO_DEFAULT_SPI
-#define PICO_DEFAULT_SPI 1
+#define PICO_DEFAULT_SPI 0
 #endif
 #ifndef PICO_DEFAULT_SPI_SCK_PIN
-#define PICO_DEFAULT_SPI_SCK_PIN 10
+#define PICO_DEFAULT_SPI_SCK_PIN 18
 #endif
 #ifndef PICO_DEFAULT_SPI_TX_PIN
-#define PICO_DEFAULT_SPI_TX_PIN 11
+#define PICO_DEFAULT_SPI_TX_PIN 19
 #endif
 #ifndef PICO_DEFAULT_SPI_RX_PIN
-#define PICO_DEFAULT_SPI_RX_PIN 12
+#define PICO_DEFAULT_SPI_RX_PIN 16
 #endif
 #ifndef PICO_DEFAULT_SPI_CSN_PIN
-#define PICO_DEFAULT_SPI_CSN_PIN 13
+#define PICO_DEFAULT_SPI_CSN_PIN 17
 #endif
 
 // --- FLASH ---
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
 
 #ifndef PICO_FLASH_SPI_CLKDIV
-#define PICO_FLASH_SPI_CLKDIV 4
-#endif
-
-#ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
+#define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
 // All boards have B1 RP2040
 #ifndef PICO_RP2040_B0_SUPPORTED
-#define PICO_RP2040_B0_SUPPORTED  0
+#define PICO_RP2040_B0_SUPPORTED 0
+#endif
+
+#ifndef PICO_FLASH_SIZE_BYTES
+#define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
 #endif
 
 #endif

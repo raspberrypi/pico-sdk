@@ -37,7 +37,9 @@ void xosc_init(void) {
     hw_set_bits(&xosc_hw->ctrl, XOSC_CTRL_ENABLE_VALUE_ENABLE << XOSC_CTRL_ENABLE_LSB);
 
     // Wait for XOSC to be stable
-    while(!(xosc_hw->status & XOSC_STATUS_STABLE_BITS));
+    while(!(xosc_hw->status & XOSC_STATUS_STABLE_BITS)) {
+        tight_loop_contents();
+    }
 }
 
 void xosc_disable(void) {
@@ -46,12 +48,16 @@ void xosc_disable(void) {
     tmp |= (XOSC_CTRL_ENABLE_VALUE_DISABLE << XOSC_CTRL_ENABLE_LSB);
     xosc_hw->ctrl = tmp;
     // Wait for stable to go away
-    while(xosc_hw->status & XOSC_STATUS_STABLE_BITS);
+    while(xosc_hw->status & XOSC_STATUS_STABLE_BITS) {
+        tight_loop_contents();
+    }
 }
 
 void xosc_dormant(void) {
     // WARNING: This stops the xosc until woken up by an irq
     xosc_hw->dormant = XOSC_DORMANT_VALUE_DORMANT;
     // Wait for it to become stable once woken up
-    while(!(xosc_hw->status & XOSC_STATUS_STABLE_BITS));
+    while(!(xosc_hw->status & XOSC_STATUS_STABLE_BITS)) {
+        tight_loop_contents();
+    }
 }

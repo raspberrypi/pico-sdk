@@ -262,7 +262,7 @@ static void async_context_freertos_set_work_pending(async_context_t *self_base, 
     async_context_freertos_wake_up(self_base);
 }
 
-static void async_context_freertos_wait_until(async_context_t *self_base, absolute_time_t until) {
+static void async_context_freertos_wait_until(__unused async_context_t *self_base, absolute_time_t until) {
     assert(!portCHECK_IF_IN_ISR());
     TickType_t ticks = sensible_ticks_until(until);
     vTaskDelay(ticks);

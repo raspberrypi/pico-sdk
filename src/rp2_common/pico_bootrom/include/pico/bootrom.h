@@ -118,7 +118,7 @@ typedef void *(*rom_table_lookup_fn)(uint16_t *table, uint32_t code);
 
 #if PICO_C_COMPILER_IS_GNU && (__GNUC__ >= 12)
 // Convert a 16 bit pointer stored at the given rom address into a 32 bit pointer
-static inline void *rom_hword_as_ptr(uint16_t rom_address) {
+static __force_inline void *rom_hword_as_ptr(uint16_t rom_address) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
     return (void *)(uintptr_t)*(uint16_t *)(uintptr_t)rom_address;
