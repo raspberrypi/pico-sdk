@@ -12,6 +12,7 @@
 
 /// \tag::watchdog_start_tick[]
 void watchdog_start_tick(uint cycles) {
+    valid_params_if(WATCHDOG, cycles <= 0x1ffu);
     // Important: This function also provides a tick reference to the timer
     watchdog_hw->tick = cycles | WATCHDOG_TICK_ENABLE_BITS;
 }
@@ -34,6 +35,7 @@ uint32_t watchdog_get_count(void) {
 // tag::watchdog_enable[]
 // Helper function used by both watchdog_enable and watchdog_reboot
 void _watchdog_enable(uint32_t delay_ms, bool pause_on_debug) {
+    valid_params_if(WATCHDOG, delay_ms <= 8388); // i.e. floor(0xffffff / 2000)
     hw_clear_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_ENABLE_BITS);
 
     // Reset everything apart from ROSC and XOSC
