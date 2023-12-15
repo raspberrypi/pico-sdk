@@ -30,17 +30,22 @@
 extern "C" {
 #endif
 
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_WATCHDOG, Enable/disable assertions in the watchdog module, type=bool, default=0, group=hardware_watchdog
+#ifndef PARAM_ASSERTIONS_ENABLED_WATCHDOG
+#define PARAM_ASSERTIONS_ENABLED_WATCHDOG 0
+#endif
+
 /*! \brief Define actions to perform at watchdog timeout
  *  \ingroup hardware_watchdog
  *
  * \note If \ref watchdog_start_tick value does not give a 1MHz clock to the watchdog system, then the \p delay_ms
- * parameter will not be in microseconds. See the datasheet for more details.
+ * parameter will not be in milliseconds. See the datasheet for more details.
  *
  * By default the SDK assumes a 12MHz XOSC and sets the \ref watchdog_start_tick appropriately.
  *
  * \param pc If Zero, a standard boot will be performed, if non-zero this is the program counter to jump to on reset.
  * \param sp If \p pc is non-zero, this will be the stack pointer used.
- * \param delay_ms Initial load value. Maximum value 0x7fffff, approximately 8.3s.
+ * \param delay_ms Initial load value. Maximum value 8388, approximately 8.3s.
  */
 void watchdog_reboot(uint32_t pc, uint32_t sp, uint32_t delay_ms);
 
@@ -63,7 +68,7 @@ void watchdog_update(void);
  * \ingroup hardware_watchdog
  *
  * \note If \ref watchdog_start_tick value does not give a 1MHz clock to the watchdog system, then the \p delay_ms
- * parameter will not be in microseconds. See the datasheet for more details.
+ * parameter will not be in milliseconds. See the datasheet for more details.
  *
  * By default the SDK assumes a 12MHz XOSC and sets the \ref watchdog_start_tick appropriately.
  *
@@ -72,7 +77,7 @@ void watchdog_update(void);
  * onto the RPI-RP2), then this value will be cleared, and so \ref watchdog_enable_caused_reboot will
  * return false.
  *
- * \param delay_ms Number of milliseconds before watchdog will reboot without watchdog_update being called. Maximum of 0x7fffff, which is approximately 8.3 seconds
+ * \param delay_ms Number of milliseconds before watchdog will reboot without watchdog_update being called. Maximum of 8388, which is approximately 8.3 seconds
  * \param pause_on_debug If the watchdog should be paused when the debugger is stepping through code
  */
 void watchdog_enable(uint32_t delay_ms, bool pause_on_debug);
