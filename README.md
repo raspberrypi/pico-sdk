@@ -59,7 +59,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
       3. Setup a `CMakeLists.txt` like:
 
           ```cmake
-          cmake_minimum_required(VERSION 3.13)
+          cmake_minimum_required(VERSION 3.13...3.27)
 
           # initialize the SDK based on PICO_SDK_PATH
           # note: this must happen before project()
@@ -79,7 +79,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
       1. Setup a `CMakeLists.txt` like:
 
           ```cmake
-          cmake_minimum_required(VERSION 3.13)
+          cmake_minimum_required(VERSION 3.13...3.27)
 
           # initialize pico-sdk from submodule
           # note: this must happen before project()
