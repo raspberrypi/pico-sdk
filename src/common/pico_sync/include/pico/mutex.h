@@ -46,10 +46,10 @@ extern "C" {
  */
 typedef struct __packed_aligned  {
     lock_core_t core;
-    lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
-    uint8_t enter_count;        //! ownership count
+    volatile lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
+    volatile uint8_t enter_count;        //! ownership count
 #if PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY
-    bool recursive;
+    volatile bool recursive;
 #endif
 } recursive_mutex_t;
 
@@ -59,7 +59,7 @@ typedef struct __packed_aligned  {
 #if !PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY
 typedef struct __packed_aligned mutex {
     lock_core_t core;
-    lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
+    volatile lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
 } mutex_t;
 #else
 typedef recursive_mutex_t mutex_t; // they are one and the same when backwards compatible with SDK1.2.0
