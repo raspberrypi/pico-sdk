@@ -344,7 +344,7 @@ enum gpio_slew_rate gpio_get_slew_rate(uint gpio);
  */
 void gpio_set_drive_strength(uint gpio, enum gpio_drive_strength drive);
 
-/*! \brief Determine current slew rate for a specified GPIO
+/*! \brief Determine current drive strength for a specified GPIO
  *  \ingroup hardware_gpio
  *
  * \sa gpio_set_drive_strength
