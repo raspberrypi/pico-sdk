@@ -52,10 +52,32 @@ uint uart_init(uart_inst_t *uart, uint baudrate) {
 
     // Any LCR writes need to take place before enabling the UART
     uint baud = uart_set_baudrate(uart, baudrate);
-    uart_set_format(uart, 8, 1, UART_PARITY_NONE);
 
+    // inline the uart_set_format() call, as we don't need the CR disable/re-enable
+    // protection, and also many people will never call it again, so having
+    // the generic function is not useful, and much bigger than this inlined
+    // code which is only a handful of instructions.
+    //
+    // The UART_UARTLCR_H_FEN_BITS setting is combined as well as it is the same register
+#if 0
+    uart_set_format(uart, 8, 1, UART_PARITY_NONE);
     // Enable FIFOs (must be before setting UARTEN, as this is an LCR access)
     hw_set_bits(&uart_get_hw(uart)->lcr_h, UART_UARTLCR_H_FEN_BITS);
+#else
+    uint data_bits = 8;
+    uint stop_bits = 1;
+    uint parity = UART_PARITY_NONE;
+    hw_write_masked(&uart_get_hw(uart)->lcr_h,
+        ((data_bits - 5u) << UART_UARTLCR_H_WLEN_LSB) |
+            ((stop_bits - 1u) << UART_UARTLCR_H_STP2_LSB) |
+            (bool_to_bit(parity != UART_PARITY_NONE) << UART_UARTLCR_H_PEN_LSB) |
+            (bool_to_bit(parity == UART_PARITY_EVEN) << UART_UARTLCR_H_EPS_LSB) |
+            UART_UARTLCR_H_FEN_BITS,
+        UART_UARTLCR_H_WLEN_BITS | UART_UARTLCR_H_STP2_BITS |
+            UART_UARTLCR_H_PEN_BITS | UART_UARTLCR_H_EPS_BITS |
+            UART_UARTLCR_H_FEN_BITS);
+#endif
+
     // Enable the UART, both TX and RX
     uart_get_hw(uart)->cr = UART_UARTCR_UARTEN_BITS | UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS;
     // Always enable DREQ signals -- no harm in this if DMA is not listening
