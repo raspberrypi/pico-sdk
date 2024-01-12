@@ -117,8 +117,13 @@ SECTIONS
     __binary_info_end = .;
     . = ALIGN(4);
 
-   .ram_vector_table (NOLOAD): {
+    .ram_vector_table (NOLOAD): {
         *(.ram_vector_table)
+    } > RAM
+
+    .uninitialized_data (NOLOAD): {
+        . = ALIGN(4);
+        *(.uninitialized_data*)
     } > RAM
 
     .data : {
@@ -172,11 +177,6 @@ SECTIONS
     } > RAM AT> FLASH
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
     __etext = LOADADDR(.data);
-
-    .uninitialized_data (NOLOAD): {
-        . = ALIGN(4);
-        *(.uninitialized_data*)
-    } > RAM
 
     /* Start and end symbols must be word-aligned */
     .scratch_x : {
