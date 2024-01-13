@@ -232,7 +232,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
 
     # Make a GATT header file from a BTstack GATT file
     # Pass the target library name library type and path to the GATT input file
-    # To add additional directories to the gatt #import path, one "-I[custom_path]"
+    # To add additional directories to the gatt #import path, one "[custom_path]"
     # argument for each custom_path to the end of the argument list.
     function(pico_btstack_make_gatt_header TARGET_LIB TARGET_TYPE GATT_FILE)
             find_package (Python3 REQUIRED COMPONENTS Interpreter)
@@ -241,14 +241,18 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             set(GATT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
             set(GATT_HEADER "${GATT_BINARY_DIR}/${GATT_NAME}.h")
             set(TARGET_GATT "${TARGET_LIB}_gatt_header")
-
+            set (ExtraGattPaths "")
+            foreach(arg IN LISTS ARGN)
+                string(PREPEND arg "-I")
+                string(APPEND ExtraGattPaths ${arg} " ")
+            endforeach()
             add_custom_target(${TARGET_GATT} DEPENDS ${GATT_HEADER})
             add_custom_command(
                     OUTPUT ${GATT_HEADER}
                     DEPENDS ${GATT_FILE}
                     WORKING_DIRECTORY ${GATT_PATH}
                     COMMAND ${CMAKE_COMMAND} -E make_directory ${GATT_BINARY_DIR} &&
-                            ${Python3_EXECUTABLE} ${PICO_SDK_PATH}/lib/btstack/tool/compile_gatt.py ${GATT_FILE} ${GATT_HEADER} ${ARGN}
+                            ${Python3_EXECUTABLE} ${PICO_SDK_PATH}/lib/btstack/tool/compile_gatt.py ${GATT_FILE} ${GATT_HEADER} ${ExtraGattPaths}
                     VERBATIM)
             add_dependencies(${TARGET_LIB}
                     ${TARGET_GATT}
