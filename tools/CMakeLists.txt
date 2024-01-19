@@ -26,6 +26,7 @@ function(pico_generate_pio_header TARGET PIO)
     endif()
 
     if (pico_generate_pio_header_OUTPUT_DIR)
+        file(MAKE_DIRECTORY ${pico_generate_pio_header_OUTPUT_DIR})
         get_filename_component(HEADER_DIR ${pico_generate_pio_header_OUTPUT_DIR} ABSOLUTE)
     else()
         set(HEADER_DIR "${CMAKE_CURRENT_BINARY_DIR}")
