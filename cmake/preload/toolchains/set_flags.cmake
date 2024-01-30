@@ -2,10 +2,11 @@
 get_property(IS_IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)
 foreach(LANG IN ITEMS C CXX ASM)
     set(CMAKE_${LANG}_FLAGS_INIT "${ARM_TOOLCHAIN_COMMON_FLAGS}")
+    unset(CMAKE_${LANG}_FLAGS_DEBUG CACHE)
     if (PICO_DEOPTIMIZED_DEBUG)
-        set(CMAKE_${LANG}_FLAGS_DEBUG "-O0 ${CMAKE_${LANG}_FLAGS_DEBUG}")
+        set(CMAKE_${LANG}_FLAGS_DEBUG_INIT "-O0")
     else()
-        set(CMAKE_${LANG}_FLAGS_DEBUG "-Og ${CMAKE_${LANG}_FLAGS_DEBUG}")
+        set(CMAKE_${LANG}_FLAGS_DEBUG_INIT "-Og")
     endif()
     set(CMAKE_${LANG}_LINK_FLAGS "-Wl,--build-id=none")
 
