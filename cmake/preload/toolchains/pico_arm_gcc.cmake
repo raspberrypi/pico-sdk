@@ -45,7 +45,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 
-option(PICO_DEOPTIMIZED_DEBUG "Build debug builds with -O0" 0)
+option(PICO_DEOPTIMIZED_DEBUG "Build debug builds with -O0" 1)
 
 # on ARM -mcpu should not be mixed with -march
 set(ARM_TOOLCHAIN_COMMON_FLAGS " -mcpu=cortex-m0plus -mthumb")

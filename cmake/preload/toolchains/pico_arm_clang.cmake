@@ -38,7 +38,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 
-option(PICO_DEOPTIMIZED_DEBUG "Build debug builds with -O0" 0)
+option(PICO_DEOPTIMIZED_DEBUG "Build debug builds with -O0" 1)
 
 # Oz is preferred for Clang (verses CMake default -Os) see also https://gitlab.kitware.com/cmake/cmake/-/issues/22458
 set(CMAKE_C_FLAGS_MINSIZEREL "-Oz -DNDEBUG")
