@@ -102,7 +102,7 @@ struct json_output : public output_format {
                         program.sideset_opt ? "true" : "false",
                         program.sideset_pindirs ? "true" : "false");
             } else {
-                fprintf(out, "%s\"sideset\": {\"size\": 0, \"optional\": false, \"pindirs\": false},\n", tabs, program.origin.get());
+                fprintf(out, "%s\"sideset\": {\"size\": 0, \"optional\": false, \"pindirs\": false},\n", tabs);
             }
 
             output_symbols(out, true, tabs, program.symbols);
