@@ -90,6 +90,7 @@ void runtime_init(void) {
             RESETS_RESET_USBCTRL_BITS
     ));
 
+#ifdef __preinit_array_start
     // pre-init runs really early since we need it even for memcpy and divide!
     // (basically anything in aeabi that uses bootrom)
 
@@ -104,6 +105,7 @@ void runtime_init(void) {
     for (void (**p)(void) = &__preinit_array_start; p < &__preinit_array_end; ++p) {
         (*p)();
     }
+#endif
 
     // After calling preinit we have enough runtime to do the exciting maths
     // in clocks_init
@@ -165,6 +167,7 @@ void runtime_init(void) {
     irq_init_priorities();
     alarm_pool_init_default();
 
+#ifdef __init_array_start
     // Start and end points of the constructor list,
     // defined by the linker script.
     extern void (*__init_array_start)(void);
@@ -176,6 +179,7 @@ void runtime_init(void) {
     for (void (**p)(void) = &__init_array_start; p < &__init_array_end; ++p) {
         (*p)();
     }
+#endif
 
 }
 
@@ -189,6 +193,7 @@ void __attribute__((noreturn)) __attribute__((weak)) _exit(__unused int status) 
 #endif
 }
 
+#if defined(__clock_t_defined) || defined(_CLOCK_T_DECLARED)
 __attribute__((weak)) void *_sbrk(int incr) {
     extern char end; /* Set by linker.  */
     static char *heap_end;
@@ -259,6 +264,7 @@ __attribute((weak)) int _kill(__unused pid_t pid, __unused int sig) {
 void exit(int status) {
     _exit(status);
 }
+#endif
 
 // incorrect warning from GCC 6
 GCC_Pragma("GCC diagnostic push")

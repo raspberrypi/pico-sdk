@@ -149,9 +149,11 @@ __force_inline static void __wfi(void) {
  * The DMB (data memory barrier) acts as a memory barrier, all memory accesses prior to this
  * instruction will be observed before any explicit access after the instruction.
  */
+#ifndef __dmb
 __force_inline static void __dmb(void) {
     pico_default_asm_volatile("dmb" : : : "memory");
 }
+#endif
 
 /*! \brief Insert a DSB instruction in to the code path.
  *  \ingroup hardware_sync
@@ -160,9 +162,11 @@ __force_inline static void __dmb(void) {
  * memory barrier (DMB). The DSB operation completes when all explicit memory
  * accesses before this instruction complete.
  */
+#ifndef __dsb
 __force_inline static void __dsb(void) {
     pico_default_asm_volatile("dsb" : : : "memory");
 }
+#endif
 
 /*! \brief Insert a ISB instruction in to the code path.
  *  \ingroup hardware_sync
@@ -171,9 +175,11 @@ __force_inline static void __dsb(void) {
  * so that all instructions following the ISB are fetched from cache or memory again, after
  * the ISB instruction has been completed.
  */
+#ifndef __isb
 __force_inline static void __isb(void) {
     pico_default_asm_volatile("isb" ::: "memory");
 }
+#endif
 
 /*! \brief Acquire a memory fence
  *  \ingroup hardware_sync
