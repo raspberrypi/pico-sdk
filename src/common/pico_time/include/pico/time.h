@@ -558,6 +558,18 @@ static inline alarm_id_t alarm_pool_add_alarm_in_ms(alarm_pool_t *pool, uint32_t
  */
 bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id);
 
+/*!
+ * \brief Return the time remaining before the next trigger of an alarm
+ * \ingroup alarm
+ * 
+ * @param pool the alarm_pool containing the alarm
+ * @param alarm_id the alarm
+ * 
+ * @return >0 the number of microseconds before the next trigger
+ * @return 0 if either the given alarm is not in progress or it has passed
+ */
+uint32_t alarm_pool_remaining_time(alarm_pool_t *pool, alarm_id_t alarm_id);
+
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 /*!
  * \brief Add an alarm callback to be called at a specific time
