@@ -225,6 +225,7 @@ typedef struct stdio_stack_buffer {
     char buf[PICO_STDIO_STACK_BUFFER_SIZE];
 } stdio_stack_buffer_t;
 
+#if LIB_PICO_PRINTF_PICO
 static void stdio_stack_buffer_flush(stdio_stack_buffer_t *buffer) {
     if (buffer->used) {
         for (stdio_driver_t *d = drivers; d; d = d->next) {
@@ -243,6 +244,7 @@ static void stdio_buffered_printer(char c, void *arg) {
     }
     buffer->buf[buffer->used++] = c;
 }
+#endif
 
 int WRAPPER_FUNC(vprintf)(const char *format, va_list va) {
     bool serialzed = stdout_serialize_begin();
