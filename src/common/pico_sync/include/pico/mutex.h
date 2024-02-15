@@ -20,7 +20,7 @@ extern "C" {
  *
  * Mutexes are application level locks usually used protecting data structures that might be used by
  * multiple threads of execution. Unlike critical sections, the mutex protected code is not necessarily
- * required/expected to complete quickly, as no other sytem wide locks are held on account of an acquired mutex.
+ * required/expected to complete quickly, as no other system wide locks are held on account of an acquired mutex.
  *
  * When acquired, the mutex has an owner (see \ref lock_get_caller_owner_id) which with the plain SDK is just
  * the acquiring core, but in an RTOS it could be a task, or an IRQ handler context.
