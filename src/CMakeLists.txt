@@ -102,7 +102,7 @@ macro(pico_simple_hardware_headers_target NAME)
     if (NOT TARGET hardware_${NAME}_headers)
         add_library(hardware_${NAME}_headers INTERFACE)
 
-        target_include_directories(hardware_${NAME}_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+        target_include_directories(hardware_${NAME}_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
         target_link_libraries(hardware_${NAME}_headers INTERFACE pico_base_headers)
         if (NOT PICO_NO_HARDWARE)
             target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs hardware_claim_headers)
