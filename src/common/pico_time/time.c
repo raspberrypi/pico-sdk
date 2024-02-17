@@ -370,6 +370,17 @@ void alarm_pool_dump(alarm_pool_t *pool) {
     spin_unlock(pool->lock, save);
 }
 
+uint32_t alarm_pool_remaining_time(alarm_pool_t *pool, alarm_id_t alarm_id) {
+    uint32_t save = spin_lock_blocking(pool->lock);
+    pheap_node_id_t next_id = ph_peek_head(pool->heap);
+    spin_unlock(pool->lock, save);
+    if (alarm_id == next_id && timer_hw->alarm[alarm_pool_hardware_alarm_num(pool)] > timer_hw->timerawl) {
+        return timer_hw->alarm[alarm_pool_hardware_alarm_num(pool)] - timer_hw->timerawl;
+    } else {
+        return 0;
+    }
+}
+
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
     uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
