@@ -1,0 +1,28 @@
+module(name = "pico-sdk")
+
+# Note: rules_cc is special-cased repository; a dependency on rules_cc in a
+# module will not ensure that the root Bazel module has that same version of
+# rules_cc. For that reason, this primarily acts as a FYI. You'll still need
+# to explicitly list this dependency in your own project's MODULE.bazel file.
+bazel_dep(name = "rules_cc", version = "0.0.9")
+
+git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "pw_toolchain",
+    strip_prefix = "pw_toolchain_bazel",
+    remote = "https://pigweed.googlesource.com/pigweed/pigweed",
+    commit = "16af162c624540512cd1dfc91980cce60007a972",
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "arm_gcc_win-x86_64",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi",
+    build_file = "@pw_toolchain//build_external.BUILD",
+    sha256 = "51d933f00578aa28016c5e3c84f94403274ea7915539f8e56c13e2196437d18f",
+)
+
+register_toolchains("//bazel/toolchain:arm_gcc_win-x86_64")

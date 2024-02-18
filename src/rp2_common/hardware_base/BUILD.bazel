@@ -1,0 +1,7 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_base",
+    includes = ["include"],
+    hdrs = ["include/hardware/address_mapped.h"],
+)

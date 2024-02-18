@@ -1,0 +1,10 @@
+# Enable Bzlmod for every Bazel command
+common --enable_bzlmod
+
+# Produce useful output when the build fails.
+common --verbose_failures
+
+# Required for new toolchain resolution API.
+build --incompatible_enable_cc_toolchain_resolution
+
+build --platforms=//bazel/platform:rp2040

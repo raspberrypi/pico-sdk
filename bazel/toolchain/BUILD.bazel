@@ -1,0 +1,81 @@
+load(
+    "@pw_toolchain//cc_toolchain:defs.bzl",
+    "pw_cc_flag_set",
+    "pw_cc_toolchain",
+)
+load(":pico.bzl", "generate_toolchains")
+
+pw_cc_flag_set(
+    name = "warnings",
+    actions = [
+        "@pw_toolchain//actions:all_c_compiler_actions",
+        "@pw_toolchain//actions:all_cpp_compiler_actions",
+    ],
+    flags = [
+        "-Wall",
+        "-Wextra",
+        # Make all warnings errors, except for the exemptions below.
+        "-Werror",
+        "-Wno-error=cpp",  # preprocessor #warning statement
+        "-Wno-error=deprecated-declarations",  # [[deprecated]] attribute
+        "-Wno-psabi",  # Silence the really verbose ARM warnings.
+    ],
+)
+
+pw_cc_flag_set(
+    name = "thumb_abi",
+    actions = [
+        "@pw_toolchain//actions:all_asm_actions",
+        "@pw_toolchain//actions:all_c_compiler_actions",
+        "@pw_toolchain//actions:all_cpp_compiler_actions",
+        "@pw_toolchain//actions:all_link_actions",
+    ],
+    flags = [
+        "-mabi=aapcs",
+        "-mthumb",
+    ],
+)
+
+pw_cc_flag_set(
+    name = "cortex_common",
+    actions = [
+        "@pw_toolchain//actions:all_c_compiler_actions",
+        "@pw_toolchain//actions:all_cpp_compiler_actions",
+    ],
+    flags = [
+        "-ffreestanding",
+        "-specs=nano.specs",
+        "-specs=nosys.specs",
+    ],
+)
+
+pw_cc_flag_set(
+    name = "cortex_common_link",
+    actions = ["@pw_toolchain//actions:all_link_actions"],
+    flags = [
+        "-Wl,--gc-sections",
+        "-specs=nano.specs",
+        "-specs=nosys.specs",
+        "-lstdc++",
+        "-lnosys",
+        "-lc",
+        "-lm",
+        "-Wl,--no-warn-rwx-segment",
+    ],
+)
+
+pw_cc_flag_set(
+    name = "cortex-m0",
+    actions = [
+        "@pw_toolchain//actions:all_asm_actions",
+        "@pw_toolchain//actions:all_c_compiler_actions",
+        "@pw_toolchain//actions:all_cpp_compiler_actions",
+        "@pw_toolchain//actions:all_link_actions",
+    ],
+    flags = [
+        "-mcpu=cortex-m0",
+        "-mfloat-abi=soft",
+    ],
+)
+
+generate_toolchains()
