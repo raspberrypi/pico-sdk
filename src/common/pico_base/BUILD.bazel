@@ -20,6 +20,14 @@ cc_library(
 )
 
 alias(
+    name = "platform_defs",
+    actual = select({
+        "//bazel/constraint:host": "//src/host/pico_platform:platform_defs",
+        "//bazel/constraint:rp2": "//src/rp2_common/pico_platform:platform_defs",
+    }),
+)
+
+alias(
     name = "pico_platform",
     actual = select({
         "//bazel/constraint:host": "//src/host/pico_platform:pico_platform",  
@@ -44,7 +52,10 @@ cc_library(
     ],
 
     # Be extra careful about who references this for now.
-    visibility = ["//src/rp2_common/pico_platform:__pkg__"],
+    visibility = [
+        "//src/host/pico_platform:__pkg__",
+        "//src/rp2_common/pico_platform:__pkg__",
+    ],
 )
 
 cc_library(

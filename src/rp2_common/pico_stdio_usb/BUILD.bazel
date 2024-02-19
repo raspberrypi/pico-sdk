@@ -1,0 +1,8 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "reset_interface_headers",
+    includes = ["include"],
+    hdrs = ["include/pico/stdio_usb/reset_interface.h"],
+    deps = ["//src/common/pico_usb_reset_interface:pico_usb_reset_interface"],
+)
