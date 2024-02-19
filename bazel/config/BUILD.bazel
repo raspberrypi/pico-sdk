@@ -14,24 +14,6 @@ label_flag(
     build_setting_default  = ":no_platform_headers",
 )
 
-# TODO: This is a stopgap to get things building.
-label_flag(
-    name = "board_defines",
-    build_setting_default  = ":default_defines",
-)
-
-# TODO: This is a stopgap to get things building.
-cc_library(
-    name = "default_defines",
-    defines = [
-        "PICO_BOARD=\"rp2040\"",
-        "PICO_ON_DEVICE=1",
-        "PICO_NO_HARDWARE=0",
-        "PICO_BUILD=1",
-    ],
-    visibility = ["//visibility:private"],
-)
-
 genrule(
     name = "empty_extra_headers_file",
     outs = ["generated_include/pico_config_extra_headers.h"],

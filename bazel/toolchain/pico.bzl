@@ -36,6 +36,7 @@ def generate_toolchains():
                 "@pico-sdk//bazel/toolchain:cortex_common",
                 "@pico-sdk//bazel/toolchain:cortex_common_link",
                 "@pico-sdk//bazel/toolchain:warnings",
+                "@pico-sdk//bazel/toolchain:pico_sdk_defines",
             ],
             action_configs = [
                 "@arm_gcc_{}//:arm-none-eabi-ar".format(_HOST_STR),

@@ -78,4 +78,18 @@ pw_cc_flag_set(
     ],
 )
 
+# TODO: This is a stopgap to get things building.
+pw_cc_flag_set(
+    name = "pico_sdk_defines",
+    actions = [
+        "@pw_toolchain//actions:all_compiler_actions",
+    ],
+    flags = [
+        '-DPICO_BOARD=\\"rp2040\\"',
+        "-DPICO_ON_DEVICE=1",
+        "-DPICO_NO_HARDWARE=0",
+        "-DPICO_BUILD=1",
+    ],
+)
+
 generate_toolchains()

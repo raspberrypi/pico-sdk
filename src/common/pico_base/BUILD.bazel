@@ -41,7 +41,6 @@ cc_library(
     deps = [
         ":version",
         "//bazel:generate_config_header",
-        "//bazel/config:board_defines",
     ],
     hdrs = [
         "include/pico.h",
