@@ -80,6 +80,24 @@ bool __time_critical_func(mutex_try_enter)(mutex_t *mtx, uint32_t *owner_out) {
     return entered;
 }
 
+bool __time_critical_func(mutex_try_enter_isr)(mutex_t *mtx, uint32_t *owner_out) {
+#if PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY
+    if (mtx->recursive) {
+        return recursive_mutex_try_enter_isr(mtx, owner_out);
+    }
+#endif
+    uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
+    if (!lock_is_owner_id_valid(mtx->owner)) {
+        mtx->owner = lock_get_caller_owner_id();
+        mtx->save = save;
+        return true;
+    } else {
+        if (owner_out) *owner_out = (uint32_t) mtx->owner;
+        spin_unlock(mtx->core.spin_lock, save);
+        return false;
+    }
+}
+
 bool __time_critical_func(mutex_try_enter_block_until)(mutex_t *mtx, absolute_time_t until) {
     // not using lock_owner_id_t to avoid backwards incompatibility change to mutex_try_enter API
     static_assert(sizeof(lock_owner_id_t) <= 4, "");
@@ -106,6 +124,22 @@ bool __time_critical_func(recursive_mutex_try_enter)(recursive_mutex_t *mtx, uin
     }
     spin_unlock(mtx->core.spin_lock, save);
     return entered;
+}
+
+bool __time_critical_func(recursive_mutex_try_enter_isr)(recursive_mutex_t *mtx, uint32_t *owner_out) {
+    lock_owner_id_t caller = lock_get_caller_owner_id();
+    uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
+    if (!lock_is_owner_id_valid(mtx->owner) || mtx->owner == caller) {
+        mtx->owner = caller;
+        uint __unused total = ++mtx->enter_count;
+        assert(total); // check for overflow
+        mtx->save = save;
+        return true;
+    } else {
+        if (owner_out) *owner_out = (uint32_t) mtx->owner;
+        spin_unlock(mtx->core.spin_lock, save);
+        return false;
+    }
 }
 
 bool __time_critical_func(mutex_enter_timeout_ms)(mutex_t *mtx, uint32_t timeout_ms) {
@@ -182,6 +216,18 @@ void __time_critical_func(mutex_exit)(mutex_t *mtx) {
     lock_internal_spin_unlock_with_notify(&mtx->core, save);
 }
 
+void __time_critical_func(mutex_exit_isr)(mutex_t *mtx) {
+#if PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY
+    if (mtx->recursive) {
+        recursive_mutex_exit_isr(mtx);
+        return;
+    }
+#endif
+    assert(lock_is_owner_id_valid(mtx->owner));
+    mtx->owner = LOCK_INVALID_OWNER_ID;
+    lock_internal_spin_unlock_with_notify(&mtx->core, mtx->save);
+}
+
 void __time_critical_func(recursive_mutex_exit)(recursive_mutex_t *mtx) {
     uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
     assert(lock_is_owner_id_valid(mtx->owner));
@@ -191,5 +237,16 @@ void __time_critical_func(recursive_mutex_exit)(recursive_mutex_t *mtx) {
         lock_internal_spin_unlock_with_notify(&mtx->core, save);
     } else {
         spin_unlock(mtx->core.spin_lock, save);
+    }
+}
+
+void __time_critical_func(recursive_mutex_exit_isr)(recursive_mutex_t *mtx) {
+    assert(lock_is_owner_id_valid(mtx->owner));
+    assert(mtx->enter_count);
+    if (!--mtx->enter_count) {
+        mtx->owner = LOCK_INVALID_OWNER_ID;
+        lock_internal_spin_unlock_with_notify(&mtx->core, mtx->save);
+    } else {
+        spin_unlock(mtx->core.spin_lock, mtx->save);
     }
 }
