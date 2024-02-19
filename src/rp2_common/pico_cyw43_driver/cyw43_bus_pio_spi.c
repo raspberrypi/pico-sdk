@@ -29,13 +29,22 @@
 #define CS_PIN 25u
 #define IRQ_SAMPLE_DELAY_NS 100
 
-#define SPI_PROGRAM_NAME spi_gap01_sample0
+#ifdef CYW43_SPI_PROGRAM_NAME
+#define SPI_PROGRAM_NAME CYW43_SPI_PROGRAM_NAME
+#else
+//#define SPI_PROGRAM_NAME spi_gap0_sample1 // for lower cpu speed
+#define SPI_PROGRAM_NAME spi_gap01_sample0 // for high cpu speed
+#endif
 #define SPI_PROGRAM_FUNC __CONCAT(SPI_PROGRAM_NAME, _program)
 #define SPI_PROGRAM_GET_DEFAULT_CONFIG_FUNC __CONCAT(SPI_PROGRAM_NAME, _program_get_default_config)
 #define SPI_OFFSET_END __CONCAT(SPI_PROGRAM_NAME, _offset_end)
 #define SPI_OFFSET_LP1_END __CONCAT(SPI_PROGRAM_NAME, _offset_lp1_end)
 
+#ifdef CYW43_PIO_CLOCK_DIV
+#define CLOCK_DIV CYW43_PIO_CLOCK_DIV
+#else
 #define CLOCK_DIV 2
+#endif
 #define CLOCK_DIV_MINOR 0
 #define PADS_DRIVE_STRENGTH PADS_BANK0_GPIO0_DRIVE_VALUE_12MA
 
