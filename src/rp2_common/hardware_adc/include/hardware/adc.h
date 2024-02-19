@@ -49,6 +49,12 @@
 #define PARAM_ASSERTIONS_ENABLED_ADC 0
 #endif
 
+#define ADC_REFERENCE_VOLTAGE 3.3
+#define ADC_MAX 4095
+
+/* Converts GPIO pin number to ADC channel */
+#define ADC_PIN_TO_CHANNEL(Pin) ((Pin) - (26))
+
 #ifdef __cplusplus
 extern "C" {
 #endif
