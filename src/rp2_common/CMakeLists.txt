@@ -77,6 +77,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(pico_fix)
 
     pico_add_subdirectory(pico_runtime)
+    pico_add_subdirectory(pico_tone)
 
 endif()
 
