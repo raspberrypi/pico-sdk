@@ -106,7 +106,7 @@ void busy_wait_until(absolute_time_t t) {
 }
 /// \end::busy_wait[]
 
-static inline uint harware_alarm_irq_number(uint alarm_num) {
+static inline uint hardware_alarm_irq_number(uint alarm_num) {
     return TIMER_IRQ_0 + alarm_num;
 }
 
@@ -150,7 +150,7 @@ void hardware_alarm_set_callback(uint alarm_num, hardware_alarm_callback_t callb
     //  note this should probably be subsumed by irq_set_exclusive_handler anyway, since that
     //  should disallow IRQ handlers on both cores
     check_hardware_alarm_num_param(alarm_num);
-    uint irq_num = harware_alarm_irq_number(alarm_num);
+    uint irq_num = hardware_alarm_irq_number(alarm_num);
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_TIMER);
     uint32_t save = spin_lock_blocking(lock);
     if (callback) {
@@ -208,7 +208,7 @@ bool hardware_alarm_set_target(uint alarm_num, absolute_time_t target) {
                     timer_hw->intr = 1u << alarm_num;
                     // ... including anything pending on the processor - perhaps unnecessary, but
                     // our timer flag says we aren't expecting anything.
-                    irq_clear(harware_alarm_irq_number(alarm_num));
+                    irq_clear(hardware_alarm_irq_number(alarm_num));
                     // and clear our flag so that if the IRQ handler is already active (because it is on
                     // the other core) it will also skip doing anything
                     timer_callbacks_pending = old_timer_callbacks_pending;
