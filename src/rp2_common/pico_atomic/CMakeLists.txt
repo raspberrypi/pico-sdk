@@ -1,0 +1,11 @@
+if (NOT TARGET pico_atomic)
+    pico_add_library(pico_atomic)
+
+    target_sources(pico_atomic INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/pico_atomic.c
+            )
+
+    target_include_directories(pico_malloc_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+
+    target_link_libraries(pico_atomic INTERFACE pico_sync)
+endif()
