@@ -6,14 +6,18 @@ load(
 
 HOSTS = (
     ("win", "x86_64"),
+    ("mac", "x86_64"),
+    ("mac", "aarch64"),
 )
 
 _HOST_OS_CONSTRAINTS = {
     "win": "@platforms//os:windows",
+    "mac": "@platforms//os:macos",
 }
 
 _HOST_CPU_CONSTRAINTS = {
     "x86_64": "@platforms//cpu:x86_64",
+    "aarch64": "@platforms//cpu:aarch64",
 }
 
 def generate_toolchains():

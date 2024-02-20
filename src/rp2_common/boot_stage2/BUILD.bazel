@@ -38,12 +38,12 @@ cc_binary(
 )
 
 # TODO: Make variable support
-_OBJCOPY_CMD = "$(location @arm_gcc_win-x86_64//:arm-none-eabi-objcopy_tool) -Obinary $< $@"
+_OBJCOPY_CMD = "$(location @arm_gcc_mac-x86_64//:arm-none-eabi-objcopy_tool) -Obinary $< $@"
 genrule(
     name = "boot_stage2_bin",
     srcs = [":boot_stage2_elf"],
     outs = ["boot_stage2.bin"],
-    tools = ["@arm_gcc_win-x86_64//:arm-none-eabi-objcopy_tool"],
+    tools = ["@arm_gcc_mac-x86_64//:arm-none-eabi-objcopy_tool"],
     cmd = _OBJCOPY_CMD,
     cmd_bat = _OBJCOPY_CMD,
 )
