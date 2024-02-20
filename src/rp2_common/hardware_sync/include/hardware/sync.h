@@ -10,6 +10,7 @@
 #include "pico.h"
 #include "hardware/address_mapped.h"
 #include "hardware/regs/sio.h"
+#include "cmsis_compiler.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -212,11 +213,9 @@ __force_inline static void __mem_fence_release(void) {
  * \return The prior interrupt enable status for restoration later via restore_interrupts()
  */
 __force_inline static uint32_t save_and_disable_interrupts(void) {
-    uint32_t status;
-    pico_default_asm_volatile(
-            "mrs %0, PRIMASK\n"
-            "cpsid i"
-            : "=r" (status) ::);
+    uint32_t status = __get_PRIMASK();
+    __disable_irq();
+
     return status;
 }
 
@@ -226,7 +225,9 @@ __force_inline static uint32_t save_and_disable_interrupts(void) {
  * \param status Previous interrupt status from save_and_disable_interrupts()
   */
 __force_inline static void restore_interrupts(uint32_t status) {
-    pico_default_asm_volatile("msr PRIMASK,%0"::"r" (status) : );
+  if (status == 0) {
+    __enable_irq();
+  }
 }
 
 /*! \brief Get HW Spinlock instance from number
