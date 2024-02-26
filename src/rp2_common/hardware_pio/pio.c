@@ -266,3 +266,31 @@ void pio_sm_drain_tx_fifo(PIO pio, uint sm) {
         pio_sm_exec(pio, sm, instr);
     }
 }
+
+bool pio_claim_free_sm_add_program(const pio_program_t *program, PIO *pio, uint *sm, uint *offset) {
+    // Find a free pio
+    int count = NUM_PIOS;
+    while(count--) {
+        *pio = pio_get_instance(count);
+        if (!pio_can_add_program(*pio, program)) {
+            continue;
+        }
+        // Find a state machine
+        int index = (int8_t)pio_claim_unused_sm(*pio, false);
+        if (index < 0) {
+            continue;
+        }
+        *sm = (uint)index;
+        *offset = pio_add_program(*pio, program);
+        return true;
+    }
+    *pio = NULL;
+    return false;
+}
+
+void pio_remove_program_unclaim_sm(const pio_program_t *program, PIO pio, uint sm, uint offset) {
+    check_pio_param(pio);
+    check_sm_param(sm);
+    pio_remove_program(pio, program, offset);
+    pio_sm_unclaim(pio, sm);
+}

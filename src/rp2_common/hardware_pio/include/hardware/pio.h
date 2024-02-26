@@ -418,6 +418,18 @@ static inline uint pio_get_index(PIO pio) {
     return pio == pio1 ? 1 : 0;
 }
 
+/*! \brief Convert PIO instance to hardware instance
+ *  \ingroup hardware_pio
+ *
+ * \param instance Instance of PIO, 0 or 1
+ * \return the PIO hardware instance
+ */
+static inline PIO pio_get_instance(uint instance) {
+    static_assert(NUM_PIOS == 2, "");
+    invalid_params_if(PIO, instance >= NUM_PIOS);
+    return instance ? pio1 : pio0;
+}
+
 /*! \brief Setup the function select for a GPIO to use output from the given PIO instance
  *  \ingroup hardware_pio
  *
@@ -1305,6 +1317,42 @@ int pio_claim_unused_sm(PIO pio, bool required);
  * \see pio_claim_sm_mask
  */
 bool pio_sm_is_claimed(PIO pio, uint sm);
+
+/*! \brief Finds a PIO and statemachine and adds a program into PIO memory
+ *  \ingroup hardware_pio
+ *
+ * \param program PIO program to add
+ * \param pio Returns the PIO hardware instance or NULL if no PIO is available
+ * \param sm Returns the index of the PIO state machine that was claimed
+ * \param offset Returns the instruction memory offset of the start of the program
+ * \return true on success, false otherwise
+ * \see pio_remove_program_unclaim_sm
+ */
+bool pio_claim_free_sm_add_program(const pio_program_t *program, PIO *pio, uint *sm, uint *offset);
+
+/*! \brief Removes a program from PIO memory and unclaims the state machine
+ *  \ingroup hardware_pio
+ *
+ * \param program PIO program to remove from memory
+ * \param pio PIO hardware instance being used
+ * \param sm PIO state machine that was claimed
+ * \param offset offset of the program in PIO memory
+ * \see pio_claim_free_sm_add_program
+ */
+void pio_remove_program_unclaim_sm(const pio_program_t *program, PIO pio, uint sm, uint offset);
+
+/*! \brief Return IRQ_0 or IRQ_1 for a PIO hardware instance
+ *  \ingroup hardware_pio
+ *
+ * \param pio PIO hardware instance
+ * \param irqn 0 for PIOx_IRQ_0 or 1 for PIOx_IRQ_1 where x is the PIO number
+ * \return The IRQ number to use for the PIO
+ */
+static inline int pio_irq_number(PIO pio, int irqn) {
+    check_pio_param(pio);
+    valid_params_if(PIO, irqn < (PIO1_IRQ_0 - PIO0_IRQ_0));
+    return PIO0_IRQ_0 + (PIO1_IRQ_0 - PIO0_IRQ_0) * pio_get_index(pio) + irqn;
+}
 
 #ifdef __cplusplus
 }
