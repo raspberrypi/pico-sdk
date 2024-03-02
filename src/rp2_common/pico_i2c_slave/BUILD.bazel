@@ -9,7 +9,6 @@ cc_library(
     deps = [
         "//src/rp2_common/hardware_i2c:hardware_i2c",
         "//src/rp2_common/hardware_irq:hardware_irq",
-        "//src/rp2_common/pico_i2c_slave:pico_i2c_slave",
     ],
     srcs = ["i2c_slave.c"],
 )

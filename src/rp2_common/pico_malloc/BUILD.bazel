@@ -9,7 +9,6 @@ cc_library(
     deps = [
         "//src/common/pico_base:pico_base",
         "//src/common/pico_sync:pico_sync",
-        "//src/rp2_common/pico_malloc:pico_malloc",
     ],
     srcs = ["pico_malloc.c"],
 )

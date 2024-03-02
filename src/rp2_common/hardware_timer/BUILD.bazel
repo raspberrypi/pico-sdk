@@ -2,6 +2,20 @@
 
 package(default_visibility = ["//visibility:public"])
 
+# This exists to break a dependency cycle between
+# this library and //src/common/pico_time.
+# Application code should always use :hardware_timer instead.
+cc_library(
+    name = "hardware_timer_headers",
+    includes = ["include"],
+    hdrs = ["include/hardware/timer.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/pico_platform:hardware_structs",
+    ],
+    visibility = ["//src/common/pico_time:__pkg__"],
+)
+
 cc_library(
     name = "hardware_timer",
     includes = ["include"],
@@ -11,7 +25,6 @@ cc_library(
         "//src/rp2_common/hardware_claim:hardware_claim",
         "//src/rp2_common/hardware_irq:hardware_irq",
         "//src/rp2_common/hardware_sync:hardware_sync",
-        "//src/rp2_common/hardware_timer:hardware_timer",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
     srcs = ["timer.c"],

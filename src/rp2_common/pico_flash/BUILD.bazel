@@ -12,7 +12,6 @@ cc_library(
         "//src/rp2_common/hardware_exception:hardware_exception",
         "//src/rp2_common/hardware_flash:hardware_flash",
         "//src/rp2_common/hardware_sync:hardware_sync",
-        "//src/rp2_common/pico_flash:pico_flash",
         "//src/rp2_common/pico_multicore:pico_multicore",
     ],
     srcs = ["flash.c"],

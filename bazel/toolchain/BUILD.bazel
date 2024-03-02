@@ -89,7 +89,11 @@ pw_cc_flag_set(
         "-DPICO_ON_DEVICE=1",
         "-DPICO_NO_HARDWARE=0",
         "-DPICO_BUILD=1",
-    ],
+    ] + select({
+        "//bazel/constraint:stdio_semihosting": ["-DLIB_PICO_STDIO_SEMIHOSTING=1"],
+        "//bazel/constraint:stdio_uart": ["-DLIB_PICO_STDIO_UART=1"],
+        "//bazel/constraint:stdio_usb": ["-DLIB_PICO_STDIO_USB=1"],
+    }),
 )
 
 alias(

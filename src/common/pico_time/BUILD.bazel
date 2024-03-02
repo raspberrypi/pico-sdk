@@ -2,6 +2,22 @@
 
 package(default_visibility = ["//visibility:public"])
 
+# This exists to break a dependency cycle between
+# this library and //src/common/pico_sync.
+# Application code should always use :pico_time instead.
+cc_library(
+    name = "pico_time_headers",
+    includes = ["include"],
+    hdrs = [
+        "include/pico/time.h",
+        "include/pico/timeout_helper.h",
+    ],
+    deps = [
+        "//src/rp2_common/hardware_timer:hardware_timer_headers",
+    ],
+    visibility = ["//src/common/pico_sync:__pkg__"],
+)
+
 cc_library(
     name = "pico_time",
     includes = ["include"],
@@ -12,7 +28,6 @@ cc_library(
     deps = [
         "//src/common/pico_base:pico_base",
         "//src/common/pico_sync:pico_sync",
-        "//src/common/pico_time:pico_time",
         "//src/common/pico_util:pico_util",
         "//src/rp2_common/hardware_timer:hardware_timer",
     ],

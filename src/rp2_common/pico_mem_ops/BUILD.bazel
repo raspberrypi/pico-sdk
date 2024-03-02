@@ -9,7 +9,6 @@ cc_library(
     deps = [
         "//src/common/pico_base:pico_base",
         "//src/rp2_common/pico_bootrom:pico_bootrom",
-        "//src/rp2_common/pico_mem_ops:pico_mem_ops",
         "//src/rp2_common/pico_platform:pico_platform",
     ],
     srcs = [

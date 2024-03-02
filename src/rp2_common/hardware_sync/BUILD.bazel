@@ -2,6 +2,21 @@
 
 package(default_visibility = ["//visibility:public"])
 
+# This exists to break a dependency cycle between
+# this library and //src/rp2_common/hardware_claim.
+# Application code should always use :hardware_sync instead.
+cc_library(
+    name = "hardware_sync_headers",
+    includes = ["include"],
+    hdrs = ["include/hardware/sync.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/hardware_base:hardware_base",
+        "//src/rp2_common/pico_platform:hardware_regs",
+    ],
+    visibility = ["//src/rp2_common/hardware_claim:__pkg__"],
+)
+
 cc_library(
     name = "hardware_sync",
     includes = ["include"],
@@ -10,7 +25,6 @@ cc_library(
         "//src/common/pico_base:pico_base",
         "//src/rp2_common/hardware_base:hardware_base",
         "//src/rp2_common/hardware_claim:hardware_claim",
-        "//src/rp2_common/hardware_sync:hardware_sync",
         "//src/rp2_common/pico_platform:hardware_regs",
     ],
     srcs = ["sync.c"],

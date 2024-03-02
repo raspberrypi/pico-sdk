@@ -9,9 +9,6 @@ cc_library(
         "include/pico/bootrom.h",
         "include/pico/bootrom/sf_table.h",
     ],
-    deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/rp2_common/pico_bootrom:pico_bootrom",
-    ],
+    deps = ["//src/common/pico_base:pico_base"],
     srcs = ["bootrom.c"],
 )

@@ -17,7 +17,6 @@ cc_library(
         "//src/common/pico_sync:pico_sync",
         "//src/common/pico_time:pico_time",
         "//src/rp2_common/hardware_irq:hardware_irq",
-        "//src/rp2_common/pico_async_context:pico_async_context",
     ],
     srcs = [
         "async_context_base.c",

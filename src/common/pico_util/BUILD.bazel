@@ -13,7 +13,6 @@ cc_library(
     deps = [
         "//src/common/pico_base:pico_base",
         "//src/common/pico_sync:pico_sync",
-        "//src/common/pico_util:pico_util",
         "//src/rp2_common/hardware_sync:hardware_sync",
     ],
     srcs = [

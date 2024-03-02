@@ -12,10 +12,11 @@ cc_library(
         "//src/rp2_common/hardware_gpio:hardware_gpio",
         "//src/rp2_common/hardware_uart:hardware_uart",
         "//src/rp2_common/pico_stdio:pico_stdio",
-        "//src/rp2_common/pico_stdio_semihosting:pico_stdio_semihosting",
-        "//src/rp2_common/pico_stdio_uart:pico_stdio_uart",
-        "//src/rp2_common/pico_stdio_usb:pico_stdio_usb",
-    ],
+    ] + select({
+        "//bazel/constraint:stdio_semihosting": ["//src/rp2_common/pico_stdio_semihosting:pico_stdio_semihosting"],
+        "//bazel/constraint:stdio_uart": ["//src/rp2_common/pico_stdio_uart:pico_stdio_uart"],
+        "//bazel/constraint:stdio_usb": ["//src/rp2_common/pico_stdio_usb:pico_stdio_usb"],
+    }),
     # TODO: Add `select()` for host redirections.
     target_compatible_with = ["//bazel/constraint:rp2"],
 )

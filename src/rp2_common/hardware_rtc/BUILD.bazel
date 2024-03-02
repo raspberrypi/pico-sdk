@@ -11,7 +11,6 @@ cc_library(
         "//src/rp2_common/hardware_clocks:hardware_clocks",
         "//src/rp2_common/hardware_irq:hardware_irq",
         "//src/rp2_common/hardware_resets:hardware_resets",
-        "//src/rp2_common/hardware_rtc:hardware_rtc",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
     srcs = ["rtc.c"],

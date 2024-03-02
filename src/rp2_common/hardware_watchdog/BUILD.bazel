@@ -8,7 +8,6 @@ cc_library(
     hdrs = ["include/hardware/watchdog.h"],
     deps = [
         "//src/common/pico_base:pico_base",
-        "//src/rp2_common/hardware_watchdog:hardware_watchdog",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
     srcs = ["watchdog.c"],

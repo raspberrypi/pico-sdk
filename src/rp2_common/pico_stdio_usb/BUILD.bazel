@@ -21,7 +21,7 @@ cc_library(
         "//src/rp2_common/hardware_irq:hardware_irq",
         "//src/rp2_common/hardware_watchdog:hardware_watchdog",
         "//src/rp2_common/pico_bootrom:pico_bootrom",
-        "//src/rp2_common/pico_stdio:pico_stdio",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
         "//src/rp2_common/pico_unique_id:pico_unique_id",
     ],
     srcs = [

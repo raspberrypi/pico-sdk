@@ -8,7 +8,6 @@ cc_library(
     hdrs = ["include/hardware/vreg.h"],
     deps = [
         "//src/common/pico_base:pico_base",
-        "//src/rp2_common/hardware_vreg:hardware_vreg",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
     srcs = ["vreg.c"],

@@ -10,7 +10,6 @@ cc_library(
         "//src/common/pico_base:pico_base",
         "//src/rp2_common/hardware_divider:hardware_divider",
         "//src/rp2_common/pico_bootrom:pico_bootrom",
-        "//src/rp2_common/pico_float:pico_float",
         "//src/rp2_common/pico_platform:pico_platform",
     ],
     srcs = [

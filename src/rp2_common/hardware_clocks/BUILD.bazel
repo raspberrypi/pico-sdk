@@ -2,13 +2,29 @@
 
 package(default_visibility = ["//visibility:public"])
 
+# This exists to break a dependency cycle between
+# this library and //src/rp2_common/hardware_xosc.
+# Application code should always use :hardware_clocks instead.
+cc_library(
+    name = "hardware_clocks_headers",
+    includes = ["include"],
+    hdrs = ["include/hardware/clocks.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/pico_platform:hardware_structs",
+    ],
+    visibility = [
+        "//src/rp2_common/hardware_pll:__pkg__",
+        "//src/rp2_common/hardware_xosc:__pkg__",
+    ],
+)
+
 cc_library(
     name = "hardware_clocks",
     includes = ["include"],
     hdrs = ["include/hardware/clocks.h"],
     deps = [
         "//src/common/pico_base:pico_base",
-        "//src/rp2_common/hardware_clocks:hardware_clocks",
         "//src/rp2_common/hardware_gpio:hardware_gpio",
         "//src/rp2_common/hardware_irq:hardware_irq",
         "//src/rp2_common/hardware_pll:hardware_pll",

@@ -21,3 +21,23 @@ constraint_value(
     name = "rp2040",
     constraint_setting = ":chip",
 )
+
+constraint_setting(
+    name = "stdio_mode",
+    default_constraint_value = "stdio_uart",
+)
+
+constraint_value(
+    name = "stdio_uart",
+    constraint_setting = ":stdio_mode",
+)
+
+constraint_value(
+    name = "stdio_usb",
+    constraint_setting = ":stdio_mode",
+)
+
+constraint_value(
+    name = "stdio_semihosting",
+    constraint_setting = ":stdio_mode",
+)

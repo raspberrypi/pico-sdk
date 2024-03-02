@@ -11,7 +11,6 @@ cc_library(
         "//src/common/pico_sync:pico_sync",
         "//src/rp2_common/hardware_base:hardware_base",
         "//src/rp2_common/hardware_claim:hardware_claim",
-        "//src/rp2_common/hardware_irq:hardware_irq",
         "//src/rp2_common/pico_platform:hardware_regs",
         "//src/rp2_common/pico_platform:hardware_structs",
         "//src/rp2_common/pico_platform:pico_platform",
