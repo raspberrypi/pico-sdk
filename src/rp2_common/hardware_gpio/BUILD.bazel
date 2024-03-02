@@ -1,0 +1,18 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_gpio",
+    includes = ["include"],
+    hdrs = ["include/hardware/gpio.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/common/pico_binary_info:pico_binary_info",
+        "//src/rp2_common/hardware_gpio:hardware_gpio",
+        "//src/rp2_common/hardware_irq:hardware_irq",
+        "//src/rp2_common/hardware_sync:hardware_sync",
+        "//src/rp2_common/pico_platform:hardware_structs",
+    ],
+    srcs = ["gpio.c"],
+)

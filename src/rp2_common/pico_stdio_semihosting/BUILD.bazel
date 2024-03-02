@@ -1,0 +1,15 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_stdio_semihosting",
+    includes = ["include"],
+    hdrs = ["include/pico/stdio_semihosting.h"],
+    deps = [
+        "//src/common/pico_binary_info:pico_binary_info",
+        "//src/rp2_common/pico_stdio:pico_stdio",
+        "//src/rp2_common/pico_stdio_semihosting:pico_stdio_semihosting",
+    ],
+    srcs = ["stdio_semihosting.c"],
+)

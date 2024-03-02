@@ -1,0 +1,19 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_rand",
+    includes = ["include"],
+    hdrs = ["include/pico/rand.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/common/pico_time:pico_time",
+        "//src/rp2_common/hardware_clocks:hardware_clocks",
+        "//src/rp2_common/hardware_sync:hardware_sync",
+        "//src/rp2_common/pico_platform:hardware_structs",
+        "//src/rp2_common/pico_rand:pico_rand",
+        "//src/rp2_common/pico_unique_id:pico_unique_id",
+    ],
+    srcs = ["rand.c"],
+)

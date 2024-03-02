@@ -1,0 +1,15 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_stdlib",
+    deps = [
+        "//src/common/pico_binary_info:pico_binary_info",
+        "//src/common/pico_stdlib:pico_stdlib",
+        "//src/rp2_common/hardware_clocks:hardware_clocks",
+        "//src/rp2_common/hardware_pll:hardware_pll",
+        "//src/rp2_common/pico_stdio_uart:pico_stdio_uart",
+    ],
+    srcs = ["stdlib.c"],
+)

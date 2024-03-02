@@ -1,0 +1,17 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_sync",
+    includes = ["include"],
+    hdrs = ["include/hardware/sync.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/hardware_base:hardware_base",
+        "//src/rp2_common/hardware_claim:hardware_claim",
+        "//src/rp2_common/hardware_sync:hardware_sync",
+        "//src/rp2_common/pico_platform:hardware_regs",
+    ],
+    srcs = ["sync.c"],
+)

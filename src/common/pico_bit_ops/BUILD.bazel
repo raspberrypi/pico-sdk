@@ -1,0 +1,10 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_bit_ops",
+    includes = ["include"],
+    hdrs = ["include/pico/bit_ops.h"],
+    deps = ["//src/common/pico_base:pico_base"],
+)

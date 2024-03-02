@@ -1,0 +1,22 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_runtime",
+    includes = ["include"],
+    hdrs = ["include/pico/runtime.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/common/pico_sync:pico_sync",
+        "//src/common/pico_time:pico_time",
+        "//src/rp2_common/hardware_clocks:hardware_clocks",
+        "//src/rp2_common/hardware_irq:hardware_irq",
+        "//src/rp2_common/hardware_resets:hardware_resets",
+        "//src/rp2_common/pico_bootrom:pico_bootrom",
+        "//src/rp2_common/pico_platform:hardware_regs",
+        "//src/rp2_common/pico_platform:hardware_structs",
+        "//src/rp2_common/pico_printf:pico_printf",
+    ],
+    srcs = ["runtime.c"],
+)

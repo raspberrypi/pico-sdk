@@ -1,0 +1,20 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_standard_link",
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/common/pico_binary_info:pico_binary_info",
+        "//src/rp2_common/pico_platform:hardware_regs",
+        "//src/rp2_common/pico_platform:pico_platform",
+    ],
+    srcs = [
+        "binary_info.c",
+        "crt0.S",
+    ],
+    # Missing deps for:
+    #     boot_stage2/config.h
+    tags = ["manual"],
+)

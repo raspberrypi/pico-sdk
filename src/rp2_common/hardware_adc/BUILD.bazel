@@ -1,0 +1,17 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_adc",
+    includes = ["include"],
+    hdrs = ["include/hardware/adc.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/hardware_adc:hardware_adc",
+        "//src/rp2_common/hardware_gpio:hardware_gpio",
+        "//src/rp2_common/hardware_resets:hardware_resets",
+        "//src/rp2_common/pico_platform:hardware_structs",
+    ],
+    srcs = ["adc.c"],
+)

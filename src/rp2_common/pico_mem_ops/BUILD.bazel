@@ -1,0 +1,19 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_mem_ops",
+    includes = ["include"],
+    hdrs = ["include/pico/mem_ops.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/pico_bootrom:pico_bootrom",
+        "//src/rp2_common/pico_mem_ops:pico_mem_ops",
+        "//src/rp2_common/pico_platform:pico_platform",
+    ],
+    srcs = [
+        "mem_ops.c",
+        "mem_ops_aeabi.S",
+    ],
+)

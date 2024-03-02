@@ -1,0 +1,19 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_i2c",
+    includes = ["include"],
+    hdrs = ["include/hardware/i2c.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/common/pico_time:pico_time",
+        "//src/rp2_common/hardware_clocks:hardware_clocks",
+        "//src/rp2_common/hardware_i2c:hardware_i2c",
+        "//src/rp2_common/hardware_resets:hardware_resets",
+        "//src/rp2_common/pico_platform:hardware_regs",
+        "//src/rp2_common/pico_platform:hardware_structs",
+    ],
+    srcs = ["i2c.c"],
+)

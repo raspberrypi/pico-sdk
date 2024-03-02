@@ -1,0 +1,17 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_pll",
+    includes = ["include"],
+    hdrs = ["include/hardware/pll.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/hardware_clocks:hardware_clocks",
+        "//src/rp2_common/hardware_pll:hardware_pll",
+        "//src/rp2_common/hardware_resets:hardware_resets",
+        "//src/rp2_common/pico_platform:hardware_structs",
+    ],
+    srcs = ["pll.c"],
+)

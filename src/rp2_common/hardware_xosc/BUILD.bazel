@@ -1,0 +1,18 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_xosc",
+    includes = ["include"],
+    hdrs = ["include/hardware/xosc.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/hardware_clocks:hardware_clocks",
+        "//src/rp2_common/hardware_xosc:hardware_xosc",
+        "//src/rp2_common/pico_platform:hardware_regs",
+        "//src/rp2_common/pico_platform:hardware_structs",
+        "//src/rp2_common/pico_platform:platform_defs",
+    ],
+    srcs = ["xosc.c"],
+)

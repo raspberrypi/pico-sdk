@@ -6,3 +6,31 @@ cc_library(
     hdrs = ["include/pico/stdio_usb/reset_interface.h"],
     deps = ["//src/common/pico_usb_reset_interface:pico_usb_reset_interface"],
 )
+
+cc_library(
+    name = "pico_stdio_usb",
+    includes = ["include"],
+    hdrs = [
+        "include/pico/stdio_usb.h",
+        "include/tusb_config.h",
+    ],
+    deps = [
+        ":reset_interface_headers",
+        "//src/common/pico_binary_info:pico_binary_info",
+        "//src/common/pico_sync:pico_sync",
+        "//src/rp2_common/hardware_irq:hardware_irq",
+        "//src/rp2_common/hardware_watchdog:hardware_watchdog",
+        "//src/rp2_common/pico_bootrom:pico_bootrom",
+        "//src/rp2_common/pico_stdio:pico_stdio",
+        "//src/rp2_common/pico_unique_id:pico_unique_id",
+    ],
+    srcs = [
+        "reset_interface.c",
+        "stdio_usb.c",
+        "stdio_usb_descriptors.c",
+    ],
+    # Missing deps:
+    #     device/usbd_pvt.h
+    #     tusb.h
+    tags = ["manual"],
+)

@@ -1,0 +1,23 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_float",
+    includes = ["include"],
+    hdrs = ["include/pico/float.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/hardware_divider:hardware_divider",
+        "//src/rp2_common/pico_bootrom:pico_bootrom",
+        "//src/rp2_common/pico_float:pico_float",
+        "//src/rp2_common/pico_platform:pico_platform",
+    ],
+    srcs = [
+        "float_aeabi.S",
+        "float_init_rom.c",
+        "float_math.c",
+        "float_none.S",
+        "float_v1_rom_shim.S",
+    ],
+)

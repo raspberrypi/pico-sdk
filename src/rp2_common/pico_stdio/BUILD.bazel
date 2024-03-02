@@ -1,0 +1,23 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_stdio",
+    includes = ["include"],
+    hdrs = [
+        "include/pico/stdio.h",
+        "include/pico/stdio/driver.h",
+    ],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/common/pico_sync:pico_sync",
+        "//src/common/pico_time:pico_time",
+        "//src/rp2_common/pico_printf:pico_printf",
+        "//src/rp2_common/pico_stdio:pico_stdio",
+        "//src/rp2_common/pico_stdio_semihosting:pico_stdio_semihosting",
+        "//src/rp2_common/pico_stdio_uart:pico_stdio_uart",
+        "//src/rp2_common/pico_stdio_usb:pico_stdio_usb",
+    ],
+    srcs = ["stdio.c"],
+)

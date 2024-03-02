@@ -1,0 +1,7 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_cxx_options",
+)

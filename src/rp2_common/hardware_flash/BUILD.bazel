@@ -1,0 +1,16 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_flash",
+    includes = ["include"],
+    hdrs = ["include/hardware/flash.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/hardware_flash:hardware_flash",
+        "//src/rp2_common/pico_bootrom:pico_bootrom",
+        "//src/rp2_common/pico_platform:hardware_structs",
+    ],
+    srcs = ["flash.c"],
+)

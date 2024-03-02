@@ -1,0 +1,19 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_printf",
+    includes = ["include"],
+    hdrs = ["include/pico/printf.h"],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/rp2_common/pico_bootrom:pico_bootrom",
+        "//src/rp2_common/pico_platform:pico_platform",
+        "//src/rp2_common/pico_printf:pico_printf",
+    ],
+    srcs = [
+        "printf.c",
+        "printf_none.S",
+    ],
+)

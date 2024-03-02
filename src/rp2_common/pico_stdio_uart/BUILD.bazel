@@ -1,0 +1,17 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_stdio_uart",
+    includes = ["include"],
+    hdrs = ["include/pico/stdio_uart.h"],
+    deps = [
+        "//src/common/pico_binary_info:pico_binary_info",
+        "//src/rp2_common/hardware_gpio:hardware_gpio",
+        "//src/rp2_common/hardware_uart:hardware_uart",
+        "//src/rp2_common/pico_stdio:pico_stdio",
+        "//src/rp2_common/pico_stdio_uart:pico_stdio_uart",
+    ],
+    srcs = ["stdio_uart.c"],
+)

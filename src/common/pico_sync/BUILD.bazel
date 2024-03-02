@@ -1,0 +1,29 @@
+# Generated build file
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_sync",
+    includes = ["include"],
+    hdrs = [
+        "include/pico/critical_section.h",
+        "include/pico/lock_core.h",
+        "include/pico/mutex.h",
+        "include/pico/sem.h",
+        "include/pico/sync.h",
+    ],
+    deps = [
+        "//src/common/pico_base:pico_base",
+        "//src/common/pico_sync:pico_sync",
+        "//src/common/pico_time:pico_time",
+        "//src/rp2_common/hardware_sync:hardware_sync",
+    ],
+    srcs = [
+        "critical_section.c",
+        "lock_core.c",
+        "mutex.c",
+        "sem.c",
+    ],
+    # TODO: Add `select()` for host redirections.
+    target_compatible_with = ["//bazel/constraint:rp2"],
+)
