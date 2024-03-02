@@ -36,5 +36,6 @@ cc_library(
         "//bazel/constraint:stdio_uart": ["//src/rp2_common/pico_stdio_uart:pico_stdio_uart"],
         "//bazel/constraint:stdio_usb": ["//src/rp2_common/pico_stdio_usb:pico_stdio_usb"],
     }),
+    copts = ["-Wno-unused-function"],
     srcs = ["stdio.c"],
 )
