@@ -10,7 +10,7 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/hardware/clocks.h"],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
     visibility = [
@@ -24,7 +24,7 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/hardware/clocks.h"],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/hardware_gpio:hardware_gpio",
         "//src/rp2_common/hardware_irq:hardware_irq",
         "//src/rp2_common/hardware_pll:hardware_pll",

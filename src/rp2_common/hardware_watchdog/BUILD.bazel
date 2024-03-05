@@ -7,7 +7,8 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/hardware/watchdog.h"],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_base:pico_platform",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
     srcs = ["watchdog.c"],

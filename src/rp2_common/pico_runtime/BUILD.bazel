@@ -7,7 +7,7 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/pico/runtime.h"],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_sync:pico_sync",
         "//src/common/pico_time:pico_time",
         "//src/rp2_common/hardware_clocks:hardware_clocks",

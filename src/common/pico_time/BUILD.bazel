@@ -26,7 +26,7 @@ cc_library(
         "include/pico/timeout_helper.h",
     ],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_sync:pico_sync",
         "//src/common/pico_util:pico_util",
         "//src/rp2_common/hardware_timer:hardware_timer",

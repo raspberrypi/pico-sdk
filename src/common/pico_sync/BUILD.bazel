@@ -13,7 +13,7 @@ cc_library(
         "include/pico/sync.h",
     ],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_time:pico_time_headers",
         "//src/rp2_common/hardware_sync:hardware_sync",
     ],

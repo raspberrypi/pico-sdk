@@ -41,6 +41,7 @@ cc_library(
     deps = [
         ":version",
         "//bazel:generate_config_header",
+        "//bazel/config:pico_config_header",
     ],
     hdrs = [
         "include/pico.h",
@@ -51,9 +52,32 @@ cc_library(
     ],
 
     # Be extra careful about who references this for now.
+    # It's generally safe for anything that circularly depends on
+    # //src/common/pico_base:pico_base to be added to this allowlist because
+    # that implicitly means the transitive dependencies of pico_base will get
+    # linked in.
     visibility = [
+        "//src/common/pico_binary_info:__pkg__",
+        "//src/common/pico_sync:__pkg__",
+        "//src/common/pico_time:__pkg__",
+        "//src/common/pico_util:__pkg__",
         "//src/host/pico_platform:__pkg__",
+        "//src/rp2_common/boot_stage2:__pkg__",
+        "//src/rp2_common/hardware_claim:__pkg__",
+        "//src/rp2_common/hardware_clocks:__pkg__",
+        "//src/rp2_common/hardware_gpio:__pkg__",
+        "//src/rp2_common/hardware_irq:__pkg__",
+        "//src/rp2_common/hardware_pll:__pkg__",
+        "//src/rp2_common/hardware_resets:__pkg__",
+        "//src/rp2_common/hardware_sync:__pkg__",
+        "//src/rp2_common/hardware_timer:__pkg__",
+        "//src/rp2_common/hardware_watchdog:__pkg__",
+        "//src/rp2_common/hardware_xosc:__pkg__",
+        "//src/rp2_common/pico_bootrom:__pkg__",
         "//src/rp2_common/pico_platform:__pkg__",
+        "//src/rp2_common/pico_printf:__pkg__",
+        "//src/rp2_common/pico_runtime:__pkg__",
+        "//src/rp2_common/pico_standard_link:__pkg__",
     ],
 )
 
@@ -64,5 +88,10 @@ cc_library(
         # via an intermediate.
         ":pico_platform",
         ":pico_base_interface",
+        "//src/rp2_common/cmsis:cmsis_core",
+        "//src/rp2_common/boot_stage2:boot_stage2",
+        "//src/rp2_common/pico_bootrom:pico_bootrom",
+        "//src/rp2_common/pico_runtime:pico_runtime",
+        "//src/rp2_common/pico_standard_link:pico_standard_link",
     ]
 )

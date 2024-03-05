@@ -10,7 +10,7 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/hardware/timer.h"],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
     visibility = ["//src/common/pico_time:__pkg__"],
@@ -21,7 +21,7 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/hardware/timer.h"],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/hardware_claim:hardware_claim",
         "//src/rp2_common/hardware_irq:hardware_irq",
         "//src/rp2_common/hardware_sync:hardware_sync",

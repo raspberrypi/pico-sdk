@@ -1,3 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+# TODO: Add a macro/helper to support the rest of the boards.
 cc_library(
     name = "boards",
     includes = ["include"],
@@ -46,4 +49,37 @@ cc_library(
         "include/boards/waveshare_rp2040_zero.h",
         "include/boards/wiznet_w5100s_evb_pico.h",
     ],
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
+    name = "semihosting_defines",
+    defines = select({
+        "//bazel/constraint:stdio_semihosting": ["LIB_PICO_STDIO_SEMIHOSTING=1"],
+        "//bazel/constraint:stdio_uart": ["LIB_PICO_STDIO_UART=1"],
+        "//bazel/constraint:stdio_usb": ["LIB_PICO_STDIO_USB=1"],
+    }),
+)
+
+cc_library(
+    name = "common_board_defines",
+    defines = [
+        "PICO_ON_DEVICE=1",
+        "PICO_NO_HARDWARE=0",
+        "PICO_BUILD=1",
+    ],
+)
+
+cc_library(
+    name = "pico",
+    defines = [
+        'PICO_BOARD=\\"rp2040\\"',
+        'PICO_CONFIG_HEADER="boards/pico.h"',
+    ],
+    deps = [
+        ":common_board_defines",
+        ":semihosting_defines",
+    ],
+    includes = ["include"],
+    hdrs = ["include/boards/pico.h"],
 )

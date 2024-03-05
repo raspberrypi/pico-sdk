@@ -14,6 +14,12 @@ label_flag(
     build_setting_default  = ":no_platform_headers",
 )
 
+# This should always point to a cc_library that defines PICO_CONFIG_HEADER.
+label_flag(
+    name = "pico_config_header",
+    build_setting_default  = "//src/boards:pico",
+)
+
 genrule(
     name = "empty_extra_headers_file",
     outs = ["generated_include/pico_config_extra_headers.h"],

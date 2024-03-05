@@ -15,12 +15,14 @@ cc_library(
         "boot2_w25q080.S",
         "boot2_w25x10cl.S",
     ],
+    visibility = ["//src/rp2_common/pico_standard_link:__pkg__"],
 )
 
 cc_binary(
     name = "boot_stage2_elf",
     deps = [
-        "//src/common/pico_base",
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_base:pico_platform",
         ":config",
         "boot_stage2.ld",
     ],
@@ -75,4 +77,7 @@ cc_library(
     name = "boot_stage2",
     srcs = [":boot_stage2_padded"],
     visibility = ["//visibility:public"],
+    # This isn't referenced as a symbol, so alwayslink is required to ensure
+    # it doesn't get dropped before the linker script can find it.
+    alwayslink = True,
 )

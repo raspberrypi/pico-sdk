@@ -10,7 +10,7 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/hardware/sync.h"],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/hardware_base:hardware_base",
         "//src/rp2_common/pico_platform:hardware_regs",
     ],
@@ -22,7 +22,7 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/hardware/sync.h"],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/hardware_base:hardware_base",
         "//src/rp2_common/hardware_claim:hardware_claim",
         "//src/rp2_common/pico_platform:hardware_regs",

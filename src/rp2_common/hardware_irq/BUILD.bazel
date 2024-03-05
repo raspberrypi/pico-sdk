@@ -7,7 +7,7 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/hardware/irq.h"],
     deps = [
-        "//src/common/pico_base:pico_base",
+        "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_sync:pico_sync",
         "//src/rp2_common/hardware_base:hardware_base",
         "//src/rp2_common/hardware_claim:hardware_claim",
