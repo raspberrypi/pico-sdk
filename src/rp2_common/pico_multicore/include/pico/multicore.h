@@ -17,7 +17,7 @@ extern "C" {
 
 /** \file multicore.h
  *  \defgroup pico_multicore pico_multicore
- * Adds support for running code on the second processor core (core 1)
+ * \brief Adds support for running code on the second processor core (core 1)
  *
  * \subsection multicore_example Example
  * \addtogroup pico_multicore

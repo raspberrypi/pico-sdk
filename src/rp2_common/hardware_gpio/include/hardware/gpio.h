@@ -25,7 +25,7 @@ extern "C" {
 /** \file gpio.h
  *  \defgroup hardware_gpio hardware_gpio
  *
- * General Purpose Input/Output (GPIO) API
+ * \brief General Purpose Input/Output (GPIO) API
  *
  * RP2040 has 36 multi-functional General Purpose Input / Output (GPIO) pins, divided into two banks. In a typical use case,
  * the pins in the QSPI bank (QSPI_SS, QSPI_SCLK and QSPI_SD0 to QSPI_SD3) are used to execute code from an external

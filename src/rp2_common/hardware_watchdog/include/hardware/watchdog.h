@@ -13,7 +13,7 @@
 /** \file hardware/watchdog.h
  *  \defgroup hardware_watchdog hardware_watchdog
  *
- * Hardware Watchdog Timer API
+ * \brief Hardware Watchdog Timer API
  *
  * Supporting functions for the Pico hardware watchdog timer.
  *
@@ -106,7 +106,7 @@ bool watchdog_caused_reboot(void);
 bool watchdog_enable_caused_reboot(void);
 
 /**
- * @brief Returns the number of microseconds before the watchdog will reboot the chip.
+ * \brief Returns the number of microseconds before the watchdog will reboot the chip.
  * \ingroup hardware_watchdog
  *
  * @return The number of microseconds before the watchdog will reboot the chip.

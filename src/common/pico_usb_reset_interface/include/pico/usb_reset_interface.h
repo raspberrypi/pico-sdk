@@ -10,7 +10,7 @@
 /** \file usb_reset_interface.h
  *  \defgroup pico_usb_reset_interface pico_usb_reset_interface
  *
- * Definition for the reset interface that may be exposed by the pico_stdio_usb library
+ * \brief Definition for the reset interface that may be exposed by the pico_stdio_usb library
  */
 
 // VENDOR sub-class for the reset interface

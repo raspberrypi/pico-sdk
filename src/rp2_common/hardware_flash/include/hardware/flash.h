@@ -12,7 +12,7 @@
 /** \file flash.h
  *  \defgroup hardware_flash hardware_flash
  *
- * Low level flash programming and erase API
+ * \brief Low level flash programming and erase API
  *
  * Note these functions are *unsafe* if you are using both cores, and the other 
  * is executing from flash concurrently with the operation. In this could be the 

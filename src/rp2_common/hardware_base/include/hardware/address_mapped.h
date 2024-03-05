@@ -13,7 +13,7 @@
 /** \file address_mapped.h
  *  \defgroup hardware_base hardware_base
  *
- *  Low-level types and (atomic) accessors for memory-mapped hardware registers
+ *  \brief Low-level types and (atomic) accessors for memory-mapped hardware registers
  *
  *  `hardware_base` defines the low level types and access functions for memory mapped hardware registers. It is included
  *  by default by all other hardware libraries.

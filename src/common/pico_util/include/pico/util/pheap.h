@@ -21,7 +21,7 @@ extern "C" {
 /**
  * \file pheap.h
  * \defgroup util_pheap pheap
- * Pairing Heap Implementation
+ * \brief Pairing Heap Implementation
  * \ingroup pico_util
  *
  * pheap defines a simple pairing heap. The implementation simply tracks array indexes, it is up to
@@ -53,7 +53,7 @@ typedef struct pheap_node {
 } pheap_node_t;
 
 /**
- * A user comparator function for nodes in a pairing heap.
+ * \brief A user comparator function for nodes in a pairing heap.
  *
  * \return true if a < b in natural order. Note this relative ordering must be stable from call to call.
  */
@@ -71,7 +71,7 @@ typedef struct pheap {
 } pheap_t;
 
 /**
- * Create a pairing heap, which effectively maintains an efficient sorted ordering
+ * \brief Create a pairing heap, which effectively maintains an efficient sorted ordering
  * of nodes. The heap itself stores no user per-node state, it is expected
  * that the user maintains a companion array. A comparator function must
  * be provided so that the heap implementation can determine the relative ordering of nodes
@@ -86,13 +86,13 @@ typedef struct pheap {
 pheap_t *ph_create(uint max_nodes, pheap_comparator comparator, void *user_data);
 
 /**
- * Removes all nodes from the pairing heap
+ * \brief Removes all nodes from the pairing heap
  * \param heap the heap
  */
 void ph_clear(pheap_t *heap);
 
 /**
- * De-allocates a pairing heap
+ * \brief De-allocates a pairing heap
  *
  * Note this method must *ONLY* be called on heaps created by ph_create()
  * \param heap the heap
@@ -135,7 +135,7 @@ static pheap_node_id_t ph_merge_nodes(pheap_t *heap, pheap_node_id_t a, pheap_no
 }
 
 /**
- * Allocate a new node from the unused space in the heap
+ * \brief Allocate a new node from the unused space in the heap
  *
  * \param heap the heap
  * \return an identifier for the node, or 0 if the heap is full
@@ -151,7 +151,7 @@ static inline pheap_node_id_t ph_new_node(pheap_t *heap) {
 }
 
 /**
- * Inserts a node into the heap.
+ * \brief Inserts a node into the heap.
  *
  * This method inserts a node (previously allocated by ph_new_node())
  * into the heap, determining the correct order by calling
@@ -170,7 +170,7 @@ static inline pheap_node_id_t ph_insert_node(pheap_t *heap, pheap_node_id_t id) 
 }
 
 /**
- * Returns the head node in the heap, i.e. the node
+ * \brief Returns the head node in the heap, i.e. the node
  * which compares first, but without removing it from the heap.
  *
  * \param heap the heap
@@ -181,7 +181,7 @@ static inline pheap_node_id_t ph_peek_head(pheap_t *heap) {
 }
 
 /**
- * Remove the head node from the pairing heap. This head node is
+ * \brief Remove the head node from the pairing heap. This head node is
  * the node which compares first in the logical ordering provided
  * by the comparator.
  *
@@ -198,7 +198,7 @@ static inline pheap_node_id_t ph_peek_head(pheap_t *heap) {
 pheap_node_id_t ph_remove_head(pheap_t *heap, bool free);
 
 /**
- * Remove the head node from the pairing heap. This head node is
+ * \brief Remove the head node from the pairing heap. This head node is
  * the node which compares first in the logical ordering provided
  * by the comparator.
  *
@@ -214,7 +214,7 @@ static inline pheap_node_id_t ph_remove_and_free_head(pheap_t *heap) {
 }
 
 /**
- * Remove and free an arbitrary node from the pairing heap. This is a more
+ * \brief Remove and free an arbitrary node from the pairing heap. This is a more
  * costly operation than removing the head via ph_remove_and_free_head()
  *
  * @param heap the heap
@@ -224,7 +224,7 @@ static inline pheap_node_id_t ph_remove_and_free_head(pheap_t *heap) {
 bool ph_remove_and_free_node(pheap_t *heap, pheap_node_id_t id);
 
 /**
- * Determine if the heap contains a given node. Note containment refers
+ * \brief Determine if the heap contains a given node. Note containment refers
  * to whether the node is inserted (ph_insert_node()) vs allocated (ph_new_node())
  *
  * @param heap the heap
@@ -237,7 +237,7 @@ static inline bool ph_contains_node(pheap_t *heap, pheap_node_id_t id) {
 
 
 /**
- * Free a node that is not currently in the heap, but has been allocated
+ * \brief Free a node that is not currently in the heap, but has been allocated
  *
  * @param heap the heap
  * @param id the id of the node
@@ -255,7 +255,7 @@ static inline void ph_free_node(pheap_t *heap, pheap_node_id_t id) {
 }
 
 /**
- * Print a representation of the heap for debugging
+ * \brief Print a representation of the heap for debugging
  *
  * @param heap the heap
  * @param dump_key a method to print a node value
@@ -264,7 +264,7 @@ static inline void ph_free_node(pheap_t *heap, pheap_node_id_t id) {
 void ph_dump(pheap_t *heap, void (*dump_key)(pheap_node_id_t id, void *user_data), void *user_data);
 
 /**
- * Initialize a statically allocated heap (ph_create() using the C heap).
+ * \brief Initialize a statically allocated heap (ph_create() using the C heap).
  * The heap member `nodes` must be allocated of size max_nodes.
  *
  * @param heap the heap
@@ -275,7 +275,7 @@ void ph_dump(pheap_t *heap, void (*dump_key)(pheap_node_id_t id, void *user_data
 void ph_post_alloc_init(pheap_t *heap, uint max_nodes, pheap_comparator comparator, void *user_data);
 
 /**
- * Define a statically allocated pairing heap. This must be initialized
+ * \brief Define a statically allocated pairing heap. This must be initialized
  * by ph_post_alloc_init
  */
 #define PHEAP_DEFINE_STATIC(name, _max_nodes) \

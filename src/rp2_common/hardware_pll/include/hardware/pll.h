@@ -17,7 +17,7 @@ extern "C" {
 /** \file hardware/pll.h
  *  \defgroup hardware_pll hardware_pll
  *
- * Phase Locked Loop control APIs
+ * \brief Phase Locked Loop control APIs
  *
  * There are two PLLs in RP2040. They are:
  *   - pll_sys - Used to generate up to a 133MHz system clock

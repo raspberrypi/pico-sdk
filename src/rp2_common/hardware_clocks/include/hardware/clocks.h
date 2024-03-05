@@ -17,7 +17,7 @@ extern "C" {
 /** \file hardware/clocks.h
  *  \defgroup hardware_clocks hardware_clocks
  *
- * Clock Management API
+ * \brief Clock Management API
  *
  * This API provides a high level interface to the clock functions.
  *

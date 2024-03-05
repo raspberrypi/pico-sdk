@@ -13,7 +13,7 @@
 /** \file hardware/divider.h
  *  \defgroup hardware_divider hardware_divider
  *
- * Low-level hardware-divider access
+ * \brief Low-level hardware-divider access
  *
  * The SIO contains an 8-cycle signed/unsigned divide/modulo circuit, per core. Calculation is started by writing a dividend
  * and divisor to the two argument registers, DIVIDEND and DIVISOR. The divider calculates the quotient / and remainder % of

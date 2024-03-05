@@ -19,7 +19,7 @@ extern "C" {
 /** \file hardware/dma.h
  *  \defgroup hardware_dma hardware_dma
  *
- * DMA Controller API
+ * \brief DMA Controller API
  *
  * The RP2040 Direct Memory Access (DMA) master performs bulk data transfers on a processor’s
  * behalf. This leaves processors free to attend to other tasks, or enter low-power sleep states. The

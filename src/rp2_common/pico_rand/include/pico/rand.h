@@ -16,7 +16,7 @@ extern "C" {
 /** \file pico/rand.h
  *  \defgroup pico_rand pico_rand
  *
- * Random Number Generator API
+ * \brief Random Number Generator API
  *
  * This module generates random numbers at runtime utilizing a number of possible entropy
  * sources and uses those sources to modify the state of a 128-bit 'Pseudo

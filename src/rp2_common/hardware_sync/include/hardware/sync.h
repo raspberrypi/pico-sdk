@@ -18,7 +18,7 @@ extern "C" {
 /** \file hardware/sync.h
  *  \defgroup hardware_sync hardware_sync
  *
- * Low level hardware spin locks, barrier and processor event APIs
+ * \brief Low level hardware spin locks, barrier and processor event APIs
  *
  * Spin Locks
  * ----------

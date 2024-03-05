@@ -7,7 +7,7 @@
 /** \file pico/async_context.h
  *  \defgroup pico_async_context pico_async_context
  *
- * An \ref async_context provides a logically single-threaded context for performing work, and responding
+ * \brief An \ref async_context provides a logically single-threaded context for performing work, and responding
  * to asynchronous events. Thus an async_context instance is suitable for servicing third-party libraries
  * that are not re-entrant.
  *
@@ -89,11 +89,11 @@ typedef struct async_context async_context_t;
  */
 typedef struct async_work_on_timeout {
     /*!
-     * private link list pointer
+     * \brief private link list pointer
      */
     struct async_work_on_timeout *next;
     /*!
-     * Method called when the timeout is reached; may not be NULL
+     * \brief Method called when the timeout is reached; may not be NULL
      *
      * Note, that when this method is called, the timeout has been removed from the async_context, so
      * if you want the timeout to repeat, you should re-add it during this callback
@@ -102,12 +102,12 @@ typedef struct async_work_on_timeout {
      */
     void (*do_work)(async_context_t *context, struct async_work_on_timeout *timeout);
     /*!
-     * The next timeout time; this should only be modified during the above methods
+     * \brief The next timeout time; this should only be modified during the above methods
      * or via async_context methods
      */
     absolute_time_t next_time;
     /*!
-     * User data associated with the timeout instance
+     * \brief User data associated with the timeout instance
      */
     void *user_data;
 } async_at_time_worker_t;
@@ -124,22 +124,22 @@ typedef struct async_work_on_timeout {
  */
 typedef struct async_when_pending_worker {
     /*!
-     * private link list pointer
+     * \brief private link list pointer
      */
     struct async_when_pending_worker *next;
     /*!
-     * Called by the async_context when the worker has been marked as having "work pending"
+     * \brief Called by the async_context when the worker has been marked as having "work pending"
      *
      * @param context the async_context
      * @param worker the function to be called when work is pending
      */
     void (*do_work)(async_context_t *context, struct async_when_pending_worker *worker);
     /**
-     * True if the worker need do_work called
+     * \brief True if the worker need do_work called
      */
     bool work_pending;
     /*!
-     * User data associated with the worker instance
+     * \brief User data associated with the worker instance
      */
     void *user_data;
 } async_when_pending_worker_t;

@@ -11,7 +11,7 @@
  *  \defgroup async_context_threadsafe_background async_context_threadsafe_background
  *  \ingroup pico_async_context
  *  
- * async_context_threadsafe_background provides an implementation of \ref async_context that handles asynchronous
+ * \brief async_context_threadsafe_background provides an implementation of \ref async_context that handles asynchronous
  * work in a low priority IRQ, and there is no need for the user to poll for work.
  *
  * \note The workers used with this async_context MUST be safe to call from an IRQ.
@@ -37,11 +37,11 @@ typedef struct async_context_threadsafe_background async_context_threadsafe_back
  */
 typedef struct async_context_threadsafe_background_config {
 /**
- * the priority of the low priority IRQ
+ * \brief the priority of the low priority IRQ
  */
     uint8_t low_priority_irq_handler_priority;
     /**
-     * a specific alarm pool to use (or NULL to use ta default)
+     * \brief a specific alarm pool to use (or NULL to use ta default)
      *
      * \note this alarm pool MUST be on the same core as the async_context
      *

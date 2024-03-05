@@ -9,7 +9,7 @@
 
 /** \file pico/sync.h
  *  \defgroup pico_sync pico_sync
- * Synchronization primitives and mutual exclusion
+ * \brief Synchronization primitives and mutual exclusion
  */
 
 #include "pico/sem.h"
