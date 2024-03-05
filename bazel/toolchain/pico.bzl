@@ -67,9 +67,11 @@ def generate_toolchains():
                 "@pw_toolchain//constraints/arm_mcpu:none": ["@platforms//:incompatible"],
             }),
             toolchain_identifier = "arm-gcc-toolchain",
-            # make_variables = {
-            #     "OBJCOPY": "arm-none-eabi-objcopy",
-            # },
+            exec_compatible_with = [
+                _HOST_CPU_CONSTRAINTS[host_cpu],
+                _HOST_OS_CONSTRAINTS[host_os],
+            ],
+            tags = ["manual"],  # Don't try to build this in wildcard builds.
         )
 
         native.toolchain(
