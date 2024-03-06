@@ -71,8 +71,7 @@ bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out) {
     // If nothing there yet, we wait for an event first,
     // to try and avoid too much busy waiting
     while (!multicore_fifo_rvalid()) {
-        __wfe();
-        if (time_reached(end_time)) return false;
+        if (best_effort_wfe_or_timeout(end_time)) return false;
     }
 
     *out = sio_hw->fifo_rd;
