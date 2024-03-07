@@ -1,3 +1,7 @@
+# TODO: https://pwbug.dev/319664275: Disable hermetic sandbox tmp due to issues
+# with arm toolchain.
+build --noincompatible_sandbox_hermetic_tmp
+
 # Enable Bzlmod for every Bazel command
 common --enable_bzlmod
 

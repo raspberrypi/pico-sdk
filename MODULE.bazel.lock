@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 3,
-  "moduleFileHash": "9c0fad7038750639344bb82bafcd04f3b89e8400ea47e7487fffa85ff73d0c8e",
+  "moduleFileHash": "40dddc8a37334a12d1251a1fc6af776e75469dc25ff7077db260dfd6fba62b16",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -23,6 +23,7 @@
       "repoName": "pico-sdk",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [
+        "//bazel/toolchain:arm_gcc_linux-x86_64",
         "//bazel/toolchain:arm_gcc_win-x86_64",
         "//bazel/toolchain:arm_gcc_mac-x86_64",
         "//bazel/toolchain:arm_gcc_mac-aarch64"
@@ -38,12 +39,29 @@
             "column": 0
           },
           "imports": {
+            "arm_gcc_linux-x86_64": "arm_gcc_linux-x86_64",
             "arm_gcc_win-x86_64": "arm_gcc_win-x86_64",
             "arm_gcc_mac-x86_64": "arm_gcc_mac-x86_64",
             "arm_gcc_mac-aarch64": "arm_gcc_mac-aarch64"
           },
           "devImports": [],
           "tags": [
+            {
+              "tagName": "@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+              "attributeValues": {
+                "url": "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
+                "strip_prefix": "arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi",
+                "build_file": "@pw_toolchain//build_external:gcc_arm_none_eabi.BUILD",
+                "sha256": "6cd1bbc1d9ae57312bcd169ae283153a9572bd6a8e4eeae2fedfbc33b115fdbb",
+                "name": "arm_gcc_linux-x86_64"
+              },
+              "devDependency": false,
+              "location": {
+                "file": "@@//:MODULE.bazel",
+                "line": 20,
+                "column": 13
+              }
+            },
             {
               "tagName": "@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
               "attributeValues": {
@@ -56,7 +74,7 @@
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 20,
+                "line": 28,
                 "column": 13
               }
             },
@@ -72,7 +90,7 @@
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 28,
+                "line": 36,
                 "column": 13
               }
             },
@@ -88,7 +106,7 @@
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 36,
+                "line": 44,
                 "column": 13
               }
             }
@@ -717,6 +735,17 @@
         "accumulatedFileDigests": {},
         "envVariables": {},
         "generatedRepoSpecs": {
+          "arm_gcc_linux-x86_64": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "url": "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
+              "strip_prefix": "arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi",
+              "build_file": "@@pw_toolchain~override//build_external:gcc_arm_none_eabi.BUILD",
+              "sha256": "6cd1bbc1d9ae57312bcd169ae283153a9572bd6a8e4eeae2fedfbc33b115fdbb",
+              "name": "_main~_repo_rules~arm_gcc_linux-x86_64"
+            }
+          },
           "arm_gcc_win-x86_64": {
             "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
             "ruleClassName": "http_archive",

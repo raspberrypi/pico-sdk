@@ -5,12 +5,14 @@ load(
 )
 
 HOSTS = (
+    ("linux", "x86_64"),
     ("win", "x86_64"),
     ("mac", "x86_64"),
     ("mac", "aarch64"),
 )
 
 _HOST_OS_CONSTRAINTS = {
+    "linux": "@platforms//os:linux",
     "win": "@platforms//os:windows",
     "mac": "@platforms//os:macos",
 }

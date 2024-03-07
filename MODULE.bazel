@@ -18,6 +18,14 @@ archive_override(
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
+    name = "arm_gcc_linux-x86_64",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi",
+    build_file = "@pw_toolchain//build_external:gcc_arm_none_eabi.BUILD",
+    sha256 = "6cd1bbc1d9ae57312bcd169ae283153a9572bd6a8e4eeae2fedfbc33b115fdbb",
+)
+
+http_archive(
     name = "arm_gcc_win-x86_64",
     url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi",
@@ -42,6 +50,7 @@ http_archive(
 )
 
 register_toolchains(
+    "//bazel/toolchain:arm_gcc_linux-x86_64",
     "//bazel/toolchain:arm_gcc_win-x86_64",
     "//bazel/toolchain:arm_gcc_mac-x86_64",
     "//bazel/toolchain:arm_gcc_mac-aarch64",
