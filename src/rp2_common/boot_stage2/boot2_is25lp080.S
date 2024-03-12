@@ -82,7 +82,7 @@
 
 pico_default_asm_setup
 
-.section text
+.section .text
 regular_func _stage2_boot
     push {lr}
 

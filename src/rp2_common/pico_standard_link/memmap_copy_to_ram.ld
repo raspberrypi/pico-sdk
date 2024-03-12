@@ -96,8 +96,13 @@ SECTIONS
     . = ALIGN(4);
 
     /* Vector table goes first in RAM, to avoid large alignment hole */
-   .ram_vector_table (NOLOAD): {
+    .ram_vector_table (NOLOAD): {
         *(.ram_vector_table)
+    } > RAM
+
+    .uninitialized_data (NOLOAD): {
+        . = ALIGN(4);
+        *(.uninitialized_data*)
     } > RAM
 
     .text : {
@@ -174,11 +179,6 @@ SECTIONS
     } > RAM AT> FLASH
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
     __etext = LOADADDR(.data);
-
-    .uninitialized_data (NOLOAD): {
-        . = ALIGN(4);
-        *(.uninitialized_data*)
-    } > RAM
 
     /* Start and end symbols must be word-aligned */
     .scratch_x : {

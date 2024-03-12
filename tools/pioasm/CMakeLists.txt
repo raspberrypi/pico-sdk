@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.13...3.27)
 project(pioasm CXX)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -23,6 +23,7 @@ add_executable(pioasm
 target_sources(pioasm PRIVATE c_sdk_output.cpp)
 target_sources(pioasm PRIVATE python_output.cpp)
 target_sources(pioasm PRIVATE hex_output.cpp)
+target_sources(pioasm PRIVATE json_output.cpp)
 target_sources(pioasm PRIVATE ada_output.cpp)
 target_sources(pioasm PRIVATE ${PIOASM_EXTRA_SOURCE_FILES})
 
