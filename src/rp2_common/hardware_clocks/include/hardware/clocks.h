@@ -164,6 +164,7 @@ extern "C" {
  *  Must be called before any other clock function.
  */
 void clocks_init(void);
+void clocks_reinit(uint32_t sleep_en0, uint32_t sleep_en1);
 
 /*! \brief Configure the specified clock
  *  \ingroup hardware_clocks
