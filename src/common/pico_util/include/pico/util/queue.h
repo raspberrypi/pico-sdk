@@ -67,24 +67,22 @@ static inline void queue_init(queue_t *q, uint element_size, uint element_count)
  *
  * \param q Pointer to a queue_t structure, used as a handle
  * \param element_size Size of each value in the queue
- * \param element_count Maximum number of entries in the queue
  * \param spinlock_num The spin ID used to protect the queue
  * \param storage Pointer to queue storage array
- * \param storage_size Size of the queue storage array
+ * \param storage_size Size of the queue storage array. (Must be N + 1 elements.)
  */
-void static_queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num, uint8_t *storage, uint32_t storage_size);
+void static_queue_init_with_spinlock(queue_t *q, uint element_size, uint spinlock_num, uint8_t *storage, uint32_t storage_size);
 
 /*! \brief Initialise a static queue, allocating a (possibly shared) spinlock
  *  \ingroup queue
  *
  * \param q Pointer to a queue_t structure, used as a handle
  * \param element_size Size of each value in the queue
- * \param element_count Maximum number of entries in the queue
  * \param storage Pointer to queue storage array
- * \param storage_size Size of the queue storage array
+ * \param storage_size Size of the queue storage array. (Must be N + 1 elements.)
  */
-static inline void static_queue_init(queue_t *q, uint element_size, uint element_count, uint8_t *storage, uint32_t storage_size) {
-    static_queue_init_with_spinlock(q, element_size, element_count, next_striped_spin_lock_num(), storage, storage_size);
+static inline void static_queue_init(queue_t *q, uint element_size, uint8_t *storage, uint32_t storage_size) {
+    static_queue_init_with_spinlock(q, element_size, next_striped_spin_lock_num(), storage, storage_size);
 }
 
 /*! \brief Destroy the specified queue.

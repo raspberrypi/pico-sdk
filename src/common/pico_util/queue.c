@@ -18,12 +18,12 @@ void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count,
     q->rptr = 0;
 }
 
-void static_queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num, uint8_t *storage, uint32_t storage_size) {
+void static_queue_init_with_spinlock(queue_t *q, uint element_size, uint spinlock_num, uint8_t *storage, uint32_t storage_size) {
     assert(q != NULL);
-    assert(storage_size >= ((element_count + 1) * element_size));
+    assert((storage_size / element_size) >= 2);
     lock_init(&q->core, spinlock_num);
     q->data = storage;
-    q->element_count = (uint16_t)element_count;
+    q->element_count = (uint16_t) ((storage_size / element_size) - 1);
     q->element_size = (uint16_t)element_size;
     q->wptr = 0;
     q->rptr = 0;
