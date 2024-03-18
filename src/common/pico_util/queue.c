@@ -9,6 +9,7 @@
 #include "pico/util/queue.h"
 
 void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num) {
+    assert(q != NULL);
     lock_init(&q->core, spinlock_num);
     q->data = (uint8_t *)calloc(element_count + 1, element_size);
     q->element_count = (uint16_t)element_count;
@@ -17,7 +18,19 @@ void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count,
     q->rptr = 0;
 }
 
+void static_queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num, uint8_t *storage, uint32_t storage_size) {
+    assert(q != NULL);
+    assert(storage_size >= ((element_count + 1) * element_size));
+    lock_init(&q->core, spinlock_num);
+    q->data = storage;
+    q->element_count = (uint16_t)element_count;
+    q->element_size = (uint16_t)element_size;
+    q->wptr = 0;
+    q->rptr = 0;
+}
+
 void queue_free(queue_t *q) {
+    assert(q != NULL);
     free(q->data);
 }
 
@@ -95,25 +108,31 @@ static bool queue_peek_internal(queue_t *q, void *data, bool block) {
 }
 
 bool queue_try_add(queue_t *q, const void *data) {
+    assert(q != NULL);
     return queue_add_internal(q, data, false);
 }
 
 bool queue_try_remove(queue_t *q, void *data) {
+    assert(q != NULL);
     return queue_remove_internal(q, data, false);
 }
 
 bool queue_try_peek(queue_t *q, void *data) {
+    assert(q != NULL);
     return queue_peek_internal(q, data, false);
 }
 
 void queue_add_blocking(queue_t *q, const void *data) {
+    assert(q != NULL);
     queue_add_internal(q, data, true);
 }
 
 void queue_remove_blocking(queue_t *q, void *data) {
+    assert(q != NULL);
     queue_remove_internal(q, data, true);
 }
 
 void queue_peek_blocking(queue_t *q, void *data) {
+    assert(q != NULL);
     queue_peek_internal(q, data, true);
 }
