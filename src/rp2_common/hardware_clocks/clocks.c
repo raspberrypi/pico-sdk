@@ -163,11 +163,15 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
 }
 /// \end::clock_configure[]
 
-void clocks_init() {
+void clocks_init(void) {
     clocks_reinit(0, 0);
 }
 
 void clocks_reinit(uint32_t sleep_en0, uint32_t sleep_en1) {
+	// Determine whether SYS_CLK is already running
+    bool init_sys_clock =  	((sleep_en0 & CLOCKS_SLEEP_EN0_CLK_SYS_DEPENDANTS_BITS) == 0) &&
+                                ((sleep_en1 & CLOCKS_SLEEP_EN1_CLK_SYS_DEPENDANTS_BITS) == 0);
+
     // Start tick in watchdog, the argument is in 'cycles per microsecond' i.e. MHz
     watchdog_start_tick(XOSC_KHZ / KHZ);
 
@@ -187,8 +191,7 @@ void clocks_reinit(uint32_t sleep_en0, uint32_t sleep_en1) {
     xosc_init();
 
     // Before we touch PLLs, switch sys and ref cleanly away from their aux sources.
-    if (((sleep_en0 & CLOCKS_SLEEP_EN0_CLK_SYS_DEPENDANTS_BITS) == 0) &&
-        ((sleep_en1 & CLOCKS_SLEEP_EN1_CLK_SYS_DEPENDANTS_BITS) == 0)) {
+	if (init_sys_clock) {
 		hw_clear_bits(&clocks_hw->clk[clk_sys].ctrl, CLOCKS_CLK_SYS_CTRL_SRC_BITS);
 		while (clocks_hw->clk[clk_sys].selected != 0x1)
 			tight_loop_contents();
@@ -198,8 +201,7 @@ void clocks_reinit(uint32_t sleep_en0, uint32_t sleep_en1) {
         tight_loop_contents();
 
     /// \tag::pll_init[]
-    if (((sleep_en0 & CLOCKS_SLEEP_EN0_CLK_SYS_DEPENDANTS_BITS) == 0) &&
-        ((sleep_en1 & CLOCKS_SLEEP_EN1_CLK_SYS_DEPENDANTS_BITS) == 0))
+	if (init_sys_clock)
         pll_init(pll_sys, PLL_COMMON_REFDIV, PLL_SYS_VCO_FREQ_KHZ * KHZ, PLL_SYS_POSTDIV1, PLL_SYS_POSTDIV2);
     pll_init(pll_usb, PLL_COMMON_REFDIV, PLL_USB_VCO_FREQ_KHZ * KHZ, PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
     /// \end::pll_init[]
@@ -214,8 +216,7 @@ void clocks_reinit(uint32_t sleep_en0, uint32_t sleep_en1) {
 
     /// \tag::configure_clk_sys[]
     // CLK SYS = PLL SYS (usually) 125MHz / 1 = 125MHz
-    if (((sleep_en0 & CLOCKS_SLEEP_EN0_CLK_SYS_DEPENDANTS_BITS) == 0) &&
-        ((sleep_en1 & CLOCKS_SLEEP_EN1_CLK_SYS_DEPENDANTS_BITS) == 0)) {
+	if (init_sys_clock) {
 		clock_configure(clk_sys,
 						CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
 						CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
