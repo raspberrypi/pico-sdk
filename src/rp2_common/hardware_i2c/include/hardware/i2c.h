@@ -24,7 +24,7 @@ extern "C" {
 /** \file hardware/i2c.h
  *  \defgroup hardware_i2c hardware_i2c
  *
- * I2C Controller API
+ * \brief I2C Controller API
  *
  * The I2C bus is a two-wire serial interface, consisting of a serial data line SDA and a serial clock SCL. These wires carry
  * information between the devices connected to the bus. Each device is recognized by a unique 7-bit address and can operate as

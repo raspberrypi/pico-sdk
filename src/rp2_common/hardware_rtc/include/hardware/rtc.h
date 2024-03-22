@@ -13,7 +13,7 @@
 /** \file hardware/rtc.h
  *  \defgroup hardware_rtc hardware_rtc
  *
- * Hardware Real Time Clock API
+ * \brief Hardware Real Time Clock API
  *
  * The RTC keeps track of time in human readable format and generates events when the time is equal
  * to a preset value. Think of a digital clock, not epoch time used by most computers. There are seven

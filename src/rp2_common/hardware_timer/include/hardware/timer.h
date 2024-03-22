@@ -17,7 +17,7 @@ extern "C" {
 /** \file hardware/timer.h
  *  \defgroup hardware_timer hardware_timer
  *
- * Low-level hardware timer API
+ * \brief Low-level hardware timer API
  *
  * This API provides medium level access to the timer HW.
  * See also \ref pico_time which provides higher levels functionality using the hardware timer.

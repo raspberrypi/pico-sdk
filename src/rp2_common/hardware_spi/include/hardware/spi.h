@@ -23,7 +23,7 @@ extern "C" {
 /** \file hardware/spi.h
  *  \defgroup hardware_spi hardware_spi
  *
- * Hardware SPI API
+ * \brief Hardware SPI API
  *
  * RP2040 has 2 identical instances of the Serial Peripheral Interface (SPI) controller.
  *
@@ -42,7 +42,7 @@ extern "C" {
 // PICO_CONFIG: PICO_DEFAULT_SPI_CSN_PIN, Define the default SPI CSN pin, min=0, max=29, group=hardware_spi
 
 /**
- * Opaque type representing an SPI instance.
+ * \brief Opaque type representing an SPI instance.
  */
 typedef struct spi_inst spi_inst_t;
 
@@ -99,6 +99,7 @@ typedef enum {
 
 /*! \brief Initialise SPI instances
  *  \ingroup hardware_spi
+ *
  * Puts the SPI into a known state, and enable it. Must be called before other
  * functions.
  *
@@ -113,6 +114,7 @@ uint spi_init(spi_inst_t *spi, uint baudrate);
 
 /*! \brief Deinitialise SPI instances
  *  \ingroup hardware_spi
+ *
  * Puts the SPI into a disabled state. Init will need to be called to reenable the device
  * functions.
  *

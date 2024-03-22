@@ -13,7 +13,7 @@
 /** \file exception.h
  *  \defgroup hardware_exception hardware_exception
  *
- * Methods for setting processor exception handlers
+ * \brief Methods for setting processor exception handlers
  *
  * Exceptions are identified by a \ref exception_number which is a number from -15 to -1; these are the numbers relative to
  * the index of the first IRQ vector in the vector table. (i.e. vector table index is exception_num plus 16)

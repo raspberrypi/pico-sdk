@@ -11,7 +11,7 @@
  *  \defgroup async_context_poll async_context_poll
  *  \ingroup pico_async_context
  *
- * async_context_poll provides an implementation of \ref async_context that is intended for use with a simple
+ * \brief async_context_poll provides an implementation of \ref async_context that is intended for use with a simple
  * polling loop on one core. It is not thread safe.
  *
  * The \ref async_context_poll() method must be called periodically to handle asynchronous work that may now be

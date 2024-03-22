@@ -10,7 +10,7 @@
 /** \file malloc.h
 *  \defgroup pico_malloc pico_malloc
 *
-* Multi-core safety for malloc, calloc and free
+* \brief Multi-core safety for malloc, calloc and free
 *
 * This library does not provide any additional functions
 */

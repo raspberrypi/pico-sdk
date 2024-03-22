@@ -18,7 +18,7 @@
 /** \file picoboot.h
 *  \defgroup boot_picoboot boot_picoboot
 *
-* Header file for the PICOBOOT USB interface exposed by an RP2040 in BOOTSEL mode.
+* \brief Header file for the PICOBOOT USB interface exposed by an RP2040 in BOOTSEL mode.
 */
 
 #define PICOBOOT_MAGIC 0x431fd10bu

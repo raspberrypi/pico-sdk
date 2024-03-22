@@ -23,7 +23,7 @@ extern "C" {
 /** \file hardware/interp.h
  *  \defgroup hardware_interp hardware_interp
  *
- * Hardware Interpolator API
+ * \brief Hardware Interpolator API
  *
  * Each core is equipped with two interpolators (INTERP0 and INTERP1) which can be used to accelerate
  * tasks by combining certain pre-configured simple operations into a single processor cycle. Intended

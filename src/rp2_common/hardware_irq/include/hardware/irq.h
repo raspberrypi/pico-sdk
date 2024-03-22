@@ -33,7 +33,7 @@
 /** \file irq.h
  *  \defgroup hardware_irq hardware_irq
  *
- * Hardware interrupt handling
+ * \brief Hardware interrupt handling
  *
  * The RP2040 uses the standard ARM nested vectored interrupt controller (NVIC).
  *

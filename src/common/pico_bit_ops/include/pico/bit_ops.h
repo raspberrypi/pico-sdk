@@ -16,7 +16,7 @@ extern "C" {
 /** \file bit_ops.h
 *  \defgroup pico_bit_ops pico_bit_ops
 *
-* Optimized bit manipulation functions.
+* \brief Optimized bit manipulation functions.
 * Additionally provides  replacement implementations of the compiler built-ins __builtin_popcount, __builtin_clz
 * and __bulitin_ctz
 */

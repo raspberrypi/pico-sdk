@@ -46,7 +46,7 @@ extern "C" {
 /** \file pico/cyw43_arch.h
  *  \defgroup pico_cyw43_arch pico_cyw43_arch
  *
- * Architecture for integrating the CYW43 driver (for the wireless on Pico W) and lwIP (for TCP/IP stack) into the SDK. It is also necessary for accessing the on-board LED on Pico W
+ * \brief Architecture for integrating the CYW43 driver (for the wireless on Pico W) and lwIP (for TCP/IP stack) into the SDK. It is also necessary for accessing the on-board LED on Pico W
  *
  * Both the low level \c cyw43_driver and the lwIP stack require periodic servicing, and have limitations
  * on whether they can be called from multiple cores/threads.
