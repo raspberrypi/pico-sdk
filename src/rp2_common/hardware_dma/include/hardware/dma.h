@@ -863,7 +863,7 @@ int dma_claim_unused_timer(bool required);
  */
 bool dma_timer_is_claimed(uint timer);
 
-/*! \brief Set the divider for the given DMA timer
+/*! \brief Set the multiplier for the given DMA timer
  *  \ingroup hardware_dma
  *
  * The timer will run at the system_clock_freq * numerator / denominator, so this is the speed
