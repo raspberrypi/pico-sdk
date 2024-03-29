@@ -43,7 +43,6 @@ pw_cc_flag_set(
         "@pw_toolchain//actions:all_cpp_compiler_actions",
     ],
     flags = [
-        "-ffreestanding",
         "-specs=nano.specs",
         "-specs=nosys.specs",
     ],
