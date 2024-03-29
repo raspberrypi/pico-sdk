@@ -17,7 +17,7 @@ label_flag(
 # This should always point to a cc_library that defines PICO_CONFIG_HEADER.
 label_flag(
     name = "pico_config_header",
-    build_setting_default  = "//src/boards:pico",
+    build_setting_default  = "//src/boards:default",
 )
 
 genrule(

@@ -83,3 +83,24 @@ cc_library(
     includes = ["include"],
     hdrs = ["include/boards/pico.h"],
 )
+
+cc_library(
+    name = "host",
+    defines = [
+        'PICO_BOARD=\\"none\\"',
+        'PICO_CONFIG_HEADER="boards/none.h"',
+        "PICO_ON_DEVICE=0",
+        "PICO_NO_HARDWARE=1",
+        "PICO_BUILD=1",
+    ],
+    includes = ["include"],
+    hdrs = ["include/boards/none.h"],
+)
+
+alias(
+    name = "default",
+    actual = select({
+        "//bazel/constraint:rp2": ":pico",
+        "//bazel/constraint:host": ":host",
+    }),
+)
