@@ -5,6 +5,12 @@ build --noincompatible_sandbox_hermetic_tmp
 # Enable Bzlmod for every Bazel command
 common --enable_bzlmod
 
+# Get non-BCR Bazel modules.
+common --registry=https://raw.githubusercontent.com/armandomontanez/bazel-registry/main/
+
+# Re-add BCR since specifying a registry disables the BCR.
+common --registry=https://bcr.bazel.build
+
 # Produce useful output when the build fails.
 common --verbose_failures
 
