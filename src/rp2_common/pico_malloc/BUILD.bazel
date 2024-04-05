@@ -11,4 +11,11 @@ cc_library(
         "//src/common/pico_sync:pico_sync",
     ],
     srcs = ["pico_malloc.c"],
+    linkopts = [
+        "--linkopts=malloc",
+        "--linkopts=calloc",
+        "--linkopts=realloc",
+        "--linkopts=free",
+    ],
+    alwayslink=True,  # Ensures the wrapped symbols are linked in.
 )

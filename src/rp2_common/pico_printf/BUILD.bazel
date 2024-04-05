@@ -13,6 +13,13 @@ cc_library(
     ],
     srcs = [
         "printf.c",
-        "printf_none.S",
     ],
+    linkopts = [
+        "-Wl,--wrap=sprintf",
+        "-Wl,--wrap=snprintf",
+        "-Wl,--wrap=vsnprintf",
+    ],
+    alwayslink=True,  # Ensures the wrapped symbols are linked in.
 )
+
+# TODO: Support printf_none.S.

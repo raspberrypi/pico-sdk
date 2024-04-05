@@ -29,19 +29,8 @@ def generate_toolchains():
         pw_cc_toolchain(
             name = "arm_gcc_{}_toolchain_cortex-m".format(_HOST_STR),
             action_config_flag_sets = [
-                "@pw_toolchain//flag_sets:o2",
-                "@pw_toolchain//flag_sets:c++17",
-                "@pw_toolchain//flag_sets:debugging",
-                "@pw_toolchain//flag_sets:reduced_size",
                 "@pw_toolchain//flag_sets:no_canonical_prefixes",
-                "@pw_toolchain//flag_sets:no_rtti",
-                "@pw_toolchain//flag_sets:wno_register",
-                "@pw_toolchain//flag_sets:wnon_virtual_dtor",
                 "@pico-sdk//bazel/toolchain:cortex-m0",
-                "@pico-sdk//bazel/toolchain:thumb_abi",
-                "@pico-sdk//bazel/toolchain:cortex_common",
-                "@pico-sdk//bazel/toolchain:cortex_common_link",
-                "@pico-sdk//bazel/toolchain:warnings",
             ],
             action_configs = [
                 "@arm_gcc_{}//:arm-none-eabi-ar".format(_HOST_STR),

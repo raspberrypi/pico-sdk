@@ -36,6 +36,13 @@ cc_library(
         "//bazel/constraint:stdio_uart": ["//src/rp2_common/pico_stdio_uart:pico_stdio_uart"],
         "//bazel/constraint:stdio_usb": ["//src/rp2_common/pico_stdio_usb:pico_stdio_usb"],
     }),
-    copts = ["-Wno-unused-function"],
+    linkopts = [
+        "-Wl,--wrap=printf",
+        "-Wl,--wrap=vprintf",
+        "-Wl,--wrap=puts",
+        "-Wl,--wrap=putchar",
+        "-Wl,--wrap=getchar",
+    ],
+    alwayslink=True,  # Ensures the wrapped symbols are linked in.
     srcs = ["stdio.c"],
 )

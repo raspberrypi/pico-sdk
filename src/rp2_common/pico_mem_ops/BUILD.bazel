@@ -15,4 +15,15 @@ cc_library(
         "mem_ops.c",
         "mem_ops_aeabi.S",
     ],
+    linkopts = [
+        "-Wl,--wrap=memcpy",
+        "-Wl,--wrap=memset",
+        "-Wl,--wrap=__aeabi_memcpy",
+        "-Wl,--wrap=__aeabi_memset",
+        "-Wl,--wrap=__aeabi_memcpy4",
+        "-Wl,--wrap=__aeabi_memset4",
+        "-Wl,--wrap=__aeabi_memcpy8",
+        "-Wl,--wrap=__aeabi_memset8",
+    ],
+    alwayslink=True,  # Ensures the wrapped symbols are linked in.
 )

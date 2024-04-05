@@ -9,4 +9,18 @@ cc_library(
         "//src/rp2_common/pico_platform:pico_platform",
     ],
     srcs = ["bit_ops_aeabi.S"],
+    linkopts = [
+        "-Wl,--wrap=__clzsi2",
+        "-Wl,--wrap=__clzsi2",
+        "-Wl,--wrap=__clzdi2",
+        "-Wl,--wrap=__ctzsi2",
+        "-Wl,--wrap=__ctzdi2",
+        "-Wl,--wrap=__popcountsi2",
+        "-Wl,--wrap=__popcountdi2",
+        "-Wl,--wrap=__clz",
+        "-Wl,--wrap=__clzl",
+        "-Wl,--wrap=__clzsi2",
+        "-Wl,--wrap=__clzll",
+    ],
+    alwayslink=True,  # Ensures the wrapped symbols are linked in.
 )
