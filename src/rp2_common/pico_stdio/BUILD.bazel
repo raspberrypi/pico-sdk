@@ -16,6 +16,7 @@ cc_library(
         "//src/rp2_common/pico_stdio_semihosting:__pkg__",
         "//src/rp2_common/pico_stdio_uart:__pkg__",
         "//src/rp2_common/pico_stdio_usb:__pkg__",
+        "//src/rp2_common/tinyusb:__pkg__",
     ],
 )
 

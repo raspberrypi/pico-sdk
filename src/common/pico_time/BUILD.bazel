@@ -15,7 +15,10 @@ cc_library(
     deps = [
         "//src/rp2_common/hardware_timer:hardware_timer_headers",
     ],
-    visibility = ["//src/common/pico_sync:__pkg__"],
+    visibility = [
+        "//src/common/pico_sync:__pkg__",
+        "//src/rp2_common/tinyusb:__pkg__",
+    ],
 )
 
 cc_library(
