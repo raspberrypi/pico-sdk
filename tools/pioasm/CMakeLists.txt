@@ -25,6 +25,7 @@ target_sources(pioasm PRIVATE python_output.cpp)
 target_sources(pioasm PRIVATE hex_output.cpp)
 target_sources(pioasm PRIVATE json_output.cpp)
 target_sources(pioasm PRIVATE ada_output.cpp)
+target_sources(pioasm PRIVATE go_output.cpp)
 target_sources(pioasm PRIVATE ${PIOASM_EXTRA_SOURCE_FILES})
 
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND
