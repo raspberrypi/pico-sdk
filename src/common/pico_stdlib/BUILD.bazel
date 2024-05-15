@@ -1,5 +1,3 @@
-# Generated build file
-
 package(default_visibility = ["//visibility:public"])
 
 # This exists to break a header dependency cycle from rp2_common/pico_stdlib.
