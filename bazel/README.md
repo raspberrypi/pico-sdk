@@ -30,9 +30,9 @@ bazel_dep(name = "rules_cc", version = "0.0.10")
 # project's MODULE.bazel too.
 archive_override(
     module_name = "rules_cc",
-    urls = "https://github.com/bazelbuild/rules_cc/archive/71d9e52bdb292a9728ec8d18f46b33d596559e38.zip",
-    strip_prefix = "rules_cc-71d9e52bdb292a9728ec8d18f46b33d596559e38",
-    integrity = "sha256-ouYPadlQQak2mfwkSszLHuPMrFR2+VESnpNWn6LS4rg=",
+    urls = "https://github.com/bazelbuild/rules_cc/archive/1acf5213b6170f1f0133e273cb85ede0e732048f.zip",
+    strip_prefix = "rules_cc-1acf5213b6170f1f0133e273cb85ede0e732048f",
+    integrity = "sha256-NddP6xi6LzsIHT8bMSVJ2NtoURbN+l3xpjvmIgB6aSg=",
 )
 ```
 
