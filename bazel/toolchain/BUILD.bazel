@@ -1,7 +1,7 @@
 load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
 load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 load("@rules_cc//cc/toolchains:feature.bzl", "cc_feature")
-load(":pico.bzl", "generate_toolchains")
+load("@rules_cc//cc/toolchains:toolchain.bzl", "cc_toolchain")
 
 cc_args(
     name = "cortex-m0",
@@ -44,22 +44,22 @@ cc_args(
 # TODO: Make this shim unnecessary.
 cc_args_list(
     name = "all_opt_debug_args",
-    args = [":opt_debug_args"]
+    args = [":opt_debug_args"],
 )
 
 cc_feature(
     name = "override_debug",
-    overrides = "@rules_cc//cc/toolchains/features:dbg",
-    enabled = True,
     args = [":all_opt_debug_args"],
+    enabled = True,
+    overrides = "@rules_cc//cc/toolchains/features:dbg",
 )
 
 # TODO: This is required for now, but hopefully will eventually go away.
 cc_feature(
     name = "legacy_features",
-    feature_name = "force_legacy_features",
-    enabled = True,
     args = [],
+    enabled = True,
+    feature_name = "force_legacy_features",
     implies = [
         "@rules_cc//cc/toolchains/features/legacy:archiver_flags",
         "@rules_cc//cc/toolchains/features/legacy:build_interface_libraries",
@@ -87,8 +87,8 @@ alias(
         "@platforms//os:windows": "@arm_gcc_win-x86_64//:arm-none-eabi-objcopy_tool",
         "//conditions:default": "@platforms//:incompatible",
     }),
-    visibility = ["//visibility:public"],
     tags = ["manual"],  # Don't try to build this in wildcard builds.
+    visibility = ["//visibility:public"],
 )
 
 alias(
@@ -101,4 +101,69 @@ alias(
     tags = ["manual"],  # Don't try to build this in wildcard builds.
 )
 
-generate_toolchains()
+HOSTS = (
+    ("linux", "x86_64"),
+    ("win", "x86_64"),
+    ("mac", "x86_64"),
+    ("mac", "aarch64"),
+)
+
+_HOST_OS_CONSTRAINTS = {
+    "linux": "@platforms//os:linux",
+    "win": "@platforms//os:windows",
+    "mac": "@platforms//os:macos",
+}
+
+_HOST_CPU_CONSTRAINTS = {
+    "x86_64": "@platforms//cpu:x86_64",
+    "aarch64": "@platforms//cpu:aarch64",
+}
+
+[cc_toolchain(
+    name = "arm_gcc_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    action_type_configs = [
+        "@arm_gcc_{}-{}//:arm-none-eabi-ar".format(host_os, host_cpu),
+        "@arm_gcc_{}-{}//:arm-none-eabi-gcc".format(host_os, host_cpu),
+        "@arm_gcc_{}-{}//:arm-none-eabi-g++".format(host_os, host_cpu),
+        "@arm_gcc_{}-{}//:arm-none-eabi-ld".format(host_os, host_cpu),
+        "@arm_gcc_{}-{}//:arm-none-eabi-objcopy".format(host_os, host_cpu),
+        "@arm_gcc_{}-{}//:arm-none-eabi-strip".format(host_os, host_cpu),
+    ],
+    args = ["@pico-sdk//bazel/toolchain:all_unconditional_args"],
+    compiler = "gcc",  # Useful for distinguishing gcc vs clang.
+    cxx_builtin_include_directories = [
+        "%sysroot%/arm-none-eabi/include/newlib-nano",
+        "%sysroot%/arm-none-eabi/include/c++/13.2.1",
+        "%sysroot%/arm-none-eabi/include/c++/13.2.1/arm-none-eabi",
+        "%sysroot%/arm-none-eabi/include/c++/13.2.1/backward",
+        "%sysroot%/lib/gcc/arm-none-eabi/13.2.1/include",
+        "%sysroot%/lib/gcc/arm-none-eabi/13.2.1/include-fixed",
+        "%sysroot%/arm-none-eabi/include",
+    ],
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    sysroot = "external/arm_gcc_{}-{}".format(host_os, host_cpu),
+    tags = ["manual"],  # Don't try to build this in wildcard builds.
+    target_compatible_with = [
+        "@pico-sdk//bazel/constraint:rp2040",
+    ],
+    toolchain_features = [
+        "@pico-sdk//bazel/toolchain:legacy_features",
+        "@pico-sdk//bazel/toolchain:override_debug",
+    ],
+) for host_os, host_cpu in HOSTS]
+
+[toolchain(
+    name = "arm_gcc_{}-{}".format(host_os, host_cpu),
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    target_compatible_with = [
+        "@pico-sdk//bazel/constraint:rp2040",
+    ],
+    toolchain = ":arm_gcc_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+) for host_os, host_cpu in HOSTS]
