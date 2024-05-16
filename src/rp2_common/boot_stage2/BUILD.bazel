@@ -1,3 +1,5 @@
+load("//bazel/toolchain:objcopy.bzl", "objcopy_to_bin")
+
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
@@ -39,15 +41,10 @@ cc_binary(
     ],
 )
 
-_OBJCOPY_CMD = "$(location //bazel/toolchain:objcopy) -Obinary $< $@"
-
-genrule(
+objcopy_to_bin(
     name = "boot_stage2_bin",
-    srcs = [":boot_stage2_elf"],
-    outs = ["boot_stage2.bin"],
-    cmd = _OBJCOPY_CMD,
-    cmd_bat = _OBJCOPY_CMD,
-    tools = ["//bazel/toolchain:objcopy"],
+    src = ":boot_stage2_elf",
+    out = "boot_stage2.bin",
 )
 
 # WORKAROUND: Python rules always require a .py extension.

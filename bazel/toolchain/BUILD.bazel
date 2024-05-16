@@ -79,28 +79,6 @@ cc_feature(
     ],
 )
 
-alias(
-    name = "objcopy",
-    actual = select({
-        "@platforms//os:linux": "@arm_gcc_linux-x86_64//:arm-none-eabi-objcopy_tool",
-        "@platforms//os:macos": ":objcopy_mac",
-        "@platforms//os:windows": "@arm_gcc_win-x86_64//:arm-none-eabi-objcopy_tool",
-        "//conditions:default": "@platforms//:incompatible",
-    }),
-    tags = ["manual"],  # Don't try to build this in wildcard builds.
-    visibility = ["//visibility:public"],
-)
-
-alias(
-    name = "objcopy_mac",
-    actual = select({
-        "@platforms//cpu:aarch64": "@arm_gcc_mac-aarch64//:arm-none-eabi-objcopy_tool",
-        "@platforms//cpu:x86_64": "@arm_gcc_mac-x86_64//:arm-none-eabi-objcopy_tool",
-        "//conditions:default": "@platforms//:incompatible",
-    }),
-    tags = ["manual"],  # Don't try to build this in wildcard builds.
-)
-
 HOSTS = (
     ("linux", "x86_64"),
     ("win", "x86_64"),
