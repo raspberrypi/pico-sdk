@@ -1,20 +1,6 @@
-# TODO: https://pwbug.dev/319664275: Disable hermetic sandbox tmp due to issues
-# with arm toolchain.
-build --noincompatible_sandbox_hermetic_tmp
-
-# Enable Bzlmod for every Bazel command
-common --enable_bzlmod
-
-# Get non-BCR Bazel modules.
-common --registry=https://raw.githubusercontent.com/armandomontanez/bazel-registry/main/
-
-# Re-add BCR since specifying a registry disables the BCR.
-common --registry=https://bcr.bazel.build
+# Required for new toolchain resolution API.
+build --incompatible_enable_cc_toolchain_resolution
+build --@rules_cc//cc/toolchains:experimental_enable_rule_based_toolchains
 
 # Produce useful output when the build fails.
 common --verbose_failures
-
-# Required for new toolchain resolution API.
-build --incompatible_enable_cc_toolchain_resolution
-
-build --platforms=//bazel/platform:rp2040

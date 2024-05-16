@@ -1,22 +1,81 @@
-load(
-    "@pw_toolchain//cc_toolchain:defs.bzl",
-    "pw_cc_flag_set",
-    "pw_cc_toolchain",
-)
+load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
+load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
+load("@rules_cc//cc/toolchains:feature.bzl", "cc_feature")
 load(":pico.bzl", "generate_toolchains")
 
-pw_cc_flag_set(
+cc_args(
     name = "cortex-m0",
-    actions = [
-        "@pw_toolchain//actions:all_asm_actions",
-        "@pw_toolchain//actions:all_c_compiler_actions",
-        "@pw_toolchain//actions:all_cpp_compiler_actions",
-        "@pw_toolchain//actions:all_link_actions",
-    ],
-    flags = [
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = [
         "-mcpu=cortex-m0plus",
         "-mthumb",
+    ],
+)
+
+cc_args(
+    name = "bazel_no_absolute_paths",
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = [
+        "-fno-canonical-system-headers",
+        "-no-canonical-prefixes",
+    ],
+)
+
+cc_args_list(
+    name = "all_unconditional_args",
+    args = [
+        ":cortex-m0",
+        ":bazel_no_absolute_paths",
+    ],
+)
+
+cc_args(
+    name = "opt_debug_args",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = [
         "-Og",  # TODO: Make this configurable.
+        "-g3",
+    ],
+)
+
+# TODO: Make this shim unnecessary.
+cc_args_list(
+    name = "all_opt_debug_args",
+    args = [":opt_debug_args"]
+)
+
+cc_feature(
+    name = "override_debug",
+    overrides = "@rules_cc//cc/toolchains/features:dbg",
+    enabled = True,
+    args = [":all_opt_debug_args"],
+)
+
+# TODO: This is required for now, but hopefully will eventually go away.
+cc_feature(
+    name = "legacy_features",
+    feature_name = "force_legacy_features",
+    enabled = True,
+    args = [],
+    implies = [
+        "@rules_cc//cc/toolchains/features/legacy:archiver_flags",
+        "@rules_cc//cc/toolchains/features/legacy:build_interface_libraries",
+        "@rules_cc//cc/toolchains/features/legacy:dynamic_library_linker_tool",
+        "@rules_cc//cc/toolchains/features/legacy:strip_debug_symbols",
+        "@rules_cc//cc/toolchains/features/legacy:linkstamps",
+        "@rules_cc//cc/toolchains/features/legacy:output_execpath_flags",
+        "@rules_cc//cc/toolchains/features/legacy:runtime_library_search_directories",
+        "@rules_cc//cc/toolchains/features/legacy:library_search_directories",
+        "@rules_cc//cc/toolchains/features/legacy:libraries_to_link",
+        "@rules_cc//cc/toolchains/features/legacy:force_pic_flags",
+        "@rules_cc//cc/toolchains/features/legacy:user_link_flags",
+        "@rules_cc//cc/toolchains/features/legacy:legacy_link_flags",
+        "@rules_cc//cc/toolchains/features/legacy:linker_param_file",
+        "@rules_cc//cc/toolchains/features/legacy:fission_support",
+        "@rules_cc//cc/toolchains/features/legacy:sysroot",
     ],
 )
 

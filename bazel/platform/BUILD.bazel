@@ -5,7 +5,6 @@ platform(
     constraint_values = [
         "@pico-sdk//bazel/constraint:rp2",
         "@pico-sdk//bazel/constraint:rp2040",
-        "@platforms//cpu:armv6-m",
-        "@pw_toolchain//constraints/arm_mcpu:cortex-m0",
+        "@platforms//cpu:armv6-m",  # This is just FYI.
     ],
 )

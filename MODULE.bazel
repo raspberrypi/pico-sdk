@@ -1,4 +1,4 @@
-module(name = "pico-sdk", version = "0.0.1")
+module(name = "pico-sdk", version = "1.6.0-rc1")
 
 bazel_dep(name = "platforms", version = "0.0.8")
 
@@ -6,9 +6,17 @@ bazel_dep(name = "platforms", version = "0.0.8")
 # module will not ensure that the root Bazel module has that same version of
 # rules_cc. For that reason, this primarily acts as a FYI. You'll still need
 # to explicitly list this dependency in your own project's MODULE.bazel file.
-bazel_dep(name = "rules_cc", version = "0.0.9")
+bazel_dep(name = "rules_cc", version = "0.0.10")
 
-bazel_dep(name = "pw_toolchain", version = "0.1")
+# rules_cc v0.0.10 is not yet cut, so manually pull in the desired version.
+# This does not apply to dependent projects, so it needs to be copied to your
+# project's MODULE.bazel too.
+archive_override(
+    module_name = "rules_cc",
+    urls = "https://github.com/bazelbuild/rules_cc/archive/71d9e52bdb292a9728ec8d18f46b33d596559e38.zip",
+    strip_prefix = "rules_cc-71d9e52bdb292a9728ec8d18f46b33d596559e38",
+    integrity = "sha256-ouYPadlQQak2mfwkSszLHuPMrFR2+VESnpNWn6LS4rg=",
+)
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
@@ -16,7 +24,7 @@ http_archive(
     name = "arm_gcc_linux-x86_64",
     url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi",
-    build_file = "@pw_toolchain//build_external:gcc_arm_none_eabi.BUILD",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
     sha256 = "6cd1bbc1d9ae57312bcd169ae283153a9572bd6a8e4eeae2fedfbc33b115fdbb",
 )
 
@@ -24,7 +32,7 @@ http_archive(
     name = "arm_gcc_win-x86_64",
     url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi",
-    build_file = "@pw_toolchain//build_external:gcc_arm_none_eabi.BUILD",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
     sha256 = "51d933f00578aa28016c5e3c84f94403274ea7915539f8e56c13e2196437d18f",
 )
 
@@ -32,7 +40,7 @@ http_archive(
     name = "arm_gcc_mac-x86_64",
     url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-x86_64-arm-none-eabi.tar.xz",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-x86_64-arm-none-eabi",
-    build_file = "@pw_toolchain//build_external:gcc_arm_none_eabi.BUILD",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
     sha256 = "075faa4f3e8eb45e59144858202351a28706f54a6ec17eedd88c9fb9412372cc",
 )
 
@@ -40,7 +48,7 @@ http_archive(
     name = "arm_gcc_mac-aarch64",
     url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-arm64-arm-none-eabi.tar.xz",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-arm64-arm-none-eabi",
-    build_file = "@pw_toolchain//build_external:gcc_arm_none_eabi.BUILD",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
     sha256 = "39c44f8af42695b7b871df42e346c09fee670ea8dfc11f17083e296ea2b0d279",
 )
 
