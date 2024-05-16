@@ -5,7 +5,10 @@ load("@rules_cc//cc/toolchains:toolchain.bzl", "cc_toolchain")
 
 cc_args(
     name = "cortex-m0",
-    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
     args = [
         "-mcpu=cortex-m0plus",
         "-mthumb",
