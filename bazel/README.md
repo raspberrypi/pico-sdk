@@ -93,3 +93,4 @@ Keep in mind the following limitations:
 * Pico-W is not yet supported.
 * Selecting an alternative board is not yet supported.
 * Nearly all preexisting CMake configuration options are not yet supported.
+* Targeting the host build of the Pico SDK is not yet supported.
