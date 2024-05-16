@@ -19,5 +19,8 @@ cc_library(
         "queue.c",
     ],
     # TODO: Add `select()` for host redirections.
-    target_compatible_with = ["//bazel/constraint:rp2"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )

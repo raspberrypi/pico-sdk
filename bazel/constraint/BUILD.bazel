@@ -1,25 +1,25 @@
 package(default_visibility = ["//visibility:public"])
 
 constraint_setting(
-    name = "class",
+    name = "sdk_target",
     default_constraint_value = "host",
 )
 
 constraint_value(
     name = "host",
-    constraint_setting = ":class",
+    constraint_setting = ":sdk_target",
 )
-
-constraint_value(
-    name = "rp2",
-    constraint_setting = ":class",
-)
-
-constraint_setting(name = "chip")
 
 constraint_value(
     name = "rp2040",
-    constraint_setting = ":chip",
+    constraint_setting = ":sdk_target",
+)
+
+config_setting(
+    name = "rp2",
+    constraint_values = [
+        ":rp2040",
+    ],
 )
 
 constraint_setting(
