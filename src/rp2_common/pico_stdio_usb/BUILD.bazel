@@ -43,6 +43,7 @@ cc_library(
         "stdio_usb.c",
         "stdio_usb_descriptors.c",
     ],
+    target_compatible_with = ["//bazel/constraint:stdio_usb"],
     # Ensure `stdio_usb_descriptors.c` isn't affected by link order.
     alwayslink=True,
 )

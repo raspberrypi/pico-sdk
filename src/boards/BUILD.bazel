@@ -53,7 +53,7 @@ cc_library(
 )
 
 cc_library(
-    name = "semihosting_defines",
+    name = "stdio_defines",
     defines = select({
         "//bazel/constraint:stdio_semihosting": ["LIB_PICO_STDIO_SEMIHOSTING=1"],
         "//bazel/constraint:stdio_uart": ["LIB_PICO_STDIO_UART=1"],
@@ -78,7 +78,7 @@ cc_library(
     ],
     deps = [
         ":common_board_defines",
-        ":semihosting_defines",
+        ":stdio_defines",
     ],
     includes = ["include"],
     hdrs = ["include/boards/pico.h"],
