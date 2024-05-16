@@ -2,8 +2,9 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hardware_xosc",
-    includes = ["include"],
+    srcs = ["xosc.c"],
     hdrs = ["include/hardware/xosc.h"],
+    includes = ["include"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_base:pico_platform",
@@ -12,5 +13,4 @@ cc_library(
         "//src/rp2_common/pico_platform:hardware_structs",
         "//src/rp2_common/pico_platform:platform_defs",
     ],
-    srcs = ["xosc.c"],
 )

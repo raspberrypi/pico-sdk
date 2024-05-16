@@ -2,14 +2,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_bootrom",
-    includes = ["include"],
+    srcs = ["bootrom.c"],
     hdrs = [
         "include/pico/bootrom.h",
         "include/pico/bootrom/sf_table.h",
     ],
+    includes = ["include"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_base:pico_platform",
     ],
-    srcs = ["bootrom.c"],
 )

@@ -2,15 +2,15 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_stdlib",
-    deps = [
-        "//src/common/pico_binary_info:pico_binary_info",
-        "//src/common/pico_stdlib:pico_stdlib_interface",
-        "//src/rp2_common/hardware_clocks:hardware_clocks",
-        "//src/rp2_common/hardware_pll:hardware_pll",
-    ] + select({
-        "//bazel/constraint:stdio_semihosting": ["//src/rp2_common/pico_stdio_semihosting:pico_stdio_semihosting"],
-        "//bazel/constraint:stdio_uart": ["//src/rp2_common/pico_stdio_uart:pico_stdio_uart"],
-        "//bazel/constraint:stdio_usb": ["//src/rp2_common/pico_stdio_usb:pico_stdio_usb"],
-    }),
     srcs = ["stdlib.c"],
+    deps = [
+        "//src/common/pico_binary_info",
+        "//src/common/pico_stdlib:pico_stdlib_interface",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_pll",
+    ] + select({
+        "//bazel/constraint:stdio_semihosting": ["//src/rp2_common/pico_stdio_semihosting"],
+        "//bazel/constraint:stdio_uart": ["//src/rp2_common/pico_stdio_uart"],
+        "//bazel/constraint:stdio_usb": ["//src/rp2_common/pico_stdio_usb"],
+    }),
 )

@@ -2,18 +2,18 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hardware_pio",
-    includes = ["include"],
+    srcs = ["pio.c"],
     hdrs = [
         "include/hardware/pio.h",
         "include/hardware/pio_instructions.h",
     ],
+    includes = ["include"],
     deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/rp2_common/hardware_base:hardware_base",
-        "//src/rp2_common/hardware_claim:hardware_claim",
-        "//src/rp2_common/hardware_gpio:hardware_gpio",
+        "//src/common/pico_base",
+        "//src/rp2_common/hardware_base",
+        "//src/rp2_common/hardware_claim",
+        "//src/rp2_common/hardware_gpio",
         "//src/rp2_common/pico_platform:hardware_regs",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
-    srcs = ["pio.c"],
 )

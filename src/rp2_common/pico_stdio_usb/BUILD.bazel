@@ -2,48 +2,47 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "reset_interface_headers",
-    includes = ["include"],
     hdrs = ["include/pico/stdio_usb/reset_interface.h"],
-    deps = ["//src/common/pico_usb_reset_interface:pico_usb_reset_interface"],
+    includes = ["include"],
+    deps = ["//src/common/pico_usb_reset_interface"],
 )
-
 
 cc_library(
     name = "tusb_config",
-    includes = ["include"],
     hdrs = ["include/tusb_config.h"],
+    includes = ["include"],
 )
 
 cc_library(
     name = "pico_stdio_usb_headers",
-    includes = ["include"],
     hdrs = ["include/pico/stdio_usb.h"],
+    includes = ["include"],
     visibility = [
         ":__pkg__",
         "//src/rp2_common/tinyusb:__pkg__",
-    ]
+    ],
 )
 
 cc_library(
     name = "pico_stdio_usb",
-    deps = [
-        ":pico_stdio_usb_headers",
-        ":reset_interface_headers",
-        "//src/common/pico_binary_info:pico_binary_info",
-        "//src/common/pico_sync:pico_sync",
-        "//src/rp2_common/hardware_irq:hardware_irq",
-        "//src/rp2_common/hardware_watchdog:hardware_watchdog",
-        "//src/rp2_common/pico_bootrom:pico_bootrom",
-        "//src/rp2_common/pico_stdio:pico_stdio_headers",
-        "//src/rp2_common/pico_unique_id:pico_unique_id",
-        "@tinyusb//:tinyusb",
-    ],
     srcs = [
         "reset_interface.c",
         "stdio_usb.c",
         "stdio_usb_descriptors.c",
     ],
     target_compatible_with = ["//bazel/constraint:stdio_usb"],
+    deps = [
+        ":pico_stdio_usb_headers",
+        ":reset_interface_headers",
+        "//src/common/pico_binary_info",
+        "//src/common/pico_sync",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_watchdog",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+        "//src/rp2_common/pico_unique_id",
+        "@tinyusb",
+    ],
     # Ensure `stdio_usb_descriptors.c` isn't affected by link order.
-    alwayslink=True,
+    alwayslink = True,
 )

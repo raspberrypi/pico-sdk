@@ -2,26 +2,26 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_lwip",
-    includes = ["include"],
+    srcs = [
+        "lwip_freertos.c",
+        "lwip_nosys.c",
+    ],
     hdrs = [
         "include/arch/cc.h",
         "include/pico/lwip_freertos.h",
         "include/pico/lwip_nosys.h",
     ],
-    deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/common/pico_time:pico_time",
-        "//src/rp2_common/pico_async_context:pico_async_context",
-        "//src/rp2_common/pico_rand:pico_rand",
-    ],
-    srcs = [
-        "lwip_freertos.c",
-        "lwip_nosys.c",
-    ],
+    includes = ["include"],
     # Missing deps for:
     #     FreeRTOS.h
     #     lwip/tcpip.h
     #     lwip/timeouts.h
     #     semphr.h
     tags = ["manual"],
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_time",
+        "//src/rp2_common/pico_async_context",
+        "//src/rp2_common/pico_rand",
+    ],
 )

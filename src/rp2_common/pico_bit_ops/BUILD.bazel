@@ -2,10 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_bit_ops",
-    deps = [
-        "//src/rp2_common/pico_bootrom:pico_bootrom",
-        "//src/rp2_common/pico_platform:pico_platform",
-    ],
     srcs = ["bit_ops_aeabi.S"],
     linkopts = [
         "-Wl,--wrap=__clzsi2",
@@ -20,5 +16,9 @@ cc_library(
         "-Wl,--wrap=__clzsi2",
         "-Wl,--wrap=__clzll",
     ],
-    alwayslink=True,  # Ensures the wrapped symbols are linked in.
+    deps = [
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_platform",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )

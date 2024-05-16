@@ -2,7 +2,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_async_context",
-    includes = ["include"],
+    srcs = [
+        "async_context_base.c",
+        "async_context_freertos.c",
+        "async_context_poll.c",
+        "async_context_threadsafe_background.c",
+    ],
     hdrs = [
         "include/pico/async_context.h",
         "include/pico/async_context_base.h",
@@ -10,21 +15,16 @@ cc_library(
         "include/pico/async_context_poll.h",
         "include/pico/async_context_threadsafe_background.h",
     ],
-    deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/common/pico_sync:pico_sync",
-        "//src/common/pico_time:pico_time",
-        "//src/rp2_common/hardware_irq:hardware_irq",
-    ],
-    srcs = [
-        "async_context_base.c",
-        "async_context_freertos.c",
-        "async_context_poll.c",
-        "async_context_threadsafe_background.c",
-    ],
+    includes = ["include"],
     # Missing deps for:
     #    FreeRTOS.h
     #    semphr.h
     #    timers.h
     tags = ["manual"],
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_sync",
+        "//src/common/pico_time",
+        "//src/rp2_common/hardware_irq",
+    ],
 )

@@ -5,15 +5,14 @@ package(default_visibility = ["//src/rp2_common/pico_platform:__pkg__"])
 
 cc_library(
     name = "platform_defs",
-    includes = ["include"],
     hdrs = [
         "include/hardware/platform_defs.h",
     ],
+    includes = ["include"],
 )
 
 cc_library(
     name = "hardware_regs",
-    includes = ["include"],
     hdrs = [
         "include/hardware/regs/adc.h",
         "include/hardware/regs/addressmap.h",
@@ -43,11 +42,12 @@ cc_library(
         "include/hardware/regs/tbman.h",
         "include/hardware/regs/timer.h",
         "include/hardware/regs/uart.h",
-        "include/hardware/regs/usb_device_dpram.h",
         "include/hardware/regs/usb.h",
+        "include/hardware/regs/usb_device_dpram.h",
         "include/hardware/regs/vreg_and_chip_reset.h",
         "include/hardware/regs/watchdog.h",
         "include/hardware/regs/xip.h",
         "include/hardware/regs/xosc.h",
     ],
+    includes = ["include"],
 )

@@ -4,15 +4,8 @@ package(default_visibility = ["//visibility:public"])
 # Do not directly depend on this.
 cc_library(
     name = "pico_stdlib_interface",
-    includes = ["include"],
     hdrs = ["include/pico/stdlib.h"],
-    deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/common/pico_time:pico_time",
-        "//src/rp2_common/hardware_gpio:hardware_gpio",
-        "//src/rp2_common/hardware_uart:hardware_uart",
-        "//src/rp2_common/pico_stdio:pico_stdio",
-    ],
+    includes = ["include"],
     # TODO: Add `select()` for host redirections.
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],
@@ -22,23 +15,30 @@ cc_library(
         "//src/rp2_common/pico_stdlib:__pkg__",
         "//src/rp2_common/tinyusb:__pkg__",
     ],
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_time",
+        "//src/rp2_common/hardware_gpio",
+        "//src/rp2_common/hardware_uart",
+        "//src/rp2_common/pico_stdio",
+    ],
 )
 
 cc_library(
     name = "pico_stdlib",
-    includes = ["include"],
     hdrs = ["include/pico/stdlib.h"],
-    deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/common/pico_time:pico_time",
-        "//src/rp2_common/hardware_gpio:hardware_gpio",
-        "//src/rp2_common/hardware_uart:hardware_uart",
-        "//src/rp2_common/pico_stdio:pico_stdio",
-        "//src/rp2_common/pico_stdlib:pico_stdlib",
-    ],
+    includes = ["include"],
     # TODO: Add `select()` for host redirections.
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_time",
+        "//src/rp2_common/hardware_gpio",
+        "//src/rp2_common/hardware_uart",
+        "//src/rp2_common/pico_stdio",
+        "//src/rp2_common/pico_stdlib",
+    ],
 )

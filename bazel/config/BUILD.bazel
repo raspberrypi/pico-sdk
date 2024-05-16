@@ -4,20 +4,20 @@ package(default_visibility = ["//visibility:public"])
 # a "pico_config_extra_headers.h".
 label_flag(
     name = "pico_config_extra_headers",
-    build_setting_default  = ":no_extra_headers",
+    build_setting_default = ":no_extra_headers",
 )
 
 # This should always point to a cc_library that provides
 # a "pico_config_platform_headers.h".
 label_flag(
     name = "pico_config_platform_headers",
-    build_setting_default  = ":no_platform_headers",
+    build_setting_default = ":no_platform_headers",
 )
 
 # This should always point to a cc_library that defines PICO_CONFIG_HEADER.
 label_flag(
     name = "pico_config_header",
-    build_setting_default  = "//src/boards:default",
+    build_setting_default = "//src/boards:default",
 )
 
 genrule(
@@ -38,14 +38,14 @@ genrule(
 
 cc_library(
     name = "no_extra_headers",
-    includes = ["generated_include"],
     hdrs = ["generated_include/pico_config_extra_headers.h"],
+    includes = ["generated_include"],
     visibility = ["//visibility:private"],
 )
 
 cc_library(
     name = "no_platform_headers",
-    includes = ["generated_include"],
     hdrs = ["generated_include/pico_config_platform_headers.h"],
+    includes = ["generated_include"],
     visibility = ["//visibility:private"],
 )

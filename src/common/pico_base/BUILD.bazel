@@ -2,11 +2,11 @@ package(default_visibility = ["//visibility:public"])
 
 genrule(
     name = "version_header",
-    outs = ["generated_include/pico/version.h"],
     srcs = [
         "//:pico_sdk_version.cmake",
         "include/pico/version.h.in",
     ],
+    outs = ["generated_include/pico/version.h"],
     cmd = "$(location //bazel:parse_version) $(location //:pico_sdk_version.cmake)  --template=$(location include/pico/version.h.in) > $@",
     cmd_bat = "$(location //bazel:parse_version) $(location //:pico_sdk_version.cmake)  --template=$(location include/pico/version.h.in) > $@",
     tools = ["//bazel:parse_version"],
@@ -15,8 +15,8 @@ genrule(
 
 cc_library(
     name = "version",
-    includes = ["generated_include"],
     hdrs = ["generated_include/pico/version.h"],
+    includes = ["generated_include"],
 )
 
 alias(
@@ -30,19 +30,13 @@ alias(
 alias(
     name = "pico_platform",
     actual = select({
-        "//bazel/constraint:host": "//src/host/pico_platform:pico_platform",  
+        "//bazel/constraint:host": "//src/host/pico_platform:pico_platform",
         "//bazel/constraint:rp2": "//src/rp2_common/pico_platform:pico_platform",
     }),
 )
 
 cc_library(
     name = "pico_base_interface",
-    includes = ["include"],
-    deps = [
-        ":version",
-        "//bazel:generate_config_header",
-        "//bazel/config:pico_config_header",
-    ],
     hdrs = [
         "include/pico.h",
         "include/pico/assert.h",
@@ -50,6 +44,7 @@ cc_library(
         "include/pico/error.h",
         "include/pico/types.h",
     ],
+    includes = ["include"],
 
     # Be extra careful about who references this for now.
     # It's generally safe for anything that circularly depends on
@@ -79,6 +74,11 @@ cc_library(
         "//src/rp2_common/pico_runtime:__pkg__",
         "//src/rp2_common/pico_standard_link:__pkg__",
     ],
+    deps = [
+        ":version",
+        "//bazel:generate_config_header",
+        "//bazel/config:pico_config_header",
+    ],
 )
 
 cc_library(
@@ -89,9 +89,9 @@ cc_library(
         ":pico_platform",
         ":pico_base_interface",
         "//src/rp2_common/cmsis:cmsis_core",
-        "//src/rp2_common/boot_stage2:boot_stage2",
-        "//src/rp2_common/pico_bootrom:pico_bootrom",
-        "//src/rp2_common/pico_runtime:pico_runtime",
-        "//src/rp2_common/pico_standard_link:pico_standard_link",
-    ]
+        "//src/rp2_common/boot_stage2",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_runtime",
+        "//src/rp2_common/pico_standard_link",
+    ],
 )

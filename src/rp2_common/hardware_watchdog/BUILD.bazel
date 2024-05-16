@@ -2,12 +2,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hardware_watchdog",
-    includes = ["include"],
+    srcs = ["watchdog.c"],
     hdrs = ["include/hardware/watchdog.h"],
+    includes = ["include"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_base:pico_platform",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
-    srcs = ["watchdog.c"],
 )

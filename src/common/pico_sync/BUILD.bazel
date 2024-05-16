@@ -2,7 +2,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_sync",
-    includes = ["include"],
+    srcs = [
+        "critical_section.c",
+        "lock_core.c",
+        "mutex.c",
+        "sem.c",
+    ],
     hdrs = [
         "include/pico/critical_section.h",
         "include/pico/lock_core.h",
@@ -10,20 +15,15 @@ cc_library(
         "include/pico/sem.h",
         "include/pico/sync.h",
     ],
-    deps = [
-        "//src/common/pico_base:pico_base_interface",
-        "//src/common/pico_time:pico_time_headers",
-        "//src/rp2_common/hardware_sync:hardware_sync",
-    ],
-    srcs = [
-        "critical_section.c",
-        "lock_core.c",
-        "mutex.c",
-        "sem.c",
-    ],
+    includes = ["include"],
     # TODO: Add `select()` for host redirections.
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
+    deps = [
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_time:pico_time_headers",
+        "//src/rp2_common/hardware_sync",
+    ],
 )

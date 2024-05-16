@@ -1,11 +1,11 @@
-load("@rules_cc//cc/toolchains:tool.bzl", "cc_tool")
 load("@rules_cc//cc/toolchains:action_type_config.bzl", "cc_action_type_config")
+load("@rules_cc//cc/toolchains:tool.bzl", "cc_tool")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_tool(
     name = "arm-none-eabi-ar_tool",
-    src =  select({
+    src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-ar.exe",
         "//conditions:default": "//:bin/arm-none-eabi-ar",
     }),
@@ -19,7 +19,7 @@ cc_action_type_config(
 
 cc_tool(
     name = "arm-none-eabi-g++_tool",
-    src =  select({
+    src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-g++.exe",
         "//conditions:default": "//:bin/arm-none-eabi-g++",
     }),
@@ -41,7 +41,7 @@ cc_action_type_config(
 
 cc_tool(
     name = "arm-none-eabi-gcc_tool",
-    src =  select({
+    src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-gcc.exe",
         "//conditions:default": "//:bin/arm-none-eabi-gcc",
     }),
@@ -75,7 +75,7 @@ cc_action_type_config(
 # different set of data files to pull into the sandbox at runtime.
 cc_tool(
     name = "arm-none-eabi-ld_tool",
-    src =  select({
+    src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-g++.exe",
         "//conditions:default": "//:bin/arm-none-eabi-g++",
     }),
@@ -98,7 +98,7 @@ cc_action_type_config(
 
 cc_tool(
     name = "arm-none-eabi-objcopy_tool",
-    src =  select({
+    src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-objcopy.exe",
         "//conditions:default": "//:bin/arm-none-eabi-objcopy",
     }),
@@ -112,7 +112,7 @@ cc_action_type_config(
 
 cc_tool(
     name = "arm-none-eabi-strip_tool",
-    src =  select({
+    src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-strip.exe",
         "//conditions:default": "//:bin/arm-none-eabi-strip",
     }),
@@ -126,7 +126,7 @@ cc_action_type_config(
 
 cc_tool(
     name = "arm-none-eabi-objdump_tool",
-    src =  select({
+    src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-objdump.exe",
         "//conditions:default": "//:bin/arm-none-eabi-objdump",
     }),
@@ -136,7 +136,7 @@ cc_tool(
 
 cc_tool(
     name = "arm-none-eabi-gcov_tool",
-    src =  select({
+    src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-gcov.exe",
         "//conditions:default": "//:bin/arm-none-eabi-gcov",
     }),

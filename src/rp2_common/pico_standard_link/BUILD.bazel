@@ -2,22 +2,22 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_standard_link",
-    deps = [
-        "//src/rp2_common/boot_stage2:config",
-        "//src/common/pico_base:pico_base_interface",
-        "//src/common/pico_binary_info:pico_binary_info",
-        "//src/rp2_common/pico_bootrom:pico_bootrom",
-        "//src/rp2_common/pico_platform:hardware_regs",
-        "//src/rp2_common/pico_platform:pico_platform",
-        "memmap_default.ld",
+    srcs = [
+        "binary_info.c",
+        "crt0.S",
+        # "new_delete.cpp",  # TODO: Doesn't build yet?
     ],
     # TODO: Make this configurable.
     linkopts = [
         "-T$(location memmap_default.ld)",
     ],
-    srcs = [
-        "binary_info.c",
-        "crt0.S",
-        # "new_delete.cpp",  # TODO: Doesn't build yet?
+    deps = [
+        "memmap_default.ld",
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_binary_info",
+        "//src/rp2_common/boot_stage2:config",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_platform",
+        "//src/rp2_common/pico_platform:hardware_regs",
     ],
 )

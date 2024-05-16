@@ -2,14 +2,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hardware_pll",
-    includes = ["include"],
+    srcs = ["pll.c"],
     hdrs = ["include/hardware/pll.h"],
+    includes = ["include"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_base:pico_platform",
         "//src/rp2_common/hardware_clocks:hardware_clocks_headers",
-        "//src/rp2_common/hardware_resets:hardware_resets",
+        "//src/rp2_common/hardware_resets",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
-    srcs = ["pll.c"],
 )

@@ -2,18 +2,18 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_malloc",
-    includes = ["include"],
-    hdrs = ["include/pico/malloc.h"],
-    deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/common/pico_sync:pico_sync",
-    ],
     srcs = ["pico_malloc.c"],
+    hdrs = ["include/pico/malloc.h"],
+    includes = ["include"],
     linkopts = [
         "--linkopts=malloc",
         "--linkopts=calloc",
         "--linkopts=realloc",
         "--linkopts=free",
     ],
-    alwayslink=True,  # Ensures the wrapped symbols are linked in.
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_sync",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )

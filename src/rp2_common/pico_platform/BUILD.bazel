@@ -23,16 +23,16 @@ alias(
 
 cc_library(
     name = "pico_platform",
-    includes = ["include"],
-    deps =  [
-        "//src/common/pico_base:pico_base_interface",
-        "//src/rp2_common/hardware_base:hardware_base",
-        ":platform_defs",
-        ":hardware_regs",
-    ],
-    hdrs = [
-        "include/pico/platform.h",
-        "include/pico/asm_helper.S",
-    ],
     srcs = ["platform.c"],
+    hdrs = [
+        "include/pico/asm_helper.S",
+        "include/pico/platform.h",
+    ],
+    includes = ["include"],
+    deps = [
+        ":hardware_regs",
+        ":platform_defs",
+        "//src/common/pico_base:pico_base_interface",
+        "//src/rp2_common/hardware_base",
+    ],
 )

@@ -2,51 +2,52 @@ package(default_visibility = ["//visibility:private"])
 
 cc_library(
     name = "config",
-    includes = ["include"],
     hdrs = [
         "asminclude/boot2_helpers/exit_from_boot2.S",
         "asminclude/boot2_helpers/read_flash_sreg.S",
         "asminclude/boot2_helpers/wait_ssi_ready.S",
-        "include/boot_stage2/config.h",
         "boot2_at25sf128a.S",
         "boot2_generic_03h.S",
         "boot2_is25lp080.S",
         "boot2_usb_blinky.S",
         "boot2_w25q080.S",
         "boot2_w25x10cl.S",
+        "include/boot_stage2/config.h",
     ],
+    includes = ["include"],
     visibility = ["//src/rp2_common/pico_standard_link:__pkg__"],
 )
 
 cc_binary(
     name = "boot_stage2_elf",
-    deps = [
-        "//src/common/pico_base:pico_base_interface",
-        "//src/common/pico_base:pico_platform",
-        ":config",
-        "boot_stage2.ld",
+    srcs = ["compile_time_choice.S"],
+    copts = ["-fPIC"],
+    includes = [
+        "asminclude",
+        "include",
     ],
-    copts = [ "-fPIC" ],
     linkopts = [
         "-Wl,--no-gc-sections",
         "-nostartfiles",
         "-T$(location boot_stage2.ld)",
     ],
-    includes = [
-        "include",
-        "asminclude",
+    deps = [
+        "boot_stage2.ld",
+        ":config",
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_base:pico_platform",
     ],
-    srcs = ["compile_time_choice.S"],
 )
 
 _OBJCOPY_CMD = "$(location //bazel/toolchain:objcopy) -Obinary $< $@"
+
 genrule(
     name = "boot_stage2_bin",
     srcs = [":boot_stage2_elf"],
     outs = ["boot_stage2.bin"],
-    tools = ["//bazel/toolchain:objcopy"],
     cmd = _OBJCOPY_CMD,
     cmd_bat = _OBJCOPY_CMD,
+    tools = ["//bazel/toolchain:objcopy"],
 )
 
 # WORKAROUND: Python rules always require a .py extension.
@@ -64,6 +65,7 @@ py_binary(
 )
 
 _PAD_CHECKSUM_CMD = "$(location :pad_checksum_tool) -s 0xffffffff  $< $@"
+
 genrule(
     name = "boot_stage2_padded",
     srcs = [":boot_stage2_bin"],

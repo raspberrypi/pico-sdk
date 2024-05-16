@@ -2,11 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_divider",
-    deps = [
-        "//src/rp2_common/hardware_divider:hardware_divider",
-        "//src/rp2_common/pico_platform:hardware_regs",
-        "//src/rp2_common/pico_platform:pico_platform",
-    ],
     srcs = ["divider.S"],
     linkopts = [
         "-Wl,--wrap=__aeabi_idiv",
@@ -16,5 +11,10 @@ cc_library(
         "-Wl,--wrap=__aeabi_uidivmod",
         "-Wl,--wrap=__aeabi_uldivmod",
     ],
-    alwayslink=True,  # Ensures the wrapped symbols are linked in.
+    deps = [
+        "//src/rp2_common/hardware_divider",
+        "//src/rp2_common/pico_platform",
+        "//src/rp2_common/pico_platform:hardware_regs",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )

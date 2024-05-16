@@ -2,7 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "boot_picoboot",
-    includes = ["include"],
     hdrs = ["include/boot/picoboot.h"],
+    includes = ["include"],
     deps = ["//src/common/pico_base:pico_platform"],
 )

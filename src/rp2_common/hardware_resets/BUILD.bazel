@@ -2,8 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hardware_resets",
-    includes = ["include"],
     hdrs = ["include/hardware/resets.h"],
+    includes = ["include"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/pico_platform:hardware_structs",

@@ -2,14 +2,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hardware_spi",
-    includes = ["include"],
+    srcs = ["spi.c"],
     hdrs = ["include/hardware/spi.h"],
+    includes = ["include"],
     deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/rp2_common/hardware_clocks:hardware_clocks",
-        "//src/rp2_common/hardware_resets:hardware_resets",
+        "//src/common/pico_base",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_resets",
         "//src/rp2_common/pico_platform:hardware_regs",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
-    srcs = ["spi.c"],
 )

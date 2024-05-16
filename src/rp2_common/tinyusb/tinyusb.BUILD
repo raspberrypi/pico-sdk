@@ -2,23 +2,14 @@ package(default_visibility = ["//visibility:public"])
 
 exports_files(
     glob(["**/*"]),
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "tinyusb",
-    includes = [
-        "src",
-        "hw",
-        "hw/bsp",
-    ],
-    hdrs = glob([
-      "src/**/*.h",
-      "hw/bsp/*.h",
-      "hw/bsp/rp2040/**/*.h",
-    ]),
-    deps = ["@pico-sdk//src/rp2_common/tinyusb:tinyusb_port"],
     srcs = [
+        "hw/bsp/board.h",
+        "hw/bsp/rp2040/family.c",
         "src/class/audio/audio_device.c",
         "src/class/cdc/cdc_device.c",
         "src/class/dfu/dfu_device.c",
@@ -37,7 +28,16 @@ cc_library(
         "src/portable/raspberrypi/rp2040/dcd_rp2040.c",
         "src/portable/raspberrypi/rp2040/rp2040_usb.c",
         "src/tusb.c",
-        "hw/bsp/board.h",
-        "hw/bsp/rp2040/family.c",
     ],
+    hdrs = glob([
+        "src/**/*.h",
+        "hw/bsp/*.h",
+        "hw/bsp/rp2040/**/*.h",
+    ]),
+    includes = [
+        "hw",
+        "hw/bsp",
+        "src",
+    ],
+    deps = ["@pico-sdk//src/rp2_common/tinyusb:tinyusb_port"],
 )

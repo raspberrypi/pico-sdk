@@ -2,17 +2,17 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hardware_uart",
-    includes = ["include"],
+    srcs = ["uart.c"],
     hdrs = ["include/hardware/uart.h"],
+    includes = ["include"],
     deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/rp2_common/hardware_base:hardware_base",
-        "//src/rp2_common/hardware_clocks:hardware_clocks",
-        "//src/rp2_common/hardware_resets:hardware_resets",
-        "//src/rp2_common/hardware_timer:hardware_timer",
+        "//src/common/pico_base",
+        "//src/rp2_common/hardware_base",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_resets",
+        "//src/rp2_common/hardware_timer",
         "//src/rp2_common/pico_platform:hardware_regs",
         "//src/rp2_common/pico_platform:hardware_structs",
         "//src/rp2_common/pico_platform:platform_defs",
     ],
-    srcs = ["uart.c"],
 )

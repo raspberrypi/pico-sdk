@@ -2,14 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_double",
-    includes = ["include"],
-    hdrs = ["include/pico/double.h"],
-    deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/rp2_common/hardware_divider:hardware_divider",
-        "//src/rp2_common/pico_bootrom:pico_bootrom",
-        "//src/rp2_common/pico_platform:pico_platform",
-    ],
     srcs = [
         "double_aeabi.S",
         "double_init_rom.c",
@@ -17,6 +9,8 @@ cc_library(
         "double_none.S",
         "double_v1_rom_shim.S",
     ],
+    hdrs = ["include/pico/double.h"],
+    includes = ["include"],
     linkopts = [
         "-Wl,--wrap=__aeabi_dadd",
         "-Wl,--wrap=__aeabi_ddiv",
@@ -80,5 +74,11 @@ cc_library(
         "-Wl,--wrap=log1p",
         "-Wl,--wrap=fma",
     ],
-    alwayslink=True,  # Ensures the wrapped symbols are linked in.
+    deps = [
+        "//src/common/pico_base",
+        "//src/rp2_common/hardware_divider",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_platform",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )

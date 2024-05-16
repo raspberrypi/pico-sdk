@@ -5,7 +5,6 @@ package(default_visibility = ["//src/rp2_common/pico_platform:__pkg__"])
 
 cc_library(
     name = "hardware_structs",
-    includes = ["include"],
     hdrs = [
         "include/hardware/structs/adc.h",
         "include/hardware/structs/bus_ctrl.h",
@@ -40,4 +39,5 @@ cc_library(
         "include/hardware/structs/xip_ctrl.h",
         "include/hardware/structs/xosc.h",
     ],
+    includes = ["include"],
 )

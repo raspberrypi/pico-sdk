@@ -4,13 +4,13 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_binary_info",
-    includes = ["include"],
     hdrs = [
         "include/pico/binary_info.h",
         "include/pico/binary_info/code.h",
         "include/pico/binary_info/defs.h",
         "include/pico/binary_info/structure.h",
     ],
+    includes = ["include"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_base:pico_platform",

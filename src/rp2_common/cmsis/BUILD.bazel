@@ -2,18 +2,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "rename_exceptions",
-    includes = ["include"],
     hdrs = ["include/cmsis/rename_exceptions.h"],
+    includes = ["include"],
 )
 
 cc_library(
     name = "cmsis_core",
-    includes = [
-      "stub/CMSIS/Core/Include",
-      "stub/CMSIS/Device/RaspberryPi/RP2040/Include",
-    ],
-    deps = [
-        "//src/rp2_common/hardware_clocks:hardware_clocks",
+    srcs = [
+        "stub/CMSIS/Device/RaspberryPi/RP2040/Source/system_RP2040.c",
     ],
     hdrs = [
         "stub/CMSIS/Core/Include/cmsis_armcc.h",
@@ -28,7 +24,11 @@ cc_library(
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include/RP2040.h",
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include/system_RP2040.h",
     ],
-    srcs = [
-        "stub/CMSIS/Device/RaspberryPi/RP2040/Source/system_RP2040.c",
+    includes = [
+        "stub/CMSIS/Core/Include",
+        "stub/CMSIS/Device/RaspberryPi/RP2040/Include",
+    ],
+    deps = [
+        "//src/rp2_common/hardware_clocks",
     ],
 )

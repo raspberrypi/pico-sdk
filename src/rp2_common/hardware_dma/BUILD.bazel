@@ -2,13 +2,13 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hardware_dma",
-    includes = ["include"],
+    srcs = ["dma.c"],
     hdrs = ["include/hardware/dma.h"],
+    includes = ["include"],
     deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/rp2_common/hardware_claim:hardware_claim",
+        "//src/common/pico_base",
+        "//src/rp2_common/hardware_claim",
         "//src/rp2_common/pico_platform:hardware_regs",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
-    srcs = ["dma.c"],
 )

@@ -24,11 +24,11 @@ py_binary(
 #     --@pico-sdk//bazel/config:pico_config_platform_headers=//my_proj:my_custom_platform_headers
 cc_library(
     name = "generate_config_header",
+    hdrs = ["include/pico/config_autogen.h"],
     includes = ["include"],
+    visibility = ["//:__subpackages__"],
     deps = [
         "//bazel/config:pico_config_extra_headers",
         "//bazel/config:pico_config_platform_headers",
     ],
-    hdrs = ["include/pico/config_autogen.h"],
-    visibility = ["//:__subpackages__"],
 )

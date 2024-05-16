@@ -2,6 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_usb_reset_interface",
-    includes = ["include"],
     hdrs = ["include/pico/usb_reset_interface.h"],
+    includes = ["include"],
 )

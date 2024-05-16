@@ -2,12 +2,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hardware_flash",
-    includes = ["include"],
+    srcs = ["flash.c"],
     hdrs = ["include/hardware/flash.h"],
+    includes = ["include"],
     deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/rp2_common/pico_bootrom:pico_bootrom",
+        "//src/common/pico_base",
+        "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
-    srcs = ["flash.c"],
 )

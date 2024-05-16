@@ -5,25 +5,25 @@ package(default_visibility = ["//visibility:public"])
 # Application code should always use :hardware_timer instead.
 cc_library(
     name = "hardware_timer_headers",
-    includes = ["include"],
     hdrs = ["include/hardware/timer.h"],
+    includes = ["include"],
+    visibility = ["//src/common/pico_time:__pkg__"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
-    visibility = ["//src/common/pico_time:__pkg__"],
 )
 
 cc_library(
     name = "hardware_timer",
-    includes = ["include"],
+    srcs = ["timer.c"],
     hdrs = ["include/hardware/timer.h"],
+    includes = ["include"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
-        "//src/rp2_common/hardware_claim:hardware_claim",
-        "//src/rp2_common/hardware_irq:hardware_irq",
-        "//src/rp2_common/hardware_sync:hardware_sync",
+        "//src/rp2_common/hardware_claim",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_sync",
         "//src/rp2_common/pico_platform:hardware_structs",
     ],
-    srcs = ["timer.c"],
 )

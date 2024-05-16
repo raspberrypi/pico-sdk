@@ -2,25 +2,25 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_util",
-    includes = ["include"],
-    hdrs = [
-        "include/pico/util/datetime.h",
-        "include/pico/util/pheap.h",
-        "include/pico/util/queue.h",
-    ],
-    deps = [
-        "//src/common/pico_base:pico_base_interface",
-        "//src/common/pico_sync:pico_sync",
-        "//src/rp2_common/hardware_sync:hardware_sync",
-    ],
     srcs = [
         "datetime.c",
         "pheap.c",
         "queue.c",
     ],
+    hdrs = [
+        "include/pico/util/datetime.h",
+        "include/pico/util/pheap.h",
+        "include/pico/util/queue.h",
+    ],
+    includes = ["include"],
     # TODO: Add `select()` for host redirections.
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
+    deps = [
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_sync",
+        "//src/rp2_common/hardware_sync",
+    ],
 )

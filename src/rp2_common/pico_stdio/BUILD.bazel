@@ -5,11 +5,11 @@ package(default_visibility = ["//visibility:public"])
 # Application code should always use :pico_stdio instead.
 cc_library(
     name = "pico_stdio_headers",
-    includes = ["include"],
     hdrs = [
         "include/pico/stdio.h",
         "include/pico/stdio/driver.h",
     ],
+    includes = ["include"],
     visibility = [
         "//src/rp2_common/pico_stdio_semihosting:__pkg__",
         "//src/rp2_common/pico_stdio_uart:__pkg__",
@@ -20,21 +20,12 @@ cc_library(
 
 cc_library(
     name = "pico_stdio",
-    includes = ["include"],
+    srcs = ["stdio.c"],
     hdrs = [
         "include/pico/stdio.h",
         "include/pico/stdio/driver.h",
     ],
-    deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/common/pico_sync:pico_sync",
-        "//src/common/pico_time:pico_time",
-        "//src/rp2_common/pico_printf:pico_printf",
-    ] + select({
-        "//bazel/constraint:stdio_semihosting": ["//src/rp2_common/pico_stdio_semihosting:pico_stdio_semihosting"],
-        "//bazel/constraint:stdio_uart": ["//src/rp2_common/pico_stdio_uart:pico_stdio_uart"],
-        "//bazel/constraint:stdio_usb": ["//src/rp2_common/pico_stdio_usb:pico_stdio_usb"],
-    }),
+    includes = ["include"],
     linkopts = [
         "-Wl,--wrap=printf",
         "-Wl,--wrap=vprintf",
@@ -42,6 +33,15 @@ cc_library(
         "-Wl,--wrap=putchar",
         "-Wl,--wrap=getchar",
     ],
-    alwayslink=True,  # Ensures the wrapped symbols are linked in.
-    srcs = ["stdio.c"],
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_sync",
+        "//src/common/pico_time",
+        "//src/rp2_common/pico_printf",
+    ] + select({
+        "//bazel/constraint:stdio_semihosting": ["//src/rp2_common/pico_stdio_semihosting"],
+        "//bazel/constraint:stdio_uart": ["//src/rp2_common/pico_stdio_uart"],
+        "//bazel/constraint:stdio_usb": ["//src/rp2_common/pico_stdio_usb"],
+    }),
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )

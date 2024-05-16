@@ -2,17 +2,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_mem_ops",
-    includes = ["include"],
-    hdrs = ["include/pico/mem_ops.h"],
-    deps = [
-        "//src/common/pico_base:pico_base",
-        "//src/rp2_common/pico_bootrom:pico_bootrom",
-        "//src/rp2_common/pico_platform:pico_platform",
-    ],
     srcs = [
         "mem_ops.c",
         "mem_ops_aeabi.S",
     ],
+    hdrs = ["include/pico/mem_ops.h"],
+    includes = ["include"],
     linkopts = [
         "-Wl,--wrap=memcpy",
         "-Wl,--wrap=memset",
@@ -23,5 +18,10 @@ cc_library(
         "-Wl,--wrap=__aeabi_memcpy8",
         "-Wl,--wrap=__aeabi_memset8",
     ],
-    alwayslink=True,  # Ensures the wrapped symbols are linked in.
+    deps = [
+        "//src/common/pico_base",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_platform",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )
