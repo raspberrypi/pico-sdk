@@ -416,9 +416,6 @@ wrapper_func __aeabi_dcmpun
    movs r0, #1
    bx lr
 
-    movs r0, #0
-    bx lr
-
 // double FUNC_NAME(__aeabi_ui2d)(unsigned)             unsigned to double (double precision) conversion
 double_wrapper_section __aeabi_ui2d
     shimmable_table_tail_call SF_TABLE_UINT2FLOAT uint2double_shim
