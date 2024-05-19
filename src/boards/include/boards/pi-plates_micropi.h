@@ -10,8 +10,6 @@
 // -----------------------------------------------------
 
 // Board definition for the Pi-Plates MICROPi processor board
-//
-// This header may be included by other board headers as "boards/micropi.h"
 
 #ifndef _BOARDS_PIPLATES_MICROPI_H_RP2040
 #define _BOARDS_PIPLATES_MICROPI_H_RP2040
