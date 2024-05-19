@@ -262,7 +262,7 @@ __force_inline static void spin_lock_unsafe_blocking(spin_lock_t *lock) {
     // Note we don't do a wfe or anything, because by convention these spin_locks are VERY SHORT LIVED and NEVER BLOCK and run
     // with INTERRUPTS disabled (to ensure that)... therefore nothing on our core could be blocking us, so we just need to wait on another core
     // anyway which should be finished soon
-    while (__builtin_expect(!*lock, 0)) {
+    while (__builtin_expect(!*lock, 0)) { // read from spinlock register (tries to acquire the lock)
         tight_loop_contents();
     }
     __mem_fence_acquire();
@@ -275,7 +275,7 @@ __force_inline static void spin_lock_unsafe_blocking(spin_lock_t *lock) {
  */
 __force_inline static void spin_unlock_unsafe(spin_lock_t *lock) {
     __mem_fence_release();
-    *lock = 0;
+    *lock = 0; // write to spinlock register (release lock)
 }
 
 /*! \brief Acquire a spin lock safely
