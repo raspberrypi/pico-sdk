@@ -9,9 +9,6 @@
 
 #include "pico.h"
 
-#include "hardware/flash.h"
-#include "pico/time.h"
-
 /** \file pico/flash.h
  *  \defgroup pico_flash pico_flash
  *

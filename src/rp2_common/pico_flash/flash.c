@@ -5,7 +5,6 @@
  */
 
 #include "pico/flash.h"
-#include "hardware/exception.h"
 #include "hardware/sync.h"
 #if PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
 #include "pico/multicore.h"
