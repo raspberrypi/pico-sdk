@@ -13,6 +13,10 @@
 auto_init_mutex(malloc_mutex);
 #endif
 
+#if PICO_DEBUG_MALLOC
+#include <stdio.h>
+#endif
+
 extern void *REAL_FUNC(malloc)(size_t size);
 extern void *REAL_FUNC(calloc)(size_t count, size_t size);
 extern void *REAL_FUNC(realloc)(void *mem, size_t size);

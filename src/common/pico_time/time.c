@@ -334,7 +334,6 @@ static void alarm_pool_dump_key(pheap_node_id_t id, void *user_data) {
 
 static int64_t repeating_timer_callback(__unused alarm_id_t id, void *user_data) {
     repeating_timer_t *rt = (repeating_timer_t *)user_data;
-    assert(rt->alarm_id == id);
     if (rt->callback(rt)) {
         return rt->delay_us;
     } else {

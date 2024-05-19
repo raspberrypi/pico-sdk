@@ -14,7 +14,7 @@
 /** \file hardware/adc.h
  *  \defgroup hardware_adc hardware_adc
  *
- * Analog to Digital Converter (ADC) API
+ * \brief Analog to Digital Converter (ADC) API
  *
  * The RP2040 has an internal analogue-digital converter (ADC) with the following features:
  * - SAR ADC

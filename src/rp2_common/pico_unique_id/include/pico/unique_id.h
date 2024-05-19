@@ -16,7 +16,7 @@ extern "C" {
 /** \file pico/unique_id.h
  *  \defgroup pico_unique_id pico_unique_id
  *
- * Unique device ID access API
+ * \brief Unique device ID access API
  *
  * RP2040 does not have an on-board unique identifier (all instances of RP2040
  * silicon are identical and have no persistent state). However, RP2040 boots

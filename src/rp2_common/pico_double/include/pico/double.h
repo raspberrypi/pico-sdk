@@ -18,7 +18,7 @@ extern "C" {
 /** \file double.h
 *  \defgroup pico_double pico_double
 *
-* Optimized double-precision floating point functions
+* \brief Optimized double-precision floating point functions
 *
 * (Replacement) optimized implementations are provided of the following compiler built-ins
 * and math library functions:

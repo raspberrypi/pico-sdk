@@ -42,7 +42,7 @@ extern "C" {
 /** \file hardware/uart.h
  *  \defgroup hardware_uart hardware_uart
  *
- * Hardware UART API
+ * \brief Hardware UART API
  *
  * RP2040 has 2 identical instances of a UART peripheral, based on the ARM PL011. Each UART can be connected to a number
  * of GPIO pins as defined in the GPIO muxing.

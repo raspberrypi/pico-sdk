@@ -9,7 +9,7 @@
 
 /** \file stdio.h
 *  \defgroup pico_stdio pico_stdio
-* Customized stdio support allowing for input and output from UART, USB, semi-hosting etc.
+* \brief Customized stdio support allowing for input and output from UART, USB, semi-hosting etc.
 *
 * Note the API for adding additional input output devices is not yet considered stable
 */

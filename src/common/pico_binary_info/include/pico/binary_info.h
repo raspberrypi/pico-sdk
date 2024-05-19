@@ -10,7 +10,7 @@
 /** \file binary_info.h
  *  \defgroup pico_binary_info pico_binary_info
  *
- * Binary info is intended for embedding machine readable information with the binary in FLASH.
+ * \brief Binary info is intended for embedding machine readable information with the binary in FLASH.
  *
  * Example uses include:
  *

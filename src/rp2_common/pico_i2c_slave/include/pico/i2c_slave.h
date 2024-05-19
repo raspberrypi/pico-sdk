@@ -17,7 +17,7 @@ extern "C" {
 /** \file pico/i2c_slave.h
  * \defgroup pico_i2c_slave pico_i2c_slave
  *
- * Functions providing an interrupt driven I2C slave interface.
+ * \brief Functions providing an interrupt driven I2C slave interface.
  *
  * This I2C slave helper library configures slave mode and hooks the relevant I2C IRQ
  * so that a user supplied handler is called with enumerated I2C events.
@@ -32,9 +32,9 @@ extern "C" {
  */
 typedef enum i2c_slave_event_t
 {
-    I2C_SLAVE_RECEIVE, /**< Data from master is available for reading. Slave must read from Rx FIFO. */
-    I2C_SLAVE_REQUEST, /**< Master is requesting data. Slave must write into Tx FIFO. */
-    I2C_SLAVE_FINISH, /**< Master has sent a Stop or Restart signal. Slave may prepare for the next transfer. */
+    I2C_SLAVE_RECEIVE, ///< Data from master is available for reading. Slave must read from Rx FIFO.
+    I2C_SLAVE_REQUEST, ///< Master is requesting data. Slave must write into Tx FIFO.
+    I2C_SLAVE_FINISH, ///< Master has sent a Stop or Restart signal. Slave may prepare for the next transfer.
 } i2c_slave_event_t;
 
 /**

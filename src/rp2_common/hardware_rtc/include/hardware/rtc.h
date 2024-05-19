@@ -13,7 +13,7 @@
 /** \file hardware/rtc.h
  *  \defgroup hardware_rtc hardware_rtc
  *
- * Hardware Real Time Clock API
+ * \brief Hardware Real Time Clock API
  *
  * The RTC keeps track of time in human readable format and generates events when the time is equal
  * to a preset value. Think of a digital clock, not epoch time used by most computers. There are seven
@@ -54,7 +54,7 @@ void rtc_init(void);
  * \param t Pointer to a \ref datetime_t structure contains time to set
  * \return true if set, false if the passed in datetime was invalid.
  */
-bool rtc_set_datetime(datetime_t *t);
+bool rtc_set_datetime(const datetime_t *t);
 
 /*! \brief Get the current time from the RTC
  *  \ingroup hardware_rtc
@@ -76,7 +76,7 @@ bool rtc_running(void);
  *  \param t Pointer to a \ref datetime_t structure containing a time in the future to fire the alarm. Any values set to -1 will not be matched on.
  *  \param user_callback pointer to a \ref rtc_callback_t to call when the alarm fires
  */
-void rtc_set_alarm(datetime_t *t, rtc_callback_t user_callback);
+void rtc_set_alarm(const datetime_t *t, rtc_callback_t user_callback);
 
 /*! \brief Enable the RTC alarm (if inactive)
  *  \ingroup hardware_rtc

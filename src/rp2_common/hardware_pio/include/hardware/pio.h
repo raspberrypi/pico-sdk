@@ -22,7 +22,7 @@
 /** \file hardware/pio.h
  *  \defgroup hardware_pio hardware_pio
  *
- * Programmable I/O (PIO) API
+ * \brief Programmable I/O (PIO) API
  *
  * A programmable input/output block (PIO) is a versatile hardware interface which
  * can support a number of different IO standards. There are two PIO blocks in the RP2040.

@@ -74,6 +74,7 @@ void lock_init(lock_core_t *core, uint lock_num);
 #ifndef lock_owner_id_t
 /*! \brief  type to use to store the 'owner' of a lock.
  *  \ingroup lock_core
+ *
  * By default this is int8_t as it only needs to store the core number or -1, however it may be
  * overridden if a larger type is required (e.g. for an RTOS task id)
  */
@@ -90,6 +91,7 @@ void lock_init(lock_core_t *core, uint lock_num);
 #ifndef lock_get_caller_owner_id
 /*! \brief  return the owner id for the caller
  *  \ingroup lock_core
+ *
  * By default this returns the calling core number, but may be overridden (e.g. to return an RTOS task id)
  */
 #define lock_get_caller_owner_id() ((lock_owner_id_t)get_core_num())

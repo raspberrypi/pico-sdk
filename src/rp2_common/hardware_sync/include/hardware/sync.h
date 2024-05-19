@@ -18,7 +18,7 @@ extern "C" {
 /** \file hardware/sync.h
  *  \defgroup hardware_sync hardware_sync
  *
- * Low level hardware spin locks, barrier and processor event APIs
+ * \brief Low level hardware spin locks, barrier and processor event APIs
  *
  * Spin Locks
  * ----------
@@ -262,7 +262,9 @@ __force_inline static void spin_lock_unsafe_blocking(spin_lock_t *lock) {
     // Note we don't do a wfe or anything, because by convention these spin_locks are VERY SHORT LIVED and NEVER BLOCK and run
     // with INTERRUPTS disabled (to ensure that)... therefore nothing on our core could be blocking us, so we just need to wait on another core
     // anyway which should be finished soon
-    while (__builtin_expect(!*lock, 0)); // read from spinlock register (tries to acquire the lock)
+    while (__builtin_expect(!*lock, 0)) { // read from spinlock register (tries to acquire the lock)
+        tight_loop_contents();
+    }
     __mem_fence_acquire();
 }
 

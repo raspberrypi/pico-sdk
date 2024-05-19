@@ -23,7 +23,7 @@ extern "C" {
 /** \file hardware/pwm.h
  *  \defgroup hardware_pwm hardware_pwm
  *
- * Hardware Pulse Width Modulation (PWM) API
+ * \brief Hardware Pulse Width Modulation (PWM) API
  *
  * The RP2040 PWM block has 8 identical slices. Each slice can drive two PWM output signals, or
  * measure the frequency or duty cycle of an input signal. This gives a total of up to 16 controllable

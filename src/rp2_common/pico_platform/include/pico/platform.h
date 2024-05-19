@@ -10,7 +10,7 @@
 /** \file platform.h
  *  \defgroup pico_platform pico_platform
  *
- * Macros and definitions (and functions when included by non assembly code) for the RP2 family device / architecture
+ * \brief Macros and definitions (and functions when included by non assembly code) for the RP2 family device / architecture
  * to provide a common abstraction over low level compiler / platform specifics.
  *
  * This header may be included by assembly code
