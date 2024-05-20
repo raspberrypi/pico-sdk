@@ -1,8 +1,8 @@
-# PICO_CMAKE_CONFIG: PICO_STDIO_UART, OPTION: Globally enable stdio UART, default=1, group=pico_stdlib
+# PICO_CMAKE_CONFIG: PICO_STDIO_UART, OPTION: Globally enable stdio UART, type=bool, default=1, group=pico_stdlib
 option(PICO_STDIO_UART "Globally enable stdio UART" 1)
-# PICO_CMAKE_CONFIG: PICO_STDIO_USB, OPTION: Globally enable stdio USB, default=0, group=pico_stdlib
+# PICO_CMAKE_CONFIG: PICO_STDIO_USB, OPTION: Globally enable stdio USB, type=bool, default=0, group=pico_stdlib
 option(PICO_STDIO_USB "Globally enable stdio USB" 0)
-# PICO_CMAKE_CONFIG: PICO_STDIO_SEMIHOSTING, OPTION: Globally enable stdio semihosting, default=0, group=pico_stdlib
+# PICO_CMAKE_CONFIG: PICO_STDIO_SEMIHOSTING, OPTION: Globally enable stdio semihosting, type=bool, default=0, group=pico_stdlib
 option(PICO_STDIO_SEMIHOSTING "Globally enable stdio semi-hosting" 0)
 
 if (NOT TARGET pico_stdlib)

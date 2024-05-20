@@ -1,4 +1,4 @@
-# PICO_CMAKE_CONFIG: PICO_PLATFORM, platform to build for e.g. rp2040/host, default=rp2040 or environment value, group=build
+# PICO_CMAKE_CONFIG: PICO_PLATFORM, platform to build for e.g. rp2040/host, type=string, default=rp2040 or environment value, group=build
 if (DEFINED ENV{PICO_PLATFORM} AND (NOT PICO_PLATFORM))
     set(PICO_PLATFORM $ENV{PICO_PLATFORM})
     message("Using PICO_PLATFORM from environment ('${PICO_PLATFORM}')")
@@ -13,7 +13,7 @@ endif ()
 
 set(PICO_PLATFORM ${PICO_PLATFORM} CACHE STRING "PICO Build platform (e.g. rp2040, host)")
 
-# PICO_CMAKE_CONFIG: PICO_CMAKE_PRELOAD_PLATFORM_FILE, custom CMake file to use to set up the platform environment, default=none, group=build
+# PICO_CMAKE_CONFIG: PICO_CMAKE_PRELOAD_PLATFORM_FILE, custom CMake file to use to set up the platform environment, type=string, group=build
 set(PICO_CMAKE_PRELOAD_PLATFORM_FILE "" CACHE INTERNAL "")
 set(PICO_CMAKE_PRELOAD_PLATFORM_DIR "${CMAKE_CURRENT_LIST_DIR}/preload/platforms" CACHE INTERNAL "")
 
