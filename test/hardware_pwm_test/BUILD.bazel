@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "hardware_pwm_test",
+    srcs = ["hardware_pwm_test.c"],
+    deps = [
+        "//src/common/pico_stdlib:pico_stdlib",
+        "//src/common/pico_time:pico_time",
+        "//src/rp2_common/hardware_irq:hardware_irq",
+        "//src/rp2_common/hardware_pwm:hardware_pwm",
+        "//src/rp2_common/hardware_resets:hardware_resets",
+        "//test/pico_test:pico_test",
+    ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    testonly = True,
+)

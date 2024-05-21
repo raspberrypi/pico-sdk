@@ -1,0 +1,31 @@
+load("//bazel/util:define_transition.bzl", "binary_with_overridden_defines")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_time_test_actual",
+    srcs = ["pico_time_test.c"],
+    deps = [
+        "//src/common/pico_stdlib:pico_stdlib",
+        "//test/pico_test:pico_test",
+    ],
+    testonly = True,
+    # Doesn't appear to work on host builds yet.
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    tags = ["manual"],
+)
+
+binary_with_overridden_defines(
+    name = "pico_time_test",
+    binary = ":pico_time_test_actual",
+    defines = ["PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS=250"],
+    testonly = True,
+    # Doesn't appear to work on host builds yet.
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)

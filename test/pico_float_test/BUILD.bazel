@@ -1,0 +1,41 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_float_test",
+    includes = ["llvm"],
+    srcs = [
+        "llvm/call_apsr.h",
+        "llvm/call_apsr.S",
+        "pico_float_test.c",
+    ],
+    deps = [
+        "//src/common/pico_stdlib",
+        "//src/rp2_common/pico_platform",
+        "//src/rp2_common/pico_float",
+    ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    testonly = True,
+)
+
+cc_binary(
+    name = "pico_double_test",
+    includes = ["llvm"],
+    srcs = [
+        "llvm/call_apsr.h",
+        "llvm/call_apsr.S",
+        "pico_double_test.c",
+    ],
+    deps = [
+        "//src/common/pico_stdlib",
+        "//src/rp2_common/pico_platform",
+        "//src/rp2_common/pico_double",
+    ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    testonly = True,
+)

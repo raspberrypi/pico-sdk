@@ -1,0 +1,16 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_stdio_test",
+    srcs = ["pico_stdio_test.c"],
+    deps = [
+        "//src/common/pico_stdlib:pico_stdlib",
+        "//src/rp2_common/pico_multicore:pico_multicore",
+        "//test/pico_test:pico_test",
+    ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    testonly = True,
+)

@@ -1,0 +1,11 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_stdlib_test",
+    srcs = ["pico_stdlib_test.c"],
+    deps = [
+        "//src/common/pico_bit_ops:pico_bit_ops",
+        "//src/common/pico_stdlib:pico_stdlib",
+    ],
+    testonly = True,
+)
