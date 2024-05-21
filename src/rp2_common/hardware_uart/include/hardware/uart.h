@@ -312,6 +312,7 @@ static inline bool uart_is_readable(uart_inst_t *uart) {
  *  \ingroup hardware_uart
  *
  * This function will block until all the data has been sent to the UART transmit buffer
+ * To check for UART Tx FIFO empty, please see: uart_tx_wait_blocking()
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param src The bytes to send
