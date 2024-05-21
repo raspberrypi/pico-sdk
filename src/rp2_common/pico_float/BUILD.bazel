@@ -6,7 +6,6 @@ cc_library(
         "float_aeabi.S",
         "float_init_rom.c",
         "float_math.c",
-        "float_none.S",
         "float_v1_rom_shim.S",
     ],
     hdrs = ["include/pico/float.h"],
@@ -82,3 +81,5 @@ cc_library(
     ],
     alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )
+
+# TODO: Support float_none.S

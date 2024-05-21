@@ -6,7 +6,6 @@ cc_library(
         "double_aeabi.S",
         "double_init_rom.c",
         "double_math.c",
-        "double_none.S",
         "double_v1_rom_shim.S",
     ],
     hdrs = ["include/pico/double.h"],
@@ -82,3 +81,5 @@ cc_library(
     ],
     alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )
+
+# TODO: Support double_none.S

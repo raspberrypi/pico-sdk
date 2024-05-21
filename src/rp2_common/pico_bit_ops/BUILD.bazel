@@ -17,6 +17,7 @@ cc_library(
         "-Wl,--wrap=__clzll",
     ],
     deps = [
+        "//src/common/pico_bit_ops:pico_bit_ops_headers",
         "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_platform",
     ],
