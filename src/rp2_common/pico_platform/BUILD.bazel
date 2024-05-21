@@ -5,6 +5,10 @@ alias(
     actual = select({
         "//bazel/constraint:rp2040": "//src/rp2040/hardware_regs:platform_defs",
     }),
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
 
 alias(
@@ -12,12 +16,20 @@ alias(
     actual = select({
         "//bazel/constraint:rp2040": "//src/rp2040/hardware_regs:hardware_regs",
     }),
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
 
 alias(
     name = "hardware_structs",
     actual = select({
         "//bazel/constraint:rp2040": "//src/rp2040/hardware_structs:hardware_structs",
+    }),
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
     }),
 )
 
@@ -29,6 +41,10 @@ cc_library(
         "include/pico/platform.h",
     ],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         ":hardware_regs",
         ":platform_defs",

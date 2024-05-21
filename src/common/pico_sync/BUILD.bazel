@@ -16,14 +16,15 @@ cc_library(
         "include/pico/sync.h",
     ],
     includes = ["include"],
-    # TODO: Add `select()` for host redirections.
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_time:pico_time_headers",
-        "//src/rp2_common/hardware_sync",
-    ],
+    ] + select({
+        "//bazel/constraint:rp2": [
+            "//src/rp2_common/hardware_sync",
+        ],
+        "//bazel/constraint:host": [
+            "//src/host/hardware_sync",
+        ],
+    }),
 )

@@ -3,6 +3,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "pico_bootsel_via_double_reset",
     srcs = ["pico_bootsel_via_double_reset.c"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/common/pico_binary_info",

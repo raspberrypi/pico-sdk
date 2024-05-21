@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["include/pico/bit_ops.h"],
     includes = ["include"],
     visibility = [
+        "//src/host/pico_bit_ops:__pkg__",
         "//src/rp2_common/pico_bit_ops:__pkg__",
     ],
     deps = [
@@ -19,13 +20,10 @@ cc_library(
     name = "pico_bit_ops",
     hdrs = ["include/pico/bit_ops.h"],
     includes = ["include"],
-    # TODO: Add `select()` for host redirections.
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
     deps = [
         "//src/common/pico_base",
-        "//src/rp2_common/pico_bit_ops",
-    ],
+    ] + select({
+        "//bazel/constraint:host": ["//src/host/pico_bit_ops"],
+        "//bazel/constraint:rp2": ["//src/rp2_common/pico_bit_ops"],
+    }),
 )

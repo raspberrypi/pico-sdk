@@ -5,6 +5,10 @@ cc_library(
     srcs = ["claim.c"],
     hdrs = ["include/hardware/claim.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_base:pico_platform",

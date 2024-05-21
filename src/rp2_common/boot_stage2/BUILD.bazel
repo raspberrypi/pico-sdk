@@ -23,6 +23,10 @@ cc_library(
         "asminclude",
         "include",
     ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     visibility = ["//src/rp2_common/pico_standard_link:__pkg__"],
 )
 
@@ -45,6 +49,10 @@ cc_binary(
     # rp2040_bootloader_binary transition forcibly clobbers --custom_malloc.
     malloc = ":no_malloc",
     tags = ["manual"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "boot_stage2.ld",
         ":config",
@@ -63,6 +71,10 @@ objcopy_to_bin(
     name = "boot_stage2_bin",
     src = ":boot_stage2_elf",
     out = "boot_stage2.bin",
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
 
 # WORKAROUND: Python rules always require a .py extension.
@@ -70,11 +82,13 @@ copy_file(
     name = "copy_tool_to_py",
     src = "pad_checksum",
     out = "pad_checksum_tool.py",
+    target_compatible_with = ["//bazel/constraint:host"],
 )
 
 py_binary(
     name = "pad_checksum_tool",
     srcs = ["pad_checksum_tool.py"],
+    target_compatible_with = ["//bazel/constraint:host"],
 )
 
 run_binary(
@@ -86,12 +100,20 @@ run_binary(
         "$(location boot_stage2_bin)",
         "$(location boot_stage2.S)",
     ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     tool = ":pad_checksum_tool",
 )
 
 cc_library(
     name = "boot_stage2",
     srcs = [":boot_stage2_padded"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     visibility = ["//visibility:public"],
     # This isn't referenced as a symbol, so alwayslink is required to ensure
     # it doesn't get dropped before the linker script can find it.

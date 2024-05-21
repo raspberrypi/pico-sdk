@@ -7,6 +7,10 @@ cc_library(
     name = "hardware_timer_headers",
     hdrs = ["include/hardware/timer.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     visibility = ["//src/common/pico_time:__pkg__"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
@@ -19,6 +23,10 @@ cc_library(
     srcs = ["timer.c"],
     hdrs = ["include/hardware/timer.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/hardware_claim",

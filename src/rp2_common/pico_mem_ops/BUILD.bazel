@@ -18,6 +18,10 @@ cc_library(
         "-Wl,--wrap=__aeabi_memcpy8",
         "-Wl,--wrap=__aeabi_memset8",
     ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/rp2_common/pico_bootrom",

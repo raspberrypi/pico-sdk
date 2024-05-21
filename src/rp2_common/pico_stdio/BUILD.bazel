@@ -10,6 +10,10 @@ cc_library(
         "include/pico/stdio/driver.h",
     ],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     visibility = [
         "//src/rp2_common/pico_stdio_semihosting:__pkg__",
         "//src/rp2_common/pico_stdio_uart:__pkg__",
@@ -33,6 +37,10 @@ cc_library(
         "-Wl,--wrap=putchar",
         "-Wl,--wrap=getchar",
     ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/common/pico_sync",

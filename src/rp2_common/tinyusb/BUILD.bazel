@@ -7,6 +7,10 @@ cc_library(
         "CFG_TUSB_MCU=OPT_MCU_RP2040",
         "CFG_TUSB_OS=OPT_OS_PICO",
     ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/common/pico_binary_info",

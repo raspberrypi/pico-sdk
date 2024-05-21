@@ -35,6 +35,10 @@ cc_library(
     #     hci_dump_segger_rtt_stdout.h
     #     hci_transport.h
     tags = ["manual"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/common/pico_time",

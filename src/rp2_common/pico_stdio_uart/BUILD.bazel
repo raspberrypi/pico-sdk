@@ -5,6 +5,10 @@ cc_library(
     srcs = ["stdio_uart.c"],
     hdrs = ["include/pico/stdio_uart.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_binary_info",
         "//src/rp2_common/hardware_gpio",

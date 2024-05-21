@@ -5,6 +5,10 @@ cc_library(
     srcs = ["multicore.c"],
     hdrs = ["include/pico/multicore.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/common/pico_sync",

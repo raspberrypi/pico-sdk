@@ -5,6 +5,10 @@ cc_library(
     srcs = ["exception.c"],
     hdrs = ["include/hardware/exception.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/rp2_common/hardware_base",

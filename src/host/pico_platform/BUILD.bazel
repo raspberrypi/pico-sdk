@@ -6,6 +6,7 @@ cc_library(
         "include/hardware/platform_defs.h",
     ],
     includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
 )
 
 cc_library(
@@ -15,6 +16,7 @@ cc_library(
         "include/pico/platform.h",
     ],
     includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
     deps = [
         ":platform_defs",
         "//src/common/pico_base:pico_base_interface",

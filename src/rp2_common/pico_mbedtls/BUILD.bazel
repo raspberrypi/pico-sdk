@@ -3,6 +3,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "pico_mbedtls",
     srcs = ["pico_mbedtls.c"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/rp2_common/pico_platform",
         "//src/rp2_common/pico_rand",

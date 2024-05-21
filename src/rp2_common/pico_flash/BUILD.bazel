@@ -9,6 +9,10 @@ cc_library(
     #     FreeRTOS.h
     #     task.h
     tags = ["manual"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/common/pico_time",

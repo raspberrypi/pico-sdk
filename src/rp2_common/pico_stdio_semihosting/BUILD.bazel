@@ -5,6 +5,10 @@ cc_library(
     srcs = ["stdio_semihosting.c"],
     hdrs = ["include/pico/stdio_semihosting.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_binary_info",
         "//src/rp2_common/pico_stdio:pico_stdio_headers",

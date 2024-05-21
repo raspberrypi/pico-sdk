@@ -5,6 +5,10 @@ cc_library(
     srcs = ["i2c.c"],
     hdrs = ["include/hardware/i2c.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/common/pico_time",

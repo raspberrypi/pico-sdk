@@ -4,6 +4,10 @@ cc_library(
     name = "rename_exceptions",
     hdrs = ["include/cmsis/rename_exceptions.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
 
 cc_library(
@@ -28,6 +32,10 @@ cc_library(
         "stub/CMSIS/Core/Include",
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include",
     ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/rp2_common/hardware_clocks",
     ],

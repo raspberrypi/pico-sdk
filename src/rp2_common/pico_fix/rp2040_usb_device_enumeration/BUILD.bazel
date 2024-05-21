@@ -5,6 +5,10 @@ cc_library(
     srcs = ["rp2040_usb_device_enumeration.c"],
     hdrs = ["include/pico/fix/rp2040_usb_device_enumeration.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base",
         "//src/common/pico_time",

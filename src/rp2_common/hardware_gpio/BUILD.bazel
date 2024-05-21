@@ -5,6 +5,10 @@ cc_library(
     srcs = ["gpio.c"],
     hdrs = ["include/hardware/gpio.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_binary_info",

@@ -2,4 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_cxx_options",
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )

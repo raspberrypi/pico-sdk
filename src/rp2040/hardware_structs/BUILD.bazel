@@ -40,4 +40,5 @@ cc_library(
         "include/hardware/structs/xosc.h",
     ],
     includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:rp2040"],
 )

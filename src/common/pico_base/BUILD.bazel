@@ -61,6 +61,7 @@ cc_library(
         "//src/common/pico_sync:__pkg__",
         "//src/common/pico_time:__pkg__",
         "//src/common/pico_util:__pkg__",
+        "//src/host/hardware_timer:__pkg__",
         "//src/host/pico_platform:__pkg__",
         "//src/rp2_common/boot_stage2:__pkg__",
         "//src/rp2_common/hardware_claim:__pkg__",
@@ -94,10 +95,16 @@ cc_library(
         # via an intermediate.
         ":pico_platform",
         ":pico_base_interface",
-        "//src/rp2_common/cmsis:cmsis_core",
-        "//src/rp2_common/boot_stage2",
-        "//src/rp2_common/pico_bootrom",
-        "//src/rp2_common/pico_runtime",
-        "//src/rp2_common/pico_standard_link",
-    ],
+    ] + select({
+        "//bazel/constraint:rp2": [
+            "//src/rp2_common/boot_stage2",
+            "//src/rp2_common/cmsis:cmsis_core",
+            "//src/rp2_common/pico_bootrom",
+            "//src/rp2_common/pico_runtime",
+            "//src/rp2_common/pico_standard_link",
+        ],
+        "//bazel/constraint:host": [
+            "//src/host/pico_platform",
+        ],
+    }),
 )

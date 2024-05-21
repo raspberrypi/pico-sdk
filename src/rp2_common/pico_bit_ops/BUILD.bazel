@@ -16,6 +16,10 @@ cc_library(
         "-Wl,--wrap=__clzsi2",
         "-Wl,--wrap=__clzll",
     ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_bit_ops:pico_bit_ops_headers",
         "//src/rp2_common/pico_bootrom",

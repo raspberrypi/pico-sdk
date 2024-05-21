@@ -7,6 +7,10 @@ cc_library(
     name = "hardware_sync_headers",
     hdrs = ["include/hardware/sync.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     visibility = ["//src/rp2_common/hardware_claim:__pkg__"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
@@ -20,6 +24,10 @@ cc_library(
     srcs = ["sync.c"],
     hdrs = ["include/hardware/sync.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/hardware_base",

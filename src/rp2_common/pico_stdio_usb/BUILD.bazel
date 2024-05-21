@@ -1,5 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
+# Picotool requires this, so it should work on host as well as rp2.
 cc_library(
     name = "reset_interface_headers",
     hdrs = ["include/pico/stdio_usb/reset_interface.h"],
@@ -11,12 +12,20 @@ cc_library(
     name = "tusb_config",
     hdrs = ["include/tusb_config.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )
 
 cc_library(
     name = "pico_stdio_usb_headers",
     hdrs = ["include/pico/stdio_usb.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     visibility = [
         ":__pkg__",
         "//src/rp2_common/tinyusb:__pkg__",
@@ -30,7 +39,12 @@ cc_library(
         "stdio_usb.c",
         "stdio_usb_descriptors.c",
     ],
-    target_compatible_with = ["//bazel/constraint:stdio_usb"],
+    target_compatible_with = [
+        "//bazel/constraint:stdio_usb",
+    ] + select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         ":pico_stdio_usb_headers",
         ":reset_interface_headers",

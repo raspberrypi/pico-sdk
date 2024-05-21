@@ -11,6 +11,10 @@ cc_library(
     linkopts = [
         "-T$(location memmap_default.ld)",
     ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "memmap_default.ld",
         "//src/common/pico_base:pico_base_interface",

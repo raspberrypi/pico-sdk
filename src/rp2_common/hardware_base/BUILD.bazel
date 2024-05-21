@@ -4,4 +4,8 @@ cc_library(
     name = "hardware_base",
     hdrs = ["include/hardware/address_mapped.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
 )

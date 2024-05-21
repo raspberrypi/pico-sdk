@@ -11,6 +11,10 @@ cc_library(
         "-Wl,--wrap=__aeabi_uidivmod",
         "-Wl,--wrap=__aeabi_uldivmod",
     ],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/rp2_common/hardware_divider",
         "//src/rp2_common/pico_platform",

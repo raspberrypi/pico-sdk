@@ -7,6 +7,10 @@ cc_library(
     name = "hardware_clocks_headers",
     hdrs = ["include/hardware/clocks.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     visibility = [
         "//src/rp2_common/hardware_pll:__pkg__",
         "//src/rp2_common/hardware_xosc:__pkg__",
@@ -22,6 +26,10 @@ cc_library(
     srcs = ["clocks.c"],
     hdrs = ["include/hardware/clocks.h"],
     includes = ["include"],
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/hardware_gpio",
