@@ -1,15 +1,17 @@
+load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+
 package(default_visibility = ["//visibility:public"])
 
-genrule(
+run_binary(
     name = "version_header",
-    srcs = [
-        "//:pico_sdk_version.cmake",
-        "include/pico/version.h.in",
-    ],
+    srcs = ["include/pico/version.h.in"],
     outs = ["generated_include/pico/version.h"],
-    cmd = "$(location //bazel:parse_version) $(location //:pico_sdk_version.cmake)  --template=$(location include/pico/version.h.in) > $@",
-    cmd_bat = "$(location //bazel:parse_version) $(location //:pico_sdk_version.cmake)  --template=$(location include/pico/version.h.in) > $@",
-    tools = ["//bazel:parse_version"],
+    args = [
+        "--version-string={}".format(module_version()),
+        "--template=$(location include/pico/version.h.in)",
+        "--output=$(location generated_include/pico/version.h)",
+    ],
+    tool = "//bazel:generate_version_header",
     visibility = ["//visibility:private"],
 )
 

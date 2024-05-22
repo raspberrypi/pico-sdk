@@ -1,4 +1,0 @@
-exports_files(
-    ["pico_sdk_version.cmake"],
-    visibility = ["//:__subpackages__"],
-)

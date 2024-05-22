@@ -1,3 +1,5 @@
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("//bazel/toolchain:objcopy.bzl", "objcopy_to_bin")
 
 package(default_visibility = ["//visibility:private"])
@@ -48,12 +50,10 @@ objcopy_to_bin(
 )
 
 # WORKAROUND: Python rules always require a .py extension.
-genrule(
+copy_file(
     name = "copy_tool_to_py",
-    srcs = ["pad_checksum"],
-    outs = ["pad_checksum_tool.py"],
-    cmd = "cp $< $@",
-    cmd_bat = "copy $< $@",
+    src = "pad_checksum",
+    out = "pad_checksum_tool.py",
 )
 
 py_binary(
@@ -61,15 +61,16 @@ py_binary(
     srcs = ["pad_checksum_tool.py"],
 )
 
-_PAD_CHECKSUM_CMD = "$(location :pad_checksum_tool) -s 0xffffffff  $< $@"
-
-genrule(
+run_binary(
     name = "boot_stage2_padded",
     srcs = [":boot_stage2_bin"],
     outs = ["boot_stage2.S"],
-    cmd = _PAD_CHECKSUM_CMD,
-    cmd_bat = _PAD_CHECKSUM_CMD,
-    tools = [":pad_checksum_tool"],
+    args = [
+        "-s 0xffffffff",
+        "$(location boot_stage2_bin)",
+        "$(location boot_stage2.S)",
+    ],
+    tool = ":pad_checksum_tool",
 )
 
 cc_library(

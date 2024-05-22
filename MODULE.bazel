@@ -2,6 +2,8 @@ module(name = "pico-sdk", version = "1.6.0-rc1")
 
 bazel_dep(name = "platforms", version = "0.0.8")
 
+bazel_dep(name = "bazel_skylib", version = "1.6.1")
+
 # Note: rules_cc is special-cased repository; a dependency on rules_cc in a
 # module will not ensure that the root Bazel module has that same version of
 # rules_cc. For that reason, this primarily acts as a FYI. You'll still need

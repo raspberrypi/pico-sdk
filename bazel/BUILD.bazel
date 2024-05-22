@@ -1,8 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
 py_binary(
-    name = "parse_version",
-    srcs = ["parse_version.py"],
+    name = "generate_version_header",
+    srcs = ["generate_version_header.py"],
     visibility = ["//:__subpackages__"],
 )
 
