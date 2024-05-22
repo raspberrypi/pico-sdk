@@ -114,7 +114,7 @@ typedef volatile uint32_t spin_lock_t;
 
  * The SEV (send event) instruction sends an event to both cores.
  */
-#if !__has_builtin(__sev)
+#if !__has_builtin(__sev) && !defined(__sev)
 __force_inline static void __sev(void) {
     pico_default_asm_volatile ("sev");
 }
@@ -126,7 +126,7 @@ __force_inline static void __sev(void) {
  * The WFE (wait for event) instruction waits until one of a number of
  * events occurs, including events signalled by the SEV instruction on either core.
  */
-#if !__has_builtin(__wfe)
+#if !__has_builtin(__wfe) && !defined(__wfe)
 __force_inline static void __wfe(void) {
     pico_default_asm_volatile ("wfe");
 }
@@ -137,7 +137,7 @@ __force_inline static void __wfe(void) {
 *
  * The WFI (wait for interrupt) instruction waits for a interrupt to wake up the core.
  */
-#if !__has_builtin(__wfi)
+#if !__has_builtin(__wfi) && !defined(__wfi)
 __force_inline static void __wfi(void) {
     pico_default_asm_volatile("wfi");
 }
