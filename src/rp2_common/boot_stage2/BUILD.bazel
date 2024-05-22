@@ -18,7 +18,10 @@ cc_library(
         "boot2_w25x10cl.S",
         "include/boot_stage2/config.h",
     ],
-    includes = ["include"],
+    includes = [
+        "asminclude",
+        "include",
+    ],
     visibility = ["//src/rp2_common/pico_standard_link:__pkg__"],
 )
 
@@ -26,10 +29,6 @@ cc_binary(
     name = "boot_stage2_elf",
     srcs = ["compile_time_choice.S"],
     copts = ["-fPIC"],
-    includes = [
-        "asminclude",
-        "include",
-    ],
     linkopts = [
         "-Wl,--no-gc-sections",
         "-nostartfiles",
