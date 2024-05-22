@@ -46,7 +46,8 @@ cc_library(
     ],
     includes = ["include"],
 
-    # Be extra careful about who references this for now.
+    # Be extra careful about who references this for now; if users depend on
+    # this but not `pico_base` they'll end up with undefined symbols.
     # It's generally safe for anything that circularly depends on
     # //src/common/pico_base:pico_base to be added to this allowlist because
     # that implicitly means the transitive dependencies of pico_base will get

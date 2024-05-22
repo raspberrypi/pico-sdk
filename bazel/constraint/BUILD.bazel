@@ -1,20 +1,28 @@
 package(default_visibility = ["//visibility:public"])
 
+# This constraint represents the dimension that guides the Pico SDK build. This
+# constraint will only ever enumerate specific MCUs (and the host), and does NOT
+# cover the differences from board-to-board.
 constraint_setting(
     name = "sdk_target",
     default_constraint_value = "host",
 )
 
+# This constraint value is used to guide the host build.
 constraint_value(
     name = "host",
     constraint_setting = ":sdk_target",
 )
 
+# This constraint value is used to guide parts of the build that are specific
+# to the rp2040.
 constraint_value(
     name = "rp2040",
     constraint_setting = ":sdk_target",
 )
 
+# This constraint value is used to guide parts of the build that apply to all
+# rp2-class chips.
 config_setting(
     name = "rp2",
     constraint_values = [
@@ -22,21 +30,28 @@ config_setting(
     ],
 )
 
+# This constraint setting guides Bazel's build file evaluation differences
+# across different stdio configurations (e.g. stdio_usb needs TinyUSB).
 constraint_setting(
     name = "stdio_mode",
     default_constraint_value = "stdio_uart",
 )
 
+# When this constraint value is active, stdio is built against a hardware UART.
 constraint_value(
     name = "stdio_uart",
     constraint_setting = ":stdio_mode",
 )
 
+# When this constraint value is active, stdio is built against TinyUSB-based
+# USB serial.
 constraint_value(
     name = "stdio_usb",
     constraint_setting = ":stdio_mode",
 )
 
+# When this constraint value is active, stdio is built against an ARM
+# semihosting library.
 constraint_value(
     name = "stdio_semihosting",
     constraint_setting = ":stdio_mode",

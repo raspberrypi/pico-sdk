@@ -57,7 +57,8 @@ cc_feature(
     overrides = "@rules_cc//cc/toolchains/features:dbg",
 )
 
-# TODO: This is required for now, but hopefully will eventually go away.
+# TODO: https://github.com/bazelbuild/rules_cc/issues/224 - This is required for
+# now, but hopefully will eventually go away.
 cc_feature(
     name = "legacy_features",
     args = [],

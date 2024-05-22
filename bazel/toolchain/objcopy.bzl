@@ -1,4 +1,5 @@
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cpp_toolchain", "use_cc_toolchain")
+load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "OBJ_COPY_ACTION_NAME")
 
 def _objcopy_to_bin_impl(ctx):
     cc_toolchain = find_cpp_toolchain(ctx)
@@ -10,8 +11,7 @@ def _objcopy_to_bin_impl(ctx):
     )
     objcopy_tool_path = cc_common.get_tool_for_action(
         feature_configuration = feature_configuration,
-        # objcopy_embed_data is not yet provided in action_names.bzl.
-        action_name = "objcopy_embed_data",
+        action_name = OBJ_COPY_ACTION_NAME,
     )
 
     ctx.actions.run(

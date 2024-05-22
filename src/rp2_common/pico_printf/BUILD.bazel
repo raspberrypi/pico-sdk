@@ -20,4 +20,4 @@ cc_library(
     alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )
 
-# TODO: Support printf_none.S.
+# TODO: Support printf_none.S when the configuration option exists.

@@ -14,7 +14,8 @@ label_flag(
     build_setting_default = ":no_platform_headers",
 )
 
-# This should always point to a cc_library that defines PICO_CONFIG_HEADER.
+# This should always point to a cc_library that defines PICO_CONFIG_HEADER and
+# any other defines that should be applied when building the SDK.
 label_flag(
     name = "pico_config_header",
     build_setting_default = "//src/boards:default",

@@ -2,7 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 # TODO: Add a macro/helper to support the rest of the boards.
 cc_library(
-    name = "boards",
+    name = "unsupported_boards",
     srcs = [
         "include/boards/adafruit_feather_rp2040.h",
         "include/boards/adafruit_itsybitsy_rp2040.h",
@@ -17,7 +17,6 @@ cc_library(
         "include/boards/melopero_shake_rp2040.h",
         "include/boards/none.h",
         "include/boards/nullbits_bit_c_pro.h",
-        "include/boards/pico.h",
         "include/boards/pico_w.h",
         "include/boards/pimoroni_badger2040.h",
         "include/boards/pimoroni_interstate75.h",
