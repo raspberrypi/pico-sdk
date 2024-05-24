@@ -7,7 +7,9 @@ run_binary(
     srcs = ["include/pico/version.h.in"],
     outs = ["generated_include/pico/version.h"],
     args = [
-        "--version-string={}".format(module_version()),
+        "--version-string={}".format(
+            module_version() if module_version() != None else "0.0.1-WORKSPACE",
+        ),
         "--template=$(location include/pico/version.h.in)",
         "--output=$(location generated_include/pico/version.h)",
     ],
