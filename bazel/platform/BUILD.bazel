@@ -7,9 +7,3 @@ platform(
         "@platforms//cpu:armv6-m",  # This is just FYI.
     ],
 )
-
-# For now, the bootloader is effectively the same platform as the rp2040.
-platform(
-    name = "rp2040_bootloader",
-    parents = [":rp2040"],
-)

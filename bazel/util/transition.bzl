@@ -65,10 +65,8 @@ def declare_transtion(attrs, flag_overrides, executable = True):
 rp2040_bootloader_binary = declare_transtion(
     attrs = {
         "_malloc": attr.label(default = "//src/rp2_common/boot_stage2:no_malloc"),
-        "_bootloader_platform": attr.label(default = "//bazel/platform:rp2040_bootloader"),
     },
     flag_overrides = {
-        "//command_line_option:platforms": "_bootloader_platform",
         # We don't want --custom_malloc to ever apply to the bootloader, so
         # always explicitly override it here.
         "//command_line_option:custom_malloc": "_malloc",
