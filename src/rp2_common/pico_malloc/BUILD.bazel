@@ -6,10 +6,10 @@ cc_library(
     hdrs = ["include/pico/malloc.h"],
     includes = ["include"],
     linkopts = [
-        "--linkopts=malloc",
-        "--linkopts=calloc",
-        "--linkopts=realloc",
-        "--linkopts=free",
+        "-Wl,--wrap=malloc",
+        "-Wl,--wrap=calloc",
+        "-Wl,--wrap=realloc",
+        "-Wl,--wrap=free",
     ],
     deps = [
         "//src/common/pico_base",

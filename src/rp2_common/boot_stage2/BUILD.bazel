@@ -25,6 +25,12 @@ cc_library(
     visibility = ["//src/rp2_common/pico_standard_link:__pkg__"],
 )
 
+# Stub library to prevent custom malloc from getting linked in. boot2 will never
+# need malloc, so letting it link can only cause problems.
+cc_library(
+    name = "no_malloc",
+)
+
 cc_binary(
     name = "boot_stage2_elf",
     srcs = ["compile_time_choice.S"],
@@ -34,6 +40,7 @@ cc_binary(
         "-nostartfiles",
         "-T$(location boot_stage2.ld)",
     ],
+    malloc = ":no_malloc",
     deps = [
         "boot_stage2.ld",
         ":config",
