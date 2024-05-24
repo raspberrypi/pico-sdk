@@ -1,6 +1,7 @@
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("//bazel/toolchain:objcopy.bzl", "objcopy_to_bin")
+load("//bazel/util:transition.bzl", "rp2040_bootloader_binary")
 
 package(default_visibility = ["//visibility:private"])
 
@@ -32,7 +33,7 @@ cc_library(
 )
 
 cc_binary(
-    name = "boot_stage2_elf",
+    name = "boot_stage2_elf_actual",
     srcs = ["compile_time_choice.S"],
     copts = ["-fPIC"],
     linkopts = [
@@ -40,13 +41,22 @@ cc_binary(
         "-nostartfiles",
         "-T$(location boot_stage2.ld)",
     ],
+    # this does nothing if someone passes --custom_malloc, so the
+    # rp2040_bootloader_binary transition forcibly clobbers --custom_malloc.
     malloc = ":no_malloc",
+    tags = ["manual"],
     deps = [
         "boot_stage2.ld",
         ":config",
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_base:pico_platform",
     ],
+)
+
+# Always build the bootloader with the bootloader-specific platform.
+rp2040_bootloader_binary(
+    name = "boot_stage2_elf",
+    src = "boot_stage2_elf_actual",
 )
 
 objcopy_to_bin(
