@@ -16,3 +16,6 @@
 [submodule "lib/pico-vfs"]
 	path = lib/pico-vfs
 	url = https://github.com/oyama/pico-vfs
+[submodule "lib/littlefs"]
+	path = lib/littlefs
+	url = git@github.com:littlefs-project/littlefs.git
