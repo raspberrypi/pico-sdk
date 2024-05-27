@@ -13,3 +13,6 @@
 [submodule "lib/btstack"]
 	path = lib/btstack
 	url = https://github.com/bluekitchen/btstack.git
+[submodule "lib/pico-vfs"]
+	path = lib/pico-vfs
+	url = https://github.com/oyama/pico-vfs
