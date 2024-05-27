@@ -81,25 +81,44 @@ if (EXISTS ${PICO_VFS_PATH}/tests)
 
     pico_promote_common_scope_vars()
 
+    #
+    # File system enable and customise function
+    #
     function(pico_enable_filesystem TARGET)
         set(options "")
-        set(oneValueArgs SIZE AUTO_INIT)
+        set(oneValueArgs SIZE AUTO_INIT MAX_FAT_VOLUME MAX_MOUNTPOINT)
         set(multiValueArgs FS_INIT)
         cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+        # Default file system size in bytes. Must be a multiple of 4096 bytes
         if(ARG_SIZE)
             target_compile_definitions(${TARGET} PRIVATE PICO_FS_DEFAULT_SIZE=${ARG_SIZE})
         endif()
 
-       if(ARG_FS_INIT)
-           target_sources(${TARGET} PRIVATE ${ARG_FS_INIT})
-       else()
-           target_link_libraries(${TARGET} PRIVATE pico_filesystem_default)
-       endif()
+        # Add custom fs_init.c source files
+        if(ARG_FS_INIT)
+            target_sources(${TARGET} PRIVATE ${ARG_FS_INIT})
+        else()
+            target_link_libraries(${TARGET} PRIVATE pico_filesystem_default)
+        endif()
 
-       if(ARG_AUTO_INIT)
-           target_compile_definitions(${TARGET} PRIVATE PICO_FS_AUTO_INIT=1)
-       endif()
+        # Enable automatic execution of fs_init()
+        if(ARG_AUTO_INIT)
+            target_compile_definitions(${TARGET} PRIVATE PICO_FS_AUTO_INIT=1)
+        endif()
+
+        # Maximum number of file system mount points
+        if(ARG_MAX_MOUNTPOINT)
+            target_compile_definitions(${TARGET} PRIVATE PICO_VFS_MAX_MOUNTPOINT=${ARG_MAX_MOUNTPOINT})
+        else()
+            target_compile_definitions(${TARGET} PRIVATE PICO_VFS_MAX_MOUNTPOINT=8)
+        endif()
+
+        # Maximum number of volumes in a FAT file system
+        if(ARG_MAX_FAT_VOLUME)
+            target_compile_definitions(${TARGET} PRIVATE PICO_VFS_MAX_FAT_VOLUME=${ARG_MAX_FAT_VOLUME})
+        else()
+            target_compile_definitions(${TARGET} PRIVATE PICO_VFS_MAX_FAT_VOLUME=4)
+        endif()
     endfunction()
-
 endif()
