@@ -38,6 +38,12 @@ if (EXISTS ${PICO_VFS_PATH}/tests)
         hardware_sync
         )
 
+    pico_add_library(pico_filesystem_blockdevice_heap)
+    target_sources(pico_filesystem_blockdevice_heap INTERFACE
+        ${PICO_VFS_PATH}/src/blockdevice/heap.c)
+    target_include_directories(pico_filesystem_blockdevice_heap INTERFACE
+        ${PICO_VFS_PATH}/include)
+
     pico_add_library(pico_filesystem_filesystem_littlefs)
     target_sources(pico_filesystem_filesystem_littlefs INTERFACE
         ${PICO_VFS_PATH}/src/filesystem/littlefs.c

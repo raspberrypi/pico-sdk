@@ -19,3 +19,6 @@
 [submodule "lib/littlefs"]
 	path = lib/littlefs
 	url = https://github.com/littlefs-project/littlefs.git
+[submodule "littlefs"]
+	path = littlefs
+	url = git@github.com:littlefs-project/littlefs.git
