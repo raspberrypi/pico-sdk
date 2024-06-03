@@ -23,7 +23,7 @@
  * - 5 input mux:
  *  - 4 inputs that are available on package pins shared with GPIO[29:26]
  *  - 1 input is dedicated to the internal temperature sensor
- * - 4 element receive sample FIFO
+ * - 8 element receive sample FIFO
  * - Interrupt generation
  * - DMA interface
  *
@@ -36,7 +36,7 @@
  *
  * T = 27 - (ADC_Voltage - 0.706)/0.001721
  *
- * The FIFO, if used, can contain up to 4 entries.
+ * The FIFO, if used, can contain up to 8 entries.
  *
  * \subsection adc_example Example
  * \addtogroup hardware_adc
@@ -167,7 +167,7 @@ static inline void adc_set_clkdiv(float clkdiv) {
 /*! \brief Setup the ADC FIFO
  *  \ingroup hardware_adc
  *
- * FIFO is 4 samples long, if a conversion is completed and the FIFO is full, the result is dropped.
+ * FIFO is 8 samples long, if a conversion is completed and the FIFO is full, the result is dropped.
  *
  * \param en Enables write each conversion result to the FIFO
  * \param dreq_en Enable DMA requests when FIFO contains data
@@ -202,7 +202,7 @@ static inline bool adc_fifo_is_empty(void) {
 /*! \brief Get number of entries in the ADC FIFO
  *  \ingroup hardware_adc
  *
- * The ADC FIFO is 4 entries long. This function will return how many samples are currently present.
+ * The ADC FIFO is 8 entries long. This function will return how many samples are currently present.
  */
 static inline uint8_t adc_fifo_get_level(void) {
     return (adc_hw->fcs & ADC_FCS_LEVEL_BITS) >> ADC_FCS_LEVEL_LSB;
