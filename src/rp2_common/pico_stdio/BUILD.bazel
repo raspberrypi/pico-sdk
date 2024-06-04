@@ -1,0 +1,47 @@
+package(default_visibility = ["//visibility:public"])
+
+# This exists to break dependency cycles between
+# this library and the stdio implementations.
+# Application code should always use :pico_stdio instead.
+cc_library(
+    name = "pico_stdio_headers",
+    hdrs = [
+        "include/pico/stdio.h",
+        "include/pico/stdio/driver.h",
+    ],
+    includes = ["include"],
+    visibility = [
+        "//src/rp2_common/pico_stdio_semihosting:__pkg__",
+        "//src/rp2_common/pico_stdio_uart:__pkg__",
+        "//src/rp2_common/pico_stdio_usb:__pkg__",
+        "//src/rp2_common/tinyusb:__pkg__",
+    ],
+)
+
+cc_library(
+    name = "pico_stdio",
+    srcs = ["stdio.c"],
+    hdrs = [
+        "include/pico/stdio.h",
+        "include/pico/stdio/driver.h",
+    ],
+    includes = ["include"],
+    linkopts = [
+        "-Wl,--wrap=printf",
+        "-Wl,--wrap=vprintf",
+        "-Wl,--wrap=puts",
+        "-Wl,--wrap=putchar",
+        "-Wl,--wrap=getchar",
+    ],
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_sync",
+        "//src/common/pico_time",
+        "//src/rp2_common/pico_printf",
+    ] + select({
+        "//bazel/constraint:stdio_semihosting": ["//src/rp2_common/pico_stdio_semihosting"],
+        "//bazel/constraint:stdio_uart": ["//src/rp2_common/pico_stdio_uart"],
+        "//bazel/constraint:stdio_usb": ["//src/rp2_common/pico_stdio_usb"],
+    }),
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

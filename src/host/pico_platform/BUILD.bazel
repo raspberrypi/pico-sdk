@@ -1,0 +1,22 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "platform_defs",
+    hdrs = [
+        "include/hardware/platform_defs.h",
+    ],
+    includes = ["include"],
+)
+
+cc_library(
+    name = "pico_platform",
+    srcs = ["platform_base.c"],
+    hdrs = [
+        "include/pico/platform.h",
+    ],
+    includes = ["include"],
+    deps = [
+        ":platform_defs",
+        "//src/common/pico_base:pico_base_interface",
+    ],
+)

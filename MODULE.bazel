@@ -1,0 +1,71 @@
+module(name = "pico-sdk", version = "1.6.0-rc1")
+
+bazel_dep(name = "platforms", version = "0.0.8")
+
+bazel_dep(name = "bazel_skylib", version = "1.6.1")
+
+# Note: rules_cc is special-cased repository; a dependency on rules_cc in a
+# module will not ensure that the root Bazel module has that same version of
+# rules_cc. For that reason, this primarily acts as a FYI. You'll still need
+# to explicitly list this dependency in your own project's MODULE.bazel file.
+bazel_dep(name = "rules_cc", version = "0.0.10")
+
+# rules_cc v0.0.10 is not yet cut, so manually pull in the desired version.
+# This does not apply to dependent projects, so it needs to be copied to your
+# project's MODULE.bazel too.
+archive_override(
+    module_name = "rules_cc",
+    urls = "https://github.com/bazelbuild/rules_cc/archive/1acf5213b6170f1f0133e273cb85ede0e732048f.zip",
+    strip_prefix = "rules_cc-1acf5213b6170f1f0133e273cb85ede0e732048f",
+    integrity = "sha256-NddP6xi6LzsIHT8bMSVJ2NtoURbN+l3xpjvmIgB6aSg=",
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "arm_gcc_linux-x86_64",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "6cd1bbc1d9ae57312bcd169ae283153a9572bd6a8e4eeae2fedfbc33b115fdbb",
+)
+
+http_archive(
+    name = "arm_gcc_win-x86_64",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "51d933f00578aa28016c5e3c84f94403274ea7915539f8e56c13e2196437d18f",
+)
+
+http_archive(
+    name = "arm_gcc_mac-x86_64",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-x86_64-arm-none-eabi.tar.xz",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-x86_64-arm-none-eabi",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "075faa4f3e8eb45e59144858202351a28706f54a6ec17eedd88c9fb9412372cc",
+)
+
+http_archive(
+    name = "arm_gcc_mac-aarch64",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-arm64-arm-none-eabi.tar.xz",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-arm64-arm-none-eabi",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "39c44f8af42695b7b871df42e346c09fee670ea8dfc11f17083e296ea2b0d279",
+)
+
+# TODO: Provide tinyusb as a proper Bazel module.
+http_archive(
+    name = "tinyusb",
+    url = "https://github.com/hathach/tinyusb/archive/86c416d4c0fb38432460b3e11b08b9de76941bf5.zip",
+    strip_prefix = "tinyusb-86c416d4c0fb38432460b3e11b08b9de76941bf5",
+    build_file = "//src/rp2_common/tinyusb:tinyusb.BUILD",
+    sha256 = "ac57109bba00d26ffa33312d5f334990ec9a9a4d82bf890ed8b825b4610d1da2",
+)
+
+register_toolchains(
+    "//bazel/toolchain:arm_gcc_linux-x86_64",
+    "//bazel/toolchain:arm_gcc_win-x86_64",
+    "//bazel/toolchain:arm_gcc_mac-x86_64",
+    "//bazel/toolchain:arm_gcc_mac-aarch64",
+)

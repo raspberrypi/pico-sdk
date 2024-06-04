@@ -1,0 +1,34 @@
+package(default_visibility = ["//visibility:public"])
+
+py_binary(
+    name = "generate_version_header",
+    srcs = ["generate_version_header.py"],
+    visibility = ["//:__subpackages__"],
+)
+
+# This isn't actually generated, it just uses the same name
+# to make it show up easier in searches.
+#
+# Rather than generating lists of headers to match CMake, the Bazel build
+# opts to have a static header that transitively include two known headers.
+# By default, empty header files are included, and users/platforms are expected
+# to specify an appropriate `cc_library` to replace them.
+#
+# You tell bazel which `cc_library` provides the respective headers by
+# configuring these `label_flag`s:
+#
+#     # Specify the library that provides "pico_config_extra_headers.h"
+#     --@pico-sdk//bazel/config:pico_config_extra_headers=//my_proj:my_custom_headers
+#
+#     # Specify the library that provides "pico_config_platform_headers.h"
+#     --@pico-sdk//bazel/config:pico_config_platform_headers=//my_proj:my_custom_platform_headers
+cc_library(
+    name = "generate_config_header",
+    hdrs = ["include/pico/config_autogen.h"],
+    includes = ["include"],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//bazel/config:pico_config_extra_headers",
+        "//bazel/config:pico_config_platform_headers",
+    ],
+)

@@ -1,0 +1,31 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_cyw43_arch",
+    srcs = [
+        "cyw43_arch.c",
+        "cyw43_arch_freertos.c",
+        "cyw43_arch_poll.c",
+        "cyw43_arch_threadsafe_background.c",
+    ],
+    hdrs = [
+        "include/pico/cyw43_arch.h",
+        "include/pico/cyw43_arch/arch_freertos.h",
+        "include/pico/cyw43_arch/arch_poll.h",
+        "include/pico/cyw43_arch/arch_threadsafe_background.h",
+    ],
+    includes = ["include"],
+    # Missing deps for:
+    #     cyw43.h
+    #     cyw43_country.h
+    #     cyw43_ll.h
+    #     cyw43_stats.h
+    tags = ["manual"],
+    deps = [
+        "//src/common/pico_base",
+        "//src/rp2_common/pico_async_context",
+        "//src/rp2_common/pico_cyw43_driver",
+        "//src/rp2_common/pico_lwip",
+        "//src/rp2_common/pico_unique_id",
+    ],
+)

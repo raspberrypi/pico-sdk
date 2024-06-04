@@ -1,0 +1,10 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_mbedtls",
+    srcs = ["pico_mbedtls.c"],
+    deps = [
+        "//src/rp2_common/pico_platform",
+        "//src/rp2_common/pico_rand",
+    ],
+)

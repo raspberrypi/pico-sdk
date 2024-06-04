@@ -1,0 +1,26 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "tinyusb_port",
+    defines = [
+        "CFG_TUSB_DEBUG=0",
+        "CFG_TUSB_MCU=OPT_MCU_RP2040",
+        "CFG_TUSB_OS=OPT_OS_PICO",
+    ],
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_binary_info",
+        "//src/common/pico_stdlib:pico_stdlib_interface",
+        "//src/common/pico_sync",
+        "//src/common/pico_time:pico_time_headers",
+        "//src/rp2_common/hardware_gpio",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_resets",
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/hardware_uart",
+        "//src/rp2_common/pico_fix/rp2040_usb_device_enumeration",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+        "//src/rp2_common/pico_stdio_usb:pico_stdio_usb_headers",
+        "//src/rp2_common/pico_stdio_usb:tusb_config",
+    ],
+)

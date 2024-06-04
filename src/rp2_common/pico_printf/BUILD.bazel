@@ -1,0 +1,23 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_printf",
+    srcs = [
+        "printf.c",
+    ],
+    hdrs = ["include/pico/printf.h"],
+    includes = ["include"],
+    linkopts = [
+        "-Wl,--wrap=sprintf",
+        "-Wl,--wrap=snprintf",
+        "-Wl,--wrap=vsnprintf",
+    ],
+    deps = [
+        "//src/common/pico_base:pico_base_interface",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_platform",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)
+
+# TODO: Support printf_none.S when the configuration option exists.

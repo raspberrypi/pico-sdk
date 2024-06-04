@@ -1,0 +1,16 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_xosc",
+    srcs = ["xosc.c"],
+    hdrs = ["include/hardware/xosc.h"],
+    includes = ["include"],
+    deps = [
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_base:pico_platform",
+        "//src/rp2_common/hardware_clocks:hardware_clocks_headers",
+        "//src/rp2_common/pico_platform:hardware_regs",
+        "//src/rp2_common/pico_platform:hardware_structs",
+        "//src/rp2_common/pico_platform:platform_defs",
+    ],
+)

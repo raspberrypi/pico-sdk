@@ -1,0 +1,44 @@
+package(default_visibility = ["//visibility:public"])
+
+# This exists to break a dependency cycle between
+# this library and //src/common/pico_sync.
+# Application code should always use :pico_time instead.
+cc_library(
+    name = "pico_time_headers",
+    hdrs = [
+        "include/pico/time.h",
+        "include/pico/timeout_helper.h",
+    ],
+    includes = ["include"],
+    visibility = [
+        "//src/common/pico_sync:__pkg__",
+        "//src/rp2_common/tinyusb:__pkg__",
+    ],
+    deps = [
+        "//src/rp2_common/hardware_timer:hardware_timer_headers",
+    ],
+)
+
+cc_library(
+    name = "pico_time",
+    srcs = [
+        "time.c",
+        "timeout_helper.c",
+    ],
+    hdrs = [
+        "include/pico/time.h",
+        "include/pico/timeout_helper.h",
+    ],
+    includes = ["include"],
+    # TODO: Add `select()` for host redirections.
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_sync",
+        "//src/common/pico_util",
+        "//src/rp2_common/hardware_timer",
+    ],
+)

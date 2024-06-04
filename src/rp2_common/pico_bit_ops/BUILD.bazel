@@ -1,0 +1,25 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_bit_ops",
+    srcs = ["bit_ops_aeabi.S"],
+    linkopts = [
+        "-Wl,--wrap=__clzsi2",
+        "-Wl,--wrap=__clzsi2",
+        "-Wl,--wrap=__clzdi2",
+        "-Wl,--wrap=__ctzsi2",
+        "-Wl,--wrap=__ctzdi2",
+        "-Wl,--wrap=__popcountsi2",
+        "-Wl,--wrap=__popcountdi2",
+        "-Wl,--wrap=__clz",
+        "-Wl,--wrap=__clzl",
+        "-Wl,--wrap=__clzsi2",
+        "-Wl,--wrap=__clzll",
+    ],
+    deps = [
+        "//src/common/pico_bit_ops:pico_bit_ops_headers",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_platform",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

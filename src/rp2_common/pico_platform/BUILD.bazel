@@ -1,0 +1,38 @@
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "platform_defs",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/hardware_regs:platform_defs",
+    }),
+)
+
+alias(
+    name = "hardware_regs",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/hardware_regs:hardware_regs",
+    }),
+)
+
+alias(
+    name = "hardware_structs",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/hardware_structs:hardware_structs",
+    }),
+)
+
+cc_library(
+    name = "pico_platform",
+    srcs = ["platform.c"],
+    hdrs = [
+        "include/pico/asm_helper.S",
+        "include/pico/platform.h",
+    ],
+    includes = ["include"],
+    deps = [
+        ":hardware_regs",
+        ":platform_defs",
+        "//src/common/pico_base:pico_base_interface",
+        "//src/rp2_common/hardware_base",
+    ],
+)

@@ -1,0 +1,103 @@
+load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+run_binary(
+    name = "version_header",
+    srcs = ["include/pico/version.h.in"],
+    outs = ["generated_include/pico/version.h"],
+    args = [
+        "--version-string={}".format(
+            module_version() if module_version() != None else "0.0.1-WORKSPACE",
+        ),
+        "--template=$(location include/pico/version.h.in)",
+        "--output=$(location generated_include/pico/version.h)",
+    ],
+    tool = "//bazel:generate_version_header",
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
+    name = "version",
+    hdrs = ["generated_include/pico/version.h"],
+    includes = ["generated_include"],
+)
+
+alias(
+    name = "platform_defs",
+    actual = select({
+        "//bazel/constraint:host": "//src/host/pico_platform:platform_defs",
+        "//bazel/constraint:rp2": "//src/rp2_common/pico_platform:platform_defs",
+    }),
+)
+
+alias(
+    name = "pico_platform",
+    actual = select({
+        "//bazel/constraint:host": "//src/host/pico_platform:pico_platform",
+        "//bazel/constraint:rp2": "//src/rp2_common/pico_platform:pico_platform",
+    }),
+)
+
+cc_library(
+    name = "pico_base_interface",
+    hdrs = [
+        "include/pico.h",
+        "include/pico/assert.h",
+        "include/pico/config.h",
+        "include/pico/error.h",
+        "include/pico/types.h",
+    ],
+    includes = ["include"],
+
+    # Be extra careful about who references this for now; if users depend on
+    # this but not `pico_base` they'll end up with undefined symbols.
+    # It's generally safe for anything that circularly depends on
+    # //src/common/pico_base:pico_base to be added to this allowlist because
+    # that implicitly means the transitive dependencies of pico_base will get
+    # linked in.
+    visibility = [
+        "//src/common/pico_binary_info:__pkg__",
+        "//src/common/pico_sync:__pkg__",
+        "//src/common/pico_time:__pkg__",
+        "//src/common/pico_util:__pkg__",
+        "//src/host/pico_platform:__pkg__",
+        "//src/rp2_common/boot_stage2:__pkg__",
+        "//src/rp2_common/hardware_claim:__pkg__",
+        "//src/rp2_common/hardware_clocks:__pkg__",
+        "//src/rp2_common/hardware_gpio:__pkg__",
+        "//src/rp2_common/hardware_irq:__pkg__",
+        "//src/rp2_common/hardware_pll:__pkg__",
+        "//src/rp2_common/hardware_resets:__pkg__",
+        "//src/rp2_common/hardware_sync:__pkg__",
+        "//src/rp2_common/hardware_timer:__pkg__",
+        "//src/rp2_common/hardware_watchdog:__pkg__",
+        "//src/rp2_common/hardware_xosc:__pkg__",
+        "//src/rp2_common/pico_bootrom:__pkg__",
+        "//src/rp2_common/pico_malloc:__pkg__",
+        "//src/rp2_common/pico_platform:__pkg__",
+        "//src/rp2_common/pico_printf:__pkg__",
+        "//src/rp2_common/pico_runtime:__pkg__",
+        "//src/rp2_common/pico_standard_link:__pkg__",
+    ],
+    deps = [
+        ":version",
+        "//bazel:generate_config_header",
+        "//bazel/config:pico_config_header",
+    ],
+)
+
+cc_library(
+    name = "pico_base",
+    deps = [
+        # :pico_platform creates circular dependencies, so break them
+        # via an intermediate.
+        ":pico_platform",
+        ":pico_base_interface",
+        "//src/rp2_common/cmsis:cmsis_core",
+        "//src/rp2_common/boot_stage2",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_runtime",
+        "//src/rp2_common/pico_standard_link",
+    ],
+)

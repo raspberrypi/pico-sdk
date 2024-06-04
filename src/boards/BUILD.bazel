@@ -1,0 +1,105 @@
+package(default_visibility = ["//visibility:public"])
+
+# TODO: Add a macro/helper to support the rest of the boards.
+cc_library(
+    name = "unsupported_boards",
+    srcs = [
+        "include/boards/adafruit_feather_rp2040.h",
+        "include/boards/adafruit_itsybitsy_rp2040.h",
+        "include/boards/adafruit_kb2040.h",
+        "include/boards/adafruit_macropad_rp2040.h",
+        "include/boards/adafruit_qtpy_rp2040.h",
+        "include/boards/adafruit_trinkey_qt2040.h",
+        "include/boards/arduino_nano_rp2040_connect.h",
+        "include/boards/datanoisetv_rp2040_dsp.h",
+        "include/boards/eetree_gamekit_rp2040.h",
+        "include/boards/garatronic_pybstick26_rp2040.h",
+        "include/boards/melopero_shake_rp2040.h",
+        "include/boards/none.h",
+        "include/boards/nullbits_bit_c_pro.h",
+        "include/boards/pico_w.h",
+        "include/boards/pimoroni_badger2040.h",
+        "include/boards/pimoroni_interstate75.h",
+        "include/boards/pimoroni_keybow2040.h",
+        "include/boards/pimoroni_motor2040.h",
+        "include/boards/pimoroni_pga2040.h",
+        "include/boards/pimoroni_picolipo_16mb.h",
+        "include/boards/pimoroni_picolipo_4mb.h",
+        "include/boards/pimoroni_picosystem.h",
+        "include/boards/pimoroni_plasma2040.h",
+        "include/boards/pimoroni_servo2040.h",
+        "include/boards/pimoroni_tiny2040.h",
+        "include/boards/pimoroni_tiny2040_2mb.h",
+        "include/boards/pololu_3pi_2040_robot.h",
+        "include/boards/seeed_xiao_rp2040.h",
+        "include/boards/solderparty_rp2040_stamp.h",
+        "include/boards/solderparty_rp2040_stamp_carrier.h",
+        "include/boards/solderparty_rp2040_stamp_round_carrier.h",
+        "include/boards/sparkfun_micromod.h",
+        "include/boards/sparkfun_promicro.h",
+        "include/boards/sparkfun_thingplus.h",
+        "include/boards/vgaboard.h",
+        "include/boards/waveshare_rp2040_lcd_0.96.h",
+        "include/boards/waveshare_rp2040_lcd_1.28.h",
+        "include/boards/waveshare_rp2040_one.h",
+        "include/boards/waveshare_rp2040_plus_16mb.h",
+        "include/boards/waveshare_rp2040_plus_4mb.h",
+        "include/boards/waveshare_rp2040_zero.h",
+        "include/boards/wiznet_w5100s_evb_pico.h",
+    ],
+    includes = ["include"],
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
+    name = "stdio_defines",
+    defines = select({
+        "//bazel/constraint:stdio_semihosting": ["LIB_PICO_STDIO_SEMIHOSTING=1"],
+        "//bazel/constraint:stdio_uart": ["LIB_PICO_STDIO_UART=1"],
+        "//bazel/constraint:stdio_usb": ["LIB_PICO_STDIO_USB=1"],
+    }),
+)
+
+cc_library(
+    name = "common_board_defines",
+    defines = [
+        "PICO_ON_DEVICE=1",
+        "PICO_NO_HARDWARE=0",
+        "PICO_BUILD=1",
+    ],
+)
+
+cc_library(
+    name = "pico",
+    hdrs = ["include/boards/pico.h"],
+    defines = [
+        'PICO_BOARD=\\"rp2040\\"',
+        'PICO_CONFIG_HEADER="boards/pico.h"',
+    ],
+    includes = ["include"],
+    deps = [
+        ":common_board_defines",
+        ":stdio_defines",
+    ],
+)
+
+cc_library(
+    name = "host",
+    hdrs = ["include/boards/none.h"],
+    defines = [
+        'PICO_BOARD=\\"none\\"',
+        'PICO_CONFIG_HEADER="boards/none.h"',
+        "PICO_ON_DEVICE=0",
+        "PICO_NO_HARDWARE=1",
+        "PICO_BUILD=1",
+    ],
+    includes = ["include"],
+)
+
+alias(
+    name = "default",
+    actual = select({
+        "//bazel/constraint:rp2": ":pico",
+        "//bazel/constraint:host": ":host",
+    }),
+)

@@ -1,0 +1,20 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_runtime",
+    srcs = ["runtime.c"],
+    hdrs = ["include/pico/runtime.h"],
+    includes = ["include"],
+    deps = [
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_sync",
+        "//src/common/pico_time",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_resets",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_platform:hardware_regs",
+        "//src/rp2_common/pico_platform:hardware_structs",
+        "//src/rp2_common/pico_printf",
+    ],
+)
