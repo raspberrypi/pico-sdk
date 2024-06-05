@@ -9,13 +9,13 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/weact_studio_rp2040_16mb.h"
+// This header may be included by other board headers as "boards/weact_studio_rp2040_4mb.h"
 
-#ifndef _BOARDS_WEACT_STUDIO_RP2040_16MB_H
-#define _BOARDS_WEACT_STUDIO_RP2040_16MB_H
+#ifndef _BOARDS_WEACT_STUDIO_RP2040_4MB_H
+#define _BOARDS_WEACT_STUDIO_RP2040_4MB_H
 
 // For board detection
-#define WEACT_STUDIO_RP2040_16MB
+#define WEACT_STUDIO_RP2040_4MB
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART

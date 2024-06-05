@@ -9,7 +9,7 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/pico.h"
+// This header may be included by other board headers as "boards/pico_w.h"
 
 #ifndef _BOARDS_PICO_W_H
 #define _BOARDS_PICO_W_H
