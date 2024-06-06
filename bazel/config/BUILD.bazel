@@ -2,6 +2,11 @@ load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
 
 package(default_visibility = ["//visibility:public"])
 
+# PICO_BAZEL_CONFIG: PICO_BOARD, The board name being built for, type=string, default=pico, group=build
+string_flag(
+    name = "PICO_BOARD",
+    build_setting_default = "pico",
+)
 
 # PICO_BAZEL_CONFIG: PICO_BARE_METAL, Flag to exclude anything except base headers from the build, type=bool, default=0, group=build
 bool_flag(

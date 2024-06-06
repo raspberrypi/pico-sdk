@@ -20,7 +20,7 @@ def declare_flag_choices(flag, choices):
         for choice in choices
     ]
 
-def select_flag_choice(flag, pkg, choice_map):
+def flag_choice(flag, pkg, choice_map):
     """Creates a `select()` based on choices declared by `declare_choices()`.
 
     Args:
@@ -28,7 +28,7 @@ def select_flag_choice(flag, pkg, choice_map):
       pkg: The package that `declare_flag_choices()` was called in.
       choice_map: A mapping of distinct choices to the final intended value.
     """
-    return select({
+    return {
         "{}:{}_{}".format(
             pkg.split(":")[0],
             flag.split(":")[1],
@@ -36,4 +36,4 @@ def select_flag_choice(flag, pkg, choice_map):
         ): val
 
         for choice, val in choice_map.items()
-    })
+    }

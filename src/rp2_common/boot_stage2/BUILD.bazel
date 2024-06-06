@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("//bazel/toolchain:objcopy.bzl", "objcopy_to_bin")
-load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "select_flag_choice")
+load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "flag_choice")
 load("//bazel/util:transition.bzl", "rp2040_bootloader_binary")
 
 # There's a lot of implementation details in here that shouldn't be considered
@@ -49,9 +49,6 @@ cc_library(
 
 # Creates a config_setting for each known boot2 option with the name:
 #     PICO_DEFAULT_BOOT_STAGE2_[choice]
-#
-# NOTE: If you need to add another boot2 choice, just update the list in
-# boot2_choices.bzl.
 declare_flag_choices(
     "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
     BOOT2_CHOICES,
@@ -59,11 +56,11 @@ declare_flag_choices(
 
 filegroup(
     name = "build_selected_boot2",
-    srcs = select_flag_choice(
+    srcs = select(flag_choice(
         "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
         ":__pkg__",
         BOOT2_CHOICE_FILE_MAP,
-    ),
+    )),
 )
 
 cc_binary(
