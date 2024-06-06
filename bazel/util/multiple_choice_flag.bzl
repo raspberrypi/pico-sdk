@@ -1,17 +1,3 @@
-# Known choices for boot2:
-BOOT2_CHOICES = [
-    "boot2_at25sf128a",
-    "boot2_generic_03h",
-    "boot2_is25lp080",
-    "boot2_usb_blinky",
-    "boot2_w25q080",
-    "boot2_w25x10cl",
-    "compile_time_choice",
-]
-
-BOOT2_CHOICE_FILES = [c + ".S" for c in BOOT2_CHOICES]
-BOOT2_CHOICE_FILE_MAP = {c: [c + ".S"] for c in BOOT2_CHOICES}
-
 def declare_flag_choices(flag, choices):
     """Declares a `config_setting` for each known choice for the provided flag.
 
