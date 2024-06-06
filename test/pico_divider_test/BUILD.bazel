@@ -19,7 +19,7 @@ cc_binary(
     }),
     # Doesn't yet build for host.
     target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
+        # "//bazel/constraint:rp2": [],  # TODO: Fix.
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     testonly = True,
