@@ -1,4 +1,14 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+
 package(default_visibility = ["//visibility:public"])
+
+
+# PICO_BAZEL_CONFIG: PICO_BARE_METAL, Flag to exclude anything except base headers from the build, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_BARE_METAL",
+    build_setting_default = False,
+)
+
 
 # This should always point to a cc_library that provides
 # a "pico_config_extra_headers.h".

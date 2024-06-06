@@ -30,6 +30,11 @@ config_setting(
     ],
 )
 
+config_setting(
+    name = "pico_baremetal_enabled",
+    flag_values = {"//bazel/config:PICO_BARE_METAL": "True"},
+)
+
 # This constraint setting guides Bazel's build file evaluation differences
 # across different stdio configurations (e.g. stdio_usb needs TinyUSB).
 constraint_setting(

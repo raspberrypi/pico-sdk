@@ -52,3 +52,23 @@ cc_library(
         "//src/rp2_common/hardware_base",
     ],
 )
+
+cc_library(
+    name = "platform_link_deps",
+    deps = select({
+        # When PICO_BARE_METAL is enabled, don't automagically add link-time
+        # dependencies.
+        "//bazel/constraint:pico_baremetal_enabled": [],
+        "//conditions:default": [
+            "//src/rp2_common/boot_stage2",
+            "//src/rp2_common/cmsis:cmsis_core",
+            "//src/rp2_common/pico_bootrom",
+            "//src/rp2_common/pico_runtime",
+            "//src/rp2_common/pico_standard_link",
+        ],
+    }),
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
