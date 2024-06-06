@@ -35,6 +35,11 @@ config_setting(
     flag_values = {"//bazel/config:PICO_BARE_METAL": "True"},
 )
 
+config_setting(
+    name = "pico_no_gc_sections_enabled",
+    flag_values = {"//bazel/config:PICO_NO_GC_SECTIONS": "True"},
+)
+
 # This constraint setting guides Bazel's build file evaluation differences
 # across different stdio configurations (e.g. stdio_usb needs TinyUSB).
 constraint_setting(

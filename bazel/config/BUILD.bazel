@@ -9,6 +9,11 @@ bool_flag(
     build_setting_default = False,
 )
 
+# PICO_BAZEL_CONFIG: PICO_NO_GC_SECTIONS, Disable -ffunction-sections -fdata-sections and --gc-sections, type=bool, default=0, advanced=true, group=pico_standard_link
+bool_flag(
+    name = "PICO_NO_GC_SECTIONS",
+    build_setting_default = False,
+)
 
 # This should always point to a cc_library that provides
 # a "pico_config_extra_headers.h".

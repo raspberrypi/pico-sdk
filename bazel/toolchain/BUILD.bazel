@@ -44,6 +44,39 @@ cc_args(
     ],
 )
 
+cc_args(
+    name = "gc_sections_compile_args",
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = [
+        "-ffunction-sections",
+        "-fdata-sections",
+    ],
+)
+
+cc_args(
+    name = "gc_sections_link_args",
+    actions = ["@rules_cc//cc/toolchains/actions:link_actions"],
+    args = ["-Wl,--gc-sections"],
+)
+
+cc_args_list(
+    name = "gc_sections_args",
+    args = [
+        ":gc_sections_compile_args",
+        ":gc_sections_link_args"
+    ],
+)
+
+cc_feature(
+    name = "gc_sections",
+    feature_name = "gc_sections",
+    args = [":gc_sections_args"],
+    enabled = select({
+        "//bazel/constraint:pico_no_gc_sections_enabled": False,
+        "//conditions:default": True,
+    }),
+)
+
 # TODO: Make this shim unnecessary.
 cc_args_list(
     name = "all_opt_debug_args",
@@ -134,6 +167,7 @@ _HOST_CPU_CONSTRAINTS = {
     toolchain_features = [
         "@pico-sdk//bazel/toolchain:legacy_features",
         "@pico-sdk//bazel/toolchain:override_debug",
+        "@pico-sdk//bazel/toolchain:gc_sections",
     ],
 ) for host_os, host_cpu in HOSTS]
 

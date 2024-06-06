@@ -45,6 +45,8 @@ cc_binary(
         "-nostartfiles",
         "-T$(location boot_stage2.ld)",
     ],
+    # Incompatible with section garbage collection.
+    features = ["-gc_sections"],
     # this does nothing if someone passes --custom_malloc, so the
     # rp2040_bootloader_binary transition forcibly clobbers --custom_malloc.
     malloc = ":no_malloc",
