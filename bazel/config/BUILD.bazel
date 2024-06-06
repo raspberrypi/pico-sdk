@@ -1,4 +1,4 @@
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,6 +13,18 @@ bool_flag(
 bool_flag(
     name = "PICO_NO_GC_SECTIONS",
     build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BOOT_STAGE2_FILE, Boot stage 2 file to use; this should point to a filegroup with the .S file to use, group=build
+label_flag(
+    name = "PICO_DEFAULT_BOOT_STAGE2_FILE",
+    build_setting_default = "//src/rp2_common/boot_stage2:build_selected_boot2",
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BOOT_STAGE2, Simpler alternative to specifying PICO_DEFAULT_BOOT_STAGE2_FILE where the file is src/rp2_common/boot_stage2/{PICO_DEFAULT_BOOT_STAGE2}.S, default=compile_time_choice, group=build
+string_flag(
+    name = "PICO_DEFAULT_BOOT_STAGE2",
+    build_setting_default = "compile_time_choice",
 )
 
 # This should always point to a cc_library that provides

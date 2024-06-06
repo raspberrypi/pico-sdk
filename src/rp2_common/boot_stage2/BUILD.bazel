@@ -2,7 +2,10 @@ load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("//bazel/toolchain:objcopy.bzl", "objcopy_to_bin")
 load("//bazel/util:transition.bzl", "rp2040_bootloader_binary")
+load(":boot2_choices.bzl", "BOOT2_CHOICES", "BOOT2_CHOICE_FILES", "BOOT2_CHOICE_FILE_MAP", "declare_flag_choices", "select_flag_choice")
 
+# There's a lot of implementation details in here that shouldn't be considered
+# stable, so allowlist visibility to just the public-facing pieces.
 package(default_visibility = ["//visibility:private"])
 
 cc_library(
@@ -11,14 +14,8 @@ cc_library(
         "asminclude/boot2_helpers/exit_from_boot2.S",
         "asminclude/boot2_helpers/read_flash_sreg.S",
         "asminclude/boot2_helpers/wait_ssi_ready.S",
-        "boot2_at25sf128a.S",
-        "boot2_generic_03h.S",
-        "boot2_is25lp080.S",
-        "boot2_usb_blinky.S",
-        "boot2_w25q080.S",
-        "boot2_w25x10cl.S",
         "include/boot_stage2/config.h",
-    ],
+    ] + BOOT2_CHOICE_FILES,
     includes = [
         "asminclude",
         "include",
@@ -36,9 +33,28 @@ cc_library(
     name = "no_malloc",
 )
 
+# Creates a config_setting for each known boot2 option with the name:
+#     PICO_DEFAULT_BOOT_STAGE2_[choice]
+#
+# NOTE: If you need to add another boot2 choice, just update the list in
+# boot2_choices.bzl.
+declare_flag_choices(
+    "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
+    BOOT2_CHOICES,
+)
+
+filegroup(
+    name = "build_selected_boot2",
+    srcs = select_flag_choice(
+        "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
+        ":__pkg__",
+        BOOT2_CHOICE_FILE_MAP,
+    ),
+)
+
 cc_binary(
     name = "boot_stage2_elf_actual",
-    srcs = ["compile_time_choice.S"],
+    srcs = ["//bazel/config:PICO_DEFAULT_BOOT_STAGE2_FILE"],
     copts = ["-fPIC"],
     linkopts = [
         "-Wl,--no-gc-sections",
