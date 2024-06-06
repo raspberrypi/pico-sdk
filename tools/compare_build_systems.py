@@ -57,6 +57,18 @@ BUILD_SYSTEM_DESCRIPTION_DIFFERENCE_ALLOWLIST = (
     "PICO_DEFAULT_BOOT_STAGE2_FILE",
 )
 
+CMAKE_ONLY_ALLOWLIST = (
+    # Not relevant to Bazel: toolchain is fetched dynamically, and can be
+    # overridden with native Bazel features.
+    "PICO_TOOLCHAIN_PATH",
+    # TODO: No built-in, pre-configured clang offering yet.
+    "PICO_COMPILER",
+    # Entirely irrelevant to Bazel, use Bazel platforms:
+    #     https://bazel.build/extending/platforms
+    "PICO_CMAKE_PRELOAD_PLATFORM_FILE",
+)
+
+BAZEL_ONLY_ALLOWLIST = tuple()
 
 @dataclass
 class Option:
@@ -98,9 +110,13 @@ def FindKnownOptions(option_pattern_matcher, file_paths):
 
 def OptionsAreEqual(bazel_option, cmake_option):
     if bazel_option is None:
+        if cmake_option.name in CMAKE_ONLY_ALLOWLIST:
+            return True
         print(f"    {cmake_option.name} does not exist in Bazel")
         return False
     elif cmake_option is None:
+        if bazel_option.name in BAZEL_ONLY_ALLOWLIST:
+            return True
         print(f"    {bazel_option.name} does not exist in CMake")
         return False
     elif not bazel_option.matches(cmake_option):
