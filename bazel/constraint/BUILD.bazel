@@ -40,6 +40,21 @@ config_setting(
     flag_values = {"//bazel/config:PICO_NO_GC_SECTIONS": "True"},
 )
 
+config_setting(
+    name = "pico_cxx_enable_exceptions_enabled",
+    flag_values = {"//bazel/config:PICO_CXX_ENABLE_EXCEPTIONS": "True"},
+)
+
+config_setting(
+    name = "pico_cxx_enable_rtti_enabled",
+    flag_values = {"//bazel/config:PICO_CXX_ENABLE_RTTI": "True"},
+)
+
+config_setting(
+    name = "pico_cxx_enable_cxa_atexit_enabled",
+    flag_values = {"//bazel/config:PICO_CXX_ENABLE_RTTI": "True"},
+)
+
 # This constraint setting guides Bazel's build file evaluation differences
 # across different stdio configurations (e.g. stdio_usb needs TinyUSB).
 constraint_setting(

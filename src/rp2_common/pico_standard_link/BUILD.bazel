@@ -1,11 +1,20 @@
+load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+
 package(default_visibility = ["//visibility:public"])
+
+# PICO_BUILD_DEFINE: PICO_CXX_ENABLE_EXCEPTIONS, value of CMake var PICO_CXX_ENABLE_EXCEPTIONS, type=string, default=0, group=pico_cxx_options
+pico_sdk_define(
+    name = "PICO_CXX_ENABLE_EXCEPTIONS",
+    define_name = "PICO_CXX_ENABLE_EXCEPTIONS",
+    from_flag = "//bazel/config:PICO_CXX_ENABLE_EXCEPTIONS",
+)
 
 cc_library(
     name = "pico_standard_link",
     srcs = [
         "binary_info.c",
         "crt0.S",
-        # "new_delete.cpp",  # TODO: Doesn't build yet?
+        "new_delete.cpp",
     ],
     # TODO: Make this configurable.
     linkopts = [
@@ -16,6 +25,7 @@ cc_library(
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [
+        ":PICO_CXX_ENABLE_EXCEPTIONS",
         "memmap_default.ld",
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_binary_info",

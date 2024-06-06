@@ -27,6 +27,24 @@ string_flag(
     build_setting_default = "compile_time_choice",
 )
 
+# PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_EXCEPTIONS, Enabled CXX exception handling, type=bool, default=0, group=pico_cxx_options
+bool_flag(
+    name = "PICO_CXX_ENABLE_EXCEPTIONS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_RTTI, Enabled CXX rtti, type=bool, default=0, group=pico_cxx_options
+bool_flag(
+    name = "PICO_CXX_ENABLE_RTTI",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_CXA_ATEXIT, Enabled cxa-atexit, type=bool, default=0, group=pico_cxx_options
+bool_flag(
+    name = "PICO_CXX_ENABLE_CXA_ATEXIT",
+    build_setting_default = False,
+)
+
 # This should always point to a cc_library that provides
 # a "pico_config_extra_headers.h".
 label_flag(
