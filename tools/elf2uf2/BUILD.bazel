@@ -1,0 +1,17 @@
+cc_binary(
+    name = "elf2uf2",
+    srcs = [
+        "elf.h",
+        "main.cpp",
+    ],
+    deps = ["//src/common/boot_uf2"],
+    copts = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": [
+            "-Wno-used-function",
+            "-Wno-reorder-ctor",
+            "-Wno-unused-variable",
+        ],
+    }),
+    target_compatible_with = ["//bazel/constraint:host"],
+)

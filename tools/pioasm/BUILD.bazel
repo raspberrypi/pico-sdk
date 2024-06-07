@@ -1,0 +1,23 @@
+# TODO: No support for building the parser.
+
+cc_binary(
+    name = "pioasm",
+    includes = [
+        "gen",
+        ".",
+    ],
+    srcs = [
+        "pio_assembler.h",
+        "pio_disassembler.h",
+        "pio_types.h",
+        "output_format.h",
+        "main.cpp",
+        "pio_assembler.cpp",
+        "pio_disassembler.cpp",
+        "gen/parser.hpp",
+        "gen/location.h",
+        "gen/lexer.cpp",
+        "gen/parser.cpp",
+    ],
+    target_compatible_with = ["//bazel/constraint:host"],
+)
