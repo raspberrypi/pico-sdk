@@ -1,3 +1,5 @@
+load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+
 package(default_visibility = ["//visibility:public"])
 
 # Picotool requires this, so it should work on host as well as rp2.
@@ -18,10 +20,17 @@ cc_library(
     }),
 )
 
+pico_sdk_define(
+    name = "PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+    define_name = "PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+    from_flag = "//bazel/config:PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+)
+
 cc_library(
     name = "pico_stdio_usb_headers",
     hdrs = ["include/pico/stdio_usb.h"],
     includes = ["include"],
+    deps = [":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS"],
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
@@ -47,6 +56,7 @@ cc_library(
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [
+        ":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
         ":pico_stdio_usb_headers",
         ":reset_interface_headers",
         "//src/common/pico_binary_info",
@@ -56,7 +66,7 @@ cc_library(
         "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_stdio:pico_stdio_headers",
         "//src/rp2_common/pico_unique_id",
-        "@tinyusb",
+        "//bazel/config:PICO_TINYUSB_LIB",
     ],
     # Ensure `stdio_usb_descriptors.c` isn't affected by link order.
     alwayslink = True,

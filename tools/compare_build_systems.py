@@ -79,6 +79,9 @@ CMAKE_ONLY_ALLOWLIST = (
 BAZEL_ONLY_ALLOWLIST = (
     # Allows users to fully replace the final image for boot_stage2.
     "PICO_BOOT_STAGE2_LINK_IMAGE",
+    # Allows users to inject an alternative TinyUSB library since TinyUSB
+    # doesn't have native Bazel support.
+    "PICO_TINYUSB_LIB",
 )
 
 @dataclass

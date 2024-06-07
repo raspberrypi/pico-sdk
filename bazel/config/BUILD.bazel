@@ -1,4 +1,4 @@
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "int_flag", "string_flag")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -84,6 +84,18 @@ label_flag(
 bool_flag(
     name = "PICO_USE_DEFAULT_MAX_PAGE_SIZE",
     build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) during initialization, default=0, group=pico_stdio_usb
+int_flag(
+    name = "PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+    build_setting_default = 0,
+)
+
+# PICO_BAZEL_CONFIG: PICO_TINYUSB_LIB, [Bazel only] The The library that provides TinyUSB, default=@tinyusb//:tinyusb, group=build
+label_flag(
+    name = "PICO_TINYUSB_LIB",
+    build_setting_default = "@tinyusb//:tinyusb",
 )
 
 # This should always point to a cc_library that provides

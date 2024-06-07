@@ -26,5 +26,11 @@ cc_library(
         "//src/rp2_common/pico_stdio:pico_stdio_headers",
         "//src/rp2_common/pico_stdio_usb:pico_stdio_usb_headers",
         "//src/rp2_common/pico_stdio_usb:tusb_config",
-    ],
+    ] + select({  # If enabled, these headers may need to be visible.
+        "//bazel/constraint:pico_stdio_semihosting_enabled": ["//src/rp2_common/pico_stdio_semihosting"],
+        "//conditions:default": [],
+    }) + select({  # If enabled, these headers may need to be visible.
+        "//bazel/constraint:pico_stdio_uart_enabled": ["//src/rp2_common/pico_stdio_uart"],
+        "//conditions:default": [],
+    }),
 )
