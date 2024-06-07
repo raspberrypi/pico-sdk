@@ -71,6 +71,9 @@ CMAKE_ONLY_ALLOWLIST = (
     # Entirely irrelevant to Bazel, use Bazel platforms:
     #     https://bazel.build/extending/platforms
     "PICO_CMAKE_PRELOAD_PLATFORM_FILE",
+    # Both of these are marked as TODO and not actually set up in CMake.
+    "PICO_CMSIS_VENDOR",
+    "PICO_CMSIS_DEVICE",
 )
 
 BAZEL_ONLY_ALLOWLIST = (
