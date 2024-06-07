@@ -55,29 +55,17 @@ config_setting(
     flag_values = {"//bazel/config:PICO_CXX_ENABLE_RTTI": "True"},
 )
 
-# This constraint setting guides Bazel's build file evaluation differences
-# across different stdio configurations (e.g. stdio_usb needs TinyUSB).
-constraint_setting(
-    name = "stdio_mode",
-    default_constraint_value = "stdio_uart",
+config_setting(
+    name = "pico_stdio_uart_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_UART": "True"},
 )
 
-# When this constraint value is active, stdio is built against a hardware UART.
-constraint_value(
-    name = "stdio_uart",
-    constraint_setting = ":stdio_mode",
+config_setting(
+    name = "pico_stdio_usb_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_USB": "True"},
 )
 
-# When this constraint value is active, stdio is built against TinyUSB-based
-# USB serial.
-constraint_value(
-    name = "stdio_usb",
-    constraint_setting = ":stdio_mode",
-)
-
-# When this constraint value is active, stdio is built against an ARM
-# semihosting library.
-constraint_value(
-    name = "stdio_semihosting",
-    constraint_setting = ":stdio_mode",
+config_setting(
+    name = "pico_stdio_semihosting_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_SEMIHOSTING": "True"},
 )

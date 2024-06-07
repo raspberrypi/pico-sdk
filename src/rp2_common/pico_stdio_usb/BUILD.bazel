@@ -39,9 +39,10 @@ cc_library(
         "stdio_usb.c",
         "stdio_usb_descriptors.c",
     ],
-    target_compatible_with = [
-        "//bazel/constraint:stdio_usb",
-    ] + select({
+    target_compatible_with = select({
+        "//bazel/constraint:pico_stdio_usb_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }) + select({
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),

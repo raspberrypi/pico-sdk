@@ -66,15 +66,6 @@ BOARD_CHOICE_MAP = {c: [":{}".format(c)] for c in BOARD_CHOICES}
     for board in BOARD_CHOICES
 ]
 
-cc_library(
-    name = "stdio_defines",
-    defines = select({
-        "//bazel/constraint:stdio_semihosting": ["LIB_PICO_STDIO_SEMIHOSTING=1"],
-        "//bazel/constraint:stdio_uart": ["LIB_PICO_STDIO_UART=1"],
-        "//bazel/constraint:stdio_usb": ["LIB_PICO_STDIO_USB=1"],
-    }),
-)
-
 # Creates a config_setting for each known board option with the name:
 #     PICO_BOARD_[choice]
 declare_flag_choices(
@@ -96,7 +87,6 @@ cc_library(
             "PICO_BUILD=1",
         ],
     }),
-    deps = [":stdio_defines"]
 )
 
 cc_library(

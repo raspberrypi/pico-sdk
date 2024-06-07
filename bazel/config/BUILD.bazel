@@ -50,6 +50,24 @@ bool_flag(
     build_setting_default = False,
 )
 
+# PICO_BAZEL_CONFIG: PICO_STDIO_UART, OPTION: Globally enable stdio UART, default=1, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_UART",
+    build_setting_default = True,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_USB, OPTION: Globally enable stdio USB, default=0, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_USB",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_SEMIHOSTING, OPTION: Globally enable stdio semihosting, default=0, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_SEMIHOSTING",
+    build_setting_default = False,
+)
+
 # This should always point to a cc_library that provides
 # a "pico_config_extra_headers.h".
 label_flag(

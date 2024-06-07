@@ -92,20 +92,6 @@ Currently there are three configurable flags for targeting a different board:
    --@pico-sdk//bazel/config:pico_config_platform_headers=//path/to:pico_board_config
    ```
 
-### Selecting a stdio mode
-To select a different stdio mode, add it to your `platform` definition. For
-example:
-```python
-platform(
-    name = "rp2040",
-    constraint_values = [
-        "@pico-sdk//bazel/constraint:rp2040",
-        "@pico-sdk//bazel/constraint:stdio_usb", # Configures stdio_mode.
-        "@platforms//cpu:armv6-m",
-    ],
-)
-```
-
 ## Building the Pico SDK itself
 
 ### First time setup
