@@ -2,14 +2,31 @@ load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 
 package(default_visibility = ["//visibility:public"])
 
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_STRING, SDK version, type=string, group=pico_base
+PICO_SDK_VERSION_STRING = module_version() if module_version() != None else "0.0.1-WORKSPACE"
+
+_version_parts = PICO_SDK_VERSION_STRING.split('.')
+
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_MAJOR, SDK major version number, type=int, group=pico_base
+PICO_SDK_VERSION_MAJOR = int(_version_parts[0])
+
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_MINOR, SDK minor version number, type=int, group=pico_base
+PICO_SDK_VERSION_MINOR = int(_version_parts[1])
+
+_revision_parts = _version_parts[2].split('-')
+
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_REVISION, SDK version revision, type=int, group=pico_base
+PICO_SDK_VERSION_REVISION = int(_revision_parts[0])
+
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_PRE_RELEASE_ID, optional SDK pre-release version identifier, type=string, group=pico_base
+PICO_SDK_VERSION_PRE_RELEASE_ID = _revision_parts[1] if len(_revision_parts) > 1 else None
+
 run_binary(
     name = "version_header",
     srcs = ["include/pico/version.h.in"],
     outs = ["generated_include/pico/version.h"],
     args = [
-        "--version-string={}".format(
-            module_version() if module_version() != None else "0.0.1-WORKSPACE",
-        ),
+        "--version-string={}".format(PICO_SDK_VERSION_STRING),
         "--template=$(location include/pico/version.h.in)",
         "--output=$(location generated_include/pico/version.h)",
     ],
@@ -17,10 +34,21 @@ run_binary(
     visibility = ["//visibility:private"],
 )
 
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_MAJOR, SDK major version number, type=int, group=pico_base
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_MINOR, SDK minor version number, type=int, group=pico_base
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_REVISION, SDK version revision, type=int, group=pico_base
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_PRE_RELEASE_ID, optional SDK pre-release version identifier, type=string, group=pico_base
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_STRING, SDK version, type=string, group=pico_base
 cc_library(
     name = "version",
     hdrs = ["generated_include/pico/version.h"],
     includes = ["generated_include"],
+    defines = [
+        'PICO_SDK_VERSION_STRING=\\"{}\\"'.format(PICO_SDK_VERSION_STRING),
+        'PICO_SDK_VERSION_MAJOR={}'.format(PICO_SDK_VERSION_MAJOR),
+        'PICO_SDK_VERSION_MINOR={}"'.format(PICO_SDK_VERSION_MINOR),
+        'PICO_SDK_VERSION_REVISION={}"'.format(PICO_SDK_VERSION_REVISION),
+    ] + [] if PICO_SDK_VERSION_PRE_RELEASE_ID == None else ['PICO_SDK_VERSION_PRE_RELEASE_ID=\\"{}\\"'.format(PICO_SDK_VERSION_PRE_RELEASE_ID)],
 )
 
 alias(

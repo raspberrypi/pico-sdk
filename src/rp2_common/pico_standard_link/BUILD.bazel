@@ -27,6 +27,7 @@ cc_library(
     deps = [
         ":PICO_CXX_ENABLE_EXCEPTIONS",
         "memmap_default.ld",
+        "//src/common/pico_base:version",
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_binary_info",
         "//src/rp2_common/boot_stage2:config",
