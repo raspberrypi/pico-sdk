@@ -1,7 +1,7 @@
 # TODO: No support for building the parser.
 
-cc_binary(
-    name = "pioasm",
+cc_library(
+    name = "pioasm_core",
     includes = [
         "gen",
         ".",
@@ -20,4 +20,43 @@ cc_binary(
         "gen/parser.cpp",
     ],
     target_compatible_with = ["//bazel/constraint:host"],
+)
+
+cc_library(
+    name = "c_sdk_output",
+    srcs = ["c_sdk_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "python_output",
+    srcs = ["python_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "hex_output",
+    srcs = ["hex_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "ada_output",
+    srcs = ["ada_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
+)
+
+cc_binary(
+    name = "pioasm",
+    deps = [
+        ":pioasm_core",
+        ":c_sdk_output",
+        ":python_output",
+        ":hex_output",
+        ":ada_output",
+    ],
 )
