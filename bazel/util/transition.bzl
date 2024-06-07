@@ -64,7 +64,7 @@ def declare_transtion(attrs, flag_overrides, executable = True):
 
 rp2040_bootloader_binary = declare_transtion(
     attrs = {
-        "_malloc": attr.label(default = "//src/rp2_common/boot_stage2:no_malloc"),
+        "_malloc": attr.label(default = "//bazel:empty_cc_lib"),
     },
     flag_overrides = {
         # We don't want --custom_malloc to ever apply to the bootloader, so

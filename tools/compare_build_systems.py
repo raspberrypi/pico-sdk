@@ -49,17 +49,17 @@ ATTR_REGEX = re.compile(r',?\s*(?P<key>[^=]+)=(?P<value>[^,]+)')
 # Sometimes the build systems are supposed to be implemented differently. This
 # allowlist permits the descriptions to differ between CMake and Bazel.
 BUILD_SYSTEM_DESCRIPTION_DIFFERENCE_ALLOWLIST = (
-    "PICO_SDK_VERSION_MAJOR",
-    "PICO_SDK_VERSION_MINOR",
-    "PICO_SDK_VERSION_REVISION",
-    "PICO_SDK_VERSION_PRE_RELEASE_ID",
-    "PICO_SDK_VERSION_STRING",
     # Minor semantic differences in Bazel.
     "PICO_DEFAULT_BOOT_STAGE2_FILE",
     # In Bazel, not overridable by user environment variables (only flags).
     "PICO_BOARD",
     # In Bazel, it's a build label rather than a path.
     "PICO_CMSIS_PATH",
+    # In Bazel, the semantics of this are slightly different.
+    "PICO_PROGRAM_NAME",
+    "PICO_PROGRAM_DESCRIPTION",
+    "PICO_PROGRAM_URL",
+    "PICO_PROGRAM_VERSION_STRING",
 )
 
 CMAKE_ONLY_ALLOWLIST = (
@@ -82,6 +82,9 @@ BAZEL_ONLY_ALLOWLIST = (
     # Allows users to inject an alternative TinyUSB library since TinyUSB
     # doesn't have native Bazel support.
     "PICO_TINYUSB_LIB",
+    # Bazel can't do pico_set_* for the binary info defines, so there's a
+    # different mechanism.
+    "PICO_DEFAULT_BINARY_INFO",
 )
 
 @dataclass

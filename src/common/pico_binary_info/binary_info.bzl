@@ -1,0 +1,27 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+# PICO_BUILD_DEFINE: PICO_PROGRAM_NAME, Provided by PICO_DEFAULT_BINARY_INFO or a manually linked custom_pico_binary_info target, type=string, default=none, group=pico_binary_info
+# PICO_BUILD_DEFINE: PICO_PROGRAM_DESCRIPTION, Provided by PICO_DEFAULT_BINARY_INFO or a manually linked custom_pico_binary_info target, type=string, default=none, group=pico_binary_info
+# PICO_BUILD_DEFINE: PICO_PROGRAM_URL, Provided by PICO_DEFAULT_BINARY_INFO or a manually linked custom_pico_binary_info target, type=string, default=none, group=pico_binary_info
+# PICO_BUILD_DEFINE: PICO_PROGRAM_VERSION_STRING, Provided by PICO_DEFAULT_BINARY_INFO or a manually linked custom_pico_binary_info target, type=string, default=none, group=pico_binary_info
+def custom_pico_binary_info(name=None, program_name = None, program_description=None, program_url=None, program_version_string=None):
+    _all_defines = []
+    if program_name != None:
+        _all_defines.append('PICO_PROGRAM_NAME=\\"{}\\"'.format(program_name))
+    if program_description != None:
+        _all_defines.append('PICO_PROGRAM_DESCRIPTION=\\"{}\\"'.format(program_description))
+    if program_url != None:
+        _all_defines.append('PICO_PROGRAM_URL=\\"{}\\"'.format(program_url))
+    if program_version_string != None:
+        _all_defines.append('PICO_PROGRAM_VERSION_STRING=\\"{}\\"'.format(program_version_string))
+    cc_library(
+        name = name,
+        defines = _all_defines,
+        srcs = ["@pico-sdk//src/rp2_common/pico_standard_link:binary_info_srcs"],
+        deps = [
+            "@pico-sdk//src/common/pico_base:version",
+            "@pico-sdk//src/common/pico_binary_info",
+            "@pico-sdk//src/rp2_common/boot_stage2:config",
+        ],
+        alwayslink = True,
+    )

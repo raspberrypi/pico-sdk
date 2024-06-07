@@ -32,3 +32,9 @@ cc_library(
         "//bazel/config:pico_config_platform_headers",
     ],
 )
+
+# An empty stub, useful for label_flag flags that need to point to a library,
+# but for some purposes the library needs to be a no-op.
+cc_library(
+    name = "empty_cc_lib",
+)
