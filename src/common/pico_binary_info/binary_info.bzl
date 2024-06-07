@@ -19,11 +19,15 @@ def custom_pico_binary_info(name=None, program_name = None, program_description=
     # TODO: There's no practical way to support this correctly without a
     # `pico_cc_binary` wrapper. Either way, this would be the right place to put
     # it.
+    _build_target_name_defines = []
     if build_target_name != None:
-        _all_defines.append('PICO_TARGET_NAME=\\"{}\\"'.format(program_version_string))
+        _build_target_name_defines.append('PICO_TARGET_NAME=\\"{}\\"'.format(build_target_name))
     cc_library(
         name = name,
-        defines = _all_defines,
+        defines = _all_defines + select({
+            "@pico-sdk//bazel/constraint:pico_no_target_name_enabled": [],
+            "//conditions:default": _build_target_name_defines,
+        }),
         srcs = ["@pico-sdk//src/rp2_common/pico_standard_link:binary_info_srcs"],
         deps = [
             "@pico-sdk//src/rp2_common/pico_standard_link:PICO_BAZEL_BUILD_TYPE",
