@@ -80,6 +80,12 @@ label_flag(
     build_setting_default = "//src/rp2_common/cmsis:cmsis_core",
 )
 
+# PICO_BAZEL_CONFIG: PICO_USE_DEFAULT_MAX_PAGE_SIZE, Don't shrink linker max page to 4096, type=bool, default=0, advanced=true, group=pico_standard_link
+bool_flag(
+    name = "PICO_USE_DEFAULT_MAX_PAGE_SIZE",
+    build_setting_default = False,
+)
+
 # This should always point to a cc_library that provides
 # a "pico_config_extra_headers.h".
 label_flag(

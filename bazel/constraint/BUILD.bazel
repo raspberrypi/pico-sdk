@@ -69,3 +69,8 @@ config_setting(
     name = "pico_stdio_semihosting_enabled",
     flag_values = {"//bazel/config:PICO_STDIO_SEMIHOSTING": "True"},
 )
+
+config_setting(
+    name = "pico_use_default_max_page_size_enabled",
+    flag_values = {"//bazel/config:PICO_USE_DEFAULT_MAX_PAGE_SIZE": "True"},
+)

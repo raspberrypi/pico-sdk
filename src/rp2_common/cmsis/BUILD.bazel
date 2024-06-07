@@ -1,5 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
+# TODO: This is appended to PICO_RP2040_CONFIG_HEADER_FILES?
 cc_library(
     name = "rename_exceptions",
     hdrs = ["include/cmsis/rename_exceptions.h"],
