@@ -67,6 +67,8 @@ CMAKE_ONLY_ALLOWLIST = (
     # Not relevant to Bazel: toolchain is fetched dynamically, and can be
     # overridden with native Bazel features.
     "PICO_TOOLCHAIN_PATH",
+    # Bazel uses native --platforms mechanics.
+    "PICO_PLATFORM",
     # TODO: No built-in, pre-configured clang offering for Bazel yet.
     "PICO_COMPILER",
     # Entirely irrelevant to Bazel, use Bazel platforms:
@@ -75,6 +77,15 @@ CMAKE_ONLY_ALLOWLIST = (
     # Both of these are marked as TODO and not actually set up in CMake.
     "PICO_CMSIS_VENDOR",
     "PICO_CMSIS_DEVICE",
+    # Bazel build uses PICO_CONFIG_EXTRA_HEADER and PICO_CONFIG_PLATFORM_HEADER
+    # instead.
+    "PICO_CONFIG_HEADER_FILES",
+    "PICO_RP2040_CONFIG_HEADER_FILES",
+    "PICO_HOST_CONFIG_HEADER_FILES",
+    # Bazel uses PICO_CONFIG_HEADER.
+    "PICO_BOARD_CMAKE_DIRS",
+    "PICO_BOARD_HEADER_FILE",
+    "PICO_BOARD_HEADER_DIRS",
 )
 
 BAZEL_ONLY_ALLOWLIST = (
@@ -90,9 +101,17 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_BAZEL_BUILD_TYPE",
     # Different mechanism for setting a linker script that is less complex.
     "PICO_DEFAULT_LINKER_SCRIPT",
-
     # Not yet documented in CMake (but probably should be):
     "PICO_CMAKE_BUILD_TYPE",
+    # Replaces PICO_RP2040_CONFIG_HEADER_FILES and
+    # PICO_HOST_CONFIG_HEADER_FILES.
+    "PICO_CONFIG_EXTRA_HEADER",
+    "PICO_CONFIG_PLATFORM_HEADER",
+    # Effectively replaces:
+    # - PICO_BOARD_CMAKE_DIRS
+    # - PICO_BOARD_HEADER_FILE
+    # - PICO_BOARD_HEADER_DIRS
+    "PICO_CONFIG_HEADER",
 )
 
 @dataclass

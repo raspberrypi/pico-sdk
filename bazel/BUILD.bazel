@@ -18,18 +18,18 @@ py_binary(
 # configuring these `label_flag`s:
 #
 #     # Specify the library that provides "pico_config_extra_headers.h"
-#     --@pico-sdk//bazel/config:pico_config_extra_headers=//my_proj:my_custom_headers
+#     --@pico-sdk//bazel/config:PICO_CONFIG_EXTRA_HEADER=//my_proj:my_custom_headers
 #
 #     # Specify the library that provides "pico_config_platform_headers.h"
-#     --@pico-sdk//bazel/config:pico_config_platform_headers=//my_proj:my_custom_platform_headers
+#     --@pico-sdk//bazel/config:PICO_CONFIG_PLATFORM_HEADER=//my_proj:my_custom_platform_headers
 cc_library(
     name = "generate_config_header",
     hdrs = ["include/pico/config_autogen.h"],
     includes = ["include"],
     visibility = ["//:__subpackages__"],
     deps = [
-        "//bazel/config:pico_config_extra_headers",
-        "//bazel/config:pico_config_platform_headers",
+        "//bazel/config:PICO_CONFIG_EXTRA_HEADER",
+        "//bazel/config:PICO_CONFIG_PLATFORM_HEADER",
     ],
 )
 

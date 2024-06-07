@@ -122,53 +122,20 @@ bool_flag(
     build_setting_default = False,
 )
 
-# This should always point to a cc_library that provides
-# a "pico_config_extra_headers.h".
+# PICO_BAZEL_CONFIG: PICO_CONFIG_EXTRA_HEADER, [Bazel only] The cc_library that provides "pico_config_extra_headers.h", default=//src/common/pico_base:no_extra_headers, group=pico_base
 label_flag(
-    name = "pico_config_extra_headers",
-    build_setting_default = ":no_extra_headers",
+    name = "PICO_CONFIG_EXTRA_HEADER",
+    build_setting_default = "//src/common/pico_base:no_extra_headers",
 )
 
-# This should always point to a cc_library that provides
-# a "pico_config_platform_headers.h".
+# PICO_BAZEL_CONFIG: PICO_CONFIG_PLATFORM_HEADER, [Bazel only] The cc_library that provides "pico_config_platform_headers.h", default=//src/common/pico_base:default_platform_headers, group=pico_base
 label_flag(
-    name = "pico_config_platform_headers",
-    build_setting_default = ":no_platform_headers",
+    name = "PICO_CONFIG_PLATFORM_HEADER",
+    build_setting_default = "//src/common/pico_base:default_platform_headers",
 )
 
-# This should always point to a cc_library that defines PICO_CONFIG_HEADER and
-# any other defines that should be applied when building the SDK.
+# PICO_BAZEL_CONFIG: PICO_CONFIG_HEADER, [Bazel only] The cc_library that defines PICO_BOARD, PICO_CONFIG_HEADER, and other SDK critical defines (overrides PICO_BOARD setting), default=//src/boards:default, group=pico_base
 label_flag(
-    name = "pico_config_header",
+    name = "PICO_CONFIG_HEADER",
     build_setting_default = "//src/boards:default",
-)
-
-genrule(
-    name = "empty_extra_headers_file",
-    outs = ["generated_include/pico_config_extra_headers.h"],
-    cmd = "echo > $@",
-    cmd_bat = "copy NUL $@",
-    visibility = ["//visibility:private"],
-)
-
-genrule(
-    name = "empty_platform_headers_file",
-    outs = ["generated_include/pico_config_platform_headers.h"],
-    cmd = "echo > $@",
-    cmd_bat = "copy NUL $@",
-    visibility = ["//visibility:private"],
-)
-
-cc_library(
-    name = "no_extra_headers",
-    hdrs = ["generated_include/pico_config_extra_headers.h"],
-    includes = ["generated_include"],
-    visibility = ["//visibility:private"],
-)
-
-cc_library(
-    name = "no_platform_headers",
-    hdrs = ["generated_include/pico_config_platform_headers.h"],
-    includes = ["generated_include"],
-    visibility = ["//visibility:private"],
 )

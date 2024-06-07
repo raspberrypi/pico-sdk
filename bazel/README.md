@@ -70,27 +70,15 @@ These configuration options are a work in progress and may see significant
 breaking changes in future versions.
 
 ### Selecting a different board
-Currently there are three configurable flags for targeting a different board:
-1. `pico_config_extra_headers`: This should always point to a `cc_library `that
-   provides a `"pico_config_extra_headers.h"` header. You can configure this
-   by including a flag like the following in your build invocation:
-   ```
-   --@pico-sdk//bazel/config:pico_config_extra_headers=//path/to:custom_extra_headers
-   ```
-2. `pico_config_platform_headers`: This should always point to a `cc_library`
-   that provides a `"pico_config_platform_headers.h"` header.
-   ```
-   --@pico-sdk//bazel/config:pico_config_platform_headers=//path/to:custom_platform_headers
-   ```
-3. `pico_config_header`: This should point to a `cc_library` that sets all
-   necessary SDK defines. Most notably, `PICO_BOARD`, `PICO_CONFIG_HEADER`,
-   `PICO_ON_DEVICE`, `PICO_NO_HARDWARE`, and `PICO_BUILD`. See
-   `//src/boards:BUILD.bazel` for working examples. Any `defines` set on this
-   library will propagate to the rest of the Pico SDK. To set this configuration
-   option, pass a flag like the following in your Bazel build invocation:
-   ```
-   --@pico-sdk//bazel/config:pico_config_platform_headers=//path/to:pico_board_config
-   ```
+A different board can be selected specifying `--@pico-sdk//bazel/config:PICO_BOARD`:
+```console
+$ bazelisk build --platforms=//bazel/platform:rp2040 --@pico-sdk//bazel/config:PICO_BOARD=pico //...
+```
+
+If you have a bespoke board definition, you can configure the Pico SDK to use it
+by pointing `--@pico-sdk//bazel/config:PICO_CONFIG_HEADER` to a `cc_library`
+that defines `PICO_BOARD` and `PICO_CONFIG_HEADER`, also providing any necessary
+`includes`.
 
 ## Building the Pico SDK itself
 

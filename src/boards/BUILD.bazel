@@ -62,7 +62,6 @@ BOARD_CHOICE_MAP = {c: [":{}".format(c)] for c in BOARD_CHOICES}
             'PICO_BOARD=\\"{}\\"'.format(board),
             'PICO_CONFIG_HEADER="boards/{}.h"'.format(board),
         ],
-        deps = [":common_sdk_defines"],
     )
     for board in BOARD_CHOICES
 ]
@@ -72,27 +71,6 @@ BOARD_CHOICE_MAP = {c: [":{}".format(c)] for c in BOARD_CHOICES}
 declare_flag_choices(
     "//bazel/config:PICO_BOARD",
     BOARD_CHOICES,
-)
-
-# PICO_BAZEL_CONFIG: PICO_NO_HARDWARE, OPTION: Whether the build is not targeting an RP2040 device, type=bool, default=1 when PICO_PLATFORM is host, 0 otherwise, group=build
-# PICO_BUILD_DEFINE: PICO_NO_HARDWARE, Whether the build is not targeting an RP2040 device, type=bool, default=1 when PICO_PLATFORM is host, 0 otherwise, group=build
-# PICO_BAZEL_CONFIG: PICO_ON_DEVICE, OPTION: Whether the build is targeting an RP2040 device, type=bool, default=0 when PICO_PLATFORM is host, 1 otherwise, group=build
-# PICO_BUILD_DEFINE: PICO_ON_DEVICE, Whether the build is targeting an RP2040 device, type=bool, default=0 when PICO_PLATFORM is host, 1 otherwise, group=build
-# PICO_BUILD is undocumented in CMake.
-cc_library(
-    name = "common_sdk_defines",
-    defines = select({
-        "//bazel/constraint:host":[
-            "PICO_ON_DEVICE=0",
-            "PICO_NO_HARDWARE=1",
-            "PICO_BUILD=1",
-        ],
-        "//conditions:default": [
-            "PICO_ON_DEVICE=1",
-            "PICO_NO_HARDWARE=0",
-            "PICO_BUILD=1",
-        ],
-    }),
 )
 
 cc_library(
