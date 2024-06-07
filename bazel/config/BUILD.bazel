@@ -32,6 +32,12 @@ string_flag(
     build_setting_default = "compile_time_choice",
 )
 
+# PICO_BAZEL_CONFIG: PICO_BOOT_STAGE2_LINK_IMAGE, [Bazel only] The final boot_stage2 image target to link in. Use this to fully override/replace boot_stage2, default=@pico-sdk//src/rp2_common/boot_stage2:boot_stage2, group=build
+label_flag(
+    name = "PICO_BOOT_STAGE2_LINK_IMAGE",
+    build_setting_default = "//src/rp2_common/boot_stage2:boot_stage2",
+)
+
 # PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_EXCEPTIONS, Enabled CXX exception handling, type=bool, default=0, group=pico_cxx_options
 bool_flag(
     name = "PICO_CXX_ENABLE_EXCEPTIONS",

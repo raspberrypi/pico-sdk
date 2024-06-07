@@ -54,21 +54,27 @@ BUILD_SYSTEM_DESCRIPTION_DIFFERENCE_ALLOWLIST = (
     "PICO_SDK_VERSION_REVISION",
     "PICO_SDK_VERSION_PRE_RELEASE_ID",
     "PICO_SDK_VERSION_STRING",
+    # Minor semantic differences in Bazel.
     "PICO_DEFAULT_BOOT_STAGE2_FILE",
+    # In Bazel, not overridable by user environment.
+    "PICO_BOARD",
 )
 
 CMAKE_ONLY_ALLOWLIST = (
     # Not relevant to Bazel: toolchain is fetched dynamically, and can be
     # overridden with native Bazel features.
     "PICO_TOOLCHAIN_PATH",
-    # TODO: No built-in, pre-configured clang offering yet.
+    # TODO: No built-in, pre-configured clang offering for Bazel yet.
     "PICO_COMPILER",
     # Entirely irrelevant to Bazel, use Bazel platforms:
     #     https://bazel.build/extending/platforms
     "PICO_CMAKE_PRELOAD_PLATFORM_FILE",
 )
 
-BAZEL_ONLY_ALLOWLIST = tuple()
+BAZEL_ONLY_ALLOWLIST = (
+    # Allows users to fully replace the final image for boot_stage2.
+    "PICO_BOOT_STAGE2_LINK_IMAGE",
+)
 
 @dataclass
 class Option:

@@ -60,7 +60,7 @@ cc_library(
         # dependencies.
         "//bazel/constraint:pico_baremetal_enabled": [],
         "//conditions:default": [
-            "//src/rp2_common/boot_stage2",
+            "//bazel/config:PICO_BOOT_STAGE2_LINK_IMAGE",
             "//src/rp2_common/cmsis:cmsis_core",
             "//src/rp2_common/pico_bootrom",
             "//src/rp2_common/pico_runtime",
