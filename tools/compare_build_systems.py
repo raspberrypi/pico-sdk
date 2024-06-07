@@ -55,11 +55,12 @@ BUILD_SYSTEM_DESCRIPTION_DIFFERENCE_ALLOWLIST = (
     "PICO_BOARD",
     # In Bazel, it's a build label rather than a path.
     "PICO_CMSIS_PATH",
-    # In Bazel, the semantics of this are slightly different.
+    # In Bazel, the semantics of embedded binary info are slightly different.
     "PICO_PROGRAM_NAME",
     "PICO_PROGRAM_DESCRIPTION",
     "PICO_PROGRAM_URL",
     "PICO_PROGRAM_VERSION_STRING",
+    "PICO_TARGET_NAME",
 )
 
 CMAKE_ONLY_ALLOWLIST = (

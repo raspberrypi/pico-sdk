@@ -4,7 +4,8 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 # PICO_BUILD_DEFINE: PICO_PROGRAM_DESCRIPTION, Provided by PICO_DEFAULT_BINARY_INFO or a manually linked custom_pico_binary_info target, type=string, default=none, group=pico_binary_info
 # PICO_BUILD_DEFINE: PICO_PROGRAM_URL, Provided by PICO_DEFAULT_BINARY_INFO or a manually linked custom_pico_binary_info target, type=string, default=none, group=pico_binary_info
 # PICO_BUILD_DEFINE: PICO_PROGRAM_VERSION_STRING, Provided by PICO_DEFAULT_BINARY_INFO or a manually linked custom_pico_binary_info target, type=string, default=none, group=pico_binary_info
-def custom_pico_binary_info(name=None, program_name = None, program_description=None, program_url=None, program_version_string=None):
+# PICO_BUILD_DEFINE: PICO_TARGET_NAME, The name of the build target being compiled, type=string, default=target name, group=build
+def custom_pico_binary_info(name=None, program_name = None, program_description=None, program_url=None, program_version_string=None, build_target_name=None):
     _all_defines = []
     if program_name != None:
         _all_defines.append('PICO_PROGRAM_NAME=\\"{}\\"'.format(program_name))
@@ -14,6 +15,12 @@ def custom_pico_binary_info(name=None, program_name = None, program_description=
         _all_defines.append('PICO_PROGRAM_URL=\\"{}\\"'.format(program_url))
     if program_version_string != None:
         _all_defines.append('PICO_PROGRAM_VERSION_STRING=\\"{}\\"'.format(program_version_string))
+
+    # TODO: There's no practical way to support this correctly without a
+    # `pico_cc_binary` wrapper. Either way, this would be the right place to put
+    # it.
+    if build_target_name != None:
+        _all_defines.append('PICO_TARGET_NAME=\\"{}\\"'.format(program_version_string))
     cc_library(
         name = name,
         defines = _all_defines,
