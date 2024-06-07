@@ -85,6 +85,11 @@ BAZEL_ONLY_ALLOWLIST = (
     # Bazel can't do pico_set_* for the binary info defines, so there's a
     # different mechanism.
     "PICO_DEFAULT_BINARY_INFO",
+    # Bazel analogue for PICO_CMAKE_BUILD_TYPE.
+    "PICO_BAZEL_BUILD_TYPE",
+
+    # Not yet documented in CMake (but probably should be):
+    "PICO_CMAKE_BUILD_TYPE",
 )
 
 @dataclass

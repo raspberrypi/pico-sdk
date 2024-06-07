@@ -19,6 +19,7 @@ def custom_pico_binary_info(name=None, program_name = None, program_description=
         defines = _all_defines,
         srcs = ["@pico-sdk//src/rp2_common/pico_standard_link:binary_info_srcs"],
         deps = [
+            "@pico-sdk//src/rp2_common/pico_standard_link:PICO_BAZEL_BUILD_TYPE",
             "@pico-sdk//src/common/pico_base:version",
             "@pico-sdk//src/common/pico_binary_info",
             "@pico-sdk//src/rp2_common/boot_stage2:config",

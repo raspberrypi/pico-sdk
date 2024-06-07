@@ -104,6 +104,12 @@ label_flag(
     build_setting_default = "//src/rp2_common/pico_standard_link:default_binary_info",
 )
 
+# PICO_BAZEL_CONFIG: PICO_BAZEL_BUILD_TYPE, The type of build (e.g. Debug or Release) to embed in binary info, type=string, default=pico, group=build
+string_flag(
+    name = "PICO_BAZEL_BUILD_TYPE",
+    build_setting_default = "Debug",
+)
+
 # This should always point to a cc_library that provides
 # a "pico_config_extra_headers.h".
 label_flag(
