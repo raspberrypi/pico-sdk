@@ -92,13 +92,13 @@ int_flag(
     build_setting_default = 0,
 )
 
-# PICO_BAZEL_CONFIG: PICO_TINYUSB_LIB, [Bazel only] The The library that provides TinyUSB, default=@tinyusb//:tinyusb, group=build
+# PICO_BAZEL_CONFIG: PICO_TINYUSB_LIB, [Bazel only] The library that provides TinyUSB, default=@tinyusb//:tinyusb, group=build
 label_flag(
     name = "PICO_TINYUSB_LIB",
     build_setting_default = "@tinyusb//:tinyusb",
 )
 
-# PICO_BAZEL_CONFIG: PICO_DEFAULT_BINARY_INFO, [Bazel only] The The library that provides custom_pico_binary_info to link into all binaries, default=//src/rp2_common/pico_standard_link:default_binary_info, group=build
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BINARY_INFO, [Bazel only] The library that provides custom_pico_binary_info to link into all binaries, default=//src/rp2_common/pico_standard_link:default_binary_info, group=pico_standard_link
 label_flag(
     name = "PICO_DEFAULT_BINARY_INFO",
     build_setting_default = "//src/rp2_common/pico_standard_link:default_binary_info",
@@ -108,6 +108,12 @@ label_flag(
 string_flag(
     name = "PICO_BAZEL_BUILD_TYPE",
     build_setting_default = "Debug",
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_LINKER_SCRIPT, [Bazel only] The library that provides a linker script to link into all binaries, default=//src/rp2_common/pico_standard_link:default_linker_script, group=pico_standard_link
+label_flag(
+    name = "PICO_DEFAULT_LINKER_SCRIPT",
+    build_setting_default = "//src/rp2_common/pico_standard_link:default_linker_script",
 )
 
 # This should always point to a cc_library that provides

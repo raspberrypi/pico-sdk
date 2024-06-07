@@ -36,12 +36,52 @@ pico_sdk_define(
 # Setting per-binary:
 #   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_INFO=@pico-sdk//bazel:empty_cc_lib
 #   * Copy this cc_library, and manually set the values as you wish.
+#   * Add custom_pico_binary_info to each cc_binary individually.
 custom_pico_binary_info(
     name = "default_binary_info",
     program_name = None,
     program_description = None,
     program_url = None,
     program_version_string = None,
+)
+
+# It's possible to set linker scripts globally or on a per-binary basis.
+#
+# Setting globally:
+#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT to point to your
+#     desired linker script.
+#
+# Setting per-binary:
+#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT=@pico-sdk//bazel:empty_cc_lib
+#   * Manually add your desired linker script to each cc_binary.
+cc_library(
+    name = "default_linker_script",
+    linkopts = ["-T$(location memmap_default.ld)"],
+    deps = ["memmap_default.ld"],
+)
+
+# PICO_BUILD_DEFINE: PICO_USE_BLOCKED_RAM, whether this is a 'blocked_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "blocked_ram_linker_script",
+    defines = ["PICO_USE_BLOCKED_RAM=1"],
+    linkopts = ["-T$(location memmap_blocked_ram.ld)"],
+    deps = ["memmap_blocked_ram.ld"],
+)
+
+# PICO_BUILD_DEFINE: PICO_COPY_TO_RAM, whether this is a 'copy_to_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "copy_to_ram_linker_script",
+    defines = ["PICO_COPY_TO_RAM=1"],
+    linkopts = ["-T$(location memmap_copy_to_ram.ld)"],
+    deps = ["memmap_copy_to_ram.ld"],
+)
+
+# PICO_BUILD_DEFINE: PICO_NO_FLASH, whether this is a 'no_flash' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "no_flash_linker_script",
+    defines = ["PICO_NO_FLASH=1"],
+    linkopts = ["-T$(location memmap_no_flash.ld)"],
+    deps = ["memmap_no_flash.ld"],
 )
 
 cc_library(
@@ -51,17 +91,14 @@ cc_library(
         "new_delete.cpp",
     ],
     # TODO: Make this configurable.
-    linkopts = [
-        "-T$(location memmap_default.ld)",
-    ],
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [
         ":PICO_CXX_ENABLE_EXCEPTIONS",
-        "memmap_default.ld",
         "//bazel/config:PICO_DEFAULT_BINARY_INFO",
+        "//bazel/config:PICO_DEFAULT_LINKER_SCRIPT",
         "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_platform",

@@ -87,6 +87,8 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_DEFAULT_BINARY_INFO",
     # Bazel analogue for PICO_CMAKE_BUILD_TYPE.
     "PICO_BAZEL_BUILD_TYPE",
+    # Different mechanism for setting a linker script that is less complex.
+    "PICO_DEFAULT_LINKER_SCRIPT",
 
     # Not yet documented in CMake (but probably should be):
     "PICO_CMAKE_BUILD_TYPE",
