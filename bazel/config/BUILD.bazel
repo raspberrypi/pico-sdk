@@ -74,6 +74,12 @@ bool_flag(
     build_setting_default = False,
 )
 
+# PICO_BAZEL_CONFIG: PICO_CMSIS_PATH, Label of a cc_ibrary providing CMSIS core, default="included stub CORE only impl", group=build
+label_flag(
+    name = "PICO_CMSIS_PATH",
+    build_setting_default = "//src/rp2_common/cmsis:cmsis_core",
+)
+
 # This should always point to a cc_library that provides
 # a "pico_config_extra_headers.h".
 label_flag(

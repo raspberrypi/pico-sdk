@@ -56,8 +56,10 @@ BUILD_SYSTEM_DESCRIPTION_DIFFERENCE_ALLOWLIST = (
     "PICO_SDK_VERSION_STRING",
     # Minor semantic differences in Bazel.
     "PICO_DEFAULT_BOOT_STAGE2_FILE",
-    # In Bazel, not overridable by user environment.
+    # In Bazel, not overridable by user environment variables (only flags).
     "PICO_BOARD",
+    # In Bazel, it's a build label rather than a path.
+    "PICO_CMSIS_PATH",
 )
 
 CMAKE_ONLY_ALLOWLIST = (

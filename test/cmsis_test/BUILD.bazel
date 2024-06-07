@@ -5,7 +5,7 @@ cc_binary(
     srcs = ["cmsis_test.c"],
     deps = [
         "//src/common/pico_stdlib:pico_stdlib",
-        "//src/rp2_common/cmsis:cmsis_core",
+        "//bazel/config:PICO_CMSIS_PATH",
     ],
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],

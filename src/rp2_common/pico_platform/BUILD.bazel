@@ -61,7 +61,7 @@ cc_library(
         "//bazel/constraint:pico_baremetal_enabled": [],
         "//conditions:default": [
             "//bazel/config:PICO_BOOT_STAGE2_LINK_IMAGE",
-            "//src/rp2_common/cmsis:cmsis_core",
+            "//bazel/config:PICO_CMSIS_PATH",
             "//src/rp2_common/pico_bootrom",
             "//src/rp2_common/pico_runtime",
             "//src/rp2_common/pico_standard_link",
