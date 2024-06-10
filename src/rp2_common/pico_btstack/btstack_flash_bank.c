@@ -7,6 +7,7 @@
 #include "pico/btstack_flash_bank.h"
 #include "pico/flash.h"
 #include "hardware/sync.h"
+#include "hardware/flash.h"
 #include <string.h>
 
 // Check sizes
