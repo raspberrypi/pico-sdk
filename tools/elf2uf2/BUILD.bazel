@@ -10,7 +10,7 @@ cc_binary(
     copts = select({
         "@platforms//os:windows": [],
         "//conditions:default": [
-            "-Wno-used-function",
+            "-Wno-unused-function",
             "-Wno-reorder-ctor",
             "-Wno-unused-variable",
         ],
