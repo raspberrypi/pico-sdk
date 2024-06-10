@@ -87,7 +87,13 @@ CMAKE_ONLY_ALLOWLIST = (
     "PICO_BOARD_HEADER_FILE",
     "PICO_BOARD_HEADER_DIRS",
     # Bazel supports this differently.
+    # TODO: Provide a helper rule for explicitly generating a UF2 so users don't
+    # have to write out a bespoke run_binary.
     "PICO_NO_UF2",
+    # Bazel will not provide a default for this.
+    # TODO: Provide handy rules for PIOASM so users don't have to write out a
+    # bespoke run_binary.
+    "PICO_DEFAULT_PIOASM_OUTPUT_FORMAT",
 )
 
 BAZEL_ONLY_ALLOWLIST = (
