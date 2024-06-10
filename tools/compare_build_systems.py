@@ -86,6 +86,8 @@ CMAKE_ONLY_ALLOWLIST = (
     "PICO_BOARD_CMAKE_DIRS",
     "PICO_BOARD_HEADER_FILE",
     "PICO_BOARD_HEADER_DIRS",
+    # Bazel supports this differently.
+    "PICO_NO_UF2",
 )
 
 BAZEL_ONLY_ALLOWLIST = (

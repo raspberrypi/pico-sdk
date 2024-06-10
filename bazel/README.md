@@ -80,6 +80,19 @@ by pointing `--@pico-sdk//bazel/config:PICO_CONFIG_HEADER` to a `cc_library`
 that defines `PICO_BOARD` and `PICO_CONFIG_HEADER`, also providing any necessary
 `includes`.
 
+## Generating UF2 firmware images
+Creation of UF2 images can be done as explicit build steps on a per-binary
+rule basis, or through an aspect. Running a wildcard build with the
+`pico_uf2_aspect` enabled is the easiest way to create a UF2 for every ELF
+firmware image.
+
+```console
+$ bazel build --platforms=@pico-sdk//bazel/platform:rp2040 \
+    --aspects @pico-sdk//tools:uf2_aspect.bzl%pico_uf2_aspect \
+    --output_groups=+pico_uf2_files \
+    //...
+```
+
 ## Building the Pico SDK itself
 
 ### First time setup
