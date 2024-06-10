@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-# TODO: Flags to support PICO_PROGRAM_*.
-
 cc_library(
     name = "pico_binary_info",
     hdrs = [

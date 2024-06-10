@@ -90,7 +90,6 @@ cc_library(
         "crt0.S",
         "new_delete.cpp",
     ],
-    # TODO: Make this configurable.
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
