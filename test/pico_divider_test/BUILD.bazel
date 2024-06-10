@@ -2,10 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "pico_divider_test",
-    srcs = [
-        "pico_divider_nesting_test.c",
-        "pico_divider_test.c",
-    ],
+    srcs = ["pico_divider_test.c"],
     deps = [
         "//src/common/pico_divider:pico_divider",
         "//src/common/pico_stdlib:pico_stdlib",
@@ -19,7 +16,29 @@ cc_binary(
     }),
     # Doesn't yet build for host.
     target_compatible_with = select({
-        # "//bazel/constraint:rp2": [],  # TODO: Fix.
+        "//bazel/constraint:rp2": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    testonly = True,
+)
+
+cc_binary(
+    name = "pico_divider_nesting_test",
+    srcs = ["pico_divider_nesting_test.c"],
+    deps = [
+        "//src/common/pico_divider:pico_divider",
+        "//src/common/pico_stdlib:pico_stdlib",
+    ] + select({
+        "//bazel/constraint:rp2": [
+            "//src/rp2_common/hardware_dma:hardware_dma",
+            "//src/rp2_common/hardware_irq:hardware_irq",
+            "//src/rp2_common/hardware_vreg:hardware_vreg",
+        ],
+        "//conditions:default": [],
+    }),
+    # Doesn't yet build for host.
+    target_compatible_with = select({
+        "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     testonly = True,
