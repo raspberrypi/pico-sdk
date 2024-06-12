@@ -133,7 +133,6 @@ cc_library(
     deps = [
         ":common_sdk_defines",
         ":version",
-        "//bazel:generate_config_header",
         "//bazel/config:PICO_CONFIG_HEADER",
     ],
 )

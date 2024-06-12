@@ -71,8 +71,9 @@ $ bazelisk build --platforms=//bazel/platform:rp2040 --@pico-sdk//bazel/config:P
 
 If you have a bespoke board definition, you can configure the Pico SDK to use it
 by pointing `--@pico-sdk//bazel/config:PICO_CONFIG_HEADER` to a `cc_library`
-that defines `PICO_BOARD` and `PICO_CONFIG_HEADER`, also providing any necessary
-`includes`.
+that defines `PICO_BOARD` and either a `PICO_CONFIG_HEADER` define or a
+`pico/config_autogen.h` header. Make sure any required `includes`, `hdrs`, and
+`deps` are also provided.
 
 ## Generating UF2 firmware images
 Creation of UF2 images can be done as explicit build steps on a per-binary

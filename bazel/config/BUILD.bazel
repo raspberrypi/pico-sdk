@@ -128,13 +128,13 @@ label_flag(
     build_setting_default = "//bazel:no_extra_headers",
 )
 
-# PICO_BAZEL_CONFIG: PICO_CONFIG_PLATFORM_HEADER, [Bazel only] The cc_library that provides "pico_config_platform_headers.h", default=//src/common/pico_base:default_platform_headers, group=pico_base
+# PICO_BAZEL_CONFIG: PICO_CONFIG_PLATFORM_HEADER, [Bazel only] The cc_library that provides "pico_config_platform_headers.h" and defines PICO_BOARD, default=//src/common/pico_base:default_platform_headers, group=pico_base
 label_flag(
     name = "PICO_CONFIG_PLATFORM_HEADER",
     build_setting_default = "//src/boards:default",
 )
 
-# PICO_BAZEL_CONFIG: PICO_CONFIG_HEADER, [Bazel only] The cc_library that defines PICO_BOARD, PICO_CONFIG_HEADER, and other SDK critical defines (overrides PICO_BOARD setting), default=//bazel:generate_config_header, group=pico_base
+# PICO_BAZEL_CONFIG: PICO_CONFIG_HEADER, [Bazel only] The cc_library that defines PICO_CONFIG_HEADER or pico/config_autogen.h and other SDK critical defines (overrides PICO_BOARD setting), default=//bazel:generate_config_header, group=pico_base
 label_flag(
     name = "PICO_CONFIG_HEADER",
     build_setting_default = "//bazel:generate_config_header",
