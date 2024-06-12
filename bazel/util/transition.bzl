@@ -22,17 +22,32 @@
 # dictionary that tells `declare_transition()` which attrs to pull flag values
 # from. The common `src` attr tells the transition which build rule to apply
 # the transition to.
-def declare_transtion(attrs, flag_overrides, executable = True):
+def declare_transtion(attrs, flag_overrides = None, append_to_flags = None, executable = True):
     def _flag_override_impl(settings, attrs):
-        return {
-            key: str(getattr(attrs, value))
-            for key, value in flag_overrides.items()
-        }
+        final_overrides = {}
+        if flag_overrides != None:
+            final_overrides = {
+                key: str(getattr(attrs, value))
+                for key, value in flag_overrides.items()
+            }
+        if append_to_flags != None:
+            for flag, field in append_to_flags.items():
+                accumulated_flags = final_overrides.get(flag, settings.get(flag, []))
+                accumulated_flags.extend(
+                    [str(val) for val in getattr(attrs, field)],
+                )
+                final_overrides[flag] = accumulated_flags
+        return final_overrides
 
+    output_flags = []
+    if flag_overrides != None:
+        output_flags.extend(flag_overrides.keys())
+    if append_to_flags != None:
+        output_flags.extend(append_to_flags.keys())
     _transition = transition(
         implementation = _flag_override_impl,
-        inputs = [],
-        outputs = flag_overrides.keys(),
+        inputs = append_to_flags.keys() if append_to_flags != None else [],
+        outputs = output_flags,
     )
 
     def _symlink_artifact_impl(ctx):
@@ -81,5 +96,14 @@ kitchen_sink_test_binary = declare_transtion(
     flag_overrides = {
         "@pico-sdk//bazel/config:PICO_BTSTACK_CONFIG": "bt_stack_config",
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG": "lwip_config",
+    },
+)
+
+extra_copts_for_all_deps = declare_transtion(
+    attrs = {
+        "extra_copts": attr.string_list(),
+    },
+    append_to_flags = {
+        "//command_line_option:copt": "extra_copts",
     },
 )

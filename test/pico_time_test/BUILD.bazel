@@ -1,5 +1,5 @@
 load("//bazel:defs.bzl", "compatible_with_rp2")
-load("//bazel/util:define_transition.bzl", "binary_with_overridden_defines")
+load("//bazel/util:transition.bzl", "extra_copts_for_all_deps")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,11 +16,11 @@ cc_binary(
     ],
 )
 
-binary_with_overridden_defines(
+extra_copts_for_all_deps(
     name = "pico_time_test",
     testonly = True,
-    binary = ":pico_time_test_actual",
-    defines = ["PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS=250"],
-    # Doesn't appear to work on host builds yet.
+    src = ":pico_time_test_actual",
+    extra_copts = ["-DPICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS=250"],
+    # Host doesn't support PICO_TIME_NO_ALARM_SUPPORT without pico_host_sdl.
     target_compatible_with = compatible_with_rp2(),
 )

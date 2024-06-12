@@ -41,7 +41,6 @@ cc_library(
     ],
 )
 
-
 # Prefer these aliases to directly referencing @lwip, as it's possible that
 # name may change.
 alias(
