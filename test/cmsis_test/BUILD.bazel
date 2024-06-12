@@ -4,11 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "cmsis_test",
-    srcs = ["cmsis_test.c"],
-    deps = [
-        "//src/common/pico_stdlib:pico_stdlib",
-        "//bazel/config:PICO_CMSIS_PATH",
-    ],
-    target_compatible_with = compatible_with_rp2(),
     testonly = True,
+    srcs = ["cmsis_test.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//bazel/config:PICO_CMSIS_PATH",
+        "//src/common/pico_stdlib",
+    ],
 )

@@ -1,4 +1,4 @@
-load("//bazel:defs.bzl", "compatible_with_rp2", "compatible_with_config")
+load("//bazel:defs.bzl", "compatible_with_config", "compatible_with_rp2")
 load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
 
 package(default_visibility = ["//visibility:public"])
@@ -28,12 +28,12 @@ cc_library(
     name = "pico_stdio_usb_headers",
     hdrs = ["include/pico/stdio_usb.h"],
     includes = ["include"],
-    deps = [":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS"],
     target_compatible_with = compatible_with_rp2(),
     visibility = [
         ":__pkg__",
         "//src/rp2_common/tinyusb:__pkg__",
     ],
+    deps = [":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS"],
 )
 
 cc_library(
@@ -44,12 +44,13 @@ cc_library(
         "stdio_usb_descriptors.c",
     ],
     target_compatible_with = compatible_with_config(
-        "//bazel/constraint:pico_stdio_usb_enabled"
+        "//bazel/constraint:pico_stdio_usb_enabled",
     ) + compatible_with_rp2(),
     deps = [
         ":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
         ":pico_stdio_usb_headers",
         ":reset_interface_headers",
+        "//bazel/config:PICO_TINYUSB_LIB",
         "//src/common/pico_binary_info",
         "//src/common/pico_sync",
         "//src/rp2_common/hardware_irq",
@@ -57,7 +58,6 @@ cc_library(
         "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_stdio:pico_stdio_headers",
         "//src/rp2_common/pico_unique_id",
-        "//bazel/config:PICO_TINYUSB_LIB",
     ],
     # Ensure `stdio_usb_descriptors.c` isn't affected by link order.
     alwayslink = True,

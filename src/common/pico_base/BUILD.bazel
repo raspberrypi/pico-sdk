@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 # PICO_BAZEL_CONFIG: PICO_SDK_VERSION_STRING, SDK version, type=string, group=pico_base
 PICO_SDK_VERSION_STRING = module_version() if module_version() != None else "0.0.1-WORKSPACE"
 
-_version_parts = PICO_SDK_VERSION_STRING.split('.')
+_version_parts = PICO_SDK_VERSION_STRING.split(".")
 
 # PICO_BAZEL_CONFIG: PICO_SDK_VERSION_MAJOR, SDK major version number, type=int, group=pico_base
 PICO_SDK_VERSION_MAJOR = int(_version_parts[0])
@@ -14,7 +14,7 @@ PICO_SDK_VERSION_MAJOR = int(_version_parts[0])
 # PICO_BAZEL_CONFIG: PICO_SDK_VERSION_MINOR, SDK minor version number, type=int, group=pico_base
 PICO_SDK_VERSION_MINOR = int(_version_parts[1])
 
-_revision_parts = _version_parts[2].split('-')
+_revision_parts = _version_parts[2].split("-")
 
 # PICO_BAZEL_CONFIG: PICO_SDK_VERSION_REVISION, SDK version revision, type=int, group=pico_base
 PICO_SDK_VERSION_REVISION = int(_revision_parts[0])
@@ -43,13 +43,13 @@ run_binary(
 cc_library(
     name = "version",
     hdrs = ["generated_include/pico/version.h"],
-    includes = ["generated_include"],
     defines = [
         'PICO_SDK_VERSION_STRING=\\"{}\\"'.format(PICO_SDK_VERSION_STRING),
-        'PICO_SDK_VERSION_MAJOR={}'.format(PICO_SDK_VERSION_MAJOR),
+        "PICO_SDK_VERSION_MAJOR={}".format(PICO_SDK_VERSION_MAJOR),
         'PICO_SDK_VERSION_MINOR={}"'.format(PICO_SDK_VERSION_MINOR),
         'PICO_SDK_VERSION_REVISION={}"'.format(PICO_SDK_VERSION_REVISION),
     ] + [] if PICO_SDK_VERSION_PRE_RELEASE_ID == None else ['PICO_SDK_VERSION_PRE_RELEASE_ID=\\"{}\\"'.format(PICO_SDK_VERSION_PRE_RELEASE_ID)],
+    includes = ["generated_include"],
 )
 
 alias(
@@ -76,7 +76,7 @@ alias(
 cc_library(
     name = "common_sdk_defines",
     defines = select({
-        "//bazel/constraint:host":[
+        "//bazel/constraint:host": [
             "PICO_ON_DEVICE=0",
             "PICO_NO_HARDWARE=1",
             "PICO_BUILD=1",
@@ -132,8 +132,8 @@ cc_library(
         "//src/rp2_common/pico_standard_link:__pkg__",
     ],
     deps = [
-        ":version",
         ":common_sdk_defines",
+        ":version",
         "//bazel:generate_config_header",
         "//bazel/config:PICO_CONFIG_HEADER",
     ],
@@ -141,18 +141,18 @@ cc_library(
 
 cc_library(
     name = "pico_base",
-    deps = [
-        # :pico_platform creates circular dependencies, so break them
-        # via an intermediate.
-        ":pico_platform",
-        ":pico_base_interface",
-    ],
     implementation_deps = select({
         "//bazel/constraint:host": [],
         "//conditions:default": [
             "//src/rp2_common/pico_platform:platform_link_deps",
         ],
     }),
+    deps = [
+        # :pico_platform creates circular dependencies, so break them
+        # via an intermediate.
+        ":pico_platform",
+        ":pico_base_interface",
+    ],
 )
 
 genrule(
@@ -200,4 +200,3 @@ cc_library(
     }),
     visibility = ["//visibility:private"],
 )
-

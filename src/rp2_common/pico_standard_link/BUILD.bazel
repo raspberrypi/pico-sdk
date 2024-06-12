@@ -40,8 +40,8 @@ pico_sdk_define(
 #   * Add custom_pico_binary_info to each cc_binary individually.
 custom_pico_binary_info(
     name = "default_binary_info",
-    program_name = None,
     program_description = None,
+    program_name = None,
     program_url = None,
     program_version_string = None,
 )

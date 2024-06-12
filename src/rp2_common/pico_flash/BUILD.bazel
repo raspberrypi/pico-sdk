@@ -1,4 +1,4 @@
-load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config")
+load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
 

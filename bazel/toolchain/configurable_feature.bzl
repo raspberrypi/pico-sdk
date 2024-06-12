@@ -2,11 +2,11 @@ load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
 load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 load("@rules_cc//cc/toolchains:feature.bzl", "cc_feature")
 
-def configurable_toolchain_feature(name, copts = [], cxxopts = [], linkopts = [], enable_if=None, disable_if=None):
+def configurable_toolchain_feature(name, copts = [], cxxopts = [], linkopts = [], enable_if = None, disable_if = None):
     if enable_if != None and disable_if != None:
-        fail('Cannot specify both enable_if and disable_if')
+        fail("Cannot specify both enable_if and disable_if")
     if enable_if == None and disable_if == None:
-        fail('Must specify at least one of enable_if and disable_if')
+        fail("Must specify at least one of enable_if and disable_if")
     if enable_if == None:
         enable_if = "//conditions:default"
     if disable_if == None:

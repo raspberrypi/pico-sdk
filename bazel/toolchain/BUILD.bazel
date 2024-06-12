@@ -53,8 +53,8 @@ configurable_toolchain_feature(
         "-ffunction-sections",
         "-fdata-sections",
     ],
-    linkopts = ["-Wl,--gc-sections"],
     disable_if = "//bazel/constraint:pico_no_gc_sections_enabled",
+    linkopts = ["-Wl,--gc-sections"],
 )
 
 configurable_toolchain_feature(
@@ -80,8 +80,8 @@ configurable_toolchain_feature(
 
 configurable_toolchain_feature(
     name = "override_max_page_size",
-    linkopts = ["-Wl,-z,max-page-size=4096"],
     disable_if = "//bazel/constraint:pico_use_default_max_page_size_enabled",
+    linkopts = ["-Wl,-z,max-page-size=4096"],
 )
 
 # TODO: Make this shim unnecessary.

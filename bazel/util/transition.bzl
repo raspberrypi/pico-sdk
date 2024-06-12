@@ -73,7 +73,7 @@ rp2040_bootloader_binary = declare_transtion(
     },
 )
 
-kitchen_sink_test_binary =  declare_transtion(
+kitchen_sink_test_binary = declare_transtion(
     attrs = {
         "bt_stack_config": attr.label(mandatory = True),
         "lwip_config": attr.label(mandatory = True),

@@ -23,11 +23,11 @@ cc_library(
     hdrs = ["include/pico/async_context_freertos.h"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2() + incompatible_with_config(
-        "//bazel/constraint:pico_freertos_unset"
+        "//bazel/constraint:pico_freertos_unset",
     ),
     deps = [
-        "//bazel/config:PICO_FREERTOS_LIB",
         ":pico_async_context",
+        "//bazel/config:PICO_FREERTOS_LIB",
         "//src/common/pico_base",
         "//src/common/pico_sync",
         "//src/common/pico_time",
@@ -48,7 +48,6 @@ cc_library(
         "//src/common/pico_time",
     ],
 )
-
 
 cc_library(
     name = "pico_async_context_threadsafe_background",

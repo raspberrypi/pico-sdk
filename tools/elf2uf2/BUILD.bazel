@@ -6,7 +6,6 @@ cc_binary(
         "elf.h",
         "main.cpp",
     ],
-    deps = ["//src/common/boot_uf2"],
     copts = select({
         "@platforms//os:windows": [],
         "//conditions:default": [
@@ -16,4 +15,5 @@ cc_binary(
         ],
     }),
     target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/common/boot_uf2"],
 )

@@ -1,5 +1,3 @@
-load("@bazel_skylib//lib:structs.bzl", "structs")
-
 # TODO: Default to a list of known compatible rules until the toolchain emits
 # firmware images with a .elf extension. When binaries have a .elf suffix,
 # this can change to ["*"] and another attribute that allows extension-based
@@ -28,11 +26,10 @@ def _pico_uf2_aspect_impl(target, ctx):
     )
     return [
         OutputGroupInfo(
-            pico_uf2_files = depset([uf2_output])
-        )
+            pico_uf2_files = depset([uf2_output]),
+        ),
     ]
     return []
-
 
 pico_uf2_aspect = aspect(
     implementation = _pico_uf2_aspect_impl,
@@ -61,6 +58,6 @@ will only be produced when you explicitly use your custom macro.
             default = _SUPPORTED_BINARY_TYPES,
             doc = "A comma-separated list of rule kinds to apply the UF2 aspect to",
         ),
-        "_elf2uf2_tool": attr.label(default = "//tools/elf2uf2:elf2uf2", executable=True, cfg = "exec"),
-    }
+        "_elf2uf2_tool": attr.label(default = "//tools/elf2uf2:elf2uf2", executable = True, cfg = "exec"),
+    },
 )

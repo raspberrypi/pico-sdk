@@ -24,9 +24,9 @@ pico_sdk_define(
 cc_library(
     name = "stdio_defines",
     deps = [
+        ":LIB_PICO_STDIO_SEMIHOSTING",
         ":LIB_PICO_STDIO_UART",
         ":LIB_PICO_STDIO_USB",
-        ":LIB_PICO_STDIO_SEMIHOSTING",
     ],
 )
 
@@ -41,13 +41,13 @@ cc_library(
     ],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
-    deps = [":stdio_defines"],
     visibility = [
         "//src/rp2_common/pico_stdio_semihosting:__pkg__",
         "//src/rp2_common/pico_stdio_uart:__pkg__",
         "//src/rp2_common/pico_stdio_usb:__pkg__",
         "//src/rp2_common/tinyusb:__pkg__",
     ],
+    deps = [":stdio_defines"],
 )
 
 cc_library(

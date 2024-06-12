@@ -29,13 +29,13 @@ _CONFIGURATIONS = [
             "cyw43_arch.c",
             "cyw43_arch_{}.c".format(kind),
         ],
-        defines = [
-            "PICO_CYW43_ARCH_{}=1".format(kind.upper()),
-            "CYW43_LWIP={}".format(1 if use_lwip else 0),
-        ],
         hdrs = [
             "include/pico/cyw43_arch.h",
             "include/pico/cyw43_arch/arch_{}.h".format(kind),
+        ],
+        defines = [
+            "PICO_CYW43_ARCH_{}=1".format(kind.upper()),
+            "CYW43_LWIP={}".format(1 if use_lwip else 0),
         ],
         includes = ["include"],
         target_compatible_with = compatible_with_pico_w() + (

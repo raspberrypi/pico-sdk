@@ -1,7 +1,7 @@
-load("//bazel:defs.bzl", "compatible_with_rp2")
-load("@rules_python//python:defs.bzl", "py_binary")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//bazel:defs.bzl", "compatible_with_rp2")
 load("//bazel/toolchain:objcopy.bzl", "objcopy_to_bin")
 load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "flag_choice")
 load("//bazel/util:transition.bzl", "rp2040_bootloader_binary")
@@ -22,8 +22,11 @@ BOOT2_CHOICES = [
 ]
 
 BOOT2_CHOICE_FILES = [c + ".S" for c in BOOT2_CHOICES]
+
 BOOT2_CHOICE_FILE_MAP = {c: [c + ".S"] for c in BOOT2_CHOICES}
+
 BOOT2_CHOICE_DEFINE_MAP = {c: ['PICO_BUILD_BOOT_STAGE2_NAME=\\"{}\\"'.format(c)] for c in BOOT2_CHOICES}
+
 # Define shouldn't be set for compile_time_choice.
 BOOT2_CHOICE_DEFINE_MAP["compile_time_choice"] = []
 
@@ -68,13 +71,13 @@ cc_binary(
     name = "boot_stage2_elf_actual",
     srcs = ["//bazel/config:PICO_DEFAULT_BOOT_STAGE2_FILE"],
     copts = ["-fPIC"],
+    # Incompatible with section garbage collection.
+    features = ["-gc_sections"],
     linkopts = [
         "-Wl,--no-gc-sections",
         "-nostartfiles",
         "-T$(location boot_stage2.ld)",
     ],
-    # Incompatible with section garbage collection.
-    features = ["-gc_sections"],
     # this does nothing if someone passes --custom_malloc, so the
     # rp2040_bootloader_binary transition forcibly clobbers --custom_malloc.
     malloc = "//bazel:empty_cc_lib",

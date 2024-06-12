@@ -4,24 +4,24 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pioasm_core",
-    includes = [
-        "gen",
-        ".",
-    ],
     srcs = [
+        "gen/lexer.cpp",
+        "gen/location.h",
+        "gen/parser.cpp",
+        "gen/parser.hpp",
+        "go_output.cpp",
+        "json_output.cpp",
+        "main.cpp",
+        "output_format.h",
+        "pio_assembler.cpp",
         "pio_assembler.h",
+        "pio_disassembler.cpp",
         "pio_disassembler.h",
         "pio_types.h",
-        "output_format.h",
-        "main.cpp",
-        "pio_assembler.cpp",
-        "pio_disassembler.cpp",
-        "json_output.cpp",
-        "go_output.cpp",
-        "gen/parser.hpp",
-        "gen/location.h",
-        "gen/lexer.cpp",
-        "gen/parser.cpp",
+    ],
+    includes = [
+        ".",
+        "gen",
     ],
     target_compatible_with = ["//bazel/constraint:host"],
 )
@@ -57,10 +57,10 @@ cc_library(
 cc_binary(
     name = "pioasm",
     deps = [
-        ":pioasm_core",
-        ":c_sdk_output",
-        ":python_output",
-        ":hex_output",
         ":ada_output",
+        ":c_sdk_output",
+        ":hex_output",
+        ":pioasm_core",
+        ":python_output",
     ],
 )

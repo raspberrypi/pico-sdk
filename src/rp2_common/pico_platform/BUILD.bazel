@@ -45,6 +45,7 @@ cc_library(
 
 cc_library(
     name = "platform_link_deps",
+    target_compatible_with = compatible_with_rp2(),
     deps = select({
         # When PICO_BARE_METAL is enabled, don't automagically add link-time
         # dependencies.
@@ -57,5 +58,4 @@ cc_library(
             "//src/rp2_common/pico_standard_link",
         ],
     }),
-    target_compatible_with = compatible_with_rp2(),
 )

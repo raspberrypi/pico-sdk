@@ -5,6 +5,7 @@ def _add_defines_to_current_cfg():
         return {
             "//command_line_option:copt": copts,
         }
+
     return transition(
         implementation = _build_with_overridden_defines_impl,
         inputs = ["//command_line_option:copt"],
@@ -12,7 +13,6 @@ def _add_defines_to_current_cfg():
     )
 
 _transition = _add_defines_to_current_cfg()
-
 
 def _binary_with_overridden_defines_impl(ctx):
     out = ctx.actions.declare_file(ctx.label.name)

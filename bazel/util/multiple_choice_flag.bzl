@@ -34,6 +34,5 @@ def flag_choice(flag, pkg, choice_map):
             flag.split(":")[1],
             choice,
         ): val
-
         for choice, val in choice_map.items()
     }

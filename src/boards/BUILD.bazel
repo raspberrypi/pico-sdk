@@ -57,18 +57,19 @@ BOARD_CHOICES = [
 ]
 
 BOARD_CHOICE_FILES = ["include/boards/" + c + ".h" for c in BOARD_CHOICES]
+
 BOARD_CHOICE_MAP = {c: [":{}".format(c)] for c in BOARD_CHOICES}
 
 # PICO_BUILD_DEFINE: PICO_BOARD, Name of board, type=string, default=CMake PICO_BOARD variable, group=pico_base
 [
     cc_library(
         name = board,
-        includes = ["include"],
         hdrs = BOARD_CHOICE_FILES,
         defines = [
             'PICO_BOARD=\\"{}\\"'.format(board),
             'PICO_CONFIG_HEADER="boards/{}.h"'.format(board),
         ],
+        includes = ["include"],
     )
     for board in BOARD_CHOICES
 ]
@@ -90,6 +91,6 @@ cc_library(
         ) | {
             "//bazel/constraint:host": [":none"],
             "//conditions:default": [":none"],
-        }
+        },
     ),
 )

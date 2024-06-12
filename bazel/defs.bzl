@@ -2,7 +2,7 @@ def _pico_generate_pio_header_impl(ctx):
     generated_headers = []
     for f in ctx.files.srcs:
         out = ctx.actions.declare_file(
-            "{}_pio_generated/{}.h".format(ctx.label.name, f.basename)
+            "{}_pio_generated/{}.h".format(ctx.label.name, f.basename),
         )
         generated_headers.append(out)
         ctx.actions.run(
@@ -22,7 +22,7 @@ def _pico_generate_pio_header_impl(ctx):
         includes = depset(direct = [generated_headers[0].dirname]),
     )
     return [
-        DefaultInfo(files=depset(direct = generated_headers)),
+        DefaultInfo(files = depset(direct = generated_headers)),
         CcInfo(compilation_context = cc_ctx),
     ]
 
@@ -33,7 +33,7 @@ pico_generate_pio_header = rule(
         "_pioasm_tool": attr.label(
             default = "@pico-sdk//tools/pioasm:pioasm",
             cfg = "exec",
-            executable = True
+            executable = True,
         ),
     },
     provides = [CcInfo],
