@@ -71,15 +71,17 @@ def declare_transtion(attrs, flag_overrides = None, append_to_flags = None, exec
                 executable = executable,
                 mandatory = True,
             ),
-            "_allowlist_function_transition": attr.label(
-                default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
-            ),
         } | attrs,
     )
 
 rp2040_bootloader_binary = declare_transtion(
     attrs = {
         "_malloc": attr.label(default = "//bazel:empty_cc_lib"),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
     },
     flag_overrides = {
         # We don't want --custom_malloc to ever apply to the bootloader, so
@@ -92,6 +94,11 @@ kitchen_sink_test_binary = declare_transtion(
     attrs = {
         "bt_stack_config": attr.label(mandatory = True),
         "lwip_config": attr.label(mandatory = True),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
     },
     flag_overrides = {
         "@pico-sdk//bazel/config:PICO_BTSTACK_CONFIG": "bt_stack_config",
@@ -102,6 +109,11 @@ kitchen_sink_test_binary = declare_transtion(
 extra_copts_for_all_deps = declare_transtion(
     attrs = {
         "extra_copts": attr.string_list(),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
     },
     append_to_flags = {
         "//command_line_option:copt": "extra_copts",
