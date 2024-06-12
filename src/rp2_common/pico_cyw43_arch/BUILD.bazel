@@ -34,6 +34,7 @@ _CONFIGURATIONS = [
             "include/pico/cyw43_arch/arch_{}.h".format(kind),
         ],
         defines = [
+            "LIB_PICO_CYW43_ARCH=1",
             "PICO_CYW43_ARCH_{}=1".format(kind.upper()),
             "CYW43_LWIP={}".format(1 if use_lwip else 0),
         ],
