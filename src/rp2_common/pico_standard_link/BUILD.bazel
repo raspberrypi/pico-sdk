@@ -1,3 +1,4 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
 load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
 load("//src/common/pico_binary_info:binary_info.bzl", "custom_pico_binary_info")
 
@@ -90,10 +91,7 @@ cc_library(
         "crt0.S",
         "new_delete.cpp",
     ],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         ":PICO_CXX_ENABLE_EXCEPTIONS",
         "//bazel/config:PICO_DEFAULT_BINARY_INFO",

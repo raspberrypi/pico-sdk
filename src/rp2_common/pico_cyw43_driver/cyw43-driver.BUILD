@@ -1,3 +1,5 @@
+load("@pico-sdk//bazel:defs.bzl", "compatible_with_pico_w")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -12,11 +14,7 @@ cc_library(
         "@pico-sdk//src/rp2_common/pico_cyw43_driver:cyw43_configport",
         "@pico-sdk//src/rp2_common/pico_lwip",
     ],
-    target_compatible_with = select({
-        "@pico-sdk//bazel/constraint:cyw43_wireless": [],
-        "@pico-sdk//bazel/constraint:is_pico_w": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_pico_w(),
     srcs = [
         "src/cyw43_ll.c",
         "src/cyw43_stats.c",

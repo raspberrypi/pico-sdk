@@ -1,3 +1,4 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
@@ -43,10 +44,7 @@ cc_library(
         "asminclude",
         "include",
     ],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     visibility = ["//visibility:public"],
 )
 
@@ -81,10 +79,7 @@ cc_binary(
     # rp2040_bootloader_binary transition forcibly clobbers --custom_malloc.
     malloc = "//bazel:empty_cc_lib",
     tags = ["manual"],  # Only build as an explicit dependency.
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         "boot_stage2.ld",
         ":config",
@@ -103,10 +98,7 @@ objcopy_to_bin(
     name = "boot_stage2_bin",
     src = ":boot_stage2_elf",
     out = "boot_stage2.bin",
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
 )
 
 # WORKAROUND: Python rules always require a .py extension.
@@ -132,20 +124,14 @@ run_binary(
         "$(location boot_stage2_bin)",
         "$(location boot_stage2.S)",
     ],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     tool = ":pad_checksum_tool",
 )
 
 cc_library(
     name = "boot_stage2",
     srcs = [":boot_stage2_padded"],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     visibility = ["//visibility:public"],
     # This isn't referenced as a symbol, so alwayslink is required to ensure
     # it doesn't get dropped before the linker script can find it.

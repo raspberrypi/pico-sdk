@@ -1,3 +1,5 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
 package(default_visibility = ["//visibility:public"])
 
 # This is added to @pico-sdk//src/common/pico_base:default_platform_headers
@@ -6,10 +8,7 @@ cc_library(
     name = "rename_exceptions",
     hdrs = ["include/cmsis/rename_exceptions.h"],
     includes = ["include"],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
 )
 
 cc_library(
@@ -34,10 +33,7 @@ cc_library(
         "stub/CMSIS/Core/Include",
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include",
     ],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/rp2_common/hardware_clocks",
     ],

@@ -1,3 +1,5 @@
+load("//bazel:defs.bzl", "compatible_with_pico_w", "incompatible_with_config")
+
 package(default_visibility = ["//visibility:public"])
 
 # Tuple is async_context type and whether or not lwip is enabled.
@@ -33,16 +35,9 @@ _CONFIGURATIONS = [
             "include/pico/cyw43_arch/arch_{}.h".format(kind),
         ],
         includes = ["include"],
-        target_compatible_with = select({
-            "//bazel/constraint:cyw43_wireless": [],
-            "//bazel/constraint:is_pico_w": [],
-            "//conditions:default": ["@platforms//:incompatible"],
-        }) + select({
-            # This second expression ensures pico_freertos_unset controls
-            # compatibility for ONLY the "freertos" configuration.
-            "//bazel/constraint:pico_freertos_unset": ["@platforms//:incompatible"] if kind == "freertos" else [],
-            "//conditions:default": [],
-        }),
+        target_compatible_with = compatible_with_pico_w() + (
+            incompatible_with_config("//bazel/constraint:pico_freertos_unset") if kind == "freertos" else []
+        ),
         deps = [
             "//src/common/pico_base",
             "//src/rp2_common/pico_async_context:pico_async_context_{}".format(kind),

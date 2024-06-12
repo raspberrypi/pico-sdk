@@ -47,13 +47,13 @@ BOARD_CHOICES = [
     "waveshare_rp2040_plus_4mb",
     "waveshare_rp2040_zero",
     "wiznet_w5100s_evb_pico",
-    "cytron_maker_pi_rp2040.h",
-    "metrotech_xerxes_rp2040.h",
-    "pololu_zumo_2040_robot.h",
-    "weact_studio_rp2040_16mb.h",
-    "weact_studio_rp2040_2mb.h",
-    "weact_studio_rp2040_4mb.h",
-    "weact_studio_rp2040_8mb.h",
+    "cytron_maker_pi_rp2040",
+    "metrotech_xerxes_rp2040",
+    "pololu_zumo_2040_robot",
+    "weact_studio_rp2040_16mb",
+    "weact_studio_rp2040_2mb",
+    "weact_studio_rp2040_4mb",
+    "weact_studio_rp2040_8mb",
 ]
 
 BOARD_CHOICE_FILES = ["include/boards/" + c + ".h" for c in BOARD_CHOICES]

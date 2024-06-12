@@ -1,4 +1,4 @@
-load("//bazel:defs.bzl", "pico_generate_pio_header")
+load("//bazel:defs.bzl", "pico_generate_pio_header", "compatible_with_pico_w")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -29,11 +29,7 @@ cc_library(
         "include/pico/cyw43_driver.h",
     ],
     includes = ["include"],
-    target_compatible_with = select({
-        "//bazel/constraint:cyw43_wireless": [],
-        "//bazel/constraint:is_pico_w": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_pico_w(),
     deps = [
         ":cyw43_configport",
         ":cyw43_bus_pio",

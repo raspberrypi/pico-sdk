@@ -1,3 +1,4 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
 load("//bazel/util:transition.bzl", "kitchen_sink_test_binary")
 
 package(default_visibility = ["//visibility:public"])
@@ -77,10 +78,7 @@ cc_library(
         "//src/common/pico_stdlib",
         "//test/pico_test:pico_test",
     ],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     testonly = True,
 )
 
@@ -126,10 +124,7 @@ kitchen_sink_test_binary(
     bt_stack_config = ":btstack_config",
     lwip_config = ":lwip_config",
     testonly = True,
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
 )
 
 kitchen_sink_test_binary(
@@ -138,10 +133,7 @@ kitchen_sink_test_binary(
     bt_stack_config = ":btstack_config",
     lwip_config = ":lwip_config",
     testonly = True,
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
 )
 
 

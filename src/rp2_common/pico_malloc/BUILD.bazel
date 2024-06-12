@@ -1,3 +1,5 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -11,10 +13,7 @@ cc_library(
         "-Wl,--wrap=realloc",
         "-Wl,--wrap=free",
     ],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_sync",

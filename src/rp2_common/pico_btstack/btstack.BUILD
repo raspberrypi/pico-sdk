@@ -1,3 +1,5 @@
+load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config")
+
 package(default_visibility = ["//visibility:public"])
 
 _DISABLE_WARNINGS = [
@@ -62,10 +64,9 @@ cc_library(
         "3rd-party/yxml/yxml.c",
     ],
     deps = ["@pico-sdk//bazel/config:PICO_BTSTACK_CONFIG"],
-    target_compatible_with = select({
-        "@pico-sdk//bazel/constraint:pico_btstack_config_unset": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
+    target_compatible_with = incompatible_with_config(
+        "@pico-sdk//bazel/constraint:pico_btstack_config_unset"
+    ),
 )
 
 cc_library(

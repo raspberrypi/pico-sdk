@@ -1,3 +1,4 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
 load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
 
 package(default_visibility = ["//visibility:public"])
@@ -39,10 +40,7 @@ cc_library(
         "include/pico/stdio/driver.h",
     ],
     includes = ["include"],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     deps = [":stdio_defines"],
     visibility = [
         "//src/rp2_common/pico_stdio_semihosting:__pkg__",
@@ -67,10 +65,7 @@ cc_library(
         "-Wl,--wrap=putchar",
         "-Wl,--wrap=getchar",
     ],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         ":stdio_defines",
         "//src/common/pico_base",

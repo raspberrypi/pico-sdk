@@ -1,3 +1,5 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
@@ -9,9 +11,6 @@ cc_binary(
         "//test/pico_test:pico_test",
     ],
     # Host doesn't support PICO_TIME_NO_ALARM_SUPPORT without pico_host_sdl.
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     testonly = True,
 )

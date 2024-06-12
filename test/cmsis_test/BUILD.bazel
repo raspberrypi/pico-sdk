@@ -1,3 +1,5 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
@@ -7,9 +9,6 @@ cc_binary(
         "//src/common/pico_stdlib:pico_stdlib",
         "//bazel/config:PICO_CMSIS_PATH",
     ],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     testonly = True,
 )

@@ -1,3 +1,5 @@
+load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -9,10 +11,9 @@ cc_library(
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG",
         "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_config",
     ],
-    target_compatible_with = select({
-        "@pico-sdk//bazel/constraint:pico_lwip_config_unset": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
+    target_compatible_with = incompatible_with_config(
+        "@pico-sdk//bazel/constraint:pico_lwip_config_unset"
+    ),
 )
 
 cc_library(

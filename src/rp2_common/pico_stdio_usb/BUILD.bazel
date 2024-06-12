@@ -1,3 +1,4 @@
+load("//bazel:defs.bzl", "compatible_with_rp2", "compatible_with_config")
 load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
 
 package(default_visibility = ["//visibility:public"])
@@ -14,10 +15,7 @@ cc_library(
     name = "tusb_config",
     hdrs = ["include/tusb_config.h"],
     includes = ["include"],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
 )
 
 pico_sdk_define(
@@ -31,10 +29,7 @@ cc_library(
     hdrs = ["include/pico/stdio_usb.h"],
     includes = ["include"],
     deps = [":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS"],
-    target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_rp2(),
     visibility = [
         ":__pkg__",
         "//src/rp2_common/tinyusb:__pkg__",
@@ -48,13 +43,9 @@ cc_library(
         "stdio_usb.c",
         "stdio_usb_descriptors.c",
     ],
-    target_compatible_with = select({
-        "//bazel/constraint:pico_stdio_usb_enabled": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }) + select({
-        "//bazel/constraint:rp2": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = compatible_with_config(
+        "//bazel/constraint:pico_stdio_usb_enabled"
+    ) + compatible_with_rp2(),
     deps = [
         ":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
         ":pico_stdio_usb_headers",
