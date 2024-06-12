@@ -16,6 +16,8 @@ cc_library(
         "main.cpp",
         "pio_assembler.cpp",
         "pio_disassembler.cpp",
+        "json_output.cpp",
+        "go_output.cpp",
         "gen/parser.hpp",
         "gen/location.h",
         "gen/lexer.cpp",
