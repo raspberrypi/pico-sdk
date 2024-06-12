@@ -28,6 +28,23 @@ def _pico_generate_pio_header_impl(ctx):
 
 pico_generate_pio_header = rule(
     implementation = _pico_generate_pio_header_impl,
+    doc = """Generates a .h header file for each listed pio source.
+
+Each source file listed in `srcs` will be available as `[pio file name].h` on
+the include path if you depend on this rule from a `cc_library`.
+
+pico_generate_pio_header(
+    name = "my_fun_pio",
+    srcs = ["my_fun_pio.pio"],
+)
+
+# This library can #include "my_fun_pio.pio.h".
+cc_library(
+    name = "libfoo",
+    deps = [":my_fun_pio"],
+    srcs = ["libfoo.c"],
+)
+""",
     attrs = {
         "srcs": attr.label_list(mandatory = True, allow_files = True),
         "_pioasm_tool": attr.label(

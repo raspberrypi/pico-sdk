@@ -60,6 +60,8 @@ $ bazelisk build --platforms=@pico-sdk//bazel/platform:rp2040 //...
 ```
 
 ## SDK configuration
+An exhaustive list of build system configuration options is available in
+`//bazel/config:BUILD.bazel`.
 
 ### Selecting a different board
 A different board can be selected specifying `--@pico-sdk//bazel/config:PICO_BOARD`:
