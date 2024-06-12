@@ -16,7 +16,6 @@ cc_binary(
             "//src/rp2_common/hardware_vreg:hardware_vreg",
         ],
     }),
-    # Doesn't yet build for host.
     target_compatible_with = compatible_with_rp2(),
     testonly = True,
 )
@@ -35,7 +34,6 @@ cc_binary(
             "//src/rp2_common/hardware_vreg:hardware_vreg",
         ],
     }),
-    # Doesn't yet build for host.
     target_compatible_with = compatible_with_rp2(),
     testonly = True,
 )

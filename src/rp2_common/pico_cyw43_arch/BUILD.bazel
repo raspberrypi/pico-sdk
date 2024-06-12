@@ -19,6 +19,9 @@ _CONFIGURATIONS = [
 #   pico_cyw43_arch_lwip_poll
 #   pico_cyw43_arch_threadsafe_background
 #   pico_cyw43_arch_lwip_threadsafe_background
+#
+# This is done rather than having intermediate libraries because the defines
+# for a given configuration must be applied to both .c files.
 [
     cc_library(
         name = "pico_cyw43_arch_" + ("lwip_" if use_lwip else "") + kind,

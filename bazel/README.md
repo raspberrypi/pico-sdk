@@ -1,10 +1,4 @@
 # Bazel build
-The Bazel build for the Pico SDK is currently community-maintained, and should
-be considered an experimental work-in-progress. There are missing features,
-and you may encounter significant breakages with future versions.
-
-You are welcome and encouraged to file issues for any problems you encounter
-along the way.
 
 ## Using the Pico SDK in a Bazel project.
 
@@ -65,14 +59,12 @@ Raspberry Pi Pico:
 $ bazelisk build --platforms=@pico-sdk//bazel/platform:rp2040 //...
 ```
 
-## SDK configuration [experimental]
-These configuration options are a work in progress and may see significant
-breaking changes in future versions.
+## SDK configuration
 
 ### Selecting a different board
 A different board can be selected specifying `--@pico-sdk//bazel/config:PICO_BOARD`:
 ```console
-$ bazelisk build --platforms=//bazel/platform:rp2040 --@pico-sdk//bazel/config:PICO_BOARD=pico //...
+$ bazelisk build --platforms=//bazel/platform:rp2040 --@pico-sdk//bazel/config:PICO_BOARD=pico_w //...
 ```
 
 If you have a bespoke board definition, you can configure the Pico SDK to use it
@@ -108,17 +100,14 @@ To build all of the Pico SDK, run the following command:
 $ bazelisk build --platforms=//bazel/platform:rp2040 //...
 ```
 
-**Note:** Since the Bazel build does not yet have any `cc_binary` rules with a
-`main()` function, there won't be any binaries to flash on your board. For now,
-this only builds the SDK as a collection of libraries.
-
 ## Known issues and limitations
-The Bazel build is currently experimental and incomplete. At this time, only the
-stock Pi Pico board is supported, and the only configuration options are
-changing the STDIO mode between UART and USB serial.
+The Bazel build for the Pico SDK is relatively new, but most features and
+configuration options available in the CMake build are also available in Bazel.
+You are welcome and encouraged to file issues for any problems and limitations
+you encounter along the way.
 
-Keep in mind the following limitations:
-* Pico-W is not yet supported.
-* Selecting an alternative board is not yet supported.
-* Nearly all preexisting CMake configuration options are not yet supported.
-* Targeting the host build of the Pico SDK is not yet supported.
+Currently, the following features are not supported:
+
+* "None" variants of pico_double, pico_float, and pico_printf are not yet
+  supported.
+* The pioasm parser cannot be built from source via Bazel.
