@@ -97,6 +97,7 @@ cc_library(
         "//bazel/config:PICO_DEFAULT_BINARY_INFO",
         "//bazel/config:PICO_DEFAULT_LINKER_SCRIPT",
         "//src/common/pico_base:pico_base_interface",
+        "//src/rp2_common/cmsis:cmsis_core",
         "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_platform",
         "//src/rp2_common/pico_platform:hardware_regs",

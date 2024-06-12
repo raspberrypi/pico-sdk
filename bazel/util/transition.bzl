@@ -26,6 +26,7 @@ def declare_transtion(attrs, flag_overrides = None, append_to_flags = None, exec
     from. The common `src` attr tells the transition which build rule to apply
     the transition to.
     """
+
     def _flag_override_impl(settings, attrs):
         final_overrides = {}
         if flag_overrides != None:

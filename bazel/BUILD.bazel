@@ -35,6 +35,21 @@ cc_library(
     ],
 )
 
+genrule(
+    name = "empty_extra_headers_file",
+    outs = ["generated_extra_include/pico_config_extra_headers.h"],
+    cmd = "echo > $@",
+    cmd_bat = "copy NUL $@",
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
+    name = "no_extra_headers",
+    hdrs = ["generated_extra_include/pico_config_extra_headers.h"],
+    includes = ["generated_extra_include"],
+    visibility = ["//visibility:private"],
+)
+
 # An empty stub, useful for label_flag flags that need to point to a library,
 # but for some purposes the library needs to be a no-op.
 cc_library(

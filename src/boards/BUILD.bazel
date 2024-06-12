@@ -1,3 +1,4 @@
+load("//bazel:defs.bzl", "pico_board_config")
 load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "flag_choice")
 
 package(default_visibility = ["//visibility:public"])
@@ -62,14 +63,18 @@ BOARD_CHOICE_MAP = {c: [":{}".format(c)] for c in BOARD_CHOICES}
 
 # PICO_BUILD_DEFINE: PICO_BOARD, Name of board, type=string, default=CMake PICO_BOARD variable, group=pico_base
 [
-    cc_library(
+    pico_board_config(
         name = board,
         hdrs = BOARD_CHOICE_FILES,
         defines = [
             'PICO_BOARD=\\"{}\\"'.format(board),
-            'PICO_CONFIG_HEADER="boards/{}.h"'.format(board),
         ],
         includes = ["include"],
+        platform_includes = [
+            "cmsis/rename_exceptions.h",
+            "boards/{}.h".format(board),
+        ],
+        deps = ["//src/rp2_common/cmsis:rename_exceptions"],
     )
     for board in BOARD_CHOICES
 ]

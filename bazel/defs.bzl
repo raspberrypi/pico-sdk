@@ -1,3 +1,6 @@
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 def _pico_generate_pio_header_impl(ctx):
     generated_headers = []
     for f in ctx.files.srcs:
@@ -87,3 +90,27 @@ def compatible_with_pico_w():
         "@pico-sdk//bazel/constraint:is_pico_w": [],
         "//conditions:default": ["@platforms//:incompatible"],
     })
+
+def pico_board_config(name, platform_includes, **kwargs):
+    """A helper macro for declaring a Pico board to use with PICO_CONFIG_HEADER.
+
+    This generates pico_config_platform_headers.h using the list of
+    includes provided in `platform_includes`, and the final artifact is
+    a cc_library that you can configure //bazel/config:PICO_CONFIG_HEADER to
+    point to.
+    """
+    _hdr_dir = "{}_generated_includes".format(name)
+    _hdr_path = "{}/pico_config_platform_headers.h".format(_hdr_dir)
+    write_file(
+        name = "{}_platform_headers_file".format(name),
+        out = _hdr_path,
+        content = ['#include "{}"'.format(inc) for inc in platform_includes],
+    )
+    kwargs.setdefault("hdrs", [])
+    kwargs["hdrs"].append(_hdr_path)
+    kwargs.setdefault("includes", [])
+    kwargs["includes"].append(_hdr_dir)
+    cc_library(
+        name = name,
+        **kwargs
+    )

@@ -8,15 +8,16 @@ cc_library(
     name = "rename_exceptions",
     hdrs = ["include/cmsis/rename_exceptions.h"],
     # This is mildly odd, but intentional. We really don't want this header
-    # to have extra deps, but this should always be defined.
-    defines = ["LIB_CMSIS_CORE=1"],
+    # to have extra deps, and this header is touched by the host build.
+    defines = select({
+        "//bazel/constraint:host": [],
+        "//conditions:default": ["LIB_CMSIS_CORE=1"],
+    }),
     includes = ["include"],
-    target_compatible_with = compatible_with_rp2(),
 )
 
 cc_library(
     name = "cmsis_core",
-    defines = ["LIB_CMSIS_CORE=1"],
     srcs = [
         "stub/CMSIS/Device/RaspberryPi/RP2040/Source/system_RP2040.c",
     ],
@@ -33,6 +34,7 @@ cc_library(
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include/RP2040.h",
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include/system_RP2040.h",
     ],
+    defines = ["LIB_CMSIS_CORE=1"],
     includes = [
         "stub/CMSIS/Core/Include",
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include",

@@ -1,5 +1,4 @@
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -153,50 +152,4 @@ cc_library(
         ":pico_platform",
         ":pico_base_interface",
     ],
-)
-
-genrule(
-    name = "empty_extra_headers_file",
-    outs = ["generated_include/pico_config_extra_headers.h"],
-    cmd = "echo > $@",
-    cmd_bat = "copy NUL $@",
-    visibility = ["//visibility:private"],
-)
-
-_RP2040_DEFAULT_HEADER_CONTENTS = [
-    '#include "cmsis/rename_exceptions.h"',
-]
-
-write_file(
-    name = "rp2040_default_platform_headers_file",
-    out = "generated_rp2040_include/pico_config_platform_headers.h",
-    content = _RP2040_DEFAULT_HEADER_CONTENTS,
-)
-
-genrule(
-    name = "empty_paltform_headers_file",
-    outs = ["generated_include/pico_config_platform_headers.h"],
-    cmd = "echo > $@",
-    cmd_bat = "copy NUL $@",
-    visibility = ["//visibility:private"],
-)
-
-cc_library(
-    name = "no_extra_headers",
-    hdrs = ["generated_include/pico_config_extra_headers.h"],
-    includes = ["generated_include"],
-    visibility = ["//visibility:private"],
-)
-
-cc_library(
-    name = "default_platform_headers",
-    hdrs = select({
-        "//bazel/constraint:host": ["generated_include/pico_config_platform_headers.h"],
-        "//conditions:default": ["generated_rp2040_include/pico_config_platform_headers.h"],
-    }),
-    includes = select({
-        "//bazel/constraint:host": ["generated_include"],
-        "//conditions:default": ["generated_rp2040_include"],
-    }),
-    visibility = ["//visibility:private"],
 )
