@@ -56,7 +56,7 @@ alias(
     name = "platform_defs",
     actual = select({
         "//bazel/constraint:host": "//src/host/pico_platform:platform_defs",
-        "//bazel/constraint:rp2": "//src/rp2_common/pico_platform:platform_defs",
+        "//conditions:default": "//src/rp2_common/pico_platform:platform_defs",
     }),
 )
 
@@ -64,7 +64,7 @@ alias(
     name = "pico_platform",
     actual = select({
         "//bazel/constraint:host": "//src/host/pico_platform:pico_platform",
-        "//bazel/constraint:rp2": "//src/rp2_common/pico_platform:pico_platform",
+        "//conditions:default": "//src/rp2_common/pico_platform:pico_platform",
     }),
 )
 
@@ -148,10 +148,10 @@ cc_library(
         ":pico_base_interface",
     ],
     implementation_deps = select({
-        "//bazel/constraint:rp2": [
+        "//bazel/constraint:host": [],
+        "//conditions:default": [
             "//src/rp2_common/pico_platform:platform_link_deps",
         ],
-        "//conditions:default": [],
     }),
 )
 
@@ -191,12 +191,12 @@ cc_library(
 cc_library(
     name = "default_platform_headers",
     hdrs = select({
-        "//bazel/constraint:rp2": ["generated_rp2040_include/pico_config_platform_headers.h"],
-        "//conditions:default": ["generated_include/pico_config_platform_headers.h"],
+        "//bazel/constraint:host": ["generated_include/pico_config_platform_headers.h"],
+        "//conditions:default": ["generated_rp2040_include/pico_config_platform_headers.h"],
     }),
     includes = select({
-        "//bazel/constraint:rp2": ["generated_rp2040_include"],
-        "//conditions:default": ["generated_include"],
+        "//bazel/constraint:host": ["generated_include"],
+        "//conditions:default": ["generated_rp2040_include"],
     }),
     visibility = ["//visibility:private"],
 )

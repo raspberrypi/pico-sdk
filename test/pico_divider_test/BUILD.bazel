@@ -9,12 +9,12 @@ cc_binary(
         "//src/common/pico_divider:pico_divider",
         "//src/common/pico_stdlib:pico_stdlib",
     ] + select({
-        "//bazel/constraint:rp2": [
+        "//bazel/constraint:host": [],
+        "//conditions:default": [
             "//src/rp2_common/hardware_dma:hardware_dma",
             "//src/rp2_common/hardware_irq:hardware_irq",
             "//src/rp2_common/hardware_vreg:hardware_vreg",
         ],
-        "//conditions:default": [],
     }),
     # Doesn't yet build for host.
     target_compatible_with = compatible_with_rp2(),
@@ -28,12 +28,12 @@ cc_binary(
         "//src/common/pico_divider:pico_divider",
         "//src/common/pico_stdlib:pico_stdlib",
     ] + select({
-        "//bazel/constraint:rp2": [
+        "//bazel/constraint:host": [],
+        "//conditions:default": [
             "//src/rp2_common/hardware_dma:hardware_dma",
             "//src/rp2_common/hardware_irq:hardware_irq",
             "//src/rp2_common/hardware_vreg:hardware_vreg",
         ],
-        "//conditions:default": [],
     }),
     # Doesn't yet build for host.
     target_compatible_with = compatible_with_rp2(),

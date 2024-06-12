@@ -17,11 +17,11 @@ cc_library(
         "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_sync",
     ] + select({
-        "//bazel/constraint:rp2": [
-            "//src/rp2_common/hardware_sync",
-        ],
         "//bazel/constraint:host": [
             "//src/host/hardware_sync",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_sync",
         ],
     }),
 )

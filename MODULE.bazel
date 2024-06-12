@@ -8,7 +8,7 @@ bazel_dep(name = "bazel_skylib", version = "1.6.1")
 # module will not ensure that the root Bazel module has that same version of
 # rules_cc. For that reason, this primarily acts as a FYI. You'll still need
 # to explicitly list this dependency in your own project's MODULE.bazel file.
-bazel_dep(name = "rules_cc", version = "0.0.10")
+bazel_dep(name = "rules_cc", version = "0.0.9")
 
 # rules_cc v0.0.10 is not yet cut, so manually pull in the desired version.
 # This does not apply to dependent projects, so it needs to be copied to your

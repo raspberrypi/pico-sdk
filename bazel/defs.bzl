@@ -61,7 +61,7 @@ def incompatible_with_config(config_label):
 
 def compatible_with_rp2():
     """Expresses a rule is compatible with the rp2 family."""
-    return compatible_with_config("//bazel/constraint:rp2")
+    return incompatible_with_config("//bazel/constraint:host")
 
 def compatible_with_pico_w():
     """Expresses a rule is compatible a Pico W."""

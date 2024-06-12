@@ -21,15 +21,6 @@ constraint_value(
     constraint_setting = ":sdk_target",
 )
 
-# This constraint value is used to guide parts of the build that apply to all
-# rp2-class chips.
-config_setting(
-    name = "rp2",
-    constraint_values = [
-        ":rp2040",
-    ],
-)
-
 constraint_setting(
     name = "wireless_support",
     default_constraint_value = "no_wireless",

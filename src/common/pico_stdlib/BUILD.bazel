@@ -16,13 +16,13 @@ cc_library(
         "//src/common/pico_base",
         "//src/common/pico_time",
     ] + select({
-        "//bazel/constraint:rp2": [
-            "//src/rp2_common/hardware_gpio",
-            "//src/rp2_common/hardware_uart",
-        ],
         "//bazel/constraint:host": [
             "//src/host/hardware_gpio",
             "//src/host/hardware_uart",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_gpio",
+            "//src/rp2_common/hardware_uart",
         ],
     }),
 )
@@ -35,17 +35,17 @@ cc_library(
         "//src/common/pico_base",
         "//src/common/pico_time",
     ] + select({
-        "//bazel/constraint:rp2": [
-            "//src/rp2_common/hardware_gpio",
-            "//src/rp2_common/hardware_uart",
-            "//src/rp2_common/pico_stdio",
-            "//src/rp2_common/pico_stdlib",
-        ],
         "//bazel/constraint:host": [
             "//src/host/hardware_gpio",
             "//src/host/hardware_uart",
             "//src/host/pico_stdio",
             "//src/host/pico_stdlib",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_gpio",
+            "//src/rp2_common/hardware_uart",
+            "//src/rp2_common/pico_stdio",
+            "//src/rp2_common/pico_stdlib",
         ],
     }),
 )
