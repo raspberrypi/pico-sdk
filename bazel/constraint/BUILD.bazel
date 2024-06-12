@@ -30,6 +30,26 @@ config_setting(
     ],
 )
 
+constraint_setting(
+    name = "wireless_support",
+    default_constraint_value = "no_wireless",
+)
+
+constraint_value(
+    name = "no_wireless",
+    constraint_setting = ":wireless_support",
+)
+
+constraint_value(
+    name = "cyw43_wireless",
+    constraint_setting = ":wireless_support",
+)
+
+config_setting(
+    name = "is_pico_w",
+    flag_values = {"//bazel/config:PICO_BOARD": "pico_w"},
+)
+
 config_setting(
     name = "pico_baremetal_enabled",
     flag_values = {"//bazel/config:PICO_BARE_METAL": "True"},
@@ -78,4 +98,19 @@ config_setting(
 config_setting(
     name = "pico_no_target_name_enabled",
     flag_values = {"//bazel/config:PICO_NO_TARGET_NAME": "True"},
+)
+
+config_setting(
+    name = "pico_btstack_config_unset",
+    flag_values = {"//bazel/config:PICO_BTSTACK_CONFIG": "@pico-sdk//bazel:empty_cc_lib"},
+)
+
+config_setting(
+    name = "pico_lwip_config_unset",
+    flag_values = {"//bazel/config:PICO_LWIP_CONFIG": "@pico-sdk//bazel:empty_cc_lib"},
+)
+
+config_setting(
+    name = "pico_freertos_unset",
+    flag_values = {"//bazel/config:PICO_FREERTOS_LIB": "@pico-sdk//bazel:empty_cc_lib"},
 )

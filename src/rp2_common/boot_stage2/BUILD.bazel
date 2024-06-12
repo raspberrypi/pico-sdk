@@ -80,7 +80,7 @@ cc_binary(
     # this does nothing if someone passes --custom_malloc, so the
     # rp2040_bootloader_binary transition forcibly clobbers --custom_malloc.
     malloc = "//bazel:empty_cc_lib",
-    tags = ["manual"],
+    tags = ["manual"],  # Only build as an explicit dependency.
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],

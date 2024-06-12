@@ -1,32 +1,84 @@
 package(default_visibility = ["//visibility:public"])
 
+# Prefer these aliases to directly referencing @btstack, as it's possible that
+# name may change.
+alias(
+    name = "pico_btstack_base",
+    actual = "@btstack//:pico_btstack_base",
+)
+
+alias(
+    name = "pico_btstack_ble",
+    actual = "@btstack//:pico_btstack_ble",
+)
+
+alias(
+    name = "pico_btstack_classic",
+    actual = "@btstack//:pico_btstack_classic",
+)
+
+alias(
+    name = "pico_btstack_sbc_encoder",
+    actual = "@btstack//:pico_btstack_classic",
+)
+
+alias(
+    name = "pico_btstack_bnep_lwip",
+    actual = "@btstack//:pico_btstack_bnep_lwip",
+)
+
+alias(
+    name = "pico_btstack_bnep_lwip_sys_freertos",
+    actual = "@btstack//:pico_btstack_bnep_lwip_sys_freertos",
+)
+
 cc_library(
-    name = "pico_btstack",
-    srcs = [
-        "btstack_flash_bank.c",
-        "btstack_run_loop_async_context.c",
-        "btstack_stdin_pico.c",
-    ],
-    hdrs = [
-        "include/pico/btstack_flash_bank.h",
-        "include/pico/btstack_run_loop_async_context.h",
-    ],
+    name = "pico_btstack_flash_bank",
     includes = ["include"],
-    # Missing deps for:
-    #     btstack_config.h
-    #     btstack_run_loop.h
-    #     btstack_stdin.h
-    #     hal_flash_bank.h
-    tags = ["manual"],
+    hdrs = ["include/pico/btstack_flash_bank.h"],
+    srcs = ["btstack_flash_bank.c"],
+    deps = [
+        "//src/common/pico_base",
+        "//src/rp2_common/pico_flash",
+        ":pico_btstack_base",
+    ],
     target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
+        "//bazel/constraint:cyw43_wireless": [],
+        "//bazel/constraint:is_pico_w": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
+
+cc_library(
+    name = "btstack_run_loop_async_context",
+    includes = ["include"],
+    hdrs = ["include/pico/btstack_run_loop_async_context.h"],
+    srcs = ["btstack_run_loop_async_context.c"],
+    deps = [
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/pico_async_context:pico_async_context",
+        "@btstack//:pico_btstack_base",
+    ],
+    target_compatible_with = select({
+        "//bazel/constraint:cyw43_wireless": [],
+        "//bazel/constraint:is_pico_w": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
+
+cc_library(
+    name = "pico_btstack_stdin",
+    srcs = ["btstack_stdin_pico.c"],
+    target_compatible_with = select({
+        "//bazel/constraint:pico_btstack_config_unset": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }) + select({
+        "//bazel/constraint:cyw43_wireless": [],
+        "//bazel/constraint:is_pico_w": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [
         "//src/common/pico_base",
-        "//src/rp2_common/hardware_sync",
-        "//src/rp2_common/pico_async_context",
-        "//src/rp2_common/pico_flash",
         "//src/rp2_common/pico_stdio",
     ],
 )

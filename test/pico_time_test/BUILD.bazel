@@ -15,7 +15,7 @@ cc_binary(
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    tags = ["manual"],
+    tags = ["manual"],  # Built via pico_time_test.
 )
 
 binary_with_overridden_defines(

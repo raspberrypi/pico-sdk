@@ -1,31 +1,53 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "pico_lwip",
-    srcs = [
-        "lwip_freertos.c",
-        "lwip_nosys.c",
-    ],
-    hdrs = [
-        "include/arch/cc.h",
-        "include/pico/lwip_freertos.h",
-        "include/pico/lwip_nosys.h",
-    ],
+    name = "pico_lwip_config",
     includes = ["include"],
-    # Missing deps for:
-    #     FreeRTOS.h
-    #     lwip/tcpip.h
-    #     lwip/timeouts.h
-    #     semphr.h
-    tags = ["manual"],
+    hdrs = ["include/arch/cc.h"],
+    deps = [
+        "//src/common/pico_base",
+        "//src/rp2_common/pico_rand",
+    ],
+)
+
+cc_library(
+    name = "pico_lwip_freertos",
+    srcs = ["lwip_freertos.c"],
+    hdrs = ["include/pico/lwip_freertos.h"],
+    includes = ["include"],
     target_compatible_with = select({
-        "//bazel/constraint:rp2": [],
+        "//bazel/constraint:cyw43_wireless": [],
+        "//bazel/constraint:is_pico_w": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [
+        ":pico_lwip",
         "//src/common/pico_base",
         "//src/common/pico_time",
-        "//src/rp2_common/pico_async_context",
+        "//src/rp2_common/pico_async_context:pico_async_context",
         "//src/rp2_common/pico_rand",
     ],
+)
+
+cc_library(
+    name = "pico_lwip_nosys",
+    srcs = ["lwip_nosys.c"],
+    hdrs = ["include/pico/lwip_nosys.h"],
+    target_compatible_with = select({
+        "//bazel/constraint:cyw43_wireless": [],
+        "//bazel/constraint:is_pico_w": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    deps = [
+        ":pico_lwip",
+        "//src/common/pico_base",
+        "//src/common/pico_time",
+        "//src/rp2_common/pico_async_context:pico_async_context",
+        "//src/rp2_common/pico_rand",
+    ],
+)
+
+alias(
+    name = "pico_lwip",
+    actual = "@lwip//:pico_lwip",
 )

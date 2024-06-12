@@ -139,3 +139,21 @@ label_flag(
     name = "PICO_CONFIG_HEADER",
     build_setting_default = "//src/boards:default",
 )
+
+# PICO_BAZEL_CONFIG: PICO_BTSTACK_CONFIG, [Bazel only] The cc_library that provides btstack_config.h, default=//bazel:empty_cc_lib, group=wireless
+label_flag(
+    name = "PICO_BTSTACK_CONFIG",
+    build_setting_default = "//bazel:empty_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_LWIP_CONFIG, [Bazel only] The cc_library that provides lwipopts.h, default=//bazel:empty_cc_lib, group=wireless
+label_flag(
+    name = "PICO_LWIP_CONFIG",
+    build_setting_default = "//bazel:empty_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_FREERTOS_LIB, [Bazel only] The cc_library that provides FreeRTOS, default=//bazel:empty_cc_lib, group=wireless
+label_flag(
+    name = "PICO_FREERTOS_LIB",
+    build_setting_default = "//bazel:empty_cc_lib",
+)

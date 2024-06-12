@@ -72,3 +72,14 @@ rp2040_bootloader_binary = declare_transtion(
         "//command_line_option:custom_malloc": "_malloc",
     },
 )
+
+kitchen_sink_test_binary =  declare_transtion(
+    attrs = {
+        "bt_stack_config": attr.label(mandatory = True),
+        "lwip_config": attr.label(mandatory = True),
+    },
+    flag_overrides = {
+        "@pico-sdk//bazel/config:PICO_BTSTACK_CONFIG": "bt_stack_config",
+        "@pico-sdk//bazel/config:PICO_LWIP_CONFIG": "lwip_config",
+    },
+)

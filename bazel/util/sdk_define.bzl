@@ -11,7 +11,7 @@ def _pico_sdk_define_impl(ctx):
         val = 1 if val else 0
     cc_ctx = cc_common.create_compilation_context(
         defines = depset(
-            ["{}={}".format(ctx.attr.define_name, val)]
+            direct = ["{}={}".format(ctx.attr.define_name, val)]
         )
     )
     return [CcInfo(compilation_context = cc_ctx)]

@@ -120,6 +120,10 @@ BAZEL_ONLY_ALLOWLIST = (
     # - PICO_BOARD_HEADER_FILE
     # - PICO_BOARD_HEADER_DIRS
     "PICO_CONFIG_HEADER",
+    # Bazel configuration for 3p deps.
+    "PICO_BTSTACK_CONFIG",
+    "PICO_LWIP_CONFIG",
+    "PICO_FREERTOS_LIB",
 )
 
 @dataclass

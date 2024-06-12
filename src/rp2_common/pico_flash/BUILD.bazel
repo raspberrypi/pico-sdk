@@ -5,15 +5,15 @@ cc_library(
     srcs = ["flash.c"],
     hdrs = ["include/pico/flash.h"],
     includes = ["include"],
-    # Missing deps for:
-    #     FreeRTOS.h
-    #     task.h
-    tags = ["manual"],
     target_compatible_with = select({
         "//bazel/constraint:rp2": [],
         "//conditions:default": ["@platforms//:incompatible"],
+    }) + select({
+        "//bazel/constraint:pico_freertos_unset": ["@platforms//:incompatible"],
+        "//conditions:default": [],
     }),
     deps = [
+        "//bazel/config:PICO_FREERTOS_LIB",
         "//src/common/pico_base",
         "//src/common/pico_time",
         "//src/rp2_common/hardware_exception",
