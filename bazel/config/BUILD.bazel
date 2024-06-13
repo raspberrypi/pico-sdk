@@ -1,52 +1,159 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "int_flag", "string_flag")
+
 package(default_visibility = ["//visibility:public"])
 
-# This should always point to a cc_library that provides
-# a "pico_config_extra_headers.h".
-label_flag(
-    name = "pico_config_extra_headers",
-    build_setting_default = ":no_extra_headers",
+# PICO_BAZEL_CONFIG: PICO_BOARD, The board name being built for, type=string, default=pico, group=build
+string_flag(
+    name = "PICO_BOARD",
+    build_setting_default = "pico",
 )
 
-# This should always point to a cc_library that provides
-# a "pico_config_platform_headers.h".
-label_flag(
-    name = "pico_config_platform_headers",
-    build_setting_default = ":no_platform_headers",
+# PICO_BAZEL_CONFIG: PICO_BARE_METAL, Flag to exclude anything except base headers from the build, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_BARE_METAL",
+    build_setting_default = False,
 )
 
-# This should always point to a cc_library that defines PICO_CONFIG_HEADER and
-# any other defines that should be applied when building the SDK.
+# PICO_BAZEL_CONFIG: PICO_NO_GC_SECTIONS, Disable -ffunction-sections -fdata-sections and --gc-sections, type=bool, default=0, advanced=true, group=pico_standard_link
+bool_flag(
+    name = "PICO_NO_GC_SECTIONS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BOOT_STAGE2_FILE, Boot stage 2 file to use; this should point to a filegroup with the .S file to use, type=string, group=build
 label_flag(
-    name = "pico_config_header",
+    name = "PICO_DEFAULT_BOOT_STAGE2_FILE",
+    build_setting_default = "//src/rp2_common/boot_stage2:build_selected_boot2",
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BOOT_STAGE2, Simpler alternative to specifying PICO_DEFAULT_BOOT_STAGE2_FILE where the file is src/rp2_common/boot_stage2/{PICO_DEFAULT_BOOT_STAGE2}.S, type=string, default=compile_time_choice, group=build
+string_flag(
+    name = "PICO_DEFAULT_BOOT_STAGE2",
+    build_setting_default = "compile_time_choice",
+)
+
+# PICO_BAZEL_CONFIG: PICO_BOOT_STAGE2_LINK_IMAGE, [Bazel only] The final boot_stage2 image target to link in. Use this to fully override/replace boot_stage2, default=@pico-sdk//src/rp2_common/boot_stage2:boot_stage2, group=build
+label_flag(
+    name = "PICO_BOOT_STAGE2_LINK_IMAGE",
+    build_setting_default = "//src/rp2_common/boot_stage2:boot_stage2",
+)
+
+# PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_EXCEPTIONS, Enabled CXX exception handling, type=bool, default=0, group=pico_cxx_options
+bool_flag(
+    name = "PICO_CXX_ENABLE_EXCEPTIONS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_RTTI, Enabled CXX rtti, type=bool, default=0, group=pico_cxx_options
+bool_flag(
+    name = "PICO_CXX_ENABLE_RTTI",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_CXA_ATEXIT, Enabled cxa-atexit, type=bool, default=0, group=pico_cxx_options
+bool_flag(
+    name = "PICO_CXX_ENABLE_CXA_ATEXIT",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_UART, OPTION: Globally enable stdio UART, type=bool, default=1, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_UART",
+    build_setting_default = True,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_USB, OPTION: Globally enable stdio USB, type=bool, default=0, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_USB",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_SEMIHOSTING, OPTION: Globally enable stdio semihosting, type=bool, default=0, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_SEMIHOSTING",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CMSIS_PATH, Label of a cc_ibrary providing CMSIS core, default="included stub CORE only impl", group=build
+label_flag(
+    name = "PICO_CMSIS_PATH",
+    build_setting_default = "//src/rp2_common/cmsis:cmsis_core",
+)
+
+# PICO_BAZEL_CONFIG: PICO_USE_DEFAULT_MAX_PAGE_SIZE, Don't shrink linker max page to 4096, type=bool, default=0, advanced=true, group=pico_standard_link
+bool_flag(
+    name = "PICO_USE_DEFAULT_MAX_PAGE_SIZE",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) during initialization, type=int, default=0, group=pico_stdio_usb
+int_flag(
+    name = "PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+    build_setting_default = 0,
+)
+
+# PICO_BAZEL_CONFIG: PICO_TINYUSB_LIB, [Bazel only] The library that provides TinyUSB, default=@tinyusb//:tinyusb, group=build
+label_flag(
+    name = "PICO_TINYUSB_LIB",
+    build_setting_default = "@tinyusb//:tinyusb",
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BINARY_INFO, [Bazel only] The library that provides custom_pico_binary_info to link into all binaries, default=//src/rp2_common/pico_standard_link:default_binary_info, group=pico_standard_link
+label_flag(
+    name = "PICO_DEFAULT_BINARY_INFO",
+    build_setting_default = "//src/rp2_common/pico_standard_link:default_binary_info",
+)
+
+# PICO_BAZEL_CONFIG: PICO_BAZEL_BUILD_TYPE, The type of build (e.g. Debug or Release) to embed in binary info, type=string, default=pico, group=build
+string_flag(
+    name = "PICO_BAZEL_BUILD_TYPE",
+    build_setting_default = "Debug",
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_LINKER_SCRIPT, [Bazel only] The library that provides a linker script to link into all binaries, default=//src/rp2_common/pico_standard_link:default_linker_script, group=pico_standard_link
+label_flag(
+    name = "PICO_DEFAULT_LINKER_SCRIPT",
+    build_setting_default = "//src/rp2_common/pico_standard_link:default_linker_script",
+)
+
+# PICO_BAZEL_CONFIG: PICO_NO_TARGET_NAME, Don't define PICO_TARGET_NAME, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_NO_TARGET_NAME",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CONFIG_EXTRA_HEADER, [Bazel only] The cc_library that provides "pico_config_extra_headers.h", default=//bazel:no_extra_headers, group=pico_base
+label_flag(
+    name = "PICO_CONFIG_EXTRA_HEADER",
+    build_setting_default = "//bazel:no_extra_headers",
+)
+
+# PICO_BAZEL_CONFIG: PICO_CONFIG_PLATFORM_HEADER, [Bazel only] The cc_library that provides "pico_config_platform_headers.h" and defines PICO_BOARD, default=//src/common/pico_base:default_platform_headers, group=pico_base
+label_flag(
+    name = "PICO_CONFIG_PLATFORM_HEADER",
     build_setting_default = "//src/boards:default",
 )
 
-genrule(
-    name = "empty_extra_headers_file",
-    outs = ["generated_include/pico_config_extra_headers.h"],
-    cmd = "echo > $@",
-    cmd_bat = "copy NUL $@",
-    visibility = ["//visibility:private"],
+# PICO_BAZEL_CONFIG: PICO_CONFIG_HEADER, [Bazel only] The cc_library that defines PICO_CONFIG_HEADER or pico/config_autogen.h and other SDK critical defines (overrides PICO_BOARD setting), default=//bazel:generate_config_header, group=pico_base
+label_flag(
+    name = "PICO_CONFIG_HEADER",
+    build_setting_default = "//bazel:generate_config_header",
 )
 
-genrule(
-    name = "empty_platform_headers_file",
-    outs = ["generated_include/pico_config_platform_headers.h"],
-    cmd = "echo > $@",
-    cmd_bat = "copy NUL $@",
-    visibility = ["//visibility:private"],
+# PICO_BAZEL_CONFIG: PICO_BTSTACK_CONFIG, [Bazel only] The cc_library that provides btstack_config.h, default=//bazel:empty_cc_lib, group=wireless
+label_flag(
+    name = "PICO_BTSTACK_CONFIG",
+    build_setting_default = "//bazel:empty_cc_lib",
 )
 
-cc_library(
-    name = "no_extra_headers",
-    hdrs = ["generated_include/pico_config_extra_headers.h"],
-    includes = ["generated_include"],
-    visibility = ["//visibility:private"],
+# PICO_BAZEL_CONFIG: PICO_LWIP_CONFIG, [Bazel only] The cc_library that provides lwipopts.h, default=//bazel:empty_cc_lib, group=wireless
+label_flag(
+    name = "PICO_LWIP_CONFIG",
+    build_setting_default = "//bazel:empty_cc_lib",
 )
 
-cc_library(
-    name = "no_platform_headers",
-    hdrs = ["generated_include/pico_config_platform_headers.h"],
-    includes = ["generated_include"],
-    visibility = ["//visibility:private"],
+# PICO_BAZEL_CONFIG: PICO_FREERTOS_LIB, [Bazel only] The cc_library that provides FreeRTOS, default=//bazel:empty_cc_lib, group=wireless
+label_flag(
+    name = "PICO_FREERTOS_LIB",
+    build_setting_default = "//bazel:empty_cc_lib",
 )

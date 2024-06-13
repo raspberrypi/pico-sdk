@@ -1,3 +1,5 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
 package(default_visibility = ["//visibility:public"])
 
 py_binary(
@@ -18,17 +20,38 @@ py_binary(
 # configuring these `label_flag`s:
 #
 #     # Specify the library that provides "pico_config_extra_headers.h"
-#     --@pico-sdk//bazel/config:pico_config_extra_headers=//my_proj:my_custom_headers
+#     --@pico-sdk//bazel/config:PICO_CONFIG_EXTRA_HEADER=//my_proj:my_custom_headers
 #
 #     # Specify the library that provides "pico_config_platform_headers.h"
-#     --@pico-sdk//bazel/config:pico_config_platform_headers=//my_proj:my_custom_platform_headers
+#     --@pico-sdk//bazel/config:PICO_CONFIG_PLATFORM_HEADER=//my_proj:my_custom_platform_headers
 cc_library(
     name = "generate_config_header",
     hdrs = ["include/pico/config_autogen.h"],
     includes = ["include"],
     visibility = ["//:__subpackages__"],
     deps = [
-        "//bazel/config:pico_config_extra_headers",
-        "//bazel/config:pico_config_platform_headers",
+        "//bazel/config:PICO_CONFIG_EXTRA_HEADER",
+        "//bazel/config:PICO_CONFIG_PLATFORM_HEADER",
     ],
+)
+
+genrule(
+    name = "empty_extra_headers_file",
+    outs = ["generated_extra_include/pico_config_extra_headers.h"],
+    cmd = "echo > $@",
+    cmd_bat = "copy NUL $@",
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
+    name = "no_extra_headers",
+    hdrs = ["generated_extra_include/pico_config_extra_headers.h"],
+    includes = ["generated_extra_include"],
+    visibility = ["//visibility:private"],
+)
+
+# An empty stub, useful for label_flag flags that need to point to a library,
+# but for some purposes the library needs to be a no-op.
+cc_library(
+    name = "empty_cc_lib",
 )

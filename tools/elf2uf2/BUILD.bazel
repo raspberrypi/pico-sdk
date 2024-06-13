@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "elf2uf2",
+    srcs = [
+        "elf.h",
+        "main.cpp",
+    ],
+    copts = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": [
+            "-Wno-unused-function",
+            "-Wno-reorder-ctor",
+            "-Wno-unused-variable",
+        ],
+    }),
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/common/boot_uf2"],
+)

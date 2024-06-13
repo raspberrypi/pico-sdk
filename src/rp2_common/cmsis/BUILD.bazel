@@ -1,8 +1,18 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
 package(default_visibility = ["//visibility:public"])
 
+# This is added to @pico-sdk//src/common/pico_base:default_platform_headers
+# by default.
 cc_library(
     name = "rename_exceptions",
     hdrs = ["include/cmsis/rename_exceptions.h"],
+    # This is mildly odd, but intentional. We really don't want this header
+    # to have extra deps, and this header is touched by the host build.
+    defines = select({
+        "//bazel/constraint:host": [],
+        "//conditions:default": ["LIB_CMSIS_CORE=1"],
+    }),
     includes = ["include"],
 )
 
@@ -24,10 +34,12 @@ cc_library(
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include/RP2040.h",
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include/system_RP2040.h",
     ],
+    defines = ["LIB_CMSIS_CORE=1"],
     includes = [
         "stub/CMSIS/Core/Include",
         "stub/CMSIS/Device/RaspberryPi/RP2040/Include",
     ],
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/rp2_common/hardware_clocks",
     ],

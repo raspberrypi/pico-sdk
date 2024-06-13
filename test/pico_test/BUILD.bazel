@@ -1,0 +1,9 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_test",
+    testonly = True,
+    hdrs = ["include/pico/test.h"],
+    includes = ["include"],
+    deps = ["//src/common/pico_base"],
+)

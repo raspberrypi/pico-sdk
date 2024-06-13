@@ -9,6 +9,7 @@ cc_library(
         "include/hardware/platform_defs.h",
     ],
     includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:rp2040"],
 )
 
 cc_library(
@@ -50,4 +51,5 @@ cc_library(
         "include/hardware/regs/xosc.h",
     ],
     includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:rp2040"],
 )

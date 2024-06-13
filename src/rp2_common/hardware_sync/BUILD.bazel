@@ -1,3 +1,5 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
 package(default_visibility = ["//visibility:public"])
 
 # This exists to break a dependency cycle between
@@ -7,6 +9,7 @@ cc_library(
     name = "hardware_sync_headers",
     hdrs = ["include/hardware/sync.h"],
     includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
     visibility = ["//src/rp2_common/hardware_claim:__pkg__"],
     deps = [
         "//src/common/pico_base:pico_base_interface",
@@ -20,6 +23,7 @@ cc_library(
     srcs = ["sync.c"],
     hdrs = ["include/hardware/sync.h"],
     includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/common/pico_base:pico_base_interface",
         "//src/rp2_common/hardware_base",

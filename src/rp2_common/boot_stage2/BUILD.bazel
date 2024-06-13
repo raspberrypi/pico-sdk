@@ -1,9 +1,34 @@
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//bazel:defs.bzl", "compatible_with_rp2")
 load("//bazel/toolchain:objcopy.bzl", "objcopy_to_bin")
+load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "flag_choice")
 load("//bazel/util:transition.bzl", "rp2040_bootloader_binary")
 
+# There's a lot of implementation details in here that shouldn't be considered
+# stable, so allowlist visibility to just the public-facing pieces.
 package(default_visibility = ["//visibility:private"])
+
+# Known choices for boot2:
+BOOT2_CHOICES = [
+    "boot2_at25sf128a",
+    "boot2_generic_03h",
+    "boot2_is25lp080",
+    "boot2_usb_blinky",
+    "boot2_w25q080",
+    "boot2_w25x10cl",
+    "compile_time_choice",
+]
+
+BOOT2_CHOICE_FILES = [c + ".S" for c in BOOT2_CHOICES]
+
+BOOT2_CHOICE_FILE_MAP = {c: [c + ".S"] for c in BOOT2_CHOICES}
+
+BOOT2_CHOICE_DEFINE_MAP = {c: ['PICO_BUILD_BOOT_STAGE2_NAME=\\"{}\\"'.format(c)] for c in BOOT2_CHOICES}
+
+# Define shouldn't be set for compile_time_choice.
+BOOT2_CHOICE_DEFINE_MAP["compile_time_choice"] = []
 
 cc_library(
     name = "config",
@@ -11,31 +36,43 @@ cc_library(
         "asminclude/boot2_helpers/exit_from_boot2.S",
         "asminclude/boot2_helpers/read_flash_sreg.S",
         "asminclude/boot2_helpers/wait_ssi_ready.S",
-        "boot2_at25sf128a.S",
-        "boot2_generic_03h.S",
-        "boot2_is25lp080.S",
-        "boot2_usb_blinky.S",
-        "boot2_w25q080.S",
-        "boot2_w25x10cl.S",
         "include/boot_stage2/config.h",
-    ],
+    ] + BOOT2_CHOICE_FILES,
+    defines = select(flag_choice(
+        "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
+        ":__pkg__",
+        BOOT2_CHOICE_DEFINE_MAP,
+    )),
     includes = [
         "asminclude",
         "include",
     ],
-    visibility = ["//src/rp2_common/pico_standard_link:__pkg__"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = ["//visibility:public"],
 )
 
-# Stub library to prevent custom malloc from getting linked in. boot2 will never
-# need malloc, so letting it link can only cause problems.
-cc_library(
-    name = "no_malloc",
+# Creates a config_setting for each known boot2 option with the name:
+#     PICO_DEFAULT_BOOT_STAGE2_[choice]
+declare_flag_choices(
+    "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
+    BOOT2_CHOICES,
+)
+
+filegroup(
+    name = "build_selected_boot2",
+    srcs = select(flag_choice(
+        "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
+        ":__pkg__",
+        BOOT2_CHOICE_FILE_MAP,
+    )),
 )
 
 cc_binary(
     name = "boot_stage2_elf_actual",
-    srcs = ["compile_time_choice.S"],
+    srcs = ["//bazel/config:PICO_DEFAULT_BOOT_STAGE2_FILE"],
     copts = ["-fPIC"],
+    # Incompatible with section garbage collection.
+    features = ["-gc_sections"],
     linkopts = [
         "-Wl,--no-gc-sections",
         "-nostartfiles",
@@ -43,8 +80,9 @@ cc_binary(
     ],
     # this does nothing if someone passes --custom_malloc, so the
     # rp2040_bootloader_binary transition forcibly clobbers --custom_malloc.
-    malloc = ":no_malloc",
-    tags = ["manual"],
+    malloc = "//bazel:empty_cc_lib",
+    tags = ["manual"],  # Only build as an explicit dependency.
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         "boot_stage2.ld",
         ":config",
@@ -63,6 +101,7 @@ objcopy_to_bin(
     name = "boot_stage2_bin",
     src = ":boot_stage2_elf",
     out = "boot_stage2.bin",
+    target_compatible_with = compatible_with_rp2(),
 )
 
 # WORKAROUND: Python rules always require a .py extension.
@@ -70,11 +109,13 @@ copy_file(
     name = "copy_tool_to_py",
     src = "pad_checksum",
     out = "pad_checksum_tool.py",
+    target_compatible_with = ["//bazel/constraint:host"],
 )
 
 py_binary(
     name = "pad_checksum_tool",
     srcs = ["pad_checksum_tool.py"],
+    target_compatible_with = ["//bazel/constraint:host"],
 )
 
 run_binary(
@@ -86,12 +127,14 @@ run_binary(
         "$(location boot_stage2_bin)",
         "$(location boot_stage2.S)",
     ],
+    target_compatible_with = compatible_with_rp2(),
     tool = ":pad_checksum_tool",
 )
 
 cc_library(
     name = "boot_stage2",
     srcs = [":boot_stage2_padded"],
+    target_compatible_with = compatible_with_rp2(),
     visibility = ["//visibility:public"],
     # This isn't referenced as a symbol, so alwayslink is required to ensure
     # it doesn't get dropped before the linker script can find it.

@@ -1,3 +1,5 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -7,6 +9,7 @@ cc_library(
         "CFG_TUSB_MCU=OPT_MCU_RP2040",
         "CFG_TUSB_OS=OPT_OS_PICO",
     ],
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/common/pico_base",
         "//src/common/pico_binary_info",
@@ -22,5 +25,13 @@ cc_library(
         "//src/rp2_common/pico_stdio:pico_stdio_headers",
         "//src/rp2_common/pico_stdio_usb:pico_stdio_usb_headers",
         "//src/rp2_common/pico_stdio_usb:tusb_config",
-    ],
+    ] + select({
+        # If enabled, these headers may need to be visible.
+        "//bazel/constraint:pico_stdio_semihosting_enabled": ["//src/rp2_common/pico_stdio_semihosting"],
+        "//conditions:default": [],
+    }) + select({
+        # If enabled, these headers may need to be visible.
+        "//bazel/constraint:pico_stdio_uart_enabled": ["//src/rp2_common/pico_stdio_uart"],
+        "//conditions:default": [],
+    }),
 )

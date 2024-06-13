@@ -21,38 +21,87 @@ constraint_value(
     constraint_setting = ":sdk_target",
 )
 
-# This constraint value is used to guide parts of the build that apply to all
-# rp2-class chips.
-config_setting(
-    name = "rp2",
-    constraint_values = [
-        ":rp2040",
-    ],
-)
-
-# This constraint setting guides Bazel's build file evaluation differences
-# across different stdio configurations (e.g. stdio_usb needs TinyUSB).
 constraint_setting(
-    name = "stdio_mode",
-    default_constraint_value = "stdio_uart",
+    name = "wireless_support",
+    default_constraint_value = "no_wireless",
 )
 
-# When this constraint value is active, stdio is built against a hardware UART.
 constraint_value(
-    name = "stdio_uart",
-    constraint_setting = ":stdio_mode",
+    name = "no_wireless",
+    constraint_setting = ":wireless_support",
 )
 
-# When this constraint value is active, stdio is built against TinyUSB-based
-# USB serial.
 constraint_value(
-    name = "stdio_usb",
-    constraint_setting = ":stdio_mode",
+    name = "cyw43_wireless",
+    constraint_setting = ":wireless_support",
 )
 
-# When this constraint value is active, stdio is built against an ARM
-# semihosting library.
-constraint_value(
-    name = "stdio_semihosting",
-    constraint_setting = ":stdio_mode",
+config_setting(
+    name = "is_pico_w",
+    flag_values = {"//bazel/config:PICO_BOARD": "pico_w"},
+)
+
+config_setting(
+    name = "pico_baremetal_enabled",
+    flag_values = {"//bazel/config:PICO_BARE_METAL": "True"},
+)
+
+config_setting(
+    name = "pico_no_gc_sections_enabled",
+    flag_values = {"//bazel/config:PICO_NO_GC_SECTIONS": "True"},
+)
+
+config_setting(
+    name = "pico_cxx_enable_exceptions_enabled",
+    flag_values = {"//bazel/config:PICO_CXX_ENABLE_EXCEPTIONS": "True"},
+)
+
+config_setting(
+    name = "pico_cxx_enable_rtti_enabled",
+    flag_values = {"//bazel/config:PICO_CXX_ENABLE_RTTI": "True"},
+)
+
+config_setting(
+    name = "pico_cxx_enable_cxa_atexit_enabled",
+    flag_values = {"//bazel/config:PICO_CXX_ENABLE_RTTI": "True"},
+)
+
+config_setting(
+    name = "pico_stdio_uart_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_UART": "True"},
+)
+
+config_setting(
+    name = "pico_stdio_usb_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_USB": "True"},
+)
+
+config_setting(
+    name = "pico_stdio_semihosting_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_SEMIHOSTING": "True"},
+)
+
+config_setting(
+    name = "pico_use_default_max_page_size_enabled",
+    flag_values = {"//bazel/config:PICO_USE_DEFAULT_MAX_PAGE_SIZE": "True"},
+)
+
+config_setting(
+    name = "pico_no_target_name_enabled",
+    flag_values = {"//bazel/config:PICO_NO_TARGET_NAME": "True"},
+)
+
+config_setting(
+    name = "pico_btstack_config_unset",
+    flag_values = {"//bazel/config:PICO_BTSTACK_CONFIG": "@pico-sdk//bazel:empty_cc_lib"},
+)
+
+config_setting(
+    name = "pico_lwip_config_unset",
+    flag_values = {"//bazel/config:PICO_LWIP_CONFIG": "@pico-sdk//bazel:empty_cc_lib"},
+)
+
+config_setting(
+    name = "pico_freertos_unset",
+    flag_values = {"//bazel/config:PICO_FREERTOS_LIB": "@pico-sdk//bazel:empty_cc_lib"},
 )

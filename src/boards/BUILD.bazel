@@ -1,105 +1,101 @@
+load("//bazel:defs.bzl", "pico_board_config")
+load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "flag_choice")
+
 package(default_visibility = ["//visibility:public"])
 
-# TODO: Add a macro/helper to support the rest of the boards.
-cc_library(
-    name = "unsupported_boards",
-    srcs = [
-        "include/boards/adafruit_feather_rp2040.h",
-        "include/boards/adafruit_itsybitsy_rp2040.h",
-        "include/boards/adafruit_kb2040.h",
-        "include/boards/adafruit_macropad_rp2040.h",
-        "include/boards/adafruit_qtpy_rp2040.h",
-        "include/boards/adafruit_trinkey_qt2040.h",
-        "include/boards/arduino_nano_rp2040_connect.h",
-        "include/boards/datanoisetv_rp2040_dsp.h",
-        "include/boards/eetree_gamekit_rp2040.h",
-        "include/boards/garatronic_pybstick26_rp2040.h",
-        "include/boards/melopero_shake_rp2040.h",
-        "include/boards/none.h",
-        "include/boards/nullbits_bit_c_pro.h",
-        "include/boards/pico_w.h",
-        "include/boards/pimoroni_badger2040.h",
-        "include/boards/pimoroni_interstate75.h",
-        "include/boards/pimoroni_keybow2040.h",
-        "include/boards/pimoroni_motor2040.h",
-        "include/boards/pimoroni_pga2040.h",
-        "include/boards/pimoroni_picolipo_16mb.h",
-        "include/boards/pimoroni_picolipo_4mb.h",
-        "include/boards/pimoroni_picosystem.h",
-        "include/boards/pimoroni_plasma2040.h",
-        "include/boards/pimoroni_servo2040.h",
-        "include/boards/pimoroni_tiny2040.h",
-        "include/boards/pimoroni_tiny2040_2mb.h",
-        "include/boards/pololu_3pi_2040_robot.h",
-        "include/boards/seeed_xiao_rp2040.h",
-        "include/boards/solderparty_rp2040_stamp.h",
-        "include/boards/solderparty_rp2040_stamp_carrier.h",
-        "include/boards/solderparty_rp2040_stamp_round_carrier.h",
-        "include/boards/sparkfun_micromod.h",
-        "include/boards/sparkfun_promicro.h",
-        "include/boards/sparkfun_thingplus.h",
-        "include/boards/vgaboard.h",
-        "include/boards/waveshare_rp2040_lcd_0.96.h",
-        "include/boards/waveshare_rp2040_lcd_1.28.h",
-        "include/boards/waveshare_rp2040_one.h",
-        "include/boards/waveshare_rp2040_plus_16mb.h",
-        "include/boards/waveshare_rp2040_plus_4mb.h",
-        "include/boards/waveshare_rp2040_zero.h",
-        "include/boards/wiznet_w5100s_evb_pico.h",
-    ],
-    includes = ["include"],
-    visibility = ["//visibility:private"],
+# Known board choices:
+BOARD_CHOICES = [
+    "adafruit_feather_rp2040",
+    "adafruit_itsybitsy_rp2040",
+    "adafruit_kb2040",
+    "adafruit_macropad_rp2040",
+    "adafruit_qtpy_rp2040",
+    "adafruit_trinkey_qt2040",
+    "arduino_nano_rp2040_connect",
+    "datanoisetv_rp2040_dsp",
+    "eetree_gamekit_rp2040",
+    "garatronic_pybstick26_rp2040",
+    "melopero_shake_rp2040",
+    "none",
+    "nullbits_bit_c_pro",
+    "pico",
+    "pico_w",
+    "pimoroni_badger2040",
+    "pimoroni_interstate75",
+    "pimoroni_keybow2040",
+    "pimoroni_motor2040",
+    "pimoroni_pga2040",
+    "pimoroni_picolipo_16mb",
+    "pimoroni_picolipo_4mb",
+    "pimoroni_picosystem",
+    "pimoroni_plasma2040",
+    "pimoroni_servo2040",
+    "pimoroni_tiny2040",
+    "pimoroni_tiny2040_2mb",
+    "pololu_3pi_2040_robot",
+    "seeed_xiao_rp2040",
+    "solderparty_rp2040_stamp",
+    "solderparty_rp2040_stamp_carrier",
+    "solderparty_rp2040_stamp_round_carrier",
+    "sparkfun_micromod",
+    "sparkfun_promicro",
+    "sparkfun_thingplus",
+    "vgaboard",
+    "waveshare_rp2040_lcd_0.96",
+    "waveshare_rp2040_lcd_1.28",
+    "waveshare_rp2040_one",
+    "waveshare_rp2040_plus_16mb",
+    "waveshare_rp2040_plus_4mb",
+    "waveshare_rp2040_zero",
+    "wiznet_w5100s_evb_pico",
+    "cytron_maker_pi_rp2040",
+    "metrotech_xerxes_rp2040",
+    "pololu_zumo_2040_robot",
+    "weact_studio_rp2040_16mb",
+    "weact_studio_rp2040_2mb",
+    "weact_studio_rp2040_4mb",
+    "weact_studio_rp2040_8mb",
+]
+
+BOARD_CHOICE_FILES = ["include/boards/" + c + ".h" for c in BOARD_CHOICES]
+
+BOARD_CHOICE_MAP = {c: [":{}".format(c)] for c in BOARD_CHOICES}
+
+# PICO_BUILD_DEFINE: PICO_BOARD, Name of board, type=string, default=CMake PICO_BOARD variable, group=pico_base
+[
+    pico_board_config(
+        name = board,
+        hdrs = BOARD_CHOICE_FILES,
+        defines = [
+            'PICO_BOARD=\\"{}\\"'.format(board),
+        ],
+        includes = ["include"],
+        platform_includes = [
+            "cmsis/rename_exceptions.h",
+            "boards/{}.h".format(board),
+        ],
+        deps = ["//src/rp2_common/cmsis:rename_exceptions"],
+    )
+    for board in BOARD_CHOICES
+]
+
+# Creates a config_setting for each known board option with the name:
+#     PICO_BOARD_[choice]
+declare_flag_choices(
+    "//bazel/config:PICO_BOARD",
+    BOARD_CHOICES,
 )
 
 cc_library(
-    name = "stdio_defines",
-    defines = select({
-        "//bazel/constraint:stdio_semihosting": ["LIB_PICO_STDIO_SEMIHOSTING=1"],
-        "//bazel/constraint:stdio_uart": ["LIB_PICO_STDIO_UART=1"],
-        "//bazel/constraint:stdio_usb": ["LIB_PICO_STDIO_USB=1"],
-    }),
-)
-
-cc_library(
-    name = "common_board_defines",
-    defines = [
-        "PICO_ON_DEVICE=1",
-        "PICO_NO_HARDWARE=0",
-        "PICO_BUILD=1",
-    ],
-)
-
-cc_library(
-    name = "pico",
-    hdrs = ["include/boards/pico.h"],
-    defines = [
-        'PICO_BOARD=\\"rp2040\\"',
-        'PICO_CONFIG_HEADER="boards/pico.h"',
-    ],
-    includes = ["include"],
-    deps = [
-        ":common_board_defines",
-        ":stdio_defines",
-    ],
-)
-
-cc_library(
-    name = "host",
-    hdrs = ["include/boards/none.h"],
-    defines = [
-        'PICO_BOARD=\\"none\\"',
-        'PICO_CONFIG_HEADER="boards/none.h"',
-        "PICO_ON_DEVICE=0",
-        "PICO_NO_HARDWARE=1",
-        "PICO_BUILD=1",
-    ],
-    includes = ["include"],
-)
-
-alias(
     name = "default",
-    actual = select({
-        "//bazel/constraint:rp2": ":pico",
-        "//bazel/constraint:host": ":host",
-    }),
+    deps = select(
+        flag_choice(
+            "//bazel/config:PICO_BOARD",
+            ":__pkg__",
+            BOARD_CHOICE_MAP,
+        ) | {
+            "//bazel/constraint:host": [":none"],
+            "//conditions:default": [":none"],
+        },
+    ),
 )

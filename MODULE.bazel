@@ -8,7 +8,7 @@ bazel_dep(name = "bazel_skylib", version = "1.6.1")
 # module will not ensure that the root Bazel module has that same version of
 # rules_cc. For that reason, this primarily acts as a FYI. You'll still need
 # to explicitly list this dependency in your own project's MODULE.bazel file.
-bazel_dep(name = "rules_cc", version = "0.0.10")
+bazel_dep(name = "rules_cc", version = "0.0.9")
 
 # rules_cc v0.0.10 is not yet cut, so manually pull in the desired version.
 # This does not apply to dependent projects, so it needs to be copied to your
@@ -61,6 +61,33 @@ http_archive(
     strip_prefix = "tinyusb-86c416d4c0fb38432460b3e11b08b9de76941bf5",
     build_file = "//src/rp2_common/tinyusb:tinyusb.BUILD",
     sha256 = "ac57109bba00d26ffa33312d5f334990ec9a9a4d82bf890ed8b825b4610d1da2",
+)
+
+# TODO: Provide btstack as a proper Bazel module.
+http_archive(
+    name = "btstack",
+    url = "https://github.com/bluekitchen/btstack/archive/72ef1732c954d938091467961e41f4aa9b976b34.zip",
+    strip_prefix = "btstack-72ef1732c954d938091467961e41f4aa9b976b34",
+    build_file = "//src/rp2_common/pico_btstack:btstack.BUILD",
+    sha256 = "f45d72b5d404dd2f8e311287de6f2ba3561fc8ae956737eeb611b277aadc2391",
+)
+
+# TODO: Provide btstack as a proper Bazel module.
+http_archive(
+    name = "cyw43-driver",
+    url = "https://github.com/georgerobotics/cyw43-driver/archive/8ef38a6d32c54f850bff8f189bdca19ded33792a.zip",
+    strip_prefix = "cyw43-driver-8ef38a6d32c54f850bff8f189bdca19ded33792a",
+    build_file = "//src/rp2_common/pico_cyw43_driver:cyw43-driver.BUILD",
+    sha256 = "0b44a19ea58537ee954357606cde5ed20c3a42be77adfebb07b7c0e4740f6228",
+)
+
+# TODO: Provide lwip as a proper Bazel module.
+http_archive(
+    name = "lwip",
+    url = "https://github.com/lwip-tcpip/lwip/archive/239918ccc173cb2c2a62f41a40fd893f57faf1d6.zip",
+    strip_prefix = "lwip-239918ccc173cb2c2a62f41a40fd893f57faf1d6",
+    build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
+    sha256 = "7ee9e02f2719c0422377e1fcce5a21716ca2e2e855cca56695f9ef7cb020e5dd",
 )
 
 register_toolchains(

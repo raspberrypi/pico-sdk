@@ -1,10 +1,4 @@
 # Bazel build
-The Bazel build for the Pico SDK is currently community-maintained, and should
-be considered an experimental work-in-progress. There are missing features,
-and you may encounter significant breakages with future versions.
-
-You are welcome and encouraged to file issues for any problems you encounter
-along the way.
 
 ## Using the Pico SDK in a Bazel project.
 
@@ -23,7 +17,7 @@ Second, in the same file you'll need to add an explicit dependency on
 # module will not ensure that the root Bazel module has that same version of
 # rules_cc. For that reason, this primarily acts as a FYI. You'll still need
 # to explicitly list this dependency in your own project's MODULE.bazel file.
-bazel_dep(name = "rules_cc", version = "0.0.10")
+bazel_dep(name = "rules_cc", version = "0.0.9")
 
 # rules_cc v0.0.10 is not yet cut, so manually pull in the desired version.
 # This does not apply to dependent projects, so it needs to be copied to your
@@ -65,45 +59,33 @@ Raspberry Pi Pico:
 $ bazelisk build --platforms=@pico-sdk//bazel/platform:rp2040 //...
 ```
 
-## SDK configuration [experimental]
-These configuration options are a work in progress and may see significant
-breaking changes in future versions.
+## SDK configuration
+An exhaustive list of build system configuration options is available in
+`//bazel/config:BUILD.bazel`.
 
 ### Selecting a different board
-Currently there are three configurable flags for targeting a different board:
-1. `pico_config_extra_headers`: This should always point to a `cc_library `that
-   provides a `"pico_config_extra_headers.h"` header. You can configure this
-   by including a flag like the following in your build invocation:
-   ```
-   --@pico-sdk//bazel/config:pico_config_extra_headers=//path/to:custom_extra_headers
-   ```
-2. `pico_config_platform_headers`: This should always point to a `cc_library`
-   that provides a `"pico_config_platform_headers.h"` header.
-   ```
-   --@pico-sdk//bazel/config:pico_config_platform_headers=//path/to:custom_platform_headers
-   ```
-3. `pico_config_header`: This should point to a `cc_library` that sets all
-   necessary SDK defines. Most notably, `PICO_BOARD`, `PICO_CONFIG_HEADER`,
-   `PICO_ON_DEVICE`, `PICO_NO_HARDWARE`, and `PICO_BUILD`. See
-   `//src/boards:BUILD.bazel` for working examples. Any `defines` set on this
-   library will propagate to the rest of the Pico SDK. To set this configuration
-   option, pass a flag like the following in your Bazel build invocation:
-   ```
-   --@pico-sdk//bazel/config:pico_config_platform_headers=//path/to:pico_board_config
-   ```
+A different board can be selected specifying `--@pico-sdk//bazel/config:PICO_BOARD`:
+```console
+$ bazelisk build --platforms=//bazel/platform:rp2040 --@pico-sdk//bazel/config:PICO_BOARD=pico_w //...
+```
 
-### Selecting a stdio mode
-To select a different stdio mode, add it to your `platform` definition. For
-example:
-```python
-platform(
-    name = "rp2040",
-    constraint_values = [
-        "@pico-sdk//bazel/constraint:rp2040",
-        "@pico-sdk//bazel/constraint:stdio_usb", # Configures stdio_mode.
-        "@platforms//cpu:armv6-m",
-    ],
-)
+If you have a bespoke board definition, you can configure the Pico SDK to use it
+by pointing `--@pico-sdk//bazel/config:PICO_CONFIG_HEADER` to a `cc_library`
+that defines `PICO_BOARD` and either a `PICO_CONFIG_HEADER` define or a
+`pico/config_autogen.h` header. Make sure any required `includes`, `hdrs`, and
+`deps` are also provided.
+
+## Generating UF2 firmware images
+Creation of UF2 images can be done as explicit build steps on a per-binary
+rule basis, or through an aspect. Running a wildcard build with the
+`pico_uf2_aspect` enabled is the easiest way to create a UF2 for every ELF
+firmware image.
+
+```console
+$ bazel build --platforms=@pico-sdk//bazel/platform:rp2040 \
+    --aspects @pico-sdk//tools:uf2_aspect.bzl%pico_uf2_aspect \
+    --output_groups=+pico_uf2_files \
+    //...
 ```
 
 ## Building the Pico SDK itself
@@ -121,17 +103,14 @@ To build all of the Pico SDK, run the following command:
 $ bazelisk build --platforms=//bazel/platform:rp2040 //...
 ```
 
-**Note:** Since the Bazel build does not yet have any `cc_binary` rules with a
-`main()` function, there won't be any binaries to flash on your board. For now,
-this only builds the SDK as a collection of libraries.
-
 ## Known issues and limitations
-The Bazel build is currently experimental and incomplete. At this time, only the
-stock Pi Pico board is supported, and the only configuration options are
-changing the STDIO mode between UART and USB serial.
+The Bazel build for the Pico SDK is relatively new, but most features and
+configuration options available in the CMake build are also available in Bazel.
+You are welcome and encouraged to file issues for any problems and limitations
+you encounter along the way.
 
-Keep in mind the following limitations:
-* Pico-W is not yet supported.
-* Selecting an alternative board is not yet supported.
-* Nearly all preexisting CMake configuration options are not yet supported.
-* Targeting the host build of the Pico SDK is not yet supported.
+Currently, the following features are not supported:
+
+* "None" variants of pico_double, pico_float, and pico_printf are not yet
+  supported.
+* The pioasm parser cannot be built from source via Bazel.

@@ -1,0 +1,11 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_stdlib",
+    srcs = ["stdlib.c"],
+    implementation_deps = [
+        "//src/common/pico_stdlib:pico_stdlib_interface",
+        "//src/host/pico_stdio",
+    ],
+    target_compatible_with = ["//bazel/constraint:host"],
+)

@@ -2,6 +2,9 @@ load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
 load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 load("@rules_cc//cc/toolchains:feature.bzl", "cc_feature")
 load("@rules_cc//cc/toolchains:toolchain.bzl", "cc_toolchain")
+load("configurable_feature.bzl", "configurable_toolchain_feature")
+
+package(default_visibility = ["//visibility:public"])
 
 cc_args(
     name = "cortex-m0",
@@ -42,6 +45,43 @@ cc_args(
         "-Og",  # TODO: Make this configurable.
         "-g3",
     ],
+)
+
+configurable_toolchain_feature(
+    name = "gc_sections",
+    copts = [
+        "-ffunction-sections",
+        "-fdata-sections",
+    ],
+    disable_if = "//bazel/constraint:pico_no_gc_sections_enabled",
+    linkopts = ["-Wl,--gc-sections"],
+)
+
+configurable_toolchain_feature(
+    name = "cxx_no_exceptions",
+    cxxopts = [
+        "-fno-exceptions",
+        "-fno-unwind-tables",
+    ],
+    disable_if = "//bazel/constraint:pico_cxx_enable_exceptions_enabled",
+)
+
+configurable_toolchain_feature(
+    name = "cxx_no_rtti",
+    cxxopts = ["-fno-rtti"],
+    disable_if = "//bazel/constraint:pico_cxx_enable_rtti_enabled",
+)
+
+configurable_toolchain_feature(
+    name = "cxx_no_cxa_atexit",
+    cxxopts = ["-fno-use-cxa-atexit"],
+    disable_if = "//bazel/constraint:pico_cxx_enable_cxa_atexit_enabled",
+)
+
+configurable_toolchain_feature(
+    name = "override_max_page_size",
+    disable_if = "//bazel/constraint:pico_use_default_max_page_size_enabled",
+    linkopts = ["-Wl,-z,max-page-size=4096"],
 )
 
 # TODO: Make this shim unnecessary.
@@ -134,6 +174,11 @@ _HOST_CPU_CONSTRAINTS = {
     toolchain_features = [
         "@pico-sdk//bazel/toolchain:legacy_features",
         "@pico-sdk//bazel/toolchain:override_debug",
+        "@pico-sdk//bazel/toolchain:gc_sections",
+        "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
+        "@pico-sdk//bazel/toolchain:cxx_no_rtti",
+        "@pico-sdk//bazel/toolchain:cxx_no_cxa_atexit",
+        "@pico-sdk//bazel/toolchain:override_max_page_size",
     ],
 ) for host_os, host_cpu in HOSTS]
 
