@@ -37,6 +37,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/src/btstack_audio.c
         ${PICO_BTSTACK_PATH}/src/btstack_base64_decoder.c
         ${PICO_BTSTACK_PATH}/src/btstack_crypto.c
+        ${PICO_BTSTACK_PATH}/src/btstack_hid.c
         ${PICO_BTSTACK_PATH}/src/btstack_hid_parser.c
         ${PICO_BTSTACK_PATH}/src/btstack_linked_list.c
         ${PICO_BTSTACK_PATH}/src/btstack_memory.c
@@ -68,6 +69,8 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/3rd-party/rijndael
         ${PICO_BTSTACK_PATH}/3rd-party/micro-ecc
         ${PICO_BTSTACK_PATH}/3rd-party/segger-rtt
+        ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/encoder/include
+        ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/decoder/include
     )
 
     pico_add_library(pico_btstack_ble)
@@ -168,6 +171,14 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     target_include_directories(pico_btstack_run_loop_async_context_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
     pico_mirrored_target_link_libraries(pico_btstack_run_loop_async_context INTERFACE pico_btstack_base pico_async_context_base)
 
+    pico_add_library(pico_btstack_sbc_common NOFLAG)
+    set(SBC_BLUEDROID "src/classic/btstack_sbc_bluedroid.c")
+    if(EXISTS ${PICO_BTSTACK_PATH}/${SBC_BLUEDROID}) # Added in 1.6.x
+        target_sources(pico_btstack_sbc_common INTERFACE
+                ${PICO_BTSTACK_PATH}/${SBC_BLUEDROID}
+                )
+    endif()
+
     pico_add_library(pico_btstack_sbc_encoder NOFLAG)
     target_sources(pico_btstack_sbc_encoder INTERFACE
             # SBC codec for A2DP and HFP demos
@@ -181,8 +192,8 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/encoder/srce/sbc_encoder.c
             ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/encoder/srce/sbc_packing.c
             )
-    target_include_directories(pico_btstack_sbc_encoder_headers INTERFACE
-            ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/encoder/include
+    pico_mirrored_target_link_libraries(pico_btstack_sbc_encoder INTERFACE
+            pico_btstack_sbc_common
             )
 
     pico_add_library(pico_btstack_sbc_decoder NOFLAG)
@@ -203,8 +214,8 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/decoder/srce/synthesis-dct8.c
             ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/decoder/srce/synthesis-8-generated.c
             )
-    target_include_directories(pico_btstack_sbc_decoder_headers INTERFACE
-            ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/decoder/include
+    pico_mirrored_target_link_libraries(pico_btstack_sbc_decoder INTERFACE
+            pico_btstack_sbc_common
             )
 
     pico_add_library(pico_btstack_bnep_lwip NOFLAG)
