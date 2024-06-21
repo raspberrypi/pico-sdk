@@ -13,8 +13,8 @@
 #define _BOARDS_PIMORONI_TINY2040_2MB_H
 
 // For board detection
-#define PIMORONI_TINY2040
 #define PIMORONI_TINY2040_2MB
+#define PIMORONI_TINY2040
 
 // --- BOARD SPECIFIC ---
 #define TINY2040_LED_R_PIN 18
