@@ -78,7 +78,7 @@ bool flash_safe_execute_core_deinit(void);
  * \param enter_exit_timeout_ms the timeout for each of the enter/exit phases when coordinating with the other core
  *
  * \return PICO_OK on success (the function will have been called).
- *         PICO_TIMEOUT on timeout (the function may have been called).
+ *         PICO_ERROR_TIMEOUT on timeout (the function may have been called).
  *         PICO_ERROR_NOT_PERMITTED if safe execution is not possible (the function will not have been called).
  *         PICO_ERROR_INSUFFICIENT_RESOURCES if the method fails due to dynamic resource exhaustion (the function will not have been called)
  * \note if \ref PICO_FLASH_ASSERT_ON_UNSAFE is 1, this function will assert in debug mode vs returning
