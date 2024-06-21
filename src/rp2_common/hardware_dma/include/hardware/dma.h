@@ -867,7 +867,8 @@ bool dma_timer_is_claimed(uint timer);
  *  \ingroup hardware_dma
  *
  * The timer will run at the system_clock_freq * numerator / denominator, so this is the speed
- * that data elements will be transferred at via a DMA channel using this timer as a DREQ
+ * that data elements will be transferred at via a DMA channel using this timer as a DREQ. The
+ * multiplier must be less than or equal to one.
  *
  * \param timer the dma timer
  * \param numerator the fraction's numerator
@@ -875,6 +876,7 @@ bool dma_timer_is_claimed(uint timer);
  */
 static inline void dma_timer_set_fraction(uint timer, uint16_t numerator, uint16_t denominator) {
     check_dma_timer_param(timer);
+    invalid_params_if(DMA, numerator > denominator);
     dma_hw->timer[timer] = (((uint32_t)numerator) << DMA_TIMER0_X_LSB) | (((uint32_t)denominator) << DMA_TIMER0_Y_LSB);
 }
 
