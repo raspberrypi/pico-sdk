@@ -206,7 +206,7 @@ static inline int8_t get_slot_index(struct irq_handler_chain_slot *slot) {
 void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_priority) {
     check_irq_param(num);
 #if PICO_NO_RAM_VECTOR_TABLE
-    panic_unsupported()
+    panic_unsupported();
 #elif PICO_DISABLE_SHARED_IRQ_HANDLERS
     irq_set_exclusive_handler(num, handler);
 #else
