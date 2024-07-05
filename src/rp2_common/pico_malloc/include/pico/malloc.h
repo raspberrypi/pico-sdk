@@ -35,4 +35,15 @@
 #define PICO_DEBUG_MALLOC_LOW_WATER 0
 #endif
 
+// PICO_CONFIG: PICO_MALLOC_TRACK_PEAK, Enable/disable tracking the peak allocated bytes by malloc, type=bool, default=0, group=pico_malloc
+#ifndef PICO_MALLOC_TRACK_PEAK
+#define PICO_MALLOC_TRACK_PEAK 0
+#endif
+
+#if PICO_MALLOC_TRACK_PEAK
+#include <stdlib.h>
+extern size_t malloc_peak_bytes;
+void malloc_reset_peak();
+#endif
+
 #endif
