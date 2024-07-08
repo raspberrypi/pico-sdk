@@ -26,7 +26,7 @@
 #define ATOMIC_LOCK_IDX_Msk (ATOMIC_LOCKS - 1UL)
 #define ATOMIC_LOCK_REG ((io_rw_32 *)(WATCHDOG_BASE + WATCHDOG_SCRATCH3_OFFSET))
 
-static __attribute__((section(".preinit_array.00030"))) void __atomic_init(void) {
+static __used __attribute__((section(".preinit_array.00030"))) void __atomic_init(void) {
     *ATOMIC_LOCK_REG = 0;
 }
 
@@ -223,7 +223,7 @@ __optimize uint32_t __atomic_fetch_and_4(volatile void *mem, uint32_t val, __unu
     return result;
 }
 
-__optimize uint32_t __atomic_fetch_or_4(volatile void *mem, uint32_t val, int model) {
+__optimize uint32_t __atomic_fetch_or_4(volatile void *mem, uint32_t val, __unused int model) {
     volatile uint32_t *ptr = mem;
     uint32_t state = __atomic_lock(mem);
     uint32_t result = *ptr;
