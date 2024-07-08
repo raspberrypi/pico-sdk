@@ -22,7 +22,7 @@
 #define ATOMIC_STRIPE 4UL
 #define ATOMIC_LOCKS 16UL
 #define ATOMIC_LOCK_WIDTH 2UL
-#define ATOMIC_LOCK_IDX_Pos ((sizeof(unsigned int) * 8) - (__builtin_clz(ATOMIC_STRIPE)))
+#define ATOMIC_LOCK_IDX_Pos ((sizeof(unsigned long) * 8) - (__builtin_clz(ATOMIC_STRIPE - 1)))
 #define ATOMIC_LOCK_IDX_Msk (ATOMIC_LOCKS - 1UL)
 #define ATOMIC_LOCK_REG ((io_rw_32 *)(WATCHDOG_BASE + WATCHDOG_SCRATCH3_OFFSET))
 #define SIO_CPUID (*(io_ro_32 *)(SIO_BASE + SIO_CPUID_OFFSET))
@@ -34,8 +34,8 @@ static __attribute__((section(".preinit_array.00030"))) void __atomic_init(void)
 /* 
    To eliminate interference with existing hardware spinlock usage and reduce multicore contention on
    unique atomic variables, we use one of the watchdog scratch registers (WATCHDOG_SCRATCH3) to 
-   implement 16, 2 bit, multicore locks, via a varation of Peterson's algorithm 
-   (see https://en.wikipedia.org/wiki/Peterson%27s_algorithm). The lock is selected as a
+   implement 16, 2 bit, multicore locks, via a varation of Dekker's algorithm 
+   (see https://en.wikipedia.org/wiki/Dekker%27s_algorithm). The lock is selected as a
    function of the variable address and the stripe width which hashes variables
    addresses to locks numbers.
 */
@@ -62,7 +62,7 @@ static __optimize uint32_t __atomic_lock(volatile void *mem) {
         hw_clear_bits(ATOMIC_LOCK_REG, locked_mask);
 
         /* Need to break any ties if the cores are in lock step, is this really required? */
-        for (uint32_t i = core; i > 0; --i)
+        for (uint32_t i = core * 2; i > 0; --i)
             asm volatile ("nop");
     }
 
