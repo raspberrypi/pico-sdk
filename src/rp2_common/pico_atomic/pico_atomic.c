@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2024 Raspberry Pi (Trading) Ltd.
  * Copyright (c) 2024 Stephen Street (stephen@redrocketcomputing.com).
  *
  * SPDX-License-Identifier: BSD-3-Clause
