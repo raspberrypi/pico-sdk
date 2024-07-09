@@ -507,7 +507,7 @@ int cyw43_read_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len, 
         logic_debug_set(pin_WIFI_RX, 0);
     }
     if (ret != 0) {
-        printf("cyw43_read_bytes error %d", ret);
+        CYW43_PRINTF("cyw43_read_bytes error %d", ret);
         return ret;
     }
     if (buf != self->spid_buf) { // avoid a copy in the usual case just to add the header
@@ -536,7 +536,7 @@ int cyw43_write_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len,
             }
         }
         if (f2_ready_attempts <= 0) {
-            printf("F2 not ready\n");
+            CYW43_PRINTF("F2 not ready\n");
             return CYW43_FAIL_FAST_CHECK(-CYW43_EIO);
         }
     }
