@@ -32,6 +32,10 @@
 #include "pico/stdio_semihosting.h"
 #endif
 
+#if LIB_PICO_STDIO_RTT
+#include "pico/stdio_rtt.h"
+#endif
+
 #define STDIO_HANDLE_STDIN  0
 #define STDIO_HANDLE_STDOUT 1
 #define STDIO_HANDLE_STDERR 2
@@ -295,6 +299,11 @@ bool stdio_init_all(void) {
     rc = true;
 #endif
 
+#if LIB_PICO_STDIO_RTT
+    stdio_rtt_init();
+    rc = true;
+#endif
+
 #if LIB_PICO_STDIO_USB
     rc |= stdio_usb_init();
 #endif
@@ -331,7 +340,7 @@ void stdio_set_translate_crlf(stdio_driver_t *driver, bool enabled) {
     // Suppress -Wunused-parameter
     (void)driver;
     (void)enabled;
-    
+
     panic_unsupported();
 #endif
 }
