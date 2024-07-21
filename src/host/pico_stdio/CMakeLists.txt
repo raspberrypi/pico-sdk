@@ -16,5 +16,7 @@ if (NOT TARGET pico_stdio)
     endfunction()
     function(pico_enable_stdio_semihosting)
     endfunction()
+    function(pico_enable_stdio_rtt)
+    endfunction()
 endif()
 
