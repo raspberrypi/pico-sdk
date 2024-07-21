@@ -29,13 +29,22 @@
 #define CS_PIN 25u
 #define IRQ_SAMPLE_DELAY_NS 100
 
-#define SPI_PROGRAM_NAME spi_gap01_sample0
+#ifdef CYW43_SPI_PROGRAM_NAME
+#define SPI_PROGRAM_NAME CYW43_SPI_PROGRAM_NAME
+#else
+//#define SPI_PROGRAM_NAME spi_gap0_sample1 // for lower cpu speed
+#define SPI_PROGRAM_NAME spi_gap01_sample0 // for high cpu speed
+#endif
 #define SPI_PROGRAM_FUNC __CONCAT(SPI_PROGRAM_NAME, _program)
 #define SPI_PROGRAM_GET_DEFAULT_CONFIG_FUNC __CONCAT(SPI_PROGRAM_NAME, _program_get_default_config)
 #define SPI_OFFSET_END __CONCAT(SPI_PROGRAM_NAME, _offset_end)
 #define SPI_OFFSET_LP1_END __CONCAT(SPI_PROGRAM_NAME, _offset_lp1_end)
 
+#ifdef CYW43_PIO_CLOCK_DIV
+#define CLOCK_DIV CYW43_PIO_CLOCK_DIV
+#else
 #define CLOCK_DIV 2
+#endif
 #define CLOCK_DIV_MINOR 0
 #define PADS_DRIVE_STRENGTH PADS_BANK0_GPIO0_DRIVE_VALUE_12MA
 
@@ -498,7 +507,7 @@ int cyw43_read_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len, 
         logic_debug_set(pin_WIFI_RX, 0);
     }
     if (ret != 0) {
-        printf("cyw43_read_bytes error %d", ret);
+        CYW43_PRINTF("cyw43_read_bytes error %d", ret);
         return ret;
     }
     if (buf != self->spid_buf) { // avoid a copy in the usual case just to add the header
@@ -527,7 +536,7 @@ int cyw43_write_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len,
             }
         }
         if (f2_ready_attempts <= 0) {
-            printf("F2 not ready\n");
+            CYW43_PRINTF("F2 not ready\n");
             return CYW43_FAIL_FAST_CHECK(-CYW43_EIO);
         }
     }

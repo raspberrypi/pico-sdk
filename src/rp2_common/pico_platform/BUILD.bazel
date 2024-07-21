@@ -1,0 +1,61 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "platform_defs",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/hardware_regs:platform_defs",
+    }),
+    target_compatible_with = compatible_with_rp2(),
+)
+
+alias(
+    name = "hardware_regs",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/hardware_regs:hardware_regs",
+    }),
+    target_compatible_with = compatible_with_rp2(),
+)
+
+alias(
+    name = "hardware_structs",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/hardware_structs:hardware_structs",
+    }),
+    target_compatible_with = compatible_with_rp2(),
+)
+
+cc_library(
+    name = "pico_platform",
+    srcs = ["platform.c"],
+    hdrs = [
+        "include/pico/asm_helper.S",
+        "include/pico/platform.h",
+    ],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":hardware_regs",
+        ":platform_defs",
+        "//src/common/pico_base:pico_base_interface",
+        "//src/rp2_common/hardware_base",
+    ],
+)
+
+cc_library(
+    name = "platform_link_deps",
+    target_compatible_with = compatible_with_rp2(),
+    deps = select({
+        # When PICO_BARE_METAL is enabled, don't automagically add link-time
+        # dependencies.
+        "//bazel/constraint:pico_baremetal_enabled": [],
+        "//conditions:default": [
+            "//bazel/config:PICO_BOOT_STAGE2_LINK_IMAGE",
+            "//bazel/config:PICO_CMSIS_PATH",
+            "//src/rp2_common/pico_bootrom",
+            "//src/rp2_common/pico_runtime",
+            "//src/rp2_common/pico_standard_link",
+        ],
+    }),
+)

@@ -15,6 +15,14 @@
 #include "pico/runtime.h"
 #endif
 
+// note that these are not reset by core reset, however for now, I think people resetting cores
+// and then relying on multicore_lockout for that core without re-initializing, is probably
+// something we can live with breaking.
+//
+// whilst we could clear this in core 1 reset path, that doesn't necessarily catch all,
+// and means pulling in this array even if multicore_lockout is not used.
+static bool lockout_victim_initialized[NUM_CORES];
+
 static inline void multicore_fifo_push_blocking_inline(uint32_t data) {
     // We wait for the fifo to have some space
     while (!multicore_fifo_wready())
@@ -63,8 +71,7 @@ bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out) {
     // If nothing there yet, we wait for an event first,
     // to try and avoid too much busy waiting
     while (!multicore_fifo_rvalid()) {
-        __wfe();
-        if (time_reached(end_time)) return false;
+        if (best_effort_wfe_or_timeout(end_time)) return false;
     }
 
     *out = sio_hw->fifo_rd;
@@ -101,9 +108,23 @@ void multicore_reset_core1() {
     *power_off_set = PSM_FRCE_OFF_PROC1_BITS;
     while (!(*power_off & PSM_FRCE_OFF_PROC1_BITS)) tight_loop_contents();
 
+    // Allow for the fact that the caller may have already enabled the FIFO IRQ for their
+    // own purposes (expecting FIFO content after core 1 is launched). We must disable
+    // the IRQ during the handshake, then restore afterwards.
+    bool enabled = irq_is_enabled(SIO_IRQ_PROC0);
+    irq_set_enabled(SIO_IRQ_PROC0, false);
+
     // Bring core 1 back out of reset. It will drain its own mailbox FIFO, then push
     // a 0 to our mailbox to tell us it has done this.
     *power_off_clr = PSM_FRCE_OFF_PROC1_BITS;
+
+    // check the pushed value
+    uint32_t value = multicore_fifo_pop_blocking();
+    assert(value == 0);
+    (void) value; // silence warning
+
+    // restore interrupt state
+    irq_set_enabled(SIO_IRQ_PROC0, enabled);
 }
 
 void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bottom, size_t stack_size_bytes) {
@@ -196,11 +217,12 @@ static void check_lockout_mutex_init(void) {
     hw_claim_unlock(save);
 }
 
-void multicore_lockout_victim_init() {
+void multicore_lockout_victim_init(void) {
     check_lockout_mutex_init();
     uint core_num = get_core_num();
     irq_set_exclusive_handler(SIO_IRQ_PROC0 + core_num, multicore_lockout_handler);
     irq_set_enabled(SIO_IRQ_PROC0 + core_num, true);
+    lockout_victim_initialized[core_num] = true;
 }
 
 static bool multicore_lockout_handshake(uint32_t magic, absolute_time_t until) {
@@ -246,7 +268,7 @@ bool multicore_lockout_start_timeout_us(uint64_t timeout_us) {
     return multicore_lockout_start_block_until(make_timeout_time_us(timeout_us));
 }
 
-void multicore_lockout_start_blocking() {
+void multicore_lockout_start_blocking(void) {
     multicore_lockout_start_block_until(at_the_end_of_time);
 }
 
@@ -268,6 +290,10 @@ bool multicore_lockout_end_timeout_us(uint64_t timeout_us) {
     return multicore_lockout_end_block_until(make_timeout_time_us(timeout_us));
 }
 
-void multicore_lockout_end_blocking() {
+void multicore_lockout_end_blocking(void) {
     multicore_lockout_end_block_until(at_the_end_of_time);
+}
+
+bool multicore_lockout_victim_is_initialized(uint core_num) {
+    return lockout_victim_initialized[core_num];
 }

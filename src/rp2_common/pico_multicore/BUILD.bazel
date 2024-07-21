@@ -1,0 +1,21 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_multicore",
+    srcs = ["multicore.c"],
+    hdrs = ["include/pico/multicore.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_sync",
+        "//src/rp2_common/hardware_claim",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/pico_platform:hardware_regs",
+        "//src/rp2_common/pico_platform:hardware_structs",
+        "//src/rp2_common/pico_runtime",
+    ],
+)

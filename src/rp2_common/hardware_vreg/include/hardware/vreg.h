@@ -17,7 +17,7 @@ extern "C" {
 /** \file vreg.h
  *  \defgroup hardware_vreg hardware_vreg
  *
- * Voltage Regulation API
+ * \brief Voltage Regulation API
  *
  */
 

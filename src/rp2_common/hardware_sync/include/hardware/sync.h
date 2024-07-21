@@ -18,7 +18,7 @@ extern "C" {
 /** \file hardware/sync.h
  *  \defgroup hardware_sync hardware_sync
  *
- * Low level hardware spin locks, barrier and processor event APIs
+ * \brief Low level hardware spin locks, barrier and processor event APIs
  *
  * Spin Locks
  * ----------
@@ -116,7 +116,7 @@ typedef volatile uint32_t spin_lock_t;
  */
 #if !__has_builtin(__sev)
 __force_inline static void __sev(void) {
-    pico_default_asm ("sev");
+    pico_default_asm_volatile ("sev");
 }
 #endif
 
@@ -128,7 +128,7 @@ __force_inline static void __sev(void) {
  */
 #if !__has_builtin(__wfe)
 __force_inline static void __wfe(void) {
-    pico_default_asm ("wfe");
+    pico_default_asm_volatile ("wfe");
 }
 #endif
 
@@ -139,7 +139,7 @@ __force_inline static void __wfe(void) {
  */
 #if !__has_builtin(__wfi)
 __force_inline static void __wfi(void) {
-    pico_default_asm ("wfi");
+    pico_default_asm_volatile("wfi");
 }
 #endif
 
@@ -150,7 +150,7 @@ __force_inline static void __wfi(void) {
  * instruction will be observed before any explicit access after the instruction.
  */
 __force_inline static void __dmb(void) {
-    pico_default_asm ("dmb" : : : "memory");
+    pico_default_asm_volatile("dmb" : : : "memory");
 }
 
 /*! \brief Insert a DSB instruction in to the code path.
@@ -161,7 +161,7 @@ __force_inline static void __dmb(void) {
  * accesses before this instruction complete.
  */
 __force_inline static void __dsb(void) {
-    pico_default_asm ("dsb" : : : "memory");
+    pico_default_asm_volatile("dsb" : : : "memory");
 }
 
 /*! \brief Insert a ISB instruction in to the code path.
@@ -172,7 +172,7 @@ __force_inline static void __dsb(void) {
  * the ISB instruction has been completed.
  */
 __force_inline static void __isb(void) {
-    pico_default_asm ("isb");
+    pico_default_asm_volatile("isb" ::: "memory");
 }
 
 /*! \brief Acquire a memory fence
@@ -213,8 +213,10 @@ __force_inline static void __mem_fence_release(void) {
  */
 __force_inline static uint32_t save_and_disable_interrupts(void) {
     uint32_t status;
-    pico_default_asm ("mrs %0, PRIMASK" : "=r" (status)::);
-    pico_default_asm ("cpsid i");
+    pico_default_asm_volatile(
+            "mrs %0, PRIMASK\n"
+            "cpsid i"
+            : "=r" (status) ::);
     return status;
 }
 
@@ -224,7 +226,7 @@ __force_inline static uint32_t save_and_disable_interrupts(void) {
  * \param status Previous interrupt status from save_and_disable_interrupts()
   */
 __force_inline static void restore_interrupts(uint32_t status) {
-    pico_default_asm ("msr PRIMASK,%0"::"r" (status) : );
+    pico_default_asm_volatile("msr PRIMASK,%0"::"r" (status) : );
 }
 
 /*! \brief Get HW Spinlock instance from number
@@ -260,7 +262,9 @@ __force_inline static void spin_lock_unsafe_blocking(spin_lock_t *lock) {
     // Note we don't do a wfe or anything, because by convention these spin_locks are VERY SHORT LIVED and NEVER BLOCK and run
     // with INTERRUPTS disabled (to ensure that)... therefore nothing on our core could be blocking us, so we just need to wait on another core
     // anyway which should be finished soon
-    while (__builtin_expect(!*lock, 0));
+    while (__builtin_expect(!*lock, 0)) { // read from spinlock register (tries to acquire the lock)
+        tight_loop_contents();
+    }
     __mem_fence_acquire();
 }
 
@@ -271,7 +275,7 @@ __force_inline static void spin_lock_unsafe_blocking(spin_lock_t *lock) {
  */
 __force_inline static void spin_unlock_unsafe(spin_lock_t *lock) {
     __mem_fence_release();
-    *lock = 0;
+    *lock = 0; // write to spinlock register (release lock)
 }
 
 /*! \brief Acquire a spin lock safely

@@ -1,0 +1,30 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_sync",
+    srcs = [
+        "critical_section.c",
+        "lock_core.c",
+        "mutex.c",
+        "sem.c",
+    ],
+    hdrs = [
+        "include/pico/critical_section.h",
+        "include/pico/lock_core.h",
+        "include/pico/mutex.h",
+        "include/pico/sem.h",
+        "include/pico/sync.h",
+    ],
+    includes = ["include"],
+    deps = [
+        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_time:pico_time_headers",
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/hardware_sync",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_sync",
+        ],
+    }),
+)

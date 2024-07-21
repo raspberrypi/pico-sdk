@@ -13,7 +13,7 @@ extern "C" {
 
 /** \file runtime.h
 *  \defgroup pico_runtime pico_runtime
-* Aggregate runtime support including @ref pico_bit_ops, @ref pico_divider, @ref pico_double, @ref pico_int64_ops, @ref pico_float, @ref pico_malloc, @ref pico_mem_ops and @ref pico_standard_link
+* \brief Aggregate runtime support including @ref pico_bit_ops, @ref pico_divider, @ref pico_double, @ref pico_int64_ops, @ref pico_float, @ref pico_malloc, @ref pico_mem_ops and @ref pico_standard_link
 */
 
 

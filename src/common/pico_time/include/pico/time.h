@@ -17,7 +17,7 @@ extern "C" {
 /** \file time.h
  *  \defgroup pico_time pico_time
  *
- * API for accurate timestamps, sleeping, and time based callbacks
+ * \brief API for accurate timestamps, sleeping, and time based callbacks
  *
  * \note The functions defined here provide a much more powerful and user friendly wrapping around the
  * low level hardware timer functionality. For these functions (and any other SDK functionality

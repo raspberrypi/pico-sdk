@@ -16,7 +16,7 @@ extern "C" {
 
 /**
  * \defgroup pico_divider pico_divider
- * Optimized 32 and 64 bit division functions accelerated by the RP2040 hardware divider.
+ * \brief Optimized 32 and 64 bit division functions accelerated by the RP2040 hardware divider.
  * Additionally provides integration with the C `/` and `%` operators
  */
 

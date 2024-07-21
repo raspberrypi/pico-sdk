@@ -13,7 +13,7 @@
 /** \file claim.h
  *  \defgroup hardware_claim hardware_claim
  *
- *  Lightweight hardware resource management
+ *  \brief Lightweight hardware resource management
  *
  * `hardware_claim` provides a simple API for management of hardware resources at runtime.
  *

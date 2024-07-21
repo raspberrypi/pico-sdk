@@ -613,7 +613,7 @@ static cybt_result_t cybt_mem_read(uint32_t mem_addr, uint8_t *p_data, uint32_t 
             transfer_size = 0x1000 - (mem_addr & 0xFFF);
         }
         cyw43_ll_read_backplane_mem(cyw43_ll, mem_addr, transfer_size, p_data);
-        cybt_debug("  read_mem addr 0x%08lx len %ld\n", transfer_size, mem_addr);
+        cybt_debug("  read_mem addr 0x%08lx len %ld\n", mem_addr, transfer_size);
         DUMP_BYTES(p_data, transfer_size);
         data_len -= transfer_size;
         p_data += transfer_size;

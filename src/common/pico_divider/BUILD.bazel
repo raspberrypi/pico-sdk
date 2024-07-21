@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_divider",
+    hdrs = ["include/pico/divider.h"],
+    includes = ["include"],
+    deps = [
+        "//src/common/pico_base",
+    ] + select({
+        "//bazel/constraint:host": ["//src/host/hardware_divider"],
+        "//conditions:default": ["//src/rp2_common/pico_divider"],
+    }),
+)

@@ -23,7 +23,7 @@
 
 /** \defgroup pico_bootsel_via_double_reset pico_bootsel_via_double_reset
  *
- * When the 'pico_bootsel_via_double_reset' library is linked, a function is
+ * \brief When the 'pico_bootsel_via_double_reset' library is linked, a function is
  * injected before main() which will detect when the system has been reset
  * twice in quick succession, and enter the USB ROM bootloader (BOOTSEL mode)
  * when this happens. This allows a double tap of a reset button on a

@@ -13,7 +13,7 @@
 /** \file hardware/resets.h
  *  \defgroup hardware_resets hardware_resets
  *
- * Hardware Reset API
+ * \brief Hardware Reset API
  *
  * The reset controller allows software control of the resets to all of the peripherals that are not
  * critical to boot the processor in the RP2040.

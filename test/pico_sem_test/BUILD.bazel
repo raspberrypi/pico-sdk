@@ -1,0 +1,12 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_sem_test",
+    testonly = True,
+    srcs = ["pico_sem_test.c"],
+    deps = [
+        "//src/common/pico_stdlib",
+        "//src/common/pico_sync",
+        "//test/pico_test",
+    ],
+)

@@ -17,7 +17,7 @@
 
 /** \file queue.h
  * \defgroup queue queue
- * Multi-core and IRQ safe queue implementation.
+ * \brief Multi-core and IRQ safe queue implementation.
  *
  * Note that this queue stores values of a specified size, and pushed values are copied into the queue
  * \ingroup pico_util

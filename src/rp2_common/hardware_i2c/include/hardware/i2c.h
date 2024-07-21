@@ -24,7 +24,7 @@ extern "C" {
 /** \file hardware/i2c.h
  *  \defgroup hardware_i2c hardware_i2c
  *
- * I2C Controller API
+ * \brief I2C Controller API
  *
  * The I2C bus is a two-wire serial interface, consisting of a serial data line SDA and a serial clock SCL. These wires carry
  * information between the devices connected to the bus. Each device is recognized by a unique 7-bit address and can operate as
@@ -148,11 +148,33 @@ static inline uint i2c_hw_index(i2c_inst_t *i2c) {
     return i2c == i2c1 ? 1 : 0;
 }
 
+/*! \brief Convert I2C instance to hardware instance number
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c I2C instance
+ * \return Number of I2C, 0 or 1.
+ */
+static inline uint i2c_get_index(i2c_inst_t *i2c) {
+    return i2c_hw_index(i2c);
+}
+
+/*! \brief Return pointer to structure containing i2c hardware registers
+ *  \ingroup hardware_i2c
+ *
+ * \param i2c I2C instance
+ * \return pointer to \ref i2c_hw_t
+ */
 static inline i2c_hw_t *i2c_get_hw(i2c_inst_t *i2c) {
     i2c_hw_index(i2c); // check it is a hw i2c
     return i2c->hw;
 }
 
+/*! \brief Convert I2C hardware instance number to I2C instance
+ *  \ingroup hardware_i2c
+ *
+ * \param Number of I2C, 0 or 1
+ * \return I2C hardware instance
+ */
 static inline i2c_inst_t *i2c_get_instance(uint instance) {
     static_assert(NUM_I2CS == 2, "");
     invalid_params_if(I2C, instance >= NUM_I2CS);

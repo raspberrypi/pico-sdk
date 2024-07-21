@@ -1,4 +1,4 @@
-# PICO_CMAKE_CONFIG: PICO_TOOLCHAIN_PATH, Path to search for compiler, default=none (i.e. search system paths), group=build
+# PICO_CMAKE_CONFIG: PICO_TOOLCHAIN_PATH, Path to search for compiler, type=string, default=none (i.e. search system paths), group=build
 set(PICO_TOOLCHAIN_PATH "${PICO_TOOLCHAIN_PATH}" CACHE INTERNAL "")
 
 # Set a default build type if none was specified
@@ -16,7 +16,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Default")
     error("Default build type is NOT supported")
 endif()
 
-# PICO_CMAKE_CONFIG: PICO_COMPILER, Optionally specifies a different compiler (other than pico_arm_gcc.cmake) - this is not yet fully supported, default=none, group=build
+# PICO_CMAKE_CONFIG: PICO_COMPILER, Optionally specifies a different compiler (other than pico_arm_gcc.cmake) - this is not yet fully supported, type=string, group=build
 # If PICO_COMPILER is specified, set toolchain file to ${PICO_COMPILER}.cmake.
 if (DEFINED PICO_COMPILER)
     if (DEFINED CMAKE_TOOLCHAIN_FILE)

@@ -3,8 +3,8 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     hardware_adc
     hardware_clocks
     hardware_divider
-    hardware_exception
     hardware_dma
+    hardware_exception
     hardware_flash
     hardware_gpio
     hardware_i2c
@@ -15,7 +15,6 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     hardware_pwm
     hardware_resets
     hardware_rtc
-    hardware_uart
     hardware_spi
     hardware_sync
     hardware_timer
@@ -29,6 +28,7 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_divider
     pico_double
     pico_fix_rp2040_usb_device_enumeration
+    pico_flash
     pico_float
     pico_i2c_slave
     pico_int64_ops

@@ -10,7 +10,7 @@
 /** \file pico/cyw43_driver.h
  *  \defgroup pico_cyw43_driver pico_cyw43_driver
  *
- * A wrapper around the lower level cyw43_driver, that integrates it with \ref pico_async_context
+ * \brief A wrapper around the lower level cyw43_driver, that integrates it with \ref pico_async_context
  * for handling background work.
  */
 

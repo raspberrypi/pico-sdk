@@ -9,7 +9,7 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/pico.h"
+// This header may be included by other board headers as "boards/pico_w.h"
 
 #ifndef _BOARDS_PICO_W_H
 #define _BOARDS_PICO_W_H
@@ -99,17 +99,22 @@
 #define CYW43_WL_GPIO_LED_PIN 0
 #endif
 
-// CYW43 GPIO to get VBUS
+// If CYW43_WL_GPIO_VBUS_PIN is defined then a CYW43 GPIO has to be used to read VBUS.
+// This can be passed to cyw43_arch_gpio_get to determine if the device is battery powered.
+// PICO_VBUS_PIN and CYW43_WL_GPIO_VBUS_PIN should not both be defined.
 #ifndef CYW43_WL_GPIO_VBUS_PIN
 #define CYW43_WL_GPIO_VBUS_PIN 2
 #endif
 
-// VSYS pin is shared with CYW43
+// If CYW43_USES_VSYS_PIN is defined then CYW43 uses the VSYS GPIO (defined by PICO_VSYS_PIN) for other purposes.
+// If this is the case, to use the VSYS GPIO it's necessary to ensure CYW43 is not using it.
+// This can be achieved by wrapping the use of the VSYS GPIO in cyw43_thread_enter / cyw43_thread_exit.
 #ifndef CYW43_USES_VSYS_PIN
 #define CYW43_USES_VSYS_PIN 1
 #endif
 
-// Pin used to monitor VSYS using ADC
+// The GPIO Pin used to monitor VSYS. Typically you would use this with ADC.
+// There is an example in adc/read_vsys in pico-examples.
 #ifndef PICO_VSYS_PIN
 #define PICO_VSYS_PIN 29
 #endif

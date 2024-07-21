@@ -164,6 +164,10 @@ void cyw43_thread_lock_check(void) {
 #endif
 
 void cyw43_await_background_or_timeout_us(uint32_t timeout_us) {
+    if (__get_current_exception() > 0) {
+        async_context_wait_until(cyw43_async_context, make_timeout_time_us(timeout_us));
+        return;
+    }
     async_context_wait_for_work_until(cyw43_async_context, make_timeout_time_us(timeout_us));
 }
 

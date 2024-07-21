@@ -19,7 +19,7 @@ extern "C" {
 /** \file float.h
 * \defgroup pico_float pico_float
 *
-* Optimized single-precision floating point functions
+* \brief Optimized single-precision floating point functions
 *
 * (Replacement) optimized implementations are provided of the following compiler built-ins
 * and math library functions:

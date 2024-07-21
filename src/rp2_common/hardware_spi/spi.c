@@ -51,7 +51,7 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
     // Find smallest prescale value which puts output frequency in range of
     // post-divide. Prescale is an even number from 2 to 254 inclusive.
     for (prescale = 2; prescale <= 254; prescale += 2) {
-        if (freq_in < (prescale + 2) * 256 * (uint64_t) baudrate)
+        if (freq_in < prescale * 256 * (uint64_t) baudrate)
             break;
     }
     invalid_params_if(SPI, prescale > 254); // Frequency too low

@@ -1,0 +1,101 @@
+load("//bazel:defs.bzl", "pico_board_config")
+load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "flag_choice")
+
+package(default_visibility = ["//visibility:public"])
+
+# Known board choices:
+BOARD_CHOICES = [
+    "adafruit_feather_rp2040",
+    "adafruit_itsybitsy_rp2040",
+    "adafruit_kb2040",
+    "adafruit_macropad_rp2040",
+    "adafruit_qtpy_rp2040",
+    "adafruit_trinkey_qt2040",
+    "arduino_nano_rp2040_connect",
+    "datanoisetv_rp2040_dsp",
+    "eetree_gamekit_rp2040",
+    "garatronic_pybstick26_rp2040",
+    "melopero_shake_rp2040",
+    "none",
+    "nullbits_bit_c_pro",
+    "pico",
+    "pico_w",
+    "pimoroni_badger2040",
+    "pimoroni_interstate75",
+    "pimoroni_keybow2040",
+    "pimoroni_motor2040",
+    "pimoroni_pga2040",
+    "pimoroni_picolipo_16mb",
+    "pimoroni_picolipo_4mb",
+    "pimoroni_picosystem",
+    "pimoroni_plasma2040",
+    "pimoroni_servo2040",
+    "pimoroni_tiny2040",
+    "pimoroni_tiny2040_2mb",
+    "pololu_3pi_2040_robot",
+    "seeed_xiao_rp2040",
+    "solderparty_rp2040_stamp",
+    "solderparty_rp2040_stamp_carrier",
+    "solderparty_rp2040_stamp_round_carrier",
+    "sparkfun_micromod",
+    "sparkfun_promicro",
+    "sparkfun_thingplus",
+    "vgaboard",
+    "waveshare_rp2040_lcd_0.96",
+    "waveshare_rp2040_lcd_1.28",
+    "waveshare_rp2040_one",
+    "waveshare_rp2040_plus_16mb",
+    "waveshare_rp2040_plus_4mb",
+    "waveshare_rp2040_zero",
+    "wiznet_w5100s_evb_pico",
+    "cytron_maker_pi_rp2040",
+    "metrotech_xerxes_rp2040",
+    "pololu_zumo_2040_robot",
+    "weact_studio_rp2040_16mb",
+    "weact_studio_rp2040_2mb",
+    "weact_studio_rp2040_4mb",
+    "weact_studio_rp2040_8mb",
+]
+
+BOARD_CHOICE_FILES = ["include/boards/" + c + ".h" for c in BOARD_CHOICES]
+
+BOARD_CHOICE_MAP = {c: [":{}".format(c)] for c in BOARD_CHOICES}
+
+# PICO_BUILD_DEFINE: PICO_BOARD, Name of board, type=string, default=CMake PICO_BOARD variable, group=pico_base
+[
+    pico_board_config(
+        name = board,
+        hdrs = BOARD_CHOICE_FILES,
+        defines = [
+            'PICO_BOARD=\\"{}\\"'.format(board),
+        ],
+        includes = ["include"],
+        platform_includes = [
+            "cmsis/rename_exceptions.h",
+            "boards/{}.h".format(board),
+        ],
+        deps = ["//src/rp2_common/cmsis:rename_exceptions"],
+    )
+    for board in BOARD_CHOICES
+]
+
+# Creates a config_setting for each known board option with the name:
+#     PICO_BOARD_[choice]
+declare_flag_choices(
+    "//bazel/config:PICO_BOARD",
+    BOARD_CHOICES,
+)
+
+cc_library(
+    name = "default",
+    deps = select(
+        flag_choice(
+            "//bazel/config:PICO_BOARD",
+            ":__pkg__",
+            BOARD_CHOICE_MAP,
+        ) | {
+            "//bazel/constraint:host": [":none"],
+            "//conditions:default": [":none"],
+        },
+    ),
+)

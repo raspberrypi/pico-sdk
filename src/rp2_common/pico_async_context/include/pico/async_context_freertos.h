@@ -11,7 +11,7 @@
  *  \defgroup async_context_freertos async_context_freertos
  *  \ingroup pico_async_context
  *  
- * async_context_freertos provides an implementation of \ref async_context that handles asynchronous
+ * \brief async_context_freertos provides an implementation of \ref async_context that handles asynchronous
  * work in a separate FreeRTOS task.
  */
 #include "pico/async_context.h"
@@ -40,15 +40,15 @@ typedef struct async_context_freertos async_context_freertos_t;
  */
 typedef struct async_context_freertos_config {
     /**
-     * Task priority for the async_context task
+     * \brief Task priority for the async_context task
      */
     UBaseType_t task_priority;
     /**
-     * Stack size for the async_context task
+     * \brief Stack size for the async_context task
      */
     configSTACK_DEPTH_TYPE task_stack_size;
     /**
-     * the core ID (see \ref portGET_CORE_ID()) to pin the task to.
+     * \brief the core ID (see \ref portGET_CORE_ID()) to pin the task to.
      * This is only relevant in SMP mode.
      */
 #if configUSE_CORE_AFFINITY && configNUM_CORES > 1
@@ -90,7 +90,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
     async_context_freertos_config_t config = {
             .task_priority = ASYNC_CONTEXT_DEFAULT_FREERTOS_TASK_PRIORITY,
             .task_stack_size = ASYNC_CONTEXT_DEFAULT_FREERTOS_TASK_STACK_SIZE,
-#if configUSE_CORE_AFFINITY
+#if configUSE_CORE_AFFINITY && configNUM_CORES > 1
             .task_core_id = (UBaseType_t)-1, // none
 #endif
     };

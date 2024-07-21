@@ -17,7 +17,7 @@ extern "C" {
 
 /** \file multicore.h
  *  \defgroup pico_multicore pico_multicore
- * Adds support for running code on the second processor core (core 1)
+ * \brief Adds support for running code on the second processor core (core 1)
  *
  * \subsection multicore_example Example
  * \addtogroup pico_multicore
@@ -256,6 +256,18 @@ static inline uint32_t multicore_fifo_get_status(void) {
  * This code hooks the intercore FIFO IRQ, and the FIFO may not be used for any other purpose after this.
  */
 void multicore_lockout_victim_init(void);
+
+/*! \brief Determine if \ref multicore_victim_init() has been called on the specified core.
+ *  \ingroup multicore_lockout
+ *
+ * \note this state persists even if the core is subsequently reset; therefore you are advised to
+ * always call \ref multicore_lockout_victim_init() again after resetting a core, which had previously
+ * been initialized.
+ *
+ * \param core_num the core number (0 or 1)
+ * \return true if \ref multicore_victim_init() has been called on the specified core, false otherwise.
+ */
+bool multicore_lockout_victim_is_initialized(uint core_num);
 
 /*! \brief Request the other core to pause in a known state and wait for it to do so
  *  \ingroup multicore_lockout

@@ -34,8 +34,10 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/platform/embedded/hci_dump_embedded_stdout.c
         ${PICO_BTSTACK_PATH}/platform/embedded/hci_dump_segger_rtt_stdout.c
         ${PICO_BTSTACK_PATH}/src/ad_parser.c
+        ${PICO_BTSTACK_PATH}/src/btstack_audio.c
         ${PICO_BTSTACK_PATH}/src/btstack_base64_decoder.c
         ${PICO_BTSTACK_PATH}/src/btstack_crypto.c
+        ${PICO_BTSTACK_PATH}/src/btstack_hid.c
         ${PICO_BTSTACK_PATH}/src/btstack_hid_parser.c
         ${PICO_BTSTACK_PATH}/src/btstack_linked_list.c
         ${PICO_BTSTACK_PATH}/src/btstack_memory.c
@@ -51,6 +53,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/src/hci.c
         ${PICO_BTSTACK_PATH}/src/hci_cmd.c
         ${PICO_BTSTACK_PATH}/src/hci_dump.c
+        ${PICO_BTSTACK_PATH}/src/hci_event.c
         ${PICO_BTSTACK_PATH}/src/l2cap.c
         ${PICO_BTSTACK_PATH}/src/l2cap_signaling.c
         ${PICO_BTSTACK_PATH}/src/mesh/gatt-service/mesh_provisioning_service_server.c
@@ -66,6 +69,8 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/3rd-party/rijndael
         ${PICO_BTSTACK_PATH}/3rd-party/micro-ecc
         ${PICO_BTSTACK_PATH}/3rd-party/segger-rtt
+        ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/encoder/include
+        ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/decoder/include
     )
 
     pico_add_library(pico_btstack_ble)
@@ -114,6 +119,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_browsing_controller.c
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_browsing_target.c
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_controller.c
+        ${PICO_BTSTACK_PATH}/src/classic/avrcp_cover_art_client.c
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_media_item_iterator.c
         ${PICO_BTSTACK_PATH}/src/classic/avrcp_target.c
         ${PICO_BTSTACK_PATH}/src/classic/btstack_cvsd_plc.c
@@ -156,7 +162,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             ${CMAKE_CURRENT_LIST_DIR}/btstack_flash_bank.c
     )
     target_include_directories(pico_btstack_flash_bank_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-    pico_mirrored_target_link_libraries(pico_btstack_flash_bank INTERFACE pico_btstack_base)
+    pico_mirrored_target_link_libraries(pico_btstack_flash_bank INTERFACE pico_btstack_base pico_flash)
 
     pico_add_library(pico_btstack_run_loop_async_context NOFLAG)
     target_sources(pico_btstack_run_loop_async_context INTERFACE
@@ -164,6 +170,14 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     )
     target_include_directories(pico_btstack_run_loop_async_context_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
     pico_mirrored_target_link_libraries(pico_btstack_run_loop_async_context INTERFACE pico_btstack_base pico_async_context_base)
+
+    pico_add_library(pico_btstack_sbc_common NOFLAG)
+    set(SBC_BLUEDROID "src/classic/btstack_sbc_bluedroid.c")
+    if(EXISTS ${PICO_BTSTACK_PATH}/${SBC_BLUEDROID}) # Added in 1.6.x
+        target_sources(pico_btstack_sbc_common INTERFACE
+                ${PICO_BTSTACK_PATH}/${SBC_BLUEDROID}
+                )
+    endif()
 
     pico_add_library(pico_btstack_sbc_encoder NOFLAG)
     target_sources(pico_btstack_sbc_encoder INTERFACE
@@ -178,8 +192,8 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/encoder/srce/sbc_encoder.c
             ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/encoder/srce/sbc_packing.c
             )
-    target_include_directories(pico_btstack_sbc_encoder_headers INTERFACE
-            ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/encoder/include
+    pico_mirrored_target_link_libraries(pico_btstack_sbc_encoder INTERFACE
+            pico_btstack_sbc_common
             )
 
     pico_add_library(pico_btstack_sbc_decoder NOFLAG)
@@ -200,8 +214,8 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/decoder/srce/synthesis-dct8.c
             ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/decoder/srce/synthesis-8-generated.c
             )
-    target_include_directories(pico_btstack_sbc_decoder_headers INTERFACE
-            ${PICO_BTSTACK_PATH}/3rd-party/bluedroid/decoder/include
+    pico_mirrored_target_link_libraries(pico_btstack_sbc_decoder INTERFACE
+            pico_btstack_sbc_common
             )
 
     pico_add_library(pico_btstack_bnep_lwip NOFLAG)
@@ -229,21 +243,22 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
 
     # Make a GATT header file from a BTstack GATT file
     # Pass the target library name library type and path to the GATT input file
+    # To add additional directories to the gatt #import path, add them to the end of the argument list.
     function(pico_btstack_make_gatt_header TARGET_LIB TARGET_TYPE GATT_FILE)
             find_package (Python3 REQUIRED COMPONENTS Interpreter)
             get_filename_component(GATT_NAME "${GATT_FILE}" NAME_WE)
             get_filename_component(GATT_PATH "${GATT_FILE}" PATH)
-            set(GATT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
-            set(GATT_HEADER "${GATT_BINARY_DIR}/${GATT_NAME}.h")
             set(TARGET_GATT "${TARGET_LIB}_gatt_header")
-
+            set(GATT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/${TARGET_GATT}")
+            set(GATT_HEADER "${GATT_BINARY_DIR}/${GATT_NAME}.h")
+            list(TRANSFORM ARGN PREPEND "-I")
             add_custom_target(${TARGET_GATT} DEPENDS ${GATT_HEADER})
             add_custom_command(
                     OUTPUT ${GATT_HEADER}
                     DEPENDS ${GATT_FILE}
                     WORKING_DIRECTORY ${GATT_PATH}
                     COMMAND ${CMAKE_COMMAND} -E make_directory ${GATT_BINARY_DIR} &&
-                            ${Python3_EXECUTABLE} ${PICO_SDK_PATH}/lib/btstack/tool/compile_gatt.py ${GATT_FILE} ${GATT_HEADER}
+                            ${Python3_EXECUTABLE} ${PICO_SDK_PATH}/lib/btstack/tool/compile_gatt.py ${GATT_FILE} ${GATT_HEADER} ${ARGN}
                     VERBATIM)
             add_dependencies(${TARGET_LIB}
                     ${TARGET_GATT}

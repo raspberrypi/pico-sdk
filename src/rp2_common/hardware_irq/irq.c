@@ -100,7 +100,7 @@ extern struct irq_handler_chain_slot {
     irq_handler_t handler;
 } irq_handler_chain_slots[PICO_MAX_SHARED_IRQ_HANDLERS];
 
-static int8_t irq_hander_chain_free_slot_head;
+static int8_t irq_handler_chain_free_slot_head;
 
 static inline bool is_shared_irq_raw_handler(irq_handler_t raw_handler) {
     return (uintptr_t)raw_handler - (uintptr_t)irq_handler_chain_slots < sizeof(irq_handler_chain_slots);
@@ -206,16 +206,16 @@ static inline int8_t get_slot_index(struct irq_handler_chain_slot *slot) {
 void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_priority) {
     check_irq_param(num);
 #if PICO_NO_RAM_VECTOR_TABLE
-    panic_unsupported()
+    panic_unsupported();
 #elif PICO_DISABLE_SHARED_IRQ_HANDLERS
     irq_set_exclusive_handler(num, handler);
 #else
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_IRQ);
     uint32_t save = spin_lock_blocking(lock);
-    hard_assert(irq_hander_chain_free_slot_head >= 0); // we must have a slot
-    struct irq_handler_chain_slot *slot = &irq_handler_chain_slots[irq_hander_chain_free_slot_head];
-    int8_t slot_index = irq_hander_chain_free_slot_head;
-    irq_hander_chain_free_slot_head = slot->link;
+    hard_assert(irq_handler_chain_free_slot_head >= 0); // we must have a slot
+    struct irq_handler_chain_slot *slot = &irq_handler_chain_slots[irq_handler_chain_free_slot_head];
+    int8_t slot_index = irq_handler_chain_free_slot_head;
+    irq_handler_chain_free_slot_head = slot->link;
     irq_handler_t vtable_handler = get_vtable()[16 + num];
     if (!is_shared_irq_raw_handler(vtable_handler)) {
         // start new chain
@@ -332,8 +332,8 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
                             0xbd01;                                                                // pop {r0, pc}
 
                     // add old next slot back to free list
-                    next_slot->link = irq_hander_chain_free_slot_head;
-                    irq_hander_chain_free_slot_head = next_slot_index;
+                    next_slot->link = irq_handler_chain_free_slot_head;
+                    irq_handler_chain_free_slot_head = next_slot_index;
                 } else {
                     // Slot being removed is at the end of the chain
                     if (!exception) {
@@ -347,8 +347,8 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
                             vtable_handler = __unhandled_user_irq;
                         }
                         // add slot back to free list
-                        to_free_slot->link = irq_hander_chain_free_slot_head;
-                        irq_hander_chain_free_slot_head = get_slot_index(to_free_slot);
+                        to_free_slot->link = irq_handler_chain_free_slot_head;
+                        irq_handler_chain_free_slot_head = get_slot_index(to_free_slot);
                     } else {
                         // since we are the last slot we know that our inst3 hasn't executed yet, so we change
                         // it to bl to irq_handler_chain_remove_tail which will remove the slot.
@@ -418,8 +418,8 @@ void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot) {
         assert(found);
     }
     // add slot to free list
-    slot->link = irq_hander_chain_free_slot_head;
-    irq_hander_chain_free_slot_head = slot_index;
+    slot->link = irq_handler_chain_free_slot_head;
+    irq_handler_chain_free_slot_head = slot_index;
     spin_unlock(lock, save);
 }
 #endif

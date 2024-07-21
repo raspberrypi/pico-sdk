@@ -9,8 +9,8 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-#ifndef _POLOLU_3PI_2040_ROBOT_H
-#define _POLOLU_3PI_2040_ROBOT_H
+#ifndef _BOARDS_POLOLU_3PI_2040_ROBOT_H
+#define _BOARDS_POLOLU_3PI_2040_ROBOT_H
 
 // For board detection
 #define POLOLU_3PI_2040_ROBOT

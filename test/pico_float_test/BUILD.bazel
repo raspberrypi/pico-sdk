@@ -1,0 +1,37 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_float_test",
+    testonly = True,
+    srcs = [
+        "llvm/call_apsr.S",
+        "llvm/call_apsr.h",
+        "pico_float_test.c",
+    ],
+    includes = ["llvm"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_stdlib",
+        "//src/rp2_common/pico_float",
+        "//src/rp2_common/pico_platform",
+    ],
+)
+
+cc_binary(
+    name = "pico_double_test",
+    testonly = True,
+    srcs = [
+        "llvm/call_apsr.S",
+        "llvm/call_apsr.h",
+        "pico_double_test.c",
+    ],
+    includes = ["llvm"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_stdlib",
+        "//src/rp2_common/pico_double",
+        "//src/rp2_common/pico_platform",
+    ],
+)

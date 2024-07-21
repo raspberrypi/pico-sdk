@@ -20,7 +20,7 @@ extern "C" {
 /** \file stdlib.h
  *  \defgroup pico_stdlib pico_stdlib
  *
- * Aggregation of a core subset of Raspberry Pi Pico SDK libraries used by most executables along with some additional
+ * \brief Aggregation of a core subset of Raspberry Pi Pico SDK libraries used by most executables along with some additional
  * utility methods. Including pico_stdlib gives you everything you need to get a basic program running
  * which prints to stdout or flashes a LED
  *

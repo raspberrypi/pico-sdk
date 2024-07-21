@@ -1,0 +1,51 @@
+package(default_visibility = ["//visibility:public"])
+
+# This exists to break a header dependency cycle from rp2_common/pico_stdlib.
+# Do not directly depend on this.
+cc_library(
+    name = "pico_stdlib_interface",
+    hdrs = ["include/pico/stdlib.h"],
+    includes = ["include"],
+    visibility = [
+        "//src/host/pico_stdio:__pkg__",
+        "//src/host/pico_stdlib:__pkg__",
+        "//src/rp2_common/pico_stdlib:__pkg__",
+        "//src/rp2_common/tinyusb:__pkg__",
+    ],
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_time",
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/hardware_gpio",
+            "//src/host/hardware_uart",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_gpio",
+            "//src/rp2_common/hardware_uart",
+        ],
+    }),
+)
+
+cc_library(
+    name = "pico_stdlib",
+    hdrs = ["include/pico/stdlib.h"],
+    includes = ["include"],
+    deps = [
+        "//src/common/pico_base",
+        "//src/common/pico_time",
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/hardware_gpio",
+            "//src/host/hardware_uart",
+            "//src/host/pico_stdio",
+            "//src/host/pico_stdlib",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_gpio",
+            "//src/rp2_common/hardware_uart",
+            "//src/rp2_common/pico_stdio",
+            "//src/rp2_common/pico_stdlib",
+        ],
+    }),
+)
