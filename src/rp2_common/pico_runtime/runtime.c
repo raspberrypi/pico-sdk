@@ -276,6 +276,7 @@ void __attribute__((noreturn)) panic_unsupported(void) {
     panic("not supported");
 }
 
+#ifndef PICO_PANIC_NO_STRINGS_ON_TARGET
 // PICO_CONFIG: PICO_PANIC_FUNCTION, Name of a function to use in place of the stock panic function or empty string to simply breakpoint on panic, group=pico_runtime
 // note the default is not "panic" it is undefined
 #ifdef PICO_PANIC_FUNCTION
@@ -324,6 +325,7 @@ void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
 
     _exit(1);
 }
+#endif
 #endif
 
 void hard_assertion_failure(void) {
