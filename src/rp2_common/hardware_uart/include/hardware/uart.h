@@ -311,7 +311,7 @@ static inline bool uart_is_readable(uart_inst_t *uart) {
 /*! \brief  Write to the UART for transmission.
  *  \ingroup hardware_uart
  *
- * This function will block until all the data has been sent to the UART
+ * This function will block until all the data has been sent to the UART transmit buffer
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param src The bytes to send
@@ -348,7 +348,7 @@ static inline void uart_read_blocking(uart_inst_t *uart, uint8_t *dst, size_t le
 /*! \brief  Write single character to UART for transmission.
  *  \ingroup hardware_uart
  *
- * This function will block until the entire character has been sent
+ * This function will block until the entire character has been sent to the UART transmit buffer
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param c The character  to send
@@ -360,7 +360,7 @@ static inline void uart_putc_raw(uart_inst_t *uart, char c) {
 /*! \brief  Write single character to UART for transmission, with optional CR/LF conversions
  *  \ingroup hardware_uart
  *
- * This function will block until the character has been sent
+ * This function will block until the character has been sent to the UART transmit buffer
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param c The character  to send
@@ -377,7 +377,7 @@ static inline void uart_putc(uart_inst_t *uart, char c) {
 /*! \brief  Write string to UART for transmission, doing any CR/LF conversions
  *  \ingroup hardware_uart
  *
- * This function will block until the entire string has been sent
+ * This function will block until the entire string has been sent to the UART transmit buffer
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param s The null terminated string to send
