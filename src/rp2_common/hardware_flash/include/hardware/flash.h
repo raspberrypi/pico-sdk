@@ -56,6 +56,10 @@ extern "C" {
  *
  * \param flash_offs Offset into flash, in bytes, to start the erase. Must be aligned to a 4096-byte flash sector.
  * \param count Number of bytes to be erased. Must be a multiple of 4096 bytes (one sector).
+ *
+ * @note Erasing a flash sector sets all the bits in all the pages in that sector to one.
+ * You can then "program" flash pages in the sector to turn some of the bits to zero.
+ * Once a bit is set to zero it can only be changed back to one by erasing the whole sector again.
  */
 void flash_range_erase(uint32_t flash_offs, size_t count);
 
@@ -65,6 +69,10 @@ void flash_range_erase(uint32_t flash_offs, size_t count);
  * \param flash_offs Flash address of the first byte to be programmed. Must be aligned to a 256-byte flash page.
  * \param data Pointer to the data to program into flash
  * \param count Number of bytes to program. Must be a multiple of 256 bytes (one page).
+ *
+ * @note: Programming a flash page effectively changes some of the bits from one to zero.
+ * The only way to change a zero bit back to one is to "erase" the whole sector that the page resides in.
+ * So you may need to make sure you have called flash_range_erase before calling flash_range_program.
  */
 
 void flash_range_program(uint32_t flash_offs, const uint8_t *data, size_t count);
