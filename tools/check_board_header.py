@@ -32,10 +32,11 @@ if not os.path.isfile(board_header):
     raise Exception("{} doesn't exist".format(board_header))
 
 with open(interfaces_json) as interfaces_fh:
-    allowed_interfaces = json.load(interfaces_fh)
+    interface_pins = json.load(interfaces_fh)
+    allowed_interfaces = interface_pins["interfaces"]
     # convert instance-keys to integers (allowed by Python but not by JSON)
     for interface in allowed_interfaces:
-        instances = allowed_interfaces[interface]
+        instances = allowed_interfaces[interface]["instances"]
         # can't modify a list that we're iterating over, so iterate over a copy
         instances_copy = list(instances)
         for instance in instances_copy:
@@ -170,9 +171,9 @@ for name, define in defines.items():
             raise Exception("{}:{}  {} is defined but {} isn't defined".format(board_header, define.lineno, name, instance_name))
         instance_define = defines[instance_name]
         instance_num = instance_define.resolved_value
-        if instance_num not in allowed_interfaces[interface]:
+        if instance_num not in allowed_interfaces[interface]["instances"]:
             raise Exception("{}:{}  {} is set to an invalid instance {}".format(board_header, instance_define.lineno, instance_define, instance_num))
-        interface_instance = allowed_interfaces[interface][instance_num]
+        interface_instance = allowed_interfaces[interface]["instances"][instance_num]
         if function not in interface_instance:
             raise Exception("{}:{}  {} is defined but {} isn't a valid function for {}".format(board_header, define.lineno, name, function, instance_define))
         if define.resolved_value not in interface_instance[function]:
