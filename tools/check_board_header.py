@@ -34,6 +34,7 @@ if not os.path.isfile(board_header):
 with open(interfaces_json) as interfaces_fh:
     interface_pins = json.load(interfaces_fh)
     allowed_interfaces = interface_pins["interfaces"]
+    allowed_pins = set(interface_pins["pins"])
     # convert instance-keys to integers (allowed by Python but not by JSON)
     for interface in allowed_interfaces:
         instances = allowed_interfaces[interface]["instances"]
@@ -150,8 +151,8 @@ with open(board_header) as header_fh:
                             warnings.warn("{}:{}  Both {} and {} claim to be pin {}".format(board_header, lineno, pins[resolved_value][0].name, name, resolved_value))
                         pins[resolved_value].append(define)
                     else:
-                        if not (0 <= resolved_value <= 29):
-                            raise Exception("{}:{}  Pin {} for {} is outside of the allowed range".format(board_header, lineno, resolved_value, name))
+                        if resolved_value not in allowed_pins:
+                            raise Exception("{}:{}  Pin {} for {} isn't a valid pin-number".format(board_header, lineno, resolved_value, name))
                         pins[resolved_value] = [define]
 
 #import pprint; pprint.pprint(dict(sorted(defines.items(), key=lambda x: x[1].lineno)))
