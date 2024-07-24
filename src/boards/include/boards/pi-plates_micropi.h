@@ -11,11 +11,11 @@
 
 // Board definition for the Pi-Plates MICROPi processor board
 
-#ifndef _BOARDS_PIPLATES_MICROPI_H_RP2040
-#define _BOARDS_PIPLATES_MICROPI_H_RP2040
+#ifndef _BOARDS_PI_PLATES_MICROPI_H
+#define _BOARDS_PI_PLATES_MICROPI_H
 
 // For board detection
-#define PIPLATES_MICROPI_RP2040
+#define PI_PLATES_MICROPI
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
