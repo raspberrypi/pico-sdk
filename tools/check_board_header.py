@@ -180,6 +180,15 @@ for name, define in defines.items():
         if define.resolved_value not in interface_instance[function]:
             raise Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num))
 
+def list_to_string_with(lst, joiner):
+    elems = len(lst)
+    if elems == 0:
+        return ""
+    elif elems == 1:
+        return str(lst[0])
+    else:
+        return "{} {} {}".format(", ".join(str(l) for l in lst[:-1]), joiner, lst[-1])
+
 # check that each used DEFAULT interface includes (at least) the expected pin-functions
 for name, define in defines.items():
     m = re.match("^PICO_DEFAULT_([A-Z0-9]+)$", name)
@@ -188,10 +197,16 @@ for name, define in defines.items():
         if interface not in allowed_interfaces:
             raise Exception("{}:{}  {} is defined but {} isn't in {}".format(board_header, define.lineno, name, interface, interfaces_json))
         if "expected_functions" in allowed_interfaces[interface]:
-            for function in allowed_interfaces[interface]["expected_functions"]:
-                expected_function_pin = "{}_{}_PIN".format(name, function)
-                if expected_function_pin not in defines:
-                    raise Exception("{}:{}  {} is defined but {} isn't defined".format(board_header, define.lineno, name, expected_function_pin))
+            expected_functions = allowed_interfaces[interface]["expected_functions"]
+            if "required" in expected_functions:
+                for function in expected_functions["required"]:
+                    expected_function_pin = "{}_{}_PIN".format(name, function)
+                    if expected_function_pin not in defines:
+                        raise Exception("{}:{}  {} is defined but {} isn't defined".format(board_header, define.lineno, name, expected_function_pin))
+            if "one_of" in expected_functions:
+                expected_function_pins = list("{}_{}_PIN".format(name, function) for function in expected_functions["one_of"])
+                if not any(func_pin in defines for func_pin in expected_function_pins):
+                    raise Exception("{}:{}  {} is defined but none of {} are defined".format(board_header, define.lineno, name, list_to_string_with(expected_function_pins, "or")))
 
 if not has_include_guard:
     raise Exception("{} has no include-guard (expected {})".format(board_header, expected_include_guard))
