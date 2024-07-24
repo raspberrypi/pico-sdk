@@ -32,11 +32,15 @@ if not os.path.isfile(board_header):
     raise Exception("{} doesn't exist".format(board_header))
 
 with open(interfaces_json) as interfaces_fh:
-    interfaces = json.load(interfaces_fh)
+    allowed_interfaces = json.load(interfaces_fh)
     # convert instance-keys to integers (allowed by Python but not by JSON)
-    for interface in interfaces:
-        for instance in list(interfaces[interface]):
-            interfaces[interface][int(instance)] = interfaces[interface].pop(instance)
+    for interface in allowed_interfaces:
+        instances = allowed_interfaces[interface]
+        # can't modify a list that we're iterating over, so iterate over a copy
+        instances_copy = list(instances)
+        for instance in instances_copy:
+            instance_num = int(instance)
+            instances[instance_num] = instances.pop(instance)
 
 DefineType = namedtuple("DefineType", ["name", "value", "resolved_value", "lineno"])
 
@@ -69,7 +73,7 @@ with open(board_header) as header_fh:
             if include_suggestion == expected_include_suggestion:
                 has_include_suggestion = True
             else:
-                raise Exception("{}:{}  Suggests including \"{}\" but file is named \"{}\"".format(board_header, lineno, include_suggestion, expected_include_suggestion))
+                raise Exception(r"{}:{}  Suggests including \"{}\" but file is named \"{}\"".format(board_header, lineno, include_suggestion, expected_include_suggestion))
         # look for "#ifndef BLAH_BLAH"
         m = re.match(r"^#ifndef (\w+)\s*$", line)
         if m:
@@ -83,7 +87,7 @@ with open(board_header) as header_fh:
             value = m.group(2)
             # check all uppercase
             if name != name.upper():
-                raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
+                raise Exception(r"{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
             # check that adjacent #ifndef and #define lines match up
             if last_ifndef_lineno + 1 == lineno:
                 if last_ifndef != name:
@@ -153,25 +157,26 @@ with open(board_header) as header_fh:
 
 # check for invalid DEFAULT mappings
 for name, define in defines.items():
-    m = re.match(r"^(PICO_DEFAULT_(\w+))_(\w+)_PIN$", name)
+    m = re.match("^(PICO_DEFAULT_([A-Z0-9]+))_([A-Z0-9]+)_PIN$", name)
     if m:
         instance_name = m.group(1)
         interface = m.group(2)
         function = m.group(3)
         if interface == "WS2812":
             continue
-        if interface not in interfaces:
+        if interface not in allowed_interfaces:
             raise Exception("{}:{}  {} is defined but {} isn't in {}".format(board_header, define.lineno, name, interface, interfaces_json))
         if instance_name not in defines:
             raise Exception("{}:{}  {} is defined but {} isn't defined".format(board_header, define.lineno, name, instance_name))
         instance_define = defines[instance_name]
-        instance = instance_define.resolved_value
-        if instance not in interfaces[interface]:
-            raise Exception("{}:{}  {} is set to an invalid instance {}".format(board_header, instance_define.lineno, instance_define, instance))
-        if function not in interfaces[interface][instance]:
+        instance_num = instance_define.resolved_value
+        if instance_num not in allowed_interfaces[interface]:
+            raise Exception("{}:{}  {} is set to an invalid instance {}".format(board_header, instance_define.lineno, instance_define, instance_num))
+        interface_instance = allowed_interfaces[interface][instance_num]
+        if function not in interface_instance:
             raise Exception("{}:{}  {} is defined but {} isn't a valid function for {}".format(board_header, define.lineno, name, function, instance_define))
-        if define.resolved_value not in interfaces[interface][instance][function]:
-            raise Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance))
+        if define.resolved_value not in interface_instance[function]:
+            raise Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num))
 
 if not has_include_guard:
     raise Exception("{} has no include-guard (expected {})".format(board_header, expected_include_guard))
