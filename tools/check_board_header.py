@@ -146,7 +146,7 @@ with open(board_header) as header_fh:
                         pins[resolved_value].append(define)
                     else:
                         if not (0 <= resolved_value <= 29):
-                            raise Exception("{}:{}  Pin {} for {} is outside of the allowed range".foramt(board_header, lineno, resolved_value, name))
+                            raise Exception("{}:{}  Pin {} for {} is outside of the allowed range".format(board_header, lineno, resolved_value, name))
                         pins[resolved_value] = [define]
 
 #import pprint; pprint.pprint(dict(sorted(defines.items(), key=lambda x: x[1].lineno)))
