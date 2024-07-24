@@ -180,6 +180,19 @@ for name, define in defines.items():
         if define.resolved_value not in interface_instance[function]:
             raise Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num))
 
+# check that each used DEFAULT interface includes (at least) the expected pin-functions
+for name, define in defines.items():
+    m = re.match("^PICO_DEFAULT_([A-Z0-9]+)$", name)
+    if m:
+        interface = m.group(1)
+        if interface not in allowed_interfaces:
+            raise Exception("{}:{}  {} is defined but {} isn't in {}".format(board_header, define.lineno, name, interface, interfaces_json))
+        if "expected_functions" in allowed_interfaces[interface]:
+            for function in allowed_interfaces[interface]["expected_functions"]:
+                expected_function_pin = "{}_{}_PIN".format(name, function)
+                if expected_function_pin not in defines:
+                    raise Exception("{}:{}  {} is defined but {} isn't defined".format(board_header, define.lineno, name, expected_function_pin))
+
 if not has_include_guard:
     raise Exception("{} has no include-guard (expected {})".format(board_header, expected_include_guard))
 if not has_board_detection and expected_board_detection != "NONE":

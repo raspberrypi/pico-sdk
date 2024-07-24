@@ -14,7 +14,8 @@
                     "CTS": [6, 10, 22, 26],
                     "RTS": [7, 11, 23, 27]
                 }
-            }
+            },
+            "expected_functions": ["TX", "RX"]
         },
         "I2C": {
             "instances": {
@@ -26,7 +27,8 @@
                     "SDA": [2, 6, 10, 14, 18, 22, 26],
                     "SCL": [3, 7, 11, 15, 19, 23, 27]
                 }
-            }
+            },
+            "expected_functions": ["SDA", "SCL"]
         },
         "SPI": {
             "instances": {
@@ -42,7 +44,8 @@
                     "SCK": [10, 14, 26],
                     "TX":  [11, 15, 27]
                 }
-            }
+            },
+            "expected_functions": ["SCK", "RX", "TX"]
         },
         "PWM": {
             "instances": {
