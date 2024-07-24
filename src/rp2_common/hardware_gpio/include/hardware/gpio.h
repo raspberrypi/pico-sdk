@@ -192,7 +192,7 @@ void gpio_set_function(uint gpio, enum gpio_function fn);
  * \param gpio_mask Mask with 1 bit per GPIO number to set the function for
  * \param fn Which GPIO function select to use from list \ref gpio_function
 */
-void gpio_set_function_mask(uint gpio_mask, enum gpio_function fn);
+void gpio_set_function_masked(uint gpio_mask, enum gpio_function fn);
 
 /*! \brief Determine current GPIO function
  *  \ingroup hardware_gpio

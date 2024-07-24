@@ -270,7 +270,7 @@ void gpio_init_mask(uint gpio_mask) {
     }
 }
 
-void gpio_set_function_mask(uint gpio_mask, enum gpio_function fn) {
+void gpio_set_function_masked(uint gpio_mask, enum gpio_function fn) {
     for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1) {
             gpio_set_function(i, fn);
