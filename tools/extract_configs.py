@@ -219,4 +219,4 @@ with open(outfile, 'w', newline='') as csvfile:
 
     writer.writeheader()
     for config_name, config_obj in sorted(all_configs.items()):
-        writer.writerow({'name': config_name, 'location': '{}:{}'.format(config_obj['filename'], config_obj['line_number']), 'description': config_obj['description'], **config_obj['attrs']})
+        writer.writerow({'name': config_name, 'location': '/{}:{}'.format(config_obj['filename'], config_obj['line_number']), 'description': config_obj['description'], **config_obj['attrs']})
