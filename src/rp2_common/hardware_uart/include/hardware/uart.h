@@ -314,7 +314,7 @@ static inline bool uart_is_readable(uart_inst_t *uart) {
  * This function will block until all the data has been sent to the UART transmit buffer
  * hardware. Note: Serial data transmission will continue until the Tx FIFO and
  * the transmit shift register (not programmer-accessible) are empty.
- * To ensure the UART FIFO has been emptied, tou can use \ref uart_tx_wait_blocking()
+ * To ensure the UART FIFO has been emptied, you can use \ref uart_tx_wait_blocking()
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param src The bytes to send
