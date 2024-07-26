@@ -32,11 +32,29 @@ static inline void check_alloc(__unused void *mem, __unused uint size) {
 #endif
 }
 
+#if PICO_MALLOC_TRACK_PEAK
+#include <malloc.h>
+size_t malloc_peak_bytes = 0;
+void malloc_reset_peak() {
+    malloc_peak_bytes = mallinfo().uordblks;
+}
+#endif
+
+static inline void update_peak() {
+#if PICO_MALLOC_TRACK_PEAK
+    struct mallinfo mi = mallinfo();
+    if (mi.uordblks > malloc_peak_bytes) {
+        malloc_peak_bytes = mi.uordblks;
+    }
+#endif
+}
+
 void *WRAPPER_FUNC(malloc)(size_t size) {
 #if PICO_USE_MALLOC_MUTEX
     mutex_enter_blocking(&malloc_mutex);
 #endif
     void *rc = REAL_FUNC(malloc)(size);
+    update_peak();
 #if PICO_USE_MALLOC_MUTEX
     mutex_exit(&malloc_mutex);
 #endif
@@ -54,6 +72,7 @@ void *WRAPPER_FUNC(calloc)(size_t count, size_t size) {
     mutex_enter_blocking(&malloc_mutex);
 #endif
     void *rc = REAL_FUNC(calloc)(count, size);
+    update_peak();
 #if PICO_USE_MALLOC_MUTEX
     mutex_exit(&malloc_mutex);
 #endif
@@ -71,6 +90,7 @@ void *WRAPPER_FUNC(realloc)(void *mem, size_t size) {
     mutex_enter_blocking(&malloc_mutex);
 #endif
     void *rc = REAL_FUNC(realloc)(mem, size);
+    update_peak();
 #if PICO_USE_MALLOC_MUTEX
     mutex_exit(&malloc_mutex);
 #endif
