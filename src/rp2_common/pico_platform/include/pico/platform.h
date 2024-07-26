@@ -388,7 +388,11 @@ void __attribute__((noreturn)) panic_unsupported(void);
  * @param fmt format string (printf-like)
  * @param ...  printf-like arguments
  */
+#ifdef PICO_PANIC_NO_STRINGS_ON_TARGET
+#define panic(fmt, ...) do{__breakpoint();while(1){};}while(0)
+#else
 void __attribute__((noreturn)) panic(const char *fmt, ...);
+#endif
 
 #ifdef NDEBUG
 #define panic_compact(...) panic(__VA_ARGS__)
