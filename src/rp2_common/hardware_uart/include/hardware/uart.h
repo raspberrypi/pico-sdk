@@ -123,6 +123,17 @@ typedef enum {
     UART_PARITY_ODD
 } uart_parity_t;
 
+/** \brief UART interrupt FIFO level select
+ *  \ingroup hardware_uart
+ */
+typedef enum {
+    UART_FIFO_LEVEL_1_8 = 0b000,
+    UART_FIFO_LEVEL_1_4 = 0b001,
+    UART_FIFO_LEVEL_1_2 = 0b010,
+    UART_FIFO_LEVEL_3_4 = 0b011,
+    UART_FIFO_LEVEL_7_8 = 0b100
+} uart_fifo_level_t;
+
 // ----------------------------------------------------------------------------
 // Setup
 
@@ -244,6 +255,22 @@ static inline void uart_set_irq_enables(uart_inst_t *uart, bool rx_has_data, boo
         hw_write_masked(&uart_get_hw(uart)->ifls, 0 << UART_UARTIFLS_TXIFLSEL_LSB,
                         UART_UARTIFLS_TXIFLSEL_BITS);
     }
+}
+
+/*! \brief Set UART interrupt FIFO trigger levels
+ *  \ingroup hardware_uart
+ *
+ * Set the FIFO level at which the UART interrupt will be triggered.
+ * Can be set to 1/8, 1/4, 1/2, 3/4, or 7/8 of FIFO size.
+ * Must be called after every call of `uart_set_irq_enables` or parameters will be reset.
+ * 
+ * \param uart UART instance. \ref uart0 or \ref uart1
+ * \param rx_level Receive interrupt FIFO level select
+ * \param tx_level Transmit interrupt FIFO level select
+ */
+static inline void uart_set_irq_fifo_levels(uart_inst_t *uart, uart_fifo_level_t rx_level, uart_fifo_level_t tx_level) {
+    hw_write_masked(&uart_get_hw(uart)->ifls, rx_level << UART_UARTIFLS_RXIFLSEL_LSB, UART_UARTIFLS_RXIFLSEL_BITS);
+    hw_write_masked(&uart_get_hw(uart)->ifls, tx_level << UART_UARTIFLS_TXIFLSEL_LSB, UART_UARTIFLS_TXIFLSEL_BITS);
 }
 
 /*! \brief Test if specific UART is enabled
