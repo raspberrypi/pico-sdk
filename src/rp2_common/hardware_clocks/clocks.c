@@ -20,6 +20,51 @@
 // customary 32 or 32.768kHz 'slow clock' crystals and provides good timing resolution.
 #define RTC_CLOCK_FREQ_HZ       (USB_CLK_KHZ * KHZ / 1024)
 
+// Clocks which are dependant on CLK_SYS
+#define CLOCKS_SLEEP_EN0_CLK_SYS_DEPENDANTS_BITS   ( \
+        CLOCKS_SLEEP_EN0_CLK_SYS_SRAM3_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_SRAM2_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_SRAM1_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_SRAM0_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_SPI1_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_SPI0_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_SIO_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_RTC_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_ROSC_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_ROM_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_RESETS_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_PWM_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_PSM_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_PLL_USB_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_PLL_SYS_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_PIO1_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_PIO0_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_PADS_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_VREG_AND_CHIP_RESET_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_JTAG_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_IO_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_I2C1_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_I2C0_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_DMA_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_BUSFABRIC_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_BUSCTRL_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_ADC_BITS | \
+        CLOCKS_SLEEP_EN0_CLK_SYS_CLOCKS_BITS )
+
+#define CLOCKS_SLEEP_EN1_CLK_SYS_DEPENDANTS_BITS   ( \
+        CLOCKS_SLEEP_EN1_CLK_SYS_XOSC_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_XIP_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_WATCHDOG_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_USBCTRL_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_UART1_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_UART0_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_TIMER_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_TBMAN_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_SYSINFO_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_SYSCFG_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_SRAM5_BITS | \
+        CLOCKS_SLEEP_EN1_CLK_SYS_SRAM4_BITS )
+
 check_hw_layout(clocks_hw_t, clk[clk_adc].selected, CLOCKS_CLK_ADC_SELECTED_OFFSET);
 check_hw_layout(clocks_hw_t, fc0.result, CLOCKS_FC0_RESULT_OFFSET);
 check_hw_layout(clocks_hw_t, ints, CLOCKS_INTS_OFFSET);
@@ -119,6 +164,14 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
 /// \end::clock_configure[]
 
 void clocks_init(void) {
+    clocks_reinit(0, 0);
+}
+
+void clocks_reinit(uint32_t sleep_en0, uint32_t sleep_en1) {
+    // Determine whether SYS_CLK is already running
+    bool init_sys_clock =   ((sleep_en0 & CLOCKS_SLEEP_EN0_CLK_SYS_DEPENDANTS_BITS) == 0) &&
+                            ((sleep_en1 & CLOCKS_SLEEP_EN1_CLK_SYS_DEPENDANTS_BITS) == 0);
+
     // Start tick in watchdog, the argument is in 'cycles per microsecond' i.e. MHz
     watchdog_start_tick(XOSC_KHZ / KHZ);
 
@@ -138,15 +191,18 @@ void clocks_init(void) {
     xosc_init();
 
     // Before we touch PLLs, switch sys and ref cleanly away from their aux sources.
-    hw_clear_bits(&clocks_hw->clk[clk_sys].ctrl, CLOCKS_CLK_SYS_CTRL_SRC_BITS);
-    while (clocks_hw->clk[clk_sys].selected != 0x1)
-        tight_loop_contents();
+    if (init_sys_clock) {
+        hw_clear_bits(&clocks_hw->clk[clk_sys].ctrl, CLOCKS_CLK_SYS_CTRL_SRC_BITS);
+        while (clocks_hw->clk[clk_sys].selected != 0x1)
+            tight_loop_contents();
+    }
     hw_clear_bits(&clocks_hw->clk[clk_ref].ctrl, CLOCKS_CLK_REF_CTRL_SRC_BITS);
     while (clocks_hw->clk[clk_ref].selected != 0x1)
         tight_loop_contents();
 
     /// \tag::pll_init[]
-    pll_init(pll_sys, PLL_COMMON_REFDIV, PLL_SYS_VCO_FREQ_KHZ * KHZ, PLL_SYS_POSTDIV1, PLL_SYS_POSTDIV2);
+    if (init_sys_clock)
+        pll_init(pll_sys, PLL_COMMON_REFDIV, PLL_SYS_VCO_FREQ_KHZ * KHZ, PLL_SYS_POSTDIV1, PLL_SYS_POSTDIV2);
     pll_init(pll_usb, PLL_COMMON_REFDIV, PLL_USB_VCO_FREQ_KHZ * KHZ, PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
     /// \end::pll_init[]
 
@@ -160,11 +216,13 @@ void clocks_init(void) {
 
     /// \tag::configure_clk_sys[]
     // CLK SYS = PLL SYS (usually) 125MHz / 1 = 125MHz
-    clock_configure(clk_sys,
-                    CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
-                    CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
-                    SYS_CLK_KHZ * KHZ,
-                    SYS_CLK_KHZ * KHZ);
+    if (init_sys_clock) {
+        clock_configure(clk_sys,
+                        CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
+                        CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
+                        SYS_CLK_KHZ * KHZ,
+                        SYS_CLK_KHZ * KHZ);
+    }
     /// \end::configure_clk_sys[]
 
     // CLK USB = PLL USB 48MHz / 1 = 48MHz

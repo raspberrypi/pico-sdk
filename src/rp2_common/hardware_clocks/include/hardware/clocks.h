@@ -165,6 +165,15 @@ extern "C" {
  */
 void clocks_init(void);
 
+/*! \brief Re-initialise the clock hardware
+ *  \ingroup hardware_clocks
+ *
+ *  During a 'lightsleep' some clocks may have been deliberately left running.
+ *  By specifying 'sleep_en0' and 'sleep_en1', it can be automatically determined
+ *  that SYS_CLK (and/or it's dependants) is running and thus it is not re-initialised.
+ */
+void clocks_reinit(uint32_t sleep_en0, uint32_t sleep_en1);
+
 /*! \brief Configure the specified clock
  *  \ingroup hardware_clocks
  *
