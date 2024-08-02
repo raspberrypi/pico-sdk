@@ -75,13 +75,13 @@ __vectors:
 .word isr_irq30
 .word isr_irq31
 
-// all default exception handlers do nothing, and we can check for them being set to our
-// default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
+// We can check for exception handlers being set to our default values by seeing if they point to somewhere
+// between __defaults_isrs_start and __default_isrs_end
 .global __default_isrs_start
 __default_isrs_start:
 
 // Declare a weak symbol for each ISR.
-// By default, they will fall through to the undefined IRQ handler below (breakpoint),
+// By default, they will fall through to the undefined exception handler below,
 // but can be overridden by C functions with correct name.
 
 .macro decl_isr_bkpt name
@@ -89,16 +89,22 @@ __default_isrs_start:
 .type \name,%function
 .thumb_func
 \name:
-    bkpt #0
 .endm
 
 // these are separated out for clarity
-decl_isr_bkpt isr_invalid
-decl_isr_bkpt isr_nmi
-decl_isr_bkpt isr_hardfault
-decl_isr_bkpt isr_svcall
-decl_isr_bkpt isr_pendsv
-decl_isr_bkpt isr_systick
+decl_isr_bkpt isr_invalid       // 1
+decl_isr_bkpt isr_nmi           // 2
+decl_isr_bkpt isr_hardfault     // 3
+decl_isr_bkpt isr_svcall        // 11
+decl_isr_bkpt isr_pendsv        // 14
+decl_isr_bkpt isr_systick       // 15
+    mov r0, lr
+    bl debug_unhandled_exception
+
+.global unhandled_exception_num_in_r0
+unhandled_exception_num_in_r0:
+    mrs r0, ipsr
+    bkpt #0
 
 .global __default_isrs_end
 __default_isrs_end:
@@ -147,11 +153,19 @@ decl_isr isr_irq31
 .global __unhandled_user_irq
 .thumb_func
 __unhandled_user_irq:
-    mrs  r0, ipsr
+    mov r0, lr
+    bl debug_unhandled_exception
+
+    mrs r0, ipsr
     subs r0, #16
 .global unhandled_user_irq_num_in_r0
 unhandled_user_irq_num_in_r0:
     bkpt #0
+
+// pico_debug intercepts unhandled exceptions by replacing this routine.
+regular_func debug_unhandled_exception
+.weak debug_unhandled_exception
+    bx lr
 
 // ----------------------------------------------------------------------------
 
