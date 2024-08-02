@@ -297,7 +297,9 @@ extern "C" {
  */
 #define __no_inline_not_in_flash_func(func_name) __noinline __not_in_flash_func(func_name)
 
+#ifndef __packed_aligned
 #define __packed_aligned __packed __aligned(4)
+#endif
 
 /*! \brief Attribute to force inlining of a function regardless of optimization level
  *  \ingroup pico_platform
@@ -311,7 +313,9 @@ extern "C" {
 #if PICO_C_COMPILER_IS_GNU && (__GNUC__ <= 6 || (__GNUC__ == 7 && (__GNUC_MINOR__ < 3 || !defined(__cplusplus))))
 #define __force_inline inline __always_inline
 #else
+#ifndef __force_inline
 #define __force_inline __always_inline
+#endif
 #endif
 
 /*! \brief Macro to determine the number of elements in an array
@@ -484,8 +488,13 @@ static __force_inline uint __get_current_exception(void) {
     return exception;
 }
 
-#define WRAPPER_FUNC(x) __wrap_ ## x
-#define REAL_FUNC(x) __real_ ## x
+#if defined(__IS_COMPILER_ARM_COMPILER_6__)
+    #define WRAPPER_FUNC(__FUNC)     $Sub$$##__FUNC
+    #define REAL_FUNC(__FUNC)        $Super$$## __FUNC
+#else
+    #define WRAPPER_FUNC(x) __wrap_ ## x
+    #define REAL_FUNC(x) __real_ ## x
+#endif
 
 /*! \brief Helper method to busy-wait for at least the given number of cycles
  *  \ingroup pico_platform
