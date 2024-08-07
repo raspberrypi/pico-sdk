@@ -68,6 +68,21 @@ void stdin_uart_init(void);
  */
 void stdio_uart_init_full(uart_inst_t *uart, uint baud_rate, int tx_pin, int rx_pin);
 
+/*! \brief Disables the UART driver and resets UART.
+ *  \ingroup pico_stdio_uart
+ *
+ * Resets the default UART pins PICO_DEFAULT_UART_TX_PIN and PICO_DEFAULT_UART_RX_PIN.
+ * If you have customised your pin via \ref stdio_uart_init_full() then use \ref stdio_uart_deinit_full() instead.
+ */
+void stdio_uart_deinit(void);
+
+/*! \brief Disables the UART driver and resets UART.
+ *  \ingroup pico_stdio_uart
+ *
+ * In addition to resetting the UART, it also resets pins to the NULL function.
+ */
+void stdio_uart_deinit_full(int tx_pin, int rx_pin);
+
 #ifdef __cplusplus
 }
 #endif

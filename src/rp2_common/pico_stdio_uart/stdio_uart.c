@@ -9,7 +9,7 @@
 #include "pico/binary_info.h"
 #include "hardware/gpio.h"
 
-static uart_inst_t *uart_instance;
+static uart_inst_t *uart_instance = NULL;
 
 #if PICO_STDIO_UART_SUPPORT_CHARS_AVAILABLE_CALLBACK
 static void (*chars_available_callback)(void*);
@@ -79,6 +79,34 @@ void stdio_uart_init_full(struct uart_inst *uart, uint baud_rate, int tx_pin, in
     if (rx_pin >= 0) gpio_set_function((uint)rx_pin, GPIO_FUNC_UART);
     uart_init(uart_instance, baud_rate);
     stdio_set_driver_enabled(&stdio_uart, true);
+}
+
+void stdio_uart_deinit() {
+    int tx_pin = -1;
+    int rx_pin = -1;
+#ifdef PICO_DEFAULT_UART_TX_PIN
+    tx_pin = PICO_DEFAULT_UART_TX_PIN;
+#endif
+#ifdef PICO_DEFAULT_UART_RX_PIN
+    rx_pin = PICO_DEFAULT_UART_RX_PIN;
+#endif
+    stdio_uart_deinit_full(tx_pin, rx_pin);
+}
+
+void stdio_uart_deinit_full(int tx_pin, int rx_pin)
+{
+    if (uart_instance != NULL)
+    {
+        stdio_set_driver_enabled(&stdio_uart, false);
+        uart_tx_wait_blocking(uart_instance);
+        uart_deinit(uart_instance);
+        uart_instance = NULL;
+
+        if (tx_pin >= 0)
+            gpio_deinit((uint)tx_pin);
+        if (rx_pin >= 0)
+            gpio_deinit((uint)rx_pin);
+    }
 }
 
 static void stdio_uart_out_chars(const char *buf, int length) {
