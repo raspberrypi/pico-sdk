@@ -28,12 +28,12 @@ def custom_pico_binary_info(name = None, program_name = None, program_descriptio
             "@pico-sdk//bazel/constraint:pico_no_target_name_enabled": [],
             "//conditions:default": _build_target_name_defines,
         }),
-        srcs = ["@pico-sdk//src/rp2_common/pico_standard_link:binary_info_srcs"],
+        srcs = ["@pico-sdk//src/rp2_common/pico_standard_binary_info:binary_info_srcs"],
         deps = [
-            "@pico-sdk//src/rp2_common/pico_standard_link:PICO_BAZEL_BUILD_TYPE",
-            "@pico-sdk//src/common/pico_base:version",
+            "@pico-sdk//src/rp2_common/pico_standard_binary_info:PICO_BAZEL_BUILD_TYPE",
+            "@pico-sdk//src/common/pico_base_headers:version",
             "@pico-sdk//src/common/pico_binary_info",
-            "@pico-sdk//src/rp2_common/boot_stage2:config",
+            "@pico-sdk//src/rp2_common:boot_stage2_config",
         ],
         alwayslink = True,
     )

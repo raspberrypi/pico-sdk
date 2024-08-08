@@ -123,9 +123,11 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                         if '=' in config_description:
                             raise Exception("For {} at {}:{} the description was set to '{}' - has the description field been omitted?".format(config_name, file_path, linenum, config_description))
                         if config_description in all_descriptions:
-                            raise Exception("Found description {} at {}:{} but it was already used at {}:{}".format(config_description, file_path, linenum, os.path.join(scandir, all_descriptions[config_description]['filename']), all_descriptions[config_description]['line_number']))
+                            # relax check for the same header/variable in a different tree
+                            if config_name != all_descriptions[config_description]['config_name'] or filename != all_descriptions[config_description]['filename_only']:
+                                raise Exception("Found description {} at {}:{} but it was already used at {}:{}".format(config_description, file_path, linenum, os.path.join(scandir, all_descriptions[config_description]['filename']), all_descriptions[config_description]['line_number']))
                         else:
-                            all_descriptions[config_description] = {'config_name': config_name, 'filename': os.path.relpath(file_path, scandir), 'line_number': linenum}
+                            all_descriptions[config_description] = {'config_name': config_name, 'filename': os.path.relpath(file_path, scandir), 'filename_only':filename, 'line_number': linenum}
 
                         config_attrs = {}
                         prev = None
@@ -148,9 +150,11 @@ for dirpath, dirnames, filenames in os.walk(scandir):
 
                         #print(file_path, config_name, config_attrs)
                         if config_name in all_configs:
-                            raise Exception("Found {} at {}:{} but it was already declared at {}:{}".format(config_name, file_path, linenum, os.path.join(scandir, all_configs[config_name]['filename']), all_configs[config_name]['line_number']))
+                            # relax check for the same header/variable in a different tree
+                            if filename != all_configs[config_name]['filename_only']:
+                                raise Exception("Found {} at {}:{} but it was already declared at {}:{}".format(config_name, file_path, linenum, os.path.join(scandir, all_configs[config_name]['filename']), all_configs[config_name]['line_number']))
                         else:
-                            all_configs[config_name] = {'attrs': config_attrs, 'filename': os.path.relpath(file_path, scandir), 'line_number': linenum, 'description': config_description}
+                            all_configs[config_name] = {'attrs': config_attrs, 'filename': os.path.relpath(file_path, scandir), 'filename_only' : filename, 'line_number': linenum, 'description': config_description}
 
 
 for config_name, config_obj in all_configs.items():
@@ -165,4 +169,9 @@ with open(outfile, 'w', newline='') as csvfile:
 
     writer.writeheader()
     for config_name, config_obj in sorted(all_configs.items()):
-        writer.writerow({'name': config_name, 'location': '/{}:{}'.format(config_obj['filename'], config_obj['line_number']), 'description': config_obj['description'], **config_obj['attrs']})
+        # kinda ugly, but good enough for now without messing with TSV
+        if 'docref' in config_obj['attrs']:
+            desc = "{} (see <<{}>>)".format(config_obj['description'], config_obj['attrs']['docref'])
+        else:
+            desc = config_obj['description']
+        writer.writerow({'name': config_name, 'location': '/{}:{}'.format(config_obj['filename'], config_obj['line_number']), 'description': desc, **config_obj['attrs']})

@@ -35,6 +35,13 @@ extern stdio_driver_t stdio_semihosting;
  */
 void stdio_semihosting_init(void);
 
+/*! \brief Explicitly deinitialize stdout over semihosting and add it to the current set of stdout targets
+ *  \ingroup pico_stdio_semihosting
+ *
+ * \note this method is automatically called by \ref stdio_deinit_all() if `pico_stdio_semihosting` is included in the build
+ */
+void stdio_semihosting_deinit(void);
+
 #ifdef __cplusplus
 }
 #endif

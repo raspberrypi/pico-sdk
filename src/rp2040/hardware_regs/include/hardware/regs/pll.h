@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -7,10 +9,9 @@
 // Register block : PLL
 // Version        : 1
 // Bus type       : apb
-// Description    : None
 // =============================================================================
-#ifndef HARDWARE_REGS_PLL_DEFINED
-#define HARDWARE_REGS_PLL_DEFINED
+#ifndef _HARDWARE_REGS_PLL_H
+#define _HARDWARE_REGS_PLL_H
 // =============================================================================
 // Register    : PLL_CS
 // Description : Control and Status
@@ -132,4 +133,5 @@
 #define PLL_PRIM_POSTDIV2_LSB    _u(12)
 #define PLL_PRIM_POSTDIV2_ACCESS "RW"
 // =============================================================================
-#endif // HARDWARE_REGS_PLL_DEFINED
+#endif // _HARDWARE_REGS_PLL_H
+

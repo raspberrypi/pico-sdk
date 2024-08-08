@@ -18,7 +18,7 @@ typedef struct timeout_state {
     uint64_t param;
 } timeout_state_t;
 
-typedef bool (*check_timeout_fn)(timeout_state_t *ts);
+typedef bool (*check_timeout_fn)(timeout_state_t *ts, bool reset);
 
 check_timeout_fn init_single_timeout_until(timeout_state_t *ts, absolute_time_t target);
 check_timeout_fn init_per_iteration_timeout_us(timeout_state_t *ts, uint64_t per_iteration_timeout_us);

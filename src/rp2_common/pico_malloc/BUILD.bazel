@@ -4,7 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_malloc",
-    srcs = ["pico_malloc.c"],
+    srcs = ["malloc.c"],
     hdrs = ["include/pico/malloc.h"],
     includes = ["include"],
     linkopts = [
@@ -15,8 +15,9 @@ cc_library(
     ],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        "//src/common/pico_base:pico_base_interface",
         "//src/common/pico_sync",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_multicore",
     ],
     alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )

@@ -130,9 +130,13 @@ extern "C" {
  *    - Sets \c CYW43_LWIP=0 to disable lwIP support in \c pico_cyw43_arch and \c cyw43_driver
  */
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_CYW43_ARCH, Enable/disable assertions in the pico_cyw43_arch module, type=bool, default=0, group=pico_cyw43_arch
-#ifndef PARAM_ASSERTIONS_ENABLED_CYW43_ARCH
-#define PARAM_ASSERTIONS_ENABLED_CYW43_ARCH 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PICO_CYW43_ARCH, Enable/disable assertions in the pico_cyw43_arch module, type=bool, default=0, group=pico_cyw43_arch
+#ifndef PARAM_ASSERTIONS_ENABLED_PICO_CYW43_ARCH
+#ifdef PARAM_ASSERTIONS_ENABLED_CYW43_ARCH // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_PICO_CYW43_ARCH PARAM_ASSERTIONS_ENABLED_CYW43_ARCH
+#else
+#define PARAM_ASSERTIONS_ENABLED_PICO_CYW43_ARCH 0
+#endif
 #endif
 
 // PICO_CONFIG: PICO_CYW43_ARCH_DEBUG_ENABLED, Enable/disable some debugging output in the pico_cyw43_arch module, type=bool, default=1 in debug builds, group=pico_cyw43_arch

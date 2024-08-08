@@ -23,7 +23,7 @@
  * the other core, then it has to be asked, nicely, to avoid flash for a bit. This is hard to do if you don't have
  * complete control of the code running on that core at all times.
  *
- * This library provides a \ref flash_safe_execute method which calls a function back having sucessfully gotten
+ * This library provides a \ref flash_safe_execute method which calls a function back having successfully gotten
  * into a state where interrupts are disabled, and the other core is not executing or reading from flash.
  *
  * How it does this is dependent on the supported environment (Free RTOS SMP or pico_multicore). Additionally

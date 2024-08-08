@@ -12,11 +12,11 @@ cc_library(
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        "//src/common/pico_base",
+        "//src/common/hardware_claim",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
         "//src/rp2_common/hardware_base",
-        "//src/rp2_common/hardware_claim",
         "//src/rp2_common/hardware_gpio",
-        "//src/rp2_common/pico_platform:hardware_regs",
-        "//src/rp2_common/pico_platform:hardware_structs",
     ],
 )

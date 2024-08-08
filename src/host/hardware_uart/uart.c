@@ -77,13 +77,13 @@ uint uart_init(uart_inst_t *uart, uint baud_rate) {
     return baud_rate;
 }
 
-size_t uart_is_writable(uart_inst_t *uart) {
+bool uart_is_writable(uart_inst_t *uart) {
     return 1;
 }
 
 // If returns 0, no data is available to be read from UART.
 // If returns nonzero, at least that many bytes can be written without blocking.
-size_t uart_is_readable(uart_inst_t *uart) {
+bool uart_is_readable(uart_inst_t *uart) {
     return _peekchar() ? 1 : 0;
 }
 
@@ -105,6 +105,10 @@ void uart_read_blocking(uart_inst_t *uart, uint8_t *dst, size_t len) {
 // UART-specific operations and aliases
 
 void uart_putc(uart_inst_t *uart, char c) {
+    putchar(c);
+}
+
+void uart_putc_raw(uart_inst_t *uart, char c) {
     putchar(c);
 }
 

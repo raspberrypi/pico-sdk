@@ -1,0 +1,10 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_platform_sections",
+    hdrs = ["include/pico/platform/sections.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+)

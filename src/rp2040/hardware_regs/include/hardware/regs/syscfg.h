@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,8 +11,8 @@
 // Bus type       : apb
 // Description    : Register block for various chip control signals
 // =============================================================================
-#ifndef HARDWARE_REGS_SYSCFG_DEFINED
-#define HARDWARE_REGS_SYSCFG_DEFINED
+#ifndef _HARDWARE_REGS_SYSCFG_H
+#define _HARDWARE_REGS_SYSCFG_H
 // =============================================================================
 // Register    : SYSCFG_PROC0_NMI_MASK
 // Description : Processor core 0 NMI source mask
@@ -191,7 +193,6 @@
 #define SYSCFG_MEMPOWERDOWN_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
 // Field       : SYSCFG_MEMPOWERDOWN_ROM
-// Description : None
 #define SYSCFG_MEMPOWERDOWN_ROM_RESET  _u(0x0)
 #define SYSCFG_MEMPOWERDOWN_ROM_BITS   _u(0x00000080)
 #define SYSCFG_MEMPOWERDOWN_ROM_MSB    _u(7)
@@ -199,7 +200,6 @@
 #define SYSCFG_MEMPOWERDOWN_ROM_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : SYSCFG_MEMPOWERDOWN_USB
-// Description : None
 #define SYSCFG_MEMPOWERDOWN_USB_RESET  _u(0x0)
 #define SYSCFG_MEMPOWERDOWN_USB_BITS   _u(0x00000040)
 #define SYSCFG_MEMPOWERDOWN_USB_MSB    _u(6)
@@ -207,7 +207,6 @@
 #define SYSCFG_MEMPOWERDOWN_USB_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : SYSCFG_MEMPOWERDOWN_SRAM5
-// Description : None
 #define SYSCFG_MEMPOWERDOWN_SRAM5_RESET  _u(0x0)
 #define SYSCFG_MEMPOWERDOWN_SRAM5_BITS   _u(0x00000020)
 #define SYSCFG_MEMPOWERDOWN_SRAM5_MSB    _u(5)
@@ -215,7 +214,6 @@
 #define SYSCFG_MEMPOWERDOWN_SRAM5_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : SYSCFG_MEMPOWERDOWN_SRAM4
-// Description : None
 #define SYSCFG_MEMPOWERDOWN_SRAM4_RESET  _u(0x0)
 #define SYSCFG_MEMPOWERDOWN_SRAM4_BITS   _u(0x00000010)
 #define SYSCFG_MEMPOWERDOWN_SRAM4_MSB    _u(4)
@@ -223,7 +221,6 @@
 #define SYSCFG_MEMPOWERDOWN_SRAM4_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : SYSCFG_MEMPOWERDOWN_SRAM3
-// Description : None
 #define SYSCFG_MEMPOWERDOWN_SRAM3_RESET  _u(0x0)
 #define SYSCFG_MEMPOWERDOWN_SRAM3_BITS   _u(0x00000008)
 #define SYSCFG_MEMPOWERDOWN_SRAM3_MSB    _u(3)
@@ -231,7 +228,6 @@
 #define SYSCFG_MEMPOWERDOWN_SRAM3_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : SYSCFG_MEMPOWERDOWN_SRAM2
-// Description : None
 #define SYSCFG_MEMPOWERDOWN_SRAM2_RESET  _u(0x0)
 #define SYSCFG_MEMPOWERDOWN_SRAM2_BITS   _u(0x00000004)
 #define SYSCFG_MEMPOWERDOWN_SRAM2_MSB    _u(2)
@@ -239,7 +235,6 @@
 #define SYSCFG_MEMPOWERDOWN_SRAM2_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : SYSCFG_MEMPOWERDOWN_SRAM1
-// Description : None
 #define SYSCFG_MEMPOWERDOWN_SRAM1_RESET  _u(0x0)
 #define SYSCFG_MEMPOWERDOWN_SRAM1_BITS   _u(0x00000002)
 #define SYSCFG_MEMPOWERDOWN_SRAM1_MSB    _u(1)
@@ -247,11 +242,11 @@
 #define SYSCFG_MEMPOWERDOWN_SRAM1_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : SYSCFG_MEMPOWERDOWN_SRAM0
-// Description : None
 #define SYSCFG_MEMPOWERDOWN_SRAM0_RESET  _u(0x0)
 #define SYSCFG_MEMPOWERDOWN_SRAM0_BITS   _u(0x00000001)
 #define SYSCFG_MEMPOWERDOWN_SRAM0_MSB    _u(0)
 #define SYSCFG_MEMPOWERDOWN_SRAM0_LSB    _u(0)
 #define SYSCFG_MEMPOWERDOWN_SRAM0_ACCESS "RW"
 // =============================================================================
-#endif // HARDWARE_REGS_SYSCFG_DEFINED
+#endif // _HARDWARE_REGS_SYSCFG_H
+

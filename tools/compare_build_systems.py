@@ -16,8 +16,10 @@ from dataclasses import dataclass
 import glob
 import os
 import re
-import subprocess
 import sys
+from typing import Dict
+
+from bazel_common import SDK_ROOT
 
 CMAKE_FILE_TYPES = (
     "**/CMakeLists.txt",
@@ -30,21 +32,7 @@ BAZEL_FILE_TYPES = (
     "**/*.BUILD",
 )
 
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-SDK_ROOT = subprocess.run(
-    (
-        "git",
-        "rev-parse",
-        "--show-toplevel",
-    ),
-    cwd=SCRIPT_DIR,
-    text=True,
-    check=True,
-    capture_output=True,
-).stdout.strip()
-
-ATTR_REGEX = re.compile(r',?\s*(?P<key>[^=]+)=(?P<value>[^,]+)')
+ATTR_REGEX = re.compile(r",?\s*(?P<key>[^=]+)=(?P<value>[^,]+)")
 
 # Sometimes the build systems are supposed to be implemented differently. This
 # allowlist permits the descriptions to differ between CMake and Bazel.
@@ -94,6 +82,16 @@ CMAKE_ONLY_ALLOWLIST = (
     # TODO: Provide handy rules for PIOASM so users don't have to write out a
     # bespoke run_binary.
     "PICO_DEFAULT_PIOASM_OUTPUT_FORMAT",
+    # Bazel always has picotool.
+    "PICO_NO_PICOTOOL",
+    # TODO: Eventualy support.
+    "PICO_NO_COPRO_DIS",
+    "PICO_DEFAULT_RP2350_PLATFORM",
+    "PICO_GCC_TRIPLE",
+    "PICO_NO_FLASH",
+    "PICO_COPY_TO_RAM",
+    "PICO_RP2350_ARM_S_CONFIG_HEADER_FILES",
+    "PICO_RP2350_RISCV_CONFIG_HEADER_FILES",
 )
 
 BAZEL_ONLY_ALLOWLIST = (
@@ -124,13 +122,28 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_BTSTACK_CONFIG",
     "PICO_LWIP_CONFIG",
     "PICO_FREERTOS_LIB",
+    "PICO_MBEDTLS_LIB",
+    # CMake has PICO_DEFAULT_CLIB, but it's not user-facing.
+    "PICO_CLIB",
+    # Selecting default library implementations.
+    "PICO_MULTICORE_ENABLED",
+    "PICO_DEFAULT_DOUBLE_IMPL",
+    "PICO_DEFAULT_FLOAT_IMPL",
+    "PICO_DEFAULT_DIVIDER_IMPL",
+    "PICO_DEFAULT_PRINTF_IMPL",
+    "PICO_DEFAULT_RAND_IMPL",
+    "PICO_BINARY_INFO_ENABLED",
+    # Allows selection of clang/gcc when using the dynamically fetched
+    # toolchains.
+    "PICO_TOOLCHAIN",
 )
+
 
 @dataclass
 class Option:
     name: str
     description: str
-    attrs: dict[str, str]
+    attrs: Dict[str, str]
 
     def matches(self, other):
         matches = (self.name == other.name) and (self.attrs == other.attrs)
@@ -141,24 +154,25 @@ class Option:
 
 def FindKnownOptions(option_pattern_matcher, file_paths):
     pattern = re.compile(
-        option_pattern_matcher +
-        r':\s+(?P<name>\w+),\s+(?P<description>[^,]+)(?:,\s+(?P<attrs>.*))?$')
+        option_pattern_matcher
+        + r":\s+(?P<name>\w+),\s+(?P<description>[^,]+)(?:,\s+(?P<attrs>.*))?$"
+    )
     options = {}
     for p in file_paths:
-        with open(p, 'r') as f:
+        with open(p, "r") as f:
             for line in f:
                 match = re.search(pattern, line)
                 if not match:
                     continue
 
                 attrs = {
-                    m.group('key'): m.group('value')
-                    for m in re.finditer(ATTR_REGEX, match.group('attrs'))
+                    m.group("key"): m.group("value")
+                    for m in re.finditer(ATTR_REGEX, match.group("attrs"))
                 }
 
-                options[match.group('name')] = Option(
-                    match.group('name'),
-                    match.group('description'),
+                options[match.group("name")] = Option(
+                    match.group("name"),
+                    match.group("description"),
                     attrs,
                 )
     return options
@@ -193,31 +207,39 @@ def CompareOptions(bazel_pattern, bazel_files, cmake_pattern, cmake_files):
     both.update(bazel_options)
     both.update(cmake_options)
     for k in both.keys():
-        if not OptionsAreEqual(bazel_options.get(k, None),
-                               cmake_options.get(k, None)):
+        if not OptionsAreEqual(bazel_options.get(k, None), cmake_options.get(k, None)):
             are_equal = False
     return are_equal
 
 
-cmake_files = [
-    f for p in CMAKE_FILE_TYPES
-    for f in glob.glob(p, root_dir=SDK_ROOT, recursive=True)
-]
-bazel_files = [
-    f for p in BAZEL_FILE_TYPES
-    for f in glob.glob(p, root_dir=SDK_ROOT, recursive=True)
-]
+def compare_build_systems():
+    cmake_files = [
+        f
+        for p in CMAKE_FILE_TYPES
+        for f in glob.glob(os.path.join(SDK_ROOT, p), recursive=True)
+    ]
+    bazel_files = [
+        f
+        for p in BAZEL_FILE_TYPES
+        for f in glob.glob(os.path.join(SDK_ROOT, p), recursive=True)
+    ]
 
-print('[1/2] Checking build system configuration flags...')
-build_options_ok = CompareOptions("PICO_BAZEL_CONFIG", bazel_files,
-                                  "PICO_CMAKE_CONFIG", cmake_files)
+    print("[1/2] Checking build system configuration flags...")
+    build_options_ok = CompareOptions(
+        "PICO_BAZEL_CONFIG", bazel_files, "PICO_CMAKE_CONFIG", cmake_files
+    )
 
-print('[2/2] Checking build system defines...')
-build_defines_ok = CompareOptions("PICO_BUILD_DEFINE", bazel_files,
-                                  "PICO_BUILD_DEFINE", cmake_files)
+    print("[2/2] Checking build system defines...")
+    build_defines_ok = CompareOptions(
+        "PICO_BUILD_DEFINE", bazel_files, "PICO_BUILD_DEFINE", cmake_files
+    )
 
-if build_options_ok and build_defines_ok:
-    print("OK")
-    sys.exit(0)
+    if build_options_ok and build_defines_ok:
+        print("OK")
+        return 0
 
-sys.exit(1)
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(compare_build_systems())

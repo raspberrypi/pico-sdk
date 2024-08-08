@@ -7,9 +7,10 @@ First, in your `MODULE.bazel` file, add a dependency on the Pico SDK:
 ```python
 bazel_dep(
   name = "pico-sdk",
-  version = "1.6.0-rc1",
+  version = "2.0.0",
 )
 ```
+
 Second, in the same file you'll need to add an explicit dependency on
 `rules_cc`, as it's a special-cased Bazel module:
 ```python
@@ -35,10 +36,14 @@ These toolchains tell Bazel how to compile for ARM cores. Add the following
 to the `MODULE.bazel` for your project:
 ```python
 register_toolchains(
-    "@pico-sdk//bazel/toolchain:arm_gcc_linux-x86_64",
-    "@pico-sdk//bazel/toolchain:arm_gcc_win-x86_64",
-    "@pico-sdk//bazel/toolchain:arm_gcc_mac-x86_64",
-    "@pico-sdk//bazel/toolchain:arm_gcc_mac-aarch64",
+    "@pico-sdk//bazel/toolchain:linux-x86_64-rp2040",
+    "@pico-sdk//bazel/toolchain:linux-x86_64-rp2350",
+    "@pico-sdk//bazel/toolchain:win-x86_64-rp2040",
+    "@pico-sdk//bazel/toolchain:win-x86_64-rp2350",
+    "@pico-sdk//bazel/toolchain:mac-x86_64-rp2040",
+    "@pico-sdk//bazel/toolchain:mac-x86_64-rp2350",
+    "@pico-sdk//bazel/toolchain:mac-aarch64-rp2040",
+    "@pico-sdk//bazel/toolchain:mac-aarch64-rp2350",
 )
 ```
 
@@ -82,7 +87,7 @@ rule basis, or through an aspect. Running a wildcard build with the
 firmware image.
 
 ```console
-$ bazel build --platforms=@pico-sdk//bazel/platform:rp2040 \
+$ bazelisk build --platforms=@pico-sdk//bazel/platform:rp2040 \
     --aspects @pico-sdk//tools:uf2_aspect.bzl%pico_uf2_aspect \
     --output_groups=+pico_uf2_files \
     //...
@@ -96,6 +101,13 @@ launcher) to build the Pico SDK.
 
 We strongly recommend you set up
 [Bazelisk](https://bazel.build/install/bazelisk).
+
+You will also need a working compiler configured if you wish to build Picotool
+or pioasm.
+
+* Linux: `sudo apt-get install build-essential` or similar.
+* macOS: `xcode-select --install`
+* Windows: [Install MSVC](https://visualstudio.microsoft.com/vs/features/cplusplus/)
 
 ### Building
 To build all of the Pico SDK, run the following command:
@@ -111,6 +123,23 @@ you encounter along the way.
 
 Currently, the following features are not supported:
 
-* "None" variants of pico_double, pico_float, and pico_printf are not yet
-  supported.
 * The pioasm parser cannot be built from source via Bazel.
+* Windows MSVC wildcard build (`bazel build //...`) does not work when targeting
+  host.
+* Bazel does not yet provide RISC-V support for Pico 2/RP2350.
+* Pico W wireless libraries have link issues.
+
+## Contributing
+When making changes to the Bazel build, please run the Bazel validation script
+to ensure all supported configurations build properly:
+
+```console
+$ ./tools/run_all_bazel_checks.py
+```
+
+If you need to check against a local version of Picotool, you can run the script
+with `--picotool-dir`:
+
+```console
+$ ./tools/run_all_bazel_checks.py --picotool-dir=/path/to/picotool
+```

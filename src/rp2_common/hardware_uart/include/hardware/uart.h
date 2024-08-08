@@ -9,11 +9,14 @@
 
 #include "pico.h"
 #include "hardware/structs/uart.h"
-#include "hardware/regs/dreq.h"
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_UART, Enable/disable assertions in the UART module, type=bool, default=0, group=hardware_uart
-#ifndef PARAM_ASSERTIONS_ENABLED_UART
-#define PARAM_ASSERTIONS_ENABLED_UART 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_UART, Enable/disable assertions in the hardware_uart module, type=bool, default=0, group=hardware_uart
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_UART
+#ifdef PARAM_ASSERTIONS_ENABLED_UART // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_UART PARAM_ASSERTIONS_ENABLED_UART
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_UART 0
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -30,9 +33,9 @@ extern "C" {
 #define PICO_UART_DEFAULT_CRLF 0
 #endif
 
-// PICO_CONFIG: PICO_DEFAULT_UART, Define the default UART used for printf etc, min=0, max=1, group=hardware_uart
-// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=29, group=hardware_uart
-// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=29, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART, Define the default UART used for printf etc, min=0, max=1, default=Usually provided via board header, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=29, default=Usually provided via board header, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=29, default=Usually provided via board header, group=hardware_uart
 
 // PICO_CONFIG: PICO_DEFAULT_UART_BAUD_RATE, Define the default UART baudrate, max=921600, default=115200, group=hardware_uart
 #ifndef PICO_DEFAULT_UART_BAUD_RATE
@@ -44,7 +47,7 @@ extern "C" {
  *
  * \brief Hardware UART API
  *
- * RP2040 has 2 identical instances of a UART peripheral, based on the ARM PL011. Each UART can be connected to a number
+ * RP-series microcontrollers have 2 identical instances of a UART peripheral, based on the ARM PL011. Each UART can be connected to a number
  * of GPIO pins as defined in the GPIO muxing.
  *
  * Only the TX, RX, RTS, and CTS signals are
@@ -56,10 +59,11 @@ extern "C" {
  *  \code
  *  int main() {
  *
- *     // Set the GPIO pin mux to the UART - 0 is TX, 1 is RX
+ *     // Set the GPIO pin mux to the UART - pin 0 is TX, 1 is RX; note use of UART_FUNCSEL_NUM for the general
+ *     // case where the func sel used for UART depends on the pin number
  *     // Do this before calling uart_init to avoid losing data
- *     gpio_set_function(0, GPIO_FUNC_UART);
- *     gpio_set_function(1, GPIO_FUNC_UART);
+ *     gpio_set_function(0, UART_FUNCSEL_NUM(uart0, 0));
+ *     gpio_set_function(1, UART_FUNCSEL_NUM(uart0, 1));
  *
  *     // Initialise UART 0
  *     uart_init(uart0, 115200);
@@ -84,12 +88,125 @@ typedef struct uart_inst uart_inst_t;
 
 /** @} */
 
+/**
+ * \def PICO_DEFAULT_UART_INSTANCE()
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns the default UART instance based on the value of PICO_DEFAULT_UART
+ */
 #if !defined(PICO_DEFAULT_UART_INSTANCE) && defined(PICO_DEFAULT_UART)
-#define PICO_DEFAULT_UART_INSTANCE (__CONCAT(uart,PICO_DEFAULT_UART))
+#define PICO_DEFAULT_UART_INSTANCE() (__CONCAT(uart,PICO_DEFAULT_UART))
 #endif
 
+/**
+ * \def PICO_DEFAULT_UART
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief The default UART instance number
+ */
+
 #ifdef PICO_DEFAULT_UART_INSTANCE
-#define uart_default PICO_DEFAULT_UART_INSTANCE
+#define uart_default PICO_DEFAULT_UART_INSTANCE()
+#endif
+
+/**
+ * \def UART_NUM(uart)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns the UART number for a UART instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_NUM
+static_assert(NUM_UARTS == 2, "");
+#define UART_NUM(uart) ((uart) == uart1)
+#endif
+
+/**
+ * \def UART_INSTANCE(uart_num)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns the UART instance with the given UART number
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_INSTANCE
+static_assert(NUM_UARTS == 2, "");
+#define UART_INSTANCE(num) ((num) ? uart1 : uart0)
+#endif
+
+/**
+ * \def UART_DREQ_NUM(uart, is_tx)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns the \ref dreq_num_t used for pacing DMA transfers to or from this UART instance.
+ * If is_tx is true, then it is for transfers to the UART else for transfers from the UART.
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_DREQ_NUM
+#include "hardware/regs/dreq.h"
+static_assert(DREQ_UART0_RX == DREQ_UART0_TX + 1, "");
+static_assert(DREQ_UART1_RX == DREQ_UART1_TX + 1, "");
+static_assert(DREQ_UART1_TX == DREQ_UART0_TX + 2, "");
+#define UART_DREQ_NUM(uart, is_tx) ({ \
+    DREQ_UART0_TX + UART_NUM(uart) * 2 + !(is_tx); \
+})
+#endif
+
+/**
+ * \def UART_CLOCK_NUM(uart)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns \ref clock_num_t of the clock for the given UART instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_CLOCK_NUM
+#define UART_CLOCK_NUM(uart) clk_peri
+#endif
+
+/**
+ * \def UART_FUNCSEL_NUM(uart, gpio)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns \ref gpio_function_t needed to select the UART function for the given UART instance on the given GPIO number.
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_FUNCSEL_NUM
+#if PICO_RP2040
+#define UART_FUNCSEL_NUM(uart, gpio) GPIO_FUNC_UART
+#else
+#define UART_FUNCSEL_NUM(uart, gpio) ((gpio) & 0x2 ? GPIO_FUNC_UART_AUX : GPIO_FUNC_UART)
+#endif
+#endif
+
+/**
+ * \def UART_IRQ_NUM(uart)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns the \ref irq_num_t for processor interrupts from the given UART instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_IRQ_NUM
+#include "hardware/regs/intctrl.h"
+static_assert(UART1_IRQ == UART0_IRQ + 1, "");
+#define UART_IRQ_NUM(uart) (UART0_IRQ + UART_NUM(uart))
+#endif
+
+/**
+ * \def UART_RESET_NUM(uart)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns the \ref reset_num_t used to reset a given UART instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_RESET_NUM
+#include "hardware/resets.h"
+#define UART_RESET_NUM(uart) (uart_get_index(uart) ? RESET_UART1 : RESET_UART0)
 #endif
 
 /*! \brief Convert UART instance to hardware instance number
@@ -99,16 +216,30 @@ typedef struct uart_inst uart_inst_t;
  * \return Number of UART, 0 or 1.
  */
 static inline uint uart_get_index(uart_inst_t *uart) {
-    invalid_params_if(UART, uart != uart0 && uart != uart1);
-    return uart == uart1 ? 1 : 0;
+    invalid_params_if(HARDWARE_UART, uart != uart0 && uart != uart1);
+    return UART_NUM(uart);
 }
 
-static inline uart_inst_t *uart_get_instance(uint instance) {
-    static_assert(NUM_UARTS == 2, "");
-    invalid_params_if(UART, instance >= NUM_UARTS);
-    return instance ? uart1 : uart0;
+/*! \brief Get the UART instance from an instance number
+ *  \ingroup hardware_uart
+ *
+ * \param uart UART instance
+ * \return Number of UART, 0 or 1
+ */
+static inline uart_inst_t *uart_get_instance(uint num) {
+    invalid_params_if(HARDWARE_UART, num >= NUM_UARTS);
+    return UART_INSTANCE(num);
 }
 
+/*! \brief Get the real hardware UART instance from a UART instance
+ *  \ingroup hardware_uart
+ *
+ * This extra level of abstraction was added to facilitate adding PIO UARTs in the future.
+ * It currently does nothing, and costs nothing.
+ *
+ * \param uart UART instance
+ * \return The uart_hw_t pointer to the UART instance registers
+ */
 static inline uart_hw_t *uart_get_hw(uart_inst_t *uart) {
     uart_get_index(uart); // check it is a hw uart
     return (uart_hw_t *)uart;
@@ -216,17 +347,17 @@ static inline void uart_set_hw_flow(uart_inst_t *uart, bool cts, bool rts) {
  */
 void uart_set_format(uart_inst_t *uart, uint data_bits, uint stop_bits, uart_parity_t parity);
 
-/*! \brief Setup UART interrupts
+/*! \brief Enable/Disable UART interrupt outputs
  *  \ingroup hardware_uart
  *
- * Enable the UART's interrupt output. An interrupt handler will need to be installed prior to calling
+ * Enable/Disable the UART's interrupt outputs. An interrupt handler should be installed prior to calling
  * this function.
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param rx_has_data If true an interrupt will be fired when the RX FIFO contains data.
  * \param tx_needs_data If true an interrupt will be fired when the TX FIFO needs data.
  */
-static inline void uart_set_irq_enables(uart_inst_t *uart, bool rx_has_data, bool tx_needs_data) {
+static inline void uart_set_irqs_enabled(uart_inst_t *uart, bool rx_has_data, bool tx_needs_data) {
     // Both UARTRXINTR (RX) and UARTRTINTR (RX timeout) interrupts are
     // required for rx_has_data. RX asserts when >=4 characters are in the RX
     // FIFO (for RXIFLSEL=0). RT asserts when there are >=1 characters and no
@@ -246,6 +377,11 @@ static inline void uart_set_irq_enables(uart_inst_t *uart, bool rx_has_data, boo
     }
 }
 
+// backwards compatibility with SDK version < 2.0.0
+static inline void uart_set_irq_enables(uart_inst_t *uart, bool rx_has_data, bool tx_needs_data) {
+    uart_set_irqs_enabled(uart, rx_has_data, tx_needs_data);
+}
+
 /*! \brief Test if specific UART is enabled
  *  \ingroup hardware_uart
  *
@@ -253,7 +389,7 @@ static inline void uart_set_irq_enables(uart_inst_t *uart, bool rx_has_data, boo
  * \return true if the UART is enabled
  */
 static inline bool uart_is_enabled(uart_inst_t *uart) {
-    return !!(uart_get_hw(uart)->cr & UART_UARTCR_UARTEN_BITS);
+    return uart_get_hw(uart)->cr & UART_UARTCR_UARTEN_BITS;
 }
 
 /*! \brief Enable/Disable the FIFOs on specified UART
@@ -452,17 +588,29 @@ static inline void uart_default_tx_wait_blocking(void) {
  */
 bool uart_is_readable_within_us(uart_inst_t *uart, uint32_t us);
 
-/*! \brief Return the DREQ to use for pacing transfers to/from a particular UART instance
+/*! \brief Return the \ref dreq_num_t to use for pacing transfers to/from a particular UART instance
  *  \ingroup hardware_uart
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param is_tx true for sending data to the UART instance, false for receiving data from the UART instance
  */
+static inline uint uart_get_dreq_num(uart_inst_t *uart, bool is_tx) {
+    return UART_DREQ_NUM(uart, is_tx);
+}
+
+/*! \brief Return the \ref reset_num_t to use for pacing transfers to/from a particular UART instance
+ *  \ingroup hardware_uart
+ *
+ * \param uart UART instance. \ref uart0 or \ref uart1
+ * \param is_tx true for sending data to the UART instance, false for receiving data from the UART instance
+ */
+static inline uint uart_get_reset_num(uart_inst_t *uart) {
+    return UART_RESET_NUM(uart);
+}
+
+// backwards compatibility
 static inline uint uart_get_dreq(uart_inst_t *uart, bool is_tx) {
-    static_assert(DREQ_UART0_RX == DREQ_UART0_TX + 1, "");
-    static_assert(DREQ_UART1_RX == DREQ_UART1_TX + 1, "");
-    static_assert(DREQ_UART1_TX == DREQ_UART0_TX + 2, "");
-    return DREQ_UART0_TX + uart_get_index(uart) * 2 + !is_tx;
+    return uart_get_dreq_num(uart, is_tx);
 }
 
 #ifdef __cplusplus

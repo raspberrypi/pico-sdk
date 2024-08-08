@@ -11,6 +11,8 @@
 
 // Board definition for the Pi-Plates MICROPi processor board
 
+// pico_cmake_set PICO_PLATFORM=rp2040
+
 #ifndef _BOARDS_PI_PLATES_MICROPI_H
 #define _BOARDS_PI_PLATES_MICROPI_H
 
@@ -70,6 +72,7 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
+// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024) //change to (16 * 1024 * 1024) on final product
 #endif

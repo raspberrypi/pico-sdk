@@ -4,40 +4,45 @@ target_sources(pico_runtime INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/runtime.c
 )
 
-target_include_directories(pico_runtime_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(pico_runtime_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 pico_mirrored_target_link_libraries(pico_runtime INTERFACE
-        hardware_uart
-        hardware_clocks
-        hardware_irq
-        pico_printf
-        pico_sync
-        )
+        pico_base
+        pico_runtime_init
+)
 
-if (TARGET pico_bit_ops)
-    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_bit_ops)
+if (TARGET hardware_gpio_headers)
+    target_link_libraries(pico_runtime INTERFACE hardware_gpio_headers) # to determine if we should init GPIO copro
 endif()
-if (TARGET pico_divider)
-    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_divider)
+if (TARGET hardware_riscv_headers)
+    target_link_libraries(pico_runtime INTERFACE hardware_riscv_headers)
 endif()
-if (TARGET pico_double)
-    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_double)
-endif()
-if (TARGET pico_int64_ops)
-    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_int64_ops)
-endif()
-if (TARGET pico_float)
-    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_float)
-endif()
-if (TARGET pico_malloc)
-    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_malloc)
-endif()
-if (TARGET pico_mem_ops)
-    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_mem_ops)
-endif()
-if (TARGET pico_standard_link)
-    pico_mirrored_target_link_libraries(pico_runtime INTERFACE pico_standard_link)
-endif()
+
+set(PICO_RUNTIME_LIBRARIES
+        hardware_uart
+        pico_bit_ops
+        pico_divider
+        pico_double
+        pico_int64_ops
+        pico_float
+        pico_malloc
+        pico_mem_ops
+        pico_atomic
+        pico_cxx_options
+        pico_standard_binary_info
+        pico_standard_link
+        pico_sync
+        pico_printf
+        pico_crt0
+        pico_clib_interface
+        pico_stdio
+)
+
+foreach(LIB IN LISTS PICO_RUNTIME_LIBRARIES)
+    if (TARGET ${LIB})
+        pico_mirrored_target_link_libraries(pico_runtime INTERFACE ${LIB})
+    endif()
+endforeach()
 
 # todo is this correct/needed?
 if (PICO_C_COMPILER_IS_GNU)
@@ -46,3 +51,70 @@ elseif (PICO_C_COMPILER_IS_CLANG)
    # target_link_options(pico_runtime INTERFACE "-nostdlib")
 endif()
 
+# pico_minimize_runtime((INCLUDE ...) (EXCLUDE ...))
+#
+# INCLUDE/EXCLUDE can contain any of the following (all defaulting to not included)
+#
+# DEFAULT_ALARM_POOL    - default alarm pool setup
+# PRINTF                - full printf support
+# PRINTF_MINIMAL        - printf support without the following
+# PRINTF_FLOAT          - to control float support if printf is enabled
+# PRINTF_EXPONENTIAL
+# PRINTF_LONG_LONG
+# PRINTF_PTRDIFF_T
+# FLOAT                 - support for single-precision floating point
+# DOUBLE                - support for double-precision floating point
+# FPGA_CHECK            - checks for FPGA which allows Raspberry Pi to run your binary on FPGA
+function(pico_minimize_runtime TARGET)
+    cmake_parse_arguments(RUNTIME "" ""
+            "INCLUDE;EXCLUDE" ${ARGN} )
+    foreach (INCL_EXCL IN ITEMS INCLUDE EXCLUDE)
+        if (INCL_EXCL STREQUAL "INCLUDE")
+            set(VAL 1)
+        else()
+            set(VAL 0)
+        endif()
+        foreach(VAR IN LISTS RUNTIME_${INCL_EXCL})
+            set(RUNTIME_INCLUDE_${VAR} ${VAL})
+        endforeach ()
+    endforeach ()
+    if (NOT RUNTIME_INCLUDE_DEFAULT_ALARM_POOL)
+        target_compile_definitions(${TARGET} PRIVATE PICO_TIME_DEFAULT_ALARM_POOL_DISABLED=1)
+    endif()
+    if (NOT RUNTIME_INCLUDE_FLOAT)
+        pico_set_float_implementation(${TARGET} none)
+    endif()
+    if (NOT RUNTIME_INCLUDE_DOUBLE)
+        pico_set_double_implementation(${TARGET} none)
+    endif()
+    if (NOT RUNTIME_INCLUDE_AUTO_INIT_MUTEX)
+        target_compile_definitions(${TARGET} PRIVATE PICO_RUNTIME_SKIP_INIT_MUTEX=1)
+    endif()
+
+    if (RUNTIME_INCLUDE_PRINTF)
+        if (NOT RUNTIME_INCLUDE_PRINTF_MINIMAL)
+            set( RUNTIME_INCLUDE_PRINTF_FLOAT 1)
+            set( RUNTIME_INCLUDE_PRINTF_EXPONENTIAL 1)
+            set( RUNTIME_INCLUDE_PRINTF_LONG_LONG 1)
+            set( RUNTIME_INCLUDE_PRINTF_PTRDIFF_T 1)
+        endif()
+        if (NOT RUNTIME_INCLUDE_PRINTF_FLOAT)
+            target_compile_definitions(${TARGET} PRIVATE PICO_PRINTF_SUPPORT_FLOAT=0)
+        endif()
+        if (NOT RUNTIME_INCLUDE_PRINTF_EXPONENTIAL)
+            target_compile_definitions(${TARGET} PRIVATE PICO_PRINTF_SUPPORT_EXPONENTIAL=0)
+        endif()
+        if (NOT RUNTIME_INCLUDE_PRINTF_LONG_LONG)
+            target_compile_definitions(${TARGET} PRIVATE PICO_PRINTF_SUPPORT_LONG_LONG=0)
+        endif()
+        if (NOT RUNTIME_INCLUDE_PRINTF_PTRDIFF_T)
+            target_compile_definitions(${TARGET} PRIVATE PICO_PRINTF_SUPPORT_PTRDIFF_T=0)
+        endif()
+    else()
+        pico_set_printf_implementation(${TARGET} none)
+    endif()
+
+    if (NOT RUNTIME_INCLUDE_FPGA_CHECK)
+        target_compile_definitions(${TARGET} PRIVATE PICO_NO_FPGA_CHECK=1)
+    endif()
+endfunction()

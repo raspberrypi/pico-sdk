@@ -1,0 +1,29 @@
+package(default_visibility = ["//visibility:public"])
+
+# This exists to break dependency cycles between
+# this library and the bit ops implementations.
+# Application code should always use :pico_bit_ops instead.
+cc_library(
+    name = "pico_bit_ops_interface",
+    hdrs = ["include/pico/bit_ops.h"],
+    includes = ["include"],
+    visibility = [
+        "//src/host/pico_bit_ops:__pkg__",
+        "//src/rp2_common/pico_bit_ops:__pkg__",
+    ],
+    deps = [
+        "//src/common/pico_base_headers",
+    ],
+)
+
+cc_library(
+    name = "pico_bit_ops_headers",
+    hdrs = ["include/pico/bit_ops.h"],
+    includes = ["include"],
+    deps = [
+        "//src/common/pico_base_headers",
+    ] + select({
+        "//bazel/constraint:host": ["//src/host/pico_bit_ops"],
+        "//conditions:default": ["//src/rp2_common/pico_bit_ops"],
+    }),
+)

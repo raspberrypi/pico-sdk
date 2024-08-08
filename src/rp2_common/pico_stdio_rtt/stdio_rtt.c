@@ -21,6 +21,10 @@ void stdio_rtt_init(void) {
     stdio_bi_decl_if_func_used(bi_program_feature("RTT stdin / stdout"));
 }
 
+void stdio_rtt_deinit(void) {
+    stdio_set_driver_enabled(&stdio_rtt, false);
+}
+
 static void stdio_rtt_out_chars(const char *buf, int length) {
     SEGGER_RTT_Write(0, buf, length);
 }

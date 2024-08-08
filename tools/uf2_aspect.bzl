@@ -17,9 +17,14 @@ def _pico_uf2_aspect_impl(target, ctx):
     ctx.actions.run(
         outputs = [uf2_output],
         inputs = [binary_to_convert],
-        tools = [ctx.executable._elf2uf2_tool],
-        executable = ctx.executable._elf2uf2_tool,
+        tools = [ctx.executable._picotool],
+        executable = ctx.executable._picotool,
         arguments = [
+            "uf2",
+            "convert",
+            "--quiet",
+            "-t",
+            "elf",
             binary_to_convert.path,
             uf2_output.path,
         ],
@@ -29,7 +34,6 @@ def _pico_uf2_aspect_impl(target, ctx):
             pico_uf2_files = depset([uf2_output]),
         ),
     ]
-    return []
 
 pico_uf2_aspect = aspect(
     implementation = _pico_uf2_aspect_impl,
@@ -58,6 +62,6 @@ will only be produced when you explicitly use your custom macro.
             default = _SUPPORTED_BINARY_TYPES,
             doc = "A comma-separated list of rule kinds to apply the UF2 aspect to",
         ),
-        "_elf2uf2_tool": attr.label(default = "//tools/elf2uf2:elf2uf2", executable = True, cfg = "exec"),
+        "_picotool": attr.label(default = "@picotool//:picotool", executable = True, cfg = "exec"),
     },
 )

@@ -1,5 +1,3 @@
-load("//bazel:defs.bzl", "compatible_with_rp2")
-
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -7,12 +5,13 @@ cc_library(
     srcs = ["rtc.c"],
     hdrs = ["include/hardware/rtc.h"],
     includes = ["include"],
-    target_compatible_with = compatible_with_rp2(),
+    # TODO: Only rp2040 has a hardware/structs/rtc.h header.
+    target_compatible_with = ["//bazel/constraint:rp2040"],
     deps = [
-        "//src/common/pico_base",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
         "//src/rp2_common/hardware_clocks",
         "//src/rp2_common/hardware_irq",
         "//src/rp2_common/hardware_resets",
-        "//src/rp2_common/pico_platform:hardware_structs",
     ],
 )

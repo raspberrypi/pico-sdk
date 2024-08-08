@@ -1,0 +1,94 @@
+# Always include these libraries through //src/rp2_common:*!
+# This ensures that you'll get the right headers for the MCU you're targeting.
+
+package(
+    default_visibility = [
+        "//src/rp2350:__subpackages__",
+        "//src/rp2_common:__pkg__",
+    ],
+)
+
+cc_library(
+    name = "platform_defs",
+    hdrs = [
+        "include/hardware/platform_defs.h",
+    ],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+)
+
+# Picotool needs this, so we can't strictly constrain compatibility.
+cc_library(
+    name = "otp_data",
+    hdrs = [
+        "include/hardware/regs/otp_data.h",
+    ],
+    includes = ["include"],
+    tags = ["manual"],
+    visibility = ["@picotool//:__subpackages__"],
+)
+
+filegroup(
+    name = "otp_data_header",
+    srcs = ["include/hardware/regs/otp_data.h"],
+    tags = ["manual"],
+    visibility = ["@picotool//:__subpackages__"],
+)
+
+cc_library(
+    name = "hardware_regs",
+    hdrs = [
+        "include/hardware/platform_defs.h",
+        "include/hardware/regs/accessctrl.h",
+        "include/hardware/regs/adc.h",
+        "include/hardware/regs/addressmap.h",
+        "include/hardware/regs/bootram.h",
+        "include/hardware/regs/busctrl.h",
+        "include/hardware/regs/clocks.h",
+        "include/hardware/regs/coresight_trace.h",
+        "include/hardware/regs/dma.h",
+        "include/hardware/regs/dreq.h",
+        "include/hardware/regs/glitch_detector.h",
+        "include/hardware/regs/hstx_ctrl.h",
+        "include/hardware/regs/hstx_fifo.h",
+        "include/hardware/regs/i2c.h",
+        "include/hardware/regs/intctrl.h",
+        "include/hardware/regs/io_bank0.h",
+        "include/hardware/regs/io_qspi.h",
+        "include/hardware/regs/m33.h",
+        "include/hardware/regs/m33_eppb.h",
+        "include/hardware/regs/otp.h",
+        "include/hardware/regs/otp_data.h",
+        "include/hardware/regs/pads_bank0.h",
+        "include/hardware/regs/pads_qspi.h",
+        "include/hardware/regs/pio.h",
+        "include/hardware/regs/pll.h",
+        "include/hardware/regs/powman.h",
+        "include/hardware/regs/psm.h",
+        "include/hardware/regs/pwm.h",
+        "include/hardware/regs/qmi.h",
+        "include/hardware/regs/resets.h",
+        "include/hardware/regs/riscv_dm.h",
+        "include/hardware/regs/rosc.h",
+        "include/hardware/regs/rp_ap.h",
+        "include/hardware/regs/rvcsr.h",
+        "include/hardware/regs/sha256.h",
+        "include/hardware/regs/sio.h",
+        "include/hardware/regs/spi.h",
+        "include/hardware/regs/syscfg.h",
+        "include/hardware/regs/sysinfo.h",
+        "include/hardware/regs/tbman.h",
+        "include/hardware/regs/ticks.h",
+        "include/hardware/regs/timer.h",
+        "include/hardware/regs/trng.h",
+        "include/hardware/regs/uart.h",
+        "include/hardware/regs/usb.h",
+        "include/hardware/regs/usb_device_dpram.h",
+        "include/hardware/regs/watchdog.h",
+        "include/hardware/regs/xip.h",
+        "include/hardware/regs/xip_aux.h",
+        "include/hardware/regs/xosc.h",
+    ],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+)

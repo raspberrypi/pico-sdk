@@ -35,7 +35,7 @@ def _parse_args():
     return parser.parse_args()
 
 
-_EXPANSION_REGEX = re.compile("(?:\$\{)([a-zA-Z]\w*)(?:\})")
+_EXPANSION_REGEX = re.compile(r"(?:\$\{)([a-zA-Z]\w*)(?:\})")
 
 
 def generate_version_header(version_string, template, output):

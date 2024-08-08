@@ -55,3 +55,9 @@ cc_library(
 cc_library(
     name = "empty_cc_lib",
 )
+
+# A library incompatible with everything. Use to mark an invalid configuration.
+cc_library(
+    name = "incompatible_cc_lib",
+    target_compatible_with = ["@platforms//:incompatible"],
+)

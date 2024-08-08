@@ -1,7 +1,12 @@
-# Always include these libraries through //src/rp2_common/pico_platform:*!
+# Always include these libraries through //src/rp2_common:*!
 # This ensures that you'll get the right headers for the MCU you're targeting.
 
-package(default_visibility = ["//src/rp2_common/pico_platform:__pkg__"])
+package(
+    default_visibility = [
+        "//src/rp2040:__subpackages__",
+        "//src/rp2_common:__pkg__",
+    ],
+)
 
 cc_library(
     name = "platform_defs",

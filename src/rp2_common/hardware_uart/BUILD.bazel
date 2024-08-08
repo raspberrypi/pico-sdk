@@ -9,13 +9,13 @@ cc_library(
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        "//src/common/pico_base",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common:platform_defs",
         "//src/rp2_common/hardware_base",
         "//src/rp2_common/hardware_clocks",
         "//src/rp2_common/hardware_resets",
         "//src/rp2_common/hardware_timer",
-        "//src/rp2_common/pico_platform:hardware_regs",
-        "//src/rp2_common/pico_platform:hardware_structs",
-        "//src/rp2_common/pico_platform:platform_defs",
     ],
 )

@@ -1,0 +1,52 @@
+package(
+    default_visibility = [
+        "//src/rp2350:__subpackages__",
+        "//src/rp2_common:__pkg__",
+    ],
+)
+
+cc_library(
+    name = "pico_platform_internal",
+    hdrs = [
+        "include/pico/asm_helper.S",
+        "include/pico/platform.h",
+        "include/pico/platform/cpu_regs.h",
+    ],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+
+    # Be extra careful about who references this for now; if users depend on
+    # this but not `pico_platform` they'll end up with undefined symbols.
+    # It's generally safe for anything that circularly depends on
+    # //src/rp2_common:pico_platform to be added to this allowlist because
+    # that implicitly means the transitive dependencies of pico_platform will
+    # get linked in.
+    visibility = [
+        "//src/rp2_common:__pkg__",
+    ],
+    deps = [
+        "//src/rp2350/hardware_regs",
+        "//src/rp2350/hardware_regs:platform_defs",
+        "//src/rp2_common/pico_platform_compiler",
+        "//src/rp2_common/pico_platform_panic:pico_platform_panic_headers",
+        "//src/rp2_common/pico_platform_sections",
+    ],
+)
+
+cc_library(
+    name = "pico_platform",
+    srcs = ["platform.c"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+    deps = [
+        ":pico_platform_internal",
+        "//src/common/pico_base_headers",
+        "//src/rp2350/hardware_regs",
+        "//src/rp2350/hardware_regs:platform_defs",
+        "//src/rp2_common/hardware_base",
+        "//src/rp2_common/pico_platform_compiler",
+        "//src/rp2_common/pico_platform_panic",
+        "//src/rp2_common/pico_platform_sections",
+        "//src/rp2_common/pico_standard_link",
+    ],
+)

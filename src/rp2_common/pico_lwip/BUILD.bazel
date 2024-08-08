@@ -7,7 +7,7 @@ cc_library(
     hdrs = ["include/arch/cc.h"],
     includes = ["include"],
     deps = [
-        "//src/common/pico_base",
+        "//src/rp2_common:pico_platform",
         "//src/rp2_common/pico_rand",
     ],
 )
@@ -20,8 +20,8 @@ cc_library(
     target_compatible_with = compatible_with_pico_w(),
     deps = [
         ":pico_lwip",
-        "//src/common/pico_base",
         "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
         "//src/rp2_common/pico_async_context",
         "//src/rp2_common/pico_rand",
     ],
@@ -34,8 +34,8 @@ cc_library(
     target_compatible_with = compatible_with_pico_w(),
     deps = [
         ":pico_lwip",
-        "//src/common/pico_base",
         "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
         "//src/rp2_common/pico_async_context",
         "//src/rp2_common/pico_rand",
     ],

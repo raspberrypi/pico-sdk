@@ -84,6 +84,7 @@ struct c_sdk_output : public output_format {
 
             fprintf(out, "#define %swrap_target %d\n", prefix.c_str(), program.wrap_target);
             fprintf(out, "#define %swrap %d\n", prefix.c_str(), program.wrap);
+            fprintf(out, "#define %spio_version %d\n", prefix.c_str(), program.pio_version);
             fprintf(out, "\n");
 
             output_symbols(out, prefix, program.symbols);
@@ -94,7 +95,7 @@ struct c_sdk_output : public output_format {
                 if (i == program.wrap_target) {
                     fprintf(out, "            //     .wrap_target\n");
                 }
-                fprintf(out, "    0x%04x, // %2d: %s\n", inst, i,
+                fprintf(out, "    0x%04x, // %2d: %s\n", (uint16_t)inst, i,
                         disassemble(inst, program.sideset_bits_including_opt.get(), program.sideset_opt).c_str());
                 if (i == program.wrap) {
                     fprintf(out, "            //     .wrap\n");
@@ -108,16 +109,57 @@ struct c_sdk_output : public output_format {
             fprintf(out, "    .instructions = %sprogram_instructions,\n", prefix.c_str());
             fprintf(out, "    .length = %d,\n", (int) program.instructions.size());
             fprintf(out, "    .origin = %d,\n", program.origin.get());
+            fprintf(out, "    .pio_version = %d,\n", program.pio_version);
+            fprintf(out, "#if PICO_PIO_VERSION > 0\n");
+            fprintf(out, "    .used_gpio_ranges = 0x%x\n", program.used_gpio_ranges);
+            fprintf(out, "#endif\n");
             fprintf(out, "};\n");
             fprintf(out, "\n");
             fprintf(out, "static inline pio_sm_config %sprogram_get_default_config(uint offset) {\n", prefix.c_str());
             fprintf(out, "    pio_sm_config c = pio_get_default_sm_config();\n");
             fprintf(out, "    sm_config_set_wrap(&c, offset + %swrap_target, offset + %swrap);\n", prefix.c_str(),
                     prefix.c_str());
+            if (program.in.pin_count >= 0) {
+                fprintf(out, "    sm_config_set_in_pin_count(&c, %d);\n", program.in.pin_count);
+                fprintf(out, "    sm_config_set_in_shift(&c, %d, %d, %d);\n", program.in.right, program.in.autop, program.in.threshold);
+            }
+            if (program.out.pin_count >= 0) {
+                fprintf(out, "    sm_config_set_out_pin_count(&c, %d);\n", program.out.pin_count);
+                fprintf(out, "    sm_config_set_out_shift(&c, %d, %d, %d);\n", program.out.right, program.out.autop, program.out.threshold);
+            }
+            if (program.set_count >= 0) {
+                fprintf(out, "    sm_config_set_set_pin_count(&c, %d);\n", program.set_count);
+            }
             if (program.sideset_bits_including_opt.is_specified()) {
                 fprintf(out, "    sm_config_set_sideset(&c, %d, %s, %s);\n", program.sideset_bits_including_opt.get(),
                         program.sideset_opt ? "true" : "false",
                         program.sideset_pindirs ? "true" : "false");
+            }
+            if (program.mov_status_type != -1) {
+                const char *types[] = {
+                        "STATUS_TX_LESSTHAN",
+                        "STATUS_RX_LESSTHAN",
+                        "STATUS_IRQ_INDEX",
+                };
+                if (program.mov_status_type < 0 || program.mov_status_type >= 3) {
+                    throw std::runtime_error("unknown mov_status type");
+                }
+                fprintf(out, "    sm_config_set_mov_status(&c, %s, %d);\n", types[program.mov_status_type], program.mov_status_n);
+            }
+            if (program.fifo != fifo_config::txrx) {
+                const char *type;
+                switch (program.fifo) {
+                    case fifo_config::tx:     type = "PIO_FIFO_JOIN_TX"; break;
+                    case fifo_config::rx:     type = "PIO_FIFO_JOIN_RX"; break;
+                    case fifo_config::txput:  type = "PIO_FIFO_JOIN_TXPUT"; break;
+                    case fifo_config::txget:  type = "PIO_FIFO_JOIN_TXGET"; break;
+                    case fifo_config::putget: type = "PIO_FIFO_JOIN_PUTGET"; break;
+                    default: throw std::runtime_error("unknown fifo_config type");
+                }
+                fprintf(out, "    sm_config_set_fifo_join(&c, %s);\n", type);
+            }
+            if (program.clock_div_int != 1 || program.clock_div_frac != 0) {
+                fprintf(out, "    sm_config_set_clkdiv_int_frac(&c, %d, %d);\n", program.clock_div_int, program.clock_div_frac);
             }
             fprintf(out, "    return c;\n");
             fprintf(out, "}\n");

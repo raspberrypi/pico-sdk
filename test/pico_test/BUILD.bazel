@@ -3,7 +3,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "pico_test",
     testonly = True,
-    hdrs = ["include/pico/test.h"],
+    hdrs = [
+        "include/pico/test.h",
+        "include/pico/test/xrand.h",
+    ],
     includes = ["include"],
-    deps = ["//src/common/pico_base"],
+    deps = [
+        "//src:pico_platform",
+    ],
 )

@@ -1,3 +1,7 @@
 pico_simple_hardware_headers_only_target(divider)
-target_sources(hardware_divider INTERFACE ${CMAKE_CURRENT_LIST_DIR}/divider.S)
+if (PICO_RP2040)
+    target_sources(hardware_divider INTERFACE ${CMAKE_CURRENT_LIST_DIR}/divider.S)
+else()
+    target_sources(hardware_divider INTERFACE ${CMAKE_CURRENT_LIST_DIR}/divider.c)
+endif()
 target_link_libraries(hardware_divider_headers INTERFACE hardware_structs)

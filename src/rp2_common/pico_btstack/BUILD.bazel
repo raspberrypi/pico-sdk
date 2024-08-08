@@ -42,7 +42,7 @@ cc_library(
     target_compatible_with = compatible_with_pico_w(),
     deps = [
         ":pico_btstack_base",
-        "//src/common/pico_base",
+        "//src/rp2_common:pico_platform",
         "//src/rp2_common/pico_flash",
     ],
 )
@@ -67,7 +67,7 @@ cc_library(
         "//bazel/constraint:pico_btstack_config_unset",
     ) + compatible_with_pico_w(),
     deps = [
-        "//src/common/pico_base",
+        "//src/rp2_common:pico_platform",
         "//src/rp2_common/pico_stdio",
     ],
 )

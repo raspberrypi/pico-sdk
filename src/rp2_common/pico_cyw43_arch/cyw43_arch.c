@@ -163,12 +163,12 @@ int cyw43_arch_init_with_country(uint32_t country) {
 }
 
 void cyw43_arch_gpio_put(uint wl_gpio, bool value) {
-    invalid_params_if(CYW43_ARCH, wl_gpio >= CYW43_WL_GPIO_COUNT);
+    invalid_params_if(PICO_CYW43_ARCH, wl_gpio >= CYW43_WL_GPIO_COUNT);
     cyw43_gpio_set(&cyw43_state, (int)wl_gpio, value);
 }
 
 bool cyw43_arch_gpio_get(uint wl_gpio) {
-    invalid_params_if(CYW43_ARCH, wl_gpio >= CYW43_WL_GPIO_COUNT);
+    invalid_params_if(PICO_CYW43_ARCH, wl_gpio >= CYW43_WL_GPIO_COUNT);
     bool value = false;
     cyw43_gpio_get(&cyw43_state, (int)wl_gpio, &value);
     return value;

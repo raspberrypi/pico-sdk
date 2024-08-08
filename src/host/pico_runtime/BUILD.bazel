@@ -1,0 +1,17 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_runtime",
+    srcs = ["runtime.c"],
+    hdrs = [
+        "include/pico/runtime.h",
+        "include/pico/runtime_init.h",
+    ],
+    copts = select({
+        "@platforms//os:windows": [],  # TODO: MSVC flags.
+        "//conditions:default": ["-Wno-ignored-attributes"],
+    }),
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/host/pico_platform"],
+)

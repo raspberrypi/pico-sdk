@@ -12,7 +12,7 @@
 
 #include "semphr.h"
 
-#if configNUM_CORES > 1 && !defined(configUSE_CORE_AFFINITY)
+#if configNUMBER_OF_CORES > 1 && !defined(configUSE_CORE_AFFINITY)
 #error async_context_freertos requires configUSE_CORE_AFFINITY under SMP
 #endif
 
@@ -125,7 +125,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
         async_context_deinit(&self->core);
         return false;
     }
-#if configNUM_CORES > 1
+#if configNUMBER_OF_CORES > 1
     UBaseType_t core_id = config->task_core_id;
     if (core_id == (UBaseType_t)-1) {
         core_id = portGET_CORE_ID();

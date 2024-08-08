@@ -1,0 +1,30 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# This exists to break a dependency cycle between
+# this library and //src/rp2_common/pico_printf.
+# Application code should always use :pico_platform_panic instead.
+cc_library(
+    name = "pico_platform_panic_headers",
+    hdrs = ["include/pico/platform/panic.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = [
+        "//src/rp2040/pico_platform:__pkg__",
+        "//src/rp2350/pico_platform:__pkg__",
+    ],
+    deps = ["//src/rp2_common/pico_clib_interface"],
+)
+
+cc_library(
+    name = "pico_platform_panic",
+    srcs = ["panic.c"],
+    hdrs = ["include/pico/platform/panic.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_printf",
+    ],
+    alwayslink = True,
+)

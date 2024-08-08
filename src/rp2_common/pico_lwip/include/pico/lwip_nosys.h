@@ -17,8 +17,9 @@ extern "C" {
 /** \file pico/lwip_nosys.h
 * \defgroup pico_lwip_nosys pico_lwip_nosys
 * \ingroup pico_lwip
-* \brief Glue library for integration lwIP in \c NO_SYS=1 mode with the SDK. Simple \c init and \c deinit
-* are all that is required to hook up lwIP via an \ref async_context instance.
+* \brief Glue library for integration lwIP in \c NO_SYS=1 mode with the SDK
+*
+* Simple \c init and \c deinit are all that is required to hook up lwIP via an \ref async_context instance.
 */
 
 /*! \brief Initializes lwIP (NO_SYS=1 mode) support support using the provided async_context

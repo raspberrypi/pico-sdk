@@ -28,7 +28,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct __packed_aligned semaphore {
+typedef struct semaphore {
     struct lock_core core;
     int16_t permits;
     int16_t max_permits;

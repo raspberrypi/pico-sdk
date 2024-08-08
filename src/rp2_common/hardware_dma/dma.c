@@ -105,8 +105,8 @@ void print_dma_ctrl(dma_channel_hw_t *channel) {
 }
 #endif
 
-#if PARAM_ASSERTIONS_ENABLED(DMA)
+#if PARAM_ASSERTIONS_ENABLED(HARDWARE_DMA)
 void check_dma_channel_param_impl(uint __unused channel) {
-    valid_params_if(DMA, channel < NUM_DMA_CHANNELS);
+    valid_params_if(HARDWARE_DMA, channel < NUM_DMA_CHANNELS);
 }
 #endif

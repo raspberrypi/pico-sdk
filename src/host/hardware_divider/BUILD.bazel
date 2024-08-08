@@ -6,5 +6,5 @@ cc_library(
     hdrs = ["include/hardware/divider.h"],
     includes = ["include"],
     target_compatible_with = ["//bazel/constraint:host"],
-    deps = ["//src/common/pico_base"],
+    deps = ["//src/host/pico_platform"],
 )

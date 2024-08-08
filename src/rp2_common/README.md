@@ -1,5 +1,4 @@
-This directory contains libraries specifically targeting the RP2040 or possible future related devices. It is selected when
-`PICO_PLATFORM=rp2040` (the default) is specified for the build
+This directory contains libraries specifically targeting the RP2040, RP2350 and possible future related devices.
 
 `hardware_` libraries exist for individual hardware components to provide a simple API
 providing a thin abstraction hiding the details of accessing the hardware registers directly.

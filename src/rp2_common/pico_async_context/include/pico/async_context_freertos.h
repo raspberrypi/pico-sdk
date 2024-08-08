@@ -35,6 +35,15 @@ extern "C" {
 
 typedef struct async_context_freertos async_context_freertos_t;
 
+#if !defined(configNUMBER_OF_CORES) && defined(configNUM_CORES)
+#if !portSUPPORT_SMP
+#error configNUMBER_OF_CORES is the new name for configNUM_CORES
+#else
+// portSUPPORT_SMP was defined in old smp branch
+#error configNUMBER_OF_CORES is the new name for configNUM_CORES, however it looks like you may need to define both as you are using an old SMP branch of FreeRTOS
+#endif
+#endif
+
 /** 
  * \brief Configuration object for async_context_freertos instances.
  */
@@ -51,7 +60,7 @@ typedef struct async_context_freertos_config {
      * \brief the core ID (see \ref portGET_CORE_ID()) to pin the task to.
      * This is only relevant in SMP mode.
      */
-#if configUSE_CORE_AFFINITY && configNUM_CORES > 1
+#if configUSE_CORE_AFFINITY && configNUMBER_OF_CORES > 1
     UBaseType_t task_core_id;
 #endif
 } async_context_freertos_config_t;
@@ -90,7 +99,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
     async_context_freertos_config_t config = {
             .task_priority = ASYNC_CONTEXT_DEFAULT_FREERTOS_TASK_PRIORITY,
             .task_stack_size = ASYNC_CONTEXT_DEFAULT_FREERTOS_TASK_STACK_SIZE,
-#if configUSE_CORE_AFFINITY && configNUM_CORES > 1
+#if configUSE_CORE_AFFINITY && configNUMBER_OF_CORES > 1
             .task_core_id = (UBaseType_t)-1, // none
 #endif
     };

@@ -1,6 +1,10 @@
 #include <stdio.h>
 
+#if PICO_RP2040
 #include "RP2040.h"
+#else
+#include "RP2350.h"
+#endif
 #include "pico/stdio.h"
 
 __STATIC_FORCEINLINE int some_function(int i) {

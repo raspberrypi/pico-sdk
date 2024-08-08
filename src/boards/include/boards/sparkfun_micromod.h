@@ -14,6 +14,8 @@
 //
 // This header may be included by other board headers as "boards/sparkfun_micromod.h"
 
+// pico_cmake_set PICO_PLATFORM=rp2040
+
 #ifndef _BOARDS_SPARKFUN_MICROMOD_H
 #define _BOARDS_SPARKFUN_MICROMOD_H
 
@@ -73,10 +75,10 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
+// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
-
 // All boards have B1 RP2040
 
 #ifndef PICO_RP2040_B0_SUPPORTED

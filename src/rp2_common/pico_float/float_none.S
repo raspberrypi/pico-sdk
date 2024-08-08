@@ -70,9 +70,13 @@ wrapper_func remquof
 wrapper_func expm1f
 wrapper_func log1pf
 wrapper_func fmaf
+#ifdef __riscv
+    la a0, str
+    j  panic
+#else
     push {lr}       // keep stack trace sane
     ldr r0, =str
     bl panic
-
+#endif
 str:
     .asciz "float support is disabled"

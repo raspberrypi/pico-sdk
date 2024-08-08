@@ -8,8 +8,8 @@ cc_binary(
     srcs = ["pico_divider_test.c"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        "//src/common/pico_divider",
-        "//src/common/pico_stdlib",
+        "//src/rp2_common/pico_divider",
+        "//src/rp2_common/pico_stdlib",
     ] + select({
         "//bazel/constraint:host": [],
         "//conditions:default": [
@@ -26,8 +26,8 @@ cc_binary(
     srcs = ["pico_divider_nesting_test.c"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        "//src/common/pico_divider",
-        "//src/common/pico_stdlib",
+        "//src/rp2_common/pico_divider",
+        "//src/rp2_common/pico_stdlib",
     ] + select({
         "//bazel/constraint:host": [],
         "//conditions:default": [

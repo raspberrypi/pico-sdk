@@ -1,0 +1,13 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_dcp",
+    hdrs = [
+        "include/hardware/dcp_canned.inc.S",
+        "include/hardware/dcp_instr.inc.S",
+    ],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+)

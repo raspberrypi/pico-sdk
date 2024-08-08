@@ -26,15 +26,36 @@ static void stdio_semihosting_out_chars(const char *buf, int length) {
     args.len = length;
 
     pico_default_asm (
-    // r1 must contain a pointer to the arguments
-    "movs r1, %[args]\n"
-    // semihosting call number 0x05 = SYS_WRITE
-    "movs r0, #5\n"
-    // make the semihosting call: https://developer.arm.com/documentation/dui0375/g/What-is-Semihosting-/The-semihosting-interface
-    "bkpt 0xab\n"
-    :
-    : [args] "r" (&args)
-    : "r0", "r1");
+#ifdef __riscv
+        // a0 encodes the semihosting call number, 0x05 = SYS_WRITE
+        "li a0, 0x05\n"
+        // a1 points to the arguments
+        "mv a1, %[args]\n"
+        // Magic three-instruction sequence, containing a breakpoint. Note the
+        // RISC-V unpriv spec implies the final instruction might encode the
+        // call number (passed in a1) but openocd source shows this is just a
+        // constant value of 0x07. These instructions must be uncompressed:
+        ".option push\n"
+        ".option norvc\n"
+        "slli x0, x0, 0x1f\n"
+        "ebreak\n"
+        "srai x0, x0, 0x07\n"
+        ".option pop\n"
+        :
+        : [args] "r" (&args)
+        : "a0", "a1"
+#else
+        // r1 must contain a pointer to the arguments
+        "movs r1, %[args]\n"
+        // semihosting call number 0x05 = SYS_WRITE
+        "movs r0, #5\n"
+        // make the semihosting call: https://developer.arm.com/documentation/dui0375/g/What-is-Semihosting-/The-semihosting-interface
+        "bkpt 0xab\n"
+        :
+        : [args] "r" (&args)
+        : "r0", "r1", "cc", "memory"
+#endif
+    );
 }
 
 stdio_driver_t stdio_semihosting = {
@@ -44,10 +65,13 @@ stdio_driver_t stdio_semihosting = {
 #endif
 };
 
-void stdio_semihosting_init() {
+void stdio_semihosting_init(void) {
 #if !PICO_NO_BI_STDIO_SEMIHOSTING
     bi_decl_if_func_used(bi_program_feature("semihosting stdout"));
 #endif
     stdio_set_driver_enabled(&stdio_semihosting, true);
 }
 
+void stdio_semihosting_deinit(void) {
+    stdio_set_driver_enabled(&stdio_semihosting, false);
+}

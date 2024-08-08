@@ -34,18 +34,21 @@
  * \include flash_program.c
  */
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_FLASH, Enable/disable assertions in the flash module, type=bool, default=0, group=hardware_flash
-#ifndef PARAM_ASSERTIONS_ENABLED_FLASH
-#define PARAM_ASSERTIONS_ENABLED_FLASH 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_FLASH, Enable/disable assertions in the hardware_flash module, type=bool, default=0, group=hardware_flash
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_FLASH
+#ifdef PARAM_ASSERTIONS_ENABLED_FLASH // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_FLASH PARAM_ASSERTIONS_ENABLED_FLASH
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_FLASH 0
 #endif
-
+#endif
 #define FLASH_PAGE_SIZE (1u << 8)
 #define FLASH_SECTOR_SIZE (1u << 12)
 #define FLASH_BLOCK_SIZE (1u << 16)
 
 #define FLASH_UNIQUE_ID_SIZE_BYTES 8
 
-// PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, group=hardware_flash
+// PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, default=Usually provided via board header, group=hardware_flash
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,6 +117,7 @@ void flash_get_unique_id(uint8_t *id_out);
  */
 void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count);
 
+void flash_flush_cache(void);
 
 #ifdef __cplusplus
 }

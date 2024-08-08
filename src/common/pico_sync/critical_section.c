@@ -6,7 +6,7 @@
 
 #include "pico/critical_section.h"
 
-#if !PICO_NO_HARDWARE
+#if PICO_32BIT
 static_assert(sizeof(critical_section_t) == 8, "");
 #endif
 

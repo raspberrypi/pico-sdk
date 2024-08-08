@@ -17,8 +17,17 @@ cc_library(
         "pio_assembler.h",
         "pio_disassembler.cpp",
         "pio_disassembler.h",
+        "pio_enums.h",
         "pio_types.h",
     ],
+    copts = select({
+        "@rules_cc//cc/compiler:msvc-cl": ["/std:c++20"],
+        "//conditions:default": ["-Wno-sign-compare"],
+    }),
+    defines = select({
+        "@rules_cc//cc/compiler:msvc-cl": ["YY_NO_UNISTD_H=1"],
+        "//conditions:default": [],
+    }),
     includes = [
         ".",
         "gen",

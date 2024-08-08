@@ -113,6 +113,26 @@ kitchen_sink_test_binary = declare_transtion(
     },
 )
 
+# This transition sets SDK configuration options required to build test binaries
+# for the pico_float_test suite of tests.
+pico_float_test_binary = declare_transtion(
+    attrs = {
+        "pico_printf_impl": attr.string(),
+        "extra_copts": attr.string_list(),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+    },
+    flag_overrides = {
+        "@pico-sdk//bazel/config:PICO_DEFAULT_PRINTF_IMPL": "pico_printf_impl",
+    },
+    append_to_flags = {
+        "//command_line_option:copt": "extra_copts",
+    },
+)
+
 # This is a general purpose transition that applies the listed copt flags to
 # all transitive dependencies.
 extra_copts_for_all_deps = declare_transtion(

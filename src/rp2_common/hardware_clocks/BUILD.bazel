@@ -15,8 +15,9 @@ cc_library(
         "//src/rp2_common/hardware_xosc:__pkg__",
     ],
     deps = [
-        "//src/common/pico_base:pico_base_interface",
-        "//src/rp2_common/pico_platform:hardware_structs",
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/hardware_base",
     ],
 )
 
@@ -27,14 +28,15 @@ cc_library(
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        "//src/common/pico_base:pico_base_interface",
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:platform_defs",
+        "//src/rp2_common/hardware_base",
         "//src/rp2_common/hardware_gpio",
         "//src/rp2_common/hardware_irq",
         "//src/rp2_common/hardware_pll",
         "//src/rp2_common/hardware_watchdog",
         "//src/rp2_common/hardware_xosc",
-        "//src/rp2_common/pico_platform:hardware_regs",
-        "//src/rp2_common/pico_platform:hardware_structs",
-        "//src/rp2_common/pico_platform:platform_defs",
     ],
 )

@@ -129,7 +129,7 @@ struct ada_output : public output_format {
                 if (i == (int)program.instructions.size() - 1) {
                     trailing_comma = ");";
                 }
-                fprintf(out, "         16#%04x#%s --  %2d: %s\n", inst, trailing_comma.c_str(), i,
+                fprintf(out, "         16#%04x#%s --  %2d: %s\n", (uint16_t)inst, trailing_comma.c_str(), i,
                         disassemble(inst, program.sideset_bits_including_opt.get(), program.sideset_opt).c_str());
                 if (i == program.wrap) {
                     fprintf(out, "                    --  .wrap\n");

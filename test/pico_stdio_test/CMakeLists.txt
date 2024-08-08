@@ -1,4 +1,4 @@
-if (NOT PICO_TIME_NO_ALARM_SUPPORT)
+if (TARGET pico_multicore AND NOT PICO_TIME_NO_ALARM_SUPPORT)
     add_executable(pico_stdio_test_uart pico_stdio_test.c)
     target_link_libraries(pico_stdio_test_uart PRIVATE pico_stdlib pico_test pico_multicore)
     pico_add_extra_outputs(pico_stdio_test_uart)

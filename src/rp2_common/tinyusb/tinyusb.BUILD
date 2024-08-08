@@ -8,7 +8,6 @@ exports_files(
 cc_library(
     name = "tinyusb",
     srcs = [
-        "hw/bsp/board.h",
         "hw/bsp/rp2040/family.c",
         "src/class/audio/audio_device.c",
         "src/class/cdc/cdc_device.c",

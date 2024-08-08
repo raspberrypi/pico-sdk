@@ -15,6 +15,11 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
     pico_register_common_scope_var(PICO_C_COMPILER_IS_CLANG)
     pico_register_common_scope_var(PICO_C_COMPILER_IS_GNU)
     pico_register_common_scope_var(PICO_C_COMPILER_IS_IAR)
+    pico_register_common_scope_var(PICO_SDK_VERSION_MAJOR)
+    pico_register_common_scope_var(PICO_SDK_VERSION_MINOR)
+    pico_register_common_scope_var(PICO_SDK_VERSION_REVISION)
+    pico_register_common_scope_var(PICO_SDK_VERSION_PRE_RELEASE_ID)
+    pico_register_common_scope_var(PICO_SDK_VERSION_STRING)
 
     message("Build type is ${CMAKE_BUILD_TYPE}")
     if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -37,6 +42,9 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
     # allow customization
     add_sub_list_dirs(PICO_SDK_PRE_LIST_DIRS)
     add_sub_list_files(PICO_SDK_PRE_LIST_FILES)
+
+    # needed by certain functions
+    set(PICO_TOOLS_DIR "${CMAKE_CURRENT_LIST_DIR}/tools" CACHE INTERNAL "")
 
     add_subdirectory(tools)
     add_subdirectory(src)

@@ -1,34 +1,6 @@
 load("//bazel:defs.bzl", "compatible_with_rp2")
-load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
 
 package(default_visibility = ["//visibility:public"])
-
-pico_sdk_define(
-    name = "LIB_PICO_STDIO_UART",
-    define_name = "LIB_PICO_STDIO_UART",
-    from_flag = "//bazel/config:PICO_STDIO_UART",
-)
-
-pico_sdk_define(
-    name = "LIB_PICO_STDIO_USB",
-    define_name = "LIB_PICO_STDIO_USB",
-    from_flag = "//bazel/config:PICO_STDIO_USB",
-)
-
-pico_sdk_define(
-    name = "LIB_PICO_STDIO_SEMIHOSTING",
-    define_name = "LIB_PICO_STDIO_SEMIHOSTING",
-    from_flag = "//bazel/config:PICO_STDIO_SEMIHOSTING",
-)
-
-cc_library(
-    name = "stdio_defines",
-    deps = [
-        ":LIB_PICO_STDIO_SEMIHOSTING",
-        ":LIB_PICO_STDIO_UART",
-        ":LIB_PICO_STDIO_USB",
-    ],
-)
 
 # This exists to break dependency cycles between
 # this library and the stdio implementations.
@@ -39,25 +11,28 @@ cc_library(
         "include/pico/stdio.h",
         "include/pico/stdio/driver.h",
     ],
+    defines = ["LIB_PICO_STDIO=1"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     visibility = [
+        "//src/rp2_common/pico_clib_interface:__pkg__",
+        "//src/rp2_common/pico_stdio_rtt:__pkg__",
         "//src/rp2_common/pico_stdio_semihosting:__pkg__",
         "//src/rp2_common/pico_stdio_uart:__pkg__",
         "//src/rp2_common/pico_stdio_usb:__pkg__",
         "//src/rp2_common/tinyusb:__pkg__",
     ],
-    deps = [":stdio_defines"],
+    # Ensure these defines are always present.
+    deps = [
+        "//src/rp2_common/pico_stdio_semihosting:LIB_PICO_STDIO_SEMIHOSTING",
+        "//src/rp2_common/pico_stdio_uart:LIB_PICO_STDIO_UART",
+        "//src/rp2_common/pico_stdio_usb:LIB_PICO_STDIO_USB",
+    ],
 )
 
 cc_library(
     name = "pico_stdio",
     srcs = ["stdio.c"],
-    hdrs = [
-        "include/pico/stdio.h",
-        "include/pico/stdio/driver.h",
-    ],
-    includes = ["include"],
     linkopts = [
         "-Wl,--wrap=printf",
         "-Wl,--wrap=vprintf",
@@ -67,20 +42,17 @@ cc_library(
     ],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        ":stdio_defines",
-        "//src/common/pico_base",
+        ":pico_stdio_headers",
         "//src/common/pico_sync",
         "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
         "//src/rp2_common/pico_printf",
-    ] + select({
-        "//bazel/constraint:pico_stdio_semihosting_enabled": ["//src/rp2_common/pico_stdio_semihosting"],
-        "//conditions:default": [],
-    }) + select({
-        "//bazel/constraint:pico_stdio_uart_enabled": ["//src/rp2_common/pico_stdio_uart"],
-        "//conditions:default": [],
-    }) + select({
-        "//bazel/constraint:pico_stdio_usb_enabled": ["//src/rp2_common/pico_stdio_usb"],
-        "//conditions:default": [],
-    }),
+        "//src/rp2_common/pico_stdio_semihosting",
+        "//src/rp2_common/pico_stdio_semihosting:LIB_PICO_STDIO_SEMIHOSTING",
+        "//src/rp2_common/pico_stdio_uart",
+        "//src/rp2_common/pico_stdio_uart:LIB_PICO_STDIO_UART",
+        "//src/rp2_common/pico_stdio_usb",
+        "//src/rp2_common/pico_stdio_usb:LIB_PICO_STDIO_USB",
+    ],
     alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )

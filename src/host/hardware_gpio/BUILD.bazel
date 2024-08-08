@@ -6,5 +6,8 @@ cc_library(
     hdrs = ["include/hardware/gpio.h"],
     includes = ["include"],
     target_compatible_with = ["//bazel/constraint:host"],
-    deps = ["//src/common/pico_base"],
+    deps = [
+        "//src/common/pico_binary_info:LIB_PICO_BINARY_INFO",
+        "//src/host/pico_platform",
+    ],
 )

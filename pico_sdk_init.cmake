@@ -41,13 +41,6 @@ if (NOT TARGET _pico_sdk_pre_init_marker)
     include(pico_utils)
 
     message("PICO_SDK_PATH is ${CMAKE_CURRENT_LIST_DIR}")
-
-    include(pico_pre_load_platform)
-
-    # We want to configure correct toolchain prior to project load
-    # todo perhaps this should be included by the platform instead?
-    include(pico_pre_load_toolchain)
-
     macro(pico_sdk_init)
         if (NOT CMAKE_PROJECT_NAME)
             message(WARNING "pico_sdk_init() should be called after the project is created (and languages added)")
@@ -90,4 +83,10 @@ if (NOT TARGET _pico_sdk_pre_init_marker)
             SET(${VAR} ${${VAR}} PARENT_SCOPE)
         endforeach()
     endmacro()
+
+    include(pico_pre_load_platform)
+
+    # We want to configure correct toolchain prior to project load
+    # todo perhaps this should be included by the platform instead?
+    include(pico_pre_load_toolchain)
 endif()

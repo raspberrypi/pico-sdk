@@ -7,6 +7,24 @@ load("configurable_feature.bzl", "configurable_toolchain_feature")
 package(default_visibility = ["//visibility:public"])
 
 cc_args(
+    name = "armv6m-none-eabi",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = ["--target=armv6m-none-eabi"],
+)
+
+cc_args(
+    name = "armv8m.main-none-eabi",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = ["--target=armv8m.main-none-eabi"],
+)
+
+cc_args(
     name = "cortex-m0",
     actions = [
         "@rules_cc//cc/toolchains/actions:compile_actions",
@@ -19,20 +37,50 @@ cc_args(
 )
 
 cc_args(
-    name = "bazel_no_absolute_paths",
-    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    name = "cortex-m33",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
     args = [
-        "-fno-canonical-system-headers",
-        "-no-canonical-prefixes",
+        "-mcpu=cortex-m33",
+        "-march=armv8-m.main+fp+dsp",
+        "-mfloat-abi=softfp",
+        "-mthumb",
+        "-mcmse",
     ],
 )
 
+cc_args(
+    name = "no-canonical-system-headers",
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = ["-fno-canonical-system-headers"],
+)
+
+cc_args(
+    name = "no-canonical-prefixes",
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = ["-no-canonical-prefixes"],
+)
+
+cc_args(
+    name = "nostdlibxx",
+    actions = ["@rules_cc//cc/toolchains/actions:link_actions"],
+    args = ["-nostdlib++"],
+)
+
+cc_args(
+    name = "nostartfiles",
+    actions = ["@rules_cc//cc/toolchains/actions:link_actions"],
+    args = ["-nostartfiles"],
+)
+
 cc_args_list(
-    name = "all_unconditional_args",
-    args = [
-        ":cortex-m0",
-        ":bazel_no_absolute_paths",
-    ],
+    name = "bazel_no_absolute_paths",
+    args = select({
+        "//bazel/constraint:pico_toolchain_clang_enabled": [],
+        "//conditions:default": [":no-canonical-system-headers"],
+    }) + [":no-canonical-prefixes"],
 )
 
 cc_args(
@@ -151,7 +199,13 @@ _HOST_CPU_CONSTRAINTS = {
         "@arm_gcc_{}-{}//:arm-none-eabi-objcopy".format(host_os, host_cpu),
         "@arm_gcc_{}-{}//:arm-none-eabi-strip".format(host_os, host_cpu),
     ],
-    args = ["@pico-sdk//bazel/toolchain:all_unconditional_args"],
+    args = select({
+        "//bazel/constraint:rp2040": [":cortex-m0"],
+        "//bazel/constraint:rp2350": [":cortex-m33"],
+        "//conditions:default": [],
+    }) + [
+        ":bazel_no_absolute_paths",
+    ],
     compiler = "gcc",  # Useful for distinguishing gcc vs clang.
     cxx_builtin_include_directories = [
         "%sysroot%/arm-none-eabi/include/newlib-nano",
@@ -168,9 +222,48 @@ _HOST_CPU_CONSTRAINTS = {
     ],
     sysroot = "external/arm_gcc_{}-{}".format(host_os, host_cpu),
     tags = ["manual"],  # Don't try to build this in wildcard builds.
-    target_compatible_with = [
-        "@pico-sdk//bazel/constraint:rp2040",
+    toolchain_features = [
+        "@pico-sdk//bazel/toolchain:legacy_features",
+        "@pico-sdk//bazel/toolchain:override_debug",
+        "@pico-sdk//bazel/toolchain:gc_sections",
+        "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
+        "@pico-sdk//bazel/toolchain:cxx_no_rtti",
+        "@pico-sdk//bazel/toolchain:cxx_no_cxa_atexit",
+        "@pico-sdk//bazel/toolchain:override_max_page_size",
     ],
+) for host_os, host_cpu in HOSTS]
+
+[cc_toolchain(
+    name = "clang_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    action_type_configs = [
+        "@clang_{}-{}//:llvm-ar".format(host_os, host_cpu),
+        "@clang_{}-{}//:clang".format(host_os, host_cpu),
+        "@clang_{}-{}//:clang++".format(host_os, host_cpu),
+        "@clang_{}-{}//:lld".format(host_os, host_cpu),
+        "@clang_{}-{}//:llvm-objcopy".format(host_os, host_cpu),
+        "@clang_{}-{}//:llvm-strip".format(host_os, host_cpu),
+    ],
+    args = select({
+        "//bazel/constraint:rp2040": [
+            ":armv6m-none-eabi",
+            ":cortex-m0",
+        ],
+        "//bazel/constraint:rp2350": [
+            ":armv8m.main-none-eabi",
+            ":cortex-m33",
+        ],
+        "//conditions:default": [],
+    }) + [
+        ":bazel_no_absolute_paths",
+        ":nostdlibxx",
+        ":nostartfiles",
+    ],
+    compiler = "clang",  # Useful for distinguishing gcc vs clang.
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    tags = ["manual"],  # Don't try to build this in wildcard builds.
     toolchain_features = [
         "@pico-sdk//bazel/toolchain:legacy_features",
         "@pico-sdk//bazel/toolchain:override_debug",
@@ -183,7 +276,7 @@ _HOST_CPU_CONSTRAINTS = {
 ) for host_os, host_cpu in HOSTS]
 
 [toolchain(
-    name = "arm_gcc_{}-{}".format(host_os, host_cpu),
+    name = "{}-{}-rp2040".format(host_os, host_cpu),
     exec_compatible_with = [
         _HOST_CPU_CONSTRAINTS[host_cpu],
         _HOST_OS_CONSTRAINTS[host_os],
@@ -191,6 +284,25 @@ _HOST_CPU_CONSTRAINTS = {
     target_compatible_with = [
         "@pico-sdk//bazel/constraint:rp2040",
     ],
-    toolchain = ":arm_gcc_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    toolchain = select({
+        "//bazel/constraint:pico_toolchain_clang_enabled": "clang_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+        "//conditions:default": ":arm_gcc_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    }),
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+) for host_os, host_cpu in HOSTS]
+
+[toolchain(
+    name = "{}-{}-rp2350".format(host_os, host_cpu),
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    target_compatible_with = [
+        "@pico-sdk//bazel/constraint:rp2350",
+    ],
+    toolchain = select({
+        "//bazel/constraint:pico_toolchain_clang_enabled": "clang_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+        "//conditions:default": ":arm_gcc_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    }),
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 ) for host_os, host_cpu in HOSTS]

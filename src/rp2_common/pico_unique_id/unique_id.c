@@ -5,6 +5,7 @@
  */
 
 #include "hardware/flash.h"
+#include "pico/bootrom.h"
 #include "pico/unique_id.h"
 
 static_assert(PICO_UNIQUE_BOARD_ID_SIZE_BYTES == FLASH_UNIQUE_ID_SIZE_BYTES, "Board ID size must match flash ID size");
@@ -12,14 +13,27 @@ static_assert(PICO_UNIQUE_BOARD_ID_SIZE_BYTES == FLASH_UNIQUE_ID_SIZE_BYTES, "Bo
 static pico_unique_board_id_t retrieved_id;
 
 static void __attribute__((constructor)) _retrieve_unique_id_on_boot(void) {
-#if PICO_NO_FLASH
-    // The hardware_flash call will panic() if called directly on a NO_FLASH
-    // build. Since this constructor is pre-main it would be annoying to
-    // debug, so just produce something well-defined and obviously wrong.
-    for (int i = 0; i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES; i++)
-        retrieved_id.id[i] = 0xee;
+#if PICO_RP2040
+    #if PICO_NO_FLASH
+        // The hardware_flash call will panic() if called directly on a NO_FLASH
+        // build. Since this constructor is pre-main it would be annoying to
+        // debug, so just produce something well-defined and obviously wrong.
+        for (int i = 0; i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES; i++)
+            retrieved_id.id[i] = 0xee;
+    #else
+        flash_get_unique_id(retrieved_id.id);
+    #endif
 #else
-    flash_get_unique_id(retrieved_id.id);
+    rom_get_sys_info_fn func = (rom_get_sys_info_fn) rom_func_lookup(ROM_FUNC_GET_SYS_INFO);
+    union {
+        uint32_t words[9];
+        uint8_t bytes[9 * 4];
+    } out;
+    __unused int rc = func(out.words, 9, SYS_INFO_CHIP_INFO);
+    assert(rc == 4);
+    for (int i = 0; i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES; i++) {
+        retrieved_id.id[i] = out.bytes[PICO_UNIQUE_BOARD_ID_SIZE_BYTES - 1 + 2 * 4 - i];
+    }
 #endif
 }
 

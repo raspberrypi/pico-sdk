@@ -4,24 +4,32 @@ if (NOT TARGET pico_divider)
 
     # no custom implementation; falls thru to compiler
     pico_add_library(pico_divider_compiler)
+    target_sources(pico_divider_compiler INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/divider_compiler.c
+            )
+    target_link_libraries(pico_divider_compiler_headers INTERFACE pico_divider_headers)
 
-    # add alias "default" which is just hardware.
+    # add alias "default" which is hardware for RP2040 and compiler for RP2350
     add_library(pico_divider_default INTERFACE)
-    target_link_libraries(pico_divider_default INTERFACE pico_divider_hardware)
+    if (PICO_RP2040)
+        target_link_libraries(pico_divider_default INTERFACE pico_divider_hardware)
+    else()
+        target_link_libraries(pico_divider_default INTERFACE pico_divider_compiler)
+    endif()
 
     set(PICO_DEFAULT_DIVIDER_IMPL pico_divider_default)
 
     target_link_libraries(pico_divider INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_DIVIDER_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_DIVIDER_IMPL>,${PICO_DEFAULT_DIVIDER_IMPL}>)
 
-    add_library(pico_divider_hardware_explicit INTERFACE)
+    pico_add_library(pico_divider_hardware_explicit NOFLAG)
     target_sources(pico_divider_hardware_explicit INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/divider.S
+            ${CMAKE_CURRENT_LIST_DIR}/divider_hardware.S
             )
 
-    target_link_libraries(pico_divider_hardware_explicit INTERFACE
+    target_link_libraries(pico_divider_hardware_explicit_headers INTERFACE
             pico_divider_headers
-            hardware_divider
+            hardware_divider_headers
             hardware_regs
             )
 

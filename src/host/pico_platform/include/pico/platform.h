@@ -67,6 +67,9 @@ extern void tight_loop_contents();
 #define PICO_WEAK_FUNCTION_DEF(x) _Pragma(__STRING(weak x))
 #define PICO_WEAK_FUNCTION_IMPL_NAME(x) x
 
+#ifndef __weak
+#define __weak __attribute__((weak))
+#endif
 #else
 #ifndef __noreturn
 #define __noreturn __declspec(noreturn)

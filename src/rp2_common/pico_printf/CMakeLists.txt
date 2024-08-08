@@ -5,7 +5,7 @@ if (NOT TARGET pico_printf)
     # no custom implementation; falls thru to compiler
     pico_add_library(pico_printf_compiler)
 
-    target_include_directories(pico_printf_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(pico_printf_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
     # add alias "default" which is just pico.
     add_library(pico_printf_default INTERFACE)
@@ -37,6 +37,10 @@ if (NOT TARGET pico_printf)
 
     wrap_printf_functions(pico_printf_pico)
     wrap_printf_functions(pico_printf_none)
+
+    # always hook printf for printf_none with out weak impl, as it is handled by pico_stdio
+    # but that library may not be included
+    pico_wrap_function(pico_printf_none printf)
 
     macro(pico_set_printf_implementation TARGET IMPL)
         get_target_property(target_type ${TARGET} TYPE)

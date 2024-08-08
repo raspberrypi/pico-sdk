@@ -1,1 +1,3 @@
 pico_simple_hardware_target(watchdog)
+
+pico_mirrored_target_link_libraries(hardware_watchdog INTERFACE hardware_ticks)

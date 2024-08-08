@@ -1,0 +1,16 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_powman",
+    srcs = ["powman.c"],
+    hdrs = ["include/hardware/powman.h"],
+    implementation_deps = ["//src/rp2_common/hardware_gpio"],
+    includes = ["include"],
+
+    # TODO: RP2350 only, but doesn't appear gated in CMake.
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+    deps = [
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
+    ],
+)

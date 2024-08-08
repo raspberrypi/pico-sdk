@@ -1,18 +1,24 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#ifndef _ADDRESSMAP_H_
-#define _ADDRESSMAP_H_
+#ifndef _ADDRESSMAP_H
+#define _ADDRESSMAP_H
+
+/**
+ * \file rp2040/addressmap.h
+ */
 
 #include "hardware/platform_defs.h"
 
 // Register address offsets for atomic RMW aliases
-#define REG_ALIAS_RW_BITS  (0x0u << 12u)
-#define REG_ALIAS_XOR_BITS (0x1u << 12u)
-#define REG_ALIAS_SET_BITS (0x2u << 12u)
-#define REG_ALIAS_CLR_BITS (0x3u << 12u)
+#define REG_ALIAS_RW_BITS  (_u(0x0) << _u(12))
+#define REG_ALIAS_XOR_BITS (_u(0x1) << _u(12))
+#define REG_ALIAS_SET_BITS (_u(0x2) << _u(12))
+#define REG_ALIAS_CLR_BITS (_u(0x3) << _u(12))
 
 #define ROM_BASE _u(0x00000000)
 #define XIP_BASE _u(0x10000000)
@@ -71,4 +77,5 @@
 #define SIO_BASE _u(0xd0000000)
 #define PPB_BASE _u(0xe0000000)
 
-#endif // _ADDRESSMAP_H_
+#endif // _ADDRESSMAP_H
+

@@ -1,0 +1,16 @@
+package(default_visibility = ["//visibility:public"])
+
+# Use //host/pico_stdlib or //rp2_common/pico_stdlib to get the
+# implementation of this header, along with other critical defines headers.
+cc_library(
+    name = "pico_stdlib_headers",
+    hdrs = ["include/pico/stdlib.h"],
+    includes = ["include"],
+    visibility = [
+        "//src/host/pico_stdio:__pkg__",
+        "//src/host/pico_stdlib:__pkg__",
+        "//src/rp2_common/pico_stdio:__pkg__",
+        "//src/rp2_common/pico_stdlib:__pkg__",
+        "//src/rp2_common/tinyusb:__pkg__",
+    ],
+)

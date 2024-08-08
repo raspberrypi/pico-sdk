@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -10,8 +12,8 @@
 // Description    : Register block for busfabric control signals and performance
 //                  counters
 // =============================================================================
-#ifndef HARDWARE_REGS_BUSCTRL_DEFINED
-#define HARDWARE_REGS_BUSCTRL_DEFINED
+#ifndef _HARDWARE_REGS_BUSCTRL_H
+#define _HARDWARE_REGS_BUSCTRL_H
 // =============================================================================
 // Register    : BUSCTRL_BUS_PRIORITY
 // Description : Set the priority of each master for bus arbitration.
@@ -102,32 +104,32 @@
 //               0x11 -> xip_main
 //               0x12 -> rom_contested
 //               0x13 -> rom
-#define BUSCTRL_PERFSEL0_OFFSET                   _u(0x0000000c)
-#define BUSCTRL_PERFSEL0_BITS                     _u(0x0000001f)
-#define BUSCTRL_PERFSEL0_RESET                    _u(0x0000001f)
-#define BUSCTRL_PERFSEL0_MSB                      _u(4)
-#define BUSCTRL_PERFSEL0_LSB                      _u(0)
-#define BUSCTRL_PERFSEL0_ACCESS                   "RW"
-#define BUSCTRL_PERFSEL0_VALUE_APB_CONTESTED      _u(0x00)
-#define BUSCTRL_PERFSEL0_VALUE_APB                _u(0x01)
+#define BUSCTRL_PERFSEL0_OFFSET _u(0x0000000c)
+#define BUSCTRL_PERFSEL0_BITS   _u(0x0000001f)
+#define BUSCTRL_PERFSEL0_RESET  _u(0x0000001f)
+#define BUSCTRL_PERFSEL0_MSB    _u(4)
+#define BUSCTRL_PERFSEL0_LSB    _u(0)
+#define BUSCTRL_PERFSEL0_ACCESS "RW"
+#define BUSCTRL_PERFSEL0_VALUE_APB_CONTESTED _u(0x00)
+#define BUSCTRL_PERFSEL0_VALUE_APB _u(0x01)
 #define BUSCTRL_PERFSEL0_VALUE_FASTPERI_CONTESTED _u(0x02)
-#define BUSCTRL_PERFSEL0_VALUE_FASTPERI           _u(0x03)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM5_CONTESTED    _u(0x04)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM5              _u(0x05)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM4_CONTESTED    _u(0x06)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM4              _u(0x07)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM3_CONTESTED    _u(0x08)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM3              _u(0x09)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM2_CONTESTED    _u(0x0a)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM2              _u(0x0b)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM1_CONTESTED    _u(0x0c)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM1              _u(0x0d)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM0_CONTESTED    _u(0x0e)
-#define BUSCTRL_PERFSEL0_VALUE_SRAM0              _u(0x0f)
+#define BUSCTRL_PERFSEL0_VALUE_FASTPERI _u(0x03)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM5_CONTESTED _u(0x04)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM5 _u(0x05)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM4_CONTESTED _u(0x06)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM4 _u(0x07)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM3_CONTESTED _u(0x08)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM3 _u(0x09)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM2_CONTESTED _u(0x0a)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM2 _u(0x0b)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM1_CONTESTED _u(0x0c)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM1 _u(0x0d)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM0_CONTESTED _u(0x0e)
+#define BUSCTRL_PERFSEL0_VALUE_SRAM0 _u(0x0f)
 #define BUSCTRL_PERFSEL0_VALUE_XIP_MAIN_CONTESTED _u(0x10)
-#define BUSCTRL_PERFSEL0_VALUE_XIP_MAIN           _u(0x11)
-#define BUSCTRL_PERFSEL0_VALUE_ROM_CONTESTED      _u(0x12)
-#define BUSCTRL_PERFSEL0_VALUE_ROM                _u(0x13)
+#define BUSCTRL_PERFSEL0_VALUE_XIP_MAIN _u(0x11)
+#define BUSCTRL_PERFSEL0_VALUE_ROM_CONTESTED _u(0x12)
+#define BUSCTRL_PERFSEL0_VALUE_ROM _u(0x13)
 // =============================================================================
 // Register    : BUSCTRL_PERFCTR1
 // Description : Bus fabric performance counter 1
@@ -166,32 +168,32 @@
 //               0x11 -> xip_main
 //               0x12 -> rom_contested
 //               0x13 -> rom
-#define BUSCTRL_PERFSEL1_OFFSET                   _u(0x00000014)
-#define BUSCTRL_PERFSEL1_BITS                     _u(0x0000001f)
-#define BUSCTRL_PERFSEL1_RESET                    _u(0x0000001f)
-#define BUSCTRL_PERFSEL1_MSB                      _u(4)
-#define BUSCTRL_PERFSEL1_LSB                      _u(0)
-#define BUSCTRL_PERFSEL1_ACCESS                   "RW"
-#define BUSCTRL_PERFSEL1_VALUE_APB_CONTESTED      _u(0x00)
-#define BUSCTRL_PERFSEL1_VALUE_APB                _u(0x01)
+#define BUSCTRL_PERFSEL1_OFFSET _u(0x00000014)
+#define BUSCTRL_PERFSEL1_BITS   _u(0x0000001f)
+#define BUSCTRL_PERFSEL1_RESET  _u(0x0000001f)
+#define BUSCTRL_PERFSEL1_MSB    _u(4)
+#define BUSCTRL_PERFSEL1_LSB    _u(0)
+#define BUSCTRL_PERFSEL1_ACCESS "RW"
+#define BUSCTRL_PERFSEL1_VALUE_APB_CONTESTED _u(0x00)
+#define BUSCTRL_PERFSEL1_VALUE_APB _u(0x01)
 #define BUSCTRL_PERFSEL1_VALUE_FASTPERI_CONTESTED _u(0x02)
-#define BUSCTRL_PERFSEL1_VALUE_FASTPERI           _u(0x03)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM5_CONTESTED    _u(0x04)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM5              _u(0x05)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM4_CONTESTED    _u(0x06)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM4              _u(0x07)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM3_CONTESTED    _u(0x08)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM3              _u(0x09)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM2_CONTESTED    _u(0x0a)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM2              _u(0x0b)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM1_CONTESTED    _u(0x0c)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM1              _u(0x0d)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM0_CONTESTED    _u(0x0e)
-#define BUSCTRL_PERFSEL1_VALUE_SRAM0              _u(0x0f)
+#define BUSCTRL_PERFSEL1_VALUE_FASTPERI _u(0x03)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM5_CONTESTED _u(0x04)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM5 _u(0x05)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM4_CONTESTED _u(0x06)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM4 _u(0x07)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM3_CONTESTED _u(0x08)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM3 _u(0x09)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM2_CONTESTED _u(0x0a)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM2 _u(0x0b)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM1_CONTESTED _u(0x0c)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM1 _u(0x0d)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM0_CONTESTED _u(0x0e)
+#define BUSCTRL_PERFSEL1_VALUE_SRAM0 _u(0x0f)
 #define BUSCTRL_PERFSEL1_VALUE_XIP_MAIN_CONTESTED _u(0x10)
-#define BUSCTRL_PERFSEL1_VALUE_XIP_MAIN           _u(0x11)
-#define BUSCTRL_PERFSEL1_VALUE_ROM_CONTESTED      _u(0x12)
-#define BUSCTRL_PERFSEL1_VALUE_ROM                _u(0x13)
+#define BUSCTRL_PERFSEL1_VALUE_XIP_MAIN _u(0x11)
+#define BUSCTRL_PERFSEL1_VALUE_ROM_CONTESTED _u(0x12)
+#define BUSCTRL_PERFSEL1_VALUE_ROM _u(0x13)
 // =============================================================================
 // Register    : BUSCTRL_PERFCTR2
 // Description : Bus fabric performance counter 2
@@ -230,32 +232,32 @@
 //               0x11 -> xip_main
 //               0x12 -> rom_contested
 //               0x13 -> rom
-#define BUSCTRL_PERFSEL2_OFFSET                   _u(0x0000001c)
-#define BUSCTRL_PERFSEL2_BITS                     _u(0x0000001f)
-#define BUSCTRL_PERFSEL2_RESET                    _u(0x0000001f)
-#define BUSCTRL_PERFSEL2_MSB                      _u(4)
-#define BUSCTRL_PERFSEL2_LSB                      _u(0)
-#define BUSCTRL_PERFSEL2_ACCESS                   "RW"
-#define BUSCTRL_PERFSEL2_VALUE_APB_CONTESTED      _u(0x00)
-#define BUSCTRL_PERFSEL2_VALUE_APB                _u(0x01)
+#define BUSCTRL_PERFSEL2_OFFSET _u(0x0000001c)
+#define BUSCTRL_PERFSEL2_BITS   _u(0x0000001f)
+#define BUSCTRL_PERFSEL2_RESET  _u(0x0000001f)
+#define BUSCTRL_PERFSEL2_MSB    _u(4)
+#define BUSCTRL_PERFSEL2_LSB    _u(0)
+#define BUSCTRL_PERFSEL2_ACCESS "RW"
+#define BUSCTRL_PERFSEL2_VALUE_APB_CONTESTED _u(0x00)
+#define BUSCTRL_PERFSEL2_VALUE_APB _u(0x01)
 #define BUSCTRL_PERFSEL2_VALUE_FASTPERI_CONTESTED _u(0x02)
-#define BUSCTRL_PERFSEL2_VALUE_FASTPERI           _u(0x03)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM5_CONTESTED    _u(0x04)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM5              _u(0x05)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM4_CONTESTED    _u(0x06)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM4              _u(0x07)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM3_CONTESTED    _u(0x08)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM3              _u(0x09)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM2_CONTESTED    _u(0x0a)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM2              _u(0x0b)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM1_CONTESTED    _u(0x0c)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM1              _u(0x0d)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM0_CONTESTED    _u(0x0e)
-#define BUSCTRL_PERFSEL2_VALUE_SRAM0              _u(0x0f)
+#define BUSCTRL_PERFSEL2_VALUE_FASTPERI _u(0x03)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM5_CONTESTED _u(0x04)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM5 _u(0x05)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM4_CONTESTED _u(0x06)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM4 _u(0x07)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM3_CONTESTED _u(0x08)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM3 _u(0x09)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM2_CONTESTED _u(0x0a)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM2 _u(0x0b)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM1_CONTESTED _u(0x0c)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM1 _u(0x0d)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM0_CONTESTED _u(0x0e)
+#define BUSCTRL_PERFSEL2_VALUE_SRAM0 _u(0x0f)
 #define BUSCTRL_PERFSEL2_VALUE_XIP_MAIN_CONTESTED _u(0x10)
-#define BUSCTRL_PERFSEL2_VALUE_XIP_MAIN           _u(0x11)
-#define BUSCTRL_PERFSEL2_VALUE_ROM_CONTESTED      _u(0x12)
-#define BUSCTRL_PERFSEL2_VALUE_ROM                _u(0x13)
+#define BUSCTRL_PERFSEL2_VALUE_XIP_MAIN _u(0x11)
+#define BUSCTRL_PERFSEL2_VALUE_ROM_CONTESTED _u(0x12)
+#define BUSCTRL_PERFSEL2_VALUE_ROM _u(0x13)
 // =============================================================================
 // Register    : BUSCTRL_PERFCTR3
 // Description : Bus fabric performance counter 3
@@ -294,31 +296,32 @@
 //               0x11 -> xip_main
 //               0x12 -> rom_contested
 //               0x13 -> rom
-#define BUSCTRL_PERFSEL3_OFFSET                   _u(0x00000024)
-#define BUSCTRL_PERFSEL3_BITS                     _u(0x0000001f)
-#define BUSCTRL_PERFSEL3_RESET                    _u(0x0000001f)
-#define BUSCTRL_PERFSEL3_MSB                      _u(4)
-#define BUSCTRL_PERFSEL3_LSB                      _u(0)
-#define BUSCTRL_PERFSEL3_ACCESS                   "RW"
-#define BUSCTRL_PERFSEL3_VALUE_APB_CONTESTED      _u(0x00)
-#define BUSCTRL_PERFSEL3_VALUE_APB                _u(0x01)
+#define BUSCTRL_PERFSEL3_OFFSET _u(0x00000024)
+#define BUSCTRL_PERFSEL3_BITS   _u(0x0000001f)
+#define BUSCTRL_PERFSEL3_RESET  _u(0x0000001f)
+#define BUSCTRL_PERFSEL3_MSB    _u(4)
+#define BUSCTRL_PERFSEL3_LSB    _u(0)
+#define BUSCTRL_PERFSEL3_ACCESS "RW"
+#define BUSCTRL_PERFSEL3_VALUE_APB_CONTESTED _u(0x00)
+#define BUSCTRL_PERFSEL3_VALUE_APB _u(0x01)
 #define BUSCTRL_PERFSEL3_VALUE_FASTPERI_CONTESTED _u(0x02)
-#define BUSCTRL_PERFSEL3_VALUE_FASTPERI           _u(0x03)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM5_CONTESTED    _u(0x04)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM5              _u(0x05)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM4_CONTESTED    _u(0x06)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM4              _u(0x07)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM3_CONTESTED    _u(0x08)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM3              _u(0x09)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM2_CONTESTED    _u(0x0a)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM2              _u(0x0b)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM1_CONTESTED    _u(0x0c)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM1              _u(0x0d)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM0_CONTESTED    _u(0x0e)
-#define BUSCTRL_PERFSEL3_VALUE_SRAM0              _u(0x0f)
+#define BUSCTRL_PERFSEL3_VALUE_FASTPERI _u(0x03)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM5_CONTESTED _u(0x04)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM5 _u(0x05)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM4_CONTESTED _u(0x06)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM4 _u(0x07)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM3_CONTESTED _u(0x08)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM3 _u(0x09)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM2_CONTESTED _u(0x0a)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM2 _u(0x0b)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM1_CONTESTED _u(0x0c)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM1 _u(0x0d)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM0_CONTESTED _u(0x0e)
+#define BUSCTRL_PERFSEL3_VALUE_SRAM0 _u(0x0f)
 #define BUSCTRL_PERFSEL3_VALUE_XIP_MAIN_CONTESTED _u(0x10)
-#define BUSCTRL_PERFSEL3_VALUE_XIP_MAIN           _u(0x11)
-#define BUSCTRL_PERFSEL3_VALUE_ROM_CONTESTED      _u(0x12)
-#define BUSCTRL_PERFSEL3_VALUE_ROM                _u(0x13)
+#define BUSCTRL_PERFSEL3_VALUE_XIP_MAIN _u(0x11)
+#define BUSCTRL_PERFSEL3_VALUE_ROM_CONTESTED _u(0x12)
+#define BUSCTRL_PERFSEL3_VALUE_ROM _u(0x13)
 // =============================================================================
-#endif // HARDWARE_REGS_BUSCTRL_DEFINED
+#endif // _HARDWARE_REGS_BUSCTRL_H
+

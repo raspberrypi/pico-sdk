@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -7,10 +9,9 @@
 // Register block : ROSC
 // Version        : 1
 // Bus type       : apb
-// Description    : None
 // =============================================================================
-#ifndef HARDWARE_REGS_ROSC_DEFINED
-#define HARDWARE_REGS_ROSC_DEFINED
+#ifndef _HARDWARE_REGS_ROSC_H
+#define _HARDWARE_REGS_ROSC_H
 // =============================================================================
 // Register    : ROSC_CTRL
 // Description : Ring Oscillator control
@@ -27,20 +28,20 @@
 //               oscillator.
 //               0xd1e -> DISABLE
 //               0xfab -> ENABLE
-#define ROSC_CTRL_ENABLE_RESET         "-"
-#define ROSC_CTRL_ENABLE_BITS          _u(0x00fff000)
-#define ROSC_CTRL_ENABLE_MSB           _u(23)
-#define ROSC_CTRL_ENABLE_LSB           _u(12)
-#define ROSC_CTRL_ENABLE_ACCESS        "RW"
+#define ROSC_CTRL_ENABLE_RESET  "-"
+#define ROSC_CTRL_ENABLE_BITS   _u(0x00fff000)
+#define ROSC_CTRL_ENABLE_MSB    _u(23)
+#define ROSC_CTRL_ENABLE_LSB    _u(12)
+#define ROSC_CTRL_ENABLE_ACCESS "RW"
 #define ROSC_CTRL_ENABLE_VALUE_DISABLE _u(0xd1e)
-#define ROSC_CTRL_ENABLE_VALUE_ENABLE  _u(0xfab)
+#define ROSC_CTRL_ENABLE_VALUE_ENABLE _u(0xfab)
 // -----------------------------------------------------------------------------
 // Field       : ROSC_CTRL_FREQ_RANGE
 // Description : Controls the number of delay stages in the ROSC ring
 //               LOW uses stages 0 to 7
-//               MEDIUM uses stages 0 to 5
-//               HIGH uses stages 0 to 3
-//               TOOHIGH uses stages 0 to 1 and should not be used because its
+//               MEDIUM uses stages 2 to 7
+//               HIGH uses stages 4 to 7
+//               TOOHIGH uses stages 6 to 7 and should not be used because its
 //               frequency exceeds design specifications
 //               The clock output will not glitch when changing the range up one
 //               step at a time
@@ -51,14 +52,14 @@
 //               0xfa5 -> MEDIUM
 //               0xfa7 -> HIGH
 //               0xfa6 -> TOOHIGH
-#define ROSC_CTRL_FREQ_RANGE_RESET         _u(0xaa0)
-#define ROSC_CTRL_FREQ_RANGE_BITS          _u(0x00000fff)
-#define ROSC_CTRL_FREQ_RANGE_MSB           _u(11)
-#define ROSC_CTRL_FREQ_RANGE_LSB           _u(0)
-#define ROSC_CTRL_FREQ_RANGE_ACCESS        "RW"
-#define ROSC_CTRL_FREQ_RANGE_VALUE_LOW     _u(0xfa4)
-#define ROSC_CTRL_FREQ_RANGE_VALUE_MEDIUM  _u(0xfa5)
-#define ROSC_CTRL_FREQ_RANGE_VALUE_HIGH    _u(0xfa7)
+#define ROSC_CTRL_FREQ_RANGE_RESET  _u(0xaa0)
+#define ROSC_CTRL_FREQ_RANGE_BITS   _u(0x00000fff)
+#define ROSC_CTRL_FREQ_RANGE_MSB    _u(11)
+#define ROSC_CTRL_FREQ_RANGE_LSB    _u(0)
+#define ROSC_CTRL_FREQ_RANGE_ACCESS "RW"
+#define ROSC_CTRL_FREQ_RANGE_VALUE_LOW _u(0xfa4)
+#define ROSC_CTRL_FREQ_RANGE_VALUE_MEDIUM _u(0xfa5)
+#define ROSC_CTRL_FREQ_RANGE_VALUE_HIGH _u(0xfa7)
 #define ROSC_CTRL_FREQ_RANGE_VALUE_TOOHIGH _u(0xfa6)
 // =============================================================================
 // Register    : ROSC_FREQA
@@ -80,11 +81,11 @@
 // Description : Set to 0x9696 to apply the settings
 //               Any other value in this field will set all drive strengths to 0
 //               0x9696 -> PASS
-#define ROSC_FREQA_PASSWD_RESET      _u(0x0000)
-#define ROSC_FREQA_PASSWD_BITS       _u(0xffff0000)
-#define ROSC_FREQA_PASSWD_MSB        _u(31)
-#define ROSC_FREQA_PASSWD_LSB        _u(16)
-#define ROSC_FREQA_PASSWD_ACCESS     "RW"
+#define ROSC_FREQA_PASSWD_RESET  _u(0x0000)
+#define ROSC_FREQA_PASSWD_BITS   _u(0xffff0000)
+#define ROSC_FREQA_PASSWD_MSB    _u(31)
+#define ROSC_FREQA_PASSWD_LSB    _u(16)
+#define ROSC_FREQA_PASSWD_ACCESS "RW"
 #define ROSC_FREQA_PASSWD_VALUE_PASS _u(0x9696)
 // -----------------------------------------------------------------------------
 // Field       : ROSC_FREQA_DS3
@@ -129,11 +130,11 @@
 // Description : Set to 0x9696 to apply the settings
 //               Any other value in this field will set all drive strengths to 0
 //               0x9696 -> PASS
-#define ROSC_FREQB_PASSWD_RESET      _u(0x0000)
-#define ROSC_FREQB_PASSWD_BITS       _u(0xffff0000)
-#define ROSC_FREQB_PASSWD_MSB        _u(31)
-#define ROSC_FREQB_PASSWD_LSB        _u(16)
-#define ROSC_FREQB_PASSWD_ACCESS     "RW"
+#define ROSC_FREQB_PASSWD_RESET  _u(0x0000)
+#define ROSC_FREQB_PASSWD_BITS   _u(0xffff0000)
+#define ROSC_FREQB_PASSWD_MSB    _u(31)
+#define ROSC_FREQB_PASSWD_LSB    _u(16)
+#define ROSC_FREQB_PASSWD_ACCESS "RW"
 #define ROSC_FREQB_PASSWD_VALUE_PASS _u(0x9696)
 // -----------------------------------------------------------------------------
 // Field       : ROSC_FREQB_DS7
@@ -174,16 +175,16 @@
 //               On power-up this field is initialised to WAKE
 //               An invalid write will also select WAKE
 //               Warning: setup the irq before selecting dormant mode
-//               0x636f6d61 -> DORMANT
+//               0x636f6d61 -> dormant
 //               0x77616b65 -> WAKE
-#define ROSC_DORMANT_OFFSET        _u(0x0000000c)
-#define ROSC_DORMANT_BITS          _u(0xffffffff)
-#define ROSC_DORMANT_RESET         "-"
-#define ROSC_DORMANT_MSB           _u(31)
-#define ROSC_DORMANT_LSB           _u(0)
-#define ROSC_DORMANT_ACCESS        "RW"
+#define ROSC_DORMANT_OFFSET _u(0x0000000c)
+#define ROSC_DORMANT_BITS   _u(0xffffffff)
+#define ROSC_DORMANT_RESET  "-"
+#define ROSC_DORMANT_MSB    _u(31)
+#define ROSC_DORMANT_LSB    _u(0)
+#define ROSC_DORMANT_ACCESS "RW"
 #define ROSC_DORMANT_VALUE_DORMANT _u(0x636f6d61)
-#define ROSC_DORMANT_VALUE_WAKE    _u(0x77616b65)
+#define ROSC_DORMANT_VALUE_WAKE _u(0x77616b65)
 // =============================================================================
 // Register    : ROSC_DIV
 // Description : Controls the output divider
@@ -193,12 +194,12 @@
 //               any other value sets div=31
 //               this register resets to div=16
 //               0xaa0 -> PASS
-#define ROSC_DIV_OFFSET     _u(0x00000010)
-#define ROSC_DIV_BITS       _u(0x00000fff)
-#define ROSC_DIV_RESET      "-"
-#define ROSC_DIV_MSB        _u(11)
-#define ROSC_DIV_LSB        _u(0)
-#define ROSC_DIV_ACCESS     "RW"
+#define ROSC_DIV_OFFSET _u(0x00000010)
+#define ROSC_DIV_BITS   _u(0x00000fff)
+#define ROSC_DIV_RESET  "-"
+#define ROSC_DIV_MSB    _u(11)
+#define ROSC_DIV_LSB    _u(0)
+#define ROSC_DIV_ACCESS "RW"
 #define ROSC_DIV_VALUE_PASS _u(0xaa0)
 // =============================================================================
 // Register    : ROSC_PHASE
@@ -309,4 +310,5 @@
 #define ROSC_COUNT_LSB    _u(0)
 #define ROSC_COUNT_ACCESS "RW"
 // =============================================================================
-#endif // HARDWARE_REGS_ROSC_DEFINED
+#endif // _HARDWARE_REGS_ROSC_H
+

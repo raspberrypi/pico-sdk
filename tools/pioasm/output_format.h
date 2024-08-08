@@ -12,6 +12,8 @@
 #include <string>
 #include <memory>
 
+#include "pio_enums.h"
+
 typedef unsigned int uint;
 
 // can't use optional because we want to support older compilers
@@ -55,6 +57,13 @@ struct compiled_source {
         symbol(std::string name, int value, bool is_label) : name(std::move(name)), value(value), is_label(is_label) {}
     };
 
+    struct in_out {
+        int pin_count;
+        bool right;
+        bool autop;
+        int threshold;
+    };
+
     struct program {
         std::string name;
         optional_int origin = optional_int::with_default(-1);
@@ -63,6 +72,16 @@ struct compiled_source {
         bool sideset_pindirs = false;
         int wrap;
         int wrap_target;
+        int pio_version;
+        int mov_status_type;
+        int mov_status_n;
+        in_out in;
+        in_out out;
+        int set_count;
+        uint clock_div_int;
+        uint clock_div_frac;
+        uint8_t used_gpio_ranges;
+        fifo_config fifo;
         std::vector<uint> instructions;
         std::vector<symbol> symbols; // public only
         std::map<std::string, std::vector<std::string>> code_blocks;

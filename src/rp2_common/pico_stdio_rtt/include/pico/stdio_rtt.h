@@ -35,6 +35,13 @@ extern stdio_driver_t stdio_rtt;
  */
 void stdio_rtt_init(void);
 
+/*! \brief Explicitly deinitialize stdin/stdout over RTT and remove it from the current set of stdin/stdout drivers
+ *  \ingroup pico_stdio_rtt
+ *
+ * \note this method is automatically called by \ref stdio_deinit_all() if `pico_stdio_rtt` is included in the build
+ */
+void stdio_rtt_deinit(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -25,8 +27,8 @@
 //                  To clear the interrupt write a 1 to the corresponding
 //                  alarm_irq
 // =============================================================================
-#ifndef HARDWARE_REGS_TIMER_DEFINED
-#define HARDWARE_REGS_TIMER_DEFINED
+#ifndef _HARDWARE_REGS_TIMER_H
+#define _HARDWARE_REGS_TIMER_H
 // =============================================================================
 // Register    : TIMER_TIMEHW
 // Description : Write to bits 63:32 of time
@@ -184,7 +186,6 @@
 #define TIMER_INTR_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTR_ALARM_3
-// Description : None
 #define TIMER_INTR_ALARM_3_RESET  _u(0x0)
 #define TIMER_INTR_ALARM_3_BITS   _u(0x00000008)
 #define TIMER_INTR_ALARM_3_MSB    _u(3)
@@ -192,7 +193,6 @@
 #define TIMER_INTR_ALARM_3_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTR_ALARM_2
-// Description : None
 #define TIMER_INTR_ALARM_2_RESET  _u(0x0)
 #define TIMER_INTR_ALARM_2_BITS   _u(0x00000004)
 #define TIMER_INTR_ALARM_2_MSB    _u(2)
@@ -200,7 +200,6 @@
 #define TIMER_INTR_ALARM_2_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTR_ALARM_1
-// Description : None
 #define TIMER_INTR_ALARM_1_RESET  _u(0x0)
 #define TIMER_INTR_ALARM_1_BITS   _u(0x00000002)
 #define TIMER_INTR_ALARM_1_MSB    _u(1)
@@ -208,7 +207,6 @@
 #define TIMER_INTR_ALARM_1_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTR_ALARM_0
-// Description : None
 #define TIMER_INTR_ALARM_0_RESET  _u(0x0)
 #define TIMER_INTR_ALARM_0_BITS   _u(0x00000001)
 #define TIMER_INTR_ALARM_0_MSB    _u(0)
@@ -222,7 +220,6 @@
 #define TIMER_INTE_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTE_ALARM_3
-// Description : None
 #define TIMER_INTE_ALARM_3_RESET  _u(0x0)
 #define TIMER_INTE_ALARM_3_BITS   _u(0x00000008)
 #define TIMER_INTE_ALARM_3_MSB    _u(3)
@@ -230,7 +227,6 @@
 #define TIMER_INTE_ALARM_3_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTE_ALARM_2
-// Description : None
 #define TIMER_INTE_ALARM_2_RESET  _u(0x0)
 #define TIMER_INTE_ALARM_2_BITS   _u(0x00000004)
 #define TIMER_INTE_ALARM_2_MSB    _u(2)
@@ -238,7 +234,6 @@
 #define TIMER_INTE_ALARM_2_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTE_ALARM_1
-// Description : None
 #define TIMER_INTE_ALARM_1_RESET  _u(0x0)
 #define TIMER_INTE_ALARM_1_BITS   _u(0x00000002)
 #define TIMER_INTE_ALARM_1_MSB    _u(1)
@@ -246,7 +241,6 @@
 #define TIMER_INTE_ALARM_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTE_ALARM_0
-// Description : None
 #define TIMER_INTE_ALARM_0_RESET  _u(0x0)
 #define TIMER_INTE_ALARM_0_BITS   _u(0x00000001)
 #define TIMER_INTE_ALARM_0_MSB    _u(0)
@@ -260,7 +254,6 @@
 #define TIMER_INTF_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTF_ALARM_3
-// Description : None
 #define TIMER_INTF_ALARM_3_RESET  _u(0x0)
 #define TIMER_INTF_ALARM_3_BITS   _u(0x00000008)
 #define TIMER_INTF_ALARM_3_MSB    _u(3)
@@ -268,7 +261,6 @@
 #define TIMER_INTF_ALARM_3_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTF_ALARM_2
-// Description : None
 #define TIMER_INTF_ALARM_2_RESET  _u(0x0)
 #define TIMER_INTF_ALARM_2_BITS   _u(0x00000004)
 #define TIMER_INTF_ALARM_2_MSB    _u(2)
@@ -276,7 +268,6 @@
 #define TIMER_INTF_ALARM_2_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTF_ALARM_1
-// Description : None
 #define TIMER_INTF_ALARM_1_RESET  _u(0x0)
 #define TIMER_INTF_ALARM_1_BITS   _u(0x00000002)
 #define TIMER_INTF_ALARM_1_MSB    _u(1)
@@ -284,7 +275,6 @@
 #define TIMER_INTF_ALARM_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTF_ALARM_0
-// Description : None
 #define TIMER_INTF_ALARM_0_RESET  _u(0x0)
 #define TIMER_INTF_ALARM_0_BITS   _u(0x00000001)
 #define TIMER_INTF_ALARM_0_MSB    _u(0)
@@ -298,7 +288,6 @@
 #define TIMER_INTS_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTS_ALARM_3
-// Description : None
 #define TIMER_INTS_ALARM_3_RESET  _u(0x0)
 #define TIMER_INTS_ALARM_3_BITS   _u(0x00000008)
 #define TIMER_INTS_ALARM_3_MSB    _u(3)
@@ -306,7 +295,6 @@
 #define TIMER_INTS_ALARM_3_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTS_ALARM_2
-// Description : None
 #define TIMER_INTS_ALARM_2_RESET  _u(0x0)
 #define TIMER_INTS_ALARM_2_BITS   _u(0x00000004)
 #define TIMER_INTS_ALARM_2_MSB    _u(2)
@@ -314,7 +302,6 @@
 #define TIMER_INTS_ALARM_2_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTS_ALARM_1
-// Description : None
 #define TIMER_INTS_ALARM_1_RESET  _u(0x0)
 #define TIMER_INTS_ALARM_1_BITS   _u(0x00000002)
 #define TIMER_INTS_ALARM_1_MSB    _u(1)
@@ -322,11 +309,11 @@
 #define TIMER_INTS_ALARM_1_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : TIMER_INTS_ALARM_0
-// Description : None
 #define TIMER_INTS_ALARM_0_RESET  _u(0x0)
 #define TIMER_INTS_ALARM_0_BITS   _u(0x00000001)
 #define TIMER_INTS_ALARM_0_MSB    _u(0)
 #define TIMER_INTS_ALARM_0_LSB    _u(0)
 #define TIMER_INTS_ALARM_0_ACCESS "RO"
 // =============================================================================
-#endif // HARDWARE_REGS_TIMER_DEFINED
+#endif // _HARDWARE_REGS_TIMER_H
+

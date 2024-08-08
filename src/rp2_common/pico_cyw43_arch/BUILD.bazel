@@ -43,7 +43,7 @@ _CONFIGURATIONS = [
             incompatible_with_config("//bazel/constraint:pico_freertos_unset") if kind == "freertos" else []
         ),
         deps = [
-            "//src/common/pico_base",
+            "//src/rp2_common:pico_platform",
             "//src/rp2_common/pico_async_context:pico_async_context_{}".format(kind),
             "//src/rp2_common/pico_cyw43_driver",
             "//src/rp2_common/pico_lwip",

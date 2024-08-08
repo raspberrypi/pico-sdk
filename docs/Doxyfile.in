@@ -1,6 +1,6 @@
 PROJECT_NAME            = "Raspberry Pi Pico SDK"
 PROJECT_BRIEF           = "Raspberry Pi Pico SDK documentation"
-PROJECT_NUMBER          = @PICO_SDK_VERSION_STRING@
+PROJECT_NUMBER          = @PICO_SDK_VERSION_STRING@ @PICO_DOXYGEN_TAG@
 
 #STRIP_FROM_PATH        = @PROJECT_SOURCE_DIR@
 STRIP_FROM_PATH         = @DOXY_INPUT_DIRS@
@@ -50,15 +50,19 @@ EXTRACT_STATIC         = YES
 
 EXTRACT_ALL            = NO
 ALWAYS_DETAILED_SEC    = NO
-#REPEAT_BRIEF           = NO
+#REPEAT_BRIEF          = NO
 
+ENABLE_PREPROCESSING   = YES
 # Need these next options to ensure that functions with modifiers do not confuse the Doxygen parser.
 # And any further function modifiers here.
 MACRO_EXPANSION        = YES
 
-PREDEFINED             = __not_in_flash_func(x) \
-                         __time_critical_func(x) \
+PREDEFINED             = __not_in_flash_func(x)= \
+                         __time_critical_func(x)= \
                          __not_in_flash(x)= \
                          __no_inline_not_in_flash(x)= \
                          __attribute__(x)= \
-                         DOXYGEN_GENERATION=
+                         DOXYGEN_GENERATION= \
+                         @DOXY_PREDEFINED@
+
+ENABLED_SECTIONS       = @DOXY_ENABLED_SECTIONS@
