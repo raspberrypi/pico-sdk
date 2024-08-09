@@ -565,7 +565,8 @@ static inline uint timer_hardware_alarm_get_irq_num(__unused timer_hw_t *timer, 
  * \param timer the timer instance
  * \param alarm_num the alarm number
  */
-static inline uint hardware_alarm_get_irq_num(timer_hw_t *timer, uint alarm_num) {
+static inline uint hardware_alarm_get_irq_num(__unused timer_hw_t *timer, uint alarm_num) {
+
     return timer_hardware_alarm_get_irq_num(PICO_DEFAULT_TIMER_INSTANCE(), alarm_num);
 }
 
