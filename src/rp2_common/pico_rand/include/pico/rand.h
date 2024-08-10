@@ -70,7 +70,7 @@ extern "C" {
 #endif
 #endif
 
-// PICO_CONFIG: PICO_RAND_ENTROPY_SRC_TRNG, Enable/disable use of hardware TRNG as an entropy source, type=bool, default=1 if no hardware TRNG, group=pico_rand
+// PICO_CONFIG: PICO_RAND_ENTROPY_SRC_TRNG, Enable/disable use of hardware TRNG as an entropy source, type=bool, default=1 if hardware TRNG is available, group=pico_rand
 #ifndef PICO_RAND_ENTROPY_SRC_TRNG
 #if HAS_RP2350_TRNG
 #define PICO_RAND_ENTROPY_SRC_TRNG 1
