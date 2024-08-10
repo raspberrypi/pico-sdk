@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <sys/times.h>
 
 #include "pico.h"
 #if LIB_PICO_STDIO
@@ -28,6 +29,7 @@
 #define weak_raw_vprintf vprintf
 #endif
 
+#ifndef POSIX_IO
 static int picolibc_putc(char c, __unused FILE *file) {
 #if LIB_PICO_STDIO
     stdio_putchar(c);
@@ -54,6 +56,7 @@ static FILE __stdio = FDEV_SETUP_STREAM(picolibc_putc,
                                         _FDEV_SETUP_RW);
 
 FILE *const stdin = &__stdio; __strong_reference(stdin, stdout); __strong_reference(stdin, stderr);
+#endif
 
 void __weak __assert_func(const char *file, int line, const char *func, const char *failedexpr) {
     weak_raw_printf("assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
@@ -93,6 +96,17 @@ __weak int settimeofday(__unused const struct timeval *tv, __unused const struct
     return 0;
 }
 
+__weak clock_t times(struct tms *tms) {
+#if CLOCKS_PER_SEC >= 1000000
+    tms->tms_utime = (clock_t)(to_us_since_boot(get_absolute_time()) * (CLOCKS_PER_SEC / 1000000));
+#else
+    tms->tms_utime = (clock_t)(to_us_since_boot(get_absolute_time()) / (1000000 / CLOCKS_PER_SEC));
+#endif
+    tms->tms_stime = 0;
+    tms->tms_cutime = 0;
+    tms->tms_cstime = 0;
+    return 0;
+}
 
 void runtime_init(void) {
 #ifndef NDEBUG
@@ -118,9 +132,9 @@ __weak void runtime_init_pre_core_tls_setup(void) {
     // for now we just set the same global area on both cores
     // note: that this is superfluous with the stock picolibc it seems, since it is itself
     // using a version of __aeabi_read_tp that returns the same pointer on both cores
-    extern void __tls_base;
+    extern char __tls_base[];
     extern void _set_tls(void *tls);
-    _set_tls(&__tls_base);
+    _set_tls(__tls_base);
 }
 #endif
 
