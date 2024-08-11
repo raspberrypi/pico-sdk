@@ -158,6 +158,6 @@ cc_library(
     ),
     deps = [
         ":pico_lwip_core",
-        "//bazel/config:PICO_FREERTOS_LIB",
+        "@pico-sdk//bazel/config:PICO_FREERTOS_LIB",
     ],
 )
