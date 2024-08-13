@@ -9,8 +9,8 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-#ifndef _BOARDS_HB_2350A_H
-#define _BOARDS_HB_2350A_H
+#ifndef _BOARDS_HELLBENDER_2350A_DEVBOARD_H
+#define _BOARDS_HELLBENDER_2350A_DEVBOARD_H
 
 // pico_cmake_set PICO_PLATFORM=rp2350
 

@@ -11,8 +11,8 @@
 
 // pico_cmake_set PICO_PLATFORM=rp2350
 
-#ifndef _BOARDS_GEN4_RP2350_32CT
-#define _BOARDS_GEN4_RP2350_32CT
+#ifndef _BOARDS_GEN4_RP2350_32CT_H
+#define _BOARDS_GEN4_RP2350_32CT_H
 
 // For board detection
 #define GEN4_RP2350_32CT	// CLB variants are exactly the same in operation
