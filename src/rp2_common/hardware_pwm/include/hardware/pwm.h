@@ -655,7 +655,7 @@ static inline void pwm_set_irq_mask_enabled(uint32_t slice_mask, bool enabled) {
         hw_clear_bits(&pwm_hw->inte, slice_mask);
     }
 #else
-    static_assert(PWM_IRQ_WRAP_1 == PWM_IRQ_WRAP_0 + 1);
+    static_assert(PWM_IRQ_WRAP_1 == PWM_IRQ_WRAP_0 + 1, "");
     uint irq_index = PWM_DEFAULT_IRQ_NUM() - PWM_IRQ_WRAP_0;
     if (enabled) {
         hw_set_bits(&pwm_hw->irq_ctrl[irq_index].inte, slice_mask);
