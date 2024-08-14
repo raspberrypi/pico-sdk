@@ -265,7 +265,12 @@ static void alarm_pool_irq_handler(void) {
         // need to wait
         alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
         earliest_target = earliest_entry->target;
-        ta_set_timeout(timer, timer_alarm_num, earliest_target);
+        // we are leaving a timeout every 2^32 microseconds anyway if there is no valid target, so we can choose any value.
+        // best_effort_wfe_or_timeout now relies on it being the last value set, and arguably this is the
+        // best value anyway, as it is the furthest away from the last fire.
+        if (earliest_target != -1) {
+            ta_set_timeout(timer, timer_alarm_num, earliest_target);
+        }
         // check we haven't now past the target time; if not we don't want to loop again
     } while ((earliest_target - now) <= 0);
 }
@@ -439,26 +444,35 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         return time_reached(timeout_timestamp);
     } else {
         alarm_id_t id;
-        id = add_alarm_at(timeout_timestamp, sleep_until_callback, NULL, false);
-        if (id <= 0) {
-            tight_loop_contents();
+        // note that as of SDK2.0.0 calling add_alarm_at always causes a SEV. Whwat we really
+        // want to do is cause an IRQ at the specified time in the future if there is not
+        // an IRQ already happening before then. The problem is that the IRQ may be happening on the
+        // other core, so taking an IRQ is the only way to get the state protection.
+        //
+        // Therefore, we make a compromise; we will set the alarm, if we won't wake up before the right time
+        // already. This means that repeated calls to this function with the same timeout will work correctly
+        // after the first one! This is fine, because we ask callers to use a polling loop on another
+        // event variable when using this function
+        if (ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
+                                     (int64_t)to_us_since_boot(timeout_timestamp))) {
+            __wfe();
             return time_reached(timeout_timestamp);
         } else {
-            // the above alarm add now may force an IRQ which will wake us up,
-            // so we want to consume one __wfe.. we do an explicit __sev
-            // just to make sure there is one
-            __sev(); // make sure there is an event sow ee don't block
-            __wfe();
-            if (!time_reached(timeout_timestamp))
-            {
-                // ^ at the point above the timer hadn't fired, so it is safe
-                // to wait; the event will happen due to IRQ at some point between
-                // then and the correct wakeup time
-                __wfe();
+            id = add_alarm_at(timeout_timestamp, sleep_until_callback, NULL, false);
+            if (id <= 0) {
+                tight_loop_contents();
+                return time_reached(timeout_timestamp);
+            } else {
+                if (!time_reached(timeout_timestamp)) {
+                    // ^ at the point above the timer hadn't fired, so it is safe
+                    // to wait; the event will happen due to IRQ at some point between
+                    // then and the correct wakeup time
+                    __wfe();
+                }
+                // we need to clean up if it wasn't us that caused the wfe; if it was this will be a noop.
+                cancel_alarm(id);
+                return time_reached(timeout_timestamp);
             }
-            // we need to clean up if it wasn't us that caused the wfe; if it was this will be a noop.
-            cancel_alarm(id);
-            return time_reached(timeout_timestamp);
         }
     }
 #else
