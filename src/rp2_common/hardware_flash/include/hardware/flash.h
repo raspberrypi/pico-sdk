@@ -46,7 +46,9 @@
 #define FLASH_SECTOR_SIZE (1u << 12)
 #define FLASH_BLOCK_SIZE (1u << 16)
 
+#ifndef FLASH_UNIQUE_ID_SIZE_BYTES
 #define FLASH_UNIQUE_ID_SIZE_BYTES 8
+#endif
 
 // PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, default=Usually provided via board header, group=hardware_flash
 

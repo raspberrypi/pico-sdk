@@ -19,7 +19,7 @@
 // Standard RUID instruction: 4Bh command prefix, 32 dummy bits, 64 data bits.
 #define FLASH_RUID_CMD 0x4b
 #define FLASH_RUID_DUMMY_BYTES 4
-#define FLASH_RUID_DATA_BYTES 8
+#define FLASH_RUID_DATA_BYTES FLASH_UNIQUE_ID_SIZE_BYTES
 #define FLASH_RUID_TOTAL_BYTES (1 + FLASH_RUID_DUMMY_BYTES + FLASH_RUID_DATA_BYTES)
 
 //-----------------------------------------------------------------------------

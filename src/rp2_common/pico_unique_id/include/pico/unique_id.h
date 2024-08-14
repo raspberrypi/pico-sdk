@@ -20,7 +20,7 @@ extern "C" {
  *
  * RP2040 does not have an on-board unique identifier (all instances of RP2040
  * silicon are identical and have no persistent state). However, RP2040 boots
- * from serial NOR flash devices which have a 64-bit unique ID as a standard
+ * from serial NOR flash devices which have at least a 64-bit unique ID as a standard
  * feature, and there is a 1:1 association between RP2040 and flash, so this
  * is suitable for use as a unique identifier for an RP2040-based board.
  *
