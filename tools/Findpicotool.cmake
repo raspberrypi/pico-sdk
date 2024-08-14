@@ -6,6 +6,23 @@
 #
 cmake_minimum_required(VERSION 3.17)
 
+# if PICOTOOL_OVERRIDE_DIR system environment variable is set,
+# then use that as the folder for the picotool executable
+if (DEFINED ENV{PICOTOOL_OVERRIDE_DIR})
+    message("PICOTOOL_OVERRIDE_DIR env var is set to '$ENV{PICOTOOL_OVERRIDE_DIR}'")
+    add_executable(picotool IMPORTED GLOBAL)
+    set_property(TARGET picotool PROPERTY IMPORTED_LOCATION $ENV{PICOTOOL_OVERRIDE_DIR}/picotool)
+    # check the picotool version:
+    execute_process(COMMAND $ENV{PICOTOOL_OVERRIDE_DIR}/picotool version
+                    OUTPUT_VARIABLE PICOTOOL_VERSION
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    string(REGEX MATCH "^picotool v${picotool_VERSION_REQUIRED}" PICOTOOL_VERSION_MATCH ${PICOTOOL_VERSION})
+    if (NOT PICOTOOL_VERSION_MATCH)
+        message("picotool version response was: ${PICOTOOL_VERSION}")
+        message(FATAL_ERROR "PICOTOOL_OVERRIDE_DIR is set to '$ENV{PICOTOOL_OVERRIDE_DIR}', but the version of picotool found is not ${picotool_VERSION_REQUIRED}")
+    endif()
+endif ()
+
 if (NOT TARGET picotool)
     include(ExternalProject)
 
