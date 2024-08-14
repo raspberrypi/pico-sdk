@@ -2,6 +2,7 @@
 .vscode
 cmake-*
 .DS_Store
+.cache
 build
 build-*
 
