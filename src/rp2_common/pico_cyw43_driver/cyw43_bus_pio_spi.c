@@ -21,17 +21,12 @@
 #include "pico/cyw43_driver.h"
 
 #if CYW43_SPI_PIO
-#define WL_REG_ON 23
-#define DATA_OUT_PIN 24u
-#define DATA_IN_PIN 24u
-#define IRQ_PIN 24u
-// #define MONITOR_PIN 3u
-#define CLOCK_PIN 29u
-#define CS_PIN 25u
+
 #define IRQ_SAMPLE_DELAY_NS 100
 
 // The pins should all work in the same gpio base
-static_assert((DATA_OUT_PIN < 32 && DATA_IN_PIN < 32 && CLOCK_PIN < 32) || (DATA_OUT_PIN > 16 && DATA_IN_PIN > 16 && CLOCK_PIN > 16), "");
+static_assert((CYW43_PIN_WL_DATA_OUT < 32 && CYW43_PIN_WL_DATA_IN < 32 && CYW43_PIN_WL_CLOCK < 32) ||
+    (CYW43_PIN_WL_DATA_OUT >= 16 && CYW43_PIN_WL_DATA_IN >= 16 && CYW43_PIN_WL_CLOCK >= 16), "");
 
 #ifdef CYW43_SPI_PROGRAM_NAME
 #define SPI_PROGRAM_NAME CYW43_SPI_PROGRAM_NAME
@@ -116,30 +111,30 @@ int cyw43_spi_init(cyw43_int_t *self) {
     pio_sm_config config = SPI_PROGRAM_GET_DEFAULT_CONFIG_FUNC(bus_data->pio_offset);
 
     sm_config_set_clkdiv_int_frac(&config, cyw43_pio_clock_div_int, cyw43_pio_clock_div_frac);
-    hw_write_masked(&pads_bank0_hw->io[CLOCK_PIN],
+    hw_write_masked(&pads_bank0_hw->io[CYW43_PIN_WL_CLOCK],
                     (uint)PADS_DRIVE_STRENGTH << PADS_BANK0_GPIO0_DRIVE_LSB,
                     PADS_BANK0_GPIO0_DRIVE_BITS
     );
-    hw_write_masked(&pads_bank0_hw->io[CLOCK_PIN],
+    hw_write_masked(&pads_bank0_hw->io[CYW43_PIN_WL_CLOCK],
                     (uint)1 << PADS_BANK0_GPIO0_SLEWFAST_LSB,
                     PADS_BANK0_GPIO0_SLEWFAST_BITS
     );
 
-    sm_config_set_out_pins(&config, DATA_OUT_PIN, 1);
-    sm_config_set_in_pins(&config, DATA_IN_PIN);
-    sm_config_set_set_pins(&config, DATA_OUT_PIN, 1);
+    sm_config_set_out_pins(&config, CYW43_PIN_WL_DATA_OUT, 1);
+    sm_config_set_in_pins(&config, CYW43_PIN_WL_DATA_IN);
+    sm_config_set_set_pins(&config, CYW43_PIN_WL_DATA_OUT, 1);
     sm_config_set_sideset(&config, 1, false, false);
-    sm_config_set_sideset_pins(&config, CLOCK_PIN);
+    sm_config_set_sideset_pins(&config, CYW43_PIN_WL_CLOCK);
     sm_config_set_in_shift(&config, false, true, 32);
     sm_config_set_out_shift(&config, false, true, 32);
-    hw_set_bits(&bus_data->pio->input_sync_bypass, 1u << DATA_IN_PIN);
+    hw_set_bits(&bus_data->pio->input_sync_bypass, 1u << CYW43_PIN_WL_DATA_IN);
     pio_sm_set_config(bus_data->pio, bus_data->pio_sm, &config);
-    pio_sm_set_consecutive_pindirs(bus_data->pio, bus_data->pio_sm, CLOCK_PIN, 1, true);
-    gpio_set_function(DATA_OUT_PIN, pio_get_funcsel(bus_data->pio));
+    pio_sm_set_consecutive_pindirs(bus_data->pio, bus_data->pio_sm, CYW43_PIN_WL_CLOCK, 1, true);
+    gpio_set_function(CYW43_PIN_WL_DATA_OUT, pio_get_funcsel(bus_data->pio));
 
     // Set data pin to pull down and schmitt
-    gpio_set_pulls(DATA_IN_PIN, false, true);
-    gpio_set_input_hysteresis_enabled(DATA_IN_PIN, true);
+    gpio_set_pulls(CYW43_PIN_WL_DATA_IN, false, true);
+    gpio_set_input_hysteresis_enabled(CYW43_PIN_WL_DATA_IN, true);
 
     pio_sm_exec(bus_data->pio, bus_data->pio_sm, pio_encode_set(pio_pins, 1));
 
@@ -174,7 +169,7 @@ void cyw43_spi_deinit(cyw43_int_t *self) {
 }
 
 static void cs_set(bool value) {
-    gpio_put(CS_PIN, value);
+    gpio_put(CYW43_PIN_WL_CS, value);
 }
 
 static __noinline void ns_delay(uint32_t ns) {
@@ -185,9 +180,9 @@ static __noinline void ns_delay(uint32_t ns) {
 
 static void start_spi_comms(cyw43_int_t *self) {
     bus_data_t *bus_data = (bus_data_t *)self->bus_data;
-    gpio_set_function(DATA_OUT_PIN, pio_get_funcsel(bus_data->pio));
-    gpio_set_function(CLOCK_PIN, pio_get_funcsel(bus_data->pio));
-    gpio_pull_down(CLOCK_PIN);
+    gpio_set_function(CYW43_PIN_WL_DATA_OUT, pio_get_funcsel(bus_data->pio));
+    gpio_set_function(CYW43_PIN_WL_CLOCK, pio_get_funcsel(bus_data->pio));
+    gpio_pull_down(CYW43_PIN_WL_CLOCK);
     // Pull CS low
     cs_set(false);
 }
@@ -243,7 +238,7 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, false);
         pio_sm_set_wrap(bus_data->pio, bus_data->pio_sm, bus_data->pio_offset, bus_data->pio_offset + SPI_OFFSET_END - 1);
         pio_sm_clear_fifos(bus_data->pio, bus_data->pio_sm);
-        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm, 1u << DATA_OUT_PIN, 1u << DATA_OUT_PIN);
+        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm, 1u << CYW43_PIN_WL_DATA_OUT, 1u << CYW43_PIN_WL_DATA_OUT);
         pio_sm_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_clkdiv_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_put(bus_data->pio, bus_data->pio_sm, tx_length * 8 - 1);
@@ -285,7 +280,7 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, false);
         pio_sm_set_wrap(bus_data->pio, bus_data->pio_sm, bus_data->pio_offset, bus_data->pio_offset + SPI_OFFSET_LP1_END - 1);
         pio_sm_clear_fifos(bus_data->pio, bus_data->pio_sm);
-        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm, 1u << DATA_OUT_PIN, 1u << DATA_OUT_PIN);
+        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm, 1u << CYW43_PIN_WL_DATA_OUT, 1u << CYW43_PIN_WL_DATA_OUT);
         pio_sm_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_clkdiv_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_put(bus_data->pio, bus_data->pio_sm, tx_length * 8 - 1);
@@ -309,7 +304,7 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
         }
         __compiler_memory_barrier();
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, false);
-        pio_sm_set_consecutive_pindirs(bus_data->pio, bus_data->pio_sm, DATA_IN_PIN, 1, false);
+        pio_sm_set_consecutive_pindirs(bus_data->pio, bus_data->pio_sm, CYW43_PIN_WL_DATA_IN, 1, false);
     } else if (rx != NULL) { /* currently do one at a time */
         DUMP_SPI_TRANSACTIONS(
                 printf("[%lu] bus TX %u bytes:", counter++, rx_length);
@@ -331,32 +326,32 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
 
 // Initialise our gpios
 void cyw43_spi_gpio_setup(void) {
-    // Setup WL_REG_ON (23)
-    gpio_init(WL_REG_ON);
-    gpio_set_dir(WL_REG_ON, GPIO_OUT);
-    gpio_pull_up(WL_REG_ON);
+    // Setup CYW43_PIN_WL_REG_ON (23)
+    gpio_init(CYW43_PIN_WL_REG_ON);
+    gpio_set_dir(CYW43_PIN_WL_REG_ON, GPIO_OUT);
+    gpio_pull_up(CYW43_PIN_WL_REG_ON);
 
     // Setup DO, DI and IRQ (24)
-    gpio_init(DATA_OUT_PIN);
-    gpio_set_dir(DATA_OUT_PIN, GPIO_OUT);
-    gpio_put(DATA_OUT_PIN, false);
+    gpio_init(CYW43_PIN_WL_DATA_OUT);
+    gpio_set_dir(CYW43_PIN_WL_DATA_OUT, GPIO_OUT);
+    gpio_put(CYW43_PIN_WL_DATA_OUT, false);
 
     // Setup CS (25)
-    gpio_init(CS_PIN);
-    gpio_set_dir(CS_PIN, GPIO_OUT);
-    gpio_put(CS_PIN, true);
+    gpio_init(CYW43_PIN_WL_CS);
+    gpio_set_dir(CYW43_PIN_WL_CS, GPIO_OUT);
+    gpio_put(CYW43_PIN_WL_CS, true);
 }
 
 // Reset wifi chip
 void cyw43_spi_reset(void) {
-    gpio_put(WL_REG_ON, false); // off
+    gpio_put(CYW43_PIN_WL_REG_ON, false); // off
     sleep_ms(20);
-    gpio_put(WL_REG_ON, true); // on
+    gpio_put(CYW43_PIN_WL_REG_ON, true); // on
     sleep_ms(250);
 
     // Setup IRQ (24) - also used for DO, DI
-    gpio_init(IRQ_PIN);
-    gpio_set_dir(IRQ_PIN, GPIO_IN);
+    gpio_init(CYW43_PIN_WL_HOST_WAKE);
+    gpio_set_dir(CYW43_PIN_WL_HOST_WAKE, GPIO_IN);
 }
 
 static inline uint32_t make_cmd(bool write, bool inc, uint32_t fn, uint32_t addr, uint32_t sz) {

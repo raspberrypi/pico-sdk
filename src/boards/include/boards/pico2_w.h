@@ -81,14 +81,6 @@
 // Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
 // note the SMSP mode pin is on WL_GPIO1
 
-#ifndef CYW43_PIN_WL_HOST_WAKE
-#define CYW43_PIN_WL_HOST_WAKE 24
-#endif
-
-#ifndef CYW43_PIN_WL_REG_ON
-#define CYW43_PIN_WL_REG_ON 23
-#endif
-
 #ifndef CYW43_WL_GPIO_COUNT
 #define CYW43_WL_GPIO_COUNT 3
 #endif

@@ -95,6 +95,38 @@ static inline uint32_t cyw43_hal_ticks_ms(void) {
     return to_ms_since_boot(get_absolute_time());
 }
 
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_REG_ON, gpio pin to power up the cyw43 chip, type=int, default=23, advanced=true, group=pico_cyw43_driver
+#ifndef CYW43_DEFAULT_PIN_WL_REG_ON
+#define CYW43_DEFAULT_PIN_WL_REG_ON 23
+#endif
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_OUT, gpio pin for spi data out to the cyw43 chip, type=int, default=24, advanced=true, group=pico_cyw43_driver
+#ifndef CYW43_DEFAULT_PIN_WL_DATA_OUT
+#define CYW43_DEFAULT_PIN_WL_DATA_OUT 24u
+#endif
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_IN, gpio pin for spi data in from the cyw43 chip, type=int, default=24, advanced=true, group=pico_cyw43_driver
+#ifndef CYW43_DEFAULT_PIN_WL_DATA_IN
+#define CYW43_DEFAULT_PIN_WL_DATA_IN 24u
+#endif
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_HOST_WAKE, gpio (irq) pin for the irq line from the cyw43 chip, type=int, default=24, advanced=true, group=pico_cyw43_driver
+#ifndef CYW43_DEFAULT_PIN_WL_HOST_WAKE
+#define CYW43_DEFAULT_PIN_WL_HOST_WAKE 24u
+#endif
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_CLOCK, gpio pin for the spi clock line to the cyw43 chip, type=int, default=29, advanced=true, group=pico_cyw43_driver
+#ifndef CYW43_DEFAULT_PIN_WL_CLOCK
+#define CYW43_DEFAULT_PIN_WL_CLOCK 29u
+#endif
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_CS, gpio pin for the spi chip select to the cyw43 chip, type=int, default=25, advanced=true, group=pico_cyw43_driver
+#ifndef CYW43_DEFAULT_PIN_WL_CS
+#define CYW43_DEFAULT_PIN_WL_CS 25u
+#endif
+
+#define CYW43_PIN_WL_REG_ON CYW43_DEFAULT_PIN_WL_REG_ON
+#define CYW43_PIN_WL_DATA_OUT CYW43_DEFAULT_PIN_WL_DATA_OUT
+#define CYW43_PIN_WL_DATA_IN CYW43_DEFAULT_PIN_WL_DATA_IN
+#define CYW43_PIN_WL_HOST_WAKE CYW43_DEFAULT_PIN_WL_HOST_WAKE
+#define CYW43_PIN_WL_CLOCK CYW43_DEFAULT_PIN_WL_CLOCK
+#define CYW43_PIN_WL_CS CYW43_DEFAULT_PIN_WL_CS
+
 static inline int cyw43_hal_pin_read(cyw43_hal_pin_obj_t pin) {
     return gpio_get(pin);
 }
