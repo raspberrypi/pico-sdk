@@ -116,7 +116,7 @@ static_assert(TIMER1_IRQ_3 == TIMER0_IRQ_0 + 7, "");
  * \def TIMER_ALARM_NUM_FROM_IRQ(irq_num)
  * \ingroup hardware_timer
  * \hideinitializer
- * \brief Returns the alarm number from an \irq_num_t. See \ref TIMER_INSTANCE_NUM_FROM_IRQ to get the timer instance number
+ * \brief Returns the alarm number from an \ref irq_num_t. See \ref TIMER_INSTANCE_NUM_FROM_IRQ to get the timer instance number
  *
  * Note this macro is intended to resolve at compile time, and does no parameter checking
  */
@@ -134,7 +134,7 @@ static_assert(TIMER1_IRQ_3 == TIMER0_IRQ_0 + 7, "");
  * \def TIMER_NUM_FROM_IRQ(irq_num)
  * \ingroup hardware_timer
  * \hideinitializer
- * \brief Returns the alarm number from an \irq_num_t. See \ref TIMER_INSTANCE_NUM_FROM_IRQ to get the alarm number
+ * \brief Returns the alarm number from an \ref irq_num_t. See \ref TIMER_INSTANCE_NUM_FROM_IRQ to get the alarm number
  *
  * Note this macro is intended to resolve at compile time, and does no parameter checking
  */
