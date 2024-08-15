@@ -24,9 +24,11 @@
 
 #define IRQ_SAMPLE_DELAY_NS 100
 
+#if !CYW43_PIN_WL_DYNAMIC
 // The pins should all work in the same gpio base
 static_assert((CYW43_PIN_WL_DATA_OUT < 32 && CYW43_PIN_WL_DATA_IN < 32 && CYW43_PIN_WL_CLOCK < 32) ||
     (CYW43_PIN_WL_DATA_OUT >= 16 && CYW43_PIN_WL_DATA_IN >= 16 && CYW43_PIN_WL_CLOCK >= 16), "");
+#endif
 
 #ifdef CYW43_SPI_PROGRAM_NAME
 #define SPI_PROGRAM_NAME CYW43_SPI_PROGRAM_NAME
@@ -540,3 +542,50 @@ int cyw43_write_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len,
     }
 }
 #endif
+
+#if CYW43_PIN_WL_DYNAMIC
+
+// storage for cyw43 pins
+static uint cyw43_pin_array[CYW43_PIN_INDEX_WL_COUNT] = {
+    CYW43_DEFAULT_PIN_WL_REG_ON,
+    CYW43_DEFAULT_PIN_WL_DATA_OUT,
+    CYW43_DEFAULT_PIN_WL_DATA_IN,
+    CYW43_DEFAULT_PIN_WL_HOST_WAKE,
+    CYW43_DEFAULT_PIN_WL_CLOCK,
+    CYW43_DEFAULT_PIN_WL_CS
+};
+
+// Check the cyw43 gpio pin array is valid
+static bool cyw43_pins_valid(uint pins[CYW43_PIN_INDEX_WL_COUNT]) {
+    // check the gpios are valid
+    for(int i = 0; i < CYW43_PIN_INDEX_WL_COUNT; i++) {
+        if (pins[i] >= NUM_BANK0_GPIOS) {
+            return false;
+        }
+    }
+    // These pins should use the same gpio base
+    return (pins[CYW43_PIN_INDEX_WL_DATA_OUT] < 32 && pins[CYW43_PIN_INDEX_WL_DATA_IN] < 32 && pins[CYW43_PIN_INDEX_WL_CLOCK] < 32) ||
+        (pins[CYW43_PIN_INDEX_WL_DATA_OUT] >= 16 && pins[CYW43_PIN_INDEX_WL_DATA_IN] >= 16 && pins[CYW43_PIN_INDEX_WL_CLOCK] >= 16);
+}
+
+// Set the gpio pin array
+int cyw43_set_pins_wl(uint pins[CYW43_PIN_INDEX_WL_COUNT]) {
+    assert(!bus_data_instance.pio);
+    if (bus_data_instance.pio) {
+        return PICO_ERROR_RESOURCE_IN_USE;
+    }
+    assert(cyw43_pins_valid(pins));
+    if (!cyw43_pins_valid(pins)) {
+        return PICO_ERROR_INVALID_ARG;
+    }
+    memcpy(cyw43_pin_array, pins, sizeof(cyw43_pin_array));
+    return PICO_OK;
+}
+
+// Get a gpio pin
+uint cyw43_get_pin_wl(cyw43_pin_index_t pin_id) {
+    assert(pin_id < CYW43_PIN_INDEX_WL_COUNT);
+    assert(cyw43_pin_array[pin_id] < NUM_BANK0_GPIOS);
+    return cyw43_pin_array[pin_id];
+}
+#endif // CYW43_PIN_WL_DYNAMIC

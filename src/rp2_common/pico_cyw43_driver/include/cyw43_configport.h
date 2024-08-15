@@ -120,12 +120,39 @@ static inline uint32_t cyw43_hal_ticks_ms(void) {
 #define CYW43_DEFAULT_PIN_WL_CS 25u
 #endif
 
+// PICO_CONFIG: CYW43_PIN_WL_DYNAMIC, flag to indicate if cyw43 SPI pins can be changed at runtime, type=bool, default=false, advanced=true, group=pico_cyw43_driver
+#ifndef CYW43_PIN_WL_DYNAMIC
+#define CYW43_PIN_WL_DYNAMIC 0
+#endif
+
+#if CYW43_PIN_WL_DYNAMIC
+// these are just an index into an array
+typedef enum cyw43_pin_index_t {
+    CYW43_PIN_INDEX_WL_REG_ON,
+    CYW43_PIN_INDEX_WL_DATA_OUT,
+    CYW43_PIN_INDEX_WL_DATA_IN,
+    CYW43_PIN_INDEX_WL_HOST_WAKE,
+    CYW43_PIN_INDEX_WL_CLOCK,
+    CYW43_PIN_INDEX_WL_CS,
+    CYW43_PIN_INDEX_WL_COUNT // last
+} cyw43_pin_index_t;
+#define CYW43_PIN_WL_REG_ON cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_REG_ON)
+#define CYW43_PIN_WL_DATA_OUT cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_DATA_OUT)
+#define CYW43_PIN_WL_DATA_IN cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_DATA_IN)
+#define CYW43_PIN_WL_HOST_WAKE cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_HOST_WAKE)
+#define CYW43_PIN_WL_CLOCK cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_CLOCK)
+#define CYW43_PIN_WL_CS cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_CS)
+// Lookup the gpio value in an array
+uint cyw43_get_pin_wl(cyw43_pin_index_t pin_id);
+#else
+// Just return the gpio number configured at build time
 #define CYW43_PIN_WL_REG_ON CYW43_DEFAULT_PIN_WL_REG_ON
 #define CYW43_PIN_WL_DATA_OUT CYW43_DEFAULT_PIN_WL_DATA_OUT
 #define CYW43_PIN_WL_DATA_IN CYW43_DEFAULT_PIN_WL_DATA_IN
 #define CYW43_PIN_WL_HOST_WAKE CYW43_DEFAULT_PIN_WL_HOST_WAKE
 #define CYW43_PIN_WL_CLOCK CYW43_DEFAULT_PIN_WL_CLOCK
 #define CYW43_PIN_WL_CS CYW43_DEFAULT_PIN_WL_CS
+#endif // !CYW43_PIN_WL_DYNAMIC
 
 static inline int cyw43_hal_pin_read(cyw43_hal_pin_obj_t pin) {
     return gpio_get(pin);
