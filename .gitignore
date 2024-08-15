@@ -1,6 +1,7 @@
 .idea
 .vscode
 cmake-*
+.cache
 .DS_Store
 build
 build-*
