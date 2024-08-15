@@ -58,9 +58,9 @@ __vectors:
 .endif
 .endm
 
-// we inlcude a lot of these to allow for different number of IRQs.
+// we include a lot of these to allow for different number of IRQs.
 // if_irq_word will only include IRQs that are valid, but we can't
-// use a macro loop becasue irq_irqx MUST appear in the source
+// use a macro loop becasue isr_irqx MUST appear in the source
 // as CMSIS rename exceptions #defines it to another value
 if_irq_word 0 isr_irq0
 if_irq_word 1 isr_irq1
