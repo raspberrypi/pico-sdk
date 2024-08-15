@@ -26,7 +26,7 @@ static inline void atomic_thread_fence(uint x) {}
 
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_ATOMIC, Spinlock ID for atomic protection, min=0, max=31, default=8, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_ATOMIC, Spinlock ID for atomics, min=0, max=31, default=8, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_ATOMIC
 #define PICO_SPINLOCK_ID_ATOMIC 8
 #endif
