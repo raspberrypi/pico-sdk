@@ -104,7 +104,9 @@ int cyw43_spi_init(cyw43_int_t *self) {
     bus_data->dma_in = -1;
     bus_data->dma_out = -1;
 
-    if (!pio_claim_free_sm_and_add_program_for_gpio_range(&SPI_PROGRAM_FUNC, &bus_data->pio, &bus_data->pio_sm, &bus_data->pio_offset, DATA_OUT_PIN, 1, true)) {
+    const uint min_gpio = MIN(CYW43_PIN_WL_CLOCK, MIN(CYW43_PIN_WL_DATA_IN, CYW43_PIN_WL_DATA_OUT));
+    const uint max_gpio = MAX(CYW43_PIN_WL_CLOCK, MAX(CYW43_PIN_WL_DATA_IN, CYW43_PIN_WL_DATA_OUT));
+    if (!pio_claim_free_sm_and_add_program_for_gpio_range(&SPI_PROGRAM_FUNC, &bus_data->pio, &bus_data->pio_sm, &bus_data->pio_offset, min_gpio, max_gpio - min_gpio + 1, true)) {
         cyw43_spi_deinit(self);
         return CYW43_FAIL_FAST_CHECK(-CYW43_EIO);
     }
