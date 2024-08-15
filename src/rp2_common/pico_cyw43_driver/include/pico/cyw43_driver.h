@@ -60,6 +60,16 @@ void cyw43_driver_deinit(struct async_context *context);
 #endif
 
 #if CYW43_PIO_CLOCK_DIV_DYNAMIC
+/*! \brief Set the clock divisor for the cyw43 pio clock
+ *  \ingroup pico_cyw43_driver
+ *
+ * SPI is used to communicate with the CYW43 device and this is implemented using a PIO running with a divisor of 2.
+ * If the system clock is changed it may be necessary to adjust for this to allow communications to succeed.
+ * This function is only available if \ref CYW43_PIO_CLOCK_DIV_DYNAMIC is true
+ *
+ * \param clock_div_int Integer part of the divisor
+ * \param clock_div_frac Fractional part in 1/256ths
+*/
 void cyw43_set_pio_clock_divisor(uint16_t clock_div_int, uint8_t clock_div_frac);
 #endif
 
