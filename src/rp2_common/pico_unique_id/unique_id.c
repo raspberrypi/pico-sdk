@@ -23,13 +23,13 @@ static void __attribute__((constructor)) _retrieve_unique_id_on_boot(void) {
     #elif (PICO_UNIQUE_BOARD_ID_SIZE_BYTES == FLASH_UNIQUE_ID_SIZE_BYTES)
         flash_get_unique_id(retrieved_id.id);
     #elif (PICO_UNIQUE_BOARD_ID_SIZE_BYTES < FLASH_UNIQUE_ID_SIZE_BYTES)
-        // The flash id is >8 bytes (e.g. IS25LP016D) but we want to keep the
-        // pico unique board id as 8 bytes, just use the last 8 bytes which are likely to change
+        // The flash ID is >8 bytes (e.g. IS25LP016D) but we want to keep the
+        // pico unique board ID as 8 bytes, just use the last 8 bytes which are likely to change
         uint8_t flash_id[FLASH_UNIQUE_ID_SIZE_BYTES];
         flash_get_unique_id(flash_id);
         memcpy(retrieved_id.id, flash_id + FLASH_UNIQUE_ID_SIZE_BYTES - PICO_UNIQUE_BOARD_ID_SIZE_BYTES, PICO_UNIQUE_BOARD_ID_SIZE_BYTES);
     #else
-        #error unique board id size is greater than flash unique id size
+        #error unique board ID size is greater than flash unique ID size
     #endif
 #else
     rom_get_sys_info_fn func = (rom_get_sys_info_fn) rom_func_lookup(ROM_FUNC_GET_SYS_INFO);
