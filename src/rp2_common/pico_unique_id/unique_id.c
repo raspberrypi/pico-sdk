@@ -8,7 +8,7 @@
 #include "pico/bootrom.h"
 #include "pico/unique_id.h"
 
-static_assert(PICO_UNIQUE_BOARD_ID_SIZE_BYTES == FLASH_UNIQUE_ID_SIZE_BYTES, "Board ID size must match flash ID size");
+static_assert(PICO_UNIQUE_BOARD_ID_SIZE_BYTES <= FLASH_UNIQUE_ID_SIZE_BYTES, "Board ID size must at least be the size of flash ID");
 
 static pico_unique_board_id_t retrieved_id;
 
@@ -20,8 +20,16 @@ static void __attribute__((constructor)) _retrieve_unique_id_on_boot(void) {
         // debug, so just produce something well-defined and obviously wrong.
         for (int i = 0; i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES; i++)
             retrieved_id.id[i] = 0xee;
-    #else
+    #elif (PICO_UNIQUE_BOARD_ID_SIZE_BYTES == FLASH_UNIQUE_ID_SIZE_BYTES)
         flash_get_unique_id(retrieved_id.id);
+    #elif (PICO_UNIQUE_BOARD_ID_SIZE_BYTES < FLASH_UNIQUE_ID_SIZE_BYTES)
+        // The flash ID is >8 bytes (e.g. IS25LP016D) but we want to keep the
+        // pico unique board ID as 8 bytes, just use the last 8 bytes which are likely to change
+        uint8_t flash_id[FLASH_UNIQUE_ID_SIZE_BYTES];
+        flash_get_unique_id(flash_id);
+        memcpy(retrieved_id.id, flash_id + FLASH_UNIQUE_ID_SIZE_BYTES - PICO_UNIQUE_BOARD_ID_SIZE_BYTES, PICO_UNIQUE_BOARD_ID_SIZE_BYTES);
+    #else
+        #error unique board ID size is greater than flash unique ID size
     #endif
 #else
     rom_get_sys_info_fn func = (rom_get_sys_info_fn) rom_func_lookup(ROM_FUNC_GET_SYS_INFO);
