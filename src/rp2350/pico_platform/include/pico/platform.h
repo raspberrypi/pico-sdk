@@ -30,6 +30,9 @@
 #endif
 
 // PICO_CONFIG: PICO_RP2350A, Whether the current board has an RP2350 in an A (30 GPIO) package, type=bool, default=Usually provided via board header, group=pico_platform
+#if 0 // make tooling checks happy
+#define PICO_RP2350A 0
+#endif
 
 // PICO_CONFIG: PICO_STACK_SIZE, Minimum amount of stack space reserved in the linker script for each core. See also PICO_CORE1_STACK_SIZE, min=0x100, default=0x800, advanced=true, group=pico_platform
 #ifndef PICO_STACK_SIZE
