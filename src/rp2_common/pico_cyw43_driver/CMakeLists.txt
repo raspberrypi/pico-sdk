@@ -166,4 +166,104 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     endfunction()
 
     pico_promote_common_scope_vars()
+
+    # Set env var, so it can be accessed in the function
+    set(ENV{PICO_CYW43_DRIVER_CURRENT_PATH} ${CMAKE_CURRENT_LIST_DIR})
+    function(pico_use_partition_firmware TARGET)
+        target_compile_definitions(${TARGET} PRIVATE CYW43_USE_PARTITION_FIRMWARE=1)
+        pico_embed_pt_in_binary(${TARGET} $ENV{PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_pt.json)
+
+        find_package (Python3 REQUIRED COMPONENTS Interpreter)
+
+        # Wifi firmware blob
+        add_custom_target(${TARGET}_firmware_w_blob DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/firmware_w_blob.S)
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/firmware_w_blob.S
+                COMMAND ${Python3_EXECUTABLE} $ENV{PICO_CYW43_DRIVER_CURRENT_PATH}/cyw43_firmware.py ${PICO_CYW43_DRIVER_PATH}/firmware/w43439A0_7_95_49_00_combined.h ${CMAKE_CURRENT_BINARY_DIR}/firmware_w_blob.S
+                )
+
+        # Wifi and bluetooth firmware blob
+        add_custom_target(${TARGET}_firmware_wb_blob DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/firmware_wb_blob.S)
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/firmware_wb_blob.S
+                COMMAND ${Python3_EXECUTABLE} $ENV{PICO_CYW43_DRIVER_CURRENT_PATH}/cyw43_firmware.py ${PICO_CYW43_DRIVER_PATH}/firmware/wb43439A0_7_95_49_00_combined.h ${CMAKE_CURRENT_BINARY_DIR}/firmware_wb_blob.S
+                )
+
+        # Create UF2s for all the variants - Wifi vs Wifi+Bluetooth, and TBYB
+        add_executable(${TARGET}_firmware_w
+                $ENV{PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+        add_executable(${TARGET}_firmware_w_tbyb
+                $ENV{PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+        add_executable(${TARGET}_firmware_wb
+                $ENV{PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+        add_executable(${TARGET}_firmware_wb_tbyb
+                $ENV{PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+
+        add_dependencies(${TARGET}_firmware_w ${TARGET}_firmware_w_blob)
+        add_dependencies(${TARGET}_firmware_w_tbyb ${TARGET}_firmware_w_blob)
+        add_dependencies(${TARGET}_firmware_wb ${TARGET}_firmware_wb_blob)
+        add_dependencies(${TARGET}_firmware_wb_tbyb ${TARGET}_firmware_wb_blob)
+
+        target_include_directories(${TARGET}_firmware_w PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+        target_include_directories(${TARGET}_firmware_w_tbyb PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+        target_include_directories(${TARGET}_firmware_wb PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+        target_include_directories(${TARGET}_firmware_wb_tbyb PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
+        target_compile_definitions(${TARGET}_firmware_w PRIVATE
+                NO_PICO_PLATFORM=1
+                )
+        target_compile_definitions(${TARGET}_firmware_w_tbyb PRIVATE
+                NO_PICO_PLATFORM=1
+                PICO_CRT0_IMAGE_TYPE_TBYB=1
+                )
+                target_compile_definitions(${TARGET}_firmware_wb PRIVATE
+                NO_PICO_PLATFORM=1
+                WB_FIRMWARE=1
+                )
+        target_compile_definitions(${TARGET}_firmware_wb_tbyb PRIVATE
+                NO_PICO_PLATFORM=1
+                PICO_CRT0_IMAGE_TYPE_TBYB=1
+                WB_FIRMWARE=1
+                )
+
+        target_link_options(${TARGET}_firmware_w PRIVATE -nostartfiles -nodefaultlibs -Ttext=0x20000000)
+        target_link_options(${TARGET}_firmware_w_tbyb PRIVATE -nostartfiles -nodefaultlibs -Ttext=0x20000000)
+        target_link_options(${TARGET}_firmware_wb PRIVATE -nostartfiles -nodefaultlibs -Ttext=0x20000000)
+        target_link_options(${TARGET}_firmware_wb_tbyb PRIVATE -nostartfiles -nodefaultlibs -Ttext=0x20000000)
+
+        target_link_libraries(${TARGET}_firmware_w boot_picobin_headers)
+        target_link_libraries(${TARGET}_firmware_w_tbyb boot_picobin_headers)
+        target_link_libraries(${TARGET}_firmware_wb boot_picobin_headers)
+        target_link_libraries(${TARGET}_firmware_wb_tbyb boot_picobin_headers)
+
+        get_target_property(hasSigfile ${TARGET} PICOTOOL_SIGFILE)
+        if (hasSigfile)
+                pico_sign_binary(${TARGET}_firmware_w ${sigfile})
+                pico_sign_binary(${TARGET}_firmware_w_tbyb ${sigfile})
+                pico_sign_binary(${TARGET}_firmware_wb ${sigfile})
+                pico_sign_binary(${TARGET}_firmware_wb_tbyb ${sigfile})
+        endif()
+
+        pico_hash_binary(${TARGET}_firmware_w)
+        pico_hash_binary(${TARGET}_firmware_w_tbyb)
+        pico_hash_binary(${TARGET}_firmware_wb)
+        pico_hash_binary(${TARGET}_firmware_wb_tbyb)
+
+        pico_set_uf2_family(${TARGET}_firmware_w 0x12345678)
+        pico_set_uf2_family(${TARGET}_firmware_w_tbyb 0x12345678)
+        pico_set_uf2_family(${TARGET}_firmware_wb 0x12345678)
+        pico_set_uf2_family(${TARGET}_firmware_wb_tbyb 0x12345678)
+
+        pico_package_uf2_output(${TARGET}_firmware_w 0x10000000)
+        pico_package_uf2_output(${TARGET}_firmware_w_tbyb 0x10000000)
+        pico_package_uf2_output(${TARGET}_firmware_wb 0x10000000)
+        pico_package_uf2_output(${TARGET}_firmware_wb_tbyb 0x10000000)
+
+        pico_add_extra_outputs(${TARGET}_firmware_w)
+        pico_add_extra_outputs(${TARGET}_firmware_w_tbyb)
+        pico_add_extra_outputs(${TARGET}_firmware_wb)
+        pico_add_extra_outputs(${TARGET}_firmware_wb_tbyb)
+
+        add_dependencies(${TARGET}
+                ${TARGET}_firmware_w ${TARGET}_firmware_w_tbyb
+                ${TARGET}_firmware_wb ${TARGET}_firmware_wb_tbyb)
+    endfunction()
 endif()

@@ -19,7 +19,17 @@
 #define CYW43_SLEEP_CHECK_MS 50
 #endif
 
-static async_context_t *cyw43_async_context;
+static async_context_t *cyw43_async_context = NULL;
+
+#if CYW43_USE_PARTITION_FIRMWARE
+    #include "pico/bootrom.h"
+    #include "boot/picobin.h"
+    #include <stdlib.h>
+
+    int32_t cyw43_wifi_fw_len;
+    int32_t cyw43_clm_len;
+    uintptr_t fw_data;
+#endif
 
 static void cyw43_sleep_timeout_reached(async_context_t *context, async_at_time_worker_t *worker);
 static void cyw43_do_poll(async_context_t *context, async_when_pending_worker_t *worker);
@@ -104,6 +114,73 @@ static void cyw43_sleep_timeout_reached(async_context_t *context, __unused async
 }
 
 bool cyw43_driver_init(async_context_t *context) {
+#if CYW43_USE_PARTITION_FIRMWARE
+    const int buf_words = (16 * 4) + 1;   // maximum of 16 partitions, each with maximum of 4 words returned, plus 1
+    uint32_t* buffer = malloc(buf_words * 4);
+    int ret = rom_get_partition_table_info(buffer, buf_words, PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_PARTITION_ID);
+
+    assert(buffer[0] == (PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_PARTITION_ID));
+
+    if (ret > 0) {
+        int i = 1;
+        int p = 0;
+        int picked_p = -1;
+        while (i < ret) {
+            i++;
+            uint32_t flags_and_permissions = buffer[i++];
+            bool has_id = (flags_and_permissions & PICOBIN_PARTITION_FLAGS_HAS_ID_BITS);
+            if (has_id) {
+                uint64_t id = 0;
+                id |= buffer[i++];
+                id |= ((uint64_t)(buffer[i++]) << 32ull);
+                if (id == 0x123456789abcdef0) {
+                    picked_p = p;
+                }
+            }
+
+            p++;
+        }
+
+        if (picked_p >= 0) {
+            uint32_t* workarea = malloc(0x1000);
+            picked_p = rom_pick_ab_update_partition(workarea, 0x1000, picked_p);
+            free(workarea);
+
+            if (picked_p < 0) {
+                if (picked_p == BOOTROM_ERROR_NOT_FOUND) {
+                    CYW43_DEBUG("Chosen CYW43 firmware partition was not verified\n");
+                } else if (picked_p == BOOTROM_ERROR_NOT_PERMITTED) {
+                    CYW43_DEBUG("Too many update boots going on at once\n");
+                }
+                return false;
+            }
+
+            CYW43_DEBUG("Chosen CYW43 firmware in partition %d\n", picked_p);
+            int ret = rom_get_partition_table_info(buffer, buf_words, PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION | (picked_p << 24));
+            assert(buffer[0] == (PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION));
+            assert(ret == 3);
+
+            uint32_t location_and_permissions = buffer[1];
+            uint32_t saddr = ((location_and_permissions >> PICOBIN_PARTITION_LOCATION_FIRST_SECTOR_LSB) & 0x1fffu) * 4096;
+            uint32_t eaddr = (((location_and_permissions >> PICOBIN_PARTITION_LOCATION_LAST_SECTOR_LSB) & 0x1fffu) + 1) * 4096;
+            // Starts with metadata block
+            while(saddr < eaddr && *(uint32_t*)(XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr) != PICOBIN_BLOCK_MARKER_END) {
+                saddr += 4;
+            }
+            saddr += 4;
+            // Now onto data
+            cyw43_wifi_fw_len = *(uint32_t*)(XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr);
+            cyw43_clm_len = *(uint32_t*)(XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr + 4);
+            fw_data = XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr + 8;
+        }
+        free(buffer);
+    } else {
+        free(buffer);
+        CYW43_DEBUG("No partition table, so cannot get firmware from partition - get_partition_table_info returned %d\n", ret);
+        return false;
+    }
+
+#endif
     cyw43_init(&cyw43_state);
     cyw43_async_context = context;
     // we need the IRQ to be on the same core as the context, because we need to be able to enable/disable the IRQ
@@ -114,13 +191,15 @@ bool cyw43_driver_init(async_context_t *context) {
 }
 
 void cyw43_driver_deinit(async_context_t *context) {
-    assert(context == cyw43_async_context);
-    async_context_remove_at_time_worker(context, &sleep_timeout_worker);
-    async_context_remove_when_pending_worker(context, &cyw43_poll_worker);
-    // the IRQ IS on the same core as the context, so must be de-initialized there
-    async_context_execute_sync(context, cyw43_irq_deinit, NULL);
-    cyw43_deinit(&cyw43_state);
-    cyw43_async_context = NULL;
+    if (cyw43_async_context != NULL) {
+        assert(context == cyw43_async_context);
+        async_context_remove_at_time_worker(context, &sleep_timeout_worker);
+        async_context_remove_when_pending_worker(context, &cyw43_poll_worker);
+        // the IRQ IS on the same core as the context, so must be de-initialized there
+        async_context_execute_sync(context, cyw43_irq_deinit, NULL);
+        cyw43_deinit(&cyw43_state);
+        cyw43_async_context = NULL;
+    }
 }
 
 // todo maybe add an #ifdef in cyw43_driver
