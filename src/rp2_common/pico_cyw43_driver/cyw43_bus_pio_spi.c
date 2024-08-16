@@ -24,7 +24,7 @@
 
 #define IRQ_SAMPLE_DELAY_NS 100
 
-#if !CYW43_PIN_WL_DYNAMIC
+#if !CYW43_PIN_WL_DYNAMIC && PICO_PIO_USE_GPIO_BASE
 // The pins should all work in the same gpio base
 static_assert((CYW43_PIN_WL_DATA_OUT < 32 && CYW43_PIN_WL_DATA_IN < 32 && CYW43_PIN_WL_CLOCK < 32) ||
     (CYW43_PIN_WL_DATA_OUT >= 16 && CYW43_PIN_WL_DATA_IN >= 16 && CYW43_PIN_WL_CLOCK >= 16), "");
@@ -131,7 +131,7 @@ int cyw43_spi_init(cyw43_int_t *self) {
     sm_config_set_sideset_pins(&config, CYW43_PIN_WL_CLOCK);
     sm_config_set_in_shift(&config, false, true, 32);
     sm_config_set_out_shift(&config, false, true, 32);
-    hw_set_bits(&bus_data->pio->input_sync_bypass, 1u << CYW43_PIN_WL_DATA_IN);
+    hw_set_bits(&bus_data->pio->input_sync_bypass, 1u << (CYW43_PIN_WL_DATA_IN - pio_get_gpio_base(bus_data->pio)));
     pio_sm_set_config(bus_data->pio, bus_data->pio_sm, &config);
     pio_sm_set_consecutive_pindirs(bus_data->pio, bus_data->pio_sm, CYW43_PIN_WL_CLOCK, 1, true);
     gpio_set_function(CYW43_PIN_WL_DATA_OUT, pio_get_funcsel(bus_data->pio));
@@ -242,7 +242,9 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, false);
         pio_sm_set_wrap(bus_data->pio, bus_data->pio_sm, bus_data->pio_offset, bus_data->pio_offset + SPI_OFFSET_END - 1);
         pio_sm_clear_fifos(bus_data->pio, bus_data->pio_sm);
-        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm, 1u << CYW43_PIN_WL_DATA_OUT, 1u << CYW43_PIN_WL_DATA_OUT);
+        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm,
+            1u << (CYW43_PIN_WL_DATA_OUT - pio_get_gpio_base(bus_data->pio)),
+            1u << (CYW43_PIN_WL_DATA_OUT - pio_get_gpio_base(bus_data->pio)));
         pio_sm_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_clkdiv_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_put(bus_data->pio, bus_data->pio_sm, tx_length * 8 - 1);
@@ -284,7 +286,9 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, false);
         pio_sm_set_wrap(bus_data->pio, bus_data->pio_sm, bus_data->pio_offset, bus_data->pio_offset + SPI_OFFSET_LP1_END - 1);
         pio_sm_clear_fifos(bus_data->pio, bus_data->pio_sm);
-        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm, 1u << CYW43_PIN_WL_DATA_OUT, 1u << CYW43_PIN_WL_DATA_OUT);
+        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm,
+            1u << (CYW43_PIN_WL_DATA_OUT - pio_get_gpio_base(bus_data->pio)),
+            1u << (CYW43_PIN_WL_DATA_OUT - pio_get_gpio_base(bus_data->pio)));
         pio_sm_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_clkdiv_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_put(bus_data->pio, bus_data->pio_sm, tx_length * 8 - 1);
@@ -563,9 +567,13 @@ static bool cyw43_pins_valid(uint pins[CYW43_PIN_INDEX_WL_COUNT]) {
             return false;
         }
     }
+#if PICO_PIO_USE_GPIO_BASE
     // These pins should use the same gpio base
     return (pins[CYW43_PIN_INDEX_WL_DATA_OUT] < 32 && pins[CYW43_PIN_INDEX_WL_DATA_IN] < 32 && pins[CYW43_PIN_INDEX_WL_CLOCK] < 32) ||
         (pins[CYW43_PIN_INDEX_WL_DATA_OUT] >= 16 && pins[CYW43_PIN_INDEX_WL_DATA_IN] >= 16 && pins[CYW43_PIN_INDEX_WL_CLOCK] >= 16);
+#else
+    return true;
+#endif
 }
 
 // Set the gpio pin array
