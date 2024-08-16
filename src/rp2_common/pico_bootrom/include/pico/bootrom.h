@@ -585,7 +585,14 @@ static inline int rom_flash_op(cflash_flags_t flags, uintptr_t addr, uint32_t si
     rom_flash_op_fn func = (rom_flash_op_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_OP);
     if (!bootrom_try_acquire_lock(BOOTROM_LOCK_FLASH_OP))
         return BOOTROM_ERROR_LOCK_REQUIRED;
+#if !PICO_NO_FLASH
+    // Flash binary must disable interrupts before accessing flash
+    uint32_t interrupt_flags = save_and_disable_interrupts();
+#endif
     int rc = func(flags, addr, size_bytes, buf);
+#if !PICO_NO_FLASH
+    restore_interrupts_from_disabled(interrupt_flags);
+#endif
     bootrom_release_lock(BOOTROM_LOCK_FLASH_OP);
     return rc;
 }
@@ -809,7 +816,9 @@ static inline intptr_t rom_flash_runtime_to_storage_addr(uintptr_t flash_runtime
 static inline int rom_chain_image(uint8_t *workarea_base, uint32_t workarea_size, uint32_t region_base, uint32_t region_size) {
     rom_chain_image_fn func = (rom_chain_image_fn) rom_func_lookup_inline(ROM_FUNC_CHAIN_IMAGE);
     bootrom_release_lock(BOOTROM_LOCK_ENABLE);
+    uint32_t interrupt_flags = save_and_disable_interrupts();
     int rc = func(workarea_base, workarea_size, region_base, region_size);
+    restore_interrupts_from_disabled(interrupt_flags);
     bootrom_acquire_lock_blocking(BOOTROM_LOCK_ENABLE);
     return rc;
 }
@@ -842,7 +851,15 @@ static inline int rom_chain_image(uint8_t *workarea_base, uint32_t workarea_size
  */
 static inline int rom_explicit_buy(uint8_t *buffer, uint32_t buffer_size) {
     rom_explicit_buy_fn func = (rom_explicit_buy_fn) rom_func_lookup_inline(ROM_FUNC_EXPLICIT_BUY);
-    return func(buffer, buffer_size);
+#if !PICO_NO_FLASH
+    // Flash binary must disable interrupts, in case a flash erase is required
+    uint32_t interrupt_flags = save_and_disable_interrupts();
+#endif
+    int rc = func(buffer, buffer_size);
+#if !PICO_NO_FLASH
+    restore_interrupts_from_disabled(interrupt_flags);
+#endif
+    return rc;
 }
 
 #ifndef __riscv
