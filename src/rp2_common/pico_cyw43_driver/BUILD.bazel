@@ -56,7 +56,6 @@ cc_library(
         "include/pico/btstack_cyw43.h",
         "include/pico/btstack_hci_transport_cyw43.h",
     ],
-    defines = ["CYW43_ENABLE_BLUETOOTH=1"],
     includes = ["include"],
     deps = [
         ":cyw43_bus_pio",

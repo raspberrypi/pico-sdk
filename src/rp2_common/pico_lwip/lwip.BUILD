@@ -15,6 +15,7 @@ cc_library(
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG",
         "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_config",
     ],
+    visibility = ["//visibility:private"],
 )
 
 cc_library(
@@ -26,8 +27,7 @@ cc_library(
     deps = [
         ":pico_lwip_headers",
     ] + select({
-        "@pico-sdk//bazel/constraint:pico_freertos_unset": [
-        ],
+        "@pico-sdk//bazel/constraint:pico_freertos_unset": [],
         "//conditions:default": [
             ":pico_lwip_contrib_freertos",
         ],
