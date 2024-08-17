@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 from pathlib import Path
+import re
 
 file_types = {
     "html": "text/html",
@@ -41,7 +42,7 @@ def process_file(input_dir, file):
     results = []
 
     # Check content type
-    content_type = file_types[file.suffix[1:].lower()]
+    content_type = file_types.get(file.suffix[1:].lower())
     if content_type is None:
         raise RuntimeError(f"Unsupported file type {file.suffix}")
 
@@ -103,8 +104,7 @@ def process_file_list(fd, input):
 
         # make a variable name
         var_name = str(file.relative_to(input_dir))
-        var_name = var_name.replace(".", "_")
-        var_name = var_name.replace("/", "_")
+        var_name = re.sub(r"\W+", "_", var_name, flags=re.ASCII)
         data_var = f"data_{var_name}"
         file_var = f"file_{var_name}"
 
@@ -121,7 +121,7 @@ def process_file_list(fd, input):
                 if byte_count % 16 == 0:
                     fd.write("\n")
             if byte_count % 16 != 0:
-                 fd.write("\n")
+                fd.write("\n")
         fd.write(f"}};\n\n")
 
         # set the flags
