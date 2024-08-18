@@ -30,7 +30,7 @@ pico_register_common_scope_var(PICO_DEFAULT_BOOT_STAGE2_FILE)
 # needed by function below
 set(PICO_BOOT_STAGE2_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
 
-add_library(boot_stage2_headers INTERFACE)
+pico_add_library(boot_stage2_headers)
 target_include_directories(boot_stage2_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 # by convention the first source file name without extension is used for the binary info name
