@@ -1,31 +1,8 @@
 #!/usr/bin/env python3
 import argparse
+import mimetypes
 from pathlib import Path
 import re
-
-file_types = {
-    "html": "text/html",
-    "htm":  "text/html",
-    "shtml": "text/html",
-    "shtm": "text/html",
-    "ssi":  "text/html",
-    "gif":  "image/gif",
-    "png":  "image/png",
-    "jpg":  "image/jpeg",
-    "bmp":  "image/bmp",
-    "ico":  "image/x-icon",
-    "class": "application/octet-stream",
-    "cls":  "application/octet-stream",
-    "js":   "application/javascript",
-    "ram":  "application/javascript",
-    "css":  "text/css",
-    "swf":  "application/x-shockwave-flash",
-    "xml":  "text/xml",
-    "xsl":  "application/pdf",
-    "pdf":  "text/xml",
-    "json": "application/json",
-    "svg":  "image/svg+xml"
-}
 
 response_types = {
   200: "HTTP/1.0 200 OK",
@@ -42,9 +19,9 @@ def process_file(input_dir, file):
     results = []
 
     # Check content type
-    content_type = file_types.get(file.suffix[1:].lower())
+    content_type, _ = mimetypes.guess_type(file)
     if content_type is None:
-        raise RuntimeError(f"Unsupported file type {file.suffix}")
+        content_type = "application/octet-stream"
 
     # file name
     data = f"/{file.relative_to(input_dir)}\x00"
@@ -165,6 +142,11 @@ def run_tool():
     )
     args = parser.parse_args()
     print(args.input)
+
+    mimetypes.init()
+    for ext in [".shtml", ".shtm", ".ssi"]:
+        mimetypes.add_type("text/html", ext)
+
     with open(args.output, "w") as fd:
         process_file_list(fd, args.input)
 
