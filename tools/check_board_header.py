@@ -99,15 +99,7 @@ def read_defines_from(header_file, defines_dict):
                 # check all uppercase
                 if name != name.upper():
                     raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
-                # check for multiply-defined values
-                if name in cmake_default_settings:
-                    if cmake_default_settings[name].value != value:
-                        if board_header_basename != "datanoisetv_rp2040_dsp.h":
-                            raise Exception("{}:{}  Conflicting values for pico_cmake_set_default {} ({} and {})".format(board_header, lineno, name, cmake_default_settings[name].value, value))
-                    else:
-                        if show_warnings:
-                            warnings.warn("{}:{}  Multiple values for pico_cmake_set_default {} ({} and {})".format(board_header, lineno, name, cmake_default_settings[name].value, value))
-                else:
+                if name not in cmake_default_settings:
                    cmake_default_settings[name] = DefineType(name, value, None, lineno)
                 continue
 
