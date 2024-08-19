@@ -12,7 +12,7 @@
 //------------------------------------------------------------------------------------------
 // Board definition for the DatanoiseTV RP2350 DSP Board
 //
-// This header may be included by other board headers as "boards/datanoisetv_rp2040_dsp.h"
+// This header may be included by other board headers as "boards/datanoisetv_rp2350_dsp.h"
 
 // pico_cmake_set PICO_PLATFORM=rp2350
 
@@ -43,12 +43,9 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
+// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (8 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
-#endif
-#ifndef PICO_RP2040_B0_SUPPORTED
-#define PICO_RP2040_B0_SUPPORTED 0
 #endif
 
 #ifndef PICO_RP2350_A2_SUPPORTED
@@ -62,7 +59,5 @@
 #ifndef PICO_AUDIO_I2S_CLOCK_PIN_BASE
 #define PICO_AUDIO_I2S_CLOCK_PIN_BASE 17
 #endif
-
-#include "boards/pico.h"
 
 #endif
