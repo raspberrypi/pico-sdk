@@ -68,7 +68,7 @@ function(pico_define_boot_stage2 NAME SOURCES)
 
     add_custom_target(${NAME}_padded_checksummed_asm DEPENDS ${PADDED_CHECKSUMMED_ASM})
     add_custom_command(OUTPUT ${PADDED_CHECKSUMMED_ASM} DEPENDS ${ORIGINAL_BIN}
-            COMMAND ${Python3_EXECUTABLE} ${PICO_BOOT_STAGE2_DIR}/pad_checksum -s 0xffffffff ${ORIGINAL_BIN} ${PADDED_CHECKSUMMED_ASM}
+            COMMAND ${Python3_EXECUTABLE} ${PICO_BOOT_STAGE2_DIR}/pad_checksum -s 0xffffffff -a $<IF:${PICO_RISCV},riscv,arm> ${ORIGINAL_BIN} ${PADDED_CHECKSUMMED_ASM}
             VERBATIM)
 
     add_library(${NAME}_library INTERFACE)
