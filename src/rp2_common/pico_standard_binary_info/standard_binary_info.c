@@ -7,7 +7,7 @@
 #if !PICO_NO_BINARY_INFO && !PICO_NO_PROGRAM_INFO
 #include "pico/binary_info.h"
 
-#if LIB_PICO_BOOT_STAGE2_HEADERS && !PICO_NO_FLASH
+#if LIB_BOOT_STAGE2_HEADERS && !PICO_NO_FLASH
 #include "boot_stage2/config.h"
 #endif
 
