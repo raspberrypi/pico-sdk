@@ -297,8 +297,8 @@ static void initialise_rand(void) {
 #if PICO_RAND_SEED_ENTROPY_SRC_BUS_PERF_COUNTER
 #if !PICO_RAND_BUS_PERF_COUNTER_INDEX
         int idx = -1;
-        for(uint i = 0; i < count_of(bus_ctrl_hw->counter); i++) {
-            if (bus_ctrl_hw->counter[i].sel == BUSCTRL_PERFSEL0_RESET) {
+        for(uint i = 0; i < count_of(busctrl_hw->counter); i++) {
+            if (busctrl_hw->counter[i].sel == BUSCTRL_PERFSEL0_RESET) {
                 idx = (int)i;
                 break;
             }
@@ -308,7 +308,7 @@ static void initialise_rand(void) {
 #else
         bus_counter_idx = (uint8_t)PICO_RAND_BUS_PERF_COUNTER_INDEX;
 #endif
-        bus_ctrl_hw->counter[bus_counter_idx].sel = PICO_RAND_BUS_PERF_COUNTER_EVENT;
+        busctrl_hw->counter[bus_counter_idx].sel = PICO_RAND_BUS_PERF_COUNTER_EVENT;
 #endif
         (void) xoroshiro128ss(&local_rng_state);
         rng_state = local_rng_state;
