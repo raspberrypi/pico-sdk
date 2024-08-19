@@ -40,7 +40,7 @@ function(pico_add_dis_output TARGET)
     add_custom_command(TARGET ${TARGET} POST_BUILD
             COMMAND ${CMAKE_OBJDUMP} -h $<TARGET_FILE:${TARGET}> > ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.dis
             COMMAND ${CMAKE_OBJDUMP} -d $<TARGET_FILE:${TARGET}> >> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.dis
-            ${EXTRA_COMMAND} || ${CMAKE_COMMAND} -E echo "WARNING: Disassembly is not correct"
+            ${EXTRA_COMMAND}
             VERBATIM
             )
 endfunction()
