@@ -82,6 +82,11 @@ def process_file_list(fd, input):
         # make a variable name
         var_name = str(file.relative_to(input_dir))
         var_name = re.sub(r"\W+", "_", var_name, flags=re.ASCII)
+
+        # Add a suffix if the variable name is used already
+        if any(d["data_var"] == f"data_{var_name}" for d in data):
+            var_name += f"_{len(data)}"
+
         data_var = f"data_{var_name}"
         file_var = f"file_{var_name}"
 
