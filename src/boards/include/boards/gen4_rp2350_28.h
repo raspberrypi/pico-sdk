@@ -11,8 +11,8 @@
 
 // pico_cmake_set PICO_PLATFORM=rp2350
 
-#ifndef _BOARDS_GEN4_RP2350_28
-#define _BOARDS_GEN4_RP2350_28
+#ifndef _BOARDS_GEN4_RP2350_28_H
+#define _BOARDS_GEN4_RP2350_28_H
 
 // For board detection
 #define GEN4_RP2350_28
