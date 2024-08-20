@@ -1071,6 +1071,22 @@ static inline int rom_get_last_boot_type(void) {
  */
 int rom_add_flash_runtime_partition(uint32_t start_offset, uint32_t size, uint32_t permissions);
 
+/*! \brief  Pick A/B partition for a separate partition
+ * \ingroup pico_bootrom
+ *
+ * This will perform extra checks to prevent disrupting a main image TBYB, and return errors
+ * 
+ * Also checks that the chosen partition contained a valid image
+ *
+ * \param workarea_base base address of work area
+ * \param workarea_size size of work area
+ * @param partition_a_num the A partition of the pair
+ * @return >= 0 the partition number picked
+ *         BOOTROM_ERROR_NOT_PERMITTED if not possible to do an update correctly, eg if both main image and data image are TBYB
+ *         BOOTROM_ERROR_NOT_FOUND if the chosen partition failed verification
+ */
+int rom_pick_ab_update_partition(uint32_t *workarea_base, uint32_t workarea_size, uint partition_a_num);
+
 #endif
 
 #ifdef __cplusplus
