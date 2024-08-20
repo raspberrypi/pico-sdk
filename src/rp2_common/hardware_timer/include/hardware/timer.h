@@ -105,7 +105,7 @@ extern "C" {
 #ifndef TIMER_ALARM_IRQ_NUM
 #if NUM_GENERIC_TIMERS == 1
 static_assert(TIMER_IRQ_3 == TIMER_IRQ_0 + 3, "");
-#define TIMER_ALARM_IRQ_NUM(timer, alarm_num) (TIMER_IRQ_0 + (alarm_num))
+#define TIMER_ALARM_IRQ_NUM(timer, alarm_num) ({ ((void)(timer)); (TIMER_IRQ_0 + (alarm_num)); })
 #else
 static_assert(TIMER1_IRQ_3 == TIMER0_IRQ_0 + 7, "");
 #define TIMER_ALARM_IRQ_NUM(timer, alarm_num) (TIMER0_IRQ_0 + TIMER_NUM(timer) * NUM_ALARMS + (alarm_num))
@@ -554,7 +554,7 @@ void hardware_alarm_force_irq(uint alarm_num);
  * \param alarm_num the alarm number
  * \sa TIMER_ALARM_IRQ_NUM
  */
-static inline uint timer_hardware_alarm_get_irq_num(__unused timer_hw_t *timer, uint alarm_num) {
+static inline uint timer_hardware_alarm_get_irq_num(timer_hw_t *timer, uint alarm_num) {
     check_hardware_alarm_num_param(alarm_num);
     return TIMER_ALARM_IRQ_NUM(timer, alarm_num);
 }
@@ -562,10 +562,9 @@ static inline uint timer_hardware_alarm_get_irq_num(__unused timer_hw_t *timer, 
 /**
  * \ingroup hardware_timer
  * \brief Returns the \ref irq_num_t for the alarm interrupt from the given alarm on the default timer instance
- * \param timer the timer instance
  * \param alarm_num the alarm number
  */
-static inline uint hardware_alarm_get_irq_num(timer_hw_t *timer, uint alarm_num) {
+static inline uint hardware_alarm_get_irq_num(uint alarm_num) {
     return timer_hardware_alarm_get_irq_num(PICO_DEFAULT_TIMER_INSTANCE(), alarm_num);
 }
 
