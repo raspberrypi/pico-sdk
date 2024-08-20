@@ -87,11 +87,18 @@ rp2040_bootloader_binary = declare_transtion(
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),
+	"_link_extra_libs": attr.label(default = "//bazel:empty_cc_lib"),
     },
     flag_overrides = {
         # We don't want --custom_malloc to ever apply to the bootloader, so
         # always explicitly override it here.
         "//command_line_option:custom_malloc": "_malloc",
+
+        # Platforms will commonly depend on bootloader components in every
+        # binary via `link_extra_libs`, so we must drop these deps when
+        # building the bootloader binaries themselves in order to avoid a
+        # circular dependency.
+	"@bazel_tools//tools/cpp:link_extra_libs": "_link_extra_libs",
     },
 )
 
