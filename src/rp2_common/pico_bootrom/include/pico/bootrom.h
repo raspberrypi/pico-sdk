@@ -549,10 +549,10 @@ typedef struct {
     uint32_t size_bytes;
     uint8_t *buf;
     int *res;
-} flash_op_params_t;
+} rom_helper_flash_op_params_t;
 
-static void flash_op_helper(void *param) {
-    const flash_op_params_t *op = (const flash_op_params_t *)param;
+static inline void rom_helper_flash_op(void *param) {
+    const rom_helper_flash_op_params_t *op = (const rom_helper_flash_op_params_t *)param;
     rom_flash_op_fn func = (rom_flash_op_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_OP);
     *(op->res) = func(op->flags, op->addr, op->size_bytes, op->buf);
 }
@@ -600,14 +600,14 @@ static inline int rom_flash_op(cflash_flags_t flags, uintptr_t addr, uint32_t si
     if (!bootrom_try_acquire_lock(BOOTROM_LOCK_FLASH_OP))
         return BOOTROM_ERROR_LOCK_REQUIRED;
     int rc = 0;
-    flash_op_params_t params = {
+    rom_helper_flash_op_params_t params = {
         .flags = flags,
         .addr = addr,
         .size_bytes = size_bytes,
         .buf = buf,
         .res = &rc
     };
-    int flash_rc = flash_safe_execute(flash_op_helper, &params, UINT32_MAX);
+    int flash_rc = flash_safe_execute(rom_helper_flash_op, &params, UINT32_MAX);
     bootrom_release_lock(BOOTROM_LOCK_FLASH_OP);
     if (flash_rc != PICO_OK) {
         return flash_rc;
@@ -846,10 +846,10 @@ typedef struct {
     uint8_t *buffer;
     uint32_t buffer_size;
     int *res;
-} buy_params_t;
+} rom_helper_explicit_buy_params_t;
 
-static void buy_helper(void *param) {
-    const buy_params_t *op = (const buy_params_t *)param;
+static inline void rom_helper_explicit_buy(void *param) {
+    const rom_helper_explicit_buy_params_t *op = (const rom_helper_explicit_buy_params_t *)param;
     rom_explicit_buy_fn func = (rom_explicit_buy_fn) rom_func_lookup_inline(ROM_FUNC_EXPLICIT_BUY);
     *(op->res) = func(op->buffer, op->buffer_size);
 }
@@ -882,12 +882,12 @@ static void buy_helper(void *param) {
  */
 static inline int rom_explicit_buy(uint8_t *buffer, uint32_t buffer_size) {
     int rc = 0;
-    buy_params_t params = {
+    rom_helper_explicit_buy_params_t params = {
         .buffer = buffer,
         .buffer_size = buffer_size,
         .res = &rc
     };
-    int flash_rc = flash_safe_execute(buy_helper, &params, UINT32_MAX);
+    int flash_rc = flash_safe_execute(rom_helper_explicit_buy, &params, UINT32_MAX);
     if (flash_rc != PICO_OK) {
         return flash_rc;
     } else {
