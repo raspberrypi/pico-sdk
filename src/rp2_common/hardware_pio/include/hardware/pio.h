@@ -1668,7 +1668,7 @@ static inline void pio_sm_clear_fifos(PIO pio, uint sm) {
     check_pio_param(pio);
     check_sm_param(sm);
     hw_xor_bits(&pio->sm[sm].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS);
-    hw_xor_bits(&pio->sm[sm].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS);
+    hw_xor_bits(&pio->sm[sm].shiftctrl, PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS);
 }
 
 /*! \brief Use a state machine to set a value on all pins for the PIO instance
