@@ -92,7 +92,11 @@
 static const tusb_desc_device_t usbd_desc_device = {
     .bLength = sizeof(tusb_desc_device_t),
     .bDescriptorType = TUSB_DESC_DEVICE,
+#if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE && PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR
     .bcdUSB = 0x0210,
+#else
+    .bcdUSB = 0x0200,
+#endif
     .bDeviceClass = TUSB_CLASS_MISC,
     .bDeviceSubClass = MISC_SUBCLASS_COMMON,
     .bDeviceProtocol = MISC_PROTOCOL_IAD,
