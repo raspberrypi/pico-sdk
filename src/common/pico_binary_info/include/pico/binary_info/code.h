@@ -208,8 +208,62 @@ static const struct _binary_info_named_group __bi_lineno_var_name = { \
 #define bi_7pins_with_func(p0, p1, p2, p3, p4, p5, p6,func) __bi_encoded_pins_64_with_func(BI_PINS_ENCODING_MULTI | ((func << 3)) | ((p0) << 8) | ((p1) << 16) | ((p2) << 24) | ((uint64_t)(p3) << 32) | ((uint64_t)(p4) << 40) | ((uint64_t)(p5) << 48) | ((uint64_t)(p6) << 56))
 
 #define bi_1pin_with_name(p0, name)                   bi_pin_mask_with_name(1ull << (p0), name)
-#define bi_2pins_with_names(p0, name0, p1, name1)     bi_pin_mask_with_names((1ull << (p0)) | (1ull << (p1)), name0 "|" name1)
-#define bi_3pins_with_names(p0, name0, p1, name1, p2, name2)  bi_pin_mask_with_names((1ull << (p0)) | (1ull << (p1)) | (1ull << (p2)), name0 "|" name1 "|" name2)
-#define bi_4pins_with_names(p0, name0, p1, name1, p2, name2, p3, name3)  bi_pin_mask_with_names((1ull << (p0)) | (1ull << (p1)) | (1ull << (p2)) | (1ull << (p3)), name0 "|" name1 "|" name2 "|" name3)
+#define bi_2pins_with_names(p0, name0, p1, name1)     bi_pin_mask_with_names((1ull << (p0)) | (1ull << (p1)), p0 < p1 ? name0 "|" name1 : name1 "|" name0)
+#define bi_3pins_with_names(p0, name0, p1, name1, p2, name2)  bi_pin_mask_with_names((1ull << (p0)) | (1ull << (p1)) | (1ull << (p2)),\
+    p0 < p1 ?\
+        (p1 < p2 ?\
+            name0 "|" name1 "|" name2:\
+            (p0 < p2 ? name0 "|" name2 "|" name1 : name2 "|" name0 "|" name1)):\
+        (p1 < p2 ?\
+            (p0 < p2 ? name1 "|" name0 "|" name2 : name1 "|" name2 "|" name0) :\
+            name2 "|" name1 "|" name0))
+#define bi_4pins_with_names(p0, name0, p1, name1, p2, name2, p3, name3)  bi_pin_mask_with_names((1ull << (p0)) | (1ull << (p1)) | (1ull << (p2)) | (1ull << (p3)),\
+    p0 < p1 ?\
+        (p1 < p2 ?\
+            (p2 < p3 ?\
+                name0 "|" name1 "|" name2 "|" name3:\
+                (p0 < p3 ?\
+                    (p1 < p3 ?\
+                        name0 "|" name1 "|" name3 "|" name2:\
+                        name0 "|" name3 "|" name1 "|" name2):\
+                    name3 "|" name0 "|" name1 "|" name2)):\
+            (p2 < p3 ?\
+                (p0 < p2 ?\
+                    (p1 < p3 ?\
+                        name0 "|" name2 "|" name1 "|" name3:\
+                        name0 "|" name2 "|" name3 "|" name1):\
+                    (p0 < p3 ?\
+                        (p1 < p3 ?\
+                            name2 "|" name0 "|" name1 "|" name3:\
+                            name2 "|" name0 "|" name3 "|" name1):\
+                        name2 "|" name3 "|" name0 "|" name1)):\
+                (p0 < p2 ?\
+                    (p0 < p3 ?\
+                        name0 "|" name3 "|" name2 "|" name1:\
+                        name3 "|" name0 "|" name2 "|" name1):\
+                    name3 "|" name2 "|" name0 "|" name1))):\
+        (p1 < p2 ?\
+            (p2 < p3 ?\
+                (p0 < p2 ?\
+                    name1 "|" name0 "|" name2 "|" name3:\
+                    (p0 < p3 ?\
+                        name1 "|" name2 "|" name0 "|" name3:\
+                        name1 "|" name2 "|" name3 "|" name0)):\
+                (p0 < p2 ?\
+                    (p0 < p3 ?\
+                        name1 "|" name0 "|" name3 "|" name2:\
+                        (p1 < p3 ?\
+                            name1 "|" name3 "|" name0 "|" name2:\
+                            name3 "|" name1 "|" name0 "|" name2)):\
+                    (p1 < p3 ?\
+                        name1 "|" name3 "|" name2 "|" name0:\
+                        name3 "|" name1 "|" name2 "|" name0))):\
+            (p2 < p3 ?\
+                (p0 < p3 ?\
+                    name2 "|" name1 "|" name0 "|" name3:\
+                    (p1 < p3 ?\
+                        name2 "|" name1 "|" name3 "|" name0:\
+                        name2 "|" name3 "|" name1 "|" name0)):\
+                name3 "|" name2 "|" name1 "|" name0)))
 
 #endif
