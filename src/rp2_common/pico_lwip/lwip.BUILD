@@ -2,18 +2,36 @@ load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
 
+# Some of the LWIP sys_arch.h and the lwip headers depend circularly on one
+# another. Include them all in the same target.
 cc_library(
-    name = "pico_lwip_core",
-    srcs = glob(["src/core/*.c"]),
+    name = "pico_lwip_headers",
     hdrs = glob(["**/*.h"]),
-    includes = ["src/include"],
-    target_compatible_with = incompatible_with_config(
-        "@pico-sdk//bazel/constraint:pico_lwip_config_unset",
-    ),
+    includes = [
+        "contrib/ports/freertos/include/arch",
+        "src/include",
+    ],
     deps = [
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG",
         "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_config",
     ],
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
+    name = "pico_lwip_core",
+    srcs = glob(["src/core/*.c"]),
+    target_compatible_with = incompatible_with_config(
+        "@pico-sdk//bazel/constraint:pico_lwip_config_unset",
+    ),
+    deps = [
+        ":pico_lwip_headers",
+    ] + select({
+        "@pico-sdk//bazel/constraint:pico_freertos_unset": [],
+        "//conditions:default": [
+            ":pico_lwip_contrib_freertos",
+        ],
+    }),
 )
 
 cc_library(
@@ -151,13 +169,13 @@ cc_library(
 
 cc_library(
     name = "pico_lwip_contrib_freertos",
-    srcs = ["ports/freertos/sys_arch.c"],
-    includes = ["ports/freertos/include"],
+    srcs = ["contrib/ports/freertos/sys_arch.c"],
+    includes = ["contrib/ports/freertos/include"],
     target_compatible_with = incompatible_with_config(
         "@pico-sdk//bazel/constraint:pico_freertos_unset",
     ),
     deps = [
-        ":pico_lwip_core",
-        "//bazel/config:PICO_FREERTOS_LIB",
+        ":pico_lwip_headers",
+        "@pico-sdk//bazel/config:PICO_FREERTOS_LIB",
     ],
 )

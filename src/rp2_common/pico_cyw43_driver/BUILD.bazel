@@ -16,16 +16,10 @@ cc_library(
 cc_library(
     name = "pico_cyw43_driver",
     srcs = [
-        "btstack_chipset_cyw43.c",
-        "btstack_cyw43.c",
-        "btstack_hci_transport_cyw43.c",
         "cyw43_bus_pio_spi.c",
         "cyw43_driver.c",
     ],
     hdrs = [
-        "include/pico/btstack_chipset_cyw43.h",
-        "include/pico/btstack_cyw43.h",
-        "include/pico/btstack_hci_transport_cyw43.h",
         "include/pico/cyw43_driver.h",
     ],
     includes = ["include"],
@@ -33,7 +27,6 @@ cc_library(
     deps = [
         ":cyw43_bus_pio",
         ":cyw43_configport",
-        "//bazel/config:PICO_BTSTACK_CONFIG",
         "//src/rp2_common:pico_platform",
         "//src/rp2_common/hardware_clocks",
         "//src/rp2_common/hardware_dma",
@@ -41,10 +34,37 @@ cc_library(
         "//src/rp2_common/hardware_pio",
         "//src/rp2_common/hardware_sync",
         "//src/rp2_common/pico_async_context",
+        "//src/rp2_common/pico_unique_id",
+        "@cyw43-driver//:cyw43_driver",
+    ] +
+    # Only depend on the btstack if its configuration is set up.
+    select({
+        "//bazel/constraint:pico_btstack_config_unset": [],
+        "//conditions:default": [":pico_cyw43_btstack"],
+    }),
+)
+
+cc_library(
+    name = "pico_cyw43_btstack",
+    srcs = [
+        "btstack_chipset_cyw43.c",
+        "btstack_cyw43.c",
+        "btstack_hci_transport_cyw43.c",
+    ],
+    hdrs = [
+        "include/pico/btstack_chipset_cyw43.h",
+        "include/pico/btstack_cyw43.h",
+        "include/pico/btstack_hci_transport_cyw43.h",
+    ],
+    includes = ["include"],
+    deps = [
+        ":cyw43_bus_pio",
+        ":cyw43_configport",
+        "//bazel/config:PICO_BTSTACK_CONFIG",
         "//src/rp2_common/pico_btstack:btstack_run_loop_async_context",
         "//src/rp2_common/pico_btstack:pico_btstack_base",
         "//src/rp2_common/pico_btstack:pico_btstack_flash_bank",
-        "//src/rp2_common/pico_unique_id",
+        "//src/rp2_common/pico_cyw43_driver/cybt_shared_bus:cybt_shared_bus_driver",
         "@cyw43-driver//:cyw43_driver",
     ],
 )
