@@ -10,6 +10,9 @@
 #include <hardware/sync.h>
 #include "pico/stdlib.h"
 #include "pico/test.h"
+// Include sys/types.h before inttypes.h to work around issue with
+// certain versions of GCC and newlib which causes omission of PRIi64
+#include <sys/types.h>
 #include <inttypes.h>
 PICOTEST_MODULE_NAME("pico_time_test", "pico_time test harness");
 
