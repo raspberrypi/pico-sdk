@@ -82,6 +82,11 @@ cc_binary(
         "-Wl,--entry=_stage2_boot",
         "-T$(location boot_stage2.ld)",
     ],
+    # Platforms will commonly depend on bootloader components in every
+    # binary via `link_extra_libs`, so we must drop these deps when
+    # building the bootloader binaries themselves in order to avoid a
+    # circular dependency.
+    link_extra_lib = "//bazel:empty_cc_lib",
     # this does nothing if someone passes --custom_malloc, so the
     # rp2040_bootloader_binary transition forcibly clobbers --custom_malloc.
     malloc = "//bazel:empty_cc_lib",
