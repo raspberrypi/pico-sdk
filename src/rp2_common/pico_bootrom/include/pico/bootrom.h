@@ -20,6 +20,7 @@
 #ifndef __ASSEMBLER__
 #include <string.h>
 #include "pico/bootrom/lock.h"
+#include "pico/flash.h"
 // ROM FUNCTION SIGNATURES
 
 #if PICO_RP2040
@@ -542,6 +543,20 @@ static inline void rom_flash_select_xip_read_mode(bootrom_xip_mode_t mode, uint8
     func(mode, clkdiv);
 }
 
+typedef struct {
+    cflash_flags_t flags;
+    uintptr_t addr;
+    uint32_t size_bytes;
+    uint8_t *buf;
+    int *res;
+} rom_helper_flash_op_params_t;
+
+static inline void rom_helper_flash_op(void *param) {
+    const rom_helper_flash_op_params_t *op = (const rom_helper_flash_op_params_t *)param;
+    rom_flash_op_fn func = (rom_flash_op_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_OP);
+    *(op->res) = func(op->flags, op->addr, op->size_bytes, op->buf);
+}
+
 /*!
  * \brief Perform a flash read, erase, or program operation
  * \ingroup pico_bootrom
@@ -582,12 +597,23 @@ static inline void rom_flash_select_xip_read_mode(bootrom_xip_mode_t mode, uint8
  * \param buf contains data to be written to flash, for program operations, and data read back from flash, for read operations
  */
 static inline int rom_flash_op(cflash_flags_t flags, uintptr_t addr, uint32_t size_bytes, uint8_t *buf) {
-    rom_flash_op_fn func = (rom_flash_op_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_OP);
     if (!bootrom_try_acquire_lock(BOOTROM_LOCK_FLASH_OP))
         return BOOTROM_ERROR_LOCK_REQUIRED;
-    int rc = func(flags, addr, size_bytes, buf);
+    int rc = 0;
+    rom_helper_flash_op_params_t params = {
+        .flags = flags,
+        .addr = addr,
+        .size_bytes = size_bytes,
+        .buf = buf,
+        .res = &rc
+    };
+    int flash_rc = flash_safe_execute(rom_helper_flash_op, &params, UINT32_MAX);
     bootrom_release_lock(BOOTROM_LOCK_FLASH_OP);
-    return rc;
+    if (flash_rc != PICO_OK) {
+        return flash_rc;
+    } else {
+        return rc;
+    }
 }
 
 /*!
@@ -809,9 +835,23 @@ static inline intptr_t rom_flash_runtime_to_storage_addr(uintptr_t flash_runtime
 static inline int rom_chain_image(uint8_t *workarea_base, uint32_t workarea_size, uint32_t region_base, uint32_t region_size) {
     rom_chain_image_fn func = (rom_chain_image_fn) rom_func_lookup_inline(ROM_FUNC_CHAIN_IMAGE);
     bootrom_release_lock(BOOTROM_LOCK_ENABLE);
+    uint32_t interrupt_flags = save_and_disable_interrupts();
     int rc = func(workarea_base, workarea_size, region_base, region_size);
+    restore_interrupts_from_disabled(interrupt_flags);
     bootrom_acquire_lock_blocking(BOOTROM_LOCK_ENABLE);
     return rc;
+}
+
+typedef struct {
+    uint8_t *buffer;
+    uint32_t buffer_size;
+    int *res;
+} rom_helper_explicit_buy_params_t;
+
+static inline void rom_helper_explicit_buy(void *param) {
+    const rom_helper_explicit_buy_params_t *op = (const rom_helper_explicit_buy_params_t *)param;
+    rom_explicit_buy_fn func = (rom_explicit_buy_fn) rom_func_lookup_inline(ROM_FUNC_EXPLICIT_BUY);
+    *(op->res) = func(op->buffer, op->buffer_size);
 }
 
 // todo SECURE only
@@ -841,8 +881,18 @@ static inline int rom_chain_image(uint8_t *workarea_base, uint32_t workarea_size
  * \param buffer_size size of scratch space
  */
 static inline int rom_explicit_buy(uint8_t *buffer, uint32_t buffer_size) {
-    rom_explicit_buy_fn func = (rom_explicit_buy_fn) rom_func_lookup_inline(ROM_FUNC_EXPLICIT_BUY);
-    return func(buffer, buffer_size);
+    int rc = 0;
+    rom_helper_explicit_buy_params_t params = {
+        .buffer = buffer,
+        .buffer_size = buffer_size,
+        .res = &rc
+    };
+    int flash_rc = flash_safe_execute(rom_helper_explicit_buy, &params, UINT32_MAX);
+    if (flash_rc != PICO_OK) {
+        return flash_rc;
+    } else {
+        return rc;
+    }
 }
 
 #ifndef __riscv
