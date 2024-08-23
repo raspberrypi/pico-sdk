@@ -80,6 +80,10 @@ extern "C" {
 #define CYW43_EINVAL           (-PICO_ERROR_INVALID_ARG) // Invalid argument
 #define CYW43_ETIMEDOUT        (-PICO_ERROR_TIMEOUT) // Connection timed out
 
+#ifndef CYW43_WL_GPIO_COUNT
+#define CYW43_WL_GPIO_COUNT 3
+#endif
+
 #define CYW43_NUM_GPIOS        CYW43_WL_GPIO_COUNT
 
 #define cyw43_hal_pin_obj_t uint
