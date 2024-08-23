@@ -58,7 +58,7 @@ if (PIOASM_FLAT_INSTALL)
     set(INSTALL_CONFIGDIR pioasm)
     set(INSTALL_BINDIR pioasm)
 else()
-    set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/pioasm)
+    set(INSTALL_CONFIGDIR lib/cmake/pioasm)
     set(INSTALL_BINDIR ${CMAKE_INSTALL_BINDIR})
 endif()
 
