@@ -13,7 +13,7 @@ if (DEFINED ENV{PICO_PLATFORM} AND NOT PICO_PLATFORM)
 endif()
 set(PICO_SAVED_PLATFORM "${PICO_PLATFORM}")
 
-# If PICO_PLATFORM is specified byt not PICO_BOARD, we'll make a stab at defaulting
+# If PICO_PLATFORM is specified but not PICO_BOARD, we'll make a stab at defaulting
 if (NOT PICO_DEFAULT_BOARD_rp2040)
     set(PICO_DEFAULT_BOARD_rp2040 "pico")
 endif()
@@ -84,7 +84,7 @@ if (NOT COMMAND pico_expand_pico_platform)
     function(pico_expand_pico_platform FUNC DO_MESSAGE)
         if (${FUNC} STREQUAL "rp2350")
             if (DO_MESSAGE)
-                message("Auto-converting non-specific PICO_PLATFORM='rp2350' to 'rp2350-arm-s'")
+                message("Auto-converting non-specific PICO_PLATFORM='rp2350' to '${PICO_DEFAULT_RP2350_PLATFORM}'")
             endif()
             set(${FUNC} "${PICO_DEFAULT_RP2350_PLATFORM}" PARENT_SCOPE)
         endif()
