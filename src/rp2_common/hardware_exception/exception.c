@@ -39,7 +39,7 @@ static void set_raw_exception_handler_and_restore_interrupts(enum exception_numb
 }
 
 static inline void check_exception_param(__unused enum exception_number num) {
-    invalid_params_if(HARDWARE_EXCEPTION, num < MIN_EXCEPTION_NUM || num >= MAX_EXCEPTION_NUM);
+    invalid_params_if(HARDWARE_EXCEPTION, num < MIN_EXCEPTION_NUM || num > MAX_EXCEPTION_NUM);
 }
 
 exception_handler_t exception_get_vtable_handler(enum exception_number num) {
