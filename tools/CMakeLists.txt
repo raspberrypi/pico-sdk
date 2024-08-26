@@ -410,7 +410,7 @@ function(pico_add_uf2_output TARGET)
             ARGS uf2 convert
                 --quiet
                 ${uf2_package_args}
-                $<TARGET_FILE:${TARGET}>
+                $<TARGET_FILE:${TARGET}>.bin
                 ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2
                 --family ${picotool_family}
                 ${extra_uf2_args}
