@@ -23,7 +23,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_PIO_VERSION, The PIO hardware version, type=int, default=0 on RP2040 and 1 on RP2350, group=hardware_pio
+// PICO_CONFIG: PICO_PIO_VERSION, PIO hardware version, type=int, default=0 on RP2040 and 1 on RP2350, group=hardware_pio
 #ifndef PICO_PIO_VERSION
 #if PIO_GPIOBASE_BITS
 #define PICO_PIO_VERSION 1
