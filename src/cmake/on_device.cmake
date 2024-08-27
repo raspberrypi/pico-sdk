@@ -29,7 +29,8 @@ function(pico_add_dis_output TARGET)
     pico_get_runtime_output_directory(${TARGET} output_path)
 
     # PICO_CMAKE_CONFIG: PICO_NO_COPRO_DIS, Disable disassembly listing postprocessing that disassembles RP2350 coprocessor instructions, type=bool, default=0, group=build
-    if (NOT (PICO_NO_COPRO_DIS OR PICO_NO_PICOTOOL))
+    if (NOT (PICO_NO_COPRO_DIS OR PICO_NO_PICOTOOL OR PICO_RISCV OR PICO_RP2040))
+        # Don't run coprocessor dissassembly on Risc-V or RP2040, as those don't have the RP2350 coprocessors
         pico_init_picotool()
         if(picotool_FOUND)
             # add custom disassembly if we have picotool
