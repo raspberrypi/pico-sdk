@@ -188,3 +188,7 @@ void rtc_disable_alarm(void) {
         tight_loop_contents();
     }
 }
+
+void rtc_run_from_external_source(uint src_hz, uint gpio_pin) {
+    clock_configure_gpin(clk_rtc, gpio_pin, src_hz, 46875);
+}

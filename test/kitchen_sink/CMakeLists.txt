@@ -46,6 +46,7 @@ set(KITCHEN_SINK_LIBS
     pico_float
     pico_i2c_slave
     pico_int64_ops
+    pico_low_power
     pico_malloc
     pico_mem_ops
     pico_multicore

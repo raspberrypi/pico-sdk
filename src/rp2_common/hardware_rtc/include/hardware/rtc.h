@@ -90,6 +90,14 @@ void rtc_enable_alarm(void);
  */
 void rtc_disable_alarm(void);
 
+/*! \brief Run the RTC from an external clock source through GPIO
+ *  \ingroup hardware_sleep
+ *
+ * \param src_hz The frequency of the external clock source
+ * \param gpio_pin The input pin providing the external clock (GP20 or GP22)
+ */
+void rtc_run_from_external_source(uint src_hz, uint gpio_pin);
+
 #ifdef __cplusplus
 }
 #endif
