@@ -18,7 +18,7 @@
 #define PICO_DISABLE_SHARED_IRQ_HANDLERS 0
 #endif
 
-// PICO_CONFIG: PICO_VTABLE_PER_CORE, user is using separate vector tables per core, type=bool, default=0, group=hardware_irq
+// PICO_CONFIG: PICO_VTABLE_PER_CORE, User is using separate vector tables per core, type=bool, default=0, group=hardware_irq
 #ifndef PICO_VTABLE_PER_CORE
 #define PICO_VTABLE_PER_CORE 0
 #endif

@@ -1,7 +1,7 @@
 # Deferring this config until we decide how to include other CMSIS libraries... it is likely that we always want to use the stub version of the core
 # at least if the vendor/device is RaspberryPi/RP2040...
 
-## PICO_CMAKE_CONFIG: PICO_CMSIS_PATH, directory to locate CMSIS installation, default="included stub CORE only impl", group=build
+## PICO_CMAKE_CONFIG: PICO_CMSIS_PATH, Directory to locate CMSIS installation, type=string, default="included stub CORE only impl", group=build
 #if (DEFINED PICO_CMSIS_PATH)
 #    set(PICO_CMSIS_PATH "${PICO_CMSIS_PATH}" CACHE PATH "Path to the CMSIS tree to use with Raspberry Pi Pico SDK")
 #    message("Using specified PICO_CMSIS_PATH for CMSIS ('${PICO_CMSIS_PATH}')")
@@ -10,7 +10,7 @@
 #    message("Using PICO_CMSIS_PATH from environment for CMSIS ('${PICO_CMSIS_PATH}')")
 #endif()
 #
-## PICO_CMAKE_CONFIG: PICO_CMSIS_VENDOR, vendor name for CMSIS, default="RaspberryPi", group=build
+## PICO_CMAKE_CONFIG: PICO_CMSIS_VENDOR, Vendor name for CMSIS, type=string, default="RaspberryPi", group=build
 #if (DEFINED PICO_CMSIS_VENDOR)
 #    set(PICO_CMSIS_VENDOR "${PICO_CMSIS_VENDOR}" CACHE STRING "CMSIS vendor name to use")
 #    message("Using specified PICO_CMSIS_VENDOR for CMSIS ('${PICO_CMSIS_VENDOR}')")
@@ -21,7 +21,7 @@
 #    set(PICO_CMSIS_VENDOR RaspberryPi)
 #endif()
 #
-## PICO_CMAKE_CONFIG: PICO_CMSIS_DEVICE, device name for CMSIS, default="RP2040", group=build
+## PICO_CMAKE_CONFIG: PICO_CMSIS_DEVICE, Device name for CMSIS, type=string, default="RP2040", group=build
 #if (DEFINED PICO_CMSIS_DEVICE)
 #    set(PICO_CMSIS_DEVICE "${PICO_CMSIS_DEVICE}" CACHE STRING "CMSIS device name to use")
 #    message("Using specified PICO_CMSIS_DEVICE for CMSIS ('${PICO_CMSIS_DEVICE}')")

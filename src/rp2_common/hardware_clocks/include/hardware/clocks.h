@@ -192,7 +192,7 @@ extern "C" {
 #ifndef PLL_SYS_VCO_FREQ_HZ
 #define PLL_SYS_VCO_FREQ_HZ                (1500 * MHZ)
 #endif
-// PICO_CONFIG: PLL_SYS_POSTDIV1, System clock PLL post divider 1 setting, type=int, default=6 on RP2040 5 or on RP2350, advanced=true, group=hardware_clocks
+// PICO_CONFIG: PLL_SYS_POSTDIV1, System clock PLL post divider 1 setting, type=int, default=6 on RP2040 or 5 on RP2350, advanced=true, group=hardware_clocks
 #ifndef PLL_SYS_POSTDIV1
 #if SYS_CLK_HZ == 125 * MHZ
 #define PLL_SYS_POSTDIV1                    6
