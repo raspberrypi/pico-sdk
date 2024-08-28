@@ -9,7 +9,4 @@ target_sources(pico_bootrom INTERFACE
         )
 
 target_link_libraries(pico_bootrom_headers INTERFACE boot_picoboot_headers)
-pico_mirrored_target_link_libraries(pico_bootrom INTERFACE pico_base hardware_boot_lock)
-if (TARGET pico_flash)
-        pico_mirrored_target_link_libraries(pico_bootrom INTERFACE pico_flash)
-endif()
+pico_mirrored_target_link_libraries(pico_bootrom INTERFACE pico_base hardware_boot_lock pico_flash)
