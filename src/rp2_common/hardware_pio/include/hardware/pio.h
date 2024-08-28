@@ -382,6 +382,19 @@ static inline void sm_config_set_in_pins(pio_sm_config *c, uint in_base) {
     sm_config_set_in_pin_base(c, in_base);
 }
 
+/*! \brief Set the number of significant consecutive 'in' pins in a state machine configuration
+ *  \ingroup sm_config
+ *
+ * When reading pins using the IN pin mapping, this many (low) bits will be read, with the reset taking
+ * the value zero.
+ *
+ * \if rp2040_specific
+ * RP2040 does not have the ability to mask unused input pins, so the in_count must be 32
+ * \endif
+ *
+ * \param c Pointer to the configuration structure to modify
+ * \param in_count 1-32 The number of pins to include when reading via the IN pin mapping
+ */
 static inline void sm_config_set_in_pin_count(pio_sm_config *c, uint in_count) {
 #if PICO_PIO_VERSION == 0
     // can't be changed from 32 on PIO v0
@@ -390,7 +403,7 @@ static inline void sm_config_set_in_pin_count(pio_sm_config *c, uint in_count) {
 #else
     valid_params_if(HARDWARE_PIO, in_count && in_count <= 32);
     c->shiftctrl = (c->shiftctrl & ~PIO_SM0_SHIFTCTRL_IN_COUNT_BITS) |
-                   ((in_count - 1) << PIO_SM0_SHIFTCTRL_IN_COUNT_LSB);
+                   ((in_count & 0x1fu) << PIO_SM0_SHIFTCTRL_IN_COUNT_LSB);
 #endif
 }
 
