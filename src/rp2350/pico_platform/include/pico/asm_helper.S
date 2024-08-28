@@ -64,24 +64,3 @@ weak_func WRAPPER_FUNC_NAME(\x)
 .macro __pre_init func, priority_string1
 __pre_init_with_offset func, 0, priority_string1
 .endm
-
-#ifdef __riscv
-// rd = (rs1 >> rs2[4:0]) & ~(-1 << nbits)
-.macro h3.bextm rd rs1 rs2 nbits
-.if (\nbits < 1) || (\nbits > 8)
-.err
-.endif
-    .insn r 0x0b, 0x4, (((\nbits - 1) & 0x7 ) << 1), \rd, \rs1, \rs2
-.endm
-
-// rd = (rs1 >> shamt) & ~(-1 << nbits)
-.macro h3.bextmi rd rs1 shamt nbits
-.if (\nbits < 1) || (\nbits > 8)
-.err
-.endif
-.if (\shamt < 0) || (\shamt > 31)
-.err
-.endif
-    .insn i 0x0b, 0x4, \rd, \rs1, (\shamt & 0x1f) | (((\nbits - 1) & 0x7 ) << 6)
-.endm
-#endif
