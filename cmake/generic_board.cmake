@@ -1,4 +1,5 @@
 # For boards without their own cmake file, we look for a header file
+cmake_minimum_required(VERSION 3.15)
 
 # PICO_CMAKE_CONFIG: PICO_BOARD_HEADER_DIRS, List of directories to look for <PICO_BOARD>.h in. This may be specified the user environment, type=list, group=build
 if (DEFINED ENV{PICO_BOARD_HEADER_DIRS})
