@@ -382,10 +382,10 @@ static inline void sm_config_set_in_pins(pio_sm_config *c, uint in_base) {
     sm_config_set_in_pin_base(c, in_base);
 }
 
-/*! \brief Set the number of significant consecutive 'in' pins in a state machine configuration
+/*! \brief Set the count of 'in' pins in a state machine configuration
  *  \ingroup sm_config
  *
- * When reading pins using the IN pin mapping, this many (low) bits will be read, with the reset taking
+ * When reading pins using the IN pin mapping, this many (low) bits will be read, with the rest taking
  * the value zero.
  *
  * \if rp2040_specific
@@ -647,7 +647,7 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  * --------|--------
  * Out Pins | 32 starting at 0
  * Set Pins | 0 starting at 0
- * In Pins (base) | 0
+ * In Pins | 32 starting at 0
  * Side Set Pins (base) | 0
  * Side Set | disabled
  * Wrap | wrap=31, wrap_to=0
