@@ -120,12 +120,12 @@ int main() {
 		uint32_t x, y;
 		x = xr256_next(rand_state) & 0xffffffffu;
 		y = xr256_next(rand_state) & 0xffffffffu;
-		// Map nan to inf (input nans should already be well-covered)
+		// Map nan to +-inf (input nans should already be well-covered)
 		if (is_nan_u(x)) {
-			x = 0x7f800000u;
+			x &= -1u << 23;
 		}
 		if (is_nan_u(y)) {
-			y = 0x7f800000u;
+			y &= -1u << 23;
 		}
 #if 1
 		printf("{0x%08xu, 0x%08xu, 0x%08xu},\n", x, y, model_fadd(x, y));
