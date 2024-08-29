@@ -13,8 +13,8 @@ if (PICO_RISCV)
     target_include_directories(pico_float_test PRIVATE ${CMAKE_CURRENT_LIST_DIR})
     pico_add_extra_outputs(pico_float_test)
 
-    pico_enable_stdio_usb(pico_float_test 1)
-    pico_enable_stdio_uart(pico_float_test 0)
+    # pico_enable_stdio_usb(pico_float_test 1)
+    # pico_enable_stdio_uart(pico_float_test 0)
 
 else ()
     add_executable(pico_float_test
