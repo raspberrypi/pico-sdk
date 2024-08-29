@@ -79,9 +79,8 @@ if (PICO_RISCV OR PICO_COMBINED_DOCS)
     pico_add_subdirectory(rp2_common/hardware_hazard3)
 endif()
 
-# Helper functions to connect to data/functions in the bootrom
-pico_add_subdirectory(rp2_common/pico_bootrom)
-
+# Basic bootrom headers
+pico_add_subdirectory(rp2_common/boot_bootrom_headers)
 pico_add_subdirectory(rp2_common/pico_platform_compiler)
 pico_add_subdirectory(rp2_common/pico_platform_sections)
 pico_add_subdirectory(rp2_common/pico_platform_panic)
@@ -89,6 +88,8 @@ pico_add_subdirectory(rp2_common/pico_platform_panic)
 if (NOT PICO_BARE_METAL)
     # NOTE THE ORDERING HERE IS IMPORTANT AS SOME TARGETS CHECK ON EXISTENCE OF OTHER TARGETS
     pico_add_subdirectory(rp2_common/pico_aon_timer)
+    # Helper functions to connect to data/functions in the bootrom
+    pico_add_subdirectory(rp2_common/pico_bootrom)
     pico_add_subdirectory(rp2_common/pico_bootsel_via_double_reset)
     pico_add_subdirectory(rp2_common/pico_multicore)
     pico_add_subdirectory(rp2_common/pico_unique_id)
