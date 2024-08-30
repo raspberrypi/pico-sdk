@@ -6,12 +6,17 @@
 
 #include "pico.h"
 
+#ifdef __riscv
+// Get macros for convenient use of Hazard3 instructions without binutils support"
+#include "hardware/hazard3/instructions.h"
+#endif
+
 #if !PICO_ASSEMBLER_IS_CLANG
 #define apsr_nzcv r15
 #endif
-# note we don't do this by default in this file for backwards comaptibility with user code
-# that may include this file, but not use unified syntax. Note that this macro does equivalent
-# setup to the pico_default_asm macro for inline assembly in C code.
+// note we don't do this by default in this file for backwards comaptibility with user code
+// that may include this file, but not use unified syntax. Note that this macro does equivalent
+// setup to the pico_default_asm macro for inline assembly in C code.
 .macro pico_default_asm_setup
 #ifndef __riscv
 .syntax unified
@@ -60,7 +65,7 @@ weak_func WRAPPER_FUNC_NAME(\x)
 .word \func + \offset
 .endm
 
-# backwards compatibility
+// backwards compatibility
 .macro __pre_init func, priority_string1
 __pre_init_with_offset func, 0, priority_string1
 .endm
