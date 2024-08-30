@@ -7,7 +7,7 @@
 #include "pico.h"
 
 #ifdef __riscv
-// Get macros for convenient use of Hazard3 instructions without binutils support"
+// Get macros for convenient use of Hazard3 instructions without binutils support
 #include "hardware/hazard3/instructions.h"
 #endif
 
