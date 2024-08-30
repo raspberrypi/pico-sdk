@@ -1,0 +1,10 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "boot_bootrom_headers",
+    hdrs = ["include/boot/bootrom_constants.h"],
+    includes = ["include"],
+    deps = [
+        "//src:pico_platform_internal",
+    ],
+)
