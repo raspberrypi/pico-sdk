@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _HARDWARE_HAZARD3_INSTRUCTIONS_
-#define _HARDWARE_HAZARD3_INSTRUCTIONS_
+#ifndef _HARDWARE_HAZARD3_INSTRUCTIONS_H
+#define _HARDWARE_HAZARD3_INSTRUCTIONS_H
 
 #include "pico.h"
 
