@@ -11,7 +11,11 @@
 #include "pico/platform.h"
 #else
 #ifndef _u
+#ifdef __ASSEMBLER__
+#define _u(x) x
+#else
 #define _u(x) x ## u
+#endif
 #endif
 #endif
 

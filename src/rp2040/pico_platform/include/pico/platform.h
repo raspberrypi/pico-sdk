@@ -66,11 +66,6 @@
 #define PICO_RP2040_B2_SUPPORTED 1
 #endif
 
-// PICO_CONFIG: PICO_RP2350_A2_SUPPORTED, Whether to include any specific software support for RP2350 A2 revision, type=bool, default=1, advanced=true, group=pico_platform
-#ifndef PICO_RP2350_A2_SUPPORTED
-#define PICO_RP2350_A2_SUPPORTED 1
-#endif
-
 #ifndef PICO_RAM_VECTOR_TABLE_SIZE
 #define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + NUM_IRQS)
 #endif

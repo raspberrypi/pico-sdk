@@ -192,7 +192,7 @@ extern "C" {
 #ifndef PLL_SYS_VCO_FREQ_HZ
 #define PLL_SYS_VCO_FREQ_HZ                (1500 * MHZ)
 #endif
-// PICO_CONFIG: PLL_SYS_POSTDIV1, System clock PLL post divider 1 setting, type=int, default=6 on RP2040 5 or on RP2350, advanced=true, group=hardware_clocks
+// PICO_CONFIG: PLL_SYS_POSTDIV1, System clock PLL post divider 1 setting, type=int, default=6 on RP2040 or 5 on RP2350, advanced=true, group=hardware_clocks
 #ifndef PLL_SYS_POSTDIV1
 #if SYS_CLK_HZ == 125 * MHZ
 #define PLL_SYS_POSTDIV1                    6
@@ -383,14 +383,14 @@ static inline void clock_gpio_init(uint gpio, uint src, float div)
 bool clock_configure_gpin(clock_handle_t clock, uint gpio, uint32_t src_freq, uint32_t freq);
 
 /*! \brief Initialise the system clock to 48MHz
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  *  Set the system clock to 48MHz, and set the peripheral clock to match.
  */
 void set_sys_clock_48mhz(void);
 
 /*! \brief Initialise the system clock
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * \param vco_freq The voltage controller oscillator frequency to be used by the SYS PLL
  * \param post_div1 The first post divider for the SYS PLL
@@ -401,7 +401,7 @@ void set_sys_clock_48mhz(void);
 void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2);
 
 /*! \brief Check if a given system clock frequency is valid/attainable
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * \param freq_hz Requested frequency
  * \param vco_freq_out On success, the voltage controlled oscillator frequency to be used by the SYS PLL
@@ -412,7 +412,7 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2);
 bool check_sys_clock_hz(uint32_t freq_hz, uint *vco_freq_out, uint *post_div1_out, uint *post_div2_out);
 
 /*! \brief Check if a given system clock frequency is valid/attainable
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * \param freq_khz Requested frequency
  * \param vco_freq_out On success, the voltage controlled oscillator frequency to be used by the SYS PLL
@@ -423,7 +423,7 @@ bool check_sys_clock_hz(uint32_t freq_hz, uint *vco_freq_out, uint *post_div1_ou
 bool check_sys_clock_khz(uint32_t freq_khz, uint *vco_freq_out, uint *post_div1_out, uint *post_div2_out);
 
 /*! \brief Attempt to set a system clock frequency in hz
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * Note that not all clock frequencies are possible; it is preferred that you
  * use src/rp2_common/hardware_clocks/scripts/vcocalc.py to calculate the parameters
@@ -445,7 +445,7 @@ static inline bool set_sys_clock_hz(uint32_t freq_hz, bool required) {
 }
 
 /*! \brief Attempt to set a system clock frequency in khz
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * Note that not all clock frequencies are possible; it is preferred that you
  * use src/rp2_common/hardware_clocks/scripts/vcocalc.py to calculate the parameters

@@ -88,7 +88,7 @@ void aon_timer_get_time(struct timespec *ts);
 void aon_timer_get_resolution(struct timespec *ts);
 
 /**
- * \brief Enable an AON timer alarm for a specifed time
+ * \brief Enable an AON timer alarm for a specified time
  * \ingroup pico_aon_timer
  *
  * \if rp2040_specific

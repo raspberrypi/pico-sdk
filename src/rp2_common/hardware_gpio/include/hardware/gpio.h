@@ -249,7 +249,7 @@ static inline void check_gpio_param(__unused uint gpio) {
  *  \ingroup hardware_gpio
  *
  * \param gpio GPIO number
- * \param fn Which GPIO function select to use from list \ref gpio_function
+ * \param fn Which GPIO function select to use from list \ref gpio_function_t
  */
 void gpio_set_function(uint gpio, gpio_function_t fn);
 
@@ -258,7 +258,7 @@ void gpio_set_function(uint gpio, gpio_function_t fn);
  *
  * \sa gpio_set_function
  * \param gpio_mask Mask with 1 bit per GPIO number to set the function for
- * \param fn Which GPIO function select to use from list \ref gpio_function
+ * \param fn Which GPIO function select to use from list \ref gpio_function_t
 */
 void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn);
 
@@ -267,7 +267,7 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn);
  *
  * \sa gpio_set_function
  * \param gpio_mask Mask with 1 bit per GPIO number to set the function for
- * \param fn Which GPIO function select to use from list \ref gpio_function
+ * \param fn Which GPIO function select to use from list \ref gpio_function_t
 */
 void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn);
 
@@ -275,7 +275,7 @@ void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn);
  *  \ingroup hardware_gpio
  *
  * \param gpio GPIO number
- * \return Which GPIO function is currently selected from list \ref gpio_function
+ * \return Which GPIO function is currently selected from list \ref gpio_function_t
  */
 gpio_function_t gpio_get_function(uint gpio);
 

@@ -29,7 +29,8 @@ function(pico_add_dis_output TARGET)
     pico_get_runtime_output_directory(${TARGET} output_path)
 
     # PICO_CMAKE_CONFIG: PICO_NO_COPRO_DIS, Disable disassembly listing postprocessing that disassembles RP2350 coprocessor instructions, type=bool, default=0, group=build
-    if (NOT (PICO_NO_COPRO_DIS OR PICO_NO_PICOTOOL))
+    if (NOT (PICO_NO_COPRO_DIS OR PICO_NO_PICOTOOL OR PICO_RISCV OR PICO_RP2040))
+        # Don't run coprocessor dissassembly on Risc-V or RP2040, as those don't have the RP2350 coprocessors
         pico_init_picotool()
         if(picotool_FOUND)
             # add custom disassembly if we have picotool
@@ -40,7 +41,7 @@ function(pico_add_dis_output TARGET)
     add_custom_command(TARGET ${TARGET} POST_BUILD
             COMMAND ${CMAKE_OBJDUMP} -h $<TARGET_FILE:${TARGET}> > ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.dis
             COMMAND ${CMAKE_OBJDUMP} -d $<TARGET_FILE:${TARGET}> >> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.dis
-            ${EXTRA_COMMAND} || ${CMAKE_COMMAND} -E echo "WARNING: Disassembly is not correct"
+            ${EXTRA_COMMAND}
             VERBATIM
             )
 endfunction()
@@ -63,7 +64,7 @@ function(pico_add_extra_outputs TARGET)
     pico_add_map_output(${TARGET})
 
     # PICO_CMAKE_CONFIG: PICO_NO_TARGET_NAME, Don't define PICO_TARGET_NAME, type=bool, default=0, group=build
-    # PICO_BUILD_DEFINE: PICO_TARGET_NAME, The name of the build target being compiled (unless PICO_NO_TARGET_NAME set in build), type=string, default=target name, group=build
+    # PICO_BUILD_DEFINE: PICO_TARGET_NAME, Name of the build target being compiled (unless PICO_NO_TARGET_NAME set in build), type=string, default=target name, group=build
     if (NOT PICO_NO_TARGET_NAME)
         target_compile_definitions(${TARGET} PRIVATE
                 PICO_TARGET_NAME="${TARGET}"

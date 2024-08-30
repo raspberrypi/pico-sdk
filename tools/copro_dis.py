@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# NOTE THIS SCRIPT IS DEPRECATED. Use 'picotool coprodis' instead
+
 import argparse, re
 
 parser = argparse.ArgumentParser(description="Disassemble RCP instructions in DIS file")

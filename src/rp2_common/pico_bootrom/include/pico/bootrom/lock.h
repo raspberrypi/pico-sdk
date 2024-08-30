@@ -10,7 +10,7 @@
 #include "hardware/boot_lock.h"
 #include "pico/bootrom_constants.h"
 
-// PICO_CONFIG: PICO_BOOTROM_LOCKING_ENABLED, Enable/disable locking for bootrom functions that use shared reqsources. If this flag is enabled bootrom lock checking is turned on and BOOT locks are taken around the relevant bootrom functions, type=bool, default=1, group=pico_bootrom
+// PICO_CONFIG: PICO_BOOTROM_LOCKING_ENABLED, Enable/disable locking for bootrom functions that use shared resources. If this flag is enabled bootrom lock checking is turned on and BOOT locks are taken around the relevant bootrom functions, type=bool, default=1, group=pico_bootrom
 #ifndef PICO_BOOTROM_LOCKING_ENABLED
 #if NUM_BOOT_LOCKS > 0
 #define PICO_BOOTROM_LOCKING_ENABLED 1

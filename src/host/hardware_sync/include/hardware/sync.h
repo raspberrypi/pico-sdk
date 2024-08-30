@@ -26,52 +26,52 @@ static inline void atomic_thread_fence(uint x) {}
 
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_ATOMIC, Spinlock ID for atomic protection, min=0, max=31, default=8, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_ATOMIC, Spinlock ID for atomics, min=0, max=31, default=8, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_ATOMIC
 #define PICO_SPINLOCK_ID_ATOMIC 8
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_IRQ, Spinlock ID for IRQ protection, min=0, max=31, default=9, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_IRQ, Spinlock ID for IRQ protection, min=0, max=31, default=9, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_IRQ
 #define PICO_SPINLOCK_ID_IRQ 9
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_TIMER, Spinlock ID for Timer protection, min=0, max=31, default=10, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_TIMER, Spinlock ID for Timer protection, min=0, max=31, default=10, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_TIMER
 #define PICO_SPINLOCK_ID_TIMER 10
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_HARDWARE_CLAIM, Spinlock ID for Hardware claim protection, min=0, max=31, default=11, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_HARDWARE_CLAIM, Spinlock ID for Hardware claim protection, min=0, max=31, default=11, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_HARDWARE_CLAIM
 #define PICO_SPINLOCK_ID_HARDWARE_CLAIM 11
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_RAND, Spinlock ID for Random Number Generator, min=0, max=31, default=12, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_RAND, Spinlock ID for Random Number Generator, min=0, max=31, default=12, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_RAND
 #define PICO_SPINLOCK_ID_RAND 12
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_OS1, First Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=14, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS1, First Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=14, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_OS1
 #define PICO_SPINLOCK_ID_OS1 14
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_OS2, Second Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=15, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS2, Second Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=15, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_OS2
 #define PICO_SPINLOCK_ID_OS2 15
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_FIRST, Lowest Spinlock ID in the 'striped' range, min=0, max=31, default=16, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_FIRST, Lowest Spinlock ID in the 'striped' range, min=0, max=31, default=16, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_STRIPED_FIRST
 #define PICO_SPINLOCK_ID_STRIPED_FIRST 16
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_LAST, Highest Spinlock ID in the 'striped' range, min=0, max=31, default=23, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_LAST, Highest Spinlock ID in the 'striped' range, min=0, max=31, default=23, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_STRIPED_LAST
 #define PICO_SPINLOCK_ID_STRIPED_LAST 23
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, Lowest Spinlock ID in the 'claim free' range, min=0, max=31, default=24, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, Lowest Spinlock ID in the 'claim free' range, min=0, max=31, default=24, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_CLAIM_FREE_FIRST
 #define PICO_SPINLOCK_ID_CLAIM_FREE_FIRST 24
 #endif
@@ -80,7 +80,7 @@ static inline void atomic_thread_fence(uint x) {}
 #warning PICO_SPINLOCK_ID_CLAIM_FREE_END has been renamed to PICO_SPINLOCK_ID_CLAIM_FREE_LAST
 #endif
 
-/// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_LAST, Highest Spinlock ID in the 'claim free' range, min=0, max=31, default=31, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_LAST, Highest Spinlock ID in the 'claim free' range, min=0, max=31, default=31, group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_CLAIM_FREE_LAST
 #define PICO_SPINLOCK_ID_CLAIM_FREE_LAST 31
 #endif

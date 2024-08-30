@@ -911,7 +911,7 @@ static inline uint dma_get_timer_dreq(uint timer_num) {
  *  \ingroup hardware_dma
  *
  * \param irq_index 0 the DMA irq index
- * \return The \ref irq_num_to use for DMA
+ * \return The \ref irq_num_t to use for DMA
  */
 static inline int dma_get_irq_num(uint irq_index) {
     valid_params_if(HARDWARE_DMA, irq_index < NUM_DMA_IRQS);

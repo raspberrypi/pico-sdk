@@ -92,7 +92,15 @@
 static const tusb_desc_device_t usbd_desc_device = {
     .bLength = sizeof(tusb_desc_device_t),
     .bDescriptorType = TUSB_DESC_DEVICE,
+// On Windows, if bcdUSB = 0x210 then a Microsoft OS 2.0 descriptor is required, else the device won't be detected
+// This is only needed for driverless access to the reset interface - the CDC interface doesn't require these descriptors
+// for driverless access, but will still not work if bcdUSB = 0x210 and no descriptor is provided. Therefore always
+// use bcdUSB = 0x200 if the Microsoft OS 2.0 descriptor isn't enabled
+#if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE && PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR
     .bcdUSB = 0x0210,
+#else
+    .bcdUSB = 0x0200,
+#endif
     .bDeviceClass = TUSB_CLASS_MISC,
     .bDeviceSubClass = MISC_SUBCLASS_COMMON,
     .bDeviceProtocol = MISC_PROTOCOL_IAD,

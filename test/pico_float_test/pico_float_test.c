@@ -17,6 +17,9 @@
 #include <math.h>
 #include <pico/float.h>
 #include "pico/stdlib.h"
+// Include sys/types.h before inttypes.h to work around issue with
+// certain versions of GCC and newlib which causes omission of PRIx64
+#include <sys/types.h>
 #include "inttypes.h"
 
 #define test_assert(x) ({ if (!(x)) { printf("Assertion failed: ");puts(#x);printf("  at " __FILE__ ":%d\n", __LINE__); exit(-1); } })

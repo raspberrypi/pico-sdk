@@ -11,7 +11,7 @@
 
 #include "pico.h"
 
-// PICO_CONFIG: PICO_BUILD_BOOT_STAGE2_NAME, The name of the boot stage 2 if selected by the build, group=boot_stage2
+// PICO_CONFIG: PICO_BUILD_BOOT_STAGE2_NAME, Name of the boot stage 2 if selected in the build system, group=boot_stage2
 #ifdef PICO_BUILD_BOOT_STAGE2_NAME
     #define _BOOT_STAGE2_SELECTED
 #else
