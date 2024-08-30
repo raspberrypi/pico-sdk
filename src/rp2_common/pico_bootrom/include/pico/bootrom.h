@@ -274,7 +274,7 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
  * bank 0 IOs are untouched.
  * \endif
  */
-static inline void rom_connect_internal_flash() {
+static inline void rom_connect_internal_flash(void) {
     rom_connect_internal_flash_fn func = (rom_connect_internal_flash_fn) rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
     func();
 }
@@ -305,7 +305,7 @@ static inline void rom_connect_internal_flash() {
  * device from its XIP state to a serial command state.
  * \endif
  */
-static inline void rom_flash_exit_xip() {
+static inline void rom_flash_exit_xip(void) {
     rom_flash_exit_xip_fn func = (rom_flash_exit_xip_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
     func();
 }
@@ -388,7 +388,7 @@ static inline void rom_flash_range_program(uint32_t addr, const uint8_t *data, s
  * No other operations are performed.
  * \endif
  */
-static inline void rom_flash_flush_cache() {
+static inline void rom_flash_flush_cache(void) {
     rom_flash_flush_cache_fn func = (rom_flash_flush_cache_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     func();
 }
@@ -404,7 +404,7 @@ static inline void rom_flash_flush_cache() {
  * Note that the same setup is performed by flash_exit_xip(), and the RP2350 flash program/erase functions do not leave XIP in an
  * inaccessible state, so calls to this function are largely redundant on RP2350. It is provided on RP2350 for compatibility with RP2040.
  */
-static inline void rom_flash_enter_cmd_xip() {
+static inline void rom_flash_enter_cmd_xip(void) {
     rom_flash_enter_cmd_xip_fn func = (rom_flash_enter_cmd_xip_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_ENTER_CMD_XIP);
     func();
 }
