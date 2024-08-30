@@ -1,7 +1,22 @@
 PROJECT(pico_float_test)
 
-# todo revist this test for
-if (NOT PICO_RISCV)
+
+if (PICO_RISCV)
+
+    # Separate, simpler test: currently we only have a few single-precision
+    # routines for RISC-V soft float (and the other tests are a bit
+    # AEABI-dependent)
+    add_executable(pico_float_test
+        pico_float_test_hazard3.c
+        )
+    target_link_libraries(pico_float_test PRIVATE pico_float pico_stdlib)
+    target_include_directories(pico_float_test PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+    pico_add_extra_outputs(pico_float_test)
+
+    # pico_enable_stdio_usb(pico_float_test 1)
+    # pico_enable_stdio_uart(pico_float_test 0)
+
+else ()
     add_executable(pico_float_test
             pico_float_test.c
             llvm/call_apsr.S
