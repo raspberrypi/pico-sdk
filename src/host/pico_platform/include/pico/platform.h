@@ -47,7 +47,7 @@ extern void tight_loop_contents();
 #define __STRING(x) #x
 #endif
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || defined(__clang__)
 #ifndef __noreturn
 #define __noreturn __attribute((noreturn))
 #endif
