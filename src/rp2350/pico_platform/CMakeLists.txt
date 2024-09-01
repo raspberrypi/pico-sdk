@@ -29,6 +29,9 @@ if (NOT TARGET pico_platform)
             hardware_dcp
             hardware_rcp
     )
+    if (PICO_RISCV)
+        pico_mirrored_target_link_libraries(pico_platform INTERFACE hardware_hazard3)
+    endif()
 endif()
 
 function(pico_add_platform_library TARGET)
