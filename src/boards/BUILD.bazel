@@ -18,6 +18,7 @@ BOARD_CHOICES = [
     "arduino_nano_rp2040_connect",
     "cytron_maker_pi_rp2040",
     "datanoisetv_rp2040_dsp",
+    "datanoisetv_rp2350_dsp",
     "defcon32_badge",
     "eetree_gamekit_rp2040",
     "garatronic_pybstick26_rp2040",

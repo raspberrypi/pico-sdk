@@ -370,7 +370,7 @@ static inline void sm_config_set_in_pin_base(pio_sm_config *c, uint in_base) {
 #endif
 }
 
-/*! \brief Set the base fpr the 'in' pins in a state machine configuration
+/*! \brief Set the base for the 'in' pins in a state machine configuration
  *  \ingroup sm_config
  *
  * 'in' pins can overlap with the 'out', 'set' and 'sideset' pins

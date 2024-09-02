@@ -53,6 +53,10 @@ extern "C" {
 #define hazard3_irqarray_clear(csr, index, data) static_assert(false, "Not supported: Xh3irq extension")
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 #endif
