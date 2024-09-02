@@ -6,10 +6,11 @@
 
 #include "pico/asm_helper.S"
 #include "pico/bootrom.h"
+#include "pico/runtime_init.h"
 
 pico_default_asm_setup
 
-__pre_init __aeabi_mem_init, 00001
+PICO_RUNTIME_INIT_FUNC_RUNTIME(__aeabi_mem_init, PICO_RUNTIME_INIT_AEABI_MEM_OPS)
 
 .macro mem_section name
 #if PICO_MEM_IN_RAM

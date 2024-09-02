@@ -31,12 +31,12 @@
 // version 2.2 of Bison.
 
 /**
- ** \file pico_sdk/tools/pioasm/gen/location.h
+ ** \file tools/pioasm/gen/location.h
  ** Define the yy::location class.
  */
 
-#ifndef YY_YY_HOME_GRAHAM_DEV_MU_PICO_SDK_TOOLS_PIOASM_GEN_LOCATION_H_INCLUDED
-# define YY_YY_HOME_GRAHAM_DEV_MU_PICO_SDK_TOOLS_PIOASM_GEN_LOCATION_H_INCLUDED
+#ifndef YY_YY_HOME_GRAHAM_DEV_AMY_AMY_SDK_TOOLS_PIOASM_GEN_LOCATION_H_INCLUDED
+# define YY_YY_HOME_GRAHAM_DEV_AMY_AMY_SDK_TOOLS_PIOASM_GEN_LOCATION_H_INCLUDED
 
 # include <iostream>
 # include <string>
@@ -299,4 +299,4 @@ namespace yy {
 
 } // yy
 
-#endif // !YY_YY_HOME_GRAHAM_DEV_MU_PICO_SDK_TOOLS_PIOASM_GEN_LOCATION_H_INCLUDED
+#endif // !YY_YY_HOME_GRAHAM_DEV_AMY_AMY_SDK_TOOLS_PIOASM_GEN_LOCATION_H_INCLUDED

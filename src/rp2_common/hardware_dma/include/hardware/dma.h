@@ -11,6 +11,7 @@
 #include "hardware/structs/dma.h"
 #include "hardware/regs/dreq.h"
 #include "pico/assert.h"
+#include "hardware/regs/intctrl.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,9 +22,9 @@ extern "C" {
  *
  * \brief DMA Controller API
  *
- * The RP2040 Direct Memory Access (DMA) master performs bulk data transfers on a processor’s
+ * The RP-series microcontroller Direct Memory Access (DMA) master performs bulk data transfers on a processor’s
  * behalf. This leaves processors free to attend to other tasks, or enter low-power sleep states. The
- * data throughput of the DMA is also significantly higher than one of RP2040’s processors.
+ * data throughput of the DMA is also significantly higher than one of RP-series microcontroller’s processors.
  *
  * The DMA can perform one read access and one write access, up to 32 bits in size, every clock cycle.
  * There are 12 independent channels, which each supervise a sequence of bus transfers, usually in
@@ -34,20 +35,29 @@ extern "C" {
  * * Memory to memory
  */
 
-// these are not defined in generated dreq.h
-#define DREQ_DMA_TIMER0 DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0
-#define DREQ_DMA_TIMER1 DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1
-#define DREQ_DMA_TIMER2 DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2
-#define DREQ_DMA_TIMER3 DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3
-#define DREQ_FORCE      DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_DMA, Enable/disable hardware_dma assertions, type=bool, default=0, group=hardware_dma
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_DMA
+#ifdef PARAM_ASSERTIONS_ENABLED_DMA // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_DMA PARAM_ASSERTIONS_ENABLED_DMA
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_DMA 0
+#endif
+#endif
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_DMA, Enable/disable DMA assertions, type=bool, default=0, group=hardware_dma
-#ifndef PARAM_ASSERTIONS_ENABLED_DMA
-#define PARAM_ASSERTIONS_ENABLED_DMA 0
+/**
+ * \def DMA_IRQ_NUM(n)
+ * \ingroup hardware_dma
+ * \hideinitializer
+ * \brief Returns the \ref irq_num_t for the nth DMA interrupt
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef DMA_IRQ_NUM
+#define DMA_IRQ_NUM(irq_index) (DMA_IRQ_0 + (irq_index))
 #endif
 
 static inline void check_dma_channel_param(__unused uint channel) {
-#if PARAM_ASSERTIONS_ENABLED(DMA)
+#if PARAM_ASSERTIONS_ENABLED(HARDWARE_DMA)
     // this method is used a lot by inline functions so avoid code bloat by deferring to function
     extern void check_dma_channel_param_impl(uint channel);
     check_dma_channel_param_impl(channel);
@@ -55,7 +65,7 @@ static inline void check_dma_channel_param(__unused uint channel) {
 }
 
 static inline void check_dma_timer_param(__unused uint timer_num) {
-    valid_params_if(DMA, timer_num < NUM_DMA_TIMERS);
+    valid_params_if(HARDWARE_DMA, timer_num < NUM_DMA_TIMERS);
 }
 
 inline static dma_channel_hw_t *dma_channel_hw_addr(uint channel) {
@@ -478,7 +488,7 @@ inline static void dma_channel_transfer_to_buffer_now(uint channel, volatile voi
  * \param chan_mask Bitmask of all the channels requiring starting. Channel 0 = bit 0, channel 1 = bit 1 etc.
  */
 static inline void dma_start_channel_mask(uint32_t chan_mask) {
-    valid_params_if(DMA, chan_mask && chan_mask < (1u << NUM_DMA_CHANNELS));
+    valid_params_if(HARDWARE_DMA, chan_mask && chan_mask < (1u << NUM_DMA_CHANNELS));
     dma_hw->multi_channel_trigger = chan_mask;
 }
 
@@ -496,10 +506,12 @@ static inline void dma_channel_start(uint channel) {
  *
  * Function will only return once the DMA has stopped.
  *
- * Note that due to errata RP2040-E13, aborting a channel which has transfers
+ * \if rp2040_specific
+ * RP2040 only: Note that due to errata RP2040-E13, aborting a channel which has transfers
  * in-flight (i.e. an individual read has taken place but the corresponding write has not), the ABORT
  * status bit will clear prematurely, and subsequently the in-flight
  * transfers will trigger a completion interrupt once they complete.
+ *\endif
  *
  * The effect of this is that you \em may see a spurious completion interrupt
  * on the channel as a result of calling this method.
@@ -521,6 +533,11 @@ static inline void dma_channel_start(uint channel) {
  *  // re-enable the channel on IRQ0
  *  dma_channel_set_irq0_enabled(channel, true);
  *\endcode
+ *
+ * \if rp2350_specific
+ * RP2350 only: Due to errata RP12350-E5 (see the RP2350 datasheet for further detail), it is necessary to clear the enable bit of
+ * the aborted channel and any chained channels prior to the abort to prevent re-triggering.
+ * \endif
  *
  * \param channel DMA channel
  */
@@ -598,12 +615,12 @@ static inline void dma_set_irq1_channel_mask_enabled(uint32_t channel_mask, bool
  * \param enabled true to enable interrupt via irq_index for specified channel, false to disable.
  */
 static inline void dma_irqn_set_channel_enabled(uint irq_index, uint channel, bool enabled) {
-    invalid_params_if(DMA, irq_index > 1);
-    if (irq_index) {
-        dma_channel_set_irq1_enabled(channel, enabled);
-    } else {
-        dma_channel_set_irq0_enabled(channel, enabled);
-    }
+    invalid_params_if(HARDWARE_DMA, irq_index >= NUM_DMA_IRQS);
+
+    if (enabled)
+        hw_set_bits(&dma_hw->irq_ctrl[irq_index].inte, 1u << channel);
+    else
+        hw_clear_bits(&dma_hw->irq_ctrl[irq_index].inte, 1u << channel);
 }
 
 /*! \brief  Enable multiple DMA channels' interrupt via either DMA_IRQ_0 or DMA_IRQ_1
@@ -614,11 +631,11 @@ static inline void dma_irqn_set_channel_enabled(uint irq_index, uint channel, bo
  * \param enabled true to enable all the interrupts specified in the mask, false to disable all the interrupts specified in the mask.
  */
 static inline void dma_irqn_set_channel_mask_enabled(uint irq_index, uint32_t channel_mask,  bool enabled) {
-    invalid_params_if(DMA, irq_index > 1);
-    if (irq_index) {
-        dma_set_irq1_channel_mask_enabled(channel_mask, enabled);
+    invalid_params_if(HARDWARE_DMA, irq_index >= NUM_DMA_IRQS);
+    if (enabled) {
+        hw_set_bits(&dma_hw->irq_ctrl[irq_index].inte, channel_mask);
     } else {
-        dma_set_irq0_channel_mask_enabled(channel_mask, enabled);
+        hw_clear_bits(&dma_hw->irq_ctrl[irq_index].inte, channel_mask);
     }
 }
 
@@ -652,9 +669,9 @@ static inline bool dma_channel_get_irq1_status(uint channel) {
  * \return true if the channel is a cause of the DMA_IRQ_N, false otherwise
  */
 static inline bool dma_irqn_get_channel_status(uint irq_index, uint channel) {
-    invalid_params_if(DMA, irq_index > 1);
+    invalid_params_if(HARDWARE_DMA, irq_index >= NUM_DMA_IRQS);
     check_dma_channel_param(channel);
-    return (irq_index ? dma_hw->ints1 : dma_hw->ints0) & (1u << channel);
+    return dma_hw->irq_ctrl[irq_index].ints & (1u << channel);
 }
 
 /*! \brief  Acknowledge a channel IRQ, resetting it as the cause of DMA_IRQ_0
@@ -684,12 +701,9 @@ static inline void dma_channel_acknowledge_irq1(uint channel) {
  * \param channel DMA channel
  */
 static inline void dma_irqn_acknowledge_channel(uint irq_index, uint channel) {
-    invalid_params_if(DMA, irq_index > 1);
+    invalid_params_if(HARDWARE_DMA, irq_index >= NUM_DMA_IRQS);
     check_dma_channel_param(channel);
-    if (irq_index)
-        dma_hw->ints1 = 1u << channel;
-    else
-        dma_hw->ints0 = 1u << channel;
+    dma_hw->irq_ctrl[irq_index].ints = 1u << channel;
 }
 
 /*! \brief  Check if DMA channel is busy
@@ -700,7 +714,7 @@ static inline void dma_irqn_acknowledge_channel(uint irq_index, uint channel) {
  */
 inline static bool dma_channel_is_busy(uint channel) {
     check_dma_channel_param(channel);
-    return !!(dma_hw->ch[channel].al1_ctrl & DMA_CH0_CTRL_TRIG_BUSY_BITS);
+    return dma_hw->ch[channel].al1_ctrl & DMA_CH0_CTRL_TRIG_BUSY_BITS;
 }
 
 /*! \brief  Wait for a DMA channel transfer to complete
@@ -710,7 +724,7 @@ inline static bool dma_channel_is_busy(uint channel) {
  */
 inline static void dma_channel_wait_for_finish_blocking(uint channel) {
     while (dma_channel_is_busy(channel)) tight_loop_contents();
-    // stop the compiler hoisting a non volatile buffer access above the DMA completion.
+    // stop the compiler hoisting a non-volatile buffer access above the DMA completion.
     __compiler_memory_barrier();
 }
 
@@ -863,11 +877,12 @@ int dma_claim_unused_timer(bool required);
  */
 bool dma_timer_is_claimed(uint timer);
 
-/*! \brief Set the divider for the given DMA timer
+/*! \brief Set the multiplier for the given DMA timer
  *  \ingroup hardware_dma
  *
  * The timer will run at the system_clock_freq * numerator / denominator, so this is the speed
- * that data elements will be transferred at via a DMA channel using this timer as a DREQ
+ * that data elements will be transferred at via a DMA channel using this timer as a DREQ. The
+ * multiplier must be less than or equal to one.
  *
  * \param timer the dma timer
  * \param numerator the fraction's numerator
@@ -875,6 +890,7 @@ bool dma_timer_is_claimed(uint timer);
  */
 static inline void dma_timer_set_fraction(uint timer, uint16_t numerator, uint16_t denominator) {
     check_dma_timer_param(timer);
+    invalid_params_if(HARDWARE_DMA, numerator > denominator);
     dma_hw->timer[timer] = (((uint32_t)numerator) << DMA_TIMER0_X_LSB) | (((uint32_t)denominator) << DMA_TIMER0_Y_LSB);
 }
 
@@ -889,6 +905,17 @@ static inline uint dma_get_timer_dreq(uint timer_num) {
     static_assert(DREQ_DMA_TIMER3 == DREQ_DMA_TIMER0 + 3, "");
     check_dma_timer_param(timer_num);
     return DREQ_DMA_TIMER0 + timer_num;
+}
+
+/*! \brief Return DMA_IRQ_<irqn>
+ *  \ingroup hardware_dma
+ *
+ * \param irq_index 0 the DMA irq index
+ * \return The \ref irq_num_to use for DMA
+ */
+static inline int dma_get_irq_num(uint irq_index) {
+    valid_params_if(HARDWARE_DMA, irq_index < NUM_DMA_IRQS);
+    return DMA_IRQ_NUM(irq_index);
 }
 
 /*! \brief Performs DMA channel cleanup after use

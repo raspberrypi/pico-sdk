@@ -9,13 +9,13 @@
 #include "hardware/spi.h"
 
 static inline void spi_reset(spi_inst_t *spi) {
-    invalid_params_if(SPI, spi != spi0 && spi != spi1);
-    reset_block(spi == spi0 ? RESETS_RESET_SPI0_BITS : RESETS_RESET_SPI1_BITS);
+    invalid_params_if(HARDWARE_SPI, spi != spi0 && spi != spi1);
+    reset_block_num(spi == spi0 ? RESET_SPI0 : RESET_SPI1);
 }
 
 static inline void spi_unreset(spi_inst_t *spi) {
-    invalid_params_if(SPI, spi != spi0 && spi != spi1);
-    unreset_block_wait(spi == spi0 ? RESETS_RESET_SPI0_BITS : RESETS_RESET_SPI1_BITS);
+    invalid_params_if(HARDWARE_SPI, spi != spi0 && spi != spi1);
+    unreset_block_num_wait_blocking(spi == spi0 ? RESET_SPI0 : RESET_SPI1);
 }
 
 uint spi_init(spi_inst_t *spi, uint baudrate) {
@@ -42,7 +42,7 @@ void spi_deinit(spi_inst_t *spi) {
 uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
     uint freq_in = clock_get_hz(clk_peri);
     uint prescale, postdiv;
-    invalid_params_if(SPI, baudrate > freq_in);
+    invalid_params_if(HARDWARE_SPI, baudrate > freq_in);
 
     // Disable the SPI
     uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
@@ -51,10 +51,10 @@ uint spi_set_baudrate(spi_inst_t *spi, uint baudrate) {
     // Find smallest prescale value which puts output frequency in range of
     // post-divide. Prescale is an even number from 2 to 254 inclusive.
     for (prescale = 2; prescale <= 254; prescale += 2) {
-        if (freq_in < (prescale + 2) * 256 * (uint64_t) baudrate)
+        if (freq_in < prescale * 256 * (uint64_t) baudrate)
             break;
     }
-    invalid_params_if(SPI, prescale > 254); // Frequency too low
+    invalid_params_if(HARDWARE_SPI, prescale > 254); // Frequency too low
 
     // Find largest post-divide which makes output <= baudrate. Post-divide is
     // an integer in the range 1 to 256 inclusive.
@@ -82,7 +82,7 @@ uint spi_get_baudrate(const spi_inst_t *spi) {
 // Write len bytes from src to SPI. Simultaneously read len bytes from SPI to dst.
 // Note this function is guaranteed to exit in a known amount of time (bits sent * time per bit)
 int __not_in_flash_func(spi_write_read_blocking)(spi_inst_t *spi, const uint8_t *src, uint8_t *dst, size_t len) {
-    invalid_params_if(SPI, 0 > (int)len);
+    invalid_params_if(HARDWARE_SPI, 0 > (int)len);
 
     // Never have more transfers in flight than will fit into the RX FIFO,
     // else FIFO will overflow if this code is heavily interrupted.
@@ -105,7 +105,7 @@ int __not_in_flash_func(spi_write_read_blocking)(spi_inst_t *spi, const uint8_t 
 
 // Write len bytes directly from src to the SPI, and discard any data received back
 int __not_in_flash_func(spi_write_blocking)(spi_inst_t *spi, const uint8_t *src, size_t len) {
-    invalid_params_if(SPI, 0 > (int)len);
+    invalid_params_if(HARDWARE_SPI, 0 > (int)len);
     // Write to TX FIFO whilst ignoring RX, then clean up afterward. When RX
     // is full, PL022 inhibits RX pushes, and sets a sticky flag on
     // push-on-full, but continues shifting. Safe if SSPIMSC_RORIM is not set.
@@ -134,7 +134,7 @@ int __not_in_flash_func(spi_write_blocking)(spi_inst_t *spi, const uint8_t *src,
 // Generally this can be 0, but some devices require a specific value here,
 // e.g. SD cards expect 0xff
 int __not_in_flash_func(spi_read_blocking)(spi_inst_t *spi, uint8_t repeated_tx_data, uint8_t *dst, size_t len) {
-    invalid_params_if(SPI, 0 > (int)len);
+    invalid_params_if(HARDWARE_SPI, 0 > (int)len);
     const size_t fifo_depth = 8;
     size_t rx_remaining = len, tx_remaining = len;
 
@@ -154,7 +154,7 @@ int __not_in_flash_func(spi_read_blocking)(spi_inst_t *spi, uint8_t repeated_tx_
 
 // Write len halfwords from src to SPI. Simultaneously read len halfwords from SPI to dst.
 int __not_in_flash_func(spi_write16_read16_blocking)(spi_inst_t *spi, const uint16_t *src, uint16_t *dst, size_t len) {
-    invalid_params_if(SPI, 0 > (int)len);
+    invalid_params_if(HARDWARE_SPI, 0 > (int)len);
     // Never have more transfers in flight than will fit into the RX FIFO,
     // else FIFO will overflow if this code is heavily interrupted.
     const size_t fifo_depth = 8;
@@ -176,7 +176,7 @@ int __not_in_flash_func(spi_write16_read16_blocking)(spi_inst_t *spi, const uint
 
 // Write len bytes directly from src to the SPI, and discard any data received back
 int __not_in_flash_func(spi_write16_blocking)(spi_inst_t *spi, const uint16_t *src, size_t len) {
-    invalid_params_if(SPI, 0 > (int)len);
+    invalid_params_if(HARDWARE_SPI, 0 > (int)len);
     // Deliberately overflow FIFO, then clean up afterward, to minimise amount
     // of APB polling required per halfword
     for (size_t i = 0; i < len; ++i) {
@@ -201,7 +201,7 @@ int __not_in_flash_func(spi_write16_blocking)(spi_inst_t *spi, const uint16_t *s
 // Read len halfwords directly from the SPI to dst.
 // repeated_tx_data is output repeatedly on SO as data is read in from SI.
 int __not_in_flash_func(spi_read16_blocking)(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *dst, size_t len) {
-    invalid_params_if(SPI, 0 > (int)len);
+    invalid_params_if(HARDWARE_SPI, 0 > (int)len);
     const size_t fifo_depth = 8;
     size_t rx_remaining = len, tx_remaining = len;
 

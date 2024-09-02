@@ -1,0 +1,44 @@
+load("//bazel:defs.bzl", "compatible_with_config", "compatible_with_rp2", "incompatible_with_config")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_multicore",
+    actual = select({
+        "//bazel/constraint:pico_multicore_enabled": ":pico_multicore_enabled",
+        "//conditions:default": ":pico_multicore_disabled",
+    }),
+)
+
+cc_library(
+    name = "pico_multicore_enabled",
+    srcs = ["multicore.c"],
+    hdrs = ["include/pico/multicore.h"],
+    defines = ["LIB_PICO_MULTICORE=1"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2() + compatible_with_config("//bazel/constraint:pico_multicore_enabled"),
+    deps = [
+        "//src/common/hardware_claim",
+        "//src/common/pico_sync",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/pico_runtime",
+    ],
+)
+
+# Stub library that does NOT link in multicore support libs.
+cc_library(
+    name = "pico_multicore_disabled",
+    hdrs = ["include/pico/multicore.h"],
+    defines = ["LIB_PICO_MULTICORE=0"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config("//bazel/constraint:pico_multicore_enabled"),
+    deps = [
+        "//src/common/pico_sync",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
+    ],
+)

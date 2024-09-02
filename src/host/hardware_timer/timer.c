@@ -99,7 +99,7 @@ void hardware_alarm_unclaim(uint alarm_num) {
 
 int hardware_alarm_claim_unused(bool required) {
     int alarm_id = claimed_alarms ? __builtin_clz(~claimed_alarms) : 1;
-    if (alarm_id >= NUM_TIMERS) return -1;
+    if (alarm_id >= NUM_ALARMS) return -1;
     claimed_alarms |= 1u << alarm_id;
     return alarm_id;
 }

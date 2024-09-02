@@ -1,0 +1,127 @@
+load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_STRING, SDK version string, type=string, default=Current SDK version string, group=pico_base
+PICO_SDK_VERSION_STRING = module_version() if module_version() != None else "0.0.1-WORKSPACE"
+
+_version_parts = PICO_SDK_VERSION_STRING.split(".")
+
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_MAJOR, SDK major version number, type=int, default=Current SDK major version, group=pico_base
+PICO_SDK_VERSION_MAJOR = int(_version_parts[0])
+
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_MINOR, SDK minor version number, type=int, default=Current SDK minor version, group=pico_base
+PICO_SDK_VERSION_MINOR = int(_version_parts[1])
+
+_revision_parts = _version_parts[2].split("-")
+
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_REVISION, SDK version revision, type=int, default=Current SDK revision, group=pico_base
+PICO_SDK_VERSION_REVISION = int(_revision_parts[0])
+
+# PICO_BAZEL_CONFIG: PICO_SDK_VERSION_PRE_RELEASE_ID, Optional SDK pre-release version identifier, default=Current SDK pre-release identifier, type=string, group=pico_base
+PICO_SDK_VERSION_PRE_RELEASE_ID = _revision_parts[1] if len(_revision_parts) > 1 else None
+
+run_binary(
+    name = "version_header",
+    srcs = ["include/pico/version.h.in"],
+    outs = ["generated_include/pico/version.h"],
+    args = [
+        "--version-string={}".format(PICO_SDK_VERSION_STRING),
+        "--template=$(location include/pico/version.h.in)",
+        "--output=$(location generated_include/pico/version.h)",
+    ],
+    tool = "//bazel:generate_version_header",
+    visibility = ["//visibility:private"],
+)
+
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_MAJOR, SDK major version number, type=int, default=Current SDK major version, group=pico_base
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_MINOR, SDK minor version number, type=int, default=Current SDK minor version, group=pico_base
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_REVISION, SDK version revision, type=int, default=Current SDK revision, group=pico_base
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_PRE_RELEASE_ID, Optional SDK pre-release version identifier, default=Current SDK pre-release identifier, type=string, group=pico_base
+# PICO_BUILD_DEFINE: PICO_SDK_VERSION_STRING, SDK version string, type=string, default=Current SDK version string, group=pico_base
+cc_library(
+    name = "version",
+    hdrs = ["generated_include/pico/version.h"],
+    defines = [
+        'PICO_SDK_VERSION_STRING=\\"{}\\"'.format(PICO_SDK_VERSION_STRING),
+        "PICO_SDK_VERSION_MAJOR={}".format(PICO_SDK_VERSION_MAJOR),
+        "PICO_SDK_VERSION_MINOR={}".format(PICO_SDK_VERSION_MINOR),
+        "PICO_SDK_VERSION_REVISION={}".format(PICO_SDK_VERSION_REVISION),
+    ] + [] if PICO_SDK_VERSION_PRE_RELEASE_ID == None else ['PICO_SDK_VERSION_PRE_RELEASE_ID=\\"{}\\"'.format(PICO_SDK_VERSION_PRE_RELEASE_ID)],
+    includes = ["generated_include"],
+)
+
+# PICO_BAZEL_CONFIG: PICO_NO_HARDWARE, Option as to whether the build is not targeting an RP2040 or RP2350 device, type=bool, default=1 when PICO_PLATFORM is host, 0 otherwise, group=build
+# PICO_BUILD_DEFINE: PICO_NO_HARDWARE, Whether the build is not targeting an RP2040 or RP2350 device, type=bool, default=1 when PICO_PLATFORM is host, 0 otherwise, group=build
+# PICO_BAZEL_CONFIG: PICO_ON_DEVICE, Option as to whether the build is targeting an RP2040 or RP2350 device, type=bool, default=0 when PICO_PLATFORM is host, 1 otherwise, group=build
+# PICO_BUILD_DEFINE: PICO_ON_DEVICE, Whether the build is targeting an RP2040 or RP2350 device, type=bool, default=0 when PICO_PLATFORM is host, 1 otherwise, group=build
+# PICO_BUILD is undocumented in CMake.
+cc_library(
+    name = "common_sdk_defines",
+    defines = select({
+        "//bazel/constraint:host": [
+            "PICO_ON_DEVICE=0",
+            "PICO_NO_HARDWARE=1",
+            "PICO_BUILD=1",
+        ],
+        "//conditions:default": [
+            "PICO_ON_DEVICE=1",
+            "PICO_NO_HARDWARE=0",
+            "PICO_BUILD=1",
+        ],
+    }) + select({
+        "//bazel/constraint:rp2040": ["PICO_RP2040=1"],
+        "//bazel/constraint:rp2350": ["PICO_RP2350=1"],
+        "//conditions:default": [],
+    }),
+)
+
+# While this provides the "pico.h" header, nearly everything should
+# instead depend on `//src/rp2_common:pico_platform` to get these headers. If
+# you try to depend on just `pico_base_headers`, you'll end up with missing
+# symbols.
+cc_library(
+    name = "pico_base_headers",
+    hdrs = [
+        "include/pico.h",
+        "include/pico/assert.h",
+        "include/pico/config.h",
+        "include/pico/error.h",
+        "include/pico/types.h",
+    ],
+    includes = ["include"],
+    visibility = [
+        "//src/common:__subpackages__",
+        "//src/host/hardware_sync:__pkg__",
+        "//src/host/hardware_timer:__pkg__",
+        "//src/host/pico_platform:__pkg__",
+        "//src/rp2040/boot_stage2:__pkg__",
+        "//src/rp2040/pico_platform:__pkg__",
+        "//src/rp2350/boot_stage2:__pkg__",
+        "//src/rp2350/pico_platform:__pkg__",
+        "//src/rp2_common/hardware_base:__pkg__",
+        "//src/rp2_common/hardware_boot_lock:__pkg__",
+        "//src/rp2_common/hardware_clocks:__pkg__",
+        "//src/rp2_common/hardware_gpio:__pkg__",
+        "//src/rp2_common/hardware_pll:__pkg__",
+        "//src/rp2_common/hardware_resets:__pkg__",
+        "//src/rp2_common/hardware_sync:__pkg__",
+        "//src/rp2_common/hardware_sync_spin_lock:__pkg__",
+        "//src/rp2_common/hardware_ticks:__pkg__",
+        "//src/rp2_common/hardware_timer:__pkg__",
+        "//src/rp2_common/hardware_watchdog:__pkg__",
+        "//src/rp2_common/hardware_xosc:__pkg__",
+        "//src/rp2_common/pico_crt0:__pkg__",
+        "//src/rp2_common/pico_printf:__pkg__",
+        "//src/rp2_common/pico_runtime:__pkg__",
+        "//src/rp2_common/pico_runtime_init:__pkg__",
+        "//src/rp2_common/pico_time_adapter:__pkg__",
+        "@picotool//:__subpackages__",
+    ],
+    deps = [
+        ":common_sdk_defines",
+        ":version",
+        "//bazel/config:PICO_CONFIG_HEADER",
+        "//src:pico_platform_internal",
+    ],
+)

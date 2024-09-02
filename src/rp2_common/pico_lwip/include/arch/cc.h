@@ -38,6 +38,10 @@
 #define PICO_LWIP_CUSTOM_LOCK_TCPIP_CORE 1
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if NO_SYS
 // todo really we should just not allow SYS_LIGHTWEIGHT_PROT for nosys mode (it doesn't do anything anyway)
 typedef int sys_prot_t;
@@ -90,4 +94,9 @@ void pico_lwip_custom_unlock_tcpip_core(void);
 // Use the pico_rand library which goes to reasonable lengths to try to provide good entropy
 #define LWIP_RAND() get_rand_32()
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __CC_H__ */

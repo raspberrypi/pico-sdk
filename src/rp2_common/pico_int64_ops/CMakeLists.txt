@@ -8,7 +8,11 @@ if (NOT TARGET pico_int64_ops)
 
     # add alias "default" which is just pico.
     add_library(pico_int64_ops_default INTERFACE)
-    target_link_libraries(pico_int64_ops_default INTERFACE pico_int64_ops_pico)
+    if (PICO_RP2040)
+        target_link_libraries(pico_int64_ops_default INTERFACE pico_int64_ops_pico)
+    else()
+        target_link_libraries(pico_int64_ops_default INTERFACE pico_int64_ops_compiler)
+    endif()
 
     set(PICO_DEFAULT_INT64_OPS_IMPL pico_int64_ops_default)
 
@@ -16,7 +20,7 @@ if (NOT TARGET pico_int64_ops)
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_INT64_OPS_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_INT64_OPS_IMPL>,${PICO_DEFAULT_INT64_OPS_IMPL}>)
 
     pico_add_library(pico_int64_ops_pico)
-    target_include_directories(pico_int64_ops_pico INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(pico_int64_ops_pico SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
     pico_mirrored_target_link_libraries(pico_int64_ops_pico INTERFACE pico_base)
 
     target_sources(pico_int64_ops_pico INTERFACE

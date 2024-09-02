@@ -23,6 +23,7 @@ void usage() {
         std::cerr << "                               " << f->get_description() << std::endl;
     }
     std::cerr << "  -p <output_param>    add a parameter to be passed to the output format generator" << std::endl;
+    std::cerr << "  -v <version>         specify the default PIO version (0 or 1)" << std::endl;
     std::cerr << "  -?, --help           print this help and exit\n";
 }
 
@@ -48,6 +49,18 @@ int main(int argc, char *argv[]) {
                 options.emplace_back(argv[i]);
             } else {
                 std::cerr << "error: -p requires parameter value" << std::endl;
+                res = 1;
+            }
+        } else if (argv[i] == std::string("-v")) {
+            if (++i < argc) {
+                if (argv[i] == std::string("0")) pioasm.default_pio_version = 0;
+                else if (argv[i] == std::string("1")) pioasm.default_pio_version = 1;
+                else {
+                    std::cerr << "error: unsupported PIO version '" <<  argv[i] << "'" << std::endl;
+                    res = 1;
+                }
+            } else {
+                std::cerr << "error: -v requires version number" << std::endl;
                 res = 1;
             }
         } else if (argv[i] == std::string("-?") || argv[i] == std::string("--help")) {

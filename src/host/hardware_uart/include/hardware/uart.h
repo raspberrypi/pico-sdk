@@ -9,8 +9,13 @@
 
 #include "pico.h"
 
-#ifndef PARAM_ASSERTIONS_ENABLED_UART
-#define PARAM_ASSERTIONS_ENABLED_UART 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_UART, Enable/disable assertions in the hardware_uart module, type=bool, default=0, group=hardware_uart
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_UART
+#ifdef PARAM_ASSERTIONS_ENABLED_UART // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_UART PARAM_ASSERTIONS_ENABLED_UART
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_UART 0
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -51,18 +56,18 @@ void uart_set_hw_flow(uart_inst_t *uart, bool cts, bool rts);
 void uart_set_format(uart_inst_t *uart, uint data_bits, uint stop_bits, uart_parity_t parity);
 
 // Enable the UART's interrupt output. Need to install an interrupt handler first.
-void uart_set_irq_enables(uart_inst_t *uart, bool rx_has_data, bool tx_needs_data);
+void uart_set_irqs_enabled(uart_inst_t *uart, bool rx_has_data, bool tx_needs_data);
 
 // ----------------------------------------------------------------------------
 // Generic input/output
 
 // If returns 0, no space is available in the UART to write more data.
 // If returns nonzero, at least that many bytes can be written without blocking.
-size_t uart_is_writable(uart_inst_t *uart);
+bool uart_is_writable(uart_inst_t *uart);
 
 // If returns 0, no data is available to be read from UART.
 // If returns nonzero, at least that many bytes can be written without blocking.
-size_t uart_is_readable(uart_inst_t *uart);
+bool uart_is_readable(uart_inst_t *uart);
 
 // Write len bytes directly from src to the UART
 void uart_write_blocking(uart_inst_t *uart, const uint8_t *src, size_t len);
@@ -75,6 +80,8 @@ void uart_read_blocking(uart_inst_t *uart, uint8_t *dst, size_t len);
 
 void uart_putc(uart_inst_t *uart, char c);
 
+void uart_putc_raw(uart_inst_t *uart, char c);
+
 void uart_puts(uart_inst_t *uart, const char *s);
 
 char uart_getc(uart_inst_t *uart);
@@ -83,6 +90,8 @@ char uart_getc(uart_inst_t *uart);
 void uart_set_break(uart_inst_t *uart, bool en);
 
 void uart_default_tx_wait_blocking();
+
+#define UART_FUNCSEL_NUM(uart, gpio) 0
 
 #ifdef __cplusplus
 }

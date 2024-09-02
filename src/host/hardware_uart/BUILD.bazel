@@ -1,0 +1,10 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_uart",
+    srcs = ["uart.c"],
+    hdrs = ["include/hardware/uart.h"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/host/pico_platform"],
+)

@@ -1,0 +1,28 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_sync_spin_lock_headers",
+    hdrs = ["include/hardware/sync/spin_lock.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = [
+        "//src/common/pico_sync:__pkg__",
+        "//src/rp2_common/hardware_sync:__pkg__",
+    ],
+    deps = [
+        "//src/common/pico_base_headers",
+    ],
+)
+
+cc_library(
+    name = "hardware_sync_spin_lock",
+    srcs = ["sync_spin_lock.c"],
+    deps = [
+        ":hardware_sync_spin_lock_headers",
+        "//src/common/pico_sync:pico_sync_headers",
+        "//src/rp2_common/hardware_sync:hardware_sync_headers",
+        "//src/rp2_common/pico_runtime_init",
+    ],
+)

@@ -17,16 +17,15 @@ if (EXISTS ${PICO_VFS_PATH}/tests)
 
     pico_register_common_scope_var(PICO_VFS_PATH)
 
-    set(BOARD pico_sdk)
-    set(FAMILY rp2040)
-
     pico_add_library(pico_filesystem_blockdevice_sd)
     target_sources(pico_filesystem_blockdevice_sd INTERFACE
         ${PICO_VFS_PATH}/src/blockdevice/sd.c)
     target_include_directories(pico_filesystem_blockdevice_sd INTERFACE
         ${PICO_VFS_PATH}/include)
     target_link_libraries(pico_filesystem_blockdevice_sd INTERFACE
-        hardware_spi)
+        hardware_spi
+        pico_sync
+        )
 
     pico_add_library(pico_filesystem_blockdevice_flash)
     target_sources(pico_filesystem_blockdevice_flash INTERFACE
@@ -34,8 +33,10 @@ if (EXISTS ${PICO_VFS_PATH}/tests)
     target_include_directories(pico_filesystem_blockdevice_flash INTERFACE
         ${PICO_VFS_PATH}/include)
     target_link_libraries(pico_filesystem_blockdevice_flash INTERFACE
+        hardware_exception
         hardware_flash
-        hardware_sync
+        pico_sync
+        pico_flash
         )
 
     pico_add_library(pico_filesystem_blockdevice_heap)
@@ -43,6 +44,7 @@ if (EXISTS ${PICO_VFS_PATH}/tests)
         ${PICO_VFS_PATH}/src/blockdevice/heap.c)
     target_include_directories(pico_filesystem_blockdevice_heap INTERFACE
         ${PICO_VFS_PATH}/include)
+    target_link_libraries(pico_filesystem_blockdevice_heap INTERFACE pico_sync)
 
     pico_add_library(pico_filesystem_filesystem_littlefs)
     target_sources(pico_filesystem_filesystem_littlefs INTERFACE
@@ -53,6 +55,7 @@ if (EXISTS ${PICO_VFS_PATH}/tests)
     target_include_directories(pico_filesystem_filesystem_littlefs INTERFACE
         ${PROJECT_SOURCE_DIR}/lib/littlefs)
     target_compile_options(pico_filesystem_filesystem_littlefs INTERFACE -Wno-unused-function -Wno-null-dereference)
+    target_link_libraries(pico_filesystem_filesystem_littlefs INTERFACE pico_sync)
 
     pico_add_library(pico_filesystem_filesystem_fat)
     target_sources(pico_filesystem_filesystem_fat INTERFACE
@@ -66,6 +69,7 @@ if (EXISTS ${PICO_VFS_PATH}/tests)
         ${PICO_VFS_PATH}/include/filesystem/ChaN
         ${PICO_VFS_PATH}/vendor/ff15/source
         )
+    target_link_libraries(pico_filesystem_filesystem_fat INTERFACE pico_sync)
 
     pico_add_library(pico_filesystem)
     target_sources(pico_filesystem INTERFACE
@@ -73,6 +77,10 @@ if (EXISTS ${PICO_VFS_PATH}/tests)
     target_include_directories(pico_filesystem INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/include
         ${PICO_VFS_PATH}/include)
+    target_link_libraries(pico_filesystem INTERFACE
+        pico_clib_interface
+        pico_sync
+        )
 
     pico_add_library(pico_filesystem_default)
     target_sources(pico_filesystem_default INTERFACE

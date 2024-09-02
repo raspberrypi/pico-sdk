@@ -342,9 +342,11 @@ double WRAPPER_FUNC(exp10)(double x) { check_nan_d1(x); return pow(10,x); }
 double WRAPPER_FUNC(log10)(double x) { check_nan_d1(x); return log(x)*LOG10E; }
 
 // todo these are marked as lofi
-double WRAPPER_FUNC(expm1(double x) { check_nan_d1(x); return exp)(x)-1; }
-double WRAPPER_FUNC(log1p(double x) { check_nan_d1(x); return log)(1+x); }
+double WRAPPER_FUNC(expm1)(double x) { check_nan_d1(x); return exp(x)-1; }
+double WRAPPER_FUNC(log1p)(double x) { check_nan_d1(x); return log(1+x); }
+#if !HAS_DOUBLE_COPROCESSOR
 double WRAPPER_FUNC(fma)(double x,double y,double z) { check_nan_d1(x); return x*y+z; }
+#endif
 
 // general power, x>0, finite
 static double dpow_1(double x,double y) {

@@ -1,0 +1,11 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_divider",
+    srcs = ["divider.c"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = [
+        "//src/common/pico_divider_headers",
+        "//src/host/hardware_divider",
+    ],
+)

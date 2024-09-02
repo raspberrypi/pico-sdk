@@ -21,20 +21,23 @@ if (NOT TARGET pico_bit_ops)
 
     target_link_libraries(pico_bit_ops_pico INTERFACE pico_bootrom pico_bit_ops_headers)
 
-    # gcc
-    pico_wrap_function(pico_bit_ops_pico __clzsi2)
-    pico_wrap_function(pico_bit_ops_pico __clzsi2)
-    pico_wrap_function(pico_bit_ops_pico __clzdi2)
-    pico_wrap_function(pico_bit_ops_pico __ctzsi2)
-    pico_wrap_function(pico_bit_ops_pico __ctzdi2)
-    pico_wrap_function(pico_bit_ops_pico __popcountsi2)
-    pico_wrap_function(pico_bit_ops_pico __popcountdi2)
+    if (NOT PICO_RP2350)
+        # gcc
+        pico_wrap_function(pico_bit_ops_pico __clzsi2)
+        pico_wrap_function(pico_bit_ops_pico __clzsi2)
+        pico_wrap_function(pico_bit_ops_pico __clzdi2)
+        pico_wrap_function(pico_bit_ops_pico __ctzsi2)
+        pico_wrap_function(pico_bit_ops_pico __popcountsi2)
+        pico_wrap_function(pico_bit_ops_pico __popcountdi2)
 
-    # armclang
-    pico_wrap_function(pico_bit_ops_pico __clz)
-    pico_wrap_function(pico_bit_ops_pico __clzl)
-    pico_wrap_function(pico_bit_ops_pico __clzsi2)
-    pico_wrap_function(pico_bit_ops_pico __clzll)
+        # armclang
+        pico_wrap_function(pico_bit_ops_pico __clz)
+        pico_wrap_function(pico_bit_ops_pico __clzl)
+        pico_wrap_function(pico_bit_ops_pico __clzsi2)
+        pico_wrap_function(pico_bit_ops_pico __clzll)
+    endif()
+    # this is overridden for RP2350 since GCCs impl is bad for both ARM and RISC-V
+    pico_wrap_function(pico_bit_ops_pico __ctzdi2)
 
     macro(pico_set_bit_ops_implementation TARGET IMPL)
         get_target_property(target_type ${TARGET} TYPE)

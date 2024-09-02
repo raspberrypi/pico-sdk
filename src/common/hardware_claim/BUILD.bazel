@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_claim",
+    srcs = ["claim.c"],
+    hdrs = ["include/hardware/claim.h"],
+    includes = ["include"],
+    deps = [
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/hardware_sync",
+        ],
+        "//conditions:default": [
+            "//src:pico_platform_internal",
+            "//src/rp2_common/hardware_sync:hardware_sync_headers",
+            "//src/rp2_common/hardware_sync_spin_lock",
+        ],
+    }),
+)

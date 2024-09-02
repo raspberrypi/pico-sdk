@@ -37,7 +37,11 @@
 #endif
 
 #ifndef USBD_PID
-#define USBD_PID (0x000a) // Raspberry Pi Pico SDK CDC
+#if PICO_RP2040
+#define USBD_PID (0x000a) // Raspberry Pi Pico SDK CDC for RP2040
+#else
+#define USBD_PID (0x0009) // Raspberry Pi Pico SDK CDC
+#endif
 #endif
 
 #ifndef USBD_MANUFACTURER
@@ -88,7 +92,7 @@
 static const tusb_desc_device_t usbd_desc_device = {
     .bLength = sizeof(tusb_desc_device_t),
     .bDescriptorType = TUSB_DESC_DEVICE,
-    .bcdUSB = 0x0200,
+    .bcdUSB = 0x0210,
     .bDeviceClass = TUSB_CLASS_MISC,
     .bDeviceSubClass = MISC_SUBCLASS_COMMON,
     .bDeviceProtocol = MISC_PROTOCOL_IAD,

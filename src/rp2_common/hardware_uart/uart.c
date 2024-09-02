@@ -11,6 +11,11 @@
 #include "hardware/structs/uart.h"
 #include "hardware/resets.h"
 #include "hardware/clocks.h"
+
+static inline uint32_t uart_clock_get_hz(__unused uart_inst_t *inst) {
+    return clock_get_hz(UART_CLOCK_NUM(inst));
+}
+
 #include "hardware/timer.h"
 
 #include "pico/assert.h"
@@ -25,21 +30,19 @@ short uart_char_to_line_feed[NUM_UARTS];
 
 /// \tag::uart_reset[]
 static inline void uart_reset(uart_inst_t *uart) {
-    invalid_params_if(UART, uart != uart0 && uart != uart1);
-    reset_block(uart_get_index(uart) ? RESETS_RESET_UART1_BITS : RESETS_RESET_UART0_BITS);
+    reset_block_num(uart_get_reset_num(uart));
 }
 
 static inline void uart_unreset(uart_inst_t *uart) {
-    invalid_params_if(UART, uart != uart0 && uart != uart1);
-    unreset_block_wait(uart_get_index(uart) ? RESETS_RESET_UART1_BITS : RESETS_RESET_UART0_BITS);
+    unreset_block_num_wait_blocking(uart_get_reset_num(uart));
 }
 /// \end::uart_reset[]
 
 /// \tag::uart_init[]
 uint uart_init(uart_inst_t *uart, uint baudrate) {
-    invalid_params_if(UART, uart != uart0 && uart != uart1);
+    invalid_params_if(HARDWARE_UART, uart != uart0 && uart != uart1);
 
-    if (clock_get_hz(clk_peri) == 0) {
+    if (uart_clock_get_hz(uart) == 0) {
         return 0;
     }
 
@@ -80,15 +83,17 @@ uint uart_init(uart_inst_t *uart, uint baudrate) {
 
     // Enable the UART, both TX and RX
     uart_get_hw(uart)->cr = UART_UARTCR_UARTEN_BITS | UART_UARTCR_TXE_BITS | UART_UARTCR_RXE_BITS;
+#if !PICO_UART_NO_DMACR_ENABLE
     // Always enable DREQ signals -- no harm in this if DMA is not listening
     uart_get_hw(uart)->dmacr = UART_UARTDMACR_TXDMAE_BITS | UART_UARTDMACR_RXDMAE_BITS;
+#endif
 
     return baud;
 }
 /// \end::uart_init[]
 
 void uart_deinit(uart_inst_t *uart) {
-    invalid_params_if(UART, uart != uart0 && uart != uart1);
+    invalid_params_if(HARDWARE_UART, uart != uart0 && uart != uart1);
     uart_reset(uart);
 }
 
@@ -127,7 +132,7 @@ static uint32_t uart_disable_before_lcr_write(uart_inst_t *uart) {
         uint32_t brdiv_ratio = 64u * current_ibrd + current_fbrd;
         brdiv_ratio <<= 10;
         // 3662 is ~(15 * 244.14) where 244.14 is 16e6 / 2^16
-        uint32_t scaled_freq = clock_get_hz(clk_peri) / 3662ul;
+        uint32_t scaled_freq = uart_clock_get_hz(uart) / 3662ul;
         uint32_t wait_time_us = brdiv_ratio / scaled_freq;
         busy_wait_us(wait_time_us);
     }
@@ -136,7 +141,7 @@ static uint32_t uart_disable_before_lcr_write(uart_inst_t *uart) {
 }
 
 static void uart_write_lcr_bits_masked(uart_inst_t *uart, uint32_t values, uint32_t write_mask) {
-    invalid_params_if(UART, uart != uart0 && uart != uart1);
+    invalid_params_if(HARDWARE_UART, uart != uart0 && uart != uart1);
 
     // (Potentially) Cleanly handle disabling the UART before touching LCR
     uint32_t cr_save = uart_disable_before_lcr_write(uart);
@@ -148,8 +153,8 @@ static void uart_write_lcr_bits_masked(uart_inst_t *uart, uint32_t values, uint3
 
 /// \tag::uart_set_baudrate[]
 uint uart_set_baudrate(uart_inst_t *uart, uint baudrate) {
-    invalid_params_if(UART, baudrate == 0);
-    uint32_t baud_rate_div = (8 * clock_get_hz(clk_peri) / baudrate);
+    invalid_params_if(HARDWARE_UART, baudrate == 0);
+    uint32_t baud_rate_div = (8 * uart_clock_get_hz(uart) / baudrate) + 1;
     uint32_t baud_ibrd = baud_rate_div >> 7;
     uint32_t baud_fbrd;
 
@@ -160,7 +165,7 @@ uint uart_set_baudrate(uart_inst_t *uart, uint baudrate) {
         baud_ibrd = 65535;
         baud_fbrd = 0;
     }  else {
-        baud_fbrd = ((baud_rate_div & 0x7f) + 1) / 2;
+        baud_fbrd = (baud_rate_div & 0x7f) >> 1;
     }
 
     uart_get_hw(uart)->ibrd = baud_ibrd;
@@ -171,14 +176,14 @@ uint uart_set_baudrate(uart_inst_t *uart, uint baudrate) {
     uart_write_lcr_bits_masked(uart, 0, 0);
 
     // See datasheet
-    return (4 * clock_get_hz(clk_peri)) / (64 * baud_ibrd + baud_fbrd);
+    return (4 * uart_clock_get_hz(uart)) / (64 * baud_ibrd + baud_fbrd);
 }
 /// \end::uart_set_baudrate[]
 
 void uart_set_format(uart_inst_t *uart, uint data_bits, uint stop_bits, uart_parity_t parity) {
-    invalid_params_if(UART, data_bits < 5 || data_bits > 8);
-    invalid_params_if(UART, stop_bits != 1 && stop_bits != 2);
-    invalid_params_if(UART, parity != UART_PARITY_NONE && parity != UART_PARITY_EVEN && parity != UART_PARITY_ODD);
+    invalid_params_if(HARDWARE_UART, data_bits < 5 || data_bits > 8);
+    invalid_params_if(HARDWARE_UART, stop_bits != 1 && stop_bits != 2);
+    invalid_params_if(HARDWARE_UART, parity != UART_PARITY_NONE && parity != UART_PARITY_EVEN && parity != UART_PARITY_ODD);
 
     uart_write_lcr_bits_masked(uart,
         ((data_bits - 5u) << UART_UARTLCR_H_WLEN_LSB) |

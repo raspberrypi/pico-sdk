@@ -32,7 +32,7 @@
 
 
 /**
- ** \file pico_sdk/tools/pioasm/gen/parser.hpp
+ ** \file tools/pioasm/gen/parser.hpp
  ** Define the yy::parser class.
  */
 
@@ -42,8 +42,8 @@
 // especially those whose name start with YY_ or yy_.  They are
 // private implementation details that can be changed or removed.
 
-#ifndef YY_YY_HOME_GRAHAM_DEV_MU_PICO_SDK_TOOLS_PIOASM_GEN_PARSER_HPP_INCLUDED
-# define YY_YY_HOME_GRAHAM_DEV_MU_PICO_SDK_TOOLS_PIOASM_GEN_PARSER_HPP_INCLUDED
+#ifndef YY_YY_HOME_GRAHAM_DEV_AMY_AMY_SDK_TOOLS_PIOASM_GEN_PARSER_HPP_INCLUDED
+# define YY_YY_HOME_GRAHAM_DEV_AMY_AMY_SDK_TOOLS_PIOASM_GEN_PARSER_HPP_INCLUDED
 // "%code requires" blocks.
 
   #include <string>
@@ -380,6 +380,8 @@ namespace yy {
     /// An auxiliary type to compute the largest semantic type.
     union union_type
     {
+      // direction
+      // autop
       // if_full
       // if_empty
       // blocking
@@ -388,40 +390,47 @@ namespace yy {
       // condition
       char dummy2[sizeof (enum condition)];
 
+      // fifo_config
+      char dummy3[sizeof (enum fifo_config)];
+
       // in_source
       // out_target
       // set_target
-      char dummy3[sizeof (enum in_out_set)];
+      char dummy4[sizeof (enum in_out_set)];
 
       // irq_modifiers
-      char dummy4[sizeof (enum irq)];
-
-      // mov_target
-      // mov_source
-      char dummy5[sizeof (enum mov)];
+      char dummy5[sizeof (enum irq)];
 
       // mov_op
       char dummy6[sizeof (enum mov_op)];
 
+      // mov_target
+      // mov_source
+      char dummy7[sizeof (extended_mov)];
+
+      // "float"
+      char dummy8[sizeof (float)];
+
       // "integer"
-      char dummy7[sizeof (int)];
+      char dummy9[sizeof (int)];
 
       // instruction
       // base_instruction
-      char dummy8[sizeof (std::shared_ptr<instruction>)];
+      char dummy10[sizeof (std::shared_ptr<instruction>)];
 
       // value
       // expression
       // delay
       // sideset
-      char dummy9[sizeof (std::shared_ptr<resolvable>)];
+      // threshold
+      char dummy11[sizeof (std::shared_ptr<resolvable>)];
 
       // label_decl
       // symbol_def
-      char dummy10[sizeof (std::shared_ptr<symbol>)];
+      char dummy12[sizeof (std::shared_ptr<symbol>)];
 
       // wait_source
-      char dummy11[sizeof (std::shared_ptr<wait_source>)];
+      char dummy13[sizeof (std::shared_ptr<wait_source>)];
 
       // "identifier"
       // "string"
@@ -429,7 +438,10 @@ namespace yy {
       // "code block"
       // "%}"
       // UNKNOWN_DIRECTIVE
-      char dummy12[sizeof (std::string)];
+      char dummy14[sizeof (std::string)];
+
+      // pio_version
+      char dummy15[sizeof (uint)];
     };
 
     /// The size of the largest semantic type.
@@ -492,59 +504,87 @@ namespace yy {
     TOK_OR = 269,                  // "|"
     TOK_AND = 270,                 // "&"
     TOK_XOR = 271,                 // "^"
-    TOK_POST_DECREMENT = 272,      // "--"
-    TOK_NOT_EQUAL = 273,           // "!="
-    TOK_NOT = 274,                 // "!"
-    TOK_REVERSE = 275,             // "::"
-    TOK_EQUAL = 276,               // "="
-    TOK_PROGRAM = 277,             // ".program"
-    TOK_WRAP_TARGET = 278,         // ".wrap_target"
-    TOK_WRAP = 279,                // ".wrap"
-    TOK_DEFINE = 280,              // ".define"
-    TOK_SIDE_SET = 281,            // ".side_set"
-    TOK_WORD = 282,                // ".word"
-    TOK_ORIGIN = 283,              // ".origin"
-    TOK_LANG_OPT = 284,            // ".lang_opt"
-    TOK_JMP = 285,                 // "jmp"
-    TOK_WAIT = 286,                // "wait"
-    TOK_IN = 287,                  // "in"
-    TOK_OUT = 288,                 // "out"
-    TOK_PUSH = 289,                // "push"
-    TOK_PULL = 290,                // "pull"
-    TOK_MOV = 291,                 // "mov"
-    TOK_IRQ = 292,                 // "irq"
-    TOK_SET = 293,                 // "set"
-    TOK_NOP = 294,                 // "nop"
-    TOK_PIN = 295,                 // "pin"
-    TOK_GPIO = 296,                // "gpio"
-    TOK_OSRE = 297,                // "osre"
-    TOK_PINS = 298,                // "pins"
-    TOK_NULL = 299,                // "null"
-    TOK_PINDIRS = 300,             // "pindirs"
-    TOK_BLOCK = 301,               // "block"
-    TOK_NOBLOCK = 302,             // "noblock"
-    TOK_IFEMPTY = 303,             // "ifempty"
-    TOK_IFFULL = 304,              // "iffull"
-    TOK_NOWAIT = 305,              // "nowait"
-    TOK_CLEAR = 306,               // "clear"
-    TOK_REL = 307,                 // "rel"
-    TOK_X = 308,                   // "x"
-    TOK_Y = 309,                   // "y"
-    TOK_EXEC = 310,                // "exec"
-    TOK_PC = 311,                  // "pc"
-    TOK_ISR = 312,                 // "isr"
-    TOK_OSR = 313,                 // "osr"
-    TOK_OPTIONAL = 314,            // "opt"
-    TOK_SIDE = 315,                // "side"
-    TOK_STATUS = 316,              // "status"
-    TOK_PUBLIC = 317,              // "public"
-    TOK_ID = 318,                  // "identifier"
-    TOK_STRING = 319,              // "string"
-    TOK_NON_WS = 320,              // "text"
-    TOK_CODE_BLOCK_START = 321,    // "code block"
-    TOK_CODE_BLOCK_CONTENTS = 322, // "%}"
-    TOK_UNKNOWN_DIRECTIVE = 323,   // UNKNOWN_DIRECTIVE
-    TOK_INT = 324                  // "integer"
+    TOK_SHL = 272,                 // "<<"
+    TOK_SHR = 273,                 // ">>"
+    TOK_POST_DECREMENT = 274,      // "--"
+    TOK_NOT_EQUAL = 275,           // "!="
+    TOK_NOT = 276,                 // "!"
+    TOK_REVERSE = 277,             // "::"
+    TOK_ASSIGN = 278,              // "="
+    TOK_LESSTHAN = 279,            // "<"
+    TOK_PROGRAM = 280,             // ".program"
+    TOK_WRAP_TARGET = 281,         // ".wrap_target"
+    TOK_WRAP = 282,                // ".wrap"
+    TOK_DEFINE = 283,              // ".define"
+    TOK_SIDE_SET = 284,            // ".side_set"
+    TOK_WORD = 285,                // ".word"
+    TOK_ORIGIN = 286,              // ".origin"
+    TOK_LANG_OPT = 287,            // ".lang_opt"
+    TOK_PIO_VERSION = 288,         // ".pio_version"
+    TOK_CLOCK_DIV = 289,           // ".clock_div"
+    TOK_FIFO = 290,                // ".fifo"
+    TOK_MOV_STATUS = 291,          // ".mov_status"
+    TOK_DOT_SET = 292,             // ".set"
+    TOK_DOT_OUT = 293,             // ".out"
+    TOK_DOT_IN = 294,              // ".in"
+    TOK_JMP = 295,                 // "jmp"
+    TOK_WAIT = 296,                // "wait"
+    TOK_IN = 297,                  // "in"
+    TOK_OUT = 298,                 // "out"
+    TOK_PUSH = 299,                // "push"
+    TOK_PULL = 300,                // "pull"
+    TOK_MOV = 301,                 // "mov"
+    TOK_IRQ = 302,                 // "irq"
+    TOK_SET = 303,                 // "set"
+    TOK_NOP = 304,                 // "nop"
+    TOK_PIN = 305,                 // "pin"
+    TOK_GPIO = 306,                // "gpio"
+    TOK_OSRE = 307,                // "osre"
+    TOK_JMPPIN = 308,              // "jmppin"
+    TOK_PREV = 309,                // "prev"
+    TOK_NEXT = 310,                // "next"
+    TOK_PINS = 311,                // "pins"
+    TOK_NULL = 312,                // "null"
+    TOK_PINDIRS = 313,             // "pindirs"
+    TOK_BLOCK = 314,               // "block"
+    TOK_NOBLOCK = 315,             // "noblock"
+    TOK_IFEMPTY = 316,             // "ifempty"
+    TOK_IFFULL = 317,              // "iffull"
+    TOK_NOWAIT = 318,              // "nowait"
+    TOK_CLEAR = 319,               // "clear"
+    TOK_REL = 320,                 // "rel"
+    TOK_X = 321,                   // "x"
+    TOK_Y = 322,                   // "y"
+    TOK_EXEC = 323,                // "exec"
+    TOK_PC = 324,                  // "pc"
+    TOK_ISR = 325,                 // "isr"
+    TOK_OSR = 326,                 // "osr"
+    TOK_OPTIONAL = 327,            // "opt"
+    TOK_SIDE = 328,                // "side"
+    TOK_STATUS = 329,              // "status"
+    TOK_PUBLIC = 330,              // "public"
+    TOK_RP2040 = 331,              // "rp2040"
+    TOK_RP2350 = 332,              // "rp2350"
+    TOK_RXFIFO = 333,              // "rxfifo"
+    TOK_TXFIFO = 334,              // "txfifo"
+    TOK_TXRX = 335,                // "txrx"
+    TOK_TX = 336,                  // "tx"
+    TOK_RX = 337,                  // "rx"
+    TOK_TXPUT = 338,               // "txput"
+    TOK_TXGET = 339,               // "txget"
+    TOK_PUTGET = 340,              // "putget"
+    TOK_LEFT = 341,                // "left"
+    TOK_RIGHT = 342,               // "right"
+    TOK_AUTO = 343,                // "auto"
+    TOK_MANUAL = 344,              // "manual"
+    TOK_ID = 345,                  // "identifier"
+    TOK_STRING = 346,              // "string"
+    TOK_NON_WS = 347,              // "text"
+    TOK_CODE_BLOCK_START = 348,    // "code block"
+    TOK_CODE_BLOCK_CONTENTS = 349, // "%}"
+    TOK_UNKNOWN_DIRECTIVE = 350,   // UNKNOWN_DIRECTIVE
+    TOK_INT = 351,                 // "integer"
+    TOK_FLOAT = 352                // "float"
       };
       /// Backward compatibility alias (Bison 3.6).
       typedef token_kind_type yytokentype;
@@ -561,7 +601,7 @@ namespace yy {
     {
       enum symbol_kind_type
       {
-        YYNTOKENS = 70, ///< Number of tokens.
+        YYNTOKENS = 98, ///< Number of tokens.
         S_YYEMPTY = -2,
         S_YYEOF = 0,                             // "end of file"
         S_YYerror = 1,                           // error
@@ -580,86 +620,119 @@ namespace yy {
         S_OR = 14,                               // "|"
         S_AND = 15,                              // "&"
         S_XOR = 16,                              // "^"
-        S_POST_DECREMENT = 17,                   // "--"
-        S_NOT_EQUAL = 18,                        // "!="
-        S_NOT = 19,                              // "!"
-        S_REVERSE = 20,                          // "::"
-        S_EQUAL = 21,                            // "="
-        S_PROGRAM = 22,                          // ".program"
-        S_WRAP_TARGET = 23,                      // ".wrap_target"
-        S_WRAP = 24,                             // ".wrap"
-        S_DEFINE = 25,                           // ".define"
-        S_SIDE_SET = 26,                         // ".side_set"
-        S_WORD = 27,                             // ".word"
-        S_ORIGIN = 28,                           // ".origin"
-        S_LANG_OPT = 29,                         // ".lang_opt"
-        S_JMP = 30,                              // "jmp"
-        S_WAIT = 31,                             // "wait"
-        S_IN = 32,                               // "in"
-        S_OUT = 33,                              // "out"
-        S_PUSH = 34,                             // "push"
-        S_PULL = 35,                             // "pull"
-        S_MOV = 36,                              // "mov"
-        S_IRQ = 37,                              // "irq"
-        S_SET = 38,                              // "set"
-        S_NOP = 39,                              // "nop"
-        S_PIN = 40,                              // "pin"
-        S_GPIO = 41,                             // "gpio"
-        S_OSRE = 42,                             // "osre"
-        S_PINS = 43,                             // "pins"
-        S_NULL = 44,                             // "null"
-        S_PINDIRS = 45,                          // "pindirs"
-        S_BLOCK = 46,                            // "block"
-        S_NOBLOCK = 47,                          // "noblock"
-        S_IFEMPTY = 48,                          // "ifempty"
-        S_IFFULL = 49,                           // "iffull"
-        S_NOWAIT = 50,                           // "nowait"
-        S_CLEAR = 51,                            // "clear"
-        S_REL = 52,                              // "rel"
-        S_X = 53,                                // "x"
-        S_Y = 54,                                // "y"
-        S_EXEC = 55,                             // "exec"
-        S_PC = 56,                               // "pc"
-        S_ISR = 57,                              // "isr"
-        S_OSR = 58,                              // "osr"
-        S_OPTIONAL = 59,                         // "opt"
-        S_SIDE = 60,                             // "side"
-        S_STATUS = 61,                           // "status"
-        S_PUBLIC = 62,                           // "public"
-        S_ID = 63,                               // "identifier"
-        S_STRING = 64,                           // "string"
-        S_NON_WS = 65,                           // "text"
-        S_CODE_BLOCK_START = 66,                 // "code block"
-        S_CODE_BLOCK_CONTENTS = 67,              // "%}"
-        S_UNKNOWN_DIRECTIVE = 68,                // UNKNOWN_DIRECTIVE
-        S_INT = 69,                              // "integer"
-        S_YYACCEPT = 70,                         // $accept
-        S_file = 71,                             // file
-        S_lines = 72,                            // lines
-        S_line = 73,                             // line
-        S_code_block = 74,                       // code_block
-        S_label_decl = 75,                       // label_decl
-        S_directive = 76,                        // directive
-        S_value = 77,                            // value
-        S_expression = 78,                       // expression
-        S_instruction = 79,                      // instruction
-        S_base_instruction = 80,                 // base_instruction
-        S_delay = 81,                            // delay
-        S_sideset = 82,                          // sideset
-        S_condition = 83,                        // condition
-        S_wait_source = 84,                      // wait_source
-        S_comma = 85,                            // comma
-        S_in_source = 86,                        // in_source
-        S_out_target = 87,                       // out_target
-        S_mov_target = 88,                       // mov_target
-        S_mov_source = 89,                       // mov_source
-        S_mov_op = 90,                           // mov_op
-        S_set_target = 91,                       // set_target
-        S_if_full = 92,                          // if_full
-        S_if_empty = 93,                         // if_empty
-        S_blocking = 94,                         // blocking
-        S_irq_modifiers = 95,                    // irq_modifiers
-        S_symbol_def = 96                        // symbol_def
+        S_SHL = 17,                              // "<<"
+        S_SHR = 18,                              // ">>"
+        S_POST_DECREMENT = 19,                   // "--"
+        S_NOT_EQUAL = 20,                        // "!="
+        S_NOT = 21,                              // "!"
+        S_REVERSE = 22,                          // "::"
+        S_ASSIGN = 23,                           // "="
+        S_LESSTHAN = 24,                         // "<"
+        S_PROGRAM = 25,                          // ".program"
+        S_WRAP_TARGET = 26,                      // ".wrap_target"
+        S_WRAP = 27,                             // ".wrap"
+        S_DEFINE = 28,                           // ".define"
+        S_SIDE_SET = 29,                         // ".side_set"
+        S_WORD = 30,                             // ".word"
+        S_ORIGIN = 31,                           // ".origin"
+        S_LANG_OPT = 32,                         // ".lang_opt"
+        S_PIO_VERSION = 33,                      // ".pio_version"
+        S_CLOCK_DIV = 34,                        // ".clock_div"
+        S_FIFO = 35,                             // ".fifo"
+        S_MOV_STATUS = 36,                       // ".mov_status"
+        S_DOT_SET = 37,                          // ".set"
+        S_DOT_OUT = 38,                          // ".out"
+        S_DOT_IN = 39,                           // ".in"
+        S_JMP = 40,                              // "jmp"
+        S_WAIT = 41,                             // "wait"
+        S_IN = 42,                               // "in"
+        S_OUT = 43,                              // "out"
+        S_PUSH = 44,                             // "push"
+        S_PULL = 45,                             // "pull"
+        S_MOV = 46,                              // "mov"
+        S_IRQ = 47,                              // "irq"
+        S_SET = 48,                              // "set"
+        S_NOP = 49,                              // "nop"
+        S_PIN = 50,                              // "pin"
+        S_GPIO = 51,                             // "gpio"
+        S_OSRE = 52,                             // "osre"
+        S_JMPPIN = 53,                           // "jmppin"
+        S_PREV = 54,                             // "prev"
+        S_NEXT = 55,                             // "next"
+        S_PINS = 56,                             // "pins"
+        S_NULL = 57,                             // "null"
+        S_PINDIRS = 58,                          // "pindirs"
+        S_BLOCK = 59,                            // "block"
+        S_NOBLOCK = 60,                          // "noblock"
+        S_IFEMPTY = 61,                          // "ifempty"
+        S_IFFULL = 62,                           // "iffull"
+        S_NOWAIT = 63,                           // "nowait"
+        S_CLEAR = 64,                            // "clear"
+        S_REL = 65,                              // "rel"
+        S_X = 66,                                // "x"
+        S_Y = 67,                                // "y"
+        S_EXEC = 68,                             // "exec"
+        S_PC = 69,                               // "pc"
+        S_ISR = 70,                              // "isr"
+        S_OSR = 71,                              // "osr"
+        S_OPTIONAL = 72,                         // "opt"
+        S_SIDE = 73,                             // "side"
+        S_STATUS = 74,                           // "status"
+        S_PUBLIC = 75,                           // "public"
+        S_RP2040 = 76,                           // "rp2040"
+        S_RP2350 = 77,                           // "rp2350"
+        S_RXFIFO = 78,                           // "rxfifo"
+        S_TXFIFO = 79,                           // "txfifo"
+        S_TXRX = 80,                             // "txrx"
+        S_TX = 81,                               // "tx"
+        S_RX = 82,                               // "rx"
+        S_TXPUT = 83,                            // "txput"
+        S_TXGET = 84,                            // "txget"
+        S_PUTGET = 85,                           // "putget"
+        S_LEFT = 86,                             // "left"
+        S_RIGHT = 87,                            // "right"
+        S_AUTO = 88,                             // "auto"
+        S_MANUAL = 89,                           // "manual"
+        S_ID = 90,                               // "identifier"
+        S_STRING = 91,                           // "string"
+        S_NON_WS = 92,                           // "text"
+        S_CODE_BLOCK_START = 93,                 // "code block"
+        S_CODE_BLOCK_CONTENTS = 94,              // "%}"
+        S_UNKNOWN_DIRECTIVE = 95,                // UNKNOWN_DIRECTIVE
+        S_INT = 96,                              // "integer"
+        S_FLOAT = 97,                            // "float"
+        S_YYACCEPT = 98,                         // $accept
+        S_file = 99,                             // file
+        S_lines = 100,                           // lines
+        S_line = 101,                            // line
+        S_code_block = 102,                      // code_block
+        S_label_decl = 103,                      // label_decl
+        S_directive = 104,                       // directive
+        S_value = 105,                           // value
+        S_expression = 106,                      // expression
+        S_pio_version = 107,                     // pio_version
+        S_instruction = 108,                     // instruction
+        S_base_instruction = 109,                // base_instruction
+        S_delay = 110,                           // delay
+        S_sideset = 111,                         // sideset
+        S_condition = 112,                       // condition
+        S_wait_source = 113,                     // wait_source
+        S_fifo_config = 114,                     // fifo_config
+        S_comma = 115,                           // comma
+        S_in_source = 116,                       // in_source
+        S_out_target = 117,                      // out_target
+        S_mov_target = 118,                      // mov_target
+        S_mov_source = 119,                      // mov_source
+        S_mov_op = 120,                          // mov_op
+        S_set_target = 121,                      // set_target
+        S_direction = 122,                       // direction
+        S_autop = 123,                           // autop
+        S_threshold = 124,                       // threshold
+        S_if_full = 125,                         // if_full
+        S_if_empty = 126,                        // if_empty
+        S_blocking = 127,                        // blocking
+        S_irq_modifiers = 128,                   // irq_modifiers
+        S_symbol_def = 129                       // symbol_def
       };
     };
 
@@ -696,6 +769,8 @@ namespace yy {
       {
         switch (this->kind ())
     {
+      case symbol_kind::S_direction: // direction
+      case symbol_kind::S_autop: // autop
       case symbol_kind::S_if_full: // if_full
       case symbol_kind::S_if_empty: // if_empty
       case symbol_kind::S_blocking: // blocking
@@ -704,6 +779,10 @@ namespace yy {
 
       case symbol_kind::S_condition: // condition
         value.move< enum condition > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_fifo_config: // fifo_config
+        value.move< enum fifo_config > (std::move (that.value));
         break;
 
       case symbol_kind::S_in_source: // in_source
@@ -716,13 +795,17 @@ namespace yy {
         value.move< enum irq > (std::move (that.value));
         break;
 
-      case symbol_kind::S_mov_target: // mov_target
-      case symbol_kind::S_mov_source: // mov_source
-        value.move< enum mov > (std::move (that.value));
-        break;
-
       case symbol_kind::S_mov_op: // mov_op
         value.move< enum mov_op > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_mov_target: // mov_target
+      case symbol_kind::S_mov_source: // mov_source
+        value.move< extended_mov > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_FLOAT: // "float"
+        value.move< float > (std::move (that.value));
         break;
 
       case symbol_kind::S_INT: // "integer"
@@ -738,6 +821,7 @@ namespace yy {
       case symbol_kind::S_expression: // expression
       case symbol_kind::S_delay: // delay
       case symbol_kind::S_sideset: // sideset
+      case symbol_kind::S_threshold: // threshold
         value.move< std::shared_ptr<resolvable> > (std::move (that.value));
         break;
 
@@ -757,6 +841,10 @@ namespace yy {
       case symbol_kind::S_CODE_BLOCK_CONTENTS: // "%}"
       case symbol_kind::S_UNKNOWN_DIRECTIVE: // UNKNOWN_DIRECTIVE
         value.move< std::string > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_pio_version: // pio_version
+        value.move< uint > (std::move (that.value));
         break;
 
       default:
@@ -808,6 +896,19 @@ namespace yy {
       {}
 #endif
 #if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, enum fifo_config&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const enum fifo_config& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, enum in_out_set&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
@@ -834,19 +935,6 @@ namespace yy {
       {}
 #endif
 #if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, enum mov&& v, location_type&& l)
-        : Base (t)
-        , value (std::move (v))
-        , location (std::move (l))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const enum mov& v, const location_type& l)
-        : Base (t)
-        , value (v)
-        , location (l)
-      {}
-#endif
-#if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, enum mov_op&& v, location_type&& l)
         : Base (t)
         , value (std::move (v))
@@ -854,6 +942,32 @@ namespace yy {
       {}
 #else
       basic_symbol (typename Base::kind_type t, const enum mov_op& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, extended_mov&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const extended_mov& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, float&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const float& v, const location_type& l)
         : Base (t)
         , value (v)
         , location (l)
@@ -937,6 +1051,19 @@ namespace yy {
         , location (l)
       {}
 #endif
+#if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, uint&& v, location_type&& l)
+        : Base (t)
+        , value (std::move (v))
+        , location (std::move (l))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const uint& v, const location_type& l)
+        : Base (t)
+        , value (v)
+        , location (l)
+      {}
+#endif
 
       /// Destroy the symbol.
       ~basic_symbol ()
@@ -960,6 +1087,8 @@ namespace yy {
         // Value type destructor.
 switch (yykind)
     {
+      case symbol_kind::S_direction: // direction
+      case symbol_kind::S_autop: // autop
       case symbol_kind::S_if_full: // if_full
       case symbol_kind::S_if_empty: // if_empty
       case symbol_kind::S_blocking: // blocking
@@ -968,6 +1097,10 @@ switch (yykind)
 
       case symbol_kind::S_condition: // condition
         value.template destroy< enum condition > ();
+        break;
+
+      case symbol_kind::S_fifo_config: // fifo_config
+        value.template destroy< enum fifo_config > ();
         break;
 
       case symbol_kind::S_in_source: // in_source
@@ -980,13 +1113,17 @@ switch (yykind)
         value.template destroy< enum irq > ();
         break;
 
-      case symbol_kind::S_mov_target: // mov_target
-      case symbol_kind::S_mov_source: // mov_source
-        value.template destroy< enum mov > ();
-        break;
-
       case symbol_kind::S_mov_op: // mov_op
         value.template destroy< enum mov_op > ();
+        break;
+
+      case symbol_kind::S_mov_target: // mov_target
+      case symbol_kind::S_mov_source: // mov_source
+        value.template destroy< extended_mov > ();
+        break;
+
+      case symbol_kind::S_FLOAT: // "float"
+        value.template destroy< float > ();
         break;
 
       case symbol_kind::S_INT: // "integer"
@@ -1002,6 +1139,7 @@ switch (yykind)
       case symbol_kind::S_expression: // expression
       case symbol_kind::S_delay: // delay
       case symbol_kind::S_sideset: // sideset
+      case symbol_kind::S_threshold: // threshold
         value.template destroy< std::shared_ptr<resolvable> > ();
         break;
 
@@ -1021,6 +1159,10 @@ switch (yykind)
       case symbol_kind::S_CODE_BLOCK_CONTENTS: // "%}"
       case symbol_kind::S_UNKNOWN_DIRECTIVE: // UNKNOWN_DIRECTIVE
         value.template destroy< std::string > ();
+        break;
+
+      case symbol_kind::S_pio_version: // pio_version
+        value.template destroy< uint > ();
         break;
 
       default:
@@ -1113,13 +1255,26 @@ switch (yykind)
       symbol_type (int tok, location_type l)
         : super_type(token_type (tok), std::move (l))
       {
-        YY_ASSERT (tok == token::TOK_END || tok == token::TOK_YYerror || tok == token::TOK_YYUNDEF || tok == token::TOK_NEWLINE || tok == token::TOK_COMMA || tok == token::TOK_COLON || tok == token::TOK_LPAREN || tok == token::TOK_RPAREN || tok == token::TOK_LBRACKET || tok == token::TOK_RBRACKET || tok == token::TOK_PLUS || tok == token::TOK_MINUS || tok == token::TOK_MULTIPLY || tok == token::TOK_DIVIDE || tok == token::TOK_OR || tok == token::TOK_AND || tok == token::TOK_XOR || tok == token::TOK_POST_DECREMENT || tok == token::TOK_NOT_EQUAL || tok == token::TOK_NOT || tok == token::TOK_REVERSE || tok == token::TOK_EQUAL || tok == token::TOK_PROGRAM || tok == token::TOK_WRAP_TARGET || tok == token::TOK_WRAP || tok == token::TOK_DEFINE || tok == token::TOK_SIDE_SET || tok == token::TOK_WORD || tok == token::TOK_ORIGIN || tok == token::TOK_LANG_OPT || tok == token::TOK_JMP || tok == token::TOK_WAIT || tok == token::TOK_IN || tok == token::TOK_OUT || tok == token::TOK_PUSH || tok == token::TOK_PULL || tok == token::TOK_MOV || tok == token::TOK_IRQ || tok == token::TOK_SET || tok == token::TOK_NOP || tok == token::TOK_PIN || tok == token::TOK_GPIO || tok == token::TOK_OSRE || tok == token::TOK_PINS || tok == token::TOK_NULL || tok == token::TOK_PINDIRS || tok == token::TOK_BLOCK || tok == token::TOK_NOBLOCK || tok == token::TOK_IFEMPTY || tok == token::TOK_IFFULL || tok == token::TOK_NOWAIT || tok == token::TOK_CLEAR || tok == token::TOK_REL || tok == token::TOK_X || tok == token::TOK_Y || tok == token::TOK_EXEC || tok == token::TOK_PC || tok == token::TOK_ISR || tok == token::TOK_OSR || tok == token::TOK_OPTIONAL || tok == token::TOK_SIDE || tok == token::TOK_STATUS || tok == token::TOK_PUBLIC);
+        YY_ASSERT (tok == token::TOK_END || tok == token::TOK_YYerror || tok == token::TOK_YYUNDEF || tok == token::TOK_NEWLINE || tok == token::TOK_COMMA || tok == token::TOK_COLON || tok == token::TOK_LPAREN || tok == token::TOK_RPAREN || tok == token::TOK_LBRACKET || tok == token::TOK_RBRACKET || tok == token::TOK_PLUS || tok == token::TOK_MINUS || tok == token::TOK_MULTIPLY || tok == token::TOK_DIVIDE || tok == token::TOK_OR || tok == token::TOK_AND || tok == token::TOK_XOR || tok == token::TOK_SHL || tok == token::TOK_SHR || tok == token::TOK_POST_DECREMENT || tok == token::TOK_NOT_EQUAL || tok == token::TOK_NOT || tok == token::TOK_REVERSE || tok == token::TOK_ASSIGN || tok == token::TOK_LESSTHAN || tok == token::TOK_PROGRAM || tok == token::TOK_WRAP_TARGET || tok == token::TOK_WRAP || tok == token::TOK_DEFINE || tok == token::TOK_SIDE_SET || tok == token::TOK_WORD || tok == token::TOK_ORIGIN || tok == token::TOK_LANG_OPT || tok == token::TOK_PIO_VERSION || tok == token::TOK_CLOCK_DIV || tok == token::TOK_FIFO || tok == token::TOK_MOV_STATUS || tok == token::TOK_DOT_SET || tok == token::TOK_DOT_OUT || tok == token::TOK_DOT_IN || tok == token::TOK_JMP || tok == token::TOK_WAIT || tok == token::TOK_IN || tok == token::TOK_OUT || tok == token::TOK_PUSH || tok == token::TOK_PULL || tok == token::TOK_MOV || tok == token::TOK_IRQ || tok == token::TOK_SET || tok == token::TOK_NOP || tok == token::TOK_PIN || tok == token::TOK_GPIO || tok == token::TOK_OSRE || tok == token::TOK_JMPPIN || tok == token::TOK_PREV || tok == token::TOK_NEXT || tok == token::TOK_PINS || tok == token::TOK_NULL || tok == token::TOK_PINDIRS || tok == token::TOK_BLOCK || tok == token::TOK_NOBLOCK || tok == token::TOK_IFEMPTY || tok == token::TOK_IFFULL || tok == token::TOK_NOWAIT || tok == token::TOK_CLEAR || tok == token::TOK_REL || tok == token::TOK_X || tok == token::TOK_Y || tok == token::TOK_EXEC || tok == token::TOK_PC || tok == token::TOK_ISR || tok == token::TOK_OSR || tok == token::TOK_OPTIONAL || tok == token::TOK_SIDE || tok == token::TOK_STATUS || tok == token::TOK_PUBLIC || tok == token::TOK_RP2040 || tok == token::TOK_RP2350 || tok == token::TOK_RXFIFO || tok == token::TOK_TXFIFO || tok == token::TOK_TXRX || tok == token::TOK_TX || tok == token::TOK_RX || tok == token::TOK_TXPUT || tok == token::TOK_TXGET || tok == token::TOK_PUTGET || tok == token::TOK_LEFT || tok == token::TOK_RIGHT || tok == token::TOK_AUTO || tok == token::TOK_MANUAL);
       }
 #else
       symbol_type (int tok, const location_type& l)
         : super_type(token_type (tok), l)
       {
-        YY_ASSERT (tok == token::TOK_END || tok == token::TOK_YYerror || tok == token::TOK_YYUNDEF || tok == token::TOK_NEWLINE || tok == token::TOK_COMMA || tok == token::TOK_COLON || tok == token::TOK_LPAREN || tok == token::TOK_RPAREN || tok == token::TOK_LBRACKET || tok == token::TOK_RBRACKET || tok == token::TOK_PLUS || tok == token::TOK_MINUS || tok == token::TOK_MULTIPLY || tok == token::TOK_DIVIDE || tok == token::TOK_OR || tok == token::TOK_AND || tok == token::TOK_XOR || tok == token::TOK_POST_DECREMENT || tok == token::TOK_NOT_EQUAL || tok == token::TOK_NOT || tok == token::TOK_REVERSE || tok == token::TOK_EQUAL || tok == token::TOK_PROGRAM || tok == token::TOK_WRAP_TARGET || tok == token::TOK_WRAP || tok == token::TOK_DEFINE || tok == token::TOK_SIDE_SET || tok == token::TOK_WORD || tok == token::TOK_ORIGIN || tok == token::TOK_LANG_OPT || tok == token::TOK_JMP || tok == token::TOK_WAIT || tok == token::TOK_IN || tok == token::TOK_OUT || tok == token::TOK_PUSH || tok == token::TOK_PULL || tok == token::TOK_MOV || tok == token::TOK_IRQ || tok == token::TOK_SET || tok == token::TOK_NOP || tok == token::TOK_PIN || tok == token::TOK_GPIO || tok == token::TOK_OSRE || tok == token::TOK_PINS || tok == token::TOK_NULL || tok == token::TOK_PINDIRS || tok == token::TOK_BLOCK || tok == token::TOK_NOBLOCK || tok == token::TOK_IFEMPTY || tok == token::TOK_IFFULL || tok == token::TOK_NOWAIT || tok == token::TOK_CLEAR || tok == token::TOK_REL || tok == token::TOK_X || tok == token::TOK_Y || tok == token::TOK_EXEC || tok == token::TOK_PC || tok == token::TOK_ISR || tok == token::TOK_OSR || tok == token::TOK_OPTIONAL || tok == token::TOK_SIDE || tok == token::TOK_STATUS || tok == token::TOK_PUBLIC);
+        YY_ASSERT (tok == token::TOK_END || tok == token::TOK_YYerror || tok == token::TOK_YYUNDEF || tok == token::TOK_NEWLINE || tok == token::TOK_COMMA || tok == token::TOK_COLON || tok == token::TOK_LPAREN || tok == token::TOK_RPAREN || tok == token::TOK_LBRACKET || tok == token::TOK_RBRACKET || tok == token::TOK_PLUS || tok == token::TOK_MINUS || tok == token::TOK_MULTIPLY || tok == token::TOK_DIVIDE || tok == token::TOK_OR || tok == token::TOK_AND || tok == token::TOK_XOR || tok == token::TOK_SHL || tok == token::TOK_SHR || tok == token::TOK_POST_DECREMENT || tok == token::TOK_NOT_EQUAL || tok == token::TOK_NOT || tok == token::TOK_REVERSE || tok == token::TOK_ASSIGN || tok == token::TOK_LESSTHAN || tok == token::TOK_PROGRAM || tok == token::TOK_WRAP_TARGET || tok == token::TOK_WRAP || tok == token::TOK_DEFINE || tok == token::TOK_SIDE_SET || tok == token::TOK_WORD || tok == token::TOK_ORIGIN || tok == token::TOK_LANG_OPT || tok == token::TOK_PIO_VERSION || tok == token::TOK_CLOCK_DIV || tok == token::TOK_FIFO || tok == token::TOK_MOV_STATUS || tok == token::TOK_DOT_SET || tok == token::TOK_DOT_OUT || tok == token::TOK_DOT_IN || tok == token::TOK_JMP || tok == token::TOK_WAIT || tok == token::TOK_IN || tok == token::TOK_OUT || tok == token::TOK_PUSH || tok == token::TOK_PULL || tok == token::TOK_MOV || tok == token::TOK_IRQ || tok == token::TOK_SET || tok == token::TOK_NOP || tok == token::TOK_PIN || tok == token::TOK_GPIO || tok == token::TOK_OSRE || tok == token::TOK_JMPPIN || tok == token::TOK_PREV || tok == token::TOK_NEXT || tok == token::TOK_PINS || tok == token::TOK_NULL || tok == token::TOK_PINDIRS || tok == token::TOK_BLOCK || tok == token::TOK_NOBLOCK || tok == token::TOK_IFEMPTY || tok == token::TOK_IFFULL || tok == token::TOK_NOWAIT || tok == token::TOK_CLEAR || tok == token::TOK_REL || tok == token::TOK_X || tok == token::TOK_Y || tok == token::TOK_EXEC || tok == token::TOK_PC || tok == token::TOK_ISR || tok == token::TOK_OSR || tok == token::TOK_OPTIONAL || tok == token::TOK_SIDE || tok == token::TOK_STATUS || tok == token::TOK_PUBLIC || tok == token::TOK_RP2040 || tok == token::TOK_RP2350 || tok == token::TOK_RXFIFO || tok == token::TOK_TXFIFO || tok == token::TOK_TXRX || tok == token::TOK_TX || tok == token::TOK_RX || tok == token::TOK_TXPUT || tok == token::TOK_TXGET || tok == token::TOK_PUTGET || tok == token::TOK_LEFT || tok == token::TOK_RIGHT || tok == token::TOK_AUTO || tok == token::TOK_MANUAL);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      symbol_type (int tok, float v, location_type l)
+        : super_type(token_type (tok), std::move (v), std::move (l))
+      {
+        YY_ASSERT (tok == token::TOK_FLOAT);
+      }
+#else
+      symbol_type (int tok, const float& v, const location_type& l)
+        : super_type(token_type (tok), v, l)
+      {
+        YY_ASSERT (tok == token::TOK_FLOAT);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -1454,6 +1609,36 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
+      make_SHL (location_type l)
+      {
+        return symbol_type (token::TOK_SHL, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_SHL (const location_type& l)
+      {
+        return symbol_type (token::TOK_SHL, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_SHR (location_type l)
+      {
+        return symbol_type (token::TOK_SHR, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_SHR (const location_type& l)
+      {
+        return symbol_type (token::TOK_SHR, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
       make_POST_DECREMENT (location_type l)
       {
         return symbol_type (token::TOK_POST_DECREMENT, std::move (l));
@@ -1514,16 +1699,31 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_EQUAL (location_type l)
+      make_ASSIGN (location_type l)
       {
-        return symbol_type (token::TOK_EQUAL, std::move (l));
+        return symbol_type (token::TOK_ASSIGN, std::move (l));
       }
 #else
       static
       symbol_type
-      make_EQUAL (const location_type& l)
+      make_ASSIGN (const location_type& l)
       {
-        return symbol_type (token::TOK_EQUAL, l);
+        return symbol_type (token::TOK_ASSIGN, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_LESSTHAN (location_type l)
+      {
+        return symbol_type (token::TOK_LESSTHAN, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_LESSTHAN (const location_type& l)
+      {
+        return symbol_type (token::TOK_LESSTHAN, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -1644,6 +1844,111 @@ switch (yykind)
       make_LANG_OPT (const location_type& l)
       {
         return symbol_type (token::TOK_LANG_OPT, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_PIO_VERSION (location_type l)
+      {
+        return symbol_type (token::TOK_PIO_VERSION, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_PIO_VERSION (const location_type& l)
+      {
+        return symbol_type (token::TOK_PIO_VERSION, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_CLOCK_DIV (location_type l)
+      {
+        return symbol_type (token::TOK_CLOCK_DIV, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_CLOCK_DIV (const location_type& l)
+      {
+        return symbol_type (token::TOK_CLOCK_DIV, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_FIFO (location_type l)
+      {
+        return symbol_type (token::TOK_FIFO, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_FIFO (const location_type& l)
+      {
+        return symbol_type (token::TOK_FIFO, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_MOV_STATUS (location_type l)
+      {
+        return symbol_type (token::TOK_MOV_STATUS, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_MOV_STATUS (const location_type& l)
+      {
+        return symbol_type (token::TOK_MOV_STATUS, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOT_SET (location_type l)
+      {
+        return symbol_type (token::TOK_DOT_SET, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOT_SET (const location_type& l)
+      {
+        return symbol_type (token::TOK_DOT_SET, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOT_OUT (location_type l)
+      {
+        return symbol_type (token::TOK_DOT_OUT, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOT_OUT (const location_type& l)
+      {
+        return symbol_type (token::TOK_DOT_OUT, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_DOT_IN (location_type l)
+      {
+        return symbol_type (token::TOK_DOT_IN, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_DOT_IN (const location_type& l)
+      {
+        return symbol_type (token::TOK_DOT_IN, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -1839,6 +2144,51 @@ switch (yykind)
       make_OSRE (const location_type& l)
       {
         return symbol_type (token::TOK_OSRE, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_JMPPIN (location_type l)
+      {
+        return symbol_type (token::TOK_JMPPIN, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_JMPPIN (const location_type& l)
+      {
+        return symbol_type (token::TOK_JMPPIN, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_PREV (location_type l)
+      {
+        return symbol_type (token::TOK_PREV, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_PREV (const location_type& l)
+      {
+        return symbol_type (token::TOK_PREV, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_NEXT (location_type l)
+      {
+        return symbol_type (token::TOK_NEXT, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_NEXT (const location_type& l)
+      {
+        return symbol_type (token::TOK_NEXT, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -2144,6 +2494,216 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
+      make_RP2040 (location_type l)
+      {
+        return symbol_type (token::TOK_RP2040, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RP2040 (const location_type& l)
+      {
+        return symbol_type (token::TOK_RP2040, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RP2350 (location_type l)
+      {
+        return symbol_type (token::TOK_RP2350, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RP2350 (const location_type& l)
+      {
+        return symbol_type (token::TOK_RP2350, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RXFIFO (location_type l)
+      {
+        return symbol_type (token::TOK_RXFIFO, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RXFIFO (const location_type& l)
+      {
+        return symbol_type (token::TOK_RXFIFO, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_TXFIFO (location_type l)
+      {
+        return symbol_type (token::TOK_TXFIFO, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_TXFIFO (const location_type& l)
+      {
+        return symbol_type (token::TOK_TXFIFO, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_TXRX (location_type l)
+      {
+        return symbol_type (token::TOK_TXRX, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_TXRX (const location_type& l)
+      {
+        return symbol_type (token::TOK_TXRX, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_TX (location_type l)
+      {
+        return symbol_type (token::TOK_TX, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_TX (const location_type& l)
+      {
+        return symbol_type (token::TOK_TX, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RX (location_type l)
+      {
+        return symbol_type (token::TOK_RX, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RX (const location_type& l)
+      {
+        return symbol_type (token::TOK_RX, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_TXPUT (location_type l)
+      {
+        return symbol_type (token::TOK_TXPUT, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_TXPUT (const location_type& l)
+      {
+        return symbol_type (token::TOK_TXPUT, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_TXGET (location_type l)
+      {
+        return symbol_type (token::TOK_TXGET, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_TXGET (const location_type& l)
+      {
+        return symbol_type (token::TOK_TXGET, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_PUTGET (location_type l)
+      {
+        return symbol_type (token::TOK_PUTGET, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_PUTGET (const location_type& l)
+      {
+        return symbol_type (token::TOK_PUTGET, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_LEFT (location_type l)
+      {
+        return symbol_type (token::TOK_LEFT, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_LEFT (const location_type& l)
+      {
+        return symbol_type (token::TOK_LEFT, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_RIGHT (location_type l)
+      {
+        return symbol_type (token::TOK_RIGHT, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_RIGHT (const location_type& l)
+      {
+        return symbol_type (token::TOK_RIGHT, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_AUTO (location_type l)
+      {
+        return symbol_type (token::TOK_AUTO, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_AUTO (const location_type& l)
+      {
+        return symbol_type (token::TOK_AUTO, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_MANUAL (location_type l)
+      {
+        return symbol_type (token::TOK_MANUAL, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_MANUAL (const location_type& l)
+      {
+        return symbol_type (token::TOK_MANUAL, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
       make_ID (std::string v, location_type l)
       {
         return symbol_type (token::TOK_ID, std::move (v), std::move (l));
@@ -2246,6 +2806,21 @@ switch (yykind)
         return symbol_type (token::TOK_INT, v, l);
       }
 #endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_FLOAT (float v, location_type l)
+      {
+        return symbol_type (token::TOK_FLOAT, std::move (v), std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_FLOAT (const float& v, const location_type& l)
+      {
+        return symbol_type (token::TOK_FLOAT, v, l);
+      }
+#endif
 
 
     class context
@@ -2286,7 +2861,7 @@ switch (yykind)
     void yy_lac_discard_ (const char* event);
 
     /// Stored state numbers (used for stacks).
-    typedef unsigned char state_type;
+    typedef short state_type;
 
     /// The arguments of the error message.
     int yy_syntax_error_arguments_ (const context& yyctx,
@@ -2331,7 +2906,7 @@ switch (yykind)
     // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
     // Performed when YYTABLE does not specify something else to do.  Zero
     // means the default is an error.
-    static const signed char yydefact_[];
+    static const unsigned char yydefact_[];
 
     // YYPGOTO[NTERM-NUM].
     static const short yypgoto_[];
@@ -2344,14 +2919,14 @@ switch (yykind)
     // number is the opposite.  If YYTABLE_NINF, syntax error.
     static const short yytable_[];
 
-    static const unsigned char yycheck_[];
+    static const short yycheck_[];
 
     // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
     // symbol of state STATE-NUM.
-    static const signed char yystos_[];
+    static const unsigned char yystos_[];
 
     // YYR1[YYN] -- Symbol number of symbol that rule YYN derives.
-    static const signed char yyr1_[];
+    static const unsigned char yyr1_[];
 
     // YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.
     static const signed char yyr2_[];
@@ -2595,9 +3170,9 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 205,     ///< Last index in yytable_.
-      yynnts_ = 27,  ///< Number of nonterminal symbols.
-      yyfinal_ = 96 ///< Termination state number.
+      yylast_ = 307,     ///< Last index in yytable_.
+      yynnts_ = 32,  ///< Number of nonterminal symbols.
+      yyfinal_ = 127 ///< Termination state number.
     };
 
 
@@ -2648,10 +3223,13 @@ switch (yykind)
       35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
       45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
-      65,    66,    67,    68,    69
+      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
+      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,    97
     };
     // Last valid token kind.
-    const int code_max = 324;
+    const int code_max = 352;
 
     if (t <= 0)
       return symbol_kind::S_YYEOF;
@@ -2670,6 +3248,8 @@ switch (yykind)
   {
     switch (this->kind ())
     {
+      case symbol_kind::S_direction: // direction
+      case symbol_kind::S_autop: // autop
       case symbol_kind::S_if_full: // if_full
       case symbol_kind::S_if_empty: // if_empty
       case symbol_kind::S_blocking: // blocking
@@ -2678,6 +3258,10 @@ switch (yykind)
 
       case symbol_kind::S_condition: // condition
         value.copy< enum condition > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_fifo_config: // fifo_config
+        value.copy< enum fifo_config > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_in_source: // in_source
@@ -2690,13 +3274,17 @@ switch (yykind)
         value.copy< enum irq > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_mov_target: // mov_target
-      case symbol_kind::S_mov_source: // mov_source
-        value.copy< enum mov > (YY_MOVE (that.value));
-        break;
-
       case symbol_kind::S_mov_op: // mov_op
         value.copy< enum mov_op > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_mov_target: // mov_target
+      case symbol_kind::S_mov_source: // mov_source
+        value.copy< extended_mov > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_FLOAT: // "float"
+        value.copy< float > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_INT: // "integer"
@@ -2712,6 +3300,7 @@ switch (yykind)
       case symbol_kind::S_expression: // expression
       case symbol_kind::S_delay: // delay
       case symbol_kind::S_sideset: // sideset
+      case symbol_kind::S_threshold: // threshold
         value.copy< std::shared_ptr<resolvable> > (YY_MOVE (that.value));
         break;
 
@@ -2731,6 +3320,10 @@ switch (yykind)
       case symbol_kind::S_CODE_BLOCK_CONTENTS: // "%}"
       case symbol_kind::S_UNKNOWN_DIRECTIVE: // UNKNOWN_DIRECTIVE
         value.copy< std::string > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_pio_version: // pio_version
+        value.copy< uint > (YY_MOVE (that.value));
         break;
 
       default:
@@ -2762,6 +3355,8 @@ switch (yykind)
     super_type::move (s);
     switch (this->kind ())
     {
+      case symbol_kind::S_direction: // direction
+      case symbol_kind::S_autop: // autop
       case symbol_kind::S_if_full: // if_full
       case symbol_kind::S_if_empty: // if_empty
       case symbol_kind::S_blocking: // blocking
@@ -2770,6 +3365,10 @@ switch (yykind)
 
       case symbol_kind::S_condition: // condition
         value.move< enum condition > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_fifo_config: // fifo_config
+        value.move< enum fifo_config > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_in_source: // in_source
@@ -2782,13 +3381,17 @@ switch (yykind)
         value.move< enum irq > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_mov_target: // mov_target
-      case symbol_kind::S_mov_source: // mov_source
-        value.move< enum mov > (YY_MOVE (s.value));
-        break;
-
       case symbol_kind::S_mov_op: // mov_op
         value.move< enum mov_op > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_mov_target: // mov_target
+      case symbol_kind::S_mov_source: // mov_source
+        value.move< extended_mov > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_FLOAT: // "float"
+        value.move< float > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_INT: // "integer"
@@ -2804,6 +3407,7 @@ switch (yykind)
       case symbol_kind::S_expression: // expression
       case symbol_kind::S_delay: // delay
       case symbol_kind::S_sideset: // sideset
+      case symbol_kind::S_threshold: // threshold
         value.move< std::shared_ptr<resolvable> > (YY_MOVE (s.value));
         break;
 
@@ -2823,6 +3427,10 @@ switch (yykind)
       case symbol_kind::S_CODE_BLOCK_CONTENTS: // "%}"
       case symbol_kind::S_UNKNOWN_DIRECTIVE: // UNKNOWN_DIRECTIVE
         value.move< std::string > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_pio_version: // pio_version
+        value.move< uint > (YY_MOVE (s.value));
         break;
 
       default:
@@ -2891,4 +3499,4 @@ switch (yykind)
 
 
 
-#endif // !YY_YY_HOME_GRAHAM_DEV_MU_PICO_SDK_TOOLS_PIOASM_GEN_PARSER_HPP_INCLUDED
+#endif // !YY_YY_HOME_GRAHAM_DEV_AMY_AMY_SDK_TOOLS_PIOASM_GEN_PARSER_HPP_INCLUDED

@@ -5,24 +5,41 @@ if (NOT TARGET pico_double)
     # no custom implementation; falls thru to compiler
     pico_add_library(pico_double_compiler)
 
-    target_include_directories(pico_double_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(pico_double_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
     # add alias "default" which is just pico.
     add_library(pico_double_default INTERFACE)
-    target_link_libraries(pico_double_default INTERFACE pico_double_pico)
+    if (PICO_RISCV)
+        target_link_libraries(pico_double_default INTERFACE pico_double_compiler)
+    else()
+        target_link_libraries(pico_double_default INTERFACE pico_double_pico)
+    endif()
 
-    set(PICO_DEFAULT_DOUBLE_IMPL pico_double_default)
+    if (NOT PICO_DEFAULT_DOUBLE_IMPL)
+        set(PICO_DEFAULT_DOUBLE_IMPL pico_double_default)
+    endif()
 
     target_link_libraries(pico_double INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>,${PICO_DEFAULT_DOUBLE_IMPL}>)
 
+    # todo maybe this should be pico_double_dcp (note FreeRTOS has a dependency on the LIB_PICO_DOUBLE_FOO)
     pico_add_library(pico_double_pico)
-    target_sources(pico_double_pico INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/double_aeabi.S
-            ${CMAKE_CURRENT_LIST_DIR}/double_init_rom.c
-            ${CMAKE_CURRENT_LIST_DIR}/double_math.c
-            ${CMAKE_CURRENT_LIST_DIR}/double_v1_rom_shim.S
-    )
+    if (PICO_RP2040)
+        target_sources(pico_double_pico INTERFACE
+                ${CMAKE_CURRENT_LIST_DIR}/double_aeabi_rp2040.S
+                ${CMAKE_CURRENT_LIST_DIR}/double_init_rom_rp2040.c
+                ${CMAKE_CURRENT_LIST_DIR}/double_math.c
+                ${CMAKE_CURRENT_LIST_DIR}/double_v1_rom_shim_rp2040.S
+        )
+    elseif(NOT PICO_RISCV)
+        target_sources(pico_double_pico INTERFACE
+                ${CMAKE_CURRENT_LIST_DIR}/double_math.c
+                ${CMAKE_CURRENT_LIST_DIR}/double_aeabi_dcp.S
+                ${CMAKE_CURRENT_LIST_DIR}/double_fma_dcp.S
+                ${CMAKE_CURRENT_LIST_DIR}/double_sci_m33.S
+                ${CMAKE_CURRENT_LIST_DIR}/double_conv_m33.S
+                )
+    endif()
 
     target_link_libraries(pico_double_pico INTERFACE pico_bootrom pico_double_headers hardware_divider)
 

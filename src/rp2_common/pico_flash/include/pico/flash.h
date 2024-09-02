@@ -9,9 +9,6 @@
 
 #include "pico.h"
 
-#include "hardware/flash.h"
-#include "pico/time.h"
-
 /** \file pico/flash.h
  *  \defgroup pico_flash pico_flash
  *
@@ -26,7 +23,7 @@
  * the other core, then it has to be asked, nicely, to avoid flash for a bit. This is hard to do if you don't have
  * complete control of the code running on that core at all times.
  *
- * This library provides a \ref flash_safe_execute method which calls a function back having sucessfully gotten
+ * This library provides a \ref flash_safe_execute method which calls a function back having successfully gotten
  * into a state where interrupts are disabled, and the other core is not executing or reading from flash.
  *
  * How it does this is dependent on the supported environment (Free RTOS SMP or pico_multicore). Additionally
@@ -81,7 +78,7 @@ bool flash_safe_execute_core_deinit(void);
  * \param enter_exit_timeout_ms the timeout for each of the enter/exit phases when coordinating with the other core
  *
  * \return PICO_OK on success (the function will have been called).
- *         PICO_TIMEOUT on timeout (the function may have been called).
+ *         PICO_ERROR_TIMEOUT on timeout (the function may have been called).
  *         PICO_ERROR_NOT_PERMITTED if safe execution is not possible (the function will not have been called).
  *         PICO_ERROR_INSUFFICIENT_RESOURCES if the method fails due to dynamic resource exhaustion (the function will not have been called)
  * \note if \ref PICO_FLASH_ASSERT_ON_UNSAFE is 1, this function will assert in debug mode vs returning

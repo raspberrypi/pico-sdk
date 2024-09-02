@@ -1,0 +1,80 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# This is added to @pico-sdk//src/common/pico_base_headers:default_platform_headers
+# by default.
+cc_library(
+    name = "rename_exceptions",
+    hdrs = ["include/cmsis/rename_exceptions.h"],
+    # This is mildly odd, but intentional. We really don't want this header
+    # to have extra deps, and this header is touched by the host build.
+    defines = select({
+        "//bazel/constraint:host": [],
+        "//conditions:default": ["LIB_CMSIS_CORE=1"],
+    }),
+    includes = ["include"],
+)
+
+cc_library(
+    name = "cmsis_core",
+    srcs = select({
+        "//bazel/constraint:rp2040": [
+            "stub/CMSIS/Device/RP2040/Source/system_RP2040.c",
+        ],
+        "//bazel/constraint:rp2350": [
+            "stub/CMSIS/Device/RP2350/Source/system_RP2350.c",
+        ],
+        "//conditions:default": [],
+    }),
+    hdrs = [
+        "stub/CMSIS/Core/Include/cmsis_armcc.h",
+        "stub/CMSIS/Core/Include/cmsis_armclang.h",
+        "stub/CMSIS/Core/Include/cmsis_armclang_ltm.h",
+        "stub/CMSIS/Core/Include/cmsis_clang.h",
+        "stub/CMSIS/Core/Include/cmsis_compiler.h",
+        "stub/CMSIS/Core/Include/cmsis_gcc.h",
+        "stub/CMSIS/Core/Include/cmsis_iccarm.h",
+        "stub/CMSIS/Core/Include/cmsis_version.h",
+        "stub/CMSIS/Core/Include/core_cm0plus.h",
+        "stub/CMSIS/Core/Include/core_cm33.h",
+        "stub/CMSIS/Core/Include/m-profile/armv7m_cachel1.h",
+        "stub/CMSIS/Core/Include/m-profile/armv7m_mpu.h",
+        "stub/CMSIS/Core/Include/m-profile/armv81m_pac.h",
+        "stub/CMSIS/Core/Include/m-profile/armv8m_mpu.h",
+        "stub/CMSIS/Core/Include/m-profile/armv8m_pmu.h",
+        "stub/CMSIS/Core/Include/m-profile/cmsis_armclang_m.h",
+        "stub/CMSIS/Core/Include/m-profile/cmsis_clang_m.h",
+        "stub/CMSIS/Core/Include/m-profile/cmsis_gcc_m.h",
+        "stub/CMSIS/Core/Include/m-profile/cmsis_iccarm_m.h",
+        "stub/CMSIS/Core/Include/m-profile/cmsis_tiarmclang_m.h",
+        "stub/CMSIS/Core/Include/mpu_armv7.h",
+        "stub/CMSIS/Core/Include/mpu_armv8.h",
+        "stub/CMSIS/Core/Include/tz_context.h",
+    ] + select({
+        "//bazel/constraint:rp2040": [
+            "stub/CMSIS/Device/RP2040/Include/RP2040.h",
+            "stub/CMSIS/Device/RP2040/Include/system_RP2040.h",
+        ],
+        "//bazel/constraint:rp2350": [
+            "stub/CMSIS/Device/RP2350/Include/RP2350.h",
+            "stub/CMSIS/Device/RP2350/Include/system_RP2350.h",
+        ],
+        "//conditions:default": [],
+    }),
+    defines = ["LIB_CMSIS_CORE=1"],
+    includes = [
+        "stub/CMSIS/Core/Include",
+    ] + select({
+        "//bazel/constraint:rp2040": [
+            "stub/CMSIS/Device/RP2040/Include",
+        ],
+        "//bazel/constraint:rp2350": [
+            "stub/CMSIS/Device/RP2350/Include",
+        ],
+    }),
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/hardware_clocks",
+    ],
+)

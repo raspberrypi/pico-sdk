@@ -1,0 +1,9 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_multicore",
+    hdrs = ["include/pico/multicore.h"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/host/pico_platform"],
+)

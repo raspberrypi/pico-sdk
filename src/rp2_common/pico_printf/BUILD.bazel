@@ -1,0 +1,65 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_printf",
+    actual = select({
+        "//bazel/constraint:pico_printf_pico_enabled": ":pico_printf_pico",
+        "//bazel/constraint:pico_printf_compiler_enabled": ":pico_printf_compiler",
+        "//conditions:default": ":pico_printf_none",
+    }),
+)
+
+cc_library(
+    name = "pico_printf_pico",
+    srcs = ["printf.c"],
+    hdrs = ["include/pico/printf.h"],
+    defines = ["LIB_PICO_PRINTF_PICO=1"],
+    includes = ["include"],
+    linkopts = [
+        "-Wl,--wrap=sprintf",
+        "-Wl,--wrap=snprintf",
+        "-Wl,--wrap=vsnprintf",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:pico_platform_internal",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)
+
+cc_library(
+    name = "pico_printf_compiler",
+    hdrs = ["include/pico/printf.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:pico_platform_internal",
+    ],
+)
+
+cc_library(
+    name = "pico_printf_none",
+    srcs = ["printf_none.S"],
+    hdrs = ["include/pico/printf.h"],
+    defines = [
+        "LIB_PICO_PRINTF_PICO=0",
+        "LIB_PICO_PRINTF_NONE=1",
+    ],
+    includes = ["include"],
+    linkopts = [
+        "-Wl,--wrap=sprintf",
+        "-Wl,--wrap=snprintf",
+        "-Wl,--wrap=vsnprintf",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:pico_platform_internal",
+        "//src/rp2_common/pico_bootrom",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

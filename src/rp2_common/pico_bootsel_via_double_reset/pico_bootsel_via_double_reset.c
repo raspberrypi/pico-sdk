@@ -5,6 +5,10 @@
  */
 
 #include "pico.h"
+
+// Doesn't make any sense for a RAM only binary
+#if !PICO_NO_FLASH
+
 #include "pico/time.h"
 #include "pico/bootrom.h"
 #include "pico/binary_info.h"
@@ -23,6 +27,8 @@
 
 /** \defgroup pico_bootsel_via_double_reset pico_bootsel_via_double_reset
  *
+ * \brief Optional support to make fast double reset of the system enter BOOTSEL mode
+ *
  * \brief When the 'pico_bootsel_via_double_reset' library is linked, a function is
  * injected before main() which will detect when the system has been reset
  * twice in quick succession, and enter the USB ROM bootloader (BOOTSEL mode)
@@ -35,8 +41,6 @@
 bi_decl(bi_program_feature("double reset -> BOOTSEL"));
 #endif
 
-// Doesn't make any sense for a RAM only binary
-#if !PICO_NO_FLASH
 static const uint32_t magic_token[] = {
         0xf01681de, 0xbd729b29, 0xd359be7a,
 };

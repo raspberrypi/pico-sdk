@@ -17,7 +17,7 @@
  *
  * Supporting functions for the Pico hardware watchdog timer.
  *
- * The RP2040 has a built in HW watchdog Timer. This is a countdown timer that can restart parts of the chip if it reaches zero.
+ * The RP-series microcontrollers have a built in HW watchdog Timer. This is a countdown timer that can restart parts of the chip if it reaches zero.
  * For example, this can be used to restart the processor if the software running on it gets stuck in an infinite loop
  * or similar. The programmer has to periodically write a value to the watchdog to stop it reaching zero.
  *
@@ -30,9 +30,13 @@
 extern "C" {
 #endif
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_WATCHDOG, Enable/disable assertions in the watchdog module, type=bool, default=0, group=hardware_watchdog
-#ifndef PARAM_ASSERTIONS_ENABLED_WATCHDOG
-#define PARAM_ASSERTIONS_ENABLED_WATCHDOG 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_WATCHDOG, Enable/disable assertions in the hardware_watchdog module, type=bool, default=0, group=hardware_watchdog
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_WATCHDOG
+#ifdef PARAM_ASSERTIONS_ENABLED_WATCHDOG // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_WATCHDOG PARAM_ASSERTIONS_ENABLED_WATCHDOG
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_WATCHDOG 0
+#endif
 #endif
 
 /*! \brief Define actions to perform at watchdog timeout
@@ -83,6 +87,12 @@ void watchdog_update(void);
 void watchdog_enable(uint32_t delay_ms, bool pause_on_debug);
 
 /**
+ * \brief Disable the watchdog
+ * \ingroup hardware_watchdog
+ */
+void watchdog_disable(void);
+
+/**
  * \brief Did the watchdog cause the last reboot?
  * \ingroup hardware_watchdog
  *
@@ -99,7 +109,7 @@ bool watchdog_caused_reboot(void);
  * \ref watchdog_enable caused the last reboot.
  *
  * This method checks for a special value in watchdog scratch register 4 placed there by \ref watchdog_enable.
- * This would not be present if a watchdog reset is initiated by \ref watchdog_reboot or by the RP2040 bootrom
+ * This would not be present if a watchdog reset is initiated by \ref watchdog_reboot or by the RP-series microcontroller bootrom
  * (e.g. dragging a UF2 onto the RPI-RP2 drive).
  *
  * @return true If the watchdog timer or a watchdog force caused (see \ref watchdog_caused_reboot) the last reboot
@@ -114,10 +124,18 @@ bool watchdog_enable_caused_reboot(void);
  * \brief Returns the number of microseconds before the watchdog will reboot the chip.
  * \ingroup hardware_watchdog
  *
+ * \if rp2040_specicifc
+ * On RP2040 this method returns the last value set instead of the remaining time due to a h/w bug.
+ * \endif
+ * 
  * @return The number of microseconds before the watchdog will reboot the chip.
  */
-uint32_t watchdog_get_count(void);
+uint32_t watchdog_get_time_remaining_ms(void);
 
+// backwards compatibility with SDK < 2.0.0
+static inline uint32_t watchdog_get_count(void) {
+    return watchdog_get_time_remaining_ms();
+}
 #ifdef __cplusplus
 }
 #endif

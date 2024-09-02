@@ -1,0 +1,17 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_mbedtls",
+    srcs = ["pico_mbedtls.c"],
+    hdrs = ["include/sha256_alt.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//bazel/config:PICO_MBEDTLS_LIB",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_rand",
+        "//src/rp2_common/pico_sha256",
+    ],
+)

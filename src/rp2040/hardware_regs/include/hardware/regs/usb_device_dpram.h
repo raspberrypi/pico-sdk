@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,8 +11,8 @@
 // Bus type       : ahbl
 // Description    : DPRAM layout for USB device.
 // =============================================================================
-#ifndef HARDWARE_REGS_USB_DEVICE_DPRAM_DEFINED
-#define HARDWARE_REGS_USB_DEVICE_DPRAM_DEFINED
+#ifndef _HARDWARE_REGS_USB_DEVICE_DPRAM_H
+#define _HARDWARE_REGS_USB_DEVICE_DPRAM_H
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_SETUP_PACKET_LOW
 // Description : Bytes 0-3 of the SETUP packet from the host.
@@ -19,7 +21,6 @@
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_SETUP_PACKET_LOW_WVALUE
-// Description : None
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_WVALUE_RESET  _u(0x0000)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_WVALUE_BITS   _u(0xffff0000)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_WVALUE_MSB    _u(31)
@@ -27,7 +28,6 @@
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_WVALUE_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_SETUP_PACKET_LOW_BREQUEST
-// Description : None
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_BREQUEST_RESET  _u(0x00)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_BREQUEST_BITS   _u(0x0000ff00)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_BREQUEST_MSB    _u(15)
@@ -35,7 +35,6 @@
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_BREQUEST_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_SETUP_PACKET_LOW_BMREQUESTTYPE
-// Description : None
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_BMREQUESTTYPE_RESET  _u(0x00)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_BMREQUESTTYPE_BITS   _u(0x000000ff)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_LOW_BMREQUESTTYPE_MSB    _u(7)
@@ -49,7 +48,6 @@
 #define USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WLENGTH
-// Description : None
 #define USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WLENGTH_RESET  _u(0x0000)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WLENGTH_BITS   _u(0xffff0000)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WLENGTH_MSB    _u(31)
@@ -57,7 +55,6 @@
 #define USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WLENGTH_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WINDEX
-// Description : None
 #define USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WINDEX_RESET  _u(0x0000)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WINDEX_BITS   _u(0x0000ffff)
 #define USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WINDEX_MSB    _u(15)
@@ -65,7 +62,6 @@
 #define USB_DEVICE_DPRAM_SETUP_PACKET_HIGH_WINDEX_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP1_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP1_IN_CONTROL_OFFSET _u(0x00000008)
 #define USB_DEVICE_DPRAM_EP1_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP1_IN_CONTROL_RESET  _u(0x00000000)
@@ -105,19 +101,19 @@
 #define USB_DEVICE_DPRAM_EP1_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP1_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP1_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -146,7 +142,6 @@
 #define USB_DEVICE_DPRAM_EP1_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP1_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_OFFSET _u(0x0000000c)
 #define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_RESET  _u(0x00000000)
@@ -186,19 +181,19 @@
 #define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP1_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -227,7 +222,6 @@
 #define USB_DEVICE_DPRAM_EP1_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP2_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP2_IN_CONTROL_OFFSET _u(0x00000010)
 #define USB_DEVICE_DPRAM_EP2_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP2_IN_CONTROL_RESET  _u(0x00000000)
@@ -267,19 +261,19 @@
 #define USB_DEVICE_DPRAM_EP2_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP2_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP2_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -308,7 +302,6 @@
 #define USB_DEVICE_DPRAM_EP2_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP2_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_OFFSET _u(0x00000014)
 #define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_RESET  _u(0x00000000)
@@ -348,19 +341,19 @@
 #define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP2_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -389,7 +382,6 @@
 #define USB_DEVICE_DPRAM_EP2_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP3_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP3_IN_CONTROL_OFFSET _u(0x00000018)
 #define USB_DEVICE_DPRAM_EP3_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP3_IN_CONTROL_RESET  _u(0x00000000)
@@ -429,19 +421,19 @@
 #define USB_DEVICE_DPRAM_EP3_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP3_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP3_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -470,7 +462,6 @@
 #define USB_DEVICE_DPRAM_EP3_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP3_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_OFFSET _u(0x0000001c)
 #define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_RESET  _u(0x00000000)
@@ -510,19 +501,19 @@
 #define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP3_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -551,7 +542,6 @@
 #define USB_DEVICE_DPRAM_EP3_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP4_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP4_IN_CONTROL_OFFSET _u(0x00000020)
 #define USB_DEVICE_DPRAM_EP4_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP4_IN_CONTROL_RESET  _u(0x00000000)
@@ -591,19 +581,19 @@
 #define USB_DEVICE_DPRAM_EP4_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP4_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP4_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -632,7 +622,6 @@
 #define USB_DEVICE_DPRAM_EP4_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP4_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_OFFSET _u(0x00000024)
 #define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_RESET  _u(0x00000000)
@@ -672,19 +661,19 @@
 #define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP4_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -713,7 +702,6 @@
 #define USB_DEVICE_DPRAM_EP4_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP5_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP5_IN_CONTROL_OFFSET _u(0x00000028)
 #define USB_DEVICE_DPRAM_EP5_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP5_IN_CONTROL_RESET  _u(0x00000000)
@@ -753,19 +741,19 @@
 #define USB_DEVICE_DPRAM_EP5_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP5_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP5_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -794,7 +782,6 @@
 #define USB_DEVICE_DPRAM_EP5_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP5_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_OFFSET _u(0x0000002c)
 #define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_RESET  _u(0x00000000)
@@ -834,19 +821,19 @@
 #define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP5_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -875,7 +862,6 @@
 #define USB_DEVICE_DPRAM_EP5_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP6_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP6_IN_CONTROL_OFFSET _u(0x00000030)
 #define USB_DEVICE_DPRAM_EP6_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP6_IN_CONTROL_RESET  _u(0x00000000)
@@ -915,19 +901,19 @@
 #define USB_DEVICE_DPRAM_EP6_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP6_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP6_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -956,7 +942,6 @@
 #define USB_DEVICE_DPRAM_EP6_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP6_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_OFFSET _u(0x00000034)
 #define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_RESET  _u(0x00000000)
@@ -996,19 +981,19 @@
 #define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP6_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1037,7 +1022,6 @@
 #define USB_DEVICE_DPRAM_EP6_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP7_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP7_IN_CONTROL_OFFSET _u(0x00000038)
 #define USB_DEVICE_DPRAM_EP7_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP7_IN_CONTROL_RESET  _u(0x00000000)
@@ -1077,19 +1061,19 @@
 #define USB_DEVICE_DPRAM_EP7_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP7_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP7_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1118,7 +1102,6 @@
 #define USB_DEVICE_DPRAM_EP7_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP7_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_OFFSET _u(0x0000003c)
 #define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_RESET  _u(0x00000000)
@@ -1158,19 +1141,19 @@
 #define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP7_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1199,7 +1182,6 @@
 #define USB_DEVICE_DPRAM_EP7_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP8_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP8_IN_CONTROL_OFFSET _u(0x00000040)
 #define USB_DEVICE_DPRAM_EP8_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP8_IN_CONTROL_RESET  _u(0x00000000)
@@ -1239,19 +1221,19 @@
 #define USB_DEVICE_DPRAM_EP8_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP8_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP8_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1280,7 +1262,6 @@
 #define USB_DEVICE_DPRAM_EP8_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP8_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_OFFSET _u(0x00000044)
 #define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_RESET  _u(0x00000000)
@@ -1320,19 +1301,19 @@
 #define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP8_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1361,7 +1342,6 @@
 #define USB_DEVICE_DPRAM_EP8_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP9_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP9_IN_CONTROL_OFFSET _u(0x00000048)
 #define USB_DEVICE_DPRAM_EP9_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP9_IN_CONTROL_RESET  _u(0x00000000)
@@ -1401,19 +1381,19 @@
 #define USB_DEVICE_DPRAM_EP9_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP9_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP9_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1442,7 +1422,6 @@
 #define USB_DEVICE_DPRAM_EP9_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP9_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_OFFSET _u(0x0000004c)
 #define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_RESET  _u(0x00000000)
@@ -1482,19 +1461,19 @@
 #define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP9_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1523,7 +1502,6 @@
 #define USB_DEVICE_DPRAM_EP9_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP10_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP10_IN_CONTROL_OFFSET _u(0x00000050)
 #define USB_DEVICE_DPRAM_EP10_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP10_IN_CONTROL_RESET  _u(0x00000000)
@@ -1563,19 +1541,19 @@
 #define USB_DEVICE_DPRAM_EP10_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP10_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP10_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1604,7 +1582,6 @@
 #define USB_DEVICE_DPRAM_EP10_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP10_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_OFFSET _u(0x00000054)
 #define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_RESET  _u(0x00000000)
@@ -1644,19 +1621,19 @@
 #define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP10_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1685,7 +1662,6 @@
 #define USB_DEVICE_DPRAM_EP10_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP11_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP11_IN_CONTROL_OFFSET _u(0x00000058)
 #define USB_DEVICE_DPRAM_EP11_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP11_IN_CONTROL_RESET  _u(0x00000000)
@@ -1725,19 +1701,19 @@
 #define USB_DEVICE_DPRAM_EP11_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP11_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP11_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1766,7 +1742,6 @@
 #define USB_DEVICE_DPRAM_EP11_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP11_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_OFFSET _u(0x0000005c)
 #define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_RESET  _u(0x00000000)
@@ -1806,19 +1781,19 @@
 #define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP11_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1847,7 +1822,6 @@
 #define USB_DEVICE_DPRAM_EP11_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP12_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP12_IN_CONTROL_OFFSET _u(0x00000060)
 #define USB_DEVICE_DPRAM_EP12_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP12_IN_CONTROL_RESET  _u(0x00000000)
@@ -1887,19 +1861,19 @@
 #define USB_DEVICE_DPRAM_EP12_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP12_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP12_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -1928,7 +1902,6 @@
 #define USB_DEVICE_DPRAM_EP12_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP12_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_OFFSET _u(0x00000064)
 #define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_RESET  _u(0x00000000)
@@ -1968,19 +1941,19 @@
 #define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP12_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -2009,7 +1982,6 @@
 #define USB_DEVICE_DPRAM_EP12_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP13_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP13_IN_CONTROL_OFFSET _u(0x00000068)
 #define USB_DEVICE_DPRAM_EP13_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP13_IN_CONTROL_RESET  _u(0x00000000)
@@ -2049,19 +2021,19 @@
 #define USB_DEVICE_DPRAM_EP13_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP13_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP13_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -2090,7 +2062,6 @@
 #define USB_DEVICE_DPRAM_EP13_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP13_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_OFFSET _u(0x0000006c)
 #define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_RESET  _u(0x00000000)
@@ -2130,19 +2101,19 @@
 #define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP13_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -2171,7 +2142,6 @@
 #define USB_DEVICE_DPRAM_EP13_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP14_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP14_IN_CONTROL_OFFSET _u(0x00000070)
 #define USB_DEVICE_DPRAM_EP14_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP14_IN_CONTROL_RESET  _u(0x00000000)
@@ -2211,19 +2181,19 @@
 #define USB_DEVICE_DPRAM_EP14_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP14_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP14_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -2252,7 +2222,6 @@
 #define USB_DEVICE_DPRAM_EP14_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP14_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_OFFSET _u(0x00000074)
 #define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_RESET  _u(0x00000000)
@@ -2292,19 +2261,19 @@
 #define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP14_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -2333,7 +2302,6 @@
 #define USB_DEVICE_DPRAM_EP14_OUT_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP15_IN_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP15_IN_CONTROL_OFFSET _u(0x00000078)
 #define USB_DEVICE_DPRAM_EP15_IN_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP15_IN_CONTROL_RESET  _u(0x00000000)
@@ -2373,19 +2341,19 @@
 #define USB_DEVICE_DPRAM_EP15_IN_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP15_IN_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP15_IN_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -2414,7 +2382,6 @@
 #define USB_DEVICE_DPRAM_EP15_IN_CONTROL_BUFFER_ADDRESS_ACCESS "RW"
 // =============================================================================
 // Register    : USB_DEVICE_DPRAM_EP15_OUT_CONTROL
-// Description : None
 #define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_OFFSET _u(0x0000007c)
 #define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_BITS   _u(0xfc03ffff)
 #define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_RESET  _u(0x00000000)
@@ -2454,19 +2421,19 @@
 #define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_INTERRUPT_PER_DOUBLE_BUFF_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE
-// Description : 0x0 -> Control
+//               0x0 -> Control
 //               0x1 -> Isochronous
 //               0x2 -> Bulk
 //               0x3 -> Interrupt
-#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_RESET             _u(0x0)
-#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_BITS              _u(0x0c000000)
-#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_MSB               _u(27)
-#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_LSB               _u(26)
-#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_ACCESS            "RW"
-#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL     _u(0x0)
+#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_BITS   _u(0x0c000000)
+#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_MSB    _u(27)
+#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_LSB    _u(26)
+#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_VALUE_CONTROL _u(0x0)
 #define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_VALUE_ISOCHRONOUS _u(0x1)
-#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK        _u(0x2)
-#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT   _u(0x3)
+#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_VALUE_BULK _u(0x2)
+#define USB_DEVICE_DPRAM_EP15_OUT_CONTROL_ENDPOINT_TYPE_VALUE_INTERRUPT _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP15_OUT_CONTROL_INTERRUPT_ON_STALL
 // Description : Trigger an interrupt if a STALL is sent. Intended for debug
@@ -2539,14 +2506,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP0_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -2664,8 +2631,7 @@
 #define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -2674,14 +2640,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP0_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -2808,14 +2774,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP1_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -2933,8 +2899,7 @@
 #define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -2943,14 +2908,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP1_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -3077,14 +3042,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP2_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -3202,8 +3167,7 @@
 #define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -3212,14 +3176,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP2_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -3346,14 +3310,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP3_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -3471,8 +3435,7 @@
 #define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -3481,14 +3444,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP3_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -3615,14 +3578,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP4_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -3740,8 +3703,7 @@
 #define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -3750,14 +3712,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP4_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -3884,14 +3846,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP5_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -4009,8 +3971,7 @@
 #define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -4019,14 +3980,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP5_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -4153,14 +4114,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP6_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -4278,8 +4239,7 @@
 #define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -4288,14 +4248,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP6_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -4422,14 +4382,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP7_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -4547,8 +4507,7 @@
 #define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -4557,14 +4516,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP7_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -4691,14 +4650,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP8_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -4816,8 +4775,7 @@
 #define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -4826,14 +4784,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP8_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -4960,14 +4918,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP9_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -5085,8 +5043,7 @@
 #define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -5095,14 +5052,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP9_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -5220,8 +5177,7 @@
 #define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -5230,14 +5186,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP10_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -5355,8 +5311,7 @@
 #define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFS
-//               ET
+// Field       : USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -5365,14 +5320,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP10_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -5490,8 +5445,7 @@
 #define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -5500,14 +5454,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP11_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -5625,8 +5579,7 @@
 #define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFS
-//               ET
+// Field       : USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -5635,14 +5588,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP11_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -5760,8 +5713,7 @@
 #define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -5770,14 +5722,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP12_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -5895,8 +5847,7 @@
 #define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFS
-//               ET
+// Field       : USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -5905,14 +5856,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP12_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -6030,8 +5981,7 @@
 #define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -6040,14 +5990,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP13_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -6165,8 +6115,7 @@
 #define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFS
-//               ET
+// Field       : USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -6175,14 +6124,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP13_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -6300,8 +6249,7 @@
 #define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -6310,14 +6258,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP14_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -6435,8 +6383,7 @@
 #define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFS
-//               ET
+// Field       : USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -6445,14 +6392,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP14_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -6570,8 +6517,7 @@
 #define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSE
-//               T
+// Field       : USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -6580,14 +6526,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP15_IN_BUFFER_CONTROL_AVAILABLE_1
@@ -6705,8 +6651,7 @@
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_PID_1_LSB    _u(29)
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_PID_1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFS
-//               ET
+// Field       : USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET
 // Description : The number of bytes buffer 1 is offset from buffer 0 in
 //               Isochronous mode. Only valid in double buffered mode for an
 //               Isochronous endpoint.
@@ -6715,14 +6660,14 @@
 //               0x1 -> 256
 //               0x2 -> 512
 //               0x3 -> 1024
-#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET      _u(0x0)
-#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS       _u(0x18000000)
-#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB        _u(28)
-#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB        _u(27)
-#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS     "RW"
-#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128  _u(0x0)
-#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256  _u(0x1)
-#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512  _u(0x2)
+#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_RESET  _u(0x0)
+#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_BITS   _u(0x18000000)
+#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_MSB    _u(28)
+#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_LSB    _u(27)
+#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_ACCESS "RW"
+#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_128 _u(0x0)
+#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_256 _u(0x1)
+#define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_512 _u(0x2)
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_DOUBLE_BUFFER_ISO_OFFSET_VALUE_1024 _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_AVAILABLE_1
@@ -6804,4 +6749,5 @@
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_LENGTH_0_LSB    _u(0)
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_LENGTH_0_ACCESS "RW"
 // =============================================================================
-#endif // HARDWARE_REGS_USB_DEVICE_DPRAM_DEFINED
+#endif // _HARDWARE_REGS_USB_DEVICE_DPRAM_H
+

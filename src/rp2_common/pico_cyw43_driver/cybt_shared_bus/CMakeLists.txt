@@ -5,7 +5,7 @@ target_sources(cybt_shared_bus INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/cybt_shared_bus.c
     ${CMAKE_CURRENT_LIST_DIR}/cybt_shared_bus_driver.c
 )
-target_include_directories(cybt_shared_bus_headers INTERFACE
+target_include_directories(cybt_shared_bus_headers SYSTEM INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}
 )
 

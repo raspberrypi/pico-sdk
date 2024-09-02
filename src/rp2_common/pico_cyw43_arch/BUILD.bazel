@@ -1,0 +1,61 @@
+load("//bazel:defs.bzl", "compatible_with_pico_w", "incompatible_with_config")
+
+package(default_visibility = ["//visibility:public"])
+
+# Tuple is async_context type and whether or not lwip is enabled.
+_CONFIGURATIONS = [
+    ("freertos", False),
+    ("freertos", True),
+    ("poll", False),
+    ("poll", True),
+    ("threadsafe_background", False),
+    ("threadsafe_background", True),
+]
+
+# This produces the following labels:
+#   pico_cyw43_arch_sys_freertos
+#   pico_cyw43_arch_lwip_sys_freertos
+#   pico_cyw43_arch_poll
+#   pico_cyw43_arch_lwip_poll
+#   pico_cyw43_arch_threadsafe_background
+#   pico_cyw43_arch_lwip_threadsafe_background
+#
+# This is done rather than having intermediate libraries because the defines
+# for a given configuration must be applied to both .c files.
+[
+    cc_library(
+        name = "pico_cyw43_arch_" + ("lwip_" if use_lwip else "") + kind,
+        srcs = [
+            "cyw43_arch.c",
+            "cyw43_arch_{}.c".format(kind),
+        ],
+        hdrs = [
+            "include/pico/cyw43_arch.h",
+            "include/pico/cyw43_arch/arch_{}.h".format(kind),
+        ],
+        defines = [
+            "LIB_PICO_CYW43_ARCH=1",
+            "PICO_CYW43_ARCH_{}=1".format(kind.upper()),
+            "CYW43_LWIP={}".format(1 if use_lwip else 0),
+        ],
+        includes = ["include"],
+        target_compatible_with = compatible_with_pico_w() + (
+            incompatible_with_config("//bazel/constraint:pico_freertos_unset") if kind == "freertos" else []
+        ),
+        deps = [
+            "//src/rp2_common:pico_platform",
+            "//src/rp2_common/pico_async_context:pico_async_context_{}".format(kind),
+            "//src/rp2_common/pico_cyw43_driver",
+            "//src/rp2_common/pico_lwip",
+            "//src/rp2_common/pico_unique_id",
+        ] + (
+            ["//src/rp2_common/pico_lwip:pico_lwip_freertos"] if kind == "freertos" else ["//src/rp2_common/pico_lwip:pico_lwip_nosys"]
+        ),
+    )
+    for kind, use_lwip in _CONFIGURATIONS
+]
+
+alias(
+    name = "pico_cyw43_arch_none",
+    actual = ":pico_cyw43_arch_threadsafe_background",
+)

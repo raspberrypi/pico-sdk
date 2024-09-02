@@ -33,8 +33,11 @@ typedef struct _binary_info_core binary_info_t;
 #define BINARY_INFO_TYPE_BLOCK_DEVICE 7
 #define BINARY_INFO_TYPE_PINS_WITH_FUNC 8
 #define BINARY_INFO_TYPE_PINS_WITH_NAME 9
-#define BINARY_INFO_TYPE_PINS_WITH_NAMES 9
 #define BINARY_INFO_TYPE_NAMED_GROUP 10
+#define BINARY_INFO_TYPE_PTR_INT32_WITH_NAME 11
+#define BINARY_INFO_TYPE_PTR_STRING_WITH_NAME 12
+#define BINARY_INFO_TYPE_PINS64_WITH_FUNC 13
+#define BINARY_INFO_TYPE_PINS64_WITH_NAME 14
 
 // note plan is to reserve c1 = 0->31 for "collision tags"; i.e.
 // for which you should always use random IDs with the binary_info,
@@ -94,6 +97,21 @@ typedef struct __packed _binary_info_id_and_string {
         bi_ptr_of(const char) value;
 } binary_info_id_and_string_t;
 
+typedef struct __packed _binary_info_ptr_int32_with_name {
+        struct _binary_info_core core;
+        int32_t id;
+        bi_ptr_of(const int) value;
+        bi_ptr_of(const char) label;
+} binary_info_ptr_int32_with_name_t;
+
+typedef struct __packed _binary_info_ptr_string_with_name {
+        struct _binary_info_core core;
+        int32_t id;
+        bi_ptr_of(const char) value;
+        bi_ptr_of(const char) label;
+        uint32_t len;
+} binary_info_ptr_string_with_name_t;
+
 typedef struct __packed _binary_info_block_device {
         struct _binary_info_core core;
         bi_ptr_of(const char) name; // optional static name (independent of what is formatted)
@@ -113,11 +131,24 @@ typedef struct __packed _binary_info_pins_with_func {
     uint32_t pin_encoding;
 } binary_info_pins_with_func_t;
 
+typedef struct __packed _binary_info_pins64_with_func {
+    struct _binary_info_core core;
+    // p6_8 : p5_8 : p4_8 : p3_8 : p2_8 : p1_8 : p0_8 : func_5 : 010_3 //individual pins p0,p1,p2 ... if fewer than 7 then duplicate p
+    //                    phi_8 : plo_8 : func_5 : 001_3 // pin range plo-phi inclusive
+    uint64_t pin_encoding;
+} binary_info_pins64_with_func_t;
+
 typedef struct __packed _binary_info_pins_with_name {
     struct _binary_info_core core;
     uint32_t pin_mask;
     bi_ptr_of(const char) label;
 } binary_info_pins_with_name_t;
+
+typedef struct __packed _binary_info_pins64_with_name {
+    struct _binary_info_core core;
+    uint64_t pin_mask;
+    bi_ptr_of(const char) label;
+} binary_info_pins64_with_name_t;
 
 #define BI_NAMED_GROUP_SHOW_IF_EMPTY   0x0001  // default is to hide
 #define BI_NAMED_GROUP_SEPARATE_COMMAS 0x0002  // default is newlines
@@ -134,8 +165,7 @@ typedef struct __packed _binary_info_named_group {
 } binary_info_named_group_t;
 
 enum {
-    BINARY_INFO_BLOCK_DEV_FLAG_READ =
-    1 << 0, // if not readable, then it is basically hidden, but tools may choose to avoid overwriting it
+    BINARY_INFO_BLOCK_DEV_FLAG_READ = 1 << 0, // if not readable, then it is basically hidden, but tools may choose to avoid overwriting it
     BINARY_INFO_BLOCK_DEV_FLAG_WRITE = 1 << 1,
     BINARY_INFO_BLOCK_DEV_FLAG_REFORMAT = 1 << 2, // may be reformatted..
 

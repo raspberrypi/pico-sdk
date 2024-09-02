@@ -23,6 +23,7 @@
 
 %{
   yy::parser::symbol_type make_INT(const std::string &s, const yy::parser::location_type& loc);
+  yy::parser::symbol_type make_FLOAT(const std::string &s, const yy::parser::location_type& loc);
   yy::parser::symbol_type make_HEX(const std::string &s, const yy::parser::location_type& loc);
   yy::parser::symbol_type make_BINARY(const std::string &s, const yy::parser::location_type& loc);
 %}
@@ -37,6 +38,7 @@ id            [a-zA-Z_][a-zA-Z0-9_]*
 
 binary        "0b"[01]+
 int           {digit}+
+float         {digit}*\.{digit}+
 hex	          "0x"[0-9a-fA-F]+
 directive     \.{id}
 
@@ -92,7 +94,7 @@ output_fmt    [^%\n]+
 <lang_opt>{
 \"[^\n]*\"                          return yy::parser::make_STRING(yytext, loc);
 {blank}+                            loc.step();
-"="		                            return yy::parser::make_EQUAL(loc);
+"="		                            return yy::parser::make_ASSIGN(loc);
 {int}                               return make_INT(yytext, loc);
 {hex}                               return make_HEX(yytext, loc);
 {binary}                            return make_BINARY(yytext, loc);
@@ -117,10 +119,13 @@ output_fmt    [^%\n]+
 "/"                                 return yy::parser::make_DIVIDE(loc);
 "|"                                 return yy::parser::make_OR(loc);
 "&"                                 return yy::parser::make_AND(loc);
+">>"                                return yy::parser::make_SHR(loc);
+"<<"                                return yy::parser::make_SHL(loc);
 "^"                                 return yy::parser::make_XOR(loc);
 "!="		                        return yy::parser::make_NOT_EQUAL(loc);
 "!"			                        return yy::parser::make_NOT(loc);
 "~"			                        return yy::parser::make_NOT(loc);
+"<"                                 return yy::parser::make_LESSTHAN(loc);
 
 ".program"		                    return yy::parser::make_PROGRAM(loc);
 ".wrap_target"	                    return yy::parser::make_WRAP_TARGET(loc);
@@ -130,6 +135,14 @@ output_fmt    [^%\n]+
 ".side_set"		                    return yy::parser::make_SIDE_SET(loc);
 ".origin"		                    return yy::parser::make_ORIGIN(loc);
 ".lang_opt"         	            { BEGIN(lang_opt); return yy::parser::make_LANG_OPT(loc); }
+".pio_version"                      return yy::parser::make_PIO_VERSION(loc);
+".clock_div"                        return yy::parser::make_CLOCK_DIV(loc);
+".fifo"                             return yy::parser::make_FIFO(loc);
+".mov_status"                       return yy::parser::make_MOV_STATUS(loc);
+".set"                              return yy::parser::make_DOT_SET(loc);
+".out"                              return yy::parser::make_DOT_OUT(loc);
+".in"                               return yy::parser::make_DOT_IN(loc);
+
 {directive}                         return yy::parser::make_UNKNOWN_DIRECTIVE(yytext, loc);
 
 "JMP"			                    return yy::parser::make_JMP(loc);
@@ -173,13 +186,33 @@ output_fmt    [^%\n]+
 
 "CLEAR"			                    return yy::parser::make_CLEAR(loc);
 "NOWAIT"		                    return yy::parser::make_NOWAIT(loc);
+"JMPPIN"                            return yy::parser::make_JMPPIN(loc);
+"NEXT"                              return yy::parser::make_NEXT(loc);
+"PREV"                              return yy::parser::make_PREV(loc);
+
+"TXRX"                              return yy::parser::make_TXRX(loc);
+"TX"                                return yy::parser::make_TX(loc);
+"RX"                                return yy::parser::make_RX(loc);
+"TXPUT"                             return yy::parser::make_TXPUT(loc);
+"TXGET"                             return yy::parser::make_TXGET(loc);
+"PUTGET"                            return yy::parser::make_PUTGET(loc);
 
 "ONE"                               return yy::parser::make_INT(1, loc);
 "ZERO"                              return yy::parser::make_INT(0, loc);
 
+"RP2040"                            return yy::parser::make_RP2040(loc);
+"RP2350"                            return yy::parser::make_RP2350(loc);
+"RXFIFO"                            return yy::parser::make_RXFIFO(loc);
+"TXFIFO"                            return yy::parser::make_TXFIFO(loc);
+
+"LEFT"                              return yy::parser::make_LEFT(loc);
+"RIGHT"                             return yy::parser::make_RIGHT(loc);
+"AUTO"                              return yy::parser::make_AUTO(loc);
+"MANUAL"                            return yy::parser::make_MANUAL(loc);
 <<EOF>>                             return yy::parser::make_END(loc);
 
 {int}                               return make_INT(yytext, loc);
+{float}                             return make_FLOAT(yytext, loc);
 {hex}                               return make_HEX(yytext, loc);
 {binary}                            return make_BINARY(yytext, loc);
 
@@ -198,6 +231,13 @@ yy::parser::symbol_type make_INT(const std::string &s, const yy::parser::locatio
   if (! (INT_MIN <= n && n <= INT_MAX && errno != ERANGE))
     throw yy::parser::syntax_error (loc, "integer is out of range: " + s);
   return yy::parser::make_INT((int) n, loc);
+}
+
+yy::parser::symbol_type make_FLOAT(const std::string &s, const yy::parser::location_type& loc)
+{
+  errno = 0;
+  float n = strtof (s.c_str(), NULL);
+  return yy::parser::make_FLOAT(n, loc);
 }
 
 yy::parser::symbol_type make_HEX(const std::string &s, const yy::parser::location_type& loc)

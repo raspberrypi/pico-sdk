@@ -68,6 +68,39 @@ void stdin_uart_init(void);
  */
 void stdio_uart_init_full(uart_inst_t *uart, uint baud_rate, int tx_pin, int rx_pin);
 
+/*! \brief Explicitly deinitialize stdin/stdout over UART and remove it from the current set of stdin/stdout drivers
+ *  \ingroup pico_stdio_uart
+ *
+ * This method disables PICO_DEFAULT_UART_TX_PIN for UART output (if defined), PICO_DEFAULT_UART_RX_PIN for input (if defined)
+ * and leaves the pads isolated.
+ *
+ * \note this method is automatically called by \ref stdio_deinit_all() if `pico_stdio_uart` is included in the build
+ */
+void stdio_uart_deinit(void);
+
+/*! \brief Explicitly deinitialize stdout only (no stdin) over UART and remove it from the current set of stdout drivers
+ *  \ingroup pico_stdio_uart
+ *
+ * This method disables PICO_DEFAULT_UART_TX_PIN for UART output (if defined), and leaves the pad isolated
+ */
+void stdout_uart_deinit(void);
+
+/*! \brief Explicitly deinitialize stdin only (no stdout) over UART and remove it from the current set of stdin drivers
+ *  \ingroup pico_stdio_uart
+ *
+ * This method disables PICO_DEFAULT_UART_RX_PIN for UART input (if defined), and leaves the pads isolated
+ */
+void stdin_uart_deinit(void);
+
+/*! \brief Perform custom deinitialization deinitialize stdin/stdout over UART and remove it from the current set of stdin/stdout drivers
+ *  \ingroup pico_stdio_uart
+ *
+ * \param uart the uart instance to use, \ref uart0 or \ref uart1
+ * \param tx_pin the UART pin to use for stdout (or -1 for no stdout)
+ * \param rx_pin the UART pin to use for stdin (or -1 for no stdin)
+ */
+void stdio_uart_deinit_full(uart_inst_t *uart, int tx_pin, int rx_pin);
+
 #ifdef __cplusplus
 }
 #endif

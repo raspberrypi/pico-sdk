@@ -1,0 +1,24 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_irq",
+    srcs = [
+        "irq.c",
+        "irq_handler_chain.S",
+    ],
+    hdrs = ["include/hardware/irq.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/hardware_claim",
+        "//src/common/pico_sync",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform_internal",
+        "//src/rp2_common:platform_defs",
+        "//src/rp2_common/hardware_base",
+    ],
+    alwayslink = True,
+)

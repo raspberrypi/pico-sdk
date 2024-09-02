@@ -1,0 +1,26 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_flash",
+    srcs = ["flash.c"],
+    hdrs = ["include/pico/flash.h"],
+    defines = select({
+        "//bazel/constraint:pico_freertos_unset": ["PICO_FREERTOS_LIB=0"],
+        "//conditions:default": ["PICO_FREERTOS_LIB=1"],
+    }),
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_exception",
+        "//src/rp2_common/hardware_flash",
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/pico_multicore",
+    ] + select({
+        "//bazel/constraint:pico_freertos_unset": [],
+        "//conditions:default": ["//bazel/config:PICO_FREERTOS_LIB"],
+    }),
+)

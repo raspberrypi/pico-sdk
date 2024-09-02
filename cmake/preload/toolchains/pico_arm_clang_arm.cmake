@@ -1,7 +1,7 @@
 # NOTE: THIS IS A WIP ONLY PICO_ARM_GCC IS CURRENTLY SUPPORTED
 # todo there is probably a more "cmake" way of doing this going thru the standard path with our "PICO" platform
 #  i.e. CMake<Lang>Information and whatnot
-include(${CMAKE_CURRENT_LIST_DIR}/find_compiler.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/util/find_compiler.cmake)
 
 # include our Platform/PICO.cmake
 set(CMAKE_SYSTEM_NAME PICO)
@@ -37,7 +37,5 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 
-option(PICO_DEOPTIMIZED_DEBUG "Build debug builds with -O0" 0)
-
 set(ARM_TOOLCHAIN_COMMON_FLAGS " --cpu=Cortex-M0plus")
-include(${CMAKE_CURRENT_LIST_DIR}/set_flags.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/util/set_flags.cmake)

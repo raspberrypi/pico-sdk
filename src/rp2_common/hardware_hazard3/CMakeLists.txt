@@ -1,0 +1,2 @@
+pico_simple_hardware_headers_only_target(hazard3)
+target_link_libraries(hardware_hazard3 INTERFACE hardware_riscv)

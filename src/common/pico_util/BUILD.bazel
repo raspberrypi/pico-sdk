@@ -1,0 +1,31 @@
+load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_util",
+    srcs = [
+        "datetime.c",
+        "pheap.c",
+        "queue.c",
+    ],
+    hdrs = [
+        "include/pico/util/datetime.h",
+        "include/pico/util/pheap.h",
+        "include/pico/util/queue.h",
+    ],
+    includes = ["include"],
+    # invalid_params_if() uses Statement Expressions, which aren't supported in MSVC.
+    target_compatible_with = incompatible_with_config("@rules_cc//cc/compiler:msvc-cl"),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/common/pico_sync",
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/hardware_sync",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_sync",
+        ],
+    }),
+)

@@ -1,10 +1,40 @@
-# For targeting the host for testing purposes
+set(CMAKE_DIR cmake)
+set(COMMON_DIR common)
+set(HOST_DIR host)
 
-function(pico_add_extra_outputs TARGET)
-endfunction()
+include (${CMAKE_DIR}/no_hardware.cmake)
 
-set(PICO_NO_HARDWARE "1" CACHE INTERNAL "")
-set(PICO_ON_DEVICE "0" CACHE INTERNAL "")
 
-add_subdirectory(common)
-add_subdirectory(host)
+# common
+ pico_add_subdirectory(${COMMON_DIR}/boot_picobin_headers)
+ pico_add_subdirectory(${COMMON_DIR}/boot_picoboot_headers)
+ pico_add_subdirectory(${COMMON_DIR}/boot_uf2_headers)
+ pico_add_subdirectory(${COMMON_DIR}/pico_base_headers)
+ pico_add_subdirectory(${COMMON_DIR}/pico_usb_reset_interface_headers)
+ pico_add_subdirectory(${COMMON_DIR}/pico_bit_ops_headers)
+ pico_add_subdirectory(${COMMON_DIR}/pico_binary_info)
+ pico_add_subdirectory(${COMMON_DIR}/pico_divider_headers)
+ pico_add_subdirectory(${COMMON_DIR}/pico_sync)
+ pico_add_subdirectory(${COMMON_DIR}/pico_time)
+ pico_add_subdirectory(${COMMON_DIR}/pico_util)
+ pico_add_subdirectory(${COMMON_DIR}/pico_stdlib_headers)
+
+# host-specific
+ pico_add_subdirectory(${HOST_DIR}/hardware_divider)
+ pico_add_subdirectory(${HOST_DIR}/hardware_gpio)
+ pico_add_subdirectory(${HOST_DIR}/hardware_sync)
+ pico_add_subdirectory(${HOST_DIR}/hardware_timer)
+ pico_add_subdirectory(${HOST_DIR}/hardware_uart)
+ pico_add_subdirectory(${HOST_DIR}/pico_bit_ops)
+ pico_add_subdirectory(${HOST_DIR}/pico_divider)
+ pico_add_subdirectory(${HOST_DIR}/pico_multicore)
+ pico_add_subdirectory(${HOST_DIR}/pico_platform)
+ pico_add_subdirectory(${HOST_DIR}/pico_runtime)
+ pico_add_subdirectory(${HOST_DIR}/pico_printf)
+ pico_add_subdirectory(${HOST_DIR}/pico_stdio)
+ pico_add_subdirectory(${HOST_DIR}/pico_stdlib)
+ pico_add_subdirectory(${HOST_DIR}/pico_time_adapter)
+
+unset(CMAKE_DIR)
+unset(COMMON_DIR)
+unset(HOST_DIR)

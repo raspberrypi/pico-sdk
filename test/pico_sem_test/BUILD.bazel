@@ -1,0 +1,14 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_sem_test",
+    testonly = True,
+    srcs = ["pico_sem_test.c"],
+    deps = [
+        "//src/common/pico_sync",
+        "//test/pico_test",
+    ] + select({
+        "//bazel/constraint:host": ["//src/host/pico_stdlib"],
+        "//conditions:default": ["//src/rp2_common/pico_stdlib"],
+    }),
+)

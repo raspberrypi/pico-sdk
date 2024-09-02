@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,8 +11,8 @@
 // Bus type       : apb
 // Description    : Controls the crystal oscillator
 // =============================================================================
-#ifndef HARDWARE_REGS_XOSC_DEFINED
-#define HARDWARE_REGS_XOSC_DEFINED
+#ifndef _HARDWARE_REGS_XOSC_H
+#define _HARDWARE_REGS_XOSC_H
 // =============================================================================
 // Register    : XOSC_CTRL
 // Description : Crystal Oscillator Control
@@ -22,34 +24,36 @@
 // Description : On power-up this field is initialised to DISABLE and the chip
 //               runs from the ROSC.
 //               If the chip has subsequently been programmed to run from the
-//               XOSC then setting this field to DISABLE may lock-up the chip.
-//               If this is a concern then run the clk_ref from the ROSC and
-//               enable the clk_sys RESUS feature.
+//               XOSC then DISABLE may lock-up the chip. If this is a concern
+//               then run the clk_ref from the ROSC and enable the clk_sys RESUS
+//               feature.
 //               The 12-bit code is intended to give some protection against
 //               accidental writes. An invalid setting will enable the
 //               oscillator.
 //               0xd1e -> DISABLE
 //               0xfab -> ENABLE
-#define XOSC_CTRL_ENABLE_RESET         "-"
-#define XOSC_CTRL_ENABLE_BITS          _u(0x00fff000)
-#define XOSC_CTRL_ENABLE_MSB           _u(23)
-#define XOSC_CTRL_ENABLE_LSB           _u(12)
-#define XOSC_CTRL_ENABLE_ACCESS        "RW"
+#define XOSC_CTRL_ENABLE_RESET  "-"
+#define XOSC_CTRL_ENABLE_BITS   _u(0x00fff000)
+#define XOSC_CTRL_ENABLE_MSB    _u(23)
+#define XOSC_CTRL_ENABLE_LSB    _u(12)
+#define XOSC_CTRL_ENABLE_ACCESS "RW"
 #define XOSC_CTRL_ENABLE_VALUE_DISABLE _u(0xd1e)
-#define XOSC_CTRL_ENABLE_VALUE_ENABLE  _u(0xfab)
+#define XOSC_CTRL_ENABLE_VALUE_ENABLE _u(0xfab)
 // -----------------------------------------------------------------------------
 // Field       : XOSC_CTRL_FREQ_RANGE
-// Description : Frequency range. This resets to 0xAA0 and cannot be changed.
+// Description : Frequency range. An invalid setting will retain the previous
+//               value. The actual value being used can be read from
+//               STATUS_FREQ_RANGE. This resets to 0xAA0 and cannot be changed.
 //               0xaa0 -> 1_15MHZ
 //               0xaa1 -> RESERVED_1
 //               0xaa2 -> RESERVED_2
 //               0xaa3 -> RESERVED_3
-#define XOSC_CTRL_FREQ_RANGE_RESET            "-"
-#define XOSC_CTRL_FREQ_RANGE_BITS             _u(0x00000fff)
-#define XOSC_CTRL_FREQ_RANGE_MSB              _u(11)
-#define XOSC_CTRL_FREQ_RANGE_LSB              _u(0)
-#define XOSC_CTRL_FREQ_RANGE_ACCESS           "RW"
-#define XOSC_CTRL_FREQ_RANGE_VALUE_1_15MHZ    _u(0xaa0)
+#define XOSC_CTRL_FREQ_RANGE_RESET  "-"
+#define XOSC_CTRL_FREQ_RANGE_BITS   _u(0x00000fff)
+#define XOSC_CTRL_FREQ_RANGE_MSB    _u(11)
+#define XOSC_CTRL_FREQ_RANGE_LSB    _u(0)
+#define XOSC_CTRL_FREQ_RANGE_ACCESS "RW"
+#define XOSC_CTRL_FREQ_RANGE_VALUE_1_15MHZ _u(0xaa0)
 #define XOSC_CTRL_FREQ_RANGE_VALUE_RESERVED_1 _u(0xaa1)
 #define XOSC_CTRL_FREQ_RANGE_VALUE_RESERVED_2 _u(0xaa2)
 #define XOSC_CTRL_FREQ_RANGE_VALUE_RESERVED_3 _u(0xaa3)
@@ -92,12 +96,12 @@
 //               0x1 -> RESERVED_1
 //               0x2 -> RESERVED_2
 //               0x3 -> RESERVED_3
-#define XOSC_STATUS_FREQ_RANGE_RESET            "-"
-#define XOSC_STATUS_FREQ_RANGE_BITS             _u(0x00000003)
-#define XOSC_STATUS_FREQ_RANGE_MSB              _u(1)
-#define XOSC_STATUS_FREQ_RANGE_LSB              _u(0)
-#define XOSC_STATUS_FREQ_RANGE_ACCESS           "RO"
-#define XOSC_STATUS_FREQ_RANGE_VALUE_1_15MHZ    _u(0x0)
+#define XOSC_STATUS_FREQ_RANGE_RESET  "-"
+#define XOSC_STATUS_FREQ_RANGE_BITS   _u(0x00000003)
+#define XOSC_STATUS_FREQ_RANGE_MSB    _u(1)
+#define XOSC_STATUS_FREQ_RANGE_LSB    _u(0)
+#define XOSC_STATUS_FREQ_RANGE_ACCESS "RO"
+#define XOSC_STATUS_FREQ_RANGE_VALUE_1_15MHZ _u(0x0)
 #define XOSC_STATUS_FREQ_RANGE_VALUE_RESERVED_1 _u(0x1)
 #define XOSC_STATUS_FREQ_RANGE_VALUE_RESERVED_2 _u(0x2)
 #define XOSC_STATUS_FREQ_RANGE_VALUE_RESERVED_3 _u(0x3)
@@ -107,29 +111,29 @@
 //               This is used to save power by pausing the XOSC
 //               On power-up this field is initialised to WAKE
 //               An invalid write will also select WAKE
-//               WARNING: stop the PLLs before selecting dormant mode
-//               WARNING: setup the irq before selecting dormant mode
-//               0x636f6d61 -> DORMANT
+//               Warning: stop the PLLs before selecting dormant mode
+//               Warning: setup the irq before selecting dormant mode
+//               0x636f6d61 -> dormant
 //               0x77616b65 -> WAKE
-#define XOSC_DORMANT_OFFSET        _u(0x00000008)
-#define XOSC_DORMANT_BITS          _u(0xffffffff)
-#define XOSC_DORMANT_RESET         "-"
-#define XOSC_DORMANT_MSB           _u(31)
-#define XOSC_DORMANT_LSB           _u(0)
-#define XOSC_DORMANT_ACCESS        "RW"
+#define XOSC_DORMANT_OFFSET _u(0x00000008)
+#define XOSC_DORMANT_BITS   _u(0xffffffff)
+#define XOSC_DORMANT_RESET  "-"
+#define XOSC_DORMANT_MSB    _u(31)
+#define XOSC_DORMANT_LSB    _u(0)
+#define XOSC_DORMANT_ACCESS "RW"
 #define XOSC_DORMANT_VALUE_DORMANT _u(0x636f6d61)
-#define XOSC_DORMANT_VALUE_WAKE    _u(0x77616b65)
+#define XOSC_DORMANT_VALUE_WAKE _u(0x77616b65)
 // =============================================================================
 // Register    : XOSC_STARTUP
 // Description : Controls the startup delay
 #define XOSC_STARTUP_OFFSET _u(0x0000000c)
 #define XOSC_STARTUP_BITS   _u(0x00103fff)
-#define XOSC_STARTUP_RESET  _u(0x000000c4)
+#define XOSC_STARTUP_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
 // Field       : XOSC_STARTUP_X4
 // Description : Multiplies the startup_delay by 4. This is of little value to
 //               the user given that the delay can be programmed directly.
-#define XOSC_STARTUP_X4_RESET  _u(0x0)
+#define XOSC_STARTUP_X4_RESET  "-"
 #define XOSC_STARTUP_X4_BITS   _u(0x00100000)
 #define XOSC_STARTUP_X4_MSB    _u(20)
 #define XOSC_STARTUP_X4_LSB    _u(20)
@@ -138,7 +142,7 @@
 // Field       : XOSC_STARTUP_DELAY
 // Description : in multiples of 256*xtal_period. The reset value of 0xc4
 //               corresponds to approx 50 000 cycles.
-#define XOSC_STARTUP_DELAY_RESET  _u(0x00c4)
+#define XOSC_STARTUP_DELAY_RESET  "-"
 #define XOSC_STARTUP_DELAY_BITS   _u(0x00003fff)
 #define XOSC_STARTUP_DELAY_MSB    _u(13)
 #define XOSC_STARTUP_DELAY_LSB    _u(0)
@@ -157,4 +161,5 @@
 #define XOSC_COUNT_LSB    _u(0)
 #define XOSC_COUNT_ACCESS "RW"
 // =============================================================================
-#endif // HARDWARE_REGS_XOSC_DEFINED
+#endif // _HARDWARE_REGS_XOSC_H
+

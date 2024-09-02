@@ -1,0 +1,14 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_time_adapter",
+    srcs = ["time_adapter.c"],
+    hdrs = ["include/pico/time_adapter.h"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = [
+        "//src/common/pico_time:pico_time_headers",
+        "//src/host/pico_platform",
+    ],
+    alwayslink = True,
+)

@@ -34,18 +34,21 @@
  * \include flash_program.c
  */
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_FLASH, Enable/disable assertions in the flash module, type=bool, default=0, group=hardware_flash
-#ifndef PARAM_ASSERTIONS_ENABLED_FLASH
-#define PARAM_ASSERTIONS_ENABLED_FLASH 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_FLASH, Enable/disable assertions in the hardware_flash module, type=bool, default=0, group=hardware_flash
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_FLASH
+#ifdef PARAM_ASSERTIONS_ENABLED_FLASH // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_FLASH PARAM_ASSERTIONS_ENABLED_FLASH
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_FLASH 0
 #endif
-
+#endif
 #define FLASH_PAGE_SIZE (1u << 8)
 #define FLASH_SECTOR_SIZE (1u << 12)
 #define FLASH_BLOCK_SIZE (1u << 16)
 
 #define FLASH_UNIQUE_ID_SIZE_BYTES 8
 
-// PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, group=hardware_flash
+// PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, default=Usually provided via board header, group=hardware_flash
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,6 +59,10 @@ extern "C" {
  *
  * \param flash_offs Offset into flash, in bytes, to start the erase. Must be aligned to a 4096-byte flash sector.
  * \param count Number of bytes to be erased. Must be a multiple of 4096 bytes (one sector).
+ *
+ * @note Erasing a flash sector sets all the bits in all the pages in that sector to one.
+ * You can then "program" flash pages in the sector to turn some of the bits to zero.
+ * Once a bit is set to zero it can only be changed back to one by erasing the whole sector again.
  */
 void flash_range_erase(uint32_t flash_offs, size_t count);
 
@@ -65,6 +72,10 @@ void flash_range_erase(uint32_t flash_offs, size_t count);
  * \param flash_offs Flash address of the first byte to be programmed. Must be aligned to a 256-byte flash page.
  * \param data Pointer to the data to program into flash
  * \param count Number of bytes to program. Must be a multiple of 256 bytes (one page).
+ *
+ * @note: Programming a flash page effectively changes some of the bits from one to zero.
+ * The only way to change a zero bit back to one is to "erase" the whole sector that the page resides in.
+ * So you may need to make sure you have called flash_range_erase before calling flash_range_program.
  */
 
 void flash_range_program(uint32_t flash_offs, const uint8_t *data, size_t count);
@@ -106,6 +117,7 @@ void flash_get_unique_id(uint8_t *id_out);
  */
 void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count);
 
+void flash_flush_cache(void);
 
 #ifdef __cplusplus
 }

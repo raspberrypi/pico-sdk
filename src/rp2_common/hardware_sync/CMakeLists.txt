@@ -1,1 +1,3 @@
 pico_simple_hardware_target(sync)
+
+pico_mirrored_target_link_libraries(hardware_sync INTERFACE hardware_sync_spin_lock)

@@ -29,7 +29,7 @@
 #include "pico/time.h"
 #include "hardware/clocks.h"
 #include "hardware/structs/rosc.h"
-#include "hardware/structs/bus_ctrl.h"
+#include "hardware/structs/busctrl.h"
 #include "hardware/sync.h"
 
 static bool rng_initialised = false;
@@ -118,6 +118,60 @@ static uint64_t sdbm_hash64_sram(uint64_t hash) {
 }
 #endif
 
+#if PICO_RAND_SEED_ENTROPY_SRC_TRNG | PICO_RAND_ENTROPY_SRC_TRNG
+#if !HAS_RP2350_TRNG
+#error PICO_RAND_SEED_ENTROPY_SRC_TRNG and PICO_RAND_ENTROPY_SRC_TRNG are only valid on RP2350
+#endif
+#include "hardware/structs/trng.h"
+
+uint32_t trng_sample_words[count_of(trng_hw->ehr_data)];
+static_assert(count_of(trng_hw->ehr_data) >= 2 && count_of(trng_hw->ehr_data) < 255, "");
+uint8_t trng_sample_word_count;
+
+static uint64_t capture_additional_trng_samples(void) {
+    spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_RAND);
+    uint32_t save = spin_lock_blocking(lock);
+    if (trng_sample_word_count < 2) {
+        // Sample one ROSC bit into EHR every cycle, subject to CPU keeping up.
+        // More temporal resolution to measure ROSC phase noise is better, if we
+        // use a high quality hash function instead of naive VN decorrelation.
+        // (Also more metastability events, which are a secondary noise source)
+        //
+        // This is out of the loop because writing to this register seems to
+        // restart the sampling, slowing things down. We don't care if this write
+        // is skipped as that would just make sampling take longer.
+        trng_hw->sample_cnt1 = 0;
+
+        // TRNG setup is inside loop in case it is skipped. Disable checks and
+        // bypass decorrelators, to stream raw TRNG ROSC samples:
+        trng_hw->trng_debug_control = -1u;
+        // Start ROSC if it is not already started
+        trng_hw->rnd_source_enable = -1u;
+        // Clear all interrupts (including EHR_VLD) -- we will check this
+        // later, after seeding RCP.
+        trng_hw->rng_icr = -1u;
+
+        // Wait for 192 ROSC samples to fill EHR, this should take constant time:
+        while (trng_hw->trng_busy);
+
+        for (uint i = 0; i < count_of(trng_sample_words); i++) {
+            trng_sample_words[i] = trng_hw->ehr_data[i];
+        }
+        trng_sample_word_count = count_of(trng_sample_words);
+
+        // TRNG is now sampling again, having started after we read the last
+        // EHR word. Grab some random bits and use them to modulate
+        // the chain length, to reduce chance of injection locking:
+        trng_hw->trng_config = rng_state.r[0];
+    }
+    trng_sample_word_count -= 2;
+    uint64_t rc = trng_sample_words[trng_sample_word_count] |
+                  (((uint64_t)trng_sample_words[trng_sample_word_count + 1]) << 32);
+    spin_unlock(lock, save);
+    return rc;
+}
+
+#endif
 #if PICO_RAND_SEED_ENTROPY_SRC_ROSC | PICO_RAND_ENTROPY_SRC_ROSC
 /* gather an additional n bits of entropy, and shift them into the 64 bit entropy counter */
 static uint64_t capture_additional_rosc_samples(uint n) {
@@ -172,6 +226,10 @@ static uint64_t capture_additional_rosc_samples(uint n) {
 }
 #endif
 
+#if PICO_RAND_SEED_ENTROPY_SRC_BOOT_RANDOM
+#include "pico/bootrom.h"
+#endif
+
 static void initialise_rand(void) {
     rng_128_t local_rng_state = local_rng_state;
     uint which = 0;
@@ -211,18 +269,33 @@ static void initialise_rand(void) {
     which ^= 1;
 #endif
 
+#if PICO_RAND_SEED_ENTROPY_SRC_BOOT_RANDOM
+    // Mix in boot random.
+    union {
+        uint64_t u64[2];
+        uint32_t u32[4];
+    } br;
+    rom_get_boot_random(br.u32);
+    local_rng_state.r[which] ^= splitmix64(br.u64[0]);
+    local_rng_state.r[which ^ 1] ^= splitmix64(br.u64[1]);
+#endif
+
 #if PICO_RAND_SEED_ENTROPY_SRC_TIME
     // Mix in hashed time.  This is [possibly] predictable boot-to-boot
     // but will vary application-to-application.
     local_rng_state.r[which] ^= splitmix64(time_us_64());
     which ^= 1;
 #endif
+#if PICO_RAND_SEED_ENTROPY_SRC_TRNG
+    local_rng_state.r[which] ^= splitmix64(capture_additional_trng_samples());
+    which ^= 1;
+#endif
 
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_RAND);
     uint32_t save = spin_lock_blocking(lock);
     if (!rng_initialised) {
-#if PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
-#if !PICO_RAND_BUSCTRL_COUNTER_INDEX
+#if PICO_RAND_SEED_ENTROPY_SRC_BUS_PERF_COUNTER
+#if !PICO_RAND_BUS_PERF_COUNTER_INDEX
         int idx = -1;
         for(uint i = 0; i < count_of(bus_ctrl_hw->counter); i++) {
             if (bus_ctrl_hw->counter[i].sel == BUSCTRL_PERFSEL0_RESET) {
@@ -233,7 +306,7 @@ static void initialise_rand(void) {
         hard_assert(idx != -1);
         bus_counter_idx = (uint8_t)idx;
 #else
-        bus_counter_idx = (uint8_t)PICO_RAND_BUSCTRL_COUNTER_INDEX;
+        bus_counter_idx = (uint8_t)PICO_RAND_BUS_PERF_COUNTER_INDEX;
 #endif
         bus_ctrl_hw->counter[bus_counter_idx].sel = PICO_RAND_BUS_PERF_COUNTER_EVENT;
 #endif
@@ -266,11 +339,16 @@ uint64_t get_rand_64(void) {
     local_rng_state.r[which] ^= splitmix64(capture_additional_rosc_samples(PICO_RAND_ROSC_BIT_SAMPLE_COUNT));
     which ^= 1;
 #endif
+#if PICO_RAND_ENTROPY_SRC_TRNG
+    uint64_t foo = capture_additional_trng_samples();
+    local_rng_state.r[which] ^= splitmix64(foo);
+    which ^= 1;
+#endif
 #if PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
-    uint32_t bus_counter_value = bus_ctrl_hw->counter[bus_counter_idx].value;
+    uint32_t bus_counter_value = busctrl_hw->counter[bus_counter_idx].value;
     // counter is saturating, so clear it if it has reached saturation
     if (bus_counter_value == BUSCTRL_PERFCTR0_BITS) {
-        bus_ctrl_hw->counter[bus_counter_idx].value = 0;
+        busctrl_hw->counter[bus_counter_idx].value = 0;
     }
     local_rng_state.r[which] ^= splitmix64(bus_counter_value);
     which ^= 1;

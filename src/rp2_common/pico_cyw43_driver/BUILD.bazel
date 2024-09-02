@@ -1,0 +1,55 @@
+load("//bazel:defs.bzl", "compatible_with_pico_w", "pico_generate_pio_header")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "cyw43_configport",
+    hdrs = ["include/cyw43_configport.h"],
+    includes = ["include"],
+    deps = [
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_gpio",
+    ],
+)
+
+cc_library(
+    name = "pico_cyw43_driver",
+    srcs = [
+        "btstack_chipset_cyw43.c",
+        "btstack_cyw43.c",
+        "btstack_hci_transport_cyw43.c",
+        "cyw43_bus_pio_spi.c",
+        "cyw43_driver.c",
+    ],
+    hdrs = [
+        "include/pico/btstack_chipset_cyw43.h",
+        "include/pico/btstack_cyw43.h",
+        "include/pico/btstack_hci_transport_cyw43.h",
+        "include/pico/cyw43_driver.h",
+    ],
+    includes = ["include"],
+    target_compatible_with = compatible_with_pico_w(),
+    deps = [
+        ":cyw43_bus_pio",
+        ":cyw43_configport",
+        "//bazel/config:PICO_BTSTACK_CONFIG",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_dma",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_pio",
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/pico_async_context",
+        "//src/rp2_common/pico_btstack:btstack_run_loop_async_context",
+        "//src/rp2_common/pico_btstack:pico_btstack_base",
+        "//src/rp2_common/pico_btstack:pico_btstack_flash_bank",
+        "//src/rp2_common/pico_unique_id",
+        "@cyw43-driver//:cyw43_driver",
+    ],
+)
+
+pico_generate_pio_header(
+    name = "cyw43_bus_pio",
+    srcs = ["cyw43_bus_pio_spi.pio"],
+)

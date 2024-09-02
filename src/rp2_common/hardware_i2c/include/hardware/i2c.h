@@ -12,11 +12,14 @@
 #include "hardware/structs/i2c.h"
 #include "hardware/regs/dreq.h"
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_I2C, Enable/disable assertions in the I2C module, type=bool, default=0, group=hardware_i2c
-#ifndef PARAM_ASSERTIONS_ENABLED_I2C
-#define PARAM_ASSERTIONS_ENABLED_I2C 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_I2C, Enable/disable assertions in the hardware_i2c module, type=bool, default=0, group=hardware_i2c
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_I2C
+#ifdef PARAM_ASSERTIONS_ENABLED_I2C // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_I2C PARAM_ASSERTIONS_ENABLED_I2C
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_I2C 0
 #endif
-
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,9 +54,9 @@ extern "C" {
 
 typedef struct i2c_inst i2c_inst_t;
 
-// PICO_CONFIG: PICO_DEFAULT_I2C, Define the default I2C for a board, min=0, max=1, group=hardware_i2c
-// PICO_CONFIG: PICO_DEFAULT_I2C_SDA_PIN, Define the default I2C SDA pin, min=0, max=29, group=hardware_i2c
-// PICO_CONFIG: PICO_DEFAULT_I2C_SCL_PIN, Define the default I2C SCL pin, min=0, max=29, group=hardware_i2c
+// PICO_CONFIG: PICO_DEFAULT_I2C, Define the default I2C for a board, min=0, max=1, default=Usually provided via board header, group=hardware_i2c
+// PICO_CONFIG: PICO_DEFAULT_I2C_SDA_PIN, Define the default I2C SDA pin, min=0, max=29, default=Usually provided via board header, group=hardware_i2c
+// PICO_CONFIG: PICO_DEFAULT_I2C_SCL_PIN, Define the default I2C SCL pin, min=0, max=29, default=Usually provided via board header, group=hardware_i2c
 
 /** The I2C identifiers for use in I2C functions.
  *
@@ -69,11 +72,24 @@ extern i2c_inst_t i2c1_inst;
 #define i2c1 (&i2c1_inst) ///< Identifier for I2C HW Block 1
 
 #if !defined(PICO_DEFAULT_I2C_INSTANCE) && defined(PICO_DEFAULT_I2C)
-#define PICO_DEFAULT_I2C_INSTANCE (__CONCAT(i2c,PICO_DEFAULT_I2C))
+#define PICO_DEFAULT_I2C_INSTANCE() (__CONCAT(i2c,PICO_DEFAULT_I2C))
 #endif
 
+/**
+ * \def PICO_DEFAULT_I2C
+ * \ingroup hardware_i2c
+ * \hideinitializer
+ * \brief The default I2C instance number
+ */
+
+/**
+ * \def PICO_DEFAULT_I2C_INSTANCE()
+ * \ingroup hardware_i2c
+ * \hideinitializer
+ * \brief Returns the default I2C instance based on the value of PICO_DEFAULT_I2C
+ */
 #ifdef PICO_DEFAULT_I2C_INSTANCE
-#define i2c_default PICO_DEFAULT_I2C_INSTANCE
+#define i2c_default PICO_DEFAULT_I2C_INSTANCE()
 #endif
 
 /** @} */
@@ -137,16 +153,47 @@ struct i2c_inst {
     bool restart_on_next;
 };
 
-/*! \brief Convert I2C instance to hardware instance number
- *  \ingroup hardware_i2c
+/**
+ * \def I2C_NUM(i2c)
+ * \ingroup hardware_i2c
+ * \hideinitializer
+ * \brief Returns the I2C number for a I2C instance
  *
- * \param i2c I2C instance
- * \return Number of I2C, 0 or 1.
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
  */
-static inline uint i2c_hw_index(i2c_inst_t *i2c) {
-    invalid_params_if(I2C, i2c != i2c0 && i2c != i2c1);
-    return i2c == i2c1 ? 1 : 0;
-}
+#ifndef I2C_NUM
+static_assert(NUM_I2CS == 2, "");
+#define I2C_NUM(i2c) ((i2c) == i2c1)
+#endif
+
+/**
+ * \def I2C_INSTANCE(i2c_num)
+ * \ingroup hardware_i2c
+ * \hideinitializer
+ * \brief Returns the I2C instance with the given I2C number
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef I2C_INSTANCE
+static_assert(NUM_I2CS == 2, "");
+#define I2C_INSTANCE(num) ((num) ? i2c1 : i2c0)
+#endif
+
+/**
+ * \def I2C_DREQ_NUM(i2c, is_tx)
+ * \ingroup hardware_i2c
+ * \hideinitializer
+ * \brief Returns the \ref dreq_num_t used for pacing DMA transfers to or from this I2C instance.
+ * If is_tx is true, then it is for transfers to the I2C instance else for transfers from the I2C instance.
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef I2C_DREQ_NUM
+static_assert(DREQ_I2C0_RX == DREQ_I2C0_TX + 1, "");
+static_assert(DREQ_I2C1_RX == DREQ_I2C1_TX + 1, "");
+static_assert(DREQ_I2C1_TX == DREQ_I2C0_TX + 2, "");
+#define I2C_DREQ_NUM(i2c,is_tx) (DREQ_I2C0_TX + I2C_NUM(i2c) * 2 + !(is_tx))
+#endif
 
 /*! \brief Convert I2C instance to hardware instance number
  *  \ingroup hardware_i2c
@@ -155,8 +202,12 @@ static inline uint i2c_hw_index(i2c_inst_t *i2c) {
  * \return Number of I2C, 0 or 1.
  */
 static inline uint i2c_get_index(i2c_inst_t *i2c) {
-    return i2c_hw_index(i2c);
+    invalid_params_if(HARDWARE_I2C, i2c != i2c0 && i2c != i2c1);
+    return I2C_NUM(i2c);
 }
+
+// backward compatibility
+#define i2c_hw_index(i2c) i2c_get_index(i2c)
 
 /*! \brief Return pointer to structure containing i2c hardware registers
  *  \ingroup hardware_i2c
@@ -172,13 +223,12 @@ static inline i2c_hw_t *i2c_get_hw(i2c_inst_t *i2c) {
 /*! \brief Convert I2C hardware instance number to I2C instance
  *  \ingroup hardware_i2c
  *
- * \param Number of I2C, 0 or 1
+ * \param num Number of I2C, 0 or 1
  * \return I2C hardware instance
  */
-static inline i2c_inst_t *i2c_get_instance(uint instance) {
-    static_assert(NUM_I2CS == 2, "");
-    invalid_params_if(I2C, instance >= NUM_I2CS);
-    return instance ? i2c1 : i2c0;
+static inline i2c_inst_t *i2c_get_instance(uint num) {
+    invalid_params_if(HARDWARE_I2C, num >= NUM_I2CS);
+    return I2C_INSTANCE(num);
 }
 
 /*! \brief Attempt to write specified number of bytes to address, blocking until the specified absolute time is reached.
@@ -370,7 +420,6 @@ static inline void i2c_write_byte_raw(i2c_inst_t *i2c, uint8_t value) {
     hw->data_cmd = value;
 }
 
-
 /*! \brief Return the DREQ to use for pacing transfers to/from a particular I2C instance
  *  \ingroup hardware_i2c
  *
@@ -378,10 +427,7 @@ static inline void i2c_write_byte_raw(i2c_inst_t *i2c, uint8_t value) {
  * \param is_tx true for sending data to the I2C instance, false for receiving data from the I2C instance
  */
 static inline uint i2c_get_dreq(i2c_inst_t *i2c, bool is_tx) {
-    static_assert(DREQ_I2C0_RX == DREQ_I2C0_TX + 1, "");
-    static_assert(DREQ_I2C1_RX == DREQ_I2C1_TX + 1, "");
-    static_assert(DREQ_I2C1_TX == DREQ_I2C0_TX + 2, "");
-    return DREQ_I2C0_TX + i2c_hw_index(i2c) * 2 + !is_tx;
+    return I2C_DREQ_NUM(i2c, is_tx);
 }
 
 #ifdef __cplusplus

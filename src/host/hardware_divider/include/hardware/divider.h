@@ -22,11 +22,11 @@ static inline int __sign_of(int32_t v) {
 /*! \brief Do an unsigned HW divide and wait for result
  *  \ingroup hardware_divider
  *
- * Divide \p a by \p b, wait for calculation to complete, return result as a pair of 32-bit quotient/remainder values.
+ * Divide \p a by \p b, wait for calculation to complete, return result as a fixed point 32p32 value.
  *
  * \param a The dividend
  * \param b The divisor
- * \return Results of divide as a pair of 32-bit quotient/remainder values.
+ * \return Results of divide as a 32p32 fixed point value.
  */
 static inline divmod_result_t hw_divider_divmod_u32(uint32_t a, uint32_t b)  {
     if (!b) return (((uint64_t)a)<<32u) | (uint32_t)(-1); // todo check this
@@ -36,11 +36,11 @@ static inline divmod_result_t hw_divider_divmod_u32(uint32_t a, uint32_t b)  {
 /*! \brief Do a signed HW divide and wait for result
  *  \ingroup hardware_divider
  *
- * Divide \p a by \p b, wait for calculation to complete, return result as a pair of 32-bit quotient/remainder values.
+ * Divide \p a by \p b, wait for calculation to complete, return result as a fixed point 32p32 value.
  *
  * \param a The dividend
  * \param b The divisor
- * \return Results of divide as a pair of 32-bit quotient/remainder values.
+ * \return Results of divide as a 32p32 fixed point value.
  */
 static inline divmod_result_t hw_divider_divmod_s32(int32_t a, int32_t b) {
     if (!b) return (((uint64_t)a)<<32u) | (uint32_t)(-__sign_of(a));
@@ -108,7 +108,7 @@ static inline void hw_divider_wait_ready(void) {}
 /*! \brief Efficient extraction of unsigned quotient from 32p32 fixed point
  *  \ingroup hardware_divider
  *
- * \param r A pair of 32-bit quotient/remainder values.
+ * \param r 32p32 fixed point value.
  * \return Unsigned quotient
  */
 inline static uint32_t to_quotient_u32(divmod_result_t r) {
@@ -118,7 +118,7 @@ inline static uint32_t to_quotient_u32(divmod_result_t r) {
 /*! \brief Efficient extraction of signed quotient from 32p32 fixed point
  *  \ingroup hardware_divider
  *
- * \param r A pair of 32-bit quotient/remainder values.
+ * \param r 32p32 fixed point value.
  * \return Unsigned quotient
  */
 inline static int32_t to_quotient_s32(divmod_result_t r) {
@@ -128,7 +128,7 @@ inline static int32_t to_quotient_s32(divmod_result_t r) {
 /*! \brief Efficient extraction of unsigned remainder from 32p32 fixed point
  *  \ingroup hardware_divider
  *
- * \param r A pair of 32-bit quotient/remainder values.
+ * \param r 32p32 fixed point value.
  * \return Unsigned remainder
  *
  * \note On Arm this is just a 32 bit register move or a nop
@@ -140,7 +140,7 @@ inline static uint32_t to_remainder_u32(divmod_result_t r) {
 /*! \brief Efficient extraction of signed remainder from 32p32 fixed point
  *  \ingroup hardware_divider
  *
- * \param r A pair of 32-bit quotient/remainder values.
+ * \param r 32p32 fixed point value.
  * \return Signed remainder
  *
  * \note On arm this is just a 32 bit register move or a nop

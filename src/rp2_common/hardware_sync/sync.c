@@ -12,23 +12,10 @@ static uint8_t striped_spin_lock_num = PICO_SPINLOCK_ID_STRIPED_FIRST;
 static uint32_t claimed;
 
 static void check_lock_num(uint __unused lock_num) {
-    invalid_params_if(SYNC, lock_num >= 32);
+    invalid_params_if(HARDWARE_SYNC, lock_num >= 32);
 }
 
-void spin_locks_reset(void) {
-    for (uint i = 0; i < NUM_SPIN_LOCKS; i++) {
-        spin_unlock_unsafe(spin_lock_instance(i));
-    }
-}
-
-spin_lock_t *spin_lock_init(uint lock_num) {
-    assert(lock_num < NUM_SPIN_LOCKS);
-    spin_lock_t *lock = spin_lock_instance(lock_num);
-    spin_unlock_unsafe(lock);
-    return lock;
-}
-
-uint next_striped_spin_lock_num() {
+uint next_striped_spin_lock_num(void) {
     uint rc = striped_spin_lock_num++;
     if (striped_spin_lock_num > PICO_SPINLOCK_ID_STRIPED_LAST) {
         striped_spin_lock_num = PICO_SPINLOCK_ID_STRIPED_FIRST;

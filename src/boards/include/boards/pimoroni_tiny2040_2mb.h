@@ -9,12 +9,14 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
+// pico_cmake_set PICO_PLATFORM=rp2040
+
 #ifndef _BOARDS_PIMORONI_TINY2040_2MB_H
 #define _BOARDS_PIMORONI_TINY2040_2MB_H
 
 // For board detection
-#define PIMORONI_TINY2040
 #define PIMORONI_TINY2040_2MB
+#define PIMORONI_TINY2040
 
 // --- BOARD SPECIFIC ---
 #define TINY2040_LED_R_PIN 18
@@ -90,10 +92,10 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
+// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (2 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
-
 // All boards have B1 RP2040
 #ifndef PICO_RP2040_B0_SUPPORTED
 #define PICO_RP2040_B0_SUPPORTED 0

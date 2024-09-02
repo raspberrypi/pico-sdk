@@ -1,0 +1,39 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_divider_test",
+    testonly = True,
+    srcs = ["pico_divider_test.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_divider",
+        "//src/rp2_common/pico_stdlib",
+    ] + select({
+        "//bazel/constraint:host": [],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_dma",
+            "//src/rp2_common/hardware_irq",
+            "//src/rp2_common/hardware_vreg",
+        ],
+    }),
+)
+
+cc_binary(
+    name = "pico_divider_nesting_test",
+    testonly = True,
+    srcs = ["pico_divider_nesting_test.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_divider",
+        "//src/rp2_common/pico_stdlib",
+    ] + select({
+        "//bazel/constraint:host": [],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_dma",
+            "//src/rp2_common/hardware_irq",
+            "//src/rp2_common/hardware_vreg",
+        ],
+    }),
+)

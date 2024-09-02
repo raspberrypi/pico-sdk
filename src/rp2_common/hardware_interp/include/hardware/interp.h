@@ -11,9 +11,13 @@
 #include "hardware/structs/interp.h"
 #include "hardware/regs/sio.h"
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_INTERP, Enable/disable assertions in the interpolation module, type=bool, default=0, group=hardware_interp
-#ifndef PARAM_ASSERTIONS_ENABLED_INTERP
-#define PARAM_ASSERTIONS_ENABLED_INTERP 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_INTERP, Enable/disable assertions in the hardware_interp module, type=bool, default=0, group=hardware_interp
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_INTERP
+#ifdef PARAM_ASSERTIONS_ENABLED_INTERP // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_INTERP PARAM_ASSERTIONS_ENABLED_INTERP
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_INTERP 0
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -35,7 +39,8 @@ extern "C" {
  * flexible configuration make it possible to optimise many other tasks such as quantization and
  * dithering, table lookup address generation, affine texture mapping, decompression and linear feedback.
  *
- * Please refer to the RP2040 datasheet for more information on the HW interpolators and how they work.
+ * Please refer to the appropriate RP-series microcontroller datasheet for more information on the HW 
+ * interpolators and how they work.
  */
 
 #define interp0 interp0_hw
@@ -55,7 +60,7 @@ typedef struct {
 } interp_config;
 
 static inline uint interp_index(interp_hw_t *interp) {
-    valid_params_if(INTERP, interp == interp0 || interp == interp1);
+    valid_params_if(HARDWARE_INTERP, interp == interp0 || interp == interp1);
     return interp == interp1 ? 1 : 0;
 }
 
@@ -119,7 +124,7 @@ void interp_unclaim_lane_mask(interp_hw_t *interp, uint lane_mask);
  * \param shift Number of bits
  */
 static inline void interp_config_set_shift(interp_config *c, uint shift) {
-    valid_params_if(INTERP, shift < 32);
+    valid_params_if(HARDWARE_INTERP, shift < 32);
     c->ctrl = (c->ctrl & ~SIO_INTERP0_CTRL_LANE0_SHIFT_BITS) |
               ((shift << SIO_INTERP0_CTRL_LANE0_SHIFT_LSB) & SIO_INTERP0_CTRL_LANE0_SHIFT_BITS);
 }
@@ -134,8 +139,8 @@ static inline void interp_config_set_shift(interp_config *c, uint shift) {
  * \param mask_msb The most significant bit allowed to pass
  */
 static inline void interp_config_set_mask(interp_config *c, uint mask_lsb, uint mask_msb) {
-    valid_params_if(INTERP, mask_msb < 32);
-    valid_params_if(INTERP, mask_lsb <= mask_msb);
+    valid_params_if(HARDWARE_INTERP, mask_msb < 32);
+    valid_params_if(HARDWARE_INTERP, mask_lsb <= mask_msb);
     c->ctrl = (c->ctrl & ~(SIO_INTERP0_CTRL_LANE0_MASK_LSB_BITS | SIO_INTERP0_CTRL_LANE0_MASK_MSB_BITS)) |
               ((mask_lsb << SIO_INTERP0_CTRL_LANE0_MASK_LSB_LSB) & SIO_INTERP0_CTRL_LANE0_MASK_LSB_BITS) |
               ((mask_msb << SIO_INTERP0_CTRL_LANE0_MASK_MSB_LSB) & SIO_INTERP0_CTRL_LANE0_MASK_MSB_BITS);
@@ -243,7 +248,7 @@ static inline void interp_config_set_clamp(interp_config *c, bool clamp) {
  * \param bits Sets the force bits to that specified. Range 0-3 (two bits)
  */
 static inline void interp_config_set_force_bits(interp_config *c, uint bits) {
-    invalid_params_if(INTERP, bits > 3);
+    invalid_params_if(HARDWARE_INTERP, bits > 3);
     // note cannot use hw_set_bits on SIO
     c->ctrl = (c->ctrl & ~SIO_INTERP0_CTRL_LANE0_FORCE_MSB_BITS) |
               (bits << SIO_INTERP0_CTRL_LANE0_FORCE_MSB_LSB);
@@ -273,10 +278,10 @@ static inline interp_config interp_default_config(void) {
  */
 
 static inline void interp_set_config(interp_hw_t *interp, uint lane, interp_config *config) {
-    invalid_params_if(INTERP, lane > 1);
-    invalid_params_if(INTERP, config->ctrl & SIO_INTERP1_CTRL_LANE0_CLAMP_BITS &&
+    invalid_params_if(HARDWARE_INTERP, lane > 1);
+    invalid_params_if(HARDWARE_INTERP, config->ctrl & SIO_INTERP1_CTRL_LANE0_CLAMP_BITS &&
                               (!interp_index(interp) || lane)); // only interp1 lane 0 has clamp bit
-    invalid_params_if(INTERP, config->ctrl & SIO_INTERP0_CTRL_LANE0_BLEND_BITS &&
+    invalid_params_if(HARDWARE_INTERP, config->ctrl & SIO_INTERP0_CTRL_LANE0_BLEND_BITS &&
                               (interp_index(interp) || lane)); // only interp0 lane 0 has blend bit
     interp->ctrl[lane] = config->ctrl;
 }

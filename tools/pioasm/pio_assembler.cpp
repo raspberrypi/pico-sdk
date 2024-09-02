@@ -48,10 +48,35 @@ void program::add_instruction(std::shared_ptr<instruction> inst) {
         msg << "instruction requires 'side' to specify side set value for the instruction because non optional sideset was specified for the program at " << sideset.location;
         throw syntax_error(inst->location, msg.str());
     }
+    inst->pre_validate(*this);
     instructions.push_back(inst);
 }
 
-using syntax_error = yy::parser::syntax_error;
+using syntax_error = syntax_error;
+
+void program::set_pio_version(const yy::location &l, int version) {
+    if (version < 0 || version > 1) {
+        throw syntax_error(l, "only PIO versions 0 (rp2040) and 1 (rp2350) are supported");
+    }
+    pio_version = version;
+}
+
+void program::set_clock_div(const yy::location &l, float clock_div) {
+    if (clock_div < 1.0f || clock_div >= 65536.0f) {
+        throw syntax_error(l, "clock divider must be between 1 and 65546");
+    }
+    clock_div_int = (uint16_t)clock_div;
+    if (clock_div_int == 0) {
+        clock_div_frac = 0;
+    } else {
+        clock_div_frac = (uint8_t)((clock_div - (float)clock_div_frac) * (1u << 8u));
+    }
+}
+
+void program::set_fifo_config(const yy::location &l, fifo_config config) {
+    fifo_loc = l;
+    fifo = config;
+}
 
 void program::add_symbol(std::shared_ptr<symbol> symbol) {
     const auto &existing = pioasm->get_symbol(symbol->name, this);
@@ -115,6 +140,10 @@ int binary_operation::resolve(pio_assembler *pioasm, const program *program, con
             return lvalue | rvalue;
         case xor_:
             return lvalue ^ rvalue;
+        case shl_:
+            return lvalue << rvalue;
+        case shr_:
+            return lvalue >> rvalue;
         default:
             throw syntax_error(location, "internal error");
     }
@@ -150,6 +179,33 @@ void program::add_lang_opt(std::string lang, std::string name, std::string value
 }
 
 void program::finalize() {
+    if (mov_status.type != mov_status_type::unspecified) {
+        uint n = mov_status.n->resolve(*this);
+        if (mov_status.type == mov_status_type::irq_set) {
+            if (n > 7) throw syntax_error(mov_status.n->location, "irq number should be >= 0 and <= 7");
+            mov_status.final_n = mov_status.param * 8 + n;
+        } else {
+            if (n > 31) throw syntax_error(mov_status.n->location, "fido depth should be >= 0 and <= 31");
+            mov_status.final_n = n;
+        }
+    }
+    if (in.pin_count) {
+        in.final_pin_count = in.pin_count->resolve(*this);
+        if (!pio_version && in.final_pin_count != 32) throw syntax_error(in.pin_count->location, "in pin count must be 32 for PIO version 0");
+        if (in.final_pin_count < 1 || in.final_pin_count > 32) throw syntax_error(in.pin_count->location, "in pin count should be >= 1 and <= 32");
+        in.final_threshold = in.threshold->resolve(*this);
+        if (in.final_threshold < 1 || in.final_threshold > 32) throw syntax_error(in.threshold->location, "threshold should be >= 1 and <= 32");
+    }
+    if (out.pin_count) {
+        out.final_pin_count = out.pin_count->resolve(*this);
+        if (out.final_pin_count < 0 || out.final_pin_count > 32) throw syntax_error(out.pin_count->location, "out pin count should be >= 0 and <= 32");
+        out.final_threshold = out.threshold->resolve(*this);
+        if (out.final_threshold < 1 || out.final_threshold > 32) throw syntax_error(out.threshold->location, "threshold should be >= 1 and <= 32");
+    }
+    if (set_count.value) {
+        final_set_count = set_count.value->resolve(*this);
+        if (final_set_count < 0 || final_set_count > 5) throw syntax_error(set_count.location, "set pin count should be >= 0 and <= 5");
+    }
     if (sideset.value) {
         int bits = sideset.value->resolve(*this);
         if (bits < 0) {
@@ -168,6 +224,13 @@ void program::finalize() {
     } else {
         sideset_max = 0;
         delay_max = 31;
+    }
+    if (fifo != fifo_config::rx && fifo != fifo_config::tx && fifo != fifo_config::txrx) {
+        std::stringstream msg;
+        if (in.pin_count && in.autop) {
+            msg << "autopush is incompatible with your selected FIFO configuration specified at " << fifo_loc;
+            throw syntax_error(in.location, msg.str());
+        }
     }
 }
 
@@ -195,7 +258,7 @@ int name_ref::resolve(pio_assembler *pioasm, const program *program, const resol
     }
 }
 
-uint instruction::encode(const program &program) {
+uint instruction::encode(program &program) {
     raw_encoding raw = raw_encode(program);
     int _delay = delay->resolve(program);
     if (_delay < 0) {
@@ -228,14 +291,15 @@ uint instruction::encode(const program &program) {
             _sideset |= 0x10u;
         }
     }
-    return (((uint) raw.type) << 13u) | (((uint) _delay | (uint) _sideset) << 8u) | (raw.arg1 << 5u) | raw.arg2;
+    // note we store the 6th bit of arg2 above the 16 bits of instruction
+    return (((uint) raw.type) << 13u) | (((uint) _delay | (uint) _sideset) << 8u) | (raw.arg1 << 5u) | raw.arg2 | ((raw.arg2 >> 5) << 16);
 }
 
-raw_encoding instruction::raw_encode(const program &program) {
+raw_encoding instruction::raw_encode(program& program) {
     throw syntax_error(location, "internal error");
 }
 
-uint instr_word::encode(const program &program) {
+uint instr_word::encode(program &program) {
     uint value = encoding->resolve(program);
     if (value > 0xffffu) {
         throw syntax_error(location, ".word value must be a positive 16 bit value");
@@ -243,7 +307,55 @@ uint instr_word::encode(const program &program) {
     return value;
 }
 
-raw_encoding instr_jmp::raw_encode(const program &program) {
+uint instr_mov::get_push_get_index(const program &program, extended_mov index) {
+    if (index.loc == mov::fifo_y) {
+        return 0;
+    } else {
+        uint v = index.fifo_index->resolve(program);
+        if (v > 7) {
+            throw syntax_error(index.fifo_index->location, "FIFO index myst be between 0 and 7");
+        }
+        return v | 8;
+    }
+}
+
+void instr_push::pre_validate(program& program) {
+    if (program.fifo != fifo_config::rx && program.fifo != fifo_config::txrx) {
+        throw syntax_error(location, "FIFO must be configured for 'txrx' or 'rx' to use this instruction");
+    }
+}
+
+void instr_mov::pre_validate(program &program) {
+    if (dest.uses_fifo()) {
+        if (src.loc != mov::isr) {
+            throw syntax_error(location, "mov rxfifo[] source must be isr");
+        }
+        if (program.fifo != fifo_config::txput && program.fifo != fifo_config::putget) {
+            throw syntax_error(location, "FIFO must be configured for 'txput' or 'putget' to use this instruction");
+        }
+    } else if (src.uses_fifo()) {
+        if (dest.loc != mov::osr) {
+            throw syntax_error(location, "mov ,txfifo[] target must be osr");
+        }
+        if (program.fifo != fifo_config::txget && program.fifo != fifo_config::putget) {
+            throw syntax_error(location, "FIFO must be configured for 'txget' or 'putget' to use this instruction");
+        }
+    }
+}
+
+raw_encoding instr_mov::raw_encode(program& program) {
+    if (!dest.uses_fifo() && !src.uses_fifo()) {
+        // regular mov
+        return {inst_type::mov, (uint) dest.loc, (uint) src.loc | ((uint) op << 3u)};
+    }
+    if (dest.uses_fifo()) {
+        return {inst_type::push_pull, 0, 0x10 | get_push_get_index(program, dest) };
+    } else {
+        return {inst_type::push_pull, 0x4, 0x10 | get_push_get_index(program, src) };
+    }
+}
+
+raw_encoding instr_jmp::raw_encode(program& program) {
     int dest = target->resolve(program);
     if (dest < 0) {
         throw syntax_error(target->location, "jmp target address must be positive");
@@ -255,7 +367,7 @@ raw_encoding instr_jmp::raw_encode(const program &program) {
     return {inst_type::jmp, (uint) cond, (uint) dest};
 }
 
-raw_encoding instr_in::raw_encode(const program &program) {
+raw_encoding instr_in::raw_encode(program& program) {
     int v = value->resolve(program);
     if (v < 1 || v > 32) {
         throw syntax_error(value->location, "'in' bit count must be >= 1 and <= 32");
@@ -263,7 +375,7 @@ raw_encoding instr_in::raw_encode(const program &program) {
     return {inst_type::in, (uint) src, (uint) v & 0x1fu};
 }
 
-raw_encoding instr_out::raw_encode(const program &program) {
+raw_encoding instr_out::raw_encode(program& program) {
     int v = value->resolve(program);
     if (v < 1 || v > 32) {
         throw syntax_error(value->location, "'out' bit count must be >= 1 and <= 32");
@@ -271,7 +383,7 @@ raw_encoding instr_out::raw_encode(const program &program) {
     return {inst_type::out, (uint) dest, (uint) v & 0x1fu};
 }
 
-raw_encoding instr_set::raw_encode(const program &program) {
+raw_encoding instr_set::raw_encode(program& program) {
     int v = value->resolve(program);
     if (v < 0 || v > 31) {
         throw syntax_error(value->location, "'set' bit count must be >= 0 and <= 31");
@@ -279,7 +391,7 @@ raw_encoding instr_set::raw_encode(const program &program) {
     return {inst_type::set, (uint) dest, (uint) v};
 }
 
-raw_encoding instr_wait::raw_encode(const program &program) {
+raw_encoding instr_wait::raw_encode(program& program) {
     uint pol = polarity->resolve(program);
     if (pol > 1) {
         throw syntax_error(polarity->location, "'wait' polarity must be 0 or 1");
@@ -289,21 +401,38 @@ raw_encoding instr_wait::raw_encode(const program &program) {
         case wait_source::irq:
             if (arg2 > 7) throw syntax_error(source->param->location, "irq number must be must be >= 0 and <= 7");
             break;
-        case wait_source::gpio:
-            if (arg2 > 31)
-                throw syntax_error(source->param->location, "absolute GPIO number must be must be >= 0 and <= 31");
+        case wait_source::gpio: {
+            if (!program.pio_version) {
+                if (arg2 > 31)
+                    throw syntax_error(source->param->location, "absolute GPIO number must be must be >= 0 and <= 31");
+            } else {
+                if (arg2 > 47)
+                    throw syntax_error(source->param->location, "absolute GPIO number must be must be >= 0 and <= 47");
+            }
+            int bitmap = 1u << (arg2 >> 4);
+            if (bitmap == 4 && program.used_gpio_ranges & 1) {
+                throw syntax_error(source->param->location, "absolute GPIO number must be must be >= 0 and <= 31 as a GPIO number <16 has already been used");
+            }
+            if (bitmap == 1 && program.used_gpio_ranges & 4) {
+                throw syntax_error(source->param->location, "absolute GPIO number must be must be >= 16 and <= 47 as a GPIO number >32 has already been used");
+            }
+            program.used_gpio_ranges |= bitmap;
             break;
+        }
         case wait_source::pin:
-            if (arg2 > 31) throw syntax_error(polarity->location, "pin number must be must be >= 0 and <= 31");
+            if (arg2 > 31) throw syntax_error(source->param->location, "pin number must be must be >= 0 and <= 31");
+            break;
+        case wait_source::jmppin:
+            if (arg2 > 3) throw syntax_error(source->param->location, "jmppin offset must be must be >= 0 and <= 3");
             break;
     }
-    return {inst_type::wait, (pol << 2u) | (uint) source->target, arg2 | (source->flag ? 0x10u : 0u)};
+    return {inst_type::wait, (pol << 2u) | (uint) source->target, arg2 | (source->irq_type << 3)};
 }
 
-raw_encoding instr_irq::raw_encode(const program &program) {
+raw_encoding instr_irq::raw_encode(program& program) {
     uint arg2 = num->resolve(program);
     if (arg2 > 7) throw syntax_error(num->location, "irq number must be must be >= 0 and <= 7");
-    if (relative) arg2 |= 0x10u;
+    arg2 |= irq_type << 3;
     return {inst_type::irq, (uint)modifiers, arg2};
 }
 
@@ -333,9 +462,9 @@ int pio_assembler::write_output() {
     source.global_symbols = public_symbols(get_dummy_global_program());
     for (auto &program : programs) {
         program.finalize();
-        source.programs.emplace_back(compiled_source::program(program.name));
+        source.programs.emplace_back(program.name);
         auto &cprogram = source.programs[source.programs.size() - 1];
-        cprogram = compiled_source::program(program.name);
+        cprogram.pio_version = program.pio_version;
 
         // encode the instructions
         std::transform(program.instructions.begin(), program.instructions.end(),
@@ -358,8 +487,32 @@ int pio_assembler::write_output() {
         }
 
         if (program.wrap) cprogram.wrap = program.wrap->resolve(program); else cprogram.wrap = std::max((int)program.instructions.size() - 1, 0);
-        if (program.wrap_target) cprogram.wrap_target = program.wrap_target->resolve(program); else cprogram.wrap_target = 0;
+        cprogram.clock_div_int = program.clock_div_int;
+        cprogram.clock_div_frac = program.clock_div_frac;
+        if (program.wrap_target) {
+            cprogram.wrap_target = program.wrap_target->resolve(program);
+            if (cprogram.wrap_target >= program.instructions.size()) {
+                throw syntax_error(program.wrap_target->location, ".wrap_target cannot be placed after the last program instruction");
+            }
+        } else {
+            cprogram.wrap_target = 0;
+        }
         if (program.origin.value) cprogram.origin = program.origin.value->resolve(program);
+        cprogram.mov_status_type = program.mov_status.type == mov_status_type::unspecified ? -1 : (int)program.mov_status.type;
+        cprogram.mov_status_n = program.mov_status.final_n;
+        cprogram.fifo = program.fifo;
+        cprogram.used_gpio_ranges = program.used_gpio_ranges;
+        auto in_out_convert = [](const in_out &io) {
+            return compiled_source::in_out{
+                .pin_count = io.final_pin_count,
+                .right = io.right,
+                .autop = io.autop,
+                .threshold = io.final_threshold,
+            };
+        };
+        cprogram.in = in_out_convert(program.in);
+        cprogram.out = in_out_convert(program.out);
+        cprogram.set_count = program.final_set_count;
         if (program.sideset.value) {
             cprogram.sideset_bits_including_opt = program.sideset_bits_including_opt;
             cprogram.sideset_opt = program.sideset_opt;

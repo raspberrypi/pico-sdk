@@ -31,19 +31,23 @@ typedef pll_hw_t *PLL;
 #define pll_sys pll_sys_hw
 #define pll_usb pll_usb_hw
 
-#ifndef PICO_PLL_VCO_MIN_FREQ_KHZ
-#ifndef PICO_PLL_VCO_MIN_FREQ_MHZ
-#define PICO_PLL_VCO_MIN_FREQ_KHZ (750 * KHZ)
+#ifndef PICO_PLL_VCO_MIN_FREQ_HZ
+#ifdef PICO_PLL_VCO_MIN_FREQ_MHZ
+#define PICO_PLL_VCO_MIN_FREQ_HZ (PICO_PLL_VCO_MIN_FREQ_MHZ * MHZ)
+#elif defined(PICO_PLL_VCO_MIN_FREQ_KHZ)
+#define PICO_PLL_VCO_MIN_FREQ_HZ (PICO_PLL_VCO_MIN_FREQ_KHZ * KHZ)
 #else
-#define PICO_PLL_VCO_MIN_FREQ_KHZ (PICO_PLL_VCO_MIN_FREQ_MHZ * KHZ)
+#define PICO_PLL_VCO_MIN_FREQ_HZ (750 * MHZ)
 #endif
 #endif
 
-#ifndef PICO_PLL_VCO_MAX_FREQ_KHZ
-#ifndef PICO_PLL_VCO_MAX_FREQ_MHZ
-#define PICO_PLL_VCO_MAX_FREQ_KHZ (1600 * KHZ)
+#ifndef PICO_PLL_VCO_MAX_FREQ_HZ
+#ifdef PICO_PLL_VCO_MAX_FREQ_MHZ
+#define PICO_PLL_VCO_MAX_FREQ_HZ (PICO_PLL_VCO_MAX_FREQ_MHZ * MHZ)
+#elif defined(PICO_PLL_VCO_MAX_FREQ_KHZ)
+#define PICO_PLL_VCO_MAX_FREQ_HZ (PICO_PLL_VCO_MAX_FREQ_KHZ * KHZ)
 #else
-#define PICO_PLL_VCO_MAX_FREQ_KHZ (PICO_PLL_VCO_MAX_FREQ_MHZ * KHZ)
+#define PICO_PLL_VCO_MAX_FREQ_HZ (1600 * MHZ)
 #endif
 #endif
 
@@ -67,6 +71,17 @@ void pll_init(PLL pll, uint ref_div, uint vco_freq, uint post_div1, uint post_di
  */
 void pll_deinit(PLL pll);
 
+/**
+ * \def PLL_RESET_NUM(pll)
+ * \ingroup hardware_pll
+ * \hideinitializer
+ * \brief Returns the \ref reset_num_t used to reset a given PLL instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef PLL_RESET_NUM
+#define PLL_RESET_NUM(pll) ((pll_usb_hw == (pll)) ? RESET_PLL_USB : RESET_PLL_SYS)
+#endif
 
 #ifdef __cplusplus
 }
