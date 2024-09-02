@@ -93,11 +93,11 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     # target name, target type, compile definition name to set then address in a string
     # This can be used to set the following compile definitions
     # CYW43_DEFAULT_IP_STA_ADDRESS
-    # CYW43_DEFAULT_IP_MASK
     # CYW43_DEFAULT_IP_STA_GATEWAY
-    # CYW43_DEFAULT_IP_DNS
     # CYW43_DEFAULT_IP_AP_ADDRESS
     # CYW43_DEFAULT_IP_AP_GATEWAY
+    # CYW43_DEFAULT_IP_MASK
+    # CYW43_DEFAULT_IP_DNS
     # e.g. pico_configure_ip4_address(picow_tcpip_server_background PRIVATE CYW43_DEFAULT_IP_STA_ADDRESS "10.3.15.204")
     function(pico_configure_ip4_address TARGET_LIB TARGET_TYPE DEF_NAME IP_ADDRESS_STR)
             string(REGEX MATCHALL "[0-9]+" IP_ADDRESS_LIST ${IP_ADDRESS_STR})
