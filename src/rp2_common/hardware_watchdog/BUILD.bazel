@@ -1,0 +1,19 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_watchdog",
+    srcs = ["watchdog.c"],
+    hdrs = ["include/hardware/watchdog.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform_internal",
+        "//src/rp2_common/hardware_base",
+        "//src/rp2_common/hardware_ticks:hardware_ticks_headers",
+        "//src/rp2_common/pico_bootrom",
+    ],
+)

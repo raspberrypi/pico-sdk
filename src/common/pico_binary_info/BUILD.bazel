@@ -1,0 +1,28 @@
+load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+
+package(default_visibility = ["//visibility:public"])
+
+pico_sdk_define(
+    name = "LIB_PICO_BINARY_INFO",
+    define_name = "LIB_PICO_BINARY_INFO",
+    from_flag = "//bazel/config:PICO_BINARY_INFO_ENABLED",
+)
+
+# The actual sources and defines for pico_binary_info are provided
+# in the //src/rp2_common/pico_standard_link package.
+
+cc_library(
+    name = "pico_binary_info",
+    hdrs = [
+        "include/pico/binary_info.h",
+        "include/pico/binary_info/code.h",
+        "include/pico/binary_info/defs.h",
+        "include/pico/binary_info/structure.h",
+    ],
+    includes = ["include"],
+    deps = [
+        ":LIB_PICO_BINARY_INFO",
+        "//src:pico_platform_internal",
+        "//src/common/pico_base_headers",
+    ],
+)

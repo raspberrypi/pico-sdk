@@ -5,7 +5,6 @@
  */
 
 #include "pico/flash.h"
-#include "hardware/exception.h"
 #include "hardware/sync.h"
 #if PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
 #include "pico/multicore.h"
@@ -15,7 +14,7 @@
 #include "task.h"
 // now we have FreeRTOS header we can check core count... we can only use FreeRTOS SMP mechanism
 // with two cores
-#if configNUM_CORES == 2
+#if configNUMBER_OF_CORES == 2
 #if configUSE_CORE_AFFINITY
 #define PICO_FLASH_SAFE_EXECUTE_USE_FREERTOS_SMP 1
 #else
@@ -31,7 +30,7 @@
 // 3. FreeRTOS on core 0, no use of core 1 - we just want to disable IRQs
 // 4. FreeRTOS SMP on both cores - we need to schedule a high priority task on the other core to disable IRQs.
 // 5. FreeRTOS on one core, but application is using the other core. ** WE CANNOT SUPPORT THIS TODAY ** without
-//    the equivalent PICO_FLASH_ASSUME_COREx_SAFE (i.e. the user mkaing sure the other core is fine)
+//    the equivalent PICO_FLASH_ASSUME_COREx_SAFE (i.e. the user making sure the other core is fine)
 
 static bool default_core_init_deinit(bool init);
 static int default_enter_safe_zone_timeout_ms(uint32_t timeout_ms);
@@ -200,7 +199,7 @@ static int default_enter_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
 
 static int default_exit_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
     // assume if we're exiting we're called then entry happened successfully
-    restore_interrupts(irq_state[get_core_num()]);
+    restore_interrupts_from_disabled(irq_state[get_core_num()]);
     if (!use_irq_only()) {
 #if PICO_FLASH_SAFE_EXECUTE_USE_FREERTOS_SMP
         uint core_num = get_core_num();

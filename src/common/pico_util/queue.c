@@ -63,7 +63,9 @@ static bool queue_remove_internal(queue_t *q, void *data, bool block) {
     do {
         uint32_t save = spin_lock_blocking(q->core.spin_lock);
         if (queue_get_level_unsafe(q) != 0) {
-            memcpy(data, element_ptr(q, q->rptr), q->element_size);
+            if (data) {
+                memcpy(data, element_ptr(q, q->rptr), q->element_size);
+            }
             q->rptr = inc_index(q, q->rptr);
             lock_internal_spin_unlock_with_notify(&q->core, save);
             return true;
@@ -81,7 +83,9 @@ static bool queue_peek_internal(queue_t *q, void *data, bool block) {
     do {
         uint32_t save = spin_lock_blocking(q->core.spin_lock);
         if (queue_get_level_unsafe(q) != 0) {
-            memcpy(data, element_ptr(q, q->rptr), q->element_size);
+            if (data) {
+                memcpy(data, element_ptr(q, q->rptr), q->element_size);
+            }
             lock_internal_spin_unlock_with_notify(&q->core, save);
             return true;
         }

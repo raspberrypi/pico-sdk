@@ -9,7 +9,7 @@ if (NOT TARGET pico_platform_headers)
             PICO_BUILD=1
     )
 
-    target_include_directories(pico_platform_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(pico_platform_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 endif()
 
 if (NOT TARGET pico_platform)

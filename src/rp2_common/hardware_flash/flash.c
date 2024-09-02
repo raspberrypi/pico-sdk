@@ -7,8 +7,12 @@
 #include "hardware/flash.h"
 #include "pico/bootrom.h"
 
+#if PICO_RP2040
+#include "hardware/structs/io_qspi.h"
 #include "hardware/structs/ssi.h"
-#include "hardware/structs/ioqspi.h"
+#else
+#include "hardware/structs/qmi.h"
+#endif
 
 #define FLASH_BLOCK_ERASE_CMD 0xd8
 
@@ -34,11 +38,19 @@ static bool boot2_copyout_valid = false;
 static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)(void) {
     if (boot2_copyout_valid)
         return;
+    // todo we may want the option of boot2 just being a free function in
+    //      user RAM, e.g. if it is larger than 256 bytes
+#if PICO_RP2040
+    const volatile uint32_t *copy_from = (uint32_t *)XIP_BASE;
+#else
+    const volatile uint32_t *copy_from = (uint32_t *)BOOTRAM_BASE;
+#endif
     for (int i = 0; i < BOOT2_SIZE_WORDS; ++i)
-        boot2_copyout[i] = ((uint32_t *)XIP_BASE)[i];
+        boot2_copyout[i] = copy_from[i];
     __compiler_memory_barrier();
     boot2_copyout_valid = true;
 }
+
 
 static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
     ((void (*)(void))((intptr_t)boot2_copyout+1))();
@@ -50,9 +62,9 @@ static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)(void) {}
 
 static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
     // Set up XIP for 03h read on bus access (slow but generic)
-    rom_flash_enter_cmd_xip_fn flash_enter_cmd_xip = (rom_flash_enter_cmd_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_ENTER_CMD_XIP);
-    assert(flash_enter_cmd_xip);
-    flash_enter_cmd_xip();
+    rom_flash_enter_cmd_xip_fn flash_enter_cmd_xip_func = (rom_flash_enter_cmd_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_ENTER_CMD_XIP);
+    assert(flash_enter_cmd_xip_func);
+    flash_enter_cmd_xip_func();
 }
 
 #endif
@@ -64,8 +76,8 @@ void __no_inline_not_in_flash_func(flash_range_erase)(uint32_t flash_offs, size_
 #ifdef PICO_FLASH_SIZE_BYTES
     hard_assert(flash_offs + count <= PICO_FLASH_SIZE_BYTES);
 #endif
-    invalid_params_if(FLASH, flash_offs & (FLASH_SECTOR_SIZE - 1));
-    invalid_params_if(FLASH, count & (FLASH_SECTOR_SIZE - 1));
+    invalid_params_if(HARDWARE_FLASH, flash_offs & (FLASH_SECTOR_SIZE - 1));
+    invalid_params_if(HARDWARE_FLASH, count & (FLASH_SECTOR_SIZE - 1));
     rom_connect_internal_flash_fn connect_internal_flash_func = (rom_connect_internal_flash_fn)rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
     rom_flash_exit_xip_fn flash_exit_xip_func = (rom_flash_exit_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
     rom_flash_range_erase_fn flash_range_erase_func = (rom_flash_range_erase_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_RANGE_ERASE);
@@ -83,17 +95,22 @@ void __no_inline_not_in_flash_func(flash_range_erase)(uint32_t flash_offs, size_
     flash_enable_xip_via_boot2();
 }
 
+void __no_inline_not_in_flash_func(flash_flush_cache)(void) {
+    rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
+    flash_flush_cache_func();
+}
+
 void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, const uint8_t *data, size_t count) {
 #ifdef PICO_FLASH_SIZE_BYTES
     hard_assert(flash_offs + count <= PICO_FLASH_SIZE_BYTES);
 #endif
-    invalid_params_if(FLASH, flash_offs & (FLASH_PAGE_SIZE - 1));
-    invalid_params_if(FLASH, count & (FLASH_PAGE_SIZE - 1));
+    invalid_params_if(HARDWARE_FLASH, flash_offs & (FLASH_PAGE_SIZE - 1));
+    invalid_params_if(HARDWARE_FLASH, count & (FLASH_PAGE_SIZE - 1));
     rom_connect_internal_flash_fn connect_internal_flash_func = (rom_connect_internal_flash_fn)rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
     rom_flash_exit_xip_fn flash_exit_xip_func = (rom_flash_exit_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
     rom_flash_range_program_fn flash_range_program_func = (rom_flash_range_program_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_RANGE_PROGRAM);
-    rom_flash_flush_cache_fn flash_flush_cache = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
-    assert(connect_internal_flash_func && flash_exit_xip_func && flash_range_program_func && flash_flush_cache);
+    rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
+    assert(connect_internal_flash_func && flash_exit_xip_func && flash_range_program_func && flash_flush_cache_func);
     flash_init_boot2_copyout();
 
     __compiler_memory_barrier();
@@ -101,7 +118,7 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
     connect_internal_flash_func();
     flash_exit_xip_func();
     flash_range_program_func(flash_offs, data, count);
-    flash_flush_cache(); // Note this is needed to remove CSn IO force as well as cache flushing
+    flash_flush_cache_func(); // Note this is needed to remove CSn IO force as well as cache flushing
     flash_enable_xip_via_boot2();
 }
 
@@ -112,13 +129,21 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
 // Bitbanging the chip select using IO overrides, in case RAM-resident IRQs
 // are still running, and the FIFO bottoms out. (the bootrom does the same)
 static void __no_inline_not_in_flash_func(flash_cs_force)(bool high) {
+#if PICO_RP2040
     uint32_t field_val = high ?
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_HIGH :
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_LOW;
-    hw_write_masked(&ioqspi_hw->io[1].ctrl,
+    hw_write_masked(&io_qspi_hw->io[1].ctrl,
         field_val << IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_LSB,
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_BITS
     );
+#else
+    if (high) {
+        hw_clear_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_ASSERT_CS0N_BITS);
+    } else {
+        hw_set_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_ASSERT_CS0N_BITS);
+    }
+#endif
 }
 
 void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *rxbuf, size_t count) {
@@ -134,12 +159,14 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
     flash_cs_force(0);
     size_t tx_remaining = count;
     size_t rx_remaining = count;
+#if PICO_RP2040
+    // Synopsys SSI version
     // We may be interrupted -- don't want FIFO to overflow if we're distracted.
     const size_t max_in_flight = 16 - 2;
     while (tx_remaining || rx_remaining) {
         uint32_t flags = ssi_hw->sr;
-        bool can_put = !!(flags & SSI_SR_TFNF_BITS);
-        bool can_get = !!(flags & SSI_SR_RFNE_BITS);
+        bool can_put = flags & SSI_SR_TFNF_BITS;
+        bool can_get = flags & SSI_SR_RFNE_BITS;
         if (can_put && tx_remaining && rx_remaining - tx_remaining < max_in_flight) {
             ssi_hw->dr0 = *txbuf++;
             --tx_remaining;
@@ -149,6 +176,24 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
             --rx_remaining;
         }
     }
+#else
+    // QMI version -- no need to bound FIFO contents as QMI stalls on full DIRECT_RX.
+    hw_set_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_EN_BITS);
+    while (tx_remaining || rx_remaining) {
+        uint32_t flags = qmi_hw->direct_csr;
+        bool can_put = !(flags & QMI_DIRECT_CSR_TXFULL_BITS);
+        bool can_get = !(flags & QMI_DIRECT_CSR_RXEMPTY_BITS);
+        if (can_put && tx_remaining) {
+            qmi_hw->direct_tx = *txbuf++;
+            --tx_remaining;
+        }
+        if (can_get && rx_remaining) {
+            *rxbuf++ = (uint8_t)qmi_hw->direct_rx;
+            --rx_remaining;
+        }
+    }
+    hw_clear_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_EN_BITS);
+#endif
     flash_cs_force(1);
 
     flash_flush_cache_func();

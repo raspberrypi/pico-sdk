@@ -136,8 +136,11 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
     else()
         target_compile_definitions(pico_mbedtls_headers INTERFACE MBEDTLS_CONFIG_FILE="mbedtls_config.h")
     endif()
+    if (TARGET pico_sha256)
+        pico_mirrored_target_link_libraries(pico_mbedtls INTERFACE pico_sha256)
+    endif()
     target_sources(pico_mbedtls INTERFACE ${CMAKE_CURRENT_LIST_DIR}/pico_mbedtls.c)
-    target_include_directories(pico_mbedtls_headers INTERFACE ${PICO_MBEDTLS_PATH}/include/ ${PICO_MBEDTLS_PATH}/library/)
+    target_include_directories(pico_mbedtls_headers SYSTEM INTERFACE ${PICO_MBEDTLS_PATH}/include/ ${PICO_MBEDTLS_PATH}/library/ ${CMAKE_CURRENT_LIST_DIR}/include/)
 
     function(suppress_mbedtls_warnings)
         set_source_files_properties(

@@ -13,19 +13,24 @@
 extern "C" {
 #endif
 
-
-#ifndef PARAM_ASSERTIONS_ENABLED_TIMER
-#define PARAM_ASSERTIONS_ENABLED_TIMER 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_TIMER, Enable/disable assertions in the hardware_timer module, type=bool, default=0, group=hardware_timer
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_TIMER
+#ifdef PARAM_ASSERTIONS_ENABLED_TIMER // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_TIMER PARAM_ASSERTIONS_ENABLED_TIMER
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_TIMER 0
+#endif
 #endif
 
 static inline void check_hardware_alarm_num_param(uint alarm_num) {
-    invalid_params_if(TIMER, alarm_num >= NUM_TIMERS);
+    invalid_params_if(HARDWARE_TIMER, alarm_num >= NUM_ALARMS);
 }
 
 uint32_t time_us_32();
 uint64_t time_us_64();
 void busy_wait_us_32(uint32_t delay_us);
 void busy_wait_us(uint64_t delay_us);
+void busy_wait_ms(uint32_t delay_m);
 void busy_wait_until(absolute_time_t t);
 bool time_reached(absolute_time_t t);
 typedef void (*hardware_alarm_callback_t)(uint alarm_num);

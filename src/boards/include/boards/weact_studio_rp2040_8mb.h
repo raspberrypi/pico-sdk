@@ -9,13 +9,15 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/weact_studio_rp2040_16mb.h"
+// This header may be included by other board headers as "boards/weact_studio_rp2040_8mb.h"
 
-#ifndef _BOARDS_WEACT_STUDIO_RP2040_16MB_H
-#define _BOARDS_WEACT_STUDIO_RP2040_16MB_H
+// pico_cmake_set PICO_PLATFORM=rp2040
+
+#ifndef _BOARDS_WEACT_STUDIO_RP2040_8MB_H
+#define _BOARDS_WEACT_STUDIO_RP2040_8MB_H
 
 // For board detection
-#define WEACT_STUDIO_RP2040_16MB
+#define WEACT_STUDIO_RP2040_8MB
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
@@ -73,8 +75,8 @@
 #define PICO_RP2040_B0_SUPPORTED 0
 #endif
 
+// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (8 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
 #endif
-
 #endif

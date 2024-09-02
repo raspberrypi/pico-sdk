@@ -1,0 +1,75 @@
+package(default_visibility = ["//visibility:public"])
+
+# TODO: No support for building the parser.
+
+cc_library(
+    name = "pioasm_core",
+    srcs = [
+        "gen/lexer.cpp",
+        "gen/location.h",
+        "gen/parser.cpp",
+        "gen/parser.hpp",
+        "go_output.cpp",
+        "json_output.cpp",
+        "main.cpp",
+        "output_format.h",
+        "pio_assembler.cpp",
+        "pio_assembler.h",
+        "pio_disassembler.cpp",
+        "pio_disassembler.h",
+        "pio_enums.h",
+        "pio_types.h",
+    ],
+    copts = select({
+        "@rules_cc//cc/compiler:msvc-cl": ["/std:c++20"],
+        "//conditions:default": ["-Wno-sign-compare"],
+    }),
+    defines = select({
+        "@rules_cc//cc/compiler:msvc-cl": ["YY_NO_UNISTD_H=1"],
+        "//conditions:default": [],
+    }),
+    includes = [
+        ".",
+        "gen",
+    ],
+    target_compatible_with = ["//bazel/constraint:host"],
+)
+
+cc_library(
+    name = "c_sdk_output",
+    srcs = ["c_sdk_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "python_output",
+    srcs = ["python_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "hex_output",
+    srcs = ["hex_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "ada_output",
+    srcs = ["ada_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
+)
+
+cc_binary(
+    name = "pioasm",
+    deps = [
+        ":ada_output",
+        ":c_sdk_output",
+        ":hex_output",
+        ":pioasm_core",
+        ":python_output",
+    ],
+)

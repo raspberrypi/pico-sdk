@@ -1,0 +1,25 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# Break a circular dependency with hardware_watchdog.
+cc_library(
+    name = "hardware_ticks_headers",
+    hdrs = ["include/hardware/ticks.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = ["//src/rp2_common/hardware_watchdog:__pkg__"],
+)
+
+cc_library(
+    name = "hardware_ticks",
+    srcs = ["ticks.c"],
+    hdrs = ["include/hardware/ticks.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/hardware_watchdog",
+    ],
+)

@@ -1,0 +1,14 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_sha256_test",
+    testonly = True,
+    srcs = ["pico_sha256_test.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_sha256",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)

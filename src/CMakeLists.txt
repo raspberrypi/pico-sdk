@@ -1,9 +1,15 @@
 cmake_policy(SET CMP0079 NEW) # allow inserting of dependencies into our INTERFACE libraries
-set(PICO_PLATFORM_CMAKE_FILE "" CACHE INTERNAL "")
+set(PICO_PLATFORM_CMAKE_FILE "${PICO_PLATFORM_CMAKE_FILE}" CACHE INTERNAL "")
 set(PICO_DOXYGEN_PATHS "" CACHE INTERNAL "") # generated each time
+set(PICO_DOXYGEN_EXCLUDE_PATHS "" CACHE INTERNAL "") # generated each time
+set(PICO_DOXYGEN_PRE_DEFINES "" CACHE INTERNAL "") # generated each time
+set(PICO_DOXYGEN_ENABLED_SECTIONS "" CACHE INTERNAL "") # generated each time
 
+if (NOT PICO_PLATFORM_CMAKE_DIR)
+    set(PICO_PLATFORM_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR})
+endif()
 if (NOT PICO_PLATFORM_CMAKE_FILE)
-    set(PICO_PLATFORM_CMAKE_FILE ${CMAKE_CURRENT_LIST_DIR}/${PICO_PLATFORM}.cmake CACHE INTERNAL "")
+    set(PICO_PLATFORM_CMAKE_FILE ${PICO_PLATFORM_CMAKE_DIR}/${PICO_PLATFORM}.cmake CACHE INTERNAL "")
 endif ()
 
 if (NOT EXISTS "${PICO_PLATFORM_CMAKE_FILE}")
@@ -11,17 +17,28 @@ if (NOT EXISTS "${PICO_PLATFORM_CMAKE_FILE}")
     Either specify a valid PICO_PLATFORM (or PICO_PLATFORM_CMAKE_FILE).")
 endif ()
 
-# Initialize board related build/compile settings
-include(${CMAKE_CURRENT_LIST_DIR}/board_setup.cmake)
-
 # call add_subdirectory(subdir) unless SKIP_SUBDIR evaluates to true
+# second argument is optional path
 function(pico_add_subdirectory subdir)
     # todo add option to disable skip flag
     string(TOUPPER ${subdir} subdir_upper)
+    # we do not include any path part of the subdir
+    get_filename_component(subdir_upper ${subdir_upper} NAME)
     set(replace_flag SKIP_${subdir_upper})
     if (NOT ${replace_flag})
-        add_subdirectory(${subdir})
-    else ()
+        string(TOUPPER ${subdir} subdir_upper)
+        set(replace_flag SKIP_${subdir_upper})
+        if (${ARGC} GREATER 1)
+            # argv1 is the root where the subdir is relative to
+            add_subdirectory(${ARGV1}/${subdir} ${subdir})
+            # todo make this optional?
+            pico_add_doxygen(${ARGV1}/${subdir})
+        else()
+            add_subdirectory(${subdir})
+            # todo make this optional?
+            pico_add_doxygen(${subdir})
+        endif()
+    else()
         message("Not including ${subdir} because ${replace_flag} defined.")
     endif ()
     pico_promote_common_scope_vars()
@@ -57,11 +74,12 @@ endfunction()
 
 # add map file generation for the given target
 function(pico_add_map_output TARGET)
+    pico_get_runtime_output_directory(${TARGET} output_path)
     get_target_property(target_type ${TARGET} TYPE)
     if ("EXECUTABLE" STREQUAL "${target_type}")
-        target_link_options(${TARGET} PRIVATE "LINKER:-Map=$<IF:$<BOOL:$<TARGET_PROPERTY:OUTPUT_NAME>>,$<TARGET_PROPERTY:OUTPUT_NAME>,$<TARGET_PROPERTY:NAME>>${CMAKE_EXECUTABLE_SUFFIX}.map")
+        target_link_options(${TARGET} PRIVATE "LINKER:-Map=${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:OUTPUT_NAME>>,$<TARGET_PROPERTY:OUTPUT_NAME>,$<TARGET_PROPERTY:NAME>>${CMAKE_EXECUTABLE_SUFFIX}.map")
     else ()
-        target_link_options(${TARGET} INTERFACE "LINKER:-Map=$<IF:$<BOOL:$<TARGET_PROPERTY:OUTPUT_NAME>>,$<TARGET_PROPERTY:OUTPUT_NAME>,$<TARGET_PROPERTY:NAME>>${CMAKE_EXECUTABLE_SUFFIX}.map")
+        target_link_options(${TARGET} INTERFACE "LINKER:-Map=${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:OUTPUT_NAME>>,$<TARGET_PROPERTY:OUTPUT_NAME>,$<TARGET_PROPERTY:NAME>>${CMAKE_EXECUTABLE_SUFFIX}.map")
     endif ()
 endfunction()
 
@@ -102,7 +120,7 @@ macro(pico_simple_hardware_headers_target NAME)
     if (NOT TARGET hardware_${NAME}_headers)
         add_library(hardware_${NAME}_headers INTERFACE)
 
-        target_include_directories(hardware_${NAME}_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+        target_include_directories(hardware_${NAME}_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
         target_link_libraries(hardware_${NAME}_headers INTERFACE pico_base_headers)
         if (NOT PICO_NO_HARDWARE)
             target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs hardware_claim_headers)
@@ -122,7 +140,7 @@ macro(pico_simple_hardware_headers_only_target NAME)
         add_library(hardware_${NAME}_headers INTERFACE)
 
         # a headers only target should still have an explicit _headers library for consistency
-        target_include_directories(hardware_${NAME}_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+        target_include_directories(hardware_${NAME}_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
         target_link_libraries(hardware_${NAME}_headers INTERFACE pico_base_headers)
         if (NOT PICO_NO_HARDWARE)
             target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs)
@@ -154,12 +172,30 @@ macro(pico_simple_hardware_impl_target NAME)
     endif()
 endmacro()
 
+function(pico_add_doxygen_pre_define PRE_DEFINE)
+    list(APPEND PICO_DOXYGEN_PRE_DEFINES "${PRE_DEFINE}")
+    set(PICO_DOXYGEN_PRE_DEFINES "${PICO_DOXYGEN_PRE_DEFINES}" CACHE INTERNAL "")
+endfunction()
+
+function(pico_add_doxygen_enabled_section ENABLED_SECTION)
+    list(APPEND PICO_DOXYGEN_ENABLED_SECTIONS "${ENABLED_SECTION}")
+    set(PICO_DOXYGEN_ENABLED_SECTIONS "${PICO_DOXYGEN_ENABLED_SECTIONS}" CACHE INTERNAL "")
+endfunction()
+
 function(pico_add_doxygen SOURCE_DIR)
-    set(PICO_DOXYGEN_PATHS "${PICO_DOXYGEN_PATHS} ${SOURCE_DIR}" CACHE INTERNAL "")
+    if (NOT IS_ABSOLUTE "${SOURCE_DIR}")
+        get_filename_component(SOURCE_DIR "${SOURCE_DIR}" ABSOLUTE BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+    list(APPEND PICO_DOXYGEN_PATHS "${SOURCE_DIR}")
+    set(PICO_DOXYGEN_PATHS "${PICO_DOXYGEN_PATHS}" CACHE INTERNAL "")
 endfunction()
 
 function(pico_add_doxygen_exclude SOURCE_DIR)
-    set(PICO_DOXYGEN_EXCLUDE_PATHS "${PICO_DOXYGEN_EXCLUDE_PATHS} ${SOURCE_DIR}" CACHE INTERNAL "")
+    if (NOT IS_ABSOLUTE "${SOURCE_DIR}")
+        get_filename_component(SOURCE_DIR "${SOURCE_DIR}" ABSOLUTE BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+    list(APPEND PICO_DOXYGEN_EXCLUDE_PATHS "${SOURCE_DIR}")
+    set(PICO_DOXYGEN_EXCLUDE_PATHS "${PICO_DOXYGEN_EXCLUDE_PATHS}" CACHE INTERNAL "")
 endfunction()
 
 include(${PICO_PLATFORM_CMAKE_FILE})

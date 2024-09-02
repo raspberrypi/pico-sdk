@@ -1,0 +1,36 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "tinyusb_port",
+    hdrs = [
+        "include/bsp/board.h",
+    ],
+    defines = [
+        "CFG_TUSB_DEBUG=0",
+        "CFG_TUSB_MCU=OPT_MCU_RP2040",
+        "CFG_TUSB_OS=OPT_OS_PICO",
+    ],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_binary_info",
+        "//src/common/pico_stdlib_headers",
+        "//src/common/pico_sync",
+        "//src/common/pico_time:pico_time_headers",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_gpio",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_resets",
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/hardware_uart",
+        "//src/rp2_common/pico_fix/rp2040_usb_device_enumeration",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+        "//src/rp2_common/pico_stdio_semihosting",
+        "//src/rp2_common/pico_stdio_uart",
+        "//src/rp2_common/pico_stdio_usb:pico_stdio_usb_headers",
+        "//src/rp2_common/pico_stdio_usb:tusb_config",
+        "//src/rp2_common/pico_unique_id",
+    ],
+)

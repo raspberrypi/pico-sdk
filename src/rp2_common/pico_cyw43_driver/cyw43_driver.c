@@ -9,6 +9,7 @@
 #include "pico/unique_id.h"
 #include "cyw43.h"
 #include "pico/cyw43_driver.h"
+#include "pico/async_context.h"
 
 #ifndef CYW43_GPIO_IRQ_HANDLER_PRIORITY
 #define CYW43_GPIO_IRQ_HANDLER_PRIORITY 0x40

@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -69,8 +71,8 @@
 //                  - Serial clock phase – capture on first edge of serial-clock
 //                  directly after reset.
 // =============================================================================
-#ifndef HARDWARE_REGS_SSI_DEFINED
-#define HARDWARE_REGS_SSI_DEFINED
+#ifndef _HARDWARE_REGS_SSI_H
+#define _HARDWARE_REGS_SSI_H
 // =============================================================================
 // Register    : SSI_CTRLR0
 // Description : Control register 0
@@ -88,16 +90,15 @@
 // -----------------------------------------------------------------------------
 // Field       : SSI_CTRLR0_SPI_FRF
 // Description : SPI frame format
-//               0x0 -> Standard 1-bit SPI frame format; 1 bit per SCK,
-//               full-duplex
+//               0x0 -> Standard 1-bit SPI frame format; 1 bit per SCK, full-duplex
 //               0x1 -> Dual-SPI frame format; two bits per SCK, half-duplex
 //               0x2 -> Quad-SPI frame format; four bits per SCK, half-duplex
-#define SSI_CTRLR0_SPI_FRF_RESET      _u(0x0)
-#define SSI_CTRLR0_SPI_FRF_BITS       _u(0x00600000)
-#define SSI_CTRLR0_SPI_FRF_MSB        _u(22)
-#define SSI_CTRLR0_SPI_FRF_LSB        _u(21)
-#define SSI_CTRLR0_SPI_FRF_ACCESS     "RW"
-#define SSI_CTRLR0_SPI_FRF_VALUE_STD  _u(0x0)
+#define SSI_CTRLR0_SPI_FRF_RESET  _u(0x0)
+#define SSI_CTRLR0_SPI_FRF_BITS   _u(0x00600000)
+#define SSI_CTRLR0_SPI_FRF_MSB    _u(22)
+#define SSI_CTRLR0_SPI_FRF_LSB    _u(21)
+#define SSI_CTRLR0_SPI_FRF_ACCESS "RW"
+#define SSI_CTRLR0_SPI_FRF_VALUE_STD _u(0x0)
 #define SSI_CTRLR0_SPI_FRF_VALUE_DUAL _u(0x1)
 #define SSI_CTRLR0_SPI_FRF_VALUE_QUAD _u(0x2)
 // -----------------------------------------------------------------------------
@@ -140,16 +141,15 @@
 //               0x0 -> Both transmit and receive
 //               0x1 -> Transmit only (not for FRF == 0, standard SPI mode)
 //               0x2 -> Receive only (not for FRF == 0, standard SPI mode)
-//               0x3 -> EEPROM read mode (TX then RX; RX starts after control
-//               data TX'd)
-#define SSI_CTRLR0_TMOD_RESET             _u(0x0)
-#define SSI_CTRLR0_TMOD_BITS              _u(0x00000300)
-#define SSI_CTRLR0_TMOD_MSB               _u(9)
-#define SSI_CTRLR0_TMOD_LSB               _u(8)
-#define SSI_CTRLR0_TMOD_ACCESS            "RW"
-#define SSI_CTRLR0_TMOD_VALUE_TX_AND_RX   _u(0x0)
-#define SSI_CTRLR0_TMOD_VALUE_TX_ONLY     _u(0x1)
-#define SSI_CTRLR0_TMOD_VALUE_RX_ONLY     _u(0x2)
+//               0x3 -> EEPROM read mode (TX then RX; RX starts after control data TX'd)
+#define SSI_CTRLR0_TMOD_RESET  _u(0x0)
+#define SSI_CTRLR0_TMOD_BITS   _u(0x00000300)
+#define SSI_CTRLR0_TMOD_MSB    _u(9)
+#define SSI_CTRLR0_TMOD_LSB    _u(8)
+#define SSI_CTRLR0_TMOD_ACCESS "RW"
+#define SSI_CTRLR0_TMOD_VALUE_TX_AND_RX _u(0x0)
+#define SSI_CTRLR0_TMOD_VALUE_TX_ONLY _u(0x1)
+#define SSI_CTRLR0_TMOD_VALUE_RX_ONLY _u(0x2)
 #define SSI_CTRLR0_TMOD_VALUE_EEPROM_READ _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : SSI_CTRLR0_SCPOL
@@ -758,15 +758,15 @@
 //               0x1 -> 4-bit instruction
 //               0x2 -> 8-bit instruction
 //               0x3 -> 16-bit instruction
-#define SSI_SPI_CTRLR0_INST_L_RESET      _u(0x0)
-#define SSI_SPI_CTRLR0_INST_L_BITS       _u(0x00000300)
-#define SSI_SPI_CTRLR0_INST_L_MSB        _u(9)
-#define SSI_SPI_CTRLR0_INST_L_LSB        _u(8)
-#define SSI_SPI_CTRLR0_INST_L_ACCESS     "RW"
+#define SSI_SPI_CTRLR0_INST_L_RESET  _u(0x0)
+#define SSI_SPI_CTRLR0_INST_L_BITS   _u(0x00000300)
+#define SSI_SPI_CTRLR0_INST_L_MSB    _u(9)
+#define SSI_SPI_CTRLR0_INST_L_LSB    _u(8)
+#define SSI_SPI_CTRLR0_INST_L_ACCESS "RW"
 #define SSI_SPI_CTRLR0_INST_L_VALUE_NONE _u(0x0)
-#define SSI_SPI_CTRLR0_INST_L_VALUE_4B   _u(0x1)
-#define SSI_SPI_CTRLR0_INST_L_VALUE_8B   _u(0x2)
-#define SSI_SPI_CTRLR0_INST_L_VALUE_16B  _u(0x3)
+#define SSI_SPI_CTRLR0_INST_L_VALUE_4B _u(0x1)
+#define SSI_SPI_CTRLR0_INST_L_VALUE_8B _u(0x2)
+#define SSI_SPI_CTRLR0_INST_L_VALUE_16B _u(0x3)
 // -----------------------------------------------------------------------------
 // Field       : SSI_SPI_CTRLR0_ADDR_L
 // Description : Address length (0b-60b in 4b increments)
@@ -779,15 +779,13 @@
 // Field       : SSI_SPI_CTRLR0_TRANS_TYPE
 // Description : Address and instruction transfer format
 //               0x0 -> Command and address both in standard SPI frame format
-//               0x1 -> Command in standard SPI format, address in format
-//               specified by FRF
-//               0x2 -> Command and address both in format specified by FRF
-//               (e.g. Dual-SPI)
-#define SSI_SPI_CTRLR0_TRANS_TYPE_RESET      _u(0x0)
-#define SSI_SPI_CTRLR0_TRANS_TYPE_BITS       _u(0x00000003)
-#define SSI_SPI_CTRLR0_TRANS_TYPE_MSB        _u(1)
-#define SSI_SPI_CTRLR0_TRANS_TYPE_LSB        _u(0)
-#define SSI_SPI_CTRLR0_TRANS_TYPE_ACCESS     "RW"
+//               0x1 -> Command in standard SPI format, address in format specified by FRF
+//               0x2 -> Command and address both in format specified by FRF (e.g. Dual-SPI)
+#define SSI_SPI_CTRLR0_TRANS_TYPE_RESET  _u(0x0)
+#define SSI_SPI_CTRLR0_TRANS_TYPE_BITS   _u(0x00000003)
+#define SSI_SPI_CTRLR0_TRANS_TYPE_MSB    _u(1)
+#define SSI_SPI_CTRLR0_TRANS_TYPE_LSB    _u(0)
+#define SSI_SPI_CTRLR0_TRANS_TYPE_ACCESS "RW"
 #define SSI_SPI_CTRLR0_TRANS_TYPE_VALUE_1C1A _u(0x0)
 #define SSI_SPI_CTRLR0_TRANS_TYPE_VALUE_1C2A _u(0x1)
 #define SSI_SPI_CTRLR0_TRANS_TYPE_VALUE_2C2A _u(0x2)
@@ -806,4 +804,5 @@
 #define SSI_TXD_DRIVE_EDGE_TDE_LSB    _u(0)
 #define SSI_TXD_DRIVE_EDGE_TDE_ACCESS "RW"
 // =============================================================================
-#endif // HARDWARE_REGS_SSI_DEFINED
+#endif // _HARDWARE_REGS_SSI_H
+

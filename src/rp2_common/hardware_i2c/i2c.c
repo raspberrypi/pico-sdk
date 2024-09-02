@@ -16,13 +16,13 @@ i2c_inst_t i2c0_inst = {i2c0_hw, false};
 i2c_inst_t i2c1_inst = {i2c1_hw, false};
 
 static inline void i2c_reset(i2c_inst_t *i2c) {
-    invalid_params_if(I2C, i2c != i2c0 && i2c != i2c1);
-    reset_block(i2c == i2c0 ? RESETS_RESET_I2C0_BITS : RESETS_RESET_I2C1_BITS);
+    invalid_params_if(HARDWARE_I2C, i2c != i2c0 && i2c != i2c1);
+    reset_block_num(i2c == i2c0 ? RESET_I2C0 : RESET_I2C1);
 }
 
 static inline void i2c_unreset(i2c_inst_t *i2c) {
-    invalid_params_if(I2C, i2c != i2c0 && i2c != i2c1);
-    unreset_block_wait(i2c == i2c0 ? RESETS_RESET_I2C0_BITS : RESETS_RESET_I2C1_BITS);
+    invalid_params_if(HARDWARE_I2C, i2c != i2c0 && i2c != i2c1);
+    unreset_block_num_wait_blocking(i2c == i2c0 ? RESET_I2C0 : RESET_I2C1);
 }
 
 // Addresses of the form 000 0xxx or 111 1xxx are reserved. No slave should
@@ -60,7 +60,7 @@ void i2c_deinit(i2c_inst_t *i2c) {
 }
 
 uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
-    invalid_params_if(I2C, baudrate == 0);
+    invalid_params_if(HARDWARE_I2C, baudrate == 0);
     // I2C is synchronous design that runs from clk_sys
     uint freq_in = clock_get_hz(clk_sys);
 
@@ -69,10 +69,10 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
     uint lcnt = period * 3 / 5; // oof this one hurts
     uint hcnt = period - lcnt;
     // Check for out-of-range divisors:
-    invalid_params_if(I2C, hcnt > I2C_IC_FS_SCL_HCNT_IC_FS_SCL_HCNT_BITS);
-    invalid_params_if(I2C, lcnt > I2C_IC_FS_SCL_LCNT_IC_FS_SCL_LCNT_BITS);
-    invalid_params_if(I2C, hcnt < 8);
-    invalid_params_if(I2C, lcnt < 8);
+    invalid_params_if(HARDWARE_I2C, hcnt > I2C_IC_FS_SCL_HCNT_IC_FS_SCL_HCNT_BITS);
+    invalid_params_if(HARDWARE_I2C, lcnt > I2C_IC_FS_SCL_LCNT_IC_FS_SCL_LCNT_BITS);
+    invalid_params_if(HARDWARE_I2C, hcnt < 8);
+    invalid_params_if(HARDWARE_I2C, lcnt < 8);
 
     // Per I2C-bus specification a device in standard or fast mode must
     // internally provide a hold time of at least 300ns for the SDA signal to
@@ -110,8 +110,8 @@ uint i2c_set_baudrate(i2c_inst_t *i2c, uint baudrate) {
 }
 
 void i2c_set_slave_mode(i2c_inst_t *i2c, bool slave, uint8_t addr) {
-    invalid_params_if(I2C, addr >= 0x80); // 7-bit addresses
-    invalid_params_if(I2C, i2c_reserved_addr(addr));
+    invalid_params_if(HARDWARE_I2C, addr >= 0x80); // 7-bit addresses
+    invalid_params_if(HARDWARE_I2C, i2c_reserved_addr(addr));
     i2c->hw->enable = 0;
     uint32_t ctrl_set_if_master = I2C_IC_CON_MASTER_MODE_BITS | I2C_IC_CON_IC_SLAVE_DISABLE_BITS;
     uint32_t ctrl_set_if_slave = I2C_IC_CON_RX_FIFO_FULL_HLD_CTRL_BITS;
@@ -132,12 +132,12 @@ void i2c_set_slave_mode(i2c_inst_t *i2c, bool slave, uint8_t addr) {
 
 static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
                                        check_timeout_fn timeout_check, struct timeout_state *ts) {
-    invalid_params_if(I2C, addr >= 0x80); // 7-bit addresses
-    invalid_params_if(I2C, i2c_reserved_addr(addr));
+    invalid_params_if(HARDWARE_I2C, addr >= 0x80); // 7-bit addresses
+    invalid_params_if(HARDWARE_I2C, i2c_reserved_addr(addr));
     // Synopsys hw accepts start/stop flags alongside data items in the same
     // FIFO word, so no 0 byte transfers.
-    invalid_params_if(I2C, len == 0);
-    invalid_params_if(I2C, ((int)len) < 0);
+    invalid_params_if(HARDWARE_I2C, len == 0);
+    invalid_params_if(HARDWARE_I2C, ((int)len) < 0);
 
     i2c->hw->enable = 0;
     i2c->hw->tar = addr;
@@ -154,6 +154,10 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
         bool first = byte_ctr == 0;
         bool last = byte_ctr == ilen - 1;
 
+        if (timeout_check) {
+            timeout_check(ts, true); // for per iteration checks, this will reset the timeout
+        }
+
         i2c->hw->data_cmd =
                 bool_to_bit(first && i2c->restart_on_next) << I2C_IC_DATA_CMD_RESTART_LSB |
                 bool_to_bit(last && !nostop) << I2C_IC_DATA_CMD_STOP_LSB |
@@ -165,7 +169,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
         // was set in i2c_init.
         do {
             if (timeout_check) {
-                timeout = timeout_check(ts);
+                timeout = timeout_check(ts, false);
                 abort |= timeout;
             }
             tight_loop_contents();
@@ -184,14 +188,14 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
 
             if (abort || (last && !nostop)) {
                 // If the transaction was aborted or if it completed
-                // successfully wait until the STOP condition has occured.
+                // successfully wait until the STOP condition has occurred.
 
                 // TODO Could there be an abort while waiting for the STOP
                 // condition here? If so, additional code would be needed here
                 // to take care of the abort.
                 do {
                     if (timeout_check) {
-                        timeout = timeout_check(ts);
+                        timeout = timeout_check(ts, false);
                         abort |= timeout;
                     }
                     tight_loop_contents();
@@ -257,10 +261,10 @@ int i2c_write_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *
 
 static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop,
                                check_timeout_fn timeout_check, timeout_state_t *ts) {
-    invalid_params_if(I2C, addr >= 0x80); // 7-bit addresses
-    invalid_params_if(I2C, i2c_reserved_addr(addr));
-    invalid_params_if(I2C, len == 0);
-    invalid_params_if(I2C, ((int)len) < 0);
+    invalid_params_if(HARDWARE_I2C, addr >= 0x80); // 7-bit addresses
+    invalid_params_if(HARDWARE_I2C, i2c_reserved_addr(addr));
+    invalid_params_if(HARDWARE_I2C, len == 0);
+    invalid_params_if(HARDWARE_I2C, ((int)len) < 0);
 
     i2c->hw->enable = 0;
     i2c->hw->tar = addr;
@@ -274,6 +278,10 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
     for (byte_ctr = 0; byte_ctr < ilen; ++byte_ctr) {
         bool first = byte_ctr == 0;
         bool last = byte_ctr == ilen - 1;
+        if (timeout_check) {
+            timeout_check(ts, true); // for per iteration checks, this will reset the timeout
+        }
+
         while (!i2c_get_write_available(i2c))
             tight_loop_contents();
 
@@ -286,7 +294,7 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
             abort_reason = i2c->hw->tx_abrt_source;
             abort = (bool) i2c->hw->clr_tx_abrt;
             if (timeout_check) {
-                timeout = timeout_check(ts);
+                timeout = timeout_check(ts, false);
                 abort |= timeout;
             }
         } while (!abort && !i2c_get_read_available(i2c));

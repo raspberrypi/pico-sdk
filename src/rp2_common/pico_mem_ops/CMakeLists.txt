@@ -7,7 +7,13 @@ if (NOT TARGET pico_mem_ops)
 
     # add alias "default" which is just pico.
     add_library(pico_mem_ops_default INTERFACE)
-    target_link_libraries(pico_mem_ops_default INTERFACE pico_mem_ops_pico)
+    if (PICO_RP2040)
+        # RP2040 bootrom has optimized versions
+        target_link_libraries(pico_mem_ops_default INTERFACE pico_mem_ops_pico)
+    else()
+        # beware commpiler memcpy cannot be used for unaligned copies in peripheral space
+        target_link_libraries(pico_mem_ops_default INTERFACE pico_mem_ops_compiler)
+    endif()
 
     set(PICO_DEFAULT_MEM_OPS_IMPL pico_mem_ops_default)
 
@@ -18,10 +24,10 @@ if (NOT TARGET pico_mem_ops)
     target_sources(pico_mem_ops_pico INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/mem_ops_aeabi.S
             )
-    target_include_directories(pico_mem_ops_pico_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(pico_mem_ops_pico_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
     pico_mirrored_target_link_libraries(pico_mem_ops_pico INTERFACE pico_base)
 
-    target_link_libraries(pico_mem_ops INTERFACE pico_bootrom)
+    target_link_libraries(pico_mem_ops_pico INTERFACE pico_bootrom)
 
     pico_wrap_function(pico_mem_ops_pico memcpy)
     pico_wrap_function(pico_mem_ops_pico memset)

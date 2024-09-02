@@ -12,8 +12,6 @@ check_hw_size(interp_hw_t, SIO_INTERP1_ACCUM0_OFFSET - SIO_INTERP0_ACCUM0_OFFSET
 
 check_hw_layout(sio_hw_t, interp, SIO_INTERP0_ACCUM0_OFFSET);
 
-static_assert(NUM_DMA_CHANNELS <= 16, "");
-
 static uint8_t _claimed;
 
 static inline uint interp_lane_bit(interp_hw_t * interp, uint lane) {
@@ -21,28 +19,28 @@ static inline uint interp_lane_bit(interp_hw_t * interp, uint lane) {
 }
 
 void interp_claim_lane(interp_hw_t *interp, uint lane) {
-    valid_params_if(INTERP, lane < 2);
+    valid_params_if(HARDWARE_INTERP, lane < 2);
     hw_claim_or_assert((uint8_t *) &_claimed, interp_lane_bit(interp, lane), "Lane is already claimed");
 }
 
 void interp_claim_lane_mask(interp_hw_t *interp, uint lane_mask) {
-    valid_params_if(INTERP, lane_mask && lane_mask <= 0x3);
+    valid_params_if(HARDWARE_INTERP, lane_mask && lane_mask <= 0x3);
     if (lane_mask & 1u) interp_claim_lane(interp, 0);
     if (lane_mask & 2u) interp_claim_lane(interp, 1);
 }
 
 void interp_unclaim_lane(interp_hw_t *interp, uint lane) {
-    valid_params_if(INTERP, lane < 2);
+    valid_params_if(HARDWARE_INTERP, lane < 2);
     hw_claim_clear((uint8_t *) &_claimed, interp_lane_bit(interp, lane));
 }
 
 bool interp_lane_is_claimed(interp_hw_t *interp, uint lane) {
-    valid_params_if(INTERP, lane < 2);
+    valid_params_if(HARDWARE_INTERP, lane < 2);
     return hw_is_claimed((uint8_t *) &_claimed, interp_lane_bit(interp, lane));
 }
 
 void interp_unclaim_lane_mask(interp_hw_t *interp, uint lane_mask) {
-    valid_params_if(INTERP, lane_mask <= 0x3);
+    valid_params_if(HARDWARE_INTERP, lane_mask <= 0x3);
     if (lane_mask & 1u) interp_unclaim_lane(interp, 0);
     if (lane_mask & 2u) interp_unclaim_lane(interp, 1);
 }

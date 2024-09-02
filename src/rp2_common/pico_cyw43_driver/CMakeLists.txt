@@ -30,7 +30,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             ${PICO_CYW43_DRIVER_PATH}/src/cyw43_lwip.c
             ${PICO_CYW43_DRIVER_PATH}/src/cyw43_ctrl.c
             )
-    target_include_directories(cyw43_driver_headers INTERFACE
+    target_include_directories(cyw43_driver_headers SYSTEM INTERFACE
             ${PICO_CYW43_DRIVER_PATH}/src
             ${PICO_CYW43_DRIVER_PATH}/firmware
             )
@@ -39,7 +39,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     pico_add_library(pico_cyw43_driver NOFLAG)
     target_sources(pico_cyw43_driver INTERFACE
             cyw43_driver.c)
-    target_include_directories(pico_cyw43_driver_headers INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(pico_cyw43_driver_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
     pico_mirrored_target_link_libraries(pico_cyw43_driver INTERFACE cyw43_driver)
 
     # cyw43_driver_picow is cyw43_driver plus Pico W specific bus implementation
@@ -63,21 +63,21 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             ${CMAKE_CURRENT_LIST_DIR}/btstack_hci_transport_cyw43.c
             ${CMAKE_CURRENT_LIST_DIR}/btstack_chipset_cyw43.c
             )
-    target_include_directories(pico_btstack_hci_transport_cyw43_headers INTERFACE
+    target_include_directories(pico_btstack_hci_transport_cyw43_headers SYSTEM INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/include
             )
     target_compile_definitions(pico_btstack_hci_transport_cyw43_headers INTERFACE
             CYW43_ENABLE_BLUETOOTH=1
             )
 
-    if (TARGET pico_btstack_base)
+    if (PICO_CYW43_SUPPORTED AND TARGET pico_btstack_base)
         message("Pico W Bluetooth build support available.")
 
         pico_add_library(pico_btstack_cyw43)
         target_sources(pico_btstack_cyw43 INTERFACE
                 ${CMAKE_CURRENT_LIST_DIR}/btstack_cyw43.c
                 )
-        target_include_directories(pico_btstack_cyw43_headers INTERFACE
+        target_include_directories(pico_btstack_cyw43_headers SYSTEM INTERFACE
                 ${CMAKE_CURRENT_LIST_DIR}/include
                 )
         pico_mirrored_target_link_libraries(pico_btstack_cyw43 INTERFACE

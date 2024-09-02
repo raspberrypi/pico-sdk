@@ -1,0 +1,38 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# This exists to break a dependency cycle between
+# this library and //src/common/hardware_claim.
+# Application code should always use :hardware_sync instead.
+cc_library(
+    name = "hardware_sync_headers",
+    hdrs = ["include/hardware/sync.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = [
+        "//src/common/hardware_claim:__pkg__",
+        "//src/common/pico_sync:__pkg__",
+        "//src/rp2_common/hardware_sync_spin_lock:__pkg__",
+    ],
+    deps = [
+        "//src/rp2_common/hardware_base",
+    ],
+)
+
+cc_library(
+    name = "hardware_sync",
+    srcs = ["sync.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":hardware_sync_headers",
+        "//src/common/hardware_claim",
+        "//src/common/pico_base_headers",
+        "//src/common/pico_sync:pico_sync_headers",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/hardware_base",
+        "//src/rp2_common/hardware_sync_spin_lock",
+        "//src/rp2_common/hardware_sync_spin_lock:hardware_sync_spin_lock_headers",
+    ],
+)

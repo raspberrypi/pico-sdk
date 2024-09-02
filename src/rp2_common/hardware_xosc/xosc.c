@@ -13,13 +13,13 @@
 #include "hardware/regs/xosc.h"
 #include "hardware/xosc.h"
 
-#if XOSC_KHZ < (1 * KHZ) || XOSC_KHZ > (50 * KHZ)
+#if XOSC_HZ < (1 * MHZ) || XOSC_HZ > (50 * MHZ)
 // Note: Although an external clock can be supplied up to 50 MHz, the maximum frequency the
-// XOSC cell is specified to work with a crystal is less, please see the RP2040 Datasheet.
-#error XOSC_KHZ must be in the range 1,000-50,000KHz i.e. 1-50MHz XOSC frequency
+// XOSC cell is specified to work with a crystal is less, please see the appropriate RP-series datasheet.
+#error XOSC_HZ must be in the range 1,000,000-50,000,000 i.e. 1-50MHz XOSC frequency
 #endif
 
-#define STARTUP_DELAY (((XOSC_KHZ + 128) / 256) * PICO_XOSC_STARTUP_DELAY_MULTIPLIER)
+#define STARTUP_DELAY ((((XOSC_HZ / KHZ) + 128) / 256) * PICO_XOSC_STARTUP_DELAY_MULTIPLIER)
 
 // The DELAY field in xosc_hw->startup is 14 bits wide.
 #if STARTUP_DELAY >= (1 << 13)

@@ -46,21 +46,19 @@
 
 # ... using these 3 lines instead
 set(PICO_CMSIS_CORE_PATH ${CMAKE_CURRENT_LIST_DIR}/stub)
-set(PICO_CMSIS_VENDOR RaspberryPi)
-set(PICO_CMSIS_DEVICE RP2040)
 
-if (PICO_CMSIS_CORE_PATH)
+if (PICO_CMSIS_CORE_PATH AND PICO_CMSIS_DEVICE)
     pico_add_library(cmsis_core)
     target_sources(cmsis_core INTERFACE
-            ${PICO_CMSIS_CORE_PATH}/CMSIS/Device/${PICO_CMSIS_VENDOR}/${PICO_CMSIS_DEVICE}/Source/system_${PICO_CMSIS_DEVICE}.c
+            ${PICO_CMSIS_CORE_PATH}/CMSIS/Device/${PICO_CMSIS_DEVICE}/Source/system_${PICO_CMSIS_DEVICE}.c
     )
-    target_include_directories(cmsis_core_headers INTERFACE
+    target_include_directories(cmsis_core_headers SYSTEM INTERFACE
             ${PICO_CMSIS_CORE_PATH}/CMSIS/Core/Include
-            ${PICO_CMSIS_CORE_PATH}/CMSIS/Device/${PICO_CMSIS_VENDOR}/${PICO_CMSIS_DEVICE}/Include
+            ${PICO_CMSIS_CORE_PATH}/CMSIS/Device/${PICO_CMSIS_DEVICE}/Include
     )
     pico_mirrored_target_link_libraries(cmsis_core INTERFACE hardware_clocks pico_platform)
 
-    list(APPEND PICO_RP2040_CONFIG_HEADER_FILES ${CMAKE_CURRENT_LIST_DIR}/include/cmsis/rename_exceptions.h)
+    list(APPEND PICO_CONFIG_HEADER_FILES ${CMAKE_CURRENT_LIST_DIR}/include/cmsis/rename_exceptions.h)
     pico_promote_common_scope_vars()
 endif()
 

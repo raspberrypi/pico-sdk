@@ -1,0 +1,26 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:transition.bzl", "extra_copts_for_all_deps")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "hardware_sync_spin_lock_test_actual",
+    testonly = True,
+    srcs = ["hardware_sync_spin_lock_test.c"],
+    tags = ["manual"],
+    deps = [
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/hardware_sync_spin_lock",
+        "//src/rp2_common/pico_multicore",
+        "//src/rp2_common/pico_stdio",
+        "//test/pico_test",
+    ],
+)
+
+extra_copts_for_all_deps(
+    name = "hardware_sync_spin_lock_test",
+    testonly = True,
+    src = ":hardware_sync_spin_lock_test_actual",
+    extra_copts = ["-DPICO_STDOUT_MUTEX=0"],
+    target_compatible_with = compatible_with_rp2(),
+)

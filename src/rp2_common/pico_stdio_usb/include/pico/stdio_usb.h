@@ -20,7 +20,7 @@
  *  use of the USB in device or host mode. For this reason, this library will automatically disengage if you try to using it alongside \ref tinyusb_device or
  *  \ref tinyusb_host. It also takes control of a lower level IRQ and sets up a periodic background task.
  *
- *  This library also includes (by default) functionality to enable the RP2040 to be reset over the USB interface.
+ *  This library also includes (by default) functionality to enable the RP-series microcontroller to be reset over the USB interface.
  */
 
 // PICO_CONFIG: PICO_STDIO_USB_DEFAULT_CRLF, Default state of CR/LF translation for USB output, type=bool, default=PICO_STDIO_DEFAULT_CRLF, group=pico_stdio_usb
@@ -44,9 +44,11 @@
 // this variable is no longer set by default (one is claimed dynamically), but will be respected if specified
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE, Enable/disable resetting into BOOTSEL mode if the host sets the baud rate to a magic value (PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE), type=bool, default=1, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE, Enable/disable resetting into BOOTSEL mode if the host sets the baud rate to a magic value (PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE), type=bool, default=1 if application is not using TinyUSB directly, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE
+#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
 #define PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE 1
+#endif
 #endif
 
 // PICO_CONFIG: PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE, baud rate that if selected causes a reset into BOOTSEL mode (if PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE is set), default=1200, group=pico_stdio_usb
@@ -64,6 +66,11 @@
 #define PICO_STDIO_USB_POST_CONNECT_WAIT_DELAY_MS 50
 #endif
 
+// PICO_CONFIG: PICO_STDIO_USB_DEINIT_DELAY_MS, Number of milliseconds to wait before deinitializing stdio_usb, default=110, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_DEINIT_DELAY_MS
+#define PICO_STDIO_USB_DEINIT_DELAY_MS 110
+#endif
+
 // PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED, Optionally define a pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE), type=int, min=0, max=29, group=pico_stdio_usb
 
 // PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED, Whether the pin specified by PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED is fixed or can be modified by picotool over the VENDOR USB interface, type=bool, default=0, group=pico_stdio_usb
@@ -77,9 +84,11 @@
 #define PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK 0u
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE, Enable/disable resetting into BOOTSEL mode via an additional VENDOR USB interface - enables picotool based reset, type=bool, default=1, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE, Enable/disable resetting into BOOTSEL mode via an additional VENDOR USB interface - enables picotool based reset, type=bool, default=1 if application is not using TinyUSB directly, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
+#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
 #define PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE 1
+#endif
 #endif
 
 // PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL, If vendor reset interface is included allow rebooting to BOOTSEL mode, type=bool, default=1, group=pico_stdio_usb
@@ -92,7 +101,12 @@
 #define PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT 1
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS, delays in ms before rebooting via regular flash boot, default=100, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR, If vendor reset interface is included add support for Microsoft OS 2.0 Descriptor, type=bool, default=1, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR
+#define PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR 1
+#endif
+
+// PICO_CONFIG: PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS, Delay in ms before rebooting via regular flash boot, default=100, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS
 #define PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS 100
 #endif
@@ -128,6 +142,13 @@ extern stdio_driver_t stdio_usb;
  *  \return true if the USB CDC was initialized, false if an error occurred
  */
 bool stdio_usb_init(void);
+
+/*! \brief Explicitly deinitialize USB stdio and remove it from the current set of stdin drivers
+ *  \ingroup pico_stdio_usb
+ *
+ *  \return true if the USB CDC was deinitialized, false if an error occurred
+ */
+bool stdio_usb_deinit(void);
 
 /*! \brief Check if there is an active stdio CDC connection to a host
  *  \ingroup pico_stdio_usb

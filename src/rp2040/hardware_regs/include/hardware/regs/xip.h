@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,8 +11,8 @@
 // Bus type       : ahb
 // Description    : QSPI flash execute-in-place block
 // =============================================================================
-#ifndef HARDWARE_REGS_XIP_DEFINED
-#define HARDWARE_REGS_XIP_DEFINED
+#ifndef _HARDWARE_REGS_XIP_H
+#define _HARDWARE_REGS_XIP_H
 // =============================================================================
 // Register    : XIP_CTRL
 // Description : Cache control
@@ -159,8 +161,8 @@
 //               a linear data block from flash to the streaming FIFO.
 //               Decrements automatically (1 at a time) as the stream
 //               progresses, and halts on reaching 0.
-//               Write 0 to halt an in-progress stream, and discard any
-//               in-flight
+//               Write 0 to halt an in-progress stream, and discard any in-
+//               flight
 //               read, so that a new stream can immediately be started (after
 //               draining the FIFO and reinitialising STREAM_ADDR)
 #define XIP_STREAM_CTR_OFFSET _u(0x00000018)
@@ -184,4 +186,5 @@
 #define XIP_STREAM_FIFO_LSB    _u(0)
 #define XIP_STREAM_FIFO_ACCESS "RF"
 // =============================================================================
-#endif // HARDWARE_REGS_XIP_DEFINED
+#endif // _HARDWARE_REGS_XIP_H
+

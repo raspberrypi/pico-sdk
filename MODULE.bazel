@@ -1,0 +1,141 @@
+module(
+    name = "pico-sdk",
+    version = "2.0.0",
+)
+
+bazel_dep(name = "platforms", version = "0.0.9")
+bazel_dep(name = "bazel_skylib", version = "1.6.1")
+bazel_dep(name = "rules_python", version = "0.22.1")
+bazel_dep(name = "picotool", version = "2.0.0")
+
+# Note: rules_cc is special-cased repository; a dependency on rules_cc in a
+# module will not ensure that the root Bazel module has that same version of
+# rules_cc. For that reason, this primarily acts as a FYI. You'll still need
+# to explicitly list this dependency in your own project's MODULE.bazel file.
+bazel_dep(name = "rules_cc", version = "0.0.9")
+
+# rules_cc v0.0.10 is not yet cut, so manually pull in the desired version.
+# This does not apply to dependent projects, so it needs to be copied to your
+# project's MODULE.bazel too.
+archive_override(
+    module_name = "rules_cc",
+    integrity = "sha256-zdQo/pQWKdIAPKSflBxOSWZNwCbc86T7SechKZo/3Xw=",
+    strip_prefix = "rules_cc-1acf5213b6170f1f0133e273cb85ede0e732048f",
+    urls = "https://github.com/bazelbuild/rules_cc/archive/1acf5213b6170f1f0133e273cb85ede0e732048f.tar.gz",
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "arm_gcc_linux-x86_64",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "6cd1bbc1d9ae57312bcd169ae283153a9572bd6a8e4eeae2fedfbc33b115fdbb",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
+)
+
+http_archive(
+    name = "arm_gcc_win-x86_64",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "51d933f00578aa28016c5e3c84f94403274ea7915539f8e56c13e2196437d18f",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip",
+)
+
+http_archive(
+    name = "arm_gcc_mac-x86_64",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "075faa4f3e8eb45e59144858202351a28706f54a6ec17eedd88c9fb9412372cc",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-x86_64-arm-none-eabi",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-x86_64-arm-none-eabi.tar.xz",
+)
+
+http_archive(
+    name = "arm_gcc_mac-aarch64",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "39c44f8af42695b7b871df42e346c09fee670ea8dfc11f17083e296ea2b0d279",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-arm64-arm-none-eabi",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-arm64-arm-none-eabi.tar.xz",
+)
+
+http_archive(
+    name = "clang_linux-x86_64",
+    build_file = "//bazel/toolchain:clang.BUILD",
+    sha256 = "e12ee0db9226f5b4a4400c5eb2c0f757d7056181b651622b5453acb00105fd87",
+    type = "zip",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/linux-amd64/+/git_revision:248c53429427034f45705af60d47f3b1090c4799",
+)
+
+http_archive(
+    name = "clang_win-x86_64",
+    build_file = "//bazel/toolchain:clang.BUILD",
+    sha256 = "8c41e8b507f4dfede80842f98a716cac209f552064088fa1b7f4c64a1e547534",
+    type = "zip",
+    # Windows doesn't like `:` in the produced filename, so replace it with `%3A`.
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/windows-amd64/+/git_revision:248c53429427034f45705af60d47f3b1090c4799".replace("git_revision:", "git_revision%3A"),
+)
+
+http_archive(
+    name = "clang_mac-x86_64",
+    build_file = "//bazel/toolchain:clang.BUILD",
+    sha256 = "1d92f52609d3c1e958fd56f5e9a68ab99b2042ddcc6e90a5eb5009cf7ac4897d",
+    type = "zip",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-amd64/+/git_revision:248c53429427034f45705af60d47f3b1090c4799",
+)
+
+http_archive(
+    name = "clang_mac-aarch64",
+    build_file = "//bazel/toolchain:clang.BUILD",
+    sha256 = "53184680db7e0043a8fba1556c7644b8f5e6c8cdffa4436a92a8e8adb0f45b8d",
+    type = "zip",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:248c53429427034f45705af60d47f3b1090c4799",
+)
+
+# TODO: Provide tinyusb as a proper Bazel module.
+http_archive(
+    name = "tinyusb",
+    build_file = "//src/rp2_common/tinyusb:tinyusb.BUILD",
+    sha256 = "d64728aef58b80d5ce3747cad133f520da46e2b7ea3aadfda0e981aba6b658b3",
+    strip_prefix = "tinyusb-4232642899362fa5e9cf0dc59bad6f1f6d32c563",
+    url = "https://github.com/hathach/tinyusb/archive/4232642899362fa5e9cf0dc59bad6f1f6d32c563.tar.gz",
+)
+
+# TODO: Provide btstack as a proper Bazel module.
+http_archive(
+    name = "btstack",
+    build_file = "//src/rp2_common/pico_btstack:btstack.BUILD",
+    sha256 = "64e86d9cf82b346e743fe1d4818b9380712b17abdb3f2c3524e92464b5ef3d19",
+    strip_prefix = "btstack-2b49e57bd1fae85ac32ac1f41cdb7c794de335f6",
+    url = "https://github.com/bluekitchen/btstack/archive/2b49e57bd1fae85ac32ac1f41cdb7c794de335f6.tar.gz",
+)
+
+# TODO: Provide btstack as a proper Bazel module.
+http_archive(
+    name = "cyw43-driver",
+    build_file = "//src/rp2_common/pico_cyw43_driver:cyw43-driver.BUILD",
+    sha256 = "0fcc7707fef95dd562d5572604713266613a27caeeae2f10afeccee9592a53ce",
+    strip_prefix = "cyw43-driver-faf36381bad1f668a30172b6336c9a970966ef4c",
+    url = "https://github.com/georgerobotics/cyw43-driver/archive/faf36381bad1f668a30172b6336c9a970966ef4c.tar.gz",
+)
+
+# TODO: Provide lwip as a proper Bazel module.
+http_archive(
+    name = "lwip",
+    build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
+    sha256 = "72856d557f72911cf6826ef745c23c54822df83a474557823241164a1d1361aa",
+    strip_prefix = "lwip-0a0452b2c39bdd91e252aef045c115f88f6ca773",
+    url = "https://github.com/lwip-tcpip/lwip/archive/0a0452b2c39bdd91e252aef045c115f88f6ca773.tar.gz",
+)
+
+register_toolchains(
+    "//bazel/toolchain:linux-x86_64-rp2040",
+    "//bazel/toolchain:linux-x86_64-rp2350",
+    "//bazel/toolchain:win-x86_64-rp2040",
+    "//bazel/toolchain:win-x86_64-rp2350",
+    "//bazel/toolchain:mac-x86_64-rp2040",
+    "//bazel/toolchain:mac-x86_64-rp2350",
+    "//bazel/toolchain:mac-aarch64-rp2040",
+    "//bazel/toolchain:mac-aarch64-rp2350",
+    # Require users to opt-in to the Pico SDK's toolchains.
+    dev_dependency = True,
+)

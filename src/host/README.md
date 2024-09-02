@@ -3,7 +3,7 @@ running on your computer (Raspberry Pi OS, Linux, macOS or Windows using Cygwin 
 It is selected by `PICO_PLATFORM=host` in your CMake build
 
 This can be extremely useful for testing and debugging higher level application code, or porting code which is not yet small enough 
-to run on the RP2040 device itself.
+to run on the RP2040 or RP2350 device itself.
 
 This base level host library provides a minimal environment to compile programs, but is likely sufficient for programs
 that don't access hardware directly.

@@ -26,6 +26,12 @@ PICO_WEAK_FUNCTION_DEF(restore_interrupts)
 void PICO_WEAK_FUNCTION_IMPL_NAME(restore_interrupts)(uint32_t status) {
 }
 
+PICO_WEAK_FUNCTION_DEF(restore_interrupts_from_disabled)
+
+void PICO_WEAK_FUNCTION_IMPL_NAME(restore_interrupts_from_disabled)(uint32_t status) {
+}
+
+
 PICO_WEAK_FUNCTION_DEF(spin_lock_instance)
 
 spin_lock_t *PICO_WEAK_FUNCTION_IMPL_NAME(spin_lock_instance)(uint lock_num) {
@@ -96,12 +102,6 @@ PICO_WEAK_FUNCTION_DEF(__wfe)
 
 void PICO_WEAK_FUNCTION_IMPL_NAME(__wfe)() {
     while (!event_fired) tight_loop_contents();
-}
-
-PICO_WEAK_FUNCTION_DEF(get_core_num)
-
-uint PICO_WEAK_FUNCTION_IMPL_NAME(get_core_num)() {
-    return 0;
 }
 
 PICO_WEAK_FUNCTION_DEF(clear_spin_locks)

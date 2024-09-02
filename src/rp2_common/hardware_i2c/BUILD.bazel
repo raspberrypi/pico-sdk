@@ -1,0 +1,19 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_i2c",
+    srcs = ["i2c.c"],
+    hdrs = ["include/hardware/i2c.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_time",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_resets",
+    ],
+)

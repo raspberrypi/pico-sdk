@@ -8,8 +8,8 @@
 #include "pico/time.h"
 #include "hardware/structs/usb.h"
 #include "hardware/gpio.h"
-#include "hardware/structs/iobank0.h"
-#include "hardware/structs/padsbank0.h"
+#include "hardware/structs/io_bank0.h"
+#include "hardware/structs/pads_bank0.h"
 #include "pico/fix/rp2040_usb_device_enumeration.h"
 
 #define LS_SE0 0b00
@@ -92,16 +92,16 @@ static void hw_enumeration_fix_force_ls_j(void) {
     hard_assert(gpio_get_function(dm) != 8);
 
     // Before changing any pin state, take a copy of the current gpio control register
-    gpio_ctrl_prev = iobank0_hw->io[dp].ctrl;
+    gpio_ctrl_prev = io_bank0_hw->io[dp].ctrl;
     // Also take a copy of the pads register
-    pad_ctrl_prev = padsbank0_hw->io[dp];
+    pad_ctrl_prev = pads_bank0_hw->io[dp];
 
     // Enable bus keep and force pin to tristate, so USB DP muxing doesn't affect
     // pin state
     gpio_set_pulls(dp, true, true);
     gpio_set_oeover(dp, GPIO_OVERRIDE_LOW);
     // Select function 8 (USB debug muxing) without disturbing other controls
-    hw_write_masked(&iobank0_hw->io[dp].ctrl,
+    hw_write_masked(&io_bank0_hw->io[dp].ctrl,
         8 << IO_BANK0_GPIO15_CTRL_FUNCSEL_LSB, IO_BANK0_GPIO15_CTRL_FUNCSEL_BITS);
 
     // J state is a differential 1 for a full speed device so
@@ -142,9 +142,9 @@ static void hw_enumeration_fix_finish(void) {
     hw_clear_bits(&usb_hw->phy_direct_override, USB_USBPHY_DIRECT_OVERRIDE_DP_PULLUP_EN_OVERRIDE_EN_BITS);
 
     // Finally, restore the gpio ctrl value back to GPIO15
-    iobank0_hw->io[dp].ctrl = gpio_ctrl_prev;
+    io_bank0_hw->io[dp].ctrl = gpio_ctrl_prev;
     // Restore the pad ctrl value
-    padsbank0_hw->io[dp] = pad_ctrl_prev;
+    pads_bank0_hw->io[dp] = pad_ctrl_prev;
 }
 
 #else

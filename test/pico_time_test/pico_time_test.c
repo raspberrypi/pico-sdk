@@ -75,9 +75,9 @@ int main() {
     alarm_pool_init_default();
 
     PICOTEST_START();
-    struct alarm_pool *pools[NUM_TIMERS];
-    for(uint i=0; i<NUM_TIMERS; i++) {
-        if (i == alarm_pool_hardware_alarm_num(alarm_pool_get_default())) {
+    struct alarm_pool *pools[NUM_ALARMS];
+    for(uint i=0; i<NUM_ALARMS; i++) {
+        if (i == alarm_pool_timer_alarm_num(alarm_pool_get_default())) {
             pools[i] = alarm_pool_get_default();
         } else {
             pools[i] = alarm_pool_create(i, MAX_TIMERS_PER_POOL);
@@ -109,8 +109,8 @@ int main() {
     }
     PICOTEST_CHECK(absolute_time_diff_us(time_base, get_absolute_time()) < init_ms * 1000, "This is a flaky test :-(");
 
-    uint64_t last_fired_at[NUM_TIMERS];
-    uint64_t last_target[NUM_TIMERS];
+    uint64_t last_fired_at[NUM_ALARMS];
+    uint64_t last_target[NUM_ALARMS];
     memset(&last_fired_at, 0, sizeof(last_fired_at));
     printf("Sleeping...\n");
     sleep_us(TEST_LENGTH_US + 250000);

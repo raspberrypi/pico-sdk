@@ -1,0 +1,29 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_stdio_headers",
+    hdrs = ["include/pico/stdio.h"],
+    defines = ["LIB_PICO_STDIO=1"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    visibility = [
+        "//src/host/pico_stdlib:__pkg__",
+    ],
+)
+
+cc_library(
+    name = "pico_stdio",
+    srcs = ["stdio.c"],
+    implementation_deps = [
+        "//src/host/hardware_uart",
+    ],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = [
+        ":pico_stdio_headers",
+        "//src/common/pico_stdlib_headers",
+        "//src/common/pico_time",
+        "//src/host/hardware_gpio",
+        "//src/host/hardware_uart",
+        "//src/host/pico_platform",
+    ],
+)

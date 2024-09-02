@@ -29,32 +29,51 @@ extern "C" {
 *
 * The following additional optimized functions are also provided:
 *
-* - fix2double, ufix2double, fix642double, ufix642double, double2fix, double2ufix, double2fix64, double2ufix64, double2int, double2int64, double2int_z, double2int64_z
+* - int2double, uint2double, int642double, uint642double, fix2double, ufix2double, fix642double, ufix642double
+* - double2fix, double2ufix, double2fix64, double2ufix64, double2int, double2uint, double2int64, double2uint64, double2int_z, double2int64_z,
+* - exp10, sincos, powint
+*
+* On RP2350 the following additional functions are available; the _fast methods are faster but do not round correctly"
+*
+* - ddiv_fast, sqrt_fast
 */
 
+double int2double(int32_t i);
+double uint2double(uint32_t u);
+double int642double(int64_t i);
+double uint642double(uint64_t u);
 double fix2double(int32_t m, int e);
 double ufix2double(uint32_t m, int e);
 double fix642double(int64_t m, int e);
 double ufix642double(uint64_t m, int e);
 
 // These methods round towards -Infinity.
-int32_t double2fix(double f, int e);
-uint32_t double2ufix(double f, int e);
-int64_t double2fix64(double f, int e);
-uint64_t double2ufix64(double f, int e);
-int32_t double2int(double f);
-int64_t double2int64(double f);
+int32_t double2fix(double d, int e);
+uint32_t double2ufix(double d, int e);
+int64_t double2fix64(double d, int e);
+uint64_t double2ufix64(double d, int e);
+int32_t double2int(double d);
+uint32_t double2uint(double d);
+int64_t double2int64(double d);
+uint64_t double2uint64(double d);
 
 // These methods round towards 0.
-int32_t double2int_z(double f);
-int64_t double2int64_z(double f);
+int32_t double2int_z(double d);
+int64_t double2int64_z(double d);
 
 double exp10(double x);
 void sincos(double x, double *sinx, double *cosx);
 double powint(double x, int y);
+
+#if !PICO_RP2040
+double ddiv_fast(double n, double d);
+double sqrt_fast(double d);
+double mla(double x, double y, double z); // note this is not fused
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+

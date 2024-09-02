@@ -1,0 +1,63 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+py_binary(
+    name = "generate_version_header",
+    srcs = ["generate_version_header.py"],
+    visibility = ["//:__subpackages__"],
+)
+
+# This isn't actually generated, it just uses the same name
+# to make it show up easier in searches.
+#
+# Rather than generating lists of headers to match CMake, the Bazel build
+# opts to have a static header that transitively include two known headers.
+# By default, empty header files are included, and users/platforms are expected
+# to specify an appropriate `cc_library` to replace them.
+#
+# You tell bazel which `cc_library` provides the respective headers by
+# configuring these `label_flag`s:
+#
+#     # Specify the library that provides "pico_config_extra_headers.h"
+#     --@pico-sdk//bazel/config:PICO_CONFIG_EXTRA_HEADER=//my_proj:my_custom_headers
+#
+#     # Specify the library that provides "pico_config_platform_headers.h"
+#     --@pico-sdk//bazel/config:PICO_CONFIG_PLATFORM_HEADER=//my_proj:my_custom_platform_headers
+cc_library(
+    name = "generate_config_header",
+    hdrs = ["include/pico/config_autogen.h"],
+    includes = ["include"],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//bazel/config:PICO_CONFIG_EXTRA_HEADER",
+        "//bazel/config:PICO_CONFIG_PLATFORM_HEADER",
+    ],
+)
+
+genrule(
+    name = "empty_extra_headers_file",
+    outs = ["generated_extra_include/pico_config_extra_headers.h"],
+    cmd = "echo > $@",
+    cmd_bat = "copy NUL $@",
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
+    name = "no_extra_headers",
+    hdrs = ["generated_extra_include/pico_config_extra_headers.h"],
+    includes = ["generated_extra_include"],
+    visibility = ["//visibility:private"],
+)
+
+# An empty stub, useful for label_flag flags that need to point to a library,
+# but for some purposes the library needs to be a no-op.
+cc_library(
+    name = "empty_cc_lib",
+)
+
+# A library incompatible with everything. Use to mark an invalid configuration.
+cc_library(
+    name = "incompatible_cc_lib",
+    target_compatible_with = ["@platforms//:incompatible"],
+)

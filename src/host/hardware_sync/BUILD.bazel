@@ -1,0 +1,21 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_sync_headers",
+    srcs = ["sync_core0_only.c"],
+    hdrs = ["include/hardware/sync.h"],
+    implementation_deps = ["//src/host/pico_platform:platform_defs"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/common/pico_base_headers"],
+)
+
+cc_library(
+    name = "hardware_sync",
+    srcs = ["sync_core0_only.c"],
+    hdrs = ["include/hardware/sync.h"],
+    implementation_deps = ["//src/host/pico_platform:platform_defs"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/host/pico_platform"],
+)

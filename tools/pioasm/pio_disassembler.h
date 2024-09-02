@@ -11,11 +11,12 @@
 
 #include <string>
 #include <cstdint>
+#include "pio_types.h"
 
 typedef unsigned int uint;
 
-std::string disassemble(uint16_t inst, uint sideset_bits, bool sideset_opt);
-extern "C" void disassemble(char *buf, int buf_len, uint16_t inst, uint sideset_bits, bool sideset_opt);
+std::string disassemble(uint inst, uint sideset_bits, bool sideset_opt);
+extern "C" void disassemble(char *buf, int buf_len, uint inst, uint sideset_bits, bool sideset_opt);
 #else
 void disassemble(char *buf, int buf_len, uint inst, uint sideset_bits, bool sideset_opt);
 #endif

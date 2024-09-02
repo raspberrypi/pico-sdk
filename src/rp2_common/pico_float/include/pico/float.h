@@ -30,9 +30,19 @@ extern "C" {
 *
 * The following additional optimized functions are also provided:
 *
-* - fix2float, ufix2float, fix642float, ufix642float, float2fix, float2ufix, float2fix64, float2ufix64, float2int, float2int64, float2int_z, float2int64_z
+* - int2float, uint2float, int642float, uint642float, fix2float, ufix2float, fix642float, ufix642float
+* - float2fix, float2ufix, float2fix64, float2ufix64, float2int, float2uint, float2int64, float2uint64, float2int_z, float2int64_z, float2uint_z, float2uint64_z
+* - exp10f, sincosf, powintf
+*
+* On RP2350 the following additional functions are available; the _fast methods are faster but do not round correctly
+*
+* - float2fix64_z, fdiv_fast, fsqrt_fast,
 */
 
+float int2float(int32_t f);
+float uint2float(uint32_t f);
+float int642float(int64_t f);
+float uint642float(uint64_t f);
 float fix2float(int32_t m, int e);
 float ufix2float(uint32_t m, int e);
 float fix642float(int64_t m, int e);
@@ -44,15 +54,25 @@ uint32_t float2ufix(float f, int e);
 int64_t float2fix64(float f, int e);
 uint64_t float2ufix64(float f, int e);
 int32_t float2int(float f);
+uint32_t float2uint(float f);
 int64_t float2int64(float f);
+uint64_t float2uint64(float f);
 
 // These methods round towards 0.
 int32_t float2int_z(float f);
 int64_t float2int64_z(float f);
+int32_t float2uint_z(float f);
+int64_t float2uint64_z(float f);
 
 float exp10f(float x);
 void sincosf(float x, float *sinx, float *cosx);
 float powintf(float x, int y);
+
+#if !PICO_RP2040 || PICO_COMBINED_DOCS
+int64_t float2fix64_z(float f, int e);
+float fdiv_fast(float n, float d);
+float fsqrt_fast(float f);
+#endif
 
 #ifdef __cplusplus
 }

@@ -17,11 +17,11 @@
 // ... and declare it for the parser's sake.
 YY_DECL;
 
-
 struct pio_assembler {
 public:
     using syntax_error = yy::parser::syntax_error;
     using location_type = yy::parser::location_type;
+    using position = yy::position;
 
     std::shared_ptr<program> dummy_global_program;
     std::vector<program> programs;
@@ -35,6 +35,7 @@ public:
     // name of the output file or "-" for stdout
     std::string dest;
     std::vector<std::string> options;
+    int default_pio_version = 0;
 
     int write_output();
 
@@ -42,6 +43,7 @@ public:
         if (std::find_if(programs.begin(), programs.end(), [&](const program &p) { return p.name == name; }) ==
             programs.end()) {
             programs.emplace_back(this, l, name);
+            programs[programs.size()-1].pio_version = get_default_pio_version();
             return true;
         } else {
             return false;
@@ -51,6 +53,7 @@ public:
     program &get_dummy_global_program() {
         if (!dummy_global_program) {
             dummy_global_program = std::shared_ptr<program>(new program(this, yy::location(&source), ""));
+            dummy_global_program->pio_version = default_pio_version;
         }
         return *dummy_global_program;
     }
@@ -68,10 +71,22 @@ public:
         auto &p = programs[programs.size() - 1];
         if (before_any_instructions && !p.instructions.empty()) {
             std::stringstream msg;
-            msg << requiring_program << " must preceed any program instructions";
+            msg << requiring_program << " must precede any program instructions";
             throw syntax_error(l, msg.str());
         }
         return p;
+    }
+
+    int get_default_pio_version() {
+        return get_dummy_global_program().pio_version;
+    }
+
+    int get_current_pio_version() {
+        if (!programs.empty()) {
+            auto &p = programs[programs.size() - 1];
+            return p.pio_version;
+        }
+        return get_default_pio_version();
     }
 
     // note p may be null for global symbols only
@@ -86,6 +101,18 @@ public:
                 return i2->second;
         }
         return nullptr;
+    }
+
+    void check_version(int min_version, const location_type &l, std::string feature) {
+        if (get_current_pio_version() < min_version) {
+            std::stringstream msg;
+            msg << "PIO version " << min_version << " is required for '" << feature << "'";
+            throw syntax_error(l, msg.str());
+        }
+    }
+
+    std::string version_string(int min_version, std::string a, std::string b) {
+        return get_current_pio_version() >= min_version ? a : b;
     }
 
     std::vector<compiled_source::symbol> public_symbols(program &program);

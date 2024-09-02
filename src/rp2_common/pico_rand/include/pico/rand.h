@@ -63,9 +63,18 @@ extern "C" {
 // ENTROPY SOURCES
 // ---------------
 
-// PICO_CONFIG: PICO_RAND_ENTROPY_SRC_ROSC, Enable/disable use of ROSC as an entropy source, type=bool, default=1, group=pico_rand
+// PICO_CONFIG: PICO_RAND_ENTROPY_SRC_ROSC, Enable/disable use of ROSC as an entropy source, type=bool, default=1 if no hardware TRNG, group=pico_rand
 #ifndef PICO_RAND_ENTROPY_SRC_ROSC
+#if !HAS_RP2350_TRNG
 #define PICO_RAND_ENTROPY_SRC_ROSC 1
+#endif
+#endif
+
+// PICO_CONFIG: PICO_RAND_ENTROPY_SRC_TRNG, Enable/disable use of hardware TRNG as an entropy source, type=bool, default=1 if no hardware TRNG, group=pico_rand
+#ifndef PICO_RAND_ENTROPY_SRC_TRNG
+#if HAS_RP2350_TRNG
+#define PICO_RAND_ENTROPY_SRC_TRNG 1
+#endif
 #endif
 
 // PICO_CONFIG: PICO_RAND_ENTROPY_SRC_TIME, Enable/disable use of hardware timestamp as an entropy source, type=bool, default=1, group=pico_rand
@@ -73,33 +82,54 @@ extern "C" {
 #define PICO_RAND_ENTROPY_SRC_TIME 1
 #endif
 
-// PICO_CONFIG: PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER, Enable/disable use of a bus performance counter as an entropy source, type=bool, default=1, group=pico_rand
+// PICO_CONFIG: PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER, Enable/disable use of a bus performance counter as an entropy source, type=bool, default=1 if no hardware TRNG, group=pico_rand
 #ifndef PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
+#if !HAS_RP2350_TRNG
 #define PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER 1
+#endif
 #endif
 
 // --------------------
 // SEED ENTROPY SOURCES
 // --------------------
 
-// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_ROSC, Enable/disable use of ROSC as an entropy source for the random seed, type=bool, default=1, group=pico_rand
+// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_ROSC, Enable/disable use of ROSC as an entropy source for the random seed, type=bool, default=PICO_RAND_ENTROPY_SRC_ROSC, group=pico_rand
 #ifndef PICO_RAND_SEED_ENTROPY_SRC_ROSC
 #define PICO_RAND_SEED_ENTROPY_SRC_ROSC PICO_RAND_ENTROPY_SRC_ROSC
 #endif
 
-// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_TIME, Enable/disable use of hardware timestamp as an entropy source for the random seed, type=bool, default=1, group=pico_rand
+// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_TRNG, Enable/disable use of hardware TRNG as an entropy source for the random seed, type=bool, default=PICO_RAND_ENTROPY_SRC_TRNG, group=pico_rand
+#if !defined(PICO_RAND_SEED_ENTROPY_SRC_TRNG) && HAS_RP2350_TRNG
+#define PICO_RAND_SEED_ENTROPY_SRC_TRNG PICO_RAND_ENTROPY_SRC_TRNG
+#endif
+
+// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_TIME, Enable/disable use of hardware timestamp as an entropy source for the random seed, type=bool, default=PICO_RAND_ENTROPY_SRC_TIME, group=pico_rand
 #ifndef PICO_RAND_SEED_ENTROPY_SRC_TIME
 #define PICO_RAND_SEED_ENTROPY_SRC_TIME PICO_RAND_ENTROPY_SRC_TIME
 #endif
 
-// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID, Enable/disable use of board id as part of the random seed, type=bool, default=1, group=pico_rand
-#ifndef PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID
-#define PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID 1
+// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_BUF_PERF_COUNTER, Enable/disable use of a bus performance counter as an entropy source for the random seed, type=bool, default=PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER, group=pico_rand
+#ifndef PICO_RAND_SEED_ENTROPY_SRC_BUF_PERF_COUNTER
+#define PICO_RAND_SEED_ENTROPY_SRC_BUF_PERF_COUNTER PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
 #endif
 
-// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH, Enable/disable use of a RAM hash as an entropy source for the random seed, type=bool, default=1, group=pico_rand
+// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_BOOT_RANDOM, Enable/disable use of the per boot random number as an entropy source for the random seed, type=bool, default=0 on RP2040 which has none, group=pico_rand
+#ifndef PICO_RAND_SEED_ENTROPY_SRC_BOOT_RANDOM
+#if !PICO_RP2040
+#define PICO_RAND_SEED_ENTROPY_SRC_BOOT_RANDOM 1
+#endif
+#endif
+
+// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID, Enable/disable use of board id as part of the random seed, type=bool, default=not PICO_RAND_SEED_ENTROPY_SRC_BOOT_RANDOM, group=pico_rand
+#ifndef PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID
+#define PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID (!PICO_RAND_SEED_ENTROPY_SRC_BOOT_RANDOM)
+#endif
+
+// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH, Enable/disable use of a RAM hash as an entropy source for the random seed, type=bool, default=1 if no hardware TRNG, group=pico_rand
 #ifndef PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH
+#if !HAS_RP2350_TRNG
 #define PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH 1
+#endif
 #endif
 
 // ---------------------------------
@@ -121,9 +151,11 @@ extern "C" {
 // PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER CONFIG
 // ---------------------------------------------
 
-// PICO_CONFIG: PICO_RAND_BUS_PERF_COUNTER_INDEX, Bus performance counter index to use for sourcing entropy, min=0, max=3, group=pico_rand
+// PICO_CONFIG: PICO_RAND_BUS_PERF_COUNTER_INDEX, Bus performance counter index to use for sourcing entropy, min=0, max=3, default=Undefined meaning pick one that is not counting any valid event already, group=pico_rand
 // this is deliberately undefined by default, meaning the code will pick that appears unused
-//#define PICO_RAND_BUS_PERF_COUNTER_INDEX 0
+#if 0 // make tooling checks happy
+#define PICO_RAND_BUS_PERF_COUNTER_INDEX 0
+#endif
 
 // PICO_CONFIG: PICO_RAND_BUS_PERF_COUNTER_EVENT, Bus performance counter event to use for sourcing entropy, default=arbiter_sram5_perf_event_access, group=pico_rand
 #ifndef PICO_RAND_BUS_PERF_COUNTER_EVENT
@@ -134,11 +166,11 @@ extern "C" {
 // PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH CONFIG
 // ------------------------------------------
 
-// PICO_CONFIG: PICO_RAND_RAM_HASH_END, end of address in RAM (non-inclusive) to hash during pico_rand seed initialization, default=SRAM_END, group=pico_rand
+// PICO_CONFIG: PICO_RAND_RAM_HASH_END, End of address in RAM (non-inclusive) to hash during pico_rand seed initialization, default=SRAM_END, group=pico_rand
 #ifndef PICO_RAND_RAM_HASH_END
 #define PICO_RAND_RAM_HASH_END     SRAM_END
 #endif
-// PICO_CONFIG: PICO_RAND_RAM_HASH_START, start of address in RAM (inclusive) to hash during pico_rand seed initialization, default=PICO_RAND_RAM_HASH_END - 1024, group=pico_rand
+// PICO_CONFIG: PICO_RAND_RAM_HASH_START, Start of address in RAM (inclusive) to hash during pico_rand seed initialization, default=PICO_RAND_RAM_HASH_END - 1024, group=pico_rand
 #ifndef PICO_RAND_RAM_HASH_START
 #define PICO_RAND_RAM_HASH_START   (PICO_RAND_RAM_HASH_END - 1024u)
 #endif

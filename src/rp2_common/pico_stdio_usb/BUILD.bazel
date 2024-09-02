@@ -1,0 +1,95 @@
+load("//bazel:defs.bzl", "compatible_with_config", "compatible_with_rp2", "incompatible_with_config")
+load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_stdio_usb",
+    actual = select({
+        "//bazel/constraint:pico_stdio_usb_enabled": ":pico_stdio_usb_enabled",
+        "//conditions:default": ":pico_stdio_usb_disabled",
+    }),
+)
+
+# Picotool requires this, so it should work on host as well as rp2.
+cc_library(
+    name = "reset_interface_headers",
+    hdrs = ["include/pico/stdio_usb/reset_interface.h"],
+    includes = ["include"],
+    deps = ["//src/common/pico_usb_reset_interface_headers"],
+)
+
+cc_library(
+    name = "tusb_config",
+    hdrs = ["include/tusb_config.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+)
+
+pico_sdk_define(
+    name = "LIB_PICO_STDIO_USB",
+    define_name = "LIB_PICO_STDIO_USB",
+    from_flag = "//bazel/config:PICO_STDIO_USB",
+)
+
+pico_sdk_define(
+    name = "PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+    define_name = "PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+    from_flag = "//bazel/config:PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+)
+
+cc_library(
+    name = "pico_stdio_usb_headers",
+    hdrs = ["include/pico/stdio_usb.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = [
+        ":__pkg__",
+        "//src/rp2_common/tinyusb:__pkg__",
+    ],
+    deps = [
+        ":LIB_PICO_STDIO_USB",
+        ":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+    ],
+)
+
+cc_library(
+    name = "pico_stdio_usb_enabled",
+    srcs = [
+        "reset_interface.c",
+        "stdio_usb.c",
+        "stdio_usb_descriptors.c",
+    ],
+    target_compatible_with = compatible_with_config(
+        "//bazel/constraint:pico_stdio_usb_enabled",
+    ) + compatible_with_rp2(),
+    deps = [
+        ":LIB_PICO_STDIO_USB",
+        ":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+        ":pico_stdio_usb_headers",
+        ":reset_interface_headers",
+        "//bazel/config:PICO_TINYUSB_LIB",
+        "//src/common/pico_binary_info",
+        "//src/common/pico_sync",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_watchdog",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+        "//src/rp2_common/pico_unique_id",
+    ],
+    # Ensure `stdio_usb_descriptors.c` isn't affected by link order.
+    alwayslink = True,
+)
+
+# Stub library that does NOT link in stdio USB support libs.
+cc_library(
+    name = "pico_stdio_usb_disabled",
+    target_compatible_with = incompatible_with_config(
+        "//bazel/constraint:pico_stdio_usb_enabled",
+    ) + compatible_with_rp2(),
+    deps = [
+        ":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+        ":pico_stdio_usb_headers",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+    ],
+)

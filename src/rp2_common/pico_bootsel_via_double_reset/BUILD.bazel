@@ -1,0 +1,15 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_bootsel_via_double_reset",
+    srcs = ["pico_bootsel_via_double_reset.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_binary_info",
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_bootrom",
+    ],
+)

@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -7,10 +9,9 @@
 // Register block : M0PLUS
 // Version        : 1
 // Bus type       : ahbl
-// Description    : None
 // =============================================================================
-#ifndef HARDWARE_REGS_M0PLUS_DEFINED
-#define HARDWARE_REGS_M0PLUS_DEFINED
+#ifndef _HARDWARE_REGS_M0PLUS_H
+#define _HARDWARE_REGS_M0PLUS_H
 // =============================================================================
 // Register    : M0PLUS_SYST_CSR
 // Description : Use the SysTick Control and Status Register to enable the
@@ -610,11 +611,11 @@
 #define M0PLUS_CPUID_REVISION_ACCESS "RO"
 // =============================================================================
 // Register    : M0PLUS_ICSR
-// Description : Use the Interrupt Control State Register to set a pending
-//               Non-Maskable Interrupt (NMI), set or clear a pending PendSV,
-//               set or clear a pending SysTick, check for pending exceptions,
-//               check the vector number of the highest priority pended
-//               exception, check the vector number of the active exception.
+// Description : Use the Interrupt Control State Register to set a pending Non-
+//               Maskable Interrupt (NMI), set or clear a pending PendSV, set or
+//               clear a pending SysTick, check for pending exceptions, check
+//               the vector number of the highest priority pended exception,
+//               check the vector number of the active exception.
 #define M0PLUS_ICSR_OFFSET _u(0x0000ed04)
 #define M0PLUS_ICSR_BITS   _u(0x9edff1ff)
 #define M0PLUS_ICSR_RESET  _u(0x00000000)
@@ -1146,4 +1147,5 @@
 #define M0PLUS_MPU_RASR_ENABLE_LSB    _u(0)
 #define M0PLUS_MPU_RASR_ENABLE_ACCESS "RW"
 // =============================================================================
-#endif // HARDWARE_REGS_M0PLUS_DEFINED
+#endif // _HARDWARE_REGS_M0PLUS_H
+

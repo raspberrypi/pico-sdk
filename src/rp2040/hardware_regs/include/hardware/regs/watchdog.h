@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -7,10 +9,9 @@
 // Register block : WATCHDOG
 // Version        : 1
 // Bus type       : apb
-// Description    : None
 // =============================================================================
-#ifndef HARDWARE_REGS_WATCHDOG_DEFINED
-#define HARDWARE_REGS_WATCHDOG_DEFINED
+#ifndef _HARDWARE_REGS_WATCHDOG_H
+#define _HARDWARE_REGS_WATCHDOG_H
 // =============================================================================
 // Register    : WATCHDOG_CTRL
 // Description : Watchdog control
@@ -89,7 +90,6 @@
 #define WATCHDOG_REASON_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
 // Field       : WATCHDOG_REASON_FORCE
-// Description : None
 #define WATCHDOG_REASON_FORCE_RESET  _u(0x0)
 #define WATCHDOG_REASON_FORCE_BITS   _u(0x00000002)
 #define WATCHDOG_REASON_FORCE_MSB    _u(1)
@@ -97,7 +97,6 @@
 #define WATCHDOG_REASON_FORCE_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : WATCHDOG_REASON_TIMER
-// Description : None
 #define WATCHDOG_REASON_TIMER_RESET  _u(0x0)
 #define WATCHDOG_REASON_TIMER_BITS   _u(0x00000001)
 #define WATCHDOG_REASON_TIMER_MSB    _u(0)
@@ -223,4 +222,5 @@
 #define WATCHDOG_TICK_CYCLES_LSB    _u(0)
 #define WATCHDOG_TICK_CYCLES_ACCESS "RW"
 // =============================================================================
-#endif // HARDWARE_REGS_WATCHDOG_DEFINED
+#endif // _HARDWARE_REGS_WATCHDOG_H
+

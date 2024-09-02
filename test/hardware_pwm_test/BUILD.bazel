@@ -1,0 +1,18 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "hardware_pwm_test",
+    testonly = True,
+    srcs = ["hardware_pwm_test.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_time",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_pwm",
+        "//src/rp2_common/hardware_resets",
+        "//src/rp2_common/pico_stdlib",
+        "//test/pico_test",
+    ],
+)

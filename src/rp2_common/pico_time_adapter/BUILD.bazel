@@ -1,0 +1,15 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_time_adapter",
+    hdrs = ["include/pico/time_adapter.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_timer",
+    ],
+)

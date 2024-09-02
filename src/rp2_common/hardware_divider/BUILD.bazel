@@ -1,0 +1,22 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_divider",
+    srcs = select({
+        "//bazel/constraint:rp2040": ["divider.S"],
+        "//conditions:default": ["divider.c"],
+    }),
+    hdrs = [
+        "include/hardware/divider.h",
+        "include/hardware/divider_helper.S",
+    ],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
+    ],
+)

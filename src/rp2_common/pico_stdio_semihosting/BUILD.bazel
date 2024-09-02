@@ -1,0 +1,47 @@
+load("//bazel:defs.bzl", "compatible_with_config", "compatible_with_rp2", "incompatible_with_config")
+load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_stdio_semihosting",
+    actual = select({
+        "//bazel/constraint:pico_stdio_semihosting_enabled": ":pico_stdio_semihosting_enabled",
+        "//conditions:default": ":pico_stdio_semihosting_disabled",
+    }),
+)
+
+pico_sdk_define(
+    name = "LIB_PICO_STDIO_SEMIHOSTING",
+    define_name = "LIB_PICO_STDIO_SEMIHOSTING",
+    from_flag = "//bazel/config:PICO_STDIO_SEMIHOSTING",
+)
+
+cc_library(
+    name = "pico_stdio_semihosting_enabled",
+    srcs = ["stdio_semihosting.c"],
+    hdrs = ["include/pico/stdio_semihosting.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2() + compatible_with_config(
+        "//bazel/constraint:pico_stdio_semihosting_enabled",
+    ),
+    deps = [
+        ":LIB_PICO_STDIO_SEMIHOSTING",
+        "//src/common/pico_binary_info",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+    ],
+)
+
+# Stub library that does NOT link in stdio semihosting support libs.
+cc_library(
+    name = "pico_stdio_semihosting_disabled",
+    hdrs = ["include/pico/stdio_semihosting.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config(
+        "//bazel/constraint:pico_stdio_semihosting_enabled",
+    ),
+    deps = [
+        ":LIB_PICO_STDIO_SEMIHOSTING",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+    ],
+)

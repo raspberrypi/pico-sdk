@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_printf",
+    target_compatible_with = ["//bazel/constraint:host"],
+)

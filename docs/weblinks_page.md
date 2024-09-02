@@ -4,6 +4,8 @@ The full documentation for the RP2040 and Raspberry Pi Pico board can be found a
 
  - [RP2040 Datasheet](https://rptl.io/rp2040-datasheet)
  - [Raspberry Pi Pico Datasheet](https://rptl.io/pico-datasheet)
+ - [RP235x Datasheet](https://rptl.io/rp2040-datasheet)
+ - [Raspberry Pi Pico2 Datasheet](https://rptl.io/pico-datasheet)
  - [Raspberry Pi Pico W Datasheet](https://rptl.io/picow-datasheet)
  - [Hardware design with RP2040](https://rptl.io/rp2040-design)
  - [Raspberry Pi Pico C/C++ SDK](https://rptl.io/pico-c-sdk)

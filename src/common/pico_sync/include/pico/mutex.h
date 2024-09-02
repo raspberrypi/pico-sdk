@@ -44,7 +44,7 @@ extern "C" {
 /*! \brief recursive mutex instance
  * \ingroup mutex
  */
-typedef struct __packed_aligned  {
+typedef struct {
     lock_core_t core;
     lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
     uint8_t enter_count;        //! ownership count
@@ -57,7 +57,7 @@ typedef struct __packed_aligned  {
  * \ingroup mutex
  */
 #if !PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY
-typedef struct __packed_aligned mutex {
+typedef struct mutex {
     lock_core_t core;
     lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
 } mutex_t;
@@ -304,6 +304,8 @@ static inline bool recursive_mutex_is_initialized(recursive_mutex_t *mtx) {
  * But the initialization of the mutex is performed automatically during runtime initialization
  */
 #define auto_init_recursive_mutex(name) static __attribute__((section(".mutex_array"))) recursive_mutex_t name = { .core = { .spin_lock = (spin_lock_t *)1 /* marker for runtime_init */ }, .owner = 0, .enter_count = 0 }
+
+void runtime_init_mutex(void);
 
 #ifdef __cplusplus
 }

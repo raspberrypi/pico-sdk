@@ -1,0 +1,4 @@
+# Don't accidentally pick up external CMake deps with Bazel build files.
+build
+# Don't treat submodules as part of this project.
+lib

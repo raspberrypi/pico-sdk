@@ -9,7 +9,10 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/pico.h"
+// pico_cmake_set PICO_PLATFORM        = rp2040
+// pico_cmake_set PICO_CYW43_SUPPORTED = 1
+
+// This header may be included by other board headers as "boards/pico_w.h"
 
 #ifndef _BOARDS_PICO_W_H
 #define _BOARDS_PICO_W_H
@@ -68,10 +71,10 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
+// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (2 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
-
 // note the SMSP mode pin is on WL_GPIO1
 // #define PICO_SMPS_MODE_PIN
 

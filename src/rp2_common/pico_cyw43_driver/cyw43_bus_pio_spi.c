@@ -18,6 +18,7 @@
 #include "cyw43_internal.h"
 #include "cyw43_spi.h"
 #include "cyw43_debug_pins.h"
+#include "pico/cyw43_driver.h"
 
 #if CYW43_SPI_PIO
 #define WL_REG_ON 23
@@ -29,14 +30,30 @@
 #define CS_PIN 25u
 #define IRQ_SAMPLE_DELAY_NS 100
 
-#define SPI_PROGRAM_NAME spi_gap01_sample0
+#ifdef CYW43_SPI_PROGRAM_NAME
+#define SPI_PROGRAM_NAME CYW43_SPI_PROGRAM_NAME
+#else
+//#define SPI_PROGRAM_NAME spi_gap0_sample1 // for lower cpu speed
+#define SPI_PROGRAM_NAME spi_gap01_sample0 // for high cpu speed
+#endif
 #define SPI_PROGRAM_FUNC __CONCAT(SPI_PROGRAM_NAME, _program)
 #define SPI_PROGRAM_GET_DEFAULT_CONFIG_FUNC __CONCAT(SPI_PROGRAM_NAME, _program_get_default_config)
 #define SPI_OFFSET_END __CONCAT(SPI_PROGRAM_NAME, _offset_end)
 #define SPI_OFFSET_LP1_END __CONCAT(SPI_PROGRAM_NAME, _offset_lp1_end)
 
-#define CLOCK_DIV 2
-#define CLOCK_DIV_MINOR 0
+#if !CYW43_PIO_CLOCK_DIV_DYNAMIC
+#define cyw43_pio_clock_div_int CYW43_PIO_CLOCK_DIV_INT
+#define cyw43_pio_clock_div_frac CYW43_PIO_CLOCK_DIV_FRAC
+#else
+static uint16_t cyw43_pio_clock_div_int = CYW43_PIO_CLOCK_DIV_INT;
+static uint8_t cyw43_pio_clock_div_frac = CYW43_PIO_CLOCK_DIV_FRAC;
+
+void cyw43_set_pio_clock_divisor(uint16_t clock_div_int, uint8_t clock_div_frac) {
+    cyw43_pio_clock_div_int = clock_div_int;
+    cyw43_pio_clock_div_frac = clock_div_frac;
+}
+#endif
+
 #define PADS_DRIVE_STRENGTH PADS_BANK0_GPIO0_DRIVE_VALUE_12MA
 
 #if !CYW43_USE_SPI
@@ -88,16 +105,21 @@ int cyw43_spi_init(cyw43_int_t *self) {
     // Only does something if CYW43_LOGIC_DEBUG=1
     logic_debug_init();
 
-    static_assert(NUM_PIOS == 2, "");
+    static_assert(NUM_PIOS == 2 || NUM_PIOS == 3, "");
 
-    pio_hw_t *pios[2] = {pio0, pio1};
+#if NUM_PIOS == 2
+    pio_hw_t *pios[NUM_PIOS] = {pio0, pio1};
+#else
+    pio_hw_t *pios[NUM_PIOS] = {pio0, pio1, pio2};
+#endif
     uint pio_index = CYW43_SPI_PIO_PREFERRED_PIO;
     // Check we can add the program
-    if (!pio_can_add_program(pios[pio_index], &SPI_PROGRAM_FUNC)) {
-        pio_index ^= 1;
-        if (!pio_can_add_program(pios[pio_index], &SPI_PROGRAM_FUNC)) {
+    for(uint i=1; i < NUM_PIOS;i++) {
+        if (pio_can_add_program(pios[pio_index], &SPI_PROGRAM_FUNC)) break;
+        if (i == NUM_PIOS - 1) {
             return CYW43_FAIL_FAST_CHECK(-CYW43_EIO);
         }
+        pio_index = (pio_index + 1 ) % NUM_PIOS;
     }
     assert(!self->bus_data);
     self->bus_data = &bus_data_instance;
@@ -117,12 +139,12 @@ int cyw43_spi_init(cyw43_int_t *self) {
     bus_data->pio_offset = pio_add_program(bus_data->pio, &SPI_PROGRAM_FUNC);
     pio_sm_config config = SPI_PROGRAM_GET_DEFAULT_CONFIG_FUNC(bus_data->pio_offset);
 
-    sm_config_set_clkdiv_int_frac(&config, CLOCK_DIV, CLOCK_DIV_MINOR);
-    hw_write_masked(&padsbank0_hw->io[CLOCK_PIN],
+    sm_config_set_clkdiv_int_frac(&config, cyw43_pio_clock_div_int, cyw43_pio_clock_div_frac);
+    hw_write_masked(&pads_bank0_hw->io[CLOCK_PIN],
                     (uint)PADS_DRIVE_STRENGTH << PADS_BANK0_GPIO0_DRIVE_LSB,
                     PADS_BANK0_GPIO0_DRIVE_BITS
     );
-    hw_write_masked(&padsbank0_hw->io[CLOCK_PIN],
+    hw_write_masked(&pads_bank0_hw->io[CLOCK_PIN],
                     (uint)1 << PADS_BANK0_GPIO0_SLEWFAST_LSB,
                     PADS_BANK0_GPIO0_SLEWFAST_BITS
     );
@@ -498,7 +520,7 @@ int cyw43_read_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len, 
         logic_debug_set(pin_WIFI_RX, 0);
     }
     if (ret != 0) {
-        printf("cyw43_read_bytes error %d", ret);
+        CYW43_PRINTF("cyw43_read_bytes error %d", ret);
         return ret;
     }
     if (buf != self->spid_buf) { // avoid a copy in the usual case just to add the header
@@ -527,7 +549,7 @@ int cyw43_write_bytes(cyw43_int_t *self, uint32_t fn, uint32_t addr, size_t len,
             }
         }
         if (f2_ready_attempts <= 0) {
-            printf("F2 not ready\n");
+            CYW43_PRINTF("F2 not ready\n");
             return CYW43_FAIL_FAST_CHECK(-CYW43_EIO);
         }
     }
