@@ -29,7 +29,6 @@
 #define weak_raw_vprintf vprintf
 #endif
 
-#ifndef POSIX_IO
 static int picolibc_putc(char c, __unused FILE *file) {
 #if LIB_PICO_STDIO
     stdio_putchar(c);
@@ -41,6 +40,7 @@ static int picolibc_getc(__unused FILE *file) {
 #if LIB_PICO_STDIO
     return stdio_getchar();
 #endif
+    return -1;
 }
 
 static int picolibc_flush(__unused FILE *file) {
@@ -56,7 +56,6 @@ static FILE __stdio = FDEV_SETUP_STREAM(picolibc_putc,
                                         _FDEV_SETUP_RW);
 
 FILE *const stdin = &__stdio; __strong_reference(stdin, stdout); __strong_reference(stdin, stderr);
-#endif
 
 void __weak __assert_func(const char *file, int line, const char *func, const char *failedexpr) {
     weak_raw_printf("assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
