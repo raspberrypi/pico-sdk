@@ -163,11 +163,11 @@ static inline int cyw43_hal_pin_read(cyw43_hal_pin_obj_t pin) {
 }
 
 static inline void cyw43_hal_pin_low(cyw43_hal_pin_obj_t pin) {
-    gpio_clr_mask64(1 << pin);
+    gpio_put(pin, false);
 }
 
 static inline void cyw43_hal_pin_high(cyw43_hal_pin_obj_t pin) {
-    gpio_set_mask64(1 << pin);
+    gpio_put(pin, true);
 }
 
 #define CYW43_HAL_PIN_MODE_INPUT           (GPIO_IN)
