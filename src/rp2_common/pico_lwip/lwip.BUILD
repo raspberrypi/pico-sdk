@@ -11,11 +11,11 @@ cc_library(
         "contrib/ports/freertos/include/arch",
         "src/include",
     ],
+    visibility = ["//visibility:private"],
     deps = [
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG",
         "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_config",
     ],
-    visibility = ["//visibility:private"],
 )
 
 cc_library(
