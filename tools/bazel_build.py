@@ -42,6 +42,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_divider_test:pico_divider_nesting_test",
                 "//test/pico_float_test:pico_double_test",
                 "//test/pico_float_test:pico_float_test",
+                "//test/pico_float_test:pico_float_test_hazard3",
                 "//test/pico_sha256_test:pico_sha256_test",
                 "//test/pico_stdio_test:pico_stdio_test",
                 "//test/pico_time_test:pico_time_test",
@@ -63,6 +64,10 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
                 # hardware_sha256 doesn't appear to work on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
             )
@@ -76,6 +81,10 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # TODO: RISC-V support.
+                "//test/pico_float_test:pico_float_test_hazard3",
             )
         ),
     },
@@ -90,6 +99,10 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
                 # hardware_sha256 doesn't appear to work on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
             )
@@ -106,6 +119,10 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # TODO: RISC-V support.
+                "//test/pico_float_test:pico_float_test_hazard3",
             )
         ),
     },
@@ -118,6 +135,10 @@ BUILD_CONFIGURATIONS = (
         "extra_targets": (),
         "exclusions": frozenset(
             (
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
                 # hardware_sha256 doesn't appear to work on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
             )
