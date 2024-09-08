@@ -68,6 +68,14 @@ endif()
 # PANIC                 - default panic impl which brings in stdio
 # AUTO_INIT_MUTEX       - auto init mutexes; without this you get no printf mutex either               -
 function(pico_minimize_runtime TARGET)
+    set(ALL_ITEMS
+            DEFAULT_ALARM_POOL
+            PRINTF
+            FLOAT
+            DOUBLE
+            FPGA_CHECK
+            PANIC
+            AUTO_INIT_MUTEX)
     cmake_parse_arguments(RUNTIME "" ""
             "INCLUDE;EXCLUDE" ${ARGN} )
     foreach (INCL_EXCL IN ITEMS INCLUDE EXCLUDE)
@@ -77,7 +85,13 @@ function(pico_minimize_runtime TARGET)
             set(VAL 0)
         endif()
         foreach(VAR IN LISTS RUNTIME_${INCL_EXCL})
-            set(RUNTIME_INCLUDE_${VAR} ${VAL})
+            if (VAR STREQUAL "ALL")
+                foreach(ITEM IN LISTS ALL_ITEMS)
+                    set(RUNTIME_INCLUDE_${ITEM} ${VAL})
+                endforeach ()
+            else()
+                set(RUNTIME_INCLUDE_${VAR} ${VAL})
+            endif()
         endforeach ()
     endforeach ()
     if (NOT RUNTIME_INCLUDE_DEFAULT_ALARM_POOL)
