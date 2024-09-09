@@ -137,6 +137,7 @@ http_archive(
 
 register_toolchains(
     "//bazel/toolchain:linux-aarch64-rp2040",
+    "//bazel/toolchain:linux-aarch64-rp2350",
     "//bazel/toolchain:linux-x86_64-rp2040",
     "//bazel/toolchain:linux-x86_64-rp2350",
     "//bazel/toolchain:win-x86_64-rp2040",
