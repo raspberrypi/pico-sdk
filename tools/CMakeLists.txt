@@ -384,7 +384,7 @@ function(pico_add_uf2_output TARGET)
     endif()
 
     get_target_property(extra_uf2_args ${TARGET} PICOTOOL_EXTRA_UF2_ARGS)
-    if (1) # TODO: A2 only (Errata RP2350-E9)
+    if (PICO_RP2350_A2_SUPPORTED)
         if (NOT extra_uf2_args)
             set(extra_uf2_args "--abs-block")
         elseif(NOT "--abs-block" IN_LIST extra_uf2_args)

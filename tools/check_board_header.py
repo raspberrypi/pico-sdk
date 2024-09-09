@@ -374,8 +374,12 @@ else:
         else:
             chip = 'RP2350B'
         if not board_header.endswith("amethyst_fpga.h"):
+            if 'PICO_RP2350_A2_SUPPORTED' not in cmake_default_settings:
+                raise Exception("{} uses chip {} but is missing a pico_cmake_set_default {}".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
             if 'PICO_RP2350_A2_SUPPORTED' not in defines:
                 raise Exception("{} uses chip {} but is missing a #define {}".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
+            if int(cmake_default_settings['PICO_RP2350_A2_SUPPORTED'].value) != defines['PICO_RP2350_A2_SUPPORTED'].resolved_value:
+                raise Exception("{} has mismatched pico_cmake_set_default and #define values for {}".format(board_header, 'PICO_RP2350_A2_SUPPORTED'))
             if defines['PICO_RP2350_A2_SUPPORTED'].resolved_value != 1:
                 raise Exception("{} sets #define {} {} (should be 1)".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED', defines['PICO_RP2350_A2_SUPPORTED'].resolved_value))
     if 'PICO_FLASH_SIZE_BYTES' not in cmake_default_settings:
