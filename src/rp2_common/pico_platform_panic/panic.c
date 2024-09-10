@@ -8,6 +8,7 @@
 #include <stdarg.h>
 #include <sys/cdefs.h>
 #include <unistd.h>
+#include "pico.h"
 #include "pico/platform/panic.h"
 
 #if LIB_PICO_PRINTF_PICO

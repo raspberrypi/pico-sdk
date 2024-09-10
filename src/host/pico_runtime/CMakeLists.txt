@@ -5,3 +5,6 @@ target_include_directories(pico_runtime_headers SYSTEM INTERFACE ${CMAKE_CURRENT
 pico_mirrored_target_link_libraries(pico_runtime INTERFACE
         pico_base
 )
+
+function(pico_minimize_runtime TARGET)
+endfunction()
