@@ -72,6 +72,12 @@ bool_flag(
     build_setting_default = True,
 )
 
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_UART_BAUD_RATE, Define the default UART baudrate, type=int, max=921600, default=115200, group=hardware_uart
+int_flag(
+    name = "PICO_DEFAULT_UART_BAUD_RATE",
+    build_setting_default = 115200,
+)
+
 # PICO_BAZEL_CONFIG: PICO_STDIO_USB, Option to globally enable stdio USB for all targets by default, type=bool, default=0, group=pico_stdlib
 bool_flag(
     name = "PICO_STDIO_USB",
@@ -151,7 +157,7 @@ bool_flag(
     build_setting_default = True,
 )
 
-# PICO_BAZEL_CONFIG: PICO_CMSIS_PATH, Label of a cc_ibrary providing CMSIS core, default="included stub CORE only impl", group=build
+# PICO_BAZEL_CONFIG: PICO_CMSIS_PATH, Label of a cc_ibrary providing CMSIS core,  type=string, default="included stub CORE only impl", group=build
 label_flag(
     name = "PICO_CMSIS_PATH",
     build_setting_default = "//src/rp2_common/cmsis:cmsis_core",

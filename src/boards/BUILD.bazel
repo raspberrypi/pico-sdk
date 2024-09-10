@@ -8,6 +8,7 @@ BOARD_CHOICES = [
     "0xcb_helios",
     "adafruit_feather_rp2040_usb_host",
     "adafruit_feather_rp2040",
+    "adafruit_feather_rp2350",
     "adafruit_itsybitsy_rp2040",
     "adafruit_kb2040",
     "adafruit_macropad_rp2040",
