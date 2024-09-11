@@ -468,19 +468,29 @@ static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool 
  *
  * \param c Pointer to the configuration structure to modify
  * \param div_int Integer part of the divisor
- * \param div_frac Fractional part in 1/256ths
+ * \param div_frac8 Fractional part in 1/256ths
  * \sa sm_config_set_clkdiv()
  */
-static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_int, uint8_t div_frac) {
-    invalid_params_if(HARDWARE_PIO, div_int == 0 && div_frac != 0);
+static inline void sm_config_set_clkdiv_int_frac8(pio_sm_config *c, uint16_t div_int, uint8_t div_frac8) {
+    invalid_params_if(HARDWARE_PIO, div_int == 0 && div_frac8 != 0);
+    static_assert(PIO_SM0_CLKDIV_INT_MSB - PIO_SM0_CLKDIV_INT_LSB == 15, "");
+    static_assert(PIO_SM0_CLKDIV_FRAC_MSB - PIO_SM0_CLKDIV_FRAC_LSB == 7, "");
     c->clkdiv =
-            (((uint)div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
+            (((uint)div_frac8) << PIO_SM0_CLKDIV_FRAC_LSB) |
             (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
 }
 
-static inline void pio_calculate_clkdiv_from_float(float div, uint16_t *div_int, uint8_t *div_frac) {
+// backwards compatibility
+static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_int, uint8_t div_frac8) {
+    sm_config_set_clkdiv_int_frac8(c, div_int, div_frac8);
+}
+
+static inline void pio_calculate_clkdiv8_from_float(float div, uint16_t *div_int, uint8_t *div_frac) {
     valid_params_if(HARDWARE_PIO, div >= 1 && div <= 65536);
     *div_int = (uint16_t)div;
+    // not a strictly necessary check, but if this changes, then this method should
+    // probably no longer be used in favor of one with a larger fraction
+    static_assert(PIO_SM0_CLKDIV_FRAC_MSB - PIO_SM0_CLKDIV_FRAC_LSB == 7, "");
     if (*div_int == 0) {
         *div_frac = 0;
     } else {
@@ -506,8 +516,8 @@ static inline void pio_calculate_clkdiv_from_float(float div, uint16_t *div_int,
 static inline void sm_config_set_clkdiv(pio_sm_config *c, float div) {
     uint16_t div_int;
     uint8_t div_frac;
-    pio_calculate_clkdiv_from_float(div, &div_int, &div_frac);
-    sm_config_set_clkdiv_int_frac(c, div_int, div_frac);
+    pio_calculate_clkdiv8_from_float(div, &div_int, &div_frac);
+    sm_config_set_clkdiv_int_frac8(c, div_int, div_frac);
 }
 
 /*! \brief Set the wrap addresses in a state machine configuration
@@ -664,7 +674,7 @@ static inline pio_sm_config pio_get_default_sm_config(void) {
 #if PICO_PIO_USE_GPIO_BASE
     c.pinhi = -1;
 #endif
-    sm_config_set_clkdiv_int_frac(&c, 1, 0);
+    sm_config_set_clkdiv_int_frac8(&c, 1, 0);
     sm_config_set_wrap(&c, 0, 31);
     sm_config_set_in_shift(&c, true, false, 32);
     sm_config_set_out_shift(&c, true, false, 32);
@@ -1649,6 +1659,7 @@ static inline void pio_sm_set_clkdiv_int_frac8(PIO pio, uint sm, uint16_t div_in
     check_pio_param(pio);
     check_sm_param(sm);
     invalid_params_if(HARDWARE_PIO, div_int == 0 && div_frac8 != 0);
+    static_assert(PIO_SM0_CLKDIV_INT_MSB - PIO_SM0_CLKDIV_INT_LSB == 15, "");
     static_assert(PIO_SM0_CLKDIV_FRAC_MSB - PIO_SM0_CLKDIV_FRAC_LSB == 7, "");
     pio->sm[sm].clkdiv =
             (((uint)div_frac8) << PIO_SM0_CLKDIV_FRAC_LSB) |
@@ -1672,8 +1683,8 @@ static inline void pio_sm_set_clkdiv(PIO pio, uint sm, float div) {
     check_sm_param(sm);
     uint16_t div_int;
     uint8_t div_frac;
-    pio_calculate_clkdiv_from_float(div, &div_int, &div_frac);
-    pio_sm_set_clkdiv_int_frac(pio, sm, div_int, div_frac);
+    pio_calculate_clkdiv8_from_float(div, &div_int, &div_frac);
+    pio_sm_set_clkdiv_int_frac8(pio, sm, div_int, div_frac);
 }
 
 /*! \brief Clear a state machine's TX and RX FIFOs

@@ -171,14 +171,15 @@ static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
  */
 static inline void pwm_config_set_clkdiv_int_frac4(pwm_config *c, uint8_t div_int, uint8_t div_frac4) {
     valid_params_if(HARDWARE_PWM, div_int >= 1);
+    static_assert(PWM_CH0_DIV_INT_MSB - PWM_CH0_DIV_INT_LSB == 7, "");
     static_assert(PWM_CH0_DIV_FRAC_MSB - PWM_CH0_DIV_FRAC_LSB == 3, "");
     valid_params_if(HARDWARE_PWM, div_frac4 < 16);
     c->div = (((uint)div_int) << PWM_CH0_DIV_INT_LSB) | (((uint)div_frac4) << PWM_CH0_DIV_FRAC_LSB);
 }
 
 // backwards compatibility
-static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t integer, uint8_t frac4) {
-    pwm_config_set_clkdiv_int_frac4(c, integer, frac4);
+static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t div_int, uint8_t div_frac4) {
+    pwm_config_set_clkdiv_int_frac4(c, div_int, div_frac4);
 }
 
 /** \brief Set PWM clock divider in a PWM configuration
@@ -193,7 +194,7 @@ static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t integer
  */
 static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
     valid_params_if(HARDWARE_PWM, div >= 1 && div < 256);
-    pwm_config_set_clkdiv_int_frac(c, (uint8_t)div, 0);
+    pwm_config_set_clkdiv_int_frac8(c, (uint8_t)div, 0);
 }
 
 /** \brief Set PWM counting mode in a PWM configuration
@@ -462,7 +463,7 @@ static inline void pwm_set_clkdiv(uint slice_num, float divider) {
     valid_params_if(HARDWARE_PWM, divider >= 1.f && divider < 256.f);
     uint8_t i = (uint8_t)divider;
     uint8_t f = (uint8_t)((divider - i) * (0x01 << 4));
-    pwm_set_clkdiv_int_frac(slice_num, i, f);
+    pwm_set_clkdiv_int_frac8(slice_num, i, f);
 }
 
 /** \brief Set PWM output polarity
