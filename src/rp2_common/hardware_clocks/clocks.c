@@ -245,6 +245,8 @@ void clock_gpio_init_int_frac16(uint gpio, uint src, uint32_t div_int, uint16_t 
         invalid_params_if(HARDWARE_CLOCKS, true);
     }
 
+    static_assert(CLOCKS_CLK_GPOUT0_DIV_INT_MSB - CLOCKS_CLK_GPOUT0_DIV_INT_LSB == 15, "");
+    invalid_params_if(HARDWARE_CLOCKS, div_int >> 16);
     // Set up the gpclk generator
     clocks_hw->clk[gpclk].ctrl = (src << CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_LSB) |
                                  CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS;
