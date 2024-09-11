@@ -245,7 +245,7 @@ void clock_gpio_init_int_frac16(uint gpio, uint src, uint32_t div_int, uint16_t 
         invalid_params_if(HARDWARE_CLOCKS, true);
     }
 
-#if !PICO_RP2040 // assert currently broken on RP2040, but we know that hardware has 16 bit integer part
+#if !PICO_RP2040 // assert currently broken on RP2040, but we know that hardware has 16-bit integer part
     static_assert(CLOCKS_CLK_GPOUT0_DIV_INT_MSB - CLOCKS_CLK_GPOUT0_DIV_INT_LSB == 15, "");
 #endif
     invalid_params_if(HARDWARE_CLOCKS, div_int >> 16);
