@@ -194,7 +194,7 @@ static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t div_int
  */
 static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
     valid_params_if(HARDWARE_PWM, div >= 1 && div < 256);
-    pwm_config_set_clkdiv_int_frac8(c, (uint8_t)div, 0);
+    pwm_config_set_clkdiv_int_frac4(c, (uint8_t)div, 0);
 }
 
 /** \brief Set PWM counting mode in a PWM configuration
@@ -463,7 +463,7 @@ static inline void pwm_set_clkdiv(uint slice_num, float divider) {
     valid_params_if(HARDWARE_PWM, divider >= 1.f && divider < 256.f);
     uint8_t i = (uint8_t)divider;
     uint8_t f = (uint8_t)((divider - i) * (0x01 << 4));
-    pwm_set_clkdiv_int_frac8(slice_num, i, f);
+    pwm_set_clkdiv_int_frac4(slice_num, i, f);
 }
 
 /** \brief Set PWM output polarity

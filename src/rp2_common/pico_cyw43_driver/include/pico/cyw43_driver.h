@@ -78,11 +78,11 @@ void cyw43_driver_deinit(struct async_context *context);
  * \param clock_div_int Integer part of the divisor
  * \param clock_div_frac8 Fractional part in 1/256ths
 */
-void cyw43_set_pio_clock_divider_int_frac8(uint16_t clock_div_int, uint8_t clock_div_frac8);
+void cyw43_set_pio_clkdiv_int_frac8(uint16_t clock_div_int, uint8_t clock_div_frac8);
 
 // backwards compatibility
 static inline void cyw43_set_pio_clock_divisor(uint16_t clock_div_int, uint8_t clock_div_frac8) {
-   return cyw43_set_pio_clock_divider_int_frac8(clock_div_int, clock_div_frac8);
+    return cyw43_set_pio_clkdiv_int_frac8(clock_div_int, clock_div_frac8);
 }
 #endif
 
