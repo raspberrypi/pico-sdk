@@ -252,7 +252,7 @@ static inline uint8_t rp2040_rom_version(void) {
  */
 __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
 #ifdef __riscv
-    __asm ("mul %0, %0, %1" : "+l" (a) : "l" (b) : );
+    __asm ("mul %0, %0, %1" : "+r" (a) : "r" (b) : );
 #else
     pico_default_asm ("muls %0, %1"     : "+l" (a) : "l" (b) : "cc");
 #endif
