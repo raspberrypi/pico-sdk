@@ -1643,15 +1643,21 @@ void pio_sm_drain_tx_fifo(PIO pio, uint sm);
  * \param pio The PIO instance; e.g. \ref pio0 or \ref pio1
  * \param sm State machine index (0..3)
  * \param div_int the integer part of the clock divider
- * \param div_frac the fractional part of the clock divider in 1/256s
+ * \param div_frac8 the fractional part of the clock divider in 1/256s
  */
-static inline void pio_sm_set_clkdiv_int_frac(PIO pio, uint sm, uint16_t div_int, uint8_t div_frac) {
+static inline void pio_sm_set_clkdiv_int_frac8(PIO pio, uint sm, uint16_t div_int, uint8_t div_frac8) {
     check_pio_param(pio);
     check_sm_param(sm);
-    invalid_params_if(HARDWARE_PIO, div_int == 0 && div_frac != 0);
+    invalid_params_if(HARDWARE_PIO, div_int == 0 && div_frac8 != 0);
+    static_assert(PIO_SM0_CLKDIV_FRAC_MSB - PIO_SM0_CLKDIV_FRAC_LSB == 7, "");
     pio->sm[sm].clkdiv =
-            (((uint)div_frac) << PIO_SM0_CLKDIV_FRAC_LSB) |
+            (((uint)div_frac8) << PIO_SM0_CLKDIV_FRAC_LSB) |
             (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
+}
+
+// backwards compatibility
+static inline void pio_sm_set_clkdiv_int_frac(PIO pio, uint sm, uint16_t div_int, uint8_t div_frac8) {
+    pio_sm_set_clkdiv_int_frac8(pio, sm, div_int, div_frac8);
 }
 
 /*! \brief set the current clock divider for a state machine
