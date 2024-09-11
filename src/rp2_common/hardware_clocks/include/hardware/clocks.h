@@ -367,7 +367,7 @@ void clock_gpio_init_int_frac16(uint gpio, uint src, uint32_t div_int, uint16_t 
  * \param div_frac8 The fractional part of the value to divide the source clock by. This is in range of 0..255 (/256).
  */
 static inline void clock_gpio_init_int_frac8(uint gpio, uint src, uint32_t div_int, uint8_t div_frac8) {
-    return clock_gpio_init_int_frac16(gpio, src, div_int, div_frac8 << 8u);
+    return clock_gpio_init_int_frac16(gpio, src, div_int, (uint16_t)(div_frac8 << 8u));
 }
 
 // backwards compatibility

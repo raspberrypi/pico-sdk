@@ -485,17 +485,22 @@ static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_
     sm_config_set_clkdiv_int_frac8(c, div_int, div_frac8);
 }
 
-static inline void pio_calculate_clkdiv8_from_float(float div, uint16_t *div_int, uint8_t *div_frac) {
+static inline void pio_calculate_clkdiv8_from_float(float div, uint16_t *div_int, uint8_t *div_frac8) {
     valid_params_if(HARDWARE_PIO, div >= 1 && div <= 65536);
     *div_int = (uint16_t)div;
     // not a strictly necessary check, but if this changes, then this method should
     // probably no longer be used in favor of one with a larger fraction
     static_assert(PIO_SM0_CLKDIV_FRAC_MSB - PIO_SM0_CLKDIV_FRAC_LSB == 7, "");
     if (*div_int == 0) {
-        *div_frac = 0;
+        *div_frac8 = 0;
     } else {
-        *div_frac = (uint8_t)((div - (float)*div_int) * (1u << 8u));
+        *div_frac8 = (uint8_t)((div - (float)*div_int) * (1u << 8u));
     }
+}
+
+// backwards compatibility
+static inline void pio_calculate_clkdiv_from_float(float div, uint16_t *div_int, uint8_t *div_frac8) {
+    pio_calculate_clkdiv8_from_float(div, div_int, div_frac8);
 }
 
 /*! \brief Set the state machine clock divider (from a floating point value) in a state machine configuration
