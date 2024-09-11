@@ -148,7 +148,11 @@ uint get_core_num();
 
 static inline uint __get_current_exception(void) {
     return 0;
+
 }
+
+void busy_wait_at_least_cycles(uint32_t minimum_cycles);
+
 #ifdef __cplusplus
 }
 #endif
