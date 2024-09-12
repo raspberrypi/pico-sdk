@@ -54,13 +54,22 @@ void cyw43_driver_deinit(struct async_context *context);
 #endif
 #endif
 
-// PICO_CONFIG: CYW43_PIO_CLOCK_DIV_FRAC, Fractional part of the clock divider for communication with the wireless chip, type=bool, default=0, group=pico_cyw43_driver
-#ifndef CYW43_PIO_CLOCK_DIV_FRAC
-#define CYW43_PIO_CLOCK_DIV_FRAC 0
+// PICO_CONFIG: CYW43_PIO_CLOCK_DIV_FRAC8, Fractional part of the clock divider for communication with the wireless chip 0-255, type=bool, default=0, group=pico_cyw43_driver
+#ifndef CYW43_PIO_CLOCK_DIV_FRAC8
+#ifdef CYW43_PIO_CLOCK_DIV_FRAC
+#define CYW43_PIO_CLOCK_DIV_FRAC8 CYW43_PIO_CLOCK_DIV_FRAC
+#else
+#define CYW43_PIO_CLOCK_DIV_FRAC8 0
+#endif
 #endif
 
 #if CYW43_PIO_CLOCK_DIV_DYNAMIC
-void cyw43_set_pio_clock_divisor(uint16_t clock_div_int, uint8_t clock_div_frac);
+void cyw43_set_pio_clkdiv_int_frac8(uint32_t clock_div_int, uint8_t clock_div_frac8);
+
+// backwards compatibility
+static inline void cyw43_set_pio_clock_divisor(uint16_t clock_div_int, uint8_t clock_div_frac8) {
+    return cyw43_set_pio_clkdiv_int_frac8(clock_div_int, clock_div_frac8);
+}
 #endif
 
 #ifdef __cplusplus
