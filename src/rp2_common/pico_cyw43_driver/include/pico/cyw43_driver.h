@@ -16,6 +16,10 @@
 
 #include "pico.h"
 
+#if CYW43_PIN_WL_DYNAMIC
+#include "cyw43_configport.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,7 +64,32 @@ void cyw43_driver_deinit(struct async_context *context);
 #endif
 
 #if CYW43_PIO_CLOCK_DIV_DYNAMIC
+/*! \brief Set the clock divisor for the cyw43 pio clock
+ *  \ingroup pico_cyw43_driver
+ *
+ * SPI is used to communicate with the CYW43 device and this is implemented using a PIO running with a divisor of 2.
+ * If the system clock is changed it may be necessary to adjust for this to allow communications to succeed.
+ * This function is only available if \ref CYW43_PIO_CLOCK_DIV_DYNAMIC is true
+ *
+ * \param clock_div_int Integer part of the divisor
+ * \param clock_div_frac Fractional part in 1/256ths
+*/
 void cyw43_set_pio_clock_divisor(uint16_t clock_div_int, uint8_t clock_div_frac);
+#endif
+
+#if CYW43_PIN_WL_DYNAMIC
+/*! \brief Set the gpio pins for the communication with the cyw43 device
+ *  \ingroup pico_cyw43_driver
+ *
+ * Set or change the pins used to communicate with the cyw43 device
+ * This function is only available if \ref CYW43_PIN_WL_DYNAMIC is true
+ *
+ * \note The cyw43 driver should not be de-initialised before this function is called or else the behaviour is undefined.
+ *
+ * \param pins An array containing the gpio pins to use
+ * \return PICO_OK if the pin configuration could be changed and is valid
+*/
+int cyw43_set_pins_wl(uint pins[CYW43_PIN_INDEX_WL_COUNT]);
 #endif
 
 #ifdef __cplusplus
