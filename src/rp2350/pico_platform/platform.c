@@ -28,7 +28,7 @@ bool __attribute__((weak)) running_in_sim(void) {
 }
 #endif
 
-#define MANUFACTURER_RPI 0x927
+#define MANUFACTURER_RPI 0x926
 #define PART_RP4 0x4
 
 uint8_t rp2350_chip_version(void) {
