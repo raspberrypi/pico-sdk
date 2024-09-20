@@ -22,4 +22,4 @@ If you are contributing new or updated code please match the existing code style
 
 ### Licensing 
 
-Code in this repository is lisensed under the [BSD-3 License](LICENSE.TXT). By contributing content to this repository you are agreeing to place your contributions under this licence.
+Code in this repository is licensed under the [BSD-3 License](LICENSE.TXT). By contributing content to this repository you are agreeing to place your contributions under this license.
