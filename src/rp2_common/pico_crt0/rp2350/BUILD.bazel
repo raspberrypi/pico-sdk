@@ -1,5 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
+exports_files(
+    [
+        "memmap_copy_to_ram.ld",
+        "memmap_default.ld",
+        "memmap_no_flash.ld",
+    ]
+)
+
 # It's possible to set linker scripts globally or on a per-binary basis.
 #
 # Setting globally:
@@ -43,12 +51,4 @@ cc_library(
         "memmap_no_flash.ld",
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
     ],
-)
-
-exports_files(
-    [
-        "memmap_copy_to_ram.ld",
-        "memmap_default.ld",
-        "memmap_no_flash.ld",
-    ]
 )
