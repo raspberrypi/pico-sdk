@@ -57,3 +57,12 @@ cc_library(
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
     ],
 )
+
+exports_files(
+    [
+        "memmap_blocked_ram.ld",
+        "memmap_copy_to_ram.ld",
+        "memmap_default.ld",
+        "memmap_no_flash.ld",
+    ]
+)
