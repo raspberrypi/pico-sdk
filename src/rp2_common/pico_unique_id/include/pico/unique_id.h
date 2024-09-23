@@ -31,6 +31,8 @@ extern "C" {
  *
  * This avoids some pitfalls of the hardware_flash API, which requires any
  * flash-resident interrupt routines to be disabled when called into.
+ *
+ * On boards using RP2350, the unique identifier is read from OTP memory.
  */
 
 #define PICO_UNIQUE_BOARD_ID_SIZE_BYTES 8
@@ -40,8 +42,8 @@ extern "C" {
  * \ingroup pico_unique_id
  *
  * This struct is suitable for holding the unique identifier of a NOR flash
- * device on an RP2040-based board. It contains an array of
- * PICO_UNIQUE_BOARD_ID_SIZE_BYTES identifier bytes.
+ * device on an RP2040-based board or the unique identifier read from OTP on an RP2350-based board.
+ * It contains an array of PICO_UNIQUE_BOARD_ID_SIZE_BYTES identifier bytes.
  */
 typedef struct {
 	uint8_t id[PICO_UNIQUE_BOARD_ID_SIZE_BYTES];
@@ -51,7 +53,7 @@ typedef struct {
  *  \ingroup pico_unique_id
  *
  * Get the unique 64-bit device identifier which was retrieved from the
- * external NOR flash device at boot.
+ * external NOR flash device or OTP memory at boot.
  *
  * On PICO_NO_FLASH builds the unique identifier is set to all 0xEE.
  *
@@ -63,10 +65,10 @@ void pico_get_unique_board_id(pico_unique_board_id_t *id_out);
  *  \ingroup pico_unique_id
  *
  * Get the unique 64-bit device identifier which was retrieved from the
- * external NOR flash device at boot, formatted as an ASCII hex string.
+ * external NOR flash device or OTP memory at boot, formatted as an ASCII hex string.
  * Will always 0-terminate.
  *
- * On PICO_NO_FLASH builds the unique identifier is set to all 0xEE.
+ * On PICO_NO_FLASH builds on RP2040-based boards, the unique identifier is set to all 0xEE.
  *
  * \param id_out a pointer to a char buffer of size len, to which the identifier will be written
  * \param len the size of id_out. For full serial, len >= 2 * PICO_UNIQUE_BOARD_ID_SIZE_BYTES + 1
