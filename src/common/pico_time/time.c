@@ -259,13 +259,13 @@ static void alarm_pool_irq_handler(void) {
                 index = next;
             }
         }
-        now = (int64_t) ta_time_us_64(timer);
         earliest_index = pool->ordered_head;
         if (earliest_index < 0) break;
         // need to wait
         alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
         earliest_target = earliest_entry->target;
         ta_set_timeout(timer, timer_alarm_num, earliest_target);
+        now = (int64_t) ta_time_us_64(timer);
         // check we haven't now past the target time; if not we don't want to loop again
     } while ((earliest_target - now) <= 0);
 }
