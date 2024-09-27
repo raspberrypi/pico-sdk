@@ -144,7 +144,6 @@ static void alarm_pool_irq_handler(void) {
     uint timer_num = ta_timer_num(timer);
     alarm_pool_t *pool = pools[timer_num][timer_alarm_num];
     assert(pool->timer_alarm_num == timer_alarm_num);
-    int64_t now = (int64_t) ta_time_us_64(timer);
     int64_t earliest_target;
     // 1. clear force bits if we were forced (do this outside the loop, as forcing is hopefully rare)
     ta_clear_force_irq(timer, timer_alarm_num);
@@ -161,7 +160,7 @@ static void alarm_pool_irq_handler(void) {
         if (earliest_index >= 0) {
             alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
             earliest_target = earliest_entry->target;
-            if ((now - earliest_target) >= 0) {
+            if (((int64_t)ta_time_us_64(timer) - earliest_target) >= 0) {
                 // time to call the callback now (or in the past)
                 // note that an entry->target of < 0 means the entry has been canceled (not this is set
                 // by this function, in response to the entry having been queued by the cancel_alarm API
@@ -261,7 +260,6 @@ static void alarm_pool_irq_handler(void) {
                 index = next;
             }
         }
-        now = (int64_t) ta_time_us_64(timer);
         earliest_index = pool->ordered_head;
         if (earliest_index < 0) break;
         // need to wait
@@ -274,7 +272,7 @@ static void alarm_pool_irq_handler(void) {
             ta_set_timeout(timer, timer_alarm_num, earliest_target);
         }
         // check we haven't now passed the target time; if not we don't want to loop again
-    } while ((earliest_target - now) <= 0);
+    } while ((earliest_target - (int64_t)ta_time_us_64(timer)) <= 0);
     // We always want the timer IRQ to wake a WFE so that best_effort_wfe_or_timeout() will wake up. It will wake
     // a WFE on its own core by nature of having taken an IRQ, but we do an explicit SEV so it wakes the other core
     __sev();

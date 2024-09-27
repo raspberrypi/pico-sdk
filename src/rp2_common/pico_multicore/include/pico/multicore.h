@@ -449,7 +449,7 @@ static inline uint multicore_doorbell_irq_num(uint doorbell_num) {
  */
 void multicore_lockout_victim_init(void);
 
-/*! \brief Determine if \ref multicore_victim_init() has been called on the specified core.
+/*! \brief Determine if \ref multicore_lockout_victim_init() has been called on the specified core.
  *  \ingroup multicore_lockout
  *
  * \note this state persists even if the core is subsequently reset; therefore you are advised to
@@ -457,7 +457,7 @@ void multicore_lockout_victim_init(void);
  * been initialized.
  *
  * \param core_num the core number (0 or 1)
- * \return true if \ref multicore_victim_init() has been called on the specified core, false otherwise.
+ * \return true if \ref multicore_lockout_victim_init() has been called on the specified core, false otherwise.
  */
 bool multicore_lockout_victim_is_initialized(uint core_num);
 

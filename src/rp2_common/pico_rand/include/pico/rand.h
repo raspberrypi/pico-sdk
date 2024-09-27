@@ -70,7 +70,7 @@ extern "C" {
 #endif
 #endif
 
-// PICO_CONFIG: PICO_RAND_ENTROPY_SRC_TRNG, Enable/disable use of hardware TRNG as an entropy source, type=bool, default=1 if no hardware TRNG, group=pico_rand
+// PICO_CONFIG: PICO_RAND_ENTROPY_SRC_TRNG, Enable/disable use of hardware TRNG as an entropy source, type=bool, default=1 if hardware TRNG is available, group=pico_rand
 #ifndef PICO_RAND_ENTROPY_SRC_TRNG
 #if HAS_RP2350_TRNG
 #define PICO_RAND_ENTROPY_SRC_TRNG 1
@@ -108,9 +108,9 @@ extern "C" {
 #define PICO_RAND_SEED_ENTROPY_SRC_TIME PICO_RAND_ENTROPY_SRC_TIME
 #endif
 
-// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_BUF_PERF_COUNTER, Enable/disable use of a bus performance counter as an entropy source for the random seed, type=bool, default=PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER, group=pico_rand
-#ifndef PICO_RAND_SEED_ENTROPY_SRC_BUF_PERF_COUNTER
-#define PICO_RAND_SEED_ENTROPY_SRC_BUF_PERF_COUNTER PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
+// PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_BUS_PERF_COUNTER, Enable/disable use of a bus performance counter as an entropy source for the random seed, type=bool, default=PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER, group=pico_rand
+#ifndef PICO_RAND_SEED_ENTROPY_SRC_BUS_PERF_COUNTER
+#define PICO_RAND_SEED_ENTROPY_SRC_BUS_PERF_COUNTER PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
 #endif
 
 // PICO_CONFIG: PICO_RAND_SEED_ENTROPY_SRC_BOOT_RANDOM, Enable/disable use of the per boot random number as an entropy source for the random seed, type=bool, default=0 on RP2040 which has none, group=pico_rand

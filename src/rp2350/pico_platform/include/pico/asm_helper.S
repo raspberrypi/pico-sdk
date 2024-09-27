@@ -6,12 +6,17 @@
 
 #include "pico.h"
 
+#ifdef __riscv
+// Get macros for convenient use of Hazard3 instructions without binutils support
+#include "hardware/hazard3/instructions.h"
+#endif
+
 #if !PICO_ASSEMBLER_IS_CLANG
 #define apsr_nzcv r15
 #endif
-# note we don't do this by default in this file for backwards comaptibility with user code
-# that may include this file, but not use unified syntax. Note that this macro does equivalent
-# setup to the pico_default_asm macro for inline assembly in C code.
+// note we don't do this by default in this file for backwards comaptibility with user code
+// that may include this file, but not use unified syntax. Note that this macro does equivalent
+// setup to the pico_default_asm macro for inline assembly in C code.
 .macro pico_default_asm_setup
 #ifndef __riscv
 .syntax unified
@@ -60,28 +65,7 @@ weak_func WRAPPER_FUNC_NAME(\x)
 .word \func + \offset
 .endm
 
-# backwards compatibility
+// backwards compatibility
 .macro __pre_init func, priority_string1
 __pre_init_with_offset func, 0, priority_string1
 .endm
-
-#ifdef __riscv
-// rd = (rs1 >> rs2[4:0]) & ~(-1 << nbits)
-.macro h3.bextm rd rs1 rs2 nbits
-.if (\nbits < 1) || (\nbits > 8)
-.err
-.endif
-    .insn r 0x0b, 0x4, (((\nbits - 1) & 0x7 ) << 1), \rd, \rs1, \rs2
-.endm
-
-// rd = (rs1 >> shamt) & ~(-1 << nbits)
-.macro h3.bextmi rd rs1 shamt nbits
-.if (\nbits < 1) || (\nbits > 8)
-.err
-.endif
-.if (\shamt < 0) || (\shamt > 31)
-.err
-.endif
-    .insn i 0x0b, 0x4, \rd, \rs1, (\shamt & 0x1f) | (((\nbits - 1) & 0x7 ) << 6)
-.endm
-#endif

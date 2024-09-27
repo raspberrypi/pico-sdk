@@ -9,7 +9,7 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/pico.h"
+// This header may be included by other board headers as "boards/pico2.h"
 
 // pico_cmake_set PICO_PLATFORM=rp2350
 

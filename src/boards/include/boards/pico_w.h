@@ -86,14 +86,6 @@
 #define PICO_RP2040_B1_SUPPORTED 0
 #endif
 
-#ifndef CYW43_PIN_WL_HOST_WAKE
-#define CYW43_PIN_WL_HOST_WAKE 24
-#endif
-
-#ifndef CYW43_PIN_WL_REG_ON
-#define CYW43_PIN_WL_REG_ON 23
-#endif
-
 #ifndef CYW43_WL_GPIO_COUNT
 #define CYW43_WL_GPIO_COUNT 3
 #endif

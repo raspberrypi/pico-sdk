@@ -1,9 +1,9 @@
 /*************************************************************************//**
- * @file     system_RP2040.c
+ * @file     system_RP2350.c
  * @brief    CMSIS-Core(M) Device Peripheral Access Layer Header File for
- *           Device RP2040
- * @version  V1.0.0
- * @date     5. May 2021
+ *           Device RP2350
+ * @version  V1.0.1
+ * @date     6. Sep 2024
  *****************************************************************************/
 /*
  * Copyright (c) 2009-2021 Arm Limited. All rights reserved.

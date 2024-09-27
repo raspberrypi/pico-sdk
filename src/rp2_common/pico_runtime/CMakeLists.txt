@@ -65,7 +65,17 @@ endif()
 # FLOAT                 - support for single-precision floating point
 # DOUBLE                - support for double-precision floating point
 # FPGA_CHECK            - checks for FPGA which allows Raspberry Pi to run your binary on FPGA
+# PANIC                 - default panic impl which brings in stdio
+# AUTO_INIT_MUTEX       - auto init mutexes; without this you get no printf mutex either               -
 function(pico_minimize_runtime TARGET)
+    set(ALL_ITEMS
+            DEFAULT_ALARM_POOL
+            PRINTF
+            FLOAT
+            DOUBLE
+            FPGA_CHECK
+            PANIC
+            AUTO_INIT_MUTEX)
     cmake_parse_arguments(RUNTIME "" ""
             "INCLUDE;EXCLUDE" ${ARGN} )
     foreach (INCL_EXCL IN ITEMS INCLUDE EXCLUDE)
@@ -75,7 +85,13 @@ function(pico_minimize_runtime TARGET)
             set(VAL 0)
         endif()
         foreach(VAR IN LISTS RUNTIME_${INCL_EXCL})
-            set(RUNTIME_INCLUDE_${VAR} ${VAL})
+            if (VAR STREQUAL "ALL")
+                foreach(ITEM IN LISTS ALL_ITEMS)
+                    set(RUNTIME_INCLUDE_${ITEM} ${VAL})
+                endforeach ()
+            else()
+                set(RUNTIME_INCLUDE_${VAR} ${VAL})
+            endif()
         endforeach ()
     endforeach ()
     if (NOT RUNTIME_INCLUDE_DEFAULT_ALARM_POOL)
@@ -114,6 +130,17 @@ function(pico_minimize_runtime TARGET)
         pico_set_printf_implementation(${TARGET} none)
     endif()
 
+    if (NOT RUNTIME_INCLUDE_PANIC)
+        target_compile_definitions(${TARGET} PRIVATE
+                PICO_PANIC_FUNCTION= #the default uses puts
+        )
+    endif()
+    if (NOT RUNTIME_INCLUDE_AUTO_INIT_MUTEX)
+        target_compile_definitions(${TARGET} PRIVATE
+                PICO_RUNTIME_NO_INIT_MUTEX=1
+                PICO_STDOUT_MUTEX=0 # currently pulls in mutex code otherwise
+        )
+    endif()
     if (NOT RUNTIME_INCLUDE_FPGA_CHECK)
         target_compile_definitions(${TARGET} PRIVATE PICO_NO_FPGA_CHECK=1)
     endif()

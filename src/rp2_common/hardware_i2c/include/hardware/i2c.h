@@ -316,6 +316,21 @@ int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, si
  */
 int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop);
 
+/*! \brief Attempt to write specified number of bytes to address, blocking in burst mode
+ *  \ingroup hardware_i2c
+ *
+ * This version of the function will not issue a stop and will not restart on the next write.
+ * This allows you to write consecutive bytes of data without having to resend a stop bit and
+ * (for example) without having to send address byte(s) repeatedly
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param addr 7-bit address of device to read from
+ * \param dst Pointer to buffer to receive data
+ * \param len Length of data in bytes to receive
+ * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
+ */
+int i2c_write_burst_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len);
+
 /*! \brief  Attempt to read specified number of bytes from address, blocking
  *  \ingroup hardware_i2c
  *
@@ -329,6 +344,20 @@ int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t
  */
 int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop);
 
+/*! \brief  Attempt to read specified number of bytes from address, blocking in burst mode
+ *  \ingroup hardware_i2c
+ *
+ * This version of the function will not issue a stop and will not restart on the next read.
+ * This allows you to read consecutive bytes of data without having to resend a stop bit and
+ * (for example) without having to send address byte(s) repeatedly
+ *
+ * \param i2c Either \ref i2c0 or \ref i2c1
+ * \param addr 7-bit address of device to read from
+ * \param dst Pointer to buffer to receive data
+ * \param len Length of data in bytes to receive
+ * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
+ */
+int i2c_read_burst_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len);
 
 /*! \brief Determine non-blocking write space available
  *  \ingroup hardware_i2c

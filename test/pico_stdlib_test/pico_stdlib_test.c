@@ -5,6 +5,9 @@
  */
 
 #include <stdio.h>
+// Include sys/types.h before inttypes.h to work around issue with
+// certain versions of GCC and newlib which causes omission of PRIu64
+#include <sys/types.h>
 #include <inttypes.h>
 #include "pico/stdlib.h"
 #include "pico/bit_ops.h"

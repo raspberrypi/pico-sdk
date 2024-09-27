@@ -25,6 +25,7 @@ cc_library(
         "//src/common/pico_bit_ops_headers:pico_bit_ops_interface",
         "//src/rp2_common:pico_platform_internal",
         "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_runtime_init",
     ],
     alwayslink = True,  # Ensures the wrapped symbols are linked in.
 )

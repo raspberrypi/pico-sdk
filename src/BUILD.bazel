@@ -14,6 +14,11 @@ alias(
         "//src/common/hardware_claim:__pkg__",
         "//src/common/pico_base_headers:__pkg__",
         "//src/common/pico_binary_info:__pkg__",
+        # These libraries sometimes need the host version even though they live
+        # in rp2_common.
+        "//src/rp2_common/boot_bootrom_headers:__pkg__",
+        "//src/rp2_common/hardware_boot_lock:__pkg__",
+        "//src/rp2_common/pico_flash:__pkg__",
     ],
 )
 

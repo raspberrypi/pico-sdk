@@ -10,11 +10,7 @@
 
     # add alias "default" which is just pico.
     add_library(pico_float_default INTERFACE)
-    if (PICO_RISCV)
-        target_link_libraries(pico_float_default INTERFACE pico_float_compiler)
-    else()
-        target_link_libraries(pico_float_default INTERFACE pico_float_pico)
-    endif()
+    target_link_libraries(pico_float_default INTERFACE pico_float_pico)
 
     set(PICO_DEFAULT_FLOAT_IMPL pico_float_default)
 
@@ -128,6 +124,10 @@
         wrap_float_functions(pico_float_pico_vfp NO_WRAP_AEABI)
         target_link_libraries(pico_float_pico INTERFACE
                 pico_float_pico_vfp)
+    else()
+        target_sources(pico_float_pico INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/float_single_hazard3.S
+            )
     endif()
 
 

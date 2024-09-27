@@ -173,6 +173,7 @@ cc_feature(
 
 HOSTS = (
     ("linux", "x86_64"),
+    ("linux", "aarch64"),
     ("win", "x86_64"),
     ("mac", "x86_64"),
     ("mac", "aarch64"),
