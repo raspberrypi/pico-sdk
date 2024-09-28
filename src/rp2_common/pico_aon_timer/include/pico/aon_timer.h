@@ -92,10 +92,10 @@ void aon_timer_get_resolution(struct timespec *ts);
  * \ingroup pico_aon_timer
  *
  * \if rp2040_specific
- * On RP2040 The alarm will not fire if it is in the past
+ * On RP2040 the alarm will not fire if it is in the past
  * \endif
  * \if rp2350_specific
- * On RP2040 The alarm will fire if it is in the past
+ * On RP2350 the alarm will fire if it is in the past
  * \endif
  *
  * \param ts the alarm time
