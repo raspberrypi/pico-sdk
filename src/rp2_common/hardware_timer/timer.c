@@ -145,9 +145,10 @@ void busy_wait_until(absolute_time_t t) {
 
 static void hardware_alarm_irq_handler(void) {
     // Determine which timer this IRQ is for
-    uint alarm_num = TIMER_ALARM_NUM_FROM_IRQ(__get_current_exception() - VTABLE_FIRST_IRQ);
+    uint irq_num = __get_current_exception() - VTABLE_FIRST_IRQ;
+    uint alarm_num = TIMER_ALARM_NUM_FROM_IRQ(irq_num);
     check_hardware_alarm_num_param(alarm_num);
-    uint timer_num = TIMER_NUM_FROM_IRQ(alarm_num);
+    uint timer_num = TIMER_NUM_FROM_IRQ(irq_num);
     timer_hw_t *timer = timer_get_instance(timer_num);
     hardware_alarm_callback_t callback = NULL;
 
