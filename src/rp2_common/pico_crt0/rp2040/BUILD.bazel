@@ -1,5 +1,14 @@
 package(default_visibility = ["//visibility:public"])
 
+exports_files(
+    [
+        "memmap_blocked_ram.ld",
+        "memmap_copy_to_ram.ld",
+        "memmap_default.ld",
+        "memmap_no_flash.ld",
+    ]
+)
+
 # It's possible to set linker scripts globally or on a per-binary basis.
 #
 # Setting globally:
