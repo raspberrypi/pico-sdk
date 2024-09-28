@@ -22,9 +22,7 @@
 #define BOOTROM_VTABLE_OFFSET           0x00
 #define BOOTROM_TABLE_LOOKUP_OFFSET     0x18
 #else
-// todo remove this (or #ifdef it for A1/A2)
-#define BOOTROM_IS_A2() ((*(volatile uint8_t *)0x13) == 2)
-#define BOOTROM_WELL_KNOWN_PTR_SIZE (BOOTROM_IS_A2() ? 2 : 4)
+#define BOOTROM_WELL_KNOWN_PTR_SIZE 2
 #if defined(__riscv)
 #define BOOTROM_ENTRY_OFFSET            0x7dfc
 #define BOOTROM_TABLE_LOOKUP_ENTRY_OFFSET (BOOTROM_ENTRY_OFFSET - BOOTROM_WELL_KNOWN_PTR_SIZE)
