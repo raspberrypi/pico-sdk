@@ -342,13 +342,18 @@ void set_sys_clock_48mhz(void) {
     }
 }
 
-// PICO_CONFIG: PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK, When the SYS clock PLL is changed keep the peripheral clock attached to it, type=bool, default=0, advanced=true, group=hardware_clocks
-#ifndef PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+// PICO_CONFIG: PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK, When the SYS clock PLL is changed keep the peripheral clock attached to it, type=bool, default=0, advanced=true, group=hardware_clocks
+#ifndef PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK
+// support old incorrect spelling too
+#ifdef PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+#define PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK
+#else
 // By default, when reconfiguring the system clock PLL settings after runtime initialization,
 // the peripheral clock is switched to the 48MHz USB clock to ensure continuity of peripheral operation.
 // Setting this value to 1 changes the behavior to have the peripheral clock re-configured
 // to the system clock at it's new frequency.
-#define PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK 0
+#define PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK 0
+#endif
 #endif
 
 void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
@@ -374,7 +379,7 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
                         CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
                         freq);
 
-#if PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+#if PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK
         clock_configure_undivided(clk_peri,
                         0,
                         CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
