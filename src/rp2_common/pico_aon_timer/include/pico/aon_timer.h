@@ -21,7 +21,7 @@
  * This library uses the RTC on RP2040.
  * \endif
  * \if rp2350_specific
- * This library uses the RTC on RP2350.
+ * This library uses the Powman Timer on RP2350.
  * \endif
  */
 
