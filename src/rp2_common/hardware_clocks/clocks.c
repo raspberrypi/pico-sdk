@@ -346,7 +346,7 @@ void set_sys_clock_48mhz(void) {
 #ifndef PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK
 // support old incorrect spelling too
 #ifdef PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
-#define PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK
+#define PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
 #else
 // By default, when reconfiguring the system clock PLL settings after runtime initialization,
 // the peripheral clock is switched to the 48MHz USB clock to ensure continuity of peripheral operation.
