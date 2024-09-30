@@ -284,6 +284,8 @@ void sleep_ms(uint32_t ms);
  *     return false; // timed out
  * }
  * ```
+ * NOTE: This method should always be used in a loop associated with checking another "event" variable, since
+ * processor events are a shared resource and can happen for a large number of reasons.
  *
  * @param timeout_timestamp the timeout time
  * @return true if the target time is reached, false otherwise
