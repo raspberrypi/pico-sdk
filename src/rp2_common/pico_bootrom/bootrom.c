@@ -75,7 +75,7 @@ void __attribute__((noreturn)) rom_reset_usb_boot(uint32_t usb_activity_gpio_pin
 #define VERSION_DOWNGRADE_ERASE_ADDR *(uint32_t*)0x400e0338
 #define TBYB_FLAG_ADDR *(uint32_t*)0x400e0348
 #define IMAGE_DEF_VERIFIED(scan_workarea) *(uint32_t*)(0x64 + (uint32_t)scan_workarea)
-#define IMAGE_DEF_TBYB_FLAGGED(scan_workarea) *(uint32_t*)(0x4c + (uint32_t)scan_workarea)
+#define IMAGE_DEF_TBYB_FLAGGED(scan_workarea) *(bool*)(0x4c + (uint32_t)scan_workarea)
 #define IMAGE_DEF_BASE(scan_workarea) *(uint32_t*)(0x54 + (uint32_t)scan_workarea)
 #define IMAGE_DEF_REL_BLOCK_OFFSET(scan_workarea) *(uint32_t*)(0x5c + (uint32_t)scan_workarea)
 
