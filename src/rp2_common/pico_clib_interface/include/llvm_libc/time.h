@@ -14,7 +14,7 @@
 
 __BEGIN_C_DECLS
 
-time_t mktime(struct tm* arg);
+time_t mktime(struct tm* arg) __NOEXCEPT;
 struct tm* localtime_r(const time_t* timer, struct tm* buf);
 
 __END_C_DECLS
