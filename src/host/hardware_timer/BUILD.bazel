@@ -15,7 +15,10 @@ cc_library(
     defines = _DEFINES,
     includes = ["include"],
     target_compatible_with = ["//bazel/constraint:host"],
-    visibility = ["//src/common/pico_time:__pkg__"],
+    visibility = [
+        "//src/common/pico_time:__pkg__",
+        "//src/host/pico_platform:__pkg__",
+    ],
     deps = ["//src/common/pico_base_headers"],
 )
 
