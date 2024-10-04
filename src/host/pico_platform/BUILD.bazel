@@ -30,5 +30,6 @@ cc_library(
         ":pico_platform_internal",
         ":platform_defs",
         "//src/common/pico_base_headers",
+        "//src/host/hardware_timer:hardware_timer_headers",
     ],
 )

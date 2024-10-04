@@ -13,6 +13,7 @@ from pathlib import Path
 import shlex
 import shutil
 import subprocess
+import sys
 
 
 _LOG = logging.getLogger(__file__)
@@ -34,13 +35,16 @@ SDK_ROOT = subprocess.run(
 
 def parse_common_args():
     parser = argparse.ArgumentParser()
+    add_common_args(parser)
+    return parser.parse_args()
+
+def add_common_args(parser):
     parser.add_argument(
         "--picotool-dir",
         help="Use a local copy of Picotool rather than the dynamically fetching it",
         default=None,
         type=Path,
     )
-    return parser.parse_args()
 
 def override_picotool_arg(picotool_dir):
     return f"--override_module=picotool={picotool_dir.resolve()}"
@@ -49,7 +53,7 @@ def override_picotool_arg(picotool_dir):
 def bazel_command() -> str:
     """Return the path to bazelisk or bazel."""
     if shutil.which("bazelisk"):
-        return "bazelisk"
+        return shutil.which("bazelisk")
     if shutil.which("bazel"):
         return "bazel"
 
@@ -93,12 +97,16 @@ def run_bazel(args, check=False, **kwargs):
     return proc
 
 
+def print_to_stderr(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
 def print_framed_string(s):
     """Frames a string of text and prints it to highlight script steps."""
     header_spacer = "#" * (len(s) + 12)
-    print(header_spacer)
-    print("###   " + s + "   ###")
-    print(header_spacer)
+    print_to_stderr(header_spacer)
+    print_to_stderr("###   " + s + "   ###")
+    print_to_stderr(header_spacer)
 
 
 def setup_logging():

@@ -15,6 +15,7 @@ from bazel_common import (
     override_picotool_arg,
     parse_common_args,
     print_framed_string,
+    print_to_stderr,
     run_bazel,
     setup_logging,
 )
@@ -196,12 +197,12 @@ def build_all_configurations(picotool_dir):
         )
         if result.returncode != 0:
             failed_builds.append(config["name"])
-        print()
+        print_to_stderr()
 
     if failed_builds:
         print_framed_string("ERROR: One or more builds failed.")
         for build in failed_builds:
-            print(f"  * FAILED: {build} build")
+            print_to_stderr(f"  * FAILED: {build} build")
         return 1
 
     print_framed_string("All builds successfully passed!")
