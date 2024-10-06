@@ -130,7 +130,7 @@ void i2c_set_slave_mode(i2c_inst_t *i2c, bool slave, uint8_t addr) {
     i2c->hw->enable = 1;
 }
 
-static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
+static i2c_result_t i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
                                        check_timeout_fn timeout_check, struct timeout_state *ts) {
     invalid_params_if(HARDWARE_I2C, addr >= 0x80); // 7-bit addresses
     invalid_params_if(HARDWARE_I2C, i2c_reserved_addr(addr));
@@ -146,7 +146,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
     bool abort = false;
     bool timeout = false;
 
-    uint32_t abort_reason = 0;
+    i2c_result_t result = { 0, 0 };
     int byte_ctr;
 
     int ilen = (int)len;
@@ -177,8 +177,8 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
 
         // If there was a timeout, don't attempt to do anything else.
         if (!timeout) {
-            abort_reason = i2c->hw->tx_abrt_source;
-            if (abort_reason) {
+            result.abort_reason = i2c->hw->tx_abrt_source;
+            if (result.abort_reason) {
                 // Note clearing the abort flag also clears the reason, and
                 // this instance of flag is clear-on-read! Note also the
                 // IC_CLR_TX_ABRT register always reads as 0.
@@ -215,57 +215,77 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
             break;
     }
 
-    int rval;
-
     // A lot of things could have just happened due to the ingenious and
     // creative design of I2C. Try to figure things out.
     if (abort) {
         if (timeout)
-            rval = PICO_ERROR_TIMEOUT;
-        else if (!abort_reason || abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS) {
+            result.rval = PICO_ERROR_TIMEOUT;
+        else if (!result.abort_reason || result.abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS) {
             // No reported errors - seems to happen if there is nothing connected to the bus.
             // Address byte not acknowledged
-            rval = PICO_ERROR_GENERIC;
-        } else if (abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_TXDATA_NOACK_BITS) {
+            result.rval = PICO_ERROR_GENERIC;
+        } else if (result.abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_TXDATA_NOACK_BITS) {
             // Address acknowledged, some data not acknowledged
-            rval = byte_ctr;
+            result.rval = byte_ctr;
         } else {
-            //panic("Unknown abort from I2C instance @%08x: %08x\n", (uint32_t) i2c->hw, abort_reason);
-            rval = PICO_ERROR_GENERIC;
+            //panic("Unknown abort from I2C instance @%08x: %08x\n", (uint32_t) i2c->hw, result.abort_reason);
+            result.rval = PICO_ERROR_GENERIC;
         }
     } else {
-        rval = byte_ctr;
+        result.rval = byte_ctr;
     }
 
     // nostop means we are now at the end of a *message* but not the end of a *transfer*
     i2c->restart_on_next = nostop;
-    return rval;
+    return result;
 }
 
-int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop) {
+i2c_result_t i2c_write_result_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop) {
     return i2c_write_blocking_internal(i2c, addr, src, len, nostop, NULL, NULL);
 }
 
-int i2c_write_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
+int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop) {
+    i2c_result_t r = i2c_write_result_blocking(i2c, addr, src, len, nostop);
+    return r.rval;
+}
+
+i2c_result_t i2c_write_result_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
                              absolute_time_t until) {
     timeout_state_t ts;
     return i2c_write_blocking_internal(i2c, addr, src, len, nostop, init_single_timeout_until(&ts, until), &ts);
 }
 
-int i2c_write_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
+int i2c_write_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
+                             absolute_time_t until) {
+    i2c_result_t r = i2c_write_result_blocking_until(i2c, addr, src, len, nostop, until);
+    return r.rval;
+}
+
+i2c_result_t i2c_write_result_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
                                   uint timeout_per_char_us) {
     timeout_state_t ts;
     return i2c_write_blocking_internal(i2c, addr, src, len, nostop,
                                        init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts);
 }
 
-int i2c_write_burst_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len) {
-    int rc = i2c_write_blocking_internal(i2c, addr, src, len, true, NULL, NULL);
-    i2c->restart_on_next = false;
-    return rc;
+int i2c_write_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
+                                  uint timeout_per_char_us) {
+    i2c_result_t r = i2c_write_result_timeout_per_char_us(i2c, addr, src, len, nostop, timeout_per_char_us);
+    return r.rval;
 }
 
-static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop,
+i2c_result_t i2c_write_result_burst_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len) {
+    i2c_result_t r = i2c_write_blocking_internal(i2c, addr, src, len, true, NULL, NULL);
+    i2c->restart_on_next = false;
+    return r;
+}
+
+int i2c_write_burst_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len) {
+    i2c_result_t r = i2c_write_result_burst_blocking(i2c, addr, src, len);
+    return r.rval;
+}
+
+static i2c_result_t i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop,
                                check_timeout_fn timeout_check, timeout_state_t *ts) {
     invalid_params_if(HARDWARE_I2C, addr >= 0x80); // 7-bit addresses
     invalid_params_if(HARDWARE_I2C, i2c_reserved_addr(addr));
@@ -278,7 +298,7 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
 
     bool abort = false;
     bool timeout = false;
-    uint32_t abort_reason;
+    i2c_result_t result = { 0, 0 };
     int byte_ctr;
     int ilen = (int)len;
     for (byte_ctr = 0; byte_ctr < ilen; ++byte_ctr) {
@@ -297,7 +317,7 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
                 I2C_IC_DATA_CMD_CMD_BITS; // -> 1 for read
 
         do {
-            abort_reason = i2c->hw->tx_abrt_source;
+            result.abort_reason = i2c->hw->tx_abrt_source;
             abort = (bool) i2c->hw->clr_tx_abrt;
             if (timeout_check) {
                 timeout = timeout_check(ts, false);
@@ -311,45 +331,64 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
         *dst++ = (uint8_t) i2c->hw->data_cmd;
     }
 
-    int rval;
-
     if (abort) {
         if (timeout)
-            rval = PICO_ERROR_TIMEOUT;
-        else if (!abort_reason || abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS) {
+            result.rval = PICO_ERROR_TIMEOUT;
+        else if (!result.abort_reason || result.abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS) {
             // No reported errors - seems to happen if there is nothing connected to the bus.
             // Address byte not acknowledged
-            rval = PICO_ERROR_GENERIC;
+            result.rval = PICO_ERROR_GENERIC;
         } else {
-//            panic("Unknown abort from I2C instance @%08x: %08x\n", (uint32_t) i2c->hw, abort_reason);
-            rval = PICO_ERROR_GENERIC;
+//            panic("Unknown abort from I2C instance @%08x: %08x\n", (uint32_t) i2c->hw, result.abort_reason);
+            result.rval = PICO_ERROR_GENERIC;
         }
     } else {
-        rval = byte_ctr;
+        result.rval = byte_ctr;
     }
 
     i2c->restart_on_next = nostop;
-    return rval;
+    return result;
 }
 
-int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop) {
+i2c_result_t i2c_read_result_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop) {
     return i2c_read_blocking_internal(i2c, addr, dst, len, nostop, NULL, NULL);
 }
 
-int i2c_read_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until) {
+int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop) {
+    i2c_result_t r = i2c_read_result_blocking(i2c, addr, dst, len, nostop);
+    return r.rval;
+}
+
+i2c_result_t i2c_read_result_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until) {
     timeout_state_t ts;
     return i2c_read_blocking_internal(i2c, addr, dst, len, nostop, init_single_timeout_until(&ts, until), &ts);
 }
 
-int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop,
+int i2c_read_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until) {
+    i2c_result_t r = i2c_read_result_blocking_until(i2c, addr, dst, len, nostop, until);
+    return r.rval;
+}
+
+i2c_result_t i2c_read_result_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop,
                                  uint timeout_per_char_us) {
     timeout_state_t ts;
     return i2c_read_blocking_internal(i2c, addr, dst, len, nostop,
                                       init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts);
 }
 
-int i2c_read_burst_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len) {
-    int rc = i2c_read_blocking_internal(i2c, addr, dst, len, true, NULL, NULL);
+int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop,
+                                 uint timeout_per_char_us) {
+    i2c_result_t r = i2c_read_result_timeout_per_char_us(i2c, addr, dst, len, nostop, timeout_per_char_us);
+    return r.rval;
+}
+
+i2c_result_t i2c_read_result_burst_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len) {
+    i2c_result_t r = i2c_read_blocking_internal(i2c, addr, dst, len, true, NULL, NULL);
     i2c->restart_on_next = false;
-    return rc;
+    return r;
+}
+
+int i2c_read_burst_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len) {
+    i2c_result_t r = i2c_read_result_burst_blocking(i2c, addr, dst, len);
+    return r.rval;
 }

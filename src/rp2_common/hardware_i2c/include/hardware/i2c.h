@@ -153,6 +153,11 @@ struct i2c_inst {
     bool restart_on_next;
 };
 
+typedef struct i2c_result {
+    int32_t rval;
+    uint32_t abort_reason;
+} i2c_result_t;
+
 /**
  * \def I2C_NUM(i2c)
  * \ingroup hardware_i2c
@@ -246,6 +251,7 @@ static inline i2c_inst_t *i2c_get_instance(uint num) {
  *
  * \return Number of bytes written, or PICO_ERROR_GENERIC if address not acknowledged, no device present, or PICO_ERROR_TIMEOUT if a timeout occurred.
  */
+i2c_result_t i2c_write_result_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop, absolute_time_t until);
 int i2c_write_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop, absolute_time_t until);
 
 /*! \brief  Attempt to read specified number of bytes from address, blocking until the specified absolute time is reached.
@@ -260,6 +266,7 @@ int i2c_write_blocking_until(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, 
  * \param until The absolute time that the block will wait until the entire transaction is complete.
  * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged, no device present, or PICO_ERROR_TIMEOUT if a timeout occurred.
  */
+i2c_result_t i2c_read_result_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until);
 int i2c_read_blocking_until(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, absolute_time_t until);
 
 /*! \brief Attempt to write specified number of bytes to address, with timeout
@@ -282,6 +289,7 @@ static inline int i2c_write_timeout_us(i2c_inst_t *i2c, uint8_t addr, const uint
     return i2c_write_blocking_until(i2c, addr, src, len, nostop, t);
 }
 
+i2c_result_t i2c_write_result_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop, uint timeout_per_char_us);
 int i2c_write_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop, uint timeout_per_char_us);
 
 /*! \brief  Attempt to read specified number of bytes from address, with timeout
@@ -301,6 +309,7 @@ static inline int i2c_read_timeout_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
     return i2c_read_blocking_until(i2c, addr, dst, len, nostop, t);
 }
 
+i2c_result_t i2c_read_result_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, uint timeout_per_char_us);
 int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop, uint timeout_per_char_us);
 
 /*! \brief Attempt to write specified number of bytes to address, blocking
@@ -314,6 +323,7 @@ int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, si
  *           and the next transfer will begin with a Restart rather than a Start.
  * \return Number of bytes written, or PICO_ERROR_GENERIC if address not acknowledged, no device present.
  */
+i2c_result_t i2c_write_result_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop);
 int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop);
 
 /*! \brief Attempt to write specified number of bytes to address, blocking in burst mode
@@ -329,6 +339,7 @@ int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t
  * \param len Length of data in bytes to receive
  * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
  */
+i2c_result_t i2c_write_result_burst_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len);
 int i2c_write_burst_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len);
 
 /*! \brief  Attempt to read specified number of bytes from address, blocking
@@ -342,6 +353,7 @@ int i2c_write_burst_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, 
  *           and the next transfer will begin with a Restart rather than a Start.
  * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
  */
+i2c_result_t i2c_read_result_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop);
 int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop);
 
 /*! \brief  Attempt to read specified number of bytes from address, blocking in burst mode
@@ -357,6 +369,7 @@ int i2c_read_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, b
  * \param len Length of data in bytes to receive
  * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
  */
+i2c_result_t i2c_read_result_burst_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len);
 int i2c_read_burst_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len);
 
 /*! \brief Determine non-blocking write space available
