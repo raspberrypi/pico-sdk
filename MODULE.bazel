@@ -69,34 +69,34 @@ http_archive(
 http_archive(
     name = "clang_linux-x86_64",
     build_file = "//bazel/toolchain:clang.BUILD",
-    sha256 = "e12ee0db9226f5b4a4400c5eb2c0f757d7056181b651622b5453acb00105fd87",
+    sha256 = "6c599d1aba568236064c340d7813324849896d5a4e2f3fd8225a8c31bfcbf884",
     type = "zip",
-    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/linux-amd64/+/git_revision:248c53429427034f45705af60d47f3b1090c4799",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/linux-amd64/+/git_revision:2b0a708f41dd6291ee744704d43febc975e3d026",
 )
 
 http_archive(
     name = "clang_win-x86_64",
     build_file = "//bazel/toolchain:clang.BUILD",
-    sha256 = "8c41e8b507f4dfede80842f98a716cac209f552064088fa1b7f4c64a1e547534",
+    sha256 = "f49ba4123ee3958f2b47289d017a5b3f1ca01f82dd7a2168c45412c18101fd13",
     type = "zip",
     # Windows doesn't like `:` in the produced filename, so replace it with `%3A`.
-    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/windows-amd64/+/git_revision:248c53429427034f45705af60d47f3b1090c4799".replace("git_revision:", "git_revision%3A"),
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/windows-amd64/+/git_revision:2b0a708f41dd6291ee744704d43febc975e3d026".replace("git_revision:", "git_revision%3A"),
 )
 
 http_archive(
     name = "clang_mac-x86_64",
     build_file = "//bazel/toolchain:clang.BUILD",
-    sha256 = "1d92f52609d3c1e958fd56f5e9a68ab99b2042ddcc6e90a5eb5009cf7ac4897d",
+    sha256 = "d3516f2eb4c12d17ae77ee84c9226fbea581d4fb806910ceac4717d5adfcf748",
     type = "zip",
-    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-amd64/+/git_revision:248c53429427034f45705af60d47f3b1090c4799",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-amd64/+/git_revision:2b0a708f41dd6291ee744704d43febc975e3d026",
 )
 
 http_archive(
     name = "clang_mac-aarch64",
     build_file = "//bazel/toolchain:clang.BUILD",
-    sha256 = "53184680db7e0043a8fba1556c7644b8f5e6c8cdffa4436a92a8e8adb0f45b8d",
+    sha256 = "68e551f41c7e9473063b09819f6ab8ec6e7e53677f4078189656cb14dc52984b",
     type = "zip",
-    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:248c53429427034f45705af60d47f3b1090c4799",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:2b0a708f41dd6291ee744704d43febc975e3d026",
 )
 
 # TODO: Provide tinyusb as a proper Bazel module.
