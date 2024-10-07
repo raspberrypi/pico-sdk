@@ -72,6 +72,7 @@ static bool repeating_timer_callback(struct repeating_timer *t) {
 #endif
 
 int issue_195_test(void);
+int issue_1812_test(void);
 
 int main() {
     setup_default_uart();
@@ -227,6 +228,8 @@ int main() {
         return -1;
     }
 
+    issue_1812_test();
+
     PICOTEST_END_TEST();
 }
 
@@ -255,3 +258,16 @@ int issue_195_test(void) {
     return 0;
 }
 
+// Setting an alarm should not swallow a sev
+int issue_1812_test(void) {
+    PICOTEST_START_SECTION("Issue #1812 defect - Setting an alarm should not ignore a sev");
+
+    __sev(); // Make sure the call below does not ignore this
+    absolute_time_t before = get_absolute_time();
+    bool result = best_effort_wfe_or_timeout(make_timeout_time_ms(1000));
+    int64_t diff = absolute_time_diff_us(before, get_absolute_time());
+    PICOTEST_CHECK(diff < 250 && !result, "sev ignored by best_effort_wfe_or_timeout")
+
+    PICOTEST_END_SECTION();
+    return 0;
+}
