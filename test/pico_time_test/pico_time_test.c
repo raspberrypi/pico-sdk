@@ -73,6 +73,7 @@ static bool repeating_timer_callback(struct repeating_timer *t) {
 
 int issue_195_test(void);
 int issue_1812_test(void);
+int issue_1953_test(void);
 
 int main() {
     setup_default_uart();
@@ -193,13 +194,19 @@ int main() {
 
     PICOTEST_END_SECTION();
 
+
     PICOTEST_START_SECTION("Repeating timertest");
     for(uint i=0;i<NUM_REPEATING_TIMERS;i++) {
 
         add_repeating_timer_us(500+ (rand() & 1023), repeating_timer_callback, (void *)(uintptr_t)i, repeating_timers + i);
     }
 
-    sleep_ms(3000);
+    // issue #1953 will lockup here if sleep_us >= 6us (PICO_TIME_SLEEP_OVERHEAD_ADJUST_US)
+    absolute_time_t timeout = make_timeout_time_ms(3000);
+    while(absolute_time_diff_us(get_absolute_time(), timeout) > 0) {
+        sleep_us(5);
+    }
+
     uint callbacks = 0;
     for(uint i=0;i<NUM_REPEATING_TIMERS;i++) {
         PICOTEST_CHECK(cancel_repeating_timer(repeating_timers + i), "Cancelling repeating timer should succeed");
@@ -227,8 +234,17 @@ int main() {
     if (issue_195_test()) {
         return -1;
     }
-
     issue_1812_test();
+
+    // Destroy alarm pools (except for default)
+    for(uint i=0; i<NUM_ALARMS; i++) {
+        if (i != alarm_pool_timer_alarm_num(alarm_pool_get_default())) {
+            alarm_pool_destroy(pools[i]);
+            pools[i] = 0;
+        }
+    }
+
+    issue_1953_test();
 
     PICOTEST_END_TEST();
 }
@@ -268,6 +284,44 @@ int issue_1812_test(void) {
     int64_t diff = absolute_time_diff_us(before, get_absolute_time());
     PICOTEST_CHECK(diff < 250 && !result, "sev ignored by best_effort_wfe_or_timeout")
 
+    PICOTEST_END_SECTION();
+    return 0;
+}
+
+static bool timer_callback_issue_1953(repeating_timer_t *rt) {
+    static int counter;
+    counter++;
+    return true;
+}
+
+// Callback should only occur if the alarm is set in the past
+static void alarm_pool_stuck_issue_1953(uint alarm) {
+    hard_assert(false);
+}
+
+int issue_1953_test(void) {
+    PICOTEST_START_SECTION("Issue #1953 defect - Alarm can be set in the past");
+    int alarm = hardware_alarm_claim_unused(true);
+    hardware_alarm_set_callback(alarm, alarm_pool_stuck_issue_1953);
+
+    repeating_timer_t timer1;
+    repeating_timer_t timer2;
+
+    assert(add_repeating_timer_us(10, timer_callback_issue_1953, NULL, &timer1));
+    assert(add_repeating_timer_us(100, timer_callback_issue_1953, NULL, &timer2));
+
+    int iterations = 0;
+    while(iterations < 100) {
+        iterations++;
+        hardware_alarm_set_target(alarm, make_timeout_time_ms(1000));
+        sleep_us(500); // lockup in here without the fix for #1953
+        hardware_alarm_cancel(alarm);
+    }
+
+    cancel_repeating_timer(&timer1);
+    cancel_repeating_timer(&timer2);
+
+    hardware_alarm_unclaim(alarm);
     PICOTEST_END_SECTION();
     return 0;
 }
