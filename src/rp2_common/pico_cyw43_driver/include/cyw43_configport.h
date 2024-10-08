@@ -63,10 +63,14 @@ extern "C" {
 #endif
 
 #ifndef CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE
+#if CYW43_USE_PARTITION_FIRMWARE
+#define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "cyw43_partition_firmware.h"
+#else
 #if CYW43_ENABLE_BLUETOOTH
 #define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "wb43439A0_7_95_49_00_combined.h"
 #else
 #define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "w43439A0_7_95_49_00_combined.h"
+#endif
 #endif
 #endif
 
