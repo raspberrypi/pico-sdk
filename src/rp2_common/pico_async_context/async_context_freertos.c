@@ -188,7 +188,6 @@ static void handle_sync_func_call(async_context_t *context, async_when_pending_w
     sync_func_call_t *call = (sync_func_call_t *)worker;
     call->rc = call->func(call->param);
     xSemaphoreGive(call->sem);
-    async_context_remove_when_pending_worker(context, worker);
 }
 
 uint32_t async_context_freertos_execute_sync(async_context_t *self_base, uint32_t (*func)(void *param), void *param) {
@@ -202,6 +201,7 @@ uint32_t async_context_freertos_execute_sync(async_context_t *self_base, uint32_
     async_context_add_when_pending_worker(self_base, &call.worker);
     async_context_set_work_pending(self_base, &call.worker);
     xSemaphoreTake(call.sem, portMAX_DELAY);
+    async_context_remove_when_pending_worker(self_base, &call.worker);
     vSemaphoreDelete(call.sem);
     return call.rc;
 }
