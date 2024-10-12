@@ -14,12 +14,15 @@
 
 from dataclasses import dataclass
 import glob
+import logging
 import os
 import re
 import sys
 from typing import Dict
 
-from bazel_common import SDK_ROOT
+from bazel_common import SDK_ROOT, setup_logging
+
+_LOG = logging.getLogger(__file__)
 
 CMAKE_FILE_TYPES = (
     "**/CMakeLists.txt",
@@ -182,17 +185,17 @@ def OptionsAreEqual(bazel_option, cmake_option):
     if bazel_option is None:
         if cmake_option.name in CMAKE_ONLY_ALLOWLIST:
             return True
-        print(f"    {cmake_option.name} does not exist in Bazel")
+        _LOG.warning(f"    {cmake_option.name} does not exist in Bazel")
         return False
     elif cmake_option is None:
         if bazel_option.name in BAZEL_ONLY_ALLOWLIST:
             return True
-        print(f"    {bazel_option.name} does not exist in CMake")
+        _LOG.warning(f"    {bazel_option.name} does not exist in CMake")
         return False
     elif not bazel_option.matches(cmake_option):
-        print("    Bazel and CMAKE definitions do not match:")
-        print(f"    [CMAKE]    {bazel_option}")
-        print(f"    [BAZEL]    {cmake_option}")
+        _LOG.error("    Bazel and CMAKE definitions do not match:")
+        _LOG.error(f"    [CMAKE]    {bazel_option}")
+        _LOG.error(f"    [BAZEL]    {cmake_option}")
         return False
 
     return True
@@ -224,22 +227,23 @@ def compare_build_systems():
         for f in glob.glob(os.path.join(SDK_ROOT, p), recursive=True)
     ]
 
-    print("[1/2] Checking build system configuration flags...")
+    _LOG.info("[1/2] Checking build system configuration flags...")
     build_options_ok = CompareOptions(
         "PICO_BAZEL_CONFIG", bazel_files, "PICO_CMAKE_CONFIG", cmake_files
     )
 
-    print("[2/2] Checking build system defines...")
+    _LOG.info("[2/2] Checking build system defines...")
     build_defines_ok = CompareOptions(
         "PICO_BUILD_DEFINE", bazel_files, "PICO_BUILD_DEFINE", cmake_files
     )
 
     if build_options_ok and build_defines_ok:
-        print("OK")
+        _LOG.info("OK")
         return 0
 
     return 1
 
 
 if __name__ == "__main__":
+    setup_logging()
     sys.exit(compare_build_systems())
