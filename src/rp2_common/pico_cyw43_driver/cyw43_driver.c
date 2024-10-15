@@ -23,6 +23,7 @@ static async_context_t *cyw43_async_context = NULL;
 
 #if CYW43_USE_PARTITION_FIRMWARE
     #include "pico/bootrom.h"
+    #include "hardware/flash.h"
     #include "boot/picobin.h"
     #include <stdlib.h>
 
@@ -161,8 +162,8 @@ bool cyw43_driver_init(async_context_t *context) {
             assert(ret == 3);
 
             uint32_t location_and_permissions = buffer[1];
-            uint32_t saddr = ((location_and_permissions >> PICOBIN_PARTITION_LOCATION_FIRST_SECTOR_LSB) & 0x1fffu) * 4096;
-            uint32_t eaddr = (((location_and_permissions >> PICOBIN_PARTITION_LOCATION_LAST_SECTOR_LSB) & 0x1fffu) + 1) * 4096;
+            uint32_t saddr = ((location_and_permissions >> PICOBIN_PARTITION_LOCATION_FIRST_SECTOR_LSB) & 0x1fffu) * FLASH_SECTOR_SIZE;
+            uint32_t eaddr = (((location_and_permissions >> PICOBIN_PARTITION_LOCATION_LAST_SECTOR_LSB) & 0x1fffu) + 1) * FLASH_SECTOR_SIZE;
             // Starts with metadata block
             while(saddr < eaddr && *(uint32_t*)(XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr) != PICOBIN_BLOCK_MARKER_END) {
                 saddr += 4;
