@@ -39,18 +39,18 @@ extern "C" {
  *
  * On Arm these are vector table indices:
  *
- * Name                 | Value | Exception
- * ---------------------|-------|-----------------------
- * NMI_EXCEPTION        | 2     | Non Maskable Interrupt
- * HARDFAULT_EXCEPTION  | 3     | HardFault
+ * Name                  | Value | Exception
+ * ----------------------|-------|-----------------------
+ * NMI_EXCEPTION         | 2     | Non Maskable Interrupt
+ * HARDFAULT_EXCEPTION   | 3     | HardFault
  * \if rp2350_specific
- * MEMMANAGE_EXCEPTION  | 4     | MemManage
- * BUSFAULT_EXCEPTION   | 5     | BusFault
- * USAGEFAULT_EXCEPTION | 6     | UsageFault
+ * MEMMANAGE_EXCEPTION   | 4     | MemManage
+ * BUSFAULT_EXCEPTION    | 5     | BusFault
+ * USAGEFAULT_EXCEPTION  | 6     | UsageFault
  * \endif
- * SVCALL_EXCEPTION     | 11    | SV Call
- * PENDSV_EXCEPTION     | 14    | Pend SV
- * SYSTICK_EXCEPTION    | 15    | System Tick
+ * SVCALL_EXCEPTION      | 11    | SV Call
+ * PENDSV_EXCEPTION      | 14    | Pend SV
+ * SYSTICK_EXCEPTION     | 15    | System Tick
  *
  * \if rp2350_specific
  * On RISC-V these are exception cause numbers:
@@ -93,16 +93,16 @@ enum exception_number {
 enum exception_number {
     // Assigned to VTOR indices
     MIN_EXCEPTION_NUM = 2,
-    NMI_EXCEPTION = 2,        ///< Non Maskable Interrupt
-    HARDFAULT_EXCEPTION = 3,  ///< HardFault Interrupt
+    NMI_EXCEPTION = 2,         ///< Non Maskable Interrupt
+    HARDFAULT_EXCEPTION = 3,   ///< HardFault Interrupt
 #if PICO_RP2350
-    MEMMANAGE_EXCEPTION = 4,  ///< MemManage Interrupt
-    BUSFAULT_EXCEPTION = 5,   ///< BusFault Interrupt
-    USAGEFAULT_EXCEPTION = 6, ///< UsageFault Interrupt
+    MEMMANAGE_EXCEPTION = 4,   ///< MemManage Interrupt
+    BUSFAULT_EXCEPTION = 5,    ///< BusFault Interrupt
+    USAGEFAULT_EXCEPTION = 6,  ///< UsageFault Interrupt
 #endif
-    SVCALL_EXCEPTION = 11,    ///< SV Call Interrupt
-    PENDSV_EXCEPTION = 14,    ///< Pend SV Interrupt
-    SYSTICK_EXCEPTION = 15,   ///< System Tick Interrupt
+    SVCALL_EXCEPTION = 11,     ///< SV Call Interrupt
+    PENDSV_EXCEPTION = 14,     ///< Pend SV Interrupt
+    SYSTICK_EXCEPTION = 15,    ///< System Tick Interrupt
     MAX_EXCEPTION_NUM = 15
 };
 #endif
