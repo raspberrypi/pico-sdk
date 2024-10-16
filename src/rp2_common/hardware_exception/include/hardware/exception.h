@@ -43,6 +43,11 @@ extern "C" {
  * ---------------------|-------|-----------------------
  * NMI_EXCEPTION        | 2     | Non Maskable Interrupt
  * HARDFAULT_EXCEPTION  | 3     | HardFault
+ * \if rp2350_specific
+ * MEMFAULT_EXCEPTION   | 4     | MemFault
+ * BUSFAULT_EXCEPTION   | 5     | BusFault
+ * USGFAULT_EXCEPTION   | 6     | UsageFault
+ * \endif
  * SVCALL_EXCEPTION     | 11    | SV Call
  * PENDSV_EXCEPTION     | 14    | Pend SV
  * SYSTICK_EXCEPTION    | 15    | System Tick
@@ -90,6 +95,11 @@ enum exception_number {
     MIN_EXCEPTION_NUM = 2,
     NMI_EXCEPTION = 2,        ///< Non Maskable Interrupt
     HARDFAULT_EXCEPTION = 3,  ///< HardFault Interrupt
+#if PICO_RP2350
+    MEMFAULT_EXCEPTION = 4,  ///< MemFault Interrupt
+    BUSFAULT_EXCEPTION = 5,  ///< BusFault Interrupt
+    USGFAULT_EXCEPTION = 6,  ///< UsageFault Interrupt
+#endif
     SVCALL_EXCEPTION = 11,    ///< SV Call Interrupt
     PENDSV_EXCEPTION = 14,    ///< Pend SV Interrupt
     SYSTICK_EXCEPTION = 15,   ///< System Tick Interrupt
