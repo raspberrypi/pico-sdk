@@ -1,170 +1,152 @@
-load("@rules_cc//cc/toolchains:action_type_config.bzl", "cc_action_type_config")
+load("@bazel_skylib//rules/directory:directory.bzl", "directory")
+load("@bazel_skylib//rules/directory:subdirectory.bzl", "subdirectory")
 load("@rules_cc//cc/toolchains:tool.bzl", "cc_tool")
+load("@rules_cc//cc/toolchains:tool_map.bzl", "cc_tool_map")
+load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
+load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_tool(
-    name = "llvm-ar_tool",
-    src = select({
-        "@platforms//os:windows": "//:bin/llvm-ar.exe",
-        "//conditions:default": "//:bin/llvm-ar",
-    }),
-    data = select({
-        "@platforms//os:windows": [],
-        "//conditions:default": ["//:bin/llvm"],
-    }),
+licenses(["notice"])
+
+# Directory-based rules in this toolchain only referece things in
+# lib/ or include/ subdirectories.
+directory(
+    name = "toolchain_root",
+    srcs = glob([
+        "lib/**",
+        "include/**",
+    ]),
 )
 
-cc_action_type_config(
-    name = "llvm-ar",
-    action_types = ["@rules_cc//cc/toolchains/actions:ar_actions"],
-    tools = [":llvm-ar_tool"],
+cc_tool_map(
+    name = "all_tools",
+    tools = {
+        "@rules_cc//cc/toolchains/actions:assembly_actions": ":asm",
+        "@rules_cc//cc/toolchains/actions:c_compile": ":clang",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions": ":clang++",
+        "@rules_cc//cc/toolchains/actions:link_actions": ":lld",
+        "@rules_cc//cc/toolchains/actions:objcopy_embed_data": ":llvm-objcopy",
+        "@rules_cc//cc/toolchains/actions:strip": ":llvm-strip",
+        "@rules_cc//cc/toolchains/actions:ar_actions": ":llvm-ar",
+    },
+)
+
+# TODO: https://github.com/bazelbuild/rules_cc/issues/235 - Workaround until
+# Bazel has a more robust way to implement `cc_tool_map`.
+alias(
+    name = "asm",
+    actual = ":clang",
 )
 
 cc_tool(
-    name = "clang_tool",
+    name = "clang",
     src = select({
         "@platforms//os:windows": "//:bin/clang.exe",
         "//conditions:default": "//:bin/clang",
     }),
     data = glob([
-        "include/armv*-unknown-none-eabi/**",
+        "bin/llvm",
         "lib/clang/*/include/**",
-    ]) + select({
-        "@platforms//os:windows": [],
-        "//conditions:default": ["//:bin/llvm"],
-    }),
-)
-
-cc_action_type_config(
-    name = "clang",
-    action_types = [
-        "@rules_cc//cc/toolchains/actions:assembly_actions",
-        "@rules_cc//cc/toolchains/actions:c_compile",
-    ],
-    tools = [":clang_tool"],
+        "include/armv*-unknown-none-eabi/**",
+    ]),
 )
 
 cc_tool(
-    name = "clang++_tool",
-    src = select({
-        "@platforms//os:windows": "//:bin/clang++.exe",
-        "//conditions:default": "//:bin/clang++",
-    }),
-    data = glob([
-        "include/armv*-unknown-none-eabi/**",
-        "include/c++/**",
-        "lib/clang/*/include/**",
-    ]) + select({
-        # Windows doesn't have llvm.exe.
-        "@platforms//os:windows": [],
-        "//conditions:default": ["//:bin/llvm"],
-    }),
-)
-
-cc_action_type_config(
     name = "clang++",
-    action_types = ["@rules_cc//cc/toolchains/actions:cpp_compile_actions"],
-    tools = [":clang++_tool"],
-)
-
-# This tool is actually just clang++ under the hood, but this specifies a
-# different set of data files to pull into the sandbox at runtime.
-cc_tool(
-    name = "lld_tool",
     src = select({
         "@platforms//os:windows": "//:bin/clang++.exe",
         "//conditions:default": "//:bin/clang++",
     }),
     data = glob([
+        "bin/llvm",
+        "lib/clang/*/include/**",
+        "include/armv*-unknown-none-eabi/**",
+        "include/c++/v1/**",
+    ]),
+)
+
+cc_tool(
+    name = "lld",
+    src = select({
+        "@platforms//os:windows": "//:bin/clang++.exe",
+        "//conditions:default": "//:bin/clang++",
+    }),
+    data = glob([
+        "bin/llvm",
+        "bin/lld*",
+        "bin/ld*",
+        "lib/**/*.a",
+        "lib/**/*.so*",
+        "lib/**/*.o",
         "lib/armv*-unknown-none-eabi/**",
         "lib/clang/*/lib/armv*-unknown-none-eabi/**",
-    ]) + select({
-        "@platforms//os:windows": [],
-        "//conditions:default": ["//:bin/llvm"],
-    }),
-)
-
-cc_action_type_config(
-    name = "lld",
-    action_types = ["@rules_cc//cc/toolchains/actions:link_actions"],
-    tools = [":lld_tool"],
+    ]),
 )
 
 cc_tool(
-    name = "llvm-objcopy_tool",
+    name = "llvm-ar",
+    src = select({
+        "@platforms//os:windows": "//:bin/llvm-ar.exe",
+        "//conditions:default": "//:bin/llvm-ar",
+    }),
+    data = glob(["bin/llvm"]),
+)
+
+cc_tool(
+    name = "llvm-libtool-darwin",
+    src = select({
+        "@platforms//os:windows": "//:bin/llvm-libtool-darwin.exe",
+        "//conditions:default": "//:bin/llvm-libtool-darwin",
+    }),
+    data = glob(["bin/llvm"]),
+)
+
+cc_tool(
+    name = "llvm-objcopy",
     src = select({
         "@platforms//os:windows": "//:bin/llvm-objcopy.exe",
         "//conditions:default": "//:bin/llvm-objcopy",
     }),
-    data = select({
-        "@platforms//os:windows": [],
-        "//conditions:default": ["//:bin/llvm"],
-    }),
-)
-
-cc_action_type_config(
-    name = "llvm-objcopy",
-    action_types = ["@rules_cc//cc/toolchains/actions:objcopy_embed_data"],
-    tools = [":llvm-objcopy_tool"],
+    data = glob(["bin/llvm"]),
 )
 
 cc_tool(
-    name = "llvm-strip_tool",
-    src = select({
-        "@platforms//os:windows": "//:bin/llvm-strip.exe",
-        "//conditions:default": "//:bin/llvm-strip",
-    }),
-    data = select({
-        "@platforms//os:windows": [],
-        "//conditions:default": ["//:bin/llvm"],
-    }),
-)
-
-cc_action_type_config(
-    name = "llvm-strip",
-    action_types = ["@rules_cc//cc/toolchains/actions:strip"],
-    tools = [":llvm-strip_tool"],
-)
-
-cc_tool(
-    name = "llvm-objdump_tool",
+    name = "llvm-objdump",
     src = select({
         "@platforms//os:windows": "//:bin/llvm-objdump.exe",
         "//conditions:default": "//:bin/llvm-objdump",
     }),
-    data = select({
-        "@platforms//os:windows": [],
-        "//conditions:default": ["//:bin/llvm"],
-    }),
+    data = glob(["bin/llvm"]),
 )
 
-# There is not yet a well-known action type for llvm-objdump.
-
 cc_tool(
-    name = "llvm-profdata_tool",
-    src = select({
-        "@platforms//os:windows": "//:bin/llvm-profdata.exe",
-        "//conditions:default": "//:bin/llvm-profdata",
-    }),
-    data = select({
-        "@platforms//os:windows": [],
-        "//conditions:default": ["//:bin/llvm"],
-    }),
-)
-
-# There is not yet a well-known action type for llvm-profdata.
-
-cc_tool(
-    name = "llvm-cov_tool",
+    name = "llvm-cov",
     src = select({
         "@platforms//os:windows": "//:bin/llvm-cov.exe",
         "//conditions:default": "//:bin/llvm-cov",
     }),
-    data = select({
-        "@platforms//os:windows": [],
-        "//conditions:default": ["//:bin/llvm"],
-    }),
+    data = glob(["bin/llvm"]),
 )
 
-# There is not yet a well-known action type for llvm-cov.
+cc_tool(
+    name = "llvm-strip",
+    src = select({
+        "@platforms//os:windows": "//:bin/llvm-strip.exe",
+        "//conditions:default": "//:bin/llvm-strip",
+    }),
+    data = glob(["bin/llvm"]),
+)
+
+cc_tool(
+    name = "clang-tidy",
+    src = select({
+        "@platforms//os:windows": "//:bin/clang-tidy.exe",
+        "//conditions:default": "//:bin/clang-tidy",
+    }),
+    data = glob([
+        "bin/llvm",
+        "include/**",
+        "lib/clang/**/include/**",
+    ]),
+)
