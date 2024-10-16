@@ -47,7 +47,6 @@ extern "C" {
  * MEMMANAGE_EXCEPTION   | 4     | MemManage
  * BUSFAULT_EXCEPTION    | 5     | BusFault
  * USAGEFAULT_EXCEPTION  | 6     | UsageFault
- * SECUREFAULT_EXCEPTION | 7     | SecureFault
  * \endif
  * SVCALL_EXCEPTION      | 11    | SV Call
  * PENDSV_EXCEPTION      | 14    | Pend SV
@@ -100,7 +99,6 @@ enum exception_number {
     MEMMANAGE_EXCEPTION = 4,   ///< MemManage Interrupt
     BUSFAULT_EXCEPTION = 5,    ///< BusFault Interrupt
     USAGEFAULT_EXCEPTION = 6,  ///< UsageFault Interrupt
-    SECUREFAULT_EXCEPTION = 7, ///< SecureFault Interrupt
 #endif
     SVCALL_EXCEPTION = 11,     ///< SV Call Interrupt
     PENDSV_EXCEPTION = 14,     ///< Pend SV Interrupt
