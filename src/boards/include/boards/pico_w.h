@@ -114,37 +114,37 @@
 #define PICO_VSYS_PIN 29
 #endif
 
-// PICO_CONFIG: CYW43_PIN_WL_DYNAMIC, flag to indicate if cyw43 SPI pins can be changed at runtime, type=bool, default=false, advanced=true, group=pico_cyw43_driver
+// cyw43 SPI pins can't be changed at runtime
 #ifndef CYW43_PIN_WL_DYNAMIC
 #define CYW43_PIN_WL_DYNAMIC 0
 #endif
 
-// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_REG_ON, gpio pin to power up the cyw43 chip, type=int, default=23, advanced=true, group=pico_cyw43_driver
+// gpio pin to power up the cyw43 chip
 #ifndef CYW43_DEFAULT_PIN_WL_REG_ON
 #define CYW43_DEFAULT_PIN_WL_REG_ON 23u
 #endif
 
-// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_OUT, gpio pin for spi data out to the cyw43 chip, type=int, default=24, advanced=true, group=pico_cyw43_driver
+// gpio pin for spi data out to the cyw43 chip
 #ifndef CYW43_DEFAULT_PIN_WL_DATA_OUT
 #define CYW43_DEFAULT_PIN_WL_DATA_OUT 24u
 #endif
 
-// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_IN, gpio pin for spi data in from the cyw43 chip, type=int, default=24, advanced=true, group=pico_cyw43_driver
+// gpio pin for spi data in from the cyw43 chip
 #ifndef CYW43_DEFAULT_PIN_WL_DATA_IN
 #define CYW43_DEFAULT_PIN_WL_DATA_IN 24u
 #endif
 
-// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_HOST_WAKE, gpio (irq) pin for the irq line from the cyw43 chip, type=int, default=24, advanced=true, group=pico_cyw43_driver
+// gpio (irq) pin for the irq line from the cyw43 chip
 #ifndef CYW43_DEFAULT_PIN_WL_HOST_WAKE
 #define CYW43_DEFAULT_PIN_WL_HOST_WAKE 24u
 #endif
 
-// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_CLOCK, gpio pin for the spi clock line to the cyw43 chip, type=int, default=29, advanced=true, group=pico_cyw43_driver
+// gpio pin for the spi clock line to the cyw43 chip
 #ifndef CYW43_DEFAULT_PIN_WL_CLOCK
 #define CYW43_DEFAULT_PIN_WL_CLOCK 29u
 #endif
 
-// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_CS, gpio pin for the spi chip select to the cyw43 chip, type=int, default=25, advanced=true, group=pico_cyw43_driver
+// gpio pin for the spi chip select to the cyw43 chip
 #ifndef CYW43_DEFAULT_PIN_WL_CS
 #define CYW43_DEFAULT_PIN_WL_CS 25u
 #endif
