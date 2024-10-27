@@ -115,9 +115,9 @@ typedef pio_hw_t *PIO;
 #define pio1 pio1_hw
 
 #if NUM_PIOS > 2
-/** Identifier for the second (PIO 1) hardware PIO instance (for use in PIO functions).
+/** Identifier for the third (PIO 2) hardware PIO instance (for use in PIO functions).
  *
- * e.g. pio_gpio_init(pio1, 5)
+ * e.g. pio_gpio_init(pio2, 5)
  *
  *  \ingroup hardware_pio
  */
