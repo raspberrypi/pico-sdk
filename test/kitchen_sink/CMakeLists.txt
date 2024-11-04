@@ -24,6 +24,7 @@ set(KITCHEN_SINK_LIBS
     hardware_uart
     hardware_vreg
     hardware_watchdog
+    hardware_xip_cache
     hardware_xosc
     pico_aon_timer
     pico_bit_ops
