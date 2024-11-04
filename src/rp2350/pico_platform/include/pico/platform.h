@@ -229,11 +229,11 @@ static inline uint8_t rp2040_chip_version(void) {
     return 2;
 }
 
-/*! \brief Returns the RP2040 rom version number
+/*! \brief Returns the RP2350 rom version number
  *  \ingroup pico_platform
- * @return the RP2040 rom version number (1 for RP2040-B0, 2 for RP2040-B1, 3 for RP2040-B2)
+ * @return the RP2350 rom version number (2 for RP2350-A2)
  */
-static inline uint8_t rp2040_rom_version(void) {
+static inline uint8_t rp2350_rom_version(void) {
     GCC_Pragma("GCC diagnostic push")
     GCC_Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
     return *(uint8_t*)0x13;
