@@ -17,7 +17,7 @@
  *
  * These functions apply some maintenance operation to either the entire cache contents, or a range
  * of offsets within the downstream address space. Offsets start from 0 (indicating the first byte
- * pf flash), so pointers should have XIP_BASE subtracted before passing into one of these
+ * of flash), so pointers should have XIP_BASE subtracted before passing into one of these
  * functions.
  *
  * \if rp2040-specific
@@ -55,13 +55,9 @@
  *
  */
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_XIP_CACHE, Enable/disable assertions in the hardwdare_xip_cache module, type=bool, default=0, group=hardwdare_xip_cache
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_XIP_CACHE, Enable/disable assertions in the hardware_xip_cache module, type=bool, default=0, group=hardware_xip_cache
 #ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_XIP_CACHE
-#ifdef PARAM_ASSERTIONS_ENABLED_FLASH // backwards compatibility with SDK < 2.0.0
-#define PARAM_ASSERTIONS_ENABLED_HARDWARE_XIP_CACHE PARAM_ASSERTIONS_ENABLED_FLASH
-#else
 #define PARAM_ASSERTIONS_ENABLED_HARDWARE_XIP_CACHE 0
-#endif
 #endif
 
 #define XIP_CACHE_LINE_SIZE _u(8)
@@ -152,7 +148,6 @@ void xip_cache_invalidate_range(uintptr_t start_offset, uintptr_t size_bytes);
  * \endif
  *
  */
-
 void xip_cache_clean_all(void);
 
 /*! \brief Clean a range of offsets within the XIP address space
