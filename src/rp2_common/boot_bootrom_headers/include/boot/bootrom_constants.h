@@ -308,7 +308,7 @@ typedef struct cflash_flags {
     uint32_t flags;
 } cflash_flags_t;
 
-#endif
+#endif // #ifdef __ASSEMBLER__
 
 // Bits which are permitted to be set in a flags variable -- any other bits being set is an error
 #define CFLASH_FLAGS_BITS               0x00070301u
