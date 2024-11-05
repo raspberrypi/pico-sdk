@@ -258,10 +258,13 @@ typedef int (*bootrom_api_callback_generic_t)(uint32_t r0, uint32_t r1, uint32_t
 #define OTP_CMD_ROW_BITS                    0x0000ffffu
 #define OTP_CMD_ROW_LSB                     _u(0)
 #define OTP_CMD_WRITE_BITS                  0x00010000u
-#define OTP_CMD_WRITE_LSB                   _u(6)
+#define OTP_CMD_WRITE_LSB                   _u(16)
 #define OTP_CMD_ECC_BITS                    0x00020000u
+#define OTP_CMD_ECC_LSB                     _u(17)
 
 #ifndef __ASSEMBLER__
+static_assert(OTP_CMD_WRITE_BITS == (1 << OTP_CMD_WRITE_LSB), "");
+static_assert(OTP_CMD_ECC_BITS == (1 << OTP_CMD_ECC_LSB), "");
 
 typedef struct {
     uint32_t permissions_and_location;
