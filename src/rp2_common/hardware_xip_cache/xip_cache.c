@@ -31,7 +31,8 @@ __always_inline static void check_xip_offset_range(uintptr_t start_offset, uintp
     (void)size_bytes;
     valid_params_if(HARDWARE_XIP_CACHE, start_offset <= XIP_CACHE_ADDRESS_SPACE_SIZE);
     valid_params_if(HARDWARE_XIP_CACHE, start_offset + size_bytes <= XIP_CACHE_ADDRESS_SPACE_SIZE);
-    valid_params_if(HARDWARE_XIP_CACHE, start_offset + size_bytes <= start_offset);
+    // Check for unsigned wrapping too:
+    valid_params_if(HARDWARE_XIP_CACHE, start_offset + size_bytes >= start_offset);
 }
 
 #if !PICO_RP2040
