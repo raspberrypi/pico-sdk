@@ -142,16 +142,14 @@ static int default_enter_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
         // it only prevents the other core from also entering a critical section.
         // Therefore, we must do our own handshake which starts a task on the other core and have it disable interrupts
         uint core_num = get_core_num();
-        // create at low priority
+        // create at low priority on other core
         TaskHandle_t task_handle;
-        if (pdPASS != xTaskCreate(flash_lockout_task, "flash lockout", configMINIMAL_STACK_SIZE, (void *)core_num, 0, &task_handle)) {
+        if (pdPASS != xTaskCreateAffinitySet(flash_lockout_task, "flash lockout", configMINIMAL_STACK_SIZE, (void *)core_num, 0, 1u << (core_num ^ 1), &task_handle)) {
             return PICO_ERROR_INSUFFICIENT_RESOURCES;
         }
         lockout_state[core_num] = FREERTOS_LOCKOUT_LOCKER_WAITING;
         __sev();
-        // bind to other core
-        vTaskCoreAffinitySet(task_handle, 1u << (core_num ^ 1));
-        // and make it super high priority
+        // make it super high priority
         vTaskPrioritySet(task_handle, configMAX_PRIORITIES -1);
         absolute_time_t until = make_timeout_time_ms(timeout_ms);
         while (lockout_state[core_num] != FREERTOS_LOCKOUT_LOCKEE_READY && !time_reached(until)) {
