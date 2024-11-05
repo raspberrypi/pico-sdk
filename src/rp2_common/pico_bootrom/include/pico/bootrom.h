@@ -174,32 +174,7 @@ __force_inline static void *rom_hword_as_ptr(uint16_t rom_address) {
 #ifdef __riscv
 static __force_inline bool rom_size_is_64k(void) {
 #ifdef RASPBERRYPI_AMETHYST_FPGA
-    // Detect ROM size by testing for bus fault at +32k
-    uint result;
-    pico_default_asm_volatile (
-        "li %0, 0\n"
-        // Save and disable IRQs before touching trap vector
-        "csrr t2, mstatus\n"
-        "csrci mstatus, 0x8\n"
-        // Set up trap vector to skip the instruction which sets the %0 flag
-        "la t0, 1f\n"
-        "csrrw t0, mtvec, t0\n"
-        // This load will fault if the bootrom is no larger than 32k:
-        "li t1, 32 * 1024\n"
-        "lw t1, (t1)\n"
-        // No fault, so set return to true
-        "li %0, 1\n"
-        ".p2align 2\n"
-        // Always end up back here, restore the trap table
-        "1:\n"
-        "csrw mtvec, t0\n"
-        // Now safe to restore interrupts
-        "csrw mstatus, t2\n"
-        : "=r" (result)
-        :
-        : "t0", "t1", "t2"
-    );
-    return result;
+    return *(uint16_t*)0x14 >= 0x8000;
 #else
     return false;
 #endif

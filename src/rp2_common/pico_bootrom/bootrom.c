@@ -23,7 +23,12 @@ void *rom_data_lookup(uint32_t code) {
     uint16_t *data_table = (uint16_t *) rom_hword_as_ptr(BOOTROM_DATA_TABLE_OFFSET);
     return rom_table_lookup(data_table, code);
 #else
+#ifdef __riscv
+    uint32_t rom_offset_adjust = rom_size_is_64k() ? 32 * 1024 : 0;
+    rom_table_lookup_fn rom_table_lookup = (rom_table_lookup_fn) (uintptr_t)*(uint16_t*)(BOOTROM_TABLE_LOOKUP_OFFSET + rom_offset_adjust);
+#else
     rom_table_lookup_fn rom_table_lookup = (rom_table_lookup_fn) (uintptr_t)*(uint16_t*)(BOOTROM_TABLE_LOOKUP_OFFSET);
+#endif
     return rom_table_lookup(code, RT_FLAG_DATA);
 #endif
 }
