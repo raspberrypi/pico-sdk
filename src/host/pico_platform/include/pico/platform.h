@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#ifdef __unix__
+#if defined __unix__ && defined __GLIBC__
 
 #include <sys/cdefs.h>
 
