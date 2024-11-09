@@ -427,6 +427,7 @@ function(picotool_postprocess_binary TARGET)
     if (picotool_sign_output)
         list(APPEND picotool_args "--sign")
         get_target_property(picotool_sigfile ${TARGET} PICOTOOL_SIGFILE)
+        pico_add_link_depend(${TARGET} ${picotool_sigfile})
     endif()
 
     get_target_property(picotool_hash_output ${TARGET} PICOTOOL_HASH_OUTPUT)
@@ -442,10 +443,19 @@ function(picotool_postprocess_binary TARGET)
 
     # Embed PT properties
     get_target_property(picotool_embed_pt ${TARGET} PICOTOOL_EMBED_PT)
+    if (picotool_embed_pt)
+        pico_add_link_depend(${TARGET} ${picotool_embed_pt})
+    endif()
 
     # Encryption properties
     get_target_property(picotool_aesfile ${TARGET} PICOTOOL_AESFILE)
+    if (picotool_aesfile)
+        pico_add_link_depend(${TARGET} ${picotool_aesfile})
+    endif()
     get_target_property(picotool_enc_sigfile ${TARGET} PICOTOOL_ENC_SIGFILE)
+    if (picotool_enc_sigfile)
+        pico_add_link_depend(${TARGET} ${picotool_enc_sigfile})
+    endif()
 
     # Extra args
     get_target_property(extra_process_args ${TARGET} PICOTOOL_EXTRA_PROCESS_ARGS)
