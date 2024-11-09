@@ -63,6 +63,20 @@ void cyw43_driver_deinit(struct async_context *context);
 #define CYW43_PIO_CLOCK_DIV_FRAC 0
 #endif
 
+// PICO_CONFIG: CYW43_PIN_WL_DYNAMIC, flag to indicate if cyw43 SPI pins can be changed at runtime, type=bool, advanced=true, group=pico_cyw43_driver
+
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_REG_ON, gpio pin to power up the cyw43 chip, type=int, advanced=true, group=pico_cyw43_driver
+
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_OUT, gpio pin for spi data out to the cyw43 chip, type=int, advanced=true, group=pico_cyw43_driver
+
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_IN, gpio pin for spi data in from the cyw43 chip, type=int, advanced=true, group=pico_cyw43_driver
+
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_HOST_WAKE, gpio (irq) pin for the irq line from the cyw43 chip, type=int, advanced=true, group=pico_cyw43_driver
+
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_CLOCK, gpio pin for the spi clock line to the cyw43 chip, type=int, advanced=true, group=pico_cyw43_driver
+
+// PICO_CONFIG: CYW43_DEFAULT_PIN_WL_CS, gpio pin for the spi chip select to the cyw43 chip, type=int, dvanced=true, group=pico_cyw43_driver
+
 #if CYW43_PIO_CLOCK_DIV_DYNAMIC
 /*! \brief Set the clock divisor for the cyw43 pio clock
  *  \ingroup pico_cyw43_driver
