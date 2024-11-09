@@ -255,18 +255,22 @@ typedef int (*bootrom_api_callback_generic_t)(uint32_t r0, uint32_t r1, uint32_t
 #define BOOTROM_NS_API_get_b_partition 7
 #define BOOTROM_NS_API_COUNT 8
 
+#define OTP_CMD_ROW_BITS                    0x0000ffffu
+#define OTP_CMD_ROW_LSB                     _u(0)
+#define OTP_CMD_WRITE_BITS                  0x00010000u
+#define OTP_CMD_WRITE_LSB                   _u(16)
+#define OTP_CMD_ECC_BITS                    0x00020000u
+#define OTP_CMD_ECC_LSB                     _u(17)
+
 #ifndef __ASSEMBLER__
+static_assert(OTP_CMD_WRITE_BITS == (1 << OTP_CMD_WRITE_LSB), "");
+static_assert(OTP_CMD_ECC_BITS == (1 << OTP_CMD_ECC_LSB), "");
 
 typedef struct {
     uint32_t permissions_and_location;
     uint32_t permissions_and_flags;
 } resident_partition_t;
 static_assert(sizeof(resident_partition_t) == 8, "");
-
-#define OTP_CMD_ROW_BITS                    0x0000ffffu
-#define OTP_CMD_ROW_LSB                     0u
-#define OTP_CMD_WRITE_BITS                  0x00010000u
-#define OTP_CMD_ECC_BITS                    0x00020000u
 
 typedef struct otp_cmd {
     uint32_t flags;
@@ -304,37 +308,37 @@ typedef struct cflash_flags {
     uint32_t flags;
 } cflash_flags_t;
 
+#endif // #ifdef __ASSEMBLER__
+
 // Bits which are permitted to be set in a flags variable -- any other bits being set is an error
 #define CFLASH_FLAGS_BITS               0x00070301u
 
 // Used to tell checked flash API which space a given address belongs to
 #define CFLASH_ASPACE_BITS              0x00000001u
-#define CFLASH_ASPACE_LSB               0u
-#define CFLASH_ASPACE_VALUE_STORAGE     0u
-#define CFLASH_ASPACE_VALUE_RUNTIME     1u
+#define CFLASH_ASPACE_LSB               _u(0)
+#define CFLASH_ASPACE_VALUE_STORAGE     _u(0)
+#define CFLASH_ASPACE_VALUE_RUNTIME     _u(1)
 
 // Used to tell checked flash APIs the effective security level of a flash access (may be forced to
 // one of these values for the NonSecure-exported version of this API)
 #define CFLASH_SECLEVEL_BITS            0x00000300u
-#define CFLASH_SECLEVEL_LSB             8u
+#define CFLASH_SECLEVEL_LSB             _u(8)
 // Zero is not a valid security level:
-#define CFLASH_SECLEVEL_VALUE_SECURE    1u
-#define CFLASH_SECLEVEL_VALUE_NONSECURE 2u
-#define CFLASH_SECLEVEL_VALUE_BOOTLOADER 3u
+#define CFLASH_SECLEVEL_VALUE_SECURE    _u(1)
+#define CFLASH_SECLEVEL_VALUE_NONSECURE _u(2)
+#define CFLASH_SECLEVEL_VALUE_BOOTLOADER _u(3)
 
 #define CFLASH_OP_BITS                  0x00070000u
-#define CFLASH_OP_LSB                   16u
+#define CFLASH_OP_LSB                   _u(16)
 // Erase size_bytes bytes of flash, starting at address addr. Both addr and size_bytes must be a
 // multiple of 4096 bytes (one flash sector).
-#define CFLASH_OP_VALUE_ERASE           0u
+#define CFLASH_OP_VALUE_ERASE           _u(0)
 // Program size_bytes bytes of flash, starting at address addr. Both addr and size_bytes must be a
 // multiple of 256 bytes (one flash page).
-#define CFLASH_OP_VALUE_PROGRAM         1u
+#define CFLASH_OP_VALUE_PROGRAM         _u(1)
 // Read size_bytes bytes of flash, starting at address addr. There are no alignment restrictions on
 // addr or size_bytes.
-#define CFLASH_OP_VALUE_READ            2u
-#define CFLASH_OP_MAX                   2u
-
-#endif
+#define CFLASH_OP_VALUE_READ            _u(2)
+#define CFLASH_OP_MAX                   _u(2)
 
 #endif

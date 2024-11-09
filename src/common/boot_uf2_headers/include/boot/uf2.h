@@ -20,10 +20,11 @@
 #define UF2_MAGIC_START1 0x9E5D5157u
 #define UF2_MAGIC_END    0x0AB16F30u
 
-#define UF2_FLAG_NOT_MAIN_FLASH     0x00000001u
-#define UF2_FLAG_FILE_CONTAINER     0x00001000u
-#define UF2_FLAG_FAMILY_ID_PRESENT  0x00002000u
-#define UF2_FLAG_MD5_PRESENT        0x00004000u
+#define UF2_FLAG_NOT_MAIN_FLASH          0x00000001u
+#define UF2_FLAG_FILE_CONTAINER          0x00001000u
+#define UF2_FLAG_FAMILY_ID_PRESENT       0x00002000u
+#define UF2_FLAG_MD5_PRESENT             0x00004000u
+#define UF2_FLAG_EXTENSION_FLAGS_PRESENT 0x00008000u
 
 #define RP2040_FAMILY_ID            0xe48bff56u
 #define ABSOLUTE_FAMILY_ID          0xe48bff57u
@@ -33,6 +34,8 @@
 #define RP2350_ARM_NS_FAMILY_ID     0xe48bff5bu
 #define FAMILY_ID_MAX               0xe48bff5bu
 
+// 04 e3 57 99
+#define UF2_EXTENSION_RP2_IGNORE_BLOCK 0x9957e304
 
 struct uf2_block {
     // 32 byte header
