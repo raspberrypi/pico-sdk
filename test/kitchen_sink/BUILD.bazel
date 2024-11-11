@@ -60,6 +60,7 @@ cc_library(
         "//src/rp2_common/hardware_uart",
         "//src/rp2_common/hardware_vreg",
         "//src/rp2_common/hardware_watchdog",
+        "//src/rp2_common/hardware_xip_cache",
         "//src/rp2_common/hardware_xosc",
         "//src/rp2_common/pico_aon_timer",
         "//src/rp2_common/pico_bootrom",
