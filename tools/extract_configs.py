@@ -40,6 +40,8 @@ BASE_BUILD_DEFINE_RE = re.compile(r'\b{}\b'.format(BASE_BUILD_DEFINE_NAME))
 CONFIG_RE = re.compile(r'//\s+{}:\s+(\w+),\s+([^,]+)(?:,\s+(.*))?$'.format(BASE_CONFIG_NAME))
 DEFINE_RE = re.compile(r'#define\s+(\w+)\s+(.+?)(\s*///.*)?$')
 
+ALLOWED_CONFIG_PROPERTIES = set(['type', 'default', 'min', 'max', 'enumvalues', 'group', 'advanced', 'depends'])
+
 CHIP_NAMES = ["rp2040", "rp2350"]
 
 chips_all_configs = defaultdict(dict)
@@ -49,10 +51,14 @@ chips_all_defines = defaultdict(dict)
 
 
 
-def ValidateAttrs(config_attrs, file_path, linenum):
+def ValidateAttrs(config_name, config_attrs, file_path, linenum):
     _type = config_attrs.get('type', 'int')
 
     # Validate attrs
+    for key in config_attrs.keys():
+        if key not in ALLOWED_CONFIG_PROPERTIES:
+            raise Exception('{} at {}:{} has unexpected property "{}"'.format(config_name, file_path, linenum, key))
+
     if _type == 'int':
         assert 'enumvalues' not in config_attrs
         _min = _max = _default = None
@@ -229,7 +235,7 @@ for applicable, all_configs in chips_all_configs.items():
         file_path = os.path.join(scandir, config_obj['filename'])
         linenum = config_obj['line_number']
 
-        ValidateAttrs(config_obj['attrs'], file_path, linenum)
+        ValidateAttrs(config_name, config_obj['attrs'], file_path, linenum)
 
         # Check that default values match up
         if 'default' in config_obj['attrs']:

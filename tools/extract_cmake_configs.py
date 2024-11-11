@@ -39,6 +39,8 @@ BASE_BUILD_DEFINE_RE = re.compile(r'\b{}\b'.format(BASE_BUILD_DEFINE_NAME))
 
 CMAKE_CONFIG_RE = re.compile(r'#\s+{}:\s+(\w+),\s+([^,]+)(?:,\s+(.*))?$'.format(BASE_CMAKE_CONFIG_NAME))
 
+ALLOWED_CONFIG_PROPERTIES = set(['type', 'default', 'min', 'max', 'group', 'advanced', 'docref'])
+
 CHIP_NAMES = ["rp2040", "rp2350"]
 
 chips_all_configs = defaultdict(dict)
@@ -47,10 +49,14 @@ chips_all_descriptions = defaultdict(dict)
 
 
 
-def ValidateAttrs(config_attrs, file_path, linenum):
+def ValidateAttrs(config_name, config_attrs, file_path, linenum):
     _type = config_attrs.get('type')
 
     # Validate attrs
+    for key in config_attrs.keys():
+        if key not in ALLOWED_CONFIG_PROPERTIES:
+            raise Exception('{} at {}:{} has unexpected property "{}"'.format(config_name, file_path, linenum, key))
+
     if _type == 'int':
         _min = _max = _default = None
         if config_attrs.get('min', None) is not None:
@@ -93,7 +99,7 @@ def ValidateAttrs(config_attrs, file_path, linenum):
         _default = config_attrs.get('default', None)
         if _default is not None:
             if '/' not in _default:
-                if (_default.lower() != '0') and (config_attrs['default'].lower() != '1') and ( _default not in all_configs):
+                if (_default.lower() != '0') and (config_attrs['default'].lower() != '1') and (_default not in all_configs):
                     logger.info('{} at {}:{} has non-integer default value "{}"'.format(config_name, file_path, linenum, config_attrs['default']))
 
     elif _type == 'string':
@@ -184,7 +190,7 @@ for applicable, all_configs in chips_all_configs.items():
         file_path = os.path.join(scandir, config_obj['filename'])
         linenum = config_obj['line_number']
 
-        ValidateAttrs(config_obj['attrs'], file_path, linenum)
+        ValidateAttrs(config_name, config_obj['attrs'], file_path, linenum)
 
 # All settings in "host" should also be in "all"
 for config_name, config_obj in chips_all_configs["host"].items():

@@ -56,28 +56,32 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             hardware_exception
             )
 
+    if (CYW43_PIN_WL_DYNAMIC)
+        # PICO_CMAKE_CONFIG: CYW43_PIN_WL_DYNAMIC, flag to indicate if cyw43 SPI pins can be changed at runtime, type=bool, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_PIN_WL_DYNAMIC=${CYW43_PIN_WL_DYNAMIC})
+    endif()
     if (CYW43_DEFAULT_PIN_WL_REG_ON)
-        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_REG_ON, gpio pin to power up the cyw43 chip, type=int, default=23, group=pico_cyw43_driver
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_REG_ON, gpio pin to power up the cyw43 chip, type=int, group=pico_cyw43_driver
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_REG_ON=${CYW43_DEFAULT_PIN_WL_REG_ON})
     endif()
     if (CYW43_DEFAULT_PIN_WL_DATA_OUT)
-        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_OUT, gpio pin for spi data out to the cyw43 chip, type=int, default=24, group=pico_cyw43_driver
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_OUT, gpio pin for spi data out to the cyw43 chip, type=int, group=pico_cyw43_driver
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_DATA_OUT=${CYW43_DEFAULT_PIN_WL_DATA_OUT})
     endif()
     if (CYW43_DEFAULT_PIN_WL_DATA_IN)
-        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_IN, gpio pin for spi data in from the cyw43 chip, type=int, default=24, group=pico_cyw43_driver
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_IN, gpio pin for spi data in from the cyw43 chip, type=int, group=pico_cyw43_driver
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_DATA_IN=${CYW43_DEFAULT_PIN_WL_DATA_IN})
     endif()
     if (CYW43_DEFAULT_PIN_WL_HOST_WAKE)
-        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_HOST_WAKE, gpio (irq) pin for the irq line from the cyw43 chip, type=int, default=24, group=pico_cyw43_driver
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_HOST_WAKE, gpio (irq) pin for the irq line from the cyw43 chip, type=int, group=pico_cyw43_driver
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_HOST_WAKE=${CYW43_DEFAULT_PIN_WL_HOST_WAKE})
     endif()
     if (CYW43_DEFAULT_PIN_WL_CLOCK)
-        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_HOST_WAKE, gpio pin for the spi clock line to the cyw43 chip, type=int, default=29, group=pico_cyw43_driver
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_CLOCK, gpio pin for the spi clock line to the cyw43 chip, type=int, group=pico_cyw43_driver
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_CLOCK=${CYW43_DEFAULT_PIN_WL_CLOCK})
     endif()
     if (CYW43_DEFAULT_PIN_WL_CS)
-        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_CS, gpio pin for the spi chip select to the cyw43 chip, type=int, default=25, group=pico_cyw43_driver
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_CS, gpio pin for the spi chip select to the cyw43 chip, type=int, group=pico_cyw43_driver
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_CS=${CYW43_DEFAULT_PIN_WL_CS})
     endif()
     if (CYW43_PIO_CLOCK_DIV_INT)
@@ -89,7 +93,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_PIO_CLOCK_DIV_FRAC8=${CYW43_PIO_CLOCK_DIV_FRAC8})
     endif()
     if (CYW43_PIO_CLOCK_DIV_DYNAMIC)
-        # PICO_CMAKE_CONFIG: CYW43_PIO_CLOCK_DIV_DYNAMIC, flag used to enable dynamic pio clock divider API, type=bool, default=false, group=pico_cyw43_driver
+        # PICO_CMAKE_CONFIG: CYW43_PIO_CLOCK_DIV_DYNAMIC, flag used to enable dynamic pio clock divider API, type=bool, default=0, group=pico_cyw43_driver
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_PIO_CLOCK_DIV_DYNAMIC=${CYW43_PIO_CLOCK_DIV_DYNAMIC})
     endif()
 
