@@ -1691,9 +1691,9 @@ static inline void pio_sm_set_clkdiv(PIO pio, uint sm, float div) {
     check_pio_param(pio);
     check_sm_param(sm);
     uint32_t div_int;
-    uint8_t div_frac;
-    pio_calculate_clkdiv8_from_float(div, &div_int, &div_frac);
-    pio_sm_set_clkdiv_int_frac8(pio, sm, div_int, div_frac);
+    uint8_t div_frac8;
+    pio_calculate_clkdiv8_from_float(div, &div_int, &div_frac8);
+    pio_sm_set_clkdiv_int_frac8(pio, sm, div_int, div_frac8);
 }
 
 /*! \brief Clear a state machine's TX and RX FIFOs

@@ -186,7 +186,7 @@ static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t div_int
  *  \ingroup hardware_pwm
  *
  * \param c PWM configuration struct to modify
- * \param div_int Integer value to reduce counting rate by. Must be greater than or equal to 1 annd less than 256.
+ * \param div_int Integer value to reduce counting rate by. Must be greater than or equal to 1 and less than 256.
  *
  * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
  * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
