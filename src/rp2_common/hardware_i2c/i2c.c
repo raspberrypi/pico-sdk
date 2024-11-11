@@ -298,7 +298,10 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
 
         do {
             abort_reason = i2c->hw->tx_abrt_source;
-            abort = (bool) i2c->hw->clr_tx_abrt;
+            if (i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+                abort = true;
+                i2c->hw->clr_tx_abrt;
+            }
             if (timeout_check) {
                 timeout = timeout_check(ts, false);
                 abort |= timeout;
