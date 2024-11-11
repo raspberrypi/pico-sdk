@@ -366,6 +366,7 @@ void clock_gpio_init_int_frac16(uint gpio, uint src, uint32_t div_int, uint16_t 
  * \param src  The source clock. See the register field CLOCKS_CLK_GPOUT0_CTRL_AUXSRC for a full list. The list is the same for each GPOUT clock generator.
  * \param div_int  The integer part of the value to divide the source clock by. This is useful to not overwhelm the GPIO pin with a fast clock. This is in range of 1..2^24-1 on RP2040
  *                 and 1..2^16-1 on RP2350
+ * \param div_frac8 The fractional part of the value to divide the source clock by. This is in range of 0..255 (/256).
  */
 static inline void clock_gpio_init_int_frac8(uint gpio, uint src, uint32_t div_int, uint8_t div_frac8) {
     return clock_gpio_init_int_frac16(gpio, src, div_int, (uint16_t)(div_frac8 << 8u));
