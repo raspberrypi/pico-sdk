@@ -1,0 +1,3 @@
+pico_simple_hardware_target(xip_cache)
+
+pico_mirrored_target_link_libraries(hardware_xip_cache INTERFACE hardware_sync)

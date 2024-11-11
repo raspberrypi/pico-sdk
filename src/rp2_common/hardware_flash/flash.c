@@ -13,6 +13,7 @@
 #else
 #include "hardware/structs/qmi.h"
 #endif
+#include "hardware/xip_cache.h"
 
 #define FLASH_BLOCK_ERASE_CMD 0xd8
 
@@ -84,6 +85,8 @@ void __no_inline_not_in_flash_func(flash_range_erase)(uint32_t flash_offs, size_
     rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     assert(connect_internal_flash_func && flash_exit_xip_func && flash_range_erase_func && flash_flush_cache_func);
     flash_init_boot2_copyout();
+    // Commit any pending writes to external RAM, to avoid losing them in the subsequent flush:
+    xip_cache_clean_all();
 
     // No flash accesses after this point
     __compiler_memory_barrier();
@@ -112,6 +115,7 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
     rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     assert(connect_internal_flash_func && flash_exit_xip_func && flash_range_program_func && flash_flush_cache_func);
     flash_init_boot2_copyout();
+    xip_cache_clean_all();
 
     __compiler_memory_barrier();
 
@@ -152,6 +156,8 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
     rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     assert(connect_internal_flash_func && flash_exit_xip_func && flash_flush_cache_func);
     flash_init_boot2_copyout();
+    xip_cache_clean_all();
+
     __compiler_memory_barrier();
     connect_internal_flash_func();
     flash_exit_xip_func();

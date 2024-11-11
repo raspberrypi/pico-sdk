@@ -60,6 +60,7 @@ pico_add_subdirectory(rp2_common/hardware_timer)
 pico_add_subdirectory(rp2_common/hardware_uart)
 pico_add_subdirectory(rp2_common/hardware_vreg)
 pico_add_subdirectory(rp2_common/hardware_watchdog)
+pico_add_subdirectory(rp2_common/hardware_xip_cache)
 pico_add_subdirectory(rp2_common/hardware_xosc)
 
 if (PICO_RP2350 OR PICO_COMBINED_DOCS)
