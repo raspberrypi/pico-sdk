@@ -130,6 +130,15 @@ void i2c_set_slave_mode(i2c_inst_t *i2c, bool slave, uint8_t addr) {
     i2c->hw->enable = 1;
 }
 
+// PICO_CONFIG: PICO_I2C_RETURN_ABORT_REASON, change i2c functions to return the abort reason via a return code less than or equal to PICO_ERROR_ABORT, type=bool, default=0, group=harware_i2c
+#if PICO_I2C_RETURN_ABORT_REASON
+// if (ret <= PICO_ERROR_ABORT) abort_reason = PICO_ERROR_ABORT - ret; // one of I2C_IC_TX_ABRT_SOURCE_ABRT_*_LSB
+#define PICO_I2C_MAKE_ABORT_ERROR(A) (PICO_ERROR_ABORT - __builtin_ctz(A))
+#else
+// By default, for compatibility, return PICO_ERROR_GENERIC if an abort occurs
+#define PICO_I2C_MAKE_ABORT_ERROR(A) PICO_ERROR_GENERIC
+#endif
+
 static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
                                        check_timeout_fn timeout_check, struct timeout_state *ts) {
     invalid_params_if(HARDWARE_I2C, addr >= 0x80); // 7-bit addresses
@@ -225,13 +234,13 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
         else if (!abort_reason || abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS) {
             // No reported errors - seems to happen if there is nothing connected to the bus.
             // Address byte not acknowledged
-            rval = PICO_ERROR_GENERIC;
+            rval = PICO_I2C_MAKE_ABORT_ERROR(I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS);
         } else if (abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_TXDATA_NOACK_BITS) {
             // Address acknowledged, some data not acknowledged
             rval = byte_ctr;
         } else {
             //panic("Unknown abort from I2C instance @%08x: %08x\n", (uint32_t) i2c->hw, abort_reason);
-            rval = PICO_ERROR_GENERIC;
+            rval = PICO_I2C_MAKE_ABORT_ERROR(abort_reason);
         }
     } else {
         rval = byte_ctr;
@@ -319,10 +328,10 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
         else if (!abort_reason || abort_reason & I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS) {
             // No reported errors - seems to happen if there is nothing connected to the bus.
             // Address byte not acknowledged
-            rval = PICO_ERROR_GENERIC;
+            rval = PICO_I2C_MAKE_ABORT_ERROR(I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS);
         } else {
 //            panic("Unknown abort from I2C instance @%08x: %08x\n", (uint32_t) i2c->hw, abort_reason);
-            rval = PICO_ERROR_GENERIC;
+            rval = PICO_I2C_MAKE_ABORT_ERROR(abort_reason);
         }
     } else {
         rval = byte_ctr;
