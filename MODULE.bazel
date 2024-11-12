@@ -84,40 +84,38 @@ http_archive(
     url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:2b0a708f41dd6291ee744704d43febc975e3d026",
 )
 
+new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+
 # TODO: Provide tinyusb as a proper Bazel module.
-http_archive(
+new_git_repository(
     name = "tinyusb",
     build_file = "//src/rp2_common/tinyusb:tinyusb.BUILD",
-    sha256 = "d64728aef58b80d5ce3747cad133f520da46e2b7ea3aadfda0e981aba6b658b3",
-    strip_prefix = "tinyusb-4232642899362fa5e9cf0dc59bad6f1f6d32c563",
-    url = "https://github.com/hathach/tinyusb/archive/4232642899362fa5e9cf0dc59bad6f1f6d32c563.tar.gz",
+    commit = "4232642899362fa5e9cf0dc59bad6f1f6d32c563",  # keep-in-sync-with-submodule: tinyusb
+    remote = "https://github.com/hathach/tinyusb.git",
 )
 
 # TODO: Provide btstack as a proper Bazel module.
-http_archive(
+new_git_repository(
     name = "btstack",
     build_file = "//src/rp2_common/pico_btstack:btstack.BUILD",
-    sha256 = "64e86d9cf82b346e743fe1d4818b9380712b17abdb3f2c3524e92464b5ef3d19",
-    strip_prefix = "btstack-2b49e57bd1fae85ac32ac1f41cdb7c794de335f6",
-    url = "https://github.com/bluekitchen/btstack/archive/2b49e57bd1fae85ac32ac1f41cdb7c794de335f6.tar.gz",
+    commit = "2b49e57bd1fae85ac32ac1f41cdb7c794de335f6",  # keep-in-sync-with-submodule: btstack
+    remote = "https://github.com/bluekitchen/btstack.git",
 )
 
-# TODO: Provide btstack as a proper Bazel module.
-http_archive(
+# TODO: Provide cyw43-driver as a proper Bazel module.
+new_git_repository(
     name = "cyw43-driver",
     build_file = "//src/rp2_common/pico_cyw43_driver:cyw43-driver.BUILD",
-    sha256 = "0fcc7707fef95dd562d5572604713266613a27caeeae2f10afeccee9592a53ce",
-    strip_prefix = "cyw43-driver-faf36381bad1f668a30172b6336c9a970966ef4c",
-    url = "https://github.com/georgerobotics/cyw43-driver/archive/faf36381bad1f668a30172b6336c9a970966ef4c.tar.gz",
+    commit = "cf924bb04c8984675ca0fc2178f082e404e048c3",  # keep-in-sync-with-submodule: cyw43-driver
+    remote = "https://github.com/georgerobotics/cyw43-driver.git",
 )
 
 # TODO: Provide lwip as a proper Bazel module.
-http_archive(
+new_git_repository(
     name = "lwip",
     build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
-    sha256 = "72856d557f72911cf6826ef745c23c54822df83a474557823241164a1d1361aa",
-    strip_prefix = "lwip-0a0452b2c39bdd91e252aef045c115f88f6ca773",
-    url = "https://github.com/lwip-tcpip/lwip/archive/0a0452b2c39bdd91e252aef045c115f88f6ca773.tar.gz",
+    commit = "0a0452b2c39bdd91e252aef045c115f88f6ca773",  # keep-in-sync-with-submodule: lwip
+    remote = "https://github.com/lwip-tcpip/lwip.git",
 )
 
 register_toolchains(
