@@ -48,7 +48,7 @@ void cyw43_driver_deinit(struct async_context *context);
 #define CYW43_PIO_CLOCK_DIV_DYNAMIC 0
 #endif
 
-// PICO_CONFIG: CYW43_PIO_CLOCK_DIV_INT, Integer part of the clock divider for communication with the wireless chip, type=bool, default=2, group=pico_cyw43_driver
+// PICO_CONFIG: CYW43_PIO_CLOCK_DIV_INT, Integer part of the clock divider for communication with the wireless chip, type=int, default=2, group=pico_cyw43_driver
 #ifndef CYW43_PIO_CLOCK_DIV_INT
 // backwards compatibility using old define
 #ifdef CYW43_PIO_CLOCK_DIV
@@ -58,9 +58,13 @@ void cyw43_driver_deinit(struct async_context *context);
 #endif
 #endif
 
-// PICO_CONFIG: CYW43_PIO_CLOCK_DIV_FRAC, Fractional part of the clock divider for communication with the wireless chip, type=bool, default=0, group=pico_cyw43_driver
-#ifndef CYW43_PIO_CLOCK_DIV_FRAC
-#define CYW43_PIO_CLOCK_DIV_FRAC 0
+// PICO_CONFIG: CYW43_PIO_CLOCK_DIV_FRAC8, Fractional part of the clock divider for communication with the wireless chip 0-255, type=int, min=0, max=255, default=0, group=pico_cyw43_driver
+#ifndef CYW43_PIO_CLOCK_DIV_FRAC8
+#ifdef CYW43_PIO_CLOCK_DIV_FRAC
+#define CYW43_PIO_CLOCK_DIV_FRAC8 CYW43_PIO_CLOCK_DIV_FRAC
+#else
+#define CYW43_PIO_CLOCK_DIV_FRAC8 0
+#endif
 #endif
 
 // PICO_CONFIG: CYW43_PIN_WL_DYNAMIC, flag to indicate if cyw43 SPI pins can be changed at runtime, type=bool, advanced=true, group=pico_cyw43_driver
@@ -86,9 +90,14 @@ void cyw43_driver_deinit(struct async_context *context);
  * This function is only available if \ref CYW43_PIO_CLOCK_DIV_DYNAMIC is true
  *
  * \param clock_div_int Integer part of the divisor
- * \param clock_div_frac Fractional part in 1/256ths
+ * \param clock_div_frac8 Fractional part in 1/256ths
 */
-void cyw43_set_pio_clock_divisor(uint16_t clock_div_int, uint8_t clock_div_frac);
+void cyw43_set_pio_clkdiv_int_frac8(uint32_t clock_div_int, uint8_t clock_div_frac8);
+
+// backwards compatibility
+static inline void cyw43_set_pio_clock_divisor(uint16_t clock_div_int, uint8_t clock_div_frac8) {
+    return cyw43_set_pio_clkdiv_int_frac8(clock_div_int, clock_div_frac8);
+}
 #endif
 
 #if CYW43_PIN_WL_DYNAMIC

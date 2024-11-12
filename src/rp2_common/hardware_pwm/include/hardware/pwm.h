@@ -162,32 +162,38 @@ static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
  *  \ingroup hardware_pwm
  *
  * \param c PWM configuration struct to modify
- * \param integer 8 bit integer part of the clock divider. Must be greater than or equal to 1.
- * \param fract 4 bit fractional part of the clock divider
+ * \param div_int 8 bit integer part of the clock divider. Must be greater than or equal to 1.
+ * \param div_frac4 4 bit fractional part of the clock divider
  *
  * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
  * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
  * before passing them on to the PWM counter.
  */
-static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t integer, uint8_t fract) {
-    valid_params_if(HARDWARE_PWM, integer >= 1);
-    valid_params_if(HARDWARE_PWM, fract < 16);
-    c->div = (((uint)integer) << PWM_CH0_DIV_INT_LSB) | (((uint)fract) << PWM_CH0_DIV_FRAC_LSB);
+static inline void pwm_config_set_clkdiv_int_frac4(pwm_config *c, uint32_t div_int, uint8_t div_frac4) {
+    static_assert(PWM_CH0_DIV_INT_MSB - PWM_CH0_DIV_INT_LSB == 7, "");
+    valid_params_if(HARDWARE_PWM, div_int >= 1 && div_int < 256);
+    static_assert(PWM_CH0_DIV_FRAC_MSB - PWM_CH0_DIV_FRAC_LSB == 3, "");
+    valid_params_if(HARDWARE_PWM, div_frac4 < 16);
+    c->div = (((uint)div_int) << PWM_CH0_DIV_INT_LSB) | (((uint)div_frac4) << PWM_CH0_DIV_FRAC_LSB);
+}
+
+// backwards compatibility
+static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t div_int, uint8_t div_frac4) {
+    pwm_config_set_clkdiv_int_frac4(c, div_int, div_frac4);
 }
 
 /** \brief Set PWM clock divider in a PWM configuration
  *  \ingroup hardware_pwm
  *
  * \param c PWM configuration struct to modify
- * \param div Integer value to reduce counting rate by. Must be greater than or equal to 1.
+ * \param div_int Integer value to reduce counting rate by. Must be greater than or equal to 1 and less than 256.
  *
  * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
  * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
  * before passing them on to the PWM counter.
  */
-static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
-    valid_params_if(HARDWARE_PWM, div >= 1 && div < 256);
-    pwm_config_set_clkdiv_int_frac(c, (uint8_t)div, 0);
+static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint32_t div_int) {
+    pwm_config_set_clkdiv_int_frac4(c, div_int, 0);
 }
 
 /** \brief Set PWM counting mode in a PWM configuration
@@ -427,14 +433,20 @@ static inline void pwm_retard_count(uint slice_num) {
  * Set the clock divider. Counter increment will be on sysclock divided by this value, taking into account the gating.
  *
  * \param slice_num PWM slice number
- * \param integer  8 bit integer part of the clock divider
- * \param fract 4 bit fractional part of the clock divider
+ * \param div_int  8 bit integer part of the clock divider
+ * \param div_frac4 4 bit fractional part of the clock divider
  */
-static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t integer, uint8_t fract) {
+static inline void pwm_set_clkdiv_int_frac4(uint slice_num, uint8_t div_int, uint8_t div_frac4) {
     check_slice_num_param(slice_num);
-    valid_params_if(HARDWARE_PWM, integer >= 1);
-    valid_params_if(HARDWARE_PWM, fract < 16);
-    pwm_hw->slice[slice_num].div = (((uint)integer) << PWM_CH0_DIV_INT_LSB) | (((uint)fract) << PWM_CH0_DIV_FRAC_LSB);
+    valid_params_if(HARDWARE_PWM, div_int >= 1);
+    static_assert(PWM_CH0_DIV_FRAC_MSB - PWM_CH0_DIV_FRAC_LSB == 3, "");
+    valid_params_if(HARDWARE_PWM, div_frac4 < 16);
+    pwm_hw->slice[slice_num].div = (((uint)div_int) << PWM_CH0_DIV_INT_LSB) | (((uint)div_frac4) << PWM_CH0_DIV_FRAC_LSB);
+}
+
+// backwards compatibility
+static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t div_int, uint8_t div_frac4) {
+    pwm_set_clkdiv_int_frac4(slice_num, div_int, div_frac4);
 }
 
 /** \brief Set PWM clock divider
@@ -450,7 +462,7 @@ static inline void pwm_set_clkdiv(uint slice_num, float divider) {
     valid_params_if(HARDWARE_PWM, divider >= 1.f && divider < 256.f);
     uint8_t i = (uint8_t)divider;
     uint8_t f = (uint8_t)((divider - i) * (0x01 << 4));
-    pwm_set_clkdiv_int_frac(slice_num, i, f);
+    pwm_set_clkdiv_int_frac4(slice_num, i, f);
 }
 
 /** \brief Set PWM output polarity
