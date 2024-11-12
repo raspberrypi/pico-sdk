@@ -150,6 +150,12 @@ BAZEL_ONLY_ALLOWLIST = (
     # Allows selection of clang/gcc when using the dynamically fetched
     # toolchains.
     "PICO_TOOLCHAIN",
+    # In CMake, linking these libraries also sets defines for adjacent
+    # libraries. That's an antipattern in Bazel, so there's flags to control
+    # which modules to enable instead.
+    "PICO_ENABLE_BLE",
+    "PICO_ENABLE_CLASSIC",
+    "PICO_ENABLE_MESH",
 )
 
 

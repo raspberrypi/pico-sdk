@@ -11,9 +11,10 @@ cc_library(
         "contrib/ports/freertos/include/arch",
         "src/include",
     ],
-    visibility = ["//visibility:private"],
+    visibility = [
+        "@pico-sdk//src/rp2_common/pico_lwip:__pkg__",
+    ],
     deps = [
-        "@pico-sdk//bazel/config:PICO_LWIP_CONFIG",
         "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_config",
     ],
 )
@@ -21,29 +22,24 @@ cc_library(
 cc_library(
     name = "pico_lwip_core",
     srcs = glob(["src/core/*.c"]),
-    target_compatible_with = incompatible_with_config(
-        "@pico-sdk//bazel/constraint:pico_lwip_config_unset",
-    ),
     deps = [
         ":pico_lwip_headers",
-    ] + select({
-        "@pico-sdk//bazel/constraint:pico_freertos_unset": [],
-        "//conditions:default": [
-            ":pico_lwip_contrib_freertos",
-        ],
-    }),
+        "@pico-sdk//bazel/config:PICO_LWIP_CONFIG",
+    ],
 )
 
 cc_library(
     name = "pico_lwip_core4",
     srcs = glob(["src/core/ipv4/*.c"]),
     deps = [":pico_lwip_core"],
+    alwayslink = True,
 )
 
 cc_library(
     name = "pico_lwip_core6",
     srcs = glob(["src/core/ipv6/*.c"]),
     deps = [":pico_lwip_core"],
+    alwayslink = True,
 )
 
 cc_library(

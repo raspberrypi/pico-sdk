@@ -11,14 +11,7 @@ cc_library(
         "src/cyw43_stats.c",
     ],
     hdrs = glob(["**/*.h"]),
-    defines = select({
-        "@pico-sdk//bazel/constraint:pico_btstack_config_unset": [
-            "CYW43_ENABLE_BLUETOOTH=0",
-        ],
-        "//conditions:default": [
-            "CYW43_ENABLE_BLUETOOTH=1",
-        ],
-    }),
+    defines = ["CYW43_ENABLE_BLUETOOTH=1"],
     includes = [
         "firmware",
         "src",

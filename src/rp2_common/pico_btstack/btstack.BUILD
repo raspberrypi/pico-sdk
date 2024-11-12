@@ -1,4 +1,5 @@
-load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config")
+load("@pico-sdk//bazel:defs.bzl", "compatible_with_config")
+load("@pico-sdk//bazel/util:sdk_define.bzl", "pico_sdk_define")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -14,15 +15,53 @@ _DISABLE_WARNINGS = [
     "-Wno-unused-parameter",
 ]
 
+pico_sdk_define(
+    name = "PICO_ENABLE_BLE",
+    define_name = "ENABLE_BLE",
+    from_flag = "@pico-sdk//bazel/config:PICO_BT_ENABLE_BLE",
+)
+
+pico_sdk_define(
+    name = "PICO_ENABLE_MESH",
+    define_name = "ENABLE_MESH",
+    from_flag = "@pico-sdk//bazel/config:PICO_BT_ENABLE_MESH",
+)
+
+pico_sdk_define(
+    name = "PICO_ENABLE_CLASSIC",
+    define_name = "ENABLE_CLASSIC",
+    from_flag = "@pico-sdk//bazel/config:PICO_BT_ENABLE_CLASSIC",
+)
+
+cc_library(
+    name = "pico_btstack_base_headers",
+    hdrs = glob(["**/*.h"]),
+    visibility = ["//visibility:private"],
+    includes = [
+        ".",
+        "3rd-party/md5",
+        "3rd-party/micro-ecc",
+        "3rd-party/rijndael",
+        "3rd-party/segger-rtt",
+        "3rd-party/yxml",
+        "platform/embedded",
+        "src",
+    ],
+    deps = [
+        ":PICO_ENABLE_BLE",
+        ":PICO_ENABLE_MESH",
+        ":PICO_ENABLE_CLASSIC",
+        "@pico-sdk//bazel/config:PICO_BTSTACK_CONFIG"
+    ],
+)
+
 cc_library(
     name = "pico_btstack_base",
     srcs = [
-        "3rd-party/md5/md5.c",
         "3rd-party/micro-ecc/uECC.c",
         "3rd-party/rijndael/rijndael.c",
         "3rd-party/segger-rtt/SEGGER_RTT.c",
         "3rd-party/segger-rtt/SEGGER_RTT_printf.c",
-        "3rd-party/yxml/yxml.c",
         "platform/embedded/btstack_tlv_flash_bank.c",
         "platform/embedded/hci_dump_embedded_stdout.c",
         "platform/embedded/hci_dump_segger_rtt_stdout.c",
@@ -30,6 +69,7 @@ cc_library(
         "src/btstack_audio.c",
         "src/btstack_base64_decoder.c",
         "src/btstack_crypto.c",
+        "src/btstack_hid.c",
         "src/btstack_hid_parser.c",
         "src/btstack_linked_list.c",
         "src/btstack_memory.c",
@@ -48,25 +88,11 @@ cc_library(
         "src/hci_event.c",
         "src/l2cap.c",
         "src/l2cap_signaling.c",
-        "src/mesh/gatt-service/mesh_provisioning_service_server.c",
-        "src/mesh/gatt-service/mesh_proxy_service_server.c",
+        "3rd-party/md5/md5.c",
+        "3rd-party/yxml/yxml.c",
     ],
-    hdrs = glob(["**/*.h"]),
     copts = _DISABLE_WARNINGS,
-    includes = [
-        ".",
-        "3rd-party/md5",
-        "3rd-party/micro-ecc",
-        "3rd-party/rijndael",
-        "3rd-party/segger-rtt",
-        "3rd-party/yxml",
-        "platform/embedded",
-        "src",
-    ],
-    target_compatible_with = incompatible_with_config(
-        "@pico-sdk//bazel/constraint:pico_btstack_config_unset",
-    ),
-    deps = ["@pico-sdk//bazel/config:PICO_BTSTACK_CONFIG"],
+    deps = [":pico_btstack_base_headers"],
 )
 
 cc_library(
@@ -76,25 +102,26 @@ cc_library(
         "src/ble/att_db_util.c",
         "src/ble/att_dispatch.c",
         "src/ble/att_server.c",
-        "src/ble/gatt-service/ancs_client.c",
-        "src/ble/gatt-service/battery_service_client.c",
         "src/ble/gatt-service/battery_service_server.c",
+        "src/ble/gatt-service/battery_service_client.c",
         "src/ble/gatt-service/cycling_power_service_server.c",
         "src/ble/gatt-service/cycling_speed_and_cadence_service_server.c",
-        "src/ble/gatt-service/device_information_service_client.c",
         "src/ble/gatt-service/device_information_service_server.c",
+        "src/ble/gatt-service/device_information_service_client.c",
         "src/ble/gatt-service/heart_rate_service_server.c",
         "src/ble/gatt-service/hids_client.c",
         "src/ble/gatt-service/hids_device.c",
         "src/ble/gatt-service/nordic_spp_service_server.c",
         "src/ble/gatt-service/ublox_spp_service_server.c",
+        "src/ble/gatt-service/ancs_client.c",
         "src/ble/gatt_client.c",
         "src/ble/le_device_db_memory.c",
         "src/ble/le_device_db_tlv.c",
         "src/ble/sm.c",
     ],
     copts = _DISABLE_WARNINGS,
-    deps = [":pico_btstack_base"],
+    target_compatible_with = compatible_with_config("@pico-sdk//bazel/constraint:pico_bt_enable_ble_enabled"),
+    deps = [":pico_btstack_base_headers"],
 )
 
 cc_library(
@@ -146,12 +173,61 @@ cc_library(
         "src/classic/spp_server.c",
     ],
     copts = _DISABLE_WARNINGS,
-    deps = [":pico_btstack_base"],
+    target_compatible_with = compatible_with_config("@pico-sdk//bazel/constraint:pico_bt_enable_classic_enabled"),
+    deps = [
+        ":pico_btstack_base",
+        ":pico_btstack_base_headers",
+    ],
+)
+
+cc_library(
+    name = "pico_btstack_mesh",
+    srcs = [
+        "src/mesh/adv_bearer.c",
+        "src/mesh/beacon.c",
+        "src/mesh/gatt_bearer.c",
+        "src/mesh/gatt-service/mesh_provisioning_service_server.c",
+        "src/mesh/gatt-service/mesh_proxy_service_server.c",
+        "src/mesh/mesh.c",
+        "src/mesh/mesh_access.c",
+        "src/mesh/mesh_configuration_client.c",
+        "src/mesh/mesh_configuration_server.c",
+        "src/mesh/mesh_crypto.c",
+        "src/mesh/mesh_foundation.c",
+        "src/mesh/mesh_generic_default_transition_time_client.c",
+        "src/mesh/mesh_generic_default_transition_time_server.c",
+        "src/mesh/mesh_generic_level_client.c",
+        "src/mesh/mesh_generic_level_server.c",
+        "src/mesh/mesh_generic_on_off_client.c",
+        "src/mesh/mesh_generic_on_off_server.c",
+        "src/mesh/mesh_health_server.c",
+        "src/mesh/mesh_iv_index_seq_number.c",
+        "src/mesh/mesh_keys.c",
+        "src/mesh/mesh_lower_transport.c",
+        "src/mesh/mesh_network.c",
+        "src/mesh/mesh_node.c",
+        "src/mesh/mesh_peer.c",
+        "src/mesh/mesh_proxy.c",
+        "src/mesh/mesh_upper_transport.c",
+        "src/mesh/mesh_virtual_addresses.c",
+        "src/mesh/pb_adv.c",
+        "src/mesh/pb_gatt.c",
+        "src/mesh/provisioning.c",
+        "src/mesh/provisioning_device.c",
+        "src/mesh/provisioning_provisioner.c",
+    ],
+    copts = _DISABLE_WARNINGS,
+    target_compatible_with = compatible_with_config("@pico-sdk//bazel/constraint:pico_bt_enable_mesh_enabled"),
+    deps = [
+        ":pico_btstack_base_headers",
+        ":pico_btstack_ble",
+    ],
 )
 
 cc_library(
     name = "pico_btstack_sbc_encoder",
     srcs = [
+        "src/classic/btstack_sbc_encoder_bluedroid.c",
         "3rd-party/bluedroid/encoder/srce/sbc_analysis.c",
         "3rd-party/bluedroid/encoder/srce/sbc_dct.c",
         "3rd-party/bluedroid/encoder/srce/sbc_dct_coeffs.c",
@@ -160,11 +236,34 @@ cc_library(
         "3rd-party/bluedroid/encoder/srce/sbc_enc_coeffs.c",
         "3rd-party/bluedroid/encoder/srce/sbc_encoder.c",
         "3rd-party/bluedroid/encoder/srce/sbc_packing.c",
-        "src/classic/btstack_sbc_encoder_bluedroid.c",
     ],
     copts = _DISABLE_WARNINGS,
     includes = ["3rd-party/bluedroid/decoder/include"],
-    deps = [":pico_btstack_base"],
+    deps = [":pico_btstack_base_headers"],
+)
+
+cc_library(
+    name = "pico_btstack_sbc_decoder",
+    srcs = [
+        "src/classic/btstack_sbc_decoder_bluedroid.c",
+        "3rd-party/bluedroid/decoder/srce/alloc.c",
+        "3rd-party/bluedroid/decoder/srce/bitalloc.c",
+        "3rd-party/bluedroid/decoder/srce/bitalloc-sbc.c",
+        "3rd-party/bluedroid/decoder/srce/bitstream-decode.c",
+        "3rd-party/bluedroid/decoder/srce/decoder-oina.c",
+        "3rd-party/bluedroid/decoder/srce/decoder-private.c",
+        "3rd-party/bluedroid/decoder/srce/decoder-sbc.c",
+        "3rd-party/bluedroid/decoder/srce/dequant.c",
+        "3rd-party/bluedroid/decoder/srce/framing.c",
+        "3rd-party/bluedroid/decoder/srce/framing-sbc.c",
+        "3rd-party/bluedroid/decoder/srce/oi_codec_version.c",
+        "3rd-party/bluedroid/decoder/srce/synthesis-sbc.c",
+        "3rd-party/bluedroid/decoder/srce/synthesis-dct8.c",
+        "3rd-party/bluedroid/decoder/srce/synthesis-8-generated.c",
+    ],
+    copts = _DISABLE_WARNINGS,
+    includes = ["3rd-party/bluedroid/decoder/include"],
+    deps = [":pico_btstack_base_headers"],
 )
 
 cc_library(
@@ -175,7 +274,10 @@ cc_library(
     ],
     copts = _DISABLE_WARNINGS,
     includes = ["platform/lwip"],
-    deps = [":pico_btstack_base"],
+    deps = [
+        ":pico_btstack_base_headers",
+        "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_nosys",
+    ],
 )
 
 cc_library(
@@ -193,5 +295,8 @@ cc_library(
         "platform/freertos",
         "platform/lwip",
     ],
-    deps = [":pico_btstack_base"],
+    deps = [
+        ":pico_btstack_base_headers",
+        "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_freertos",
+    ],
 )

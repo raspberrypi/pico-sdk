@@ -49,6 +49,11 @@ config_setting(
 )
 
 config_setting(
+    name = "is_pico2_w",
+    flag_values = {"//bazel/config:PICO_BOARD": "pico2_w"},
+)
+
+config_setting(
     name = "pico_toolchain_clang_enabled",
     flag_values = {"//bazel/config:PICO_TOOLCHAIN": "clang"},
 )
@@ -199,13 +204,18 @@ config_setting(
 )
 
 config_setting(
-    name = "pico_btstack_config_unset",
-    flag_values = {"//bazel/config:PICO_BTSTACK_CONFIG": "//bazel:empty_cc_lib"},
+    name = "pico_bt_enable_ble_enabled",
+    flag_values = {"//bazel/config:PICO_BT_ENABLE_BLE": "True"},
 )
 
 config_setting(
-    name = "pico_lwip_config_unset",
-    flag_values = {"//bazel/config:PICO_LWIP_CONFIG": "//bazel:empty_cc_lib"},
+    name = "pico_bt_enable_classic_enabled",
+    flag_values = {"//bazel/config:PICO_BT_ENABLE_CLASSIC": "True"},
+)
+
+config_setting(
+    name = "pico_bt_enable_mesh_enabled",
+    flag_values = {"//bazel/config:PICO_BT_ENABLE_MESH": "True"},
 )
 
 config_setting(
