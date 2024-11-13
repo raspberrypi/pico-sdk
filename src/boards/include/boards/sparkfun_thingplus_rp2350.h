@@ -114,6 +114,7 @@
 #define CYW43_WL_GPIO_VBUS_PIN 2
 #endif
 
+// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif
