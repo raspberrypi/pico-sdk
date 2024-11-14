@@ -157,7 +157,6 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
 
     pico_add_library(pico_btstack_mesh)
     target_sources(pico_btstack_mesh INTERFACE
-        ${PICO_BTSTACK_PATH}/src/mesh/mesh.c
         ${PICO_BTSTACK_PATH}/src/mesh/adv_bearer.c
         ${PICO_BTSTACK_PATH}/src/mesh/beacon.c
         ${PICO_BTSTACK_PATH}/src/mesh/gatt_bearer.c
