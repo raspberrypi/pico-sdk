@@ -640,7 +640,7 @@ static inline int rom_func_otp_access(uint8_t *buf, uint32_t buf_len, otp_cmd_t 
  * a hash of the partition table as of the time it loaded it. If the hash has changed by the time this method is called,
  * then it will return BOOTROM_ERROR_INVALID_STATE.
  * 
- * The information returned is chosen by the flags_and_partition parameter; the first word in the returned buffer,
+ * The information returned is chosen by the partition_and_flags parameter; the first word in the returned buffer,
  * is the (sub)set of those flags that the API supports. You should always check this value before interpreting
  * the buffer.
  * 
