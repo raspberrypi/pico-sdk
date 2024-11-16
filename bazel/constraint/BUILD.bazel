@@ -1,3 +1,5 @@
+load("//bazel/util:label_flag_matches.bzl", "label_flag_matches")
+
 package(default_visibility = ["//visibility:public"])
 
 # This constraint represents the dimension that guides the Pico SDK build. This
@@ -218,7 +220,20 @@ config_setting(
     flag_values = {"//bazel/config:PICO_BT_ENABLE_MESH": "True"},
 )
 
-config_setting(
+label_flag_matches(
+    name = "pico_lwip_config_unset",
+    flag = "//bazel/config:PICO_LWIP_CONFIG",
+    value = "//bazel:empty_cc_lib",
+)
+
+label_flag_matches(
+    name = "pico_btstack_config_unset",
+    flag = "//bazel/config:PICO_BTSTACK_CONFIG",
+    value = "//bazel:empty_cc_lib",
+)
+
+label_flag_matches(
     name = "pico_freertos_unset",
-    flag_values = {"//bazel/config:PICO_FREERTOS_LIB": "//bazel:empty_cc_lib"},
+    flag = "//bazel/config:PICO_FREERTOS_LIB",
+    value = "//bazel:empty_cc_lib",
 )

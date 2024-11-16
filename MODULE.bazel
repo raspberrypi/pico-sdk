@@ -132,3 +132,19 @@ register_toolchains(
     # Require users to opt-in to the Pico SDK's toolchains.
     dev_dependency = True,
 )
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    configure_coverage_tool = True,
+    python_version = "3.9",
+)
+
+use_repo(python, "pythons_hub")
+register_toolchains(
+    "@pythons_hub//:all",
+    dev_dependency = True,
+)
+register_toolchains(
+    "@rules_python//python/runtime_env_toolchains:all",
+    dev_dependency = True,
+)

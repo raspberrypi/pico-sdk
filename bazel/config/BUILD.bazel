@@ -245,7 +245,7 @@ string_flag(
 # PICO_BAZEL_CONFIG: PICO_BTSTACK_CONFIG, [Bazel only] The cc_library that provides btstack_config.h, default=//bazel:empty_cc_lib, group=wireless
 label_flag(
     name = "PICO_BTSTACK_CONFIG",
-    build_setting_default = "//bazel:incompatible_cc_lib",
+    build_setting_default = "//bazel:empty_cc_lib",
 )
 
 # PICO_BAZEL_CONFIG: PICO_BT_ENABLE_BLE, [Bazel only] Whether or not to link in BLE portions of the btstack as part of //src/rp2_common/pico_btstack. Also defines ENABLE_BLE=1, type=bool, default=False, group=wireless
@@ -269,7 +269,7 @@ bool_flag(
 # PICO_BAZEL_CONFIG: PICO_LWIP_CONFIG, [Bazel only] The cc_library that provides lwipopts.h, default=//bazel:empty_cc_lib, group=wireless
 label_flag(
     name = "PICO_LWIP_CONFIG",
-    build_setting_default = "//bazel:incompatible_cc_lib",
+    build_setting_default = "@pico-sdk//bazel:empty_cc_lib",
 )
 
 # PICO_BAZEL_CONFIG: PICO_FREERTOS_LIB, [Bazel only] The cc_library that provides FreeRTOS, default=//bazel:empty_cc_lib, group=wireless

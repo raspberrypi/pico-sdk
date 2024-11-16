@@ -11,7 +11,21 @@ cc_library(
         "src/cyw43_stats.c",
     ],
     hdrs = glob(["**/*.h"]),
-    defines = ["CYW43_ENABLE_BLUETOOTH=1"],
+    defines = select({
+        "@pico-sdk//bazel/constraint:pico_lwip_config_unset": [
+            "CYW43_LWIP=0",
+        ],
+        "//conditions:default": [
+            "CYW43_LWIP=1",
+        ],
+    })+ select({
+        "@pico-sdk//bazel/constraint:pico_btstack_config_unset": [
+            "CYW43_ENABLE_BLUETOOTH=0",
+        ],
+        "//conditions:default": [
+            "CYW43_ENABLE_BLUETOOTH=1",
+        ],
+    }),
     includes = [
         "firmware",
         "src",
@@ -19,6 +33,10 @@ cc_library(
     target_compatible_with = compatible_with_pico_w(),
     deps = [
         "@pico-sdk//src/rp2_common/pico_cyw43_driver:cyw43_configport",
-        "@pico-sdk//src/rp2_common/pico_lwip",
-    ],
+    ] + select({
+        "@pico-sdk//bazel/constraint:pico_lwip_config_unset": [],
+        "//conditions:default": [
+            "@pico-sdk//src/rp2_common/pico_lwip",
+        ],
+    }),
 )

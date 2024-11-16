@@ -1,7 +1,13 @@
+load("@rules_python//python:defs.bzl", "py_binary")
 load("@pico-sdk//bazel:defs.bzl", "compatible_with_config")
-load("@pico-sdk//bazel/util:sdk_define.bzl", "pico_sdk_define")
 
 package(default_visibility = ["//visibility:public"])
+
+# Expose the gatt header for pico_btstack_make_gatt_header.
+exports_files(
+    ["src/bluetooth_gatt.h"],
+    visibility = ["@pico-sdk//bazel:__pkg__"],
+)
 
 _DISABLE_WARNINGS = [
     "-Wno-cast-qual",
@@ -15,28 +21,20 @@ _DISABLE_WARNINGS = [
     "-Wno-unused-parameter",
 ]
 
-pico_sdk_define(
-    name = "PICO_ENABLE_BLE",
-    define_name = "ENABLE_BLE",
-    from_flag = "@pico-sdk//bazel/config:PICO_BT_ENABLE_BLE",
-)
-
-pico_sdk_define(
-    name = "PICO_ENABLE_MESH",
-    define_name = "ENABLE_MESH",
-    from_flag = "@pico-sdk//bazel/config:PICO_BT_ENABLE_MESH",
-)
-
-pico_sdk_define(
-    name = "PICO_ENABLE_CLASSIC",
-    define_name = "ENABLE_CLASSIC",
-    from_flag = "@pico-sdk//bazel/config:PICO_BT_ENABLE_CLASSIC",
-)
-
 cc_library(
     name = "pico_btstack_base_headers",
     hdrs = glob(["**/*.h"]),
     visibility = ["//visibility:private"],
+    defines = select({
+        "@pico-sdk//bazel/constraint:pico_bt_enable_ble_enabled": ["ENABLE_BLE=1"],
+        "//conditions:default": [],
+    }) + select({
+        "@pico-sdk//bazel/constraint:pico_bt_enable_mesh_enabled": ["ENABLE_MESH=1"],
+        "//conditions:default": [],
+    }) + select({
+        "@pico-sdk//bazel/constraint:pico_bt_enable_classic_enabled": ["ENABLE_CLASSIC=1"],
+        "//conditions:default": [],
+    }),
     includes = [
         ".",
         "3rd-party/md5",
@@ -48,9 +46,6 @@ cc_library(
         "src",
     ],
     deps = [
-        ":PICO_ENABLE_BLE",
-        ":PICO_ENABLE_MESH",
-        ":PICO_ENABLE_CLASSIC",
         "@pico-sdk//bazel/config:PICO_BTSTACK_CONFIG"
     ],
 )
@@ -299,4 +294,13 @@ cc_library(
         ":pico_btstack_base_headers",
         "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_freertos",
     ],
+)
+
+py_binary(
+    name = "compile_gatt",
+    srcs = [
+        "tool/compile_gatt.py",
+    ],
+    # TODO: Add pip pins.
+    # deps = ["@python_packages//pycryptodomex"]
 )
