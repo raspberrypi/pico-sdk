@@ -1,16 +1,7 @@
+"""A wrapper that enables a `config_setting` matcher for label_flag flags."""
+
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain", "use_cpp_toolchain")
-
-def _cc_toolchain_feature_is_enabled_impl(ctx):
-    toolchain = find_cpp_toolchain(ctx)
-    feature_configuration = cc_common.configure_features(
-        ctx = ctx,
-        cc_toolchain = toolchain,
-    )
-    val = cc_common.is_enabled(
-        feature_configuration = feature_configuration,
-        feature_name = ctx.attr.feature_name,
-    )
 
 def _match_label_flag_impl(ctx):
     matches = str(ctx.attr.expected_value.label) == str(ctx.attr.flag.label)
