@@ -26,11 +26,11 @@ void stdio_rtt_deinit(void) {
 }
 
 static void stdio_rtt_out_chars(const char *buf, int length) {
-    SEGGER_RTT_Write(0, buf, length);
+    SEGGER_RTT_Write(0, buf, (unsigned)length);
 }
 
 static int stdio_rtt_in_chars(char *buf, int length) {
-    return SEGGER_RTT_Read(0, buf, length);
+    return (int)SEGGER_RTT_Read(0, buf, (unsigned)length);
 }
 
 stdio_driver_t stdio_rtt = {

@@ -28,7 +28,6 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     target_sources(pico_btstack_base INTERFACE
         ${PICO_BTSTACK_PATH}/3rd-party/micro-ecc/uECC.c
         ${PICO_BTSTACK_PATH}/3rd-party/rijndael/rijndael.c
-        ${PICO_BTSTACK_PATH}/3rd-party/segger-rtt/SEGGER_RTT.c
         ${PICO_BTSTACK_PATH}/3rd-party/segger-rtt/SEGGER_RTT_printf.c
         ${PICO_BTSTACK_PATH}/platform/embedded/btstack_tlv_flash_bank.c
         ${PICO_BTSTACK_PATH}/platform/embedded/hci_dump_embedded_stdout.c
@@ -60,6 +59,13 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/3rd-party/yxml/yxml.c
         ${CMAKE_CURRENT_LIST_DIR}/btstack_stdin_pico.c
     )
+    # pico-sdk now supports RTT using pico_enable_stdio_rtt in your cmake file or -DPICO_STDIO_RTT=1 on the command line
+    # Then the output of printf goes to RTT. But if you define ENABLE_SEGGER_RTT=1 it will use the btstack functionality to use RTT
+    # and we'll have to add the source file it requires.
+    target_sources(pico_btstack_base INTERFACE
+        $<IF:$<BOOL:$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_STDIO_RTT>,>,${PICO_STDIO_RTT},$<TARGET_PROPERTY:PICO_TARGET_STDIO_RTT>>>,,${PICO_BTSTACK_PATH}/3rd-party/segger-rtt/SEGGER_RTT.c>
+    )
+
     target_include_directories(pico_btstack_base_headers SYSTEM INTERFACE
         ${PICO_BTSTACK_PATH}/
         ${PICO_BTSTACK_PATH}/3rd-party/md5

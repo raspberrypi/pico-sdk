@@ -78,6 +78,11 @@ Additional information:
 
 #include <string.h>                 // for memcpy
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wcast-qual"
+#pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 /*********************************************************************
 *
 *       Configuration, default values
