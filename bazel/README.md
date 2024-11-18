@@ -6,7 +6,7 @@
 First, in your `MODULE.bazel` file, add a dependency on the Pico SDK and
 `rules_cc`:
 ```python
-bazel_dep(name = "pico-sdk", version = "2.0.1")
+bazel_dep(name = "pico-sdk", version = "2.1.0")
 ```
 
 ### Register toolchains
