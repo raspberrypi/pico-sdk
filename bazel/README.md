@@ -92,7 +92,8 @@ you encounter along the way.
 
 Currently, the following features are not supported:
 
-* Pico W wireless libraries work, but may not have complete coverage.
+* Pico W wireless libraries work, but may not have complete feature parity with
+  the CMake build.
 * Bazel does not yet provide RISC-V support for Pico 2/RP2350.
 * The pioasm parser cannot be built from source via Bazel.
 * Windows MSVC wildcard build (`bazel build //...`) does not work when targeting
