@@ -239,7 +239,7 @@ def CompareExternalDependencyVersions():
                 continue
 
             current_submodule_pin = subprocess.run(
-                ("git", "-C", SDK_ROOT, "rev-parse", f'HEAD:lib/{maybe_match.group("dependency")}'),
+                ("git", "-C", SDK_ROOT, "rev-parse", f'HEAD:{maybe_match.group("dependency")}'),
                 text=True,
                 check=True,
                 capture_output=True,

@@ -90,7 +90,7 @@ new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl"
 new_git_repository(
     name = "tinyusb",
     build_file = "//src/rp2_common/tinyusb:tinyusb.BUILD",
-    commit = "4232642899362fa5e9cf0dc59bad6f1f6d32c563",  # keep-in-sync-with-submodule: tinyusb
+    commit = "4232642899362fa5e9cf0dc59bad6f1f6d32c563",  # keep-in-sync-with-submodule: lib/tinyusb
     remote = "https://github.com/hathach/tinyusb.git",
 )
 
@@ -98,7 +98,7 @@ new_git_repository(
 new_git_repository(
     name = "btstack",
     build_file = "//src/rp2_common/pico_btstack:btstack.BUILD",
-    commit = "2b49e57bd1fae85ac32ac1f41cdb7c794de335f6",  # keep-in-sync-with-submodule: btstack
+    commit = "2b49e57bd1fae85ac32ac1f41cdb7c794de335f6",  # keep-in-sync-with-submodule: lib/btstack
     remote = "https://github.com/bluekitchen/btstack.git",
 )
 
@@ -106,7 +106,7 @@ new_git_repository(
 new_git_repository(
     name = "cyw43-driver",
     build_file = "//src/rp2_common/pico_cyw43_driver:cyw43-driver.BUILD",
-    commit = "cf924bb04c8984675ca0fc2178f082e404e048c3",  # keep-in-sync-with-submodule: cyw43-driver
+    commit = "cf924bb04c8984675ca0fc2178f082e404e048c3",  # keep-in-sync-with-submodule: lib/cyw43-driver
     remote = "https://github.com/georgerobotics/cyw43-driver.git",
 )
 
@@ -114,7 +114,7 @@ new_git_repository(
 new_git_repository(
     name = "lwip",
     build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
-    commit = "0a0452b2c39bdd91e252aef045c115f88f6ca773",  # keep-in-sync-with-submodule: lwip
+    commit = "0a0452b2c39bdd91e252aef045c115f88f6ca773",  # keep-in-sync-with-submodule: lib/lwip
     remote = "https://github.com/lwip-tcpip/lwip.git",
 )
 
