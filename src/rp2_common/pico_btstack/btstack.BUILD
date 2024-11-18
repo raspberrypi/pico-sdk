@@ -1,5 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("@pico-sdk//bazel:defs.bzl", "compatible_with_config")
+load("@pico-sdk//bazel:defs.bzl", "compatible_with_config", "incompatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -87,6 +87,7 @@ cc_library(
         "3rd-party/yxml/yxml.c",
     ],
     copts = _DISABLE_WARNINGS,
+    target_compatible_with = incompatible_with_config("@pico-sdk//bazel/constraint:pico_btstack_config_unset"),
     deps = [":pico_btstack_base_headers"],
 )
 

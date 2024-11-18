@@ -21,6 +21,7 @@ cc_library(
         "//bazel/constraint:pico_bt_enable_mesh_enabled": [":pico_btstack_mesh"],
         "//conditions:default": [],
     }),
+    target_compatible_with = incompatible_with_config("//bazel/constraint:pico_btstack_config_unset"),
 )
 
 # Prefer these aliases to directly referencing @btstack, as it's possible that
@@ -89,7 +90,7 @@ cc_library(
 cc_library(
     name = "pico_btstack_stdin",
     srcs = ["btstack_stdin_pico.c"],
-    target_compatible_with = compatible_with_pico_w(),
+    target_compatible_with = compatible_with_pico_w() + incompatible_with_config("//bazel/constraint:pico_btstack_config_unset"),
     deps = [
         "//bazel/config:PICO_BTSTACK_CONFIG",
         "//src/rp2_common:pico_platform",
