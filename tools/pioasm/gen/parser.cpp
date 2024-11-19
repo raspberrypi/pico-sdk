@@ -1127,7 +1127,7 @@ namespace yy {
     break;
 
   case 22: // directive: ".in" value direction autop threshold
-                                           { pioasm.get_current_program(yystack_[4].location, ".out", true).set_in(yylhs.location, yystack_[3].value.as < std::shared_ptr<resolvable> > (), yystack_[2].value.as < bool > (), yystack_[1].value.as < bool > (), yystack_[0].value.as < std::shared_ptr<resolvable> > ()); }
+                                           { pioasm.get_current_program(yystack_[4].location, ".in", true).set_in(yylhs.location, yystack_[3].value.as < std::shared_ptr<resolvable> > (), yystack_[2].value.as < bool > (), yystack_[1].value.as < bool > (), yystack_[0].value.as < std::shared_ptr<resolvable> > ()); }
     break;
 
   case 23: // directive: ".out" value direction autop threshold
@@ -1135,7 +1135,7 @@ namespace yy {
     break;
 
   case 24: // directive: ".set" value
-                                      { pioasm.check_version(1, yylhs.location, ".in"); pioasm.get_current_program(yystack_[1].location, ".out", true).set_set_count(yylhs.location, yystack_[0].value.as < std::shared_ptr<resolvable> > ()); }
+                                      { pioasm.get_current_program(yystack_[1].location, ".set", true).set_set_count(yylhs.location, yystack_[0].value.as < std::shared_ptr<resolvable> > ()); }
     break;
 
   case 25: // directive: ".wrap_target"

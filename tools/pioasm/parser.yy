@@ -199,9 +199,9 @@ directive:
   | SIDE_SET value OPTIONAL           { pioasm.get_current_program(@1, ".side_set", true).set_sideset(@$, $2, true, false); }
   | SIDE_SET value PINDIRS            { pioasm.get_current_program(@1, ".side_set", true).set_sideset(@$, $2, false, true); }
   | SIDE_SET value                    { pioasm.get_current_program(@1, ".side_set", true).set_sideset(@$, $2, false, false); }
-  | DOT_IN value direction autop threshold { pioasm.get_current_program(@1, ".out", true).set_in(@$, $2, $3, $4, $5); }
+  | DOT_IN value direction autop threshold { pioasm.get_current_program(@1, ".in", true).set_in(@$, $2, $3, $4, $5); }
   | DOT_OUT value direction autop threshold { pioasm.get_current_program(@1, ".out", true).set_out(@$, $2, $3, $4, $5); }
-  | DOT_SET value                     { pioasm.check_version(1, @$, ".in"); pioasm.get_current_program(@1, ".out", true).set_set_count(@$, $2); }
+  | DOT_SET value                     { pioasm.get_current_program(@1, ".set", true).set_set_count(@$, $2); }
   | WRAP_TARGET                       { pioasm.get_current_program(@1, ".wrap_target").set_wrap_target(@$); }
   | WRAP                              { pioasm.get_current_program(@1, ".wrap").set_wrap(@$); }
   | WORD value                        { pioasm.get_current_program(@1, "instruction").add_instruction(std::shared_ptr<instruction>(new instr_word(@$, $2))); }
