@@ -29,6 +29,11 @@ chip_interfaces = {
     'RP2350B': "src/rp2350/rp2350b_interface_pins.json",
 }
 
+compulsory_cmake_settings = set(['PICO_PLATFORM'])
+compulsory_cmake_default_settings = set(['PICO_FLASH_SIZE_BYTES'])
+matching_cmake_default_settings = set(['PICO_FLASH_SIZE_BYTES', 'PICO_RP2350_A2_SUPPORTED'])
+compulsory_defines = set(['PICO_FLASH_SIZE_BYTES'])
+
 DefineType = namedtuple("DefineType", ["name", "value", "resolved_value", "lineno"])
 
 def list_to_string_with(lst, joiner):
@@ -230,7 +235,13 @@ with open(board_header) as header_fh:
             if name in cmake_settings:
                 raise Exception("{}:{}  Multiple values for pico_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
             else:
-               cmake_settings[name] = DefineType(name, value, None, lineno)
+                if value:
+                    try:
+                        # most cmake settings are integer values
+                        value = int(value, 0)
+                    except ValueError:
+                        pass
+                cmake_settings[name] = DefineType(name, value, None, lineno)
             continue
 
         # look for "// pico_cmake_set_default BLAH_BLAH=42"
@@ -246,7 +257,13 @@ with open(board_header) as header_fh:
             if name in cmake_default_settings:
                 raise Exception("{}:{}  Multiple values for pico_cmake_set_default {} ({} and {})".format(board_header, lineno, name, cmake_default_settings[name].value, value))
             else:
-               cmake_default_settings[name] = DefineType(name, value, None, lineno)
+                if value:
+                    try:
+                        # most cmake settings are integer values
+                        value = int(value, 0)
+                    except ValueError:
+                        pass
+                cmake_default_settings[name] = DefineType(name, value, None, lineno)
             continue
 
         # look for "#else"
@@ -362,8 +379,9 @@ if board_header_basename == "none.h":
     chip = 'RP2040'
     other_chip = 'RP2350'
 else:
-    if 'PICO_PLATFORM' not in cmake_settings:
-        raise Exception("{} is missing a pico_cmake_set {} comment".format(board_header, 'PICO_PLATFORM'))
+    for setting in compulsory_cmake_settings:
+        if setting not in cmake_settings:
+            raise Exception("{} is missing a pico_cmake_set {} comment".format(board_header, setting))
     if cmake_settings['PICO_PLATFORM'].value == "rp2040":
         chip = 'RP2040'
         other_chip = 'RP2350'
@@ -375,19 +393,25 @@ else:
             chip = 'RP2350B'
         if not board_header.endswith("amethyst_fpga.h"):
             if 'PICO_RP2350_A2_SUPPORTED' not in cmake_default_settings:
-                raise Exception("{} uses chip {} but is missing a pico_cmake_set_default {}".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
+                raise Exception("{} uses chip {} but is missing a pico_cmake_set_default {} comment".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
             if 'PICO_RP2350_A2_SUPPORTED' not in defines:
                 raise Exception("{} uses chip {} but is missing a #define {}".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
-            if int(cmake_default_settings['PICO_RP2350_A2_SUPPORTED'].value) != defines['PICO_RP2350_A2_SUPPORTED'].resolved_value:
-                raise Exception("{} has mismatched pico_cmake_set_default and #define values for {}".format(board_header, 'PICO_RP2350_A2_SUPPORTED'))
             if defines['PICO_RP2350_A2_SUPPORTED'].resolved_value != 1:
                 raise Exception("{} sets #define {} {} (should be 1)".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED', defines['PICO_RP2350_A2_SUPPORTED'].resolved_value))
-    if 'PICO_FLASH_SIZE_BYTES' not in cmake_default_settings:
-        raise Exception("{} is missing a pico_cmake_set_default {} comment".format(board_header, 'PICO_FLASH_SIZE_BYTES'))
-    if 'PICO_FLASH_SIZE_BYTES' not in defines:
-        raise Exception("{} is missing a #define {}".format(board_header, 'PICO_FLASH_SIZE_BYTES'))
-    if cmake_default_settings['PICO_FLASH_SIZE_BYTES'].value != defines['PICO_FLASH_SIZE_BYTES'].resolved_value:
-        raise Exception("{} has mismatched pico_cmake_set_default and #define values for {}".format(board_header, 'PICO_FLASH_SIZE_BYTES'))
+    for setting in compulsory_cmake_default_settings:
+        if setting not in cmake_default_settings:
+            raise Exception("{} is missing a pico_cmake_set_default {} comment".format(board_header, setting))
+    for setting in matching_cmake_default_settings:
+        if setting in cmake_default_settings and setting not in defines:
+            raise Exception("{} has pico_cmake_set_default {} but is missing a matching #define".format(board_header, setting))
+        elif setting in defines and setting not in cmake_default_settings:
+            raise Exception("{} has #define {} but is missing a matching pico_cmake_set_default comment".format(board_header, setting))
+        elif setting in defines and setting in cmake_default_settings:
+            if cmake_default_settings[setting].value != defines[setting].resolved_value:
+                raise Exception("{} has mismatched pico_cmake_set_default and #define values for {}".format(board_header, setting))
+    for setting in compulsory_defines:
+        if setting not in defines:
+            raise Exception("{} is missing a #define {}".format(board_header, setting))
 
 if chip is None:
     raise Exception("Couldn't determine chip for {}".format(board_header))
