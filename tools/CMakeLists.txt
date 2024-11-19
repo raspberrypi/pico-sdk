@@ -71,6 +71,12 @@ define_property(TARGET
     BRIEF_DOCS "Extra arguments to pass to uf2 conversion"
     FULL_DOCS "Extra arguments to pass to uf2 conversion"
 )
+define_property(TARGET
+    PROPERTY PICOTOOL_PROCESSING_DONE
+    INHERITED
+    BRIEF_DOCS "Set once post-processing has been completed in CMake"
+    FULL_DOCS "Set once post-processing has been completed in CMake"
+)
 
 # Check pioasm is installed, or build it if not installed
 function(pico_init_pioasm)
@@ -146,6 +152,13 @@ function(pico_init_picotool)
     endif()
 endfunction()
 
+function(picotool_check_not_done TARGET)
+    get_target_property(done ${TARGET} PICOTOOL_PROCESSING_DONE)
+    if (done)
+        message(FATAL_ERROR "All picotool post-processing functions for \"${TARGET}\" must come before pico_add_extra_outputs(${TARGET})")
+    endif()
+endfunction()
+
 # Generate pio header and include it in the build
 # PICO_CMAKE_CONFIG: PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, Default output format used by pioasm when using pico_generate_pio_header, type=string, default=c-sdk, group=build
 function(pico_generate_pio_header TARGET PIO)
@@ -198,6 +211,7 @@ endfunction()
 # dropping, and it will be copied to SRAM by the bootrom before execution.
 # This sets PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR.
 function(pico_package_uf2_output TARGET PACKADDR)
+    picotool_check_not_done(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_UF2_PACKAGE_ADDR ${PACKADDR}
     )
@@ -207,6 +221,7 @@ endfunction()
 # Output the public key hash and other necessary rows to an otp JSON file.
 # This sets PICOTOOL_OTP_FILE to OTPFILE.
 function(pico_set_otp_key_output_file TARGET OTPFILE)
+    picotool_check_not_done(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_OTP_FILE ${OTPFILE}
     )
@@ -217,6 +232,7 @@ endfunction()
 # before loading the binary. This appends the `--clear` argument
 # to PICOTOOL_EXTRA_PROCESS_ARGS.
 function(pico_load_map_clear_sram TARGET)
+    picotool_check_not_done(${TARGET})
     # get and set, to inherit list
     get_target_property(extra_args ${TARGET} PICOTOOL_EXTRA_PROCESS_ARGS)
     if (extra_args)
@@ -234,6 +250,7 @@ endfunction()
 # to PICOTOOL_EXTRA_PROCESS_ARGS if setting the rollback version, or set as compile
 # definitions if only setting the major/minor versions.
 function(pico_set_binary_version TARGET)
+    picotool_check_not_done(${TARGET})
     set(oneValueArgs MAJOR MINOR ROLLBACK)
     set(multiValueArgs ROWS)
     cmake_parse_arguments(PARSE_ARGV 1 SV "" "${oneValueArgs}" "${multiValueArgs}")
@@ -283,6 +300,7 @@ endfunction()
 # Set the UF2 family to use when creating the UF2.
 # This sets PICOTOOL_UF2_FAMILY to FAMILY.
 function(pico_set_uf2_family TARGET FAMILY)
+    picotool_check_not_done(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_UF2_FAMILY ${FAMILY}
     )
@@ -295,6 +313,7 @@ endfunction()
 # specify a common SIGFILE for multiple targets, the SIGFILE property can be
 # set for a given scope, and then the SIGFILE argument is optional.
 function(pico_sign_binary TARGET)
+    picotool_check_not_done(${TARGET})
     # Enforce signing through target properties
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_SIGN_OUTPUT true
@@ -320,6 +339,7 @@ endfunction()
 # pico_hash_binary(TARGET)
 # Hash the target binary. This sets PICOTOOL_HASH_OUTPUT to true.
 function(pico_hash_binary TARGET)
+    picotool_check_not_done(${TARGET})
     # Enforce hashing through target properties
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_HASH_OUTPUT true
@@ -330,6 +350,7 @@ endfunction()
 # Create the specified partition table from JSON, and embed it in the
 # block loop. This sets PICOTOOL_EMBED_PT to PTFILE.
 function(pico_embed_pt_in_binary TARGET PTFILE)
+    picotool_check_not_done(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_EMBED_PT ${PTFILE}
     )
@@ -341,6 +362,7 @@ endfunction()
 # This sets PICOTOOL_AESFILE to AESFILE, and PICOTOOL_ENC_SIGFILE to SIGFILE
 # if present, else PICOTOOL_SIGFILE.
 function(pico_encrypt_binary TARGET AESFILE)
+    picotool_check_not_done(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_AESFILE ${AESFILE}
     )
@@ -422,6 +444,9 @@ endfunction()
 # Run picotool post-processing on the binary - must be called after
 # all required properties have been set
 function(picotool_postprocess_binary TARGET)
+    set_target_properties(${TARGET} PROPERTIES
+        PICOTOOL_PROCESSING_DONE true
+    )
     # Read target properties
     get_target_property(picotool_sign_output ${TARGET} PICOTOOL_SIGN_OUTPUT)
     if (picotool_sign_output)
