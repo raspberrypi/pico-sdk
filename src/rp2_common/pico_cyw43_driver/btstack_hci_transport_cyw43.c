@@ -139,6 +139,9 @@ static void hci_transport_cyw43_process(void) {
     CYW43_THREAD_LOCK_CHECK
     uint32_t len = 0;
     bool has_work;
+#ifdef PICO_BTSTACK_CYW43_MAX_HCI_PROCESS_LOOP_COUNT
+    uint32_t loop_count = 0;
+#endif
     do {
         int err = cyw43_bluetooth_hci_read(hci_packet_with_pre_buffer, sizeof(hci_packet_with_pre_buffer), &len);
         BT_DEBUG("bt in len=%lu err=%d\n", len, err);
@@ -148,6 +151,12 @@ static void hci_transport_cyw43_process(void) {
         } else {
             has_work = false;
         }
+// PICO_CONFIG: PICO_BTSTACK_CYW43_MAX_HCI_PROCESS_LOOP_COUNT, limit the max number of iterations of the hci processing loop, type=int, advanced=true, group=pico_btstack
+#ifdef PICO_BTSTACK_CYW43_MAX_HCI_PROCESS_LOOP_COUNT
+        if (++loop_count >= PICO_BTSTACK_CYW43_MAX_HCI_PROCESS_LOOP_COUNT) {
+            break;
+        }
+#endif
     } while (has_work);
 }
 
