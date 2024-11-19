@@ -75,7 +75,7 @@ void dma_channel_cleanup(uint channel) {
     // Disable CHAIN_TO, and disable channel, so that it ignores any further triggers 
     hw_write_masked( &dma_hw->ch[channel].al1_ctrl, (channel << DMA_CH0_CTRL_TRIG_CHAIN_TO_LSB) | (0u << DMA_CH0_CTRL_TRIG_EN_LSB), DMA_CH0_CTRL_TRIG_CHAIN_TO_BITS | DMA_CH0_CTRL_TRIG_EN_BITS );
     // disable IRQs first as abort can cause spurious IRQs
-    for(int i=0; i < NUM_DMA_IRQS; i++) {
+    for(uint i=0; i < NUM_DMA_IRQS; i++) {
         dma_irqn_set_channel_enabled(i, channel, false);
     }
     dma_channel_abort(channel);
