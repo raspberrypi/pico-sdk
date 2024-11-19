@@ -66,8 +66,10 @@ bool multicore_fifo_pop_timeout_us(uint64_t timeout_us, uint32_t *out) {
     return true;
 }
 
+#if PICO_CORE1_STACK_SIZE > 0
 // Default stack for core1 ... if multicore_launch_core1 is not included then .stack1 section will be garbage collected
 static uint32_t __attribute__((section(".stack1"))) core1_stack[PICO_CORE1_STACK_SIZE / sizeof(uint32_t)];
+#endif
 
 static void __attribute__ ((naked)) core1_trampoline(void) {
 #ifdef __riscv
@@ -153,11 +155,15 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
 }
 
 void multicore_launch_core1(void (*entry)(void)) {
+#if PICO_CORE1_STACK_SIZE > 0
     extern uint32_t __StackOneBottom;
     uint32_t *stack_limit = (uint32_t *) &__StackOneBottom;
     // hack to reference core1_stack although that pointer is wrong.... core1_stack should always be <= stack_limit, if not boom!
     uint32_t *stack = core1_stack <= stack_limit ? stack_limit : (uint32_t *) -1;
     multicore_launch_core1_with_stack(entry, stack, sizeof(core1_stack));
+#else
+    panic("multicore_launch_core1() can't be used when PICO_CORE1_STACK_SIZE == 0");
+#endif
 }
 
 void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vector_table) {
