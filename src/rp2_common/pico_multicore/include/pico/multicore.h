@@ -29,7 +29,7 @@ extern "C" {
  * \include multicore.c
 */
 
-// PICO_CONFIG: PICO_CORE1_STACK_SIZE, Minimum amount of stack space reserved in the linker script for core 1, min=0x100, max=0x10000, default=PICO_STACK_SIZE (0x800), group=pico_multicore
+// PICO_CONFIG: PICO_CORE1_STACK_SIZE, Minimum amount of stack space reserved in the linker script for core 1 - if zero then no space is reserved and the user must provide their own stack, min=0, max=0x10000, default=PICO_STACK_SIZE (0x800), group=pico_multicore
 #ifndef PICO_CORE1_STACK_SIZE
 #ifdef PICO_STACK_SIZE
 #define PICO_CORE1_STACK_SIZE PICO_STACK_SIZE
