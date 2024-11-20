@@ -250,9 +250,7 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, false);
         pio_sm_set_wrap(bus_data->pio, bus_data->pio_sm, bus_data->pio_offset, bus_data->pio_offset + SPI_OFFSET_END - 1);
         pio_sm_clear_fifos(bus_data->pio, bus_data->pio_sm);
-        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm,
-            1u << (CYW43_PIN_WL_DATA_OUT - pio_get_gpio_base(bus_data->pio)),
-            1u << (CYW43_PIN_WL_DATA_OUT - pio_get_gpio_base(bus_data->pio)));
+        pio_sm_set_pindirs_with_mask64(bus_data->pio, bus_data->pio_sm, 1ull << CYW43_PIN_WL_DATA_OUT, 1ull << CYW43_PIN_WL_DATA_OUT);
         pio_sm_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_clkdiv_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_put(bus_data->pio, bus_data->pio_sm, tx_length * 8 - 1);
@@ -294,9 +292,7 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, false);
         pio_sm_set_wrap(bus_data->pio, bus_data->pio_sm, bus_data->pio_offset, bus_data->pio_offset + SPI_OFFSET_LP1_END - 1);
         pio_sm_clear_fifos(bus_data->pio, bus_data->pio_sm);
-        pio_sm_set_pindirs_with_mask(bus_data->pio, bus_data->pio_sm,
-            1u << (CYW43_PIN_WL_DATA_OUT - pio_get_gpio_base(bus_data->pio)),
-            1u << (CYW43_PIN_WL_DATA_OUT - pio_get_gpio_base(bus_data->pio)));
+        pio_sm_set_pindirs_with_mask64(bus_data->pio, bus_data->pio_sm, 1ull << CYW43_PIN_WL_DATA_OUT, 1ull << CYW43_PIN_WL_DATA_OUT);
         pio_sm_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_clkdiv_restart(bus_data->pio, bus_data->pio_sm);
         pio_sm_put(bus_data->pio, bus_data->pio_sm, tx_length * 8 - 1);

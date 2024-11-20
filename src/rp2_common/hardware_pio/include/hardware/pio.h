@@ -708,6 +708,15 @@ static inline uint pio_get_gpio_base(PIO pio) {
 #endif
 }
 
+static inline void check_pio_pin_mask64(__unused PIO pio, __unused uint64_t pinmask) {
+    // check no pins are set in the mask which are incompatible with the pio
+#if PICO_PIO_USE_GPIO_BASE
+    valid_params_if(HARDWARE_PIO, (pinmask & ~(0xffffffffull << pio_get_gpio_base(pio))) == 0);
+#else
+    valid_params_if(HARDWARE_PIO, (pinmask & ~0xffffffffull) == 0);
+#endif
+}
+
 /*! \brief Apply a state machine configuration to a state machine
  *  \ingroup hardware_pio
  *
@@ -1717,12 +1726,43 @@ static inline void pio_sm_clear_fifos(PIO pio, uint sm) {
  * before restoring the state machine's pin configuration to what it was.
  *
  * This method is provided as a convenience to set initial pin states, and should not be used against a state machine that is enabled.
+ * Note: This method only works for pins < 32. To use with pins >= 32 call pio_sm_set_pins64
  *
  * \param pio The PIO instance; e.g. \ref pio0 or \ref pio1
  * \param sm State machine index (0..3) to use
  * \param pin_values the pin values to set
  */
 void pio_sm_set_pins(PIO pio, uint sm, uint32_t pin_values);
+
+/*! \brief Use a state machine to set a value on all pins for the PIO instance
+ *  \ingroup hardware_pio
+ *
+ * This method repeatedly reconfigures the target state machine's pin configuration and executes 'set' instructions to set values on all 32 pins,
+ * before restoring the state machine's pin configuration to what it was.
+ *
+ * This method is provided as a convenience to set initial pin states, and should not be used against a state machine that is enabled.
+ *
+ * \param pio The PIO instance; e.g. \ref pio0 or \ref pio1
+ * \param sm State machine index (0..3) to use
+ * \param pin_values the pin values to set
+ */
+void pio_sm_set_pins64(PIO pio, uint sm, uint64_t pin_values);
+
+/*! \brief Use a state machine to set a value on multiple pins for the PIO instance
+ *  \ingroup hardware_pio
+ *
+ * This method repeatedly reconfigures the target state machine's pin configuration and executes 'set' instructions to set values on up to 32 pins,
+ * before restoring the state machine's pin configuration to what it was.
+ *
+ * This method is provided as a convenience to set initial pin states, and should not be used against a state machine that is enabled.
+* Note: This method only works for pins < 32. To use with pins >= 32 call pio_sm_set_pins_with_mask64
+ *
+ * \param pio The PIO instance; e.g. \ref pio0 or \ref pio1
+ * \param sm State machine index (0..3) to use
+ * \param pin_values the pin values to set (if the corresponding bit in pin_mask is set)
+ * \param pin_mask a bit for each pin to indicate whether the corresponding pin_value for that pin should be applied.
+ */
+void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pin_values, uint32_t pin_mask);
 
 /*! \brief Use a state machine to set a value on multiple pins for the PIO instance
  *  \ingroup hardware_pio
@@ -1737,7 +1777,23 @@ void pio_sm_set_pins(PIO pio, uint sm, uint32_t pin_values);
  * \param pin_values the pin values to set (if the corresponding bit in pin_mask is set)
  * \param pin_mask a bit for each pin to indicate whether the corresponding pin_value for that pin should be applied.
  */
-void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pin_values, uint32_t pin_mask);
+void pio_sm_set_pins_with_mask64(PIO pio, uint sm, uint64_t pin_values, uint64_t pin_mask);
+
+/*! \brief Use a state machine to set the pin directions for multiple pins for the PIO instance
+ *  \ingroup hardware_pio
+ *
+ * This method repeatedly reconfigures the target state machine's pin configuration and executes 'set' instructions to set pin directions on up to 32 pins,
+ * before restoring the state machine's pin configuration to what it was.
+ *
+ * This method is provided as a convenience to set initial pin directions, and should not be used against a state machine that is enabled.
+ * Note: This method only works for pins < 32. To use with pins >= 32 call pio_sm_set_pindirs_with_mask64
+ *
+ * \param pio The PIO instance; e.g. \ref pio0 or \ref pio1
+ * \param sm State machine index (0..3) to use
+ * \param pin_dirs the pin directions to set - 1 = out, 0 = in (if the corresponding bit in pin_mask is set)
+ * \param pin_mask a bit for each pin to indicate whether the corresponding pin_value for that pin should be applied.
+ */
+void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pin_dirs, uint32_t pin_mask);
 
 /*! \brief Use a state machine to set the pin directions for multiple pins for the PIO instance
  *  \ingroup hardware_pio
@@ -1752,7 +1808,7 @@ void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pin_values, uint32_t p
  * \param pin_dirs the pin directions to set - 1 = out, 0 = in (if the corresponding bit in pin_mask is set)
  * \param pin_mask a bit for each pin to indicate whether the corresponding pin_value for that pin should be applied.
  */
-void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pin_dirs, uint32_t pin_mask);
+void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pin_dirs, uint64_t pin_mask);
 
 /*! \brief Use a state machine to set the same pin direction for multiple consecutive pins for the PIO instance
  *  \ingroup hardware_pio
