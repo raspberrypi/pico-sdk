@@ -204,7 +204,7 @@ static inline void adc_run(bool run) {
 static inline void adc_set_clkdiv(float clkdiv) {
     invalid_params_if(HARDWARE_ADC, clkdiv >= 1 << (ADC_DIV_INT_MSB - ADC_DIV_INT_LSB + 1));
 #if PICO_ADC_CLKDIV_ROUND_NEAREST
-    clkdiv += 0.5f / (1 << ADC_DIV_INT_LSB); // round to the nearest fraction
+    clkdiv += 0.5f / (1 << (ADC_DIV_FRAC_MSB + 1 - ADC_DIV_FRAC_LSB)); // round to the nearest fraction
 #endif
     adc_hw->div = (uint32_t)(clkdiv * (float) (1 << ADC_DIV_INT_LSB));
 }

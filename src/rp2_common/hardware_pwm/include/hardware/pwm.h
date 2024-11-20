@@ -161,7 +161,7 @@ static inline void pwm_config_set_phase_correct(pwm_config *c, bool phase_correc
 static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
     valid_params_if(HARDWARE_PWM, div >= 1.f && div < 256.f);
 #if PICO_PWM_CLKDIV_ROUND_NEAREST
-    div += 0.5f / (1 << PWM_CH0_DIV_INT_LSB); // round to the nearest fraction
+    div += 0.5f / (1 << (PWM_CH0_DIV_FRAC_MSB + 1 - PWM_CH0_DIV_FRAC_LSB)); // round to the nearest fraction
 #endif
     c->div = (uint32_t)(div * (float)(1u << PWM_CH0_DIV_INT_LSB));
 }
