@@ -32,14 +32,15 @@ extern char __StackLimit; /* Set by linker.  */
 #define MALLOC_EXIT(outer) mutex_exit(&malloc_mutex);
 #else
 static uint8_t mutex_exception_level_plus_one[NUM_CORES];
-// PICOLIBC implementations of calloc and realloc may call malloc and free, so
-// we need to cope with re-entrant calls. We don't want to use a recursive
+// PICOLIBC implementations of calloc and realloc may call malloc and free,
+// so we need to cope with re-entrant calls. We don't want to use a recursive
 // mutex as that won't catch usage within an ISR; instead we record the exception
-// nesting on entry
+// nesting as of acquiring the mutex
 #define MALLOC_ENTER(outer) \
     uint exception = __get_current_exception(); \
     uint core_num = get_core_num(); \
     /* we skip the locking on outer == false if we are in the same irq nesting */ \
+    /* note: the `+ 1` is to distinguish no malloc nesting vs no-exception/irq level */ \
     bool do_lock = outer || exception + 1 != mutex_exception_level_plus_one[core_num]; \
     if (do_lock) { \
         mutex_enter_blocking(&malloc_mutex); \
