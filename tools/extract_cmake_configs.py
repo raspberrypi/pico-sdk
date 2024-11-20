@@ -99,7 +99,7 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
         _default = config_attrs.get('default', None)
         if _default is not None:
             if '/' not in _default:
-                if (_default.lower() != '0') and (config_attrs['default'].lower() != '1') and (_default not in all_configs):
+                if (_default not in ('0', '1')) and (_default not in all_config_names):
                     logger.info('{} at {}:{} has non-integer default value "{}"'.format(config_name, file_path, linenum, config_attrs['default']))
 
     elif _type == 'string':
@@ -184,6 +184,10 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                             else:
                                 all_configs[config_name] = {'attrs': config_attrs, 'filename': os.path.relpath(file_path, scandir), 'line_number': linenum, 'description': config_description}
 
+
+all_config_names = set()
+for all_configs in chips_all_configs.values():
+    all_config_names.update(all_configs.keys())
 
 for applicable, all_configs in chips_all_configs.items():
     for config_name, config_obj in all_configs.items():
