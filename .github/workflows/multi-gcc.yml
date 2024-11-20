@@ -20,7 +20,7 @@ jobs:
         mkdir -p "${{ github.workspace }}"
 
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Checkout submodules
       run: git submodule update --init
