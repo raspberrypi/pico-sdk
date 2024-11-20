@@ -188,7 +188,7 @@ static void stdio_uart_set_chars_available_callback(void (*fn)(void*), void *par
 #endif
 
 static void stdio_uart_out_flush(void) {
-    uart_default_tx_wait_blocking();
+    uart_tx_wait_blocking(uart_instance);
 }
 
 stdio_driver_t stdio_uart = {
