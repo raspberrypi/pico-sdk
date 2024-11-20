@@ -668,7 +668,7 @@ static inline int rom_get_partition_table_info(uint32_t *out_buffer, uint32_t ou
  *
  * This method potentially requires similar complexity to the boot path in terms of picking amongst versions, checking signatures etc.
  * As a result it requires a user provided memory buffer as a work area. The work area should byte word-aligned and of sufficient size
- * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3064, so 3K is a good choice.
+ * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3264, so 3.25K is a good choice.
  * 
  * If force_reload is false, then this method will return BOOTROM_OK immediately if the bootrom is loaded, otherwise it will
  * reload the partition table if it has been loaded already, allowing for the partition table to be updated in a running program.
@@ -695,7 +695,7 @@ static inline int rom_load_partition_table(uint8_t *workarea_base, uint32_t work
  * 
  * This method potentially requires similar complexity to the boot path in terms of picking amongst versions, checking signatures etc.
  * As a result it requires a user provided memory buffer as a work area. The work area should bye word aligned, and of sufficient size
- * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3064, so 3K is a good choice.
+ * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3264, so 3.25K is a good choice.
  * 
  * The passed partition number can be any valid partition number other than the "B" partition of an A/B pair.
  * 
@@ -742,7 +742,7 @@ static inline int rom_get_b_partition(uint pi_a) {
  * 
  * This method potentially requires similar complexity to the boot path in terms of picking amongst versions, checking signatures etc.
  * As a result it requires a user provided memory buffer as a work area. The work area should byte word-aligned and of sufficient size
- * or `BOOTROM_ERROR_INSUFFICIENT_RESOURCES` will be returned. The work area size currently required is 3064, so 3K is a good choice.
+ * or `BOOTROM_ERROR_INSUFFICIENT_RESOURCES` will be returned. The work area size currently required is 3264, so 3.25K is a good choice.
  * 
  * If the partition table
  * has not been loaded (e.g. from a watchdog or RAM boot), then this method will return `BOOTROM_ERROR_PRECONDITION_NOT_MET`, and you
@@ -795,7 +795,7 @@ static inline intptr_t rom_flash_runtime_to_storage_addr(uintptr_t flash_runtime
  * 
  * This method potentially requires similar complexity to the boot path in terms of picking amongst versions, checking signatures etc.
  * As a result it requires a user provided memory buffer as a work area. The work area should be word aligned, and of sufficient size
- * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3064, so 3K is a good choice.
+ * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3264, so 3.25K is a good choice.
  * 
  * NOTE: This method is primarily expected to be used when implementing bootloaders.
  * 
