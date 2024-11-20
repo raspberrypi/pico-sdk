@@ -1845,7 +1845,7 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, u
  * must be set per PIO instance to either address the 32 GPIOs (0->31) or the 32 GPIOS (16-47). No single
  * PIO instance can interact with both pins 0->15 or 32->47 at the same time.
  *
- * This method takes additional information about the GPIO pins needed (via gpi_base and gpio_count),
+ * This method takes additional information about the GPIO pins needed (via gpio_base and gpio_count),
  * and optionally will set the GPIO base (\see pio_set_gpio_base) of an unused PIO instance if necessary
  *
  * \param program PIO program to add
