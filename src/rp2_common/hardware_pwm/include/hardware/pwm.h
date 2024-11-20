@@ -103,6 +103,11 @@ static_assert(DREQ_PWM_WRAP7 == DREQ_PWM_WRAP0 + 7, "");
 })
 #endif
 
+// PICO_CONFIG: PICO_PWM_CLKDIV_ROUND_NEAREST, True if floating point PWM clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group-hardware_pio
+#ifndef PICO_PWM_CLKDIV_ROUND_NEAREST
+#define PICO_PWM_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
+#endif
+
 static inline void check_slice_num_param(__unused uint slice_num) {
     valid_params_if(HARDWARE_PWM, slice_num < NUM_PWM_SLICES);
 }
@@ -155,6 +160,9 @@ static inline void pwm_config_set_phase_correct(pwm_config *c, bool phase_correc
  */
 static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
     valid_params_if(HARDWARE_PWM, div >= 1.f && div < 256.f);
+#if PICO_PWM_CLKDIV_ROUND_NEAREST
+    div += 0.5f / (1 << PWM_CH0_DIV_INT_LSB); // round to the nearest fraction
+#endif
     c->div = (uint32_t)(div * (float)(1u << PWM_CH0_DIV_INT_LSB));
 }
 

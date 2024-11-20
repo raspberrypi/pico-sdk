@@ -255,6 +255,11 @@ extern "C" {
 #endif
 #endif
 
+ // PICO_CONFIG: PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST, True if floating point GPIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group-hardware_pio
+#ifndef PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST
+#define PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
+#endif
+
 typedef clock_num_t clock_handle_t;
 
 /*! \brief Configure the specified clock
@@ -387,6 +392,9 @@ static inline void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_in
 static inline void clock_gpio_init(uint gpio, uint src, float div)
 {
     uint div_int = (uint)div;
+#if PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST
+    div += 0.5f / (1 << (CLOCKS_CLK_GPOUT0_DIV_FRAC_MSB + 1 - CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB)); // round to the nearest fraction
+#endif
 #if CLOCKS_CLK_GPOUT0_DIV_FRAC_MSB - CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB == 15
     uint16_t frac = (uint16_t)((div - (float)div_int) * (1u << 16));
     clock_gpio_init_int_frac16(gpio, src, div_int, frac);
