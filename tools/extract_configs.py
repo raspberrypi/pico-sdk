@@ -63,19 +63,25 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
         assert 'enumvalues' not in config_attrs
         _min = _max = _default = None
         if config_attrs.get('min', None) is not None:
-            value = config_attrs['min']
-            m = re.match(r'^(\d+)e(\d+)$', value.lower())
-            if m:
-                _min = int(m.group(1)) * 10**int(m.group(2))
-            else:
-                _min = int(value, 0)
+            try:
+                value = config_attrs['min']
+                m = re.match(r'^(\d+)e(\d+)$', value.lower())
+                if m:
+                    _min = int(m.group(1)) * 10**int(m.group(2))
+                else:
+                    _min = int(value, 0)
+            except ValueError:
+                logger.info('{} at {}:{} has non-integer min value "{}"'.format(config_name, file_path, linenum, config_attrs['min']))
         if config_attrs.get('max', None) is not None:
-            value = config_attrs['max']
-            m = re.match(r'^(\d+)e(\d+)$', value.lower())
-            if m:
-                _max = int(m.group(1)) * 10**int(m.group(2))
-            else:
-                _max = int(value, 0)
+            try:
+                value = config_attrs['max']
+                m = re.match(r'^(\d+)e(\d+)$', value.lower())
+                if m:
+                    _max = int(m.group(1)) * 10**int(m.group(2))
+                else:
+                    _max = int(value, 0)
+            except ValueError:
+                logger.info('{} at {}:{} has non-integer max value "{}"'.format(config_name, file_path, linenum, config_attrs['max']))
         if config_attrs.get('default', None) is not None:
             if '/' not in config_attrs['default']:
                 try:
@@ -86,7 +92,7 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
                     else:
                         _default = int(value, 0)
                 except ValueError:
-                    pass
+                    logger.info('{} at {}:{} has non-integer default value "{}"'.format(config_name, file_path, linenum, config_attrs['default']))
         if _min is not None and _max is not None:
             if _min > _max:
                 raise Exception('{} at {}:{} has min {} > max {}'.format(config_name, file_path, linenum, config_attrs['min'], config_attrs['max']))

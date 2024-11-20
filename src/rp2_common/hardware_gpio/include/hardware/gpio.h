@@ -1403,12 +1403,12 @@ extern void gpio_debug_pins_init(void);
 #endif
 
 
-// PICO_CONFIG: PICO_DEBUG_PIN_BASE, First pin to use for debug output (if enabled), min=0, max=28, default=19, group=hardware_gpio
+// PICO_CONFIG: PICO_DEBUG_PIN_BASE, First pin to use for debug output (if enabled), min=0, max=31 on RP2350B, 29 otherwise, default=19, group=hardware_gpio
 #ifndef PICO_DEBUG_PIN_BASE
 #define PICO_DEBUG_PIN_BASE 19u
 #endif
 
-// PICO_CONFIG: PICO_DEBUG_PIN_COUNT, Number of pins to use for debug output (if enabled), min=1, max=28, default=3, group=hardware_gpio
+// PICO_CONFIG: PICO_DEBUG_PIN_COUNT, Number of pins to use for debug output (if enabled), min=1, max=32 on RP2350B, 30 otherwise, default=3, group=hardware_gpio
 #ifndef PICO_DEBUG_PIN_COUNT
 #define PICO_DEBUG_PIN_COUNT 3u
 #endif

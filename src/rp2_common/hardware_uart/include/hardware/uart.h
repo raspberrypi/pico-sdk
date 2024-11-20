@@ -34,8 +34,8 @@ extern "C" {
 #endif
 
 // PICO_CONFIG: PICO_DEFAULT_UART, Define the default UART used for printf etc, min=0, max=1, default=Usually provided via board header, group=hardware_uart
-// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=29, default=Usually provided via board header, group=hardware_uart
-// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=29, default=Usually provided via board header, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_uart
 
 // PICO_CONFIG: PICO_DEFAULT_UART_BAUD_RATE, Define the default UART baudrate, max=921600, default=115200, group=hardware_uart
 #ifndef PICO_DEFAULT_UART_BAUD_RATE
