@@ -89,7 +89,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_PIO_CLOCK_DIV_INT=${CYW43_PIO_CLOCK_DIV_INT})
     endif()
     if (CYW43_PIO_CLOCK_DIV_FRAC8)
-        # PICO_CMAKE_CONFIG: CYW43_PIO_CLOCK_DIV_FRAC, fractional component of pio clock divider used for cyw43 comms in range 0-255, type=int, default=0, group=pico_cyw43_driver
+        # PICO_CMAKE_CONFIG: CYW43_PIO_CLOCK_DIV_FRAC8, fractional component of pio clock divider used for cyw43 comms in range 0-255, type=int, default=0, group=pico_cyw43_driver
         target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_PIO_CLOCK_DIV_FRAC8=${CYW43_PIO_CLOCK_DIV_FRAC8})
     endif()
     if (CYW43_PIO_CLOCK_DIV_DYNAMIC)
