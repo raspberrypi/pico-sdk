@@ -773,7 +773,7 @@ static inline uint32_t pwm_get_irq1_status_mask(void) {
  * \return Bitmask of all PWM interrupts currently set
  */
 static inline uint32_t pwm_irqn_get_status_mask(uint irq_index) {
-    invalid_params_if(HARDWARE_PWM, irq_index >= NUM_DMA_IRQS);
+    invalid_params_if(HARDWARE_PWM, irq_index >= NUM_PWM_IRQS);
     return pwm_hw->irq_ctrl[irq_index].ints;
 }
 
