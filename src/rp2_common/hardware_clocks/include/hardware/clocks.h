@@ -392,14 +392,15 @@ static inline void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_in
 static inline void clock_gpio_init(uint gpio, uint src, float div)
 {
     uint div_int = (uint)div;
+    const int frac_bit_count = REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC);
 #if PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST
-    div += 0.5f / (1 << (CLOCKS_CLK_GPOUT0_DIV_FRAC_MSB + 1 - CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB)); // round to the nearest fraction
+    div += 0.5f / (1 << frac_bit_count); // round to the nearest fraction
 #endif
-#if CLOCKS_CLK_GPOUT0_DIV_FRAC_MSB - CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB == 15
-    uint16_t frac = (uint16_t)((div - (float)div_int) * (1u << 16));
+#if REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 16
+    uint16_t frac = (uint16_t)((div - (float)div_int) * (1u << frac_bit_count));
     clock_gpio_init_int_frac16(gpio, src, div_int, frac);
-#elif CLOCKS_CLK_GPOUT0_DIV_FRAC_MSB - CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB == 7
-    uint8_t frac = (uint8_t)((div - (float)div_int) * (1u << 8));
+#elif REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 8
+    uint8_t frac = (uint8_t)((div - (float)div_int) * (1u << frac_bit_count));
     clock_gpio_init_int_frac8(gpio, src, div_int, frac);
 #else
 #error unsupported number of fractional bits
