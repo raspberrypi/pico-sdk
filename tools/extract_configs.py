@@ -105,7 +105,7 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
         _default = config_attrs.get('default', None)
         if _default is not None:
             if '/' not in _default:
-                if (_default.lower() != '0') and (config_attrs['default'].lower() != '1') and ( _default not in all_configs):
+                if (_default.lower() != '0') and (config_attrs['default'].lower() != '1') and ( _default not in all_config_names):
                     logger.info('{} at {}:{} has non-integer default value "{}"'.format(config_name, file_path, linenum, config_attrs['default']))
 
     elif _type == 'enum':
@@ -217,11 +217,15 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                                 all_defines[name][value] = set()
                             all_defines[name][value] = (file_path, linenum)
 
+all_config_names = set()
+for all_configs in chips_all_configs.values():
+    all_config_names.update(all_configs.keys())
+
 # Check for defines with missing PICO_CONFIG entries
 chips_resolved_defines = defaultdict(dict)
 for applicable, all_defines in chips_all_defines.items():
     for d in all_defines:
-        if d not in all_configs and d.startswith("PICO_"):
+        if d not in all_config_names and d.startswith("PICO_"):
             logger.warning("Potential unmarked PICO define {}".format(d))
         resolved_defines = chips_resolved_defines[applicable]
         # resolve "nested defines" - this allows e.g. USB_DPRAM_MAX to resolve to USB_DPRAM_SIZE which is set to 4096 (which then matches the relevant PICO_CONFIG entry)
