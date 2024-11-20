@@ -70,7 +70,7 @@
 #define ADC_TEMPERATURE_CHANNEL_NUM (NUM_ADC_CHANNELS - 1)
 #endif
 
-// PICO_CONFIG: PICO_ADC_CLKDIV_ROUND_NEAREST, True if floating point ADC clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group-hardware_pio
+// PICO_CONFIG: PICO_ADC_CLKDIV_ROUND_NEAREST, True if floating point ADC clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_adc
 #ifndef PICO_ADC_CLKDIV_ROUND_NEAREST
 #define PICO_ADC_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
 #endif

@@ -103,7 +103,7 @@ static_assert(DREQ_PWM_WRAP7 == DREQ_PWM_WRAP0 + 7, "");
 })
 #endif
 
-// PICO_CONFIG: PICO_PWM_CLKDIV_ROUND_NEAREST, True if floating point PWM clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group-hardware_pio
+// PICO_CONFIG: PICO_PWM_CLKDIV_ROUND_NEAREST, True if floating point PWM clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_pwm
 #ifndef PICO_PWM_CLKDIV_ROUND_NEAREST
 #define PICO_PWM_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
 #endif

@@ -32,7 +32,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_PIO_CLKDIV_ROUND_NEAREST, True if floating point PIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group-hardware_pio
+// PICO_CONFIG: PICO_PIO_CLKDIV_ROUND_NEAREST, True if floating point PIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_pio
 #ifndef PICO_PIO_CLKDIV_ROUND_NEAREST
 #define PICO_PIO_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
 #endif

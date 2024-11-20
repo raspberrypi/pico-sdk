@@ -255,7 +255,7 @@ extern "C" {
 #endif
 #endif
 
- // PICO_CONFIG: PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST, True if floating point GPIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group-hardware_pio
+ // PICO_CONFIG: PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST, True if floating point GPIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_clocks
 #ifndef PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST
 #define PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
 #endif

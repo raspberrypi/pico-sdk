@@ -70,7 +70,7 @@
 #define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + NUM_IRQS)
 #endif
 
-// PICO_CONFIG: PICO_CLKDIV_ROUND_NEAREST, True if floating point clock divisors should be rounded to the nearest possible clock divisor by default rather than rounding down, type=bool, default=1, group-pico_platform
+// PICO_CONFIG: PICO_CLKDIV_ROUND_NEAREST, True if floating point clock divisors should be rounded to the nearest possible clock divisor by default rather than rounding down, type=bool, default=1, group=pico_platform
 #ifndef PICO_CLKDIV_ROUND_NEAREST
 #define PICO_CLKDIV_ROUND_NEAREST 1
 #endif
