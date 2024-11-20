@@ -27,6 +27,11 @@ static async_context_t *cyw43_async_context = NULL;
     #include "boot/picobin.h"
     #include <stdlib.h>
 
+    // PICO_CONFIG: CYW43_WIFI_FW_PARTITION_ID, ID of Wi-Fi firmware partition, type=int, default=0x776966696669726d (wififirm), group=pico_cyw43_driver
+    #ifndef CYW43_WIFI_FW_PARTITION_ID
+    #define CYW43_WIFI_FW_PARTITION_ID 0x776966696669726d // wififirm
+    #endif
+
     int32_t cyw43_wifi_fw_len;
     int32_t cyw43_clm_len;
     uintptr_t fw_data;
@@ -134,7 +139,7 @@ bool cyw43_driver_init(async_context_t *context) {
                 uint64_t id = 0;
                 id |= buffer[i++];
                 id |= ((uint64_t)(buffer[i++]) << 32ull);
-                if (id == 0x123456789abcdef0) {
+                if (id == CYW43_WIFI_FW_PARTITION_ID) {
                     picked_p = p;
                 }
             }

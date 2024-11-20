@@ -23,10 +23,10 @@
     },
     {
       "name": "Wi-Fi Firmware",
-      "id": "0x123456789abcdef0",
+      "id": "0x776966696669726d",
       "start": "3500k",
       "size": "240K",
-      "families": ["0x12345678"],
+      "families": ["data"],
       "permissions": {
         "secure": "rw",
         "nonsecure": "rw",
@@ -38,7 +38,7 @@
     {
       "start": "3500k",
       "size": "240k",
-      "families": ["0x12345678"],
+      "families": ["data"],
       "permissions": {
         "secure": "rw",
         "nonsecure": "rw",

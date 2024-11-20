@@ -222,8 +222,8 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
         pico_hash_binary(${TARGET}_firmware)
         pico_hash_binary(${TARGET}_firmware_tbyb)
 
-        pico_set_uf2_family(${TARGET}_firmware 0x12345678)
-        pico_set_uf2_family(${TARGET}_firmware_tbyb 0x12345678)
+        pico_set_uf2_family(${TARGET}_firmware data)
+        pico_set_uf2_family(${TARGET}_firmware_tbyb data)
 
         pico_package_uf2_output(${TARGET}_firmware 0x10000000)
         pico_package_uf2_output(${TARGET}_firmware_tbyb 0x10000000)
