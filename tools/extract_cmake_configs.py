@@ -99,7 +99,7 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
         _default = config_attrs.get('default', None)
         if _default is not None:
             if '/' not in _default:
-                if (_default.lower() != '0') and (config_attrs['default'].lower() != '1') and (_default not in all_config_names):
+                if (_default not in ('0', '1')) and (_default not in all_config_names):
                     logger.info('{} at {}:{} has non-integer default value "{}"'.format(config_name, file_path, linenum, config_attrs['default']))
 
     elif _type == 'string':
