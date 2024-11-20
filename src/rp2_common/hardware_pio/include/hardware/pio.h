@@ -488,6 +488,7 @@ static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_
 
 static inline void pio_calculate_clkdiv8_from_float(float div, uint32_t *div_int, uint8_t *div_frac8) {
     valid_params_if(HARDWARE_PIO, div >= 1 && div <= 65536);
+    div += 0.5f / 256; // round to the nearest 1/256
     *div_int = (uint16_t)div;
     // not a strictly necessary check, but if this changes, then this method should
     // probably no longer be used in favor of one with a larger fraction
