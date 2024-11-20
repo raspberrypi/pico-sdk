@@ -205,13 +205,22 @@ void pio_clear_instruction_memory(PIO pio) {
     hw_claim_unlock(save);
 }
 
+void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
+    pio_sm_set_pins64(pio, sm, pins);
+}
+
 // Set the value of all PIO pins. This is done by forcibly executing
 // instructions on a "victim" state machine, sm. Ideally you should choose one
 // which is not currently running a program. This is intended for one-time
 // setup of initial pin states.
-void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
+void pio_sm_set_pins64(PIO pio, uint sm, uint64_t pins) {
     check_pio_param(pio);
     check_sm_param(sm);
+    check_pio_pin_mask64(pio, pins);
+
+#if PICO_PIO_USE_GPIO_BASE
+    pins >>= pio_get_gpio_base(pio);
+#endif
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
     hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
@@ -232,8 +241,17 @@ void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
 }
 
 void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pinvals, uint32_t pin_mask) {
+    pio_sm_set_pins_with_mask64(pio, sm, pinvals, pin_mask);
+}
+
+void pio_sm_set_pins_with_mask64(PIO pio, uint sm, uint64_t pinvals, uint64_t pin_mask) {
     check_pio_param(pio);
     check_sm_param(sm);
+    check_pio_pin_mask64(pio, pin_mask);
+#if PICO_PIO_USE_GPIO_BASE
+    pinvals >>= pio_get_gpio_base(pio);
+    pin_mask >>= pio_get_gpio_base(pio);
+#endif
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
     hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
@@ -250,8 +268,17 @@ void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pinvals, uint32_t pin_
 }
 
 void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t pin_mask) {
+    pio_sm_set_pindirs_with_mask64(pio, sm, pindirs, pin_mask);
+}
+
+void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pindirs, uint64_t pin_mask) {
     check_pio_param(pio);
     check_sm_param(sm);
+    check_pio_pin_mask64(pio, pin_mask);
+#if PICO_PIO_USE_GPIO_BASE
+    pindirs >>= pio_get_gpio_base(pio);
+    pin_mask >>= pio_get_gpio_base(pio);
+#endif
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
     hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
