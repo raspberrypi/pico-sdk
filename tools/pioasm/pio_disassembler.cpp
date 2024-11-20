@@ -90,8 +90,8 @@ std::string disassemble(uint inst, uint sideset_bits_including_opt, bool sideset
                     invalid = true;
                 } else {
                     std::string index;
-                    if (arg2 & 8) index = "y";
-                    else          index = std::to_string(arg2 & 7);
+                    if (arg2 & 8) index = std::to_string(arg2 & 3);
+                    else          index = "y";
                     std::string guts = "";
                     op("mov");
                     if (arg1 & 4) {
