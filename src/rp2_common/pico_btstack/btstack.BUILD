@@ -37,6 +37,8 @@ cc_library(
     }),
     includes = [
         ".",
+        "3rd-party/bluedroid/decoder/include",
+        "3rd-party/bluedroid/encoder/include",
         "3rd-party/md5",
         "3rd-party/micro-ecc",
         "3rd-party/rijndael",
@@ -89,6 +91,7 @@ cc_library(
     copts = _DISABLE_WARNINGS,
     target_compatible_with = incompatible_with_config("@pico-sdk//bazel/constraint:pico_btstack_config_unset"),
     deps = [":pico_btstack_base_headers"],
+    alwayslink = True,
 )
 
 cc_library(
@@ -118,6 +121,7 @@ cc_library(
     copts = _DISABLE_WARNINGS,
     target_compatible_with = compatible_with_config("@pico-sdk//bazel/constraint:pico_bt_enable_ble_enabled"),
     deps = [":pico_btstack_base_headers"],
+    alwayslink = True,
 )
 
 cc_library(
@@ -174,6 +178,7 @@ cc_library(
         ":pico_btstack_base",
         ":pico_btstack_base_headers",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -218,6 +223,14 @@ cc_library(
         ":pico_btstack_base_headers",
         ":pico_btstack_ble",
     ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "pico_btstack_sbc_common",
+    srcs = ["src/classic/btstack_sbc_bluedroid.c"],
+    deps = [":pico_btstack_base_headers"],
+    target_compatible_with = incompatible_with_config("@pico-sdk//bazel/constraint:pico_btstack_config_unset"),
 )
 
 cc_library(
@@ -235,13 +248,18 @@ cc_library(
     ],
     copts = _DISABLE_WARNINGS,
     includes = ["3rd-party/bluedroid/decoder/include"],
-    deps = [":pico_btstack_base_headers"],
+    deps = [
+        ":pico_btstack_base_headers",
+        ":pico_btstack_sbc_common",
+    ],
+    alwayslink = True,
 )
 
 cc_library(
     name = "pico_btstack_sbc_decoder",
     srcs = [
         "src/classic/btstack_sbc_decoder_bluedroid.c",
+        "3rd-party/bluedroid/decoder/srce/readsamplesjoint.inc",
         "3rd-party/bluedroid/decoder/srce/alloc.c",
         "3rd-party/bluedroid/decoder/srce/bitalloc.c",
         "3rd-party/bluedroid/decoder/srce/bitalloc-sbc.c",
@@ -259,7 +277,11 @@ cc_library(
     ],
     copts = _DISABLE_WARNINGS,
     includes = ["3rd-party/bluedroid/decoder/include"],
-    deps = [":pico_btstack_base_headers"],
+    deps = [
+        ":pico_btstack_base_headers",
+        ":pico_btstack_sbc_common",
+    ],
+    alwayslink = True,
 )
 
 cc_library(

@@ -147,6 +147,7 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_DEFAULT_PRINTF_IMPL",
     "PICO_DEFAULT_RAND_IMPL",
     "PICO_BINARY_INFO_ENABLED",
+    "PICO_ASYNC_CONTEXT_IMPL",
     # Allows selection of clang/gcc when using the dynamically fetched
     # toolchains.
     "PICO_TOOLCHAIN",

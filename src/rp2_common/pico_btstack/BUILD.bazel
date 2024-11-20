@@ -43,12 +43,17 @@ alias(
 
 alias(
     name = "pico_btstack_mesh",
-    actual = "@btstack//:pico_btstack_classic",
+    actual = "@btstack//:pico_btstack_mesh",
 )
 
 alias(
     name = "pico_btstack_sbc_encoder",
-    actual = "@btstack//:pico_btstack_classic",
+    actual = "@btstack//:pico_btstack_sbc_encoder",
+)
+
+alias(
+    name = "pico_btstack_sbc_decoder",
+    actual = "@btstack//:pico_btstack_sbc_decoder",
 )
 
 alias(
@@ -92,8 +97,10 @@ cc_library(
     srcs = ["btstack_stdin_pico.c"],
     target_compatible_with = compatible_with_pico_w() + incompatible_with_config("//bazel/constraint:pico_btstack_config_unset"),
     deps = [
+        ":pico_btstack_base",
         "//bazel/config:PICO_BTSTACK_CONFIG",
         "//src/rp2_common:pico_platform",
         "//src/rp2_common/pico_stdio",
     ],
+    alwayslink = True,
 )

@@ -151,6 +151,17 @@ string_flag(
     ],
 )
 
+# PICO_BAZEL_CONFIG: PICO_ASYNC_CONTEXT_IMPL, The default implementation for pico_async_context to link, type=string, default=threadsafe_background, group=build
+string_flag(
+    name = "PICO_ASYNC_CONTEXT_IMPL",
+    build_setting_default = "threadsafe_background",
+    values = [
+        "poll",
+        "threadsafe_background",
+        "freertos",
+    ],
+)
+
 # PICO_BAZEL_CONFIG: PICO_BINARY_INFO_ENABLED, Whether to include binary info in final firmware, type=bool, default=1, group=pico_stdlib
 bool_flag(
     name = "PICO_BINARY_INFO_ENABLED",

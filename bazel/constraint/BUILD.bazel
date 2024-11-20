@@ -181,6 +181,21 @@ config_setting(
 )
 
 config_setting(
+    name = "pico_async_context_poll_enabled",
+    flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "poll"},
+)
+
+config_setting(
+    name = "pico_async_context_threadsafe_background_enabled",
+    flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "threadsafe_background"},
+)
+
+config_setting(
+    name = "pico_async_context_freertos_enabled",
+    flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "freertos"},
+)
+
+config_setting(
     name = "pico_use_default_max_page_size_enabled",
     flag_values = {"//bazel/config:PICO_USE_DEFAULT_MAX_PAGE_SIZE": "True"},
 )
