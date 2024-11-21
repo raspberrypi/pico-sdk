@@ -238,6 +238,25 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
 }
 
 /*!
+ * \brief Reboot the device into BOOTSEL mode
+ * \ingroup pico_bootrom
+ *
+ * This function reboots the device into the BOOTSEL mode ('usb boot").
+ *
+ * Facilities are provided to enable an "activity light" via GPIO attached LED for the USB Mass Storage Device,
+ * and to limit the USB interfaces exposed.
+ *
+ * \param usb_activity_gpio_pin  GPIO pin to be used as an activitiy pin, or -1 for none
+ *                               from the host.
+ * \param disable_interface_mask value to control exposed interfaces
+ *  - 0 To enable both interfaces (as per a cold boot)
+ *  - 1 To disable the USB Mass Storage Interface
+ *  - 2 To disable the USB PICOBOOT Interface
+ * \param usb_activity_gpio_pin_active_low Activity GPIO is active low (ignored on RP2040)
+ */
+void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pin, uint32_t disable_interface_mask, bool usb_activity_gpio_pin_active_low);
+
+/*!
  * \brief Connect the SSI/QMI to the QSPI pads
  * \ingroup pico_bootrom
  * 

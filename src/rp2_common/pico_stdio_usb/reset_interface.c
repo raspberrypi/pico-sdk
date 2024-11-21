@@ -119,16 +119,19 @@ static bool resetd_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_
 #if PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL
         if (request->bRequest == RESET_REQUEST_BOOTSEL) {
 #ifdef PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED
-            uint gpio_mask = 1u << PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED;
+            int gpio = PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED;
+            bool active_low = PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW;
 #else
-            uint gpio_mask = 0u;
+            int gpio = -1;
+            bool active_low = false;
 #endif
 #if !PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED
             if (request->wValue & 0x100) {
-                gpio_mask = 1u << (request->wValue >> 9u);
+                gpio = request->wValue >> 9u;
             }
+            active_low = request->wValue & 0x200;
 #endif
-            reset_usb_boot(gpio_mask, (request->wValue & 0x7f) | PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK);
+            rom_reset_usb_boot_extra(gpio, (request->wValue & 0x7f) | PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK, active_low);
             // does not return, otherwise we'd return true
         }
 #endif
@@ -173,11 +176,13 @@ usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count) {
 void tud_cdc_line_coding_cb(__unused uint8_t itf, cdc_line_coding_t const* p_line_coding) {
     if (p_line_coding->bit_rate == PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE) {
 #ifdef PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED
-        const uint gpio_mask = 1u << PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED;
+        int gpio = PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED;
+        bool active_low = PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW;
 #else
-        const uint gpio_mask = 0u;
+        int gpio = -1;
+        bool active_low = false;
 #endif
-        reset_usb_boot(gpio_mask, PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK);
+        rom_reset_usb_boot_extra(gpio, PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK, active_low);
     }
 }
 #endif

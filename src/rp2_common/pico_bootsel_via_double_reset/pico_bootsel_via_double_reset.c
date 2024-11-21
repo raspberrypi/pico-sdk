@@ -24,6 +24,11 @@
 
 // PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED, Optionally define a pin to use as bootloader activity LED when BOOTSEL mode is entered via reset double tap, type=int, min=0, max=47 on RP2350B, 29 otherwise, group=pico_bootsel_via_double_reset
 
+// PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED_ACTIVE_LOW, Whether pin used as bootloader activity LED when BOOTSEL mode is entered via reset double tap is active low. Not supported on RP2040, type=bool, default=0, group=pico_bootsel_via_double_reset
+#ifndef PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED_ACTIVE_LOW
+#define PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED_ACTIVE_LOW 0
+#endif
+
 // PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK, Optionally disable either the mass storage interface (bit 0) or the PICOBOOT interface (bit 1) when entering BOOTSEL mode via double reset, type=int, min=0, max=3, default=0, group=pico_bootsel_via_double_reset
 #ifndef PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK
 #define PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK 0u
@@ -127,13 +132,14 @@ static void __attribute__((constructor)) boot_double_tap_check(void) {
     // Detected a double reset, so enter USB bootloader
     clear_double_tap_flag();
 #ifdef PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED
-    const uint32_t led_mask = 1u << PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED;
+    const int led = PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED;
 #else
-    const uint32_t led_mask = 0u;
+    const int led = -1;
 #endif
-    reset_usb_boot(
-        led_mask,
-        PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK
+    rom_reset_usb_boot_extra(
+        led,
+        PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK,
+        PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED_ACTIVE_LOW
     );
 }
 
