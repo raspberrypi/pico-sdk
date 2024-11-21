@@ -255,6 +255,11 @@ extern "C" {
 #endif
 #endif
 
+ // PICO_CONFIG: PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST, True if floating point GPIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_clocks
+#ifndef PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST
+#define PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
+#endif
+
 typedef clock_num_t clock_handle_t;
 
 /*! \brief Configure the specified clock
@@ -387,11 +392,15 @@ static inline void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_in
 static inline void clock_gpio_init(uint gpio, uint src, float div)
 {
     uint div_int = (uint)div;
-#if CLOCKS_CLK_GPOUT0_DIV_FRAC_MSB - CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB == 15
-    uint16_t frac = (uint16_t)((div - (float)div_int) * (1u << 16));
+    const int frac_bit_count = REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC);
+#if PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST
+    div += 0.5f / (1 << frac_bit_count); // round to the nearest fraction
+#endif
+#if REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 16
+    uint16_t frac = (uint16_t)((div - (float)div_int) * (1u << frac_bit_count));
     clock_gpio_init_int_frac16(gpio, src, div_int, frac);
-#elif CLOCKS_CLK_GPOUT0_DIV_FRAC_MSB - CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB == 7
-    uint8_t frac = (uint8_t)((div - (float)div_int) * (1u << 8));
+#elif REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 8
+    uint8_t frac = (uint8_t)((div - (float)div_int) * (1u << frac_bit_count));
     clock_gpio_init_int_frac8(gpio, src, div_int, frac);
 #else
 #error unsupported number of fractional bits

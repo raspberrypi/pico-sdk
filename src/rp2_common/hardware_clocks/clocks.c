@@ -245,13 +245,13 @@ void clock_gpio_init_int_frac16(uint gpio, uint src, uint32_t div_int, uint16_t 
         invalid_params_if(HARDWARE_CLOCKS, true);
     }
 
-    invalid_params_if(HARDWARE_CLOCKS, div_int >> (CLOCKS_CLK_GPOUT0_DIV_INT_MSB - CLOCKS_CLK_GPOUT0_DIV_INT_LSB + 1));
+    invalid_params_if(HARDWARE_CLOCKS, div_int >> REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_INT));
     // Set up the gpclk generator
     clocks_hw->clk[gpclk].ctrl = (src << CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_LSB) |
                                  CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS;
-#if CLOCKS_CLK_GPOUT0_DIV_FRAC_MSB - CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB == 15
+#if REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 16
     clocks_hw->clk[gpclk].div = (div_int << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) | (div_frac16 << CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB);
-#elif CLOCKS_CLK_GPOUT0_DIV_FRAC_MSB - CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB == 7
+#elif REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 8
     clocks_hw->clk[gpclk].div = (div_int << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) | ((div_frac16>>8u) << CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB);
 #else
 #error unsupported number of fractional bits

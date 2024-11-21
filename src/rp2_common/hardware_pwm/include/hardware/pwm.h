@@ -103,6 +103,11 @@ static_assert(DREQ_PWM_WRAP7 == DREQ_PWM_WRAP0 + 7, "");
 })
 #endif
 
+// PICO_CONFIG: PICO_PWM_CLKDIV_ROUND_NEAREST, True if floating point PWM clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_pwm
+#ifndef PICO_PWM_CLKDIV_ROUND_NEAREST
+#define PICO_PWM_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
+#endif
+
 static inline void check_slice_num_param(__unused uint slice_num) {
     valid_params_if(HARDWARE_PWM, slice_num < NUM_PWM_SLICES);
 }
@@ -155,7 +160,11 @@ static inline void pwm_config_set_phase_correct(pwm_config *c, bool phase_correc
  */
 static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
     valid_params_if(HARDWARE_PWM, div >= 1.f && div < 256.f);
-    c->div = (uint32_t)(div * (float)(1u << PWM_CH0_DIV_INT_LSB));
+    const int frac_bit_count = REG_FIELD_WIDTH(PWM_CH0_DIV_FRAC);
+#if PICO_PWM_CLKDIV_ROUND_NEAREST
+    div += 0.5f / (1 << frac_bit_count); // round to the nearest fraction
+#endif
+    c->div = (uint32_t)(div * (float)(1u << frac_bit_count));
 }
 
 /** \brief Set PWM clock divider in a PWM configuration using an 8:4 fractional value
@@ -170,9 +179,9 @@ static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
  * before passing them on to the PWM counter.
  */
 static inline void pwm_config_set_clkdiv_int_frac4(pwm_config *c, uint32_t div_int, uint8_t div_frac4) {
-    static_assert(PWM_CH0_DIV_INT_MSB - PWM_CH0_DIV_INT_LSB == 7, "");
+    static_assert(REG_FIELD_WIDTH(PWM_CH0_DIV_INT) == 8, "");
     valid_params_if(HARDWARE_PWM, div_int >= 1 && div_int < 256);
-    static_assert(PWM_CH0_DIV_FRAC_MSB - PWM_CH0_DIV_FRAC_LSB == 3, "");
+    static_assert(REG_FIELD_WIDTH(PWM_CH0_DIV_FRAC) == 4, "");
     valid_params_if(HARDWARE_PWM, div_frac4 < 16);
     c->div = (((uint)div_int) << PWM_CH0_DIV_INT_LSB) | (((uint)div_frac4) << PWM_CH0_DIV_FRAC_LSB);
 }
@@ -439,7 +448,7 @@ static inline void pwm_retard_count(uint slice_num) {
 static inline void pwm_set_clkdiv_int_frac4(uint slice_num, uint8_t div_int, uint8_t div_frac4) {
     check_slice_num_param(slice_num);
     valid_params_if(HARDWARE_PWM, div_int >= 1);
-    static_assert(PWM_CH0_DIV_FRAC_MSB - PWM_CH0_DIV_FRAC_LSB == 3, "");
+    static_assert(REG_FIELD_WIDTH(PWM_CH0_DIV_FRAC) == 4, "");
     valid_params_if(HARDWARE_PWM, div_frac4 < 16);
     pwm_hw->slice[slice_num].div = (((uint)div_int) << PWM_CH0_DIV_INT_LSB) | (((uint)div_frac4) << PWM_CH0_DIV_FRAC_LSB);
 }

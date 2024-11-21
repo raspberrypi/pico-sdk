@@ -31,6 +31,12 @@
 #define PICO_PIO_VERSION 0
 #endif
 #endif
+
+// PICO_CONFIG: PICO_PIO_CLKDIV_ROUND_NEAREST, True if floating point PIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_pio
+#ifndef PICO_PIO_CLKDIV_ROUND_NEAREST
+#define PICO_PIO_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
+#endif
+
 /** \file hardware/pio.h
  *  \defgroup hardware_pio hardware_pio
  *
@@ -472,10 +478,10 @@ static inline void sm_config_set_sideset(pio_sm_config *c, uint bit_count, bool 
  * \sa sm_config_set_clkdiv()
  */
 static inline void sm_config_set_clkdiv_int_frac8(pio_sm_config *c, uint32_t div_int, uint8_t div_frac8) {
-    static_assert(PIO_SM0_CLKDIV_INT_MSB - PIO_SM0_CLKDIV_INT_LSB == 15, "");
+    static_assert(REG_FIELD_WIDTH(PIO_SM0_CLKDIV_INT) == 16, "");
     invalid_params_if(HARDWARE_PIO, div_int >> 16);
     invalid_params_if(HARDWARE_PIO, div_int == 0 && div_frac8 != 0);
-    static_assert(PIO_SM0_CLKDIV_FRAC_MSB - PIO_SM0_CLKDIV_FRAC_LSB == 7, "");
+    static_assert(REG_FIELD_WIDTH(PIO_SM0_CLKDIV_FRAC) == 8, "");
     c->clkdiv =
             (((uint)div_frac8) << PIO_SM0_CLKDIV_FRAC_LSB) |
             (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
@@ -488,14 +494,18 @@ static inline void sm_config_set_clkdiv_int_frac(pio_sm_config *c, uint16_t div_
 
 static inline void pio_calculate_clkdiv8_from_float(float div, uint32_t *div_int, uint8_t *div_frac8) {
     valid_params_if(HARDWARE_PIO, div >= 1 && div <= 65536);
+    const int frac_bit_count = REG_FIELD_WIDTH(PIO_SM0_CLKDIV_FRAC);
+#if PICO_PIO_CLKDIV_ROUND_NEAREST
+    div += 0.5f / (1 << frac_bit_count); // round to the nearest 1/256
+#endif
     *div_int = (uint16_t)div;
     // not a strictly necessary check, but if this changes, then this method should
     // probably no longer be used in favor of one with a larger fraction
-    static_assert(PIO_SM0_CLKDIV_FRAC_MSB - PIO_SM0_CLKDIV_FRAC_LSB == 7, "");
+    static_assert(REG_FIELD_WIDTH(PIO_SM0_CLKDIV_FRAC) == 8, "");
     if (*div_int == 0) {
         *div_frac8 = 0;
     } else {
-        *div_frac8 = (uint8_t)((div - (float)*div_int) * (1u << 8u));
+        *div_frac8 = (uint8_t)((div - (float)*div_int) * (1u << frac_bit_count));
     }
 }
 
@@ -1675,10 +1685,10 @@ void pio_sm_drain_tx_fifo(PIO pio, uint sm);
 static inline void pio_sm_set_clkdiv_int_frac8(PIO pio, uint sm, uint32_t div_int, uint8_t div_frac8) {
     check_pio_param(pio);
     check_sm_param(sm);
-    static_assert(PIO_SM0_CLKDIV_INT_MSB - PIO_SM0_CLKDIV_INT_LSB == 15, "");
+    static_assert(REG_FIELD_WIDTH(PIO_SM0_CLKDIV_INT) == 16, "");
     invalid_params_if(HARDWARE_PIO, div_int >> 16);
     invalid_params_if(HARDWARE_PIO, div_int == 0 && div_frac8 != 0);
-    static_assert(PIO_SM0_CLKDIV_FRAC_MSB - PIO_SM0_CLKDIV_FRAC_LSB == 7, "");
+    static_assert(REG_FIELD_WIDTH(PIO_SM0_CLKDIV_FRAC) == 8, "");
     pio->sm[sm].clkdiv =
             (((uint)div_frac8) << PIO_SM0_CLKDIV_FRAC_LSB) |
             (((uint)div_int) << PIO_SM0_CLKDIV_INT_LSB);
