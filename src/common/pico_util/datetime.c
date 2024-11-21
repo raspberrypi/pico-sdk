@@ -1,16 +1,23 @@
 #include "pico/util/datetime.h"
 
-#include <stdio.h>
+#if !PICO_ON_DEVICE && __APPLE__
+// if we're compiling with LLVM on Apple, __weak does something else, but we don't care about overriding these ayway
+#define __datetime_weak
+#else
+#define __datetime_weak __weak
+#endif
 
-struct tm * __weak pico_localtime_r(const time_t *time, struct tm *tm) {
+__datetime_weak struct tm * pico_localtime_r(const time_t *time, struct tm *tm) {
     return localtime_r(time, tm);
 }
 
-time_t __weak pico_mktime(struct tm *tm) {
+__datetime_weak time_t pico_mktime(struct tm *tm) {
     return mktime(tm);
 }
 
 #if PICO_INCLUDE_RTC_DATETIME
+#include <stdio.h>
+
 static const char *DATETIME_MONTHS[12] = {
         "January",
         "February",
