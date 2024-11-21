@@ -18,7 +18,7 @@
 #define PICO_BOOTSEL_VIA_DOUBLE_RESET_TIMEOUT_MS 200
 #endif
 
-// PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED, Optionally define a pin to use as bootloader activity LED when BOOTSEL mode is entered via reset double tap, type=int, min=0, max=29, group=pico_bootsel_via_double_reset
+// PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_ACTIVITY_LED, Optionally define a pin to use as bootloader activity LED when BOOTSEL mode is entered via reset double tap, type=int, min=0, max=47 on RP2350B, 29 otherwise, group=pico_bootsel_via_double_reset
 
 // PICO_CONFIG: PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK, Optionally disable either the mass storage interface (bit 0) or the PICOBOOT interface (bit 1) when entering BOOTSEL mode via double reset, type=int, min=0, max=3, default=0, group=pico_bootsel_via_double_reset
 #ifndef PICO_BOOTSEL_VIA_DOUBLE_RESET_INTERFACE_DISABLE_MASK

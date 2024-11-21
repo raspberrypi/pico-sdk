@@ -40,10 +40,10 @@ extern "C" {
  */
 
 // PICO_CONFIG: PICO_DEFAULT_SPI, Define the default SPI for a board, min=0, max=1, default=Usually provided via board header, group=hardware_spi
-// PICO_CONFIG: PICO_DEFAULT_SPI_SCK_PIN, Define the default SPI SCK pin, min=0, max=29, default=Usually provided via board header, group=hardware_spi
-// PICO_CONFIG: PICO_DEFAULT_SPI_TX_PIN, Define the default SPI TX pin, min=0, max=29, default=Usually provided via board header, group=hardware_spi
-// PICO_CONFIG: PICO_DEFAULT_SPI_RX_PIN, Define the default SPI RX pin, min=0, max=29, default=Usually provided via board header, group=hardware_spi
-// PICO_CONFIG: PICO_DEFAULT_SPI_CSN_PIN, Define the default SPI CSN pin, min=0, max=29, default=Usually provided via board header, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_SCK_PIN, Define the default SPI SCK pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_TX_PIN, Define the default SPI TX pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_RX_PIN, Define the default SPI RX pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_CSN_PIN, Define the default SPI CSN pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_spi
 
 /**
  * \brief Opaque type representing an SPI instance.
