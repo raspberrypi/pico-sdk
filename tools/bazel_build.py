@@ -145,6 +145,22 @@ BUILD_CONFIGURATIONS = (
             )
         ),
     },
+    {
+        "name": "Pico 2 W",
+        "args": (
+            "--platforms=//bazel/platform:rp2350",
+            "--@pico-sdk//bazel/config:PICO_BOARD=pico2_w",
+        ),
+        "extra_targets": (),
+        "exclusions": frozenset(
+            (
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
+            )
+        ),
+    },
 )
 
 

@@ -5,7 +5,7 @@ module(
 
 bazel_dep(name = "platforms", version = "0.0.9")
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
-bazel_dep(name = "rules_python", version = "0.22.1")
+bazel_dep(name = "rules_python", version = "0.36.0")
 bazel_dep(name = "picotool", version = "2.0.0")
 bazel_dep(name = "rules_cc", version = "0.0.10")
 
@@ -130,5 +130,21 @@ register_toolchains(
     "//bazel/toolchain:mac-aarch64-rp2040",
     "//bazel/toolchain:mac-aarch64-rp2350",
     # Require users to opt-in to the Pico SDK's toolchains.
+    dev_dependency = True,
+)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    configure_coverage_tool = True,
+    python_version = "3.9",
+)
+
+use_repo(python, "pythons_hub")
+register_toolchains(
+    "@pythons_hub//:all",
+    dev_dependency = True,
+)
+register_toolchains(
+    "@rules_python//python/runtime_env_toolchains:all",
     dev_dependency = True,
 )

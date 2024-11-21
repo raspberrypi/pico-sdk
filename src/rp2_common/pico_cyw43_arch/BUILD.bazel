@@ -2,6 +2,36 @@ load("//bazel:defs.bzl", "compatible_with_pico_w", "incompatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
 
+alias(
+    name = "pico_cyw43_arch",
+    actual = select({
+        "//bazel/constraint:pico_lwip_config_unset": ":select_no_lwip",
+        "//conditions:default": ":select_lwip",
+    })
+)
+
+alias(
+    name = "select_lwip",
+    actual = select({
+        "//bazel/constraint:pico_async_context_poll_enabled": ":pico_cyw43_arch_lwip_poll",
+        "//bazel/constraint:pico_async_context_threadsafe_background_enabled": ":pico_cyw43_arch_lwip_threadsafe_background",
+        "//bazel/constraint:pico_async_context_freertos_enabled": ":pico_cyw43_arch_lwip_freertos",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+    visibility = ["//visibility:private"],
+)
+
+alias(
+    name = "select_no_lwip",
+    actual = select({
+        "//bazel/constraint:pico_async_context_poll_enabled": ":pico_cyw43_arch_poll",
+        "//bazel/constraint:pico_async_context_threadsafe_background_enabled": ":pico_cyw43_arch_threadsafe_background",
+        "//bazel/constraint:pico_async_context_freertos_enabled": ":pico_cyw43_arch_freertos",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+    visibility = ["//visibility:private"],
+)
+
 # Tuple is async_context type and whether or not lwip is enabled.
 _CONFIGURATIONS = [
     ("freertos", False),
@@ -13,8 +43,8 @@ _CONFIGURATIONS = [
 ]
 
 # This produces the following labels:
-#   pico_cyw43_arch_sys_freertos
-#   pico_cyw43_arch_lwip_sys_freertos
+#   pico_cyw43_arch_freertos
+#   pico_cyw43_arch_lwip_freertos
 #   pico_cyw43_arch_poll
 #   pico_cyw43_arch_lwip_poll
 #   pico_cyw43_arch_threadsafe_background
@@ -36,20 +66,24 @@ _CONFIGURATIONS = [
         defines = [
             "LIB_PICO_CYW43_ARCH=1",
             "PICO_CYW43_ARCH_{}=1".format(kind.upper()),
-            "CYW43_LWIP={}".format(1 if use_lwip else 0),
         ],
         includes = ["include"],
         target_compatible_with = compatible_with_pico_w() + (
             incompatible_with_config("//bazel/constraint:pico_freertos_unset") if kind == "freertos" else []
+        ) + (
+            incompatible_with_config("//bazel/constraint:pico_lwip_config_unset") if use_lwip else []
         ),
         deps = [
             "//src/rp2_common:pico_platform",
             "//src/rp2_common/pico_async_context:pico_async_context_{}".format(kind),
             "//src/rp2_common/pico_cyw43_driver",
-            "//src/rp2_common/pico_lwip",
             "//src/rp2_common/pico_unique_id",
         ] + (
-            ["//src/rp2_common/pico_lwip:pico_lwip_freertos"] if kind == "freertos" else ["//src/rp2_common/pico_lwip:pico_lwip_nosys"]
+            ["//src/rp2_common/pico_lwip:pico_lwip_freertos"] if kind == "freertos" and use_lwip else []
+        ) + (
+            ["//src/rp2_common/pico_lwip:pico_lwip_nosys"] if kind != "freertos" and use_lwip else []
+        ) + (
+            ["//src/rp2_common/pico_lwip"] if use_lwip else []
         ),
     )
     for kind, use_lwip in _CONFIGURATIONS

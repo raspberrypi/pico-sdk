@@ -25,11 +25,13 @@ cc_library(
         "//src/rp2_common/pico_async_context",
         "//src/rp2_common/pico_rand",
     ],
+    alwayslink = True,
 )
 
 cc_library(
     name = "pico_lwip_nosys",
     srcs = ["lwip_nosys.c"],
+    includes = ["include"],
     hdrs = ["include/pico/lwip_nosys.h"],
     target_compatible_with = compatible_with_pico_w(),
     deps = [
@@ -39,6 +41,7 @@ cc_library(
         "//src/rp2_common/pico_async_context",
         "//src/rp2_common/pico_rand",
     ],
+    alwayslink = True,
 )
 
 # Prefer these aliases to directly referencing @lwip, as it's possible that

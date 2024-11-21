@@ -2,6 +2,28 @@ load("//bazel:defs.bzl", "compatible_with_pico_w", "incompatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
 
+# Prefer using this target to link in all the enabled bt modules, as it will
+# link the appropriate libraries and set the appropraite defines based on the
+# following flags:
+#
+#   --@pico-sdk//bazel/constraint:PICO_BT_ENABLE_BLE
+#   --@pico-sdk//bazel/constraint:PICO_BT_ENABLE_CLASSIC
+#   --@pico-sdk//bazel/constraint:PICO_BT_ENABLE_MESH
+cc_library(
+    name = "pico_btstack",
+    deps = ["pico_btstack_base"] + select({
+        "//bazel/constraint:pico_bt_enable_ble_enabled": [":pico_btstack_ble"],
+        "//conditions:default": [],
+    }) + select({
+        "//bazel/constraint:pico_bt_enable_classic_enabled": [":pico_btstack_classic"],
+        "//conditions:default": [],
+    }) + select({
+        "//bazel/constraint:pico_bt_enable_mesh_enabled": [":pico_btstack_mesh"],
+        "//conditions:default": [],
+    }),
+    target_compatible_with = incompatible_with_config("//bazel/constraint:pico_btstack_config_unset"),
+)
+
 # Prefer these aliases to directly referencing @btstack, as it's possible that
 # name may change.
 alias(
@@ -20,8 +42,18 @@ alias(
 )
 
 alias(
+    name = "pico_btstack_mesh",
+    actual = "@btstack//:pico_btstack_mesh",
+)
+
+alias(
     name = "pico_btstack_sbc_encoder",
-    actual = "@btstack//:pico_btstack_classic",
+    actual = "@btstack//:pico_btstack_sbc_encoder",
+)
+
+alias(
+    name = "pico_btstack_sbc_decoder",
+    actual = "@btstack//:pico_btstack_sbc_decoder",
 )
 
 alias(
@@ -63,11 +95,12 @@ cc_library(
 cc_library(
     name = "pico_btstack_stdin",
     srcs = ["btstack_stdin_pico.c"],
-    target_compatible_with = incompatible_with_config(
-        "//bazel/constraint:pico_btstack_config_unset",
-    ) + compatible_with_pico_w(),
+    target_compatible_with = compatible_with_pico_w() + incompatible_with_config("//bazel/constraint:pico_btstack_config_unset"),
     deps = [
+        ":pico_btstack_base",
+        "//bazel/config:PICO_BTSTACK_CONFIG",
         "//src/rp2_common:pico_platform",
         "//src/rp2_common/pico_stdio",
     ],
+    alwayslink = True,
 )

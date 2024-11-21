@@ -27,6 +27,7 @@ cc_library(
     deps = [
         ":cyw43_bus_pio",
         ":cyw43_configport",
+        ":pico_btstack_cyw43",
         "//src/rp2_common:pico_platform",
         "//src/rp2_common/hardware_clocks",
         "//src/rp2_common/hardware_dma",
@@ -36,21 +37,25 @@ cc_library(
         "//src/rp2_common/pico_async_context",
         "//src/rp2_common/pico_unique_id",
         "@cyw43-driver//:cyw43_driver",
-    ] +
-    # Only depend on the btstack if its configuration is set up.
-    select({
+    ] + select({
         "//bazel/constraint:pico_btstack_config_unset": [],
-        "//conditions:default": [":pico_cyw43_btstack"],
+        "//conditions:default": [
+            "//src/rp2_common/pico_btstack:pico_btstack",
+        ],
     }),
+    alwayslink = True,
 )
 
 cc_library(
-    name = "pico_cyw43_btstack",
-    srcs = [
-        "btstack_chipset_cyw43.c",
-        "btstack_cyw43.c",
-        "btstack_hci_transport_cyw43.c",
-    ],
+    name = "pico_btstack_cyw43",
+    srcs = select({
+        "//bazel/constraint:pico_btstack_config_unset": [],
+        "//conditions:default": [
+            "btstack_cyw43.c",
+            "btstack_chipset_cyw43.c",
+            "btstack_hci_transport_cyw43.c",
+        ],
+    }),
     hdrs = [
         "include/pico/btstack_chipset_cyw43.h",
         "include/pico/btstack_cyw43.h",
@@ -60,13 +65,18 @@ cc_library(
     deps = [
         ":cyw43_bus_pio",
         ":cyw43_configport",
-        "//bazel/config:PICO_BTSTACK_CONFIG",
-        "//src/rp2_common/pico_btstack:btstack_run_loop_async_context",
-        "//src/rp2_common/pico_btstack:pico_btstack_base",
-        "//src/rp2_common/pico_btstack:pico_btstack_flash_bank",
-        "//src/rp2_common/pico_cyw43_driver/cybt_shared_bus:cybt_shared_bus_driver",
         "@cyw43-driver//:cyw43_driver",
-    ],
+    ] + select({
+        "//bazel/constraint:pico_btstack_config_unset": [],
+        "//conditions:default": [
+            "//bazel/config:PICO_BTSTACK_CONFIG",
+            "//src/rp2_common/pico_cyw43_driver/cybt_shared_bus:cybt_shared_bus_driver",
+            "//src/rp2_common/pico_btstack:btstack_run_loop_async_context",
+            "//src/rp2_common/pico_btstack:pico_btstack",
+            "//src/rp2_common/pico_btstack:pico_btstack_flash_bank",
+        ],
+    }),
+    alwayslink = True,
 )
 
 pico_generate_pio_header(
