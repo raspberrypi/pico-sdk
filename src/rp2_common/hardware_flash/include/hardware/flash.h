@@ -123,31 +123,31 @@ void flash_flush_cache(void);
 
 #if !PICO_RP2040
 typedef enum {
-	FLASH_DEVINFO_SIZE_NONE = 0x0,
-	FLASH_DEVINFO_SIZE_8K = 0x1,
-	FLASH_DEVINFO_SIZE_16K = 0x2,
-	FLASH_DEVINFO_SIZE_32K = 0x3,
-	FLASH_DEVINFO_SIZE_64K = 0x4,
-	FLASH_DEVINFO_SIZE_128K = 0x5,
-	FLASH_DEVINFO_SIZE_256K = 0x6,
-	FLASH_DEVINFO_SIZE_512K = 0x7,
-	FLASH_DEVINFO_SIZE_1M = 0x8,
-	FLASH_DEVINFO_SIZE_2M = 0x9,
-	FLASH_DEVINFO_SIZE_4M = 0xa,
-	FLASH_DEVINFO_SIZE_8M = 0xb,
-	FLASH_DEVINFO_SIZE_16M = 0xc,
-	FLASH_DEVINFO_SIZE_MAX = 0xc
+    FLASH_DEVINFO_SIZE_NONE = 0x0,
+    FLASH_DEVINFO_SIZE_8K = 0x1,
+    FLASH_DEVINFO_SIZE_16K = 0x2,
+    FLASH_DEVINFO_SIZE_32K = 0x3,
+    FLASH_DEVINFO_SIZE_64K = 0x4,
+    FLASH_DEVINFO_SIZE_128K = 0x5,
+    FLASH_DEVINFO_SIZE_256K = 0x6,
+    FLASH_DEVINFO_SIZE_512K = 0x7,
+    FLASH_DEVINFO_SIZE_1M = 0x8,
+    FLASH_DEVINFO_SIZE_2M = 0x9,
+    FLASH_DEVINFO_SIZE_4M = 0xa,
+    FLASH_DEVINFO_SIZE_8M = 0xb,
+    FLASH_DEVINFO_SIZE_16M = 0xc,
+    FLASH_DEVINFO_SIZE_MAX = 0xc
 } flash_devinfo_size_t;
 
 /*! \brief Convert a flash/PSRAM size enum to an integer size in bytes
  *  \ingroup hardware_flash
  */
 static inline uint32_t flash_devinfo_size_to_bytes(flash_devinfo_size_t size) {
-	if (size == FLASH_DEVINFO_SIZE_NONE) {
-		return 0;
-	} else {
-		return 4096u << (uint)size;
-	}
+    if (size == FLASH_DEVINFO_SIZE_NONE) {
+        return 0;
+    } else {
+        return 4096u << (uint)size;
+    }
 }
 
 /*! \brief Convert an integer flash/PSRAM size in bytes to a size enum, as
@@ -155,14 +155,14 @@ static inline uint32_t flash_devinfo_size_to_bytes(flash_devinfo_size_t size) {
  *  \ingroup hardware_flash
  */
 static inline flash_devinfo_size_t flash_devinfo_bytes_to_size(uint32_t bytes) {
-	// Must be zero or a power of two
-	valid_params_if(HARDWARE_FLASH, (bytes & (bytes - 1)) == 0u);
-	uint sectors = bytes / 4096u;
-	if (sectors <= 1u) {
-		return FLASH_DEVINFO_SIZE_NONE;
-	} else {
-		return (flash_devinfo_size_t) __builtin_ctz(sectors);
-	}
+    // Must be zero or a power of two
+    valid_params_if(HARDWARE_FLASH, (bytes & (bytes - 1)) == 0u);
+    uint sectors = bytes / 4096u;
+    if (sectors <= 1u) {
+        return FLASH_DEVINFO_SIZE_NONE;
+    } else {
+        return (flash_devinfo_size_t) __builtin_ctz(sectors);
+    }
 }
 
 /*! \brief Get the size of the QSPI device attached to chip select cs, according to FLASH_DEVINFO

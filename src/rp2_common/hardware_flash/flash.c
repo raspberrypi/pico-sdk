@@ -310,10 +310,15 @@ flash_devinfo_size_t __no_inline_not_in_flash_func(flash_devinfo_get_cs_size)(ui
     if (cs == 0u) {
 #ifdef PICO_FLASH_SIZE_BYTES
         // A flash size explicitly specified for the build (e.g. from the board header) takes
-        // precedence over whatever was found in OTP.
-        return (flash_devinfo_size_t) (
-            __builtin_ctz(PICO_FLASH_SIZE_BYTES / 8192u) + (uint)FLASH_DEVINFO_SIZE_8K
-        );
+        // precedence over whatever was found in OTP. Not using flash_devinfo_bytes_to_size() as
+        // the call could be outlined, and this code must be in RAM.
+        if (PICO_FLASH_SIZE_BYTES == 0) {
+            return FLASH_DEVINFO_SIZE_NONE;
+        } else {
+            return (flash_devinfo_size_t) (
+                __builtin_ctz(PICO_FLASH_SIZE_BYTES / 8192u) + (uint)FLASH_DEVINFO_SIZE_8K
+            );
+        }
 #else
         return (flash_devinfo_size_t) (
             (*devinfo & OTP_DATA_FLASH_DEVINFO_CS0_SIZE_BITS) >> OTP_DATA_FLASH_DEVINFO_CS0_SIZE_LSB
