@@ -2,11 +2,11 @@
 
 #include <stdio.h>
 
-__weak struct tm *pico_localtime_r(const time_t *time, struct tm *tm) {
+struct tm * __weak pico_localtime_r(const time_t *time, struct tm *tm) {
     return localtime_r(time, tm);
 }
 
-__weak time_t pico_mktime(struct tm *tm) {
+time_t __weak pico_mktime(struct tm *tm) {
     return mktime(tm);
 }
 
