@@ -24,7 +24,7 @@ typedef enum {
 // safely from flash, because they are likely to be called during a flash programming operation
 // (which makes flash execution momentarily unsafe)
 
-__always_inline static void check_xip_offset_range(uintptr_t start_offset, uintptr_t size_bytes) {
+__force_inline static void check_xip_offset_range(uintptr_t start_offset, uintptr_t size_bytes) {
     // We use offsets, not addresses, for consistency with the flash API. This means the range of
     // valid inputs starts at 0.
     (void)start_offset;
