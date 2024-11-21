@@ -19,8 +19,10 @@ extern "C" {
  * \ingroup pico_util
  */
 
-#if PICO_INCLUDE_RTC_DATETIME
 #include <time.h>
+#include <sys/time.h>
+
+#if PICO_INCLUDE_RTC_DATETIME
 
 /*! \brief  Convert a datetime_t structure to a string
  *  \ingroup util_datetime
@@ -33,13 +35,32 @@ void datetime_to_str(char *buf, uint buf_size, const datetime_t *t);
 
 bool time_to_datetime(time_t time, datetime_t *dt);
 bool datetime_to_time(const datetime_t *dt, time_t *time);
+
+void datetime_to_tm(const datetime_t *dt, struct tm *tm);
+void tm_to_datetime(const struct tm *tm, datetime_t *dt);
+
 #endif
 
-#include <sys/time.h>
 uint64_t timespec_to_ms(const struct timespec *ts);
 uint64_t timespec_to_us(const struct timespec *ts);
 void ms_to_timespec(uint64_t ms, struct timespec *ts);
 void us_to_timespec(uint64_t ms, struct timespec *ts);
+
+/*! \brief  localtime_r implementation for use by the pico_util datetime functions
+ *  \ingroup util_datetime
+ *
+ * This method calls localtime_r from the C library by default,
+ * but is declared as a weak implementation to allow user code to override it
+ */
+struct tm *pico_localtime_r(const time_t *time, struct tm *tm);
+
+/*! \brief  mktime implementation for use by the pico_util datetime functions
+*  \ingroup util_datetime
+*
+* This method calls mktime from the C library by default,
+* but is declared as a weak implementation to allow user code to override it
+*/
+time_t pico_mktime(struct tm *tm);
 
 #ifdef __cplusplus
 }

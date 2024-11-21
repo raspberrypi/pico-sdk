@@ -13,6 +13,10 @@ static aon_timer_alarm_handler_t aon_timer_alarm_handler;
 #if HAS_RP2040_RTC
 #include "hardware/rtc.h"
 #include "pico/util/datetime.h"
+
+static __force_inline bool ts_to_tm(const struct timespec *ts, struct tm *tm) {
+    return pico_localtime_r(&ts->tv_sec, tm) != NULL;
+}
 #elif HAS_POWMAN_TIMER
 #include "hardware/powman.h"
 
@@ -23,56 +27,89 @@ static void powman_timer_irq_handler(void) {
     irq_remove_handler(irq_num, powman_timer_irq_handler);
     if (aon_timer_alarm_handler) aon_timer_alarm_handler();
 }
+
 #endif
 
-void aon_timer_set_time(const struct timespec *ts) {
+static bool tm_to_ts(const struct tm *tm, struct timespec *ts) {
+    struct tm tm_clone = *tm;
+    ts->tv_sec = pico_mktime(&tm_clone);
+    ts->tv_nsec = 0;
+    return ts->tv_sec != -1;
+}
+
+bool aon_timer_set_time(const struct timespec *ts) {
 #if HAS_RP2040_RTC
-    datetime_t dt;
-    bool ok = time_to_datetime(ts->tv_sec, &dt);
-    assert(ok);
-    if (ok) rtc_set_datetime(&dt);
+    struct tm tm;
+    bool ok = pico_localtime_r(&ts->tv_sec, &tm);
+    if (ok) aon_timer_set_time_calendar(&tm);
+    return ok;
 #elif HAS_POWMAN_TIMER
     powman_timer_set_ms(timespec_to_ms(ts));
+    return true;
 #else
     panic_unsupported();
 #endif
 }
 
-void aon_timer_get_time(struct timespec *ts) {
+bool aon_timer_set_time_calendar(const struct tm *tm) {
+#if HAS_RP2040_RTC
+    datetime_t dt;
+    tm_to_datetime(tm, &dt);
+    rtc_set_datetime(&dt);
+    return true;
+#elif HAS_POWMAN_TIMER
+    struct timespec ts;
+    if (tm_to_ts(tm, &ts)) {
+        return aon_timer_set_time(&ts);
+    }
+    return false;
+#else
+    panic_unsupported();
+#endif
+}
+
+bool aon_timer_get_time(struct timespec *ts) {
+#if HAS_RP2040_RTC
+    struct tm tm;
+    bool ok = aon_timer_get_time_calendar(&tm);
+    return ok && tm_to_ts(&tm, ts);
+#elif HAS_POWMAN_TIMER
+    ms_to_timespec(powman_timer_get_ms(), ts);
+    return true;
+#else
+    panic_unsupported();
+#endif
+}
+
+bool aon_timer_get_time_calendar(struct tm *tm) {
 #if HAS_RP2040_RTC
     datetime_t dt;
     rtc_get_datetime(&dt);
-    time_t t;
-    bool ok = datetime_to_time(&dt, &t);
-    assert(ok);
-    ts->tv_nsec = 0;
-    if (ok) {
-        ts->tv_sec = t;
-    } else {
-        ts->tv_sec = -1;
-    }
+    datetime_to_tm(&dt, tm);
+    return true;
 #elif HAS_POWMAN_TIMER
-    ms_to_timespec(powman_timer_get_ms(), ts);
+    struct timespec ts;
+    bool ok = tm_to_ts(tm, &ts);
+    return ok && aon_timer_get_time(&ts);
 #else
     panic_unsupported();
 #endif
 }
 
 aon_timer_alarm_handler_t aon_timer_enable_alarm(const struct timespec *ts, aon_timer_alarm_handler_t handler, bool wakeup_from_low_power) {
+#if HAS_RP2040_RTC
+    struct tm tm;
+    // adjust to after the target time
+    struct timespec ts_adjusted = *ts;
+    if (ts_adjusted.tv_nsec) ts_adjusted.tv_sec++;
+    if (!pico_localtime_r(&ts_adjusted.tv_sec, &tm)) {
+        return (aon_timer_alarm_handler_t)PICO_ERROR_INVALID_ARG;
+    }
+    return aon_timer_enable_alarm_calendar(&tm, handler, wakeup_from_low_power);
+#elif HAS_POWMAN_TIMER
     uint32_t save = save_and_disable_interrupts();
     aon_timer_alarm_handler_t old_handler = aon_timer_alarm_handler;
     struct timespec ts_adjusted = *ts;
-#if HAS_RP2040_RTC
-    ((void)wakeup_from_low_power); // don't have a choice
-    datetime_t dt;
-    // adjust to after the target time
-    if (ts_adjusted.tv_nsec) ts_adjusted.tv_sec++;
-    bool ok = time_to_datetime(ts_adjusted.tv_sec, &dt);
-    assert(ok);
-    if (ok) {
-        rtc_set_alarm(&dt, handler);
-    }
-#elif HAS_POWMAN_TIMER
     uint irq_num = aon_timer_get_irq_num();
     powman_timer_disable_alarm();
     // adjust to after the target time
@@ -92,12 +129,34 @@ aon_timer_alarm_handler_t aon_timer_enable_alarm(const struct timespec *ts, aon_
         irq_set_exclusive_handler(irq_num, powman_timer_irq_handler);
         irq_set_enabled(irq_num, true);
     }
-#else
-    panic_unsupported();
-#endif
     aon_timer_alarm_handler = handler;
     restore_interrupts_from_disabled(save);
     return old_handler;
+#else
+    panic_unsupported();
+#endif
+}
+
+aon_timer_alarm_handler_t aon_timer_enable_alarm_calendar(const struct tm *tm, aon_timer_alarm_handler_t handler, bool wakeup_from_low_power) {
+#if HAS_RP2040_RTC
+    ((void)wakeup_from_low_power); // don't have a choice
+    uint32_t save = save_and_disable_interrupts();
+    aon_timer_alarm_handler_t old_handler = aon_timer_alarm_handler;
+    datetime_t dt;
+    tm_to_datetime(tm, &dt);
+    rtc_set_alarm(&dt, handler);
+    aon_timer_alarm_handler = handler;
+    restore_interrupts_from_disabled(save);
+    return old_handler;
+#elif HAS_POWMAN_TIMER
+    struct timespec ts;
+    if (!tm_to_ts(tm, &ts)) {
+        return (aon_timer_alarm_handler_t)PICO_ERROR_INVALID_ARG;
+    }
+    return aon_timer_enable_alarm(&ts, handler, wakeup_from_low_power);
+#else
+    panic_unsupported();
+#endif
 }
 
 void aon_timer_disable_alarm(void) {
@@ -128,6 +187,20 @@ void aon_timer_start(const struct timespec *ts) {
     // todo how best to allow different configurations; this should just be the default
     powman_timer_set_1khz_tick_source_xosc();
     powman_timer_set_ms(timespec_to_ms(ts));
+    powman_timer_start();
+#else
+    panic_unsupported();
+#endif
+}
+
+void aon_timer_start_calendar(const struct tm *tm) {
+#if HAS_RP2040_RTC
+    rtc_init();
+    aon_timer_set_time_calendar(tm);
+#elif HAS_POWMAN_TIMER
+    // todo how best to allow different configurations; this should just be the default
+    powman_timer_set_1khz_tick_source_xosc();
+    aon_timer_set_time_calendar(tm);
     powman_timer_start();
 #else
     panic_unsupported();
