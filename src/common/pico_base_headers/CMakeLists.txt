@@ -6,6 +6,11 @@ if (NOT TARGET pico_base_headers)
     target_compile_definitions(pico_base_headers INTERFACE
             PICO_BOARD="${PICO_BOARD}")
 
+    foreach(override ${PICO_BOARD_CMAKE_OVERRIDES})
+        target_compile_definitions(pico_base_headers INTERFACE
+                ${override}=${${override}})
+    endforeach()
+
     target_link_libraries(pico_base_headers INTERFACE pico_platform_headers)
 
     list(APPEND PICO_SDK_POST_LIST_FILES ${CMAKE_CURRENT_LIST_DIR}/generate_config_header.cmake)
