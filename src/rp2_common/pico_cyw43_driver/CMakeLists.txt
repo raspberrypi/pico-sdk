@@ -174,7 +174,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
         if (PICO_PLATFORM STREQUAL "rp2040")
                 message(FATAL_ERROR "RP2040 does not support storing wi-fi firmware in partitions")
         endif()
-        target_compile_definitions(${TARGET} PRIVATE CYW43_USE_PARTITION_FIRMWARE=1)
+        target_compile_definitions(${TARGET} PRIVATE CYW43_USE_FIRMWARE_PARTITION=1)
         pico_embed_pt_in_binary(${TARGET} ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_pt.json)
 
         find_package (Python3 REQUIRED COMPONENTS Interpreter)

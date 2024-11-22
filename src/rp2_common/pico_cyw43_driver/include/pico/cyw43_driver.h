@@ -20,6 +20,13 @@
 #include "cyw43_configport.h"
 #endif
 
+#if CYW43_USE_FIRMWARE_PARTITION
+// PICO_CONFIG: CYW43_FIRMWARE_PARTITION_ID, ID of Wi-Fi firmware partition, type=int, default=0x776966696669726d (wififirm), group=pico_cyw43_driver
+#ifndef CYW43_FIRMWARE_PARTITION_ID
+#define CYW43_FIRMWARE_PARTITION_ID 0x776966696669726d // wififirm
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
