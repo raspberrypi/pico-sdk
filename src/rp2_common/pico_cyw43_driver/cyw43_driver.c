@@ -143,9 +143,21 @@ bool cyw43_driver_init(async_context_t *context) {
         }
 
         if (picked_p >= 0) {
+            #ifdef __riscv
+                // Increased bootrom stack is required for this function
+                bootrom_stack_t stack = {
+                    .base = malloc(0x400),
+                    .size = 0x400
+                };
+                rom_set_bootrom_stack(&stack);
+            #endif
             uint32_t* workarea = malloc(0x1000);
             picked_p = rom_pick_ab_update_partition(workarea, 0x1000, picked_p);
             free(workarea);
+            #ifdef __riscv
+                // Reset bootrom stack
+                rom_set_bootrom_stack(&stack);
+            #endif
 
             if (picked_p < 0) {
                 if (picked_p == BOOTROM_ERROR_NOT_FOUND) {
