@@ -213,6 +213,16 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
         target_link_libraries(${TARGET}_firmware boot_picobin_headers)
         target_link_libraries(${TARGET}_firmware_tbyb boot_picobin_headers)
 
+        if (PICO_RISCV)
+                # Use pre-generated firmware elfs on Risc-V, as the compiler has issues with the assembly
+                add_custom_command(TARGET ${TARGET}_firmware POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy ${PICO_CYW43_DRIVER_CURRENT_PATH}/firmware.elf $<TARGET_FILE:${TARGET}_firmware>
+                        )
+                add_custom_command(TARGET ${TARGET}_firmware_tbyb POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy ${PICO_CYW43_DRIVER_CURRENT_PATH}/firmware_tbyb.elf $<TARGET_FILE:${TARGET}_firmware_tbyb>
+                        )
+        endif()
+
         get_target_property(hasSigfile ${TARGET} PICOTOOL_SIGFILE)
         if (hasSigfile)
                 pico_sign_binary(${TARGET}_firmware ${sigfile})
@@ -228,8 +238,19 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
         pico_package_uf2_output(${TARGET}_firmware 0x10000000)
         pico_package_uf2_output(${TARGET}_firmware_tbyb 0x10000000)
 
-        pico_add_extra_outputs(${TARGET}_firmware)
-        pico_add_extra_outputs(${TARGET}_firmware_tbyb)
+        if (PICO_RISCV)
+                # As Arm ELFs are being used for firmware, the bin & dis output generation will fail
+                # with a Risc-V toolchain
+                picotool_postprocess_binary(${TARGET}_firmware)
+                picotool_postprocess_binary(${TARGET}_firmware_tbyb)
+                if (NOT (PICO_NO_UF2 OR PICO_NO_PICOTOOL))
+                        pico_add_uf2_output(${TARGET}_firmware)
+                        pico_add_uf2_output(${TARGET}_firmware_tbyb)
+                endif()
+        else()
+                pico_add_extra_outputs(${TARGET}_firmware)
+                pico_add_extra_outputs(${TARGET}_firmware_tbyb)
+        endif()
 
         add_dependencies(${TARGET}
                 ${TARGET}_firmware ${TARGET}_firmware_tbyb)
