@@ -28,7 +28,8 @@
  * and `aon_timer_xxx()` methods which use a linear time value relative an internal reference time (via struct timespec).
  *
  * \if rp2040_specific
- * NOTE: On RP2040 the non 'calendar date/time' methods must convert the linear time value to a calendar date/time internally; these methods are:
+ * \anchor rp2040_caveats
+ * On RP2040 the non 'calendar date/time' methods must convert the linear time value to a calendar date/time internally; these methods are:
  *
  * * \ref aon_timer_start_with_timeofday
  * * \ref aon_timer_start
@@ -42,7 +43,8 @@
  * \endif
  *
  * \if rp2350_specific
- * NOTE: On RP2350 the 'calendar date/time' methods  must convert the calendar date/time to a linear time value internally; these methods are:
+ * \anchor rp2350_caveats
+ * On RP2350 the 'calendar date/time' methods  must convert the calendar date/time to a linear time value internally; these methods are:
  *
  * * \ref aon_timer_start_calendar
  * * \ref aon_timer_set_time_calendar
@@ -81,7 +83,7 @@ typedef void (*aon_timer_alarm_handler_t)(void);
  * \brief Start the AON timer running using the result from the gettimeofday() function as the current time
  *
  * \if rp2040_specific
- * See \ref pico_aon_timer for caveats with using this method on RP2040
+ * See \ref rp2040_caveats "caveats" for using this method on RP2040
  * \endif
  *
  * \ingroup pico_aon_timer
@@ -93,7 +95,7 @@ void aon_timer_start_with_timeofday(void);
  * \ingroup pico_aon_timer
  *
  * \if rp2040_specific
- * See \ref pico_aon_timer for caveats with using this method on RP2040
+ * See \ref rp2040_caveats "caveats" for using this method on RP2040
  * \endif
  *
  * \param ts the time to set as 'now'
@@ -106,7 +108,7 @@ bool aon_timer_start(const struct timespec *ts);
  * \brief Start the AON timer running using the specified calendar date/time as the current time
  *
  * \if rp2350_specific
- * See \ref pico_aon_timer for caveats with using this method on RP2350
+ * See \ref rp2040_caveats "caveats" for using this method on RP2350
  * \endif
  *
  * \ingroup pico_aon_timer
@@ -127,7 +129,7 @@ void aon_timer_stop(void);
  * \ingroup pico_aon_timer
  *
  * \if rp2040_specific
- * See \ref pico_aon_timer for caveats with using this method on RP2040
+ * See \ref rp2040_caveats "caveats" for using this method on RP2040
  * \endif
  *
  * \param ts the new current time
@@ -141,7 +143,7 @@ bool aon_timer_set_time(const struct timespec *ts);
  * \ingroup pico_aon_timer
  *
  * \if rp2350_specific
- * See \ref pico_aon_timer for caveats with using this method on RP2350
+ * See \ref rp2040_caveats "caveats" for using this method on RP2350
  * \endif
  *
  * \param tm the new current time
@@ -155,7 +157,7 @@ bool aon_timer_set_time_calendar(const struct tm *tm);
  * \ingroup pico_aon_timer
  *
  * \if rp2040_specific
- * See \ref pico_aon_timer for caveats with using this method on RP2040
+ * See \ref rp2040_caveats "caveats" for using this method on RP2040
  * \endif
  *
  * \param ts out value for the current time
@@ -169,7 +171,7 @@ bool aon_timer_get_time(struct timespec *ts);
  * \ingroup pico_aon_timer
  *
  * \if rp2350_specific
- * See \ref pico_aon_timer for caveats with using this method on RP2350
+ * See \ref rp2040_caveats "caveats" for using this method on RP2350
  * \endif
  *
  * \param tm out value for the current calendar date/time
@@ -195,7 +197,7 @@ void aon_timer_get_resolution(struct timespec *ts);
  * \if rp2040_specific
  * On RP2040 the alarm will not fire if it is in the past.
  *
- * See \ref pico_aon_timer for caveats with using this method on RP2040
+ * See \ref rp2040_caveats "caveats" for using this method on RP2040
  * \endif
  *
  * \param ts the alarm time
@@ -214,7 +216,7 @@ aon_timer_alarm_handler_t aon_timer_enable_alarm(const struct timespec *ts, aon_
  * \if rp2350_specific
  * On RP2350 the alarm will fire if it is in the past
  *
- * See \ref pico_aon_timer for caveats with using this method on RP2350
+ * See \ref rp2040_caveats "caveats" for using this method on RP2350
  * \endif
  *
  * \if rp2040_specific
