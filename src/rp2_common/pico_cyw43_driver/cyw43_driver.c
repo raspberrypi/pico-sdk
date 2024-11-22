@@ -121,9 +121,8 @@ static void cyw43_sleep_timeout_reached(async_context_t *context, __unused async
 
 bool cyw43_driver_init(async_context_t *context) {
 #if CYW43_USE_PARTITION_FIRMWARE
-    const int buf_words = (16 * 4) + 1;   // maximum of 16 partitions, each with maximum of 4 words returned, plus 1
-    uint32_t* buffer = malloc(buf_words * 4);
-    int ret = rom_get_partition_table_info(buffer, buf_words, PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_PARTITION_ID);
+    uint32_t buffer[(16 * 4) + 1] = {}; // maximum of 16 partitions, each with maximum of 4 words returned, plus 1
+    int ret = rom_get_partition_table_info(buffer, count_of(buffer), PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_PARTITION_ID);
 
     assert(buffer[0] == (PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_PARTITION_ID));
 
@@ -141,6 +140,7 @@ bool cyw43_driver_init(async_context_t *context) {
                 id |= ((uint64_t)(buffer[i++]) << 32ull);
                 if (id == CYW43_WIFI_FW_PARTITION_ID) {
                     picked_p = p;
+                    break;
                 }
             }
 
@@ -162,7 +162,7 @@ bool cyw43_driver_init(async_context_t *context) {
             }
 
             CYW43_DEBUG("Chosen CYW43 firmware in partition %d\n", picked_p);
-            int ret = rom_get_partition_table_info(buffer, buf_words, PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION | (picked_p << 24));
+            int ret = rom_get_partition_table_info(buffer, count_of(buffer), PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION | (picked_p << 24));
             assert(buffer[0] == (PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION));
             assert(ret == 3);
 
@@ -179,9 +179,7 @@ bool cyw43_driver_init(async_context_t *context) {
             cyw43_clm_len = *(uint32_t*)(XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr + 4);
             fw_data = XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr + 8;
         }
-        free(buffer);
     } else {
-        free(buffer);
         CYW43_DEBUG("No partition table, so cannot get firmware from partition - get_partition_table_info returned %d\n", ret);
         return false;
     }

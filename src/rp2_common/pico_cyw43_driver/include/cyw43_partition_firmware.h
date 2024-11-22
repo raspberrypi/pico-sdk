@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 
 extern int cyw43_wifi_fw_len;
 extern int cyw43_clm_len;

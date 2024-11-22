@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #include "boot/picobin.h"
             
 #if PICO_CRT0_IMAGE_TYPE_TBYB

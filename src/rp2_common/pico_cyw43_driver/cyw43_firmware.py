@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+#
+# Copyright (c) 2024 Raspberry Pi (Trading) Ltd.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 import sys
 
 with open(sys.argv[1], "r") as f:
