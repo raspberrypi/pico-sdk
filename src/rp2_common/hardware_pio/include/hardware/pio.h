@@ -284,12 +284,10 @@ typedef struct {
 #if PICO_PIO_USE_GPIO_BASE
 #define PINHI_ALL_PINCTRL_LSBS ((1u << PIO_SM0_PINCTRL_IN_BASE_LSB) | (1u << PIO_SM0_PINCTRL_OUT_BASE_LSB) | \
                                (1u << PIO_SM0_PINCTRL_SET_BASE_LSB) | (1u << PIO_SM0_PINCTRL_SIDESET_BASE_LSB))
-static_assert( 0 == (0xfff00000u & (PINHI_ALL_PINCTRL_LSBS * 0x1f)), "");
-#define PINHI_EXECCTRL_LSB 20
-static_assert(PIO_SM0_EXECCTRL_JMP_PIN_LSB == PIO_SM0_EXECCTRL_OUT_EN_SEL_LSB + 5, "");
 // note we put the out_special pin starting at bit 20
-// note we put the jmp_ctrl pin starting at bit 25
-#define PINHI_ALL_PIN_LSBS ((1u << 25) | (1u << 20) |(1u << PIO_SM0_PINCTRL_IN_BASE_LSB) | (1u << PIO_SM0_PINCTRL_OUT_BASE_LSB) | \
+#define PINHI_EXECCTRL_LSB 20
+static_assert( (1u << PINHI_EXECCTRL_LSB) > (PINHI_ALL_PINCTRL_LSBS * 0x1f), "");
+#define PINHI_ALL_PIN_LSBS ((1u << PINHI_EXECCTRL_LSB) |(1u << PIO_SM0_PINCTRL_IN_BASE_LSB) | (1u << PIO_SM0_PINCTRL_OUT_BASE_LSB) | \
                                (1u << PIO_SM0_PINCTRL_SET_BASE_LSB) | (1u << PIO_SM0_PINCTRL_SIDESET_BASE_LSB))
     // each 5-bit field which would usually be used for the pin_base in pin_ctrl, is used for:
     // 0b11111 - corresponding field not specified
@@ -624,8 +622,8 @@ static inline void sm_config_set_jmp_pin(pio_sm_config *c, uint pin) {
     c->execctrl = (c->execctrl & ~PIO_SM0_EXECCTRL_JMP_PIN_BITS) |
                   ((pin & 31) << PIO_SM0_EXECCTRL_JMP_PIN_LSB);
 #if PICO_PIO_USE_GPIO_BASE
-    c->pinhi = (c->pinhi & ~(31u << 25)) |
-               ((pin >> 4) << 25);
+    c->pinhi = (c->pinhi & ~(31u << 20)) |
+               ((pin >> 4) << 20);
 #endif
 }
 
@@ -696,19 +694,15 @@ static inline void sm_config_set_fifo_join(pio_sm_config *c, enum pio_fifo_join 
  * \param c Pointer to the configuration structure to modify
  * \param sticky to enable 'sticky' output (i.e. re-asserting most recent OUT/SET pin values on subsequent cycles)
  * \param has_enable_pin true to enable auxiliary OUT enable pin
- * \param enable_pin Pin for auxiliary OUT enable. See \ref sm_config_pins "sm_config_ pins" for more detail on pin arguments
+ * \param enable_bit_index Data bit index for auxiliary OUT enable.
 */
-static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool has_enable_pin, uint enable_pin) {
+static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool has_enable_pin, uint enable_bit_index) {
     c->execctrl = (c->execctrl &
                    (uint)~(PIO_SM0_EXECCTRL_OUT_STICKY_BITS | PIO_SM0_EXECCTRL_INLINE_OUT_EN_BITS |
                      PIO_SM0_EXECCTRL_OUT_EN_SEL_BITS)) |
                   (bool_to_bit(sticky) << PIO_SM0_EXECCTRL_OUT_STICKY_LSB) |
                   (bool_to_bit(has_enable_pin) << PIO_SM0_EXECCTRL_INLINE_OUT_EN_LSB) |
-                  ((enable_pin << PIO_SM0_EXECCTRL_OUT_EN_SEL_LSB) & PIO_SM0_EXECCTRL_OUT_EN_SEL_BITS);
-#if PICO_PIO_USE_GPIO_BASE
-    c->pinhi = (c->pinhi & ~(31u << 20)) |
-               ((enable_pin >> 4) << 20);
-#endif
+                  ((enable_bit_index << PIO_SM0_EXECCTRL_OUT_EN_SEL_LSB) & PIO_SM0_EXECCTRL_OUT_EN_SEL_BITS);
 }
 
 /*! \brief Set source for 'mov status' in a state machine configuration
@@ -819,8 +813,7 @@ static inline int pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *confi
     // bit6(32) + 0-15  -> base(16) + 16-31
     // bit6(0)  + 16-31 -> base(16) + 0-15
     static_assert(PINHI_EXECCTRL_LSB == 20, ""); // we use shifts to mask off bits below
-    static_assert(PIO_SM0_EXECCTRL_JMP_PIN_LSB == PIO_SM0_EXECCTRL_OUT_EN_SEL_LSB + 5, "");
-    pio->sm[sm].execctrl = config->execctrl ^ (gpio_base ? ((used >> 20) << (PIO_SM0_EXECCTRL_OUT_EN_SEL_LSB + 4)) : 0);
+    pio->sm[sm].execctrl = config->execctrl ^ (gpio_base ? ((used >> 20) << (PIO_SM0_EXECCTRL_JMP_PIN_LSB + 4)) : 0);
     pio->sm[sm].pinctrl = config->pinctrl ^ (gpio_base ? ((used << 12) >> 8) : 0);
 #else
     pio->sm[sm].execctrl = config->execctrl;
