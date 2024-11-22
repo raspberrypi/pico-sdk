@@ -70,7 +70,7 @@
  * additional features in the RP2350 PIO implementation that mean care should be taken when writing PIO
  * code that needs to run on both the RP2040 and the RP2350.
  *
-* \anchor sm_config_pins
+ * \anchor pio_sm_pins
  * \if rp2040_specific
  * On RP2040, pin numbers may always be specified from 0-31
  * \endif
