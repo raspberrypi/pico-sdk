@@ -170,7 +170,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
 
     pico_promote_common_scope_vars()
 
-    function(pico_use_partition_firmware TARGET)
+    function(pico_use_wifi_firmware_partition TARGET)
         if (PICO_PLATFORM STREQUAL "rp2040")
                 message(FATAL_ERROR "RP2040 does not support storing wi-fi firmware in partitions")
         endif()
