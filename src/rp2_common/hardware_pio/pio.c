@@ -298,10 +298,6 @@ void pio_sm_set_pins_with_mask64(PIO pio, uint sm, uint64_t pin_values, uint64_t
 void pio_sm_set_pindirs_with_mask_internal(PIO pio, uint sm, uint32_t pindirs, uint32_t pin_mask) {
     check_pio_param(pio);
     check_sm_param(sm);
-#if PICO_PIO_USE_GPIO_BASE
-    pindirs >>= pio_get_gpio_base(pio);
-    pin_mask >>= pio_get_gpio_base(pio);
-#endif
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
     hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
