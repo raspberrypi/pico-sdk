@@ -14,9 +14,6 @@ static aon_timer_alarm_handler_t aon_timer_alarm_handler;
 #include "hardware/rtc.h"
 #include "pico/util/datetime.h"
 
-static __force_inline bool ts_to_tm(const struct timespec *ts, struct tm *tm) {
-    return pico_localtime_r(&ts->tv_sec, tm) != NULL;
-}
 #elif HAS_POWMAN_TIMER
 #include "hardware/powman.h"
 
@@ -28,6 +25,9 @@ static void powman_timer_irq_handler(void) {
     if (aon_timer_alarm_handler) aon_timer_alarm_handler();
 }
 
+static bool ts_to_tm(const struct timespec *ts, struct tm *tm) {
+    return pico_localtime_r(&ts->tv_sec, tm) != NULL;
+}
 #endif
 
 static bool tm_to_ts(const struct tm *tm, struct timespec *ts) {
@@ -89,8 +89,8 @@ bool aon_timer_get_time_calendar(struct tm *tm) {
     return true;
 #elif HAS_POWMAN_TIMER
     struct timespec ts;
-    bool ok = tm_to_ts(tm, &ts);
-    return ok && aon_timer_get_time(&ts);
+    aon_timer_get_time(&ts);
+    return ts_to_tm(&ts, tm);
 #else
     panic_unsupported();
 #endif
@@ -179,29 +179,36 @@ void aon_timer_start_with_timeofday(void) {
     aon_timer_start(&ts);
 }
 
-void aon_timer_start(const struct timespec *ts) {
+bool aon_timer_start(const struct timespec *ts) {
 #if HAS_RP2040_RTC
     rtc_init();
-    aon_timer_set_time(ts);
+    return aon_timer_set_time(ts);
 #elif HAS_POWMAN_TIMER
     // todo how best to allow different configurations; this should just be the default
     powman_timer_set_1khz_tick_source_xosc();
-    powman_timer_set_ms(timespec_to_ms(ts));
-    powman_timer_start();
+    bool ok = aon_timer_set_time(ts);
+    if (ok) {
+        powman_timer_set_ms(timespec_to_ms(ts));
+        powman_timer_start();
+    }
+    return ok;
 #else
     panic_unsupported();
 #endif
 }
 
-void aon_timer_start_calendar(const struct tm *tm) {
+bool aon_timer_start_calendar(const struct tm *tm) {
 #if HAS_RP2040_RTC
     rtc_init();
-    aon_timer_set_time_calendar(tm);
+    return aon_timer_set_time_calendar(tm);
 #elif HAS_POWMAN_TIMER
     // todo how best to allow different configurations; this should just be the default
     powman_timer_set_1khz_tick_source_xosc();
-    aon_timer_set_time_calendar(tm);
-    powman_timer_start();
+    bool ok = aon_timer_set_time_calendar(tm);
+    if (ok) {
+        powman_timer_start();
+    }
+    return ok;
 #else
     panic_unsupported();
 #endif
