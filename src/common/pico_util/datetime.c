@@ -1,7 +1,7 @@
 #include "pico/util/datetime.h"
 
 #if !PICO_ON_DEVICE && __APPLE__
-// if we're compiling with LLVM on Apple, __weak does something else, but we don't care about overriding these ayway
+// if we're compiling with LLVM on Apple, __weak does something else, but we don't care about overriding these anyway on host builds
 #define __datetime_weak
 #else
 #define __datetime_weak __weak
