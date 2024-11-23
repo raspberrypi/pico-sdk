@@ -216,13 +216,10 @@ __mulsf3:
     clz a0, a4
     sll a4, a4, a0
     sub a2, a2, a0
-    // After normalising we can calculate the final exponent, since rounding
-    // cannot increase the exponent for multiplication (unlike addition)
     add a2, a2, a3
     // Subtract redundant bias term (127), add 1 for normalisation correction
     addi a2, a2, -126
     blez a2, __mulsf_underflow
-    bge a2, t0, __mulsf_overflow
 
     // Gather sticky bits from low fraction:
     snez a1, a1
@@ -231,6 +228,10 @@ __mulsf3:
     bexti a1, a4, 8
     add a4, a4, a1
     addi a4, a4, 127
+    // Check carry-out: exponent may increase due to rounding
+    bgez a4, 2f
+1:
+    bge a2, t0, __mulsf_overflow
     // Pack it and ship it
     packh a2, a2, a6
     slli a2, a2, 23
@@ -238,6 +239,10 @@ __mulsf3:
     srli a4, a4, 9
     add a0, a4, a2
     ret
+2:
+    srli a4, a4, 1
+    addi a2, a2, 1
+    j 1b
 
 __mulsf_underflow:
     // Signed zero
