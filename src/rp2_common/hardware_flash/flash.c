@@ -337,8 +337,8 @@ void flash_devinfo_set_cs_size(uint cs, flash_devinfo_size_t size) {
     uint cs_shift = cs == 0u ? OTP_DATA_FLASH_DEVINFO_CS0_SIZE_LSB : OTP_DATA_FLASH_DEVINFO_CS1_SIZE_LSB;
     uint cs_mask = OTP_DATA_FLASH_DEVINFO_CS0_SIZE_BITS >> OTP_DATA_FLASH_DEVINFO_CS0_SIZE_LSB;
     flash_devinfo_update_field(
-        (uint)size << cs_shift,
-        cs_mask << cs_shift
+        (uint16_t)size << cs_shift,
+        (uint16_t)cs_mask << cs_shift
     );
 }
 
@@ -364,7 +364,7 @@ void flash_devinfo_set_cs_gpio(uint cs, uint gpio) {
     invalid_params_if(HARDWARE_FLASH, gpio >= NUM_BANK0_GPIOS);
     (void)cs;
     flash_devinfo_update_field(
-        gpio << OTP_DATA_FLASH_DEVINFO_CS1_GPIO_LSB,
+        (uint16_t)gpio << OTP_DATA_FLASH_DEVINFO_CS1_GPIO_LSB,
         OTP_DATA_FLASH_DEVINFO_CS1_GPIO_BITS
     );
 }

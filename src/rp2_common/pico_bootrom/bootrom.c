@@ -76,7 +76,7 @@ void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pi
             flags |= BOOTSEL_FLAG_GPIO_PIN_ACTIVE_LOW;
         }
     }
-    rom_reboot(REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | REBOOT2_FLAG_NO_RETURN_ON_SUCCESS, 10, flags, usb_activity_gpio_pin);
+    rom_reboot(REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | REBOOT2_FLAG_NO_RETURN_ON_SUCCESS, 10, flags, usb_activity_gpio_pin >= 0 ? (uint32_t)usb_activity_gpio_pin : NUM_BANK0_GPIOS);
     __builtin_unreachable();
 #else
     panic_unsupported();
