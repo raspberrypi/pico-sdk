@@ -149,6 +149,18 @@ test_t mul_directed_tests[] = {
     // 1.25 x 2^-63 x 1.25 x 2^-64 = 0
     // (normal inputs with subnormal output, and we claim to be FTZ)
     {0x20200000u, 0x1fa00000u, 0x00000000u},
+    // 1.333333 (rounded down) x 1.5 = 2 - 1 ulp
+    {0x3faaaaaau, 0x3fc00000u, 0x3fffffffu},
+    // 1.333333 (rounded down) x (1.5 + 1 ulp) = 2 exactly
+    {0x3faaaaaau, 0x3fc00001u, 0x40000000u},
+    // (1.333333 (rounded down) + 1 ulp) x 1.5 = 2 exactly
+    {0x3faaaaabu, 0x3fc00000u, 0x40000000u},
+    // (1.25 - 1 ulp) x (0.8 + 1 ulp) = 1 exactly (exponent increases after rounding)
+    {0x3f9fffffu, 0x3f4cccceu, 0x3f800000u},
+    // as above, but overflow on exponent increase -> +inf
+    {0x3f9fffffu, 0x7f4cccceu, 0x7f800000u},
+    // subtract 1 ulp from rhs -> largest normal
+    {0x3f9fffffu, 0x7f4ccccdu, 0x7f7fffffu},
 };
 
 #define N_RANDOM_TESTS 1000
