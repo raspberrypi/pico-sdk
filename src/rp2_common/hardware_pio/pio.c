@@ -292,7 +292,7 @@ void pio_sm_set_pins_with_mask64(PIO pio, uint sm, uint64_t pin_values, uint64_t
     pin_values >>= pio_get_gpio_base(pio);
     pin_mask >>= pio_get_gpio_base(pio);
 #endif
-    pio_sm_set_pins_with_mask_internal(pio, sm, pin_values, pin_mask);
+    pio_sm_set_pins_with_mask_internal(pio, sm, (uint32_t)pin_values, (uint32_t)pin_mask);
 }
 
 void pio_sm_set_pindirs_with_mask_internal(PIO pio, uint sm, uint32_t pindirs, uint32_t pin_mask) {

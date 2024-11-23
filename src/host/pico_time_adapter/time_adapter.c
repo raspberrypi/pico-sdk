@@ -28,7 +28,7 @@ void PICO_WEAK_FUNCTION_IMPL_NAME(ta_set_timeout)(alarm_pool_timer_t *timer, uin
     panic_unsupported();
 }
 PICO_WEAK_FUNCTION_DEF(ta_wakes_up_on_or_before)
-void PICO_WEAK_FUNCTION_IMPL_NAME(ta_wakes_up_on_or_before)(alarm_pool_timer_t *timer, uint hardware_alarm_num, int64_t target) {
+bool PICO_WEAK_FUNCTION_IMPL_NAME(ta_wakes_up_on_or_before)(alarm_pool_timer_t *timer, uint hardware_alarm_num, int64_t target) {
     panic_unsupported();
 }
 PICO_WEAK_FUNCTION_DEF(ta_enable_irq_handler)
