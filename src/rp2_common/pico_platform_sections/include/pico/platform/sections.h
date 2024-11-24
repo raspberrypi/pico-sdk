@@ -143,7 +143,7 @@
  *
  * For example a function called my_func taking an int parameter:
  *
- *     void __time_critical(my_func)(int some_arg) {
+ *     void __time_critical_func(my_func)(int some_arg) {
  *
  * The function is placed in the `.time_critical.<func_name>` linker section
  *

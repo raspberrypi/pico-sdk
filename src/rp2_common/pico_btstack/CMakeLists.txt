@@ -28,7 +28,6 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     target_sources(pico_btstack_base INTERFACE
         ${PICO_BTSTACK_PATH}/3rd-party/micro-ecc/uECC.c
         ${PICO_BTSTACK_PATH}/3rd-party/rijndael/rijndael.c
-        ${PICO_BTSTACK_PATH}/3rd-party/segger-rtt/SEGGER_RTT.c
         ${PICO_BTSTACK_PATH}/3rd-party/segger-rtt/SEGGER_RTT_printf.c
         ${PICO_BTSTACK_PATH}/platform/embedded/btstack_tlv_flash_bank.c
         ${PICO_BTSTACK_PATH}/platform/embedded/hci_dump_embedded_stdout.c
@@ -56,12 +55,17 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/src/hci_event.c
         ${PICO_BTSTACK_PATH}/src/l2cap.c
         ${PICO_BTSTACK_PATH}/src/l2cap_signaling.c
-        ${PICO_BTSTACK_PATH}/src/mesh/gatt-service/mesh_provisioning_service_server.c
-        ${PICO_BTSTACK_PATH}/src/mesh/gatt-service/mesh_proxy_service_server.c
         ${PICO_BTSTACK_PATH}/3rd-party/md5/md5.c
         ${PICO_BTSTACK_PATH}/3rd-party/yxml/yxml.c
         ${CMAKE_CURRENT_LIST_DIR}/btstack_stdin_pico.c
     )
+    # pico-sdk now supports RTT using pico_enable_stdio_rtt in your cmake file or -DPICO_STDIO_RTT=1 on the command line
+    # Then the output of printf goes to RTT. But if you define ENABLE_SEGGER_RTT=1 it will use the btstack functionality to use RTT
+    # and we'll have to add the source file it requires.
+    target_sources(pico_btstack_base INTERFACE
+        $<IF:$<BOOL:$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_STDIO_RTT>,>,${PICO_STDIO_RTT},$<TARGET_PROPERTY:PICO_TARGET_STDIO_RTT>>>,,${PICO_BTSTACK_PATH}/3rd-party/segger-rtt/SEGGER_RTT.c>
+    )
+
     target_include_directories(pico_btstack_base_headers SYSTEM INTERFACE
         ${PICO_BTSTACK_PATH}/
         ${PICO_BTSTACK_PATH}/3rd-party/md5
@@ -155,6 +159,48 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     )
     target_compile_definitions(pico_btstack_classic_headers INTERFACE
             ENABLE_CLASSIC=1
+            )
+
+    pico_add_library(pico_btstack_mesh)
+    target_sources(pico_btstack_mesh INTERFACE
+        ${PICO_BTSTACK_PATH}/src/mesh/adv_bearer.c
+        ${PICO_BTSTACK_PATH}/src/mesh/beacon.c
+        ${PICO_BTSTACK_PATH}/src/mesh/gatt_bearer.c
+        ${PICO_BTSTACK_PATH}/src/mesh/gatt-service/mesh_provisioning_service_server.c
+        ${PICO_BTSTACK_PATH}/src/mesh/gatt-service/mesh_proxy_service_server.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_access.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_configuration_client.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_configuration_server.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_crypto.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_foundation.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_generic_default_transition_time_client.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_generic_default_transition_time_server.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_generic_level_client.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_generic_level_server.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_generic_on_off_client.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_generic_on_off_server.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_health_server.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_iv_index_seq_number.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_keys.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_lower_transport.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_network.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_node.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_peer.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_proxy.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_upper_transport.c
+        ${PICO_BTSTACK_PATH}/src/mesh/mesh_virtual_addresses.c
+        ${PICO_BTSTACK_PATH}/src/mesh/pb_adv.c
+        ${PICO_BTSTACK_PATH}/src/mesh/pb_gatt.c
+        ${PICO_BTSTACK_PATH}/src/mesh/provisioning.c
+        ${PICO_BTSTACK_PATH}/src/mesh/provisioning_device.c
+        ${PICO_BTSTACK_PATH}/src/mesh/provisioning_provisioner.c
+    )
+    pico_mirrored_target_link_libraries(pico_btstack_mesh INTERFACE
+        pico_btstack_ble
+    )
+    target_compile_definitions(pico_btstack_mesh_headers INTERFACE
+            ENABLE_MESH=1
             )
 
     pico_add_library(pico_btstack_flash_bank)

@@ -17,15 +17,14 @@ jobs:
           echo "Cleaning up previous run"
           rm -rf "${{ github.workspace }}/pico-sdk"
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Checkout submodules
         run: git submodule update --init
       - name: Install dependencies
         run: choco install .github/workflows/choco_packages.config
 
       - name: Build Project
-        # bash required otherwise this mysteriously (no error) fails at "Generating cyw43_bus_pio_spi.pio.h"
-        shell: bash
+        shell: pwsh
         run: |
           mkdir build
           cd build

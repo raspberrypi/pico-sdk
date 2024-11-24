@@ -188,10 +188,10 @@ enum gpio_dir {
  * cleared by writing to the INTR register.
  */
 enum gpio_irq_level {
-    GPIO_IRQ_LEVEL_LOW = 0x1u,  ///< IRQ when the GPIO pin is a logical 1
-    GPIO_IRQ_LEVEL_HIGH = 0x2u, ///< IRQ when the GPIO pin is a logical 0
-    GPIO_IRQ_EDGE_FALL = 0x4u,  ///< IRQ when the GPIO has transitioned from a logical 0 to a logical 1
-    GPIO_IRQ_EDGE_RISE = 0x8u,  ///< IRQ when the GPIO has transitioned from a logical 1 to a logical 0
+    GPIO_IRQ_LEVEL_LOW = 0x1u,  ///< IRQ when the GPIO pin is a logical 0
+    GPIO_IRQ_LEVEL_HIGH = 0x2u, ///< IRQ when the GPIO pin is a logical 1
+    GPIO_IRQ_EDGE_FALL = 0x4u,  ///< IRQ when the GPIO has transitioned from a logical 1 to a logical 0
+    GPIO_IRQ_EDGE_RISE = 0x8u,  ///< IRQ when the GPIO has transitioned from a logical 0 to a logical 1
 };
 
 /*! Callback function type for GPIO events
@@ -249,7 +249,7 @@ static inline void check_gpio_param(__unused uint gpio) {
  *  \ingroup hardware_gpio
  *
  * \param gpio GPIO number
- * \param fn Which GPIO function select to use from list \ref gpio_function
+ * \param fn Which GPIO function select to use from list \ref gpio_function_t
  */
 void gpio_set_function(uint gpio, gpio_function_t fn);
 
@@ -258,7 +258,7 @@ void gpio_set_function(uint gpio, gpio_function_t fn);
  *
  * \sa gpio_set_function
  * \param gpio_mask Mask with 1 bit per GPIO number to set the function for
- * \param fn Which GPIO function select to use from list \ref gpio_function
+ * \param fn Which GPIO function select to use from list \ref gpio_function_t
 */
 void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn);
 
@@ -267,7 +267,7 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn);
  *
  * \sa gpio_set_function
  * \param gpio_mask Mask with 1 bit per GPIO number to set the function for
- * \param fn Which GPIO function select to use from list \ref gpio_function
+ * \param fn Which GPIO function select to use from list \ref gpio_function_t
 */
 void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn);
 
@@ -275,7 +275,7 @@ void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn);
  *  \ingroup hardware_gpio
  *
  * \param gpio GPIO number
- * \return Which GPIO function is currently selected from list \ref gpio_function
+ * \return Which GPIO function is currently selected from list \ref gpio_function_t
  */
 gpio_function_t gpio_get_function(uint gpio);
 
@@ -1403,12 +1403,12 @@ extern void gpio_debug_pins_init(void);
 #endif
 
 
-// PICO_CONFIG: PICO_DEBUG_PIN_BASE, First pin to use for debug output (if enabled), min=0, max=28, default=19, group=hardware_gpio
+// PICO_CONFIG: PICO_DEBUG_PIN_BASE, First pin to use for debug output (if enabled), min=0, max=31 on RP2350B, 29 otherwise, default=19, group=hardware_gpio
 #ifndef PICO_DEBUG_PIN_BASE
 #define PICO_DEBUG_PIN_BASE 19u
 #endif
 
-// PICO_CONFIG: PICO_DEBUG_PIN_COUNT, Number of pins to use for debug output (if enabled), min=1, max=28, default=3, group=hardware_gpio
+// PICO_CONFIG: PICO_DEBUG_PIN_COUNT, Number of pins to use for debug output (if enabled), min=1, max=32 on RP2350B, 30 otherwise, default=3, group=hardware_gpio
 #ifndef PICO_DEBUG_PIN_COUNT
 #define PICO_DEBUG_PIN_COUNT 3u
 #endif

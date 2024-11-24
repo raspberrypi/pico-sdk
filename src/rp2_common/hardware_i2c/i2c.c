@@ -259,6 +259,12 @@ int i2c_write_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, const uint8_t *
                                        init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts);
 }
 
+int i2c_write_burst_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len) {
+    int rc = i2c_write_blocking_internal(i2c, addr, src, len, true, NULL, NULL);
+    i2c->restart_on_next = false;
+    return rc;
+}
+
 static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len, bool nostop,
                                check_timeout_fn timeout_check, timeout_state_t *ts) {
     invalid_params_if(HARDWARE_I2C, addr >= 0x80); // 7-bit addresses
@@ -292,7 +298,10 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
 
         do {
             abort_reason = i2c->hw->tx_abrt_source;
-            abort = (bool) i2c->hw->clr_tx_abrt;
+            if (i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+                abort = true;
+                i2c->hw->clr_tx_abrt;
+            }
             if (timeout_check) {
                 timeout = timeout_check(ts, false);
                 abort |= timeout;
@@ -340,4 +349,10 @@ int i2c_read_timeout_per_char_us(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, si
     timeout_state_t ts;
     return i2c_read_blocking_internal(i2c, addr, dst, len, nostop,
                                       init_per_iteration_timeout_us(&ts, timeout_per_char_us), &ts);
+}
+
+int i2c_read_burst_blocking(i2c_inst_t *i2c, uint8_t addr, uint8_t *dst, size_t len) {
+    int rc = i2c_read_blocking_internal(i2c, addr, dst, len, true, NULL, NULL);
+    i2c->restart_on_next = false;
+    return rc;
 }

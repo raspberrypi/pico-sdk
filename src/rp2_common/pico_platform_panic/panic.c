@@ -8,7 +8,7 @@
 #include <stdarg.h>
 #include <sys/cdefs.h>
 #include <unistd.h>
-#include "pico/platform/panic.h"
+#include "pico.h"
 
 #if LIB_PICO_PRINTF_PICO
 #include "pico/printf.h"
@@ -37,8 +37,8 @@ void __attribute__((naked, noreturn)) __printflike(1, 0) panic(__unused const ch
 #if !PICO_PANIC_FUNCTION_EMPTY
             "jal " __XSTRING(PICO_PANIC_FUNCTION) "\n"
 #endif
-            "ebreak\n"
-            "1: j 1b\n"
+            "1: ebreak\n"
+            "j 1b\n"
 
 #else
 
@@ -46,8 +46,8 @@ void __attribute__((naked, noreturn)) __printflike(1, 0) panic(__unused const ch
 #if !PICO_PANIC_FUNCTION_EMPTY
             "bl " __XSTRING(PICO_PANIC_FUNCTION) "\n"
 #endif
-            "bkpt #0\n"
-            "1: b 1b\n" // loop for ever as we are no return
+            "1: bkpt #0\n"
+            "b 1b\n" // loop for ever as we are no return
 
 #endif
         :

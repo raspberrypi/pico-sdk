@@ -62,6 +62,7 @@ f"""target_compile_definitions({args.cmake_executable_name} PRIVATE
 	PLL_SYS_VCO_FREQ_HZ={int((args.input * 1_000_000) / best_refdiv * best_fbdiv)}
 	PLL_SYS_POSTDIV1={best_pd1}
 	PLL_SYS_POSTDIV2={best_pd2}
+	SYS_CLK_HZ={int((args.input * 1_000_000) / (best_refdiv * best_pd1 * best_pd2) * best_fbdiv)}
 )
 """
 	if not args.cmake_only:

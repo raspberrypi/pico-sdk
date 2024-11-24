@@ -150,10 +150,12 @@ extern "C" {
 #define pico_default_asm(...) __asm (".syntax unified\n" __VA_ARGS__)
 #define pico_default_asm_volatile(...) __asm volatile (".syntax unified\n" __VA_ARGS__)
 #define pico_default_asm_goto(...) __asm goto (".syntax unified\n" __VA_ARGS__)
+#define pico_default_asm_volatile_goto(...) __asm volatile goto (".syntax unified\n" __VA_ARGS__)
 #else
 #define pico_default_asm(...) __asm (__VA_ARGS__)
 #define pico_default_asm_volatile(...) __asm volatile (__VA_ARGS__)
 #define pico_default_asm_goto(...) __asm goto (__VA_ARGS__)
+#define pico_default_asm_volatile_goto(...) __asm volatile goto (__VA_ARGS__)
 #endif
 
 /*! \brief Ensure that the compiler does not move memory access across this method call

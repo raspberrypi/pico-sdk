@@ -15,6 +15,7 @@ from bazel_common import (
     override_picotool_arg,
     parse_common_args,
     print_framed_string,
+    print_to_stderr,
     run_bazel,
     setup_logging,
 )
@@ -42,6 +43,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_divider_test:pico_divider_nesting_test",
                 "//test/pico_float_test:pico_double_test",
                 "//test/pico_float_test:pico_float_test",
+                "//test/pico_float_test:pico_float_test_hazard3",
                 "//test/pico_sha256_test:pico_sha256_test",
                 "//test/pico_stdio_test:pico_stdio_test",
                 "//test/pico_time_test:pico_time_test",
@@ -63,6 +65,10 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
                 # hardware_sha256 doesn't appear to work on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
             )
@@ -76,6 +82,10 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # TODO: RISC-V support.
+                "//test/pico_float_test:pico_float_test_hazard3",
             )
         ),
     },
@@ -90,6 +100,10 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
                 # hardware_sha256 doesn't appear to work on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
             )
@@ -106,6 +120,10 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # TODO: RISC-V support.
+                "//test/pico_float_test:pico_float_test_hazard3",
             )
         ),
     },
@@ -118,8 +136,28 @@ BUILD_CONFIGURATIONS = (
         "extra_targets": (),
         "exclusions": frozenset(
             (
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
                 # hardware_sha256 doesn't appear to work on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
+            )
+        ),
+    },
+    {
+        "name": "Pico 2 W",
+        "args": (
+            "--platforms=//bazel/platform:rp2350",
+            "--@pico-sdk//bazel/config:PICO_BOARD=pico2_w",
+        ),
+        "extra_targets": (),
+        "exclusions": frozenset(
+            (
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
             )
         ),
     },
@@ -175,12 +213,12 @@ def build_all_configurations(picotool_dir):
         )
         if result.returncode != 0:
             failed_builds.append(config["name"])
-        print()
+        print_to_stderr()
 
     if failed_builds:
         print_framed_string("ERROR: One or more builds failed.")
         for build in failed_builds:
-            print(f"  * FAILED: {build} build")
+            print_to_stderr(f"  * FAILED: {build} build")
         return 1
 
     print_framed_string("All builds successfully passed!")

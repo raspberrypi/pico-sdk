@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# NOTE THIS SCRIPT IS DEPRECATED. Use 'picotool coprodis' instead
+
 import argparse, re
 
 parser = argparse.ArgumentParser(description="Disassemble RCP instructions in DIS file")
@@ -61,6 +64,7 @@ replacements = [
     (r'mcr2\s*p?7, #?0, (.*), cr?(.*), cr?(.*), [\{#]1}?',  lambda m: 'rcp_canary_check {0}, 0x{1:02x} ({1}), nodelay'.format(m.group(1), int(m.group(2)) * 16 + int(m.group(3)))),
 
     (r'mrc\s*p?7, #?1, (.*), cr?(.*), cr?(.*), [\{#]0}?',   r'rcp_canary_status \1, delay'),
+    (r'mrc2\s*p?7, #?1, (.*), cr?(.*), cr?(.*), [\{#]0}?',   r'rcp_canary_status \1, nodelay'),
     (r'mcr\s*p?7, #?1, (.*), cr?(.*), cr?(.*), [\{#]0}?',   r'rcp_bvalid \1, delay'),
     (r'mcr2\s*p?7, #?1, (.*), cr?(.*), cr?(.*), [\{#]0}?',  r'rcp_bvalid \1, nodelay'),
 

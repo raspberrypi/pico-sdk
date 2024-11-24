@@ -24,6 +24,39 @@ extern void REAL_FUNC(free)(void *mem);
 
 extern char __StackLimit; /* Set by linker.  */
 
+#if !PICO_USE_MALLOC_MUTEX
+#define MALLOC_ENTER(outer) ((void)0);
+#define MALLOC_EXIT(outer) ((void)0);
+#elif !__PICOLIBC__
+#define MALLOC_ENTER(outer) mutex_enter_blocking(&malloc_mutex);
+#define MALLOC_EXIT(outer) mutex_exit(&malloc_mutex);
+#else
+static uint8_t mutex_exception_level_plus_one[NUM_CORES];
+// PICOLIBC implementations of calloc and realloc may call malloc and free,
+// so we need to cope with re-entrant calls. We don't want to use a recursive
+// mutex as that won't catch usage within an ISR; instead we record the exception
+// nesting as of acquiring the mutex
+#define MALLOC_ENTER(outer) \
+    uint exception = __get_current_exception(); \
+    uint core_num = get_core_num(); \
+    /* we skip the locking on outer == false if we are in the same irq nesting */ \
+    /* note: the `+ 1` is to distinguish no malloc nesting vs no-exception/irq level */ \
+    bool do_lock = outer || exception + 1 != mutex_exception_level_plus_one[core_num]; \
+    if (do_lock) { \
+        mutex_enter_blocking(&malloc_mutex); \
+        if (outer) mutex_exception_level_plus_one[core_num] = (uint8_t)(exception + 1); \
+    }
+
+#define MALLOC_EXIT(outer) \
+    if (outer) { \
+        mutex_exception_level_plus_one[core_num] = 0; \
+    } \
+    if (do_lock) { \
+        mutex_exit(&malloc_mutex); \
+    }
+
+#endif
+
 static inline void check_alloc(__unused void *mem, __unused uint size) {
 #if PICO_MALLOC_PANIC
     if (!mem || (((char *)mem) + size) > &__StackLimit) {
@@ -33,13 +66,9 @@ static inline void check_alloc(__unused void *mem, __unused uint size) {
 }
 
 void *WRAPPER_FUNC(malloc)(size_t size) {
-#if PICO_USE_MALLOC_MUTEX
-    mutex_enter_blocking(&malloc_mutex);
-#endif
+    MALLOC_ENTER(false)
     void *rc = REAL_FUNC(malloc)(size);
-#if PICO_USE_MALLOC_MUTEX
-    mutex_exit(&malloc_mutex);
-#endif
+    MALLOC_EXIT(false)
 #if PICO_DEBUG_MALLOC
     if (!rc) {
         printf("malloc %d failed to allocate memory\n", (uint) size);
@@ -52,13 +81,9 @@ void *WRAPPER_FUNC(malloc)(size_t size) {
 }
 
 void *WRAPPER_FUNC(calloc)(size_t count, size_t size) {
-#if PICO_USE_MALLOC_MUTEX
-    mutex_enter_blocking(&malloc_mutex);
-#endif
+    MALLOC_ENTER(true)
     void *rc = REAL_FUNC(calloc)(count, size);
-#if PICO_USE_MALLOC_MUTEX
-    mutex_exit(&malloc_mutex);
-#endif
+    MALLOC_EXIT(true)
 #if PICO_DEBUG_MALLOC
     if (!rc) {
         printf("calloc %d failed to allocate memory\n", (uint) (count * size));
@@ -71,13 +96,9 @@ void *WRAPPER_FUNC(calloc)(size_t count, size_t size) {
 }
 
 void *WRAPPER_FUNC(realloc)(void *mem, size_t size) {
-#if PICO_USE_MALLOC_MUTEX
-    mutex_enter_blocking(&malloc_mutex);
-#endif
+    MALLOC_ENTER(true)
     void *rc = REAL_FUNC(realloc)(mem, size);
-#if PICO_USE_MALLOC_MUTEX
-    mutex_exit(&malloc_mutex);
-#endif
+    MALLOC_EXIT(true)
 #if PICO_DEBUG_MALLOC
     if (!rc) {
         printf("realloc %d failed to allocate memory\n", (uint) size);
@@ -90,11 +111,7 @@ void *WRAPPER_FUNC(realloc)(void *mem, size_t size) {
 }
 
 void WRAPPER_FUNC(free)(void *mem) {
-#if PICO_USE_MALLOC_MUTEX
-    mutex_enter_blocking(&malloc_mutex);
-#endif
+    MALLOC_ENTER(false)
     REAL_FUNC(free)(mem);
-#if PICO_USE_MALLOC_MUTEX
-    mutex_exit(&malloc_mutex);
-#endif
+    MALLOC_EXIT(false)
 }

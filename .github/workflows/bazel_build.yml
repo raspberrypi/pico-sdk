@@ -1,0 +1,75 @@
+name: Bazel presubmit checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  bazel-build-check:
+    strategy:
+        matrix:
+          # TODO: Windows is currently broken.
+          os: [ubuntu-latest, macos-latest]
+        fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get Bazel
+        uses: bazel-contrib/setup-bazel@0.9.0
+        with:
+          # Avoid downloading Bazel every time.
+          bazelisk-cache: true
+          # Store build cache per workflow.
+          disk-cache: ${{ github.workflow }}
+          # Share repository cache between workflows.
+          repository-cache: true
+      # Only needed to drive the presbumit scripts.
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Fetch latest Picotool
+        uses: actions/checkout@v4
+        with:
+          repository: raspberrypi/picotool
+          ref: develop
+          fetch-depth: 0
+          path: lib/picotool
+      - name: Full Bazel build with develop Picotool
+        run: python3 tools/run_all_bazel_checks.py --program=build --picotool-dir=lib/picotool
+      # Checks that the current BCR-requested version of Picotool builds.
+      - name: Bazel Picotool backwards compatibility
+        run: bazel build @picotool//:picotool
+  other-bazel-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get Bazel
+        uses: bazel-contrib/setup-bazel@0.9.0
+        with:
+          # Avoid downloading Bazel every time.
+          bazelisk-cache: true
+          # Store build cache per workflow.
+          disk-cache: ${{ github.workflow }}
+          # Share repository cache between workflows.
+          repository-cache: true
+      # Only needed to drive the presbumit scripts.
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Fetch latest Picotool
+        uses: actions/checkout@v4
+        with:
+          repository: raspberrypi/picotool
+          ref: develop
+          fetch-depth: 0
+          path: lib/picotool
+      - name: Other Bazel checks
+        run: python3 tools/run_all_bazel_checks.py --program=other --picotool-dir=lib/picotool

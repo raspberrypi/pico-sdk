@@ -3,7 +3,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/find_compiler.cmake)
 # include our Platform/PICO.cmake
 set(CMAKE_SYSTEM_NAME PICO)
 
-# PICO_CMAKE_CONFIG: PICO_GCC_TRIPLE, List of GCC_TRIPLES -- usually only one -- to try when searching for a compiler. This may be specified the user environment, type=int, default=PICO_DEFAULT_GCC_TRIPLE which is set based on PICO_COMPILER, group=pico_base, doxref=cmake-toolchain-config
+# PICO_CMAKE_CONFIG: PICO_GCC_TRIPLE, List of GCC_TRIPLES -- usually only one -- to try when searching for a compiler. This may be specified the user environment, type=int, default=PICO_DEFAULT_GCC_TRIPLE which is set based on PICO_COMPILER, group=pico_base, docref=cmake-toolchain-config
 if (NOT PICO_GCC_TRIPLE)
     if (DEFINED ENV{_SAVED_PICO_GCC_TRIPLE})
         # saved within the same cmake invocation

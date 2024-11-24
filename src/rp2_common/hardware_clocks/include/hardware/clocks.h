@@ -110,7 +110,7 @@ extern "C" {
  * USB PLL    | CLOCKS_CLK_GPOUTx_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB | CLOCKS_CLK_REF_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB| CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB
  * ROSC       | CLOCKS_CLK_GPOUTx_CTRL_AUXSRC_VALUE_ROSC_CLKSRC    |                                                | CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_ROSC_CLKSRC
  * XOSC       | CLOCKS_CLK_GPOUTx_CTRL_AUXSRC_VALUE_XOSC_CLKSRC    |                                                | CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_XOSC_CLKSRC
- * LPOSC      | CLOCKS_CLK_GPOUTx_CTRL_AUXSRC_VALUE_LPOSC_CLKSRC | CLOCKS_CLK_REF_CTRL_AUXSRC_VALUE_LPOSC_CLKSRC | |
+ * LPOSC      | CLOCKS_CLK_GPOUTx_CTRL_AUXSRC_VALUE_LPOSC_CLKSRC   | | |
  * System clock | CLOCKS_CLK_GPOUTx_CTRL_AUXSRC_VALUE_CLK_SYS      | | |
  * USB Clock  | CLOCKS_CLK_GPOUTx_CTRL_AUXSRC_VALUE_CLK_USB        | | |
  * ADC clock  | CLOCKS_CLK_GPOUTx_CTRL_AUXSRC_VALUE_CLK_ADC        | | |
@@ -192,7 +192,7 @@ extern "C" {
 #ifndef PLL_SYS_VCO_FREQ_HZ
 #define PLL_SYS_VCO_FREQ_HZ                (1500 * MHZ)
 #endif
-// PICO_CONFIG: PLL_SYS_POSTDIV1, System clock PLL post divider 1 setting, type=int, default=6 on RP2040 5 or on RP2350, advanced=true, group=hardware_clocks
+// PICO_CONFIG: PLL_SYS_POSTDIV1, System clock PLL post divider 1 setting, type=int, default=6 on RP2040 or 5 on RP2350, advanced=true, group=hardware_clocks
 #ifndef PLL_SYS_POSTDIV1
 #if SYS_CLK_HZ == 125 * MHZ
 #define PLL_SYS_POSTDIV1                    6
@@ -253,6 +253,11 @@ extern "C" {
 #else
 #define PARAM_ASSERTIONS_ENABLED_HARDWARE_CLOCKS 0
 #endif
+#endif
+
+ // PICO_CONFIG: PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST, True if floating point GPIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_clocks
+#ifndef PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST
+#define PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
 #endif
 
 typedef clock_num_t clock_handle_t;
@@ -353,10 +358,29 @@ void clocks_enable_resus(resus_callback_t resus_callback);
  *
  * \param gpio The GPIO pin to output the clock to. Valid GPIOs are: 21, 23, 24, 25. These GPIOs are connected to the GPOUT0-3 clock generators.
  * \param src  The source clock. See the register field CLOCKS_CLK_GPOUT0_CTRL_AUXSRC for a full list. The list is the same for each GPOUT clock generator.
- * \param div_int  The integer part of the value to divide the source clock by. This is useful to not overwhelm the GPIO pin with a fast clock. this is in range of 1..2^24-1.
- * \param div_frac The fractional part of the value to divide the source clock by. This is in range of 0..255 (/256).
+ * \param div_int  The integer part of the value to divide the source clock by. This is useful to not overwhelm the GPIO pin with a fast clock. This is in range of 1..2^24-1 on RP2040
+ *                 and 1..2^16-1 on RP2350
+ * \param div_frac16 The fractional part of the value to divide the source clock by. This is in range of 0..65535 (/65536).
  */
-void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_int, uint8_t div_frac);
+void clock_gpio_init_int_frac16(uint gpio, uint src, uint32_t div_int, uint16_t div_frac16);
+
+/*! \brief Output an optionally divided clock to the specified gpio pin.
+ *  \ingroup hardware_clocks
+ *
+ * \param gpio The GPIO pin to output the clock to. Valid GPIOs are: 21, 23, 24, 25. These GPIOs are connected to the GPOUT0-3 clock generators.
+ * \param src  The source clock. See the register field CLOCKS_CLK_GPOUT0_CTRL_AUXSRC for a full list. The list is the same for each GPOUT clock generator.
+ * \param div_int  The integer part of the value to divide the source clock by. This is useful to not overwhelm the GPIO pin with a fast clock. This is in range of 1..2^24-1 on RP2040
+ *                 and 1..2^16-1 on RP2350
+ * \param div_frac8 The fractional part of the value to divide the source clock by. This is in range of 0..255 (/256).
+ */
+static inline void clock_gpio_init_int_frac8(uint gpio, uint src, uint32_t div_int, uint8_t div_frac8) {
+    return clock_gpio_init_int_frac16(gpio, src, div_int, (uint16_t)(div_frac8 << 8u));
+}
+
+// backwards compatibility
+static inline void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_int, uint8_t div_frac8) {
+    return clock_gpio_init_int_frac8(gpio, src, div_int, div_frac8);
+}
 
 /*! \brief Output an optionally divided clock to the specified gpio pin.
  *  \ingroup hardware_clocks
@@ -368,8 +392,19 @@ void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_int, uint8_t div
 static inline void clock_gpio_init(uint gpio, uint src, float div)
 {
     uint div_int = (uint)div;
-    uint8_t frac = (uint8_t)((div - (float)div_int) * (1u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB));
-    clock_gpio_init_int_frac(gpio, src, div_int, frac);
+    const int frac_bit_count = REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC);
+#if PICO_CLOCK_GPIO_CLKDIV_ROUND_NEAREST
+    div += 0.5f / (1 << frac_bit_count); // round to the nearest fraction
+#endif
+#if REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 16
+    uint16_t frac = (uint16_t)((div - (float)div_int) * (1u << frac_bit_count));
+    clock_gpio_init_int_frac16(gpio, src, div_int, frac);
+#elif REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 8
+    uint8_t frac = (uint8_t)((div - (float)div_int) * (1u << frac_bit_count));
+    clock_gpio_init_int_frac8(gpio, src, div_int, frac);
+#else
+#error unsupported number of fractional bits
+#endif
 }
 
 /*! \brief Configure a clock to come from a gpio input
@@ -383,14 +418,14 @@ static inline void clock_gpio_init(uint gpio, uint src, float div)
 bool clock_configure_gpin(clock_handle_t clock, uint gpio, uint32_t src_freq, uint32_t freq);
 
 /*! \brief Initialise the system clock to 48MHz
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  *  Set the system clock to 48MHz, and set the peripheral clock to match.
  */
 void set_sys_clock_48mhz(void);
 
 /*! \brief Initialise the system clock
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * \param vco_freq The voltage controller oscillator frequency to be used by the SYS PLL
  * \param post_div1 The first post divider for the SYS PLL
@@ -401,7 +436,7 @@ void set_sys_clock_48mhz(void);
 void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2);
 
 /*! \brief Check if a given system clock frequency is valid/attainable
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * \param freq_hz Requested frequency
  * \param vco_freq_out On success, the voltage controlled oscillator frequency to be used by the SYS PLL
@@ -412,7 +447,7 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2);
 bool check_sys_clock_hz(uint32_t freq_hz, uint *vco_freq_out, uint *post_div1_out, uint *post_div2_out);
 
 /*! \brief Check if a given system clock frequency is valid/attainable
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * \param freq_khz Requested frequency
  * \param vco_freq_out On success, the voltage controlled oscillator frequency to be used by the SYS PLL
@@ -423,7 +458,7 @@ bool check_sys_clock_hz(uint32_t freq_hz, uint *vco_freq_out, uint *post_div1_ou
 bool check_sys_clock_khz(uint32_t freq_khz, uint *vco_freq_out, uint *post_div1_out, uint *post_div2_out);
 
 /*! \brief Attempt to set a system clock frequency in hz
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * Note that not all clock frequencies are possible; it is preferred that you
  * use src/rp2_common/hardware_clocks/scripts/vcocalc.py to calculate the parameters
@@ -445,7 +480,7 @@ static inline bool set_sys_clock_hz(uint32_t freq_hz, bool required) {
 }
 
 /*! \brief Attempt to set a system clock frequency in khz
- *  \ingroup pico_stdlib
+ *  \ingroup hardware_clocks
  *
  * Note that not all clock frequencies are possible; it is preferred that you
  * use src/rp2_common/hardware_clocks/scripts/vcocalc.py to calculate the parameters

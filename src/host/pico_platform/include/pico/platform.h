@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#ifdef __unix__
+#if defined __unix__ && defined __GLIBC__
 
 #include <sys/cdefs.h>
 
@@ -47,7 +47,7 @@ extern void tight_loop_contents();
 #define __STRING(x) #x
 #endif
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || defined(__clang__)
 #ifndef __noreturn
 #define __noreturn __attribute((noreturn))
 #endif
@@ -148,7 +148,11 @@ uint get_core_num();
 
 static inline uint __get_current_exception(void) {
     return 0;
+
 }
+
+void busy_wait_at_least_cycles(uint32_t minimum_cycles);
+
 #ifdef __cplusplus
 }
 #endif

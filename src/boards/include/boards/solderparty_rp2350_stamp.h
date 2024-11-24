@@ -78,10 +78,7 @@
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
 
-#ifndef PICO_RP2040_B0_SUPPORTED
-#define PICO_RP2040_B0_SUPPORTED 1
-#endif
-
+// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

@@ -74,7 +74,7 @@
 #define HAS_RP2350_TRNG 1
 #define HAS_HSTX 1
 
-// PICO_CONFIG: XOSC_HZ, The crystal oscillator frequency in Hz, type=int, default=12000000, advanced=true, group=hardware_base
+// PICO_CONFIG: XOSC_HZ, Crystal oscillator frequency in Hz, type=int, default=12000000, advanced=true, group=hardware_base
 // NOTE:  The system and USB clocks are generated from the frequency using two PLLs.
 // If you override this define, or SYS_CLK_HZ/USB_CLK_HZ below, you will *also* need to add your own adjusted PLL set-up defines to
 // override the defaults which live in src/rp2_common/hardware_clocks/include/hardware/clocks.h
@@ -89,7 +89,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: SYS_CLK_HZ, The system operating frequency in Hz, type=int, default=150000000, advanced=true, group=hardware_base
+// PICO_CONFIG: SYS_CLK_HZ, System operating frequency in Hz, type=int, default=150000000, advanced=true, group=hardware_base
 #ifndef SYS_CLK_HZ
 #ifdef SYS_CLK_KHZ
 #define SYS_CLK_HZ ((SYS_CLK_KHZ) * _u(1000))
@@ -159,5 +159,7 @@
 #define VTABLE_FIRST_IRQ 16
 #endif
 #define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
+
+#define REG_FIELD_WIDTH(f) (f ## _MSB + 1 - f ## _LSB)
 
 #endif

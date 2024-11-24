@@ -228,7 +228,7 @@ void clocks_enable_resus(resus_callback_t resus_callback) {
     clocks_hw->resus.ctrl = CLOCKS_CLK_SYS_RESUS_CTRL_ENABLE_BITS | timeout;
 }
 
-void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_int, uint8_t div_frac) {
+void clock_gpio_init_int_frac16(uint gpio, uint src, uint32_t div_int, uint16_t div_frac16) {
     // Bit messy but it's as much code to loop through a lookup
     // table. The sources for each gpout generators are the same
     // so just call with the sources from GP0
@@ -245,10 +245,17 @@ void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_int, uint8_t div
         invalid_params_if(HARDWARE_CLOCKS, true);
     }
 
+    invalid_params_if(HARDWARE_CLOCKS, div_int >> REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_INT));
     // Set up the gpclk generator
     clocks_hw->clk[gpclk].ctrl = (src << CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_LSB) |
                                  CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS;
-    clocks_hw->clk[gpclk].div = (div_int << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) | div_frac;
+#if REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 16
+    clocks_hw->clk[gpclk].div = (div_int << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) | (div_frac16 << CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB);
+#elif REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 8
+    clocks_hw->clk[gpclk].div = (div_int << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) | ((div_frac16>>8u) << CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB);
+#else
+#error unsupported number of fractional bits
+#endif
 
     // Set gpio pin to gpclock function
     gpio_set_function(gpio, GPIO_FUNC_GPCK);
@@ -342,13 +349,18 @@ void set_sys_clock_48mhz(void) {
     }
 }
 
-// PICO_CONFIG: PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK, When the SYS clock PLL is changed keep the peripheral clock attached to it, type=bool, default=0, advanced=true, group=hardware_clocks
-#ifndef PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+// PICO_CONFIG: PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK, When the SYS clock PLL is changed keep the peripheral clock attached to it, type=bool, default=0, advanced=true, group=hardware_clocks
+#ifndef PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK
+// support old incorrect spelling too
+#ifdef PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+#define PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+#else
 // By default, when reconfiguring the system clock PLL settings after runtime initialization,
 // the peripheral clock is switched to the 48MHz USB clock to ensure continuity of peripheral operation.
 // Setting this value to 1 changes the behavior to have the peripheral clock re-configured
 // to the system clock at it's new frequency.
-#define PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK 0
+#define PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK 0
+#endif
 #endif
 
 void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
@@ -374,7 +386,7 @@ void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
                         CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
                         freq);
 
-#if PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+#if PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK
         clock_configure_undivided(clk_peri,
                         0,
                         CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,

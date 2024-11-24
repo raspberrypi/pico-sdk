@@ -20,6 +20,7 @@
 #ifndef __ASSEMBLER__
 #include <string.h>
 #include "pico/bootrom/lock.h"
+#include "pico/flash.h"
 // ROM FUNCTION SIGNATURES
 
 #if PICO_RP2040
@@ -173,32 +174,7 @@ __force_inline static void *rom_hword_as_ptr(uint16_t rom_address) {
 #ifdef __riscv
 static __force_inline bool rom_size_is_64k(void) {
 #ifdef RASPBERRYPI_AMETHYST_FPGA
-    // Detect ROM size by testing for bus fault at +32k
-    uint result;
-    pico_default_asm_volatile (
-        "li %0, 0\n"
-        // Save and disable IRQs before touching trap vector
-        "csrr t2, mstatus\n"
-        "csrci mstatus, 0x8\n"
-        // Set up trap vector to skip the instruction which sets the %0 flag
-        "la t0, 1f\n"
-        "csrrw t0, mtvec, t0\n"
-        // This load will fault if the bootrom is no larger than 32k:
-        "li t1, 32 * 1024\n"
-        "lw t1, (t1)\n"
-        // No fault, so set return to true
-        "li %0, 1\n"
-        ".p2align 2\n"
-        // Always end up back here, restore the trap table
-        "1:\n"
-        "csrw mtvec, t0\n"
-        // Now safe to restore interrupts
-        "csrw mstatus, t2\n"
-        : "=r" (result)
-        :
-        : "t0", "t1", "t2"
-    );
-    return result;
+    return *(uint16_t*)0x14 >= 0x8000;
 #else
     return false;
 #endif
@@ -262,6 +238,25 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
 }
 
 /*!
+ * \brief Reboot the device into BOOTSEL mode
+ * \ingroup pico_bootrom
+ *
+ * This function reboots the device into the BOOTSEL mode ('usb boot").
+ *
+ * Facilities are provided to enable an "activity light" via GPIO attached LED for the USB Mass Storage Device,
+ * and to limit the USB interfaces exposed.
+ *
+ * \param usb_activity_gpio_pin  GPIO pin to be used as an activitiy pin, or -1 for none
+ *                               from the host.
+ * \param disable_interface_mask value to control exposed interfaces
+ *  - 0 To enable both interfaces (as per a cold boot)
+ *  - 1 To disable the USB Mass Storage Interface
+ *  - 2 To disable the USB PICOBOOT Interface
+ * \param usb_activity_gpio_pin_active_low Activity GPIO is active low (ignored on RP2040)
+ */
+void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pin, uint32_t disable_interface_mask, bool usb_activity_gpio_pin_active_low);
+
+/*!
  * \brief Connect the SSI/QMI to the QSPI pads
  * \ingroup pico_bootrom
  * 
@@ -273,7 +268,7 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
  * bank 0 IOs are untouched.
  * \endif
  */
-static inline void rom_connect_internal_flash() {
+static inline void rom_connect_internal_flash(void) {
     rom_connect_internal_flash_fn func = (rom_connect_internal_flash_fn) rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
     func();
 }
@@ -304,7 +299,7 @@ static inline void rom_connect_internal_flash() {
  * device from its XIP state to a serial command state.
  * \endif
  */
-static inline void rom_flash_exit_xip() {
+static inline void rom_flash_exit_xip(void) {
     rom_flash_exit_xip_fn func = (rom_flash_exit_xip_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
     func();
 }
@@ -387,7 +382,7 @@ static inline void rom_flash_range_program(uint32_t addr, const uint8_t *data, s
  * No other operations are performed.
  * \endif
  */
-static inline void rom_flash_flush_cache() {
+static inline void rom_flash_flush_cache(void) {
     rom_flash_flush_cache_fn func = (rom_flash_flush_cache_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     func();
 }
@@ -403,7 +398,7 @@ static inline void rom_flash_flush_cache() {
  * Note that the same setup is performed by flash_exit_xip(), and the RP2350 flash program/erase functions do not leave XIP in an
  * inaccessible state, so calls to this function are largely redundant on RP2350. It is provided on RP2350 for compatibility with RP2040.
  */
-static inline void rom_flash_enter_cmd_xip() {
+static inline void rom_flash_enter_cmd_xip(void) {
     rom_flash_enter_cmd_xip_fn func = (rom_flash_enter_cmd_xip_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_ENTER_CMD_XIP);
     func();
 }
@@ -542,6 +537,20 @@ static inline void rom_flash_select_xip_read_mode(bootrom_xip_mode_t mode, uint8
     func(mode, clkdiv);
 }
 
+typedef struct {
+    cflash_flags_t flags;
+    uintptr_t addr;
+    uint32_t size_bytes;
+    uint8_t *buf;
+    int *res;
+} rom_helper_flash_op_params_t;
+
+static inline void rom_helper_flash_op(void *param) {
+    const rom_helper_flash_op_params_t *op = (const rom_helper_flash_op_params_t *)param;
+    rom_flash_op_fn func = (rom_flash_op_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_OP);
+    *(op->res) = func(op->flags, op->addr, op->size_bytes, op->buf);
+}
+
 /*!
  * \brief Perform a flash read, erase, or program operation
  * \ingroup pico_bootrom
@@ -582,12 +591,23 @@ static inline void rom_flash_select_xip_read_mode(bootrom_xip_mode_t mode, uint8
  * \param buf contains data to be written to flash, for program operations, and data read back from flash, for read operations
  */
 static inline int rom_flash_op(cflash_flags_t flags, uintptr_t addr, uint32_t size_bytes, uint8_t *buf) {
-    rom_flash_op_fn func = (rom_flash_op_fn) rom_func_lookup_inline(ROM_FUNC_FLASH_OP);
     if (!bootrom_try_acquire_lock(BOOTROM_LOCK_FLASH_OP))
         return BOOTROM_ERROR_LOCK_REQUIRED;
-    int rc = func(flags, addr, size_bytes, buf);
+    int rc = 0;
+    rom_helper_flash_op_params_t params = {
+        .flags = flags,
+        .addr = addr,
+        .size_bytes = size_bytes,
+        .buf = buf,
+        .res = &rc
+    };
+    int flash_rc = flash_safe_execute(rom_helper_flash_op, &params, UINT32_MAX);
     bootrom_release_lock(BOOTROM_LOCK_FLASH_OP);
-    return rc;
+    if (flash_rc != PICO_OK) {
+        return flash_rc;
+    } else {
+        return rc;
+    }
 }
 
 /*!
@@ -639,7 +659,7 @@ static inline int rom_func_otp_access(uint8_t *buf, uint32_t buf_len, otp_cmd_t 
  * a hash of the partition table as of the time it loaded it. If the hash has changed by the time this method is called,
  * then it will return BOOTROM_ERROR_INVALID_STATE.
  * 
- * The information returned is chosen by the flags_and_partition parameter; the first word in the returned buffer,
+ * The information returned is chosen by the partition_and_flags parameter; the first word in the returned buffer,
  * is the (sub)set of those flags that the API supports. You should always check this value before interpreting
  * the buffer.
  * 
@@ -667,7 +687,7 @@ static inline int rom_get_partition_table_info(uint32_t *out_buffer, uint32_t ou
  *
  * This method potentially requires similar complexity to the boot path in terms of picking amongst versions, checking signatures etc.
  * As a result it requires a user provided memory buffer as a work area. The work area should byte word-aligned and of sufficient size
- * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3064, so 3K is a good choice.
+ * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3264, so 3.25K is a good choice.
  * 
  * If force_reload is false, then this method will return BOOTROM_OK immediately if the bootrom is loaded, otherwise it will
  * reload the partition table if it has been loaded already, allowing for the partition table to be updated in a running program.
@@ -694,7 +714,7 @@ static inline int rom_load_partition_table(uint8_t *workarea_base, uint32_t work
  * 
  * This method potentially requires similar complexity to the boot path in terms of picking amongst versions, checking signatures etc.
  * As a result it requires a user provided memory buffer as a work area. The work area should bye word aligned, and of sufficient size
- * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3064, so 3K is a good choice.
+ * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3264, so 3.25K is a good choice.
  * 
  * The passed partition number can be any valid partition number other than the "B" partition of an A/B pair.
  * 
@@ -741,7 +761,7 @@ static inline int rom_get_b_partition(uint pi_a) {
  * 
  * This method potentially requires similar complexity to the boot path in terms of picking amongst versions, checking signatures etc.
  * As a result it requires a user provided memory buffer as a work area. The work area should byte word-aligned and of sufficient size
- * or `BOOTROM_ERROR_INSUFFICIENT_RESOURCES` will be returned. The work area size currently required is 3064, so 3K is a good choice.
+ * or `BOOTROM_ERROR_INSUFFICIENT_RESOURCES` will be returned. The work area size currently required is 3264, so 3.25K is a good choice.
  * 
  * If the partition table
  * has not been loaded (e.g. from a watchdog or RAM boot), then this method will return `BOOTROM_ERROR_PRECONDITION_NOT_MET`, and you
@@ -794,7 +814,7 @@ static inline intptr_t rom_flash_runtime_to_storage_addr(uintptr_t flash_runtime
  * 
  * This method potentially requires similar complexity to the boot path in terms of picking amongst versions, checking signatures etc.
  * As a result it requires a user provided memory buffer as a work area. The work area should be word aligned, and of sufficient size
- * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3064, so 3K is a good choice.
+ * or BOOTROM_ERROR_INSUFFICIENT_RESOURCES will be returned. The work area size currently required is 3264, so 3.25K is a good choice.
  * 
  * NOTE: This method is primarily expected to be used when implementing bootloaders.
  * 
@@ -809,9 +829,23 @@ static inline intptr_t rom_flash_runtime_to_storage_addr(uintptr_t flash_runtime
 static inline int rom_chain_image(uint8_t *workarea_base, uint32_t workarea_size, uint32_t region_base, uint32_t region_size) {
     rom_chain_image_fn func = (rom_chain_image_fn) rom_func_lookup_inline(ROM_FUNC_CHAIN_IMAGE);
     bootrom_release_lock(BOOTROM_LOCK_ENABLE);
+    uint32_t interrupt_flags = save_and_disable_interrupts();
     int rc = func(workarea_base, workarea_size, region_base, region_size);
+    restore_interrupts_from_disabled(interrupt_flags);
     bootrom_acquire_lock_blocking(BOOTROM_LOCK_ENABLE);
     return rc;
+}
+
+typedef struct {
+    uint8_t *buffer;
+    uint32_t buffer_size;
+    int *res;
+} rom_helper_explicit_buy_params_t;
+
+static inline void rom_helper_explicit_buy(void *param) {
+    const rom_helper_explicit_buy_params_t *op = (const rom_helper_explicit_buy_params_t *)param;
+    rom_explicit_buy_fn func = (rom_explicit_buy_fn) rom_func_lookup_inline(ROM_FUNC_EXPLICIT_BUY);
+    *(op->res) = func(op->buffer, op->buffer_size);
 }
 
 // todo SECURE only
@@ -841,8 +875,18 @@ static inline int rom_chain_image(uint8_t *workarea_base, uint32_t workarea_size
  * \param buffer_size size of scratch space
  */
 static inline int rom_explicit_buy(uint8_t *buffer, uint32_t buffer_size) {
-    rom_explicit_buy_fn func = (rom_explicit_buy_fn) rom_func_lookup_inline(ROM_FUNC_EXPLICIT_BUY);
-    return func(buffer, buffer_size);
+    int rc = 0;
+    rom_helper_explicit_buy_params_t params = {
+        .buffer = buffer,
+        .buffer_size = buffer_size,
+        .res = &rc
+    };
+    int flash_rc = flash_safe_execute(rom_helper_explicit_buy, &params, UINT32_MAX);
+    if (flash_rc != PICO_OK) {
+        return flash_rc;
+    } else {
+        return rc;
+    }
 }
 
 #ifndef __riscv

@@ -19,6 +19,7 @@ void ta_clear_force_irq(alarm_pool_timer_t *timer, uint hardware_alarm_num);
 void ta_clear_irq(alarm_pool_timer_t *timer, uint hardware_alarm_num);
 void ta_force_irq(alarm_pool_timer_t *timer, uint hardware_alarm_num);
 void ta_set_timeout(alarm_pool_timer_t *timer, uint hardware_alarm_num, int64_t target);
+bool ta_wakes_up_on_or_before(alarm_pool_timer_t *timer, uint alarm_num, int64_t target);
 void ta_enable_irq_handler(alarm_pool_timer_t *timer, uint hardware_alarm_num, void (*irq_handler)(void));
 void ta_disable_irq_handler(alarm_pool_timer_t *timer, uint hardware_alarm_num, void (*irq_handler)(void));
 void ta_hardware_alarm_claim(alarm_pool_timer_t *timer, uint hardware_alarm_num);

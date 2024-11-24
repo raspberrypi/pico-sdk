@@ -1,31 +1,46 @@
-load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config")
+load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config", "compatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
+
+# Some of the LWIP sys_arch.h and the lwip headers depend circularly on one
+# another. Include them all in the same target.
+cc_library(
+    name = "pico_lwip_headers",
+    hdrs = glob(["**/*.h"]),
+    includes = [
+        "contrib/ports/freertos/include/arch",
+        "src/include",
+    ],
+    visibility = [
+        "@pico-sdk//src/rp2_common/pico_lwip:__pkg__",
+    ],
+    deps = [
+        "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_config",
+    ],
+)
 
 cc_library(
     name = "pico_lwip_core",
     srcs = glob(["src/core/*.c"]),
-    hdrs = glob(["**/*.h"]),
-    includes = ["src/include"],
-    target_compatible_with = incompatible_with_config(
-        "@pico-sdk//bazel/constraint:pico_lwip_config_unset",
-    ),
     deps = [
+        ":pico_lwip_headers",
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG",
-        "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_config",
     ],
+    target_compatible_with = incompatible_with_config("@pico-sdk//bazel/constraint:pico_lwip_config_unset")
 )
 
 cc_library(
     name = "pico_lwip_core4",
     srcs = glob(["src/core/ipv4/*.c"]),
     deps = [":pico_lwip_core"],
+    alwayslink = True,
 )
 
 cc_library(
     name = "pico_lwip_core6",
     srcs = glob(["src/core/ipv6/*.c"]),
     deps = [":pico_lwip_core"],
+    alwayslink = True,
 )
 
 cc_library(
@@ -151,13 +166,13 @@ cc_library(
 
 cc_library(
     name = "pico_lwip_contrib_freertos",
-    srcs = ["ports/freertos/sys_arch.c"],
-    includes = ["ports/freertos/include"],
+    srcs = ["contrib/ports/freertos/sys_arch.c"],
+    includes = ["contrib/ports/freertos/include"],
     target_compatible_with = incompatible_with_config(
         "@pico-sdk//bazel/constraint:pico_freertos_unset",
     ),
     deps = [
-        ":pico_lwip_core",
-        "//bazel/config:PICO_FREERTOS_LIB",
+        ":pico_lwip_headers",
+        "@pico-sdk//bazel/config:PICO_FREERTOS_LIB",
     ],
 )

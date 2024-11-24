@@ -20,6 +20,7 @@
  * * \c \b pico_btstack_sbc_decoder - Adds Bluetooth Sub Band Coding (SBC) decoder support.
  * * \c \b pico_btstack_bnep_lwip - Adds Bluetooth Network Encapsulation Protocol (BNEP) support using LwIP.
  * * \c \b pico_btstack_bnep_lwip_sys_freertos - Adds Bluetooth Network Encapsulation Protocol (BNEP) support using LwIP with FreeRTOS for NO_SYS=0.
+ * * \c \b pico_btstack_mesh - Adds Bluetooth mesh support from BTstack.
  *
  * \note The CMake function pico_btstack_make_gatt_header can be used to run the BTstack compile_gatt tool to make a GATT header file from a BTstack GATT file.
  *

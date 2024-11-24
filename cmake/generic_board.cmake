@@ -1,4 +1,5 @@
 # For boards without their own cmake file, we look for a header file
+cmake_minimum_required(VERSION 3.15)
 
 # PICO_CMAKE_CONFIG: PICO_BOARD_HEADER_DIRS, List of directories to look for <PICO_BOARD>.h in. This may be specified the user environment, type=list, group=build
 if (DEFINED ENV{PICO_BOARD_HEADER_DIRS})
@@ -25,6 +26,8 @@ if (EXISTS ${PICO_BOARD_HEADER_FILE})
         if (LINE MATCHES "^[ \t\]*//[ \t\]*pico_cmake_set_default[ \t\]*([a-zA-Z_][a-zA-Z0-9_]*)[ \t\]*=[ \t\]*(.*)")
             if (NOT DEFINED "${CMAKE_MATCH_1}")
                 set("${CMAKE_MATCH_1}" "${CMAKE_MATCH_2}")
+            else()
+                list(APPEND PICO_BOARD_CMAKE_OVERRIDES ${CMAKE_MATCH_1})
             endif()
         endif()
     endwhile()

@@ -9,7 +9,7 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/pico.h"
+// This header may be included by other board headers as "boards/pico2.h"
 
 // pico_cmake_set PICO_PLATFORM=rp2350
 
@@ -93,6 +93,7 @@
 #define PICO_VSYS_PIN 29
 #endif
 
+// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

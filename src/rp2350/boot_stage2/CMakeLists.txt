@@ -40,9 +40,9 @@ function(pico_define_boot_stage2 NAME SOURCES)
     )
 
     # todo bit of an abstraction failure - revisit for Clang support anyway
-    if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    if (PICO_C_COMPILER_IS_CLANG)
         target_link_options(${NAME} PRIVATE "-nostdlib")
-    else ()
+    elseif (PICO_C_COMPILER_IS_GNU)
         target_link_options(${NAME} PRIVATE "--specs=nosys.specs")
         target_link_options(${NAME} PRIVATE "-nostartfiles")
     endif ()
@@ -63,17 +63,15 @@ function(pico_define_boot_stage2 NAME SOURCES)
     find_package (Python3 REQUIRED COMPONENTS Interpreter)
 
     add_custom_target(${NAME}_bin DEPENDS ${ORIGINAL_BIN})
-    add_custom_command(OUTPUT ${ORIGINAL_BIN} DEPENDS ${NAME} COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${NAME}> ${ORIGINAL_BIN})
+    add_custom_command(OUTPUT ${ORIGINAL_BIN} DEPENDS ${NAME} COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${NAME}> ${ORIGINAL_BIN}
+        VERBATIM)
 
-    add_custom_target(${NAME}_padded_checksummed_asm DEPENDS ${PADDED_CHECKSUMMED_ASM})
     add_custom_command(OUTPUT ${PADDED_CHECKSUMMED_ASM} DEPENDS ${ORIGINAL_BIN}
             COMMAND ${Python3_EXECUTABLE} ${PICO_BOOT_STAGE2_DIR}/pad_checksum -s 0xffffffff -a $<IF:${PICO_RISCV},riscv,arm> ${ORIGINAL_BIN} ${PADDED_CHECKSUMMED_ASM}
-            )
+            VERBATIM)
 
-    add_library(${NAME}_library INTERFACE)
-    add_dependencies(${NAME}_library ${NAME}_padded_checksummed_asm)
-    # not strictly (or indeed actually) a link library, but this avoids dependency cycle
-    target_link_libraries(${NAME}_library INTERFACE ${PADDED_CHECKSUMMED_ASM})
+    add_library(${NAME}_library OBJECT ${PADDED_CHECKSUMMED_ASM})
+    target_link_libraries(${NAME}_library INTERFACE "$<TARGET_OBJECTS:${NAME}_library>")
     target_link_libraries(${NAME}_library INTERFACE boot_stage2_headers)
 
     list(GET SOURCES 0 FIRST_SOURCE)

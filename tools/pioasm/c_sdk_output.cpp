@@ -109,7 +109,7 @@ struct c_sdk_output : public output_format {
             fprintf(out, "    .instructions = %sprogram_instructions,\n", prefix.c_str());
             fprintf(out, "    .length = %d,\n", (int) program.instructions.size());
             fprintf(out, "    .origin = %d,\n", program.origin.get());
-            fprintf(out, "    .pio_version = %d,\n", program.pio_version);
+            fprintf(out, "    .pio_version = %spio_version,\n", prefix.c_str());
             fprintf(out, "#if PICO_PIO_VERSION > 0\n");
             fprintf(out, "    .used_gpio_ranges = 0x%x\n", program.used_gpio_ranges);
             fprintf(out, "#endif\n");

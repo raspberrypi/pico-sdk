@@ -72,6 +72,12 @@ bool_flag(
     build_setting_default = True,
 )
 
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_UART_BAUD_RATE, Define the default UART baudrate, type=int, max=921600, default=115200, group=hardware_uart
+int_flag(
+    name = "PICO_DEFAULT_UART_BAUD_RATE",
+    build_setting_default = 115200,
+)
+
 # PICO_BAZEL_CONFIG: PICO_STDIO_USB, Option to globally enable stdio USB for all targets by default, type=bool, default=0, group=pico_stdlib
 bool_flag(
     name = "PICO_STDIO_USB",
@@ -145,13 +151,24 @@ string_flag(
     ],
 )
 
+# PICO_BAZEL_CONFIG: PICO_ASYNC_CONTEXT_IMPL, The default implementation for pico_async_context to link, type=string, default=threadsafe_background, group=build
+string_flag(
+    name = "PICO_ASYNC_CONTEXT_IMPL",
+    build_setting_default = "threadsafe_background",
+    values = [
+        "poll",
+        "threadsafe_background",
+        "freertos",
+    ],
+)
+
 # PICO_BAZEL_CONFIG: PICO_BINARY_INFO_ENABLED, Whether to include binary info in final firmware, type=bool, default=1, group=pico_stdlib
 bool_flag(
     name = "PICO_BINARY_INFO_ENABLED",
     build_setting_default = True,
 )
 
-# PICO_BAZEL_CONFIG: PICO_CMSIS_PATH, Label of a cc_ibrary providing CMSIS core, default="included stub CORE only impl", group=build
+# PICO_BAZEL_CONFIG: PICO_CMSIS_PATH, Label of a cc_ibrary providing CMSIS core,  type=string, default="included stub CORE only impl", group=build
 label_flag(
     name = "PICO_CMSIS_PATH",
     build_setting_default = "//src/rp2_common/cmsis:cmsis_core",
@@ -240,6 +257,24 @@ string_flag(
 label_flag(
     name = "PICO_BTSTACK_CONFIG",
     build_setting_default = "//bazel:empty_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_BT_ENABLE_BLE, [Bazel only] Whether or not to link in BLE portions of the btstack as part of //src/rp2_common/pico_btstack. Also defines ENABLE_BLE=1, type=bool, default=False, group=wireless
+bool_flag(
+    name = "PICO_BT_ENABLE_BLE",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_BT_ENABLE_CLASSIC, [Bazel only] Whether or not to link in classic BT portions of the btstack as part of //src/rp2_common/pico_btstack. Also defines ENABLE_CLASSIC=1, type=bool, default=False, group=wireless
+bool_flag(
+    name = "PICO_BT_ENABLE_CLASSIC",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_BT_ENABLE_MESH, [Bazel only] Whether or not to link in mesh BT portions of the btstack as part of //src/rp2_common/pico_btstack. Also defines ENABLE_MESH=1, type=bool, default=False, group=wireless
+bool_flag(
+    name = "PICO_BT_ENABLE_MESH",
+    build_setting_default = False,
 )
 
 # PICO_BAZEL_CONFIG: PICO_LWIP_CONFIG, [Bazel only] The cc_library that provides lwipopts.h, default=//bazel:empty_cc_lib, group=wireless

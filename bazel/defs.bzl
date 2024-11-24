@@ -88,6 +88,7 @@ def compatible_with_pico_w():
     return select({
         "@pico-sdk//bazel/constraint:cyw43_wireless": [],
         "@pico-sdk//bazel/constraint:is_pico_w": [],
+        "@pico-sdk//bazel/constraint:is_pico2_w": [],
         "//conditions:default": ["@platforms//:incompatible"],
     })
 

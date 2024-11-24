@@ -11,8 +11,8 @@
 
 // pico_cmake_set PICO_PLATFORM=rp2350
 
-#ifndef _BOARDS_GEN4_RP2350_35CT
-#define _BOARDS_GEN4_RP2350_35CT
+#ifndef _BOARDS_GEN4_RP2350_35CT_H
+#define _BOARDS_GEN4_RP2350_35CT_H
 
 // For board detection
 #define GEN4_RP2350_35CT	// CLB variants are exactly the same in operation
@@ -76,6 +76,7 @@
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
 
+// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

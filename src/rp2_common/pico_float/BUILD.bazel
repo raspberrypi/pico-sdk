@@ -86,6 +86,7 @@ alias(
     actual = select({
         "//bazel/constraint:rp2040": ":pico_float_pico",
         "@platforms//cpu:armv8-m": ":pico_float_vfp",
+        "@platforms//cpu:riscv32": ":pico_float_single_hazard3",
         "//conditions:default": ":pico_float_compiler",
     }),
     visibility = ["//visibility:private"],
@@ -138,12 +139,22 @@ _PICO_FLOAT_IMPLS = [
         "extra_deps": ["//src/rp2_common/hardware_dcp"],
         "linkopts": _WRAP_FLOAT_SCI_FLAGS,
     },
+    {
+        "name": "single_hazard3",
+        "srcs": [
+            "float_single_hazard3.S",
+        ],
+        "compatibility": compatible_with_rp2() + ["@platforms//cpu:riscv32"],
+        "extra_deps": ["//src/rp2_common/hardware_hazard3"],
+        "linkopts": _WRAP_FLOAT_SCI_FLAGS,
+    },
 ]
 
 # Creates:
 #   * pico_float_pico
 #   * pico_float_dcp
 #   * pico_float_vfp
+#   * pico_float_single_hazard3
 [
     cc_library(
         name = "pico_float_{}".format(impl["name"]),

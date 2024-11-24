@@ -6,10 +6,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "btstack_config",
     hdrs = ["btstack_config.h"],
-    defines = [
-        "ENABLE_CLASSIC=1",
-        "ENABLE_BLE=1",
-    ],
     includes = ["."],
 )
 
@@ -60,6 +56,7 @@ cc_library(
         "//src/rp2_common/hardware_uart",
         "//src/rp2_common/hardware_vreg",
         "//src/rp2_common/hardware_watchdog",
+        "//src/rp2_common/hardware_xip_cache",
         "//src/rp2_common/hardware_xosc",
         "//src/rp2_common/pico_aon_timer",
         "//src/rp2_common/pico_bootrom",
@@ -112,6 +109,7 @@ cc_binary(
     deps = [
         ":kitchen_sink_common",
         "//src/rp2_common/pico_cyw43_arch:pico_cyw43_arch_lwip_poll",
+        "//src/rp2_common/pico_btstack:pico_btstack",
     ],
 )
 
@@ -132,6 +130,8 @@ kitchen_sink_test_binary(
     src = ":kitchen_sink_lwip_poll_actual",
     bt_stack_config = ":btstack_config",
     lwip_config = ":lwip_config",
+    enable_ble = True,
+    enable_bt_classic = True,
     target_compatible_with = compatible_with_rp2(),
 )
 
@@ -141,5 +141,7 @@ kitchen_sink_test_binary(
     src = ":kitchen_sink_lwip_background_actual",
     bt_stack_config = ":btstack_config",
     lwip_config = ":lwip_config",
+    enable_ble = True,
+    enable_bt_classic = True,
     target_compatible_with = compatible_with_rp2(),
 )

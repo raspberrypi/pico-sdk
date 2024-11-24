@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["include/hardware/boot_lock.h"],
     includes = ["include"],
     tags = ["manual"],
+    deps = ["//src:pico_platform_internal"],
     visibility = ["//src/rp2_common/pico_bootrom:__pkg__"],
 )
 

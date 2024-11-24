@@ -62,8 +62,7 @@ void i2c_slave_init(i2c_inst_t *i2c, uint8_t address, i2c_slave_handler_t handle
     slave->handler = handler;
 
     // Note: The I2C slave does clock stretching implicitly after a RD_REQ, while the Tx FIFO is empty.
-    // There is also an option to enable clock stretching while the Rx FIFO is full, but we leave it
-    // disabled since the Rx FIFO should never fill up (unless slave->handler() is way too slow).
+    // Clock stretching while the Rx FIFO is full is also enabled by default.
     i2c_set_slave_mode(i2c, true, address);
 
     i2c_hw_t *hw = i2c_get_hw(i2c);

@@ -14,10 +14,10 @@
  *
  * \brief Low level flash programming and erase API
  *
- * Note these functions are *unsafe* if you are using both cores, and the other 
- * is executing from flash concurrently with the operation. In this could be the 
- * case, you must perform your own synchronisation to make sure that no XIP
- * accesses take place during flash programming. One option is to use the
+ * Note these functions are *unsafe* if you are using both cores, and the other
+ * is executing from flash concurrently with the operation. In this case, you
+ * must perform your own synchronisation to make sure that no XIP accesses take
+ * place during flash programming. One option is to use the
  * \ref multicore_lockout functions.
  *
  * Likewise they are *unsafe* if you have interrupt handlers or an interrupt
@@ -46,7 +46,9 @@
 #define FLASH_SECTOR_SIZE (1u << 12)
 #define FLASH_BLOCK_SIZE (1u << 16)
 
+#ifndef FLASH_UNIQUE_ID_SIZE_BYTES
 #define FLASH_UNIQUE_ID_SIZE_BYTES 8
+#endif
 
 // PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, default=Usually provided via board header, group=hardware_flash
 
@@ -118,6 +120,132 @@ void flash_get_unique_id(uint8_t *id_out);
 void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count);
 
 void flash_flush_cache(void);
+
+#if !PICO_RP2040
+typedef enum {
+    FLASH_DEVINFO_SIZE_NONE = 0x0,
+    FLASH_DEVINFO_SIZE_8K = 0x1,
+    FLASH_DEVINFO_SIZE_16K = 0x2,
+    FLASH_DEVINFO_SIZE_32K = 0x3,
+    FLASH_DEVINFO_SIZE_64K = 0x4,
+    FLASH_DEVINFO_SIZE_128K = 0x5,
+    FLASH_DEVINFO_SIZE_256K = 0x6,
+    FLASH_DEVINFO_SIZE_512K = 0x7,
+    FLASH_DEVINFO_SIZE_1M = 0x8,
+    FLASH_DEVINFO_SIZE_2M = 0x9,
+    FLASH_DEVINFO_SIZE_4M = 0xa,
+    FLASH_DEVINFO_SIZE_8M = 0xb,
+    FLASH_DEVINFO_SIZE_16M = 0xc,
+    FLASH_DEVINFO_SIZE_MAX = 0xc
+} flash_devinfo_size_t;
+
+/*! \brief Convert a flash/PSRAM size enum to an integer size in bytes
+ *  \ingroup hardware_flash
+ */
+static inline uint32_t flash_devinfo_size_to_bytes(flash_devinfo_size_t size) {
+    if (size == FLASH_DEVINFO_SIZE_NONE) {
+        return 0;
+    } else {
+        return 4096u << (uint)size;
+    }
+}
+
+/*! \brief Convert an integer flash/PSRAM size in bytes to a size enum, as
+  !  stored in OTP and used by the ROM.
+ *  \ingroup hardware_flash
+ */
+static inline flash_devinfo_size_t flash_devinfo_bytes_to_size(uint32_t bytes) {
+    // Must be zero or a power of two
+    valid_params_if(HARDWARE_FLASH, (bytes & (bytes - 1)) == 0u);
+    uint sectors = bytes / 4096u;
+    if (sectors <= 1u) {
+        return FLASH_DEVINFO_SIZE_NONE;
+    } else {
+        return (flash_devinfo_size_t) __builtin_ctz(sectors);
+    }
+}
+
+/*! \brief Get the size of the QSPI device attached to chip select cs, according to FLASH_DEVINFO
+ *  \ingroup hardware_flash
+ *
+ * \param cs Chip select index: 0 is QMI chip select 0 (QSPI CS pin), 1 is QMI chip select 1.
+ *
+ * The bootrom reads the FLASH_DEVINFO OTP data entry from OTP into boot RAM during startup. This
+ * contains basic information about the flash device which can be queried without communicating
+ * with the external device.(There are several methods to determine the size of a QSPI device over
+ * QSPI, but none are universally supported.)
+ *
+ * Since the FLASH_DEVINFO information is stored in boot RAM at runtime, it can be updated. Updates
+ * made in this way persist until the next reboot. The ROM uses this device information to control
+ * some low-level flash API behaviour, such as issuing an XIP exit sequence to CS 1 if its size is
+ * nonzero.
+ *
+ * If the macro PICO_FLASH_SIZE_BYTES is specified, this overrides the value for chip select 0. This
+ * can be specified in a board header if a board is always equipped with the same size of flash.
+ */
+flash_devinfo_size_t flash_devinfo_get_cs_size(uint cs);
+
+/*! \brief Update the size of the QSPI device attached to chip select cs in the runtime copy
+ *         of FLASH_DEVINFO.
+ *
+ *  \ingroup hardware_flash
+ *
+ * \param cs Chip select index: 0 is QMI chip select 0 (QSPI CS pin), 1 is QMI chip select 1.
+ *
+ * \param size The size of the attached device, or FLASH_DEVINFO_SIZE_NONE if there is none on this
+ *  chip select.
+ *
+ * The bootrom maintains a copy in boot RAM of the FLASH_DEVINFO information read from OTP during
+ * startup. This function updates that copy to reflect runtime information about the sizes of
+ * attached QSPI devices.
+ *
+ * This controls the behaviour of some ROM flash APIs, such as bounds checking addresses for
+ * erase/programming in the checked_flash_op() API, or issuing an XIP exit sequence to CS 1 in
+ * flash_exit_xip() if the size is nonzero.
+ */
+void flash_devinfo_set_cs_size(uint cs, flash_devinfo_size_t size);
+
+/*! \brief Check whether all attached devices support D8h block erase with 64k size, according to
+ *         FLASH_DEVINFO.
+ *
+ *  \ingroup hardware_flash
+ *
+ * This controls whether checked_flash_op() ROM API uses D8h 64k block erase where possible, for
+ * faster erase times. If not, this ROM API always uses 20h 4k sector erase.
+ *
+ * The bootrom loads this flag from the OTP FLASH_DEVINFO data entry during startup, and stores it
+ * in boot RAM. You can update the boot RAM copy based on runtime knowledge of the attached QSPI
+ * devices.
+ */
+bool flash_devinfo_get_d8h_erase_supported(void);
+
+/*! \brief Specify whether all attached devices support D8h block erase with 64k size, in the
+ *         runtime copy of FLASH_DEVINFO
+ *
+ *  \ingroup hardware_flash
+ *
+ * This function updates the boot RAM copy of OTP FLASH_DEVINFO. The flag passed here is visible to
+ * ROM APIs, and is also returned in the next call to flash_devinfo_get_d8h_erase_supported()
+ */
+void flash_devinfo_set_d8h_erase_supported(bool supported);
+
+/*! \brief Check the GPIO allocated for each chip select, according to FLASH_DEVINFO
+ *  \ingroup hardware_flash
+ *
+ * \param cs Chip select index (only the value 1 is supported on RP2350)
+ */
+uint flash_devinfo_get_cs_gpio(uint cs);
+
+/*! \brief Update the GPIO allocated for each chip select in the runtime copy of FLASH_DEVINFO
+ *  \ingroup hardware_flash
+ *
+ * \param cs Chip select index (only the value 1 is supported on RP2350)
+ *
+ * \param gpio GPIO index (must be less than NUM_BANK0_GPIOS)
+ */
+void flash_devinfo_set_cs_gpio(uint cs, uint gpio);
+
+#endif // !PICO_RP2040
 
 #ifdef __cplusplus
 }

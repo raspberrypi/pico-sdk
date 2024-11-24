@@ -29,7 +29,7 @@ extern "C" {
  * \include multicore.c
 */
 
-// PICO_CONFIG: PICO_CORE1_STACK_SIZE, Minimum amount of stack space reserved in the linker script for core 1, min=0x100, max=0x10000, default=PICO_STACK_SIZE (0x800), group=pico_multicore
+// PICO_CONFIG: PICO_CORE1_STACK_SIZE, Minimum amount of stack space reserved in the linker script for core 1 - if zero then no space is reserved and the user must provide their own stack, min=0, max=0x10000, default=PICO_STACK_SIZE (0x800), group=pico_multicore
 #ifndef PICO_CORE1_STACK_SIZE
 #ifdef PICO_STACK_SIZE
 #define PICO_CORE1_STACK_SIZE PICO_STACK_SIZE
@@ -449,7 +449,7 @@ static inline uint multicore_doorbell_irq_num(uint doorbell_num) {
  */
 void multicore_lockout_victim_init(void);
 
-/*! \brief Determine if \ref multicore_victim_init() has been called on the specified core.
+/*! \brief Determine if \ref multicore_lockout_victim_init() has been called on the specified core.
  *  \ingroup multicore_lockout
  *
  * \note this state persists even if the core is subsequently reset; therefore you are advised to
@@ -457,7 +457,7 @@ void multicore_lockout_victim_init(void);
  * been initialized.
  *
  * \param core_num the core number (0 or 1)
- * \return true if \ref multicore_victim_init() has been called on the specified core, false otherwise.
+ * \return true if \ref multicore_lockout_victim_init() has been called on the specified core, false otherwise.
  */
 bool multicore_lockout_victim_is_initialized(uint core_num);
 

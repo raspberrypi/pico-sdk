@@ -172,6 +172,8 @@ static void on_uart_rx(void) {
 static void stdio_uart_set_chars_available_callback(void (*fn)(void*), void *param) {
     uint irq_num = UART_IRQ_NUM(uart_instance);
     if (fn && !chars_available_callback) {
+        chars_available_callback = fn;
+        chars_available_param = param;
         irq_set_exclusive_handler(irq_num, on_uart_rx);
         irq_set_enabled(irq_num, true);
         uart_set_irqs_enabled(uart_instance, true, false);
@@ -179,14 +181,14 @@ static void stdio_uart_set_chars_available_callback(void (*fn)(void*), void *par
         uart_set_irqs_enabled(uart_instance, false, false);
         irq_set_enabled(irq_num, false);
         irq_remove_handler(irq_num, on_uart_rx);
+        chars_available_callback = NULL;
+        chars_available_param = NULL;
     }
-    chars_available_callback = fn;
-    chars_available_param = param;
 }
 #endif
 
 static void stdio_uart_out_flush(void) {
-    uart_default_tx_wait_blocking();
+    uart_tx_wait_blocking(uart_instance);
 }
 
 stdio_driver_t stdio_uart = {

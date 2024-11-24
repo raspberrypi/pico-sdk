@@ -12,14 +12,11 @@
 #define memcmp __builtin_memcmp
 
 static inline uint32_t atomic_lock(__unused const volatile void *ptr) {
-    uint32_t save = save_and_disable_interrupts();
-//    __dmb(); not necessary on RP2040
-    return save;
+    return spin_lock_blocking(spin_lock_instance(PICO_SPINLOCK_ID_ATOMIC));
 }
 
 static inline void atomic_unlock(__unused const volatile void *ptr, uint32_t save) {
-//    __dmb(); not necessary on RP2040
-    restore_interrupts_from_disabled(save);
+    spin_unlock(spin_lock_instance(PICO_SPINLOCK_ID_ATOMIC), save);
 }
 
 #if PICO_C_COMPILER_IS_GNU

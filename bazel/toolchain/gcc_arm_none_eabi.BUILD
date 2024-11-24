@@ -1,24 +1,43 @@
-load("@rules_cc//cc/toolchains:action_type_config.bzl", "cc_action_type_config")
+load("@bazel_skylib//rules/directory:directory.bzl", "directory")
+load("@bazel_skylib//rules/directory:subdirectory.bzl", "subdirectory")
 load("@rules_cc//cc/toolchains:tool.bzl", "cc_tool")
+load("@rules_cc//cc/toolchains:tool_map.bzl", "cc_tool_map")
+load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
+load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
+
 
 package(default_visibility = ["//visibility:public"])
 
+cc_tool_map(
+    name = "all_tools",
+    tools = {
+        "@rules_cc//cc/toolchains/actions:assembly_actions": ":asm",
+        "@rules_cc//cc/toolchains/actions:c_compile": ":arm-none-eabi-gcc",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions": ":arm-none-eabi-g++",
+        "@rules_cc//cc/toolchains/actions:link_actions": ":arm-none-eabi-ld",
+        "@rules_cc//cc/toolchains/actions:objcopy_embed_data": ":arm-none-eabi-objcopy",
+        "@rules_cc//cc/toolchains/actions:strip": ":arm-none-eabi-strip",
+        "@rules_cc//cc/toolchains/actions:ar_actions": ":arm-none-eabi-ar",
+    },
+)
+
+# TODO: https://github.com/bazelbuild/rules_cc/issues/235 - Workaround until
+# Bazel has a more robust way to implement `cc_tool_map`.
+alias(
+    name = "asm",
+    actual = ":arm-none-eabi-gcc",
+)
+
 cc_tool(
-    name = "arm-none-eabi-ar_tool",
+    name = "arm-none-eabi-ar",
     src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-ar.exe",
         "//conditions:default": "//:bin/arm-none-eabi-ar",
     }),
 )
 
-cc_action_type_config(
-    name = "arm-none-eabi-ar",
-    action_types = ["@rules_cc//cc/toolchains/actions:ar_actions"],
-    tools = [":arm-none-eabi-ar_tool"],
-)
-
 cc_tool(
-    name = "arm-none-eabi-g++_tool",
+    name = "arm-none-eabi-g++",
     src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-g++.exe",
         "//conditions:default": "//:bin/arm-none-eabi-g++",
@@ -33,14 +52,8 @@ cc_tool(
     ]),
 )
 
-cc_action_type_config(
-    name = "arm-none-eabi-g++",
-    action_types = ["@rules_cc//cc/toolchains/actions:cpp_compile_actions"],
-    tools = [":arm-none-eabi-g++_tool"],
-)
-
 cc_tool(
-    name = "arm-none-eabi-gcc_tool",
+    name = "arm-none-eabi-gcc",
     src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-gcc.exe",
         "//conditions:default": "//:bin/arm-none-eabi-gcc",
@@ -62,19 +75,10 @@ cc_tool(
     }),
 )
 
-cc_action_type_config(
-    name = "arm-none-eabi-gcc",
-    action_types = [
-        "@rules_cc//cc/toolchains/actions:assembly_actions",
-        "@rules_cc//cc/toolchains/actions:c_compile",
-    ],
-    tools = [":arm-none-eabi-gcc_tool"],
-)
-
 # This tool is actually just g++ under the hood, but this specifies a
 # different set of data files to pull into the sandbox at runtime.
 cc_tool(
-    name = "arm-none-eabi-ld_tool",
+    name = "arm-none-eabi-ld",
     src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-g++.exe",
         "//conditions:default": "//:bin/arm-none-eabi-g++",
@@ -90,42 +94,24 @@ cc_tool(
     ]),
 )
 
-cc_action_type_config(
-    name = "arm-none-eabi-ld",
-    action_types = ["@rules_cc//cc/toolchains/actions:link_actions"],
-    tools = [":arm-none-eabi-ld_tool"],
-)
-
 cc_tool(
-    name = "arm-none-eabi-objcopy_tool",
+    name = "arm-none-eabi-objcopy",
     src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-objcopy.exe",
         "//conditions:default": "//:bin/arm-none-eabi-objcopy",
     }),
 )
 
-cc_action_type_config(
-    name = "arm-none-eabi-objcopy",
-    action_types = ["@rules_cc//cc/toolchains/actions:objcopy_embed_data"],
-    tools = [":arm-none-eabi-objcopy_tool"],
-)
-
 cc_tool(
-    name = "arm-none-eabi-strip_tool",
+    name = "arm-none-eabi-strip",
     src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-strip.exe",
         "//conditions:default": "//:bin/arm-none-eabi-strip",
     }),
 )
 
-cc_action_type_config(
-    name = "arm-none-eabi-strip",
-    action_types = ["@rules_cc//cc/toolchains/actions:strip"],
-    tools = [":arm-none-eabi-strip_tool"],
-)
-
 cc_tool(
-    name = "arm-none-eabi-objdump_tool",
+    name = "arm-none-eabi-objdump",
     src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-objdump.exe",
         "//conditions:default": "//:bin/arm-none-eabi-objdump",
@@ -135,7 +121,7 @@ cc_tool(
 # There is not yet a well-known action type for objdump.
 
 cc_tool(
-    name = "arm-none-eabi-gcov_tool",
+    name = "arm-none-eabi-gcov",
     src = select({
         "@platforms//os:windows": "//:bin/arm-none-eabi-gcov.exe",
         "//conditions:default": "//:bin/arm-none-eabi-gcov",

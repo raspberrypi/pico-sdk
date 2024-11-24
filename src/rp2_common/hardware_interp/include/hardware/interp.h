@@ -438,9 +438,11 @@ static inline uint32_t interp_peek_full_result(interp_hw_t *interp) {
  * \param lane The lane number, 0 or 1
  * \param val Value to add
  */
-static inline void interp_add_accumulater(interp_hw_t *interp, uint lane, uint32_t val) {
+static inline void interp_add_accumulator(interp_hw_t *interp, uint lane, uint32_t val) {
     interp->add_raw[lane] = val;
 }
+// backwards incompatibility with old incorrect spelling
+#define interp_add_accumulater(interp, lane, val) interp_add_accumulator(interp, lane, val)
 
 /*! \brief Get raw lane value
  *  \ingroup hardware_interp

@@ -1,5 +1,6 @@
 #if PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK
 .section .embedded_end_block, "a"
+.p2align 2
 embedded_end_block:
 .word PICOBIN_BLOCK_MARKER_START
 

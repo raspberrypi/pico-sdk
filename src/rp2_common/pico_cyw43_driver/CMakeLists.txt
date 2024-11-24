@@ -56,6 +56,47 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
             hardware_exception
             )
 
+    if (CYW43_PIN_WL_DYNAMIC)
+        # PICO_CMAKE_CONFIG: CYW43_PIN_WL_DYNAMIC, flag to indicate if cyw43 SPI pins can be changed at runtime, type=bool, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_PIN_WL_DYNAMIC=${CYW43_PIN_WL_DYNAMIC})
+    endif()
+    if (CYW43_DEFAULT_PIN_WL_REG_ON)
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_REG_ON, gpio pin to power up the cyw43 chip, type=int, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_REG_ON=${CYW43_DEFAULT_PIN_WL_REG_ON})
+    endif()
+    if (CYW43_DEFAULT_PIN_WL_DATA_OUT)
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_OUT, gpio pin for spi data out to the cyw43 chip, type=int, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_DATA_OUT=${CYW43_DEFAULT_PIN_WL_DATA_OUT})
+    endif()
+    if (CYW43_DEFAULT_PIN_WL_DATA_IN)
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_DATA_IN, gpio pin for spi data in from the cyw43 chip, type=int, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_DATA_IN=${CYW43_DEFAULT_PIN_WL_DATA_IN})
+    endif()
+    if (CYW43_DEFAULT_PIN_WL_HOST_WAKE)
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_HOST_WAKE, gpio (irq) pin for the irq line from the cyw43 chip, type=int, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_HOST_WAKE=${CYW43_DEFAULT_PIN_WL_HOST_WAKE})
+    endif()
+    if (CYW43_DEFAULT_PIN_WL_CLOCK)
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_CLOCK, gpio pin for the spi clock line to the cyw43 chip, type=int, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_CLOCK=${CYW43_DEFAULT_PIN_WL_CLOCK})
+    endif()
+    if (CYW43_DEFAULT_PIN_WL_CS)
+        # PICO_CMAKE_CONFIG: CYW43_DEFAULT_PIN_WL_CS, gpio pin for the spi chip select to the cyw43 chip, type=int, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_DEFAULT_PIN_WL_CS=${CYW43_DEFAULT_PIN_WL_CS})
+    endif()
+    if (CYW43_PIO_CLOCK_DIV_INT)
+        # PICO_CMAKE_CONFIG: CYW43_PIO_CLOCK_DIV_INT, integer component of pio clock divider used for cyw43 comms, type=int, default=2, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_PIO_CLOCK_DIV_INT=${CYW43_PIO_CLOCK_DIV_INT})
+    endif()
+    if (CYW43_PIO_CLOCK_DIV_FRAC8)
+        # PICO_CMAKE_CONFIG: CYW43_PIO_CLOCK_DIV_FRAC8, fractional component of pio clock divider used for cyw43 comms in range 0-255, type=int, default=0, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_PIO_CLOCK_DIV_FRAC8=${CYW43_PIO_CLOCK_DIV_FRAC8})
+    endif()
+    if (CYW43_PIO_CLOCK_DIV_DYNAMIC)
+        # PICO_CMAKE_CONFIG: CYW43_PIO_CLOCK_DIV_DYNAMIC, flag used to enable dynamic pio clock divider API, type=bool, default=0, group=pico_cyw43_driver
+        target_compile_definitions(cyw43_driver_picow INTERFACE CYW43_PIO_CLOCK_DIV_DYNAMIC=${CYW43_PIO_CLOCK_DIV_DYNAMIC})
+    endif()
+
     # Note: This is used by MP, so check for issues when making changes
     # e.g. Don't add new depenedences
     pico_add_library(pico_btstack_hci_transport_cyw43 NOFLAG)
@@ -92,12 +133,13 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     # Set an ip address in a compile definition
     # target name, target type, compile definition name to set then address in a string
     # This can be used to set the following compile definitions
-    # CYW43_DEFAULT_IP_ADDRESS
+    # CYW43_DEFAULT_IP_STA_ADDRESS
+    # CYW43_DEFAULT_IP_STA_GATEWAY
+    # CYW43_DEFAULT_IP_AP_ADDRESS
+    # CYW43_DEFAULT_IP_AP_GATEWAY
     # CYW43_DEFAULT_IP_MASK
-    # CYW43_DEFAULT_IP_GATEWAY
     # CYW43_DEFAULT_IP_DNS
-    # CYW43_DEFAULT_AP_IP_ADDRESS
-    # e.g. pico_configure_ip4_address(picow_tcpip_server_background PRIVATE CYW43_DEFAULT_IP_ADDRESS "10.3.15.204")
+    # e.g. pico_configure_ip4_address(picow_tcpip_server_background PRIVATE CYW43_DEFAULT_IP_STA_ADDRESS "10.3.15.204")
     function(pico_configure_ip4_address TARGET_LIB TARGET_TYPE DEF_NAME IP_ADDRESS_STR)
             string(REGEX MATCHALL "[0-9]+" IP_ADDRESS_LIST ${IP_ADDRESS_STR})
             list(LENGTH IP_ADDRESS_LIST IP_ADDRESS_COMPONENT_COUNT)

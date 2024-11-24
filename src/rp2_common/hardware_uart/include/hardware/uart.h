@@ -34,8 +34,8 @@ extern "C" {
 #endif
 
 // PICO_CONFIG: PICO_DEFAULT_UART, Define the default UART used for printf etc, min=0, max=1, default=Usually provided via board header, group=hardware_uart
-// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=29, default=Usually provided via board header, group=hardware_uart
-// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=29, default=Usually provided via board header, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_TX_PIN, Define the default UART TX pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_uart
+// PICO_CONFIG: PICO_DEFAULT_UART_RX_PIN, Define the default UART RX pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_uart
 
 // PICO_CONFIG: PICO_DEFAULT_UART_BAUD_RATE, Define the default UART baudrate, max=921600, default=115200, group=hardware_uart
 #ifndef PICO_DEFAULT_UART_BAUD_RATE
@@ -213,7 +213,7 @@ static_assert(UART1_IRQ == UART0_IRQ + 1, "");
  *  \ingroup hardware_uart
  *
  * \param uart UART instance
- * \return Number of UART, 0 or 1.
+ * \return Number of UART, 0 or 1
  */
 static inline uint uart_get_index(uart_inst_t *uart) {
     invalid_params_if(HARDWARE_UART, uart != uart0 && uart != uart1);
@@ -223,8 +223,8 @@ static inline uint uart_get_index(uart_inst_t *uart) {
 /*! \brief Get the UART instance from an instance number
  *  \ingroup hardware_uart
  *
- * \param uart UART instance
- * \return Number of UART, 0 or 1
+ * \param num Number of UART, 0 or 1
+ * \return UART instance
  */
 static inline uart_inst_t *uart_get_instance(uint num) {
     invalid_params_if(HARDWARE_UART, num >= NUM_UARTS);
@@ -598,11 +598,10 @@ static inline uint uart_get_dreq_num(uart_inst_t *uart, bool is_tx) {
     return UART_DREQ_NUM(uart, is_tx);
 }
 
-/*! \brief Return the \ref reset_num_t to use for pacing transfers to/from a particular UART instance
+/*! \brief Return the \ref reset_num_t to use to reset a particular UART instance
  *  \ingroup hardware_uart
  *
  * \param uart UART instance. \ref uart0 or \ref uart1
- * \param is_tx true for sending data to the UART instance, false for receiving data from the UART instance
  */
 static inline uint uart_get_reset_num(uart_inst_t *uart) {
     return UART_RESET_NUM(uart);

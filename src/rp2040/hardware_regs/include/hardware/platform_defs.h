@@ -116,4 +116,6 @@
 #define FIRST_USER_IRQ (NUM_IRQS - NUM_USER_IRQS)
 #define VTABLE_FIRST_IRQ 16
 
+#define REG_FIELD_WIDTH(f) (f ## _MSB + 1 - f ## _LSB)
+
 #endif

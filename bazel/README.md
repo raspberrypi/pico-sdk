@@ -3,32 +3,10 @@
 ## Using the Pico SDK in a Bazel project.
 
 ### Add pico-sdk as a dependency
-First, in your `MODULE.bazel` file, add a dependency on the Pico SDK:
+First, in your `MODULE.bazel` file, add a dependency on the Pico SDK and
+`rules_cc`:
 ```python
-bazel_dep(
-  name = "pico-sdk",
-  version = "2.0.0",
-)
-```
-
-Second, in the same file you'll need to add an explicit dependency on
-`rules_cc`, as it's a special-cased Bazel module:
-```python
-# Note: rules_cc is special-cased repository; a dependency on rules_cc in a
-# module will not ensure that the root Bazel module has that same version of
-# rules_cc. For that reason, this primarily acts as a FYI. You'll still need
-# to explicitly list this dependency in your own project's MODULE.bazel file.
-bazel_dep(name = "rules_cc", version = "0.0.9")
-
-# rules_cc v0.0.10 is not yet cut, so manually pull in the desired version.
-# This does not apply to dependent projects, so it needs to be copied to your
-# project's MODULE.bazel too.
-archive_override(
-    module_name = "rules_cc",
-    urls = "https://github.com/bazelbuild/rules_cc/archive/1acf5213b6170f1f0133e273cb85ede0e732048f.zip",
-    strip_prefix = "rules_cc-1acf5213b6170f1f0133e273cb85ede0e732048f",
-    integrity = "sha256-NddP6xi6LzsIHT8bMSVJ2NtoURbN+l3xpjvmIgB6aSg=",
-)
+bazel_dep(name = "pico-sdk", version = "2.1.0")
 ```
 
 ### Register toolchains
@@ -45,15 +23,6 @@ register_toolchains(
     "@pico-sdk//bazel/toolchain:mac-aarch64-rp2040",
     "@pico-sdk//bazel/toolchain:mac-aarch64-rp2350",
 )
-```
-
-### Enable required .bazelrc flags
-To use the toolchains provided by the Pico SDK, you'll need to enable a few
-new features. In your project's `.bazelrc`, add the following
-```
-# Required for new toolchain resolution API.
-build --incompatible_enable_cc_toolchain_resolution
-build --@rules_cc//cc/toolchains:experimental_enable_rule_based_toolchains
 ```
 
 ### Ready to build!
@@ -123,11 +92,12 @@ you encounter along the way.
 
 Currently, the following features are not supported:
 
+* Pico W wireless libraries work, but may not have complete feature parity with
+  the CMake build.
+* Bazel does not yet provide RISC-V support for Pico 2/RP2350.
 * The pioasm parser cannot be built from source via Bazel.
 * Windows MSVC wildcard build (`bazel build //...`) does not work when targeting
   host.
-* Bazel does not yet provide RISC-V support for Pico 2/RP2350.
-* Pico W wireless libraries have link issues.
 
 ## Contributing
 When making changes to the Bazel build, please run the Bazel validation script

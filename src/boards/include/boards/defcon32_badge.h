@@ -9,13 +9,6 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// NOTE: since there is no UART on the badge, you should probably pass:
-// -DPICO_BOARD=defcon32_badge -DPICO_STDIO_USB=1 -DPICO_STDIO_UART+0
-// when building to set up stdio over USB CDC by default
-#define PICO_DEFAULT_UART 0
-#define PICO_DEFAULT_UART_TX_PIN 30
-#define PICO_DEFAULT_UART_RX_PIN 31
-
 // pico_cmake_set PICO_PLATFORM=rp2350
 
 #ifndef _BOARDS_DEFCON32_BADGE_H
@@ -56,6 +49,11 @@
 #define DEFCON32_BADGE_IR_RX_PIN               27
 #define DEFCON32_BADGE_IR_TX_PIN               28
 
+// --- UART ---
+// NOTE: since there is no UART on the badge, you should probably pass:
+// -DPICO_BOARD=defcon32_badge -DPICO_STDIO_USB=1 -DPICO_STDIO_UART=0
+// when building to set up stdio over USB CDC by default
+
 // --- LED ---
 // no PICO_DEFAULT_LED_PIN
 #ifndef PICO_DEFAULT_WS2812_PIN
@@ -75,16 +73,16 @@
 
 // --- SPI ---
 #ifndef PICO_DEFAULT_SPI
-#define PICO_DEFAULT_SPI 0
+#define PICO_DEFAULT_SPI 1
 #endif
 #ifndef PICO_DEFAULT_SPI_SCK_PIN
 #define PICO_DEFAULT_SPI_SCK_PIN DEFCON32_BADGE_SPI_CK_PIN
 #endif
 #ifndef PICO_DEFAULT_SPI_TX_PIN
-#define PICO_DEFAULT_SPI_TX_PIN DEFCON32_BADGE_SPI_MISO_PIN
+#define PICO_DEFAULT_SPI_TX_PIN DEFCON32_BADGE_SPI_MOSI_PIN
 #endif
 #ifndef PICO_DEFAULT_SPI_RX_PIN
-#define PICO_DEFAULT_SPI_RX_PIN DEFCON32_BADGE_SPI_MOSI_PIN
+#define PICO_DEFAULT_SPI_RX_PIN DEFCON32_BADGE_SPI_MISO_PIN
 #endif
 // multiple devices, so this doesn't make much sense
 // no PICO_DEFAULT_SPI_CSN_PIN
@@ -110,6 +108,7 @@
 #define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
 #endif
 
+// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

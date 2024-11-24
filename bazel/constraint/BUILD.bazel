@@ -1,3 +1,5 @@
+load("//bazel/util:label_flag_matches.bzl", "label_flag_matches")
+
 package(default_visibility = ["//visibility:public"])
 
 # This constraint represents the dimension that guides the Pico SDK build. This
@@ -46,6 +48,11 @@ constraint_value(
 config_setting(
     name = "is_pico_w",
     flag_values = {"//bazel/config:PICO_BOARD": "pico_w"},
+)
+
+config_setting(
+    name = "is_pico2_w",
+    flag_values = {"//bazel/config:PICO_BOARD": "pico2_w"},
 )
 
 config_setting(
@@ -174,6 +181,21 @@ config_setting(
 )
 
 config_setting(
+    name = "pico_async_context_poll_enabled",
+    flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "poll"},
+)
+
+config_setting(
+    name = "pico_async_context_threadsafe_background_enabled",
+    flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "threadsafe_background"},
+)
+
+config_setting(
+    name = "pico_async_context_freertos_enabled",
+    flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "freertos"},
+)
+
+config_setting(
     name = "pico_use_default_max_page_size_enabled",
     flag_values = {"//bazel/config:PICO_USE_DEFAULT_MAX_PAGE_SIZE": "True"},
 )
@@ -199,16 +221,34 @@ config_setting(
 )
 
 config_setting(
-    name = "pico_btstack_config_unset",
-    flag_values = {"//bazel/config:PICO_BTSTACK_CONFIG": "//bazel:empty_cc_lib"},
+    name = "pico_bt_enable_ble_enabled",
+    flag_values = {"//bazel/config:PICO_BT_ENABLE_BLE": "True"},
 )
 
 config_setting(
+    name = "pico_bt_enable_classic_enabled",
+    flag_values = {"//bazel/config:PICO_BT_ENABLE_CLASSIC": "True"},
+)
+
+config_setting(
+    name = "pico_bt_enable_mesh_enabled",
+    flag_values = {"//bazel/config:PICO_BT_ENABLE_MESH": "True"},
+)
+
+label_flag_matches(
     name = "pico_lwip_config_unset",
-    flag_values = {"//bazel/config:PICO_LWIP_CONFIG": "//bazel:empty_cc_lib"},
+    flag = "//bazel/config:PICO_LWIP_CONFIG",
+    value = "//bazel:empty_cc_lib",
 )
 
-config_setting(
+label_flag_matches(
+    name = "pico_btstack_config_unset",
+    flag = "//bazel/config:PICO_BTSTACK_CONFIG",
+    value = "//bazel:empty_cc_lib",
+)
+
+label_flag_matches(
     name = "pico_freertos_unset",
-    flag_values = {"//bazel/config:PICO_FREERTOS_LIB": "//bazel:empty_cc_lib"},
+    flag = "//bazel/config:PICO_FREERTOS_LIB",
+    value = "//bazel:empty_cc_lib",
 )

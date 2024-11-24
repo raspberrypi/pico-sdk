@@ -75,6 +75,7 @@ if (NOT TARGET _pico_sdk_pre_init_marker)
             PICO_SDK_POST_LIST_FILES
             PICO_CONFIG_HEADER_FILES
             PICO_RP2040_CONFIG_HEADER_FILES
+            PICO_BOARD_CMAKE_OVERRIDES
     )
 
     macro(pico_promote_common_scope_vars)

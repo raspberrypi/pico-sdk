@@ -46,6 +46,7 @@
  * \cond hardware_uart \defgroup hardware_uart hardware_uart \endcond
  * \cond hardware_vreg \defgroup hardware_vreg hardware_vreg \endcond
  * \cond hardware_watchdog \defgroup hardware_watchdog hardware_watchdog \endcond
+ * \cond hardware_xip_cache \defgroup hardware_xip_cache hardware_xip_cache \endcond
  * \cond hardware_xosc \defgroup hardware_xosc hardware_xosc \endcond
  * \cond hardware_powman hardware_powman
  * \cond hardware_hazard3 hardware_hazard3

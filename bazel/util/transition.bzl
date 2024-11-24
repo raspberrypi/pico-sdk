@@ -1,3 +1,9 @@
+def _normalize_flag_value(val):
+    """Converts flag values to transition-safe primitives."""
+    if type(val) == "label":
+        return str(val)
+    return val
+
 def declare_transtion(attrs, flag_overrides = None, append_to_flags = None, executable = True):
     """A helper that drastically simplifies declaration of a transition.
 
@@ -31,7 +37,7 @@ def declare_transtion(attrs, flag_overrides = None, append_to_flags = None, exec
         final_overrides = {}
         if flag_overrides != None:
             final_overrides = {
-                key: str(getattr(attrs, value))
+                key: _normalize_flag_value(getattr(attrs, value))
                 for key, value in flag_overrides.items()
             }
         if append_to_flags != None:
@@ -87,11 +93,18 @@ rp2040_bootloader_binary = declare_transtion(
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),
+	"_link_extra_libs": attr.label(default = "//bazel:empty_cc_lib"),
     },
     flag_overrides = {
         # We don't want --custom_malloc to ever apply to the bootloader, so
         # always explicitly override it here.
         "//command_line_option:custom_malloc": "_malloc",
+
+        # Platforms will commonly depend on bootloader components in every
+        # binary via `link_extra_libs`, so we must drop these deps when
+        # building the bootloader binaries themselves in order to avoid a
+        # circular dependency.
+	"@bazel_tools//tools/cpp:link_extra_libs": "_link_extra_libs",
     },
 )
 
@@ -101,6 +114,8 @@ kitchen_sink_test_binary = declare_transtion(
     attrs = {
         "bt_stack_config": attr.label(mandatory = True),
         "lwip_config": attr.label(mandatory = True),
+        "enable_ble": attr.bool(default = False),
+        "enable_bt_classic": attr.bool(default = False),
         # This could be shared, but we don't in order to make it clearer that
         # a transition is in use.
         "_allowlist_function_transition": attr.label(
@@ -110,6 +125,8 @@ kitchen_sink_test_binary = declare_transtion(
     flag_overrides = {
         "@pico-sdk//bazel/config:PICO_BTSTACK_CONFIG": "bt_stack_config",
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG": "lwip_config",
+        "@pico-sdk//bazel/config:PICO_BT_ENABLE_BLE": "enable_ble",
+        "@pico-sdk//bazel/config:PICO_BT_ENABLE_CLASSIC": "enable_bt_classic",
     },
 )
 

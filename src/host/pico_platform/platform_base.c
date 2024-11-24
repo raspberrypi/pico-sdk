@@ -7,9 +7,9 @@
 #include <stdio.h>
 
 #include "pico.h"
+#include "hardware/timer.h"
 
 PICO_WEAK_FUNCTION_DEF(tight_loop_contents)
-
 void PICO_WEAK_FUNCTION_IMPL_NAME(tight_loop_contents)() {
 
 }
@@ -45,4 +45,10 @@ void __breakpoint() {
     #else
         __builtin_trap();
     #endif
+}
+
+PICO_WEAK_FUNCTION_DEF(busy_wait_at_least_cycles)
+void PICO_WEAK_FUNCTION_IMPL_NAME(busy_wait_at_least_cycles)(uint32_t cycles) {
+    // fairly arbitrary; we'll use 125Mhz as a reference
+    busy_wait_us((cycles + 124)/125);
 }
