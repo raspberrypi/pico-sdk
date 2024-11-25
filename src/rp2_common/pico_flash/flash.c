@@ -9,6 +9,7 @@
 #if PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
 #include "pico/multicore.h"
 #endif
+#include "pico/time.h"
 #if PICO_FLASH_SAFE_EXECUTE_SUPPORT_FREERTOS_SMP
 #include "FreeRTOS.h"
 #include "task.h"
