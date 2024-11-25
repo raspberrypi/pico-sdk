@@ -919,7 +919,7 @@ int pio_set_gpio_base(PIO pio, uint gpio_base);
  * \param pio The PIO instance; e.g. \ref pio0 or \ref pio1
  * \param program the program definition
  * \return true if the program can be loaded;
- *         false if not, e.g. if there is not suitable space in the instruction memory      
+ *         false if not, e.g. if there is not suitable space in the instruction memory
  */
 bool pio_can_add_program(PIO pio, const pio_program_t *program);
 

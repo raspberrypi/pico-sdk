@@ -403,7 +403,7 @@ static inline void rom_flash_enter_cmd_xip(void) {
     func();
 }
 
-#if !PICO_RP2040
+#if !PICO_RP2040 || PICO_COMBINED_DOCS
 #ifdef __riscv
 /*!
  * \brief Give the bootrom a new stack

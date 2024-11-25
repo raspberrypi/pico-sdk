@@ -42,12 +42,12 @@ extern "C" {
  *
  * RP-series microcontrollers have two banks of General Purpose Input / Output (GPIO) pins, which are assigned as follows:
  * 
- * \if rp2040-specific
+ * \if rp2040_specific
  * RP2040 has 30 user GPIO pins in bank 0, and 6 QSPI pins in the QSPI bank 1 (QSPI_SS, QSPI_SCLK and QSPI_SD0 to QSPI_SD3). The QSPI 
  * pins are used to execute code from an external flash device, leaving the User bank (GPIO0 to GPIO29) for the programmer to use. 
  * \endif
  * 
- * \if rp2350-specific
+ * \if rp2350_specific
  * The number of GPIO pins available depends on the package. There are 30 user GPIOs in bank 0 in the QFN-60 package (RP2350A), or 48 user GPIOs 
  * in the QFN-80 package. Bank 1 contains the 6 QSPI pins and the USB DP/DM pins.
  * \endif

@@ -139,7 +139,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     elif BASE_CMAKE_CONFIG_RE.search(line):
                         m = CMAKE_CONFIG_RE.match(line)
                         if not m:
-                            if line.startswith("## "):
+                            if re.match("^\s*#\s*# ", line):
                                 logger.info("Possible misformatted {} at {}:{} ({})".format(BASE_CMAKE_CONFIG_NAME, file_path, linenum, line))
                             else:
                                 raise Exception("Found misformatted {} at {}:{} ({})".format(BASE_CMAKE_CONFIG_NAME, file_path, linenum, line))

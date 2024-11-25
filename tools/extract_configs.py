@@ -158,7 +158,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     elif BASE_CONFIG_RE.search(line):
                         m = CONFIG_RE.match(line)
                         if not m:
-                            if line.startswith("//// "):
+                            if re.match(r"^\s*//\s*// ", line):
                                 logger.info("Possible misformatted {} at {}:{} ({})".format(BASE_CONFIG_NAME, file_path, linenum, line))
                             else:
                                 raise Exception("Found misformatted {} at {}:{} ({})".format(BASE_CONFIG_NAME, file_path, linenum, line))

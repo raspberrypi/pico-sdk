@@ -20,14 +20,14 @@
  * of flash), so pointers should have XIP_BASE subtracted before passing into one of these
  * functions.
  *
- * \if rp2040-specific
+ * \if rp2040_specific
  * The only valid cache maintenance operation on RP2040 is "invalidate", which tells the cache to
  * forget everything it knows about some address. This is necessary after a programming operation,
  * because the cache does not automatically know about any serial programming operations performed
  * on the external flash device, and could return stale data.
  * \endif
  *
- * \if rp2350-specific
+ * \if rp2350_specific
  * On RP2350, the three types of operation are:
  *
  * * Invalidate: tell the cache to forget everything it knows about some address. The next access to
@@ -124,7 +124,7 @@ void xip_cache_invalidate_all(void);
  */
 void xip_cache_invalidate_range(uintptr_t start_offset, uintptr_t size_bytes);
 
-#if !XIP_CACHE_IS_READ_ONLY
+#if !XIP_CACHE_IS_READ_ONLY || PICO_COMBINED_DOCS
 
 /*! \brief Clean the cache for the entire XIP address space
  *  \ingroup hardware_xip_cache
@@ -136,12 +136,12 @@ void xip_cache_invalidate_range(uintptr_t start_offset, uintptr_t size_bytes);
  * This function is faster than calling xip_cache_clean_range() for the entire address space,
  * because it iterates over cachelines instead of addresses.
  *
- * \if rp2040-specific
+ * \if rp2040_specific
  * On RP2040 this is a no-op, as the XIP cache is read-only. This is indicated by the
  * XIP_CACHE_IS_READ_ONLY macro.
  * \endif
  *
- * \if rp2350-specific
+ * \if rp2350_specific
  * On RP2350, due to the workaround applied for RP2350-E11, this function also effectively
  * invalidates all cache lines after cleaning them. The next access to each line will miss. Avoid
  * this by calling xip_cache_clean_range() which does not suffer this issue.
@@ -155,7 +155,7 @@ void xip_cache_clean_all(void);
  *
  * This causes the cache to write out pending write data at these offsets to the downstream memory.
  *
- * \if rp2040-specific
+ * \if rp2040_specific
  * On RP2040 this is a no-op, as the XIP cache is read-only. This is indicated by the
  * XIP_CACHE_IS_READ_ONLY macro.
  * \endif
@@ -177,7 +177,7 @@ static inline void xip_cache_clean_range(uintptr_t start_offset, uintptr_t size_
 }
 #endif
 
-#if !PICO_RP2040
+#if !PICO_RP2040 || PICO_COMBINED_DOCS
 
 /*! \brief Pin a range of offsets within the XIP address space
  *  \ingroup hardware_xip_cache

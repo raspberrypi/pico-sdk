@@ -65,7 +65,7 @@ double exp10(double x);
 void sincos(double x, double *sinx, double *cosx);
 double powint(double x, int y);
 
-#if !PICO_RP2040
+#if !PICO_RP2040 || PICO_COMBINED_DOCS
 double ddiv_fast(double n, double d);
 double sqrt_fast(double d);
 double mla(double x, double y, double z); // note this is not fused

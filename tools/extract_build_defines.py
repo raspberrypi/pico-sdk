@@ -139,7 +139,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     elif BASE_BUILD_DEFINE_RE.search(line):
                         m = BUILD_DEFINE_RE.match(line)
                         if not m:
-                            if line.startswith("## "):
+                            if re.match(r"^\s*#\s*# ", line):
                                 logger.info("Possible misformatted {} at {}:{} ({})".format(BASE_BUILD_DEFINE_NAME, file_path, linenum, line))
                             else:
                                 raise Exception("Found misformatted {} at {}:{} ({})".format(BASE_BUILD_DEFINE_NAME, file_path, linenum, line))
