@@ -6,7 +6,7 @@ module(
 bazel_dep(name = "platforms", version = "0.0.9")
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
 bazel_dep(name = "rules_python", version = "0.36.0")
-bazel_dep(name = "picotool", version = "2.0.0")
+bazel_dep(name = "picotool", version = "2.1.0")
 bazel_dep(name = "rules_cc", version = "0.0.10")
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
