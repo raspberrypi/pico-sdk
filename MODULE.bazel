@@ -1,6 +1,6 @@
 module(
     name = "pico-sdk",
-    version = "2.0.1-develop",
+    version = "2.1.0",
 )
 
 bazel_dep(name = "platforms", version = "0.0.9")
