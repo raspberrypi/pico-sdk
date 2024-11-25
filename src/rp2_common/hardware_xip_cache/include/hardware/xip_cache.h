@@ -124,7 +124,7 @@ void xip_cache_invalidate_all(void);
  */
 void xip_cache_invalidate_range(uintptr_t start_offset, uintptr_t size_bytes);
 
-#if !XIP_CACHE_IS_READ_ONLY
+#if !XIP_CACHE_IS_READ_ONLY || PICO_COMBINED_DOCS
 
 /*! \brief Clean the cache for the entire XIP address space
  *  \ingroup hardware_xip_cache
@@ -177,7 +177,7 @@ static inline void xip_cache_clean_range(uintptr_t start_offset, uintptr_t size_
 }
 #endif
 
-#if !PICO_RP2040
+#if !PICO_RP2040 || PICO_COMBINED_DOCS
 
 /*! \brief Pin a range of offsets within the XIP address space
  *  \ingroup hardware_xip_cache
