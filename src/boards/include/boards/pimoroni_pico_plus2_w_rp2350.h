@@ -21,12 +21,12 @@
 #define PIMORONI_PICO_PLUS2_W_RP2350
 
 // --- BOARD SPECIFIC ---
-#define SPICE_SPI 0
-#define SPICE_TX_MISO_PIN 32
-#define SPICE_RX_CS_PIN 33
-#define SPICE_NETLIGHT_SCK_PIN 34
-#define SPICE_RESET_MOSI_PIN 35
-#define SPICE_PWRKEY_BL_PIN 36
+#define SPCE_SPI 0
+#define SPCE_TX_MISO_PIN 32
+#define SPCE_RX_CS_PIN 33
+#define SPCE_NETLIGHT_SCK_PIN 34
+#define SPCE_RESET_MOSI_PIN 35
+#define SPCE_PWRKEY_BL_PIN 36
 
 #define PIMORONI_PICO_PLUS2_USER_SW_PIN 45
 #define PIMORONI_PICO_PLUS2_PSRAM_CS_PIN 47
@@ -62,16 +62,16 @@
 #define PICO_DEFAULT_SPI 0
 #endif
 #ifndef PICO_DEFAULT_SPI_SCK_PIN
-#define PICO_DEFAULT_SPI_SCK_PIN SPICE_NETLIGHT_SCK_PIN
+#define PICO_DEFAULT_SPI_SCK_PIN SPCE_NETLIGHT_SCK_PIN
 #endif
 #ifndef PICO_DEFAULT_SPI_TX_PIN
-#define PICO_DEFAULT_SPI_TX_PIN SPICE_RESET_MOSI_PIN
+#define PICO_DEFAULT_SPI_TX_PIN SPCE_RESET_MOSI_PIN
 #endif
 #ifndef PICO_DEFAULT_SPI_RX_PIN
-#define PICO_DEFAULT_SPI_RX_PIN SPICE_TX_MISO_PIN
+#define PICO_DEFAULT_SPI_RX_PIN SPCE_TX_MISO_PIN
 #endif
 #ifndef PICO_DEFAULT_SPI_CSN_PIN
-#define PICO_DEFAULT_SPI_CSN_PIN SPICE_RX_CS_PIN
+#define PICO_DEFAULT_SPI_CSN_PIN SPCE_RX_CS_PIN
 #endif
 
 // --- FLASH ---
@@ -87,29 +87,42 @@
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
 
-// The GPIO Pin used to read VBUS to determine if the device is battery powered.
-#ifndef PICO_VBUS_PIN
-#define PICO_VBUS_PIN 24
-#endif
-
 // The GPIO Pin used to monitor VSYS. Typically you would use this with ADC.
 // There is an example in adc/read_vsys in pico-examples.
 #ifndef PICO_VSYS_PIN
 #define PICO_VSYS_PIN 43
 #endif
 
+// pico_cmake_set PICO_RP2350_A2_SUPPORTED = 1
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif
 
 // --- CYW43 ---
 
-#ifndef CYW43_PIN_WL_HOST_WAKE
-#define CYW43_PIN_WL_HOST_WAKE 24
+// gpio pin to power up the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_REG_ON
+#define CYW43_DEFAULT_PIN_WL_REG_ON 23
 #endif
 
-#ifndef CYW43_PIN_WL_REG_ON
-#define CYW43_PIN_WL_REG_ON 23
+// gpio pin for spi data out to the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_DATA_OUT
+#define CYW43_DEFAULT_PIN_WL_DATA_OUT 24
+#endif
+
+// gpio pin for spi data in from the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_DATA_IN
+#define CYW43_DEFAULT_PIN_WL_DATA_IN 24
+#endif
+
+// gpio (irq) pin for the irq line from the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_HOST_WAKE
+#define CYW43_DEFAULT_PIN_WL_HOST_WAKE 24
+#endif
+
+// gpio pin for the spi clock line to the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_CLOCK
+#define CYW43_DEFAULT_PIN_WL_CLOCK 29
 #endif
 
 #ifndef CYW43_WL_GPIO_COUNT
