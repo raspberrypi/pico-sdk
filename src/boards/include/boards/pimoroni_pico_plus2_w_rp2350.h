@@ -118,6 +118,11 @@
 #define CYW43_DEFAULT_PIN_WL_CLOCK 29
 #endif
 
+// gpio pin for the spi chip select to the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_CS
+#define CYW43_DEFAULT_PIN_WL_CS 25u
+#endif
+
 #ifndef CYW43_WL_GPIO_COUNT
 #define CYW43_WL_GPIO_COUNT 3
 #endif
