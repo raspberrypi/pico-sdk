@@ -36,9 +36,7 @@ void mbedtls_sha256_init(__unused mbedtls_sha256_context *ctx) {
 }
 
 void mbedtls_sha256_free(__unused mbedtls_sha256_context *ctx) {
-    if (ctx->locked) {
-        pico_sha256_unlock(ctx);
-    }
+    pico_sha256_cleanup(ctx);
 }
 
 int mbedtls_sha256_starts_ret(mbedtls_sha256_context *ctx, int is224) {

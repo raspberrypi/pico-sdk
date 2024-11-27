@@ -58,15 +58,15 @@ typedef struct pico_sha256_state {
     size_t total_data_size;
 } pico_sha256_state_t;
 
-/*! \brief Release the internal lock on the SHA256 hardware
+/*! \brief Release the internal lock on the SHA-256 hardware
  *  \ingroup pico_sha256
  *
- * Release the internal lock on the hardware.
+ * Release the internal lock on the SHA-256 hardware.
  * Fails if the internal lock was not claimed.
  *
  * @param state A pointer to a pico_sha256_state_t instance
  */
-void __weak pico_sha256_unlock(pico_sha256_state_t *state);
+void pico_sha256_cleanup(pico_sha256_state_t *state);
 
 /*! \brief Start a SHA-256 calculation returning immediately with an error if the SHA-256 hardware is not available
  *  \ingroup pico_sha256
