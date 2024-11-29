@@ -290,7 +290,7 @@ void flash_get_unique_id(uint8_t *id_out) {
 // device, so fields must have getters/setters.
 static io_rw_16 * flash_devinfo_ptr(void) {
     // Note the lookup returns a pointer to a 32-bit pointer literal in the ROM
-    io_rw_16 **p = (io_rw_16 **) rom_data_lookup(ROM_DATA_FLASH_DEVINFO16_PTR);
+    io_rw_16 **p = (io_rw_16 **) rom_data_lookup_inline(ROM_DATA_FLASH_DEVINFO16_PTR);
     assert(p);
     return *p;
 }
