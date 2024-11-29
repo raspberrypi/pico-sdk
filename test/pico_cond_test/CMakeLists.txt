@@ -1,0 +1,4 @@
+add_executable(pico_cond_test pico_cond_test.c)
+
+target_link_libraries(pico_cond_test PRIVATE pico_test pico_sync pico_multicore pico_stdlib )
+pico_add_extra_outputs(pico_cond_test)
