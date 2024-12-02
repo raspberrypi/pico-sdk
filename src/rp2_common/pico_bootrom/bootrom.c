@@ -14,25 +14,9 @@ void *rom_func_lookup(uint32_t code) {
     return rom_func_lookup_inline(code);
 }
 
-#pragma GCC diagnostic push
-// diagnostic: GCC thinks near-zero value is a null pointer member access, but it's not
-#pragma GCC diagnostic ignored "-Warray-bounds"
 void *rom_data_lookup(uint32_t code) {
-#if PICO_RP2040
-    rom_table_lookup_fn rom_table_lookup = (rom_table_lookup_fn) rom_hword_as_ptr(BOOTROM_TABLE_LOOKUP_OFFSET);
-    uint16_t *data_table = (uint16_t *) rom_hword_as_ptr(BOOTROM_DATA_TABLE_OFFSET);
-    return rom_table_lookup(data_table, code);
-#else
-#ifdef __riscv
-    uint32_t rom_offset_adjust = rom_size_is_64k() ? 32 * 1024 : 0;
-    rom_table_lookup_fn rom_table_lookup = (rom_table_lookup_fn) (uintptr_t)*(uint16_t*)(BOOTROM_TABLE_LOOKUP_OFFSET + rom_offset_adjust);
-#else
-    rom_table_lookup_fn rom_table_lookup = (rom_table_lookup_fn) (uintptr_t)*(uint16_t*)(BOOTROM_TABLE_LOOKUP_OFFSET);
-#endif
-    return rom_table_lookup(code, RT_FLAG_DATA);
-#endif
+    return rom_data_lookup_inline(code);
 }
-#pragma GCC diagnostic pop
 /// \end::table_lookup[]
 
 bool rom_funcs_lookup(uint32_t *table, unsigned int count) {

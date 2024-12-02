@@ -216,6 +216,32 @@ static __force_inline void *rom_func_lookup_inline(uint32_t code) {
 #pragma GCC diagnostic pop
 
 /*!
+ * \brief Lookup a bootrom data address by its code. This method is forcibly inlined into the caller for FLASH/RAM sensitive code usage
+ * \ingroup pico_bootrom
+ * \param code the code
+ * \return a pointer to the data, or NULL if the code does not match any bootrom data
+ */
+#pragma GCC diagnostic push
+// diagnostic: GCC thinks near-zero value is a null pointer member access, but it's not
+#pragma GCC diagnostic ignored "-Warray-bounds"
+static __force_inline void *rom_data_lookup_inline(uint32_t code) {
+#if PICO_RP2040
+    rom_table_lookup_fn rom_table_lookup = (rom_table_lookup_fn) rom_hword_as_ptr(BOOTROM_TABLE_LOOKUP_OFFSET);
+    uint16_t *data_table = (uint16_t *) rom_hword_as_ptr(BOOTROM_DATA_TABLE_OFFSET);
+    return rom_table_lookup(data_table, code);
+#else
+#ifdef __riscv
+    uint32_t rom_offset_adjust = rom_size_is_64k() ? 32 * 1024 : 0;
+    rom_table_lookup_fn rom_table_lookup = (rom_table_lookup_fn) (uintptr_t)*(uint16_t*)(BOOTROM_TABLE_LOOKUP_OFFSET + rom_offset_adjust);
+#else
+    rom_table_lookup_fn rom_table_lookup = (rom_table_lookup_fn) (uintptr_t)*(uint16_t*)(BOOTROM_TABLE_LOOKUP_OFFSET);
+#endif
+    return rom_table_lookup(code, RT_FLAG_DATA);
+#endif
+}
+#pragma GCC diagnostic pop
+
+/*!
  * \brief Reboot the device into BOOTSEL mode
  * \ingroup pico_bootrom
  *
