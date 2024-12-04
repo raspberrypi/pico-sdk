@@ -158,5 +158,94 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
                     )
     endfunction()
 
+    set(PICO_CYW43_DRIVER_CURRENT_PATH ${CMAKE_CURRENT_LIST_DIR})
+    pico_register_common_scope_var(PICO_CYW43_DRIVER_CURRENT_PATH)
+
     pico_promote_common_scope_vars()
+
+    function(pico_use_wifi_firmware_partition TARGET)
+        if (PICO_PLATFORM STREQUAL "rp2040")
+                message(FATAL_ERROR "RP2040 does not support storing wi-fi firmware in partitions")
+        endif()
+        target_compile_definitions(${TARGET} PRIVATE CYW43_USE_FIRMWARE_PARTITION=1)
+        pico_embed_pt_in_binary(${TARGET} ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_pt.json)
+
+        find_package (Python3 REQUIRED COMPONENTS Interpreter)
+
+        # Wifi firmware blob
+        add_custom_target(${TARGET}_firmware_blob DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/firmware_wb_blob.S)
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/firmware_wb_blob.S
+                COMMAND ${Python3_EXECUTABLE} ${PICO_CYW43_DRIVER_CURRENT_PATH}/cyw43_firmware.py ${PICO_CYW43_DRIVER_PATH}/firmware/wb43439A0_7_95_49_00_combined.h ${CMAKE_CURRENT_BINARY_DIR}/firmware_wb_blob.S
+                )
+
+        # Create UF2s for regular and TBYB firmwares
+        add_executable(${TARGET}_firmware
+                ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+        add_executable(${TARGET}_firmware_tbyb
+                ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+
+        add_dependencies(${TARGET}_firmware ${TARGET}_firmware_blob)
+        add_dependencies(${TARGET}_firmware_tbyb ${TARGET}_firmware_blob)
+
+        target_include_directories(${TARGET}_firmware PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+        target_include_directories(${TARGET}_firmware_tbyb PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
+        target_compile_definitions(${TARGET}_firmware PRIVATE
+                NO_PICO_PLATFORM=1
+                WB_FIRMWARE=1
+                )
+        target_compile_definitions(${TARGET}_firmware_tbyb PRIVATE
+                NO_PICO_PLATFORM=1
+                PICO_CRT0_IMAGE_TYPE_TBYB=1
+                WB_FIRMWARE=1
+                )
+
+        target_link_options(${TARGET}_firmware PRIVATE -nostartfiles -nodefaultlibs -Ttext=0x20000000)
+        target_link_options(${TARGET}_firmware_tbyb PRIVATE -nostartfiles -nodefaultlibs -Ttext=0x20000000)
+
+        target_link_libraries(${TARGET}_firmware boot_picobin_headers)
+        target_link_libraries(${TARGET}_firmware_tbyb boot_picobin_headers)
+
+        if (PICO_RISCV)
+                # Use pre-generated firmware elfs on Risc-V, as the compiler has issues with the assembly
+                add_custom_command(TARGET ${TARGET}_firmware POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy ${PICO_CYW43_DRIVER_CURRENT_PATH}/firmware.elf $<TARGET_FILE:${TARGET}_firmware>
+                        )
+                add_custom_command(TARGET ${TARGET}_firmware_tbyb POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy ${PICO_CYW43_DRIVER_CURRENT_PATH}/firmware_tbyb.elf $<TARGET_FILE:${TARGET}_firmware_tbyb>
+                        )
+        endif()
+
+        get_target_property(hasSigfile ${TARGET} PICOTOOL_SIGFILE)
+        if (hasSigfile)
+                pico_sign_binary(${TARGET}_firmware ${sigfile})
+                pico_sign_binary(${TARGET}_firmware_tbyb ${sigfile})
+        endif()
+
+        pico_hash_binary(${TARGET}_firmware)
+        pico_hash_binary(${TARGET}_firmware_tbyb)
+
+        pico_set_uf2_family(${TARGET}_firmware data)
+        pico_set_uf2_family(${TARGET}_firmware_tbyb data)
+
+        pico_package_uf2_output(${TARGET}_firmware 0x10000000)
+        pico_package_uf2_output(${TARGET}_firmware_tbyb 0x10000000)
+
+        if (PICO_RISCV)
+                # As Arm ELFs are being used for firmware, the bin & dis output generation will fail
+                # with a Risc-V toolchain
+                picotool_postprocess_binary(${TARGET}_firmware)
+                picotool_postprocess_binary(${TARGET}_firmware_tbyb)
+                if (NOT (PICO_NO_UF2 OR PICO_NO_PICOTOOL))
+                        pico_add_uf2_output(${TARGET}_firmware)
+                        pico_add_uf2_output(${TARGET}_firmware_tbyb)
+                endif()
+        else()
+                pico_add_extra_outputs(${TARGET}_firmware)
+                pico_add_extra_outputs(${TARGET}_firmware_tbyb)
+        endif()
+
+        add_dependencies(${TARGET}
+                ${TARGET}_firmware ${TARGET}_firmware_tbyb)
+    endfunction()
 endif()

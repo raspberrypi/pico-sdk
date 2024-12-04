@@ -15,13 +15,15 @@
  */
 
 // ----------------------------------------------------------------------------
-// RCP instructions (this header is Arm-only)
-#if defined(PICO_RP2350) && !defined(__riscv)
+// RCP masks (this header is RP2350 only)
+#if defined(PICO_RP2350)
 
 #define RCP_MASK_TRUE   _u(0xa500a500)
 #define RCP_MASK_FALSE  _u(0x00c300c3)
 #define RCP_MASK_INTXOR _u(0x96009600)
 
+// RCP instructions (this header is Arm-only)
+#if !defined(__riscv)
 // ----------------------------------------------------------------------------
 // Macros and inline functions for use in C files
 #ifndef __ASSEMBLER__
@@ -995,6 +997,7 @@ rcp_switch_u8_to_ch_cl rcp_canary_check_nodelay_impl \tag, \x
 .endm
 
 #endif // !__riscv
+#endif // PICO_RP2350
 #endif // __ASSEMBLER__
 // ----------------------------------------------------------------------------
 

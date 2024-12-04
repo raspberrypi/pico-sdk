@@ -18,6 +18,7 @@ cc_library(
         "//src/rp2_common/boot_bootrom_headers",
         "//src/rp2_common/hardware_boot_lock:hardware_boot_lock_headers",
         "//src/rp2_common/pico_flash:pico_flash_headers",
+        "//src/rp2_common/hardware_rcp:hardware_rcp_headers",
     ] + select({
         "//bazel/constraint:host": ["//src/host/hardware_sync"],
         "//conditions:default": ["//src/rp2_common/hardware_sync"],
