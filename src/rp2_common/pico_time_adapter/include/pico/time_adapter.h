@@ -48,7 +48,8 @@ static inline void ta_set_timeout(alarm_pool_timer_t *timer, uint alarm_num, int
     // 2. If we just passed the target time, then time_til_target will be high, meaning we will
     //    likely not do the update, but this is OK since the caller who has the full 64 bits
     //    must check if the target time has passed when we return anyway to avoid races.
-    if (time_til_target < time_til_alarm) {
+    // 3. We should never leave here without an alarm being armed
+    if (time_til_target < time_til_alarm || (timer_hw_from_timer(timer)->armed & (1 << alarm_num)) == 0) {
         timer_hw_from_timer(timer)->alarm[alarm_num] = (uint32_t) target;
     }
 }
