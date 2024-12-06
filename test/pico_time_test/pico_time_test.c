@@ -355,8 +355,8 @@ int issue_2118_test(void) {
     }
     PICOTEST_CHECK(counter_2118 >= 100, "Repeating timer failure");
 
-    cancel_repeating_timer(&timer);
     alarm_pool_destroy(pool);
+    hard_assert(timer_hw->armed == 0); // check destroying the pool unarms its timer
 
     set_sys_clock_hz(SYS_CLK_HZ, true);
     setup_default_uart();
