@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <hardware/sync.h>
+#include "hardware/clocks.h"
 #include "pico/stdlib.h"
 #include "pico/test.h"
 // Include sys/types.h before inttypes.h to work around issue with
@@ -74,6 +75,7 @@ static bool repeating_timer_callback(struct repeating_timer *t) {
 int issue_195_test(void);
 int issue_1812_test(void);
 int issue_1953_test(void);
+int issue_2118_test(void);
 
 int main() {
     setup_default_uart();
@@ -246,6 +248,8 @@ int main() {
 
     issue_1953_test();
 
+    issue_2118_test();
+
     PICOTEST_END_TEST();
 }
 
@@ -322,6 +326,41 @@ int issue_1953_test(void) {
     cancel_repeating_timer(&timer2);
 
     hardware_alarm_unclaim(alarm);
+    PICOTEST_END_SECTION();
+    return 0;
+}
+
+static int counter_2118;
+static bool timer_callback_issue_2118(repeating_timer_t *rt) {
+    counter_2118++;
+    return true;
+}
+
+int issue_2118_test(void) {
+    PICOTEST_START_SECTION("Issue #2118 defect - failure to set an alarm");
+
+    // this problem only happens when running the clock fast as it requires the time between
+    // alarm_pool_irq_handler handling an alarm and setting the next alarm to be <1us
+    set_sys_clock_hz(200 * MHZ, true);
+    setup_default_uart();
+
+    alarm_pool_t *pool = alarm_pool_create(2, 1);
+    repeating_timer_t timer;
+    alarm_pool_add_repeating_timer_ms(pool, -20, timer_callback_issue_2118, NULL, &timer);
+
+    int iterations = 0;
+    while(iterations < 100) {
+        iterations++;
+        sleep_ms(20);
+    }
+    PICOTEST_CHECK(counter_2118 >= 100, "Repeating timer failure");
+
+    alarm_pool_destroy(pool);
+    hard_assert(timer_hw->armed == 0); // check destroying the pool unarms its timer
+
+    set_sys_clock_hz(SYS_CLK_HZ, true);
+    setup_default_uart();
+
     PICOTEST_END_SECTION();
     return 0;
 }
