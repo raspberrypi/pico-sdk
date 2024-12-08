@@ -81,6 +81,7 @@
 // A better solution is to use a volatile SR write if your device supports it.
 #define PROGRAM_STATUS_REG
 
+#define CMD_RELEASE_POWERDOWN 0xAB
 #define CMD_WRITE_ENABLE 0x06
 #define CMD_READ_STATUS 0x05
 #define CMD_READ_STATUS2 0x35
@@ -176,6 +177,12 @@ program_sregs:
     lw a1, QMI_DIRECT_CSR_OFFSET(a3)
     andi a1, a1, QMI_DIRECT_CSR_BUSY_BITS
     bnez a1, 1b
+    
+    // Send release power-down command, discard RX
+    li a0, CMD_RELEASE_POWERDOWN
+    sw a0, QMI_DIRECT_TX_OFFSET(a3)
+    jal wait_qmi_ready
+    lw a0, QMI_DIRECT_RX_OFFSET(a3)
 
     // Check whether SR needs updating
     li a0, CMD_READ_STATUS2
@@ -268,6 +275,12 @@ program_sregs:
     ldr r0, [r3, #QMI_DIRECT_CSR_OFFSET]
     tst r0, #QMI_DIRECT_CSR_BUSY_BITS
     bne 1b
+    
+    // Send release power-down command, discard RX
+    movs r0, #CMD_RELEASE_POWERDOWN
+    str r0, [r3, #QMI_DIRECT_TX_OFFSET]
+    bl wait_qmi_ready
+    ldr r0, [r3, #QMI_DIRECT_RX_OFFSET]
 
     // Check whether SR needs updating
     movs r0, #CMD_READ_STATUS2
