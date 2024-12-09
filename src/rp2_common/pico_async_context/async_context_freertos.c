@@ -193,7 +193,7 @@ static void handle_sync_func_call(async_context_t *context, async_when_pending_w
 uint32_t async_context_freertos_execute_sync(async_context_t *self_base, uint32_t (*func)(void *param), void *param) {
     async_context_freertos_t *self = (async_context_freertos_t*)self_base;
     hard_assert(xSemaphoreGetMutexHolder(self->lock_mutex) != xTaskGetCurrentTaskHandle());
-    sync_func_call_t call;
+    sync_func_call_t call = {0};
     call.worker.do_work = handle_sync_func_call;
     call.func = func;
     call.param = param;
