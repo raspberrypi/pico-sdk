@@ -83,3 +83,13 @@ pico_generate_pio_header(
     name = "cyw43_bus_pio",
     srcs = ["cyw43_bus_pio_spi.pio"],
 )
+
+# TODO: https://github.com/raspberrypi/pico-sdk/issues/2055 Support storing
+# Wi-Fi firmware in a separate partition
+filegroup(
+    name = "pico_use_partition_firmware",
+    srcs = [
+        "wifi_firmware.S",
+        "include/cyw43_partition_firmware.h",
+    ]
+)
