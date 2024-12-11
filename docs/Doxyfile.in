@@ -17,7 +17,7 @@ FILE_PATTERNS          = *.h \
                          *.md
 
 USE_MDFILE_AS_MAINPAGE = @PROJECT_SOURCE_DIR@/docs/mainpage.md
-LAYOUT_FILE = @PROJECT_SOURCE_DIR@/docs/DoxygenLayout.xml
+LAYOUT_FILE = @PROJECT_BINARY_DIR@/docs/DoxygenLayout.xml
 HTML_FOOTER = @PROJECT_SOURCE_DIR@/docs/footer.html
 HTML_HEADER = @PROJECT_SOURCE_DIR@/docs/header.html
 

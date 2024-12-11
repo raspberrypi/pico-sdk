@@ -3,7 +3,7 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title="Introduction"></tab>
-    <tab type="modules" visible="yes" title="API Documentation" intro="These are the libraries supplied in the Raspberry Pi Pico SDK"/>
+    <tab type="@DOXY_API_DOCS_TAB_TYPE@" visible="yes" title="API Documentation" intro="These are the libraries supplied in the Raspberry Pi Pico SDK"/>
     <tab type="user" url="@ref examples_page" visible="yes" title="Examples" intro="Links to SDK examples"/>
     <tab type="usergroup" url="@ref weblinks_page" visible="yes" title="Additional Documentation" intro="Links to datasheets and documentation">
       <tab type="user" url="https://rptl.io/pico-datasheet" visible="yes" title="Raspberry Pi Pico Datasheet" intro=""/>
