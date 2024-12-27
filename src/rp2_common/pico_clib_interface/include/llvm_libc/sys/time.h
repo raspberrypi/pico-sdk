@@ -11,8 +11,7 @@
 
 #include <llvm-libc-types/time_t.h>
 #include <llvm-libc-types/struct_timespec.h>
-
-typedef long suseconds_t;
+#include <llvm-libc-types/suseconds_t.h>
 
 struct timeval {
   time_t tv_sec;
