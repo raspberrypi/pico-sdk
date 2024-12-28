@@ -54,34 +54,34 @@ http_archive(
 http_archive(
     name = "clang_linux-x86_64",
     build_file = "//bazel/toolchain:clang.BUILD",
-    sha256 = "6c599d1aba568236064c340d7813324849896d5a4e2f3fd8225a8c31bfcbf884",
+    sha256 = "dd4b3b0fc7186a4da2b52796b251e0757aefac4813f9f635982954fec3337d2e",
     type = "zip",
-    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/linux-amd64/+/git_revision:2b0a708f41dd6291ee744704d43febc975e3d026",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/linux-amd64/+/git_revision:9d3f9f47e6e630b8308562297757e0911be03a18",
 )
 
 http_archive(
     name = "clang_win-x86_64",
     build_file = "//bazel/toolchain:clang.BUILD",
-    sha256 = "f49ba4123ee3958f2b47289d017a5b3f1ca01f82dd7a2168c45412c18101fd13",
+    sha256 = "21092395df915ee5a899a832a592b137c9ea07fbc91e49ac6069ea0083d31899",
     type = "zip",
     # Windows doesn't like `:` in the produced filename, so replace it with `%3A`.
-    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/windows-amd64/+/git_revision:2b0a708f41dd6291ee744704d43febc975e3d026".replace("git_revision:", "git_revision%3A"),
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/windows-amd64/+/git_revision:9d3f9f47e6e630b8308562297757e0911be03a18".replace("git_revision:", "git_revision%3A"),
 )
 
 http_archive(
     name = "clang_mac-x86_64",
     build_file = "//bazel/toolchain:clang.BUILD",
-    sha256 = "d3516f2eb4c12d17ae77ee84c9226fbea581d4fb806910ceac4717d5adfcf748",
+    sha256 = "bb397fdce21d068ea40fefa9618993baa4907a248f996f18316c8fa6ca24dee2",
     type = "zip",
-    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-amd64/+/git_revision:2b0a708f41dd6291ee744704d43febc975e3d026",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-amd64/+/git_revision:9d3f9f47e6e630b8308562297757e0911be03a18",
 )
 
 http_archive(
     name = "clang_mac-aarch64",
     build_file = "//bazel/toolchain:clang.BUILD",
-    sha256 = "68e551f41c7e9473063b09819f6ab8ec6e7e53677f4078189656cb14dc52984b",
+    sha256 = "dad5583f96eabc913c1930d923c53a105d6ed73f56ca32451ea79ad70e495b0f",
     type = "zip",
-    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:2b0a708f41dd6291ee744704d43febc975e3d026",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:9d3f9f47e6e630b8308562297757e0911be03a18",
 )
 
 new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
