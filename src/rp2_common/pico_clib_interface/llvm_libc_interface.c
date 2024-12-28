@@ -7,6 +7,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <time.h>
 #include <sys/time.h>
 
 #include <llvm-libc-types/ssize_t.h>
