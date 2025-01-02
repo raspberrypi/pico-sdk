@@ -6,10 +6,14 @@ cc_library(
     name = "pico_aon_timer",
     srcs = ["aon_timer.c"],
     hdrs = ["include/pico/aon_timer.h"],
+    defines = [
+        "LIB_PICO_AON_TIMER=1",
+    ],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/common/pico_util",
+        "//src/common/pico_time",
         "//src/rp2_common:hardware_regs",
         "//src/rp2_common:pico_platform",
         "//src/rp2_common/hardware_irq",
