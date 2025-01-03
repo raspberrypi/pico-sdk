@@ -34,6 +34,8 @@ static void (*hci_transport_cyw43_packet_handler)(uint8_t packet_type, uint8_t *
 // Incoming packet buffer - cyw43 packet header (incl packet type) + incoming pre buffer + max(acl header + acl payload, event header + event data)
 __attribute__((aligned(4)))
 static uint8_t hci_packet_with_pre_buffer[4 + HCI_INCOMING_PRE_BUFFER_SIZE + HCI_INCOMING_PACKET_BUFFER_SIZE ];
+static uint8_t * hci_receive_buffer = &hci_packet_with_pre_buffer[HCI_INCOMING_PRE_BUFFER_SIZE];
+
 
 static btstack_data_source_t transport_data_source;
 static bool hci_transport_ready;
@@ -143,10 +145,10 @@ static void hci_transport_cyw43_process(void) {
     uint32_t loop_count = 0;
 #endif
     do {
-        int err = cyw43_bluetooth_hci_read(hci_packet_with_pre_buffer, sizeof(hci_packet_with_pre_buffer), &len);
+        int err = cyw43_bluetooth_hci_read(hci_receive_buffer, sizeof(hci_packet_with_pre_buffer) - HCI_INCOMING_PRE_BUFFER_SIZE, &len);
         BT_DEBUG("bt in len=%lu err=%d\n", len, err);
         if (err == 0 && len > 0) {
-            hci_transport_cyw43_packet_handler(hci_packet_with_pre_buffer[3], hci_packet_with_pre_buffer + 4, len - 4);
+            hci_transport_cyw43_packet_handler(hci_receive_buffer[3], &hci_receive_buffer[4], len - 4);
             has_work = true;
         } else {
             has_work = false;
