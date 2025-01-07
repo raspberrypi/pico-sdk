@@ -48,17 +48,31 @@ if (NOT PICO_SDK_PATH)
 
         if (NOT pico_sdk)
             message("Downloading Raspberry Pi Pico SDK")
-            FetchContent_Populate(
-                    pico_sdk
-                    QUIET
-                    GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
-                    GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
-                    GIT_SUBMODULES_RECURSE FALSE
+            # GIT_SUBMODULES_RECURSE was added in 3.17
+            if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.17.0")
+                FetchContent_Populate(
+                        pico_sdk
+                        QUIET
+                        GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
+                        GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
+                        GIT_SUBMODULES_RECURSE FALSE
 
-                    SOURCE_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-src
-                    BINARY_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-build
-                    SUBBUILD_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-subbuild
-            )
+                        SOURCE_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-src
+                        BINARY_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-build
+                        SUBBUILD_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-subbuild
+                )
+            else ()
+                FetchContent_Populate(
+                        pico_sdk
+                        QUIET
+                        GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
+                        GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
+
+                        SOURCE_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-src
+                        BINARY_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-build
+                        SUBBUILD_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-subbuild
+                )
+            endif ()
 
             set(PICO_SDK_PATH ${pico_sdk_SOURCE_DIR})
         endif ()
