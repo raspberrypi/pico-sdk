@@ -15,10 +15,12 @@ if (NOT TARGET picotool)
     endif ()
 
     include(FetchContent)
-    set(FETCHCONTENT_BASE_DIR_SAVE ${FETCHCONTENT_BASE_DIR})
     if (PICOTOOL_FETCH_FROM_GIT_PATH)
-        get_filename_component(FETCHCONTENT_BASE_DIR "${PICOTOOL_FETCH_FROM_GIT_PATH}" ABSOLUTE)
+        get_filename_component(picotool_INSTALL_DIR "${PICOTOOL_FETCH_FROM_GIT_PATH}" ABSOLUTE)
+    else ()
+        get_filename_component(picotool_INSTALL_DIR "${FETCHCONTENT_BASE_DIR}" ABSOLUTE)
     endif ()
+    set(picotool_INSTALL_DIR ${picotool_INSTALL_DIR} CACHE PATH "Directory where picotool has been installed" FORCE)
 
     set(picotool_BUILD_TARGET picotoolBuild)
     set(picotool_TARGET picotool)
@@ -32,20 +34,15 @@ if (NOT TARGET picotool)
             )
         endif()
 
-        FetchContent_Declare(
-                picotool
-                GIT_REPOSITORY https://github.com/raspberrypi/picotool.git
-                GIT_TAG develop
-                GIT_PROGRESS true
-        )
+        message("Downloading Picotool")
+        FetchContent_Populate(picotool QUIET
+            GIT_REPOSITORY https://github.com/raspberrypi/picotool.git
+            GIT_TAG develop
 
-        FetchContent_GetProperties(picotool)
-        set(picotool_INSTALL_DIR ${FETCHCONTENT_BASE_DIR} CACHE PATH "Directory where picotool has been installed" FORCE)
-        if (NOT picotool_POPULATED)
-            message("Downloading Picotool")
-            FetchContent_Populate(picotool)
-        endif ()
-        set(FETCHCONTENT_BASE_DIR ${FETCHCONTENT_BASE_DIR_SAVE})
+            SOURCE_DIR ${picotool_INSTALL_DIR}/picotool-src
+            BINARY_DIR ${picotool_INSTALL_DIR}/picotool-build
+            SUBBUILD_DIR ${picotool_INSTALL_DIR}/picotool-subbuild
+        )
 
         add_custom_target(picotoolForceReconfigure
             ${CMAKE_COMMAND} -E touch_nocreate "${CMAKE_SOURCE_DIR}/CMakeLists.txt"
