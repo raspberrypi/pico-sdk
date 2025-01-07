@@ -23,9 +23,10 @@ def process_file(input_dir, file):
     if content_type is None:
         content_type = "application/octet-stream"
 
-    # file name
-    data = f"/{file.relative_to(input_dir)}\x00"
-    comment = f"\"/{file.relative_to(input_dir)}\" ({len(data)} chars)"
+    # file name with posix directory separators 
+    file_path_posix = file.relative_to(input_dir).as_posix()
+    data = f"/{file_path_posix}\x00"
+    comment = f"\"/{file_path_posix}\" ({len(data)} chars)"
     while(len(data) % PAYLOAD_ALIGNMENT != 0):
         data += "\x00"
     results.append({'data': bytes(data, "utf-8"), 'comment': comment});
