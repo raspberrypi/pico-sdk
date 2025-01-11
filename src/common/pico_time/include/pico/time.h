@@ -688,7 +688,6 @@ static inline bool cancel_alarm(alarm_id_t alarm_id) {
  * \brief Return the time remaining before the next trigger of an alarm
  * \ingroup alarm
  *
- * @param pool the alarm_pool containing the alarm
  * @param alarm_id the alarm
  *
  * @return >=0 the number of microseconds before the next trigger
