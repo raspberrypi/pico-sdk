@@ -140,7 +140,7 @@ uint32_t async_context_threadsafe_background_execute_sync(async_context_t *self_
 #if ASYNC_CONTEXT_THREADSAFE_BACKGROUND_MULTI_CORE
     if (self_base->core_num != get_core_num()) {
         hard_assert(!recursive_mutex_enter_count(&self->lock_mutex));
-        sync_func_call_t call;
+        sync_func_call_t call = {0};
         call.worker.do_work = handle_sync_func_call;
         call.func = func;
         call.param = param;
