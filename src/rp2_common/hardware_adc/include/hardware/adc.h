@@ -106,7 +106,7 @@ static inline void adc_gpio_init(uint gpio) {
  *
  * Select an ADC input
  * \if rp2040_specific
- * On RP02040 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
+ * On RP2040 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
  * \endif
  * \if rp2350_specific
  * On RP2350A 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
@@ -126,7 +126,7 @@ static inline void adc_select_input(uint input) {
  * \return The currently selected input channel.
  * 
  * \if rp2040_specific
- * On RP02040 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
+ * On RP2040 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
  * \endif
  *
  * \if rp2350_specific
