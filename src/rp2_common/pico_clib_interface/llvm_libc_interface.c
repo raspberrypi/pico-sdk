@@ -5,8 +5,10 @@
  */
 
 #include <math.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <sys/time.h>
+#include <time.h>
 
 #include <llvm-libc-types/ssize_t.h>
 
@@ -63,6 +65,13 @@ ssize_t __llvm_libc_stdio_write(__unused void *cookie, const char *buf, size_t s
         putchar_raw(buf[i]);
     }
     return size;
+}
+
+bool __llvm_libc_timespec_get_utc(struct timespec *ts) {
+    int64_t absolute_time = (int64_t)get_absolute_time();
+    ts->tv_sec = (time_t)(absolute_time / 1000000);
+    ts->tv_nsec = (long)(absolute_time % 1000000 * 1000);
+    return true;
 }
 
 void __cxa_finalize(__unused void *dso) {}

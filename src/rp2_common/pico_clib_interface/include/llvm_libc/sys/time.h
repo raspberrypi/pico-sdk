@@ -9,15 +9,7 @@
 
 #include <__llvm-libc-common.h>
 
-#include <llvm-libc-types/time_t.h>
-#include <llvm-libc-types/struct_timespec.h>
-
-typedef long suseconds_t;
-
-struct timeval {
-  time_t tv_sec;
-  suseconds_t tv_usec;
-};
+#include <llvm-libc-types/struct_timeval.h>
 
 struct timezone {
   int tz_minuteswest;

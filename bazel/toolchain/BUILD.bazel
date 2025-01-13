@@ -79,9 +79,11 @@ cc_args(
     name = "llvm-libc_args",
     actions = ["@rules_cc//cc/toolchains/actions:link_actions"],
     args = [
+        "--unwindlib=none",
         "-nostdlib++",
         "-nostartfiles",
         "-Wl,-lc++",
+        "-Wl,-lm",
     ],
     visibility = ["//visibility:private"],
 )
