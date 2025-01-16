@@ -16,16 +16,25 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
 
     pico_register_common_scope_var(PICO_MBEDTLS_PATH)
 
+    # We use version 2.28.8. But this should build version 3.5.1
+    if (NOT MBEDTLS_VERSION_MAJOR)
+        if (EXISTS ${PICO_MBEDTLS_PATH}/library/ssl_cli.c)
+            set(MBEDTLS_VERSION_MAJOR 2)
+        elseif (EXISTS ${PICO_MBEDTLS_PATH}/library/ssl_client.c)
+            set(MBEDTLS_VERSION_MAJOR 3)
+        else()
+            message(WARNING "Cannot determine the version of mbedtls")
+        endif()
+    endif()
+
     set(src_crypto
         aes.c
         aesni.c
-        arc4.c
         aria.c
         asn1parse.c
         asn1write.c
         base64.c
         bignum.c
-        blowfish.c
         camellia.c
         ccm.c
         chacha20.c
@@ -46,12 +55,9 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         entropy_poll.c
         error.c
         gcm.c
-        havege.c
         hkdf.c
         hmac_drbg.c
         md.c
-        md2.c
-        md4.c
         md5.c
         memory_buffer_alloc.c
         mps_reader.c
@@ -73,7 +79,6 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         psa_crypto_aead.c
         psa_crypto_cipher.c
         psa_crypto_client.c
-        psa_crypto_driver_wrappers.c
         psa_crypto_ecp.c
         psa_crypto_hash.c
         psa_crypto_mac.c
@@ -84,7 +89,6 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         psa_its_file.c
         ripemd160.c
         rsa.c
-        rsa_internal.c
         sha1.c
         sha256.c
         sha512.c
@@ -92,15 +96,29 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         timing.c
         version.c
         version_features.c
-        xtea.c
     )
+    if (MBEDTLS_VERSION_MAJOR EQUAL 2)
+        list(APPEND src_crypto
+            arc4.c
+            blowfish.c
+            havege.c
+            md2.c
+            md4.c
+            psa_crypto_driver_wrappers.c
+            rsa_internal.c xtea.c
+        )
+    elseif (MBEDTLS_VERSION_MAJOR EQUAL 3)
+        list(APPEND src_crypto
+            bignum_core.c
+            rsa_alt_helpers.c
+            pk_ecc.c
+        )
+    endif()
     list(TRANSFORM src_crypto PREPEND ${PICO_MBEDTLS_PATH}/library/)
     pico_add_library(pico_mbedtls_crypto NOFLAG)
     target_sources(pico_mbedtls_crypto INTERFACE ${src_crypto})
 
     set(src_x509
-        certs.c
-        pkcs11.c
         x509.c
         x509_create.c
         x509_crl.c
@@ -109,6 +127,13 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         x509write_crt.c
         x509write_csr.c
     )
+    if (MBEDTLS_VERSION_MAJOR EQUAL 2)
+        list(APPEND src_x509
+            certs.c
+            pkcs11.c
+        )
+    endif()
+
     list(TRANSFORM src_x509 PREPEND ${PICO_MBEDTLS_PATH}/library/)
     pico_add_library(pico_mbedtls_x509 NOFLAG)
     target_sources(pico_mbedtls_x509 INTERFACE ${src_x509})
@@ -118,14 +143,26 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         net_sockets.c
         ssl_cache.c
         ssl_ciphersuites.c
-        ssl_cli.c
         ssl_cookie.c
         ssl_msg.c
-        ssl_srv.c
         ssl_ticket.c
         ssl_tls.c
         ssl_tls13_keys.c
     )
+    if (MBEDTLS_VERSION_MAJOR EQUAL 2)
+        list(APPEND src_tls
+            ssl_cli.c
+            ssl_srv.c
+        )
+    elseif (MBEDTLS_VERSION_MAJOR EQUAL 3)
+        list(APPEND src_tls
+            ssl_client.c
+            ssl_debug_helpers_generated.c
+            ssl_tls12_client.c
+            ssl_tls12_server.c
+        )
+    endif()
+
     list(TRANSFORM src_tls PREPEND ${PICO_MBEDTLS_PATH}/library/)
     pico_add_library(pico_mbedtls_tls NOFLAG)
     target_sources(pico_mbedtls_tls INTERFACE ${src_tls})
@@ -135,7 +172,12 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
     if (DEFINED PICO_MBEDTLS_CONFIG_FILE)
         target_compile_definitions(pico_mbedtls_headers INTERFACE MBEDTLS_CONFIG_FILE="${PICO_MBEDTLS_CONFIG_FILE}")
     else()
-        target_compile_definitions(pico_mbedtls_headers INTERFACE MBEDTLS_CONFIG_FILE="mbedtls_config.h")
+        if (MBEDTLS_VERSION_MAJOR EQUAL 2)
+            target_compile_definitions(pico_mbedtls_headers INTERFACE MBEDTLS_CONFIG_FILE="mbedtls_config.h")
+        else()
+            # Avoid including mbedtls/include/mbedtls_config.h
+            target_compile_definitions(pico_mbedtls_headers INTERFACE MBEDTLS_CONFIG_FILE="pico_mbedtls_config.h")
+        endif()
     endif()
     if (TARGET pico_sha256)
         pico_mirrored_target_link_libraries(pico_mbedtls INTERFACE pico_sha256)
