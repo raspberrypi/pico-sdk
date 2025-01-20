@@ -239,7 +239,7 @@ aon_timer_alarm_handler_t aon_timer_enable_alarm_calendar(const struct tm *tm, a
 void aon_timer_disable_alarm(void);
 
 /**
- * \brief Disable the currently enabled AON timer alarm if any
+ * \brief Check if the AON timer is running
  * \ingroup pico_aon_timer
  * \return true if the AON timer is running
  */
