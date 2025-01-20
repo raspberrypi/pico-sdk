@@ -76,6 +76,7 @@ int issue_195_test(void);
 int issue_1812_test(void);
 int issue_1953_test(void);
 int issue_2118_test(void);
+int issue_2186_test(void);
 
 int main() {
     setup_default_uart();
@@ -250,6 +251,8 @@ int main() {
 
     issue_2118_test();
 
+    issue_2186_test();
+
     PICOTEST_END_TEST();
 }
 
@@ -311,8 +314,8 @@ int issue_1953_test(void) {
     repeating_timer_t timer1;
     repeating_timer_t timer2;
 
-    assert(add_repeating_timer_us(10, timer_callback_issue_1953, NULL, &timer1));
-    assert(add_repeating_timer_us(100, timer_callback_issue_1953, NULL, &timer2));
+    hard_assert(add_repeating_timer_us(10, timer_callback_issue_1953, NULL, &timer1));
+    hard_assert(add_repeating_timer_us(100, timer_callback_issue_1953, NULL, &timer2));
 
     int iterations = 0;
     while(iterations < 100) {
@@ -360,6 +363,16 @@ int issue_2118_test(void) {
 
     set_sys_clock_hz(SYS_CLK_HZ, true);
     setup_default_uart();
+
+    PICOTEST_END_SECTION();
+    return 0;
+}
+
+int issue_2186_test(void) {
+    PICOTEST_START_SECTION("Issue #2186 defect - ta_wakes_up_on_or_before");
+
+    hard_assert(best_effort_wfe_or_timeout(get_absolute_time() - 1));
+    hard_assert(best_effort_wfe_or_timeout(get_absolute_time() - 1)); // this will lockup without the fix - wfe which never happens
 
     PICOTEST_END_SECTION();
     return 0;

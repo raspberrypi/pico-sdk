@@ -55,9 +55,9 @@ static inline void ta_set_timeout(alarm_pool_timer_t *timer, uint alarm_num, int
 }
 
 static inline bool ta_wakes_up_on_or_before(alarm_pool_timer_t *timer, uint alarm_num, int64_t target) {
-    uint32_t current = timer_time_us_32(timer_hw_from_timer(timer));
-    uint32_t time_til_target = (uint32_t) target - current;
-    uint32_t time_til_alarm = timer_hw_from_timer(timer)->alarm[alarm_num] - current;
+    int64_t current = (int64_t)timer_time_us_64(timer_hw_from_timer(timer));
+    int64_t time_til_target = target - current;
+    uint32_t time_til_alarm = timer_hw_from_timer(timer)->alarm[alarm_num] - (uint32_t)current;
     return time_til_alarm <= time_til_target;
 }
 
