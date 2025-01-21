@@ -54,8 +54,13 @@
 #define PICO_NO_RAM_VECTOR_TABLE 0
 #endif
 
+// PICO_CONFIG: PICO_VECTOR_TABLE_NUM_IRQS, Number of IRQ vectors to include in the vector table, type=int, default=NUM_IRQS, advanced=true, group=pico_platform
+#ifndef PICO_VECTOR_TABLE_NUM_IRQS
+#define PICO_VECTOR_TABLE_NUM_IRQS NUM_IRQS
+#endif
+
 #ifndef PICO_RAM_VECTOR_TABLE_SIZE
-#define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + NUM_IRQS)
+#define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + PICO_VECTOR_TABLE_NUM_IRQS)
 #endif
 
 // PICO_CONFIG: PICO_USE_STACK_GUARDS, Enable/disable stack guards, type=bool, default=0, advanced=true, group=pico_platform
@@ -284,4 +289,3 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
 #endif // __ASSEMBLER__
 
 #endif
-

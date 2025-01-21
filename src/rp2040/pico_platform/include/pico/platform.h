@@ -66,8 +66,13 @@
 #define PICO_RP2040_B2_SUPPORTED 1
 #endif
 
+// PICO_CONFIG: PICO_VECTOR_TABLE_NUM_IRQS, Number of IRQ vectors to include in the vector table, type=int, default=NUM_IRQS, advanced=true, group=pico_platform
+#ifndef PICO_VECTOR_TABLE_NUM_IRQS
+#define PICO_VECTOR_TABLE_NUM_IRQS NUM_IRQS
+#endif
+
 #ifndef PICO_RAM_VECTOR_TABLE_SIZE
-#define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + NUM_IRQS)
+#define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + PICO_VECTOR_TABLE_NUM_IRQS)
 #endif
 
 // PICO_CONFIG: PICO_CLKDIV_ROUND_NEAREST, True if floating point clock divisors should be rounded to the nearest possible clock divisor by default rather than rounding down, type=bool, default=1, group=pico_platform
