@@ -52,6 +52,7 @@ __vectors:
 // we don't include any IRQ vectors; we will initialize them during runtime_init in the RAM vector table
 #else
 
+// PICO_CONFIG: PICO_VECTOR_TABLE_NUM_IRQS, Number of IRQ vectors to include in the vector table, type=int, default=NUM_IRQS, group=pico_crt0
 #ifndef PICO_VECTOR_TABLE_NUM_IRQS
 #define PICO_VECTOR_TABLE_NUM_IRQS NUM_IRQS
 #endif
