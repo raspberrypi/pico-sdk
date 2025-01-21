@@ -107,6 +107,13 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             ENABLE_BLE=1
             )
 
+    # Added in v1.6.2
+    if (EXISTS ${PICO_BTSTACK_PATH}/src/hci_event_builder.c)
+        target_sources(pico_btstack_ble INTERFACE
+            ${PICO_BTSTACK_PATH}/src/hci_event_builder.c
+        )
+    endif()
+
     pico_add_library(pico_btstack_classic)
     target_sources(pico_btstack_classic INTERFACE
         ${PICO_BTSTACK_PATH}/src/classic/a2dp.c
@@ -160,6 +167,13 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     target_compile_definitions(pico_btstack_classic_headers INTERFACE
             ENABLE_CLASSIC=1
             )
+
+    # Added in v1.6.2
+    if (EXISTS ${PICO_BTSTACK_PATH}/src/classic/obex_srm_client.c)
+        target_sources(pico_btstack_classic INTERFACE
+            ${PICO_BTSTACK_PATH}/src/classic/obex_srm_client.c
+        )
+    endif()
 
     pico_add_library(pico_btstack_mesh)
     target_sources(pico_btstack_mesh INTERFACE
