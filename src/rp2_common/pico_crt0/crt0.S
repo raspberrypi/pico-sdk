@@ -52,8 +52,12 @@ __vectors:
 // we don't include any IRQ vectors; we will initialize them during runtime_init in the RAM vector table
 #else
 
+#ifndef PICO_VECTOR_TABLE_NUM_IRQS
+#define PICO_VECTOR_TABLE_NUM_IRQS NUM_IRQS
+#endif
+
 .macro if_irq_word num func
-.if \num < NUM_IRQS
+.if \num < PICO_VECTOR_TABLE_NUM_IRQS
 .word \func
 .endif
 .endm
@@ -142,7 +146,7 @@ if_irq_word 76 isr_irq76
 if_irq_word 77 isr_irq77
 if_irq_word 78 isr_irq78
 if_irq_word 79 isr_irq79
-#if NUM_IRQS > 80
+#if PICO_VECTOR_TABLE_NUM_IRQS > 80
 #error more IRQ entries required
 #endif
 #endif
