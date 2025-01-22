@@ -35,10 +35,8 @@ pico_default_asm_setup
 #define PICO_FLASH_SPI_CLKDIV 4
 #endif
 
-#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
-#define CMD_RELEASE_POWERDOWN 0xAB
-#endif
 #define CMD_READ 0x03
+#define CMD_RELEASE_POWERDOWN 0xAB
 
 // Value is number of address bits divided by 4
 #define ADDR_L 6
