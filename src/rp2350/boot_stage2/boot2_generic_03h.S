@@ -46,7 +46,9 @@
 #error "RX delay greater than maximum"
 #endif
 
+#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
 #define CMD_RELEASE_POWERDOWN 0xAB
+#endif
 #define CMD_READ 0x03
 
 // ----------------------------------------------------------------------------
@@ -61,6 +63,7 @@
 // CLKDIV and RXDELAY, and no constraints on CS max assertion, CS min
 // deassertion, or page boundary burst breaks.
 
+#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
 // Need to use direct serial mode to send SR commands. Choose a
 // conservative direct-mode divisor (5 MHz at 150 MHz clk_sys)
 // since the XIP-mode divisor may be unsafe without an RX delay.
@@ -69,6 +72,7 @@
     QMI_DIRECT_CSR_EN_BITS | \
     QMI_DIRECT_CSR_AUTO_CS0N_BITS | \
 0)
+#endif
 
 #define INIT_M0_TIMING (\
     1                      << QMI_M0_TIMING_COOLDOWN_LSB |\
@@ -111,6 +115,7 @@ regular_func _stage2_boot
     li a0, INIT_M0_RFMT
     sw a0, QMI_M0_RFMT_OFFSET(a3)
 
+#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
     // Need to use direct serial mode to send commands.
     li a1, INIT_DIRECT_CSR
     sw a1, QMI_DIRECT_CSR_OFFSET(a3)
@@ -129,6 +134,7 @@ regular_func _stage2_boot
     // Disable direct mode
     andi a1, a1, ~QMI_DIRECT_CSR_EN_BITS
     sw a1, QMI_DIRECT_CSR_OFFSET(a3)
+#endif
 #else
     push {lr}
     ldr r3, =XIP_QMI_BASE
@@ -139,6 +145,7 @@ regular_func _stage2_boot
     ldr r0, =INIT_M0_RFMT
     str r0, [r3, #QMI_M0_RFMT_OFFSET]
 
+#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
     // Need to use direct serial mode to send commands.
     ldr r1, =INIT_DIRECT_CSR
     str r1, [r3, #QMI_DIRECT_CSR_OFFSET]
@@ -158,12 +165,15 @@ regular_func _stage2_boot
     bics r1, #QMI_DIRECT_CSR_EN_BITS
     str r1, [r3, #QMI_DIRECT_CSR_OFFSET]
 #endif
+#endif
 
 // Pull in standard exit routine
 #include "boot2_helpers/exit_from_boot2.S"
 
+#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
 // Common functions
 #include "boot2_helpers/wait_qmi_ready.S"
+#endif
 
 #ifndef __riscv
 .global literals
