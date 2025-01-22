@@ -76,6 +76,9 @@
 // A better solution is to use a volatile SR write if your device supports it.
 #define PROGRAM_STATUS_REG
 
+#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
+#define CMD_RELEASE_POWERDOWN 0xAB
+#endif
 #define CMD_WRITE_ENABLE 0x06
 #define CMD_READ_STATUS 0x05
 #define CMD_READ_STATUS2 0x35
@@ -147,9 +150,19 @@ program_sregs:
     ldr r1, =(CTRL0_SPI_TXRX)
     str r1, [r3, #SSI_CTRLR0_OFFSET]
 
-     // Enable SSI and select slave 0
+    // Enable SSI and select slave 0
     movs r1, #1
     str r1, [r3, #SSI_SSIENR_OFFSET]
+
+#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
+    // Send release power-down command, discard RX
+    movs r1, #CMD_RELEASE_POWERDOWN
+    str r1, [r3, #SSI_DR0_OFFSET]
+
+    // Poll for completion and discard RX
+    bl wait_ssi_ready
+    ldr r1, [r3, #SSI_DR0_OFFSET]
+#endif
 
     // Check whether SR needs updating
     movs r0, #CMD_READ_STATUS2
