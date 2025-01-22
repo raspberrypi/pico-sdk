@@ -54,7 +54,7 @@
 #define PICO_NO_RAM_VECTOR_TABLE 0
 #endif
 
-// PICO_CONFIG: PICO_VECTOR_TABLE_NUM_IRQS, Number of IRQ vectors to include in the vector table, type=int, default=NUM_IRQS, advanced=true, group=pico_platform
+// PICO_CONFIG: PICO_VECTOR_TABLE_NUM_IRQS, Number of IRQ vectors to include in the vector table, type=int, min=0, max=NUM_IRQS, default=NUM_IRQS, advanced=true, group=pico_platform
 #ifndef PICO_VECTOR_TABLE_NUM_IRQS
 #define PICO_VECTOR_TABLE_NUM_IRQS NUM_IRQS
 #endif
