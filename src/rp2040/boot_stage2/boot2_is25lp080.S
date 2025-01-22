@@ -71,12 +71,10 @@
 // A better solution is to use a volatile SR write if your device supports it.
 #define PROGRAM_STATUS_REG
 
-#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
-#define CMD_RELEASE_POWERDOWN 0xAB
-#endif
 #define CMD_WRITE_ENABLE 0x06
 #define CMD_READ_STATUS 0x05
 #define CMD_WRITE_STATUS 0x01
+#define CMD_RELEASE_POWERDOWN 0xAB
 #define SREG_DATA 0x40  // Enable quad-SPI mode
 
 // ----------------------------------------------------------------------------
