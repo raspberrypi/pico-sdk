@@ -61,7 +61,6 @@
 // CLKDIV and RXDELAY, and no constraints on CS max assertion, CS min
 // deassertion, or page boundary burst breaks.
 
-#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
 // Need to use direct serial mode to send SR commands. Choose a
 // conservative direct-mode divisor (5 MHz at 150 MHz clk_sys)
 // since the XIP-mode divisor may be unsafe without an RX delay.
@@ -70,7 +69,6 @@
     QMI_DIRECT_CSR_EN_BITS | \
     QMI_DIRECT_CSR_AUTO_CS0N_BITS | \
 0)
-#endif
 
 #define INIT_M0_TIMING (\
     1                      << QMI_M0_TIMING_COOLDOWN_LSB |\
