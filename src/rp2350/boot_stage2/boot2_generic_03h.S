@@ -46,10 +46,8 @@
 #error "RX delay greater than maximum"
 #endif
 
-#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
-#define CMD_RELEASE_POWERDOWN 0xAB
-#endif
 #define CMD_READ 0x03
+#define CMD_RELEASE_POWERDOWN 0xAB
 
 // ----------------------------------------------------------------------------
 // Register initialisation values -- same in Arm/RISC-V code.
