@@ -11,7 +11,7 @@
 
 #include "pico.h"
 
-// PICO_CONFIG: PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN, Enable/disable releasing flash device from the power-down state during boot stage 2, type=bool, default=0, group=hardware_flash
+// PICO_CONFIG: PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN, Enable/disable releasing flash device from the power-down state during boot stage 2, type=bool, default=0, group=boot_stage2
 #ifndef PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
 #define PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN 0
 #endif
