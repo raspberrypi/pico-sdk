@@ -26,11 +26,21 @@ pico_default_asm_setup
 .section .vectors, "ax"
 .align 2
 
+// PICO_CONFIG: PICO_MINIMAL_VECTOR_TABLE, Use Minimal Vector Table - this prevents use of all interrupts, type=bool, default=0, advanced=true, group=pico_crt0
+#ifndef PICO_MINIMAL_VECTOR_TABLE
+#define PICO_MINIMAL_VECTOR_TABLE 0
+#endif
+
 .global __vectors, __VECTOR_TABLE
 __VECTOR_TABLE:
 __vectors:
 .word __StackTop
 .word _reset_handler
+
+#if PICO_MINIMAL_VECTOR_TABLE
+.word isr_invalid   // NMI
+.word isr_invalid   // HardFault
+#else
 .word isr_nmi
 .word isr_hardfault
 .word isr_invalid // Reserved, should never fire
@@ -146,6 +156,7 @@ if_irq_word 79 isr_irq79
 #error more IRQ entries required
 #endif
 #endif
+#endif  // #if !PICO_MINIMAL_VECTOR_TABLE
 
 // all default exception handlers do nothing, and we can check for them being set to our
 // default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
@@ -166,6 +177,7 @@ __default_isrs_start:
 
 // these are separated out for clarity
 decl_isr_bkpt isr_invalid
+#if !PICO_MINIMAL_VECTOR_TABLE
 decl_isr_bkpt isr_nmi
 decl_isr_bkpt isr_hardfault
 decl_isr_bkpt isr_svcall
@@ -287,6 +299,7 @@ __unhandled_user_irq:
 .global unhandled_user_irq_num_in_r0
 unhandled_user_irq_num_in_r0:
     bkpt #0
+#endif  // #if !PICO_MINIMAL_VECTOR_TABLE
 
 // ----------------------------------------------------------------------------
 
