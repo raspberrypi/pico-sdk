@@ -42,6 +42,12 @@ define_property(TARGET
     FULL_DOCS "AES key for encrypting"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_EMBED_DECRYPTION
+    INHERITED
+    BRIEF_DOCS "Embed decryption stage into encrypted binary"
+    FULL_DOCS "Embed decryption stage into encrypted binary"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_ENC_SIGFILE
     INHERITED
     BRIEF_DOCS "Private key for signing encrypted binaries"
@@ -424,7 +430,7 @@ endfunction()
 # \brief_nodesc\ Encrypt the taget binary
 #
 # Encrypt the target binary with the given AES key (should be a binary
-# file containing 32 bytes of a random key), and sign the encrypted binary.
+# file containing 128 bytes of a random key), and sign the encrypted binary.
 #
 # This sets the target properties PICOTOOL_AESFILE to AESFILE,
 # and PICOTOOL_ENC_SIGFILE to SIGFILE if present, else PICOTOOL_SIGFILE.
@@ -435,6 +441,37 @@ function(pico_encrypt_binary TARGET AESFILE)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_AESFILE ${AESFILE}
+    )
+    if (ARGC EQUAL 3)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENC_SIGFILE ${ARGV2}
+        )
+    else()
+        get_target_property(enc_sig_file ${TARGET} PICOTOOL_ENC_SIGFILE)
+        if (NOT enc_sig_file)
+            get_target_property(sig_file ${TARGET} PICOTOOL_SIGFILE)
+            if (NOT sig_file)
+                message(FATAL_ERROR "Signature file not set for ${TARGET}")
+            else()
+                set_target_properties(${TARGET} PROPERTIES
+                    PICOTOOL_ENC_SIGFILE ${sig_file}
+                )
+            endif()
+        endif()
+    endif()
+endfunction()
+
+# pico_create_decrypting_binary(TARGET AESFILE [SIGFILE])
+# Encrypt the target binary with the given AES key (should be a binary
+# file containing 128 bytes of a random key), add a decryption stage to
+# decrypt the binary at runtime, and then sign the encrypted binary.
+# This sets PICOTOOL_AESFILE to AESFILE, PICOTOOL_EMBED_DECRYPTION to TRUE,
+# and PICOTOOL_ENC_SIGFILE to SIGFILE if present, else PICOTOOL_SIGFILE.
+function(pico_create_decrypting_binary TARGET AESFILE)
+    picotool_check_configurable(${TARGET})
+    set_target_properties(${TARGET} PROPERTIES
+        PICOTOOL_AESFILE ${AESFILE}
+        PICOTOOL_EMBED_DECRYPTION TRUE
     )
     if (ARGC EQUAL 3)
         set_target_properties(${TARGET} PROPERTIES
@@ -595,9 +632,20 @@ function(picotool_postprocess_binary TARGET)
         endif()
         # Encryption
         if (picotool_aesfile)
+            get_target_property(picotool_embed_decryption ${TARGET} PICOTOOL_EMBED_DECRYPTION)
+            if (picotool_embed_decryption)
+                list(APPEND picotool_encrypt_args "--embed")
+            endif()
+
             add_custom_command(TARGET ${TARGET} POST_BUILD
                 DEPENDS ${picotool_enc_sigfile} ${picotool_aesfile}
-                COMMAND picotool encrypt --quiet --hash --sign $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}> ${picotool_aesfile} ${picotool_enc_sigfile}
+                COMMAND picotool
+                ARGS encrypt
+                    --quiet --hash --sign
+                    ${picotool_encrypt_args}
+                    $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
+                    ${picotool_aesfile} ${picotool_enc_sigfile}
+                COMMAND_EXPAND_LISTS
                 VERBATIM)
             if (ARGC EQUAL 2)
                 set(${ARGV1} TRUE PARENT_SCOPE)
