@@ -8,7 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <hardware/sync.h>
+#if PICO_ON_DEVICE
 #include "hardware/clocks.h"
+#endif
 #include "pico/stdlib.h"
 #include "pico/test.h"
 // Include sys/types.h before inttypes.h to work around issue with
@@ -342,10 +344,12 @@ static bool timer_callback_issue_2118(repeating_timer_t *rt) {
 int issue_2118_test(void) {
     PICOTEST_START_SECTION("Issue #2118 defect - failure to set an alarm");
 
+#if PICO_ON_DEVICE
     // this problem only happens when running the clock fast as it requires the time between
     // alarm_pool_irq_handler handling an alarm and setting the next alarm to be <1us
     set_sys_clock_hz(200 * MHZ, true);
     setup_default_uart();
+#endif
 
     alarm_pool_t *pool = alarm_pool_create(2, 1);
     repeating_timer_t timer;
@@ -359,10 +363,11 @@ int issue_2118_test(void) {
     PICOTEST_CHECK(counter_2118 >= 100, "Repeating timer failure");
 
     alarm_pool_destroy(pool);
+#if PICO_ON_DEVICE
     hard_assert(timer_hw->armed == 0); // check destroying the pool unarms its timer
-
     set_sys_clock_hz(SYS_CLK_HZ, true);
     setup_default_uart();
+#endif
 
     PICOTEST_END_SECTION();
     return 0;
