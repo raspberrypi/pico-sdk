@@ -48,6 +48,12 @@ define_property(TARGET
     FULL_DOCS "Embed decryption stage into encrypted binary"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_OTP_KEY_PAGE
+    INHERITED
+    BRIEF_DOCS "OTP page storing the AES key"
+    FULL_DOCS "OTP page storing the AES key"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_ENC_SIGFILE
     INHERITED
     BRIEF_DOCS "Private key for signing encrypted binaries"
@@ -426,7 +432,7 @@ function(pico_embed_pt_in_binary TARGET PTFILE)
     )
 endfunction()
 
-# pico_encrypt_binary(TARGET AESFILE [SIGFILE])
+# pico_encrypt_binary(TARGET AESFILE [SIGFILE <file>] [EMBED] [OTP_KEY_PAGE <page>])
 # \brief_nodesc\ Encrypt the taget binary
 #
 # Encrypt the target binary with the given AES key (should be a binary
@@ -435,47 +441,41 @@ endfunction()
 # This sets the target properties PICOTOOL_AESFILE to AESFILE,
 # and PICOTOOL_ENC_SIGFILE to SIGFILE if present, else PICOTOOL_SIGFILE.
 #
+# Optionally, use EMBED to embed a decryption stage into the encrypted binary.
+# This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
+#
+# Optionally, use OTP_KEY_PAGE to specify the OTP page storing the AES key.
+# This sets the target property PICOTOOL_OTP_KEY_PAGE to OTP_KEY_PAGE.
+#
 # \param\ AESFILE The AES key file to use
 # \param\ SIGFILE The PEM signature file to use
+# \param\ EMBED Embed a decryption stage into the encrypted binary
+# \param\ OTP_KEY_PAGE The OTP page storing the AES key
 function(pico_encrypt_binary TARGET AESFILE)
+    set(options EMBED)
+    set(oneValueArgs OTP_KEY_PAGE SIGFILE)
+    # set(multiValueArgs )
+    cmake_parse_arguments(PARSE_ARGV 2 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_AESFILE ${AESFILE}
     )
-    if (ARGC EQUAL 3)
-        set_target_properties(${TARGET} PROPERTIES
-            PICOTOOL_ENC_SIGFILE ${ARGV2}
-        )
-    else()
-        get_target_property(enc_sig_file ${TARGET} PICOTOOL_ENC_SIGFILE)
-        if (NOT enc_sig_file)
-            get_target_property(sig_file ${TARGET} PICOTOOL_SIGFILE)
-            if (NOT sig_file)
-                message(FATAL_ERROR "Signature file not set for ${TARGET}")
-            else()
-                set_target_properties(${TARGET} PROPERTIES
-                    PICOTOOL_ENC_SIGFILE ${sig_file}
-                )
-            endif()
-        endif()
-    endif()
-endfunction()
 
-# pico_create_decrypting_binary(TARGET AESFILE [SIGFILE])
-# Encrypt the target binary with the given AES key (should be a binary
-# file containing 128 bytes of a random key), add a decryption stage to
-# decrypt the binary at runtime, and then sign the encrypted binary.
-# This sets PICOTOOL_AESFILE to AESFILE, PICOTOOL_EMBED_DECRYPTION to TRUE,
-# and PICOTOOL_ENC_SIGFILE to SIGFILE if present, else PICOTOOL_SIGFILE.
-function(pico_create_decrypting_binary TARGET AESFILE)
-    picotool_check_configurable(${TARGET})
-    set_target_properties(${TARGET} PROPERTIES
-        PICOTOOL_AESFILE ${AESFILE}
-        PICOTOOL_EMBED_DECRYPTION TRUE
-    )
-    if (ARGC EQUAL 3)
+    if (ENC_EMBED)
         set_target_properties(${TARGET} PROPERTIES
-            PICOTOOL_ENC_SIGFILE ${ARGV2}
+            PICOTOOL_EMBED_DECRYPTION TRUE
+        )
+    endif()
+
+    if (ENC_OTP_KEY_PAGE)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_OTP_KEY_PAGE ${ENC_OTP_KEY_PAGE}
+        )
+    endif()
+
+    if (ENC_SIGFILE)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENC_SIGFILE ${ENC_SIGFILE}
         )
     else()
         get_target_property(enc_sig_file ${TARGET} PICOTOOL_ENC_SIGFILE)
@@ -635,6 +635,11 @@ function(picotool_postprocess_binary TARGET)
             get_target_property(picotool_embed_decryption ${TARGET} PICOTOOL_EMBED_DECRYPTION)
             if (picotool_embed_decryption)
                 list(APPEND picotool_encrypt_args "--embed")
+            endif()
+
+            get_target_property(otp_key_page ${TARGET} PICOTOOL_OTP_KEY_PAGE)
+            if (otp_key_page)
+                list(APPEND picotool_encrypt_args "--otp-key-page" ${otp_key_page})
             endif()
 
             add_custom_command(TARGET ${TARGET} POST_BUILD
