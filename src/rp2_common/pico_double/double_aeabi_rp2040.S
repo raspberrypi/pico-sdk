@@ -425,6 +425,7 @@ double_wrapper_section __aeabi_ui2d
 double_wrapper_section __aeabi_i2d
 
 wrapper_func __aeabi_ui2d
+regular_func uint2double
     movs r1, #0
     cmp r0, #0
     bne 2f
@@ -432,6 +433,7 @@ wrapper_func __aeabi_ui2d
     bx lr
 // double FUNC_NAME(__aeabi_i2d)(int)                     integer to double (double precision) conversion
 wrapper_func __aeabi_i2d
+regular_func int2double
     asrs r1, r0, #31
     eors r0, r1
     subs r0, r1
@@ -506,6 +508,7 @@ regular_func double2int
 // unsigned FUNC_NAME(__aeabi_d2uiz)(double)             double (double precision) to unsigned C-style conversion [3]
 double_wrapper_section __aeabi_d2uiz
 wrapper_func __aeabi_d2uiz
+regular_func double2uint_z
 regular_func double2uint
     shimmable_table_tail_call SF_TABLE_FLOAT2UINT double2uint_shim
 
@@ -528,11 +531,13 @@ regular_func ufix642double
 // double FUNC_NAME(__aeabi_l2d)(long long)             long long to double (double precision) conversion
 double_wrapper_section __aeabi_l2d
 wrapper_func __aeabi_l2d
+regular_func int642double
     shimmable_table_tail_call SF_TABLE_INT642FLOAT int642double_shim
 
 // double FUNC_NAME(__aeabi_l2f)(long long)             long long to double (double precision) conversion
 double_wrapper_section __aeabi_ul2d
 wrapper_func __aeabi_ul2d
+regular_func uint642double
     shimmable_table_tail_call SF_TABLE_UINT642FLOAT uint642double_shim
 
 // long long FUNC_NAME(__aeabi_d2lz)(double)             double (double precision) to long long C-style conversion [3]
@@ -566,7 +571,47 @@ regular_func double2int64
 // unsigned long long FUNC_NAME(__aeabi_d2ulz)(double)     double to unsigned long long C-style conversion [3]
 double_wrapper_section __aeabi_d2ulz
 wrapper_func __aeabi_d2ulz
+regular_func double2uint64
+regular_func double2uint64_z
     shimmable_table_tail_call SF_TABLE_FLOAT2UINT64 double2uint64_shim
+
+double_section double2fix64_z
+regular_func double2fix64_z
+  lsls r3, r1, #1
+  bcc double2fix64 // positive is ok for fix64
+  push {r1, r2}
+  lsrs r3, #21
+
+  adds r3, r2
+  movs r2, #1
+  negs r2, r2
+  lsrs r2, #22
+  subs r3, r2
+
+  bcc 1f // <1 means subtract 1
+  cmp r3, #52
+  bge double2fix64 // must be an integer
+
+  lsls r2, r1, #12
+  lsrs r1, r0, #20
+  adds r2, r1
+  // r2 now has highest 32 mantissa bits
+  lsls r2, r3
+  bne 1f // not integer as non zero fractional bits remain
+  lsls r2, r0, #12
+  lsls r2, r3
+  bne 1f
+  // integer
+  pop {r1, r2}
+  b double2fix64
+1:
+  pop {r1, r2}
+  push {lr}
+  bl double2fix64
+  movs r2, #0
+  adds r0, #1
+  adcs r1, r2
+  pop {pc}
 
 double_section double2fix64
 regular_func double2fix64
@@ -574,6 +619,7 @@ regular_func double2fix64
 
 double_section double2ufix64
 regular_func double2ufix64
+regular_func double2ufix64_z
     shimmable_table_tail_call SF_TABLE_FLOAT2UFIX64 double2ufix64_shim
 
 double_section double2fix
@@ -582,6 +628,7 @@ regular_func double2fix
 
 double_section double2ufix
 regular_func double2ufix
+regular_func double2ufix_z
     shimmable_table_tail_call SF_TABLE_FLOAT2UFIX double2ufix_shim
 
 double_wrapper_section __aeabi_d2f

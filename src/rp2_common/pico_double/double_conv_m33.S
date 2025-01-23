@@ -249,7 +249,61 @@ regular_func ufix2double
  movs r1,#0
  bx r14
 
-double_wrapper_section conv_dtoi64
+double_section conv_dtoi64
+regular_func double2int64
+  lsls r2, r1, #1
+  bcc double2int64_z // positive is ok for int64_z
+  orrs r3, r2, r0
+  beq double2int64_z // 0 or -0 is ok for int64_z
+
+  lsrs r2, #21
+  adds r2, #1
+  subs r2, r2, #0x400
+  bcc 1f // <1 means subtract 1
+  cmp r2, #52
+  bge double2int64_z // must be an integer
+  lsls r3, r1, #12
+  adds r3, r3, r0, lsr #20
+  // r3 now has highest 32 mantissa bits
+  lsls r3, r2
+  bne 1f // not integer as non zero fractional bits remain
+  lsls r3, r0, #12
+  lsls r3, r2
+  beq double2int64_z // integer
+1:
+  push {lr}
+  bl double2int64_z
+  subs r0, #1
+  sbcs r1, r1, #0
+  pop {pc}
+
+double_section conv_dtofix64
+regular_func double2fix64
+  lsls r3, r1, #1
+  bcc double2fix64_z // positive is ok for int64_z
+  lsrs r3, #21
+  adds r3, #1
+  rsb ip, r2, #0x400
+  subs r3, ip
+  bcc 1f // <1 means subtract 1
+  cmp r3, #52
+  bge double2fix64_z // must be an integer
+  lsls ip, r1, #12
+  adds ip, ip, r0, lsr #20
+  // ip now has highest 32 mantissa bits
+  lsls ip, r3
+  bne 1f // not integer as non zero fractional bits remain
+  lsls ip, r0, #12
+  lsls ip, r3
+  beq double2fix64_z // integer
+1:
+  push {lr}
+  bl double2fix64_z
+  subs r0, #1
+  sbcs r1, r1, #0
+  pop {pc}
+
+double_wrapper_section conv_dtoi64_z
 
 @ convert double to signed int64, rounding towards 0, clamping
 wrapper_func __aeabi_d2lz

@@ -128,9 +128,8 @@ saving_func wrapper sqrt
   dcp_dsqrt_m r0,r1,r0,r1,r0,r1,r2,r3,r12
   saving_func_return
 
-// todo not a real thing
-double_wrapper_section __aeabi_dclassify
-saving_func wrapper __aeabi_dclassify
+double_section dclassify
+saving_func regular dclassify
 @ with correct rounding
   dcp_dclassify_m apsr_nzcv,r0,r1
   saving_func_return
@@ -138,43 +137,122 @@ saving_func wrapper __aeabi_dclassify
 // ============== CONVERSION FUNCTIONS ===============
 
 double_wrapper_section __aeabi_d2f
+regular_func double2float
 saving_func wrapper __aeabi_d2f
 @ with rounding
   dcp_double2float_m r0,r0,r1
   saving_func_return
 
 double_wrapper_section __aeabi_i2d
+regular_func int2double
 saving_func wrapper __aeabi_i2d
   dcp_int2double_m r0,r1,r0
   saving_func_return
 
 double_wrapper_section __aeabi_ui2d
+regular_func uint2double
 saving_func wrapper __aeabi_ui2d
   dcp_uint2double_m r0,r1,r0
   saving_func_return
 
+double_section double2fix_z
+saving_func regular double2fix_z
+  ubfx r3, r1, #20, #11
+  adds r3, r2
+  beq 1f // very small; we don't care that we might make a denormal
+  asrs ip, r3, #11
+  beq 1f
+  ite pl
+  movpl r3, #0x7ff
+  movsmi r3, #0
+1:
+  bfi r1, r3, #20, #11
+  b double2int_z_entry
+
+double_section double2ufix
+regular_func double2ufix
+saving_func regular double2ufix_z
+double2ufix_z_entry:
+  ubfx r3, r1, #20, #11
+  adds r3, r2
+  beq 1f // very small; we don't care that we might make a denormal
+  asrs ip, r3, #11
+  beq 1f
+  ite pl
+  lsrspl r3, r1, #20 // 0x7ff
+  movsmi r3, #0
+1:
+  bfi r1, r3, #20, #11
+  b double2uint_z_entry
+
+double_section double2fix
+saving_func regular double2fix
+  ubfx r3, r1, #20, #11
+  adds r3, r2
+  beq 1f // very small; we don't care that we might make a denormal
+  asrs ip, r3, #11
+  beq 1f
+  ite pl
+  movpl r3, #0x7ff
+  movsmi r3, #0
+1:
+  bfi r1, r3, #20, #11
+  b double2int_entry
+
+double_section double2int
+saving_func regular double2int
+double2int_entry:
+  lsls r2, r1, #1
+  // r1 = abs(zero)                   => r1 = 0x00000000
+  // r1 = abs(denornaml)              => r1 = 0x00.xxxxx
+  // r1 = abs(1.0f)                   => r1 = 0x7f800000
+  // r1 = abs(inf/nan)                => r1 = 0xffXxxxxx
+  bcc double2int_z_entry // positive is ok for int64_z
+  orrs r3, r2, r0
+  beq double2int_z_entry // 0 or -0 is ok for int64_z
+  // r3 = last 3 bits of 23 significant bits of mantissa at position 32-23
+  lsrs r3, r0, #32 - 3
+  lsls r3, #9
+
+  lsrs r2, #21
+  adds r2, #1
+  subs r2, r2, #0x400
+  bcc 1f // <1 means subtract 1
+  // recreate the 23 significant bits of mantissa for float at the top of r3
+  adds r3, r3, r1, lsl #12
+  lsls r3, r2
+  beq double2int_z_entry // integer
+1:
+  dcp_double2int_m r0,r0,r1
+  subs r0, #1
+saving_func_return
+
 double_wrapper_section __aeabi_d2iz
+regular_func double2int_z
 saving_func wrapper __aeabi_d2iz
+double2int_z_entry:
 @ with truncation towards 0
   dcp_double2int_m r0,r0,r1
+  // note: this works with either saved or not saved call as it is just a `bx lr`
   saving_func_return
 
 double_wrapper_section __aeabi_d2uiz
+regular_func double2uint_z
+regular_func double2uint
 saving_func wrapper __aeabi_d2uiz
+double2uint_z_entry:
 @ with truncation towards 0
   dcp_double2uint_m r0,r0,r1
   saving_func_return
 
-// todo not a real thing
-double_wrapper_section __aeabi_d2i_r
-saving_func wrapper __aeabi_d2i_r
+double_section double2int_r
+saving_func regular double2int_r
 @ with rounding
   dcp_double2int_r_m r0,r0,r1
   saving_func_return
 
-// todo not a real thing
-double_wrapper_section __aeabi_d2ui_r
-saving_func wrapper __aeabi_d2ui_r
+double_section double2uint_r
+saving_func regular double2uint_r
 @ with rounding
   dcp_double2uint_r_m r0,r0,r1
   saving_func_return
