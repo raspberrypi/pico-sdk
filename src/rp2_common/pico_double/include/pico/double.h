@@ -21,7 +21,7 @@ extern "C" {
 * \brief Optimized double-precision floating point functions
 *
 * An application can take control of the floating point routines used in the application over and above what is provided by the compiler,
-* by depending on the pico_double library. A user might want to do this
+* by depending on the pico_double library. A user might want to do this:
 *
 * 1. To use optimized software implementations provided by the RP2-series device's bootrom or the SDK
 * 2. To use optimized combined software/hardware implementations utilizing custom RP2-series hardware for acceleration
@@ -52,14 +52,14 @@ extern "C" {
 * floating point implementation; they are however usually fine for the majority of cases
 * \endif
 *
-* On Arm, (replacement) optimized implementations are provided for the following compiler built-ins when
-* and math library functions when using `pico_dobule_pico`:
+* On Arm, (replacement) optimized implementations are provided for the following compiler built-ins
+* and math library functions when using `pico_double_pico`:
 *
 * - basic arithmetic:
 *
 *   __aeabi_dadd, __aeabi_ddiv, __aeabi_dmul, __aeabi_drsub, __aeabi_dsub
 *
-* - comparison: (except `pico_double_pico_vfp`)
+* - comparison:
 *
 *   __aeabi_cfcmpeq, __aeabi_cfrcmple, __aeabi_cfcmple, __aeabi_dcmpeq, __aeabi_dcmplt, __aeabi_dcmple, __aeabi_dcmpge, __aeabi_dcmpgt, __aeabi_dcmpun
 *
@@ -113,24 +113,24 @@ extern "C" {
 *
 *       fix2double, ufix2double, fix642double, ufix642double
 *
-*     note: on `pico_double_vfp` the 32-bit functions are curretly _only_ provided as C macros and must use a compile
+*     note: on `pico_double_vfp` the 32-bit functions are currently _only_ provided as C macros and must use a compile
 *     time constant between 1 and 32 for the fixed point position
 *
 *   - double -> (u)fix (round towards zero):
 *
 *       double2fix_z, double2ufix_z, double2fix64_z, double2ufix64_z
 *
-*     note: on `pico_double_vfp` the 32-bit functions are curretly _only_ provided as C macros and must use a compile
+*     note: on `pico_double_vfp` the 32-bit functions are currently _only_ provided as C macros and must use a compile
 *     time constant between 1 and 32 for the fixed point position
 *
 *   - double -> (u)fix (round towards -infinity):
 *
 *       double2fix, double2ufix, double2fix64, double2ufix64
 *
-*     note: on `pico_double_vfp` the 32-bit functions are curretly _only_ provided as C macros and must use a compile
+*     note: on `pico_double_vfp` the 32-bit functions are currently _only_ provided as C macros and must use a compile
 *     time constant between 1 and 32 for the fixed point position
 *
-* - Even faster methods versions of divide and square-root that do not round correctly:
+* - Even faster versions of divide and square-root functions that do not round correctly:
 *
 *   ddiv_fast, sqrt_fast (these do not round correctly)
 *
@@ -185,7 +185,7 @@ double powint(double x, int y);
 double ddiv_fast(double n, double d);
 double sqrt_fast(double f);
 double fma_fast(double x, double y, double z); // this is not fused
-double mla(double x, double y, double z); // another name for fma_flast
+double mla(double x, double y, double z); // another name for fma_fast
 #endif
 
 #endif

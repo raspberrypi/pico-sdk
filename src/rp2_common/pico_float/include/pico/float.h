@@ -51,17 +51,17 @@ extern "C" {
 *
 * 1. `pico_float_pico_vfp` - this library leaves basic C single-precision floating point operations to the compiler
 * which can use inlined VFP (Arm FPU) code. Custom optimized versions of trigonometric and scientific functions are provided.
-* no DCP (RP2350 Double co-processor) instructions are used.
+* No DCP (RP2350 Double co-processor) instructions are used.
 * 2. `pico_float_pico_dcp` - this library prevents the compiler injecting inlined VFP code, and also implements
-* all single-precision floating point operations in optimized DCP or M33 code. This option is not as fast
-* as pico_float_pico_vfp, however allows floating point operations without enabling the floating point co-processor
+* all single-precision floating point operations in optimized DCP or M33 code. This option is not quite as fast
+* as pico_float_pico_vfp, however it allows floating point operations without enabling the floating point co-processor
 * on the CPU; this can be beneficial in certain circumstances, e.g. where leaving stack in tasks or interrupts
 * for the floating point state is undesirable.
 *
-* Note: `pico_float_pico` is equivalent ot `pico_flot_pico_vfp` on RP2350, as this is the most sensible default
+* Note: `pico_float_pico` is equivalent to `pico_float_pico_vfp` on RP2350, as this is the most sensible default
 * \endif
 *
-* On Arm, (replacement) optimized implementations are provided for the following compiler built-ins when
+* On Arm, (replacement) optimized implementations are provided for the following compiler built-ins
 * and math library functions when using `_pico` variants of `pico_float`:
 *
 * - basic arithmetic: (except `pico_float_pico_vfp`)
@@ -104,13 +104,13 @@ extern "C" {
 *
 *     int2float, uint2float, int642float, uint642float
 *
-*     note: on `pico_float_vfp` the 32-bit functions are also provided as C macros since they map to inline VFP code
+*     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they map to inline VFP code
 *
 *   - (u)float -> int (round towards zero):
 *
 *     float2int_z, float2uint_z, float2int64_z, float2uint64_z
 *
-*     note: on `pico_float_vfp` the 32-bit functions are also provided as C macros since they map to inline VFP code
+*     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they map to inline VFP code
 *
 *   - (u)float -> int (round towards -infinity):
 *
@@ -126,17 +126,17 @@ extern "C" {
 *
 *       float2fix_z, float2ufix_z, float2fix64_z, float2ufix64_z
 *
-*     note: on `pico_float_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
+*     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
 *     when the number of fractional bits is a compile time constant between 1 and 32
 *
 *   - float -> (u)fix (round towards -infinity):
 *
 *       float2fix, float2ufix, float2fix64, float2ufix64
 *
-*     note: on `pico_float_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
+*     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
 *     when the number of fractional bits is a compile time constant between 1 and 32
 *
-* - Even faster methods versions of divide and square-root that do not round correctly: (`pico_float_pico_dcp` only)
+* - Even faster versions of divide and square-root functions that do not round correctly: (`pico_float_pico_dcp` only)
 *
 *   fdiv_fast, sqrtf_fast
 *
@@ -276,12 +276,12 @@ uint64_t float2ufix64(float f, int e);
 #define _float2ufix_inline(f, e) _float2ufix_z_inline((f), (e))
 #endif
 
-#if LIB_PIC_FLOAT_PICO_VFP
+#if LIB_PICO_FLOAT_PICO_VFP
 // may as well provide inline macros for VFP
-#define int2float(int32_t i) ((float)(i))
-#define uint2float(uint32_t i) ((float)(i))
-#define float2int_z(float f) ((int32_t)(f))
-#define float2uint_z(float f) ((uint32_t)(f))
+#define int2float(i) ((float)(int32_t)(i))
+#define uint2float(i) ((float)(uint32_t)(i))
+#define float2int_z(f) ((int32_t)(f))
+#define float2uint_z(f) ((uint32_t)(f))
 #endif
 
 #endif
