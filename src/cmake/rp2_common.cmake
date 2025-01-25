@@ -119,6 +119,7 @@ if (NOT PICO_BARE_METAL)
          pico_add_subdirectory(rp2_common/cmsis)
     endif()
     pico_add_subdirectory(rp2_common/tinyusb)
+    pico_add_subdirectory(rp2_common/cherryusb)
     pico_add_subdirectory(rp2_common/pico_stdio_usb)
     pico_add_subdirectory(rp2_common/pico_i2c_slave)
 

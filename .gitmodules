@@ -13,3 +13,6 @@
 [submodule "lib/btstack"]
 	path = lib/btstack
 	url = https://github.com/bluekitchen/btstack.git
+[submodule "lib/cherryusb"]
+	path = lib/cherryusb
+	url = https://github.com/cherry-embedded/CherryUSB.git
