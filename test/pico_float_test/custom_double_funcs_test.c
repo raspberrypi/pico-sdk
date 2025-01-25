@@ -223,6 +223,11 @@ int test() {
     test_checku64(double2ufix64_z(3.25, 2), 13, "double2ufix64_z7");
     test_checki64(double2ufix64_z(3.0, -1), 1, "double2fuix64_z8"); // not very useful
 
+    union {
+        uint64_t u;
+        double d;
+    } u64d;
+
     printf("double2int\n");
     test_checki(double2int(0.0), 0, "double2int1");
     test_checki(double2int(0.25), 0, "double2int1b");
@@ -236,12 +241,25 @@ int test() {
     test_checki(double2int(-0.75), -1, "double2int5");
     test_checki(double2int(-1.0), -1, "double2int5b");
     // todo test correct rounding around maximum precision
+    test_checki(double2int(2147483646.0), INT32_MAX-1, "double2int6");
     test_checki(double2int(2147483647.0), INT32_MAX, "double2int6");
     test_checki(double2int(21474836470.0), INT32_MAX, "double2int7");
     test_checki(double2int(-2147483648.0), INT32_MIN, "double2int8");
     test_checki(double2int(-21474836480.0), INT32_MIN, "double2int9");
     test_checki(double2int(-2.5), -3, "double2int10");
     test_checki(double2int(-2.4), -3, "double2int11");
+    u64d.u = 0xc000000000000000ull;
+    test_checki(double2int(u64d.d), -2, "double2int12");
+    u64d.u = 0xc008000000000000ull;
+    test_checki(double2int(u64d.d), -3, "double2int12b");
+    u64d.u = 0xc000000000000001ull;
+    test_checki(double2int(u64d.d), -3, "double2int12c");
+    u64d.u = 0xc000000080000000ull;
+    test_checki(double2int(u64d.d), -3, "double2int12d");
+    u64d.u = 0xc000000100000000ull;
+    test_checki(double2int(u64d.d), -3, "double2int12e");
+    u64d.u = 0xc000000100000001ull;
+    test_checki(double2int(u64d.d), -3, "double2int12f");
 
     printf("double2uint\n");
     test_checku(double2uint(0.0), 0, "double2uint1");
@@ -274,10 +292,6 @@ int test() {
     test_checki64(double2int64(-21474836480.0), -21474836480ll, "double2int649");
     test_checki64(double2int64(-2.5), -3, "double2int6410");
     test_checki64(double2int64(-2.4), -3, "double2int6411");
-    union {
-        uint64_t u;
-        double d;
-    } u64d;
     u64d.u = 0xc000000000000000ull;
     test_checki64(double2int64(u64d.d), -2, "double2int6412");
     u64d.u = 0xc008000000000000ull;

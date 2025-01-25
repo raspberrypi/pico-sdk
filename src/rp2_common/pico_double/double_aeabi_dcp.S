@@ -203,23 +203,22 @@ double_section double2int
 saving_func regular double2int
 double2int_entry:
   lsls r2, r1, #1
-  // r1 = abs(zero)                   => r1 = 0x00000000
-  // r1 = abs(denornaml)              => r1 = 0x00.xxxxx
-  // r1 = abs(1.0f)                   => r1 = 0x7f800000
-  // r1 = abs(inf/nan)                => r1 = 0xffXxxxxx
   bcc double2int_z_entry // positive is ok for int64_z
   orrs r3, r2, r0
   beq double2int_z_entry // 0 or -0 is ok for int64_z
-  // r3 = last 3 bits of 23 significant bits of mantissa at position 32-23
-  lsrs r3, r0, #32 - 3
-  lsls r3, #9
 
   lsrs r2, #21
   adds r2, #1
   subs r2, r2, #0x400
   bcc 1f // <1 means subtract 1
-  // recreate the 23 significant bits of mantissa for float at the top of r3
-  adds r3, r3, r1, lsl #12
+  cmp r2, #52
+  bge double2int_z_entry // must be an integer
+  lsls r3, r1, #12
+  adds r3, r3, r0, lsr #20
+  // r3 now has highest 32 mantissa bits
+  lsls r3, r2
+  bne 1f // not integer as non zero fractional bits remain
+  lsls r3, r0, #12
   lsls r3, r2
   beq double2int_z_entry // integer
 1:
