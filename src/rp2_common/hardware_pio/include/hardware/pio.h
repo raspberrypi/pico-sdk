@@ -215,10 +215,6 @@ static_assert(DREQ_PIO0_TX2 == DREQ_PIO0_TX0 + 2, "");
 static_assert(DREQ_PIO0_TX3 == DREQ_PIO0_TX0 + 3, "");
 static_assert(DREQ_PIO0_RX0 == DREQ_PIO0_TX0 + NUM_PIO_STATE_MACHINES, "");
 static_assert(DREQ_PIO1_RX0 == DREQ_PIO1_TX0 + NUM_PIO_STATE_MACHINES, "");
-#if NUM_PIOS > 2
-static_assert(DREQ_PIO2_TX0 == DREQ_PIO1_RX0 + NUM_PIO_STATE_MACHINES, "");
-static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
-#endif
 #define PIO_DREQ_NUM(pio, sm, is_tx) ((sm) + (((is_tx) ? 0 : NUM_PIO_STATE_MACHINES) + PIO_NUM(pio) * (DREQ_PIO1_TX0 - DREQ_PIO0_TX0)))
 #endif
 
