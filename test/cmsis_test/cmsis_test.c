@@ -35,5 +35,7 @@ int main(void) {
     irq_set_enabled(DMA_IRQ_0_IRQn, true);
     irq_set_pending(DMA_IRQ_0_IRQn);
     puts(irq_handler_called ? "SUCCESS" : "FAILURE");
-    return !(pendsv_called && irq_handler_called);
+    bool ok = pendsv_called && irq_handler_called;
+    puts(ok ? "PASSED" : "FAILED");
+    return !ok;
 }
