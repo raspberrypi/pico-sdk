@@ -47,7 +47,15 @@ bool timer_callback(repeating_timer_t *t) {
 //    if (fabs(fz - (fa * 11.0f + fb)) > 1e-9f) {
 //        FAILED();
 //    }
-    if (fabsf(fz - fa * 11.0f) > 1e-3f) {
+    union {
+        float f;
+        uint32_t i;
+    } fi, fi2;
+    fi.f = fabsf(fz - fa * 11.0f);
+    // make a float which is close to 1ulp
+    fi2.i = fi.i & 0x7f800000u;
+    fi2.i++;
+    if (fi.f > fi2.f) {
         FAILED();
     }
     double dz = z;
@@ -258,4 +266,3 @@ int main() {
     printf("PASSED\n");
     return 0;
 }
-
