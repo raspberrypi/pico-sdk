@@ -242,7 +242,7 @@ int test() {
     test_checki(double2int(-1.0), -1, "double2int5b");
     // todo test correct rounding around maximum precision
     test_checki(double2int(2147483646.0), INT32_MAX-1, "double2int6");
-    test_checki(double2int(2147483647.0), INT32_MAX, "double2int6");
+    test_checki(double2int(2147483647.0), INT32_MAX, "double2int6b");
     test_checki(double2int(21474836470.0), INT32_MAX, "double2int7");
     test_checki(double2int(-2147483648.0), INT32_MIN, "double2int8");
     test_checki(double2int(-21474836480.0), INT32_MIN, "double2int9");

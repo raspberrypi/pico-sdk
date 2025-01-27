@@ -95,13 +95,9 @@ extern "C" {
 *
 *     int2double, uint2double, int642double, uint642double
 *
-*     note: on `pico_double_vfp` the 32-bit functions are also provided as C macros too since they map to inline VFP code
-*
 *   - (u)double -> int (round towards zero):
 *
 *     double2int_z, double2uint_z, double2int64_z, double2uint64_z
-*
-*     note: on `pico_double_vfp` the 32-bit functions are also provided as C macros too since they map to inline VFP code
 *
 *   - (u)double -> int (round towards -infinity):
 *
@@ -113,22 +109,13 @@ extern "C" {
 *
 *       fix2double, ufix2double, fix642double, ufix642double
 *
-*     note: on `pico_double_vfp` the 32-bit functions are currently _only_ provided as C macros and must use a compile
-*     time constant between 1 and 32 for the fixed point position
-*
 *   - double -> (u)fix (round towards zero):
 *
 *       double2fix_z, double2ufix_z, double2fix64_z, double2ufix64_z
 *
-*     note: on `pico_double_vfp` the 32-bit functions are currently _only_ provided as C macros and must use a compile
-*     time constant between 1 and 32 for the fixed point position
-*
 *   - double -> (u)fix (round towards -infinity):
 *
 *       double2fix, double2ufix, double2fix64, double2ufix64
-*
-*     note: on `pico_double_vfp` the 32-bit functions are currently _only_ provided as C macros and must use a compile
-*     time constant between 1 and 32 for the fixed point position
 *
 * - Even faster versions of divide and square-root functions that do not round correctly:
 *
