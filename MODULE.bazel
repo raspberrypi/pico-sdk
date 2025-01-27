@@ -90,7 +90,7 @@ new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl"
 new_git_repository(
     name = "tinyusb",
     build_file = "//src/rp2_common/tinyusb:tinyusb.BUILD",
-    commit = "5217cee5de4cd555018da90f9f1bcc87fb1c1d3a",  # keep-in-sync-with-submodule: lib/tinyusb
+    commit = "86ad6e56c1700e85f1c5678607a762cfe3aa2f47",  # keep-in-sync-with-submodule: lib/tinyusb
     remote = "https://github.com/hathach/tinyusb.git",
 )
 
