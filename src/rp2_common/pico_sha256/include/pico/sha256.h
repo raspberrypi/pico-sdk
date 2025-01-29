@@ -62,7 +62,7 @@ typedef struct pico_sha256_state {
  *  \ingroup pico_sha256
  *
  * Release the internal lock on the SHA-256 hardware.
- * Fails if the internal lock was not claimed.
+ * Does nothing if the internal lock was not claimed.
  *
  * @param state A pointer to a pico_sha256_state_t instance
  */
