@@ -98,7 +98,7 @@ new_git_repository(
 new_git_repository(
     name = "btstack",
     build_file = "//src/rp2_common/pico_btstack:btstack.BUILD",
-    commit = "2b49e57bd1fae85ac32ac1f41cdb7c794de335f6",  # keep-in-sync-with-submodule: lib/btstack
+    commit = "501e6d2b86e6c92bfb9c390bcf55709938e25ac1",  # keep-in-sync-with-submodule: lib/btstack
     remote = "https://github.com/bluekitchen/btstack.git",
 )
 
