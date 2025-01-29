@@ -95,6 +95,12 @@ jobs:
 
     - name: Checkout submodules
       run: git submodule update --init
+
+    - name: Host Release
+      run: cd ${{github.workspace}}; mkdir -p build; rm -rf build/*; cd build; cmake ../ -DPICO_SDK_TESTS_ENABLED=1 -DCMAKE_BUILD_TYPE=Release -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=host --output-sync=target --no-builtin-rules --no-builtin-variables -j$(nproc)
+
+    - name: Host Debug
+      run: cd ${{github.workspace}}; mkdir -p build; rm -rf build/*; cd build; cmake ../ -DPICO_SDK_TESTS_ENABLED=1 -DCMAKE_BUILD_TYPE=Debug -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=host --output-sync=target --no-builtin-rules --no-builtin-variables -j$(nproc)
 '''
 
 platforms = []
