@@ -257,14 +257,14 @@ uint64_t float2ufix64(float f, int e);
         "bls 2f\n" /* positive or zero or -zero are ok with the result we have */ \
         "lsrs %3, %1, #24\n" \
         "subs %3, #0x7f - %c4\n" \
-        "bcc 1f\n" /* 0 < abs(f) < 1 ^ e, so need to to round down */ \
+        "bcc 1f\n" /* 0 < abs(f) < 1 ^ e, so need to round down */ \
         /* mask off all but fractional bits */ \
         "lsls %1, %3\n" \
         "lsls %1, #8\n" \
         "beq 2f\n" /* integers can round towards zero */ \
         "1:\n" \
         /* need to subtract 1 from the result to round towards -infinity... */ \
-        /* todo is this true for fixed point? note: this will never cause an overflow, because to get here we must have had a non integer/infinite value which */ \
+        /* this will never cause an overflow, because to get here we must have had a non integer/infinite value which */ \
         /* therefore cannot have been equal to INT64_MIN when rounded towards zero */ \
         "subs %2, #1\n" \
         "2:\n" \

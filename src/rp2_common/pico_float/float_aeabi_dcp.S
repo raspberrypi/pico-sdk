@@ -5,15 +5,17 @@
  */
 
 #include "pico/asm_helper.S"
-#if HAS_DOUBLE_COPROCESSOR
+
+#if !HAS_DOUBLE_COPROCESSOR
+#error attempt to compile float_aeabi_dcp when there is no DCP
+#else
+
 #include "hardware/dcp_instr.inc.S"
 #include "hardware/dcp_canned.inc.S"
 
 pico_default_asm_setup
 
-// todo alignment
-//__pre_init __aeabi_float_init, 00020
-// factor out save/restore (there is a copy in double code)
+// todo factor out save/restore (there is a copy in double code)
 
 .macro float_section name
 #if PICO_FLOAT_IN_RAM
@@ -29,7 +31,7 @@ float_section WRAPPER_FUNC_NAME(\func)
 
 // ============== STATE SAVE AND RESTORE ===============
 
-.macro saving_func type func
+.macro saving_func type func, opt_label1='-', opt_label2='-'
   // Note we are usually 32-bit aligned already at this point, as most of the
   // function bodies contain exactly two 16-bit instructions: bmi and bx lr.
   // We want the PCMP word-aligned.
@@ -41,6 +43,12 @@ float_section WRAPPER_FUNC_NAME(\func)
   push {lr}              // 16-bit instruction
   bl generic_save_state  // 32-bit instruction
   b 1f                   // 16-bit instruction
+.ifnc \opt_label1,'-'
+regular_func \opt_label1
+.endif
+.ifnc \opt_label2,'-'
+regular_func \opt_label2
+.endif
   // This is the actual entry point:
 \type\()_func \func
   PCMP apsr_nzcv
@@ -131,20 +139,18 @@ saving_func regular fclassify
 // ============== CONVERSION FUNCTIONS ===============
 
 float_wrapper_section __aeabi_f2d
-saving_func wrapper __aeabi_f2d
+saving_func wrapper __aeabi_f2d float2double
   dcp_float2double_m r0,r1,r0
   saving_func_return
 
 float_wrapper_section __aeabi_i2f
-regular_func int2float
-saving_func  wrapper __aeabi_i2f
+saving_func  wrapper __aeabi_i2f int2float
 @ with rounding
   dcp_int2float_m r0,r0
   saving_func_return
 
 float_wrapper_section __aeabi_ui2f
-regular_func uint2float
-saving_func wrapper __aeabi_ui2f
+saving_func wrapper __aeabi_ui2f uint2float
 @ with rounding
   dcp_uint2float_m r0,r0
   saving_func_return
@@ -152,20 +158,24 @@ saving_func wrapper __aeabi_ui2f
 float_section float2fix_z
 regular_func float2fix_z
   ubfx r2, r0, #23, #8
+  cbz r2, 2f // input is zero or denormal
+  cmp r2, #0xff
+  beq 1f // infinte just pass thru
   adds r2, r1
-  beq 1f // very small; we don't care that we might make a denormal
   asrs r3, r2, #8
-  beq 1f
+  beq 1f // exponent in range
   ite pl
-  movspl r2, #0xff
-  movsmi r2, #0
+  movpl r2, #0xff
+  movmi r2, #0
 1:
   bfi r0, r2, #23, #8
   b float2int_z_entry
+2:
+  movs r0, #0
+  bx lr
 
 float_wrapper_section __aeabi_f2iz
-regular_func float2int_z
-saving_func wrapper __aeabi_f2iz
+saving_func wrapper __aeabi_f2iz float2int_z
 @ with truncation towards 0
 float2int_z_entry:
   dcp_float2int_m r0,r0
@@ -175,21 +185,24 @@ float_section __aeabi_f2ufix
 regular_func float2ufix
 regular_func float2ufix_z
   ubfx r2, r0, #23, #8
+  cbz r2, 2f // input is zero or denormal
+  cmp r2, #0xff
+  beq 1f // infinte just pass thru
   adds r2, r1
-  beq 1f // very small; we don't care that we might make a denormal
   asrs r3, r2, #8
-  beq 1f
+  beq 1f // exponent in range
   ite pl
-  movspl r2, #0xff
-  movsmi r2, #0
+  movpl r2, #0xff
+  movmi r2, #0
 1:
   bfi r0, r2, #23, #8
   b float2uint_z_entry
+2:
+  movs r0, #0
+  bx lr
 
 float_wrapper_section __aeabi_f2uiz
-regular_func float2uint_z
-regular_func float2uint
-saving_func wrapper __aeabi_f2uiz
+saving_func wrapper __aeabi_f2uiz float2uint_z float2uint
 @ with truncation towards 0
 float2uint_z_entry:
   dcp_float2uint_m r0,r0
@@ -198,16 +211,21 @@ float2uint_z_entry:
 float_section conv_f2fix
 saving_func regular float2fix
   ubfx r2, r0, #23, #8
+  cbz r2, 2f // input is zero or denormal
+  cmp r2, #0xff
+  beq 1f // infinte just pass thru
   adds r2, r1
-  beq 1f // very small; we don't care that we might make a denormal
   asrs r3, r2, #8
-  beq 1f
+  beq 1f // exponent in range
   ite pl
-  movspl r2, #0xff
-  movsmi r2, #0
+  movpl r2, #0xff
+  movmi r2, #0
 1:
   bfi r0, r2, #23, #8
   b float2int_entry
+2:
+  movs r0, #0
+  bx lr
 
 float_section float2int
 // (not a real thing - kept because we use wrapper in saving_func)
@@ -218,14 +236,15 @@ float2int_entry:
   // r0 = abs(denornaml)              => r1 = 0x00xxxxxx
   // r0 = abs(1.0f)                   => r1 = 0x7f000000
   // r0 = abs(inf/nan)                => r1 = 0xffxxxxxx
-  bls float2int_z_entry // positive or zero or -zero are ok for int64_z
+  bls float2int_z_entry // input positive or zero or -zero are ok for int64_z
   lsrs r1, #24
+  beq float2int_z_entry // input denormal is flushed to zero anyway
   subs r1, #0x7f
-  bcc 1f // <1 means subtract 1
+  bcc 1f // input < 1.0f means we need to subtract 1 after conversion
   // mask off all but fractional bits
   lsls r2, r0, r1
   lsls r2, #9
-  beq float2int_z_entry // integer
+  beq float2int_z_entry // input is integer
 1:
   WXFC r0, r0
   ADD0

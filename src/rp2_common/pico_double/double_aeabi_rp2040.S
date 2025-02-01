@@ -578,35 +578,45 @@ regular_func double2uint64_z
 double_section double2fix64_z
 regular_func double2fix64_z
   lsls r3, r1, #1
-  bcc double2fix64 // positive is ok for fix64
-  push {r1, r2}
-  lsrs r3, #21
+  bcc double2fix64 // input positive is ok for fix64
+  mov ip, r2
+  asrs r2, r3, #21
+  beq 3f           // input zero or denormal, so just return zero
+  adds r2, #1
+  beq double2fix64 // input infinite/nan is ok for fix64
 
-  adds r3, r2
+  lsrs r3, #21
+  add r3, ip
   movs r2, #1
   negs r2, r2
   lsrs r2, #22
-  subs r3, r2
+  subs r3, r2 // r3 = modified e - 0x3ff
 
-  bcc 1f // <1 means subtract 1
+  bcc 3f // modified input < 1.0 means result is zero
   cmp r3, #52
-  bge double2fix64 // must be an integer
+  bge 2f // modified input must be an integer or infinite
 
-  lsls r2, r1, #12
-  lsrs r1, r0, #20
-  adds r2, r1
-  // r2 now has highest 32 mantissa bits
-  lsls r2, r3
-  bne 1f // not integer as non zero fractional bits remain
-  lsls r2, r0, #12
-  lsls r2, r3
-  bne 1f
+  adds r3, #12
+  mov r2, r1
+  lsls r2, r2, r3    // r2 has remaining fractional mantissa bits of r1
+  bne 1f             // not integer as non zero fractional bits remain
+  subs r3, #32
+  asrs r2, r3, #31
+  bics r3, r3, r2
+  movs r2, r0
+  lsls r2, r2, r3
+  bne 1f             // remaining fractional bits are non-zero, so argument was not an integer
+2:
   // integer
-  pop {r1, r2}
+  mov r2, ip
   b double2fix64
+3: // result is zero
+  movs r0, #0
+  movs r1, #0
+  bx lr
 1:
-  pop {r1, r2}
   push {lr}
+  mov r2, ip
   bl double2fix64
   movs r2, #0
   adds r0, #1
@@ -625,6 +635,44 @@ regular_func double2ufix64_z
 double_section double2fix
 regular_func double2fix
     shimmable_table_tail_call SF_TABLE_FLOAT2FIX double2fix_shim
+
+double_section double2fix_z
+regular_func double2fix_z
+  lsls r3, r1, #1
+  asrs r3, #21
+  beq 2f // input is zero or denormal
+  adds r3, #1
+  beq 3f // input is infinite or nan
+
+  // extract exponent again
+  lsls r3, r1, #1
+  lsrs r3, #21
+  // adjust
+  adds r3, r2
+  ble 2f // adjusted input is zero or dedornmal or < 1
+  lsrs r2, r3, #11
+  bne 3f // adjusted input is > infinite
+
+  // put updated exponent back in double and convert to int
+  movs r2, #1
+  lsls r2, #11
+  subs r2, #1
+  lsls r2, #20
+  bics r1, r2
+  lsls r3, #20
+  orrs r1, r3
+  b double2int_z
+2:
+  // result is zero
+  movs r0, #0
+  bx lr
+3:
+  movs r0, #0
+  subs r0, #1
+  lsrs r0, #1
+  asrs r1, #31
+  eors r0, r1
+  bx lr
 
 double_section double2ufix
 regular_func double2ufix

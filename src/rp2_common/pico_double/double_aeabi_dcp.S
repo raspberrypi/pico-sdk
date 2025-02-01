@@ -7,7 +7,7 @@
 #include "pico/asm_helper.S"
 
 #if !HAS_DOUBLE_COPROCESSOR
-#error attempt to compile double_aeabi_rp2350 when there is no DCP
+#error attempt to compile double_aeabi_dcp when there is no DCP
 #else
 
 #include "hardware/dcp_instr.inc.S"
@@ -29,7 +29,7 @@ double_section WRAPPER_FUNC_NAME(\func)
 
 // ============== STATE SAVE AND RESTORE ===============
 
-.macro saving_func type func
+.macro saving_func type func, opt_label1='-', opt_label2='-'
   // Note we are usually 32-bit aligned already at this point, as most of the
   // function bodies contain exactly two 16-bit instructions: bmi and bx lr.
   // We want the PCMP word-aligned.
@@ -41,6 +41,12 @@ double_section WRAPPER_FUNC_NAME(\func)
   push {lr}              // 16-bit instruction
   bl generic_save_state  // 32-bit instruction
   b 1f                   // 16-bit instruction
+.ifnc \opt_label1,'-'
+regular_func \opt_label1
+.endif
+.ifnc \opt_label2,'-'
+regular_func \opt_label2
+.endif
   // This is the actual entry point:
 \type\()_func \func
   PCMP apsr_nzcv
@@ -130,28 +136,24 @@ saving_func wrapper sqrt
 
 double_section dclassify
 saving_func regular dclassify
-@ with correct rounding
   dcp_dclassify_m apsr_nzcv,r0,r1
   saving_func_return
 
 // ============== CONVERSION FUNCTIONS ===============
 
 double_wrapper_section __aeabi_d2f
-regular_func double2float
-saving_func wrapper __aeabi_d2f
+saving_func wrapper __aeabi_d2f double2float
 @ with rounding
   dcp_double2float_m r0,r0,r1
   saving_func_return
 
 double_wrapper_section __aeabi_i2d
-regular_func int2double
-saving_func wrapper __aeabi_i2d
+saving_func wrapper __aeabi_i2d int2double
   dcp_int2double_m r0,r1,r0
   saving_func_return
 
 double_wrapper_section __aeabi_ui2d
-regular_func uint2double
-saving_func wrapper __aeabi_ui2d
+saving_func wrapper __aeabi_ui2d uint2double
   dcp_uint2double_m r0,r1,r0
   saving_func_return
 
@@ -170,8 +172,7 @@ saving_func regular double2fix_z
   b double2int_z_entry
 
 double_section double2ufix
-regular_func double2ufix
-saving_func regular double2ufix_z
+saving_func regular double2ufix_z double2ufix
 double2ufix_z_entry:
   ubfx r3, r1, #20, #11
   adds r3, r2
@@ -188,6 +189,7 @@ double2ufix_z_entry:
 double_section double2fix
 saving_func regular double2fix
   ubfx r3, r1, #20, #11
+  cbz r3, 2f // 0 or denormal
   adds r3, r2
   beq 1f // very small; we don't care that we might make a denormal
   asrs ip, r3, #11
@@ -198,28 +200,29 @@ saving_func regular double2fix
 1:
   bfi r1, r3, #20, #11
   b double2int_entry
+2:
+  movs r0, #0
+saving_func_return
+
 
 double_section double2int
 saving_func regular double2int
 double2int_entry:
   lsls r2, r1, #1
   bcc double2int_z_entry // positive is ok for int64_z
-  orrs r3, r2, r0
-  beq double2int_z_entry // 0 or -0 is ok for int64_z
+  lsrs r3, r2, #21
+  beq double2int_z_entry // 0 or -0 or denormal is ok for int_z
 
   lsrs r2, #21
   adds r2, #1
   subs r2, r2, #0x400
   bcc 1f // <1 means subtract 1
-  cmp r2, #52
-  bge double2int_z_entry // must be an integer
+  cmp r2, #31
+  bge double2int_z_entry // must be an integer or maxed out
   lsls r3, r1, #12
-  adds r3, r3, r0, lsr #20
-  // r3 now has highest 32 mantissa bits
+  adds r3, r3, r0, lsr #20 // r3 now has highest 32 mantissa bits
   lsls r3, r2
-  bne 1f // not integer as non zero fractional bits remain
-  lsls r3, r0, #12
-  lsls r3, r2
+  orrs r3, r3, r0, lsl #12 // these bits are all guaranteed to be in the fraction
   beq double2int_z_entry // integer
 1:
   dcp_double2int_m r0,r0,r1
@@ -227,8 +230,7 @@ double2int_entry:
 saving_func_return
 
 double_wrapper_section __aeabi_d2iz
-regular_func double2int_z
-saving_func wrapper __aeabi_d2iz
+saving_func wrapper __aeabi_d2iz double2int_z
 double2int_z_entry:
 @ with truncation towards 0
   dcp_double2int_m r0,r0,r1
@@ -236,9 +238,7 @@ double2int_z_entry:
   saving_func_return
 
 double_wrapper_section __aeabi_d2uiz
-regular_func double2uint_z
-regular_func double2uint
-saving_func wrapper __aeabi_d2uiz
+saving_func wrapper __aeabi_d2uiz double2uint double2uint_z
 double2uint_z_entry:
 @ with truncation towards 0
   dcp_double2uint_m r0,r0,r1
@@ -266,7 +266,6 @@ saving_func wrapper __aeabi_dcmpun
   saving_func_return
 
 double_wrapper_section __aeabi_dcmp
-
 saving_func wrapper __aeabi_cdrcmple
   dcp_dcmp_m apsr_nzcv,r2,r3,r0,r1 // with arguments reversed
   bvs cmp_nan

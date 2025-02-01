@@ -57,12 +57,11 @@ float_section float2fix_z
 regular_func float2fix_z
   ubfx r2, r0, #23, #8
   adds r2, r1
-  beq 1f // very small; we don't care that we might make a denormal
   asrs r3, r2, #8
   beq 1f
   ite pl
-  movspl r2, #0xff
-  movsmi r2, #0
+  movpl r2, #0xff
+  movmi r2, #0
 1:
   bfi r0, r2, #23, #8
   b float2int_z
@@ -74,15 +73,16 @@ regular_func float2fix
   // r0 = abs(denornaml)              => r1 = 0x00xxxxxx
   // r0 = abs(1.0f)                   => r1 = 0x7f000000
   // r0 = abs(inf/nan)                => r1 = 0xffxxxxxx
-  bls float2fix_z // positive or zero or -zero are ok for fix_z
+  bls float2fix_z // input positive or zero or -zero are ok for fix_z
   lsrs r2, #24
+  beq float2fix_z // input denormal will be flushed to zero
   rsbs r3, r1, #0x7f
   subs r2, r3
-  bcc 1f // <1 means subtract 1
+  bcc 1f // iunput <1.0f means we need to subtract 1
   // mask off all but fractional bits
   lsls r2, r0, r2
   lsls r2, #9
-  beq float2fix_z // integer
+  beq float2fix_z // input is integer
 1:
   push {lr}
   bl float2fix_z
@@ -95,12 +95,11 @@ regular_func float2ufix
 regular_func float2ufix_z
   ubfx r2, r0, #23, #8
   adds r2, r1
-  beq 1f // very small; we don't care that we might make a denormal
   asrs r3, r2, #8
   beq 1f
   ite pl
-  movspl r2, #0xff
-  movsmi r2, #0
+  movpl r2, #0xff
+  movmi r2, #0
 1:
   bfi r0, r2, #23, #8
   b float2uint_z

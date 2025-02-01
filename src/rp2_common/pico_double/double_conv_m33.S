@@ -251,57 +251,65 @@ regular_func ufix2double
 
 double_section conv_dtoi64
 regular_func double2int64
-  lsls r2, r1, #1
-  bcc double2int64_z // positive is ok for int64_z
-  orrs r3, r2, r0
-  beq double2int64_z // 0 or -0 is ok for int64_z
-
-  lsrs r2, #21
-  adds r2, #1
-  subs r2, r2, #0x400
-  bcc 1f // <1 means subtract 1
-  cmp r2, #52
-  bge double2int64_z // must be an integer
-  lsls r3, r1, #12
-  adds r3, r3, r0, lsr #20
-  // r3 now has highest 32 mantissa bits
-  lsls r3, r2
-  bne 1f // not integer as non zero fractional bits remain
-  lsls r3, r0, #12
-  lsls r3, r2
-  beq double2int64_z // integer
+  lsls r3, r1, #1
+  bcc double2int64_z // input positive is ok for int64_z
+  cmp r3, #0xffe00000
+  bcs double2int64_z // input is infinite
+  lsrs r3, #21
+  beq 2f // input zero or denormal, means answer remains zero
+  sub r3, #0x3ff
+  cmp r3, #0
+  blt 1f // modified input zero or denormal, or less than 1.0
+  cmp r3, #52
+  bge double2int64_z // modified input must be an integer or infinite
+  adds r3, #12
+  lsls r2, r1, r3    // ip has remaining fractional mantissa bits of r1
+  bne 1f             // not integer as non zero fractional bits remain
+  subs r3, #32
+  bics r3, r3, r3, asr #31 // map negative shift to zero
+  lsls r3, r0, r3
+  beq double2int64_z   // remaining fractional bits are 0, so argument was an integer
 1:
   push {lr}
   bl double2int64_z
   subs r0, #1
   sbcs r1, r1, #0
   pop {pc}
+2:
+  movs r0, #0
+  movs r1, #0
+  bx lr
 
 double_section conv_dtofix64
 regular_func double2fix64
   lsls r3, r1, #1
-  bcc double2fix64_z // positive is ok for int64_z
+  bcc double2fix64_z // input positive is ok for fix64_z
+  cmp r3, #0xffe00000
+  bcs double2fix64_z // input is infinite
   lsrs r3, #21
-  adds r3, #1
-  rsb ip, r2, #0x400
-  subs r3, ip
-  bcc 1f // <1 means subtract 1
+  beq 2f // input zero or denormal, means answer remains zero
+  sub r3, #0x3ff
+  adds r3, r2
+  blt 1f // modified input zero or denormal, or less than 1.0
   cmp r3, #52
-  bge double2fix64_z // must be an integer
-  lsls ip, r1, #12
-  adds ip, ip, r0, lsr #20
-  // ip now has highest 32 mantissa bits
-  lsls ip, r3
-  bne 1f // not integer as non zero fractional bits remain
-  lsls ip, r0, #12
-  lsls ip, r3
-  beq double2fix64_z // integer
+  bge double2fix64_z // modified input must be an integer or infinite
+  adds r3, #12
+  lsls ip, r1, r3    // ip has remaining fractional mantissa bits of r1
+  bne 1f             // not integer as non zero fractional bits remain
+  subs r3, #32
+  bics r3, r3, r3, asr #31 // map negative shift to zero
+  lsls r3, r0, r3
+  beq double2fix64_z   // remaining fractional bits are 0, so argument was an integer
 1:
   push {lr}
   bl double2fix64_z
   subs r0, #1
   sbcs r1, r1, #0
   pop {pc}
+2:
+  movs r0, #0
+  movs r1, #0
+  bx lr
 
 double_wrapper_section conv_dtoi64_z
 
