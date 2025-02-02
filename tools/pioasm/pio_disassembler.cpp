@@ -56,7 +56,9 @@ std::string disassemble(uint inst, uint sideset_bits_including_opt, bool sideset
                     if (arg2 & 0x1cu) {
                         invalid = true;
                     } else if (arg2) {
-                        guts = "jmppin " + std::to_string(arg2 & 3u);
+                        guts = "jmppin + " + std::to_string(arg2 & 3u);
+                    } else {
+                        guts = "jmppin";
                     }
                     break;
             }
@@ -131,7 +133,7 @@ std::string disassemble(uint inst, uint sideset_bits_including_opt, bool sideset
                 op("mov");
                 std::string guts = dest + ", ";
                 if (operation == 1) {
-                    guts += "!";
+                    guts += "~";
                 } else if (operation == 2) {
                     guts += "::";
                 }
@@ -193,6 +195,9 @@ std::string disassemble(uint inst, uint sideset_bits_including_opt, bool sideset
     }
     delay &= ((1u << (5 - sideset_bits_including_opt)) - 1u);
     ss << std::left << std::setw(4) << (delay ? ("[" + std::to_string(delay) + "]") : "");
-    return ss.str();
+    // remove trailing spaces
+    auto str = ss.str();
+    str.erase(str.find_last_not_of(' ')+1);
+    return str;
 }
 
