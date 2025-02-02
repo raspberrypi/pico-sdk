@@ -102,6 +102,10 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
         return false;
 
     uint32_t div = (uint32_t)((((uint64_t) src_freq) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / freq);
+    // only clock divider of 1, or  >= 2 are supported
+    if (div < (2u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB)) {
+        div = (1u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB);
+    }
     uint32_t actual_freq = (uint32_t) ((((uint64_t) src_freq) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / div);
 
     clock_configure_internal(clock, src, auxsrc, actual_freq, div);
