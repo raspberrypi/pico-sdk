@@ -145,7 +145,18 @@ static int default_enter_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
         uint core_num = get_core_num();
         // create at low priority on other core
         TaskHandle_t task_handle;
+
+        // when FreeRTOS dynamic allocation is disabled (configSUPPORT_DYNAMIC_ALLOCATION == 0), the following instruction fails
+#ifndef configSUPPORT_DYNAMIC_ALLOCATION
         if (pdPASS != xTaskCreateAffinitySet(flash_lockout_task, "flash lockout", configMINIMAL_STACK_SIZE, (void *)core_num, 0, 1u << (core_num ^ 1), &task_handle)) {
+#else
+        static StackType_t flash_lockout_stack[configMINIMAL_STACK_SIZE];
+        static StaticTask_t flash_lockout_task_tcb;
+        task_handle = xTaskCreateStatic(flash_lockout_task, "flash lockout", configMINIMAL_STACK_SIZE, (void *)core_num, 0, flash_lockout_stack, &flash_lockout_task_tcb);
+        if (task_handle != NULL) {
+            vTaskCoreAffinitySet(task_handle, 1u << (core_num ^ 1));
+        } else {
+#endif
             return PICO_ERROR_INSUFFICIENT_RESOURCES;
         }
         lockout_state[core_num] = FREERTOS_LOCKOUT_LOCKER_WAITING;
