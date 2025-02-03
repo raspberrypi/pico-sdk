@@ -160,18 +160,20 @@ regular_func float2fix_z
   ubfx r2, r0, #23, #8
   cbz r2, 2f // input is zero or denormal
   cmp r2, #0xff
-  beq 1f // infinte just pass thru
+  beq 3f // input infinite or nan
   adds r2, r1
-  asrs r3, r2, #8
-  beq 1f // exponent in range
-  ite pl
-  movpl r2, #0xff
-  movmi r2, #0
+  ble 2f // modified input is denormal so zero
+  cmp r2, #0xff
+  beq 3f // modified input is infinite
 1:
   bfi r0, r2, #23, #8
   b float2int_z_entry
 2:
   movs r0, #0
+  bx lr
+3:
+  mvn r1, #0x80000000
+  add r0, r1, r0, lsr#31 @ so -Inf → 0x80000000, +Inf → 0x7fffffff
   bx lr
 
 float_wrapper_section __aeabi_f2iz
@@ -187,18 +189,19 @@ regular_func float2ufix_z
   ubfx r2, r0, #23, #8
   cbz r2, 2f // input is zero or denormal
   cmp r2, #0xff
-  beq 1f // infinte just pass thru
+  beq 3f // input infinite or nan
   adds r2, r1
-  asrs r3, r2, #8
-  beq 1f // exponent in range
-  ite pl
-  movpl r2, #0xff
-  movmi r2, #0
+  ble 2f // modified input is denormal so zero
+  cmp r2, #0xff
+  beq 3f // modified input is infinite
 1:
   bfi r0, r2, #23, #8
   b float2uint_z_entry
 2:
   movs r0, #0
+  bx lr
+3:
+  mvn r0, r0, asr #31
   bx lr
 
 float_wrapper_section __aeabi_f2uiz
@@ -213,18 +216,20 @@ saving_func regular float2fix
   ubfx r2, r0, #23, #8
   cbz r2, 2f // input is zero or denormal
   cmp r2, #0xff
-  beq 1f // infinte just pass thru
+  beq 3f // input infinite or nan
   adds r2, r1
-  asrs r3, r2, #8
-  beq 1f // exponent in range
-  ite pl
-  movpl r2, #0xff
-  movmi r2, #0
+  ble 2f // modified input is denormal so zero
+  cmp r2, #0xff
+  beq 3f // modified input is infinite
 1:
   bfi r0, r2, #23, #8
   b float2int_entry
 2:
   movs r0, #0
+  bx lr
+3:
+  mvn r1, #0x80000000
+  add r0, r1, r0, lsr#31 @ so -Inf → 0x80000000, +Inf → 0x7fffffff
   bx lr
 
 float_section float2int

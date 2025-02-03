@@ -650,17 +650,11 @@ regular_func double2fix_z
   // adjust
   adds r3, r2
   ble 2f // adjusted input is zero or dedornmal or < 1
-  lsrs r2, r3, #11
+  lsrs r3, r3, #11
   bne 3f // adjusted input is > infinite
 
-  // put updated exponent back in double and convert to int
-  movs r2, #1
-  lsls r2, #11
-  subs r2, #1
-  lsls r2, #20
-  bics r1, r2
-  lsls r3, #20
-  orrs r1, r3
+  lsls r2, r2, #20 // align exponent adjustment offset
+  adds r1, r1, r2  // we know adjustment is safe
   b double2int_z
 2:
   // result is zero

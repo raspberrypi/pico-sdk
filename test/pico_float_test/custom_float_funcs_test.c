@@ -110,6 +110,11 @@ int test() {
     // todo test correct rounding around maximum precision
     test_checkf(uint642float(UINT64_MAX), 18446744073709551615.0f, "uint642float7");
 
+    union {
+        uint32_t u;
+        float f;
+    } u32f;
+
 #if !(LIB_PICO_FLOAT_COMPILER || defined(__riscv))
     printf("fix2float\n");
     // todo test correct rounding around maximum precision
@@ -154,6 +159,10 @@ int test() {
     test_checki(float2fix(-3.25f, 2), -13, "float2fix9");
     test_checki(float2fix(-0.75f, 1), -2, "float2fix10");
     test_checki(float2fix(-3.0f, -1), -2, "float2fix11"); // not very useful
+    u32f.u = 0x7f012345;
+    test_checki(float2fix(u32f.f, 1), INT32_MAX, "float2fix12");
+    u32f.u = 0xff012345;
+    test_checki(float2fix(u32f.f, 1), INT32_MIN, "float2fix13");
 
     printf("float2ufix\n");
     test_checku(float2ufix(3.5f, 8), 0x380, "float2ufix1");
@@ -203,6 +212,10 @@ int test() {
     test_checki(float2fix_z(-3.25f, 2), -13, "float2fix_z9");
     test_checki(float2fix_z(-0.75f, 1), -1, "float2fix_z10");
     test_checki(float2fix_z(-3.0f, -1), -1, "float2fix_z11"); // not very useful
+    u32f.u = 0x7f012345;
+    test_checki(float2fix_z(u32f.f, 1), INT32_MAX, "float2fix_z12");
+    u32f.u = 0xff012345;
+    test_checki(float2fix_z(u32f.f, 1), INT32_MIN, "float2fix_z13");
 
     printf("float2ufix_z\n");
     test_checku(float2ufix_z(3.5f, 8), 0x380, "float2ufix_z1");
@@ -213,6 +226,10 @@ int test() {
     test_checku(float2ufix_z(3.24999f, 2), 12, "float2ufix_z6");
     test_checku(float2ufix_z(3.25f, 2), 13, "float2ufix_z7");
     test_checku(float2ufix_z(3.0f, -1), 1, "float2ufix_z8"); // not very useful
+    u32f.u = 0x7f012345;
+    test_checku(float2ufix_z(u32f.f, 1), UINT32_MAX, "float2fix_z9");
+    u32f.u = 0xff012345;
+    test_checku(float2ufix_z(u32f.f, 1), 0, "float2fix_z10");
 
     printf("float2fix64_z\n");
     test_checki64(float2fix64_z(3.5f, 8), 0x380, "float2fix64_z1");

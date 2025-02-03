@@ -259,11 +259,11 @@ regular_func double2int64
   beq 2f // input zero or denormal, means answer remains zero
   sub r3, #0x3ff
   cmp r3, #0
-  blt 1f // modified input zero or denormal, or less than 1.0
+  blt 1f // input is less than 1.0
   cmp r3, #52
   bge double2int64_z // modified input must be an integer or infinite
   adds r3, #12
-  lsls r2, r1, r3    // ip has remaining fractional mantissa bits of r1
+  lsls r2, r1, r3    // r2 has remaining fractional mantissa bits of r1
   bne 1f             // not integer as non zero fractional bits remain
   subs r3, #32
   bics r3, r3, r3, asr #31 // map negative shift to zero
