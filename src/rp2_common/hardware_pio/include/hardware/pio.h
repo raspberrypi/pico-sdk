@@ -172,6 +172,9 @@ typedef pio_hw_t *PIO;
  */
 #ifndef PIO_NUM
 static_assert(PIO1_BASE - PIO0_BASE == (1u << 20), "hardware layout mismatch");
+#if NUM_PIOS > 2
+static_assert(PIO2_BASE - PIO0_BASE == (2u << 20), "hardware layout mismatch");
+#endif
 #define PIO_NUM(pio) (((uintptr_t)(pio) - PIO0_BASE) >> 20)
 #endif
 
@@ -185,6 +188,9 @@ static_assert(PIO1_BASE - PIO0_BASE == (1u << 20), "hardware layout mismatch");
  */
 #ifndef PIO_INSTANCE
 static_assert(PIO1_BASE - PIO0_BASE == (1u << 20), "hardware layout mismatch");
+#if NUM_PIOS > 2
+static_assert(PIO2_BASE - PIO0_BASE == (2u << 20), "hardware layout mismatch");
+#endif
 #define PIO_INSTANCE(instance) ((pio_hw_t *)(PIO0_BASE + (instance) * (1u << 20)))
 #endif
 
@@ -214,8 +220,13 @@ static_assert(DREQ_PIO0_TX1 == DREQ_PIO0_TX0 + 1, "");
 static_assert(DREQ_PIO0_TX2 == DREQ_PIO0_TX0 + 2, "");
 static_assert(DREQ_PIO0_TX3 == DREQ_PIO0_TX0 + 3, "");
 static_assert(DREQ_PIO0_RX0 == DREQ_PIO0_TX0 + NUM_PIO_STATE_MACHINES, "");
+static_assert(DREQ_PIO1_TX0 == DREQ_PIO0_RX0 + NUM_PIO_STATE_MACHINES, "");
 static_assert(DREQ_PIO1_RX0 == DREQ_PIO1_TX0 + NUM_PIO_STATE_MACHINES, "");
-#define PIO_DREQ_NUM(pio, sm, is_tx) ((sm) + (((is_tx) ? 0 : NUM_PIO_STATE_MACHINES) + PIO_NUM(pio) * (DREQ_PIO1_TX0 - DREQ_PIO0_TX0)))
+#if NUM_PIOS > 2
+static_assert(DREQ_PIO2_TX0 == DREQ_PIO1_RX0 + NUM_PIO_STATE_MACHINES, "");
+static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
+#endif
+#define PIO_DREQ_NUM(pio, sm, is_tx) (DREQ_PIO0_TX0 + (sm) + (((is_tx) ? 0 : NUM_PIO_STATE_MACHINES) + PIO_NUM(pio) * (DREQ_PIO1_TX0 - DREQ_PIO0_TX0)))
 #endif
 
 /**
