@@ -452,7 +452,7 @@ void multicore_lockout_victim_init(void);
 /*! \brief Stop the current core being able to be a "victim" of lockout (i.e. forced to pause in a known state by the other core)
  *  \ingroup multicore_lockout
  *
- * This code unhooks the intercore FIFO IRQ, and the FIFO mayt be used for any other purpose after this.
+ * This code unhooks the intercore FIFO IRQ, and the FIFO may be used for any other purpose after this.
  */
 void multicore_lockout_victim_deinit(void);
 
