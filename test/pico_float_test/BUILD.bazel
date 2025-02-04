@@ -85,3 +85,12 @@ filegroup(
     name = "m33",
     srcs = ["m33.c"],
 )
+
+# TODO: Add these tests to the Bazel build.
+filegroup(
+    name = "unsupported_tests",
+    srcs = [
+        "custom_double_funcs_test.c",
+        "custom_float_funcs_test.c",
+    ],
+)

@@ -425,6 +425,7 @@ double_wrapper_section __aeabi_ui2d
 double_wrapper_section __aeabi_i2d
 
 wrapper_func __aeabi_ui2d
+regular_func uint2double
     movs r1, #0
     cmp r0, #0
     bne 2f
@@ -432,6 +433,7 @@ wrapper_func __aeabi_ui2d
     bx lr
 // double FUNC_NAME(__aeabi_i2d)(int)                     integer to double (double precision) conversion
 wrapper_func __aeabi_i2d
+regular_func int2double
     asrs r1, r0, #31
     eors r0, r1
     subs r0, r1
@@ -506,6 +508,7 @@ regular_func double2int
 // unsigned FUNC_NAME(__aeabi_d2uiz)(double)             double (double precision) to unsigned C-style conversion [3]
 double_wrapper_section __aeabi_d2uiz
 wrapper_func __aeabi_d2uiz
+regular_func double2uint_z
 regular_func double2uint
     shimmable_table_tail_call SF_TABLE_FLOAT2UINT double2uint_shim
 
@@ -528,11 +531,13 @@ regular_func ufix642double
 // double FUNC_NAME(__aeabi_l2d)(long long)             long long to double (double precision) conversion
 double_wrapper_section __aeabi_l2d
 wrapper_func __aeabi_l2d
+regular_func int642double
     shimmable_table_tail_call SF_TABLE_INT642FLOAT int642double_shim
 
 // double FUNC_NAME(__aeabi_l2f)(long long)             long long to double (double precision) conversion
 double_wrapper_section __aeabi_ul2d
 wrapper_func __aeabi_ul2d
+regular_func uint642double
     shimmable_table_tail_call SF_TABLE_UINT642FLOAT uint642double_shim
 
 // long long FUNC_NAME(__aeabi_d2lz)(double)             double (double precision) to long long C-style conversion [3]
@@ -566,7 +571,57 @@ regular_func double2int64
 // unsigned long long FUNC_NAME(__aeabi_d2ulz)(double)     double to unsigned long long C-style conversion [3]
 double_wrapper_section __aeabi_d2ulz
 wrapper_func __aeabi_d2ulz
+regular_func double2uint64
+regular_func double2uint64_z
     shimmable_table_tail_call SF_TABLE_FLOAT2UINT64 double2uint64_shim
+
+double_section double2fix64_z
+regular_func double2fix64_z
+  lsls r3, r1, #1
+  bcc double2fix64 // input positive is ok for fix64
+  mov ip, r2
+  asrs r2, r3, #21
+  beq 3f           // input zero or denormal, so just return zero
+  adds r2, #1
+  beq double2fix64 // input infinite/nan is ok for fix64
+
+  lsrs r3, #21
+  add r3, ip
+  movs r2, #1
+  negs r2, r2
+  lsrs r2, #22
+  subs r3, r2 // r3 = modified e - 0x3ff
+
+  bcc 3f // modified input < 1.0 means result is zero
+  cmp r3, #52
+  bge 2f // modified input must be an integer or infinite
+
+  adds r3, #12
+  mov r2, r1
+  lsls r2, r2, r3    // r2 has remaining fractional mantissa bits of r1
+  bne 1f             // not integer as non zero fractional bits remain
+  subs r3, #32
+  asrs r2, r3, #31
+  bics r3, r3, r2
+  movs r2, r0
+  lsls r2, r2, r3
+  bne 1f             // remaining fractional bits are non-zero, so argument was not an integer
+2:
+  // integer
+  mov r2, ip
+  b double2fix64
+3: // result is zero
+  movs r0, #0
+  movs r1, #0
+  bx lr
+1:
+  push {lr}
+  mov r2, ip
+  bl double2fix64
+  movs r2, #0
+  adds r0, #1
+  adcs r1, r2
+  pop {pc}
 
 double_section double2fix64
 regular_func double2fix64
@@ -574,14 +629,48 @@ regular_func double2fix64
 
 double_section double2ufix64
 regular_func double2ufix64
+regular_func double2ufix64_z
     shimmable_table_tail_call SF_TABLE_FLOAT2UFIX64 double2ufix64_shim
 
 double_section double2fix
 regular_func double2fix
     shimmable_table_tail_call SF_TABLE_FLOAT2FIX double2fix_shim
 
+double_section double2fix_z
+regular_func double2fix_z
+  lsls r3, r1, #1
+  asrs r3, #21
+  beq 2f // input is zero or denormal
+  adds r3, #1
+  beq 3f // input is infinite or nan
+
+  // extract exponent again
+  lsls r3, r1, #1
+  lsrs r3, #21
+  // adjust
+  adds r3, r2
+  ble 2f // adjusted input is zero or dedornmal or < 1
+  lsrs r3, r3, #11
+  bne 3f // adjusted input is > infinite
+
+  lsls r2, r2, #20 // align exponent adjustment offset
+  adds r1, r1, r2  // we know adjustment is safe
+  b double2int_z
+2:
+  // result is zero
+  movs r0, #0
+  bx lr
+3:
+  movs r0, #0
+  subs r0, #1
+  lsrs r0, #1
+  asrs r1, #31
+  eors r0, r1
+  bx lr
+
 double_section double2ufix
 regular_func double2ufix
+regular_func double2ufix_z
     shimmable_table_tail_call SF_TABLE_FLOAT2UFIX double2ufix_shim
 
 double_wrapper_section __aeabi_d2f

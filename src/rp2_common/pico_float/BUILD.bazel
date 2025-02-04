@@ -2,13 +2,16 @@ load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
 
-_WRAP_FLOAT_AEABI_FLAGS = [
+_WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS = [
     "-Wl,--wrap=__aeabi_fadd",
     "-Wl,--wrap=__aeabi_fdiv",
     "-Wl,--wrap=__aeabi_fmul",
     "-Wl,--wrap=__aeabi_frsub",
     "-Wl,--wrap=__aeabi_fsub",
     "-Wl,--wrap=__aeabi_cfcmpeq",
+]
+
+_WRAP_FLOAT_AEABI_CMP_FLAGS = [
     "-Wl,--wrap=__aeabi_cfrcmple",
     "-Wl,--wrap=__aeabi_cfcmple",
     "-Wl,--wrap=__aeabi_fcmpeq",
@@ -17,15 +20,27 @@ _WRAP_FLOAT_AEABI_FLAGS = [
     "-Wl,--wrap=__aeabi_fcmpge",
     "-Wl,--wrap=__aeabi_fcmpgt",
     "-Wl,--wrap=__aeabi_fcmpun",
+]
+
+_WRAP_FLOAT_AEABI_CONV_32_FLAGS = [
     "-Wl,--wrap=__aeabi_i2f",
     "-Wl,--wrap=__aeabi_l2f",
     "-Wl,--wrap=__aeabi_ui2f",
     "-Wl,--wrap=__aeabi_ul2f",
+]
+
+_WRAP_FLOAT_AEABI_CONV_64_FLAGS = [
     "-Wl,--wrap=__aeabi_f2iz",
     "-Wl,--wrap=__aeabi_f2lz",
     "-Wl,--wrap=__aeabi_f2uiz",
     "-Wl,--wrap=__aeabi_f2ulz",
+]
+
+_WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS = [
     "-Wl,--wrap=__aeabi_f2d",
+]
+
+_WRAP_FLOAT_SQRTF_FLAGS = [
     "-Wl,--wrap=sqrtf",
 ]
 
@@ -36,13 +51,16 @@ _WRAP_FLOAT_SCI_FLAGS = [
     "-Wl,--wrap=atan2f",
     "-Wl,--wrap=expf",
     "-Wl,--wrap=logf",
+    "-Wl,--wrap=sincosf",  # gnu
+]
+
+_WRAP_FLOAT_SCI_EXTRA_FLAGS = [
     "-Wl,--wrap=ldexpf",
     "-Wl,--wrap=copysignf",
     "-Wl,--wrap=truncf",
     "-Wl,--wrap=floorf",
     "-Wl,--wrap=ceilf",
     "-Wl,--wrap=roundf",
-    "-Wl,--wrap=sincosf",  # gnu
     "-Wl,--wrap=asinf",
     "-Wl,--wrap=acosf",
     "-Wl,--wrap=atanf",
@@ -114,30 +132,31 @@ _PICO_FLOAT_IMPLS = [
         ],
         "compatibility": incompatible_with_config("@platforms//cpu:riscv32") + ["//bazel/constraint:rp2040"],
         "extra_deps": [],
-        "linkopts": _WRAP_FLOAT_AEABI_FLAGS + _WRAP_FLOAT_SCI_FLAGS,
+        "linkopts": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
     },
     {
         "name": "dcp",
         "srcs": [
             "float_aeabi_dcp.S",
-            "float_conv_m33.S",
+            "float_common_m33.S",
             "float_math.c",
             "float_sci_m33.S",
         ],
         "compatibility": compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + incompatible_with_config("//bazel/constraint:rp2040"),
         "extra_deps": ["//src/rp2_common/hardware_dcp"],
-        "linkopts": _WRAP_FLOAT_SCI_FLAGS,
+        "linkopts": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
     },
     {
         "name": "vfp",
         "srcs": [
+            "float_conv32_vfp.S",
             "float_sci_m33_vfp.S",
-            "float_conv_m33.S",
+            "float_common_m33.S",
             "float_math.c",
         ],
         "compatibility": compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + incompatible_with_config("//bazel/constraint:rp2040"),
         "extra_deps": ["//src/rp2_common/hardware_dcp"],
-        "linkopts": _WRAP_FLOAT_SCI_FLAGS,
+        "linkopts": _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
     },
     {
         "name": "single_hazard3",
@@ -146,7 +165,7 @@ _PICO_FLOAT_IMPLS = [
         ],
         "compatibility": compatible_with_rp2() + ["@platforms//cpu:riscv32"],
         "extra_deps": ["//src/rp2_common/hardware_hazard3"],
-        "linkopts": _WRAP_FLOAT_SCI_FLAGS,
+        "linkopts": _WRAP_FLOAT_SCI_EXTRA_FLAGS,
     },
 ]
 
@@ -184,7 +203,7 @@ cc_library(
     hdrs = ["include/pico/float.h"],
     defines = ["LIB_PICO_FLOAT_PICO=0"],
     includes = ["include"],
-    linkopts = _WRAP_FLOAT_AEABI_FLAGS + _WRAP_FLOAT_SCI_FLAGS,
+    linkopts = _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
     target_compatible_with = compatible_with_rp2(),
     visibility = ["//visibility:private"],
     deps = [
