@@ -287,7 +287,7 @@ void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled);
  * for the specified irq number.
  *
  * NOTE: By default, the SDK uses a single shared vector table per core, and the current installed
- * IRQ handlers are effectively a linked list starting a vector table entry for a particular IRQ numbers.
+ * IRQ handlers are effectively a linked list starting a vector table entry for a particular IRQ number.
  * Therefore, this method (when using the same vector table for both cores) sets the same interrupt handler
  * for both cores.
  *
@@ -344,7 +344,7 @@ irq_handler_t irq_get_exclusive_handler(uint num);
  * would be exceeded.
  *
  * NOTE: By default, the SDK uses a single shared vector table per core, and the current installed
- * IRQ handlers are effectively a linked list starting a vector table entry for a particular IRQ numbers.
+ * IRQ handlers are effectively a linked list starting a vector table entry for a particular IRQ number.
  * Therefore, this method (when using the same vector table for both cores) add the same interrupt handler
  * for both cores.
  *
