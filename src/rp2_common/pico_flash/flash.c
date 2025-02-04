@@ -147,7 +147,7 @@ static int default_enter_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
         TaskHandle_t task_handle;
 
         // when FreeRTOS dynamic allocation is disabled (configSUPPORT_DYNAMIC_ALLOCATION == 0), the following instruction fails
-#ifndef configSUPPORT_DYNAMIC_ALLOCATION
+#if configSUPPORT_DYNAMIC_ALLOCATION
         if (pdPASS != xTaskCreateAffinitySet(flash_lockout_task, "flash lockout", configMINIMAL_STACK_SIZE, (void *)core_num, 0, 1u << (core_num ^ 1), &task_handle)) {
 #else
         static StackType_t flash_lockout_stack[configMINIMAL_STACK_SIZE];
