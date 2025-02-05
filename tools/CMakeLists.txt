@@ -649,7 +649,7 @@ function(picotool_postprocess_binary TARGET)
                     --quiet --hash --sign
                     ${picotool_encrypt_args}
                     $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
-                    ${picotool_aesfile} ${picotool_enc_sigfile}
+                    ${picotool_aesfile} ${picotool_enc_sigfile} ${otp_file}
                 COMMAND_EXPAND_LISTS
                 VERBATIM)
             if (ARGC EQUAL 2)
