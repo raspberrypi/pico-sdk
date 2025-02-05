@@ -204,6 +204,9 @@ struct python_output : public output_format {
                             }
                         }
                         break;
+                    default:
+                        invalid = true;
+                        break;
                 }
                 if (!invalid) {
                     guts = ((arg1 & 4u) ? "1, " : "0, ") + guts;
@@ -254,23 +257,24 @@ struct python_output : public output_format {
                 uint operation = arg2 >> 3u;
                 if (source.empty() || dest.empty() || operation == 3) {
                     invalid = true;
-                }
-                if (dest == source && (arg1 == 1 || arg2 == 2) && operation == 0) {
-                    op("nop");
-                    op_guts("");
                 } else {
-                    op("mov");
-                    std::string guts = dest + ", ";
-                    if (operation == 1) {
-                        guts += "invert(";
-                    } else if (operation == 2) {
-                        guts += "reverse(";
+                    if (dest == source && (arg1 == 1 || arg2 == 2) && operation == 0) {
+                        op("nop");
+                        op_guts("");
+                    } else {
+                        op("mov");
+                        std::string guts = dest + ", ";
+                        if (operation == 1) {
+                            guts += "invert(";
+                        } else if (operation == 2) {
+                            guts += "reverse(";
+                        }
+                        guts += source;
+                        if (operation == 1 || operation == 2) {
+                            guts += ")";
+                        }
+                        op_guts(guts);
                     }
-                    guts += source;
-                    if (operation == 1 || operation == 2) {
-                        guts += ")";
-                    }
-                    op_guts(guts);
                 }
                 break;
             }
@@ -310,7 +314,9 @@ struct python_output : public output_format {
         if (invalid) {
             op("word");
             ss << std::hex;
-            op_guts(std::to_string(inst));
+            std::stringstream guts;
+            guts << std::hex << std::showbase << std::setfill('0') << std::setw(4) << inst;
+            op_guts(guts.str());
         }
         uint delay = ((uint) inst >> 8u) & 0x1f;
         ss << std::left << std::setw(9);
