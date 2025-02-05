@@ -1,5 +1,3 @@
-# NOTE: THIS IS A WIP ONLY PICO_ARM_GCC IS CURRENTLY SUPPORTED
-# todo there is probably a more "cmake" way of doing this going thru the standard path with our "PICO" platform
 #  i.e. CMake<Lang>Information and whatnot
 include(${CMAKE_CURRENT_LIST_DIR}/util/find_compiler.cmake)
 
