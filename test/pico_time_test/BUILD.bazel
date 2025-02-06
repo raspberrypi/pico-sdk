@@ -12,6 +12,7 @@ cc_binary(
     target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/rp2_common/pico_stdlib",
+        "//src/rp2_common/pico_aon_timer",
         "//test/pico_test",
     ],
 )
