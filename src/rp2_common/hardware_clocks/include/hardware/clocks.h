@@ -318,6 +318,22 @@ typedef clock_num_t clock_handle_t;
  */
 bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq);
 
+/*! \brief Configure the specified clock to +/- 1MHz
+ *  \ingroup hardware_clocks
+ *
+ * This function differs from clock_configure in that it does not configure the clocks as accurately,
+ * but therefore doesn't need to bring in 64-bit division functions, reducing the code size.
+ *
+ * See the tables in the description for details on the possible values for clock sources.
+ *
+ * \param clock The clock to configure
+ * \param src The main clock source, can be 0.
+ * \param auxsrc The auxiliary clock source, which depends on which clock is being set. Can be 0
+ * \param src_freq_mhz Frequency of the input clock source in MHz
+ * \param freq_mhz Requested frequency in MHz
+ */
+bool clock_configure_mhz(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint16_t src_freq_mhz, uint16_t freq_mhz);
+
 /*! \brief Configure the specified clock to use the undivided input source
  *  \ingroup hardware_clocks
  *

@@ -123,6 +123,20 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
     return true;
 }
 
+bool clock_configure_mhz(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint16_t src_freq_mhz, uint16_t freq_mhz) {
+    assert(src_freq_mhz >= freq_mhz);
+
+    if (freq_mhz > src_freq_mhz)
+        return false;
+
+    uint32_t div = (uint32_t)((((uint32_t) src_freq_mhz) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / freq_mhz);
+    uint32_t actual_freq = (uint32_t) ((((uint32_t) src_freq_mhz) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / div) * MHZ;
+
+    clock_configure_internal(clock, src, auxsrc, actual_freq, div);
+    // Store the configured frequency
+    return true;
+}
+
 void clock_configure_int_divider(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t int_divider) {
     clock_configure_internal(clock, src, auxsrc, src_freq / int_divider, int_divider << CLOCKS_CLK_GPOUT0_DIV_INT_LSB);
 }
