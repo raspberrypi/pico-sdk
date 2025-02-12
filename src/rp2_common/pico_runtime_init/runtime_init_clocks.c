@@ -10,6 +10,8 @@
 #include "hardware/clocks.h"
 #include "hardware/pll.h"
 #include "hardware/ticks.h"
+#include "hardware/timer.h"
+#include "hardware/vreg.h"
 #include "hardware/xosc.h"
 #if PICO_RP2040
 #include "hardware/regs/rtc.h"
@@ -67,6 +69,13 @@ void __weak runtime_init_clocks(void) {
         pll_init(pll_usb, PLL_USB_REFDIV, PLL_USB_VCO_FREQ_HZ, PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
         /// \end::pll_init[]
 
+#if SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST && defined(SYS_CLK_VREG_VOLTAGE_MIN)
+        if (vreg_get_voltage() < SYS_CLK_VREG_VOLTAGE_MIN) {
+            vreg_set_voltage(SYS_CLK_VREG_VOLTAGE_MIN);
+            // wait for voltage to settle
+            busy_wait_ms(1);
+        }
+#endif
         // Configure clocks
 
         // RP2040 CLK_REF = XOSC (usually) 12MHz / 1 = 12MHz

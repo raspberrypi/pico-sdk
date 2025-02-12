@@ -16,7 +16,7 @@ void vreg_set_voltage(enum vreg_voltage voltage) {
         VREG_AND_CHIP_RESET_VREG_VSEL_BITS
     );
 
-#elif PICO_RP2350
+#else
 
     hw_set_bits(&powman_hw->vreg_ctrl, POWMAN_PASSWORD_BITS | POWMAN_VREG_CTRL_UNLOCK_BITS);
 
@@ -32,19 +32,21 @@ void vreg_set_voltage(enum vreg_voltage voltage) {
     while (powman_hw->vreg & POWMAN_VREG_UPDATE_IN_PROGRESS_BITS)
         tight_loop_contents();
 
+#endif
+}
+
+enum vreg_voltage vreg_get_voltage(void) {
+#if PICO_RP2040
+    return (vreg_and_chip_reset_hw->vreg & VREG_AND_CHIP_RESET_VREG_VSEL_BITS) >> VREG_AND_CHIP_RESET_VREG_VSEL_LSB;
 #else
-    panic_unsupported();
+    return (powman_hw->vreg & POWMAN_VREG_VSEL_BITS) >> POWMAN_VREG_VSEL_LSB;
 #endif
 }
 
 void vreg_disable_voltage_limit(void) {
 #if PICO_RP2040
-    // The voltage limit can't be disabled on RP2040 (was implemented by
-    // hardwiring the LDO controls)
-    return;
-#elif PICO_RP2350
-    hw_set_bits(&powman_hw->vreg_ctrl, POWMAN_PASSWORD_BITS | POWMAN_VREG_CTRL_DISABLE_VOLTAGE_LIMIT_BITS);
+    // The voltage limit can't be disabled on RP2040 (was implemented by hard-wiring the LDO controls)
 #else
-    panic_unsupported();
+    hw_set_bits(&powman_hw->vreg_ctrl, POWMAN_PASSWORD_BITS | POWMAN_VREG_CTRL_DISABLE_VOLTAGE_LIMIT_BITS);
 #endif
 }
