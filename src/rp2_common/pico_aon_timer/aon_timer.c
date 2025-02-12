@@ -13,6 +13,8 @@ static aon_timer_alarm_handler_t aon_timer_alarm_handler;
 #if HAS_RP2040_RTC
 #include "hardware/rtc.h"
 #include "pico/util/datetime.h"
+#include "pico/time.h"
+#include "hardware/clocks.h"
 
 #elif HAS_POWMAN_TIMER
 #include "hardware/powman.h"
@@ -56,6 +58,10 @@ bool aon_timer_set_time_calendar(const struct tm *tm) {
     datetime_t dt;
     tm_to_datetime(tm, &dt);
     rtc_set_datetime(&dt);
+
+    // Writing to the RTC will take 2 clk_rtc clock periods to arrive
+    uint rtc_freq = clock_get_hz(clk_rtc);
+    busy_wait_us(((1000000 + rtc_freq - 1) / rtc_freq) * 2);
     return true;
 #elif HAS_POWMAN_TIMER
     struct timespec ts;

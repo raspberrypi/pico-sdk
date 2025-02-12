@@ -582,7 +582,7 @@ wrapper_func fma
  saving_func_return
 
 
-double_wrapper_section __dmla
+double_section fma_fast
 @ cf saving_func macro: but here we need to record the SP before the state save possibly changes it
 1:
  push {lr}              // 16-bit instruction
@@ -592,6 +592,7 @@ double_wrapper_section __dmla
 @ r0:r1 m
 @ r2:r3 n
 @ [r13,#0] a
+regular_func fma_fast
 regular_func mla
  mov r12,sp                  @ save the SP
  PCMP apsr_nzcv              @ test the engaged flag

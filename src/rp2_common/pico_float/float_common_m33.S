@@ -241,7 +241,52 @@ regular_func ufix642float
  bxlo r14
  b 3b
 
-float_wrapper_section conv_ftoi64
+float_section conv_ftoi64
+regular_func float2int64
+  lsls r1, r0, #1
+  // r0 = abs(zero)                   => r1 = 0x00000000
+  // r0 = abs(denornaml)              => r1 = 0x00xxxxxx
+  // r0 = abs(1.0f)                   => r1 = 0x7f000000
+  // r0 = abs(inf/nan)                => r1 = 0xffxxxxxx
+  bls float2int64_z // positive or zero or -zero are ok for int64_z
+  lsrs r1, #24
+  subs r1, #0x7f
+  bcc 1f // <1 means subtract 1
+  // mask off all but fractional bits
+  lsls r2, r0, r1
+  lsls r2, #9
+  beq float2int64_z // integer
+1:
+  push {lr}
+  bl float2int64_z
+  subs r0, #1
+  sbcs r1, r1, #0
+  pop {pc}
+
+float_section conv_ftof64
+regular_func float2fix64
+  lsls r2, r0, #1
+  // r0 = abs(zero)                   => r1 = 0x00000000
+  // r0 = abs(denornaml)              => r1 = 0x00xxxxxx
+  // r0 = abs(1.0f)                   => r1 = 0x7f000000
+  // r0 = abs(inf/nan)                => r1 = 0xffxxxxxx
+  bls float2fix64_z // positive or zero or -zero are ok for fix64_z
+  lsrs r2, #24
+  rsbs r3, r1, #0x7f
+  subs r2, r3
+  bcc 1f // <1 means subtract 1
+  // mask off all but fractional bits
+  lsls r2, r0, r2
+  lsls r2, #9
+  beq float2fix64_z // integer
+1:
+  push {lr}
+  bl float2fix64_z
+  subs r0, #1
+  sbcs r1, r1, #0
+  pop {pc}
+
+float_wrapper_section conv_ftoi64z
 
 @ convert float to signed int64, rounding towards 0, clamping
 wrapper_func __aeabi_f2lz
@@ -318,7 +363,7 @@ regular_func float2uint64_z
  movs r1,#0      @ fall through
 @ convert float in r0 to unsigned fixed point in r0:r1, clamping
 regular_func float2ufix64
-//regular_func float2ufix64_z
+regular_func float2ufix64_z
  subs r1,#0x96 @ remove exponent bias, compensate for mantissa length
  asrs r2,r0,#23 @ sign and exponent
  sub r3,r2,#1

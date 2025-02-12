@@ -12,6 +12,7 @@ pico_mirrored_target_link_libraries(pico_aon_timer INTERFACE pico_util)
 
 if (TARGET hardware_rtc)
     pico_mirrored_target_link_libraries(pico_aon_timer INTERFACE hardware_rtc)
+    target_link_libraries(pico_aon_timer_headers INTERFACE pico_time_headers)
 endif()
 
 if (TARGET hardware_powman)

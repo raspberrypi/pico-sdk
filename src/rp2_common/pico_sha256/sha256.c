@@ -30,6 +30,12 @@ void __weak pico_sha256_unlock(pico_sha256_state_t *state) {
     state->locked = false;
 }
 
+void pico_sha256_cleanup(pico_sha256_state_t *state) {
+    if (state->locked) {
+        pico_sha256_unlock(state);
+    }
+}
+
 int pico_sha256_try_start(pico_sha256_state_t *state, enum sha256_endianness endianness, bool use_dma) {
     memset(state, 0, sizeof(*state));
     if (!pico_sha256_lock(state)) return PICO_ERROR_RESOURCE_IN_USE;

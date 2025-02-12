@@ -535,7 +535,7 @@ static inline void dma_channel_start(uint channel) {
  *\endcode
  *
  * \if rp2350_specific
- * RP2350 only: Due to errata RP12350-E5 (see the RP2350 datasheet for further detail), it is necessary to clear the enable bit of
+ * RP2350 only: Due to errata RP2350-E5 (see the RP2350 datasheet for further detail), it is necessary to clear the enable bit of
  * the aborted channel and any chained channels prior to the abort to prevent re-triggering.
  * \endif
  *

@@ -262,10 +262,17 @@ extern "C" {
 
 typedef clock_num_t clock_handle_t;
 
-/*! \brief Configure the specified clock
+/*! \brief Configure the specified clock with automatic clock divisor setup
  *  \ingroup hardware_clocks
  *
+ * This method allows both the src_frequency of the input clock source AND the desired
+ * frequency to be specified, and will set the clock divider to achieve the exact or higher frequency
+ * achievable, with the maximum being the src_freq.
+ *
+ * Note: That the clock hardware only support divisors of exactly 1 or 2.0->65535.0
+ *
  * See the tables in the description for details on the possible values for clock sources.
+ *
  *
  * \param clock The clock to configure
  * \param src The main clock source, can be 0.
@@ -275,7 +282,7 @@ typedef clock_num_t clock_handle_t;
  */
 bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq);
 
-/*! \brief Configure the specified clock to use the undividded input source
+/*! \brief Configure the specified clock to use the undivided input source
  *  \ingroup hardware_clocks
  *
  * See the tables in the description for details on the possible values for clock sources.
@@ -287,7 +294,7 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
  */
 void clock_configure_undivided(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq);
 
-/*! \brief Configure the specified clock to use the undividded input source
+/*! \brief Configure the specified clock to use the undivided input source
  *  \ingroup hardware_clocks
  *
  * See the tables in the description for details on the possible values for clock sources.
