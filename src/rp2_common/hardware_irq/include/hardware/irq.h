@@ -286,7 +286,7 @@ void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled);
  * This method will assert if there is already any sort of interrupt handler installed
  * for the specified irq number.
  *
- * NOTE: By default, the SDK uses a single shared vector table per core, and the current installed
+ * NOTE: By default, the SDK uses a single shared vector table for both cores, and the currently installed
  * IRQ handlers are effectively a linked list starting a vector table entry for a particular IRQ number.
  * Therefore, this method (when using the same vector table for both cores) sets the same interrupt handler
  * for both cores.
@@ -309,7 +309,7 @@ void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled);
  * NOTE: It is not thread safe to add/remove/handle IRQs for the same irq number in the same vector table
  * from both cores concurrently.
  *
- * NOTE: The SDK defines a PICO_VTABLE_PER_CORE variable indicating whether the two vector tables are separate,
+ * NOTE: The SDK has a PICO_VTABLE_PER_CORE define indicating whether the two vector tables are separate,
  * however as of version 2.1.1 the user cannot set this value, and expect the vector table duplication to be handled
  * for them. This functionality will be added in a future SDK version
  *
@@ -343,7 +343,7 @@ irq_handler_t irq_get_exclusive_handler(uint num);
  * the (total across all IRQs on both cores) maximum (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) number of shared handlers
  * would be exceeded.
  *
- * NOTE: By default, the SDK uses a single shared vector table per core, and the current installed
+ * NOTE: By default, the SDK uses a single shared vector table for both core, and the currently installed
  * IRQ handlers are effectively a linked list starting a vector table entry for a particular IRQ number.
  * Therefore, this method (when using the same vector table for both cores) add the same interrupt handler
  * for both cores.
