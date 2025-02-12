@@ -46,7 +46,7 @@
  * where there is one IO interrupt per bank, per core. These are completely independent, so, for example, processor 0 can be
  * interrupted by GPIO 0 in bank 0, and processor 1 by GPIO 1 in the same bank.
  *
- * \note That all IRQ APIs affect the executing core only (i.e. the core calling the function).
+ * \note All IRQ APIs affect the executing core only (i.e. the core calling the function).
  *
  * \note You should not enable the same (shared) IRQ number on both cores, as this will lead to race conditions
  * or starvation of one of the cores. Additionally, don't forget that disabling interrupts on one core does not disable interrupts
@@ -280,7 +280,7 @@ void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled);
  *  \ingroup hardware_irq
  *
  * Use this method to set a handler for single IRQ source interrupts, or when
- * your code, use case or performance requirements dictate that there should
+ * your code, use case or performance requirements dictate that there should be
  * no other handlers for the interrupt.
  *
  * This method will assert if there is already any sort of interrupt handler installed
@@ -343,7 +343,7 @@ irq_handler_t irq_get_exclusive_handler(uint num);
  * the (total across all IRQs on both cores) maximum (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) number of shared handlers
  * would be exceeded.
  *
- * NOTE: By default, the SDK uses a single shared vector table for both core, and the currently installed
+ * NOTE: By default, the SDK uses a single shared vector table for both cores, and the currently installed
  * IRQ handlers are effectively a linked list starting a vector table entry for a particular IRQ number.
  * Therefore, this method (when using the same vector table for both cores) add the same interrupt handler
  * for both cores.
@@ -366,7 +366,7 @@ irq_handler_t irq_get_exclusive_handler(uint num);
  * NOTE: It is not thread safe to add/remove/handle IRQs for the same irq number in the same vector table
  * from both cores concurrently.
  *
- * NOTE: The SDK defines a PICO_VTABLE_PER_CORE variable indicating whether the two vector tables are separate,
+ * NOTE: The SDK has a PICO_VTABLE_PER_CORE define indicating whether the two vector tables are separate,
  * however as of version 2.1.1 the user cannot set this value, and expect the vector table duplication to be handled
  * for them. This functionality will be added in a future SDK version
  *
