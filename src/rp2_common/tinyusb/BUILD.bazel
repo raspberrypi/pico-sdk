@@ -15,6 +15,7 @@ cc_library(
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
+        "//bazel/config:PICO_TINYUSB_CONFIG",
         "//src/common/pico_binary_info",
         "//src/common/pico_stdlib_headers",
         "//src/common/pico_sync",
@@ -30,7 +31,6 @@ cc_library(
         "//src/rp2_common/pico_stdio_semihosting",
         "//src/rp2_common/pico_stdio_uart",
         "//src/rp2_common/pico_stdio_usb:pico_stdio_usb_headers",
-        "//src/rp2_common/pico_stdio_usb:tusb_config",
         "//src/rp2_common/pico_unique_id",
     ],
 )
