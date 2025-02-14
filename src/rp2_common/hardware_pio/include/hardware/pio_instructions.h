@@ -79,6 +79,10 @@ static inline uint _pio_major_instr_bits(uint instr) {
     return instr & 0xe000u;
 }
 
+static inline uint _pio_arg1(uint instr) {
+    return (instr >> 5) & 0x7u;
+}
+
 static inline uint _pio_encode_instr_and_args(enum pio_instr_bits instr_bits, uint arg1, uint arg2) {
     valid_params_if(PIO_INSTRUCTIONS, arg1 <= 0x7);
 #if PARAM_ASSERTIONS_ENABLED(PIO_INSTRUCTIONS)
