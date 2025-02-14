@@ -292,7 +292,7 @@ uint instruction::encode(program &program) {
         }
     }
     // note we store the 6th bit of arg2 above the 16 bits of instruction
-    return (((uint) raw.type) << 13u) | (((uint) _delay | (uint) _sideset) << 8u) | (raw.arg1 << 5u) | raw.arg2 | ((raw.arg2 >> 5) << 16);
+    return (((uint) raw.type) << 13u) | (((uint) _delay | (uint) _sideset) << 8u) | (raw.arg1 << 5u) | (raw.arg2 & 0x1fu) | ((raw.arg2 >> 5) << 16);
 }
 
 raw_encoding instruction::raw_encode(program& program) {
