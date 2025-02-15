@@ -270,11 +270,11 @@ typedef clock_num_t clock_handle_t;
  * achievable, with the maximum being the src_freq.
  *
  * \if rp2350_specific
- * Note: That the RP2350 clock hardware supports divisors from 1.0->65535.0 in steps of 1/65536
+ * Note: The RP2350 clock hardware supports divisors from 1.0->65536.0 in steps of 1/65536
  *
  * \endif
  * \if rp2030_specific
- * Note: That the RP2040 clock hardware only support divisors of exactly 1.0 or 2.0->65535.0 in steps of 1/256
+ * Note: The RP2040 clock hardware only supports divisors of exactly 1.0 or 2.0->16777216.0 in steps of 1/256
  * \endif
  *
  * See the tables in the description for details on the possible values for clock sources.
