@@ -273,7 +273,7 @@ typedef clock_num_t clock_handle_t;
  * Note: The RP2350 clock hardware supports divisors from 1.0->65536.0 in steps of 1/65536
  *
  * \endif
- * \if rp2030_specific
+ * \if rp2040_specific
  * Note: The RP2040 clock hardware only supports divisors of exactly 1.0 or 2.0->16777216.0 in steps of 1/256
  * \endif
  *
