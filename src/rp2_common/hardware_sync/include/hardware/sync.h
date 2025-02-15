@@ -207,7 +207,7 @@ __force_inline static uint32_t disable_interrupts(void) {
     riscv_clear_csr(mstatus, 8);
     __compiler_memory_barrier();
 #else
-    pico_default_asm_volatile ( "cpsid i" :: "memory");
+    pico_default_asm_volatile ( "cpsid i" : : : "memory");
 #endif
 }
 
@@ -220,7 +220,7 @@ __force_inline static uint32_t enable_interrupts(void) {
     riscv_set_csr(mstatus, 8);
     __compiler_memory_barrier();
 #else
-    pico_default_asm_volatile ( "cpsie i" :: "memory");
+    pico_default_asm_volatile ( "cpsie i" : : : "memory");
 #endif
 }
 
