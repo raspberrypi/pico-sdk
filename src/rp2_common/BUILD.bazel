@@ -71,6 +71,7 @@ alias(
         "//src/rp2_common/hardware_base:__pkg__",
         "//src/rp2_common/hardware_irq:__pkg__",
         "//src/rp2_common/hardware_pll:__pkg__",
+        "//src/rp2_common/hardware_vreg:__pkg__",
         "//src/rp2_common/hardware_watchdog:__pkg__",
         "//src/rp2_common/hardware_xosc:__pkg__",
         "//src/rp2_common/pico_bit_ops:__pkg__",
