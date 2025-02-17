@@ -198,10 +198,41 @@ __force_inline static void __mem_fence_release(void) {
 //#endif
 }
 
-/*! \brief Save and disable interrupts
+/*! \brief Explicitly disable interrupts on the calling core
+ *  \ingroup hardware_sync
+ */
+__force_inline static uint32_t disable_interrupts(void) {
+#ifdef __riscv
+    __compiler_memory_barrier();
+    riscv_clear_csr(mstatus, 8);
+    __compiler_memory_barrier();
+#else
+    pico_default_asm_volatile ( "cpsid i" : : : "memory");
+#endif
+}
+
+/*! \brief Explicitly enable interrupts on the calling core
+ *  \ingroup hardware_sync
+ */
+__force_inline static uint32_t enable_interrupts(void) {
+#ifdef __riscv
+    __compiler_memory_barrier();
+    riscv_set_csr(mstatus, 8);
+    __compiler_memory_barrier();
+#else
+    pico_default_asm_volatile ( "cpsie i" : : : "memory");
+#endif
+}
+
+/*! \brief Disable interrupts on the calling core, returning the previous interrupt state
  *  \ingroup hardware_sync
  *
- * \return The prior interrupt enable status for restoration later via restore_interrupts()
+ * This method is commonly paired with \ref restore_interrupts_from_disabled() to temporarily
+ * disable interrupts around a piece of code, without needing to care whether interrupts
+ * were previously enabled
+ *
+ * \return The prior interrupt enable status for restoration later via \ref restore_interrupts_from_disabled()
+ * or \ref restore_interrupts()
  */
 __force_inline static uint32_t save_and_disable_interrupts(void) {
     uint32_t status;
@@ -219,7 +250,7 @@ __force_inline static uint32_t save_and_disable_interrupts(void) {
     return status;
 }
 
-/*! \brief Restore interrupts to a specified state
+/*! \brief Restore interrupts to a specified state on the calling core
  *  \ingroup hardware_sync
  *
  * \param status Previous interrupt status from save_and_disable_interrupts()
@@ -238,10 +269,10 @@ __force_inline static void restore_interrupts(uint32_t status) {
 #endif
 }
 
-/*! \brief Restore interrupts to a specified state with restricted transitions
+/*! \brief Restore interrupts to a specified state on the calling core with restricted transitions
  *  \ingroup hardware_sync
  *
- * This method should only be used when the interrupt state is known to be disabled,
+ * This method should only be used when the current interrupt state is known to be disabled,
  * e.g. when paired with \ref save_and_disable_interrupts()
  *
  * \param status Previous interrupt status from save_and_disable_interrupts()
