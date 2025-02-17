@@ -9,6 +9,10 @@
 
 #include "pico.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_BOOT_LOCK, Enable/disable assertions in the hardware_boot_lock module, type=bool, default=0, group=hardware_boot_lock
 #ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_BOOT_LOCK
 #define PARAM_ASSERTIONS_ENABLED_HARDWARE_BOOT_LOCK 0
@@ -141,4 +145,9 @@ boot_lock_t *boot_lock_init(uint lock_num);
 void boot_locks_reset(void);
 
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

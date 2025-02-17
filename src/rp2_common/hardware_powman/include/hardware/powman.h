@@ -10,6 +10,10 @@
 #include "pico.h"
 #include "hardware/structs/powman.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \file hardware/powman.h
  *  \defgroup hardware_powman hardware_powman
  *
@@ -271,5 +275,9 @@ static inline void powman_set_debug_power_request_ignored(bool ignored) {
     else
         powman_clear_bits(&powman_hw->dbg_pwrcfg, 0);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
