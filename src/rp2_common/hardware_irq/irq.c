@@ -197,10 +197,16 @@ static inline bool is_shared_irq_raw_handler(irq_handler_t raw_handler) {
     return (uintptr_t)raw_handler - (uintptr_t)irq_handler_chain_slots < sizeof(irq_handler_chain_slots);
 }
 
+bool irq_has_handler(uint irq_num) {
+    check_irq_param(irq_num);
+    irq_handler_t handler = irq_get_vtable_handler(irq_num);
+    return handler && handler != __unhandled_user_irq;
+}
+
 bool irq_has_shared_handler(uint irq_num) {
     check_irq_param(irq_num);
     irq_handler_t handler = irq_get_vtable_handler(irq_num);
-    return handler && is_shared_irq_raw_handler(handler);
+    return is_shared_irq_raw_handler(handler);
 }
 
 #else // PICO_DISABLE_SHARED_IRQ_HANDLERS

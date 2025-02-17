@@ -403,8 +403,22 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
  */
 void irq_remove_handler(uint num, irq_handler_t handler);
 
-/*! \brief Determine if the current handler for the given number is shared
+/*! \brief Determine if there is an installed IRQ handler for the given interrupt number
  *  \ingroup hardware_irq
+ *
+ * See \ref irq_set_exclusive_handler() for discussion on the scope of handlers
+ * when using both cores.
+ *
+ * \param num Interrupt number \ref interrupt_nums
+ * \return true if the specified IRQ has a handler
+ */
+bool irq_has_handler(uint num);
+
+/*! \brief Determine if the current IRQ andler for the given interrupt number is shared
+ *  \ingroup hardware_irq
+ *
+ * See \ref irq_set_exclusive_handler() for discussion on the scope of handlers
+ * when using both cores.
  *
  * \param num Interrupt number \ref interrupt_nums
  * \return true if the specified IRQ has a shared handler
