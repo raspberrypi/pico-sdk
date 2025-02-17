@@ -69,6 +69,9 @@
 #define SYS_CLK_HZ ((SYS_CLK_MHZ) * _u(1000000))
 #else
 // PICO_CONFIG: PICO_USE_FASTEST_SUPPORTED_CLOCK, Use the fastest officially supported clock by default, type=bool, default=0, group=hardware_base
+#ifndef PICO_USE_FASTEST_SUPPORTED_CLOCK
+#define PICO_USE_FASTEST_SUPPORTED_CLOCK 0
+#endif
 #if PICO_USE_FASTEST_SUPPORTED_CLOCK
 #define SYS_CLK_HZ _u(200000000)
 #else

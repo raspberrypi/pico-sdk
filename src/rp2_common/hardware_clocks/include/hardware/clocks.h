@@ -225,6 +225,10 @@ extern "C" {
 #ifndef PLL_SYS_POSTDIV2
 #define PLL_SYS_POSTDIV2                    1
 #endif
+#else
+#ifndef SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST
+#define SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST 0
+#endif
 #endif // PICO_RP2040 && SYS_CLK_KHZ == 200000 && XOSC_KHZ == 12000 && PLL_COMMON_REFDIV == 1
 
 #if !defined(PLL_SYS_VCO_FREQ_HZ) || !defined(PLL_SYS_POSTDIV1) || !defined(PLL_SYS_POSTDIV2)
