@@ -269,16 +269,22 @@ typedef clock_num_t clock_handle_t;
  * frequency to be specified, and will set the clock divider to achieve the exact or higher frequency
  * achievable, with the maximum being the src_freq.
  *
- * Note: That the clock hardware only support divisors of exactly 1 or 2.0->65535.0
+ * \if rp2350_specific
+ * Note: The RP2350 clock hardware supports divisors from 1.0->65536.0 in steps of 1/65536
+ *
+ * \endif
+ * \if rp2040_specific
+ * Note: The RP2040 clock hardware only supports divisors of exactly 1.0 or 2.0->16777216.0 in steps of 1/256
+ * \endif
  *
  * See the tables in the description for details on the possible values for clock sources.
- *
  *
  * \param clock The clock to configure
  * \param src The main clock source, can be 0.
  * \param auxsrc The auxiliary clock source, which depends on which clock is being set. Can be 0
  * \param src_freq Frequency of the input clock source
  * \param freq Requested frequency
+ * \return true if the clock is updated, false if freq > src_freq
  */
 bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq);
 
