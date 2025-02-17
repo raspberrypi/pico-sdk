@@ -73,7 +73,7 @@ void __weak runtime_init_clocks(void) {
         if (vreg_get_voltage() < SYS_CLK_VREG_VOLTAGE_MIN) {
             vreg_set_voltage(SYS_CLK_VREG_VOLTAGE_MIN);
             // wait for voltage to settle
-            busy_wait_ms(1);
+            busy_wait_ms(SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_MS);
         }
 #endif
         // Configure clocks
