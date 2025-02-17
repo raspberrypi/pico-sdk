@@ -69,13 +69,6 @@ void __weak runtime_init_clocks(void) {
         pll_init(pll_usb, PLL_USB_REFDIV, PLL_USB_VCO_FREQ_HZ, PLL_USB_POSTDIV1, PLL_USB_POSTDIV2);
         /// \end::pll_init[]
 
-#if SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST && defined(SYS_CLK_VREG_VOLTAGE_MIN)
-        if (vreg_get_voltage() < SYS_CLK_VREG_VOLTAGE_MIN) {
-            vreg_set_voltage(SYS_CLK_VREG_VOLTAGE_MIN);
-            // wait for voltage to settle
-            busy_wait_us_32(SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_US);
-        }
-#endif
         // Configure clocks
 
         // RP2040 CLK_REF = XOSC (usually) 12MHz / 1 = 12MHz
@@ -93,6 +86,15 @@ void __weak runtime_init_clocks(void) {
                         CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC,
                         0,
                         XOSC_HZ);
+
+        // This must be done after we've configured CLK_REF to XOSC due to the need to time a delay
+#if SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST && defined(SYS_CLK_VREG_VOLTAGE_MIN)
+        if (vreg_get_voltage() < SYS_CLK_VREG_VOLTAGE_MIN) {
+            vreg_set_voltage(SYS_CLK_VREG_VOLTAGE_MIN);
+            // wait for voltage to settle; must use CPU cycles as TIMER is not yet clocked correctly
+            busy_wait_at_least_cycles((uint32_t)((SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_US * (uint64_t)XOSC_HZ) / 1000000));
+        }
+#endif
 
         /// \tag::configure_clk_sys[]
         // CLK SYS = PLL SYS (usually) 125MHz / 1 = 125MHz
