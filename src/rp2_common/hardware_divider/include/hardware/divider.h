@@ -110,7 +110,7 @@ static inline void hw_divider_divmod_s32_start(int32_t a, int32_t b) {
     sio_hw->div_sdividend = (uint32_t)a;
     sio_hw->div_sdivisor = (uint32_t)b;
 #else
-    hw_divider_divmod_s32(a, b);
+    hw_divider_results[get_core_num()] = hw_divider_divmod_s32(a, b);
 #endif
 }
 
@@ -130,7 +130,7 @@ static inline void hw_divider_divmod_u32_start(uint32_t a, uint32_t b) {
     sio_hw->div_udividend = a;
     sio_hw->div_udivisor = b;
 #else
-    hw_divider_divmod_u32(a, b);
+    hw_divider_results[get_core_num()] = hw_divider_divmod_u32(a, b);
 #endif
 }
 
