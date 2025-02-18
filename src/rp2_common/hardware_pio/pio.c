@@ -168,7 +168,7 @@ static int add_program_at_offset(PIO pio, const pio_program_t *program, uint off
             // base is 16 we need to flip bit 4 (which is equivalent to subtracting 16 from
             // the original number 16-47 stored as 16-31 and 0-15)
             static_assert(PIO_GPIOBASE_BITS == 16, ""); // only works for gpio base being 0 or 16
-            instr ^= pio_get_gpio_base(pio);
+            instr ^= (uint16_t)pio_get_gpio_base(pio);
         }
 #endif
         pio->instr_mem[offset + i] = pio_instr_bits_jmp != _pio_major_instr_bits(instr) ? instr : instr + offset;
