@@ -108,7 +108,7 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
         div = 0;
         actual_freq = src_freq >> (32 - CLOCKS_CLK_GPOUT0_DIV_INT_LSB);
     } else {
-        div = div64;
+        div = (uint32_t) div64;
 #if PICO_RP2040
         // on RP2040 only clock divider of 1, or  >= 2 are supported
         if (div < (2u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB)) {
