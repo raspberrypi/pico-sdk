@@ -206,6 +206,36 @@ extern "C" {
 #endif
 #endif // SYS_CLK_KHZ == 125000 && XOSC_KHZ == 12000 && PLL_COMMON_REFDIV == 1
 
+#if PICO_RP2040 && (SYS_CLK_HZ == 200 * MHZ) && (XOSC_HZ == 12 * MHZ) && (PLL_SYS_REFDIV == 1)
+// PICO_CONFIG: SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST, Should the regulator voltage be adjusted above SYS_CLK_VREG_VOLTAGE_MIN when initializing the clocks, type=bool, default=0, advanced=true, group=hardware_clocks
+#ifndef SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST
+#define SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST 1
+#endif
+// PICO_CONFIG: SYS_CLK_VREG_VOLTAGE_MIN, minimum voltage (see VREG_VOLTAGE_x_xx) for the voltage regulator to be ensured during clock initialization if SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST is 1, type=int, advanced=true, group=hardware_clocks
+#if SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST && !defined(SYS_CLK_VREG_VOLTAGE_MIN)
+#define SYS_CLK_VREG_VOLTAGE_MIN VREG_VOLTAGE_1_15
+#endif
+// PLL settings for fast 200 MHz system clock on RP2040
+#ifndef PLL_SYS_VCO_FREQ_HZ
+#define PLL_SYS_VCO_FREQ_HZ                (1200 * MHZ)
+#endif
+#ifndef PLL_SYS_POSTDIV1
+#define PLL_SYS_POSTDIV1                    6
+#endif
+#ifndef PLL_SYS_POSTDIV2
+#define PLL_SYS_POSTDIV2                    1
+#endif
+#else
+#ifndef SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST
+#define SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST 0
+#endif
+#endif // PICO_RP2040 && SYS_CLK_KHZ == 200000 && XOSC_KHZ == 12000 && PLL_COMMON_REFDIV == 1
+
+// PICO_CONFIG: SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_US, Number of microseconds to wait after updating regulator voltage due to SYS_CLK_VREG_VOLTAGE_MIN to allow voltage to settle, type=bool, default=1, advanced=true, group=hardware_clocks
+#ifndef SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_US
+#define SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_US 1000
+#endif
+
 #if !defined(PLL_SYS_VCO_FREQ_HZ) || !defined(PLL_SYS_POSTDIV1) || !defined(PLL_SYS_POSTDIV2)
 #error PLL_SYS_VCO_FREQ_HZ, PLL_SYS_POSTDIV1 and PLL_SYS_POSTDIV2 must all be specified when using custom clock setup
 #endif

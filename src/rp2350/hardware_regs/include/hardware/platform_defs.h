@@ -89,6 +89,11 @@
 #endif
 #endif
 
+// PICO_CONFIG: PICO_USE_FASTEST_SUPPORTED_CLOCK, Use the fastest officially supported clock by default, type=bool, default=0, group=hardware_base
+#ifndef PICO_USE_FASTEST_SUPPORTED_CLOCK
+#define PICO_USE_FASTEST_SUPPORTED_CLOCK 0
+#endif
+
 // PICO_CONFIG: SYS_CLK_HZ, System operating frequency in Hz, type=int, default=150000000, advanced=true, group=hardware_base
 #ifndef SYS_CLK_HZ
 #ifdef SYS_CLK_KHZ
