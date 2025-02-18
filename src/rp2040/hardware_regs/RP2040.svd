@@ -32215,7 +32215,7 @@ SPDX-License-Identifier: BSD-3-Clause
                             After writing, this register must be polled until it returns all-zero. Until this point, it is unsafe to restart the channel.</description>
                         <bitRange>[15:0]</bitRange>
                         <access>read-write</access>
-                        <modifiedWriteValues>clear</modifiedWriteValues>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                 </fields>
             </register>
