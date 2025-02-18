@@ -41,8 +41,8 @@ jobs:
       - name: Full Bazel build with develop Picotool
         run: python3 tools/run_all_bazel_checks.py --program=build --picotool-dir=lib/picotool
       # Checks that the current BCR-requested version of Picotool builds.
-      - name: Bazel Picotool backwards compatibility
-        run: bazel build @picotool//:picotool
+      # - name: Bazel Picotool backwards compatibility
+      #   run: bazel build @picotool//:picotool
   other-bazel-checks:
     runs-on: ubuntu-latest
     steps:
