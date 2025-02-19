@@ -9,12 +9,11 @@
 
 #include "pico.h"
 #include "hardware/address_mapped.h"
-#include "hardware/regs/m0plus.h"
 
 /** \file exception.h
  *  \defgroup hardware_exception hardware_exception
  *
- * Methods for setting processor exception handlers
+ * \brief Methods for setting processor exception handlers
  *
  * Exceptions are identified by a \ref exception_number which is a number from -15 to -1; these are the numbers relative to
  * the index of the first IRQ vector in the vector table. (i.e. vector table index is exception_num plus 16)
@@ -24,37 +23,95 @@
  * \note That all exception APIs affect the executing core only (i.e. the core calling the function).
  */
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_EXCEPTION, Enable/disable assertions in the exception module, type=bool, default=0, group=hardware_exception
-#ifndef PARAM_ASSERTIONS_ENABLED_EXCEPTION
-#define PARAM_ASSERTIONS_ENABLED_EXCEPTION 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_EXCEPTION, Enable/disable assertions in the hardware_exception module, type=bool, default=0, group=hardware_exception
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_EXCEPTION
+#ifdef PARAM_ASSERTIONS_ENABLED_EXCEPTION // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_EXCEPTION PARAM_ASSERTIONS_ENABLED_EXCEPTION
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_EXCEPTION 0
 #endif
-
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*! \brief  Exception number definitions
  *
- * Note for consistency with irq numbers, these numbers are defined to be negative. The VTABLE index is
- * the number here plus 16.
+ * On Arm these are vector table indices:
  *
- * Name                 | Value | Exception
- * ---------------------|-------|----------
- * NMI_EXCEPTION        |  -14  | Non Maskable Interrupt
- * HARDFAULT_EXCEPTION  |  -13  | HardFault
- * SVCALL_EXCEPTION     |   -5  | SV Call
- * PENDSV_EXCEPTION     |   -2  | Pend SV
- * SYSTICK_EXCEPTION    |   -1  | System Tick
+ * Name                  | Value | Exception
+ * ----------------------|-------|-----------------------
+ * NMI_EXCEPTION         | 2     | Non Maskable Interrupt
+ * HARDFAULT_EXCEPTION   | 3     | HardFault
+ * \if rp2350_specific
+ * MEMMANAGE_EXCEPTION   | 4     | MemManage
+ * BUSFAULT_EXCEPTION    | 5     | BusFault
+ * USAGEFAULT_EXCEPTION  | 6     | UsageFault
+ * SECUREFAULT_EXCEPTION | 7     | SecureFault
+ * \endif
+ * SVCALL_EXCEPTION      | 11    | SV Call
+ * PENDSV_EXCEPTION      | 14    | Pend SV
+ * SYSTICK_EXCEPTION     | 15    | System Tick
+ *
+ * \if rp2350_specific
+ * On RISC-V these are exception cause numbers:
+ *
+ * Name                    | Value | Exception
+ * ------------------------|-------|-----------------------------
+ * INSTR_ALIGN_EXCEPTION   | 0     | Instruction fetch misaligned
+ * INSTR_FAULT_EXCEPTION   | 1     | Instruction fetch bus fault
+ * INSTR_ILLEGAL_EXCEPTION | 2     | Invalid or illegal instruction
+ * EBREAK_EXCEPTION        | 3     | ebreak was not caught by an ex
+ * LOAD_ALIGN_EXCEPTION    | 4     | Load address not naturally ali
+ * LOAD_FAULT_EXCEPTION    | 5     | Load bus fault
+ * STORE_ALIGN_EXCEPTION   | 6     | Store or AMO address not natur
+ * STORE_FAULT_EXCEPTION   | 7     | Store or AMO bus fault
+ * ECALL_UMODE_EXCEPTION   | 8     | ecall was executed in U-mode
+ * ECALL_SMODE_EXCEPTION   | 9     | ecall was executed in S-mode
+ * ECALL_MMODE_EXCEPTION   | 11    | ecall was executed in M-mode
+ * \endif
  *
  * \ingroup hardware_exception
  */
+#ifdef __riscv
 enum exception_number {
-    NMI_EXCEPTION        = -14,     /* Non Maskable Interrupt */
-    HARDFAULT_EXCEPTION  = -13,     /* HardFault Interrupt */
-    SVCALL_EXCEPTION     =  -5,     /* SV Call Interrupt */
-    PENDSV_EXCEPTION     =  -2,     /* Pend SV Interrupt */
-    SYSTICK_EXCEPTION    =  -1,     /* System Tick Interrupt */
+    // Assigned to non-IRQ xcause values
+    MIN_EXCEPTION_NUM       = 0,
+    INSTR_ALIGN_EXCEPTION   = 0,  ///< Instruction fetch misaligned (never fires if C/Zca is present)
+    INSTR_FAULT_EXCEPTION   = 1,  ///< Instruction fetch bus fault
+    INSTR_ILLEGAL_EXCEPTION = 2,  ///< Invalid or illegal instruction
+    EBREAK_EXCEPTION        = 3,  ///< ebreak was not caught by an external debugger
+    LOAD_ALIGN_EXCEPTION    = 4,  ///< Load address not naturally aligned
+    LOAD_FAULT_EXCEPTION    = 5,  ///< Load bus fault
+    STORE_ALIGN_EXCEPTION   = 6,  ///< Store or AMO address not naturally aligned
+    STORE_FAULT_EXCEPTION   = 7,  ///< Store or AMO bus fault
+    ECALL_UMODE_EXCEPTION   = 8,  ///< ecall was executed in U-mode
+    ECALL_SMODE_EXCEPTION   = 9,  ///< ecall was executed in S-mode
+    ECALL_MMODE_EXCEPTION   = 11, ///< ecall was executed in M-mode
+    MAX_EXCEPTION_NUM       = 11
 };
+#else
+enum exception_number {
+    // Assigned to VTOR indices
+    MIN_EXCEPTION_NUM = 2,
+    NMI_EXCEPTION = 2,         ///< Non Maskable Interrupt
+    HARDFAULT_EXCEPTION = 3,   ///< HardFault Interrupt
+#if PICO_RP2350
+    MEMMANAGE_EXCEPTION = 4,   ///< MemManage Interrupt
+    BUSFAULT_EXCEPTION = 5,    ///< BusFault Interrupt
+    USAGEFAULT_EXCEPTION = 6,  ///< UsageFault Interrupt
+    SECUREFAULT_EXCEPTION = 7, ///< SecureFault Interrupt
+#endif
+    SVCALL_EXCEPTION = 11,     ///< SV Call Interrupt
+    PENDSV_EXCEPTION = 14,     ///< Pend SV Interrupt
+    SYSTICK_EXCEPTION = 15,    ///< System Tick Interrupt
+    MAX_EXCEPTION_NUM = 15
+};
+#endif
+
+#define PICO_LOWEST_EXCEPTION_PRIORITY 0xff
+#define PICO_HIGHEST_EXCEPTION_PRIORITY 0x00
+
 
 /*! \brief Exception handler function type
  *  \ingroup hardware_exception
@@ -99,6 +156,49 @@ void exception_restore_handler(enum exception_number num, exception_handler_t or
  * \return the address stored in the VTABLE for the given exception number
  */
 exception_handler_t exception_get_vtable_handler(enum exception_number num);
+
+#ifndef __riscv
+/*! \brief Set specified exception's priority
+ *  \ingroup hardware_exception
+ *
+ * \param num Exception number \ref exception_number
+ * \param hardware_priority Priority to set.
+ *
+ * Numerically-lower values indicate a higher priority. Hardware priorities
+ * range from 0 (highest priority) to 255 (lowest priority).
+ *
+ * \if rp2040_specific
+ * Only the top 2 bits are significant on ARM Cortex-M0+ on RP2040.
+ * \endif
+ *
+ * \if rp2350_specific
+ * Only the top 4 bits are significant on ARM Cortex-M33 on RP2350, and exception priorities
+ * are not supported on RISC-V
+ * \endif
+ */
+bool exception_set_priority(uint num, uint8_t hardware_priority);
+
+/*! \brief Get specified exception's priority
+ *  \ingroup hardware_exception
+ *
+ * Numerically-lower values indicate a higher priority. Hardware priorities
+ * range from 0 (highest priority) to 255 (lowest priority).
+ *
+ * \if rp2040_specific
+ * Only the top 2 bits are significant on ARM Cortex-M0+ on RP2040.
+ * \endif
+ *
+ * \if rp2350_specific
+ * Only the top 4 bits are significant on ARM Cortex-M33 on RP2350, and exception priorities
+ * are not supported on RISC-V
+ * \endif
+ *
+ * \param num Exception number \ref exception_number
+ * \return the exception priority
+ */
+uint exception_get_priority(uint num);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

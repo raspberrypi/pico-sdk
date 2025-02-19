@@ -1,0 +1,16 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_int64_ops",
+    srcs = ["pico_int64_ops_aeabi.S"],
+    hdrs = ["include/pico/int64_ops.h"],
+    includes = ["include"],
+    linkopts = ["-Wl,--wrap=__aeabi_lmul"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common:pico_platform",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

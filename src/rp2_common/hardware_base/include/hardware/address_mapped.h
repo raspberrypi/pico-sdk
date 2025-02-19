@@ -13,7 +13,7 @@
 /** \file address_mapped.h
  *  \defgroup hardware_base hardware_base
  *
- *  Low-level types and (atomic) accessors for memory-mapped hardware registers
+ *  \brief Low-level types and (atomic) accessors for memory-mapped hardware registers
  *
  *  `hardware_base` defines the low level types and access functions for memory mapped hardware registers. It is included
  *  by default by all other hardware libraries.
@@ -34,7 +34,7 @@
  *  When dealing with these types, you will always use a pointer, i.e. `io_rw_32 *some_reg` is a pointer to a read/write
  *  32 bit register that you can write with `*some_reg = value`, or read with `value = *some_reg`.
  *
- *  RP2040 hardware is also aliased to provide atomic setting, clear or flipping of a subset of the bits within
+ *  RP-series hardware is also aliased to provide atomic setting, clear or flipping of a subset of the bits within
  *  a hardware register so that concurrent access by two cores is always consistent with one atomic operation
  *  being performed first, followed by the second.
  *
@@ -60,6 +60,9 @@ extern "C" {
 #define PARAM_ASSERTIONS_ENABLED_ADDRESS_ALIAS 0
 #endif
 
+typedef volatile uint64_t io_rw_64;
+typedef const volatile uint64_t io_ro_64;
+typedef volatile uint64_t io_wo_64;
 typedef volatile uint32_t io_rw_32;
 typedef const volatile uint32_t io_ro_32;
 typedef volatile uint32_t io_wo_32;
@@ -89,20 +92,31 @@ typedef ioptr const const_ioptr;
 //    return rc;
 //}
 
+#if PICO_RP2040
 // Helper method used by xip_alias macros to optionally check input validity
 __force_inline static uint32_t xip_alias_check_addr(const void *addr) {
     uint32_t rc = (uintptr_t)addr;
     valid_params_if(ADDRESS_ALIAS, rc >= XIP_MAIN_BASE && rc < XIP_NOALLOC_BASE);
     return rc;
 }
+#else
+//static __force_inline uint32_t xip_alias_check_addr(const void *addr) {
+//    uint32_t rc = (uintptr_t)addr;
+//    valid_params_if(ADDRESS_ALIAS, rc >= XIP_BASE && rc < XIP_END);
+//    return rc;
+//}
+#endif
 
 // Untyped conversion alias pointer generation macros
-#define hw_set_alias_untyped(addr) ((void *)(REG_ALIAS_SET_BITS | hw_alias_check_addr(addr)))
-#define hw_clear_alias_untyped(addr) ((void *)(REG_ALIAS_CLR_BITS | hw_alias_check_addr(addr)))
-#define hw_xor_alias_untyped(addr) ((void *)(REG_ALIAS_XOR_BITS | hw_alias_check_addr(addr)))
+#define hw_set_alias_untyped(addr) ((void *)(REG_ALIAS_SET_BITS + hw_alias_check_addr(addr)))
+#define hw_clear_alias_untyped(addr) ((void *)(REG_ALIAS_CLR_BITS + hw_alias_check_addr(addr)))
+#define hw_xor_alias_untyped(addr) ((void *)(REG_ALIAS_XOR_BITS + hw_alias_check_addr(addr)))
+
+#if PICO_RP2040
 #define xip_noalloc_alias_untyped(addr) ((void *)(XIP_NOALLOC_BASE | xip_alias_check_addr(addr)))
 #define xip_nocache_alias_untyped(addr) ((void *)(XIP_NOCACHE_BASE | xip_alias_check_addr(addr)))
 #define xip_nocache_noalloc_alias_untyped(addr) ((void *)(XIP_NOCACHE_NOALLOC_BASE | xip_alias_check_addr(addr)))
+#endif
 
 // Typed conversion alias pointer generation macros
 #define hw_set_alias(p) ((typeof(p))hw_set_alias_untyped(p))
@@ -157,6 +171,11 @@ __force_inline static void hw_xor_bits(io_rw_32 *addr, uint32_t mask) {
 __force_inline static void hw_write_masked(io_rw_32 *addr, uint32_t values, uint32_t write_mask) {
     hw_xor_bits(addr, (*addr ^ values) & write_mask);
 }
+
+#if !PICO_RP2040
+// include this here to avoid the check in every other hardware/structs header that needs it
+#include "hardware/structs/accessctrl.h"
+#endif
 
 #ifdef __cplusplus
 }

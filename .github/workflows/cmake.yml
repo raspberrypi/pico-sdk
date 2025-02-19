@@ -1,5 +1,9 @@
 name: CMake
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - 'iar/**'
+  pull_request:
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -7,7 +11,8 @@ env:
 
 jobs:
   build:
-    if: github.repository_owner == 'raspberrypi'
+    # cannot specify filter for pull_request in on: above, so do it here
+    if: github.repository_owner == 'raspberrypi' && (github.event_name != 'pull_request' || !startsWith(github.head_ref, 'iar/'))
     runs-on: [self-hosted, Linux, X64]
 
     steps:
@@ -18,7 +23,7 @@ jobs:
         mkdir -p "${{ github.workspace }}"
 
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Checkout submodules
       run: git submodule update --init
@@ -33,17 +38,13 @@ jobs:
       # access regardless of the host operating system
       shell: bash
       working-directory: ${{github.workspace}}/build
-      # Note the current convention is to use the -S and -B options here to specify source 
-      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # Note the current convention is to use the -S and -B options here to specify source
+      # and build directories, but this is only available with CMake 3.13 and higher.
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPICO_SDK_TESTS_ENABLED=1
-
-    - name: Get core count
-      id: core_count
-      run : cat /proc/cpuinfo  | grep processor | wc -l
 
     - name: Build
       working-directory: ${{github.workspace}}/build
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config $BUILD_TYPE --parallel ${{steps.core_count.outputs.output}}
+      run: cmake --build . --config $BUILD_TYPE --parallel $(nproc)

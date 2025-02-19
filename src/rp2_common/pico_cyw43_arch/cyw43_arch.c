@@ -28,9 +28,20 @@ void cyw43_arch_set_async_context(async_context_t *context) {
     async_context = context;
 }
 
-void cyw43_arch_enable_sta_mode() {
+void cyw43_arch_enable_sta_mode(void) {
     assert(cyw43_is_initialized(&cyw43_state));
     cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_STA, true, cyw43_arch_get_country_code());
+}
+
+void cyw43_arch_disable_sta_mode(void) {
+    assert(cyw43_is_initialized(&cyw43_state));
+    if (cyw43_state.itf_state & (1 << CYW43_ITF_STA)) {
+        cyw43_cb_tcpip_deinit(&cyw43_state, CYW43_ITF_STA);
+        cyw43_state.itf_state &= ~(1 << CYW43_ITF_STA);
+    }
+    if (cyw43_state.wifi_join_state) {
+        cyw43_wifi_leave(&cyw43_state, CYW43_ITF_STA);
+    }
 }
 
 void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t auth) {
@@ -45,9 +56,15 @@ void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t 
     cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_AP, true, cyw43_arch_get_country_code());
 }
 
+void cyw43_arch_disable_ap_mode(void) {
+    assert(cyw43_is_initialized(&cyw43_state));
+    cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_AP, false, cyw43_arch_get_country_code());
+    cyw43_state.itf_state &= ~(1 << CYW43_ITF_AP);
+}
+
 #if PICO_CYW43_ARCH_DEBUG_ENABLED
 // Return a string for the wireless state
-const char* cyw43_tcpip_link_status_name(int status)
+static const char* cyw43_tcpip_link_status_name(int status)
 {
     switch (status) {
     case CYW43_LINK_DOWN:
@@ -146,12 +163,12 @@ int cyw43_arch_init_with_country(uint32_t country) {
 }
 
 void cyw43_arch_gpio_put(uint wl_gpio, bool value) {
-    invalid_params_if(CYW43_ARCH, wl_gpio >= CYW43_WL_GPIO_COUNT);
+    invalid_params_if(PICO_CYW43_ARCH, wl_gpio >= CYW43_WL_GPIO_COUNT);
     cyw43_gpio_set(&cyw43_state, (int)wl_gpio, value);
 }
 
 bool cyw43_arch_gpio_get(uint wl_gpio) {
-    invalid_params_if(CYW43_ARCH, wl_gpio >= CYW43_WL_GPIO_COUNT);
+    invalid_params_if(PICO_CYW43_ARCH, wl_gpio >= CYW43_WL_GPIO_COUNT);
     bool value = false;
     cyw43_gpio_get(&cyw43_state, (int)wl_gpio, &value);
     return value;

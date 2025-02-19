@@ -1,5 +1,13 @@
 .idea
 .vscode
 cmake-*
+.cache
 .DS_Store
 build
+build-*
+
+bazel-*
+
+# Ignore until https://github.com/bazelbuild/bazel/issues/20369 is fixed.
+MODULE.bazel.lock
+__pycache__/

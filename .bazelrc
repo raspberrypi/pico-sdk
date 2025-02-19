@@ -1,0 +1,6 @@
+# Silence all C/C++ warnings in external code.
+common --per_file_copt=external/.*@-w
+common --host_per_file_copt=external/.*@-w
+
+# Produce useful output when the build fails.
+common --verbose_failures

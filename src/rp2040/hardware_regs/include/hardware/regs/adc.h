@@ -1,5 +1,7 @@
+// THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
+
 /**
- * Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2024 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,8 +11,8 @@
 // Bus type       : apb
 // Description    : Control and data interface to SAR ADC
 // =============================================================================
-#ifndef HARDWARE_REGS_ADC_DEFINED
-#define HARDWARE_REGS_ADC_DEFINED
+#ifndef _HARDWARE_REGS_ADC_H
+#define _HARDWARE_REGS_ADC_H
 // =============================================================================
 // Register    : ADC_CS
 // Description : ADC Control and Status
@@ -25,8 +27,8 @@
 //               round-robin fashion.
 //               The first channel to be sampled will be the one currently
 //               indicated by AINSEL.
-//               AINSEL will be updated after each conversion with the
-//               newly-selected channel.
+//               AINSEL will be updated after each conversion with the newly-
+//               selected channel.
 #define ADC_CS_RROBIN_RESET  _u(0x00)
 #define ADC_CS_RROBIN_BITS   _u(0x001f0000)
 #define ADC_CS_RROBIN_MSB    _u(20)
@@ -153,7 +155,6 @@
 #define ADC_FCS_UNDER_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : ADC_FCS_FULL
-// Description : None
 #define ADC_FCS_FULL_RESET  _u(0x0)
 #define ADC_FCS_FULL_BITS   _u(0x00000200)
 #define ADC_FCS_FULL_MSB    _u(9)
@@ -161,7 +162,6 @@
 #define ADC_FCS_FULL_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : ADC_FCS_EMPTY
-// Description : None
 #define ADC_FCS_EMPTY_RESET  _u(0x0)
 #define ADC_FCS_EMPTY_BITS   _u(0x00000100)
 #define ADC_FCS_EMPTY_MSB    _u(8)
@@ -218,7 +218,6 @@
 #define ADC_FIFO_ERR_ACCESS "RF"
 // -----------------------------------------------------------------------------
 // Field       : ADC_FIFO_VAL
-// Description : None
 #define ADC_FIFO_VAL_RESET  "-"
 #define ADC_FIFO_VAL_BITS   _u(0x00000fff)
 #define ADC_FIFO_VAL_MSB    _u(11)
@@ -311,4 +310,5 @@
 #define ADC_INTS_FIFO_LSB    _u(0)
 #define ADC_INTS_FIFO_ACCESS "RO"
 // =============================================================================
-#endif // HARDWARE_REGS_ADC_DEFINED
+#endif // _HARDWARE_REGS_ADC_H
+

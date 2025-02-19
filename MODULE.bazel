@@ -1,0 +1,150 @@
+module(
+    name = "pico-sdk",
+    version = "2.1.2-develop",
+)
+
+bazel_dep(name = "platforms", version = "0.0.9")
+bazel_dep(name = "bazel_skylib", version = "1.6.1")
+bazel_dep(name = "rules_python", version = "0.36.0")
+bazel_dep(name = "picotool", version = "2.1.1")
+bazel_dep(name = "rules_cc", version = "0.0.10")
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "arm_gcc_linux-aarch64",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "8fd8b4a0a8d44ab2e195ccfbeef42223dfb3ede29d80f14dcf2183c34b8d199a",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-aarch64-arm-none-eabi",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-aarch64-arm-none-eabi.tar.xz",
+)
+
+http_archive(
+    name = "arm_gcc_linux-x86_64",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "6cd1bbc1d9ae57312bcd169ae283153a9572bd6a8e4eeae2fedfbc33b115fdbb",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
+)
+
+http_archive(
+    name = "arm_gcc_win-x86_64",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "51d933f00578aa28016c5e3c84f94403274ea7915539f8e56c13e2196437d18f",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip",
+)
+
+http_archive(
+    name = "arm_gcc_mac-x86_64",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "075faa4f3e8eb45e59144858202351a28706f54a6ec17eedd88c9fb9412372cc",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-x86_64-arm-none-eabi",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-x86_64-arm-none-eabi.tar.xz",
+)
+
+http_archive(
+    name = "arm_gcc_mac-aarch64",
+    build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
+    sha256 = "39c44f8af42695b7b871df42e346c09fee670ea8dfc11f17083e296ea2b0d279",
+    strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-arm64-arm-none-eabi",
+    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-arm64-arm-none-eabi.tar.xz",
+)
+
+http_archive(
+    name = "clang_linux-x86_64",
+    build_file = "//bazel/toolchain:clang.BUILD",
+    sha256 = "82302f8f0d9cb1062e60756147403c1525e965e1d7b777fab8076c74c7a5a19b",
+    type = "zip",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/linux-amd64/+/git_revision:910be4ff90d7d07bd4518ea03b85c0974672bf9c",
+)
+
+http_archive(
+    name = "clang_win-x86_64",
+    build_file = "//bazel/toolchain:clang.BUILD",
+    sha256 = "2e9b8ac889838754e5305b6fd73c7bba7a6ec7364f1ce8ac60268b6d3bc61e6c",
+    type = "zip",
+    # Windows doesn't like `:` in the produced filename, so replace it with `%3A`.
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/windows-amd64/+/git_revision:910be4ff90d7d07bd4518ea03b85c0974672bf9c".replace("git_revision:", "git_revision%3A"),
+)
+
+http_archive(
+    name = "clang_mac-x86_64",
+    build_file = "//bazel/toolchain:clang.BUILD",
+    sha256 = "d3f2ef6f391ef66141092cfdf07facd18d2587a25616e1251e6e6b13b05ab3df",
+    type = "zip",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-amd64/+/git_revision:910be4ff90d7d07bd4518ea03b85c0974672bf9c",
+)
+
+http_archive(
+    name = "clang_mac-aarch64",
+    build_file = "//bazel/toolchain:clang.BUILD",
+    sha256 = "61109b8464e9213ef8b9bfe55ce56298b94d4c66eaea308cf2b6556b0b85429e",
+    type = "zip",
+    url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:910be4ff90d7d07bd4518ea03b85c0974672bf9c",
+)
+
+new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+
+# TODO: Provide tinyusb as a proper Bazel module.
+new_git_repository(
+    name = "tinyusb",
+    build_file = "//src/rp2_common/tinyusb:tinyusb.BUILD",
+    commit = "86ad6e56c1700e85f1c5678607a762cfe3aa2f47",  # keep-in-sync-with-submodule: lib/tinyusb
+    remote = "https://github.com/hathach/tinyusb.git",
+)
+
+# TODO: Provide btstack as a proper Bazel module.
+new_git_repository(
+    name = "btstack",
+    build_file = "//src/rp2_common/pico_btstack:btstack.BUILD",
+    commit = "501e6d2b86e6c92bfb9c390bcf55709938e25ac1",  # keep-in-sync-with-submodule: lib/btstack
+    remote = "https://github.com/bluekitchen/btstack.git",
+)
+
+# TODO: Provide cyw43-driver as a proper Bazel module.
+new_git_repository(
+    name = "cyw43-driver",
+    build_file = "//src/rp2_common/pico_cyw43_driver:cyw43-driver.BUILD",
+    commit = "c1075d4bc440422cf2b2fd12c64a1f53f77660ee",  # keep-in-sync-with-submodule: lib/cyw43-driver
+    remote = "https://github.com/georgerobotics/cyw43-driver.git",
+)
+
+# TODO: Provide lwip as a proper Bazel module.
+new_git_repository(
+    name = "lwip",
+    build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
+    commit = "0a0452b2c39bdd91e252aef045c115f88f6ca773",  # keep-in-sync-with-submodule: lib/lwip
+    remote = "https://github.com/lwip-tcpip/lwip.git",
+)
+
+register_toolchains(
+    "//bazel/toolchain:linux-aarch64-rp2040",
+    "//bazel/toolchain:linux-aarch64-rp2350",
+    "//bazel/toolchain:linux-x86_64-rp2040",
+    "//bazel/toolchain:linux-x86_64-rp2350",
+    "//bazel/toolchain:win-x86_64-rp2040",
+    "//bazel/toolchain:win-x86_64-rp2350",
+    "//bazel/toolchain:mac-x86_64-rp2040",
+    "//bazel/toolchain:mac-x86_64-rp2350",
+    "//bazel/toolchain:mac-aarch64-rp2040",
+    "//bazel/toolchain:mac-aarch64-rp2350",
+    # Require users to opt-in to the Pico SDK's toolchains.
+    dev_dependency = True,
+)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    configure_coverage_tool = True,
+    python_version = "3.9",
+)
+
+use_repo(python, "pythons_hub")
+register_toolchains(
+    "@pythons_hub//:all",
+    dev_dependency = True,
+)
+register_toolchains(
+    "@rules_python//python/runtime_env_toolchains:all",
+    dev_dependency = True,
+)

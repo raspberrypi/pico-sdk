@@ -17,7 +17,7 @@
 
 /** \file queue.h
  * \defgroup queue queue
- * Multi-core and IRQ safe queue implementation.
+ * \brief Multi-core and IRQ safe queue implementation
  *
  * Note that this queue stores values of a specified size, and pushed values are copied into the queue
  * \ingroup pico_util
@@ -59,7 +59,7 @@ void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count,
  * \param element_count Maximum number of entries in the queue
  */
 static inline void queue_init(queue_t *q, uint element_size, uint element_count) {
-    return queue_init_with_spinlock(q, element_size, element_count, next_striped_spin_lock_num());
+    queue_init_with_spinlock(q, element_size, element_count, next_striped_spin_lock_num());
 }
 
 /*! \brief Destroy the specified queue.
@@ -169,7 +169,7 @@ bool queue_try_add(queue_t *q, const void *data);
  *  \ingroup queue
  *
  * \param q Pointer to a queue_t structure, used as a handle
- * \param data Pointer to the location to receive the removed value
+ * \param data Pointer to the location to receive the removed value, or NULL if the data isn't required
  * \return true if a value was removed
  *
  * If the queue is not empty function will copy the removed value into the location provided and return
@@ -181,7 +181,7 @@ bool queue_try_remove(queue_t *q, void *data);
  *  \ingroup queue
  *
  * \param q Pointer to a queue_t structure, used as a handle
- * \param data Pointer to the location to receive the peeked value
+ * \param data Pointer to the location to receive the peeked value, or NULL if the data isn't required
  * \return true if there was a value to peek
  *
  * If the queue is not empty this function will return immediately with true with the peeked entry
@@ -205,7 +205,7 @@ void queue_add_blocking(queue_t *q, const void *data);
  *  \ingroup queue
  *
  * \param q Pointer to a queue_t structure, used as a handle
- * \param data Pointer to the location to receive the removed value
+ * \param data Pointer to the location to receive the removed value, or NULL if the data isn't required
  *
  * If the queue is empty this function will block until a value is added.
  */
@@ -215,7 +215,7 @@ void queue_remove_blocking(queue_t *q, void *data);
  *  \ingroup queue
  *
  * \param q Pointer to a queue_t structure, used as a handle
- * \param data Pointer to the location to receive the peeked value
+ * \param data Pointer to the location to receive the peeked value, or NULL if the data isn't required
  *
  * If the queue is empty function will block until a value is added
  */

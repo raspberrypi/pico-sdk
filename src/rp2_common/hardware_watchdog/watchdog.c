@@ -9,11 +9,12 @@
 #include "hardware/watchdog.h"
 #include "hardware/structs/watchdog.h"
 #include "hardware/structs/psm.h"
+#include "hardware/ticks.h"
+#include "pico/bootrom.h"
 
 /// \tag::watchdog_start_tick[]
 void watchdog_start_tick(uint cycles) {
-    // Important: This function also provides a tick reference to the timer
-    watchdog_hw->tick = cycles | WATCHDOG_TICK_ENABLE_BITS;
+    tick_start(TICK_WATCHDOG, cycles);
 }
 /// \end::watchdog_start_tick[]
 
@@ -27,13 +28,20 @@ void watchdog_update(void) {
 }
 // end::watchdog_update[]
 
-uint32_t watchdog_get_count(void) {
-    return (watchdog_hw->ctrl & WATCHDOG_CTRL_TIME_BITS) / 2 ;
+uint32_t watchdog_get_time_remaining_ms(void) {
+    return watchdog_hw->ctrl & WATCHDOG_CTRL_TIME_BITS;
 }
 
+#if PICO_RP2040
+// Note, we have x2 here as the watchdog HW currently decrements twice per tick
+#define WATCHDOG_XFACTOR 2
+#else
+#define WATCHDOG_XFACTOR 1
+#endif
 // tag::watchdog_enable[]
 // Helper function used by both watchdog_enable and watchdog_reboot
 void _watchdog_enable(uint32_t delay_ms, bool pause_on_debug) {
+    valid_params_if(HARDWARE_WATCHDOG, delay_ms <= WATCHDOG_LOAD_BITS / (1000 * WATCHDOG_XFACTOR));
     hw_clear_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_ENABLE_BITS);
 
     // Reset everything apart from ROSC and XOSC
@@ -52,11 +60,12 @@ void _watchdog_enable(uint32_t delay_ms, bool pause_on_debug) {
     if (!delay_ms) {
         hw_set_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_TRIGGER_BITS);
     } else {
-        // Note, we have x2 here as the watchdog HW currently decrements twice per tick
-        load_value = delay_ms * 1000 * 2;
-
-        if (load_value > 0xffffffu)
-            load_value = 0xffffffu;
+        load_value = delay_ms * 1000;
+#if PICO_RP2040
+        load_value *= 2;
+#endif
+        if (load_value > WATCHDOG_LOAD_BITS)
+            load_value = WATCHDOG_LOAD_BITS;
 
         watchdog_update();
 
@@ -74,6 +83,10 @@ void watchdog_enable(uint32_t delay_ms, bool pause_on_debug) {
     _watchdog_enable(delay_ms, pause_on_debug);
 }
 
+void watchdog_disable(void) {
+    hw_clear_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_ENABLE_BITS);
+}
+
 void watchdog_reboot(uint32_t pc, uint32_t sp, uint32_t delay_ms) {
     check_hw_layout(watchdog_hw_t, scratch[7], WATCHDOG_SCRATCH7_OFFSET);
 
@@ -81,7 +94,9 @@ void watchdog_reboot(uint32_t pc, uint32_t sp, uint32_t delay_ms) {
     hw_clear_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_ENABLE_BITS);
 
     if (pc) {
+#ifndef __riscv
         pc |= 1u; // thumb mode
+#endif
         watchdog_hw->scratch[4] = 0xb007c0d3;
         watchdog_hw->scratch[5] = pc ^ -0xb007c0d3;
         watchdog_hw->scratch[6] = sp;
@@ -98,7 +113,11 @@ void watchdog_reboot(uint32_t pc, uint32_t sp, uint32_t delay_ms) {
 
 bool watchdog_caused_reboot(void) {
     // If any reason bits are set this is true
+#if PICO_RP2040
     return watchdog_hw->reason;
+#else
+    return watchdog_hw->reason && rom_get_last_boot_type() == BOOT_TYPE_NORMAL;
+#endif
 }
 
 bool watchdog_enable_caused_reboot(void) {

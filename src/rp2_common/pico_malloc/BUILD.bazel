@@ -1,0 +1,23 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_malloc",
+    srcs = ["malloc.c"],
+    hdrs = ["include/pico/malloc.h"],
+    includes = ["include"],
+    linkopts = [
+        "-Wl,--wrap=malloc",
+        "-Wl,--wrap=calloc",
+        "-Wl,--wrap=realloc",
+        "-Wl,--wrap=free",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_sync",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_multicore",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

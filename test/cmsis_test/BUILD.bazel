@@ -1,0 +1,15 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "cmsis_test",
+    testonly = True,
+    srcs = ["cmsis_test.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//bazel/config:PICO_CMSIS_PATH",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)

@@ -13,11 +13,11 @@
 /** \file hardware/watchdog.h
  *  \defgroup hardware_watchdog hardware_watchdog
  *
- * Hardware Watchdog Timer API
+ * \brief Hardware Watchdog Timer API
  *
  * Supporting functions for the Pico hardware watchdog timer.
  *
- * The RP2040 has a built in HW watchdog Timer. This is a countdown timer that can restart parts of the chip if it reaches zero.
+ * The RP-series microcontrollers have a built in HW watchdog Timer. This is a countdown timer that can restart parts of the chip if it reaches zero.
  * For example, this can be used to restart the processor if the software running on it gets stuck in an infinite loop
  * or similar. The programmer has to periodically write a value to the watchdog to stop it reaching zero.
  *
@@ -30,17 +30,26 @@
 extern "C" {
 #endif
 
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_WATCHDOG, Enable/disable assertions in the hardware_watchdog module, type=bool, default=0, group=hardware_watchdog
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_WATCHDOG
+#ifdef PARAM_ASSERTIONS_ENABLED_WATCHDOG // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_WATCHDOG PARAM_ASSERTIONS_ENABLED_WATCHDOG
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_WATCHDOG 0
+#endif
+#endif
+
 /*! \brief Define actions to perform at watchdog timeout
  *  \ingroup hardware_watchdog
  *
  * \note If \ref watchdog_start_tick value does not give a 1MHz clock to the watchdog system, then the \p delay_ms
- * parameter will not be in microseconds. See the datasheet for more details.
+ * parameter will not be in milliseconds. See the datasheet for more details.
  *
  * By default the SDK assumes a 12MHz XOSC and sets the \ref watchdog_start_tick appropriately.
  *
  * \param pc If Zero, a standard boot will be performed, if non-zero this is the program counter to jump to on reset.
  * \param sp If \p pc is non-zero, this will be the stack pointer used.
- * \param delay_ms Initial load value. Maximum value 0x7fffff, approximately 8.3s.
+ * \param delay_ms Initial load value. Maximum value 8388, approximately 8.3s.
  */
 void watchdog_reboot(uint32_t pc, uint32_t sp, uint32_t delay_ms);
 
@@ -63,7 +72,7 @@ void watchdog_update(void);
  * \ingroup hardware_watchdog
  *
  * \note If \ref watchdog_start_tick value does not give a 1MHz clock to the watchdog system, then the \p delay_ms
- * parameter will not be in microseconds. See the datasheet for more details.
+ * parameter will not be in milliseconds. See the datasheet for more details.
  *
  * By default the SDK assumes a 12MHz XOSC and sets the \ref watchdog_start_tick appropriately.
  *
@@ -72,10 +81,16 @@ void watchdog_update(void);
  * onto the RPI-RP2), then this value will be cleared, and so \ref watchdog_enable_caused_reboot will
  * return false.
  *
- * \param delay_ms Number of milliseconds before watchdog will reboot without watchdog_update being called. Maximum of 0x7fffff, which is approximately 8.3 seconds
+ * \param delay_ms Number of milliseconds before watchdog will reboot without watchdog_update being called. Maximum of 8388, which is approximately 8.3 seconds
  * \param pause_on_debug If the watchdog should be paused when the debugger is stepping through code
  */
 void watchdog_enable(uint32_t delay_ms, bool pause_on_debug);
+
+/**
+ * \brief Disable the watchdog
+ * \ingroup hardware_watchdog
+ */
+void watchdog_disable(void);
 
 /**
  * \brief Did the watchdog cause the last reboot?
@@ -94,7 +109,7 @@ bool watchdog_caused_reboot(void);
  * \ref watchdog_enable caused the last reboot.
  *
  * This method checks for a special value in watchdog scratch register 4 placed there by \ref watchdog_enable.
- * This would not be present if a watchdog reset is initiated by \ref watchdog_reboot or by the RP2040 bootrom
+ * This would not be present if a watchdog reset is initiated by \ref watchdog_reboot or by the RP-series microcontroller bootrom
  * (e.g. dragging a UF2 onto the RPI-RP2 drive).
  *
  * @return true If the watchdog timer or a watchdog force caused (see \ref watchdog_caused_reboot) the last reboot
@@ -106,13 +121,21 @@ bool watchdog_caused_reboot(void);
 bool watchdog_enable_caused_reboot(void);
 
 /**
- * @brief Returns the number of microseconds before the watchdog will reboot the chip.
+ * \brief Returns the number of microseconds before the watchdog will reboot the chip.
  * \ingroup hardware_watchdog
  *
+ * \if rp2040_specicifc
+ * On RP2040 this method returns the last value set instead of the remaining time due to a h/w bug.
+ * \endif
+ * 
  * @return The number of microseconds before the watchdog will reboot the chip.
  */
-uint32_t watchdog_get_count(void);
+uint32_t watchdog_get_time_remaining_ms(void);
 
+// backwards compatibility with SDK < 2.0.0
+static inline uint32_t watchdog_get_count(void) {
+    return watchdog_get_time_remaining_ms();
+}
 #ifdef __cplusplus
 }
 #endif

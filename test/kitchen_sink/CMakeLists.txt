@@ -1,34 +1,39 @@
 add_library(kitchen_sink_libs INTERFACE)
-target_link_libraries(kitchen_sink_libs INTERFACE
+
+set(KITCHEN_SINK_LIBS
     hardware_adc
     hardware_clocks
     hardware_divider
-    hardware_exception
     hardware_dma
+    hardware_exception
     hardware_flash
     hardware_gpio
     hardware_i2c
     hardware_interp
     hardware_irq
     hardware_pio
+    hardware_powman
     hardware_pll
     hardware_pwm
     hardware_resets
     hardware_rtc
-    hardware_uart
     hardware_spi
     hardware_sync
+    hardware_ticks
     hardware_timer
     hardware_uart
     hardware_vreg
     hardware_watchdog
+    hardware_xip_cache
     hardware_xosc
+    pico_aon_timer
     pico_bit_ops
     pico_bootrom
     pico_bootsel_via_double_reset
     pico_divider
     pico_double
     pico_fix_rp2040_usb_device_enumeration
+    pico_flash
     pico_float
     pico_i2c_slave
     pico_int64_ops
@@ -37,12 +42,19 @@ target_link_libraries(kitchen_sink_libs INTERFACE
     pico_multicore
     pico_platform
     pico_rand
+    pico_sha256
     pico_stdlib
     pico_sync
     pico_time
     pico_unique_id
     pico_util
 )
+
+foreach(LIB IN LISTS KITCHEN_SINK_LIBS)
+    if (TARGET ${LIB})
+        target_link_libraries(kitchen_sink_libs INTERFACE ${LIB})
+    endif()
+endforeach ()
 
 add_library(kitchen_sink_options INTERFACE)
 
@@ -56,31 +68,33 @@ target_compile_options(kitchen_sink_options INTERFACE
         -Wuninitialized
         -Wunused
         -Wcast-align
-        -Wall
         -Wcast-qual
         -Wfloat-equal
         -Wmissing-format-attribute
         #-Wconversion
         -Wsign-compare
         $<$<COMPILE_LANGUAGE:C>:-Wstrict-prototypes>
+        # todo we have some of these in usb_device_tiny to try to make it more readable.. perhaps doxygen would help here instead
+        -Wredundant-decls
 
         -Wno-inline
         # todo not sure these are true, but investigate
         #-Wpacked
 
-        # todo we have some of these in usb_device_tiny to try to make it more readable.. perhaps doxygen would help here instead
-        -Wredundant-decls
-
-        -Wno-shadow
-        -Wno-missing-field-initializers
-        -Wno-missing-braces
-        -Wno-multichar
-
         # todo useful but fix later
         #-Wundef
         )
 
+if (PICO_C_COMPILER_IS_CLANG)
+    # todo fix up clang warnings
+    target_compile_options(kitchen_sink_options INTERFACE
+            -Wno-cast-qual
+            -Wno-unused-function
+            -Wno-format)
+endif()
+
 target_compile_definitions(kitchen_sink_libs INTERFACE
+        PICO_FORBID_ARM_HEADERS_ON_RISCV=1
         PARAM_ASSERTIONS_ENABLE_ALL=1 # want to check all the assertions for compilation warnings
         PICO_AUDIO_DMA_IRQ=1
 )
@@ -89,6 +103,7 @@ add_executable(kitchen_sink ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 target_link_libraries(kitchen_sink kitchen_sink_libs kitchen_sink_options)
 pico_set_program_name(kitchen_sink "Wombat tentacles")
 pico_add_extra_outputs(kitchen_sink)
+target_compile_definitions(kitchen_sink PRIVATE KITCHEN_SINK_ID="regular binary")
 
 add_executable(kitchen_sink_extra_stdio ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 if (COMMAND suppress_tinyusb_warnings)
@@ -97,6 +112,8 @@ if (COMMAND suppress_tinyusb_warnings)
     # TinyUSB itself, so we have to guard against TinyUSB not being present with the above if
     suppress_tinyusb_warnings()
 endif()
+target_compile_definitions(kitchen_sink_extra_stdio PRIVATE
+        TUD_OPT_RP2040_USB_DEVICE_ENUMERATION_FIX=1)
 if (TARGET pico_lwip)
     set_source_files_properties(
             ${PICO_LWIP_PATH}/src/core/ipv4/ip4_frag.c
@@ -109,15 +126,43 @@ pico_add_extra_outputs(kitchen_sink_extra_stdio)
 pico_enable_stdio_usb(kitchen_sink_extra_stdio 1)
 pico_enable_stdio_semihosting(kitchen_sink_extra_stdio 1)
 
+add_executable(kitchen_sink_printf_compiler ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+target_link_libraries(kitchen_sink_printf_compiler kitchen_sink_libs kitchen_sink_options)
+pico_add_extra_outputs(kitchen_sink_printf_compiler)
+pico_set_printf_implementation(kitchen_sink_printf_compiler compiler)
+
+add_executable(kitchen_sink_printf_compiler_no_shortcircuit ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+target_link_libraries(kitchen_sink_printf_compiler_no_shortcircuit kitchen_sink_libs kitchen_sink_options)
+pico_add_extra_outputs(kitchen_sink_printf_compiler_no_shortcircuit)
+pico_set_printf_implementation(kitchen_sink_printf_compiler_no_shortcircuit compiler)
+target_compile_definitions(kitchen_sink_printf_compiler_no_shortcircuit PRIVATE PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS=0)
+
+
+add_executable(kitchen_sink_printf_none ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+target_link_libraries(kitchen_sink_printf_none kitchen_sink_libs kitchen_sink_options)
+pico_add_extra_outputs(kitchen_sink_printf_none)
+pico_set_printf_implementation(kitchen_sink_printf_none none)
+
 add_executable(kitchen_sink_copy_to_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 pico_set_binary_type(kitchen_sink_copy_to_ram copy_to_ram)
 target_link_libraries(kitchen_sink_copy_to_ram kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_copy_to_ram)
+target_compile_definitions(kitchen_sink_copy_to_ram PRIVATE KITCHEN_SINK_ID="copy-to-ram binary")
 
 add_executable(kitchen_sink_no_flash ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 pico_set_binary_type(kitchen_sink_no_flash no_flash)
 target_link_libraries(kitchen_sink_no_flash kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_no_flash)
+target_compile_definitions(kitchen_sink_no_flash PRIVATE KITCHEN_SINK_ID="no-flash binary")
+
+if (NOT PICO_RP2350)
+    # RP2350 does not have blocked ram
+    add_executable(kitchen_sink_blocked_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    pico_set_binary_type(kitchen_sink_blocked_ram blocked_ram)
+    target_link_libraries(kitchen_sink_blocked_ram kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_blocked_ram)
+    target_compile_definitions(kitchen_sink_blocked_ram PRIVATE KITCHEN_SINK_ID="blocked-ram binary")
+endif()
 
 add_executable(kitchen_sink_cpp ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_cpp.cpp)
 target_link_libraries(kitchen_sink_cpp kitchen_sink_libs kitchen_sink_options)
@@ -131,7 +176,11 @@ if (TARGET pico_cyw43_arch)
     pico_add_extra_outputs(kitchen_sink_lwip_poll)
     target_link_libraries(kitchen_sink_lwip_poll
             pico_cyw43_arch_lwip_poll)
-    # for lwipopts.h
+    if (TARGET pico_btstack)
+        target_link_libraries(kitchen_sink_lwip_poll
+            pico_btstack_ble pico_btstack_classic pico_btstack_cyw43)
+    endif()
+    # for lwipopts.h and btstack_config.h.
     target_include_directories(kitchen_sink_lwip_poll PRIVATE
             ${CMAKE_CURRENT_LIST_DIR})
 
@@ -153,4 +202,8 @@ if (TARGET pico_cyw43_arch)
         target_link_libraries(kitchen_sink_lwip_background pico_mbedtls)
         suppress_mbedtls_warnings()
     endif()
+endif()
+
+if (TARGET pico_btstack_base AND COMMAND suppress_btstack_warnings)
+    suppress_btstack_warnings()
 endif()

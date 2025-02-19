@@ -1,0 +1,71 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "default_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2_common/pico_crt0/rp2040:default_linker_script",
+        "//bazel/constraint:rp2350": "//src/rp2_common/pico_crt0/rp2350:default_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "blocked_ram_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2_common/pico_crt0/rp2040:blocked_ram_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "copy_to_ram_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2_common/pico_crt0/rp2040:copy_to_ram_linker_script",
+        "//bazel/constraint:rp2350": "//src/rp2_common/pico_crt0/rp2350:copy_to_ram_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "no_flash_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2_common/pico_crt0/rp2040:no_flash_linker_script",
+        "//bazel/constraint:rp2350": "//src/rp2_common/pico_crt0/rp2350:no_flash_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+cc_library(
+    name = "no_warn_rwx_flag",
+    linkopts = select({
+        "//bazel/constraint:pico_toolchain_gcc_enabled": ["-Wl,--no-warn-rwx-segments"],
+        "//conditions:default": [],
+    }),
+    visibility = [":__subpackages__"],
+)
+
+cc_library(
+    name = "pico_crt0",
+    srcs = ["crt0.S"],
+    hdrs = [
+        "embedded_end_block.inc.S",
+        "embedded_start_block.inc.S",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/boot_picobin_headers",
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:pico_platform_internal",
+        "//src/rp2_common/cmsis:cmsis_core",
+        "//src/rp2_common/pico_bootrom",
+    ],
+)
+
+# TODO: RISC-V support.
+filegroup(
+    name = "crt0_riscv",
+    srcs = ["crt0_riscv.S"],
+)

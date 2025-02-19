@@ -17,8 +17,12 @@
 #include <math.h>
 #include <pico/float.h>
 #include "pico/stdlib.h"
+// Include sys/types.h before inttypes.h to work around issue with
+// certain versions of GCC and newlib which causes omission of PRIx64
+#include <sys/types.h>
 #include "inttypes.h"
 
+#define test_assert(x) ({ if (!(x)) { printf("Assertion failed: ");puts(#x);printf("  at " __FILE__ ":%d\n", __LINE__); exit(-1); } })
 extern int __aeabi_fcmpun(float a, float b);
 
 #if __arm__
@@ -282,7 +286,7 @@ int test_fcmpun() {
     return 0;
 }
 
-#define assert_nan(a) assert(isnan(a))
+#define assert_nan(a) test_assert(isnanf(a))
 #define check_nan(a) ({ assert_nan(a); a; })
 
 float __aeabi_i2f(int32_t);
@@ -294,6 +298,7 @@ int64_t __aeabi_f2lz(float);
 float __aeabi_fmul(float, float);
 float __aeabi_fdiv(float, float);
 #if LIB_PICO_FLOAT_PICO
+#if !LIB_PICO_FLOAT_PICO_VFP
 float __real___aeabi_i2f(int);
 float __real___aeabi_ui2f(int);
 float __real___aeabi_l2f(int64_t);
@@ -303,6 +308,7 @@ float __real___aeabi_fdiv(float, float);
 int32_t __real___aeabi_f2iz(float);
 int64_t __real___aeabi_f2lz(float);
 float __real_sqrtf(float);
+#endif
 float __real_cosf(float);
 float __real_sinf(float);
 float __real_tanf(float);
@@ -313,12 +319,16 @@ float __real_powf(float, float);
 float __real_truncf(float);
 float __real_ldexpf(float, int);
 float __real_fmodf(float, float);
-#define EPSILON 1e-9
-#define assert_close(a, b) assert(((b - a) < EPSILON || (a - b) < EPSILON) || (isinf(a) && isinf(b) && (a < 0) == (b < 0)))
-#define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); assert(r == r2); r; })
-#define check2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); assert(r == r2); r; })
-#define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnan(p0)) assert_nan(r); else assert_close(r, r2); r; })
-#define check_close2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); if (isnan(p0) || isnan(p1)) assert_nan(r); else assert_close(r, r2); r; })
+#define FRAC ((float)(1u << 22))
+#define allowed_range(a) (fabsf(a) / FRAC)
+#ifdef LLVM_LIBC_MATH_H
+#define isinff isinf
+#endif
+#define assert_close(a, b) test_assert((fabsf(a - b) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && (a < 0) == (b < 0)))
+#define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
+#define check2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
+#define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnanf(p0)) assert_nan(r); else assert_close(r, r2); r; })
+#define check_close2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); if (isnanf(p0) || isnanf(p1)) assert_nan(r); else assert_close(r, r2); r; })
 #else
 #define check1(func,p0) func(p0)
 #define check2(func,p0,p1) func(p0,p1)
@@ -386,7 +396,9 @@ int main() {
 #if 1
     for (float x = 0; x < 3; x++) {
         printf("\n ----- %f\n", x);
+#if !LIB_PICO_FLOAT_PICO_VFP
         printf("FSQRT %10.18f\n", check_close1(sqrtf, x));
+#endif
         printf("FCOS %10.18f\n", check_close1(cosf, x));
         printf("FSIN %10.18f\n", check_close1(sinf, x));
         float s, c;
@@ -398,7 +410,10 @@ int main() {
         printf("FEXP %10.18f\n", check_close1(expf, x));
         printf("FLN %10.18f\n", check_close1(logf, x));
         printf("POWF %10.18f\n", check_close2(powf, x, x));
+        // todo clang why does this not compile?
+#ifndef __clang__
         printf("TRUNCF %10.18f\n", check_close1(truncf, x));
+#endif
         printf("LDEXPF %10.18f\n", check_close2(ldexpf, x, x));
         printf("FMODF %10.18f\n", check_close2(fmodf, x, 3.0f));
         sincosf(x, &s, &c);
@@ -464,6 +479,7 @@ int main() {
     }
 #endif
 
+#if !LIB_PICO_FLOAT_PICO_VFP
     {
         int32_t y;
 //        for (int32_t x = 0; x>-512; x--) {
@@ -506,21 +522,20 @@ int main() {
     }
     for(float x = -4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
         printf("f %f->%lld\n", x, (int64_t)x);
-        if (x < INT64_MIN) {
-            // seems like there is a bug in the gcc version!
-            assert(__aeabi_f2lz(x) == INT64_MIN);
-        } else {
-            check1(__aeabi_f2lz, x);
-        }
+        check1(__aeabi_f2lz, x);
     }
     for(float x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
         printf("f2i64 %f->%lld\n", x, (int64_t)x);
-        if (x >= INT64_MAX) {
-            // seems like there is a bug in the gcc version!
-            assert(__aeabi_f2lz(x) == INT64_MAX);
+#if PICO_RP2040
+        if ((double)x >= (double)INT64_MAX) {
+            // seems like there is a bug in the gcc version (which returns UINT64_MAX)
+            test_assert(__aeabi_f2lz(x) == INT64_MAX);
         } else {
             check1(__aeabi_f2lz, x);
         }
+#else
+        check1(__aeabi_f2lz, x);
+#endif
     }
     for(float x = -4294967296.f * 4294967296.f; x<=-0.5f; x/=2.f) {
         printf("d2i32 %f->%d\n", x, (int32_t)x);
@@ -528,7 +543,16 @@ int main() {
     }
     for(float x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
         printf("d2i32 %f->%d\n", x, (int32_t)x);
+#if PICO_RP2040
+        if ((double)x >= (double)INT32_MAX) {
+            // seems like there is a bug in the clang version (which returns INT32_MIN)
+            test_assert(__aeabi_f2iz(x) == INT32_MAX);
+        } else {
+            check1(__aeabi_f2iz, x);
+        }
+#else
         check1(__aeabi_f2iz, x);
+#endif
     }
 
     for (float x = 1; x < 11; x += 2) {
@@ -539,6 +563,7 @@ int main() {
         check2(__aeabi_fmul, x, x);
         check2(__aeabi_fdiv, 1.0f, x);
     }
+#endif
 
     if (fail ||
         test_cfcmpeq() ||

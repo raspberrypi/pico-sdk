@@ -1,0 +1,51 @@
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_divider",
+    actual = select({
+        "//bazel/constraint:pico_divider_auto_enabled": ":pico_divider_auto",
+        "//bazel/constraint:pico_divider_hardware_enabled": ":divider_hardware",
+        "//conditions:default": ":divider_compiler",
+    }),
+)
+
+alias(
+    name = "pico_divider_auto",
+    actual = select({
+        "//bazel/constraint:rp2040": ":divider_hardware",
+        "//conditions:default": ":divider_compiler",
+    }),
+)
+
+cc_library(
+    name = "divider_compiler",
+    srcs = ["divider_compiler.c"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+    deps = [
+        "//src/common/pico_divider_headers",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_divider",
+    ],
+)
+
+cc_library(
+    name = "divider_hardware",
+    srcs = ["divider_hardware.S"],
+    linkopts = [
+        "-Wl,--wrap=__aeabi_idiv",
+        "-Wl,--wrap=__aeabi_idivmod",
+        "-Wl,--wrap=__aeabi_ldivmod",
+        "-Wl,--wrap=__aeabi_uidiv",
+        "-Wl,--wrap=__aeabi_uidivmod",
+        "-Wl,--wrap=__aeabi_uldivmod",
+    ],
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+    deps = [
+        "//src/common/pico_divider_headers",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_divider",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

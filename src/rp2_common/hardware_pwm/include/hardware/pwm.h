@@ -10,23 +10,28 @@
 #include "pico.h"
 #include "hardware/structs/pwm.h"
 #include "hardware/regs/dreq.h"
+#include "hardware/regs/intctrl.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PWM, Enable/disable assertions in the PWM module, type=bool, default=0, group=hardware_pwm
-#ifndef PARAM_ASSERTIONS_ENABLED_PWM
-#define PARAM_ASSERTIONS_ENABLED_PWM 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_PWM, Enable/disable assertions in the hardware_pwm module, type=bool, default=0, group=hardware_pwm
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_PWM
+#ifdef PARAM_ASSERTIONS_ENABLED_PWM // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_PWM PARAM_ASSERTIONS_ENABLED_PWM
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_PWM 0
+#endif
 #endif
 
 /** \file hardware/pwm.h
  *  \defgroup hardware_pwm hardware_pwm
  *
- * Hardware Pulse Width Modulation (PWM) API
+ * \brief Hardware Pulse Width Modulation (PWM) API
  *
- * The RP2040 PWM block has 8 identical slices. Each slice can drive two PWM output signals, or
- * measure the frequency or duty cycle of an input signal. This gives a total of up to 16 controllable
+ * The RP2040 PWM block has 8 identical slices, the RP2350 has 12.  Each slice can drive two PWM output signals, or
+ * measure the frequency or duty cycle of an input signal. This gives a total of up to 16/24 controllable
  * PWM outputs. All 30 GPIOs can be driven by the PWM block.
  *
  * The PWM hardware functions by continuously comparing the input value to a free-running counter. This produces a
@@ -51,7 +56,7 @@ enum pwm_clkdiv_mode
     PWM_DIV_FREE_RUNNING = 0, ///< Free-running counting at rate dictated by fractional divider
     PWM_DIV_B_HIGH = 1,       ///< Fractional divider is gated by the PWM B pin
     PWM_DIV_B_RISING = 2,     ///< Fractional divider advances with each rising edge of the PWM B pin
-    PWM_DIV_B_FALLING = 3    ///< Fractional divider advances with each falling edge of the PWM B pin
+    PWM_DIV_B_FALLING = 3     ///< Fractional divider advances with each falling edge of the PWM B pin
 };
 
 enum pwm_chan
@@ -66,8 +71,45 @@ typedef struct {
     uint32_t top;
 } pwm_config;
 
+/**
+ * \def PWM_DREQ_NUM(slice_num)
+ * \ingroup hardware_pwm
+ * \hideinitializer
+ * \brief Returns the \ref dreq_num_t used for pacing DMA transfers for a given PWM slice
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef PWM_DREQ_NUM
+static_assert(DREQ_PWM_WRAP1 == DREQ_PWM_WRAP0 + 1, "");
+static_assert(DREQ_PWM_WRAP7 == DREQ_PWM_WRAP0 + 7, "");
+#define PWM_DREQ_NUM(slice_num) (DREQ_PWM_WRAP0 + (slice_num))
+#endif
+
+/**
+ * \def PWM_GPIO_SLICE_NUM(gpio)
+ * \ingroup hardware_pwm
+ * \hideinitializer
+ * \brief Returns the PWM slice number for a given GPIO number
+ */
+#ifndef PWM_GPIO_SLICE_NUM
+#define PWM_GPIO_SLICE_NUM(gpio) ({             \
+    uint slice_num;                             \
+    if ((gpio) < 32) {                          \
+        slice_num = ((gpio) >> 1u) & 7u;        \
+    } else {                                    \
+        slice_num = 8u + (((gpio) >> 1u) & 3u); \
+    }                                           \
+    slice_num;                                  \
+})
+#endif
+
+// PICO_CONFIG: PICO_PWM_CLKDIV_ROUND_NEAREST, True if floating point PWM clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_pwm
+#ifndef PICO_PWM_CLKDIV_ROUND_NEAREST
+#define PICO_PWM_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
+#endif
+
 static inline void check_slice_num_param(__unused uint slice_num) {
-    valid_params_if(PWM, slice_num < NUM_PWM_SLICES);
+    valid_params_if(HARDWARE_PWM, slice_num < NUM_PWM_SLICES);
 }
 
 /** \brief Determine the PWM slice that is attached to the specified GPIO
@@ -76,8 +118,8 @@ static inline void check_slice_num_param(__unused uint slice_num) {
  * \return The PWM slice number that controls the specified GPIO.
  */
 static inline uint pwm_gpio_to_slice_num(uint gpio) {
-    valid_params_if(PWM, gpio < NUM_BANK0_GPIOS);
-    return (gpio >> 1u) & 7u;
+    valid_params_if(HARDWARE_PWM, gpio < NUM_BANK0_GPIOS);
+    return PWM_GPIO_SLICE_NUM(gpio);
 }
 
 /** \brief Determine the PWM channel that is attached to the specified GPIO.
@@ -88,7 +130,7 @@ static inline uint pwm_gpio_to_slice_num(uint gpio) {
  * \return The PWM channel that controls the specified GPIO.
  */
 static inline uint pwm_gpio_to_channel(uint gpio) {
-    valid_params_if(PWM, gpio < NUM_BANK0_GPIOS);
+    valid_params_if(HARDWARE_PWM, gpio < NUM_BANK0_GPIOS);
     return gpio & 1u;
 }
 
@@ -117,40 +159,50 @@ static inline void pwm_config_set_phase_correct(pwm_config *c, bool phase_correc
  * before passing them on to the PWM counter.
  */
 static inline void pwm_config_set_clkdiv(pwm_config *c, float div) {
-    valid_params_if(PWM, div >= 1.f && div < 256.f);
-    c->div = (uint32_t)(div * (float)(1u << PWM_CH0_DIV_INT_LSB));
+    valid_params_if(HARDWARE_PWM, div >= 1.f && div < 256.f);
+    const int frac_bit_count = REG_FIELD_WIDTH(PWM_CH0_DIV_FRAC);
+#if PICO_PWM_CLKDIV_ROUND_NEAREST
+    div += 0.5f / (1 << frac_bit_count); // round to the nearest fraction
+#endif
+    c->div = (uint32_t)(div * (float)(1u << frac_bit_count));
 }
 
 /** \brief Set PWM clock divider in a PWM configuration using an 8:4 fractional value
  *  \ingroup hardware_pwm
  *
  * \param c PWM configuration struct to modify
- * \param integer 8 bit integer part of the clock divider. Must be greater than or equal to 1.
- * \param fract 4 bit fractional part of the clock divider
+ * \param div_int 8 bit integer part of the clock divider. Must be greater than or equal to 1.
+ * \param div_frac4 4 bit fractional part of the clock divider
  *
  * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
  * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
  * before passing them on to the PWM counter.
  */
-static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t integer, uint8_t fract) {
-    valid_params_if(PWM, integer >= 1);
-    valid_params_if(PWM, fract < 16);
-    c->div = (((uint)integer) << PWM_CH0_DIV_INT_LSB) | (((uint)fract) << PWM_CH0_DIV_FRAC_LSB);
+static inline void pwm_config_set_clkdiv_int_frac4(pwm_config *c, uint32_t div_int, uint8_t div_frac4) {
+    static_assert(REG_FIELD_WIDTH(PWM_CH0_DIV_INT) == 8, "");
+    valid_params_if(HARDWARE_PWM, div_int >= 1 && div_int < 256);
+    static_assert(REG_FIELD_WIDTH(PWM_CH0_DIV_FRAC) == 4, "");
+    valid_params_if(HARDWARE_PWM, div_frac4 < 16);
+    c->div = (((uint)div_int) << PWM_CH0_DIV_INT_LSB) | (((uint)div_frac4) << PWM_CH0_DIV_FRAC_LSB);
+}
+
+// backwards compatibility
+static inline void pwm_config_set_clkdiv_int_frac(pwm_config *c, uint8_t div_int, uint8_t div_frac4) {
+    pwm_config_set_clkdiv_int_frac4(c, div_int, div_frac4);
 }
 
 /** \brief Set PWM clock divider in a PWM configuration
  *  \ingroup hardware_pwm
  *
  * \param c PWM configuration struct to modify
- * \param div Integer value to reduce counting rate by. Must be greater than or equal to 1.
+ * \param div_int Integer value to reduce counting rate by. Must be greater than or equal to 1 and less than 256.
  *
  * If the divide mode is free-running, the PWM counter runs at clk_sys / div.
  * Otherwise, the divider reduces the rate of events seen on the B pin input (level or edge)
  * before passing them on to the PWM counter.
  */
-static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
-    valid_params_if(PWM, div >= 1 && div < 256);
-    pwm_config_set_clkdiv_int_frac(c, (uint8_t)div, 0);
+static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint32_t div_int) {
+    pwm_config_set_clkdiv_int_frac4(c, div_int, 0);
 }
 
 /** \brief Set PWM counting mode in a PWM configuration
@@ -164,7 +216,7 @@ static inline void pwm_config_set_clkdiv_int(pwm_config *c, uint div) {
  * high level, rising edge or falling edge of the B pin input.
  */
 static inline void pwm_config_set_clkdiv_mode(pwm_config *c, enum pwm_clkdiv_mode mode) {
-    valid_params_if(PWM, mode == PWM_DIV_FREE_RUNNING ||
+    valid_params_if(HARDWARE_PWM, mode == PWM_DIV_FREE_RUNNING ||
             mode == PWM_DIV_B_RISING ||
             mode == PWM_DIV_B_HIGH ||
             mode == PWM_DIV_B_FALLING);
@@ -319,7 +371,7 @@ static inline void pwm_set_both_levels(uint slice_num, uint16_t level_a, uint16_
  * \param level PWM level for this GPIO
  */
 static inline void pwm_set_gpio_level(uint gpio, uint16_t level) {
-    valid_params_if(PWM, gpio < NUM_BANK0_GPIOS);
+    valid_params_if(HARDWARE_PWM, gpio < NUM_BANK0_GPIOS);
     pwm_set_chan_level(pwm_gpio_to_slice_num(gpio), pwm_gpio_to_channel(gpio), level);
 }
 
@@ -390,14 +442,20 @@ static inline void pwm_retard_count(uint slice_num) {
  * Set the clock divider. Counter increment will be on sysclock divided by this value, taking into account the gating.
  *
  * \param slice_num PWM slice number
- * \param integer  8 bit integer part of the clock divider
- * \param fract 4 bit fractional part of the clock divider
+ * \param div_int  8 bit integer part of the clock divider
+ * \param div_frac4 4 bit fractional part of the clock divider
  */
-static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t integer, uint8_t fract) {
+static inline void pwm_set_clkdiv_int_frac4(uint slice_num, uint8_t div_int, uint8_t div_frac4) {
     check_slice_num_param(slice_num);
-    valid_params_if(PWM, integer >= 1);
-    valid_params_if(PWM, fract < 16);
-    pwm_hw->slice[slice_num].div = (((uint)integer) << PWM_CH0_DIV_INT_LSB) | (((uint)fract) << PWM_CH0_DIV_FRAC_LSB);
+    valid_params_if(HARDWARE_PWM, div_int >= 1);
+    static_assert(REG_FIELD_WIDTH(PWM_CH0_DIV_FRAC) == 4, "");
+    valid_params_if(HARDWARE_PWM, div_frac4 < 16);
+    pwm_hw->slice[slice_num].div = (((uint)div_int) << PWM_CH0_DIV_INT_LSB) | (((uint)div_frac4) << PWM_CH0_DIV_FRAC_LSB);
+}
+
+// backwards compatibility
+static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t div_int, uint8_t div_frac4) {
+    pwm_set_clkdiv_int_frac4(slice_num, div_int, div_frac4);
 }
 
 /** \brief Set PWM clock divider
@@ -410,10 +468,10 @@ static inline void pwm_set_clkdiv_int_frac(uint slice_num, uint8_t integer, uint
  */
 static inline void pwm_set_clkdiv(uint slice_num, float divider) {
     check_slice_num_param(slice_num);
-    valid_params_if(PWM, divider >= 1.f && divider < 256.f);
+    valid_params_if(HARDWARE_PWM, divider >= 1.f && divider < 256.f);
     uint8_t i = (uint8_t)divider;
     uint8_t f = (uint8_t)((divider - i) * (0x01 << 4));
-    pwm_set_clkdiv_int_frac(slice_num, i, f);
+    pwm_set_clkdiv_int_frac4(slice_num, i, f);
 }
 
 /** \brief Set PWM output polarity
@@ -438,7 +496,7 @@ static inline void pwm_set_output_polarity(uint slice_num, bool a, bool b) {
  */
 static inline void pwm_set_clkdiv_mode(uint slice_num, enum pwm_clkdiv_mode mode) {
     check_slice_num_param(slice_num);
-    valid_params_if(PWM, mode == PWM_DIV_FREE_RUNNING ||
+    valid_params_if(HARDWARE_PWM, mode == PWM_DIV_FREE_RUNNING ||
                          mode == PWM_DIV_B_RISING ||
                          mode == PWM_DIV_B_HIGH ||
                          mode == PWM_DIV_B_FALLING);
@@ -499,10 +557,39 @@ static inline void pwm_set_mask_enabled(uint32_t mask) {
     pwm_hw->en = mask;
 }
 
-/*! \brief  Enable PWM instance interrupt
+/**
+ * \def PWM_DEFAULT_IRQ_NUM()
+ * \ingroup hardware_pwm
+ * \hideinitializer
+ * \brief Returns the \ref irq_num_t for the default PWM IRQ.
+ *
+ * \if rp2040_specific
+ * On RP2040, there is only one PWM irq: PWM_IRQ_WRAP
+ * \endif
+ *
+ * \if rp2350_specific
+ * On RP2350 this returns to PWM_IRQ_WRAP0
+ * \endif
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef PWM_DEFAULT_IRQ_NUM
+#if PICO_RP2040
+#define PWM_DEFAULT_IRQ_NUM() PWM_IRQ_WRAP
+#else
+#define PWM_DEFAULT_IRQ_NUM() PWM_IRQ_WRAP_0
+// backwards compatibility with RP2040
+#define PWM_IRQ_WRAP          PWM_IRQ_WRAP_0
+#define isr_pwm_wrap          isr_pwm_wrap_0
+#endif
+#endif
+
+/*! \brief  Enable PWM instance interrupt via the default PWM IRQ (PWM_IRQ_WRAP_0 on RP2350)
  *  \ingroup hardware_pwm
  *
  * Used to enable a single PWM instance interrupt.
+ *
+ * Note there is only one PWM_IRQ_WRAP on RP2040.
  *
  * \param slice_num PWM block to enable/disable
  * \param enabled true to enable, false to disable
@@ -516,7 +603,90 @@ static inline void pwm_set_irq_enabled(uint slice_num, bool enabled) {
     }
 }
 
-/*! \brief  Enable multiple PWM instance interrupts
+/*! \brief  Enable PWM instance interrupt via PWM_IRQ_WRAP_0
+ *  \ingroup hardware_pwm
+ *
+ * Used to enable a single PWM instance interrupt.
+ *
+ * \param slice_num PWM block to enable/disable
+ * \param enabled true to enable, false to disable
+ */
+static inline void pwm_set_irq0_enabled(uint slice_num, bool enabled) {
+    // irq0 always corresponds to the default IRQ
+    pwm_set_irq_enabled(slice_num, enabled);
+}
+
+#if NUM_PWM_IRQS > 1
+/*! \brief  Enable PWM instance interrupt via PWM_IRQ_WRAP_1
+ *  \ingroup hardware_pwm
+ *
+ * Used to enable a single PWM instance interrupt.
+ *
+ * \param slice_num PWM block to enable/disable
+ * \param enabled true to enable, false to disable
+ */
+static inline void pwm_set_irq1_enabled(uint slice_num, bool enabled) {
+    check_slice_num_param(slice_num);
+    if (enabled) {
+        hw_set_bits(&pwm_hw->inte1, 1u << slice_num);
+    } else {
+        hw_clear_bits(&pwm_hw->inte1, 1u << slice_num);
+    }
+}
+#endif
+
+/*! \brief  Enable PWM instance interrupt via either PWM_IRQ_WRAP_0 or PWM_IRQ_WRAP_1
+ *  \ingroup hardware_pwm
+ *
+ * Used to enable a single PWM instance interrupt.
+ *
+ * Note there is only one PWM_IRQ_WRAP on RP2040.
+ *
+ * \param irq_index the IRQ index; either 0 or 1 for PWM_IRQ_WRAP_0 or PWM_IRQ_WRAP_1
+ * \param slice_num PWM block to enable/disable
+ * \param enabled true to enable, false to disable
+ */
+static inline void pwm_irqn_set_slice_enabled(uint irq_index, uint slice_num, bool enabled) {
+    check_slice_num_param(slice_num);
+    invalid_params_if(HARDWARE_PWM, irq_index >= NUM_PWM_IRQS);
+    check_slice_num_param(slice_num);
+    if (enabled) {
+        hw_set_bits(&pwm_hw->irq_ctrl[irq_index].inte, 1u << slice_num);
+    } else {
+        hw_clear_bits(&pwm_hw->irq_ctrl[irq_index].inte, 1u << slice_num);
+    }
+}
+
+/*! \brief  Enable multiple PWM instance interrupts via the default PWM IRQ (PWM_IRQ_WRAP_0 on RP2350)
+ *  \ingroup hardware_pwm
+ *
+ * Use this to enable multiple PWM interrupts at once.
+ *
+ * Note there is only one PWM_IRQ_WRAP on RP2040.
+ *
+ * \param slice_mask Bitmask of all the blocks to enable/disable. Channel 0 = bit 0, channel 1 = bit 1 etc.
+ * \param enabled true to enable, false to disable
+ */
+static inline void pwm_set_irq_mask_enabled(uint32_t slice_mask, bool enabled) {
+    valid_params_if(HARDWARE_PWM, slice_mask < 256);
+#if PICO_RP2040
+    if (enabled) {
+        hw_set_bits(&pwm_hw->inte, slice_mask);
+    } else {
+        hw_clear_bits(&pwm_hw->inte, slice_mask);
+    }
+#else
+    static_assert(PWM_IRQ_WRAP_1 == PWM_IRQ_WRAP_0 + 1, "");
+    uint irq_index = PWM_DEFAULT_IRQ_NUM() - PWM_IRQ_WRAP_0;
+    if (enabled) {
+        hw_set_bits(&pwm_hw->irq_ctrl[irq_index].inte, slice_mask);
+    } else {
+        hw_clear_bits(&pwm_hw->irq_ctrl[irq_index].inte, slice_mask);
+    }
+#endif
+}
+
+/*! \brief  Enable multiple PWM instance interrupts via PWM_IRQ_WRAP_0
  *  \ingroup hardware_pwm
  *
  * Use this to enable multiple PWM interrupts at once.
@@ -524,12 +694,46 @@ static inline void pwm_set_irq_enabled(uint slice_num, bool enabled) {
  * \param slice_mask Bitmask of all the blocks to enable/disable. Channel 0 = bit 0, channel 1 = bit 1 etc.
  * \param enabled true to enable, false to disable
  */
-static inline void pwm_set_irq_mask_enabled(uint32_t slice_mask, bool enabled) {
-    valid_params_if(PWM, slice_mask < 256);
+static inline void pwm_set_irq0_mask_enabled(uint32_t slice_mask, bool enabled) {
+    // default irq is irq0
+    pwm_set_irq_mask_enabled(slice_mask, enabled);
+}
+
+#if NUM_PWM_IRQS > 1
+/*! \brief  Enable multiple PWM instance interrupts via PWM_IRQ_WRAP_1
+ *  \ingroup hardware_pwm
+ *
+ * Use this to enable multiple PWM interrupts at once.
+ *
+ * \param slice_mask Bitmask of all the blocks to enable/disable. Channel 0 = bit 0, channel 1 = bit 1 etc.
+ * \param enabled true to enable, false to disable
+ */
+static inline void pwm_set_irq1_mask_enabled(uint32_t slice_mask, bool enabled) {
     if (enabled) {
-        hw_set_bits(&pwm_hw->inte, slice_mask);
+        hw_set_bits(&pwm_hw->inte1, slice_mask);
     } else {
-        hw_clear_bits(&pwm_hw->inte, slice_mask);
+        hw_clear_bits(&pwm_hw->inte1, slice_mask);
+    }
+}
+#endif
+
+/*! \brief  Enable PWM instance interrupts via either PWM_IRQ_WRAP_0 or PWM_IRQ_WRAP_1
+*  \ingroup hardware_pwm
+*
+* Used to enable a single PWM instance interrupt.
+*
+* Note there is only one PWM_IRQ_WRAP on RP2040.
+*
+* \param irq_index the IRQ index; either 0 or 1 for PWM_IRQ_WRAP_0 or PWM_IRQ_WRAP_1
+* \param slice_mask Bitmask of all the blocks to enable/disable. Channel 0 = bit 0, channel 1 = bit 1 etc.
+* \param enabled true to enable, false to disable
+*/
+static inline void pwm_irqn_set_slice_mask_enabled(uint irq_index, uint slice_mask, bool enabled) {
+    invalid_params_if(HARDWARE_PWM, irq_index >= NUM_PWM_IRQS);
+    if (enabled) {
+        hw_set_bits(&pwm_hw->irq_ctrl[irq_index].inte, slice_mask);
+    } else {
+        hw_clear_bits(&pwm_hw->irq_ctrl[irq_index].inte, slice_mask);
     }
 }
 
@@ -542,7 +746,7 @@ static inline void pwm_clear_irq(uint slice_num) {
     pwm_hw->intr = 1u << slice_num;
 }
 
-/*! \brief  Get PWM interrupt status, raw
+/*! \brief  Get PWM interrupt status, raw for the default PWM IRQ (PWM_IRQ_WRAP_0 on RP2350)
  *  \ingroup hardware_pwm
  *
  * \return Bitmask of all PWM interrupts currently set
@@ -551,7 +755,38 @@ static inline uint32_t pwm_get_irq_status_mask(void) {
     return pwm_hw->ints;
 }
 
-/*! \brief  Force PWM interrupt
+/*! \brief  Get PWM interrupt status, raw for the PWM_IRQ_WRAP_0
+ *  \ingroup hardware_pwm
+ *
+ * \return Bitmask of all PWM interrupts currently set
+ */
+static inline uint32_t pwm_get_irq0_status_mask(void) {
+    return pwm_get_irq_status_mask();
+}
+
+#if NUM_PWM_IRQS > 1
+/*! \brief  Get PWM interrupt status, raw for the PWM_IRQ_WRAP_1
+ *  \ingroup hardware_pwm
+ *
+ * \return Bitmask of all PWM interrupts currently set
+ */
+static inline uint32_t pwm_get_irq1_status_mask(void) {
+    return pwm_hw->ints1;
+}
+#endif
+
+/*! \brief  Get PWM interrupt status, raw for either PWM_IRQ_WRAP_0 or PWM_IRQ_WRAP_1
+ *  \ingroup hardware_pwm
+ *
+* \param irq_index the IRQ index; either 0 or 1 for PWM_IRQ_WRAP_0 or PWM_IRQ_WRAP_1
+ * \return Bitmask of all PWM interrupts currently set
+ */
+static inline uint32_t pwm_irqn_get_status_mask(uint irq_index) {
+    invalid_params_if(HARDWARE_PWM, irq_index >= NUM_PWM_IRQS);
+    return pwm_hw->irq_ctrl[irq_index].ints;
+}
+
+/*! \brief  Force PWM interrupt for the default PWM IRQ (PWM_IRQ_WRAP_0 on RP2350)
  *  \ingroup hardware_pwm
  *
  * \param slice_num PWM slice number
@@ -560,16 +795,45 @@ static inline void pwm_force_irq(uint slice_num) {
     pwm_hw->intf = 1u << slice_num;
 }
 
+/*! \brief  Force PWM interrupt via PWM_IRQ_WRAP_0
+ *  \ingroup hardware_pwm
+ *
+ * \param slice_num PWM slice number
+ */
+static inline void pwm_force_irq0(uint slice_num) {
+    pwm_force_irq(slice_num);
+}
+
+#if NUM_PWM_IRQS > 1
+/*! \brief  Force PWM interrupt via PWM_IRQ_WRAP_0
+ *  \ingroup hardware_pwm
+ *
+ * \param slice_num PWM slice number
+ */
+static inline void pwm_force_irq1(uint slice_num) {
+    pwm_hw->intf1 = 1u << slice_num;
+}
+#endif
+
+/*! \brief  Force PWM interrupt via PWM_IRQ_WRAP_0 or PWM_IRQ_WRAP_1
+ *  \ingroup hardware_pwm
+ *
+ * \param irq_index the IRQ index; either 0 or 1 for PWM_IRQ_WRAP_0 or PWM_IRQ_WRAP_1
+ * \param slice_num PWM slice number
+ */
+static inline void pwm_irqn_force(uint irq_index, uint slice_num) {
+    invalid_params_if(HARDWARE_PWM, irq_index >= NUM_PWM_IRQS);
+    pwm_hw->irq_ctrl[irq_index].intf = 1u << slice_num;
+}
+
 /*! \brief Return the DREQ to use for pacing transfers to a particular PWM slice
  *  \ingroup hardware_pwm
  *
  * \param slice_num PWM slice number
  */
 static inline uint pwm_get_dreq(uint slice_num) {
-    static_assert(DREQ_PWM_WRAP1 == DREQ_PWM_WRAP0 + 1, "");
-    static_assert(DREQ_PWM_WRAP7 == DREQ_PWM_WRAP0 + 7, "");
     check_slice_num_param(slice_num);
-    return DREQ_PWM_WRAP0 + slice_num;
+    return PWM_DREQ_NUM(slice_num);
 }
 
 #ifdef __cplusplus

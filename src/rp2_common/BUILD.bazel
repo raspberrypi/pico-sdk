@@ -1,0 +1,93 @@
+package(default_visibility = ["//visibility:public"])
+
+# This alias is exposed here to simplify configuration.
+alias(
+    name = "build_selected_boot2",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/boot_stage2:build_selected_boot2",
+        "//bazel/constraint:rp2350": "//src/rp2350/boot_stage2:build_selected_boot2",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "boot_stage2_config",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/boot_stage2:config",
+        "//bazel/constraint:rp2350": "//src/rp2350/boot_stage2:config",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "boot_stage2",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/boot_stage2:boot_stage2",
+        "//bazel/constraint:rp2350": "//src/rp2350/boot_stage2:boot_stage2",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "hardware_regs",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/hardware_regs:hardware_regs",
+        "//bazel/constraint:rp2350": "//src/rp2350/hardware_regs:hardware_regs",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "hardware_structs",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/hardware_structs:hardware_structs",
+        "//bazel/constraint:rp2350": "//src/rp2350/hardware_structs:hardware_structs",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "platform_defs",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/hardware_regs:platform_defs",
+        "//bazel/constraint:rp2350": "//src/rp2350/hardware_regs:platform_defs",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+# This shim exists as a way to break internal header dependency cycles
+# that occur within the dependency chain of the pico_platform target below.
+alias(
+    name = "pico_platform_internal",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:pico_platform_internal",
+        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:pico_platform_internal",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+    visibility = [
+        "//src:__pkg__",
+        "//src/rp2040/boot_stage2:__pkg__",
+        "//src/rp2350/boot_stage2:__pkg__",
+        "//src/rp2_common/hardware_base:__pkg__",
+        "//src/rp2_common/hardware_irq:__pkg__",
+        "//src/rp2_common/hardware_pll:__pkg__",
+        "//src/rp2_common/hardware_vreg:__pkg__",
+        "//src/rp2_common/hardware_watchdog:__pkg__",
+        "//src/rp2_common/hardware_xosc:__pkg__",
+        "//src/rp2_common/pico_bit_ops:__pkg__",
+        "//src/rp2_common/pico_bootrom:__pkg__",
+        "//src/rp2_common/pico_crt0:__pkg__",
+        "//src/rp2_common/pico_mem_ops:__pkg__",
+        "//src/rp2_common/pico_printf:__pkg__",
+        "//src/rp2_common/pico_runtime_init:__pkg__",
+    ],
+)
+
+alias(
+    name = "pico_platform",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:pico_platform",
+        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:pico_platform",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)

@@ -1,0 +1,162 @@
+load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config")
+
+package(default_visibility = ["//visibility:public"])
+
+_WRAP_DOUBLE_FLAGS = [
+    "-Wl,--wrap=__aeabi_dadd",
+    "-Wl,--wrap=__aeabi_ddiv",
+    "-Wl,--wrap=__aeabi_dmul",
+    "-Wl,--wrap=__aeabi_drsub",
+    "-Wl,--wrap=__aeabi_dsub",
+    "-Wl,--wrap=__aeabi_cdcmpeq",
+    "-Wl,--wrap=__aeabi_cdrcmple",
+    "-Wl,--wrap=__aeabi_cdcmple",
+    "-Wl,--wrap=__aeabi_dcmpeq",
+    "-Wl,--wrap=__aeabi_dcmplt",
+    "-Wl,--wrap=__aeabi_dcmple",
+    "-Wl,--wrap=__aeabi_dcmpge",
+    "-Wl,--wrap=__aeabi_dcmpgt",
+    "-Wl,--wrap=__aeabi_dcmpun",
+    "-Wl,--wrap=__aeabi_i2d",
+    "-Wl,--wrap=__aeabi_l2d",
+    "-Wl,--wrap=__aeabi_ui2d",
+    "-Wl,--wrap=__aeabi_ul2d",
+    "-Wl,--wrap=__aeabi_d2iz",
+    "-Wl,--wrap=__aeabi_d2lz",
+    "-Wl,--wrap=__aeabi_d2uiz",
+    "-Wl,--wrap=__aeabi_d2ulz",
+    "-Wl,--wrap=__aeabi_d2f",
+    "-Wl,--wrap=sqrt",
+    "-Wl,--wrap=cos",
+    "-Wl,--wrap=sin",
+    "-Wl,--wrap=tan",
+    "-Wl,--wrap=atan2",
+    "-Wl,--wrap=exp",
+    "-Wl,--wrap=log",
+    "-Wl,--wrap=ldexp",
+    "-Wl,--wrap=copysign",
+    "-Wl,--wrap=trunc",
+    "-Wl,--wrap=floor",
+    "-Wl,--wrap=ceil",
+    "-Wl,--wrap=round",
+    "-Wl,--wrap=sincos",
+    "-Wl,--wrap=asin",
+    "-Wl,--wrap=acos",
+    "-Wl,--wrap=atan",
+    "-Wl,--wrap=sinh",
+    "-Wl,--wrap=cosh",
+    "-Wl,--wrap=tanh",
+    "-Wl,--wrap=asinh",
+    "-Wl,--wrap=acosh",
+    "-Wl,--wrap=atanh",
+    "-Wl,--wrap=exp2",
+    "-Wl,--wrap=log2",
+    "-Wl,--wrap=exp10",
+    "-Wl,--wrap=log10",
+    "-Wl,--wrap=pow",
+    "-Wl,--wrap=powint",
+    "-Wl,--wrap=hypot",
+    "-Wl,--wrap=cbrt",
+    "-Wl,--wrap=fmod",
+    "-Wl,--wrap=drem",
+    "-Wl,--wrap=remainder",
+    "-Wl,--wrap=remquo",
+    "-Wl,--wrap=expm1",
+    "-Wl,--wrap=log1p",
+    "-Wl,--wrap=fma",
+]
+
+alias(
+    name = "pico_double",
+    actual = select({
+        "//bazel/constraint:pico_double_auto_enabled": ":pico_double_auto",
+        "//bazel/constraint:pico_double_compiler_enabled": ":pico_double_auto",
+        "//bazel/constraint:pico_double_dcp_enabled": ":pico_double_pico",
+        "//bazel/constraint:pico_double_rp2040_enabled": ":pico_double_pico",
+        "//conditions:default": ":pico_double_none",
+    }),
+)
+
+alias(
+    name = "pico_double_auto",
+    actual = select({
+        "@platforms//cpu:riscv32": ":pico_double_compiler",
+        "//bazel/constraint:rp2040": ":pico_double_pico",
+        "//conditions:default": ":pico_double_dcp",
+    }),
+)
+
+# An empty stub that just lets the compiler handle the implementation.
+cc_library(
+    name = "pico_double_compiler",
+    hdrs = ["include/pico/double.h"],
+    defines = ["PICO_DOUBLE_COMPILER=1"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+)
+
+cc_library(
+    name = "pico_double_pico",
+    srcs = [
+        "double_aeabi_rp2040.S",
+        "double_init_rom_rp2040.c",
+        "double_math.c",
+        "double_v1_rom_shim_rp2040.S",
+    ],
+    hdrs = ["include/pico/double.h"],
+    defines = ["LIB_PICO_DOUBLE_PICO=1"],
+    includes = ["include"],
+    linkopts = _WRAP_DOUBLE_FLAGS,
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + ["//bazel/constraint:rp2040"],
+    visibility = ["//visibility:private"],
+    deps = [
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_divider",
+        "//src/rp2_common/pico_bootrom",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)
+
+cc_library(
+    name = "pico_double_dcp",
+    srcs = [
+        "double_aeabi_dcp.S",
+        "double_conv_m33.S",
+        "double_fma_dcp.S",
+        "double_math.c",
+        "double_sci_m33.S",
+    ],
+    hdrs = ["include/pico/double.h"],
+    defines = ["LIB_PICO_DOUBLE_PICO=1"],
+    includes = ["include"],
+    linkopts = _WRAP_DOUBLE_FLAGS,
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + incompatible_with_config("//bazel/constraint:rp2040"),
+    visibility = ["//visibility:private"],
+    deps = [
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_dcp",
+        "//src/rp2_common/hardware_divider",
+        "//src/rp2_common/pico_bootrom",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)
+
+cc_library(
+    name = "pico_double_none",
+    srcs = ["double_none.S"],
+    hdrs = ["include/pico/double.h"],
+    defines = [
+        "LIB_PICO_DOUBLE_PICO=0",
+        "PICO_PRINTF_SUPPORT_FLOAT=0",
+    ],
+    includes = ["include"],
+    linkopts = _WRAP_DOUBLE_FLAGS,
+    target_compatible_with = compatible_with_rp2(),
+    visibility = ["//visibility:private"],
+    deps = [
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_divider",
+        "//src/rp2_common/pico_bootrom",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

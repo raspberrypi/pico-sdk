@@ -7,7 +7,9 @@ if (PICO_ON_DEVICE)
 
     target_link_libraries(pico_divider_test pico_stdlib)
 
-    pico_set_divider_implementation(pico_divider_test hardware_explicit) # want to compare against compiler impl
+    if (PICO_RP2040)
+        pico_set_divider_implementation(pico_divider_test hardware_explicit) # want to compare against compiler impl
+    endif()
 
     pico_add_extra_outputs(pico_divider_test)
 
@@ -25,14 +27,18 @@ if (PICO_ON_DEVICE)
 
     add_executable(pico_divider_nesting_test_with_dirty_check)
     target_link_libraries(pico_divider_nesting_test_with_dirty_check pico_divider_nesting_test_core)
-    pico_set_divider_implementation(pico_divider_nesting_test_with_dirty_check hardware)
+    if (PICO_RP2040)
+        pico_set_divider_implementation(pico_divider_nesting_test_with_dirty_check hardware)
+    endif()
     pico_add_extra_outputs(pico_divider_nesting_test_with_dirty_check)
 
     add_executable(pico_divider_nesting_test_with_disable_irq)
     target_link_libraries(pico_divider_nesting_test_with_disable_irq pico_divider_nesting_test_core)
     target_compile_definitions(pico_divider_nesting_test_with_disable_irq PRIVATE
             PICO_DIVIDER_DISABLE_INTERRUPTS=1)
-    pico_set_divider_implementation(pico_divider_nesting_test_with_disable_irq hardware)
+    if (PICO_RP2040)
+        pico_set_divider_implementation(pico_divider_nesting_test_with_disable_irq hardware)
+    endif()
     pico_add_extra_outputs(pico_divider_nesting_test_with_disable_irq)
 
 endif()

@@ -1,0 +1,42 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# This exists to break a dependency cycle between
+# this library and //src/rp2_common/hardware_xosc.
+# Application code should always use :hardware_clocks instead.
+cc_library(
+    name = "hardware_clocks_headers",
+    hdrs = ["include/hardware/clocks.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = [
+        "//src/rp2_common/hardware_pll:__pkg__",
+        "//src/rp2_common/hardware_xosc:__pkg__",
+    ],
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/hardware_base",
+    ],
+)
+
+cc_library(
+    name = "hardware_clocks",
+    srcs = ["clocks.c"],
+    hdrs = ["include/hardware/clocks.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:platform_defs",
+        "//src/rp2_common/hardware_base",
+        "//src/rp2_common/hardware_gpio",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_pll",
+        "//src/rp2_common/hardware_watchdog",
+        "//src/rp2_common/hardware_xosc",
+    ],
+)

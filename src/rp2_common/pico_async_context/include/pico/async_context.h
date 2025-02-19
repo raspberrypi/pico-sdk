@@ -7,7 +7,7 @@
 /** \file pico/async_context.h
  *  \defgroup pico_async_context pico_async_context
  *
- * An \ref async_context provides a logically single-threaded context for performing work, and responding
+ * \brief An \ref async_context provides a logically single-threaded context for performing work, and responding
  * to asynchronous events. Thus an async_context instance is suitable for servicing third-party libraries
  * that are not re-entrant.
  *
@@ -31,7 +31,7 @@
  * Note: "when pending" workers with work pending are executed before "at time" workers.
  *
  * The async_context provides locking mechanisms, see \ref async_context_acquire_lock_blocking,
- * \ref async_context_release_lock and \ref async_context_check_lock which can be used by
+ * \ref async_context_release_lock and \ref async_context_lock_check which can be used by
  * external code to ensure execution of external code does not happen concurrently with worker code.
  * Locked code runs on the calling core, however \ref async_context_execute_sync is provided to
  * synchronously run a function from the core of the async_context.
@@ -82,18 +82,18 @@ typedef struct async_context async_context_t;
  *  \ingroup pico_async_context
  *
  *  A "timeout" represents some future action that must be taken at a specific time.
- *  It's methods are called from the async_context under lock at the given time
+ *  Its methods are called from the async_context under lock at the given time
  *
  * \see async_context_add_worker_at
  * \see async_context_add_worker_in_ms
  */
 typedef struct async_work_on_timeout {
     /*!
-     * private link list pointer
+     * \brief private link list pointer
      */
     struct async_work_on_timeout *next;
     /*!
-     * Method called when the timeout is reached; may not be NULL
+     * \brief Method called when the timeout is reached; may not be NULL
      *
      * Note, that when this method is called, the timeout has been removed from the async_context, so
      * if you want the timeout to repeat, you should re-add it during this callback
@@ -102,12 +102,12 @@ typedef struct async_work_on_timeout {
      */
     void (*do_work)(async_context_t *context, struct async_work_on_timeout *timeout);
     /*!
-     * The next timeout time; this should only be modified during the above methods
+     * \brief The next timeout time; this should only be modified during the above methods
      * or via async_context methods
      */
     absolute_time_t next_time;
     /*!
-     * User data associated with the timeout instance
+     * \brief User data associated with the timeout instance
      */
     void *user_data;
 } async_at_time_worker_t;
@@ -117,27 +117,31 @@ typedef struct async_work_on_timeout {
  *
  *  A "worker" represents some external entity that must do work in response
  *  to some external stimulus (usually an IRQ).
- *  It's methods are called from the async_context under lock at the given time
+ *  Its methods are called from the async_context under lock at the given time
  *
  * \see async_context_add_worker_at
  * \see async_context_add_worker_in_ms
  */
 typedef struct async_when_pending_worker {
     /*!
-     * private link list pointer
+     * \brief private link list pointer
      */
     struct async_when_pending_worker *next;
     /*!
-     * Called by the async_context when the worker has been marked as having "work pending"
+     * \brief Called by the async_context when the worker has been marked as having "work pending"
      *
      * @param context the async_context
      * @param worker the function to be called when work is pending
      */
     void (*do_work)(async_context_t *context, struct async_when_pending_worker *worker);
     /**
-     * True if the worker need do_work called
+     * \brief True if the worker need do_work called
      */
     bool work_pending;
+    /*!
+     * \brief User data associated with the worker instance
+     */
+    void *user_data;
 } async_when_pending_worker_t;
 
 #define ASYNC_CONTEXT_FLAG_CALLBACK_FROM_NON_IRQ 0x1
@@ -245,7 +249,7 @@ static inline void async_context_lock_check(async_context_t *context) {
  *
  * \param context the async_context
  * \param func the function to call
- * \param parm the paramter to pass to the function
+ * \param param the parameter to pass to the function
  * \return the return value from func
  */
 static inline uint32_t async_context_execute_sync(async_context_t *context, uint32_t (*func)(void *param), void *param) {
@@ -455,7 +459,6 @@ static inline uint async_context_core_num(const async_context_t *context) {
  * callback is being called once this method returns.
  *
  * \param context the async_context
- * \return the physical core number
  */
 static inline void async_context_deinit(async_context_t *context) {
     context->type->deinit(context);

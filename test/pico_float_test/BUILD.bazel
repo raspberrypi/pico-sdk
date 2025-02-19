@@ -1,0 +1,96 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:transition.bzl", "pico_float_test_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "hazard3_test_gen",
+    srcs = ["hazard3_test_gen.c"],
+    target_compatible_with = ["//bazel/constraint:host"],
+)
+
+# TODO: Set up a transition to build this under RISC-V.
+cc_binary(
+    name = "pico_float_test_hazard3",
+    testonly = True,
+    srcs = [
+        "pico_float_test_hazard3.c",
+        "vectors/hazard3_addsf.inc",
+        "vectors/hazard3_mulsf.inc",
+    ],
+    includes = ["."],
+    target_compatible_with = compatible_with_rp2() + ["@platforms//cpu:riscv32"],
+    deps = [
+        "//src/rp2_common/pico_float",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)
+
+cc_binary(
+    name = "pico_float_test",
+    testonly = True,
+    srcs = [
+        "llvm/call_apsr.S",
+        "llvm/call_apsr.h",
+        "pico_float_test.c",
+    ],
+    includes = ["llvm"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_double",
+        "//src/rp2_common/pico_float",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)
+
+cc_binary(
+    name = "pico_double_test_actual",
+    testonly = True,
+    srcs = [
+        "llvm/call_apsr.S",
+        "llvm/call_apsr.h",
+        "pico_double_test.c",
+    ],
+    includes = ["llvm"],
+    tags = ["manual"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_double",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)
+
+pico_float_test_binary(
+    name = "pico_double_test",
+    testonly = True,
+    src = ":pico_double_test_actual",
+    extra_copts = [
+        "-DPICO_USE_CRT_PRINTF=1",
+        "-DPICO_FLOAT_PROPAGATE_NANS=1",
+        "-DPICO_DOUBLE_PROPAGATE_NANS=1",
+    ],
+    pico_printf_impl = select({
+        # raw compiler printf on llvm_libc doesn't currently have floating point
+        "//bazel/constraint:pico_clib_llvm_libc_enabled": "pico",
+        "//bazel/constraint:pico_toolchain_clang_enabled": "pico",
+        "//conditions:default": "compiler",
+    }),
+    target_compatible_with = compatible_with_rp2(),
+)
+
+# TODO: Marked in CMake as to-be-removed.
+filegroup(
+    name = "m33",
+    srcs = ["m33.c"],
+)
+
+# TODO: Add these tests to the Bazel build.
+filegroup(
+    name = "unsupported_tests",
+    srcs = [
+        "custom_double_funcs_test.c",
+        "custom_float_funcs_test.c",
+    ],
+)

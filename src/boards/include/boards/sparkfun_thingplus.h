@@ -14,6 +14,8 @@
 //
 // This header may be included by other board headers as "boards/sparkfun_thingplus.h"
 
+// pico_cmake_set PICO_PLATFORM=rp2040
+
 #ifndef _BOARDS_SPARKFUN_THINGPLUS_H
 #define _BOARDS_SPARKFUN_THINGPLUS_H
 
@@ -32,6 +34,10 @@
 
 #ifndef PICO_DEFAULT_LED_PIN
 #define PICO_DEFAULT_LED_PIN 25
+#endif
+
+#ifndef PICO_DEFAULT_WS2812_PIN
+#define PICO_DEFAULT_WS2812_PIN 8
 #endif
 
 // Default I2C - for qwiic connector
@@ -68,10 +74,10 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
+// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
-
 // The thing plus has a SD Card.
 #define PICO_SD_CLK_PIN   14
 #define PICO_SD_CMD_PIN   15

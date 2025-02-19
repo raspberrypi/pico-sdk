@@ -1,0 +1,25 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_aon_timer",
+    srcs = ["aon_timer.c"],
+    hdrs = ["include/pico/aon_timer.h"],
+    defines = [
+        "LIB_PICO_AON_TIMER=1",
+    ],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_util",
+        "//src/common/pico_time",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_sync",
+    ] + select({
+        "//bazel/constraint:rp2040": ["//src/rp2_common/hardware_rtc"],
+        "//conditions:default": ["//src/rp2_common/hardware_powman"],
+    }),
+)

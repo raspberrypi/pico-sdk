@@ -1,0 +1,42 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("pico_flash_region.bzl", "generated_pico_flash_region")
+
+package(default_visibility = ["//visibility:public"])
+
+# This produces a small fragment of a linker script that is INCLUDEed from
+# the other linker scripts. For example:
+#
+#     FLASH(rx) : ORIGIN = 0x10000000, LENGTH = 4194304
+#
+# TODO: Make this a configurable flag.
+generated_pico_flash_region(
+    name = "default_flash_region",
+    flash_region_size = select({
+        "//bazel/constraint:rp2350": 4 * 1024 * 1024,
+        "//conditions:default": 2 * 1024 * 1024,
+    }),
+)
+
+cc_library(
+    name = "pico_standard_link",
+    target_compatible_with = compatible_with_rp2(),
+    deps = select({
+        # When PICO_BARE_METAL is enabled, don't automagically add link-time
+        # dependencies.
+        "//bazel/constraint:pico_baremetal_enabled": [],
+        "//conditions:default": [
+            "//bazel/config:PICO_BOOT_STAGE2_LINK_IMAGE",
+            "//bazel/config:PICO_CMSIS_PATH",
+            "//bazel/config:PICO_DEFAULT_BINARY_INFO",
+            "//bazel/config:PICO_DEFAULT_LINKER_SCRIPT",
+            "//src/rp2_common/pico_bit_ops",
+            "//src/rp2_common/pico_bootrom",
+            "//src/rp2_common/pico_clib_interface:pico_clib_interface_link",
+            "//src/rp2_common/pico_crt0",
+            "//src/rp2_common/pico_cxx_options:PICO_CXX_ENABLE_EXCEPTIONS",
+            "//src/rp2_common/pico_mem_ops",
+            "//src/rp2_common/pico_runtime:pico_runtime_link",
+            "//src/rp2_common/pico_runtime_init:pico_runtime_init_link",
+        ],
+    }),
+)

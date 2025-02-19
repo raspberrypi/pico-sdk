@@ -1,0 +1,33 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# This exists to break a dependency cycle between
+# this library and //src/common/pico_time.
+# Application code should always use :hardware_timer instead.
+cc_library(
+    name = "hardware_timer_headers",
+    hdrs = ["include/hardware/timer.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = ["//src/common/pico_time:__pkg__"],
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:hardware_structs",
+    ],
+)
+
+cc_library(
+    name = "hardware_timer",
+    srcs = ["timer.c"],
+    hdrs = ["include/hardware/timer.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/hardware_claim",
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_sync",
+    ],
+)

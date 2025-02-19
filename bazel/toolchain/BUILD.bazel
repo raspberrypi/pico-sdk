@@ -1,0 +1,293 @@
+load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
+load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
+load("@rules_cc//cc/toolchains:feature.bzl", "cc_feature")
+load("@rules_cc//cc/toolchains:toolchain.bzl", "cc_toolchain")
+load("configurable_feature.bzl", "configurable_toolchain_feature")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_args(
+    name = "armv6m-none-eabi",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = ["--target=armv6m-none-eabi"],
+)
+
+cc_args(
+    name = "armv8m.main-none-eabi",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = ["--target=armv8m.main-none-eabi"],
+)
+
+cc_args(
+    name = "cortex-m0",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = [
+        "-mcpu=cortex-m0plus",
+        "-mthumb",
+    ],
+)
+
+cc_args(
+    name = "cortex-m33",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = [
+        "-mcpu=cortex-m33",
+        "-march=armv8-m.main+fp+dsp",
+        "-mfloat-abi=softfp",
+        "-mthumb",
+        "-mcmse",
+    ],
+)
+
+# :no_canonical_system_headers and :no_canonical_prefixes both prevent built-in
+# compiler include directories from resolving to absolute paths. Prefer to use
+# :bazel_no_absolute_paths, since it correctly guides based on the current
+# compiler type.
+cc_args(
+    name = "no_canonical_system_headers",
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = ["-fno-canonical-system-headers"],
+)
+
+cc_args(
+    name = "no_canonical_prefixes",
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = ["-no-canonical-prefixes"],
+)
+
+cc_args_list(
+    name = "bazel_no_absolute_paths",
+    args = select({
+        "//bazel/constraint:pico_toolchain_clang_enabled": [],
+        "//conditions:default": [":no_canonical_system_headers"],
+    }) + [":no_canonical_prefixes"],
+)
+
+cc_args(
+    name = "llvm-libc_args",
+    actions = ["@rules_cc//cc/toolchains/actions:link_actions"],
+    args = [
+        "--unwindlib=none",
+        "-nostdlib++",
+        "-nostartfiles",
+        "-Wl,-lc++",
+        "-Wl,-lm",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+cc_args(
+    name = "opt_debug_args",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = [
+        "-Og",  # TODO: Make this configurable.
+        "-g3",
+    ],
+)
+
+configurable_toolchain_feature(
+    name = "gc_sections",
+    copts = [
+        "-ffunction-sections",
+        "-fdata-sections",
+    ],
+    linkopts = ["-Wl,--gc-sections"],
+)
+
+configurable_toolchain_feature(
+    name = "cxx_no_exceptions",
+    cxxopts = [
+        "-fno-exceptions",
+        "-fno-unwind-tables",
+    ],
+)
+
+configurable_toolchain_feature(
+    name = "cxx_no_rtti",
+    cxxopts = ["-fno-rtti"],
+)
+
+configurable_toolchain_feature(
+    name = "cxx_no_cxa_atexit",
+    cxxopts = ["-fno-use-cxa-atexit"],
+)
+
+configurable_toolchain_feature(
+    name = "override_max_page_size",
+    linkopts = ["-Wl,-z,max-page-size=4096"],
+)
+
+# TODO: Make this shim unnecessary.
+cc_args_list(
+    name = "all_opt_debug_args",
+    args = [":opt_debug_args"],
+)
+
+cc_feature(
+    name = "override_debug",
+    args = [":all_opt_debug_args"],
+    overrides = "@rules_cc//cc/toolchains/features:dbg",
+)
+
+HOSTS = (
+    ("linux", "x86_64"),
+    ("linux", "aarch64"),
+    ("win", "x86_64"),
+    ("mac", "x86_64"),
+    ("mac", "aarch64"),
+)
+
+_HOST_OS_CONSTRAINTS = {
+    "linux": "@platforms//os:linux",
+    "win": "@platforms//os:windows",
+    "mac": "@platforms//os:macos",
+}
+
+_HOST_CPU_CONSTRAINTS = {
+    "x86_64": "@platforms//cpu:x86_64",
+    "aarch64": "@platforms//cpu:aarch64",
+}
+
+[cc_toolchain(
+    name = "arm_gcc_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    tool_map = "@arm_gcc_{}-{}//:all_tools".format(host_os, host_cpu),
+    args = select({
+        "//bazel/constraint:rp2040": [":cortex-m0"],
+        "//bazel/constraint:rp2350": [":cortex-m33"],
+        "//conditions:default": [],
+    }) + [
+        ":bazel_no_absolute_paths",
+    ],
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    tags = ["manual"],  # Don't try to build this in wildcard builds.
+    known_features = [
+        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
+        "@pico-sdk//bazel/toolchain:override_debug",
+        "@pico-sdk//bazel/toolchain:gc_sections",
+        "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
+        "@pico-sdk//bazel/toolchain:cxx_no_rtti",
+        "@pico-sdk//bazel/toolchain:cxx_no_cxa_atexit",
+        "@pico-sdk//bazel/toolchain:override_max_page_size",
+    ],
+    enabled_features = [
+        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
+        "@pico-sdk//bazel/toolchain:override_debug",
+    ] + select({
+        "//bazel/constraint:pico_no_gc_sections_enabled": [],
+        "//conditions:default": [":gc_sections"],
+    }) + select({
+        "//bazel/constraint:pico_cxx_enable_exceptions_enabled": [],
+        "//conditions:default": [":cxx_no_exceptions"],
+    }) + select({
+        "//bazel/constraint:pico_cxx_enable_rtti_enabled": [],
+        "//conditions:default": [":cxx_no_rtti"],
+    }) + select({
+        "//bazel/constraint:pico_cxx_enable_cxa_atexit_enabled": [],
+        "//conditions:default": [":cxx_no_cxa_atexit"],
+    }) + select({
+        "//bazel/constraint:pico_use_default_max_page_size_enabled": [],
+        "//conditions:default": [":override_max_page_size"],
+    }),
+) for host_os, host_cpu in HOSTS]
+
+[cc_toolchain(
+    name = "clang_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    tool_map = "@clang_{}-{}//:all_tools".format(host_os, host_cpu),
+    args = select({
+        "//bazel/constraint:rp2040": [
+            ":armv6m-none-eabi",
+            ":cortex-m0",
+        ],
+        "//bazel/constraint:rp2350": [
+            ":armv8m.main-none-eabi",
+            ":cortex-m33",
+        ],
+        "//conditions:default": [],
+    }) + [
+        ":bazel_no_absolute_paths",
+        ":llvm-libc_args",
+    ],
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    tags = ["manual"],  # Don't try to build this in wildcard builds.
+    known_features = [
+        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
+        "@pico-sdk//bazel/toolchain:override_debug",
+        "@pico-sdk//bazel/toolchain:gc_sections",
+        "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
+        "@pico-sdk//bazel/toolchain:cxx_no_rtti",
+        "@pico-sdk//bazel/toolchain:cxx_no_cxa_atexit",
+        "@pico-sdk//bazel/toolchain:override_max_page_size",
+    ],
+    enabled_features = [
+        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
+        "@pico-sdk//bazel/toolchain:override_debug",
+    ] + select({
+        "//bazel/constraint:pico_no_gc_sections_enabled": [],
+        "//conditions:default": [":gc_sections"],
+    }) + select({
+        "//bazel/constraint:pico_cxx_enable_exceptions_enabled": [],
+        "//conditions:default": [":cxx_no_exceptions"],
+    }) + select({
+        "//bazel/constraint:pico_cxx_enable_rtti_enabled": [],
+        "//conditions:default": [":cxx_no_rtti"],
+    }) + select({
+        "//bazel/constraint:pico_cxx_enable_cxa_atexit_enabled": [],
+        "//conditions:default": [":cxx_no_cxa_atexit"],
+    }) + select({
+        "//bazel/constraint:pico_use_default_max_page_size_enabled": [],
+        "//conditions:default": [":override_max_page_size"],
+    }),
+) for host_os, host_cpu in HOSTS]
+
+[toolchain(
+    name = "{}-{}-rp2040".format(host_os, host_cpu),
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    target_compatible_with = [
+        "@pico-sdk//bazel/constraint:rp2040",
+    ],
+    toolchain = select({
+        "//bazel/constraint:pico_toolchain_clang_enabled": "clang_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+        "//conditions:default": ":arm_gcc_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    }),
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+) for host_os, host_cpu in HOSTS]
+
+[toolchain(
+    name = "{}-{}-rp2350".format(host_os, host_cpu),
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    target_compatible_with = [
+        "@pico-sdk//bazel/constraint:rp2350",
+    ],
+    toolchain = select({
+        "//bazel/constraint:pico_toolchain_clang_enabled": "clang_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+        "//conditions:default": ":arm_gcc_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
+    }),
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+) for host_os, host_cpu in HOSTS]

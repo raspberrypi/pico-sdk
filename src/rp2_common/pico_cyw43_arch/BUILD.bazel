@@ -1,0 +1,95 @@
+load("//bazel:defs.bzl", "compatible_with_pico_w", "incompatible_with_config")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_cyw43_arch",
+    actual = select({
+        "//bazel/constraint:pico_lwip_config_unset": ":select_no_lwip",
+        "//conditions:default": ":select_lwip",
+    })
+)
+
+alias(
+    name = "select_lwip",
+    actual = select({
+        "//bazel/constraint:pico_async_context_poll_enabled": ":pico_cyw43_arch_lwip_poll",
+        "//bazel/constraint:pico_async_context_threadsafe_background_enabled": ":pico_cyw43_arch_lwip_threadsafe_background",
+        "//bazel/constraint:pico_async_context_freertos_enabled": ":pico_cyw43_arch_lwip_freertos",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+    visibility = ["//visibility:private"],
+)
+
+alias(
+    name = "select_no_lwip",
+    actual = select({
+        "//bazel/constraint:pico_async_context_poll_enabled": ":pico_cyw43_arch_poll",
+        "//bazel/constraint:pico_async_context_threadsafe_background_enabled": ":pico_cyw43_arch_threadsafe_background",
+        "//bazel/constraint:pico_async_context_freertos_enabled": ":pico_cyw43_arch_freertos",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+    visibility = ["//visibility:private"],
+)
+
+# Tuple is async_context type and whether or not lwip is enabled.
+_CONFIGURATIONS = [
+    ("freertos", False),
+    ("freertos", True),
+    ("poll", False),
+    ("poll", True),
+    ("threadsafe_background", False),
+    ("threadsafe_background", True),
+]
+
+# This produces the following labels:
+#   pico_cyw43_arch_freertos
+#   pico_cyw43_arch_lwip_freertos
+#   pico_cyw43_arch_poll
+#   pico_cyw43_arch_lwip_poll
+#   pico_cyw43_arch_threadsafe_background
+#   pico_cyw43_arch_lwip_threadsafe_background
+#
+# This is done rather than having intermediate libraries because the defines
+# for a given configuration must be applied to both .c files.
+[
+    cc_library(
+        name = "pico_cyw43_arch_" + ("lwip_" if use_lwip else "") + kind,
+        srcs = [
+            "cyw43_arch.c",
+            "cyw43_arch_{}.c".format(kind),
+        ],
+        hdrs = [
+            "include/pico/cyw43_arch.h",
+            "include/pico/cyw43_arch/arch_{}.h".format(kind),
+        ],
+        defines = [
+            "LIB_PICO_CYW43_ARCH=1",
+            "PICO_CYW43_ARCH_{}=1".format(kind.upper()),
+        ],
+        includes = ["include"],
+        target_compatible_with = compatible_with_pico_w() + (
+            incompatible_with_config("//bazel/constraint:pico_freertos_unset") if kind == "freertos" else []
+        ) + (
+            incompatible_with_config("//bazel/constraint:pico_lwip_config_unset") if use_lwip else []
+        ),
+        deps = [
+            "//src/rp2_common:pico_platform",
+            "//src/rp2_common/pico_async_context:pico_async_context_{}".format(kind),
+            "//src/rp2_common/pico_cyw43_driver",
+            "//src/rp2_common/pico_unique_id",
+        ] + (
+            ["//src/rp2_common/pico_lwip:pico_lwip_freertos"] if kind == "freertos" and use_lwip else []
+        ) + (
+            ["//src/rp2_common/pico_lwip:pico_lwip_nosys"] if kind != "freertos" and use_lwip else []
+        ) + (
+            ["//src/rp2_common/pico_lwip"] if use_lwip else []
+        ),
+    )
+    for kind, use_lwip in _CONFIGURATIONS
+]
+
+alias(
+    name = "pico_cyw43_arch_none",
+    actual = ":pico_cyw43_arch_threadsafe_background",
+)

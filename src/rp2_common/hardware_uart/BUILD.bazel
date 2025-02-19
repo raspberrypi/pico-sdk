@@ -1,0 +1,29 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+
+package(default_visibility = ["//visibility:public"])
+
+pico_sdk_define(
+    name = "PICO_DEFAULT_UART_BAUD_RATE",
+    define_name = "PICO_DEFAULT_UART_BAUD_RATE",
+    from_flag = "//bazel/config:PICO_DEFAULT_UART_BAUD_RATE",
+)
+
+cc_library(
+    name = "hardware_uart",
+    srcs = ["uart.c"],
+    hdrs = ["include/hardware/uart.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":PICO_DEFAULT_UART_BAUD_RATE",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common:platform_defs",
+        "//src/rp2_common/hardware_base",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_resets",
+        "//src/rp2_common/hardware_timer",
+    ],
+)

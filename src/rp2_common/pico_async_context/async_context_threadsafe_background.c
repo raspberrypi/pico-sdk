@@ -86,6 +86,7 @@ static void async_context_threadsafe_background_lock_check(async_context_t *self
     }
 }
 
+#if ASYNC_CONTEXT_THREADSAFE_BACKGROUND_MULTI_CORE
 typedef struct sync_func_call{
     async_when_pending_worker_t worker;
     semaphore_t sem;
@@ -100,7 +101,7 @@ static void handle_sync_func_call(async_context_t *context, async_when_pending_w
     sem_release(&call->sem);
     async_context_remove_when_pending_worker(context, worker);
 }
-
+#endif
 
 static void lock_release(async_context_threadsafe_background_t *self) {
     bool outermost = 1 == recursive_mutex_enter_count(&self->lock_mutex);
@@ -139,7 +140,7 @@ uint32_t async_context_threadsafe_background_execute_sync(async_context_t *self_
 #if ASYNC_CONTEXT_THREADSAFE_BACKGROUND_MULTI_CORE
     if (self_base->core_num != get_core_num()) {
         hard_assert(!recursive_mutex_enter_count(&self->lock_mutex));
-        sync_func_call_t call;
+        sync_func_call_t call = {0};
         call.worker.do_work = handle_sync_func_call;
         call.func = func;
         call.param = param;

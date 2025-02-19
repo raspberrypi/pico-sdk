@@ -1,0 +1,19 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# TODO: Needs LIB_FREERTOS_KERNEL defined.
+cc_library(
+    name = "hardware_flash",
+    srcs = ["flash.c"],
+    hdrs = ["include/hardware/flash.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/hardware_xip_cache",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_multicore",
+    ],
+)

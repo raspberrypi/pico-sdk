@@ -1,0 +1,22 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "hardware_pio",
+    srcs = ["pio.c"],
+    hdrs = [
+        "include/hardware/pio.h",
+        "include/hardware/pio_instructions.h",
+    ],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/hardware_claim",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_base",
+        "//src/rp2_common/hardware_gpio",
+    ],
+)

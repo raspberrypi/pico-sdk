@@ -1,0 +1,214 @@
+load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config")
+
+package(default_visibility = ["//visibility:public"])
+
+_WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS = [
+    "-Wl,--wrap=__aeabi_fadd",
+    "-Wl,--wrap=__aeabi_fdiv",
+    "-Wl,--wrap=__aeabi_fmul",
+    "-Wl,--wrap=__aeabi_frsub",
+    "-Wl,--wrap=__aeabi_fsub",
+    "-Wl,--wrap=__aeabi_cfcmpeq",
+]
+
+_WRAP_FLOAT_AEABI_CMP_FLAGS = [
+    "-Wl,--wrap=__aeabi_cfrcmple",
+    "-Wl,--wrap=__aeabi_cfcmple",
+    "-Wl,--wrap=__aeabi_fcmpeq",
+    "-Wl,--wrap=__aeabi_fcmplt",
+    "-Wl,--wrap=__aeabi_fcmple",
+    "-Wl,--wrap=__aeabi_fcmpge",
+    "-Wl,--wrap=__aeabi_fcmpgt",
+    "-Wl,--wrap=__aeabi_fcmpun",
+]
+
+_WRAP_FLOAT_AEABI_CONV_32_FLAGS = [
+    "-Wl,--wrap=__aeabi_i2f",
+    "-Wl,--wrap=__aeabi_l2f",
+    "-Wl,--wrap=__aeabi_ui2f",
+    "-Wl,--wrap=__aeabi_ul2f",
+]
+
+_WRAP_FLOAT_AEABI_CONV_64_FLAGS = [
+    "-Wl,--wrap=__aeabi_f2iz",
+    "-Wl,--wrap=__aeabi_f2lz",
+    "-Wl,--wrap=__aeabi_f2uiz",
+    "-Wl,--wrap=__aeabi_f2ulz",
+]
+
+_WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS = [
+    "-Wl,--wrap=__aeabi_f2d",
+]
+
+_WRAP_FLOAT_SQRTF_FLAGS = [
+    "-Wl,--wrap=sqrtf",
+]
+
+_WRAP_FLOAT_SCI_FLAGS = [
+    "-Wl,--wrap=cosf",
+    "-Wl,--wrap=sinf",
+    "-Wl,--wrap=tanf",
+    "-Wl,--wrap=atan2f",
+    "-Wl,--wrap=expf",
+    "-Wl,--wrap=logf",
+    "-Wl,--wrap=sincosf",  # gnu
+]
+
+_WRAP_FLOAT_SCI_EXTRA_FLAGS = [
+    "-Wl,--wrap=ldexpf",
+    "-Wl,--wrap=copysignf",
+    "-Wl,--wrap=truncf",
+    "-Wl,--wrap=floorf",
+    "-Wl,--wrap=ceilf",
+    "-Wl,--wrap=roundf",
+    "-Wl,--wrap=asinf",
+    "-Wl,--wrap=acosf",
+    "-Wl,--wrap=atanf",
+    "-Wl,--wrap=sinhf",
+    "-Wl,--wrap=coshf",
+    "-Wl,--wrap=tanhf",
+    "-Wl,--wrap=asinhf",
+    "-Wl,--wrap=acoshf",
+    "-Wl,--wrap=atanhf",
+    "-Wl,--wrap=exp2f",
+    "-Wl,--wrap=log2f",
+    "-Wl,--wrap=exp10f",
+    "-Wl,--wrap=log10f",
+    "-Wl,--wrap=powf",
+    "-Wl,--wrap=powintf",  # gnu
+    "-Wl,--wrap=hypotf",
+    "-Wl,--wrap=cbrtf",
+    "-Wl,--wrap=fmodf",
+    "-Wl,--wrap=dremf",
+    "-Wl,--wrap=remainderf",
+    "-Wl,--wrap=remquof",
+    "-Wl,--wrap=expm1f",
+    "-Wl,--wrap=log1pf",
+    "-Wl,--wrap=fmaf",
+]
+
+alias(
+    name = "pico_float",
+    actual = select({
+        "//bazel/constraint:pico_float_auto_enabled": ":pico_float_platform_default",
+        "//bazel/constraint:pico_float_compiler_enabled": ":pico_float_compiler",
+        "//bazel/constraint:pico_float_dcp_enabled": ":pico_float_dcp",
+        "//bazel/constraint:pico_float_rp2040_enabled": ":pico_float_pico",
+        "//bazel/constraint:pico_float_vfp_enabled": ":pico_float_vfp",
+        "//conditions:default": ":pico_float_none",
+    }),
+)
+
+alias(
+    name = "pico_float_platform_default",
+    actual = select({
+        "//bazel/constraint:rp2040": ":pico_float_pico",
+        "@platforms//cpu:armv8-m": ":pico_float_vfp",
+        "@platforms//cpu:riscv32": ":pico_float_single_hazard3",
+        "//conditions:default": ":pico_float_compiler",
+    }),
+    visibility = ["//visibility:private"],
+)
+
+# An empty stub that just lets the compiler use M33 FPU instructions.
+cc_library(
+    name = "pico_float_compiler",
+    hdrs = ["include/pico/float.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+)
+
+# This highlights the differences between the various float implementations.
+# Most of the cc_library attributes are shared, so this prevents significant
+# duplication.
+_PICO_FLOAT_IMPLS = [
+    {
+        "name": "pico",  # RP2040-specific float implementation.
+        "srcs": [
+            "float_aeabi_rp2040.S",
+            "float_init_rom_rp2040.c",
+            "float_math.c",
+            "float_v1_rom_shim_rp2040.S",
+        ],
+        "compatibility": incompatible_with_config("@platforms//cpu:riscv32") + ["//bazel/constraint:rp2040"],
+        "extra_deps": [],
+        "linkopts": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+    },
+    {
+        "name": "dcp",
+        "srcs": [
+            "float_aeabi_dcp.S",
+            "float_common_m33.S",
+            "float_math.c",
+            "float_sci_m33.S",
+        ],
+        "compatibility": compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + incompatible_with_config("//bazel/constraint:rp2040"),
+        "extra_deps": ["//src/rp2_common/hardware_dcp"],
+        "linkopts": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+    },
+    {
+        "name": "vfp",
+        "srcs": [
+            "float_conv32_vfp.S",
+            "float_sci_m33_vfp.S",
+            "float_common_m33.S",
+            "float_math.c",
+        ],
+        "compatibility": compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + incompatible_with_config("//bazel/constraint:rp2040"),
+        "extra_deps": ["//src/rp2_common/hardware_dcp"],
+        "linkopts": _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+    },
+    {
+        "name": "single_hazard3",
+        "srcs": [
+            "float_single_hazard3.S",
+        ],
+        "compatibility": compatible_with_rp2() + ["@platforms//cpu:riscv32"],
+        "extra_deps": ["//src/rp2_common/hardware_hazard3"],
+        "linkopts": _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+    },
+]
+
+# Creates:
+#   * pico_float_pico
+#   * pico_float_dcp
+#   * pico_float_vfp
+#   * pico_float_single_hazard3
+[
+    cc_library(
+        name = "pico_float_{}".format(impl["name"]),
+        srcs = impl["srcs"],
+        hdrs = ["include/pico/float.h"],
+        defines = [
+            "LIB_PICO_FLOAT_PICO=1",
+            "LIB_PICO_FLOAT_PICO_{}=1".format(impl["name"].upper()),
+        ],
+        includes = ["include"],
+        linkopts = impl["linkopts"],
+        target_compatible_with = impl["compatibility"],
+        visibility = ["//visibility:private"],
+        deps = [
+            "//src/rp2_common:pico_platform",
+            "//src/rp2_common/hardware_divider",
+            "//src/rp2_common/pico_bootrom",
+        ] + impl["extra_deps"],
+        alwayslink = True,  # Ensures the wrapped symbols are linked in.
+    )
+    for impl in _PICO_FLOAT_IMPLS
+]
+
+cc_library(
+    name = "pico_float_none",
+    srcs = ["float_none.S"],
+    hdrs = ["include/pico/float.h"],
+    defines = ["LIB_PICO_FLOAT_PICO=0"],
+    includes = ["include"],
+    linkopts = _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+    target_compatible_with = compatible_with_rp2(),
+    visibility = ["//visibility:private"],
+    deps = [
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_bootrom",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

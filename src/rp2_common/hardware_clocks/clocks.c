@@ -8,9 +8,7 @@
 #include "hardware/regs/clocks.h"
 #include "hardware/platform_defs.h"
 #include "hardware/clocks.h"
-#include "hardware/watchdog.h"
 #include "hardware/pll.h"
-#include "hardware/xosc.h"
 #include "hardware/irq.h"
 #include "hardware/gpio.h"
 
@@ -28,42 +26,32 @@ static resus_callback_t _resus_callback;
 // - An auxiliary (glitchy) mux, whose output glitches when switched, but has
 //   no constraints on its inputs
 // Not all clocks have both types of mux.
-static inline bool has_glitchless_mux(enum clock_index clk_index) {
-    return clk_index == clk_sys || clk_index == clk_ref;
+static inline bool has_glitchless_mux(clock_handle_t clock) {
+    return clock == clk_sys || clock == clk_ref;
 }
 
-void clock_stop(enum clock_index clk_index) {
-    clock_hw_t *clock = &clocks_hw->clk[clk_index];
-    hw_clear_bits(&clock->ctrl, CLOCKS_CLK_USB_CTRL_ENABLE_BITS);
-    configured_freq[clk_index] = 0;
+void clock_stop(clock_handle_t clock) {
+    clock_hw_t *clock_hw = &clocks_hw->clk[clock];
+    hw_clear_bits(&clock_hw->ctrl, CLOCKS_CLK_USB_CTRL_ENABLE_BITS);
+    configured_freq[clock] = 0;
 }
 
 /// \tag::clock_configure[]
-bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq) {
-    uint32_t div;
-
-    assert(src_freq >= freq);
-
-    if (freq > src_freq)
-        return false;
-
-    // Div register is 24.8 int.frac divider so multiply by 2^8 (left shift by 8)
-    div = (uint32_t) (((uint64_t) src_freq << 8) / freq);
-
-    clock_hw_t *clock = &clocks_hw->clk[clk_index];
+static void clock_configure_internal(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t actual_freq, uint32_t div) {
+    clock_hw_t *clock_hw = &clocks_hw->clk[clock];
 
     // If increasing divisor, set divisor before source. Otherwise set source
     // before divisor. This avoids a momentary overspeed when e.g. switching
     // to a faster source and increasing divisor to compensate.
-    if (div > clock->div)
-        clock->div = div;
+    if (div > clock_hw->div)
+        clock_hw->div = div;
 
     // If switching a glitchless slice (ref or sys) to an aux source, switch
     // away from aux *first* to avoid passing glitches when changing aux mux.
     // Assume (!!!) glitchless source 0 is no faster than the aux source.
-    if (has_glitchless_mux(clk_index) && src == CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX) {
-        hw_clear_bits(&clock->ctrl, CLOCKS_CLK_REF_CTRL_SRC_BITS);
-        while (!(clock->selected & 1u))
+    if (has_glitchless_mux(clock) && src == CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX) {
+        hw_clear_bits(&clock_hw->ctrl, CLOCKS_CLK_REF_CTRL_SRC_BITS);
+        while (!(clock_hw->selected & 1u))
             tight_loop_contents();
     }
     // If no glitchless mux, cleanly stop the clock to avoid glitches
@@ -72,146 +60,87 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
     else {
         // Disable clock. On clk_ref and clk_sys this does nothing,
         // all other clocks have the ENABLE bit in the same position.
-        hw_clear_bits(&clock->ctrl, CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS);
-        if (configured_freq[clk_index] > 0) {
+        hw_clear_bits(&clock_hw->ctrl, CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS);
+        if (configured_freq[clock] > 0) {
             // Delay for 3 cycles of the target clock, for ENABLE propagation.
             // Note XOSC_COUNT is not helpful here because XOSC is not
-            // necessarily running, nor is timer... so, 3 cycles per loop:
-            uint delay_cyc = configured_freq[clk_sys] / configured_freq[clk_index] + 1;
-            asm volatile (
-                ".syntax unified \n\t"
-                "1: \n\t"
-                "subs %0, #1 \n\t"
-                "bne 1b"
-                : "+r" (delay_cyc)
-            );
+            // necessarily running, nor is timer...
+            uint delay_cyc = configured_freq[clk_sys] / configured_freq[clock] + 1;
+            busy_wait_at_least_cycles(delay_cyc * 3);
         }
     }
 
     // Set aux mux first, and then glitchless mux if this clock has one
-    hw_write_masked(&clock->ctrl,
+    hw_write_masked(&clock_hw->ctrl,
         (auxsrc << CLOCKS_CLK_SYS_CTRL_AUXSRC_LSB),
         CLOCKS_CLK_SYS_CTRL_AUXSRC_BITS
     );
 
-    if (has_glitchless_mux(clk_index)) {
-        hw_write_masked(&clock->ctrl,
+    if (has_glitchless_mux(clock)) {
+        hw_write_masked(&clock_hw->ctrl,
             src << CLOCKS_CLK_REF_CTRL_SRC_LSB,
             CLOCKS_CLK_REF_CTRL_SRC_BITS
         );
-        while (!(clock->selected & (1u << src)))
+        while (!(clock_hw->selected & (1u << src)))
             tight_loop_contents();
     }
 
     // Enable clock. On clk_ref and clk_sys this does nothing,
     // all other clocks have the ENABLE bit in the same position.
-    hw_set_bits(&clock->ctrl, CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS);
+    hw_set_bits(&clock_hw->ctrl, CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS);
 
     // Now that the source is configured, we can trust that the user-supplied
     // divisor is a safe value.
-    clock->div = div;
-
-    // Store the configured frequency
-    configured_freq[clk_index] = (uint32_t)(((uint64_t) src_freq << 8) / div);
-
-    return true;
+    clock_hw->div = div;
+    configured_freq[clock] = actual_freq;
 }
-/// \end::clock_configure[]
 
-void clocks_init(void) {
-    // Start tick in watchdog
-    watchdog_start_tick(XOSC_MHZ);
+bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq) {
+    assert(src_freq >= freq);
 
-    // Everything is 48MHz on FPGA apart from RTC. Otherwise set to 0 and will be set in clock configure
-    if (running_on_fpga()) {
-        for (uint i = 0; i < CLK_COUNT; i++) {
-            configured_freq[i] = 48 * MHZ;
+    if (freq > src_freq)
+        return false;
+
+    uint64_t div64 =((((uint64_t) src_freq) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / freq);
+    uint32_t div, actual_freq;
+    if (div64 >> 32) {
+        // set div to 0 for maximum clock divider
+        div = 0;
+        actual_freq = src_freq >> (32 - CLOCKS_CLK_GPOUT0_DIV_INT_LSB);
+    } else {
+        div = (uint32_t) div64;
+#if PICO_RP2040
+        // on RP2040 only clock divider of 1, or  >= 2 are supported
+        if (div < (2u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB)) {
+            div = (1u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB);
         }
-        configured_freq[clk_rtc] = 46875;
-        return;
+#endif
+        actual_freq = (uint32_t) ((((uint64_t) src_freq) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / div);
     }
 
-    // Disable resus that may be enabled from previous software
-    clocks_hw->resus.ctrl = 0;
-
-    // Enable the xosc
-    xosc_init();
-
-    // Before we touch PLLs, switch sys and ref cleanly away from their aux sources.
-    hw_clear_bits(&clocks_hw->clk[clk_sys].ctrl, CLOCKS_CLK_SYS_CTRL_SRC_BITS);
-    while (clocks_hw->clk[clk_sys].selected != 0x1)
-        tight_loop_contents();
-    hw_clear_bits(&clocks_hw->clk[clk_ref].ctrl, CLOCKS_CLK_REF_CTRL_SRC_BITS);
-    while (clocks_hw->clk[clk_ref].selected != 0x1)
-        tight_loop_contents();
-
-    /// \tag::pll_settings[]
-    // Configure PLLs
-    //                   REF     FBDIV VCO            POSTDIV
-    // PLL SYS: 12 / 1 = 12MHz * 125 = 1500MHz / 6 / 2 = 125MHz
-    // PLL USB: 12 / 1 = 12MHz * 100 = 1200MHz / 5 / 5 =  48MHz
-    /// \end::pll_settings[]
-
-    /// \tag::pll_init[]
-    pll_init(pll_sys, 1, 1500 * MHZ, 6, 2);
-    pll_init(pll_usb, 1, 1200 * MHZ, 5, 5);
-    /// \end::pll_init[]
-
-    // Configure clocks
-    // CLK_REF = XOSC (12MHz) / 1 = 12MHz
-    clock_configure(clk_ref,
-                    CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC,
-                    0, // No aux mux
-                    12 * MHZ,
-                    12 * MHZ);
-
-    /// \tag::configure_clk_sys[]
-    // CLK SYS = PLL SYS (125MHz) / 1 = 125MHz
-    clock_configure(clk_sys,
-                    CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
-                    CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
-                    125 * MHZ,
-                    125 * MHZ);
-    /// \end::configure_clk_sys[]
-
-    // CLK USB = PLL USB (48MHz) / 1 = 48MHz
-    clock_configure(clk_usb,
-                    0, // No GLMUX
-                    CLOCKS_CLK_USB_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
-                    48 * MHZ,
-                    48 * MHZ);
-
-    // CLK ADC = PLL USB (48MHZ) / 1 = 48MHz
-    clock_configure(clk_adc,
-                    0, // No GLMUX
-                    CLOCKS_CLK_ADC_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
-                    48 * MHZ,
-                    48 * MHZ);
-
-    // CLK RTC = PLL USB (48MHz) / 1024 = 46875Hz
-    clock_configure(clk_rtc,
-                    0, // No GLMUX
-                    CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
-                    48 * MHZ,
-                    46875);
-
-    // CLK PERI = clk_sys. Used as reference clock for Peripherals. No dividers so just select and enable
-    // Normally choose clk_sys or clk_usb
-    clock_configure(clk_peri,
-                    0,
-                    CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLK_SYS,
-                    125 * MHZ,
-                    125 * MHZ);
+    clock_configure_internal(clock, src, auxsrc, actual_freq, div);
+    // Store the configured frequency
+    return true;
 }
 
+void clock_configure_int_divider(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t int_divider) {
+    clock_configure_internal(clock, src, auxsrc, src_freq / int_divider, int_divider << CLOCKS_CLK_GPOUT0_DIV_INT_LSB);
+}
+
+void clock_configure_undivided(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq) {
+    clock_configure_internal(clock, src, auxsrc, src_freq, 1u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB);
+}
+
+/// \end::clock_configure[]
+
 /// \tag::clock_get_hz[]
-uint32_t clock_get_hz(enum clock_index clk_index) {
-    return configured_freq[clk_index];
+uint32_t clock_get_hz(clock_handle_t clock) {
+    return configured_freq[clock];
 }
 /// \end::clock_get_hz[]
 
-void clock_set_reported_hz(enum clock_index clk_index, uint hz) {
-    configured_freq[clk_index] = hz;
+void clock_set_reported_hz(clock_handle_t clock, uint hz) {
+    configured_freq[clock] = hz;
 }
 
 /// \tag::frequency_count_khz[]
@@ -251,10 +180,9 @@ static void clocks_handle_resus(void) {
 
     // CLK SYS = CLK_REF. Must be running for this code to be running
     uint clk_ref_freq = clock_get_hz(clk_ref);
-    clock_configure(clk_sys,
+    clock_configure_undivided(clk_sys,
                     CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLK_REF,
                     0,
-                    clk_ref_freq,
                     clk_ref_freq);
 
     // Assert we have been resussed
@@ -314,7 +242,7 @@ void clocks_enable_resus(resus_callback_t resus_callback) {
     clocks_hw->resus.ctrl = CLOCKS_CLK_SYS_RESUS_CTRL_ENABLE_BITS | timeout;
 }
 
-void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_int, uint8_t div_frac) {
+void clock_gpio_init_int_frac16(uint gpio, uint src, uint32_t div_int, uint16_t div_frac16) {
     // Bit messy but it's as much code to loop through a lookup
     // table. The sources for each gpout generators are the same
     // so just call with the sources from GP0
@@ -323,14 +251,25 @@ void clock_gpio_init_int_frac(uint gpio, uint src, uint32_t div_int, uint8_t div
     else if (gpio == 23) gpclk = clk_gpout1;
     else if (gpio == 24) gpclk = clk_gpout2;
     else if (gpio == 25) gpclk = clk_gpout3;
+#if !PICO_RP2040
+    else if (gpio == 13) gpclk = clk_gpout0;
+    else if (gpio == 15) gpclk = clk_gpout1;
+#endif
     else {
-        invalid_params_if(CLOCKS, true);
+        invalid_params_if(HARDWARE_CLOCKS, true);
     }
 
+    invalid_params_if(HARDWARE_CLOCKS, div_int >> REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_INT));
     // Set up the gpclk generator
     clocks_hw->clk[gpclk].ctrl = (src << CLOCKS_CLK_GPOUT0_CTRL_AUXSRC_LSB) |
                                  CLOCKS_CLK_GPOUT0_CTRL_ENABLE_BITS;
-    clocks_hw->clk[gpclk].div = (div_int << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) | div_frac;
+#if REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 16
+    clocks_hw->clk[gpclk].div = (div_int << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) | (div_frac16 << CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB);
+#elif REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_FRAC) == 8
+    clocks_hw->clk[gpclk].div = (div_int << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) | ((div_frac16>>8u) << CLOCKS_CLK_GPOUT0_DIV_FRAC_LSB);
+#else
+#error unsupported number of fractional bits
+#endif
 
     // Set gpio pin to gpclock function
     gpio_set_function(gpio, GPIO_FUNC_GPCK);
@@ -344,9 +283,14 @@ static const uint8_t gpin0_src[CLK_COUNT] = {
     CLOCKS_CLK_REF_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0,    // CLK_REF
     CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0,    // CLK_SYS
     CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0,   // CLK_PERI
+#if !PICO_RP2040
+    CLOCKS_CLK_HSTX_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0,   // CLK_HSTX
+#endif
     CLOCKS_CLK_USB_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0,    // CLK_USB
     CLOCKS_CLK_ADC_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0,    // CLK_ADC
+#if PICO_RP2040
     CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0,    // CLK_RTC
+#endif
 };
 
 // Assert GPIN1 is GPIN0 + 1
@@ -357,26 +301,35 @@ static_assert(CLOCKS_CLK_GPOUT3_CTRL_AUXSRC_VALUE_CLKSRC_GPIN1 == (CLOCKS_CLK_GP
 static_assert(CLOCKS_CLK_REF_CTRL_AUXSRC_VALUE_CLKSRC_GPIN1    == (CLOCKS_CLK_REF_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0    + 1), "hw mismatch");
 static_assert(CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_GPIN1    == (CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0    + 1), "hw mismatch");
 static_assert(CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_GPIN1   == (CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0   + 1), "hw mismatch");
+#if HAS_HSTX
+static_assert(CLOCKS_CLK_HSTX_CTRL_AUXSRC_VALUE_CLKSRC_GPIN1   == (CLOCKS_CLK_HSTX_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0   + 1), "hw mismatch");
+#endif
 static_assert(CLOCKS_CLK_USB_CTRL_AUXSRC_VALUE_CLKSRC_GPIN1    == (CLOCKS_CLK_USB_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0    + 1), "hw mismatch");
 static_assert(CLOCKS_CLK_ADC_CTRL_AUXSRC_VALUE_CLKSRC_GPIN1    == (CLOCKS_CLK_ADC_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0    + 1), "hw mismatch");
+#if HAS_RP2040_RTC
 static_assert(CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_CLKSRC_GPIN1    == (CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_CLKSRC_GPIN0    + 1), "hw mismatch");
+#endif
 
-bool clock_configure_gpin(enum clock_index clk_index, uint gpio, uint32_t src_freq, uint32_t freq) {
+bool clock_configure_gpin(clock_handle_t clock, uint gpio, uint32_t src_freq, uint32_t freq) {
     // Configure a clock to run from a GPIO input
     uint gpin = 0;
     if      (gpio == 20) gpin = 0;
     else if (gpio == 22) gpin = 1;
+#if PICO_RP2350
+    else if (gpio == 12) gpin = 0;
+    else if (gpio == 14) gpin = 1;
+#endif
     else {
-        invalid_params_if(CLOCKS, true);
+        invalid_params_if(HARDWARE_CLOCKS, true);
     }
 
     // Work out sources. GPIN is always an auxsrc
     uint src = 0;
 
     // GPIN1 == GPIN0 + 1
-    uint auxsrc = gpin0_src[clk_index] + gpin;
+    uint auxsrc = gpin0_src[clock] + gpin;
 
-    if (has_glitchless_mux(clk_index)) {
+    if (has_glitchless_mux(clock)) {
         // AUX src is always 1
         src = 1;
     }
@@ -386,5 +339,118 @@ bool clock_configure_gpin(enum clock_index clk_index, uint gpio, uint32_t src_fr
 
     // Now we have the src, auxsrc, and configured the gpio input
     // call clock configure to run the clock from a gpio
-    return clock_configure(clk_index, src, auxsrc, src_freq, freq);
+    return clock_configure(clock, src, auxsrc, src_freq, freq);
+}
+
+// everything running off the USB oscillator
+void set_sys_clock_48mhz(void) {
+    if (!running_on_fpga()) {
+        // Change clk_sys to be 48MHz. The simplest way is to take this from PLL_USB
+        // which has a source frequency of 48MHz
+        clock_configure_undivided(clk_sys,
+                        CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
+                        CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
+                        USB_CLK_HZ);
+
+        // Turn off PLL sys for good measure
+        pll_deinit(pll_sys);
+
+        // CLK peri is clocked from clk_sys so need to change clk_peri's freq
+        clock_configure_undivided(clk_peri,
+                        0,
+                        CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLK_SYS,
+                        USB_CLK_HZ);
+    }
+}
+
+// PICO_CONFIG: PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK, When the SYS clock PLL is changed keep the peripheral clock attached to it, type=bool, default=0, advanced=true, group=hardware_clocks
+#ifndef PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK
+// support old incorrect spelling too
+#ifdef PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+#define PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK PICO_CLOCK_AJDUST_PERI_CLOCK_WITH_SYS_CLOCK
+#else
+// By default, when reconfiguring the system clock PLL settings after runtime initialization,
+// the peripheral clock is switched to the 48MHz USB clock to ensure continuity of peripheral operation.
+// Setting this value to 1 changes the behavior to have the peripheral clock re-configured
+// to the system clock at it's new frequency.
+#define PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK 0
+#endif
+#endif
+
+void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
+    if (!running_on_fpga()) {
+        clock_configure_undivided(clk_sys,
+                        CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
+                        CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
+                        USB_CLK_HZ);
+
+        pll_init(pll_sys, PLL_SYS_REFDIV, vco_freq, post_div1, post_div2);
+        uint32_t freq = vco_freq / (post_div1 * post_div2);
+
+        // Configure clocks
+        // CLK_REF is the XOSC source
+        clock_configure_undivided(clk_ref,
+                        CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC,
+                        0, // No aux mux
+                        XOSC_HZ);
+
+        // CLK SYS = PLL SYS (usually) 125MHz / 1 = 125MHz
+        clock_configure_undivided(clk_sys,
+                        CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX,
+                        CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
+                        freq);
+
+#if PICO_CLOCK_ADJUST_PERI_CLOCK_WITH_SYS_CLOCK
+        clock_configure_undivided(clk_peri,
+                        0,
+                        CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
+                        freq);
+#else
+        clock_configure_undivided(clk_peri,
+                        0, // Only AUX mux on ADC
+                        CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
+                        USB_CLK_HZ);
+#endif
+    }
+}
+
+bool check_sys_clock_hz(uint32_t freq_hz, uint *vco_out, uint *postdiv1_out, uint *postdiv2_out) {
+    uint reference_freq_hz = XOSC_HZ / PLL_SYS_REFDIV;
+    for (uint fbdiv = 320; fbdiv >= 16; fbdiv--) {
+        uint vco_hz = fbdiv * reference_freq_hz;
+        if (vco_hz < PICO_PLL_VCO_MIN_FREQ_HZ || vco_hz > PICO_PLL_VCO_MAX_FREQ_HZ) continue;
+        for (uint postdiv1 = 7; postdiv1 >= 1; postdiv1--) {
+            for (uint postdiv2 = postdiv1; postdiv2 >= 1; postdiv2--) {
+                uint out = vco_hz / (postdiv1 * postdiv2);
+                if (out == freq_hz && !(vco_hz % (postdiv1 * postdiv2))) {
+                    *vco_out = vco_hz;
+                    *postdiv1_out = postdiv1;
+                    *postdiv2_out = postdiv2;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+// Note this impl is kept to preserve previous rounding behavior, vs calling check_sys_clock_hz
+bool check_sys_clock_khz(uint32_t freq_khz, uint *vco_out, uint *postdiv1_out, uint *postdiv2_out) {
+    uint reference_freq_khz = (XOSC_HZ / KHZ) / PLL_SYS_REFDIV;
+    for (uint fbdiv = 320; fbdiv >= 16; fbdiv--) {
+        uint vco_khz = fbdiv * reference_freq_khz;
+        if (vco_khz < PICO_PLL_VCO_MIN_FREQ_HZ / KHZ || vco_khz > PICO_PLL_VCO_MAX_FREQ_HZ / KHZ) continue;
+        for (uint postdiv1 = 7; postdiv1 >= 1; postdiv1--) {
+            for (uint postdiv2 = postdiv1; postdiv2 >= 1; postdiv2--) {
+                uint out = vco_khz / (postdiv1 * postdiv2);
+                if (out == freq_khz && !(vco_khz % (postdiv1 * postdiv2))) {
+                    *vco_out = vco_khz * KHZ;
+                    *postdiv1_out = postdiv1;
+                    *postdiv2_out = postdiv2;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }

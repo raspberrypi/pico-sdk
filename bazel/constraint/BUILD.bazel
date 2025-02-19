@@ -1,0 +1,254 @@
+load("//bazel/util:label_flag_matches.bzl", "label_flag_matches")
+
+package(default_visibility = ["//visibility:public"])
+
+# This constraint represents the dimension that guides the Pico SDK build. This
+# constraint will only ever enumerate specific MCUs (and the host), and does NOT
+# cover the differences from board-to-board.
+constraint_setting(
+    name = "sdk_target",
+    default_constraint_value = "host",
+)
+
+# This constraint value is used to guide the host build.
+constraint_value(
+    name = "host",
+    constraint_setting = ":sdk_target",
+)
+
+# This constraint value is used to guide parts of the build that are specific
+# to the rp2040.
+constraint_value(
+    name = "rp2040",
+    constraint_setting = ":sdk_target",
+)
+
+# This constraint value is used to guide parts of the build that are specific
+# to the rp2350.
+constraint_value(
+    name = "rp2350",
+    constraint_setting = ":sdk_target",
+)
+
+constraint_setting(
+    name = "wireless_support",
+    default_constraint_value = "no_wireless",
+)
+
+constraint_value(
+    name = "no_wireless",
+    constraint_setting = ":wireless_support",
+)
+
+constraint_value(
+    name = "cyw43_wireless",
+    constraint_setting = ":wireless_support",
+)
+
+config_setting(
+    name = "is_pico_w",
+    flag_values = {"//bazel/config:PICO_BOARD": "pico_w"},
+)
+
+config_setting(
+    name = "is_pico2_w",
+    flag_values = {"//bazel/config:PICO_BOARD": "pico2_w"},
+)
+
+config_setting(
+    name = "pico_toolchain_clang_enabled",
+    flag_values = {"//bazel/config:PICO_TOOLCHAIN": "clang"},
+)
+
+config_setting(
+    name = "pico_toolchain_gcc_enabled",
+    flag_values = {"//bazel/config:PICO_TOOLCHAIN": "gcc"},
+)
+
+config_setting(
+    name = "pico_baremetal_enabled",
+    flag_values = {"//bazel/config:PICO_BARE_METAL": "True"},
+)
+
+config_setting(
+    name = "pico_no_gc_sections_enabled",
+    flag_values = {"//bazel/config:PICO_NO_GC_SECTIONS": "True"},
+)
+
+config_setting(
+    name = "pico_cxx_enable_exceptions_enabled",
+    flag_values = {"//bazel/config:PICO_CXX_ENABLE_EXCEPTIONS": "True"},
+)
+
+config_setting(
+    name = "pico_cxx_enable_rtti_enabled",
+    flag_values = {"//bazel/config:PICO_CXX_ENABLE_RTTI": "True"},
+)
+
+config_setting(
+    name = "pico_cxx_enable_cxa_atexit_enabled",
+    flag_values = {"//bazel/config:PICO_CXX_ENABLE_RTTI": "True"},
+)
+
+config_setting(
+    name = "pico_stdio_uart_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_UART": "True"},
+)
+
+config_setting(
+    name = "pico_stdio_usb_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_USB": "True"},
+)
+
+config_setting(
+    name = "pico_stdio_semihosting_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_SEMIHOSTING": "True"},
+)
+
+config_setting(
+    name = "pico_stdio_rtt_enabled",
+    flag_values = {"//bazel/config:PICO_STDIO_RTT": "True"},
+)
+
+config_setting(
+    name = "pico_multicore_enabled",
+    flag_values = {"//bazel/config:PICO_MULTICORE_ENABLED": "True"},
+)
+
+config_setting(
+    name = "pico_float_auto_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_FLOAT_IMPL": "auto"},
+)
+
+config_setting(
+    name = "pico_float_compiler_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_FLOAT_IMPL": "compiler"},
+)
+
+config_setting(
+    name = "pico_float_dcp_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_FLOAT_IMPL": "dcp"},
+)
+
+config_setting(
+    name = "pico_float_rp2040_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_FLOAT_IMPL": "rp2040"},
+)
+
+config_setting(
+    name = "pico_float_vfp_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_FLOAT_IMPL": "vfp"},
+)
+
+config_setting(
+    name = "pico_double_auto_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_DOUBLE_IMPL": "auto"},
+)
+
+config_setting(
+    name = "pico_double_compiler_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_DOUBLE_IMPL": "compiler"},
+)
+
+config_setting(
+    name = "pico_double_dcp_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_DOUBLE_IMPL": "dcp"},
+)
+
+config_setting(
+    name = "pico_double_rp2040_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_DOUBLE_IMPL": "rp2040"},
+)
+
+config_setting(
+    name = "pico_divider_hardware_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_DIVIDER_IMPL": "hardware"},
+)
+
+config_setting(
+    name = "pico_divider_auto_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_DIVIDER_IMPL": "auto"},
+)
+
+config_setting(
+    name = "pico_printf_pico_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_PRINTF_IMPL": "pico"},
+)
+
+config_setting(
+    name = "pico_printf_compiler_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_PRINTF_IMPL": "compiler"},
+)
+
+config_setting(
+    name = "pico_async_context_poll_enabled",
+    flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "poll"},
+)
+
+config_setting(
+    name = "pico_async_context_threadsafe_background_enabled",
+    flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "threadsafe_background"},
+)
+
+config_setting(
+    name = "pico_async_context_freertos_enabled",
+    flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "freertos"},
+)
+
+config_setting(
+    name = "pico_use_default_max_page_size_enabled",
+    flag_values = {"//bazel/config:PICO_USE_DEFAULT_MAX_PAGE_SIZE": "True"},
+)
+
+config_setting(
+    name = "pico_no_target_name_enabled",
+    flag_values = {"//bazel/config:PICO_NO_TARGET_NAME": "True"},
+)
+
+config_setting(
+    name = "pico_clib_llvm_libc_enabled",
+    flag_values = {"//bazel/config:PICO_CLIB": "llvm_libc"},
+)
+
+config_setting(
+    name = "pico_clib_newlib_enabled",
+    flag_values = {"//bazel/config:PICO_CLIB": "newlib"},
+)
+
+config_setting(
+    name = "pico_clib_picolibc_enabled",
+    flag_values = {"//bazel/config:PICO_CLIB": "picolibc"},
+)
+
+config_setting(
+    name = "pico_bt_enable_ble_enabled",
+    flag_values = {"//bazel/config:PICO_BT_ENABLE_BLE": "True"},
+)
+
+config_setting(
+    name = "pico_bt_enable_classic_enabled",
+    flag_values = {"//bazel/config:PICO_BT_ENABLE_CLASSIC": "True"},
+)
+
+config_setting(
+    name = "pico_bt_enable_mesh_enabled",
+    flag_values = {"//bazel/config:PICO_BT_ENABLE_MESH": "True"},
+)
+
+label_flag_matches(
+    name = "pico_lwip_config_unset",
+    flag = "//bazel/config:PICO_LWIP_CONFIG",
+    value = "//bazel:empty_cc_lib",
+)
+
+label_flag_matches(
+    name = "pico_btstack_config_unset",
+    flag = "//bazel/config:PICO_BTSTACK_CONFIG",
+    value = "//bazel:empty_cc_lib",
+)
+
+label_flag_matches(
+    name = "pico_freertos_unset",
+    flag = "//bazel/config:PICO_FREERTOS_LIB",
+    value = "//bazel:empty_cc_lib",
+)

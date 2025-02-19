@@ -1,0 +1,39 @@
+load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+load("//src/common/pico_binary_info:binary_info.bzl", "custom_pico_binary_info")
+
+package(default_visibility = ["//visibility:public"])
+
+# This is exposed so that custom_pico_binary_info targets can find the required
+# source files.
+filegroup(
+    name = "binary_info_srcs",
+    srcs = ["standard_binary_info.c"],
+)
+
+# PICO_BUILD_DEFINE: PICO_CMAKE_BUILD_TYPE, The type of build (e.g. Debug or Release) to embed in binary info, type=string, default=pico, group=build
+pico_sdk_define(
+    name = "PICO_BAZEL_BUILD_TYPE",
+    # WARNING: The actual define is named after CMake, so that define
+    # is reused for compatibility.
+    define_name = "PICO_CMAKE_BUILD_TYPE",
+    from_flag = "//bazel/config:PICO_BAZEL_BUILD_TYPE",
+)
+
+# With custom_pico_binary_info, it's possible to set binary info globally or
+# on a per-binary basis.
+#
+# Setting globally:
+#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_INFO to point to your
+#     custom custom_pico_binary_info.
+#
+# Setting per-binary:
+#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_INFO=@pico-sdk//bazel:empty_cc_lib
+#   * Copy this cc_library, and manually set the values as you wish.
+#   * Add custom_pico_binary_info to each cc_binary individually.
+custom_pico_binary_info(
+    name = "default_binary_info",
+    program_description = None,
+    program_name = None,
+    program_url = None,
+    program_version_string = None,
+)

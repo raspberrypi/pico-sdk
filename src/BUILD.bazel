@@ -1,0 +1,31 @@
+package(default_visibility = ["//visibility:public"])
+
+# This shim exists as a way to break internal header dependency cycles
+# that occur within the dependency chain of the pico_platform target below.
+alias(
+    name = "pico_platform_internal",
+    actual = select({
+        "//bazel/constraint:host": "//src/host/pico_platform:pico_platform_internal",
+        "//conditions:default": "//src/rp2_common:pico_platform_internal",
+    }),
+    visibility = [
+        "//src/common/boot_picobin_headers:__pkg__",
+        "//src/common/boot_picoboot_headers:__pkg__",
+        "//src/common/hardware_claim:__pkg__",
+        "//src/common/pico_base_headers:__pkg__",
+        "//src/common/pico_binary_info:__pkg__",
+        # These libraries sometimes need the host version even though they live
+        # in rp2_common.
+        "//src/rp2_common/boot_bootrom_headers:__pkg__",
+        "//src/rp2_common/hardware_boot_lock:__pkg__",
+        "//src/rp2_common/pico_flash:__pkg__",
+    ],
+)
+
+alias(
+    name = "pico_platform",
+    actual = select({
+        "//bazel/constraint:host": "//src/host/pico_platform",
+        "//conditions:default": "//src/rp2_common:pico_platform",
+    }),
+)

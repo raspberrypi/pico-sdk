@@ -1,0 +1,50 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_mem_ops",
+    actual = select({
+        "//bazel/constraint:rp2040": ":pico_mem_ops_pico",
+        "//conditions:default": ":pico_mem_ops_compiler",
+    }),
+)
+
+cc_library(
+    name = "pico_mem_ops_compiler",
+    hdrs = ["include/pico/mem_ops.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = ["//visibility:private"],
+    deps = [
+        "//src/rp2_common:pico_platform_internal",
+    ],
+)
+
+cc_library(
+    name = "pico_mem_ops_pico",
+    srcs = [
+        "mem_ops.c",
+        "mem_ops_aeabi.S",
+    ],
+    hdrs = ["include/pico/mem_ops.h"],
+    includes = ["include"],
+    linkopts = [
+        "-Wl,--wrap=memcpy",
+        "-Wl,--wrap=memset",
+        "-Wl,--wrap=__aeabi_memcpy",
+        "-Wl,--wrap=__aeabi_memset",
+        "-Wl,--wrap=__aeabi_memcpy4",
+        "-Wl,--wrap=__aeabi_memset4",
+        "-Wl,--wrap=__aeabi_memcpy8",
+        "-Wl,--wrap=__aeabi_memset8",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = ["//visibility:private"],
+    deps = [
+        "//src/rp2_common:pico_platform_internal",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_runtime_init",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

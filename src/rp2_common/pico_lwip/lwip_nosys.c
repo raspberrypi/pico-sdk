@@ -71,4 +71,8 @@ void sys_arch_unprotect(__unused sys_prot_t pval) {
 uint32_t sys_now(void) {
     return to_ms_since_boot(get_absolute_time());
 }
+
+__weak uint32_t sys_jiffies(void) {
+    return time_us_32();
+}
 #endif

@@ -1,0 +1,8 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_bit_ops",
+    srcs = ["bit_ops.c"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/common/pico_bit_ops_headers:pico_bit_ops_interface"],
+)

@@ -1,0 +1,60 @@
+# Always include these libraries through //src/rp2_common:*!
+# This ensures that you'll get the right headers for the MCU you're targeting.
+
+package(
+    default_visibility = [
+        "//src/rp2040:__subpackages__",
+        "//src/rp2_common:__pkg__",
+    ],
+)
+
+cc_library(
+    name = "platform_defs",
+    hdrs = [
+        "include/hardware/platform_defs.h",
+    ],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+)
+
+cc_library(
+    name = "hardware_regs",
+    hdrs = [
+        "include/hardware/regs/adc.h",
+        "include/hardware/regs/addressmap.h",
+        "include/hardware/regs/busctrl.h",
+        "include/hardware/regs/clocks.h",
+        "include/hardware/regs/dma.h",
+        "include/hardware/regs/dreq.h",
+        "include/hardware/regs/i2c.h",
+        "include/hardware/regs/intctrl.h",
+        "include/hardware/regs/io_bank0.h",
+        "include/hardware/regs/io_qspi.h",
+        "include/hardware/regs/m0plus.h",
+        "include/hardware/regs/pads_bank0.h",
+        "include/hardware/regs/pads_qspi.h",
+        "include/hardware/regs/pio.h",
+        "include/hardware/regs/pll.h",
+        "include/hardware/regs/psm.h",
+        "include/hardware/regs/pwm.h",
+        "include/hardware/regs/resets.h",
+        "include/hardware/regs/rosc.h",
+        "include/hardware/regs/rtc.h",
+        "include/hardware/regs/sio.h",
+        "include/hardware/regs/spi.h",
+        "include/hardware/regs/ssi.h",
+        "include/hardware/regs/syscfg.h",
+        "include/hardware/regs/sysinfo.h",
+        "include/hardware/regs/tbman.h",
+        "include/hardware/regs/timer.h",
+        "include/hardware/regs/uart.h",
+        "include/hardware/regs/usb.h",
+        "include/hardware/regs/usb_device_dpram.h",
+        "include/hardware/regs/vreg_and_chip_reset.h",
+        "include/hardware/regs/watchdog.h",
+        "include/hardware/regs/xip.h",
+        "include/hardware/regs/xosc.h",
+    ],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+)

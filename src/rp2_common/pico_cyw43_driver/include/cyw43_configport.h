@@ -62,6 +62,14 @@ extern "C" {
 #define CYW43_SPI_PIO 1
 #endif
 
+#ifndef CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE
+#if CYW43_ENABLE_BLUETOOTH
+#define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "wb43439A0_7_95_49_00_combined.h"
+#else
+#define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "w43439A0_7_95_49_00_combined.h"
+#endif
+#endif
+
 #ifndef CYW43_WIFI_NVRAM_INCLUDE_FILE
 #define CYW43_WIFI_NVRAM_INCLUDE_FILE "wifi_nvram_43439.h"
 #endif
@@ -71,6 +79,10 @@ extern "C" {
 #define CYW43_EIO              (-PICO_ERROR_IO) // I/O error
 #define CYW43_EINVAL           (-PICO_ERROR_INVALID_ARG) // Invalid argument
 #define CYW43_ETIMEDOUT        (-PICO_ERROR_TIMEOUT) // Connection timed out
+
+#ifndef CYW43_WL_GPIO_COUNT
+#define CYW43_WL_GPIO_COUNT 3
+#endif
 
 #define CYW43_NUM_GPIOS        CYW43_WL_GPIO_COUNT
 
@@ -87,16 +99,45 @@ static inline uint32_t cyw43_hal_ticks_ms(void) {
     return to_ms_since_boot(get_absolute_time());
 }
 
+#if CYW43_PIN_WL_DYNAMIC
+// these are just an index into an array
+typedef enum cyw43_pin_index_t {
+    CYW43_PIN_INDEX_WL_REG_ON,
+    CYW43_PIN_INDEX_WL_DATA_OUT,
+    CYW43_PIN_INDEX_WL_DATA_IN,
+    CYW43_PIN_INDEX_WL_HOST_WAKE,
+    CYW43_PIN_INDEX_WL_CLOCK,
+    CYW43_PIN_INDEX_WL_CS,
+    CYW43_PIN_INDEX_WL_COUNT // last
+} cyw43_pin_index_t;
+#define CYW43_PIN_WL_REG_ON cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_REG_ON)
+#define CYW43_PIN_WL_DATA_OUT cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_DATA_OUT)
+#define CYW43_PIN_WL_DATA_IN cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_DATA_IN)
+#define CYW43_PIN_WL_HOST_WAKE cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_HOST_WAKE)
+#define CYW43_PIN_WL_CLOCK cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_CLOCK)
+#define CYW43_PIN_WL_CS cyw43_get_pin_wl(CYW43_PIN_INDEX_WL_CS)
+// Lookup the gpio value in an array
+uint cyw43_get_pin_wl(cyw43_pin_index_t pin_id);
+#else
+// Just return the gpio number configured at build time
+#define CYW43_PIN_WL_REG_ON CYW43_DEFAULT_PIN_WL_REG_ON
+#define CYW43_PIN_WL_DATA_OUT CYW43_DEFAULT_PIN_WL_DATA_OUT
+#define CYW43_PIN_WL_DATA_IN CYW43_DEFAULT_PIN_WL_DATA_IN
+#define CYW43_PIN_WL_HOST_WAKE CYW43_DEFAULT_PIN_WL_HOST_WAKE
+#define CYW43_PIN_WL_CLOCK CYW43_DEFAULT_PIN_WL_CLOCK
+#define CYW43_PIN_WL_CS CYW43_DEFAULT_PIN_WL_CS
+#endif // !CYW43_PIN_WL_DYNAMIC
+
 static inline int cyw43_hal_pin_read(cyw43_hal_pin_obj_t pin) {
     return gpio_get(pin);
 }
 
 static inline void cyw43_hal_pin_low(cyw43_hal_pin_obj_t pin) {
-    gpio_clr_mask(1 << pin);
+    gpio_put(pin, false);
 }
 
 static inline void cyw43_hal_pin_high(cyw43_hal_pin_obj_t pin) {
-    gpio_set_mask(1 << pin);
+    gpio_put(pin, true);
 }
 
 #define CYW43_HAL_PIN_MODE_INPUT           (GPIO_IN)
@@ -148,6 +189,14 @@ void cyw43_schedule_internal_poll_dispatch(void (*func)(void));
 void cyw43_post_poll_hook(void);
 
 #define CYW43_POST_POLL_HOOK cyw43_post_poll_hook();
+
+// Allow malloc and free to be changed
+#ifndef cyw43_malloc
+#define cyw43_malloc malloc
+#endif
+#ifndef cyw43_free
+#define cyw43_free free
+#endif
 
 #ifdef __cplusplus
 }

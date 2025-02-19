@@ -14,6 +14,8 @@
 //
 // This header may be included by other board headers as "boards/nullbits_bit_c_pro.h"
 
+// pico_cmake_set PICO_PLATFORM=rp2040
+
 #ifndef _BOARDS_NULLBITS_BIT_C_PRO_H
 #define _BOARDS_NULLBITS_BIT_C_PRO_H
 
@@ -56,7 +58,7 @@
 
 //------------- I2C -------------//
 #ifndef PICO_DEFAULT_I2C
-#define PICO_DEFAULT_I2C 0
+#define PICO_DEFAULT_I2C 1
 #endif
 
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
@@ -98,10 +100,10 @@
 #endif
 
 // Bit-C PRO has 4MB SPI flash
+// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (4 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
 #endif
-
 // All boards have B1+ RP2040
 #ifndef PICO_RP2040_B0_SUPPORTED
 #define PICO_RP2040_B0_SUPPORTED 0

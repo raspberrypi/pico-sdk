@@ -1,0 +1,49 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# Picotool needs this, so we can't strictly constrain platform compatibility.
+cc_library(
+    name = "pico_bootrom_headers",
+    hdrs = [
+        "include/pico/bootrom.h",
+        "include/pico/bootrom/lock.h",
+        "include/pico/bootrom/sf_table.h",
+        "include/pico/bootrom_constants.h",
+    ],
+    includes = ["include"],
+    tags = ["manual"],
+    visibility = ["@picotool//:__subpackages__"],
+    deps = [
+        "//src/rp2_common/boot_bootrom_headers",
+        "//src/rp2_common/hardware_boot_lock:hardware_boot_lock_headers",
+        "//src/rp2_common/pico_flash:pico_flash_headers",
+    ] + select({
+        "//bazel/constraint:host": ["//src/host/hardware_sync"],
+        "//conditions:default": ["//src/rp2_common/hardware_sync"],
+    }),
+)
+
+cc_library(
+    name = "pico_bootrom",
+    srcs = [
+        "bootrom.c",
+        "bootrom_lock.c",
+    ],
+    implementation_deps = [
+        "//src/common/boot_picobin_headers",
+        "//src/common/boot_picoboot_headers",
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/pico_runtime_init",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":pico_bootrom_headers",
+    ] + select({
+        "//bazel/constraint:host": [
+        ],
+        "//conditions:default": [
+            "//src/rp2_common:pico_platform_internal",
+        ],
+    }),
+)

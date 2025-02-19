@@ -11,9 +11,13 @@
 #include "hardware/structs/spi.h"
 #include "hardware/regs/dreq.h"
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_SPI, Enable/disable assertions in the SPI module, type=bool, default=0, group=hardware_spi
-#ifndef PARAM_ASSERTIONS_ENABLED_SPI
-#define PARAM_ASSERTIONS_ENABLED_SPI 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_SPI, Enable/disable assertions in the hardware_spi module, type=bool, default=0, group=hardware_spi
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_SPI
+#ifdef PARAM_ASSERTIONS_ENABLED_SPI // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_SPI PARAM_ASSERTIONS_ENABLED_SPI
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_SPI 0
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -23,9 +27,9 @@ extern "C" {
 /** \file hardware/spi.h
  *  \defgroup hardware_spi hardware_spi
  *
- * Hardware SPI API
+ * \brief Hardware SPI API
  *
- * RP2040 has 2 identical instances of the Serial Peripheral Interface (SPI) controller.
+ * RP-series microcontrollers have 2 identical instances of the Serial Peripheral Interface (SPI) controller.
  *
  * The PrimeCell SSP is a master or slave interface for synchronous serial communication with peripheral devices that have
  * Motorola SPI, National Semiconductor Microwire, or Texas Instruments synchronous serial interfaces.
@@ -35,14 +39,14 @@ extern "C" {
  * Each controller can be connected to a number of GPIO pins, see the datasheet GPIO function selection table for more information.
  */
 
-// PICO_CONFIG: PICO_DEFAULT_SPI, Define the default SPI for a board, min=0, max=1, group=hardware_spi
-// PICO_CONFIG: PICO_DEFAULT_SPI_SCK_PIN, Define the default SPI SCK pin, min=0, max=29, group=hardware_spi
-// PICO_CONFIG: PICO_DEFAULT_SPI_TX_PIN, Define the default SPI TX pin, min=0, max=29, group=hardware_spi
-// PICO_CONFIG: PICO_DEFAULT_SPI_RX_PIN, Define the default SPI RX pin, min=0, max=29, group=hardware_spi
-// PICO_CONFIG: PICO_DEFAULT_SPI_CSN_PIN, Define the default SPI CSN pin, min=0, max=29, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI, Define the default SPI for a board, min=0, max=1, default=Usually provided via board header, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_SCK_PIN, Define the default SPI SCK pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_TX_PIN, Define the default SPI TX pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_RX_PIN, Define the default SPI RX pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_spi
+// PICO_CONFIG: PICO_DEFAULT_SPI_CSN_PIN, Define the default SPI CSN pin, min=0, max=47 on RP2350B, 29 otherwise, default=Usually provided via board header, group=hardware_spi
 
 /**
- * Opaque type representing an SPI instance.
+ * \brief Opaque type representing an SPI instance.
  */
 typedef struct spi_inst spi_inst_t;
 
@@ -62,12 +66,73 @@ typedef struct spi_inst spi_inst_t;
  */
 #define spi1 ((spi_inst_t *)spi1_hw)
 
+/**
+ * \def PICO_DEFAULT_SPI_INSTANCE()
+ * \ingroup hardware_spi
+ * \hideinitializer
+ * \brief Returns the default SPI instance
+ */
 #if !defined(PICO_DEFAULT_SPI_INSTANCE) && defined(PICO_DEFAULT_SPI)
-#define PICO_DEFAULT_SPI_INSTANCE (__CONCAT(spi,PICO_DEFAULT_SPI))
+#define PICO_DEFAULT_SPI_INSTANCE() (__CONCAT(spi,PICO_DEFAULT_SPI))
 #endif
 
+/**
+ * \def PICO_DEFAULT_SPI
+ * \ingroup hardware_spi
+ * \hideinitializer
+ * \brief The default SPI instance number
+ */
+
+/**
+ * \def PICO_DEFAULT_SPI_INSTANCE()
+ * \ingroup hardware_spi
+ * \hideinitializer
+ * \brief Returns the default SPI instance
+ */
 #ifdef PICO_DEFAULT_SPI_INSTANCE
-#define spi_default PICO_DEFAULT_SPI_INSTANCE
+#define spi_default PICO_DEFAULT_SPI_INSTANCE()
+#endif
+
+/**
+ * \def SPI_NUM(spi)
+ * \ingroup hardware_spi
+ * \hideinitializer
+ * \brief Returns the SPI number for a SPI instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef SPI_NUM
+static_assert(NUM_SPIS == 2, "");
+#define SPI_NUM(spi) ((spi) == spi1)
+#endif
+
+/**
+ * \def SPI_INSTANCE(spi_num)
+ * \ingroup hardware_spi
+ * \hideinitializer
+ * \brief Returns the SPI instance with the given SPI number
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef SPI_INSTANCE
+static_assert(NUM_SPIS == 2, "");
+#define SPI_INSTANCE(num) ((num) ? spi1 : spi0)
+#endif
+
+/**
+ * \def SPI_DREQ_NUM(spi, is_tx)
+ * \ingroup hardware_spi
+ * \hideinitializer
+ * \brief Returns the \ref dreq_num_t used for pacing DMA transfers to or from this SPI instance.
+ * If is_tx is true, then it is for transfers to the SPI else for transfers from the SPI.
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef SPI_DREQ_NUM
+static_assert(DREQ_SPI0_RX == DREQ_SPI0_TX + 1, "");
+static_assert(DREQ_SPI1_RX == DREQ_SPI1_TX + 1, "");
+static_assert(DREQ_SPI1_TX == DREQ_SPI0_TX + 2, "");
+#define SPI_DREQ_NUM(spi, is_tx) (DREQ_SPI0_TX + SPI_NUM(spi) * 2 + !(is_tx))
 #endif
 
 /** \brief Enumeration of SPI CPHA (clock phase) values.
@@ -99,6 +164,7 @@ typedef enum {
 
 /*! \brief Initialise SPI instances
  *  \ingroup hardware_spi
+ *
  * Puts the SPI into a known state, and enable it. Must be called before other
  * functions.
  *
@@ -113,7 +179,8 @@ uint spi_init(spi_inst_t *spi, uint baudrate);
 
 /*! \brief Deinitialise SPI instances
  *  \ingroup hardware_spi
- * Puts the SPI into a disabled state. Init will need to be called to reenable the device
+ *
+ * Puts the SPI into a disabled state. Init will need to be called to re-enable the device
  * functions.
  *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
@@ -149,8 +216,8 @@ uint spi_get_baudrate(const spi_inst_t *spi);
  * \return Number of SPI, 0 or 1.
  */
 static inline uint spi_get_index(const spi_inst_t *spi) {
-    invalid_params_if(SPI, spi != spi0 && spi != spi1);
-    return spi == spi1 ? 1 : 0;
+    invalid_params_if(HARDWARE_SPI, spi != spi0 && spi != spi1);
+    return SPI_NUM(spi);
 }
 
 static inline spi_hw_t *spi_get_hw(spi_inst_t *spi) {
@@ -175,11 +242,16 @@ static inline const spi_hw_t *spi_get_const_hw(const spi_inst_t *spi) {
  * \param order Must be SPI_MSB_FIRST, no other values supported on the PL022
  */
 static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cpol, spi_cpha_t cpha, __unused spi_order_t order) {
-    invalid_params_if(SPI, data_bits < 4 || data_bits > 16);
+    invalid_params_if(HARDWARE_SPI, data_bits < 4 || data_bits > 16);
     // LSB-first not supported on PL022:
-    invalid_params_if(SPI, order != SPI_MSB_FIRST);
-    invalid_params_if(SPI, cpol != SPI_CPOL_0 && cpol != SPI_CPOL_1);
-    invalid_params_if(SPI, cpha != SPI_CPHA_0 && cpha != SPI_CPHA_1);
+    invalid_params_if(HARDWARE_SPI, order != SPI_MSB_FIRST);
+    invalid_params_if(HARDWARE_SPI, cpol != SPI_CPOL_0 && cpol != SPI_CPOL_1);
+    invalid_params_if(HARDWARE_SPI, cpha != SPI_CPHA_0 && cpha != SPI_CPHA_1);
+
+    // Disable the SPI
+    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
+    hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
+
     hw_write_masked(&spi_get_hw(spi)->cr0,
                     ((uint)(data_bits - 1)) << SPI_SSPCR0_DSS_LSB |
                     ((uint)cpol) << SPI_SSPCR0_SPO_LSB |
@@ -187,6 +259,9 @@ static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cp
         SPI_SSPCR0_DSS_BITS |
         SPI_SSPCR0_SPO_BITS |
         SPI_SSPCR0_SPH_BITS);
+
+    // Re-enable the SPI
+    hw_set_bits(&spi_get_hw(spi)->cr1, enable_mask);
 }
 
 /*! \brief Set SPI master/slave
@@ -199,10 +274,17 @@ static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cp
  * \param slave true to set SPI device as a slave device, false for master.
  */
 static inline void spi_set_slave(spi_inst_t *spi, bool slave) {
+    // Disable the SPI
+    uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
+    hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
+
     if (slave)
         hw_set_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_MS_BITS);
     else
         hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_MS_BITS);
+
+    // Re-enable the SPI
+    hw_set_bits(&spi_get_hw(spi)->cr1, enable_mask);
 }
 
 // ----------------------------------------------------------------------------
@@ -344,10 +426,7 @@ int spi_read16_blocking(spi_inst_t *spi, uint16_t repeated_tx_data, uint16_t *ds
  * \param is_tx true for sending data to the SPI instance, false for receiving data from the SPI instance
  */
 static inline uint spi_get_dreq(spi_inst_t *spi, bool is_tx) {
-    static_assert(DREQ_SPI0_RX == DREQ_SPI0_TX + 1, "");
-    static_assert(DREQ_SPI1_RX == DREQ_SPI1_TX + 1, "");
-    static_assert(DREQ_SPI1_TX == DREQ_SPI0_TX + 2, "");
-    return DREQ_SPI0_TX + spi_get_index(spi) * 2 + !is_tx;
+    return SPI_DREQ_NUM(spi, is_tx);
 }
 
 #ifdef __cplusplus

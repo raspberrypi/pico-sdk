@@ -1,0 +1,8 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_fix",
+    target_compatible_with = compatible_with_rp2(),
+)

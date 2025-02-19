@@ -2,9 +2,11 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
+#if !PICO_RP2040
+#warning "Building hardware/divider.S on a platform with no SIO divider hardware"
+#endif
+
+pico_default_asm_setup
 
 // tag::hw_div_s32[]
 regular_func_with_section hw_divider_divmod_s32
@@ -39,7 +41,7 @@ regular_func_with_section hw_divider_save_state
     ldr r1, [r3, #SIO_DIV_UDIVIDEND_OFFSET]
     ldr r2, [r3, #SIO_DIV_UDIVISOR_OFFSET]
     stmia r0!, {r1-r2}
-    // The 8 cycles needed to guarantee that the result is ready is ensured by the preceeding
+    // The 8 cycles needed to guarantee that the result is ready is ensured by the preceding
     // code of 7 cycles together with any branch to it taking at least 2 cycles.
     ldr r1, [r3, #SIO_DIV_REMAINDER_OFFSET]
     ldr r2, [r3, #SIO_DIV_QUOTIENT_OFFSET]

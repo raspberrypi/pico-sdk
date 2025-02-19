@@ -13,8 +13,8 @@ check_hw_size(dma_channel_hw_t, DMA_CHAN_STRIDE);
 check_hw_layout(dma_hw_t, abort, DMA_CHAN_ABORT_OFFSET);
 
 // sanity check
-static_assert(__builtin_offsetof(dma_hw_t, ch[0].ctrl_trig) == DMA_CH0_CTRL_TRIG_OFFSET, "hw mismatch");
-static_assert(__builtin_offsetof(dma_hw_t, ch[1].ctrl_trig) == DMA_CH1_CTRL_TRIG_OFFSET, "hw mismatch");
+static_assert(offsetof(dma_hw_t, ch[0].ctrl_trig) == DMA_CH0_CTRL_TRIG_OFFSET, "hw mismatch");
+static_assert(offsetof(dma_hw_t, ch[1].ctrl_trig) == DMA_CH1_CTRL_TRIG_OFFSET, "hw mismatch");
 
 static_assert(NUM_DMA_CHANNELS <= 16, "");
 static uint16_t _claimed;
@@ -70,6 +70,19 @@ bool dma_timer_is_claimed(uint timer) {
     return hw_is_claimed(&_timer_claimed, timer);
 }
 
+void dma_channel_cleanup(uint channel) {
+    check_dma_channel_param(channel);
+    // Disable CHAIN_TO, and disable channel, so that it ignores any further triggers 
+    hw_write_masked( &dma_hw->ch[channel].al1_ctrl, (channel << DMA_CH0_CTRL_TRIG_CHAIN_TO_LSB) | (0u << DMA_CH0_CTRL_TRIG_EN_LSB), DMA_CH0_CTRL_TRIG_CHAIN_TO_BITS | DMA_CH0_CTRL_TRIG_EN_BITS );
+    // disable IRQs first as abort can cause spurious IRQs
+    for(uint i=0; i < NUM_DMA_IRQS; i++) {
+        dma_irqn_set_channel_enabled(i, channel, false);
+    }
+    dma_channel_abort(channel);
+    // finally clear the IRQ status, which may have been set during abort
+    dma_hw->intr = 1u << channel;
+}
+
 #ifndef NDEBUG
 
 void print_dma_ctrl(dma_channel_hw_t *channel) {
@@ -93,8 +106,8 @@ void print_dma_ctrl(dma_channel_hw_t *channel) {
 }
 #endif
 
-#if PARAM_ASSERTIONS_ENABLED(DMA)
+#if PARAM_ASSERTIONS_ENABLED(HARDWARE_DMA)
 void check_dma_channel_param_impl(uint __unused channel) {
-    valid_params_if(DMA, channel < NUM_DMA_CHANNELS);
+    valid_params_if(HARDWARE_DMA, channel < NUM_DMA_CHANNELS);
 }
 #endif

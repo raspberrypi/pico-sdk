@@ -78,7 +78,7 @@
    (MPU_RBAR_VALID_Msk))
 
 /**
-* MPU Memory Access Attributes
+* \brief MPU Memory Access Attributes
 * 
 * \param TypeExtField      Type extension field, allows you to configure memory access type, for example strongly ordered, peripheral.
 * \param IsShareable       Region is shareable between multiple bus masters.
@@ -92,7 +92,7 @@
    (((IsBufferable) << MPU_RASR_B_Pos)   & MPU_RASR_B_Msk))
 
 /**
-* MPU Region Attribute and Size Register Value
+* \brief MPU Region Attribute and Size Register Value
 * 
 * \param DisableExec       Instruction access disable bit, 1= disable instruction fetches.
 * \param AccessPermission  Data access permissions, allows you to configure read/write access for User and Privileged mode.
@@ -109,7 +109,7 @@
    (((MPU_RASR_ENABLE_Msk))))
 
 /**
-* MPU Region Attribute and Size Register Value
+* \brief MPU Region Attribute and Size Register Value
 * 
 * \param DisableExec       Instruction access disable bit, 1= disable instruction fetches.
 * \param AccessPermission  Data access permissions, allows you to configure read/write access for User and Privileged mode.
@@ -124,7 +124,7 @@
   ARM_MPU_RASR_EX(DisableExec, AccessPermission, ARM_MPU_ACCESS_(TypeExtField, IsShareable, IsCacheable, IsBufferable), SubRegionDisable, Size)
 
 /**
-* MPU Memory Access Attribute for strongly ordered memory.
+* \brief MPU Memory Access Attribute for strongly ordered memory.
 *  - TEX: 000b
 *  - Shareable
 *  - Non-cacheable
@@ -133,7 +133,7 @@
 #define ARM_MPU_ACCESS_ORDERED ARM_MPU_ACCESS_(0U, 1U, 0U, 0U)
 
 /**
-* MPU Memory Access Attribute for device memory.
+* \brief MPU Memory Access Attribute for device memory.
 *  - TEX: 000b (if shareable) or 010b (if non-shareable)
 *  - Shareable or non-shareable
 *  - Non-cacheable
@@ -144,7 +144,7 @@
 #define ARM_MPU_ACCESS_DEVICE(IsShareable) ((IsShareable) ? ARM_MPU_ACCESS_(0U, 1U, 0U, 1U) : ARM_MPU_ACCESS_(2U, 0U, 0U, 0U))
 
 /**
-* MPU Memory Access Attribute for normal memory.
+* \brief MPU Memory Access Attribute for normal memory.
 *  - TEX: 1BBb (reflecting outer cacheability rules)
 *  - Shareable or non-shareable
 *  - Cacheable or non-cacheable (reflecting inner cacheability rules)
@@ -157,28 +157,28 @@
 #define ARM_MPU_ACCESS_NORMAL(OuterCp, InnerCp, IsShareable) ARM_MPU_ACCESS_((4U | (OuterCp)), IsShareable, ((InnerCp) >> 1U), ((InnerCp) & 1U))
 
 /**
-* MPU Memory Access Attribute non-cacheable policy.
+* \brief MPU Memory Access Attribute non-cacheable policy.
 */
 #define ARM_MPU_CACHEP_NOCACHE 0U
 
 /**
-* MPU Memory Access Attribute write-back, write and read allocate policy.
+* \brief MPU Memory Access Attribute write-back, write and read allocate policy.
 */
 #define ARM_MPU_CACHEP_WB_WRA 1U
 
 /**
-* MPU Memory Access Attribute write-through, no write allocate policy.
+* \brief MPU Memory Access Attribute write-through, no write allocate policy.
 */
 #define ARM_MPU_CACHEP_WT_NWA 2U
 
 /**
-* MPU Memory Access Attribute write-back, no write allocate policy.
+* \brief MPU Memory Access Attribute write-back, no write allocate policy.
 */
 #define ARM_MPU_CACHEP_WB_NWA 3U
 
 
 /**
-* Struct for a single MPU Region
+* \brief Struct for a single MPU Region
 */
 typedef struct {
   uint32_t RBAR; //!< The region base address register value (RBAR)

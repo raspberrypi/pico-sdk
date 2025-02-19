@@ -1,0 +1,76 @@
+load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_async_context",
+    actual = select({
+        "//bazel/constraint:pico_async_context_poll_enabled": ":pico_async_context_poll",
+        "//bazel/constraint:pico_async_context_threadsafe_background_enabled": ":pico_async_context_threadsafe_background",
+        "//bazel/constraint:pico_async_context_freertos_enabled": ":pico_async_context_freertos",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+cc_library(
+    name = "pico_async_context_base",
+    srcs = ["async_context_base.c"],
+    hdrs = [
+        "include/pico/async_context.h",
+        "include/pico/async_context_base.h",
+    ],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+    ],
+)
+
+cc_library(
+    name = "pico_async_context_freertos",
+    srcs = ["async_context_freertos.c"],
+    hdrs = ["include/pico/async_context_freertos.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config(
+        "//bazel/constraint:pico_freertos_unset",
+    ),
+    deps = [
+        ":pico_async_context_base",
+        "//bazel/config:PICO_FREERTOS_LIB",
+        "//src/common/pico_sync",
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_irq",
+    ],
+)
+
+cc_library(
+    name = "pico_async_context_poll",
+    srcs = ["async_context_poll.c"],
+    hdrs = ["include/pico/async_context_poll.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":pico_async_context_base",
+        "//src/common/pico_sync",
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+    ],
+)
+
+cc_library(
+    name = "pico_async_context_threadsafe_background",
+    srcs = ["async_context_threadsafe_background.c"],
+    hdrs = ["include/pico/async_context_threadsafe_background.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":pico_async_context_base",
+        "//src/common/pico_sync",
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/pico_multicore",
+    ],
+)

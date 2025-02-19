@@ -1,0 +1,54 @@
+load("//bazel:defs.bzl", "pico_board_config")
+load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "flag_choice")
+
+package(default_visibility = ["//visibility:public"])
+
+# Find all boards.
+BOARD_CHOICE_FILES = glob(["include/boards/*.h"])
+
+# Extract just the name of the board.
+BOARD_CHOICES = [
+    path.removeprefix("include/boards/").removesuffix(".h")
+    for path in BOARD_CHOICE_FILES
+]
+
+BOARD_CHOICE_MAP = {c: [":{}".format(c)] for c in BOARD_CHOICES}
+
+# PICO_BUILD_DEFINE: PICO_BOARD, Name of board, type=string, default=CMake PICO_BOARD variable, group=pico_base
+[
+    pico_board_config(
+        name = board,
+        hdrs = BOARD_CHOICE_FILES,
+        defines = [
+            'PICO_BOARD=\\"{}\\"'.format(board),
+        ],
+        includes = ["include"],
+        platform_includes = [
+            "cmsis/rename_exceptions.h",
+            "boards/{}.h".format(board),
+        ],
+        deps = ["//src/rp2_common/cmsis:rename_exceptions"],
+    )
+    for board in BOARD_CHOICES
+]
+
+# Creates a config_setting for each known board option with the name:
+#     PICO_BOARD_[choice]
+declare_flag_choices(
+    "//bazel/config:PICO_BOARD",
+    BOARD_CHOICES,
+)
+
+cc_library(
+    name = "default",
+    deps = select(
+        flag_choice(
+            "//bazel/config:PICO_BOARD",
+            ":__pkg__",
+            BOARD_CHOICE_MAP,
+        ) | {
+            "//bazel/constraint:host": [":none"],
+            "//conditions:default": [":none"],
+        },
+    ),
+)

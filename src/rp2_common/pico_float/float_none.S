@@ -7,9 +7,7 @@
 #include "pico/asm_helper.S"
 #include "pico/bootrom/sf_table.h"
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
+pico_default_asm_setup
 
 wrapper_func __aeabi_fadd
 wrapper_func __aeabi_fdiv
@@ -29,7 +27,6 @@ wrapper_func __aeabi_i2f
 wrapper_func __aeabi_l2f
 wrapper_func __aeabi_ui2f
 wrapper_func __aeabi_ul2f
-wrapper_func __aeabi_i2f
 wrapper_func __aeabi_f2iz
 wrapper_func __aeabi_f2lz
 wrapper_func __aeabi_f2uiz
@@ -73,9 +70,13 @@ wrapper_func remquof
 wrapper_func expm1f
 wrapper_func log1pf
 wrapper_func fmaf
+#ifdef __riscv
+    la a0, str
+    j  panic
+#else
     push {lr}       // keep stack trace sane
     ldr r0, =str
     bl panic
-
+#endif
 str:
     .asciz "float support is disabled"

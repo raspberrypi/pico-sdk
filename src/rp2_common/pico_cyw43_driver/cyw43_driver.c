@@ -9,6 +9,7 @@
 #include "pico/unique_id.h"
 #include "cyw43.h"
 #include "pico/cyw43_driver.h"
+#include "pico/async_context.h"
 
 #ifndef CYW43_GPIO_IRQ_HANDLER_PRIORITY
 #define CYW43_GPIO_IRQ_HANDLER_PRIORITY 0x40
@@ -62,8 +63,8 @@ uint32_t cyw43_irq_deinit(__unused void *param) {
 #ifndef NDEBUG
     assert(get_core_num() == async_context_core_num(cyw43_async_context));
 #endif
-    gpio_remove_raw_irq_handler(CYW43_PIN_WL_HOST_WAKE, cyw43_gpio_irq_handler);
     cyw43_set_irq_enabled(false);
+    gpio_remove_raw_irq_handler(CYW43_PIN_WL_HOST_WAKE, cyw43_gpio_irq_handler);
     return 0;
 }
 
@@ -164,6 +165,10 @@ void cyw43_thread_lock_check(void) {
 #endif
 
 void cyw43_await_background_or_timeout_us(uint32_t timeout_us) {
+    if (__get_current_exception() > 0) {
+        async_context_wait_until(cyw43_async_context, make_timeout_time_us(timeout_us));
+        return;
+    }
     async_context_wait_for_work_until(cyw43_async_context, make_timeout_time_us(timeout_us));
 }
 

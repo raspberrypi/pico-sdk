@@ -1,0 +1,15 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "cybt_shared_bus_driver",
+    srcs = [
+        "cybt_shared_bus.c",
+        "cybt_shared_bus_driver.c",
+    ],
+    hdrs = ["cybt_shared_bus_driver.h"],
+    includes = ["."],
+    deps = [
+        "@cyw43-driver//:cyw43_driver",
+    ],
+    alwayslink = True,
+)

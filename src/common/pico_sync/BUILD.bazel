@@ -1,0 +1,46 @@
+load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_sync_headers",
+    hdrs = [
+        "include/pico/critical_section.h",
+        "include/pico/lock_core.h",
+        "include/pico/mutex.h",
+        "include/pico/sem.h",
+        "include/pico/sync.h",
+    ],
+    includes = ["include"],
+    visibility = [
+        "//src/rp2_common/hardware_sync:__pkg__",
+        "//src/rp2_common/hardware_sync_spin_lock:__pkg__",
+    ],
+)
+
+cc_library(
+    name = "pico_sync",
+    srcs = [
+        "critical_section.c",
+        "lock_core.c",
+        "mutex.c",
+        "sem.c",
+    ],
+    # valid_params_if() uses Statement Expressions, which aren't supported in MSVC.
+    target_compatible_with = incompatible_with_config("@rules_cc//cc/compiler:msvc-cl"),
+    deps = [
+        ":pico_sync_headers",
+        "//src/common/pico_base_headers",
+        "//src/common/pico_time:pico_time_headers",
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/hardware_sync",
+            "//src/host/pico_runtime",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common/hardware_sync",
+            "//src/rp2_common/hardware_sync_spin_lock",
+            "//src/rp2_common/pico_runtime_init",
+        ],
+    }),
+)

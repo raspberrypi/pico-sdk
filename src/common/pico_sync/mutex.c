@@ -6,6 +6,39 @@
 
 #include "pico/mutex.h"
 #include "pico/time.h"
+#include "pico/runtime_init.h"
+
+#if !PICO_RUNTIME_NO_INIT_MUTEX
+void __weak runtime_init_mutex(void) {
+    // this is an array of either mutex_t or recursive_mutex_t (i.e. not necessarily the same size)
+    // however each starts with a lock_core_t, and the spin_lock is initialized to address 1 for a recursive
+    // spinlock and 0 for a regular one.
+
+    static_assert(!(sizeof(mutex_t)&3), "");
+    static_assert(!(sizeof(recursive_mutex_t)&3), "");
+    static_assert(!offsetof(mutex_t, core), "");
+    static_assert(!offsetof(recursive_mutex_t, core), "");
+    extern lock_core_t __mutex_array_start;
+    extern lock_core_t __mutex_array_end;
+
+    for (lock_core_t *l = &__mutex_array_start; l < &__mutex_array_end; ) {
+        if (l->spin_lock) {
+            assert(1 == (uintptr_t)l->spin_lock); // indicator for a recursive mutex
+            recursive_mutex_t *rm = (recursive_mutex_t *)l;
+            recursive_mutex_init(rm);
+            l = &rm[1].core; // next
+        } else {
+            mutex_t *m = (mutex_t *)l;
+            mutex_init(m);
+            l = &m[1].core; // next
+        }
+    }
+}
+#endif
+
+#if defined(PICO_RUNTIME_INIT_MUTEX) && !PICO_RUNTIME_SKIP_INIT_MUTEX
+PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_mutex, PICO_RUNTIME_INIT_MUTEX);
+#endif
 
 void mutex_init(mutex_t *mtx) {
     lock_init(&mtx->core, next_striped_spin_lock_num());

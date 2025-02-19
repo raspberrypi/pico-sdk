@@ -14,29 +14,39 @@
 /** \file hardware/adc.h
  *  \defgroup hardware_adc hardware_adc
  *
- * Analog to Digital Converter (ADC) API
+ * \brief Analog to Digital Converter (ADC) API
  *
- * The RP2040 has an internal analogue-digital converter (ADC) with the following features:
+ * RP-series microcontrollers have
+ *  an internal analogue-digital converter (ADC) with the following features:
  * - SAR ADC
  * - 500 kS/s (Using an independent 48MHz clock)
- * - 12 bit (8.7 ENOB)
- * - 5 input mux:
+ * - 12 bit (RP2040 8.7 ENOB, RP2350 9.2 ENOB)
+ * \if rp2040_specific
+ * - RP2040 5 input mux:
  *  - 4 inputs that are available on package pins shared with GPIO[29:26]
  *  - 1 input is dedicated to the internal temperature sensor
- * - 4 element receive sample FIFO
+ *  - 4 element receive sample FIFO
+ * \endif
+ *
+ * \if rp2350_specific
+ * - RP2350 5 or 9 input mux:
+ *  - 4 inputs available on QFN-60 package pins shared with GPIO[29:26]
+ *  - 8 inputs available on QFN-80 package pins shared with GPIO[47:40]
+ *  - 8 element receive sample FIFO
+ * \endif
+ * - One input dedicated to the internal temperature sensor (see Section 12.4.6)
  * - Interrupt generation
  * - DMA interface
  *
  * Although there is only one ADC you can specify the input to it using the adc_select_input() function.
  * In round robin mode (adc_set_round_robin()), the ADC will use that input and move to the next one after a read.
  *
- * User ADC inputs are on 0-3 (GPIO 26-29), the temperature sensor is on input 4.
+ * RP2040, RP2350 QFN-60: User ADC inputs are on 0-3 (GPIO 26-29), the temperature sensor is on input 4.
+ * RP2350 QFN-80 : User ADC inputs are on 0-7 (GPIO 40-47), the temperature sensor is on input 8.
  *
  * Temperature sensor values can be approximated in centigrade as:
  *
  * T = 27 - (ADC_Voltage - 0.706)/0.001721
- *
- * The FIFO, if used, can contain up to 4 entries.
  *
  * \subsection adc_example Example
  * \addtogroup hardware_adc
@@ -44,9 +54,25 @@
  * \include hello_adc.c
  */
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_ADC, Enable/disable assertions in the ADC module, type=bool, default=0, group=hardware_adc
-#ifndef PARAM_ASSERTIONS_ENABLED_ADC
-#define PARAM_ASSERTIONS_ENABLED_ADC 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_ADC, Enable/disable assertions in the hardware_adc module, type=bool, default=0, group=hardware_adc
+#ifndef PARAM_ASSERTIONS_ENABLED_HARDWARE_ADC
+#ifdef PARAM_ASSERTIONS_ENABLED_ADC // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_ADC PARAM_ASSERTIONS_ENABLED_ADC
+#else
+#define PARAM_ASSERTIONS_ENABLED_HARDWARE_ADC 0
+#endif
+#endif
+
+/**
+ * The ADC channel number of the on-board temperature sensor
+ */
+#ifndef ADC_TEMPERATURE_CHANNEL_NUM
+#define ADC_TEMPERATURE_CHANNEL_NUM (NUM_ADC_CHANNELS - 1)
+#endif
+
+// PICO_CONFIG: PICO_ADC_CLKDIV_ROUND_NEAREST, True if floating point ADC clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_adc
+#ifndef PICO_ADC_CLKDIV_ROUND_NEAREST
+#define PICO_ADC_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
 #endif
 
 #ifdef __cplusplus
@@ -64,10 +90,10 @@ void adc_init(void);
  *
  * Prepare a GPIO for use with ADC by disabling all digital functions.
  *
- * \param gpio The GPIO number to use. Allowable GPIO numbers are 26 to 29 inclusive.
+ * \param gpio The GPIO number to use. Allowable GPIO numbers are 26 to 29 inclusive on RP2040 or RP2350A, 40-48 inclusive on RP2350B
  */
 static inline void adc_gpio_init(uint gpio) {
-    invalid_params_if(ADC, gpio < 26 || gpio > 29);
+    invalid_params_if(HARDWARE_ADC, gpio < ADC_BASE_PIN || gpio >= ADC_BASE_PIN + NUM_ADC_CHANNELS - 1);
     // Select NULL function to make output driver hi-Z
     gpio_set_function(gpio, GPIO_FUNC_NULL);
     // Also disable digital pulls and digital receiver
@@ -78,20 +104,35 @@ static inline void adc_gpio_init(uint gpio) {
 /*! \brief  ADC input select
  *  \ingroup hardware_adc
  *
- * Select an ADC input. 0...3 are GPIOs 26...29 respectively.
- * Input 4 is the onboard temperature sensor.
+ * Select an ADC input
+ * \if rp2040_specific
+ * On RP2040 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
+ * \endif
+ * \if rp2350_specific
+ * On RP2350A 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
+ * On RP2350B 0...7 are GPIOs 40...47 respectively. Input 8 is the onboard temperature sensor.
+ * \endif
  *
  * \param input Input to select.
  */
 static inline void adc_select_input(uint input) {
-    valid_params_if(ADC, input < NUM_ADC_CHANNELS);
+    valid_params_if(HARDWARE_ADC, input < NUM_ADC_CHANNELS);
     hw_write_masked(&adc_hw->cs, input << ADC_CS_AINSEL_LSB, ADC_CS_AINSEL_BITS);
 }
 
 /*! \brief  Get the currently selected ADC input channel
  *  \ingroup hardware_adc
  *
- * \return The currently selected input channel. 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
+ * \return The currently selected input channel.
+ * 
+ * \if rp2040_specific
+ * On RP2040 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
+ * \endif
+ *
+ * \if rp2350_specific
+ * On RP2350A 0...3 are GPIOs 26...29 respectively. Input 4 is the onboard temperature sensor.
+ * On RP2350B 0...7 are GPIOs 40...47 respectively. Input 8 is the onboard temperature sensor.
+ * \endif
  */
 static inline uint adc_get_selected_input(void) {
     return (adc_hw->cs & ADC_CS_AINSEL_BITS) >> ADC_CS_AINSEL_LSB;
@@ -101,12 +142,13 @@ static inline uint adc_get_selected_input(void) {
  *  \ingroup hardware_adc
  *
  * This function sets which inputs are to be run through in round robin mode.
- * Value between 0 and 0x1f (bit 0 to bit 4 for GPIO 26 to 29 and temperature sensor input respectively)
+ * RP2040, RP2350 QFN-60: Value between 0 and 0x1f (bit 0 to bit 4 for GPIO 26 to 29 and temperature sensor input respectively)
+ * RP2350 QFN-80: Value between 0 and 0xff (bit 0 to bit 7 for GPIO 40 to 47 and temperature sensor input respectively)
  *
- * \param input_mask A bit pattern indicating which of the 5 inputs are to be sampled. Write a value of 0 to disable round robin sampling.
+ * \param input_mask A bit pattern indicating which of the 5/8 inputs are to be sampled. Write a value of 0 to disable round robin sampling.
  */
 static inline void adc_set_round_robin(uint input_mask) {
-    valid_params_if(ADC, input_mask < (1 << NUM_ADC_CHANNELS));
+    valid_params_if(HARDWARE_ADC, input_mask < (1 << NUM_ADC_CHANNELS));
     hw_write_masked(&adc_hw->cs, input_mask << ADC_CS_RROBIN_LSB, ADC_CS_RROBIN_BITS);
 }
 
@@ -160,14 +202,26 @@ static inline void adc_run(bool run) {
  * \param clkdiv If non-zero, conversion will be started at intervals rather than back to back.
  */
 static inline void adc_set_clkdiv(float clkdiv) {
-    invalid_params_if(ADC, clkdiv >= 1 << (ADC_DIV_INT_MSB - ADC_DIV_INT_LSB + 1));
-    adc_hw->div = (uint32_t)(clkdiv * (float) (1 << ADC_DIV_INT_LSB));
+    invalid_params_if(HARDWARE_ADC, clkdiv >= 1 << REG_FIELD_WIDTH(ADC_DIV_INT));
+    const int frac_bit_count = REG_FIELD_WIDTH(ADC_DIV_FRAC);
+#if PICO_ADC_CLKDIV_ROUND_NEAREST
+    clkdiv += 0.5f / (1 << frac_bit_count); // round to the nearest fraction
+#endif
+    adc_hw->div = (uint32_t)(clkdiv * (float) (1 << frac_bit_count));
 }
 
 /*! \brief Setup the ADC FIFO
  *  \ingroup hardware_adc
  *
- * FIFO is 4 samples long, if a conversion is completed and the FIFO is full, the result is dropped.
+ * \if rp2040_specific
+ * On RP2040 the FIFO is 4 samples long.
+ * \endif
+ *
+ * \if rp2350_specific
+ * On RP2350 the FIFO is 8 samples long.
+ * \endif
+ * 
+ * If a conversion is completed and the FIFO is full, the result is dropped.
  *
  * \param en Enables write each conversion result to the FIFO
  * \param dreq_en Enable DMA requests when FIFO contains data
@@ -196,13 +250,20 @@ static inline void adc_set_clkdiv(float clkdiv) {
  * \return Returns true if the FIFO is empty
  */
 static inline bool adc_fifo_is_empty(void) {
-    return !!(adc_hw->fcs & ADC_FCS_EMPTY_BITS);
+    return adc_hw->fcs & ADC_FCS_EMPTY_BITS;
 }
 
 /*! \brief Get number of entries in the ADC FIFO
  *  \ingroup hardware_adc
  *
- * The ADC FIFO is 4 entries long. This function will return how many samples are currently present.
+ * \if rp2040_specific
+ * On RP2040 the FIFO is 4 samples long.
+ * \endif
+ * \if rp2350_specific
+ * On RP2350 the FIFO is 8 samples long.
+ * \endif
+ * 
+ * This function will return how many samples are currently present.
  */
 static inline uint8_t adc_fifo_get_level(void) {
     return (adc_hw->fcs & ADC_FCS_LEVEL_BITS) >> ADC_FCS_LEVEL_LSB;

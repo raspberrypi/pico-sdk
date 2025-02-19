@@ -4,14 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
-
 #include "pico/asm_helper.S"
 #include "pico/bootrom.h"
+#include "pico/runtime_init.h"
 
-__pre_init __aeabi_bits_init, 00010
+pico_default_asm_setup
 
 .macro bits_section name
 #if PICO_BITS_IN_RAM
@@ -20,6 +17,9 @@ __pre_init __aeabi_bits_init, 00010
 .section SECTION_NAME(\name), "ax"
 #endif
 .endm
+
+#if PICO_RP2040
+PICO_RUNTIME_INIT_FUNC_RUNTIME(__aeabi_bits_init, PICO_RUNTIME_INIT_AEABI_BIT_OPS)
 
 .section .data.aeabi_bits_funcs
 .global aeabi_bits_funcs, aeabi_bits_funcs_end
@@ -107,21 +107,17 @@ wrapper_func __popcountdi2
     add r0, r1
     pop {pc}
 
-bits_section reverse32
-regular_func reverse32
-    ldr r3, =aeabi_bits_funcs
-    ldr r3, [r3, #REVERSE32]
-    bx r3
-
 bits_section __rev
 regular_func __rev
 regular_func __revl
+regular_func reverse32
     ldr r3, =aeabi_bits_funcs
     ldr r3, [r3, #REVERSE32]
     bx r3
 
 bits_section __revll
 regular_func __revll
+regular_func reverse64
     push {lr}
     ldr r3, =aeabi_bits_funcs
     ldr r3, [r3, #REVERSE32]
@@ -132,3 +128,63 @@ regular_func __revll
     blx r3
     mov r1, ip
     pop {pc}
+
+#else // RP2350
+
+bits_section __rev
+regular_func __rev
+regular_func __revl
+regular_func reverse32
+#ifdef __riscv
+    rev8 a0, a0
+    brev8 a0, a0
+    ret
+#else
+    rbit r0, r0
+    bx lr
+#endif
+
+bits_section __revll
+regular_func __revll
+regular_func reverse64
+#ifdef __riscv
+    rev8 a0, a0
+    brev8 a0, a0
+    rev8 a1, a1
+    brev8 a1, a1
+    mv a2, a0
+    mv a0, a1
+    mv a1, a2
+    ret
+#else
+    mov r2, r1
+    rbit r1, r0
+    rbit r0, r2
+    bx lr
+#endif
+
+// todo gcc riscv version is nuts; we'll provide both versions for simplicity in CMakeLists.txt
+//  (also gcc arm version is a bit pants)
+bits_section ctzdi
+wrapper_func __ctzdi2
+#ifdef __riscv
+    beqz a0, 1f
+    ctz a0, a0
+    ret
+1:
+    ctz a0, a1
+    addi a0, a0, 32
+    ret
+#else
+    cbz r0, 1f
+    rbit r0, r0
+    clz r0, r0
+    bx	lr
+1:
+    rbit r0, r1
+    clz r0, r0
+    adds r0, #32
+    bx	lr
+#endif
+
+#endif

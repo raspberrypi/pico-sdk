@@ -1,0 +1,38 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# This library creates a bunch of circular dependencies, so just rely on
+# the implementation getting pulled in as a link dep (i.e. invert the usual
+# interface pattern).
+cc_library(
+    name = "pico_runtime",
+    hdrs = ["include/pico/runtime.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+    ],
+)
+
+cc_library(
+    name = "pico_runtime_link",
+    srcs = ["runtime.c"],
+    hdrs = ["include/pico/runtime.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/common/pico_sync",
+        "//src/common/pico_time",
+        "//src/rp2_common:hardware_regs",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_resets",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_clib_interface:pico_clib_interface_link",
+        "//src/rp2_common/pico_printf",
+    ],
+    alwayslink = True,
+)

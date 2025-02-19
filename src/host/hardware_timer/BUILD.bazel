@@ -1,0 +1,33 @@
+package(default_visibility = ["//visibility:public"])
+
+_DEFINES = [
+    "PICO_HARDWARE_TIMER_RESOLUTION_US=1000",
+    # TODO: This seems to be the default, make configurable eventually.
+    "PICO_TIME_DEFAULT_ALARM_POOL_DISABLED=1",
+]
+
+# This exists to break a dependency cycle between
+# this library and //src/common/pico_time.
+# Application code should always use :hardware_timer instead.
+cc_library(
+    name = "hardware_timer_headers",
+    hdrs = ["include/hardware/timer.h"],
+    defines = _DEFINES,
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    visibility = [
+        "//src/common/pico_time:__pkg__",
+        "//src/host/pico_platform:__pkg__",
+    ],
+    deps = ["//src/common/pico_base_headers"],
+)
+
+cc_library(
+    name = "hardware_timer",
+    srcs = ["timer.c"],
+    hdrs = ["include/hardware/timer.h"],
+    defines = _DEFINES,
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/host/pico_platform"],
+)

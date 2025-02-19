@@ -1,3 +1,3 @@
-void main() {
+int main() {
 
 }

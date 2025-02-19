@@ -63,13 +63,26 @@ void __isr handler3(void) {
 }
 
 static inline irq_handler_t *get_vtable(void) {
+#ifdef __riscv
+    return (irq_handler_t *) (riscv_read_csr(RVCSR_MTVEC_OFFSET) & ~0x3u);
+#else
     return (irq_handler_t *) scb_hw->vtor;
+#endif
 }
+
+// Only used for dumping the chain for post-mortem:
+#define SLOT_SIZE 12
+extern uint8_t irq_handler_chain_slots[SLOT_SIZE * PICO_MAX_SHARED_IRQ_HANDLERS];
+#ifdef __riscv
+#define SLOT_LINK_OFFSET 10
+#else
+#define SLOT_LINK_OFFSET 6
+#endif
 
 int dma_check(int expected, ...) {
     if (expected == 0) {
         // doing the DMA if there are no IRQ handlers will cause a hard fault, so we just check we are pointing at the handler which does this.
-        PICOTEST_CHECK_AND_ABORT(get_vtable()[16 + DMA_IRQ_0] == __unhandled_user_irq, "Expected there to be no IRQ handlers");
+        PICOTEST_CHECK_AND_ABORT(get_vtable()[VTABLE_FIRST_IRQ + DMA_IRQ_0] == __unhandled_user_irq, "Expected there to be no IRQ handlers");
         return 0;
     }
     fire_count = 0;
@@ -101,6 +114,23 @@ int dma_check(int expected, ...) {
             printf("%d", fired[i]);
         }
         printf("\n");
+        printf("Dump of slot chain:\n");
+        uint8_t *head = (uint8_t*)get_vtable()[VTABLE_FIRST_IRQ + DMA_IRQ_0];
+        printf("  Head at %p\n", head);
+        while (head >= irq_handler_chain_slots && head <= &irq_handler_chain_slots[SLOT_SIZE * (PICO_MAX_SHARED_IRQ_HANDLERS - 1)]) {
+            printf(
+                "  %p (slot %3u): %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x\n",
+                head, ((uintptr_t)head - (uintptr_t)irq_handler_chain_slots) / SLOT_SIZE,
+                head[1],  head[0],
+                head[3],  head[2],
+                head[5],  head[4],
+                head[7],  head[6],
+                head[9],  head[8],
+                head[11], head[10]
+            );
+            head = &irq_handler_chain_slots[head[SLOT_LINK_OFFSET] * SLOT_SIZE];
+        }
+        printf("Handlers at: %p, %p, %p\n", handler1, handler2, handler3);
         return -1;
     }
     return 0;

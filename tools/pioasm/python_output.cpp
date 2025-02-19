@@ -97,7 +97,7 @@ struct python_output : public output_format {
             std::map<uint, std::string> jmp_labels;
             // for now just use numeric labels
             for (int i = 0; i < (int)program.instructions.size(); i++) {
-                const auto &inst = program.instructions[i];
+                const auto &inst = (uint16_t)program.instructions[i];
                 if (!(inst >> 13u)) {
                     // a jump
                     uint target = inst &0x1fu;
@@ -105,9 +105,9 @@ struct python_output : public output_format {
                 }
             }
 
-            for (uint i = 0; i < (int)program.instructions.size(); i++) {
+            for (uint i = 0; i < (uint)program.instructions.size(); i++) {
                 const auto &inst = program.instructions[i];
-                if (i == program.wrap_target) {
+                if (i == (uint)program.wrap_target) {
                     fprintf(out, "    wrap_target()\n");
                 }
                 auto it = jmp_labels.find(i);
@@ -115,7 +115,7 @@ struct python_output : public output_format {
                     fprintf(out, "    label(\"%s\")\n", it->second.c_str());
                 }
                 fprintf(out, "    %s # %d\n", disassemble(jmp_labels, inst, program.sideset_bits_including_opt.get(), program.sideset_opt).c_str(), i);
-                if (i == program.wrap) {
+                if (i == (uint)program.wrap) {
                     fprintf(out, "    wrap()\n");
                 }
             }
@@ -151,11 +151,11 @@ struct python_output : public output_format {
         return 0;
     }
 
-    static std::string disassemble(const std::map<uint, std::string>& jmp_labels, uint16_t inst, uint sideset_bits_including_opt, bool sideset_opt) {
+    static std::string disassemble(const std::map<uint, std::string>& jmp_labels, uint inst, uint sideset_bits_including_opt, bool sideset_opt) {
         std::stringstream ss;
-        uint major = inst >> 13u;
+        uint major = (inst >> 13u) & 0x7;
         uint arg1 = ((uint) inst >> 5u) & 0x7u;
-        uint arg2 = inst & 0x1fu;
+        uint arg2 = (inst & 0x1fu) | ((inst & 0x10000) >> 11);
         std::string op_string;
         auto op = [&](const std::string &s) {
             op_string = s;
@@ -203,6 +203,9 @@ struct python_output : public output_format {
                                 guts += irq;
                             }
                         }
+                        break;
+                    default:
+                        invalid = true;
                         break;
                 }
                 if (!invalid) {
@@ -254,23 +257,24 @@ struct python_output : public output_format {
                 uint operation = arg2 >> 3u;
                 if (source.empty() || dest.empty() || operation == 3) {
                     invalid = true;
-                }
-                if (dest == source && (arg1 == 1 || arg2 == 2) && operation == 0) {
-                    op("nop");
-                    op_guts("");
                 } else {
-                    op("mov");
-                    std::string guts = dest + ", ";
-                    if (operation == 1) {
-                        guts += "invert(";
-                    } else if (operation == 2) {
-                        guts += "reverse(";
+                    if (dest == source && (arg1 == 1 || arg2 == 2) && operation == 0) {
+                        op("nop");
+                        op_guts("");
+                    } else {
+                        op("mov");
+                        std::string guts = dest + ", ";
+                        if (operation == 1) {
+                            guts += "invert(";
+                        } else if (operation == 2) {
+                            guts += "reverse(";
+                        }
+                        guts += source;
+                        if (operation == 1 || operation == 2) {
+                            guts += ")";
+                        }
+                        op_guts(guts);
                     }
-                    guts += source;
-                    if (operation == 1 || operation == 2) {
-                        guts += ")";
-                    }
-                    op_guts(guts);
                 }
                 break;
             }
@@ -310,7 +314,9 @@ struct python_output : public output_format {
         if (invalid) {
             op("word");
             ss << std::hex;
-            op_guts(std::to_string(inst));
+            std::stringstream guts;
+            guts << std::hex << std::showbase << std::setfill('0') << std::setw(4) << inst;
+            op_guts(guts.str());
         }
         uint delay = ((uint) inst >> 8u) & 0x1f;
         ss << std::left << std::setw(9);

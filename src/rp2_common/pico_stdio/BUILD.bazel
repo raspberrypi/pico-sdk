@@ -1,0 +1,58 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# This exists to break dependency cycles between
+# this library and the stdio implementations.
+# Application code should always use :pico_stdio instead.
+cc_library(
+    name = "pico_stdio_headers",
+    hdrs = [
+        "include/pico/stdio.h",
+        "include/pico/stdio/driver.h",
+    ],
+    defines = ["LIB_PICO_STDIO=1"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    visibility = [
+        "//src/rp2_common/pico_clib_interface:__pkg__",
+        "//src/rp2_common/pico_stdio_rtt:__pkg__",
+        "//src/rp2_common/pico_stdio_semihosting:__pkg__",
+        "//src/rp2_common/pico_stdio_uart:__pkg__",
+        "//src/rp2_common/pico_stdio_usb:__pkg__",
+        "//src/rp2_common/tinyusb:__pkg__",
+    ],
+    # Ensure these defines are always present.
+    deps = [
+        "//src/rp2_common/pico_stdio_semihosting:LIB_PICO_STDIO_SEMIHOSTING",
+        "//src/rp2_common/pico_stdio_uart:LIB_PICO_STDIO_UART",
+        "//src/rp2_common/pico_stdio_usb:LIB_PICO_STDIO_USB",
+    ],
+)
+
+cc_library(
+    name = "pico_stdio",
+    srcs = ["stdio.c"],
+    linkopts = [
+        "-Wl,--wrap=printf",
+        "-Wl,--wrap=vprintf",
+        "-Wl,--wrap=puts",
+        "-Wl,--wrap=putchar",
+        "-Wl,--wrap=getchar",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":pico_stdio_headers",
+        "//src/common/pico_sync",
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_printf",
+        "//src/rp2_common/pico_stdio_semihosting",
+        "//src/rp2_common/pico_stdio_semihosting:LIB_PICO_STDIO_SEMIHOSTING",
+        "//src/rp2_common/pico_stdio_uart",
+        "//src/rp2_common/pico_stdio_uart:LIB_PICO_STDIO_UART",
+        "//src/rp2_common/pico_stdio_usb",
+        "//src/rp2_common/pico_stdio_usb:LIB_PICO_STDIO_USB",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

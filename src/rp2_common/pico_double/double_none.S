@@ -7,9 +7,7 @@
 #include "pico/asm_helper.S"
 #include "pico/bootrom/sf_table.h"
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
+pico_default_asm_setup
 
     wrapper_func __aeabi_dadd
     wrapper_func __aeabi_ddiv
@@ -74,9 +72,14 @@
     wrapper_func log1p
     wrapper_func fma
 
+#ifdef __riscv
+    la a0, str
+    j  panic
+#else
     push {lr}       // keep stack trace sane
     ldr r0, =str
     bl panic
+#endif
 
 str:
     .asciz "double support is disabled"

@@ -1,0 +1,38 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# Picotool needs this (transitively through
+# //src/rp2_common/pico_bootrom:pico_bootrom_headers), so we can't strictly
+# constrain compatibility.
+cc_library(
+    name = "pico_flash_headers",
+    hdrs = ["include/pico/flash.h"],
+    includes = ["include"],
+    visibility = ["//src/rp2_common/pico_bootrom:__pkg__"],
+    deps = [
+        "//src:pico_platform_internal",
+    ],
+)
+
+cc_library(
+    name = "pico_flash",
+    srcs = ["flash.c"],
+    defines = select({
+        "//bazel/constraint:pico_freertos_unset": ["PICO_FREERTOS_LIB=0"],
+        "//conditions:default": ["PICO_FREERTOS_LIB=1"],
+    }),
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":pico_flash_headers",
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_exception",
+        "//src/rp2_common/hardware_flash",
+        "//src/rp2_common/hardware_sync",
+        "//src/rp2_common/pico_multicore",
+    ] + select({
+        "//bazel/constraint:pico_freertos_unset": [],
+        "//conditions:default": ["//bazel/config:PICO_FREERTOS_LIB"],
+    }),
+)

@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+# This needs to remain compatible with the host build since it's used by
+# Picotool.
+cc_library(
+    name = "boot_picoboot_headers",
+    hdrs = [
+        "include/boot/picoboot.h",
+        "include/boot/picoboot_constants.h",
+    ],
+    includes = ["include"],
+    deps = ["//src:pico_platform_internal"],
+)

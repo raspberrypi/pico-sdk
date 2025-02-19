@@ -1,0 +1,54 @@
+package(default_visibility = ["//visibility:public"])
+
+exports_files(
+    [
+        "memmap_copy_to_ram.ld",
+        "memmap_default.ld",
+        "memmap_no_flash.ld",
+    ]
+)
+
+# It's possible to set linker scripts globally or on a per-binary basis.
+#
+# Setting globally:
+#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT to point to your
+#     desired linker script.
+#
+# Setting per-binary:
+#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT=@pico-sdk//bazel:empty_cc_lib
+#   * Manually add your desired linker script to each cc_binary.
+cc_library(
+    name = "default_linker_script",
+    linkopts = ["-T$(location memmap_default.ld)"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+    deps = [
+        "memmap_default.ld",
+        "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2_common/pico_standard_link:default_flash_region",
+    ],
+)
+
+# PICO_BUILD_DEFINE: PICO_COPY_TO_RAM, whether this is a 'copy_to_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "copy_to_ram_linker_script",
+    defines = ["PICO_COPY_TO_RAM=1"],
+    linkopts = ["-T$(location memmap_copy_to_ram.ld)"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+    deps = [
+        "memmap_copy_to_ram.ld",
+        "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2_common/pico_standard_link:default_flash_region",
+    ],
+)
+
+# PICO_BUILD_DEFINE: PICO_NO_FLASH, whether this is a 'no_flash' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "no_flash_linker_script",
+    defines = ["PICO_NO_FLASH=1"],
+    linkopts = ["-T$(location memmap_no_flash.ld)"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+    deps = [
+        "memmap_no_flash.ld",
+        "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+    ],
+)

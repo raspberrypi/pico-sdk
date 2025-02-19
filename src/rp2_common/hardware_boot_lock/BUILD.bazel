@@ -1,0 +1,28 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# Picotool needs this, so we can't strictly constrain compatibility.
+cc_library(
+    name = "hardware_boot_lock_headers",
+    hdrs = ["include/hardware/boot_lock.h"],
+    includes = ["include"],
+    tags = ["manual"],
+    deps = ["//src:pico_platform_internal"],
+    visibility = ["//src/rp2_common/pico_bootrom:__pkg__"],
+)
+
+cc_library(
+    name = "hardware_boot_lock",
+    srcs = ["boot_lock.c"],
+    hdrs = ["include/hardware/boot_lock.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/common/pico_sync",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/pico_runtime",
+        "//src/rp2_common/pico_runtime_init",
+    ],
+)

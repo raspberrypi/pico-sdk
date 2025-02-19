@@ -1,0 +1,121 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# This is split between the headers and a link-time requirement to fix issues
+# with circular dependencies introduced by the implementations.
+alias(
+    name = "pico_clib_interface",
+    actual = select({
+        "//bazel/constraint:pico_clib_llvm_libc_enabled": ":llvm_libc_interface",
+        "//bazel/constraint:pico_clib_newlib_enabled": ":newlib_interface",
+        "//bazel/constraint:pico_clib_picolibc_enabled": ":picolibc_interface",
+        "//conditions:default": ":pico_clib_interface_auto",
+    }),
+)
+
+alias(
+    name = "pico_clib_interface_link",
+    actual = select({
+        "//bazel/constraint:pico_clib_llvm_libc_enabled": ":llvm_libc_interface_link",
+        "//bazel/constraint:pico_clib_newlib_enabled": ":newlib_interface_link",
+        "//bazel/constraint:pico_clib_picolibc_enabled": ":picolibc_interface_link",
+        "//conditions:default": ":pico_clib_interface_auto_link",
+    }),
+)
+
+# TODO: Provide a way to hook up Arm Compiler for Embedded into the automagic
+# flow.
+alias(
+    name = "pico_clib_interface_auto",
+    actual = select({
+        "//bazel/constraint:pico_toolchain_clang_enabled": ":llvm_libc_interface",
+        "//conditions:default": ":newlib_interface",
+    }),
+)
+
+alias(
+    name = "pico_clib_interface_auto_link",
+    actual = select({
+        "//bazel/constraint:pico_toolchain_clang_enabled": ":llvm_libc_interface_link",
+        "//conditions:default": ":newlib_interface_link",
+    }),
+)
+
+cc_library(
+    name = "llvm_libc_interface",
+    hdrs = [
+        "include/llvm_libc/sys/cdefs.h",
+        "include/llvm_libc/sys/stat.h",
+        "include/llvm_libc/sys/time.h",
+        "include/llvm_libc/sys/times.h",
+        "include/llvm_libc/sys/types.h",
+        "include/llvm_libc/time.h",
+        "include/llvm_libc/unistd.h",
+    ],
+    includes = ["include/llvm_libc"],
+    # It's hard to properly constrain compatibility since `auto` may select this,
+    # so just tag as manual.
+    tags = ["manual"],
+    target_compatible_with = compatible_with_rp2(),
+)
+
+cc_library(
+    name = "llvm_libc_interface_link",
+    srcs = ["llvm_libc_interface.c"],
+    implementation_deps = [
+        ":llvm_libc_interface",
+        "//src/rp2_common/pico_atomic",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_runtime_init",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+    ],
+    # It's hard to properly constrain compatibility since `auto` may select this,
+    # so just tag as manual.
+    tags = ["manual"],
+    target_compatible_with = compatible_with_rp2(),
+)
+
+# For now, newlib doesn't need to provide any headers.
+alias(
+    name = "newlib_interface",
+    actual = "//bazel:empty_cc_lib",
+)
+
+cc_library(
+    name = "newlib_interface_link",
+    srcs = ["newlib_interface.c"],
+    implementation_deps = [
+        "//src/common/pico_time",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_printf",
+        "//src/rp2_common/pico_runtime_init",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+    ],
+    # It's hard to properly constrain compatibility since `auto` may select this,
+    # so just tag as manual.
+    tags = ["manual"],
+    target_compatible_with = compatible_with_rp2(),
+)
+
+# For now, picolibc doesn't need to provide any headers.
+alias(
+    name = "picolibc_interface",
+    actual = "//bazel:empty_cc_lib",
+)
+
+cc_library(
+    name = "picolibc_interface_link",
+    srcs = ["picolibc_interface.c"],
+    implementation_deps = [
+        "//src/common/pico_time",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_printf",
+        "//src/rp2_common/pico_runtime_init",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+    ],
+    # It's hard to properly constrain compatibility since `auto` may select this,
+    # so just tag as manual.
+    tags = ["manual"],
+    target_compatible_with = compatible_with_rp2(),
+)

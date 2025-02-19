@@ -10,7 +10,7 @@
 /** \file binary_info.h
  *  \defgroup pico_binary_info pico_binary_info
  *
- * Binary info is intended for embedding machine readable information with the binary in FLASH.
+ * \brief Binary info is intended for embedding machine readable information with the binary in FLASH
  *
  * Example uses include:
  *
@@ -22,6 +22,8 @@
 
 #include "pico/binary_info/defs.h"
 #include "pico/binary_info/structure.h"
+
+// PICO_CONFIG: PICO_NO_BINARY_INFO, Don't include "binary info" in the output binary, type=bool, default=0 except for `PICO_PLATFORM` `host`, group=pico_runtime_init
 #if !PICO_ON_DEVICE && !defined(PICO_NO_BINARY_INFO)
 #define PICO_NO_BINARY_INFO 1
 #endif

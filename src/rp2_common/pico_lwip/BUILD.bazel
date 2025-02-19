@@ -1,0 +1,147 @@
+load("//bazel:defs.bzl", "compatible_with_pico_w")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_lwip_config",
+    hdrs = ["include/arch/cc.h"],
+    includes = ["include"],
+    deps = [
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_rand",
+    ],
+)
+
+cc_library(
+    name = "pico_lwip_freertos",
+    srcs = ["lwip_freertos.c"],
+    hdrs = ["include/pico/lwip_freertos.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_pico_w(),
+    deps = [
+        ":pico_lwip",
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_async_context",
+        "//src/rp2_common/pico_rand",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "pico_lwip_nosys",
+    srcs = ["lwip_nosys.c"],
+    includes = ["include"],
+    hdrs = ["include/pico/lwip_nosys.h"],
+    target_compatible_with = compatible_with_pico_w(),
+    deps = [
+        ":pico_lwip",
+        "//src/common/pico_time",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/pico_async_context",
+        "//src/rp2_common/pico_rand",
+    ],
+    alwayslink = True,
+)
+
+# Prefer these aliases to directly referencing @lwip, as it's possible that
+# name may change.
+alias(
+    name = "pico_lwip",
+    actual = "@lwip//:pico_lwip",
+)
+
+alias(
+    name = "pico_lwip_core",
+    actual = "@lwip//:pico_lwip_core",
+)
+
+alias(
+    name = "pico_lwip_core4",
+    actual = "@lwip//:pico_lwip_core4",
+)
+
+alias(
+    name = "pico_lwip_core6",
+    actual = "@lwip//:pico_lwip_core6",
+)
+
+alias(
+    name = "pico_lwip_api",
+    actual = "@lwip//:pico_lwip_api",
+)
+
+alias(
+    name = "pico_lwip_netif",
+    actual = "@lwip//:pico_lwip_netif",
+)
+
+alias(
+    name = "pico_lwip_sixlowpan",
+    actual = "@lwip//:pico_lwip_sixlowpan",
+)
+
+alias(
+    name = "pico_lwip_ppp",
+    actual = "@lwip//:pico_lwip_ppp",
+)
+
+alias(
+    name = "pico_lwip_snmp",
+    actual = "@lwip//:pico_lwip_snmp",
+)
+
+alias(
+    name = "pico_lwip_http",
+    actual = "@lwip//:pico_lwip_http",
+)
+
+alias(
+    name = "pico_lwip_makefsdata",
+    actual = "@lwip//:pico_lwip_makefsdata",
+)
+
+alias(
+    name = "pico_lwip_iperf",
+    actual = "@lwip//:pico_lwip_iperf",
+)
+
+alias(
+    name = "pico_lwip_smtp",
+    actual = "@lwip//:pico_lwip_smtp",
+)
+
+alias(
+    name = "pico_lwip_sntp",
+    actual = "@lwip//:pico_lwip_sntp",
+)
+
+alias(
+    name = "pico_lwip_mdns",
+    actual = "@lwip//:pico_lwip_mdns",
+)
+
+alias(
+    name = "pico_lwip_netbios",
+    actual = "@lwip//:pico_lwip_netbios",
+)
+
+alias(
+    name = "pico_lwip_tftp",
+    actual = "@lwip//:pico_lwip_tftp",
+)
+
+alias(
+    name = "pico_lwip_mbedtls",
+    actual = "@lwip//:pico_lwip_mbedtls",
+)
+
+alias(
+    name = "pico_lwip_mqttt",
+    actual = "@lwip//:pico_lwip_mqttt",
+)
+
+alias(
+    name = "pico_lwip_contrib_freertos",
+    actual = "@lwip//:pico_lwip_contrib_freertos",
+)

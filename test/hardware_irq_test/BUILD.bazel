@@ -1,0 +1,18 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "hardware_irq_test",
+    testonly = True,
+    srcs = ["hardware_irq_test.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_time",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/hardware_dma",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/pico_stdlib",
+        "//test/pico_test",
+    ],
+)

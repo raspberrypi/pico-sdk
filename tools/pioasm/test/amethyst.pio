@@ -1,0 +1,53 @@
+.pio_version rp2350
+.pio_version ONE
+
+.pio_version 0
+
+.program bar
+.fifo tx
+
+.program foo
+.pio_version 1
+.clock_div 3.6
+//wait fling
+.fifo putget
+.out 3 auto
+wait jmppin
+wait 0 jmppin + 3
+mov pindirs, null
+set pins, 3
+irq 3 rel
+irq next 3
+irq prev 3
+set pins, (1 << 3)
+//irq prev 3 rel
+wait 1 irq 2 rel
+wait 1 irq next 2
+wait 1 irq prev 4
+.define flan 1
+mov osr, rxfifo[flan]
+mov rxfifo[y], isr
+
+//wait 0 jmppin + 4
+
+.program wibble
+.pio_version 0
+wait gpio 23
+wait gpio 7
+
+.program wibble2
+.pio_version 1
+wait gpio 23
+wait gpio 40
+
+.program wibble3
+.pio_version 1
+.mov_status txfifo < 12
+.mov_status irq next set 3
+
+.program python
+.pio_version 1
+wait 0 jmppin
+wait 0 jmppin + 3
+mov x, !x
+.word 0x1234

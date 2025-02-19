@@ -1,0 +1,64 @@
+load("//bazel:defs.bzl", "compatible_with_config", "compatible_with_rp2", "incompatible_with_config")
+load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_stdio_rtt",
+    actual = select({
+        "//bazel/constraint:pico_stdio_rtt_enabled": ":pico_stdio_rtt_enabled",
+        "//conditions:default": ":pico_stdio_rtt_disabled",
+    }),
+)
+
+pico_sdk_define(
+    name = "LIB_PICO_STDIO_RTT",
+    define_name = "LIB_PICO_STDIO_RTT",
+    from_flag = "//bazel/config:PICO_STDIO_RTT",
+)
+
+cc_library(
+    name = "pico_stdio_rtt_enabled",
+    srcs = [
+        "SEGGER/RTT/SEGGER_RTT.c",
+        "stdio_rtt.c",
+    ],
+    hdrs = [
+        "SEGGER/Config/SEGGER_RTT_Conf.h",
+        "SEGGER/RTT/SEGGER_RTT.h",
+        "include/pico/stdio_rtt.h",
+    ],
+    includes = [
+        "SEGGER/RTT",
+        "include",
+    ],
+    target_compatible_with = compatible_with_rp2() + compatible_with_config(
+        "//bazel/constraint:pico_stdio_rtt_enabled",
+    ),
+    deps = [
+        ":LIB_PICO_STDIO_RTT",
+        "//src/common/pico_binary_info",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+    ],
+)
+
+# Stub library that does NOT link in stdio rtt support libs.
+cc_library(
+    name = "pico_stdio_rtt_disabled",
+    hdrs = [
+        "SEGGER/Config/SEGGER_RTT_Conf.h",
+        "SEGGER/RTT/SEGGER_RTT.h",
+        "include/pico/stdio_rtt.h",
+    ],
+    includes = [
+        "SEGGER/RTT",
+        "include",
+    ],
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config(
+        "//bazel/constraint:pico_stdio_rtt_enabled",
+    ),
+    deps = [
+        ":LIB_PICO_STDIO_RTT",
+        "//src/rp2_common/pico_stdio:pico_stdio_headers",
+    ],
+)

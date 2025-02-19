@@ -17,7 +17,7 @@ extern "C" {
 /** \file time.h
  *  \defgroup pico_time pico_time
  *
- * API for accurate timestamps, sleeping, and time based callbacks
+ * \brief API for accurate timestamps, sleeping, and time based callbacks
  *
  * \note The functions defined here provide a much more powerful and user friendly wrapping around the
  * low level hardware timer functionality. For these functions (and any other SDK functionality
@@ -29,19 +29,24 @@ extern "C" {
  * \sa \ref hardware_timer
  */
 
-// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_TIME, Enable/disable assertions in the time module, type=bool, default=0, group=pico_time
-#ifndef PARAM_ASSERTIONS_ENABLED_TIME
-#define PARAM_ASSERTIONS_ENABLED_TIME 0
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PICO_TIME, Enable/disable assertions in the pico_time module, type=bool, default=0, group=pico_time
+#ifndef PARAM_ASSERTIONS_ENABLED_PICO_TIME
+#ifdef PARAM_ASSERTIONS_ENABLED_PICO_TIME // backwards compatibility with SDK < 2.0.0
+#define PARAM_ASSERTIONS_ENABLED_PICO_TIME PARAM_ASSERTIONS_ENABLED_TIME
+#else
+#define PARAM_ASSERTIONS_ENABLED_PICO_TIME 0
+#endif
 #endif
 
 // PICO_CONFIG: PICO_TIME_SLEEP_OVERHEAD_ADJUST_US, How many microseconds to wake up early (and then busy_wait) to account for timer overhead when sleeping in low power mode, type=int, default=6, group=pico_time
 #ifndef PICO_TIME_SLEEP_OVERHEAD_ADJUST_US
 #define PICO_TIME_SLEEP_OVERHEAD_ADJUST_US 6
 #endif
+
 /*!
  * \defgroup timestamp timestamp
  *  \ingroup pico_time
- * \brief Timestamp functions relating to points in time (including the current time)
+ * \brief Timestamp functions relating to points in time (including the current time).
  *
  * These are functions for dealing with timestamps (i.e. instants in time) represented by the type absolute_time_t. This opaque
  * type is provided to help prevent accidental mixing of timestamps and relative time values.
@@ -279,6 +284,8 @@ void sleep_ms(uint32_t ms);
  *     return false; // timed out
  * }
  * ```
+ * NOTE: This method should always be used in a loop associated with checking another "event" variable, since
+ * processor events are a shared resource and can happen for a large number of reasons.
  *
  * @param timeout_timestamp the timeout time
  * @return true if the target time is reached, false otherwise
@@ -291,9 +298,9 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp);
  * \brief Alarm functions for scheduling future execution
  *
  *  Alarms are added to alarm pools, which may hold a certain fixed number of active alarms. Each alarm pool
- *  utilizes one of four underlying hardware alarms, thus you may have up to four alarm pools. An alarm pool
+ *  utilizes one of four underlying timer_alarms, thus you may have up to four alarm pools. An alarm pool
  *  calls (except when the callback would happen before or during being set) the callback on the core from which
- *  the alarm pool was created. Callbacks are called from the hardware alarm IRQ handler, so care must
+ *  the alarm pool was created. Callbacks are called from the timer_alarm IRQ handler, so care must
  *  be taken in their implementation.
  *
  *  A default pool is created  the core specified by PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM
@@ -306,7 +313,7 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp);
 // PICO_CONFIG: PICO_TIME_DEFAULT_ALARM_POOL_DISABLED, Disable the default alarm pool, type=bool, default=0, advanced=true, group=pico_time
 #ifndef PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 /*!
- * \brief If 1 then the default alarm pool is disabled (so no hardware alarm is claimed for the pool)
+ * \brief If 1 then the default alarm pool is disabled (so no timer_alarm is claimed for the pool)
  *
  * \note Setting to 1 may cause some code not to compile as default timer pool related methods are removed
  *
@@ -323,7 +330,7 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp);
 // PICO_CONFIG: PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM, Select which HW alarm is used for the default alarm pool, min=0, max=3, default=3, advanced=true, group=pico_time
 #ifndef PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM
 /*!
- * \brief Selects which hardware alarm is used for the default alarm pool
+ * \brief Selects which timer_alarm is used for the default alarm pool
  * \ingroup alarm
  * \sa alarm_pool_get_default()
  */
@@ -346,7 +353,7 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp);
 /**
  * \brief The identifier for an alarm
  *
- * \note this identifier is signed because -1 is used as an error condition when creating alarms
+ * \note this identifier is signed because <0 is used as an error condition when creating alarms
  *
  * \note alarm ids may be reused, however for convenience the implementation makes an attempt to defer
  * reusing as long as possible. You should certainly expect it to be hundreds of ids before one is
@@ -354,9 +361,10 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp);
  * alarms or other functionality based on alarms when the alarm may have expired, as eventually
  * the alarm id may be reused for another alarm.
  *
+ * \see pico_error_codes
  * \ingroup alarm
  */
-typedef int32_t alarm_id_t; // note this is signed because we use -1 as a meaningful error value
+typedef int32_t alarm_id_t; // note this is signed because we use <0 as a meaningful error value
 
 /**
  * \brief User alarm callback
@@ -370,12 +378,14 @@ typedef int32_t alarm_id_t; // note this is signed because we use -1 as a meanin
 typedef int64_t (*alarm_callback_t)(alarm_id_t id, void *user_data);
 
 typedef struct alarm_pool alarm_pool_t;
+typedef void alarm_pool_timer_t;
 
 /**
  * \brief Create the default alarm pool (if not already created or disabled)
  * \ingroup alarm
  */
 void alarm_pool_init_default(void);
+void runtime_init_default_alarm_pool(void);
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 /*!
@@ -388,6 +398,12 @@ void alarm_pool_init_default(void);
 alarm_pool_t *alarm_pool_get_default(void);
 #endif
 
+alarm_pool_t *alarm_pool_create_on_timer(alarm_pool_timer_t *timer, uint timer_alarm_num, uint max_timers);
+
+alarm_pool_timer_t *alarm_pool_timer_for_timer_num(uint timer_num);
+
+alarm_pool_timer_t *alarm_pool_get_default_timer(void);
+
 /**
  * \brief Create an alarm pool
  *
@@ -397,19 +413,23 @@ alarm_pool_t *alarm_pool_get_default(void);
  * might want to create another if you want alarm callbacks on core 1 or require alarm pools of
  * different priority (IRQ priority based preemption of callbacks)
  *
- * \note This method will hard assert if the hardware alarm is already claimed.
+ * \note This method will hard assert if the timer_alarm is already claimed.
  *
  * \ingroup alarm
- * \param hardware_alarm_num the hardware alarm to use to back this pool
+ * \param timer_alarm_num the timer_alarm to use to back this pool
  * \param max_timers the maximum number of timers
  *        \note For implementation reasons this is limited to PICO_PHEAP_MAX_ENTRIES which defaults to 255
  * \sa alarm_pool_get_default()
  * \sa hardware_claiming
  */
-alarm_pool_t *alarm_pool_create(uint hardware_alarm_num, uint max_timers);
+static inline alarm_pool_t *alarm_pool_create(uint timer_alarm_num, uint max_timers) {
+    return alarm_pool_create_on_timer(alarm_pool_get_default_timer(), timer_alarm_num, max_timers);
+}
+
+alarm_pool_t *alarm_pool_create_on_timer_with_unused_hardware_alarm(alarm_pool_timer_t *timer, uint max_timers);
 
 /**
- * \brief Create an alarm pool, claiming an used hardware alarm to back it.
+ * \brief Create an alarm pool, claiming an used timer_alarm to back it.
  *
  * The alarm pool will call callbacks from an alarm IRQ Handler on the core of this function is called from.
  *
@@ -425,16 +445,21 @@ alarm_pool_t *alarm_pool_create(uint hardware_alarm_num, uint max_timers);
  * \sa alarm_pool_get_default()
  * \sa hardware_claiming
  */
-alarm_pool_t *alarm_pool_create_with_unused_hardware_alarm(uint max_timers);
+static inline alarm_pool_t *alarm_pool_create_with_unused_hardware_alarm(uint max_timers) {
+    return alarm_pool_create_on_timer_with_unused_hardware_alarm(alarm_pool_get_default_timer(), max_timers);
+}
 
 /**
- * \brief Return the hardware alarm used by an alarm pool
+ * \brief Return the timer alarm used by an alarm pool
  * \ingroup alarm
  * \param pool the pool
- * \return the hardware alarm used by the pool
+ * \return the timer_alarm used by the pool
  */
-uint alarm_pool_hardware_alarm_num(alarm_pool_t *pool);
-
+uint alarm_pool_timer_alarm_num(alarm_pool_t *pool);
+// backwards compatibility
+static inline uint alarm_pool_hardware_alarm_num(alarm_pool_t *pool) {
+    return alarm_pool_timer_alarm_num(pool);
+}
 /**
  * \brief Return the core number the alarm pool was initialized on (and hence callbacks are called on)
  * \ingroup alarm
@@ -444,10 +469,9 @@ uint alarm_pool_hardware_alarm_num(alarm_pool_t *pool);
 uint alarm_pool_core_num(alarm_pool_t *pool);
 
 /**
- * \brief Destroy the alarm pool, cancelling all alarms and freeing up the underlying hardware alarm
+ * \brief Destroy the alarm pool, cancelling all alarms and freeing up the underlying timer_alarm
  * \ingroup alarm
  * \param pool the pool
- * \return the hardware alarm used by the pool
  */
 void alarm_pool_destroy(alarm_pool_t *pool);
 
@@ -462,17 +486,15 @@ void alarm_pool_destroy(alarm_pool_t *pool);
  *
  * \note It is safe to call this method from an IRQ handler (including alarm callbacks), and from either core.
  *
- * @param pool the alarm pool to use for scheduling the callback (this determines which hardware alarm is used, and which core calls the callback)
+ * @param pool the alarm pool to use for scheduling the callback (this determines which timer_alarm is used, and which core calls the callback)
  * @param time the timestamp when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls before or during this call before the alarm can be set,
  *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id for an active (at the time of return) alarm
- * @return 0 if the alarm time passed before or during the call AND there is no active alarm to return the id of.
- *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
- *           or if the callback <i>was</i> called during this method but the callback cancelled itself by returning 0
- * @return -1 if there were no alarm slots available
+ * @return 0 if the alarm time passed before or during the call and fire_if_past was false
+ * @return <0 if there were no alarm slots available, or other error occurred
  */
 alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, alarm_callback_t callback, void *user_data, bool fire_if_past);
 
@@ -486,12 +508,12 @@ alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, ala
  *
  * \note It is safe to call this method from an IRQ handler (including alarm callbacks), and from either core.
  *
- * @param pool the alarm pool to use for scheduling the callback (this determines which hardware alarm is used, and which core calls the callback)
+ * @param pool the alarm pool to use for scheduling the callback (this determines which timer_alarm is used, and which core calls the callback)
  * @param time the timestamp when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @return >0 the alarm id for an active (at the time of return) alarm
- * @return -1 if there were no alarm slots available
+ * @return <0 if there were no alarm slots available, or other error occurred
  */
 alarm_id_t alarm_pool_add_alarm_at_force_in_context(alarm_pool_t *pool, absolute_time_t time, alarm_callback_t callback,
                                                     void *user_data);
@@ -506,17 +528,15 @@ alarm_id_t alarm_pool_add_alarm_at_force_in_context(alarm_pool_t *pool, absolute
  *
  * \note It is safe to call this method from an IRQ handler (including alarm callbacks), and from either core.
  *
- * @param pool the alarm pool to use for scheduling the callback (this determines which hardware alarm is used, and which core calls the callback)
+ * @param pool the alarm pool to use for scheduling the callback (this determines which timer_alarm is used, and which core calls the callback)
  * @param us the delay (from now) in microseconds when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls during this call before the alarm can be set,
  *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id
- * @return 0 if the alarm time passed before or during the call AND there is no active alarm to return the id of.
- *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
- *           or if the callback <i>was</i> called during this method but the callback cancelled itself by returning 0
- * @return -1 if there were no alarm slots available
+ * @return 0 if the alarm time passed before or during the call and fire_if_past was false
+ * @return <0 if there were no alarm slots available, or other error occurred
  */
 static inline alarm_id_t alarm_pool_add_alarm_in_us(alarm_pool_t *pool, uint64_t us, alarm_callback_t callback, void *user_data, bool fire_if_past) {
     return alarm_pool_add_alarm_at(pool, delayed_by_us(get_absolute_time(), us), callback, user_data, fire_if_past);
@@ -533,21 +553,43 @@ static inline alarm_id_t alarm_pool_add_alarm_in_us(alarm_pool_t *pool, uint64_t
  *
  * \note It is safe to call this method from an IRQ handler (including alarm callbacks), and from either core.
  *
- * @param pool the alarm pool to use for scheduling the callback (this determines which hardware alarm is used, and which core calls the callback)
+ * @param pool the alarm pool to use for scheduling the callback (this determines which timer_alarm is used, and which core calls the callback)
  * @param ms the delay (from now) in milliseconds when (after which) the callback should fire
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls before or during this call before the alarm can be set,
  *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id
- * @return 0 if the alarm time passed before or during the call AND there is no active alarm to return the id of.
- *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
- *           or if the callback <i>was</i> called during this method but the callback cancelled itself by returning 0
- * @return -1 if there were no alarm slots available
+ * @return 0 if the alarm time passed before or during the call and fire_if_past was false
+ * @return <0 if there were no alarm slots available, or other error occurred
  */
 static inline alarm_id_t alarm_pool_add_alarm_in_ms(alarm_pool_t *pool, uint32_t ms, alarm_callback_t callback, void *user_data, bool fire_if_past) {
     return alarm_pool_add_alarm_at(pool, delayed_by_ms(get_absolute_time(), ms), callback, user_data, fire_if_past);
 }
+
+/*!
+ * \brief Return the time remaining before the next trigger of an alarm
+ * \ingroup alarm
+ *
+ * @param pool the alarm_pool containing the alarm
+ * @param alarm_id the alarm
+ *
+ * @return >=0 the number of microseconds before the next trigger
+ * @return <0 if either the given alarm is not in progress or it has passed
+ */
+int64_t alarm_pool_remaining_alarm_time_us(alarm_pool_t *pool, alarm_id_t alarm_id);
+
+/*!
+ * \brief Return the time remaining before the next trigger of an alarm
+ * \ingroup alarm
+ *
+ * @param pool the alarm_pool containing the alarm
+ * @param alarm_id the alarm
+ *
+ * @return >=0 the number of milliseconds before the next trigger (INT32_MAX if the number of ms is higher than can be represented0
+ * @return <0 if either the given alarm is not in progress or it has passed
+ */
+int32_t alarm_pool_remaining_alarm_time_ms(alarm_pool_t *pool, alarm_id_t alarm_id);
 
 /*!
  * \brief Cancel an alarm
@@ -577,10 +619,8 @@ bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id);
  * @param fire_if_past if true, and the alarm time falls before or during this call before the alarm can be set,
  *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id
- * @return 0 if the alarm time passed before or during the call AND there is no active alarm to return the id of.
- *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
- *           or if the callback <i>was</i> called during this method but the callback cancelled itself by returning 0
- * @return -1 if there were no alarm slots available
+ * @return 0 if the alarm time passed before or during the call and fire_if_past was false
+ * @return <0 if there were no alarm slots available, or other error occurred
  */
 static inline alarm_id_t add_alarm_at(absolute_time_t time, alarm_callback_t callback, void *user_data, bool fire_if_past) {
     return alarm_pool_add_alarm_at(alarm_pool_get_default(), time, callback, user_data, fire_if_past);
@@ -603,10 +643,8 @@ static inline alarm_id_t add_alarm_at(absolute_time_t time, alarm_callback_t cal
  * @param fire_if_past if true, and the alarm time falls during this call before the alarm can be set,
  *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id
- * @return 0 if the alarm time passed before or during the call AND there is no active alarm to return the id of.
- *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
- *           or if the callback <i>was</i> called during this method but the callback cancelled itself by returning 0
- * @return -1 if there were no alarm slots available
+ * @return 0 if the alarm time passed before or during the call and fire_if_past was false
+ * @return <0 if there were no alarm slots available, or other error occurred
  */
 static inline alarm_id_t add_alarm_in_us(uint64_t us, alarm_callback_t callback, void *user_data, bool fire_if_past) {
     return alarm_pool_add_alarm_in_us(alarm_pool_get_default(), us, callback, user_data, fire_if_past);
@@ -629,10 +667,8 @@ static inline alarm_id_t add_alarm_in_us(uint64_t us, alarm_callback_t callback,
  * @param fire_if_past if true, and the alarm time falls during this call before the alarm can be set,
  *                     then the callback should be called during (by) this function instead 
  * @return >0 the alarm id
- * @return 0 if the alarm time passed before or during the call AND there is no active alarm to return the id of.
- *           The latter can either happen because fire_if_past was false (i.e. no timer was ever created),
- *           or if the callback <i>was</i> called during this method but the callback cancelled itself by returning 0
- * @return -1 if there were no alarm slots available
+ * @return 0 if the alarm time passed before or during the call and fire_if_past was false
+ * @return <0 if there were no alarm slots available, or other error occurred
  */
 static inline alarm_id_t add_alarm_in_ms(uint32_t ms, alarm_callback_t callback, void *user_data, bool fire_if_past) {
     return alarm_pool_add_alarm_in_ms(alarm_pool_get_default(), ms, callback, user_data, fire_if_past);
@@ -647,6 +683,28 @@ static inline alarm_id_t add_alarm_in_ms(uint32_t ms, alarm_callback_t callback,
 static inline bool cancel_alarm(alarm_id_t alarm_id) {
     return alarm_pool_cancel_alarm(alarm_pool_get_default(), alarm_id);
 }
+
+/*!
+ * \brief Return the time remaining before the next trigger of an alarm
+ * \ingroup alarm
+ *
+ * @param alarm_id the alarm
+ *
+ * @return >=0 the number of microseconds before the next trigger
+ * @return <0 if either the given alarm is not in progress or it has passed
+ */
+int64_t remaining_alarm_time_us(alarm_id_t alarm_id);
+
+/*!
+ * \brief Return the time remaining before the next trigger of an alarm
+ * \ingroup alarm
+ *
+ * @param alarm_id the alarm
+ *
+ * @return >=0 the number of milliseconds before the next trigger (INT32_MAX if the number of ms is higher than can be represented0
+ * @return <0 if either the given alarm is not in progress or it has passed
+ */
+int32_t remaining_alarm_time_ms(alarm_id_t alarm_id);
 
 #endif
 
@@ -694,7 +752,7 @@ struct repeating_timer {
  *
  * \note It is safe to call this method from an IRQ handler (including alarm callbacks), and from either core.
  *
- * @param pool the alarm pool to use for scheduling the repeating timer (this determines which hardware alarm is used, and which core calls the callback)
+ * @param pool the alarm pool to use for scheduling the repeating timer (this determines which timer_alarm is used, and which core calls the callback)
  * @param delay_us the repeat delay in microseconds; if >0 then this is the delay between one callback ending and the next starting; if <0 then this is the negative of the time between the starts of the callbacks. The value of 0 is treated as 1
  * @param callback the repeating timer callback function
  * @param user_data user data to pass to store in the repeating_timer structure for use by the callback.
@@ -714,7 +772,7 @@ bool alarm_pool_add_repeating_timer_us(alarm_pool_t *pool, int64_t delay_us, rep
  *
  * \note It is safe to call this method from an IRQ handler (including alarm callbacks), and from either core.
  *
- * @param pool the alarm pool to use for scheduling the repeating timer (this determines which hardware alarm is used, and which core calls the callback)
+ * @param pool the alarm pool to use for scheduling the repeating timer (this determines which timer_alarm is used, and which core calls the callback)
  * @param delay_ms the repeat delay in milliseconds; if >0 then this is the delay between one callback ending and the next starting; if <0 then this is the negative of the time between the starts of the callbacks. The value of 0 is treated as 1 microsecond
  * @param callback the repeating timer callback function
  * @param user_data user data to pass to store in the repeating_timer structure for use by the callback.

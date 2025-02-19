@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
-
 #include "pico/asm_helper.S"
 #include "pico/bootrom.h"
+#include "pico/runtime_init.h"
 
-__pre_init __aeabi_mem_init, 00001
+pico_default_asm_setup
+
+PICO_RUNTIME_INIT_FUNC_RUNTIME(__aeabi_mem_init, PICO_RUNTIME_INIT_AEABI_MEM_OPS)
 
 .macro mem_section name
 #if PICO_MEM_IN_RAM

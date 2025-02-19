@@ -9,15 +9,15 @@
 #include <iomanip>
 #include "pio_disassembler.h"
 
-extern "C" void disassemble(char *buf, int buf_len, uint16_t inst, uint sideset_bits, bool sideset_opt) {
+extern "C" void disassemble(char *buf, int buf_len, uint inst, uint sideset_bits, bool sideset_opt) {
     if (buf_len) buf[disassemble(inst, sideset_bits, sideset_opt).copy(buf, buf_len - 1)] = 0;
 }
 
-std::string disassemble(uint16_t inst, uint sideset_bits_including_opt, bool sideset_opt) {
+std::string disassemble(uint inst, uint sideset_bits_including_opt, bool sideset_opt) {
     std::stringstream ss;
-    uint major = inst >> 13u;
+    uint major = (inst >> 13u) & 0x7;
     uint arg1 = ((uint) inst >> 5u) & 0x7u;
-    uint arg2 = inst & 0x1fu;
+    uint arg2 = (inst & 0x1fu) | ((inst & 0x10000) >> 11);
     auto op = [&](const std::string &s) {
         ss << std::left << std::setw(7) << s;
     };
@@ -45,13 +45,20 @@ std::string disassemble(uint16_t inst, uint sideset_bits_including_opt, bool sid
                     guts = "pin, " + std::to_string(arg2);
                     break;
                 case 0b10:
-                    if (arg2 & 0x8u) {
+                    guts = "irq";
+                    if (arg2 & 0x08) {
+                        guts += arg2 & 0x10 ? " next" : " prev";
+                    }
+                    guts += ", " + std::to_string(arg2 & 7u);
+                    if (0x10 == (arg2 & 0x18)) guts += " rel";
+                    break;
+                case 0b11:
+                    if (arg2 & 0x1cu) {
                         invalid = true;
+                    } else if (arg2) {
+                        guts = "jmppin + " + std::to_string(arg2 & 3u);
                     } else {
-                        guts = "irq, " + std::to_string(arg2 & 7u);
-                        if (arg2 & 0x10u) {
-                            guts += " rel";
-                        }
+                        guts = "jmppin";
                     }
                     break;
             }
@@ -81,7 +88,21 @@ std::string disassemble(uint16_t inst, uint sideset_bits_including_opt, bool sid
         }
         case 0b100: {
             if (arg2) {
-                invalid = true;
+                if ((arg1 & 3) || !(arg2 & 0x10)) {
+                    invalid = true;
+                } else {
+                    std::string index;
+                    if (arg2 & 8) index = std::to_string(arg2 & 3);
+                    else          index = "y";
+                    std::string guts = "";
+                    op("mov");
+                    if (arg1 & 4) {
+                        guts = "osr, rxfifo[" + index + "]";
+                    } else {
+                        guts = "rxfifo[" + index + "], isr";
+                    }
+                    op_guts(guts);
+                }
             } else {
                 std::string guts = "";
                 if (arg1 & 4u) {
@@ -97,7 +118,7 @@ std::string disassemble(uint16_t inst, uint sideset_bits_including_opt, bool sid
             break;
         }
         case 0b101: {
-            static std::array<std::string, 8> dests { "pins", "x", "y", "", "exec", "pc", "isr", "osr"};
+            static std::array<std::string, 8> dests { "pins", "x", "y", "pindirs", "exec", "pc", "isr", "osr"};
             static std::array<std::string, 8> sources { "pins", "x", "y", "null", "", "status", "isr", "osr"};
             std::string dest = dests[arg1];
             std::string source = sources[arg2 & 7u];
@@ -112,7 +133,7 @@ std::string disassemble(uint16_t inst, uint sideset_bits_including_opt, bool sid
                 op("mov");
                 std::string guts = dest + ", ";
                 if (operation == 1) {
-                    guts += "!";
+                    guts += "~";
                 } else if (operation == 2) {
                     guts += "::";
                 }
@@ -122,7 +143,7 @@ std::string disassemble(uint16_t inst, uint sideset_bits_including_opt, bool sid
             break;
         }
         case 0b110: {
-            if ((arg1 & 0x4u) || (arg2 & 0x8u)) {
+            if ((arg1 & 0x4u)) {
                 invalid = true;
             } else {
                 op("irq");
@@ -135,8 +156,16 @@ std::string disassemble(uint16_t inst, uint sideset_bits_including_opt, bool sid
                     guts += "nowait ";
                 }
                 guts += std::to_string(arg2 & 7u);
-                if (arg2 & 0x10u) {
-                    guts += " rel";
+                switch(arg2 & 0x18) {
+                    case 0x10:
+                        guts += " rel";
+                        break;
+                    case 0x08:
+                        guts = "prev "+guts;
+                        break;
+                    case 0x18:
+                        guts = "next "+guts;
+                        break;
                 }
                 op_guts(guts);
             }
@@ -166,6 +195,9 @@ std::string disassemble(uint16_t inst, uint sideset_bits_including_opt, bool sid
     }
     delay &= ((1u << (5 - sideset_bits_including_opt)) - 1u);
     ss << std::left << std::setw(4) << (delay ? ("[" + std::to_string(delay) + "]") : "");
-    return ss.str();
+    // remove trailing spaces
+    auto str = ss.str();
+    str.erase(str.find_last_not_of(' ')+1);
+    return str;
 }
 

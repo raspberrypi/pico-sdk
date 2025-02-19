@@ -1,0 +1,31 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_bit_ops",
+    srcs = ["bit_ops_aeabi.S"],
+    linkopts = select({
+        "//bazel/constraint:rp2040": [
+            "-Wl,--wrap=__clzsi2",
+            "-Wl,--wrap=__clzsi2",
+            "-Wl,--wrap=__clzdi2",
+            "-Wl,--wrap=__ctzsi2",
+            "-Wl,--wrap=__popcountsi2",
+            "-Wl,--wrap=__popcountdi2",
+            "-Wl,--wrap=__clz",
+            "-Wl,--wrap=__clzl",
+            "-Wl,--wrap=__clzsi2",
+            "-Wl,--wrap=__clzll",
+        ],
+        "//conditions:default": [],
+    }) + ["-Wl,--wrap=__ctzdi2"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_bit_ops_headers:pico_bit_ops_interface",
+        "//src/rp2_common:pico_platform_internal",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_runtime_init",
+    ],
+    alwayslink = True,  # Ensures the wrapped symbols are linked in.
+)

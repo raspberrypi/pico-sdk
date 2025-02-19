@@ -12,7 +12,7 @@
 
 #include "semphr.h"
 
-#if configNUM_CORES > 1 && !defined(configUSE_CORE_AFFINITY)
+#if configNUMBER_OF_CORES > 1 && !defined(configUSE_CORE_AFFINITY)
 #error async_context_freertos requires configUSE_CORE_AFFINITY under SMP
 #endif
 
@@ -125,7 +125,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
         async_context_deinit(&self->core);
         return false;
     }
-#if configNUM_CORES > 1
+#if configNUMBER_OF_CORES > 1
     UBaseType_t core_id = config->task_core_id;
     if (core_id == (UBaseType_t)-1) {
         core_id = portGET_CORE_ID();
@@ -168,10 +168,12 @@ void async_context_freertos_acquire_lock_blocking(async_context_t *self_base) {
     self->nesting++;
 }
 
-void async_context_freertos_lock_check(async_context_t *self_base) {
+void async_context_freertos_lock_check(__unused async_context_t *self_base) {
+#ifndef NDEBUG
     async_context_freertos_t *self = (async_context_freertos_t *)self_base;
     // Lock the other core and stop low_prio_irq running
     assert(xSemaphoreGetMutexHolder(self->lock_mutex) == xTaskGetCurrentTaskHandle());
+#endif
 }
 
 typedef struct sync_func_call{
@@ -186,13 +188,12 @@ static void handle_sync_func_call(async_context_t *context, async_when_pending_w
     sync_func_call_t *call = (sync_func_call_t *)worker;
     call->rc = call->func(call->param);
     xSemaphoreGive(call->sem);
-    async_context_remove_when_pending_worker(context, worker);
 }
 
 uint32_t async_context_freertos_execute_sync(async_context_t *self_base, uint32_t (*func)(void *param), void *param) {
     async_context_freertos_t *self = (async_context_freertos_t*)self_base;
     hard_assert(xSemaphoreGetMutexHolder(self->lock_mutex) != xTaskGetCurrentTaskHandle());
-    sync_func_call_t call;
+    sync_func_call_t call = {0};
     call.worker.do_work = handle_sync_func_call;
     call.func = func;
     call.param = param;
@@ -200,6 +201,7 @@ uint32_t async_context_freertos_execute_sync(async_context_t *self_base, uint32_
     async_context_add_when_pending_worker(self_base, &call.worker);
     async_context_set_work_pending(self_base, &call.worker);
     xSemaphoreTake(call.sem, portMAX_DELAY);
+    async_context_remove_when_pending_worker(self_base, &call.worker);
     vSemaphoreDelete(call.sem);
     return call.rc;
 }
@@ -260,7 +262,7 @@ static void async_context_freertos_set_work_pending(async_context_t *self_base, 
     async_context_freertos_wake_up(self_base);
 }
 
-static void async_context_freertos_wait_until(async_context_t *self_base, absolute_time_t until) {
+static void async_context_freertos_wait_until(__unused async_context_t *self_base, absolute_time_t until) {
     assert(!portCHECK_IF_IN_ISR());
     TickType_t ticks = sensible_ticks_until(until);
     vTaskDelay(ticks);

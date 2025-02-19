@@ -8,8 +8,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <hardware/sync.h>
+#if PICO_ON_DEVICE
+#include "hardware/clocks.h"
+#endif
 #include "pico/stdlib.h"
 #include "pico/test.h"
+
+#if LIB_PICO_AON_TIMER
+#include "pico/aon_timer.h"
+#endif
+
+// Include sys/types.h before inttypes.h to work around issue with
+// certain versions of GCC and newlib which causes omission of PRIi64
+#include <sys/types.h>
 #include <inttypes.h>
 PICOTEST_MODULE_NAME("pico_time_test", "pico_time test harness");
 
@@ -68,16 +79,21 @@ static bool repeating_timer_callback(struct repeating_timer *t) {
 #define RESOLUTION_ALLOWANCE PICO_HARDWARE_TIMER_RESOLUTION_US
 #endif
 
-int issue_195_test(void);
+static int issue_195_test(void);
+static int issue_1812_test(void);
+static int issue_1953_test(void);
+static int issue_2118_test(void);
+static int issue_2148_test(void);
+static int issue_2186_test(void);
 
 int main() {
     setup_default_uart();
     alarm_pool_init_default();
 
     PICOTEST_START();
-    struct alarm_pool *pools[NUM_TIMERS];
-    for(uint i=0; i<NUM_TIMERS; i++) {
-        if (i == alarm_pool_hardware_alarm_num(alarm_pool_get_default())) {
+    struct alarm_pool *pools[NUM_ALARMS];
+    for(uint i=0; i<NUM_ALARMS; i++) {
+        if (i == alarm_pool_timer_alarm_num(alarm_pool_get_default())) {
             pools[i] = alarm_pool_get_default();
         } else {
             pools[i] = alarm_pool_create(i, MAX_TIMERS_PER_POOL);
@@ -109,8 +125,8 @@ int main() {
     }
     PICOTEST_CHECK(absolute_time_diff_us(time_base, get_absolute_time()) < init_ms * 1000, "This is a flaky test :-(");
 
-    uint64_t last_fired_at[NUM_TIMERS];
-    uint64_t last_target[NUM_TIMERS];
+    uint64_t last_fired_at[NUM_ALARMS];
+    uint64_t last_target[NUM_ALARMS];
     memset(&last_fired_at, 0, sizeof(last_fired_at));
     printf("Sleeping...\n");
     sleep_us(TEST_LENGTH_US + 250000);
@@ -189,13 +205,19 @@ int main() {
 
     PICOTEST_END_SECTION();
 
+
     PICOTEST_START_SECTION("Repeating timertest");
     for(uint i=0;i<NUM_REPEATING_TIMERS;i++) {
 
         add_repeating_timer_us(500+ (rand() & 1023), repeating_timer_callback, (void *)(uintptr_t)i, repeating_timers + i);
     }
 
-    sleep_ms(3000);
+    // issue #1953 will lockup here if sleep_us >= 6us (PICO_TIME_SLEEP_OVERHEAD_ADJUST_US)
+    absolute_time_t timeout = make_timeout_time_ms(3000);
+    while(absolute_time_diff_us(get_absolute_time(), timeout) > 0) {
+        sleep_us(5);
+    }
+
     uint callbacks = 0;
     for(uint i=0;i<NUM_REPEATING_TIMERS;i++) {
         PICOTEST_CHECK(cancel_repeating_timer(repeating_timers + i), "Cancelling repeating timer should succeed");
@@ -223,6 +245,23 @@ int main() {
     if (issue_195_test()) {
         return -1;
     }
+    issue_1812_test();
+
+    // Destroy alarm pools (except for default)
+    for(uint i=0; i<NUM_ALARMS; i++) {
+        if (i != alarm_pool_timer_alarm_num(alarm_pool_get_default())) {
+            alarm_pool_destroy(pools[i]);
+            pools[i] = 0;
+        }
+    }
+
+    issue_1953_test();
+
+    issue_2118_test();
+
+    issue_2148_test();
+    
+    issue_2186_test();
 
     PICOTEST_END_TEST();
 }
@@ -234,7 +273,7 @@ int64_t issue_195_callback(alarm_id_t id, void *user_data) {
     return -ISSUE_195_TIMER_DELAY;
 }
 
-int issue_195_test(void) {
+static int issue_195_test(void) {
     PICOTEST_START_SECTION("Issue #195 race condition - without fix may hang on gcc 10.2.1 release builds");
     absolute_time_t t1 = get_absolute_time();
     int id = add_alarm_in_us(ISSUE_195_TIMER_DELAY, issue_195_callback, NULL, true);
@@ -252,3 +291,133 @@ int issue_195_test(void) {
     return 0;
 }
 
+// Setting an alarm should not swallow a sev
+static int issue_1812_test(void) {
+    PICOTEST_START_SECTION("Issue #1812 defect - Setting an alarm should not ignore a sev");
+
+    __sev(); // Make sure the call below does not ignore this
+    absolute_time_t before = get_absolute_time();
+    bool result = best_effort_wfe_or_timeout(make_timeout_time_ms(1000));
+    int64_t diff = absolute_time_diff_us(before, get_absolute_time());
+    PICOTEST_CHECK(diff < 250 && !result, "sev ignored by best_effort_wfe_or_timeout")
+
+    PICOTEST_END_SECTION();
+    return 0;
+}
+
+static bool timer_callback_issue_1953(repeating_timer_t *rt) {
+    static int counter;
+    counter++;
+    return true;
+}
+
+// Callback should only occur if the alarm is set in the past
+static void alarm_pool_stuck_issue_1953(uint alarm) {
+    hard_assert(false);
+}
+
+static int issue_1953_test(void) {
+    PICOTEST_START_SECTION("Issue #1953 defect - Alarm can be set in the past");
+    int alarm = hardware_alarm_claim_unused(true);
+    hardware_alarm_set_callback(alarm, alarm_pool_stuck_issue_1953);
+
+    repeating_timer_t timer1;
+    repeating_timer_t timer2;
+
+    hard_assert(add_repeating_timer_us(10, timer_callback_issue_1953, NULL, &timer1));
+    hard_assert(add_repeating_timer_us(100, timer_callback_issue_1953, NULL, &timer2));
+
+    int iterations = 0;
+    while(iterations < 100) {
+        iterations++;
+        hardware_alarm_set_target(alarm, make_timeout_time_ms(1000));
+        sleep_us(500); // lockup in here without the fix for #1953
+        hardware_alarm_cancel(alarm);
+    }
+
+    cancel_repeating_timer(&timer1);
+    cancel_repeating_timer(&timer2);
+
+    hardware_alarm_unclaim(alarm);
+    PICOTEST_END_SECTION();
+    return 0;
+}
+
+static int counter_2118;
+static bool timer_callback_issue_2118(repeating_timer_t *rt) {
+    counter_2118++;
+    return true;
+}
+
+static int issue_2118_test(void) {
+    PICOTEST_START_SECTION("Issue #2118 defect - failure to set an alarm");
+
+#if PICO_ON_DEVICE
+    // this problem only happens when running the clock fast as it requires the time between
+    // alarm_pool_irq_handler handling an alarm and setting the next alarm to be <1us
+    set_sys_clock_hz(200 * MHZ, true);
+    setup_default_uart();
+#endif
+
+    alarm_pool_t *pool = alarm_pool_create(2, 1);
+    repeating_timer_t timer;
+    alarm_pool_add_repeating_timer_ms(pool, -20, timer_callback_issue_2118, NULL, &timer);
+
+    int iterations = 0;
+    while(iterations < 100) {
+        iterations++;
+        sleep_ms(20);
+    }
+    PICOTEST_CHECK(counter_2118 >= 100, "Repeating timer failure");
+
+    alarm_pool_destroy(pool);
+#if PICO_ON_DEVICE
+    hard_assert(timer_hw->armed == 0); // check destroying the pool unarms its timer
+    set_sys_clock_hz(SYS_CLK_HZ, true);
+    setup_default_uart();
+#endif
+
+    PICOTEST_END_SECTION();
+    return 0;
+}
+
+static int issue_2186_test(void) {
+    PICOTEST_START_SECTION("Issue #2186 defect - ta_wakes_up_on_or_before");
+
+    hard_assert(best_effort_wfe_or_timeout(get_absolute_time() - 1));
+    hard_assert(best_effort_wfe_or_timeout(get_absolute_time() - 1)); // this will lockup without the fix - wfe which never happens
+
+    PICOTEST_END_SECTION();
+    return 0;
+}
+
+static int issue_2148_test(void) {
+#if HAS_RP2040_RTC
+    PICOTEST_START_SECTION("Issue #2148 defect - get time after rtc start");
+    struct tm tm = { 0 };
+    struct tm tm_check = { 0 };
+
+    tm.tm_sec = 55;
+    tm.tm_min = 36;
+    tm.tm_hour = 20;
+    tm.tm_mday = 21;
+    tm.tm_mon = 10;
+    tm.tm_year = 124;
+    tm.tm_wday = 4;
+    tm.tm_yday = 325;
+    tm.tm_isdst = 0;
+    hard_assert(aon_timer_start_calendar(&tm));
+    hard_assert(aon_timer_get_time_calendar(&tm_check));
+
+    PICOTEST_CHECK(tm.tm_sec == tm_check.tm_sec || tm.tm_sec == tm_check.tm_sec - 1, "failed to get seconds");
+    PICOTEST_CHECK(tm.tm_min == tm_check.tm_min, "failed to get minutes");
+    PICOTEST_CHECK(tm.tm_hour == tm_check.tm_hour, "failed to get hour");
+    PICOTEST_CHECK(tm.tm_mday == tm_check.tm_mday, "failed to get day");
+    PICOTEST_CHECK(tm.tm_mon == tm_check.tm_mon, "failed to get month");
+    PICOTEST_CHECK(tm.tm_year == tm_check.tm_year, "failed to get year");
+
+    aon_timer_stop();
+    PICOTEST_END_SECTION();
+#endif
+    return 0;
+}

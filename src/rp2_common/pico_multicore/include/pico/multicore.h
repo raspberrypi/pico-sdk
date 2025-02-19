@@ -15,21 +15,51 @@
 extern "C" {
 #endif
 
+// PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PICO_MULTICORE, Enable/disable assertions in the pico_multicore module, type=bool, default=0, group=pico_multicore
+#ifndef PARAM_ASSERTIONS_ENABLED_PICO_MULTICORE
+#define PARAM_ASSERTIONS_ENABLED_PICO_MULTICORE 0
+#endif
+
 /** \file multicore.h
- *  \defgroup pico_multicore pico_multicore
- * Adds support for running code on the second processor core (core 1)
+ * \defgroup pico_multicore pico_multicore
+ * \brief Adds support for running code on, and interacting with the second processor core (core 1).
  *
  * \subsection multicore_example Example
  * \addtogroup pico_multicore
  * \include multicore.c
 */
 
-// PICO_CONFIG: PICO_CORE1_STACK_SIZE, Stack size for core 1, min=0x100, max=0x10000, default=PICO_STACK_SIZE (0x800), group=pico_multicore
+// PICO_CONFIG: PICO_CORE1_STACK_SIZE, Minimum amount of stack space reserved in the linker script for core 1 - if zero then no space is reserved and the user must provide their own stack, min=0, max=0x10000, default=PICO_STACK_SIZE (0x800), group=pico_multicore
 #ifndef PICO_CORE1_STACK_SIZE
 #ifdef PICO_STACK_SIZE
 #define PICO_CORE1_STACK_SIZE PICO_STACK_SIZE
 #else
 #define PICO_CORE1_STACK_SIZE 0x800
+#endif
+#endif
+
+/**
+ * \def SIO_FIFO_IRQ_NUM(core)
+ * \ingroup pico_multicore
+ * \hideinitializer
+ * \brief Returns the \ref irq_num_t for the FIFO IRQ on the given core.
+ *
+ * \if rp2040_specific
+ * On RP2040 each core has a different IRQ number: `SIO_IRQ_PROC0` and `SIO_IRQ_PROC1`.
+ * \endif
+ * \if rp2350_specific
+ * On RP2350 both cores share the same irq number (`SIO_IRQ_PROC`) just with a different SIO
+ * interrupt output routed to that IRQ input on each core.
+ * \endif
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef SIO_FIFO_IRQ_NUM
+#if !PICO_RP2040
+#define SIO_FIFO_IRQ_NUM(core) SIO_IRQ_FIFO
+#else
+static_assert(SIO_IRQ_PROC1 == SIO_IRQ_PROC0 + 1, "");
+#define SIO_FIFO_IRQ_NUM(core) (SIO_IRQ_PROC0 + (core))
 #endif
 #endif
 
@@ -94,15 +124,15 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
  * \ingroup pico_multicore
  * \brief Functions for the inter-core FIFOs
  *
- * The RP2040 contains two FIFOs for passing data, messages or ordered events between the two cores. Each FIFO is 32 bits
- * wide, and 8 entries deep. One of the FIFOs can only be written by core 0, and read by core 1. The other can only be written
- * by core 1, and read by core 0.
+ * RP-series microcontrollers contains two FIFOs for passing data, messages or ordered events between the two cores. Each FIFO
+ * is 32 bits wide, and 8 entries deep on the RP2040, and 4 entries deep on the RP2350. One of the FIFOs can only be written by
+ * core 0, and read by core 1. The other can only be written by core 1, and read by core 0.
  *
  * \note The inter-core FIFOs are a very precious resource and are frequently used for SDK functionality (e.g. during
  * core 1 launch or by the \ref multicore_lockout functions). Additionally they are often required for the exclusive use
  * of an RTOS (e.g. FreeRTOS SMP). For these reasons it is suggested that you do not use the FIFO for your own purposes
  * unless none of the above concerns apply; the majority of cases for transferring data between cores can be eqaully
- * well handled  by using a \ref queue
+ * well handled by using a \ref queue
  */
 
 /*! \brief Check the read FIFO to see if there is data available (sent by the other core)
@@ -113,7 +143,7 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
  * \return true if the FIFO has data in it, false otherwise
  */
 static inline bool multicore_fifo_rvalid(void) {
-    return !!(sio_hw->fifo_st & SIO_FIFO_ST_VLD_BITS);
+    return sio_hw->fifo_st & SIO_FIFO_ST_VLD_BITS;
 }
 
 /*! \brief Check the write FIFO to see if it has space for more data
@@ -124,8 +154,21 @@ static inline bool multicore_fifo_rvalid(void) {
  *  @return true if the FIFO has room for more data, false otherwise
  */
 static inline bool multicore_fifo_wready(void) {
-    return !!(sio_hw->fifo_st & SIO_FIFO_ST_RDY_BITS);
+    return sio_hw->fifo_st & SIO_FIFO_ST_RDY_BITS;
 }
+
+/*! \brief Push data on to the write FIFO (data to the other core).
+ *  \ingroup multicore_fifo
+ *
+ * This function will block until there is space for the data to be sent.
+ * Use \ref multicore_fifo_wready() to check if it is possible to write to the
+ * FIFO if you don't want to block.
+ *
+ * See the note in the \ref multicore_fifo section for considerations regarding use of the inter-core FIFOs
+ *
+ * \param data A 32 bit value to push on to the FIFO
+ */
+void multicore_fifo_push_blocking(uint32_t data);
 
 /*! \brief Push data on to the write FIFO (data to the other core).
  *  \ingroup multicore_fifo
@@ -138,7 +181,16 @@ static inline bool multicore_fifo_wready(void) {
  *
  * \param data A 32 bit value to push on to the FIFO
  */
-void multicore_fifo_push_blocking(uint32_t data);
+static inline void multicore_fifo_push_blocking_inline(uint32_t data) {
+    // We wait for the fifo to have some space
+    while (!multicore_fifo_wready())
+        tight_loop_contents();
+
+    sio_hw->fifo_wr = data;
+
+    // Fire off an event to the other core
+    __sev();
+}
 
 /*! \brief Push data on to the write FIFO (data to the other core) with timeout.
  *  \ingroup multicore_fifo
@@ -164,6 +216,26 @@ bool multicore_fifo_push_timeout_us(uint32_t data, uint64_t timeout_us);
  * \return 32 bit data from the read FIFO.
  */
 uint32_t multicore_fifo_pop_blocking(void);
+
+/*! \brief Pop data from the read FIFO (data from the other core).
+ *  \ingroup multicore_fifo
+ *
+ * This function will block until there is data ready to be read
+ * Use multicore_fifo_rvalid() to check if data is ready to be read if you don't
+ * want to block.
+ *
+ * See the note in the \ref multicore_fifo section for considerations regarding use of the inter-core FIFOs
+ *
+ * \return 32 bit data from the read FIFO.
+ */
+static inline uint32_t multicore_fifo_pop_blocking_inline(void) {
+    // If nothing there yet, we wait for an event first,
+    // to try and avoid too much busy waiting
+    while (!multicore_fifo_rvalid())
+        __wfe();
+
+    return sio_hw->fifo_rd;
+}
 
 /*! \brief Pop data from the read FIFO (data from the other core) with timeout.
  *  \ingroup multicore_fifo
@@ -223,9 +295,129 @@ static inline uint32_t multicore_fifo_get_status(void) {
 }
 
 /*!
+ * \defgroup multicore_doorbell doorbell
+ * \ingroup pico_multicore
+ * \brief Functions related to doorbells which a core can use to raise IRQs on itself or the other core.
+ *
+ * \if (rp2040_specific && !combined_docs)
+ * The doorbell functionality is not available on RP2040.
+ * \endif
+ */
+
+#if NUM_DOORBELLS
+static inline void check_doorbell_num_param(__unused uint doorbell_num) {
+    invalid_params_if(PICO_MULTICORE, doorbell_num >= NUM_DOORBELLS);
+}
+
+/*! \brief Cooperatively claim the use of this hardware alarm_num
+ *  \ingroup multicore_doorbell
+ *
+ * This method hard asserts if the hardware alarm is currently claimed.
+ *
+ * \param doorbell_num the doorbell number to claim
+ * \param core_mask 0b01: core 0, 0b10: core 1, 0b11 both core 0 and core 1
+ * \sa hardware_claiming
+ */
+void multicore_doorbell_claim(uint doorbell_num, uint core_mask);
+
+/*! \brief Cooperatively claim the use of this hardware alarm_num
+ *  \ingroup multicore_doorbell
+ *
+ * This method attempts to claim an unused hardware alarm
+ *
+ * \param core_mask 0b01: core 0, 0b10: core 1, 0b11 both core 0 and core 1
+ * \param required if true the function will panic if none are available
+ * \return the doorbell number claimed or -1 if required was false, and none are available
+ * \sa hardware_claiming
+ */
+int multicore_doorbell_claim_unused(uint core_mask, bool required);
+
+/*! \brief Cooperatively release the claim on use of this hardware alarm_num
+ *  \ingroup multicore_doorbell
+ *
+ * \param doorbell_num the doorbell number to unclaim
+ * \param core_mask 0b01: core 0, 0b10: core 1, 0b11 both core 0 and core 1
+ * \sa hardware_claiming
+ */
+void multicore_doorbell_unclaim(uint doorbell_num, uint core_mask);
+
+/*! \brief Activate the given doorbell on the other core
+ * \ingroup multicore_doorbell
+ * \param doorbell_num the doorbell number
+ */
+static inline void multicore_doorbell_set_other_core(uint doorbell_num) {
+    check_doorbell_num_param(doorbell_num);
+    sio_hw->doorbell_out_set = 1u << doorbell_num;
+}
+
+/*! \brief Deactivate the given doorbell on the other core
+ * \ingroup multicore_doorbell
+ * \param doorbell_num the doorbell number
+ */
+static inline void multicore_doorbell_clear_other_core(uint doorbell_num) {
+    check_doorbell_num_param(doorbell_num);
+    sio_hw->doorbell_out_clr = 1u << doorbell_num;
+}
+
+/*! \brief Activate the given doorbell on this core
+ * \ingroup multicore_doorbell
+ * \param doorbell_num the doorbell number
+ */
+static inline void multicore_doorbell_set_current_core(uint doorbell_num) {
+    check_doorbell_num_param(doorbell_num);
+    sio_hw->doorbell_in_set = 1u << doorbell_num;
+}
+
+/*! \brief Deactivate the given doorbell on this core
+ * \ingroup multicore_doorbell
+ * \param doorbell_num the doorbell number
+ */
+static inline void multicore_doorbell_clear_current_core(uint doorbell_num) {
+    check_doorbell_num_param(doorbell_num);
+    sio_hw->doorbell_in_clr = 1u << doorbell_num;
+}
+
+/*! \brief Determine if the given doorbell is active on the other core
+ * \ingroup multicore_doorbell
+ * \param doorbell_num the doorbell number
+ */
+static inline bool multicore_doorbell_is_set_current_core(uint doorbell_num) {
+    check_doorbell_num_param(doorbell_num);
+    return sio_hw->doorbell_in_set & (1u << doorbell_num);
+}
+
+/*! \brief Determine if the given doorbell is active on the this core
+ * \ingroup multicore_doorbell
+ * \param doorbell_num the doorbell number
+ */
+static inline bool multicore_doorbell_is_set_other_core(uint doorbell_num) {
+    check_doorbell_num_param(doorbell_num);
+    return sio_hw->doorbell_out_set & (1u << doorbell_num);
+}
+
+/**
+ * \def DOORBELL_IRQ_NUM(doorbell_num)
+ * \ingroup multicore_doorbell
+ * \hideinitializer
+ * \brief Returns the \ref irq_num_t for processor interrupts for the given doorbell number
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef DOORBELL_IRQ_NUM
+#define DOORBELL_IRQ_NUM(doorbell_num) SIO_IRQ_BELL
+#endif
+
+static inline uint multicore_doorbell_irq_num(uint doorbell_num) {
+    check_doorbell_num_param(doorbell_num);
+    return DOORBELL_IRQ_NUM(doorbell_num);
+}
+
+#endif
+
+/*!
  * \defgroup multicore_lockout lockout
  * \ingroup pico_multicore
- * \brief Functions to enable one core to force the other core to pause execution in a known state.
+ * \brief Functions to enable one core to force the other core to pause execution in a known state
  *
  * Sometimes it is useful to enter a critical section on both cores at once. On a single
  * core system a critical section can trivially be entered by disabling interrupts, however on a multi-core
@@ -256,6 +448,25 @@ static inline uint32_t multicore_fifo_get_status(void) {
  * This code hooks the intercore FIFO IRQ, and the FIFO may not be used for any other purpose after this.
  */
 void multicore_lockout_victim_init(void);
+
+/*! \brief Stop the current core being able to be a "victim" of lockout (i.e. forced to pause in a known state by the other core)
+ *  \ingroup multicore_lockout
+ *
+ * This code unhooks the intercore FIFO IRQ, and the FIFO may be used for any other purpose after this.
+ */
+void multicore_lockout_victim_deinit(void);
+
+/*! \brief Determine if \ref multicore_lockout_victim_init() has been called on the specified core.
+ *  \ingroup multicore_lockout
+ *
+ * \note this state persists even if the core is subsequently reset; therefore you are advised to
+ * always call \ref multicore_lockout_victim_init() again after resetting a core, which had previously
+ * been initialized.
+ *
+ * \param core_num the core number (0 or 1)
+ * \return true if \ref multicore_lockout_victim_init() has been called on the specified core, false otherwise.
+ */
+bool multicore_lockout_victim_is_initialized(uint core_num);
 
 /*! \brief Request the other core to pause in a known state and wait for it to do so
  *  \ingroup multicore_lockout

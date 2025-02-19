@@ -1,0 +1,290 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "int_flag", "string_flag")
+
+package(default_visibility = ["//visibility:public"])
+
+# PICO_BAZEL_CONFIG: PICO_TOOLCHAIN, The toolchain to use, type=string, default=gcc, group=build
+string_flag(
+    name = "PICO_TOOLCHAIN",
+    build_setting_default = "gcc",
+    values = [
+        "gcc",
+        "clang",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_BOARD, Board name being built for, type=string, default=pico or pico2, group=build, docref=cmake-platform-board-config
+string_flag(
+    name = "PICO_BOARD",
+    build_setting_default = "pico",
+)
+
+# PICO_BAZEL_CONFIG: PICO_BARE_METAL, Flag to exclude anything except base headers from the build, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_BARE_METAL",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_NO_GC_SECTIONS, Disable `-ffunction-sections` `-fdata-sections` and `--gc-sections`, type=bool, default=0, advanced=true, group=pico_standard_link
+bool_flag(
+    name = "PICO_NO_GC_SECTIONS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BOOT_STAGE2_FILE, Boot stage 2 file to use; this should point to a filegroup with the .S file to use, type=string, group=build
+label_flag(
+    name = "PICO_DEFAULT_BOOT_STAGE2_FILE",
+    build_setting_default = "//src/rp2_common:build_selected_boot2",
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BOOT_STAGE2, Simpler alternative to specifying PICO_DEFAULT_BOOT_STAGE2_FILE where the latter is set to src/rp2_common/boot_stage2/{PICO_DEFAULT_BOOT_STAGE2}.S, type=string, default=compile_time_choice, group=build
+string_flag(
+    name = "PICO_DEFAULT_BOOT_STAGE2",
+    build_setting_default = "compile_time_choice",
+)
+
+# PICO_BAZEL_CONFIG: PICO_BOOT_STAGE2_LINK_IMAGE, [Bazel only] The final boot_stage2 image target to link in. Use this to fully override/replace boot_stage2, default=@pico-sdk//src/rp2_common:boot_stage2, group=build
+label_flag(
+    name = "PICO_BOOT_STAGE2_LINK_IMAGE",
+    build_setting_default = "//src/rp2_common:boot_stage2",
+)
+
+# PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_EXCEPTIONS, Enable CXX exception handling, type=bool, default=0, group=pico_cxx_options
+bool_flag(
+    name = "PICO_CXX_ENABLE_EXCEPTIONS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_RTTI, Enable CXX rtti, type=bool, default=0, group=pico_cxx_options
+bool_flag(
+    name = "PICO_CXX_ENABLE_RTTI",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CXX_ENABLE_CXA_ATEXIT, Enable cxa-atexit, type=bool, default=0, group=pico_cxx_options
+bool_flag(
+    name = "PICO_CXX_ENABLE_CXA_ATEXIT",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_UART, Option to globally enable stdio UART for all targets by default, type=bool, default=1, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_UART",
+    build_setting_default = True,
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_UART_BAUD_RATE, Define the default UART baudrate, type=int, max=921600, default=115200, group=hardware_uart
+int_flag(
+    name = "PICO_DEFAULT_UART_BAUD_RATE",
+    build_setting_default = 115200,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_USB, Option to globally enable stdio USB for all targets by default, type=bool, default=0, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_USB",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_SEMIHOSTING, Option to globally enable stdio semi-hosting for all targets by default, type=bool, default=0, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_SEMIHOSTING",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_RTT, Option to globally enable stdio RTT for all targets by default, type=bool, default=0, group=pico_stdlib
+bool_flag(
+    name = "PICO_STDIO_RTT",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_MULTICORE_ENABLED, OPTION: Enable multicore handling, type=bool, default=1, group=pico_stdlib
+bool_flag(
+    name = "PICO_MULTICORE_ENABLED",
+    build_setting_default = True,
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_DOUBLE_IMPL, The default implementation for pico_double to link. auto selects an appropriate default for the current platform. rp2040 is only supported on the rp2040. dcp is only supported on rp2350, type=string, default=auto, group=build
+string_flag(
+    name = "PICO_DEFAULT_DOUBLE_IMPL",
+    build_setting_default = "auto",
+    values = [
+        "auto",
+        "compiler",
+        "dcp",
+        "rp2040",
+        "none",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_FLOAT_IMPL, The default implementation for pico_float to link. auto selects an appropriate default for the current platform. rp2040 is only supported on the rp2040. vfp and dcp are only supported on rp2350, type=string, default=auto, group=build
+string_flag(
+    name = "PICO_DEFAULT_FLOAT_IMPL",
+    build_setting_default = "auto",
+    values = [
+        "auto",
+        "compiler",
+        "dcp",
+        "rp2040",
+        "vfp",
+        "none",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_DIVIDER_IMPL, The default implementation for pico_divider to link. hardware uses accelerated divide instructions while compiler allows the compiler to decide how to handle divide instructions. auto uses the platform default (hardware on RP2040 and compiler on RP2350), type=string, default=auto, group=build
+string_flag(
+    name = "PICO_DEFAULT_DIVIDER_IMPL",
+    build_setting_default = "auto",
+    values = [
+        "auto",
+        "hardware",
+        "compiler",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_PRINTF_IMPL, The default implementation for pico_printf to link. compiler lets the compiler control printf behavior while pico provides a pico-specific implementation, type=string, default=double, group=build
+string_flag(
+    name = "PICO_DEFAULT_PRINTF_IMPL",
+    build_setting_default = "pico",
+    values = [
+        "pico",
+        "compiler",
+        "none",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_ASYNC_CONTEXT_IMPL, The default implementation for pico_async_context to link, type=string, default=threadsafe_background, group=build
+string_flag(
+    name = "PICO_ASYNC_CONTEXT_IMPL",
+    build_setting_default = "threadsafe_background",
+    values = [
+        "poll",
+        "threadsafe_background",
+        "freertos",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_BINARY_INFO_ENABLED, Whether to include binary info in final firmware, type=bool, default=1, group=pico_stdlib
+bool_flag(
+    name = "PICO_BINARY_INFO_ENABLED",
+    build_setting_default = True,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CMSIS_PATH, Label of a cc_ibrary providing CMSIS core,  type=string, default="included stub CORE only impl", group=build
+label_flag(
+    name = "PICO_CMSIS_PATH",
+    build_setting_default = "//src/rp2_common/cmsis:cmsis_core",
+)
+
+# PICO_BAZEL_CONFIG: PICO_USE_DEFAULT_MAX_PAGE_SIZE, Don't shrink linker max page to 4096, type=bool, default=0, advanced=true, group=pico_standard_link
+bool_flag(
+    name = "PICO_USE_DEFAULT_MAX_PAGE_SIZE",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) during initialization, type=int, default=0, group=pico_stdio_usb
+int_flag(
+    name = "PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
+    build_setting_default = 0,
+)
+
+# PICO_BAZEL_CONFIG: PICO_TINYUSB_LIB, [Bazel only] The library that provides TinyUSB, default=@tinyusb//:tinyusb, group=build
+label_flag(
+    name = "PICO_TINYUSB_LIB",
+    build_setting_default = "@tinyusb//:tinyusb",
+)
+
+# TODO: Bazel build for mbedtls at @mbedtls//:mbedtls.
+# PICO_BAZEL_CONFIG: PICO_MBEDTLS_LIB, [Bazel only] The library that provides mbedtls, default=@mbedtls//:mbedtls, group=build
+label_flag(
+    name = "PICO_MBEDTLS_LIB",
+    build_setting_default = "//bazel:incompatible_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BINARY_INFO, [Bazel only] The library that provides custom_pico_binary_info to link into all binaries, default=//src/rp2_common/pico_standard_binary_info:default_binary_info, group=pico_standard_link
+label_flag(
+    name = "PICO_DEFAULT_BINARY_INFO",
+    build_setting_default = "//src/rp2_common/pico_standard_binary_info:default_binary_info",
+)
+
+# PICO_BAZEL_CONFIG: PICO_BAZEL_BUILD_TYPE, The type of build (e.g. Debug or Release) to embed in binary info, type=string, default=pico, group=build
+string_flag(
+    name = "PICO_BAZEL_BUILD_TYPE",
+    build_setting_default = "Debug",
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_LINKER_SCRIPT, [Bazel only] The library that provides a linker script to link into all binaries, default=//src/rp2_common/pico_crt0:default_linker_script, group=pico_standard_link
+label_flag(
+    name = "PICO_DEFAULT_LINKER_SCRIPT",
+    build_setting_default = "//src/rp2_common/pico_crt0:default_linker_script",
+)
+
+# PICO_BAZEL_CONFIG: PICO_NO_TARGET_NAME, Don't define PICO_TARGET_NAME, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_NO_TARGET_NAME",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_CONFIG_EXTRA_HEADER, [Bazel only] The cc_library that provides "pico_config_extra_headers.h", default=//bazel:no_extra_headers, group=pico_base
+label_flag(
+    name = "PICO_CONFIG_EXTRA_HEADER",
+    build_setting_default = "//bazel:no_extra_headers",
+)
+
+# PICO_BAZEL_CONFIG: PICO_CONFIG_PLATFORM_HEADER, [Bazel only] The cc_library that provides "pico_config_platform_headers.h" and defines PICO_BOARD, default=//src/common/pico_base_headers:default_platform_headers, group=pico_base
+label_flag(
+    name = "PICO_CONFIG_PLATFORM_HEADER",
+    build_setting_default = "//src/boards:default",
+)
+
+# PICO_BAZEL_CONFIG: PICO_CONFIG_HEADER, [Bazel only] The cc_library that defines PICO_CONFIG_HEADER or pico/config_autogen.h and other SDK critical defines (overrides PICO_BOARD setting), default=//bazel:generate_config_header, group=pico_base
+label_flag(
+    name = "PICO_CONFIG_HEADER",
+    build_setting_default = "//bazel:generate_config_header",
+)
+
+# PICO_BAZEL_CONFIG: PICO_CLIB, [Bazel only] The flavor of libc porting layer to use. auto infers the correct value to use from PICO_TOOLCHAIN, group=pico_standard_link
+string_flag(
+    name = "PICO_CLIB",
+    build_setting_default = "auto",
+    values = [
+        "auto",
+        "llvm_libc",
+        "newlib",
+        "picolibc",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_BTSTACK_CONFIG, [Bazel only] The cc_library that provides btstack_config.h, default=//bazel:empty_cc_lib, group=wireless
+label_flag(
+    name = "PICO_BTSTACK_CONFIG",
+    build_setting_default = "//bazel:empty_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_BT_ENABLE_BLE, [Bazel only] Whether or not to link in BLE portions of the btstack as part of //src/rp2_common/pico_btstack. Also defines ENABLE_BLE=1, type=bool, default=False, group=wireless
+bool_flag(
+    name = "PICO_BT_ENABLE_BLE",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_BT_ENABLE_CLASSIC, [Bazel only] Whether or not to link in classic BT portions of the btstack as part of //src/rp2_common/pico_btstack. Also defines ENABLE_CLASSIC=1, type=bool, default=False, group=wireless
+bool_flag(
+    name = "PICO_BT_ENABLE_CLASSIC",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_BT_ENABLE_MESH, [Bazel only] Whether or not to link in mesh BT portions of the btstack as part of //src/rp2_common/pico_btstack. Also defines ENABLE_MESH=1, type=bool, default=False, group=wireless
+bool_flag(
+    name = "PICO_BT_ENABLE_MESH",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_LWIP_CONFIG, [Bazel only] The cc_library that provides lwipopts.h, default=//bazel:empty_cc_lib, group=wireless
+label_flag(
+    name = "PICO_LWIP_CONFIG",
+    build_setting_default = "//bazel:empty_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_FREERTOS_LIB, [Bazel only] The cc_library that provides FreeRTOS, default=//bazel:empty_cc_lib, group=wireless
+label_flag(
+    name = "PICO_FREERTOS_LIB",
+    build_setting_default = "//bazel:empty_cc_lib",
+)

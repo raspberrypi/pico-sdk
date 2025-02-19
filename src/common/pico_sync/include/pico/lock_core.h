@@ -14,7 +14,7 @@
 /** \file lock_core.h
  *  \defgroup lock_core lock_core
  *  \ingroup pico_sync
- * \brief base synchronization/lock primitive support
+ * \brief base synchronization/lock primitive support.
  *
  * Most of the pico_sync locking primitives contain a lock_core_t structure member. This currently just holds a spin
  * lock which is used only to protect the contents of the rest of the structure as part of implementing the synchronization
@@ -34,7 +34,7 @@
  * and those that notify, to wake a blocked task which isn't on processor. At least the wait macro implementation needs to be atomic with the protecting
  * spin_lock unlock from the callers point of view; i.e. the task should unlock the spin lock when it starts its wait. Such implementation is
  * up to the RTOS integration, however the macros are defined such that such operations are always combined into a single call
- * (so they can be perfomed atomically) even though the default implementation does not need this, as a WFE which starts
+ * (so they can be performed atomically) even though the default implementation does not need this, as a WFE which starts
  * following the corresponding SEV is not missed.
  */
 
@@ -74,6 +74,7 @@ void lock_init(lock_core_t *core, uint lock_num);
 #ifndef lock_owner_id_t
 /*! \brief  type to use to store the 'owner' of a lock.
  *  \ingroup lock_core
+ *
  * By default this is int8_t as it only needs to store the core number or -1, however it may be
  * overridden if a larger type is required (e.g. for an RTOS task id)
  */
@@ -90,6 +91,7 @@ void lock_init(lock_core_t *core, uint lock_num);
 #ifndef lock_get_caller_owner_id
 /*! \brief  return the owner id for the caller
  *  \ingroup lock_core
+ *
  * By default this returns the calling core number, but may be overridden (e.g. to return an RTOS task id)
  */
 #define lock_get_caller_owner_id() ((lock_owner_id_t)get_core_num())

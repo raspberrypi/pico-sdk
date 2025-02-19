@@ -9,7 +9,7 @@
 
 /** \file stdio.h
 *  \defgroup pico_stdio pico_stdio
-* Customized stdio support allowing for input and output from UART, USB, semi-hosting etc.
+* \brief Customized stdio support allowing for input and output from UART, USB, semi-hosting etc
 *
 * Note the API for adding additional input output devices is not yet considered stable
 */
@@ -41,26 +41,42 @@
 #define PICO_STDIO_DEADLOCK_TIMEOUT_MS 1000
 #endif
 
+// PICO_CONFIG: PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS, Directly replace common stdio functions such as putchar from the C-library to avoid pulling in lots of c library code for simple output, type=bool, default=1, advanced=true, group=pico_stdio
+#ifndef PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS
+#define PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS 1
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <stdarg.h>
 
 typedef struct stdio_driver stdio_driver_t;
 
 /*! \brief Initialize all of the present standard stdio types that are linked into the binary.
  * \ingroup pico_stdio
  *
- * Call this method once you have set up your clocks to enable the stdio support for UART, USB
- * and semihosting based on the presence of the respective libraries in the binary.
+ * Call this method once you have set up your clocks to enable the stdio support for UART, USB,
+ * semihosting, and RTT based on the presence of the respective libraries in the binary.
  *
  * When stdio_usb is configured, this method can be optionally made to block, waiting for a connection
  * via the variables specified in \ref stdio_usb_init (i.e. \ref PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS)
  *
  * \return true if at least one output was successfully initialized, false otherwise.
- * \see stdio_uart, stdio_usb, stdio_semihosting
+ * \see stdio_uart, stdio_usb, stdio_semihosting, stdio_rtt
  */
 bool stdio_init_all(void);
+
+/*! \brief Deinitialize all of the present standard stdio types that are linked into the binary.
+ * \ingroup pico_stdio
+ *
+ * This method currently only supports stdio_uart and stdio_semihosting
+ *
+ * \return true if all outputs was successfully deinitialized, false otherwise.
+ * \see stdio_uart, stdio_usb, stdio_semihosting, stdio_rtt
+ */
+bool stdio_deinit_all(void);
 
 /*! \brief Flushes any buffered output.
  * \ingroup pico_stdio
@@ -73,7 +89,14 @@ void stdio_flush(void);
  * \param timeout_us the timeout in microseconds, or 0 to not wait for a character if none available.
  * \return the character from 0-255 or PICO_ERROR_TIMEOUT if timeout occurs
  */
-int getchar_timeout_us(uint32_t timeout_us);
+int stdio_getchar_timeout_us(uint32_t timeout_us);
+
+/*! \brief Alias for \ref stdio_getchar_timeout_us for backwards compatibility
+ * \ingroup pico_stdio
+ */
+static inline int getchar_timeout_us(uint32_t timeout_us) {
+    return stdio_getchar_timeout_us(timeout_us);
+}
 
 /*! \brief Adds or removes a driver from the list of active drivers used for input/output
  * \ingroup pico_stdio
@@ -107,12 +130,26 @@ void stdio_set_translate_crlf(stdio_driver_t *driver, bool translate);
 /*! \brief putchar variant that skips any CR/LF conversion if enabled
  * \ingroup pico_stdio
  */
-int putchar_raw(int c);
+int stdio_putchar_raw(int c);
+
+/*! \brief Alias for \ref stdio_putchar_raw for backwards compatibility
+ * \ingroup pico_stdio
+ */
+static inline int putchar_raw(int c) {
+    return stdio_putchar_raw(c);
+}
 
 /*! \brief puts variant that skips any CR/LF conversion if enabled
  * \ingroup pico_stdio
  */
-int puts_raw(const char *s);
+int stdio_puts_raw(const char *s);
+
+/*! \brief Alias for \ref stdio_puts_raw for backwards compatibility
+ * \ingroup pico_stdio
+ */
+static inline int puts_raw(const char *s) {
+    return stdio_puts_raw(s);
+}
 
 /*! \brief get notified when there are input characters available
  * \ingroup pico_stdio
@@ -121,6 +158,68 @@ int puts_raw(const char *s);
  * \param param Pointer to pass to the callback
  */
 void stdio_set_chars_available_callback(void (*fn)(void*), void *param);
+
+/*! \brief Waits until a timeout to reard at least one character into a buffer
+ * \ingroup pico_stdio
+ *
+ * This method returns as soon as input is available, but more characters may
+ * be returned up to the end of the buffer.
+ *
+ * \param buf the buffer to read into
+ * \param len the length of the buffer
+ * \return the number of characters read or PICO_ERROR_TIMEOUT
+ * \param until the time after which to return PICO_ERROR_TIMEOUT if no characters are available
+ */
+int stdio_get_until(char *buf, int len, absolute_time_t until);
+
+/*! \brief Prints a buffer to stdout with optional newline and carriage return insertion
+ * \ingroup pico_stdio
+ *
+ * This method returns as soon as input is available, but more characters may
+ * be returned up to the end of the buffer.
+ *
+ * \param s the characters to print
+ * \param len the length of s
+ * \param newline true if a newline should be added after the string
+ * \param cr_translation true if line feed to carriage return translation should be performed
+ * \return the number of characters written
+ */
+int stdio_put_string(const char *s, int len, bool newline, bool cr_translation);
+
+/*! \brief stdio_getchar Alias for \ref getchar that definitely does not go thru the implementation
+ * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
+ *
+ * \ingroup pico_stdio
+ */
+int stdio_getchar(void);
+
+/*! \brief stdio_getchar Alias for \ref putchar that definitely does not go thru the implementation
+ * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
+ *
+ * \ingroup pico_stdio
+ */
+int stdio_putchar(int);
+
+/*! \brief stdio_getchar Alias for \ref puts that definitely does not go thru the implementation
+ * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
+ *
+ * \ingroup pico_stdio
+ */
+int stdio_puts(const char *s);
+
+/*! \brief stdio_getchar Alias for \ref vprintf that definitely does not go thru the implementation
+ * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
+ *
+ * \ingroup pico_stdio
+ */
+int stdio_vprintf(const char *format, va_list va);
+
+/*! \brief stdio_getchar Alias for \ref printf that definitely does not go thru the implementation
+ * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
+ *
+ * \ingroup pico_stdio
+ */
+int __printflike(1, 0) stdio_printf(const char* format, ...);
 
 #ifdef __cplusplus
 }

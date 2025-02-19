@@ -40,13 +40,36 @@ if(PICO_BUILD_DOCS)
     endif()
 
     set(DOXY_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
-    set(DOXY_INPUT_DIRS "${PICO_DOXYGEN_PATHS}")
-    set(DOXY_EXCLUDE_DIRS "${PICO_DOXYGEN_EXCLUDE_PATHS}")
+    string(REPLACE ";" " " DOXY_INPUT_DIRS "${PICO_DOXYGEN_PATHS}")
+    string(REPLACE ";" " " DOXY_EXCLUDE_DIRS "${PICO_DOXYGEN_EXCLUDE_PATHS}")
+    string(REPLACE ";" " " DOXY_PREDEFINED "${PICO_DOXYGEN_PRE_DEFINES}")
+    string(REPLACE ";" " " DOXY_ENABLED_SECTIONS "${PICO_DOXYGEN_ENABLED_SECTIONS}")
     set(DOXY_EXAMPLE_DIR "${PICO_EXAMPLES_PATH}")
-
+    # auto genereate additional section enables from library paths
+    foreach (DIR IN LISTS PICO_DOXYGEN_PATHS)
+        get_filename_component(NAME "${DIR}" NAME)
+        if (NOT DIR STREQUAL "src")
+            set(DOXY_ENABLED_SECTIONS "${DOXY_ENABLED_SECTIONS} ${NAME}")
+        endif()
+    endforeach ()
     set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
     set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
+    if(DOXYGEN_VERSION VERSION_GREATER_EQUAL "1.9.8")
+        # see https://github.com/doxygen/doxygen/issues/10562
+        set(DOXY_API_DOCS_TAB_TYPE "topics")
+    else()
+        set(DOXY_API_DOCS_TAB_TYPE "modules")
+    endif()
+    set(doxylayout_in ${CMAKE_CURRENT_SOURCE_DIR}/DoxygenLayout.xml.in)
+    set(doxylayout ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml)
+
+    if (PICO_PLATFORM STREQUAL "rp2040")
+        set(PICO_DOXYGEN_TAG "(RP2040)")
+    elseif (PICO_PLATFORM STREQUAL "rp2350-arm-s" OR PICO_PLATFORM STREQUAL "rp2350-riscv")
+        set(PICO_DOXYGEN_TAG "(RP2350)")
+    endif()
+    configure_file(${doxylayout_in} ${doxylayout} @ONLY)
     configure_file(${doxyfile_in} ${doxyfile} @ONLY)
 
     add_custom_target(docs

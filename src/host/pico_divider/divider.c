@@ -8,7 +8,7 @@
 
 // These functions save/restore divider state, so are safe to call from interrupts
 int32_t div_s32s32(int32_t a, int32_t b) {
-    return hw_divider_s32_quotient(a, b);
+    return hw_divider_quotient_s32(a, b);
 }
 
 divmod_result_t divmod_s32s32(int32_t a, int32_t b) {
@@ -99,7 +99,7 @@ uint64_t divmod_u64u64(uint64_t a, uint64_t b) {
 
 int32_t div_s32s32_unsafe(int32_t a, int32_t b) { return div_s32s32(a,b); }
 int32_t divmod_s32s32_rem_unsafe(int32_t a, int32_t b, int32_t *rem) { return divmod_s32s32_rem(a, b, rem); }
-int64_t divmod_s32s32_unsafe(int32_t a, int32_t b) { return divmod_s32s32(a, b); }
+divmod_result_t divmod_s32s32_unsafe(int32_t a, int32_t b) { return divmod_s32s32(a, b); }
 
 uint32_t div_u32u32_unsafe(uint32_t a, uint32_t b) { return div_u32u32(a, b); }
 uint32_t divmod_u32u32_rem_unsafe(uint32_t a, uint32_t b, uint32_t *rem) { return divmod_u32u32_rem(a, b, rem); }
