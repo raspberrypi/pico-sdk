@@ -451,13 +451,6 @@ static inline int _cyw43_write_reg(cyw43_int_t *self, uint32_t fn, uint32_t reg,
     uint32_t buf[2];
     buf[0] = make_cmd(true, true, fn, reg, size);
     buf[1] = val;
-    if (fn == BACKPLANE_FUNCTION) {
-        // In case of f1 overflow
-        self->last_size = 8;
-        self->last_header[0] = buf[0];
-        self->last_header[1] = buf[1];
-        self->last_backplane_window = self->cur_backplane_window;
-    }
 
     if (fn == BACKPLANE_FUNCTION) {
         logic_debug_set(pin_BACKPLANE_WRITE, 1);
