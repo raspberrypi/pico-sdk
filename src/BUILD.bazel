@@ -19,6 +19,7 @@ alias(
         "//src/rp2_common/boot_bootrom_headers:__pkg__",
         "//src/rp2_common/hardware_boot_lock:__pkg__",
         "//src/rp2_common/pico_flash:__pkg__",
+        "//src/rp2_common/hardware_rcp:__pkg__",
     ],
 )
 
