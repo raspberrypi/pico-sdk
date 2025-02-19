@@ -36,6 +36,7 @@ pico_default_asm_setup
 #endif
 
 #define CMD_READ 0x03
+#define CMD_RELEASE_POWERDOWN 0xAB
 
 // Value is number of address bits divided by 4
 #define ADDR_L 6
@@ -92,12 +93,27 @@ regular_func _stage2_boot
     movs r1, #1
     str r1, [r3, #SSI_SSIENR_OFFSET]
 
+#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
+    // Send release power-down command, discard RX
+    movs r1, #CMD_RELEASE_POWERDOWN
+    str r1, [r3, #SSI_DR0_OFFSET]
+
+    // Poll for completion and discard RX
+    bl wait_ssi_ready
+    ldr r1, [r3, #SSI_DR0_OFFSET]
+#endif
+
 // We are now in XIP mode. Any bus accesses to the XIP address window will be
 // translated by the SSI into 03h read commands to the external flash (if cache is missed),
 // and the data will be returned to the bus.
 
 // Pull in standard exit routine
 #include "boot2_helpers/exit_from_boot2.S"
+
+#if PICO_BOOT_STAGE2_FLASH_RELEASE_POWERDOWN
+// Common functions
+#include "boot2_helpers/wait_ssi_ready.S"
+#endif
 
 .global literals
 literals:
