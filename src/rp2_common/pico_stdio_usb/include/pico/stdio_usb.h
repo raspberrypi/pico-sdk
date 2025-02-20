@@ -44,10 +44,30 @@
 // this variable is no longer set by default (one is claimed dynamically), but will be respected if specified
 #endif
 
+// PICO_CONFIG: PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK, Enable/disable the use of a background task to call tud_task(), default=1 if the application is not using tinyUSB directly, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK
+#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
+#define PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK 1
+#else
+#define PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK 0
+#endif
+#endif
+
+// PICO_CONFIG: PICO_STDIO_USB_ENABLE_TINYUSB_INIT, Enable/disable calling tinyUSB tusb_init() during initialization, default=1 if the application is not using tinyUSB directly, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_ENABLE_TINYUSB_INIT
+#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
+#define PICO_STDIO_USB_ENABLE_TINYUSB_INIT 1
+#else
+#define PICO_STDIO_USB_ENABLE_TINYUSB_INIT 0
+#endif
+#endif
+
 // PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE, Enable/disable resetting into BOOTSEL mode if the host sets the baud rate to a magic value (PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE), type=bool, default=1 if application is not using TinyUSB directly, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE
 #if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
 #define PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE 1
+#else
+#define PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE 0
 #endif
 #endif
 
@@ -93,6 +113,8 @@
 #ifndef PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
 #if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
 #define PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE 1
+#else
+#define PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE 0
 #endif
 #endif
 
@@ -114,6 +136,15 @@
 // PICO_CONFIG: PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS, Delay in ms before rebooting via regular flash boot, default=100, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS
 #define PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS 100
+#endif
+
+// PICO_CONFIG: PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS, Defines the default USB descriptors needed for USB communication, default=1 if the application is not using tinyUSB directly, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS
+#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
+#define PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS 1
+#else
+#define PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS 0
+#endif
 #endif
 
 // PICO_CONFIG: PICO_STDIO_USB_CONNECTION_WITHOUT_DTR, Disable use of DTR for connection checking meaning connection is assumed to be valid, type=bool, default=0, group=pico_stdio_usb
