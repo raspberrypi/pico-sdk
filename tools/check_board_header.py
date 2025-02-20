@@ -391,6 +391,8 @@ else:
             chip = 'RP2350A'
         else:
             chip = 'RP2350B'
+        if 'PICO_RP2350B' in defines:
+            raise Exception("{} sets #define {} {} (should probably be #define {} {})".format(board_header, 'PICO_RP2350B', defines['PICO_RP2350B'].resolved_value, 'PICO_RP2350A', 1 - defines['PICO_RP2350B'].resolved_value))
         if not board_header.endswith("amethyst_fpga.h"):
             if 'PICO_RP2350_A2_SUPPORTED' not in cmake_default_settings:
                 raise Exception("{} uses chip {} but is missing a pico_cmake_set_default {} comment".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
