@@ -121,6 +121,10 @@ void restore_interrupts(uint32_t status);
 
 void restore_interrupts_from_disabled(uint32_t status);
 
+void disable_interrupts(void);
+
+void enable_interrupts(void);
+
 uint spin_lock_get_num(spin_lock_t *lock);
 
 spin_lock_t *spin_lock_instance(uint lock_num);

@@ -201,7 +201,7 @@ __force_inline static void __mem_fence_release(void) {
 /*! \brief Explicitly disable interrupts on the calling core
  *  \ingroup hardware_sync
  */
-__force_inline static uint32_t disable_interrupts(void) {
+__force_inline static void disable_interrupts(void) {
 #ifdef __riscv
     __compiler_memory_barrier();
     riscv_clear_csr(mstatus, 8);
@@ -214,7 +214,7 @@ __force_inline static uint32_t disable_interrupts(void) {
 /*! \brief Explicitly enable interrupts on the calling core
  *  \ingroup hardware_sync
  */
-__force_inline static uint32_t enable_interrupts(void) {
+__force_inline static void enable_interrupts(void) {
 #ifdef __riscv
     __compiler_memory_barrier();
     riscv_set_csr(mstatus, 8);
