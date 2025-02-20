@@ -782,6 +782,8 @@ static inline void gpio_add_raw_irq_handler(uint gpio, irq_handler_t handler) {
  *
  * This method removes such a callback, and enables the "default" callback for the specified GPIOs.
  *
+ * \note You should always use the same gpio_mask as you used when you added the raw IRQ handler.
+ *
  * @param gpio_mask a bit mask of the GPIO numbers that will now be passed to the default callback for this core
  * @param handler the handler to remove from the list of GPIO IRQ handlers for this core
  */
