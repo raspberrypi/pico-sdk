@@ -7,6 +7,9 @@
 #include "pico/bootrom.h"
 #include "boot/picoboot.h"
 #include "boot/picobin.h"
+#if !PICO_RP2040
+#include "hardware/rcp.h"
+#endif
 
 /// \tag::table_lookup[]
 
@@ -68,6 +71,23 @@ void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pi
 }
 
 #if !PICO_RP2040
+
+
+// Generated from adding the following code into the bootrom
+// scan_workarea_t* scan_workarea = (scan_workarea_t*)workarea;
+// printf("VERSION_DOWNGRADE_ERASE_ADDR %08x\n", &(always->zero_init.version_downgrade_erase_flash_addr));
+// printf("TBYB_FLAG_ADDR %08x\n", &(always->zero_init.tbyb_flag_flash_addr));
+// printf("IMAGE_DEF_VERIFIED %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.verified) - (uint32_t)scan_workarea);
+// printf("IMAGE_DEF_TBYB_FLAGGED %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.tbyb_flagged) - (uint32_t)scan_workarea);
+// printf("IMAGE_DEF_BASE %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.enclosing_window.base) - (uint32_t)scan_workarea);
+// printf("IMAGE_DEF_REL_BLOCK_OFFSET %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.window_rel_block_offset) - (uint32_t)scan_workarea);
+#define VERSION_DOWNGRADE_ERASE_ADDR *(uint32_t*)0x400e0338
+#define TBYB_FLAG_ADDR *(uint32_t*)0x400e0348
+#define IMAGE_DEF_VERIFIED(scan_workarea) *(uint32_t*)(0x64 + (uint32_t)scan_workarea)
+#define IMAGE_DEF_TBYB_FLAGGED(scan_workarea) *(bool*)(0x4c + (uint32_t)scan_workarea)
+#define IMAGE_DEF_BASE(scan_workarea) *(uint32_t*)(0x54 + (uint32_t)scan_workarea)
+#define IMAGE_DEF_REL_BLOCK_OFFSET(scan_workarea) *(uint32_t*)(0x5c + (uint32_t)scan_workarea)
+
 bool rom_get_boot_random(uint32_t out[4]) {
     uint32_t result[5];
     rom_get_sys_info_fn func = (rom_get_sys_info_fn) rom_func_lookup_inline(ROM_FUNC_GET_SYS_INFO);
@@ -107,5 +127,63 @@ int rom_add_flash_runtime_partition(uint32_t start_offset, uint32_t size, uint32
         return pt->permission_partition_count++;
     }
     return PICO_ERROR_INSUFFICIENT_RESOURCES;
+}
+
+int rom_pick_ab_update_partition(uint32_t *workarea_base, uint32_t workarea_size, uint partition_a_num) {
+    uint32_t flash_update_base = 0;
+    bool tbyb_boot = false;
+    uint32_t saved_erase_addr = 0;
+    if (rom_get_last_boot_type() == BOOT_TYPE_FLASH_UPDATE) {
+        // For a flash update boot, get the flash update base
+        boot_info_t boot_info = {};
+        int ret = rom_get_boot_info(&boot_info);
+        if (ret) {
+            flash_update_base = boot_info.reboot_params[0];
+            if (boot_info.tbyb_and_update_info & BOOT_TBYB_AND_UPDATE_FLAG_BUY_PENDING) {
+                // A buy is pending, so the main software has not been bought
+                tbyb_boot = true;
+                // Save the erase address, as this will be overwritten by rom_pick_ab_partition
+                saved_erase_addr = VERSION_DOWNGRADE_ERASE_ADDR;
+            }
+        }
+    }
+
+    int rc = rom_pick_ab_partition((uint8_t*)workarea_base, workarea_size, partition_a_num, flash_update_base);
+
+    if (IMAGE_DEF_VERIFIED(workarea_base) != RCP_MASK_TRUE) {
+        // Chosen partition failed verification
+        return BOOTROM_ERROR_NOT_FOUND;
+    }
+
+    if (IMAGE_DEF_TBYB_FLAGGED(workarea_base)) {
+        // The chosen partition is TBYB
+        if (tbyb_boot) {
+            // The boot partition is also TBYB - cannot update both, so prioritise boot partition
+            // Restore the erase address saved earlier
+            VERSION_DOWNGRADE_ERASE_ADDR = saved_erase_addr;
+            return BOOTROM_ERROR_NOT_PERMITTED;
+        } else {
+            // Update the tbyb flash address, so that explicit_buy will clear the flag for the chosen partition
+            TBYB_FLAG_ADDR =
+                    IMAGE_DEF_BASE(workarea_base)
+                    + IMAGE_DEF_REL_BLOCK_OFFSET(workarea_base) + 4;
+        }
+    } else {
+        // The chosen partition is not TBYB
+        if (tbyb_boot && saved_erase_addr) {
+            // The boot partition was TBYB, and requires an erase
+            if (VERSION_DOWNGRADE_ERASE_ADDR) {
+                // But both the chosen partition requires an erase too
+                // As before, prioritise the boot partition, and restore it's saved erase_address
+                VERSION_DOWNGRADE_ERASE_ADDR = saved_erase_addr;
+                return BOOTROM_ERROR_NOT_PERMITTED;
+            } else {
+                // The chosen partition doesn't require an erase, so we're fine
+                VERSION_DOWNGRADE_ERASE_ADDR = saved_erase_addr;
+            }
+        }
+    }
+
+    return rc;
 }
 #endif
