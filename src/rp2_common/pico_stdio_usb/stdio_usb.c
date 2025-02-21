@@ -66,7 +66,7 @@ static void low_priority_worker_irq(void) {
 #endif
         mutex_exit(&stdio_usb_mutex);
 #if PICO_STDIO_USB_SUPPORT_CHARS_AVAILABLE_CALLBACK
-        if (chars_avail && chars_available_callback) chars_available_callback(chars_available_param);
+        if (chars_avail && chars_available_callback) stdio_usb_run_chars_available_callback();
 #endif
     } else {
         // if the mutex is already owned, then we are in non IRQ code in this file.
@@ -170,6 +170,12 @@ int stdio_usb_in_chars(char *buf, int length) {
 void stdio_usb_set_chars_available_callback(void (*fn)(void*), void *param) {
     chars_available_callback = fn;
     chars_available_param = param;
+}
+
+void stdio_usb_run_chars_available_callback(void) {
+    if (chars_available_callback) {
+        chars_available_callback(chars_available_param);
+    }
 }
 #endif
 
