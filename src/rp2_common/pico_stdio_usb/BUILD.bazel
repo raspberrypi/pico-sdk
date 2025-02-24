@@ -24,6 +24,9 @@ cc_library(
     hdrs = ["include/tusb_config.h"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":pico_stdio_usb_headers",
+    ],
 )
 
 pico_sdk_define(
@@ -43,10 +46,6 @@ cc_library(
     hdrs = ["include/pico/stdio_usb.h"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
-    visibility = [
-        ":__pkg__",
-        "//src/rp2_common/tinyusb:__pkg__",
-    ],
     deps = [
         ":LIB_PICO_STDIO_USB",
         ":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
