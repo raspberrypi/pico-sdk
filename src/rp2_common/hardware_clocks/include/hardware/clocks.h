@@ -322,8 +322,17 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
  *  \ingroup hardware_clocks
  *
  * This function differs from clock_configure in that it does not configure the clocks as accurately,
- * but therefore doesn't need to bring in 64-bit division functions, reducing the code size.
+ * but therefore doesn't need to bring in 64-bit division functions, reducing the code size if 64-bit
+ * division is not otherwise used by the application.
  *
+ * \if rp2350_specific
+ * Note: The RP2350 clock hardware supports divisors from 1.0->65536.0 in steps of 1/65536
+ *
+ * \endif
+ * \if rp2040_specific
+ * Note: The RP2040 clock hardware only supports divisors of exactly 1.0 or 2.0->16777216.0 in steps of 1/256
+ * \endif
+ * 
  * See the tables in the description for details on the possible values for clock sources.
  *
  * \param clock The clock to configure

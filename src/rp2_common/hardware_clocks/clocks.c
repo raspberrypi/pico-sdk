@@ -130,6 +130,12 @@ bool clock_configure_mhz(clock_handle_t clock, uint32_t src, uint32_t auxsrc, ui
         return false;
 
     uint32_t div = (uint32_t)((((uint32_t) src_freq_mhz) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / freq_mhz);
+#if PICO_RP2040
+    // on RP2040 only clock divider of 1, or  >= 2 are supported
+    if (div < (2u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB)) {
+        div = (1u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB);
+    }
+#endif
     uint32_t actual_freq = (uint32_t) ((((uint32_t) src_freq_mhz) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / div) * MHZ;
 
     clock_configure_internal(clock, src, auxsrc, actual_freq, div);
