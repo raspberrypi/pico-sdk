@@ -42,6 +42,12 @@ define_property(TARGET
     FULL_DOCS "AES key for encrypting"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_IVFILE
+    INHERITED
+    BRIEF_DOCS "IV OTP salt for encrypting"
+    FULL_DOCS "IV OTP salt for encrypting"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_EMBED_DECRYPTION
     INHERITED
     BRIEF_DOCS "Embed decryption stage into encrypted binary"
@@ -432,14 +438,17 @@ function(pico_embed_pt_in_binary TARGET PTFILE)
     )
 endfunction()
 
-# pico_encrypt_binary(TARGET AESFILE [SIGFILE <file>] [EMBED] [OTP_KEY_PAGE <page>])
+# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [OTP_KEY_PAGE <page>])
 # \brief_nodesc\ Encrypt the taget binary
 #
 # Encrypt the target binary with the given AES key (should be a binary
 # file containing 128 bytes of a random key), and sign the encrypted binary.
 #
-# This sets the target properties PICOTOOL_AESFILE to AESFILE,
-# and PICOTOOL_ENC_SIGFILE to SIGFILE if present, else PICOTOOL_SIGFILE.
+# Salts the public IV with the provided IVFILE (should be a binary file
+# containing 16 bytes of a random IV), to give the IV used by the encryption.
+#
+# This sets the target properties PICOTOOL_AESFILE to AESFILE, PICOTOOL_IVFILE to IVFILE, and
+# PICOTOOL_ENC_SIGFILE to SIGFILE if specified, else PICOTOOL_SIGFILE.
 #
 # Optionally, use EMBED to embed a decryption stage into the encrypted binary.
 # This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
@@ -451,14 +460,17 @@ endfunction()
 # \param\ SIGFILE The PEM signature file to use
 # \param\ EMBED Embed a decryption stage into the encrypted binary
 # \param\ OTP_KEY_PAGE The OTP page storing the AES key
-function(pico_encrypt_binary TARGET AESFILE)
+function(pico_encrypt_binary TARGET AESFILE IVFILE)
     set(options EMBED)
     set(oneValueArgs OTP_KEY_PAGE SIGFILE)
     # set(multiValueArgs )
-    cmake_parse_arguments(PARSE_ARGV 2 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
+    cmake_parse_arguments(PARSE_ARGV 3 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_AESFILE ${AESFILE}
+    )
+    set_target_properties(${TARGET} PROPERTIES
+        PICOTOOL_IVFILE ${IVFILE}
     )
 
     if (ENC_EMBED)
@@ -592,6 +604,10 @@ function(picotool_postprocess_binary TARGET)
     if (picotool_aesfile)
         pico_add_link_depend(${TARGET} ${picotool_aesfile})
     endif()
+    get_target_property(picotool_ivfile ${TARGET} PICOTOOL_IVFILE)
+    if (picotool_ivfile)
+        pico_add_link_depend(${TARGET} ${picotool_ivfile})
+    endif()
     get_target_property(picotool_enc_sigfile ${TARGET} PICOTOOL_ENC_SIGFILE)
     if (picotool_enc_sigfile)
         pico_add_link_depend(${TARGET} ${picotool_enc_sigfile})
@@ -631,7 +647,7 @@ function(picotool_postprocess_binary TARGET)
             VERBATIM)
         endif()
         # Encryption
-        if (picotool_aesfile)
+        if (picotool_aesfile AND picotool_ivfile)
             get_target_property(picotool_embed_decryption ${TARGET} PICOTOOL_EMBED_DECRYPTION)
             if (picotool_embed_decryption)
                 list(APPEND picotool_encrypt_args "--embed")
@@ -643,13 +659,13 @@ function(picotool_postprocess_binary TARGET)
             endif()
 
             add_custom_command(TARGET ${TARGET} POST_BUILD
-                DEPENDS ${picotool_enc_sigfile} ${picotool_aesfile}
+                DEPENDS ${picotool_enc_sigfile} ${picotool_aesfile} ${picotool_ivfile}
                 COMMAND picotool
                 ARGS encrypt
                     --quiet --hash --sign
                     ${picotool_encrypt_args}
                     $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
-                    ${picotool_aesfile} ${picotool_enc_sigfile} ${otp_file}
+                    ${picotool_aesfile} ${picotool_ivfile} ${picotool_enc_sigfile} ${otp_file}
                 COMMAND_EXPAND_LISTS
                 VERBATIM)
             if (ARGC EQUAL 2)
