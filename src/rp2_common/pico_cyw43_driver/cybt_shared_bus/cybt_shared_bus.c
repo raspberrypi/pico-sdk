@@ -39,7 +39,11 @@ extern const int     brcm_patch_ram_length;
 #else
 #define cybt_debug(format, ...) ((void)0)
 #endif
+#ifndef NDEBUG
 #define cybt_printf(format, args...) printf("%d.%d: " format, (int)cyw43_hal_ticks_ms() / 1000, (int)cyw43_hal_ticks_ms() % 1000, ## args)
+#else
+#define cybt_printf(...)
+#endif
 
 #define ROUNDUP(x, a)               ((((x) + ((a) - 1)) / (a)) * (a))
 #define ROUNDDN(x, a)               ((x) & ~((a) - 1))
