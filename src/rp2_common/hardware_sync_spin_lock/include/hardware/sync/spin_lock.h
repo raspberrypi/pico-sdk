@@ -149,7 +149,7 @@ typedef SW_SPIN_LOCK_TYPE spin_lock_t;
     __mem_fence_acquire();                                                      \
     })
 #else
-#error no SW_SPIN_TRY_LOCK available for PICO_USE_SW_SPIN_LOCK on this platform
+#error no SW_SPIN_LOCK_LOCK available for PICO_USE_SW_SPIN_LOCK on this platform
 #endif
 #endif
 
@@ -210,7 +210,7 @@ typedef SW_SPIN_LOCK_TYPE spin_lock_t;
     *(lock) = 0; /* write to spinlock register (release lock) */  \
     })
 #else
-#error no SW_SPIN_TRY_LOCK available for PICO_USE_SW_SPIN_LOCK on this platform
+#error no SW_SPIN_LOCK_UNLOCK available for PICO_USE_SW_SPIN_LOCK on this platform
 #endif
 #endif
 
