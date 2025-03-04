@@ -8,9 +8,9 @@
 // NOTE: THIS HEADER IS ALSO INCLUDED BY ASSEMBLER SO
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
-// Board definition for the SparkFun RP2350 Thing Plus
+// Board definition for the SparkFun IoT RedBoard - RP2350
 //
-// This header may be included by other board headers as "boards/sparkfun_thingplus_rp2350.h"
+// This header may be included by other board headers as "boards/sparkfun_iotredboard_rp2350.h"
 
 // pico_cmake_set PICO_PLATFORM=rp2350
 // pico_cmake_set PICO_CYW43_SUPPORTED = 1
@@ -22,8 +22,7 @@
 #define SPARKFUN_IOTREDBOARD_RP2350
 
 // --- RP2350 VARIANT ---
-#define PICO_RP2350B 1
-#define PICO_RP2350A 0
+#define PICO_RP2350A 0 // 1 for RP2350A, 0 for RP2350B
 
 // --- BOARD SPECIFIC ---
 #define SPARKFUN_IOTREDBOARD_RP2350_USER_SW_PIN 39
