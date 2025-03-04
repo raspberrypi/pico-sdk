@@ -54,6 +54,12 @@ define_property(TARGET
     FULL_DOCS "Embed decryption stage into encrypted binary"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_USE_MBEDTLS_DECRYPTION
+    INHERITED
+    BRIEF_DOCS "Use MbedTLS based decryption stage - this is faster, but not secure against power snooping"
+    FULL_DOCS "Use MbedTLS based decryption stage - this is faster, but not secure against power snooping"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_OTP_KEY_PAGE
     INHERITED
     BRIEF_DOCS "OTP page storing the AES key"
@@ -438,7 +444,7 @@ function(pico_embed_pt_in_binary TARGET PTFILE)
     )
 endfunction()
 
-# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [OTP_KEY_PAGE <page>])
+# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [MBEDTLS] [OTP_KEY_PAGE <page>])
 # \brief_nodesc\ Encrypt the taget binary
 #
 # Encrypt the target binary with the given AES key (should be a binary
@@ -453,15 +459,21 @@ endfunction()
 # Optionally, use EMBED to embed a decryption stage into the encrypted binary.
 # This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
 #
+# Optionally, use MBEDTLS to to use the MbedTLS based decryption stage - this
+# is faster, but less secure.
+# This sets the target property PICOTOOL_USE_MBEDTLS_DECRYPTION to TRUE.
+#
 # Optionally, use OTP_KEY_PAGE to specify the OTP page storing the AES key.
 # This sets the target property PICOTOOL_OTP_KEY_PAGE to OTP_KEY_PAGE.
 #
 # \param\ AESFILE The AES key file to use
+# \param\ IVFILE The IV file to use
 # \param\ SIGFILE The PEM signature file to use
 # \param\ EMBED Embed a decryption stage into the encrypted binary
+# \param\ MBEDTLS Use MbedTLS based decryption stage (faster, but less secure)
 # \param\ OTP_KEY_PAGE The OTP page storing the AES key
 function(pico_encrypt_binary TARGET AESFILE IVFILE)
-    set(options EMBED)
+    set(options EMBED MBEDTLS)
     set(oneValueArgs OTP_KEY_PAGE SIGFILE)
     # set(multiValueArgs )
     cmake_parse_arguments(PARSE_ARGV 3 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
@@ -476,6 +488,12 @@ function(pico_encrypt_binary TARGET AESFILE IVFILE)
     if (ENC_EMBED)
         set_target_properties(${TARGET} PROPERTIES
             PICOTOOL_EMBED_DECRYPTION TRUE
+        )
+    endif()
+
+    if (ENC_MBEDTLS)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_USE_MBEDTLS_DECRYPTION TRUE
         )
     endif()
 
@@ -651,6 +669,11 @@ function(picotool_postprocess_binary TARGET)
             get_target_property(picotool_embed_decryption ${TARGET} PICOTOOL_EMBED_DECRYPTION)
             if (picotool_embed_decryption)
                 list(APPEND picotool_encrypt_args "--embed")
+            endif()
+
+            get_target_property(picotool_mbedtls_decryption ${TARGET} PICOTOOL_USE_MBEDTLS_DECRYPTION)
+            if (picotool_mbedtls_decryption)
+                list(APPEND picotool_encrypt_args "--use-mbedtls")
             endif()
 
             get_target_property(otp_key_page ${TARGET} PICOTOOL_OTP_KEY_PAGE)
