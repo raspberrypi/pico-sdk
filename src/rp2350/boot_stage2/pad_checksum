@@ -44,7 +44,7 @@ odata = idata + bytes(args.pad - len(idata))
 with open(args.ofile, "w") as ofile:
     ofile.write("// Padded and checksummed version of: {}\n\n".format(args.ifile))
     if args.arch == "arm":
-        ofile.write(".cpu cortex-m0plus\n")
+        ofile.write(".cpu cortex-m33\n")
         ofile.write(".thumb\n\n")
     ofile.write(".section .boot2, \"ax\"\n\n")
     ofile.write(".global __boot2_entry_point\n")
