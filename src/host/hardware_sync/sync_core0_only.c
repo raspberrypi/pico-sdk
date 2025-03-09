@@ -31,6 +31,15 @@ PICO_WEAK_FUNCTION_DEF(restore_interrupts_from_disabled)
 void PICO_WEAK_FUNCTION_IMPL_NAME(restore_interrupts_from_disabled)(uint32_t status) {
 }
 
+PICO_WEAK_FUNCTION_DEF(disable_interrupts)
+
+void PICO_WEAK_FUNCTION_IMPL_NAME(disable_interrupts)(void) {
+}
+
+PICO_WEAK_FUNCTION_DEF(enable_interrupts)
+
+void PICO_WEAK_FUNCTION_IMPL_NAME(enable_interrupts)(void) {
+}
 
 PICO_WEAK_FUNCTION_DEF(spin_lock_instance)
 
