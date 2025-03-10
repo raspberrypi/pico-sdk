@@ -54,6 +54,17 @@ void cyw43_set_pio_clkdiv_int_frac8(uint32_t clock_div_int, uint8_t clock_div_fr
 }
 #endif
 
+#if CYW43_PIO_SLEEP_MIN_US
+static uint32_t bit_rate_khz;
+static void sleep_if_long_transfer(uint32_t xfr_length)
+{
+    // Estimate transfer delay & sleep for about that long if it's long enough
+    unsigned xfr_us = (xfr_length * 8 * 1000) / bit_rate_khz;
+    if (xfr_us > CYW43_PIO_SLEEP_MIN_US)
+        cyw43_delay_us(xfr_us);
+}
+#endif
+
 #define PADS_DRIVE_STRENGTH PADS_BANK0_GPIO0_DRIVE_VALUE_12MA
 
 #if !CYW43_USE_SPI
@@ -122,6 +133,10 @@ int cyw43_spi_init(cyw43_int_t *self) {
     }
     pio_sm_config config = SPI_PROGRAM_GET_DEFAULT_CONFIG_FUNC(bus_data->pio_offset);
 
+#if CYW43_PIO_SLEEP_MIN_US
+    // 2 PIO cycles per bit, PIO clock scaled
+    bit_rate_khz = clock_get_hz(clk_sys) / (cyw43_pio_clock_div_int * 2 * 1000);
+#endif
     sm_config_set_clkdiv_int_frac8(&config, cyw43_pio_clock_div_int, cyw43_pio_clock_div_frac8);
     hw_write_masked(&pads_bank0_hw->io[CYW43_PIN_WL_CLOCK],
                     (uint)PADS_DRIVE_STRENGTH << PADS_BANK0_GPIO0_DRIVE_LSB,
@@ -277,6 +292,9 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, true);
         __compiler_memory_barrier();
 
+#if CYW43_PIO_SLEEP_MIN_US
+        sleep_if_long_transfer(MAX(tx_length, rx_length));
+#endif			
         dma_channel_wait_for_finish_blocking(bus_data->dma_out);
         dma_channel_wait_for_finish_blocking(bus_data->dma_in);
 
@@ -309,6 +327,9 @@ int cyw43_spi_transfer(cyw43_int_t *self, const uint8_t *tx, size_t tx_length, u
         dma_channel_configure(bus_data->dma_out, &out_config, &bus_data->pio->txf[bus_data->pio_sm], tx, tx_length / 4, true);
 
         pio_sm_set_enabled(bus_data->pio, bus_data->pio_sm, true);
+#if CYW43_PIO_SLEEP_MIN_US
+        sleep_if_long_transfer(tx_length);
+#endif			
         dma_channel_wait_for_finish_blocking(bus_data->dma_out);
 
         uint32_t fdebug_tx_stall = 1u << (PIO_FDEBUG_TXSTALL_LSB + bus_data->pio_sm);
