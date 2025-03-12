@@ -9,6 +9,17 @@ bazel_dep(name = "rules_python", version = "0.36.0")
 bazel_dep(name = "picotool", version = "2.1.1")
 bazel_dep(name = "rules_cc", version = "0.0.10")
 
+# Only use Pigweed for develop flows (code formatting, on-device testing, etc.).
+# Since Pigweed isn't in the BCR, any references to Pigweed will force
+# downstream projects to add an override. Don't `load()` from @pigweed in
+# any directories other than //test/*.
+bazel_dep(name = "pigweed", version = "0.0.1", dev_dependency = True)
+git_override(
+    module_name = "pigweed",
+    commit = "5ec4ad9051a66bbcd003b1961936624fe6ee952f",
+    remote = "https://pigweed.googlesource.com/pigweed/pigweed",
+)
+
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
@@ -136,7 +147,7 @@ register_toolchains(
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
     configure_coverage_tool = True,
-    python_version = "3.9",
+    python_version = "3.11",
 )
 
 use_repo(python, "pythons_hub")
