@@ -16,7 +16,7 @@ bazel_dep(name = "rules_cc", version = "0.0.10")
 bazel_dep(name = "pigweed", version = "0.0.1", dev_dependency = True)
 git_override(
     module_name = "pigweed",
-    commit = "5ec4ad9051a66bbcd003b1961936624fe6ee952f",
+    commit = "f9979ae9110b650072b463392c72ae536763718b",
     remote = "https://pigweed.googlesource.com/pigweed/pigweed",
 )
 
