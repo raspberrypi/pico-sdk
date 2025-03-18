@@ -299,8 +299,7 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
     pico_mirrored_target_link_libraries(pico_lwip_freertos INTERFACE
             pico_async_context_base
             pico_lwip
-            pico_lwip_contrib_freertos
-            pico_rand)
+            pico_lwip_contrib_freertos)
 
     pico_add_subdirectory(tools)
     pico_promote_common_scope_vars()
