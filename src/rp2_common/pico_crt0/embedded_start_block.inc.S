@@ -41,7 +41,7 @@ embedded_block:
        PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(RISCV) | \
        PICOBIN_IMAGE_TYPE_EXE_CHIP_AS_BITS(RP2350) | \
        CRT0_TBYB_FLAG
-#elif defined(PICO_RP2040)
+#elif PICO_RP2040
 .hword PICOBIN_IMAGE_TYPE_IMAGE_TYPE_AS_BITS(EXE) | \
        PICOBIN_IMAGE_TYPE_EXE_SECURITY_AS_BITS(NS) | \
        PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(ARM) | \
@@ -84,7 +84,7 @@ embedded_block:
 .word SRAM_END // stack pointer
 #endif
 
-#ifndef PICO_RP2040
+#if !PICO_RP2040
 #if PICO_NO_FLASH
 // If no_flash bin, then include a vector table item
 .byte PICOBIN_BLOCK_ITEM_1BS_VECTOR_TABLE
