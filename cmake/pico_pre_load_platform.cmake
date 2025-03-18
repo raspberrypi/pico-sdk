@@ -122,7 +122,7 @@ if (PICO_PREVIOUS_PLATFORM AND NOT PICO_PREVIOUS_PLATFORM STREQUAL PICO_PLATFORM
                 The best practice is to use separate build directories for different platforms.")
 endif()
 set(PICO_PLATFORM ${PICO_PLATFORM} CACHE STRING "PICO Build platform (e.g. rp2040, rp2350, rp2350-riscv,  host)" FORCE)
-set(PICO_PREVIOUS_PLATFORM ${PICO_PLATFORM} CACHE STRING "Saved PICO Build platform (e.g. rp2040, rp2350, rp2350-riscv,  host)" INTERNAL)
+set(PICO_PREVIOUS_PLATFORM ${PICO_PLATFORM} CACHE INTERNAL "Saved PICO Build platform (e.g. rp2040, rp2350, rp2350-riscv,  host)")
 
 # PICO_CMAKE_CONFIG: PICO_CMAKE_PRELOAD_PLATFORM_FILE, Custom CMake file to use to set up the platform environment, type=string, group=build
 set(PICO_CMAKE_PRELOAD_PLATFORM_FILE ${PICO_CMAKE_PRELOAD_PLATFORM_FILE} CACHE INTERNAL "")
