@@ -472,11 +472,6 @@ function(picotool_postprocess_binary TARGET)
         PICOTOOL_PROCESSING_CONFIGURED true
     )
 
-    # Allow using the example keys for pico-examples
-    if ((NOT DEFINED PICO_ALLOW_EXAMPLE_KEYS) AND (DEFINED PICO_EXAMPLES_PATH))
-        set(PICO_ALLOW_EXAMPLE_KEYS 1)
-    endif()
-
     # PICO_CMAKE_CONFIG: PICO_ALLOW_EXAMPLE_KEYS, Don't throw warning when using default signing/encryption keys, type=bool, default=0, group=build
     if (NOT PICO_ALLOW_EXAMPLE_KEYS)
         picotool_check_default_keys(${TARGET})
