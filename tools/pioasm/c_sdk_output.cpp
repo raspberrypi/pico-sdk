@@ -139,7 +139,7 @@ struct c_sdk_output : public output_format {
                 const char *types[] = {
                         "STATUS_TX_LESSTHAN",
                         "STATUS_RX_LESSTHAN",
-                        "STATUS_IRQ_INDEX",
+                        "STATUS_IRQ_SET",
                 };
                 if (program.mov_status_type < 0 || program.mov_status_type >= 3) {
                     throw std::runtime_error("unknown mov_status type");
