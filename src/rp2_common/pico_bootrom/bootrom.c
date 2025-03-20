@@ -71,23 +71,6 @@ void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pi
 }
 
 #if !PICO_RP2040
-
-
-// Generated from adding the following code into the bootrom
-// scan_workarea_t* scan_workarea = (scan_workarea_t*)workarea;
-// printf("VERSION_DOWNGRADE_ERASE_ADDR %08x\n", &(always->zero_init.version_downgrade_erase_flash_addr));
-// printf("TBYB_FLAG_ADDR %08x\n", &(always->zero_init.tbyb_flag_flash_addr));
-// printf("IMAGE_DEF_VERIFIED %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.verified) - (uint32_t)scan_workarea);
-// printf("IMAGE_DEF_TBYB_FLAGGED %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.tbyb_flagged) - (uint32_t)scan_workarea);
-// printf("IMAGE_DEF_BASE %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.enclosing_window.base) - (uint32_t)scan_workarea);
-// printf("IMAGE_DEF_REL_BLOCK_OFFSET %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.window_rel_block_offset) - (uint32_t)scan_workarea);
-#define VERSION_DOWNGRADE_ERASE_ADDR *(uint32_t*)0x400e0338
-#define TBYB_FLAG_ADDR *(uint32_t*)0x400e0348
-#define IMAGE_DEF_VERIFIED(scan_workarea) *(uint32_t*)(0x64 + (uint32_t)scan_workarea)
-#define IMAGE_DEF_TBYB_FLAGGED(scan_workarea) *(bool*)(0x4c + (uint32_t)scan_workarea)
-#define IMAGE_DEF_BASE(scan_workarea) *(uint32_t*)(0x54 + (uint32_t)scan_workarea)
-#define IMAGE_DEF_REL_BLOCK_OFFSET(scan_workarea) *(uint32_t*)(0x5c + (uint32_t)scan_workarea)
-
 bool rom_get_boot_random(uint32_t out[4]) {
     uint32_t result[5];
     rom_get_sys_info_fn func = (rom_get_sys_info_fn) rom_func_lookup_inline(ROM_FUNC_GET_SYS_INFO);
@@ -130,6 +113,33 @@ int rom_add_flash_runtime_partition(uint32_t start_offset, uint32_t size, uint32
 }
 
 int rom_pick_ab_update_partition(uint32_t *workarea_base, uint32_t workarea_size, uint partition_a_num) {
+#if PICO_RP2350
+    // Generated from adding the following code into the bootrom
+    // scan_workarea_t* scan_workarea = (scan_workarea_t*)workarea;
+    // printf("VERSION_DOWNGRADE_ERASE_ADDR %08x\n", &(always->zero_init.version_downgrade_erase_flash_addr));
+    // printf("TBYB_FLAG_ADDR %08x\n", &(always->zero_init.tbyb_flag_flash_addr));
+    // printf("IMAGE_DEF_VERIFIED %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.verified) - (uint32_t)scan_workarea);
+    // printf("IMAGE_DEF_TBYB_FLAGGED %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.tbyb_flagged) - (uint32_t)scan_workarea);
+    // printf("IMAGE_DEF_BASE %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.enclosing_window.base) - (uint32_t)scan_workarea);
+    // printf("IMAGE_DEF_REL_BLOCK_OFFSET %08x\n", (uint32_t)&(scan_workarea->parsed_block_loops[0].image_def.core.window_rel_block_offset) - (uint32_t)scan_workarea);
+    #define VERSION_DOWNGRADE_ERASE_ADDR *(uint32_t*)0x400e0338
+    #define TBYB_FLAG_ADDR *(uint32_t*)0x400e0348
+    #define IMAGE_DEF_VERIFIED(scan_workarea) *(uint32_t*)(0x64 + (uint32_t)scan_workarea)
+    #define IMAGE_DEF_TBYB_FLAGGED(scan_workarea) *(bool*)(0x4c + (uint32_t)scan_workarea)
+    #define IMAGE_DEF_BASE(scan_workarea) *(uint32_t*)(0x54 + (uint32_t)scan_workarea)
+    #define IMAGE_DEF_REL_BLOCK_OFFSET(scan_workarea) *(uint32_t*)(0x5c + (uint32_t)scan_workarea)
+#else
+    // Prevent linting errors
+    #define VERSION_DOWNGRADE_ERASE_ADDR *(uint32_t*)NULL
+    #define TBYB_FLAG_ADDR *(uint32_t*)NULL
+    #define IMAGE_DEF_VERIFIED(scan_workarea) *(uint32_t*)(NULL + (uint32_t)scan_workarea)
+    #define IMAGE_DEF_TBYB_FLAGGED(scan_workarea) *(bool*)(NULL + (uint32_t)scan_workarea)
+    #define IMAGE_DEF_BASE(scan_workarea) *(uint32_t*)(NULL + (uint32_t)scan_workarea)
+    #define IMAGE_DEF_REL_BLOCK_OFFSET(scan_workarea) *(uint32_t*)(NULL + (uint32_t)scan_workarea)
+
+    panic_unsupported();
+#endif
+
     uint32_t flash_update_base = 0;
     bool tbyb_boot = false;
     uint32_t saved_erase_addr = 0;
