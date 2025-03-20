@@ -15,14 +15,14 @@
  */
 
 // ----------------------------------------------------------------------------
-// RCP masks (this header is RP2350 only)
-#if PICO_RP2350
+// RCP masks
+#if !PICO_RP2040
 
 #define RCP_MASK_TRUE   _u(0xa500a500)
 #define RCP_MASK_FALSE  _u(0x00c300c3)
 #define RCP_MASK_INTXOR _u(0x96009600)
 
-// RCP instructions (this header is Arm-only)
+// RCP instructions (these instructions are Arm-only)
 #if HAS_REDUNDANCY_COPROCESSOR
 // ----------------------------------------------------------------------------
 // Macros and inline functions for use in C files
@@ -997,7 +997,7 @@ rcp_switch_u8_to_ch_cl rcp_canary_check_nodelay_impl \tag, \x
 .endm
 
 #endif // HAS_REDUNDANCY_COPROCESSOR
-#endif // PICO_RP2350
+#endif // !PICO_RP2040
 #endif // __ASSEMBLER__
 // ----------------------------------------------------------------------------
 

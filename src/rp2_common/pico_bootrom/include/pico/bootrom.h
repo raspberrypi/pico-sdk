@@ -1106,14 +1106,14 @@ int rom_add_flash_runtime_partition(uint32_t start_offset, uint32_t size, uint32
  * issue, and returns `BOOTROM_ERROR_NOT_PERMITTED` if the partition chosen by `pick_ab_partition` also requires a flash erase version downgrade (as you can't
  * erase 2 partitions with one `explicit_buy` call).
  * 
- * It also checks that the chosen partition contained a valid image (eg a signed image when using secure boot), and returns `BOOTROM_ERROR_NOT_FOUND`
+ * It also checks that the chosen partition contained a valid image (e.g. a signed image when using secure boot), and returns `BOOTROM_ERROR_NOT_FOUND`
  * if it does not.
  *
  * \param workarea_base base address of work area
  * \param workarea_size size of work area
  * \param partition_a_num the A partition of the pair
  * \return >= 0 the partition number picked
- *         BOOTROM_ERROR_NOT_PERMITTED if not possible to do an update correctly, eg if both main image and data image are TBYB
+ *         BOOTROM_ERROR_NOT_PERMITTED if not possible to do an update correctly, e.g. if both main image and data image are TBYB
  *         BOOTROM_ERROR_NOT_FOUND if the chosen partition failed verification
  */
 int rom_pick_ab_update_partition(uint32_t *workarea_base, uint32_t workarea_size, uint partition_a_num);
