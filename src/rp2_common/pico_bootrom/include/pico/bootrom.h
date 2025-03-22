@@ -749,6 +749,9 @@ static inline int rom_load_partition_table(uint8_t *workarea_base, uint32_t work
  * 
  * NOTE: This method does not look at owner partitions, only the A partition passed and it's corresponding B partition.
  * 
+ * NOTE: You should not call this method directly when performing a Flash Update Boot before calling `explicit_buy`, as it may prevent
+ * any version downgrade from occuring - instead \see rom_pick_ab_update_partition() which wraps this function.
+ * 
  * \param workarea_base base address of work area
  * \param workarea_size size of work area
  * \param partition_a_num the A partition of the pair
@@ -1090,6 +1093,30 @@ static inline int rom_get_last_boot_type(void) {
  *         PICO_ERROR_INVALID_ARG if the start_offset or size are out of range, or invalid permission bits are set.
  */
 int rom_add_flash_runtime_partition(uint32_t start_offset, uint32_t size, uint32_t permissions);
+
+/*! \brief Pick A/B partition without disturbing any in progress update or TBYB boot
+ * \ingroup pico_bootrom
+ *
+ * This will call `rom_pick_ab_partition` using the `flash_update_boot_window_base` from the current boot, while performing extra checks to prevent disrupting
+ * a main image TBYB boot. It requires the same minimum workarea size as `rom_pick_ab_partition`.
+ * \see rom_pick_ab_partition()
+ * 
+ * For example, if an `explicit_buy` is pending then calling `pick_ab_partition` would normally clear the saved flash erase address for the version downgrade,
+ * so the required erase of the other partition would not occur when `explicit_buy` is called - this function saves and restores that address to prevent this
+ * issue, and returns `BOOTROM_ERROR_NOT_PERMITTED` if the partition chosen by `pick_ab_partition` also requires a flash erase version downgrade (as you can't
+ * erase 2 partitions with one `explicit_buy` call).
+ * 
+ * It also checks that the chosen partition contained a valid image (e.g. a signed image when using secure boot), and returns `BOOTROM_ERROR_NOT_FOUND`
+ * if it does not.
+ *
+ * \param workarea_base base address of work area
+ * \param workarea_size size of work area
+ * \param partition_a_num the A partition of the pair
+ * \return >= 0 the partition number picked
+ *         BOOTROM_ERROR_NOT_PERMITTED if not possible to do an update correctly, e.g. if both main image and data image are TBYB
+ *         BOOTROM_ERROR_NOT_FOUND if the chosen partition failed verification
+ */
+int rom_pick_ab_update_partition(uint32_t *workarea_base, uint32_t workarea_size, uint partition_a_num);
 
 #endif
 
