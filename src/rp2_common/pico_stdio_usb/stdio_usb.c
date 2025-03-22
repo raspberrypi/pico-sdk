@@ -170,6 +170,12 @@ void stdio_usb_set_chars_available_callback(void (*fn)(void*), void *param) {
     chars_available_callback = fn;
     chars_available_param = param;
 }
+
+void stdio_usb_call_chars_available_callback(void) {
+    if (chars_available_callback) {
+        chars_available_callback(chars_available_param);
+    }
+}
 #endif
 
 stdio_driver_t stdio_usb = {
