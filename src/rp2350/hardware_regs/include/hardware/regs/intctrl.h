@@ -59,12 +59,12 @@
 #define PLL_USB_IRQ 43
 #define POWMAN_IRQ_POW 44
 #define POWMAN_IRQ_TIMER 45
-#define SPAREIRQ_IRQ_0 46
-#define SPAREIRQ_IRQ_1 47
-#define SPAREIRQ_IRQ_2 48
-#define SPAREIRQ_IRQ_3 49
-#define SPAREIRQ_IRQ_4 50
-#define SPAREIRQ_IRQ_5 51
+#define SPARE_IRQ_0 46
+#define SPARE_IRQ_1 47
+#define SPARE_IRQ_2 48
+#define SPARE_IRQ_3 49
+#define SPARE_IRQ_4 50
+#define SPARE_IRQ_5 51
 #else
 /**
  * \brief Interrupt numbers on RP2350 (used as typedef \ref irq_num_t)

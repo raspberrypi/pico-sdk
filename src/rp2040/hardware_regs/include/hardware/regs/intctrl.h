@@ -39,6 +39,12 @@
 #define I2C0_IRQ 23
 #define I2C1_IRQ 24
 #define RTC_IRQ 25
+#define SPARE_IRQ_0 26
+#define SPARE_IRQ_1 27
+#define SPARE_IRQ_2 28
+#define SPARE_IRQ_3 29
+#define SPARE_IRQ_4 30
+#define SPARE_IRQ_5 31
 #else
 /**
  * \brief Interrupt numbers on RP2040 (used as typedef \ref irq_num_t)
