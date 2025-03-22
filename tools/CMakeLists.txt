@@ -472,7 +472,7 @@ function(picotool_postprocess_binary TARGET)
         PICOTOOL_PROCESSING_CONFIGURED true
     )
 
-    # PICO_CMAKE_CONFIG: PICO_ALLOW_EXAMPLE_KEYS, Don't throw warning when using default signing/encryption keys, type=bool, default=0, group=build
+    # PICO_CMAKE_CONFIG: PICO_ALLOW_EXAMPLE_KEYS, Don't raise a warning when using default signing/encryption keys, type=bool, default=0, group=build
     if (NOT PICO_ALLOW_EXAMPLE_KEYS)
         picotool_check_default_keys(${TARGET})
     endif()
