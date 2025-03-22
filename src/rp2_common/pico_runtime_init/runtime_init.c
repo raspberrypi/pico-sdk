@@ -195,6 +195,8 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_spin_locks_reset, PICO_RUNTIME_INIT_
 // RISC-V to have an initial flash-resident vector table at a well-known
 // location, unlike Cortex-M which can take an NMI on cycle 0.
 #ifndef __riscv
+#include "hardware/structs/scb.h"
+#include "hardware/irq.h"
 
 #if !PICO_RUNTIME_NO_INIT_INSTALL_RAM_VECTOR_TABLE
 // note that this is not a safely overridable value, you should use override PICO_NUM_VTABLE_IRQs instead.
@@ -209,10 +211,9 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_spin_locks_reset, PICO_RUNTIME_INIT_
 
 uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[PICO_RAM_VECTOR_TABLE_SIZE];
 
-#include "hardware/structs/scb.h"
 void runtime_init_install_ram_vector_table(void) {
     // Note on RISC-V the RAM vector table is initialised during crt0
-#if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH) && !defined(__riscv)
+#if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH)
     extern uint32_t __vectors;
     extern uint32_t __vectors_end;
     uint32_t stored_words = &__vectors_end - &__vectors;
