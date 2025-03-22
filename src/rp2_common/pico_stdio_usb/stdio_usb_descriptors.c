@@ -26,11 +26,12 @@
  * THE SOFTWARE.
  */
 
-#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
-
-#include "tusb.h"
+#include "pico/stdio_usb.h"
 #include "pico/stdio_usb/reset_interface.h"
 #include "pico/unique_id.h"
+#include "tusb.h"
+
+#if PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS
 
 #ifndef USBD_VID
 #define USBD_VID (0x2E8A) // Raspberry Pi
