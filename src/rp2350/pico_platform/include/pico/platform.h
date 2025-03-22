@@ -54,10 +54,6 @@
 #define PICO_NO_RAM_VECTOR_TABLE 0
 #endif
 
-#ifndef PICO_RAM_VECTOR_TABLE_SIZE
-#define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + NUM_IRQS)
-#endif
-
 // PICO_CONFIG: PICO_USE_STACK_GUARDS, Enable/disable stack guards, type=bool, default=0, advanced=true, group=pico_platform
 #ifndef PICO_USE_STACK_GUARDS
 #define PICO_USE_STACK_GUARDS 0

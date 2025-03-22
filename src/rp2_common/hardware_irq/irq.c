@@ -76,7 +76,7 @@ bool irq_is_enabled(uint num) {
 }
 
 static inline void irq_set_mask_n_enabled_internal(uint n, uint32_t mask, bool enabled) {
-    invalid_params_if(HARDWARE_IRQ, n * 32u >= ((NUM_IRQS + 31u) & ~31u));
+    invalid_params_if(HARDWARE_IRQ, n * 32u >= ((PICO_NUM_VTABLE_IRQS + 31u) & ~31u));
 #if defined(__riscv)
     if (enabled) {
         hazard3_irqarray_clear(RVCSR_MEIFA_OFFSET, 2 * n, mask & 0xffffu);
@@ -658,7 +658,7 @@ __weak void runtime_init_per_core_irq_priorities(void) {
         *p++ = prio4;
     }
 #else
-    for (uint i = 0; i < NUM_IRQS; ++i) {
+    for (uint i = 0; i < PICO_NUM_VTABLE_IRQS; ++i) {
         irq_set_priority(i, PICO_DEFAULT_IRQ_PRIORITY);
     }
 #endif
@@ -666,7 +666,7 @@ __weak void runtime_init_per_core_irq_priorities(void) {
 }
 
 static uint get_user_irq_claim_index(uint irq_num) {
-    invalid_params_if(HARDWARE_IRQ, irq_num < FIRST_USER_IRQ || irq_num >= NUM_IRQS);
+    invalid_params_if(HARDWARE_IRQ, irq_num < FIRST_USER_IRQ || irq_num >= PICO_NUM_VTABLE_IRQS);
     // we count backwards from the last, to match the existing hard coded uses of user IRQs in the SDK which were previously using 31
     static_assert(NUM_IRQS - FIRST_USER_IRQ <= 8, ""); // we only use a single byte's worth of claim bits today.
     return NUM_IRQS - irq_num  - 1u;

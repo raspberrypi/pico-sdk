@@ -23,6 +23,25 @@
 #define PICO_VTABLE_PER_CORE 0
 #endif
 
+// note this is defined here as it simplifies dependencies
+// PICO_CONFIG: PICO_MINIMAL_STORED_VECTOR_TABLE, Only store a very minimal vector table in the binary on Arm, type=bool, default=0, advanced=true, group=pico_crt0
+#ifndef PICO_MINIMAL_STORED_VECTOR_TABLE
+#define PICO_MINIMAL_STORED_VECTOR_TABLE 0
+#endif
+
+#if PICO_MINIMAL_STORED_VECTOR_TABLE && (PICO_NO_FLASH && !defined(__riscv))
+#if PICO_NUM_VTABLE_IRQS
+#warning PICO_NUM_VTABLE_IRQS is specied with PICO_MINIMAL_STORED_VECTOR_TABLE for NO_FLASH Arm binary; ignored
+#undef PICO_NUM_VTABLE_IRQS
+#endif
+#define PICO_NUM_VTABLE_IRQS 0
+#else
+// PICO_CONFIG: PICO_NUM_VTABLE_IRQS, Number of IRQ handlers in the vector table - can be lowered to save space if you aren't using some higher IRQs, type=int, default=NUM_IRQS, group=hardware_irq
+#ifndef PICO_NUM_VTABLE_IRQS
+#define PICO_NUM_VTABLE_IRQS NUM_IRQS
+#endif
+#endif
+
 #ifndef __ASSEMBLER__
 
 #include "pico.h"
@@ -195,7 +214,7 @@ extern "C" {
 typedef void (*irq_handler_t)(void);
 
 static inline void check_irq_param(__unused uint num) {
-    invalid_params_if(HARDWARE_IRQ, num >= NUM_IRQS);
+    invalid_params_if(HARDWARE_IRQ, num >= PICO_NUM_VTABLE_IRQS);
 }
 
 /*! \brief Set specified interrupt's priority
