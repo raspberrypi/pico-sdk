@@ -1,0 +1,14 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_platform_common",
+    hdrs = ["include/pico/platform/common.h"],
+    srcs = ["common.c"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common:platform_defs",
+    ],
+)

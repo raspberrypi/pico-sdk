@@ -11,7 +11,6 @@
 
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
-#include "hardware/irq.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
@@ -37,9 +36,12 @@ __vectors:
 .word __StackTop
 .word _reset_handler
 
+#if PICO_MINIMAL_STORED_VECTOR_TABLE
 .word isr_invalid   // NMI
 .word isr_invalid   // HardFault
-#if !PICO_MINIMAL_STORED_VECTOR_TABLE
+#else
+.word isr_nmi
+.word isr_hardfault
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire

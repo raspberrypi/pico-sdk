@@ -23,6 +23,7 @@ if (NOT TARGET pico_platform)
             hardware_regs
     )
     pico_mirrored_target_link_libraries(pico_platform INTERFACE
+            pico_platform_common
             pico_platform_compiler
             pico_platform_panic
             pico_platform_sections

@@ -8,10 +8,9 @@
 
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/rvcsr.h"
-#include "hardware/irq.h"
 #include "pico/binary_info/defs.h"
-#include "pico/bootrom_constants.h"
 #include "boot/picobin.h"
+#include "pico/bootrom_constants.h"
 
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS

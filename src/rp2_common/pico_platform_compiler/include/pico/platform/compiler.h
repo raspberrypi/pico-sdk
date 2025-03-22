@@ -7,8 +7,8 @@
 #ifndef _PICO_PLATFORM_COMPILER_H
 #define _PICO_PLATFORM_COMPILER_H
 
-/** \file platform_compiler.h
- *  \defgroup pico_platform pico_platform
+/** \file pico/platform/compiler.h
+ *  \ingroup pico_platform
  *
  * \brief Macros and definitions (and functions when included by non assembly code) to adapt for different compilers
  *

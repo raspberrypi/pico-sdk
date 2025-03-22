@@ -23,6 +23,7 @@
 #include "pico/platform/compiler.h"
 #include "pico/platform/sections.h"
 #include "pico/platform/panic.h"
+#include "pico/platform/common.h"
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 
@@ -73,15 +74,6 @@
 
 #ifndef __ASSEMBLER__
 
-/*! \brief No-op function for the body of tight loops
- *  \ingroup pico_platform
- *
- * No-op function intended to be called by any tight hardware polling loop. Using this ubiquitously
- * makes it much easier to find tight loops, but also in the future \#ifdef-ed support for lockup
- * debugging might be added
- */
-static __force_inline void tight_loop_contents(void) {}
-
 /*! \brief Helper method to busy-wait for at least the given number of cycles
  *  \ingroup pico_platform
  *
@@ -103,17 +95,6 @@ static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
     : "+l" (minimum_cycles) : : "cc", "memory"
     );
 }
-
-// PICO_CONFIG: PICO_NO_FPGA_CHECK, Remove the FPGA platform check for small code size reduction, type=bool, default=1, advanced=true, group=pico_runtime
-#ifndef PICO_NO_FPGA_CHECK
-#define PICO_NO_FPGA_CHECK 1
-#endif
-
-#if PICO_NO_FPGA_CHECK
-static inline bool running_on_fpga(void) {return false;}
-#else
-bool running_on_fpga(void);
-#endif
 
 /*! \brief Execute a breakpoint instruction
  *  \ingroup pico_platform
@@ -149,9 +130,6 @@ static __force_inline uint __get_current_exception(void) {
     pico_default_asm_volatile ( "mrs %0, ipsr" : "=l" (exception));
     return exception;
 }
-
-#define host_safe_hw_ptr(x) ((uintptr_t)(x))
-#define native_safe_hw_ptr(x) host_safe_hw_ptr(x)
 
 /*! \brief Returns the RP2040 chip revision number
  *  \ingroup pico_platform
