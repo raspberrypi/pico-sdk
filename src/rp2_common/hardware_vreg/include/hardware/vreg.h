@@ -82,6 +82,13 @@ enum vreg_voltage {
 void vreg_set_voltage(enum vreg_voltage voltage);
 
 
+/*! \brief Get voltage
+ *  \ingroup hardware_vreg
+ *
+ * \return The current voltage (from enumeration \ref vreg_voltage) of the voltage regulator
+ **/
+enum vreg_voltage vreg_get_voltage(void);
+
 /*! \brief  Enable use of voltages beyond the safe range of operation
  *  \ingroup hardware_vreg
  *

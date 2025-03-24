@@ -74,6 +74,9 @@
 
 #ifndef __ASSEMBLER__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*! \brief Helper method to busy-wait for at least the given number of cycles
  *  \ingroup pico_platform
  *
@@ -183,6 +186,10 @@ return a;
 #define __fast_mul(a, b) __builtin_choose_expr(__builtin_constant_p(b) && !__builtin_constant_p(a), \
     (__builtin_popcount(b) >= 2 ? __mul_instruction(a,b) : (a)*(b)), \
     (a)*(b))
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __ASSEMBLER__
 

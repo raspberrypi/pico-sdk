@@ -162,6 +162,15 @@ static int add_program_at_offset(PIO pio, const pio_program_t *program, uint off
     if (rc != 0) return rc;
     for (uint i = 0; i < program->length; ++i) {
         uint16_t instr = program->instructions[i];
+#if PICO_PIO_USE_GPIO_BASE
+        if (pio_instr_bits_wait == _pio_major_instr_bits(instr) && !((_pio_arg1(instr) & 3u))) {
+            // wait GPIO will include only the 5 lower bits of the GPIO number, so if the GPIO
+            // base is 16 we need to flip bit 4 (which is equivalent to subtracting 16 from
+            // the original number 16-47 stored as 16-31 and 0-15)
+            static_assert(PIO_GPIOBASE_BITS == 16, ""); // only works for gpio base being 0 or 16
+            instr ^= (uint16_t)pio_get_gpio_base(pio);
+        }
+#endif
         pio->instr_mem[offset + i] = pio_instr_bits_jmp != _pio_major_instr_bits(instr) ? instr : instr + offset;
     }
     uint32_t program_mask = (1u << program->length) - 1;

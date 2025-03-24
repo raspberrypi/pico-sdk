@@ -95,7 +95,7 @@ def process_file_list(fd, input):
         fd.write(f"static const unsigned char {data_var}[] = {{\n")
         for entry in results:
             fd.write(f"\n    /* {entry['comment']} */\n")
-            byte_count = 0;
+            byte_count = 0
             for b in entry['data']:
                 if byte_count % 16 == 0:
                     fd.write("    ")

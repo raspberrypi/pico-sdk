@@ -186,6 +186,12 @@ int_flag(
     build_setting_default = 0,
 )
 
+# PICO_BAZEL_CONFIG: PICO_TINYUSB_CONFIG, [Bazel only] The library that provides TinyUSB config header (e.g. tusb_config.h), default=//src/rp2_common/pico_stdio_usb:tusb_config, group=build
+label_flag(
+    name = "PICO_TINYUSB_CONFIG",
+    build_setting_default = "//src/rp2_common/pico_stdio_usb:tusb_config",
+)
+
 # PICO_BAZEL_CONFIG: PICO_TINYUSB_LIB, [Bazel only] The library that provides TinyUSB, default=@tinyusb//:tinyusb, group=build
 label_flag(
     name = "PICO_TINYUSB_LIB",

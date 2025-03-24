@@ -23,12 +23,11 @@
 #endif
 #endif
 
-// note that these are not reset by core reset, however for now, I think people resetting cores
-// and then relying on multicore_lockout for that core without re-initializing, is probably
-// something we can live with breaking.
-//
-// whilst we could clear this in core 1 reset path, that doesn't necessarily catch all,
-// and means pulling in this array even if multicore_lockout is not used.
+// Note that there is no automatic way for us to clear these flags when a particular core is reset, and yet
+// we DO ideally want to clear them, as the `multicore_lockout_victim_init()` checks the flag for the current core
+// and is a no-op if set. We DO have a new `multicore_lockout_victim_deinit()` method, which can be called in a pinch after
+// the reset before calling `multicore_lockout_victim_init()` again, so that is good. We will reset the flag
+// for core1 in `multicore_reset_core1()` though as a convenience since most people will use that to reset core 1.
 static bool lockout_victim_initialized[NUM_CORES];
 
 void multicore_fifo_push_blocking(uint32_t data) {
@@ -117,6 +116,9 @@ void multicore_reset_core1(void) {
     uint irq_num = SIO_FIFO_IRQ_NUM(0);
     bool enabled = irq_is_enabled(irq_num);
     irq_set_enabled(irq_num, false);
+
+    // Core 1 will be in un-initialized state
+    lockout_victim_initialized[1] = false;
 
     // Bring core 1 back out of reset. It will drain its own mailbox FIFO, then push
     // a 0 to our mailbox to tell us it has done this.
@@ -241,6 +243,18 @@ void multicore_lockout_victim_init(void) {
     irq_set_exclusive_handler(fifo_irq_this_core, multicore_lockout_handler);
     irq_set_enabled(fifo_irq_this_core, true);
     lockout_victim_initialized[core_num] = true;
+}
+
+void multicore_lockout_victim_deinit(void) {
+    uint core_num = get_core_num();
+    if (lockout_victim_initialized[core_num]) {
+        // On platforms other than RP2040, these are actually the same IRQ number
+        // (each core only sees its own IRQ, always at the same IRQ number).
+        uint fifo_irq_this_core = SIO_FIFO_IRQ_NUM(core_num);
+        irq_remove_handler(fifo_irq_this_core, multicore_lockout_handler);
+        irq_set_enabled(fifo_irq_this_core, false);
+        lockout_victim_initialized[core_num] = false;
+    }
 }
 
 static bool multicore_lockout_handshake(uint32_t magic, absolute_time_t until) {

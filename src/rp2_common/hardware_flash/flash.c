@@ -288,7 +288,7 @@ void flash_get_unique_id(uint8_t *id_out) {
 #if !PICO_RP2040
 // This is a static symbol because the layout of FLASH_DEVINFO is liable to change from device to
 // device, so fields must have getters/setters.
-static io_rw_16 * flash_devinfo_ptr(void) {
+static io_rw_16 * __no_inline_not_in_flash_func(flash_devinfo_ptr)(void) {
     // Note the lookup returns a pointer to a 32-bit pointer literal in the ROM
     io_rw_16 **p = (io_rw_16 **) rom_data_lookup_inline(ROM_DATA_FLASH_DEVINFO16_PTR);
     assert(p);

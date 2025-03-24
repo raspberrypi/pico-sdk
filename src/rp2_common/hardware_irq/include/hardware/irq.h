@@ -46,7 +46,7 @@
  * where there is one IO interrupt per bank, per core. These are completely independent, so, for example, processor 0 can be
  * interrupted by GPIO 0 in bank 0, and processor 1 by GPIO 1 in the same bank.
  *
- * \note That all IRQ APIs affect the executing core only (i.e. the core calling the function).
+ * \note All IRQ APIs affect the executing core only (i.e. the core calling the function).
  *
  * \note You should not enable the same (shared) IRQ number on both cores, as this will lead to race conditions
  * or starvation of one of the cores. Additionally, don't forget that disabling interrupts on one core does not disable interrupts
@@ -280,11 +280,38 @@ void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled);
  *  \ingroup hardware_irq
  *
  * Use this method to set a handler for single IRQ source interrupts, or when
- * your code, use case or performance requirements dictate that there should
+ * your code, use case or performance requirements dictate that there should be
  * no other handlers for the interrupt.
  *
  * This method will assert if there is already any sort of interrupt handler installed
  * for the specified irq number.
+ *
+ * NOTE: By default, the SDK uses a single shared vector table for both cores, and the currently installed
+ * IRQ handlers are effectively a linked list starting a vector table entry for a particular IRQ number.
+ * Therefore, this method (when using the same vector table for both cores) sets the same interrupt handler
+ * for both cores.
+ *
+ * On RP2040 this was never really a cause of any confusion, because it rarely made sense to enable
+ * the same interrupt number in the NVIC on both cores (see \ref irq_set_enabled()), because the interrupt
+ * would then fire on both cores, and the interrupt handlers would race.
+ *
+ * The problem *does* exist however when dealing with interrupts which are independent on the two cores.
+ *
+ * This includes:
+ *
+ * * the core local "spare" IRQs
+ * * on RP2350 the SIO FIFO IRQ which is now the same irq number for both cores (vs RP2040 where it was two)
+ *
+ * In the cases where you want to enable the same IRQ on both cores, and both cores are sharing the same vector
+ * table, you should install the IRQ handler once - it will be used on both cores - and check the core
+ * number (via \ref get_core_num()) on each core.
+ *
+ * NOTE: It is not thread safe to add/remove/handle IRQs for the same irq number in the same vector table
+ * from both cores concurrently.
+ *
+ * NOTE: The SDK has a PICO_VTABLE_PER_CORE define indicating whether the two vector tables are separate,
+ * however as of version 2.1.1 the user cannot set this value, and expect the vector table duplication to be handled
+ * for them. This functionality will be added in a future SDK version
  *
  * \param num Interrupt number \ref interrupt_nums
  * \param handler The handler to set. See \ref irq_handler_t
@@ -315,6 +342,33 @@ irq_handler_t irq_get_exclusive_handler(uint num);
  * This method will assert if there is an exclusive interrupt handler set for this irq number on this core, or if
  * the (total across all IRQs on both cores) maximum (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) number of shared handlers
  * would be exceeded.
+ *
+ * NOTE: By default, the SDK uses a single shared vector table for both cores, and the currently installed
+ * IRQ handlers are effectively a linked list starting a vector table entry for a particular IRQ number.
+ * Therefore, this method (when using the same vector table for both cores) add the same interrupt handler
+ * for both cores.
+ *
+ * On RP2040 this was never really a cause of any confusion, because it rarely made sense to enable
+ * the same interrupt number in the NVIC on both cores (see \ref irq_set_enabled()), because the interrupt
+ * would then fire on both cores, and the interrupt handlers would race.
+ *
+ * The problem *does* exist however when dealing with interrupts which are independent on the two cores.
+ *
+ * This includes:
+ *
+ * * the core local "spare" IRQs
+ * * on RP2350 the SIO FIFO IRQ which is now the same irq number for both cores (vs RP2040 where it was two)
+ *
+ * In the cases where you want to enable the same IRQ on both cores, and both cores are sharing the same vector
+ * table, you should install the IRQ handler once - it will be used on both cores - and check the core
+ * number (via \ref get_core_num()) on each core.
+ *
+ * NOTE: It is not thread safe to add/remove/handle IRQs for the same irq number in the same vector table
+ * from both cores concurrently.
+ *
+ * NOTE: The SDK has a PICO_VTABLE_PER_CORE define indicating whether the two vector tables are separate,
+ * however as of version 2.1.1 the user cannot set this value, and expect the vector table duplication to be handled
+ * for them. This functionality will be added in a future SDK version
  *
  * \param num Interrupt number \ref interrupt_nums
  * \param handler The handler to set. See \ref irq_handler_t
@@ -349,8 +403,22 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
  */
 void irq_remove_handler(uint num, irq_handler_t handler);
 
-/*! \brief Determine if the current handler for the given number is shared
+/*! \brief Determine if there is an installed IRQ handler for the given interrupt number
  *  \ingroup hardware_irq
+ *
+ * See \ref irq_set_exclusive_handler() for discussion on the scope of handlers
+ * when using both cores.
+ *
+ * \param num Interrupt number \ref interrupt_nums
+ * \return true if the specified IRQ has a handler
+ */
+bool irq_has_handler(uint num);
+
+/*! \brief Determine if the current IRQ andler for the given interrupt number is shared
+ *  \ingroup hardware_irq
+ *
+ * See \ref irq_set_exclusive_handler() for discussion on the scope of handlers
+ * when using both cores.
  *
  * \param num Interrupt number \ref interrupt_nums
  * \return true if the specified IRQ has a shared handler

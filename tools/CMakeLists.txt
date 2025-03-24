@@ -101,7 +101,7 @@ endfunction()
 
 # Check picotool is installed, or download and build it if not installed
 function(pico_init_picotool)
-    set(picotool_VERSION_REQUIRED 2.1.0)
+    set(picotool_VERSION_REQUIRED 2.1.1)
     if (NOT TARGET picotool AND NOT DEFINED picotool_FOUND)
         # Build path of local install dir
         if (DEFINED ENV{PICOTOOL_FETCH_FROM_GIT_PATH} AND (NOT PICOTOOL_FETCH_FROM_GIT_PATH))
@@ -153,11 +153,34 @@ function(picotool_check_configurable TARGET)
     endif()
 endfunction()
 
+# Compare 2 key files, used by picotool_check_default_keys
+function(picotool_compare_keys TARGET KEY DEFAULT TYPE)
+    if (KEY)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files "${KEY}" "${PICO_SDK_PATH}/tools/example_keys/${DEFAULT}"
+            RESULT_VARIABLE compare_result
+        )
+        if(compare_result EQUAL 0)
+            message(WARNING "${TARGET} is using a default ${TYPE} key - this must be changed before production")
+        endif()
+    endif()
+endfunction()
+
+# Check if default signing/encryption keys are being used
+function(picotool_check_default_keys TARGET)
+    get_target_property(picotool_sigfile ${TARGET} PICOTOOL_SIGFILE)
+    picotool_compare_keys(${TARGET} ${picotool_sigfile} private.pem "signing")
+    get_target_property(picotool_aesfile ${TARGET} PICOTOOL_AESFILE)
+    picotool_compare_keys(${TARGET} ${picotool_aesfile} privateaes.bin "encryption")
+    get_target_property(picotool_enc_sigfile ${TARGET} PICOTOOL_ENC_SIGFILE)
+    picotool_compare_keys(${TARGET} ${picotool_enc_sigfile} private.pem "encrypted signing")
+endfunction()
+
 # Generate pio header and include it in the build
 # PICO_CMAKE_CONFIG: PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, Default output format used by pioasm when using pico_generate_pio_header, type=string, default=c-sdk, group=build
-function(pico_generate_pio_header TARGET PIO)
+function(pico_generate_pio_header TARGET)
     pico_init_pioasm()
-    cmake_parse_arguments(pico_generate_pio_header "" "OUTPUT_FORMAT;OUTPUT_DIR" "" ${ARGN} )
+    # Note that PATH is not a valid argument but was previously ignored (and happens to be passed by pico-extras)
+    cmake_parse_arguments(pico_generate_pio_header "" "OUTPUT_FORMAT;OUTPUT_DIR;PATH" "" ${ARGN} )
 
     if (pico_generate_pio_header_OUTPUT_FORMAT)
         set(OUTPUT_FORMAT "${pico_generate_pio_header_OUTPUT_FORMAT}")
@@ -173,24 +196,31 @@ function(pico_generate_pio_header TARGET PIO)
     else()
         set(HEADER_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     endif()
-    get_filename_component(PIO_NAME ${PIO} NAME)
-    set(HEADER "${HEADER_DIR}/${PIO_NAME}.h")
-    #message("Will generate ${HEADER}")
-    get_filename_component(HEADER_GEN_TARGET ${PIO} NAME_WE)
-    set(HEADER_GEN_TARGET "${TARGET}_${HEADER_GEN_TARGET}_pio_h")
 
-    add_custom_target(${HEADER_GEN_TARGET} DEPENDS ${HEADER})
+    # Loop through each PIO file
+    foreach(PIO ${pico_generate_pio_header_UNPARSED_ARGUMENTS})
+        get_filename_component(PIO_NAME ${PIO} NAME)
+        set(HEADER "${HEADER_DIR}/${PIO_NAME}.h")
+        #message("Will generate ${HEADER}")
+        get_filename_component(HEADER_GEN_TARGET ${PIO} NAME_WE)
+        set(HEADER_GEN_TARGET "${TARGET}_${HEADER_GEN_TARGET}_pio_h")
 
-    if (PICO_PIO_VERSION)
-        set(VERSION_STRING "${PICO_PIO_VERSION}")
-    else()
-        set(VERSION_STRING "0")
-    endif()
-    add_custom_command(OUTPUT ${HEADER}
-            DEPENDS ${PIO}
-            COMMAND pioasm -o ${OUTPUT_FORMAT} -v ${VERSION_STRING} ${PIO} ${HEADER}
-            VERBATIM)
-    add_dependencies(${TARGET} ${HEADER_GEN_TARGET})
+        add_custom_target(${HEADER_GEN_TARGET} DEPENDS ${HEADER})
+
+        if (PICO_PIO_VERSION)
+            set(VERSION_STRING "${PICO_PIO_VERSION}")
+        else()
+            set(VERSION_STRING "0")
+        endif()
+
+        add_custom_command(OUTPUT ${HEADER}
+                DEPENDS ${PIO}
+                COMMAND pioasm -o ${OUTPUT_FORMAT} -v ${VERSION_STRING} ${PIO} ${HEADER}
+                VERBATIM)
+
+        add_dependencies(${TARGET} ${HEADER_GEN_TARGET})
+    endforeach()
+
     get_target_property(target_type ${TARGET} TYPE)
     if ("INTERFACE_LIBRARY" STREQUAL "${target_type}")
         target_include_directories(${TARGET} INTERFACE ${HEADER_DIR})
@@ -441,6 +471,12 @@ function(picotool_postprocess_binary TARGET)
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_PROCESSING_CONFIGURED true
     )
+
+    # PICO_CMAKE_CONFIG: PICO_ALLOW_EXAMPLE_KEYS, Don't raise a warning when using default signing/encryption keys, type=bool, default=0, group=build
+    if (NOT PICO_ALLOW_EXAMPLE_KEYS)
+        picotool_check_default_keys(${TARGET})
+    endif()
+
     # Read target properties
     get_target_property(picotool_sign_output ${TARGET} PICOTOOL_SIGN_OUTPUT)
     if (picotool_sign_output)

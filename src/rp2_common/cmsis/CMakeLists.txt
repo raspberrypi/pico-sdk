@@ -44,7 +44,7 @@
 #    message(WARNING "Non-standard vendor ${PICO_CMSIS_VENDOR} amd device ${PICO_CMSIS_DEVICE} specified, but PICO_CMSIS_PATH was not set")
 #endif()
 
-# ... using these 3 lines instead
+# ... using this line instead
 set(PICO_CMSIS_CORE_PATH ${CMAKE_CURRENT_LIST_DIR}/stub)
 
 if (PICO_CMSIS_CORE_PATH AND PICO_CMSIS_DEVICE)

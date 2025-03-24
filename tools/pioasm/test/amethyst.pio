@@ -44,3 +44,10 @@ wait gpio 40
 .pio_version 1
 .mov_status txfifo < 12
 .mov_status irq next set 3
+
+.program python
+.pio_version 1
+wait 0 jmppin
+wait 0 jmppin + 3
+mov x, !x
+.word 0x1234

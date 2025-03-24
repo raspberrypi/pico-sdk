@@ -34,6 +34,8 @@ cc_library(
         "//src/rp2_common/hardware_base",
         "//src/rp2_common/hardware_clocks",
         "//src/rp2_common/hardware_ticks",
+        "//src/rp2_common/hardware_timer",
+        "//src/rp2_common/hardware_vreg",
         "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_runtime",
     ],

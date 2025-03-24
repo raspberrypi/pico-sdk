@@ -9,8 +9,6 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// FIXME delete this file before release (board file for Amethyst FPGA platform)
-
 // pico_cmake_set PICO_PLATFORM=rp2350
 
 #ifndef _BOARDS_AMETHYST_FPGA_H
