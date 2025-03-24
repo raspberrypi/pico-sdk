@@ -27,7 +27,7 @@ cc_library(
     deps = [
         "//src/rp2350/hardware_regs",
         "//src/rp2350/hardware_regs:platform_defs",
-        "//src/rp2_common/pico_platform_common",
+        "//src/rp2_common/pico_platform_common:pico_platform_common_headers",
         "//src/rp2_common/pico_platform_compiler",
         "//src/rp2_common/pico_platform_panic:pico_platform_panic_headers",
         "//src/rp2_common/pico_platform_sections",
