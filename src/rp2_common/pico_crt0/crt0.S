@@ -168,25 +168,14 @@ __default_isrs_start:
     bkpt #0
 .endm
 
-// these are separated out for clarity
-decl_isr_bkpt isr_invalid
-#if !PICO_MINIMAL_STORED_VECTOR_TABLE
-decl_isr_bkpt isr_nmi
-decl_isr_bkpt isr_hardfault
-decl_isr_bkpt isr_svcall
-decl_isr_bkpt isr_pendsv
-decl_isr_bkpt isr_systick
-
-.global __default_isrs_end
-__default_isrs_end:
-
 .altmacro
 .macro decl_isr name
 #if !PICO_MINIMAL_STORED_VECTOR_TABLE | PICO_NO_FLASH
 // We declare a weak label, so user can override
 .weak \name
 #else
-// We declare a strong label, so user can't override (their version would not automatically be used)
+// We declare a strong global label, so user can't override (their version would not automatically be used)
+.global \name
 #endif
 .type \name,%function
 .thumb_func
@@ -197,7 +186,8 @@ __default_isrs_end:
 .if \num < PICO_NUM_VTABLE_IRQS
 decl_isr \func
 .elseif \num < NUM_IRQS
-// We declare a strong label, so user can't override, since there is no vtable entry
+// We declare a strong global label, so user can't override (their version would not automatically be used)
+.global \func
 .type \func,%function
 .thumb_func
 \func:
@@ -288,16 +278,33 @@ if_irq_decl 79 isr_irq79
 #error more IRQ entries required
 #endif
 
-#endif  // #if !PICO_MINIMAL_STORED_VECTOR_TABLE
 // All unhandled USER IRQs fall through to here
 .global __unhandled_user_irq
 .thumb_func
 __unhandled_user_irq:
+// if we include the implementation if there could be a valid IRQ hanler in the vtable that uses it
+#if !(PICO_NO_RAM_VECTOR_TABLE && PICO_MINIMAL_STORED_VECTOR_TABLE)
     mrs  r0, ipsr
     subs r0, #16
 .global unhandled_user_irq_num_in_r0
 unhandled_user_irq_num_in_r0:
+#endif
+    // note the next instruction is a breakpoint too, however we have a 2 byte alignment hole
+    // and it is preferrable to have distinct labels, to inform the user what has happened in the debugger.
     bkpt #0
+
+decl_isr_bkpt isr_invalid
+#if !PICO_MINIMAL_STORED_VECTOR_TABLE
+// these are separated out for clarity
+decl_isr_bkpt isr_nmi
+decl_isr_bkpt isr_hardfault
+decl_isr_bkpt isr_svcall
+decl_isr_bkpt isr_pendsv
+decl_isr_bkpt isr_systick
+#endif
+
+.global __default_isrs_end
+__default_isrs_end:
 
 // ----------------------------------------------------------------------------
 
