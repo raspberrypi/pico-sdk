@@ -37,6 +37,7 @@
 #endif
 
 #ifndef __ASSEMBLER__
+
 // PICO_CONFIG: PICO_NO_FPGA_CHECK, Remove the FPGA platform check for small code size reduction, type=bool, default=1, advanced=true, group=pico_runtime
 #ifndef PICO_NO_FPGA_CHECK
 #define PICO_NO_FPGA_CHECK 1
@@ -47,11 +48,16 @@
 #define PICO_NO_SIM_CHECK 1
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if PICO_NO_FPGA_CHECK
 static inline bool running_on_fpga(void) {return false;}
 #else
 bool running_on_fpga(void);
 #endif
+
 #if PICO_NO_SIM_CHECK
 static inline bool running_in_sim(void) {return false;}
 #else
@@ -70,7 +76,10 @@ static __force_inline void tight_loop_contents(void) {}
 #define host_safe_hw_ptr(x) ((uintptr_t)(x))
 #define native_safe_hw_ptr(x) host_safe_hw_ptr(x)
 
+#ifdef __cplusplus
+}
 #endif
+#endif // __ASSEMBLER__
 
 
 #endif
