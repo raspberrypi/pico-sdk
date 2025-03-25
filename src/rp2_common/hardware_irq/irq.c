@@ -15,6 +15,12 @@
 PICO_RUNTIME_INIT_FUNC_PER_CORE(runtime_init_per_core_irq_priorities, PICO_RUNTIME_INIT_PER_CORE_IRQ_PRIORITIES);
 #endif
 
+static_assert(IRQ_COUNT == NUM_IRQS, "");
+// "USER IRQs" use the spare irq numbers
+#if NUM_USER_IRQS
+static_assert(IRQ_COUNT - NUM_USER_IRQS == SPARE_IRQ_0, "");
+#endif
+
 #if PICO_VTABLE_PER_CORE
 static uint8_t user_irq_claimed[NUM_CORES];
 static inline uint8_t *user_irq_claimed_ptr(void) {
