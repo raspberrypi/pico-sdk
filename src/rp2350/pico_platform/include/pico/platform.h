@@ -30,7 +30,7 @@
 #include "hardware/regs/rvcsr.h"
 #endif
 
-// PICO_CONFIG: PICO_RP2350A, Whether the current board has an RP2350 in an A (30 GPIO) package - set to 0 for RP2350in a B (48 GPIO) package, type=bool, default=Usually provided via board header, group=pico_platform
+// PICO_CONFIG: PICO_RP2350A, Whether the current board has an RP2350 in an A (30 GPIO) package - set to 0 for RP2350 in a B (48 GPIO) package, type=bool, default=Usually provided via board header, group=pico_platform
 #if 0 // make tooling checks happy
 #define PICO_RP2350A 0
 #endif
