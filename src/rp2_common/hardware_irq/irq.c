@@ -57,13 +57,6 @@ static inline void *remove_thumb_bit(void *addr) {
 #endif
 }
 
-static void set_raw_irq_handler_and_unlock(uint num, irq_handler_t handler, uint32_t save) {
-    // update vtable (vtable_handler may be same or updated depending on cases, but we do it anyway for compactness)
-    get_vtable()[VTABLE_FIRST_IRQ + num] = handler;
-    __dmb();
-    spin_unlock(spin_lock_instance(PICO_SPINLOCK_ID_IRQ), save);
-}
-
 void irq_set_enabled(uint num, bool enabled) {
     check_irq_param(num);
     // really should update irq_set_mask_enabled?
@@ -82,7 +75,7 @@ bool irq_is_enabled(uint num) {
 }
 
 static inline void irq_set_mask_n_enabled_internal(uint n, uint32_t mask, bool enabled) {
-    invalid_params_if(HARDWARE_IRQ, n * 32u >= ((NUM_IRQS + 31u) & ~31u));
+    invalid_params_if(HARDWARE_IRQ, n * 32u >= ((PICO_NUM_VTABLE_IRQS + 31u) & ~31u));
 #if defined(__riscv)
     if (enabled) {
         hazard3_irqarray_clear(RVCSR_MEIFA_OFFSET, 2 * n, mask & 0xffffu);
@@ -135,7 +128,7 @@ void irq_set_pending(uint num) {
 #endif
 }
 
-#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS && !PICO_NO_RAM_VECTOR_TABLE
 // limited by 8 bit relative links (and reality)
 static_assert(PICO_MAX_SHARED_IRQ_HANDLERS >= 1 && PICO_MAX_SHARED_IRQ_HANDLERS < 0x7f, "");
 
@@ -215,9 +208,17 @@ bool irq_has_shared_handler(uint irq_num) {
     return is_shared_irq_raw_handler(handler);
 }
 
-#else // PICO_DISABLE_SHARED_IRQ_HANDLERS
+static void set_raw_irq_handler_and_unlock(uint num, irq_handler_t handler, uint32_t save) {
+    // update vtable (vtable_handler may be same or updated depending on cases, but we do it anyway for compactness)
+    get_vtable()[VTABLE_FIRST_IRQ + num] = handler;
+    __dmb();
+    spin_unlock(spin_lock_instance(PICO_SPINLOCK_ID_IRQ), save);
+}
+
+#else // PICO_DISABLE_SHARED_IRQ_HANDLERS && PICO_NO_RAM_VECTOR_TABLE
 #define is_shared_irq_raw_handler(h) false
 bool irq_has_shared_handler(uint irq_num) {
+    ((void)irq_num);
     return false;
 }
 #endif
@@ -237,6 +238,7 @@ void irq_set_exclusive_handler(uint num, irq_handler_t handler) {
     hard_assert(current == __unhandled_user_irq || current == handler);
     set_raw_irq_handler_and_unlock(num, handler, save);
 #else
+    ((void)handler);
     panic_unsupported();
 #endif
 }
@@ -258,7 +260,7 @@ irq_handler_t irq_get_exclusive_handler(uint num) {
 }
 
 
-#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS && !PICO_NO_RAM_VECTOR_TABLE
 
 #ifndef __riscv
 
@@ -368,6 +370,8 @@ static inline int8_t get_slot_index(struct irq_handler_chain_slot *slot) {
 void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_priority) {
     check_irq_param(num);
 #if PICO_NO_RAM_VECTOR_TABLE
+    ((void)handler);
+    ((void)order_priority);
     panic_unsupported();
 #elif PICO_DISABLE_SHARED_IRQ_HANDLERS
     irq_set_exclusive_handler(num, handler);
@@ -461,7 +465,7 @@ void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t order_prior
 #endif // !PICO_NO_RAM_VECTOR_TABLE && !PICO_DISABLE_SHARED_IRQ_HANDLERS
 }
 
-#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS && !PICO_NO_RAM_VECTOR_TABLE
 static inline irq_handler_t handler_from_slot(struct irq_handler_chain_slot *slot) {
 #ifndef __riscv
     return slot->handler;
@@ -586,6 +590,8 @@ void irq_remove_handler(uint num, irq_handler_t handler) {
     }
     set_raw_irq_handler_and_unlock(num, vtable_handler, save);
 #else
+    ((void)num);
+    ((void)handler);
     panic_unsupported();
 #endif
 }
@@ -626,7 +632,7 @@ uint irq_get_priority(uint num) {
 #endif
 }
 
-#if !PICO_DISABLE_SHARED_IRQ_HANDLERS
+#if !PICO_DISABLE_SHARED_IRQ_HANDLERS && !PICO_NO_RAM_VECTOR_TABLE
 // used by irq_handler_chain.S to remove the last link in a handler chain after it executes
 // note this must be called only with the last slot in a chain (and during the exception)
 void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot) {
@@ -670,7 +676,7 @@ __weak void runtime_init_per_core_irq_priorities(void) {
         *p++ = prio4;
     }
 #else
-    for (uint i = 0; i < NUM_IRQS; ++i) {
+    for (uint i = 0; i < PICO_NUM_VTABLE_IRQS; ++i) {
         irq_set_priority(i, PICO_DEFAULT_IRQ_PRIORITY);
     }
 #endif
@@ -678,7 +684,7 @@ __weak void runtime_init_per_core_irq_priorities(void) {
 }
 
 static uint get_user_irq_claim_index(uint irq_num) {
-    invalid_params_if(HARDWARE_IRQ, irq_num < FIRST_USER_IRQ || irq_num >= NUM_IRQS);
+    invalid_params_if(HARDWARE_IRQ, irq_num < FIRST_USER_IRQ || irq_num >= PICO_NUM_VTABLE_IRQS);
     // we count backwards from the last, to match the existing hard coded uses of user IRQs in the SDK which were previously using 31
     static_assert(NUM_IRQS - FIRST_USER_IRQ <= 8, ""); // we only use a single byte's worth of claim bits today.
     return NUM_IRQS - irq_num  - 1u;
