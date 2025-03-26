@@ -460,7 +460,8 @@ endfunction()
 # This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
 #
 # Optionally, use MBEDTLS to to use the MbedTLS based decryption stage - this
-# is faster, but less secure.
+# is faster, but offers no security against power or timing sniffing attacks,
+# and takes up more code size.
 # This sets the target property PICOTOOL_USE_MBEDTLS_DECRYPTION to TRUE.
 #
 # Optionally, use OTP_KEY_PAGE to specify the OTP page storing the AES key.
