@@ -46,14 +46,14 @@ extern "C" {
  * \ingroup pico_unique_id
  *
  * This defines the init_priority of the pico_unique_id. By default, it is 1000. The valid range is
- * from 101-65535. Set to -1 to set the priority to none, thus putting it after 65535. Changing
- * This value will initialize the unique_id earlier or later in the static initialization order.
+ * from 101-65535. Set it to -1 to set the priority to none, thus putting it after 65535. Changing
+ * this value will initialize the unique_id earlier or later in the static initialization order.
  * This is most useful for C++ consumers of the pico-sdk.
  *
  * See https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-constructor-function-attribute
  * and https://gcc.gnu.org/onlinedocs/gcc/C_002b_002b-Attributes.html#index-init_005fpriority-variable-attribute
  *
- * This is an example C++ static initializer that will to run before, and then after pico_unique_id:
+ * Here is an example of C++ static initializers that will run before, and then after, pico_unique_id is loaded:
  *
  * [[gnu::init_priority(500)]] my_class before_instance;
  * [[gnu::init_priority(2000)]] my_class after_instance;
