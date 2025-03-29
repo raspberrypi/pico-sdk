@@ -1,0 +1,5 @@
+file(READ ${PICO_LINKER_SCRIPT_PATH}/memmap_@TYPE@.ld LINKER_SCRIPT)
+@RAM@
+@SCRATCH_X@
+@SCRATCH_Y@
+file(WRITE ${output_file} "${LINKER_SCRIPT}")
