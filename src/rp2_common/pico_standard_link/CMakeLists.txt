@@ -59,7 +59,6 @@ if (NOT TARGET pico_standard_link)
         (PICO_COPY_TO_RAM AND PICO_NO_FLASH))
         message(FATAL_ERROR "Conflicting binary types specified amongst PICO_DEFAULT_BINARY_TYPE, PICO_NO_FLASH, PICO_USE_BLOCKED_RAM and PICO_COPY_TO_RAM")
     endif()
-    unset(_BINARY_TYPES_SPECIFIED)
 
     # todo only needed if not using a custom linker script
     if (NOT PICO_LINKER_SCRIPT_PATH)
