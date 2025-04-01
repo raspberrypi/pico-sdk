@@ -48,9 +48,9 @@
  * \cond hardware_watchdog \defgroup hardware_watchdog hardware_watchdog \endcond
  * \cond hardware_xip_cache \defgroup hardware_xip_cache hardware_xip_cache \endcond
  * \cond hardware_xosc \defgroup hardware_xosc hardware_xosc \endcond
- * \cond hardware_powman hardware_powman
- * \cond hardware_hazard3 hardware_hazard3
- * \cond hardware_riscv hardware_riscv
+ * \cond hardware_powman \defgroup hardware_powman hardware_powman \endcond
+ * \cond hardware_hazard3 \defgroup hardware_hazard3 hardware_hazard3 \endcond
+ * \cond hardware_riscv \defgroup hardware_riscv hardware_riscv \endcond
 
  * @}
  *

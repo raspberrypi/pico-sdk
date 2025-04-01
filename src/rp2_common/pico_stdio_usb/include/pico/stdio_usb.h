@@ -197,7 +197,7 @@ bool stdio_usb_connected(void);
 /*! \brief Explicitly calls the registered USB stdio chars_available_callback
  *  \ingroup pico_stdio_usb
  *
- * \ref This method is normally called by the internal USB stdio background thread when there is new USB CDC
+ * This method is normally called by the internal USB stdio background thread when there is new USB CDC
  * data available to read. However, if the internal background thread is disabled (e.g. when the user
  * directly links tinyUSB), the user will need to implement their own background thread and call this
  * method directly.

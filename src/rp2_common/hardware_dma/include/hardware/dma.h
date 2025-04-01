@@ -123,7 +123,7 @@ int dma_claim_unused_channel(bool required);
  * \param channel the dma channel
  * \return true if the channel is claimed, false otherwise
  * \see dma_channel_claim
- * \see dma_channel_claim_mask
+ * \see dma_claim_mask
  */
 bool dma_channel_is_claimed(uint channel);
 

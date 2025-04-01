@@ -151,7 +151,7 @@ static inline bool multicore_fifo_rvalid(void) {
  *
  * See the note in the \ref multicore_fifo section for considerations regarding use of the inter-core FIFOs
  *
- *  @return true if the FIFO has room for more data, false otherwise
+ * \return true if the FIFO has room for more data, false otherwise
  */
 static inline bool multicore_fifo_wready(void) {
     return sio_hw->fifo_st & SIO_FIFO_ST_RDY_BITS;
@@ -316,7 +316,7 @@ static inline void check_doorbell_num_param(__unused uint doorbell_num) {
  *
  * \param doorbell_num the doorbell number to claim
  * \param core_mask 0b01: core 0, 0b10: core 1, 0b11 both core 0 and core 1
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 void multicore_doorbell_claim(uint doorbell_num, uint core_mask);
 
@@ -328,7 +328,7 @@ void multicore_doorbell_claim(uint doorbell_num, uint core_mask);
  * \param core_mask 0b01: core 0, 0b10: core 1, 0b11 both core 0 and core 1
  * \param required if true the function will panic if none are available
  * \return the doorbell number claimed or -1 if required was false, and none are available
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 int multicore_doorbell_claim_unused(uint core_mask, bool required);
 
@@ -337,7 +337,7 @@ int multicore_doorbell_claim_unused(uint core_mask, bool required);
  *
  * \param doorbell_num the doorbell number to unclaim
  * \param core_mask 0b01: core 0, 0b10: core 1, 0b11 both core 0 and core 1
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 void multicore_doorbell_unclaim(uint doorbell_num, uint core_mask);
 
