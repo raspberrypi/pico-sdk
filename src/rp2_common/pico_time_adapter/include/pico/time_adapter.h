@@ -80,7 +80,7 @@ static inline void ta_disable_irq_handler(alarm_pool_timer_t *timer, uint alarm_
     hw_clear_bits(&timer_hw_from_timer(timer)->inte, 1u << alarm_num);
     irq_set_enabled(irq_num, true);
     irq_remove_handler(irq_num, irq_handler);
-    hardware_alarm_unclaim(alarm_num);
+    timer_hardware_alarm_unclaim(timer, alarm_num);
 }
 
 static inline void ta_hardware_alarm_claim(alarm_pool_timer_t *timer, uint hardware_alaram_num) {
