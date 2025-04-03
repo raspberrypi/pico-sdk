@@ -294,3 +294,13 @@ label_flag(
     name = "PICO_FREERTOS_LIB",
     build_setting_default = "//bazel:empty_cc_lib",
 )
+
+bool_flag(
+    name = "PICO_COMPILATION_OPT_OVERRIDE",
+    build_setting_default = False,
+)
+
+bool_flag(
+    name = "PICO_COMPILATION_DEBUG_OVERRIDE",
+    build_setting_default = False,
+)

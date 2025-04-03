@@ -89,15 +89,33 @@ cc_args(
 )
 
 cc_args(
-    name = "opt_debug_args",
+    name = "debug_args",
     actions = [
         "@rules_cc//cc/toolchains/actions:compile_actions",
         "@rules_cc//cc/toolchains/actions:link_actions",
     ],
-    args = [
-        "-Og",  # TODO: Make this configurable.
-        "-g3",
+    args = select({
+        "//bazel/constraint:pico_compiliation_debug_override": [],
+        "//conditions:default": [
+            "-Og",
+            "-g3",
+        ],
+    })
+)
+
+cc_args(
+    name = "opt_args",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
     ],
+    args = select({
+        "//bazel/constraint:pico_compiliation_opt_override": [],
+        "//conditions:default": [
+            "-O2",
+            "-DNDEBUG",
+        ],
+    })
 )
 
 configurable_toolchain_feature(
@@ -134,14 +152,25 @@ configurable_toolchain_feature(
 
 # TODO: Make this shim unnecessary.
 cc_args_list(
-    name = "all_opt_debug_args",
-    args = [":opt_debug_args"],
+    name = "all_debug_args",
+    args = [":debug_args"],
+)
+
+cc_args_list(
+    name = "all_opt_args",
+    args = [":opt_args"],
 )
 
 cc_feature(
-    name = "override_debug",
-    args = [":all_opt_debug_args"],
+    name = "dbg",
+    args = [":all_debug_args"],
     overrides = "@rules_cc//cc/toolchains/features:dbg",
+)
+
+cc_feature(
+    name = "opt",
+    args = [":all_opt_args"],
+    overrides = "@rules_cc//cc/toolchains/features:opt",
 )
 
 HOSTS = (
@@ -180,7 +209,8 @@ _HOST_CPU_CONSTRAINTS = {
     tags = ["manual"],  # Don't try to build this in wildcard builds.
     known_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
-        "@pico-sdk//bazel/toolchain:override_debug",
+        "@pico-sdk//bazel/toolchain:dbg",
+        "@pico-sdk//bazel/toolchain:opt",
         "@pico-sdk//bazel/toolchain:gc_sections",
         "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
         "@pico-sdk//bazel/toolchain:cxx_no_rtti",
@@ -189,7 +219,6 @@ _HOST_CPU_CONSTRAINTS = {
     ],
     enabled_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
-        "@pico-sdk//bazel/toolchain:override_debug",
     ] + select({
         "//bazel/constraint:pico_no_gc_sections_enabled": [],
         "//conditions:default": [":gc_sections"],
@@ -232,7 +261,8 @@ _HOST_CPU_CONSTRAINTS = {
     tags = ["manual"],  # Don't try to build this in wildcard builds.
     known_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
-        "@pico-sdk//bazel/toolchain:override_debug",
+        "@pico-sdk//bazel/toolchain:dbg",
+        "@pico-sdk//bazel/toolchain:opt",
         "@pico-sdk//bazel/toolchain:gc_sections",
         "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
         "@pico-sdk//bazel/toolchain:cxx_no_rtti",
@@ -241,7 +271,6 @@ _HOST_CPU_CONSTRAINTS = {
     ],
     enabled_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
-        "@pico-sdk//bazel/toolchain:override_debug",
     ] + select({
         "//bazel/constraint:pico_no_gc_sections_enabled": [],
         "//conditions:default": [":gc_sections"],

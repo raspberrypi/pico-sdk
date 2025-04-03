@@ -252,3 +252,13 @@ label_flag_matches(
     flag = "//bazel/config:PICO_FREERTOS_LIB",
     value = "//bazel:empty_cc_lib",
 )
+
+config_setting(
+    name = "pico_compiliation_opt_override",
+    flag_values = {"//bazel/config:PICO_COMPILATION_OPT_OVERRIDE": "True"},
+)
+
+config_setting(
+    name = "pico_compiliation_debug_override",
+    flag_values = {"//bazel/config:PICO_COMPILATION_DEBUG_OVERRIDE": "True"},
+)
