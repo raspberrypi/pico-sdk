@@ -295,11 +295,13 @@ label_flag(
     build_setting_default = "//bazel:empty_cc_lib",
 )
 
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_OPT_OVERRIDE, Override the default opt compilation mode arguments to none, type=bool, default=0, group=build
 bool_flag(
     name = "PICO_COMPILATION_OPT_OVERRIDE",
     build_setting_default = False,
 )
 
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_DEBUG_OVERRIDE, Override the default dbg compilation mode arguments to none, type=bool, default=0, group=build
 bool_flag(
     name = "PICO_COMPILATION_DEBUG_OVERRIDE",
     build_setting_default = False,
