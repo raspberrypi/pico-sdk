@@ -750,7 +750,7 @@ static inline int rom_load_partition_table(uint8_t *workarea_base, uint32_t work
  * NOTE: This method does not look at owner partitions, only the A partition passed and it's corresponding B partition.
  * 
  * NOTE: You should not call this method directly when performing a Flash Update Boot before calling `explicit_buy`, as it may prevent
- * any version downgrade from occuring - instead \see rom_pick_ab_update_partition() which wraps this function.
+ * any version downgrade from occuring - instead see \ref rom_pick_ab_update_partition() which wraps this function.
  * 
  * \param workarea_base base address of work area
  * \param workarea_size size of work area

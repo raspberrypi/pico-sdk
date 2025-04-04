@@ -25,7 +25,7 @@ extern "C" {
  * The random numbers (32 to 128 bit) to be supplied are read from the PRNG which is used
  * to help provide a large number space.
  *
- * The following (multiple) sources of entropy are available (of varying quality), each enabled by a #define:
+ * The following (multiple) sources of entropy are available (of varying quality), each enabled by a \#define:
  *
  *  - The Ring Oscillator (ROSC) (\ref PICO_RAND_ENTROPY_SRC_ROSC == 1):
  *    \ref PICO_RAND_ROSC_BIT_SAMPLE_COUNT bits are gathered from the ring oscillator "random bit" and mixed in each
@@ -47,7 +47,7 @@ extern "C" {
  *  - Time (\ref PICO_RAND_SEED_ENTROPY_SRC_TIME == 1): The 64-bit microsecond timer is mixed into the seed.
  *  - Board Identifier (PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID == 1): The board id via \ref pico_get_unique_board_id
  *    is mixed into the seed.
- *  - RAM hash (\ref PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH (\ref PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH): The hashed contents of a
+ *  - RAM hash (\ref PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH): The hashed contents of a
  *    subset of RAM are mixed in. Initial RAM contents are undefined on power up, so provide a reasonable source of entropy.
  *    By default the last 1K of RAM (which usually contains the core 0 stack) is hashed, which may also provide for differences
  *    after each warm reset.
