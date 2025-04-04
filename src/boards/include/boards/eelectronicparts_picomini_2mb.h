@@ -14,10 +14,10 @@
 //
 // This header may be included by other board headers as "boards/eelectronicparts_picomini_2mb.h"
 
-// pico_cmake_set PICO_PLATFORM=rp2040
-
 #ifndef _BOARDS_EELECTRONICPARTS_PICOMINI_2MB_H
 #define _BOARDS_EELECTRONICPARTS_PICOMINI_2MB_H
+
+pico_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
 #define EELECTRONICPARTS_PICOMINI_2MB
@@ -72,7 +72,7 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (2 * 1024 * 1024)
+pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, 2 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 // This board comes in 2MB, 4MB, 8MB, and 16MB variants
 #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)

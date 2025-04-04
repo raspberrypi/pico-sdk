@@ -12,7 +12,7 @@
 #ifndef _BOARDS_HELLBENDER_2350A_DEVBOARD_H
 #define _BOARDS_HELLBENDER_2350A_DEVBOARD_H
 
-// pico_cmake_set PICO_PLATFORM=rp2350
+pico_cmake_set(PICO_PLATFORM, rp2350)
 
 // For board detection
 #define HELLBENDER_2350A_DEVBOARD
@@ -84,14 +84,14 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
+pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, 16 * 1024 * 1024)
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
 // --- RP2350 VARIANT ---
 #define PICO_RP2350A 1
 
-// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
+pico_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif
