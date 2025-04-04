@@ -150,26 +150,16 @@ configurable_toolchain_feature(
     linkopts = ["-Wl,-z,max-page-size=4096"],
 )
 
-# TODO: Make this shim unnecessary.
-cc_args_list(
-    name = "all_debug_args",
-    args = [":debug_args"],
-)
-
-cc_args_list(
-    name = "all_opt_args",
-    args = [":opt_args"],
-)
 
 cc_feature(
     name = "dbg",
-    args = [":all_debug_args"],
+    args = [":debug_args"],
     overrides = "@rules_cc//cc/toolchains/features:dbg",
 )
 
 cc_feature(
     name = "opt",
-    args = [":all_opt_args"],
+    args = [":opt_args"],
     overrides = "@rules_cc//cc/toolchains/features:opt",
 )
 
