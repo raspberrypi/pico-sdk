@@ -118,6 +118,22 @@ cc_args(
     })
 )
 
+cc_args(
+    name = "fastbuild_args",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = select({
+        "//bazel/constraint:pico_compiliation_fastbuild_override": [],
+        "//conditions:default": [
+            "-gmlt",
+            "-Wl",
+            "-S",
+        ],
+    })
+)
+
 configurable_toolchain_feature(
     name = "gc_sections",
     copts = [
@@ -163,6 +179,12 @@ cc_feature(
     overrides = "@rules_cc//cc/toolchains/features:opt",
 )
 
+cc_feature(
+    name = "fastbuild",
+    args = [":fastbuild_args"],
+    overrides = "@rules_cc//cc/toolchains/features:fastbuild",
+)
+
 HOSTS = (
     ("linux", "x86_64"),
     ("linux", "aarch64"),
@@ -201,6 +223,7 @@ _HOST_CPU_CONSTRAINTS = {
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
         "@pico-sdk//bazel/toolchain:dbg",
         "@pico-sdk//bazel/toolchain:opt",
+        "@pico-sdk//bazel/toolchain:fastbuild",
         "@pico-sdk//bazel/toolchain:gc_sections",
         "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
         "@pico-sdk//bazel/toolchain:cxx_no_rtti",
@@ -253,6 +276,7 @@ _HOST_CPU_CONSTRAINTS = {
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
         "@pico-sdk//bazel/toolchain:dbg",
         "@pico-sdk//bazel/toolchain:opt",
+        "@pico-sdk//bazel/toolchain:fastbuild",
         "@pico-sdk//bazel/toolchain:gc_sections",
         "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
         "@pico-sdk//bazel/toolchain:cxx_no_rtti",

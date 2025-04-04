@@ -306,3 +306,9 @@ bool_flag(
     name = "PICO_COMPILATION_DEBUG_OVERRIDE",
     build_setting_default = False,
 )
+
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_FASTBUILD_OVERRIDE, Override the default fastbuild compilation mode arguments to none, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_COMPILATION_FASTBUILD_OVERRIDE",
+    build_setting_default = False,
+)

@@ -262,3 +262,8 @@ config_setting(
     name = "pico_compiliation_debug_override",
     flag_values = {"//bazel/config:PICO_COMPILATION_DEBUG_OVERRIDE": "True"},
 )
+
+config_setting(
+    name = "pico_compiliation_fastbuild_override",
+    flag_values = {"//bazel/config:PICO_COMPILATION_FASTBUILD_OVERRIDE": "True"},
+)
