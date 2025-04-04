@@ -126,11 +126,8 @@ cc_args(
     ],
     args = select({
         "//bazel/constraint:pico_compiliation_fastbuild_override": [],
-        "//conditions:default": [
-            "-gmlt",
-            "-Wl",
-            "-S",
-        ],
+        # The conditions default are kept as nothing here, The bazel docs default are -gmlt -Wl,-S.
+        "//conditions:default": [],
     })
 )
 
