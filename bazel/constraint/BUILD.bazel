@@ -254,16 +254,16 @@ label_flag_matches(
 )
 
 config_setting(
-    name = "pico_compiliation_opt_override",
-    flag_values = {"//bazel/config:PICO_COMPILATION_OPT_OVERRIDE": "True"},
+    name = "pico_compiliation_opt_remove_defs",
+    flag_values = {"//bazel/config:PICO_COMPILATION_OPT_REMOVE_DEFS": "True"},
 )
 
 config_setting(
-    name = "pico_compiliation_debug_override",
-    flag_values = {"//bazel/config:PICO_COMPILATION_DEBUG_OVERRIDE": "True"},
+    name = "pico_compiliation_debug_remove_defs",
+    flag_values = {"//bazel/config:PICO_COMPILATION_DEBUG_REMOVE_DEFS": "True"},
 )
 
 config_setting(
-    name = "pico_compiliation_fastbuild_override",
-    flag_values = {"//bazel/config:PICO_COMPILATION_FASTBUILD_OVERRIDE": "True"},
+    name = "pico_compiliation_fastbuild_remove_defs",
+    flag_values = {"//bazel/config:PICO_COMPILATION_FASTBUILD_REMOVE_DEFS": "True"},
 )

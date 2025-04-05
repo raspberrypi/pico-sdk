@@ -295,20 +295,20 @@ label_flag(
     build_setting_default = "//bazel:empty_cc_lib",
 )
 
-# PICO_BAZEL_CONFIG: PICO_COMPILATION_OPT_OVERRIDE, Override the default opt compilation mode arguments to none, type=bool, default=0, group=build
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_OPT_REMOVE_DEFS, Remove the default opt compilation mode arguments, type=bool, default=0, group=build
 bool_flag(
-    name = "PICO_COMPILATION_OPT_OVERRIDE",
+    name = "PICO_COMPILATION_OPT_REMOVE_DEFS",
     build_setting_default = False,
 )
 
-# PICO_BAZEL_CONFIG: PICO_COMPILATION_DEBUG_OVERRIDE, Override the default dbg compilation mode arguments to none, type=bool, default=0, group=build
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_DEBUG_REMOVE_DEFS, Remove the default dbg compilation mode arguments, type=bool, default=0, group=build
 bool_flag(
-    name = "PICO_COMPILATION_DEBUG_OVERRIDE",
+    name = "PICO_COMPILATION_DEBUG_REMOVE_DEFS",
     build_setting_default = False,
 )
 
-# PICO_BAZEL_CONFIG: PICO_COMPILATION_FASTBUILD_OVERRIDE, Override the default fastbuild compilation mode arguments to none, type=bool, default=0, group=build
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_FASTBUILD_REMOVE_DEFS, Remove the default fastbuild compilation mode arguments, type=bool, default=0, group=build
 bool_flag(
-    name = "PICO_COMPILATION_FASTBUILD_OVERRIDE",
+    name = "PICO_COMPILATION_FASTBUILD_REMOVE_DEFS",
     build_setting_default = False,
 )

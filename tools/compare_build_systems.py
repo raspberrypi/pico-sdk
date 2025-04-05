@@ -157,10 +157,10 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_BT_ENABLE_BLE",
     "PICO_BT_ENABLE_CLASSIC",
     "PICO_BT_ENABLE_MESH",
-    # Compilation modes overrides, These allow the user to override the defaults, with no args. See --compilation_mode cmd line option
-    "PICO_COMPILATION_FASTBUILD_OVERRIDE",
-    "PICO_COMPILATION_DEBUG_OVERRIDE",
-    "PICO_COMPILATION_OPT_OVERRIDE",
+    # Compilation modes remove, These allow the user to remove the defaults, with no args. See --compilation_mode cmd line option
+    "PICO_COMPILATION_FASTBUILD_REMOVE_DEFS",
+    "PICO_COMPILATION_DEBUG_REMOVE_DEFS",
+    "PICO_COMPILATION_OPT_REMOVE_DEFS",
 )
 
 
