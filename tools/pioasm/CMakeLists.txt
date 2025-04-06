@@ -27,6 +27,7 @@ add_executable(pioasm
 target_sources(pioasm PRIVATE c_sdk_output.cpp)
 target_sources(pioasm PRIVATE python_output.cpp)
 target_sources(pioasm PRIVATE hex_output.cpp)
+target_sources(pioasm PRIVATE constexpr_output.cpp)
 target_sources(pioasm PRIVATE json_output.cpp)
 target_sources(pioasm PRIVATE ada_output.cpp)
 target_sources(pioasm PRIVATE go_output.cpp)
