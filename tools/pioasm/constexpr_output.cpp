@@ -15,12 +15,24 @@ struct constexpr_output : public output_format {
     constexpr_output() : output_format("constexpr") {}
 
     std::string get_description() {
-        return "c++ constexpr array output (only raw programs are output) ";
+        return "c++ constexpr array output (only raw programs are output)\n"
+               "                               "
+               "-p namespace=some_namespace    add optional namespace";
     }
 
     virtual int output(std::string destination,
                        std::vector<std::string> output_options,
                        const compiled_source &source) {
+
+        std::string generated_namespace = "";
+
+        for (const auto &o_opt : output_options) {
+            const std::string prefix = "namespace=";
+            if (o_opt.find(prefix) == 0) {
+                generated_namespace = o_opt.substr(prefix.size());
+            }
+        }
+
         FILE *out = open_single_output(destination);
         if (!out)
             return 1;
@@ -29,7 +41,7 @@ struct constexpr_output : public output_format {
         fprintf(out, "#include <array>\n");
         fprintf(out, "#include <cstdint>\n\n");
 
-        fprintf(out, "namespace Pioasm {\n\n");
+        fprintf(out, "namespace %s {\n\n", generated_namespace.c_str());
 
         for (auto &p : source.programs) {
             fprintf(out, "inline constexpr std::array<uint16_t, %lu> %s = {\n",
@@ -50,7 +62,7 @@ struct constexpr_output : public output_format {
             fprintf(out, "};\n\n");
         }
 
-        fprintf(out, "}");
+        fprintf(out, "}\n");
 
         if (out != stdout) {
             fclose(out);
