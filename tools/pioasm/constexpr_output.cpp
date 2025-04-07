@@ -15,7 +15,7 @@ struct constexpr_output : public output_format {
     constexpr_output() : output_format("constexpr") {}
 
     std::string get_description() {
-        return "c++ constexpr array output (only raw program are output) ";
+        return "c++ constexpr array output (only raw programs are output) ";
     }
 
     virtual int output(std::string destination,
