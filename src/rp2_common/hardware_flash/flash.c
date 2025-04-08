@@ -299,7 +299,7 @@ static void flash_devinfo_update_field(uint16_t wdata, uint16_t mask) {
     // Boot RAM does not support exclusives, but does support RWTYPE SET/CLR/XOR (with byte
     // strobes). Can't use hw_write_masked because it performs a 32-bit write.
     io_rw_16 *devinfo = flash_devinfo_ptr();
-    *hw_xor_alias(devinfo) = (*devinfo ^ wdata) & mask;
+    *(io_rw_32 *)hw_xor_alias_untyped(devinfo) = (*devinfo ^ wdata) & mask;
 }
 
 // This is a RAM function because may be called during flash programming to enable save/restore of
