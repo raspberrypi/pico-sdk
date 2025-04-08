@@ -114,7 +114,7 @@ new_git_repository(
 new_git_repository(
     name = "lwip",
     build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
-    commit = "0a0452b2c39bdd91e252aef045c115f88f6ca773",  # keep-in-sync-with-submodule: lib/lwip
+    commit = "77dcd25a72509eb83f72b033d219b1d40cd8eb95",  # keep-in-sync-with-submodule: lib/lwip
     remote = "https://github.com/lwip-tcpip/lwip.git",
 )
 
