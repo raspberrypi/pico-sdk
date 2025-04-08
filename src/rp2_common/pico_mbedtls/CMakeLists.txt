@@ -1,3 +1,4 @@
+# PICO_CMAKE_CONFIG: PICO_MBEDTLS_PATH, Path to an alternative version of mbedtls overriding the version in pico-sdk/libs/mbedtls. Can be passed to cmake or set in your environment, type=string, group=pico_mbedtls
 if (DEFINED ENV{PICO_MBEDTLS_PATH} AND (NOT PICO_MBEDTLS_PATH))
     set(PICO_MBEDTLS_PATH $ENV{PICO_MBEDTLS_PATH})
     message("Using PICO_MBEDTLS_PATH from environment ('${PICO_MBEDTLS_PATH}')")
