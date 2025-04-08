@@ -127,9 +127,9 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(rp2_common/pico_async_context)
     pico_add_subdirectory(rp2_common/pico_btstack)
     pico_add_subdirectory(rp2_common/pico_cyw43_driver)
+    pico_add_subdirectory(rp2_common/pico_mbedtls)
     pico_add_subdirectory(rp2_common/pico_lwip)
     pico_add_subdirectory(rp2_common/pico_cyw43_arch)
-    pico_add_subdirectory(rp2_common/pico_mbedtls)
 
     pico_add_subdirectory(rp2_common/pico_time_adapter)
 

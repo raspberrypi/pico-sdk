@@ -16,7 +16,7 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
 
     pico_register_common_scope_var(PICO_MBEDTLS_PATH)
 
-    # We use version 2.28.8. But this should build version 3.5.1
+    # Support version 2.28.8 or 3.6.2
     if (NOT MBEDTLS_VERSION_MAJOR)
         if (EXISTS ${PICO_MBEDTLS_PATH}/library/ssl_cli.c)
             set(MBEDTLS_VERSION_MAJOR 2)
@@ -25,6 +25,7 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
         else()
             message(WARNING "Cannot determine the version of mbedtls")
         endif()
+        pico_register_common_scope_var(MBEDTLS_VERSION_MAJOR)
     endif()
 
     set(src_crypto
