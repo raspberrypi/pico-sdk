@@ -1,3 +1,4 @@
+# PICO_CMAKE_CONFIG: PICO_LWIP_PATH, Path to an alternative version of lwip overriding the version in pico-sdk/libs/lwip. Can be passed to cmake or set in your environment, type=string, group=pico_lwip
 if (DEFINED ENV{PICO_LWIP_PATH} AND (NOT PICO_LWIP_PATH))
     set(PICO_LWIP_PATH $ENV{PICO_LWIP_PATH})
     message("Using PICO_LWIP_PATH from environment ('${PICO_LWIP_PATH}')")
