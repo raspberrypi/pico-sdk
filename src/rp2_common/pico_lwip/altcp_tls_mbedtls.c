@@ -429,7 +429,7 @@ altcp_mbedtls_handle_rx_appldata(struct altcp_pcb *conn, altcp_mbedtls_state_t *
     } else {
       err_t err;
       if (ret) {
-        LWIP_ASSERT("bogus receive length", ret <= PBUF_POOL_BUFSIZE);
+        LWIP_ASSERT("bogus receive length", ret <= (int)PBUF_POOL_BUFSIZE);
         /* trim pool pbuf to actually decoded length */
         pbuf_realloc(buf, (u16_t)ret);
 
@@ -1059,6 +1059,8 @@ altcp_tls_configure_alpn_protocols(struct altcp_tls_config *conf, const char **p
 
   return ret;
 #else
+  (void)conf;
+  (void)protos;
   return -1;
 #endif
 }
