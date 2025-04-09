@@ -15,8 +15,8 @@
 #ifndef _BOARDS_SPARKFUN_IOTREDBOARD_RP2350_H
 #define _BOARDS_SPARKFUN_IOTREDBOARD_RP2350_H
 
-pico_cmake_set(PICO_PLATFORM, rp2350)
-pico_cmake_set(PICO_CYW43_SUPPORTED, 1)
+pico_board_cmake_set(PICO_PLATFORM, rp2350)
+pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 
 // For board detection
 #define SPARKFUN_IOTREDBOARD_RP2350
@@ -85,7 +85,7 @@ pico_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
@@ -113,7 +113,7 @@ pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #define PICO_VSYS_PIN 46
 #endif
 
-pico_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
+pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

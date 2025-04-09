@@ -17,7 +17,7 @@
 #ifndef _BOARDS_NULLBITS_BIT_C_PRO_H
 #define _BOARDS_NULLBITS_BIT_C_PRO_H
 
-pico_cmake_set(PICO_PLATFORM, rp2040)
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
 #define NULLBITS_BIT_C_PRO
@@ -100,7 +100,7 @@ pico_cmake_set(PICO_PLATFORM, rp2040)
 #endif
 
 // Bit-C PRO has 4MB SPI flash
-pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, (4 * 1024 * 1024))
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (4 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
 #endif

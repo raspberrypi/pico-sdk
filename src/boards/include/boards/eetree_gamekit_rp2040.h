@@ -12,7 +12,7 @@
 #ifndef _BOARDS_EETREE_GAMEKIT_RP2040_H
 #define _BOARDS_EETREE_GAMEKIT_RP2040_H
 
-pico_cmake_set(PICO_PLATFORM, rp2040)
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
 #define EETREE_GAMEKIT_RP2040
@@ -69,7 +69,7 @@ pico_cmake_set(PICO_PLATFORM, rp2040)
 #ifndef PICO_FLASH_SPI_CLKDIV
     #define PICO_FLASH_SPI_CLKDIV 2
 #endif
-pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
     #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif

@@ -14,7 +14,7 @@
 #ifndef _BOARDS_WEACT_STUDIO_RP2040_16MB_H
 #define _BOARDS_WEACT_STUDIO_RP2040_16MB_H
 
-pico_cmake_set(PICO_PLATFORM, rp2040)
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
 #define WEACT_STUDIO_RP2040_16MB
@@ -75,7 +75,7 @@ pico_cmake_set(PICO_PLATFORM, rp2040)
 #define PICO_RP2040_B0_SUPPORTED 0
 #endif
 
-pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif

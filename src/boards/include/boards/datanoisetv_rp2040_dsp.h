@@ -17,7 +17,7 @@
 #ifndef _BOARDS_DATANOISETV_RP2040_DSP_H
 #define _BOARDS_DATANOISETV_RP2040_DSP_H
 
-pico_cmake_set(PICO_PLATFORM, rp2040)
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
 #define DATANOISETV_RP2040_DSP
@@ -40,7 +40,7 @@ pico_cmake_set(PICO_PLATFORM, rp2040)
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
