@@ -25,7 +25,15 @@ cc_library(
     deps = [
         ":pico_lwip_headers",
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG",
-    ],
+    ]
+    # altcp_alloc.c *might* depend on mbedtls
+    + select({
+        "@pico-sdk//bazel/constraint:pico_mbedtls_config_unset": [],
+        "//conditions:default": [
+            "@pico-sdk//src/rp2_common/pico_mbedtls:pico_mbedtls_library",
+        ]
+    })
+    ,
     target_compatible_with = incompatible_with_config("@pico-sdk//bazel/constraint:pico_lwip_config_unset")
 )
 
@@ -142,7 +150,11 @@ cc_library(
         "src/apps/altcp_tls/altcp_tls_mbedtls_mem.c",
         "src/apps/snmp/snmpv3_mbedtls.c",
     ],
-    deps = [":pico_lwip_core"],
+    includes = ["src/apps/altcp_tls"],
+    deps = [
+        ":pico_lwip_core",
+        "@pico-sdk//src/rp2_common/pico_mbedtls:pico_mbedtls_config"
+    ],
 )
 
 cc_library(

@@ -118,6 +118,13 @@ new_git_repository(
     remote = "https://github.com/lwip-tcpip/lwip.git",
 )
 
+new_git_repository(
+    name = "mbedtls",
+    build_file = "//src/rp2_common/pico_mbedtls:mbedtls.BUILD",
+    commit = "107ea89daaefb9867ea9121002fbbdf926780e98",  # keep-in-sync-with-submodule: lib/mbedtls
+    remote = "https://github.com/Mbed-TLS/mbedtls.git",
+)
+
 register_toolchains(
     "//bazel/toolchain:linux-aarch64-rp2040",
     "//bazel/toolchain:linux-aarch64-rp2350",
