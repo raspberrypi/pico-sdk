@@ -31,11 +31,11 @@ if (EXISTS ${PICO_BOARD_HEADER_FILE})
                 list(APPEND PICO_BOARD_CMAKE_OVERRIDES ${CMAKE_MATCH_1})
             endif()
         # continue to support these for now
-        # // pico_board_cmake_set var = value
-        elseif (LINE MATCHES "^[ \t\]*//[ \t\]*pico_board_cmake_set[ \t\]*([a-zA-Z_][a-zA-Z0-9_]*)[ \t\]*=[ \t\]*(.*)")
+        # // pico_cmake_set var = value
+        elseif (LINE MATCHES "^[ \t\]*//[ \t\]*pico_cmake_set[ \t\]*([a-zA-Z_][a-zA-Z0-9_]*)[ \t\]*=[ \t\]*(.*)")
             set("${CMAKE_MATCH_1}" "${CMAKE_MATCH_2}")
-        # // pico_board_cmake_set_default var = value
-        elseif (LINE MATCHES "^[ \t\]*//[ \t\]*pico_board_cmake_set_default[ \t\]*([a-zA-Z_][a-zA-Z0-9_]*)[ \t\]*=[ \t\]*(.*)")
+        # // pico_cmake_set_default var = value
+        elseif (LINE MATCHES "^[ \t\]*//[ \t\]*pico_cmake_set_default[ \t\]*([a-zA-Z_][a-zA-Z0-9_]*)[ \t\]*=[ \t\]*(.*)")
             if (NOT DEFINED "${CMAKE_MATCH_1}")
                 set("${CMAKE_MATCH_1}" "${CMAKE_MATCH_2}")
             else()
