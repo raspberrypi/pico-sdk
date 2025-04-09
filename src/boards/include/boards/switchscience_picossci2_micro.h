@@ -61,7 +61,7 @@ pico_cmake_set(PICO_PLATFORM, rp2350)
 #endif
 
 // board has 4MB onboard flash
-pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, 4 * 1024 * 1024)
+pico_cmake_set_default(PICO_FLASH_SIZE_BYTES, (4 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
 #endif
