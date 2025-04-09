@@ -8,7 +8,6 @@
 #include "pico.h"
 #include "pico/rand.h"
 #include "mbedtls/sha256.h"
-#include "common.h"
 
 /* Function to feed mbedtls entropy. */
 int mbedtls_hardware_poll(void *data __unused, unsigned char *output, size_t len, size_t *olen) {
