@@ -138,8 +138,8 @@ cc_library(
 )
 
 alias(
-    name = "pico_lwip_mqttt",
-    actual = "@lwip//:pico_lwip_mqttt",
+    name = "pico_lwip_mqtt",
+    actual = "@lwip//:pico_lwip_mqtt",
 )
 
 alias(

@@ -160,7 +160,7 @@ cc_library(
 )
 
 cc_library(
-    name = "pico_lwip_mqttt",
+    name = "pico_lwip_mqtt",
     srcs = ["src/apps/mqtt/mqtt.c"],
     deps = [":pico_lwip_core"],
 )
