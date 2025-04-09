@@ -75,8 +75,8 @@ def read_defines_from(header_file, defines_dict):
             # strip trailing comments
             line = re.sub(r"(?<=\S)\s*//.*$", "", line)
 
-            # look for "// pico_cmake_set BLAH_BLAH=42"
-            m = re.match(r"^\s*//\s*pico_cmake_set\s+(\w+)\s*=\s*(.+?)\s*$", line)
+            # look for "pico_cmake_set(BLAH_BLAH, 42)"
+            m = re.match(r"^\s*pico_cmake_set\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
             if m:
                 #print(m.groups())
                 name = m.group(1)
@@ -95,8 +95,8 @@ def read_defines_from(header_file, defines_dict):
                    cmake_settings[name] = DefineType(name, value, None, lineno)
                 continue
 
-            # look for "// pico_cmake_set_default BLAH_BLAH=42"
-            m = re.match(r"^\s*//\s*pico_cmake_set_default\s+(\w+)\s*=\s*(.+?)\s*$", line)
+            # look for "pico_cmake_set_default(BLAH_BLAH, 42)"
+            m = re.match(r"^\s*pico_cmake_set_default\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
             if m:
                 #print(m.groups())
                 name = m.group(1)
@@ -223,8 +223,8 @@ with open(board_header) as header_fh:
                 raise Exception("{}:{}  Suggests including \"{}\" but file is named \"{}\"".format(board_header, lineno, include_suggestion, expected_include_suggestion))
             continue
 
-        # look for "// pico_cmake_set BLAH_BLAH=42"
-        m = re.match(r"^\s*//\s*pico_cmake_set\s+(\w+)\s*=\s*(.+?)\s*$", line)
+        # look for "pico_cmake_set(BLAH_BLAH, 42)"
+        m = re.match(r"^\s*pico_cmake_set\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
         if m:
             #print(m.groups())
             name = m.group(1)
@@ -245,8 +245,8 @@ with open(board_header) as header_fh:
                 cmake_settings[name] = DefineType(name, value, None, lineno)
             continue
 
-        # look for "// pico_cmake_set_default BLAH_BLAH=42"
-        m = re.match(r"^\s*//\s*pico_cmake_set_default\s+(\w+)\s*=\s*(.+?)\s*$", line)
+        # look for "pico_cmake_set_default(BLAH_BLAH, 42)"
+        m = re.match(r"^\s*pico_cmake_set_default\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
         if m:
             #print(m.groups())
             name = m.group(1)
