@@ -146,7 +146,9 @@ cc_library(
 cc_library(
     name = "pico_lwip_mbedtls",
     srcs = [
-        "src/apps/altcp_tls/altcp_tls_mbedtls.c",
+        # This source file has issues with mbedtls 3.x
+        # See https://savannah.nongnu.org/patch/index.php?10448
+        #"src/apps/altcp_tls/altcp_tls_mbedtls.c",
         "src/apps/altcp_tls/altcp_tls_mbedtls_mem.c",
         "src/apps/snmp/snmpv3_mbedtls.c",
     ],
