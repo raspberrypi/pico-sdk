@@ -8,7 +8,6 @@
 #include "pico.h"
 #include "pico/rand.h"
 #include "mbedtls/sha256.h"
-#include "common.h"
 
 /* Function to feed mbedtls entropy. */
 int mbedtls_hardware_poll(void *data __unused, unsigned char *output, size_t len, size_t *olen) {
@@ -27,7 +26,7 @@ int mbedtls_hardware_poll(void *data __unused, unsigned char *output, size_t len
 #error SHA256 hardware acceleration not supported
 #endif
 
-// PICO_CONFIG: PICO_MBEDTLS_SHA256_ALT_USE_DMA, Whether to use DMA for writing to hardware for the mbedtls SHA-256 hardware acceleration, type=int, default=1, group=pico_stdlib
+// PICO_CONFIG: PICO_MBEDTLS_SHA256_ALT_USE_DMA, Whether to use DMA for writing to hardware for the mbedtls SHA-256 hardware acceleration, type=int, default=1, group=pico_mbedtls
 #ifndef PICO_MBEDTLS_SHA256_ALT_USE_DMA
 #define PICO_MBEDTLS_SHA256_ALT_USE_DMA 1
 #endif

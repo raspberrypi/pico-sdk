@@ -110,6 +110,8 @@ cc_binary(
         ":kitchen_sink_common",
         "//src/rp2_common/pico_cyw43_arch:pico_cyw43_arch_lwip_poll",
         "//src/rp2_common/pico_btstack:pico_btstack",
+        "//src/rp2_common/pico_lwip:pico_lwip_mbedtls",
+        "//src/rp2_common/pico_mbedtls",
     ],
 )
 
@@ -121,6 +123,9 @@ cc_binary(
     deps = [
         ":kitchen_sink_common",
         "//src/rp2_common/pico_cyw43_arch:pico_cyw43_arch_lwip_threadsafe_background",
+        "//src/rp2_common/pico_btstack:pico_btstack",
+        "//src/rp2_common/pico_lwip:pico_lwip_mbedtls",
+        "//src/rp2_common/pico_mbedtls",
     ],
 )
 
@@ -130,6 +135,7 @@ kitchen_sink_test_binary(
     src = ":kitchen_sink_lwip_poll_actual",
     bt_stack_config = ":btstack_config",
     lwip_config = ":lwip_config",
+    mbedtls_config = ":mbedtls_config",
     enable_ble = True,
     enable_bt_classic = True,
     target_compatible_with = compatible_with_rp2(),
@@ -141,6 +147,7 @@ kitchen_sink_test_binary(
     src = ":kitchen_sink_lwip_background_actual",
     bt_stack_config = ":btstack_config",
     lwip_config = ":lwip_config",
+    mbedtls_config = ":mbedtls_config",
     enable_ble = True,
     enable_bt_classic = True,
     target_compatible_with = compatible_with_rp2(),

@@ -1,3 +1,4 @@
+# PICO_CMAKE_CONFIG: PICO_LWIP_PATH, Path to an alternative version of lwip overriding the version in pico-sdk/libs/lwip. Can be passed to cmake or set in your environment, type=string, group=pico_lwip
 if (DEFINED ENV{PICO_LWIP_PATH} AND (NOT PICO_LWIP_PATH))
     set(PICO_LWIP_PATH $ENV{PICO_LWIP_PATH})
     message("Using PICO_LWIP_PATH from environment ('${PICO_LWIP_PATH}')")
@@ -234,13 +235,28 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             ${PICO_LWIP_PATH}/src/apps/tftp/tftp.c
             )
 
+
     # Mbed TLS files
     pico_add_library(pico_lwip_mbedtls NOFLAG)
     target_sources(pico_lwip_mbedtls INTERFACE
-            ${PICO_LWIP_PATH}/src/apps/altcp_tls/altcp_tls_mbedtls.c
             ${PICO_LWIP_PATH}/src/apps/altcp_tls/altcp_tls_mbedtls_mem.c
             ${PICO_LWIP_PATH}/src/apps/snmp/snmpv3_mbedtls.c
             )
+
+    # altcp_tls_mbedtls.c is not compatible with mbedtls 3.x so use a patched version until this is resolved
+    # See https://savannah.nongnu.org/patch/index.php?10448
+    if (MBEDTLS_VERSION_MAJOR AND MBEDTLS_VERSION_MAJOR GREATER_EQUAL  3)
+        target_sources(pico_lwip_mbedtls INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/altcp_tls_mbedtls.c
+            )
+        target_include_directories(pico_lwip_mbedtls INTERFACE
+            ${PICO_LWIP_PATH}/src/apps/altcp_tls
+            )
+    else()
+        target_sources(pico_lwip_mbedtls INTERFACE
+            ${PICO_LWIP_PATH}/src/apps/altcp_tls/altcp_tls_mbedtls.c
+            )
+    endif()
 
     # MQTT client files
     pico_add_library(pico_lwip_mqtt NOFLAG)

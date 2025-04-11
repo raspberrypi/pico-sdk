@@ -80,6 +80,7 @@
  * \defgroup tinyusb_device tinyusb_device
  * \defgroup tinyusb_host tinyusb_host
  * \endcond
+ * \cond pico_mbedtls \defgroup pico_mbedtls pico_mbedtls \endcond
  * @}
  *
  * \defgroup networking Networking Libraries
