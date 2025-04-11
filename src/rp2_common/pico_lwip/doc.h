@@ -65,14 +65,14 @@
  * \par pico_set_lwip_httpd_content
  *
  * To make this whole process easier, a python script `makefsdata.py` is provided to generate a source file for your HTML content.
- * A cmake function `pico_set_lwip_httpd_content` takes care of running the `makefsdata.py` python script for you.
+ * A CMake function `pico_set_lwip_httpd_content` takes care of running the `makefsdata.py` python script for you.
  * To make use of this, specify the name of the source file as `pico_fsdata.inc` in `lwipopts.h`.
  *
  * \code
  * #define HTTPD_FSDATA_FILE "pico_fsdata.inc"
  * \endcode
  *
- * Then call the cmake function `pico_set_lwip_httpd_content` in your `CMakeLists.txt` to add your content to a library.
+ * Then call the CMake function `pico_set_lwip_httpd_content` in your `CMakeLists.txt` to add your content to a library.
  * Make sure you add this library to your executable by adding it to your target_link_libraries list.
  * Here is an example from the httpd example in pico-examples.
   *
