@@ -23,6 +23,8 @@
  *
  * Multiple blocks are referred to using a bitmask as follows:
  *
+ * \if rp2040_specific
+ * For RP2040:
  * Block to reset | Bit
  * ---------------|----
  * USB | 24
@@ -41,15 +43,51 @@
  * PIO 1 | 11
  * PIO 0 | 10
  * Pads - QSPI | 9
- * Pads - bank 0 | 8
+ * Pads - Bank 0 | 8
  * JTAG | 7
- * IO Bank 1 | 6
+ * IO QSPI | 6
  * IO Bank 0 | 5
  * I2C 1 | 4
  * I2C 0 | 3
  * DMA | 2
  * Bus Control | 1
  * ADC 0 | 0
+ * \endif
+ *
+ * \if rp2350_specific
+ * For RP2350:
+ * Block to reset | Bit
+ * ---------------|----
+ * USB | 28
+ * UART 1 | 27
+ * UART 0 | 26
+ * TRNG | 25
+ * Timer 1 | 24
+ * Timer 0 | 23
+ * TB Manager | 22
+ * SysInfo | 21
+ * System Config | 20
+ * SPI 1 | 19
+ * SPI 0 | 18
+ * SHA256 | 17
+ * PWM | 16
+ * PLL USB | 15
+ * PLL System | 14
+ * PIO 2 | 13
+ * PIO 1 | 12
+ * PIO 0 | 11
+ * Pads - QSPI | 10
+ * Pads - Bank 0 | 9
+ * JTAG | 8
+ * IO QSPI | 7
+ * IO Bank 0 | 6
+ * I2C 1 | 5
+ * I2C 0 | 4
+ * HSTX | 3
+ * DMA | 2
+ * Bus Control | 1
+ * ADC 0 | 0
+ * \endif
  *
  * \subsection reset_example Example
  * \addtogroup hardware_resets

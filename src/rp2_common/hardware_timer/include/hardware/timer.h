@@ -351,7 +351,7 @@ typedef void (*hardware_alarm_callback_t)(uint alarm_num);
  * \param timer the timer instance
  * \param alarm_num the hardware alarm to claim
  * \sa hardware_alarm_claim
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 void timer_hardware_alarm_claim(timer_hw_t *timer, uint alarm_num);
 
@@ -362,7 +362,7 @@ void timer_hardware_alarm_claim(timer_hw_t *timer, uint alarm_num);
  *
  * \param alarm_num the hardware alarm to claim
  * \sa timer_hardware_alarm_claim
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 void hardware_alarm_claim(uint alarm_num);
 
@@ -375,7 +375,7 @@ void hardware_alarm_claim(uint alarm_num);
  * \param required if true the function will panic if none are available
  * \return alarm_num the hardware alarm claimed or -1 if required was false, and none are available
  * \sa hardware_alarm_claim_unused
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 int timer_hardware_alarm_claim_unused(timer_hw_t *timer, bool required);
 
@@ -387,7 +387,7 @@ int timer_hardware_alarm_claim_unused(timer_hw_t *timer, bool required);
  * \param required if true the function will panic if none are available
  * \return alarm_num the hardware alarm claimed or -1 if required was false, and none are available
  * \sa timer_hardware_alarm_claim_unused
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 int hardware_alarm_claim_unused(bool required);
 
@@ -397,7 +397,7 @@ int hardware_alarm_claim_unused(bool required);
  * \param timer the timer instance
  * \param alarm_num the hardware alarm to unclaim
  * \sa hardware_alarm_unclaim
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 void timer_hardware_alarm_unclaim(timer_hw_t *timer, uint alarm_num);
 
@@ -406,7 +406,7 @@ void timer_hardware_alarm_unclaim(timer_hw_t *timer, uint alarm_num);
  *
  * \param alarm_num the hardware alarm to unclaim
  * \sa timer_hardware_alarm_unclaim
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 void hardware_alarm_unclaim(uint alarm_num);
 

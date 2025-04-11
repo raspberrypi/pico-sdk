@@ -196,6 +196,7 @@ def read_defines_from(header_file, defines_dict):
 
 if board_header_basename == "amethyst_fpga.h":
     defines['PICO_RP2350'] = DefineType('PICO_RP2350', 1, 1, -1)
+    defines['PICO_RP2350A'] = DefineType('PICO_RP2350A', 0, 0, -1)
 
 with open(board_header) as header_fh:
     last_ifndef = None
@@ -347,7 +348,7 @@ with open(board_header) as header_fh:
                         raise Exception("{}:{}  Include-guard #define {} is missing an #ifndef".format(board_header, lineno, name))
                     if value:
                         raise Exception("{}:{}  Include-guard #define {} shouldn't have a value".format(board_header, lineno, name))
-                    if len(defines) and not (len(defines) == 1 and defines[list(defines.keys())[0]].lineno < 0):
+                    if any(defines[d].lineno >= 0 for d in defines):
                         raise Exception("{}:{}  Include-guard #define {} should be the first define".format(board_header, lineno, name))
                     if name == expected_include_guard:
                         has_include_guard = True
@@ -387,10 +388,15 @@ else:
         other_chip = 'RP2350'
     elif cmake_settings['PICO_PLATFORM'].value == "rp2350":
         other_chip = 'RP2040'
-        if 'PICO_RP2350A' in defines and defines['PICO_RP2350A'].resolved_value == 1:
-            chip = 'RP2350A'
+        if 'PICO_RP2350B' in defines:
+            raise Exception("{} sets #define {} {} (should probably be #define {} {})".format(board_header, 'PICO_RP2350B', defines['PICO_RP2350B'].resolved_value, 'PICO_RP2350A', 1 - defines['PICO_RP2350B'].resolved_value))
+        if 'PICO_RP2350A' not in defines:
+            raise Exception("{} has no #define for {} (set to 1 for RP2350A, or 0 for RP2350B)".format(board_header, 'PICO_RP2350A'))
         else:
-            chip = 'RP2350B'
+            if defines['PICO_RP2350A'].resolved_value == 1:
+                chip = 'RP2350A'
+            else:
+                chip = 'RP2350B'
         if not board_header.endswith("amethyst_fpga.h"):
             if 'PICO_RP2350_A2_SUPPORTED' not in cmake_default_settings:
                 raise Exception("{} uses chip {} but is missing a pico_cmake_set_default {} comment".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))

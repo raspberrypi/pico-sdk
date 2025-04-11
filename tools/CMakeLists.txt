@@ -153,6 +153,28 @@ function(picotool_check_configurable TARGET)
     endif()
 endfunction()
 
+# Compare 2 key files, used by picotool_check_default_keys
+function(picotool_compare_keys TARGET KEY DEFAULT TYPE)
+    if (KEY)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files "${KEY}" "${PICO_SDK_PATH}/tools/example_keys/${DEFAULT}"
+            RESULT_VARIABLE compare_result
+        )
+        if(compare_result EQUAL 0)
+            message(WARNING "${TARGET} is using a default ${TYPE} key - this must be changed before production")
+        endif()
+    endif()
+endfunction()
+
+# Check if default signing/encryption keys are being used
+function(picotool_check_default_keys TARGET)
+    get_target_property(picotool_sigfile ${TARGET} PICOTOOL_SIGFILE)
+    picotool_compare_keys(${TARGET} ${picotool_sigfile} private.pem "signing")
+    get_target_property(picotool_aesfile ${TARGET} PICOTOOL_AESFILE)
+    picotool_compare_keys(${TARGET} ${picotool_aesfile} privateaes.bin "encryption")
+    get_target_property(picotool_enc_sigfile ${TARGET} PICOTOOL_ENC_SIGFILE)
+    picotool_compare_keys(${TARGET} ${picotool_enc_sigfile} private.pem "encrypted signing")
+endfunction()
+
 # Generate pio header and include it in the build
 # PICO_CMAKE_CONFIG: PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, Default output format used by pioasm when using pico_generate_pio_header, type=string, default=c-sdk, group=build
 function(pico_generate_pio_header TARGET)
@@ -449,6 +471,12 @@ function(picotool_postprocess_binary TARGET)
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_PROCESSING_CONFIGURED true
     )
+
+    # PICO_CMAKE_CONFIG: PICO_ALLOW_EXAMPLE_KEYS, Don't raise a warning when using default signing/encryption keys, type=bool, default=0, group=build
+    if (NOT PICO_ALLOW_EXAMPLE_KEYS)
+        picotool_check_default_keys(${TARGET})
+    endif()
+
     # Read target properties
     get_target_property(picotool_sign_output ${TARGET} PICOTOOL_SIGN_OUTPUT)
     if (picotool_sign_output)

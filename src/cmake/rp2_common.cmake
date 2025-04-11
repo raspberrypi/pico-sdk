@@ -82,6 +82,7 @@ endif()
 
 # Basic bootrom headers
 pico_add_subdirectory(rp2_common/boot_bootrom_headers)
+pico_add_subdirectory(rp2_common/pico_platform_common)
 pico_add_subdirectory(rp2_common/pico_platform_compiler)
 pico_add_subdirectory(rp2_common/pico_platform_sections)
 pico_add_subdirectory(rp2_common/pico_platform_panic)

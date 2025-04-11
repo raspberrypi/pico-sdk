@@ -1,0 +1,25 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_platform_common_headers",
+    hdrs = ["include/pico/platform/common.h"],
+    includes = ["include"],
+    visibility = [
+        "//src/rp2040/pico_platform:__pkg__",
+        "//src/rp2350/pico_platform:__pkg__",
+    ],
+)
+
+cc_library(
+    name = "pico_platform_common",
+    srcs = ["common.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":pico_platform_common_headers",
+        "//src/rp2_common:platform_defs",
+        "//src/rp2_common/hardware_base",
+        "//src/common/pico_base_headers",
+    ],
+)
