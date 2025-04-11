@@ -33,9 +33,10 @@ ENTRY(_entry_point)
 
 SECTIONS
 {
-    /* Second stage bootloader is prepended to the image. It must be 256 bytes big
-       and checksummed. It is usually built by the boot_stage2 target
-       in the Raspberry Pi Pico SDK
+    /* On Arm, the bootrom expects a VT at the start of the
+       image by default; on RISC-V, the default is to enter the image at its
+       lowest address, so an IMAGEDEF item is required to specify the
+       nondefault entry point. */
     */
 
     .flash_begin : {
