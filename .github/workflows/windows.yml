@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
       - name: Checkout submodules
-        run: git submodule update --init
+        run: git submodule update --init --recursive
       - name: Install dependencies
         run: choco install .github/workflows/choco_packages.config
 

@@ -135,6 +135,7 @@ BAZEL_ONLY_ALLOWLIST = (
     # Bazel configuration for 3p deps.
     "PICO_BTSTACK_CONFIG",
     "PICO_LWIP_CONFIG",
+    "PICO_MBEDTLS_CONFIG",
     "PICO_FREERTOS_LIB",
     "PICO_MBEDTLS_LIB",
     # CMake has PICO_DEFAULT_CLIB, but it's not user-facing.

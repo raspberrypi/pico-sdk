@@ -204,6 +204,11 @@ enum gpio_irq_level {
  */
 typedef void (*gpio_irq_callback_t)(uint gpio, uint32_t event_mask);
 
+/*! \brief GPIO override modes
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_set_irqover, gpio_set_outover, gpio_set_inover, gpio_set_oeover
+ */
 enum gpio_override {
     GPIO_OVERRIDE_NORMAL = 0,      ///< peripheral signal selected via \ref gpio_set_function
     GPIO_OVERRIDE_INVERT = 1,      ///< invert peripheral signal selected via \ref gpio_set_function

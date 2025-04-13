@@ -295,6 +295,12 @@ label_flag(
     build_setting_default = "//bazel:empty_cc_lib",
 )
 
+# PICO_BAZEL_CONFIG: PICO_MBEDTL_CONFIG, [Bazel only] The cc_library that provides mbedtls_config.h, default=//bazel:empty_cc_lib, group=pico_mbedtls
+label_flag(
+    name = "PICO_MBEDTLS_CONFIG",
+    build_setting_default = "//bazel:empty_cc_lib",
+)
+
 # PICO_BAZEL_CONFIG: PICO_COMPILATION_OPT_REMOVE_DEFS, Remove the default opt compilation mode arguments, type=bool, default=0, group=build
 bool_flag(
     name = "PICO_COMPILATION_OPT_REMOVE_DEFS",

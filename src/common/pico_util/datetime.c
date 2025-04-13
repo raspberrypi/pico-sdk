@@ -63,6 +63,7 @@ void datetime_to_tm(const datetime_t *dt, struct tm *tm) {
     tm->tm_hour = dt->hour;
     tm->tm_min = dt->min;
     tm->tm_sec = dt->sec;
+    tm->tm_isdst  = -1;
 }
 
 void tm_to_datetime(const struct tm *tm, datetime_t *dt) {

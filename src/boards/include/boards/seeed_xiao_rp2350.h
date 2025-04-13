@@ -17,6 +17,9 @@
 // For board detection
 #define SEEED_XIAO_RP2350
 
+// --- RP2350 VARIANT ---
+#define PICO_RP2350A 1
+
 //------------- UART -------------//
 #ifndef PICO_DEFAULT_UART
 #define PICO_DEFAULT_UART 0

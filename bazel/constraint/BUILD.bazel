@@ -253,6 +253,12 @@ label_flag_matches(
     value = "//bazel:empty_cc_lib",
 )
 
+label_flag_matches(
+    name = "pico_mbedtls_config_unset",
+    flag = "//bazel/config:PICO_MBEDTLS_CONFIG",
+    value = "//bazel:empty_cc_lib",
+)
+
 config_setting(
     name = "pico_compiliation_opt_remove_defs",
     flag_values = {"//bazel/config:PICO_COMPILATION_OPT_REMOVE_DEFS": "True"},

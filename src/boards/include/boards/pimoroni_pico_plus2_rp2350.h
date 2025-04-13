@@ -19,6 +19,9 @@
 // For board detection
 #define PIMORONI_PICO_PLUS2_RP2350
 
+// --- RP2350 VARIANT ---
+#define PICO_RP2350A 0
+
 // --- BOARD SPECIFIC ---
 #define SPCE_SPI 0
 #define SPCE_TX_MISO_PIN 32
