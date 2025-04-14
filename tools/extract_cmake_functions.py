@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 #
-# Copyright (c) 2021 Raspberry Pi (Trading) Ltd.
+# Copyright (c) 2025 Raspberry Pi (Trading) Ltd.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
 #
 # Script to scan the Raspberry Pi Pico SDK tree searching for CMake functions
 # Outputs a tab separated file of the function:
-# name	signature	description
+# name	signature	description	group
 #
 # Usage:
 #
@@ -83,7 +83,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                 for match in CMAKE_PICO_FUNCTIONS_RE.finditer(text):
                     name = match.group(1)
                     if name not in all_functions and name not in allowed_missing_functions:
-                        print(f"Warning: {name} function has no description in {file_path}")
+                        logger.warning("{} function has no description in {}".format(name, file_path))
 
 
 with open(outfile, 'w', newline='') as csvfile:
