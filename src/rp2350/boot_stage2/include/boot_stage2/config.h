@@ -9,7 +9,7 @@
 
 // NOTE THIS HEADER IS INCLUDED FROM ASSEMBLY
 
-#include "pico/config.h"
+#include "pico.h"
 
 // PICO_CONFIG: PICO_BUILD_BOOT_STAGE2_NAME, Name of the boot stage 2 if selected in the build system, group=boot_stage2
 #ifdef PICO_BUILD_BOOT_STAGE2_NAME

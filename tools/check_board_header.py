@@ -75,8 +75,8 @@ def read_defines_from(header_file, defines_dict):
             # strip trailing comments
             line = re.sub(r"(?<=\S)\s*//.*$", "", line)
 
-            # look for "// pico_cmake_set BLAH_BLAH=42"
-            m = re.match(r"^\s*//\s*pico_cmake_set\s+(\w+)\s*=\s*(.+?)\s*$", line)
+            # look for "pico_board_cmake_set(BLAH_BLAH, 42)"
+            m = re.match(r"^\s*pico_board_cmake_set\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
             if m:
                 #print(m.groups())
                 name = m.group(1)
@@ -87,16 +87,16 @@ def read_defines_from(header_file, defines_dict):
                 # check for multiply-defined values
                 if name in cmake_settings:
                     if cmake_settings[name].value != value:
-                        raise Exception("{}:{}  Conflicting values for pico_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
+                        raise Exception("{}:{}  Conflicting values for pico_board_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
                     else:
                         if show_warnings:
-                            warnings.warn("{}:{}  Multiple values for pico_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
+                            warnings.warn("{}:{}  Multiple values for pico_board_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
                 else:
                    cmake_settings[name] = DefineType(name, value, None, lineno)
                 continue
 
-            # look for "// pico_cmake_set_default BLAH_BLAH=42"
-            m = re.match(r"^\s*//\s*pico_cmake_set_default\s+(\w+)\s*=\s*(.+?)\s*$", line)
+            # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
+            m = re.match(r"^\s*pico_board_cmake_set_default\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
             if m:
                 #print(m.groups())
                 name = m.group(1)
@@ -223,8 +223,8 @@ with open(board_header) as header_fh:
                 raise Exception("{}:{}  Suggests including \"{}\" but file is named \"{}\"".format(board_header, lineno, include_suggestion, expected_include_suggestion))
             continue
 
-        # look for "// pico_cmake_set BLAH_BLAH=42"
-        m = re.match(r"^\s*//\s*pico_cmake_set\s+(\w+)\s*=\s*(.+?)\s*$", line)
+        # look for "pico_board_cmake_set(BLAH_BLAH, 42)"
+        m = re.match(r"^\s*pico_board_cmake_set\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
         if m:
             #print(m.groups())
             name = m.group(1)
@@ -234,7 +234,7 @@ with open(board_header) as header_fh:
                 raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
             # check for multiply-defined values
             if name in cmake_settings:
-                raise Exception("{}:{}  Multiple values for pico_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
+                raise Exception("{}:{}  Multiple values for pico_board_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
             else:
                 if value:
                     try:
@@ -245,8 +245,8 @@ with open(board_header) as header_fh:
                 cmake_settings[name] = DefineType(name, value, None, lineno)
             continue
 
-        # look for "// pico_cmake_set_default BLAH_BLAH=42"
-        m = re.match(r"^\s*//\s*pico_cmake_set_default\s+(\w+)\s*=\s*(.+?)\s*$", line)
+        # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
+        m = re.match(r"^\s*pico_board_cmake_set_default\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
         if m:
             #print(m.groups())
             name = m.group(1)
@@ -256,7 +256,7 @@ with open(board_header) as header_fh:
                 raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
             # check for multiply-defined values
             if name in cmake_default_settings:
-                raise Exception("{}:{}  Multiple values for pico_cmake_set_default {} ({} and {})".format(board_header, lineno, name, cmake_default_settings[name].value, value))
+                raise Exception("{}:{}  Multiple values for pico_board_cmake_set_default {} ({} and {})".format(board_header, lineno, name, cmake_default_settings[name].value, value))
             else:
                 if value:
                     try:
@@ -382,7 +382,7 @@ if board_header_basename == "none.h":
 else:
     for setting in compulsory_cmake_settings:
         if setting not in cmake_settings:
-            raise Exception("{} is missing a pico_cmake_set {} comment".format(board_header, setting))
+            raise Exception("{} is missing a pico_board_cmake_set {} comment".format(board_header, setting))
     if cmake_settings['PICO_PLATFORM'].value == "rp2040":
         chip = 'RP2040'
         other_chip = 'RP2350'
@@ -399,22 +399,22 @@ else:
                 chip = 'RP2350B'
         if not board_header.endswith("amethyst_fpga.h"):
             if 'PICO_RP2350_A2_SUPPORTED' not in cmake_default_settings:
-                raise Exception("{} uses chip {} but is missing a pico_cmake_set_default {} comment".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
+                raise Exception("{} uses chip {} but is missing a pico_board_cmake_set_default {} comment".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
             if 'PICO_RP2350_A2_SUPPORTED' not in defines:
                 raise Exception("{} uses chip {} but is missing a #define {}".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
             if defines['PICO_RP2350_A2_SUPPORTED'].resolved_value != 1:
                 raise Exception("{} sets #define {} {} (should be 1)".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED', defines['PICO_RP2350_A2_SUPPORTED'].resolved_value))
     for setting in compulsory_cmake_default_settings:
         if setting not in cmake_default_settings:
-            raise Exception("{} is missing a pico_cmake_set_default {} comment".format(board_header, setting))
+            raise Exception("{} is missing a pico_board_cmake_set_default {} comment".format(board_header, setting))
     for setting in matching_cmake_default_settings:
         if setting in cmake_default_settings and setting not in defines:
-            raise Exception("{} has pico_cmake_set_default {} but is missing a matching #define".format(board_header, setting))
+            raise Exception("{} has pico_board_cmake_set_default {} but is missing a matching #define".format(board_header, setting))
         elif setting in defines and setting not in cmake_default_settings:
-            raise Exception("{} has #define {} but is missing a matching pico_cmake_set_default comment".format(board_header, setting))
+            raise Exception("{} has #define {} but is missing a matching pico_board_cmake_set_default comment".format(board_header, setting))
         elif setting in defines and setting in cmake_default_settings:
             if cmake_default_settings[setting].value != defines[setting].resolved_value:
-                raise Exception("{} has mismatched pico_cmake_set_default and #define values for {}".format(board_header, setting))
+                raise Exception("{} has mismatched pico_board_cmake_set_default and #define values for {}".format(board_header, setting))
     for setting in compulsory_defines:
         if setting not in defines:
             raise Exception("{} is missing a #define {}".format(board_header, setting))
