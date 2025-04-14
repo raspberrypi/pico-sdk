@@ -95,7 +95,7 @@ cc_args(
         "@rules_cc//cc/toolchains/actions:link_actions",
     ],
     args = select({
-        "//bazel/constraint:pico_compiliation_debug_remove_defs": [],
+        "//bazel/constraint:pico_compiliation_no_debug_args_set": [],
         "//conditions:default": [
             "-Og",
             "-g3",
@@ -110,7 +110,7 @@ cc_args(
         "@rules_cc//cc/toolchains/actions:link_actions",
     ],
     args = select({
-        "//bazel/constraint:pico_compiliation_opt_remove_defs": [],
+        "//bazel/constraint:pico_compiliation_no_opt_args_set": [],
         "//conditions:default": [
             "-O2",
             "-DNDEBUG",
@@ -125,7 +125,7 @@ cc_args(
         "@rules_cc//cc/toolchains/actions:link_actions",
     ],
     args = select({
-        "//bazel/constraint:pico_compiliation_fastbuild_remove_defs": [],
+        "//bazel/constraint:pico_compiliation_no_fastbuild_args_set": [],
         # The conditions default are kept as nothing here, The bazel docs default are -gmlt -Wl,-S.
         "//conditions:default": [],
     })
