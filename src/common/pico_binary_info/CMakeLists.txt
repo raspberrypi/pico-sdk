@@ -9,11 +9,15 @@ endif()
 
 target_link_libraries(pico_binary_info INTERFACE pico_binary_info_headers)
 
+# pico_set_program_name(TARGET name)
+# Set the program name for the target
 function(pico_set_program_name TARGET name)
     # PICO_BUILD_DEFINE: PICO_PROGRAM_NAME, value passed to pico_set_program_name, type=string, group=pico_binary_info
     target_compile_definitions(${TARGET} PRIVATE -DPICO_PROGRAM_NAME="${name}")
 endfunction()
 
+# pico_set_program_description(TARGET description)
+# Set the program description for the target
 function(pico_set_program_description TARGET description)
     # since this is the command line, we will remove newlines
     string(REPLACE "\n" " " description ${description})
@@ -22,11 +26,15 @@ function(pico_set_program_description TARGET description)
     target_compile_definitions(${TARGET} PRIVATE -DPICO_PROGRAM_DESCRIPTION="${description}")
 endfunction()
 
+# pico_set_program_url(TARGET url)
+# Set the program URL for the target
 function(pico_set_program_url TARGET url)
     # PICO_BUILD_DEFINE: PICO_PROGRAM_URL, value passed to pico_set_program_url, type=string, group=pico_binary_info
     target_compile_definitions(${TARGET} PRIVATE -DPICO_PROGRAM_URL="${url}")
 endfunction()
 
+# pico_set_program_version(TARGET version)
+# Set the program version for the target
 function(pico_set_program_version TARGET version)
     # PICO_BUILD_DEFINE: PICO_PROGRAM_VERSION_STRING, value passed to pico_set_program_version, type=string, group=pico_binary_info
     target_compile_definitions(${TARGET} PRIVATE -DPICO_PROGRAM_VERSION_STRING="${version}")

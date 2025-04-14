@@ -302,6 +302,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
 
     pico_promote_common_scope_vars()
 
+    # pico_btstack_make_gatt_header(TARGET_LIB TARGET_TYPE GATT_FILE)
     # Make a GATT header file from a BTstack GATT file
     # Pass the target library name library type and path to the GATT input file
     # To add additional directories to the gatt #import path, add them to the end of the argument list.

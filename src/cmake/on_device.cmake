@@ -15,16 +15,22 @@ function(pico_get_runtime_output_directory TARGET output_path_name)
     set(${output_path_name} ${output_path} PARENT_SCOPE)
 endfunction()
 
+# pico_add_hex_output(TARGET)
+# Generate a hex file for the target
 function(pico_add_hex_output TARGET)
     pico_get_runtime_output_directory(${TARGET} output_path)
     add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${TARGET}> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.hex VERBATIM)
 endfunction()
 
+# pico_add_bin_output(TARGET)
+# Generate a bin file for the target
 function(pico_add_bin_output TARGET)
     pico_get_runtime_output_directory(${TARGET} output_path)
     add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${TARGET}> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.bin VERBATIM)
 endfunction()
 
+# pico_add_dis_output(TARGET)
+# Generate a disassembly file for the target
 function(pico_add_dis_output TARGET)
     pico_get_runtime_output_directory(${TARGET} output_path)
 
@@ -45,6 +51,8 @@ function(pico_add_dis_output TARGET)
             )
 endfunction()
 
+# pico_add_extra_outputs(TARGET)
+# Perform picotool processing and add disassembly, hex, bin, map, and uf2 outputs for the target
 function(pico_add_extra_outputs TARGET)
     # Disassembly will be nonsense for encrypted binaries,
     # so disassemble before picotool processing

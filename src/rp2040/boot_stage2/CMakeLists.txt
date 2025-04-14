@@ -33,7 +33,9 @@ set(PICO_BOOT_STAGE2_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
 pico_add_library(boot_stage2_headers)
 target_include_directories(boot_stage2_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
-# by convention the first source file name without extension is used for the binary info name
+# pico_define_boot_stage2(TARGET NAME SOURCES)
+# Define a boot stage 2 target.
+# By convention the first source file name without extension is used for the binary info name
 function(pico_define_boot_stage2 NAME SOURCES)
     add_executable(${NAME}
             ${SOURCES}
@@ -97,6 +99,7 @@ endmacro()
 
 pico_define_boot_stage2(bs2_default ${PICO_DEFAULT_BOOT_STAGE2_FILE})
 
+# pico_clone_default_boot_stage2(TARGET NAME)
 # Create a new boot stage 2 target using the default implementation for the current build (PICO_BOARD derived)
 function(pico_clone_default_boot_stage2 NAME)
     pico_define_boot_stage2(${NAME} ${PICO_DEFAULT_BOOT_STAGE2_FILE})
