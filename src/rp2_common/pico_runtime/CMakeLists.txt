@@ -51,22 +51,22 @@ elseif (PICO_C_COMPILER_IS_CLANG)
    # target_link_options(pico_runtime INTERFACE "-nostdlib")
 endif()
 
-# pico_minimize_runtime((INCLUDE ...) (EXCLUDE ...))
+# pico_minimize_runtime([INCLUDE ...] [EXCLUDE ...])
 #
 # INCLUDE/EXCLUDE can contain any of the following (all defaulting to not included)
 #
-# DEFAULT_ALARM_POOL    - default alarm pool setup
-# PRINTF                - full printf support
-# PRINTF_MINIMAL        - printf support without the following
-# PRINTF_FLOAT          - to control float support if printf is enabled
-# PRINTF_EXPONENTIAL
-# PRINTF_LONG_LONG
-# PRINTF_PTRDIFF_T
-# FLOAT                 - support for single-precision floating point
-# DOUBLE                - support for double-precision floating point
-# FPGA_CHECK            - checks for FPGA which allows Raspberry Pi to run your binary on FPGA
-# PANIC                 - default panic impl which brings in stdio
-# AUTO_INIT_MUTEX       - auto init mutexes; without this you get no printf mutex either               -
+# DEFAULT_ALARM_POOL    - default alarm pool setup;
+# PRINTF                - full printf support;
+# PRINTF_MINIMAL        - printf support without the following;
+# PRINTF_FLOAT          - to control float support if printf is enabled;
+# PRINTF_EXPONENTIAL    - to control exponential support if printf is enabled;
+# PRINTF_LONG_LONG      - to control long long support if printf is enabled;
+# PRINTF_PTRDIFF_T      - to control ptrdiff_t support if printf is enabled;
+# FLOAT                 - support for single-precision floating point;
+# DOUBLE                - support for double-precision floating point;
+# FPGA_CHECK            - checks for FPGA which allows Raspberry Pi to run your binary on FPGA;
+# PANIC                 - default panic impl which brings in stdio;
+# AUTO_INIT_MUTEX       - auto init mutexes, without this you get no printf mutex either;
 function(pico_minimize_runtime TARGET)
     set(ALL_ITEMS
             DEFAULT_ALARM_POOL

@@ -22,8 +22,6 @@ import re
 import csv
 import logging
 
-from collections import defaultdict
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -41,6 +39,7 @@ all_functions = {}
 for dirpath, dirnames, filenames in os.walk(scandir):
     # dirnames[:] = [d for d in dirnames if d != "lib"]
     for filename in filenames:
+        group = os.path.basename(dirpath)
         file_ext = os.path.splitext(filename)[1]
         if filename == 'CMakeLists.txt' or file_ext == '.cmake':
             file_path = os.path.join(dirpath, filename)
@@ -51,20 +50,18 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     name = match.group(4)
                     signature = match.group(1).strip()
                     description = match.group(2)
-                    description = description.replace('\n#\n', '\n\n').strip()
+                    description = description.strip('#').strip('\n')
+                    description = description.replace('\n#\n', ';').strip()
                     description = description.replace('\n#', '').strip()
                     description = description.replace('#', '').strip()
                     if signature.startswith(name):
-                        all_functions[name] = (signature, description)
-
-
-print(all_functions)
+                        all_functions[name] = (signature, description, group)
 
 
 with open(outfile, 'w', newline='') as csvfile:
-    fieldnames = ('name', 'signature', 'description')
+    fieldnames = ('name', 'signature', 'description', 'group')
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', dialect='excel-tab')
 
     writer.writeheader()
-    for name, (signature, description) in sorted(all_functions.items()):
-        writer.writerow({'name': name, 'signature': signature, 'description': description})
+    for name, (signature, description, group) in sorted(all_functions.items(), key=lambda x: all_functions[x[0]][2]):
+        writer.writerow({'name': name, 'signature': signature, 'description': description, 'group': group})
