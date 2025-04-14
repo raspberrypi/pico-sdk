@@ -30,6 +30,7 @@ outfile = sys.argv[2] if len(sys.argv) > 2 else 'pico_cmake_functions.tsv'
 
 CMAKE_FUNCTION_RE = re.compile(r'^#(.*)((\n\s*#.*)*)\nfunction\(([^\s]*)', re.MULTILINE)
 
+CMAKE_PICO_FUNCTIONS_RE = re.compile(r'^\s*function\((pico_[^\s]*)', re.MULTILINE)
 
 all_functions = {}
 
@@ -37,7 +38,6 @@ all_functions = {}
 # Scan all CMakeLists.txt and .cmake files in the specific path, recursively.
 
 for dirpath, dirnames, filenames in os.walk(scandir):
-    # dirnames[:] = [d for d in dirnames if d != "lib"]
     for filename in filenames:
         group = os.path.basename(dirpath)
         file_ext = os.path.splitext(filename)[1]
@@ -50,12 +50,14 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     name = match.group(4)
                     signature = match.group(1).strip()
                     description = match.group(2)
-                    description = description.strip('#').strip('\n')
-                    description = description.replace('\n#\n', ';').strip()
-                    description = description.replace('\n#', '').strip()
                     description = description.replace('#', '').strip()
                     if signature.startswith(name):
                         all_functions[name] = (signature, description, group)
+
+                for match in CMAKE_PICO_FUNCTIONS_RE.finditer(text):
+                    name = match.group(1)
+                    if name not in all_functions:
+                        print(f"Warning: {name} function has no description")
 
 
 with open(outfile, 'w', newline='') as csvfile:
