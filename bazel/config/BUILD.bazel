@@ -300,18 +300,20 @@ label_flag(
     name = "PICO_MBEDTLS_CONFIG",
     build_setting_default = "//bazel:empty_cc_lib",
 )
+
 # PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_OPT_ARGS, Makes the opt compilation mode a no-op so custom optimization arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
 bool_flag(
     name = "PICO_COMPILATION_NO_OPT_ARGS",
     build_setting_default = False,
 )
-# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_DEBUG_ARGS, Makes the debug compilation mode a no-op so custom optimization arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
+
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_DEBUG_ARGS, Makes the debug compilation mode a no-op so custom debug arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
 bool_flag(
     name = "PICO_COMPILATION_NO_DEBUG_ARGS",
     build_setting_default = False,
 )
 
-# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_FASTBUILD_ARGS, Makes the fastbuild compilation mode a no-op so custom optimization arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_FASTBUILD_ARGS, Makes the fastbuild compilation mode a no-op so custom fastbuild arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
 bool_flag(
     name = "PICO_COMPILATION_NO_FASTBUILD_ARGS",
     build_setting_default = False,
