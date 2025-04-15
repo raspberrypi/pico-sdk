@@ -51,18 +51,12 @@
  *
  * This library enables you to make use of the LwIP HTTP client and server library
  *
- * \par LwIP HTTP server
- *
  * To make use of the LwIP HTTP server you need to provide the HTML that the server will return to the client.
  * This is done by compiling the content directly into the executable.
- *
- * \par makefsdata
  *
  * LwIP provides a c-library tool `makefsdata` to compile your HTML into a source file for inclusion into your program.
  * This is quite hard to use as you need to compile the tool as a native binary, then run the tool to generate a source file
  * before compiling your code for the Pico device.
- *
- * \par pico_set_lwip_httpd_content
  *
  * To make this whole process easier, a python script `makefsdata.py` is provided to generate a source file for your HTML content.
  * A CMake function `pico_set_lwip_httpd_content` takes care of running the `makefsdata.py` python script for you.
