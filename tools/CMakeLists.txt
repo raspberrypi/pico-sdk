@@ -235,7 +235,7 @@ endfunction()
 # used with a no_flash binary to write the UF2 to flash when dragging &
 # dropping, and it will be copied to SRAM by the bootrom before execution.
 #
-# This sets PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR.
+# This sets the target property PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR.
 function(pico_package_uf2_output TARGET PACKADDR)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -246,7 +246,7 @@ endfunction()
 # pico_set_otp_key_output_file(TARGET OTPFILE)
 # Output the public key hash and other necessary rows to an otp JSON file.
 #
-# This sets PICOTOOL_OTP_FILE to OTPFILE.
+# This sets the target property PICOTOOL_OTP_FILE to OTPFILE.
 function(pico_set_otp_key_output_file TARGET OTPFILE)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -258,7 +258,7 @@ endfunction()
 # Adds an entry to the load map to instruct the bootrom to clear all of SRAM
 # before loading the binary.
 #
-# This appends the `--clear` argument to PICOTOOL_EXTRA_PROCESS_ARGS.
+# This appends the `--clear` argument to the target property PICOTOOL_EXTRA_PROCESS_ARGS.
 function(pico_load_map_clear_sram TARGET)
     picotool_check_configurable(${TARGET})
     # get and set, to inherit list
@@ -276,7 +276,7 @@ endfunction()
 # Adds a version item to the metadata block, with the given major, minor and
 # rollback version, along with the rollback rows.
 #
-# These are appended as arguments to PICOTOOL_EXTRA_PROCESS_ARGS if setting the
+# These are appended as arguments to the target property PICOTOOL_EXTRA_PROCESS_ARGS if setting the
 # rollback version, or set as compile definitions if only setting the major/minor
 # versions.
 function(pico_set_binary_version TARGET)
@@ -329,7 +329,7 @@ endfunction()
 # pico_set_uf2_family(TARGET FAMILY)
 # Set the UF2 family to use when creating the UF2.
 #
-# This sets PICOTOOL_UF2_FAMILY to FAMILY.
+# This sets the target property PICOTOOL_UF2_FAMILY to FAMILY.
 function(pico_set_uf2_family TARGET FAMILY)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -340,8 +340,9 @@ endfunction()
 # pico_sign_binary(TARGET [SIGFILE])
 # Sign the target binary with the given PEM signature.
 #
-# This sets PICOTOOL_SIGN_OUTPUT to true, PICOTOOL_SIGFILE to SIGFILE (if
-# specified), and PICOTOOL_OTP_FILE to ${TARGET}.otp.json (if not already set).
+# This sets the target properties PICOTOOL_SIGN_OUTPUT to true,
+# PICOTOOL_SIGFILE to SIGFILE (if specified), and PICOTOOL_OTP_FILE to
+# ${TARGET}.otp.json (if not already set).
 #
 # To specify a common SIGFILE for multiple targets, the SIGFILE property can be
 # set for a given scope, and then the SIGFILE argument is optional.
@@ -372,7 +373,7 @@ endfunction()
 # pico_hash_binary(TARGET)
 # Hash the target binary.
 #
-# This sets PICOTOOL_HASH_OUTPUT to true.
+# This sets the target property PICOTOOL_HASH_OUTPUT to true.
 function(pico_hash_binary TARGET)
     picotool_check_configurable(${TARGET})
     # Enforce hashing through target properties
@@ -385,7 +386,7 @@ endfunction()
 # Create the specified partition table from JSON, and embed it in the
 # block loop.
 #
-# This sets PICOTOOL_EMBED_PT to PTFILE.
+# This sets the target property PICOTOOL_EMBED_PT to PTFILE.
 function(pico_embed_pt_in_binary TARGET PTFILE)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -396,8 +397,8 @@ endfunction()
 # pico_encrypt_binary(TARGET AESFILE [SIGFILE])
 # Encrypt the target binary with the given AES key (should be a binary
 # file containing 32 bytes of a random key), and sign the encrypted binary.
-# This sets PICOTOOL_AESFILE to AESFILE, and PICOTOOL_ENC_SIGFILE to SIGFILE
-# if present, else PICOTOOL_SIGFILE.
+# This sets the target properties PICOTOOL_AESFILE to AESFILE,
+# and PICOTOOL_ENC_SIGFILE to SIGFILE if present, else PICOTOOL_SIGFILE.
 function(pico_encrypt_binary TARGET AESFILE)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
