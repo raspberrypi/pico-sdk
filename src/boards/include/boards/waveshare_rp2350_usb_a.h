@@ -17,6 +17,11 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 // For board detection
 #define WAVESHARE_RP2350_USB_A
 
+// On some samples, the xosc can take longer to stabilize than is usual
+#ifndef PICO_XOSC_STARTUP_DELAY_MULTIPLIER
+#define PICO_XOSC_STARTUP_DELAY_MULTIPLIER 64
+#endif
+
 // --- RP2350 VARIANT ---
 #define PICO_RP2350A 1
 
