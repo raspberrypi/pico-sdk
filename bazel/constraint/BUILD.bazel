@@ -271,5 +271,5 @@ config_setting(
 
 config_setting(
     name = "pico_compilation_no_fastbuild_args_set",
-    flag_values = {"//bazel/config:PICO_COMPILATION_NO_FASBUILD_ARGS": "True"},
+    flag_values = {"//bazel/config:PICO_COMPILATION_NO_FASTBUILD_ARGS": "True"},
 )
