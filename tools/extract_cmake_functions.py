@@ -142,7 +142,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     signature = match.group(1).strip()
                     if signature.startswith(name):
                         description, brief, params = process_commands(match.group(2).replace('#', ''), name, group, signature)
-                        all_functions[name] = {
+                        new_dict = {
                             'name': name,
                             'group': group,
                             'signature': signature,
@@ -150,6 +150,10 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                             'description': description,
                             'params': params
                         }
+                        if all_functions.get(name):
+                            if new_dict != all_functions[name]:
+                                logger.warning("{}:{} has multiple different definitions - using the new one from {}".format(group, name, file_path))
+                        all_functions[name] = new_dict
 
                 for match in CMAKE_PICO_FUNCTIONS_RE.finditer(text):
                     name = match.group(1)
