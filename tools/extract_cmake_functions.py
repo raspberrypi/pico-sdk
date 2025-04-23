@@ -56,6 +56,49 @@ allowed_missing_functions = set([
 
 all_functions = {}
 
+# Supported commands:
+# \brief\ <brief description, which should be included in the main description>
+# \brief_nodesc\ <brief description, which should be excluded from the main description>
+# \param\ <parameter_name> <parameter description>
+#
+# Commands in the middle of a line are not supported
+def process_commands(description, name, group, signature):
+    brief = ''
+    params = []
+    ret = ''
+    for line in description.split('\n'):
+        line = line.strip()
+        if line.startswith('\\'):
+            command = line.split('\\')[1]
+            if command == 'param':
+                # Parameter name and description
+                params.append(line.split('\\')[2].strip())
+            elif command == 'brief':
+                # Brief description
+                brief = line.split('\\')[2].strip()
+                ret += brief + '\n'
+            elif command == 'brief_nodesc':
+                # Brief description which should not be included in the main description
+                brief = line.split('\\')[2].strip()
+            else:
+                logger.error("{}:{} has unknown command: {}".format(group, name, command))
+        elif '\\' in line:
+            logger.error("{}:{} has a line containing '\\': {}".format(group, name, line))
+        else:
+            ret += line + '\n'
+    # Check that there are no semicolons in the parameter descriptions, as that's the delimiter for the parameter list
+    if any([';' in x for x in params]):
+        logger.error("{}:{} has a parameter description containing ';'".format(group, name))
+    # Check that all parameters are in the signature
+    for param in params:
+        if param.split(' ')[0] not in signature:
+            logger.error("{}:{} has a parameter {} which is not in the signature {}".format(group, name, param.split(' ')[0], signature))
+    # Check that the brief description is not empty
+    if not brief:
+        logger.warning("{}:{} has no brief description".format(group, name))
+
+    return ret.strip(), brief, ';'.join(params)
+
 
 # Scan all CMakeLists.txt and .cmake files in the specific path, recursively.
 
@@ -75,10 +118,9 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                 for match in CMAKE_FUNCTION_RE.finditer(text):
                     name = match.group(4)
                     signature = match.group(1).strip()
-                    description = match.group(2)
-                    description = description.replace('#', '').strip()
                     if signature.startswith(name):
-                        all_functions[name] = (signature, description, group)
+                        description, brief, params = process_commands(match.group(2).replace('#', ''), name, group, signature)
+                        all_functions[name] = (group, signature, brief, description, params)
 
                 for match in CMAKE_PICO_FUNCTIONS_RE.finditer(text):
                     name = match.group(1)
@@ -87,9 +129,9 @@ for dirpath, dirnames, filenames in os.walk(scandir):
 
 
 with open(outfile, 'w', newline='') as csvfile:
-    fieldnames = ('name', 'signature', 'description', 'group')
+    fieldnames = ('name', 'group', 'signature', 'brief', 'description', 'params')
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', dialect='excel-tab')
 
     writer.writeheader()
-    for name, (signature, description, group) in sorted(all_functions.items(), key=lambda x: all_functions[x[0]][2]):
-        writer.writerow({'name': name, 'signature': signature, 'description': description, 'group': group})
+    for name, (group, signature, brief, description, params) in sorted(all_functions.items(), key=lambda x: x[1][0]):
+        writer.writerow({'name': name, 'group': group, 'signature': signature, 'brief': brief, 'description': description, 'params': params})

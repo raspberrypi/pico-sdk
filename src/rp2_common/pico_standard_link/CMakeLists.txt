@@ -6,7 +6,9 @@ if (NOT TARGET pico_standard_link)
     endif()
 
     # pico_add_link_depend(TARGET dependency)
-    # Add a link time dependency to the target
+    # \brief\ Add a link time dependency to the target
+    #
+    # \param\ dependency The dependency to add
     function(pico_add_link_depend TARGET dependency)
         get_target_property(target_type ${TARGET} TYPE)
         if (${target_type} STREQUAL "INTERFACE_LIBRARY")
@@ -24,13 +26,17 @@ if (NOT TARGET pico_standard_link)
     endfunction()
 
     # pico_set_linker_script(TARGET LDSCRIPT)
-    # Set the linker script for the target
+    # \brief\ Set the linker script for the target
+    #
+    # \param\ LDSCRIPT Full path to the linker script to set
     function(pico_set_linker_script TARGET LDSCRIPT)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_LINKER_SCRIPT ${LDSCRIPT})
     endfunction()
 
     # pico_set_binary_type(TARGET TYPE)
-    # Set the binary type for the target
+    # \brief\ Set the binary type for the target
+    #
+    # \param\ TYPE The binary type to set
     function(pico_set_binary_type TARGET TYPE)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()

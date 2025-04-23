@@ -132,7 +132,8 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     endif()
 
     # pico_configure_ip4_address(TARGET_LIB TARGET_TYPE DEF_NAME IP_ADDRESS_STR)
-    # Set an ip address in a compile definition;
+    # \brief\ Set an ip address in a compile definition
+    #
     # This can be used to set the following compile definitions;
     # CYW43_DEFAULT_IP_STA_ADDRESS;
     # CYW43_DEFAULT_IP_STA_GATEWAY;
@@ -141,6 +142,11 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     # CYW43_DEFAULT_IP_MASK;
     # CYW43_DEFAULT_IP_DNS;
     # e.g. pico_configure_ip4_address(picow_tcpip_server_background PRIVATE CYW43_DEFAULT_IP_STA_ADDRESS "10.3.15.204")
+    #
+    # \param\ TARGET_LIB The target library to set the ip address for
+    # \param\ TARGET_TYPE The type of target library
+    # \param\ DEF_NAME The name of the compile definition to set
+    # \param\ IP_ADDRESS_STR The ip address to set
     function(pico_configure_ip4_address TARGET_LIB TARGET_TYPE DEF_NAME IP_ADDRESS_STR)
             string(REGEX MATCHALL "[0-9]+" IP_ADDRESS_LIST ${IP_ADDRESS_STR})
             list(LENGTH IP_ADDRESS_LIST IP_ADDRESS_COMPONENT_COUNT)

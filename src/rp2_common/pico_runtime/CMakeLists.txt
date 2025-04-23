@@ -51,7 +51,8 @@ elseif (PICO_C_COMPILER_IS_CLANG)
    # target_link_options(pico_runtime INTERFACE "-nostdlib")
 endif()
 
-# pico_minimize_runtime([INCLUDE ...] [EXCLUDE ...])
+# pico_minimize_runtime(TARGET [INCLUDE ...] [EXCLUDE ...])
+# \brief\ Minimize the runtime components for the target
 #
 # INCLUDE/EXCLUDE can contain any of the following (all defaulting to not included)
 #
@@ -67,6 +68,9 @@ endif()
 # FPGA_CHECK            - checks for FPGA which allows Raspberry Pi to run your binary on FPGA;
 # PANIC                 - default panic impl which brings in stdio;
 # AUTO_INIT_MUTEX       - auto init mutexes, without this you get no printf mutex either;
+#
+# \param\ INCLUDE The items to include
+# \param\ EXCLUDE The items to exclude
 function(pico_minimize_runtime TARGET)
     set(ALL_ITEMS
             DEFAULT_ALARM_POOL
