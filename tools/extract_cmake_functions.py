@@ -104,8 +104,8 @@ def process_commands(description, name, group, signature):
 
 
 def sort_functions(item):
-    group = item[1]['group']
-    name = item[1]['name']
+    group = item['group']
+    name = item['name']
 
     precedence = 5
     if group == 'other':
@@ -166,5 +166,5 @@ with open(outfile, 'w', newline='') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', dialect='excel-tab')
 
     writer.writeheader()
-    for name, row in sorted(all_functions.items(), key=sort_functions):
+    for row in sorted(all_functions.values(), key=sort_functions):
         writer.writerow(row)
