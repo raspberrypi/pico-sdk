@@ -306,7 +306,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     # \brief\ Make a GATT header file from a BTstack GATT file.
     #
     # Pass the target library name, library type, and path to the GATT input file.
-    # To add additional directories to the gatt #import path, add them to the end of the argument list.
+    # To add additional directories to the gatt import path, add them to the end of the argument list.
     #
     # \param\ TARGET_LIB The target library name
     # \param\ TARGET_TYPE The target library type
