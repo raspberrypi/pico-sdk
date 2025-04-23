@@ -7,7 +7,7 @@
 #
 # Script to scan the Raspberry Pi Pico SDK tree searching for CMake functions
 # Outputs a tab separated file of the function:
-# name	signature	description	group
+# name	group	signature	brief	description	params
 #
 # Usage:
 #
@@ -62,10 +62,13 @@ all_functions = {}
 # \param\ <parameter_name> <parameter description>
 #
 # Commands in the middle of a line are not supported
+#
+# The ; character at the end of a line denotes a hard line break in the description
+# The \ character (outside of a command) and the # character are not supported in descriptions
 def process_commands(description, name, group, signature):
     brief = ''
     params = []
-    ret = ''
+    desc = ''
     for line in description.split('\n'):
         line = line.strip()
         if line.startswith('\\'):
@@ -76,7 +79,7 @@ def process_commands(description, name, group, signature):
             elif command == 'brief':
                 # Brief description
                 brief = line.split('\\')[2].strip()
-                ret += brief + '\n'
+                desc += brief + '\\n'
             elif command == 'brief_nodesc':
                 # Brief description which should not be included in the main description
                 brief = line.split('\\')[2].strip()
@@ -85,7 +88,7 @@ def process_commands(description, name, group, signature):
         elif '\\' in line:
             logger.error("{}:{} has a line containing '\\': {}".format(group, name, line))
         else:
-            ret += line + '\n'
+            desc += line + '\\n'
     # Check that there are no semicolons in the parameter descriptions, as that's the delimiter for the parameter list
     if any([';' in x for x in params]):
         logger.error("{}:{} has a parameter description containing ';'".format(group, name))
@@ -97,7 +100,24 @@ def process_commands(description, name, group, signature):
     if not brief:
         logger.warning("{}:{} has no brief description".format(group, name))
 
-    return ret.strip(), brief, ';'.join(params)
+    return desc.strip(), brief, ';'.join(params)
+
+
+def sort_functions(item):
+    group = item[1]['group']
+    name = item[1]['name']
+
+    precedence = 5
+    if group == 'other':
+        if name == 'pico_generate_pio_header':
+            precedence = 0
+        elif re.match(r'^pico_add_.*_output$', name):
+            precedence = 1
+        elif name == 'pico_add_extra_outputs':
+            precedence = 2
+        elif re.match(r'^pico_.*_binary$', name):
+            precedence = 3
+    return group + str(precedence) + name
 
 
 # Scan all CMakeLists.txt and .cmake files in the specific path, recursively.
@@ -109,6 +129,8 @@ for dirpath, dirnames, filenames in os.walk(scandir):
         group = os.path.basename(dirpath)
         if group in skip_groups:
             continue
+        if group in ['tools', 'cmake']:
+            group = 'other'
         file_ext = os.path.splitext(filename)[1]
         if filename == 'CMakeLists.txt' or file_ext == '.cmake':
             file_path = os.path.join(dirpath, filename)
@@ -120,7 +142,14 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     signature = match.group(1).strip()
                     if signature.startswith(name):
                         description, brief, params = process_commands(match.group(2).replace('#', ''), name, group, signature)
-                        all_functions[name] = (group, signature, brief, description, params)
+                        all_functions[name] = {
+                            'name': name,
+                            'group': group,
+                            'signature': signature,
+                            'brief': brief,
+                            'description': description,
+                            'params': params
+                        }
 
                 for match in CMAKE_PICO_FUNCTIONS_RE.finditer(text):
                     name = match.group(1)
@@ -133,5 +162,5 @@ with open(outfile, 'w', newline='') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', dialect='excel-tab')
 
     writer.writeheader()
-    for name, (group, signature, brief, description, params) in sorted(all_functions.items(), key=lambda x: x[1][0]):
-        writer.writerow({'name': name, 'group': group, 'signature': signature, 'brief': brief, 'description': description, 'params': params})
+    for name, row in sorted(all_functions.items(), key=sort_functions):
+        writer.writerow(row)
