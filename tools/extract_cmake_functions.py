@@ -72,17 +72,18 @@ def process_commands(description, name, group, signature):
     for line in description.split('\n'):
         line = line.strip()
         if line.startswith('\\'):
-            command = line.split('\\')[1]
+            _, command, remainder = line.split('\\', 2)
+            remainder = remainder.strip()
             if command == 'param':
                 # Parameter name and description
-                params.append(line.split('\\')[2].strip())
+                params.append(remainder)
             elif command == 'brief':
                 # Brief description
-                brief = line.split('\\')[2].strip()
+                brief = remainder
                 desc += brief + '\\n'
             elif command == 'brief_nodesc':
                 # Brief description which should not be included in the main description
-                brief = line.split('\\')[2].strip()
+                brief = remainder
             else:
                 logger.error("{}:{} has unknown command: {}".format(group, name, command))
         elif '\\' in line:
@@ -100,6 +101,7 @@ def process_commands(description, name, group, signature):
     if not brief:
         logger.warning("{}:{} has no brief description".format(group, name))
 
+    desc = re.sub(r'^(\\n)*(.*?)(\\n)*$', r'\2', desc)
     return desc.strip(), brief, ';'.join(params)
 
 
