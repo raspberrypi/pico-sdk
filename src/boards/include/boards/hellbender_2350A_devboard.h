@@ -22,16 +22,17 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define HB_2350A_IMU_INT_PIN 1
 #define HB_2350A_USER_QWIIC_SDA_PIN 2
 #define HB_2350A_USER_QWIIC_SCL_PIN 3
-#define HB_2350A_RTC_INT_PIN 8
+#define HB_2350A_RTC_INT_PIN 22
 #define HB_2350A_SDCARD_CS_PIN 9
 #define HB_2350A_LORA_IO1_PIN 10
 #define HB_2350A_LORA_IO3_PIN 11
-#define HB_2350A_LORA_CS_PIN 21
+#define HB_2350A_LORA_CS_PIN 28
+#define HB_2350A_LORA_BUSY_PIN 24
+#define HB_2350A_LORA_RESET_PIN 29
 #define HB_2350A_RTC_CLKIN_PIN 22
 #define HB_2350A_IMU_CLKOUT_PIN 23
-#define HB_2350A_LORA_BUSY_PIN 24
-#define HB_2350A_FUSB307_INT_PIN 25
-#define HB_2350A_LORA_RESET_PIN 29
+#define HB_2350A_FUSB307_INT_PIN 21
+#define HB_2350A_BQ25792_INT_PIN 8
 
 // --- UART ---
 // Note, conflicts with HSTX range
@@ -45,7 +46,11 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_DEFAULT_UART_RX_PIN 13
 #endif
 
-// no PICO_DEFAULT_LED_PIN
+// --- LED ---
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN 25
+#endif
+
 // no PICO_DEFAULT_WS2812_PIN
 
 // --- I2C ---
@@ -73,7 +78,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_DEFAULT_SPI_RX_PIN 20
 #endif
 #ifndef PICO_DEFAULT_SPI_CSN_PIN
-#define PICO_DEFAULT_SPI_CSN_PIN 21
+#define PICO_DEFAULT_SPI_CSN_PIN 28
 #endif
 
 // --- FLASH ---
