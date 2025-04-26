@@ -649,7 +649,7 @@ regular_func double2fix_z
   lsrs r3, #21
   // adjust
   adds r3, r2
-  ble 2f // adjusted input is zero or dedornmal or < 1
+  ble 2f // adjusted input is zero or denormal or < 1
   lsrs r3, r3, #11
   bne 3f // adjusted input is > infinite
 
