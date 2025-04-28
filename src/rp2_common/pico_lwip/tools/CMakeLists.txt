@@ -1,4 +1,5 @@
 # pico_set_lwip_httpd_content(TARGET_LIB TARGET_TYPE HTTPD_FILES...)
+# \ingroup\ pico_lwip
 # \brief_nodesc\ Compile the http content into a source file for lwip.
 #
 # Compile the http content into a source file "pico_fsdata.inc" in a format suitable for the lwip httpd server.

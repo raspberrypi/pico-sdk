@@ -176,6 +176,7 @@ function(picotool_check_default_keys TARGET)
 endfunction()
 
 # pico_generate_pio_header(TARGET PIO_FILES... [OUTPUT_FORMAT <format>] [OUTPUT_DIR <dir>])
+# \ingroup\ pico_pio
 # \brief\ Generate pio header and include it in the build
 #
 # \param\ PIO_FILES The PIO files to generate the header for

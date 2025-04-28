@@ -6,7 +6,7 @@
 #
 #
 # Script to scan the Raspberry Pi Pico SDK tree searching for CMake functions
-# Outputs a tab separated file of the function:
+# Outputs a tab separated file of the functions:
 # name	group	signature	brief	description	params
 #
 # Usage:
@@ -54,12 +54,38 @@ allowed_missing_functions = set([
     "pico_expand_pico_platform",
 ])
 
+# Group descriptions
+group_names_descriptions = {
+    'boot_stage2': ('Boot Stage 2', 'CMake functions to create stage 2 bootloaders'),
+    'pico_binary_info': ('Pico Binary Info', 'CMake functions to add binary info to the output binary'),
+    'pico_btstack': ('Pico BTstack', 'CMake functions to configure the bluetooth stack'),
+    'pico_lwip': ('Pico LwIP', 'CMake functions to configure LwIP'),
+    'pico_cyw43_driver': ('Pico CYW43 Driver', 'CMake functions to configure the CYW43 driver'),
+    'pico_runtime': ('Pico Runtime', 'CMake functions to configure the runtime environment'),
+    'pico_standard_link': ('Pico Standard Link', 'CMake functions to configure the linker'),
+    'pico_stdio': ('Pico Standard I/O', 'CMake functions to configure the standard I/O library'),
+    'pico_pio': ('Pico PIO', 'CMake functions to generate PIO headers'),
+    'other': ('Other', 'Other CMake functions'),
+}
+
+
 all_functions = {}
+
+for group, (brief, description) in group_names_descriptions.items():
+    all_functions['_desc_{group}'.format(group=group)] = {
+        'name': '_desc_{group}'.format(group=group),
+        'group': group,
+        'signature': '',
+        'brief': brief,
+        'description': description,
+        'params': '',
+    }
 
 # Supported commands:
 # \brief\ <brief description, which should be included in the main description>
 # \brief_nodesc\ <brief description, which should be excluded from the main description>
 # \param\ <parameter_name> <parameter description>
+# \ingroup\ <group_name>
 #
 # Commands in the middle of a line are not supported
 #
@@ -84,6 +110,9 @@ def process_commands(description, name, group, signature):
             elif command == 'brief_nodesc':
                 # Brief description which should not be included in the main description
                 brief = remainder
+            elif command == 'ingroup':
+                # Group name override
+                group = remainder
             else:
                 logger.error("{}:{} has unknown command: {}".format(group, name, command))
         elif '\\' in line:
@@ -102,9 +131,12 @@ def process_commands(description, name, group, signature):
     # Check that the brief description is not empty
     if not brief:
         logger.warning("{}:{} has no brief description".format(group, name))
+    # Check that the group has a description
+    if group not in group_names_descriptions:
+        logger.error("{} has no group description (referenced from {})".format(group, name))
 
     desc = re.sub(r'^(\\n)*(.*?)(\\n)*$', r'\2', desc)
-    return desc.strip(), brief, ';'.join(params)
+    return desc.strip(), brief, ';'.join(params), group
 
 
 def sort_functions(item):
@@ -112,10 +144,10 @@ def sort_functions(item):
     name = item['name']
 
     precedence = 5
-    if group == 'other':
-        if name == 'pico_generate_pio_header':
-            precedence = 0
-        elif re.match(r'^pico_add_.*_output$', name):
+    if name.startswith('_desc_'):
+        precedence = 0
+    elif group == 'other':
+        if re.match(r'^pico_add_.*_output$', name):
             precedence = 1
         elif name == 'pico_add_extra_outputs':
             precedence = 2
@@ -130,6 +162,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
     for filename in filenames:
         if filename in skip_files:
             continue
+        # Default group is the directory name - can be overridden by the \ingroup\ command
         group = os.path.basename(dirpath)
         if group in skip_groups:
             continue
@@ -145,10 +178,10 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     name = match.group(4)
                     signature = match.group(1).strip()
                     if signature.startswith(name):
-                        description, brief, params = process_commands(match.group(2).replace('#', ''), name, group, signature)
+                        description, brief, params, processed_group = process_commands(match.group(2).replace('#', ''), name, group, signature)
                         new_dict = {
                             'name': name,
-                            'group': group,
+                            'group': processed_group,
                             'signature': signature,
                             'brief': brief,
                             'description': description,
@@ -156,7 +189,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                         }
                         if all_functions.get(name):
                             if new_dict != all_functions[name]:
-                                logger.warning("{}:{} has multiple different definitions - using the new one from {}".format(group, name, file_path))
+                                logger.warning("{}:{} has multiple different definitions - using the new one from {}".format(processed_group, name, file_path))
                         all_functions[name] = new_dict
 
                 for match in CMAKE_PICO_FUNCTIONS_RE.finditer(text):
