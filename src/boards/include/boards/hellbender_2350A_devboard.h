@@ -77,9 +77,8 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #ifndef PICO_DEFAULT_SPI_RX_PIN
 #define PICO_DEFAULT_SPI_RX_PIN 20
 #endif
-#ifndef PICO_DEFAULT_SPI_CSN_PIN
-#define PICO_DEFAULT_SPI_CSN_PIN 28
-#endif
+// multiple devices, so this doesn't make much sense
+// no PICO_DEFAULT_SPI_CSN_PIN
 
 // --- FLASH ---
 
