@@ -448,7 +448,8 @@ endfunction()
 # \brief_nodesc\ Encrypt the taget binary
 #
 # Encrypt the target binary with the given AES key (should be a binary
-# file containing 128 bytes of a random key), and sign the encrypted binary.
+# file containing 128 bytes of a random key share, or 32 bytes of a random key),
+# and sign the encrypted binary.
 #
 # Salts the public IV with the provided IVFILE (should be a binary file
 # containing 16 bytes of a random IV), to give the IV used by the encryption.
