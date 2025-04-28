@@ -94,9 +94,11 @@ def process_commands(description, name, group, signature):
     if any([';' in x for x in params]):
         logger.error("{}:{} has a parameter description containing ';'".format(group, name))
     # Check that all parameters are in the signature
+    signature_words = set(re.split('\W+', signature))
     for param in params:
-        if param.split(' ')[0] not in signature:
-            logger.error("{}:{} has a parameter {} which is not in the signature {}".format(group, name, param.split(' ')[0], signature))
+        param_name = param.split(' ', maxsplit=1)[0]
+        if param_name not in signature_words:
+            logger.error("{}:{} has a parameter {} which is not in the signature {}".format(group, name, param_name, signature))
     # Check that the brief description is not empty
     if not brief:
         logger.warning("{}:{} has no brief description".format(group, name))
