@@ -2,7 +2,7 @@
 # \brief_nodesc\ Compile the http content into a source file for lwip.
 #
 # Compile the http content into a source file "pico_fsdata.inc" in a format suitable for the lwip httpd server.
-# Pass the target library name library type and the list of httpd content files to compile.
+# Pass the target library name, library type, and the list of httpd content files to compile.
 #
 # \param\ TARGET_LIB The target library name
 # \param\ TARGET_TYPE The type of the target library
