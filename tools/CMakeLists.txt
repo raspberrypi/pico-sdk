@@ -283,7 +283,7 @@ function(pico_load_map_clear_sram TARGET)
     )
 endfunction()
 
-# pico_set_binary_version(<TARGET> [MAJOR <version>] [MINOR <version>] [ROLLBACK <version>] [ROWS <rows...>])
+# pico_set_binary_version(TARGET [MAJOR <version>] [MINOR <version>] [ROLLBACK <version>] [ROWS <rows...>])
 # \brief_nodesc\ Add a version item to the metadata block
 #
 # Adds a version item to the metadata block, with the given major, minor and
