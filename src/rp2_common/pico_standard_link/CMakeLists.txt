@@ -5,6 +5,10 @@ if (NOT TARGET pico_standard_link)
         target_link_libraries(pico_standard_link INTERFACE boot_stage2_headers)
     endif()
 
+    # pico_add_link_depend(TARGET dependency)
+    # \brief\ Add a link time dependency to the target
+    #
+    # \param\ dependency The dependency to add
     function(pico_add_link_depend TARGET dependency)
         get_target_property(target_type ${TARGET} TYPE)
         if (${target_type} STREQUAL "INTERFACE_LIBRARY")
@@ -21,11 +25,18 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES ${PROP} "${_LINK_DEPENDS}")
     endfunction()
 
-    # need this because cmake does not appear to have a way to override an INTERFACE variable
+    # pico_set_linker_script(TARGET LDSCRIPT)
+    # \brief\ Set the linker script for the target
+    #
+    # \param\ LDSCRIPT Full path to the linker script to set
     function(pico_set_linker_script TARGET LDSCRIPT)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_LINKER_SCRIPT ${LDSCRIPT})
     endfunction()
 
+    # pico_set_binary_type(TARGET TYPE)
+    # \brief\ Set the binary type for the target
+    #
+    # \param\ TYPE The binary type to set
     function(pico_set_binary_type TARGET TYPE)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()

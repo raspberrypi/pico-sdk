@@ -175,13 +175,19 @@ function(picotool_check_default_keys TARGET)
     picotool_compare_keys(${TARGET} ${picotool_enc_sigfile} private.pem "encrypted signing")
 endfunction()
 
-# Generate pio header and include it in the build
-# PICO_CMAKE_CONFIG: PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, Default output format used by pioasm when using pico_generate_pio_header, type=string, default=c-sdk, group=build
+# pico_generate_pio_header(TARGET PIO_FILES... [OUTPUT_FORMAT <format>] [OUTPUT_DIR <dir>])
+# \ingroup\ pico_pio
+# \brief\ Generate pio header and include it in the build
+#
+# \param\ PIO_FILES The PIO files to generate the header for
+# \param\ OUTPUT_FORMAT The output format to use for the pio header
+# \param\ OUTPUT_DIR The directory to output the pio header to
 function(pico_generate_pio_header TARGET)
     pico_init_pioasm()
     # Note that PATH is not a valid argument but was previously ignored (and happens to be passed by pico-extras)
     cmake_parse_arguments(pico_generate_pio_header "" "OUTPUT_FORMAT;OUTPUT_DIR;PATH" "" ${ARGN} )
 
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, Default output format used by pioasm when using pico_generate_pio_header, type=string, default=c-sdk, group=build
     if (pico_generate_pio_header_OUTPUT_FORMAT)
         set(OUTPUT_FORMAT "${pico_generate_pio_header_OUTPUT_FORMAT}")
     elseif(DEFINED PICO_DEFAULT_PIOASM_OUTPUT_FORMAT)
@@ -230,10 +236,13 @@ function(pico_generate_pio_header TARGET)
 endfunction()
 
 # pico_package_uf2_output(TARGET PACKADDR)
-# Package a UF2 output to be written to the PACKADDR address. This can be
-# used with a no_flash binary to write the UF2 to flash when dragging &
+# \brief\ Package a UF2 output to be written to the PACKADDR address.
+# This can be used with a no_flash binary to write the UF2 to flash when dragging &
 # dropping, and it will be copied to SRAM by the bootrom before execution.
-# This sets PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR.
+#
+# This sets the target property PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR.
+#
+# \param\ PACKADDR The address to package the UF2 to
 function(pico_package_uf2_output TARGET PACKADDR)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -242,8 +251,11 @@ function(pico_package_uf2_output TARGET PACKADDR)
 endfunction()
 
 # pico_set_otp_key_output_file(TARGET OTPFILE)
-# Output the public key hash and other necessary rows to an otp JSON file.
-# This sets PICOTOOL_OTP_FILE to OTPFILE.
+# \brief\ Output the public key hash and other necessary rows to an otp JSON file.
+#
+# This sets the target property PICOTOOL_OTP_FILE to OTPFILE.
+#
+# \param\ OTPFILE The OTP file to output the public key hash and other necessary rows to
 function(pico_set_otp_key_output_file TARGET OTPFILE)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -252,9 +264,12 @@ function(pico_set_otp_key_output_file TARGET OTPFILE)
 endfunction()
 
 # pico_load_map_clear_sram(TARGET)
+# \brief_nodesc\ Adds a load map entry to clear all of SRAM
+#
 # Adds an entry to the load map to instruct the bootrom to clear all of SRAM
-# before loading the binary. This appends the `--clear` argument
-# to PICOTOOL_EXTRA_PROCESS_ARGS.
+# before loading the binary.
+#
+# This appends the `--clear` argument to the target property PICOTOOL_EXTRA_PROCESS_ARGS.
 function(pico_load_map_clear_sram TARGET)
     picotool_check_configurable(${TARGET})
     # get and set, to inherit list
@@ -268,11 +283,20 @@ function(pico_load_map_clear_sram TARGET)
     )
 endfunction()
 
-# pico_set_binary_version(<TARGET> [MAJOR <version>] [MINOR <version>] [ROLLBACK <version>] [ROLLBACK_ROWS <rows...>])
+# pico_set_binary_version(TARGET [MAJOR <version>] [MINOR <version>] [ROLLBACK <version>] [ROWS <rows...>])
+# \brief_nodesc\ Add a version item to the metadata block
+#
 # Adds a version item to the metadata block, with the given major, minor and
-# rollback version, along with the rollback rows. These are appended as arguments
-# to PICOTOOL_EXTRA_PROCESS_ARGS if setting the rollback version, or set as compile
-# definitions if only setting the major/minor versions.
+# rollback version, along with the rollback rows.
+#
+# These are appended as arguments to the target property PICOTOOL_EXTRA_PROCESS_ARGS if setting the
+# rollback version, or set as compile definitions if only setting the major/minor
+# versions.
+#
+# \param\ MAJOR The major version to set
+# \param\ MINOR The minor version to set
+# \param\ ROLLBACK The rollback version to set
+# \param\ ROWS The OTP rows to use for the rollback version
 function(pico_set_binary_version TARGET)
     picotool_check_configurable(${TARGET})
     set(oneValueArgs MAJOR MINOR ROLLBACK)
@@ -321,8 +345,11 @@ function(pico_set_binary_version TARGET)
 endfunction()
 
 # pico_set_uf2_family(TARGET FAMILY)
-# Set the UF2 family to use when creating the UF2.
-# This sets PICOTOOL_UF2_FAMILY to FAMILY.
+# \brief\ Set the UF2 family to use when creating the UF2.
+#
+# This sets the target property PICOTOOL_UF2_FAMILY to FAMILY.
+#
+# \param\ FAMILY The UF2 family to use
 function(pico_set_uf2_family TARGET FAMILY)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -331,11 +358,16 @@ function(pico_set_uf2_family TARGET FAMILY)
 endfunction()
 
 # pico_sign_binary(TARGET [SIGFILE])
-# Sign the target binary with the given PEM signature. This sets
-# PICOTOOL_SIGN_OUTPUT to true, PICOTOOL_SIGFILE to SIGFILE (if specified),
-# and PICOTOOL_OTP_FILE to ${TARGET}.otp.json (if not already set). To
-# specify a common SIGFILE for multiple targets, the SIGFILE property can be
+# \brief\ Sign the target binary with the given PEM signature.
+#
+# This sets the target properties PICOTOOL_SIGN_OUTPUT to true,
+# PICOTOOL_SIGFILE to SIGFILE (if specified), and PICOTOOL_OTP_FILE to
+# ${TARGET}.otp.json (if not already set).
+#
+# To specify a common SIGFILE for multiple targets, the SIGFILE property can be
 # set for a given scope, and then the SIGFILE argument is optional.
+#
+# \param\ SIGFILE The PEM signature file to use
 function(pico_sign_binary TARGET)
     picotool_check_configurable(${TARGET})
     # Enforce signing through target properties
@@ -361,7 +393,9 @@ function(pico_sign_binary TARGET)
 endfunction()
 
 # pico_hash_binary(TARGET)
-# Hash the target binary. This sets PICOTOOL_HASH_OUTPUT to true.
+# \brief\ Hash the target binary.
+#
+# This sets the target property PICOTOOL_HASH_OUTPUT to true.
 function(pico_hash_binary TARGET)
     picotool_check_configurable(${TARGET})
     # Enforce hashing through target properties
@@ -371,8 +405,14 @@ function(pico_hash_binary TARGET)
 endfunction()
 
 # pico_embed_pt_in_binary(TARGET PTFILE)
+# \brief_nodesc\ Embed a partition table in the binary
+#
 # Create the specified partition table from JSON, and embed it in the
-# block loop. This sets PICOTOOL_EMBED_PT to PTFILE.
+# block loop.
+#
+# This sets the target property PICOTOOL_EMBED_PT to PTFILE.
+#
+# \param\ PTFILE The partition table JSON file to use
 function(pico_embed_pt_in_binary TARGET PTFILE)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -381,10 +421,16 @@ function(pico_embed_pt_in_binary TARGET PTFILE)
 endfunction()
 
 # pico_encrypt_binary(TARGET AESFILE [SIGFILE])
+# \brief_nodesc\ Encrypt the taget binary
+#
 # Encrypt the target binary with the given AES key (should be a binary
 # file containing 32 bytes of a random key), and sign the encrypted binary.
-# This sets PICOTOOL_AESFILE to AESFILE, and PICOTOOL_ENC_SIGFILE to SIGFILE
-# if present, else PICOTOOL_SIGFILE.
+#
+# This sets the target properties PICOTOOL_AESFILE to AESFILE,
+# and PICOTOOL_ENC_SIGFILE to SIGFILE if present, else PICOTOOL_SIGFILE.
+#
+# \param\ AESFILE The AES key file to use
+# \param\ SIGFILE The PEM signature file to use
 function(pico_encrypt_binary TARGET AESFILE)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -410,6 +456,8 @@ function(pico_encrypt_binary TARGET AESFILE)
 endfunction()
 
 # pico_add_uf2_output(TARGET)
+# \brief_nodesc\ Add a UF2 output using picotool
+#
 # Add a UF2 output using picotool - must be called after
 # all required properties have been set
 function(pico_add_uf2_output TARGET)
