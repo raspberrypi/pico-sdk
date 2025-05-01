@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
       - name: Checkout submodules
-        run: git submodule update --init --recursive
+        run: git submodule update --init
       - name: Install dependencies
         run: |
           brew install cmake
