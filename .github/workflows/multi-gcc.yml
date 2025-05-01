@@ -23,7 +23,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Checkout submodules
-      run: git submodule update --init --recursive
+      run: git submodule update --init
 
     - name: Host Release
       run: cd ${{github.workspace}}; mkdir -p build; rm -rf build/*; cd build; cmake ../ -DPICO_SDK_TESTS_ENABLED=1 -DCMAKE_BUILD_TYPE=Release -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=host; make --output-sync=target --no-builtin-rules --no-builtin-variables -j$(nproc)
