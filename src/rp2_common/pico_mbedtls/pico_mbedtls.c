@@ -8,6 +8,13 @@
 #include "pico.h"
 #include "pico/rand.h"
 #include "mbedtls/sha256.h"
+#include "mbedtls/version.h"
+
+#if MBEDTLS_VERSION_MAJOR < 3
+#define mbedtls_sha256_starts mbedtls_sha256_starts_ret
+#define mbedtls_sha256_update mbedtls_sha256_update_ret
+#define mbedtls_sha256_finish mbedtls_sha256_finish_ret
+#endif
 
 /* Function to feed mbedtls entropy. */
 int mbedtls_hardware_poll(void *data __unused, unsigned char *output, size_t len, size_t *olen) {
@@ -38,17 +45,17 @@ void mbedtls_sha256_free(__unused mbedtls_sha256_context *ctx) {
     pico_sha256_cleanup(ctx);
 }
 
-int mbedtls_sha256_starts_ret(mbedtls_sha256_context *ctx, int is224) {
+int mbedtls_sha256_starts(mbedtls_sha256_context *ctx, int is224) {
     hard_assert(!is224); // that's annoying
     return pico_sha256_start_blocking(ctx, SHA256_BIG_ENDIAN, PICO_MBEDTLS_SHA256_ALT_USE_DMA);
 }
 
-int mbedtls_sha256_update_ret(mbedtls_sha256_context *ctx, const unsigned char *input, size_t ilen) {
+int mbedtls_sha256_update(mbedtls_sha256_context *ctx, const unsigned char *input, size_t ilen) {
     pico_sha256_update_blocking(ctx, input, ilen);
     return 0;
 }
 
-int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx, unsigned char output[32]) {
+int mbedtls_sha256_finish( mbedtls_sha256_context *ctx, unsigned char output[32]) {
     sha256_result_t result;
     pico_sha256_finish(ctx, &result);
     memcpy(output, result.bytes, 32);
