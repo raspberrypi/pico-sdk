@@ -69,7 +69,7 @@ void powman_timer_set_1khz_tick_source_lposc_with_hz(uint32_t lposc_freq_hz) {
     bool was_running = powman_timer_is_running();
     if (was_running) powman_timer_stop();
     uint32_t lposc_freq_khz = lposc_freq_hz / 1000;
-    uint32_t lposc_freq_khz_frac16 = (lposc_freq_khz % 1000) * 65536 / 1000;
+    uint32_t lposc_freq_khz_frac16 = (lposc_freq_hz % 1000) * 65536 / 1000;
     powman_write(&powman_hw->lposc_freq_khz_int, lposc_freq_khz);
     powman_write(&powman_hw->lposc_freq_khz_frac, lposc_freq_khz_frac16);
     powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_LPOSC_BITS);
@@ -87,7 +87,7 @@ void powman_timer_set_1khz_tick_source_xosc_with_hz(uint32_t xosc_freq_hz) {
     bool was_running = powman_timer_is_running();
     if (was_running) powman_timer_stop();
     uint32_t xosc_freq_khz = xosc_freq_hz / 1000;
-    uint32_t xosc_freq_khz_frac16 = (xosc_freq_khz % 1000) * 65536 / 1000;
+    uint32_t xosc_freq_khz_frac16 = (xosc_freq_hz % 1000) * 65536 / 1000;
     powman_write(&powman_hw->xosc_freq_khz_int, xosc_freq_khz);
     powman_write(&powman_hw->xosc_freq_khz_frac, xosc_freq_khz_frac16);
     powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_XOSC_BITS);
