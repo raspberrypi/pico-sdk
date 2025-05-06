@@ -68,7 +68,7 @@ endif()
 # FPGA_CHECK            - checks for FPGA which allows Raspberry Pi to run your binary on FPGA;
 # PANIC                 - default panic impl which brings in stdio;
 # AUTO_INIT_MUTEX       - auto init mutexes, without this you get no printf mutex either;
-# CRT0_FAR_CALLS        - use blx not bl far calls from crt0
+# CRT0_FAR_CALLS        - use blx not bl for calls from crt0 to user overridable functions;
 #
 # \param\ INCLUDE The items to include
 # \param\ EXCLUDE The items to exclude
