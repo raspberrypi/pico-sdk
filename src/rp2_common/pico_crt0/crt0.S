@@ -23,7 +23,7 @@
 
 pico_default_asm_setup
 
-// PICO_CONFIG: PICO_CRT0_NO_RESET_SECTION, Omit .reset section contents containing the startup code. This must be set if you want to replace the startup code while still keeping the reset of pico_crt0 as the reset section define here is not garbage collected, type=bool, default=0, advanced=true, group=pico_crt0
+// PICO_CONFIG: PICO_CRT0_NO_RESET_SECTION, Omit .reset section contents containing the startup code. This must be set if you want to replace the startup code while still keeping the rest of pico_crt0 as the reset section define here is not garbage collected, type=bool, default=0, advanced=true, group=pico_crt0
 #ifndef PICO_CRT0_NO_RESET_SECTION
 #define PICO_CRT0_NO_RESET_SECTION 0
 #endif
@@ -535,7 +535,7 @@ data_cpy_table:
 runtime_init:
     bx lr
 
-#endif // PICO_CRT0_NO_RESET
+#endif // PICO_CRT0_NO_RESET_SECTION
 // ----------------------------------------------------------------------------
 // Stack/heap dummies to set size
 
