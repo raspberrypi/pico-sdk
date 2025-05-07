@@ -68,6 +68,7 @@ endif()
 # FPGA_CHECK            - checks for FPGA which allows Raspberry Pi to run your binary on FPGA;
 # PANIC                 - default panic impl which brings in stdio;
 # AUTO_INIT_MUTEX       - auto init mutexes, without this you get no printf mutex either;
+# CRT0_FAR_CALLS        - use blx not bl for calls from crt0 to user overridable functions;
 #
 # \param\ INCLUDE The items to include
 # \param\ EXCLUDE The items to exclude
@@ -147,5 +148,8 @@ function(pico_minimize_runtime TARGET)
     endif()
     if (NOT RUNTIME_INCLUDE_FPGA_CHECK)
         target_compile_definitions(${TARGET} PRIVATE PICO_NO_FPGA_CHECK=1)
+    endif()
+    if (NOT RUNTIME_CRT0_FAR_CALLS)
+        target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_NEAR_CALLS=1)
     endif()
 endfunction()

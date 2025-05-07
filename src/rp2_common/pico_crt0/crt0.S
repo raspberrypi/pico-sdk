@@ -15,6 +15,11 @@
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
 
+// PICO_CONFIG: PICO_CRT0_NEAR_CALLS, Whether calls from crt0 into the binary are near (<16M away) - ignored for PICO_COPY_TO_RAM, default=0, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_NEAR_CALLS
+#define PICO_CRT0_NEAR_CALLS 0
+#endif
+
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS
 #define COLLAPSE_IRQS
@@ -377,6 +382,12 @@ _entry_point:
     sev
 1:
 #endif
+#if !__ARM_ARCH_6M__
+    // Make sure stack limit is 0 if we came in thru the debugger; we do not know what it should be
+    movs r0, #0
+    msr msplim, r0
+#endif
+
     ldr r0, =__vectors
     // Vector through our own table (SP, VTOR will not have been set up at
     // this point). Same path for debugger entry and bootloader entry.
@@ -403,6 +414,9 @@ _enter_vtable_in_r0:
 .type _reset_handler,%function
 .thumb_func
 _reset_handler:
+    // Note if we entered thru here on core 0, then we should have gone thru bootrom, so SP (and MSPLIM) on Armv8-M
+    // should already be set
+
     // Only core 0 should run the C runtime startup code; core 1 is normally
     // sleeping in the bootrom at this point but check to be sure (e.g. if
     // debugger put core 1 at the ELF entry point for some reason)
@@ -465,20 +479,20 @@ bss_fill_test:
     bne bss_fill_loop
 
 platform_entry: // symbol for stack traces
+#if PICO_CRT0_NEAR_CALLS && !PICO_COPY_TO_RAM
+    bl runtime_init
+    bl main
+    bl exit
+#else
     // Use 32-bit jumps, in case these symbols are moved out of branch range
     // (e.g. if main is in SRAM and crt0 in flash)
-#if !__ARM_ARCH_6M__
-    // Make sure stack limit is 0 - the user can set it themselves
-    //  todo probably worth adding to the EXE_DEF in the future
-    movs r0, #0
-    msr msplim, r0
-#endif
     ldr r1, =runtime_init
     blx r1
     ldr r1, =main
     blx r1
     ldr r1, =exit
     blx r1
+#endif
     // exit should not return.  If it does, hang the core.
 1: // separate label because _exit can be moved out of branch range
     bkpt #0
