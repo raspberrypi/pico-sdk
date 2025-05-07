@@ -23,6 +23,11 @@
 
 pico_default_asm_setup
 
+// PICO_CONFIG: PICO_CRT0_NO_RESET_SECTION, Omit .reset section contents containing the startup code. This must be set if you want to replace the startup code while still keeping the rest of pico_crt0 as the reset section define here is not garbage collected, type=bool, default=0, advanced=true, group=pico_crt0
+#ifndef PICO_CRT0_NO_RESET_SECTION
+#define PICO_CRT0_NO_RESET_SECTION 0
+#endif
+
 #ifdef PICO_NO_STORED_VECTOR_TABLE
 #warning PICO_NO_STORED_VECTOR_TABLE is no longer used. PICO_MINIMAL_STORED_VECTOR_TABLE is not identical but usually serves the same purpose
 #endif
@@ -328,6 +333,7 @@ binary_info_header:
 
 // ----------------------------------------------------------------------------
 
+#if !PICO_CRT0_NO_RESET_SECTION
 .section .reset, "ax"
 
 // On flash builds, the vector table comes first in the image (conventional).
@@ -492,7 +498,7 @@ data_cpy:
 // Note the data copy table is still included for NO_FLASH builds, even though
 // we skip the copy, because it is listed in binary info
 
-.align 2
+.p2align 2
 data_cpy_table:
 #if PICO_RP2350 && PICO_EMBED_XIP_SETUP && !PICO_NO_FLASH
 .word __boot2_start__
@@ -529,6 +535,7 @@ data_cpy_table:
 runtime_init:
     bx lr
 
+#endif // PICO_CRT0_NO_RESET_SECTION
 // ----------------------------------------------------------------------------
 // Stack/heap dummies to set size
 
