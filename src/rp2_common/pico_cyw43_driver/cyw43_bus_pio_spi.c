@@ -359,9 +359,9 @@ void cyw43_spi_gpio_setup(void) {
 // Reset wifi chip
 void cyw43_spi_reset(void) {
     gpio_put(CYW43_PIN_WL_REG_ON, false); // off
-    sleep_ms(20);
+    cyw43_delay_ms(20);
     gpio_put(CYW43_PIN_WL_REG_ON, true); // on
-    sleep_ms(250);
+    cyw43_delay_ms(250);
 
     // Setup IRQ (24) - also used for DO, DI
     gpio_init(CYW43_PIN_WL_HOST_WAKE);
