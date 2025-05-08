@@ -54,7 +54,7 @@ void cyw43_set_pio_clkdiv_int_frac8(uint32_t clock_div_int, uint8_t clock_div_fr
 }
 #endif
 
-// PICO_CONFIG: CYW43_PIO_SLEEP_MIN_US, For PIO SPI transfers longer than this (in microseconds), sleep via async_context before entering busy wait, default=disabled, group=pico_cyw43_driver
+// PICO_CONFIG: CYW43_PIO_SLEEP_MIN_US, For PIO SPI transfers longer than this (in microseconds), sleep via async_context before entering busy wait, type=int, default=disabled, group=pico_cyw43_driver
 #if CYW43_PIO_SLEEP_MIN_US
 static uint32_t bit_rate_khz;
 static void sleep_if_long_transfer(uint32_t xfr_length)
