@@ -17,6 +17,9 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 // For board detection
 #define WIZNET_W5100S_EVB_PICO2
 
+// --- RP2350 VARIANT ---
+#define PICO_RP2350A 1
+
 // --- BOARD SPECIFIC ---
 #ifndef W5100S_EVB_PICO2_INTN_PIN
 #define W5100S_EVB_PICO2_INTN_PIN 21
