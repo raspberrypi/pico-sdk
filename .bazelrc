@@ -4,3 +4,9 @@ common --host_per_file_copt=external/.*@-w
 
 # Produce useful output when the build fails.
 common --verbose_failures
+
+# Don't automatically create __init__.py files.
+#
+# This prevents spurious package name collisions at import time, and should be
+# the default (https://github.com/bazelbuild/bazel/issues/7386).
+common --incompatible_default_to_explicit_init_py

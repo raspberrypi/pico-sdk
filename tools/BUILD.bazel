@@ -1,1 +1,16 @@
 package(default_visibility = ["//visibility:public"])
+
+# `bazelisk run //tools:format_code` to fix code formatting.
+alias(
+    name = "format_code",
+    actual = "@pigweed//pw_presubmit/py:format",
+    tags = ["manual"],  # Don't let wildcards touch this.
+)
+
+# `bazelisk run //tools:check_code_formatting` to check for formatting
+# findings without fixing them in-place.
+alias(
+    name = "check_code_formatting",
+    actual = "@pigweed//pw_presubmit/py:check_formatting",
+    tags = ["manual"],  # Don't let wildcards touch this.
+)
