@@ -152,7 +152,7 @@ void __weak runtime_init_post_clock_resets(void) {
 }
 #endif
 
-#if !PICO_RUNTIME_SKIP_POST_CLOCK_RESETS
+#if !PICO_RUNTIME_SKIP_INIT_POST_CLOCK_RESETS
 PICO_RUNTIME_INIT_FUNC_HW(runtime_init_post_clock_resets, PICO_RUNTIME_INIT_POST_CLOCK_RESETS);
 #endif
 
