@@ -203,24 +203,26 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
 }
 
 #define LOCKOUT_MAGIC_START 0x73a8831eu
-#define LOCKOUT_MAGIC_END (~LOCKOUT_MAGIC_START)
 
 static mutex_t lockout_mutex;
-static bool lockout_in_progress;
+static io_rw_32 lockout_request_id = LOCKOUT_MAGIC_START;
 
 // note this method is in RAM because lockout is used when writing to flash
 // it only makes inline calls
 static void __isr __not_in_flash_func(multicore_lockout_handler)(void) {
     multicore_fifo_clear_irq();
     while (multicore_fifo_rvalid()) {
-        if (sio_hw->fifo_rd == LOCKOUT_MAGIC_START) {
+        uint32_t request_id = sio_hw->fifo_rd;
+        if (request_id == lockout_request_id) {
+            // valid lockout request received
             uint32_t save = save_and_disable_interrupts();
-            multicore_fifo_push_blocking_inline(LOCKOUT_MAGIC_START);
-            while (multicore_fifo_pop_blocking_inline() != LOCKOUT_MAGIC_END) {
-                tight_loop_contents(); // not tight but endless potentially
+            multicore_fifo_push_blocking_inline(request_id);
+            // wait for the lockout to expire
+            while (request_id == lockout_request_id) {
+                // when lockout_request_id is updated, the other CPU core calls __sev
+                __wfe();
             }
             restore_interrupts_from_disabled(save);
-            multicore_fifo_push_blocking_inline(LOCKOUT_MAGIC_END);
         }
     }
 }
@@ -257,7 +259,7 @@ void multicore_lockout_victim_deinit(void) {
     }
 }
 
-static bool multicore_lockout_handshake(uint32_t magic, absolute_time_t until) {
+static bool multicore_lockout_handshake(uint32_t request_id, absolute_time_t until) {
     uint irq_num = SIO_FIFO_IRQ_NUM(get_core_num());
     bool enabled = irq_is_enabled(irq_num);
     if (enabled) irq_set_enabled(irq_num, false);
@@ -267,7 +269,7 @@ static bool multicore_lockout_handshake(uint32_t magic, absolute_time_t until) {
         if (next_timeout_us < 0) {
             break;
         }
-        multicore_fifo_push_timeout_us(magic, (uint64_t)next_timeout_us);
+        multicore_fifo_push_timeout_us(request_id, (uint64_t)next_timeout_us);
         next_timeout_us = absolute_time_diff_us(get_absolute_time(), until);
         if (next_timeout_us < 0) {
             break;
@@ -276,7 +278,7 @@ static bool multicore_lockout_handshake(uint32_t magic, absolute_time_t until) {
         if (!multicore_fifo_pop_timeout_us((uint64_t)next_timeout_us, &word)) {
             break;
         }
-        if (word == magic) {
+        if (word == request_id) {
             rc = true;
         }
     } while (!rc);
@@ -284,14 +286,28 @@ static bool multicore_lockout_handshake(uint32_t magic, absolute_time_t until) {
     return rc;
 }
 
+static uint32_t update_lockout_request_id() {
+    // generate new number and then update shared variable
+    uint32_t new_request_id = lockout_request_id + 1;
+    lockout_request_id = new_request_id;
+    // notify other core
+    __sev();
+    return new_request_id;
+}
+
 static bool multicore_lockout_start_block_until(absolute_time_t until) {
     check_lockout_mutex_init();
     if (!mutex_enter_block_until(&lockout_mutex, until)) {
         return false;
     }
-    hard_assert(!lockout_in_progress);
-    bool rc = multicore_lockout_handshake(LOCKOUT_MAGIC_START, until);
-    lockout_in_progress = rc;
+    // generate a new request_id number
+    uint32_t request_id = update_lockout_request_id();
+    // attempt to lock out
+    bool rc = multicore_lockout_handshake(request_id, until);
+    if (!rc) {
+        // lockout failed - cancel it
+        update_lockout_request_id();
+    }
     mutex_exit(&lockout_mutex);
     return rc;
 }
@@ -309,13 +325,10 @@ static bool multicore_lockout_end_block_until(absolute_time_t until) {
     if (!mutex_enter_block_until(&lockout_mutex, until)) {
         return false;
     }
-    assert(lockout_in_progress);
-    bool rc = multicore_lockout_handshake(LOCKOUT_MAGIC_END, until);
-    if (rc) {
-        lockout_in_progress = false;
-    }
+    // lockout finished - cancel it
+    update_lockout_request_id();
     mutex_exit(&lockout_mutex);
-    return rc;
+    return true;
 }
 
 bool multicore_lockout_end_timeout_us(uint64_t timeout_us) {
