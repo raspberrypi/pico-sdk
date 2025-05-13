@@ -360,7 +360,7 @@ binary_info_header:
 _entry_point:
 
 #if PICO_NO_FLASH
-    // on the NO_FLASH case, we do not do a rest thru bootrom below, so the RCP may or may not have been initialized:
+    // on the NO_FLASH case, we do not do a reset thru bootrom below, so the RCP may or may not have been initialized:
     //
     // in the normal (e.g. UF2 download etc. case) we will have passed thru bootrom initialization, but if
     // a NO_FLASH binary is loaded by the debugger, and run directly after a reset, then we won't have.
@@ -387,6 +387,9 @@ _entry_point:
     movs r0, #0
     msr msplim, r0
 #endif
+
+    // note that theoretically we should also call bootrom_state_reset here too, however
+    // we expect it to have been called by the debugger
 
     ldr r0, =__vectors
     // Vector through our own table (SP, VTOR will not have been set up at

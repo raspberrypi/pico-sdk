@@ -80,7 +80,7 @@ void runtime_init_bootrom_reset(void);
 #endif
 
 // ---------------------------------------------------------------------------------------
-// Non-boot core eset of bootrom state, not needed if only using core 0 not used on RP2040
+// Non-boot core reset of bootrom state, not needed if only using core 0 not used on RP2040
 // ---------------------------------------------------------------------------------------
 #ifndef PICO_RUNTIME_INIT_PER_CORE_BOOTROM_RESET
 #define PICO_RUNTIME_INIT_PER_CORE_BOOTROM_RESET "00051"

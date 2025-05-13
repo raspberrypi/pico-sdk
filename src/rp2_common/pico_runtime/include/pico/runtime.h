@@ -49,13 +49,26 @@ void runtime_init(void);
 
 void runtime_run_initializers(void);
 void runtime_run_per_core_initializers(void);
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_ALL, Skip calling of `runtime_init_` functions during runtime init, type=bool, default=0, group=pico_runtime_init
+#if !PICO_RUNTIME_SKIP_INIT_ALL
+#define PICO_RUNTIME_SKIP_INIT_ALL 0
+#endif
 
 #ifndef PICO_RUNTIME_INIT_FUNC
+#if !PICO_RUNTIME_SKIP_INIT_ALL
 #define PICO_RUNTIME_INIT_FUNC(func, priority_string) uintptr_t __used __attribute__((section(".preinit_array." priority_string))) __pre_init_ ## func = (uintptr_t)(void (*)(void)) (func)
+#else
+// define the variable in case it is referenced, but do not stick it in the preinit_array
+#define PICO_RUNTIME_INIT_FUNC(func, priority_string) uintptr_t __pre_init_ ## func;
+#endif
 #endif
 #else
 #ifndef PICO_RUNTIME_INIT_FUNC
+#if !PICO_RUNTIME_INIT_SKIP_INIT_ALL
 #define PICO_RUNTIME_INIT_FUNC(func, priority_string) __pre_init func, priority_string
+#else
+#define PICO_RUNTIME_INIT_FUNC(func, priority_string)
+#endif
 #endif
 #endif
 #define PICO_RUNTIME_INIT_FUNC_HW(func, priority_string) PICO_RUNTIME_INIT_FUNC(func, priority_string)
