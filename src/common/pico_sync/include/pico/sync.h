@@ -15,5 +15,6 @@
 #include "pico/sem.h"
 #include "pico/mutex.h"
 #include "pico/critical_section.h"
+#include "pico/cond.h"
 
 #endif
