@@ -202,10 +202,8 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
     irq_set_enabled(irq_num, enabled);
 }
 
-#define LOCKOUT_MAGIC_START 0x73a8831eu
-
 static mutex_t lockout_mutex;
-static io_rw_32 lockout_request_id = LOCKOUT_MAGIC_START;
+static io_rw_32 lockout_request_id = 0;
 
 // note this method is in RAM because lockout is used when writing to flash
 // it only makes inline calls
