@@ -15,7 +15,7 @@
 #ifndef PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM
 // On RISC-V the default entry point from bootrom is the start of the binary, but
 // we have our vtable at the start, so we must include an entry point
-#if !defined(PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM) && defined(__riscv)
+#ifdef __riscv
 #define PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM 1
 #endif
 #endif
