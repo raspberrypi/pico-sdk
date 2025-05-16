@@ -203,7 +203,7 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
 }
 
 static mutex_t lockout_mutex;
-static io_rw_32 lockout_request_id = 0;
+static volatile uint32_t lockout_request_id = 0;
 
 // note this method is in RAM because lockout is used when writing to flash
 // it only makes inline calls
@@ -284,7 +284,7 @@ static bool multicore_lockout_handshake(uint32_t request_id, absolute_time_t unt
     return rc;
 }
 
-static uint32_t update_lockout_request_id() {
+static uint32_t update_lockout_request_id(void) {
     // generate new number and then update shared variable
     uint32_t new_request_id = lockout_request_id + 1;
     lockout_request_id = new_request_id;
