@@ -202,8 +202,10 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
     irq_set_enabled(irq_num, enabled);
 }
 
+// A non-zero initialisation value is used in order to reduce the chance of
+// entering the lock handler on bootup due to a 0-word being present in the FIFO
+static volatile uint32_t lockout_request_id = 0x73a8831eu;
 static mutex_t lockout_mutex;
-static volatile uint32_t lockout_request_id = 0;
 
 // note this method is in RAM because lockout is used when writing to flash
 // it only makes inline calls
