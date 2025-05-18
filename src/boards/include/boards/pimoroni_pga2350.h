@@ -21,7 +21,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PIMORONI_PGA2350_16MB
 
 // --- RP2350 VARIANT ---
-#define PICO_RP2350A 0
+#define PICO_RP2350A 1
 
 // --- BOARD SPECIFIC ---
 #define PIMORONI_PGA2350_PSRAM_CS_PIN 47
