@@ -491,6 +491,14 @@ function(pico_encrypt_binary TARGET AESFILE IVFILE)
         set_target_properties(${TARGET} PROPERTIES
             PICOTOOL_EMBED_DECRYPTION TRUE
         )
+
+        # Embedded decryption stage only works with packaged binaries
+        get_target_property(uf2_package_addr ${TARGET} PICOTOOL_UF2_PACKAGE_ADDR)
+        if (NOT uf2_package_addr)
+            set_target_properties(${TARGET} PROPERTIES
+                PICOTOOL_UF2_PACKAGE_ADDR 0x10000000
+            )
+        endif()
     endif()
 
     if (ENC_MBEDTLS)
