@@ -163,6 +163,14 @@ function(pico_init_picotool)
         endif()
     endif()
 
+    if (TARGET picotool AND NOT DEFINED ENV{_PICOTOOL_FOUND_THIS_RUN})
+        # Internal environment variable to prevent printing multiple times
+        set(ENV{_PICOTOOL_FOUND_THIS_RUN} 1)
+
+        get_property(picotool_location TARGET picotool PROPERTY LOCATION)
+        message("Using picotool from ${picotool_location}")
+    endif()
+
     if (TARGET picotool)
         set(picotool_FOUND 1 PARENT_SCOPE)
     else()

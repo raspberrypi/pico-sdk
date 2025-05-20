@@ -437,7 +437,7 @@ static inline uint multicore_doorbell_irq_num(uint doorbell_num) {
  * The core which wishes to lockout the other core calls \ref multicore_lockout_start_blocking or
  * \ref multicore_lockout_start_timeout_us to interrupt the other "victim" core and wait for it to be in a
  * "locked out" state. Once the lockout is no longer needed it calls \ref multicore_lockout_end_blocking or
- * \ref multicore_lockout_end_timeout_us to release the lockout and wait for confirmation.
+ * \ref multicore_lockout_end_timeout_us to release the lockout.
  *
  * \note Because multicore lockout uses the intercore FIFOs, the FIFOs <b>cannot</b> be used for any other purpose
  */
@@ -491,27 +491,31 @@ void multicore_lockout_start_blocking(void);
  */
 bool multicore_lockout_start_timeout_us(uint64_t timeout_us);
 
-/*! \brief Release the other core from a locked out state amd wait for it to acknowledge
+/*! \brief Release the other core from a locked out state
  *  \ingroup multicore_lockout
  *
- * \note The other core must previously have been "locked out" by calling a `multicore_lockout_start_` function
- * from this core
+ * The other core must previously have been "locked out" by calling a `multicore_lockout_start_` function
+ * from this core.
+ *
+ * \note The other core will leave the lockout state if this function is called.
+ * The function only blocks for access to a lockout mutex, it does not wait for the other core
+ * to leave the lockout state.
  */
 void multicore_lockout_end_blocking(void);
 
-/*! \brief Release the other core from a locked out state amd wait up to a time limit for it to acknowledge
+/*! \brief Release the other core from a locked out state
  *  \ingroup multicore_lockout
  *
  * The other core must previously have been "locked out" by calling a `multicore_lockout_start_` function
  * from this core
  *
- * \note be very careful using small timeout values, as a timeout here will leave the "lockout" functionality
- * in a bad state. It is probably preferable to use \ref multicore_lockout_end_blocking anyway as if you have
- * already waited for the victim core to enter the lockout state, then the victim core will be ready to exit
- * the lockout state very quickly.
+ * \note The other core will leave the lockout state if this function returns true.
+ * The function only blocks for access to a lockout mutex, it does not wait for the other core
+ * to leave the lockout state. If the lockout mutex could not be acquired, the function returns
+ * false and no action is taken.
  *
  * \param timeout_us the timeout in microseconds
- * \return true if the other core successfully exited locked out state within the timeout, false otherwise
+ * \return true if the other core will leave the lockout state, false otherwise
  */
 bool multicore_lockout_end_timeout_us(uint64_t timeout_us);
 
