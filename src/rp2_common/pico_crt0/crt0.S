@@ -573,11 +573,15 @@ spacer_section .stack
 // align to allow for memory protection (although this alignment is pretty much ignored by linker script)
 .p2align 5
     .equ StackSize, PICO_STACK_SIZE
+.if StackSize != 0
 .space StackSize
+.endif
 
 spacer_section .heap
 .p2align 2
     .equ HeapSize, PICO_HEAP_SIZE
+.if HeapSize != 0
 .space HeapSize
+.endif
 
 #include "embedded_end_block.inc.S"
