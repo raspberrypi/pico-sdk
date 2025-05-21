@@ -186,35 +186,35 @@ int stdio_get_until(char *buf, int len, absolute_time_t until);
  */
 int stdio_put_string(const char *s, int len, bool newline, bool cr_translation);
 
-/*! \brief stdio_getchar Alias for \ref getchar that definitely does not go thru the implementation
+/*! \brief Alias for \ref getchar that definitely does not go thru the implementation
  * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
  *
  * \ingroup pico_stdio
  */
 int stdio_getchar(void);
 
-/*! \brief stdio_getchar Alias for \ref putchar that definitely does not go thru the implementation
+/*! \brief Alias for \ref putchar that definitely does not go thru the implementation
  * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
  *
  * \ingroup pico_stdio
  */
 int stdio_putchar(int);
 
-/*! \brief stdio_getchar Alias for \ref puts that definitely does not go thru the implementation
+/*! \brief Alias for \ref puts that definitely does not go thru the implementation
  * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
  *
  * \ingroup pico_stdio
  */
 int stdio_puts(const char *s);
 
-/*! \brief stdio_getchar Alias for \ref vprintf that definitely does not go thru the implementation
+/*! \brief Alias for \ref vprintf that definitely does not go thru the implementation
  * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
  *
  * \ingroup pico_stdio
  */
 int stdio_vprintf(const char *format, va_list va);
 
-/*! \brief stdio_getchar Alias for \ref printf that definitely does not go thru the implementation
+/*! \brief Alias for \ref printf that definitely does not go thru the implementation
  * in the standard C library even when \ref PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS == 0
  *
  * \ingroup pico_stdio
