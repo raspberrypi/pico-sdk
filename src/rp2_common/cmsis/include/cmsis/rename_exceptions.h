@@ -52,7 +52,12 @@
 #if PICO_RP2350
 #define isr_nmi NMI_Handler
 #define isr_hardfault HardFault_Handler
+#define isr_memmanage MemManage_Handler
+#define isr_busfault BusFault_Handler
+#define isr_usagefault UsageFault_Handler
+#define isr_securefault SecureFault_Handler
 #define isr_svcall SVC_Handler
+#define isr_debugmonitor DebugMon_Handler
 #define isr_pendsv PendSV_Handler
 #define isr_systick SysTick_Handler
 #define isr_irq0 TIMER0_IRQ_0_Handler
