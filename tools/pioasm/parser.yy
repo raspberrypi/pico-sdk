@@ -85,6 +85,7 @@
     DOT_SET         ".set"
     DOT_OUT         ".out"
     DOT_IN          ".in"
+    DOT             "."
 
     JMP             "jmp"
     WAIT            "wait"
@@ -203,8 +204,8 @@ directive:
   | DOT_OUT value direction autop threshold { pioasm.get_current_program(@1, ".out", true).set_out(@$, $2, $3, $4, $5); }
   | DOT_SET value                     { pioasm.get_current_program(@1, ".set", true).set_set_count(@$, $2); }
   | WRAP_TARGET                       { pioasm.get_current_program(@1, ".wrap_target").set_wrap_target(@$); }
+  | WRAP expression                   { pioasm.get_current_program(@1, ".wrap").set_wrap(@$, $2); }
   | WRAP                              { pioasm.get_current_program(@1, ".wrap").set_wrap(@$); }
-  | WORD value                        { pioasm.get_current_program(@1, "instruction").add_instruction(std::shared_ptr<instruction>(new instr_word(@$, $2))); }
   | LANG_OPT NON_WS NON_WS ASSIGN INT  { pioasm.get_current_program(@1, ".lang_opt").add_lang_opt($2, $3, std::to_string($5)); }
   | LANG_OPT NON_WS NON_WS ASSIGN STRING { pioasm.get_current_program(@1, ".lang_opt").add_lang_opt($2, $3, $5); }
   | LANG_OPT NON_WS NON_WS ASSIGN NON_WS { pioasm.get_current_program(@1, ".lang_opt").add_lang_opt($2, $3, $5); }
@@ -224,6 +225,7 @@ directive:
 /* value is a more limited top level expression... requiring parenthesis */
 %type <std::shared_ptr<resolvable>> value;
 value: INT { $$ = resolvable_int(@$, $1); }
+     | DOT { $$ = resolvable_int(@$, pioasm.get_current_program(@1, ".").instructions.size()); }
      | ID { $$ = std::shared_ptr<resolvable>(new name_ref(@$, $1)); }
      | LPAREN expression RPAREN { $$ = $2; }
 
@@ -257,7 +259,8 @@ instruction:
 
 %type <std::shared_ptr<instruction>> base_instruction;
 base_instruction:
-    NOP                                                   { $$ = std::shared_ptr<instruction>(new instr_nop(@$)); }
+    WORD value                                            { $$ = std::shared_ptr<instruction>(new instr_word(@$, $2)); }
+    | NOP                                                 { $$ = std::shared_ptr<instruction>(new instr_nop(@$)); }
     | JMP condition comma expression                      { $$ = std::shared_ptr<instruction>(new instr_jmp(@$, $2, $4)); }
     | WAIT value wait_source                              { $$ = std::shared_ptr<instruction>(new instr_wait(@$, $2, $3)); }
     | WAIT wait_source                                    { $$ = std::shared_ptr<instruction>(new instr_wait(@$, resolvable_int(@$, 1),  $2)); }
