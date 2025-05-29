@@ -52,15 +52,26 @@ __vectors:
 #else
 .word isr_nmi
 .word isr_hardfault
+#if PICO_RP2040
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
+#else
+.word isr_memmanage
+.word isr_busfault
+.word isr_usagefault
+.word isr_securefault
+#endif
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_svcall
+#if PICO_RP2040
 .word isr_invalid // Reserved, should never fire
+#else
+.word isr_debugmonitor
+#endif
 .word isr_invalid // Reserved, should never fire
 .word isr_pendsv
 .word isr_systick
@@ -287,8 +298,20 @@ if_irq_decl 79 isr_irq79
 #if PICO_NUM_VTABLE_IRQS > 80
 #error more IRQ entries required
 #endif
+#if !PICO_RP2040
+// since these are disabled by default, map them all to __unhandled_user_irq (will have
+// a negative number
+decl_isr isr_memmanage
+decl_isr isr_busfault
+decl_isr isr_usagefault
+decl_isr isr_securefault
+decl_isr isr_debugmonitor
+#endif
 
-// All unhandled USER IRQs fall through to here
+// All unhandled USER IRQs fall through to here.
+// Additionally, if the Armv9-M MemManage/BusFault/UsageFault/SecureFault/DebugMonitor exceptions
+// are enabled, but the handlers are not defined, then unhandled_user_irq_num_in_r0 will
+// also be reached, but with a negative exception number (e.g. MemManage == -12)
 .global __unhandled_user_irq
 .thumb_func
 __unhandled_user_irq:
@@ -305,7 +328,7 @@ unhandled_user_irq_num_in_r0:
 
 decl_isr_bkpt isr_invalid
 #if !PICO_MINIMAL_STORED_VECTOR_TABLE
-// these are separated out for clarity
+// these are separated out into individual BKPT instructions with label for clarity
 decl_isr_bkpt isr_nmi
 decl_isr_bkpt isr_hardfault
 decl_isr_bkpt isr_svcall
