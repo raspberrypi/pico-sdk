@@ -309,7 +309,7 @@ decl_isr isr_debugmonitor
 #endif
 
 // All unhandled USER IRQs fall through to here.
-// Additionally, if the Armv9-M MemManage/BusFault/UsageFault/SescureFault/DebugMonitor exceptions
+// Additionally, if the Armv9-M MemManage/BusFault/UsageFault/SecureFault/DebugMonitor exceptions
 // are enabled, but the handlers are not defined, then unhandled_user_irq_num_in_r0 will
 // also be reached, but with a negative exception number (e.g. MemManage == -12)
 .global __unhandled_user_irq
