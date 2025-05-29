@@ -42,6 +42,30 @@ define_property(TARGET
     FULL_DOCS "AES key for encrypting"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_IVFILE
+    INHERITED
+    BRIEF_DOCS "IV OTP salt for encrypting"
+    FULL_DOCS "IV OTP salt for encrypting"
+)
+define_property(TARGET
+    PROPERTY PICOTOOL_EMBED_DECRYPTION
+    INHERITED
+    BRIEF_DOCS "Embed decryption stage into encrypted binary"
+    FULL_DOCS "Embed decryption stage into encrypted binary"
+)
+define_property(TARGET
+    PROPERTY PICOTOOL_USE_MBEDTLS_DECRYPTION
+    INHERITED
+    BRIEF_DOCS "Use MbedTLS based decryption stage - this is faster, but not secure against power snooping"
+    FULL_DOCS "Use MbedTLS based decryption stage - this is faster, but not secure against power snooping"
+)
+define_property(TARGET
+    PROPERTY PICOTOOL_OTP_KEY_PAGE
+    INHERITED
+    BRIEF_DOCS "OTP page storing the AES key"
+    FULL_DOCS "OTP page storing the AES key"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_ENC_SIGFILE
     INHERITED
     BRIEF_DOCS "Private key for signing encrypted binaries"
@@ -428,25 +452,78 @@ function(pico_embed_pt_in_binary TARGET PTFILE)
     )
 endfunction()
 
-# pico_encrypt_binary(TARGET AESFILE [SIGFILE])
+# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [MBEDTLS] [OTP_KEY_PAGE <page>])
 # \brief_nodesc\ Encrypt the taget binary
 #
 # Encrypt the target binary with the given AES key (should be a binary
-# file containing 32 bytes of a random key), and sign the encrypted binary.
+# file containing 128 bytes of a random key share, or 32 bytes of a random key),
+# and sign the encrypted binary.
 #
-# This sets the target properties PICOTOOL_AESFILE to AESFILE,
-# and PICOTOOL_ENC_SIGFILE to SIGFILE if present, else PICOTOOL_SIGFILE.
+# Salts the public IV with the provided IVFILE (should be a binary file
+# containing 16 bytes of a random IV), to give the IV used by the encryption.
+#
+# This sets the target properties PICOTOOL_AESFILE to AESFILE, PICOTOOL_IVFILE to IVFILE, and
+# PICOTOOL_ENC_SIGFILE to SIGFILE if specified, else PICOTOOL_SIGFILE.
+#
+# Optionally, use EMBED to embed a decryption stage into the encrypted binary.
+# This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
+#
+# Optionally, use MBEDTLS to to use the MbedTLS based decryption stage - this
+# is faster, but offers no security against power or timing sniffing attacks,
+# and takes up more code size.
+# This sets the target property PICOTOOL_USE_MBEDTLS_DECRYPTION to TRUE.
+#
+# Optionally, use OTP_KEY_PAGE to specify the OTP page storing the AES key.
+# This sets the target property PICOTOOL_OTP_KEY_PAGE to OTP_KEY_PAGE.
 #
 # \param\ AESFILE The AES key file to use
+# \param\ IVFILE The IV file to use
 # \param\ SIGFILE The PEM signature file to use
-function(pico_encrypt_binary TARGET AESFILE)
+# \param\ EMBED Embed a decryption stage into the encrypted binary
+# \param\ MBEDTLS Use MbedTLS based decryption stage (faster, but less secure)
+# \param\ OTP_KEY_PAGE The OTP page storing the AES key
+function(pico_encrypt_binary TARGET AESFILE IVFILE)
+    set(options EMBED MBEDTLS)
+    set(oneValueArgs OTP_KEY_PAGE SIGFILE)
+    # set(multiValueArgs )
+    cmake_parse_arguments(PARSE_ARGV 3 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_AESFILE ${AESFILE}
     )
-    if (ARGC EQUAL 3)
+    set_target_properties(${TARGET} PROPERTIES
+        PICOTOOL_IVFILE ${IVFILE}
+    )
+
+    if (ENC_EMBED)
         set_target_properties(${TARGET} PROPERTIES
-            PICOTOOL_ENC_SIGFILE ${ARGV2}
+            PICOTOOL_EMBED_DECRYPTION TRUE
+        )
+
+        # Embedded decryption stage only works with packaged binaries
+        get_target_property(uf2_package_addr ${TARGET} PICOTOOL_UF2_PACKAGE_ADDR)
+        if (NOT uf2_package_addr)
+            set_target_properties(${TARGET} PROPERTIES
+                PICOTOOL_UF2_PACKAGE_ADDR 0x10000000
+            )
+        endif()
+    endif()
+
+    if (ENC_MBEDTLS)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_USE_MBEDTLS_DECRYPTION TRUE
+        )
+    endif()
+
+    if (ENC_OTP_KEY_PAGE)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_OTP_KEY_PAGE ${ENC_OTP_KEY_PAGE}
+        )
+    endif()
+
+    if (ENC_SIGFILE)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENC_SIGFILE ${ENC_SIGFILE}
         )
     else()
         get_target_property(enc_sig_file ${TARGET} PICOTOOL_ENC_SIGFILE)
@@ -563,6 +640,10 @@ function(picotool_postprocess_binary TARGET)
     if (picotool_aesfile)
         pico_add_link_depend(${TARGET} ${picotool_aesfile})
     endif()
+    get_target_property(picotool_ivfile ${TARGET} PICOTOOL_IVFILE)
+    if (picotool_ivfile)
+        pico_add_link_depend(${TARGET} ${picotool_ivfile})
+    endif()
     get_target_property(picotool_enc_sigfile ${TARGET} PICOTOOL_ENC_SIGFILE)
     if (picotool_enc_sigfile)
         pico_add_link_depend(${TARGET} ${picotool_enc_sigfile})
@@ -602,10 +683,31 @@ function(picotool_postprocess_binary TARGET)
             VERBATIM)
         endif()
         # Encryption
-        if (picotool_aesfile)
+        if (picotool_aesfile AND picotool_ivfile)
+            get_target_property(picotool_embed_decryption ${TARGET} PICOTOOL_EMBED_DECRYPTION)
+            if (picotool_embed_decryption)
+                list(APPEND picotool_encrypt_args "--embed")
+            endif()
+
+            get_target_property(picotool_mbedtls_decryption ${TARGET} PICOTOOL_USE_MBEDTLS_DECRYPTION)
+            if (picotool_mbedtls_decryption)
+                list(APPEND picotool_encrypt_args "--use-mbedtls")
+            endif()
+
+            get_target_property(otp_key_page ${TARGET} PICOTOOL_OTP_KEY_PAGE)
+            if (otp_key_page)
+                list(APPEND picotool_encrypt_args "--otp-key-page" ${otp_key_page})
+            endif()
+
             add_custom_command(TARGET ${TARGET} POST_BUILD
-                DEPENDS ${picotool_enc_sigfile} ${picotool_aesfile}
-                COMMAND picotool encrypt --quiet --hash --sign $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}> ${picotool_aesfile} ${picotool_enc_sigfile}
+                DEPENDS ${picotool_enc_sigfile} ${picotool_aesfile} ${picotool_ivfile}
+                COMMAND picotool
+                ARGS encrypt
+                    --quiet --hash --sign
+                    ${picotool_encrypt_args}
+                    $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
+                    ${picotool_aesfile} ${picotool_ivfile} ${picotool_enc_sigfile} ${otp_file}
+                COMMAND_EXPAND_LISTS
                 VERBATIM)
             if (ARGC EQUAL 2)
                 set(${ARGV1} TRUE PARENT_SCOPE)
