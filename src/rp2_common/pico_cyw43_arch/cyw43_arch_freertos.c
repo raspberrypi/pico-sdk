@@ -25,7 +25,7 @@
 
 static async_context_freertos_t cyw43_async_context_freertos;
 
-#if configSUPPORT_STATIC_ALLOCATION
+#if configSUPPORT_STATIC_ALLOCATION && !CYW43_NO_DEFAULT_TASK_STACK
 static StackType_t cyw43_async_context_freertos_task_stack[CYW43_TASK_STACK_SIZE];
 #endif
 
@@ -37,7 +37,7 @@ async_context_t *cyw43_arch_init_default_async_context(void) {
 #ifdef CYW43_TASK_STACK_SIZE
     config.task_stack_size = CYW43_TASK_STACK_SIZE;
 #endif
-#if configSUPPORT_STATIC_ALLOCATION
+#if configSUPPORT_STATIC_ALLOCATION && !CYW43_NO_DEFAULT_TASK_STACK
     config.task_stack = cyw43_async_context_freertos_task_stack;
 #endif
     if (async_context_freertos_init(&cyw43_async_context_freertos, &config))
