@@ -664,21 +664,21 @@ function(picotool_postprocess_binary TARGET)
                 VERBATIM)
         endif()
         # Signing/hashing/load maps for packaging
-        if (
-            picotool_sign_output OR
+        if (picotool_sign_output OR
             picotool_hash_output OR
             uf2_package_addr OR
-            extra_process_args
-        )
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND picotool
-            ARGS seal
-                --quiet
-                $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
-                ${picotool_sigfile} ${otp_file}
-                ${picotool_args}
-            COMMAND_EXPAND_LISTS
-            VERBATIM)
+            extra_process_args)
+            # We don't need the extra end block, as picotool seal will add one
+            target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK=0)
+            add_custom_command(TARGET ${TARGET} POST_BUILD
+                COMMAND picotool
+                ARGS seal
+                    --quiet
+                    $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
+                    ${picotool_sigfile} ${otp_file}
+                    ${picotool_args}
+                COMMAND_EXPAND_LISTS
+                VERBATIM)
         endif()
         # Encryption
         if (picotool_aesfile AND picotool_ivfile)
