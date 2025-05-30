@@ -6,7 +6,7 @@ cc_library(
         "cybt_shared_bus.c",
         "cybt_shared_bus_driver.c",
     ],
-    hdrs = ["cybt_shared_bus_driver.h"],
+    hdrs = ["cybt_shared_bus_driver.h", "cybt_logging.h"],
     includes = ["."],
     deps = [
         "@cyw43-driver//:cyw43_driver",
