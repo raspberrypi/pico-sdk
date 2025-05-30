@@ -666,8 +666,6 @@ void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot) {
 #endif
 
 __weak void runtime_init_per_core_irq_priorities(void) {
-    // enable interrupts that might be disabled by a previous bootloader stage
-    enable_interrupts();
 #if PICO_DEFAULT_IRQ_PRIORITY != 0
 #ifndef __riscv
     // static_assert(!(NUM_IRQS & 3), ""); // this isn't really required - the reg is still 32 bit
@@ -682,6 +680,8 @@ __weak void runtime_init_per_core_irq_priorities(void) {
     }
 #endif
 #endif
+    // enable interrupts that might be disabled by a previous bootloader stage
+    enable_interrupts();
 }
 
 static uint get_user_irq_claim_index(uint irq_num) {
