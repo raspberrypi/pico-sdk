@@ -110,6 +110,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
     self->core.flags = ASYNC_CONTEXT_FLAG_CALLBACK_FROM_NON_IRQ;
     self->core.core_num = get_core_num();
 #if configSUPPORT_STATIC_ALLOCATION
+    assert(config->task_stack);
     self->lock_mutex = xSemaphoreCreateRecursiveMutexStatic(&self->lock_mutex_buf);
     self->work_needed_sem = xSemaphoreCreateBinaryStatic(&self->work_needed_sem_buf);
     self->timer_handle = xTimerCreateStatic( "async_context_timer",       // Just a text name, not used by the kernel.
