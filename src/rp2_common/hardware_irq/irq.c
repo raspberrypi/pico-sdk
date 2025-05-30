@@ -680,8 +680,10 @@ __weak void runtime_init_per_core_irq_priorities(void) {
     }
 #endif
 #endif
-    // enable interrupts that might be disabled by a previous bootloader stage
+#if !PICO_RP2040
+    // enable interrupts that might be disabled by a previous bootloader stage (guarded for RP2040 as there is no bootrom chain_image call there)
     enable_interrupts();
+#endif
 }
 
 static uint get_user_irq_claim_index(uint irq_num) {
