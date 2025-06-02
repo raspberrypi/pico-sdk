@@ -58,8 +58,6 @@ typedef struct async_context_freertos_config {
     configSTACK_DEPTH_TYPE task_stack_size;
      /**
      * \brief Pointer to stack memory for the async_context task.
-     * If this is not provided, then a stack will be allocated from the
-     * freertos heap.
      */
 #if configSUPPORT_STATIC_ALLOCATION
     StackType_t *task_stack;
