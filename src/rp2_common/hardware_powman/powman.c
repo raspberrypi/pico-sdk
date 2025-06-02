@@ -102,7 +102,15 @@ static void powman_timer_use_gpio(uint32_t gpio, uint32_t use, uint32_t using) {
     if (was_running) powman_timer_stop();
     invalid_params_if(HARDWARE_POWMAN, !((gpio == 12) || (gpio == 14) || (gpio == 20) || (gpio == 22)));
     gpio_set_input_enabled(gpio, true);
-    powman_write(&powman_hw->ext_time_ref, gpio);
+    uint32_t source = 0; // 12
+    if (gpio == 20) {
+        source = 1;
+    } else if (gpio == 14) {
+        source = 2;
+    } else if (gpio == 22) {
+        source = 3;
+    }
+    powman_write(&powman_hw->ext_time_ref, source);
     powman_set_bits(&powman_hw->timer, use);
     if (was_running) {
         powman_timer_start();
