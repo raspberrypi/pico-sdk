@@ -98,8 +98,8 @@ typedef struct sync_func_call{
 static void handle_sync_func_call(async_context_t *context, async_when_pending_worker_t *worker) {
     sync_func_call_t *call = (sync_func_call_t *)worker;
     call->rc = call->func(call->param);
-    sem_release(&call->sem);
     async_context_remove_when_pending_worker(context, worker);
+    sem_release(&call->sem);
 }
 #endif
 
