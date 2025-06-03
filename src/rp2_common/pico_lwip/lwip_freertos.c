@@ -25,10 +25,10 @@ static void tcpip_init_done(void *param) {
 }
 
 bool lwip_freertos_init(async_context_t *context) {
-    assert(!lwip_context);
-    lwip_context = context;
+    assert(!lwip_context || lwip_context == context);
     static bool done_lwip_init;
     if (!done_lwip_init) {
+        lwip_context = context;
         done_lwip_init = true;
         SemaphoreHandle_t init_sem = xSemaphoreCreateBinary();
         tcpip_task_blocker = xSemaphoreCreateBinary();

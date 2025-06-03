@@ -1,0 +1,28 @@
+load("//bazel:defs.bzl", "compatible_with_rp2", "pico_generate_pio_header")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_status_led",
+    srcs = ["status_led.c"],
+    hdrs = ["include/pico/status_led.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/hardware_gpio",
+        "//src/rp2_common/hardware_pio",
+    ] + select({
+        "//bazel/constraint:is_pico_w": [
+            "//src/rp2_common/pico_cyw43_driver",
+        ],
+        "//bazel/constraint:is_pico2_w": [
+            "//src/rp2_common/pico_cyw43_driver"
+        ],
+        "//conditions:default": [],
+    }),
+)
+
+pico_generate_pio_header(
+    name = "ws2812",
+    srcs = ["ws2812.pio"],
+)

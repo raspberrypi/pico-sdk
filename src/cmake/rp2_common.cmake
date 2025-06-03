@@ -140,6 +140,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(rp2_common/pico_standard_link)
 
     pico_add_subdirectory(rp2_common/pico_fix)
+    pico_add_subdirectory(rp2_common/pico_status_led)
 
     # at the end as it includes a lot of other stuff
     pico_add_subdirectory(rp2_common/pico_runtime_init)
