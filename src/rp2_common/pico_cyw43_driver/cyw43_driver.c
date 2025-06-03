@@ -157,6 +157,7 @@ bool cyw43_driver_init(async_context_t *context) {
             #ifdef __riscv
                 // Reset bootrom stack
                 rom_set_bootrom_stack(&stack);
+                free(stack.base);
             #endif
 
             if (picked_p < 0) {
