@@ -50,6 +50,7 @@ allowed_missing_functions = set([
     "pico_init_picotool",
     "pico_add_platform_library",
     "pico_get_runtime_output_directory",
+    "pico_get_output_name",
     "pico_set_printf_implementation",
     "pico_expand_pico_platform",
 ])
