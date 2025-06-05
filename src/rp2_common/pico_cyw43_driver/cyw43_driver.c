@@ -186,6 +186,9 @@ bool cyw43_driver_init(async_context_t *context) {
             cyw43_wifi_fw_len = *(uint32_t*)(XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr);
             cyw43_clm_len = *(uint32_t*)(XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr + 4);
             fw_data = XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + saddr + 8;
+        } else {
+            CYW43_DEBUG("No CYW43 firmware partition found, so cannot get firmware from partition\n");
+            return false;
         }
     } else {
         CYW43_DEBUG("No partition table, so cannot get firmware from partition - get_partition_table_info returned %d\n", ret);
