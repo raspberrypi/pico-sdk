@@ -170,14 +170,29 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
 
     pico_promote_common_scope_vars()
 
+    # pico_use_wifi_firmware_partition(TARGET [NO_EMBEDDED_PT])
+    # \brief\ Use a partition for the Wi-Fi firmware
+    #
+    # This will read the CYW43 firmware from a partition with the ID 0x776966696669726d,
+    # instead of embedding the firmware blob in the binary. By default it will also embed
+    # a compatible partition table in the binary, but this can be disabled by passing the
+    # NO_EMBEDDED_PT argument (for example, if you need to chain into the binary, it
+    # can't contain a partition table).
+    #
+    # \param\ NO_EMBEDDED_PT If set, will not embed a partition table in the binary
     function(pico_use_wifi_firmware_partition TARGET)
+        set(options NO_EMBEDDED_PT)
+        cmake_parse_arguments(PARSE_ARGV 1 OPTS "${options}" "" "")
         if (PICO_PLATFORM STREQUAL "rp2040")
                 message(FATAL_ERROR "RP2040 does not support storing wi-fi firmware in partitions")
         endif()
         target_compile_definitions(${TARGET} PRIVATE CYW43_USE_FIRMWARE_PARTITION=1)
-        get_target_property(picotool_embed_pt ${TARGET} PICOTOOL_EMBED_PT)
-        if (NOT picotool_embed_pt)
+
+        if (NOT OPTS_NO_EMBEDDED_PT)
+            get_target_property(picotool_embed_pt ${TARGET} PICOTOOL_EMBED_PT)
+            if (NOT picotool_embed_pt)
                 pico_embed_pt_in_binary(${TARGET} ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_pt.json)
+            endif()
         endif()
 
         find_package (Python3 REQUIRED COMPONENTS Interpreter)

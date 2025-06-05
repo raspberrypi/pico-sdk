@@ -25,7 +25,7 @@
       "name": "Wi-Fi Firmware",
       "id": "0x776966696669726d",
       "start": "3500k",
-      "size": "240K",
+      "size": "256K",
       "families": ["data"],
       "permissions": {
         "secure": "rw",
@@ -37,7 +37,7 @@
     },
     {
       "start": "3500k",
-      "size": "240k",
+      "size": "256k",
       "families": ["data"],
       "permissions": {
         "secure": "rw",
