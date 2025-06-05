@@ -12,7 +12,7 @@
 #define CRT0_TBYB_FLAG 0
 #endif
 
-.section .text
+.section .wifi_fw, "a"
 .global _start
 _start:
 .word 0
