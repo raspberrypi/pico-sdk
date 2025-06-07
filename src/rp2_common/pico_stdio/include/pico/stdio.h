@@ -159,7 +159,7 @@ static inline int puts_raw(const char *s) {
  */
 void stdio_set_chars_available_callback(void (*fn)(void*), void *param);
 
-/*! \brief Waits until a timeout to reard at least one character into a buffer
+/*! \brief Waits until a timeout to read at least one character into a buffer
  * \ingroup pico_stdio
  *
  * This method returns as soon as input is available, but more characters may
