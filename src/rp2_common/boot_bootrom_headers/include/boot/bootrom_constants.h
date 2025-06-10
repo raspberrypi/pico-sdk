@@ -230,7 +230,7 @@ typedef int (*bootrom_api_callback_generic_t)(uint32_t r0, uint32_t r1, uint32_t
 #define PT_INFO_PARTITION_NAME                  0x0080
 
 // items are returned in order
-// 3 words package_id, device_id, wafer_id
+// 3 words package_id, device_id_lo, device_id_hi
 #define SYS_INFO_CHIP_INFO                      0x0001
 // 1 word: chip specific critical bits
 #define SYS_INFO_CRITICAL                       0x0002
