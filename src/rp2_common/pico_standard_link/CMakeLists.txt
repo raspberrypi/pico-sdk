@@ -25,11 +25,48 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES ${PROP} "${_LINK_DEPENDS}")
     endfunction()
 
+    # pico_check_linker_script(LDSCRIPT)
+    # \brief_nodesc\ Check the linker script for compatibility
+    #
+    # Checks the linker script for compatibility with the current SDK version,
+    # and if not, raises warnings and enables workarounds to maintain
+    # compatibility where possible.
+    #
+    # \param\ LDSCRIPT Full path to the linker script to check
+    function(pico_check_linker_script TARGET LDSCRIPT)
+        if (EXISTS ${LDSCRIPT})
+            file(READ ${LDSCRIPT} LDSCRIPT_CONTENTS)
+        else()
+            return()
+        endif()
+
+        # Check if the linker script uses KEEP to keep the .stack and .heap sections
+        # and if not, set PICO_CRT0_ALLOCATE_SPACERS to 0 to maintain compatibility
+        string(FIND "${LDSCRIPT_CONTENTS}" "KEEP(*(.stack*))" KEEP_STACK_FOUND)
+        string(FIND "${LDSCRIPT_CONTENTS}" "KEEP(*(.heap*))" KEEP_HEAP_FOUND)
+        string(FIND "${LDSCRIPT_CONTENTS}" "*(.stack*)" STACK_FOUND)
+        string(FIND "${LDSCRIPT_CONTENTS}" "*(.heap*)" HEAP_FOUND)
+        set(PICO_CRT0_ALLOCATE_SPACERS TRUE)
+        if ((${STACK_FOUND} GREATER -1) AND NOT (${KEEP_STACK_FOUND} GREATER -1))
+            message(WARNING "Linker script ${LDSCRIPT} does not KEEP the .stack section - replace `*(.stack*)` with `KEEP(*(.stack*))`")
+            set(PICO_CRT0_ALLOCATE_SPACERS FALSE)
+        endif()
+        if ((${HEAP_FOUND} GREATER -1) AND NOT (${KEEP_HEAP_FOUND} GREATER -1))
+            message(WARNING "Linker script ${LDSCRIPT} does not KEEP the .heap section - replace `*(.heap*)` with `KEEP(*(.heap*))`")
+            set(PICO_CRT0_ALLOCATE_SPACERS FALSE)
+        endif()
+        if (NOT ${PICO_CRT0_ALLOCATE_SPACERS})
+            message(WARNING "Linker script ${LDSCRIPT} is incompatible with Pico SDK >2.1.1 - setting PICO_CRT0_ALLOCATE_SPACERS=0 to maintain compatibility")
+            target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_ALLOCATE_SPACERS=0)
+        endif()
+    endfunction()
+
     # pico_set_linker_script(TARGET LDSCRIPT)
     # \brief\ Set the linker script for the target
     #
     # \param\ LDSCRIPT Full path to the linker script to set
     function(pico_set_linker_script TARGET LDSCRIPT)
+        pico_check_linker_script(${TARGET} ${LDSCRIPT})
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_LINKER_SCRIPT ${LDSCRIPT})
     endfunction()
 
