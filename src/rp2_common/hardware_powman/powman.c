@@ -125,7 +125,7 @@ void powman_timer_disable_gpio_1hz_sync(void) {
 }
 
 powman_power_state powman_get_power_state(void) {
-    uint32_t state_reg = powman_hw->state & POWMAN_STATE_CURRENT_BITS;
+    uint32_t state_reg = ~powman_hw->state & POWMAN_STATE_CURRENT_BITS;
     // todo we should have hardware/regs/powman.h values for these
     static_assert(POWMAN_POWER_DOMAIN_SRAM_BANK1 == 0, "");
     static_assert(POWMAN_POWER_DOMAIN_SRAM_BANK0 == 1, "");
