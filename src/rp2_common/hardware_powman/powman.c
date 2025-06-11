@@ -181,19 +181,30 @@ int powman_set_power_state(powman_power_state state) {
 }
 
 bool powman_configure_wakeup_state(powman_power_state sleep_state, powman_power_state wakeup_state) {
-    // When powman wakes up it can keep the state of the sram0 and sram1 banks. Note, it can't
-    // explicitly
-    bool valid = powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_XIP_CACHE);
+    // Must be entering a P1 low-power state (SWCORE OFF).
+    bool valid = !powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SWITCHED_CORE);
+    // Must be waking up in a P0 state (SWCORE ON).
     valid &= powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SWITCHED_CORE);
-    valid &= powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK0) ==
-             powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SRAM_BANK0);
-    valid &= powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK1) ==
-             powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    powman_power_state current_state = powman_get_power_state();
+    bool current_sram0 = powman_power_state_is_domain_on(current_state, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    bool current_sram1 = powman_power_state_is_domain_on(current_state, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    bool sleep_sram0 = powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    bool sleep_sram1 = powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    bool wakeup_sram0 = powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    bool wakeup_sram1 = powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    // Sleep state cannot turn ON SRAM0 or SRAM1 if it is OFF in the current state.
+    if (!current_sram0) valid &= !sleep_sram0;
+    if (!current_sram1) valid &= !sleep_sram1;
+    // Wakeup state cannot turn OFF SRAM0 or SRAM1 if it is ON in the sleep state.
+    if (sleep_sram0) valid &= wakeup_sram0;
+    if (sleep_sram1) valid &= wakeup_sram1;
     if (valid) {
+        // Prepare power sequencer to power SRAM domains on wakeup.
         powman_clear_bits(&powman_hw->seq_cfg, POWMAN_SEQ_CFG_HW_PWRUP_SRAM0_BITS | POWMAN_SEQ_CFG_HW_PWRUP_SRAM1_BITS);
         uint32_t seq_cfg_set = 0;
-        if (!powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK0)) seq_cfg_set |= POWMAN_SEQ_CFG_HW_PWRUP_SRAM0_BITS;
-        if (!powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK1)) seq_cfg_set |= POWMAN_SEQ_CFG_HW_PWRUP_SRAM1_BITS;
+        // Sequencer SRAM power transitions from sleep to wakeup are: OFF->ON (0), ON->ON (1) and OFF->OFF (1)
+        if (sleep_sram0 == wakeup_sram0) seq_cfg_set |= POWMAN_SEQ_CFG_HW_PWRUP_SRAM0_BITS;
+        if (sleep_sram1 == wakeup_sram1) seq_cfg_set |= POWMAN_SEQ_CFG_HW_PWRUP_SRAM1_BITS;
         powman_set_bits(&powman_hw->seq_cfg, seq_cfg_set);
     }
     return valid;
