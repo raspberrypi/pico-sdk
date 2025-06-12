@@ -6,11 +6,13 @@ on:
       - 'src/boards/include/boards/**'
       - 'tools/check_board_header.py'
       - 'tools/check_all_board_headers.sh'
+      - '.github/workflows/check_board.yml'
   pull_request:
     paths:
       - 'src/boards/include/boards/**'
       - 'tools/check_board_header.py'
       - 'tools/check_all_board_headers.sh'
+      - '.github/workflows/check_board.yml'
 
 jobs:
   check-board-headers:
