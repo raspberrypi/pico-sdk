@@ -22,9 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: sudo apt install python3
-
       - name: Check Board Headers
         run: |
           tools/check_all_board_headers.sh
