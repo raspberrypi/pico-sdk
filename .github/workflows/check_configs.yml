@@ -21,6 +21,11 @@ jobs:
         if: always()
         run: |
           tools/extract_cmake_configs.py .
+      
+      - name: Check CMake Functions
+        if: always()
+        run: |
+          tools/extract_cmake_functions.py .
 
       - name: Check Configs
         if: always()
