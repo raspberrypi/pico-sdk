@@ -220,12 +220,12 @@ with open(board_header) as header_fh:
         line = re.sub(r"(?<=\S)\s*//.*$", "", line)
 
         # look for board-detection comment
-        if re.match("^\s*// For board detection", line):
+        if re.match(r"^\s*// For board detection", line):
             board_detection_is_next = True
             continue
 
         # check include-suggestion
-        m = re.match("^\s*// This header may be included by other board headers as \"(.+?)\"", line)
+        m = re.match(r"""^\s*// This header may be included by other board headers as "(.+?)"$""", line)
         if m:
             include_suggestion = m.group(1)
             if include_suggestion == expected_include_suggestion:
