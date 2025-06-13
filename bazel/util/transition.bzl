@@ -114,6 +114,7 @@ kitchen_sink_test_binary = declare_transtion(
     attrs = {
         "bt_stack_config": attr.label(mandatory = True),
         "lwip_config": attr.label(mandatory = True),
+        "mbedtls_config": attr.label(mandatory = True),
         "enable_ble": attr.bool(default = False),
         "enable_bt_classic": attr.bool(default = False),
         # This could be shared, but we don't in order to make it clearer that
@@ -127,6 +128,7 @@ kitchen_sink_test_binary = declare_transtion(
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG": "lwip_config",
         "@pico-sdk//bazel/config:PICO_BT_ENABLE_BLE": "enable_ble",
         "@pico-sdk//bazel/config:PICO_BT_ENABLE_CLASSIC": "enable_bt_classic",
+        "@pico-sdk//bazel/config:PICO_MBEDTLS_CONFIG": "mbedtls_config",
     },
 )
 

@@ -26,8 +26,7 @@ static void (*chars_available_callback)(void*);
 static void *chars_available_param;
 #endif
 
-// when tinyusb_device is explicitly linked we do no background tud processing
-#if !LIB_TINYUSB_DEVICE
+#if PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK
 // if this crit_sec is initialized, we are not in periodic timer mode, and must make sure
 // we don't either create multiple one shot timers, or miss creating one. this crit_sec
 // is used to protect the one_shot_timer_pending flag
@@ -171,6 +170,12 @@ void stdio_usb_set_chars_available_callback(void (*fn)(void*), void *param) {
     chars_available_callback = fn;
     chars_available_param = param;
 }
+
+void stdio_usb_call_chars_available_callback(void) {
+    if (chars_available_callback) {
+        chars_available_callback(chars_available_param);
+    }
+}
 #endif
 
 stdio_driver_t stdio_usb = {
@@ -197,8 +202,8 @@ bool stdio_usb_init(void) {
     bi_decl_if_func_used(bi_program_feature("USB stdin / stdout"));
 #endif
 
-#if !defined(LIB_TINYUSB_DEVICE)
-    // initialize TinyUSB, as user hasn't explicitly linked it
+#if PICO_STDIO_USB_ENABLE_TINYUSB_INIT
+    // initialize TinyUSB
     tusb_init();
 #else
     assert(tud_inited()); // we expect the caller to have initialized if they are using TinyUSB
@@ -206,7 +211,7 @@ bool stdio_usb_init(void) {
 
     if (!mutex_is_initialized(&stdio_usb_mutex)) mutex_init(&stdio_usb_mutex);
     bool rc = true;
-#if !LIB_TINYUSB_DEVICE
+#if PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK
 #ifdef PICO_STDIO_USB_LOW_PRIORITY_IRQ
     user_irq_claim(PICO_STDIO_USB_LOW_PRIORITY_IRQ);
 #else
@@ -265,7 +270,7 @@ bool stdio_usb_deinit(void) {
     sleep_ms(PICO_STDIO_USB_DEINIT_DELAY_MS);
 #endif
 
-#if !LIB_TINYUSB_DEVICE
+#if PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK
     if (irq_has_shared_handler(USBCTRL_IRQ)) {
         spin_lock_unclaim(spin_lock_get_num(one_shot_timer_crit_sec.spin_lock));
         critical_section_deinit(&one_shot_timer_crit_sec);

@@ -252,3 +252,24 @@ label_flag_matches(
     flag = "//bazel/config:PICO_FREERTOS_LIB",
     value = "//bazel:empty_cc_lib",
 )
+
+label_flag_matches(
+    name = "pico_mbedtls_config_unset",
+    flag = "//bazel/config:PICO_MBEDTLS_CONFIG",
+    value = "//bazel:empty_cc_lib",
+)
+
+config_setting(
+    name = "pico_compilation_no_opt_args_set",
+    flag_values = {"//bazel/config:PICO_COMPILATION_NO_OPT_ARGS": "True"},
+)
+
+config_setting(
+    name = "pico_compilation_no_debug_args_set",
+    flag_values = {"//bazel/config:PICO_COMPILATION_NO_DEBUG_ARGS": "True"},
+)
+
+config_setting(
+    name = "pico_compilation_no_fastbuild_args_set",
+    flag_values = {"//bazel/config:PICO_COMPILATION_NO_FASTBUILD_ARGS": "True"},
+)

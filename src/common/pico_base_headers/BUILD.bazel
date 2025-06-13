@@ -112,6 +112,7 @@ cc_library(
         "//src/rp2_common/hardware_watchdog:__pkg__",
         "//src/rp2_common/hardware_xosc:__pkg__",
         "//src/rp2_common/pico_crt0:__pkg__",
+        "//src/rp2_common/pico_platform_common:__pkg__",
         "//src/rp2_common/pico_printf:__pkg__",
         "//src/rp2_common/pico_runtime:__pkg__",
         "//src/rp2_common/pico_runtime_init:__pkg__",

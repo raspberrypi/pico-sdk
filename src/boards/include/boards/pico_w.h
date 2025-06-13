@@ -9,13 +9,13 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// pico_cmake_set PICO_PLATFORM        = rp2040
-// pico_cmake_set PICO_CYW43_SUPPORTED = 1
-
 // This header may be included by other board headers as "boards/pico_w.h"
 
 #ifndef _BOARDS_PICO_W_H
 #define _BOARDS_PICO_W_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
+pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 
 // For board detection
 #define RASPBERRYPI_PICO_W
@@ -71,7 +71,7 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (2 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
@@ -92,6 +92,12 @@
 
 #ifndef CYW43_WL_GPIO_LED_PIN
 #define CYW43_WL_GPIO_LED_PIN 0
+#endif
+
+// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
+// As this is a CYW43 pin you can do this by calling cyw43_gpio_set
+#ifndef CYW43_WL_GPIO_SMPS_PIN
+#define CYW43_WL_GPIO_SMPS_PIN 1
 #endif
 
 // If CYW43_WL_GPIO_VBUS_PIN is defined then a CYW43 GPIO has to be used to read VBUS.

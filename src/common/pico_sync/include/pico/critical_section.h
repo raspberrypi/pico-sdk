@@ -7,6 +7,7 @@
 #ifndef _PICO_CRITICAL_SECTION_H
 #define _PICO_CRITICAL_SECTION_H
 
+#include "pico.h"
 #include "pico/lock_core.h"
 
 #ifdef __cplusplus
@@ -58,7 +59,7 @@ void critical_section_init_with_lock_num(critical_section_t *crit_sec, uint lock
  *
  * \param crit_sec Pointer to critical_section structure
  */
-static inline void critical_section_enter_blocking(critical_section_t *crit_sec) {
+__force_inline static void critical_section_enter_blocking(critical_section_t *crit_sec) {
     crit_sec->save = spin_lock_blocking(crit_sec->spin_lock);
 }
 
@@ -67,7 +68,7 @@ static inline void critical_section_enter_blocking(critical_section_t *crit_sec)
  *
  * \param crit_sec Pointer to critical_section structure
  */
-static inline void critical_section_exit(critical_section_t *crit_sec) {
+__force_inline static void critical_section_exit(critical_section_t *crit_sec) {
     spin_unlock(crit_sec->spin_lock, crit_sec->save);
 }
 

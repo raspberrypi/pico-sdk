@@ -5,6 +5,10 @@ if (NOT TARGET pico_standard_link)
         target_link_libraries(pico_standard_link INTERFACE boot_stage2_headers)
     endif()
 
+    # pico_add_link_depend(TARGET dependency)
+    # \brief\ Add a link time dependency to the target
+    #
+    # \param\ dependency The dependency to add
     function(pico_add_link_depend TARGET dependency)
         get_target_property(target_type ${TARGET} TYPE)
         if (${target_type} STREQUAL "INTERFACE_LIBRARY")
@@ -21,15 +25,23 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES ${PROP} "${_LINK_DEPENDS}")
     endfunction()
 
-    # need this because cmake does not appear to have a way to override an INTERFACE variable
+    # pico_set_linker_script(TARGET LDSCRIPT)
+    # \brief\ Set the linker script for the target
+    #
+    # \param\ LDSCRIPT Full path to the linker script to set
     function(pico_set_linker_script TARGET LDSCRIPT)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_LINKER_SCRIPT ${LDSCRIPT})
     endfunction()
 
+    # pico_set_binary_type(TARGET TYPE)
+    # \brief\ Set the binary type for the target
+    #
+    # \param\ TYPE The binary type to set
     function(pico_set_binary_type TARGET TYPE)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()
 
+    # slightly messy as we support both the preferred PICO_DEFAULT_BINARY_TYPE and the individual variables
     if (NOT PICO_DEFAULT_BINARY_TYPE)
         if (PICO_NO_FLASH)
             set(PICO_DEFAULT_BINARY_TYPE no_flash)
@@ -40,6 +52,23 @@ if (NOT TARGET pico_standard_link)
         else()
             set(PICO_DEFAULT_BINARY_TYPE default)
         endif()
+    else()
+        # we must set the individual variables here, as they are used in generator expressions,
+        # but also for our checks below
+        if (PICO_DEFAULT_BINARY_TYPE STREQUAL no_flash)
+            set(PICO_NO_FLASH 1)
+        endif()
+        if (PICO_DEFAULT_BINARY_TYPE STREQUAL blocked_ram)
+            set(PICO_USE_BLOCKED_RAM 1)
+        endif()
+        if (PICO_DEFAULT_BINARY_TYPE STREQUAL copy_to_ram)
+            set(PICO_COPY_TO_RAM 1)
+        endif()
+    endif()
+    if ((PICO_NO_FLASH AND PICO_USE_BLOCKED_RAM) OR
+        (PICO_USE_BLOCKED_RAM AND PICO_COPY_TO_RAM) OR
+        (PICO_COPY_TO_RAM AND PICO_NO_FLASH))
+        message(FATAL_ERROR "Conflicting binary types specified amongst PICO_DEFAULT_BINARY_TYPE, PICO_NO_FLASH, PICO_USE_BLOCKED_RAM and PICO_COPY_TO_RAM")
     endif()
 
     # todo only needed if not using a custom linker script

@@ -160,64 +160,22 @@ check_irq_before_exit:
     addi sp, sp, 80
     mret
 
+
 // Default software vector table for system interrupts, routed through
 // mip.meip. Note this is assumed in e.g. hardware_irq to begin exactly 0x34
 // words after the hardware vector table indicated by mtvec (defined above).
 .p2align 4
 .global __soft_vector_table
 __soft_vector_table:
-.word isr_irq0
-.word isr_irq1
-.word isr_irq2
-.word isr_irq3
-.word isr_irq4
-.word isr_irq5
-.word isr_irq6
-.word isr_irq7
-.word isr_irq8
-.word isr_irq9
-.word isr_irq10
-.word isr_irq11
-.word isr_irq12
-.word isr_irq13
-.word isr_irq14
-.word isr_irq15
-.word isr_irq16
-.word isr_irq17
-.word isr_irq18
-.word isr_irq19
-.word isr_irq20
-.word isr_irq21
-.word isr_irq22
-.word isr_irq23
-.word isr_irq24
-.word isr_irq25
-.word isr_irq26
-.word isr_irq27
-.word isr_irq28
-.word isr_irq29
-.word isr_irq30
-.word isr_irq31
-.word isr_irq32
-.word isr_irq33
-.word isr_irq34
-.word isr_irq35
-.word isr_irq36
-.word isr_irq37
-.word isr_irq38
-.word isr_irq39
-.word isr_irq40
-.word isr_irq41
-.word isr_irq42
-.word isr_irq43
-.word isr_irq44
-.word isr_irq45
-.word isr_irq46
-.word isr_irq47
-.word isr_irq48
-.word isr_irq49
-.word isr_irq50
-.word isr_irq51
+.macro vtable_irq_n n
+.word isr_irq\n
+.endm
+
+.set IRQN, 0
+.rept PICO_NUM_VTABLE_IRQS
+vtable_irq_n IRQN
+.set IRQN, IRQN + 1
+.endr
 
 // all default trap handlers do nothing, and we can check for them being set to our
 // default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
@@ -252,58 +210,23 @@ decl_isr isr_riscv_machine_exception
 decl_isr_bkpt isr_riscv_machine_timer
 decl_isr_bkpt isr_riscv_machine_soft_irq
 
-decl_isr isr_irq0
-decl_isr isr_irq1
-decl_isr isr_irq2
-decl_isr isr_irq3
-decl_isr isr_irq4
-decl_isr isr_irq5
-decl_isr isr_irq6
-decl_isr isr_irq7
-decl_isr isr_irq8
-decl_isr isr_irq9
-decl_isr isr_irq10
-decl_isr isr_irq11
-decl_isr isr_irq12
-decl_isr isr_irq13
-decl_isr isr_irq14
-decl_isr isr_irq15
-decl_isr isr_irq16
-decl_isr isr_irq17
-decl_isr isr_irq18
-decl_isr isr_irq19
-decl_isr isr_irq20
-decl_isr isr_irq21
-decl_isr isr_irq22
-decl_isr isr_irq23
-decl_isr isr_irq24
-decl_isr isr_irq25
-decl_isr isr_irq26
-decl_isr isr_irq27
-decl_isr isr_irq28
-decl_isr isr_irq29
-decl_isr isr_irq30
-decl_isr isr_irq31
-decl_isr isr_irq32
-decl_isr isr_irq33
-decl_isr isr_irq34
-decl_isr isr_irq35
-decl_isr isr_irq36
-decl_isr isr_irq37
-decl_isr isr_irq38
-decl_isr isr_irq39
-decl_isr isr_irq40
-decl_isr isr_irq41
-decl_isr isr_irq42
-decl_isr isr_irq43
-decl_isr isr_irq44
-decl_isr isr_irq45
-decl_isr isr_irq46
-decl_isr isr_irq47
-decl_isr isr_irq48
-decl_isr isr_irq49
-decl_isr isr_irq50
-decl_isr isr_irq51
+// Declare all the ISR labels
+.macro decl_isr_n n
+.if \n < PICO_NUM_VTABLE_IRQS
+    decl_isr isr_irq\n
+.elseif \n < NUM_IRQS
+    // We declare a strong label, so user can't override, since there is no vtable entry
+    .type isr_irq\n,%function
+    .thumb_func
+    isr_irq\n:
+.endif
+.endm
+
+.set IRQN, 0
+.rept PICO_NUM_VTABLE_IRQS
+decl_isr_n IRQN
+.set IRQN, IRQN + 1
+.endr
     // fall through
 
 // All unhandled USER IRQs fall through to here. Note there is no way to get

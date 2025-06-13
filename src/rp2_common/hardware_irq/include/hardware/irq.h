@@ -195,7 +195,7 @@ extern "C" {
 typedef void (*irq_handler_t)(void);
 
 static inline void check_irq_param(__unused uint num) {
-    invalid_params_if(HARDWARE_IRQ, num >= NUM_IRQS);
+    invalid_params_if(HARDWARE_IRQ, num >= PICO_NUM_VTABLE_IRQS);
 }
 
 /*! \brief Set specified interrupt's priority

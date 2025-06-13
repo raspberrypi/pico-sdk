@@ -133,12 +133,12 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
 
 
 
-# Scan all .c and .h files in the specific path, recursively.
+# Scan all .c and .h and .S files in the specific path, recursively.
 
 for dirpath, dirnames, filenames in os.walk(scandir):
     for filename in filenames:
         file_ext = os.path.splitext(filename)[1]
-        if file_ext in ('.c', '.h'):
+        if file_ext in ('.c', '.h', '.S'):
             file_path = os.path.join(dirpath, filename)
             applicable = "all"
             for chip in (*CHIP_NAMES, "host"):
@@ -241,6 +241,7 @@ for applicable, all_defines in chips_all_defines.items():
 
 for applicable, all_configs in chips_all_configs.items():
     all_defines = chips_all_defines[applicable]
+    resolved_defines = chips_resolved_defines[applicable]
     for config_name, config_obj in all_configs.items():
         file_path = os.path.join(scandir, config_obj['filename'])
         linenum = config_obj['line_number']

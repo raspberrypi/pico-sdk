@@ -60,6 +60,12 @@ extern void tight_loop_contents();
 #define __noinline __attribute__((noinline))
 #endif
 
+#ifndef __force_inline
+// don't think it is critical to inline in host mode, and this is simpler than picking the
+// correct attribute incantation for always_inline on different compiler versions
+#define __force_inline inline
+#endif
+
 #ifndef __aligned
 #define __aligned(x) __attribute__((aligned(x)))
 #endif

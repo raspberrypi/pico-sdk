@@ -204,6 +204,11 @@ enum gpio_irq_level {
  */
 typedef void (*gpio_irq_callback_t)(uint gpio, uint32_t event_mask);
 
+/*! \brief GPIO override modes
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_set_irqover, gpio_set_outover, gpio_set_inover, gpio_set_oeover
+ */
 enum gpio_override {
     GPIO_OVERRIDE_NORMAL = 0,      ///< peripheral signal selected via \ref gpio_set_function
     GPIO_OVERRIDE_INVERT = 1,      ///< invert peripheral signal selected via \ref gpio_set_function
@@ -781,6 +786,8 @@ static inline void gpio_add_raw_irq_handler(uint gpio, irq_handler_t handler) {
  * it is possible to add explicit GPIO IRQ handlers which are called independent of the default event callback.
  *
  * This method removes such a callback, and enables the "default" callback for the specified GPIOs.
+ *
+ * \note You should always use the same gpio_mask as you used when you added the raw IRQ handler.
  *
  * @param gpio_mask a bit mask of the GPIO numbers that will now be passed to the default callback for this core
  * @param handler the handler to remove from the list of GPIO IRQ handlers for this core

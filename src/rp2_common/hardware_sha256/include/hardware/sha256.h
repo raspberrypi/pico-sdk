@@ -122,7 +122,7 @@ static inline bool sha256_is_sum_valid(void) {
  *  \ingroup hardware_sha256
  *
  * After writing 64 bytes of data to the hardware, it will be unable to accept more data for a time.
- * Call this to check if the hardware is ready for more data to be written. \see sha256_err_not_ready
+ * Call this to check if the hardware is ready for more data to be written. See \ref sha256_err_not_ready
  *
  * \return True if the hardware is ready to receive more data
  */

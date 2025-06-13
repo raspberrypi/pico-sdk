@@ -152,7 +152,7 @@ void __weak runtime_init_post_clock_resets(void) {
 }
 #endif
 
-#if !PICO_RUNTIME_SKIP_POST_CLOCK_RESETS
+#if !PICO_RUNTIME_SKIP_INIT_POST_CLOCK_RESETS
 PICO_RUNTIME_INIT_FUNC_HW(runtime_init_post_clock_resets, PICO_RUNTIME_INIT_POST_CLOCK_RESETS);
 #endif
 
@@ -195,23 +195,32 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_spin_locks_reset, PICO_RUNTIME_INIT_
 // RISC-V to have an initial flash-resident vector table at a well-known
 // location, unlike Cortex-M which can take an NMI on cycle 0.
 #ifndef __riscv
+#include "hardware/structs/scb.h"
+#include "hardware/irq.h"
 
 #if !PICO_RUNTIME_NO_INIT_INSTALL_RAM_VECTOR_TABLE
-uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[PICO_RAM_VECTOR_TABLE_SIZE];
-
-#include "hardware/structs/scb.h"
-void runtime_init_install_ram_vector_table(void) {
-    // Note on RISC-V the RAM vector table is initialised during crt0
-#if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH) && !defined(__riscv)
-#if !PICO_NO_STORED_VECTOR_TABLE
-    __builtin_memcpy(ram_vector_table, (uint32_t *) scb_hw->vtor, sizeof(ram_vector_table));
-#else
-    __builtin_memcpy(ram_vector_table, (uint32_t *) scb_hw->vtor, MIN(VTABLE_FIRST_IRQ, sizeof(ram_vector_table)));
-    for(uint i = VTABLE_FIRST_IRQ; i<count_of(ram_vector_table); i++) {
-        ram_vector_table[i] = (uintptr_t)__unhandled_user_irq;
-    }
+// note that this is not a safely overridable value, you should use override PICO_NUM_VTABLE_IRQs instead.
+// keeping around as a #define though as it used to be supported
+#ifdef PICO_RAM_VECTOR_TABLE_SIZE
+#warning Overriding PICO_RAM_VECTOR_TABLE_SIZE is deprecated; specify PICO_NUM_VTABLE_IRQS instead
+#endif
+#ifndef PICO_RAM_VECTOR_TABLE_SIZE
+#define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + PICO_NUM_VTABLE_IRQS)
 #endif
 
+
+uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[PICO_RAM_VECTOR_TABLE_SIZE];
+
+void runtime_init_install_ram_vector_table(void) {
+    // Note on RISC-V the RAM vector table is initialised during crt0
+#if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH)
+    extern uint32_t __vectors;
+    extern uint32_t __vectors_end;
+    uint32_t stored_words = (uint32_t)(&__vectors_end - &__vectors);
+    __builtin_memcpy(ram_vector_table, &__vectors, 4 * MIN(stored_words, PICO_RAM_VECTOR_TABLE_SIZE));
+    for(uint i = stored_words; i<count_of(ram_vector_table); i++) {
+        ram_vector_table[i] = (uintptr_t)__unhandled_user_irq;
+    }
     scb_hw->vtor = (uintptr_t) ram_vector_table;
 #endif
 }

@@ -135,6 +135,7 @@ BAZEL_ONLY_ALLOWLIST = (
     # Bazel configuration for 3p deps.
     "PICO_BTSTACK_CONFIG",
     "PICO_LWIP_CONFIG",
+    "PICO_MBEDTLS_CONFIG",
     "PICO_FREERTOS_LIB",
     "PICO_MBEDTLS_LIB",
     # CMake has PICO_DEFAULT_CLIB, but it's not user-facing.
@@ -157,6 +158,10 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_BT_ENABLE_BLE",
     "PICO_BT_ENABLE_CLASSIC",
     "PICO_BT_ENABLE_MESH",
+    # Compilation modes remove, These allow the user to remove the defaults, with no args. See --compilation_mode cmd line option
+    "PICO_COMPILATION_NO_OPT_ARGS",
+    "PICO_COMPILATION_NO_DEBUG_ARGS",
+    "PICO_COMPILATION_NO_FASTBUILD_ARGS",
 )
 
 

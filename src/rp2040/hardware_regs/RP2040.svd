@@ -51022,5 +51022,38 @@ SPDX-License-Identifier: BSD-3-Clause
             </register>
         </registers>
     </peripheral>
+    <peripheral>
+        <name>SPARE_IRQ</name>
+        <baseAddress>0x00000000</baseAddress>
+        <addressBlock>
+            <offset>0</offset>
+            <size>4</size>
+            <usage>reserved</usage>
+        </addressBlock>
+        <interrupt>
+            <name>SPARE_IRQ_0</name>
+            <value>26</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_1</name>
+            <value>27</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_2</name>
+            <value>28</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_3</name>
+            <value>29</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_4</name>
+            <value>30</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_5</name>
+            <value>31</value>
+        </interrupt>
+    </peripheral>
     </peripherals>
 </device>

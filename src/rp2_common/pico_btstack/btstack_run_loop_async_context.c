@@ -129,6 +129,14 @@ const btstack_run_loop_t *btstack_run_loop_async_context_get_instance(async_cont
     return &btstack_run_loop_async_context;
 }
 
+void btstack_run_loop_async_context_deinit(void) {
+    if (btstack_async_context) {
+        async_context_remove_at_time_worker(btstack_async_context, &btstack_timeout_worker);
+        async_context_remove_when_pending_worker(btstack_async_context, &btstack_processing_worker);
+        btstack_async_context = NULL;
+    }
+}
+
 static void btstack_timeout_reached(__unused async_context_t *context, __unused async_at_time_worker_t *worker) {
     // simply wakeup worker
     async_context_set_work_pending(btstack_async_context, &btstack_processing_worker);

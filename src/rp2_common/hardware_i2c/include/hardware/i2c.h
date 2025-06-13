@@ -324,10 +324,10 @@ int i2c_write_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t
  * (for example) without having to send address byte(s) repeatedly
  *
  * \param i2c Either \ref i2c0 or \ref i2c1
- * \param addr 7-bit address of device to read from
- * \param dst Pointer to buffer to receive data
- * \param len Length of data in bytes to receive
- * \return Number of bytes read, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
+ * \param addr 7-bit address of device to write to
+ * \param src Pointer to data to send
+ * \param len Length of data in bytes to send
+ * \return Number of bytes written, or PICO_ERROR_GENERIC if address not acknowledged or no device present.
  */
 int i2c_write_burst_blocking(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len);
 

@@ -1,5 +1,13 @@
-# Compile the http content into a source file "pico_fsdata.inc" in a format suitable for the lwip httpd server
-# Pass the target library name library type and the list of httpd content
+# pico_set_lwip_httpd_content(TARGET_LIB TARGET_TYPE HTTPD_FILES...)
+# \ingroup\ pico_lwip
+# \brief_nodesc\ Compile the http content into a source file for lwip.
+#
+# Compile the http content into a source file "pico_fsdata.inc" in a format suitable for the lwip httpd server.
+# Pass the target library name, library type, and the list of httpd content files to compile.
+#
+# \param\ TARGET_LIB The target library name
+# \param\ TARGET_TYPE The type of the target library
+# \param\ HTTPD_FILES The list of httpd content files to compile
 function(pico_set_lwip_httpd_content TARGET_LIB TARGET_TYPE)
     find_package (Python3 REQUIRED COMPONENTS Interpreter)
     set(HTTPD_CONTENT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")

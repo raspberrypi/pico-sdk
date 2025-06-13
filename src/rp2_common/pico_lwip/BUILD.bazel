@@ -131,14 +131,15 @@ alias(
     actual = "@lwip//:pico_lwip_tftp",
 )
 
-alias(
+cc_library(
     name = "pico_lwip_mbedtls",
-    actual = "@lwip//:pico_lwip_mbedtls",
+    srcs = ["altcp_tls_mbedtls.c"],
+    deps = ["@lwip//:pico_lwip_mbedtls"],
 )
 
 alias(
-    name = "pico_lwip_mqttt",
-    actual = "@lwip//:pico_lwip_mqttt",
+    name = "pico_lwip_mqtt",
+    actual = "@lwip//:pico_lwip_mqtt",
 )
 
 alias(
