@@ -59,19 +59,19 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 //------------- SPI -------------//
 #ifndef PICO_DEFAULT_SPI
-#define PICO_DEFAULT_SPI 0
+#define PICO_DEFAULT_SPI 1
 #endif
 
 #ifndef PICO_DEFAULT_SPI_TX_PIN
-#define PICO_DEFAULT_SPI_TX_PIN 19
+#define PICO_DEFAULT_SPI_TX_PIN 15
 #endif
 
 #ifndef PICO_DEFAULT_SPI_RX_PIN
-#define PICO_DEFAULT_SPI_RX_PIN 20
+#define PICO_DEFAULT_SPI_RX_PIN 8
 #endif
 
 #ifndef PICO_DEFAULT_SPI_SCK_PIN
-#define PICO_DEFAULT_SPI_SCK_PIN 18
+#define PICO_DEFAULT_SPI_SCK_PIN 14
 #endif
 
 //------------- SD -------------//
