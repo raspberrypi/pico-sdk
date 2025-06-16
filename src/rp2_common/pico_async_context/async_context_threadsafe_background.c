@@ -140,7 +140,11 @@ uint32_t async_context_threadsafe_background_execute_sync(async_context_t *self_
 #if ASYNC_CONTEXT_THREADSAFE_BACKGROUND_MULTI_CORE
     const uint calling_core = get_core_num();
     if (self_base->core_num != calling_core) {
-        hard_assert(self->lock_mutex.owner != calling_core);
+        // It is ok for the other call to own the mutex currently. Note that this
+        // read of the owner is not synchronized with the other core; however we only
+        // care about it being set to `calling_core`, which the other core will not transition
+        // it either from or to.
+        hard_assert(recursive_mutex_owner(self->lock_mutex) != calling_core);
         sync_func_call_t call = {0};
         call.worker.do_work = handle_sync_func_call;
         call.func = func;
