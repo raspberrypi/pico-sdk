@@ -138,9 +138,9 @@ static void lock_release(async_context_threadsafe_background_t *self) {
 uint32_t async_context_threadsafe_background_execute_sync(async_context_t *self_base, uint32_t (*func)(void *param), void *param) {
     async_context_threadsafe_background_t *self = (async_context_threadsafe_background_t*)self_base;
 #if ASYNC_CONTEXT_THREADSAFE_BACKGROUND_MULTI_CORE
-	const uint calling_core = get_core_num();
-	if (self_base->core_num != calling_core) {
-	    hard_assert(self->lock_mutex.owner != calling_core);
+    const uint calling_core = get_core_num();
+    if (self_base->core_num != calling_core) {
+        hard_assert(self->lock_mutex.owner != calling_core);
         sync_func_call_t call = {0};
         call.worker.do_work = handle_sync_func_call;
         call.func = func;
