@@ -131,7 +131,7 @@ def process_commands(description, name, group, signature):
     if any([';' in x for x in params]):
         errors.append(Exception("{}:{} has a parameter description containing ';'".format(group, name)))
     # Check that all parameters are in the signature
-    signature_words = set(re.split('\W+', signature))
+    signature_words = set(re.split(r'\W+', signature))
     for param in params:
         param_name = param.split(' ', maxsplit=1)[0]
         if param_name not in signature_words:
