@@ -46,6 +46,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define ADAFRUIT_FRUIT_JAM_D10_PIN 10
 
 // Buttons
+// Boot button is also known as Button 1.
 #define ADAFRUIT_FRUIT_JAM_BOOT_BUTTON_PIN 0
 #define ADAFRUIT_FRUIT_JAM_BUTTON1_PIN 0
 #define ADAFRUIT_FRUIT_JAM_BUTTON2_PIN 4
@@ -120,7 +121,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_DEFAULT_LED_PIN 29
 #endif
 
-// --- RGB (NeoPixel) LED
+// --- RGB (NeoPixel) LED ---
 #ifndef PICO_DEFAULT_WS2812_PIN
 #define PICO_DEFAULT_WS2812_PIN 32
 #endif
@@ -150,6 +151,34 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #ifndef PICO_DEFAULT_SPI_RX_PIN
 #define PICO_DEFAULT_SPI_RX_PIN ADAFRUIT_FRUIT_JAM_SD_MISO_PIN
 #endif
+
+//------------- SD ------------
+#ifndef PICO_SD_CARD_DETECT_PIN
+#define PICO_SD_CARD_DETECT_PIN ADAFRUIT_FRUIT_JAM_SD_CARD_DETECT_PIN
+#endif
+
+#ifndef PICO_SD_CLK_PIN
+#define PICO_SD_CLK_PIN ADAFRUIT_FRUIT_JAM_SDIO_CLOCK_PIN
+#endif
+
+#ifndef PICO_SD_CMD_PIN
+#define PICO_SD_CMD_PIN ADAFRUIT_FRUIT_JAM_SDIO_COMMAND_PIN
+#endif
+
+#ifndef PICO_SD_DAT0_PIN
+#define PICO_SD_DAT0_PIN ADAFRUIT_FRUIT_JAM_SDIO_DATA0_PIN
+#endif
+
+#ifndef PICO_SD_DAT_PIN_INCREMENT
+#define PICO_SD_DAT_PIN_INCREMENT 1
+#endif
+
+#ifndef PICO_SD_DAT_PIN_COUNT
+#define PICO_SD_DAT_PIN_COUNT 4
+#endif
+
+// --- PIO USB ---
+#define PICO_DEFAULT_PIO_USB_DP_PIN ADAFRUIT_FRUIT_JAM_USB_HOST_DATA_PLUS_PIN
 
 // --- FLASH ---
 // Winbond W25Q128 (16MB) flash
