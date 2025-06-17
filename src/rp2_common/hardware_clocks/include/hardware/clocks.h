@@ -231,7 +231,7 @@ extern "C" {
 #endif
 #endif // PICO_RP2040 && SYS_CLK_KHZ == 200000 && XOSC_KHZ == 12000 && PLL_COMMON_REFDIV == 1
 
-// PICO_CONFIG: SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_US, Number of microseconds to wait after updating regulator voltage due to SYS_CLK_VREG_VOLTAGE_MIN to allow voltage to settle, type=bool, default=1000, advanced=true, group=hardware_clocks
+// PICO_CONFIG: SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_US, Number of microseconds to wait after updating regulator voltage due to SYS_CLK_VREG_VOLTAGE_MIN to allow voltage to settle, type=int, default=1000, advanced=true, group=hardware_clocks
 #ifndef SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_US
 #define SYS_CLK_VREG_VOLTAGE_AUTO_ADJUST_DELAY_US 1000
 #endif
