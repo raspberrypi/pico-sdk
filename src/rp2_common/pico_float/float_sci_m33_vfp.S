@@ -29,6 +29,7 @@ float_section WRAPPER_FUNC_NAME(\func)
 
 float_section frrcore_v
 
+.p2align 2
 // 1/2π to plenty of accuracy
 .long 0                      @ this allows values of e down to -32
 rtwopi:
@@ -152,7 +153,7 @@ wrapper_func expf
  mov r0,#0
  bx r14
 
-.align 3
+.p2align 3
 k_exp2:
 .float 0.693147181           @ log2
 .float 0.240226507           @ log²2/2
@@ -254,7 +255,7 @@ wrapper_func logf
  movlong r0,0xff800000
  bx r14
 
-.align 3
+.p2align 3
 k_log3:
 .float 0.5
 .float 0.333333333333333
@@ -501,7 +502,7 @@ fsc_sintail:
  and r0,r0,#0x80000000       @ make signed zero
  b 22b
 
-.align 2
+.p2align 2
 2:
  vmul.f32 s3,s3,s9           @ ε³/3!
  vsub.f32 s1,s1,s3           @ ε-ε³/3! ~ sinε
@@ -515,7 +516,7 @@ fsc_costail:
  eor r0,r0,r12,lsl#31
  bx r14
 
-.align 3
+.p2align 3
 k_sc3:
 .word 0x3EFFFEC1             @ ~ 1/2! with PMC
 .word 0x3e2aaa25             @ ~ 1/3! with PMC

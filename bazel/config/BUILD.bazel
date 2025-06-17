@@ -186,6 +186,12 @@ int_flag(
     build_setting_default = 0,
 )
 
+# PICO_BAZEL_CONFIG: PICO_TINYUSB_CONFIG, [Bazel only] The library that provides TinyUSB config header (e.g. tusb_config.h), default=//src/rp2_common/pico_stdio_usb:tusb_config, group=build
+label_flag(
+    name = "PICO_TINYUSB_CONFIG",
+    build_setting_default = "//src/rp2_common/pico_stdio_usb:tusb_config",
+)
+
 # PICO_BAZEL_CONFIG: PICO_TINYUSB_LIB, [Bazel only] The library that provides TinyUSB, default=@tinyusb//:tinyusb, group=build
 label_flag(
     name = "PICO_TINYUSB_LIB",
@@ -287,4 +293,28 @@ label_flag(
 label_flag(
     name = "PICO_FREERTOS_LIB",
     build_setting_default = "//bazel:empty_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_MBEDTL_CONFIG, [Bazel only] The cc_library that provides mbedtls_config.h, default=//bazel:empty_cc_lib, group=pico_mbedtls
+label_flag(
+    name = "PICO_MBEDTLS_CONFIG",
+    build_setting_default = "//bazel:empty_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_OPT_ARGS, Makes the opt compilation mode a no-op so custom optimization arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_COMPILATION_NO_OPT_ARGS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_DEBUG_ARGS, Makes the debug compilation mode a no-op so custom debug arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_COMPILATION_NO_DEBUG_ARGS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_FASTBUILD_ARGS, Makes the fastbuild compilation mode a no-op so custom fastbuild arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_COMPILATION_NO_FASTBUILD_ARGS",
+    build_setting_default = False,
 )

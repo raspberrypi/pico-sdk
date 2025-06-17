@@ -96,7 +96,7 @@ void PICO_WEAK_FUNCTION_IMPL_NAME(irq_init_priorities)() {
 }
 
 static uint get_user_irq_claim_index(uint irq_num) {
-    invalid_params_if(HARDWARE_IRQ, irq_num < FIRST_USER_IRQ || irq_num >= NUM_IRQS);
+    invalid_params_if(HARDWARE_IRQ, irq_num < FIRST_USER_IRQ || irq_num >= PICO_NUM_VTABLE_IRQS);
     // we count backwards from the last, to match the existing hard coded uses of user IRQs in the SDK which were previously using 31
     static_assert(NUM_IRQS - FIRST_USER_IRQ <= 8, ""); // we only use a single byte's worth of claim bits today.
     return NUM_IRQS - irq_num  - 1u;

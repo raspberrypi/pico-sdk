@@ -5,6 +5,21 @@
 #endif
 #endif
 
+#ifndef PICO_CRT0_INCLUDE_PICOBIN_VECTOR_TABLE_ITEM
+// If no_flash bin, then include a vector table item
+#if PICO_NO_FLASH && !PICO_RP2040
+#define PICO_CRT0_INCLUDE_PICOBIN_VECTOR_TABLE_ITEM 1
+#endif
+#endif
+
+#ifndef PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM
+// On RISC-V the default entry point from bootrom is the start of the binary, but
+// we have our vtable at the start, so we must include an entry point
+#ifdef __riscv
+#define PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM 1
+#endif
+#endif
+
 #ifndef PICO_CRT0_INCLUDE_PICOBIN_BLOCK
 #define PICO_CRT0_INCLUDE_PICOBIN_BLOCK PICO_CRT0_INCLUDE_PICOBIN_IMAGE_TYPE_ITEM
 #endif
@@ -41,7 +56,7 @@ embedded_block:
        PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(RISCV) | \
        PICOBIN_IMAGE_TYPE_EXE_CHIP_AS_BITS(RP2350) | \
        CRT0_TBYB_FLAG
-#elif defined(PICO_RP2040)
+#elif PICO_RP2040
 .hword PICOBIN_IMAGE_TYPE_IMAGE_TYPE_AS_BITS(EXE) | \
        PICOBIN_IMAGE_TYPE_EXE_SECURITY_AS_BITS(NS) | \
        PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(ARM) | \
@@ -73,9 +88,7 @@ embedded_block:
 .hword PICO_CRT0_VERSION_MAJOR
 #endif
 
-#ifdef __riscv
-// On RISC-V the default entry point from bootrom is the start of the binary, but
-// we have our vtable at the start, so we must include an entry point
+#if PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM
 .byte PICOBIN_BLOCK_ITEM_1BS_ENTRY_POINT
 .byte 0x3 // word size to next item
 .byte 0 // pad
@@ -84,14 +97,11 @@ embedded_block:
 .word SRAM_END // stack pointer
 #endif
 
-#ifndef PICO_RP2040
-#if PICO_NO_FLASH
-// If no_flash bin, then include a vector table item
+#if PICO_CRT0_INCLUDE_PICOBIN_VECTOR_TABLE_ITEM
 .byte PICOBIN_BLOCK_ITEM_1BS_VECTOR_TABLE
 .byte 0x2
 .hword 0
 .word __vectors
-#endif
 #endif
 
 .byte PICOBIN_BLOCK_ITEM_2BS_LAST

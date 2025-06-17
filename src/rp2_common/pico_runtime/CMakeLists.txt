@@ -51,22 +51,27 @@ elseif (PICO_C_COMPILER_IS_CLANG)
    # target_link_options(pico_runtime INTERFACE "-nostdlib")
 endif()
 
-# pico_minimize_runtime((INCLUDE ...) (EXCLUDE ...))
+# pico_minimize_runtime(TARGET [INCLUDE ...] [EXCLUDE ...])
+# \brief\ Minimize the runtime components for the target
 #
 # INCLUDE/EXCLUDE can contain any of the following (all defaulting to not included)
 #
-# DEFAULT_ALARM_POOL    - default alarm pool setup
-# PRINTF                - full printf support
-# PRINTF_MINIMAL        - printf support without the following
-# PRINTF_FLOAT          - to control float support if printf is enabled
-# PRINTF_EXPONENTIAL
-# PRINTF_LONG_LONG
-# PRINTF_PTRDIFF_T
-# FLOAT                 - support for single-precision floating point
-# DOUBLE                - support for double-precision floating point
-# FPGA_CHECK            - checks for FPGA which allows Raspberry Pi to run your binary on FPGA
-# PANIC                 - default panic impl which brings in stdio
-# AUTO_INIT_MUTEX       - auto init mutexes; without this you get no printf mutex either               -
+# DEFAULT_ALARM_POOL    - default alarm pool setup;
+# PRINTF                - full printf support;
+# PRINTF_MINIMAL        - printf support without the following;
+# PRINTF_FLOAT          - to control float support if printf is enabled;
+# PRINTF_EXPONENTIAL    - to control exponential support if printf is enabled;
+# PRINTF_LONG_LONG      - to control long long support if printf is enabled;
+# PRINTF_PTRDIFF_T      - to control ptrdiff_t support if printf is enabled;
+# FLOAT                 - support for single-precision floating point;
+# DOUBLE                - support for double-precision floating point;
+# FPGA_CHECK            - checks for FPGA which allows Raspberry Pi to run your binary on FPGA;
+# PANIC                 - default panic impl which brings in stdio;
+# AUTO_INIT_MUTEX       - auto init mutexes, without this you get no printf mutex either;
+# CRT0_FAR_CALLS        - use blx not bl for calls from crt0 to user overridable functions;
+#
+# \param\ INCLUDE The items to include
+# \param\ EXCLUDE The items to exclude
 function(pico_minimize_runtime TARGET)
     set(ALL_ITEMS
             DEFAULT_ALARM_POOL
@@ -143,5 +148,8 @@ function(pico_minimize_runtime TARGET)
     endif()
     if (NOT RUNTIME_INCLUDE_FPGA_CHECK)
         target_compile_definitions(${TARGET} PRIVATE PICO_NO_FPGA_CHECK=1)
+    endif()
+    if (NOT RUNTIME_CRT0_FAR_CALLS)
+        target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_NEAR_CALLS=1)
     endif()
 endfunction()

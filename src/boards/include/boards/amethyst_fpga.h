@@ -9,12 +9,10 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// FIXME delete this file before release (board file for Amethyst FPGA platform)
-
-// pico_cmake_set PICO_PLATFORM=rp2350
-
 #ifndef _BOARDS_AMETHYST_FPGA_H
 #define _BOARDS_AMETHYST_FPGA_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
 #if !PICO_RP2350
 #error "Invalid PICO_PLATFORM for amethyst_fpga.h: must be rp2350 or rp2350-riscv"
@@ -100,7 +98,7 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif

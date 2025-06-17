@@ -69,6 +69,7 @@ bool btstack_cyw43_init(async_context_t *context) {
 void btstack_cyw43_deinit(__unused async_context_t *context) {
     hci_power_control(HCI_POWER_OFF);
     hci_close();
+    btstack_run_loop_async_context_deinit();
     btstack_run_loop_deinit();
     btstack_memory_deinit();
 }

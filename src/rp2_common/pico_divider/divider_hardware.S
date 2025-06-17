@@ -12,21 +12,27 @@
 #warning "Building divider_hardware.S on a platform with no SIO divider hardware"
 #endif
 
-// PICO_CONFIG: PICO_DIVIDER_DISABLE_INTERRUPTS, Disable interrupts around division such that divider state need not be saved/restored in exception handlers, default=0, group=pico_divider
+// PICO_CONFIG: PICO_DIVIDER_DISABLE_INTERRUPTS, Disable interrupts around division such that divider state need not be saved/restored in exception handlers, default=0, type=bool, group=pico_divider
+#if 0 // make tooling checks happy
+#define PICO_DIVIDER_DISABLE_INTERRUPTS 0
+#endif
 
-// PICO_CONFIG: PICO_DIVIDER_CALL_IDIV0, Whether 32 bit division by zero should call __aeabi_idiv0, default=1, group=pico_divider
+// PICO_CONFIG: PICO_DIVIDER_CALL_IDIV0, Whether 32 bit division by zero should call __aeabi_idiv0, default=1, type=bool, group=pico_divider
 #ifndef PICO_DIVIDER_CALL_IDIV0
 #define PICO_DIVIDER_CALL_IDIV0 1
 #endif
 
-// PICO_CONFIG: PICO_DIVIDER_CALL_IDIV0, Whether 64 bit division by zero should call __aeabi_ldiv0, default=1, group=pico_divider
+// PICO_CONFIG: PICO_DIVIDER_CALL_LDIV0, Whether 64 bit division by zero should call __aeabi_ldiv0, default=1, type=bool, group=pico_divider
 #ifndef PICO_DIVIDER_CALL_LDIV0
 #define PICO_DIVIDER_CALL_LDIV0 1
 #endif
 
 pico_default_asm_setup
 
-// PICO_CONFIG: PICO_DIVIDER_IN_RAM, Whether divider functions should be placed in RAM, default=0, group=pico_divider
+// PICO_CONFIG: PICO_DIVIDER_IN_RAM, Whether divider functions should be placed in RAM, default=0, type=bool, group=pico_divider
+#if 0 // make tooling checks happy
+#define PICO_DIVIDER_IN_RAM 0
+#endif
 .macro div_section name
 #if PICO_DIVIDER_IN_RAM
 .section RAM_SECTION_NAME(\name), "ax"

@@ -11,14 +11,17 @@
 
 // This header may be included by other board headers as "boards/pimoroni_pga2350.h"
 
-// pico_cmake_set PICO_PLATFORM=rp2350
-
 #ifndef _BOARDS_PIMORONI_PGA2350_H
 #define _BOARDS_PIMORONI_PGA2350_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
 // For board detection
 #define PIMORONI_PGA2350
 #define PIMORONI_PGA2350_16MB
+
+// --- RP2350 VARIANT ---
+#define PICO_RP2350A 0
 
 // --- BOARD SPECIFIC ---
 #define PIMORONI_PGA2350_PSRAM_CS_PIN 47
@@ -76,7 +79,7 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
@@ -85,7 +88,7 @@
 // no PICO_VBUS_PIN
 // no PICO_VSYS_PIN
 
-// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
+pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

@@ -15,6 +15,11 @@
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
 
+// PICO_CONFIG: PICO_CRT0_NEAR_CALLS, Whether calls from crt0 into the binary are near (<16M away) - ignored for PICO_COPY_TO_RAM, default=0, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_NEAR_CALLS
+#define PICO_CRT0_NEAR_CALLS 0
+#endif
+
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS
 #define COLLAPSE_IRQS
@@ -23,37 +28,56 @@
 
 pico_default_asm_setup
 
+// PICO_CONFIG: PICO_CRT0_NO_RESET_SECTION, Omit .reset section contents containing the startup code. This must be set if you want to replace the startup code while still keeping the rest of pico_crt0 as the reset section define here is not garbage collected, type=bool, default=0, advanced=true, group=pico_crt0
+#ifndef PICO_CRT0_NO_RESET_SECTION
+#define PICO_CRT0_NO_RESET_SECTION 0
+#endif
+
+#ifdef PICO_NO_STORED_VECTOR_TABLE
+#warning PICO_NO_STORED_VECTOR_TABLE is no longer used. PICO_MINIMAL_STORED_VECTOR_TABLE is not identical but usually serves the same purpose
+#endif
+
 .section .vectors, "ax"
 .align 2
 
-.global __vectors, __VECTOR_TABLE
+.global __vectors, __VECTOR_TABLE, __vectors_end
 __VECTOR_TABLE:
 __vectors:
 .word __StackTop
 .word _reset_handler
+
+#if PICO_MINIMAL_STORED_VECTOR_TABLE
+.word isr_invalid   // NMI
+.word isr_invalid   // HardFault
+#else
 .word isr_nmi
 .word isr_hardfault
+#if PICO_RP2040
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
+#else
+.word isr_memmanage
+.word isr_busfault
+.word isr_usagefault
+.word isr_securefault
+#endif
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_svcall
+#if PICO_RP2040
 .word isr_invalid // Reserved, should never fire
+#else
+.word isr_debugmonitor
+#endif
 .word isr_invalid // Reserved, should never fire
 .word isr_pendsv
 .word isr_systick
-#if PICO_NO_STORED_VECTOR_TABLE && !PICO_NO_FLASH // note in no flash binary, we only have the single RAM vector table anyway
-#if PICO_NO_RAM_VECTOR_TABLE
-#error Can't specify PICO_NO_STORED_VECTOR_TABLE and PICO_NO_RAM_VECTOR_TABLE
-#endif
-// we don't include any IRQ vectors; we will initialize them during runtime_init in the RAM vector table
-#else
 
 .macro if_irq_word num func
-.if \num < NUM_IRQS
+.if \num < PICO_NUM_VTABLE_IRQS
 .word \func
 .endif
 .endm
@@ -142,10 +166,11 @@ if_irq_word 76 isr_irq76
 if_irq_word 77 isr_irq77
 if_irq_word 78 isr_irq78
 if_irq_word 79 isr_irq79
-#if NUM_IRQS > 80
+#if PICO_NUM_VTABLE_IRQS > 80
 #error more IRQ entries required
 #endif
-#endif
+#endif  // #if !PICO_MINIMAL_STORED_VECTOR_TABLE
+__vectors_end:
 
 // all default exception handlers do nothing, and we can check for them being set to our
 // default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
@@ -164,24 +189,14 @@ __default_isrs_start:
     bkpt #0
 .endm
 
-// these are separated out for clarity
-decl_isr_bkpt isr_invalid
-decl_isr_bkpt isr_nmi
-decl_isr_bkpt isr_hardfault
-decl_isr_bkpt isr_svcall
-decl_isr_bkpt isr_pendsv
-decl_isr_bkpt isr_systick
-
-.global __default_isrs_end
-__default_isrs_end:
-
 .altmacro
 .macro decl_isr name
-#if !PICO_NO_STORED_VECTOR_TABLE | PICO_NO_FLASH
+#if !PICO_MINIMAL_STORED_VECTOR_TABLE | PICO_NO_FLASH
 // We declare a weak label, so user can override
 .weak \name
 #else
-// We declare a strong label, so user can't override (their version would not automatically be used)
+// We declare a strong global label, so user can't override (their version would not automatically be used)
+.global \name
 #endif
 .type \name,%function
 .thumb_func
@@ -189,8 +204,14 @@ __default_isrs_end:
 .endm
 
 .macro if_irq_decl num func
-.if \num < NUM_IRQS
+.if \num < PICO_NUM_VTABLE_IRQS
 decl_isr \func
+.elseif \num < NUM_IRQS
+// We declare a strong global label, so user can't override (their version would not automatically be used)
+.global \func
+.type \func,%function
+.thumb_func
+\func:
 .endif
 .endm
 
@@ -274,19 +295,49 @@ if_irq_decl 76 isr_irq76
 if_irq_decl 77 isr_irq77
 if_irq_decl 78 isr_irq78
 if_irq_decl 79 isr_irq79
-#if NUM_IRQS > 80
+#if PICO_NUM_VTABLE_IRQS > 80
 #error more IRQ entries required
 #endif
+#if !PICO_RP2040
+// since these are disabled by default, map them all to __unhandled_user_irq (will have
+// a negative number
+decl_isr isr_memmanage
+decl_isr isr_busfault
+decl_isr isr_usagefault
+decl_isr isr_securefault
+decl_isr isr_debugmonitor
+#endif
 
-// All unhandled USER IRQs fall through to here
+// All unhandled USER IRQs fall through to here.
+// Additionally, if the Armv9-M MemManage/BusFault/UsageFault/SecureFault/DebugMonitor exceptions
+// are enabled, but the handlers are not defined, then unhandled_user_irq_num_in_r0 will
+// also be reached, but with a negative exception number (e.g. MemManage == -12)
 .global __unhandled_user_irq
 .thumb_func
 __unhandled_user_irq:
+// if we include the implementation if there could be a valid IRQ hanler in the vtable that uses it
+#if !(PICO_NO_RAM_VECTOR_TABLE && PICO_MINIMAL_STORED_VECTOR_TABLE)
     mrs  r0, ipsr
     subs r0, #16
 .global unhandled_user_irq_num_in_r0
 unhandled_user_irq_num_in_r0:
+#endif
+    // note the next instruction is a breakpoint too, however we have a 2 byte alignment hole
+    // and it is preferrable to have distinct labels, to inform the user what has happened in the debugger.
     bkpt #0
+
+decl_isr_bkpt isr_invalid
+#if !PICO_MINIMAL_STORED_VECTOR_TABLE
+// these are separated out into individual BKPT instructions with label for clarity
+decl_isr_bkpt isr_nmi
+decl_isr_bkpt isr_hardfault
+decl_isr_bkpt isr_svcall
+decl_isr_bkpt isr_pendsv
+decl_isr_bkpt isr_systick
+#endif
+
+.global __default_isrs_end
+__default_isrs_end:
 
 // ----------------------------------------------------------------------------
 
@@ -310,6 +361,7 @@ binary_info_header:
 
 // ----------------------------------------------------------------------------
 
+#if !PICO_CRT0_NO_RESET_SECTION
 .section .reset, "ax"
 
 // On flash builds, the vector table comes first in the image (conventional).
@@ -353,6 +405,12 @@ _entry_point:
     sev
 1:
 #endif
+#if !__ARM_ARCH_6M__
+    // Make sure stack limit is 0 if we came in thru the debugger; we do not know what it should be
+    movs r0, #0
+    msr msplim, r0
+#endif
+
     ldr r0, =__vectors
     // Vector through our own table (SP, VTOR will not have been set up at
     // this point). Same path for debugger entry and bootloader entry.
@@ -379,6 +437,9 @@ _enter_vtable_in_r0:
 .type _reset_handler,%function
 .thumb_func
 _reset_handler:
+    // Note if we entered thru here on core 0, then we should have gone thru bootrom, so SP (and MSPLIM) on Armv8-M
+    // should already be set
+
     // Only core 0 should run the C runtime startup code; core 1 is normally
     // sleeping in the bootrom at this point but check to be sure (e.g. if
     // debugger put core 1 at the ELF entry point for some reason)
@@ -441,20 +502,20 @@ bss_fill_test:
     bne bss_fill_loop
 
 platform_entry: // symbol for stack traces
+#if PICO_CRT0_NEAR_CALLS && !PICO_COPY_TO_RAM
+    bl runtime_init
+    bl main
+    bl exit
+#else
     // Use 32-bit jumps, in case these symbols are moved out of branch range
     // (e.g. if main is in SRAM and crt0 in flash)
-#if !__ARM_ARCH_6M__
-    // Make sure stack limit is 0 - the user can set it themselves
-    //  todo probably worth adding to the EXE_DEF in the future
-    movs r0, #0
-    msr msplim, r0
-#endif
     ldr r1, =runtime_init
     blx r1
     ldr r1, =main
     blx r1
     ldr r1, =exit
     blx r1
+#endif
     // exit should not return.  If it does, hang the core.
 1: // separate label because _exit can be moved out of branch range
     bkpt #0
@@ -474,7 +535,7 @@ data_cpy:
 // Note the data copy table is still included for NO_FLASH builds, even though
 // we skip the copy, because it is listed in binary info
 
-.align 2
+.p2align 2
 data_cpy_table:
 #if PICO_RP2350 && PICO_EMBED_XIP_SETUP && !PICO_NO_FLASH
 .word __boot2_start__
@@ -511,6 +572,7 @@ data_cpy_table:
 runtime_init:
     bx lr
 
+#endif // PICO_CRT0_NO_RESET_SECTION
 // ----------------------------------------------------------------------------
 // Stack/heap dummies to set size
 
@@ -534,11 +596,15 @@ spacer_section .stack
 // align to allow for memory protection (although this alignment is pretty much ignored by linker script)
 .p2align 5
     .equ StackSize, PICO_STACK_SIZE
+.if StackSize != 0
 .space StackSize
+.endif
 
 spacer_section .heap
 .p2align 2
     .equ HeapSize, PICO_HEAP_SIZE
+.if HeapSize != 0
 .space HeapSize
+.endif
 
 #include "embedded_end_block.inc.S"

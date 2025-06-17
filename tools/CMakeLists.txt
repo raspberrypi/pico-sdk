@@ -42,6 +42,30 @@ define_property(TARGET
     FULL_DOCS "AES key for encrypting"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_IVFILE
+    INHERITED
+    BRIEF_DOCS "IV OTP salt for encrypting"
+    FULL_DOCS "IV OTP salt for encrypting"
+)
+define_property(TARGET
+    PROPERTY PICOTOOL_EMBED_DECRYPTION
+    INHERITED
+    BRIEF_DOCS "Embed decryption stage into encrypted binary"
+    FULL_DOCS "Embed decryption stage into encrypted binary"
+)
+define_property(TARGET
+    PROPERTY PICOTOOL_USE_MBEDTLS_DECRYPTION
+    INHERITED
+    BRIEF_DOCS "Use MbedTLS based decryption stage - this is faster, but not secure against power snooping"
+    FULL_DOCS "Use MbedTLS based decryption stage - this is faster, but not secure against power snooping"
+)
+define_property(TARGET
+    PROPERTY PICOTOOL_OTP_KEY_PAGE
+    INHERITED
+    BRIEF_DOCS "OTP page storing the AES key"
+    FULL_DOCS "OTP page storing the AES key"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_ENC_SIGFILE
     INHERITED
     BRIEF_DOCS "Private key for signing encrypted binaries"
@@ -139,6 +163,14 @@ function(pico_init_picotool)
         endif()
     endif()
 
+    if (TARGET picotool AND NOT DEFINED ENV{_PICOTOOL_FOUND_THIS_RUN})
+        # Internal environment variable to prevent printing multiple times
+        set(ENV{_PICOTOOL_FOUND_THIS_RUN} 1)
+
+        get_property(picotool_location TARGET picotool PROPERTY LOCATION)
+        message("Using picotool from ${picotool_location}")
+    endif()
+
     if (TARGET picotool)
         set(picotool_FOUND 1 PARENT_SCOPE)
     else()
@@ -153,13 +185,41 @@ function(picotool_check_configurable TARGET)
     endif()
 endfunction()
 
-# Generate pio header and include it in the build
-# PICO_CMAKE_CONFIG: PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, Default output format used by pioasm when using pico_generate_pio_header, type=string, default=c-sdk, group=build
+# Compare 2 key files, used by picotool_check_default_keys
+function(picotool_compare_keys TARGET KEY DEFAULT TYPE)
+    if (KEY)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files "${KEY}" "${PICO_SDK_PATH}/tools/example_keys/${DEFAULT}"
+            RESULT_VARIABLE compare_result
+        )
+        if(compare_result EQUAL 0)
+            message(WARNING "${TARGET} is using a default ${TYPE} key - this must be changed before production")
+        endif()
+    endif()
+endfunction()
+
+# Check if default signing/encryption keys are being used
+function(picotool_check_default_keys TARGET)
+    get_target_property(picotool_sigfile ${TARGET} PICOTOOL_SIGFILE)
+    picotool_compare_keys(${TARGET} ${picotool_sigfile} private.pem "signing")
+    get_target_property(picotool_aesfile ${TARGET} PICOTOOL_AESFILE)
+    picotool_compare_keys(${TARGET} ${picotool_aesfile} privateaes.bin "encryption")
+    get_target_property(picotool_enc_sigfile ${TARGET} PICOTOOL_ENC_SIGFILE)
+    picotool_compare_keys(${TARGET} ${picotool_enc_sigfile} private.pem "encrypted signing")
+endfunction()
+
+# pico_generate_pio_header(TARGET PIO_FILES... [OUTPUT_FORMAT <format>] [OUTPUT_DIR <dir>])
+# \ingroup\ pico_pio
+# \brief\ Generate pio header and include it in the build
+#
+# \param\ PIO_FILES The PIO files to generate the header for
+# \param\ OUTPUT_FORMAT The output format to use for the pio header
+# \param\ OUTPUT_DIR The directory to output the pio header to
 function(pico_generate_pio_header TARGET)
     pico_init_pioasm()
     # Note that PATH is not a valid argument but was previously ignored (and happens to be passed by pico-extras)
     cmake_parse_arguments(pico_generate_pio_header "" "OUTPUT_FORMAT;OUTPUT_DIR;PATH" "" ${ARGN} )
 
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_PIOASM_OUTPUT_FORMAT, Default output format used by pioasm when using pico_generate_pio_header, type=string, default=c-sdk, group=build
     if (pico_generate_pio_header_OUTPUT_FORMAT)
         set(OUTPUT_FORMAT "${pico_generate_pio_header_OUTPUT_FORMAT}")
     elseif(DEFINED PICO_DEFAULT_PIOASM_OUTPUT_FORMAT)
@@ -208,10 +268,13 @@ function(pico_generate_pio_header TARGET)
 endfunction()
 
 # pico_package_uf2_output(TARGET PACKADDR)
-# Package a UF2 output to be written to the PACKADDR address. This can be
-# used with a no_flash binary to write the UF2 to flash when dragging &
+# \brief\ Package a UF2 output to be written to the PACKADDR address.
+# This can be used with a no_flash binary to write the UF2 to flash when dragging &
 # dropping, and it will be copied to SRAM by the bootrom before execution.
-# This sets PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR.
+#
+# This sets the target property PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR.
+#
+# \param\ PACKADDR The address to package the UF2 to
 function(pico_package_uf2_output TARGET PACKADDR)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -220,8 +283,11 @@ function(pico_package_uf2_output TARGET PACKADDR)
 endfunction()
 
 # pico_set_otp_key_output_file(TARGET OTPFILE)
-# Output the public key hash and other necessary rows to an otp JSON file.
-# This sets PICOTOOL_OTP_FILE to OTPFILE.
+# \brief\ Output the public key hash and other necessary rows to an otp JSON file.
+#
+# This sets the target property PICOTOOL_OTP_FILE to OTPFILE.
+#
+# \param\ OTPFILE The OTP file to output the public key hash and other necessary rows to
 function(pico_set_otp_key_output_file TARGET OTPFILE)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -230,9 +296,12 @@ function(pico_set_otp_key_output_file TARGET OTPFILE)
 endfunction()
 
 # pico_load_map_clear_sram(TARGET)
+# \brief_nodesc\ Adds a load map entry to clear all of SRAM
+#
 # Adds an entry to the load map to instruct the bootrom to clear all of SRAM
-# before loading the binary. This appends the `--clear` argument
-# to PICOTOOL_EXTRA_PROCESS_ARGS.
+# before loading the binary.
+#
+# This appends the `--clear` argument to the target property PICOTOOL_EXTRA_PROCESS_ARGS.
 function(pico_load_map_clear_sram TARGET)
     picotool_check_configurable(${TARGET})
     # get and set, to inherit list
@@ -246,11 +315,20 @@ function(pico_load_map_clear_sram TARGET)
     )
 endfunction()
 
-# pico_set_binary_version(<TARGET> [MAJOR <version>] [MINOR <version>] [ROLLBACK <version>] [ROLLBACK_ROWS <rows...>])
+# pico_set_binary_version(TARGET [MAJOR <version>] [MINOR <version>] [ROLLBACK <version>] [ROWS <rows...>])
+# \brief_nodesc\ Add a version item to the metadata block
+#
 # Adds a version item to the metadata block, with the given major, minor and
-# rollback version, along with the rollback rows. These are appended as arguments
-# to PICOTOOL_EXTRA_PROCESS_ARGS if setting the rollback version, or set as compile
-# definitions if only setting the major/minor versions.
+# rollback version, along with the rollback rows.
+#
+# These are appended as arguments to the target property PICOTOOL_EXTRA_PROCESS_ARGS if setting the
+# rollback version, or set as compile definitions if only setting the major/minor
+# versions.
+#
+# \param\ MAJOR The major version to set
+# \param\ MINOR The minor version to set
+# \param\ ROLLBACK The rollback version to set
+# \param\ ROWS The OTP rows to use for the rollback version
 function(pico_set_binary_version TARGET)
     picotool_check_configurable(${TARGET})
     set(oneValueArgs MAJOR MINOR ROLLBACK)
@@ -299,8 +377,11 @@ function(pico_set_binary_version TARGET)
 endfunction()
 
 # pico_set_uf2_family(TARGET FAMILY)
-# Set the UF2 family to use when creating the UF2.
-# This sets PICOTOOL_UF2_FAMILY to FAMILY.
+# \brief\ Set the UF2 family to use when creating the UF2.
+#
+# This sets the target property PICOTOOL_UF2_FAMILY to FAMILY.
+#
+# \param\ FAMILY The UF2 family to use
 function(pico_set_uf2_family TARGET FAMILY)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -309,11 +390,16 @@ function(pico_set_uf2_family TARGET FAMILY)
 endfunction()
 
 # pico_sign_binary(TARGET [SIGFILE])
-# Sign the target binary with the given PEM signature. This sets
-# PICOTOOL_SIGN_OUTPUT to true, PICOTOOL_SIGFILE to SIGFILE (if specified),
-# and PICOTOOL_OTP_FILE to ${TARGET}.otp.json (if not already set). To
-# specify a common SIGFILE for multiple targets, the SIGFILE property can be
+# \brief\ Sign the target binary with the given PEM signature.
+#
+# This sets the target properties PICOTOOL_SIGN_OUTPUT to true,
+# PICOTOOL_SIGFILE to SIGFILE (if specified), and PICOTOOL_OTP_FILE to
+# ${TARGET}.otp.json (if not already set).
+#
+# To specify a common SIGFILE for multiple targets, the SIGFILE property can be
 # set for a given scope, and then the SIGFILE argument is optional.
+#
+# \param\ SIGFILE The PEM signature file to use
 function(pico_sign_binary TARGET)
     picotool_check_configurable(${TARGET})
     # Enforce signing through target properties
@@ -339,7 +425,9 @@ function(pico_sign_binary TARGET)
 endfunction()
 
 # pico_hash_binary(TARGET)
-# Hash the target binary. This sets PICOTOOL_HASH_OUTPUT to true.
+# \brief\ Hash the target binary.
+#
+# This sets the target property PICOTOOL_HASH_OUTPUT to true.
 function(pico_hash_binary TARGET)
     picotool_check_configurable(${TARGET})
     # Enforce hashing through target properties
@@ -349,8 +437,14 @@ function(pico_hash_binary TARGET)
 endfunction()
 
 # pico_embed_pt_in_binary(TARGET PTFILE)
+# \brief_nodesc\ Embed a partition table in the binary
+#
 # Create the specified partition table from JSON, and embed it in the
-# block loop. This sets PICOTOOL_EMBED_PT to PTFILE.
+# block loop.
+#
+# This sets the target property PICOTOOL_EMBED_PT to PTFILE.
+#
+# \param\ PTFILE The partition table JSON file to use
 function(pico_embed_pt_in_binary TARGET PTFILE)
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -358,19 +452,78 @@ function(pico_embed_pt_in_binary TARGET PTFILE)
     )
 endfunction()
 
-# pico_encrypt_binary(TARGET AESFILE [SIGFILE])
+# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [MBEDTLS] [OTP_KEY_PAGE <page>])
+# \brief_nodesc\ Encrypt the taget binary
+#
 # Encrypt the target binary with the given AES key (should be a binary
-# file containing 32 bytes of a random key), and sign the encrypted binary.
-# This sets PICOTOOL_AESFILE to AESFILE, and PICOTOOL_ENC_SIGFILE to SIGFILE
-# if present, else PICOTOOL_SIGFILE.
-function(pico_encrypt_binary TARGET AESFILE)
+# file containing 128 bytes of a random key share, or 32 bytes of a random key),
+# and sign the encrypted binary.
+#
+# Salts the public IV with the provided IVFILE (should be a binary file
+# containing 16 bytes of a random IV), to give the IV used by the encryption.
+#
+# This sets the target properties PICOTOOL_AESFILE to AESFILE, PICOTOOL_IVFILE to IVFILE, and
+# PICOTOOL_ENC_SIGFILE to SIGFILE if specified, else PICOTOOL_SIGFILE.
+#
+# Optionally, use EMBED to embed a decryption stage into the encrypted binary.
+# This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
+#
+# Optionally, use MBEDTLS to to use the MbedTLS based decryption stage - this
+# is faster, but offers no security against power or timing sniffing attacks,
+# and takes up more code size.
+# This sets the target property PICOTOOL_USE_MBEDTLS_DECRYPTION to TRUE.
+#
+# Optionally, use OTP_KEY_PAGE to specify the OTP page storing the AES key.
+# This sets the target property PICOTOOL_OTP_KEY_PAGE to OTP_KEY_PAGE.
+#
+# \param\ AESFILE The AES key file to use
+# \param\ IVFILE The IV file to use
+# \param\ SIGFILE The PEM signature file to use
+# \param\ EMBED Embed a decryption stage into the encrypted binary
+# \param\ MBEDTLS Use MbedTLS based decryption stage (faster, but less secure)
+# \param\ OTP_KEY_PAGE The OTP page storing the AES key
+function(pico_encrypt_binary TARGET AESFILE IVFILE)
+    set(options EMBED MBEDTLS)
+    set(oneValueArgs OTP_KEY_PAGE SIGFILE)
+    # set(multiValueArgs )
+    cmake_parse_arguments(PARSE_ARGV 3 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_AESFILE ${AESFILE}
     )
-    if (ARGC EQUAL 3)
+    set_target_properties(${TARGET} PROPERTIES
+        PICOTOOL_IVFILE ${IVFILE}
+    )
+
+    if (ENC_EMBED)
         set_target_properties(${TARGET} PROPERTIES
-            PICOTOOL_ENC_SIGFILE ${ARGV2}
+            PICOTOOL_EMBED_DECRYPTION TRUE
+        )
+
+        # Embedded decryption stage only works with packaged binaries
+        get_target_property(uf2_package_addr ${TARGET} PICOTOOL_UF2_PACKAGE_ADDR)
+        if (NOT uf2_package_addr)
+            set_target_properties(${TARGET} PROPERTIES
+                PICOTOOL_UF2_PACKAGE_ADDR 0x10000000
+            )
+        endif()
+    endif()
+
+    if (ENC_MBEDTLS)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_USE_MBEDTLS_DECRYPTION TRUE
+        )
+    endif()
+
+    if (ENC_OTP_KEY_PAGE)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_OTP_KEY_PAGE ${ENC_OTP_KEY_PAGE}
+        )
+    endif()
+
+    if (ENC_SIGFILE)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENC_SIGFILE ${ENC_SIGFILE}
         )
     else()
         get_target_property(enc_sig_file ${TARGET} PICOTOOL_ENC_SIGFILE)
@@ -388,6 +541,8 @@ function(pico_encrypt_binary TARGET AESFILE)
 endfunction()
 
 # pico_add_uf2_output(TARGET)
+# \brief_nodesc\ Add a UF2 output using picotool
+#
 # Add a UF2 output using picotool - must be called after
 # all required properties have been set
 function(pico_add_uf2_output TARGET)
@@ -449,6 +604,12 @@ function(picotool_postprocess_binary TARGET)
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_PROCESSING_CONFIGURED true
     )
+
+    # PICO_CMAKE_CONFIG: PICO_ALLOW_EXAMPLE_KEYS, Don't raise a warning when using default signing/encryption keys, type=bool, default=0, group=build
+    if (NOT PICO_ALLOW_EXAMPLE_KEYS)
+        picotool_check_default_keys(${TARGET})
+    endif()
+
     # Read target properties
     get_target_property(picotool_sign_output ${TARGET} PICOTOOL_SIGN_OUTPUT)
     if (picotool_sign_output)
@@ -479,6 +640,10 @@ function(picotool_postprocess_binary TARGET)
     if (picotool_aesfile)
         pico_add_link_depend(${TARGET} ${picotool_aesfile})
     endif()
+    get_target_property(picotool_ivfile ${TARGET} PICOTOOL_IVFILE)
+    if (picotool_ivfile)
+        pico_add_link_depend(${TARGET} ${picotool_ivfile})
+    endif()
     get_target_property(picotool_enc_sigfile ${TARGET} PICOTOOL_ENC_SIGFILE)
     if (picotool_enc_sigfile)
         pico_add_link_depend(${TARGET} ${picotool_enc_sigfile})
@@ -495,33 +660,51 @@ function(picotool_postprocess_binary TARGET)
         # Embed PT
         if (picotool_embed_pt)
             add_custom_command(TARGET ${TARGET} POST_BUILD
-                DEPENDS ${picotool_embed_pt}
                 COMMAND picotool partition create --quiet ${picotool_embed_pt} $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
                 VERBATIM)
         endif()
         # Signing/hashing/load maps for packaging
-        if (
-            picotool_sign_output OR
+        if (picotool_sign_output OR
             picotool_hash_output OR
             uf2_package_addr OR
-            extra_process_args
-        )
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            DEPENDS ${picotool_sigfile}
-            COMMAND picotool
-            ARGS seal
-                --quiet
-                $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
-                ${picotool_sigfile} ${otp_file}
-                ${picotool_args}
-            COMMAND_EXPAND_LISTS
-            VERBATIM)
+            extra_process_args)
+            # We don't need the extra end block, as picotool seal will add one
+            target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK=0)
+            add_custom_command(TARGET ${TARGET} POST_BUILD
+                COMMAND picotool
+                ARGS seal
+                    --quiet
+                    $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
+                    ${picotool_sigfile} ${otp_file}
+                    ${picotool_args}
+                COMMAND_EXPAND_LISTS
+                VERBATIM)
         endif()
         # Encryption
-        if (picotool_aesfile)
+        if (picotool_aesfile AND picotool_ivfile)
+            get_target_property(picotool_embed_decryption ${TARGET} PICOTOOL_EMBED_DECRYPTION)
+            if (picotool_embed_decryption)
+                list(APPEND picotool_encrypt_args "--embed")
+            endif()
+
+            get_target_property(picotool_mbedtls_decryption ${TARGET} PICOTOOL_USE_MBEDTLS_DECRYPTION)
+            if (picotool_mbedtls_decryption)
+                list(APPEND picotool_encrypt_args "--use-mbedtls")
+            endif()
+
+            get_target_property(otp_key_page ${TARGET} PICOTOOL_OTP_KEY_PAGE)
+            if (otp_key_page)
+                list(APPEND picotool_encrypt_args "--otp-key-page" ${otp_key_page})
+            endif()
+
             add_custom_command(TARGET ${TARGET} POST_BUILD
-                DEPENDS ${picotool_enc_sigfile} ${picotool_aesfile}
-                COMMAND picotool encrypt --quiet --hash --sign $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}> ${picotool_aesfile} ${picotool_enc_sigfile}
+                COMMAND picotool
+                ARGS encrypt
+                    --quiet --hash --sign
+                    ${picotool_encrypt_args}
+                    $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
+                    ${picotool_aesfile} ${picotool_ivfile} ${picotool_enc_sigfile} ${otp_file}
+                COMMAND_EXPAND_LISTS
                 VERBATIM)
             if (ARGC EQUAL 2)
                 set(${ARGV1} TRUE PARENT_SCOPE)
