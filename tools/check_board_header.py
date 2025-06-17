@@ -130,7 +130,7 @@ def read_defines_from(header_file, defines_dict):
             if m:
                 validity_stack.pop()
                 continue
-            
+
             if validity_stack[-1]:
                 # look for "#include "foo.h"
                 m = re.match(r"""^\s*#include\s+"(.+?)"\s*$""", line)
@@ -220,12 +220,12 @@ with open(board_header) as header_fh:
         line = re.sub(r"(?<=\S)\s*//.*$", "", line)
 
         # look for board-detection comment
-        if re.match("^\s*// For board detection", line):
+        if re.match(r"^\s*// For board detection", line):
             board_detection_is_next = True
             continue
 
         # check include-suggestion
-        m = re.match("^\s*// This header may be included by other board headers as \"(.+?)\"", line)
+        m = re.match(r"^\s*// This header may be included by other board headers as \"(.+?)\"", line)
         if m:
             include_suggestion = m.group(1)
             if include_suggestion == expected_include_suggestion:
@@ -300,7 +300,7 @@ with open(board_header) as header_fh:
         if m:
             validity_stack.pop()
             continue
-        
+
         if validity_stack[-1]:
             # look for "#include "foo.h"
             m = re.match(r"""^\s*#include\s+"(.+?)"\s*$""", line)
@@ -484,7 +484,7 @@ for name, define in defines.items():
                 pins[define.resolved_value] = [define]
 
     # check for invalid DEFAULT mappings
-    m = re.match("^(PICO_DEFAULT_([A-Z0-9]+))_([A-Z0-9]+)_PIN$", name)
+    m = re.match(r"^(PICO_DEFAULT_([A-Z0-9]+))_([A-Z0-9]+)_PIN$", name)
     if m:
         instance_name = m.group(1)
         interface = m.group(2)
@@ -506,7 +506,7 @@ for name, define in defines.items():
             raise Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num))
 
     # check that each used DEFAULT interface includes (at least) the expected pin-functions
-    m = re.match("^PICO_DEFAULT_([A-Z0-9]+)$", name)
+    m = re.match(r"^PICO_DEFAULT_([A-Z0-9]+)$", name)
     if m:
         interface = m.group(1)
         if interface not in allowed_interfaces:
