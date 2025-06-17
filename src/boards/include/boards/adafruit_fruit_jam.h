@@ -177,6 +177,16 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_SD_DAT_PIN_COUNT 4
 #endif
 
+// --- I2S AUDIO (for pico-extras/src/rp2_common/pico_audio_i2s/)
+
+#ifndef PICO_AUDIO_I2S_DATA_PIN
+#define PICO_AUDIO_I2S_DATA_PIN ADAFRUIT_FRUIT_JAM_I2S_DIN_PIN
+#endif
+
+#ifndef PICO_AUDIO_I2S_CLOCK_PIN_BASE
+#define PICO_AUDIO_I2S_CLOCK_PIN_BASE ADAFRUIT_FRUIT_JAM_I2S_BCLK_PIN
+#endif
+
 // --- PIO USB ---
 #define PICO_DEFAULT_PIO_USB_DP_PIN ADAFRUIT_FRUIT_JAM_USB_HOST_DATA_PLUS_PIN
 
