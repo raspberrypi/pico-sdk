@@ -556,6 +556,7 @@ function(pico_add_uf2_output TARGET)
     else()
         set(output_path "")
     endif()
+    pico_get_output_name(${TARGET} output_name)
 
     get_target_property(${TARGET}_uf2_package_addr ${TARGET} PICOTOOL_UF2_PACKAGE_ADDR)
     if (${TARGET}_uf2_package_addr)
@@ -594,7 +595,8 @@ function(pico_add_uf2_output TARGET)
                 --family ${picotool_family}
                 ${extra_uf2_args}
             COMMAND_EXPAND_LISTS
-            VERBATIM)
+            VERBATIM
+            BYPRODUCTS "${output_path}${output_name}.uf2")
     endif()
 endfunction()
 
