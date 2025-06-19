@@ -134,14 +134,26 @@ bool watchdog_enable_caused_reboot(void);
  * \if rp2040_specific
  * On RP2040 this method returns the last value set instead of the remaining time due to a h/w bug.
  * \endif
- * 
+ *
  * @return The number of microseconds before the watchdog will reboot the chip.
+ */
+uint32_t watchdog_get_time_remaining_us(void);
+
+/**
+ * \brief Returns the number of milliseconds before the watchdog will reboot the chip.
+ * \ingroup hardware_watchdog
+ *
+ * \if rp2040_specific
+ * On RP2040 this method returns the last value set instead of the remaining time due to a h/w bug.
+ * \endif
+ *
+ * @return The number of milliseconds before the watchdog will reboot the chip.
  */
 uint32_t watchdog_get_time_remaining_ms(void);
 
 // backwards compatibility with SDK < 2.0.0
 static inline uint32_t watchdog_get_count(void) {
-    return watchdog_get_time_remaining_ms();
+    return watchdog_get_time_remaining_us();
 }
 #ifdef __cplusplus
 }
