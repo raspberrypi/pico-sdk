@@ -198,6 +198,15 @@ void cyw43_post_poll_hook(void);
 #define cyw43_free free
 #endif
 
+// PICO_CONFIG: PICO_CYW43_LOGGING_ENABLED, Enable/disable CYW43_PRINTF used for logging in cyw43 components. Has no effect if CYW43_PRINTF is defined by the user, default=1, type=bool, group=pico_cyw43_driver
+#ifndef PICO_CYW43_LOGGING_ENABLED
+#define PICO_CYW43_LOGGING_ENABLED 1
+#endif
+
+#if !defined CYW43_PRINTF && !PICO_CYW43_LOGGING_ENABLED
+#define CYW43_PRINTF(...) (void)0
+#endif
+
 #ifdef __cplusplus
 }
 #endif
