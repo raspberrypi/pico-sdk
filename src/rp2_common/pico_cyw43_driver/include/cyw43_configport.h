@@ -203,7 +203,7 @@ void cyw43_post_poll_hook(void);
 #define PICO_CYW43_LOGGING_ENABLED 1
 #endif
 
-#if !defined CYW43_PRINTF && !PICO_CYW43_LOGGING_ENABLED
+#if !defined(CYW43_PRINTF) && !PICO_CYW43_LOGGING_ENABLED
 #define CYW43_PRINTF(...) (void)0
 #endif
 
