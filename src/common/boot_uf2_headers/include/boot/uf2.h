@@ -26,6 +26,8 @@
 #define UF2_FLAG_MD5_PRESENT             0x00004000u
 #define UF2_FLAG_EXTENSION_FLAGS_PRESENT 0x00008000u
 
+#define CYW43_FIRMWARE_FAMILY_ID    0xe48bff55u
+#define DEFAULT_FAMILY_ID_MIN       0xe48bff56u
 #define RP2040_FAMILY_ID            0xe48bff56u
 #define ABSOLUTE_FAMILY_ID          0xe48bff57u
 #define DATA_FAMILY_ID              0xe48bff58u
