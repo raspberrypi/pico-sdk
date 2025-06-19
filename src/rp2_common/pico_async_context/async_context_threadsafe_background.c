@@ -145,7 +145,7 @@ uint32_t async_context_threadsafe_background_execute_sync(async_context_t *self_
         // Note that this read of the owner is not synchronized with the other core; however we only
         // care about it being set to `calling_core`, which the other core will not transition
         // it either from or to.
-        hard_assert(recursive_mutex_owner(&self->lock_mutex) != lock_get_caller_owner_id());
+        assert(recursive_mutex_owner(&self->lock_mutex) != lock_get_caller_owner_id());
         sync_func_call_t call = {0};
         call.worker.do_work = handle_sync_func_call;
         call.func = func;
