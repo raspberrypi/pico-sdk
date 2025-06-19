@@ -138,15 +138,14 @@ static void lock_release(async_context_threadsafe_background_t *self) {
 uint32_t async_context_threadsafe_background_execute_sync(async_context_t *self_base, uint32_t (*func)(void *param), void *param) {
     async_context_threadsafe_background_t *self = (async_context_threadsafe_background_t*)self_base;
 #if ASYNC_CONTEXT_THREADSAFE_BACKGROUND_MULTI_CORE
-    const uint calling_core = get_core_num();
-    if (self_base->core_num != calling_core) {
+    if (self_base->core_num != get_core_num()) {
         // This core must not hold the lock mutex, or this cross-core execute would deadlock. It is fine if the other core holds it.
         // It would be a strange set of circumstances for it to do so, hence the hard_assert
         
         // Note that this read of the owner is not synchronized with the other core; however we only
         // care about it being set to `calling_core`, which the other core will not transition
         // it either from or to.
-        hard_assert(recursive_mutex_owner(&self->lock_mutex) != calling_core);
+        hard_assert(recursive_mutex_owner(&self->lock_mutex) != lock_get_caller_owner_id());
         sync_func_call_t call = {0};
         call.worker.do_work = handle_sync_func_call;
         call.func = func;
