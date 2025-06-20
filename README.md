@@ -201,3 +201,23 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 # RISC-V support on RP2350
 
 See [Raspberry Pi Pico-series C/C++ SDK](https://rptl.io/pico-c-sdk) for information on setting up a build environment for RISC-V on RP2350.
+
+## RISC-V quick start
+
+The [pico-sdk-tools](https://github.com/raspberrypi/pico-sdk-tools/releases) repository contains some prebuilt versions of the RISC-V compiler.
+
+You can use these to get a working RISC-V compiler on Raspberry Pi OS for example.
+
+```
+wget https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-aarch64-lin.tar.gz
+sudo mkdir -p /opt/riscv/riscv-toolchain-14
+sudo chown $USER /opt/riscv/riscv-toolchain-14
+tar xvf riscv-toolchain-14-aarch64-lin.tar.gz -C /opt/riscv/riscv-toolchain-14
+```
+
+To use the RISC-V compiler to build code you need to set a couple of environment variables and run cmake from fresh.
+
+```
+export PICO_TOOLCHAIN_PATH=/opt/riscv/riscv-toolchain-14/
+export PICO_PLATFORM=rp2350-riscv
+```
