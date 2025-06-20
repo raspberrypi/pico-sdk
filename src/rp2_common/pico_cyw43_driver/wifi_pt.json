@@ -26,7 +26,7 @@
       "id": "0x776966696669726d",
       "start": "3500k",
       "size": "256K",
-      "families": ["data"],
+      "families": ["cyw43-firmware"],
       "permissions": {
         "secure": "rw",
         "nonsecure": "rw",
@@ -38,7 +38,7 @@
     {
       "start": "3500k",
       "size": "256k",
-      "families": ["data"],
+      "families": ["cyw43-firmware"],
       "permissions": {
         "secure": "rw",
         "nonsecure": "rw",
