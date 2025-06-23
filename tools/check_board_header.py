@@ -24,7 +24,7 @@ if sys.version_info < (3, 11):
     # Python <3.11 doesn't have ExceptionGroup, so define a simple one
     class ExceptionGroup(Exception):
         def __init__(self, message, errors):
-            message += "\n" + "\n".join(e.__str__() for e in errors)
+            message += "\n" + "\n".join(str(e) for e in errors)
             super().__init__(message)
 
 
