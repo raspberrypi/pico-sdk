@@ -74,6 +74,13 @@ void watchdog_update(void);
  * \note If \ref watchdog_start_tick value does not give a 1MHz clock to the watchdog system, then the \p delay_ms
  * parameter will not be in milliseconds. See the datasheet for more details.
  *
+ * \if rp2040_specific
+ * On RP2040 the maximum delay is 8388 milliseconds, which is approximately 8.3 seconds (this is due to RP2040-E1).
+ * \endif
+ * \if rp2350_specific
+ * On RP2350 the maximum delay is 16777 milliseconds, which is approximately 16.7 seconds.
+ * \endif
+ *
  * By default the SDK assumes a 12MHz XOSC and sets the \ref watchdog_start_tick appropriately.
  *
  * This method sets a marker in the watchdog scratch register 4 that is checked by \ref watchdog_enable_caused_reboot.
@@ -81,7 +88,7 @@ void watchdog_update(void);
  * onto the RPI-RP2), then this value will be cleared, and so \ref watchdog_enable_caused_reboot will
  * return false.
  *
- * \param delay_ms Number of milliseconds before watchdog will reboot without watchdog_update being called. Maximum of 8388, which is approximately 8.3 seconds
+ * \param delay_ms Number of milliseconds before watchdog will reboot without watchdog_update being called
  * \param pause_on_debug If the watchdog should be paused when the debugger is stepping through code
  */
 void watchdog_enable(uint32_t delay_ms, bool pause_on_debug);
@@ -124,17 +131,29 @@ bool watchdog_enable_caused_reboot(void);
  * \brief Returns the number of microseconds before the watchdog will reboot the chip.
  * \ingroup hardware_watchdog
  *
- * \if rp2040_specicifc
+ * \if rp2040_specific
  * On RP2040 this method returns the last value set instead of the remaining time due to a h/w bug.
  * \endif
- * 
+ *
  * @return The number of microseconds before the watchdog will reboot the chip.
+ */
+uint32_t watchdog_get_time_remaining_us(void);
+
+/**
+ * \brief Returns the number of milliseconds before the watchdog will reboot the chip.
+ * \ingroup hardware_watchdog
+ *
+ * \if rp2040_specific
+ * On RP2040 this method returns the last value set instead of the remaining time due to a h/w bug.
+ * \endif
+ *
+ * @return The number of milliseconds before the watchdog will reboot the chip.
  */
 uint32_t watchdog_get_time_remaining_ms(void);
 
 // backwards compatibility with SDK < 2.0.0
 static inline uint32_t watchdog_get_count(void) {
-    return watchdog_get_time_remaining_ms();
+    return watchdog_get_time_remaining_us();
 }
 #ifdef __cplusplus
 }

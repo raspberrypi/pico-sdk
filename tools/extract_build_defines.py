@@ -24,6 +24,13 @@ import logging
 
 from collections import defaultdict
 
+if sys.version_info < (3, 11):
+    # Python <3.11 doesn't have ExceptionGroup, so define a simple one
+    class ExceptionGroup(Exception):
+        def __init__(self, message, errors):
+            message += "\n" + "\n".join(e.__str__() for e in errors)
+            super().__init__(message)
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -51,11 +58,12 @@ chips_all_descriptions = defaultdict(dict)
 
 def ValidateAttrs(config_name, config_attrs, file_path, linenum):
     _type = config_attrs.get('type')
+    errors = []
 
     # Validate attrs
     for key in config_attrs.keys():
         if key not in ALLOWED_CONFIG_PROPERTIES:
-            raise Exception('{} at {}:{} has unexpected property "{}"'.format(config_name, file_path, linenum, key))
+            errors.append(Exception('{} at {}:{} has unexpected property "{}"'.format(config_name, file_path, linenum, key)))
 
     if _type == 'int':
         _min = _max = _default = None
@@ -86,13 +94,13 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
                     pass
         if _min is not None and _max is not None:
             if _min > _max:
-                raise Exception('{} at {}:{} has min {} > max {}'.format(config_name, file_path, linenum, config_attrs['min'], config_attrs['max']))
+                errors.append(Exception('{} at {}:{} has min {} > max {}'.format(config_name, file_path, linenum, config_attrs['min'], config_attrs['max'])))
         if _min is not None and _default is not None:
             if _min > _default:
-                raise Exception('{} at {}:{} has min {} > default {}'.format(config_name, file_path, linenum, config_attrs['min'], config_attrs['default']))
+                errors.append(Exception('{} at {}:{} has min {} > default {}'.format(config_name, file_path, linenum, config_attrs['min'], config_attrs['default'])))
         if _default is not None and _max is not None:
             if _default > _max:
-                raise Exception('{} at {}:{} has default {} > max {}'.format(config_name, file_path, linenum, config_attrs['default'], config_attrs['max']))
+                errors.append(Exception('{} at {}:{} has default {} > max {}'.format(config_name, file_path, linenum, config_attrs['default'], config_attrs['max'])))
     elif _type == 'bool':
         assert 'min' not in config_attrs
         assert 'max' not in config_attrs
@@ -111,10 +119,12 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
         assert 'max' not in config_attrs
         _default = config_attrs.get('default', None)
     else:
-        raise Exception("Found unknown {} type {} at {}:{}".format(BASE_BUILD_DEFINE_NAME, _type, file_path, linenum))
+        errors.append(Exception("Found unknown {} type {} at {}:{}".format(BASE_BUILD_DEFINE_NAME, _type, file_path, linenum)))
+    
+    return errors
 
 
-
+errors = []
 
 # Scan all CMakeLists.txt and .cmake files in the specific path, recursively.
 
@@ -135,14 +145,14 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     linenum += 1
                     line = line.strip()
                     if BASE_CONFIG_RE.search(line):
-                        raise Exception("Found {} at {}:{} ({}) which isn't expected in {} files".format(BASE_CONFIG_NAME, file_path, linenum, line, filename if filename == 'CMakeLists.txt' else file_ext))
+                        errors.append(Exception("Found {} at {}:{} ({}) which isn't expected in {} files".format(BASE_CONFIG_NAME, file_path, linenum, line, filename if filename == 'CMakeLists.txt' else file_ext)))
                     elif BASE_BUILD_DEFINE_RE.search(line):
                         m = BUILD_DEFINE_RE.match(line)
                         if not m:
                             if re.match(r"^\s*#\s*# ", line):
                                 logger.info("Possible misformatted {} at {}:{} ({})".format(BASE_BUILD_DEFINE_NAME, file_path, linenum, line))
                             else:
-                                raise Exception("Found misformatted {} at {}:{} ({})".format(BASE_BUILD_DEFINE_NAME, file_path, linenum, line))
+                                errors.append(Exception("Found misformatted {} at {}:{} ({})".format(BASE_BUILD_DEFINE_NAME, file_path, linenum, line)))
                         else:
                             config_name = m.group(1)
                             config_description = m.group(2)
@@ -151,10 +161,10 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                             _attrs = re.sub(r'(\(.+\))', lambda m: m.group(1).replace(',', '\0'), _attrs)
 
                             if '=' in config_description:
-                                raise Exception("For {} at {}:{} the description was set to '{}' - has the description field been omitted?".format(config_name, file_path, linenum, config_description))
+                                errors.append(Exception("For {} at {}:{} the description was set to '{}' - has the description field been omitted?".format(config_name, file_path, linenum, config_description)))
                             all_descriptions = chips_all_descriptions[applicable]
                             if config_description in all_descriptions:
-                                raise Exception("Found description {} at {}:{} but it was already used at {}:{}".format(config_description, file_path, linenum, os.path.join(scandir, all_descriptions[config_description]['filename']), all_descriptions[config_description]['line_number']))
+                                errors.append(Exception("Found description {} at {}:{} but it was already used at {}:{}".format(config_description, file_path, linenum, os.path.join(scandir, all_descriptions[config_description]['filename']), all_descriptions[config_description]['line_number'])))
                             else:
                                 all_descriptions[config_description] = {'config_name': config_name, 'filename': os.path.relpath(file_path, scandir), 'line_number': linenum}
 
@@ -168,19 +178,19 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                                 try:
                                     k, v = (i.strip() for i in item.split('='))
                                 except ValueError:
-                                    raise Exception('{} at {}:{} has malformed value {}'.format(config_name, file_path, linenum, item))
+                                    errors.append(Exception('{} at {}:{} has malformed value {}'.format(config_name, file_path, linenum, item)))
                                 config_attrs[k] = v.replace('\0', ',')
                                 all_attrs.add(k)
                                 prev = item
                             #print(file_path, config_name, config_attrs)
 
                             if 'group' not in config_attrs:
-                                raise Exception('{} at {}:{} has no group attribute'.format(config_name, file_path, linenum))
+                                errors.append(Exception('{} at {}:{} has no group attribute'.format(config_name, file_path, linenum)))
 
                             #print(file_path, config_name, config_attrs)
                             all_configs = chips_all_configs[applicable]
                             if config_name in all_configs:
-                                raise Exception("Found {} at {}:{} but it was already declared at {}:{}".format(config_name, file_path, linenum, os.path.join(scandir, all_configs[config_name]['filename']), all_configs[config_name]['line_number']))
+                                errors.append(Exception("Found {} at {}:{} but it was already declared at {}:{}".format(config_name, file_path, linenum, os.path.join(scandir, all_configs[config_name]['filename']), all_configs[config_name]['line_number'])))
                             else:
                                 all_configs[config_name] = {'attrs': config_attrs, 'filename': os.path.relpath(file_path, scandir), 'line_number': linenum, 'description': config_description}
 
@@ -194,14 +204,14 @@ for applicable, all_configs in chips_all_configs.items():
         file_path = os.path.join(scandir, config_obj['filename'])
         linenum = config_obj['line_number']
 
-        ValidateAttrs(config_name, config_obj['attrs'], file_path, linenum)
+        errors.extend(ValidateAttrs(config_name, config_obj['attrs'], file_path, linenum))
 
 # All settings in "host" should also be in "all"
 for config_name, config_obj in chips_all_configs["host"].items():
     if config_name not in chips_all_configs["all"]:
         file_path = os.path.join(scandir, config_obj['filename'])
         linenum = config_obj['line_number']
-        raise Exception("Found 'host' config {} at {}:{}, but no matching non-host config found".format(config_name, file_path, linenum))
+        errors.append(Exception("Found 'host' config {} at {}:{}, but no matching non-host config found".format(config_name, file_path, linenum)))
 
 # Any chip-specific settings should not be in "all"
 for chip in CHIP_NAMES:
@@ -212,7 +222,7 @@ for chip in CHIP_NAMES:
             chip_linenum = chip_config_obj['line_number']
             all_file_path = os.path.join(scandir, all_config_obj['filename'])
             all_linenum = all_config_obj['line_number']
-            raise Exception("'{}' config {} at {}:{} also found at {}:{}".format(chip, config_name, chip_file_path, chip_linenum, all_file_path, all_linenum))
+            errors.append(Exception("'{}' config {} at {}:{} also found at {}:{}".format(chip, config_name, chip_file_path, chip_linenum, all_file_path, all_linenum)))
 
 def build_mismatch_exception_message(name, thing, config_obj1, value1, config_obj2, value2):
     obj1_filepath = os.path.join(scandir, config_obj1['filename'])
@@ -232,14 +242,18 @@ for applicable in chips_all_configs:
                     applicable_value = applicable_config_obj[field]
                     other_value = other_config_obj[field]
                     if applicable_value != other_value:
-                        raise Exception(build_mismatch_exception_message(config_name, field, applicable_config_obj, applicable_value, other_config_obj, other_value))
+                        errors.append(Exception(build_mismatch_exception_message(config_name, field, applicable_config_obj, applicable_value, other_config_obj, other_value)))
                 # Check that attributes match
                 for attr in applicable_config_obj['attrs']:
                     if attr != 'default': # totally fine for defaults to vary per-platform
                         applicable_value = applicable_config_obj['attrs'][attr]
                         other_value = other_config_obj['attrs'][attr]
                         if applicable_value != other_value:
-                            raise Exception(build_mismatch_exception_message(config_name, "attribute '{}'".format(attr), applicable_config_obj, applicable_value, other_config_obj, other_value))
+                            errors.append(Exception(build_mismatch_exception_message(config_name, "attribute '{}'".format(attr), applicable_config_obj, applicable_value, other_config_obj, other_value)))
+
+# Raise errors if any were found
+if errors:
+    raise ExceptionGroup("Errors in {}".format(outfile), errors)
 
 # Sort the output alphabetically by name and then by chip
 output_rows = set()

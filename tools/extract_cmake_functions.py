@@ -22,6 +22,13 @@ import re
 import csv
 import logging
 
+if sys.version_info < (3, 11):
+    # Python <3.11 doesn't have ExceptionGroup, so define a simple one
+    class ExceptionGroup(Exception):
+        def __init__(self, message, errors):
+            message += "\n" + "\n".join(e.__str__() for e in errors)
+            super().__init__(message)
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -50,6 +57,7 @@ allowed_missing_functions = set([
     "pico_init_picotool",
     "pico_add_platform_library",
     "pico_get_runtime_output_directory",
+    "pico_get_output_name",
     "pico_set_printf_implementation",
     "pico_expand_pico_platform",
 ])
@@ -95,6 +103,7 @@ def process_commands(description, name, group, signature):
     brief = ''
     params = []
     desc = ''
+    errors = []
     for line in description.split('\n'):
         line = line.strip()
         if line.startswith('\\'):
@@ -114,29 +123,29 @@ def process_commands(description, name, group, signature):
                 # Group name override
                 group = remainder
             else:
-                logger.error("{}:{} has unknown command: {}".format(group, name, command))
+                errors.append(Exception("{}:{} has unknown command: {}".format(group, name, command)))
         elif '\\' in line:
-            logger.error("{}:{} has a line containing '\\': {}".format(group, name, line))
+            errors.append(Exception("{}:{} has a line containing '\\': {}".format(group, name, line)))
         else:
             desc += line + '\\n'
     # Check that there are no semicolons in the parameter descriptions, as that's the delimiter for the parameter list
     if any([';' in x for x in params]):
-        logger.error("{}:{} has a parameter description containing ';'".format(group, name))
+        errors.append(Exception("{}:{} has a parameter description containing ';'".format(group, name)))
     # Check that all parameters are in the signature
-    signature_words = set(re.split('\W+', signature))
+    signature_words = set(re.split(r'\W+', signature))
     for param in params:
         param_name = param.split(' ', maxsplit=1)[0]
         if param_name not in signature_words:
-            logger.error("{}:{} has a parameter {} which is not in the signature {}".format(group, name, param_name, signature))
+            errors.append(Exception("{}:{} has a parameter {} which is not in the signature {}".format(group, name, param_name, signature)))
     # Check that the brief description is not empty
     if not brief:
         logger.warning("{}:{} has no brief description".format(group, name))
     # Check that the group has a description
     if group not in group_names_descriptions:
-        logger.error("{} has no group description (referenced from {})".format(group, name))
+        errors.append(Exception("{} has no group description (referenced from {})".format(group, name)))
 
     desc = re.sub(r'^(\\n)*(.*?)(\\n)*$', r'\2', desc)
-    return desc.strip(), brief, ';'.join(params), group
+    return desc.strip(), brief, ';'.join(params), group, errors
 
 
 def sort_functions(item):
@@ -155,6 +164,7 @@ def sort_functions(item):
             precedence = 3
     return group + str(precedence) + name
 
+all_errors = []
 
 # Scan all CMakeLists.txt and .cmake files in the specific path, recursively.
 
@@ -178,7 +188,8 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     name = match.group(4)
                     signature = match.group(1).strip()
                     if signature.startswith(name):
-                        description, brief, params, processed_group = process_commands(match.group(2).replace('#', ''), name, group, signature)
+                        description, brief, params, processed_group, errors = process_commands(match.group(2).replace('#', ''), name, group, signature)
+                        all_errors.extend(errors)
                         new_dict = {
                             'name': name,
                             'group': processed_group,
@@ -196,6 +207,9 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                     name = match.group(1)
                     if name not in all_functions and name not in allowed_missing_functions:
                         logger.warning("{} function has no description in {}".format(name, file_path))
+
+if all_errors:
+    raise ExceptionGroup("Errors in {}".format(outfile), all_errors)
 
 
 with open(outfile, 'w', newline='') as csvfile:

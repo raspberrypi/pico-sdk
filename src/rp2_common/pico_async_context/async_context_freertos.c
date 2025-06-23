@@ -109,6 +109,24 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
     self->core.type = &template;
     self->core.flags = ASYNC_CONTEXT_FLAG_CALLBACK_FROM_NON_IRQ;
     self->core.core_num = get_core_num();
+#if configSUPPORT_STATIC_ALLOCATION
+    assert(config->task_stack);
+    self->lock_mutex = xSemaphoreCreateRecursiveMutexStatic(&self->lock_mutex_buf);
+    self->work_needed_sem = xSemaphoreCreateBinaryStatic(&self->work_needed_sem_buf);
+    self->timer_handle = xTimerCreateStatic( "async_context_timer",       // Just a text name, not used by the kernel.
+                                             portMAX_DELAY,
+                                             pdFALSE,        // The timers will auto-reload themselves when they expire.
+                                             self,
+                                             timer_handler,
+                                             &self->timer_buf);
+    self->task_handle = xTaskCreateStatic( async_context_task,
+                                           "async_context_task",
+                                           config->task_stack_size,
+                                           self,
+                                           config->task_priority,
+                                           config->task_stack,
+                                           &self->task_buf);
+#else
     self->lock_mutex = xSemaphoreCreateRecursiveMutex();
     self->work_needed_sem = xSemaphoreCreateBinary();
     self->timer_handle = xTimerCreate( "async_context_timer",       // Just a text name, not used by the kernel.
@@ -116,12 +134,18 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
                                     pdFALSE,        // The timers will auto-reload themselves when they expire.
                                     self,
                                     timer_handler);
+#endif
 
     if (!self->lock_mutex ||
         !self->work_needed_sem ||
         !self->timer_handle ||
+#if configSUPPORT_STATIC_ALLOCATION
+        !self->task_handle
+#else
         pdPASS != xTaskCreate(async_context_task, "async_context_task", config->task_stack_size, self,
-                config->task_priority, &self->task_handle)) {
+                config->task_priority, &self->task_handle)
+#endif
+    ) {
         async_context_deinit(&self->core);
         return false;
     }
@@ -179,6 +203,9 @@ void async_context_freertos_lock_check(__unused async_context_t *self_base) {
 typedef struct sync_func_call{
     async_when_pending_worker_t worker;
     SemaphoreHandle_t sem;
+#if configSUPPORT_STATIC_ALLOCATION
+    StaticSemaphore_t sem_buf;
+#endif
     uint32_t (*func)(void *param);
     void *param;
     uint32_t rc;
@@ -197,7 +224,11 @@ uint32_t async_context_freertos_execute_sync(async_context_t *self_base, uint32_
     call.worker.do_work = handle_sync_func_call;
     call.func = func;
     call.param = param;
+#if configSUPPORT_STATIC_ALLOCATION
+    call.sem = xSemaphoreCreateBinaryStatic(&call.sem_buf);
+#else
     call.sem = xSemaphoreCreateBinary();
+#endif
     async_context_add_when_pending_worker(self_base, &call.worker);
     async_context_set_work_pending(self_base, &call.worker);
     xSemaphoreTake(call.sem, portMAX_DELAY);
