@@ -177,9 +177,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 1. Setup a CMake build directory.
       For example, if not using an IDE:
       ```
-      $ mkdir build
-      $ cd build
-      $ cmake ..
+      $ cmake -S . -B build
       ```   
    
    When building for a board other than the Raspberry Pi Pico, you should pass `-DPICO_BOARD=board_name` to the `cmake` command above, e.g. `cmake -DPICO_BOARD=pico2 ..` or `cmake -DPICO_BOARD=pico_w ..` to configure the SDK and build options accordingly for that particular board.
@@ -193,7 +191,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
 1. Make your target from the build directory you created.
       ```sh
-      $ make hello_world
+      $ cmake --build build --target hello_world
       ```
 
 1. You now have `hello_world.elf` to load via a debugger, or `hello_world.uf2` that can be installed and run on your Raspberry Pi Pico-series device via drag and drop.
