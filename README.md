@@ -194,7 +194,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
       ```sh
       $ cmake --build build --target hello_world
       ```
-> The directory-name supplied to the `--build` flag needs to match the directory-name that was passed to the `-B` flag in the earlier cmake command.
+      > The directory-name supplied to the `--build` flag needs to match the directory-name that was passed to the `-B` flag in the earlier cmake command.
 
 1. You now have `hello_world.elf` to load via a debugger, or `hello_world.uf2` that can be installed and run on your Raspberry Pi Pico-series device via drag and drop.
 
