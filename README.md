@@ -179,7 +179,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
       ```
       $ cmake -S . -B build
       ```
-      > The cmake -S flag indicates the source directory, and -B tells cmake where to put the output files.
+      > The cmake -S flag indicates the source directory, and the -B flag tells cmake the name of the output-directory to create. This doesn't have to be named "build", you can call it whatever you want.
    
    When building for a board other than the Raspberry Pi Pico, you should pass `-DPICO_BOARD=board_name` to the `cmake` command above, e.g. `cmake -S . -B build -DPICO_BOARD=pico2` or `cmake -S . -B build -DPICO_BOARD=pico_w` to configure the SDK and build options accordingly for that particular board.
 
@@ -194,6 +194,7 @@ instructions for other platforms, and just in general, we recommend you see [Ras
       ```sh
       $ cmake --build build --target hello_world
       ```
+> The directory-name supplied to the `--build` flag needs to match the directory-name that was passed to the `-B` flag in the earlier cmake command.
 
 1. You now have `hello_world.elf` to load via a debugger, or `hello_world.uf2` that can be installed and run on your Raspberry Pi Pico-series device via drag and drop.
 
