@@ -60,10 +60,6 @@ _lm_item:
 .word PICOBIN_BLOCK_MARKER_END
 embedded_block_end:
 
-#if WB_FIRMWARE
-#include "firmware_wb_blob.S"
-#else
-#include "firmware_w_blob.S"
-#endif
+#include "firmware_blob.S"
 
 firmware_end:

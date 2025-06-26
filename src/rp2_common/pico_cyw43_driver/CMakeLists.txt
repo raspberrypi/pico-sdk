@@ -197,10 +197,10 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
 
         find_package (Python3 REQUIRED COMPONENTS Interpreter)
 
-        # Wifi firmware blob
-        add_custom_target(${TARGET}_firmware_blob DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/firmware_wb_blob.S)
-        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/firmware_wb_blob.S
-                COMMAND ${Python3_EXECUTABLE} ${PICO_CYW43_DRIVER_CURRENT_PATH}/cyw43_firmware.py ${PICO_CYW43_DRIVER_PATH}/firmware/wb43439A0_7_95_49_00_combined.h ${CMAKE_CURRENT_BINARY_DIR}/firmware_wb_blob.S
+        # CYW43 firmware blob
+        add_custom_target(${TARGET}_firmware_blob DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S)
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S
+                COMMAND ${Python3_EXECUTABLE} ${PICO_CYW43_DRIVER_CURRENT_PATH}/cyw43_firmware.py ${PICO_CYW43_DRIVER_PATH}/firmware/wb43439A0_7_95_49_00_combined.h ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S
                 )
 
         # Create UF2s for regular and TBYB firmwares
@@ -217,12 +217,10 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
 
         target_compile_definitions(${TARGET}_firmware PRIVATE
                 NO_PICO_PLATFORM=1
-                WB_FIRMWARE=1
                 )
         target_compile_definitions(${TARGET}_firmware_tbyb PRIVATE
                 NO_PICO_PLATFORM=1
                 PICO_CRT0_IMAGE_TYPE_TBYB=1
-                WB_FIRMWARE=1
                 )
 
         target_link_options(${TARGET}_firmware PRIVATE -nostartfiles -nodefaultlibs -N LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
