@@ -26,15 +26,18 @@
 #define UF2_FLAG_MD5_PRESENT             0x00004000u
 #define UF2_FLAG_EXTENSION_FLAGS_PRESENT 0x00008000u
 
+// Extra family IDs
 #define CYW43_FIRMWARE_FAMILY_ID    0xe48bff55u
-#define DEFAULT_FAMILY_ID_MIN       0xe48bff56u
+
+// Bootrom supported family IDs
 #define RP2040_FAMILY_ID            0xe48bff56u
 #define ABSOLUTE_FAMILY_ID          0xe48bff57u
 #define DATA_FAMILY_ID              0xe48bff58u
 #define RP2350_ARM_S_FAMILY_ID      0xe48bff59u
 #define RP2350_RISCV_FAMILY_ID      0xe48bff5au
 #define RP2350_ARM_NS_FAMILY_ID     0xe48bff5bu
-#define FAMILY_ID_MAX               0xe48bff5bu
+#define DEFAULT_FAMILY_ID_MIN       RP2040_FAMILY_ID
+#define FAMILY_ID_MAX               RP2350_ARM_NS_FAMILY_ID
 
 // 04 e3 57 99
 #define UF2_EXTENSION_RP2_IGNORE_BLOCK 0x9957e304
