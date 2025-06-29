@@ -13,6 +13,7 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include <cstdint>
 
 #include "location.h"
 #include "pio_enums.h"
