@@ -295,7 +295,7 @@ endfunction()
 # This sets the target property PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR and calls
 # pico_ensure_load_map(TARGET).
 #
-# \param\ PACKADDR The address to package the UF2 to
+# \param\ PACKADDR The address to package the UF2 to, either "FLASH" or a specific address
 function(pico_package_uf2_output TARGET PACKADDR)
     picotool_check_configurable(${TARGET})
     if (${PACKADDR} STREQUAL "FLASH")
