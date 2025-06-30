@@ -95,6 +95,12 @@ define_property(TARGET
     BRIEF_DOCS "Extra arguments to pass to uf2 conversion"
     FULL_DOCS "Extra arguments to pass to uf2 conversion"
 )
+define_property(TARGET
+    PROPERTY PICOTOOL_LOAD_MAP
+    INHERITED
+    BRIEF_DOCS "Ensure a load map is added"
+    FULL_DOCS "Ensure a load map is added"
+)
 
 # Check pioasm is installed, or build it if not installed
 function(pico_init_pioasm)
@@ -267,12 +273,27 @@ function(pico_generate_pio_header TARGET)
     endif()
 endfunction()
 
+# pico_ensure_load_map(TARGET)
+# \brief\ Ensure a load map is added to the target.
+# This can be used to ensure a load map is present, so the bootrom knows where
+# to load the binary if it's stored in a different location (e.g. a packaged
+# binary).
+#
+# This sets the target property PICOTOOL_LOAD_MAP to true.
+function(pico_ensure_load_map TARGET)
+    picotool_check_configurable(${TARGET})
+    set_target_properties(${TARGET} PROPERTIES
+        PICOTOOL_LOAD_MAP true
+    )
+endfunction()
+
 # pico_package_uf2_output(TARGET PACKADDR)
 # \brief\ Package a UF2 output to be written to the PACKADDR address.
 # This can be used with a no_flash binary to write the UF2 to flash when dragging &
 # dropping, and it will be copied to SRAM by the bootrom before execution.
 #
-# This sets the target property PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR.
+# This sets the target property PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR and calls
+# pico_ensure_load_map(TARGET).
 #
 # \param\ PACKADDR The address to package the UF2 to
 function(pico_package_uf2_output TARGET PACKADDR)
@@ -286,6 +307,7 @@ function(pico_package_uf2_output TARGET PACKADDR)
             PICOTOOL_UF2_PACKAGE_ADDR ${PACKADDR}
         )
     endif()
+    pico_ensure_load_map(${TARGET})
 endfunction()
 
 # pico_set_otp_key_output_file(TARGET OTPFILE)
@@ -635,7 +657,7 @@ function(picotool_postprocess_binary TARGET)
     if (NOT otp_file)
         set(otp_file "")
     endif()
-    get_target_property(uf2_package_addr ${TARGET} PICOTOOL_UF2_PACKAGE_ADDR)
+    get_target_property(ensure_load_map ${TARGET} PICOTOOL_LOAD_MAP)
 
     # Embed PT properties
     get_target_property(picotool_embed_pt ${TARGET} PICOTOOL_EMBED_PT)
@@ -674,7 +696,7 @@ function(picotool_postprocess_binary TARGET)
         # Signing/hashing/load maps for packaging
         if (picotool_sign_output OR
             picotool_hash_output OR
-            uf2_package_addr OR
+            ensure_load_map OR
             extra_process_args)
             # We don't need the extra end block, as picotool seal will add one
             target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK=0)
