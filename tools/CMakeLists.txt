@@ -277,9 +277,15 @@ endfunction()
 # \param\ PACKADDR The address to package the UF2 to
 function(pico_package_uf2_output TARGET PACKADDR)
     picotool_check_configurable(${TARGET})
-    set_target_properties(${TARGET} PROPERTIES
-        PICOTOOL_UF2_PACKAGE_ADDR ${PACKADDR}
-    )
+    if (${PACKADDR} STREQUAL "FLASH")
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_UF2_PACKAGE_ADDR 0x10000000
+        )
+    else()
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_UF2_PACKAGE_ADDR ${PACKADDR}
+        )
+    endif()
 endfunction()
 
 # pico_set_otp_key_output_file(TARGET OTPFILE)
