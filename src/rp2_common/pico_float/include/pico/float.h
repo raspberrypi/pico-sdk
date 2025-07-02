@@ -149,6 +149,8 @@ extern "C" {
 *   __addsf3, __subsf3, __mulsf3
 * \endif
 */
+
+// PICO_CONFIG: PICO_FLOAT_IN_RAM, Force placement of SDK provided single-precision floating point into RAM, type=bool, default=0, group=pico_float
 #if !defined(__riscv) || PICO_COMBINED_DOCS
 
 #if PICO_COMBINED_DOCS || !LIB_PICO_FLOAT_COMPILER

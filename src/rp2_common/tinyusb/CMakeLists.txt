@@ -1,4 +1,4 @@
-# PICO_CMAKE_CONFIG: PICO_TINYUSB_PATH, Path to an alternative version of tinyusb overriding the version in pico-sdk/lib/tinyusb. Can be passed to cmake or set in your environment, type=string, group=tinyusb_device
+# PICO_CMAKE_CONFIG: PICO_TINYUSB_PATH, Path to TinyUSB. Can be passed to CMake or set in your environment if you do not wish to use the version included with the SDK, type=string, default=<PICO_SDK_PATH>/lib/tinyusb, group=tinyusb_device
 if (DEFINED ENV{PICO_TINYUSB_PATH} AND (NOT PICO_TINYUSB_PATH))
     set(PICO_TINYUSB_PATH $ENV{PICO_TINYUSB_PATH})
     message("Using PICO_TINYUSB_PATH from environment ('${PICO_TINYUSB_PATH}')")

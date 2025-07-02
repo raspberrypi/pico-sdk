@@ -48,6 +48,7 @@ if (DEFINED PICO_COMPILER)
     if (NOT PICO_COMPILER STREQUAL ORIG_PICO_COMPILER)
         message("Accepting PICO_COMPILER value '${ORIG_PICO_COMPILER}' for compatibility, but using '${PICO_COMPILER}' instead")
     endif()
+    # PICO_CMAKE_CONFIG: PICO_TOOLCHAIN_DIR, Path to search for toolchain CMake files, type=string, default=<sdk_path>/preload/toolchains, group=build, docref=cmake-toolchain-config
     if (NOT DEFINED PICO_TOOLCHAIN_DIR)
         set(PICO_TOOLCHAIN_DIR "${CMAKE_CURRENT_LIST_DIR}/preload/toolchains")
     endif()
