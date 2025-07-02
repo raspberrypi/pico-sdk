@@ -19,7 +19,7 @@ def process_file(input_dir, file):
     results = []
 
     # Check content type
-    content_type, _ = mimetypes.guess_type(file)
+    content_type, content_encoding = mimetypes.guess_type(file)
     if content_type is None:
         content_type = "application/octet-stream"
 
@@ -53,9 +53,13 @@ def process_file(input_dir, file):
         comment = f"\"Content-Length: {file_size}\" ({len(data)} chars)"
         results.append({'data': bytes(data, "utf-8"), 'comment': comment});
 
-    # content type
-    data = f"Content-Type: {content_type}\r\n\r\n"
-    comment = f"\"Content-Type: {content_type}\" ({len(data)} chars)"
+    # content type and content encoding
+    if content_encoding is None:
+        data = f"Content-Type: {content_type}\r\n\r\n"
+        comment = f"\"Content-Type: {content_type}\" ({len(data)} chars)"
+    else:
+        data = f"Content-Type: {content_type}\r\nContent-Encoding: {content_encoding}\r\n\r\n"
+        comment = f"\"Content-Type: {content_type} Content-Encoding: {content_encoding}\" ({len(data)} chars)"
     results.append({'data': bytes(data, "utf-8"), 'comment': comment});
 
     # file contents
