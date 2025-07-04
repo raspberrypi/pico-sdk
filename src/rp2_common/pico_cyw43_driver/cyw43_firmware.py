@@ -19,7 +19,7 @@ with open(sys.argv[1], "r") as f:
         if "#define CYW43_WIFI_FW_LEN" in line:
             matches = re.search(r"#define\s+\S+\s+\((\S+)\)", line)
             cyw43_wifi_fw_len = int(matches[1])
-        if "#define CYW43_CLM_LEN" in line:
+        elif "#define CYW43_CLM_LEN" in line:
             matches = re.search(r"#define\s+\S+\s+\((\S+)\)", line)
             cyw43_clm_len = int(matches[1])
         if cyw43_wifi_fw_len > 0 and cyw43_clm_len > 0:
