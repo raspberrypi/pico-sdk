@@ -34,6 +34,7 @@ if (NOT TARGET pioasm)
                     "-DCMAKE_RULE_MESSAGES=OFF" # quieten the build
                     "-DCMAKE_INSTALL_MESSAGE=NEVER" # quieten the install
                 CMAKE_CACHE_ARGS "-DPIOASM_EXTRA_SOURCE_FILES:STRING=${PIOASM_EXTRA_SOURCE_FILES}"
+                                 "-DPIOASM_VERSION_STRING:STRING=${PICO_SDK_VERSION_STRING}"
                 BUILD_ALWAYS 1 # force dependency checking
                 EXCLUDE_FROM_ALL TRUE
                 )

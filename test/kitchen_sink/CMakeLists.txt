@@ -105,6 +105,10 @@ pico_set_program_name(kitchen_sink "Wombat tentacles")
 pico_add_extra_outputs(kitchen_sink)
 target_compile_definitions(kitchen_sink PRIVATE KITCHEN_SINK_ID="regular binary")
 
+if (TARGET hardware_pio)
+    pico_generate_pio_header(kitchen_sink ${CMAKE_CURRENT_LIST_DIR}/trivial.pio)
+endif()
+
 add_executable(kitchen_sink_extra_stdio ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 if (COMMAND suppress_tinyusb_warnings)
     # Explicitly suppress warnings in TinyUSB files which have them (this has to be done

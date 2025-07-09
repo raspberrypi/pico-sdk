@@ -51,3 +51,22 @@ wait 0 jmppin
 wait 0 jmppin + 3
 mov x, !x
 .word 0x1234
+
+
+.program prev_next
+.pio_version 1
+wait 0 irq prev 0      ; Wait for IRQ0
+irq prev clear 0        ; Clear IRQ0
+irq clear 0        ; Clear IRQ0
+wait 0 irq next 0      ; Wait for IRQ0
+irq next clear 0        ; Clear IRQ0
+
+.program wee
+.pio_version 1
+wait 0 gpio 15
+wait 0 gpio 31
+
+.program wee2
+.pio_version 1
+wait 0 gpio 31
+wait 0 gpio 47
