@@ -247,7 +247,7 @@ label_flag(
     build_setting_default = "//bazel:generate_config_header",
 )
 
-# PICO_BAZEL_CONFIG: PICO_CLIB, The C library to use e.g. newlib/picolibc/llvm_libc, type=string, default=based on PICO_COMPILER, group=build, docref=docref=cmake-toolchain-config
+# PICO_BAZEL_CONFIG: PICO_CLIB, The C library to use e.g. newlib/picolibc/llvm_libc, type=string, default=based on PICO_COMPILER, group=build, docref=cmake-toolchain-config
 string_flag(
     name = "PICO_CLIB",
     build_setting_default = "auto",
