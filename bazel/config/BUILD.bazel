@@ -247,7 +247,7 @@ label_flag(
     build_setting_default = "//bazel:generate_config_header",
 )
 
-# PICO_BAZEL_CONFIG: PICO_CLIB, [Bazel only] The flavor of libc porting layer to use. auto infers the correct value to use from PICO_TOOLCHAIN, group=pico_standard_link
+# PICO_BAZEL_CONFIG: PICO_CLIB, The C library to use e.g. newlib/picolibc/llvm_libc, type=string, default=based on PICO_COMPILER, group=pico_standard_link
 string_flag(
     name = "PICO_CLIB",
     build_setting_default = "auto",
