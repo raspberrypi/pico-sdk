@@ -287,7 +287,7 @@ function(pico_ensure_load_map TARGET)
     )
 endfunction()
 
-# pico_package_uf2_output(TARGET PACKADDR)
+# pico_package_uf2_output(TARGET [PACKADDR])
 # \brief\ Package a UF2 output to be written to the PACKADDR address.
 # This can be used with a no_flash binary to write the UF2 to flash when dragging &
 # dropping, and it will be copied to SRAM by the bootrom before execution.
@@ -295,16 +295,16 @@ endfunction()
 # This sets the target property PICOTOOL_UF2_PACKAGE_ADDR to PACKADDR and calls
 # pico_ensure_load_map(TARGET).
 #
-# \param\ PACKADDR The address to package the UF2 to, either "FLASH" or a specific address
-function(pico_package_uf2_output TARGET PACKADDR)
+# \param\ PACKADDR The address to package the UF2 to, defaults to start of flash
+function(pico_package_uf2_output TARGET)
     picotool_check_configurable(${TARGET})
-    if (${PACKADDR} STREQUAL "FLASH")
+    if (ARGC EQUAL 1)
         set_target_properties(${TARGET} PROPERTIES
             PICOTOOL_UF2_PACKAGE_ADDR 0x10000000
         )
     else()
         set_target_properties(${TARGET} PROPERTIES
-            PICOTOOL_UF2_PACKAGE_ADDR ${PACKADDR}
+            PICOTOOL_UF2_PACKAGE_ADDR ${ARGV1}
         )
     endif()
     pico_ensure_load_map(${TARGET})
