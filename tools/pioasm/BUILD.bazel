@@ -1,3 +1,5 @@
+load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
+
 package(default_visibility = ["//visibility:public"])
 
 # TODO: No support for building the parser.
@@ -19,6 +21,7 @@ cc_library(
         "pio_disassembler.h",
         "pio_enums.h",
         "pio_types.h",
+        ":version",
     ],
     copts = select({
         "@rules_cc//cc/compiler:msvc-cl": ["/std:c++20"],
@@ -61,6 +64,15 @@ cc_library(
     srcs = ["ada_output.cpp"],
     deps = [":pioasm_core"],
     alwayslink = True,
+)
+
+expand_template(
+    name = "version",
+    template = "version.h.in",
+    substitutions = {
+        "${PIOASM_VERSION_STRING}": module_version() if module_version() != None else "0.0.1-WORKSPACE",
+    },
+    out = "gen/version.h",
 )
 
 cc_binary(

@@ -18,6 +18,10 @@
  * parameters.
  *
  * For fuller descriptions of the instructions in question see the "RP2040 Datasheet"
+ *
+ * NOTE: These are helper functions for the raw instruction encoding, and thus
+ * only provide support for pins numbered 0-31. You should adjust your encoding
+ * according to your expected GPIO_BASE (see \ref pio_set_gpio_base)
  */
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PIO_INSTRUCTIONS, Enable/disable assertions in the PIO instructions, type=bool, default=0, group=pio_instructions

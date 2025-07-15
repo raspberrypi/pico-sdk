@@ -1,4 +1,4 @@
-load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel:defs.bzl", "compatible_with_rp2", "pico_generate_pio_header")
 load("//bazel/util:transition.bzl", "kitchen_sink_test_binary")
 
 package(default_visibility = ["//visibility:public"])
@@ -19,6 +19,11 @@ cc_library(
     name = "mbedtls_config",
     hdrs = ["mbedtls_config.h"],
     includes = ["."],
+)
+
+pico_generate_pio_header(
+    name = "trivial_pio_test",
+    srcs = ["trivial.pio"],
 )
 
 cc_library(

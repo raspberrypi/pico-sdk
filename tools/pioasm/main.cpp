@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include "pio_assembler.h"
+#include "version.h"
 
 #define DEFAULT_OUTPUT_FORMAT "c-sdk"
 
@@ -24,6 +25,7 @@ void usage() {
     }
     std::cerr << "  -p <output_param>    add a parameter to be passed to the output format generator" << std::endl;
     std::cerr << "  -v <version>         specify the default PIO version (0 or 1)" << std::endl;
+    std::cerr << "  --version            print pioasm version information" << std::endl;
     std::cerr << "  -?, --help           print this help and exit\n";
 }
 
@@ -66,6 +68,9 @@ int main(int argc, char *argv[]) {
         } else if (argv[i] == std::string("-?") || argv[i] == std::string("--help")) {
             usage();
             return 1;
+        } else if (argv[i] == std::string("--version")) {
+            std::cout << "pioasm version: " << PIOASM_VERSION_STRING << std::endl;
+            return 0;
         } else {
             std::cerr << "error: unknown option " << argv[i] << std::endl;
             res = 1;
