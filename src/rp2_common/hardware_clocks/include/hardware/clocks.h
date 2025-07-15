@@ -544,6 +544,42 @@ static inline bool set_sys_clock_khz(uint32_t freq_khz, bool required) {
     return false;
 }
 
+#define GPIO_TO_GPOUT_CLOCK_HANDLE_RP2040(gpio, default_clk_handle) \
+    ((gpio == 21) ? clk_gpout0 :                        \
+        ((gpio == 23) ? clk_gpout1 :                    \
+            ((gpio == 24) ? clk_gpout2 :                \
+                ((gpio == 25) ? clk_gpout3 :            \
+                    (default_clk_handle)))))
+
+#define GPIO_TO_GPOUT_CLOCK_HANDLE_RP2350(gpio, default_clk_handle) \
+    ((gpio == 13) ? clk_gpout0 :                        \
+        ((gpio == 15) ? clk_gpout1 :                    \
+            (GPIO_TO_GPOUT_CLOCK_HANDLE_RP2040(gpio, default_clk_handle))))
+
+/**
+ * \def GPIO_TO_GPOUT_CLOCK_HANDLE(gpio, default_clk_handle)
+ * \ingroup hardware_clocks
+ * \hideinitializer
+ * \brief Returns the GPOUT clock number associated with a particular GPIO if there is one, or default_clk_handle otherwise
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef GPIO_TO_GPOUT_CLOCK_HANDLE
+#if PICO_RP2040
+#define GPIO_TO_GPOUT_CLOCK_HANDLE GPIO_TO_GPOUT_CLOCK_HANDLE_RP2040
+#else
+#define GPIO_TO_GPOUT_CLOCK_HANDLE GPIO_TO_GPOUT_CLOCK_HANDLE_RP2350
+#endif
+#endif
+    
+/**
+ * \brief return the associated GPOUT clock for a given GPIO if any
+ * \ingroup hardware_clocks
+ * \return the GPOUT clock number associated with a particular GPIO or default_clk_handle otherwise
+ */
+static inline clock_handle_t gpio_to_gpout_clock_handle(uint gpio, clock_handle_t default_clk_handle) {
+    return GPIO_TO_GPOUT_CLOCK_HANDLE(gpio, ({invalid_params_if(HARDWARE_CLOCKS, true); default_clk_handle;}));
+}
 #ifdef __cplusplus
 }
 #endif
