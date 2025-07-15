@@ -223,8 +223,8 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
                 PICO_CRT0_IMAGE_TYPE_TBYB=1
                 )
 
-        target_link_options(${TARGET}_firmware PRIVATE -nostartfiles -nodefaultlibs -N LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
-        target_link_options(${TARGET}_firmware_tbyb PRIVATE -nostartfiles -nodefaultlibs -N LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
+        target_link_options(${TARGET}_firmware PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
+        target_link_options(${TARGET}_firmware_tbyb PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
 
         target_link_libraries(${TARGET}_firmware boot_picobin_headers)
         target_link_libraries(${TARGET}_firmware_tbyb boot_picobin_headers)
