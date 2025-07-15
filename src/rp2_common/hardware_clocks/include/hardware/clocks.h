@@ -545,15 +545,15 @@ static inline bool set_sys_clock_khz(uint32_t freq_khz, bool required) {
 }
 
 #define GPIO_TO_GPOUT_CLOCK_HANDLE_RP2040(gpio, default_clk_handle) \
-    ((gpio == 21) ? clk_gpout0 :                        \
-        ((gpio == 23) ? clk_gpout1 :                    \
-            ((gpio == 24) ? clk_gpout2 :                \
-                ((gpio == 25) ? clk_gpout3 :            \
+    ((gpio) == 21 ? clk_gpout0 :                        \
+        ((gpio) == 23 ? clk_gpout1 :                    \
+            ((gpio) == 24 ? clk_gpout2 :                \
+                ((gpio) == 25 ? clk_gpout3 :            \
                     (default_clk_handle)))))
 
 #define GPIO_TO_GPOUT_CLOCK_HANDLE_RP2350(gpio, default_clk_handle) \
-    ((gpio == 13) ? clk_gpout0 :                        \
-        ((gpio == 15) ? clk_gpout1 :                    \
+    ((gpio) == 13 ? clk_gpout0 :                        \
+        ((gpio) == 15 ? clk_gpout1 :                    \
             (GPIO_TO_GPOUT_CLOCK_HANDLE_RP2040(gpio, default_clk_handle))))
 
 /**
