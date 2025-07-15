@@ -570,7 +570,10 @@ static inline uint32_t gpio_get_irq_event_mask(uint gpio) {
  * \note For callbacks set with \ref gpio_set_irq_enabled_with_callback, or \ref gpio_set_irq_callback, this function is called automatically.
  * \param event_mask Bitmask of events to clear. See \ref gpio_irq_level for details.
  */
-void gpio_acknowledge_irq(uint gpio, uint32_t event_mask);
+static inline void gpio_acknowledge_irq(uint gpio, uint32_t event_mask) {
+    check_gpio_param(gpio);
+    io_bank0_hw->intr[gpio / 8] = event_mask << (4 * (gpio % 8));
+}
 
 /*! \brief Adds a raw GPIO IRQ handler for the specified GPIOs on the current core
  *  \ingroup hardware_gpio
