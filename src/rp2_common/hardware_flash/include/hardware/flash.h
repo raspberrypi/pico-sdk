@@ -56,6 +56,24 @@
 extern "C" {
 #endif
 
+/*! \brief  Initialise QSPI interface and external QSPI devices for execute-in-place
+ *  \ingroup hardware_flash
+ *
+ * This function performs the same first-time flash setup that would normally occur during startup
+ * of a flash binary.
+ *
+ * This is mostly useful for initialising flash on a PICO_NO_FLASH=1 binary. In spite of the name,
+ * this binary type really means "preloaded to RAM" and there may still be a flash device.
+ *
+ * This function does not preserve the QSPI interface state or pad state. However, on RP2350 it does
+ * preserve the QMI window 1 configuration if you have not opted into bootrom CS1 support via
+ * FLASH_DEVINFO. This is in contrast to most other functions in this library, which preserve at
+ * least the QSPI pad state.
+ *
+ */
+void flash_start_xip(void);
+
+
 /*! \brief  Erase areas of flash
  *  \ingroup hardware_flash
  *
