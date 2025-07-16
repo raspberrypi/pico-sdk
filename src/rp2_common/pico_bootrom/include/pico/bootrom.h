@@ -173,7 +173,7 @@ __force_inline static void *rom_hword_as_ptr(uint16_t rom_address) {
 
 #ifdef __riscv
 static __force_inline bool rom_size_is_64k(void) {
-#ifdef RASPBERRYPI_FPGA
+#if RASPBERRYPI_FPGA
     return *(uint16_t*)0x14 >= 0x8000;
 #else
     return false;
