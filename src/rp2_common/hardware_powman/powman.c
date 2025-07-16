@@ -97,12 +97,25 @@ void powman_timer_set_1khz_tick_source_xosc_with_hz(uint32_t xosc_freq_hz) {
     }
 }
 
+#ifndef GPIO_TO_POWMAN_EXT_TIME_REF_SOURCE
+#define GPIO_TO_POWMAN_EXT_TIME_REF_SOURCE(gpio, default_ext_time_ref_source) \
+    ((gpio) == 12 ? 0 :                                 \
+        ((gpio) == 20 ? 1 :                             \
+            ((gpio) == 14 ? 2 :                         \
+                ((gpio) == 22 ? 3 :                     \
+                    (default_ext_time_ref_source)))))
+#endif
+
+static inline uint32_t gpio_to_powman_ext_time_ref_source(uint gpio, uint32_t default_ext_time_ref_source) {
+    return GPIO_TO_POWMAN_EXT_TIME_REF_SOURCE(gpio, ({invalid_params_if(HARDWARE_POWMAN, true); default_ext_time_ref_source;}));
+}
+
 static void powman_timer_use_gpio(uint32_t gpio, uint32_t use, uint32_t using) {
     bool was_running = powman_timer_is_running();
     if (was_running) powman_timer_stop();
-    invalid_params_if(HARDWARE_POWMAN, !((gpio == 12) || (gpio == 14) || (gpio == 20) || (gpio == 22)));
+    uint32_t source = gpio_to_powman_ext_time_ref_source(gpio, 0);
     gpio_set_input_enabled(gpio, true);
-    powman_write(&powman_hw->ext_time_ref, gpio);
+    powman_write(&powman_hw->ext_time_ref, source);
     powman_set_bits(&powman_hw->timer, use);
     if (was_running) {
         powman_timer_start();
