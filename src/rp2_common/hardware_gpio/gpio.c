@@ -253,11 +253,6 @@ void gpio_set_dormant_irq_enabled(uint gpio, uint32_t events, bool enabled) {
     _gpio_set_irq_enabled(gpio, events, enabled, irq_ctrl_base);
 }
 
-void gpio_acknowledge_irq(uint gpio, uint32_t events) {
-    check_gpio_param(gpio);
-    io_bank0_hw->intr[gpio / 8] = events << (4 * (gpio % 8));
-}
-
 #define DEBUG_PIN_MASK (((1u << PICO_DEBUG_PIN_COUNT)-1) << PICO_DEBUG_PIN_BASE)
 void gpio_debug_pins_init(void) {
     gpio_init_mask(DEBUG_PIN_MASK);
