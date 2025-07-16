@@ -4,7 +4,7 @@ set(PICO_TOOLCHAIN_PATH "${PICO_TOOLCHAIN_PATH}" CACHE INTERNAL "")
 # Set a default build type if none was specified
 set(default_build_type "Release")
 
-list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES CMAKE_PREFIX_PATH)
+list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES CMAKE_PREFIX_PATH PICO_SDK_PATH)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Defaulting build type to '${default_build_type}' since not specified.")

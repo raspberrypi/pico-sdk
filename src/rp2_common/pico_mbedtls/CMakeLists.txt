@@ -6,7 +6,7 @@ endif()
 
 set(MBEDTLS_TEST_PATH "library/aes.c")
 if (NOT PICO_MBEDTLS_PATH)
-    set(PICO_MBEDTLS_PATH ${PROJECT_SOURCE_DIR}/lib/mbedtls)
+    set(PICO_MBEDTLS_PATH ${PICO_SDK_PATH}/lib/mbedtls)
 elseif (NOT EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
     message(WARNING "PICO_MBEDTLS_PATH specified but content not present.")
 endif()

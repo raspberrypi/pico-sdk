@@ -46,7 +46,7 @@ void gpio_set_function(uint gpio, gpio_function_t fn) {
     // Zero all fields apart from fsel; we want this IO to do what the peripheral tells it.
     // This doesn't affect e.g. pullup/pulldown, as these are in pad controls.
     io_bank0_hw->io[gpio].ctrl = fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB;
-#if !PICO_RP2040
+#if HAS_PADS_BANK0_ISOLATION
     // Remove pad isolation now that the correct peripheral is in control of the pad
     hw_clear_bits(&pads_bank0_hw->io[gpio], PADS_BANK0_GPIO0_ISO_BITS);
 #endif

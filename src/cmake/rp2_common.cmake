@@ -63,14 +63,14 @@ pico_add_subdirectory(rp2_common/hardware_watchdog)
 pico_add_subdirectory(rp2_common/hardware_xip_cache)
 pico_add_subdirectory(rp2_common/hardware_xosc)
 
-if (PICO_RP2350 OR PICO_COMBINED_DOCS)
+if (PICO_COMBINED_DOCS OR NOT PICO_RP2040)
     pico_add_subdirectory(rp2_common/hardware_powman)
     # Note in spite of the name this is usable on Arm as well as RISC-V:
     pico_add_subdirectory(rp2_common/hardware_riscv_platform_timer)
     pico_add_subdirectory(rp2_common/hardware_sha256)
 endif()
 
-if (PICO_RP2350 OR PICO_COMBINED_DOCS)
+if (PICO_COMBINED_DOCS OR NOT PICO_RP2040)
     pico_add_subdirectory(rp2_common/hardware_dcp)
     pico_add_subdirectory(rp2_common/hardware_rcp)
 endif()
@@ -108,7 +108,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(rp2_common/pico_printf)
     pico_add_subdirectory(rp2_common/pico_rand)
 
-    if (PICO_RP2350 OR PICO_COMBINED_DOCS)
+    if (PICO_COMBINED_DOCS OR NOT PICO_RP2040)
         pico_add_subdirectory(rp2_common/pico_sha256)
     endif()
 

@@ -7,8 +7,13 @@ target_sources(pico_rand INTERFACE
 target_include_directories(pico_rand_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 pico_mirrored_target_link_libraries(pico_rand INTERFACE
-        pico_unique_id
         hardware_clocks
         hardware_timer
         hardware_sync
 )
+
+if (TARGET pico_unique_id)
+    pico_mirrored_target_link_libraries(pico_rand INTERFACE
+            pico_unique_id
+    )
+endif()

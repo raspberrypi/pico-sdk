@@ -14,7 +14,7 @@
 #include "hardware/structs/scb.h"
 #endif
 #include "hardware/structs/sio.h"
-#include "hardware/regs/psm.h"
+#include "hardware/structs/psm.h"
 #include "hardware/claim.h"
 
 #if !PICO_RP2040

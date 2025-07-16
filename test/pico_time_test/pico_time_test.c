@@ -41,8 +41,8 @@ static struct timeout {
     alarm_id_t alarm_id;
     absolute_time_t target;
     absolute_time_t fired_at;
-    uint pool;
     uint fired_count;
+    uint8_t pool;
     bool cancelled;
     bool not_cancelled; // tried to cancel but it was done
 } timeouts[NUM_TIMEOUTS];

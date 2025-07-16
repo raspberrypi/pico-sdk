@@ -13,7 +13,13 @@ pico_mirrored_target_link_libraries(pico_runtime_init INTERFACE
 )
 
 if (TARGET hardware_clocks)
-    pico_mirrored_target_link_libraries(pico_runtime_init INTERFACE hardware_clocks hardware_timer hardware_vreg)
+    pico_mirrored_target_link_libraries(pico_runtime_init INTERFACE hardware_clocks)
+endif()
+if (TARGET hardware_timer)
+    pico_mirrored_target_link_libraries(pico_runtime_init INTERFACE hardware_timer)
+endif()
+if (TARGET hardware_vreg)
+    pico_mirrored_target_link_libraries(pico_runtime_init INTERFACE hardware_vreg)
 endif()
 
 # pico/runtime_init.h includes pico/runtime.h

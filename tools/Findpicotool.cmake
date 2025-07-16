@@ -34,10 +34,16 @@ if (NOT TARGET picotool)
             )
         endif()
 
+        if (NOT PICOTOOL_GIT_REPOSITORY_URL)
+            set(PICOTOOL_GIT_REPOSITORY_URL https://github.com/raspberrypi/picotool.git)
+        endif()
+        if (NOT PICOTOOL_GIT_BRANCH)
+            set(PICOTOOL_GIT_BRANCH develop)
+        endif()
         message("Downloading Picotool")
         FetchContent_Populate(picotool QUIET
-            GIT_REPOSITORY https://github.com/raspberrypi/picotool.git
-            GIT_TAG develop
+            GIT_REPOSITORY ${PICOTOOL_GIT_REPOSITORY_URL}
+            GIT_TAG ${PICOTOOL_GIT_BRANCH}
 
             SOURCE_DIR ${picotool_INSTALL_DIR}/picotool-src
             BINARY_DIR ${picotool_INSTALL_DIR}/picotool-build

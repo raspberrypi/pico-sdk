@@ -1,3 +1,7 @@
+if (NOT TARGET pico_divider)
+    message("Skipping pico_divider_test as pico_divider is unavailable on this platform")
+    return()
+endif()
 PROJECT(pico_divider_test)
 
 if (PICO_ON_DEVICE)
