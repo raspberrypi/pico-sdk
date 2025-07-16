@@ -19,6 +19,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #endif
 
 // For board detection
+#define RASPBERRYPI_FPGA
 #define RASPBERRYPI_AMETHYST_FPGA
 
 #define PICO_NO_FPGA_CHECK 0
