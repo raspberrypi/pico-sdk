@@ -2,23 +2,32 @@ add_library(kitchen_sink_libs INTERFACE)
 
 set(KITCHEN_SINK_LIBS
     hardware_adc
+    hardware_boot_lock
+    hardware_claim
     hardware_clocks
+    hardware_dcp
     hardware_divider
     hardware_dma
     hardware_exception
     hardware_flash
     hardware_gpio
+    hardware_hazard3
     hardware_i2c
     hardware_interp
     hardware_irq
     hardware_pio
-    hardware_powman
     hardware_pll
+    hardware_powman
     hardware_pwm
+    hardware_rcp
     hardware_resets
+    hardware_riscv
+    hardware_riscv_platform_timer
     hardware_rtc
+    hardware_sha256
     hardware_spi
     hardware_sync
+    hardware_sync_spin_lock
     hardware_ticks
     hardware_timer
     hardware_uart
@@ -41,8 +50,12 @@ set(KITCHEN_SINK_LIBS
     pico_mem_ops
     pico_multicore
     pico_platform
+    pico_printf
     pico_rand
+    pico_runtime
+    pico_runtime_init
     pico_sha256
+    pico_stdio
     pico_stdlib
     pico_sync
     pico_time
@@ -50,16 +63,47 @@ set(KITCHEN_SINK_LIBS
     pico_util
 )
 
+set(KITCHEN_SINK_NO_HEADER_LIBS
+    hardware_dcp
+    pico_bootsel_via_double_reset
+    pico_int64_ops # currently empty, and only included by _pico variant
+    pico_mem_ops # currently empty, and only included by _pico variant
+)
+
+set(KITCHEN_SINK_INCLUDES "#pragma once\n")
 foreach(LIB IN LISTS KITCHEN_SINK_LIBS)
     if (TARGET ${LIB})
         target_link_libraries(kitchen_sink_libs INTERFACE ${LIB})
+        string(REGEX MATCH "([a-z]+)_(.+)" HAS_MATCH ${LIB})
+       if (HAS_MATCH AND NOT LIB IN_LIST KITCHEN_SINK_NO_HEADER_LIBS)
+           # these are few, so just hack fixing for now
+           if (LIB STREQUAL "pico_util")
+               string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/datetime.h\"\n")
+               string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/pheap.h\"\n")
+               string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/queue.h\"\n")
+           else()
+               if ("${CMAKE_MATCH_2}" STREQUAL "fix_rp2040_usb_device_enumeration")
+                   set(CMAKE_MATCH_2 "fix/rp2040_usb_device_enumeration")
+               elseif ("${CMAKE_MATCH_2}" STREQUAL "sync_spin_lock")
+                   set(CMAKE_MATCH_2 "sync/spin_lock")
+               endif()
+               string(APPEND KITCHEN_SINK_INCLUDES "#include \"${CMAKE_MATCH_1}/${CMAKE_MATCH_2}.h\"\n")
+           endif()
+       endif()
     endif()
 endforeach ()
+set(KITCHEN_SINK_INCLUDE_HEADER "${CMAKE_CURRENT_BINARY_DIR}/kitchen_sink_includes.h")
+file(GENERATE OUTPUT ${KITCHEN_SINK_INCLUDE_HEADER} CONTENT ${KITCHEN_SINK_INCLUDES})
 
 add_library(kitchen_sink_options INTERFACE)
 
-target_compile_options(kitchen_sink_options INTERFACE
+if (NOT KITCHEN_SINK_NO_WERROR)
+    target_compile_options(kitchen_sink_options INTERFACE
         -Werror
+    )
+endif()
+
+target_compile_options(kitchen_sink_options INTERFACE
         -Wall
         -Wextra
         #        -pedantic
@@ -97,6 +141,7 @@ target_compile_definitions(kitchen_sink_libs INTERFACE
         PICO_FORBID_ARM_HEADERS_ON_RISCV=1
         PARAM_ASSERTIONS_ENABLE_ALL=1 # want to check all the assertions for compilation warnings
         PICO_AUDIO_DMA_IRQ=1
+        KITCHEN_SINK_INCLUDE_HEADER="${KITCHEN_SINK_INCLUDE_HEADER}"
 )
 
 add_executable(kitchen_sink ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
@@ -147,25 +192,27 @@ target_link_libraries(kitchen_sink_printf_none kitchen_sink_libs kitchen_sink_op
 pico_add_extra_outputs(kitchen_sink_printf_none)
 pico_set_printf_implementation(kitchen_sink_printf_none none)
 
-add_executable(kitchen_sink_copy_to_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
-pico_set_binary_type(kitchen_sink_copy_to_ram copy_to_ram)
-target_link_libraries(kitchen_sink_copy_to_ram kitchen_sink_libs kitchen_sink_options)
-pico_add_extra_outputs(kitchen_sink_copy_to_ram)
-target_compile_definitions(kitchen_sink_copy_to_ram PRIVATE KITCHEN_SINK_ID="copy-to-ram binary")
+if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
+    add_executable(kitchen_sink_copy_to_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    pico_set_binary_type(kitchen_sink_copy_to_ram copy_to_ram)
+    target_link_libraries(kitchen_sink_copy_to_ram kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_copy_to_ram)
+    target_compile_definitions(kitchen_sink_copy_to_ram PRIVATE KITCHEN_SINK_ID="copy-to-ram binary")
 
-add_executable(kitchen_sink_no_flash ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
-pico_set_binary_type(kitchen_sink_no_flash no_flash)
-target_link_libraries(kitchen_sink_no_flash kitchen_sink_libs kitchen_sink_options)
-pico_add_extra_outputs(kitchen_sink_no_flash)
-target_compile_definitions(kitchen_sink_no_flash PRIVATE KITCHEN_SINK_ID="no-flash binary")
+    add_executable(kitchen_sink_no_flash ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    pico_set_binary_type(kitchen_sink_no_flash no_flash)
+    target_link_libraries(kitchen_sink_no_flash kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_no_flash)
+    target_compile_definitions(kitchen_sink_no_flash PRIVATE KITCHEN_SINK_ID="no-flash binary")
 
-if (NOT PICO_RP2350)
-    # RP2350 does not have blocked ram
-    add_executable(kitchen_sink_blocked_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
-    pico_set_binary_type(kitchen_sink_blocked_ram blocked_ram)
-    target_link_libraries(kitchen_sink_blocked_ram kitchen_sink_libs kitchen_sink_options)
-    pico_add_extra_outputs(kitchen_sink_blocked_ram)
-    target_compile_definitions(kitchen_sink_blocked_ram PRIVATE KITCHEN_SINK_ID="blocked-ram binary")
+    if (PICO_RP2040)
+        # RP2040 has blocked ram
+        add_executable(kitchen_sink_blocked_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+        pico_set_binary_type(kitchen_sink_blocked_ram blocked_ram)
+        target_link_libraries(kitchen_sink_blocked_ram kitchen_sink_libs kitchen_sink_options)
+        pico_add_extra_outputs(kitchen_sink_blocked_ram)
+        target_compile_definitions(kitchen_sink_blocked_ram PRIVATE KITCHEN_SINK_ID="blocked-ram binary")
+    endif()
 endif()
 
 add_executable(kitchen_sink_cpp ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_cpp.cpp)
