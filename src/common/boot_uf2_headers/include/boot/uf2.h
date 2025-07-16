@@ -36,8 +36,11 @@
 #define RP2350_ARM_S_FAMILY_ID      0xe48bff59u
 #define RP2350_RISCV_FAMILY_ID      0xe48bff5au
 #define RP2350_ARM_NS_FAMILY_ID     0xe48bff5bu
-#define DEFAULT_FAMILY_ID_MIN       RP2040_FAMILY_ID
-#define FAMILY_ID_MAX               RP2350_ARM_NS_FAMILY_ID
+#define BOOTROM_FAMILY_ID_MIN       RP2040_FAMILY_ID
+#define BOOTROM_FAMILY_ID_MAX       RP2350_ARM_NS_FAMILY_ID
+
+// Defined for backwards compatibility
+#define FAMILY_ID_MAX               BOOTROM_FAMILY_ID_MAX
 
 // 04 e3 57 99
 #define UF2_EXTENSION_RP2_IGNORE_BLOCK 0x9957e304
