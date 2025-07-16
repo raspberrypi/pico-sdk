@@ -11,6 +11,9 @@
 #include "hardware/dma.h"
 #include "pico/sync.h"
 #include "pico/stdlib.h"
+#if LIB_PICO_BINARY_INFO
+#include "pico/binary_info.h"
+#endif
 #else
 #include KITCHEN_SINK_INCLUDE_HEADER
 #endif
