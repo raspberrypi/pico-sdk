@@ -178,7 +178,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                             # allow commas to appear inside brackets by converting them to and from NULL chars
                             _attrs = re.sub(r'(\(.+\))', lambda m: m.group(1).replace(',', '\0'), _attrs)
 
-                            if '=' in config_description:
+                            if '=' in config_description and not '==' in config_description:
                                 errors.append(Exception("For {} at {}:{} the description was set to '{}' - has the description field been omitted?".format(config_name, file_path, linenum, config_description)))
                             all_descriptions = chips_all_descriptions[applicable]
                             if config_description in all_descriptions:

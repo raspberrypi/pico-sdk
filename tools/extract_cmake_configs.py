@@ -44,7 +44,7 @@ BASE_CMAKE_CONFIG_RE = re.compile(r'\b{}\b'.format(BASE_CMAKE_CONFIG_NAME))
 BASE_BUILD_DEFINE_NAME = 'PICO_BUILD_DEFINE'
 BASE_BUILD_DEFINE_RE = re.compile(r'\b{}\b'.format(BASE_BUILD_DEFINE_NAME))
 
-CMAKE_CONFIG_RE = re.compile(r'#\s+{}:\s+(\w+),\s+([^,]+)(?:,\s+(.*))?$'.format(BASE_CMAKE_CONFIG_NAME))
+CMAKE_CONFIG_RE = re.compile(r'#\s+{}:\s+([\w-]+),\s+([^,]+)(?:,\s+(.*))?$'.format(BASE_CMAKE_CONFIG_NAME))
 
 ALLOWED_CONFIG_PROPERTIES = set(['type', 'default', 'min', 'max', 'group', 'advanced', 'docref'])
 
@@ -159,7 +159,7 @@ for dirpath, dirnames, filenames in os.walk(scandir):
                             # allow commas to appear inside brackets by converting them to and from NULL chars
                             _attrs = re.sub(r'(\(.+\))', lambda m: m.group(1).replace(',', '\0'), _attrs)
 
-                            if '=' in config_description:
+                            if '=' in config_description and not '==' in config_description:
                                 errors.append(Exception("For {} at {}:{} the description was set to '{}' - has the description field been omitted?".format(config_name, file_path, linenum, config_description)))
                             all_descriptions = chips_all_descriptions[applicable]
                             if config_description in all_descriptions:
