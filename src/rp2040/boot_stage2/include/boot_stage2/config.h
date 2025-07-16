@@ -12,7 +12,6 @@
 #include "pico.h"
 
 // PICO_CONFIG: PICO_FLASH_SPI_CLKDIV, Clock divider fron clk_sys to use for serial flash communications in boot stage 2. On RP2040 this must be a multiple of 2, type=int, default=varies; often specified in board header, advanced=true, group=boot_stage2
-// PICO_CONFIG: PICO_FLASH_SPI_RXDELAY, Receive delay in 1/2 clock cycles to use for serial flash communications in boot stage 2, type=int, default=varies; often specified in board header, advanced=true, group=boot_stage2
 
 // PICO_CONFIG: PICO_BUILD_BOOT_STAGE2_NAME, Name of the boot stage 2 if selected in the build system, group=boot_stage2
 #ifdef PICO_BUILD_BOOT_STAGE2_NAME
