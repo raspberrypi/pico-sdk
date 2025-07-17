@@ -28,7 +28,9 @@
 #if PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID
 #include "pico/unique_id.h"
 #endif
+#if PICO_RAND_ENTROPY_SRC_TIME
 #include "pico/time.h"
+#endif
 #include "hardware/clocks.h"
 #if PICO_RAND_SEED_ENTROPY_SRC_ROSC || PICO_RAND_ENTROPY_SRC_ROSC
 #include "hardware/structs/rosc.h"
