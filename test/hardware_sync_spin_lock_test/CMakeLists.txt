@@ -1,5 +1,5 @@
 if (NOT TARGET pico_multicore)
-	message("Skipping pico_float_test as pico_multicore is unavailable on this platform")
+	message("Skipping hardware_sync_spin_lock_test as pico_multicore is unavailable on this platform")
 	return()
 endif()
 
