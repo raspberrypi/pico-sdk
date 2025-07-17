@@ -165,5 +165,89 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
                     )
     endfunction()
 
+    set(PICO_CYW43_DRIVER_CURRENT_PATH ${CMAKE_CURRENT_LIST_DIR})
+    pico_register_common_scope_var(PICO_CYW43_DRIVER_CURRENT_PATH)
+
     pico_promote_common_scope_vars()
+
+    # pico_use_wifi_firmware_partition(TARGET [NO_EMBEDDED_PT])
+    # \brief\ Use a partition for the Wi-Fi firmware
+    #
+    # This will read the CYW43 firmware from a partition with the ID 0x776966696669726d,
+    # instead of embedding the firmware blob in the binary. By default it will also embed
+    # a compatible partition table in the binary, but this can be disabled by passing the
+    # NO_EMBEDDED_PT argument (for example, if you need to chain into the binary, it
+    # can't contain a partition table).
+    #
+    # \param\ NO_EMBEDDED_PT If set, will not embed a partition table in the binary
+    function(pico_use_wifi_firmware_partition TARGET)
+        set(options NO_EMBEDDED_PT)
+        cmake_parse_arguments(PARSE_ARGV 1 OPTS "${options}" "" "")
+        if (PICO_PLATFORM STREQUAL "rp2040")
+                message(FATAL_ERROR "RP2040 does not support storing wi-fi firmware in partitions")
+        endif()
+        target_compile_definitions(${TARGET} PRIVATE CYW43_USE_FIRMWARE_PARTITION=1)
+
+        if (NOT OPTS_NO_EMBEDDED_PT)
+            get_target_property(picotool_embed_pt ${TARGET} PICOTOOL_EMBED_PT)
+            if (NOT picotool_embed_pt)
+                pico_embed_pt_in_binary(${TARGET} ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_pt.json)
+            endif()
+        endif()
+
+        find_package (Python3 REQUIRED COMPONENTS Interpreter)
+
+        # CYW43 firmware blob
+        add_custom_target(${TARGET}_firmware_blob DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S)
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S
+                COMMAND ${Python3_EXECUTABLE} ${PICO_CYW43_DRIVER_CURRENT_PATH}/cyw43_firmware.py ${PICO_CYW43_DRIVER_PATH}/firmware/wb43439A0_7_95_49_00_combined.h ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S
+                )
+
+        # Create UF2s for regular and TBYB firmwares
+        add_executable(${TARGET}_firmware
+                ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+        add_executable(${TARGET}_firmware_tbyb
+                ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+
+        add_dependencies(${TARGET}_firmware ${TARGET}_firmware_blob)
+        add_dependencies(${TARGET}_firmware_tbyb ${TARGET}_firmware_blob)
+
+        target_include_directories(${TARGET}_firmware PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+        target_include_directories(${TARGET}_firmware_tbyb PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
+        target_compile_definitions(${TARGET}_firmware PRIVATE
+                NO_PICO_PLATFORM=1
+                )
+        target_compile_definitions(${TARGET}_firmware_tbyb PRIVATE
+                NO_PICO_PLATFORM=1
+                PICO_CRT0_IMAGE_TYPE_TBYB=1
+                )
+
+        target_link_options(${TARGET}_firmware PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
+        target_link_options(${TARGET}_firmware_tbyb PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
+
+        target_link_libraries(${TARGET}_firmware boot_picobin_headers)
+        target_link_libraries(${TARGET}_firmware_tbyb boot_picobin_headers)
+
+        get_target_property(hasSigfile ${TARGET} PICOTOOL_SIGFILE)
+        if (hasSigfile)
+                pico_sign_binary(${TARGET}_firmware ${sigfile})
+                pico_sign_binary(${TARGET}_firmware_tbyb ${sigfile})
+        endif()
+
+        pico_hash_binary(${TARGET}_firmware)
+        pico_hash_binary(${TARGET}_firmware_tbyb)
+
+        pico_set_uf2_family(${TARGET}_firmware cyw43-firmware)
+        pico_set_uf2_family(${TARGET}_firmware_tbyb cyw43-firmware)
+
+        pico_package_uf2_output(${TARGET}_firmware 0x10000000)
+        pico_package_uf2_output(${TARGET}_firmware_tbyb 0x10000000)
+
+        pico_add_extra_outputs(${TARGET}_firmware)
+        pico_add_extra_outputs(${TARGET}_firmware_tbyb)
+
+        add_dependencies(${TARGET}
+                ${TARGET}_firmware ${TARGET}_firmware_tbyb)
+    endfunction()
 endif()

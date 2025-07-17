@@ -1,0 +1,52 @@
+{
+  "version": [1, 0],
+  "unpartitioned": {
+    "families": ["absolute"],
+    "permissions": {
+      "secure": "rw",
+      "nonsecure": "rw",
+      "bootloader": "rw"
+    }
+  },
+  "partitions": [
+    {
+      "name": "Main",
+      "id": 0,
+      "start": 0,
+      "size": "3500K",
+      "families": ["rp2350-arm-s", "rp2350-riscv"],
+      "permissions": {
+        "secure": "rw",
+        "nonsecure": "rw",
+        "bootloader": "rw"
+      }
+    },
+    {
+      "name": "Wi-Fi Firmware",
+      "id": "0x776966696669726d",
+      "start": "3500k",
+      "size": "256K",
+      "families": ["cyw43-firmware"],
+      "permissions": {
+        "secure": "rw",
+        "nonsecure": "rw",
+        "bootloader": "rw"
+      },
+      "ignored_during_riscv_boot": true,
+      "no_reboot_on_uf2_download": true
+    },
+    {
+      "start": "3500k",
+      "size": "256k",
+      "families": ["cyw43-firmware"],
+      "permissions": {
+        "secure": "rw",
+        "nonsecure": "rw",
+        "bootloader": "rw"
+      },
+      "link": ["a", 1],
+      "ignored_during_riscv_boot": true,
+      "no_reboot_on_uf2_download": true
+    }
+  ]
+}
