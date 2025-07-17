@@ -12,7 +12,7 @@ This documentation is generated from the SDK source tree using Doxygen. It provi
 
 The RP-series microcontrollers are powerful chips designed for embedded systems, which means that these chips operate in environments with limited memory (RAM) and storage (program space). Developers must balance performance with other factors, such as edge-case error handling, runtime versus compile time, and so on. These trade-offs are necessarily more visible to developers for RP-series microcontrollers than they might be for higher-level platforms (like desktop systems), where such considerations are often abstracted or automated.
 
-The SDK is designed to be both beginner friendly and powerful for more experienced users. Its features work out-of-the-box, with sensible defaults that cover most use cases. At the same time, it gives developers as much control as possible to adjust the application they're building and the libraries used, if they choose to.
+The SDK is designed to be both beginner friendly and powerful for more experienced users. Its features work out-of-the-box, with sensible defaults that cover most use cases. At the same time, it gives developers as much control as possible to refine the application they're building and the libraries used, if they choose to.
 
 ## The Build System
 
