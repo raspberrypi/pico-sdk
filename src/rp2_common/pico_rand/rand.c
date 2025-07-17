@@ -30,7 +30,9 @@
 #endif
 #include "pico/time.h"
 #include "hardware/clocks.h"
+#if PICO_RAND_SEED_ENTROPY_SRC_ROSC || PICO_RAND_ENTROPY_SRC_ROSC
 #include "hardware/structs/rosc.h"
+#endif
 #if PICO_RAND_SEED_ENTROPY_SRC_BUS_PERF_COUNTER || PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
 #include "hardware/structs/busctrl.h"
 #endif
