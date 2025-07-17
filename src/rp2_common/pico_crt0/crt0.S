@@ -582,10 +582,16 @@ runtime_init:
 //
 // Strictly the most correct thing to do (as .stack and .heap are unreferenced) is to mark them as "a", and also KEEP, which
 // works correctly for both GCC and Clang, however doing so may break anyone who already has custom linker scripts without
-// the KEEP. Therefore we will only add the "a" on Clang, but will also use KEEP to our own linker scripts.
+// the KEEP. Therefore we add a define of PICO_CRT0_ALLOCATE_SPACERS to switch between the old and new behaviour, so anyone
+// with custom linker scripts without the KEEP can set it to 0 (or update their linker script).
+
+// PICO_CONFIG: PICO_CRT0_ALLOCATE_SPACERS, Set spacer sections as allocatable. This makes them appear in print-memory-usage but is incompatible with linker scripts that do not KEEP the sections, type=bool, default=1, advanced=true, group=pico_crt0
+#ifndef PICO_CRT0_ALLOCATE_SPACERS
+#define PICO_CRT0_ALLOCATE_SPACERS 1
+#endif
 
 .macro spacer_section name
-#if PICO_ASSEMBLER_IS_CLANG
+#if PICO_CRT0_ALLOCATE_SPACERS
 .section \name, "a"
 #else
 .section \name
