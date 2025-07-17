@@ -160,7 +160,7 @@ int rom_pick_ab_update_partition(uint32_t *workarea_base, uint32_t workarea_size
 
     int rc = rom_pick_ab_partition((uint8_t*)workarea_base, workarea_size, partition_a_num, flash_update_base);
 
-    if (IMAGE_DEF_VERIFIED(workarea_base) != RCP_MASK_TRUE) {
+    if (!rcp_is_true(IMAGE_DEF_VERIFIED(workarea_base))) {
         // Chosen partition failed verification
         return BOOTROM_ERROR_NOT_FOUND;
     }
