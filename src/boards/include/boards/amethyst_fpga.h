@@ -21,8 +21,6 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 // For board detection
 #define RASPBERRYPI_AMETHYST_FPGA
 
-#define RASPBERRYPI_FPGA 1
-
 #define PICO_NO_FPGA_CHECK 0
 
 // --- UART ---
