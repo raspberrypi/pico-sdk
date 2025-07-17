@@ -243,21 +243,8 @@ void clocks_enable_resus(resus_callback_t resus_callback) {
 }
 
 void clock_gpio_init_int_frac16(uint gpio, uint src, uint32_t div_int, uint16_t div_frac16) {
-    // Bit messy but it's as much code to loop through a lookup
-    // table. The sources for each gpout generators are the same
-    // so just call with the sources from GP0
-    uint gpclk = 0;
-    if      (gpio == 21) gpclk = clk_gpout0;
-    else if (gpio == 23) gpclk = clk_gpout1;
-    else if (gpio == 24) gpclk = clk_gpout2;
-    else if (gpio == 25) gpclk = clk_gpout3;
-#if !PICO_RP2040
-    else if (gpio == 13) gpclk = clk_gpout0;
-    else if (gpio == 15) gpclk = clk_gpout1;
-#endif
-    else {
-        invalid_params_if(HARDWARE_CLOCKS, true);
-    }
+    // note this includes an invalid_params_if before defaulting to clk_gpout0
+    uint gpclk = gpio_to_gpout_clock_handle(gpio, clk_gpout0);
 
     invalid_params_if(HARDWARE_CLOCKS, div_int >> REG_FIELD_WIDTH(CLOCKS_CLK_GPOUT0_DIV_INT));
     // Set up the gpclk generator
