@@ -129,7 +129,7 @@ void stdio_uart_deinit_full(struct uart_inst *uart, int tx_pin, int rx_pin) {
     stdio_set_driver_enabled(&stdio_uart, false);
     uart_deinit(uart_instance);
 #if HAS_PADS_BANK0_ISOLATION
-// Leave pads isolated
+    // Leave pads isolated
     if (tx_pin >= 0) hw_set_bits(&pads_bank0_hw->io[tx_pin], PADS_BANK0_GPIO0_ISO_BITS);
     if (rx_pin >= 0) hw_set_bits(&pads_bank0_hw->io[rx_pin], PADS_BANK0_GPIO0_ISO_BITS);
 #else
