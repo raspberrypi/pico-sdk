@@ -36,7 +36,7 @@ if (NOT PICO_DEFAULT_BOARD_host)
 endif()
 
 if (NOT PICO_DEFAULT_PLATFORM)
-    # PICO_CMAKE_CONFIG: PICO_DEFAULT_PLATFORM, The default for PICO_PLATFORM if not specified, type=string, default=pico, group=build, docref=cmake-platform-board-config
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_PLATFORM, The default for PICO_PLATFORM if not specified, type=string, default=rp2040, group=build, docref=cmake-platform-board-config
     set(PICO_DEFAULT_PLATFORM "rp2040")
 endif()
 
