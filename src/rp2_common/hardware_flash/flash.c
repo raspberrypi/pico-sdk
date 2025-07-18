@@ -88,7 +88,7 @@ static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
 // flags. This avoids clobbering CS1 setup (e.g. PSRAM) performed by the
 // application.
 
-#if PICO_RP2350
+#if !PICO_RP2040
 // This is specifically for saving/restoring the registers modified by RP2350
 // flash_exit_xip() ROM func, not the entirety of the QMI window state.
 typedef struct flash_rp2350_qmi_save_state {
@@ -127,7 +127,7 @@ static void __no_inline_not_in_flash_func(flash_rp2350_restore_qmi_cs1)(const fl
 
 
 typedef struct flash_hardware_save_state {
-#if PICO_RP2350
+#if !PICO_RP2040
     flash_rp2350_qmi_save_state_t qmi_save;
 #endif
     uint32_t qspi_pads[count_of(pads_qspi_hw->io)];
@@ -139,7 +139,7 @@ static void __no_inline_not_in_flash_func(flash_save_hardware_state)(flash_hardw
     for (size_t i = 0; i < count_of(pads_qspi_hw->io); ++i) {
         state->qspi_pads[i] = pads_qspi_hw->io[i];
     }
-#if PICO_RP2350
+#if !PICO_RP2040
     flash_rp2350_save_qmi_cs1(&state->qmi_save);
 #endif
 }
@@ -148,7 +148,7 @@ static void __no_inline_not_in_flash_func(flash_restore_hardware_state)(flash_ha
     for (size_t i = 0; i < count_of(pads_qspi_hw->io); ++i) {
         pads_qspi_hw->io[i] = state->qspi_pads[i];
     }
-#if PICO_RP2350
+#if !PICO_RP2040
     // Tail call!
     flash_rp2350_restore_qmi_cs1(&state->qmi_save);
 #endif
@@ -165,7 +165,7 @@ void __no_inline_not_in_flash_func(flash_start_xip)(void) {
     assert(connect_internal_flash_func && flash_exit_xip_func && flash_flush_cache_func && flash_enter_cmd_xip_func);
     // Commit any pending writes to external RAM, to avoid losing them in the subsequent flush:
     xip_cache_clean_all();
-#if PICO_RP2350
+#if !PICO_RP2040
     flash_rp2350_qmi_save_state_t qmi_save;
     flash_rp2350_save_qmi_cs1(&qmi_save);
 #endif
@@ -183,7 +183,7 @@ void __no_inline_not_in_flash_func(flash_start_xip)(void) {
     flash_init_boot2_copyout();
     flash_enable_xip_via_boot2();
 
-#if PICO_RP2350
+#if !PICO_RP2040
     flash_rp2350_restore_qmi_cs1(&qmi_save);
 #endif
 }

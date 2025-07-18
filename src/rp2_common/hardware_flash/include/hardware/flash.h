@@ -59,17 +59,25 @@ extern "C" {
 /*! \brief  Initialise QSPI interface and external QSPI devices for execute-in-place
  *  \ingroup hardware_flash
  *
- * This function performs the same first-time flash setup that would normally occur during startup
- * of a flash binary.
+ * This function performs the same first-time flash setup that would normally occur over the course
+ * of the bootrom locating a flash binary and booting it, and that flash binary executing the SDK
+ * crt0. Specifically:
  *
- * This is mostly useful for initialising flash on a PICO_NO_FLASH=1 binary. In spite of the name,
- * this binary type really means "preloaded to RAM" and there may still be a flash device.
+ * * Initialise QSPI pads to their default states, and (non-RP2040) disable pad isolation latches
+ * * Issue a hardcoded sequence to attached QSPI devices to return them to a serial command state
+ * * Flush the XIP cache
+ * * Configure the QSPI interface for low-speed 03h reads
+ * * If this is not a PICO_NO_FLASH=1 binary:
+ *      * (RP2040) load a boot2 stage from the first 256 bytes of RAM and execute it
+ *      * (non-RP2040) execute an XIP setup function stored in boot RAM by either the bootrom or by crt0
  *
- * This function does not preserve the QSPI interface state or pad state. However, on RP2350 it does
- * preserve the QMI window 1 configuration if you have not opted into bootrom CS1 support via
- * FLASH_DEVINFO. This is in contrast to most other functions in this library, which preserve at
- * least the QSPI pad state.
+ * This is mostly useful for initialising flash on a PICO_NO_FLASH=1 binary. (In spite of the name,
+ * this binary type really means "preloaded to RAM" and there may still be a flash device.)
  *
+ * This function does not preserve the QSPI interface state or pad state. This is in contrast to
+ * most other functions in this library, which preserve at least the QSPI pad state. However, on
+ * RP2350 it does preserve the QMI window 1 configuration if you have not opted into bootrom CS1
+ * support via FLASH_DEVINFO.
  */
 void flash_start_xip(void);
 
