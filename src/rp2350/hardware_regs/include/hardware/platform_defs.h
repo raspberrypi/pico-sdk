@@ -73,6 +73,16 @@
 #define HAS_POWMAN_TIMER 1
 #define HAS_RP2350_TRNG 1
 #define HAS_HSTX 1
+#define HAS_PADS_BANK0_ISOLATION 1
+#define __RISCV_PMP_CHECKED 1
+
+#ifndef FPGA_CLK_SYS_HZ
+#define FPGA_CLK_SYS_HZ (48 * MHZ)
+#endif
+
+#ifndef FPGA_CLK_REF_HZ
+#define FPGA_CLK_REF_HZ (12 * MHZ)
+#endif
 
 // PICO_CONFIG: XOSC_HZ, Crystal oscillator frequency in Hz, type=int, default=12000000, advanced=true, group=hardware_base
 // NOTE:  The system and USB clocks are generated from the frequency using two PLLs.

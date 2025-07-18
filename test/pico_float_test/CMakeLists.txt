@@ -1,3 +1,8 @@
+if (NOT TARGET pico_float)
+    message("Skipping pico_float_test as pico_float is unavailable on this platform")
+    return()
+endif()
+
 PROJECT(pico_float_test)
 
 

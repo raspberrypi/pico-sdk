@@ -6,7 +6,7 @@ endif ()
 
 set(LWIP_TEST_PATH "src/Filelists.cmake")
 if (NOT PICO_LWIP_PATH)
-    set(PICO_LWIP_PATH ${PROJECT_SOURCE_DIR}/lib/lwip)
+    set(PICO_LWIP_PATH ${PICO_SDK_PATH}/lib/lwip)
     if (PICO_CYW43_SUPPORTED AND NOT EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
         message(WARNING "LWIP submodule has not been initialized; Pico W wireless support will be unavailable
 #hint: try 'git submodule update --init' from your SDK directory (${PICO_SDK_PATH}).")

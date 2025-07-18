@@ -255,11 +255,11 @@ typedef int (*bootrom_api_callback_generic_t)(uint32_t r0, uint32_t r1, uint32_t
 #define BOOTROM_NS_API_get_b_partition 7
 #define BOOTROM_NS_API_COUNT 8
 
-#define OTP_CMD_ROW_BITS                    0x0000ffffu
+#define OTP_CMD_ROW_BITS                    _u(0x0000ffff)
 #define OTP_CMD_ROW_LSB                     _u(0)
-#define OTP_CMD_WRITE_BITS                  0x00010000u
+#define OTP_CMD_WRITE_BITS                  _u(0x00010000)
 #define OTP_CMD_WRITE_LSB                   _u(16)
-#define OTP_CMD_ECC_BITS                    0x00020000u
+#define OTP_CMD_ECC_BITS                    _u(0x00020000)
 #define OTP_CMD_ECC_LSB                     _u(17)
 
 #ifndef __ASSEMBLER__

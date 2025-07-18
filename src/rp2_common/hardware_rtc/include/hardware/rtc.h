@@ -8,7 +8,9 @@
 #define _HARDWARE_RTC_H
 
 #include "pico.h"
+#if HAS_RP2040_RTC
 #include "hardware/structs/rtc.h"
+#endif
 
 /** \file hardware/rtc.h
  *  \defgroup hardware_rtc hardware_rtc

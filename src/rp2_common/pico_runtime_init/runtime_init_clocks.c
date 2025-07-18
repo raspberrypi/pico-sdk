@@ -41,10 +41,10 @@ void __weak runtime_init_clocks(void) {
     // Note: These need setting *before* the ticks are started
     if (running_on_fpga()) {
         for (uint i = 0; i < CLK_COUNT; i++) {
-            clock_set_reported_hz(i, 48 * MHZ);
+            clock_set_reported_hz(i, FPGA_CLK_SYS_HZ);
         }
         // clk_ref is 12MHz in both RP2040 and RP2350 FPGA
-        clock_set_reported_hz(clk_ref, 12 * MHZ);
+        clock_set_reported_hz(clk_ref, FPGA_CLK_REF_HZ);
         // RP2040 has an extra clock, the rtc
 #if HAS_RP2040_RTC
         clock_set_reported_hz(clk_rtc, RTC_CLOCK_FREQ_HZ);

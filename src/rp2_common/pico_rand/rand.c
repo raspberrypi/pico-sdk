@@ -25,11 +25,19 @@
 */
 
 #include "pico/rand.h"
+#if PICO_RAND_SEED_ENTROPY_SRC_BOARD_ID
 #include "pico/unique_id.h"
+#endif
+#if PICO_RAND_ENTROPY_SRC_TIME
 #include "pico/time.h"
+#endif
 #include "hardware/clocks.h"
+#if PICO_RAND_SEED_ENTROPY_SRC_ROSC || PICO_RAND_ENTROPY_SRC_ROSC
 #include "hardware/structs/rosc.h"
+#endif
+#if PICO_RAND_SEED_ENTROPY_SRC_BUS_PERF_COUNTER || PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER
 #include "hardware/structs/busctrl.h"
+#endif
 #include "hardware/sync.h"
 
 static bool rng_initialised = false;

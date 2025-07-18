@@ -6,7 +6,7 @@ endif ()
 
 set(BTSTACK_TEST_PATH "src/bluetooth.h")
 if (NOT PICO_BTSTACK_PATH)
-    set(PICO_BTSTACK_PATH ${PROJECT_SOURCE_DIR}/lib/btstack)
+    set(PICO_BTSTACK_PATH ${PICO_SDK_PATH}/lib/btstack)
     if (PICO_CYW43_SUPPORTED AND NOT EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         message(WARNING "btstack submodule has not been initialized; Pico W BLE support will be unavailable.
             hint: try 'git submodule update --init' from your SDK directory (${PICO_SDK_PATH}).")
