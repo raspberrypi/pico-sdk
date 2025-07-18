@@ -872,9 +872,25 @@ static inline PIO pio_get_instance(uint instance) {
  *
  * PIO appears as an alternate function in the GPIO muxing, just like an SPI
  * or UART. This function configures that multiplexing to connect a given PIO
- * instance to a GPIO. Note that this is not necessary for a state machine to
- * be able to read the *input* value from a GPIO, but only for it to set the
- * output value or output enable.
+ * instance to a GPIO. It also configures the GPIO pad to pass signals in and
+ * out, by:
+ *
+ * * Clearing the pad output disable (OD) bit
+ * * Setting the pad input enable (IE) bit
+ * * (Non-RP2040) removing pad isolation
+ *
+ * This function achieves this low-level pad setup by calling gpio_set_function()
+ * internally.
+ *
+ * Note that, if your PIO program only needs the *input* from a given GPIO,
+ * it's not necessary to select the PIO GPIO function, because PIO input
+ * paths ignore the GPIO muxing. However, you must still configure the GPIO
+ * pad itself for input.
+ *
+ * Conversely, if using PIO for both input and output on a given pin, you must
+ * select the PIO GPIO function for the given PIO instance, as well as
+ * configuring the pad for input and output. Calling this function is
+ * sufficient for both the input-only and input/output case.
  *
  * \param pio The PIO instance; e.g. \ref pio0 or \ref pio1
  * \param pin the GPIO pin whose function select to set
