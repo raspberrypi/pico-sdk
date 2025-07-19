@@ -10,6 +10,7 @@ The full documentation for the RP2040, RP2350 and Raspberry Pi Pico-series board
  - [Raspberry Pi Pico 2 Datasheet](https://rptl.io/pico2-datasheet)
  - [Raspberry Pi Pico 2 W Datasheet](https://rptl.io/pico2w-datasheet)
  - [Hardware design with RP2350](https://rptl.io/rp2350-design)
+ - [RM2 Datasheet](https://rptl.io/rm2-datasheet)
  - [Raspberry Pi Pico-series C/C++ SDK](https://rptl.io/pico-c-sdk)
  - [Raspberry Pi Pico-series Python SDK](https://rptl.io/pico-micropython)
  - [Getting started with Raspberry Pi Pico-series](https://rptl.io/pico-get-started)
