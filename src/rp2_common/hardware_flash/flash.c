@@ -14,6 +14,7 @@
 #include "hardware/structs/qmi.h"
 #include "hardware/regs/otp_data.h"
 #endif
+#include "hardware/structs/pads_qspi.h"
 #include "hardware/xip_cache.h"
 
 #define FLASH_BLOCK_ERASE_CMD 0xd8
@@ -71,7 +72,23 @@ static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
 
 #endif
 
-#if PICO_RP2350
+//-----------------------------------------------------------------------------
+// State save/restore
+
+// Most functions save and restore the QSPI pad state over the call. (The main
+// exception is flash_start_xip() which is explicitly intended to initialise
+// them). The expectation is that by the time you do any flash operations,
+// you have either gone through a normal flash boot process or (in the case
+// of PICO_NO_FLASH=1) you have called flash_start_xip(). Any further
+// modifications to the pad state are therefore deliberate changes that we
+// should preserve.
+//
+// Additionally, on RP2350, we save and restore the window 1 QMI configuration
+// if the user has not opted into bootrom CS1 support via FLASH_DEVINFO OTP
+// flags. This avoids clobbering CS1 setup (e.g. PSRAM) performed by the
+// application.
+
+#if !PICO_RP2040
 // This is specifically for saving/restoring the registers modified by RP2350
 // flash_exit_xip() ROM func, not the entirety of the QMI window state.
 typedef struct flash_rp2350_qmi_save_state {
@@ -108,8 +125,68 @@ static void __no_inline_not_in_flash_func(flash_rp2350_restore_qmi_cs1)(const fl
 }
 #endif
 
+
+typedef struct flash_hardware_save_state {
+#if !PICO_RP2040
+    flash_rp2350_qmi_save_state_t qmi_save;
+#endif
+    uint32_t qspi_pads[count_of(pads_qspi_hw->io)];
+} flash_hardware_save_state_t;
+
+static void __no_inline_not_in_flash_func(flash_save_hardware_state)(flash_hardware_save_state_t *state) {
+    // Commit any pending writes to external RAM, to avoid losing them in a subsequent flush:
+    xip_cache_clean_all();
+    for (size_t i = 0; i < count_of(pads_qspi_hw->io); ++i) {
+        state->qspi_pads[i] = pads_qspi_hw->io[i];
+    }
+#if !PICO_RP2040
+    flash_rp2350_save_qmi_cs1(&state->qmi_save);
+#endif
+}
+
+static void __no_inline_not_in_flash_func(flash_restore_hardware_state)(flash_hardware_save_state_t *state) {
+    for (size_t i = 0; i < count_of(pads_qspi_hw->io); ++i) {
+        pads_qspi_hw->io[i] = state->qspi_pads[i];
+    }
+#if !PICO_RP2040
+    // Tail call!
+    flash_rp2350_restore_qmi_cs1(&state->qmi_save);
+#endif
+}
+
 //-----------------------------------------------------------------------------
 // Actual flash programming shims (work whether or not PICO_NO_FLASH==1)
+
+void __no_inline_not_in_flash_func(flash_start_xip)(void) {
+    rom_connect_internal_flash_fn connect_internal_flash_func = (rom_connect_internal_flash_fn)rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
+    rom_flash_exit_xip_fn flash_exit_xip_func = (rom_flash_exit_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
+    rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
+    rom_flash_enter_cmd_xip_fn flash_enter_cmd_xip_func = (rom_flash_enter_cmd_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_ENTER_CMD_XIP);
+    assert(connect_internal_flash_func && flash_exit_xip_func && flash_flush_cache_func && flash_enter_cmd_xip_func);
+    // Commit any pending writes to external RAM, to avoid losing them in the subsequent flush:
+    xip_cache_clean_all();
+#if !PICO_RP2040
+    flash_rp2350_qmi_save_state_t qmi_save;
+    flash_rp2350_save_qmi_cs1(&qmi_save);
+#endif
+
+    // Use ROM calls to get from ~any state to a state where low-speed flash access works:
+    connect_internal_flash_func();
+    flash_exit_xip_func();
+    flash_flush_cache_func();
+    flash_enter_cmd_xip_func();
+
+    // If a boot2 is available then call it now. Slight limitation here is that if this is a
+    // NO_FLASH binary which was loaded via bootrom LOAD_MAP, we should actually have a better
+    // flash setup than this available via xip setup func stub left in boot RAM, but we can't
+    // easily detect this case to take advantage of this.
+    flash_init_boot2_copyout();
+    flash_enable_xip_via_boot2();
+
+#if !PICO_RP2040
+    flash_rp2350_restore_qmi_cs1(&qmi_save);
+#endif
+}
 
 void __no_inline_not_in_flash_func(flash_range_erase)(uint32_t flash_offs, size_t count) {
 #ifdef PICO_FLASH_SIZE_BYTES
@@ -123,12 +200,8 @@ void __no_inline_not_in_flash_func(flash_range_erase)(uint32_t flash_offs, size_
     rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     assert(connect_internal_flash_func && flash_exit_xip_func && flash_range_erase_func && flash_flush_cache_func);
     flash_init_boot2_copyout();
-    // Commit any pending writes to external RAM, to avoid losing them in the subsequent flush:
-    xip_cache_clean_all();
-#if PICO_RP2350
-    flash_rp2350_qmi_save_state_t qmi_save;
-    flash_rp2350_save_qmi_cs1(&qmi_save);
-#endif
+    flash_hardware_save_state_t state;
+    flash_save_hardware_state(&state);
 
     // No flash accesses after this point
     __compiler_memory_barrier();
@@ -138,9 +211,7 @@ void __no_inline_not_in_flash_func(flash_range_erase)(uint32_t flash_offs, size_
     flash_range_erase_func(flash_offs, count, FLASH_BLOCK_SIZE, FLASH_BLOCK_ERASE_CMD);
     flash_flush_cache_func(); // Note this is needed to remove CSn IO force as well as cache flushing
     flash_enable_xip_via_boot2();
-#if PICO_RP2350
-    flash_rp2350_restore_qmi_cs1(&qmi_save);
-#endif
+    flash_restore_hardware_state(&state);
 }
 
 void __no_inline_not_in_flash_func(flash_flush_cache)(void) {
@@ -160,11 +231,8 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
     rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     assert(connect_internal_flash_func && flash_exit_xip_func && flash_range_program_func && flash_flush_cache_func);
     flash_init_boot2_copyout();
-    xip_cache_clean_all();
-#if PICO_RP2350
-    flash_rp2350_qmi_save_state_t qmi_save;
-    flash_rp2350_save_qmi_cs1(&qmi_save);
-#endif
+    flash_hardware_save_state_t state;
+    flash_save_hardware_state(&state);
 
     __compiler_memory_barrier();
 
@@ -173,9 +241,8 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
     flash_range_program_func(flash_offs, data, count);
     flash_flush_cache_func(); // Note this is needed to remove CSn IO force as well as cache flushing
     flash_enable_xip_via_boot2();
-#if PICO_RP2350
-    flash_rp2350_restore_qmi_cs1(&qmi_save);
-#endif
+
+    flash_restore_hardware_state(&state);
 }
 
 //-----------------------------------------------------------------------------
@@ -208,11 +275,8 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
     rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
     assert(connect_internal_flash_func && flash_exit_xip_func && flash_flush_cache_func);
     flash_init_boot2_copyout();
-    xip_cache_clean_all();
-#if PICO_RP2350
-    flash_rp2350_qmi_save_state_t qmi_save;
-    flash_rp2350_save_qmi_cs1(&qmi_save);
-#endif
+    flash_hardware_save_state_t state;
+    flash_save_hardware_state(&state);
 
     __compiler_memory_barrier();
     connect_internal_flash_func();
@@ -260,9 +324,7 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
 
     flash_flush_cache_func();
     flash_enable_xip_via_boot2();
-#if PICO_RP2350
-    flash_rp2350_restore_qmi_cs1(&qmi_save);
-#endif
+    flash_restore_hardware_state(&state);
 }
 #endif
 
