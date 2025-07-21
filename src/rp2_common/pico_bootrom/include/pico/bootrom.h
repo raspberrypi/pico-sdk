@@ -756,6 +756,7 @@ static inline int rom_load_partition_table(uint8_t *workarea_base, uint32_t work
  * \param workarea_size size of work area
  * \param partition_a_num the A partition of the pair
  * \param flash_update_boot_window_base the flash update base, to pick that partition instead of the normally "better" partition
+ * \return >= 0 the chosen partition number out of the A/B pair
  */
 static inline int rom_pick_ab_partition(uint8_t *workarea_base, uint32_t workarea_size, uint partition_a_num, uint32_t flash_update_boot_window_base) {
     rom_pick_ab_partition_fn func = (rom_pick_ab_partition_fn) rom_func_lookup_inline(ROM_FUNC_PICK_AB_PARTITION);
