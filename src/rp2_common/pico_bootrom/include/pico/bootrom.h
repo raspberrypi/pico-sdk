@@ -1101,6 +1101,9 @@ int rom_add_flash_runtime_partition(uint32_t start_offset, uint32_t size, uint32
  * a main image TBYB boot. It requires the same minimum workarea size as `rom_pick_ab_partition`.
  * \see rom_pick_ab_partition()
  * 
+ * This should be used instead of `rom_pick_ab_partition` when performing a Flash Update Boot before calling `explicit_buy`, and can still be used without
+ * issue when a Flash Update Boot is not in progress.
+ * 
  * For example, if an `explicit_buy` is pending then calling `pick_ab_partition` would normally clear the saved flash erase address for the version downgrade,
  * so the required erase of the other partition would not occur when `explicit_buy` is called - this function saves and restores that address to prevent this
  * issue, and returns `BOOTROM_ERROR_NOT_PERMITTED` if the partition chosen by `pick_ab_partition` also requires a flash erase version downgrade (as you can't
