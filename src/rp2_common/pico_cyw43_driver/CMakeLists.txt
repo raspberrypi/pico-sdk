@@ -179,6 +179,16 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     # NO_EMBEDDED_PT argument (for example, if you need to chain into the binary, it
     # can't contain a partition table).
     #
+    # This will create a separate UF2 file for the firmware and a separate UF2 file for a
+    # TBYB version of the firmware. You will need to flash one of these to each device once,
+    # after loading the partition table. For example using picotool:
+    #
+    # `picotool load TARGET.uf2`;
+    # `picotool reboot -u`;
+    # `picotool load TARGET_firmware.uf2 -x`;
+    #
+    # Then on subsequent updates, you can just flash the TARGET.uf2 file to the device.
+    #
     # \param\ NO_EMBEDDED_PT If set, will not embed a partition table in the binary
     function(pico_use_wifi_firmware_partition TARGET)
         set(options NO_EMBEDDED_PT)
