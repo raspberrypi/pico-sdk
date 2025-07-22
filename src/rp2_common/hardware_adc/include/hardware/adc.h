@@ -170,15 +170,24 @@ static inline void adc_set_temp_sensor_enabled(bool enable) {
  *
  *  Performs an ADC conversion, waits for the result, and then returns it.
  *
- * \return Result of the conversion.
+ * \return Result of the conversion or negative value on error.
  */
-static inline uint16_t adc_read(void) {
+static inline int32_t adc_read(void) {
     hw_set_bits(&adc_hw->cs, ADC_CS_START_ONCE_BITS);
+    
+    while ((adc_hw->cs & (ADC_CS_READY_BITS|ADC_CS_ERR_BITS|ADC_CS_ERR_STICKY_BITS))==0) {
+         tight_loop_contents();
+    }
 
-    while (!(adc_hw->cs & ADC_CS_READY_BITS))
-        tight_loop_contents();
-
-    return (uint16_t) adc_hw->result;
+    if ((adc_hw->cs & ADC_CS_READY_BITS)>0) {
+        return adc_hw->result & 0xfff;
+    }
+    if ((adc_hw->cs & ADC_CS_ERR_BITS)>0) {
+        return -ADC_CS_ERR_BITS;
+    }
+    /* clear sticky bit */
+    hw_set_bits(&adc_hw->cs, ADC_CS_ERR_STICKY_BITS);
+    return -ADC_CS_ERR_STICKY_BITS;
 }
 
 /*! \brief Enable or disable free-running sampling mode
