@@ -112,7 +112,7 @@ int rom_add_flash_runtime_partition(uint32_t start_offset, uint32_t size, uint32
     return PICO_ERROR_INSUFFICIENT_RESOURCES;
 }
 
-int rom_pick_ab_update_partition(uint32_t *workarea_base, uint32_t workarea_size, uint partition_a_num) {
+int rom_pick_ab_partition_during_update(uint32_t *workarea_base, uint32_t workarea_size, uint partition_a_num) {
 #if !PICO_RP2040
     // Generated from adding the following code into the bootrom
     // scan_workarea_t* scan_workarea = (scan_workarea_t*)workarea;

@@ -152,7 +152,7 @@ bool cyw43_driver_init(async_context_t *context) {
                 rom_set_bootrom_stack(&stack);
             #endif
             uint32_t* workarea = malloc(0x1000);
-            picked_p = rom_pick_ab_update_partition(workarea, 0x1000, picked_p);
+            picked_p = rom_pick_ab_partition_during_update(workarea, 0x1000, picked_p);
             free(workarea);
             #ifdef __riscv
                 // Reset bootrom stack
