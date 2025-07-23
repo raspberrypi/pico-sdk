@@ -74,12 +74,11 @@ endfunction()
 
 # add map file generation for the given target
 function(pico_add_map_output TARGET)
-    pico_get_runtime_output_directory(${TARGET} output_path)
     get_target_property(target_type ${TARGET} TYPE)
     if ("EXECUTABLE" STREQUAL "${target_type}")
-        target_link_options(${TARGET} PRIVATE "LINKER:-Map=${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:OUTPUT_NAME>>,$<TARGET_PROPERTY:OUTPUT_NAME>,$<TARGET_PROPERTY:NAME>>${CMAKE_EXECUTABLE_SUFFIX}.map")
+        target_link_options(${TARGET} PRIVATE "LINKER:-Map=$<TARGET_FILE:${TARGET}>.map")
     else ()
-        target_link_options(${TARGET} INTERFACE "LINKER:-Map=${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:OUTPUT_NAME>>,$<TARGET_PROPERTY:OUTPUT_NAME>,$<TARGET_PROPERTY:NAME>>${CMAKE_EXECUTABLE_SUFFIX}.map")
+        target_link_options(${TARGET} INTERFACE "LINKER:-Map=$<TARGET_FILE:${TARGET}>.map")
     endif ()
 endfunction()
 
