@@ -73,6 +73,7 @@ static void async_context_task(__unused void *vself) {
         async_context_freertos_release_lock(&self->core);
         __sev(); // it is possible regular code is waiting on a WFE on the other core
     } while (!self->task_should_exit);
+    xSemaphoreGive(self->task_complete_sem);
     vTaskDelete(NULL);
 }
 
@@ -113,6 +114,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
     assert(config->task_stack);
     self->lock_mutex = xSemaphoreCreateRecursiveMutexStatic(&self->lock_mutex_buf);
     self->work_needed_sem = xSemaphoreCreateBinaryStatic(&self->work_needed_sem_buf);
+    self->task_complete_sem = xSemaphoreCreateBinaryStatic(&self->task_complete_sem_buf);
     self->timer_handle = xTimerCreateStatic( "async_context_timer",       // Just a text name, not used by the kernel.
                                              portMAX_DELAY,
                                              pdFALSE,        // The timers will auto-reload themselves when they expire.
@@ -129,6 +131,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
 #else
     self->lock_mutex = xSemaphoreCreateRecursiveMutex();
     self->work_needed_sem = xSemaphoreCreateBinary();
+    self->task_complete_sem = xSemaphoreCreateBinary();
     self->timer_handle = xTimerCreate( "async_context_timer",       // Just a text name, not used by the kernel.
                                     portMAX_DELAY,
                                     pdFALSE,        // The timers will auto-reload themselves when they expire.
@@ -171,6 +174,9 @@ void async_context_freertos_deinit(async_context_t *self_base) {
     async_context_freertos_t *self = (async_context_freertos_t *)self_base;
     if (self->task_handle) {
         async_context_execute_sync(self_base, end_task_func, self_base);
+        if (self->task_complete_sem) {
+            xSemaphoreTake(self->task_complete_sem, portMAX_DELAY);
+        }
     }
     if (self->timer_handle) {
         xTimerDelete(self->timer_handle, 0);
@@ -180,6 +186,9 @@ void async_context_freertos_deinit(async_context_t *self_base) {
     }
     if (self->work_needed_sem) {
         vSemaphoreDelete(self->work_needed_sem);
+    }
+    if (self->task_complete_sem) {
+        vSemaphoreDelete(self->task_complete_sem);
     }
     memset(self, 0, sizeof(*self));
 }
