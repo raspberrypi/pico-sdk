@@ -146,30 +146,116 @@ enum dma_channel_transfer_size {
     DMA_SIZE_32 = 2    ///< Word transfer (32 bits)
 };
 
+/*! \brief Enumeration of types of updates that can be made to the DMA read or write address after each transfer
+ *  \ingroup hardware_dma
+ */
+enum dma_address_update_type {
+    DMA_ADDRESS_UPDATE_NONE = 0,                ///< The address remains the same after each transfer
+    DMA_ADDRESS_UPDATE_INCREMENT = 1,           ///< The address is incremented by the transfer size after each transfer
+#if !PICO_RP2040
+    DMA_ADDRESS_UPDATE_INCREMENT_BY_TWO = 2,    ///< (RP2350 only) The address is incremented by twice the transfer size after each transfer
+    DMA_ADDRESS_UPDATE_DECREMENT = 3,           ///< (RP2350 only) The address is decremented by the transfer size after each transfer
+#endif
+};
+
 typedef struct {
     uint32_t ctrl;
 } dma_channel_config;
 
-/*! \brief  Set DMA channel read increment in a channel configuration object
+#ifndef DMA_ADDRESS_UPDATE_TYPE_TO_DMA_CH_CTRL_READ_BITS
+#if PICO_RP2040
+#define DMA_ADDRESS_UPDATE_TYPE_TO_DMA_CH_CTRL_READ_BITS(u) (((u)&1) << DMA_CH0_CTRL_TRIG_INCR_READ_LSB)
+#else
+#define DMA_ADDRESS_UPDATE_TYPE_TO_DMA_CH_CTRL_READ_BITS(u) \
+    ((((u)&1) << DMA_CH0_CTRL_TRIG_INCR_READ_LSB) | \
+    (((u)&2) << (DMA_CH0_CTRL_TRIG_INCR_READ_REV_LSB - 1)))
+#endif
+#endif
+
+#ifndef DMA_ADDRESS_UPDATE_TYPE_TO_DMA_CH_CTRL_WRITE_BITS
+#if PICO_RP2040
+#define DMA_ADDRESS_UPDATE_TYPE_TO_DMA_CH_CTRL_WRITE_BITS(u) (((u)&1) << DMA_CH0_CTRL_TRIG_INCR_WRITE_LSB)
+#else
+#define DMA_ADDRESS_UPDATE_TYPE_TO_DMA_CH_CTRL_WRITE_BITS(u) \
+((((u)&1) << DMA_CH0_CTRL_TRIG_INCR_WRITE_LSB) | \
+(((u)&2) << (DMA_CH0_CTRL_TRIG_INCR_WRITE_REV_LSB - 1)))
+#endif
+#endif
+
+#ifndef DMA_CH_CTRL_ALL_ADDRESS_UPDATE_READ_BITS
+#if PICO_RP2040
+#define DMA_CH_CTRL_ALL_ADDRESS_UPDATE_READ_BITS DMA_CH0_CTRL_TRIG_INCR_READ_BITS
+#else
+#define DMA_CH_CTRL_ALL_ADDRESS_UPDATE_READ_BITS (DMA_CH0_CTRL_TRIG_INCR_READ_BITS | DMA_CH0_CTRL_TRIG_INCR_READ_REV_BITS)
+#endif
+#endif
+
+#ifndef DMA_CH_CTRL_ALL_ADDRESS_UPDATE_WRITE_BITS
+#if PICO_RP2040
+#define DMA_CH_CTRL_ALL_ADDRESS_UPDATE_WRITE_BITS DMA_CH0_CTRL_TRIG_INCR_WRITE_BITS
+#else
+#define DMA_CH_CTRL_ALL_ADDRESS_UPDATE_WRITE_BITS (DMA_CH0_CTRL_TRIG_INCR_WRITE_BITS | DMA_CH0_CTRL_TRIG_INCR_WRITE_REV_BITS)
+#endif
+#endif
+
+/*! \brief  Set DMA channel read address update type in a channel configuration object
  *  \ingroup channel_config
  *
  * \param c Pointer to channel configuration object
- * \param incr True to enable read address increments, if false, each read will be from the same address
- *             Usually disabled for peripheral to memory transfers
+ * \param update_type The type of adjustment to make to the read address after each transfer.
+ *             Usually set to DMA_ADDRESS_UPDATE_NONE for peripheral to memory transfers
+ * \sa channel_config_set_read_increment
  */
+static inline void channel_config_set_read_address_update_type(dma_channel_config *c, enum dma_address_update_type update_type) {
+    c->ctrl = (c->ctrl & ~DMA_CH_CTRL_ALL_ADDRESS_UPDATE_READ_BITS) |
+        DMA_ADDRESS_UPDATE_TYPE_TO_DMA_CH_CTRL_READ_BITS(update_type);
+}
+
+/*! \brief  Set DMA channel write address update type in a channel configuration object
+ *  \ingroup channel_config
+ *
+ * \param c Pointer to channel configuration object
+ * \param update_type The type of adjustment to make to the read address after each transfer.
+ *             Usually set to DMA_ADDRESS_UPDATE_NONE for peripheral to memory transfers
+ * \sa channel_config_set_write_increment
+ */
+static inline void channel_config_set_write_address_update_type(dma_channel_config *c, enum dma_address_update_type update_type) {
+    c->ctrl = (c->ctrl & ~DMA_CH_CTRL_ALL_ADDRESS_UPDATE_WRITE_BITS) |
+        DMA_ADDRESS_UPDATE_TYPE_TO_DMA_CH_CTRL_WRITE_BITS(update_type);
+}
+
+/*! \brief  Set DMA channel read increment in a channel configuration object
+*  \ingroup channel_config
+*
+* \note this method is equivalent to
+* \code
+* channel_config_set_read_address_update_type(c, incr ? DMA_ADDRESS_UPDATE_INCREMENT : DMA_ADDRESS_UPDATE_NONE)
+* \endcode
+*
+* \param c Pointer to channel configuration object
+* \param incr True to enable read address increments, whereby the read address increments by the transfer size with each transfer, false to perform each read from the same address.
+*             Usually disabled for peripheral to memory transfers
+* \sa channel_config_set_read_address_update_type
+*/
 static inline void channel_config_set_read_increment(dma_channel_config *c, bool incr) {
-    c->ctrl = incr ? (c->ctrl | DMA_CH0_CTRL_TRIG_INCR_READ_BITS) : (c->ctrl & ~DMA_CH0_CTRL_TRIG_INCR_READ_BITS);
+    channel_config_set_read_address_update_type(c, incr ? DMA_ADDRESS_UPDATE_INCREMENT : DMA_ADDRESS_UPDATE_NONE);
 }
 
 /*! \brief  Set DMA channel write increment in a channel configuration object
  *  \ingroup channel_config
  *
+ * \note this method is equivalent to
+ * \code
+ * channel_config_set_write_address_update_type(c, incr ? DMA_ADDRESS_UPDATE_INCREMENT : DMA_ADDRESS_UPDATE_NONE)
+ * \endcode
+ *
  * \param c Pointer to channel configuration object
- * \param incr True to enable write address increments, if false, each write will be to the same address
+ * \param incr True to enable write address increments, whereby the writee address increments by the transfer size with each transfer, false to perform each write to the same address.
  *             Usually disabled for memory to peripheral transfers
+ * \sa channel_config_set_write_address_update_type
  */
 static inline void channel_config_set_write_increment(dma_channel_config *c, bool incr) {
-    c->ctrl = incr ? (c->ctrl | DMA_CH0_CTRL_TRIG_INCR_WRITE_BITS) : (c->ctrl & ~DMA_CH0_CTRL_TRIG_INCR_WRITE_BITS);
+    channel_config_set_write_address_update_type(c, incr ? DMA_ADDRESS_UPDATE_INCREMENT : DMA_ADDRESS_UPDATE_NONE);
 }
 
 /*! \brief  Select a transfer request signal in a channel configuration object
@@ -419,19 +505,108 @@ static inline void dma_channel_set_write_addr(uint channel, volatile void *write
     }
 }
 
+/*! \brief  Encode the specified transfer length into an "encoded_transfer_length" value suitable for the referenced methods
+ *  \ingroup hardware_dma
+ * \param transfer_count the number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size)
+ *
+ * \if rp2040_specific
+ * On RP2040 the valid range is 0 -> 2^32 - 1
+ * \endif
+ *
+ * \if rp2350_specific
+ * On RP2350 the valid range is 0 -> 2^28 - 1
+ * \endif
+ * \return the encoded_transfer_count
+ * \sa dma_channel_set_transfer_count
+ * \sa dma_channel_configure
+ * \sa dma_channel_transfer_from_buffer_now
+ * \sa dma_channel_transfer_to_buffer_now
+ */
+static inline uint32_t dma_encode_transfer_count(uint transfer_count) {
+#if !PICO_RP2040
+    invalid_params_if(HARDWARE_DMA, transfer_count & DMA_CH0_TRANS_COUNT_MODE_BITS);
+    return transfer_count & DMA_CH0_TRANS_COUNT_COUNT_BITS;
+#else
+    return transfer_count;
+#endif
+}
+
+/*! \brief  Encode the specified transfer length, along with a flag to indicate the DMA transfer should be self-triggering, into an "encoded_transfer_length" value suitable for the referenced methods
+ *  \ingroup hardware_dma
+ * \param transfer_count the number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size)
+ *
+ * \if rp2040_specific
+ * On RP2040 self-triggering DMA is not supported, so this method may not be used
+ * \endif
+ *
+ * \if rp2350_specific
+ * On RP2350 the valid range is 0 -> 2^28 - 1
+ * \endif
+ * \return the encoded_transfer_count
+ * \sa dma_channel_set_transfer_count
+ * \sa dma_channel_configure
+ * \sa dma_channel_transfer_from_buffer_now
+ * \sa dma_channel_transfer_to_buffer_now
+ */
+static inline uint32_t dma_encode_transfer_count_with_self_trigger(uint transfer_count) {
+#if PICO_RP2040
+    panic_unsupported();
+#else
+    return dma_encode_transfer_count(transfer_count) | (DMA_CH0_TRANS_COUNT_MODE_VALUE_TRIGGER_SELF << DMA_CH0_TRANS_COUNT_MODE_LSB);
+#endif
+}
+
+/*! \brief  Return an endless transfer as an "encoded_transfer_length" value suitable for the referenced methods
+ *  \ingroup hardware_dma
+ *
+ * \if rp2040_specific
+ * On RP2040 endless DMA transfers are not supported, so this method may not be used
+ * \endif
+ * \return the encoded_transfer_count
+ * \sa dma_channel_set_transfer_count
+ * \sa dma_channel_configure
+ * \sa dma_channel_transfer_from_buffer_now
+ * \sa dma_channel_transfer_to_buffer_now
+ */
+static inline uint32_t dma_encode_endless_transfer_count(void) {
+#if PICO_RP2040
+    panic_unsupported();
+#else
+    static_assert(DMA_CH0_TRANS_COUNT_MODE_VALUE_ENDLESS == 0xf);
+    static_assert(DMA_CH0_TRANS_COUNT_MODE_LSB == 28);
+    return 0xffffffffu;
+#endif
+}
+
 /*! \brief  Set the number of bus transfers the channel will do
  *  \ingroup hardware_dma
  *
  * \param channel DMA channel
- * \param trans_count The number of transfers (not NOT bytes, see channel_config_set_transfer_data_size)
+ * \param encoded_transfer_count The encoded transfer count
+ *
+ * \if rp2040_specific
+ * On RP2040 this is just the number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size) from 0 -> 2^32 - 1.
+ * \endif
+ *
+ * \if rp2350_specific
+ * On RP2350 the low 28 bits are used to encode a number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size) and non-zero values of the top 4 bits are used to specify other options.
+ * \endif
+ *
+ * The best practice is always to use either \ref dma_encode_transfer_count, \ref dma_encode_transfer_count_with_self_trigger, or \ref dma_encode_endless_transfer_count to generate a value
+ * to pass for this argument
  * \param trigger True to start the transfer immediately
  */
-static inline void dma_channel_set_trans_count(uint channel, uint32_t trans_count, bool trigger) {
+static inline void dma_channel_set_transfer_count(uint channel, uint32_t encoded_transfer_count, bool trigger) {
     if (!trigger) {
-        dma_channel_hw_addr(channel)->transfer_count = trans_count;
+        dma_channel_hw_addr(channel)->transfer_count = encoded_transfer_count;
     } else {
-        dma_channel_hw_addr(channel)->al1_transfer_count_trig = trans_count;
+        dma_channel_hw_addr(channel)->al1_transfer_count_trig = encoded_transfer_count;
     }
+}
+
+// backwards compatibility with SDK < 2.2.0
+static inline void dma_channel_set_trans_count(uint channel, uint32_t trans_count, bool trigger) {
+    dma_channel_set_transfer_count(channel, trans_count, trigger);
 }
 
 /*! \brief  Configure all DMA parameters and optionally start transfer
@@ -441,15 +616,26 @@ static inline void dma_channel_set_trans_count(uint channel, uint32_t trans_coun
  * \param config Pointer to DMA config structure
  * \param write_addr Initial write address
  * \param read_addr Initial read address
- * \param transfer_count Number of transfers to perform
+ * \param encoded_transfer_count The encoded transfer count
+ *
+ * \if rp2040_specific
+ * On RP2040 this is just the number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size) from 0 -> 2^32 - 1.
+ * \endif
+ *
+ * \if rp2350_specific
+ * On RP2350 the low 28 bits are used to encode a number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size) and non-zero values of the top 4 bits are used to specify other options.
+ * \endif
+ *
+ * The best practice is always to use either \ref dma_encode_transfer_count, \ref dma_encode_transfer_count_with_self_trigger, or \ref dma_encode_endless_transfer_count to generate a value
+ * to pass for this argument
  * \param trigger True to start the transfer immediately
  */
 static inline void dma_channel_configure(uint channel, const dma_channel_config *config, volatile void *write_addr,
                                          const volatile void *read_addr,
-                                         uint transfer_count, bool trigger) {
+                                         uint32_t encoded_transfer_count, bool trigger) {
     dma_channel_set_read_addr(channel, read_addr, false);
     dma_channel_set_write_addr(channel, write_addr, false);
-    dma_channel_set_trans_count(channel, transfer_count, false);
+    dma_channel_set_transfer_count(channel, encoded_transfer_count, false);
     dma_channel_set_config(channel, config, trigger);
 }
 
@@ -458,15 +644,26 @@ static inline void dma_channel_configure(uint channel, const dma_channel_config 
  *
  * \param channel DMA channel
  * \param read_addr Sets the initial read address
- * \param transfer_count Number of transfers to make. Not bytes, but the number of transfers of channel_config_set_transfer_data_size() to be sent.
+ * \param encoded_transfer_count The encoded transfer count
+ *
+ * \if rp2040_specific
+ * On RP2040 this is just the number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size) from 0 -> 2^32 - 1.
+ * \endif
+ *
+ * \if rp2350_specific
+ * On RP2350 the low 28 bits are used to encode a number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size) and non-zero values of the top 4 bits are used to specify other options.
+ * \endif
+ *
+ * The best practice is always to use either \ref dma_encode_transfer_count, \ref dma_encode_transfer_count_with_self_trigger, or \ref dma_encode_endless_transfer_count to generate a value
+ * to pass for this argument
  */
 inline static void __attribute__((always_inline)) dma_channel_transfer_from_buffer_now(uint channel, 
                                                                                        const volatile void *read_addr,
-                                                                                       uint32_t transfer_count) {
+                                                                                       uint32_t encoded_transfer_count) {
 //    check_dma_channel_param(channel);
     dma_channel_hw_t *hw = dma_channel_hw_addr(channel);
     hw->read_addr = (uintptr_t) read_addr;
-    hw->al1_transfer_count_trig = transfer_count;
+    hw->al1_transfer_count_trig = encoded_transfer_count;
 }
 
 /*! \brief Start a DMA transfer to a buffer immediately
@@ -474,12 +671,23 @@ inline static void __attribute__((always_inline)) dma_channel_transfer_from_buff
  *
  * \param channel DMA channel
  * \param write_addr Sets the initial write address
- * \param transfer_count Number of transfers to make. Not bytes, but the number of transfers of channel_config_set_transfer_data_size() to be sent.
+ * \param encoded_transfer_count The encoded transfer count
+ *
+ * \if rp2040_specific
+ * On RP2040 this is just the number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size) from 0 -> 2^32 - 1.
+ * \endif
+ *
+ * \if rp2350_specific
+ * On RP2350 the low 28 bits are used to encode a number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size) and non-zero values of the top 4 bits are used to specify other options.
+ * \endif
+ *
+ * The best practice is always to use either \ref dma_encode_transfer_count, \ref dma_encode_transfer_count_with_self_trigger, or \ref dma_encode_endless_transfer_count to generate a value
+ * to pass for this argument
  */
-inline static void dma_channel_transfer_to_buffer_now(uint channel, volatile void *write_addr, uint32_t transfer_count) {
+inline static void dma_channel_transfer_to_buffer_now(uint channel, volatile void *write_addr, uint32_t encoded_transfer_count) {
     dma_channel_hw_t *hw = dma_channel_hw_addr(channel);
     hw->write_addr = (uintptr_t) write_addr;
-    hw->al1_transfer_count_trig = transfer_count;
+    hw->al1_transfer_count_trig = encoded_transfer_count;
 }
 
 /*! \brief  Start one or more channels simultaneously
