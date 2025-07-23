@@ -240,8 +240,9 @@ for all_configs in chips_all_configs.values():
 chips_resolved_defines = defaultdict(dict)
 for applicable, all_defines in chips_all_defines.items():
     for d in all_defines:
-        if d not in all_config_names and d.startswith("PICO_"):
-            logger.warning("Potential unmarked PICO define {}".format(d))
+        for define_prefix in ('PICO', 'PARAM', 'CYW43'):
+            if d not in all_config_names and d.startswith(define_prefix+'_'):
+                logger.warning("#define {} is potentially missing a {}: entry".format(d, BASE_CONFIG_NAME))
         resolved_defines = chips_resolved_defines[applicable]
         # resolve "nested defines" - this allows e.g. USB_DPRAM_MAX to resolve to USB_DPRAM_SIZE which is set to 4096 (which then matches the relevant PICO_CONFIG entry)
         for val in all_defines[d]:
