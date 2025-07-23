@@ -42,7 +42,7 @@ extern void hard_assertion_failure(void);
 /*! \brief  Perform a runtime assertion always (i.e. not just when NDEBUG is undefined)
 *  \ingroup pico_base
 *
-* This function is intended to provide useful information in debug builds like a normal asstion, but also
+* This function is intended to provide useful information in debug builds like a normal assertion, but also
 * prevent execution proceeding in other builds
 *
 * In debug builds this is equivalent to \ref assert, however in release builds it calls \ref hard_assertion_failure
