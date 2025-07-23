@@ -179,9 +179,9 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     # NO_EMBEDDED_PT argument (for example, if you need to chain into the binary, it
     # can't contain a partition table).
     #
-    # This will create a separate UF2 file for the firmware and a separate UF2 file for a
-    # TBYB version of the firmware. You will need to flash one of these to each device once,
-    # after loading the partition table. For example using picotool:
+    # This will create additional UF2 files for the CYW43 firmware and a TBYB version of the
+    # CYW43 firmware. You will need to flash one of these to each device once, after loading the
+    # partition table. For example using picotool:
     #
     # `picotool load TARGET.uf2`;
     # `picotool reboot -u`;
