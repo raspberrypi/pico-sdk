@@ -75,11 +75,13 @@ struct async_context_freertos {
     async_context_t core;
     SemaphoreHandle_t lock_mutex;
     SemaphoreHandle_t work_needed_sem;
+    SemaphoreHandle_t task_complete_sem;
     TimerHandle_t timer_handle;
     TaskHandle_t task_handle;
 #if configSUPPORT_STATIC_ALLOCATION
     StaticSemaphore_t lock_mutex_buf;
     StaticSemaphore_t work_needed_sem_buf;
+    StaticSemaphore_t task_complete_sem_buf;
     StaticTimer_t timer_buf;
     StaticTask_t task_buf;
 #endif
