@@ -1,17 +1,20 @@
 ## Documentation and datasheets {#weblinks_page}
 
-The full documentation for the RP2040 and Raspberry Pi Pico board can be found at the following links
+The full documentation for the RP2040, RP2350 and Raspberry Pi Pico-series boards can be found at the following links
 
- - [RP2040 Datasheet](https://rptl.io/rp2040-datasheet)
- - [Raspberry Pi Pico Datasheet](https://rptl.io/pico-datasheet)
- - [RP235x Datasheet](https://rptl.io/rp2040-datasheet)
- - [Raspberry Pi Pico2 Datasheet](https://rptl.io/pico-datasheet)
- - [Raspberry Pi Pico W Datasheet](https://rptl.io/picow-datasheet)
- - [Hardware design with RP2040](https://rptl.io/rp2040-design)
- - [Raspberry Pi Pico C/C++ SDK](https://rptl.io/pico-c-sdk)
- - [Raspberry Pi Pico Python SDK](https://rptl.io/pico-micropython)
- - [Getting started with Raspberry Pi Pico](https://rptl.io/pico-get-started)
- - [Connecting to the Internet with Raspberry Pi Pico W](https://rptl.io/picow-connect)
+ - [RP2040 Datasheet](https://rpltd.co/rp2040-datasheet)
+ - [Raspberry Pi Pico Datasheet](https://rpltd.co/pico-datasheet)
+ - [Raspberry Pi Pico W Datasheet](https://rpltd.co/picow-datasheet)
+ - [Hardware design with RP2040](https://rpltd.co/rp2040-design)
+ - [RP2350 Datasheet](https://rpltd.co/rp2350-datasheet)
+ - [Raspberry Pi Pico 2 Datasheet](https://rpltd.co/pico2-datasheet)
+ - [Raspberry Pi Pico 2 W Datasheet](https://rpltd.co/pico2w-datasheet)
+ - [Hardware design with RP2350](https://rpltd.co/rp2350-hardware-design)
+ - [RM2 Datasheet](https://rpltd.co/rm2-datasheet)
+ - [Raspberry Pi Pico-series C/C++ SDK](https://rpltd.co/pico-c-sdk)
+ - [Raspberry Pi Pico-series Python SDK](https://rpltd.co/pico-micropython)
+ - [Getting started with Raspberry Pi Pico-series](https://rpltd.co/pico-get-started)
+ - [Connecting to the Internet with Raspberry Pi Pico W-series](https://rpltd.co/picow-connect)
 
 ### Weblinks
 
@@ -31,4 +34,9 @@ All the source code for the Raspberry Pi Pico SDK, examples and other libraries 
  - [Pico Examples](https://github.com/raspberrypi/pico-examples)
  - [Pico Extras - Libraries under development](https://github.com/raspberrypi/pico-extras)
  - [Pico Playground - Examples that use Pico Extras](https://github.com/raspberrypi/pico-playground)
- - [Pico Bootrom source code](https://github.com/raspberrypi/pico-bootrom)
+ - [Pico MicroPython Examples](https://github.com/raspberrypi/pico-micropython-examples)
+ - [RP2040 Bootrom source code](https://github.com/raspberrypi/pico-bootrom-rp2040)
+ - [RP2350 Bootrom source code](https://github.com/raspberrypi/pico-bootrom-rp2350)
+ - [Picotool](https://github.com/raspberrypi/picotool)
+ - [Pico VS Code extension](https://github.com/raspberrypi/pico-vscode)
+ - [Pico TensorFlow Lite Port](https://github.com/raspberrypi/pico-tflmicro)
