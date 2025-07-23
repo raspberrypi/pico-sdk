@@ -399,7 +399,9 @@ void cyw43_arch_disable_ap_mode(void);
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  *
- * \return 0 if the initialization is successful, an error code otherwise see \ref pico_error_codes
+ * \return 0 if the connection is successful.
+ * PICO_ERROR_BADAUTH is returned if the WiFi password is wrong.
+ * PICO_ERROR_CONNECT_FAILED is returned if the connection failed for some other reason.
  */
 int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t auth);
 
@@ -413,7 +415,9 @@ int cyw43_arch_wifi_connect_blocking(const char *ssid, const char *pw, uint32_t 
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  *
- * \return 0 if the initialization is successful, an error code otherwise see \ref pico_error_codes
+ * \return 0 if the connection is successful.
+ * PICO_ERROR_BADAUTH is returned if the WiFi password is wrong.
+ * PICO_ERROR_CONNECT_FAILED is returned if the connection failed for some other reason.
  */
 int cyw43_arch_wifi_connect_bssid_blocking(const char *ssid, const uint8_t *bssid, const char *pw, uint32_t auth);
 
@@ -427,7 +431,10 @@ int cyw43_arch_wifi_connect_bssid_blocking(const char *ssid, const uint8_t *bssi
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  * \param timeout how long to wait in milliseconds for a connection to succeed before giving up
  *
- * \return 0 if the initialization is successful, an error code otherwise see \ref pico_error_codes
+ * \return 0 if the connection is successful.
+ * PICO_ERROR_TIMEOUT is returned if the timeout is reached before a successful connection.
+ * PICO_ERROR_BADAUTH is returned if the WiFi password is wrong.
+ * PICO_ERROR_CONNECT_FAILED is returned if the connection failed for some other reason.
  */
 int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_t auth, uint32_t timeout);
 
@@ -442,7 +449,10 @@ int cyw43_arch_wifi_connect_timeout_ms(const char *ssid, const char *pw, uint32_
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  * \param timeout how long to wait in milliseconds for a connection to succeed before giving up
  *
- * \return 0 if the initialization is successful, an error code otherwise see \ref pico_error_codes
+ * \return 0 if the connection is successful.
+ * PICO_ERROR_TIMEOUT is returned if the timeout is reached before a successful connection.
+ * PICO_ERROR_BADAUTH is returned if the WiFi password is wrong.
+ * PICO_ERROR_CONNECT_FAILED is returned if the connection failed for some other reason.
  */
 int cyw43_arch_wifi_connect_bssid_timeout_ms(const char *ssid, const uint8_t *bssid, const char *pw, uint32_t auth, uint32_t timeout);
 
