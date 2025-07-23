@@ -315,8 +315,8 @@ int PRIMARY_STDIO_FUNC(puts)(const char *s) {
 int REAL_FUNC(vprintf)(const char *format, va_list va);
 
 int PRIMARY_STDIO_FUNC(vprintf)(const char *format, va_list va) {
-    bool serialzed = stdout_serialize_begin();
-    if (!serialzed) {
+    bool serialized = stdout_serialize_begin();
+    if (!serialized) {
 #if PICO_STDIO_IGNORE_NESTED_STDOUT
         return 0;
 #endif
@@ -337,7 +337,7 @@ int PRIMARY_STDIO_FUNC(vprintf)(const char *format, va_list va) {
 #else
     ret = REAL_FUNC(vprintf)(format, va);
 #endif
-    if (serialzed) {
+    if (serialized) {
         stdout_serialize_end();
     }
     return ret;
