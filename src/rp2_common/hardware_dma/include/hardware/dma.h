@@ -215,7 +215,7 @@ static inline void channel_config_set_read_address_update_type(dma_channel_confi
  *  \ingroup channel_config
  *
  * \param c Pointer to channel configuration object
- * \param update_type The type of adjustment to make to the read address after each transfer.
+ * \param update_type The type of adjustment to make to the write address after each transfer.
  *             Usually set to DMA_ADDRESS_UPDATE_NONE for peripheral to memory transfers
  * \sa channel_config_set_write_increment
  */
