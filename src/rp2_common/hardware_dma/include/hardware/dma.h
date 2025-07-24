@@ -216,7 +216,7 @@ static inline void channel_config_set_read_address_update_type(dma_channel_confi
  *
  * \param c Pointer to channel configuration object
  * \param update_type The type of adjustment to make to the write address after each transfer.
- *             Usually set to DMA_ADDRESS_UPDATE_NONE for peripheral to memory transfers
+ *             Usually set to DMA_ADDRESS_UPDATE_NONE for memory to peripheral transfers
  * \sa channel_config_set_write_increment
  */
 static inline void channel_config_set_write_address_update_type(dma_channel_config *c, enum dma_address_update_type update_type) {
@@ -250,7 +250,7 @@ static inline void channel_config_set_read_increment(dma_channel_config *c, bool
  * \endcode
  *
  * \param c Pointer to channel configuration object
- * \param incr True to enable write address increments, whereby the writee address increments by the transfer size with each transfer, false to perform each write to the same address.
+ * \param incr True to enable write address increments, whereby the  address increments by the transfer size with each transfer, false to perform each write to the same address.
  *             Usually disabled for memory to peripheral transfers
  * \sa channel_config_set_write_address_update_type
  */
