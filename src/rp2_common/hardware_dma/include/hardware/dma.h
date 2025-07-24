@@ -256,7 +256,7 @@ static inline void channel_config_set_read_increment(dma_channel_config_t *c, bo
  * \endcode
  *
  * \param c Pointer to channel configuration object
- * \param incr True to enable write address increments, whereby the write address increments by the transfer size with each transfer, false to perform each write to the same address.
+ * \param incr True to enable write address increments, whereby the write address increments by the transfer size with each transfer. False to perform each write to the same address.
  *             Usually disabled for memory to peripheral transfers
  * \sa channel_config_set_write_address_update_type
  */
@@ -542,7 +542,7 @@ static inline uint32_t dma_encode_transfer_count(uint transfer_count) {
  * \param transfer_count the number of transfers (NOT bytes, see \ref channel_config_set_transfer_data_size)
  *
  * \if rp2040_specific
- * On RP2040 self-triggering DMA is not supported, so this method may not be used
+ * On RP2040 self-triggering DMA is not supported, so this method should not be used
  * \endif
  *
  * \if rp2350_specific
@@ -566,7 +566,7 @@ static inline uint32_t dma_encode_transfer_count_with_self_trigger(uint transfer
  *  \ingroup hardware_dma
  *
  * \if rp2040_specific
- * On RP2040 endless DMA transfers are not supported, so this method may not be used
+ * On RP2040 endless DMA transfers are not supported, so this method should not be used
  * \endif
  * \return the encoded_transfer_count
  * \sa dma_channel_set_transfer_count
