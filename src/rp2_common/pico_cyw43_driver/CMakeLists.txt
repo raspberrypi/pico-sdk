@@ -179,13 +179,14 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     # NO_EMBEDDED_PT argument (for example, if you need to chain into the binary, it
     # can't contain a partition table).
     #
-    # This will create additional UF2 files for the CYW43 firmware and a TBYB version of the
-    # CYW43 firmware. You will need to flash one of these to each device once, after loading the
-    # partition table. For example using picotool:
+    # This will create additional UF2 files for the CYW43 firmware - both a regular version,
+    # and a TBYB version to use if you're updating it using the TBYB feature (see section
+    # 5.1.17 of the RP2350 datasheet). You will need to flash your chosen version to each
+    # new device once, after loading the partition table. For example using picotool:
     #
     # `picotool load TARGET.uf2`;
     # `picotool reboot -u`;
-    # `picotool load TARGET_wifi_firmware.uf2 -x`;
+    # `picotool load -ux TARGET_wifi_firmware.uf2`;
     #
     # Then on subsequent updates, you can just flash the TARGET.uf2 file to the device.
     #
