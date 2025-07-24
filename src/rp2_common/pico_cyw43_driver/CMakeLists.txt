@@ -179,6 +179,17 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     # NO_EMBEDDED_PT argument (for example, if you need to chain into the binary, it
     # can't contain a partition table).
     #
+    # This will create additional UF2 files for the CYW43 firmware - both a regular version,
+    # and a TBYB version to use if you're updating it using the TBYB feature (see section
+    # 5.1.17 of the RP2350 datasheet). You will need to flash your chosen version to each
+    # new device once, after loading the partition table. For example using picotool:
+    #
+    # `picotool load TARGET.uf2`;
+    # `picotool reboot -u`;
+    # `picotool load -ux TARGET_wifi_firmware.uf2`;
+    #
+    # Then on subsequent updates, you can just flash the TARGET.uf2 file to the device.
+    #
     # \param\ NO_EMBEDDED_PT If set, will not embed a partition table in the binary
     function(pico_use_wifi_firmware_partition TARGET)
         set(options NO_EMBEDDED_PT)
@@ -204,50 +215,50 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
                 )
 
         # Create UF2s for regular and TBYB firmwares
-        add_executable(${TARGET}_firmware
+        add_executable(${TARGET}_wifi_firmware
                 ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
-        add_executable(${TARGET}_firmware_tbyb
+        add_executable(${TARGET}_wifi_firmware_tbyb
                 ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
 
-        add_dependencies(${TARGET}_firmware ${TARGET}_firmware_blob)
-        add_dependencies(${TARGET}_firmware_tbyb ${TARGET}_firmware_blob)
+        add_dependencies(${TARGET}_wifi_firmware ${TARGET}_firmware_blob)
+        add_dependencies(${TARGET}_wifi_firmware_tbyb ${TARGET}_firmware_blob)
 
-        target_include_directories(${TARGET}_firmware PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-        target_include_directories(${TARGET}_firmware_tbyb PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+        target_include_directories(${TARGET}_wifi_firmware PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+        target_include_directories(${TARGET}_wifi_firmware_tbyb PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-        target_compile_definitions(${TARGET}_firmware PRIVATE
+        target_compile_definitions(${TARGET}_wifi_firmware PRIVATE
                 NO_PICO_PLATFORM=1
                 )
-        target_compile_definitions(${TARGET}_firmware_tbyb PRIVATE
+        target_compile_definitions(${TARGET}_wifi_firmware_tbyb PRIVATE
                 NO_PICO_PLATFORM=1
                 PICO_CRT0_IMAGE_TYPE_TBYB=1
                 )
 
-        target_link_options(${TARGET}_firmware PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
-        target_link_options(${TARGET}_firmware_tbyb PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
+        target_link_options(${TARGET}_wifi_firmware PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
+        target_link_options(${TARGET}_wifi_firmware_tbyb PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
 
-        target_link_libraries(${TARGET}_firmware boot_picobin_headers)
-        target_link_libraries(${TARGET}_firmware_tbyb boot_picobin_headers)
+        target_link_libraries(${TARGET}_wifi_firmware boot_picobin_headers)
+        target_link_libraries(${TARGET}_wifi_firmware_tbyb boot_picobin_headers)
 
         get_target_property(hasSigfile ${TARGET} PICOTOOL_SIGFILE)
         if (hasSigfile)
-                pico_sign_binary(${TARGET}_firmware ${sigfile})
-                pico_sign_binary(${TARGET}_firmware_tbyb ${sigfile})
+                pico_sign_binary(${TARGET}_wifi_firmware ${sigfile})
+                pico_sign_binary(${TARGET}_wifi_firmware_tbyb ${sigfile})
         endif()
 
-        pico_hash_binary(${TARGET}_firmware)
-        pico_hash_binary(${TARGET}_firmware_tbyb)
+        pico_hash_binary(${TARGET}_wifi_firmware)
+        pico_hash_binary(${TARGET}_wifi_firmware_tbyb)
 
-        pico_set_uf2_family(${TARGET}_firmware cyw43-firmware)
-        pico_set_uf2_family(${TARGET}_firmware_tbyb cyw43-firmware)
+        pico_set_uf2_family(${TARGET}_wifi_firmware cyw43-firmware)
+        pico_set_uf2_family(${TARGET}_wifi_firmware_tbyb cyw43-firmware)
 
-        pico_package_uf2_output(${TARGET}_firmware 0x10000000)
-        pico_package_uf2_output(${TARGET}_firmware_tbyb 0x10000000)
+        pico_package_uf2_output(${TARGET}_wifi_firmware 0x10000000)
+        pico_package_uf2_output(${TARGET}_wifi_firmware_tbyb 0x10000000)
 
-        pico_add_extra_outputs(${TARGET}_firmware)
-        pico_add_extra_outputs(${TARGET}_firmware_tbyb)
+        pico_add_extra_outputs(${TARGET}_wifi_firmware)
+        pico_add_extra_outputs(${TARGET}_wifi_firmware_tbyb)
 
         add_dependencies(${TARGET}
-                ${TARGET}_firmware ${TARGET}_firmware_tbyb)
+                ${TARGET}_wifi_firmware ${TARGET}_wifi_firmware_tbyb)
     endfunction()
 endif()
