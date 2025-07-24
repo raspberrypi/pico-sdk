@@ -7,10 +7,10 @@
 /** \file pico/status_led.h
  *  \defgroup pico_status_led pico_status_led
  *
- * \brief Enables access to the on-board status leds
+ * \brief Enables access to the on-board status LED(s)
  *
- * Boards usually have access to an on-board status leds which are configured via the board header (\see PICO_DEFAULT_LED_PIN and \see PICO_DEFAULT_WS2812_PIN)
- * This library hides the details so you can use the status leds for all boards without changing your code.
+ * Boards usually have access to an on-board status LEDs which are configured via the board header (\see PICO_DEFAULT_LED_PIN and \see PICO_DEFAULT_WS2812_PIN)
+ * This library hides the details so you can use the status LEDs for all boards without changing your code.
  */
 
 #ifndef _PICO_STATUS_LED_H
@@ -28,167 +28,217 @@ struct async_context;
 extern "C" {
 #endif
 
-// PICO_CONFIG: PICO_STATUS_LED_WS2812_WRGB, Indicate if the colored status led supports WRGB, type=bool, default=0, group=pico_status_led
-#ifndef PICO_STATUS_LED_WS2812_WRGB
-#define PICO_STATUS_LED_WS2812_WRGB 0
-#endif
-
-// PICO_CONFIG: PICO_STATUS_LED_COLOR_ONLY, Indicate if only the colored status led should be used. Only true by default if a WS2812 pin is defined and no led pin is defined, type=bool, group=pico_status_led
-#ifdef PICO_DEFAULT_WS2812_PIN
-#ifndef PICO_STATUS_LED_COLOR_ONLY
-#define PICO_STATUS_LED_COLOR_ONLY !(defined PICO_DEFAULT_LED_PIN || defined CYW43_WL_GPIO_LED_PIN)
-#endif
+// PICO_CONFIG: PICO_STATUS_LED_AVAILABLE, Indicate whether a non-colored status LED is availble, type=bool, default=1 if PICO_DEFAULT_LED_PIN or CYW43_WL_GPIO_LED_PIN is defined; may be set by the user to 0 to not use either even if they are available, group=pico_status_led
+#ifndef PICO_STATUS_LED_AVAILABLE
+#if defined(PICO_DEFAULT_LED_PIN) || defined(CYW43_WL_GPIO_LED_PIN)
+#define PICO_STATUS_LED_AVAILABLE 1
 #else
-// Force this off if PICO_DEFAULT_WS2812_PIN is not defined
-#undef PICO_STATUS_LED_COLOR_ONLY
-#define PICO_STATUS_LED_COLOR_ONLY 0
+#define PICO_STATUS_LED_AVAILABLE 0
+#endif
 #endif
 
-/*! \brief Generate an RGB colour value for /ref pico_status_led_color_set_on_value
+// PICO_CONFIG: PICO_COLORED_STATUS_LED_AVAILABLE, Indicate whether a colored status LED is availble, type=bool, default=1 if PICO_DEFAULT_WS2812_PIN is defined; may be set by the user to 0 to not use either even if available, group=pico_status_led
+#ifndef PICO_COLORED_STATUS_LED_AVAILABLE
+#ifdef PICO_DEFAULT_WS2812_PIN
+#define PICO_COLORED_STATUS_LED_AVAILABLE 1
+#else
+#define PICO_COLORED_STATUS_LED_AVAILABLE 0
+#endif
+#endif    
+
+// PICO_CONFIG: PICO_STATUS_LED_VIA_COLORED_STATUS_LED, Indicate if the colored status LED should be used for both status_led and colored_status_led APIs, type=bool, default=1 if PICO_COLORED_STATUS_LED_AVAILABLE is 1 and PICO_STATUS_LED_AVAILABLE is 0, group=pico_status_led
+#ifndef PICO_STATUS_LED_VIA_COLORED_STATUS_LED
+#define PICO_STATUS_LED_VIA_COLORED_STATUS_LED (PICO_COLORED_STATUS_LED_AVAILABLE && !PICO_STATUS_LED_AVAILABLE)
+#endif
+
+// PICO_CONFIG: PICO_COLORED_STATUS_LED_USES_WRGB, Indicate if the colored status LED supports WRGB, type=bool, default=0, group=pico_status_led
+#ifndef PICO_COLORED_STATUS_LED_USES_WRGB
+#define PICO_COLORED_STATUS_LED_USES_WRGB 0
+#endif
+
+/*! \brief Generate an RGB color value for /ref colored_status_led_set_on_with_color
  *  \ingroup pico_status_led
  */
-#ifndef PICO_STATUS_LED_RGB
-#define PICO_STATUS_LED_RGB(R, G, B) (((R) << 16) | ((G) << 8) | (B))
+#ifndef PICO_COLORED_STATUS_LED_COLOR_FROM_RGB
+#define PICO_COLORED_STATUS_LED_COLOR_FROM_RGB(r, g, b) (((r) << 16) | ((g) << 8) | (b))
 #endif
 
-/*! \brief Generate an WRGB colour value for \ref pico_status_led_color_set_on_value
+/*! \brief Generate an WRGB color value for \ref colored_status_led_set_on_with_color
+ *  \ingroup pico_status_led
  *
  *  \note: If your hardware does not support a white pixel, the white component is ignored
- *
- *  \ingroup pico_status_led
  */
-#ifndef PICO_STATUS_LED_WRGB
-#define PICO_STATUS_LED_WRGB(W, R, G, B) (((W) << 24) | ((R) << 16) | ((G) << 8) | (B))
+#ifndef PICO_COLORED_STATUS_LED_COLOR_FROM_WRGB
+#define PICO_COLORED_STATUS_LED_COLOR_FROM_WRGB(w, r, g, b) (((w) << 24) | ((r) << 16) | ((g) << 8) | (b))
 #endif
 
-// PICO_CONFIG: PICO_STATUS_LED_COLOR_ON_DEFAULT, the default pixel color value of the coloured status led when it is on, type=int, group=pico_status_led
-#ifndef PICO_STATUS_LED_COLOR_ON_DEFAULT
-#if PICO_STATUS_LED_WS2812_WRGB
-#define PICO_STATUS_LED_COLOR_ON_DEFAULT PICO_STATUS_LED_WRGB(0xaa, 0, 0, 0)
+// PICO_CONFIG: PICO_DEFUALT_COLORED_STATUS_LED_ON_COLOR, the default pixel color value of the colored status LED when it is on, type=int, group=pico_status_led
+#ifndef PICO_DEFUALT_COLORED_STATUS_LED_ON_COLOR
+#if PICO_COLORED_STATUS_LED_USES_WRGB
+#define PICO_DEFUALT_COLORED_STATUS_LED_ON_COLOR PICO_COLORED_STATUS_LED_COLOR_FROM_WRGB(0xaa, 0, 0, 0)
 #else
-#define PICO_STATUS_LED_COLOR_ON_DEFAULT PICO_STATUS_LED_RGB(0xaa, 0xaa, 0xaa)
+#define PICO_DEFAULT_COLORED_STATUS_LED_ON_COLOR PICO_COLORED_STATUS_LED_COLOR_FROM_RGB(0xaa, 0xaa, 0xaa)
 #endif
 #endif
 
-// PICO_CONFIG: PICO_STATUS_LED_COLOR_OFF, the pixel color value of the coloured status led when it is off, type=int, group=pico_status_led
-#ifndef PICO_STATUS_LED_COLOR_OFF
-#if PICO_STATUS_LED_WS2812_WRGB
-#define PICO_STATUS_LED_COLOR_OFF PICO_STATUS_LED_WRGB(0, 0, 0, 0)
-#else
-#define PICO_STATUS_LED_COLOR_OFF PICO_STATUS_LED_RGB(0, 0, 0)
-#endif
-#endif
+/*! \brief Initialize the status LED(s)
+ * \ingroup pico_status_led
+ *
+ * Initialize the status LED(s) and the resources they need before use. On some devices (e.g. Pico W, Pico 2 W) accessing
+ * the status LED requires talking to the WiFi chip, which requires an \ref async_context. This method will create one for you,
+ * however an application only one has a single \ref async_context instance to talk to the WiFi chip, you should use \ref
+ * status_led_init_with_context instead and pass it the \ref async_context already created within your application
+ *
+ * \note: You must call this function (or \ref status_led_init_with_context) before using any other pico_status_led functions.
+ *
+ * \return Returns true if the LED was initialized successfully, otherwise false on failure
+ * \sa status_led_init_with_context
+ */
+bool status_led_init(void);
 
-/*! \brief Initialise the status leds
+/*! \brief Initialise the status LED(s)
  *  \ingroup pico_status_led
  *
- *  Initialise the status leds and the resources they need before use.
+ * Initialize the status LED(s) and the resources they need before use.
  *
- * \note: You must call this function before using any other status led functions.
+ * \note: You must call this function (or \ref status_led_init) before using any other pico_status_led functions.
  *
- * \param context An async context is needed to control the led on some devices (e.g. Pico W).
- * You can usually only have one async context. Pass your async context into the function or if you don't have one, pass NULL to get the function to just create a context for it's own use as and if required.
- * \return Returns true if the led was initialised successfully, otherwise false on failure
+ * \param context An \ref async_context used to communicate with the status LED (e.g. on Pico W or Pico 2 W)
+ * \return Returns true if the LED was initialized successfully, otherwise false on failure
+ * \sa status_led_init_with_context
  */
-bool pico_status_led_init(struct async_context *context);
+bool status_led_init_with_context(struct async_context *context);
 
-/*! \brief Set the color used for the status led when it is on
+/*! \brief Determine if the `colored_status_led_` APIs are supported (i.e. if there is a colored status LED, and its
+ *         use isn't disabled via \ref PICO_COLORED_STATUS_LED_AVAILABLE being set to 0
  *  \ingroup pico_status_led
- *
- * \note: If your hardware does not support a colored status led (\see PICO_DEFAULT_WS2812_PIN), this function does nothing and returns false.
- *
- * \param value The color to use for the colored status led when it is on, in 0xWWRRGGBB format
- * \param True if the coloured status led could be set, otherwise false on failure
+ * \return true if the colored status LED API is available and expected to produce visible results
+ * \sa PICO_COLORED_STATUS_LED_AVAILABLE
  */
-bool pico_status_led_color_set_on_value(uint32_t value);
-
-/*! \brief Get the color used for the status led value when it is on
- *  \ingroup pico_status_led
- *
- * \note: If your hardware does not support a colored status led (\see PICO_DEFAULT_WS2812_PIN), this function always returns 0x0.
- *
- * \return The color used for the colored status led when it is on, in 0xWWRRGGBB format
- */
-uint32_t pico_status_led_color_get_on_value(void);
-
-/*! \brief Set the colored status led on or off
- *  \ingroup pico_status_led
- *
- * \note: If your hardware does not support a colored status led (\see PICO_DEFAULT_WS2812_PIN), this function does nothing and returns false.
- *
- * \param led_on True to turn the colored led on. Pass False to turn the colored led off
- * \param True if the colored status led could be set, otherwise false
- */
-bool pico_status_led_color_set(bool led_on);
-
-/*! \brief Get the state of the colored status led
- *  \ingroup pico_status_led
- *
- * \note: If your hardware does not support a colored status led (\see PICO_DEFAULT_WS2812_PIN), this function returns false.
- *
- * \return True if the colored status led is on, or False if the coloured status led is off
- */
-bool pico_status_led_color_get(void);
-
-/*! \brief Set the status led on or off
- *  \ingroup pico_status_led
- *
- * \note: If your hardware does not support a status led (\see PICO_DEFAULT_LED_PIN), this function does nothing and returns false.
- *
- * \param led_on True to turn the led on. Pass False to turn the led off
- * \param True if the status led could be set, otherwise false
- */
-static inline bool pico_status_led_set(bool led_on) {
-#if PICO_STATUS_LED_COLOR_ONLY
-    return pico_status_led_color_set(led_on);
-#elif defined PICO_DEFAULT_LED_PIN
-#if defined(PICO_DEFAULT_LED_PIN_INVERTED) && PICO_DEFAULT_LED_PIN_INVERTED
-    gpio_put(PICO_DEFAULT_LED_PIN, !led_on);
-#else
-    gpio_put(PICO_DEFAULT_LED_PIN, led_on);
-#endif
-    return true;
-#elif defined CYW43_WL_GPIO_LED_PIN
-    cyw43_gpio_set(&cyw43_state, CYW43_WL_GPIO_LED_PIN, led_on);
-    return true;
-#else
-    return false;
-#endif
+static inline bool colored_status_led_supported() {
+    return PICO_COLORED_STATUS_LED_AVAILABLE;
 }
 
-/*! \brief Get the state of the status led
+/*! \brief Determine if the colored status LED is being used for the non-colored `status_led_` APIs
  *  \ingroup pico_status_led
- *
- * \note: If your hardware does not support a status led (\see PICO_DEFAULT_LED_PIN), this function always returns false.
- *
- * \return True if the status led is on, or False if the status led is off
+ * \return true if the olored status LED is being used for the non-colored `status_led_` API
+ * \sa PICO_STATUS_LED_VIA_COLORED_STATUS_LED
  */
-static inline bool pico_status_led_get(void) {
-#if PICO_STATUS_LED_COLOR_ONLY
-    return pico_status_led_color_get();
-#elif defined PICO_DEFAULT_LED_PIN
-#if defined(PICO_DEFAULT_LED_PIN_INVERTED) && PICO_DEFAULT_LED_PIN_INVERTED
-    return !gpio_get(PICO_DEFAULT_LED_PIN);
-#else
-    return gpio_get(PICO_DEFAULT_LED_PIN);
-#endif
-#elif defined CYW43_WL_GPIO_LED_PIN
-    bool value = false;
-    cyw43_gpio_get(&cyw43_state, CYW43_WL_GPIO_LED_PIN, &value);
-    return value;
-#else
-    return false;
-#endif
+static inline bool status_led_via_colored_status_led() {
+    return PICO_STATUS_LED_VIA_COLORED_STATUS_LED;
 }
 
-/*! \brief Deinitialise the status leds
+/*! \brief Determine if the non-colored `status_led_` APIs are supported (i.e. if there is a regular LED, and its
+ *         use isn't disabled via \ref PICO_STATUS_LED_AVAILABLE being set to 0, or if the colored status LED is being used for
+ *  \ingroup pico_status_led
+ * \return true if the non-colored status LED API is available and expected to produce visible results
+ * \sa PICO_STATUS_LED_AVAILABLE
+ * \sa PICO_STATUS_LED_VIA_COLORED_STATUS_LED
+ */
+static inline bool status_led_supported() {
+    if (status_led_via_colored_status_led()) {
+        return colored_status_led_supported();
+    }
+    return PICO_STATUS_LED_AVAILABLE;
+}
+
+/*! \brief Set the colored status LED on or off
  *  \ingroup pico_status_led
  *
- * Deinitialises the status leds when they are no longer needed.
+ * \note: If your hardware does not support a colored status LED (\see PICO_DEFAULT_WS2812_PIN), this function does nothing and returns false.
  *
- * \param context The async context to be used. This should be the same as the value passed into pico_status_led_init
+ * \param led_on true to turn the colored LED on. Pass false to turn the colored LED off
+ * \return true if the colored status LED could be set, otherwise false
  */
-void pico_status_led_deinit(struct async_context *context);
+bool colored_status_led_set_state(bool led_on);
+
+/*! \brief Get the state of the colored status LED
+ *  \ingroup pico_status_led
+ *
+ * \note: If your hardware does not support a colored status LED (\see PICO_DEFAULT_WS2812_PIN), this function returns false.
+ *
+ * \return true if the colored status LED is on, or false if the colored status LED is off
+ */
+bool colored_status_led_get_state();
+    
+/*! \brief Ensure the colored status LED is on, with the specified color
+ *  \ingroup pico_status_led
+ *
+ * \note: If your hardware does not support a colored status LED (\see PICO_DEFAULT_WS2812_PIN), this function does nothing and returns false.
+ *
+ * \param color The color to use for the colored status LED when it is on, in 0xWWRRGGBB format
+ * \return true if the coloured status LED could be set, otherwise false on failure
+ */
+bool colored_status_led_set_on_with_color(uint32_t color);
+
+/*! \brief Get the color used for the status LED value when it is on
+ *  \ingroup pico_status_led
+ *
+ * \note: If your hardware does not support a colored status LED (\see PICO_DEFAULT_WS2812_PIN), this function always returns 0x0.
+ *
+* \return The color used for the colored status LED when it is on, in 0xWWRRGGBB format
+*/
+uint32_t colored_status_led_get_on_color(void);
+
+/*! \brief Set the status LED on or off
+*  \ingroup pico_status_led
+*
+* \note: If your hardware does not support a status LED (\see PICO_DEFAULT_LED_PIN), this function does nothing and returns false.
+*
+* \param led_on true to turn the LED on. Pass false to turn the LED off
+* \return true if the status LED could be set, otherwise false
+*/
+static inline bool status_led_set_state(bool led_on) {
+    if (status_led_via_colored_status_led()) {
+        return colored_status_led_set_state(led_on);
+    } else if (status_led_supported()) {
+#if defined(PICO_DEFAULT_LED_PIN)
+    #if PICO_DEFAULT_LED_PIN_INVERTED
+        gpio_put(PICO_DEFAULT_LED_PIN, !led_on);
+    #else
+        gpio_put(PICO_DEFAULT_LED_PIN, led_on);
+    #endif
+        return true;
+#elif defined(CYW43_WL_GPIO_LED_PIN)
+        cyw43_gpio_set(&cyw43_state, CYW43_WL_GPIO_LED_PIN, led_on);
+        return true;
+#endif
+    }
+    return false;
+}
+
+/*! \brief Get the state of the status LED
+ *  \ingroup pico_status_led
+ *
+ * \note: If your hardware does not support a status LED (\see PICO_DEFAULT_LED_PIN), this function always returns false.
+ *
+ * \return true if the status LED is on, or false if the status LED is off
+ */
+static inline bool status_led_get_state() {
+    if (status_led_via_colored_status_led()) {
+        return colored_status_led_get_state();
+    } else if (status_led_supported()) {
+#if defined(PICO_DEFAULT_LED_PIN)
+    #if PICO_DEFAULT_LED_PIN_INVERTED
+        return !gpio_get(PICO_DEFAULT_LED_PIN);
+    #else
+        return gpio_get(PICO_DEFAULT_LED_PIN);
+    #endif
+#elif defined CYW43_WL_GPIO_LED_PIN
+        bool value = false;
+        cyw43_gpio_get(&cyw43_state, CYW43_WL_GPIO_LED_PIN, &value);
+        return value;
+#endif
+    }
+    return false;
+}
+
+/*! \brief De-initialize the status LED(s)
+ *  \ingroup pico_status_led
+ *
+ * De-initializes the status LED(s) when they are no longer needed.
+ */
+void status_led_deinit();
 
 #ifdef __cplusplus
 }

@@ -66,6 +66,7 @@
  * \cond pico_multicore \defgroup pico_multicore pico_multicore \endcond
  * \cond pico_rand \defgroup pico_rand pico_rand \endcond
  * \cond pico_sha256 \defgroup pico_sha256 pico_sha256 \endcond
+ * \cond pico_status_led \defgroup pico_status_led pico_status_led \endcond
  * \cond pico_stdlib \defgroup pico_stdlib pico_stdlib \endcond
  * \cond pico_sync \defgroup pico_sync pico_sync \endcond
  * \cond pico_time \defgroup pico_time pico_time \endcond
