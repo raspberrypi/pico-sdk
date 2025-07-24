@@ -35,7 +35,7 @@ SECTIONS
     /* Note unlike RP2040, we start the image with a vector table even for
        NO_FLASH builds. On Arm, the bootrom expects a VT at the start of the
        image by default; on RISC-V, the default is to enter the image at its
-       lowest address, so an IMAGEDEF item is required to specify the
+       lowest address, so an IMAGE_DEF item is required to specify the
        nondefault entry point. */
 
     .text : {
