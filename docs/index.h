@@ -15,7 +15,7 @@
  * @{
  * \cond hardware_adc \defgroup hardware_adc hardware_adc \endcond
  * \cond hardware_base \defgroup hardware_base hardware_base \endcond
- * \cond hardware_bootlock \defgroup hardware_bootlock hardware_bootlock \endcond
+ * \cond hardware_boot_lock \defgroup hardware_boot_lock hardware_boot_lock \endcond
  * \cond hardware_claim \defgroup hardware_claim hardware_claim \endcond
  * \cond hardware_clocks \defgroup hardware_clocks hardware_clocks \endcond
  * \cond hardware_divider \defgroup hardware_divider hardware_divider \endcond
@@ -32,7 +32,6 @@
  * \cond hardware_pll \defgroup hardware_pll hardware_pll \endcond
  * \cond hardware_powman \defgroup hardware_powman hardware_powman \endcond
  * \cond hardware_pwm \defgroup hardware_pwm hardware_pwm \endcond
- * \cond hardware_pwm \defgroup hardware_pwm hardware_pwm \endcond
  * \cond hardware_resets \defgroup hardware_resets hardware_resets \endcond
  * \cond hardware_riscv \defgroup hardware_riscv hardware_riscv \endcond
  * \cond hardware_riscv_platform_timer \defgroup hardware_riscv_platform_timer hardware_riscv_platform_timer \endcond
@@ -44,13 +43,11 @@
  * \cond hardware_ticks \defgroup hardware_ticks hardware_ticks \endcond
  * \cond hardware_timer \defgroup hardware_timer hardware_timer \endcond
  * \cond hardware_uart \defgroup hardware_uart hardware_uart \endcond
+ * \cond hardware_usb \defgroup hardware_usb hardware_usb \endcond
  * \cond hardware_vreg \defgroup hardware_vreg hardware_vreg \endcond
  * \cond hardware_watchdog \defgroup hardware_watchdog hardware_watchdog \endcond
  * \cond hardware_xip_cache \defgroup hardware_xip_cache hardware_xip_cache \endcond
  * \cond hardware_xosc \defgroup hardware_xosc hardware_xosc \endcond
- * \cond hardware_powman \defgroup hardware_powman hardware_powman \endcond
- * \cond hardware_hazard3 \defgroup hardware_hazard3 hardware_hazard3 \endcond
- * \cond hardware_riscv \defgroup hardware_riscv hardware_riscv \endcond
 
  * @}
  *
@@ -61,6 +58,7 @@
  * \cond pico_aon_timer \defgroup pico_aon_timer pico_aon_timer \endcond
  * \cond pico_async_context \defgroup pico_async_context pico_async_context \endcond
  * \cond pico_bootsel_via_double_reset \defgroup pico_bootsel_via_double_reset pico_bootsel_via_double_reset \endcond
+ * \cond pico_fix \defgroup pico_fix pico_fix \endcond
  * \cond pico_flash \defgroup pico_flash pico_flash \endcond
  * \cond pico_i2c_slave \defgroup pico_i2c_slave pico_i2c_slave \endcond
  * \cond pico_multicore \defgroup pico_multicore pico_multicore \endcond
