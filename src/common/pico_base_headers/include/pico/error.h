@@ -42,7 +42,7 @@ enum pico_error_codes {
     PICO_ERROR_UNSUPPORTED_MODIFICATION = -18,  ///< Write is impossible based on previous writes; e.g. attempted to clear an OTP bit
     PICO_ERROR_LOCK_REQUIRED = -19,             ///< A required lock is not owned
     PICO_ERROR_VERSION_MISMATCH = -20,          ///< A version mismatch occurred (e.g. trying to run PIO version 1 code on RP2040)
-    PICO_ERROR_RESOURCE_IN_USE = -21            ///< The call could not proceed because requires resourcesw were unavailable
+    PICO_ERROR_RESOURCE_IN_USE = -21            ///< The call could not proceed because the required resources were unavailable
 };
 
 #endif // !__ASSEMBLER__
