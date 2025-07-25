@@ -46,7 +46,17 @@ BASE_BUILD_DEFINE_RE = re.compile(r'\b{}\b'.format(BASE_BUILD_DEFINE_NAME))
 
 BUILD_DEFINE_RE = re.compile(r'#\s+{}:\s+(\w+),\s+([^,]+)(?:,\s+(.*))?$'.format(BASE_BUILD_DEFINE_NAME))
 
-ALLOWED_CONFIG_PROPERTIES = set(['type', 'default', 'min', 'max', 'group'])
+PROPERTY_TYPE = 'type'
+PROPERTY_DEFAULT = 'default'
+PROPERTY_MIN = 'min'
+PROPERTY_MAX = 'max'
+PROPERTY_GROUP = 'group'
+ALLOWED_CONFIG_PROPERTIES = set([PROPERTY_TYPE, PROPERTY_DEFAULT, PROPERTY_MIN, PROPERTY_MAX, PROPERTY_GROUP])
+
+PROPERTY_TYPE_INT = 'int'
+PROPERTY_TYPE_BOOL = 'bool'
+PROPERTY_TYPE_STRING = 'string'
+PROPERTY_TYPE_LIST = 'list'
 
 CHIP_NAMES = ["rp2040", "rp2350"]
 
@@ -57,7 +67,7 @@ chips_all_descriptions = defaultdict(dict)
 
 
 def ValidateAttrs(config_name, config_attrs, file_path, linenum):
-    _type = config_attrs.get('type')
+    type_str = config_attrs.get(PROPERTY_TYPE)
     errors = []
 
     # Validate attrs
@@ -65,64 +75,56 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
         if key not in ALLOWED_CONFIG_PROPERTIES:
             errors.append(Exception('{} at {}:{} has unexpected property "{}"'.format(config_name, file_path, linenum, key)))
 
-    if _type == 'int':
-        _min = _max = _default = None
-        if config_attrs.get('min', None) is not None:
-            value = config_attrs['min']
-            m = re.match(r'^(\d+)e(\d+)$', value.lower())
-            if m:
-                _min = int(m.group(1)) * 10**int(m.group(2))
-            else:
-                _min = int(value, 0)
-        if config_attrs.get('max', None) is not None:
-            value = config_attrs['max']
-            m = re.match(r'^(\d+)e(\d+)$', value.lower())
-            if m:
-                _max = int(m.group(1)) * 10**int(m.group(2))
-            else:
-                _max = int(value, 0)
-        if config_attrs.get('default', None) is not None:
-            if '/' not in config_attrs['default']:
+    str_values = dict()
+    parsed_values = dict()
+    if type_str == PROPERTY_TYPE_INT:
+        for attr_name in (PROPERTY_MIN, PROPERTY_MAX, PROPERTY_DEFAULT):
+            str_values[attr_name] = config_attrs.get(attr_name, None)
+            if str_values[attr_name] is not None:
                 try:
-                    value = config_attrs['default']
-                    m = re.match(r'^(\d+)e(\d+)$', value.lower())
+                    m = re.match(r'^(\d+)e(\d+)$', str_values[attr_name].lower())
                     if m:
-                        _default = int(m.group(1)) * 10**int(m.group(2))
+                        parsed_values[attr_name] = int(m.group(1)) * 10**int(m.group(2))
                     else:
-                        _default = int(value, 0)
+                        parsed_values[attr_name] = int(str_values[attr_name], 0)
                 except ValueError:
-                    pass
-        if _min is not None and _max is not None:
-            if _min > _max:
-                errors.append(Exception('{} at {}:{} has min {} > max {}'.format(config_name, file_path, linenum, config_attrs['min'], config_attrs['max'])))
-        if _min is not None and _default is not None:
-            if _min > _default:
-                errors.append(Exception('{} at {}:{} has min {} > default {}'.format(config_name, file_path, linenum, config_attrs['min'], config_attrs['default'])))
-        if _default is not None and _max is not None:
-            if _default > _max:
-                errors.append(Exception('{} at {}:{} has default {} > max {}'.format(config_name, file_path, linenum, config_attrs['default'], config_attrs['max'])))
-    elif _type == 'bool':
-        assert 'min' not in config_attrs
-        assert 'max' not in config_attrs
-        _default = config_attrs.get('default', None)
-        if _default is not None:
-            if '/' not in _default:
-                if (_default not in ('0', '1')) and (_default not in all_config_names):
-                    logger.info('{} at {}:{} has non-integer default value "{}"'.format(config_name, file_path, linenum, config_attrs['default']))
+                    logger.info('{} at {}:{} has non-integer {} value "{}"'.format(config_name, file_path, linenum, attr_name, str_values[attr_name]))
+        for (small_attr, large_attr) in (
+            (PROPERTY_MIN, PROPERTY_MAX),
+            (PROPERTY_MIN, PROPERTY_DEFAULT),
+            (PROPERTY_DEFAULT, PROPERTY_MAX),
+        ):
+            if small_attr in parsed_values and large_attr in parsed_values and parsed_values[small_attr] > parsed_values[large_attr]:
+                errors.append(Exception('{} at {}:{} has {} {} > {} {}'.format(config_name, file_path, linenum, small_attr, str_values[small_attr], large_attr, str_values[large_attr])))
 
-    elif _type == 'string':
-        assert 'min' not in config_attrs
-        assert 'max' not in config_attrs
-        _default = config_attrs.get('default', None)
-    elif _type == 'list':
-        assert 'min' not in config_attrs
-        assert 'max' not in config_attrs
-        _default = config_attrs.get('default', None)
+    elif type_str == PROPERTY_TYPE_BOOL:
+        assert PROPERTY_MIN not in config_attrs
+        assert PROPERTY_MAX not in config_attrs
+
+        attr_name = PROPERTY_DEFAULT
+        str_values[attr_name] = config_attrs.get(attr_name, None)
+        if str_values[attr_name] is not None:
+            if (str_values[attr_name] not in ('0', '1')) and (str_values[attr_name] not in all_config_names):
+                logger.info('{} at {}:{} has non-integer {} value "{}"'.format(config_name, file_path, linenum, attr_name, str_values[attr_name]))
+
+    elif type_str == PROPERTY_TYPE_STRING:
+        assert PROPERTY_MIN not in config_attrs
+        assert PROPERTY_MAX not in config_attrs
+
+        attr_name = PROPERTY_DEFAULT
+        str_values[attr_name] = config_attrs.get(attr_name, None)
+
+    elif type_str == PROPERTY_TYPE_LIST:
+        assert PROPERTY_MIN not in config_attrs
+        assert PROPERTY_MAX not in config_attrs
+
+        attr_name = PROPERTY_DEFAULT
+        str_values[attr_name] = config_attrs.get(attr_name, None)
+
     else:
-        errors.append(Exception("Found unknown {} type {} at {}:{}".format(BASE_BUILD_DEFINE_NAME, _type, file_path, linenum)))
-    
-    return errors
+        errors.append(Exception("Found unknown {} type {} at {}:{}".format(BASE_BUILD_DEFINE_NAME, type_str, file_path, linenum)))
 
+    return errors
 
 errors = []
 
