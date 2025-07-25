@@ -267,7 +267,7 @@ static inline uint _pio_encode_irq(bool relative, uint irq) {
  *
  * This is the equivalent of `WAIT <polarity> GPIO <gpio>`
  *
- * \note gpio here refers to the raw instruction encoding, which only supports 32 GPIOs. so, if you had a PIO
+ * \note gpio here refers to the raw instruction encoding, which only supports 32 GPIOs. So, if you had a PIO
  * program with `WAIT <polarity> GPIO 42` and a GPIO_BASE (see \ref pio_set_gpio_base) of 16, then you'd want to do
  * `pio_encode_wait_gpio(polarity, 42-16)` assuming you are using this function to craft instructions for \ref pio_sm_exec.
  *
