@@ -18,10 +18,6 @@
  * parameters.
  *
  * For fuller descriptions of the instructions in question see the "RP2040 Datasheet"
- *
- * NOTE: These are helper functions for the raw instruction encoding, and thus
- * only provide support for pins numbered 0-31. You should adjust your encoding
- * according to your expected GPIO_BASE (see \ref pio_set_gpio_base)
  */
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PIO_INSTRUCTIONS, Enable/disable assertions in the PIO instructions, type=bool, default=0, group=pio_instructions
@@ -271,8 +267,12 @@ static inline uint _pio_encode_irq(bool relative, uint irq) {
  *
  * This is the equivalent of `WAIT <polarity> GPIO <gpio>`
  *
+ * \note gpio here refers to the raw instruction encoding, which only supports 32 GPIOs. So, if you had a PIO
+ * program with `WAIT <polarity> GPIO 42` and a GPIO_BASE (see \ref pio_set_gpio_base) of 16, then you'd want to do
+ * `pio_encode_wait_gpio(polarity, 42-16)` assuming you are using this function to craft instructions for \ref pio_sm_exec.
+ *
  * \param polarity true for `WAIT 1`, false for `WAIT 0`
- * \param gpio The real GPIO number 0-31
+ * \param gpio The GPIO number 0-31 relative to the state machine's GPIO_BASE (see \ref pio_set_gpio_base)
  * \return The instruction encoding with 0 delay and no side set value
  * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
  */
