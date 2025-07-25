@@ -1,4 +1,4 @@
-# PICO_CMAKE_CONFIG: PICO_MBEDTLS_PATH, Path to an alternative version of mbedtls overriding the version in pico-sdk/lib/mbedtls. Can be passed to cmake or set in your environment, type=string, group=pico_mbedtls
+# PICO_CMAKE_CONFIG: PICO_MBEDTLS_PATH, Path to Mbed TLS. Can be passed to CMake or set in your environment if you do not wish to use the version included with the SDK, type=string, default=<PICO_SDK_PATH>/lib/mbedtls, group=pico_mbedtls
 if (DEFINED ENV{PICO_MBEDTLS_PATH} AND (NOT PICO_MBEDTLS_PATH))
     set(PICO_MBEDTLS_PATH $ENV{PICO_MBEDTLS_PATH})
     message("Using PICO_MBEDTLS_PATH from environment ('${PICO_MBEDTLS_PATH}')")

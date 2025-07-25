@@ -35,6 +35,7 @@ if (NOT TARGET pico_clib_interface)
     pico_mirrored_target_link_libraries(pico_llvm_libc_interface INTERFACE pico_stdio)
 
     if (NOT PICO_CLIB)
+        # PICO_CMAKE_CONFIG: PICO_CLIB, The C library to use e.g. newlib/picolibc/llvm_libc, type=string, default=based on PICO_COMPILER, group=build, docref=cmake-toolchain-config
         set(PICO_CLIB newlib)
     endif()
 

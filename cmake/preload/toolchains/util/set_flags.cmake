@@ -1,4 +1,6 @@
+# PICO_CMAKE_CONFIG: PICO_DEOPTIMIZED_DEBUG, Disable all compiler optimization in debug builds, type=bool, default=0, group=build, docref=cmake-toolchain-config
 option(PICO_DEOPTIMIZED_DEBUG "Build debug builds with -O0" 0)
+# PICO_CMAKE_CONFIG: PICO_DEBUG_INFO_IN_RELEASE, Include debug information in release builds, type=bool, default=1, group=build, docref=cmake-toolchain-config
 option(PICO_DEBUG_INFO_IN_RELEASE "Include debug info in release builds" 1)
 
 get_property(IS_IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)

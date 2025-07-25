@@ -138,7 +138,7 @@
 #define PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS 100
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS, Defines the default USB descriptors needed for USB communication, type=bool, default=1 if the application is not using tinyUSB directly, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS, Whether `pico_stdio_usb` provides the USB descriptors needed for USB communication, type=bool, default=1 if the application is not using tinyUSB directly, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS
 #if !LIB_TINYUSB_HOST && !LIB_TINYUSB_DEVICE
 #define PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS 1

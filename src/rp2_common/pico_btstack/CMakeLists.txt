@@ -1,4 +1,4 @@
-# PICO_CMAKE_CONFIG: PICO_BTSTACK_PATH, Path to an alternative version of btstack overriding the version in pico-sdk/lib/btstack. Can be passed to cmake or set in your environment, type=string, group=pico_btstack
+# PICO_CMAKE_CONFIG: PICO_BTSTACK_PATH, Path to BTstack. Can be passed to CMake or set in your environment if you do not wish to use the version included with the SDK, type=string, default=<PICO_SDK_PATH>/lib/btstack, group=pico_btstack
 if (DEFINED ENV{PICO_BTSTACK_PATH} AND (NOT PICO_BTSTACK_PATH))
     set(PICO_BTSTACK_PATH $ENV{PICO_BTSTACK_PATH})
     message("Using PICO_BTSTACK_PATH from environment ('${PICO_BTSTACK_PATH}')")

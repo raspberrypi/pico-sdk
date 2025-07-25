@@ -1,4 +1,4 @@
-# PICO_CMAKE_CONFIG: PICO_CYW43_DRIVER_PATH, Path to an alternative version of cyw43-driver overriding the version in pico-sdk/lib/cyw43-driver, type=string, group=pico_cyw43_driver
+# PICO_CMAKE_CONFIG: PICO_CYW43_DRIVER_PATH, Path to cyw43-driver. Can be passed to CMake or set in your environment if you do not wish to use the version included with the SDK, type=string, default=<PICO_SDK_PATH>/lib/cyw43-driver, group=pico_cyw43_driver
 if (DEFINED ENV{PICO_CYW43_DRIVER_PATH} AND (NOT PICO_CYW43_DRIVER_PATH))
     set(PICO_CYW43_DRIVER_PATH $ENV{PICO_CYW43_DRIVER_PATH})
     message("Using PICO_CYW43_DRIVER_PATH from environment ('${PICO_CYW43_DRIVER_PATH}')")
