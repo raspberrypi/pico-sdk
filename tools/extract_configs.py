@@ -47,7 +47,19 @@ BASE_BUILD_DEFINE_RE = re.compile(r'\b{}\b'.format(BASE_BUILD_DEFINE_NAME))
 CONFIG_RE = re.compile(r'//\s+{}:\s+(\w+),\s+([^,]+)(?:,\s+(.*))?$'.format(BASE_CONFIG_NAME))
 DEFINE_RE = re.compile(r'#define\s+(\w+)\s+(.+?)(\s*///.*)?$')
 
-ALLOWED_CONFIG_PROPERTIES = set(['type', 'default', 'min', 'max', 'enumvalues', 'group', 'advanced', 'depends'])
+PROPERTY_TYPE = 'type'
+PROPERTY_DEFAULT = 'default'
+PROPERTY_MIN = 'min'
+PROPERTY_MAX = 'max'
+PROPERTY_ENUMVALUES = 'enumvalues'
+PROPERTY_GROUP = 'group'
+PROPERTY_ADVANCED = 'advanced'
+PROPERTY_DEPENDS = 'depends'
+ALLOWED_CONFIG_PROPERTIES = set([PROPERTY_TYPE, PROPERTY_DEFAULT, PROPERTY_MIN, PROPERTY_MAX, PROPERTY_ENUMVALUES, PROPERTY_GROUP, PROPERTY_ADVANCED, PROPERTY_DEPENDS])
+
+PROPERTY_TYPE_INT = 'int'
+PROPERTY_TYPE_BOOL = 'bool'
+PROPERTY_TYPE_ENUM = 'enum'
 
 CHIP_NAMES = ["rp2040", "rp2350"]
 
@@ -57,9 +69,37 @@ chips_all_descriptions = defaultdict(dict)
 chips_all_defines = defaultdict(dict)
 
 
+def get_first_dict_key(some_dict):
+    return list(some_dict.keys())[0]
 
-def ValidateAttrs(config_name, config_attrs, file_path, linenum):
-    _type = config_attrs.get('type', 'int')
+def look_for_integer_define(config_name, attr_name, attr_str, file_path, linenum, applicable):
+    defined_str = None
+    if re.match('^\w+$', attr_str):
+        # See if we have a matching define
+        all_defines = chips_all_defines[applicable]
+        if attr_str in all_defines:
+            # There _may_ be multiple matching defines, but arbitrarily choose just one
+            defined_str = get_first_dict_key(all_defines[attr_str])
+        else:
+            if applicable == 'all':
+                # Look for it in the chip-specific defines
+                found_chips = []
+                missing_chips = []
+                for chip in CHIP_NAMES:
+                    all_defines = chips_all_defines[chip]
+                    if attr_str in all_defines:
+                        found_chips.append(chip)
+                        # There _may_ be multiple matching defines, but arbitrarily choose just one
+                        defined_str = get_first_dict_key(all_defines[attr_str])
+                    else:
+                        missing_chips.append(chip)
+                # Report if it's found for some chips but not others (but ignore if it's missing for all)
+                if found_chips and missing_chips:
+                    logger.info('{} at {}:{} has {} value "{}" which has a matching define for {} but not for {}'.format(config_name, file_path, linenum, attr_name, attr_str, found_chips, missing_chips))
+    return defined_str
+
+def ValidateAttrs(config_name, config_attrs, file_path, linenum, applicable):
+    type_str = config_attrs.get(PROPERTY_TYPE, PROPERTY_TYPE_INT)
     errors = []
 
     # Validate attrs
@@ -67,76 +107,69 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum):
         if key not in ALLOWED_CONFIG_PROPERTIES:
             errors.append(Exception('{} at {}:{} has unexpected property "{}"'.format(config_name, file_path, linenum, key)))
 
-    if _type == 'int':
-        assert 'enumvalues' not in config_attrs
-        _min = _max = _default = None
-        if config_attrs.get('min', None) is not None:
-            try:
-                value = config_attrs['min']
-                m = re.match(r'^(\d+)e(\d+)$', value.lower())
-                if m:
-                    _min = int(m.group(1)) * 10**int(m.group(2))
-                else:
-                    _min = int(value, 0)
-            except ValueError:
-                logger.info('{} at {}:{} has non-integer min value "{}"'.format(config_name, file_path, linenum, config_attrs['min']))
-        if config_attrs.get('max', None) is not None:
-            try:
-                value = config_attrs['max']
-                m = re.match(r'^(\d+)e(\d+)$', value.lower())
-                if m:
-                    _max = int(m.group(1)) * 10**int(m.group(2))
-                else:
-                    _max = int(value, 0)
-            except ValueError:
-                logger.info('{} at {}:{} has non-integer max value "{}"'.format(config_name, file_path, linenum, config_attrs['max']))
-        if config_attrs.get('default', None) is not None:
-            if '/' not in config_attrs['default']:
+    str_values = dict()
+    parsed_values = dict()
+    if type_str == PROPERTY_TYPE_INT:
+        assert PROPERTY_ENUMVALUES not in config_attrs
+
+        for attr_name in (PROPERTY_MIN, PROPERTY_MAX, PROPERTY_DEFAULT):
+            str_values[attr_name] = config_attrs.get(attr_name, None)
+            if str_values[attr_name] is not None:
                 try:
-                    value = config_attrs['default']
-                    m = re.match(r'^(\d+)e(\d+)$', value.lower())
+                    m = re.match(r'^(\d+)e(\d+)$', str_values[attr_name].lower())
                     if m:
-                        _default = int(m.group(1)) * 10**int(m.group(2))
+                        parsed_values[attr_name] = int(m.group(1)) * 10**int(m.group(2))
                     else:
-                        _default = int(value, 0)
+                        parsed_values[attr_name] = int(str_values[attr_name], 0)
                 except ValueError:
-                    logger.info('{} at {}:{} has non-integer default value "{}"'.format(config_name, file_path, linenum, config_attrs['default']))
-        if _min is not None and _max is not None:
-            if _min > _max:
-                errors.append(Exception('{} at {}:{} has min {} > max {}'.format(config_name, file_path, linenum, config_attrs['min'], config_attrs['max'])))
-        if _min is not None and _default is not None:
-            if _min > _default:
-                errors.append(Exception('{} at {}:{} has min {} > default {}'.format(config_name, file_path, linenum, config_attrs['min'], config_attrs['default'])))
-        if _default is not None and _max is not None:
-            if _default > _max:
-                errors.append(Exception('{} at {}:{} has default {} > max {}'.format(config_name, file_path, linenum, config_attrs['default'], config_attrs['max'])))
-    elif _type == 'bool':
+                    defined_str = look_for_integer_define(config_name, attr_name, str_values[attr_name], file_path, linenum, applicable)
+                    if defined_str is not None:
+                        try:
+                            m = re.match(r'^(\d+)e(\d+)$', str_values[attr_name].lower())
+                            if m:
+                                parsed_values[attr_name] = int(m.group(1)) * 10**int(m.group(2))
+                            else:
+                                parsed_values[attr_name] = int(defined_str, 0)
+                        except ValueError:
+                            logger.info('{} at {}:{} has {} value "{}" which resolves to the non-integer value "{}"'.format(config_name, file_path, linenum, attr_name, str_values[attr_name], defined_str))
+                    else:
+                        logger.info('{} at {}:{} has non-integer {} value "{}"'.format(config_name, file_path, linenum, attr_name, str_values[attr_name]))
+        for (small_attr, large_attr) in (
+            (PROPERTY_MIN, PROPERTY_MAX),
+            (PROPERTY_MIN, PROPERTY_DEFAULT),
+            (PROPERTY_DEFAULT, PROPERTY_MAX),
+        ):
+            if small_attr in parsed_values and large_attr in parsed_values and parsed_values[small_attr] > parsed_values[large_attr]:
+                errors.append(Exception('{} at {}:{} has {} {} > {} {}'.format(config_name, file_path, linenum, small_attr, str_values[small_attr], large_attr, str_values[large_attr])))
 
-        assert 'min' not in config_attrs
-        assert 'max' not in config_attrs
-        assert 'enumvalues' not in config_attrs
+    elif type_str == PROPERTY_TYPE_BOOL:
+        assert PROPERTY_MIN not in config_attrs
+        assert PROPERTY_MAX not in config_attrs
+        assert PROPERTY_ENUMVALUES not in config_attrs
 
-        _default = config_attrs.get('default', None)
-        if _default is not None:
-            if '/' not in _default:
-                if (_default not in ('0', '1')) and (_default not in all_config_names):
-                    logger.info('{} at {}:{} has non-integer default value "{}"'.format(config_name, file_path, linenum, config_attrs['default']))
+        attr_name = PROPERTY_DEFAULT
+        str_values[attr_name] = config_attrs.get(attr_name, None)
+        if str_values[attr_name] is not None:
+            if (str_values[attr_name] not in ('0', '1')) and (str_values[attr_name] not in all_config_names):
+                logger.info('{} at {}:{} has non-integer {} value "{}"'.format(config_name, file_path, linenum, attr_name, str_values[attr_name]))
 
-    elif _type == 'enum':
+    elif type_str == PROPERTY_TYPE_ENUM:
+        assert PROPERTY_ENUMVALUES in config_attrs
+        assert PROPERTY_MIN not in config_attrs
+        assert PROPERTY_MAX not in config_attrs
 
-        assert 'min' not in config_attrs
-        assert 'max' not in config_attrs
-        assert 'enumvalues' in config_attrs
+        attr_name = PROPERTY_ENUMVALUES
+        str_values[attr_name] = config_attrs[attr_name]
+        parsed_values[attr_name] = tuple(str_values[attr_name].split('|'))
 
-        _enumvalues = tuple(config_attrs['enumvalues'].split('|'))
-        _default = None
-        if config_attrs.get('default', None) is not None:
-            _default = config_attrs['default']
-        if _default is not None:
-            if _default not in _enumvalues:
-                errors.append(Exception('{} at {}:{} has default value {} which isn\'t in list of enumvalues {}'.format(config_name, file_path, linenum, config_attrs['default'], config_attrs['enumvalues'])))
+        attr_name = PROPERTY_DEFAULT
+        str_values[attr_name] = config_attrs.get(attr_name, None)
+        if str_values[attr_name] is not None:
+            if str_values[attr_name] not in _enumvalues:
+                errors.append(Exception('{} at {}:{} has {} value {} which isn\'t in list of {} {}'.format(config_name, file_path, linenum, attr_name, str_values[attr_name], PROPERTY_ENUMVALUES, str_values[PROPERTY_ENUMVALUES])))
+
     else:
-        errors.append(Exception("Found unknown {} type {} at {}:{}".format(BASE_CONFIG_NAME, _type, file_path, linenum)))
+        errors.append(Exception("Found unknown {} type {} at {}:{}".format(BASE_CONFIG_NAME, type_str, file_path, linenum)))
 
     return errors
 
@@ -256,7 +289,7 @@ for applicable, all_configs in chips_all_configs.items():
         file_path = os.path.join(scandir, config_obj['filename'])
         linenum = config_obj['line_number']
 
-        errors.extend(ValidateAttrs(config_name, config_obj['attrs'], file_path, linenum))
+        errors.extend(ValidateAttrs(config_name, config_obj['attrs'], file_path, linenum, applicable))
 
         # Check that default values match up
         if 'default' in config_obj['attrs']:
@@ -267,7 +300,7 @@ for applicable, all_configs in chips_all_configs.items():
                     if '/' in config_default or ' ' in config_default:
                         continue
                     # There _may_ be multiple matching defines, but arbitrarily display just one in the error message
-                    first_define_value = list(defines_obj.keys())[0]
+                    first_define_value = get_first_dict_key(defines_obj)
                     first_define_file_path, first_define_linenum = defines_obj[first_define_value]
                     errors.append(Exception('Found {} at {}:{} with a default of {}, but #define says {} (at {}:{})'.format(config_name, file_path, linenum, config_default, first_define_value, first_define_file_path, first_define_linenum)))
             else:
