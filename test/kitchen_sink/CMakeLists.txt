@@ -62,7 +62,6 @@ set(KITCHEN_SINK_LIBS
     pico_time
     pico_unique_id
     pico_util
-    pico_status_led
 )
 
 set(KITCHEN_SINK_NO_HEADER_LIBS
