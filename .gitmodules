@@ -6,7 +6,7 @@
 	url = https://github.com/georgerobotics/cyw43-driver.git
 [submodule "lib/lwip"]
 	path = lib/lwip
-	url = https://github.com/lwip-tcpip/lwip.git
+	url = https://github.com/el-bert0/lwip.git
 [submodule "lib/mbedtls"]
 	path = lib/mbedtls
 	url = https://github.com/Mbed-TLS/mbedtls.git
