@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_rand",
+    srcs = ["rand.c"],
+    hdrs = ["include/pico/rand.h"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = [
+        "//src/host/hardware_sync",
+        "//src/host/hardware_timer",
+    ],
+)
