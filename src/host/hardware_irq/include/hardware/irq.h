@@ -24,7 +24,8 @@
 #endif
 
 #include "pico.h"
-#include "hardware/regs/intctrl.h"
+// TODO: No hardware/regs/intctrl.h for host yet.
+// #include "hardware/regs/intctrl.h"
 
 /** \file irq.h
  *  \defgroup hardware_irq hardware_irq
