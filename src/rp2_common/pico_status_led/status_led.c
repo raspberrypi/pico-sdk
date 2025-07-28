@@ -6,7 +6,7 @@
 
 #include "pico/status_led.h"
 
-#if PICO_STATUS_LED_AVAILABLE && defined(CYW43_WL_GPIO_LED_PIN)
+#if PICO_STATUS_LED_AVAILABLE && defined(CYW43_WL_GPIO_LED_PIN) && !defined(PICO_DEFAULT_LED_PIN)
 #define STATUS_LED_USING_WL_GPIO 1
 #else
 #define STATUS_LED_USING_WL_GPIO 0
@@ -18,7 +18,7 @@
 #define STATUS_LED_USING_GPIO 0
 #endif
 
-#if PICO_COLORED_STATUS_LED_HW_AVAILABLE && defined(PICO_DEFAULT_WS2812_PIN)
+#if PICO_COLORED_STATUS_LED_AVAILABLE && defined(PICO_DEFAULT_WS2812_PIN)
 #define COLORED_STATUS_LED_USING_WS2812_PIO 1
 #else
 #define COLORED_STATUS_LED_USING_WS2812_PIO 0
@@ -127,8 +127,8 @@ static bool status_led_init_internal(__unused struct async_context *context) {
 
     // ---- colored status LED ----
 #if COLORED_STATUS_LED_USING_WS2812_PIO
-    if (pio_claim_free_sm_and_add_program_for_gpio_range(&ws2812_program, &pio, &sm, &offset, PICO_DEFAULT_WS2812_PIN, 1, true))) {
-        ws2812_program_init(pio, sm, offset, PICO_DEFAULT_WS2812_PIN, PICO_STATUS_LED_WS2812_FREQ, PICO_COLORED_STATUS_LED_USES_WRGB);
+    if (pio_claim_free_sm_and_add_program_for_gpio_range(&ws2812_program, &pio, &sm, &offset, PICO_DEFAULT_WS2812_PIN, 1, true)) {
+        ws2812_program_init(pio, sm, offset, PICO_DEFAULT_WS2812_PIN, PICO_COLORED_STATUS_LED_WS2812_FREQ, PICO_COLORED_STATUS_LED_USES_WRGB);
     } else {
         status_led_deinit();
         return false;
@@ -152,7 +152,7 @@ bool status_led_init_with_context(struct async_context *context) {
     return status_led_init_internal(context);
 }
 
-void pico_status_led_deinit(void) {
+void status_led_deinit(void) {
 #if STATUS_LED_USING_GPIO
     gpio_deinit(PICO_DEFAULT_LED_PIN);
 #elif STATUS_LED_USING_WL_GPIO

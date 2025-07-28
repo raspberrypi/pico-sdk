@@ -72,10 +72,10 @@ extern "C" {
 #define PICO_COLORED_STATUS_LED_COLOR_FROM_WRGB(w, r, g, b) (((w) << 24) | ((r) << 16) | ((g) << 8) | (b))
 #endif
 
-// PICO_CONFIG: PICO_DEFUALT_COLORED_STATUS_LED_ON_COLOR, the default pixel color value of the colored status LED when it is on, type=int, group=pico_status_led
-#ifndef PICO_DEFUALT_COLORED_STATUS_LED_ON_COLOR
+// PICO_CONFIG: PICO_DEFAULT_COLORED_STATUS_LED_ON_COLOR, the default pixel color value of the colored status LED when it is on, type=int, group=pico_status_led
+#ifndef PICO_DEFAULT_COLORED_STATUS_LED_ON_COLOR
 #if PICO_COLORED_STATUS_LED_USES_WRGB
-#define PICO_DEFUALT_COLORED_STATUS_LED_ON_COLOR PICO_COLORED_STATUS_LED_COLOR_FROM_WRGB(0xaa, 0, 0, 0)
+#define PICO_DEFAULT_COLORED_STATUS_LED_ON_COLOR PICO_COLORED_STATUS_LED_COLOR_FROM_WRGB(0xaa, 0, 0, 0)
 #else
 #define PICO_DEFAULT_COLORED_STATUS_LED_ON_COLOR PICO_COLORED_STATUS_LED_COLOR_FROM_RGB(0xaa, 0xaa, 0xaa)
 #endif
@@ -118,7 +118,7 @@ bool status_led_init_with_context(struct async_context *context);
  * \return true if the colored status LED API is available and expected to produce visible results
  * \sa PICO_COLORED_STATUS_LED_AVAILABLE
  */
-static inline bool colored_status_led_supported() {
+static inline bool colored_status_led_supported(void) {
     return PICO_COLORED_STATUS_LED_AVAILABLE;
 }
 
@@ -127,7 +127,7 @@ static inline bool colored_status_led_supported() {
  * \return true if the olored status LED is being used for the non-colored `status_led_` API
  * \sa PICO_STATUS_LED_VIA_COLORED_STATUS_LED
  */
-static inline bool status_led_via_colored_status_led() {
+static inline bool status_led_via_colored_status_led(void) {
     return PICO_STATUS_LED_VIA_COLORED_STATUS_LED;
 }
 
@@ -138,7 +138,7 @@ static inline bool status_led_via_colored_status_led() {
  * \sa PICO_STATUS_LED_AVAILABLE
  * \sa PICO_STATUS_LED_VIA_COLORED_STATUS_LED
  */
-static inline bool status_led_supported() {
+static inline bool status_led_supported(void) {
     if (status_led_via_colored_status_led()) {
         return colored_status_led_supported();
     }
@@ -162,7 +162,7 @@ bool colored_status_led_set_state(bool led_on);
  *
  * \return true if the colored status LED is on, or false if the colored status LED is off
  */
-bool colored_status_led_get_state();
+bool colored_status_led_get_state(void);
     
 /*! \brief Ensure the colored status LED is on, with the specified color
  *  \ingroup pico_status_led
