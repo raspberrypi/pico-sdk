@@ -28,7 +28,7 @@ struct async_context;
 extern "C" {
 #endif
 
-// PICO_CONFIG: PICO_STATUS_LED_AVAILABLE, Indicate whether a non-colored status LED is availble, type=bool, default=1 if PICO_DEFAULT_LED_PIN or CYW43_WL_GPIO_LED_PIN is defined; may be set by the user to 0 to not use either even if they are available, group=pico_status_led
+// PICO_CONFIG: PICO_STATUS_LED_AVAILABLE, Indicate whether a non-colored status LED is available, type=bool, default=1 if PICO_DEFAULT_LED_PIN or CYW43_WL_GPIO_LED_PIN is defined; may be set by the user to 0 to not use either even if they are available, group=pico_status_led
 #ifndef PICO_STATUS_LED_AVAILABLE
 #if defined(PICO_DEFAULT_LED_PIN) || defined(CYW43_WL_GPIO_LED_PIN)
 #define PICO_STATUS_LED_AVAILABLE 1
@@ -37,7 +37,7 @@ extern "C" {
 #endif
 #endif
 
-// PICO_CONFIG: PICO_COLORED_STATUS_LED_AVAILABLE, Indicate whether a colored status LED is availble, type=bool, default=1 if PICO_DEFAULT_WS2812_PIN is defined; may be set by the user to 0 to not use either even if available, group=pico_status_led
+// PICO_CONFIG: PICO_COLORED_STATUS_LED_AVAILABLE, Indicate whether a colored status LED is available, type=bool, default=1 if PICO_DEFAULT_WS2812_PIN is defined; may be set by the user to 0 to not use the colored status LED even if available, group=pico_status_led
 #ifndef PICO_COLORED_STATUS_LED_AVAILABLE
 #ifdef PICO_DEFAULT_WS2812_PIN
 #define PICO_COLORED_STATUS_LED_AVAILABLE 1
@@ -85,9 +85,12 @@ extern "C" {
  * \ingroup pico_status_led
  *
  * Initialize the status LED(s) and the resources they need before use. On some devices (e.g. Pico W, Pico 2 W) accessing
- * the status LED requires talking to the WiFi chip, which requires an \ref async_context. This method will create one for you,
- * however an application only one has a single \ref async_context instance to talk to the WiFi chip, you should use \ref
- * status_led_init_with_context instead and pass it the \ref async_context already created within your application
+ * the status LED requires talking to the WiFi chip, which requires an \ref async_context.
+ * This method will create an async_context for you.
+ *
+ * However an application should only use a single \ref async_context instance to talk to the WiFi chip.
+ * If the application already has an async context (e.g. created by cyw43_arch_init) you should use \ref
+ * status_led_init_with_context instead and pass it the \ref async_context already created by your application
  *
  * \note: You must call this function (or \ref status_led_init_with_context) before using any other pico_status_led functions.
  *
