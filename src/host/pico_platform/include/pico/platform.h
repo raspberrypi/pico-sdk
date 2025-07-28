@@ -128,6 +128,12 @@ void __noreturn panic_unsupported();
 
 void __noreturn panic(const char *fmt, ...);
 
+#ifdef NDEBUG
+#define panic_compact(...) panic(__VA_ARGS__)
+#else
+#define panic_compact(...) panic("")
+#endif
+
 // arggggghhhh there is a weak function called sem_init used by SDL
 #define sem_init sem_init_alternative
 

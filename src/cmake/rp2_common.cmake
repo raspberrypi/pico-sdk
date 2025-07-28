@@ -16,6 +16,7 @@ pico_add_subdirectory(common/pico_usb_reset_interface_headers)
 
 # PICO_CMAKE_CONFIG: PICO_BARE_METAL, Flag to exclude anything except base headers from the build, type=bool, default=0, group=build
 if (NOT PICO_BARE_METAL)
+    pico_add_subdirectory(common/pico_async_context)
     pico_add_subdirectory(common/pico_bit_ops_headers)
     pico_add_subdirectory(common/pico_binary_info)
     pico_add_subdirectory(common/pico_divider_headers)
@@ -124,7 +125,6 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(rp2_common/pico_i2c_slave)
 
     # networking libraries - note dependency order is important
-    pico_add_subdirectory(rp2_common/pico_async_context)
     pico_add_subdirectory(rp2_common/pico_btstack)
     pico_add_subdirectory(rp2_common/pico_cyw43_driver)
     pico_add_subdirectory(rp2_common/pico_mbedtls)
