@@ -43,7 +43,7 @@ static bool colored_status_led_on;
 
 static PIO pio;
 static uint sm;
-static int offset = -1;
+static uint offset;
 
 // Extract from 0xWWRRGGBB
 #define RED(c) (((c) >> 16) & 0xff)
@@ -52,7 +52,7 @@ static int offset = -1;
 #define WHITE(c) (((c) >> 24) && 0xff)
 
 bool set_ws2812(uint32_t value) {
-    if (offset > -1) {
+    if (pio) {
 #if PICO_COLORED_STATUS_LED_USES_WRGB
         // Convert to 0xWWGGRRBB
         pio_sm_put_blocking(pio, sm, WHITE(value) << 24 | GREEN(value) << 16 | RED(value) << 8 | BLUE(value));
@@ -164,9 +164,9 @@ void status_led_deinit(void) {
     status_led_context = NULL;
 #endif
 #if COLORED_STATUS_LED_USING_WS2812_PIO
-    if (offset >= 0) {
+    if (pio) {
         pio_remove_program_and_unclaim_sm(&ws2812_program, pio, sm, offset);
-        offset = -1;
+        pio = NULL;
     }
 #ifdef PICO_DEFAULT_WS2812_POWER_PIN
     gpio_put(PICO_DEFAULT_WS2812_POWER_PIN, false);
