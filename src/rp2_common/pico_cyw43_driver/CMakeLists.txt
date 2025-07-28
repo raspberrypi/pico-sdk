@@ -41,7 +41,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     target_sources(pico_cyw43_driver INTERFACE
             cyw43_driver.c)
     target_include_directories(pico_cyw43_driver_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-    pico_mirrored_target_link_libraries(pico_cyw43_driver INTERFACE cyw43_driver)
+    pico_mirrored_target_link_libraries(pico_cyw43_driver INTERFACE cyw43_driver pico_unique_id)
 
     # cyw43_driver_picow is cyw43_driver plus Pico W specific bus implementation
     pico_add_library(cyw43_driver_picow NOFLAG)

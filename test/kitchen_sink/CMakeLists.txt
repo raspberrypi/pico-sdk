@@ -55,6 +55,7 @@ set(KITCHEN_SINK_LIBS
     pico_runtime
     pico_runtime_init
     pico_sha256
+    pico_status_led
     pico_stdio
     pico_stdlib
     pico_sync

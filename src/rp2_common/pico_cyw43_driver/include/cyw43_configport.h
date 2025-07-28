@@ -211,6 +211,11 @@ void cyw43_post_poll_hook(void);
 #define CYW43_PRINTF(...) (void)0
 #endif
 
+// PICO_CONFIG: CYW43_LWIP_DEFAULT, Sets the default value of CYW43_LWIP if it's undefined. CYW43_LWIP defines if cyw43-driver uses LwIP. The default behavior - if it's not defined anywhere - is to set it to 1 and cyw43-driver will use lwIP requiring you to provide an lwipopts.h header file. You can set CYW43_LWIP_DEFAULT to change the default to 0 and avoid using lwIP if CYW43_LWIP is undefined, type=bool, group=pico_cyw43_driver
+#if !defined CYW43_LWIP && defined CYW43_LWIP_DEFAULT
+#define CYW43_LWIP CYW43_LWIP_DEFAULT
+#endif
+
 #ifdef __cplusplus
 }
 #endif

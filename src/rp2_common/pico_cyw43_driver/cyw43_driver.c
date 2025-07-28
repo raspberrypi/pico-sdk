@@ -275,20 +275,20 @@ void cyw43_delay_us(uint32_t us) {
 }
 
 #if !CYW43_LWIP
-static void no_lwip_fail() {
+static void no_lwip_fail(void) {
     panic("cyw43 has no ethernet interface");
 }
-void __attribute__((weak)) cyw43_cb_tcpip_init(cyw43_t *self, int itf) {
+void __attribute__((weak)) cyw43_cb_tcpip_init(__unused cyw43_t *self, __unused int itf) {
 }
-void __attribute__((weak)) cyw43_cb_tcpip_deinit(cyw43_t *self, int itf) {
+void __attribute__((weak)) cyw43_cb_tcpip_deinit(__unused cyw43_t *self, __unused int itf) {
 }
-void __attribute__((weak)) cyw43_cb_tcpip_set_link_up(cyw43_t *self, int itf) {
+void __attribute__((weak)) cyw43_cb_tcpip_set_link_up(__unused cyw43_t *self, __unused int itf) {
     no_lwip_fail();
 }
-void __attribute__((weak)) cyw43_cb_tcpip_set_link_down(cyw43_t *self, int itf) {
+void __attribute__((weak)) cyw43_cb_tcpip_set_link_down(__unused cyw43_t *self, __unused int itf) {
     no_lwip_fail();
 }
-void __attribute__((weak)) cyw43_cb_process_ethernet(void *cb_data, int itf, size_t len, const uint8_t *buf) {
+void __attribute__((weak)) cyw43_cb_process_ethernet(__unused void *cb_data, __unused int itf, __unused size_t len, __unused const uint8_t *buf) {
     no_lwip_fail();
 }
 #endif
