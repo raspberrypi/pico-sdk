@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_status_led",
+    srcs = ["status_led.c"],
+    hdrs = ["include/pico/status_led.h"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = [
+        "//src/host/hardware_gpio",
+    ],
+)
+
