@@ -20,11 +20,16 @@ cc_library(
         "include/pico/async_context_base.h",
     ],
     includes = ["include"],
-    target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/common/pico_time",
-        "//src/rp2_common:pico_platform",
-    ],
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/pico_platform",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common:pico_platform",
+        ],
+    }),
 )
 
 cc_library(
@@ -32,7 +37,7 @@ cc_library(
     srcs = ["async_context_freertos.c"],
     hdrs = ["include/pico/async_context_freertos.h"],
     includes = ["include"],
-    target_compatible_with = compatible_with_rp2() + incompatible_with_config(
+    target_compatible_with = incompatible_with_config(
         "//bazel/constraint:pico_freertos_unset",
     ),
     deps = [
@@ -40,9 +45,16 @@ cc_library(
         "//bazel/config:PICO_FREERTOS_LIB",
         "//src/common/pico_sync",
         "//src/common/pico_time",
-        "//src/rp2_common:pico_platform",
-        "//src/rp2_common/hardware_irq",
-    ],
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/pico_platform",
+            "//src/host/hardware_irq",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common:pico_platform",
+            "//src/rp2_common/hardware_irq",
+        ],
+    }),
 )
 
 cc_library(
@@ -50,13 +62,18 @@ cc_library(
     srcs = ["async_context_poll.c"],
     hdrs = ["include/pico/async_context_poll.h"],
     includes = ["include"],
-    target_compatible_with = compatible_with_rp2(),
     deps = [
         ":pico_async_context_base",
         "//src/common/pico_sync",
         "//src/common/pico_time",
-        "//src/rp2_common:pico_platform",
-    ],
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/pico_platform",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common:pico_platform",
+        ],
+    }),
 )
 
 cc_library(
@@ -64,13 +81,20 @@ cc_library(
     srcs = ["async_context_threadsafe_background.c"],
     hdrs = ["include/pico/async_context_threadsafe_background.h"],
     includes = ["include"],
-    target_compatible_with = compatible_with_rp2(),
     deps = [
         ":pico_async_context_base",
         "//src/common/pico_sync",
         "//src/common/pico_time",
-        "//src/rp2_common:pico_platform",
-        "//src/rp2_common/hardware_irq",
-        "//src/rp2_common/pico_multicore",
-    ],
+    ] + select({
+        "//bazel/constraint:host": [
+            "//src/host/pico_platform",
+            "//src/host/hardware_irq",
+            "//src/host/pico_multicore",
+        ],
+        "//conditions:default": [
+            "//src/rp2_common:pico_platform",
+            "//src/rp2_common/hardware_irq",
+            "//src/rp2_common/pico_multicore",
+        ],
+    }),
 )

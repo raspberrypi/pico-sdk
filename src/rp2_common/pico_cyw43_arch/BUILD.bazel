@@ -75,7 +75,7 @@ _CONFIGURATIONS = [
         ),
         deps = [
             "//src/rp2_common:pico_platform",
-            "//src/rp2_common/pico_async_context:pico_async_context_{}".format(kind),
+            "//src/common/pico_async_context:pico_async_context_{}".format(kind),
             "//src/rp2_common/pico_cyw43_driver",
             "//src/rp2_common/pico_unique_id",
         ] + (
