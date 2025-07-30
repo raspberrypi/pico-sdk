@@ -79,11 +79,11 @@ _CONFIGURATIONS = [
             "//src/rp2_common/pico_cyw43_driver",
             "//src/rp2_common/pico_unique_id",
         ] + (
-            ["//src/rp2_common/pico_lwip:pico_lwip_freertos"] if kind == "freertos" and use_lwip else []
+            ["//src/common/pico_lwip:pico_lwip_freertos"] if kind == "freertos" and use_lwip else []
         ) + (
-            ["//src/rp2_common/pico_lwip:pico_lwip_nosys"] if kind != "freertos" and use_lwip else []
+            ["//src/common/pico_lwip:pico_lwip_nosys"] if kind != "freertos" and use_lwip else []
         ) + (
-            ["//src/rp2_common/pico_lwip"] if use_lwip else []
+            ["//src/common/pico_lwip"] if use_lwip else []
         ),
     )
     for kind, use_lwip in _CONFIGURATIONS

@@ -103,8 +103,12 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             ${PICO_LWIP_PATH}/src/netif/ethernet.c
             ${PICO_LWIP_PATH}/src/netif/bridgeif.c
             ${PICO_LWIP_PATH}/src/netif/bridgeif_fdb.c
+            )
+    if (PICO_ON_DEVICE)
+    target_sources(pico_lwip_netif INTERFACE
             ${PICO_LWIP_PATH}/src/netif/slipif.c
             )
+    endif()
 
     # 6LoWPAN
     pico_add_library(pico_lwip_sixlowpan NOFLAG)

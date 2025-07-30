@@ -12,10 +12,10 @@ cc_library(
         "src/include",
     ],
     visibility = [
-        "@pico-sdk//src/rp2_common/pico_lwip:__pkg__",
+        "@pico-sdk//src/common/pico_lwip:__pkg__",
     ],
     deps = [
-        "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_config",
+        "@pico-sdk//src/common/pico_lwip:pico_lwip_config",
     ],
 )
 
