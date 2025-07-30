@@ -294,7 +294,7 @@ cc_library(
     includes = ["platform/lwip"],
     deps = [
         ":pico_btstack_base_headers",
-        "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_nosys",
+        "@pico-sdk//src/common/pico_lwip:pico_lwip_nosys",
     ],
 )
 
@@ -315,7 +315,7 @@ cc_library(
     ],
     deps = [
         ":pico_btstack_base_headers",
-        "@pico-sdk//src/rp2_common/pico_lwip:pico_lwip_freertos",
+        "@pico-sdk//src/common/pico_lwip:pico_lwip_freertos",
     ],
 )
 

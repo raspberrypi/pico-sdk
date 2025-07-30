@@ -36,7 +36,7 @@ cc_library(
     ] + select({
         "@pico-sdk//bazel/constraint:pico_lwip_config_unset": [],
         "//conditions:default": [
-            "@pico-sdk//src/rp2_common/pico_lwip",
+            "@pico-sdk//src/common/pico_lwip",
         ],
     }),
 )

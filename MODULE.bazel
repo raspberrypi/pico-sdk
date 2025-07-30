@@ -113,7 +113,7 @@ new_git_repository(
 # TODO: Provide lwip as a proper Bazel module.
 new_git_repository(
     name = "lwip",
-    build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
+    build_file = "//src/common/pico_lwip:lwip.BUILD",
     commit = "77dcd25a72509eb83f72b033d219b1d40cd8eb95",  # keep-in-sync-with-submodule: lib/lwip
     remote = "https://github.com/lwip-tcpip/lwip.git",
 )
