@@ -123,6 +123,8 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(rp2_common/pico_stdio_usb)
     pico_add_subdirectory(rp2_common/pico_i2c_slave)
 
+    pico_add_subdirectory(rp2_common/pico_filesystem)
+
     # networking libraries - note dependency order is important
     pico_add_subdirectory(rp2_common/pico_async_context)
     pico_add_subdirectory(rp2_common/pico_btstack)
