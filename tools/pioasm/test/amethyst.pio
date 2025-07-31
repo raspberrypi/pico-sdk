@@ -45,6 +45,16 @@ wait gpio 40
 .mov_status txfifo < 12
 .mov_status irq next set 3
 
+.program wrap
+decrement:
+    jmp x--, .+1
+skip:
+    .wrap .+1
+delay:
+    jmp x--, .
+jump:
+    .word (.-1) [2]
+
 .program python
 .pio_version 1
 wait 0 jmppin
