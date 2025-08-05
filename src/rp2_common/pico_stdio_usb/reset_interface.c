@@ -7,13 +7,13 @@
 
 #if !defined(LIB_TINYUSB_HOST) || (defined(LIB_TINYUSB_HOST) && defined(CFG_TUH_RPI_PIO_USB))
 #include "pico/bootrom.h"
+#include "pico/stdio_usb/reset_interface.h"
 
 #if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE && !(PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL || PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT)
 #warning PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE has been selected but neither PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL nor PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT have been selected.
 #endif
 
 #if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
-#include "pico/stdio_usb/reset_interface.h"
 #include "hardware/watchdog.h"
 #include "device/usbd_pvt.h"
 
@@ -24,7 +24,6 @@ static uint8_t itf_num;
 #define BOS_TOTAL_LEN      (TUD_BOS_DESC_LEN + TUD_BOS_MICROSOFT_OS_DESC_LEN)
 
 #define MS_OS_20_DESC_LEN  166
-#define USBD_ITF_RPI_RESET 2
 
 uint8_t const desc_bos[] =
 {
@@ -48,7 +47,7 @@ static const uint8_t desc_ms_os_20[] =
     U16_TO_U8S_LE(0x000A), U16_TO_U8S_LE(MS_OS_20_SET_HEADER_DESCRIPTOR), U32_TO_U8S_LE(0x06030000), U16_TO_U8S_LE(MS_OS_20_DESC_LEN),
 
     // Function Subset header: length, type, first interface, reserved, subset length
-    U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_FUNCTION), USBD_ITF_RPI_RESET, 0, U16_TO_U8S_LE(0x009C),
+    U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_FUNCTION), PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF, 0, U16_TO_U8S_LE(MS_OS_20_DESC_LEN-0x000A),
 
     // MS OS 2.0 Compatible ID descriptor: length, type, compatible ID, sub compatible ID
     U16_TO_U8S_LE(0x0014), U16_TO_U8S_LE(MS_OS_20_FEATURE_COMPATBLE_ID), 'W', 'I', 'N', 'U', 'S', 'B', 0x00, 0x00,
