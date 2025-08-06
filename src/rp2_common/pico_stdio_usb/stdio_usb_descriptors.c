@@ -27,7 +27,7 @@
  */
 
 #include "pico/stdio_usb.h"
-#include "pico/stdio_usb/reset_interface.h"
+#include "pico/usb_reset_interface.h"
 #include "pico/unique_id.h"
 #include "tusb.h"
 

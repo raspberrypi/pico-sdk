@@ -1,19 +1,4 @@
 if (TARGET tinyusb_device_unmarked)
-    pico_add_library(pico_stdio_usb_reset_interface)
-
-    target_include_directories(pico_stdio_usb_reset_interface_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-
-    target_sources(pico_stdio_usb_reset_interface INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}/reset_interface.c
-    )
-
-    pico_mirrored_target_link_libraries(pico_stdio_usb_reset_interface INTERFACE
-        pico_usb_reset_interface
-    )
-    target_link_libraries(pico_stdio_usb_reset_interface INTERFACE
-        tinyusb_device_unmarked
-    )
-
     pico_add_library(pico_stdio_usb)
 
     target_include_directories(pico_stdio_usb_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
@@ -27,7 +12,7 @@ if (TARGET tinyusb_device_unmarked)
         pico_stdio
         pico_time
         pico_unique_id
-        pico_stdio_usb_reset_interface
+        pico_usb_reset_interface
     )
     target_link_libraries(pico_stdio_usb INTERFACE
         tinyusb_device_unmarked
