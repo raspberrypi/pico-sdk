@@ -8,6 +8,6 @@
 #define _PICO_STDIO_USB_RESET_INTERFACE_H
 
 // definitions have been moved here
-#include "pico/usb_reset_interface_constants.h"
+#include "pico/usb_reset_interface.h"
 
 #endif

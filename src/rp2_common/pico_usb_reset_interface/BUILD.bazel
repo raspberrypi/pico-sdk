@@ -1,0 +1,21 @@
+load("//bazel:defs.bzl", "compatible_with_config", "compatible_with_rp2", "incompatible_with_config")
+load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_usb_reset_interface",
+    srcs = [
+        "usb_reset_interface.c",
+    ],
+    defines = [
+        "LIB_PICO_USB_RESET_INTERFACE=1",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_usb_reset_interface_headers",
+        "//bazel/config:PICO_TINYUSB_LIB",
+        "//src/rp2_common/hardware_watchdog",
+        "//src/rp2_common/pico_bootrom",
+    ],
+)
