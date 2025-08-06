@@ -79,7 +79,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF, If vendor reset interface is included, the USB interface number for the reset interface, type=int, default=2 when using default USB descriptors, undefined otherwise, group=pico_stdio_usb
+// PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF, If vendor reset interface is included the USB interface number for the reset interface, type=int, default=2 when using default USB descriptors, undefined otherwise, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF
 #if PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS
 #define PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF 2
