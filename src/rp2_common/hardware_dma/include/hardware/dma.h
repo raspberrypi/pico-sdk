@@ -554,7 +554,7 @@ static inline uint32_t dma_encode_transfer_count(uint transfer_count) {
  * \sa dma_channel_transfer_from_buffer_now
  * \sa dma_channel_transfer_to_buffer_now
  */
-static inline uint32_t dma_encode_transfer_count_with_self_trigger(uint transfer_count) {
+static inline uint32_t dma_encode_transfer_count_with_self_trigger(__unused uint transfer_count) {
 #if PICO_RP2040
     panic_unsupported();
 #else
