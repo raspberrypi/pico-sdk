@@ -251,6 +251,7 @@ void pio_sm_set_pins_internal(PIO pio, uint sm, uint32_t pins) {
 
 #ifndef pio_sm_set_pins_internal
 void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
+    check_pio_pin_mask(pio, sm, pins);
 #if PICO_PIO_USE_GPIO_BASE
     pins >>= pio_get_gpio_base(pio);
 #endif
@@ -287,6 +288,7 @@ void pio_sm_set_pins_with_mask_internal(PIO pio, uint sm, uint32_t pin_values, u
 
 #ifndef pio_sm_set_pins_with_mask_internal
 void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pin_values, uint32_t pin_mask) {
+    check_pio_pin_mask(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
     pin_values >>= pio_get_gpio_base(pio);
     pin_mask >>= pio_get_gpio_base(pio);
@@ -324,6 +326,7 @@ void pio_sm_set_pindirs_with_mask_internal(PIO pio, uint sm, uint32_t pindirs, u
 
 #ifndef pio_sm_set_pindirs_with_mask_internal
 void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t pin_mask) {
+    check_pio_pin_mask(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
     pindirs >>= pio_get_gpio_base(pio);
     pin_mask >>= pio_get_gpio_base(pio);
@@ -333,6 +336,7 @@ void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t p
 #endif
 
 void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pindirs, uint64_t pin_mask) {
+    check_pio_pin_mask64(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
     pindirs >>= pio_get_gpio_base(pio);
     pin_mask >>= pio_get_gpio_base(pio);
