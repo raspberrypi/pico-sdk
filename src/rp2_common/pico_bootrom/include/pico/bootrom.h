@@ -1010,17 +1010,6 @@ static inline intptr_t rom_set_rom_callback(uint callback_num, bootrom_api_callb
     return func(callback_num, funcptr);
 }
 
-#define BOOT_TYPE_NORMAL     0
-#define BOOT_TYPE_BOOTSEL    2
-#define BOOT_TYPE_RAM_IMAGE  3
-#define BOOT_TYPE_FLASH_UPDATE 4
-
-// values 8-15 are secure only
-#define BOOT_TYPE_PC_SP      0xd
-
-// ORed in if a bootloader chained into the image
-#define BOOT_TYPE_CHAINED_FLAG 0x80
-
 /*!
  * \brief Get system information
  * \ingroup pico_bootrom
