@@ -22,7 +22,7 @@ static uint8_t itf_num;
 // Support for Microsoft OS 2.0 descriptor
 #define BOS_TOTAL_LEN      (TUD_BOS_DESC_LEN + TUD_BOS_MICROSOFT_OS_DESC_LEN)
 
-#define MS_OS_20_DESC_LEN  166
+#define MS_OS_20_DESC_LEN  (RPI_RESET_MS_OS_20_DESC_LEN + 0x0A)
 
 uint8_t const desc_bos[] =
 {
@@ -45,27 +45,7 @@ static const uint8_t desc_ms_os_20[] =
     // Set header: length, type, windows version, total length
     U16_TO_U8S_LE(0x000A), U16_TO_U8S_LE(MS_OS_20_SET_HEADER_DESCRIPTOR), U32_TO_U8S_LE(0x06030000), U16_TO_U8S_LE(MS_OS_20_DESC_LEN),
 
-    // Function Subset header: length, type, first interface, reserved, subset length
-    U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_FUNCTION), PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF, 0, U16_TO_U8S_LE(MS_OS_20_DESC_LEN-0x000A),
-
-    // MS OS 2.0 Compatible ID descriptor: length, type, compatible ID, sub compatible ID
-    U16_TO_U8S_LE(0x0014), U16_TO_U8S_LE(MS_OS_20_FEATURE_COMPATBLE_ID), 'W', 'I', 'N', 'U', 'S', 'B', 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // sub-compatible
-    
-    // MS OS 2.0 Registry property descriptor: length, type
-    U16_TO_U8S_LE(0x0080), U16_TO_U8S_LE(MS_OS_20_FEATURE_REG_PROPERTY),
-    U16_TO_U8S_LE(0x0001), U16_TO_U8S_LE(0x0028), // wPropertyDataType, wPropertyNameLength and PropertyName "DeviceInterfaceGUID" in UTF-16
-    'D', 0x00, 'e', 0x00, 'v', 0x00, 'i', 0x00, 'c', 0x00, 'e', 0x00, 'I', 0x00, 'n', 0x00, 't', 0x00, 'e', 0x00,
-    'r', 0x00, 'f', 0x00, 'a', 0x00, 'c', 0x00, 'e', 0x00, 'G', 0x00, 'U', 0x00, 'I', 0x00, 'D', 0x00, 0x00, 0x00,
-    U16_TO_U8S_LE(0x004E), // wPropertyDataLength
-    // Vendor-defined Property Data: {bc7398c1-73cd-4cb7-98b8-913a8fca7bf6}
-    '{', 0,     'b', 0,     'c', 0,     '7', 0,     '3', 0,     '9', 0,
-    '8', 0,     'c', 0,     '1', 0,     '-', 0,     '7', 0,     '3', 0,
-    'c', 0,     'd', 0,     '-', 0,     '4', 0,     'c', 0,     'b', 0,
-    '7', 0,     '-', 0,     '9', 0,     '8', 0,     'b', 0,     '8', 0,
-    '-', 0,     '9', 0,     '1', 0,     '3', 0,     'a', 0,     '8', 0,
-    'f', 0,     'c', 0,     'a', 0,     '7', 0,     'b', 0,     'f', 0,
-    '6', 0,     '}', 0,       0, 0
+    RPI_RESET_MS_OS_20_DESCRIPTOR(PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF)
 };
 
 TU_VERIFY_STATIC(sizeof(desc_ms_os_20) == MS_OS_20_DESC_LEN, "Incorrect size");
