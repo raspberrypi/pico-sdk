@@ -41,7 +41,9 @@
 // regular flash boot
 #define RESET_REQUEST_FLASH 0x02
 
-#if PICO_ON_DEVICE
+#if LIB_PICO_USB_RESET_INTERFACE
+// These defines are only used by the pico_usb_reset_interface library, not the pico_usb_reset_interface_headers library
+
 // PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED, Optionally define a pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE), type=int, min=0, max=47 on RP2350B, 29 otherwise, group=pico_usb_reset_interface
 
 // PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW, Whether pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE) is active low, type=bool, default=0, group=pico_usb_reset_interface
