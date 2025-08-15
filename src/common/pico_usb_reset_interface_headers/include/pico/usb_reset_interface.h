@@ -21,7 +21,7 @@
  * 2. Define PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE=1
  * 3. Add `TUD_RPI_RESET_DESCRIPTOR(<ITF_NUM>, <STR_IDX>)` to your USB descriptors (length is `TUD_RPI_RESET_DESC_LEN`)
  * 4. Check if your project has an existing `usbd_app_driver_get_cb` function:
- *    - If it does, you need to add the `_resetd_driver` to the drivers returned
+ *    - If it does, you need to add the `pico_usb_reset_interface_driver` to the drivers returned
  *    - If it does not, and you aren't using the `pico_stdio_usb` library, you need to define `PICO_STDIO_USB_RESET_INCLUDE_APP_DRIVER_CB=1`
  * 5. Check if your project has an existing Microsoft OS 2.0 Descriptor:
  *    - If it does, you need to add the Function Subset header `RPI_RESET_MS_OS_20_DESCRIPTOR(<ITF_NUM>)` to your Microsoft OS 2.0 Descriptor (length is `RPI_RESET_MS_OS_20_DESC_LEN`)
@@ -144,22 +144,22 @@
 #include "stdint.h"
 #include "device/usbd_pvt.h"
 
-void resetd_init(void);
-void resetd_reset(uint8_t __unused rhport);
-uint16_t resetd_open(uint8_t __unused rhport, tusb_desc_interface_t const *itf_desc, uint16_t max_len);
-bool resetd_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_control_request_t const * request);
-bool resetd_xfer_cb(uint8_t __unused rhport, uint8_t __unused ep_addr, xfer_result_t __unused result, uint32_t __unused xferred_bytes);
+void pico_usb_reset_interface_init(void);
+void pico_usb_reset_interface_reset(uint8_t __unused rhport);
+uint16_t pico_usb_reset_interface_open(uint8_t __unused rhport, tusb_desc_interface_t const *itf_desc, uint16_t max_len);
+bool pico_usb_reset_interface_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_control_request_t const * request);
+bool pico_usb_reset_interface_xfer_cb(uint8_t __unused rhport, uint8_t __unused ep_addr, xfer_result_t __unused result, uint32_t __unused xferred_bytes);
 
-static usbd_class_driver_t const _resetd_driver =
+static usbd_class_driver_t const pico_usb_reset_interface_driver =
 {
 #if CFG_TUSB_DEBUG >= 2
     .name = "RESET",
 #endif
-    .init             = resetd_init,
-    .reset            = resetd_reset,
-    .open             = resetd_open,
-    .control_xfer_cb  = resetd_control_xfer_cb,
-    .xfer_cb          = resetd_xfer_cb,
+    .init             = pico_usb_reset_interface_init,
+    .reset            = pico_usb_reset_interface_reset,
+    .open             = pico_usb_reset_interface_open,
+    .control_xfer_cb  = pico_usb_reset_interface_control_xfer_cb,
+    .xfer_cb          = pico_usb_reset_interface_xfer_cb,
     .sof              = NULL
 };
 

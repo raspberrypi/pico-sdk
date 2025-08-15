@@ -67,14 +67,14 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
 }
 #endif
 
-void resetd_init(void) {
+void pico_usb_reset_interface_init(void) {
 }
 
-void resetd_reset(uint8_t __unused rhport) {
+void pico_usb_reset_interface_reset(uint8_t __unused rhport) {
     itf_num = 0;
 }
 
-uint16_t resetd_open(uint8_t __unused rhport, tusb_desc_interface_t const *itf_desc, uint16_t max_len) {
+uint16_t pico_usb_reset_interface_open(uint8_t __unused rhport, tusb_desc_interface_t const *itf_desc, uint16_t max_len) {
     TU_VERIFY(TUSB_CLASS_VENDOR_SPECIFIC == itf_desc->bInterfaceClass &&
               RESET_INTERFACE_SUBCLASS == itf_desc->bInterfaceSubClass &&
               RESET_INTERFACE_PROTOCOL == itf_desc->bInterfaceProtocol, 0);
@@ -87,7 +87,7 @@ uint16_t resetd_open(uint8_t __unused rhport, tusb_desc_interface_t const *itf_d
 }
 
 // Support for parameterized reset via vendor interface control request
-bool resetd_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_control_request_t const * request) {
+bool pico_usb_reset_interface_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_control_request_t const * request) {
     // nothing to do with DATA & ACK stage
     if (stage != CONTROL_STAGE_SETUP) return true;
 
@@ -124,7 +124,7 @@ bool resetd_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_control
     return false;
 }
 
-bool resetd_xfer_cb(uint8_t __unused rhport, uint8_t __unused ep_addr, xfer_result_t __unused result, uint32_t __unused xferred_bytes) {
+bool pico_usb_reset_interface_xfer_cb(uint8_t __unused rhport, uint8_t __unused ep_addr, xfer_result_t __unused result, uint32_t __unused xferred_bytes) {
     return true;
 }
 
@@ -132,7 +132,7 @@ bool resetd_xfer_cb(uint8_t __unused rhport, uint8_t __unused ep_addr, xfer_resu
 // Implement callback to add our custom driver
 usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count) {
     *driver_count = 1;
-    return &_resetd_driver;
+    return &pico_usb_reset_interface_driver;
 }
 #endif
 #endif
