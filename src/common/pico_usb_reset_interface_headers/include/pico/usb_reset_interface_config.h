@@ -34,9 +34,9 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_RESET_INCLUDE_APP_DRIVER_CB, Set to 0 if your application defines usbd_app_driver_get_cb, type=bool, default=1 when using pico_usb_reset_interface, 0 otherwise, group=pico_usb_reset_interface
-#ifndef PICO_STDIO_USB_RESET_INCLUDE_APP_DRIVER_CB
-#define PICO_STDIO_USB_RESET_INCLUDE_APP_DRIVER_CB LIB_PICO_STDIO_USB
+// PICO_CONFIG: PICO_STDIO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB, Set to 0 if your application defines its own usbd_app_driver_get_cb function, type=bool, default=1 when using pico_usb_reset_interface, 0 otherwise, group=pico_usb_reset_interface
+#ifndef PICO_STDIO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB
+#define PICO_STDIO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB LIB_PICO_STDIO_USB
 #endif
 
 // PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL, If vendor reset interface is included allow rebooting to BOOTSEL mode, type=bool, default=1, group=pico_usb_reset_interface
@@ -63,7 +63,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF, If vendor reset interface is included the USB interface number for the reset interface, type=int, default=2 if application is not using TinyUSB directly, undefined otherwise, group=pico_usb_reset_interface
+// PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF, If vendor reset interface is included this specifies the USB interface number for the reset interface, type=int, default=2 if application is not using TinyUSB directly, undefined otherwise, group=pico_usb_reset_interface
 #ifndef PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF
 #if !LIB_TINYUSB_HOST && !LIB_TINYUSB_DEVICE
 #define PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF 2

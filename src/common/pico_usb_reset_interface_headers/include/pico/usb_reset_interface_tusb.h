@@ -42,22 +42,22 @@
 #include "stdint.h"
 #include "device/usbd_pvt.h"
 
-void pico_usb_reset_interface_init(void);
-void pico_usb_reset_interface_reset(uint8_t __unused rhport);
-uint16_t pico_usb_reset_interface_open(uint8_t __unused rhport, tusb_desc_interface_t const *itf_desc, uint16_t max_len);
-bool pico_usb_reset_interface_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_control_request_t const * request);
-bool pico_usb_reset_interface_xfer_cb(uint8_t __unused rhport, uint8_t __unused ep_addr, xfer_result_t __unused result, uint32_t __unused xferred_bytes);
+void usb_reset_interface_init(void);
+void usb_reset_interface_reset(uint8_t __unused rhport);
+uint16_t usb_reset_interface_open(uint8_t __unused rhport, tusb_desc_interface_t const *itf_desc, uint16_t max_len);
+bool usb_reset_interface_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_control_request_t const * request);
+bool usb_reset_interface_xfer_cb(uint8_t __unused rhport, uint8_t __unused ep_addr, xfer_result_t __unused result, uint32_t __unused xferred_bytes);
 
-static usbd_class_driver_t const pico_usb_reset_interface_driver =
+static usbd_class_driver_t const usb_reset_interface_driver =
 {
 #if CFG_TUSB_DEBUG >= 2
     .name = "RESET",
 #endif
-    .init             = pico_usb_reset_interface_init,
-    .reset            = pico_usb_reset_interface_reset,
-    .open             = pico_usb_reset_interface_open,
-    .control_xfer_cb  = pico_usb_reset_interface_control_xfer_cb,
-    .xfer_cb          = pico_usb_reset_interface_xfer_cb,
+    .init             = usb_reset_interface_init,
+    .reset            = usb_reset_interface_reset,
+    .open             = usb_reset_interface_open,
+    .control_xfer_cb  = usb_reset_interface_control_xfer_cb,
+    .xfer_cb          = usb_reset_interface_xfer_cb,
     .sof              = NULL
 };
 
