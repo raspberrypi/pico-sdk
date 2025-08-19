@@ -80,7 +80,8 @@ bool colored_status_led_set_state(bool led_on) {
     if (colored_status_led_supported()) {
 #if COLORED_STATUS_LED_USING_WS2812_PIO
         success = true;
-        if (led_on && !colored_status_led_on) {
+        if (led_on) {
+            // Turn the LED "on" even if it was already on, as the color might have changed
             success = set_ws2812(colored_status_led_on_color);
         } else if (!led_on && colored_status_led_on) {
             success = set_ws2812(0);
