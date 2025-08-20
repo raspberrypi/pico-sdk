@@ -59,7 +59,9 @@ static void prepare_for_clock_gating(void) {
 }
 
 static void post_clock_gating(void) {
-
+    // restore all clocks in sleep mode, to prevent other __wfi from causing issues
+    clock_dest_set_t all = clock_dest_set_all();
+    clock_gate_sleep_en(&all);
 }
 
 static void prepare_for_clock_switch(void) {
@@ -113,7 +115,7 @@ static void replace_null_enable_values(const clock_dest_set_t *keep_enabled,
 
 // only the deep_sleep variant of this, as DORMANT cannot wake from TIMER
 int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
-                                const clock_dest_set_t *keep_enabled) {
+                                const clock_dest_set_t *keep_enabled, __unused bool exclusive) {
     int alarm_num = timer_hardware_alarm_claim_unused(timer, false);
     if (alarm_num < 0) return PICO_ERROR_INSUFFICIENT_RESOURCES;
 
@@ -131,7 +133,7 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
     //  we know that people in the wild (MicroPython) have wanted to do some mapping to also
     //  figure out what PLLs are still on via these bits
 #if PICO_RP2040
-    clock_dests_add(&local_keep_enabled, CLK_DEST_SYS_TIMER);
+    clock_dest_set_add(&local_keep_enabled, CLK_DEST_SYS_TIMER);
 #elif PICO_RP2350
     clock_dest_set_add(&local_keep_enabled, timer_get_index(timer) ? CLK_DEST_SYS_TIMER1 : CLK_DEST_SYS_TIMER0);
     clock_dest_set_add(&local_keep_enabled, CLK_DEST_REF_TICKS);
@@ -155,6 +157,7 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
     return 0;
 }
 
+#if 0
 // todo note this has (not surprisingly a lot of commonality with the timer one)
 int low_power_sleep_until_aon_timer(absolute_time_t until,
                                     const clock_dest_set_t *keep_enabled) {
@@ -172,7 +175,7 @@ int low_power_sleep_until_aon_timer(absolute_time_t until,
     //  fun, we probably want to have a "sparse" bitset macro encoded as 4 bytes or 8 bytes (for 4 or 7 indices
     //  between 0 and 254) - i say 7, to leave encoding space for maybe indices > 256 in the 8 byte variant
 #if PICO_RP2040
-    clock_dests_add(&local_keep_enabled, CLOCK_DEST_RTC_RTC);
+    clock_dest_set_add(&local_keep_enabled, CLOCK_DEST_RTC_RTC);
 #elif PICO_RP2350
     clock_dest_set_add(&local_keep_enabled, CLK_DEST_REF_POWMAN);
 #else
@@ -198,7 +201,7 @@ int low_power_sleep_until_aon_timer(absolute_time_t until,
     post_clock_gating();
     return 0;
 }
-
+#endif
 
 // In order to go into dormant mode we need to be running from a stoppable clock source:
 // either the xosc or rosc with no PLLs running. This means we disable the USB and ADC clocks
@@ -225,6 +228,7 @@ void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_source) {
 #endif
         default:
             hard_assert(false);
+            __builtin_unreachable();
     }
 
     clock_configure_undivided(clk_ref,
@@ -314,7 +318,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
 #if PICO_RP2040
     // The RTC must be run from an external source, since the dormant source will be inactive
     rtc_run_from_external_source(src_hz, gpio_pin);
-    clock_dests_add(&local_keep_enabled, CLOCK_DEST_RTC_RTC);
+    clock_dest_set_add(&local_keep_enabled, CLK_DEST_RTC_RTC);
 #elif PICO_RP2350
     // todo
     ((void)gpio_pin);
@@ -393,3 +397,24 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
     low_power_wake_from_dormant();
 }
 
+#if !PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX
+#include "hardware/sync.h"
+void __weak runtime_init_rp2350_sleep_fix(void) {
+    if (watchdog_hw->reason && WATCHDOG_REASON_TIMER_BITS) { // detect rom_reboot() usage
+        int alarm_num = timer_hardware_alarm_claim_unused(timer_hw, false);
+        if (alarm_num < 0) return;
+
+        timer_hardware_alarm_set_callback(timer_hw, alarm_num, ((hardware_alarm_callback_t )low_power_wakeup));
+        timer_hardware_alarm_set_target(timer_hw, alarm_num, make_timeout_time_us(100));
+
+        __wfi();
+
+        timer_hardware_alarm_set_callback(timer_hw, alarm_num, NULL);
+        timer_hardware_alarm_unclaim(timer_hw, alarm_num);
+    }
+}
+#endif
+
+#if !PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX
+PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_rp2350_sleep_fix, PICO_RUNTIME_INIT_RP2350_SLEEP_FIX);
+#endif

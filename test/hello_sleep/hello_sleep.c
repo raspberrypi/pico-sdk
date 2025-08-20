@@ -26,12 +26,19 @@ int main() {
     printf("Waiting 1 sec\n"); // so we can see some repeat printfs
     busy_wait_ms(1100);
 #endif
+
+    absolute_time_t start_time;
+    absolute_time_t wakeup_time;
+    int64_t diff;
+    uint64_t current_aon;
+    struct timespec ts;
+
     printf("Going to sleep for 5 seconds via TIMER\n");
 
-    absolute_time_t start_time = get_absolute_time();
-    absolute_time_t wakeup_time = delayed_by_ms(start_time, 5000);
-    low_power_sleep_until_timer(timer_hw, wakeup_time, NULL);
-    int64_t diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
+    start_time = get_absolute_time();
+    wakeup_time = delayed_by_ms(start_time, 5000);
+    low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, true);
+    diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
         printf("ERROR: Woke up too soon\n");
@@ -39,33 +46,7 @@ int main() {
     }
     busy_wait_ms(3000);
 
-    printf("Going to sleep for 5 seconds via AON TIMER\n");
-
-    // todo, ah; we should start the aon timer; still have to decide what to do about keeping them in sync
-    start_time = get_absolute_time();
-    struct timespec ts;
-    us_to_timespec(start_time, &ts);
-    aon_timer_start(&ts);
-
-    wakeup_time = delayed_by_ms(start_time, 5000);
-    low_power_sleep_until_aon_timer(wakeup_time, NULL);
-    diff = absolute_time_diff_us(get_absolute_time(), wakeup_time);
-    // need to use the AON timer for checking time, since the other timer is unclocked
-    diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
-    if (diff > -4000000) {
-        printf("ERROR: doesn't seem like timer was stopped\n");
-        return - 1;
-    }
-    aon_timer_get_time(&ts);
-    uint64_t current_aon = timespec_to_us(&ts);
-    diff = absolute_time_diff_us(wakeup_time, from_us_since_boot(current_aon));
-    printf("Woken up now @%dus since target\n", (int)diff);
-    if (diff < 0) {
-        printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
-    }
-    printf("5 second pause to prove timer still running\n");
-    busy_wait_ms(5000);
-
+#if !PICO_RP2040
     printf("Going DORMANT for 5 seconds via AON TIMER\n");
 
     // todo, ah; we should start the aon timer; still have to decide what to do about keeping them in sync
@@ -77,7 +58,6 @@ int main() {
     low_power_dormant_until_aon_timer(wakeup_time, DORMANT_CLOCK_SOURCE_LPOSC, XOSC_KHZ * 1000,
                                       0, // gpio pin (unused with powman)
                                       NULL);
-    low_power_sleep_until_aon_timer(wakeup_time, NULL);
     diff = absolute_time_diff_us(get_absolute_time(), wakeup_time);
     // need to use the AON timer for checking time, since the other timer is unclocked
     diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
@@ -94,6 +74,7 @@ int main() {
     }
     printf("Final 5 second pause to prove timer still running\n");
     busy_wait_ms(5000);
+#endif
 
     printf("SUCCESS\n");
 

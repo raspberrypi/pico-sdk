@@ -416,6 +416,22 @@ void runtime_init_bootrom_locking_enable(void);
 #endif
 #endif
 
+// ------------------------------------------------------------
+// RP2350 sleep fix
+// ------------------------------------------------------------
+
+#ifndef PICO_RUNTIME_INIT_RP2350_SLEEP_FIX
+#define PICO_RUNTIME_INIT_RP2350_SLEEP_FIX "11010"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX
+#define PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX !PICO_RP2350
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX
+#define PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX !PICO_RP2350
+#endif
+
 // ------------------------------------------------------------------------------------------------
 // stack guard; these are a special case as they take a parameter; however the normal defines apply
 // ------------------------------------------------------------------------------------------------

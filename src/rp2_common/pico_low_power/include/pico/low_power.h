@@ -41,6 +41,16 @@ extern "C" {
 #include "hardware/clocks.h"
 
 
+typedef enum {
+    DORMANT_CLOCK_SOURCE_XOSC,
+    DORMANT_CLOCK_SOURCE_ROSC,
+#if !PICO_RP2040
+    DORMANT_CLOCK_SOURCE_LPOSC,
+#endif
+    NUM_DORMANT_CLOCK_SOURCES
+} dormant_clock_source_t;
+
+
 // NOTE: Need to deinit usb before doing into any of these sleep states
 // could keep usb clk_sys and clk_usb to usbctrl running during low_power_sleep. Although you'll get woken
 // up pretty quickly
@@ -49,7 +59,7 @@ extern "C" {
 // sleep is really just calling a __wfi() until an irq, with some optional clock gating in the sleep_en register. Activated once processor goes to sleep
 // So can just do it for arbitrary interrupts. processors implement their own internal clock gating, just leaving the wakeup interrupt controller running during
 // __wfi()
-int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled)
+int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled);
 
 // sleep until the given timer reaches the specified value; if the time passes then no sleep occurs
 // keep_enabled defaults to none if NULL
@@ -58,18 +68,21 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until, const 
 // Note bool above saying shall we only listen for timer irq or other irqs
 // Need to defer handling of irqs to do clock setup etc
 
-static inline int low_power_sleep_until_default_timer(absolute_time_t until, const clock_dest_set_t *keep_enabled) {
+static inline int low_power_sleep_until_default_timer(absolute_time_t until, const clock_dest_set_t *keep_enabled, bool exclusive) {
     // Need to assert (or add) ticks block and timer clocks to the keep_enabled list
-    return low_power_sleep_until_timer(PICO_DEFAULT_TIMER_INSTANCE(), until, keep_enabled);
+    return low_power_sleep_until_timer(PICO_DEFAULT_TIMER_INSTANCE(), until, keep_enabled, exclusive);
 }
 
 // ** LIAM BLESSED this for RP2040; why not RP2350 **
 // This should work on both via io bank interrupts
 void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high);
 
+#if 0
 // ** LIAM SAYS THIS IS NO MORE USEFUL THAN SLEEP_UNTIL TIMER... **
 // There isn't much advantage to using the aon timer here as system timers are more accurate and on anyway
+// ** WILL AGREES WITH LIAM ON THIS **
 int low_power_sleep_until_aon_timer(absolute_time_t until, const clock_dest_set_t *keep_enabled);
+#endif
 
 // ** LIAM BLESSED but we need to impl it correctly (note not blessed for RP2040, but we should do it anyway for orthogonality **
 // Only works for RP2350 as every clock will be stopped on RP2040 (unless you provide a clock for the RTC)
@@ -78,18 +91,17 @@ int low_power_sleep_until_aon_timer(absolute_time_t until, const clock_dest_set_
 // NOTE: Asserting that we will alway use rosc for dormant and simplifies the API
 // Means if the user has sped up the rosc they should slow it down before going into dormant
 // Need to re initialize clocks after this
-int low_power_dormant_until_aon_timer(absolute_time_t until, uint src_hz, uint gpio_pin);
+int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_source_t dormant_clock_source, uint src_hz, uint gpio_pin, const clock_dest_set_t *keep_enabled);
 
 // ** LIAM BLESSED but we need to impl it correctly (note not blessed for RP2040, but we should do it anyway for orthogonality **
 // This works on both
 // Need to re initialize clocks after this
-void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high);
+void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_set_t *keep_enabled);
 
-#if !PICO_RP2040
+#if !PICO_RP2040 && 0   // todo - implement these
 // pstate functions should return to the pstate you were in
 void low_power_pstate_until_aon_timer(pstate_bitset_t *pstate);
 void low_power_pstate_until_pin_state(pstate_bitset_t *pstate);
-#endif
 
 // Or a function saying how did I boot?
 // Would like to make it easy to get back to main after going to sleep
@@ -103,8 +115,9 @@ void low_power_pstate_until_pin_state(pstate_bitset_t *pstate);
 // Doesn't support powering down switched core domain
 void low_power_pstate_set(pstate_bitset_t *pstate);
 pstate_bitset_t low_power_pstate_get(void);
+#endif
 
-#if 0
+#if 0   // todo - I think these are not being done?
 void sleep_run_from_dormant_source(dormant_clock_source_t dormant_source);
 /*! \brief Send system to sleep until a leading high edge is detected on GPIO
  *  \ingroup pico_sleep
@@ -128,8 +141,6 @@ static inline void sleep_goto_dormant_until_level_high(uint gpio_pin) {
     sleep_goto_dormant_until_pin(gpio_pin, false, true);
 }
 
-#endif
-
 /*! \brief Reconfigure clocks to wake up properly from sleep/dormant mode
  *  \ingroup pico_sleep
  *
@@ -137,6 +148,8 @@ static inline void sleep_goto_dormant_until_level_high(uint gpio_pin) {
  *
  */
 void sleep_power_up(void);
+
+#endif
 
 #ifdef __cplusplus
 }
