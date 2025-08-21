@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 #include "hardware/clocks.h"
-
+#include "hardware/powman.h"
 
 typedef enum {
     DORMANT_CLOCK_SOURCE_XOSC,
@@ -49,6 +49,8 @@ typedef enum {
 #endif
     NUM_DORMANT_CLOCK_SOURCES
 } dormant_clock_source_t;
+
+typedef void (*low_power_pstate_resume_func)(void);
 
 
 // NOTE: Need to deinit usb before doing into any of these sleep states
@@ -98,10 +100,10 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
 // Need to re initialize clocks after this
 void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_set_t *keep_enabled);
 
-#if !PICO_RP2040 && 0   // todo - implement these
+#if !PICO_RP2040
 // pstate functions should return to the pstate you were in
-void low_power_pstate_until_aon_timer(pstate_bitset_t *pstate);
-void low_power_pstate_until_pin_state(pstate_bitset_t *pstate);
+int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
+int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
 
 // Or a function saying how did I boot?
 // Would like to make it easy to get back to main after going to sleep
@@ -113,7 +115,7 @@ void low_power_pstate_until_pin_state(pstate_bitset_t *pstate);
 
 // Go to a pstate
 // Doesn't support powering down switched core domain
-void low_power_pstate_set(pstate_bitset_t *pstate);
+int low_power_pstate_set(pstate_bitset_t *pstate);
 pstate_bitset_t low_power_pstate_get(void);
 #endif
 

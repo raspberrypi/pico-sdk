@@ -72,6 +72,16 @@ static void prepare_for_clock_switch(void) {
 static void post_clock_switch(void) {
     setup_default_uart();
 }
+
+#if HAS_POWMAN_TIMER
+static void prepare_for_pstate_change(void) {
+    prepare_for_clock_switch();
+}
+
+static void post_pstate_change(void) {
+}
+#endif
+
 // ------------------------------------------------------------------------------------------------------
 
 // todo should we make this a save/restore thing?
@@ -396,6 +406,80 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
 
     low_power_wake_from_dormant();
 }
+
+#if !PICO_RP2040
+int low_power_pstate_set(pstate_bitset_t *pstate) {
+    invalid_params_if(PICO_LOW_POWER, !pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SWITCHED_CORE));
+
+    return powman_set_power_state(pstate_bitset_to_powman_power_state(pstate));
+}
+
+pstate_bitset_t low_power_pstate_get(void) {
+    return pstate_bitset_from_powman_power_state(powman_get_power_state());
+}
+
+int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
+    prepare_for_pstate_change();
+
+    // Configure the wakeup state
+    pstate_bitset_t current_pstate = low_power_pstate_get();
+    bool valid_state = powman_configure_wakeup_state(pstate_bitset_to_powman_power_state(pstate), pstate_bitset_to_powman_power_state(&current_pstate));
+    if (!valid_state) {
+        return PICO_ERROR_INVALID_STATE;
+    }
+
+    // reboot to main
+    powman_hw->boot[0] = 0;
+    powman_hw->boot[1] = 0;
+    powman_hw->boot[2] = 0;
+    powman_hw->boot[3] = 0;
+
+    powman_hw->scratch[7] = (uint32_t)resume_func;
+
+    // Switch to required power state
+    int rc = powman_set_power_state(pstate_bitset_to_powman_power_state(pstate));
+    if (rc != PICO_OK) {
+        return rc;
+    }
+
+    // Power down
+    while (true) __wfi();
+
+    post_pstate_change();
+
+    return rc;
+}
+
+int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
+    powman_enable_alarm_wakeup_at_ms(to_ms_since_boot(until));
+
+    return low_power_go_pstate(pstate, resume_func);
+}
+
+int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
+    powman_enable_gpio_wakeup(0, gpio_pin, edge, high);
+
+    return low_power_go_pstate(pstate, resume_func);
+}
+
+#if !PICO_RUNTIME_NO_INIT_LOW_POWER_REBOOT_CHECK
+void __weak runtime_init_low_power_reboot_check(void) {
+    // check if we came from powman reboot
+    if (powman_hw->chip_reset & POWMAN_CHIP_RESET_HAD_SWCORE_PD_BITS) {
+        // we came from powman reboot, so execute the resume function
+        if (powman_hw->scratch[7]) {
+            ((low_power_pstate_resume_func)powman_hw->scratch[7])();
+            powman_hw->scratch[7] = 0;
+        }
+    }
+}
+#endif
+
+#if !PICO_RUNTIME_SKIP_INIT_LOW_POWER_REBOOT_CHECK
+PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_low_power_reboot_check, PICO_RUNTIME_INIT_LOW_POWER_REBOOT_CHECK);
+#endif
+
+#endif // !PICO_RP2040
 
 #if !PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX
 #include "hardware/sync.h"

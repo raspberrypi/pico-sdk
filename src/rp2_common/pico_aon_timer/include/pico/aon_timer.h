@@ -181,6 +181,13 @@ bool aon_timer_get_time(struct timespec *ts);
 bool aon_timer_get_time_calendar(struct tm *tm);
 
 /**
+ * \brief Get the current time of the AON timer as an absolute time
+ * \ingroup pico_aon_timer
+ * \return the current time of the AON timer as an absolute time
+ */
+absolute_time_t aon_timer_get_absolute_time(void);
+
+/**
  * \brief Get the resolution of the AON timer
  * \ingroup pico_aon_timer
  * \param ts out value for the resolution of the AON timer

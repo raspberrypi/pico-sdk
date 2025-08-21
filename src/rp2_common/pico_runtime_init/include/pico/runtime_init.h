@@ -432,6 +432,22 @@ void runtime_init_bootrom_locking_enable(void);
 #define PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX !PICO_RP2350
 #endif
 
+// ------------------------------------------------------------
+// Low power reboot check
+// ------------------------------------------------------------
+
+#ifndef PICO_RUNTIME_INIT_LOW_POWER_REBOOT_CHECK
+#define PICO_RUNTIME_INIT_LOW_POWER_REBOOT_CHECK "11020"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_LOW_POWER_REBOOT_CHECK
+#define PICO_RUNTIME_SKIP_INIT_LOW_POWER_REBOOT_CHECK !HAS_POWMAN_TIMER
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_LOW_POWER_REBOOT_CHECK
+#define PICO_RUNTIME_NO_INIT_LOW_POWER_REBOOT_CHECK !HAS_POWMAN_TIMER
+#endif
+
 // ------------------------------------------------------------------------------------------------
 // stack guard; these are a special case as they take a parameter; however the normal defines apply
 // ------------------------------------------------------------------------------------------------

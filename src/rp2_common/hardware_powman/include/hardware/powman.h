@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include "hardware/structs/powman.h"
+#include "pico/util/bitset.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -167,8 +168,47 @@ enum powman_power_domains {
     POWMAN_POWER_DOMAIN_SWITCHED_CORE = 3, ///< Switched core logic (processors, busfabric, peris etc)
     POWMAN_POWER_DOMAIN_COUNT = 4,
 };
+typedef enum powman_power_domains powman_power_domain_t;
 
 typedef uint32_t powman_power_state;
+
+typedef bitset_type_t(POWMAN_POWER_DOMAIN_COUNT) pstate_bitset_t;
+#define pstate_bitset_none() ({ pstate_bitset_t bitset; bitset_init(&bitset, pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 0); bitset; })
+#define pstate_bitset_all() ({ pstate_bitset_t bitset; bitset_init(&bitset, pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 1); bitset; })
+
+static inline pstate_bitset_t *pstate_bitset_clear(pstate_bitset_t *domains) {
+    bitset_clear(&domains->bitset);
+    return domains;
+}
+
+static inline pstate_bitset_t *pstate_bitset_add_all(pstate_bitset_t *domains) {
+    bitset_set_all(&domains->bitset);
+    return domains;
+}
+
+static inline pstate_bitset_t *pstate_bitset_add(pstate_bitset_t *domains, powman_power_domain_t domain) {
+    bitset_set_bit(&domains->bitset, domain);
+    return domains;
+}
+
+static inline pstate_bitset_t *pstate_bitset_remove(pstate_bitset_t *domains, powman_power_domain_t domain) {
+    bitset_clear_bit(&domains->bitset, domain);
+    return domains;
+}
+
+static inline bool pstate_bitset_is_set(pstate_bitset_t *domains, powman_power_domain_t domain) {
+    return bitset_get_bit(&domains->bitset, domain);
+}
+
+static inline pstate_bitset_t pstate_bitset_from_powman_power_state(powman_power_state pstate) {
+    pstate_bitset_t bitset;
+    bitset_init(&bitset, pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, pstate);
+    return bitset;
+}
+
+static inline powman_power_state pstate_bitset_to_powman_power_state(pstate_bitset_t *pstate) {
+    return pstate->bitset.words[0];
+}
 
 /*! \brief Get the current power state
  *  \ingroup hardware_powman
