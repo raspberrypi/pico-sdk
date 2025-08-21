@@ -39,7 +39,9 @@ extern "C" {
 #endif
 
 #include "hardware/clocks.h"
+#if !PICO_RP2040
 #include "hardware/powman.h"
+#endif
 
 typedef enum {
     DORMANT_CLOCK_SOURCE_XOSC,
@@ -77,7 +79,7 @@ static inline int low_power_sleep_until_default_timer(absolute_time_t until, con
 
 // ** LIAM BLESSED this for RP2040; why not RP2350 **
 // This should work on both via io bank interrupts
-void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high);
+void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_set_t *keep_enabled, bool exclusive);
 
 #if 0
 // ** LIAM SAYS THIS IS NO MORE USEFUL THAN SLEEP_UNTIL TIMER... **

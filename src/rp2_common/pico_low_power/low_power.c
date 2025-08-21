@@ -64,13 +64,22 @@ static void post_clock_gating(void) {
     clock_gate_sleep_en(&all);
 }
 
+static uint32_t interrupt_flags;
+
 static void prepare_for_clock_switch(void) {
     // particularly for UART we want nothing left to clock out
     prepare_for_clock_gating();
+
+    // disable interrupts
+    interrupt_flags = save_and_disable_interrupts();
 }
 
 static void post_clock_switch(void) {
+    // restore UART baudrate
     setup_default_uart();
+
+    // restore interrupts
+    restore_interrupts_from_disabled(interrupt_flags);
 }
 
 #if HAS_POWMAN_TIMER
@@ -111,6 +120,10 @@ volatile bool event_happened;
 
 static void low_power_wakeup(void) {
     event_happened = true;
+}
+
+static void low_power_wakeup_gpio(__unused uint gpio, __unused uint32_t event_mask) {
+    low_power_wakeup();
 }
 
 static void replace_null_enable_values(const clock_dest_set_t *keep_enabled,
@@ -165,6 +178,46 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
     post_clock_gating();
 
     return 0;
+}
+
+void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
+                                     const clock_dest_set_t *keep_enabled, __unused bool exclusive) {
+
+    event_happened = false;
+
+    clock_dest_set_t local_keep_enabled;
+    replace_null_enable_values(keep_enabled, &local_keep_enabled);
+
+    bool low = !high;
+    bool level = !edge;
+
+    // Configure the appropriate IRQ at IO bank 0
+    assert(gpio_pin < NUM_BANK0_GPIOS);
+
+    uint32_t event = 0;
+
+    if (level && low) event = GPIO_IRQ_LEVEL_LOW;
+    if (level && high) event = GPIO_IRQ_LEVEL_HIGH;
+    if (edge && high) event = GPIO_IRQ_EDGE_RISE;
+    if (edge && low) event = GPIO_IRQ_EDGE_FALL;
+
+    gpio_set_input_enabled(gpio_pin, true);
+    gpio_set_irq_enabled_with_callback(gpio_pin, event, true, low_power_wakeup_gpio);
+
+    prepare_for_clock_gating();
+    // gate clocks
+    clock_gate_sleep_en(&local_keep_enabled);
+
+    low_power_enable_processor_deep_sleep();
+    // Go to sleep until the wakeup event happens (note it may have happened already)
+    while (!event_happened) __wfi();
+    low_power_disable_processor_deep_sleep();
+
+    // Clear the irq so we can go back to dormant mode again if we want
+    gpio_acknowledge_irq(gpio_pin, event);
+    gpio_set_irq_enabled_with_callback(gpio_pin, event, false, NULL);
+
+    post_clock_gating();
 }
 
 #if 0
@@ -382,12 +435,11 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
 
     uint32_t event = 0;
 
-    if (level && low) event = IO_BANK0_DORMANT_WAKE_INTE0_GPIO0_LEVEL_LOW_BITS;
-    if (level && high) event = IO_BANK0_DORMANT_WAKE_INTE0_GPIO0_LEVEL_HIGH_BITS;
-    if (edge && high) event = IO_BANK0_DORMANT_WAKE_INTE0_GPIO0_EDGE_HIGH_BITS;
-    if (edge && low) event = IO_BANK0_DORMANT_WAKE_INTE0_GPIO0_EDGE_LOW_BITS;
+    if (level && low) event = GPIO_IRQ_LEVEL_LOW;
+    if (level && high) event = GPIO_IRQ_LEVEL_HIGH;
+    if (edge && high) event = GPIO_IRQ_EDGE_RISE;
+    if (edge && low) event = GPIO_IRQ_EDGE_FALL;
 
-    gpio_init(gpio_pin);
     gpio_set_input_enabled(gpio_pin, true);
     gpio_set_dormant_irq_enabled(gpio_pin, event, true);
 
@@ -402,7 +454,7 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
 
     // Clear the irq so we can go back to dormant mode again if we want
     gpio_acknowledge_irq(gpio_pin, event);
-    gpio_set_input_enabled(gpio_pin, false);
+    gpio_set_dormant_irq_enabled(gpio_pin, event, false);
 
     low_power_wake_from_dormant();
 }

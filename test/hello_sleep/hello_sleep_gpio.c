@@ -57,90 +57,50 @@ int main() {
 
     if (came_from_pstate) {
         printf("Came from powerup %s - skipping to end\n", powman_last_pwrup);
-        goto post_pstate_timer;
+        goto post_pstate_gpio;
     }
 
     printf("Waiting %d seconds\n", SLEEP_TIME_S); // so we can see some repeat printfs
     busy_wait_ms(SLEEP_TIME_MS);
-
     pstate_bitset_t pstate;
 #endif
 
     absolute_time_t start_time;
-    absolute_time_t wakeup_time;
-    int64_t diff;
     struct timespec ts;
     int ret;
 
-    printf("Going to sleep for %d seconds via TIMER\n", SLEEP_TIME_S);
+    printf("Going to sleep until GPIO wakeup\n");
 
-    start_time = get_absolute_time();
-    wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
-    low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, true);
-    diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
-    printf("Woken up now @%dus since target\n", (int)diff);
-    if (diff < 0) {
-        printf("ERROR: Woke up too soon\n");
-        return -1;
-    }
+    low_power_sleep_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, NULL, true);
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
-
-#if !PICO_RP2040
-    printf("Going DORMANT for %d seconds via AON TIMER\n", SLEEP_TIME_S);
 
     // todo, ah; we should start the aon timer; still have to decide what to do about keeping them in sync
     start_time = get_absolute_time();
     us_to_timespec(start_time, &ts);
     aon_timer_start(&ts);
 
-    wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
-    low_power_dormant_until_aon_timer(wakeup_time, DORMANT_CLOCK_SOURCE_LPOSC, XOSC_KHZ * 1000,
-                                      0, // gpio pin (unused with powman)
-                                      NULL);
-    diff = absolute_time_diff_us(get_absolute_time(), wakeup_time);
-    // need to use the AON timer for checking time, since the other timer is unclocked
-    diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
-    if (diff > -1000000) {
-        printf("ERROR: doesn't seem like timer was stopped\n");
-        return - 1;
-    }
-    diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
-    printf("Woken up now @%dus since target\n", (int)diff);
-    if (diff < 0) {
-        printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
-    }
+    printf("Going DORMANT until GPIO wakeup\n");
+
+    low_power_dormant_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, DORMANT_CLOCK_SOURCE_ROSC, NULL);
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
-    printf("Going to PSTATE for %d seconds\n", SLEEP_TIME_S);
+#if !PICO_RP2040
+    printf("Going to PSTATE until GPIO wakeup\n");
 
-    start_time = aon_timer_get_absolute_time();
-
-    wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
-    powman_hw->scratch[0] = to_us_since_boot(wakeup_time) & 0xFFFFFFFF;
-    powman_hw->scratch[1] = to_us_since_boot(wakeup_time) >> 32;
     pstate = pstate_bitset_none();
-    ret = low_power_pstate_until_aon_timer(wakeup_time, &pstate, pstate_resume_func);
+    ret = low_power_pstate_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, &pstate, pstate_resume_func);
 
     __breakpoint();
 
-    printf("%d low_power_pstate_until_aon_timer returned\n", ret);
+    printf("%d low_power_pstate_until_pin_state returned\n", ret);
     while (true) {
         printf("Waiting\n");
         busy_wait_ms(1000);
     }
 
-post_pstate_timer:
-
-    // restore from scratch
-    wakeup_time = from_us_since_boot((uint64_t)powman_hw->scratch[1] << 32 | (uint64_t)powman_hw->scratch[0]);
-
-    diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
-    printf("Woken up now @%dus since target\n", (int)diff);
-    if (diff < 0) {
-        printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
-    }
+post_pstate_gpio:
 
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
