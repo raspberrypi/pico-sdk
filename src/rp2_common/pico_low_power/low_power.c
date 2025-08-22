@@ -487,6 +487,8 @@ int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func re
     powman_hw->boot[2] = 0;
     powman_hw->boot[3] = 0;
 
+    // Store the low power state and resume function for use after reboot
+    powman_hw->scratch[6] = pstate_bitset_to_powman_power_state(pstate);
     powman_hw->scratch[7] = (uint32_t)resume_func;
 
     // Switch to required power state
@@ -521,7 +523,10 @@ void __weak runtime_init_low_power_reboot_check(void) {
     if (powman_hw->chip_reset & POWMAN_CHIP_RESET_HAD_SWCORE_PD_BITS) {
         // we came from powman reboot, so execute the resume function
         if (powman_hw->scratch[7]) {
-            ((low_power_pstate_resume_func)powman_hw->scratch[7])();
+            pstate_bitset_t pstate = pstate_bitset_from_powman_power_state(powman_hw->scratch[6]);
+            ((low_power_pstate_resume_func)powman_hw->scratch[7])(&pstate);
+            // clear the scratch registers
+            powman_hw->scratch[6] = 0;
             powman_hw->scratch[7] = 0;
         }
     }

@@ -113,6 +113,13 @@ static inline bool bitset_get_bit(generic_bitset_t *bitset, uint bit) {
     return false;
 }
 
+static inline bool bitset_equal(const generic_bitset_t *bitset1, const generic_bitset_t *bitset2) {
+    check_bitset(bitset1);
+    check_bitset(bitset2);
+    assert(bitset1->size == bitset2->size);
+    return __builtin_memcmp(bitset1->words, bitset2->words, bitset1->word_size * sizeof(uint32_t)) == 0;
+}
+
 typedef uint32_t tiny_encoded_bitset_t;
 typedef uint64_t encoded_bitset_t;
 

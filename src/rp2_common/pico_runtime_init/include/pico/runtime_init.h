@@ -425,11 +425,19 @@ void runtime_init_bootrom_locking_enable(void);
 #endif
 
 #ifndef PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX
-#define PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX !PICO_RP2350
+#if PICO_RP2350 && !defined(__riscv)
+#define PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX 0
+#else
+#define PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX 1
+#endif
 #endif
 
 #ifndef PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX
-#define PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX !PICO_RP2350
+#if PICO_RP2350 && !defined(__riscv)
+#define PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX 0
+#else
+#define PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX 1
+#endif
 #endif
 
 // ------------------------------------------------------------

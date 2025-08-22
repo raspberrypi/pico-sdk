@@ -52,7 +52,9 @@ typedef enum {
     NUM_DORMANT_CLOCK_SOURCES
 } dormant_clock_source_t;
 
-typedef void (*low_power_pstate_resume_func)(void);
+#if !PICO_RP2040
+typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
+#endif
 
 
 // NOTE: Need to deinit usb before doing into any of these sleep states
@@ -104,6 +106,8 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dorm
 
 #if !PICO_RP2040
 // pstate functions should return to the pstate you were in
+
+// pass resume_func which will be called on reboot by runtime_init_low_power_reboot_check
 int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
 int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
 
@@ -119,40 +123,6 @@ int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate
 // Doesn't support powering down switched core domain
 int low_power_pstate_set(pstate_bitset_t *pstate);
 pstate_bitset_t low_power_pstate_get(void);
-#endif
-
-#if 0   // todo - I think these are not being done?
-void sleep_run_from_dormant_source(dormant_clock_source_t dormant_source);
-/*! \brief Send system to sleep until a leading high edge is detected on GPIO
- *  \ingroup pico_sleep
- *
- * One of the sleep_run_* functions must be called prior to this call
- *
- * \param gpio_pin The pin to provide the wake up
- */
-static inline void sleep_goto_dormant_until_edge_high(uint gpio_pin) {
-    sleep_goto_dormant_until_pin(gpio_pin, true, true);
-}
-
-/*! \brief Send system to sleep until a high level is detected on GPIO
- *  \ingroup pico_sleep
- *
- * One of the sleep_run_* functions must be called prior to this call
- *
- * \param gpio_pin The pin to provide the wake up
- */
-static inline void sleep_goto_dormant_until_level_high(uint gpio_pin) {
-    sleep_goto_dormant_until_pin(gpio_pin, false, true);
-}
-
-/*! \brief Reconfigure clocks to wake up properly from sleep/dormant mode
- *  \ingroup pico_sleep
- *
- * This must be called immediately after continuing execution when waking up from sleep/dormant mode
- *
- */
-void sleep_power_up(void);
-
 #endif
 
 #ifdef __cplusplus

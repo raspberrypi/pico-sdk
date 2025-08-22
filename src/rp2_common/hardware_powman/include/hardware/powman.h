@@ -200,6 +200,11 @@ static inline bool pstate_bitset_is_set(pstate_bitset_t *domains, powman_power_d
     return bitset_get_bit(&domains->bitset, domain);
 }
 
+static inline bool pstate_bitset_none_set(pstate_bitset_t *domains) {
+    pstate_bitset_t none = pstate_bitset_none();
+    return bitset_equal(&domains->bitset, &none.bitset);
+}
+
 static inline pstate_bitset_t pstate_bitset_from_powman_power_state(powman_power_state pstate) {
     pstate_bitset_t bitset;
     bitset_init(&bitset, pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, pstate);

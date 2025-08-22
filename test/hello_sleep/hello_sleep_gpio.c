@@ -27,8 +27,9 @@ bool repeater(repeating_timer_t *timer) {
 #if !PICO_RP2040
 static bool came_from_pstate = false;
 static char powman_last_pwrup[100];
+static char powman_last_pstate[100];
 
-void pstate_resume_func(void) {
+void pstate_resume_func(pstate_bitset_t *pstate) {
     came_from_pstate = true;
     switch (powman_hw->last_swcore_pwrup) {
         //               0 = chip reset, for the source of the last reset see
@@ -41,6 +42,11 @@ void pstate_resume_func(void) {
         case 1 << 6: strcpy(powman_last_pwrup, "Alarm_pwrup"); break;
         default: strcpy(powman_last_pwrup, "Unknown pwrup"); break;
     }
+
+    if (pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_XIP_CACHE)) strcat(powman_last_pstate, "XIP_CACHE, ");
+    if (pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK0)) strcat(powman_last_pstate, "SRAM_BANK0, ");
+    if (pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1)) strcat(powman_last_pstate, "SRAM_BANK1, ");
+    if (pstate_bitset_none_set(pstate)) strcat(powman_last_pstate, "NONE, ");
 }
 #endif
 
@@ -55,7 +61,7 @@ int main() {
 
 #if !PICO_RP2040
     if (came_from_pstate) {
-        printf("Came from powerup %s - skipping to end\n", powman_last_pwrup);
+        printf("Came from powerup %s with (%s) memory kept on - skipping to end\n", powman_last_pwrup, powman_last_pstate);
         goto post_pstate_gpio;
     }
 
@@ -91,8 +97,6 @@ int main() {
 
     pstate = pstate_bitset_none();
     ret = low_power_pstate_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, &pstate, pstate_resume_func);
-
-    __breakpoint();
 
     printf("%d low_power_pstate_until_pin_state returned\n", ret);
     while (true) {
