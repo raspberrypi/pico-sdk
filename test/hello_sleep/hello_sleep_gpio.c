@@ -48,22 +48,22 @@ int main() {
     stdio_init_all();
     status_led_init();
     printf("Hello Sleep!\n");
-#if !PICO_RP2040
-    // use a second repeating timer on the other TIMER instance; it should be gated
+    // use a repeating timer; it should be gated
     // during our sleep (todo not sure how it affects power!)
-    alarm_pool_t *alarm_pool = alarm_pool_create_on_timer_with_unused_hardware_alarm(timer1_hw, 4);
     repeating_timer_t repeat;
-    alarm_pool_add_repeating_timer_ms(alarm_pool, 500, repeater, NULL, &repeat);
+    add_repeating_timer_ms(500, repeater, NULL, &repeat);
 
+#if !PICO_RP2040
     if (came_from_pstate) {
         printf("Came from powerup %s - skipping to end\n", powman_last_pwrup);
         goto post_pstate_gpio;
     }
 
-    printf("Waiting %d seconds\n", SLEEP_TIME_S); // so we can see some repeat printfs
-    busy_wait_ms(SLEEP_TIME_MS);
     pstate_bitset_t pstate;
 #endif
+
+    printf("Waiting %d seconds\n", SLEEP_TIME_S); // so we can see some repeat printfs
+    busy_wait_ms(SLEEP_TIME_MS);
 
     absolute_time_t start_time;
     struct timespec ts;

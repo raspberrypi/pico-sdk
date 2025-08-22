@@ -215,7 +215,11 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
 
     // Clear the irq so we can go back to dormant mode again if we want
     gpio_acknowledge_irq(gpio_pin, event);
-    gpio_set_irq_enabled_with_callback(gpio_pin, event, false, NULL);
+
+    // todo fix race in gpio_set_irq_enabled_with_callback
+    // gpio_set_irq_enabled_with_callback(gpio_pin, event, false, NULL);
+    gpio_set_irq_enabled(gpio_pin, event, false);
+    gpio_set_irq_callback(NULL);
 
     post_clock_gating();
 }
