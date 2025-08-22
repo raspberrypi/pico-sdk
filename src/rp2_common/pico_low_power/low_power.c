@@ -136,9 +136,27 @@ static void replace_null_enable_values(const clock_dest_set_t *keep_enabled,
     }
 }
 
+static uint32_t irq_mask_disabled_during_sleep[NUM_IRQS];
+
+static void save_and_disable_other_interrupts(uint32_t irq) {
+    for (uint n = 0; n <= ((NUM_IRQS-1) / 32); n++) {
+        irq_mask_disabled_during_sleep[n] = irq_get_mask_n(n);
+        if (irq >= n * 32 && irq < (n + 1) * 32) {
+            irq_mask_disabled_during_sleep[n] &= ~(1u << (irq % 32));
+        }
+        irq_set_mask_n_enabled(n, irq_mask_disabled_during_sleep[n], false);
+    }
+}
+
+static void restore_other_interrupts(void) {
+    for (uint n = 0; n < NUM_IRQS; n++) {
+        irq_set_mask_n_enabled(n, irq_mask_disabled_during_sleep[n], true);
+    }
+}
+
 // only the deep_sleep variant of this, as DORMANT cannot wake from TIMER
 int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
-                                const clock_dest_set_t *keep_enabled, __unused bool exclusive) {
+                                const clock_dest_set_t *keep_enabled, bool exclusive) {
     int alarm_num = timer_hardware_alarm_claim_unused(timer, false);
     if (alarm_num < 0) return PICO_ERROR_INSUFFICIENT_RESOURCES;
 
@@ -163,6 +181,15 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
 #else
 #error Unknown processor
 #endif
+
+#if NUM_GENERIC_TIMERS == 1
+#define TIMER_BASE_IRQ TIMER_IRQ_0
+#else
+#define TIMER_BASE_IRQ TIMER0_IRQ_0
+#endif
+
+    if (exclusive) save_and_disable_other_interrupts(TIMER_BASE_IRQ + alarm_num + (timer_get_index(timer) * NUM_ALARMS));
+
     prepare_for_clock_gating();
     // gate clocks
     clock_gate_sleep_en(&local_keep_enabled);
@@ -177,11 +204,13 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
 
     post_clock_gating();
 
+    if (exclusive) restore_other_interrupts();
+
     return 0;
 }
 
 void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
-                                     const clock_dest_set_t *keep_enabled, __unused bool exclusive) {
+                                     const clock_dest_set_t *keep_enabled, bool exclusive) {
 
     event_happened = false;
 
@@ -204,6 +233,8 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
     gpio_set_input_enabled(gpio_pin, true);
     gpio_set_irq_enabled_with_callback(gpio_pin, event, true, low_power_wakeup_gpio);
 
+    if (exclusive) save_and_disable_other_interrupts(IO_IRQ_BANK0);
+
     prepare_for_clock_gating();
     // gate clocks
     clock_gate_sleep_en(&local_keep_enabled);
@@ -218,6 +249,8 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
     gpio_set_irq_enabled_with_callback(gpio_pin, event, false, NULL);
 
     post_clock_gating();
+
+    if (exclusive) restore_other_interrupts();
 }
 
 #if 0
