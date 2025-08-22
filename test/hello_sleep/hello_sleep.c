@@ -18,9 +18,9 @@
 
 bool repeater(repeating_timer_t *timer) {
     if (aon_timer_is_running()) {
-        printf("  Repeating timer at %dms (aon: %dms)\n", to_ms_since_boot(get_absolute_time()), to_ms_since_boot(aon_timer_get_absolute_time()));
+        printf("  Repeating timer %d at %dms (aon: %dms)\n", *(uint32_t*)timer->user_data, to_ms_since_boot(get_absolute_time()), to_ms_since_boot(aon_timer_get_absolute_time()));
     } else {
-        printf("  Repeating timer at %dms (aon: not running)\n", to_ms_since_boot(get_absolute_time()));
+        printf("  Repeating timer %d at %dms (aon: not running)\n", *(uint32_t*)timer->user_data, to_ms_since_boot(get_absolute_time()));
     }
     status_led_set_state(!status_led_get_state());
     return true;
@@ -56,23 +56,31 @@ int main() {
     stdio_init_all();
     status_led_init();
     printf("Hello Sleep!\n");
+
+    // use a repeating timer on the same TIMER instance; it should be disabled
+    // during exclusive sleep (todo not sure how it affects power!)
+    repeating_timer_t repeat;
+    uint32_t repeater_id = 0;
+    add_repeating_timer_ms(500, repeater, &repeater_id, &repeat);
+
 #if !PICO_RP2040
     // use a second repeating timer on the other TIMER instance; it should be gated
     // during our sleep (todo not sure how it affects power!)
     alarm_pool_t *alarm_pool = alarm_pool_create_on_timer_with_unused_hardware_alarm(timer1_hw, 4);
-    repeating_timer_t repeat;
-    alarm_pool_add_repeating_timer_ms(alarm_pool, 500, repeater, NULL, &repeat);
+    repeating_timer_t repeat2;
+    uint32_t repeater2_id = 1;
+    alarm_pool_add_repeating_timer_ms(alarm_pool, 500, repeater, &repeater2_id, &repeat2);
 
     if (came_from_pstate) {
         printf("Came from powerup %s with (%s) memory kept on - skipping to end\n", powman_last_pwrup, powman_last_pstate);
         goto post_pstate_timer;
     }
 
-    printf("Waiting %d seconds\n", SLEEP_TIME_S); // so we can see some repeat printfs
-    busy_wait_ms(SLEEP_TIME_MS);
-
     pstate_bitset_t pstate;
 #endif
+
+    printf("Waiting %d seconds\n", SLEEP_TIME_S); // so we can see some repeat printfs
+    busy_wait_ms(SLEEP_TIME_MS);
 
     absolute_time_t start_time;
     absolute_time_t wakeup_time;
@@ -85,6 +93,20 @@ int main() {
     start_time = get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, true);
+    diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
+    printf("Woken up now @%dus since target\n", (int)diff);
+    if (diff < 0) {
+        printf("ERROR: Woke up too soon\n");
+        return -1;
+    }
+    printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
+    busy_wait_ms(SLEEP_TIME_MS);
+
+    printf("Going to non-exclusive sleep for %d seconds via TIMER\n", SLEEP_TIME_S);
+
+    start_time = get_absolute_time();
+    wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
+    low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, false);
     diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {

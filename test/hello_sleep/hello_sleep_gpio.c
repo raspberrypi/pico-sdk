@@ -81,6 +81,21 @@ int main() {
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
+    printf("Going to non-exclusive sleep until GPIO wakeup\n");
+
+    // need to keep the timer running
+    clock_dest_set_t keep_enabled = clock_dest_set_none();
+#if PICO_RP2040
+    clock_dest_set_add(&keep_enabled, CLK_DEST_SYS_TIMER);
+#else
+    clock_dest_set_add(&keep_enabled, CLK_DEST_SYS_TIMER0);
+    clock_dest_set_add(&keep_enabled, CLK_DEST_REF_TICKS);
+#endif
+
+    low_power_sleep_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, &keep_enabled, false);
+    printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
+    busy_wait_ms(SLEEP_TIME_MS);
+
     // todo, ah; we should start the aon timer; still have to decide what to do about keeping them in sync
     start_time = get_absolute_time();
     us_to_timespec(start_time, &ts);
