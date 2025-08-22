@@ -14,6 +14,8 @@
 #define SLEEP_TIME_S 2
 #define SLEEP_TIME_MS SLEEP_TIME_S * 1000
 
+#define RTC_GPIO 22 // must support clock input, see the GPIO function table in the datasheet.
+
 bool repeater(repeating_timer_t *timer) {
     if (aon_timer_is_running()) {
         printf("  Repeating timer at %dms (aon: %dms)\n", to_ms_since_boot(get_absolute_time()), to_ms_since_boot(aon_timer_get_absolute_time()));
@@ -86,7 +88,6 @@ int main() {
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
-#if !PICO_RP2040
     printf("Going DORMANT for %d seconds via AON TIMER\n", SLEEP_TIME_S);
 
     // todo, ah; we should start the aon timer; still have to decide what to do about keeping them in sync
@@ -95,9 +96,13 @@ int main() {
     aon_timer_start(&ts);
 
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
-    low_power_dormant_until_aon_timer(wakeup_time, DORMANT_CLOCK_SOURCE_LPOSC, XOSC_KHZ * 1000,
-                                      0, // gpio pin (unused with powman)
-                                      NULL);
+    low_power_dormant_until_aon_timer(wakeup_time,
+                                #if PICO_RP2040
+                                      DORMANT_CLOCK_SOURCE_XOSC, 46875,
+                                #else
+                                      DORMANT_CLOCK_SOURCE_LPOSC, XOSC_HZ,
+                                #endif
+                                      RTC_GPIO, NULL);
     diff = absolute_time_diff_us(get_absolute_time(), wakeup_time);
     // need to use the AON timer for checking time, since the other timer is unclocked
     diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
@@ -113,6 +118,7 @@ int main() {
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
+#if !PICO_RP2040
     printf("Going to PSTATE for %d seconds\n", SLEEP_TIME_S);
 
     start_time = aon_timer_get_absolute_time();

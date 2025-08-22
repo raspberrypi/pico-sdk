@@ -215,11 +215,7 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
 
     // Clear the irq so we can go back to dormant mode again if we want
     gpio_acknowledge_irq(gpio_pin, event);
-
-    // todo fix race in gpio_set_irq_enabled_with_callback
-    // gpio_set_irq_enabled_with_callback(gpio_pin, event, false, NULL);
-    gpio_set_irq_enabled(gpio_pin, event, false);
-    gpio_set_irq_callback(NULL);
+    gpio_set_irq_enabled_with_callback(gpio_pin, event, false, NULL);
 
     post_clock_gating();
 }
@@ -374,7 +370,7 @@ void low_power_go_dormant(dormant_clock_source_t dormant_clock_source) {
 
 int low_power_dormant_until_aon_timer(absolute_time_t until,
                                       dormant_clock_source_t dormant_clock_source,
-                                      __unused uint src_hz, uint gpio_pin,
+                                      uint src_hz, uint gpio_pin,
                                       const clock_dest_set_t *keep_enabled) {
     low_power_setup_clocks_for_dormant(dormant_clock_source);
 
@@ -388,6 +384,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     clock_dest_set_add(&local_keep_enabled, CLK_DEST_RTC_RTC);
 #elif PICO_RP2350
     // todo
+    ((void)src_hz);
     ((void)gpio_pin);
     if (dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC)
         powman_timer_set_1khz_tick_source_lposc();
