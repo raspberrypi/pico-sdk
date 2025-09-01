@@ -205,14 +205,13 @@ static inline bool pstate_bitset_none_set(pstate_bitset_t *domains) {
     return bitset_equal(&domains->bitset, &none.bitset);
 }
 
-static inline pstate_bitset_t pstate_bitset_from_powman_power_state(powman_power_state pstate) {
-    pstate_bitset_t bitset;
-    bitset_init(&bitset, pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, pstate);
-    return bitset;
+static inline pstate_bitset_t *pstate_bitset_from_powman_power_state(pstate_bitset_t *domains, powman_power_state pstate) {
+    bitset_write_word(&domains->bitset, 0, pstate);
+    return domains;
 }
 
-static inline powman_power_state pstate_bitset_to_powman_power_state(pstate_bitset_t *pstate) {
-    return pstate->bitset.words[0];
+static inline powman_power_state pstate_bitset_to_powman_power_state(pstate_bitset_t *domains) {
+    return bitset_read_word(&domains->bitset, 0);
 }
 
 /*! \brief Get the current power state

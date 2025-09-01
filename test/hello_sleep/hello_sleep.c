@@ -30,9 +30,13 @@ bool repeater(repeating_timer_t *timer) {
 static bool came_from_pstate = false;
 static char powman_last_pwrup[100];
 static char powman_last_pstate[100];
+static char powman_last_pstate_val[10];
 
 void pstate_resume_func(pstate_bitset_t *pstate) {
     came_from_pstate = true;
+    memset(powman_last_pwrup, 0, sizeof(powman_last_pwrup));
+    memset(powman_last_pstate, 0, sizeof(powman_last_pstate));
+    memset(powman_last_pstate_val, 0, sizeof(powman_last_pstate_val));
     switch (powman_hw->last_swcore_pwrup) {
         //               0 = chip reset, for the source of the last reset see
         case 1 << 0: strcpy(powman_last_pwrup, "Chip reset"); break;
@@ -50,6 +54,8 @@ void pstate_resume_func(pstate_bitset_t *pstate) {
     if (pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1)) strcat(powman_last_pstate, "SRAM_BANK1, ");
     if (pstate_bitset_none_set(pstate)) strcat(powman_last_pstate, "NONE, ");
 }
+
+static volatile int my_number = 12345;
 #endif
 
 int main() {
@@ -73,7 +79,13 @@ int main() {
 
     if (came_from_pstate) {
         printf("Came from powerup %s with (%s) memory kept on - skipping to end\n", powman_last_pwrup, powman_last_pstate);
-        goto post_pstate_timer;
+        if (strstr(powman_last_pstate, "SRAM_BANK0") != NULL) {
+            goto post_pstate_sram0_on;
+        } else if (strstr(powman_last_pstate, "SRAM_BANK1") != NULL) {
+            goto post_pstate_sram1_on;
+        } else {
+            goto post_pstate_sram_off;
+        }
     }
 
     pstate_bitset_t pstate;
@@ -88,6 +100,9 @@ int main() {
     struct timespec ts;
     int ret;
 
+
+
+    // exclusive sleep
     printf("Going to sleep for %d seconds via TIMER\n", SLEEP_TIME_S);
 
     start_time = get_absolute_time();
@@ -102,6 +117,9 @@ int main() {
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
+
+
+    // non-exclusive sleep
     printf("Going to non-exclusive sleep for %d seconds via TIMER\n", SLEEP_TIME_S);
 
     start_time = get_absolute_time();
@@ -116,6 +134,9 @@ int main() {
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
+
+
+    // dormant
     printf("Going DORMANT for %d seconds via AON TIMER\n", SLEEP_TIME_S);
 
     // todo, ah; we should start the aon timer; still have to decide what to do about keeping them in sync
@@ -146,8 +167,98 @@ int main() {
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
+
+
+    // powman states
 #if !PICO_RP2040
-    printf("Going to PSTATE for %d seconds\n", SLEEP_TIME_S);
+    // pstate with sram0 on
+    printf("Going to PSTATE with SRAM0 on for %d seconds\n", SLEEP_TIME_S);
+
+    if (my_number != 12345) {
+        printf("ERROR: my_number is %d not 12345 - initialisation issue?\n", my_number);
+        return -1;
+    }
+    my_number = 67890;
+
+    start_time = aon_timer_get_absolute_time();
+
+    wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
+    powman_hw->scratch[0] = to_us_since_boot(wakeup_time) & 0xFFFFFFFF;
+    powman_hw->scratch[1] = to_us_since_boot(wakeup_time) >> 32;
+    pstate = pstate_bitset_none();
+    pstate_bitset_add(&pstate, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    printf("pstate: %08x\n", pstate_bitset_to_powman_power_state(&pstate));
+    ret = low_power_pstate_until_aon_timer(wakeup_time, &pstate, pstate_resume_func);
+
+    printf("%d low_power_pstate_until_aon_timer returned\n", ret);
+    while (true) {
+        printf("Waiting\n");
+        busy_wait_ms(1000);
+    }
+
+post_pstate_sram0_on:
+    // restore from scratch
+    wakeup_time = from_us_since_boot((uint64_t)powman_hw->scratch[1] << 32 | (uint64_t)powman_hw->scratch[0]);
+    diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
+    printf("Woken up now @%dus since target\n", (int)diff);
+    if (diff < 0) {
+        printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
+    }
+
+    if (my_number != 67890) {
+        printf("ERROR: my_number is %d not 67890 - SRAM has been re-loaded\n", my_number);
+        return -1;
+    } else {
+        printf("my_number in sram: %d\n", my_number);
+    }
+
+    printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
+    busy_wait_ms(SLEEP_TIME_MS);
+
+
+
+    // pstate with sram1 on
+    printf("Going to PSTATE with SRAM1 on for %d seconds\n", SLEEP_TIME_S);
+
+    start_time = aon_timer_get_absolute_time();
+
+    wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
+    powman_hw->scratch[0] = to_us_since_boot(wakeup_time) & 0xFFFFFFFF;
+    powman_hw->scratch[1] = to_us_since_boot(wakeup_time) >> 32;
+    pstate = pstate_bitset_none();
+    pstate_bitset_add(&pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    printf("pstate: %08x\n", pstate_bitset_to_powman_power_state(&pstate));
+    ret = low_power_pstate_until_aon_timer(wakeup_time, &pstate, pstate_resume_func);
+
+    printf("%d low_power_pstate_until_aon_timer returned\n", ret);
+    while (true) {
+        printf("Waiting\n");
+        busy_wait_ms(1000);
+    }
+
+post_pstate_sram1_on:
+    // restore from scratch
+    wakeup_time = from_us_since_boot((uint64_t)powman_hw->scratch[1] << 32 | (uint64_t)powman_hw->scratch[0]);
+    diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
+    printf("Woken up now @%dus since target\n", (int)diff);
+    if (diff < 0) {
+        printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
+    }
+
+    if (my_number != 12345) {
+        printf("ERROR: my_number is %d not 12345 - SRAM has not been re-loaded\n", my_number);
+        return -1;
+    } else {
+        printf("my_number in sram: %d\n", my_number);
+    }
+
+    printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
+    busy_wait_ms(SLEEP_TIME_MS);
+
+
+
+    // pstate with sram off
+    printf("Going to PSTATE with SRAM off for %d seconds\n", SLEEP_TIME_S);
 
     start_time = aon_timer_get_absolute_time();
 
@@ -163,15 +274,20 @@ int main() {
         busy_wait_ms(1000);
     }
 
-post_pstate_timer:
-
+post_pstate_sram_off:
     // restore from scratch
     wakeup_time = from_us_since_boot((uint64_t)powman_hw->scratch[1] << 32 | (uint64_t)powman_hw->scratch[0]);
-
     diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
         printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
+    }
+
+    if (my_number != 12345) {
+        printf("ERROR: my_number is not 12345 - SRAM has not been re-loaded\n");
+        return -1;
+    } else {
+        printf("my_number in sram: %d\n", my_number);
     }
 
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);

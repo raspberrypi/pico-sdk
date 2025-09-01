@@ -15,6 +15,10 @@
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
 
+#if !PICO_RP2040
+#include "hardware/regs/powman.h"
+#endif
+
 // PICO_CONFIG: PICO_CRT0_NEAR_CALLS, Whether calls from crt0 into the binary are near (<16M away) - ignored for PICO_COPY_TO_RAM, default=0, type=bool, group=pico_crt0
 #ifndef PICO_CRT0_NEAR_CALLS
 #define PICO_CRT0_NEAR_CALLS 0
@@ -478,6 +482,11 @@ _call_xip_setup:
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
 #if !PICO_NO_FLASH
+#if LIB_PICO_LOW_POWER && !PICO_RP2040
+    // Load previous power state into r6
+    ldr r6, =(POWMAN_BASE+POWMAN_SCRATCH6_OFFSET)
+    ldr r6, [r6]
+#endif
     adr r4, data_cpy_table
 
     // assume there is at least one entry
@@ -485,6 +494,11 @@ _call_xip_setup:
     ldmia r4!, {r1-r3}
     cmp r1, #0
     beq 2f
+#if LIB_PICO_LOW_POWER && !PICO_RP2040
+    bl data_cpy_check
+    cmp r0, #1
+    beq 1b
+#endif
     bl data_cpy
     b 1b
 2:
@@ -530,6 +544,54 @@ data_cpy:
     cmp r2, r3
     blo data_cpy_loop
     bx lr
+
+#if LIB_PICO_LOW_POWER && !PICO_RP2040
+data_cpy_check:
+    // uses r5 and r7 as scratch
+    // uses the powman_power_state in r6
+    // returns in r0
+    mov r0, #0
+    // First check start of copy (r2)
+    mov r7, r2
+check_r7:
+    ldr r5, =(SRAM_BASE >> 16)
+    cmp r5, r7, lsr #16
+    bgt check_xip_sram
+    ldr r5, =(SRAM4_BASE >> 16)
+    cmp r5, r7, lsr #16
+    bgt check_sram0
+    b check_sram1
+check_xip_sram:
+    mov r5, #(1 << 2) // POWMAN_POWER_DOMAIN_XIP_CACHE
+    and r5, r6
+    cmp r5, #(1 << 2)
+    beq skip
+    b noskip
+check_sram0:
+    mov r5, #(1 << 1) // POWMAN_POWER_DOMAIN_SRAM_BANK0
+    and r5, r6
+    cmp r5, #(1 << 1)
+    beq skip
+    b noskip
+check_sram1:
+    mov r5, #(1 << 0) // POWMAN_POWER_DOMAIN_SRAM_BANK1
+    and r5, r6
+    cmp r5, #(1 << 0)
+    beq skip
+    b noskip
+skip:
+    cmp r0, #1
+    bne check_end
+    bx lr
+check_end:
+    add r0, #1
+    // If start was skipped, check end of copy
+    mov r7, r3
+    b check_r7
+noskip:
+    mov r0, #0
+    bx lr
+#endif
 #endif
 
 // Note the data copy table is still included for NO_FLASH builds, even though

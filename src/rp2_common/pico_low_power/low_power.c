@@ -500,15 +500,17 @@ int low_power_pstate_set(pstate_bitset_t *pstate) {
     return powman_set_power_state(pstate_bitset_to_powman_power_state(pstate));
 }
 
-pstate_bitset_t low_power_pstate_get(void) {
-    return pstate_bitset_from_powman_power_state(powman_get_power_state());
+pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate) {
+    pstate_bitset_from_powman_power_state(pstate, powman_get_power_state());
+    return pstate;
 }
 
 int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
     prepare_for_pstate_change();
 
     // Configure the wakeup state
-    pstate_bitset_t current_pstate = low_power_pstate_get();
+    pstate_bitset_t current_pstate = pstate_bitset_none();
+    low_power_pstate_get(&current_pstate);
     bool valid_state = powman_configure_wakeup_state(pstate_bitset_to_powman_power_state(pstate), pstate_bitset_to_powman_power_state(&current_pstate));
     if (!valid_state) {
         return PICO_ERROR_INVALID_STATE;
@@ -556,7 +558,8 @@ void __weak runtime_init_low_power_reboot_check(void) {
     if (powman_hw->chip_reset & POWMAN_CHIP_RESET_HAD_SWCORE_PD_BITS) {
         // we came from powman reboot, so execute the resume function
         if (powman_hw->scratch[7]) {
-            pstate_bitset_t pstate = pstate_bitset_from_powman_power_state(powman_hw->scratch[6]);
+            pstate_bitset_t pstate = pstate_bitset_none();
+            pstate_bitset_from_powman_power_state(&pstate, powman_hw->scratch[6]);
             ((low_power_pstate_resume_func)powman_hw->scratch[7])(&pstate);
             // clear the scratch registers
             powman_hw->scratch[6] = 0;
