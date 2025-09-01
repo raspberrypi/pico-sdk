@@ -1,5 +1,6 @@
-file(READ ${PICO_LINKER_SCRIPT_PATH}/memmap_@TYPE@.ld LINKER_SCRIPT)
+# These lines are configured to be set(RAM_ORIGIN xxx) set(RAM_LENGTH xxx) etc.
 @RAM@
 @SCRATCH_X@
 @SCRATCH_Y@
-file(WRITE ${output_file} "${LINKER_SCRIPT}")
+
+configure_file("${PICO_LINKER_SCRIPT_PATH}/memmap_@TYPE@.template.ld" "${output_file}" @ONLY)

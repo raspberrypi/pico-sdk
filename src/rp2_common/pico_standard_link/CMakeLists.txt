@@ -78,13 +78,42 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()
 
+    # pico_set_modified_binary_type(TARGET TYPE [RAM <RAM_ORIGIN> <RAM_LENGTH>] [SCRATCH_X <SCRATCH_X_ORIGIN> <SCRATCH_X_LENGTH>] [SCRATCH_Y <SCRATCH_Y_ORIGIN> <SCRATCH_Y_LENGTH>])
+    # \brief\ Set the binary type for the target with modified RAM, SCRATCH_X and SCRATCH_Y regions
+    #
+    # \param\ TYPE The type of binary to use (flash or sram)
+    # \param\ RAM_ORIGIN The origin of the RAM section
+    # \param\ RAM_LENGTH The length of the RAM section
+    # \param\ SCRATCH_X_ORIGIN The origin of the SCRATCH_X section
+    # \param\ SCRATCH_X_LENGTH The length of the SCRATCH_X section
+    # \param\ SCRATCH_Y_ORIGIN The origin of the SCRATCH_Y section
+    # \param\ SCRATCH_Y_LENGTH The length of the SCRATCH_Y section
     function(pico_set_modified_binary_type TARGET TYPE)
         set(multiValueArgs RAM SCRATCH_X SCRATCH_Y)
         cmake_parse_arguments(PARSE_ARGV 0 args
             "" "" "${multiValueArgs}"
         )
 
-        pico_set_binary_type(${TARGET} ${TYPE})
+        if (NOT (TYPE STREQUAL "sram" OR TYPE STREQUAL "flash"))
+            message(FATAL_ERROR "Invalid binary type for pico_set_modified_binary_type: ${TYPE}")
+        endif()
+
+        # Default RAM, SCRATCH_X and SCRATCH_Y regions
+        if (PICO_RP2040)
+            set(PICO_DEFAULT_RAM_ORIGIN 0x20000000)
+            set(PICO_DEFAULT_RAM_LENGTH 256k)
+            set(PICO_DEFAULT_SCRATCH_X_ORIGIN 0x20040000)
+            set(PICO_DEFAULT_SCRATCH_X_LENGTH 4k)
+            set(PICO_DEFAULT_SCRATCH_Y_ORIGIN 0x20041000)
+            set(PICO_DEFAULT_SCRATCH_Y_LENGTH 4k)
+        elseif (PICO_RP2350)
+            set(PICO_DEFAULT_RAM_ORIGIN 0x20000000)
+            set(PICO_DEFAULT_RAM_LENGTH 512k)
+            set(PICO_DEFAULT_SCRATCH_X_ORIGIN 0x20080000)
+            set(PICO_DEFAULT_SCRATCH_X_LENGTH 4k)
+            set(PICO_DEFAULT_SCRATCH_Y_ORIGIN 0x20081000)
+            set(PICO_DEFAULT_SCRATCH_Y_LENGTH 4k)
+        endif()
 
         # Scripts that will be created by this function
         set(LINKER_CMAKE_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/memmap_${TARGET}.cmake")
@@ -93,15 +122,27 @@ if (NOT TARGET pico_standard_link)
         # Configure memmap_${TARGET}.cmake script file to create memmap_${TARGET}.ld
         if (args_RAM)
             list(POP_FRONT args_RAM ORIGIN LENGTH)
-            set(RAM "string(REGEX REPLACE \"RAM\\\\(rwx\\\\) *: *ORIGIN *= *[0-9xX]*, *LENGTH *= *[0-9kKmM]*\\n\" \"RAM(rwx) : ORIGIN = ${ORIGIN}, LENGTH = ${LENGTH}\\n\" LINKER_SCRIPT \"\${LINKER_SCRIPT}\")\n")
+            set(RAM "set(RAM_ORIGIN ${ORIGIN})\nset(RAM_LENGTH ${LENGTH})\n")
+        elseif (PICO_DEFAULT_RAM_ORIGIN)
+            set(RAM "set(RAM_ORIGIN ${PICO_DEFAULT_RAM_ORIGIN})\nset(RAM_LENGTH ${PICO_DEFAULT_RAM_LENGTH})\n")
+        else()
+            message(FATAL_ERROR "Unknown default RAM region for ${PICO_PLATFORM}")
         endif()
         if (args_SCRATCH_X)
             list(POP_FRONT args_SCRATCH_X ORIGIN LENGTH)
-            set(SCRATCH_X "string(REGEX REPLACE \"SCRATCH_X\\\\(rwx\\\\) *: *ORIGIN *= *[0-9xX]*, *LENGTH *= *[0-9kKmM]*\\n\" \"SCRATCH_X(rwx) : ORIGIN = ${ORIGIN}, LENGTH = ${LENGTH}\\n\" LINKER_SCRIPT \"\${LINKER_SCRIPT}\")\n")
+            set(SCRATCH_X "set(SCRATCH_X_ORIGIN ${ORIGIN})\nset(SCRATCH_X_LENGTH ${LENGTH})\n")
+        elseif(PICO_DEFAULT_SCRATCH_X_ORIGIN)
+            set(SCRATCH_X "set(SCRATCH_X_ORIGIN ${PICO_DEFAULT_SCRATCH_X_ORIGIN})\nset(SCRATCH_X_LENGTH ${PICO_DEFAULT_SCRATCH_X_LENGTH})\n")
+        else()
+            message(FATAL_ERROR "Unknown default SCRATCH_X region for ${PICO_PLATFORM}")
         endif()
         if (args_SCRATCH_Y)
             list(POP_FRONT args_SCRATCH_Y ORIGIN LENGTH)
-            set(SCRATCH_Y "string(REGEX REPLACE \"SCRATCH_Y\\\\(rwx\\\\) *: *ORIGIN *= *[0-9xX]*, *LENGTH *= *[0-9kKmM]*\\n\" \"SCRATCH_Y(rwx) : ORIGIN = ${ORIGIN}, LENGTH = ${LENGTH}\\n\" LINKER_SCRIPT \"\${LINKER_SCRIPT}\")\n")
+            set(SCRATCH_Y "set(SCRATCH_Y_ORIGIN ${ORIGIN})\nset(SCRATCH_Y_LENGTH ${LENGTH})\n")
+        elseif(PICO_DEFAULT_SCRATCH_Y_ORIGIN)
+            set(SCRATCH_Y "set(SCRATCH_Y_ORIGIN ${PICO_DEFAULT_SCRATCH_Y_ORIGIN})\nset(SCRATCH_Y_LENGTH ${PICO_DEFAULT_SCRATCH_Y_LENGTH})\n")
+        else()
+            message(FATAL_ERROR "Unknown default SCRATCH_Y region for ${PICO_PLATFORM}")
         endif()
         if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.17.0")
             # CMAKE_CURRENT_FUNCTION_LIST_DIR added in 3.17.0
@@ -110,17 +151,24 @@ if (NOT TARGET pico_standard_link)
             configure_file(${PICO_SDK_PATH}src/rp2_common/pico_standard_link/memmap_script.template.cmake ${LINKER_CMAKE_SCRIPT} @ONLY)
         endif()
 
-        # Add command to run this script whenever it or memmap_${TYPE}.ld changes
+        # Add command to run this script whenever it changes
         add_custom_command(OUTPUT ${LINKER_LD_SCRIPT}
             COMMAND ${CMAKE_COMMAND}
                 -DPICO_LINKER_SCRIPT_PATH:PATH=${PICO_LINKER_SCRIPT_PATH}
                 -Doutput_file:FILEPATH=${LINKER_LD_SCRIPT}
                 -P "${LINKER_CMAKE_SCRIPT}"
-            DEPENDS ${PICO_LINKER_SCRIPT_PATH}/memmap_${TYPE}.ld ${LINKER_CMAKE_SCRIPT})
+            DEPENDS ${LINKER_CMAKE_SCRIPT})
         add_custom_target(memmap_${TARGET}_ld DEPENDS ${LINKER_LD_SCRIPT})
         add_dependencies(${TARGET} memmap_${TARGET}_ld)
 
         pico_set_linker_script(${TARGET} ${CMAKE_CURRENT_BINARY_DIR}/memmap_${TARGET}.ld)
+
+        # Set PICO_TARGET_BINARY_TYPE for additional configuration
+        if (TYPE STREQUAL "sram")
+            set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE no_flash)
+        else()
+            set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE default)
+        endif()
     endfunction()
 
     # slightly messy as we support both the preferred PICO_DEFAULT_BINARY_TYPE and the individual variables
