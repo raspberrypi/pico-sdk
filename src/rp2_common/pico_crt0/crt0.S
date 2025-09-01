@@ -554,29 +554,24 @@ data_cpy_check:
     // First check start of copy (r2)
     mov r7, r2
 check_r7:
-    ldr r5, =(SRAM_BASE >> 16)
-    cmp r5, r7, lsr #16
+    ldr r5, =SRAM_BASE
+    cmp r5, r7
     bgt check_xip_sram
-    ldr r5, =(SRAM4_BASE >> 16)
-    cmp r5, r7, lsr #16
+    ldr r5, =SRAM4_BASE
+    cmp r5, r7
     bgt check_sram0
-    b check_sram1
-check_xip_sram:
-    mov r5, #(1 << 2) // POWMAN_POWER_DOMAIN_XIP_CACHE
-    and r5, r6
-    cmp r5, #(1 << 2)
-    beq skip
-    b noskip
-check_sram0:
-    mov r5, #(1 << 1) // POWMAN_POWER_DOMAIN_SRAM_BANK0
-    and r5, r6
-    cmp r5, #(1 << 1)
-    beq skip
-    b noskip
 check_sram1:
     mov r5, #(1 << 0) // POWMAN_POWER_DOMAIN_SRAM_BANK1
-    and r5, r6
-    cmp r5, #(1 << 0)
+    b do_check
+check_xip_sram:
+    mov r5, #(1 << 2) // POWMAN_POWER_DOMAIN_XIP_CACHE
+    b do_check
+check_sram0:
+    mov r5, #(1 << 1) // POWMAN_POWER_DOMAIN_SRAM_BANK0
+    b do_check
+do_check:
+    and r7, r5, r6
+    cmp r5, r7
     beq skip
     b noskip
 skip:

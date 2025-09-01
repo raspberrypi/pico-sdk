@@ -12,6 +12,10 @@
 #include "boot/picobin.h"
 #include "pico/bootrom_constants.h"
 
+#if !PICO_RP2040
+#include "hardware/regs/powman.h"
+#endif
+
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS
 #define COLLAPSE_IRQS
@@ -345,6 +349,11 @@ _call_xip_setup:
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
 #if !PICO_NO_FLASH
+#if LIB_PICO_LOW_POWER && !PICO_RP2040
+    // Load previous power state into r6
+    li a6, POWMAN_BASE+POWMAN_SCRATCH6_OFFSET
+    lw a6, 0(a6)
+#endif
     la a4, data_cpy_table
 
     // assume there is at least one entry
@@ -354,6 +363,10 @@ _call_xip_setup:
     lw a2, 4(a4)
     lw a3, 8(a4)
     addi a4, a4, 12
+#if LIB_PICO_LOW_POWER && !PICO_RP2040
+    jal data_cpy_check
+    bnez a0, 1b
+#endif
     jal data_cpy
     j 1b
 2:
@@ -383,6 +396,8 @@ platform_entry: // symbol for stack traces
     ebreak
     j 1b
 
+
+#if !PICO_NO_FLASH
 data_cpy_loop:
     lw a0, (a1)
     sw a0, (a2)
@@ -391,6 +406,45 @@ data_cpy_loop:
 data_cpy:
     bltu a2, a3, data_cpy_loop
     ret
+
+#if LIB_PICO_LOW_POWER && !PICO_RP2040
+data_cpy_check:
+    // uses a5 and a7 as scratch
+    // uses the powman_power_state in a6
+    // returns in a0
+    li a0, 0
+    // First check start of copy (a2)
+    mv a7, a2
+check_a7:
+    li a5, SRAM_BASE
+    bgt a5, a7, check_xip_sram
+    li a5, SRAM4_BASE
+    bgt a5, a7, check_sram0
+check_sram1:
+    li a5, 1 << 0 // POWMAN_POWER_DOMAIN_SRAM_BANK1
+    j do_check
+check_xip_sram:
+    li a5, 1 << 2 // POWMAN_POWER_DOMAIN_XIP_CACHE
+    j do_check
+check_sram0:
+    li a5, 1 << 1 // POWMAN_POWER_DOMAIN_SRAM_BANK0
+    j do_check
+do_check:
+    and a7, a5, a6
+    beq a5, a7, skip
+    j noskip
+skip:
+    beqz a0, check_end
+    ret
+check_end:
+    addi a0, a0, 1
+    mv a7, a3
+    j check_a7
+noskip:
+    li a0, 0
+    ret
+#endif
+#endif
 
 .align 2
 data_cpy_table:
