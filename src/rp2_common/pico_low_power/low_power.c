@@ -493,7 +493,7 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
     low_power_wake_from_dormant();
 }
 
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
 int low_power_pstate_set(pstate_bitset_t *pstate) {
     invalid_params_if(PICO_LOW_POWER, !pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SWITCHED_CORE));
 
@@ -573,7 +573,7 @@ void __weak runtime_init_low_power_reboot_check(void) {
 PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_low_power_reboot_check, PICO_RUNTIME_INIT_LOW_POWER_REBOOT_CHECK);
 #endif
 
-#endif // !PICO_RP2040
+#endif // HAS_POWMAN_TIMER
 
 #if !PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX
 #include "hardware/sync.h"

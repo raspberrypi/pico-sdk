@@ -12,7 +12,7 @@
 #include "boot/picobin.h"
 #include "pico/bootrom_constants.h"
 
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
 #include "hardware/regs/powman.h"
 #endif
 
@@ -349,7 +349,7 @@ _call_xip_setup:
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
 #if !PICO_NO_FLASH
-#if LIB_PICO_LOW_POWER && !PICO_RP2040
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
     // Load previous power state into r6
     li a6, POWMAN_BASE+POWMAN_SCRATCH6_OFFSET
     lw a6, 0(a6)
@@ -363,7 +363,7 @@ _call_xip_setup:
     lw a2, 4(a4)
     lw a3, 8(a4)
     addi a4, a4, 12
-#if LIB_PICO_LOW_POWER && !PICO_RP2040
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
     jal data_cpy_check
     bnez a0, 1b
 #endif
@@ -407,7 +407,7 @@ data_cpy:
     bltu a2, a3, data_cpy_loop
     ret
 
-#if LIB_PICO_LOW_POWER && !PICO_RP2040
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
 data_cpy_check:
     // uses a5 and a7 as scratch
     // uses the powman_power_state in a6

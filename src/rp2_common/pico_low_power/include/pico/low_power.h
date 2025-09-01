@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 #include "hardware/clocks.h"
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
 #include "hardware/powman.h"
 #endif
 
@@ -52,7 +52,7 @@ typedef enum {
     NUM_DORMANT_CLOCK_SOURCES
 } dormant_clock_source_t;
 
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
 typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
 #endif
 
@@ -104,7 +104,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
 // Need to re initialize clocks after this
 void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_set_t *keep_enabled);
 
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
 // pstate functions should return to the pstate you were in
 
 // pass resume_func which will be called on reboot by runtime_init_low_power_reboot_check

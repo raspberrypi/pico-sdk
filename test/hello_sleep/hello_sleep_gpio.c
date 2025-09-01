@@ -24,13 +24,16 @@ bool repeater(repeating_timer_t *timer) {
     return true;
 }
 
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
 static bool came_from_pstate = false;
 static char powman_last_pwrup[100];
 static char powman_last_pstate[100];
 
 void pstate_resume_func(pstate_bitset_t *pstate) {
     came_from_pstate = true;
+    memset(powman_last_pwrup, 0, sizeof(powman_last_pwrup));
+    memset(powman_last_pstate, 0, sizeof(powman_last_pstate));
+    memset(powman_last_pstate_val, 0, sizeof(powman_last_pstate_val));
     switch (powman_hw->last_swcore_pwrup) {
         //               0 = chip reset, for the source of the last reset see
         case 1 << 0: strcpy(powman_last_pwrup, "Chip reset"); break;
@@ -59,7 +62,7 @@ int main() {
     repeating_timer_t repeat;
     add_repeating_timer_ms(500, repeater, NULL, &repeat);
 
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
     if (came_from_pstate) {
         printf("Came from powerup %s with (%s) memory kept on - skipping to end\n", powman_last_pwrup, powman_last_pstate);
         goto post_pstate_gpio;
@@ -107,7 +110,7 @@ int main() {
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
     printf("Going to PSTATE until GPIO wakeup\n");
 
     pstate = pstate_bitset_none();

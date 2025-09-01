@@ -26,7 +26,7 @@ bool repeater(repeating_timer_t *timer) {
     return true;
 }
 
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
 static bool came_from_pstate = false;
 static char powman_last_pwrup[100];
 static char powman_last_pstate[100];
@@ -69,7 +69,7 @@ int main() {
     uint32_t repeater_id = 0;
     add_repeating_timer_ms(500, repeater, &repeater_id, &repeat);
 
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
     // use a second repeating timer on the other TIMER instance; it should be gated
     // during our sleep (todo not sure how it affects power!)
     alarm_pool_t *alarm_pool = alarm_pool_create_on_timer_with_unused_hardware_alarm(timer1_hw, 4);
@@ -170,7 +170,7 @@ int main() {
 
 
     // powman states
-#if !PICO_RP2040
+#if HAS_POWMAN_TIMER
     // pstate with sram0 on
     printf("Going to PSTATE with SRAM0 on for %d seconds\n", SLEEP_TIME_S);
 
