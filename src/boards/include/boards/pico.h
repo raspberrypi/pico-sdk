@@ -80,7 +80,7 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #define PICO_SMPS_MODE_PIN 23
 
 #ifndef PICO_RP2040_B0_SUPPORTED
-#define PICO_RP2040_B0_SUPPORTED 1
+#define PICO_RP2040_B0_SUPPORTED 0
 #endif
 
 // The GPIO Pin used to read VBUS to determine if the device is battery powered.
