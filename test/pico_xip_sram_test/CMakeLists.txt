@@ -1,0 +1,7 @@
+if (NOT PICO_RP2040)
+    add_executable(pico_xip_sram_test pico_xip_sram_test.c)
+    target_link_libraries(pico_xip_sram_test PRIVATE pico_stdlib)
+    pico_set_binary_type(pico_xip_sram_test xip_sram)
+    pico_package_uf2_output(pico_xip_sram_test)
+    pico_add_extra_outputs(pico_xip_sram_test)
+endif()
