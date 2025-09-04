@@ -66,8 +66,6 @@ int main() {
         printf("Came from powerup %s with (%s) memory kept on - skipping to end\n", powman_last_pwrup, powman_last_pstate);
         goto post_pstate_gpio;
     }
-
-    pstate_bitset_t pstate;
 #endif
 
     printf("Waiting %d seconds\n", SLEEP_TIME_S); // so we can see some repeat printfs
@@ -112,8 +110,7 @@ int main() {
 #if HAS_POWMAN_TIMER
     printf("Going to PSTATE until GPIO wakeup\n");
 
-    pstate = pstate_bitset_none();
-    ret = low_power_pstate_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, &pstate, pstate_resume_func);
+    ret = low_power_pstate_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, NULL, pstate_resume_func);
 
     printf("%d low_power_pstate_until_pin_state returned\n", ret);
     while (true) {

@@ -98,35 +98,22 @@
 #define __uninitialized_ram(group) __attribute__((section(".uninitialized_data." #group))) group
 #endif
 
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER && !PICO_PICOTOOL_SEALED
-/*! \brief Section attribute macro for placement in RAM in a section persisted across POWMAN resets
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
+/*! \brief Section attribute macro for placement in a section persisted across default POWMAN resets
  *  \ingroup pico_platform
  *
- * Data marked this way will retain its value across a reset (normally uninitialized data - in the .persistent_data
- * section) is initialized to zero during runtime initialization
+ * Data marked this way will retain its value across a default POWMAN reset
  *
- * For example a `uint32_t` foo that will retain its value if the program is restarted by reset.
+ * For example a `uint32_t` foo that will retain its value if the program is restarted by default POWMAN reset.
  *
- *     uint32_t __persistent_data(foo) = 23;
+ *     uint32_t __persistent_data(foo);
  *
- * The section attribute is `.persistent_data.<group>`
+ * The section attribute is `.persistent_data.<name>`
  *
- * Note: This macro is not supported for sealed binaries, as they will overwrite the persistent data
- * due to the load map - use __uninitialized_ram instead.
- *
- * \param group a string suffix to use in the section name to distinguish groups that can be linker
- *              garbage-collected independently
+ * \param name  the name of the variable to place in the section
  */
 #ifndef __persistent_data
-#define __persistent_data(group) __attribute__((section(".persistent_data." #group))) group
-#endif
-#elif PICO_PICOTOOL_SEALED
-#ifndef __persistent_data
-#define __persistent_data(group) group; static_assert(false, "__persistent_data is not supported for sealed binaries - use __uninitialized_ram instead")
-#endif
-#elif !LIB_PICO_LOW_POWER
-#ifndef __persistent_data
-#define __persistent_data(group) group; static_assert(false, "__persistent_data is only supported when using pico_low_power - use __uninitialized_ram instead")
+#define __persistent_data(name) __attribute__((section(".persistent_data." #name))) name
 #endif
 #endif
 

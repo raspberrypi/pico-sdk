@@ -231,7 +231,7 @@ SECTIONS
         __bss_end__ = .;
     } > RAM
 
-    .persistent_data DEFINED(PERSISTENT_DATA_LOC) ? PERSISTENT_DATA_LOC : . : {
+    .persistent_data DEFINED(PERSISTENT_DATA_LOC) ? PERSISTENT_DATA_LOC : . (NOLOAD) : {
         __persistent_data_start__ = .;
         *(.persistent_data*)
         . = ALIGN(4);

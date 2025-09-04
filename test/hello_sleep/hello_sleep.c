@@ -35,6 +35,9 @@ static bool came_from_pstate = false;
 static char powman_last_pwrup[100];
 static char powman_last_pstate[100];
 
+int __persistent_data(my_number);
+int my_other_numer = 12345;
+
 void pstate_resume_func(pstate_bitset_t *pstate) {
     came_from_pstate = true;
     memset(powman_last_pwrup, 0, sizeof(powman_last_pwrup));
@@ -55,11 +58,17 @@ void pstate_resume_func(pstate_bitset_t *pstate) {
     if (pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK0)) strcat(powman_last_pstate, "SRAM_BANK0, ");
     if (pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1)) strcat(powman_last_pstate, "SRAM_BANK1, ");
     if (pstate_bitset_none_set(pstate)) strcat(powman_last_pstate, "NONE, ");
+
+    pstate_bitset_t default_pstate = pstate_bitset_none();
+    low_power_persistent_pstate_get(&default_pstate);
+    for (int i = 0; i < POWMAN_POWER_DOMAIN_COUNT; i++) {
+        if (pstate_bitset_is_set(&default_pstate, i) && !pstate_bitset_is_set(pstate, i)) {
+            strcat(powman_last_pstate, "PERSISTENT_DATA_OFF, ");
+            my_number = 34567;
+            break;
+        }
+    }
 }
-
-int __persistent_data(my_number) = 12345;
-int my_other_numer = 12345;
-
 #endif
 
 int main() {
@@ -88,6 +97,9 @@ int main() {
         } else {
             goto post_pstate_sram_on;
         }
+    } else {
+        // initialise my_number on first boot
+        my_number = 12345;
     }
 
     pstate_bitset_t pstate;
@@ -253,8 +265,8 @@ post_pstate_sram_off:
         printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
     }
 
-    if (my_number != 12345) {
-        printf("ERROR: my_number is not 12345 - SRAM has not been re-loaded\n");
+    if (my_number != 34567) {
+        printf("ERROR: my_number is %d not 34567 - SRAM has not been re-loaded\n", my_number);
         return -1;
     } else {
         printf("my_number in sram: %d\n", my_number);
