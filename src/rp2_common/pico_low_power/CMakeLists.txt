@@ -24,6 +24,8 @@ function(pico_set_persistent_data_loc TARGET PERSISTENT_DATA_LOC)
                 # XIP_SRAM, so heap should come after bss
                 set_target_properties(${TARGET} PROPERTIES
                         PICO_TARGET_HEAP_LOC __bss_end__)
+                # Also pin the XIP_SRAM
+                target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_PIN_XIP_SRAM=1)
         elseif (PERSISTENT_DATA_LOC LESS 0x20040000)
                 # SRAM0, so heap should come after persistent data
                 set_target_properties(${TARGET} PROPERTIES

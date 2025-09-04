@@ -441,9 +441,23 @@ void runtime_init_bootrom_locking_enable(void);
 #endif
 
 // ------------------------------------------------------------
-// Low power reboot check
+// Low power initialization
 // ------------------------------------------------------------
 
+// Unpin cache if persistent data is in xip_sram - do this early for performance
+#ifndef PICO_RUNTIME_INIT_LOW_POWER_CACHE_UNPIN
+#define PICO_RUNTIME_INIT_LOW_POWER_CACHE_UNPIN "00650"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_LOW_POWER_CACHE_UNPIN
+#define PICO_RUNTIME_SKIP_INIT_LOW_POWER_CACHE_UNPIN !HAS_POWMAN_TIMER || PICO_NO_FLASH || !PICO_CRT0_PIN_XIP_SRAM
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_LOW_POWER_CACHE_UNPIN
+#define PICO_RUNTIME_NO_INIT_LOW_POWER_CACHE_UNPIN !HAS_POWMAN_TIMER || PICO_NO_FLASH || !PICO_CRT0_PIN_XIP_SRAM
+#endif
+
+// Run user callback if this is a powman reboot - do this later, so user has a full SDK to work with
 #ifndef PICO_RUNTIME_INIT_LOW_POWER_REBOOT_CHECK
 #define PICO_RUNTIME_INIT_LOW_POWER_REBOOT_CHECK "11020"
 #endif

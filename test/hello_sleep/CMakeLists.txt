@@ -26,8 +26,6 @@ add_executable(hello_sleep_xip_sram
 
 target_link_libraries(hello_sleep_xip_sram pico_stdlib pico_low_power pico_status_led)
 
-target_compile_definitions(hello_sleep_xip_sram PRIVATE PICO_CRT0_PIN_XIP_SRAM=1)
-
 pico_set_persistent_data_loc(hello_sleep_xip_sram 0x13ffc000)
 
 # create map/bin/hex file etc.

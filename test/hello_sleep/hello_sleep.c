@@ -10,6 +10,7 @@
 #include "pico/low_power.h"
 #include "pico/aon_timer.h"
 #include "pico/status_led.h"
+#include "hardware/structs/xip_ctrl.h"
 
 #define SLEEP_TIME_S 2
 #define SLEEP_TIME_MS SLEEP_TIME_S * 1000
@@ -22,6 +23,9 @@ bool repeater(repeating_timer_t *timer) {
     } else {
         printf("  Repeating timer %d at %dms (aon: not running)\n", *(uint32_t*)timer->user_data, to_ms_since_boot(get_absolute_time()));
     }
+
+    printf("Cache hits: %f\n", (float)xip_ctrl_hw->ctr_hit / (float)xip_ctrl_hw->ctr_acc);
+
     status_led_set_state(!status_led_get_state());
     return true;
 }

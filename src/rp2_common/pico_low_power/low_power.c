@@ -599,6 +599,35 @@ void __weak runtime_init_low_power_reboot_check(void) {
 PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_low_power_reboot_check, PICO_RUNTIME_INIT_LOW_POWER_REBOOT_CHECK);
 #endif
 
+#if !PICO_RUNTIME_NO_INIT_LOW_POWER_CACHE_UNPIN
+void __weak __no_inline_not_in_flash_func(runtime_init_low_power_cache_unpin)(void) {
+    extern unsigned char __persistent_data_start__[];
+    extern unsigned char __persistent_data_end__[];
+
+    // if persistent data is in xip_sram, then the whole cache is currently pinned
+    // for performance, we should unpin the rest of it
+    if ((uint32_t)__persistent_data_start__ < SRAM_BASE) {
+        uint32_t persistent_data_start_maintenance = XIP_MAINTENANCE_BASE + ((uint32_t)__persistent_data_start__ - XIP_BASE);
+        uint32_t persistent_data_end_maintenance = XIP_MAINTENANCE_BASE + ((uint32_t)__persistent_data_end__ - XIP_BASE);
+        volatile uint8_t* cache;
+        for (
+            cache = (volatile uint8_t*)(XIP_MAINTENANCE_BASE + XIP_SRAM_BASE - XIP_BASE);
+            cache < (volatile uint8_t*)(XIP_MAINTENANCE_BASE + XIP_END - XIP_BASE);
+            cache += 8
+        ) {
+            if ((uint32_t)cache >= persistent_data_start_maintenance && (uint32_t)cache < persistent_data_end_maintenance) {
+                continue;
+            }
+            *(cache + 0) = 0; // invalidate
+        }
+    }
+}
+#endif
+
+#if !PICO_RUNTIME_SKIP_INIT_LOW_POWER_CACHE_UNPIN
+PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_low_power_cache_unpin, PICO_RUNTIME_INIT_LOW_POWER_CACHE_UNPIN);
+#endif
+
 #endif // HAS_POWMAN_TIMER
 
 #if !PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX
