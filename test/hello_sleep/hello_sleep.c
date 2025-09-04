@@ -192,10 +192,7 @@ int main() {
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     powman_hw->scratch[0] = to_us_since_boot(wakeup_time) & 0xFFFFFFFF;
     powman_hw->scratch[1] = to_us_since_boot(wakeup_time) >> 32;
-    pstate = pstate_bitset_none();
-    low_power_persistent_pstate_get(&pstate);
-    printf("pstate: %08x\n", pstate_bitset_to_powman_power_state(&pstate));
-    ret = low_power_pstate_until_aon_timer(wakeup_time, &pstate, pstate_resume_func);
+    ret = low_power_pstate_until_aon_timer(wakeup_time, NULL, pstate_resume_func);
 
     printf("%d low_power_pstate_until_aon_timer returned\n", ret);
     while (true) {

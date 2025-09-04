@@ -510,6 +510,11 @@ pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
     extern unsigned char __persistent_data_start__[];
     extern unsigned char __persistent_data_end__[];
 
+    if (__persistent_data_start__ == __persistent_data_end__) {
+        // No persistent data, so power down everything
+        return pstate;
+    }
+
     // Keep __persistent_data_start__ on
     if ((uint32_t)__persistent_data_start__ < SRAM_BASE) {
         pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_XIP_CACHE);
@@ -532,6 +537,12 @@ pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
 }
 
 int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
+    pstate_bitset_t default_pstate = pstate_bitset_none();
+    if (pstate == NULL) {
+        pstate = &default_pstate;
+        low_power_persistent_pstate_get(pstate);
+    }
+
     prepare_for_pstate_change();
 
     // Configure the wakeup state
