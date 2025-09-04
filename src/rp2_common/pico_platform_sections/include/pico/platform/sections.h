@@ -98,6 +98,38 @@
 #define __uninitialized_ram(group) __attribute__((section(".uninitialized_data." #group))) group
 #endif
 
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER && !PICO_PICOTOOL_SEALED
+/*! \brief Section attribute macro for placement in RAM in a section persisted across POWMAN resets
+ *  \ingroup pico_platform
+ *
+ * Data marked this way will retain its value across a reset (normally uninitialized data - in the .persistent_data
+ * section) is initialized to zero during runtime initialization
+ *
+ * For example a `uint32_t` foo that will retain its value if the program is restarted by reset.
+ *
+ *     uint32_t __persistent_data(foo) = 23;
+ *
+ * The section attribute is `.persistent_data.<group>`
+ *
+ * Note: This macro is not supported for sealed binaries, as they will overwrite the persistent data
+ * due to the load map - use __uninitialized_ram instead.
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
+#ifndef __persistent_data
+#define __persistent_data(group) __attribute__((section(".persistent_data." #group))) group
+#endif
+#elif PICO_PICOTOOL_SEALED
+#ifndef __persistent_data
+#define __persistent_data(group) group; static_assert(false, "__persistent_data is not supported for sealed binaries - use __uninitialized_ram instead")
+#endif
+#elif !LIB_PICO_LOW_POWER
+#ifndef __persistent_data
+#define __persistent_data(group) group; static_assert(false, "__persistent_data is only supported when using pico_low_power - use __uninitialized_ram instead")
+#endif
+#endif
+
 /*! \brief Section attribute macro for placement in flash even in a COPY_TO_RAM binary
  *  \ingroup pico_platform
  *

@@ -505,6 +505,32 @@ pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate) {
     return pstate;
 }
 
+pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
+    pstate_bitset_clear(pstate);
+    extern unsigned char __persistent_data_start__[];
+    extern unsigned char __persistent_data_end__[];
+
+    // Keep __persistent_data_start__ on
+    if ((uint32_t)__persistent_data_start__ < SRAM_BASE) {
+        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_XIP_CACHE);
+    } else if ((uint32_t)__persistent_data_start__ < SRAM4_BASE) {
+        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    } else {
+        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    }
+
+    // Keep __persistent_data_end__ on
+    if ((uint32_t)__persistent_data_end__ < SRAM_BASE) {
+        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_XIP_CACHE);
+    } else if ((uint32_t)__persistent_data_end__ < SRAM4_BASE) {
+        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    } else {
+        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    }
+
+    return pstate;
+}
+
 int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
     prepare_for_pstate_change();
 

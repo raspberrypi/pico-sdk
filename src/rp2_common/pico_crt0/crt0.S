@@ -551,6 +551,10 @@ data_cpy_check:
     // uses the powman_power_state in r6
     // returns in r0
     mov r0, #0
+    // Check if this is the persistent_data section
+    ldr r7, =__persistent_data_start__
+    cmp r2, r7
+    bne noskip
     // First check start of copy (r2)
     mov r7, r2
 check_r7:
@@ -608,6 +612,12 @@ data_cpy_table:
 .word __etext
 .word __data_start__
 .word __data_end__
+
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
+.word __persistent_data_loadaddr__
+.word __persistent_data_start__
+.word __persistent_data_end__
+#endif
 
 .word __scratch_x_source__
 .word __scratch_x_start__

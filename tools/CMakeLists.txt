@@ -709,6 +709,9 @@ function(picotool_postprocess_binary TARGET)
                     ${picotool_args}
                 COMMAND_EXPAND_LISTS
                 VERBATIM)
+
+            # tag that this binary will be sealed
+            target_compile_definitions(${TARGET} PRIVATE PICO_PICOTOOL_SEALED=1)
         endif()
         # Encryption
         if (picotool_aesfile AND picotool_ivfile)

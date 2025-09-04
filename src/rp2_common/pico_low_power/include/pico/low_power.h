@@ -123,6 +123,9 @@ int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate
 // Doesn't support powering down switched core domain
 int low_power_pstate_set(pstate_bitset_t *pstate);
 pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate);
+
+// get pstate which keeps persistent data powered on
+pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate);
 #endif
 
 #ifdef __cplusplus

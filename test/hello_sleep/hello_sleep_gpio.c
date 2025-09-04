@@ -33,7 +33,6 @@ void pstate_resume_func(pstate_bitset_t *pstate) {
     came_from_pstate = true;
     memset(powman_last_pwrup, 0, sizeof(powman_last_pwrup));
     memset(powman_last_pstate, 0, sizeof(powman_last_pstate));
-    memset(powman_last_pstate_val, 0, sizeof(powman_last_pstate_val));
     switch (powman_hw->last_swcore_pwrup) {
         //               0 = chip reset, for the source of the last reset see
         case 1 << 0: strcpy(powman_last_pwrup, "Chip reset"); break;
