@@ -349,11 +349,6 @@ _call_xip_setup:
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
 #if !PICO_NO_FLASH
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
-    // Load previous power state into r6
-    li a6, POWMAN_BASE+POWMAN_SCRATCH6_OFFSET
-    lw a6, 0(a6)
-#endif
     la a4, data_cpy_table
 
     // assume there is at least one entry
@@ -363,10 +358,6 @@ _call_xip_setup:
     lw a2, 4(a4)
     lw a3, 8(a4)
     addi a4, a4, 12
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
-    jal data_cpy_check
-    bnez a0, 1b
-#endif
     jal data_cpy
     j 1b
 2:
@@ -381,6 +372,22 @@ bss_fill_loop:
     addi a1, a1, 4
 bss_fill_test:
     bne a1, a2, bss_fill_loop
+
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
+    // Check if we're done
+    la a6, __bss_end__
+    bne a2, a6, 1f
+    // Zero out persistent_data on non-powman boot
+    la a1, __persistent_data_start__
+    la a2, __persistent_data_end__
+    // Load previous power state into r6
+    li a6, POWMAN_BASE+POWMAN_SCRATCH6_OFFSET
+    lw a6, 0(a6)
+    // Check if we should skip zeroing
+    jal persistent_zero_check
+    beqz a0, bss_fill_test
+1:
+#endif
 
 platform_entry: // symbol for stack traces
     // Use `call` pseudo-instruction instead of a bare `jal` so that the
@@ -406,15 +413,16 @@ data_cpy_loop:
 data_cpy:
     bltu a2, a3, data_cpy_loop
     ret
+#endif
 
 #if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
-data_cpy_check:
+persistent_zero_check:
     // uses a5 and a7 as scratch
     // uses the powman_power_state in a6
     // returns in a0
     li a0, 0
-    // First check start of copy (a2)
-    mv a7, a2
+    // First check __persistent_data_start__
+    la a7, __persistent_data_start__
 check_a7:
     li a5, SRAM_BASE
     bgt a5, a7, check_xip_sram
@@ -438,12 +446,12 @@ skip:
     ret
 check_end:
     addi a0, a0, 1
-    mv a7, a3
+    // If start was skipped, check __persistent_data_end__
+    la a7, __persistent_data_end__
     j check_a7
 noskip:
     li a0, 0
     ret
-#endif
 #endif
 
 .align 2

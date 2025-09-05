@@ -482,11 +482,6 @@ _call_xip_setup:
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
 #if !PICO_NO_FLASH
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
-    // Load previous power state into r6
-    ldr r6, =(POWMAN_BASE+POWMAN_SCRATCH6_OFFSET)
-    ldr r6, [r6]
-#endif
     adr r4, data_cpy_table
 
     // assume there is at least one entry
@@ -494,11 +489,6 @@ _call_xip_setup:
     ldmia r4!, {r1-r3}
     cmp r1, #0
     beq 2f
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
-    bl data_cpy_check
-    cmp r0, #1
-    beq 1b
-#endif
     bl data_cpy
     b 1b
 2:
@@ -507,6 +497,7 @@ _call_xip_setup:
     // Zero out the BSS
     ldr r1, =__bss_start__
     ldr r2, =__bss_end__
+1:
     movs r0, #0
     b bss_fill_test
 bss_fill_loop:
@@ -514,6 +505,24 @@ bss_fill_loop:
 bss_fill_test:
     cmp r1, r2
     bne bss_fill_loop
+
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
+    // Check if we're done
+    ldr r6, =__bss_end__
+    cmp r2, r6
+    bne 1f
+    // Zero out persistent_data on non-powman boot
+    ldr r1, =__persistent_data_start__
+    ldr r2, =__persistent_data_end__
+    // Load previous power state into r6
+    ldr r6, =(POWMAN_BASE+POWMAN_SCRATCH6_OFFSET)
+    ldr r6, [r6]
+    // Check if we should skip zeroing
+    bl persistent_zero_check
+    cmp r0, #0
+    beq 1b
+1:
+#endif
 
 platform_entry: // symbol for stack traces
 #if PICO_CRT0_NEAR_CALLS && !PICO_COPY_TO_RAM
@@ -544,19 +553,16 @@ data_cpy:
     cmp r2, r3
     blo data_cpy_loop
     bx lr
+#endif
 
 #if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
-data_cpy_check:
+persistent_zero_check:
     // uses r5 and r7 as scratch
     // uses the powman_power_state in r6
     // returns in r0
     mov r0, #0
-    // Check if this is the persistent_data section
+    // First check __persistent_data_start__
     ldr r7, =__persistent_data_start__
-    cmp r2, r7
-    bne noskip
-    // First check start of copy (r2)
-    mov r7, r2
 check_r7:
     ldr r5, =SRAM_BASE
     cmp r5, r7
@@ -584,13 +590,12 @@ skip:
     bx lr
 check_end:
     add r0, #1
-    // If start was skipped, check end of copy
-    mov r7, r3
+    // If start was skipped, check __persistent_data_end__
+    ldr r7, =__persistent_data_end__
     b check_r7
 noskip:
     mov r0, #0
     bx lr
-#endif
 #endif
 
 // Note the data copy table is still included for NO_FLASH builds, even though
@@ -612,12 +617,6 @@ data_cpy_table:
 .word __etext
 .word __data_start__
 .word __data_end__
-
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
-.word __persistent_data_loadaddr__
-.word __persistent_data_start__
-.word __persistent_data_end__
-#endif
 
 .word __scratch_x_source__
 .word __scratch_x_start__

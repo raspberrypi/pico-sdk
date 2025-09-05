@@ -19,12 +19,16 @@
 
 bool repeater(repeating_timer_t *timer) {
     if (aon_timer_is_running()) {
-        printf("  Repeating timer %d at %dms (aon: %dms)\n", *(uint32_t*)timer->user_data, to_ms_since_boot(get_absolute_time()), to_ms_since_boot(aon_timer_get_absolute_time()));
+        printf("  Repeating timer %d at %dms (aon: %dms)", *(uint32_t*)timer->user_data, to_ms_since_boot(get_absolute_time()), to_ms_since_boot(aon_timer_get_absolute_time()));
     } else {
-        printf("  Repeating timer %d at %dms (aon: not running)\n", *(uint32_t*)timer->user_data, to_ms_since_boot(get_absolute_time()));
+        printf("  Repeating timer %d at %dms (aon: not running)", *(uint32_t*)timer->user_data, to_ms_since_boot(get_absolute_time()));
     }
 
-    printf("Cache hits: %f\n", (float)xip_ctrl_hw->ctr_hit / (float)xip_ctrl_hw->ctr_acc);
+#if PICO_NO_FLASH || PICO_COPY_TO_RAM
+    printf("\n");
+#else
+    printf(" - Cache hit rate %.2f%%\n", ((float)xip_ctrl_hw->ctr_hit / (float)xip_ctrl_hw->ctr_acc) * 100.0f);
+#endif
 
     status_led_set_state(!status_led_get_state());
     return true;
@@ -36,7 +40,9 @@ static char powman_last_pwrup[100];
 static char powman_last_pstate[100];
 
 int __persistent_data(my_number);
-int my_other_numer = 12345;
+
+// Increase this size to see the cache hit rate decrease, when using XIP_SRAM for persistent data
+char __persistent_data(large_thing)[0x1000];
 
 void pstate_resume_func(pstate_bitset_t *pstate) {
     came_from_pstate = true;
@@ -64,7 +70,7 @@ void pstate_resume_func(pstate_bitset_t *pstate) {
     for (int i = 0; i < POWMAN_POWER_DOMAIN_COUNT; i++) {
         if (pstate_bitset_is_set(&default_pstate, i) && !pstate_bitset_is_set(pstate, i)) {
             strcat(powman_last_pstate, "PERSISTENT_DATA_OFF, ");
-            my_number = 34567;
+            if (my_number == 0) my_number = 34567;  // initialise my_number to special value
             break;
         }
     }
@@ -90,6 +96,14 @@ int main() {
     uint32_t repeater2_id = 1;
     alarm_pool_add_repeating_timer_ms(alarm_pool, 500, repeater, &repeater2_id, &repeat2);
 
+    if (my_number == 0) {
+        // initialise persistent data
+        my_number = 12345;
+        memset(large_thing, 0x55, sizeof(large_thing));
+        // track number of reboots
+        powman_hw->scratch[3] = 0;
+    }
+
     if (came_from_pstate) {
         printf("Came from powerup %s with (%s) memory kept on - skipping to end\n", powman_last_pwrup, powman_last_pstate);
         if (strstr(powman_last_pstate, "NONE") != NULL) {
@@ -97,9 +111,6 @@ int main() {
         } else {
             goto post_pstate_sram_on;
         }
-    } else {
-        // initialise my_number on first boot
-        my_number = 12345;
     }
 
     pstate_bitset_t pstate;
@@ -109,7 +120,7 @@ int main() {
     busy_wait_ms(SLEEP_TIME_MS);
 
     absolute_time_t start_time;
-    absolute_time_t wakeup_time;
+    static absolute_time_t __persistent_data(wakeup_time);
     int64_t diff;
     struct timespec ts;
     int ret;
@@ -193,17 +204,10 @@ int main() {
         return -1;
     }
     my_number = 67890;
-    if (my_other_numer != 12345) {
-        printf("ERROR: my_other_numer is %d not 12345 - initialisation issue?\n", my_other_numer);
-        return -1;
-    }
-    my_other_numer = 67890;
 
     start_time = aon_timer_get_absolute_time();
 
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
-    powman_hw->scratch[0] = to_us_since_boot(wakeup_time) & 0xFFFFFFFF;
-    powman_hw->scratch[1] = to_us_since_boot(wakeup_time) >> 32;
     ret = low_power_pstate_until_aon_timer(wakeup_time, NULL, pstate_resume_func);
 
     printf("%d low_power_pstate_until_aon_timer returned\n", ret);
@@ -213,12 +217,15 @@ int main() {
     }
 
 post_pstate_sram_on:
-    // restore from scratch
-    wakeup_time = from_us_since_boot((uint64_t)powman_hw->scratch[1] << 32 | (uint64_t)powman_hw->scratch[0]);
+    // track number of reboots
+    powman_hw->scratch[3]++;
     diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
         printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
+    } else if (diff > 1000000) {
+        printf("ERROR: Woke up more than %d seconds late\n", (int)(diff / 1000000));
+        return -1;
     }
 
     if (my_number != 67890) {
@@ -226,12 +233,6 @@ post_pstate_sram_on:
         return -1;
     } else {
         printf("my_number in sram: %d\n", my_number);
-    }
-    if (my_other_numer != 12345) {
-        printf("ERROR: my_other_numer is %d not 12345 - SRAM has not been re-loaded\n", my_other_numer);
-        return -1;
-    } else {
-        printf("my_other_numer in sram: %d\n", my_other_numer);
     }
 
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
@@ -245,6 +246,7 @@ post_pstate_sram_on:
     start_time = aon_timer_get_absolute_time();
 
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
+    // store in scratch, as not persisting memory over this reboot
     powman_hw->scratch[0] = to_us_since_boot(wakeup_time) & 0xFFFFFFFF;
     powman_hw->scratch[1] = to_us_since_boot(wakeup_time) >> 32;
     pstate = pstate_bitset_none();
@@ -257,12 +259,17 @@ post_pstate_sram_on:
     }
 
 post_pstate_sram_off:
+    // track number of reboots
+    powman_hw->scratch[3]++;
     // restore from scratch
     wakeup_time = from_us_since_boot((uint64_t)powman_hw->scratch[1] << 32 | (uint64_t)powman_hw->scratch[0]);
     diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
         printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
+    } else if (diff > 1000000) {
+        printf("ERROR: Woke up more than %d seconds late\n", (int)(diff / 1000000));
+        return -1;
     }
 
     if (my_number != 34567) {
@@ -274,6 +281,11 @@ post_pstate_sram_off:
 
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
+
+    if (powman_hw->scratch[3] != 2) {
+        printf("ERROR: number of POWMAN reboots was %d not 2\n", powman_hw->scratch[3]);
+        return -1;
+    }
 #endif
 
     printf("SUCCESS\n");

@@ -189,7 +189,6 @@ SECTIONS
         . = ALIGN(4);
     }
     PROVIDE(__persistent_data_end__ = .);
-    __persistent_data_loadaddr__ = LOADADDR(.persistent_data);
 
     .heap DEFINED(HEAP_LOC) ? HEAP_LOC : . (NOLOAD):
     {

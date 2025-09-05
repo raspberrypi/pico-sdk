@@ -102,9 +102,11 @@
 /*! \brief Section attribute macro for placement in a section persisted across default POWMAN resets
  *  \ingroup pico_platform
  *
- * Data marked this way will retain its value across a default POWMAN reset
+ * Data marked this way will retain its value across a default POWMAN reset, and will be zeroed on
+ * any other reset.
  *
- * For example a `uint32_t` foo that will retain its value if the program is restarted by default POWMAN reset.
+ * For example a `uint32_t` foo that will be zeroed initially, then retain its value if the program
+ * is restarted by default POWMAN reset.
  *
  *     uint32_t __persistent_data(foo);
  *

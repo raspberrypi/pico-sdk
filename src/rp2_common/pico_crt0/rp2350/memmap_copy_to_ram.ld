@@ -235,9 +235,8 @@ SECTIONS
         __persistent_data_start__ = .;
         *(.persistent_data*)
         . = ALIGN(4);
-    } AT> FLASH
+    }
     PROVIDE(__persistent_data_end__ = .);
-    __persistent_data_loadaddr__ = LOADADDR(.persistent_data);
 
     .heap DEFINED(HEAP_LOC) ? HEAP_LOC : . (NOLOAD):
     {
