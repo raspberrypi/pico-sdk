@@ -514,6 +514,9 @@ bss_fill_test:
     // Zero out persistent_data on non-powman boot
     ldr r1, =__persistent_data_start__
     ldr r2, =__persistent_data_end__
+    // Skip if there is no persistent data
+    cmp r1, r2
+    beq 1f
     // Load previous power state into r6
     ldr r6, =(POWMAN_BASE+POWMAN_SCRATCH6_OFFSET)
     ldr r6, [r6]
