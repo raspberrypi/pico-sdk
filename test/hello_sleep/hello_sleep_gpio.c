@@ -24,6 +24,13 @@ bool repeater(repeating_timer_t *timer) {
     return true;
 }
 
+void chars_available_callback(__unused void *param) {
+    char buf[16] = {0};
+    while (stdio_get_until(buf, sizeof(buf), make_timeout_time_us(10)) > 0) {
+        printf("Chars available callback: %s\n", buf);
+    }
+}
+
 #if HAS_POWMAN_TIMER
 static bool came_from_pstate = false;
 static char powman_last_pwrup[100];
@@ -61,6 +68,9 @@ int main() {
     repeating_timer_t repeat;
     add_repeating_timer_ms(500, repeater, NULL, &repeat);
 
+    // test stdio_set_chars_available_callback
+    stdio_set_chars_available_callback(chars_available_callback, NULL);
+
 #if HAS_POWMAN_TIMER
     if (came_from_pstate) {
         printf("Came from powerup %s with (%s) memory kept on - skipping to end\n", powman_last_pwrup, powman_last_pstate);
@@ -93,6 +103,12 @@ int main() {
 #endif
 
     low_power_sleep_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, &keep_enabled, false);
+    printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
+    busy_wait_ms(SLEEP_TIME_MS);
+
+    printf("Going to sleep until any wakeup (expecting stdin characters)\n");
+
+    low_power_sleep_until_irq(NULL);
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 

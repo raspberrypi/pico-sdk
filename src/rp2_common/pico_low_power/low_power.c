@@ -182,6 +182,26 @@ static void restore_other_interrupts(void) {
     }
 }
 
+int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled) {
+    clock_dest_set_t local_keep_enabled;
+    replace_null_enable_values(keep_enabled, &local_keep_enabled);
+
+    add_stdio_clocks(&local_keep_enabled);
+
+    prepare_for_clock_gating();
+    // gate clocks
+    clock_gate_sleep_en(&local_keep_enabled);
+
+    low_power_enable_processor_deep_sleep();
+    // Go to sleep until any event happens
+    __wfi();
+    low_power_disable_processor_deep_sleep();
+
+    post_clock_gating();
+
+    return 0;
+}
+
 // only the deep_sleep variant of this, as DORMANT cannot wake from TIMER
 int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
                                 const clock_dest_set_t *keep_enabled, bool exclusive) {
