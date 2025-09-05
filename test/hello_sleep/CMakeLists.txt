@@ -34,6 +34,23 @@ endif()
 pico_add_extra_outputs(hello_sleep_sram1)
 
 if (NOT PICO_RP2040)
+        if (NOT PICO_RISCV)
+                add_executable(hello_sleep_encrypted
+                        hello_sleep.c
+                        )
+
+                target_link_libraries(hello_sleep_encrypted pico_stdlib pico_low_power pico_status_led)
+
+                pico_set_binary_type(hello_sleep_encrypted no_flash)
+                pico_package_uf2_output(hello_sleep_encrypted)
+                pico_sign_binary(hello_sleep_encrypted ${CMAKE_SOURCE_DIR}/tools/example_keys/private.pem)
+                pico_encrypt_binary(hello_sleep_encrypted ${CMAKE_SOURCE_DIR}/tools/example_keys/privateaes.bin ${CMAKE_SOURCE_DIR}/tools/example_keys/ivsalt.bin EMBED NO_CLEAR)
+
+                # create map/bin/hex file etc.
+                pico_add_extra_outputs(hello_sleep_encrypted)
+        endif()
+
+
         add_executable(hello_sleep_xip_sram
                 hello_sleep.c
                 )

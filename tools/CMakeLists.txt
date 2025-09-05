@@ -66,6 +66,12 @@ define_property(TARGET
     FULL_DOCS "OTP page storing the AES key"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_ENC_NO_CLEAR
+    INHERITED
+    BRIEF_DOCS "Do not clear SRAM when loading encrypted binary"
+    FULL_DOCS "Do not clear SRAM when loading encrypted binary"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_ENC_SIGFILE
     INHERITED
     BRIEF_DOCS "Private key for signing encrypted binaries"
@@ -510,8 +516,9 @@ endfunction()
 # \param\ EMBED Embed a decryption stage into the encrypted binary
 # \param\ MBEDTLS Use MbedTLS based decryption stage (faster, but less secure)
 # \param\ OTP_KEY_PAGE The OTP page storing the AES key
+# \param\ NO_CLEAR Do not clear SRAM when loading encrypted binary
 function(pico_encrypt_binary TARGET AESFILE IVFILE)
-    set(options EMBED MBEDTLS)
+    set(options EMBED MBEDTLS NO_CLEAR)
     set(oneValueArgs OTP_KEY_PAGE SIGFILE)
     # set(multiValueArgs )
     cmake_parse_arguments(PARSE_ARGV 3 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
@@ -540,6 +547,12 @@ function(pico_encrypt_binary TARGET AESFILE IVFILE)
     if (ENC_MBEDTLS)
         set_target_properties(${TARGET} PROPERTIES
             PICOTOOL_USE_MBEDTLS_DECRYPTION TRUE
+        )
+    endif()
+
+    if (ENC_NO_CLEAR)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENC_NO_CLEAR TRUE
         )
     endif()
 
@@ -715,6 +728,11 @@ function(picotool_postprocess_binary TARGET)
         endif()
         # Encryption
         if (picotool_aesfile AND picotool_ivfile)
+            get_target_property(enc_no_clear ${TARGET} PICOTOOL_ENC_NO_CLEAR)
+            if (NOT enc_no_clear)
+                list(APPEND picotool_encrypt_args "--clear")
+            endif()
+
             get_target_property(picotool_embed_decryption ${TARGET} PICOTOOL_EMBED_DECRYPTION)
             if (picotool_embed_decryption)
                 list(APPEND picotool_encrypt_args "--embed")
