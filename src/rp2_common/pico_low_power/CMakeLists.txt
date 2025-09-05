@@ -18,6 +18,9 @@ pico_mirrored_target_link_libraries(pico_low_power INTERFACE
         )
 
 function(pico_set_persistent_data_loc TARGET PERSISTENT_DATA_LOC)
+        if (NOT PICO_RP2350)
+                message(FATAL_ERROR "pico_set_persistent_data_loc is only supported on RP2350")
+        endif()
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_PERSISTENT_DATA_LOC ${PERSISTENT_DATA_LOC})
 
         if (PERSISTENT_DATA_LOC LESS 0x20000000)

@@ -70,16 +70,23 @@ static void prepare_for_clock_switch(void) {
     // particularly for UART we want nothing left to clock out
     prepare_for_clock_gating();
 
+#if LIB_PICO_STDIO_USB
+    // deinit USB
+    stdio_usb_deinit();
+#endif
+
     // disable interrupts
     interrupt_flags = save_and_disable_interrupts();
 }
 
 static void post_clock_switch(void) {
-    // restore UART baudrate
-    setup_default_uart();
-
     // restore interrupts
     restore_interrupts_from_disabled(interrupt_flags);
+
+#if LIB_PICO_STDIO_USB
+    // reinit USB
+    stdio_usb_init();
+#endif
 }
 
 #if HAS_POWMAN_TIMER
@@ -136,6 +143,27 @@ static void replace_null_enable_values(const clock_dest_set_t *keep_enabled,
     }
 }
 
+static void add_stdio_clocks(clock_dest_set_t *local_keep_enabled) {
+#if LIB_PICO_STDIO_USB
+    // this is necessary to prevent dropping the connection
+    #if PICO_RP2040
+        clock_dest_set_add(local_keep_enabled, CLK_DEST_SYS_USBCTRL);
+        clock_dest_set_add(local_keep_enabled, CLK_DEST_USB_USBCTRL);
+    #elif PICO_RP2350
+        clock_dest_set_add(local_keep_enabled, CLK_DEST_SYS_USBCTRL);
+        clock_dest_set_add(local_keep_enabled, CLK_DEST_USB);
+    #else
+    #error Unknown processor
+    #endif
+#endif
+
+#if LIB_PICO_STDIO_UART
+    // this is only needed to prevent losing stdin while sleeping
+    clock_dest_set_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_PERI_UART1 : CLK_DEST_PERI_UART0);
+    clock_dest_set_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_SYS_UART1 : CLK_DEST_SYS_UART0);
+#endif
+}
+
 static uint32_t irq_mask_disabled_during_sleep[NUM_IRQS];
 
 static void save_and_disable_other_interrupts(uint32_t irq) {
@@ -182,6 +210,8 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
 #error Unknown processor
 #endif
 
+    add_stdio_clocks(&local_keep_enabled);
+
 #if NUM_GENERIC_TIMERS == 1
 #define TIMER_BASE_IRQ TIMER_IRQ_0
 #else
@@ -216,6 +246,8 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
 
     clock_dest_set_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
+
+    add_stdio_clocks(&local_keep_enabled);
 
     bool low = !high;
     bool level = !edge;

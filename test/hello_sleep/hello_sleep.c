@@ -34,6 +34,13 @@ bool repeater(repeating_timer_t *timer) {
     return true;
 }
 
+void chars_available_callback(__unused void *param) {
+    char buf[16] = {0};
+    while (stdio_get_until(buf, sizeof(buf), make_timeout_time_us(10)) > 0) {
+        printf("Chars available callback: %s\n", buf);
+    }
+}
+
 #if HAS_POWMAN_TIMER
 static bool came_from_pstate = false;
 static char powman_last_pwrup[100];
@@ -88,13 +95,16 @@ int main() {
     uint32_t repeater_id = 0;
     add_repeating_timer_ms(500, repeater, &repeater_id, &repeat);
 
+    // test stdio_set_chars_available_callback
+    stdio_set_chars_available_callback(chars_available_callback, NULL);
+
 #if HAS_POWMAN_TIMER
     // use a second repeating timer on the other TIMER instance; it should be gated
     // during our sleep (todo not sure how it affects power!)
     alarm_pool_t *alarm_pool = alarm_pool_create_on_timer_with_unused_hardware_alarm(timer1_hw, 4);
     repeating_timer_t repeat2;
     uint32_t repeater2_id = 1;
-    alarm_pool_add_repeating_timer_ms(alarm_pool, 500, repeater, &repeater2_id, &repeat2);
+    alarm_pool_add_repeating_timer_ms(alarm_pool, 700, repeater, &repeater2_id, &repeat2);
 
     if (my_number == 0) {
         // initialise persistent data
@@ -177,10 +187,13 @@ int main() {
                                       DORMANT_CLOCK_SOURCE_LPOSC, XOSC_HZ,
                                 #endif
                                       RTC_GPIO, NULL);
-    diff = absolute_time_diff_us(get_absolute_time(), wakeup_time);
     // need to use the AON timer for checking time, since the other timer is unclocked
     diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
-    if (diff > -1000000) {
+    if (diff > -1000000
+        #ifdef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
+        + (PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS * 1000)
+        #endif
+    ) {
         printf("ERROR: doesn't seem like timer was stopped\n");
         return - 1;
     }
@@ -223,7 +236,11 @@ post_pstate_sram_on:
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
         printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
-    } else if (diff > 1000000) {
+    } else if (diff > 1000000
+        #ifdef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
+        + (PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS * 1000)
+        #endif
+    ) {
         printf("ERROR: Woke up more than %d seconds late\n", (int)(diff / 1000000));
         return -1;
     }
@@ -267,7 +284,11 @@ post_pstate_sram_off:
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
         printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
-    } else if (diff > 1000000) {
+    } else if (diff > 1000000
+        #ifdef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
+        + (PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS * 1000)
+        #endif
+    ) {
         printf("ERROR: Woke up more than %d seconds late\n", (int)(diff / 1000000));
         return -1;
     }

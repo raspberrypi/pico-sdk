@@ -117,6 +117,11 @@
 #ifndef __persistent_data
 #define __persistent_data(name) __attribute__((section(".persistent_data." #name))) name
 #endif
+#else
+// If not supported, use the .bss section, as that will be zeroed on boot
+#ifndef __persistent_data
+#define __persistent_data(name) __attribute__((section(".bss." #name))) name
+#endif
 #endif
 
 /*! \brief Section attribute macro for placement in flash even in a COPY_TO_RAM binary
