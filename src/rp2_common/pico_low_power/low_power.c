@@ -26,6 +26,10 @@
 //  setup hooks
 #include "pico/stdlib.h"
 
+#if LIB_TINYUSB_DEVICE || LIB_TINYUSB_HOST
+#include "tusb.h"
+#endif
+
 #if HAS_RP2040_RTC
 #include "hardware/rtc.h"
 #elif HAS_POWMAN_TIMER
@@ -66,9 +70,27 @@ static void post_clock_gating(void) {
 
 static uint32_t interrupt_flags;
 
+#if LIB_TINYUSB_DEVICE
+static bool tud_was_inited = false;
+#endif
+
+#if LIB_TINYUSB_HOST
+static bool tuh_was_inited = false;
+#endif
+
 static void prepare_for_clock_switch(void) {
     // particularly for UART we want nothing left to clock out
     prepare_for_clock_gating();
+
+#if LIB_TINYUSB_DEVICE
+    tud_was_inited = tud_inited();
+    if (tud_was_inited) tud_deinit(0);
+#endif
+
+#if LIB_TINYUSB_HOST
+    tuh_was_inited = tuh_inited();
+    if (tuh_was_inited) tuh_deinit(0);
+#endif
 
 #if LIB_PICO_STDIO_USB
     // deinit USB
@@ -82,6 +104,14 @@ static void prepare_for_clock_switch(void) {
 static void post_clock_switch(void) {
     // restore interrupts
     restore_interrupts_from_disabled(interrupt_flags);
+
+#if LIB_TINYUSB_DEVICE
+    if (tud_was_inited) tud_init(0);
+#endif
+
+#if LIB_TINYUSB_HOST
+    if (tuh_was_inited) tuh_init(0);
+#endif
 
 #if LIB_PICO_STDIO_USB
     // reinit USB
@@ -143,8 +173,8 @@ static void replace_null_enable_values(const clock_dest_set_t *keep_enabled,
     }
 }
 
-static void add_stdio_clocks(clock_dest_set_t *local_keep_enabled) {
-#if LIB_PICO_STDIO_USB
+static void add_library_clocks(clock_dest_set_t *local_keep_enabled) {
+#if LIB_PICO_STDIO_USB || LIB_TINYUSB_HOST || LIB_TINYUSB_DEVICE
     // this is necessary to prevent dropping the connection
     #if PICO_RP2040
         clock_dest_set_add(local_keep_enabled, CLK_DEST_SYS_USBCTRL);
@@ -186,7 +216,7 @@ int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled) {
     clock_dest_set_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
-    add_stdio_clocks(&local_keep_enabled);
+    add_library_clocks(&local_keep_enabled);
 
     prepare_for_clock_gating();
     // gate clocks
@@ -230,7 +260,7 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
 #error Unknown processor
 #endif
 
-    add_stdio_clocks(&local_keep_enabled);
+    add_library_clocks(&local_keep_enabled);
 
 #if NUM_GENERIC_TIMERS == 1
 #define TIMER_BASE_IRQ TIMER_IRQ_0
@@ -267,7 +297,7 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
     clock_dest_set_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
-    add_stdio_clocks(&local_keep_enabled);
+    add_library_clocks(&local_keep_enabled);
 
     bool low = !high;
     bool level = !edge;
@@ -562,7 +592,7 @@ pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
     extern unsigned char __persistent_data_start__[];
     extern unsigned char __persistent_data_end__[];
 
-    if (__persistent_data_start__ == __persistent_data_end__) {
+    if ((uint32_t)__persistent_data_start__ == (uint32_t)__persistent_data_end__) {
         // No persistent data, so power down everything
         return pstate;
     }
