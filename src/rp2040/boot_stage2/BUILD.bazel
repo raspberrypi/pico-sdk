@@ -35,6 +35,7 @@ BOOT2_CHOICE_DEFINE_MAP["compile_time_choice"] = []
 cc_library(
     name = "config",
     hdrs = [
+        "asminclude/embedded_xip_cache_enable_block.inc.S",
         "asminclude/boot2_helpers/exit_from_boot2.S",
         "asminclude/boot2_helpers/read_flash_sreg.S",
         "asminclude/boot2_helpers/wait_ssi_ready.S",

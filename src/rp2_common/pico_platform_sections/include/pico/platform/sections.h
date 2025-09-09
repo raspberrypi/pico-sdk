@@ -136,21 +136,21 @@
  *  \ingroup pico_platform
  *
  * Decorates a function name, such that the function will execute from RAM (assuming it is not inlined
- * into a flash function by the compiler) to avoid possible flash latency. Currently this macro is identical
- * in implementation to `__not_in_flash_func`, however the semantics are distinct and a `__time_critical_func`
- * may in the future be treated more specially to reduce the overhead when calling such function from a flash
- * function.
+ * into a flash function by the compiler) to avoid possible flash latency. The semantics of
+ * `__time_critical_func` are distinct from `__not_in_flash_func` in that its function may be run from
+ * its own dedicated block of instruction RAM when available, like when PICO_USE_XIP_CACHE_AS_RAM=1 is set
+ * for a PICO_COPY_TO_RAM=1 RP2040 build.
  *
  * For example a function called my_func taking an int parameter:
  *
  *     void __time_critical_func(my_func)(int some_arg) {
  *
- * The function is placed in the `.time_critical.<func_name>` linker section
+ * The function is placed in the `.time_critical.text.<func_name>` linker section
  *
  * \see __not_in_flash_func
  */
 #ifndef __time_critical_func
-#define __time_critical_func(func_name) __not_in_flash_func(func_name)
+#define __time_critical_func(func_name) __attribute__((section(".time_critical.text." __STRING(func_name)))) func_name
 #endif
 
 /*! \brief Indicate a function should not be stored in flash and should not be inlined
@@ -164,12 +164,36 @@
  *     void __no_inline_not_in_flash_func(my_func)(int some_arg) {
  *
  * The function is placed in the `.time_critical.<func_name>` linker section
+ *
+ * \see __not_in_flash_func
  */
 #ifndef __no_inline_not_in_flash_func
 #define __no_inline_not_in_flash_func(func_name) __noinline __not_in_flash_func(func_name)
 #endif
 
+/*! \brief Indicate a function is time/latency critical, should not be stored in flash, and should not be inlined
+ *  \ingroup pico_platform
+ *
+ * Decorates a function name, such that the function will execute from RAM, explicitly marking it as
+ * noinline to prevent it being inlined into a flash function by the compiler
+ *
+ * For example a function called my_func taking an int parameter:
+ *
+ *     void __no_inline_time_critical_func(my_func)(int some_arg) {
+ *
+ * The function is placed in the `.time_critical.text.<func_name>` linker section
+  *
+ * \see __time_critical_func
+*/
+#ifndef __no_inline_time_critical_func
+#define __no_inline_time_critical_func(func_name) __noinline __time_critical_func(func_name)
+#endif
+
 #else
+
+#ifndef TIME_CRITICAL_SECTION_NAME
+#define TIME_CRITICAL_SECTION_NAME(x) .time_critical.text.##x
+#endif
 
 #ifndef RAM_SECTION_NAME
 #define RAM_SECTION_NAME(x) .time_critical.##x

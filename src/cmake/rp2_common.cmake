@@ -3,7 +3,7 @@
 include(cmake/on_device.cmake)
 
 # PICO_CMAKE_CONFIG: PICO_NO_FLASH, Option to default all binaries to not use flash i.e. run from SRAM, type=bool, default=0, group=build, docref=cmake-binary-type-config
-option(PICO_NO_FLASH "Default binaries to not not use flash")
+option(PICO_NO_FLASH "Default binaries to not use flash")
 # PICO_CMAKE_CONFIG: PICO_COPY_TO_RAM, Option to default all binaries to copy code from flash to SRAM before running, type=bool, default=0, group=build, docref=cmake-binary-type-config
 option(PICO_COPY_TO_RAM "Default binaries to copy code to RAM when booting from flash")
 

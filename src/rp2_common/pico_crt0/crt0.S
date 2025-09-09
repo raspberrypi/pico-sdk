@@ -11,6 +11,7 @@
 
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
+#include "hardware/regs/xip.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
@@ -457,6 +458,22 @@ hold_non_core0_in_bootrom:
     b _enter_vtable_in_r0
 1:
 
+#if PICO_RP2040 && PICO_NO_FLASH
+    #if PICO_USE_XIP_CACHE_AS_RAM
+        // Disable the XIP cache making its 16k of XIP RAM available for storage
+_disable_xip_cache:
+        ldr r0, =(REG_ALIAS_CLR_BITS + XIP_CTRL_BASE + XIP_CTRL_OFFSET)
+        movs r1, #XIP_CTRL_EN_BITS
+        str r1, [r0]
+    #else
+        // Enable the XIP cache (hardware default)
+_enable_xip_cache:
+        ldr r0, =(REG_ALIAS_SET_BITS + XIP_CTRL_BASE + XIP_CTRL_OFFSET)
+        movs r1, #XIP_CTRL_EN_BITS
+        str r1, [r0]
+    #endif
+#endif
+
 #if !PICO_RP2040 && PICO_EMBED_XIP_SETUP && !PICO_NO_FLASH
     // Execute boot2 on the core 0 stack (it also gets copied into BOOTRAM due
     // to inclusion in the data copy table below). Note the reference
@@ -551,6 +568,12 @@ data_cpy_table:
 .word __etext
 .word __data_start__
 .word __data_end__
+
+#if PICO_RP2040 && PICO_USE_XIP_CACHE_AS_RAM
+.word __xip_ram_text_source__
+.word __xip_ram_text_start__
+.word __xip_ram_text_end__
+#endif
 
 .word __scratch_x_source__
 .word __scratch_x_start__

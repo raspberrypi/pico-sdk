@@ -96,6 +96,8 @@ regular_func _stage2_boot
 // translated by the SSI into 03h read commands to the external flash (if cache is missed),
 // and the data will be returned to the bus.
 
+#include "embedded_xip_cache_enable_block.inc.S"
+
 // Pull in standard exit routine
 #include "boot2_helpers/exit_from_boot2.S"
 

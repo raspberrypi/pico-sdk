@@ -24,6 +24,7 @@
 MEMORY
 {
     INCLUDE "pico_flash_region.ld"
+    XIP_RAM(rwx) : ORIGIN = 0x15000000, LENGTH = 16k
     RAM(rwx) : ORIGIN =  0x20000000, LENGTH = 256k
     SCRATCH_X(rwx) : ORIGIN = 0x20040000, LENGTH = 4k
     SCRATCH_Y(rwx) : ORIGIN = 0x20041000, LENGTH = 4k
@@ -96,6 +97,18 @@ SECTIONS
         *(.binary_info.*)
     } > FLASH
     __binary_info_end = .;
+    . = ALIGN(4);
+
+    .xip_text : {
+        __xip_ram_text_start__ = .;
+        . = ALIGN(4);
+
+        *(.time_critical.text*)
+
+        . = ALIGN(4);
+        __xip_ram_text_end__ = .;
+    } > XIP_RAM AT> FLASH
+    __xip_ram_text_source__ = LOADADDR(.xip_text);
     . = ALIGN(4);
 
     /* Vector table goes first in RAM, to avoid large alignment hole */

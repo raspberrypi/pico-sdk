@@ -268,6 +268,8 @@ configure_ssi:
 // Bus accesses to the XIP window will now be transparently serviced by the
 // external flash on cache miss. We are ready to run code from flash.
 
+#include "embedded_xip_cache_enable_block.inc.S"
+
 // Pull in standard exit routine
 #include "boot2_helpers/exit_from_boot2.S"
 

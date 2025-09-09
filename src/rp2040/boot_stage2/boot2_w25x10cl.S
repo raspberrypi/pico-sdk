@@ -187,6 +187,8 @@ regular_func _stage2_boot
 // We are now in XIP mode, with all transactions using Dual I/O and only
 // needing to send 24-bit addresses (plus mode bits) for each read transaction.
 
+#include "embedded_xip_cache_enable_block.inc.S"
+
 // Pull in standard exit routine
 #include "boot2_helpers/exit_from_boot2.S"
 

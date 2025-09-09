@@ -29,10 +29,26 @@ alias(
 )
 
 alias(
+    name = "copy_to_ram_using_xip_ram_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2_common/pico_crt0/rp2040:copy_to_ram_using_xip_ram_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
     name = "no_flash_linker_script",
     actual = select({
         "//bazel/constraint:rp2040": "//src/rp2_common/pico_crt0/rp2040:no_flash_linker_script",
         "//bazel/constraint:rp2350": "//src/rp2_common/pico_crt0/rp2350:no_flash_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "no_flash_using_xip_ram_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2_common/pico_crt0/rp2040:no_flash_using_xip_ram_linker_script",
         "//conditions:default": "//bazel:incompatible_cc_lib",
     }),
 )

@@ -4,8 +4,10 @@ exports_files(
     [
         "memmap_blocked_ram.ld",
         "memmap_copy_to_ram.ld",
+        "memmap_copy_to_ram_using_xip_ram.ld",
         "memmap_default.ld",
         "memmap_no_flash.ld",
+        "memmap_no_flash_using_xip_ram.ld",
     ]
 )
 
@@ -45,7 +47,7 @@ cc_library(
 # PICO_BUILD_DEFINE: PICO_COPY_TO_RAM, whether this is a 'copy_to_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
 cc_library(
     name = "copy_to_ram_linker_script",
-    defines = ["PICO_COPY_TO_RAM=1"],
+    defines = ["PICO_COPY_TO_RAM=1", "PICO_USE_XIP_CACHE_AS_RAM=0"],
     linkopts = ["-T$(location memmap_copy_to_ram.ld)"],
     target_compatible_with = ["//bazel/constraint:rp2040"],
     deps = [
@@ -55,14 +57,39 @@ cc_library(
     ],
 )
 
+# PICO_BUILD_DEFINE: PICO_COPY_TO_RAM && PICO_USE_XIP_CACHE_AS_RAM, whether this is a 'copy_to_ram_using_xip_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "copy_to_ram_using_xip_ram_linker_script",
+    defines = ["PICO_COPY_TO_RAM=1", "PICO_USE_XIP_CACHE_AS_RAM=1"],
+    linkopts = ["-T$(location memmap_copy_to_ram_using_xip_ram.ld)"],
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+    deps = [
+        "memmap_copy_to_ram_using_xip_ram.ld",
+        "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2_common/pico_standard_link:default_flash_region",
+    ],
+)
+
 # PICO_BUILD_DEFINE: PICO_NO_FLASH, whether this is a 'no_flash' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
 cc_library(
     name = "no_flash_linker_script",
-    defines = ["PICO_NO_FLASH=1"],
+    defines = ["PICO_NO_FLASH=1", "PICO_USE_XIP_CACHE_AS_RAM=0"],
     linkopts = ["-T$(location memmap_no_flash.ld)"],
     target_compatible_with = ["//bazel/constraint:rp2040"],
     deps = [
         "memmap_no_flash.ld",
+        "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+    ],
+)
+
+# PICO_BUILD_DEFINE: PICO_NO_FLASH && PICO_USE_XIP_CACHE_AS_RAM, whether this is a 'no_flash_using_xip_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "no_flash_using_xip_ram_linker_script",
+    defines = ["PICO_NO_FLASH=1", "PICO_USE_XIP_CACHE_AS_RAM=1"],
+    linkopts = ["-T$(location memmap_no_flash_using_xip_ram.ld)"],
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+    deps = [
+        "memmap_no_flash_using_xip_ram.ld",
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
     ],
 )
