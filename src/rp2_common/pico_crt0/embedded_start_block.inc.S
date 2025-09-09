@@ -130,8 +130,8 @@ embedded_block:
 .byte 0 // pad
 .byte 0x01 // number of entries
 .word 0 // clear
-.word XIP_END - 4 // last word of XIP_SRAM
-.word 4 // size
+.word XIP_SRAM_BASE
+.word 0 // size
 #endif
 
 .byte PICOBIN_BLOCK_ITEM_2BS_LAST
