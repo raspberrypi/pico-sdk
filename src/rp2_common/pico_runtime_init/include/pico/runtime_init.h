@@ -421,7 +421,7 @@ void runtime_init_bootrom_locking_enable(void);
 // ------------------------------------------------------------
 
 #ifndef PICO_RUNTIME_INIT_RP2350_SLEEP_FIX
-#define PICO_RUNTIME_INIT_RP2350_SLEEP_FIX "11010"
+#define PICO_RUNTIME_INIT_RP2350_SLEEP_FIX "00070"
 #endif
 
 #ifndef PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX

@@ -725,18 +725,42 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_low_power_cache_unpin, PICO_RUNTIME_
 
 #if !PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX
 #include "hardware/sync.h"
-void __weak runtime_init_rp2350_sleep_fix(void) {
+void __weak __not_in_flash_func(runtime_init_rp2350_sleep_fix)(void) {
     if (watchdog_hw->reason && WATCHDOG_REASON_TIMER_BITS) { // detect rom_reboot() usage
-        int alarm_num = timer_hardware_alarm_claim_unused(timer_hw, false);
-        if (alarm_num < 0) return;
+        uint32_t flags = save_and_disable_interrupts();
+        uint32_t num_irq_words = (NUM_IRQS + 31u) / 32u;
 
-        timer_hardware_alarm_set_callback(timer_hw, alarm_num, ((hardware_alarm_callback_t )low_power_wakeup));
-        timer_hardware_alarm_set_target(timer_hw, alarm_num, make_timeout_time_us(100));
+        // Clear (and save) NVIC mask so only the dummy can fire
+        uint32_t saved_irq_mask[num_irq_words];
+        for (int i = 0; i < num_irq_words; ++i) {
+            saved_irq_mask[i] = nvic_hw->icer[i];
+            nvic_hw->icer[i] = -1u;
+        }
 
-        __wfi();
+        // Un-pend then enable the dummy
+        const uint32_t dummy_irq_idx = FIRST_USER_IRQ / 32u;
+        const uint32_t dummy_irq_bit = FIRST_USER_IRQ % 32u;
+        nvic_hw->icpr[dummy_irq_idx] = 1u << dummy_irq_bit;
+        nvic_hw->iser[dummy_irq_idx] = 1u << dummy_irq_bit;
 
-        timer_hardware_alarm_set_callback(timer_hw, alarm_num, NULL);
-        timer_hardware_alarm_unclaim(timer_hw, alarm_num);
+        // Sleep and immediately dummy-IRQ back out of sleep (these events happen
+        // in reverse order on M33; Armv8-M doesn't specify the ordering)
+        pico_default_asm_volatile (
+            ".p2align 2\n"    // Make sure both 16-bit instructions are fetched
+            "str %0, [%1]\n"
+            "wfi\n"
+            :
+            : "l" (1u << dummy_irq_bit),
+            "l" (&nvic_hw->ispr[dummy_irq_idx])
+        );
+
+        // Restore NVIC mask
+        nvic_hw->icer[dummy_irq_idx] = 1u << dummy_irq_bit;
+        for (int i = 0; i < num_irq_words; ++i) {
+            nvic_hw->iser[i] = saved_irq_mask[i];
+        }
+
+        restore_interrupts(flags);
     }
 }
 #endif
