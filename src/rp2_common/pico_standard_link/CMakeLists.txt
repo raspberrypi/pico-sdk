@@ -5,6 +5,53 @@ if (NOT TARGET pico_standard_link)
         target_link_libraries(pico_standard_link INTERFACE boot_stage2_headers)
     endif()
 
+    if (TARGET hardware_regs_headers)
+        # parse addressmap.h for values, and set them as properties on pico_standard_link
+        get_target_property(hardware_regs_headers_source_dir hardware_regs_headers SOURCE_DIR)
+        if (NOT EXISTS ${hardware_regs_headers_source_dir}/include/hardware/regs/addressmap.h)
+            message(STATUS "addressmap.h not found in ${hardware_regs_headers_source_dir}/include/hardware/regs/")
+        else()
+            file(READ ${hardware_regs_headers_source_dir}/include/hardware/regs/addressmap.h hardware_regs_addressmap_h)
+            foreach (VAR
+                XIP_SRAM_BASE XIP_SRAM_END
+                SRAM_BASE SRAM_STRIPED_END
+                SRAM4_BASE SRAM5_BASE
+                SRAM_SCRATCH_X_BASE SRAM_SCRATCH_Y_BASE
+                SRAM_END
+            )
+                string(REGEX MATCH "#define ${VAR} _u\\(([^)]*)\\)" TMP_VAR "${hardware_regs_addressmap_h}")
+                if (${CMAKE_MATCH_1})
+                    set_target_properties(pico_standard_link PROPERTIES ${VAR} ${CMAKE_MATCH_1})
+                endif()
+            endforeach()
+        endif()
+    endif()
+
+    # pico_get_addressmap_value(VAR [FALLBACK_VAR <VAR>])
+    # \brief\ Get the value of a variable from the addressmap.h file
+    #
+    # \param\ VAR The variable to get the value of
+    # \param\ FALLBACK_VAR The variable to use if VAR is not found
+    function(pico_get_addressmap_value VAR)
+        set(oneValueArgs FALLBACK_VAR)
+        cmake_parse_arguments(PARSE_ARGV 0 args
+            "" "${oneValueArgs}" ""
+        )
+        get_target_property(TMP_VAR pico_standard_link ${VAR})
+        if (TMP_VAR)
+            set(${VAR} ${TMP_VAR} PARENT_SCOPE)
+        elseif (args_FALLBACK_VAR)
+            get_target_property(TMP_VAR pico_standard_link ${args_FALLBACK_VAR})
+            if (TMP_VAR)
+                set(${VAR} ${TMP_VAR} PARENT_SCOPE)
+            else()
+                message(FATAL_ERROR "Variable ${VAR} and fallback ${args_FALLBACK_VAR} not found in addressmap.h")
+            endif()
+        else()
+            message(FATAL_ERROR "Variable ${VAR} not found in addressmap.h")
+        endif()
+    endfunction()
+
     # pico_add_link_depend(TARGET dependency)
     # \brief\ Add a link time dependency to the target
     #
@@ -77,17 +124,18 @@ if (NOT TARGET pico_standard_link)
     function(pico_set_binary_type TARGET TYPE)
         # catch special cases
         if (TYPE STREQUAL "xip_sram")
+            pico_get_addressmap_value(XIP_SRAM_BASE)
+            pico_get_addressmap_value(XIP_SRAM_END)
+            target_compile_definitions(${TARGET} PRIVATE PICO_USE_XIP_CACHE_AS_RAM=1)
+            set(TYPE "sram")
             if (PICO_RP2040)
                 # Use copy_flash_sram, as RP2040 bootrom cannot directly access XIP SRAM
-                pico_set_modified_binary_type(${TARGET} copy_flash_sram RAM 0x15000000 12k SCRATCH_X 0x15003000 2k SCRATCH_Y 0x15003800 2k)
-                target_compile_definitions(${TARGET} PRIVATE PICO_USE_XIP_CACHE_AS_RAM=1)
+                set(TYPE "copy_flash_sram")
             elseif (PICO_RP2350)
-                pico_set_modified_binary_type(${TARGET} sram RAM 0x13ffc000 12k SCRATCH_X 0x13fff000 2k SCRATCH_Y 0x13fff800 2k)
                 # Exclusives only work in main SRAM on RP2350, so cannot use software spin locks
                 target_compile_definitions(${TARGET} PRIVATE PICO_USE_XIP_CACHE_AS_RAM=1 PICO_USE_SW_SPIN_LOCKS=0)
-            else()
-                message(FATAL_ERROR "unknown chip for xip_sram binary type")
             endif()
+            pico_set_modified_binary_type(${TARGET} ${TYPE} RAM ${XIP_SRAM_BASE} ${XIP_SRAM_END}-${XIP_SRAM_BASE}-4k SCRATCH_X ${XIP_SRAM_END}-4k 2k SCRATCH_Y ${XIP_SRAM_END}-2k 2k)
             return()
         elseif (TYPE STREQUAL "no_flash_using_xip_ram" OR TYPE STREQUAL "copy_to_ram_using_xip_ram")
             function(pico_internal_add_xip_text_section)
@@ -101,13 +149,9 @@ if (NOT TARGET pico_standard_link)
                 } > XIP_RAM AT> FLASH
                 __xip_ram_text_source__ = LOADADDR(.xip_text);\")" PARENT_SCOPE)
 
-                if (PICO_RP2040)
-                    set(ADDITIONAL_MEMORY "set(ADDITIONAL_MEMORY \"    XIP_RAM(rwx) : ORIGIN = 0x15000000, LENGTH = 16k\")" PARENT_SCOPE)
-                elseif(PICO_RP2350)
-                    set(ADDITIONAL_MEMORY "set(ADDITIONAL_MEMORY \"    XIP_RAM(rwx) : ORIGIN = 0x13ffc000, LENGTH = 16k\")" PARENT_SCOPE)
-                else()
-                    message(FATAL_ERROR "unknown chip for xxx_using_xip_ram binary type")
-                endif()
+                pico_get_addressmap_value(XIP_SRAM_BASE)
+                pico_get_addressmap_value(XIP_SRAM_END)
+                set(ADDITIONAL_MEMORY "set(ADDITIONAL_MEMORY \"    XIP_RAM(rwx) : ORIGIN = ${XIP_SRAM_BASE}, LENGTH = ${XIP_SRAM_END} - ${XIP_SRAM_BASE}\")" PARENT_SCOPE)
             endfunction()
             target_compile_definitions(${TARGET} PRIVATE PICO_DATA_COPY_EXTRA_SECTIONS_FILE="data_cpy_xip_text.S" PICO_USE_XIP_CACHE_AS_RAM=1)
             file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/data_cpy_xip_text.S "
@@ -149,21 +193,18 @@ if (NOT TARGET pico_standard_link)
         endif()
 
         # Default RAM, SCRATCH_X and SCRATCH_Y regions
-        if (PICO_RP2040)
-            set(PICO_DEFAULT_RAM_ORIGIN 0x20000000)
-            set(PICO_DEFAULT_RAM_LENGTH 256k)
-            set(PICO_DEFAULT_SCRATCH_X_ORIGIN 0x20040000)
-            set(PICO_DEFAULT_SCRATCH_X_LENGTH 4k)
-            set(PICO_DEFAULT_SCRATCH_Y_ORIGIN 0x20041000)
-            set(PICO_DEFAULT_SCRATCH_Y_LENGTH 4k)
-        elseif (PICO_RP2350)
-            set(PICO_DEFAULT_RAM_ORIGIN 0x20000000)
-            set(PICO_DEFAULT_RAM_LENGTH 512k)
-            set(PICO_DEFAULT_SCRATCH_X_ORIGIN 0x20080000)
-            set(PICO_DEFAULT_SCRATCH_X_LENGTH 4k)
-            set(PICO_DEFAULT_SCRATCH_Y_ORIGIN 0x20081000)
-            set(PICO_DEFAULT_SCRATCH_Y_LENGTH 4k)
-        endif()
+        pico_get_addressmap_value(SRAM_BASE)
+        pico_get_addressmap_value(SRAM_STRIPED_END)
+        pico_get_addressmap_value(SRAM_SCRATCH_X_BASE FALLBACK_VAR SRAM4_BASE)  # fallback for RP2040
+        pico_get_addressmap_value(SRAM_SCRATCH_Y_BASE FALLBACK_VAR SRAM5_BASE)  # fallback for RP2040
+        pico_get_addressmap_value(SRAM_END)
+
+        set(PICO_DEFAULT_RAM_ORIGIN ${SRAM_BASE})
+        set(PICO_DEFAULT_RAM_LENGTH ${SRAM_STRIPED_END}-${SRAM_BASE})
+        set(PICO_DEFAULT_SCRATCH_X_ORIGIN ${SRAM_SCRATCH_X_BASE})
+        set(PICO_DEFAULT_SCRATCH_X_LENGTH ${SRAM_SCRATCH_Y_BASE}-${SRAM_SCRATCH_X_BASE})
+        set(PICO_DEFAULT_SCRATCH_Y_ORIGIN ${SRAM_SCRATCH_Y_BASE})
+        set(PICO_DEFAULT_SCRATCH_Y_LENGTH ${SRAM_END}-${SRAM_SCRATCH_Y_BASE})
 
         # Scripts that will be created by this function
         set(LINKER_CMAKE_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/memmap_${TARGET}.cmake")
