@@ -145,12 +145,12 @@
  *
  *     void __time_critical_func(my_func)(int some_arg) {
  *
- * The function is placed in the `.time_critical.<func_name>` linker section
+ * The function is placed in the `.time_critical.text.<func_name>` linker section
  *
  * \see __not_in_flash_func
  */
 #ifndef __time_critical_func
-#define __time_critical_func(func_name) __not_in_flash_func(func_name)
+#define __time_critical_func(func_name) __noinline __attribute__((section(".time_critical.text." __STRING(func_name)))) func_name
 #endif
 
 /*! \brief Indicate a function should not be stored in flash and should not be inlined

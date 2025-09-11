@@ -584,6 +584,10 @@ data_cpy_table:
 .word __scratch_y_start__
 .word __scratch_y_end__
 
+#ifdef PICO_DATA_COPY_EXTRA_SECTIONS_FILE
+#include PICO_DATA_COPY_EXTRA_SECTIONS_FILE
+#endif
+
 .word 0 // null terminator
 
 // ----------------------------------------------------------------------------

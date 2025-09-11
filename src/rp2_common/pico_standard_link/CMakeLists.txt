@@ -86,7 +86,40 @@ if (NOT TARGET pico_standard_link)
                 # Exclusives only work in main SRAM on RP2350, so cannot use software spin locks
                 target_compile_definitions(${TARGET} PRIVATE PICO_USE_XIP_CACHE_AS_RAM=1 PICO_USE_SW_SPIN_LOCKS=0)
             else()
-                message(FATAL_ERROR "xip_sram binary type is only supported on RP2350")
+                message(FATAL_ERROR "unknown chip for xip_sram binary type")
+            endif()
+            return()
+        elseif (TYPE STREQUAL "no_flash_using_xip_ram" OR TYPE STREQUAL "copy_to_ram_using_xip_ram")
+            function(pico_internal_add_xip_text_section)
+                set(ADDITIONAL_PRE_DATA "set(ADDITIONAL_PRE_DATA \"
+                .xip_text : {
+                    __xip_ram_text_start__ = .;
+                    . = ALIGN(4);
+                    *(.time_critical.text*)
+                    . = ALIGN(4);
+                    __xip_ram_text_end__ = .;
+                } > XIP_RAM AT> FLASH
+                __xip_ram_text_source__ = LOADADDR(.xip_text);\")" PARENT_SCOPE)
+
+                if (PICO_RP2040)
+                    set(ADDITIONAL_MEMORY "set(ADDITIONAL_MEMORY \"    XIP_RAM(rwx) : ORIGIN = 0x15000000, LENGTH = 16k\")" PARENT_SCOPE)
+                elseif(PICO_RP2350)
+                    set(ADDITIONAL_MEMORY "set(ADDITIONAL_MEMORY \"    XIP_RAM(rwx) : ORIGIN = 0x13ffc000, LENGTH = 16k\")" PARENT_SCOPE)
+                else()
+                    message(FATAL_ERROR "unknown chip for xxx_using_xip_ram binary type")
+                endif()
+            endfunction()
+            target_compile_definitions(${TARGET} PRIVATE PICO_DATA_COPY_EXTRA_SECTIONS_FILE="data_cpy_xip_text.S" PICO_USE_XIP_CACHE_AS_RAM=1)
+            file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/data_cpy_xip_text.S "
+.word __xip_ram_text_source__
+.word __xip_ram_text_start__
+.word __xip_ram_text_end__
+")
+            target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+            if (TYPE STREQUAL "no_flash_using_xip_ram")
+                pico_set_modified_binary_type(${TARGET} sram EXTRAS pico_internal_add_xip_text_section)
+            elseif (TYPE STREQUAL "copy_to_ram_using_xip_ram")
+                pico_set_modified_binary_type(${TARGET} copy_flash_sram EXTRAS pico_internal_add_xip_text_section)
             endif()
             return()
         endif()
