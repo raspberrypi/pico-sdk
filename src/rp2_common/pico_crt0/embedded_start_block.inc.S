@@ -12,6 +12,10 @@
 #endif
 #endif
 
+#ifndef PICO_CRT0_PIN_XIP_SRAM
+#define PICO_CRT0_PIN_XIP_SRAM PICO_USE_XIP_CACHE_AS_RAM
+#endif
+
 #ifndef PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM
 // On RISC-V the default entry point from bootrom is the start of the binary, but
 // we have our vtable at the start, so we must include an entry point
@@ -102,6 +106,16 @@ embedded_block:
 .byte 0x2
 .hword 0
 .word __vectors
+#endif
+
+#if PICO_CRT0_PIN_XIP_SRAM
+.byte PICOBIN_BLOCK_ITEM_LOAD_MAP
+.byte 0x04 // word size
+.byte 0 // pad
+.byte 0x01 // number of entries
+.word 0 // clear
+.word XIP_SRAM_BASE
+.word 0 // size
 #endif
 
 .byte PICOBIN_BLOCK_ITEM_2BS_LAST

@@ -11,6 +11,7 @@
 
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
+#include "hardware/regs/xip.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
@@ -461,6 +462,14 @@ hold_non_core0_in_bootrom:
     ldr r0, =BOOTROM_VTABLE_OFFSET
     b _enter_vtable_in_r0
 1:
+
+#if PICO_RP2040 && PICO_USE_XIP_CACHE_AS_RAM
+_disable_xip_cache:
+    // Disable the XIP cache on RP2040 making its SRAM available for use
+    ldr r0, =(REG_ALIAS_CLR_BITS + XIP_CTRL_BASE + XIP_CTRL_OFFSET)
+    movs r1, #XIP_CTRL_EN_BITS
+    str r1, [r0]
+#endif
 
 #if !PICO_RP2040 && PICO_EMBED_XIP_SETUP && !PICO_NO_FLASH
     // Execute boot2 on the core 0 stack (it also gets copied into BOOTRAM due

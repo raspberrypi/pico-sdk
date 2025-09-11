@@ -77,9 +77,14 @@ if (NOT TARGET pico_standard_link)
     function(pico_set_binary_type TARGET TYPE)
         # catch special cases
         if (TYPE STREQUAL "xip_sram")
-            if (PICO_RP2350)
+            if (PICO_RP2040)
+                # Use copy_flash_sram, as RP2040 bootrom cannot directly access XIP SRAM
+                pico_set_modified_binary_type(${TARGET} copy_flash_sram RAM 0x15000000 12k SCRATCH_X 0x15003000 2k SCRATCH_Y 0x15003800 2k)
+                target_compile_definitions(${TARGET} PRIVATE PICO_USE_XIP_CACHE_AS_RAM=1)
+            elseif (PICO_RP2350)
                 pico_set_modified_binary_type(${TARGET} sram RAM 0x13ffc000 12k SCRATCH_X 0x13fff000 2k SCRATCH_Y 0x13fff800 2k)
-                target_compile_definitions(${TARGET} PRIVATE PICO_USE_SW_SPIN_LOCKS=0 PICO_USE_XIP_SRAM=1) # exclusives only work in main SRAM on RP2350
+                # Exclusives only work in main SRAM on RP2350, so cannot use software spin locks
+                target_compile_definitions(${TARGET} PRIVATE PICO_USE_XIP_CACHE_AS_RAM=1 PICO_USE_SW_SPIN_LOCKS=0)
             else()
                 message(FATAL_ERROR "xip_sram binary type is only supported on RP2350")
             endif()
