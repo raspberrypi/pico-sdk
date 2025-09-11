@@ -199,12 +199,16 @@ if (NOT TARGET pico_standard_link)
         pico_get_addressmap_value(SRAM_SCRATCH_Y_BASE FALLBACK_VAR SRAM5_BASE)  # fallback for RP2040
         pico_get_addressmap_value(SRAM_END)
 
+        # Convert sizes to kibibytes - not necessary, but makes the scripts easier to read
         set(PICO_DEFAULT_RAM_ORIGIN ${SRAM_BASE})
-        set(PICO_DEFAULT_RAM_LENGTH ${SRAM_STRIPED_END}-${SRAM_BASE})
+        math(EXPR PICO_DEFAULT_RAM_LENGTH "(${SRAM_STRIPED_END}-${SRAM_BASE})/1024")
+        set(PICO_DEFAULT_RAM_LENGTH "${PICO_DEFAULT_RAM_LENGTH}k")
         set(PICO_DEFAULT_SCRATCH_X_ORIGIN ${SRAM_SCRATCH_X_BASE})
-        set(PICO_DEFAULT_SCRATCH_X_LENGTH ${SRAM_SCRATCH_Y_BASE}-${SRAM_SCRATCH_X_BASE})
+        math(EXPR PICO_DEFAULT_SCRATCH_X_LENGTH "(${SRAM_SCRATCH_Y_BASE}-${SRAM_SCRATCH_X_BASE})/1024")
+        set(PICO_DEFAULT_SCRATCH_X_LENGTH "${PICO_DEFAULT_SCRATCH_X_LENGTH}k")
         set(PICO_DEFAULT_SCRATCH_Y_ORIGIN ${SRAM_SCRATCH_Y_BASE})
-        set(PICO_DEFAULT_SCRATCH_Y_LENGTH ${SRAM_END}-${SRAM_SCRATCH_Y_BASE})
+        math(EXPR PICO_DEFAULT_SCRATCH_Y_LENGTH "(${SRAM_END}-${SRAM_SCRATCH_Y_BASE})/1024")
+        set(PICO_DEFAULT_SCRATCH_Y_LENGTH "${PICO_DEFAULT_SCRATCH_Y_LENGTH}k")
 
         # Scripts that will be created by this function
         set(LINKER_CMAKE_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/memmap_${TARGET}.cmake")
