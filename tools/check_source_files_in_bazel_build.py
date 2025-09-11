@@ -60,6 +60,8 @@ IGNORED_FILE_PATTERNS = (
     # Doxygen only files.
     "**/index.h",
     "**/doc.h",
+    # Not supported in Bazel build
+    "test/pico_xip_sram_test/*",
 )
 
 
