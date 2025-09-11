@@ -26,6 +26,7 @@ MEMORY
     RAM(rwx) : ORIGIN =  @RAM_ORIGIN@, LENGTH = @RAM_LENGTH@
     SCRATCH_X(rwx) : ORIGIN = @SCRATCH_X_ORIGIN@, LENGTH = @SCRATCH_X_LENGTH@
     SCRATCH_Y(rwx) : ORIGIN = @SCRATCH_Y_ORIGIN@, LENGTH = @SCRATCH_Y_LENGTH@
+@ADDITIONAL_MEMORY@
 }
 
 ENTRY(_entry_point)
@@ -101,6 +102,8 @@ SECTIONS
     } > RAM
     __binary_info_end = .;
     . = ALIGN(4);
+
+@ADDITIONAL_PRE_DATA@
 
     .data : {
         __data_start__ = .;

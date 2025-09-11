@@ -26,6 +26,7 @@ MEMORY
     RAM(rwx) : ORIGIN =  0x20000000, LENGTH = 256k
     SCRATCH_X(rwx) : ORIGIN = 0x20040000, LENGTH = 4k
     SCRATCH_Y(rwx) : ORIGIN = 0x20041000, LENGTH = 4k
+
 }
 
 ENTRY(_entry_point)
@@ -101,6 +102,8 @@ SECTIONS
     } > RAM
     __binary_info_end = .;
     . = ALIGN(4);
+
+
 
     .data : {
         __data_start__ = .;

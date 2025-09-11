@@ -88,23 +88,25 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()
 
-    # pico_set_modified_binary_type(TARGET TYPE [RAM <RAM_ORIGIN> <RAM_LENGTH>] [SCRATCH_X <SCRATCH_X_ORIGIN> <SCRATCH_X_LENGTH>] [SCRATCH_Y <SCRATCH_Y_ORIGIN> <SCRATCH_Y_LENGTH>])
-    # \brief\ Set the binary type for the target with modified RAM, SCRATCH_X and SCRATCH_Y regions
+    # pico_set_modified_binary_type(TARGET TYPE [RAM <RAM_ORIGIN> <RAM_LENGTH>] [SCRATCH_X <SCRATCH_X_ORIGIN> <SCRATCH_X_LENGTH>] [SCRATCH_Y <SCRATCH_Y_ORIGIN> <SCRATCH_Y_LENGTH>] [EXTRAS <EXTRA_FN>])
+    # \brief\ Set the binary type for the target with modified regions
     #
-    # \param\ TYPE The type of binary to use (flash or sram)
+    # \param\ TYPE The type of binary to use (flash, sram, or copy_flash_sram)
     # \param\ RAM_ORIGIN The origin of the RAM section
     # \param\ RAM_LENGTH The length of the RAM section
     # \param\ SCRATCH_X_ORIGIN The origin of the SCRATCH_X section
     # \param\ SCRATCH_X_LENGTH The length of the SCRATCH_X section
     # \param\ SCRATCH_Y_ORIGIN The origin of the SCRATCH_Y section
     # \param\ SCRATCH_Y_LENGTH The length of the SCRATCH_Y section
+    # \param\ EXTRAS A CMake function to call to set additional variables - requires CMake 3.18.0 or later
     function(pico_set_modified_binary_type TARGET TYPE)
+        set(oneValueArgs EXTRAS)
         set(multiValueArgs RAM SCRATCH_X SCRATCH_Y)
         cmake_parse_arguments(PARSE_ARGV 0 args
-            "" "" "${multiValueArgs}"
+            "" "${oneValueArgs}" "${multiValueArgs}"
         )
 
-        if (NOT (TYPE STREQUAL "sram" OR TYPE STREQUAL "flash"))
+        if (NOT (TYPE STREQUAL "sram" OR TYPE STREQUAL "flash" OR TYPE STREQUAL "copy_flash_sram"))
             message(FATAL_ERROR "Invalid binary type for pico_set_modified_binary_type: ${TYPE}")
         endif()
 
@@ -154,6 +156,15 @@ if (NOT TARGET pico_standard_link)
         else()
             message(FATAL_ERROR "Unknown default SCRATCH_Y region for ${PICO_PLATFORM}")
         endif()
+
+        if (args_EXTRAS)
+            if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0")
+                cmake_language(CALL ${args_EXTRAS})
+            else()
+                message(FATAL_ERROR "EXTRAS argument requires CMake 3.18.0 or later")
+            endif()
+        endif()
+
         if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.17.0")
             # CMAKE_CURRENT_FUNCTION_LIST_DIR added in 3.17.0
             configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/memmap_script.template.cmake ${LINKER_CMAKE_SCRIPT} @ONLY)
@@ -167,7 +178,7 @@ if (NOT TARGET pico_standard_link)
                 -DPICO_LINKER_SCRIPT_PATH:PATH=${PICO_LINKER_SCRIPT_PATH}
                 -Doutput_file:FILEPATH=${LINKER_LD_SCRIPT}
                 -P "${LINKER_CMAKE_SCRIPT}"
-            DEPENDS ${LINKER_CMAKE_SCRIPT})
+            DEPENDS ${LINKER_CMAKE_SCRIPT} ${PICO_LINKER_SCRIPT_PATH}/memmap_${TYPE}.template.ld)
         add_custom_target(memmap_${TARGET}_ld DEPENDS ${LINKER_LD_SCRIPT})
         add_dependencies(${TARGET} memmap_${TARGET}_ld)
 
@@ -176,6 +187,8 @@ if (NOT TARGET pico_standard_link)
         # Set PICO_TARGET_BINARY_TYPE for additional configuration
         if (TYPE STREQUAL "sram")
             set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE no_flash)
+        elseif (TYPE STREQUAL "copy_flash_sram")
+            set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE copy_to_ram)
         else()
             set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE default)
         endif()

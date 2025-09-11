@@ -23,39 +23,95 @@
 
 MEMORY
 {
-    RAM(rwx) : ORIGIN =  0x20000000, LENGTH = 512k
-    SCRATCH_X(rwx) : ORIGIN = 0x20080000, LENGTH = 4k
-    SCRATCH_Y(rwx) : ORIGIN = 0x20081000, LENGTH = 4k
-
+    @FLASH_REGION@
+    RAM(rwx) : ORIGIN =  @RAM_ORIGIN@, LENGTH = @RAM_LENGTH@
+    SCRATCH_X(rwx) : ORIGIN = @SCRATCH_X_ORIGIN@, LENGTH = @SCRATCH_X_LENGTH@
+    SCRATCH_Y(rwx) : ORIGIN = @SCRATCH_Y_ORIGIN@, LENGTH = @SCRATCH_Y_LENGTH@
+@ADDITIONAL_MEMORY@
 }
 
 ENTRY(_entry_point)
 
 SECTIONS
 {
-    /* Note unlike RP2040, we start the image with a vector table even for
-       NO_FLASH builds. On Arm, the bootrom expects a VT at the start of the
-       image by default; on RISC-V, the default is to enter the image at its
-       lowest address, so an IMAGE_DEF item is required to specify the
-       nondefault entry point. */
+    /* Second stage bootloader is prepended to the image. It must be 256 bytes big
+       and checksummed. It is usually built by the boot_stage2 target
+       in the Raspberry Pi Pico SDK
+    */
 
-    .text : {
+    .flash_begin : {
+        __flash_binary_start = .;
+    } > FLASH
+
+    .boot2 : {
+        __boot2_start__ = .;
+        KEEP (*(.boot2))
+        __boot2_end__ = .;
+    } > FLASH
+
+    ASSERT(__boot2_end__ - __boot2_start__ == 256,
+        "ERROR: Pico second stage bootloader must be 256 bytes in size")
+
+    /* The second stage will always enter the image at the start of .text.
+       The debugger will use the ELF entry point, which is the _entry_point
+       symbol if present, otherwise defaults to start of .text.
+       This can be used to transfer control back to the bootrom on debugger
+       launches only, to perform proper flash setup.
+    */
+
+    .flashtext : {
         __logical_binary_start = .;
-        /* Vectors require 512-byte alignment on v8-M when >48 IRQs are used,
-           so we would waste RAM if the vector table were not at the
-           start. */
         KEEP (*(.vectors))
         KEEP (*(.binary_info_header))
         __binary_info_header_end = .;
         KEEP (*(.embedded_block))
         __embedded_block_end = .;
-        __reset_start = .;
         KEEP (*(.reset))
-        __reset_end = .;
-        *(.time_critical*)
-        *(.text*)
+    }
+
+    .rodata : {
+        /* segments not marked as .flashdata are instead pulled into .data (in RAM) to avoid accidental flash accesses */
+        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
         . = ALIGN(4);
+    } > FLASH
+
+    .ARM.extab :
+    {
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
+    } > FLASH
+
+    __exidx_start = .;
+    .ARM.exidx :
+    {
+        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+    } > FLASH
+    __exidx_end = .;
+
+    /* Machine inspectable binary information */
+    . = ALIGN(4);
+    __binary_info_start = .;
+    .binary_info :
+    {
+        KEEP(*(.binary_info.keep.*))
+        *(.binary_info.*)
+    } > FLASH
+    __binary_info_end = .;
+    . = ALIGN(4);
+
+    /* Vector table goes first in RAM, to avoid large alignment hole */
+    .ram_vector_table (NOLOAD): {
+        *(.ram_vector_table)
+    } > RAM
+
+    .uninitialized_data (NOLOAD): {
+        . = ALIGN(4);
+        *(.uninitialized_data*)
+    } > RAM
+
+    .text : {
+        __ram_text_start__ = .;
         *(.init)
+        *(.text*)
         *(.fini)
         /* Pull all c'tors into .text */
         *crtbegin.o(.ctors)
@@ -71,47 +127,25 @@ SECTIONS
         *(.dtors)
 
         *(.eh_frame*)
-    } > RAM
-
-    .rodata : {
         . = ALIGN(4);
-        *(.rodata*)
-        *(.srodata*)
-        . = ALIGN(4);
-        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
-        . = ALIGN(4);
-    } > RAM
-
-    .ARM.extab :
-    {
-        *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > RAM
-
-    __exidx_start = .;
-    .ARM.exidx :
-    {
-        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > RAM
-    __exidx_end = .;
-
-    /* Machine inspectable binary information */
-    . = ALIGN(4);
-    __binary_info_start = .;
-    .binary_info :
-    {
-        KEEP(*(.binary_info.keep.*))
-        *(.binary_info.*)
-    } > RAM
-    __binary_info_end = .;
+        __ram_text_end__ = .;
+    } > RAM AT> FLASH
+    __ram_text_source__ = LOADADDR(.text);
     . = ALIGN(4);
 
-
+@ADDITIONAL_PRE_DATA@
 
     .data : {
         __data_start__ = .;
         *(vtable)
+
+        *(.time_critical*)
+
+        . = ALIGN(4);
+        *(.rodata*)
+        . = ALIGN(4);
+
         *(.data*)
-        *(.sdata*)
 
         . = ALIGN(4);
         *(.after_data.*)
@@ -145,20 +179,16 @@ SECTIONS
 
         *(.jcr)
         . = ALIGN(4);
-   } > RAM
+    } > RAM AT> FLASH
 
     .tdata : {
         . = ALIGN(4);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
         /* All data end */
         __tdata_end = .;
-    } > RAM
+    } > RAM AT> FLASH
     PROVIDE(__data_end__ = .);
 
-    .uninitialized_data (NOLOAD): {
-        . = ALIGN(4);
-        *(.uninitialized_data*)
-    } > RAM
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
     __etext = LOADADDR(.data);
 
@@ -172,14 +202,12 @@ SECTIONS
         __tls_end = .;
     } > RAM
 
-    .bss (NOLOAD) : {
+    .bss  : {
         . = ALIGN(4);
         __tbss_end = .;
 
         *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
         *(COMMON)
-        PROVIDE(__global_pointer$ = . + 2K);
-        *(.sbss*)
         . = ALIGN(4);
         __bss_end__ = .;
     } > RAM
@@ -200,7 +228,7 @@ SECTIONS
         *(.scratch_x.*)
         . = ALIGN(4);
         __scratch_x_end__ = .;
-    } > SCRATCH_X
+    } > SCRATCH_X AT > FLASH
     __scratch_x_source__ = LOADADDR(.scratch_x);
 
     .scratch_y : {
@@ -208,7 +236,7 @@ SECTIONS
         *(.scratch_y.*)
         . = ALIGN(4);
         __scratch_y_end__ = .;
-    } > SCRATCH_Y
+    } > SCRATCH_Y AT > FLASH
     __scratch_y_source__ = LOADADDR(.scratch_y);
 
     /* .stack*_dummy section doesn't contains any symbols. It is only
@@ -228,6 +256,11 @@ SECTIONS
     {
         KEEP(*(.stack*))
     } > SCRATCH_Y
+
+    .flash_end : {
+        KEEP(*(.embedded_end_block*))
+        PROVIDE(__flash_binary_end = .);
+    } > FLASH
 
     /* stack limit is poorly named, but historically is maximum heap ptr */
     __StackLimit = ORIGIN(RAM) + LENGTH(RAM);
@@ -251,9 +284,7 @@ SECTIONS
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed")
 
-    ASSERT( __binary_info_header_end - __logical_binary_start <= 1024, "Binary info must be in first 1024 bytes of the binary")
-    ASSERT( __embedded_block_end - __logical_binary_start <= 4096, "Embedded block must be in first 4096 bytes of the binary")
-
+    ASSERT( __binary_info_header_end - __logical_binary_start <= 256, "Binary info must be in first 256 bytes of the binary")
     /* todo assert on extra code */
 }
 

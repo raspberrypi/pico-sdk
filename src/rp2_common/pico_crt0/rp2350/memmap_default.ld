@@ -27,6 +27,7 @@ MEMORY
     RAM(rwx) : ORIGIN =  0x20000000, LENGTH = 512k
     SCRATCH_X(rwx) : ORIGIN = 0x20080000, LENGTH = 4k
     SCRATCH_Y(rwx) : ORIGIN = 0x20081000, LENGTH = 4k
+
 }
 
 ENTRY(_entry_point)
@@ -160,6 +161,8 @@ SECTIONS
         . = ALIGN(4);
         *(.uninitialized_data*)
     } > RAM
+
+
 
     .data : {
         __data_start__ = .;

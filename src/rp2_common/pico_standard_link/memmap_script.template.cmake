@@ -2,5 +2,11 @@
 @RAM@
 @SCRATCH_X@
 @SCRATCH_Y@
+@ADDITIONAL_CHANGES@
+
+# Set some defaults
+if (NOT FLASH_REGION)
+    set(FLASH_REGION "INCLUDE \"pico_flash_region.ld\"")
+endif()
 
 configure_file("${PICO_LINKER_SCRIPT_PATH}/memmap_@TYPE@.template.ld" "${output_file}" @ONLY)

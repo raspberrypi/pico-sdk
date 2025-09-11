@@ -20,6 +20,11 @@
 #define PICO_CRT0_NEAR_CALLS 0
 #endif
 
+// PICO_CONFIG: PICO_CRT0_NO_DATA_COPY, Whether crt0 should perform the data copies - usually copying from flash into sram, default=1 for no_flash builds, 0 otherwise, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_NO_DATA_COPY
+#define PICO_CRT0_NO_DATA_COPY PICO_NO_FLASH
+#endif
+
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS
 #define COLLAPSE_IRQS
@@ -477,7 +482,7 @@ _call_xip_setup:
 
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
-#if !PICO_NO_FLASH
+#if !PICO_CRT0_NO_DATA_COPY
     adr r4, data_cpy_table
 
     // assume there is at least one entry
@@ -522,11 +527,21 @@ platform_entry: // symbol for stack traces
     b 1b
 
 
-#if !PICO_NO_FLASH
+#if !PICO_CRT0_NO_DATA_COPY
+#if PICO_NO_FLASH
+data_cpy:
+    // skip copies with same source and destination
+    cmp r1, r2
+    bne data_cpy_start
+    bx lr
+#else
+    // go straight into the copy
+    #define data_cpy_start data_cpy
+#endif
 data_cpy_loop:
     ldm r1!, {r0}
     stm r2!, {r0}
-data_cpy:
+data_cpy_start:
     cmp r2, r3
     blo data_cpy_loop
     bx lr

@@ -23,10 +23,11 @@
 
 MEMORY
 {
-    INCLUDE "pico_flash_region.ld"
+    @FLASH_REGION@
     RAM(rwx) : ORIGIN =  @RAM_ORIGIN@, LENGTH = @RAM_LENGTH@
     SCRATCH_X(rwx) : ORIGIN = @SCRATCH_X_ORIGIN@, LENGTH = @SCRATCH_X_LENGTH@
     SCRATCH_Y(rwx) : ORIGIN = @SCRATCH_Y_ORIGIN@, LENGTH = @SCRATCH_Y_LENGTH@
+@ADDITIONAL_MEMORY@
 }
 
 ENTRY(_entry_point)
@@ -160,6 +161,8 @@ SECTIONS
         . = ALIGN(4);
         *(.uninitialized_data*)
     } > RAM
+
+@ADDITIONAL_PRE_DATA@
 
     .data : {
         __data_start__ = .;

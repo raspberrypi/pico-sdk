@@ -219,6 +219,12 @@ if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
     pico_add_extra_outputs(kitchen_sink_sram)
     target_compile_definitions(kitchen_sink_sram PRIVATE KITCHEN_SINK_ID="sram binary")
 
+    add_executable(kitchen_sink_copy_flash_sram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    pico_set_modified_binary_type(kitchen_sink_copy_flash_sram copy_flash_sram)
+    target_link_libraries(kitchen_sink_copy_flash_sram kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_copy_flash_sram)
+    target_compile_definitions(kitchen_sink_copy_flash_sram PRIVATE KITCHEN_SINK_ID="copy-flash-sram binary")
+
     # Add command to check files match
     add_custom_target(kitchen_sink_flash_ld_match ALL
         COMMAND ${CMAKE_COMMAND}
@@ -232,6 +238,12 @@ if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
             -DMODIFIED_LINKER_SCRIPT:PATH=${CMAKE_CURRENT_BINARY_DIR}/memmap_kitchen_sink_sram.ld
             -P ${CMAKE_CURRENT_LIST_DIR}/memmap_check.cmake
         DEPENDS kitchen_sink_sram)
+    add_custom_target(kitchen_sink_copy_flash_sram_ld_match ALL
+        COMMAND ${CMAKE_COMMAND}
+            -DDEFAULT_LINKER_SCRIPT:PATH=${PICO_LINKER_SCRIPT_PATH}/memmap_copy_to_ram.ld
+            -DMODIFIED_LINKER_SCRIPT:PATH=${CMAKE_CURRENT_BINARY_DIR}/memmap_kitchen_sink_copy_flash_sram.ld
+            -P ${CMAKE_CURRENT_LIST_DIR}/memmap_check.cmake
+        DEPENDS kitchen_sink_copy_flash_sram)
 
     if (PICO_RP2040)
         # RP2040 has blocked ram
