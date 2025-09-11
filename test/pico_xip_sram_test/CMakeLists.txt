@@ -1,6 +1,6 @@
 # XIP SRAM only binary
 add_executable(pico_xip_sram_test pico_xip_sram_test.c)
-target_link_libraries(pico_xip_sram_test PRIVATE pico_stdlib pico_multicore)
+target_link_libraries(pico_xip_sram_test PRIVATE pico_stdlib pico_multicore hardware_dma)
 pico_set_binary_type(pico_xip_sram_test xip_sram)
 pico_minimize_runtime(pico_xip_sram_test INCLUDE PRINTF PRINTF_MINIMAL DEFAULT_ALARM_POOL PANIC)
 target_compile_definitions(pico_xip_sram_test PRIVATE PICO_HEAP_SIZE=0x200)
@@ -8,12 +8,12 @@ pico_add_extra_outputs(pico_xip_sram_test)
 
 # Use XIP SRAM for time critical functions
 add_executable(pico_critical_xip_sram_test pico_xip_sram_test.c)
-target_link_libraries(pico_critical_xip_sram_test PRIVATE pico_stdlib pico_multicore)
+target_link_libraries(pico_critical_xip_sram_test PRIVATE pico_stdlib pico_multicore hardware_dma)
 pico_set_binary_type(pico_critical_xip_sram_test copy_to_ram_using_xip_ram)
 pico_add_extra_outputs(pico_critical_xip_sram_test)
 
 # Same as above, but without XIP SRAM, to show the difference
 add_executable(pico_critical_no_xip_sram_test pico_xip_sram_test.c)
-target_link_libraries(pico_critical_no_xip_sram_test PRIVATE pico_stdlib pico_multicore)
+target_link_libraries(pico_critical_no_xip_sram_test PRIVATE pico_stdlib pico_multicore hardware_dma)
 pico_set_binary_type(pico_critical_no_xip_sram_test copy_to_ram)
 pico_add_extra_outputs(pico_critical_no_xip_sram_test)
