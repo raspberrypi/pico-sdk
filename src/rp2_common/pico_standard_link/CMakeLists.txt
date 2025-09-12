@@ -5,50 +5,80 @@ if (NOT TARGET pico_standard_link)
         target_link_libraries(pico_standard_link INTERFACE boot_stage2_headers)
     endif()
 
-    if (TARGET hardware_regs_headers)
-        # parse addressmap.h for values, and set them as properties on pico_standard_link
-        get_target_property(hardware_regs_headers_source_dir hardware_regs_headers SOURCE_DIR)
-        if (NOT EXISTS ${hardware_regs_headers_source_dir}/include/hardware/regs/addressmap.h)
-            message(STATUS "addressmap.h not found in ${hardware_regs_headers_source_dir}/include/hardware/regs/")
-        else()
-            file(READ ${hardware_regs_headers_source_dir}/include/hardware/regs/addressmap.h hardware_regs_addressmap_h)
-            foreach (VAR
-                XIP_SRAM_BASE XIP_SRAM_END
-                SRAM_BASE SRAM_STRIPED_END
-                SRAM4_BASE SRAM5_BASE
-                SRAM_SCRATCH_X_BASE SRAM_SCRATCH_Y_BASE
-                SRAM_END
-            )
-                string(REGEX MATCH "#define ${VAR} _u\\(([^)]*)\\)" TMP_VAR "${hardware_regs_addressmap_h}")
-                if (${CMAKE_MATCH_1})
-                    set_target_properties(pico_standard_link PROPERTIES ${VAR} ${CMAKE_MATCH_1})
-                endif()
-            endforeach()
+    # pico_read_addressmap_value(VARS ...)
+    # \brief_nodesc\ Read the addressmap.h file and set the values as properties on pico_standard_link
+    #
+    # This function is used to read the addressmap.h file and set the values as properties on pico_standard_link,
+    # for fetching later using pico_get_addressmap_value.
+    #
+    # \param\ VARS The variables to read the values of
+    function(pico_read_addressmap_value)
+        if (TARGET hardware_regs_headers)
+            # parse addressmap.h for values, and set them as properties on pico_standard_link
+            get_target_property(hardware_regs_headers_source_dir hardware_regs_headers SOURCE_DIR)
+            if (NOT EXISTS ${hardware_regs_headers_source_dir}/include/hardware/regs/addressmap.h)
+                message(STATUS "addressmap.h not found in ${hardware_regs_headers_source_dir}/include/hardware/regs/")
+            else()
+                file(READ ${hardware_regs_headers_source_dir}/include/hardware/regs/addressmap.h hardware_regs_addressmap_h)
+                foreach (VAR ${ARGV})
+                    string(REGEX MATCH "#define ${VAR} _u\\(([^)]*)\\)" TMP_VAR "${hardware_regs_addressmap_h}")
+                    if (${CMAKE_MATCH_1})
+                        set_target_properties(pico_standard_link PROPERTIES ${VAR} ${CMAKE_MATCH_1})
+                    endif()
+                endforeach()
+            endif()
         endif()
-    endif()
+    endfunction()
+
+    # Read all the standard variables from the addressmap.h file
+    pico_read_addressmap_value(
+        XIP_SRAM_BASE XIP_SRAM_END
+        SRAM_BASE SRAM_STRIPED_END
+        SRAM4_BASE SRAM5_BASE
+        SRAM_SCRATCH_X_BASE SRAM_SCRATCH_Y_BASE
+        SRAM_END
+    )
 
     # pico_get_addressmap_value(VAR [FALLBACK_VAR <VAR>])
     # \brief\ Get the value of a variable from the addressmap.h file
     #
+    # Use pico_read_addressmap_value to read all the values you need from the addressmap.h 
+    # file before using this function, for best performance.
+    #
+    # This function will use the fallback variable if the first variable is not found.
+    #
+    # If neither are found, it will call pico_read_addressmap_value to read the values
+    # from the addressmap.h file, and throw an error if the values are still not found.
+    #
     # \param\ VAR The variable to get the value of
     # \param\ FALLBACK_VAR The variable to use if VAR is not found
     function(pico_get_addressmap_value VAR)
+        set(zeroValueArgs NO_RECURSE)
         set(oneValueArgs FALLBACK_VAR)
         cmake_parse_arguments(PARSE_ARGV 0 args
-            "" "${oneValueArgs}" ""
+            "${zeroValueArgs}" "${oneValueArgs}" ""
         )
+
         get_target_property(TMP_VAR pico_standard_link ${VAR})
         if (TMP_VAR)
             set(${VAR} ${TMP_VAR} PARENT_SCOPE)
+            return()
         elseif (args_FALLBACK_VAR)
             get_target_property(TMP_VAR pico_standard_link ${args_FALLBACK_VAR})
             if (TMP_VAR)
                 set(${VAR} ${TMP_VAR} PARENT_SCOPE)
-            else()
-                message(FATAL_ERROR "Variable ${VAR} and fallback ${args_FALLBACK_VAR} not found in addressmap.h")
+                return()
             endif()
+        endif()
+
+        # Attempt to read the value from the addressmap.h file
+        if (NOT args_NO_RECURSE)
+            pico_read_addressmap_value(${VAR} ${args_FALLBACK_VAR})
+            pico_get_addressmap_value(${VAR} NO_RECURSE FALLBACK_VAR ${args_FALLBACK_VAR})
+            set(${VAR} ${${VAR}} PARENT_SCOPE)
+            return()
         else()
-            message(FATAL_ERROR "Variable ${VAR} not found in addressmap.h")
+            message(FATAL_ERROR "Variable ${VAR} and fallback ${args_FALLBACK_VAR} not found in addressmap.h")
         endif()
     endfunction()
 
