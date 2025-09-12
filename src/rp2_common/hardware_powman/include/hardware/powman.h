@@ -224,8 +224,8 @@ powman_power_state powman_get_power_state(void);
  *
  * Check the desired state is valid. Powman will go to the state if it is valid and there are no pending power up requests.
  *
- * Note that if you are turning off the switched core then this function will never return as the processor will have
- * been turned off at the end.
+ * Note that if you are turning off the switched core then you need to call __wfi() after this function returns, otherwise
+ * the transition will not take place.
  *
  * \param state the power state to go to
  * \returns PICO_OK if the state is valid. Misc PICO_ERRORs are returned if not
