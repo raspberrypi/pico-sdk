@@ -556,6 +556,7 @@ static inline uint32_t dma_encode_transfer_count(uint transfer_count) {
  */
 static inline uint32_t dma_encode_transfer_count_with_self_trigger(uint transfer_count) {
 #if PICO_RP2040
+    (void)transfer_count;
     panic_unsupported();
 #else
     return dma_encode_transfer_count(transfer_count) | (DMA_CH0_TRANS_COUNT_MODE_VALUE_TRIGGER_SELF << DMA_CH0_TRANS_COUNT_MODE_LSB);
