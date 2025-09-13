@@ -79,7 +79,7 @@ struct c_sdk_output : public output_format {
         fprintf(out, "#endif\n");
         fprintf(out, "\n");
 
-        fprintf(out, "#ifdef __cplusplus\n");
+        fprintf(out, "#ifdef __cpp_constexpr\n");
         fprintf(out, "#define PIO_CONST constexpr\n");
         fprintf(out, "#else\n");
         fprintf(out, "#define PIO_CONST const\n");
