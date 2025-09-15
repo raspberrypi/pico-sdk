@@ -15,6 +15,8 @@ pico_mirrored_target_link_libraries(pico_low_power INTERFACE
         hardware_irq
         hardware_timer
         pico_aon_timer
+        hardware_uart
+        pico_stdio
         )
 
 # pico_set_persistent_data_loc(TARGET PERSISTENT_DATA_LOC)

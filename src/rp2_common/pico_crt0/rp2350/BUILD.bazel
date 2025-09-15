@@ -27,6 +27,7 @@ cc_library(
         "memmap_default.ld",
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
         "//src/rp2_common/pico_standard_link:default_flash_region",
+        "//src/rp2_common/pico_standard_link:default_ld_constants",
     ],
 )
 
@@ -40,6 +41,7 @@ cc_library(
         "memmap_copy_to_ram.ld",
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
         "//src/rp2_common/pico_standard_link:default_flash_region",
+        "//src/rp2_common/pico_standard_link:default_ld_constants",
     ],
 )
 
@@ -52,5 +54,6 @@ cc_library(
     deps = [
         "memmap_no_flash.ld",
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2_common/pico_standard_link:default_ld_constants",
     ],
 )

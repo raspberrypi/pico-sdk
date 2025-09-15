@@ -15,6 +15,9 @@
 #if LIB_PICO_BINARY_INFO
 #include "pico/binary_info.h"
 #endif
+#if LIB_PICO_AON_TIMER
+#include "pico/aon_timer.h"
+#endif
 #else
 #include KITCHEN_SINK_INCLUDE_HEADER
 #endif

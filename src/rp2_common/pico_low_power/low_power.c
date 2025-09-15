@@ -9,6 +9,11 @@
 #include "pico/low_power.h"
 #include "pico/aon_timer.h"
 #include "pico/runtime_init.h"
+#include "pico/time.h"
+#include "pico/stdio.h"
+#if LIB_PICO_STDIO_USB
+#include "pico/stdio_usb.h"
+#endif
 
 #include "hardware/pll.h"
 #include "hardware/claim.h"
@@ -20,11 +25,6 @@
 #include "hardware/uart.h"
 #include "hardware/watchdog.h"
 #include "hardware/xosc.h"
-
-// todo this is a hack for now as we use setup_default_uart(); this is deliberately not in
-//  the library dependencies right now, as this should get fixed up by better "pre/post" clock
-//  setup hooks
-#include "pico/stdlib.h"
 
 #if LIB_TINYUSB_DEVICE || LIB_TINYUSB_HOST
 #include "tusb.h"

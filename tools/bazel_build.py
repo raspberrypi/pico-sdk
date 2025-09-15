@@ -87,6 +87,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
+                # RP2040 only.
+                "//test/hello_sleep:rtc_clksrc",
                 # TODO: RISC-V support.
                 "//test/pico_float_test:pico_float_test_hazard3",
             )
@@ -125,6 +127,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
+                # RP2040 only.
+                "//test/hello_sleep:rtc_clksrc",
                 # TODO: RISC-V support.
                 "//test/pico_float_test:pico_float_test_hazard3",
             )
@@ -159,7 +163,9 @@ BUILD_CONFIGURATIONS = (
             (
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
-                # No RISC-V on RP2040.
+                # RP2040 only.
+                "//test/hello_sleep:rtc_clksrc",
+                # TODO: RISC-V support.
                 "//test/pico_float_test:pico_float_test_hazard3",
             )
         ),
@@ -201,6 +207,8 @@ def build_all_configurations(picotool_dir):
         build_targets = [
             t for t in default_build_targets if t not in config["exclusions"]
         ]
+        print("Build targets: ", build_targets)
+        print("Exclusions: ", config["exclusions"])
         build_targets.extend(config["extra_targets"])
 
         args = list(config["args"])
