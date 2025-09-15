@@ -11,6 +11,7 @@
 #include "hardware/dma.h"
 #include "pico/sync.h"
 #include "pico/stdlib.h"
+#include "pico/util/bitset.h"
 #if LIB_PICO_BINARY_INFO
 #include "pico/binary_info.h"
 #endif
@@ -95,6 +96,7 @@ int main(void) {
         if (bitset_get_bit(&fooper.bitset, i)) printf("Have at %d\n", i);
     }
     printf("%f\n", foox(1.3f, 2.6f));
+#if LIB_PICO_AON_TIMER
     aon_timer_start_with_timeofday();
     void spoop(void);
     struct timespec ts;
@@ -106,6 +108,7 @@ int main(void) {
         printf("%ld %ld\n", (long)ts.tv_sec, ts.tv_nsec);
         busy_wait_ms(4000);
     }
+#endif
 
 #ifndef __riscv
     // this should compile as we are Cortex M0+
@@ -113,6 +116,8 @@ int main(void) {
 #endif
 }
 
+#if LIB_PICO_AON_TIMER
 void spoop(void) {
     printf("XXXX YARGLE XXXX\n");
 }
+#endif

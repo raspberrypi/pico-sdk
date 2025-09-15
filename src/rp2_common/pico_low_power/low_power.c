@@ -576,6 +576,9 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
 }
 
 #if HAS_POWMAN_TIMER
+extern unsigned char __persistent_data_start__[];
+extern unsigned char __persistent_data_end__[];
+
 int low_power_pstate_set(pstate_bitset_t *pstate) {
     invalid_params_if(PICO_LOW_POWER, !pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SWITCHED_CORE));
 
@@ -589,8 +592,6 @@ pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate) {
 
 pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
     pstate_bitset_clear(pstate);
-    extern unsigned char __persistent_data_start__[];
-    extern unsigned char __persistent_data_end__[];
 
     if ((uint32_t)__persistent_data_start__ == (uint32_t)__persistent_data_end__) {
         // No persistent data, so power down everything
@@ -694,9 +695,6 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_low_power_reboot_check, PICO_RUNTIME
 
 #if !PICO_RUNTIME_NO_INIT_LOW_POWER_CACHE_UNPIN
 void __weak __no_inline_not_in_flash_func(runtime_init_low_power_cache_unpin)(void) {
-    extern unsigned char __persistent_data_start__[];
-    extern unsigned char __persistent_data_end__[];
-
     // if persistent data is in xip_sram, then the whole cache is currently pinned
     // for performance, we should unpin the rest of it
     if ((uint32_t)__persistent_data_start__ < SRAM_BASE) {
@@ -728,7 +726,7 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_low_power_cache_unpin, PICO_RUNTIME_
 void __weak __not_in_flash_func(runtime_init_rp2350_sleep_fix)(void) {
     if (watchdog_hw->reason && WATCHDOG_REASON_TIMER_BITS) { // detect rom_reboot() usage
         uint32_t flags = save_and_disable_interrupts();
-        uint32_t num_irq_words = (NUM_IRQS + 31u) / 32u;
+        int32_t num_irq_words = (NUM_IRQS + 31u) / 32u;
 
         // Clear (and save) NVIC mask so only the dummy can fire
         uint32_t saved_irq_mask[num_irq_words];
