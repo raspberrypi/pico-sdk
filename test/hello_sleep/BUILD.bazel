@@ -1,0 +1,38 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "hello_sleep",
+    testonly = True,
+    srcs = ["hello_sleep.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_stdlib",
+        "//src/rp2_common/pico_low_power",
+        "//src/rp2_common/pico_status_led",
+    ],
+)
+
+cc_binary(
+    name = "hello_sleep_gpio",
+    testonly = True,
+    srcs = ["hello_sleep_gpio.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_stdlib",
+        "//src/rp2_common/pico_low_power",
+        "//src/rp2_common/pico_status_led",
+    ],
+)
+
+cc_binary(
+    name = "rtc_clksrc",
+    testonly = True,
+    srcs = ["rtc_clksrc.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_stdlib",
+        "//src/rp2_common/pico_status_led",
+    ],
+)

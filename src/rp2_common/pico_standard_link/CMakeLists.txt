@@ -61,6 +61,12 @@ if (NOT TARGET pico_standard_link)
         endif()
     endfunction()
 
+    # pico_add_linker_constants(TARGET)
+    # \brief\ Add custom linker script constants to the target
+    #
+    # This reads target properties PICO_TARGET_PERSISTENT_DATA_LOC, PICO_TARGET_HEAP_LOC,
+    # and PICO_TARGET_HEAP_LIMIT and writes them to a linker script constant file, which
+    # is included by the linker script
     function(pico_add_linker_constants TARGET)
         set(pico_ld_constants_dir ${CMAKE_BINARY_DIR}/pico_ld_constants/${TARGET})
 

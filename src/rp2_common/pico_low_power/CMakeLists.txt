@@ -17,6 +17,17 @@ pico_mirrored_target_link_libraries(pico_low_power INTERFACE
         pico_aon_timer
         )
 
+# pico_set_persistent_data_loc(TARGET PERSISTENT_DATA_LOC)
+# \brief\ Set the persistent data location for the target
+#
+# This sets the target property PICO_TARGET_PERSISTENT_DATA_LOC to the given value,
+# and also sets the target property PICO_TARGET_HEAP_LOC and PICO_TARGET_HEAP_LIMIT
+# to the appropriate values based on the persistent data location.
+#
+# It also sets PICO_CRT0_PIN_XIP_SRAM=1 to pin the XIP_SRAM,
+# if the persistent data is stored in XIP_SRAM on RP2350.
+#
+# \param\ PERSISTENT_DATA_LOC The persistent data location to set
 function(pico_set_persistent_data_loc TARGET PERSISTENT_DATA_LOC)
         if (NOT PICO_RP2350)
                 message(FATAL_ERROR "pico_set_persistent_data_loc is only supported on RP2350")
