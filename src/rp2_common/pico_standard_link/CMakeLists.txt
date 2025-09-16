@@ -184,11 +184,11 @@ if (NOT TARGET pico_standard_link)
                 set(ADDITIONAL_MEMORY "set(ADDITIONAL_MEMORY \"    XIP_RAM(rwx) : ORIGIN = ${XIP_SRAM_BASE}, LENGTH = ${XIP_SRAM_END} - ${XIP_SRAM_BASE}\")" PARENT_SCOPE)
             endfunction()
             target_compile_definitions(${TARGET} PRIVATE PICO_DATA_COPY_EXTRA_SECTIONS_FILE="data_cpy_xip_text.S" PICO_USE_XIP_CACHE_AS_RAM=1)
-            file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/data_cpy_xip_text.S "
+            file(CONFIGURE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/data_cpy_xip_text.S CONTENT "
 .word __xip_ram_text_source__
 .word __xip_ram_text_start__
 .word __xip_ram_text_end__
-")
+" @ONLY)
             target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
             if (TYPE STREQUAL "no_flash_using_xip_ram")
                 pico_set_modified_binary_type(${TARGET} sram EXTRAS pico_internal_add_xip_text_section)

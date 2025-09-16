@@ -2,34 +2,57 @@
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
 #include "hardware/dma.h"
+#if PICO_RP2040
 #include "hardware/structs/systick.h"
+#else
+#include "hardware/riscv_platform_timer.h"
+#endif
 #include "hardware/structs/busctrl.h"
 
 
 int __time_critical_func(test_func_xip)(void) {
+#if PICO_RP2040
     systick_hw->rvr = 0x00ffffff;
     systick_hw->cvr = 0;
+#else
+    riscv_timer_set_mtimecmp(0xffffffffffffffff);
+    riscv_timer_set_mtime(0);
+#endif
 
     volatile uint32_t i = 0;
     i += 4;
     i += i;
 
+#if PICO_RP2040
     return systick_hw->rvr - systick_hw->cvr;
+#else
+    return riscv_timer_get_mtime();
+#endif
 }
 
 int __not_in_flash_func(test_func_sram)(void) {
+#if PICO_RP2040
     systick_hw->rvr = 0x00ffffff;
     systick_hw->cvr = 0;
+#else
+    riscv_timer_set_mtimecmp(0xffffffffffffffff);
+    riscv_timer_set_mtime(0);
+#endif
 
     volatile uint32_t i = 0;
     i += 4;
     i += i;
 
+#if PICO_RP2040
     return systick_hw->rvr - systick_hw->cvr;
+#else
+    return riscv_timer_get_mtime();
+#endif
 }
 
 
 void core1_entry() {
+#ifndef __riscv
     // Just read memory repeatedly
     pico_default_asm_volatile(
         "1:\n"
@@ -45,6 +68,29 @@ void core1_entry() {
         "b 1b\n"
         : : "i" (SRAM_BASE) : "r0", "r1", "r2", "r3", "r4"
     );
+#else
+    pico_default_asm_volatile(
+        "1:\n"
+        "li a0, %0\n"
+        "lw a1, 0(a0)\n"
+        "lw a2, 4(a0)\n"
+        "lw a3, 8(a0)\n"
+        "lw a4, 12(a0)\n"
+        "addi a0, a0, 16\n"
+        "lw a1, 0(a0)\n"
+        "lw a2, 4(a0)\n"
+        "lw a3, 8(a0)\n"
+        "lw a4, 12(a0)\n"
+        "addi a0, a0, 16\n"
+        "lw a1, 0(a0)\n"
+        "lw a2, 4(a0)\n"
+        "lw a3, 8(a0)\n"
+        "lw a4, 12(a0)\n"
+        "addi a0, a0, 16\n"
+        "j 1b\n"
+        : : "i" (SRAM_BASE) : "a0", "a1", "a2", "a3", "a4"
+    );
+#endif
 }
 
 
@@ -74,7 +120,13 @@ int main(void) {
 
     multicore_launch_core1(core1_entry);
 
+#if PICO_RP2040
     systick_hw->csr = 0x4 | 0x1; // clock source and enable
+#else
+    riscv_timer_set_fullspeed(true);
+    riscv_timer_set_enabled(true);
+    riscv_timer_set_mtimecmp(0xffffffffffffffff);
+#endif
 
     // Give core1 and DMA high priority
     hw_set_bits(&busctrl_hw->priority, BUSCTRL_BUS_PRIORITY_PROC1_BITS | BUSCTRL_BUS_PRIORITY_DMA_R_BITS | BUSCTRL_BUS_PRIORITY_DMA_W_BITS);

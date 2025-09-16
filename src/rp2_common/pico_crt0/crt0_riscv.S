@@ -30,6 +30,11 @@
 #define PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK (PICO_CRT0_INCLUDE_PICOBIN_BLOCK && !PICO_NO_FLASH)
 #endif
 
+// PICO_CONFIG: PICO_CRT0_NO_DATA_COPY, Whether crt0 should perform the data copies - usually copying from flash into sram, default=1 for no_flash builds, 0 otherwise, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_NO_DATA_COPY
+#define PICO_CRT0_NO_DATA_COPY PICO_NO_FLASH
+#endif
+
 // If vectors are in RAM, we put them in the .data section, so that they are
 // preloaded by _reset_handler (assuming this is not a loaded-in-place
 // binary).
@@ -340,7 +345,7 @@ _call_xip_setup:
 
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
-#if !PICO_NO_FLASH
+#if !PICO_CRT0_NO_DATA_COPY
     la a4, data_cpy_table
 
     // assume there is at least one entry
@@ -379,14 +384,25 @@ platform_entry: // symbol for stack traces
     ebreak
     j 1b
 
+#if !PICO_CRT0_NO_DATA_COPY
+#if PICO_NO_FLASH
+data_cpy:
+    // skip copies with same source and destination
+    bne a0, a1, data_cpy_start
+    ret
+#else
+    // go straight into the copy
+    #define data_cpy_start data_cpy
+#endif
 data_cpy_loop:
     lw a0, (a1)
     sw a0, (a2)
     addi a1, a1, 4
     addi a2, a2, 4
-data_cpy:
+data_cpy_start:
     bltu a2, a3, data_cpy_loop
     ret
+#endif
 
 .align 2
 data_cpy_table:
@@ -411,6 +427,10 @@ data_cpy_table:
 .word __scratch_y_source__
 .word __scratch_y_start__
 .word __scratch_y_end__
+
+#ifdef PICO_DATA_COPY_EXTRA_SECTIONS_FILE
+#include PICO_DATA_COPY_EXTRA_SECTIONS_FILE
+#endif
 
 .word 0 // null terminator
 
