@@ -318,7 +318,7 @@ typedef clock_num_t clock_handle_t;
  */
 bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq);
 
-/*! \brief Configure the specified clock to +/- 1MHz
+/*! \brief Configure the specified clock with 1MHz accuracy
  *  \ingroup hardware_clocks
  *
  * This function differs from clock_configure in that it does not configure the clocks as accurately,
