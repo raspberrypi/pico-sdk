@@ -340,6 +340,7 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
  * \param auxsrc The auxiliary clock source, which depends on which clock is being set. Can be 0
  * \param src_freq_mhz Frequency of the input clock source in MHz
  * \param freq_mhz Requested frequency in MHz
+ * \return true if the clock is updated, false if freq > src_freq
  */
 bool clock_configure_mhz(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint16_t src_freq_mhz, uint16_t freq_mhz);
 
