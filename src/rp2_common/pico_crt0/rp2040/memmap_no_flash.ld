@@ -51,7 +51,6 @@ SECTIONS
         __embedded_block_end = .;
         . = ALIGN(256);
         KEEP (*(.vectors))
-        *(.time_critical*)
         *(.text*)
         . = ALIGN(4);
         *(.init)
@@ -108,6 +107,9 @@ SECTIONS
     .data : {
         __data_start__ = .;
         *(vtable)
+
+        *(.time_critical*)
+
         *(.data*)
 
         . = ALIGN(4);

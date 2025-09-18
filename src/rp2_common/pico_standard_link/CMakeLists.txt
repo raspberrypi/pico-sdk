@@ -168,7 +168,7 @@ if (NOT TARGET pico_standard_link)
             pico_set_modified_binary_type(${TARGET} ${TYPE} RAM ${XIP_SRAM_BASE} ${XIP_SRAM_END}-${XIP_SRAM_BASE}-4k SCRATCH_X ${XIP_SRAM_END}-4k 2k SCRATCH_Y ${XIP_SRAM_END}-2k 2k)
             return()
         elseif (TYPE STREQUAL "no_flash_using_xip_ram" OR TYPE STREQUAL "copy_to_ram_using_xip_ram")
-            function(pico_internal_add_xip_text_section)
+            function(pico_internal_add_xip_text_section STORE_AT)
                 set(ADDITIONAL_PRE_DATA "set(ADDITIONAL_PRE_DATA \"
                 .xip_text : {
                     __xip_ram_text_start__ = .;
@@ -176,12 +176,22 @@ if (NOT TARGET pico_standard_link)
                     *(.time_critical.text*)
                     . = ALIGN(4);
                     __xip_ram_text_end__ = .;
-                } > XIP_RAM AT> FLASH
+                } > XIP_RAM ${STORE_AT}
                 __xip_ram_text_source__ = LOADADDR(.xip_text);\")" PARENT_SCOPE)
 
                 pico_get_addressmap_value(XIP_SRAM_BASE)
                 pico_get_addressmap_value(XIP_SRAM_END)
                 set(ADDITIONAL_MEMORY "set(ADDITIONAL_MEMORY \"    XIP_RAM(rwx) : ORIGIN = ${XIP_SRAM_BASE}, LENGTH = ${XIP_SRAM_END} - ${XIP_SRAM_BASE}\")" PARENT_SCOPE)
+            endfunction()
+            function(pico_internal_add_xip_text_section_no_flash)
+                pico_internal_add_xip_text_section("")
+                set(ADDITIONAL_PRE_DATA ${ADDITIONAL_PRE_DATA} PARENT_SCOPE)
+                set(ADDITIONAL_MEMORY ${ADDITIONAL_MEMORY} PARENT_SCOPE)
+            endfunction()
+            function(pico_internal_add_xip_text_section_copy_to_ram)
+                pico_internal_add_xip_text_section("AT> FLASH")
+                set(ADDITIONAL_PRE_DATA ${ADDITIONAL_PRE_DATA} PARENT_SCOPE)
+                set(ADDITIONAL_MEMORY ${ADDITIONAL_MEMORY} PARENT_SCOPE)
             endfunction()
             target_compile_definitions(${TARGET} PRIVATE PICO_DATA_COPY_EXTRA_SECTIONS_FILE="data_cpy_xip_text.S" PICO_USE_XIP_CACHE_AS_RAM=1)
             file(CONFIGURE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/data_cpy_xip_text.S CONTENT "
@@ -191,9 +201,9 @@ if (NOT TARGET pico_standard_link)
 " @ONLY)
             target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
             if (TYPE STREQUAL "no_flash_using_xip_ram")
-                pico_set_modified_binary_type(${TARGET} sram EXTRAS pico_internal_add_xip_text_section)
+                pico_set_modified_binary_type(${TARGET} sram EXTRAS pico_internal_add_xip_text_section_no_flash)
             elseif (TYPE STREQUAL "copy_to_ram_using_xip_ram")
-                pico_set_modified_binary_type(${TARGET} copy_flash_sram EXTRAS pico_internal_add_xip_text_section)
+                pico_set_modified_binary_type(${TARGET} copy_flash_sram EXTRAS pico_internal_add_xip_text_section_copy_to_ram)
             endif()
             return()
         endif()
