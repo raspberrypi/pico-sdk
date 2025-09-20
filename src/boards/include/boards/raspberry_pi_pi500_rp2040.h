@@ -40,6 +40,13 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #define PI500_RP2040_POWER_KEY_COL_PIN 20  // Also matrix col 11
 #define PI500_RP2040_POWER_KEY_ROW_PIN 6   // Also matrix row 6
 
+// --- UART ---
+#ifndef PICO_DEFAULT_UART
+#define PICO_DEFAULT_UART 0
+#endif
+#ifndef PICO_DEFAULT_UART_TX_PIN
+#define PICO_DEFAULT_UART_TX_PIN 16
+#endif
 
 // --- KEYBOARD MATRIX PINS ---
 // Matrix row pins (8 pins)
