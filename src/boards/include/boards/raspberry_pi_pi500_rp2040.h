@@ -13,28 +13,21 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define RASPBERRY_PI_PI500_RP2040
 
 // --- FLASH ---
-// Pi 500 uses W25X10CL flash (differs from standard Pico W25Q080)
+// Pi 500 uses the same flash as the original Pi Pico (W25Q16JVUXIQ) but only DSPI pins are connected
 #define PICO_BOOT_STAGE2_CHOOSE_W25X10CL 1
 
 #ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (128 * 1024))
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (128 * 1024)
+#define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
-
 
 
 #ifndef PICO_RP2040_B0_SUPPORTED
 #define PICO_RP2040_B0_SUPPORTED 0
-#endif
-
-// --- PI 500 KEYBOARD LEDS ---
-// LEDs directly connected to RP2040 (not via FFC)
-#ifndef PICO_DEFAULT_LED_PIN
-#define PICO_DEFAULT_LED_PIN 17  // Power/Status LED
 #endif
 
 // Keyboard indicator LEDs
@@ -42,10 +35,11 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (128 * 1024))
 
 // --- PI 500 POWER MANAGEMENT ---
 // Power button control (critical for Pi 500 power management)
-#define PI500_RP2040_POWER_BUTTON_PIN 19
+#define PI500_RP2040_POWER_BUTTON_PIN 19 //DO NOT SCAN OR YOU WON'T BE ABLE TO TURN THE PI500 ON!
 // Power key detection (shared with matrix pins but scanned separately)
 #define PI500_RP2040_POWER_KEY_COL_PIN 20  // Also matrix col 11
 #define PI500_RP2040_POWER_KEY_ROW_PIN 6   // Also matrix row 6
+
 
 // --- KEYBOARD MATRIX PINS ---
 // Matrix row pins (8 pins)
@@ -60,7 +54,7 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (128 * 1024))
 
 // Matrix column pins (18 pins)
 #define PI500_RP2040_MATRIX_COL_0_PIN 27
-#define PI500_RP2040_MATRIX_COL_1_PIN 8
+#define PI500_RP2040_MATRIX_COL_1_PIN 8 
 #define PI500_RP2040_MATRIX_COL_2_PIN 9
 #define PI500_RP2040_MATRIX_COL_3_PIN 10
 #define PI500_RP2040_MATRIX_COL_4_PIN 11
