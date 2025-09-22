@@ -11,6 +11,8 @@ endif()
 # TARGET that match either an optionally specified list of source files or all the target's "SOURCES" found
 # within in the target's "SOURCE_DIR".
 #
+# This utility function is only available in builds using CMake 3.27 and later.
+#
 # Examples:
 # pico_sections_time_critical(MyTarget)
 #
@@ -22,6 +24,8 @@ endif()
 # \param\ TARGET The build target
 # \param\ SOURCES Optional, source files of the object files to be modified. If not specified, uses the build
 # target's "SOURCES" list.
+#
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
 function(pico_sections_time_critical TARGET)
     add_custom_command(
             TARGET ${TARGET}
@@ -33,6 +37,7 @@ function(pico_sections_time_critical TARGET)
             COMMAND_EXPAND_LISTS
     )
 endfunction()
+endif()
 
 # pico_sections_not_in_flash(TARGET [SOURCES])
 # \brief\ Prefix target's object file sections with ".time_critical_ram"
@@ -40,6 +45,8 @@ endfunction()
 # This function will apply "objcopy --prefix-alloc-sections .time_critical_ram" to all the object files of
 # TARGET that match either an optionally specified list of source files or all the target's "SOURCES" found
 # within in the target's "SOURCE_DIR".
+#
+# This utility function is only available in builds using CMake 3.27 and later.
 #
 # Examples:
 # pico_sections_not_in_flash(MyTarget)
@@ -52,6 +59,7 @@ endfunction()
 # \param\ TARGET The build target
 # \param\ SOURCES Optional, source files of the object files to be modified. If not specified, uses the build
 # target's "SOURCES" list.
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.27)
 function(pico_sections_not_in_flash TARGET)
     add_custom_command(
             TARGET ${TARGET}
@@ -63,3 +71,4 @@ function(pico_sections_not_in_flash TARGET)
             COMMAND_EXPAND_LISTS
     )
 endfunction()
+endif()
