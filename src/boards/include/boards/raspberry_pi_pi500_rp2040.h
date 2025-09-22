@@ -30,8 +30,11 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #define PICO_RP2040_B0_SUPPORTED 0
 #endif
 
-// Keyboard indicator LEDs
+// Keyboard CAPS Lock indicator LED as default
 #define PI500_RP2040_CAPS_LOCK_LED_PIN 25
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN PI500_RP2040_CAPS_LOCK_LED_PIN
+#endif
 
 // --- PI 500 POWER MANAGEMENT ---
 // Power button control (critical for Pi 500 power management)
