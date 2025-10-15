@@ -370,7 +370,7 @@ static bool multicore_doorbell_claim_under_lock(uint doorbell_num, uint core_mas
                                               (is_bit_claimed(doorbell_claimed[1], doorbell_num + 1u) << 1));
     if (claimed_cores_for_doorbell & core_mask) {
         if (required) {
-            panic( "Multicoore doorbell %d already claimed on core mask 0x%x; requested core mask 0x%x\n",
+            panic( "Multicore doorbell %d already claimed on core mask 0x%x; requested core mask 0x%x\n",
                    claimed_cores_for_doorbell, core_mask);
         }
         return false;

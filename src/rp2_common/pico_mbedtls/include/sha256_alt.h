@@ -11,6 +11,6 @@
 #include "pico/sha256.h"
 
 typedef struct pico_sha256_state mbedtls_sha256_context;
-#endif // PICO_RP2350
+#endif // LIB_PICO_SHA256
 
 #endif

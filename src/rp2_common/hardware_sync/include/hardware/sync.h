@@ -94,6 +94,9 @@ __force_inline static void __sev(void) {
     pico_default_asm_volatile ("sev");
 #endif
 }
+#else
+// Forward declare so we don't have to #include <arm_acle.h>.
+void __sev(void);
 #endif
 
 /*! \brief Insert a WFE instruction in to the code path.
@@ -110,6 +113,9 @@ __force_inline static void __wfe(void) {
     pico_default_asm_volatile ("wfe");
 #endif
 }
+#else
+// Forward declare so we don't have to #include <arm_acle.h>.
+void __wfe(void);
 #endif
 
 /*! \brief Insert a WFI instruction in to the code path.
@@ -121,6 +127,9 @@ __force_inline static void __wfe(void) {
 __force_inline static void __wfi(void) {
     pico_default_asm_volatile("wfi");
 }
+#else
+// Forward declare so we don't have to #include <arm_acle.h>.
+void __wfi(void);
 #endif
 
 /*! \brief Insert a DMB instruction in to the code path.

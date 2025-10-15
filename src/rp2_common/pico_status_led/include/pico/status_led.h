@@ -109,7 +109,7 @@ bool status_led_init(void);
  *
  * \param context An \ref async_context used to communicate with the status LED (e.g. on Pico W or Pico 2 W)
  * \return Returns true if the LED was initialized successfully, otherwise false on failure
- * \sa status_led_init_with_context
+ * \sa status_led_init
  */
 bool status_led_init_with_context(struct async_context *context);
 
