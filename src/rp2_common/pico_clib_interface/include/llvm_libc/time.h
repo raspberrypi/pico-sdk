@@ -9,15 +9,15 @@
 
 #include <__llvm-libc-common.h>
 
+#include <llvm-libc-types/struct_timespec.h>
 #include <llvm-libc-types/struct_tm.h>
 #include <llvm-libc-types/time_t.h>
 
 __BEGIN_C_DECLS
 
 struct tm* localtime_r(const time_t* timer, struct tm* buf);
+time_t mktime(struct tm *);
 
 __END_C_DECLS
-
-#include_next <time.h>
 
 #endif // _PICO_LLVM_LIBC_TIME_H

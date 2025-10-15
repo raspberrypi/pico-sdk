@@ -7,10 +7,10 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <sys/time.h>
-#include <time.h>
-
 #include <llvm-libc-types/ssize_t.h>
+
+#include "include/llvm_libc/time.h"
+#include "include/llvm_libc/sys/time.h"
 
 #include "pico/runtime_init.h"
 #include "pico/stdio.h"
