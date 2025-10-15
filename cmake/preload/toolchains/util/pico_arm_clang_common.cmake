@@ -43,12 +43,31 @@ endforeach()
 
 list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES PICO_CLIB)
 
+set(_PICO_CLIB_PATH "${PICO_COMPILER_DIR}/../lib/clang-runtimes/arm-none-eabi")
+if(PICO_CLIB STREQUAL "")
+    # use default from above
+elseif(PICO_CLIB STREQUAL "llvm_libc")
+    if(EXISTS "${PICO_COMPILER_DIR}/../lib/clang-runtimes/llvmlibc/arm-none-eabi")
+        set(_PICO_CLIB_PATH "${PICO_COMPILER_DIR}/../lib/clang-runtimes/llvmlibc/arm-none-eabi")
+    endif()
+elseif(PICO_CLIB STREQUAL "picolibc")
+    if(EXISTS "${PICO_COMPILER_DIR}/../lib/clang-runtimes/picolibc/arm-none-eabi")
+        set(_PICO_CLIB_PATH "${PICO_COMPILER_DIR}/../lib/clang-runtimes/picolibc/arm-none-eabi")
+    endif()
+elseif(PICO_CLIB STREQUAL "newlib")
+    if(EXISTS "${PICO_COMPILER_DIR}/../lib/clang-runtimes/newlib/arm-none-eabi")
+        set(_PICO_CLIB_PATH "${PICO_COMPILER_DIR}/../lib/clang-runtimes/newlib/arm-none-eabi")
+    endif()
+else()
+    message(FATAL_ERROR "PICO_CLIB must be one of newlib, picolib, llvm_libc or empty (but is '${PICO_CLIB}')")
+endif()
+
 foreach(PICO_CLANG_RUNTIME IN LISTS PICO_CLANG_RUNTIMES)
     # LLVM embedded-toolchain for ARM style
-    find_path(PICO_COMPILER_SYSROOT NAMES include/stdio.h
+    find_path(PICO_COMPILER_SYSROOT NAMES lib/libc.a
             HINTS
-            ${PICO_COMPILER_DIR}/../lib/clang-runtimes/arm-none-eabi/${PICO_CLANG_RUNTIME}
-            ${PICO_COMPILER_DIR}/../lib/clang-runtimes/${PICO_CLANG_RUNTIME}
+                ${_PICO_CLIB_PATH}/${PICO_CLANG_RUNTIME}
+                ${PICO_COMPILER_DIR}/../lib/clang-runtimes/${PICO_CLANG_RUNTIME}
     )
 
     if (PICO_COMPILER_SYSROOT)
@@ -66,7 +85,7 @@ foreach(PICO_CLANG_RUNTIME IN LISTS PICO_CLANG_RUNTIMES)
     # llvm_libc style
     find_path(PICO_COMPILER_SYSROOT NAMES stdio.h
             HINTS
-            ${PICO_COMPILER_DIR}/../include/${PICO_CLANG_RUNTIME}
+                ${PICO_COMPILER_DIR}/../include/${PICO_CLANG_RUNTIME}
     )
     if (PICO_COMPILER_SYSROOT)
         if (NOT PICO_CLIB)
@@ -76,6 +95,10 @@ foreach(PICO_CLANG_RUNTIME IN LISTS PICO_CLANG_RUNTIMES)
         break()
     endif()
 endforeach()
+if (NOT PICO_COMPILER_SYSROOT)
+    message(FATAL_ERROR "Could not find an llvm runtime for '${PICO_CLANG_RUNTIME}'")
+endif()
+set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} --sysroot ${PICO_COMPILER_SYSROOT}")
 
 # moving this here as a reminder from pico_standard_link; it was commented out theee, but if ever needed,
 # it belongs here as part of LINKER_FLAGS_INIT
@@ -87,11 +110,5 @@ if (PICO_CLIB STREQUAL "llvm_libc")
     foreach(TYPE IN ITEMS EXE SHARED MODULE)
         set(CMAKE_${TYPE}_LINKER_FLAGS_INIT "-nostdlib++ -nostartfiles")
     endforeach()
-else()
-    if (NOT PICO_COMPILER_SYSROOT)
-        message(FATAL_ERROR "Could not find an llvm runtime for '${PICO_CLANG_RUNTIME}'")
-    endif()
-
-    set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} --sysroot ${PICO_COMPILER_SYSROOT}")
 endif()
 include(${CMAKE_CURRENT_LIST_DIR}/set_flags.cmake)
