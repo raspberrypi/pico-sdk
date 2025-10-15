@@ -98,8 +98,7 @@ cc_library(
     target_compatible_with = compatible_with_rp2(),
 )
 
-# For now, picolibc doesn't need to provide any headers.
-alias(
+cc_library(
     name = "picolibc_interface",
     hdrs = [
         "include/picolibc/sys/cdefs.h",
