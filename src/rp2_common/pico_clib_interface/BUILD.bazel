@@ -101,7 +101,14 @@ cc_library(
 # For now, picolibc doesn't need to provide any headers.
 alias(
     name = "picolibc_interface",
-    actual = "//bazel:empty_cc_lib",
+    hdrs = [
+        "include/picolibc/sys/cdefs.h",
+    ],
+    includes = ["include/picolibc"],
+    # It's hard to properly constrain compatibility since `auto` may select this,
+    # so just tag as manual.
+    tags = ["manual"],
+    target_compatible_with = compatible_with_rp2(),
 )
 
 cc_library(

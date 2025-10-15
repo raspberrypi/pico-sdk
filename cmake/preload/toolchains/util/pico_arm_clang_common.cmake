@@ -99,10 +99,15 @@ if (NOT PICO_COMPILER_SYSROOT)
     message(FATAL_ERROR "Could not find an llvm runtime for '${PICO_CLANG_RUNTIME}'")
 endif()
 set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} --sysroot ${PICO_COMPILER_SYSROOT}")
-# llvmlibc / newlib
-set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -isystem ${PICO_COMPILER_SYSROOT}/../include/c++/v1")
-# llvmlibc / newlib
-set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -isystem ${PICO_COMPILER_SYSROOT}/../include")
+
+# add some system includes due to structure of ATfE-21.1.1 header structure
+# required for llvmlibc / newlib, NOT for picolibc
+if(EXISTS "${PICO_COMPILER_SYSROOT}/../include/c++/v1")
+    set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -isystem ${PICO_COMPILER_SYSROOT}/../include/c++/v1")
+endif()
+if(EXISTS "${PICO_COMPILER_SYSROOT}/../include")
+    set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -isystem ${PICO_COMPILER_SYSROOT}/../include")
+endif()
 
 # moving this here as a reminder from pico_standard_link; it was commented out theee, but if ever needed,
 # it belongs here as part of LINKER_FLAGS_INIT
