@@ -43,19 +43,20 @@ endforeach()
 
 list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES PICO_CLIB)
 
-set(_PICO_CLIB_PATH "${PICO_COMPILER_DIR}/../lib/clang-runtimes/arm-none-eabi")
+set(_CLANG_RUNTIMES_DIR "${PICO_COMPILER_DIR}/../lib/clang-runtimes")
+set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/arm-none-eabi")
 if(PICO_CLIB STREQUAL ""  OR  PICO_CLIB STREQUAL "newlib")
     # newlib is 1st class choice
-    if(EXISTS "${PICO_COMPILER_DIR}/../lib/clang-runtimes/newlib/arm-none-eabi")
-        set(_PICO_CLIB_PATH "${PICO_COMPILER_DIR}/../lib/clang-runtimes/newlib/arm-none-eabi")
+    if(EXISTS "${_CLANG_RUNTIMES_DIR}/newlib/arm-none-eabi")
+        set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/newlib/arm-none-eabi")
     endif()
 elseif(PICO_CLIB STREQUAL "llvm_libc")
-    if(EXISTS "${PICO_COMPILER_DIR}/../lib/clang-runtimes/llvmlibc/arm-none-eabi")
-        set(_PICO_CLIB_PATH "${PICO_COMPILER_DIR}/../lib/clang-runtimes/llvmlibc/arm-none-eabi")
+    if(EXISTS "${_CLANG_RUNTIMES_DIR}/llvmlibc/arm-none-eabi")
+        set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/llvmlibc/arm-none-eabi")
     endif()
 elseif(PICO_CLIB STREQUAL "picolibc")
-    if(EXISTS "${PICO_COMPILER_DIR}/../lib/clang-runtimes/picolibc/arm-none-eabi")
-        set(_PICO_CLIB_PATH "${PICO_COMPILER_DIR}/../lib/clang-runtimes/picolibc/arm-none-eabi")
+    if(EXISTS "${_CLANG_RUNTIMES_DIR}/picolibc/arm-none-eabi")
+        set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/picolibc/arm-none-eabi")
     endif()
 else()
     message(FATAL_ERROR "PICO_CLIB must be one of newlib, picolib, llvm_libc or empty (but is '${PICO_CLIB}')")
@@ -66,7 +67,7 @@ foreach(PICO_CLANG_RUNTIME IN LISTS PICO_CLANG_RUNTIMES)
     find_path(PICO_COMPILER_SYSROOT NAMES lib/libc.a
             HINTS
                 ${_PICO_CLIB_PATH}/${PICO_CLANG_RUNTIME}
-                ${PICO_COMPILER_DIR}/../lib/clang-runtimes/${PICO_CLANG_RUNTIME}
+                ${_CLANG_RUNTIMES_DIR}/${PICO_CLANG_RUNTIME}
     )
 
     if (PICO_COMPILER_SYSROOT)
