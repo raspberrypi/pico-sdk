@@ -45,7 +45,8 @@ list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES PICO_CLIB)
 
 set(_CLANG_RUNTIMES_DIR "${PICO_COMPILER_DIR}/../lib/clang-runtimes")
 set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/arm-none-eabi")
-if(PICO_CLIB STREQUAL ""  OR  PICO_CLIB STREQUAL "newlib")
+
+if(NOT PICO_CLIB  OR  PICO_CLIB STREQUAL ""  OR  PICO_CLIB STREQUAL "newlib")
     # newlib is 1st class choice
     if(EXISTS "${_CLANG_RUNTIMES_DIR}/newlib/arm-none-eabi")
         set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/newlib/arm-none-eabi")
