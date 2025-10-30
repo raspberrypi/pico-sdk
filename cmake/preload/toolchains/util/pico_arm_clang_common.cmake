@@ -11,7 +11,7 @@ pico_find_compiler(PICO_OBJCOPY llvm-objcopy)
 pico_find_compiler(PICO_OBJDUMP llvm-objdump)
 
 # Specify the cross compiler.
-set(CMAKE_C_COMPILER ${PICO_COMPILER_CC} CACHE FILEPATH "C compiler")
+set(CMAKE_C_COMPILER   ${PICO_COMPILER_CC} CACHE FILEPATH "C compiler")
 set(CMAKE_CXX_COMPILER ${PICO_COMPILER_CXX} CACHE FILEPATH "C++ compiler")
 set(CMAKE_ASM_COMPILER ${PICO_COMPILER_ASM} CACHE FILEPATH "ASM compiler")
 
@@ -44,81 +44,48 @@ endforeach()
 list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES PICO_CLIB)
 
 set(_CLANG_RUNTIMES_DIR "${PICO_COMPILER_DIR}/../lib/clang-runtimes")
-set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/arm-none-eabi")
+cmake_path(NORMAL_PATH _CLANG_RUNTIMES_DIR)
+set(PICO_CLIB_ROOT "${_CLANG_RUNTIMES_DIR}")
 
-if(NOT PICO_CLIB  OR  PICO_CLIB STREQUAL ""  OR  PICO_CLIB STREQUAL "newlib")
-    # newlib is 1st class choice
-    if(EXISTS "${_CLANG_RUNTIMES_DIR}/newlib/arm-none-eabi")
-        set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/newlib/arm-none-eabi")
+if(NOT PICO_CLIB  OR  PICO_CLIB STREQUAL "")
+    # newlib is primary if no clib specified 
+    if(EXISTS "${_CLANG_RUNTIMES_DIR}/newlib")
+        set(PICO_CLIB "newlib")
+    else()
+        set(PICO_CLIB "picolibc")
+    endif()
+    set(CACHE{PICO_CLIB} TYPE STRING FORCE VALUE ${PICO_CLIB})
+endif()
+
+if(PICO_CLIB STREQUAL "newlib")
+    if(EXISTS "${_CLANG_RUNTIMES_DIR}/newlib")
+        set(PICO_CLIB_ROOT "${_CLANG_RUNTIMES_DIR}/newlib")
     endif()
 elseif(PICO_CLIB STREQUAL "llvm_libc")
-    if(EXISTS "${_CLANG_RUNTIMES_DIR}/llvmlibc/arm-none-eabi")
-        set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/llvmlibc/arm-none-eabi")
+    if(EXISTS "${_CLANG_RUNTIMES_DIR}/llvmlibc")
+        set(PICO_CLIB_ROOT "${_CLANG_RUNTIMES_DIR}/llvmlibc")
     endif()
 elseif(PICO_CLIB STREQUAL "picolibc")
-    if(EXISTS "${_CLANG_RUNTIMES_DIR}/picolibc/arm-none-eabi")
-        set(_PICO_CLIB_PATH "${_CLANG_RUNTIMES_DIR}/picolibc/arm-none-eabi")
+    if(EXISTS "${_CLANG_RUNTIMES_DIR}/picolibc")
+        set(PICO_CLIB_ROOT "${_CLANG_RUNTIMES_DIR}/picolibc")
     endif()
 else()
     message(FATAL_ERROR "PICO_CLIB must be one of newlib, picolib, llvm_libc or empty (but is '${PICO_CLIB}')")
 endif()
 
-foreach(PICO_CLANG_RUNTIME IN LISTS PICO_CLANG_RUNTIMES)
-    # LLVM embedded-toolchain for ARM style
-    find_path(PICO_COMPILER_SYSROOT NAMES lib/libc.a
-            HINTS
-                ${_PICO_CLIB_PATH}/${PICO_CLANG_RUNTIME}
-                ${_CLANG_RUNTIMES_DIR}/${PICO_CLANG_RUNTIME}
-    )
-
-    if (PICO_COMPILER_SYSROOT)
-        if (NOT PICO_CLIB)
-            # this is a bit of a hack; to try to autodetect the C library used:
-            # `picolibc.h` seems to exist on the newer versions of LLVM embedded toolchain for ARM using picolibc whereas
-            # `newlib.h` appears in all versions, so isn't very useful
-            if (EXISTS "${PICO_COMPILER_SYSROOT}/include/picolibc.h")
-                message("Setting default C library to picolibc as LLVM appears to be using it")
-                set(PICO_CLIB "picolibc" CACHE INTERNAL "")
-            endif()
-        endif()
-        break()
-    endif()
-    # llvm_libc style
-    find_path(PICO_COMPILER_SYSROOT NAMES stdio.h
-            HINTS
-                ${PICO_COMPILER_DIR}/../include/${PICO_CLANG_RUNTIME}
-    )
-    if (PICO_COMPILER_SYSROOT)
-        if (NOT PICO_CLIB)
-            message("Setting default C library to llvm_libc as LLVM appears to be using it")
-            set(PICO_CLIB "llvm_libc" CACHE INTERNAL "")
-        endif()
-        break()
-    endif()
-endforeach()
-if (NOT PICO_COMPILER_SYSROOT)
-    message(FATAL_ERROR "Could not find an llvm runtime for '${PICO_CLANG_RUNTIME}'")
-endif()
-set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} --sysroot ${PICO_COMPILER_SYSROOT}")
-
-# add some system includes due to structure of ATfE-21.1.1 header structure
-# required for llvmlibc / newlib, NOT for picolibc
-if(EXISTS "${PICO_COMPILER_SYSROOT}/../include/c++/v1")
-    set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -isystem ${PICO_COMPILER_SYSROOT}/../include/c++/v1")
-endif()
-if(EXISTS "${PICO_COMPILER_SYSROOT}/../include")
-    set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -isystem ${PICO_COMPILER_SYSROOT}/../include")
-endif()
+set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} --sysroot ${PICO_CLIB_ROOT}")
 
 # moving this here as a reminder from pico_standard_link; it was commented out theee, but if ever needed,
 # it belongs here as part of LINKER_FLAGS_INIT
 #target_link_options(pico_standard_link INTERFACE "LINKER:-fuse-ld=lld")
 
 if (PICO_CLIB STREQUAL "llvm_libc")
-    # TODO: Remove -nostdlib++ once we include libc++ in the toolchain.
     # TODO: Move -nostartfiles to the appropriate library.
     foreach(TYPE IN ITEMS EXE SHARED MODULE)
-        set(CMAKE_${TYPE}_LINKER_FLAGS_INIT "-nostdlib++ -nostartfiles")
+        set(CMAKE_${TYPE}_LINKER_FLAGS_INIT "-nostartfiles")
     endforeach()
 endif()
+
+message(STATUS "Taking '${PICO_CLIB}' from '${PICO_CLIB_ROOT}'")
+
 include(${CMAKE_CURRENT_LIST_DIR}/set_flags.cmake)
