@@ -8,6 +8,7 @@ cc_library(
     target_compatible_with = ["//bazel/constraint:host"],
     deps = [
         "//src/common/pico_binary_info:LIB_PICO_BINARY_INFO",
+        "//src/host/hardware_irq",
         "//src/host/pico_platform",
     ],
 )
