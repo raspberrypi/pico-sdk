@@ -66,6 +66,8 @@ enum gpio_drive_strength {
     GPIO_DRIVE_STRENGTH_12MA = 3 ///< 12 mA nominal drive strength
 };
 
+void check_gpio_param(uint gpio);
+
 // ----------------------------------------------------------------------------
 // Pad Controls + IO Muxing
 // ----------------------------------------------------------------------------
