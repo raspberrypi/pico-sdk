@@ -8,7 +8,7 @@ cc_library(
     tags = ["manual"],  # TODO: No hardware/regs/intctrl.h for host yet.
     target_compatible_with = ["//bazel/constraint:host"],
     deps = [
-        "//src/host/hardware_claim",
+        "//src/common/hardware_claim",
         "//src/host/pico_platform",
     ],
 )

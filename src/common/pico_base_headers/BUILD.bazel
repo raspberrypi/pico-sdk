@@ -92,6 +92,7 @@ cc_library(
     includes = ["include"],
     visibility = [
         "//src/common:__subpackages__",
+        "//src/host/hardware_irq:__pkg__",
         "//src/host/hardware_sync:__pkg__",
         "//src/host/hardware_timer:__pkg__",
         "//src/host/pico_platform:__pkg__",
