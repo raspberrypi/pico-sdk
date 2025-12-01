@@ -70,6 +70,15 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_LINKER_SCRIPT ${LDSCRIPT})
     endfunction()
 
+    # pico_set_linker_script_var(TARGET NAME VALUE)
+    # \brief\ Set the linker script for the target
+    #
+    # \param\ NAME Name of varAible to set
+    # \param\ VALUE Value of variable to set
+    function(pico_set_linker_script_var TARGET NAME VALUE)
+        set_property(TARGET ${TARGET} APPEND PROPERTY PICO_TARGET_LINKER_SCRIPT_VARS "--defsym=${NAME}=${VALUE}")
+    endfunction()
+
     # pico_set_binary_type(TARGET TYPE)
     # \brief\ Set the binary type for the target
     #
@@ -129,6 +138,9 @@ if (NOT TARGET pico_standard_link)
 
     # add include path for main linker script sections
     target_link_options(pico_standard_link INTERFACE "LINKER:-L${PICO_LINKER_SCRIPT_PATH}")
+
+    # add variables set by pico_set_linker_script_var function
+    target_link_options(pico_standard_link INTERFACE "LINKER:$<JOIN:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_VARS>,,>")
 
     # LINKER script will be PICO_TARGET_LINKER_SCRIPT if set on target, or ${CMAKE_CURRENT_LIST_DIR}/memmap_foo.ld
     # if PICO_TARGET_BINARY_TYPE is set to foo on the target, otherwise ${CMAKE_CURRENT_LIST_DIR}/memmap_${PICO_DEFAULT_BINARY_TYPE).ld
