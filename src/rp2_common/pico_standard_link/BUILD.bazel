@@ -1,7 +1,6 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2")
 load("pico_flash_region.bzl", "generated_pico_flash_region")
-load("pico_ld_constants.bzl", "generated_pico_ld_constants")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,10 +16,6 @@ generated_pico_flash_region(
         "//bazel/constraint:rp2350": 4 * 1024 * 1024,
         "//conditions:default": 2 * 1024 * 1024,
     }),
-)
-
-generated_pico_ld_constants(
-    name = "default_ld_constants",
 )
 
 cc_library(

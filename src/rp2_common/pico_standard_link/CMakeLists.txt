@@ -61,41 +61,6 @@ if (NOT TARGET pico_standard_link)
         endif()
     endfunction()
 
-    # pico_add_linker_constants(TARGET)
-    # \brief\ Add custom linker script constants to the target
-    #
-    # This reads target properties PICO_TARGET_PERSISTENT_DATA_LOC, PICO_TARGET_HEAP_LOC,
-    # and PICO_TARGET_HEAP_LIMIT and writes them to a linker script constant file, which
-    # is included by the linker script
-    function(pico_add_linker_constants TARGET)
-        set(pico_ld_constants_dir ${CMAKE_BINARY_DIR}/pico_ld_constants/${TARGET})
-
-        # add extra constants to content
-        set(pico_ld_constants_content "")
-        get_target_property(PERSISTENT_DATA_LOC ${TARGET} PICO_TARGET_PERSISTENT_DATA_LOC)
-        if (PERSISTENT_DATA_LOC)
-            set(pico_ld_constants_content "${pico_ld_constants_content}PERSISTENT_DATA_LOC = ${PERSISTENT_DATA_LOC}; ")
-        endif()
-        get_target_property(HEAP_LOC ${TARGET} PICO_TARGET_HEAP_LOC)
-        if (HEAP_LOC)
-            set(pico_ld_constants_content "${pico_ld_constants_content}HEAP_LOC = ${HEAP_LOC}; ")
-        endif()
-        get_target_property(HEAP_LIMIT ${TARGET} PICO_TARGET_HEAP_LIMIT)
-        if (HEAP_LIMIT)
-            set(pico_ld_constants_content "${pico_ld_constants_content}HEAP_LIMIT = ${HEAP_LIMIT}; ")
-        endif()
-
-        # write the constants file
-        if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.17.0")
-            # CMAKE_CURRENT_FUNCTION_LIST_DIR added in 3.17.0
-            configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/pico_ld_constants.template.ld ${pico_ld_constants_dir}/pico_ld_constants.ld @ONLY)
-        else()
-            configure_file(${PICO_SDK_PATH}src/rp2_common/pico_standard_link/pico_ld_constants.template.ld ${pico_ld_constants_dir}/pico_ld_constants.ld @ONLY)
-        endif()
-        set_target_properties(${TARGET} PROPERTIES PICO_TARGET_LINKER_SCRIPT_INCLUDE_DIR ${pico_ld_constants_dir})
-        pico_add_link_depend(pico_standard_link ${pico_ld_constants_dir}/pico_ld_constants.ld)
-    endfunction()
-
     # pico_set_linker_script(TARGET LDSCRIPT)
     # \brief\ Set the linker script for the target
     #
