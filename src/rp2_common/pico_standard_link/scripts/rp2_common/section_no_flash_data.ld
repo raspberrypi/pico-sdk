@@ -6,11 +6,6 @@ SECTIONS
 
         *(.time_critical*)
 
-        . = ALIGN(4);
-        *(.rodata*)
-        *(.srodata*)
-        . = ALIGN(4);
-
         *(.data*)
         *(.sdata*)
 
@@ -46,16 +41,20 @@ SECTIONS
 
         *(.jcr)
         . = ALIGN(4);
-    } > RAM AT> FLASH
+   } > RAM
 
     .tdata : {
         . = ALIGN(4);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
         /* All data end */
         __tdata_end = .;
-    } > RAM AT> FLASH
+    } > RAM
     PROVIDE(__data_end__ = .);
 
+    .uninitialized_data (NOLOAD): {
+        . = ALIGN(4);
+        *(.uninitialized_data*)
+    } > RAM
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
     __etext = LOADADDR(.data);
 
@@ -69,7 +68,7 @@ SECTIONS
         __tls_end = .;
     } > RAM
 
-    .bss  : {
+    .bss (NOLOAD) : {
         . = ALIGN(4);
         __tbss_end = .;
 
@@ -80,4 +79,11 @@ SECTIONS
         . = ALIGN(4);
         __bss_end__ = .;
     } > RAM
+
+    .persistent_data DEFINED(PERSISTENT_DATA_LOC) ? PERSISTENT_DATA_LOC : . (NOLOAD) : {
+        __persistent_data_start__ = .;
+        *(.persistent_data*)
+        . = ALIGN(4);
+    }
+    PROVIDE(__persistent_data_end__ = .);
 }

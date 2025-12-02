@@ -1,16 +1,28 @@
 SECTIONS
 {
+    .ram_vector_table (NOLOAD): {
+        *(.ram_vector_table)
+    } > RAM
+
+    .uninitialized_data (NOLOAD): {
+        . = ALIGN(4);
+        *(.uninitialized_data*)
+    } > RAM
+
     .data : {
         __data_start__ = .;
         *(vtable)
 
         *(.time_critical*)
 
+        /* remaining .text and .rodata; i.e. stuff we exclude above because we want it in RAM */
+        *(.text*)
         . = ALIGN(4);
         *(.rodata*)
         . = ALIGN(4);
 
         *(.data*)
+        *(.sdata*)
 
         . = ALIGN(4);
         *(.after_data.*)
@@ -20,27 +32,6 @@ SECTIONS
         KEEP(*(SORT(.mutex_array.*)))
         KEEP(*(.mutex_array))
         PROVIDE_HIDDEN (__mutex_array_end = .);
-
-        . = ALIGN(4);
-        /* preinit data */
-        PROVIDE_HIDDEN (__preinit_array_start = .);
-        KEEP(*(SORT(.preinit_array.*)))
-        KEEP(*(.preinit_array))
-        PROVIDE_HIDDEN (__preinit_array_end = .);
-
-        . = ALIGN(4);
-        /* init data */
-        PROVIDE_HIDDEN (__init_array_start = .);
-        KEEP(*(SORT(.init_array.*)))
-        KEEP(*(.init_array))
-        PROVIDE_HIDDEN (__init_array_end = .);
-
-        . = ALIGN(4);
-        /* finit data */
-        PROVIDE_HIDDEN (__fini_array_start = .);
-        *(SORT(.fini_array.*))
-        *(.fini_array)
-        PROVIDE_HIDDEN (__fini_array_end = .);
 
         *(.jcr)
         . = ALIGN(4);
@@ -67,12 +58,14 @@ SECTIONS
         __tls_end = .;
     } > RAM
 
-    .bss  : {
+    .bss (NOLOAD) : {
         . = ALIGN(4);
         __tbss_end = .;
 
         *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
         *(COMMON)
+        PROVIDE(__global_pointer$ = . + 2K);
+        *(.sbss*)
         . = ALIGN(4);
         __bss_end__ = .;
     } > RAM

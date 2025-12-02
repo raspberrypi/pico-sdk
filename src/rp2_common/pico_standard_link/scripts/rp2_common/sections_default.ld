@@ -1,5 +1,5 @@
 INCLUDE "platform/section_default_text.ld"
-INCLUDE "platform/section_default_data.ld"
+INCLUDE "rp2_common/section_default_data.ld"
 INCLUDE "rp2_common/section_heap.ld"
 INCLUDE "rp2_common/section_scratch.ld"
 INCLUDE "rp2_common/section_flash_end.ld"
