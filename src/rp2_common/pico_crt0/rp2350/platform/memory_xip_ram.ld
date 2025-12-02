@@ -1,4 +1,0 @@
-MEMORY
-{
-    XIP_RAM(rwx) : ORIGIN =  0x13FFC000, LENGTH = 16k
-}

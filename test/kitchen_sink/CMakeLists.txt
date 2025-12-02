@@ -215,13 +215,14 @@ if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
         target_compile_definitions(kitchen_sink_blocked_ram PRIVATE KITCHEN_SINK_ID="blocked-ram binary")
     endif()
 
-    add_executable(kitchen_sink_memmap_custom ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
-    # Have heap start from 0x20030000, and custom linker script
-    pico_set_linker_script(kitchen_sink_memmap_custom ${CMAKE_CURRENT_LIST_DIR}/memmap_custom.ld)
-    pico_set_linker_script_var(kitchen_sink_memmap_custom HEAP_LOC 0x20030000)
-    target_link_libraries(kitchen_sink_memmap_custom kitchen_sink_libs kitchen_sink_options)
-    pico_add_extra_outputs(kitchen_sink_memmap_custom)
-    target_compile_definitions(kitchen_sink_memmap_custom PRIVATE KITCHEN_SINK_ID="custom memmap binary")
+    add_executable(kitchen_sink_ram_custom ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    # Have ram start from 0x20020000 length 128k, and heap start from 0x20030000
+    pico_set_linker_script_var(kitchen_sink_ram_custom RAM_ORIGIN 0x20020000)
+    pico_set_linker_script_var(kitchen_sink_ram_custom RAM_LENGTH 128k)
+    pico_set_linker_script_var(kitchen_sink_ram_custom HEAP_LOC 0x20030000)
+    target_link_libraries(kitchen_sink_ram_custom kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_ram_custom)
+    target_compile_definitions(kitchen_sink_ram_custom PRIVATE KITCHEN_SINK_ID="custom ram binary")
 endif()
 
 add_executable(kitchen_sink_cpp ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_cpp.cpp)

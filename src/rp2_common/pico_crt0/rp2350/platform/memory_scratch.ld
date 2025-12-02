@@ -1,5 +1,0 @@
-MEMORY
-{
-    SCRATCH_X(rwx) : ORIGIN = 0x20080000, LENGTH = 4k
-    SCRATCH_Y(rwx) : ORIGIN = 0x20081000, LENGTH = 4k
-}

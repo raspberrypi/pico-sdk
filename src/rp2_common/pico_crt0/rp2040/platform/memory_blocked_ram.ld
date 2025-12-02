@@ -1,4 +1,0 @@
-MEMORY
-{
-    RAM(rwx) : ORIGIN =  0x21000000, LENGTH = 256k
-}
