@@ -84,7 +84,7 @@ __force_inline static void critical_section_exit(critical_section_t *crit_sec) {
 void critical_section_deinit(critical_section_t *crit_sec);
 
 /*! \brief Test whether a critical_section has been initialized
- *  \ingroup mutex
+ *  \ingroup critical_section
  *
  * \param crit_sec Pointer to critical_section structure
  * \return true if the critical section is initialized, false otherwise
