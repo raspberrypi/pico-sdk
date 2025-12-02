@@ -1,6 +1,6 @@
 /* Include memory regions used */
 INCLUDE "rp2_common/memory_flash.ld"
-INCLUDE "platform/memory_blocked_ram.ld"
+INCLUDE "platform/memory_ram.ld"
 INCLUDE "platform/memory_scratch.ld"
 
 /* Include aliases for storage memory regions */
