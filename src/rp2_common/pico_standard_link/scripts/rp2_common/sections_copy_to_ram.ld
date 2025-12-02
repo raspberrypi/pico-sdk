@@ -1,5 +1,5 @@
 INCLUDE "platform/section_copy_to_ram_text.ld"
-INCLUDE "platform/section_copy_to_ram_data.ld"
+INCLUDE "rp2_common/section_copy_to_ram_data.ld"
 INCLUDE "rp2_common/section_heap.ld"
 INCLUDE "rp2_common/section_scratch.ld"
 INCLUDE "rp2_common/section_flash_end.ld"
