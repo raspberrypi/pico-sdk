@@ -138,6 +138,7 @@ if (NOT TARGET pico_standard_link)
 
     # add include path for main linker script sections
     target_link_options(pico_standard_link INTERFACE "LINKER:-L${PICO_LINKER_SCRIPT_PATH}")
+    target_link_options(pico_standard_link INTERFACE "LINKER:-L${CMAKE_CURRENT_LIST_DIR}/scripts")
 
     # add variables set by pico_set_linker_script_var function
     target_link_options(pico_standard_link INTERFACE "LINKER:$<JOIN:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_VARS>,,>")
