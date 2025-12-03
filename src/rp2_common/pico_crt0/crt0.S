@@ -11,6 +11,7 @@
 
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
+#include "hardware/regs/xip.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
@@ -18,6 +19,20 @@
 // PICO_CONFIG: PICO_CRT0_NEAR_CALLS, Whether calls from crt0 into the binary are near (<16M away) - ignored for PICO_COPY_TO_RAM, default=0, type=bool, group=pico_crt0
 #ifndef PICO_CRT0_NEAR_CALLS
 #define PICO_CRT0_NEAR_CALLS 0
+#endif
+
+// PICO_CONFIG: PICO_CRT0_NO_DATA_COPY, Whether crt0 should perform the data copies - usually copying from flash into sram, default=1 for no_flash builds, 0 otherwise, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_NO_DATA_COPY
+#if PICO_RP2040
+#define PICO_CRT0_NO_DATA_COPY (PICO_NO_FLASH && !PICO_USING_XIP_RAM)
+#else
+#define PICO_CRT0_NO_DATA_COPY PICO_NO_FLASH
+#endif
+#endif
+
+// PICO_CONFIG: PICO_USE_XIP_CACHE_AS_RAM, Whether to use xip cache as ram, default=1 for xip_ram and xxx_using_xip_ram builds, 0 otherwise, type=bool, group=pico_crt0
+#ifndef PICO_USE_XIP_CACHE_AS_RAM
+#define PICO_USE_XIP_CACHE_AS_RAM (PICO_XIP_RAM || PICO_USING_XIP_RAM)
 #endif
 
 #ifdef NDEBUG
@@ -457,6 +472,14 @@ hold_non_core0_in_bootrom:
     b _enter_vtable_in_r0
 1:
 
+#if PICO_RP2040 && PICO_USE_XIP_CACHE_AS_RAM
+_disable_xip_cache:
+    // Disable the XIP cache on RP2040 making its SRAM available for use
+    ldr r0, =(REG_ALIAS_CLR_BITS + XIP_CTRL_BASE + XIP_CTRL_OFFSET)
+    movs r1, #XIP_CTRL_EN_BITS
+    str r1, [r0]
+#endif
+
 #if !PICO_RP2040 && PICO_EMBED_XIP_SETUP && !PICO_NO_FLASH
     // Execute boot2 on the core 0 stack (it also gets copied into BOOTRAM due
     // to inclusion in the data copy table below). Note the reference
@@ -477,7 +500,7 @@ _call_xip_setup:
 
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
-#if !PICO_NO_FLASH
+#if !PICO_CRT0_NO_DATA_COPY
     adr r4, data_cpy_table
 
     // assume there is at least one entry
@@ -522,11 +545,21 @@ platform_entry: // symbol for stack traces
     b 1b
 
 
-#if !PICO_NO_FLASH
+#if !PICO_CRT0_NO_DATA_COPY
+#if PICO_NO_FLASH
+data_cpy:
+    // skip copies with same source and destination
+    cmp r1, r2
+    bne data_cpy_start
+    bx lr
+#else
+    // go straight into the copy
+    #define data_cpy_start data_cpy
+#endif
 data_cpy_loop:
     ldm r1!, {r0}
     stm r2!, {r0}
-data_cpy:
+data_cpy_start:
     cmp r2, r3
     blo data_cpy_loop
     bx lr
@@ -559,6 +592,12 @@ data_cpy_table:
 .word __scratch_y_source__
 .word __scratch_y_start__
 .word __scratch_y_end__
+
+#if PICO_USING_XIP_RAM
+.word __xip_ram_text_source__
+.word __xip_ram_text_start__
+.word __xip_ram_text_end__
+#endif
 
 .word 0 // null terminator
 

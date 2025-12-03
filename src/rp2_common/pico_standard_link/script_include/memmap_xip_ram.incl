@@ -1,0 +1,28 @@
+/* Include platform memory locations */
+INCLUDE "set_memory_locations.incl"
+
+/* Allow customisation of XIP_RAM_SCRATCH_SIZE */
+XIP_RAM_SCRATCH_SIZE = DEFINED(XIP_RAM_SCRATCH_SIZE) ? XIP_RAM_SCRATCH_SIZE : 2k;
+
+/* Split XIP_RAM into RAM and SCRATCH */
+RAM_ORIGIN = XIP_RAM_ORIGIN;
+RAM_LENGTH = XIP_RAM_LENGTH - (XIP_RAM_SCRATCH_SIZE*2);
+SCRATCH_X_ORIGIN = XIP_RAM_ORIGIN + XIP_RAM_LENGTH - (XIP_RAM_SCRATCH_SIZE*2);
+SCRATCH_X_LENGTH = XIP_RAM_SCRATCH_SIZE;
+SCRATCH_Y_ORIGIN = XIP_RAM_ORIGIN + XIP_RAM_LENGTH - XIP_RAM_SCRATCH_SIZE;
+SCRATCH_Y_LENGTH = XIP_RAM_SCRATCH_SIZE;
+
+/* Include memory regions used */
+INCLUDE "memory_ram.incl"
+INCLUDE "memory_scratch.incl"
+INCLUDE "memory_generated.incl"
+INCLUDE "memory_extra.incl"
+
+/* Include aliases for no_flash storage memory regions (alias to themselves) */
+INCLUDE "memory_aliases_no_flash.incl"
+
+/* Define entry point symbol */
+ENTRY(_entry_point)
+
+/* Include no_flash sections */
+INCLUDE "sections_no_flash.incl"

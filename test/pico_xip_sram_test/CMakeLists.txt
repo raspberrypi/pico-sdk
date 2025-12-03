@@ -1,0 +1,29 @@
+# Use XIP SRAM for time critical functions
+add_executable(pico_critical_xip_sram_test pico_critical_xip_sram_test.c)
+target_link_libraries(pico_critical_xip_sram_test PRIVATE pico_stdlib pico_multicore hardware_dma)
+if (NOT PICO_RP2040)
+    target_link_libraries(pico_critical_xip_sram_test PRIVATE hardware_riscv_platform_timer)
+endif()
+pico_set_binary_type(pico_critical_xip_sram_test copy_to_ram_using_xip_ram)
+pico_enable_stdio_usb(pico_critical_xip_sram_test 1) # test with USB as that invokes flash functions
+pico_add_extra_outputs(pico_critical_xip_sram_test)
+
+# Use XIP SRAM for time critical functions (no_flash build)
+add_executable(pico_critical_xip_sram_test_no_flash pico_critical_xip_sram_test.c)
+target_link_libraries(pico_critical_xip_sram_test_no_flash PRIVATE pico_stdlib pico_multicore hardware_dma)
+if (NOT PICO_RP2040)
+    target_link_libraries(pico_critical_xip_sram_test_no_flash PRIVATE hardware_riscv_platform_timer)
+endif()
+pico_set_binary_type(pico_critical_xip_sram_test_no_flash no_flash_using_xip_ram)
+pico_enable_stdio_usb(pico_critical_xip_sram_test 1)
+pico_add_extra_outputs(pico_critical_xip_sram_test_no_flash)
+
+if (NOT PICO_RP2040)
+    # XIP SRAM only binary
+    add_executable(pico_xip_sram_test pico_xip_sram_test.c)
+    target_link_libraries(pico_xip_sram_test PRIVATE pico_stdlib)
+    pico_set_binary_type(pico_xip_sram_test xip_ram)
+    pico_minimize_runtime(pico_xip_sram_test INCLUDE PRINTF PRINTF_MINIMAL DEFAULT_ALARM_POOL PANIC FLOAT)
+    target_compile_definitions(pico_xip_sram_test PRIVATE PICO_HEAP_SIZE=0x200)
+    pico_add_extra_outputs(pico_xip_sram_test)
+endif()
