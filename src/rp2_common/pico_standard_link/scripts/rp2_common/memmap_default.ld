@@ -1,5 +1,5 @@
 /* Include platform memory locations */
-INCLUDE "platform/default_locations.ld"
+INCLUDE "rp2_common/set_memory_locations.ld"
 
 /* Include memory regions used */
 INCLUDE "rp2_common/memory_flash.ld"
