@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_unique_id",
+    srcs = ["unique_id.c"],
+    hdrs = ["include/pico/unique_id.h"],
+    includes = ["include"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/host/pico_platform",
+    ],
+)
