@@ -40,6 +40,7 @@ set(KITCHEN_SINK_LIBS
     pico_bit_ops
     pico_bootrom
     pico_bootsel_via_double_reset
+    pico_cJSON
     pico_divider
     pico_double
     pico_fix_rp2040_usb_device_enumeration
@@ -71,6 +72,7 @@ set(KITCHEN_SINK_NO_HEADER_LIBS
     pico_bootsel_via_double_reset
     pico_int64_ops # currently empty, and only included by _pico variant
     pico_mem_ops # currently empty, and only included by _pico variant
+    pico_cJSON
 )
 
 set(KITCHEN_SINK_INCLUDES "#pragma once\n")
@@ -84,6 +86,7 @@ foreach(LIB IN LISTS KITCHEN_SINK_LIBS)
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/datetime.h\"\n")
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/pheap.h\"\n")
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/queue.h\"\n")
+               string(APPEND KITCHEN_SINK_INCLUDES "#include \"cJSON.h\"\n")
            else()
                if ("${CMAKE_MATCH_2}" STREQUAL "fix_rp2040_usb_device_enumeration")
                    set(CMAKE_MATCH_2 "fix/rp2040_usb_device_enumeration")
@@ -169,6 +172,10 @@ target_link_libraries(kitchen_sink kitchen_sink_libs kitchen_sink_options)
 pico_set_program_name(kitchen_sink "Wombat tentacles")
 pico_add_extra_outputs(kitchen_sink)
 target_compile_definitions(kitchen_sink PRIVATE KITCHEN_SINK_ID="regular binary")
+
+if (COMMAND suppress_cJSON_warnings)
+   suppress_cJSON_warnings()
+endif()
 
 if (TARGET hardware_pio)
     pico_generate_pio_header(kitchen_sink ${CMAKE_CURRENT_LIST_DIR}/trivial.pio)

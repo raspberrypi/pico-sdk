@@ -124,6 +124,7 @@ CMAKE_ONLY_ALLOWLIST = (
     "PICO_CYW43_DRIVER_PATH",
     "PICO_MBEDTLS_PATH",
     "PICO_LWIP_PATH",
+    "PICO_CJSON_PATH",
     # These are legacy CMake options that should not be used.
     "PICO_NO_FLASH",
     "PICO_COPY_TO_RAM",

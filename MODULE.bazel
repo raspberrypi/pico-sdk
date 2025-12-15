@@ -142,6 +142,13 @@ git_repository(
     remote = "https://github.com/Mbed-TLS/mbedtls.git",
 )
 
+git_repository(
+    name = "cJSON",
+    build_file = "//src/common/pico_cjson:cJSON.BUILD",
+    commit = "c859b25da02955fef659d658b8f324b5cde87be3",  # keep-in-sync-with-submodule: lib/cJSON
+    remote = "https://github.com/DaveGamble/cJSON.git",
+)
+
 register_toolchains(
     "//bazel/toolchain:linux-aarch64-rp2040",
     "//bazel/toolchain:linux-aarch64-rp2350",
