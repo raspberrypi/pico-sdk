@@ -111,6 +111,7 @@ regular_func divmod_s32s32
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_s32s32_savestate
 regular_func divmod_s32s32_unsafe
+    ldr r2, =SIO_BASE
 #else
 // to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
 // in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
@@ -173,6 +174,7 @@ wrapper_func __aeabi_uidivmod
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_u32u32_savestate
 regular_func divmod_u32u32_unsafe
+    ldr r2, =SIO_BASE
 #else
 // to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
 // in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
