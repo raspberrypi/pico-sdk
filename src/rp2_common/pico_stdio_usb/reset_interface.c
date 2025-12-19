@@ -5,6 +5,7 @@
  */
 #include "tusb.h"
 
+#if !defined(LIB_TINYUSB_HOST) || (defined(LIB_TINYUSB_HOST) && defined(CFG_TUH_RPI_PIO_USB))
 #include "pico/bootrom.h"
 
 #if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE && !(PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL || PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT)
@@ -184,4 +185,4 @@ void tud_cdc_line_coding_cb(__unused uint8_t itf, cdc_line_coding_t const* p_lin
     }
 }
 #endif
-
+#endif // !defined(LIB_TINYUSB_HOST) || (defined(LIB_TINYUSB_HOST) && defined(CFG_TUH_RPI_PIO_USB))

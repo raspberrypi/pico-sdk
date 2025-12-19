@@ -5,6 +5,8 @@
  */
 
 #include "tusb.h"
+
+#if !defined(LIB_TINYUSB_HOST) || (defined(LIB_TINYUSB_HOST) && defined(CFG_TUH_RPI_PIO_USB))
 #include "pico/stdio_usb.h"
 
 // these may not be set if the user is providing tud support (i.e. LIB_TINYUSB_DEVICE is 1 because
@@ -300,4 +302,10 @@ bool stdio_usb_init(void) {
     return false;
 }
 #endif // CFG_TUD_ENABLED && CFG_TUD_CDC
+#else
+#warning stdio USB was configured, but is being disabled as TinyUSB host is explicitly linked and is not using PIO-USB
+bool stdio_usb_init(void) {
+    return false;
+}
+#endif // !defined(LIB_TINYUSB_HOST) || (defined(LIB_TINYUSB_HOST) && defined(CFG_TUH_RPI_PIO_USB))
 
