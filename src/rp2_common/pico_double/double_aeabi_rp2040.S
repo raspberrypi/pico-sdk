@@ -44,11 +44,9 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(__aeabi_double_init, PICO_RUNTIME_INIT_AEABI_DOUB
 #endif
 .endm
 
-.section .text
-
 #if PICO_DOUBLE_PROPAGATE_NANS
-.thumb_func
-__check_nan_d1:
+double_section __check_nan_d1
+regular_func __check_nan_d1
    movs r3, #1
    lsls r3, #21
    lsls r2, r1, #1
@@ -58,8 +56,8 @@ __check_nan_d1:
 1:
    bx ip
 
-.thumb_func
-__check_nan_d2:
+double_section __check_nan_d2
+regular_func __check_nan_d2
    push {r0, r2}
    movs r2, #1
    lsls r2, #21
