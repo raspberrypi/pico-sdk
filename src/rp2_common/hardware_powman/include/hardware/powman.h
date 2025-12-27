@@ -84,7 +84,7 @@ void powman_timer_set_ms(uint64_t time_ms);
 /*! \brief Set an alarm at an absolute time in ms
  *  \ingroup hardware_powman
  *
- * Note, the timer is stopped and then restarted as part of this function. This only controls the alarm
+ * Note, the alarm is disabled and then re-enabled as part of this function. This only controls the alarm;
  * if you want to use the alarm to wake up powman then you should use \ref powman_enable_alarm_wakeup_at_ms
  *
  * \param alarm_time_ms time at which the alarm will fire
