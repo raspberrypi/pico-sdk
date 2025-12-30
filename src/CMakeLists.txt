@@ -121,9 +121,7 @@ macro(pico_simple_hardware_headers_target NAME)
 
         target_include_directories(hardware_${NAME}_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
         target_link_libraries(hardware_${NAME}_headers INTERFACE pico_base_headers)
-        if (NOT PICO_NO_HARDWARE)
-            target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs hardware_claim_headers)
-        endif()
+        target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs hardware_claim_headers)
     endif()
 endmacro()
 
@@ -141,9 +139,7 @@ macro(pico_simple_hardware_headers_only_target NAME)
         # a headers only target should still have an explicit _headers library for consistency
         target_include_directories(hardware_${NAME}_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
         target_link_libraries(hardware_${NAME}_headers INTERFACE pico_base_headers)
-        if (NOT PICO_NO_HARDWARE)
-            target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs)
-        endif()
+        target_link_libraries(hardware_${NAME}_headers INTERFACE hardware_structs)
 
         add_library(hardware_${NAME} INTERFACE)
         target_link_libraries(hardware_${NAME} INTERFACE hardware_${NAME}_headers)
