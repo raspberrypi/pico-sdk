@@ -114,7 +114,14 @@ saving_func wrapper __aeabi_dmul
 
 double_section ddiv_fast
 saving_func regular ddiv_fast
+#if PICO_USE_HARD_ABI
+  vmov r0,r1,d0
+  vmov r2,r3,d1
+#endif
   dcp_ddiv_fast_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r12
+#if PICO_USE_HARD_ABI
+  vmov d0,r0,r1
+#endif
   saving_func_return
 
 double_wrapper_section __aeabi_ddiv
@@ -125,40 +132,99 @@ saving_func wrapper __aeabi_ddiv
 
 double_section sqrt_fast
 saving_func regular sqrt_fast
+#if PICO_USE_HARD_ABI
+  vmov r0,r1,d0
+#endif
   dcp_dsqrt_fast_m r0,r1,r0,r1,r0,r1,r2,r3,r12
+#if PICO_USE_HARD_ABI
+  vmov d0,r0,r1
+#endif
   saving_func_return
 
 double_wrapper_section sqrt
 saving_func wrapper sqrt
+#if PICO_USE_HARD_ABI
+  vmov r0,r1,d0
+#endif
 @ with correct rounding
   dcp_dsqrt_m r0,r1,r0,r1,r0,r1,r2,r3,r12
+#if PICO_USE_HARD_ABI
+  vmov d0,r0,r1
+#endif
   saving_func_return
 
 double_section dclassify
 saving_func regular dclassify
+#if PICO_USE_HARD_ABI
+  vmov r0,r1,d0
+#endif
   dcp_dclassify_m apsr_nzcv,r0,r1
   saving_func_return
 
 // ============== CONVERSION FUNCTIONS ===============
 
 double_wrapper_section __aeabi_d2f
+#if PICO_USE_HARD_ABI
+saving_func wrapper __aeabi_d2f
+#else
 saving_func wrapper __aeabi_d2f double2float
+#endif
 @ with rounding
   dcp_double2float_m r0,r0,r1
   saving_func_return
 
+#if PICO_USE_HARD_ABI
+double_section double2float
+regular_func double2float
+  push {r0,lr}
+  vmov r0,r1,d0
+  bl WRAPPER_FUNC_NAME(__aeabi_d2f)
+  vmov s0,r0
+  pop {r0,pc}
+#endif
+
 double_wrapper_section __aeabi_i2d
+#if PICO_USE_HARD_ABI
+saving_func wrapper __aeabi_i2d
+#else
 saving_func wrapper __aeabi_i2d int2double
+#endif
   dcp_int2double_m r0,r1,r0
   saving_func_return
 
+#if PICO_USE_HARD_ABI
+double_section int2double
+regular_func int2double
+  push {r0,lr}
+  bl WRAPPER_FUNC_NAME(__aeabi_i2d)
+  vmov d0,r0,r1
+  pop {r0,pc}
+#endif
+
 double_wrapper_section __aeabi_ui2d
+#if PICO_USE_HARD_ABI
+saving_func wrapper __aeabi_ui2d
+#else
 saving_func wrapper __aeabi_ui2d uint2double
+#endif
   dcp_uint2double_m r0,r1,r0
   saving_func_return
 
+#if PICO_USE_HARD_ABI
+double_section uint2double
+regular_func uint2double
+  push {r0,lr}
+  bl WRAPPER_FUNC_NAME(__aeabi_ui2d)
+  vmov d0,r0,r1
+  pop {r0,pc}
+#endif
+
 double_section double2fix_z
 saving_func regular double2fix_z
+#if PICO_USE_HARD_ABI
+  mov r2, r0
+  vmov r0, r1, d0
+#endif
   ubfx r3, r1, #20, #11
   adds r3, r2
   beq 1f // very small; we don't care that we might make a denormal
@@ -173,6 +239,10 @@ saving_func regular double2fix_z
 
 double_section double2ufix
 saving_func regular double2ufix_z double2ufix
+#if PICO_USE_HARD_ABI
+  mov r2, r0
+  vmov r0, r1, d0
+#endif
 double2ufix_z_entry:
   ubfx r3, r1, #20, #11
   adds r3, r2
@@ -188,6 +258,10 @@ double2ufix_z_entry:
 
 double_section double2fix
 saving_func regular double2fix
+#if PICO_USE_HARD_ABI
+  mov r2, r0
+  vmov r0, r1, d0
+#endif
   ubfx r3, r1, #20, #11
   cbz r3, 2f // 0 or denormal
   adds r3, r2
@@ -207,6 +281,9 @@ saving_func_return
 
 double_section double2int
 saving_func regular double2int
+#if PICO_USE_HARD_ABI
+  vmov r0, r1, d0
+#endif
 double2int_entry:
   lsls r2, r1, #1
   bcc double2int_z_entry // positive is ok for int64_z
@@ -230,29 +307,62 @@ double2int_entry:
 saving_func_return
 
 double_wrapper_section __aeabi_d2iz
+#if PICO_USE_HARD_ABI
+saving_func wrapper __aeabi_d2iz
+#else
 saving_func wrapper __aeabi_d2iz double2int_z
+#endif
 double2int_z_entry:
 @ with truncation towards 0
   dcp_double2int_m r0,r0,r1
   // note: this works with either saved or not saved call as it is just a `bx lr`
   saving_func_return
 
+#if PICO_USE_HARD_ABI
+double_section double2int_z
+regular_func double2int_z
+  vmov r0,r1,d0
+  push {r4,lr}
+  bl WRAPPER_FUNC_NAME(__aeabi_d2iz)
+  pop {r4,pc}
+#endif
+
 double_wrapper_section __aeabi_d2uiz
+#if PICO_USE_HARD_ABI
+saving_func wrapper __aeabi_d2uiz
+#else
 saving_func wrapper __aeabi_d2uiz double2uint double2uint_z
+#endif
 double2uint_z_entry:
 @ with truncation towards 0
   dcp_double2uint_m r0,r0,r1
   saving_func_return
 
+#if PICO_USE_HARD_ABI
+double_section double2uint
+regular_func double2uint
+regular_func double2uint_z
+  vmov r0,r1,d0
+  push {r4,lr}
+  bl WRAPPER_FUNC_NAME(__aeabi_d2uiz)
+  pop {r4,pc}
+#endif
+
 double_section double2int_r
 saving_func regular double2int_r
 @ with rounding
+#if PICO_USE_HARD_ABI
+  vmov r0,r1,d0
+#endif
   dcp_double2int_r_m r0,r0,r1
   saving_func_return
 
 double_section double2uint_r
 saving_func regular double2uint_r
 @ with rounding
+#if PICO_USE_HARD_ABI
+  vmov r0,r1,d0
+#endif
   dcp_double2uint_r_m r0,r0,r1
   saving_func_return
 

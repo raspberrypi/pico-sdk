@@ -39,6 +39,11 @@ if (NOT TARGET pico_double)
                 ${CMAKE_CURRENT_LIST_DIR}/double_sci_m33.S
                 ${CMAKE_CURRENT_LIST_DIR}/double_conv_m33.S
                 )
+
+        # May be used together with pico_float_pico_vfp so support hard ABI for double dcp.
+        if (PICO_USE_HARD_ABI)
+            target_compile_definitions(pico_double_pico INTERFACE PICO_USE_HARD_ABI=1)
+        endif ()
     endif()
 
     target_link_libraries(pico_double_pico INTERFACE pico_bootrom pico_double_headers hardware_divider)

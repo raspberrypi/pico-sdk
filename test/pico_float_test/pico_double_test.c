@@ -24,7 +24,7 @@
 
 #define test_assert(x) ({ if (!(x)) { printf("Assertion failed: ");puts(#x);printf("  at " __FILE__ ":%d\n", __LINE__); exit(-1); } })
 
-extern int __aeabi_dcmpun(double a, double b);
+extern __attribute__((pcs("aapcs"))) int __aeabi_dcmpun(double a, double b);
 
 #if __arm__
 
@@ -290,23 +290,23 @@ int test_dcmpun() {
 #define assert_nan(a) test_assert(isnan(a))
 #define check_nan(a) ({ assert_nan(a); a; })
 
-double __aeabi_i2d(int32_t);
-double __aeabi_ui2d(int32_t);
-double __aeabi_l2d(int64_t);
-double __aeabi_ul2d(int64_t);
-int32_t __aeabi_d2iz(double);
-int64_t __aeabi_d2lz(double);
-double __aeabi_dmul(double, double);
-double __aeabi_ddiv(double, double);
+double __attribute__((pcs("aapcs"))) __aeabi_i2d(int32_t);
+double __attribute__((pcs("aapcs"))) __aeabi_ui2d(int32_t);
+double __attribute__((pcs("aapcs"))) __aeabi_l2d(int64_t);
+double __attribute__((pcs("aapcs"))) __aeabi_ul2d(int64_t);
+int32_t __attribute__((pcs("aapcs")))__aeabi_d2iz(double);
+int64_t __attribute__((pcs("aapcs"))) __aeabi_d2lz(double);
+double __attribute__((pcs("aapcs"))) __aeabi_dmul(double, double);
+double __attribute__((pcs("aapcs"))) __aeabi_ddiv(double, double);
 #if LIB_PICO_DOUBLE_PICO
-double __real___aeabi_i2d(int);
-double __real___aeabi_ui2d(int);
-double __real___aeabi_l2d(int64_t);
-double __real___aeabi_ul2d(int64_t);
-double __real___aeabi_dmul(double, double);
-double __real___aeabi_ddiv(double, double);
-int32_t __real___aeabi_d2iz(double);
-int64_t __real___aeabi_d2lz(double);
+double __attribute__((pcs("aapcs"))) __real___aeabi_i2d(int);
+double __attribute__((pcs("aapcs"))) __real___aeabi_ui2d(int);
+double __attribute__((pcs("aapcs"))) __real___aeabi_l2d(int64_t);
+double __attribute__((pcs("aapcs"))) __real___aeabi_ul2d(int64_t);
+double __attribute__((pcs("aapcs"))) __real___aeabi_dmul(double, double);
+double __attribute__((pcs("aapcs"))) __real___aeabi_ddiv(double, double);
+int32_t __attribute__((pcs("aapcs"))) __real___aeabi_d2iz(double);
+int64_t __attribute__((pcs("aapcs"))) __real___aeabi_d2lz(double);
 double __real_sqrt(double);
 double __real_cos(double);
 double __real_sin(double);
