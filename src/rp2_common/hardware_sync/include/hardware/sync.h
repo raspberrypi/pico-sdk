@@ -372,8 +372,8 @@ bool spin_lock_is_claimed(uint lock_num);
 #define remove_volatile_cast(t, x) (t)(x)
 #define remove_volatile_cast_no_barrier(t, x) (t)(x)
 #else
-#define remove_volatile_cast(t, x) ({__compiler_memory_barrier(); Clang_Pragma("clang diagnostic push"); Clang_Pragma("clang diagnostic ignored \"-Wcast-qual\""); (t)(x); Clang_Pragma("clang diagnostic pop"); })
-#define remove_volatile_cast_no_barrier(t, x) ({ Clang_Pragma("clang diagnostic push"); Clang_Pragma("clang diagnostic ignored \"-Wcast-qual\""); (t)(x); Clang_Pragma("clang diagnostic pop"); })
+#define remove_volatile_cast(t, x) (__compiler_memory_barrier(), Clang_Pragma("clang diagnostic push") Clang_Pragma("clang diagnostic ignored \"-Wcast-qual\"") (t)(x) Clang_Pragma("clang diagnostic pop"))
+#define remove_volatile_cast_no_barrier(t, x) Clang_Pragma("clang diagnostic push") Clang_Pragma("clang diagnostic ignored \"-Wcast-qual\"") (t)(x) Clang_Pragma("clang diagnostic pop")
 #endif
 
 #ifdef __cplusplus

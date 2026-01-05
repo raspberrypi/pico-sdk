@@ -367,7 +367,7 @@ static inline void clear_claimed_bit(uint8_t *bits, uint bit_index) {
 static bool multicore_doorbell_claim_under_lock(uint doorbell_num, uint core_mask, bool required) {
     static_assert(NUM_CORES == 2, "");
     uint claimed_cores_for_doorbell = (uint) (is_bit_claimed(doorbell_claimed[0], doorbell_num) |
-                                              (is_bit_claimed(doorbell_claimed[1], doorbell_num + 1u) << 1));
+                                              (is_bit_claimed(doorbell_claimed[1], doorbell_num) << 1));
     if (claimed_cores_for_doorbell & core_mask) {
         if (required) {
             panic( "Multicore doorbell %d already claimed on core mask 0x%x; requested core mask 0x%x\n",

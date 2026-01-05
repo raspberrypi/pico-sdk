@@ -51,7 +51,7 @@ static void async_context_poll_lock_check(async_context_t *self_base) {
     }
 }
 
-uint32_t async_context_poll_execute_sync(__unused async_context_t *context, uint32_t (*func)(void *param), void *param) {
+static uint32_t async_context_poll_execute_sync(__unused async_context_t *context, uint32_t (*func)(void *param), void *param) {
     return func(param);
 }
 

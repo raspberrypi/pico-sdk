@@ -1899,7 +1899,7 @@ void pio_sm_set_pins_with_mask64(PIO pio, uint sm, uint64_t pin_values, uint64_t
  * \param pio The PIO instance; e.g. \ref pio0 or \ref pio1
  * \param sm State machine index (0..3) to use
  * \param pin_dirs the pin directions to set - 1 = out, 0 = in (if the corresponding bit in pin_mask is set)
- * \param pin_mask a bit for each pin to indicate whether the corresponding pin_value for that pin should be applied.
+ * \param pin_mask a bit for each pin to indicate whether the corresponding pin_dir for that pin should be applied.
  */
 void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pin_dirs, uint32_t pin_mask);
 
@@ -1914,7 +1914,7 @@ void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pin_dirs, uint32_t 
  * \param pio The PIO instance; e.g. \ref pio0 or \ref pio1
  * \param sm State machine index (0..3) to use
  * \param pin_dirs the pin directions to set - 1 = out, 0 = in (if the corresponding bit in pin_mask is set)
- * \param pin_mask a bit for each pin to indicate whether the corresponding pin_value for that pin should be applied.
+ * \param pin_mask a bit for each pin to indicate whether the corresponding pin_dir for that pin should be applied.
  */
 void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pin_dirs, uint64_t pin_mask);
 
