@@ -23,7 +23,8 @@
 #include "inttypes.h"
 
 #define test_assert(x) ({ if (!(x)) { printf("Assertion failed: ");puts(#x);printf("  at " __FILE__ ":%d\n", __LINE__); exit(-1); } })
-extern int __aeabi_fcmpun(float a, float b);
+
+extern __attribute__((pcs("aapcs"))) int __aeabi_fcmpun(float a, float b);
 
 #if __arm__
 
@@ -289,24 +290,24 @@ int test_fcmpun() {
 #define assert_nan(a) test_assert(isnanf(a))
 #define check_nan(a) ({ assert_nan(a); a; })
 
-float __aeabi_i2f(int32_t);
-float __aeabi_ui2f(int32_t);
-float __aeabi_l2f(int64_t);
-float __aeabi_ul2f(int64_t);
-int32_t __aeabi_f2iz(float);
-int64_t __aeabi_f2lz(float);
-float __aeabi_fmul(float, float);
-float __aeabi_fdiv(float, float);
+float __attribute__((pcs("aapcs"))) __aeabi_i2f(int32_t);
+float __attribute__((pcs("aapcs"))) __aeabi_ui2f(int32_t);
+float __attribute__((pcs("aapcs"))) __aeabi_l2f(int64_t);
+float __attribute__((pcs("aapcs"))) __aeabi_ul2f(int64_t);
+int32_t __attribute__((pcs("aapcs"))) __aeabi_f2iz(float);
+int64_t __attribute__((pcs("aapcs"))) __aeabi_f2lz(float);
+float __attribute__((pcs("aapcs"))) __aeabi_fmul(float, float);
+float __attribute__((pcs("aapcs"))) __aeabi_fdiv(float, float);
 #if LIB_PICO_FLOAT_PICO
 #if !LIB_PICO_FLOAT_PICO_VFP
-float __real___aeabi_i2f(int);
-float __real___aeabi_ui2f(int);
-float __real___aeabi_l2f(int64_t);
-float __real___aeabi_ul2f(int64_t);
-float __real___aeabi_fmul(float, float);
-float __real___aeabi_fdiv(float, float);
-int32_t __real___aeabi_f2iz(float);
-int64_t __real___aeabi_f2lz(float);
+float __attribute__((pcs("aapcs"))) __real___aeabi_i2f(int);
+float __attribute__((pcs("aapcs"))) __real___aeabi_ui2f(int);
+float __attribute__((pcs("aapcs"))) __real___aeabi_l2f(int64_t);
+float __attribute__((pcs("aapcs"))) __real___aeabi_ul2f(int64_t);
+float __attribute__((pcs("aapcs"))) __real___aeabi_fmul(float, float);
+float __attribute__((pcs("aapcs"))) __real___aeabi_fdiv(float, float);
+int32_t __attribute__((pcs("aapcs"))) __real___aeabi_f2iz(float);
+int64_t __attribute__((pcs("aapcs"))) __real___aeabi_f2lz(float);
 float __real_sqrtf(float);
 #endif
 float __real_cosf(float);

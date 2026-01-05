@@ -166,6 +166,9 @@
                 #NO_SCI_EXTRA       # todo - are our versions better than what GCC proides?
         )
 
+        if (PICO_USE_HARD_ABI)
+            target_compile_definitions(pico_float_pico_vfp INTERFACE PICO_USE_HARD_ABI=1)
+        endif ()
 
         target_link_libraries(pico_float_pico INTERFACE
                 pico_float_pico_vfp)
