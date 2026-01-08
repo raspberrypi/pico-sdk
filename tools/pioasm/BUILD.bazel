@@ -94,3 +94,13 @@ cc_binary(
         ":python_output",
     ],
 )
+
+py_test(
+    name = "pioasm_tests",
+    srcs = ["test/run_tests.py"],
+    data = glob(["test/*.pio"]) + [":pioasm"],
+    env = {
+        "PIOASM_BIN": "$(location :pioasm)",
+    },
+    main = "test/run_tests.py",
+)

@@ -9,16 +9,21 @@
 # Usage:
 # test/run_tests.py
 
-import os, sys, subprocess, tempfile, shutil
+import os, sys, subprocess, tempfile, shutil, re, unittest
+from typing import Optional
 from pathlib import Path
 
 TEST_DIR = Path(".") / "test"
+OVERWRITE = False
+PIOASM_BIN = None
 
 def discover_tests() -> list[Path]:
-	for (root, dirs, files) in TEST_DIR.walk():
-		return [root / file for file in files if file.startswith("test_") and file.endswith(".pio")]
-
-	return []
+	tests = []
+	for root, _dirs, files in os.walk(TEST_DIR):
+		for file in files:
+			if file.startswith("test_") and file.endswith(".pio"):
+				tests.append(Path(root) / file)
+	return tests
 
 def run_test(test: Path, overwrite: bool = False) -> bool:
 	with open(test, "r") as test_file:
@@ -127,26 +132,48 @@ def execute_command(test_file, command) -> tuple[int, str, str]:
 
 	shutil.copy(test_file, Path(tempdir) / "input.pio")
 
-	# path=foobar:$PATH
 	env = os.environ.copy()
-	env["PATH"] = f"/Users/gonzalo/.pico-sdk/tools/2.2.0/pioasm:{env['PATH']}"
+	if PIOASM_BIN:
+		pioasm_dir = str(Path(PIOASM_BIN).parent)
+		env["PATH"] = f"{pioasm_dir}{os.pathsep}{env.get('PATH', '')}"
 	result = subprocess.run(command, cwd=tempdir, env=env, capture_output=True, shell=True)
 	
 	return (result.returncode, result.stdout.decode(), result.stderr.decode())
 
-def run_tests(overwrite: bool = False):
+class PioasmTests(unittest.TestCase):
+	pass
+
+def _make_test(test_path: Path):
+	def _test(self):
+		ok = run_test(test_path, OVERWRITE)
+		self.assertTrue(ok, f"Test failed: {test_path}")
+	return _test
+
+def _register_tests():
 	tests = discover_tests()
-	print(tests)
-	all_passed = True
+	for index, test_path in enumerate(tests):
+		rel_path = test_path.relative_to(TEST_DIR)
+		safe_name = re.sub(r"[^0-9A-Za-z_]+", "_", str(rel_path))
+		test_name = f"test_{safe_name}_{index}"
+		setattr(PioasmTests, test_name, _make_test(test_path))
 
-	for test in tests:
-		print(f"Running test {test}: ", end="")
-		if not run_test(test, overwrite):
-			all_passed = False
-		else:
-			print("OK")
+_register_tests()
 
-	return 0 if all_passed else 1
+def resolve_pioasm_bin() -> Optional[str]:
+	env_bin = os.environ.get("PIOASM_BIN")
+	if env_bin:
+		return env_bin
+
+	repo_root = Path(__file__).resolve().parents[3]
+	candidate = repo_root / "bazel-bin" / "tools" / "pioasm" / "pioasm"
+	if candidate.exists():
+		return str(candidate)
+
+	return None
 
 if __name__ == "__main__":
-    sys.exit(run_tests(sys.argv[1:] == ["--overwrite"]))
+	PIOASM_BIN = resolve_pioasm_bin()
+	if "--overwrite" in sys.argv:
+		OVERWRITE = True
+		sys.argv.remove("--overwrite")
+	unittest.main(verbosity=2)
