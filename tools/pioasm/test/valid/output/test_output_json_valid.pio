@@ -1,0 +1,30 @@
+// run: pioasm -o json input.pio
+.program format_test
+    nop
+
+// -- Output
+// Command: pioasm -o json input.pio
+// Exit code: 0
+// Stdout:
+// {
+// 	"publicSymbols": {
+// 	},
+// 	"programs": [
+// 		{
+// 			"name": "format_test",
+// 			"wrapTarget": 0,
+// 			"wrap": 0,
+// 			"origin": -1,
+// 			"sideset": {"size": 0, "optional": false, "pindirs": false},
+// 			"publicSymbols": {
+// 			},
+// 			"publicLabels": {
+// 			},
+// 			"instructions": [
+// 				{"hex": "A042"}
+// 			]
+// 		}
+// 	]
+// }
+// 
+// Stderr:

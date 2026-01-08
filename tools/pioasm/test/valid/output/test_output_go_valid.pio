@@ -1,0 +1,35 @@
+// run: pioasm -o go input.pio
+.program format_test
+    nop
+
+// -- Output
+// Command: pioasm -o go input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// error: unknown output format 'go'
+// 
+// usage: pioasm <options> <input> (<output>)
+// 
+// Assemble file of PIO program(s) for use in applications.
+//    <input>             the input filename
+//    <output>            the output filename (or filename prefix if the output format produces multiple outputs).
+//                        if not specified, a single output will be written to stdout
+// 
+// options:
+//   -o <output_format>   select output_format (default 'c-sdk'); available options are:
+//                            ada
+//                                Ada specification
+//                            c-sdk
+//                                C header suitable for use with the Raspberry Pi Pico SDK
+//                            hex
+//                                Raw hex output (only valid for single program inputs)
+//                            json
+//                                Machine-formatted output for integrating with external tools
+//                            python
+//                                Python file suitable for use with MicroPython
+//   -p <output_param>    add a parameter to be passed to the output format generator
+//   -v <version>         specify the default PIO version (0 or 1)
+//   --version            print pioasm version information
+//   -?, --help           print this help and exit
+// 

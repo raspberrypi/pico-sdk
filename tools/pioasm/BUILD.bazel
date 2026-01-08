@@ -105,7 +105,7 @@ cc_binary(
 py_test(
     name = "pioasm_tests",
     srcs = ["test/run_tests.py"],
-    data = glob(["test/*.pio"]) + [":pioasm"],
+    data = glob(["test/**/*.pio"]) + [":pioasm"],
     env = {
         "PIOASM_BIN": "$(location :pioasm)",
     },

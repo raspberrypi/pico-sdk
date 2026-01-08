@@ -1,0 +1,11 @@
+// run: pioasm -o ada input.pio
+.program format_test
+    nop
+
+// -- Output
+// Command: pioasm -o ada input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// error: missing package name options for Ada format
+// 

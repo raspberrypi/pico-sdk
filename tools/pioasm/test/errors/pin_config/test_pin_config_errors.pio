@@ -1,0 +1,25 @@
+// run: pioasm -v 1 input.pio
+.program out_pin_count_error
+.pio_version 1
+.out 33
+    nop
+
+.program in_pin_count_error
+.pio_version 1
+.in 33
+    nop
+
+.program set_pin_count_error
+.pio_version 1
+.set 32
+    nop
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.6-7: out pin count should be >= 0 and <= 32
+//     4 | .out 33
+//       |      ^~
+// 

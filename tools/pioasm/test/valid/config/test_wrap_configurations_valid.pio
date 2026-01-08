@@ -1,0 +1,23 @@
+// run: pioasm input.pio
+.program wrap_begin
+.wrap_target
+    nop
+    jmp wrap_begin
+.wrap
+
+.program wrap_mid
+    nop
+.wrap_target
+    nop
+    jmp wrap_mid
+.wrap
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:5.9-18: undefined symbol 'wrap_begin'
+//     5 |     jmp wrap_begin
+//       |         ^~~~~~~~~~
+// 

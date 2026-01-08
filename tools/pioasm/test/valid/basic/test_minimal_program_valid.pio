@@ -1,8 +1,6 @@
 // run: pioasm input.pio
-.program word_test
-    .word 0x0000
-    .word 0xFFFF
-    .word 0xa042
+.program minimal
+    nop
 
 // -- Output
 // Command: pioasm input.pio
@@ -18,36 +16,34 @@
 // #include "hardware/pio.h"
 // #endif
 // 
-// // --------- //
-// // word_test //
-// // --------- //
+// // ------- //
+// // minimal //
+// // ------- //
 // 
-// #define word_test_wrap_target 0
-// #define word_test_wrap 2
-// #define word_test_pio_version 0
+// #define minimal_wrap_target 0
+// #define minimal_wrap 0
+// #define minimal_pio_version 0
 // 
-// static const uint16_t word_test_program_instructions[] = {
+// static const uint16_t minimal_program_instructions[] = {
 //             //     .wrap_target
-//     0x0000, //  0: jmp    0
-//     0xffff, //  1: reserved
-//     0xa042, //  2: nop
+//     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program word_test_program = {
-//     .instructions = word_test_program_instructions,
-//     .length = 3,
+// static const struct pio_program minimal_program = {
+//     .instructions = minimal_program_instructions,
+//     .length = 1,
 //     .origin = -1,
-//     .pio_version = word_test_pio_version,
+//     .pio_version = minimal_pio_version,
 // #if PICO_PIO_VERSION > 0
 //     .used_gpio_ranges = 0x0
 // #endif
 // };
 // 
-// static inline pio_sm_config word_test_program_get_default_config(uint offset) {
+// static inline pio_sm_config minimal_program_get_default_config(uint offset) {
 //     pio_sm_config c = pio_get_default_sm_config();
-//     sm_config_set_wrap(&c, offset + word_test_wrap_target, offset + word_test_wrap);
+//     sm_config_set_wrap(&c, offset + minimal_wrap_target, offset + minimal_wrap);
 //     return c;
 // }
 // #endif
