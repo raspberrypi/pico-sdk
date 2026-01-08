@@ -18,3 +18,11 @@
     mov txfifo[0], isr
 
 // -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:18.9-14: syntax error, unexpected txfifo
+//    18 |     mov txfifo[0], isr
+//       |         ^~~~~~
+// 

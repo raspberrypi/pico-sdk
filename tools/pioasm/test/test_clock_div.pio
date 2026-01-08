@@ -10,3 +10,11 @@
     nop
 
 // -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:9.1-22: clock divider must be between 1 and 65535
+//     9 | .clock_div 65535.99999
+//       | ^~~~~~~~~~~~~~~~~~~~~~
+// 

@@ -14,3 +14,11 @@
     set pins, (:: 0b10110)  ; reverse
 
 // -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:14.16-25: 'set' bit count must be >= 0 and <= 31
+//    14 |     set pins, (:: 0b10110)  ; reverse
+//       |                ^~~~~~~~~~
+// 
