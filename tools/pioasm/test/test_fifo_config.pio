@@ -1,13 +1,13 @@
 // run: pioasm -v 1 input.pio
 .program fifo_tx
-. pio_version 1
-. fifo tx
+.pio_version 1
+.fifo tx
     pull
     out pins, 8
 
 .program fifo_rx
-. pio_version 1
-. fifo rx
+.pio_version 1
+.fifo rx
     in pins, 8
     push
 

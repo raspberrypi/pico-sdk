@@ -1,5 +1,5 @@
 // run: pioasm input.pio
-. program push_pull_test
+.program push_pull_test
     push
     push block
     push noblock

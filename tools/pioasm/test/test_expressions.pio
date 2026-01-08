@@ -1,6 +1,6 @@
 // run: pioasm input.pio
 .program expr_test
-. define a 5
+.define a 5
 .define b 3
     set pins, (a + b)      ; addition
     set pins, (a - b)      ; subtraction

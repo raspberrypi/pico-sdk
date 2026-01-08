@@ -1,5 +1,5 @@
 // run: pioasm input.pio
-. program word_test
+.program word_test
     .word 0x0000
     .word 0xFFFF
     .word 0xa042

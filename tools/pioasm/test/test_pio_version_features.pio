@@ -1,6 +1,6 @@
 // run: pioasm -v 0 input.pio
 .program pio_v0
-. pio_version 0
+.pio_version 0
     wait 0 gpio 7      ; max GPIO 31 on v0
 
 .program pio_v1

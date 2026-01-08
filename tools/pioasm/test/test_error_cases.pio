@@ -1,4 +1,5 @@
-// run: pioasm input.pio #expect-error
+// run: pioasm input.pio
+// expects an error
 .program error_test
     in pins, 0         ; invalid:  bit count must be 1-32
     in pins, 33        ; invalid: bit count too large

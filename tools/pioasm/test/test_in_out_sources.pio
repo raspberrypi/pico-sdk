@@ -1,5 +1,5 @@
 // run: pioasm input.pio
-. program in_out_test
+.program in_out_test
     in pins, 4
     in x, 8
     in y, 16

@@ -1,8 +1,8 @@
 // run: pioasm input.pio
-. program jmp_test
+.program jmp_test
 start:
     jmp start          ; unconditional
-    jmp ! x, start      ; if X zero
+    jmp !x, start      ; if X zero
     jmp x--, start     ; if X non-zero, post-decrement
     jmp !y, start      ; if Y zero
     jmp y--, start     ; if Y non-zero, post-decrement

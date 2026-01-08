@@ -1,11 +1,11 @@
 // run: pioasm -v 1 input.pio
-. program config_test
-. wrap_target
-. side_set 2 opt
+.program config_test
+.wrap_target
+.side_set 2 opt
 .origin 0
     nop         side 1
     nop         side 2
-. wrap
-. define PUBLIC myconst 42
+.wrap
+.define PUBLIC myconst 42
 
 // -- Output
