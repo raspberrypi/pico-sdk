@@ -1,0 +1,18 @@
+// run: pioasm input.pio
+. program in_out_test
+    in pins, 4
+    in x, 8
+    in y, 16
+    in null, 32
+    in isr, 1
+    in osr, 24
+    out pins, 4
+    out x, 8
+    out y, 16
+    out null, 32
+    out pindirs, 5
+    out pc, 5
+    out isr, 7
+    out exec, 16
+
+// -- Output

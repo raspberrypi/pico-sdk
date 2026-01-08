@@ -1,0 +1,11 @@
+// run: pioasm input.pio
+.program label_test
+.define PUBLIC entry_point 0
+start:
+    jmp middle
+middle:
+    jmp end
+end:
+    jmp start
+
+// -- Output

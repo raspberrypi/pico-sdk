@@ -1,0 +1,12 @@
+// run: pioasm -v 1 input.pio
+.program clock_test
+.pio_version 1
+.clock_div 1.0
+    nop
+
+.program clock_test2
+.pio_version 1
+.clock_div 65535.99999
+    nop
+
+// -- Output

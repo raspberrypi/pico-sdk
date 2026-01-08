@@ -1,0 +1,6 @@
+// run: pioasm -o c-sdk input.pio
+// run: pioasm -o python input.pio
+// run: pioasm -o hex input.pio
+// run: pioasm -o json input.pio
+. program format_test
+    nop

@@ -1,0 +1,8 @@
+// run: pioasm -v 1 input.pio
+.program mov_status_test
+.pio_version 1
+.mov_status txfifo < 4
+. mov_status irq next set 3
+    mov x, status
+
+// -- Output

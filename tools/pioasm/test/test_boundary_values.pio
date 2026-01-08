@@ -1,0 +1,10 @@
+// run: pioasm input.pio
+.program boundary_test
+    in pins, 1         ; min bit count
+    in pins, 32        ; max bit count
+    set pins, 0        ; min value
+    set pins, 31       ; max value
+    irq 0              ; min IRQ
+    irq 7              ; max IRQ
+
+// -- Output

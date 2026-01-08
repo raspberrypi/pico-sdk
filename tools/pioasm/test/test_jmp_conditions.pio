@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+. program jmp_test
+start:
+    jmp start          ; unconditional
+    jmp ! x, start      ; if X zero
+    jmp x--, start     ; if X non-zero, post-decrement
+    jmp !y, start      ; if Y zero
+    jmp y--, start     ; if Y non-zero, post-decrement
+    jmp x!=y, start    ; if X != Y
+    jmp pin, start     ; if pin
+    jmp ! osre, start   ; if OSR not empty
+
+// -- Output

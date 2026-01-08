@@ -1,0 +1,14 @@
+// run: pioasm input.pio
+. program push_pull_test
+    push
+    push block
+    push noblock
+    push iffull
+    push iffull block
+    pull
+    pull block
+    pull noblock
+    pull ifempty
+    pull ifempty noblock
+
+// -- Output

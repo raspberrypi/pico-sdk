@@ -1,0 +1,12 @@
+// run: pioasm -v 0 input.pio
+.program pio_v0
+. pio_version 0
+    wait 0 gpio 7      ; max GPIO 31 on v0
+
+.program pio_v1
+.pio_version 1
+    wait 0 gpio 47     ; extended GPIO on v1
+    wait 0 jmppin + 3  ; jmppin offset on v1
+    irq next 0         ; next/prev on v1
+
+// -- Output

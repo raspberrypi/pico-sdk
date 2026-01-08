@@ -1,0 +1,13 @@
+// run: pioasm -v 1 input.pio
+.program mov_test
+    mov x, y
+    mov x, !y          ; bitwise NOT
+    mov x, :: y         ; bit reverse
+    mov pins, x
+    mov x, pins
+    mov y, status      ; read status
+    mov osr, isr
+    mov isr, osr
+    mov pc, x          ; computed jump
+
+// -- Output

@@ -1,0 +1,12 @@
+// run: pioasm -v 1 input.pio
+.program wait_test
+    wait 0 gpio 5      ; wait GPIO low
+    wait 1 gpio 10     ; wait GPIO high
+    wait 0 pin 2       ; wait pin low
+    wait 1 pin 3       ; wait pin high
+    wait 0 irq 4       ; wait IRQ clear
+    wait 1 irq 7 rel   ; wait IRQ set, relative
+    wait 0 jmppin      ; wait jmppin low (PIO v1)
+    wait 1 jmppin + 2  ; wait jmppin offset (PIO v1)
+
+// -- Output

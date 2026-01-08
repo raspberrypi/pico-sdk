@@ -1,0 +1,18 @@
+// run: pioasm input.pio
+. program sideset_test
+. side_set 3
+    nop         side 0
+    nop         side 7
+    set pins, 1 side 3
+
+.program sideset_opt_test
+.side_set 2 opt
+    nop
+    nop         side 1
+    nop         side 3
+
+.program sideset_pindirs_test
+.side_set 2 opt pindirs
+    nop         side 2
+
+// -- Output

@@ -1,0 +1,10 @@
+// run: pioasm input.pio
+.program delay_test
+    nop            [0]
+    nop            [7]
+    nop            [31]
+    set pins, 0    [15]
+    jmp loop       [3]
+loop:
+
+// -- Output

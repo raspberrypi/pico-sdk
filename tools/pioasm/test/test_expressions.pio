@@ -1,0 +1,16 @@
+// run: pioasm input.pio
+.program expr_test
+. define a 5
+.define b 3
+    set pins, (a + b)      ; addition
+    set pins, (a - b)      ; subtraction
+    set pins, (a * b)      ; multiplication
+    set pins, (a / b)      ; division
+    set pins, (a | b)      ; OR
+    set pins, (a & b)      ; AND
+    set pins, (a ^ b)      ; XOR
+    set pins, (1 << 4)     ; shift left
+    set pins, (16 >> 2)    ; shift right
+    set pins, (:: 0b10110)  ; reverse
+
+// -- Output

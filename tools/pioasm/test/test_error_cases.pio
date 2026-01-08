@@ -1,0 +1,8 @@
+// run: pioasm input.pio #expect-error
+.program error_test
+    in pins, 0         ; invalid:  bit count must be 1-32
+    in pins, 33        ; invalid: bit count too large
+    jmp 99             ; invalid: address out of range
+    irq 8              ; invalid: IRQ number too large
+
+// -- Output

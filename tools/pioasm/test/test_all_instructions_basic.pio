@@ -1,0 +1,14 @@
+// run: pioasm -o hex input.pio
+.program all_basic
+    jmp loop           ; JMP instruction
+    wait 0 gpio 0      ; WAIT instruction  
+    in pins, 8         ; IN instruction
+    out pins, 8        ; OUT instruction
+    push               ; PUSH instruction
+    pull               ; PULL instruction
+    mov x, y           ; MOV instruction
+    irq 0              ; IRQ instruction
+    set pins, 0        ; SET instruction
+loop:
+
+// -- Output

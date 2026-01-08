@@ -1,0 +1,12 @@
+// run: pioasm -v 1 input.pio
+.program irq_test
+    irq 0              ; set IRQ 0
+    irq 7              ; set IRQ 7
+    irq clear 3        ; clear IRQ 3
+    irq wait 2         ; set and wait IRQ 2
+    irq 1 rel          ; relative IRQ
+    irq next 0         ; next state machine (PIO v1)
+    irq prev 0         ; previous state machine (PIO v1)
+    irq next clear 1   ; combined (PIO v1)
+
+// -- Output
