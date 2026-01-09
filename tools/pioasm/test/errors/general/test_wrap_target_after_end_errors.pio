@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program wrap_target_after_end
+    nop
+.wrap_target
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.1-12: .wrap_target cannot be placed after the last program instruction
+//     4 | .wrap_target
+//       | ^~~~~~~~~~~~
+// 

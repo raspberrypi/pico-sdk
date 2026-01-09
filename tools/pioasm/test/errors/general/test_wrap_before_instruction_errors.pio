@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program wrap_error
+.wrap
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.1-5: .wrap cannot be placed before the first program instruction
+//     3 | .wrap
+//       | ^~~~~
+// 

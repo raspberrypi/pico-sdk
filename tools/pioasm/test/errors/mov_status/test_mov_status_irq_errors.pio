@@ -1,0 +1,14 @@
+// run: pioasm -v 1 input.pio
+.program mov_status_irq
+.pio_version 1
+.mov_status irq set 8
+    mov x, status
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.21: irq number should be >= 0 and <= 7
+//     4 | .mov_status irq set 8
+//       |                     ^
+// 

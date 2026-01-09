@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program delay_sideset_limit
+.side_set 5
+    nop side 0 [1]
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.17: the instruction delay limit is 0 because of the side set specified at input.pio:3.1-11
+//     4 |     nop side 0 [1]
+//       |                 ^
+// 

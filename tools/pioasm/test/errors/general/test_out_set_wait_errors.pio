@@ -1,0 +1,14 @@
+// run: pioasm input.pio
+.program out_set_wait_invalid
+    out pins, 0
+    set pins, 32
+    wait 2 irq 0
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.15: 'out' bit count must be >= 1 and <= 32
+//     3 |     out pins, 0
+//       |               ^
+// 
