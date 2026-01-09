@@ -1,0 +1,60 @@
+// run: pioasm -o json input.pio
+.define public GLOBAL_CONST 2
+.program json_cov
+.pio_version 1
+.lang_opt json some_option = 1
+.side_set 2 opt pindirs
+.define public LOCAL_CONST 3
+public entry:
+    nop side 0
+    jmp entry
+
+.program json_no_sideset
+.origin 5
+    nop
+// -- Output
+// Command: pioasm -o json input.pio
+// Exit code: 0
+// Stdout:
+// {
+// 	"publicSymbols": {
+// 		"GLOBAL_CONST": 2
+// 	},
+// 	"programs": [
+// 		{
+// 			"name": "json_cov",
+// 			"wrapTarget": 0,
+// 			"wrap": 1,
+// 			"origin": -1,
+// 			"sideset": {"size": 3, "optional": true, "pindirs": true},
+// 			"publicSymbols": {
+// 				"LOCAL_CONST": 3
+// 			},
+// 			"publicLabels": {
+// 				"entry": 0
+// 			},
+// 			"instructions": [
+// 				{"hex": "B042"},
+// 				{"hex": "0000"}
+// 			]
+// 		},
+// 		{
+// 			"name": "json_no_sideset",
+// 			"wrapTarget": 0,
+// 			"wrap": 0,
+// 			"origin": 5,
+// 			"sideset": {"size": 0, "optional": false, "pindirs": false},
+// 			"publicSymbols": {
+// 			},
+// 			"publicLabels": {
+// 			},
+// 			"instructions": [
+// 				{"hex": "A042"}
+// 			]
+// 		}
+// 	]
+// }
+// 
+// Stderr:
+// warning: json does not support output options; json lang_opt ignored.
+// 
