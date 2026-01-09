@@ -93,7 +93,7 @@ def run_test(test: Path, overwrite: bool = False) -> bool:
 		for output_line in output_lines:
 			expected_output.append(strip_trailing_newline(output_line))
 
-		if expected_output != commands_output:
+		if not outputs_match(expected_output, commands_output):
 			print("Test failed!")
 			#print a diff instead
 			#an actual diff that is not broken if there is a new / removed line. maybe use a lib
@@ -107,6 +107,16 @@ def run_test(test: Path, overwrite: bool = False) -> bool:
 			# print("\n".join(commands_output))
 			return False
 
+	return True
+
+def outputs_match(expected: list[str], actual: list[str]) -> bool:
+	if len(expected) != len(actual):
+		return False
+	for expected_line, actual_line in zip(expected, actual):
+		if expected_line.startswith("//?"):
+			continue
+		if expected_line != actual_line:
+			return False
 	return True
 
 def strip_trailing_newline(line: str) -> str:
