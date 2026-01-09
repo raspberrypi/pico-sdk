@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program fifo_missing_mode
+.fifo
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.1-5: expected txrx, tx or rx
+//     3 | .fifo
+//       | ^~~~~
+// 

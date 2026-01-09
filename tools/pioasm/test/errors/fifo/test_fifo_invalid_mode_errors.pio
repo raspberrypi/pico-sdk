@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program fifo_invalid_mode
+.fifo bogus
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.7-11: syntax error, unexpected identifier
+//     3 | .fifo bogus
+//       |       ^~~~~
+// 

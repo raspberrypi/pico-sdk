@@ -1,0 +1,13 @@
+// run: pioasm -v 1 input.pio
+.program wait_irq_next_rel
+.pio_version 1
+    wait 0 irq next, 0 rel
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.24-26: 'rel' is not supported for 'irq next'
+//     4 |     wait 0 irq next, 0 rel
+//       |                        ^~~
+// 
