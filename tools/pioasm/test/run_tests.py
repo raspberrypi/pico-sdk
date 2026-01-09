@@ -13,7 +13,7 @@ import os, sys, subprocess, tempfile, shutil, re, unittest
 from typing import Optional
 from pathlib import Path
 
-TEST_DIR = Path(".") / "test"
+TEST_DIR = Path(__file__).resolve().parent
 OVERWRITE = False
 PIOASM_BIN = None
 
@@ -133,6 +133,11 @@ def execute_command(test_file, command) -> tuple[int, str, str]:
 	shutil.copy(test_file, Path(tempdir) / "input.pio")
 
 	env = os.environ.copy()
+	coverage_dir = env.get("COVERAGE_DIR") or env.get("TEST_UNDECLARED_OUTPUTS_DIR")
+	if coverage_dir:
+		env.setdefault("GCOV_PREFIX", coverage_dir)
+		env.setdefault("GCOV_PREFIX_STRIP", "0")
+		env.setdefault("LLVM_PROFILE_FILE", str(Path(coverage_dir) / "pioasm-%p.profraw"))
 	if PIOASM_BIN:
 		pioasm_dir = str(Path(PIOASM_BIN).parent)
 		env["PATH"] = f"{pioasm_dir}{os.pathsep}{env.get('PATH', '')}"
@@ -162,6 +167,44 @@ _register_tests()
 def resolve_pioasm_bin() -> Optional[str]:
 	env_bin = os.environ.get("PIOASM_BIN")
 	if env_bin:
+		env_path = Path(env_bin)
+		if env_path.is_absolute():
+			return str(env_path)
+		runfiles_dir = os.environ.get("RUNFILES_DIR")
+		if runfiles_dir:
+			candidate = Path(runfiles_dir) / env_path
+			if candidate.exists():
+				return str(candidate)
+			candidate = Path(runfiles_dir) / "_main" / env_path
+			if candidate.exists():
+				return str(candidate)
+		manifest = os.environ.get("RUNFILES_MANIFEST_FILE")
+		if manifest:
+			with open(manifest, "r") as manifest_file:
+				for line in manifest_file:
+					if line.startswith(f"{env_path} "):
+						return line.split(" ", 1)[1].strip()
+					if line.startswith(f"_main/{env_path} "):
+						return line.split(" ", 1)[1].strip()
+		for parent in Path(__file__).resolve().parents:
+			if parent.name == "_main":
+				candidate = parent.parent / env_path
+				if candidate.exists():
+					return str(candidate)
+				candidate = parent / env_path
+				if candidate.exists():
+					return str(candidate)
+				break
+		for parent in Path(__file__).resolve().parents:
+			if parent.name == "execroot":
+				candidate = parent / env_path
+				if candidate.exists():
+					return str(candidate)
+				break
+		repo_root = Path(__file__).resolve().parents[3]
+		candidate = repo_root / env_path
+		if candidate.exists():
+			return str(candidate)
 		return env_bin
 
 	repo_root = Path(__file__).resolve().parents[3]
@@ -171,8 +214,9 @@ def resolve_pioasm_bin() -> Optional[str]:
 
 	return None
 
+PIOASM_BIN = resolve_pioasm_bin()
+
 if __name__ == "__main__":
-	PIOASM_BIN = resolve_pioasm_bin()
 	if "--overwrite" in sys.argv:
 		OVERWRITE = True
 		sys.argv.remove("--overwrite")

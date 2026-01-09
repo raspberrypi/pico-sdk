@@ -13,7 +13,6 @@ cc_library(
         "gen/location.h",
         "gen/parser.cpp",
         "gen/parser.hpp",
-        "go_output.cpp",
         "main.cpp",
         "output_format.h",
         "pio_assembler.cpp",
@@ -39,6 +38,8 @@ cc_library(
     target_compatible_with = ["//bazel/constraint:host"],
 )
 
+# Register and link outputs as dynamic libraries to ensure they are properly recognized.
+
 cc_library(
     name = "json_output",
     srcs = ["json_output.cpp"],
@@ -63,6 +64,13 @@ cc_library(
 cc_library(
     name = "hex_output",
     srcs = ["hex_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "go_output",
+    srcs = ["go_output.cpp"],
     deps = [":pioasm_core"],
     alwayslink = True,
 )
@@ -95,6 +103,7 @@ cc_binary(
     deps = [
         ":ada_output",
         ":c_sdk_output",
+        ":go_output",
         ":hex_output",
         ":json_output",
         ":pioasm_core",
@@ -110,4 +119,46 @@ py_test(
         "PIOASM_BIN": "$(location :pioasm)",
     },
     main = "test/run_tests.py",
+    size = "small",
+    timeout = "short",
+)
+
+sh_test(
+    name = "pioasm_coverage_tests",
+    srcs = ["test/run_tests.sh"],
+    data = glob(["test/**/*.pio"]) + [
+        ":pioasm",
+        "test/run_tests.py",
+    ],
+    env = {
+        "PIOASM_BIN": "$(location :pioasm)",
+    },
+    size = "small",
+    timeout = "short",
+)
+
+cc_test(
+    name = "pioasm_core_coverage_test",
+    srcs = ["test/pioasm_core_coverage_test.cc"],
+    data = glob(["test/**/*.pio"]),
+    copts = select({
+        "@rules_cc//cc/compiler:msvc-cl": ["/std:c++20"],
+        "//conditions:default": ["-std=c++17"],
+    }),
+    deps = [
+        ":ada_output",
+        ":c_sdk_output",
+        ":go_output",
+        ":hex_output",
+        ":json_output",
+        ":pioasm_core",
+        ":python_output",
+    ],
+    size = "small",
+    timeout = "short",
+)
+
+sh_binary(
+    name = "pioasm_coverage",
+    srcs = ["test/coverage.sh"],
 )
