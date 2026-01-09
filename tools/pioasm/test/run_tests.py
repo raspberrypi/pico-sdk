@@ -80,19 +80,25 @@ def run_test(test: Path, overwrite: bool = False) -> bool:
 			commands_output.extend(format_stream_output("Stdout:", out))
 			commands_output.extend(format_stream_output("Stderr:", err))
 
+	expected_output = []
+	for output_line in output_lines:
+		expected_output.append(strip_trailing_newline(output_line))
+
 	if overwrite:
-		# Rewrite the test file with new output
+		# Rewrite the test file with new output, preserving wildcard lines.
+		merged_output = list(commands_output)
+		for index, expected_line in enumerate(expected_output):
+			if index >= len(merged_output):
+				break
+			if expected_line.startswith("//?"):
+				merged_output[index] = expected_line
 		with open(test, "w") as test_file:
 			for line in lines:
 				test_file.write(line)
-			for output_line in commands_output:
+			for output_line in merged_output:
 				test_file.write(output_line + "\n")
 	else:
 		# Compare output
-		expected_output = []
-		for output_line in output_lines:
-			expected_output.append(strip_trailing_newline(output_line))
-
 		if not outputs_match(expected_output, commands_output):
 			print("Test failed!")
 			#print a diff instead
