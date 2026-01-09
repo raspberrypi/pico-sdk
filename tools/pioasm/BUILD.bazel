@@ -123,9 +123,9 @@ py_test(
     timeout = "short",
 )
 
-sh_test(
+py_test(
     name = "pioasm_coverage_tests",
-    srcs = ["test/run_tests.sh"],
+    srcs = ["test/run_tests_wrapper.py"],
     data = glob(["test/**/*.pio"]) + [
         ":pioasm",
         "test/run_tests.py",
@@ -133,6 +133,7 @@ sh_test(
     env = {
         "PIOASM_BIN": "$(location :pioasm)",
     },
+    main = "test/run_tests_wrapper.py",
     size = "small",
     timeout = "short",
 )
@@ -158,7 +159,8 @@ cc_test(
     timeout = "short",
 )
 
-sh_binary(
+py_binary(
     name = "pioasm_coverage",
-    srcs = ["test/coverage.sh"],
+    srcs = ["test/coverage.py"],
+    main = "test/coverage.py",
 )
