@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (c) 2024 Raspberry Pi (Trading) Ltd.
+# Copyright (c) 2026 Raspberry Pi (Trading) Ltd.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -107,10 +107,6 @@ def run_test(test: Path, overwrite: bool = False) -> bool:
 			diff = difflib.unified_diff(expected_output, commands_output, fromfile='expected', tofile='actual', lineterm='')
 			print('\n'.join(diff))
 
-			# print("Expected output:")
-			# print("\n".join(expected_output))
-			# print("Actual output:")
-			# print("\n".join(commands_output))
 			return False
 
 	return True
