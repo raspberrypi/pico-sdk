@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program out_count_too_large
+.out 33
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.6-7: out pin count should be >= 0 and <= 32
+//     3 | .out 33
+//       |      ^~
+// 
