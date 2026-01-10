@@ -3,10 +3,6 @@
 .pio_version 0
     wait 0 gpio 32
 
-.program gpio_v1_overflow
-.pio_version 1
-    wait 0 gpio 48
-
 // -- Output
 // Command: pioasm -v 0 input.pio
 // Exit code: 1
