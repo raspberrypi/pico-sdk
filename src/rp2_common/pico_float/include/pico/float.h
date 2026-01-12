@@ -184,6 +184,19 @@ uint32_t float2ufix(float f, int e);
 int64_t float2fix64(float f, int e);
 uint64_t float2ufix64(float f, int e);
 
+#if LIB_PICO_FLOAT_PICO_DCP
+float int2float_unsafe(int32_t i);
+float uint2float_unsafe(uint32_t i);
+int32_t float2int_z_unsafe(float f);
+int32_t float2uint_z_unsafe(float f);
+int32_t float2fix_z_unsafe(float f, int e);
+int32_t float2int_unsafe(float f);
+uint32_t float2uint_unsafe(float f);
+int32_t float2fix_unsafe(float f, int e);
+uint32_t float2ufix_unsafe(float f, int e);
+uint32_t float2ufix_z_unsafe(float f, int e);
+#endif
+
 #if LIB_PICO_FLOAT_PICO_VFP
 // a bit of a hack to inline VFP fixed point conversion when exponent is constant and in range 1-32
 #define fix2float(m, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _fix2float_inline(m, e) : fix2 ## float(m, e), fix2 ## float(m, e))
@@ -295,6 +308,11 @@ float powintf(float x, int y);
 #if !PICO_RP2040 || PICO_COMBINED_DOCS
 float fdiv_fast(float n, float d);
 float sqrtf_fast(float f);
+
+#if LIB_PICO_FLOAT_PICO_DCP
+float fdiv_fast_unsafe(float n, float d);
+float sqrtf_fast_unsafe(float f);
+#endif
 #endif
 
 #endif

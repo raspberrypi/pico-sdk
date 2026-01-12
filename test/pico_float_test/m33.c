@@ -15,8 +15,17 @@ extern ui64 sqrt_fast(ui64);
 #define m33cf_dadd __aeabi_dadd
 #define m33cf_dsub __aeabi_dsub
 #define m33cf_dmul __aeabi_dmul
+
+#if LIB_PICO_DOUBLE_PICO && PICO_DOUBLE_USE_UNSAFE_DCP
+extern ui64 ddiv_fast_unsafe(ui64, ui64);
+extern ui64 sqrt_fast_unsafe(ui64);
+#define m33cf_ddiv_fast ddiv_fast_unsafe
+#define m33cf_dsqrt_fast sqrt_fast_unsafe
+#else
 #define m33cf_ddiv_fast ddiv_fast
 #define m33cf_dsqrt_fast sqrt_fast
+#endif
+
 static void checkf(ui32 r,ui32 t) {
     static int n=0;
     if(r!=t) {

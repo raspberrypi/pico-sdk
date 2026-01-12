@@ -73,11 +73,18 @@ double_wrapper_section __dfma
 @ r0:r1 m
 @ r2:r3 n
 @ [r13,#0] a
+regular_func fma_safe
+#if !PICO_DOUBLE_USE_UNSAFE_DCP
 wrapper_func fma
+#endif
  mov r12,sp                  @ save the SP
  PCMP apsr_nzcv              @ test the engaged flag
  bmi 1b
 1:
+#if PICO_DOUBLE_USE_UNSAFE_DCP
+wrapper_func fma
+#endif
+regular_func fma_unsafe
  push {r4-r8,r14}
  ldrd r4,r5,[r12,#0]         @ fetch a using original SP
  ubfx r7,r1,#20,#11          @ r7=em
@@ -597,6 +604,8 @@ regular_func mla
  mov r12,sp                  @ save the SP
  PCMP apsr_nzcv              @ test the engaged flag
  bmi 1b
+regular_func fma_fast_unsafe
+regular_func mla_unsafe
 1:
  push {r4,r5,r14}
  dcp_dmul_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r4,r5,r14

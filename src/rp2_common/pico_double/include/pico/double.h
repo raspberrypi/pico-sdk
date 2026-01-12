@@ -162,6 +162,19 @@ uint32_t double2ufix(double f, int e);
 int64_t double2fix64(double f, int e);
 uint64_t double2ufix64(double f, int e);
 
+#if PICO_RP2350
+int32_t double2int_unsafe(double f);
+uint32_t double2uint_unsafe(double f);
+int32_t double2fix_unsafe(double f, int e);
+uint32_t double2ufix_unsafe(double f, int e);
+int32_t double2fix_z_unsafe(double f, int e);
+double int2double_unsafe(int32_t i);
+double uint2double_unsafe(uint32_t i);
+int32_t double2int_z_unsafe(double f);
+int32_t double2uint_z_unsafe(double f);
+uint32_t double2ufix_z_unsafe(double f, int e);
+#endif
+
 #endif
 
 double exp10(double x);
@@ -173,6 +186,12 @@ double ddiv_fast(double n, double d);
 double sqrt_fast(double f);
 double fma_fast(double x, double y, double z); // this is not fused
 double mla(double x, double y, double z); // another name for fma_fast
+#if !defined(__riscv) && LIB_PICO_DOUBLE_PICO
+double ddiv_fast_unsafe(double n, double d);
+double sqrt_fast_unsafe(double f);
+double fma_fast_unsafe(double x, double y, double z);
+double mla_unsafe(double x, double y, double z);
+#endif
 #endif
 
 #endif

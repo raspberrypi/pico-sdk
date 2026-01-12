@@ -49,10 +49,31 @@ regular_func \opt_label1
 .ifnc \opt_label2,'-'
 regular_func \opt_label2
 .endif
-  // This is the actual entry point:
+  // For wrapper functions: export `<func>_safe`, `<func>_unsafe` and configurable `<func>`.
+  // For regular functions: export fixed `<func>` and `<func>_unsafe`.
+.ifc \type,wrapper
+regular_func \func\()_safe
+#if !PICO_FLOAT_USE_UNSAFE_DCP
 \type\()_func \func
+#endif
+.else
+\type\()_func \func
+.endif
   PCMP apsr_nzcv
   bmi 1b
+#if PICO_FLOAT_USE_UNSAFE_DCP
+.ifc \type,wrapper
+\type\()_func \func
+.endif
+#endif
+regular_func \func\()_unsafe
+.ifnc \opt_label1,'-'
+regular_func \opt_label1\()_unsafe
+.endif
+.ifnc \opt_label2,'-'
+regular_func \opt_label2\()_unsafe
+.endif
+  // This is the actual entry point:
 1:
 .endm
 
@@ -137,6 +158,11 @@ saving_func regular fclassify
   saving_func_return
 
 // ============== CONVERSION FUNCTIONS ===============
+
+// PICO_CONFIG: PICO_FLOAT_USE_UNSAFE_DCP, Use unsafe variant as the default implemention for all wrapper functions, default=0, type=bool, group=pico_float
+#if 0
+#define PICO_FLOAT_USE_UNSAFE_DCP 0
+#endif
 
 float_wrapper_section __aeabi_f2d
 saving_func wrapper __aeabi_f2d float2double
