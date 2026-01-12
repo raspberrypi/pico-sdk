@@ -156,7 +156,7 @@ saving_func wrapper __aeabi_ui2f uint2float
   saving_func_return
 
 float_section float2fix_z
-regular_func float2fix_z
+saving_func regular float2fix_z
   ubfx r2, r0, #23, #8
   cbz r2, 2f // input is zero or denormal
   cmp r2, #0xff
@@ -170,11 +170,11 @@ regular_func float2fix_z
   b float2int_z_entry
 2:
   movs r0, #0
-  bx lr
+  saving_func_return
 3:
   mvn r1, #0x80000000
   add r0, r1, r0, lsr#31 @ so -Inf → 0x80000000, +Inf → 0x7fffffff
-  bx lr
+  saving_func_return
 
 float_wrapper_section __aeabi_f2iz
 saving_func wrapper __aeabi_f2iz float2int_z
@@ -184,8 +184,7 @@ float2int_z_entry:
   saving_func_return
 
 float_section __aeabi_f2ufix
-regular_func float2ufix
-regular_func float2ufix_z
+saving_func regular float2ufix float2ufix_z
   ubfx r2, r0, #23, #8
   cbz r2, 2f // input is zero or denormal
   cmp r2, #0xff
@@ -199,10 +198,10 @@ regular_func float2ufix_z
   b float2uint_z_entry
 2:
   movs r0, #0
-  bx lr
+  saving_func_return
 3:
   mvn r0, r0, asr #31
-  bx lr
+  saving_func_return
 
 float_wrapper_section __aeabi_f2uiz
 saving_func wrapper __aeabi_f2uiz float2uint_z float2uint
