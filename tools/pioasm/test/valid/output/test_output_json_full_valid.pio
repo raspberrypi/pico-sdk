@@ -1,6 +1,5 @@
 // run: pioasm -o json input.pio
 .define PUBLIC global_const 7
-
 .program format_test
 .origin 4
 .side_set 2 opt pindirs
@@ -9,6 +8,25 @@ public entry:
 .wrap_target
     nop side 1
 .wrap
+
+.lang_opt lang1 opt1 = "this is a test 1"
+.lang_opt lang2 opt1 = "this is a test 2"
+.lang_opt lang1 opt2 = test_3
+.lang_opt lang1 opt2 = test_4
+
+% lang1 {
+    foo
+%}
+
+% lang2 {
+    bar
+%}
+
+% lang1 {
+    foobar
+%}
+
+.lang_opt lang1 opt3 = test_5
 
 .program second_prog
     nop
@@ -55,3 +73,6 @@ public entry:
 // }
 // 
 // Stderr:
+// input.pio:17.1-19.2: warning, unknown code block output type 'lang1'
+// input.pio:21.1-23.2: warning, unknown code block output type 'lang2'
+// 
