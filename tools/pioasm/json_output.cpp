@@ -173,7 +173,7 @@ struct json_output : public output_format {
                 if (program.mov_status_type < 0 || program.mov_status_type >= 3) {
                     throw std::runtime_error("unknown mov_status type");
                 }
-                fprintf(out, "%s\"movStatus\": {\"type\": %s, \"n\": %d},\n", tabs, types[program.mov_status_type], program.mov_status_n);
+                fprintf(out, "%s\"movStatus\": {\"type\": \"%s\", \"n\": %d},\n", tabs, types[program.mov_status_type], program.mov_status_n);
             } else {
                 fprintf(out, "%s\"movStatus\": null,\n", tabs);
             }
