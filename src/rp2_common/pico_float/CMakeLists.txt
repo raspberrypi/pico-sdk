@@ -106,9 +106,10 @@
 
     target_link_libraries(pico_float_none INTERFACE pico_float_headers)
     wrap_float_functions(pico_float_none) # we wrap all functions
-    # be explicit that there should be no floating point instructions
-    target_compile_options(pico_float_none INTERFACE -msoft-float)
-
+    if (NOT PICO_RISCV)
+        # be explicit that there should be no floating point instructions
+        target_compile_options(pico_float_none INTERFACE -msoft-float)
+    endif()
     pico_add_library(pico_float_pico)
     if (PICO_RP2040)
         target_sources(pico_float_pico INTERFACE
