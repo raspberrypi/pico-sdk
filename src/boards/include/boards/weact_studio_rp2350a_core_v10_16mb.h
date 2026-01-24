@@ -9,16 +9,20 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-#ifndef _BOARDS_WAVESHARE_RP2350_PLUS_4MB_H
-#define _BOARDS_WAVESHARE_RP2350_PLUS_4MB_H
+// This header may be included by other board headers as "boards/weact_studio_rp2350a_core_v10_16mb.h"
+
+#ifndef _BOARDS_WEACT_STUDIO_RP2350A_CORE_V10_16MB_H
+#define _BOARDS_WEACT_STUDIO_RP2350A_CORE_V10_16MB_H
 
 pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
 // For board detection
-#define WAVESHARE_RP2350_PLUS_4MB
+#define WEACT_STUDIO_RP2350A_CORE_V10_16MB
 
-// --- RP2350 VARIANT ---
-#define PICO_RP2350A 1
+// --- BOARD SPECIFIC ---
+#define WEACT_STUDIO_USER_SW_PIN 23
+#define WEACT_STUDIO_LED1_PIN 24
+#define WEACT_STUDIO_LED2_PIN 25
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
@@ -31,17 +35,24 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_DEFAULT_UART_RX_PIN 1
 #endif
 
-// no PICO_DEFAULT_WS2812_PIN
+// --- LED ---
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN 25
+#endif
+
+#ifndef PICO_DEFAULT_LED1_PIN
+#define PICO_DEFAULT_LED1_PIN WEACT_STUDIO_LED1_PIN
+#endif
 
 // --- I2C ---
 #ifndef PICO_DEFAULT_I2C
-#define PICO_DEFAULT_I2C 1
+#define PICO_DEFAULT_I2C 0
 #endif
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
-#define PICO_DEFAULT_I2C_SDA_PIN 6
+#define PICO_DEFAULT_I2C_SDA_PIN 4
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
-#define PICO_DEFAULT_I2C_SCL_PIN 7
+#define PICO_DEFAULT_I2C_SCL_PIN 5
 #endif
 
 // --- SPI ---
@@ -61,25 +72,21 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_DEFAULT_SPI_CSN_PIN 17
 #endif
 
-// --- ADC ---
-#ifndef WAVESHARE_BAT_ADC_PIN
-#define WAVESHARE_BAT_ADC_PIN 29
-#endif
-
 // --- FLASH ---
-
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
 
 #ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (4 * 1024 * 1024))
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
+#define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-#define PICO_SMPS_MODE_PIN 23
+
+// --- RP2350 VARIANT ---
+// This means RP2350B.
+#define PICO_RP2350A 1
 
 pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #ifndef PICO_RP2350_A2_SUPPORTED

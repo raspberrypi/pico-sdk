@@ -196,9 +196,11 @@ void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled) {
 }
 
 void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback) {
-    // first set callback, then enable the interrupt
-    gpio_set_irq_callback(callback);
+    // when enabling, first set callback, then enable the interrupt
+    // when disabling, first disable the interrupt, then clear callback
+    if (enabled) gpio_set_irq_callback(callback);
     gpio_set_irq_enabled(gpio, events, enabled);
+    if (!enabled) gpio_set_irq_callback(callback);
     if (enabled) irq_set_enabled(IO_IRQ_BANK0, true);
 }
 

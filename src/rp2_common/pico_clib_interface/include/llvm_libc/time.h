@@ -14,7 +14,7 @@
 
 __BEGIN_C_DECLS
 
-struct tm* localtime_r(const time_t* timer, struct tm* buf);
+struct tm* localtime_r(const time_t* timer, struct tm* buf) __NOEXCEPT;
 
 __END_C_DECLS
 

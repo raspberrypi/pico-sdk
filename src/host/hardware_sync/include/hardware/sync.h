@@ -109,8 +109,6 @@ extern "C" {
 
 void __sev();
 
-void __wev();
-
 void __wfi();
 
 void __wfe();

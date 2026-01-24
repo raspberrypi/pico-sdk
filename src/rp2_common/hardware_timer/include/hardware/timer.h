@@ -157,7 +157,7 @@ static_assert(TIMER1_IRQ_3 == TIMER0_IRQ_0 + 7, "");
  * On RP2040 this must be 0 as there is only one timer instance
  * \endif
  * \if rp2350_specific
- * On RP2040 this may be set to 0 or 1
+ * On RP2350 this may be set to 0 or 1
  * \endif
  */
 #ifndef PICO_DEFAULT_TIMER

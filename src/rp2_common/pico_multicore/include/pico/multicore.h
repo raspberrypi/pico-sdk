@@ -377,7 +377,7 @@ static inline void multicore_doorbell_clear_current_core(uint doorbell_num) {
     sio_hw->doorbell_in_clr = 1u << doorbell_num;
 }
 
-/*! \brief Determine if the given doorbell is active on the other core
+/*! \brief Determine if the given doorbell is active on this core
  * \ingroup multicore_doorbell
  * \param doorbell_num the doorbell number
  */
@@ -386,7 +386,7 @@ static inline bool multicore_doorbell_is_set_current_core(uint doorbell_num) {
     return sio_hw->doorbell_in_set & (1u << doorbell_num);
 }
 
-/*! \brief Determine if the given doorbell is active on the this core
+/*! \brief Determine if the given doorbell is active on the other core
  * \ingroup multicore_doorbell
  * \param doorbell_num the doorbell number
  */

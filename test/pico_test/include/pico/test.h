@@ -39,11 +39,13 @@ but not sure that is implemented yet.
 
 #define PICOTEST_CHECK_AND_ABORT(COND, MESSAGE) if (!(COND)) {                                     \
                                         printf("Module %s: %s\n", picotest_module, MESSAGE);       \
+                                        picotest_error_code = -1;                                   \
                                         return -1;                                                  \
                                     }
 
 #define PICOTEST_CHECK_CHANNEL_AND_ABORT(CHANNEL, COND, MESSAGE) if (!(COND)) {                    \
                                         printf("Module %s, channel %d: %s\n", picotest_module, CHANNEL, MESSAGE);  \
+                                        picotest_error_code = -1;                                   \
                                         return -1;                                                  \
                                     }
 

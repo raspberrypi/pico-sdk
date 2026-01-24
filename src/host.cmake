@@ -38,6 +38,7 @@ include (${CMAKE_DIR}/no_hardware.cmake)
  pico_add_subdirectory(${HOST_DIR}/pico_stdio)
  pico_add_subdirectory(${HOST_DIR}/pico_stdlib)
  pico_add_subdirectory(${HOST_DIR}/pico_time_adapter)
+ pico_add_subdirectory(${HOST_DIR}/pico_unique_id)
 
 unset(CMAKE_DIR)
 unset(COMMON_DIR)

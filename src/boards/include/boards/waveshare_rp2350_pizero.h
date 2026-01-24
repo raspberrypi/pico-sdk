@@ -9,28 +9,28 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-#ifndef _BOARDS_WAVESHARE_RP2040_BLE_H
-#define _BOARDS_WAVESHARE_RP2040_BLE_H
+// This header may be included by other board headers as "boards/waveshare_rp2350_pizero.h"
 
-pico_board_cmake_set(PICO_PLATFORM, rp2040)
+#ifndef _BOARDS_WAVESHARE_RP2350_PIZERO_H
+#define _BOARDS_WAVESHARE_RP2350_PIZERO_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
 // For board detection
-#define WAVESHARE_RP2040_BLE
+#define WAVESHARE_RP2350_PIZERO
+
+// --- RP2350 VARIANT ---
+#define PICO_RP2350A 0
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
-#define PICO_DEFAULT_UART 0
+#define PICO_DEFAULT_UART 1
 #endif
 #ifndef PICO_DEFAULT_UART_TX_PIN
-#define PICO_DEFAULT_UART_TX_PIN 0
+#define PICO_DEFAULT_UART_TX_PIN 4
 #endif
 #ifndef PICO_DEFAULT_UART_RX_PIN
-#define PICO_DEFAULT_UART_RX_PIN 1
-#endif
-
-// --- WS2812 ---
-#ifndef PICO_DEFAULT_WS2812_PIN
-#define PICO_DEFAULT_WS2812_PIN 16
+#define PICO_DEFAULT_UART_RX_PIN 5
 #endif
 
 // --- I2C ---
@@ -38,46 +38,45 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define PICO_DEFAULT_I2C 1
 #endif
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
-#define PICO_DEFAULT_I2C_SDA_PIN 6
+#define PICO_DEFAULT_I2C_SDA_PIN 2
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
-#define PICO_DEFAULT_I2C_SCL_PIN 7
+#define PICO_DEFAULT_I2C_SCL_PIN 3
 #endif
 
 // --- SPI ---
 #ifndef PICO_DEFAULT_SPI
-#define PICO_DEFAULT_SPI 0
+#define PICO_DEFAULT_SPI 1
 #endif
 #ifndef PICO_DEFAULT_SPI_SCK_PIN
-#define PICO_DEFAULT_SPI_SCK_PIN 2
+#define PICO_DEFAULT_SPI_SCK_PIN 10
 #endif
 #ifndef PICO_DEFAULT_SPI_TX_PIN
-#define PICO_DEFAULT_SPI_TX_PIN 3
+#define PICO_DEFAULT_SPI_TX_PIN 11
 #endif
 #ifndef PICO_DEFAULT_SPI_RX_PIN
-#define PICO_DEFAULT_SPI_RX_PIN 4
+#define PICO_DEFAULT_SPI_RX_PIN 12
 #endif
 #ifndef PICO_DEFAULT_SPI_CSN_PIN
-#define PICO_DEFAULT_SPI_CSN_PIN 5
+#define PICO_DEFAULT_SPI_CSN_PIN 13
 #endif
 
 // --- FLASH ---
+
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
 
 #ifndef PICO_FLASH_SPI_CLKDIV
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
+#define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-#define PICO_SMPS_MODE_PIN 23
 
-// All boards have B1 RP2040
-#ifndef PICO_RP2040_B0_SUPPORTED
-#define PICO_RP2040_B0_SUPPORTED  0
+pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
+#ifndef PICO_RP2350_A2_SUPPORTED
+#define PICO_RP2350_A2_SUPPORTED 1
 #endif
 
 #endif

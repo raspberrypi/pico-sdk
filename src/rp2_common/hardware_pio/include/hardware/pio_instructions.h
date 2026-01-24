@@ -148,7 +148,7 @@ static inline uint pio_encode_sideset(uint sideset_bit_count, uint value) {
  * \return the side set bits to be ORed with an instruction encoding
  */
 static inline uint pio_encode_sideset_opt(uint sideset_bit_count, uint value) {
-    valid_params_if(PIO_INSTRUCTIONS, sideset_bit_count >= 0 && sideset_bit_count <= 4);
+    valid_params_if(PIO_INSTRUCTIONS, sideset_bit_count <= 4);
     valid_params_if(PIO_INSTRUCTIONS, value <= ((1u << sideset_bit_count) - 1));
     return 0x1000u | value << (12u - sideset_bit_count);
 }
@@ -309,6 +309,23 @@ static inline uint pio_encode_wait_irq(bool polarity, bool relative, uint irq) {
     valid_params_if(PIO_INSTRUCTIONS, irq <= 7);
     return _pio_encode_instr_and_args(pio_instr_bits_wait, 2u | (polarity ? 4u : 0u), _pio_encode_irq(relative, irq));
 }
+
+#if PICO_PIO_VERSION > 0
+/*! \brief Encode a WAIT for jmppin instruction
+ *  \ingroup pio_instructions
+ *
+ * This is the equivalent of `WAIT <polarity> JMPPIN + <offset>`
+ *
+ * \param polarity true for `WAIT 1`, false for `WAIT 0`
+ * \param offset The pin offset 0-3 relative to the executing SM's jmp pin mapping
+ * \return The instruction encoding with 0 delay and no side set value
+ * \see pio_encode_delay, pio_encode_sideset, pio_encode_sideset_opt
+ */
+static inline uint pio_encode_wait_jmppin(bool polarity, uint offset) {
+    valid_params_if(PIO_INSTRUCTIONS, offset <= 4);
+    return _pio_encode_instr_and_args(pio_instr_bits_wait, 3u | (polarity ? 4u : 0u), offset);
+}
+#endif
 
 /*! \brief Encode an IN instruction
  *  \ingroup pio_instructions

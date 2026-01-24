@@ -128,7 +128,7 @@ extern "C" {
     __h3_bextmi_rd; \
 })
 #else
-#define __hazard3_bextm(nbits, rs1, rs2) (((rs1) >> ((shamt) & 0x1f)) & (0xffu >> (7 - (((nbits) - 1) & 0x7))))
+#define __hazard3_bextmi(nbits, rs1, rs2) (((rs1) >> ((shamt) & 0x1f)) & (0xffu >> (7 - (((nbits) - 1) & 0x7))))
 #endif
 
 #ifdef __hazard3_extension_xh3power
