@@ -7,6 +7,7 @@
 #ifndef _OUTPUT_FORMAT_H
 #define _OUTPUT_FORMAT_H
 
+#include <cstdint>
 #include <vector>
 #include <map>
 #include <string>
