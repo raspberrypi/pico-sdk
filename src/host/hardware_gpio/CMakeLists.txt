@@ -1,1 +1,2 @@
 pico_simple_hardware_target(gpio)
+target_link_libraries(hardware_gpio INTERFACE hardware_irq)

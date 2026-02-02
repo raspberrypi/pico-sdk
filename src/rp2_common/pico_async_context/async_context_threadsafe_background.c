@@ -135,7 +135,7 @@ static void lock_release(async_context_threadsafe_background_t *self) {
 #endif
 }
 
-uint32_t async_context_threadsafe_background_execute_sync(async_context_t *self_base, uint32_t (*func)(void *param), void *param) {
+static uint32_t async_context_threadsafe_background_execute_sync(async_context_t *self_base, uint32_t (*func)(void *param), void *param) {
     async_context_threadsafe_background_t *self = (async_context_threadsafe_background_t*)self_base;
 #if ASYNC_CONTEXT_THREADSAFE_BACKGROUND_MULTI_CORE
     if (self_base->core_num != get_core_num()) {

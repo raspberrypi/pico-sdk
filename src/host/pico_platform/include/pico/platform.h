@@ -159,6 +159,11 @@ static inline uint __get_current_exception(void) {
 
 void busy_wait_at_least_cycles(uint32_t minimum_cycles);
 
+// PICO_CONFIG: PICO_NUM_VTABLE_IRQS, Number of IRQ handlers in the vector table - can be lowered to save space if you aren't using some higher IRQs, type=int, default=NUM_IRQS, group=hardware_irq
+#ifndef PICO_NUM_VTABLE_IRQS
+#define PICO_NUM_VTABLE_IRQS NUM_IRQS
+#endif
+
 #ifdef __cplusplus
 }
 #endif

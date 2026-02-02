@@ -1,0 +1,85 @@
+/*
+ * Copyright (c) 2024 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef _BOARDS_RASPBERRY_PI_PI500_RP2040_H
+#define _BOARDS_RASPBERRY_PI_PI500_RP2040_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
+
+// For board detection
+#define RASPBERRY_PI_PI500_RP2040
+
+// --- FLASH ---
+// Pi 500 uses the same flash as the original Pi Pico (W25Q16JVUXIQ) but only DSPI pins are connected
+#define PICO_BOOT_STAGE2_CHOOSE_W25X10CL 1
+
+#ifndef PICO_FLASH_SPI_CLKDIV
+#define PICO_FLASH_SPI_CLKDIV 2
+#endif
+
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
+#ifndef PICO_FLASH_SIZE_BYTES
+#define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
+#endif
+
+
+#ifndef PICO_RP2040_B0_SUPPORTED
+#define PICO_RP2040_B0_SUPPORTED 0
+#endif
+
+// Keyboard CAPS Lock indicator LED as default
+#define PI500_RP2040_CAPS_LOCK_LED_PIN 25
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN PI500_RP2040_CAPS_LOCK_LED_PIN
+#endif
+
+// --- PI 500 POWER MANAGEMENT ---
+// Power button control (critical for Pi 500 power management)
+#define PI500_RP2040_POWER_BUTTON_PIN 19 //DO NOT SCAN OR YOU WON'T BE ABLE TO TURN THE PI500 ON!
+// Power key detection (shared with matrix pins but scanned separately)
+#define PI500_RP2040_POWER_KEY_COL_PIN 20  // Also matrix col 11
+#define PI500_RP2040_POWER_KEY_ROW_PIN 6   // Also matrix row 6
+
+// --- UART ---
+#ifndef PICO_DEFAULT_UART
+#define PICO_DEFAULT_UART 0
+#endif
+#ifndef PICO_DEFAULT_UART_TX_PIN
+#define PICO_DEFAULT_UART_TX_PIN 16
+#endif
+
+// --- KEYBOARD MATRIX PINS ---
+// Matrix row pins (8 pins)
+#define PI500_RP2040_MATRIX_ROW_0_PIN 0
+#define PI500_RP2040_MATRIX_ROW_1_PIN 1
+#define PI500_RP2040_MATRIX_ROW_2_PIN 2
+#define PI500_RP2040_MATRIX_ROW_3_PIN 3
+#define PI500_RP2040_MATRIX_ROW_4_PIN 4
+#define PI500_RP2040_MATRIX_ROW_5_PIN 5
+#define PI500_RP2040_MATRIX_ROW_6_PIN 6
+#define PI500_RP2040_MATRIX_ROW_7_PIN 7
+
+// Matrix column pins (18 pins)
+#define PI500_RP2040_MATRIX_COL_0_PIN 27
+#define PI500_RP2040_MATRIX_COL_1_PIN 8 
+#define PI500_RP2040_MATRIX_COL_2_PIN 9
+#define PI500_RP2040_MATRIX_COL_3_PIN 10
+#define PI500_RP2040_MATRIX_COL_4_PIN 11
+#define PI500_RP2040_MATRIX_COL_5_PIN 12
+#define PI500_RP2040_MATRIX_COL_6_PIN 13
+#define PI500_RP2040_MATRIX_COL_7_PIN 14
+#define PI500_RP2040_MATRIX_COL_8_PIN 23
+#define PI500_RP2040_MATRIX_COL_9_PIN 24
+#define PI500_RP2040_MATRIX_COL_10_PIN 22
+#define PI500_RP2040_MATRIX_COL_11_PIN 20
+#define PI500_RP2040_MATRIX_COL_12_PIN 29
+#define PI500_RP2040_MATRIX_COL_13_PIN 18
+#define PI500_RP2040_MATRIX_COL_14_PIN 15
+#define PI500_RP2040_MATRIX_COL_15_PIN 21
+#define PI500_RP2040_MATRIX_COL_16_PIN 28
+#define PI500_RP2040_MATRIX_COL_17_PIN 26
+
+#endif
