@@ -74,7 +74,7 @@ double_wrapper_section __dfma
 @ r2:r3    | d1 n
 @ [r13,#0] | d2 a
 wrapper_func fma
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  push {r4,lr}
  vmov r0,r1,d0
  vmov r2,r3,d1
@@ -605,7 +605,7 @@ double_section fma_fast
 @ [r13,#0] | d2 a
 regular_func fma_fast
 regular_func mla
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,r1,d0
  vmov r2,r3,d1
  vpush {d2}
@@ -620,7 +620,7 @@ regular_func mla
  dcp_dadd_m r0,r1,r0,r1,r2,r3
 // todo optimize this based on final decision on saving_func_entry
  pop {r4,r5,r14}
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
  add sp,sp,#8
 #endif

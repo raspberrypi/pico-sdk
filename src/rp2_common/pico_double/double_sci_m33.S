@@ -36,7 +36,7 @@ double_section WRAPPER_FUNC_NAME(\func)
 
 .macro hardabi_wrapper_func type, func, argn
 \type\()_func \func
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 .ifgt \argn - 0
  vmov r0,r1,d0
 .endif
@@ -119,13 +119,13 @@ drr_core:
 
 double_wrapper_section tan
 wrapper_func tan
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,r1,d0
 #endif
  push {r14}
  bl sincos_raw
  bl __aeabi_ddiv
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
 #endif
  pop {r15}
@@ -307,7 +307,7 @@ double_wrapper_section sin_cos
 
 @ sincos à la GNU with pointers to where to put results
 wrapper_func sincos
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  push {r0-r1,r4-r5, lr}
  vmov r0,r1,d0
 #else
@@ -328,12 +328,12 @@ sincos_raw:
  b 1f
 
 wrapper_func sin
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,r1,d0
 #endif
  lsrs r12,r1,#29             @ negative argument -> +2 quadrants
  ands r12,#4
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  push {lr}
  bl 1f
  vmov d0,r0,r1
@@ -1326,9 +1326,9 @@ double_wrapper_section atan2
  ubfx r4,r3,#20,#11
  movs r0,#0
  movs r1,#0
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  cmp r4,#0
- bne 80f @ The imm range in cbnz would be insufficient if PICO_USE_HARD_ABI were defined
+ bne 80f @ The imm range in cbnz would be insufficient if __ARM_PCS_VFP were defined
 #else
  cbnz r4,80f                 @ x' also zero?
 #endif

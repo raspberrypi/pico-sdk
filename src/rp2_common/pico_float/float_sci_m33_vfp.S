@@ -68,7 +68,7 @@ frr_core:
 float_wrapper_section expf
 
 wrapper_func expf
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
 @ soft float version, via 2^x
@@ -103,7 +103,7 @@ wrapper_func expf
  add r2,r2,r1,lsl#23
  vmov s0,r2
  vmla.f32 s0,s0,s4
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
  bx r14
@@ -121,14 +121,14 @@ wrapper_func expf
  cmp r0,#0x7f800000
  bls 4f                      @ not NaN?
  orrs r0,#0x00400000
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
 
 4:
  movlong r0,0x7f800000       @ return +Inf
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
@@ -159,13 +159,13 @@ wrapper_func expf
  cmp r0,#0xff800000
  bls 14f
  orrs r0,#0x00400000
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
 14:
  mov r0,#0
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
@@ -213,7 +213,7 @@ exptab3:                     @ pow(2,[0..31]/32)
 float_wrapper_section logf
 
 wrapper_func logf
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
  cmp r0,#0x7f800000          @ catch Inf, NaN, -ve
@@ -255,7 +255,7 @@ wrapper_func logf
  vsub.f32 s1,s1,s2
  vadd.f32 s0,s0,s1           @ log ε - log u
  vadd.f32 s0,s0,s7           @ e log 2 + log ε - log u
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
  bx r14
@@ -272,13 +272,13 @@ wrapper_func logf
  bhi 10f
  movlong r0,0xffc00000
 10:
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
 11:
  movlong r0,0xff800000
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
@@ -326,7 +326,7 @@ float_wrapper_section fsin_fcos
  orrs r0,r0,#0x80000000      @ Inf: make a NaN
 1:
  orrs r0,r0,#0x00400000      @ set top mantissa bit of NaN
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
@@ -426,7 +426,7 @@ k_sc4:
 .word 0xb695777a,0x3fc91000  @ these two add up to π/2 with error ~1.6e-13
 
 wrapper_func sincosf
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  mov r2,r1
  mov r1,r0
  vmov r0,s0
@@ -436,7 +436,7 @@ wrapper_func sincosf
  cmp r1,#0xff                @ Inf/NaN?
  beq 2f
  bl cosf_entry               @ this will exit via 1f or 2f...
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
  pop {r1-r2,r14}
@@ -481,7 +481,7 @@ wrapper_func sincosf
  bx r14
 
 wrapper_func sinf
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
 @ r12b1..0: quadrant count
@@ -490,7 +490,7 @@ wrapper_func sinf
 
 wrapper_func cosf
 .thumb_func
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
 cosf_entry:
@@ -540,7 +540,7 @@ fsc_sintail:
  vsub.f32 s4,s7,s4           @ cosφ sinε + sinφ cosε
  vmov.f32 r0,s4
  eor r0,r0,r1,lsl#31
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
@@ -561,7 +561,7 @@ fsc_costail:
  vsub.f32 s5,s6,s5           @ cosφ - (sinφ sinε + cosφ(1-cosε)) = cosφ cosε - sinφ sinε
  vmov.f32 r0,s5
  eor r0,r0,r12,lsl#31
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
@@ -610,7 +610,7 @@ trigtab2:
 float_wrapper_section tanf
 
 wrapper_func tanf
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
  push {r0,r14}
@@ -618,7 +618,7 @@ wrapper_func tanf
  cmp r1,#0xff                @ Inf/NaN?
  beq 2f
  bl cosf_entry               @ this will exit via sintail or costail...
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
  ldr r1,[sp,#0]
@@ -635,7 +635,7 @@ wrapper_func tanf
  vmov.f32 r0,s0
  it pl
  eorpl r0,r0,#0x80000000
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  pop {r1,r15}
@@ -652,7 +652,7 @@ wrapper_func tanf
  vmov.f32 r0,s0
  it mi
  eormi r0,r0,#0x80000000
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  pop {r1,r15}
@@ -664,7 +664,7 @@ wrapper_func tanf
  orrs r0,r0,#0x80000000      @ Inf: make a NaN
 1:
  orrs r0,r0,#0x00400000      @ set top mantissa bit of NaN
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  pop {r3,r15}
@@ -675,7 +675,7 @@ float_wrapper_section atan2f
 50:
 60:
  orrs r0,r1,#0x00400000
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
@@ -690,7 +690,7 @@ float_wrapper_section atan2f
 52:
 62:
  orrs r0,r0,#0x00400000
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14
@@ -735,7 +735,7 @@ float_wrapper_section atan2f
  b 83f                       @ and go back and check for NaNs
 
 wrapper_func atan2f
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,r1,d0
 #endif
 86:
@@ -843,7 +843,7 @@ wrapper_func atan2f
  ite pl
  vaddpl.f32 s0,s4,s0
  vsubmi.f32 s0,s4,s0
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
  vmov.f32 r0,s0
 #endif
  bx r14
@@ -889,7 +889,7 @@ wrapper_func atan2f
  it ne
  bxne r14
  and r0,r0,#0x80000000       @ make it zero
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov s0,r0
 #endif
  bx r14

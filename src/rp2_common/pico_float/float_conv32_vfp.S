@@ -19,9 +19,9 @@ pico_default_asm_setup
 
 float_section int2float
 regular_func int2float
-  vmov s0, r0
-  vcvt.f32.s32 s0, s0
-#if !PICO_USE_HARD_ABI
+    vmov s0, r0
+    vcvt.f32.s32 s0, s0
+#if !defined(__ARM_PCS_VFP)
 	vmov r0, s0
 #endif
 	bx lr
@@ -30,14 +30,14 @@ float_section uint2float
 regular_func uint2float
 	vmov s0, r0
 	vcvt.f32.u32 s0, s0
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 	vmov r0, s0
 #endif
 	bx lr
 
 float_section float2int
 regular_func float2int
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 	vmov s0, r0
 #endif
 	vcvtm.s32.f32 s0, s0
@@ -46,7 +46,7 @@ regular_func float2int
 
 float_section float2int_z
 regular_func float2int_z
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 	vmov s0, r0
 #endif
 	vcvt.s32.f32 s0, s0
@@ -56,7 +56,7 @@ regular_func float2int_z
 float_section float2uint
 regular_func float2uint
 regular_func float2uint_z
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 	vmov s0, r0
 #endif
 	vcvt.u32.f32 s0, s0
@@ -65,7 +65,7 @@ regular_func float2uint_z
 
 float_section float2fix_z
 regular_func float2fix_z
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   mov r1, r0
   vmov r0, s0
 #endif
@@ -79,14 +79,14 @@ float2fix_z_entry:
   movmi r2, #0
 1:
   bfi r0, r2, #23, #8
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov s0, r0
 #endif
   b float2int_z
 
 float_section float2fix
 regular_func float2fix
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   mov r1, r0
   vmov r0, s0
 #endif
@@ -115,7 +115,7 @@ regular_func float2fix
 float_section float2ufix
 regular_func float2ufix
 regular_func float2ufix_z
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   mov r1, r0
   vmov r0, s0
 #endif
@@ -128,8 +128,8 @@ regular_func float2ufix_z
   movmi r2, #0
 1:
   bfi r0, r2, #23, #8
-#if PICO_USE_HARD_ABI
-	vmov s0, r0
+#if defined(__ARM_PCS_VFP)
+  vmov s0, r0
 #endif
   b float2uint_z
 #endif

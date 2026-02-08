@@ -114,12 +114,12 @@ saving_func wrapper __aeabi_dmul
 
 double_section ddiv_fast
 saving_func regular ddiv_fast
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov r0,r1,d0
   vmov r2,r3,d1
 #endif
   dcp_ddiv_fast_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r12
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov d0,r0,r1
 #endif
   saving_func_return
@@ -132,30 +132,30 @@ saving_func wrapper __aeabi_ddiv
 
 double_section sqrt_fast
 saving_func regular sqrt_fast
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov r0,r1,d0
 #endif
   dcp_dsqrt_fast_m r0,r1,r0,r1,r0,r1,r2,r3,r12
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov d0,r0,r1
 #endif
   saving_func_return
 
 double_wrapper_section sqrt
 saving_func wrapper sqrt
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov r0,r1,d0
 #endif
 @ with correct rounding
   dcp_dsqrt_m r0,r1,r0,r1,r0,r1,r2,r3,r12
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov d0,r0,r1
 #endif
   saving_func_return
 
 double_section dclassify
 saving_func regular dclassify
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov r0,r1,d0
 #endif
   dcp_dclassify_m apsr_nzcv,r0,r1
@@ -164,7 +164,7 @@ saving_func regular dclassify
 // ============== CONVERSION FUNCTIONS ===============
 
 double_wrapper_section __aeabi_d2f
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 saving_func wrapper __aeabi_d2f
 #else
 saving_func wrapper __aeabi_d2f double2float
@@ -173,7 +173,7 @@ saving_func wrapper __aeabi_d2f double2float
   dcp_double2float_m r0,r0,r1
   saving_func_return
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 double_section double2float
 regular_func double2float
   push {r0,lr}
@@ -184,7 +184,7 @@ regular_func double2float
 #endif
 
 double_wrapper_section __aeabi_i2d
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 saving_func wrapper __aeabi_i2d
 #else
 saving_func wrapper __aeabi_i2d int2double
@@ -192,7 +192,7 @@ saving_func wrapper __aeabi_i2d int2double
   dcp_int2double_m r0,r1,r0
   saving_func_return
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 double_section int2double
 regular_func int2double
   push {r0,lr}
@@ -202,7 +202,7 @@ regular_func int2double
 #endif
 
 double_wrapper_section __aeabi_ui2d
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 saving_func wrapper __aeabi_ui2d
 #else
 saving_func wrapper __aeabi_ui2d uint2double
@@ -210,7 +210,7 @@ saving_func wrapper __aeabi_ui2d uint2double
   dcp_uint2double_m r0,r1,r0
   saving_func_return
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 double_section uint2double
 regular_func uint2double
   push {r0,lr}
@@ -221,7 +221,7 @@ regular_func uint2double
 
 double_section double2fix_z
 saving_func regular double2fix_z
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   mov r2, r0
   vmov r0, r1, d0
 #endif
@@ -239,7 +239,7 @@ saving_func regular double2fix_z
 
 double_section double2ufix
 saving_func regular double2ufix_z double2ufix
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   mov r2, r0
   vmov r0, r1, d0
 #endif
@@ -258,7 +258,7 @@ double2ufix_z_entry:
 
 double_section double2fix
 saving_func regular double2fix
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   mov r2, r0
   vmov r0, r1, d0
 #endif
@@ -281,7 +281,7 @@ saving_func_return
 
 double_section double2int
 saving_func regular double2int
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov r0, r1, d0
 #endif
 double2int_entry:
@@ -307,7 +307,7 @@ double2int_entry:
 saving_func_return
 
 double_wrapper_section __aeabi_d2iz
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 saving_func wrapper __aeabi_d2iz
 #else
 saving_func wrapper __aeabi_d2iz double2int_z
@@ -318,7 +318,7 @@ double2int_z_entry:
   // note: this works with either saved or not saved call as it is just a `bx lr`
   saving_func_return
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 double_section double2int_z
 regular_func double2int_z
   vmov r0,r1,d0
@@ -328,7 +328,7 @@ regular_func double2int_z
 #endif
 
 double_wrapper_section __aeabi_d2uiz
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 saving_func wrapper __aeabi_d2uiz
 #else
 saving_func wrapper __aeabi_d2uiz double2uint double2uint_z
@@ -338,7 +338,7 @@ double2uint_z_entry:
   dcp_double2uint_m r0,r0,r1
   saving_func_return
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 double_section double2uint
 regular_func double2uint
 regular_func double2uint_z
@@ -351,7 +351,7 @@ regular_func double2uint_z
 double_section double2int_r
 saving_func regular double2int_r
 @ with rounding
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov r0,r1,d0
 #endif
   dcp_double2int_r_m r0,r0,r1
@@ -360,7 +360,7 @@ saving_func regular double2int_r
 double_section double2uint_r
 saving_func regular double2uint_r
 @ with rounding
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov r0,r1,d0
 #endif
   dcp_double2uint_r_m r0,r0,r1

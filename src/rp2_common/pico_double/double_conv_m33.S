@@ -23,7 +23,7 @@ double_section WRAPPER_FUNC_NAME(\func)
 
 double_wrapper_section conv_tod
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func int642double
  movs r2,#0
 regular_func fix642double
@@ -35,12 +35,12 @@ regular_func fix642double
 
 @ convert int64 to double, rounding
 wrapper_func __aeabi_l2d
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func int642double
 #endif
  movs r2,#0       @ fall through
 @ convert unsigned 64-bit fix to double, rounding; number of r0:r1 bits after point in r2
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func fix642double
 #endif
 fix642double_entry:
@@ -109,7 +109,7 @@ fix642double_entry:
  bic r0,r0,#1 @ force to even
  b 5b
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func uint642double
  movs r2,#0
 regular_func ufix642double
@@ -121,12 +121,12 @@ regular_func ufix642double
 
 @ convert uint64 to double, rounding
 wrapper_func __aeabi_ul2d
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func uint642double
 #endif
  movs r2,#0       @ fall through
 @ convert unsigned 64-bit fix to double, rounding; number of r0:r1 bits after point in r2
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func ufix642double
 #endif
 ufix642double_entry:
@@ -206,7 +206,7 @@ fix2double_neg:
  mov r0,#0
  mov r3,0x7fe
  cmp r2,r3
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
 #endif
  it lo @ over/underflow?
@@ -225,7 +225,7 @@ fix2double_neg:
  add r1,r12,r2,lsl#20 @ insert exponent
  orr r1,#0x80000000
  mov r3,0x7fe
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
 #endif
  cmp r2,r3
@@ -237,13 +237,13 @@ fix2double_neg:
  it ge
  movtge r1,#0xfff0 @ overflow
  mov r0,#0
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
 #endif
  bx r14
 1:
  movs r1,#0
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
 #endif
  bx r14
@@ -260,7 +260,7 @@ regular_func ufix2double
  add r1,r0,r2,lsl#20 @ insert exponent
  mov r0,#0
  mov r3,0x7fe
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
 #endif
  cmp r2,r3
@@ -279,7 +279,7 @@ regular_func ufix2double
  add r2,#0x3ff+19
  add r1,r12,r2,lsl#20 @ insert exponent
  mov r3,0x7fe
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
 #endif
  cmp r2,r3
@@ -291,20 +291,20 @@ regular_func ufix2double
  it ge
  movtge r1,#0x7ff0 @ overflow
  mov r0,#0
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
 #endif
  bx r14
 1:
  movs r1,#0
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov d0,r0,r1
 #endif
  bx r14
 
 double_section conv_dtoi64
 regular_func double2int64
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov r0, r1, d0
 #endif
   lsls r3, r1, #1
@@ -338,7 +338,7 @@ regular_func double2int64
 
 double_section conv_dtofix64
 regular_func double2fix64
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   mov r2, r0
   vmov r0, r1, d0
 #endif
@@ -373,7 +373,7 @@ regular_func double2fix64
 
 double_wrapper_section conv_dtoi64_z
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func double2fix64_z
  mov r2,r0
  vmov r0,r1,d0
@@ -381,13 +381,13 @@ regular_func double2fix64_z
 #endif
 @ convert double to signed int64, rounding towards 0, clamping
 regular_func double2int64_z
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,r1,d0
 #endif
 wrapper_func __aeabi_d2lz
 double2int64_z_softfp:
  movs r2,#0      @ fall through for softfp build
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func double2fix64_z
 #endif
 @ convert double in r0:r1 to signed fixed point in r0:r1, clamping
@@ -461,7 +461,7 @@ double2fix64_z_softfp:
 
 double_wrapper_section conv_dtoui64
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func double2ufix64
 regular_func double2ufix64_z
  mov r2,r0
@@ -471,12 +471,12 @@ regular_func double2ufix64_z
 @ convert double to unsigned int64, rounding towards -Inf, clamping
 regular_func double2uint64
 regular_func double2uint64_z
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,r1,d0
 #endif
 wrapper_func __aeabi_d2ulz
  movs r2,#0      @ fall through
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func double2ufix64
 regular_func double2ufix64_z
 #endif

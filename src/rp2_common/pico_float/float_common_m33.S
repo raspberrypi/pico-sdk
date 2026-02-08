@@ -23,9 +23,9 @@ float_section WRAPPER_FUNC_NAME(\func)
 
 float_wrapper_section conv_tof
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func int642float
- movs r2,#0
+ movs r2,#0       @ fall through
 regular_func fix642float
  push {lr}
  bl fix642float_softfp
@@ -35,11 +35,11 @@ regular_func fix642float
 
 @ convert int64 to float, rounding
 wrapper_func __aeabi_l2f
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func int642float
 #endif
  movs r2,#0       @ fall through
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func fix642float
 #endif
 @ convert signed 64-bit fix to float, rounding; number of r0:r1 bits after point in r2
@@ -104,7 +104,7 @@ fix642float_softfp:
 @ convert signed 32-bit fix to float, rounding; number of r0 bits after point in r1
 .thumb_func
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func fix2float
  push {lr}
  bl fix2float_entry
@@ -162,7 +162,7 @@ fix2float_neg:
  b 3b
 
 @ convert unsigned 32-bit fix to float, rounding; number of r0 bits after point in r1
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func ufix2float
  push {lr}
  bl ufix2float_entry
@@ -217,7 +217,7 @@ ufix2float_entry:
  bxlo r14
  b 3b
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func uint642float
  movs r2,#0
 regular_func ufix642float
@@ -228,11 +228,11 @@ regular_func ufix642float
 #endif
 
 wrapper_func __aeabi_ul2f
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func uint642float
 #endif
  movs r2,#0       @ fall through
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func ufix642float
 #endif
 @ convert unsigned 64-bit fix to float, rounding; number of r0:r1 bits after point in r2
@@ -290,7 +290,7 @@ ufix642float_softfp:
 
 float_section conv_ftoi64
 regular_func float2int64
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   vmov r0, s0
 #endif
   lsls r1, r0, #1
@@ -315,7 +315,7 @@ regular_func float2int64
 
 float_section conv_ftof64
 regular_func float2fix64
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
   mov r1, r0
   vmov r0, s0
 #endif
@@ -342,7 +342,7 @@ regular_func float2fix64
 
 float_wrapper_section conv_ftoi64z
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func float2fix64_z
  mov r1,r0
  vmov r0,s0
@@ -351,13 +351,13 @@ regular_func float2fix64_z
 
 @ convert float to signed int64, rounding towards 0, clamping
 regular_func float2int64_z
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
 wrapper_func __aeabi_f2lz
 float2int64_z_softfp:
  movs r1,#0      @ fall through
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func float2fix64_z
 #endif
 @ convert float in r0 to signed fixed point in r0:r1, clamping
@@ -424,7 +424,7 @@ float2fix64_z_entry:
 
 float_wrapper_section conv_ftoui64
 
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
 regular_func float2ufix64
 regular_func float2ufix64_z
  mov r1,r0
@@ -434,12 +434,12 @@ regular_func float2ufix64_z
 @ convert float to unsigned int64, rounding towards -Inf, clamping
 regular_func float2uint64
 regular_func float2uint64_z
-#if PICO_USE_HARD_ABI
+#if defined(__ARM_PCS_VFP)
  vmov r0,s0
 #endif
 wrapper_func __aeabi_f2ulz
  movs r1,#0      @ fall through
-#if !PICO_USE_HARD_ABI
+#if !defined(__ARM_PCS_VFP)
 regular_func float2ufix64
 regular_func float2ufix64_z
 #endif

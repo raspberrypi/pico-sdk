@@ -104,11 +104,14 @@
             ${CMAKE_CURRENT_LIST_DIR}/float_none.S
     )
 
-    target_link_libraries(pico_float_none INTERFACE pico_float_headers)
-    wrap_float_functions(pico_float_none) # we wrap all functions
-    if (NOT PICO_RISCV)
-        # be explicit that there should be no floating point instructions
-        target_compile_options(pico_float_none INTERFACE -msoft-float)
+    # float_none doesn't make much sense with hard float
+    if (NOT PICO_HARD_FLOAT_ABI)
+        target_link_libraries(pico_float_none INTERFACE pico_float_headers)
+        wrap_float_functions(pico_float_none) # we wrap all functions
+        if (NOT PICO_RISCV)
+            # be explicit that there should be no floating point instructions
+            target_compile_options(pico_float_none INTERFACE -msoft-float)
+        endif()
     endif()
     pico_add_library(pico_float_pico)
     if (PICO_RP2040)
@@ -121,30 +124,33 @@
         wrap_float_functions(pico_float_pico)
         target_link_libraries(pico_float_pico INTERFACE pico_bootrom pico_float_headers hardware_divider)
     elseif(NOT PICO_RISCV)
-        pico_add_library(pico_float_pico_dcp)
-        # todo what functions from float_math belong in each case; should some be left to GCC on RP2350?
-        target_sources(pico_float_pico_dcp INTERFACE
-                ${CMAKE_CURRENT_LIST_DIR}/float_math.c
-                ${CMAKE_CURRENT_LIST_DIR}/float_aeabi_dcp.S
-                ${CMAKE_CURRENT_LIST_DIR}/float_common_m33.S
-                ${CMAKE_CURRENT_LIST_DIR}/float_sci_m33.S
-                )
+        # dcp library not supported with hard float
+        if (NOT PICO_HARD_FLOAT_ABI)
+            pico_add_library(pico_float_pico_dcp)
+            # todo what functions from float_math belong in each case; should some be left to GCC on RP2350?
+            target_sources(pico_float_pico_dcp INTERFACE
+                    ${CMAKE_CURRENT_LIST_DIR}/float_math.c
+                    ${CMAKE_CURRENT_LIST_DIR}/float_aeabi_dcp.S
+                    ${CMAKE_CURRENT_LIST_DIR}/float_common_m33.S
+                    ${CMAKE_CURRENT_LIST_DIR}/float_sci_m33.S
+                    )
 
-        # NOTE the main reason for using pico_float_pico_dcp is presumably that you
-        # don't want to use VFP at all, so turn off compiler support, otherwise, it will inline usages
-        target_compile_options(pico_float_pico_dcp INTERFACE -msoft-float)
+            # NOTE the main reason for using pico_float_pico_dcp is presumably that you
+            # don't want to use VFP at all, so turn off compiler support, otherwise, it will inline usages
+            target_compile_options(pico_float_pico_dcp INTERFACE -msoft-float)
 
-        wrap_float_functions(pico_float_pico_dcp
-                # we wrap all functions as we don't want to use VFP (or compiler versions) at all
-                #NO_AEABI_ARITHMETIC
-                #NO_AEABI_CMP
-                #NO_AEABI_CONV_32
-                #NO_AEABI_CONV_64
-                #NO_AEABI_CONV_DOUBLE
-                #NO_SQRTF
-                #NO_SCI
-                #NO_SCI_EXTRA
-        )
+            wrap_float_functions(pico_float_pico_dcp
+                    # we wrap all functions as we don't want to use VFP (or compiler versions) at all
+                    #NO_AEABI_ARITHMETIC
+                    #NO_AEABI_CMP
+                    #NO_AEABI_CONV_32
+                    #NO_AEABI_CONV_64
+                    #NO_AEABI_CONV_DOUBLE
+                    #NO_SQRTF
+                    #NO_SCI
+                    #NO_SCI_EXTRA
+            )
+        endif()
 
         pico_add_library(pico_float_pico_vfp)
         target_sources(pico_float_pico_vfp INTERFACE
@@ -166,10 +172,6 @@
                 #NO_SCI             # we have optimized VFP versions
                 #NO_SCI_EXTRA       # todo - are our versions better than what GCC proides?
         )
-
-        if (PICO_USE_HARD_ABI)
-            target_compile_definitions(pico_float_pico_vfp INTERFACE PICO_USE_HARD_ABI=1)
-        endif ()
 
         target_link_libraries(pico_float_pico INTERFACE
                 pico_float_pico_vfp)
