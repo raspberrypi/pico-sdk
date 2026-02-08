@@ -75,7 +75,7 @@ int test() {
     printf(" (hard)");
 #endif
     printf("\n");
-#if LIB_PICO_DOUBLE_PICO
+#if LIB_PICO_DOUBLE_PICO_DCP
     printf("--- using DCP\n");
 #elif LIB_PICO_FLOAT_COMPILER
     printf("--- using compiler\n");
