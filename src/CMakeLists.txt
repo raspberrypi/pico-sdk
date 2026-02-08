@@ -165,9 +165,7 @@ macro(pico_simple_hardware_impl_target NAME)
                 )
 
         pico_mirrored_target_link_libraries(hardware_${NAME} INTERFACE pico_platform)
-        if (NOT PICO_NO_HARDWARE)
-            target_link_libraries(hardware_${NAME} INTERFACE hardware_claim)
-        endif()
+        target_link_libraries(hardware_${NAME} INTERFACE hardware_claim)
     endif()
 endmacro()
 

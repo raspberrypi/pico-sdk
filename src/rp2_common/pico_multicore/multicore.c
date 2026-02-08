@@ -371,7 +371,7 @@ static bool multicore_doorbell_claim_under_lock(uint doorbell_num, uint core_mas
     if (claimed_cores_for_doorbell & core_mask) {
         if (required) {
             panic( "Multicore doorbell %d already claimed on core mask 0x%x; requested core mask 0x%x\n",
-                   claimed_cores_for_doorbell, core_mask);
+                   doorbell_num, claimed_cores_for_doorbell, core_mask);
         }
         return false;
     } else {
