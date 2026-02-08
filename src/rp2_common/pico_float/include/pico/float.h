@@ -154,8 +154,14 @@ extern "C" {
 #if !defined(__riscv) || PICO_COMBINED_DOCS
 
 #if PICO_COMBINED_DOCS || !LIB_PICO_FLOAT_COMPILER
+#if LIB_PICO_FLOAT_PICO_VFP
+// note these functions do still exist for assembler use, we would just prefer to let the compiler handle it for C/C++ to avoid a call
+static inline float int2float(int32_t i) { return (float)i; }
+static inline float uint2float(uint32_t i) { return (float)i; }
+#else
 float int2float(int32_t i);
 float uint2float(uint32_t i);
+#endif
 float int642float(int64_t i);
 float uint642float(uint64_t i);
 float fix2float(int32_t m, int e);
@@ -164,9 +170,15 @@ float fix642float(int64_t m, int e);
 float ufix642float(uint64_t m, int e);
 
 // These methods round towards 0, which IS the C way
+#if LIB_PICO_FLOAT_PICO_VFP
+// note these functions do still exist for assembler use, we would just prefer to let the compiler handle it for C/C++ to avoid a call
+static inline int32_t float2int_z(float f) { return (int32_t)f; }
+static inline uint32_t float2uint_z(float f) { return (uint32_t)f; }
+#else
 int32_t float2int_z(float f);
-int64_t float2int64_z(float f);
 int32_t float2uint_z(float f);
+#endif
+int64_t float2int64_z(float f);
 int64_t float2uint64_z(float f);
 int32_t float2fix_z(float f, int e);
 uint32_t float2ufix_z(float f, int e);
@@ -276,14 +288,6 @@ uint64_t float2ufix64(float f, int e);
     rc; \
 })
 #define _float2ufix_inline(f, e) _float2ufix_z_inline((f), (e))
-#endif
-
-#if LIB_PICO_FLOAT_PICO_VFP
-// may as well provide inline macros for VFP
-#define int2float(i) ((float)(int32_t)(i))
-#define uint2float(i) ((float)(uint32_t)(i))
-#define float2int_z(f) ((int32_t)(f))
-#define float2uint_z(f) ((uint32_t)(f))
 #endif
 
 #endif
