@@ -53,7 +53,7 @@ foreach (FLOAT_TYPE IN LISTS FLOAT_TYPES)
         # handy for testing we aren't pulling in extra stuff
         #target_link_options(${PICO_FLOAT_TEST} PRIVATE -nodefaultlibs)
         target_include_directories(${PICO_FLOAT_TEST} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/llvm)
-        target_link_libraries(${PICO_FLOAT_TEST} pico_float pico_stdlib)
+        target_link_libraries(${PICO_FLOAT_TEST} pico_float pico_stdlib m)
         pico_add_extra_outputs(${PICO_FLOAT_TEST})
         pico_set_float_implementation(${PICO_FLOAT_TEST} ${FLOAT_TYPE})
     endif()
@@ -87,7 +87,7 @@ foreach (DOUBLE_TYPE IN LISTS DOUBLE_TYPES)
         )
 
         target_include_directories(${PICO_DOUBLE_TEST} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/llvm)
-        target_link_libraries(${PICO_DOUBLE_TEST} pico_double pico_stdlib)
+        target_link_libraries(${PICO_DOUBLE_TEST} pico_double pico_stdlib m)
         pico_add_extra_outputs(${PICO_DOUBLE_TEST})
         pico_set_double_implementation(${PICO_DOUBLE_TEST} ${DOUBLE_TYPE})
         #todo split out variants with different flags

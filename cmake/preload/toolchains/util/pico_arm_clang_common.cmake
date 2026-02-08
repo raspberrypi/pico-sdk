@@ -85,7 +85,9 @@ if (PICO_CLIB STREQUAL "llvm_libc")
     # TODO: Remove -nostdlib++ once we include libc++ in the toolchain.
     # TODO: Move -nostartfiles to the appropriate library.
     foreach(TYPE IN ITEMS EXE SHARED MODULE)
-        set(CMAKE_${TYPE}_LINKER_FLAGS_INIT "-nostdlib++ -nostartfiles")
+        # note --unwindlib=none is only needed on recent compiler/lib versions, however just produces a
+        # warning on earlier versions, so not attempting a version check for now
+        set(CMAKE_${TYPE}_LINKER_FLAGS_INIT "-nostdlib++ -nostartfiles --unwindlib=none")
     endforeach()
 else()
     if (NOT PICO_COMPILER_SYSROOT)
