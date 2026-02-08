@@ -50,21 +50,60 @@ static inline float float2ufix_12(int32_t m) { return float2ufix(m, 12); }
 #define uint642float(i) ({ uint64_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); uint642 ## float(_i); })
 #endif
 
-#if 1 && LIB_PICO_FLOAT_VFP
-// prevet the compiler from eliding the calculations
-#undef float2int_z
-#undef float2uint_z
-#undef int2float
-#undef uint2float
+float make_positive_denormal_float(void) {
+    union {
+        float f;
+        uint32_t u;
+    } x;
+    x.u = 0x00000001u;
+    return x.f;
+}
+
+float make_negative_denormal_float(void) {
+    union {
+        float f;
+        uint32_t u;
+    } x;
+    x.u = 0x80000001u;
+    return x.f;
+}
+
+#if LIB_PICO_FLOAT_PICO_VFP
+float __attribute__((naked)) call_int2float(int32_t i) {
+    pico_default_asm_volatile("b int2float");
+}
+
+float __attribute__((naked)) call_uint2float(uint32_t i) {
+    pico_default_asm_volatile("b uint2float");
+}
+
+int32_t __attribute__((naked)) call_float2int_z(float f) {
+    pico_default_asm_volatile("b float2int_z");
+}
+
+uint32_t __attribute__((naked)) call_float2uint_z(float f) {
+    pico_default_asm_volatile("b float2uint_z");
+}
 #endif
 
 int test() {
     int rc = 0;
-#if LIB_PICO_FLOAT_PICO_DCP
-    printf(">>> Using DCP\n");
+    printf("=== custom_float_funcs_test ");
+#if PICO_C_COMPILER_IS_CLANG
+    printf("(LLVM)");
+#elif PICO_C_COMPILER_IS_GNU
+    printf("(GCC)");
 #endif
-#if LIB_PICO_FLOAT_PICO_VFP
-    printf(">>> Using VFP\n");
+#if defined(__ARM_PCS_VFP)
+    printf(" (hard)");
+#endif
+    printf("\n");
+#if LIB_PICO_FLOAT_PICO_DCP
+    printf("--- using DCP\n");
+#elif LIB_PICO_FLOAT_PICO_VFP
+    printf("--- using VFP\n");
+#elif LIB_PICO_FLOAT_COMPILER
+    printf("--- using compiler\n");
 #endif
     printf("int2float\n");
     test_checkf(int2float(0), 0.0f, "int2float1");
@@ -79,12 +118,36 @@ int test() {
     test_checkf(int2float(2147483483), 2147483520.0f, "int2float9");
     test_checkf(int2float(2147483584), 2147483648.0f, "int2float10");
 
+#if LIB_PICO_FLOAT_PICO_VFP
+    printf("call_int2float\n");
+    test_checkf(call_int2float(0), 0.0f, "call_int2float1");
+    test_checkf(call_int2float(-1), -1.0f, "call_int2float2");
+    test_checkf(call_int2float(1), 1.0f, "call_int2float3");
+    test_checkf(call_int2float(INT32_MAX), 2147483647.0f, "call_int2float4");
+    test_checkf(call_int2float(INT32_MIN), -2147483648.0f, "call_int2float5");
+    // check rounding
+    test_checkf(call_int2float(2147483391), 2147483392.0f, "call_int2float6");
+    test_checkf(call_int2float(2147483456), 2147483392.0f, "call_int2float7");
+    test_checkf(call_int2float(2147483457), 2147483520.0f, "call_int2float8");
+    test_checkf(call_int2float(2147483483), 2147483520.0f, "call_int2float9");
+    test_checkf(call_int2float(2147483584), 2147483648.0f, "call_int2float10");
+#endif
+
     printf("uint2float\n");
     test_checkf(uint2float(0), 0.0f, "uint2float1");
     test_checkf(uint2float(1), 1.0f, "uint2float2");
     test_checkf(uint2float(INT32_MAX), 2147483647.0f, "uint2float3");
     // todo test correct rounding around maximum precision
     test_checkf(uint2float(UINT32_MAX), 4294967295.0f, "uint2float4");
+
+#if LIB_PICO_FLOAT_PICO_VFP
+    printf("call_uint2float\n");
+    test_checkf(call_uint2float(0), 0.0f, "call_uint2float1");
+    test_checkf(call_uint2float(1), 1.0f, "call_uint2float2");
+    test_checkf(call_uint2float(INT32_MAX), 2147483647.0f, "call_uint2float3");
+    // todo test correct rounding around maximum precision
+    test_checkf(call_uint2float(UINT32_MAX), 4294967295.0f, "call_uint2float4");
+#endif
 
     printf("int642float\n");
     test_checkf(int642float(0), 0.0f, "int642float1");
@@ -321,6 +384,7 @@ int test() {
 #endif
 
     // // These methods round towards 0.
+
     printf("float2int_z\n");
     test_checki(float2int_z(0.0f), 0, "float2int_z1");
     test_checki(float2int_z(0.25f), 0, "float2int_z1b");
@@ -340,6 +404,32 @@ int test() {
     test_checki(float2int_z(-21474836480.0f), INT32_MIN, "float2int_z9");
     test_checki(float2int_z(-2.5f), -2, "float2int_z10");
     test_checki(float2int_z(-2.4f), -2, "float2int_z11");
+    test_checki(float2int_z(make_positive_denormal_float()), 0, "float2int_z12");
+    test_checki(float2int_z(make_negative_denormal_float()), 0, "float2int_z13");
+
+#if LIB_PICO_FLOAT_PICO_VFP
+    printf("call_float2int_z\n");
+    test_checki(call_float2int_z(0.0f), 0, "call_float2int_z1");
+    test_checki(call_float2int_z(0.25f), 0, "call_float2int_z1b");
+    test_checki(call_float2int_z(0.5f), 0, "call_float2int_z2");
+    test_checki(call_float2int_z(0.75f), 0, "call_float2int_z2b");
+    test_checki(call_float2int_z(1.0f), 1, "call_float2int_z3");
+    test_checki(call_float2int_z(-10.0f), -10, "call_float2int_z3a");
+    test_checki(call_float2int_z(-0.0f), 0, "call_float2int_z3b");
+    test_checki(call_float2int_z(-0.25f), 0, "call_float2int_z4");
+    test_checki(call_float2int_z(-0.5f), 0, "call_float2int_z4b");
+    test_checki(call_float2int_z(-0.75f), 0, "call_float2int_z5");
+    test_checki(call_float2int_z(-1.0f), -1, "call_float2int_z5b");
+    // todo test correct rounding around maximum precision
+    test_checki(call_float2int_z(2147483647.0f), INT32_MAX, "call_float2int_z6");
+    test_checki(call_float2int_z(21474836470.0f), INT32_MAX, "call_float2int_z7");
+    test_checki(call_float2int_z(-2147483648.0f), INT32_MIN, "call_float2int_z8");
+    test_checki(call_float2int_z(-21474836480.0f), INT32_MIN, "call_float2int_z9");
+    test_checki(call_float2int_z(-2.5f), -2, "call_float2int_z10");
+    test_checki(call_float2int_z(-2.4f), -2, "call_float2int_z11");
+    test_checki(call_float2int_z(make_positive_denormal_float()), 0, "call_float2int_z12");
+    test_checki(call_float2int_z(make_negative_denormal_float()), 0, "call_float2int_z13");
+#endif
 
     printf("float2int64_z\n");
     test_checki64(float2int64_z(0.0f), 0, "float2int64_z1");
@@ -359,6 +449,8 @@ int test() {
     test_checki64(float2int64_z(-21474836480.0f), -21474836480ll, "float2int64_z9");
     test_checki64(float2int64_z(-2.5f), -2, "float2int64_z10");
     test_checki64(float2int64_z(-2.4f), -2, "float2int64_z11");
+    test_checki64(float2int64_z(make_positive_denormal_float()), 0, "float2int64_z12");
+    test_checki64(float2int64_z(make_negative_denormal_float()), 0, "float2int64_z13");
 
     printf("float2uint_z\n");
     test_checku(float2uint_z(0.0f), 0, "float2uint_z1");
@@ -372,6 +464,25 @@ int test() {
     test_checku(float2uint_z(4294967294.5f), UINT32_MAX, "float2uint_z8"); // note loss of precision
     test_checku(float2uint_z(4294967295.0f), UINT32_MAX, "float2uint_z9");
     test_checku(float2uint_z(42949672950.0f), UINT32_MAX, "float2uint_z10");
+    test_checku(float2uint_z(make_positive_denormal_float()), 0, "float2uint_z11");
+    test_checku(float2uint_z(make_negative_denormal_float()), 0, "float2uint_z12");
+
+#if LIB_PICO_FLOAT_PICO_VFP
+    printf("call_float2uint_z\n");
+    test_checku(call_float2uint_z(0.0f), 0, "call_float2uint_z1");
+    test_checku(call_float2uint_z(0.25f), 0, "call_float2uint_z2");
+    test_checku(call_float2uint_z(0.5f), 0, "call_float2uint_z3");
+    test_checku(call_float2uint_z(0.75f), 0, "call_float2uint_z4");
+    test_checku(call_float2uint_z(1.0f), 1, "call_float2uint_z5");
+    test_checku(call_float2uint_z(2147483647.0f), INT32_MAX+1u, "call_float2uint_z6"); // note loss of precision
+    test_checku(call_float2uint_z(2147483648.0f), INT32_MAX+1u, "call_float2uint_z7");
+    // todo test correct rounding around maximum precision
+    test_checku(call_float2uint_z(4294967294.5f), UINT32_MAX, "call_float2uint_z8"); // note loss of precision
+    test_checku(call_float2uint_z(4294967295.0f), UINT32_MAX, "call_float2uint_z9");
+    test_checku(call_float2uint_z(42949672950.0f), UINT32_MAX, "call_float2uint_z10");
+    test_checku(call_float2uint_z(make_positive_denormal_float()), 0, "call_float2uint_z11");
+    test_checku(call_float2uint_z(make_negative_denormal_float()), 0, "call_float2uint_z12");
+#endif
 
     printf("float2uint64_z\n");
     test_checku64(float2uint64_z(0.0f), 0, "float2uint64_z1");
@@ -384,6 +495,8 @@ int test() {
     test_checku64(float2uint64_z(4294967294.5f), 4294967296ull, "float2uint64_z8"); // note loss of precision
     test_checku64(float2uint64_z(4294967295.0f), 4294967296ull, "float2uint64_z9"); // note loss of precision
     test_checku64(float2uint64_z(42949672950.0f), 42949672960ull, "float2uint64_z10"); // note loss of precision
+    test_checku64(float2uint64_z(make_positive_denormal_float()), 0, "float2uint64_z11");
+    test_checku64(float2uint64_z(make_negative_denormal_float()), 0, "float2uint64_z12");
 
     // float exp10f(float x);
     // void sincosf(float x, float *sinx, float *cosx);

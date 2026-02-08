@@ -14,7 +14,7 @@ extern ui64 __aeabi_dmul(ui64, ui64);
 #define m33cf_dsub __aeabi_dsub
 #define m33cf_dmul __aeabi_dmul
 
-#if PICO_USE_HARD_ABI
+#if PICO_HARD_FLOAT_ABI
 extern double ddiv_fast(double, double);
 extern double sqrt_fast(double);
 

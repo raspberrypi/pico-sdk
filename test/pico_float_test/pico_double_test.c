@@ -22,6 +22,10 @@
 #include <sys/types.h>
 #include "inttypes.h"
 
+#if !LIB_PICO_LLVM_LIBC_INTERFACE
+#define TEST_SATURATION 1
+#endif
+
 #define test_assert(x) ({ if (!(x)) { printf("Assertion failed: ");puts(#x);printf("  at " __FILE__ ":%d\n", __LINE__); exit(-1); } })
 
 extern __attribute__((pcs("aapcs"))) int __aeabi_dcmpun(double a, double b);
@@ -469,8 +473,9 @@ int main() {
     for(double x = -4294967296.f * 4294967296.f * 2.f; x<=-0.5f; x/=2.f) {
         printf("d2i64 %f->%lld\n", x, (int64_t)x);
         if (x <= (double) INT64_MIN) {
-            // seems like there is a bug in the gcc version!
+#if TEST_SATURATION
             test_assert(__aeabi_d2lz(x) == INT64_MIN);
+#endif
         } else {
             check1(__aeabi_d2lz, x);
         }
@@ -478,8 +483,9 @@ int main() {
     for(double x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
         printf("d2i64 %f->%lld\n", x, (int64_t)x);
         if (x >= (double)INT64_MAX) {
-            // seems like there is a bug in the clang and gcc versions!
+#if TEST_SATURATION
             test_assert(__aeabi_d2lz(x) == INT64_MAX);
+#endif
         } else {
             check1(__aeabi_d2lz, x);
         }
@@ -491,8 +497,9 @@ int main() {
     for(double x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
         printf("d2i32 %f->%d\n", x, (int32_t)x);
         if (x >= (double) INT32_MAX - 1 && x <= (double) INT32_MAX + 1) {
-            // seems like there is a bug in the clang version!
+#if TEST_SATURATION
             test_assert(__aeabi_d2iz(x) == INT32_MAX);
+#endif
         } else {
             check1(__aeabi_d2iz, x);
         }

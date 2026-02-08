@@ -44,10 +44,41 @@ static inline double double2ufix_12(int32_t m) { return double2ufix(m, 12); }
 #define uint642double(i) ({ uint64_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); uint642 ## double(_i); })
 #endif
 
+double make_positive_denormal_double(void) {
+    union {
+        double d;
+        uint64_t u;
+    } x;
+    x.u = 0x0000000000000001ull;
+    return x.d;
+}
+
+double make_negative_denormal_double(void) {
+    union {
+        double d;
+        uint64_t u;
+    } x;
+    x.u = 0x8000000000000001ull;
+    return x.d;
+}
+
+
 int test() {
     int rc = 0;
+    printf("=== custom_double_funcs_test ");
+#if PICO_C_COMPILER_IS_CLANG
+    printf("(LLVM)");
+#elif PICO_C_COMPILER_IS_GNU
+    printf("(GCC)");
+#endif
+#if defined(__ARM_PCS_VFP)
+    printf(" (hard)");
+#endif
+    printf("\n");
 #if LIB_PICO_DOUBLE_PICO
-    printf(">>> Using PICO\n");
+    printf("--- using DCP\n");
+#elif LIB_PICO_FLOAT_COMPILER
+    printf("--- using compiler\n");
 #endif
     printf("int2double\n");
     test_checkd(int2double(0), 0.0, "int2double1");
@@ -359,6 +390,8 @@ int test() {
     test_checki(double2int(-2147483648.0), INT32_MIN, "double2int16");
     test_checki(double2int(-2147483648.1), INT32_MIN, "double2int17");
     test_checki(double2int(-21474836480.1), INT32_MIN, "double2int18");
+    test_checki(double2int(make_positive_denormal_double()), 0, "double2int19");
+    test_checki(double2int(make_negative_denormal_double()), 0, "double2int20");
 
     printf("double2uint\n");
     test_checku(double2uint(0.0), 0, "double2uint1");
@@ -403,6 +436,8 @@ int test() {
     test_checki64(double2int64(u64d.d), -3, "double2int6412e");
     u64d.u = 0xc000000100000001ull;
     test_checki64(double2int64(u64d.d), -3, "double2int6412f");
+    test_checki64(double2int64(make_positive_denormal_double()), 0, "double2int6413");
+    test_checki64(double2int64(make_negative_denormal_double()), 0, "double2int6414");
 
     printf("double2uint64\n");
     test_checku64(double2uint64(0.0), 0, "double2uint641");
@@ -416,6 +451,8 @@ int test() {
     test_checku64(double2uint64(4294967294.5), 4294967294ull, "double2uint648");
     test_checku64(double2uint64(4294967295.0), 4294967295ull, "double2uint649");
     test_checku64(double2uint64(42949672950.0), 42949672950, "double2uint6410");
+    test_checku64(double2uint64(make_positive_denormal_double()), 0, "double2uint6411");
+    test_checku64(double2uint64(make_negative_denormal_double()), 0, "double2uint6412");
 #endif
 
     // // These methods round towards 0.
@@ -450,6 +487,8 @@ int test() {
     test_checki(double2int_z(u64d.d), -2, "double2int_z12e");
     u64d.u = 0xc000000100000001ull;
     test_checki(double2int_z(u64d.d), -2, "double2int_z12f");
+    test_checki(double2int_z(make_positive_denormal_double()), 0, "double2int_z13");
+    test_checki(double2int_z(make_negative_denormal_double()), 0, "double2int_z14");
 
     printf("double2int64_z\n");
     test_checki64(double2int64_z(0.0), 0, "double2int64_z1");
@@ -470,6 +509,8 @@ int test() {
     test_checki64(double2int64_z(-21474836480.0), -21474836480ll, "double2int64_z9");
     test_checki64(double2int64_z(-2.5), -2, "double2int64_z10");
     test_checki64(double2int64_z(-2.4), -2, "double2int64_z11");
+    test_checki64(double2int64_z(make_positive_denormal_double()), 0, "double2int64_z12");
+    test_checki64(double2int64_z(make_negative_denormal_double()), 0, "double2int64_z13");
 
     printf("double2uint_z\n");
     test_checku(double2uint_z(0.0), 0, "double2uint_z1");
@@ -483,6 +524,8 @@ int test() {
     test_checku(double2uint_z(4294967294.5), UINT32_MAX-1u, "double2uint_z8");
     test_checku(double2uint_z(4294967295.0), UINT32_MAX, "double2uint_z9");
     test_checku(double2uint_z(42949672950.0), UINT32_MAX, "double2uint_z10");
+    test_checku(double2uint_z(make_positive_denormal_double()), 0, "double2uint_z11");
+    test_checku(double2uint_z(make_negative_denormal_double()), 0, "double2uint_z12");
 
     printf("double2uint64_z\n");
     test_checku64(double2uint64_z(0.0), 0, "double2uint64_z1");
@@ -497,6 +540,8 @@ int test() {
     test_checku64(double2uint64_z(4294967295.0), 4294967295ull, "double2uint64_z9");
     test_checku64(double2uint64_z(4294967296.0), 4294967296ull, "double2uint64_z9b");
     test_checku64(double2uint64_z(42949672950.0), 42949672950ull, "double2uint64_z10");
+    test_checku64(double2uint64_z(make_positive_denormal_double()), 0, "double2uint64_z11");
+    test_checku64(double2uint64_z(make_negative_denormal_double()), 0, "double2uint64_z12");
 
     // double exp10(double x);
     // void sincos(double x, double *sinx, double *cosx);
