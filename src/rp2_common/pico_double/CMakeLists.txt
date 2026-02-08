@@ -22,7 +22,6 @@ if (NOT TARGET pico_double)
     target_link_libraries(pico_double INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>,${PICO_DEFAULT_DOUBLE_IMPL}>)
 
-    # todo maybe this should be pico_double_dcp (note FreeRTOS has a dependency on the LIB_PICO_DOUBLE_FOO)
     pico_add_library(pico_double_pico)
     if (PICO_RP2040)
         target_sources(pico_double_pico INTERFACE
@@ -31,17 +30,20 @@ if (NOT TARGET pico_double)
                 ${CMAKE_CURRENT_LIST_DIR}/double_math.c
                 ${CMAKE_CURRENT_LIST_DIR}/double_v1_rom_shim_rp2040.S
         )
+        target_link_libraries(pico_double_pico INTERFACE pico_bootrom pico_double_headers hardware_divider)
     elseif(NOT PICO_RISCV)
-        target_sources(pico_double_pico INTERFACE
+        pico_add_library(pico_double_pico_dcp)
+        target_sources(pico_double_pico_dcp INTERFACE
                 ${CMAKE_CURRENT_LIST_DIR}/double_math.c
                 ${CMAKE_CURRENT_LIST_DIR}/double_aeabi_dcp.S
                 ${CMAKE_CURRENT_LIST_DIR}/double_fma_dcp.S
                 ${CMAKE_CURRENT_LIST_DIR}/double_sci_m33.S
                 ${CMAKE_CURRENT_LIST_DIR}/double_conv_m33.S
                 )
+        target_link_libraries(pico_double_pico_dcp INTERFACE pico_double_headers)
+        target_link_libraries(pico_double_pico INTERFACE pico_double_pico_dcp)
     endif()
 
-    target_link_libraries(pico_double_pico INTERFACE pico_bootrom pico_double_headers hardware_divider)
 
     pico_add_library(pico_double_none)
     target_sources(pico_double_none INTERFACE
