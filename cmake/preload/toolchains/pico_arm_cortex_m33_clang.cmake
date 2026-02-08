@@ -2,7 +2,6 @@ set(CMAKE_SYSTEM_PROCESSOR cortex-m33)
 
 set(PICO_COMMON_LANG_FLAGS "-mcpu=cortex-m33 --target=armv8m.main-none-eabi -march=armv8m.main+fp+dsp")
 
-# PICO_CMAKE_CONFIG: PICO_HARD_FLOAT_ABI, use hard floating point ABI, type=bool, default=0, group=build, docref=cmake-toolchain-config
 if (PICO_HARD_FLOAT_ABI)
     set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -mfloat-abi=hard")
     # todo - doesn't seem to be a hard_fp variant for google atm?
