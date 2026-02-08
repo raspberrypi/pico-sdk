@@ -5,7 +5,6 @@
  */
 
 #include "pico/asm_helper.S"
-#if HAS_DOUBLE_COPROCESSOR
 
 pico_default_asm_setup
 
@@ -531,5 +530,3 @@ double2ufix64_z_softfp:
  movs r0,#0
  movs r1,#0
  bx r14
-
-#endif
