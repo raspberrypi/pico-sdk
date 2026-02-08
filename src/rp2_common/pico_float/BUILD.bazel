@@ -24,15 +24,15 @@ _WRAP_FLOAT_AEABI_CMP_FLAGS = [
 
 _WRAP_FLOAT_AEABI_CONV_32_FLAGS = [
     "-Wl,--wrap=__aeabi_i2f",
-    "-Wl,--wrap=__aeabi_l2f",
     "-Wl,--wrap=__aeabi_ui2f",
-    "-Wl,--wrap=__aeabi_ul2f",
+    "-Wl,--wrap=__aeabi_f2iz",
+    "-Wl,--wrap=__aeabi_f2uiz",
 ]
 
 _WRAP_FLOAT_AEABI_CONV_64_FLAGS = [
-    "-Wl,--wrap=__aeabi_f2iz",
+    "-Wl,--wrap=__aeabi_l2f",
+    "-Wl,--wrap=__aeabi_ul2f",
     "-Wl,--wrap=__aeabi_f2lz",
-    "-Wl,--wrap=__aeabi_f2uiz",
     "-Wl,--wrap=__aeabi_f2ulz",
 ]
 
