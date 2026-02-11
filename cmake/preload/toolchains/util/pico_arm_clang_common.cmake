@@ -75,15 +75,17 @@ endif()
 
 set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} --sysroot ${PICO_CLIB_ROOT}")
 
-# moving this here as a reminder from pico_standard_link; it was commented out theee, but if ever needed,
-# it belongs here as part of LINKER_FLAGS_INIT
-#target_link_options(pico_standard_link INTERFACE "LINKER:-fuse-ld=lld")
-
 if (PICO_CLIB STREQUAL "llvm_libc")
     # TODO: Move -nostartfiles to the appropriate library.
     foreach(TYPE IN ITEMS EXE SHARED MODULE)
         set(CMAKE_${TYPE}_LINKER_FLAGS_INIT "-nostartfiles")
     endforeach()
+endif()
+
+# at least rp2040 does not work with lld.  For rp2350 it seems to work with lld, but not really sure
+set(CMAKE_EXE_LINKER_FLAGS_INIT "${CMAKE_EXE_LINKER_FLAGS_INIT} -fuse-ld=ld -Wl,-z,noexecstack")
+if(CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+    message(FATAL_ERROR "IPO is not supported with the current configuration of the Pico SDK")
 endif()
 
 message(STATUS "Taking '${PICO_CLIB}' from '${PICO_CLIB_ROOT}'")
