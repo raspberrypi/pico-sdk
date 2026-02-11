@@ -85,6 +85,18 @@ int main(void) {
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     printf("%f\n", foox(1.3f, 2.6f));
+#ifdef EXTRA_DATA_SECTION
+    static int extra_data __attribute__((section(".extra_data"))) = 12345678;
+    printf("extra_data before load = %d\n", extra_data);
+
+    extern uint32_t __extra_data_source__;
+    extern uint32_t __extra_data_start__;
+    extern uint32_t __extra_data_end__;
+    uint32_t stored_words = (uint32_t)(&__extra_data_end__ - &__extra_data_start__);
+    memcpy(&__extra_data_start__, &__extra_data_source__, 4 * stored_words);
+
+    printf("extra_data after load = %d\n", extra_data);
+#endif
 #ifndef __riscv
     // this should compile as we are Cortex M0+
     pico_default_asm ("SVC #3");

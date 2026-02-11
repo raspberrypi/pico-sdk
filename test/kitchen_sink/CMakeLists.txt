@@ -223,6 +223,12 @@ if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
     target_link_libraries(kitchen_sink_ram_custom kitchen_sink_libs kitchen_sink_options)
     pico_add_extra_outputs(kitchen_sink_ram_custom)
     target_compile_definitions(kitchen_sink_ram_custom PRIVATE KITCHEN_SINK_ID="custom ram binary")
+
+    add_executable(kitchen_sink_ram_section ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    pico_add_linker_script_override_path(kitchen_sink_ram_section ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_ram_section_scripts)
+    target_link_libraries(kitchen_sink_ram_section kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_ram_section)
+    target_compile_definitions(kitchen_sink_ram_section PRIVATE KITCHEN_SINK_ID="ram section binary" EXTRA_DATA_SECTION=1)
 endif()
 
 add_executable(kitchen_sink_cpp ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_cpp.cpp)
