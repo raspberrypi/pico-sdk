@@ -1,5 +1,5 @@
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_common", "cc_library", "CcInfo")
 
 def _pico_generate_pio_header_impl(ctx):
     generated_headers = []

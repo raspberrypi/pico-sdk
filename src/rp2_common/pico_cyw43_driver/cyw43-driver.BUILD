@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@pico-sdk//bazel:defs.bzl", "compatible_with_pico_w")
 
 package(default_visibility = ["//visibility:public"])

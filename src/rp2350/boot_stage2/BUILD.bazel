@@ -1,6 +1,7 @@
 # Always include these libraries through //src/rp2_common:*!
 # This ensures that you'll get the right headers for the MCU you're targeting.
 
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("@rules_python//python:defs.bzl", "py_binary")

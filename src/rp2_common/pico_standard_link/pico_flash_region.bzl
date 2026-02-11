@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_common", "CcInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "use_cpp_toolchain")
 
 def _generated_pico_flash_region_impl(ctx):

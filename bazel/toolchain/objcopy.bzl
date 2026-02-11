@@ -1,4 +1,5 @@
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "OBJ_COPY_ACTION_NAME")
+load("@rules_cc//cc:defs.bzl", "cc_common")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cpp_toolchain", "use_cc_toolchain")
 
 def _objcopy_to_bin_impl(ctx):

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2", "pico_generate_pio_header")
 load("//bazel/util:transition.bzl", "kitchen_sink_test_binary")
 

@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+
 # Always include these libraries through //src/rp2_common:*!
 # This ensures that you'll get the right headers for the MCU you're targeting.
 

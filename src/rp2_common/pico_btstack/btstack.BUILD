@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@pico-sdk//bazel:defs.bzl", "compatible_with_config", "incompatible_with_config")
 

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_common", "CcInfo")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cpp_toolchain", "use_cc_toolchain")
 
 def _pico_btstack_make_gatt_header_impl(ctx):

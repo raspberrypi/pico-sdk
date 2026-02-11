@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_common", "CcInfo")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 
 def _pico_sdk_define_impl(ctx):
