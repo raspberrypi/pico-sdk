@@ -73,10 +73,31 @@ if (NOT TARGET pico_standard_link)
     # pico_set_linker_script_var(TARGET NAME VALUE)
     # \brief\ Set the linker script for the target
     #
-    # \param\ NAME Name of varAible to set
+    # \param\ NAME Name of variable to set
     # \param\ VALUE Value of variable to set
     function(pico_set_linker_script_var TARGET NAME VALUE)
         set_property(TARGET ${TARGET} APPEND PROPERTY PICO_TARGET_LINKER_SCRIPT_VARS "--defsym=${NAME}=${VALUE}")
+    endfunction()
+
+    # pico_add_linker_script_override_path(TARGET PATH)
+    # \brief\ Add an override linker script path to the target
+    #
+    # This can be used to override default linker script files with custom versions.
+    #
+    # For example, to use custom files in ${CMAKE_CURRENT_LIST_DIR}/extra_scripts instead of the default ones,
+    # call pico_add_linker_script_override_path(TARGET ${CMAKE_CURRENT_LIST_DIR}/extra_scripts). This will
+    # include the custom files first, overriding the default ones.
+    #
+    # Must be called before target_link_libraries, otherwise it will not override the default linker scripts.
+    #
+    # \param\ TARGET The target to add the linker script override path to
+    # \param\ PATH The path containing the overriding linker scripts
+    function(pico_add_linker_script_override_path TARGET PATH)
+        get_target_property(OUT ${TARGET} LINK_LIBRARIES)
+        if (OUT)
+            message(WARNING "pico_add_linker_script_override_path does not work when called after target_link_libraries")
+        endif()
+        target_link_options(${TARGET} PRIVATE "LINKER:-L${PATH}")
     endfunction()
 
     # pico_set_binary_type(TARGET TYPE)
@@ -137,11 +158,11 @@ if (NOT TARGET pico_standard_link)
     target_link_options(pico_standard_link INTERFACE "LINKER:-L${CMAKE_BINARY_DIR}")
 
     # add include path for main linker script sections
-    target_link_options(pico_standard_link INTERFACE "LINKER:-L${PICO_LINKER_SCRIPT_PATH}")
+    target_link_options(pico_standard_link INTERFACE "LINKER:-L${PICO_LINKER_SCRIPT_PATH}/scripts")
     target_link_options(pico_standard_link INTERFACE "LINKER:-L${CMAKE_CURRENT_LIST_DIR}/scripts")
 
     # add default locations script, so they can be referenced by pico_set_linker_script_var variables
-    target_link_options(pico_standard_link INTERFACE "LINKER:--script=${PICO_LINKER_SCRIPT_PATH}/platform/default_locations.ld")
+    target_link_options(pico_standard_link INTERFACE "LINKER:--script=${PICO_LINKER_SCRIPT_PATH}/scripts/default_locations.ld")
 
     # add variables set by pico_set_linker_script_var function
     target_link_options(pico_standard_link INTERFACE "LINKER:$<JOIN:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_VARS>,,>")

@@ -1,0 +1,7 @@
+INCLUDE "section_copy_to_ram_text.ld"
+INCLUDE "section_copy_to_ram_data.ld"
+INCLUDE "section_heap.ld"
+INCLUDE "section_scratch.ld"
+INCLUDE "section_flash_end.ld"
+INCLUDE "section_end.ld"
+INCLUDE "section_platform_end.ld"
