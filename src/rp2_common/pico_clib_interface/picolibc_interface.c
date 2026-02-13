@@ -58,6 +58,12 @@ static FILE __stdio = FDEV_SETUP_STREAM(picolibc_putc,
                                         picolibc_flush,
                                         _FDEV_SETUP_RW);
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#endif
+
 FILE *const stdin = &__stdio; __strong_reference(stdin, stdout); __strong_reference(stdin, stderr);
 
 void __weak __assert_func(const char *file, int line, const char *func, const char *failedexpr) {
