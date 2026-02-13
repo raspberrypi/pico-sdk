@@ -46,7 +46,9 @@ endforeach()
 
 # todo is this correct/needed?
 if (PICO_C_COMPILER_IS_GNU)
-    target_link_options(pico_runtime INTERFACE "--specs=nosys.specs")
+    if (PICO_CLIB STREQUAL "newlib")
+        target_link_options(${NAME} PRIVATE "--specs=nosys.specs")
+    endif()
 elseif (PICO_C_COMPILER_IS_CLANG)
    # target_link_options(pico_runtime INTERFACE "-nostdlib")
 endif()
