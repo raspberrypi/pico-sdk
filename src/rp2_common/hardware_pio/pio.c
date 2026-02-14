@@ -405,8 +405,8 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, u
     return pio_claim_free_sm_and_add_program_for_gpio_range(program, pio, sm, offset, 0, 0, false);
 }
 
-bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio, uint *sm, uint *offset, uint gpio_base, uint gpio_count, bool set_gpio_base) {
-    invalid_params_if(HARDWARE_PIO, (gpio_base + gpio_count) > NUM_BANK0_GPIOS);
+bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio, uint *sm, uint *offset, uint gpio_start, uint gpio_count, bool set_gpio_base) {
+    invalid_params_if(HARDWARE_PIO, (gpio_start + gpio_count) > NUM_BANK0_GPIOS);
 
 #if !PICO_PIO_USE_GPIO_BASE
     // short-circuit some logic when not using GIO_BASE
@@ -417,7 +417,7 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
     // note if we gpio_count == 0, we don't care about GPIOs so use a zero mask for what we require
     // if gpio_count > 0, then we just set used mask for the ends, since that is all that is checked at the moment
     uint32_t required_gpio_ranges;
-    if (gpio_count) required_gpio_ranges = (1u << (gpio_base >> 4)) | (1u << ((gpio_base + gpio_count - 1) >> 4));
+    if (gpio_count) required_gpio_ranges = (1u << (gpio_start >> 4)) | (1u << ((gpio_start + gpio_count - 1) >> 4));
     else            required_gpio_ranges = 0;
     int passes = set_gpio_base ? 2 : 1;
 

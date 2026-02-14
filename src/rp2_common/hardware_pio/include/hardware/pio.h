@@ -2005,26 +2005,26 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, u
 /*! \brief Finds a PIO and statemachine and adds a program into PIO memory
  *  \ingroup hardware_pio
  *
- * This variation of \ref pio_claim_free_sm_and_add_program is useful on RP2350 QFN80 where the "GPIO Base"
+ * This variation of \ref pio_claim_free_sm_and_add_program is useful on RP2350B where the "GPIO Base"
  * must be set per PIO instance to either address the 32 GPIOs (0->31) or the 32 GPIOS (16-47). No single
  * PIO instance can interact with both pins 0->15 or 32->47 at the same time.
  *
- * This method takes additional information about the GPIO pins needed (via gpio_base and gpio_count),
+ * This method takes additional information about the GPIO pins needed (via gpio_start and gpio_count),
  * and optionally will set the GPIO base (see \ref pio_set_gpio_base) of an unused PIO instance if necessary
  *
  * \param program PIO program to add
  * \param pio Returns the PIO hardware instance or NULL if no PIO is available
  * \param sm Returns the index of the PIO state machine that was claimed
  * \param offset Returns the instruction memory offset of the start of the program
- * \param gpio_base the lowest GPIO number required (0-47 on RP2350B, 0-31 otherwise)
- * \param gpio_count the count of GPIOs required
+ * \param gpio_start the lowest GPIO number required (0-47 on RP2350B, 0-31 otherwise)
+ * \param gpio_count the count of consecutive GPIOs required
  * \param set_gpio_base if there is no free SM on a PIO instance with the right GPIO base, and there IS an unused PIO
  *                      instance, then that PIO will be reconfigured so that this method can succeed
  *
  * \return true on success, false otherwise
  * \see pio_remove_program_and_unclaim_sm
  */
-bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio, uint *sm, uint *offset, uint gpio_base, uint gpio_count, bool set_gpio_base);
+bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio, uint *sm, uint *offset, uint gpio_start, uint gpio_count, bool set_gpio_base);
 
 /*! \brief Removes a program from PIO memory and unclaims the state machine
  *  \ingroup hardware_pio
