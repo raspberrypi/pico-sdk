@@ -68,11 +68,11 @@ static int find_offset_for_program(PIO pio, const pio_program_t *program) {
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     uint32_t program_mask = (1u << program->length) - 1;
     if (program->origin >= 0) {
-        if (program->origin > 32 - program->length) return PICO_ERROR_GENERIC;
+        if (program->origin > PIO_INSTRUCTION_COUNT - program->length) return PICO_ERROR_GENERIC;
         return used_mask & (program_mask << program->origin) ? -1 : program->origin;
     } else {
         // work down from the top always
-        for (int i = 32 - program->length; i >= 0; i--) {
+        for (int i = PIO_INSTRUCTION_COUNT - program->length; i >= 0; i--) {
             if (!(used_mask & (program_mask << (uint) i))) {
                 return i;
             }
