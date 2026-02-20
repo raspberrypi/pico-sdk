@@ -264,6 +264,7 @@ static void process_under_lock(async_context_threadsafe_background_t *self) {
             if (self->alarm_id > 0) {
                 alarm_pool_cancel_alarm(self->alarm_pool, self->alarm_id);
                 self->alarm_id = 0;
+                self->alarm_pending = false;
             }
             break;
         }
