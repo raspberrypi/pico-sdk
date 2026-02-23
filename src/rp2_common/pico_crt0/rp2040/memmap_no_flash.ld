@@ -4,10 +4,12 @@
     __exidx_end
     __etext
     __data_start__
+    __bothinit_array_start
     __preinit_array_start
     __preinit_array_end
     __init_array_start
     __init_array_end
+    __bothinit_array_end
     __fini_array_start
     __fini_array_end
     __data_end__
@@ -118,6 +120,7 @@ SECTIONS
 
         . = ALIGN(4);
         /* preinit data */
+        PROVIDE_HIDDEN (__bothinit_array_start = .);
         PROVIDE_HIDDEN (__preinit_array_start = .);
         KEEP(*(SORT(.preinit_array.*)))
         KEEP(*(.preinit_array))
@@ -129,6 +132,7 @@ SECTIONS
         KEEP(*(SORT(.init_array.*)))
         KEEP(*(.init_array))
         PROVIDE_HIDDEN (__init_array_end = .);
+        PROVIDE_HIDDEN (__bothinit_array_end = .);
 
         . = ALIGN(4);
         /* finit data */
