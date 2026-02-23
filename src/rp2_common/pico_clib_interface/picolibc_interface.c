@@ -11,6 +11,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/times.h>
+#include <picotls.h>
 
 #include "pico.h"
 #if LIB_PICO_STDIO
@@ -135,26 +136,45 @@ void runtime_init(void) {
     __libc_init_array();
 }
 
-#if !PICO_RUNTIME_NO_INIT_PER_CORE_TLS_SETUP
-__weak void runtime_init_pre_core_tls_setup(void) {
-    // for now we just set the same global area on both cores
-    // note: that this is superfluous with the stock picolibc it seems, since it is itself
-    // using a version of __aeabi_read_tp that returns the same pointer on both cores
-    extern char __tls_base[];
-    extern void _set_tls(void *tls);
-    _set_tls(__tls_base);
+/* The size of the thread control block.
+ * TLS relocations are generated relative to
+ * a location this far *before* the first thread
+ * variable (!)
+ * NB: The actual size before tp also includes padding
+ * to align up to the alignment of .tdata/.tbss.
+ */
+extern char __arm32_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
+
+static void *__tls[2];
+
+void _set_tls(void *tls) {
+    tls = (uint8_t *)tls - TP_OFFSET;
+    __tls[get_core_num()] = tls;
 }
-#endif
 
-#if !PICO_RUNTIME_SKIP_INIT_PER_CORE_TLS_SETUP
-PICO_RUNTIME_INIT_FUNC_PER_CORE(runtime_init_pre_core_tls_setup, PICO_RUNTIME_INIT_PER_CORE_TLS_SETUP);
-#endif
+/* Initialized by the linker, one per core */
+extern char __tls0_base[], __tls1_base[];
+static void * const __tls_base[2] = { __tls0_base, __tls1_base };
 
-//// naked as it must preserve everything except r0 and lr
-//uint32_t __attribute__((naked)) WRAPPER_FUNC(__aeabi_read_tp)() {
-//    // note for now we are just returning a shared instance on both cores
-//    pico_default_asm_volatile(
-//            "ldr r0, =__tls_base\n"
-//            "bx lr\n"
-//            );
-//}
+void runtime_init_per_core_tls_setup(void) {
+    void *tls_base = __tls_base[get_core_num()];
+    _init_tls(tls_base);
+    _set_tls(tls_base);
+}
+
+PICO_RUNTIME_INIT_FUNC_PER_CORE(runtime_init_per_core_tls_setup, PICO_RUNTIME_INIT_PER_CORE_TLS_SETUP);
+
+uint32_t __aeabi_read_tp(void);
+
+uint32_t __attribute__((naked)) __aeabi_read_tp(void) {
+    pico_default_asm_volatile(
+        "push {r1,lr}           /* Save R1 (and LR) */\n"
+        "ldr r1,=0xd0000000     /* Address of SIO->CPUID */\n"
+        "ldr r1,[r1]            /* Fetch active core */\n"
+        "lsls r1,r1,#2          /* Multiply by 4 */\n"
+        "ldr r0,=%0             /* Address of __tls array */\n"
+        "ldr r0,[r0,r1]         /* Fetch __tls[CPUID] */\n"
+        "pop {r1,pc}            /* Restore R1 and return  */\n" : : "i" (__tls)
+        );
+}

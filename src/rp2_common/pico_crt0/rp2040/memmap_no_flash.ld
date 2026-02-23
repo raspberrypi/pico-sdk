@@ -93,6 +93,30 @@ SECTIONS
     } > RAM
     __exidx_end = .;
 
+    /* Assign TLS offsets and load TLS initialization data */
+    .tdata :
+    {
+        *(.tdata .tdata.* .gnu.linkonce.td.*)
+        PROVIDE( __tdata_end = . );
+    } >RAM
+
+    .tbss (NOLOAD) : {
+        *(.tbss .tbss.* .gnu.linkonce.tb.*)
+        *(.tcommon)
+        PROVIDE( __tls_end = . );
+        PROVIDE( __tbss_end = . );
+    } >RAM
+
+    PROVIDE( __tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
+    PROVIDE( __tls_size = __tls_end - __tls_start );
+    PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+    PROVIDE( __tls_size_align = ALIGN( __tls_size, __tls_align) );
+    PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
+    PROVIDE( __tdata_size = SIZEOF(.tdata) );
+    PROVIDE( __tdata_source = LOADADDR(.tdata) );
+    PROVIDE( __tbss_size = SIZEOF(.tbss) );
+    PROVIDE( __tbss_offset = ADDR(.tbss) - __tls_start );
+
     /* Machine inspectable binary information */
     . = ALIGN(4);
     __binary_info_start = .;
@@ -145,12 +169,6 @@ SECTIONS
         . = ALIGN(4);
    } > RAM
 
-    .tdata : {
-        . = ALIGN(4);
-		*(.tdata .tdata.* .gnu.linkonce.td.*)
-        /* All data end */
-        __tdata_end = .;
-    } > RAM
     PROVIDE(__data_end__ = .);
 
     .uninitialized_data (NOLOAD): {
@@ -160,24 +178,27 @@ SECTIONS
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
     __etext = LOADADDR(.data);
 
-    .tbss (NOLOAD) : {
-        . = ALIGN(4);
-        __bss_start__ = .;
-        __tls_base = .;
-        *(.tbss .tbss.* .gnu.linkonce.tb.*)
-        *(.tcommon)
-
-        __tls_end = .;
-    } > RAM
-
     .bss (NOLOAD) : {
         . = ALIGN(4);
-        __tbss_end = .;
-
+        __bss_start__ = .;
         *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
         *(COMMON)
         . = ALIGN(4);
         __bss_end__ = .;
+    } > RAM
+
+    # Thread local storage static allocations, one per core
+
+    .tls0 (NOLOAD) : {
+       . = ALIGN(__tls_align);
+       PROVIDE(__tls0_base = .);
+       . = . + __tls_size_align;
+    } > RAM
+
+    .tls1 (NOLOAD) : {
+        . = ALIGN(__tls_align);
+        PROVIDE(__tls1_base = .);
+        . = . + __tls_size_align;
     } > RAM
 
     .heap (NOLOAD):
@@ -236,9 +257,6 @@ SECTIONS
     /* picolibc and LLVM */
     PROVIDE (__heap_start = __end__);
     PROVIDE (__heap_end = __HeapLimit);
-    PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
-    PROVIDE( __tls_size_align = (__tls_size + __tls_align - 1) & ~(__tls_align - 1));
-    PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
 
     /* llvm-libc */
     PROVIDE (_end = __end__);
