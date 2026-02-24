@@ -191,4 +191,23 @@ if (NOT TARGET pico_standard_link)
             endif()
         endif()
     endif()
+
+    # Convert pico-sdk printf variant selection into picolibc version
+    # when using pico_printf_compiler
+
+    if (PICO_CLIB STREQUAL "picolibc")
+        if (RUNTIME_INCLUDE_PRINTF_MINIMAL)
+            target_link_options(pico_standard_link INTERFACE
+              $<$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_PRINTF_IMPL>,pico_printf_compiler>:--printf=m>)
+        elseif (RUNTIME_INCLUDE_PRINTF_FLOAT)
+            # this is the default
+        elseif (RUNTIME_INCLUDE_PRINTF_LONG_LONG)
+            target_link_options(pico_standard_link INTERFACE
+              $<$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_PRINTF_IMPL>,pico_printf_compiler>:--printf=l>)
+        else()
+            target_link_options(pico_standard_link INTERFACE
+              $<$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_PRINTF_IMPL>,pico_printf_compiler>:--printf=i>)
+        endif()
+    endif()
+
 endif()
