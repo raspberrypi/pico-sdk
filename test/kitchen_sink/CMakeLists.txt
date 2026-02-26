@@ -229,6 +229,15 @@ if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
     target_link_libraries(kitchen_sink_ram_section kitchen_sink_libs kitchen_sink_options)
     pico_add_extra_outputs(kitchen_sink_ram_section)
     target_compile_definitions(kitchen_sink_ram_section PRIVATE KITCHEN_SINK_ID="ram section binary" EXTRA_DATA_SECTION=1)
+
+    if (NOT PICO_C_COMPILER_IS_CLANG)
+        # Clang does not support overlay sections
+        add_executable(kitchen_sink_simple_overlay ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+        pico_add_linker_script_override_path(kitchen_sink_simple_overlay ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_simple_overlay_scripts)
+        target_link_libraries(kitchen_sink_simple_overlay kitchen_sink_libs kitchen_sink_options)
+        pico_add_extra_outputs(kitchen_sink_simple_overlay)
+        target_compile_definitions(kitchen_sink_simple_overlay PRIVATE KITCHEN_SINK_ID="simple overlay binary" EXTRA_DATA_SECTION=2)
+    endif()
 endif()
 
 add_executable(kitchen_sink_cpp ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_cpp.cpp)
