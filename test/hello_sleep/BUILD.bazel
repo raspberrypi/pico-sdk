@@ -30,7 +30,7 @@ cc_binary(
     name = "rtc_clksrc",
     testonly = True,
     srcs = ["rtc_clksrc.c"],
-    target_compatible_with = compatible_with_rp2(),
+    target_compatible_with = ["//bazel/constraint:rp2040"],
     deps = [
         "//src/rp2_common/pico_stdlib",
         "//src/rp2_common/pico_status_led",
