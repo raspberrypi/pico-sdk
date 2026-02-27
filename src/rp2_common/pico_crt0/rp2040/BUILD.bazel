@@ -2,6 +2,8 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
+load("//bazel/util:pico_linker_scripts.bzl", "use_linker_script_file")
+
 exports_files(
     [
         "memmap_blocked_ram.ld",
@@ -9,6 +11,26 @@ exports_files(
         "memmap_default.ld",
         "memmap_no_flash.ld",
     ],
+)
+
+use_linker_script_file(
+    name = "memmap_default_args",
+    script = "memmap_default.ld",
+)
+
+use_linker_script_file(
+    name = "memmap_blocked_ram_args",
+    script = "memmap_blocked_ram.ld",
+)
+
+use_linker_script_file(
+    name = "memmap_copy_to_ram_args",
+    script = "memmap_copy_to_ram.ld",
+)
+
+use_linker_script_file(
+    name = "memmap_no_flash_args",
+    script = "memmap_no_flash.ld",
 )
 
 # It's possible to set linker scripts globally or on a per-binary basis.
@@ -22,12 +44,14 @@ exports_files(
 #   * Manually add your desired linker script to each cc_binary.
 cc_library(
     name = "default_linker_script",
-    linkopts = ["-T$(location memmap_default.ld)"],
     target_compatible_with = ["//bazel/constraint:rp2040"],
     deps = [
-        "memmap_default.ld",
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2_common/pico_crt0/rp2040/scripts:rp2040_linker_scripts",
+        "//src/rp2_common/pico_standard_link/scripts:rp2_linker_scripts",
         "//src/rp2_common/pico_standard_link:default_flash_region",
+        "memmap_default.ld",
+        "memmap_default_args",
     ],
 )
 
@@ -35,12 +59,14 @@ cc_library(
 cc_library(
     name = "blocked_ram_linker_script",
     defines = ["PICO_USE_BLOCKED_RAM=1"],
-    linkopts = ["-T$(location memmap_blocked_ram.ld)"],
     target_compatible_with = ["//bazel/constraint:rp2040"],
     deps = [
-        "memmap_blocked_ram.ld",
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2_common/pico_crt0/rp2040/scripts:rp2040_linker_scripts",
+        "//src/rp2_common/pico_standard_link/scripts:rp2_linker_scripts",
         "//src/rp2_common/pico_standard_link:default_flash_region",
+        "memmap_blocked_ram.ld",
+        "memmap_blocked_ram_args",
     ],
 )
 
@@ -48,12 +74,14 @@ cc_library(
 cc_library(
     name = "copy_to_ram_linker_script",
     defines = ["PICO_COPY_TO_RAM=1"],
-    linkopts = ["-T$(location memmap_copy_to_ram.ld)"],
     target_compatible_with = ["//bazel/constraint:rp2040"],
     deps = [
-        "memmap_copy_to_ram.ld",
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2_common/pico_crt0/rp2040/scripts:rp2040_linker_scripts",
+        "//src/rp2_common/pico_standard_link/scripts:rp2_linker_scripts",
         "//src/rp2_common/pico_standard_link:default_flash_region",
+        "memmap_copy_to_ram.ld",
+        "memmap_copy_to_ram_args",
     ],
 )
 
@@ -61,10 +89,12 @@ cc_library(
 cc_library(
     name = "no_flash_linker_script",
     defines = ["PICO_NO_FLASH=1"],
-    linkopts = ["-T$(location memmap_no_flash.ld)"],
     target_compatible_with = ["//bazel/constraint:rp2040"],
     deps = [
-        "memmap_no_flash.ld",
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2_common/pico_crt0/rp2040/scripts:rp2040_linker_scripts",
+        "//src/rp2_common/pico_standard_link/scripts:rp2_linker_scripts",
+        "memmap_no_flash.ld",
+        "memmap_no_flash_args",
     ],
 )

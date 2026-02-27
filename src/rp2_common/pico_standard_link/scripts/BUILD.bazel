@@ -1,0 +1,61 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:pico_linker_scripts.bzl", "include_linker_script_dir")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(
+    [
+        "memory_aliases_default.ld",
+        "memory_aliases_no_flash.ld",
+        "memory_flash.ld",
+        "memory_ram.ld",
+        "memory_scratch.ld",
+        "memory_xip_ram.ld",
+        "section_copy_to_ram_data.ld",
+        "section_default_data.ld",
+        "section_end.ld",
+        "section_flash_end.ld",
+        "section_heap.ld",
+        "section_no_flash_data.ld",
+        "sections_copy_to_ram.ld",
+        "section_scratch.ld",
+        "sections_default.ld",
+        "sections_no_flash.ld",
+        "set_memory_locations.ld",
+        "rp2_common/memmap_default.ld",
+        "rp2_common/memmap_no_flash.ld",
+        "rp2_common/memmap_copy_to_ram.ld",
+    ]
+)
+
+include_linker_script_dir(
+    name = "rp2_linker_script_args",
+)
+
+cc_library(
+    name = "rp2_linker_scripts",
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "rp2_linker_script_args",
+        "memory_aliases_default.ld",
+        "memory_aliases_no_flash.ld",
+        "memory_flash.ld",
+        "memory_ram.ld",
+        "memory_scratch.ld",
+        "memory_xip_ram.ld",
+        "section_copy_to_ram_data.ld",
+        "section_default_data.ld",
+        "section_end.ld",
+        "section_flash_end.ld",
+        "section_heap.ld",
+        "section_no_flash_data.ld",
+        "sections_copy_to_ram.ld",
+        "section_scratch.ld",
+        "sections_default.ld",
+        "sections_no_flash.ld",
+        "set_memory_locations.ld",
+        "rp2_common/memmap_default.ld",
+        "rp2_common/memmap_no_flash.ld",
+        "rp2_common/memmap_copy_to_ram.ld",
+    ],
+)
