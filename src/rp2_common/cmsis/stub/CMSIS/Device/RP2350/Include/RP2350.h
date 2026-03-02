@@ -4017,7 +4017,7 @@ typedef struct {                                /*!< SIO Structure              
                                                      interrupts are routed to normal system-level interrupt
                                                      lines as well as to the MIP.MTIP inputs on the RISC-V cores.              */
   __IM  uint32_t  RESERVED3[2];
-  __IOM uint32_t  MTIME;                        /*!< Read/write access to the high half of RISC-V Machine-mode timer.
+  __IOM uint32_t  MTIME;                        /*!< Read/write access to the low half of RISC-V Machine-mode timer.
                                                      This register is shared between both cores. If both cores
                                                      write on the same cycle, core 1 takes precedence.                         */
   __IOM uint32_t  MTIMEH;                       /*!< Read/write access to the high half of RISC-V Machine-mode timer.
