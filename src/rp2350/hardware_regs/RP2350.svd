@@ -76208,7 +76208,7 @@ SPDX-License-Identifier: BSD-3-Clause
             <register>
                 <name>MTIME</name>
                 <addressOffset>0x000001b0</addressOffset>
-                <description>Read/write access to the high half of RISC-V Machine-mode timer. This register is shared between both cores. If both cores write on the same cycle, core 1 takes precedence.</description>
+                <description>Read/write access to the low half of RISC-V Machine-mode timer. This register is shared between both cores. If both cores write on the same cycle, core 1 takes precedence.</description>
                 <resetValue>0x00000000</resetValue>
                 <fields>
                     <field>
