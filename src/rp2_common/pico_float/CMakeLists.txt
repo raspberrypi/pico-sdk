@@ -130,6 +130,11 @@
                 ${CMAKE_CURRENT_LIST_DIR}/float_sci_m33.S
                 )
 
+        # PICO_CMAKE_CONFIG: PICO_FLOAT_USE_UNSAFE_DCP, Use unsafe variant as the default implemention for all wrapper functions, default=0, type=bool, group=pico_float
+        if(PICO_FLOAT_USE_UNSAFE_DCP)
+                target_compile_definitions(pico_float_pico_dcp INTERFACE PICO_FLOAT_USE_UNSAFE_DCP=1)
+        endif()
+
         # NOTE the main reason for using pico_float_pico_dcp is presumably that you
         # don't want to use VFP at all, so turn off compiler support, otherwise, it will inline usages
         target_compile_options(pico_float_pico_dcp INTERFACE -msoft-float)

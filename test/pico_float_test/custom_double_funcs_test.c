@@ -44,6 +44,19 @@ static inline double double2ufix_12(int32_t m) { return double2ufix(m, 12); }
 #define uint642double(i) ({ uint64_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); uint642 ## double(_i); })
 #endif
 
+#if 1 && PICO_DOUBLE_USE_UNSAFE_DCP && !defined(__riscv) && PICO_RP2350
+#define int2double int2double_unsafe
+#define uint2double uint2double_unsafe
+#define double2fix double2fix_unsafe
+#define double2ufix double2ufix_unsafe
+#define double2fix_z double2fix_z_unsafe
+#define double2ufix_z double2ufix_z_unsafe
+#define double2int double2int_unsafe
+#define double2int_z double2int_z_unsafe
+#define double2uint double2uint_unsafe
+#define double2uint_z double2uint_z_unsafe
+#endif
+
 int test() {
     int rc = 0;
 #if LIB_PICO_DOUBLE_PICO

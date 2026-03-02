@@ -18,6 +18,19 @@
 #define test_checki64(x, expected, msg) ({ if ((x) != (expected)) { printf("  %s: %lld != %lld\n", msg, (int64_t)(x), (int64_t)(expected)); stop(); } })
 #define test_checku64(x, expected, msg) ({ if ((uint64_t)(x) != (uint64_t)(expected)) { printf("  %s: %llu != %llu\n", msg, (uint64_t)(x), (uint64_t)(expected)); stop(); } })
 
+#if PICO_FLOAT_USE_UNSAFE_DCP && PICO_RP2350 && !defined(__riscv)
+#define int2float int2float_unsafe
+#define uint2float uint2float_unsafe
+#define float2int float2int_unsafe
+#define float2int_z float2int_z_unsafe
+#define float2uint float2uint_unsafe
+#define float2uint_z float2uint_z_unsafe
+#define float2fix float2fix_unsafe
+#define float2fix_z float2fix_z_unsafe
+#define float2ufix float2ufix_unsafe
+#define float2ufix_z float2ufix_z_unsafe
+#endif
+
 #if !(LIB_PICO_FLOAT_COMPILER || defined(__riscv))
 static inline float fix2float_8(int32_t m) { return fix2float(m, 8); }
 static inline float fix2float_12(int32_t m) { return fix2float(m, 12); }

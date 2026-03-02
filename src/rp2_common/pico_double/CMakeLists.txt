@@ -39,6 +39,11 @@ if (NOT TARGET pico_double)
                 ${CMAKE_CURRENT_LIST_DIR}/double_sci_m33.S
                 ${CMAKE_CURRENT_LIST_DIR}/double_conv_m33.S
                 )
+
+        # PICO_CMAKE_CONFIG: PICO_DOUBLE_USE_UNSAFE_DCP, Use unsafe variant as the default implemention for all wrapper functions, default=0, type=bool, group=pico_double
+        if(PICO_DOUBLE_USE_UNSAFE_DCP)
+                target_compile_definitions(pico_double_pico INTERFACE PICO_DOUBLE_USE_UNSAFE_DCP=1)
+        endif()
     endif()
 
     target_link_libraries(pico_double_pico INTERFACE pico_bootrom pico_double_headers hardware_divider)
