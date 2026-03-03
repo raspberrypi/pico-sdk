@@ -600,16 +600,13 @@ double_section fma_fast
  bl __dcp_save_state    // 32-bit instruction
  b 1f                   // 16-bit instruction
 
-@ r0:r1    | d0 m
-@ r2:r3    | d1 n
-@ [r13,#0] | d2 a
 regular_func fma_fast
 regular_func mla
-#if defined(__ARM_PCS_VFP)
- vmov r0,r1,d0
- vmov r2,r3,d1
- vpush {d2}
-#endif
+#if !defined(__ARM_PCS_VFP)
+// non__ARM_PCS_VFP version
+@ r0:r1    m
+@ r2:r3    n
+@ [sp,#0]  a
  mov r12,sp                  @ save the SP
  PCMP apsr_nzcv              @ test the engaged flag
  bmi 1b
@@ -618,12 +615,25 @@ regular_func mla
  dcp_dmul_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r4,r5,r14
  ldrd r2,r3,[r12,#0]        @ fetch a using original SP
  dcp_dadd_m r0,r1,r0,r1,r2,r3
-// todo optimize this based on final decision on saving_func_entry
  pop {r4,r5,r14}
-#if defined(__ARM_PCS_VFP)
- vmov d0,r0,r1
- add sp,sp,#8
-#endif
  saving_func_return
+#else
+// __ARM_PCS_VFP version
+@ d0    m
+@ d1    n
+@ d2    a
+ vmov r0,r1,d0
+ vmov r2,r3,d1
+ PCMP apsr_nzcv              @ test the engaged flag
+ bmi 1b
+1:
+ push {r4,r5,r14}
+ dcp_dmul_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r4,r5,r14
+ vmov r2,r3,d2
+ dcp_dadd_m r0,r1,r0,r1,r2,r3
+ vmov d0,r0,r1
+ pop {r4, r5, r14}
+ saving_func_return
+#endif
 
 #endif
