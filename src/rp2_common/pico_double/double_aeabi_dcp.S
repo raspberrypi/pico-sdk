@@ -176,11 +176,11 @@ saving_func wrapper __aeabi_d2f double2float
 #if defined(__ARM_PCS_VFP)
 double_section double2float
 regular_func double2float
-  push {r0,lr}
+  push {lr}
   vmov r0,r1,d0
   bl WRAPPER_FUNC_NAME(__aeabi_d2f)
   vmov s0,r0
-  pop {r0,pc}
+  pop {pc}
 #endif
 
 double_wrapper_section __aeabi_i2d
@@ -195,10 +195,10 @@ saving_func wrapper __aeabi_i2d int2double
 #if defined(__ARM_PCS_VFP)
 double_section int2double
 regular_func int2double
-  push {r0,lr}
+  push {lr}
   bl WRAPPER_FUNC_NAME(__aeabi_i2d)
   vmov d0,r0,r1
-  pop {r0,pc}
+  pop {pc}
 #endif
 
 double_wrapper_section __aeabi_ui2d
@@ -213,10 +213,10 @@ saving_func wrapper __aeabi_ui2d uint2double
 #if defined(__ARM_PCS_VFP)
 double_section uint2double
 regular_func uint2double
-  push {r0,lr}
+  push {lr}
   bl WRAPPER_FUNC_NAME(__aeabi_ui2d)
   vmov d0,r0,r1
-  pop {r0,pc}
+  pop {pc}
 #endif
 
 double_section double2fix_z
