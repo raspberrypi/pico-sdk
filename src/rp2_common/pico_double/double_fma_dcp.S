@@ -31,10 +31,6 @@ double_section WRAPPER_FUNC_NAME(\func)
 
 // ============== STATE SAVE AND RESTORE ===============
 
-.macro saving_func_return
-  bx lr
-.endm
-
 double_section __rp2350_dcp_engaged_state_save_restore_copy
 .thumb_func
 __dcp_save_state:
@@ -156,9 +152,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD                        @ as dmul macro tail: exponent computed in coprocessor is correct
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
-  pop {r4-r8,lr}
-  saving_func_return
+  pop {r4-r8,pc}
 
 93:
  adds r1,r1,r4
@@ -168,9 +162,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 92:
  adds r2,r2,r4
@@ -179,9 +171,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 91:                          @ case where a (Q52) is shifted down relative to mn (Q124); the mod 32 part of the shift of a has already been done
 @ r0:r1:r2:r3: mn
@@ -197,9 +187,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 94:
  adds r0,r0,r5               @ one word shift down
@@ -211,9 +199,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 95:
  adds r0,r0,r6               @ two word shift down
@@ -226,9 +212,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 @ ======================== ADDITION PATH, RESULT HAS COMPARABLE MAGNITUDE TO a  ========================
 
@@ -267,9 +251,7 @@ fma_entry:
  add r3,r3,r14,lsl#20        @ note that "implied" 1 is present in r3, giving an offset of 1 in the exponent
  bmi 1f                      @ negative? then we have just constructed a denormal (or less) and the addition will give an incorrect result
  dcp_dadd_m r0,r1,r2,r3,r4,r5
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 1:
 @ compare with similar code in subtraction path: here we cannot underflow
@@ -279,9 +261,7 @@ fma_entry:
  add r5,r5,#0x40000000
  dcp_dadd_m r0,r1,r2,r3,r4,r5
  sub r1,r1,#0x40000000       @ fix exponent
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 90:
 @ dcp_dmul_m tail then dadd ("mla path")
@@ -290,17 +270,13 @@ fma_entry:
  NRDD
  RDDM r0,r1
  dcp_dadd_m r0,r1,r0,r1,r4,r5
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 82:                          @ |mn| is very small compared to |a|, so result is a
  RDDM r0,r1                  @ clear the engaged flag
  movs r0,r4
  movs r1,r5
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 @ ======================== SUBTRACTION PATH ========================
 
@@ -342,9 +318,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD                        @ as dmul macro tail: exponent and sign computed in coprocessor is correct
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 94:
 @ here if ea-(em+en)=3 e.g. if ea=0 then em+en=-3 and 1/8=2^-3≤mn<4.2^-3=1/2
@@ -364,9 +338,7 @@ fma_entry:
  NRDD
  RDDM r0,r1
  eor r1,r1,0x80000000        @ sign of result is opposite to that of product as yielded by coprocessor
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 93:
  subs r1,r1,r4               @ shifting a up by one word: this cannot go negative or have bad cancellation
@@ -376,9 +348,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 92:
  subs r2,r2,r4               @ shifting a up by two words: this /can/ go negative or have bad cancellation
@@ -389,9 +359,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 @ heavy cancellation case
 @ r0:r1:r2:r3: result Q124, signed
@@ -450,9 +418,7 @@ fma_entry:
  ble 12f                     @ underflow? overflow cannot occur here as the result is smaller in magnitude than a
  bfi r1,r8,#20,#11           @ insert exponent
  orr r1,r1,r14,lsl#31        @ or in sign
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 11:
  adcs r0,r0,#0               @ round up as above
@@ -462,9 +428,7 @@ fma_entry:
  ble 12f                     @ underflow?
  bfi r1,r8,#20,#11           @ insert exponent
  orr r1,r1,r14,lsl#31        @ or in sign
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 10:
  adds r8,r8,r1,lsr#20        @ candidate for exponent field
@@ -472,16 +436,12 @@ fma_entry:
  bfi r1,r8,#20,#11           @ insert exponent
  orr r1,r1,r14,lsl#31        @ or in sign
 9:
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 12:
  mov r1,r14,lsl#31           @ underflow: return signed zero
  movs r0,#0
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 91:                          @ case where a (Q52) is shifted down relative to mn (Q124); the mod 32 part of the shift of a has already been done
 @ r0:r1:r2:r3: mn
@@ -501,9 +461,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 94:
  rsbs r4,r4,#0               @ one word shift down
@@ -516,9 +474,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 95:
  movs r7,#0                  @ two words shift down
@@ -534,9 +490,7 @@ fma_entry:
  WXMO r2,r3                  @ write sticky+result bits
  NRDD
  RDDM r0,r1
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 80:
 @ here |a| is big compared to |mn|, more precisely ea-(em+en)≥4 so e.g. if ea=0 then em+en≤-4 and mn<4.2^-4=1/4
@@ -572,9 +526,7 @@ fma_entry:
  bmi 1f                      @ did exponent go negative?
 
  dcp_dadd_m r0,r1,r2,r3,r4,r5
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 1:
  cmn r7,#64                  @ is mn being shifted well below the bottom of a?
@@ -588,9 +540,7 @@ fma_entry:
  andls r1,r1,0x80000000      @ flush to signed zero
  movls r0,#0
  subhi r1,r1,#0x40000000     @ else fix exponent of result
-// todo optimize this based on final decision on saving_func_entry
- pop {r4-r8,lr}
- saving_func_return
+ pop {r4-r8,pc}
 
 
 double_section fma_fast
@@ -615,8 +565,7 @@ regular_func mla
  dcp_dmul_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r4,r5,r14
  ldrd r2,r3,[r12,#0]        @ fetch a using original SP
  dcp_dadd_m r0,r1,r0,r1,r2,r3
- pop {r4,r5,r14}
- saving_func_return
+ pop {r4,r5,pc}
 #else
 // __ARM_PCS_VFP version
 @ d0    m
@@ -632,8 +581,7 @@ regular_func mla
  vmov r2,r3,d2
  dcp_dadd_m r0,r1,r0,r1,r2,r3
  vmov d0,r0,r1
- pop {r4, r5, r14}
- saving_func_return
+ pop {r4, r5, pc}
 #endif
 
 #endif
