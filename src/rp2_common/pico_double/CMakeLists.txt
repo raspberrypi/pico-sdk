@@ -121,7 +121,7 @@ if (NOT TARGET pico_double)
         pico_wrap_function(${TARGET} fma)
     endfunction()
 
-    wrap_double_functions(pico_double_pico)
+    wrap_double_functions(pico_double_pico_dcp)
     wrap_double_functions(pico_double_none)
 
     macro(pico_set_double_implementation TARGET IMPL)
