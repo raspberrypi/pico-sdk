@@ -27,7 +27,7 @@ regular_func int642double
  movs r2,#0
 regular_func fix642double
  push {lr}
- bl fix642double_entry
+ bl fix642double_softfp
  vmov d0,r0,r1
  pop {pc}
 #endif
@@ -42,9 +42,9 @@ regular_func int642double
 #if !defined(__ARM_PCS_VFP)
 regular_func fix642double
 #endif
-fix642double_entry:
+fix642double_softfp:
  cmp r1,#0
- bge ufix642double_entry @ positive? can use unsigned code
+ bge ufix642double_softfp @ positive? can use unsigned code
  rsbs r0,#0
  sbc r1,r1,r1,lsl#1 @ make positive
  cbz r1,7f @ high word is zero?
@@ -113,7 +113,7 @@ regular_func uint642double
  movs r2,#0
 regular_func ufix642double
  push {lr}
- bl ufix642double_entry
+ bl ufix642double_softfp
  vmov d0,r0,r1
  pop {pc}
 #endif
@@ -128,7 +128,7 @@ regular_func uint642double
 #if !defined(__ARM_PCS_VFP)
 regular_func ufix642double
 #endif
-ufix642double_entry:
+ufix642double_softfp:
  cbz r1,7f @ high word zero?
  clz r3,r1
  subs r3,#11

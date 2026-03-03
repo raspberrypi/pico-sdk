@@ -107,15 +107,15 @@ fix642float_softfp:
 #if defined(__ARM_PCS_VFP)
 regular_func fix2float
  push {lr}
- bl fix2float_entry
+ bl fix2float_softfp
  vmov s0,r0
  pop {pc}
 #else
 regular_func fix2float
 #endif
-fix2float_entry:
+fix2float_softfp:
  cmp r0,#0
- bge ufix2float_entry @ positive? can use unsigned code
+ bge ufix2float_softfp @ positive? can use unsigned code
  rsbs r0,#0 @ make positive
 fix2float_neg:
  clz r3,r0
@@ -165,13 +165,13 @@ fix2float_neg:
 #if defined(__ARM_PCS_VFP)
 regular_func ufix2float
  push {lr}
- bl ufix2float_entry
+ bl ufix2float_softfp
  vmov s0,r0
  pop {pc}
 #else
 regular_func ufix2float
 #endif
-ufix2float_entry:
+ufix2float_softfp:
  cbz r0,1f @ zero? return it
  clz r3,r0
  subs r3,#8
@@ -279,7 +279,7 @@ ufix642float_softfp:
  bx r14
 7:
  mov r1,r2
- b ufix2float_entry
+ b ufix2float_softfp
 4:
  it cs @ rounding tie?
  biccs r0,r0,#1 @ force to even if we rounded up
@@ -324,7 +324,7 @@ regular_func float2fix64
   // r0 = abs(denornaml)              => r1 = 0x00xxxxxx
   // r0 = abs(1.0f)                   => r1 = 0x7f000000
   // r0 = abs(inf/nan)                => r1 = 0xffxxxxxx
-  bls float2fix64_z_entry // positive or zero or -zero are ok for fix64_z
+  bls float2fix64_z_softfp // positive or zero or -zero are ok for fix64_z
   lsrs r2, #24
   rsbs r3, r1, #0x7f
   subs r2, r3
@@ -332,10 +332,10 @@ regular_func float2fix64
   // mask off all but fractional bits
   lsls r2, r0, r2
   lsls r2, #9
-  beq float2fix64_z_entry // integer
+  beq float2fix64_z_softfp // integer
 1:
   push {lr}
-  bl float2fix64_z_entry
+  bl float2fix64_z_softfp
   subs r0, #1
   sbcs r1, r1, #0
   pop {pc}
@@ -346,7 +346,7 @@ float_wrapper_section conv_ftoi64z
 regular_func float2fix64_z
  mov r1,r0
  vmov r0,s0
- b float2fix64_z_entry
+ b float2fix64_z_softfp
 #endif
 
 @ convert float to signed int64, rounding towards 0, clamping
@@ -361,7 +361,7 @@ float2int64_z_softfp:
 regular_func float2fix64_z
 #endif
 @ convert float in r0 to signed fixed point in r0:r1, clamping
-float2fix64_z_entry:
+float2fix64_z_softfp:
  subs r1,#0x95 @ remove exponent bias, compensate for mantissa length
  asrs r2,r0,#23 @ sign and exponent
  sub r3,r2,#1
@@ -429,7 +429,7 @@ regular_func float2ufix64
 regular_func float2ufix64_z
  mov r1,r0
  vmov r0,s0
- b float2ufix64_z_entry
+ b float2ufix64_z_softfp
 #endif
 @ convert float to unsigned int64, rounding towards -Inf, clamping
 regular_func float2uint64
@@ -444,7 +444,7 @@ regular_func float2ufix64
 regular_func float2ufix64_z
 #endif
 @ convert float in r0 to unsigned fixed point in r0:r1, clamping
-float2ufix64_z_entry:
+float2ufix64_z_softfp:
  subs r1,#0x96 @ remove exponent bias, compensate for mantissa length
  asrs r2,r0,#23 @ sign and exponent
  sub r3,r2,#1

@@ -75,12 +75,12 @@ wrapper_func fma
  vmov r0,r1,d0
  vmov r2,r3,d1
  vpush {d2}
- bl fma_entry
+ bl fma_softfp
  add sp,#8
  vmov d0,r0,r1
  pop {r4,pc}
 #endif
-fma_entry:
+fma_softfp:
  mov r12,sp                  @ save the SP
  PCMP apsr_nzcv              @ test the engaged flag
  bmi 1b
