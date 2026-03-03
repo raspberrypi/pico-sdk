@@ -345,6 +345,7 @@ float __real_fmodf(float, float);
 #endif
 #define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnanf(p0)) assert_nan(r); else assert_close(r, r2); r; })
 #define check_close2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); if (isnanf(p0) || isnanf(p1)) assert_nan(r); else assert_close(r, r2); r; })
+#define check_close3(func,p0,p1,p2) ({ typeof(p0) r = func(p0,p1,p2), r2 = __CONCAT(__real_, func)(p0,p1,p2); if (isnanf(p0) || isnanf(p1) || isnanf(p2)) assert_nan(r); else assert_close(r, r2); r; })
 #else
 #define check1(func,p0) func(p0)
 #define check1_vfp_unwrapped(func,p0) func(p0)
@@ -352,6 +353,7 @@ float __real_fmodf(float, float);
 #define check2_vfp_unwrapped(func,p0,p1) func(p0,p1)
 #define check_close1(func,p0) func(p0)
 #define check_close2(func,p0,p1) func(p0,p1)
+#define check_close3(func,p0,p1,p2) func(p0,p1,p2)
 #endif
 
 double aa = 0.5;
@@ -497,7 +499,15 @@ int main() {
     }
 #endif
 
-#if 1 || !LIB_PICO_FLOAT_PICO_VFP
+    for (float a = -100.0f; a < 100.0f; a += 53.103f) {
+        for (float b = -2000000.0f; b < 1000000.0f; b += 397243.5f) {
+            for (float c = -700.0f; c < 1000.0f; c += 287.4f) {
+                printf("fma %f %f %f\n", a, b, c);
+                check_close3(fmaf, a, b, c);
+            }
+        }
+    }
+
     {
         int32_t y;
 //        for (int32_t x = 0; x>-512; x--) {
@@ -556,11 +566,11 @@ int main() {
 #endif
     }
     for(float x = -4294967296.f * 4294967296.f; x<=-0.5f; x/=2.f) {
-        printf("d2i32 %f->%d\n", x, (int32_t)x);
+        printf("f2i32 %f->%d\n", x, (int32_t)x);
         check1_vfp_unwrapped(__aeabi_f2iz, x);
     }
     for(float x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
-        printf("d2i32 %f->%d\n", x, (int32_t)x);
+        printf("f2i32 %f->%d\n", x, (int32_t)x);
 #if PICO_RP2040
         if ((double)x >= (double)INT32_MAX) {
             // seems like there is a bug in the clang version (which returns INT32_MIN)
@@ -581,7 +591,6 @@ int main() {
         check2_vfp_unwrapped(__aeabi_fmul, x, x);
         check2_vfp_unwrapped(__aeabi_fdiv, 1.0f, x);
     }
-#endif
 
     if (fail ||
         test_cfcmpeq() ||
