@@ -81,7 +81,7 @@ wrapper_func fma
  vpush {d2}
  bl fma_entry
  add sp,#8
- vmov r0,r1,d0
+ vmov d0,r0,r1
  pop {r4,pc}
 #endif
 fma_entry:
