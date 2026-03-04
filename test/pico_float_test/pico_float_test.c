@@ -318,6 +318,7 @@ float __attribute__((pcs("aapcs"))) __real___aeabi_fdiv(float, float);
 int32_t __attribute__((pcs("aapcs"))) __real___aeabi_f2iz(float);
 int64_t __attribute__((pcs("aapcs"))) __real___aeabi_f2lz(float);
 float __real_sqrtf(float);
+float __real_fmaf(float, float, float);
 #endif
 float __real_cosf(float);
 float __real_sinf(float);
@@ -499,6 +500,7 @@ int main() {
     }
 #endif
 
+#if !LIB_PICO_FLOAT_PICO_VFP
     for (float a = -100.0f; a < 100.0f; a += 53.103f) {
         for (float b = -2000000.0f; b < 1000000.0f; b += 397243.5f) {
             for (float c = -700.0f; c < 1000.0f; c += 287.4f) {
@@ -507,6 +509,7 @@ int main() {
             }
         }
     }
+#endif
 
     {
         int32_t y;
