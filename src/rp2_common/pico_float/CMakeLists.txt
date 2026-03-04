@@ -18,7 +18,7 @@
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_FLOAT_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_FLOAT_IMPL>,${PICO_DEFAULT_FLOAT_IMPL}>)
 
     function(wrap_float_functions TARGET)
-        cmake_parse_arguments(WRAP_FLOAT "NO_AEABI_ARITHMETIC;NO_AEABI_CMP;NO_AEABI_CONV_32;NO_AEABI_CONV_64;NO_AEABI_CONV_DOUBLE;NO_SQRTF;NO_SCI;NO_SCI_EXTRA" "" "" ${ARGN} )
+        cmake_parse_arguments(WRAP_FLOAT "NO_AEABI_ARITHMETIC;NO_AEABI_CMP;NO_AEABI_CONV_32;NO_AEABI_CONV_64;NO_AEABI_CONV_DOUBLE;NO_SQRTF;NO_SCI;NO_SCI_EXTRA;NO_FMAF" "" "" ${ARGN} )
         if (NOT WRAP_FLOAT_NO_AEABI_ARITHMETIC)
             pico_wrap_function(${TARGET} __aeabi_fadd)
             pico_wrap_function(${TARGET} __aeabi_fdiv)
@@ -52,7 +52,7 @@
         if (NOT WRAP_FLOAT_NO_AEABI_CONV_DOUBLE)
             pico_wrap_function(${TARGET} __aeabi_f2d)
         endif()
-        # separate as we have a direct DCP version
+        # separate as we have a direct DCP version, and VFP has an instruction
         if (NOT WRAP_FLOAT_NO_SQRTF)
             pico_wrap_function(${TARGET} sqrtf)
         endif()
@@ -95,6 +95,8 @@
             pico_wrap_function(${TARGET} remquof)
             pico_wrap_function(${TARGET} expm1f)
             pico_wrap_function(${TARGET} log1pf)
+        endif()
+        if (NOT WRAP_FLOAT_NO_FMAF)
             pico_wrap_function(${TARGET} fmaf)
         endif()
     endfunction()
@@ -162,15 +164,15 @@
         wrap_float_functions(pico_float_pico_vfp
                 # for these 3, arguably compiler is probably inlining anyway, but use the cmopiler's
                 # version for explicit AEABI calls
-                NO_AEABI_ARITHMETIC
-                NO_AEABI_CMP
-                NO_AEABI_CONV_32
+                NO_AEABI_ARITHMETIC # direct VFP instruction support
+                NO_AEABI_CMP        # direct VFP instruction support
+                NO_AEABI_CONV_32    # direct VFP instruction support
                 #NO_AEABI_CONV_64   # we have optimized M33 versions
-                NO_AEABI_CONV_DOUBLE
-                # we don't have an optimized vfp or m33 sqrtf available
-                NO_SQRTF
+                NO_AEABI_CONV_DOUBLE# direct VFP instruction support
+                NO_SQRTF            # direct VFP instruction support
                 #NO_SCI             # we have optimized VFP versions
                 #NO_SCI_EXTRA       # todo - are our versions better than what GCC proides?
+                NO_FMAF             # direct VFP instruction support
         )
 
         target_link_libraries(pico_float_pico INTERFACE
@@ -180,7 +182,6 @@
             ${CMAKE_CURRENT_LIST_DIR}/float_single_hazard3.S
             )
     endif()
-
 
     macro(pico_set_float_implementation TARGET IMPL)
         get_target_property(target_type ${TARGET} TYPE)

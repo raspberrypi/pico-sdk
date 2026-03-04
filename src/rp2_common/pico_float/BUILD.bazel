@@ -84,6 +84,9 @@ _WRAP_FLOAT_SCI_EXTRA_FLAGS = [
     "-Wl,--wrap=remquof",
     "-Wl,--wrap=expm1f",
     "-Wl,--wrap=log1pf",
+]
+
+_WRAP_FLOAT_FMAF_FLAGS = [
     "-Wl,--wrap=fmaf",
 ]
 
@@ -132,7 +135,7 @@ _PICO_FLOAT_IMPLS = [
         ],
         "compatibility": incompatible_with_config("@platforms//cpu:riscv32") + ["//bazel/constraint:rp2040"],
         "extra_deps": [],
-        "linkopts": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+        "linkopts": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS + _WRAP_FLOAT_FMAF_FLAGS,
     },
     {
         "name": "dcp",
@@ -144,7 +147,7 @@ _PICO_FLOAT_IMPLS = [
         ],
         "compatibility": compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + incompatible_with_config("//bazel/constraint:rp2040"),
         "extra_deps": ["//src/rp2_common/hardware_dcp"],
-        "linkopts": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+        "linkopts": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS + _WRAP_FLOAT_FMAF_FLAGS + _WRAP_FLOAT_FMAF_FLAGS,
     },
     {
         "name": "vfp",
@@ -156,7 +159,7 @@ _PICO_FLOAT_IMPLS = [
         ],
         "compatibility": compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + incompatible_with_config("//bazel/constraint:rp2040"),
         "extra_deps": ["//src/rp2_common/hardware_dcp"],
-        "linkopts": _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+        "linkopts": _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS + _WRAP_FLOAT_FMAF_FLAGS,
     },
     {
         "name": "single_hazard3",
