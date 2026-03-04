@@ -65,7 +65,7 @@ foreach (FLOAT_TYPE IN LISTS FLOAT_TYPES)
     pico_set_printf_implementation(custom_float_funcs_test_${FLOAT_TYPE} compiler)
     if (PICO_C_COMPILER_IS_CLANG)
         # llvm by default will treat our out of range float->int conversions as undefined behavior
-        # and may just decide the function is too broken to bother even with the function epiolgue, so we
+        # and may just decide the function is too broken to bother even with the function epilogue, so we
         # force it to accept out of range values (since we support them in our versions today)
         target_compile_options(${PICO_FLOAT_TEST} PRIVATE -fno-strict-float-cast-overflow)
         target_compile_options(custom_float_funcs_test_${FLOAT_TYPE} PRIVATE -fno-strict-float-cast-overflow)
@@ -110,7 +110,7 @@ foreach (DOUBLE_TYPE IN LISTS DOUBLE_TYPES)
 
         if (PICO_C_COMPILER_IS_CLANG)
             # llvm by default will treat our out of range float->int conversions as undefined behavior
-            # and may just decide the function is too broken to bother even with the function epiolgue, so we
+            # and may just decide the function is too broken to bother even with the function epilogue, so we
             # force it to accept out of range values (since we support them in our versions today)
             target_compile_options(${PICO_DOUBLE_TEST} PRIVATE -fno-strict-float-cast-overflow)
             target_compile_options(custom_double_funcs_test_${DOUBLE_TYPE} PRIVATE -fno-strict-float-cast-overflow)
