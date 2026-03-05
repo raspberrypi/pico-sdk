@@ -9,7 +9,6 @@
 
 #include <math.h>
 #include "pico.h"
-#include "pico/bootrom/sf_table.h"
 
 #ifdef __cplusplus
 extern "C" {
