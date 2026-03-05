@@ -65,30 +65,64 @@ typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
 // sleep is really just calling a __wfi() until an irq, with some optional clock gating in the sleep_en register. Activated once processor goes to sleep
 // So can just do it for arbitrary interrupts. processors implement their own internal clock gating, just leaving the wakeup interrupt controller running during
 // __wfi()
+
+/*! \brief  Sleep until an interrupt occurs
+ *  \ingroup pico_low_power
+ * Sleep until any interrupt occurs. The clocks specified in keep_enabled will be kept enabled during sleep.
+ *
+ * \param keep_enabled The clocks to keep enabled during sleep.
+ * \return 0 on success, non-zero on error.
+ */
 int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled);
 
 // sleep until the given timer reaches the specified value; if the time passes then no sleep occurs
 // keep_enabled defaults to none if NULL
 // ** LIAM BLESSED **
+
+/*! \brief  Sleep until time using timer
+ *  \ingroup pico_low_power
+ * Sleep until the given timer reaches the specified value. The clocks specified in keep_enabled will be kept enabled during sleep, along with clocks required
+ * for the timer. If exclusive is true, only the timer interrupt will be listened for, otherwise other interrupts will be listened for.
+ *
+ * \param timer The timer to use.
+ * \param until The time to sleep until.
+ * \param keep_enabled The clocks to keep enabled during sleep.
+ * \param exclusive Whether to only listen for the timer interrupt, or other interrupts.
+ * \return 0 on success, non-zero on error.
+ */
 int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until, const clock_dest_set_t *keep_enabled, bool exclusive);
 // Note bool above saying shall we only listen for timer irq or other irqs
 // Need to defer handling of irqs to do clock setup etc
 
+/*! \brief  Sleep until time using default timer
+ *  \ingroup pico_low_power
+ * See \ref low_power_sleep_until_timer for more information.
+ *
+ * \param until The time to sleep until.
+ * \param keep_enabled The clocks to keep enabled during sleep.
+ * \param exclusive Whether to only listen for the timer interrupt, or other interrupts.
+ * \return 0 on success, non-zero on error.
+ */
 static inline int low_power_sleep_until_default_timer(absolute_time_t until, const clock_dest_set_t *keep_enabled, bool exclusive) {
     // Need to assert (or add) ticks block and timer clocks to the keep_enabled list
     return low_power_sleep_until_timer(PICO_DEFAULT_TIMER_INSTANCE(), until, keep_enabled, exclusive);
 }
 
-// ** LIAM BLESSED this for RP2040; why not RP2350 **
-// This should work on both via io bank interrupts
+
+/*! \brief  Sleep until pin state changes
+ *  \ingroup pico_low_power
+ * Sleep until the given GPIO pin changes state. The clocks specified in keep_enabled will be kept enabled during sleep.
+ * If exclusive is true, only the GPIO interrupt will be listened for, otherwise other interrupts will be listened for.
+ *
+ * \param gpio_pin The GPIO pin to use.
+ * \param edge Whether to listen for edge or level.
+ * \param high Whether to listen for the high/low level, or rising/falling edge.
+ * \param keep_enabled The clocks to keep enabled during sleep.
+ * \param exclusive Whether to only listen for the GPIO interrupt, or other interrupts.
+ * \return 0 on success, non-zero on error.
+ */
 void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_set_t *keep_enabled, bool exclusive);
 
-#if 0
-// ** LIAM SAYS THIS IS NO MORE USEFUL THAN SLEEP_UNTIL TIMER... **
-// There isn't much advantage to using the aon timer here as system timers are more accurate and on anyway
-// ** WILL AGREES WITH LIAM ON THIS **
-int low_power_sleep_until_aon_timer(absolute_time_t until, const clock_dest_set_t *keep_enabled);
-#endif
 
 // ** LIAM BLESSED but we need to impl it correctly (note not blessed for RP2040, but we should do it anyway for orthogonality **
 // Only works for RP2350 as every clock will be stopped on RP2040 (unless you provide a clock for the RTC)
@@ -97,18 +131,63 @@ int low_power_sleep_until_aon_timer(absolute_time_t until, const clock_dest_set_
 // NOTE: Asserting that we will alway use rosc for dormant and simplifies the API
 // Means if the user has sped up the rosc they should slow it down before going into dormant
 // Need to re initialize clocks after this
+
+/*! \brief  Go dormant until time using AON timer
+ *  \ingroup pico_low_power
+ * Go dormant until the given AON timer reaches the specified value. The clocks specified in keep_enabled will be kept enabled during sleep.
+ *
+ * \param until The time to go dormant until.
+ * \param dormant_clock_source The clock source to use for dormant. Must be DORMANT_CLOCK_SOURCE_LPOSC on RP2350.
+ * \param src_hz The frequency of the clock source on RP2040. Ignored on RP2350.
+ * \param gpio_pin The GPIO pin to use for the RTC on RP2040. Ignored on RP2350.
+ * \param keep_enabled The clocks to keep enabled during dormant.
+ * \return 0 on success, non-zero on error.
+ */
 int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_source_t dormant_clock_source, uint src_hz, uint gpio_pin, const clock_dest_set_t *keep_enabled);
 
 // ** LIAM BLESSED but we need to impl it correctly (note not blessed for RP2040, but we should do it anyway for orthogonality **
 // This works on both
 // Need to re initialize clocks after this
+
+/*! \brief  Go dormant until pin state changes
+ *  \ingroup pico_low_power
+ * Go dormant until the given GPIO pin changes state. The clocks specified in keep_enabled will be kept enabled during dormant.
+ *
+ * \param gpio_pin The GPIO pin to use.
+ * \param edge Whether to listen for edge or level.
+ * \param high Whether to listen for the high/low level, or rising/falling edge.
+ * \param dormant_clock_source The clock source to use for dormant. Must be DORMANT_CLOCK_SOURCE_LPOSC on RP2350.
+ * \param keep_enabled The clocks to keep enabled during dormant.
+ */
 void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_set_t *keep_enabled);
 
 #if HAS_POWMAN_TIMER
 // pstate functions should return to the pstate you were in
 
 // pass resume_func which will be called on reboot by runtime_init_low_power_reboot_check
+
+/*! \brief  Go to Pstate until time using AON timer
+ *  \ingroup pico_low_power
+ * Go to Pstate until the given AON timer reaches the specified value. The function specified in resume_func will be called on reboot.
+ *
+ * \param until The time to go to Pstate until.
+ * \param pstate The Pstate to use. If NULL, the Pstate will keep persistent data powered on.
+ * \param resume_func The function to call on reboot.
+ * \return 0 on success, non-zero on error.
+ */
 int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
+
+/*! \brief  Go Pstate until pin state changes
+ *  \ingroup pico_low_power
+ * Go Pstate until the given GPIO pin changes state. The function specified in resume_func will be called on reboot.
+ *
+ * \param gpio_pin The GPIO pin to use.
+ * \param edge Whether to listen for edge or level.
+ * \param high Whether to listen for the high/low level, or rising/falling edge.
+ * \param pstate The Pstate to use. If NULL, the Pstate will keep persistent data powered on.
+ * \param resume_func The function to call on reboot.
+ * \return 0 on success, non-zero on error.
+ */
 int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
 
 // Or a function saying how did I boot?
@@ -119,12 +198,12 @@ int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate
 // - Switched core off (args are which rams you want to keep on)
 // Switched core, XIP cache + bootram, SRAM0 bank, SRAM1 bank + SCRATCH
 
-// Go to a pstate
-// Doesn't support powering down switched core domain
-int low_power_pstate_set(pstate_bitset_t *pstate);
-pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate);
-
-// get pstate which keeps persistent data powered on
+/*! \brief  Get Pstate which keeps persistent data powered on
+ *  \ingroup pico_low_power
+ *
+ * \param pstate Pointer to the Pstate to write the result to.
+ * \return The Pstate.
+ */
 pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate);
 #endif
 
