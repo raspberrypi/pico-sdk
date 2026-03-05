@@ -154,7 +154,7 @@ int test__aeabi_cdcmple(double a, double b, int expected) {
         expected_z = 0;
         expected_c = 1;
     }
-#if PICO_DOUBLE_COMPILER
+#if PICO_RP2040 && LIB_PICO_DOUBLE_COMPILER && PICO_C_COMPILER_IS_GNU
     // gcc has this backwards it seems - not a good thing, but I guess it doesn't ever call them
     expected_c ^= 1;
 #endif
@@ -367,7 +367,7 @@ int main() {
     for (double x = 0; x < 3; x++) {
         printf("\n ----- %g\n", x);
         printf("SQRT %10.18g\n", check_close1(sqrt, x));
-#if !PICO_RP2040 && !LIB_PICO_DOUBLE_COMPILER
+#if PICO_RP2350 && !LIB_PICO_DOUBLE_COMPILER
         printf("SQRT_FAST %10.18g\n", check_close1(sqrt_fast, x));
 #endif
         printf("COS %10.18g\n", check_close1(cos, x));
@@ -444,7 +444,7 @@ int main() {
             for (double c = -700.0; c < 1000.0; c += 287.4) {
                 printf("fma %f %f %f\n", a, b, c);
                 check_close3(fma, a, b, c);
-#if !PICO_RP2040 && !LIB_PICO_DOUBLE_COMPILER
+#if PICO_RP2350 && !LIB_PICO_DOUBLE_COMPILER
                 check_close3(fma_fast, a, b, c);
 #endif
             }
@@ -531,7 +531,7 @@ int main() {
                x - 0.377777777777777777777777777777, g, 123456789.0 / x);
         check2(__aeabi_dmul, x, x);
         check2(__aeabi_ddiv, 1.0, x);
-#if !PICO_RP2040 && !LIB_PICO_DOUBLE_COMPILER
+#if PICO_RP2350 && !LIB_PICO_DOUBLE_COMPILER
         check2(ddiv_fast, 1.0, x);
 #endif
     }

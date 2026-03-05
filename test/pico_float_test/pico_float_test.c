@@ -22,6 +22,10 @@
 #include <sys/types.h>
 #include "inttypes.h"
 
+#if !LIB_PICO_FLOAT_COMPILER
+#define TEST_SATURATION 1
+#endif
+
 #define test_assert(x) ({ if (!(x)) { printf("Assertion failed: ");puts(#x);printf("  at " __FILE__ ":%d\n", __LINE__); exit(-1); } })
 
 extern __attribute__((pcs("aapcs"))) int __aeabi_fcmpun(float a, float b);
@@ -159,7 +163,7 @@ int test__aeabi_cfcmple(float a, float b, int expected) {
         expected_z = 0;
         expected_c = 1;
     }
-#if PICO_FLOAT_COMPILER
+#if PICO_RP2040 && LIB_PICO_FLOAT_COMPILER && PICO_C_COMPILER_IS_GNU
     // gcc has this backwards it seems - not a good thing, but I guess it doesn't ever call them
     expected_c ^= 1;
 #endif
@@ -559,8 +563,9 @@ int main() {
         printf("f2i64 %f->%lld\n", x, (int64_t)x);
 #if PICO_RP2040
         if ((double)x >= (double)INT64_MAX) {
-            // seems like there is a bug in the gcc version (which returns UINT64_MAX)
+#if TEST_SATURATION
             test_assert(__aeabi_f2lz(x) == INT64_MAX);
+#endif
         } else {
             check1(__aeabi_f2lz, x);
         }
@@ -576,8 +581,9 @@ int main() {
         printf("f2i32 %f->%d\n", x, (int32_t)x);
 #if PICO_RP2040
         if ((double)x >= (double)INT32_MAX) {
-            // seems like there is a bug in the clang version (which returns INT32_MIN)
+#if TEST_SATURATION
             test_assert(__aeabi_f2iz(x) == INT32_MAX);
+#endif
         } else {
             check1(__aeabi_f2iz, x);
         }

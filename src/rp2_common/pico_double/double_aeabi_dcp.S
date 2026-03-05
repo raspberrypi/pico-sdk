@@ -226,16 +226,21 @@ saving_func regular double2fix_z
   vmov r0, r1, d0
 #endif
   ubfx r3, r1, #20, #11
+  cbz r3, 1f // zero or denormal
   adds r3, r2
-  beq 1f // very small; we don't care that we might make a denormal
-  asrs ip, r3, #11
-  beq 1f
-  ite pl
-  movpl r3, #0x7ff
-  movsmi r3, #0
-1:
+  ble 1f // very small; we don't care that we might make a denormal
+  adds r2, r3, #1
+  lsrs r2, r2, #11
   bfi r1, r3, #20, #11
-  b double2int_z_entry
+  beq double2int_z_entry // wasn't infinite or above (exponent)
+  // infinite value
+  asrs    r0, r1, #31             // -ve/+ve 0xffffffff/0x00000000
+  mvns    r0, r0                  // -ve/+ve 0x00000000/0xffffffff
+  eors    r0, r0, #0x80000000     // -ve/+ve 0x80000000/0x7FFFFFFF
+  saving_func_return
+1: // small value; return 0
+  movs r0, #0
+  saving_func_return
 
 double_section double2ufix
 saving_func regular double2ufix_z double2ufix
@@ -245,16 +250,20 @@ saving_func regular double2ufix_z double2ufix
 #endif
 double2ufix_z_entry:
   ubfx r3, r1, #20, #11
+  cbz r3, 1f // zero or denormal
   adds r3, r2
-  beq 1f // very small; we don't care that we might make a denormal
-  asrs ip, r3, #11
-  beq 1f
-  ite pl
-  lsrspl r3, r1, #20 // 0x7ff
-  movsmi r3, #0
-1:
+  ble 1f // 0 or denormal
+  adds r2, r3, #1
+  lsrs r2, r2, #11
   bfi r1, r3, #20, #11
-  b double2uint_z_entry
+  beq double2uint_z_entry // wasn't infinite or above (exponent)
+  // infinite value
+  asrs    r0, r1, #31             // -ve/+ve 0xffffffff/0x00000000
+  mvns    r0, r0                  // -ve/+ve 0x00000000/0xffffffff
+  saving_func_return
+1: // small value; return 0
+  movs r0, #0
+  saving_func_return
 
 double_section double2fix
 saving_func regular double2fix
@@ -263,20 +272,21 @@ saving_func regular double2fix
   vmov r0, r1, d0
 #endif
   ubfx r3, r1, #20, #11
-  cbz r3, 2f // 0 or denormal
+  cbz r3, 1f // zero or denormal
   adds r3, r2
-  beq 1f // very small; we don't care that we might make a denormal
-  asrs ip, r3, #11
-  beq 1f
-  ite pl
-  movpl r3, #0x7ff
-  movsmi r3, #0
-1:
+  ble 1f // 0 or denormal
+  adds r2, r3, #1
+  lsrs r2, r2, #11
   bfi r1, r3, #20, #11
-  b double2int_entry
-2:
+  beq double2int_entry // wasn't infinite or above (exponent)
+  // infinite value
+  asrs    r0, r1, #31             // -ve/+ve 0xffffffff/0x00000000
+  mvns    r0, r0                  // -ve/+ve 0x00000000/0xffffffff
+  eors    r0, r0, #0x80000000     // -ve/+ve 0x80000000/0x7FFFFFFF
+  saving_func_return
+1: // small value; return 0
   movs r0, #0
-saving_func_return
+  saving_func_return
 
 
 double_section double2int
@@ -290,16 +300,15 @@ double2int_entry:
   lsrs r3, r2, #21
   beq double2int_z_entry // 0 or -0 or denormal is ok for int_z
 
-  lsrs r2, #21
-  adds r2, #1
-  subs r2, r2, #0x400
+  adds r3, #1
+  subs r3, r3, #0x400
   bcc 1f // <1 means subtract 1
-  cmp r2, #31
+  cmp r3, #31
   bge double2int_z_entry // must be an integer or maxed out
-  lsls r3, r1, #12
-  adds r3, r3, r0, lsr #20 // r3 now has highest 32 mantissa bits
-  lsls r3, r2
-  orrs r3, r3, r0, lsl #12 // these bits are all guaranteed to be in the fraction
+  lsls r2, r1, #12
+  adds r2, r2, r0, lsr #20 // r3 now has highest 32 mantissa bits
+  lsls r2, r3
+  orrs r2, r2, r0, lsl #12 // these bits are all guaranteed to be in the fraction
   beq double2int_z_entry // integer
 1:
   dcp_double2int_m r0,r0,r1
