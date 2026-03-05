@@ -104,13 +104,9 @@ saving_func wrapper __aeabi_drsub
 
 double_wrapper_section __aeabi_dmul
 saving_func wrapper __aeabi_dmul
-
- // todo optimize this based on final decision on saving_func_entry
-  push {r4,r14}
-  dcp_dmul_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r4,r12,r14
- // todo optimize this based on final decision on saving_func_entry
-  pop {r4,lr}
-  saving_func_return
+push {r4,r14}
+dcp_dmul_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r4,r12,r14
+pop {r4,pc}
 
 double_section ddiv_fast
 saving_func regular ddiv_fast
