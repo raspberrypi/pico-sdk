@@ -774,7 +774,7 @@ static inline pio_sm_config pio_get_default_sm_config(void) {
  * This method always return 0 in RP2040
  * \endif
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \return the current GPIO base for the PIO instance
   */
 static inline uint pio_get_gpio_base(PIO pio) {
@@ -808,7 +808,7 @@ static inline void check_pio_pin_mask64(__unused PIO pio, __unused uint sm, __un
  * \if rp2350_specific
  * See \ref sm_config_pins "sm_config_ pins" for more detail on why this method might fail on RP2350B
  * \endif
- * \param pio Handle to PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio Handle to PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param config the configuration to apply
  * \return PICO_OK (0) on success, negative error code otherwise
@@ -843,7 +843,7 @@ static inline int pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *confi
 /*! \brief Return the instance number of a PIO instance
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \return the PIO instance number (0, 1, ...)
  */
 static inline uint pio_get_index(PIO pio) {
@@ -854,7 +854,7 @@ static inline uint pio_get_index(PIO pio) {
 /*! \brief Return the funcsel number of a PIO instance
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \return the PIO instance number (0, 1, ...)
  * \see gpio_function_t
  */
@@ -899,7 +899,7 @@ static inline PIO pio_get_instance(uint instance) {
  * configuring the pad for input and output. Calling this function is
  * sufficient for both the input-only and input/output case.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param pin the GPIO pin whose function select to set
  */
 static inline void pio_gpio_init(PIO pio, uint pin) {
@@ -911,7 +911,7 @@ static inline void pio_gpio_init(PIO pio, uint pin) {
 /*! \brief Return the DREQ to use for pacing transfers to/from a particular state machine FIFO
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param is_tx true for sending data to the state machine, false for receiving data from the state machine
  */
@@ -941,7 +941,7 @@ typedef struct pio_program {
  * NOTE: This method simply changes the underlying PIO register, it does not detect or attempt
  * to prevent any side effects this change will have on in use state machines on this PIO.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param gpio_base the GPIO base (either 0 or 16)
  * \return PICO_OK (0) on success, error code otherwise
  */
@@ -950,7 +950,7 @@ int pio_set_gpio_base(PIO pio, uint gpio_base);
 /*! \brief Determine whether the given program can (at the time of the call) be loaded onto the PIO instance
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param program the program definition
  * \return true if the program can be loaded;
  *         false if not, e.g. if there is not suitable space in the instruction memory
@@ -960,7 +960,7 @@ bool pio_can_add_program(PIO pio, const pio_program_t *program);
 /*! \brief Determine whether the given program can (at the time of the call) be loaded onto the PIO instance starting at a particular location
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param program the program definition
  * \param offset the instruction memory offset wanted for the start of the program
  * \return true if the program can be loaded at that location;
@@ -973,7 +973,7 @@ bool pio_can_add_program_at_offset(PIO pio, const pio_program_t *program, uint o
  *
  * See pio_can_add_program() if you need to check whether the program can be loaded
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param program the program definition
  * \return the instruction memory offset the program is loaded at, or negative for error (for
  * backwards compatibility with prior SDK the error value is -1 i.e. PICO_ERROR_GENERIC)
@@ -985,7 +985,7 @@ int pio_add_program(PIO pio, const pio_program_t *program);
  *
  * See pio_can_add_program_at_offset() if you need to check whether the program can be loaded
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param program the program definition
  * \param offset the instruction memory offset wanted for the start of the program
  * \return the instruction memory offset the program is loaded at, or negative for error (for
@@ -996,7 +996,7 @@ int pio_add_program_at_offset(PIO pio, const pio_program_t *program, uint offset
 /*! \brief Remove a program from a PIO instance's instruction memory
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param program the program definition
  * \param loaded_offset the loaded offset returned when the program was added
  */
@@ -1005,7 +1005,7 @@ void pio_remove_program(PIO pio, const pio_program_t *program, uint loaded_offse
 /*! \brief Clears all of a PIO instance's instruction memory
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  */
 void pio_clear_instruction_memory(PIO pio);
 
@@ -1025,7 +1025,7 @@ void pio_clear_instruction_memory(PIO pio);
  * See \ref sm_config_pins "sm_config_ pins" for more detail on why this method might fail on RP2350B
  * \endif
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param initial_pc the initial program memory offset to run from
  * \param config the configuration to apply (or NULL to apply defaults)
@@ -1036,7 +1036,7 @@ int pio_sm_init(PIO pio, uint sm, uint initial_pc, const pio_sm_config *config);
 /*! \brief Enable or disable a PIO state machine
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param enabled true to enable the state machine; false to disable
  */
@@ -1055,7 +1055,7 @@ static inline void pio_sm_set_enabled(PIO pio, uint sm, bool enabled) {
  * See pio_enable_sm_mask_in_sync() if you wish to enable multiple state machines
  * and ensure their clock dividers are in sync.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param mask bit mask of state machine indexes to modify the enabled state of
  * \param enabled true to enable the state machines; false to disable
  */
@@ -1075,7 +1075,7 @@ static inline void pio_set_sm_mask_enabled(PIO pio, uint32_t mask, bool enabled)
  * See pio_enable_sm_mask_in_sync() if you wish to enable multiple state machines
  * and ensure their clock dividers are in sync.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param mask_prev bit mask of state machine indexes to modify the enabled state of, in the next-lower numbered PIO instance
  * \param mask bit mask of state machine indexes to modify the enabled state of, in this PIO instance
  * \param mask bit mask of state machine indexes to modify the enabled state of, in the next-higher numbered PIO instance
@@ -1099,7 +1099,7 @@ static inline void pio_set_sm_multi_mask_enabled(PIO pio, uint32_t mask_prev, ui
  * This method clears the ISR, shift counters, clock divider counter
  * pin write flags, delay counter, latched EXEC instruction, and IRQ wait condition.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  */
 static inline void pio_sm_restart(PIO pio, uint sm) {
@@ -1114,7 +1114,7 @@ static inline void pio_sm_restart(PIO pio, uint sm) {
  * This method clears the ISR, shift counters, clock divider counter
  * pin write flags, delay counter, latched EXEC instruction, and IRQ wait condition.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param mask bit mask of state machine indexes to modify the enabled state of
  */
 static inline void pio_restart_sm_mask(PIO pio, uint32_t mask) {
@@ -1141,7 +1141,7 @@ static inline void pio_restart_sm_mask(PIO pio, uint32_t mask) {
  * More commonly this hardware mechanism is used to synchronise the execution
  * clocks of multiple state machines -- see pio_clkdiv_restart_sm_mask().
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  */
 static inline void pio_sm_clkdiv_restart(PIO pio, uint sm) {
@@ -1176,7 +1176,7 @@ static inline void pio_sm_clkdiv_restart(PIO pio, uint sm) {
  * machines have their clocks synchronised, you can safely disable and
  * re-enable one of the state machines without losing synchronisation.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param mask bit mask of state machine indexes to modify the enabled state of
  */
 static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
@@ -1212,7 +1212,7 @@ static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
  * machines have their clocks synchronised, you can safely disable and
  * re-enable one of the state machines without losing synchronisation.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param mask_prev bit mask of state machine indexes to modify the enabled state of, in the next-lower numbered PIO instance
  * \param mask bit mask of state machine indexes to modify the enabled state of, in this PIO instance
  * \param mask_next bit mask of state machine indexes to modify the enabled state of, in the next-higher numbered PIO instance
@@ -1235,7 +1235,7 @@ static inline void pio_clkdiv_restart_sm_multi_mask(PIO pio, uint32_t mask_prev,
  * specified by 'mask' are started simultaneously and, assuming they have the
  * same clock divisors, their divided clocks will stay precisely synchronised.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param mask bit mask of state machine indexes to modify the enabled state of
  */
 static inline void pio_enable_sm_mask_in_sync(PIO pio, uint32_t mask) {
@@ -1255,7 +1255,7 @@ static inline void pio_enable_sm_mask_in_sync(PIO pio, uint32_t mask) {
  * specified by 'mask' are started simultaneously and, assuming they have the
  * same clock divisors, their divided clocks will stay precisely synchronised.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param mask_prev bit mask of state machine indexes to modify the enabled state of, in the next-lower numbered PIO instance
  * \param mask bit mask of state machine indexes to modify the enabled state of, in this PIO instance
  * \param mask_next bit mask of state machine indexes to modify the enabled state of, in the next-higher numbered PIO instance
@@ -1300,7 +1300,7 @@ typedef enum pio_interrupt_source {
 /*! \brief  Enable/Disable a single source on a PIO's IRQ 0
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param source the source number (see \ref pio_interrupt_source)
  * \param enabled true to enable IRQ 0 for the source, false to disable.
  */
@@ -1316,7 +1316,7 @@ static inline void pio_set_irq0_source_enabled(PIO pio, pio_interrupt_source_t s
 /*! \brief  Enable/Disable a single source on a PIO's IRQ 1
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param source the source number (see \ref pio_interrupt_source)
  * \param enabled true to enable IRQ 0 for the source, false to disable.
  */
@@ -1332,7 +1332,7 @@ static inline void pio_set_irq1_source_enabled(PIO pio, pio_interrupt_source_t s
 /*! \brief  Enable/Disable multiple sources on a PIO's IRQ 0
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param source_mask Mask of bits, one for each source number (see \ref pio_interrupt_source) to affect
  * \param enabled true to enable all the sources specified in the mask on IRQ 0, false to disable all the sources specified in the mask on IRQ 0
  */
@@ -1349,7 +1349,7 @@ static inline void pio_set_irq0_source_mask_enabled(PIO pio, uint32_t source_mas
 /*! \brief  Enable/Disable multiple sources on a PIO's IRQ 1
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param source_mask Mask of bits, one for each source number (see \ref pio_interrupt_source) to affect
  * \param enabled true to enable all the sources specified in the mask on IRQ 1, false to disable all the source specified in the mask on IRQ 1
  */
@@ -1366,7 +1366,7 @@ static inline void pio_set_irq1_source_mask_enabled(PIO pio, uint32_t source_mas
 /*! \brief  Enable/Disable a single source on a PIO's specified (0/1) IRQ index
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param irq_index the IRQ index; either 0 or 1
  * \param source the source number (see \ref pio_interrupt_source)
  * \param enabled true to enable the source on the specified IRQ, false to disable.
@@ -1383,7 +1383,7 @@ static inline void pio_set_irqn_source_enabled(PIO pio, uint irq_index, pio_inte
 /*! \brief  Enable/Disable multiple sources on a PIO's specified (0/1) IRQ index
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param irq_index the IRQ index; either 0 or 1
  * \param source_mask Mask of bits, one for each source number (see \ref pio_interrupt_source) to affect
  * \param enabled true to enable all the sources specified in the mask on the specified IRQ, false to disable all the sources specified in the mask on the specified IRQ
@@ -1402,7 +1402,7 @@ static inline void pio_set_irqn_source_mask_enabled(PIO pio, uint irq_index, uin
 /*! \brief  Determine if a particular PIO interrupt is set
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param pio_interrupt_num the PIO interrupt number 0-7
  * \return true if corresponding PIO interrupt is currently set
  */
@@ -1415,7 +1415,7 @@ static inline bool pio_interrupt_get(PIO pio, uint pio_interrupt_num) {
 /*! \brief  Clear a particular PIO interrupt
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param pio_interrupt_num the PIO interrupt number 0-7
  */
 static inline void pio_interrupt_clear(PIO pio, uint pio_interrupt_num) {
@@ -1427,7 +1427,7 @@ static inline void pio_interrupt_clear(PIO pio, uint pio_interrupt_num) {
 /*! \brief Return the current program counter for a state machine
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \return the program counter
  */
@@ -1445,7 +1445,7 @@ static inline uint8_t pio_sm_get_pc(PIO pio, uint sm) {
  * instruction if it is still running. See pio_sm_is_exec_stalled() to see if an executed instruction
  * is still running (i.e. it is stalled on some condition)
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param instr the encoded PIO instruction
  */
@@ -1458,7 +1458,7 @@ inline static void pio_sm_exec(PIO pio, uint sm, uint instr) {
 /*! \brief Determine if an instruction set by pio_sm_exec() is stalled executing
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \return true if the executed instruction is still running (stalled)
  */
@@ -1476,7 +1476,7 @@ static inline bool pio_sm_is_exec_stalled(PIO pio, uint sm) {
  * instruction if it is still running. See pio_sm_is_exec_stalled() to see if an executed instruction
  * is still running (i.e. it is stalled on some condition)
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param instr the encoded PIO instruction
  */
@@ -1490,7 +1490,7 @@ static inline void pio_sm_exec_wait_blocking(PIO pio, uint sm, uint instr) {
 /*! \brief Set the current wrap configuration for a state machine
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param wrap_target the instruction memory address to wrap to
  * \param wrap        the instruction memory address after which to set the program counter to wrap_target
@@ -1512,7 +1512,7 @@ static inline void pio_sm_set_wrap(PIO pio, uint sm, uint wrap_target, uint wrap
  *
  * 'out' pins can overlap with the 'in', 'set' and 'sideset' pins
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param out_base First pin to set as output. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
  * \param out_count 0-32 Number of pins to set.
@@ -1536,7 +1536,7 @@ static inline void pio_sm_set_out_pins(PIO pio, uint sm, uint out_base, uint out
  *
  * 'set' pins can overlap with the 'in', 'out' and 'sideset' pins
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param set_base First pin to set as 'set'. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
  * \param set_count 0-5 Number of pins to set.
@@ -1559,7 +1559,7 @@ static inline void pio_sm_set_set_pins(PIO pio, uint sm, uint set_base, uint set
  *
  * 'in' pins can overlap with the 'out', 'set' and 'sideset' pins
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param in_base First pin to use as input. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
  */
@@ -1579,7 +1579,7 @@ static inline void pio_sm_set_in_pins(PIO pio, uint sm, uint in_base) {
  *
  * 'sideset' pins can overlap with the 'in', 'out' and 'set' pins
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param sideset_base Base pin for 'side set'. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
  */
@@ -1597,7 +1597,7 @@ static inline void pio_sm_set_sideset_pins(PIO pio, uint sm, uint sideset_base) 
 /*! \brief Set the 'jmp' pin for a state machine
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param pin The pin number to use as the source for a `jmp pin` instruction. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
  */
@@ -1622,7 +1622,7 @@ static inline void pio_sm_set_jmp_pin(PIO pio, uint sm, uint pin) {
  * Hardware sets the TXOVER sticky flag for this FIFO in FDEBUG, to indicate
  * that the system attempted to write to a full FIFO.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param data the 32 bit data value
  *
@@ -1644,7 +1644,7 @@ static inline void pio_sm_put(PIO pio, uint sm, uint32_t data) {
  * from this FIFO when empty. The data returned by this function is undefined
  * when the FIFO is empty.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  *
  * \sa pio_sm_get_blocking()
@@ -1658,7 +1658,7 @@ static inline uint32_t pio_sm_get(PIO pio, uint sm) {
 /*! \brief Determine if a state machine's RX FIFO is full
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \return true if the RX FIFO is full
  */
@@ -1671,7 +1671,7 @@ static inline bool pio_sm_is_rx_fifo_full(PIO pio, uint sm) {
 /*! \brief Determine if a state machine's RX FIFO is empty
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \return true if the RX FIFO is empty
  */
@@ -1684,7 +1684,7 @@ static inline bool pio_sm_is_rx_fifo_empty(PIO pio, uint sm) {
 /*! \brief Return the number of elements currently in a state machine's RX FIFO
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \return the number of elements in the RX FIFO
  */
@@ -1699,7 +1699,7 @@ static inline uint pio_sm_get_rx_fifo_level(PIO pio, uint sm) {
 /*! \brief Determine if a state machine's TX FIFO is full
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \return true if the TX FIFO is full
  */
@@ -1712,7 +1712,7 @@ static inline bool pio_sm_is_tx_fifo_full(PIO pio, uint sm) {
 /*! \brief Determine if a state machine's TX FIFO is empty
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \return true if the TX FIFO is empty
  */
@@ -1725,7 +1725,7 @@ static inline bool pio_sm_is_tx_fifo_empty(PIO pio, uint sm) {
 /*! \brief Return the number of elements currently in a state machine's TX FIFO
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \return the number of elements in the TX FIFO
  */
@@ -1740,7 +1740,7 @@ static inline uint pio_sm_get_tx_fifo_level(PIO pio, uint sm) {
 /*! \brief Write a word of data to a state machine's TX FIFO, blocking if the FIFO is full
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param data the 32 bit data value
  */
@@ -1754,7 +1754,7 @@ static inline void pio_sm_put_blocking(PIO pio, uint sm, uint32_t data) {
 /*! \brief Read a word of data from a state machine's RX FIFO, blocking if the FIFO is empty
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  */
 static inline uint32_t pio_sm_get_blocking(PIO pio, uint sm) {
@@ -1772,7 +1772,7 @@ static inline uint32_t pio_sm_get_blocking(PIO pio, uint sm) {
  * pio_sm_clear_fifos() which clears both FIFOs but leaves the state machine's
  * internal state undisturbed.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  *
  * \sa pio_sm_clear_fifos()
@@ -1782,7 +1782,7 @@ void pio_sm_drain_tx_fifo(PIO pio, uint sm);
 /*! \brief set the current clock divider for a state machine using a 16:8 fraction
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param div_int the integer part of the clock divider
  * \param div_frac8 the fractional part of the clock divider in 1/256s
@@ -1807,7 +1807,7 @@ static inline void pio_sm_set_clkdiv_int_frac(PIO pio, uint sm, uint16_t div_int
 /*! \brief set the current clock divider for a state machine
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \param div the floating point clock divider
  */
@@ -1823,7 +1823,7 @@ static inline void pio_sm_set_clkdiv(PIO pio, uint sm, float div) {
 /*! \brief Clear a state machine's TX and RX FIFOs
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  */
 static inline void pio_sm_clear_fifos(PIO pio, uint sm) {
@@ -1843,7 +1843,7 @@ static inline void pio_sm_clear_fifos(PIO pio, uint sm) {
  * This method is provided as a convenience to set initial pin states, and should not be used against a state machine that is enabled.
  * Note: This method only works for pins < 32. To use with pins >= 32 call pio_sm_set_pins64
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3) to use
  * \param pin_values the pin values to set. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
  */
@@ -1857,7 +1857,7 @@ void pio_sm_set_pins(PIO pio, uint sm, uint32_t pin_values);
  *
  * This method is provided as a convenience to set initial pin states, and should not be used against a state machine that is enabled.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3) to use
  * \param pin_values the pin values to set. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
  */
@@ -1872,7 +1872,7 @@ void pio_sm_set_pins64(PIO pio, uint sm, uint64_t pin_values);
  * This method is provided as a convenience to set initial pin states, and should not be used against a state machine that is enabled.
 * Note: This method only works for pins < 32. To use with pins >= 32 call pio_sm_set_pins_with_mask64
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3) to use
  * \param pin_values the pin values to set (if the corresponding bit in pin_mask is set)
  * \param pin_mask a bit for each pin to indicate whether the corresponding pin_value for that pin should be applied. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
@@ -1887,7 +1887,7 @@ void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pin_values, uint32_t p
  *
  * This method is provided as a convenience to set initial pin states, and should not be used against a state machine that is enabled.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3) to use
  * \param pin_values the pin values to set (if the corresponding bit in pin_mask is set)
  * \param pin_mask a bit for each pin to indicate whether the corresponding pin_value for that pin should be applied. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
@@ -1903,7 +1903,7 @@ void pio_sm_set_pins_with_mask64(PIO pio, uint sm, uint64_t pin_values, uint64_t
  * This method is provided as a convenience to set initial pin directions, and should not be used against a state machine that is enabled.
  * Note: This method only works for pins < 32. To use with pins >= 32 call pio_sm_set_pindirs_with_mask64
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3) to use
  * \param pin_dirs the pin directions to set - 1 = out, 0 = in (if the corresponding bit in pin_mask is set)
  * \param pin_mask a bit for each pin to indicate whether the corresponding pin_dir for that pin should be applied.
@@ -1918,7 +1918,7 @@ void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pin_dirs, uint32_t 
  *
  * This method is provided as a convenience to set initial pin directions, and should not be used against a state machine that is enabled.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3) to use
  * \param pin_dirs the pin directions to set - 1 = out, 0 = in (if the corresponding bit in pin_mask is set)
  * \param pin_mask a bit for each pin to indicate whether the corresponding pin_dir for that pin should be applied.
@@ -1933,7 +1933,7 @@ void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pin_dirs, uint64_
  *
  * This method is provided as a convenience to set initial pin directions, and should not be used against a state machine that is enabled.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3) to use
  * \param pins_base the first pin to set a direction for. See \ref pio_sm_pins "pio_sm_ pins" for more detail on pin arguments
  * \param pin_count the count of consecutive pins to set the direction for
@@ -1949,7 +1949,7 @@ int pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pins_base, uint pin_co
  * is already claimed. Use of this method by libraries detects accidental
  * configurations that would fail in unpredictable ways.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  */
 void pio_sm_claim(PIO pio, uint sm);
@@ -1961,7 +1961,7 @@ void pio_sm_claim(PIO pio, uint sm);
  * are already claimed. Use of this method by libraries detects accidental
  * configurations that would fail in unpredictable ways.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm_mask Mask of state machine indexes
  */
 void pio_claim_sm_mask(PIO pio, uint sm_mask);
@@ -1971,7 +1971,7 @@ void pio_claim_sm_mask(PIO pio, uint sm_mask);
  *
  * Method for cooperative claiming of hardware.
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  */
 void pio_sm_unclaim(PIO pio, uint sm);
@@ -1979,7 +1979,7 @@ void pio_sm_unclaim(PIO pio, uint sm);
 /*! \brief Claim a free state machine on a PIO instance
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param required if true the function will panic if none are available
  * \return the state machine index or negative if required was false, and none were free (for
  * backwards compatibility with prior SDK the error value is -1 i.e. PICO_ERROR_GENERIC)
@@ -1989,7 +1989,7 @@ int pio_claim_unused_sm(PIO pio, bool required);
 /*! \brief Determine if a PIO state machine is claimed
  *  \ingroup hardware_pio
  *
- * \param pio The PIO instance; e.g. \ref pi0, \ref pio1 etc.
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
  * \return true if claimed, false otherwise
  * \see pio_sm_claim
