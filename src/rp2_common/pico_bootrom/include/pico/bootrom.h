@@ -464,7 +464,7 @@ static inline int rom_set_bootrom_stack(bootrom_stack_t *stack) {
  * 
  * The flags field contains one of the following values:
  * 
- * \ref REBOOT2_FLAG_BOOT_TYPE_NORMAL - reboot into the normal boot path.
+ * \ref REBOOT2_FLAG_REBOOT_TYPE_NORMAL - reboot into the normal boot path.
  * 
  * \ref REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL - reboot into BOOTSEL mode.
  *  p0 - the GPIO number to use as an activity indicator (enabled by flag in p1).
@@ -479,7 +479,7 @@ static inline int rom_set_bootrom_stack(bootrom_stack_t *stack) {
  *  p0 - the region start address (word-aligned).
  *  p1 - the region size (word-aligned).
  * 
- * \ref REBOOT2_FLAG_REBOOT_TYPE_FLASH_UPDATE - variant of \ref REBOOT2_FLAG_BOOT_TYPE_NORMAL to use when flash has been updated. This is the type
+ * \ref REBOOT2_FLAG_REBOOT_TYPE_FLASH_UPDATE - variant of \ref REBOOT2_FLAG_REBOOT_TYPE_NORMAL to use when flash has been updated. This is the type
  * of reboot used after dragging a flash UF2 onto the BOOTSEL USB drive.
  *  p0 - the address of the start of the region of flash that was updated. If this address matches the start address of a partition or slot, then that
  *       partition or slot is treated preferentially during boot (when there is a choice). This type of boot facilitates TBYB and version downgrades.
