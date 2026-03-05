@@ -92,7 +92,7 @@ def main():
         for elf in args.elf_filenames:
             full_path = f"{args.path_prefix}/{seg}/{args.path_postfix}/{elf}"
             if not os.path.isfile(full_path):
-                print(f"Skipping missing ELF {full_path}...")
+                print(f"\n=== Skipping missing ELF {full_path} ===")
                 continue
 
             attempted += 1
