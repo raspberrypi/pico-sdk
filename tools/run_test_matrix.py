@@ -83,13 +83,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Make sure pyserial is available
-    try:
-        import serial
-    except ImportError:
-        print("Error: pyserial not installed. Run: pip install pyserial")
-        sys.exit(1)
-
     os.makedirs(args.output_dir, exist_ok=True)
 
     attempted = 0
