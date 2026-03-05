@@ -228,12 +228,12 @@ saving_func regular double2fix_z
   ubfx r3, r1, #20, #11
   cbz r3, 1f // zero or denormal
   adds r3, r2
-  ble 1f // very small; we don't care that we might make a denormal
+  ble 1f // zero or denormal after exponent changed
   adds r2, r3, #1
   lsrs r2, r2, #11
   bfi r1, r3, #20, #11
   beq double2int_z_entry // wasn't infinite or above (exponent)
-  // infinite value
+  // infinite value is handled specially since the mantissa bits may have been non zero which is a NaN
   asrs    r0, r1, #31             // -ve/+ve 0xffffffff/0x00000000
   mvns    r0, r0                  // -ve/+ve 0x00000000/0xffffffff
   eors    r0, r0, #0x80000000     // -ve/+ve 0x80000000/0x7FFFFFFF
@@ -252,12 +252,12 @@ double2ufix_z_entry:
   ubfx r3, r1, #20, #11
   cbz r3, 1f // zero or denormal
   adds r3, r2
-  ble 1f // 0 or denormal
+  ble 1f // zero or denormal after exponent changed
   adds r2, r3, #1
   lsrs r2, r2, #11
   bfi r1, r3, #20, #11
   beq double2uint_z_entry // wasn't infinite or above (exponent)
-  // infinite value
+  // infinite value is handled specially since the mantissa bits may have been non zero which is a NaN
   asrs    r0, r1, #31             // -ve/+ve 0xffffffff/0x00000000
   mvns    r0, r0                  // -ve/+ve 0x00000000/0xffffffff
   saving_func_return
@@ -274,12 +274,12 @@ saving_func regular double2fix
   ubfx r3, r1, #20, #11
   cbz r3, 1f // zero or denormal
   adds r3, r2
-  ble 1f // 0 or denormal
+  ble 1f // zero or denormal after exponent changed
   adds r2, r3, #1
   lsrs r2, r2, #11
   bfi r1, r3, #20, #11
   beq double2int_entry // wasn't infinite or above (exponent)
-  // infinite value
+  // infinite value is handled specially since the mantissa bits may have been non zero which is a NaN
   asrs    r0, r1, #31             // -ve/+ve 0xffffffff/0x00000000
   mvns    r0, r0                  // -ve/+ve 0x00000000/0xffffffff
   eors    r0, r0, #0x80000000     // -ve/+ve 0x80000000/0x7FFFFFFF
