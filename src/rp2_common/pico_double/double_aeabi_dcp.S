@@ -230,9 +230,8 @@ saving_func regular double2fix_z
   bfi r1, r3, #20, #11
   beq double2int_z_entry // wasn't infinite or above (exponent)
   // infinite value is handled specially since the mantissa bits may have been non zero which is a NaN
-  asrs    r0, r1, #31             // -ve/+ve 0xffffffff/0x00000000
-  mvns    r0, r0                  // -ve/+ve 0x00000000/0xffffffff
-  eors    r0, r0, #0x80000000     // -ve/+ve 0x80000000/0x7FFFFFFF
+  mvn r2, #0x80000000
+  add r0, r2, r1, lsr#31 // so -Inf → 0x80000000, +Inf → 0x7fffffff
   saving_func_return
 1: // small value; return 0
   movs r0, #0
@@ -276,9 +275,8 @@ saving_func regular double2fix
   bfi r1, r3, #20, #11
   beq double2int_entry // wasn't infinite or above (exponent)
   // infinite value is handled specially since the mantissa bits may have been non zero which is a NaN
-  asrs    r0, r1, #31             // -ve/+ve 0xffffffff/0x00000000
-  mvns    r0, r0                  // -ve/+ve 0x00000000/0xffffffff
-  eors    r0, r0, #0x80000000     // -ve/+ve 0x80000000/0x7FFFFFFF
+  mvn r2, #0x80000000
+  add r0, r2, r1, lsr#31 // so -Inf → 0x80000000, +Inf → 0x7fffffff
   saving_func_return
 1: // small value; return 0
   movs r0, #0
