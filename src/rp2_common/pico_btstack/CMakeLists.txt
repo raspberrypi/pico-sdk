@@ -91,7 +91,6 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
         ${PICO_BTSTACK_PATH}/src/ble/gatt-service/device_information_service_server.c
         ${PICO_BTSTACK_PATH}/src/ble/gatt-service/device_information_service_client.c
         ${PICO_BTSTACK_PATH}/src/ble/gatt-service/heart_rate_service_server.c
-        ${PICO_BTSTACK_PATH}/src/ble/gatt-service/hids_client.c
         ${PICO_BTSTACK_PATH}/src/ble/gatt-service/hids_device.c
         ${PICO_BTSTACK_PATH}/src/ble/gatt-service/nordic_spp_service_server.c
         ${PICO_BTSTACK_PATH}/src/ble/gatt-service/ublox_spp_service_server.c
@@ -112,6 +111,17 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     if (EXISTS ${PICO_BTSTACK_PATH}/src/hci_event_builder.c)
         target_sources(pico_btstack_ble INTERFACE
             ${PICO_BTSTACK_PATH}/src/hci_event_builder.c
+        )
+    endif()
+
+    # v1.8 hids_client.c renamed hids_host.c
+    if (EXISTS ${PICO_BTSTACK_PATH}/src/ble/gatt-service/hids_host.c)
+        target_sources(pico_btstack_ble INTERFACE
+            ${PICO_BTSTACK_PATH}/src/ble/gatt-service/hids_host.c
+        )
+    else()
+        target_sources(pico_btstack_ble INTERFACE
+            ${PICO_BTSTACK_PATH}/src/ble/gatt-service/hids_client.c
         )
     endif()
 
