@@ -32,7 +32,7 @@ $ tools/run_test_matrix.py \
        test/pico_float_test \
     -- out_dir
 
-Which will run the following if they exist, storing the output in out_dir/
+Which will run each of the following if they exist:
    gcc_build/test/pico_float_test/custom_float_funcs_test_compiler.elf
    gcc_build/test/pico_float_test/custom_float_funcs_test_pico_dcp.elf
    gcc_build/test/pico_float_test/custom_float_funcs_test_pico.elf
@@ -41,8 +41,18 @@ Which will run the following if they exist, storing the output in out_dir/
    clang_build/test/pico_float_test/custom_float_funcs_test_pico_dcp.elf
    clang_build/test/pico_float_test/custom_float_funcs_test_pico.elf
    clang_build/test/pico_float_test/custom_float_funcs_test_pico_vfp.elf
+storing their UART output in:
+   out_dir/gcc_build.custom_float_funcs_test_compiler.elf.out
+   out_dir/gcc_build.custom_float_funcs_test_pico_dcp.elf.out
+   out_dir/gcc_build.custom_float_funcs_test_pico.elf.out
+   out_dir/gcc_build.custom_float_funcs_test_pico_vfp.elf.out
+   out_dir/clang_build.custom_float_funcs_test_compiler.elf.out
+   out_dir/clang_build.custom_float_funcs_test_pico_dcp.elf.out
+   out_dir/clang_build.custom_float_funcs_test_pico.elf.out
+   out_dir/clang_build.custom_float_funcs_test_pico_vfp.elf.out
 
 This would run the same tests:
+(but store the output in e.g out_dir/gcc_build.pico_float_test.custom_float_funcs_test_compiler.elf.out )
 
 $ tools/run_test_matrix.py \
     --path-segments \
@@ -66,7 +76,7 @@ import time
 import signal
 
 def main():
-    parser = argparse.ArgumentParser(description="RP2350 ELF test runner with OpenOCD + pyserial UART capture")
+    parser = argparse.ArgumentParser(description="RP2xxx ELF test runner with OpenOCD + grabserial UART capture")
     parser.add_argument("output_dir", help="Directory where *.out files will be written (will be created if missing)")
     parser.add_argument("--path-segments", nargs="+", required=True,
                         help="Space-separated list of path segments (no slashes), e.g. seg1 seg2")
@@ -90,7 +100,7 @@ def main():
 
     for seg in args.path_segments:
         for elf in args.elf_filenames:
-            full_path = f"{args.path_prefix}/{seg}/{args.path_postfix}/{elf}"
+            full_path = os.path.join(args.path_prefix, seg, args.path_postfix, elf)
             if not os.path.isfile(full_path):
                 print(f"\n=== Skipping missing ELF {full_path} ===")
                 continue
@@ -103,8 +113,8 @@ def main():
             print(f"   ELF: {full_path}")
             print(f"   Out: {outfile}")
 
-            # ====================== START MINICOM EARLY FOR FULL UART CAPTURE ======================
-            print(f"   Starting minicom capture early on {args.serial_port} @ {args.baud} baud...")
+            # ====================== START GRABSERIAL EARLY FOR FULL UART CAPTURE ======================
+            print(f"   Starting grabserial capture early on {args.serial_port} @ {args.baud} baud...")
 
             logger_proc = None
             try:
@@ -123,7 +133,7 @@ def main():
                 )
                 print(f"   grabserial started (PID {logger_proc.pid}) — capturing from now on")
 
-                # Give minicom a moment to open the port and settle
+                # Give grabserial a moment to open the port and settle
                 time.sleep(0.5)
 
                 # ====================== FLASH + START VIA GDB ======================
@@ -186,7 +196,7 @@ def main():
                         except:
                             pass
 
-            # ====================== CHECK LAST LINE ======================
+            # ====================== CHECK WE CAPTURED SOME OUTPUT ======================
             if not os.path.isfile(outfile) or os.path.getsize(outfile) == 0:
                 print("   No output captured")
                 continue
@@ -211,6 +221,7 @@ def main():
                 print(f"Error reading output file: {e}")
 
             print("="*60 + "\n")
+            # ====================== CHECK LAST LINE ======================
             try:
                 with open(outfile, "r", encoding="utf-8", errors="ignore") as f:
                     lines = f.readlines()
@@ -230,11 +241,8 @@ def main():
 
     if attempted == 0:
         print("No ELFs were found to test.")
-        sys.exit(0)
-
-    if succeeded == attempted:
+    elif succeeded == attempted:
         print("All tests passed!")
-        sys.exit(0)
     else:
         print("Some tests failed.")
         sys.exit(1)
