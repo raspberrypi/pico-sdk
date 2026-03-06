@@ -430,9 +430,9 @@ int test() {
     test_checku64(double2ufix64_z(u64d.d, 1), UINT64_MAX, "double2ufix64_z13b");
     test_checku64(double2ufix64_z(u64d.d, 2), UINT64_MAX, "double2ufix64_z13c");
     u64d.u = 0xffe0000000012345ull;
-    test_checku64(double2ufix64_z(u64d.d, 0), 0, "double2ufix64_z13d");
-    test_checku64(double2ufix64_z(u64d.d, 1), 0, "double2ufix64_z13e");
-    test_checku64(double2ufix64_z(u64d.d, 2), 0, "double2ufix64_z13f");
+    test_checku64(double2ufix64_z(u64d.d, 0), 0, "double2ufix64_z14a");
+    test_checku64(double2ufix64_z(u64d.d, 1), 0, "double2ufix64_z14b");
+    test_checku64(double2ufix64_z(u64d.d, 2), 0, "double2ufix64_z14c");
 
     printf("double2int\n");
     test_checki(double2int(0.0), 0, "double2int1");
