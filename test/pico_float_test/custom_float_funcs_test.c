@@ -33,7 +33,7 @@ static inline float float2fix_12(int32_t m) { return float2fix(m, 12); }
 static inline float float2ufix_12(int32_t m) { return float2ufix(m, 12); }
 #endif
 
-#if 1 && (LIB_PICO_FLOAT_COMPILER || defined(__riscv))
+#if LIB_PICO_FLOAT_COMPILER || defined(__riscv)
 #if __SOFTFP__ || defined(__riscv)
 #define FREG "+r"
 #else
@@ -83,6 +83,22 @@ int32_t __attribute__((naked)) call_float2int_z(float f) {
 
 uint32_t __attribute__((naked)) call_float2uint_z(float f) {
     pico_default_asm_volatile("b float2uint_z");
+}
+
+float __attribute__((naked)) call_fix2float(int32_t i, uint32_t n) {
+    pico_default_asm_volatile("b fix2float");
+}
+
+float __attribute__((naked)) call_ufix2float(int32_t i, uint32_t n) {
+    pico_default_asm_volatile("b ufix2float");
+}
+
+int32_t __attribute__((naked)) call_float2fix(float f, uint32_t n) {
+    pico_default_asm_volatile("b float2fix");
+}
+
+uint32_t __attribute__((naked)) call_float2ufix(float f, uint32_t n) {
+    pico_default_asm_volatile("b float2ufix");
 }
 #endif
 
@@ -185,21 +201,52 @@ int test() {
     test_checkf(fix2float(-3, 1), -1.5f, "fix2float2");
     test_checkf(fix2float(-3, -4), -48.0f, "fix2float3");
 
+#if LIB_PICO_FLOAT_PICO_VFP
+#ifndef fix2float
+#error fix2float not actually overridden
+#endif
+    printf("call_fix2float\n");
+    // todo test correct rounding around maximum precision
+    test_checkf(call_fix2float(-3, 1), -1.5f, "call_fix2float1");
+    test_checkf(call_fix2float(-3, 1), -1.5f, "call_fix2float2");
+    test_checkf(call_fix2float(-3, -4), -48.0f, "call_fix2float3");
+#endif
+
     printf("ufix2float\n");
     // todo test correct rounding around maximum precision
     test_checkf(ufix2float(0xa0000000, 30), 2.5f, "ufix2float1");
     test_checkf(ufix2float(3, -4), 48.0f, "ufix2float2");
+
+#if LIB_PICO_FLOAT_PICO_VFP
+#ifndef ufix2float
+#error ufix2float not actually overridden
+#endif
+
+    printf("call_ufix2float\n");
+    // todo test correct rounding around maximum precision
+    test_checkf(call_ufix2float(0xa0000000, 30), 2.5f, "call_ufix2float1");
+    test_checkf(call_ufix2float(3, -4), 48.0f, "call_ufix2float2");
+#endif
 
     printf("fix642float\n");
     // todo test correct rounding around maximum precision
     test_checkf(fix642float(-0xa000000000ll, 38), -2.5f, "fix6422float1");
     test_checkf(fix642float(-3, -34), -51539607552.0f, "fix642float2");
 
+#ifdef fix642float
+#error fix642float overridden, so original needs testing
+#endif
+
     printf("ufix642float\n");
     // todo test correct rounding around maximum precision
     test_checkf(ufix642float(0xa000000000ll, 38), 2.5f, "ufix642float1");
     test_checkf(ufix642float(3, -34), 51539607552.0f, "fix64float2");
 
+#ifdef ufix642float
+#error ufix642float overridden, so original needs testing
+#endif
+
+    printf("fix2float_N\n");
     test_checkf(fix2float_8(128), 0.5f, "fix2float_8_1");
     test_checkf(fix2float_8(-128), -0.5f, "fix2float_8_2");
     test_checkf(fix2float_16(8192), 0.125f, "fix2float_8_3");
@@ -235,6 +282,39 @@ int test() {
     test_checki(float2fix(u32f.f, 1), INT32_MIN, "float2fix13b");
     test_checki(float2fix(u32f.f, 2), INT32_MIN, "float2fix13c");
 
+#if LIB_PICO_FLOAT_PICO_VFP
+#ifndef float2fix
+#error float2fix not actually overridden
+#endif
+    printf("call_float2fix\n");
+    test_checki(call_float2fix(-0.5f, 8), -0x80, "call_float2fix0");
+    test_checki(call_float2fix(3.5f, 8), 0x380, "call_float2fix1");
+    test_checki(call_float2fix(-3.5f, 8), -0x380, "call_float2fix2");
+    test_checki(call_float2fix(32768.0f, 16), INT32_MAX, "call_float2fix3");
+    test_checki(call_float2fix(65536.0f, 16), INT32_MAX, "call_float2fix4");
+    test_checki(call_float2fix(-65536.0f, 16), INT32_MIN, "call_float2fix4b");
+    test_checki(call_float2fix(INFINITY, 16), INT32_MAX, "call_float2fix5");
+    test_checki(call_float2fix(-INFINITY, 16), INT32_MIN, "call_float2fix5b");
+    test_checki(call_float2fix(INFINITY, -16), INT32_MAX, "call_float2fix5c");
+    test_checki(call_float2fix(-INFINITY, -16), INT32_MIN, "call_float2fix5d");
+    test_checki(call_float2fix(INFINITY, 0), INT32_MAX, "call_float2fix5e");
+    test_checki(call_float2fix(-INFINITY, 0), INT32_MIN, "call_float2fix5f");
+    test_checki(call_float2fix(3.24999f, 2), 12, "call_float2fix6");
+    test_checki(call_float2fix(3.25f, 2), 13, "call_float2fix7");
+    test_checki(call_float2fix(-3.24999f, 2), -13, "call_float2fix8");
+    test_checki(call_float2fix(-3.25f, 2), -13, "call_float2fix9");
+    test_checki(call_float2fix(-0.75f, 1), -2, "call_float2fix10");
+    test_checki(call_float2fix(-3.0f, -1), -2, "call_float2fix11"); // not very useful
+    u32f.u = 0x7f012345;
+    test_checki(call_float2fix(u32f.f, 0), INT32_MAX, "call_float2fix12a");
+    test_checki(call_float2fix(u32f.f, 1), INT32_MAX, "call_float2fix12b");
+    test_checki(call_float2fix(u32f.f, 2), INT32_MAX, "call_float2fix12c");
+    u32f.u = 0xff012345;
+    test_checki(call_float2fix(u32f.f, 0), INT32_MIN, "call_float2fix13a");
+    test_checki(call_float2fix(u32f.f, 1), INT32_MIN, "call_float2fix13b");
+    test_checki(call_float2fix(u32f.f, 2), INT32_MIN, "call_float2fix13c");
+#endif
+
     printf("float2ufix\n");
     test_checku(float2ufix(3.5f, 8), 0x380, "float2ufix1");
     test_checku(float2ufix(-3.5f, 8), 0, "float2ufix2");
@@ -257,6 +337,34 @@ int test() {
     test_checku(float2ufix(u32f.f, 0), 0, "float2ufix10a");
     test_checku(float2ufix(u32f.f, 1), 0, "float2ufix10b");
     test_checku(float2ufix(u32f.f, 2), 0, "float2ufix10c");
+
+#if LIB_PICO_FLOAT_PICO_VFP
+#ifndef float2ufix
+#error float2ufix not actually overridden
+#endif
+    printf("call_float2ufix\n");
+    test_checku(call_float2ufix(3.5f, 8), 0x380, "call_float2ufix1");
+    test_checku(call_float2ufix(-3.5f, 8), 0, "call_float2ufix2");
+    test_checku(call_float2ufix(32768.0f, 16), 32768 << 16, "call_float2ufix3");
+    test_checku(call_float2ufix(65536.0f, 16), UINT32_MAX, "call_float2ufix4");
+    test_checku(call_float2ufix(INFINITY, 16), UINT32_MAX, "call_float2ufix5");
+    test_checku(call_float2ufix(-INFINITY, 16), 0, "call_float2ufix5b");
+    test_checku(call_float2ufix(INFINITY, -16), UINT32_MAX, "call_float2ufix5c");
+    test_checku(call_float2ufix(-INFINITY, -16), 0, "call_float2ufix5d");
+    test_checku(call_float2ufix(INFINITY, 0), UINT32_MAX, "call_float2ufix5e");
+    test_checku(call_float2ufix(-INFINITY, 0), 0, "call_float2ufix5f");
+    test_checku(call_float2ufix(3.24999f, 2), 12, "call_float2ufix6");
+    test_checku(call_float2ufix(3.25f, 2), 13, "call_float2ufix7");
+    test_checku(call_float2ufix(3.0f, -1), 1, "call_float2ufix8"); // not very useful
+    u32f.u = 0x7f012345;
+    test_checku(call_float2ufix(u32f.f, 0), UINT32_MAX, "call_float2ufix9a");
+    test_checku(call_float2ufix(u32f.f, 1), UINT32_MAX, "call_float2ufix9b");
+    test_checku(call_float2ufix(u32f.f, 2), UINT32_MAX, "call_float2ufix9c");
+    u32f.u = 0xff012345;
+    test_checku(call_float2ufix(u32f.f, 0), 0, "call_float2ufix10a");
+    test_checku(call_float2ufix(u32f.f, 1), 0, "call_float2ufix10b");
+    test_checku(call_float2ufix(u32f.f, 2), 0, "call_float2ufix10c");
+#endif
 
     printf("float2fix64\n");
     test_checki64(float2fix64(3.5f, 8), 0x380, "float2fix641");
@@ -285,6 +393,10 @@ int test() {
     test_checki64(float2fix64(u32f.f, 1), INT64_MIN, "float2fix6412b");
     test_checki64(float2fix64(u32f.f, 2), INT64_MIN, "float2fix6412c");
 
+#ifdef float2fix64
+#error float2fix64 overridden, so original needs testing
+#endif
+
     printf("float2ufix64\n");
     test_checku64(float2ufix64(3.5f, 8), 0x380, "float2ufix641");
     test_checku64(float2ufix64(-3.5f, 8), 0, "float2ufix642");
@@ -310,6 +422,10 @@ int test() {
     test_checku64(float2ufix64(u32f.f, 0), 0, "float2ufix6410a");
     test_checku64(float2ufix64(u32f.f, 1), 0, "float2ufix6410b");
     test_checku64(float2ufix64(u32f.f, 2), 0, "float2ufix6410c");
+
+#ifdef float2ufix64
+#error float2ufix64 overridden, so original needs testing
+#endif
 
     printf("float2fix_z\n");
     test_checki(float2fix_z(3.5f, 8), 0x380, "float2fix_z1");
@@ -385,6 +501,9 @@ int test() {
     test_checki64(float2fix64_z(u32f.f, 0), INT64_MIN, "float2fix64_z12a");
     test_checki64(float2fix64_z(u32f.f, 1), INT64_MIN, "float2fix64_z12b");
     test_checki64(float2fix64_z(u32f.f, 2), INT64_MIN, "float2fix64_z12c");
+#ifdef float2fix64_z
+#error float2fix64_z overridden, so original needs testing
+#endif
 
     printf("float2ufix64_z\n");
     test_checku64(float2ufix64_z(3.5f, 8), 0x380, "float2ufix64_z1");
@@ -409,6 +528,9 @@ int test() {
     test_checku64(float2ufix64_z(u32f.f, 0), 0, "float2ufix64_z10a");
     test_checku64(float2ufix64_z(u32f.f, 1), 0, "float2ufix64_z10b");
     test_checku64(float2ufix64_z(u32f.f, 2), 0, "float2ufix64_z10c");
+#ifdef float2ufix64_z
+#error float2ufix64_z overridden, so original needs testing
+#endif
 
     printf("float2int\n");
     test_checki(float2int(0.0f), 0, "float2int1");
@@ -429,6 +551,9 @@ int test() {
     test_checki(float2int(-21474836480.0f), INT32_MIN, "float2int9");
     test_checki(float2int(-2.5f), -3, "float2int10");
     test_checki(float2int(-2.4f), -3, "float2int11");
+#ifdef float2int
+#error float2int overridden, so original needs testing
+#endif
 
     printf("float2uint\n");
     test_checku(float2uint(0.0f), 0, "float2uint1");
@@ -441,6 +566,9 @@ int test() {
     test_checku(float2uint(4294967294.5f), UINT32_MAX, "float2uint8"); // note loss of precision
     test_checku(float2uint(4294967295.0f), UINT32_MAX, "float2uint9");
     test_checku(float2uint(42949672950.0f), UINT32_MAX, "float2uint10");
+#ifdef float2uint
+#error float2uint overridden, so original needs testing
+#endif
 
     printf("float2int64\n");
     test_checki64(float2int64(0.0f), 0, "float2int641");
@@ -461,6 +589,10 @@ int test() {
     test_checki64(float2int64(-21474836480.0f), -21474836480ll, "float2int649");
     test_checki64(float2int64(-2.5f), -3, "float2int6410");
     test_checki64(float2int64(-2.4f), -3, "float2int6411");
+#ifdef float2uint64
+#error float2uint64 overridden, so original needs testing
+#endif
+
 
     printf("float2uint64\n");
     test_checku64(float2uint64(0.0f), 0, "float2uint641");
@@ -500,6 +632,10 @@ int test() {
     test_checki(float2int_z(make_negative_denormal_float()), 0, "float2int_z13");
 
 #if LIB_PICO_FLOAT_PICO_VFP
+    // the override is actually an inline func
+// #ifndef float2int_z
+// #error float2int_z not actually overridden
+// #endif
     printf("call_float2int_z\n");
     test_checki(call_float2int_z(0.0f), 0, "call_float2int_z1");
     test_checki(call_float2int_z(0.25f), 0, "call_float2int_z1b");
@@ -560,6 +696,10 @@ int test() {
     test_checku(float2uint_z(make_negative_denormal_float()), 0, "float2uint_z12");
 
 #if LIB_PICO_FLOAT_PICO_VFP
+    // the override is actually an inline func
+// #ifndef float2uint_z
+// #error float2uint_z not actually overridden
+// #endif
     printf("call_float2uint_z\n");
     test_checku(call_float2uint_z(0.0f), 0, "call_float2uint_z1");
     test_checku(call_float2uint_z(0.25f), 0, "call_float2uint_z2");
