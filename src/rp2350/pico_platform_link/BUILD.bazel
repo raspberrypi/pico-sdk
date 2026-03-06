@@ -32,15 +32,6 @@ use_linker_script_file(
     script = "memmap_no_flash.ld",
 )
 
-# It's possible to set linker scripts globally or on a per-binary basis.
-#
-# Setting globally:
-#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT to point to your
-#     desired linker script.
-#
-# Setting per-binary:
-#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT=@pico-sdk//bazel:empty_cc_lib
-#   * Manually add your desired linker script to each cc_binary.
 cc_library(
     name = "default_linker_script",
     target_compatible_with = ["//bazel/constraint:rp2350"],
