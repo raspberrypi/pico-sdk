@@ -86,7 +86,8 @@ extern "C" {
 *
 *   powint, sincos
 *
-* On Arm, the following additional optimized functions are also provided when using `pico_double_pico`:
+* On Arm, the following additional optimized functions are also provided when using `pico_double_pico`, all of which
+* saturate to the nearest representable value for too large input when converting from floating point types:
 *
 * - Conversions to/from integer types:
 *
@@ -120,9 +121,9 @@ extern "C" {
 *
 *   ddiv_fast, sqrt_fast (these do not round correctly)
 *
-* - Faster unfused multiply and accumulate:
+* - Faster un-fused multiply and accumulate:
 *
-*   mla (fast fma)
+*   mla/fast_fma
 *
 * \if rp2350_specific
 * On RISC-V there is no custom double-precision floating point support, so `pico_double_pico` is equivalent to `pico_double_compiler`

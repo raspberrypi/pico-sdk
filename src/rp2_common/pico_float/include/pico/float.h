@@ -96,7 +96,8 @@ extern "C" {
 *
 *   powintf, sincosf
 *
-* On Arm, the following additional optimized functions are also provided (when using `_pico` variants of `pico_float`):
+* On Arm, the following additional optimized functions are also provided (when using `_pico` variants of `pico_float`), all of which
+* saturate to the nearest representable value for too large input when converting from floating point types:
 *
 * - Conversions to/from integer types:
 *
