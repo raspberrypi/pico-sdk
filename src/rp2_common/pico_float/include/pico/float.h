@@ -137,11 +137,11 @@ extern "C" {
 *     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
 *     when the number of fractional bits is a compile time constant between 1 and 32
 *
+* \if rp2350_specific
 * - Even faster versions of divide and square-root functions that do not round correctly: (`pico_float_pico_dcp` only)
 *
 *   fdiv_fast, sqrtf_fast
 *
-* \if rp2350_specific
 * On RISC-V, (replacement) optimized implementations are provided for the following compiler built-ins when using the `pico_float_pico`
 * library (note that there are no variants of this library like there are on Arm):
 *
@@ -297,7 +297,7 @@ float exp10f(float x);
 void sincosf(float x, float *sinx, float *cosx);
 float powintf(float x, int y);
 
-#if !PICO_RP2040 || PICO_COMBINED_DOCS
+#if PICO_RP2350 || PICO_COMBINED_DOCS
 float fdiv_fast(float n, float d);
 float sqrtf_fast(float f);
 #endif

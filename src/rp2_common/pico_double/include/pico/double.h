@@ -117,6 +117,7 @@ extern "C" {
 *
 *       double2fix, double2ufix, double2fix64, double2ufix64
 *
+* \if rp2350_specific
 * - Even faster versions of divide and square-root functions that do not round correctly:
 *
 *   ddiv_fast, sqrt_fast (these do not round correctly)
@@ -125,7 +126,6 @@ extern "C" {
 *
 *   mla/fast_fma
 *
-* \if rp2350_specific
 * On RISC-V there is no custom double-precision floating point support, so `pico_double_pico` is equivalent to `pico_double_compiler`
 * \endif
 */
@@ -168,7 +168,7 @@ double exp10(double x);
 void sincos(double x, double *sinx, double *cosx);
 double powint(double x, int y);
 
-#if !PICO_RP2040 || PICO_COMBINED_DOCS
+#if PICO_RP2350 || PICO_COMBINED_DOCS
 double ddiv_fast(double n, double d);
 double sqrt_fast(double f);
 double fma_fast(double x, double y, double z); // this is not fused
