@@ -44,16 +44,6 @@
 #include "hardware/structs/scb.h"
 #endif
 
-
-// The difference between sleep and dormant is that ALL clocks are stopped in dormant mode,
-// until the source (either xosc or rosc) is started again by an external event.
-// In sleep mode some clocks can be left running controlled by the SLEEP_EN registers in the clocks
-// block. For example you could keep clk_rtc running. Some destinations (proc0 and proc1 wakeup logic)
-// can't be stopped in sleep mode otherwise there wouldn't be enough logic to wake up again.
-
-
-// TODO: Optionally, memories can also be powered down.
-
 // ------------------------------------------------------------------------------------------------------
 // todo these probably belong in h/w clocks as some sort of registered thing, but leave them private here
 //      for now
@@ -128,15 +118,12 @@ static void post_pstate_change(void) {
 }
 #endif
 
-// ------------------------------------------------------------------------------------------------------
-
-// todo should we make this a save/restore thing?
 void low_power_enable_processor_deep_sleep(void) {
     // Enable deep sleep at the proc
 #ifdef __riscv
     uint32_t bits = RVCSR_MSLEEP_POWERDOWN_BITS;
     if (!get_core_num()) {
-        // todo errata ref
+        // see errata RP2350-E4
         bits |= RVCSR_MSLEEP_DEEPSLEEP_BITS;
     }
     riscv_set_csr(RVCSR_MSLEEP_OFFSET, bits);
@@ -248,9 +235,6 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
 
     clock_dest_set_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
-    // todo we need mapping of hardware to clocks; also this needs to come from AON timer
-    //  we know that people in the wild (MicroPython) have wanted to do some mapping to also
-    //  figure out what PLLs are still on via these bits
 #if PICO_RP2040
     clock_dest_set_add(&local_keep_enabled, CLK_DEST_SYS_TIMER);
 #elif PICO_RP2350
@@ -463,13 +447,11 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     clock_dest_set_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
-    // todo ugh this doesn't really belong here like this; need to encapsulate in aon timer?
 #if PICO_RP2040
     // The RTC must be run from an external source, since the dormant source will be inactive
     rtc_run_from_external_source(src_hz, gpio_pin);
     clock_dest_set_add(&local_keep_enabled, CLK_DEST_RTC_RTC);
 #elif PICO_RP2350
-    // todo
     ((void)src_hz);
     ((void)gpio_pin);
     if (dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC)
@@ -486,7 +468,6 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     struct timespec ts;
     us_to_timespec(to_us_since_boot(until), &ts);
     event_happened = false;
-    // note wakeup from low power == false, means don't wake up from dormant
     aon_timer_enable_alarm(&ts, (aon_timer_alarm_handler_t)low_power_wakeup, true);
 
     prepare_for_clock_gating();
@@ -499,7 +480,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     low_power_go_dormant(dormant_clock_source);
 
 
-    assert(event_happened); // does it?
+    assert(event_happened);
     low_power_wake_from_dormant();
 
     return 0;
@@ -626,6 +607,7 @@ int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func re
     // Power down
     while (true) __wfi();
 
+    // Should not reach here
     post_pstate_change();
 
     return rc;
