@@ -5,9 +5,6 @@ load("//bazel/util:pico_linker_scripts.bzl", "include_linker_script_dir")
 exports_files(
     [
         "default_locations.ld",
-        "section_copy_to_ram_text.ld",
-        "section_default_text.ld",
-        "section_no_flash_text.ld",
         "section_platform_end.ld",
     ]
 )
@@ -22,9 +19,6 @@ cc_library(
     target_compatible_with = ["//bazel/constraint:rp2350"],
     deps = [
         "default_locations.ld",
-        "section_copy_to_ram_text.ld",
-        "section_default_text.ld",
-        "section_no_flash_text.ld",
         "section_platform_end.ld",
         "rp2350_linker_script_args",
     ],
