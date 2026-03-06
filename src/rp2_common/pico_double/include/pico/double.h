@@ -116,11 +116,11 @@ extern "C" {
 *   - double -> (u)fix (round towards -infinity):
 *
 *       double2fix, double2ufix, double2fix64, double2ufix64
-*
 * \if rp2350_specific
+*
 * - Even faster versions of divide and square-root functions that do not round correctly:
 *
-*   ddiv_fast, sqrt_fast (these do not round correctly)
+*   ddiv_fast, sqrt_fast
 *
 * - Faster un-fused multiply and accumulate:
 *

@@ -136,8 +136,8 @@ extern "C" {
 *
 *     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
 *     when the number of fractional bits is a compile time constant between 1 and 32
-*
 * \if rp2350_specific
+*
 * - Even faster versions of divide and square-root functions that do not round correctly: (`pico_float_pico_dcp` only)
 *
 *   fdiv_fast, sqrtf_fast
