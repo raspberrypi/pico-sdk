@@ -400,7 +400,7 @@ int test() {
     test_checku64(float2ufix64_z(-INFINITY, 0), 0, "float2ufix64_z5f");
     test_checku64(float2ufix64_z(3.24999f, 2), 12, "float2ufix64_z6");
     test_checku64(float2ufix64_z(3.25f, 2), 13, "float2ufix64_z7");
-    test_checki64(float2ufix64_z(3.0f, -1), 1, "float2ufix64_z8"); // not very useful
+    test_checku64(float2ufix64_z(3.0f, -1), 1, "float2ufix64_z8"); // not very useful
     u32f.u = 0x7f012345;
     test_checku64(float2ufix64_z(u32f.f, 0), UINT64_MAX, "float2ufix64_z9a");
     test_checku64(float2ufix64_z(u32f.f, 1), UINT64_MAX, "float2ufix64_z9b");

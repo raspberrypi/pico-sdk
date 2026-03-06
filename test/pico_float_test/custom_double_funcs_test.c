@@ -286,8 +286,8 @@ int test() {
     test_checku64(double2ufix64(3.24999, 2), 12, "double2ufix646");
     test_checku64(double2ufix64(3.25, 2), 13, "double2ufix647");
     test_checku64(double2ufix64(3.0, -1), 1, "double2ufix648"); // not very useful
-    test_checki64(double2ufix64(0.0, 16), 0, "double2ufix649");
-    test_checki64(double2ufix64(-0.0, 16), 0, "double2ufix6410");
+    test_checku64(double2ufix64(0.0, 16), 0, "double2ufix649");
+    test_checku64(double2ufix64(-0.0, 16), 0, "double2ufix6410");
     u64d.u = 0x7fe0000000012345ull;
     test_checku64(double2ufix64(u64d.d, 0), UINT64_MAX, "double2ufix6411a");
     test_checku64(double2ufix64(u64d.d, 1), UINT64_MAX, "double2ufix6411b");
