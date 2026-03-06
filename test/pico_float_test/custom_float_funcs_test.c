@@ -100,6 +100,14 @@ int32_t __attribute__((naked)) call_float2fix(float f, uint32_t n) {
 uint32_t __attribute__((naked)) call_float2ufix(float f, uint32_t n) {
     pico_default_asm_volatile("b float2ufix");
 }
+
+int32_t __attribute__((naked)) call_float2fix_z(float f, uint32_t n) {
+    pico_default_asm_volatile("b float2fix_z");
+}
+
+uint32_t __attribute__((naked)) call_float2ufix_z(float f, uint32_t n) {
+    pico_default_asm_volatile("b float2ufix_z");
+}
 #endif
 
 int test() {
@@ -453,6 +461,34 @@ int test() {
     test_checki(float2fix_z(u32f.f, 1), INT32_MIN, "float2fix_z13b");
     test_checki(float2fix_z(u32f.f, 2), INT32_MIN, "float2fix_z13c");
 
+#if LIB_PICO_FLOAT_PICO_VFP
+    printf("call_float2fix_z\n");
+    test_checki(call_float2fix_z(3.5f, 8), 0x380, "call_float2fix_z1");
+    test_checki(call_float2fix_z(-3.5f, 8), -0x380, "call_float2fix_z2");
+    test_checki(call_float2fix_z(32768.0f, 16), INT32_MAX, "call_float2fix_z3");
+    test_checki(call_float2fix_z(65536.0f, 16), INT32_MAX, "call_float2fix_z4");
+    test_checki(call_float2fix_z(INFINITY, 16), INT32_MAX, "call_float2fix_z5");
+    test_checki(call_float2fix_z(-INFINITY, 16), INT32_MIN, "call_float2fix_z5b");
+    test_checki(call_float2fix_z(INFINITY, -16), INT32_MAX, "call_float2fix_z5c");
+    test_checki(call_float2fix_z(-INFINITY, -16), INT32_MIN, "call_float2fix_z5d");
+    test_checki(call_float2fix_z(INFINITY, 0), INT32_MAX, "call_float2fix_z5e");
+    test_checki(call_float2fix_z(-INFINITY, 0), INT32_MIN, "call_float2fix_z5f");
+    test_checki(call_float2fix_z(3.24999f, 2), 12, "call_float2fix_z6");
+    test_checki(call_float2fix_z(3.25f, 2), 13, "call_float2fix_z7");
+    test_checki(call_float2fix_z(-3.24999f, 2), -12, "call_float2fix_z8");
+    test_checki(call_float2fix_z(-3.25f, 2), -13, "call_float2fix_z9");
+    test_checki(call_float2fix_z(-0.75f, 1), -1, "call_float2fix_z10");
+    test_checki(call_float2fix_z(-3.0f, -1), -1, "call_float2fix_z11"); // not very useful
+    u32f.u = 0x7f012345;
+    test_checki(call_float2fix_z(u32f.f, 0), INT32_MAX, "call_float2fix_z12a");
+    test_checki(call_float2fix_z(u32f.f, 1), INT32_MAX, "call_float2fix_z12b");
+    test_checki(call_float2fix_z(u32f.f, 2), INT32_MAX, "call_float2fix_z12c");
+    u32f.u = 0xff012345;
+    test_checki(call_float2fix_z(u32f.f, 0), INT32_MIN, "call_float2fix_z13a");
+    test_checki(call_float2fix_z(u32f.f, 1), INT32_MIN, "call_float2fix_z13b");
+    test_checki(call_float2fix_z(u32f.f, 2), INT32_MIN, "call_float2fix_z13c");
+#endif
+
     printf("float2ufix_z\n");
     test_checku(float2ufix_z(3.5f, 8), 0x380, "float2ufix_z1");
     test_checku(float2ufix_z(-3.5f, 8), 0, "float2ufix_z2");
@@ -475,6 +511,31 @@ int test() {
     test_checku(float2ufix_z(u32f.f, 0), 0, "float2ufix_z10a");
     test_checku(float2ufix_z(u32f.f, 1), 0, "float2ufix_z10b");
     test_checku(float2ufix_z(u32f.f, 2), 0, "float2ufix_z10c");
+
+#if LIB_PICO_FLOAT_PICO_VFP
+    printf("call_float2ufix_z\n");
+    test_checku(call_float2ufix_z(3.5f, 8), 0x380, "call_float2ufix_z1");
+    test_checku(call_float2ufix_z(-3.5f, 8), 0, "call_float2ufix_z2");
+    test_checku(call_float2ufix_z(32768.0f, 16), 32768 << 16, "call_float2ufix_z3");
+    test_checku(call_float2ufix_z(65536.0f, 16), UINT32_MAX, "call_float2ufix_z4");
+    test_checku(call_float2ufix_z(INFINITY, 16), UINT32_MAX, "call_float2ufix_z5");
+    test_checku(call_float2ufix_z(-INFINITY, 16), 0, "call_float2ufix_z5b");
+    test_checku(call_float2ufix_z(INFINITY, -16), UINT32_MAX, "call_float2ufix_z5c");
+    test_checku(call_float2ufix_z(-INFINITY, -16), 0, "call_float2ufix_z5d");
+    test_checku(call_float2ufix_z(INFINITY, 0), UINT32_MAX, "call_float2ufix_z5e");
+    test_checku(call_float2ufix_z(-INFINITY, 0), 0, "call_float2ufix_z5f");
+    test_checku(call_float2ufix_z(3.24999f, 2), 12, "call_float2ufix_z6");
+    test_checku(call_float2ufix_z(3.25f, 2), 13, "call_float2ufix_z7");
+    test_checku(call_float2ufix_z(3.0f, -1), 1, "call_float2ufix_z8"); // not very useful
+    u32f.u = 0x7f012345;
+    test_checku(call_float2ufix_z(u32f.f, 0), UINT32_MAX, "call_float2ufix_z9a");
+    test_checku(call_float2ufix_z(u32f.f, 1), UINT32_MAX, "call_float2ufix_z9b");
+    test_checku(call_float2ufix_z(u32f.f, 2), UINT32_MAX, "call_float2ufix_z9c");
+    u32f.u = 0xff012345;
+    test_checku(call_float2ufix_z(u32f.f, 0), 0, "call_float2ufix_z10a");
+    test_checku(call_float2ufix_z(u32f.f, 1), 0, "call_float2ufix_z10b");
+    test_checku(call_float2ufix_z(u32f.f, 2), 0, "call_float2ufix_z10c");
+#endif
 
     printf("float2fix64_z\n");
     test_checki64(float2fix64_z(3.5f, 8), 0x380, "float2fix64_z1");
