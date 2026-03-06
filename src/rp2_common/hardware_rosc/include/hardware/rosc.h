@@ -71,7 +71,23 @@ void rosc_restart(void);
 
 uint32_t next_rosc_code(uint32_t code);
 
-uint rosc_find_freq(uint32_t low_mhz, uint32_t high_mhz);
+/*! \brief  Set the frequency of the Ring Oscillator within a range
+ *  \ingroup hardware_rosc
+ *
+ * This function will set the frequency of the Ring Oscillator to the first frequency within the range.
+ *
+ * \param low_mhz The bottom of the range to search for.
+ * \param high_mhz The top of the range to search for.
+ * \return The frequency of the Ring Oscillator within the range in MHz, or 0 if no frequency within the range is found.
+ */
+uint rosc_find_freq_mhz(uint32_t low_mhz, uint32_t high_mhz);
+
+/*! \brief  Measure the frequency of the Ring Oscillator
+ *  \ingroup hardware_rosc
+ *
+ * \return The frequency of the Ring Oscillator in kHz.
+ */
+uint rosc_measure_freq_khz(void);
 
 void rosc_set_div(uint32_t div);
 

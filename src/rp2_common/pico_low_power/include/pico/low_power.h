@@ -26,7 +26,7 @@ extern "C" {
  * block. For example you could keep clk_rtc running. Some destinations (proc0 and proc1 wakeup logic)
  * can't be stopped in sleep mode otherwise there wouldn't be enough logic to wake up again.
  *
- * In pstate mode some power domains are switched off and don't retain state.
+ * In Pstate mode some power domains are switched off and don't retain state.
  * 
  * \subsection sleep_example Example
  * \addtogroup pico_sleep
@@ -134,7 +134,8 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const 
 
 /*! \brief  Go dormant until time using AON timer
  *  \ingroup pico_low_power
- * Go dormant until the given AON timer reaches the specified value. The clocks specified in keep_enabled will be kept enabled during sleep.
+ * Go dormant until the given AON timer reaches the specified value.
+ * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
  *
  * \param until The time to go dormant until.
  * \param dormant_clock_source The clock source to use for dormant. Must be DORMANT_CLOCK_SOURCE_LPOSC on RP2350.
@@ -151,12 +152,13 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
 
 /*! \brief  Go dormant until pin state changes
  *  \ingroup pico_low_power
- * Go dormant until the given GPIO pin changes state. The clocks specified in keep_enabled will be kept enabled during dormant.
+ * Go dormant until the given GPIO pin changes state.
+ * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
  *
  * \param gpio_pin The GPIO pin to use.
  * \param edge Whether to listen for edge or level.
  * \param high Whether to listen for the high/low level, or rising/falling edge.
- * \param dormant_clock_source The clock source to use for dormant. Must be DORMANT_CLOCK_SOURCE_LPOSC on RP2350.
+ * \param dormant_clock_source The clock source to use for dormant.
  * \param keep_enabled The clocks to keep enabled during dormant.
  */
 void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_set_t *keep_enabled);
@@ -170,6 +172,12 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dorm
  *  \ingroup pico_low_power
  * Go to Pstate until the given AON timer reaches the specified value. The function specified in resume_func will be called on reboot.
  *
+ * If pstate is NULL, it will go to the minimum Pstate that will keep persistent data powered on.
+ *
+ * NOTE: This function will overwrite the last 2 powman scratch registers - the other scratch registers are not modified.
+ *
+ * To also wake up from a GPIO, configure that using \ref powman_enable_gpio_wakeup before calling this function.
+ *
  * \param until The time to go to Pstate until.
  * \param pstate The Pstate to use. If NULL, the Pstate will keep persistent data powered on.
  * \param resume_func The function to call on reboot.
@@ -177,9 +185,13 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dorm
  */
 int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
 
-/*! \brief  Go Pstate until pin state changes
+/*! \brief  Go to Pstate until pin state changes
  *  \ingroup pico_low_power
- * Go Pstate until the given GPIO pin changes state. The function specified in resume_func will be called on reboot.
+ * Go to Pstate until the given GPIO pin changes state. The function specified in resume_func will be called on reboot.
+ *
+ * If pstate is NULL, it will go to the minimum Pstate that will keep persistent data powered on.
+ *
+ * NOTE: This function will overwrite the last 2 powman scratch registers - the other scratch registers are not modified.
  *
  * \param gpio_pin The GPIO pin to use.
  * \param edge Whether to listen for edge or level.

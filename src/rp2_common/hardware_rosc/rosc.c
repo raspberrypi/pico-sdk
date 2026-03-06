@@ -16,7 +16,7 @@ uint32_t next_rosc_code(uint32_t code) {
     return ((code | 0x08888888u) + 1u) & 0xf7777777u;
 }
 
-uint rosc_find_freq(uint32_t low_mhz, uint32_t high_mhz) {
+uint rosc_find_freq_mhz(uint32_t low_mhz, uint32_t high_mhz) {
     // TODO: This could be a lot better
     rosc_set_div(1);
     for (uint32_t code = 0; code <= 0x77777777u; code = next_rosc_code(code)) {
@@ -27,6 +27,10 @@ uint rosc_find_freq(uint32_t low_mhz, uint32_t high_mhz) {
         }
     }
     return 0;
+}
+
+uint rosc_measure_freq_khz(void) {
+    return frequency_count_khz(CLOCKS_FC0_SRC_VALUE_ROSC_CLKSRC);
 }
 
 void rosc_set_div(uint32_t div) {

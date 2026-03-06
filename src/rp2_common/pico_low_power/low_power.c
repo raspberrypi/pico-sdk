@@ -335,73 +335,39 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
     if (exclusive) restore_other_interrupts();
 }
 
-#if 0
-// todo note this has (not surprisingly a lot of commonality with the timer one)
-int low_power_sleep_until_aon_timer(absolute_time_t until,
-                                    const clock_dest_set_t *keep_enabled) {
-    event_happened = false;
-
-    clock_dest_set_t local_keep_enabled;
-    replace_null_enable_values(keep_enabled, &local_keep_enabled);
-    // Turn off all clocks except for the timer
-    // todo we need mapping of hardware to clocks; also this needs to come from AON timer
-    //  we know that people in the wild (MicroPython) have wanted to do some mapping to also
-    //  figure out what PLLs are still on via these bits
-    //
-    // todo note also here that this should come from AON_TIMER via AON_TIMER_CLOCK_DEST_NUM() but
-    //  how do we indicate multiple bits there; actually todo (graham) and no one steal this as it sounds
-    //  fun, we probably want to have a "sparse" bitset macro encoded as 4 bytes or 8 bytes (for 4 or 7 indices
-    //  between 0 and 254) - i say 7, to leave encoding space for maybe indices > 256 in the 8 byte variant
-#if PICO_RP2040
-    clock_dest_set_add(&local_keep_enabled, CLOCK_DEST_RTC_RTC);
-#elif PICO_RP2350
-    clock_dest_set_add(&local_keep_enabled, CLK_DEST_REF_POWMAN);
-#else
-#error Unknown processor
-#endif
-    // todo catch race condition here (or just plain in the past)
-    struct timespec ts;
-    us_to_timespec(to_us_since_boot(until), &ts);
-    // note wakeup from low power == false, means don't wake up from dormant
-    aon_timer_enable_alarm(&ts, (aon_timer_alarm_handler_t)low_power_wakeup, false);
-
-    prepare_for_clock_gating();
-    // gate clocks
-    clock_gate_sleep_en(&local_keep_enabled);
-
-    low_power_enable_processor_deep_sleep();
-    // Go to sleep until the wakeup event happens (note it may have happened already)
-    while (!event_happened) {
-        __wfi();
-    }
-    low_power_disable_processor_deep_sleep();
-
-    post_clock_gating();
-    return 0;
-}
-#endif
-
 // In order to go into dormant mode we need to be running from a stoppable clock source:
 // either the xosc or rosc with no PLLs running. This means we disable the USB and ADC clocks
 // and all PLLs
 void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_source) {
     prepare_for_clock_switch();
 
-    uint src_hz;
+    uint clk_ref_src_hz;
     uint32_t clk_ref_src;
+    uint clk_sys_src_hz;
+    uint32_t clk_sys_src;
+    uint32_t clk_sys_aux_src;
     switch (dormant_source) {
         case DORMANT_CLOCK_SOURCE_XOSC:
-            src_hz = XOSC_HZ;
+            clk_ref_src_hz = XOSC_HZ;
             clk_ref_src = CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC;
+            clk_sys_src_hz = clk_ref_src_hz;
+            clk_sys_src = CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLK_REF;
+            clk_sys_aux_src = 0;
             break;
         case DORMANT_CLOCK_SOURCE_ROSC:
-            src_hz = 6500 * KHZ; // todo
+            clk_ref_src_hz = rosc_measure_freq_khz() * KHZ;
             clk_ref_src = CLOCKS_CLK_REF_CTRL_SRC_VALUE_ROSC_CLKSRC_PH;
+            clk_sys_src_hz = clk_ref_src_hz;
+            clk_sys_src = CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLK_REF;
+            clk_sys_aux_src = 0;
             break;
 #if !PICO_RP2040
         case DORMANT_CLOCK_SOURCE_LPOSC:
-            src_hz = 32 * KHZ;
+            clk_ref_src_hz = 32 * KHZ;
             clk_ref_src = CLOCKS_CLK_REF_CTRL_SRC_VALUE_LPOSC_CLKSRC;
+            clk_sys_src_hz = rosc_measure_freq_khz() * KHZ;
+            clk_sys_src = CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLKSRC_CLK_SYS_AUX;
+            clk_sys_aux_src = CLOCKS_CLK_SYS_CTRL_AUXSRC_VALUE_ROSC_CLKSRC;
             break;
 #endif
         default:
@@ -412,13 +378,13 @@ void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_source) {
     clock_configure_undivided(clk_ref,
                               clk_ref_src,
                               0,
-                              src_hz);
+                              clk_ref_src_hz);
 
     // CLK SYS = CLK_REF
     clock_configure_undivided(clk_sys,
-                    CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLK_REF,
-                    0, // Using glitchless mux
-                    src_hz);
+                    clk_sys_src,
+                    clk_sys_aux_src,
+                    clk_sys_src_hz);
 
 
     // CLK ADC = 0MHz
@@ -437,7 +403,7 @@ void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_source) {
     clock_configure(clk_rtc,
                     0, // No GLMUX
                     clk_rtc_src,
-                    src_hz,
+                    clk_sys_src_hz,
                     46875);
 #endif
 
@@ -445,8 +411,8 @@ void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_source) {
     clock_configure(clk_peri,
                     0,
                     CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLK_SYS,
-                    src_hz,
-                    src_hz);
+                    clk_sys_src_hz,
+                    clk_sys_src_hz);
 
     pll_deinit(pll_sys);
     pll_deinit(pll_usb);
@@ -474,7 +440,12 @@ void low_power_wake_from_dormant(void) {
 }
 
 void low_power_go_dormant(dormant_clock_source_t dormant_clock_source) {
-    assert(dormant_clock_source == DORMANT_CLOCK_SOURCE_XOSC || dormant_clock_source == DORMANT_CLOCK_SOURCE_ROSC);
+    assert(
+        dormant_clock_source == DORMANT_CLOCK_SOURCE_XOSC || dormant_clock_source == DORMANT_CLOCK_SOURCE_ROSC
+    #if !PICO_RP2040
+        || dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC
+    #endif
+    );
 
     if (dormant_clock_source == DORMANT_CLOCK_SOURCE_XOSC) {
         xosc_dormant();
