@@ -71,18 +71,26 @@ regular_func float2fix_z
 #endif
 float2fix_z_entry:
   ubfx r2, r0, #23, #8
+  cbz r2, 2f // input is zero or denormal
+  cmp r2, #0xff
+  beq 3f // input infinite or nan
   adds r2, r1
-  asrs r3, r2, #8
-  beq 1f
-  ite pl
-  movpl r2, #0xff
-  movmi r2, #0
+  ble 2f // modified input is denormal so zero
+  cmp r2, #0xff
+  bge 3f // modified input is infinite
 1:
   bfi r0, r2, #23, #8
-#if defined(__ARM_PCS_VFP)
   vmov s0, r0
-#endif
-  b float2int_z
+  vcvt.s32.f32 s0, s0
+  vmov r0, s0
+  bx lr
+2:
+  movs r0, #0
+  bx lr
+3:
+  mvn r1, #0x80000000
+  add r0, r1, r0, lsr#31 @ so -Inf → 0x80000000, +Inf → 0x7fffffff
+  bx lr
 
 float_section float2fix
 regular_func float2fix
@@ -90,27 +98,27 @@ regular_func float2fix
   mov r1, r0
   vmov r0, s0
 #endif
-  lsls r2, r0, #1
-  // r0 = abs(zero)                   => r1 = 0x00000000
-  // r0 = abs(denornaml)              => r1 = 0x00xxxxxx
-  // r0 = abs(1.0f)                   => r1 = 0x7f000000
-  // r0 = abs(inf/nan)                => r1 = 0xffxxxxxx
-  bls float2fix_z_entry // input positive or zero or -zero are ok for fix_z
-  lsrs r2, #24
-  beq float2fix_z_entry // input denormal will be flushed to zero
-  rsbs r3, r1, #0x7f
-  subs r2, r3
-  bcc 1f // iunput <1.0f means we need to subtract 1
-  // mask off all but fractional bits
-  lsls r2, r0, r2
-  lsls r2, #9
-  beq float2fix_z_entry // input is integer
+  ubfx r2, r0, #23, #8
+  cbz r2, 2f // input is zero or denormal
+  cmp r2, #0xff
+  beq 3f // input infinite or nan
+  adds r2, r1
+  ble 2f // modified input is denormal so zero
+  cmp r2, #0xff
+  bge 3f // modified input is infinite
 1:
-  push {lr}
-  bl float2fix_z_entry
-  subs r0, #1
-  sbcs r1, r1, #0
-  pop {pc}
+  bfi r0, r2, #23, #8
+  vmov s0, r0
+  vcvtm.s32.f32 s0, s0
+  vmov r0, s0
+  bx lr
+2:
+  movs r0, #0
+  bx lr
+3:
+  mvn r1, #0x80000000
+  add r0, r1, r0, lsr#31 @ so -Inf → 0x80000000, +Inf → 0x7fffffff
+  bx lr
 
 float_section float2ufix
 regular_func float2ufix
@@ -120,16 +128,23 @@ regular_func float2ufix_z
   vmov r0, s0
 #endif
   ubfx r2, r0, #23, #8
+  cbz r2, 2f // input is zero or denormal
+  cmp r2, #0xff
+  beq 3f // input infinite or nan
   adds r2, r1
-  asrs r3, r2, #8
-  beq 1f
-  ite pl
-  movpl r2, #0xff
-  movmi r2, #0
+  ble 2f // modified input is denormal so zero
+  cmp r2, #0xff
+  bge 3f // modified input is infinite
 1:
   bfi r0, r2, #23, #8
-#if defined(__ARM_PCS_VFP)
   vmov s0, r0
-#endif
-  b float2uint_z
+  vcvtm.u32.f32 s0, s0
+  vmov r0, s0
+  bx lr
+2:
+  movs r0, #0
+  bx lr
+3:
+  mvn r0, r0, asr #31
+  bx lr
 #endif
