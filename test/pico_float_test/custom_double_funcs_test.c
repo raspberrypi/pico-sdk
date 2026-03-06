@@ -420,7 +420,7 @@ int test() {
     test_checku64(double2ufix64_z(-INFINITY, 0), 0, "double2ufix64_z5f");
     test_checku64(double2ufix64_z(3.24999, 2), 12, "double2ufix64_z6");
     test_checku64(double2ufix64_z(3.25, 2), 13, "double2ufix64_z7");
-    test_checku64(double2ufix64_z(3.0, -1), 1, "double2fuix64_z8"); // not very useful
+    test_checku64(double2ufix64_z(3.0, -1), 1, "double2ufix64_z8"); // not very useful
     test_checku64(double2ufix64_z(0.0, 16), 0, "double2ufix64_z9");
     test_checku64(double2ufix64_z(-0.0, 16), 0, "double2ufix64_z10");
     test_checku64(double2ufix64_z(0.0, -16), 0, "double2ufix64_z11");
