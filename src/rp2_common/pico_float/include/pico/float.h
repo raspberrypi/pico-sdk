@@ -10,7 +10,6 @@
 #include <math.h>
 #include <float.h>
 #include "pico.h"
-#include "pico/bootrom/sf_table.h"
 
 #ifdef __cplusplus
 extern "C" {
