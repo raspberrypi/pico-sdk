@@ -92,7 +92,7 @@ extern "C" {
 *
 *   ldexpf, copysignf, truncf, floorf, ceilf, roundf, asinf, acosf, atanf, sinhf, coshf, tanhf, asinhf, acoshf, atanhf, exp2f, log2f, exp10f, log10f, powf, hypotf, cbrtf, fmodf, dremf, remainderf, remquof, expm1f, log1pf, fmaf
 *
-* - GNU exetnsions:
+* - GNU extensions:
 *
 *   powintf, sincosf
 *

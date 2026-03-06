@@ -82,7 +82,7 @@ extern "C" {
 *
 *   ldexp, copysign, trunc, floor, ceil, round, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, exp2, log2, exp10, log10, pow, hypot, cbrt, fmod, drem, remainder, remquo, expm1, log1p, fma
 *
-* - GNU exetnsions:
+* - GNU extensions:
 *
 *   powint, sincos
 *
