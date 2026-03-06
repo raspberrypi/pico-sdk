@@ -253,8 +253,7 @@ double2ufix_z_entry:
   bfi r1, r3, #20, #11
   beq double2uint_z_entry // wasn't infinite or above (exponent)
   // infinite value is handled specially since the mantissa bits may have been non zero which is a NaN
-  asrs    r0, r1, #31             // -ve/+ve 0xffffffff/0x00000000
-  mvns    r0, r0                  // -ve/+ve 0x00000000/0xffffffff
+  mvn r0, r1, asr #31
   saving_func_return
 1: // small value; return 0
   movs r0, #0
