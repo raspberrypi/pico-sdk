@@ -17,17 +17,40 @@ extern "C" {
 /** \file low_power.h
  *  \defgroup pico_low_power pico_low_power
  *
- * Lower Power Sleep APIs
+ * Lower Power APIs
  *
- * The difference between sleep and dormant is that ALL clocks are stopped in dormant mode,
- * until the source (either xosc or rosc) is started again by an external event.
+ * There are three modes of operation: sleep, dormant, and Pstate, with the lowest power consumption being Pstate.
  *
- * In sleep mode some clocks can be left running controlled by the SLEEP_EN registers in the clocks
- * block. For example you could keep clk_rtc running. Some destinations (proc0 and proc1 wakeup logic)
- * can't be stopped in sleep mode otherwise there wouldn't be enough logic to wake up again.
+ * \if rp2040_specific
+ * NOTE: On RP2040, there is no Pstate mode.
+ * \endif
  *
- * In Pstate mode some power domains are switched off and don't retain state.
- * 
+ * In sleep mode:
+ * - Some clocks can be left running controlled by the SLEEP_EN registers in the clocks
+ *   block. For example you could keep clk_rtc running.
+ * - Some destinations (proc0 and proc1 wakeup logic) can't be stopped in sleep mode otherwise there wouldn't be enough logic to wake up again.
+ * - You can wake up from sleep by any interrupt, provided the clock for that interrupt is kept enabled
+ * - The sleep APIs will keep the clocks enabled for stdio during sleep, along with USB clocks when using tinyusb.
+ *
+ * In dormant mode:
+ * - Both xosc and rosc are stopped, until the dormant clock source is started again by an external event.
+ * - USB will be disabled before going into dormant, and re-enabled after waking up.
+ * - You can only wake up from dormant using the AON timer, or a GPIO interrupt configured using \ref gpio_set_dormant_irq_enabled.
+ *   All other interrupts will be disabled during dormant.
+ *
+ * \if (!rp2040_specific)
+ * In Pstate mode:
+ * - Some power domains are switched off and don't retain state (eg specified SRAMs). By default, only the power domains
+ *   required to keep persistent data powered on will be kept on.
+ * - You can only wake up from Pstate using the AON timer, or a GPIO wakeup configured using \ref powman_enable_gpio_wakeup.
+ * - Waking up from Pstate will run your program from the start, optionally executing a resume_func during runtime init.
+ *   All non-persistent data will be overwritten by crt0 when the program starts again.
+ * - Variables can be marked as persistent using the __persistent_data macro. The location of the CMake function pico_set_persistent_data_loc.
+ *   For example, the persistent data could be stored in XIP_SRAM, SRAM0, or SRAM1.
+ * - The Pstate APIs will overwrite the last 2 powman scratch registers - the other scratch registers are not modified,
+ *   so can be used for other persistent data.
+ * \endif
+ *
  * \subsection sleep_example Example
  * \addtogroup pico_sleep
  * \include hello_sleep.c
@@ -57,15 +80,6 @@ typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
 #endif
 
 
-// NOTE: Need to deinit usb before doing into any of these sleep states
-// could keep usb clk_sys and clk_usb to usbctrl running during low_power_sleep. Although you'll get woken
-// up pretty quickly
-// Also you are plugged into a host so why bother?
-
-// sleep is really just calling a __wfi() until an irq, with some optional clock gating in the sleep_en register. Activated once processor goes to sleep
-// So can just do it for arbitrary interrupts. processors implement their own internal clock gating, just leaving the wakeup interrupt controller running during
-// __wfi()
-
 /*! \brief  Sleep until an interrupt occurs
  *  \ingroup pico_low_power
  * Sleep until any interrupt occurs. The clocks specified in keep_enabled will be kept enabled during sleep.
@@ -74,10 +88,6 @@ typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
  * \return 0 on success, non-zero on error.
  */
 int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled);
-
-// sleep until the given timer reaches the specified value; if the time passes then no sleep occurs
-// keep_enabled defaults to none if NULL
-// ** LIAM BLESSED **
 
 /*! \brief  Sleep until time using timer
  *  \ingroup pico_low_power
@@ -91,8 +101,6 @@ int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled);
  * \return 0 on success, non-zero on error.
  */
 int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until, const clock_dest_set_t *keep_enabled, bool exclusive);
-// Note bool above saying shall we only listen for timer irq or other irqs
-// Need to defer handling of irqs to do clock setup etc
 
 /*! \brief  Sleep until time using default timer
  *  \ingroup pico_low_power
@@ -104,7 +112,6 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until, const 
  * \return 0 on success, non-zero on error.
  */
 static inline int low_power_sleep_until_default_timer(absolute_time_t until, const clock_dest_set_t *keep_enabled, bool exclusive) {
-    // Need to assert (or add) ticks block and timer clocks to the keep_enabled list
     return low_power_sleep_until_timer(PICO_DEFAULT_TIMER_INSTANCE(), until, keep_enabled, exclusive);
 }
 
@@ -123,19 +130,15 @@ static inline int low_power_sleep_until_default_timer(absolute_time_t until, con
  */
 void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_set_t *keep_enabled, bool exclusive);
 
-
-// ** LIAM BLESSED but we need to impl it correctly (note not blessed for RP2040, but we should do it anyway for orthogonality **
-// Only works for RP2350 as every clock will be stopped on RP2040 (unless you provide a clock for the RTC)
-// Easier to not support on RP2040 - might as well buy a 2350
-
-// NOTE: Asserting that we will alway use rosc for dormant and simplifies the API
-// Means if the user has sped up the rosc they should slow it down before going into dormant
-// Need to re initialize clocks after this
-
 /*! \brief  Go dormant until time using AON timer
  *  \ingroup pico_low_power
  * Go dormant until the given AON timer reaches the specified value.
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
+ *
+ * \if (!rp2040_specific)
+ * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be run from the ROSC while dormant so
+ * it can be stopped, while clk_ref will be run from the LPOSC so that continues running for the timer.
+ * \endif
  *
  * \param until The time to go dormant until.
  * \param dormant_clock_source The clock source to use for dormant. Must be DORMANT_CLOCK_SOURCE_LPOSC on RP2350.
@@ -146,14 +149,15 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const 
  */
 int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_source_t dormant_clock_source, uint src_hz, uint gpio_pin, const clock_dest_set_t *keep_enabled);
 
-// ** LIAM BLESSED but we need to impl it correctly (note not blessed for RP2040, but we should do it anyway for orthogonality **
-// This works on both
-// Need to re initialize clocks after this
-
 /*! \brief  Go dormant until pin state changes
  *  \ingroup pico_low_power
  * Go dormant until the given GPIO pin changes state.
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
+ *
+ * \if (!rp2040_specific)
+ * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be run from the ROSC while dormant so
+ * it can be stopped, while clk_ref will be run from the LPOSC so that continues running for the GPIO interrupt.
+ * \endif
  *
  * \param gpio_pin The GPIO pin to use.
  * \param edge Whether to listen for edge or level.
@@ -164,19 +168,16 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
 void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_set_t *keep_enabled);
 
 #if HAS_POWMAN_TIMER
-// pstate functions should return to the pstate you were in
-
-// pass resume_func which will be called on reboot by runtime_init_low_power_reboot_check
-
 /*! \brief  Go to Pstate until time using AON timer
  *  \ingroup pico_low_power
- * Go to Pstate until the given AON timer reaches the specified value. The function specified in resume_func will be called on reboot.
+ * Go to Pstate until the given AON timer reaches the specified value. The function specified in resume_func will be called on reboot,
+ * with the low power Pstate passed to it.
  *
  * If pstate is NULL, it will go to the minimum Pstate that will keep persistent data powered on.
  *
- * NOTE: This function will overwrite the last 2 powman scratch registers - the other scratch registers are not modified.
- *
  * To also wake up from a GPIO, configure that using \ref powman_enable_gpio_wakeup before calling this function.
+ *
+ * NOTE: This function will overwrite the last 2 powman scratch registers - the other scratch registers are not modified.
  *
  * \param until The time to go to Pstate until.
  * \param pstate The Pstate to use. If NULL, the Pstate will keep persistent data powered on.
@@ -187,7 +188,8 @@ int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pst
 
 /*! \brief  Go to Pstate until pin state changes
  *  \ingroup pico_low_power
- * Go to Pstate until the given GPIO pin changes state. The function specified in resume_func will be called on reboot.
+ * Go to Pstate until the given GPIO pin changes state. The function specified in resume_func will be called on reboot,
+ * with the low power Pstate passed to it.
  *
  * If pstate is NULL, it will go to the minimum Pstate that will keep persistent data powered on.
  *
@@ -201,14 +203,6 @@ int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pst
  * \return 0 on success, non-zero on error.
  */
 int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
-
-// Or a function saying how did I boot?
-// Would like to make it easy to get back to main after going to sleep
-
-// Two configs:
-// - Everything off apart from AON, ram needs zeroing on boot
-// - Switched core off (args are which rams you want to keep on)
-// Switched core, XIP cache + bootram, SRAM0 bank, SRAM1 bank + SCRATCH
 
 /*! \brief  Get Pstate which keeps persistent data powered on
  *  \ingroup pico_low_power
