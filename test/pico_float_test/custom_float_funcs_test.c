@@ -238,7 +238,7 @@ int test() {
 
     printf("fix642float\n");
     // todo test correct rounding around maximum precision
-    test_checkf(fix642float(-0xa000000000ll, 38), -2.5f, "fix6422float1");
+    test_checkf(fix642float(-0xa000000000ll, 38), -2.5f, "fix642float1");
     test_checkf(fix642float(-3, -34), -51539607552.0f, "fix642float2");
 
 #ifdef fix642float
@@ -248,7 +248,7 @@ int test() {
     printf("ufix642float\n");
     // todo test correct rounding around maximum precision
     test_checkf(ufix642float(0xa000000000ll, 38), 2.5f, "ufix642float1");
-    test_checkf(ufix642float(3, -34), 51539607552.0f, "fix64float2");
+    test_checkf(ufix642float(3, -34), 51539607552.0f, "ufix642float2");
 
 #ifdef ufix642float
 #error ufix642float overridden, so original needs testing
