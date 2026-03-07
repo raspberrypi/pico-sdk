@@ -9,6 +9,7 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "$schema": {},
     "pioASMVersion": {
       "type": "string"
     },
