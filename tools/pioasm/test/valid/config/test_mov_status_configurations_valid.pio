@@ -59,6 +59,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ---------------------- //
 // // mov_status_tx_lessthan //
 // // ---------------------- //
@@ -67,7 +73,7 @@
 // #define mov_status_tx_lessthan_wrap 1
 // #define mov_status_tx_lessthan_pio_version 1
 // 
-// static const uint16_t mov_status_tx_lessthan_program_instructions[] = {
+// static __pio_const uint16_t mov_status_tx_lessthan_program_instructions[] = {
 //             //     .wrap_target
 //     0xa025, //  0: mov    x, status
 //     0xa042, //  1: nop
@@ -75,7 +81,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_status_tx_lessthan_program = {
+// static __pio_const struct pio_program mov_status_tx_lessthan_program = {
 //     .instructions = mov_status_tx_lessthan_program_instructions,
 //     .length = 2,
 //     .origin = -1,
@@ -101,14 +107,14 @@
 // #define mov_status_tx_zero_wrap 0
 // #define mov_status_tx_zero_pio_version 1
 // 
-// static const uint16_t mov_status_tx_zero_program_instructions[] = {
+// static __pio_const uint16_t mov_status_tx_zero_program_instructions[] = {
 //             //     .wrap_target
 //     0xa025, //  0: mov    x, status
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_status_tx_zero_program = {
+// static __pio_const struct pio_program mov_status_tx_zero_program = {
 //     .instructions = mov_status_tx_zero_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -134,14 +140,14 @@
 // #define mov_status_tx_max_wrap 0
 // #define mov_status_tx_max_pio_version 1
 // 
-// static const uint16_t mov_status_tx_max_program_instructions[] = {
+// static __pio_const uint16_t mov_status_tx_max_program_instructions[] = {
 //             //     .wrap_target
 //     0xa025, //  0: mov    x, status
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_status_tx_max_program = {
+// static __pio_const struct pio_program mov_status_tx_max_program = {
 //     .instructions = mov_status_tx_max_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -167,14 +173,14 @@
 // #define mov_status_rx_lessthan_wrap 0
 // #define mov_status_rx_lessthan_pio_version 1
 // 
-// static const uint16_t mov_status_rx_lessthan_program_instructions[] = {
+// static __pio_const uint16_t mov_status_rx_lessthan_program_instructions[] = {
 //             //     .wrap_target
 //     0xa045, //  0: mov    y, status
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_status_rx_lessthan_program = {
+// static __pio_const struct pio_program mov_status_rx_lessthan_program = {
 //     .instructions = mov_status_rx_lessthan_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -200,14 +206,14 @@
 // #define mov_status_rx_max_wrap 0
 // #define mov_status_rx_max_pio_version 1
 // 
-// static const uint16_t mov_status_rx_max_program_instructions[] = {
+// static __pio_const uint16_t mov_status_rx_max_program_instructions[] = {
 //             //     .wrap_target
 //     0xa045, //  0: mov    y, status
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_status_rx_max_program = {
+// static __pio_const struct pio_program mov_status_rx_max_program = {
 //     .instructions = mov_status_rx_max_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -233,14 +239,14 @@
 // #define mov_status_irq_set_wrap 0
 // #define mov_status_irq_set_pio_version 1
 // 
-// static const uint16_t mov_status_irq_set_program_instructions[] = {
+// static __pio_const uint16_t mov_status_irq_set_program_instructions[] = {
 //             //     .wrap_target
 //     0xa0c5, //  0: mov    isr, status
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_status_irq_set_program = {
+// static __pio_const struct pio_program mov_status_irq_set_program = {
 //     .instructions = mov_status_irq_set_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -266,14 +272,14 @@
 // #define mov_status_irq_zero_wrap 0
 // #define mov_status_irq_zero_pio_version 1
 // 
-// static const uint16_t mov_status_irq_zero_program_instructions[] = {
+// static __pio_const uint16_t mov_status_irq_zero_program_instructions[] = {
 //             //     .wrap_target
 //     0xa0c5, //  0: mov    isr, status
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_status_irq_zero_program = {
+// static __pio_const struct pio_program mov_status_irq_zero_program = {
 //     .instructions = mov_status_irq_zero_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -299,14 +305,14 @@
 // #define mov_status_irq_max_wrap 0
 // #define mov_status_irq_max_pio_version 1
 // 
-// static const uint16_t mov_status_irq_max_program_instructions[] = {
+// static __pio_const uint16_t mov_status_irq_max_program_instructions[] = {
 //             //     .wrap_target
 //     0xa0c5, //  0: mov    isr, status
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_status_irq_max_program = {
+// static __pio_const struct pio_program mov_status_irq_max_program = {
 //     .instructions = mov_status_irq_max_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -332,14 +338,14 @@
 // #define mov_status_irq_rel_wrap 0
 // #define mov_status_irq_rel_pio_version 1
 // 
-// static const uint16_t mov_status_irq_rel_program_instructions[] = {
+// static __pio_const uint16_t mov_status_irq_rel_program_instructions[] = {
 //             //     .wrap_target
 //     0xa0e5, //  0: mov    osr, status
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_status_irq_rel_program = {
+// static __pio_const struct pio_program mov_status_irq_rel_program = {
 //     .instructions = mov_status_irq_rel_program_instructions,
 //     .length = 1,
 //     .origin = -1,

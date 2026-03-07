@@ -23,6 +23,12 @@ end:
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ----------- //
 // // symbol_test //
 // // ----------- //
@@ -33,7 +39,7 @@ end:
 // 
 // #define symbol_test_entry_point 0
 // 
-// static const uint16_t symbol_test_program_instructions[] = {
+// static __pio_const uint16_t symbol_test_program_instructions[] = {
 //             //     .wrap_target
 //     0x0001, //  0: jmp    1
 //     0x0002, //  1: jmp    2
@@ -42,7 +48,7 @@ end:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program symbol_test_program = {
+// static __pio_const struct pio_program symbol_test_program = {
 //     .instructions = symbol_test_program_instructions,
 //     .length = 3,
 //     .origin = -1,

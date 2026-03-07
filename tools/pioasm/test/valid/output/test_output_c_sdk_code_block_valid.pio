@@ -19,6 +19,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ------------------ //
 // // code_block_program //
 // // ------------------ //
@@ -27,14 +33,14 @@
 // #define code_block_program_wrap 0
 // #define code_block_program_pio_version 0
 // 
-// static const uint16_t code_block_program_program_instructions[] = {
+// static __pio_const uint16_t code_block_program_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program code_block_program_program = {
+// static __pio_const struct pio_program code_block_program_program = {
 //     .instructions = code_block_program_program_instructions,
 //     .length = 1,
 //     .origin = -1,

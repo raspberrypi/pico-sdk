@@ -49,6 +49,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ----------- //
 // // max_program //
 // // ----------- //
@@ -57,7 +63,7 @@
 // #define max_program_wrap 31
 // #define max_program_pio_version 0
 // 
-// static const uint16_t max_program_program_instructions[] = {
+// static __pio_const uint16_t max_program_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -95,7 +101,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program max_program_program = {
+// static __pio_const struct pio_program max_program_program = {
 //     .instructions = max_program_program_instructions,
 //     .length = 32,
 //     .origin = -1,

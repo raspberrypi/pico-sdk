@@ -22,6 +22,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ----------- //
 // // origin_zero //
 // // ----------- //
@@ -30,7 +36,7 @@
 // #define origin_zero_wrap 1
 // #define origin_zero_pio_version 0
 // 
-// static const uint16_t origin_zero_program_instructions[] = {
+// static __pio_const uint16_t origin_zero_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -38,7 +44,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program origin_zero_program = {
+// static __pio_const struct pio_program origin_zero_program = {
 //     .instructions = origin_zero_program_instructions,
 //     .length = 2,
 //     .origin = 0,
@@ -63,14 +69,14 @@
 // #define origin_five_wrap 0
 // #define origin_five_pio_version 0
 // 
-// static const uint16_t origin_five_program_instructions[] = {
+// static __pio_const uint16_t origin_five_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program origin_five_program = {
+// static __pio_const struct pio_program origin_five_program = {
 //     .instructions = origin_five_program_instructions,
 //     .length = 1,
 //     .origin = 5,

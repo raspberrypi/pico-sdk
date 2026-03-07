@@ -27,6 +27,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // --------- //
 // // mov_combo //
 // // --------- //
@@ -35,7 +41,7 @@
 // #define mov_combo_wrap 10
 // #define mov_combo_pio_version 1
 // 
-// static const uint16_t mov_combo_program_instructions[] = {
+// static __pio_const uint16_t mov_combo_program_instructions[] = {
 //             //     .wrap_target
 //     0xa022, //  0: mov    x, y
 //     0xa041, //  1: mov    y, x
@@ -52,7 +58,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program mov_combo_program = {
+// static __pio_const struct pio_program mov_combo_program = {
 //     .instructions = mov_combo_program_instructions,
 //     .length = 11,
 //     .origin = -1,

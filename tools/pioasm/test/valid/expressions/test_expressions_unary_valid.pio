@@ -18,6 +18,12 @@ start:
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ---------- //
 // // unary_test //
 // // ---------- //
@@ -29,14 +35,14 @@ start:
 // #define unary_test_neg_val -5
 // #define unary_test_rev_val -2147483648
 // 
-// static const uint16_t unary_test_program_instructions[] = {
+// static __pio_const uint16_t unary_test_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program unary_test_program = {
+// static __pio_const struct pio_program unary_test_program = {
 //     .instructions = unary_test_program_instructions,
 //     .length = 1,
 //     .origin = -1,

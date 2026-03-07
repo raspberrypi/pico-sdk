@@ -66,6 +66,12 @@ loop2:
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ----------------------- //
 // // wrap_single_instruction //
 // // ----------------------- //
@@ -74,14 +80,14 @@ loop2:
 // #define wrap_single_instruction_wrap 0
 // #define wrap_single_instruction_pio_version 0
 // 
-// static const uint16_t wrap_single_instruction_program_instructions[] = {
+// static __pio_const uint16_t wrap_single_instruction_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program wrap_single_instruction_program = {
+// static __pio_const struct pio_program wrap_single_instruction_program = {
 //     .instructions = wrap_single_instruction_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -106,7 +112,7 @@ loop2:
 // #define wrap_last_instruction_wrap 2
 // #define wrap_last_instruction_pio_version 0
 // 
-// static const uint16_t wrap_last_instruction_program_instructions[] = {
+// static __pio_const uint16_t wrap_last_instruction_program_instructions[] = {
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
 //             //     .wrap_target
@@ -115,7 +121,7 @@ loop2:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program wrap_last_instruction_program = {
+// static __pio_const struct pio_program wrap_last_instruction_program = {
 //     .instructions = wrap_last_instruction_program_instructions,
 //     .length = 3,
 //     .origin = -1,
@@ -140,7 +146,7 @@ loop2:
 // #define wrap_entire_program_wrap 3
 // #define wrap_entire_program_pio_version 0
 // 
-// static const uint16_t wrap_entire_program_program_instructions[] = {
+// static __pio_const uint16_t wrap_entire_program_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -150,7 +156,7 @@ loop2:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program wrap_entire_program_program = {
+// static __pio_const struct pio_program wrap_entire_program_program = {
 //     .instructions = wrap_entire_program_program_instructions,
 //     .length = 4,
 //     .origin = -1,
@@ -175,7 +181,7 @@ loop2:
 // #define wrap_skip_first_wrap 2
 // #define wrap_skip_first_pio_version 0
 // 
-// static const uint16_t wrap_skip_first_program_instructions[] = {
+// static __pio_const uint16_t wrap_skip_first_program_instructions[] = {
 //     0xa042, //  0: nop
 //             //     .wrap_target
 //     0xa042, //  1: nop
@@ -184,7 +190,7 @@ loop2:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program wrap_skip_first_program = {
+// static __pio_const struct pio_program wrap_skip_first_program = {
 //     .instructions = wrap_skip_first_program_instructions,
 //     .length = 3,
 //     .origin = -1,
@@ -209,7 +215,7 @@ loop2:
 // #define wrap_skip_last_wrap 1
 // #define wrap_skip_last_pio_version 0
 // 
-// static const uint16_t wrap_skip_last_program_instructions[] = {
+// static __pio_const uint16_t wrap_skip_last_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -218,7 +224,7 @@ loop2:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program wrap_skip_last_program = {
+// static __pio_const struct pio_program wrap_skip_last_program = {
 //     .instructions = wrap_skip_last_program_instructions,
 //     .length = 3,
 //     .origin = -1,
@@ -243,7 +249,7 @@ loop2:
 // #define wrap_with_jmp_outside_wrap 1
 // #define wrap_with_jmp_outside_pio_version 0
 // 
-// static const uint16_t wrap_with_jmp_outside_program_instructions[] = {
+// static __pio_const uint16_t wrap_with_jmp_outside_program_instructions[] = {
 //             //     .wrap_target
 //     0x0002, //  0: jmp    2
 //     0xa042, //  1: nop
@@ -252,7 +258,7 @@ loop2:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program wrap_with_jmp_outside_program = {
+// static __pio_const struct pio_program wrap_with_jmp_outside_program = {
 //     .instructions = wrap_with_jmp_outside_program_instructions,
 //     .length = 3,
 //     .origin = -1,
@@ -277,7 +283,7 @@ loop2:
 // #define wrap_nested_loops_wrap 2
 // #define wrap_nested_loops_pio_version 0
 // 
-// static const uint16_t wrap_nested_loops_program_instructions[] = {
+// static __pio_const uint16_t wrap_nested_loops_program_instructions[] = {
 //             //     .wrap_target
 //     0x0040, //  0: jmp    x--, 0
 //     0x0002, //  1: jmp    2
@@ -286,7 +292,7 @@ loop2:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program wrap_nested_loops_program = {
+// static __pio_const struct pio_program wrap_nested_loops_program = {
 //     .instructions = wrap_nested_loops_program_instructions,
 //     .length = 3,
 //     .origin = -1,

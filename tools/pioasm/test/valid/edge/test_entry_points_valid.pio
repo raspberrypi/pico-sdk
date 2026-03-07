@@ -55,6 +55,12 @@ public setup:
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // -------------- //
 // // entry_at_start //
 // // -------------- //
@@ -65,7 +71,7 @@ public setup:
 // 
 // #define entry_at_start_offset_entry_start 0u
 // 
-// static const uint16_t entry_at_start_program_instructions[] = {
+// static __pio_const uint16_t entry_at_start_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -73,7 +79,7 @@ public setup:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program entry_at_start_program = {
+// static __pio_const struct pio_program entry_at_start_program = {
 //     .instructions = entry_at_start_program_instructions,
 //     .length = 2,
 //     .origin = -1,
@@ -100,7 +106,7 @@ public setup:
 // 
 // #define entry_in_middle_offset_entry_middle 1u
 // 
-// static const uint16_t entry_in_middle_program_instructions[] = {
+// static __pio_const uint16_t entry_in_middle_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -109,7 +115,7 @@ public setup:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program entry_in_middle_program = {
+// static __pio_const struct pio_program entry_in_middle_program = {
 //     .instructions = entry_in_middle_program_instructions,
 //     .length = 3,
 //     .origin = -1,
@@ -136,7 +142,7 @@ public setup:
 // 
 // #define entry_at_end_offset_entry_end 2u
 // 
-// static const uint16_t entry_at_end_program_instructions[] = {
+// static __pio_const uint16_t entry_at_end_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -145,7 +151,7 @@ public setup:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program entry_at_end_program = {
+// static __pio_const struct pio_program entry_at_end_program = {
 //     .instructions = entry_at_end_program_instructions,
 //     .length = 3,
 //     .origin = -1,
@@ -174,7 +180,7 @@ public setup:
 // #define multiple_entries_offset_process 1u
 // #define multiple_entries_offset_cleanup 2u
 // 
-// static const uint16_t multiple_entries_program_instructions[] = {
+// static __pio_const uint16_t multiple_entries_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -183,7 +189,7 @@ public setup:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program multiple_entries_program = {
+// static __pio_const struct pio_program multiple_entries_program = {
 //     .instructions = multiple_entries_program_instructions,
 //     .length = 3,
 //     .origin = -1,
@@ -210,7 +216,7 @@ public setup:
 // 
 // #define entry_with_wrap_offset_loop_start 0u
 // 
-// static const uint16_t entry_with_wrap_program_instructions[] = {
+// static __pio_const uint16_t entry_with_wrap_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -218,7 +224,7 @@ public setup:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program entry_with_wrap_program = {
+// static __pio_const struct pio_program entry_with_wrap_program = {
 //     .instructions = entry_with_wrap_program_instructions,
 //     .length = 2,
 //     .origin = -1,
@@ -245,7 +251,7 @@ public setup:
 // 
 // #define entry_outside_wrap_offset_setup 0u
 // 
-// static const uint16_t entry_outside_wrap_program_instructions[] = {
+// static __pio_const uint16_t entry_outside_wrap_program_instructions[] = {
 //     0xa042, //  0: nop
 //             //     .wrap_target
 //     0xa042, //  1: nop
@@ -254,7 +260,7 @@ public setup:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program entry_outside_wrap_program = {
+// static __pio_const struct pio_program entry_outside_wrap_program = {
 //     .instructions = entry_outside_wrap_program_instructions,
 //     .length = 3,
 //     .origin = -1,

@@ -21,6 +21,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ------------- //
 // // boundary_test //
 // // ------------- //
@@ -29,7 +35,7 @@
 // #define boundary_test_wrap 5
 // #define boundary_test_pio_version 0
 // 
-// static const uint16_t boundary_test_program_instructions[] = {
+// static __pio_const uint16_t boundary_test_program_instructions[] = {
 //             //     .wrap_target
 //     0x4001, //  0: in     pins, 1
 //     0x4000, //  1: in     pins, 32
@@ -41,7 +47,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program boundary_test_program = {
+// static __pio_const struct pio_program boundary_test_program = {
 //     .instructions = boundary_test_program_instructions,
 //     .length = 6,
 //     .origin = -1,

@@ -17,6 +17,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ------------ //
 // // pio_v0_basic //
 // // ------------ //
@@ -25,14 +31,14 @@
 // #define pio_v0_basic_wrap 0
 // #define pio_v0_basic_pio_version 0
 // 
-// static const uint16_t pio_v0_basic_program_instructions[] = {
+// static __pio_const uint16_t pio_v0_basic_program_instructions[] = {
 //             //     .wrap_target
 //     0x2007, //  0: wait   0 gpio, 7
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program pio_v0_basic_program = {
+// static __pio_const struct pio_program pio_v0_basic_program = {
 //     .instructions = pio_v0_basic_program_instructions,
 //     .length = 1,
 //     .origin = -1,

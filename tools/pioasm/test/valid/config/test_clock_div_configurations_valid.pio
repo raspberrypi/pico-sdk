@@ -37,6 +37,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ----------------- //
 // // clock_div_integer //
 // // ----------------- //
@@ -45,14 +51,14 @@
 // #define clock_div_integer_wrap 0
 // #define clock_div_integer_pio_version 0
 // 
-// static const uint16_t clock_div_integer_program_instructions[] = {
+// static __pio_const uint16_t clock_div_integer_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program clock_div_integer_program = {
+// static __pio_const struct pio_program clock_div_integer_program = {
 //     .instructions = clock_div_integer_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -77,14 +83,14 @@
 // #define clock_div_fractional_wrap 0
 // #define clock_div_fractional_pio_version 0
 // 
-// static const uint16_t clock_div_fractional_program_instructions[] = {
+// static __pio_const uint16_t clock_div_fractional_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program clock_div_fractional_program = {
+// static __pio_const struct pio_program clock_div_fractional_program = {
 //     .instructions = clock_div_fractional_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -110,14 +116,14 @@
 // #define clock_div_small_fraction_wrap 0
 // #define clock_div_small_fraction_pio_version 0
 // 
-// static const uint16_t clock_div_small_fraction_program_instructions[] = {
+// static __pio_const uint16_t clock_div_small_fraction_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program clock_div_small_fraction_program = {
+// static __pio_const struct pio_program clock_div_small_fraction_program = {
 //     .instructions = clock_div_small_fraction_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -143,14 +149,14 @@
 // #define clock_div_large_fraction_wrap 0
 // #define clock_div_large_fraction_pio_version 0
 // 
-// static const uint16_t clock_div_large_fraction_program_instructions[] = {
+// static __pio_const uint16_t clock_div_large_fraction_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program clock_div_large_fraction_program = {
+// static __pio_const struct pio_program clock_div_large_fraction_program = {
 //     .instructions = clock_div_large_fraction_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -176,14 +182,14 @@
 // #define clock_div_max_integer_wrap 0
 // #define clock_div_max_integer_pio_version 0
 // 
-// static const uint16_t clock_div_max_integer_program_instructions[] = {
+// static __pio_const uint16_t clock_div_max_integer_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program clock_div_max_integer_program = {
+// static __pio_const struct pio_program clock_div_max_integer_program = {
 //     .instructions = clock_div_max_integer_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -209,14 +215,14 @@
 // #define clock_div_complex_wrap 0
 // #define clock_div_complex_pio_version 0
 // 
-// static const uint16_t clock_div_complex_program_instructions[] = {
+// static __pio_const uint16_t clock_div_complex_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program clock_div_complex_program = {
+// static __pio_const struct pio_program clock_div_complex_program = {
 //     .instructions = clock_div_complex_program_instructions,
 //     .length = 1,
 //     .origin = -1,

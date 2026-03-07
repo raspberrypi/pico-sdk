@@ -28,6 +28,12 @@ wrap_mid:
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ---------- //
 // // wrap_begin //
 // // ---------- //
@@ -36,7 +42,7 @@ wrap_mid:
 // #define wrap_begin_wrap 1
 // #define wrap_begin_pio_version 0
 // 
-// static const uint16_t wrap_begin_program_instructions[] = {
+// static __pio_const uint16_t wrap_begin_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0x0000, //  1: jmp    0
@@ -44,7 +50,7 @@ wrap_mid:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program wrap_begin_program = {
+// static __pio_const struct pio_program wrap_begin_program = {
 //     .instructions = wrap_begin_program_instructions,
 //     .length = 2,
 //     .origin = -1,
@@ -69,7 +75,7 @@ wrap_mid:
 // #define wrap_mid_wrap 2
 // #define wrap_mid_pio_version 0
 // 
-// static const uint16_t wrap_mid_program_instructions[] = {
+// static __pio_const uint16_t wrap_mid_program_instructions[] = {
 //     0xa042, //  0: nop
 //             //     .wrap_target
 //     0xa042, //  1: nop
@@ -78,7 +84,7 @@ wrap_mid:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program wrap_mid_program = {
+// static __pio_const struct pio_program wrap_mid_program = {
 //     .instructions = wrap_mid_program_instructions,
 //     .length = 3,
 //     .origin = -1,

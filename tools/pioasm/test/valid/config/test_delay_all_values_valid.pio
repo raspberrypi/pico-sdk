@@ -47,6 +47,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // --------- //
 // // delay_all //
 // // --------- //
@@ -55,7 +61,7 @@
 // #define delay_all_wrap 31
 // #define delay_all_pio_version 0
 // 
-// static const uint16_t delay_all_program_instructions[] = {
+// static __pio_const uint16_t delay_all_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa142, //  1: nop                           [1]
@@ -93,7 +99,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program delay_all_program = {
+// static __pio_const struct pio_program delay_all_program = {
 //     .instructions = delay_all_program_instructions,
 //     .length = 32,
 //     .origin = -1,

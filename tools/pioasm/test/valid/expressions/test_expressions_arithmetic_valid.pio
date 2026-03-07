@@ -21,6 +21,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ---------- //
 // // expr_arith //
 // // ---------- //
@@ -29,7 +35,7 @@
 // #define expr_arith_wrap 3
 // #define expr_arith_pio_version 0
 // 
-// static const uint16_t expr_arith_program_instructions[] = {
+// static __pio_const uint16_t expr_arith_program_instructions[] = {
 //             //     .wrap_target
 //     0xe00c, //  0: set    pins, 12
 //     0xe008, //  1: set    pins, 8
@@ -39,7 +45,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program expr_arith_program = {
+// static __pio_const struct pio_program expr_arith_program = {
 //     .instructions = expr_arith_program_instructions,
 //     .length = 4,
 //     .origin = -1,

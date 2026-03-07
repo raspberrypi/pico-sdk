@@ -17,6 +17,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // -------- //
 // // gpio_ext //
 // // -------- //
@@ -25,14 +31,14 @@
 // #define gpio_ext_wrap 0
 // #define gpio_ext_pio_version 1
 // 
-// static const uint16_t gpio_ext_program_instructions[] = {
+// static __pio_const uint16_t gpio_ext_program_instructions[] = {
 //             //     .wrap_target
 //     0x200f, //  0: wait   0 gpio, 47
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program gpio_ext_program = {
+// static __pio_const struct pio_program gpio_ext_program = {
 //     .instructions = gpio_ext_program_instructions,
 //     .length = 1,
 //     .origin = -1,

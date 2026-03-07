@@ -16,6 +16,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ------- //
 // // minimal //
 // // ------- //
@@ -24,14 +30,14 @@
 // #define minimal_wrap 0
 // #define minimal_pio_version 0
 // 
-// static const uint16_t minimal_program_instructions[] = {
+// static __pio_const uint16_t minimal_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program minimal_program = {
+// static __pio_const struct pio_program minimal_program = {
 //     .instructions = minimal_program_instructions,
 //     .length = 1,
 //     .origin = -1,

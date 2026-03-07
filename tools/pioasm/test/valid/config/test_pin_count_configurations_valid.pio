@@ -47,6 +47,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ------------------------ //
 // // pin_config_comprehensive //
 // // ------------------------ //
@@ -55,7 +61,7 @@
 // #define pin_config_comprehensive_wrap 2
 // #define pin_config_comprehensive_pio_version 1
 // 
-// static const uint16_t pin_config_comprehensive_program_instructions[] = {
+// static __pio_const uint16_t pin_config_comprehensive_program_instructions[] = {
 //             //     .wrap_target
 //     0xe005, //  0: set    pins, 5
 //     0x4008, //  1: in     pins, 8
@@ -64,7 +70,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program pin_config_comprehensive_program = {
+// static __pio_const struct pio_program pin_config_comprehensive_program = {
 //     .instructions = pin_config_comprehensive_program_instructions,
 //     .length = 3,
 //     .origin = -1,
@@ -94,14 +100,14 @@
 // #define pin_config_set_zero_wrap 0
 // #define pin_config_set_zero_pio_version 1
 // 
-// static const uint16_t pin_config_set_zero_program_instructions[] = {
+// static __pio_const uint16_t pin_config_set_zero_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program pin_config_set_zero_program = {
+// static __pio_const struct pio_program pin_config_set_zero_program = {
 //     .instructions = pin_config_set_zero_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -127,14 +133,14 @@
 // #define pin_config_set_max_wrap 0
 // #define pin_config_set_max_pio_version 1
 // 
-// static const uint16_t pin_config_set_max_program_instructions[] = {
+// static __pio_const uint16_t pin_config_set_max_program_instructions[] = {
 //             //     .wrap_target
 //     0xe01f, //  0: set    pins, 31
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program pin_config_set_max_program = {
+// static __pio_const struct pio_program pin_config_set_max_program = {
 //     .instructions = pin_config_set_max_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -160,14 +166,14 @@
 // #define pin_config_in_min_wrap 0
 // #define pin_config_in_min_pio_version 1
 // 
-// static const uint16_t pin_config_in_min_program_instructions[] = {
+// static __pio_const uint16_t pin_config_in_min_program_instructions[] = {
 //             //     .wrap_target
 //     0x4001, //  0: in     pins, 1
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program pin_config_in_min_program = {
+// static __pio_const struct pio_program pin_config_in_min_program = {
 //     .instructions = pin_config_in_min_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -194,14 +200,14 @@
 // #define pin_config_in_max_wrap 0
 // #define pin_config_in_max_pio_version 1
 // 
-// static const uint16_t pin_config_in_max_program_instructions[] = {
+// static __pio_const uint16_t pin_config_in_max_program_instructions[] = {
 //             //     .wrap_target
 //     0x4000, //  0: in     pins, 32
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program pin_config_in_max_program = {
+// static __pio_const struct pio_program pin_config_in_max_program = {
 //     .instructions = pin_config_in_max_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -228,14 +234,14 @@
 // #define pin_config_out_zero_wrap 0
 // #define pin_config_out_zero_pio_version 1
 // 
-// static const uint16_t pin_config_out_zero_program_instructions[] = {
+// static __pio_const uint16_t pin_config_out_zero_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program pin_config_out_zero_program = {
+// static __pio_const struct pio_program pin_config_out_zero_program = {
 //     .instructions = pin_config_out_zero_program_instructions,
 //     .length = 1,
 //     .origin = -1,
@@ -262,14 +268,14 @@
 // #define pin_config_out_max_wrap 0
 // #define pin_config_out_max_pio_version 1
 // 
-// static const uint16_t pin_config_out_max_program_instructions[] = {
+// static __pio_const uint16_t pin_config_out_max_program_instructions[] = {
 //             //     .wrap_target
 //     0x6000, //  0: out    pins, 32
 //             //     .wrap
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program pin_config_out_max_program = {
+// static __pio_const struct pio_program pin_config_out_max_program = {
 //     .instructions = pin_config_out_max_program_instructions,
 //     .length = 1,
 //     .origin = -1,

@@ -42,6 +42,12 @@ start:
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ---------------------- //
 // // origin_zero_with_jumps //
 // // ---------------------- //
@@ -50,7 +56,7 @@ start:
 // #define origin_zero_with_jumps_wrap 2
 // #define origin_zero_with_jumps_pio_version 0
 // 
-// static const uint16_t origin_zero_with_jumps_program_instructions[] = {
+// static __pio_const uint16_t origin_zero_with_jumps_program_instructions[] = {
 //             //     .wrap_target
 //     0x0000, //  0: jmp    0
 //     0x0002, //  1: jmp    2
@@ -59,7 +65,7 @@ start:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program origin_zero_with_jumps_program = {
+// static __pio_const struct pio_program origin_zero_with_jumps_program = {
 //     .instructions = origin_zero_with_jumps_program_instructions,
 //     .length = 3,
 //     .origin = 0,
@@ -84,7 +90,7 @@ start:
 // #define origin_at_end_wrap 2
 // #define origin_at_end_pio_version 0
 // 
-// static const uint16_t origin_at_end_program_instructions[] = {
+// static __pio_const uint16_t origin_at_end_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -93,7 +99,7 @@ start:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program origin_at_end_program = {
+// static __pio_const struct pio_program origin_at_end_program = {
 //     .instructions = origin_at_end_program_instructions,
 //     .length = 3,
 //     .origin = 29,
@@ -118,7 +124,7 @@ start:
 // #define origin_with_wrap_target_wrap 1
 // #define origin_with_wrap_target_pio_version 0
 // 
-// static const uint16_t origin_with_wrap_target_program_instructions[] = {
+// static __pio_const uint16_t origin_with_wrap_target_program_instructions[] = {
 //             //     .wrap_target
 //     0xa042, //  0: nop
 //     0xa042, //  1: nop
@@ -126,7 +132,7 @@ start:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program origin_with_wrap_target_program = {
+// static __pio_const struct pio_program origin_with_wrap_target_program = {
 //     .instructions = origin_with_wrap_target_program_instructions,
 //     .length = 2,
 //     .origin = 15,
@@ -151,7 +157,7 @@ start:
 // #define origin_affects_jmp_wrap 1
 // #define origin_affects_jmp_pio_version 0
 // 
-// static const uint16_t origin_affects_jmp_program_instructions[] = {
+// static __pio_const uint16_t origin_affects_jmp_program_instructions[] = {
 //             //     .wrap_target
 //     0x0000, //  0: jmp    0
 //     0xa042, //  1: nop
@@ -159,7 +165,7 @@ start:
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program origin_affects_jmp_program = {
+// static __pio_const struct pio_program origin_affects_jmp_program = {
 //     .instructions = origin_affects_jmp_program_instructions,
 //     .length = 2,
 //     .origin = 10,

@@ -22,6 +22,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ------------ //
 // // expr_bitwise //
 // // ------------ //
@@ -30,7 +36,7 @@
 // #define expr_bitwise_wrap 4
 // #define expr_bitwise_pio_version 0
 // 
-// static const uint16_t expr_bitwise_program_instructions[] = {
+// static __pio_const uint16_t expr_bitwise_program_instructions[] = {
 //             //     .wrap_target
 //     0xe007, //  0: set    pins, 7
 //     0xe001, //  1: set    pins, 1
@@ -41,7 +47,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program expr_bitwise_program = {
+// static __pio_const struct pio_program expr_bitwise_program = {
 //     .instructions = expr_bitwise_program_instructions,
 //     .length = 5,
 //     .origin = -1,

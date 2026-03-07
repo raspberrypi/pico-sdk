@@ -34,6 +34,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ----------------------- //
 // // everything_kitchen_sink //
 // // ----------------------- //
@@ -44,7 +50,7 @@
 // 
 // #define everything_kitchen_sink_test_constant 42
 // 
-// static const uint16_t everything_kitchen_sink_program_instructions[] = {
+// static __pio_const uint16_t everything_kitchen_sink_program_instructions[] = {
 //             //     .wrap_target
 //     0xfb03, //  0: set    pins, 3         side 2 [3]
 //     0x7608, //  1: out    pins, 8         side 1 [2]
@@ -56,7 +62,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program everything_kitchen_sink_program = {
+// static __pio_const struct pio_program everything_kitchen_sink_program = {
 //     .instructions = everything_kitchen_sink_program_instructions,
 //     .length = 6,
 //     .origin = 10,

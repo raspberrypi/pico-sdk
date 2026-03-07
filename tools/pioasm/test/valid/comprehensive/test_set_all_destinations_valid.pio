@@ -19,6 +19,12 @@
 // #include "hardware/pio.h"
 // #endif
 // 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
 // // ----------- //
 // // set_targets //
 // // ----------- //
@@ -27,7 +33,7 @@
 // #define set_targets_wrap 3
 // #define set_targets_pio_version 0
 // 
-// static const uint16_t set_targets_program_instructions[] = {
+// static __pio_const uint16_t set_targets_program_instructions[] = {
 //             //     .wrap_target
 //     0xe000, //  0: set    pins, 0
 //     0xe021, //  1: set    x, 1
@@ -37,7 +43,7 @@
 // };
 // 
 // #if !PICO_NO_HARDWARE
-// static const struct pio_program set_targets_program = {
+// static __pio_const struct pio_program set_targets_program = {
 //     .instructions = set_targets_program_instructions,
 //     .length = 4,
 //     .origin = -1,
