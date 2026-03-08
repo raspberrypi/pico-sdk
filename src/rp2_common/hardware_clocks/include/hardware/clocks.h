@@ -490,6 +490,7 @@ static inline void clock_gpio_init(uint gpio, uint src, float div)
  * \param gpio The GPIO pin to run the clock from. Valid GPIOs are: 20 and 22.
  * \param src_freq Frequency of the input clock source
  * \param freq Requested frequency
+ * \return true if the clock is updated, false if freq > src_freq
  */
 bool clock_configure_gpin(clock_handle_t clock, uint gpio, uint32_t src_freq, uint32_t freq);
 
