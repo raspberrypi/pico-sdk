@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
@@ -18,8 +19,8 @@ cc_library(
     target_compatible_with = compatible_with_rp2(),
     deps = [
         ":pico_platform_common_headers",
+        "//src/common/pico_base_headers",
         "//src/rp2_common:platform_defs",
         "//src/rp2_common/hardware_base",
-        "//src/common/pico_base_headers",
     ],
 )

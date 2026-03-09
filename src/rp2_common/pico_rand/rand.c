@@ -239,7 +239,7 @@ static uint64_t capture_additional_rosc_samples(uint n) {
 #endif
 
 static void initialise_rand(void) {
-    rng_128_t local_rng_state = local_rng_state;
+    rng_128_t local_rng_state = {0};
     uint which = 0;
 #if PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH
     ram_hash = sdbm_hash64_sram(ram_hash);

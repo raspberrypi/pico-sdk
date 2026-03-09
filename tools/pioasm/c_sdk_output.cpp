@@ -79,6 +79,13 @@ struct c_sdk_output : public output_format {
         fprintf(out, "#endif\n");
         fprintf(out, "\n");
 
+        fprintf(out, "#ifdef __cpp_constexpr\n");
+        fprintf(out, "#define __pio_const constexpr\n");
+        fprintf(out, "#else\n");
+        fprintf(out, "#define __pio_const const\n");
+        fprintf(out, "#endif\n");
+        fprintf(out, "\n");
+
         output_symbols(out, "", source.global_symbols);
 
         for (const auto &program : source.programs) {
@@ -93,7 +100,7 @@ struct c_sdk_output : public output_format {
 
             output_symbols(out, prefix, program.symbols);
 
-            fprintf(out, "static const uint16_t %sprogram_instructions[] = {\n", prefix.c_str());
+            fprintf(out, "static __pio_const uint16_t %sprogram_instructions[] = {\n", prefix.c_str());
             for (int i = 0; i < (int)program.instructions.size(); i++) {
                 const auto &inst = program.instructions[i];
                 if (i == program.wrap_target) {
@@ -109,7 +116,7 @@ struct c_sdk_output : public output_format {
             fprintf(out, "\n");
 
             fprintf(out, "#if !PICO_NO_HARDWARE\n");
-            fprintf(out, "static const struct pio_program %sprogram = {\n", prefix.c_str());
+            fprintf(out, "static __pio_const struct pio_program %sprogram = {\n", prefix.c_str());
             fprintf(out, "    .instructions = %sprogram_instructions,\n", prefix.c_str());
             fprintf(out, "    .length = %d,\n", (int) program.instructions.size());
             fprintf(out, "    .origin = %d,\n", program.origin.get());

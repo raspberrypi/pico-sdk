@@ -9,14 +9,36 @@ typedef uint64_t ui64;
 extern ui64 __aeabi_dadd(ui64, ui64);
 extern ui64 __aeabi_dsub(ui64, ui64);
 extern ui64 __aeabi_dmul(ui64, ui64);
-extern ui64 ddiv_fast(ui64, ui64);
-extern ui64 sqrt_fast(ui64);
 
 #define m33cf_dadd __aeabi_dadd
 #define m33cf_dsub __aeabi_dsub
 #define m33cf_dmul __aeabi_dmul
+
+#if PICO_HARD_FLOAT_ABI
+extern double ddiv_fast(double, double);
+extern double sqrt_fast(double);
+
+static double as_double(ui64 u) {
+    union { double d; ui64 u; } tmp = {.u = u};
+    return tmp.d;
+}
+
+static ui64 as_u64(double d) {
+    union { double d; ui64 u; } tmp = {.d = d};
+    return tmp.u;
+}
+
+#define m33cf_ddiv_fast(a, b) as_u64(ddiv_fast(as_double(a), as_double(b)))
+#define m33cf_dsqrt_fast(a) as_u64(sqrt_fast(as_double(a)))
+
+#else
+extern ui64 ddiv_fast(ui64, ui64);
+extern ui64 sqrt_fast(ui64);
+
 #define m33cf_ddiv_fast ddiv_fast
 #define m33cf_dsqrt_fast sqrt_fast
+#endif
+
 static void checkf(ui32 r,ui32 t) {
     static int n=0;
     if(r!=t) {

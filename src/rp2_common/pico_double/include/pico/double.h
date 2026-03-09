@@ -9,7 +9,6 @@
 
 #include <math.h>
 #include "pico.h"
-#include "pico/bootrom/sf_table.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,11 +82,12 @@ extern "C" {
 *
 *   ldexp, copysign, trunc, floor, ceil, round, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, exp2, log2, exp10, log10, pow, hypot, cbrt, fmod, drem, remainder, remquo, expm1, log1p, fma
 *
-* - GNU exetnsions:
+* - GNU extensions:
 *
 *   powint, sincos
 *
-* On Arm, the following additional optimized functions are also provided when using `pico_double_pico`:
+* On Arm, the following additional optimized functions are also provided when using `pico_double_pico`, all of which
+* saturate to the nearest representable value for too large input when converting from floating point types:
 *
 * - Conversions to/from integer types:
 *
@@ -116,16 +116,16 @@ extern "C" {
 *   - double -> (u)fix (round towards -infinity):
 *
 *       double2fix, double2ufix, double2fix64, double2ufix64
+* \if rp2350_specific
 *
 * - Even faster versions of divide and square-root functions that do not round correctly:
 *
-*   ddiv_fast, sqrt_fast (these do not round correctly)
+*   ddiv_fast, sqrt_fast
 *
-* - Faster unfused multiply and accumulate:
+* - Faster un-fused multiply and accumulate:
 *
-*   mla (fast fma)
+*   mla/fast_fma
 *
-* \if rp2350_specific
 * On RISC-V there is no custom double-precision floating point support, so `pico_double_pico` is equivalent to `pico_double_compiler`
 * \endif
 */
@@ -168,7 +168,7 @@ double exp10(double x);
 void sincos(double x, double *sinx, double *cosx);
 double powint(double x, int y);
 
-#if !PICO_RP2040 || PICO_COMBINED_DOCS
+#if PICO_RP2350 || PICO_COMBINED_DOCS
 double ddiv_fast(double n, double d);
 double sqrt_fast(double f);
 double fma_fast(double x, double y, double z); // this is not fused

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_pico_w")
 
 package(default_visibility = ["//visibility:public"])
@@ -31,8 +32,8 @@ cc_library(
 cc_library(
     name = "pico_lwip_nosys",
     srcs = ["lwip_nosys.c"],
-    includes = ["include"],
     hdrs = ["include/pico/lwip_nosys.h"],
+    includes = ["include"],
     target_compatible_with = compatible_with_pico_w(),
     deps = [
         ":pico_lwip",

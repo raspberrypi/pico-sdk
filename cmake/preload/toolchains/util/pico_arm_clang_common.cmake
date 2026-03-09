@@ -78,7 +78,9 @@ set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} --sysroot ${PICO_CLIB_ROOT
 if (PICO_CLIB STREQUAL "llvm_libc")
     # TODO: Move -nostartfiles to the appropriate library.
     foreach(TYPE IN ITEMS EXE SHARED MODULE)
-        set(CMAKE_${TYPE}_LINKER_FLAGS_INIT "-nostartfiles")
+        # note --unwindlib=none is only needed on recent compiler/lib versions, however just produces a
+        # warning on earlier versions, so not attempting a version check for now
+        set(CMAKE_${TYPE}_LINKER_FLAGS_INIT "-nostdlib++ -nostartfiles --unwindlib=none")
     endforeach()
 endif()
 

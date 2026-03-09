@@ -5,7 +5,6 @@
  */
 
 #include "pico/asm_helper.S"
-#if HAS_DOUBLE_COPROCESSOR
 
 pico_default_asm_setup
 
@@ -23,14 +22,29 @@ double_section WRAPPER_FUNC_NAME(\func)
 
 double_wrapper_section conv_tod
 
+#if defined(__ARM_PCS_VFP)
+regular_func int642double
+ movs r2,#0
+regular_func fix642double
+ push {lr}
+ bl fix642double_softfp
+ vmov d0,r0,r1
+ pop {pc}
+#endif
+
 @ convert int64 to double, rounding
 wrapper_func __aeabi_l2d
+#if !defined(__ARM_PCS_VFP)
 regular_func int642double
+#endif
  movs r2,#0       @ fall through
 @ convert unsigned 64-bit fix to double, rounding; number of r0:r1 bits after point in r2
+#if !defined(__ARM_PCS_VFP)
 regular_func fix642double
+#endif
+fix642double_softfp:
  cmp r1,#0
- bge 10f @ positive? can use unsigned code
+ bge ufix642double_softfp @ positive? can use unsigned code
  rsbs r0,#0
  sbc r1,r1,r1,lsl#1 @ make positive
  cbz r1,7f @ high word is zero?
@@ -94,13 +108,27 @@ regular_func fix642double
  bic r0,r0,#1 @ force to even
  b 5b
 
+#if defined(__ARM_PCS_VFP)
+regular_func uint642double
+ movs r2,#0
+regular_func ufix642double
+ push {lr}
+ bl ufix642double_softfp
+ vmov d0,r0,r1
+ pop {pc}
+#endif
+
 @ convert uint64 to double, rounding
 wrapper_func __aeabi_ul2d
+#if !defined(__ARM_PCS_VFP)
 regular_func uint642double
+#endif
  movs r2,#0       @ fall through
 @ convert unsigned 64-bit fix to double, rounding; number of r0:r1 bits after point in r2
+#if !defined(__ARM_PCS_VFP)
 regular_func ufix642double
-10:
+#endif
+ufix642double_softfp:
  cbz r1,7f @ high word zero?
  clz r3,r1
  subs r3,#11
@@ -177,6 +205,9 @@ fix2double_neg:
  mov r0,#0
  mov r3,0x7fe
  cmp r2,r3
+#if defined(__ARM_PCS_VFP)
+ vmov d0,r0,r1
+#endif
  it lo @ over/underflow?
  bxlo r14
  b 3f
@@ -193,6 +224,9 @@ fix2double_neg:
  add r1,r12,r2,lsl#20 @ insert exponent
  orr r1,#0x80000000
  mov r3,0x7fe
+#if defined(__ARM_PCS_VFP)
+ vmov d0,r0,r1
+#endif
  cmp r2,r3
  it lo
  bxlo r14
@@ -202,9 +236,15 @@ fix2double_neg:
  it ge
  movtge r1,#0xfff0 @ overflow
  mov r0,#0
+#if defined(__ARM_PCS_VFP)
+ vmov d0,r0,r1
+#endif
  bx r14
 1:
  movs r1,#0
+#if defined(__ARM_PCS_VFP)
+ vmov d0,r0,r1
+#endif
  bx r14
 
 regular_func ufix2double
@@ -219,6 +259,9 @@ regular_func ufix2double
  add r1,r0,r2,lsl#20 @ insert exponent
  mov r0,#0
  mov r3,0x7fe
+#if defined(__ARM_PCS_VFP)
+ vmov d0,r0,r1
+#endif
  cmp r2,r3
  it lo @ over/underflow?
  bxlo r14
@@ -235,6 +278,9 @@ regular_func ufix2double
  add r2,#0x3ff+19
  add r1,r12,r2,lsl#20 @ insert exponent
  mov r3,0x7fe
+#if defined(__ARM_PCS_VFP)
+ vmov d0,r0,r1
+#endif
  cmp r2,r3
  it lo
  bxlo r14
@@ -244,34 +290,43 @@ regular_func ufix2double
  it ge
  movtge r1,#0x7ff0 @ overflow
  mov r0,#0
+#if defined(__ARM_PCS_VFP)
+ vmov d0,r0,r1
+#endif
  bx r14
 1:
  movs r1,#0
+#if defined(__ARM_PCS_VFP)
+ vmov d0,r0,r1
+#endif
  bx r14
 
 double_section conv_dtoi64
 regular_func double2int64
+#if defined(__ARM_PCS_VFP)
+  vmov r0, r1, d0
+#endif
   lsls r3, r1, #1
-  bcc double2int64_z // input positive is ok for int64_z
+  bcc double2int64_z_softfp // input positive is ok for int64_z
   cmp r3, #0xffe00000
-  bcs double2int64_z // input is infinite
+  bcs double2int64_z_softfp // input is infinite
   lsrs r3, #21
   beq 2f // input zero or denormal, means answer remains zero
   sub r3, #0x3ff
   cmp r3, #0
   blt 1f // input is less than 1.0
   cmp r3, #52
-  bge double2int64_z // modified input must be an integer or infinite
+  bge double2int64_z_softfp // modified input must be an integer or infinite
   adds r3, #12
   lsls r2, r1, r3    // r2 has remaining fractional mantissa bits of r1
   bne 1f             // not integer as non zero fractional bits remain
   subs r3, #32
   bics r3, r3, r3, asr #31 // map negative shift to zero
   lsls r3, r0, r3
-  beq double2int64_z   // remaining fractional bits are 0, so argument was an integer
+  beq double2int64_z_softfp   // remaining fractional bits are 0, so argument was an integer
 1:
   push {lr}
-  bl double2int64_z
+  bl double2int64_z_softfp
   subs r0, #1
   sbcs r1, r1, #0
   pop {pc}
@@ -282,27 +337,31 @@ regular_func double2int64
 
 double_section conv_dtofix64
 regular_func double2fix64
+#if defined(__ARM_PCS_VFP)
+  mov r2, r0
+  vmov r0, r1, d0
+#endif
   lsls r3, r1, #1
-  bcc double2fix64_z // input positive is ok for fix64_z
+  bcc double2fix64_z_softfp // input positive is ok for fix64_z
   cmp r3, #0xffe00000
-  bcs double2fix64_z // input is infinite
+  bcs double2fix64_z_softfp // input is infinite
   lsrs r3, #21
   beq 2f // input zero or denormal, means answer remains zero
   sub r3, #0x3ff
   adds r3, r2
   blt 1f // modified input zero or denormal, or less than 1.0
   cmp r3, #52
-  bge double2fix64_z // modified input must be an integer or infinite
+  bge double2fix64_z_softfp // modified input must be an integer or infinite
   adds r3, #12
   lsls ip, r1, r3    // ip has remaining fractional mantissa bits of r1
   bne 1f             // not integer as non zero fractional bits remain
   subs r3, #32
   bics r3, r3, r3, asr #31 // map negative shift to zero
   lsls r3, r0, r3
-  beq double2fix64_z   // remaining fractional bits are 0, so argument was an integer
+  beq double2fix64_z_softfp   // remaining fractional bits are 0, so argument was an integer
 1:
   push {lr}
-  bl double2fix64_z
+  bl double2fix64_z_softfp
   subs r0, #1
   sbcs r1, r1, #0
   pop {pc}
@@ -313,12 +372,25 @@ regular_func double2fix64
 
 double_wrapper_section conv_dtoi64_z
 
-@ convert double to signed int64, rounding towards 0, clamping
-wrapper_func __aeabi_d2lz
-regular_func double2int64_z
- movs r2,#0      @ fall through
-@ convert double in r0:r1 to signed fixed point in r0:r1, clamping
+#if defined(__ARM_PCS_VFP)
 regular_func double2fix64_z
+ mov r2,r0
+ vmov r0,r1,d0
+ b double2fix64_z_softfp
+#endif
+@ convert double to signed int64, rounding towards 0, clamping
+regular_func double2int64_z
+#if defined(__ARM_PCS_VFP)
+ vmov r0,r1,d0
+#endif
+wrapper_func __aeabi_d2lz
+double2int64_z_softfp:
+ movs r2,#0      @ fall through for softfp build
+#if !defined(__ARM_PCS_VFP)
+regular_func double2fix64_z
+#endif
+@ convert double in r0:r1 to signed fixed point in r0:r1, clamping
+double2fix64_z_softfp:
  sub r2,#0x3ff+52-1 @ remove exponent bias, compensate for mantissa length
  asrs r12,r1,#20 @ sign and exponent
  sub r3,r12,#1
@@ -388,14 +460,27 @@ regular_func double2fix64_z
 
 double_wrapper_section conv_dtoui64
 
-@ convert double to unsigned int64, rounding towards -Inf, clamping
-wrapper_func __aeabi_d2ulz
-regular_func double2uint64
-regular_func double2uint64_z
- movs r2,#0      @ fall through
-@ convert double in r0:r1 to unsigned fixed point in r0:r1, clamping
+#if defined(__ARM_PCS_VFP)
 regular_func double2ufix64
 regular_func double2ufix64_z
+ mov r2,r0
+ vmov r0,r1,d0
+ b double2ufix64_z_softfp
+#endif
+@ convert double to unsigned int64, rounding towards -Inf, clamping
+regular_func double2uint64
+regular_func double2uint64_z
+#if defined(__ARM_PCS_VFP)
+ vmov r0,r1,d0
+#endif
+wrapper_func __aeabi_d2ulz
+ movs r2,#0      @ fall through
+#if !defined(__ARM_PCS_VFP)
+regular_func double2ufix64
+regular_func double2ufix64_z
+#endif
+@ convert double in r0:r1 to unsigned fixed point in r0:r1, clamping
+double2ufix64_z_softfp:
  subw r2,r2,#0x3ff+52-1 @ remove exponent bias, compensate for mantissa length
  asrs r3,r1,#20 @ sign and exponent
  sub r3,#1
@@ -445,5 +530,3 @@ regular_func double2ufix64_z
  movs r0,#0
  movs r1,#0
  bx r14
-
-#endif

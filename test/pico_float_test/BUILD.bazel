@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("//bazel:defs.bzl", "compatible_with_rp2")
 load("//bazel/util:transition.bzl", "pico_float_test_binary")
 

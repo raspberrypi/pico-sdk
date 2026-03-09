@@ -22,9 +22,13 @@
 #include <sys/types.h>
 #include "inttypes.h"
 
+#if !LIB_PICO_DOUBLE_COMPILER //!LIB_PICO_LLVM_LIBC_INTERFACE
+#define TEST_SATURATION 1
+#endif
+
 #define test_assert(x) ({ if (!(x)) { printf("Assertion failed: ");puts(#x);printf("  at " __FILE__ ":%d\n", __LINE__); exit(-1); } })
 
-extern int __aeabi_dcmpun(double a, double b);
+extern __attribute__((pcs("aapcs"))) int __aeabi_dcmpun(double a, double b);
 
 #if __arm__
 
@@ -150,7 +154,7 @@ int test__aeabi_cdcmple(double a, double b, int expected) {
         expected_z = 0;
         expected_c = 1;
     }
-#if PICO_DOUBLE_COMPILER
+#if PICO_RP2040 && LIB_PICO_DOUBLE_COMPILER && PICO_C_COMPILER_IS_GNU
     // gcc has this backwards it seems - not a good thing, but I guess it doesn't ever call them
     expected_c ^= 1;
 #endif
@@ -290,23 +294,23 @@ int test_dcmpun() {
 #define assert_nan(a) test_assert(isnan(a))
 #define check_nan(a) ({ assert_nan(a); a; })
 
-double __aeabi_i2d(int32_t);
-double __aeabi_ui2d(int32_t);
-double __aeabi_l2d(int64_t);
-double __aeabi_ul2d(int64_t);
-int32_t __aeabi_d2iz(double);
-int64_t __aeabi_d2lz(double);
-double __aeabi_dmul(double, double);
-double __aeabi_ddiv(double, double);
+double __attribute__((pcs("aapcs"))) __aeabi_i2d(int32_t);
+double __attribute__((pcs("aapcs"))) __aeabi_ui2d(int32_t);
+double __attribute__((pcs("aapcs"))) __aeabi_l2d(int64_t);
+double __attribute__((pcs("aapcs"))) __aeabi_ul2d(int64_t);
+int32_t __attribute__((pcs("aapcs")))__aeabi_d2iz(double);
+int64_t __attribute__((pcs("aapcs"))) __aeabi_d2lz(double);
+double __attribute__((pcs("aapcs"))) __aeabi_dmul(double, double);
+double __attribute__((pcs("aapcs"))) __aeabi_ddiv(double, double);
 #if LIB_PICO_DOUBLE_PICO
-double __real___aeabi_i2d(int);
-double __real___aeabi_ui2d(int);
-double __real___aeabi_l2d(int64_t);
-double __real___aeabi_ul2d(int64_t);
-double __real___aeabi_dmul(double, double);
-double __real___aeabi_ddiv(double, double);
-int32_t __real___aeabi_d2iz(double);
-int64_t __real___aeabi_d2lz(double);
+double __attribute__((pcs("aapcs"))) __real___aeabi_i2d(int);
+double __attribute__((pcs("aapcs"))) __real___aeabi_ui2d(int);
+double __attribute__((pcs("aapcs"))) __real___aeabi_l2d(int64_t);
+double __attribute__((pcs("aapcs"))) __real___aeabi_ul2d(int64_t);
+double __attribute__((pcs("aapcs"))) __real___aeabi_dmul(double, double);
+double __attribute__((pcs("aapcs"))) __real___aeabi_ddiv(double, double);
+int32_t __attribute__((pcs("aapcs"))) __real___aeabi_d2iz(double);
+int64_t __attribute__((pcs("aapcs"))) __real___aeabi_d2lz(double);
 double __real_sqrt(double);
 double __real_cos(double);
 double __real_sin(double);
@@ -318,6 +322,10 @@ double __real_pow(double, double);
 double __real_trunc(double);
 double __real_ldexp(double, int);
 double __real_fmod(double, double);
+double __real_fma(double, double, double);
+#define __real_fma_fast __real_fma
+#define __real_ddiv_fast __real___aeabi_ddiv
+#define __real_sqrt_fast __real_sqrt
 
 #define FRAC ((double)(1ull << 50))
 #define allowed_range(a) (fabs(a) / FRAC)
@@ -326,11 +334,13 @@ double __real_fmod(double, double);
 #define check2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
 #define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnan(p0)) assert_nan(r); else assert_close(r, r2); r; })
 #define check_close2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); if (isnan(p0) || isnan(p1)) assert_nan(r); else assert_close(r, r2); r; })
+#define check_close3(func,p0,p1,p2) ({ typeof(p0) r = func(p0,p1,p2), r2 = __CONCAT(__real_, func)(p0,p1,p2); if (isnan(p0) || isnan(p1) || isnan(p2)) assert_nan(r); else assert_close(r, r2); r; })
 #else
 #define check1(func,p0) func(p0)
 #define check2(func,p0,p1) func(p0,p1)
 #define check_close1(func,p0) func(p0)
 #define check_close2(func,p0,p1) func(p0,p1)
+#define check_close3(func,p0,p1,p2) func(p0,p1,p2)
 #endif
 
 double aa = 0.5;
@@ -357,6 +367,9 @@ int main() {
     for (double x = 0; x < 3; x++) {
         printf("\n ----- %g\n", x);
         printf("SQRT %10.18g\n", check_close1(sqrt, x));
+#if PICO_RP2350 && !LIB_PICO_DOUBLE_COMPILER
+        printf("SQRT_FAST %10.18g\n", check_close1(sqrt_fast, x));
+#endif
         printf("COS %10.18g\n", check_close1(cos, x));
         printf("SIN %10.18g\n", check_close1(sin, x));
         printf("TAN %10.18g\n", check_close1(tan, x));
@@ -426,6 +439,17 @@ int main() {
     }
 #endif
 
+    for (double a = -100.0; a < 100.0; a += 53.103) {
+        for (double b = -2000000.0; b < 1000000.0; b += 397243.5) {
+            for (double c = -700.0; c < 1000.0; c += 287.4) {
+                printf("fma %f %f %f\n", a, b, c);
+                check_close3(fma, a, b, c);
+#if PICO_RP2350 && !LIB_PICO_DOUBLE_COMPILER
+                check_close3(fma_fast, a, b, c);
+#endif
+            }
+        }
+    }
     {
         int32_t y;
 //        for (int32_t x = 0; x>-512; x--) {
@@ -469,8 +493,9 @@ int main() {
     for(double x = -4294967296.f * 4294967296.f * 2.f; x<=-0.5f; x/=2.f) {
         printf("d2i64 %f->%lld\n", x, (int64_t)x);
         if (x <= (double) INT64_MIN) {
-            // seems like there is a bug in the gcc version!
+#if TEST_SATURATION
             test_assert(__aeabi_d2lz(x) == INT64_MIN);
+#endif
         } else {
             check1(__aeabi_d2lz, x);
         }
@@ -478,8 +503,9 @@ int main() {
     for(double x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
         printf("d2i64 %f->%lld\n", x, (int64_t)x);
         if (x >= (double)INT64_MAX) {
-            // seems like there is a bug in the clang and gcc versions!
+#if TEST_SATURATION
             test_assert(__aeabi_d2lz(x) == INT64_MAX);
+#endif
         } else {
             check1(__aeabi_d2lz, x);
         }
@@ -491,8 +517,9 @@ int main() {
     for(double x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
         printf("d2i32 %f->%d\n", x, (int32_t)x);
         if (x >= (double) INT32_MAX - 1 && x <= (double) INT32_MAX + 1) {
-            // seems like there is a bug in the clang version!
+#if TEST_SATURATION
             test_assert(__aeabi_d2iz(x) == INT32_MAX);
+#endif
         } else {
             check1(__aeabi_d2iz, x);
         }
@@ -504,6 +531,9 @@ int main() {
                x - 0.377777777777777777777777777777, g, 123456789.0 / x);
         check2(__aeabi_dmul, x, x);
         check2(__aeabi_ddiv, 1.0, x);
+#if PICO_RP2350 && !LIB_PICO_DOUBLE_COMPILER
+        check2(ddiv_fast, 1.0, x);
+#endif
     }
 
     if (fail ||

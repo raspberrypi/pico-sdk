@@ -22,8 +22,22 @@
 #include <sys/types.h>
 #include "inttypes.h"
 
+#if !LIB_PICO_FLOAT_COMPILER
+#define TEST_SATURATION 1
+#endif
+
 #define test_assert(x) ({ if (!(x)) { printf("Assertion failed: ");puts(#x);printf("  at " __FILE__ ":%d\n", __LINE__); exit(-1); } })
-extern int __aeabi_fcmpun(float a, float b);
+
+extern __attribute__((pcs("aapcs"))) int __aeabi_fcmpun(float a, float b);
+
+#if 1
+#define failure() 1
+#else
+static inline int failure(void) {
+    __breakpoint();
+    return 1;
+}
+#endif
 
 #if __arm__
 
@@ -37,7 +51,7 @@ int test__aeabi_cfcmpeq(float a, float b, int expected) {
     if (expected != cpsr.flags.z) {
         printf("error in __aeabi_cfcmpeq(%f, %f) => Z = %08x, expected %08x\n",
                a, b, cpsr.flags.z, expected);
-        return 1;
+        return failure();
     }
     return 0;
 }
@@ -47,45 +61,45 @@ int test__aeabi_cfcmpeq(float a, float b, int expected) {
 int test_cfcmpeq() {
 #if __arm__
     if (test__aeabi_cfcmpeq(1.0, 1.0, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(1234.567, 765.4321, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(-123.0, -678.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(0.0, -0.0, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(0.0, 0.0, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(-0.0, -0.0, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(-0.0, 0.0, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(0.0, -1.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(-0.0, -1.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(-1.0, 0.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(-1.0, -0.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(1.0, NAN, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(NAN, 1.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(NAN, NAN, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(INFINITY, 1.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(0.0, INFINITY, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(-INFINITY, 0.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(0.0, -INFINITY, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(INFINITY, INFINITY, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmpeq(-INFINITY, -INFINITY, 1))
-        return 1;
+        return failure();
 #else
     printf("skipped\n");
 #endif
@@ -102,12 +116,12 @@ int test_fcmple_gt(float a, float b, int expected) {
     if ((a <= b) != expected) {
         printf("error in fcmple(%f, %f) => %d, expected %d\n",
                a, b, a <= b, expected);
-        return 1;
+        return failure();
     }
     if ((a > b) == expected && !isnanf(a) && !isnanf(b)) {
         printf("error in fcmpgt(%f, %f) => %d, expected %d\n",
                a, b, a > b, !expected);
-        return 1;
+        return failure();
     }
     return 0;
 }
@@ -116,12 +130,12 @@ int test_fcmplt_ge(float a, float b, int expected) {
     if ((a < b) != expected) {
         printf("error in fcmplt(%f, %f) => %d, expected %d\n",
                a, b, a < b, expected);
-        return 1;
+        return failure();
     }
     if ((a >= b) == expected && !isnanf(a) && !isnanf(b)) {
         printf("error in fcmpge(%f, %f) => %d, expected %d\n",
                a, b, a >= b, !expected);
-        return 1;
+        return failure();
     }
     return 0;
 }
@@ -134,7 +148,7 @@ int test__aeabi_cfcmple(float a, float b, int expected) {
 
     if (cpsr_value != r_cpsr_value) {
         printf("error: __aeabi_cfcmple(%f, %f) != __aeabi_cfrcmple(%f, %f)\n", a, b, b, a);
-        return 1;
+        return failure();
     }
 
     int expected_z, expected_c;
@@ -149,7 +163,7 @@ int test__aeabi_cfcmple(float a, float b, int expected) {
         expected_z = 0;
         expected_c = 1;
     }
-#if PICO_FLOAT_COMPILER
+#if PICO_RP2040 && LIB_PICO_FLOAT_COMPILER && PICO_C_COMPILER_IS_GNU
     // gcc has this backwards it seems - not a good thing, but I guess it doesn't ever call them
     expected_c ^= 1;
 #endif
@@ -158,14 +172,14 @@ int test__aeabi_cfcmple(float a, float b, int expected) {
     if (expected_z != cpsr.flags.z || expected_c != cpsr.flags.c) {
         printf("error in __aeabi_cfcmple(%f, %f) => (Z = %d, C = %d), expected (Z = %d, C = %d)\n",
                a, b, cpsr.flags.z, cpsr.flags.c, expected_z, expected_c);
-        return 1;
+        return failure();
     }
 
     cpsr.value = r_cpsr_value;
     if (expected_z != cpsr.flags.z || expected_c != cpsr.flags.c) {
         printf("error in __aeabi_cfrcmple(%f, %f) => (Z = %d, C = %d), expected (Z = %d, C = %d)\n",
                a, b, cpsr.flags.z, cpsr.flags.c, expected_z, expected_c);
-        return 1;
+        return failure();
     }
     return 0;
 }
@@ -175,27 +189,27 @@ int test__aeabi_cfcmple(float a, float b, int expected) {
 int test_cfcmple() {
 #if __arm__
     if (test__aeabi_cfcmple(1.0, 1.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(1234.567, 765.4321, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(765.4321, 1234.567, -1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(-123.0, -678.0, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(-678.0, -123.0, -1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(-123.0, 678.0, -1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(678.0, -123.0, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(0.0, -0.0, 0))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(1.0, NAN, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(NAN, 1.0, 1))
-        return 1;
+        return failure();
     if (test__aeabi_cfcmple(NAN, NAN, 1))
-        return 1;
+        return failure();
 #else
     printf("skipped\n");
 #endif
@@ -204,64 +218,64 @@ int test_cfcmple() {
 
 int test_cmple_gt() {
     if (test_fcmple_gt(1.0, 1.0, 1))
-        return 1;
+        return failure();
     if (test_fcmple_gt(1234.567, 765.4321, 0))
-        return 1;
+        return failure();
     if (test_fcmple_gt(765.4321, 1234.567, 1))
-        return 1;
+        return failure();
     if (test_fcmple_gt(-123.0, -678.0, 0))
-        return 1;
+        return failure();
     if (test_fcmple_gt(-678.0, -123.0, 1))
-        return 1;
+        return failure();
     if (test_fcmple_gt(-123.0, 678.0, 1))
-        return 1;
+        return failure();
     if (test_fcmple_gt(678.0, -123.0, 0))
-        return 1;
+        return failure();
     if (test_fcmple_gt(0.0, -0.0, 1))
-        return 1;
+        return failure();
     if (test_fcmple_gt(-0.0, 0.0, 1))
-        return 1;
+        return failure();
     if (test_fcmple_gt(1.0, NAN, 0))
-        return 1;
+        return failure();
     if (test_fcmple_gt(NAN, 1.0, 0))
-        return 1;
+        return failure();
     if (test_fcmple_gt(NAN, NAN, 0))
-        return 1;
+        return failure();
     return 0;
 }
 
 int test_cmplt_ge() {
     if (test_fcmplt_ge(1.0, 1.0, 0))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(1234.567, 765.4321, 0))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(765.4321, 1234.567, 1))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(-123.0, -678.0, 0))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(-678.0, -123.0, 1))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(-123.0, 678.0, 1))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(678.0, -123.0, 0))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(0.0, -0.0, 0))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(-0.0, 0.0, 0))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(1.0, NAN, 0))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(NAN, 1.0, 0))
-        return 1;
+        return failure();
     if (test_fcmplt_ge(NAN, NAN, 0))
-        return 1;
+        return failure();
     return 0;
 }
 
 int check_fcmpun(float a, float b, bool expected, bool expect_equal) {
     if (__aeabi_fcmpun(a, b) != expected) {
         printf("Failed fcmpun(%f, %f)\n", a, b);
-        return 1;
+        return failure();
     }
     if ((a == b) != expect_equal) {
         printf("Failed equality check %f %f\n", a, b);
@@ -269,7 +283,7 @@ int check_fcmpun(float a, float b, bool expected, bool expect_equal) {
         if (b == a) {
             printf("SAS\n");
         }
-        return 1;
+        return failure();
     }
     return 0;
 }
@@ -281,7 +295,7 @@ int test_fcmpun() {
         check_fcmpun(0, NAN, true, false) ||
         check_fcmpun(NAN, NAN, true, false) ||
         check_fcmpun(-NAN, NAN, true, false)) {
-        return 1;
+        return failure();
     }
     return 0;
 }
@@ -289,25 +303,26 @@ int test_fcmpun() {
 #define assert_nan(a) test_assert(isnanf(a))
 #define check_nan(a) ({ assert_nan(a); a; })
 
-float __aeabi_i2f(int32_t);
-float __aeabi_ui2f(int32_t);
-float __aeabi_l2f(int64_t);
-float __aeabi_ul2f(int64_t);
-int32_t __aeabi_f2iz(float);
-int64_t __aeabi_f2lz(float);
-float __aeabi_fmul(float, float);
-float __aeabi_fdiv(float, float);
+float __attribute__((pcs("aapcs"))) __aeabi_i2f(int32_t);
+float __attribute__((pcs("aapcs"))) __aeabi_ui2f(int32_t);
+float __attribute__((pcs("aapcs"))) __aeabi_l2f(int64_t);
+float __attribute__((pcs("aapcs"))) __aeabi_ul2f(int64_t);
+int32_t __attribute__((pcs("aapcs"))) __aeabi_f2iz(float);
+int64_t __attribute__((pcs("aapcs"))) __aeabi_f2lz(float);
+float __attribute__((pcs("aapcs"))) __aeabi_fmul(float, float);
+float __attribute__((pcs("aapcs"))) __aeabi_fdiv(float, float);
 #if LIB_PICO_FLOAT_PICO
 #if !LIB_PICO_FLOAT_PICO_VFP
-float __real___aeabi_i2f(int);
-float __real___aeabi_ui2f(int);
-float __real___aeabi_l2f(int64_t);
-float __real___aeabi_ul2f(int64_t);
-float __real___aeabi_fmul(float, float);
-float __real___aeabi_fdiv(float, float);
-int32_t __real___aeabi_f2iz(float);
-int64_t __real___aeabi_f2lz(float);
+float __attribute__((pcs("aapcs"))) __real___aeabi_i2f(int);
+float __attribute__((pcs("aapcs"))) __real___aeabi_ui2f(int);
+float __attribute__((pcs("aapcs"))) __real___aeabi_l2f(int64_t);
+float __attribute__((pcs("aapcs"))) __real___aeabi_ul2f(int64_t);
+float __attribute__((pcs("aapcs"))) __real___aeabi_fmul(float, float);
+float __attribute__((pcs("aapcs"))) __real___aeabi_fdiv(float, float);
+int32_t __attribute__((pcs("aapcs"))) __real___aeabi_f2iz(float);
+int64_t __attribute__((pcs("aapcs"))) __real___aeabi_f2lz(float);
 float __real_sqrtf(float);
+float __real_fmaf(float, float, float);
 #endif
 float __real_cosf(float);
 float __real_sinf(float);
@@ -326,14 +341,24 @@ float __real_fmodf(float, float);
 #endif
 #define assert_close(a, b) test_assert((fabsf(a - b) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && (a < 0) == (b < 0)))
 #define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
-#define check2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
+#if !LIB_PICO_FLOAT_PICO_VFP
+#define check1_vfp_unwrapped(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
+#define check2_vfp_unwrapped(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
+#else
+#define check1_vfp_unwrapped(func,p0) ({ typeof(p0) r = func(p0), r2 = func(p0); test_assert(r == r2); r; })
+#define check2_vfp_unwrapped(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = func(p0,p1); test_assert(r == r2); r; })
+#endif
 #define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnanf(p0)) assert_nan(r); else assert_close(r, r2); r; })
 #define check_close2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); if (isnanf(p0) || isnanf(p1)) assert_nan(r); else assert_close(r, r2); r; })
+#define check_close3(func,p0,p1,p2) ({ typeof(p0) r = func(p0,p1,p2), r2 = __CONCAT(__real_, func)(p0,p1,p2); if (isnanf(p0) || isnanf(p1) || isnanf(p2)) assert_nan(r); else assert_close(r, r2); r; })
 #else
 #define check1(func,p0) func(p0)
+#define check1_vfp_unwrapped(func,p0) func(p0)
 #define check2(func,p0,p1) func(p0,p1)
+#define check2_vfp_unwrapped(func,p0,p1) func(p0,p1)
 #define check_close1(func,p0) func(p0)
 #define check_close2(func,p0,p1) func(p0,p1)
+#define check_close3(func,p0,p1,p2) func(p0,p1,p2)
 #endif
 
 double aa = 0.5;
@@ -480,6 +505,16 @@ int main() {
 #endif
 
 #if !LIB_PICO_FLOAT_PICO_VFP
+    for (float a = -100.0f; a < 100.0f; a += 53.103f) {
+        for (float b = -2000000.0f; b < 1000000.0f; b += 397243.5f) {
+            for (float c = -700.0f; c < 1000.0f; c += 287.4f) {
+                printf("fma %f %f %f\n", a, b, c);
+                check_close3(fmaf, a, b, c);
+            }
+        }
+    }
+#endif
+
     {
         int32_t y;
 //        for (int32_t x = 0; x>-512; x--) {
@@ -487,21 +522,21 @@ int main() {
 //        }
         for (int32_t x = -1; x; x <<= 1) {
             printf("i %d->%f\n", x, (float) x);
-            check1(__aeabi_i2f, x);
+            check1_vfp_unwrapped(__aeabi_i2f, x);
         }
         for (int32_t x = 1; x; x <<= 1) {
             printf("i %d->%f\n", x, (float) x);
-            check1(__aeabi_i2f, x);
+            check1_vfp_unwrapped(__aeabi_i2f, x);
             y = x << 1;
         }
         for (int64_t x = 1; x; x <<= 1) {
             printf("i %lld->%f\n", x, (float) x);
-            check1(__aeabi_l2f, x);
+            check1_vfp_unwrapped(__aeabi_l2f, x);
             y = x << 1;
         }
         for (int64_t x = -1; x; x <<= 1) {
             printf("i %lld->%f\n", x, (float) x);
-            check1(__aeabi_l2f, x);
+            check1_vfp_unwrapped(__aeabi_l2f, x);
             y = x << 1;
         }
         printf("d %d->%f\n", y, (float) y);
@@ -511,47 +546,49 @@ int main() {
         uint32_t y;
         for(uint32_t x = 1; x; x <<= 1) {
             printf("u %u->%f\n", x, (float)x);
-            check1(__aeabi_ui2f, x);
+            check1_vfp_unwrapped(__aeabi_ui2f, x);
             y = x << 1;
         }
         printf("u %u->%f\n", y, (float)y);
     }
     for(int64_t x = 1; x !=0; x <<= 1u) {
         printf("%lld->%f\n", x, (float)x);
-        check1(__aeabi_l2f, x);
+        check1_vfp_unwrapped(__aeabi_l2f, x);
     }
     for(float x = -4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
         printf("f %f->%lld\n", x, (int64_t)x);
-        check1(__aeabi_f2lz, x);
+        check1_vfp_unwrapped(__aeabi_f2lz, x);
     }
     for(float x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
         printf("f2i64 %f->%lld\n", x, (int64_t)x);
 #if PICO_RP2040
         if ((double)x >= (double)INT64_MAX) {
-            // seems like there is a bug in the gcc version (which returns UINT64_MAX)
+#if TEST_SATURATION
             test_assert(__aeabi_f2lz(x) == INT64_MAX);
+#endif
         } else {
             check1(__aeabi_f2lz, x);
         }
 #else
-        check1(__aeabi_f2lz, x);
+        check1_vfp_unwrapped(__aeabi_f2lz, x);
 #endif
     }
     for(float x = -4294967296.f * 4294967296.f; x<=-0.5f; x/=2.f) {
-        printf("d2i32 %f->%d\n", x, (int32_t)x);
-        check1(__aeabi_f2iz, x);
+        printf("f2i32 %f->%d\n", x, (int32_t)x);
+        check1_vfp_unwrapped(__aeabi_f2iz, x);
     }
     for(float x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
-        printf("d2i32 %f->%d\n", x, (int32_t)x);
+        printf("f2i32 %f->%d\n", x, (int32_t)x);
 #if PICO_RP2040
         if ((double)x >= (double)INT32_MAX) {
-            // seems like there is a bug in the clang version (which returns INT32_MIN)
+#if TEST_SATURATION
             test_assert(__aeabi_f2iz(x) == INT32_MAX);
+#endif
         } else {
             check1(__aeabi_f2iz, x);
         }
 #else
-        check1(__aeabi_f2iz, x);
+        check1_vfp_unwrapped(__aeabi_f2iz, x);
 #endif
     }
 
@@ -560,10 +597,9 @@ int main() {
         float g = 1.0f / x;
         printf("%g %10.18g %10.18g, %10.18g, %10.18g %10.18g\n", x, f, x + 0.37777777777777777777777777777f,
                x - 0.377777777777777777777777777777f, g, 123456789.0f / x);
-        check2(__aeabi_fmul, x, x);
-        check2(__aeabi_fdiv, 1.0f, x);
+        check2_vfp_unwrapped(__aeabi_fmul, x, x);
+        check2_vfp_unwrapped(__aeabi_fdiv, 1.0f, x);
     }
-#endif
 
     if (fail ||
         test_cfcmpeq() ||

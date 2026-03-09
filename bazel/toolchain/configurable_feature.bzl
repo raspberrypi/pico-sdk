@@ -3,7 +3,6 @@ load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 load("@rules_cc//cc/toolchains:feature.bzl", "cc_feature")
 
 def configurable_toolchain_feature(name, copts = [], cxxopts = [], linkopts = []):
-
     all_args = []
 
     if copts:

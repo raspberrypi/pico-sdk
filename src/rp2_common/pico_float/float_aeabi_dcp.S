@@ -164,10 +164,10 @@ regular_func float2fix_z
   adds r2, r1
   ble 2f // modified input is denormal so zero
   cmp r2, #0xff
-  beq 3f // modified input is infinite
+  bge 3f // modified input is infinite
 1:
   bfi r0, r2, #23, #8
-  b float2int_z_entry
+  b float2int_z
 2:
   movs r0, #0
   bx lr
@@ -193,10 +193,10 @@ regular_func float2ufix_z
   adds r2, r1
   ble 2f // modified input is denormal so zero
   cmp r2, #0xff
-  beq 3f // modified input is infinite
+  bge 3f // modified input is infinite
 1:
   bfi r0, r2, #23, #8
-  b float2uint_z_entry
+  b float2uint_z
 2:
   movs r0, #0
   bx lr
@@ -212,7 +212,8 @@ float2uint_z_entry:
   saving_func_return
 
 float_section conv_f2fix
-saving_func regular float2fix
+regular_func regular
+regular_func float2fix
   ubfx r2, r0, #23, #8
   cbz r2, 2f // input is zero or denormal
   cmp r2, #0xff
@@ -220,10 +221,10 @@ saving_func regular float2fix
   adds r2, r1
   ble 2f // modified input is denormal so zero
   cmp r2, #0xff
-  beq 3f // modified input is infinite
+  bge 3f // modified input is infinite
 1:
   bfi r0, r2, #23, #8
-  b float2int_entry
+  b float2int
 2:
   movs r0, #0
   bx lr

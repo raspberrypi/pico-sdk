@@ -273,7 +273,7 @@ static inline void powman_set_debug_power_request_ignored(bool ignored) {
     if (ignored)
         powman_set_bits(&powman_hw->dbg_pwrcfg, 1);
     else
-        powman_clear_bits(&powman_hw->dbg_pwrcfg, 0);
+        powman_clear_bits(&powman_hw->dbg_pwrcfg, 1);
 }
 
 #ifdef __cplusplus

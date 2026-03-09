@@ -3,6 +3,8 @@
 
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//bazel/toolchain:objcopy.bzl", "objcopy_to_bin")
 load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "flag_choice")

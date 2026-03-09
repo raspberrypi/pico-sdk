@@ -22,38 +22,6 @@ if (NOT TARGET pico_double)
     target_link_libraries(pico_double INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>,${PICO_DEFAULT_DOUBLE_IMPL}>)
 
-    # todo maybe this should be pico_double_dcp (note FreeRTOS has a dependency on the LIB_PICO_DOUBLE_FOO)
-    pico_add_library(pico_double_pico)
-    if (PICO_RP2040)
-        target_sources(pico_double_pico INTERFACE
-                ${CMAKE_CURRENT_LIST_DIR}/double_aeabi_rp2040.S
-                ${CMAKE_CURRENT_LIST_DIR}/double_init_rom_rp2040.c
-                ${CMAKE_CURRENT_LIST_DIR}/double_math.c
-                ${CMAKE_CURRENT_LIST_DIR}/double_v1_rom_shim_rp2040.S
-        )
-    elseif(NOT PICO_RISCV)
-        target_sources(pico_double_pico INTERFACE
-                ${CMAKE_CURRENT_LIST_DIR}/double_math.c
-                ${CMAKE_CURRENT_LIST_DIR}/double_aeabi_dcp.S
-                ${CMAKE_CURRENT_LIST_DIR}/double_fma_dcp.S
-                ${CMAKE_CURRENT_LIST_DIR}/double_sci_m33.S
-                ${CMAKE_CURRENT_LIST_DIR}/double_conv_m33.S
-                )
-    endif()
-
-    target_link_libraries(pico_double_pico INTERFACE pico_bootrom pico_double_headers hardware_divider)
-
-    pico_add_library(pico_double_none)
-    target_sources(pico_double_none INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/double_none.S
-            )
-
-    target_link_libraries(pico_double_none INTERFACE pico_double_headers)
-
-    target_compile_definitions(pico_double_none_headers INTERFACE
-            PICO_PRINTF_SUPPORT_FLOAT=0 # printing floats/doubles won't work, so we can save space by removing it
-    )
-
     function(wrap_double_functions TARGET)
         pico_wrap_function(${TARGET} __aeabi_dadd)
         pico_wrap_function(${TARGET} __aeabi_ddiv)
@@ -119,7 +87,42 @@ if (NOT TARGET pico_double)
         pico_wrap_function(${TARGET} fma)
     endfunction()
 
-    wrap_double_functions(pico_double_pico)
+    pico_add_library(pico_double_pico)
+    if (PICO_RP2040)
+        target_sources(pico_double_pico INTERFACE
+                ${CMAKE_CURRENT_LIST_DIR}/double_aeabi_rp2040.S
+                ${CMAKE_CURRENT_LIST_DIR}/double_init_rom_rp2040.c
+                ${CMAKE_CURRENT_LIST_DIR}/double_math.c
+                ${CMAKE_CURRENT_LIST_DIR}/double_v1_rom_shim_rp2040.S
+        )
+        target_link_libraries(pico_double_pico INTERFACE pico_bootrom pico_double_headers hardware_divider)
+        wrap_double_functions(pico_double_pico)
+    elseif(NOT PICO_RISCV)
+        pico_add_library(pico_double_pico_dcp)
+        target_sources(pico_double_pico_dcp INTERFACE
+                ${CMAKE_CURRENT_LIST_DIR}/double_math.c
+                ${CMAKE_CURRENT_LIST_DIR}/double_aeabi_dcp.S
+                ${CMAKE_CURRENT_LIST_DIR}/double_fma_dcp.S
+                ${CMAKE_CURRENT_LIST_DIR}/double_sci_m33.S
+                ${CMAKE_CURRENT_LIST_DIR}/double_conv_m33.S
+                )
+        target_link_libraries(pico_double_pico_dcp INTERFACE pico_double_headers)
+        wrap_double_functions(pico_double_pico_dcp)
+        target_link_libraries(pico_double_pico INTERFACE pico_double_pico_dcp)
+    endif()
+
+
+    pico_add_library(pico_double_none)
+    target_sources(pico_double_none INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/double_none.S
+            )
+
+    target_link_libraries(pico_double_none INTERFACE pico_double_headers)
+
+    target_compile_definitions(pico_double_none_headers INTERFACE
+            PICO_PRINTF_SUPPORT_FLOAT=0 # printing floats/doubles won't work, so we can save space by removing it
+    )
+
     wrap_double_functions(pico_double_none)
 
     macro(pico_set_double_implementation TARGET IMPL)

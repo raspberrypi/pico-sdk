@@ -1,4 +1,6 @@
 load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -68,11 +70,11 @@ cc_library(
 
 expand_template(
     name = "version",
-    template = "version.h.in",
+    out = "gen/version.h",
     substitutions = {
         "${PIOASM_VERSION_STRING}": module_version() if module_version() != None else "0.0.1-WORKSPACE",
     },
-    out = "gen/version.h",
+    template = "version.h.in",
 )
 
 cc_binary(

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("//bazel:defs.bzl", "compatible_with_rp2")
 load("//bazel/util:transition.bzl", "extra_copts_for_all_deps")
 
@@ -11,8 +12,8 @@ cc_binary(
     # Doesn't appear to work on host builds yet.
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        "//src/rp2_common/pico_stdlib",
         "//src/rp2_common/pico_aon_timer",
+        "//src/rp2_common/pico_stdlib",
         "//test/pico_test",
     ],
 )

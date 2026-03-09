@@ -104,17 +104,20 @@ saving_func wrapper __aeabi_drsub
 
 double_wrapper_section __aeabi_dmul
 saving_func wrapper __aeabi_dmul
-
- // todo optimize this based on final decision on saving_func_entry
-  push {r4,r14}
-  dcp_dmul_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r4,r12,r14
- // todo optimize this based on final decision on saving_func_entry
-  pop {r4,lr}
-  saving_func_return
+push {r4,r14}
+dcp_dmul_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r4,r12,r14
+pop {r4,pc}
 
 double_section ddiv_fast
 saving_func regular ddiv_fast
+#if defined(__ARM_PCS_VFP)
+  vmov r0,r1,d0
+  vmov r2,r3,d1
+#endif
   dcp_ddiv_fast_m r0,r1,r0,r1,r2,r3,r0,r1,r2,r3,r12
+#if defined(__ARM_PCS_VFP)
+  vmov d0,r0,r1
+#endif
   saving_func_return
 
 double_wrapper_section __aeabi_ddiv
@@ -125,104 +128,180 @@ saving_func wrapper __aeabi_ddiv
 
 double_section sqrt_fast
 saving_func regular sqrt_fast
+#if defined(__ARM_PCS_VFP)
+  vmov r0,r1,d0
+#endif
   dcp_dsqrt_fast_m r0,r1,r0,r1,r0,r1,r2,r3,r12
+#if defined(__ARM_PCS_VFP)
+  vmov d0,r0,r1
+#endif
   saving_func_return
 
 double_wrapper_section sqrt
 saving_func wrapper sqrt
+#if defined(__ARM_PCS_VFP)
+  vmov r0,r1,d0
+#endif
 @ with correct rounding
   dcp_dsqrt_m r0,r1,r0,r1,r0,r1,r2,r3,r12
+#if defined(__ARM_PCS_VFP)
+  vmov d0,r0,r1
+#endif
   saving_func_return
 
 double_section dclassify
 saving_func regular dclassify
+#if defined(__ARM_PCS_VFP)
+  vmov r0,r1,d0
+#endif
   dcp_dclassify_m apsr_nzcv,r0,r1
   saving_func_return
 
 // ============== CONVERSION FUNCTIONS ===============
 
 double_wrapper_section __aeabi_d2f
+#if defined(__ARM_PCS_VFP)
+saving_func wrapper __aeabi_d2f
+#else
 saving_func wrapper __aeabi_d2f double2float
+#endif
 @ with rounding
   dcp_double2float_m r0,r0,r1
   saving_func_return
 
+#if defined(__ARM_PCS_VFP)
+double_section double2float
+regular_func double2float
+  push {lr}
+  vmov r0,r1,d0
+  bl WRAPPER_FUNC_NAME(__aeabi_d2f)
+  vmov s0,r0
+  pop {pc}
+#endif
+
 double_wrapper_section __aeabi_i2d
+#if defined(__ARM_PCS_VFP)
+saving_func wrapper __aeabi_i2d
+#else
 saving_func wrapper __aeabi_i2d int2double
+#endif
   dcp_int2double_m r0,r1,r0
   saving_func_return
 
+#if defined(__ARM_PCS_VFP)
+double_section int2double
+regular_func int2double
+  push {lr}
+  bl WRAPPER_FUNC_NAME(__aeabi_i2d)
+  vmov d0,r0,r1
+  pop {pc}
+#endif
+
 double_wrapper_section __aeabi_ui2d
+#if defined(__ARM_PCS_VFP)
+saving_func wrapper __aeabi_ui2d
+#else
 saving_func wrapper __aeabi_ui2d uint2double
+#endif
   dcp_uint2double_m r0,r1,r0
   saving_func_return
 
+#if defined(__ARM_PCS_VFP)
+double_section uint2double
+regular_func uint2double
+  push {lr}
+  bl WRAPPER_FUNC_NAME(__aeabi_ui2d)
+  vmov d0,r0,r1
+  pop {pc}
+#endif
+
 double_section double2fix_z
 saving_func regular double2fix_z
+#if defined(__ARM_PCS_VFP)
+  mov r2, r0
+  vmov r0, r1, d0
+#endif
   ubfx r3, r1, #20, #11
+  cbz r3, 1f // zero or denormal
   adds r3, r2
-  beq 1f // very small; we don't care that we might make a denormal
-  asrs ip, r3, #11
-  beq 1f
-  ite pl
-  movpl r3, #0x7ff
-  movsmi r3, #0
-1:
+  ble 1f // zero or denormal after exponent changed
+  adds r2, r3, #1
+  lsrs r2, r2, #11
   bfi r1, r3, #20, #11
-  b double2int_z_entry
+  beq double2int_z_entry // wasn't infinite or above (exponent)
+  // infinite value is handled specially since the mantissa bits may have been non zero which is a NaN
+  mvn r2, #0x80000000
+  add r0, r2, r1, lsr#31 // so -Inf → 0x80000000, +Inf → 0x7fffffff
+  saving_func_return
+1: // small value; return 0
+  movs r0, #0
+  saving_func_return
 
 double_section double2ufix
 saving_func regular double2ufix_z double2ufix
+#if defined(__ARM_PCS_VFP)
+  mov r2, r0
+  vmov r0, r1, d0
+#endif
 double2ufix_z_entry:
   ubfx r3, r1, #20, #11
+  cbz r3, 1f // zero or denormal
   adds r3, r2
-  beq 1f // very small; we don't care that we might make a denormal
-  asrs ip, r3, #11
-  beq 1f
-  ite pl
-  lsrspl r3, r1, #20 // 0x7ff
-  movsmi r3, #0
-1:
+  ble 1f // zero or denormal after exponent changed
+  adds r2, r3, #1
+  lsrs r2, r2, #11
   bfi r1, r3, #20, #11
-  b double2uint_z_entry
+  beq double2uint_z_entry // wasn't infinite or above (exponent)
+  // infinite value is handled specially since the mantissa bits may have been non zero which is a NaN
+  mvn r0, r1, asr #31
+  saving_func_return
+1: // small value; return 0
+  movs r0, #0
+  saving_func_return
 
 double_section double2fix
 saving_func regular double2fix
+#if defined(__ARM_PCS_VFP)
+  mov r2, r0
+  vmov r0, r1, d0
+#endif
   ubfx r3, r1, #20, #11
-  cbz r3, 2f // 0 or denormal
+  cbz r3, 1f // zero or denormal
   adds r3, r2
-  beq 1f // very small; we don't care that we might make a denormal
-  asrs ip, r3, #11
-  beq 1f
-  ite pl
-  movpl r3, #0x7ff
-  movsmi r3, #0
-1:
+  ble 1f // zero or denormal after exponent changed
+  adds r2, r3, #1
+  lsrs r2, r2, #11
   bfi r1, r3, #20, #11
-  b double2int_entry
-2:
+  beq double2int_entry // wasn't infinite or above (exponent)
+  // infinite value is handled specially since the mantissa bits may have been non zero which is a NaN
+  mvn r2, #0x80000000
+  add r0, r2, r1, lsr#31 // so -Inf → 0x80000000, +Inf → 0x7fffffff
+  saving_func_return
+1: // small value; return 0
   movs r0, #0
-saving_func_return
+  saving_func_return
 
 
 double_section double2int
 saving_func regular double2int
+#if defined(__ARM_PCS_VFP)
+  vmov r0, r1, d0
+#endif
 double2int_entry:
   lsls r2, r1, #1
   bcc double2int_z_entry // positive is ok for int64_z
   lsrs r3, r2, #21
   beq double2int_z_entry // 0 or -0 or denormal is ok for int_z
 
-  lsrs r2, #21
-  adds r2, #1
-  subs r2, r2, #0x400
+  adds r3, #1
+  subs r3, r3, #0x400
   bcc 1f // <1 means subtract 1
-  cmp r2, #31
+  cmp r3, #31
   bge double2int_z_entry // must be an integer or maxed out
-  lsls r3, r1, #12
-  adds r3, r3, r0, lsr #20 // r3 now has highest 32 mantissa bits
-  lsls r3, r2
-  orrs r3, r3, r0, lsl #12 // these bits are all guaranteed to be in the fraction
+  lsls r2, r1, #12
+  adds r2, r2, r0, lsr #20 // r3 now has highest 32 mantissa bits
+  lsls r2, r3
+  orrs r2, r2, r0, lsl #12 // these bits are all guaranteed to be in the fraction
   beq double2int_z_entry // integer
 1:
   dcp_double2int_m r0,r0,r1
@@ -230,29 +309,62 @@ double2int_entry:
 saving_func_return
 
 double_wrapper_section __aeabi_d2iz
+#if defined(__ARM_PCS_VFP)
+saving_func wrapper __aeabi_d2iz
+#else
 saving_func wrapper __aeabi_d2iz double2int_z
+#endif
 double2int_z_entry:
 @ with truncation towards 0
   dcp_double2int_m r0,r0,r1
   // note: this works with either saved or not saved call as it is just a `bx lr`
   saving_func_return
 
+#if defined(__ARM_PCS_VFP)
+double_section double2int_z
+regular_func double2int_z
+  vmov r0,r1,d0
+  push {r4,lr}
+  bl WRAPPER_FUNC_NAME(__aeabi_d2iz)
+  pop {r4,pc}
+#endif
+
 double_wrapper_section __aeabi_d2uiz
+#if defined(__ARM_PCS_VFP)
+saving_func wrapper __aeabi_d2uiz
+#else
 saving_func wrapper __aeabi_d2uiz double2uint double2uint_z
+#endif
 double2uint_z_entry:
 @ with truncation towards 0
   dcp_double2uint_m r0,r0,r1
   saving_func_return
 
+#if defined(__ARM_PCS_VFP)
+double_section double2uint
+regular_func double2uint
+regular_func double2uint_z
+  vmov r0,r1,d0
+  push {r4,lr}
+  bl WRAPPER_FUNC_NAME(__aeabi_d2uiz)
+  pop {r4,pc}
+#endif
+
 double_section double2int_r
 saving_func regular double2int_r
 @ with rounding
+#if defined(__ARM_PCS_VFP)
+  vmov r0,r1,d0
+#endif
   dcp_double2int_r_m r0,r0,r1
   saving_func_return
 
 double_section double2uint_r
 saving_func regular double2uint_r
 @ with rounding
+#if defined(__ARM_PCS_VFP)
+  vmov r0,r1,d0
+#endif
   dcp_double2uint_r_m r0,r0,r1
   saving_func_return
 

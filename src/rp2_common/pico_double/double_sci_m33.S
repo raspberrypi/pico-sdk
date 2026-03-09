@@ -34,6 +34,26 @@ double_section WRAPPER_FUNC_NAME(\func)
  movt \rx,#((\n)>>16)&0xffff
 .endm
 
+.macro hardabi_wrapper_func type, func, argn
+\type\()_func \func
+#if defined(__ARM_PCS_VFP)
+.ifgt \argn - 0
+ vmov r0,r1,d0
+.endif
+.ifgt \argn - 1
+ vmov r2,r3,d1
+.endif
+.ifgt \argn - 2
+.error "Unsupported argn: \argn"
+.endif
+ push {lr}
+ bl \func\()_entry
+ vmov d0,r0,r1
+ pop {pc}
+\func\()_entry:
+#endif
+.endm
+
 double_section rtwopi
 
 // 1/2π to plenty of accuracy, 256 bits per line
@@ -99,9 +119,15 @@ drr_core:
 
 double_wrapper_section tan
 wrapper_func tan
+#if defined(__ARM_PCS_VFP)
+ vmov r0,r1,d0
+#endif
  push {r14}
  bl sincos_raw
  bl __aeabi_ddiv
+#if defined(__ARM_PCS_VFP)
+ vmov d0,r0,r1
+#endif
  pop {r15}
 
 double_wrapper_section sin_cos
@@ -281,7 +307,12 @@ double_wrapper_section sin_cos
 
 @ sincos à la GNU with pointers to where to put results
 wrapper_func sincos
+#if defined(__ARM_PCS_VFP)
+ push {r0-r1,r4-r5, lr}
+ vmov r0,r1,d0
+#else
  push {r2-r5, lr}
+#endif
  bl sincos_raw
  pop {r4-r5}
  stmia r4!, {r0, r1}
@@ -297,11 +328,21 @@ sincos_raw:
  b 1f
 
 wrapper_func sin
+#if defined(__ARM_PCS_VFP)
+ vmov r0,r1,d0
+#endif
  lsrs r12,r1,#29             @ negative argument -> +2 quadrants
  ands r12,#4
+#if defined(__ARM_PCS_VFP)
+ push {lr}
+ bl 1f
+ vmov d0,r0,r1
+ pop {pc}
+#else
  b 1f
+#endif
 
-wrapper_func cos
+hardabi_wrapper_func wrapper cos 1
  movs r12,#2                 @ cos -> +1 quadrant
 1:
  ubfx r3,r1,#20,#11          @ get exponent
@@ -735,7 +776,7 @@ double_wrapper_section exp
  sbc r1,r1,#0
  bx r14
 
-wrapper_func exp
+hardabi_wrapper_func wrapper exp 1
  movs r12,r1,lsr#31          @ save sign
  ubfx r3,r1,#20,#11          @ get exponent
  sub r3,r3,#0x3ff
@@ -1008,7 +1049,7 @@ double_wrapper_section log
  eors r1,r1,#0x80000000
  pop {r4-r8,r15}
 
-wrapper_func log
+hardabi_wrapper_func wrapper log 1
  lsls r12,r1,#1
  bcs 1b                      @ x<0?
  lsrs r12,#21
@@ -1285,7 +1326,12 @@ double_wrapper_section atan2
  ubfx r4,r3,#20,#11
  movs r0,#0
  movs r1,#0
+#if defined(__ARM_PCS_VFP)
+ cmp r4,#0
+ bne 80f @ The imm range in cbnz would be insufficient if __ARM_PCS_VFP were defined
+#else
  cbnz r4,80f                 @ x' also zero?
+#endif
  tst r7,#4
  beq 80f                     @ already in quadrants 0/±2? then 0/0 result will be correct
  tst r7,#2
@@ -1301,7 +1347,7 @@ double_wrapper_section atan2
  orrs r1,r1,#0x00080000
  bx r14
 
-wrapper_func atan2
+hardabi_wrapper_func wrapper atan2 2
  cmp r2,#1                   @ set C if low word is non-zero
  adc r12,r3,r3
  cmn r12,#0x00200000         @ y NaN?
