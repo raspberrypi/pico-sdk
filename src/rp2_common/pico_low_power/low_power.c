@@ -181,7 +181,7 @@ static void add_library_clocks(clock_dest_set_t *local_keep_enabled) {
 #endif
 }
 
-static uint32_t irq_mask_disabled_during_sleep[NUM_IRQS];
+static uint32_t irq_mask_disabled_during_sleep[((NUM_IRQS-1) / 32)];
 
 static void save_and_disable_other_interrupts(uint32_t irq) {
     for (uint n = 0; n <= ((NUM_IRQS-1) / 32); n++) {
@@ -283,18 +283,16 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
 
     add_library_clocks(&local_keep_enabled);
 
-    bool low = !high;
-    bool level = !edge;
-
     // Configure the appropriate IRQ at IO bank 0
     assert(gpio_pin < NUM_BANK0_GPIOS);
 
     uint32_t event = 0;
 
-    if (level && low) event = GPIO_IRQ_LEVEL_LOW;
-    if (level && high) event = GPIO_IRQ_LEVEL_HIGH;
-    if (edge && high) event = GPIO_IRQ_EDGE_RISE;
-    if (edge && low) event = GPIO_IRQ_EDGE_FALL;
+    if (edge) {
+        event = high ? GPIO_IRQ_EDGE_RISE : GPIO_IRQ_EDGE_FALL;
+    } else { // level
+        event = high ? GPIO_IRQ_LEVEL_HIGH : GPIO_IRQ_LEVEL_LOW;
+    }
 
     gpio_set_input_enabled(gpio_pin, true);
     gpio_set_irq_enabled_with_callback(gpio_pin, event, true, low_power_wakeup_gpio);
@@ -495,18 +493,16 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
     clock_dest_set_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
-    bool low = !high;
-    bool level = !edge;
-
     // Configure the appropriate IRQ at IO bank 0
     assert(gpio_pin < NUM_BANK0_GPIOS);
 
     uint32_t event = 0;
 
-    if (level && low) event = GPIO_IRQ_LEVEL_LOW;
-    if (level && high) event = GPIO_IRQ_LEVEL_HIGH;
-    if (edge && high) event = GPIO_IRQ_EDGE_RISE;
-    if (edge && low) event = GPIO_IRQ_EDGE_FALL;
+    if (edge) {
+        event = high ? GPIO_IRQ_EDGE_RISE : GPIO_IRQ_EDGE_FALL;
+    } else { // level
+        event = high ? GPIO_IRQ_LEVEL_HIGH : GPIO_IRQ_LEVEL_LOW;
+    }
 
     gpio_set_input_enabled(gpio_pin, true);
     gpio_set_dormant_irq_enabled(gpio_pin, event, true);

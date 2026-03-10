@@ -136,8 +136,8 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const 
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
  *
  * \if (!rp2040_specific)
- * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be run from the ROSC while dormant so
- * it can be stopped, while clk_ref will be run from the LPOSC so that continues running for the timer.
+ * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be switched to the ROSC while dormant so
+ * it can be stopped, while clk_ref will be run from the LPOSC so that it continues running for the timer.
  * \endif
  *
  * \param until The time to go dormant until.
