@@ -35,14 +35,14 @@ static inline double double2ufix_12(int32_t m) { return double2ufix(m, 12); }
 #endif
 
 #if LIB_PICO_DOUBLE_COMPILER || defined(__riscv)
-#define double2int_z(f) ({ double _d = f; pico_default_asm_volatile("" : "+r" (_d)); double2 ## int_z(_d); })
-#define double2uint_z(f) ({ double _d = f; pico_default_asm_volatile("" : "+r" (_d)); double2 ## uint_z(_d); })
-#define double2int64_z(f) ({ double _d = f; pico_default_asm_volatile("" : "+r" (_d)); double2 ## int64_z(_d); })
-#define double2uint64_z(f) ({ double _d = f; pico_default_asm_volatile("" : "+r" (_d)); double2 ## uint64_z(_d); })
+#define double2int_z(d) ({ double _d = d; pico_default_asm_volatile("" : "+r" (_d)); double2 ## int_z(_d); })
+#define double2uint_z(d) ({ double _d = d; pico_default_asm_volatile("" : "+r" (_d)); double2 ## uint_z(_d); })
+#define double2int64_z(d) ({ double _d = d; pico_default_asm_volatile("" : "+r" (_d)); double2 ## int64_z(_d); })
+#define double2uint64_z(d) ({ double _d = d; pico_default_asm_volatile("" : "+r" (_d)); double2 ## uint64_z(_d); })
 #define int2double(i) ({ int32_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); int2 ## double(_i); })
-#define uint2double(i) ({ uint32_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); uint2 ## double(_i); })
+#define uint2double(u) ({ uint32_t _u = u; pico_default_asm_volatile("" : "+r" (_u)); uint2 ## double(_u); })
 #define int642double(i) ({ int64_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); int642 ## double(_i); })
-#define uint642double(i) ({ uint64_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); uint642 ## double(_i); })
+#define uint642double(u) ({ uint64_t _u = u; pico_default_asm_volatile("" : "+r" (_u)); uint642 ## double(_u); })
 #endif
 
 double make_positive_denormal_double(void) {

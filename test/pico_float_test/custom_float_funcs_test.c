@@ -44,9 +44,9 @@ static inline float float2ufix_12(int32_t m) { return float2ufix(m, 12); }
 #define float2int64_z(f) ({ float _f = f; pico_default_asm_volatile("" : FREG (_f)); float2 ## int64_z(_f); })
 #define float2uint64_z(f) ({ float _f = f; pico_default_asm_volatile("" : FREG (_f)); float2 ## uint64_z(_f); })
 #define int2float(i) ({ int32_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); int2 ## float(_i); })
-#define uint2float(i) ({ uint32_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); uint2 ## float(_i); })
+#define uint2float(u) ({ uint32_t _u = u; pico_default_asm_volatile("" : "+r" (_u)); uint2 ## float(_u); })
 #define int642float(i) ({ int64_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); int642 ## float(_i); })
-#define uint642float(i) ({ uint64_t _i = i; pico_default_asm_volatile("" : "+r" (_i)); uint642 ## float(_i); })
+#define uint642float(u) ({ uint64_t _u = u; pico_default_asm_volatile("" : "+r" (_u)); uint642 ## float(_u); })
 #endif
 
 float make_positive_denormal_float(void) {
