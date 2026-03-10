@@ -117,7 +117,7 @@ int test() {
     test_checkd(int642double(INT32_MIN+1ll), -2147483647.0, "int642double9");
     // todo test correct rounding around maximum precision
     test_checkd(int642double(INT64_MAX), 9223372036854775807.0, "int642double10");
-    test_checkd(int642double(INT64_MIN), -9223372036854775808.0, "int642doubl11e");
+    test_checkd(int642double(INT64_MIN), -9223372036854775808.0, "int642double11");
 
     printf("uint642double\n");
     test_checkd(uint642double(0), 0.0, "uint642double1");
@@ -147,23 +147,25 @@ int test() {
     test_checkd(ufix2double(0xa0000000, 30), 2.5, "ufix2double1");
     test_checkd(ufix2double(3, -4), 48.0, "ufix2double2");
 
+    printf("fix2double_N\n");
     test_checkd(fix2double_8(128), 0.5, "fix2double_8_1");
     test_checkd(fix2double_8(-128), -0.5, "fix2double_8_2");
-    test_checkd(fix2double_16(8192), 0.125, "fix2double_8_3");
-    test_checkd(fix2double_16(-8192), -0.125, "fix2double_8_4");
-    test_checkd(fix2double_24(3<<23), 1.5, "fix2double_8_5");
-    test_checkd(fix2double_24(-(3<<23)), -1.5, "fix2double_8_6");
+    test_checkd(fix2double_16(8192), 0.125, "fix2double_16_1");
+    test_checkd(fix2double_16(-8192), -0.125, "fix2double_16_2");
+    test_checkd(fix2double_24(3<<23), 1.5, "fix2double_24_1");
+    test_checkd(fix2double_24(-(3<<23)), -1.5, "fix2double_24_2");
 
-    test_checkd(ufix2double_8(128), 0.5, "fix2double_8_1");
+    printf("ufix2double_N\n");
+    test_checkd(ufix2double_8(128), 0.5, "ufix2double_8_1");
     test_checkd(ufix2double_8(-128), 16777215.5, "ufix2double_8_2");
-    test_checkd(ufix2double_16(8192), 0.125, "ufix2double_8_3");
-    test_checkd(ufix2double_16(-8192), 65535.875, "ufix2double_8_4");
-    test_checkd(ufix2double_24(3<<23), 1.5, "ufix2double_8_5");
-    test_checkd(ufix2double_24(-(3<<23)), 254.5, "ufix2double_8_6");
+    test_checkd(ufix2double_16(8192), 0.125, "ufix2double_16_1");
+    test_checkd(ufix2double_16(-8192), 65535.875, "ufix2double_16_2");
+    test_checkd(ufix2double_24(3<<23), 1.5, "ufix2double_24_1");
+    test_checkd(ufix2double_24(-(3<<23)), 254.5, "ufix2double_24_2");
 #endif
 
 #if PICO_DOUBLE_HAS_FIX64_TO_DOUBLE_CONVERSIONS
-    printf("fix64double\n");
+    printf("fix642double\n");
     // todo test correct rounding around maximum precision
     test_checkd(fix642double(-0xa000000000ll, 38), -2.5, "fix642double1");
     test_checkd(fix642double(-3, -34), -51539607552.0, "fix642double2");
@@ -171,7 +173,7 @@ int test() {
     printf("ufix642double\n");
     // todo test correct rounding around maximum precision
     test_checkd(ufix642double(0xa000000000ll, 38), 2.5, "ufix642double1");
-    test_checkd(ufix642double(3, -34), 51539607552.0, "fix64double2");
+    test_checkd(ufix642double(3, -34), 51539607552.0, "ufix642double2");
 #endif
 
 #if PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_M_CONVERSIONS
@@ -255,7 +257,7 @@ int test() {
     test_checki64(double2fix64(-3.24999, 2), -13, "double2fix648");
     test_checki64(double2fix64(-3.25, 2), -13, "double2fix649");
     test_checki64(double2fix64(-3.0, -1), -2, "double2fix6410"); // not very useful
-    test_checki64(double2fix64(2147483648.0 * 2147483648.0, 16), INT64_MAX, "double2ufix6411");
+    test_checki64(double2fix64(2147483648.0 * 2147483648.0, 16), INT64_MAX, "double2fix6411");
     test_checki64(double2fix64(0.0, 16), 0, "double2fix6412");
     test_checki64(double2fix64(-0.0, 16), 0, "double2fix6413");
     test_checki64(double2fix64(0.0, -16), 0, "double2fix6412b");
@@ -362,10 +364,10 @@ int test() {
     test_checku(double2ufix_z(3.24999, 2), 12, "double2ufix_z6");
     test_checku(double2ufix_z(3.25, 2), 13, "double2ufix_z7");
     test_checku(double2ufix_z(3.0, -1), 1, "double2ufix_z8"); // not very useful
-    test_checki(double2ufix_z(0.0, 16), 0, "double2ufix_z9");
-    test_checki(double2ufix_z(-0.0, 16), 0, "double2ufix_z10");
-    test_checki(double2ufix_z(0.0, -16), 0, "double2ufix_z11");
-    test_checki(double2ufix_z(-0.0, -16), 0, "double2ufix_z12");
+    test_checku(double2ufix_z(0.0, 16), 0, "double2ufix_z9");
+    test_checku(double2ufix_z(-0.0, 16), 0, "double2ufix_z10");
+    test_checku(double2ufix_z(0.0, -16), 0, "double2ufix_z11");
+    test_checku(double2ufix_z(-0.0, -16), 0, "double2ufix_z12");
     u64d.u = 0x7fe0000000012345ull;
     test_checku(double2ufix_z(u64d.d, 0), UINT32_MAX, "double2ufix_z13a");
     test_checku(double2ufix_z(u64d.d, 1), UINT32_MAX, "double2ufix_z13b");
@@ -433,7 +435,7 @@ int test() {
     test_checku64(double2ufix64_z(-3.5, 8), 0, "double2ufix64_z2");
     test_checku64(double2ufix64_z(32768.0, 16), 32768ll << 16, "double2ufix64_z3");
     test_checku64(double2ufix64_z(65536.0, 16), 65536ll << 16, "double2ufix64_z4");
-    test_checki64(double2ufix64_z(65536.0 * 65536.0 * 65536.0, 16), UINT64_MAX, "double2ufix64_z4b");
+    test_checku64(double2ufix64_z(65536.0 * 65536.0 * 65536.0, 16), UINT64_MAX, "double2ufix64_z4b");
     test_checku64(double2ufix64_z(INFINITY, 16), UINT64_MAX, "double2ufix64_z5");
     test_checku64(double2ufix64_z(-INFINITY, 16), 0, "double2ufix64_z5b");
     test_checku64(double2ufix64_z(INFINITY, -16), UINT64_MAX, "double2ufix64_z5c");

@@ -243,18 +243,18 @@ int test() {
     printf("fix2float_N\n");
     test_checkf(fix2float_8(128), 0.5f, "fix2float_8_1");
     test_checkf(fix2float_8(-128), -0.5f, "fix2float_8_2");
-    test_checkf(fix2float_16(8192), 0.125f, "fix2float_8_3");
-    test_checkf(fix2float_16(-8192), -0.125f, "fix2float_8_4");
-    test_checkf(fix2float_24(3<<23), 1.5f, "fix2float_8_5");
-    test_checkf(fix2float_24(-(3<<23)), -1.5f, "fix2float_8_6");
+    test_checkf(fix2float_16(8192), 0.125f, "fix2float_16_1");
+    test_checkf(fix2float_16(-8192), -0.125f, "fix2float_16_2");
+    test_checkf(fix2float_24(3<<23), 1.5f, "fix2float_24_1");
+    test_checkf(fix2float_24(-(3<<23)), -1.5f, "fix2float_24_2");
 
     printf("ufix2float_N\n");
     test_checkf(ufix2float_8(128), 0.5f, "ufix2float_8_1");
     test_checkf(ufix2float_8(-128), 16777216.f, "ufix2float_8_2");
-    test_checkf(ufix2float_16(8192), 0.125f, "ufix2floa4t_8_3");
-    test_checkf(ufix2float_16(-8192), 65535.875f, "ufix2float_8_4");
-    test_checkf(ufix2float_24(3<<23), 1.5f, "ufix2float_8_5");
-    test_checkf(ufix2float_24(-(3<<23)), 254.5f, "ufix2float_8_6");
+    test_checkf(ufix2float_16(8192), 0.125f, "ufix2float_16_1");
+    test_checkf(ufix2float_16(-8192), 65535.875f, "ufix2float_16_2");
+    test_checkf(ufix2float_24(3<<23), 1.5f, "ufix2float_24_1");
+    test_checkf(ufix2float_24(-(3<<23)), 254.5f, "ufix2float_24_2");
 
 #endif
 
@@ -436,8 +436,6 @@ int test() {
     test_checku64(float2ufix64(-INFINITY, -16), 0, "float2ufix645d");
     test_checku64(float2ufix64(INFINITY, 0), UINT64_MAX, "float2ufix645e");
     test_checku64(float2ufix64(-INFINITY, 0), 0, "float2ufix645f");
-    test_checku64(float2ufix64(INFINITY, 16), UINT64_MAX, "float2ufix645");
-    test_checku64(float2ufix64(-INFINITY, 16), 0, "float2ufix645b");
     test_checku64(float2ufix64(3.24999f, 2), 12, "float2ufix646");
     test_checku64(float2ufix64(3.25f, 2), 13, "float2ufix647");
     test_checku64(float2ufix64(3.0f, -1), 1, "float2ufix648"); // not very useful
@@ -748,7 +746,7 @@ int test() {
     test_checki(call_float2int_z(make_negative_denormal_float()), 0, "call_float2int_z13");
 #endif
 
-        printf("float2uint_z\n");
+    printf("float2uint_z\n");
     test_checku(float2uint_z(0.0f), 0, "float2uint_z1");
     test_checku(float2uint_z(0.25f), 0, "float2uint_z2");
     test_checku(float2uint_z(0.5f), 0, "float2uint_z3");
