@@ -95,8 +95,9 @@ void rtc_disable_alarm(void);
  *
  * \param src_hz The frequency of the external clock source
  * \param gpio_pin The input pin providing the external clock (GP20 or GP22)
+ * \return true if it is possible to run the RTC from the external clock frequency, false otherwise.
  */
-void rtc_run_from_external_source(uint src_hz, uint gpio_pin);
+bool rtc_run_from_external_source(uint32_t src_hz, uint gpio_pin);
 
 #ifdef __cplusplus
 }

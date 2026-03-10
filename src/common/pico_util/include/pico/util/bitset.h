@@ -66,6 +66,7 @@ static inline generic_bitset_t *bitset_write_word(generic_bitset_t *bitset, uint
     if (word_num < bitset_word_size(bitset)) {
         bitset->words[word_num] = value;
     }
+    return bitset;
 }
 
 static inline uint32_t bitset_read_word(const generic_bitset_t *bitset, uint word_num) {
