@@ -581,8 +581,8 @@ static inline bool set_sys_clock_khz(uint32_t freq_khz, bool required) {
 #include "pico/util/bitset.h"
 
 typedef bitset_type_t(NUM_CLOCK_DESTINATIONS) clock_dest_set_t;
-#define clock_dest_set_none() ({ clock_dest_set_t bitset; bitset_init(&bitset, clock_dest_set_t, NUM_CLOCK_DESTINATIONS, 0); bitset; })
-#define clock_dest_set_all() ({ clock_dest_set_t bitset; bitset_init(&bitset, clock_dest_set_t, NUM_CLOCK_DESTINATIONS, 1); bitset; })
+#define clock_dest_set_none() bitset_with_value(clock_dest_set_t, NUM_CLOCK_DESTINATIONS, 0)
+#define clock_dest_set_all() bitset_with_value(clock_dest_set_t, NUM_CLOCK_DESTINATIONS, 1)
 
 static inline clock_dest_set_t *clock_dest_set_clear(clock_dest_set_t *dests) {
     bitset_clear(&dests->bitset);

@@ -173,8 +173,8 @@ typedef enum powman_power_domains powman_power_domain_t;
 typedef uint32_t powman_power_state;
 
 typedef bitset_type_t(POWMAN_POWER_DOMAIN_COUNT) pstate_bitset_t;
-#define pstate_bitset_none() ({ pstate_bitset_t bitset; bitset_init(&bitset, pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 0); bitset; })
-#define pstate_bitset_all() ({ pstate_bitset_t bitset; bitset_init(&bitset, pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 1); bitset; })
+#define pstate_bitset_none() bitset_with_value(pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 0)
+#define pstate_bitset_all() bitset_with_value(pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 1)
 
 static inline pstate_bitset_t *pstate_bitset_clear(pstate_bitset_t *domains) {
     bitset_clear(&domains->bitset);
