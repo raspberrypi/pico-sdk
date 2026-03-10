@@ -94,12 +94,12 @@ int main() {
     printf("Going to non-exclusive sleep until GPIO wakeup\n");
 
     // need to keep the timer running
-    clock_dest_set_t keep_enabled = clock_dest_set_none();
+    clock_dest_bitset_t keep_enabled = clock_dest_bitset_none();
 #if PICO_RP2040
-    clock_dest_set_add(&keep_enabled, CLK_DEST_SYS_TIMER);
+    clock_dest_bitset_add(&keep_enabled, CLK_DEST_SYS_TIMER);
 #else
-    clock_dest_set_add(&keep_enabled, CLK_DEST_SYS_TIMER0);
-    clock_dest_set_add(&keep_enabled, CLK_DEST_REF_TICKS);
+    clock_dest_bitset_add(&keep_enabled, CLK_DEST_SYS_TIMER0);
+    clock_dest_bitset_add(&keep_enabled, CLK_DEST_REF_TICKS);
 #endif
 
     low_power_sleep_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, &keep_enabled, false);

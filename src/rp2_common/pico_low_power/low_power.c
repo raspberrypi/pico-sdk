@@ -54,7 +54,7 @@ static void prepare_for_clock_gating(void) {
 
 static void post_clock_gating(void) {
     // restore all clocks in sleep mode, to prevent other __wfi from causing issues
-    clock_dest_set_t all = clock_dest_set_all();
+    clock_dest_bitset_t all = clock_dest_bitset_all();
     clock_gate_sleep_en(&all);
 }
 
@@ -150,25 +150,25 @@ static void low_power_wakeup_gpio(__unused uint gpio, __unused uint32_t event_ma
     low_power_wakeup();
 }
 
-static void replace_null_enable_values(const clock_dest_set_t *keep_enabled,
-                                       clock_dest_set_t *local_keep_enabled) {
+static void replace_null_enable_values(const clock_dest_bitset_t *keep_enabled,
+                                       clock_dest_bitset_t *local_keep_enabled) {
     if (keep_enabled) {
         *local_keep_enabled = *keep_enabled;
     } else {
         // default to keep nothing on
-        *local_keep_enabled = clock_dest_set_none();
+        *local_keep_enabled = clock_dest_bitset_none();
     }
 }
 
-static void add_library_clocks(clock_dest_set_t *local_keep_enabled) {
+static void add_library_clocks(clock_dest_bitset_t *local_keep_enabled) {
 #if LIB_PICO_STDIO_USB || LIB_TINYUSB_HOST || LIB_TINYUSB_DEVICE
     // this is necessary to prevent dropping the connection
     #if PICO_RP2040
-        clock_dest_set_add(local_keep_enabled, CLK_DEST_SYS_USBCTRL);
-        clock_dest_set_add(local_keep_enabled, CLK_DEST_USB_USBCTRL);
+        clock_dest_bitset_add(local_keep_enabled, CLK_DEST_SYS_USBCTRL);
+        clock_dest_bitset_add(local_keep_enabled, CLK_DEST_USB_USBCTRL);
     #elif PICO_RP2350
-        clock_dest_set_add(local_keep_enabled, CLK_DEST_SYS_USBCTRL);
-        clock_dest_set_add(local_keep_enabled, CLK_DEST_USB);
+        clock_dest_bitset_add(local_keep_enabled, CLK_DEST_SYS_USBCTRL);
+        clock_dest_bitset_add(local_keep_enabled, CLK_DEST_USB);
     #else
     #error Unknown processor
     #endif
@@ -176,8 +176,8 @@ static void add_library_clocks(clock_dest_set_t *local_keep_enabled) {
 
 #if LIB_PICO_STDIO_UART
     // this is only needed to prevent losing stdin while sleeping
-    clock_dest_set_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_PERI_UART1 : CLK_DEST_PERI_UART0);
-    clock_dest_set_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_SYS_UART1 : CLK_DEST_SYS_UART0);
+    clock_dest_bitset_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_PERI_UART1 : CLK_DEST_PERI_UART0);
+    clock_dest_bitset_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_SYS_UART1 : CLK_DEST_SYS_UART0);
 #endif
 }
 
@@ -202,8 +202,8 @@ static void restore_other_interrupts(void) {
     }
 }
 
-int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled) {
-    clock_dest_set_t local_keep_enabled;
+int low_power_sleep_until_irq(const clock_dest_bitset_t *keep_enabled) {
+    clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
     add_library_clocks(&local_keep_enabled);
@@ -224,7 +224,7 @@ int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled) {
 
 // only the deep_sleep variant of this, as DORMANT cannot wake from TIMER
 int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
-                                const clock_dest_set_t *keep_enabled, bool exclusive) {
+                                const clock_dest_bitset_t *keep_enabled, bool exclusive) {
     int alarm_num = timer_hardware_alarm_claim_unused(timer, false);
     if (alarm_num < 0) return PICO_ERROR_INSUFFICIENT_RESOURCES;
 
@@ -236,13 +236,13 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
         return 0;
     }
 
-    clock_dest_set_t local_keep_enabled;
+    clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 #if PICO_RP2040
-    clock_dest_set_add(&local_keep_enabled, CLK_DEST_SYS_TIMER);
+    clock_dest_bitset_add(&local_keep_enabled, CLK_DEST_SYS_TIMER);
 #elif PICO_RP2350
-    clock_dest_set_add(&local_keep_enabled, timer_get_index(timer) ? CLK_DEST_SYS_TIMER1 : CLK_DEST_SYS_TIMER0);
-    clock_dest_set_add(&local_keep_enabled, CLK_DEST_REF_TICKS);
+    clock_dest_bitset_add(&local_keep_enabled, timer_get_index(timer) ? CLK_DEST_SYS_TIMER1 : CLK_DEST_SYS_TIMER0);
+    clock_dest_bitset_add(&local_keep_enabled, CLK_DEST_REF_TICKS);
 #else
 #error Unknown processor
 #endif
@@ -277,11 +277,11 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
 }
 
 int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
-                                     const clock_dest_set_t *keep_enabled, bool exclusive) {
+                                     const clock_dest_bitset_t *keep_enabled, bool exclusive) {
 
     event_happened = false;
 
-    clock_dest_set_t local_keep_enabled;
+    clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
     add_library_clocks(&local_keep_enabled);
@@ -444,16 +444,16 @@ void low_power_go_dormant(dormant_clock_source_t dormant_clock_source) {
 int low_power_dormant_until_aon_timer(absolute_time_t until,
                                       dormant_clock_source_t dormant_clock_source,
                                       uint src_hz, uint gpio_pin,
-                                      const clock_dest_set_t *keep_enabled) {
+                                      const clock_dest_bitset_t *keep_enabled) {
     low_power_setup_clocks_for_dormant(dormant_clock_source);
 
-    clock_dest_set_t local_keep_enabled;
+    clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
 #if PICO_RP2040
     // The RTC must be run from an external source, since the dormant source will be inactive
     rtc_run_from_external_source(src_hz, gpio_pin);
-    clock_dest_set_add(&local_keep_enabled, CLK_DEST_RTC_RTC);
+    clock_dest_bitset_add(&local_keep_enabled, CLK_DEST_RTC_RTC);
 #elif PICO_RP2350
     ((void)src_hz);
     ((void)gpio_pin);
@@ -462,7 +462,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     else
         return PICO_ERROR_INVALID_ARG;
 
-    clock_dest_set_add(&local_keep_enabled, CLK_DEST_REF_POWMAN);
+    clock_dest_bitset_add(&local_keep_enabled, CLK_DEST_REF_POWMAN);
 #else
     #error Unknown processor
 #endif
@@ -491,11 +491,11 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
 
 int low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
                                        dormant_clock_source_t dormant_clock_source,
-                                       const clock_dest_set_t *keep_enabled) {
+                                       const clock_dest_bitset_t *keep_enabled) {
 
     low_power_setup_clocks_for_dormant(dormant_clock_source);
 
-    clock_dest_set_t local_keep_enabled;
+    clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
     // Configure the appropriate IRQ at IO bank 0

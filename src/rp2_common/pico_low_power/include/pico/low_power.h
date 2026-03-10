@@ -87,7 +87,7 @@ typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
  * \param keep_enabled The clocks to keep enabled during sleep.
  * \return 0 on success, non-zero on error.
  */
-int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled);
+int low_power_sleep_until_irq(const clock_dest_bitset_t *keep_enabled);
 
 /*! \brief  Sleep until time using timer
  *  \ingroup pico_low_power
@@ -100,7 +100,7 @@ int low_power_sleep_until_irq(const clock_dest_set_t *keep_enabled);
  * \param exclusive Whether to only listen for the timer interrupt, or other interrupts.
  * \return 0 on success, non-zero on error.
  */
-int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until, const clock_dest_set_t *keep_enabled, bool exclusive);
+int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until, const clock_dest_bitset_t *keep_enabled, bool exclusive);
 
 /*! \brief  Sleep until time using default timer
  *  \ingroup pico_low_power
@@ -111,7 +111,7 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until, const 
  * \param exclusive Whether to only listen for the timer interrupt, or other interrupts.
  * \return 0 on success, non-zero on error.
  */
-static inline int low_power_sleep_until_default_timer(absolute_time_t until, const clock_dest_set_t *keep_enabled, bool exclusive) {
+static inline int low_power_sleep_until_default_timer(absolute_time_t until, const clock_dest_bitset_t *keep_enabled, bool exclusive) {
     return low_power_sleep_until_timer(PICO_DEFAULT_TIMER_INSTANCE(), until, keep_enabled, exclusive);
 }
 
@@ -128,7 +128,7 @@ static inline int low_power_sleep_until_default_timer(absolute_time_t until, con
  * \param exclusive Whether to only listen for the GPIO interrupt, or other interrupts.
  * \return 0 on success, non-zero on error.
  */
-int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_set_t *keep_enabled, bool exclusive);
+int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_bitset_t *keep_enabled, bool exclusive);
 
 /*! \brief  Go dormant until time using AON timer
  *  \ingroup pico_low_power
@@ -147,7 +147,7 @@ int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const c
  * \param keep_enabled The clocks to keep enabled during dormant.
  * \return 0 on success, non-zero on error.
  */
-int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_source_t dormant_clock_source, uint src_hz, uint gpio_pin, const clock_dest_set_t *keep_enabled);
+int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_source_t dormant_clock_source, uint src_hz, uint gpio_pin, const clock_dest_bitset_t *keep_enabled);
 
 /*! \brief  Go dormant until pin state changes
  *  \ingroup pico_low_power
@@ -166,7 +166,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
  * \param keep_enabled The clocks to keep enabled during dormant.
  * \return 0 on success, non-zero on error.
  */
-int low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_set_t *keep_enabled);
+int low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_bitset_t *keep_enabled);
 
 #if HAS_POWMAN_TIMER
 /*! \brief  Go to Pstate until time using AON timer

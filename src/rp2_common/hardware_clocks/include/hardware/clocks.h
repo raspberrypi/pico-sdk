@@ -580,32 +580,32 @@ static inline bool set_sys_clock_khz(uint32_t freq_khz, bool required) {
 
 #include "pico/util/bitset.h"
 
-typedef bitset_type_t(NUM_CLOCK_DESTINATIONS) clock_dest_set_t;
-#define clock_dest_set_none() bitset_with_value(clock_dest_set_t, NUM_CLOCK_DESTINATIONS, 0)
-#define clock_dest_set_all() bitset_with_value(clock_dest_set_t, NUM_CLOCK_DESTINATIONS, 1)
+typedef bitset_type_t(NUM_CLOCK_DESTINATIONS) clock_dest_bitset_t;
+#define clock_dest_bitset_none() bitset_with_value(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 0)
+#define clock_dest_bitset_all() bitset_with_value(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 1)
 
-static inline clock_dest_set_t *clock_dest_set_clear(clock_dest_set_t *dests) {
+static inline clock_dest_bitset_t *clock_dest_bitset_clear(clock_dest_bitset_t *dests) {
     bitset_clear(&dests->bitset);
     return dests;
 }
 
-static inline clock_dest_set_t *clock_dest_set_add_all(clock_dest_set_t *dests) {
+static inline clock_dest_bitset_t *clock_dest_bitset_add_all(clock_dest_bitset_t *dests) {
     bitset_set_all(&dests->bitset);
     return dests;
 }
 
-static inline clock_dest_set_t *clock_dest_set_add(clock_dest_set_t *dests, clock_dest_num_t dest) {
+static inline clock_dest_bitset_t *clock_dest_bitset_add(clock_dest_bitset_t *dests, clock_dest_num_t dest) {
     bitset_set_bit(&dests->bitset, dest);
     return dests;
 }
 
-static inline clock_dest_set_t *clock_dest_set_remove(clock_dest_set_t *dests, clock_dest_num_t dest) {
+static inline clock_dest_bitset_t *clock_dest_bitset_remove(clock_dest_bitset_t *dests, clock_dest_num_t dest) {
     bitset_clear_bit(&dests->bitset, dest);
     return dests;
 }
 
-void clock_get_sleep_en_gate(clock_dest_set_t *clocks);
-void clock_gate_sleep_en(const clock_dest_set_t *clocks);
+void clock_get_sleep_en_gate(clock_dest_bitset_t *clocks);
+void clock_gate_sleep_en(const clock_dest_bitset_t *clocks);
 
 #define GPIO_TO_GPOUT_CLOCK_HANDLE_RP2040(gpio, default_clk_handle) \
     ((gpio) == 21 ? clk_gpout0 :                        \
