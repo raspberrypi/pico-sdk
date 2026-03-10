@@ -34,13 +34,17 @@ uint rosc_measure_freq_khz(void) {
 }
 
 void rosc_set_div(uint32_t div) {
-    assert(div <= 31 && div >= 1);
+#if PICO_RP2040
+    assert(div <= 31 && div >= 0);
+#else
+    assert(div <= 127 && div >= 0);
+#endif
     rosc_write(&rosc_hw->div, ROSC_DIV_VALUE_PASS + div);
 }
 
 void rosc_set_freq(uint32_t code) {
     rosc_write(&rosc_hw->freqa, (ROSC_FREQA_PASSWD_VALUE_PASS << ROSC_FREQA_PASSWD_LSB) | (code & 0xffffu));
-    rosc_write(&rosc_hw->freqb, (ROSC_FREQA_PASSWD_VALUE_PASS << ROSC_FREQA_PASSWD_LSB) | (code >> 16u));
+    rosc_write(&rosc_hw->freqb, (ROSC_FREQB_PASSWD_VALUE_PASS << ROSC_FREQB_PASSWD_LSB) | (code >> 16u));
 }
 
 void rosc_set_range(uint range) {

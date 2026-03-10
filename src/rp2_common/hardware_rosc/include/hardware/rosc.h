@@ -20,7 +20,7 @@ extern "C" {
  * Ring Oscillator (ROSC) API
  *
  * A Ring Oscillator is an on-chip oscillator that requires no external crystal. Instead, the output is generated from a series of
- * inverters that are chained together to create a feedback loop. RP2040 boots from the ring oscillator initially, meaning the
+ * inverters that are chained together to create a feedback loop. RP2 chips boot from the ring oscillator initially, meaning the
  * first stages of the bootrom, including booting from SPI flash, will be clocked by the ring oscillator. If your design has a
  * crystal oscillator, you’ll likely want to switch to this as your reference clock as soon as possible, because the frequency is
  * more accurate than the ring oscillator.
@@ -29,7 +29,7 @@ extern "C" {
 /*! \brief  Set frequency of the Ring Oscillator
  *  \ingroup hardware_rosc
  *
- * \param code The drive strengths. See the RP2040 datasheet for information on this value.
+ * \param code The drive strengths. See the datasheet for information on this value.
  */
 void rosc_set_freq(uint32_t code);
 
@@ -67,8 +67,15 @@ void rosc_set_dormant(void);
 */
 void rosc_restart(void);
 
-// FIXME: Add doxygen
-
+/*! \brief  Get the next ROSC freq code
+ *  \ingroup hardware_rosc
+ * 
+ * Given a ROSC freq code, return the next-numerically-higher code.
+ * Top result bit is set when called on maximum ROSC code.
+ *
+ * \param code The current ROSC freq code.
+ * \return The next ROSC freq code.
+ */
 uint32_t next_rosc_code(uint32_t code);
 
 /*! \brief  Set the frequency of the Ring Oscillator within a range
@@ -89,6 +96,23 @@ uint rosc_find_freq_mhz(uint32_t low_mhz, uint32_t high_mhz);
  */
 uint rosc_measure_freq_khz(void);
 
+/*! \brief  Set the output divider of the Ring Oscillator
+ *  \ingroup hardware_rosc
+ *
+ * \if rp2040_specific
+ * div = 0 divides by 32
+ * div = 1-31 divides by div
+ * any other value sets div=31
+ * \endif
+ *
+ * \if rp2350_specific
+ * div = 0 divides by 128
+ * div = 1-127 divides by div
+ * any other value sets div=128
+ * \endif
+ *
+ * \param div The output divider.
+ */
 void rosc_set_div(uint32_t div);
 
 inline static void rosc_clear_bad_write(void) {
@@ -99,6 +123,14 @@ inline static bool rosc_write_okay(void) {
     return !(rosc_hw->status & ROSC_STATUS_BADWRITE_BITS);
 }
 
+/*! \brief  Checked write to a Ring Oscillator register
+ *  \ingroup hardware_rosc
+ * 
+ * Clears the bad write flag and asserts that the write is okay.
+ *
+ * \param addr The register address.
+ * \param value The value to write.
+ */
 inline static void rosc_write(io_rw_32 *addr, uint32_t value) {
     rosc_clear_bad_write();
     assert(rosc_write_okay());
