@@ -128,7 +128,7 @@ static inline int low_power_sleep_until_default_timer(absolute_time_t until, con
  * \param exclusive Whether to only listen for the GPIO interrupt, or other interrupts.
  * \return 0 on success, non-zero on error.
  */
-void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_set_t *keep_enabled, bool exclusive);
+int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_set_t *keep_enabled, bool exclusive);
 
 /*! \brief  Go dormant until time using AON timer
  *  \ingroup pico_low_power
@@ -164,8 +164,9 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
  * \param high Whether to listen for high level / rising edge (true), or  low level / falling edge (false).
  * \param dormant_clock_source The clock source to use for dormant.
  * \param keep_enabled The clocks to keep enabled during dormant.
+ * \return 0 on success, non-zero on error.
  */
-void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_set_t *keep_enabled);
+int low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_set_t *keep_enabled);
 
 #if HAS_POWMAN_TIMER
 /*! \brief  Go to Pstate until time using AON timer

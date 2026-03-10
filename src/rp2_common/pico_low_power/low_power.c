@@ -181,10 +181,13 @@ static void add_library_clocks(clock_dest_set_t *local_keep_enabled) {
 #endif
 }
 
-static uint32_t irq_mask_disabled_during_sleep[((NUM_IRQS-1) / 32)];
+// Ceiling division of NUM_IRQS by 32
+#define NUM_IRQ_WORDS ((NUM_IRQS / 32) + ((NUM_IRQS % 32) > 0))
+
+static uint32_t irq_mask_disabled_during_sleep[NUM_IRQ_WORDS];
 
 static void save_and_disable_other_interrupts(uint32_t irq) {
-    for (uint n = 0; n <= ((NUM_IRQS-1) / 32); n++) {
+    for (uint n = 0; n < NUM_IRQ_WORDS; n++) {
         irq_mask_disabled_during_sleep[n] = irq_get_mask_n(n);
         if (irq >= n * 32 && irq < (n + 1) * 32) {
             irq_mask_disabled_during_sleep[n] &= ~(1u << (irq % 32));
@@ -194,7 +197,7 @@ static void save_and_disable_other_interrupts(uint32_t irq) {
 }
 
 static void restore_other_interrupts(void) {
-    for (uint n = 0; n < NUM_IRQS; n++) {
+    for (uint n = 0; n < NUM_IRQ_WORDS; n++) {
         irq_set_mask_n_enabled(n, irq_mask_disabled_during_sleep[n], true);
     }
 }
@@ -273,7 +276,7 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
     return 0;
 }
 
-void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
+int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
                                      const clock_dest_set_t *keep_enabled, bool exclusive) {
 
     event_happened = false;
@@ -315,6 +318,8 @@ void low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
     post_clock_gating();
 
     if (exclusive) restore_other_interrupts();
+
+    return 0;
 }
 
 // In order to go into dormant mode we need to be running from a stoppable clock source:
@@ -484,7 +489,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     return 0;
 }
 
-void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
+int low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
                                        dormant_clock_source_t dormant_clock_source,
                                        const clock_dest_set_t *keep_enabled) {
 
@@ -521,6 +526,8 @@ void low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
     gpio_set_dormant_irq_enabled(gpio_pin, event, false);
 
     low_power_wake_from_dormant();
+
+    return 0;
 }
 
 #if HAS_POWMAN_TIMER
@@ -551,15 +558,11 @@ pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
         pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_XIP_CACHE);
     } else if ((uint32_t)__persistent_data_start__ < SRAM4_BASE) {
         pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK0);
-    } else {
-        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1);
-    }
 
-    // Keep __persistent_data_end__ on
-    if ((uint32_t)__persistent_data_end__ < SRAM_BASE) {
-        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_XIP_CACHE);
-    } else if ((uint32_t)__persistent_data_end__ < SRAM4_BASE) {
-        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+        // Keep __persistent_data_end__ on too, if it is in SRAM bank 1
+        if ((uint32_t)__persistent_data_end__ >= SRAM4_BASE) {
+            pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+        }
     } else {
         pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1);
     }
@@ -675,11 +678,10 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_low_power_cache_unpin, PICO_RUNTIME_
 void __weak __not_in_flash_func(runtime_init_rp2350_sleep_fix)(void) {
     if (watchdog_hw->reason && WATCHDOG_REASON_TIMER_BITS) { // detect rom_reboot() usage
         uint32_t flags = save_and_disable_interrupts();
-        int32_t num_irq_words = (NUM_IRQS + 31u) / 32u;
 
         // Clear (and save) NVIC mask so only the dummy can fire
-        uint32_t saved_irq_mask[num_irq_words];
-        for (int i = 0; i < num_irq_words; ++i) {
+        uint32_t saved_irq_mask[NUM_IRQ_WORDS];
+        for (uint i = 0; i < NUM_IRQ_WORDS; ++i) {
             saved_irq_mask[i] = nvic_hw->icer[i];
             nvic_hw->icer[i] = -1u;
         }
@@ -703,7 +705,7 @@ void __weak __not_in_flash_func(runtime_init_rp2350_sleep_fix)(void) {
 
         // Restore NVIC mask
         nvic_hw->icer[dummy_irq_idx] = 1u << dummy_irq_bit;
-        for (int i = 0; i < num_irq_words; ++i) {
+        for (uint i = 0; i < NUM_IRQ_WORDS; ++i) {
             nvic_hw->iser[i] = saved_irq_mask[i];
         }
 
