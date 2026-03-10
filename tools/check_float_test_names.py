@@ -7,7 +7,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 
 ENFORCE_SEQUENTIAL_SUFFIXES = True # if False, allow "double2ufix8" to be followed by "double2ufix12"
-ENFORCE_UNDERSCORE_IN_SUFFIX_IF_FUNCTION_ENDS_WITH_NUMBER = False # if False, allow "float2fix641"
+ENFORCE_UNDERSCORE_IN_SUFFIX_IF_FUNCTION_ENDS_WITH_NUMBER = True # if False, allow "float2fix641"
 ALLOW_TEST_SUFFIXES_TO_START_AT_ZERO = True # if False, don't allow "float2fix0"
 ALLOW_TEST_SUFFIXES_TO_SKIP_A = True # if False, don't allow "float2int1b" to follow "float2int1"
 
