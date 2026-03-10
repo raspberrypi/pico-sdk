@@ -121,7 +121,7 @@ static inline uint32_t irq_get_mask_n_internal(uint n) {
     ((void)n);
     return nvic_hw->iser;
 #else
-    // >32 IRQs (well this works for the bottom 32 which is all that is passed in
+    // >32 IRQs
     return nvic_hw->iser[n];
 #endif
 }

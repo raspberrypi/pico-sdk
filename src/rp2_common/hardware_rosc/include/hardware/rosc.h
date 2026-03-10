@@ -52,7 +52,7 @@ void rosc_disable(void);
 /*! \brief  Put Ring Oscillator in to dormant mode.
  *  \ingroup hardware_rosc
  *
- * The ROSC supports a dormant mode,which stops oscillation until woken up up by an asynchronous interrupt.
+ * The ROSC supports a dormant mode, which stops oscillation until woken up up by an asynchronous interrupt.
  * This can either come from the RTC, being clocked by an external clock, or a GPIO pin going high or low.
  * If no IRQ is configured before going into dormant mode the ROSC will never restart.
  *
@@ -61,7 +61,7 @@ void rosc_disable(void);
 void rosc_set_dormant(void);
 
 /*! \brief Re-enable the ring oscillator so that the processor cores can wake up after sleep/dormant mode
-    \ingroup hardware_sleep
+    \ingroup hardware_rosc
 
     This must be called at the end of the sleeping period (e.g., in an interrupt service routine)
 */

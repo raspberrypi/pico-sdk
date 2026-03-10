@@ -66,7 +66,7 @@ void rosc_set_dormant(void) {
 
 void rosc_restart(void) {
     //Re-enable the rosc
-    rosc_write(&rosc_hw->ctrl, ROSC_CTRL_ENABLE_BITS);
+    rosc_write(&rosc_hw->ctrl, ROSC_CTRL_ENABLE_VALUE_ENABLE << ROSC_CTRL_ENABLE_LSB);
 
     //Wait for it to become stable once restarted
     while (!(rosc_hw->status & ROSC_STATUS_STABLE_BITS));
