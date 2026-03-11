@@ -473,8 +473,8 @@ int test() {
     test_checki(double2int(-2147483648.1), INT32_MIN, "double2int17");
     test_checki(double2int(-21474836480.1), INT32_MIN, "double2int18");
     test_checki(double2int(make_positive_denormal_double()), 0, "double2int19");
-    double double2int20 = double2int(make_negative_denormal_double());
-    if (double2int20 == -1.0) double2int20 = 0; // -1 is a valid answer depending on flush to zero
+    int double2int20 = double2int(make_negative_denormal_double());
+    if (double2int20 == -1) double2int20 = 0; // -1 is a valid answer depending on flush to zero
     test_checki(double2int20, 0, "double2int20");
 
     printf("double2uint\n");
