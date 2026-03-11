@@ -87,6 +87,8 @@ def main():
                         help="Path postfix")
     parser.add_argument("--gdb", default="arm-none-eabi-gdb",
                         help="gdb executable")
+    parser.add_argument("--gdb-timeout", type=int, default=60,
+                        help="gdb timeout for executable if it doesn't finish")
     parser.add_argument("--openocd-server", default="localhost:3333",
                         help="openocd server address:port"),
     parser.add_argument("--elf-filenames", nargs="+", required=True,
@@ -154,7 +156,7 @@ def main():
                 gdb_result = subprocess.run(
                     gdb_cmd,
                     check=False,
-                    timeout=60,
+                    timeout=args.gdb_timeout,
                     capture_output=True,
                     text=True, encoding="utf-8", errors="replace"
                 )
