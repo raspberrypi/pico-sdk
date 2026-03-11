@@ -66,7 +66,8 @@ $ tools/run_test_matrix.py \
         pico_float_test/custom_float_funcs_test_pico_vfp.elf \
     --path-postfix \
        test \
-    -- out_dir
+    -- \
+    out_dir
 """
 
 import argparse
