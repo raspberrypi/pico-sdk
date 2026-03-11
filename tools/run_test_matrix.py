@@ -80,7 +80,7 @@ def main():
     parser = argparse.ArgumentParser(description="RP2xxx ELF test runner with OpenOCD + grabserial UART capture")
     parser.add_argument("output_dir", help="Directory where *.out files will be written (will be created if missing)")
     parser.add_argument("--path-segments", nargs="+", required=True,
-                        help="Space-separated list of path segments (no slashes), e.g. seg1 seg2")
+                        help="Space-separated list of path segments; e.g. foo, bar, foo/bar/humbug")
     parser.add_argument("--path-prefix", default=".",
                         help="Path prefix")
     parser.add_argument("--path-postfix", default="",
