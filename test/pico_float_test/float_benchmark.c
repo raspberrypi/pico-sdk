@@ -4,6 +4,10 @@
 #include "pico/float.h"
 #include "pico/platform/cpu_regs.h"
 
+#if defined(LLVM_LIBC_COMMON_H) && !defined(__LLVM_LIBC__)
+#define __LLVM_LIBC__ 1
+#endif
+
 static void init_systick() {
     systick_hw->csr = 0;
     systick_hw->rvr = ARM_CPU_PREFIXED(SYST_RVR_RELOAD_BITS);
@@ -942,11 +946,16 @@ timer_func_def(ffmod)(volatile float a, volatile float b) {
 }
 
 timer_func_def(fdrem)(volatile float a, volatile float b) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__)// not sure when this is fixed && (__clang_major__ < 21)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile float x = dremf(a, b);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(fremainder)(volatile float a, volatile float b) {

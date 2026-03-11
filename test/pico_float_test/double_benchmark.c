@@ -4,6 +4,10 @@
 #include "pico/double.h"
 #include "pico/platform/cpu_regs.h"
 
+#if defined(LLVM_LIBC_COMMON_H) && !defined(__LLVM_LIBC__)
+#define __LLVM_LIBC__ 1
+#endif
+
 static void init_systick() {
     systick_hw->csr = 0;
     systick_hw->rvr = ARM_CPU_PREFIXED(SYST_RVR_RELOAD_BITS);
@@ -955,11 +959,16 @@ timer_func_def(dfmod)(volatile double a, volatile double b) {
 }
 
 timer_func_def(ddrem)(volatile double a, volatile double b) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) // && (__clang_major__ < 23)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = drem(a, b);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(dremainder)(volatile double a, volatile double b) {
@@ -1052,19 +1061,29 @@ timer_func_def(dcbrt)(volatile double a) {
 }
 
 timer_func_def(dacosh)(volatile double a) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) // && (__clang_major__ < 21)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = acosh(a);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(datanh)(volatile double a) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) // && (__clang_major__ < 21)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = atanh(a);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(dhypot)(volatile double a, volatile double b) {
@@ -1076,59 +1095,94 @@ timer_func_def(dhypot)(volatile double a, volatile double b) {
 }
 
 timer_func_def(dasin)(volatile double a) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) && (__clang_major__ < 23)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = asin(a);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(dacos)(volatile double a) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) && (__clang_major__ < 23)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = acos(a);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(datan)(volatile double a) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) && (__clang_major__ < 23)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = atan(a);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(dsinh)(volatile double a) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) // && (__clang_major__ < 21)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = sinh(a);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(dcosh)(volatile double a) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) // && (__clang_major__ < 21)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = cosh(a);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(dtanh)(volatile double a) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) // && (__clang_major__ < 21)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = tanh(a);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 timer_func_def(dasinh)(volatile double a) {
+    // LLVM libc is string betting the floating point functions
+#if defined(__LLVM_LIBC__) && defined(__llvm__) // && (__clang_major__ < 21)
+    return -1;
+#else
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
     volatile double x = asinh(a);
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST - DOUBLE_OUTPUT_COST;
+#endif
 }
 
 int main() {
