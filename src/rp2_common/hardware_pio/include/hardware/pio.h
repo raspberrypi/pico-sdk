@@ -741,6 +741,7 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  *
  * Setting | Default
  * --------|--------
+ * Clock Divider | 1
  * Out Pins | 32 starting at 0
  * Set Pins | 0 starting at 0
  * In Pins | 32 starting at 0
