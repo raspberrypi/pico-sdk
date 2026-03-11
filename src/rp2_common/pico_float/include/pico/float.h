@@ -93,7 +93,11 @@ extern "C" {
 *
 * - GNU extensions:
 *
-*   powintf, sincosf
+*   sincosf
+*
+* Additional functions on Arm:
+*
+*   powintf
 *
 * On Arm, the following additional optimized functions are also provided (when using `_pico` variants of `pico_float`), all of which
 * saturate to the nearest representable value for too large input when converting from floating point types:
@@ -150,10 +154,32 @@ extern "C" {
 * \endif
 */
 
+// === we always define these
+#define PICO_FLOAT_HAS_INT32_TO_FLOAT_CONVERSIONS 1
+#define PICO_FLOAT_HAS_INT64_TO_FLOAT_CONVERSIONS 1
+// rounding towards zero
+#define PICO_FLOAT_HAS_FLOAT_TO_INT32_Z_CONVERSIONS 1
+#define PICO_FLOAT_HAS_FLOAT_TO_INT64_Z_CONVERSIONS 1
+// ===
+
 // PICO_CONFIG: PICO_FLOAT_IN_RAM, Force placement of SDK provided single-precision floating point into RAM, type=bool, default=0, group=pico_float
 #if !defined(__riscv) || PICO_COMBINED_DOCS
 
 #if PICO_COMBINED_DOCS || !LIB_PICO_FLOAT_COMPILER
+#define PICO_FLOAT_HAS_FIX32_TO_FLOAT_CONVERSIONS 1
+#define PICO_FLOAT_HAS_FIX64_TO_FLOAT_CONVERSIONS 1
+// rounding towards zero
+#define PICO_FLOAT_HAS_FLOAT_TO_FIX32_Z_CONVERSIONS 1
+#define PICO_FLOAT_HAS_FLOAT_TO_FIX64_Z_CONVERSIONS 1
+
+// rounding towards negative infinity
+#define PICO_FLOAT_HAS_FLOAT_TO_INT32_M_CONVERSIONS 1
+#define PICO_FLOAT_HAS_FLOAT_TO_INT64_M_CONVERSIONS 1
+#define PICO_FLOAT_HAS_FLOAT_TO_FIX32_M_CONVERSIONS 1
+#define PICO_FLOAT_HAS_FLOAT_TO_FIX64_M_CONVERSIONS 1
+
+#define PICO_FLOAT_HAS_POWINTF 1
+
 #if LIB_PICO_FLOAT_PICO_VFP
 // note these functions do still exist for assembler use, we would just prefer to let the compiler handle it for C/C++ to avoid a call
 static inline float int2float(int32_t i) { return (float)i; }
@@ -164,6 +190,7 @@ float uint2float(uint32_t i);
 #endif
 float int642float(int64_t i);
 float uint642float(uint64_t i);
+
 float fix2float(int32_t m, int e);
 float ufix2float(uint32_t m, int e);
 float fix642float(int64_t m, int e);
@@ -195,6 +222,8 @@ int32_t float2fix(float f, int e);
 uint32_t float2ufix(float f, int e);
 int64_t float2fix64(float f, int e);
 uint64_t float2ufix64(float f, int e);
+
+float powintf(float x, int y);
 
 #if LIB_PICO_FLOAT_PICO_VFP
 // a bit of a hack to inline VFP fixed point conversion when exponent is constant and in range 1-32
@@ -293,10 +322,17 @@ uint64_t float2ufix64(float f, int e);
 #endif
 
 float exp10f(float x);
+#if PICO_C_COMPILER_IS_CLANG && !LIB_PICO_FLOAT_COMPILER
+// clang unhelpfully splits sincosf into explict calls to sin & cos
+extern void WRAPPER_FUNC(sincosf)(float x, float *sinx, float *cosx);
+#define sincosf(x, sinx, cosx) WRAPPER_FUNC(sincosf)(x, sinx, cosx)
+#else
 void sincosf(float x, float *sinx, float *cosx);
-float powintf(float x, int y);
+#endif
 
-#if PICO_RP2350 || PICO_COMBINED_DOCS
+#if (PICO_RP2350 && LIB_PICO_FLOAT_PICO_DCP) || PICO_COMBINED_DOCS
+#define PICO_FLOAT_HAS_FDIV_FAST 1
+#define PICO_FLOAT_HAS_SQRTF_FAST 1
 float fdiv_fast(float n, float d);
 float sqrtf_fast(float f);
 #endif
@@ -315,6 +351,13 @@ static inline int32_t float2int_z(float f) { return (int32_t)f; }
 static inline int64_t float2int64_z(float f) { return (int64_t)f; }
 static inline int32_t float2uint_z(float f) { return (uint32_t)f; }
 static inline int64_t float2uint64_z(float f) { return (uint64_t)f; }
+
+#if __has_builtin(__builtin_powif)
+#define PICO_FLOAT_HAS_POWINTF 1
+static __force_inline float powintf(float f, int32_t p) {
+    return __builtin_powif(f, p);
+}
+#endif
 #endif
 
 #ifdef __cplusplus

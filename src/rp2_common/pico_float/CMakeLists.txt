@@ -174,6 +174,8 @@
                 #NO_SCI_EXTRA       # todo - are our versions better than what GCC proides?
                 NO_FMAF             # direct VFP instruction support
         )
+        # this allows inlining of sqrtf for example - if you really want errno support, use pico_float_compiler
+        target_compile_options(pico_float_pico_vfp INTERFACE -fno-math-errno)
 
         target_link_libraries(pico_float_pico INTERFACE
                 pico_float_pico_vfp)

@@ -84,7 +84,10 @@ extern "C" {
 *
 * - GNU extensions:
 *
-*   powint, sincos
+*   sincos
+*
+* Additional functions on Arm:
+*   powint
 *
 * On Arm, the following additional optimized functions are also provided when using `pico_double_pico`, all of which
 * saturate to the nearest representable value for too large input when converting from floating point types:
@@ -129,9 +132,33 @@ extern "C" {
 * On RISC-V there is no custom double-precision floating point support, so `pico_double_pico` is equivalent to `pico_double_compiler`
 * \endif
 */
+
+// === we always define these
+#define PICO_DOUBLE_HAS_INT32_TO_DOUBLE_CONVERSIONS 1
+#define PICO_DOUBLE_HAS_INT64_TO_DOUBLE_CONVERSIONS 1
+// rounding towards zero
+#define PICO_DOUBLE_HAS_DOUBLE_TO_INT32_Z_CONVERSIONS 1
+#define PICO_DOUBLE_HAS_DOUBLE_TO_INT64_Z_CONVERSIONS 1
+// ===
+
+// PICO_CONFIG: PICO_DOUBLE_IN_RAM, Force placement of SDK provided double-precision floating point into RAM, type=bool, default=0, group=pico_float
 #if !defined(__riscv) || PICO_COMBINED_DOCS
 
 #if PICO_COMBINED_DOCS || !LIB_PICO_DOUBLE_COMPILER
+#define PICO_DOUBLE_HAS_FIX32_TO_DOUBLE_CONVERSIONS 1
+#define PICO_DOUBLE_HAS_FIX64_TO_DOUBLE_CONVERSIONS 1
+// rounding towards zero
+#define PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_Z_CONVERSIONS 1
+#define PICO_DOUBLE_HAS_DOUBLE_TO_FIX64_Z_CONVERSIONS 1
+
+// rounding towards negative infinity
+#define PICO_DOUBLE_HAS_DOUBLE_TO_INT32_M_CONVERSIONS 1
+#define PICO_DOUBLE_HAS_DOUBLE_TO_INT64_M_CONVERSIONS 1
+#define PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_M_CONVERSIONS 1
+#define PICO_DOUBLE_HAS_DOUBLE_TO_FIX64_M_CONVERSIONS 1
+
+#define PICO_DOUBLE_HAS_POWINT 1
+
 double int2double(int32_t i);
 double uint2double(uint32_t i);
 double int642double(int64_t i);
@@ -143,8 +170,8 @@ double ufix642double(uint64_t m, int e);
 
 // These methods round towards 0, which IS the C way
 int32_t double2int_z(double f);
-int64_t double2int64_z(double f);
 int32_t double2uint_z(double f);
+int64_t double2int64_z(double f);
 int64_t double2uint64_z(double f);
 int32_t double2fix_z(double f, int e);
 uint32_t double2ufix_z(double f, int e);
@@ -162,17 +189,30 @@ uint32_t double2ufix(double f, int e);
 int64_t double2fix64(double f, int e);
 uint64_t double2ufix64(double f, int e);
 
+double powint(double x, int y);
 #endif
 
 double exp10(double x);
+#if PICO_C_COMPILER_IS_CLANG && !LIB_PICO_DOUBLE_COMPILER
+// clang unhelpfully splits sincosf into explict calls to sin & cos
+extern void WRAPPER_FUNC(sincos)(double x, double *sinx, double *cosx);
+#define sincos(x, sinx, cosx) WRAPPER_FUNC(sincos)(x, sinx, cosx)
+#else
 void sincos(double x, double *sinx, double *cosx);
-double powint(double x, int y);
+#endif
+
 
 #if PICO_RP2350 || PICO_COMBINED_DOCS
+
+#if LIB_PICO_DOUBLE_PICO_DCP
+#define PICO_DOUBLE_HAS_DDIV_FAST 1
+#define PICO_DOUBLE_HAS_SQRT_FAST 1
+#define PICO_DOUBLE_HAS_FMA_FAST 1
 double ddiv_fast(double n, double d);
 double sqrt_fast(double f);
 double fma_fast(double x, double y, double z); // this is not fused
 double mla(double x, double y, double z); // another name for fma_fast
+#endif
 #endif
 
 #endif
@@ -188,6 +228,14 @@ static inline int32_t double2int_z(double d) { return (int32_t)d; }
 static inline int64_t double2int64_z(double d) { return (int64_t)d; }
 static inline int32_t double2uint_z(double d) { return (uint32_t)d; }
 static inline int64_t double2uint64_z(double d) { return (uint64_t)d; }
+
+#if __has_builtin(__builtin_powi)
+#define PICO_DOUBLE_HAS_POWINT 1
+static __force_inline double powint(double d, int32_t p) {
+    return __builtin_powi(d, p);
+}
+#endif
+
 #endif
 
 #ifdef __cplusplus
