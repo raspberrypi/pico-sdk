@@ -30,7 +30,8 @@ $ tools/run_test_matrix.py \
         custom_float_funcs_test_pico_vfp.elf \
     --path-postfix \
        test/pico_float_test \
-    -- out_dir
+    -- \
+    out_dir
 
 Which will run each of the following if they exist:
    gcc_build/test/pico_float_test/custom_float_funcs_test_compiler.elf
