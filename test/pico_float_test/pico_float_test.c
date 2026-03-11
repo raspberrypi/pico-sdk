@@ -311,7 +311,7 @@ int32_t __attribute__((pcs("aapcs"))) __aeabi_f2iz(float);
 int64_t __attribute__((pcs("aapcs"))) __aeabi_f2lz(float);
 float __attribute__((pcs("aapcs"))) __aeabi_fmul(float, float);
 float __attribute__((pcs("aapcs"))) __aeabi_fdiv(float, float);
-#if LIB_PICO_FLOAT_PICO
+#if !LIB_PICO_FLOAT_COMPILER
 #if !LIB_PICO_FLOAT_PICO_VFP
 float __attribute__((pcs("aapcs"))) __real___aeabi_i2f(int);
 float __attribute__((pcs("aapcs"))) __real___aeabi_ui2f(int);
@@ -321,9 +321,9 @@ float __attribute__((pcs("aapcs"))) __real___aeabi_fmul(float, float);
 float __attribute__((pcs("aapcs"))) __real___aeabi_fdiv(float, float);
 int32_t __attribute__((pcs("aapcs"))) __real___aeabi_f2iz(float);
 int64_t __attribute__((pcs("aapcs"))) __real___aeabi_f2lz(float);
+#endif
 float __real_sqrtf(float);
 float __real_fmaf(float, float, float);
-#endif
 float __real_cosf(float);
 float __real_sinf(float);
 float __real_tanf(float);
@@ -421,6 +421,7 @@ int main() {
 #if 1
     for (float x = 0; x < 3; x++) {
         printf("\n ----- %f\n", x);
+        // not replaced in this version
 #if !LIB_PICO_FLOAT_PICO_VFP
         printf("FSQRT %10.18f\n", check_close1(sqrtf, x));
 #endif
@@ -435,9 +436,8 @@ int main() {
         printf("FEXP %10.18f\n", check_close1(expf, x));
         printf("FLN %10.18f\n", check_close1(logf, x));
         printf("POWF %10.18f\n", check_close2(powf, x, x));
-        // todo clang why does this not compile?
-#ifndef __clang__
-        printf("TRUNCF %10.18f\n", check_close1(truncf, x));
+#if !(__clang__ && __PICOLIBC__) // seems to be a buf with wrapping the extern inline trunc
+        printf("TRUNCF %10.18f\n", check1(truncf, x));
 #endif
         printf("LDEXPF %10.18f\n", check_close2(ldexpf, x, x));
         printf("FMODF %10.18f\n", check_close2(fmodf, x, 3.0f));
@@ -561,17 +561,17 @@ int main() {
     }
     for(float x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
         printf("f2i64 %f->%lld\n", x, (int64_t)x);
-#if PICO_RP2040
         if ((double)x >= (double)INT64_MAX) {
 #if TEST_SATURATION
             test_assert(__aeabi_f2lz(x) == INT64_MAX);
 #endif
         } else {
+#if PICO_RP2040
             check1(__aeabi_f2lz, x);
-        }
 #else
-        check1_vfp_unwrapped(__aeabi_f2lz, x);
+            check1_vfp_unwrapped(__aeabi_f2lz, x);
 #endif
+        }
     }
     for(float x = -4294967296.f * 4294967296.f; x<=-0.5f; x/=2.f) {
         printf("f2i32 %f->%d\n", x, (int32_t)x);
@@ -579,17 +579,17 @@ int main() {
     }
     for(float x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
         printf("f2i32 %f->%d\n", x, (int32_t)x);
-#if PICO_RP2040
         if ((double)x >= (double)INT32_MAX) {
 #if TEST_SATURATION
             test_assert(__aeabi_f2iz(x) == INT32_MAX);
 #endif
         } else {
+#if PICO_RP2040
             check1(__aeabi_f2iz, x);
-        }
 #else
-        check1_vfp_unwrapped(__aeabi_f2iz, x);
+            check1_vfp_unwrapped(__aeabi_f2iz, x);
 #endif
+        }
     }
 
     for (float x = 1; x < 11; x += 2) {
