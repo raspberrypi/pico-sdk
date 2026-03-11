@@ -87,6 +87,8 @@ def main():
                         help="Path postfix")
     parser.add_argument("--gdb", default="arm-none-eabi-gdb",
                         help="gdb executable")
+    parser.add_argument("--openocd-server", default="localhost:3333",
+                        help="openocd server address:port"),
     parser.add_argument("--elf-filenames", nargs="+", required=True,
                         help="Space-separated list of ELF filenames (including .elf), e.g. test1.elf test2.elf")
     parser.add_argument("--serial-port", default="/dev/ttyACM0", help="UART device (default: /dev/ttyACM0)")
@@ -142,7 +144,7 @@ def main():
 
                 gdb_cmd = [
                     args.gdb, "--batch", "--nx", full_path,
-                    "-ex", "target extended-remote localhost:3333",
+                    "-ex", f"target extended-remote {args.openocd_server}",
                     "-ex", "monitor reset init",
                     "-ex", "load",
                     "-ex", "monitor verify",   # optional
