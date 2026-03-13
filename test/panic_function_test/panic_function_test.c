@@ -58,6 +58,9 @@ void __printflike(1, 0) handle_panic(const char *magic1, ...)
 #endif
     va_end(args);
     puts("PASSED");
+#if PICO_PANIC_FUNCTION_DOES_NOT_RETURN
+    __breakpoint();
+#endif
 }
 
 void main() {
