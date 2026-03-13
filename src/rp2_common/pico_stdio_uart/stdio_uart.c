@@ -130,8 +130,8 @@ void stdio_uart_deinit_full(struct uart_inst *uart, int tx_pin, int rx_pin) {
     uart_deinit(uart_instance);
 #if HAS_PADS_BANK0_ISOLATION
     // Leave pads isolated
-    if (tx_pin >= 0) hw_set_bits(&pads_bank0_hw->io[tx_pin], PADS_BANK0_GPIO0_ISO_BITS);
-    if (rx_pin >= 0) hw_set_bits(&pads_bank0_hw->io[rx_pin], PADS_BANK0_GPIO0_ISO_BITS);
+    if (tx_pin >= 0) pads_bank0_set_bits(tx_pin, PADS_BANK0_GPIO0_ISO_BITS);
+    if (rx_pin >= 0) pads_bank0_set_bits(rx_pin, PADS_BANK0_GPIO0_ISO_BITS);
 #else
     ((void)tx_pin);
     ((void)rx_pin);

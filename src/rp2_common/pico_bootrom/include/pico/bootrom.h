@@ -21,6 +21,8 @@
 #include <string.h>
 #include "pico/bootrom/lock.h"
 #include "pico/flash.h"
+
+#include "hardware/structs/pads_bank0.h"
 // ROM FUNCTION SIGNATURES
 
 #if PICO_RP2040
@@ -636,6 +638,21 @@ static inline int rom_flash_op(cflash_flags_t flags, uintptr_t addr, uint32_t si
     }
 }
 
+
+/*!
+ * \brief Roll QMI to a partition
+ * \ingroup pico_bootrom
+ *
+ * Rolls the QMI to the specified partition, enabling access to the partition via the translated XIP windows.
+ *
+ * This is necessary when the partition is not stored at the flash address it was linked at, e.g. when
+ * using A/B partitions.
+ * 
+ * \param partition_num the partition number
+ * \return BOOTROM_OK on success, otherwise a negative error code
+ */
+int rom_roll_qmi_to_partition(uint partition_num);
+
 /*!
  * \brief Writes data from a buffer into OTP, or reads data from OTP into a buffer
  * \ingroup pico_bootrom
@@ -798,14 +815,29 @@ int rom_pick_ab_partition_during_update(uint32_t *workarea_base, uint32_t workar
  * \ingroup pico_bootrom
  *
  * Returns the index of the B partition of partition A if a partition table is present and loaded, and there is a partition A with a B partition;
- * otherwise returns BOOTROM_ERROR_NOT_FOUND.
+ * otherwise returns a negative error code.
  * 
  * \param pi_a the A partition number
+ * \return >= 0 the index of the B partition
+ *         BOOTROM_ERROR_NOT_FOUND if the partition number does not have a B partition
  */
 static inline int rom_get_b_partition(uint pi_a) {
     rom_get_b_partition_fn func = (rom_get_b_partition_fn) rom_func_lookup_inline(ROM_FUNC_GET_B_PARTITION);
     return func(pi_a);
 }
+
+/*!
+ * \brief Get Owned Partition
+ * \ingroup pico_bootrom
+ *
+ * Returns the index of the matching owned partition if a partition table is present and loaded, and the partition number has an owned
+ * partition; otherwise returns a negative error code.
+ * 
+ * \param partition_num the partition number
+ * \return >= 0 the index of the matching owned partition
+ *         BOOTROM_ERROR_NOT_FOUND if the partition number does not have an owned partition
+ */
+int rom_get_owned_partition(uint partition_num);
 
 // todo SECURE only
 /*!
@@ -1009,6 +1041,225 @@ static inline intptr_t rom_set_rom_callback(uint callback_num, bootrom_api_callb
     rom_set_rom_callback_fn func = (rom_set_rom_callback_fn) rom_func_lookup_inline(ROM_FUNC_SET_ROM_CALLBACK);
     return func(callback_num, funcptr);
 }
+
+#ifndef __riscv
+int rom_secure_call(uint a, uint b, uint c, uint d, uint func);
+
+int rom_default_callback(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t fn);
+
+// PICO_CONFIG: PICO_MAX_SECURE_CALL_USER_CALLBACKS, Maximum number of secure call user callbacks, default=4, advanced=true, group=pico_bootrom
+#ifndef PICO_MAX_SECURE_CALL_USER_CALLBACKS
+#define PICO_MAX_SECURE_CALL_USER_CALLBACKS 4
+#endif
+
+/*! Callback function type for user handled rom_secure_call
+ *  \ingroup pico_bootrom
+ */
+typedef int (*rom_secure_call_callback_t)(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t fn);
+
+/*!
+ * \brief Add user ROM callback function
+ * \ingroup pico_bootrom
+ * 
+ * Add a user callback for rom_secure_call called if using a function code starting with `0b1xxx`,
+ * which is a "unique" or "private" function as specified by the rom_secure_call() documentation.
+ * 
+ * \param callback pointer to the callback function
+ * \param fn_mask first 16 bits of fn codes this callback handles
+ */
+int rom_secure_call_add_user_callback(rom_secure_call_callback_t callback, uint16_t fn_mask);
+
+/*!
+ * \brief Remove user ROM callback function
+ * \ingroup pico_bootrom
+ * 
+ * Remove a user callback for rom_secure_call which was previously added with rom_secure_call_add_user_callback()
+ * 
+ * \param callback pointer to the callback function
+ */
+void rom_secure_call_remove_user_callback(rom_secure_call_callback_t callback);
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_STDIO, Allow non-secure to use stdio, type=bool, default=0, group=pico_bootrom
+#ifndef PICO_ALLOW_NONSECURE_STDIO
+#define PICO_ALLOW_NONSECURE_STDIO 0
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_RAND, Allow non-secure to request random numbers, type=bool, default=0, group=pico_bootrom
+#ifndef PICO_ALLOW_NONSECURE_RAND
+#define PICO_ALLOW_NONSECURE_RAND 0
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_DMA, Allow non-secure to request DMA channels, type=bool, default=0, group=hardware_dma
+#ifndef PICO_ALLOW_NONSECURE_DMA
+#define PICO_ALLOW_NONSECURE_DMA 0
+#endif
+
+// PICO_CONFIG: PICO_NONSECURE_DMA_MAX_CHANNEL, Max number of DMA channels that can be allocated to non-secure use, type=int, default=NUM_DMA_CHANNELS, group=hardware_dma
+#ifndef PICO_NONSECURE_DMA_MAX_CHANNEL
+#define PICO_NONSECURE_DMA_MAX_CHANNEL NUM_DMA_CHANNELS
+#endif
+
+#if PICO_ALLOW_NONSECURE_DMA && PICO_NONSECURE
+/*! \brief Request unused dma channels from secure
+ *  \ingroup hardware_dma
+ *
+ * \param num_channels the number of channels to request
+ * \return the number of channels provided
+ */
+int dma_request_unused_channels_from_secure(int num_channels);
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_USER_IRQ, Allow non-secure to request user IRQs, type=bool, default=0, group=hardware_irq
+#ifndef PICO_ALLOW_NONSECURE_USER_IRQ
+#define PICO_ALLOW_NONSECURE_USER_IRQ 0
+#endif
+
+// PICO_CONFIG: PICO_NONSECURE_USER_IRQ_MIN, Lowest number user IRQ that can be allocated to non-secure use, type=int, default=FIRST_USER_IRQ, group=hardware_irq
+#ifndef PICO_NONSECURE_USER_IRQ_MIN
+#define PICO_NONSECURE_USER_IRQ_MIN FIRST_USER_IRQ
+#endif
+
+#if PICO_ALLOW_NONSECURE_USER_IRQ && PICO_NONSECURE
+/*! \brief Request unused user IRQs from secure
+ *  \ingroup hardware_irq
+ *
+ * \param num_irqs the number of IRQs to request
+ * \return the number of IRQs provided
+ */
+int user_irq_request_unused_from_secure(int num_irqs);
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_PIO, Allow non-secure to request PIOs, type=bool, default=0, group=hardware_pio
+#ifndef PICO_ALLOW_NONSECURE_PIO
+#define PICO_ALLOW_NONSECURE_PIO 0
+#endif
+
+// PICO_CONFIG: PICO_NONSECURE_PIO_MAX, Max number of PIOs that can be allocated to non-secure use, type=int, default=NUM_PIOS, group=hardware_pio
+#ifndef PICO_NONSECURE_PIO_MAX
+#define PICO_NONSECURE_PIO_MAX NUM_PIOS
+#endif
+
+#if PICO_ALLOW_NONSECURE_PIO && PICO_NONSECURE
+/*! \brief Request unused PIO from secure
+ *  \ingroup hardware_pio
+ *
+ * \return the PIO number
+ */
+int pio_request_unused_pio_from_secure(void);
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_GPIO, Allow non-secure to access GPIO, type=bool, default=0, group=hardware_gpio
+#ifndef PICO_ALLOW_NONSECURE_GPIO
+#define PICO_ALLOW_NONSECURE_GPIO 0
+#endif
+
+// PICO_CONFIG: PICO_ADD_NONSECURE_PADS_HELPER, Add non-secure helper functions for PADS_BANK0, type=bool, default=1 on RP2350A A2, group=hardware_pads
+#ifndef PICO_ADD_NONSECURE_PADS_HELPER
+#define PICO_ADD_NONSECURE_PADS_HELPER PICO_RP2350A && PICO_RP2350_A2_SUPPORTED && PICO_ALLOW_NONSECURE_GPIO
+#endif
+
+/*! \brief Set bits in PADS_BANK0
+ *  \ingroup hardware_pads
+ *
+ * \param gpio the GPIO number
+ * \param bits the bits to set
+ */
+#if PICO_ADD_NONSECURE_PADS_HELPER && PICO_NONSECURE
+static inline int pads_bank0_set_bits(uint gpio, uint bits) {
+    return rom_secure_call(gpio, bits, 0, 0, SECURE_CALL_pads_bank0_set_bits);
+}
+#else
+static inline int pads_bank0_set_bits(uint gpio, uint bits) {
+    hw_set_bits(&pads_bank0_hw->io[gpio], bits);
+    return PICO_OK;
+}
+#endif
+
+/*! \brief Clear bits in PADS_BANK0
+ *  \ingroup hardware_pads
+ *
+ * \param gpio the GPIO number
+ * \param bits the bits to clear
+ */
+#if PICO_ADD_NONSECURE_PADS_HELPER && PICO_NONSECURE
+static inline int pads_bank0_clear_bits(uint gpio, uint bits) {
+    return rom_secure_call(gpio, bits, 0, 0, SECURE_CALL_pads_bank0_clear_bits);
+}
+#else
+static inline int pads_bank0_clear_bits(uint gpio, uint bits) {
+    hw_clear_bits(&pads_bank0_hw->io[gpio], bits);
+    return PICO_OK;
+}
+#endif
+
+/*! \brief Write masked bits in PADS_BANK0
+ *  \ingroup hardware_pads
+ *
+ * \param gpio the GPIO number
+ * \param bits the bits to write
+ * \param mask the mask
+ */
+#if PICO_ADD_NONSECURE_PADS_HELPER && PICO_NONSECURE
+static inline int pads_bank0_write_masked(uint gpio, uint bits, uint mask) {
+    return rom_secure_call(gpio, bits, mask, 0, SECURE_CALL_pads_bank0_write_masked);
+}
+#else
+static inline int pads_bank0_write_masked(uint gpio, uint bits, uint mask) {
+    hw_write_masked(&pads_bank0_hw->io[gpio], bits, mask);
+    return PICO_OK;
+}
+#endif
+
+/*! \brief Read bits in PADS_BANK0
+ *  \ingroup hardware_pads
+ *
+ * \param gpio the GPIO number
+ * \return the bits read
+ */
+#if PICO_ADD_NONSECURE_PADS_HELPER && PICO_NONSECURE
+static inline int pads_bank0_read(uint gpio) {
+    return rom_secure_call(gpio, 0, 0, 0, SECURE_CALL_pads_bank0_read);
+}
+#else
+static inline int pads_bank0_read(uint gpio) {
+    return pads_bank0_hw->io[gpio];
+}
+#endif
+
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_USB, Allow non-secure to access USB, type=bool, default=0, group=hardware_usb
+#ifndef PICO_ALLOW_NONSECURE_USB
+#define PICO_ALLOW_NONSECURE_USB 0
+#endif
+
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_RESETS, Allow non-secure to access RESETS, type=bool, default=0, group=hardware_resets
+#ifndef PICO_ALLOW_NONSECURE_RESETS
+#define PICO_ALLOW_NONSECURE_RESETS 0
+#endif
+
+#if PICO_SECURE
+#include "hardware/regs/resets.h"
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_RESETS_MASK, Mask of RESETS that can be accessed by non-secure, type=int, default=resets needed for other PICO_ALLOW_NONSECURE_* options, group=hardware_resets
+#ifndef PICO_ALLOW_NONSECURE_RESETS_MASK
+#define PICO_ALLOW_NONSECURE_RESETS_MASK (PICO_ALLOW_NONSECURE_USB ? RESETS_RESET_USBCTRL_BITS : 0)
+#endif
+#endif
+
+#if PICO_ALLOW_NONSECURE_RESETS && PICO_NONSECURE
+static inline int reset_block_reg_mask(__unused io_rw_32 *reset, uint32_t mask) {
+    return rom_secure_call(mask, 0, 0, 0, SECURE_CALL_reset_block_mask);
+}
+static inline int unreset_block_reg_mask(__unused io_rw_32 *reset, uint32_t mask) {
+    return rom_secure_call(mask, 0, 0, 0, SECURE_CALL_unreset_block_mask);
+}
+static inline int unreset_block_reg_mask_wait_blocking(__unused io_rw_32 *reset, __unused io_ro_32 *reset_done, uint32_t mask) {
+    return rom_secure_call(mask, 0, 0, 0, SECURE_CALL_unreset_block_mask_wait_blocking);
+}
+#endif
+
+#endif  // ifndef __riscv
 
 #define BOOT_TYPE_NORMAL     0
 #define BOOT_TYPE_BOOTSEL    2

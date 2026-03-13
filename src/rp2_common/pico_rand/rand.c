@@ -325,7 +325,7 @@ static void initialise_rand(void) {
     spin_unlock(lock, save);
 }
 
-uint64_t get_rand_64(void) {
+uint64_t __weak get_rand_64(void) {
     if (!rng_initialised) {
         // Do not provide 'RNs' until the system has been initialised.  Note:
         // The first initialisation can be quite time-consuming depending on

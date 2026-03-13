@@ -742,3 +742,40 @@ function(picotool_postprocess_binary TARGET)
         endif()
     endif()
 endfunction()
+
+
+# pico_concatenate_uf2_outputs(COMBINED_TARGET <TARGETS>...)
+# \brief_nodesc\ Concatenate UF2 outputs into a single UF2 file
+#
+# Concatenate UF2 outputs from multiple targets into a single UF2 file, in the order they're passed to the function
+#
+# This can be used in conjunction with a partition table with no_reboot_on_uf2_download set on some partitions,
+# to allow loading multiple partitions with a single UF2 file. For example, with this partition table you could concatenate
+# rp2350-arm-ns and rp2350-arm-s binaries into a single UF2 file for loading into the main and owned partitions in one shot:
+# ```
+# partitions:
+#   0(A)       uf2 { 'rp2350-arm-s' }
+#   1(B w/ 0)  uf2 { 'rp2350-arm-s' }
+#   2(A ob/ 0) uf2 { 'rp2350-arm-ns' }, no_reboot_on_uf2_download, ab_non_bootable_owner_affinity
+#   3(B w/ 2)  uf2 { 'rp2350-arm-ns' }, no_reboot_on_uf2_download, ab_non_bootable_owner_affinity
+# ```
+#
+# NOTE: This does not modify the UF2 data structures, so the chip will still see multiple UF2 files,
+# this just concatenates them into a single file on the host.
+#
+# \param\ COMBINED_TARGET The name of the combined UF2 target
+# \param\ TARGETS The targets to combine
+function(pico_concatenate_uf2_outputs COMBINED_TARGET)
+    list(TRANSFORM ARGN PREPEND ${CMAKE_CURRENT_BINARY_DIR}/ OUTPUT_VARIABLE UF2S)
+    list(TRANSFORM UF2S APPEND .uf2)
+
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}.uf2
+        COMMAND ${CMAKE_COMMAND} -E cat
+            ${UF2S}
+            > ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}.uf2
+        DEPENDS ${ARGN}
+        COMMAND_EXPAND_LISTS)
+
+    add_custom_target(${COMBINED_TARGET} ALL
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}.uf2)
+endfunction()

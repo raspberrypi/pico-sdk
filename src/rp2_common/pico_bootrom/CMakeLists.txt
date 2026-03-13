@@ -9,7 +9,7 @@ target_sources(pico_bootrom INTERFACE
         )
 
 target_link_libraries(pico_bootrom_headers INTERFACE boot_picoboot_headers boot_bootrom_headers)
-pico_mirrored_target_link_libraries(pico_bootrom INTERFACE pico_base hardware_boot_lock pico_flash)
+pico_mirrored_target_link_libraries(pico_bootrom INTERFACE pico_base hardware_boot_lock pico_flash hardware_flash pico_rand hardware_dma hardware_irq pico_stdio hardware_pio)
 
 # bootrom.c includes boot/picobin.h
 # bootrom_lock.c includes pico/runtime_init.h

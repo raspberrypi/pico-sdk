@@ -106,6 +106,9 @@
 extern "C" {
 #endif
 
+#if PICO_NONSECURE
+#include "pico/bootrom.h"
+#else
 static __force_inline  void reset_block_reg_mask(io_rw_32 *reset, uint32_t mask) {
     hw_set_bits(reset, mask);
 }
@@ -119,6 +122,7 @@ static __force_inline void unreset_block_reg_mask_wait_blocking(io_rw_32 *reset,
     while (~*reset_done & mask)
         tight_loop_contents();
 }
+#endif
 
 /// \tag::reset_funcs[]
 

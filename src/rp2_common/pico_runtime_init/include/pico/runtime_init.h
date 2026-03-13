@@ -64,13 +64,13 @@ extern "C" {
 #endif
 
 #ifndef PICO_RUNTIME_SKIP_INIT_BOOTROM_RESET
-#if PICO_RP2040 || (!LIB_PICO_MULTICORE && PICO_NO_FLASH)
+#if PICO_RP2040 || (!LIB_PICO_MULTICORE && PICO_NO_FLASH) || PICO_NONSECURE
 #define PICO_RUNTIME_SKIP_INIT_BOOTROM_RESET 1
 #endif
 #endif
 
 #ifndef PICO_RUNTIME_NO_INIT_BOOTROM_RESET
-#if PICO_RP2040 || (!LIB_PICO_MULTICORE && PICO_NO_FLASH)
+#if PICO_RP2040 || (!LIB_PICO_MULTICORE && PICO_NO_FLASH) || PICO_NONSECURE
 #define PICO_RUNTIME_NO_INIT_BOOTROM_RESET 1
 #endif
 #endif
@@ -89,13 +89,13 @@ void runtime_init_bootrom_reset(void);
 // PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_PER_CORE_BOOTROM_RESET, Skip calling of `runtime_init_per_core_bootrom_reset` function during per-core init, type=bool, default=1 on RP2040, group=pico_runtime_init
 // PICO_CONFIG: PICO_RUNTIME_NO_INIT_PER_CORE_BOOTROM_RESET, Do not include SDK implementation of `runtime_init_per_core_bootrom_reset` function, type=bool, default=1 on RP2040, group=pico_runtime_init
 #ifndef PICO_RUNTIME_SKIP_INIT_PER_CORE_BOOTROM_RESET
-#if PICO_RP2040
+#if PICO_RP2040 || PICO_NONSECURE
 #define PICO_RUNTIME_SKIP_INIT_PER_CORE_BOOTROM_RESET 1
 #endif
 #endif
 
 #ifndef PICO_RUNTIME_NO_INIT_PER_CORE_BOOTROM_RESET
-#if PICO_RP2040
+#if PICO_RP2040 || PICO_NONSECURE
 #define PICO_RUNTIME_NO_INIT_PER_CORE_BOOTROM_RESET 1
 #endif
 #endif
@@ -317,7 +317,11 @@ void runtime_init_spin_locks_reset(void);
 #endif
 
 #ifndef PICO_RUNTIME_SKIP_INIT_BOOT_LOCKS_RESET
+#if PICO_NONSECURE
+#define PICO_RUNTIME_SKIP_INIT_BOOT_LOCKS_RESET 1
+#else
 #define PICO_RUNTIME_SKIP_INIT_BOOT_LOCKS_RESET 0
+#endif
 #endif
 #ifndef __ASSEMBLER__
 void runtime_init_boot_locks_reset(void);
@@ -333,11 +337,111 @@ void runtime_init_boot_locks_reset(void);
 #endif
 
 #ifndef PICO_RUNTIME_SKIP_INIT_BOOTROM_LOCKING_ENABLE
+#if PICO_NONSECURE
+#define PICO_RUNTIME_SKIP_INIT_BOOTROM_LOCKING_ENABLE 1
+#else
 #define PICO_RUNTIME_SKIP_INIT_BOOTROM_LOCKING_ENABLE 0
+#endif
 #endif
 
 #ifndef __ASSEMBLER__
 void runtime_init_bootrom_locking_enable(void);
+#endif
+
+// ------------------------------
+// Set default bootrom secure callback
+// ------------------------------
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_BOOTROM_API_CALLBACK, Skip calling of `runtime_init_rom_set_default_callback` function during runtime init, type=bool, default=0, group=pico_runtime_init
+#ifndef PICO_RUNTIME_INIT_BOOTROM_API_CALLBACK
+#define PICO_RUNTIME_INIT_BOOTROM_API_CALLBACK "01020"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_BOOTROM_API_CALLBACK
+#define PICO_RUNTIME_SKIP_INIT_BOOTROM_API_CALLBACK !PICO_SECURE
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_BOOTROM_API_CALLBACK
+#define PICO_RUNTIME_NO_INIT_BOOTROM_API_CALLBACK !PICO_SECURE
+#endif
+
+// ------------------------------
+// Initialise non-secure claimed resources
+// ------------------------------
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_CLAIMS, Skip calling of `runtime_init_nonsecure_claims` function during runtime init, type=bool, default=0, group=pico_runtime_init
+#ifndef PICO_RUNTIME_INIT_NONSECURE_CLAIMS
+#define PICO_RUNTIME_INIT_NONSECURE_CLAIMS "01020"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_NONSECURE_CLAIMS
+#define PICO_RUNTIME_SKIP_INIT_NONSECURE_CLAIMS !PICO_NONSECURE
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_NONSECURE_CLAIMS
+#define PICO_RUNTIME_NO_INIT_NONSECURE_CLAIMS !PICO_NONSECURE
+#endif
+
+// ------------------------------
+// Initialise non-secure stdio
+// ------------------------------
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_STDIO, Skip calling of `runtime_init_nonsecure_stdio` function during runtime init, type=bool, default=0, group=pico_runtime_init
+#ifndef PICO_RUNTIME_INIT_NONSECURE_STDIO
+#define PICO_RUNTIME_INIT_NONSECURE_STDIO "20000"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_NONSECURE_STDIO
+#define PICO_RUNTIME_SKIP_INIT_NONSECURE_STDIO !PICO_NONSECURE
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_NONSECURE_STDIO
+#define PICO_RUNTIME_NO_INIT_NONSECURE_STDIO !PICO_NONSECURE
+#endif
+
+// ------------------------------
+// Initialise non-secure clocks
+// ------------------------------
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_CLOCKS, Skip calling of `runtime_init_nonsecure_clocks` function during runtime init, type=bool, default=0, group=pico_runtime_init
+#ifndef PICO_RUNTIME_INIT_NONSECURE_CLOCKS
+#define PICO_RUNTIME_INIT_NONSECURE_CLOCKS "00500"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_NONSECURE_CLOCKS
+#define PICO_RUNTIME_SKIP_INIT_NONSECURE_CLOCKS !PICO_NONSECURE
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_NONSECURE_CLOCKS
+#define PICO_RUNTIME_NO_INIT_NONSECURE_CLOCKS !PICO_NONSECURE
+#endif
+
+// ------------------------------
+// Initialise non-secure coprocessors
+// ------------------------------
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_COPROCESSORS, Skip calling of `runtime_init_nonsecure_coprocessors` function during runtime init, type=bool, default=0, group=pico_runtime_init
+#ifndef PICO_RUNTIME_INIT_NONSECURE_COPROCESSORS
+#define PICO_RUNTIME_INIT_NONSECURE_COPROCESSORS "00210"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_NONSECURE_COPROCESSORS
+#define PICO_RUNTIME_SKIP_INIT_NONSECURE_COPROCESSORS !PICO_SECURE
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_NONSECURE_COPROCESSORS
+#define PICO_RUNTIME_NO_INIT_NONSECURE_COPROCESSORS !PICO_SECURE
+#endif
+
+// ------------------------------
+// Initialise non-secure accessctrl
+// ------------------------------
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_ACCESSCTRL_AND_IRQS, Skip calling of `runtime_init_nonsecure_accessctrl_and_irqs` function during runtime init, type=bool, default=0, group=pico_runtime_init
+#ifndef PICO_RUNTIME_INIT_NONSECURE_ACCESSCTRL_AND_IRQS
+#define PICO_RUNTIME_INIT_NONSECURE_ACCESSCTRL_AND_IRQS "00220"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_NONSECURE_ACCESSCTRL_AND_IRQS
+#define PICO_RUNTIME_SKIP_INIT_NONSECURE_ACCESSCTRL_AND_IRQS !PICO_SECURE
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_NONSECURE_ACCESSCTRL_AND_IRQS
+#define PICO_RUNTIME_NO_INIT_NONSECURE_ACCESSCTRL_AND_IRQS !PICO_SECURE
 #endif
 
 // PICO_RUNTIME_INIT_MUTEX is registered automatically by pico_sync
