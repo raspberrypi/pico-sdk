@@ -11,8 +11,20 @@
 extern "C" {
 #endif
 
-#ifndef __ASSEMBLER__
+// PICO_CONFIG: PICO_PANIC_FUNCTION, Name of a function to use in place of the stock panic function or empty string to simply breakpoint on panic, group=pico_runtime
 
+// PICO_CONFIG: PICO_PANIC_FUNCTION_WITH_CALL_STACK, Ensure the call stack is available when using a custom panic function via PICO_PANIC_FUNCTION=. When set to 1 it conflicts with PICO_PANIC_FUNCTION_WITH_ALL_VAARGS=1 as a stack fram is pushed onto the stack corrupting later vaargs. Note this defaults to 1 as most custom panic functions don't actually use the arguments and the call stack seems more useful in general, default=1group=pico_runtime
+#ifndef PICO_PANIC_FUNCTION_WITH_CALL_STACK
+#define PICO_PANIC_FUNCTION_WITH_CALL_STACK 1
+#endif
+
+// PICO_CONFIG: PICO_PANIC_FUNCTION_WITH_ALL_VAARGS, Ensures that all vaargs are faithfully passed to the custom panic function via PICO_PANIC_FUNCTION=. When set to 1 it conflicts with PICO_PANIC_FUNCTION_WITH_CALL_STACK=1 because both the later vaargs and the stack frame would be expected at the top of the stack. Note this defaults to 0 as most custom panic functions don't actually use the arguments and the call stack seems more useful in general, default=1group=pico_runtime
+#ifndef PICO_PANIC_FUNCTION_WITH_ALL_VAARGS
+#define PICO_PANIC_FUNCTION_WITH_ALL_VAARGS 0
+#endif
+
+
+#ifndef __ASSEMBLER__
 /*! \brief Panics with the message "Unsupported"
  *  \ingroup pico_platform
  *  \see panic

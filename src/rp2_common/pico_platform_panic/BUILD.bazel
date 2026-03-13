@@ -20,7 +20,7 @@ cc_library(
 
 cc_library(
     name = "pico_platform_panic",
-    srcs = ["panic.c"],
+    srcs = ["panic.c", "custom_panic_function.S"],
     hdrs = ["include/pico/platform/panic.h"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
