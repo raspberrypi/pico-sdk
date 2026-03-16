@@ -5,6 +5,6 @@ load("//bazel:defs.bzl", "compatible_with_rp2")
 filegroup(
     name = "unsupported_tests",
     srcs = [
-        "panic_function__test.c",
+        "panic_function_test.c",
     ],
 )
