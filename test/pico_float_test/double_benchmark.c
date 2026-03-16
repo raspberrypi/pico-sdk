@@ -288,7 +288,7 @@ timer_func_def(dcmpgt)(volatile double a, volatile double b) {
 timer_func_def(dcmpge)(volatile double a, volatile double b) {
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
-    volatile bool v = a > b;
+    volatile bool v = a >= b;
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - DOUBLE_INPUT_COST * 2 - DCMP_OVERHEAD;
 }
@@ -676,8 +676,6 @@ timer_func_def(double2ufix64)(volatile double a, volatile int32_t nn) {
     return -1;
 #endif
 }
-
-// ----------------------
 
 // ----------------------
 

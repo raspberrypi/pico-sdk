@@ -95,10 +95,6 @@ extern "C" {
 *
 *   sincosf
 *
-* Additional functions on Arm:
-*
-*   powintf
-*
 * On Arm, the following additional optimized functions are also provided (when using `_pico` variants of `pico_float`), all of which
 * saturate to the nearest representable value for too large input when converting from floating point types:
 *
@@ -139,18 +135,22 @@ extern "C" {
 *
 *     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
 *     when the number of fractional bits is a compile time constant between 1 and 32
+*
+* - Scientific functions:
+*
+*    powintf
 * \if rp2350_specific
 *
 * - Even faster versions of divide and square-root functions that do not round correctly: (`pico_float_pico_dcp` only)
 *
-*   fdiv_fast, sqrtf_fast
+*    fdiv_fast, sqrtf_fast
 *
 * On RISC-V, (replacement) optimized implementations are provided for the following compiler built-ins when using the `pico_float_pico`
 * library (note that there are no variants of this library like there are on Arm):
 *
-* - basic arithmetic:
+* - Basic arithmetic:
 *
-*   __addsf3, __subsf3, __mulsf3
+*    __addsf3, __subsf3, __mulsf3
 * \endif
 */
 

@@ -86,9 +86,6 @@ extern "C" {
 *
 *   sincos
 *
-* Additional functions on Arm:
-*   powint
-*
 * On Arm, the following additional optimized functions are also provided when using `pico_double_pico`, all of which
 * saturate to the nearest representable value for too large input when converting from floating point types:
 *
@@ -119,6 +116,10 @@ extern "C" {
 *   - double -> (u)fix (round towards -infinity):
 *
 *       double2fix, double2ufix, double2fix64, double2ufix64
+*
+* - Scientific functions:
+*
+*    powint
 * \if rp2350_specific
 *
 * - Even faster versions of divide and square-root functions that do not round correctly:
@@ -141,7 +142,7 @@ extern "C" {
 #define PICO_DOUBLE_HAS_DOUBLE_TO_INT64_Z_CONVERSIONS 1
 // ===
 
-// PICO_CONFIG: PICO_DOUBLE_IN_RAM, Force placement of SDK provided double-precision floating point into RAM, type=bool, default=0, group=pico_float
+// PICO_CONFIG: PICO_DOUBLE_IN_RAM, Force placement of SDK provided double-precision floating point into RAM, type=bool, default=0, group=pico_double
 #if !defined(__riscv) || PICO_COMBINED_DOCS
 
 #if PICO_COMBINED_DOCS || !LIB_PICO_DOUBLE_COMPILER

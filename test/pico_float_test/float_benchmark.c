@@ -275,7 +275,7 @@ timer_func_def(fcmpgt)(volatile float a, volatile float b) {
 timer_func_def(fcmpge)(volatile float a, volatile float b) {
     register io_ro_32 *systick_ptr = systick_value_ptr();
     uint32_t t0 = *systick_ptr;
-    volatile bool v = a > b;
+    volatile bool v = a >= b;
     uint32_t t1 = *systick_ptr;
     return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - DCMP_OVERHEAD;
 }
