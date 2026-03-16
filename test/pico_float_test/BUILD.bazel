@@ -93,5 +93,7 @@ filegroup(
     srcs = [
         "custom_double_funcs_test.c",
         "custom_float_funcs_test.c",
+        "float_benchmark.c",
+        "double_benchmark.c"
     ],
 )
