@@ -18,22 +18,23 @@
 #define test_checki64(x, expected, msg) ({ if ((x) != (expected)) { printf("  %s: %lld != %lld\n", msg, (int64_t)(x), (int64_t)(expected)); stop(); } })
 #define test_checku64(x, expected, msg) ({ if ((uint64_t)(x) != (uint64_t)(expected)) { printf("  %s: %llu != %llu\n", msg, (uint64_t)(x), (uint64_t)(expected)); stop(); } })
 
+// we only want these when we provided macros
 #if !(LIB_PICO_DOUBLE_COMPILER || defined(__riscv))
 static inline double fix2double_8(int32_t m) { return fix2double(m, 8); }
-static inline double fix2double_12(int32_t m) { return fix2double(m, 12); }
 static inline double fix2double_16(int32_t m) { return fix2double(m, 16); }
 static inline double fix2double_24(int32_t m) { return fix2double(m, 24); }
-static inline double fix2double_28(int32_t m) { return fix2double(m, 28); }
 static inline double fix2double_32(int32_t m) { return fix2double(m, 32); }
 
-static inline double ufix2double_12(int32_t m) { return ufix2double(m, 12); }
+static inline double ufix2double_8(uint32_t m) { return ufix2double(m, 8); }
+static inline double ufix2double_16(uint32_t m) { return ufix2double(m, 16); }
+static inline double ufix2double_24(uint32_t m) { return ufix2double(m, 24); }
+static inline double ufix2double_32(uint32_t m) { return ufix2double(m, 32); }
 
 static inline double double2fix_12(int32_t m) { return double2fix(m, 12); }
-
 static inline double double2ufix_12(int32_t m) { return double2ufix(m, 12); }
 #endif
 
-#if 1 && (LIB_PICO_DOUBLE_COMPILER || defined(__riscv))
+#if LIB_PICO_DOUBLE_COMPILER || defined(__riscv)
 #define double2int_z(f) ({ double _d = f; pico_default_asm_volatile("" : "+r" (_d)); double2 ## int_z(_d); })
 #define double2uint_z(f) ({ double _d = f; pico_default_asm_volatile("" : "+r" (_d)); double2 ## uint_z(_d); })
 #define double2int64_z(f) ({ double _d = f; pico_default_asm_volatile("" : "+r" (_d)); double2 ## int64_z(_d); })
@@ -152,6 +153,13 @@ int test() {
     test_checkd(fix2double_16(-8192), -0.125, "fix2double_8_4");
     test_checkd(fix2double_24(3<<23), 1.5, "fix2double_8_5");
     test_checkd(fix2double_24(-(3<<23)), -1.5, "fix2double_8_6");
+
+    test_checkd(ufix2double_8(128), 0.5, "fix2double_8_1");
+    test_checkd(ufix2double_8(-128), 16777215.5, "ufix2double_8_2");
+    test_checkd(ufix2double_16(8192), 0.125, "ufix2double_8_3");
+    test_checkd(ufix2double_16(-8192), 65535.875, "ufix2double_8_4");
+    test_checkd(ufix2double_24(3<<23), 1.5, "ufix2double_8_5");
+    test_checkd(ufix2double_24(-(3<<23)), 254.5, "ufix2double_8_6");
 #endif
 
 #if PICO_DOUBLE_HAS_FIX64_TO_DOUBLE_CONVERSIONS

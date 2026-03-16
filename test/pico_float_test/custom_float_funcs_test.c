@@ -18,18 +18,17 @@
 #define test_checki64(x, expected, msg) ({ if ((x) != (expected)) { printf("  %s: %lld != %lld\n", msg, (int64_t)(x), (int64_t)(expected)); stop(); } })
 #define test_checku64(x, expected, msg) ({ if ((uint64_t)(x) != (uint64_t)(expected)) { printf("  %s: %llu != %llu\n", msg, (uint64_t)(x), (uint64_t)(expected)); stop(); } })
 
+// we only want these when we provided macros
 #if !(LIB_PICO_FLOAT_COMPILER || defined(__riscv))
 static inline float fix2float_8(int32_t m) { return fix2float(m, 8); }
-static inline float fix2float_12(int32_t m) { return fix2float(m, 12); }
 static inline float fix2float_16(int32_t m) { return fix2float(m, 16); }
 static inline float fix2float_24(int32_t m) { return fix2float(m, 24); }
-static inline float fix2float_28(int32_t m) { return fix2float(m, 28); }
-static inline float fix2float_32(int32_t m) { return fix2float(m, 32); }
 
-static inline float ufix2float_12(int32_t m) { return ufix2float(m, 12); }
+static inline float ufix2float_8(uint32_t m) { return ufix2float(m, 8); }
+static inline float ufix2float_16(uint32_t m) { return ufix2float(m, 16); }
+static inline float ufix2float_24(uint32_t m) { return ufix2float(m, 24); }
 
 static inline float float2fix_12(int32_t m) { return float2fix(m, 12); }
-
 static inline float float2ufix_12(int32_t m) { return float2ufix(m, 12); }
 #endif
 
@@ -240,6 +239,7 @@ int test() {
     test_checkf(call_ufix2float(0xa0000000, 30), 2.5f, "call_ufix2float1");
     test_checkf(call_ufix2float(3, -4), 48.0f, "call_ufix2float2");
 #endif
+
     printf("fix2float_N\n");
     test_checkf(fix2float_8(128), 0.5f, "fix2float_8_1");
     test_checkf(fix2float_8(-128), -0.5f, "fix2float_8_2");
@@ -247,6 +247,15 @@ int test() {
     test_checkf(fix2float_16(-8192), -0.125f, "fix2float_8_4");
     test_checkf(fix2float_24(3<<23), 1.5f, "fix2float_8_5");
     test_checkf(fix2float_24(-(3<<23)), -1.5f, "fix2float_8_6");
+
+    printf("ufix2float_N\n");
+    test_checkf(ufix2float_8(128), 0.5f, "ufix2float_8_1");
+    test_checkf(ufix2float_8(-128), 16777216.f, "ufix2float_8_2");
+    test_checkf(ufix2float_16(8192), 0.125f, "ufix2floa4t_8_3");
+    test_checkf(ufix2float_16(-8192), 65535.875f, "ufix2float_8_4");
+    test_checkf(ufix2float_24(3<<23), 1.5f, "ufix2float_8_5");
+    test_checkf(ufix2float_24(-(3<<23)), 254.5f, "ufix2float_8_6");
+
 #endif
 
 #if PICO_FLOAT_HAS_FIX64_TO_FLOAT_CONVERSIONS
