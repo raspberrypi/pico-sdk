@@ -13,7 +13,7 @@ extern "C" {
 
 // PICO_CONFIG: PICO_PANIC_FUNCTION, Name of a function to use in place of the stock panic function or empty string to simply breakpoint on panic, group=pico_runtime
 
-// PICO_CONFIG: PICO_PANIC_FUNCTION_WITH_CALL_STACK, Ensure the call stack is available when using a custom panic function via PICO_PANIC_FUNCTION=. When set to 1 it conflicts with PICO_PANIC_FUNCTION_WITH_ALL_VAARGS=1 as a stack fram is pushed onto the stack corrupting later vaargs. Note this defaults to 1 as most custom panic functions don't actually use the arguments and the call stack seems more useful in general, default=1, group=pico_runtime
+// PICO_CONFIG: PICO_PANIC_FUNCTION_WITH_CALL_STACK, Ensure the call stack is available when using a custom panic function via PICO_PANIC_FUNCTION=. When set to 1 it conflicts with PICO_PANIC_FUNCTION_WITH_ALL_VAARGS=1 as a stack frame is pushed onto the stack corrupting later vaargs. Note this defaults to 1 as most custom panic functions don't actually use the arguments and the call stack seems more useful in general, default=1, group=pico_runtime
 #ifndef PICO_PANIC_FUNCTION_WITH_CALL_STACK
 #define PICO_PANIC_FUNCTION_WITH_CALL_STACK 1
 #endif
@@ -23,9 +23,9 @@ extern "C" {
 #define PICO_PANIC_FUNCTION_WITH_ALL_VAARGS 0
 #endif
 
-// PICO_CONFIG: PICO_PANIC_FUNCTION_DOES_NOT_RETURN, Indicate that the user supplied PICO_PANIC_FUNCTION= does not return so the caller does not need to inject a breakpoint. When this is 1 both full call stacks are available and all vaargs are correctly passed to the user function, default=-0 group=pico_runtime
-#ifndef PICO_PANIC_FUNCTION_WITH_ALL_VAARGS
-#define PICO_PANIC_FUNCTION_WITH_ALL_VAARGS 0
+// PICO_CONFIG: PICO_PANIC_FUNCTION_DOES_NOT_RETURN, Indicate that the user supplied PICO_PANIC_FUNCTION= does not return so the caller does not need to inject a breakpoint. When this is 1 the full call stack is available and all vaargs are correctly passed to the user function, default=-0 group=pico_runtime
+#ifndef PICO_PANIC_FUNCTION_DOES_NOT_RETURN
+#define PICO_PANIC_FUNCTION_DOES_NOT_RETURN 0
 #endif
 
 #ifndef __ASSEMBLER__
