@@ -15,7 +15,7 @@ SECTIONS
 
         *(.time_critical*)
 
-        /* remaining .text and .rodata; i.e. stuff we exclude above because we want it in RAM */
+        /* remaining .text and .rodata; i.e. stuff we exclude in ..._excludes files because we want it in RAM */
         *(.text*)
         . = ALIGN(4);
         *(.rodata*)
