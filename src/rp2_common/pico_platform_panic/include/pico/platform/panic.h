@@ -23,7 +23,7 @@ extern "C" {
 #define PICO_PANIC_FUNCTION_WITH_ALL_VAARGS 0
 #endif
 
-// PICO_CONFIG: PICO_PANIC_FUNCTION_DOES_NOT_RETURN, Indicate that the user supplied PICO_PANIC_FUNCTION= does not return so the caller does not need to inject a breakpoint. When this is 1 the full call stack is available and all vaargs are correctly passed to the user function, default=-0 group=pico_runtime
+// PICO_CONFIG: PICO_PANIC_FUNCTION_DOES_NOT_RETURN, Indicate that the user supplied PICO_PANIC_FUNCTION does not return so the caller does not need to inject a breakpoint. When this is 1 the full call stack is available and all vaargs are correctly passed to the user function, default=-0 group=pico_runtime
 #ifndef PICO_PANIC_FUNCTION_DOES_NOT_RETURN
 #define PICO_PANIC_FUNCTION_DOES_NOT_RETURN 0
 #endif
