@@ -125,6 +125,12 @@ SECTIONS
         *(SORT(.dtors.*))
         *(.dtors)
 
+        /* section information for usbh class */
+        . = ALIGN(4);
+        __usbh_class_info_start__ = .;
+        KEEP(*(.usbh_class_info))
+        __usbh_class_info_end__ = .;
+
         *(.eh_frame*)
         . = ALIGN(4);
         __ram_text_end__ = .;
