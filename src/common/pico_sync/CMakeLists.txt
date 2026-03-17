@@ -8,7 +8,7 @@ endif()
 if (NOT TARGET pico_sync)
     pico_add_impl_library(pico_sync)
     target_include_directories(pico_sync_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-    pico_mirrored_target_link_libraries(pico_sync INTERFACE pico_sync_sem pico_sync_mutex pico_sync_critical_section pico_time hardware_sync)
+    pico_mirrored_target_link_libraries(pico_sync INTERFACE pico_sync_cond pico_sync_sem pico_sync_mutex pico_sync_critical_section pico_time hardware_sync)
 endif()
 
 
@@ -17,6 +17,14 @@ if (NOT TARGET pico_sync_core)
     target_sources(pico_sync_core INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/lock_core.c
     )
+endif()
+
+if (NOT TARGET pico_sync_cond)
+    pico_add_library(pico_sync_cond)
+    target_sources(pico_sync_cond INTERFACE
+            ${CMAKE_CURRENT_LIST_DIR}/cond.c
+            )
+    pico_mirrored_target_link_libraries(pico_sync_cond INTERFACE pico_sync_core)
 endif()
 
 if (NOT TARGET pico_sync_sem)

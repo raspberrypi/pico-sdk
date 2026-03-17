@@ -39,6 +39,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_cpp",
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                "//test/pico_cond_test:pico_cond_test",
                 "//test/pico_divider_test:pico_divider_test",
                 "//test/pico_divider_test:pico_divider_nesting_test",
                 "//test/pico_float_test:pico_double_test",
