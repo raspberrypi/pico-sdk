@@ -5,6 +5,7 @@
  */
 
 #include "pico/asm_helper.S"
+#include "pico/float.h"
 #include "pico/runtime_init.h"
 #include "pico/bootrom/sf_table.h"
 #include "hardware/divider_helper.S"
