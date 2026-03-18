@@ -205,8 +205,8 @@ extern "C" {
 #if PICO_DOUBLE_HAS_INT32_TO_DOUBLE_CONVERSIONS
 #if !__PICO_DOUBLE_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
-    static inline double int2double(int32_t i) { return (float)i; }
-    static inline double uint2double(uint32_t i) { return (float)i; }
+    static inline double int2double(int32_t i) { return (double)i; }
+    static inline double uint2double(uint32_t i) { return (double)i; }
 #else
     //! Convert a signed 32-bit integer to the nearest float
     double int2double(int32_t i);
@@ -218,8 +218,8 @@ extern "C" {
 #if PICO_DOUBLE_HAS_INT64_TO_DOUBLE_CONVERSIONS
 #if !__PICO_DOUBLE_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
-    static inline double int642double(int64_t i) { return (float)i; }
-    static inline double uint642double(uint64_t i) { return (float)i; }
+    static inline double int642double(int64_t i) { return (double)i; }
+    static inline double uint642double(uint64_t i) { return (double)i; }
 #else
     //! Convert a signed 64-bit integer to the nearest float
     double int642double(int64_t i);
