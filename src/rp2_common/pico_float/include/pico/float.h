@@ -162,7 +162,7 @@
 //! \{
 
 // we always define these for C code, but they are inline
-// funcs except for _PICO_FLOAT_OPTIMIZED so wouldn't
+// funcs except for __PICO_FLOAT_ARM_OPTIMIZED so wouldn't
 // be callable for assembly
 #if __PICO_FLOAT_ARM_OPTIMIZED || !defined(__ASSEMBLER__)
 //! Set if \ref int2float and \ref uint2float are available
