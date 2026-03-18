@@ -17,7 +17,7 @@ void __printflike(1, 0) handle_panic(const char *magic1, ...)
 {
     printf("checking first arg...\n");
     if (magic1 != MAGIC1) {
-        printf("magic1 (%08x) != 0x%08x\n", magic1, MAGIC1);
+        printf("magic1 (%p) != %p\n", magic1, MAGIC1);
         return;
     }
     va_list args;
