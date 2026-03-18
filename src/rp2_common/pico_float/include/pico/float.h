@@ -221,7 +221,7 @@ extern "C" {
 //! \{
 #if PICO_FLOAT_HAS_INT32_TO_FLOAT_CONVERSIONS
 #if LIB_PICO_FLOAT_PICO_VFP || !__PICO_FLOAT_ARM_OPTIMIZED
-    // for VFP the C cast is an assembly instruction anyway, so we prefer that over a functino call
+    // for VFP the C cast is an assembly instruction anyway, so we prefer that over a function call
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline float int2float(int32_t i) { return (float)i; }
     static inline float uint2float(uint32_t i) { return (float)i; }
