@@ -129,7 +129,7 @@
 
 #include "pico.h"
 
-// PICO_CONFIG: PICO_DOUBLE_IN_RAM, Force placement of SDK provided single-precision floating point into RAM, type=bool, default=0, group=pico_double
+// PICO_CONFIG: PICO_DOUBLE_IN_RAM, Force placement of SDK provided double-precision floating point code into RAM, type=bool, default=0, group=pico_double
 #ifndef PICO_DOUBLE_IN_RAM
 #define PICO_DOUBLE_IN_RAM 0
 #endif
