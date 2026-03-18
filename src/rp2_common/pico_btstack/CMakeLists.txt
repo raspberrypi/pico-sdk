@@ -118,6 +118,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
     if (EXISTS ${PICO_BTSTACK_PATH}/src/ble/gatt-service/hids_host.c)
         target_sources(pico_btstack_ble INTERFACE
             ${PICO_BTSTACK_PATH}/src/ble/gatt-service/hids_host.c
+            ${PICO_BTSTACK_PATH}/src/ble/gatt_service_client.c
         )
     else()
         target_sources(pico_btstack_ble INTERFACE
