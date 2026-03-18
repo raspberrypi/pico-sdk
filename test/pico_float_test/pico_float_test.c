@@ -336,10 +336,18 @@ float __real_ldexpf(float, int);
 float __real_fmodf(float, float);
 #define FRAC ((float)(1u << 22))
 #define allowed_range(a) (fabsf(a) / FRAC)
+#if PICO_C_COMPILER_IS_GNU && __GNUC__ < 14
+// seems to be an inaccuracy in GNU impl - presumably not fused
+#define allowed_range_fma(a) (65536 * fabsf(a) / FRAC)
+#else
+#define allowed_range_fma(a) allowed_range(a)
+#endif
+
 #ifdef LLVM_LIBC_MATH_H
 #define isinff isinf
 #endif
 #define assert_close(a, b) test_assert((fabsf(a - b) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && (a < 0) == (b < 0)))
+#define assert_close_fma(a, b) test_assert((fabsf(a - b) <= allowed_range_fma(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && (a < 0) == (b < 0)))
 #define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
 #if !LIB_PICO_FLOAT_PICO_VFP
 #define check1_vfp_unwrapped(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
@@ -350,7 +358,7 @@ float __real_fmodf(float, float);
 #endif
 #define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnanf(p0)) assert_nan(r); else assert_close(r, r2); r; })
 #define check_close2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); if (isnanf(p0) || isnanf(p1)) assert_nan(r); else assert_close(r, r2); r; })
-#define check_close3(func,p0,p1,p2) ({ typeof(p0) r = func(p0,p1,p2), r2 = __CONCAT(__real_, func)(p0,p1,p2); if (isnanf(p0) || isnanf(p1) || isnanf(p2)) assert_nan(r); else assert_close(r, r2); r; })
+#define check_close3_fma(func,p0,p1,p2) ({ typeof(p0) r = func(p0,p1,p2), r2 = __CONCAT(__real_, func)(p0,p1,p2); if (isnanf(p0) || isnanf(p1) || isnanf(p2)) assert_nan(r); else assert_close_fma(r, r2); r; })
 #else
 #define check1(func,p0) func(p0)
 #define check1_vfp_unwrapped(func,p0) func(p0)
@@ -358,7 +366,7 @@ float __real_fmodf(float, float);
 #define check2_vfp_unwrapped(func,p0,p1) func(p0,p1)
 #define check_close1(func,p0) func(p0)
 #define check_close2(func,p0,p1) func(p0,p1)
-#define check_close3(func,p0,p1,p2) func(p0,p1,p2)
+#define check_close3_fma(func,p0,p1,p2) func(p0,p1,p2)
 #endif
 
 double aa = 0.5;
@@ -509,7 +517,7 @@ int main() {
         for (float b = -2000000.0f; b < 1000000.0f; b += 397243.5f) {
             for (float c = -700.0f; c < 1000.0f; c += 287.4f) {
                 printf("fma %f %f %f\n", a, b, c);
-                check_close3(fmaf, a, b, c);
+                check_close3_fma(fmaf, a, b, c);
             }
         }
     }
