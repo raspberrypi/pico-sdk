@@ -143,7 +143,7 @@
 //! \{
 
 // we always define these for C code, but they are inline
-// funcs except for _PICO_DOUBLE_OPTIMIZED so wouldn't
+// funcs except for __PICO_DOUBLE_ARM_OPTIMIZED so wouldn't
 // be callable for assembly
 #if __PICO_DOUBLE_ARM_OPTIMIZED || !defined(__ASSEMBLER__)
 //! Set if \ref int2double and \ref uint2double are available
