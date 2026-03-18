@@ -203,8 +203,7 @@ extern "C" {
 //! \addtogroup pico_double
 //! \{
 #if PICO_DOUBLE_HAS_INT32_TO_DOUBLE_CONVERSIONS
-#if LIB_PICO_DOUBLE_PICO_VFP || !__PICO_DOUBLE_ARM_OPTIMIZED
-    // for VFP the C cast is an assembly instruction anyway, so we prefer that over a functino call
+#if !__PICO_DOUBLE_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline double int2double(int32_t i) { return (float)i; }
     static inline double uint2double(uint32_t i) { return (float)i; }
@@ -331,103 +330,6 @@ int64_t double2fix64(double f, int e);
 //! \brief Convert a double to an unsigned 64-bit fixed-point integer with the given number of fractional bits, rounding towards -Infinity.
 //! This conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input
 uint64_t double2ufix64(double f, int e);
-#endif
-
-#if LIB_PICO_DOUBLE_PICO_VFP
-// special handling of fixed-point conversions for VFP - we want to inline calls with fixed exponents
-// between 1 and 32, because they can use an assembly instruction. we leave the function in place
-// with its original name, however make a #define which will either do the inline instruction
-// or call the original function
-#if PICO_DOUBLE_HAS_FIX32_TO_DOUBLE_CONVERSIONS
-// a bit of a hack to inline VFP fixed-point conversion when exponent is constant and in range 1-32
-#define fix2double(m, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _fix2double_inline(m, e) : fix2 ## float(m, e), fix2 ## float(m, e))
-#define ufix2double(m, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _ufix2double_inline(m, e) : ufix2 ## float(m, e), ufix2 ## float(m, e))
-
-#define _fix2double_inline(m, e) ({ \
-    int32_t _m = m; \
-    double f; \
-    pico_default_asm( \
-        "vmov %0, %1\n" \
-        "vcvt.f32.s32 %0, %0, %2\n" \
-        : "=t" (f) \
-        : "r" (_m), "i" (e) \
-    ); \
-    f; \
-})
-#define _ufix2double_inline(m, e) ({ \
-    uint32_t _m = m; \
-    double f; \
-    pico_default_asm( \
-        "vmov %0, %1\n" \
-        "vcvt.f32.u32 %0, %0, %2\n" \
-        : "=t" (f) \
-        : "r" (_m), "i" (e) \
-    ); \
-    f; \
-})
-
-#endif
-#if PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_Z_CONVERSIONS
-#define double2fix_z(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _double2fix_z_inline(f, e) : double2 ## fix_z(f, e), double2 ## fix_z(f, e))
-#define double2ufix_z(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _double2ufix_z_inline(f, e) : double2 ## ufix_z(f, e), double2 ## ufix_z(f, e))
-
-#define _double2fix_z_inline(f, e) ({ \
-    int32_t _m; \
-    double _f = (f); \
-    pico_default_asm( \
-        "vcvt.s32.f32 %0, %0, %2\n" \
-        "vmov %1, %0\n" \
-        : "+t" (_f), "=r" (_m) \
-        : "i" (e) \
-    ); \
-    _m; \
-})
-#define _double2ufix_z_inline(f, e) ({ \
-    uint32_t _m; \
-    double _f = (f); \
-    pico_default_asm( \
-        "vcvt.u32.f32 %0, %0, %2\n" \
-        "vmov %1, %0\n" \
-        : "+t" (_f), "=r" (_m) \
-        : "i" (e) \
-    ); \
-    _m; \
-})
-
-#endif
-#if PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_M_CONVERSIONS
-#define double2fix(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _double2fix_inline(f, e) : double2 ## fix(f, e), double2 ## fix(f, e))
-#define double2ufix(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _double2ufix_inline(f, e) : double2 ## ufix(f, e), double2 ## ufix(f, e))
-
-#define _double2fix_inline(f, e) ({ \
-    union { double _f; int32_t _i; } _u; \
-    _u._f = (f); \
-    uint rc, tmp; \
-    pico_default_asm( \
-        "vcvt.s32.f32 %0, %0, %4\n" \
-        "vmov %2, %0\n" \
-        "lsls %1, #1\n" \
-        "bls 2f\n" /* positive or zero or -zero are ok with the result we have */ \
-        "lsrs %3, %1, #24\n" \
-        "subs %3, #0x7f - %c4\n" \
-        "bcc 1f\n" /* 0 < abs(f) < 1 ^ e, so need to round down */ \
-        /* mask off all but fractional bits */ \
-        "lsls %1, %3\n" \
-        "lsls %1, #8\n" \
-        "beq 2f\n" /* integers can round towards zero */ \
-        "1:\n" \
-        /* need to subtract 1 from the result to round towards -infinity... */ \
-        /* this will never cause an overflow, because to get here we must have had a non integer/infinite value which */ \
-        /* therefore cannot have been equal to INT64_MIN when rounded towards zero */ \
-        "subs %2, #1\n" \
-        "2:\n" \
-        : "+t" (_u._f), "+r" (_u._i), "=r" (rc), "=r" (tmp) \
-        : "i" (e) \
-    ); \
-    rc; \
-})
-#define _double2ufix_inline(f, e) _double2ufix_z_inline((f), (e))
-#endif
 #endif
 
     // exp10 doesn't always appear in math.h but is present on all our platforms even for LIB_PICO_DOUBLE_COMPILER
