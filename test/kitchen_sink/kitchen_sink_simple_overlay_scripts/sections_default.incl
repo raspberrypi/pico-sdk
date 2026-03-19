@@ -1,5 +1,5 @@
-INCLUDE "section_default_text.incl"
-INCLUDE "section_default_data.incl"
+INCLUDE "sections_default_text.incl"
+INCLUDE "sections_default_data.incl"
 
 SECTIONS
 {
@@ -18,7 +18,7 @@ SECTIONS
 }
 
 INCLUDE "section_heap.incl"
-INCLUDE "section_scratch.incl"
+INCLUDE "sections_scratch.incl"
 INCLUDE "section_flash_end.incl"
 INCLUDE "section_end.incl"
 INCLUDE "section_platform_end.incl"

@@ -1,0 +1,2 @@
+INCLUDE "section_copy_to_ram_data.incl"
+INCLUDE "section_bss.incl"

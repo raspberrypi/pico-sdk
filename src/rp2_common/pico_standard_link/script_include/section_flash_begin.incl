@@ -1,0 +1,6 @@
+SECTIONS
+{
+    .flash_begin : {
+        __flash_binary_start = .;
+    } > TEXT_STORE
+}

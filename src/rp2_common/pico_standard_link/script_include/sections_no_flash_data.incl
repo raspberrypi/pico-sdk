@@ -1,0 +1,3 @@
+INCLUDE "section_no_flash_data.incl"
+INCLUDE "section_uninitialized_data.incl"
+INCLUDE "section_bss.incl"

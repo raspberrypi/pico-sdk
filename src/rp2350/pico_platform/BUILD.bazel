@@ -71,11 +71,6 @@ use_linker_script_file(
 )
 
 use_linker_script_file(
-    name = "memmap_blocked_ram_args",
-    script = "memmap_blocked_ram.ld",
-)
-
-use_linker_script_file(
     name = "memmap_copy_to_ram_args",
     script = "memmap_copy_to_ram.ld",
 )
