@@ -373,7 +373,6 @@ uint64_t double2ufix64(double f, int e);
 #if PICO_DOUBLE_HAS_DDIV_FAST
 //! Perform a fast floating point divide with reduced accuracy
 double ddiv_fast(double n, double d);
-//! Perform a fast multiply-add (x * y + z) with reduced accuracy (not fused multiply-add). This is another name for \ref fma_fast
 
 #if PICO_DOUBLE_HAS_SQRT_FAST
 //! Perform a fast floating point square-root with reduced accuracy
@@ -381,9 +380,9 @@ double sqrt_fast(double f);
 #endif
 
 #if PICO_DOUBLE_HAS_FMA_FAST
-//! Perform a fast multipy-add with reduced accuracy (not fused multiply-add)
-double fma_fast(double x, double y, double z); // this is not fused
-//! Perform a fast multipy-add with reduced accuracy (not fused multiply-add). This is another name for \ref fma_fast
+//! Perform a fast (non-fused) multiply-add (x * y + z) with reduced accuracy
+double fma_fast(double x, double y, double z);
+//! Perform a fast multiply-add (x * y + z) with reduced accuracy (not fused multiply-add). This is another name for \ref fma_fast
 double mla(double x, double y, double z); // another name for fma_fast
 #endif
 //! \}
