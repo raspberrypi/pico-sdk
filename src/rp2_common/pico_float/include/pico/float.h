@@ -280,7 +280,7 @@ extern "C" {
 //! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +/- Infinity
 float fix2float(int32_t m, int e);
-//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 32-bit integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +Infinity
 float ufix2float(uint32_t m, int e);
 #endif
@@ -289,7 +289,7 @@ float ufix2float(uint32_t m, int e);
 //! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +/- Infinity
 float fix642float(int64_t m, int e);
-//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 64-bit integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +Infinity
 float ufix642float(uint64_t m, int e);
 #endif
@@ -327,8 +327,8 @@ uint32_t float2uint(float f);
 //! \brief Convert a float to a signed 64-bit integer, rounding towards -Infinity.
 //! This conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input
 int64_t float2int64(float f);
-//! \brief Convert a float to a signed 64-bit integer, rounding towards -Infinity.
-//! This conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input
+//! \brief Convert a float to an unsigned 64-bit integer, rounding towards -Infinity.
+//! This conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input
 uint64_t float2uint64(float f);
 #endif
 
