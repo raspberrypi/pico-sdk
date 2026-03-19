@@ -158,11 +158,11 @@ if (NOT TARGET pico_standard_link)
     target_link_options(pico_standard_link INTERFACE "LINKER:-L${CMAKE_BINARY_DIR}")
 
     # add include path for main linker script sections
-    target_link_options(pico_standard_link INTERFACE "LINKER:-L${PICO_LINKER_SCRIPT_PATH}/platform_scripts")
-    target_link_options(pico_standard_link INTERFACE "LINKER:-L${CMAKE_CURRENT_LIST_DIR}/standard_scripts")
+    target_link_options(pico_standard_link INTERFACE "LINKER:-L${PICO_LINKER_SCRIPT_PATH}/script_include")
+    target_link_options(pico_standard_link INTERFACE "LINKER:-L${CMAKE_CURRENT_LIST_DIR}/script_include")
 
     # add default locations script, so they can be referenced by pico_set_linker_script_var variables
-    target_link_options(pico_standard_link INTERFACE "LINKER:--script=${PICO_LINKER_SCRIPT_PATH}/platform_scripts/default_locations.ld")
+    target_link_options(pico_standard_link INTERFACE "LINKER:--script=${PICO_LINKER_SCRIPT_PATH}/script_include/default_locations.ld")
 
     # add variables set by pico_set_linker_script_var function
     target_link_options(pico_standard_link INTERFACE "LINKER:$<JOIN:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_VARS>,,>")
