@@ -19,7 +19,7 @@
 #define test_checku64(x, expected, msg) ({ if ((uint64_t)(x) != (uint64_t)(expected)) { printf("  %s: %llu != %llu\n", msg, (uint64_t)(x), (uint64_t)(expected)); stop(); } })
 
 // we only want these when we provided macros
-#if !(LIB_PICO_DOUBLE_COMPILER || defined(__riscv))
+#if PICO_DOUBLE_HAS_FIX32_TO_DOUBLE_CONVERSIONS
 static inline double fix2double_8(int32_t m) { return fix2double(m, 8); }
 static inline double fix2double_16(int32_t m) { return fix2double(m, 16); }
 static inline double fix2double_24(int32_t m) { return fix2double(m, 24); }

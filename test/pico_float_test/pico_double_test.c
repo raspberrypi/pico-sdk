@@ -444,7 +444,7 @@ int main() {
             for (double c = -700.0; c < 1000.0; c += 287.4) {
                 printf("FMA %f\n", check_close3(fma, a, b, c));
 #if PICO_DOUBLE_HAS_FMA_FAST
-                printf("FMAFAST %f\n", check_close3(fma, a, b, c));
+                printf("FMAFAST %f\n", check_close3(fma_fast, a, b, c));
 #endif
             }
         }
