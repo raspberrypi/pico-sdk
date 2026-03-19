@@ -37,35 +37,4 @@ SECTIONS
 
         *(.eh_frame*)
     } > RAM
-
-    .rodata : {
-        . = ALIGN(4);
-        *(.rodata*)
-        . = ALIGN(4);
-        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
-        . = ALIGN(4);
-    } > RAM
-
-    .ARM.extab :
-    {
-        *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > RAM
-
-    __exidx_start = .;
-    .ARM.exidx :
-    {
-        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > RAM
-    __exidx_end = .;
-
-    /* Machine inspectable binary information */
-    . = ALIGN(4);
-    __binary_info_start = .;
-    .binary_info :
-    {
-        KEEP(*(.binary_info.keep.*))
-        *(.binary_info.*)
-    } > RAM
-    __binary_info_end = .;
-    . = ALIGN(4);
 }

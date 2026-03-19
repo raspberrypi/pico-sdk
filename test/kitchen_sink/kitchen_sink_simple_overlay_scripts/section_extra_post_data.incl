@@ -1,6 +1,3 @@
-INCLUDE "sections_default_text.incl"
-INCLUDE "sections_default_data.incl"
-
 SECTIONS
 {
     PROVIDE(__overlays_start__ = .);
@@ -16,9 +13,3 @@ SECTIONS
     } > RAM AT> RAM_STORE
     PROVIDE(__overlays_end__ = .);
 }
-
-INCLUDE "section_heap.incl"
-INCLUDE "sections_scratch.incl"
-INCLUDE "section_flash_end.incl"
-INCLUDE "section_end.incl"
-INCLUDE "section_platform_end.incl"

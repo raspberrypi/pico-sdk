@@ -226,6 +226,8 @@ if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
 
     add_executable(kitchen_sink_ram_section ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
     pico_add_linker_script_override_path(kitchen_sink_ram_section ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_ram_section_scripts)
+    # Also add this directory to test that multiple override paths work (although it doesn't override anything, as it's the same file)
+    pico_add_linker_script_override_path(kitchen_sink_ram_section ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_simple_overlay_scripts)
     target_link_libraries(kitchen_sink_ram_section kitchen_sink_libs kitchen_sink_options)
     pico_add_extra_outputs(kitchen_sink_ram_section)
     target_compile_definitions(kitchen_sink_ram_section PRIVATE KITCHEN_SINK_ID="ram section binary" EXTRA_DATA_SECTION=1)
