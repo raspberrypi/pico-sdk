@@ -1,3 +1,6 @@
-/* Empty file - can be overriden
-   This file is included between the end of data/bss and the start of the heap
+/* Empty file
+
+   This file is included between the end of data/bss and the start of the heap.
+
+   It can be overridden to add extra sections into ram.
 */

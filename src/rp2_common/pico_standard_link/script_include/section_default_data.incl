@@ -1,3 +1,9 @@
+/* Defines the following symbols for use by code:
+    __data_start__, __data_end__
+    __mutex_array_start, __mutex_array_end
+    __etext
+*/
+
 SECTIONS
 {
     .data : {

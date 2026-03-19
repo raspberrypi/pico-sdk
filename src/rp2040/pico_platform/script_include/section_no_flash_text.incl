@@ -1,3 +1,10 @@
+/* Defines the following symbols for use by code:
+    __logical_binary_start
+    __binary_info_header_end
+    __embedded_block_end
+    __reset_start, __reset_end
+*/
+
 SECTIONS
 {
     /* Note in NO_FLASH builds the entry point for both the bootrom, and debugger

@@ -1,3 +1,5 @@
+/* Set memory locations either to the already defined value, or to the default value from default_locations.ld */
+
 RAM_ORIGIN = DEFINED(RAM_ORIGIN) ? RAM_ORIGIN : RAM_ORIGIN_DEFAULT;
 RAM_LENGTH = DEFINED(RAM_LENGTH) ? RAM_LENGTH : RAM_LENGTH_DEFAULT;
 SCRATCH_X_ORIGIN = DEFINED(SCRATCH_X_ORIGIN) ? SCRATCH_X_ORIGIN : SCRATCH_X_ORIGIN_DEFAULT;

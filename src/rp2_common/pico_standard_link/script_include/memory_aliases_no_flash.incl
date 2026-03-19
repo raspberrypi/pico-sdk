@@ -1,3 +1,5 @@
+/* Store everything where it came from (ram/scratch) */
+
 REGION_ALIAS("TEXT_STORE", RAM);
 REGION_ALIAS("RAM_STORE", RAM);
 REGION_ALIAS("SCRATCH_X_STORE", SCRATCH_X);

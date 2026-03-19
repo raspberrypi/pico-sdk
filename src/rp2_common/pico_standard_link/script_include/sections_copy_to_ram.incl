@@ -1,3 +1,5 @@
+/* Main section list for copy_to_ram binaries */
+
 INCLUDE "sections_copy_to_ram_text.incl"
 INCLUDE "section_extra_post_text.incl"
 INCLUDE "sections_copy_to_ram_data.incl"
@@ -9,3 +11,4 @@ INCLUDE "sections_stack.incl"
 INCLUDE "section_flash_end.incl"
 INCLUDE "section_end.incl"
 INCLUDE "section_platform_end.incl"
+INCLUDE "section_extra_post_end.incl"

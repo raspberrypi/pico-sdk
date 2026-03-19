@@ -1,3 +1,10 @@
+/* Defines the following symbols for use by code:
+    __bss_start__, __bss_end__
+    __tls_base, __tls_end
+    __tbss_end
+    __global_pointer$
+*/
+
 SECTIONS
 {
     .tbss (NOLOAD) : {

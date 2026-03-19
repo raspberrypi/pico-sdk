@@ -12,5 +12,5 @@ SECTIONS
     } > TEXT_STORE
 
     ASSERT(__boot2_end__ - __boot2_start__ == 256,
-        "ERROR: Pico second stage bootloader must be 256 bytes in size")
+        "ERROR: Pico second stage bootloader must be exactly 256 bytes in size for RP2040")
 }

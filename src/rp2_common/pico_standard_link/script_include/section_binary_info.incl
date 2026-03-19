@@ -1,3 +1,7 @@
+/* Defines the following symbols for use by code:
+    __binary_info_start, __binary_info_end
+*/
+
 SECTIONS
 {
     /* Machine inspectable binary information */

@@ -1,3 +1,7 @@
+/* Defines the following symbols for use by code:
+    __HeapLimit
+*/
+
 SECTIONS
 {
     .heap DEFINED(HEAP_LOC) ? HEAP_LOC : . (NOLOAD):

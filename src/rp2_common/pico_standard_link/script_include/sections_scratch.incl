@@ -1,3 +1,8 @@
+/* Defines the following symbols for use by code:
+    __scratch_x_start__, __scratch_x_end__, __scratch_x_source__
+    __scratch_y_start__, __scratch_y_end__, __scratch_y_source__
+*/
+
 SECTIONS
 {
     /* Start and end symbols must be word-aligned */

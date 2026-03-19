@@ -1,3 +1,5 @@
+/* Main section list for default binaries */
+
 INCLUDE "sections_default_text.incl"
 INCLUDE "section_extra_post_text.incl"
 INCLUDE "sections_default_data.incl"
@@ -9,3 +11,4 @@ INCLUDE "sections_stack.incl"
 INCLUDE "section_flash_end.incl"
 INCLUDE "section_end.incl"
 INCLUDE "section_platform_end.incl"
+INCLUDE "section_extra_post_end.incl"

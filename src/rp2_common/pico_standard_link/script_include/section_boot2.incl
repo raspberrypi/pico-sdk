@@ -1,3 +1,7 @@
+/* Defines the following symbols for use by code:
+    __boot2_start__, __boot2_end__
+*/
+
 SECTIONS
 {
     /* Note the boot2 section is optional, and should be discarded if there is

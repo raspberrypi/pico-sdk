@@ -1,3 +1,7 @@
+/* Defines the following symbols for use by code:
+    __flash_binary_start
+*/
+
 SECTIONS
 {
     .flash_begin : {
