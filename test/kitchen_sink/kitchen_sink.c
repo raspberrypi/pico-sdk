@@ -86,6 +86,8 @@ int main(void) {
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     printf("%f\n", foox(1.3f, 2.6f));
 #ifdef EXTRA_DATA_SECTION
+    extern uint32_t __extra_end_variable__;
+    printf("__extra_end_variable__ = %p\n", (void *)&__extra_end_variable__);
 #if EXTRA_DATA_SECTION > 1
     extern uint32_t __overlays_start__;
     uint32_t stored_words;

@@ -93,16 +93,11 @@ if (NOT TARGET pico_standard_link)
     # call pico_add_linker_script_override_path(TARGET ${CMAKE_CURRENT_LIST_DIR}/extra_scripts). This will
     # include the custom files first, overriding the default ones.
     #
-    # Must be called before target_link_libraries, otherwise it will not override the default linker scripts.
-    # It will also not override prior paths set by pico_add_linker_script_override_path.
+    # It will not override prior paths set by pico_add_linker_script_override_path.
     #
     # \param\ TARGET The target to add the linker script override path to
     # \param\ PATH The path containing the overriding linker scripts
     function(pico_add_linker_script_override_path TARGET PATH)
-        get_target_property(OUT ${TARGET} LINK_LIBRARIES)
-        if (OUT)
-            message(WARNING "pico_add_linker_script_override_path does not work when called after target_link_libraries")
-        endif()
         set_property(TARGET ${TARGET} APPEND PROPERTY PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS "${PATH}")
     endfunction()
 
