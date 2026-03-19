@@ -30,8 +30,8 @@ generated_pico_flash_region(
 alias(
     name = "default_linker_script",
     actual = select({
-        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform_link:default_linker_script",
-        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform_link:default_linker_script",
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:default_linker_script",
+        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:default_linker_script",
         "//conditions:default": "//bazel:incompatible_cc_lib",
     }),
 )
@@ -39,7 +39,7 @@ alias(
 alias(
     name = "blocked_ram_linker_script",
     actual = select({
-        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform_link:blocked_ram_linker_script",
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:blocked_ram_linker_script",
         "//conditions:default": "//bazel:incompatible_cc_lib",
     }),
 )
@@ -47,8 +47,8 @@ alias(
 alias(
     name = "copy_to_ram_linker_script",
     actual = select({
-        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform_link:copy_to_ram_linker_script",
-        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform_link:copy_to_ram_linker_script",
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:copy_to_ram_linker_script",
+        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:copy_to_ram_linker_script",
         "//conditions:default": "//bazel:incompatible_cc_lib",
     }),
 )
@@ -56,8 +56,8 @@ alias(
 alias(
     name = "no_flash_linker_script",
     actual = select({
-        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform_link:no_flash_linker_script",
-        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform_link:no_flash_linker_script",
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:no_flash_linker_script",
+        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:no_flash_linker_script",
         "//conditions:default": "//bazel:incompatible_cc_lib",
     }),
 )

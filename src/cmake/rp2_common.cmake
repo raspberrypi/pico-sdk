@@ -28,7 +28,6 @@ pico_add_subdirectory(common/hardware_claim)
 #
 # RP2040/RP2350 specific From standard build variants
 pico_add_subdirectory(${RP2_VARIANT_DIR}/pico_platform)
-pico_add_subdirectory(${RP2_VARIANT_DIR}/pico_platform_link)
 pico_add_subdirectory(${RP2_VARIANT_DIR}/hardware_regs)
 pico_add_subdirectory(${RP2_VARIANT_DIR}/hardware_structs)
 pico_add_subdirectory(${RP2_VARIANT_DIR}/boot_stage2)
