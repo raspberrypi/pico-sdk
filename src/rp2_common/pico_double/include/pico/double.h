@@ -208,9 +208,9 @@ extern "C" {
     static inline double int2double(int32_t i) { return (double)i; }
     static inline double uint2double(uint32_t i) { return (double)i; }
 #else
-    //! Convert a signed 32-bit integer to the nearest float
+    //! Convert a signed 32-bit integer to the nearest double
     double int2double(int32_t i);
-    //! Convert an unsigned 32-bit integer to the nearest float
+    //! Convert an unsigned 32-bit integer to the nearest double
     double uint2double(uint32_t i);
 #endif
 #endif
@@ -221,9 +221,9 @@ extern "C" {
     static inline double int642double(int64_t i) { return (double)i; }
     static inline double uint642double(uint64_t i) { return (double)i; }
 #else
-    //! Convert a signed 64-bit integer to the nearest float
+    //! Convert a signed 64-bit integer to the nearest double
     double int642double(int64_t i);
-    //! Convert an unsigned 64-bit integer to the nearest float
+    //! Convert an unsigned 64-bit integer to the nearest double
     double uint642double(uint64_t i);
 #endif
 #endif
@@ -259,19 +259,19 @@ extern "C" {
 #endif
 
 #if PICO_DOUBLE_HAS_FIX32_TO_DOUBLE_CONVERSIONS
-//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +/- Infinity
 double fix2double(int32_t m, int e);
-//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 32-bit integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +Infinity
 double ufix2double(uint32_t m, int e);
 #endif
 
 #if PICO_DOUBLE_HAS_FIX64_TO_DOUBLE_CONVERSIONS
-//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +/- Infinity
 double fix642double(int64_t m, int e);
-//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 64-bit integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +Infinity
 double ufix642double(uint64_t m, int e);
 #endif
@@ -309,8 +309,8 @@ uint32_t double2uint(double f);
 //! \brief Convert a double to a signed 64-bit integer, rounding towards -Infinity.
 //! This conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input
 int64_t double2int64(double f);
-//! \brief Convert a double to a signed 64-bit integer, rounding towards -Infinity.
-//! This conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input
+//! \brief Convert a double to an usigned 64-bit integer, rounding towards -Infinity.
+//! This conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input
 uint64_t double2uint64(double f);
 #endif
 
