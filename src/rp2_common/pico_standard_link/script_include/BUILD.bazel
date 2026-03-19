@@ -4,34 +4,11 @@ load("//bazel/util:pico_linker_scripts.bzl", "include_linker_script_dir")
 
 package(default_visibility = ["//visibility:public"])
 
-exports_files(
-    [
-        "memory_aliases_default.ld",
-        "memory_aliases_no_flash.ld",
-        "memory_flash.ld",
-        "memory_ram.ld",
-        "memory_scratch.ld",
-        "memory_xip_ram.ld",
-        "section_copy_to_ram_data.ld",
-        "section_copy_to_ram_text.ld",
-        "section_default_data.ld",
-        "section_default_text.ld",
-        "section_default_text_excludes.ld",
-        "section_default_rodata_excludes.ld",
-        "section_end.ld",
-        "section_flash_end.ld",
-        "section_heap.ld",
-        "section_no_flash_data.ld",
-        "section_no_flash_text.ld",
-        "sections_copy_to_ram.ld",
-        "section_scratch.ld",
-        "sections_default.ld",
-        "sections_no_flash.ld",
-        "set_memory_locations.ld",
-        "memmap_default.ld",
-        "memmap_no_flash.ld",
-        "memmap_copy_to_ram.ld",
-    ]
+filegroup(
+    name = "rp2_linker_script_incls",
+    srcs = glob([
+        "*.incl",
+    ]),
 )
 
 include_linker_script_dir(
@@ -43,30 +20,8 @@ cc_library(
     target_compatible_with = compatible_with_rp2(),
     deps = [
         "rp2_linker_script_args",
-        "memory_aliases_default.ld",
-        "memory_aliases_no_flash.ld",
-        "memory_flash.ld",
-        "memory_ram.ld",
-        "memory_scratch.ld",
-        "memory_xip_ram.ld",
-        "section_copy_to_ram_data.ld",
-        "section_copy_to_ram_text.ld",
-        "section_default_data.ld",
-        "section_default_text.ld",
-        "section_default_text_excludes.ld",
-        "section_default_rodata_excludes.ld",
-        "section_end.ld",
-        "section_flash_end.ld",
-        "section_heap.ld",
-        "section_no_flash_data.ld",
-        "section_no_flash_text.ld",
-        "sections_copy_to_ram.ld",
-        "section_scratch.ld",
-        "sections_default.ld",
-        "sections_no_flash.ld",
-        "set_memory_locations.ld",
-        "memmap_default.ld",
-        "memmap_no_flash.ld",
-        "memmap_copy_to_ram.ld",
     ],
+    additional_linker_inputs = [
+        "rp2_linker_script_incls",
+    ]
 )

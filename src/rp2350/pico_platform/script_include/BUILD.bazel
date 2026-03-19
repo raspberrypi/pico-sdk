@@ -4,11 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 load("//bazel/util:pico_linker_scripts.bzl", "include_linker_script_dir")
 
-exports_files(
-    [
-        "default_locations.ld",
-        "section_platform_end.ld",
-    ]
+filegroup(
+    name = "rp2350_linker_script_incls",
+    srcs = glob([
+        "*.incl",
+    ]),
 )
 
 include_linker_script_dir(
@@ -21,7 +21,9 @@ cc_library(
     target_compatible_with = ["//bazel/constraint:rp2350"],
     deps = [
         "default_locations.ld",
-        "section_platform_end.ld",
         "rp2350_linker_script_args",
+    ],
+    additional_linker_inputs = [
+        "rp2350_linker_script_incls",
     ],
 )

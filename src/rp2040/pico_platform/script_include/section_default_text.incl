@@ -1,17 +1,28 @@
 SECTIONS
 {
+    /* Second stage bootloader is prepended to the image. It must be 256 bytes big
+       and checksummed. It is usually built by the boot_stage2 target
+       in the Raspberry Pi Pico SDK
+    */
+
     .flash_begin : {
         __flash_binary_start = .;
     } > FLASH
 
-    /* The bootrom will enter the image at the point indicated in your
-       IMAGE_DEF, which is usually the reset handler of your vector table.
+    .boot2 : {
+        __boot2_start__ = .;
+        KEEP (*(.boot2))
+        __boot2_end__ = .;
+    } > FLASH
 
+    ASSERT(__boot2_end__ - __boot2_start__ == 256,
+        "ERROR: Pico second stage bootloader must be 256 bytes in size")
+
+    /* The second stage will always enter the image at the start of .text.
        The debugger will use the ELF entry point, which is the _entry_point
-       symbol, and in our case is *different from the bootrom's entry point.*
-       This is used to go back through the bootrom on debugger launches only,
-       to perform the same initial flash setup that would be performed on a
-       cold boot.
+       symbol if present, otherwise defaults to start of .text.
+       This can be used to transfer control back to the bootrom on debugger
+       launches only, to perform proper flash setup.
     */
 
     .text : {
@@ -26,8 +37,7 @@ SECTIONS
         /* bit of a hack right now to exclude all floating point and time critical (e.g. memset, memcpy) code from
          * FLASH ... we will include any thing excluded here in .data below by default */
         *(.init)
-        *libgcc.a:cmse_nonsecure_call.o
-        INCLUDE "section_default_text_excludes.ld"
+        INCLUDE "section_default_text_excludes.incl"
         *(.fini)
         /* Pull all c'tors into .text */
         *crtbegin.o(.ctors)
@@ -67,30 +77,8 @@ SECTIONS
         . = ALIGN(4);
     } > FLASH
 
-    /* Note the boot2 section is optional, and should be discarded if there is
-       no reference to it *inside* the binary, as it is not called by the
-       bootrom. (The bootrom performs a simple best-effort XIP setup and
-       leaves it to the binary to do anything more sophisticated.) However
-       there is still a size limit of 256 bytes, to ensure the boot2 can be
-       stored in boot RAM.
-
-       Really this is a "XIP setup function" -- the name boot2 is historic and
-       refers to its dual-purpose on RP2040, where it also handled vectoring
-       from the bootrom into the user image.
-    */
-
-    .boot2 : {
-        __boot2_start__ = .;
-        *(.boot2)
-        __boot2_end__ = .;
-    } > FLASH
-
-    ASSERT(__boot2_end__ - __boot2_start__ <= 256,
-        "ERROR: Pico second stage bootloader must be no more than 256 bytes in size")
-
     .rodata : {
-        INCLUDE "section_default_rodata_excludes.ld"
-        *(.srodata*)
+        INCLUDE "section_default_rodata_excludes.incl"
         . = ALIGN(4);
         *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
         . = ALIGN(4);

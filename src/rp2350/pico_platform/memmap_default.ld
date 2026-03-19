@@ -1,1 +1,1 @@
-INCLUDE "memmap_default.ld"
+INCLUDE "memmap_default.incl"

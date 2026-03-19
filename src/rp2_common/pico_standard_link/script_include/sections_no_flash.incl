@@ -1,0 +1,6 @@
+INCLUDE "section_no_flash_text.incl"
+INCLUDE "section_no_flash_data.incl"
+INCLUDE "section_heap.incl"
+INCLUDE "section_scratch.incl"
+INCLUDE "section_end.incl"
+INCLUDE "section_platform_end.incl"

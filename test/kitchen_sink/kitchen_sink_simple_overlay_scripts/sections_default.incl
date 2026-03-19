@@ -1,5 +1,5 @@
-INCLUDE "section_default_text.ld"
-INCLUDE "section_default_data.ld"
+INCLUDE "section_default_text.incl"
+INCLUDE "section_default_data.incl"
 
 SECTIONS
 {
@@ -17,8 +17,8 @@ SECTIONS
     PROVIDE(__overlays_end__ = .);
 }
 
-INCLUDE "section_heap.ld"
-INCLUDE "section_scratch.ld"
-INCLUDE "section_flash_end.ld"
-INCLUDE "section_end.ld"
-INCLUDE "section_platform_end.ld"
+INCLUDE "section_heap.incl"
+INCLUDE "section_scratch.incl"
+INCLUDE "section_flash_end.incl"
+INCLUDE "section_end.incl"
+INCLUDE "section_platform_end.incl"

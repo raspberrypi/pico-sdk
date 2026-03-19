@@ -1,1 +1,1 @@
-INCLUDE "memmap_no_flash.ld"
+INCLUDE "memmap_no_flash.incl"
