@@ -67,6 +67,9 @@ if (NOT TARGET picotool)
                 CMAKE_ARGS
                     "--no-warn-unused-cli"
                     "-DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}"
+                    "-DCMAKE_C_FLAGS=${PICOTOOL_C_FLAGS}"
+                    "-DCMAKE_CXX_FLAGS=${PICOTOOL_CXX_FLAGS}"
+                    "-DCMAKE_EXE_LINKER_FLAGS=${PICOTOOL_EXE_LINKER_FLAGS}"
                     "-DPICO_SDK_PATH:FILEPATH=${PICO_SDK_PATH}"
                     "-DPICOTOOL_NO_LIBUSB=1"
                     "-DPICOTOOL_FLAT_INSTALL=1"

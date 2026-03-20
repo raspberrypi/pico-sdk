@@ -29,6 +29,9 @@ if (NOT TARGET pioasm)
                 CMAKE_ARGS
                     "--no-warn-unused-cli"
                     "-DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}"
+                    "-DCMAKE_C_FLAGS=${PIOASM_C_FLAGS}"
+                    "-DCMAKE_CXX_FLAGS=${PIOASM_CXX_FLAGS}"
+                    "-DCMAKE_EXE_LINKER_FLAGS=${PIOASM_EXE_LINKER_FLAGS}"
                     "-DPIOASM_FLAT_INSTALL=1"
                     "-DCMAKE_INSTALL_PREFIX=${PIOASM_INSTALL_DIR}"
                     "-DCMAKE_RULE_MESSAGES=OFF" # quieten the build
