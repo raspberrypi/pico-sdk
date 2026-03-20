@@ -217,7 +217,7 @@ string_flag(
     build_setting_default = "Debug",
 )
 
-# PICO_BAZEL_CONFIG: PICO_DEFAULT_BINARY_TYPE, [Bazel only] The default binary type to use, type=string, default=default, group=build
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BINARY_TYPE, The default binary type to use, type=string, default=default, group=build
 string_flag(
     name = "PICO_DEFAULT_BINARY_TYPE",
     build_setting_default = "default",
