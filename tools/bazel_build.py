@@ -161,6 +161,70 @@ BUILD_CONFIGURATIONS = (
             )
         ),
     },
+    {
+        "name": "rp2040 no_flash",
+        "args": ("--platforms=//bazel/platform:rp2040", "--@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_TYPE=no_flash"),
+        "extra_targets": (),
+        "exclusions": frozenset(
+            (
+                "//test/kitchen_sink:kitchen_sink_lwip_poll",
+                "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
+                # hardware_sha256 doesn't appear to work on RP2040.
+                "//test/pico_sha256_test:pico_sha256_test",
+            )
+        ),
+    },
+    {
+        "name": "rp2350 no_flash",
+        "args": ("--platforms=//bazel/platform:rp2350", "--@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_TYPE=no_flash"),
+        "extra_targets": (),
+        "exclusions": frozenset(
+            (
+                "//test/kitchen_sink:kitchen_sink_lwip_poll",
+                "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # TODO: RISC-V support.
+                "//test/pico_float_test:pico_float_test_hazard3",
+            )
+        ),
+    },
+    {
+        "name": "rp2040 copy_to_ram",
+        "args": ("--platforms=//bazel/platform:rp2040", "--@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_TYPE=copy_to_ram"),
+        "extra_targets": (),
+        "exclusions": frozenset(
+            (
+                "//test/kitchen_sink:kitchen_sink_lwip_poll",
+                "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # No RISC-V on RP2040.
+                "//test/pico_float_test:pico_float_test_hazard3",
+                # hardware_sha256 doesn't appear to work on RP2040.
+                "//test/pico_sha256_test:pico_sha256_test",
+            )
+        ),
+    },
+    {
+        "name": "rp2350 copy_to_ram",
+        "args": ("--platforms=//bazel/platform:rp2350", "--@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_TYPE=copy_to_ram"),
+        "extra_targets": (),
+        "exclusions": frozenset(
+            (
+                "//test/kitchen_sink:kitchen_sink_lwip_poll",
+                "//test/kitchen_sink:kitchen_sink_lwip_background",
+                # Host only.
+                "//test/pico_float_test:hazard3_test_gen",
+                # TODO: RISC-V support.
+                "//test/pico_float_test:pico_float_test_hazard3",
+            )
+        ),
+    },
 )
 
 

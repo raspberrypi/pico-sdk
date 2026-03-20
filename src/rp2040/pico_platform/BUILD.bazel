@@ -105,7 +105,6 @@ cc_library(
 # PICO_BUILD_DEFINE: PICO_USE_BLOCKED_RAM, whether this is a 'blocked_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
 cc_library(
     name = "blocked_ram_linker_script",
-    defines = ["PICO_USE_BLOCKED_RAM=1"],
     target_compatible_with = ["//bazel/constraint:rp2040"],
     visibility = [
         "//src/rp2_common/pico_standard_link:__pkg__",
@@ -123,7 +122,6 @@ cc_library(
 # PICO_BUILD_DEFINE: PICO_COPY_TO_RAM, whether this is a 'copy_to_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
 cc_library(
     name = "copy_to_ram_linker_script",
-    defines = ["PICO_COPY_TO_RAM=1"],
     target_compatible_with = ["//bazel/constraint:rp2040"],
     visibility = [
         "//src/rp2_common/pico_standard_link:__pkg__",
@@ -141,7 +139,6 @@ cc_library(
 # PICO_BUILD_DEFINE: PICO_NO_FLASH, whether this is a 'no_flash' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
 cc_library(
     name = "no_flash_linker_script",
-    defines = ["PICO_NO_FLASH=1"],
     target_compatible_with = ["//bazel/constraint:rp2040"],
     visibility = [
         "//src/rp2_common/pico_standard_link:__pkg__",

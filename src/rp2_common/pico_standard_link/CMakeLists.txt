@@ -109,6 +109,7 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()
 
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_BINARY_TYPE, The default binary type to use, type=string, default=default, group=pico_standard_link
     # slightly messy as we support both the preferred PICO_DEFAULT_BINARY_TYPE and the individual variables
     if (NOT PICO_DEFAULT_BINARY_TYPE)
         if (PICO_NO_FLASH)
