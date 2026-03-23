@@ -273,3 +273,8 @@ config_setting(
     name = "pico_compilation_no_fastbuild_args_set",
     flag_values = {"//bazel/config:PICO_COMPILATION_NO_FASTBUILD_ARGS": "True"},
 )
+
+config_setting(
+    name = "pico_hard_float_abi_enabled",
+    flag_values = {"//bazel/config:PICO_HARD_FLOAT_ABI": "True"},
+)
