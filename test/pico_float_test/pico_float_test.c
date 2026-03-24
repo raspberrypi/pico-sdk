@@ -334,6 +334,9 @@ float __real_powf(float, float);
 float __real_truncf(float);
 float __real_ldexpf(float, int);
 float __real_fmodf(float, float);
+#define __real_fdiv_fast __real___aeabi_fdiv
+#define __real_sqrtf_fast __real_sqrtf
+
 #define FRAC ((float)(1u << 22))
 #define allowed_range(a) (fabsf(a) / FRAC)
 #if PICO_C_COMPILER_IS_GNU && __GNUC__ < 14
@@ -432,6 +435,9 @@ int main() {
         // not replaced in this version
 #if !LIB_PICO_FLOAT_PICO_VFP
         printf("FSQRT %10.18f\n", check_close1(sqrtf, x));
+#endif
+#if PICO_FLOAT_HAS_SQRTF_FAST
+        printf("FSQRT_FAST %10.18g\n", check_close1(sqrtf_fast, x));
 #endif
         printf("FCOS %10.18f\n", check_close1(cosf, x));
         printf("FSIN %10.18f\n", check_close1(sinf, x));
@@ -607,6 +613,9 @@ int main() {
                x - 0.377777777777777777777777777777f, g, 123456789.0f / x);
         check2_vfp_unwrapped(__aeabi_fmul, x, x);
         check2_vfp_unwrapped(__aeabi_fdiv, 1.0f, x);
+#if PICO_FLOAT_HAS_FDIV_FAST
+        check2_vfp_unwrapped(fdiv_fast, 1.0f, x);
+#endif
     }
 
     if (fail ||
