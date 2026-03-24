@@ -366,7 +366,7 @@ uint64_t double2ufix64(double f, int e);
     }
 #else
     //! Raise a floating point number to an integer power
-    double powint(double x, int y);
+    double powint(double x, int32_t y);
 #endif
 #endif
 
