@@ -121,7 +121,7 @@
 *
 * - Faster un-fused multiply and accumulate:
 *
-*   mla/fast_fma
+*   mla/fma_fast
 *
 * On RISC-V there is no custom double-precision floating point support, so `pico_double_pico` is equivalent to `pico_double_compiler`
 * \endif
