@@ -373,6 +373,7 @@ uint64_t double2ufix64(double f, int e);
 #if PICO_DOUBLE_HAS_DDIV_FAST
 //! Perform a fast floating point divide with reduced accuracy
 double ddiv_fast(double n, double d);
+#endif
 
 #if PICO_DOUBLE_HAS_SQRT_FAST
 //! Perform a fast floating point square-root with reduced accuracy
