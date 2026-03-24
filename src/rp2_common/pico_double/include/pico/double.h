@@ -194,7 +194,6 @@
 
 #ifndef __ASSEMBLER__
 #include <math.h>
-#include <float.h>
 
 #ifdef __cplusplus
 extern "C" {
