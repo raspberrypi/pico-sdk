@@ -1,7 +1,7 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2", "pico_generate_pio_header")
-load("//bazel/util:transition.bzl", "kitchen_sink_test_binary")
+load("//bazel/util:transition.bzl", "kitchen_sink_test_binary", "pico_set_binary_type")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -107,6 +107,55 @@ cc_binary(
     srcs = ["kitchen_sink_cpp.cpp"],
     deps = [":kitchen_sink_common"],
 )
+
+cc_binary(
+    name = "kitchen_sink_copy_to_ram_actual",
+    testonly = True,
+    srcs = ["kitchen_sink.c"],
+    tags = ["manual"],  # Built via kitchen_sink_copy_to_ram
+    deps = [":kitchen_sink_common"],
+)
+
+cc_binary(
+    name = "kitchen_sink_no_flash_actual",
+    testonly = True,
+    srcs = ["kitchen_sink.c"],
+    tags = ["manual"],  # Built via kitchen_sink_no_flash
+    deps = [":kitchen_sink_common"],
+)
+
+cc_binary(
+    name = "kitchen_sink_blocked_ram_actual",
+    testonly = True,
+    srcs = ["kitchen_sink.c"],
+    tags = ["manual"],  # Built via kitchen_sink_blocked_ram
+    deps = [":kitchen_sink_common"],
+)
+
+pico_set_binary_type(
+    name = "kitchen_sink_copy_to_ram",
+    testonly = True,
+    src = ":kitchen_sink_copy_to_ram_actual",
+    binary_type = "copy_to_ram",
+    target_compatible_with = compatible_with_rp2(),
+)
+
+pico_set_binary_type(
+    name = "kitchen_sink_no_flash",
+    testonly = True,
+    src = ":kitchen_sink_no_flash_actual",
+    binary_type = "no_flash",
+    target_compatible_with = compatible_with_rp2(),
+)
+
+pico_set_binary_type(
+    name = "kitchen_sink_blocked_ram",
+    testonly = True,
+    src = ":kitchen_sink_blocked_ram_actual",
+    binary_type = "blocked_ram",
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+)
+
 
 cc_binary(
     name = "kitchen_sink_lwip_poll_actual",

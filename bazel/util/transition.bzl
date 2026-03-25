@@ -167,3 +167,18 @@ extra_copts_for_all_deps = declare_transtion(
         "//command_line_option:copt": "extra_copts",
     },
 )
+
+# This transition sets the binary type
+pico_set_binary_type = declare_transtion(
+    attrs = {
+        "binary_type": attr.string(),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+    },
+    flag_overrides = {
+        "@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_TYPE": "binary_type",
+    },
+)
