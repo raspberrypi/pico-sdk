@@ -182,3 +182,18 @@ pico_set_binary_type = declare_transtion(
         "@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_TYPE": "binary_type",
     },
 )
+
+# This transition sets the binary type
+pico_set_linker_script = declare_transtion(
+    attrs = {
+        "linker_script": attr.string(),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+    },
+    flag_overrides = {
+        "@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT": "linker_script",
+    },
+)

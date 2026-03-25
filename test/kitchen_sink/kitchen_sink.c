@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #ifndef KITCHEN_SINK_INCLUDE_HEADER
 // provided for backwards compatibility for non CMake build systems - just includes enough to compile
