@@ -4,7 +4,7 @@ def _linker_scripts_impl(ctx):
     link_flags = []
     for script in ctx.attr.include_scripts:
         link_include_dir = script.label.package
-        if ctx.label.workspace_root:  
+        if ctx.label.workspace_root:
             link_include_dir = "/".join((ctx.label.workspace_root, link_include_dir))
         link_flag = "-L" + str(link_include_dir)
         if not (link_flag in link_flags):
