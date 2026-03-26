@@ -70,18 +70,19 @@
 // note this is deliberately > MAX_PARTITIONs is likely to be, and also -1 as a signed byte
 #define PARTITION_TABLE_NO_PARTITION_INDEX 0xff
 
-// todo these are duplicated in picoboot_constants.h
+// values returned from \ref rom_get_last_boot_type()
+// --- note these match the REBOOT2_FLAG_REBOOT_TYPE_ constants in pico/bootrom_constants.h
 // values 0-7 are secure/non-secure
 #define BOOT_TYPE_NORMAL     0
 #define BOOT_TYPE_BOOTSEL    2
 #define BOOT_TYPE_RAM_IMAGE  3
 #define BOOT_TYPE_FLASH_UPDATE 4
-
 // values 8-15 are secure only
 #define BOOT_TYPE_PC_SP      0xd
 
 // ORed in if a bootloader chained into the image
 #define BOOT_TYPE_CHAINED_FLAG 0x80
+// ---
 
 // call from NS to S
 #ifndef __riscv

@@ -55,6 +55,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/hello_sleep:hello_sleep",
                 "//test/hello_sleep:hello_sleep_gpio",
                 "//test/hello_sleep:rtc_clksrc",
+                "//test/pico_async_context_test:pico_async_context_test",
 
                 # Pretty much only Picotool and pioasm build on Windows.
                 "//..." if os.name == "nt" else "",

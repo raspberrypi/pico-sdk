@@ -14,7 +14,6 @@ cc_library(
         "gen/parser.cpp",
         "gen/parser.hpp",
         "go_output.cpp",
-        "json_output.cpp",
         "main.cpp",
         "output_format.h",
         "pio_assembler.cpp",
@@ -38,6 +37,13 @@ cc_library(
         "gen",
     ],
     target_compatible_with = ["//bazel/constraint:host"],
+)
+
+cc_library(
+    name = "json_output",
+    srcs = ["json_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
 )
 
 cc_library(
@@ -83,6 +89,7 @@ cc_binary(
         ":ada_output",
         ":c_sdk_output",
         ":hex_output",
+        ":json_output",
         ":pioasm_core",
         ":python_output",
     ],

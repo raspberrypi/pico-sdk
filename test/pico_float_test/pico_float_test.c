@@ -311,7 +311,7 @@ int32_t __attribute__((pcs("aapcs"))) __aeabi_f2iz(float);
 int64_t __attribute__((pcs("aapcs"))) __aeabi_f2lz(float);
 float __attribute__((pcs("aapcs"))) __aeabi_fmul(float, float);
 float __attribute__((pcs("aapcs"))) __aeabi_fdiv(float, float);
-#if LIB_PICO_FLOAT_PICO
+#if !LIB_PICO_FLOAT_COMPILER
 #if !LIB_PICO_FLOAT_PICO_VFP
 float __attribute__((pcs("aapcs"))) __real___aeabi_i2f(int);
 float __attribute__((pcs("aapcs"))) __real___aeabi_ui2f(int);
@@ -321,9 +321,9 @@ float __attribute__((pcs("aapcs"))) __real___aeabi_fmul(float, float);
 float __attribute__((pcs("aapcs"))) __real___aeabi_fdiv(float, float);
 int32_t __attribute__((pcs("aapcs"))) __real___aeabi_f2iz(float);
 int64_t __attribute__((pcs("aapcs"))) __real___aeabi_f2lz(float);
+#endif
 float __real_sqrtf(float);
 float __real_fmaf(float, float, float);
-#endif
 float __real_cosf(float);
 float __real_sinf(float);
 float __real_tanf(float);
@@ -334,12 +334,23 @@ float __real_powf(float, float);
 float __real_truncf(float);
 float __real_ldexpf(float, int);
 float __real_fmodf(float, float);
+#define __real_fdiv_fast __real___aeabi_fdiv
+#define __real_sqrtf_fast __real_sqrtf
+
 #define FRAC ((float)(1u << 22))
 #define allowed_range(a) (fabsf(a) / FRAC)
+#if PICO_C_COMPILER_IS_GNU && __GNUC__ < 14
+// seems to be an inaccuracy in GNU impl - presumably not fused
+#define allowed_range_fma(a) (65536 * fabsf(a) / FRAC)
+#else
+#define allowed_range_fma(a) allowed_range(a)
+#endif
+
 #ifdef LLVM_LIBC_MATH_H
 #define isinff isinf
 #endif
 #define assert_close(a, b) test_assert((fabsf(a - b) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && (a < 0) == (b < 0)))
+#define assert_close_fma(a, b) test_assert((fabsf(a - b) <= allowed_range_fma(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && (a < 0) == (b < 0)))
 #define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
 #if !LIB_PICO_FLOAT_PICO_VFP
 #define check1_vfp_unwrapped(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
@@ -350,7 +361,7 @@ float __real_fmodf(float, float);
 #endif
 #define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnanf(p0)) assert_nan(r); else assert_close(r, r2); r; })
 #define check_close2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); if (isnanf(p0) || isnanf(p1)) assert_nan(r); else assert_close(r, r2); r; })
-#define check_close3(func,p0,p1,p2) ({ typeof(p0) r = func(p0,p1,p2), r2 = __CONCAT(__real_, func)(p0,p1,p2); if (isnanf(p0) || isnanf(p1) || isnanf(p2)) assert_nan(r); else assert_close(r, r2); r; })
+#define check_close3_fma(func,p0,p1,p2) ({ typeof(p0) r = func(p0,p1,p2), r2 = __CONCAT(__real_, func)(p0,p1,p2); if (isnanf(p0) || isnanf(p1) || isnanf(p2)) assert_nan(r); else assert_close_fma(r, r2); r; })
 #else
 #define check1(func,p0) func(p0)
 #define check1_vfp_unwrapped(func,p0) func(p0)
@@ -358,7 +369,7 @@ float __real_fmodf(float, float);
 #define check2_vfp_unwrapped(func,p0,p1) func(p0,p1)
 #define check_close1(func,p0) func(p0)
 #define check_close2(func,p0,p1) func(p0,p1)
-#define check_close3(func,p0,p1,p2) func(p0,p1,p2)
+#define check_close3_fma(func,p0,p1,p2) func(p0,p1,p2)
 #endif
 
 double aa = 0.5;
@@ -421,8 +432,12 @@ int main() {
 #if 1
     for (float x = 0; x < 3; x++) {
         printf("\n ----- %f\n", x);
+        // not replaced in this version
 #if !LIB_PICO_FLOAT_PICO_VFP
         printf("FSQRT %10.18f\n", check_close1(sqrtf, x));
+#endif
+#if PICO_FLOAT_HAS_SQRTF_FAST
+        printf("FSQRT_FAST %10.18g\n", check_close1(sqrtf_fast, x));
 #endif
         printf("FCOS %10.18f\n", check_close1(cosf, x));
         printf("FSIN %10.18f\n", check_close1(sinf, x));
@@ -435,9 +450,8 @@ int main() {
         printf("FEXP %10.18f\n", check_close1(expf, x));
         printf("FLN %10.18f\n", check_close1(logf, x));
         printf("POWF %10.18f\n", check_close2(powf, x, x));
-        // todo clang why does this not compile?
-#ifndef __clang__
-        printf("TRUNCF %10.18f\n", check_close1(truncf, x));
+#if !(__clang__ && __PICOLIBC__) // seems to be a buf with wrapping the extern inline trunc
+        printf("TRUNCF %10.18f\n", check1(truncf, x));
 #endif
         printf("LDEXPF %10.18f\n", check_close2(ldexpf, x, x));
         printf("FMODF %10.18f\n", check_close2(fmodf, x, 3.0f));
@@ -509,7 +523,7 @@ int main() {
         for (float b = -2000000.0f; b < 1000000.0f; b += 397243.5f) {
             for (float c = -700.0f; c < 1000.0f; c += 287.4f) {
                 printf("fma %f %f %f\n", a, b, c);
-                check_close3(fmaf, a, b, c);
+                check_close3_fma(fmaf, a, b, c);
             }
         }
     }
@@ -561,17 +575,17 @@ int main() {
     }
     for(float x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
         printf("f2i64 %f->%lld\n", x, (int64_t)x);
-#if PICO_RP2040
         if ((double)x >= (double)INT64_MAX) {
 #if TEST_SATURATION
             test_assert(__aeabi_f2lz(x) == INT64_MAX);
 #endif
         } else {
+#if PICO_RP2040
             check1(__aeabi_f2lz, x);
-        }
 #else
-        check1_vfp_unwrapped(__aeabi_f2lz, x);
+            check1_vfp_unwrapped(__aeabi_f2lz, x);
 #endif
+        }
     }
     for(float x = -4294967296.f * 4294967296.f; x<=-0.5f; x/=2.f) {
         printf("f2i32 %f->%d\n", x, (int32_t)x);
@@ -579,17 +593,17 @@ int main() {
     }
     for(float x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
         printf("f2i32 %f->%d\n", x, (int32_t)x);
-#if PICO_RP2040
         if ((double)x >= (double)INT32_MAX) {
 #if TEST_SATURATION
             test_assert(__aeabi_f2iz(x) == INT32_MAX);
 #endif
         } else {
+#if PICO_RP2040
             check1(__aeabi_f2iz, x);
-        }
 #else
-        check1_vfp_unwrapped(__aeabi_f2iz, x);
+            check1_vfp_unwrapped(__aeabi_f2iz, x);
 #endif
+        }
     }
 
     for (float x = 1; x < 11; x += 2) {
@@ -599,6 +613,9 @@ int main() {
                x - 0.377777777777777777777777777777f, g, 123456789.0f / x);
         check2_vfp_unwrapped(__aeabi_fmul, x, x);
         check2_vfp_unwrapped(__aeabi_fdiv, 1.0f, x);
+#if PICO_FLOAT_HAS_FDIV_FAST
+        check2_vfp_unwrapped(fdiv_fast, 1.0f, x);
+#endif
     }
 
     if (fail ||
