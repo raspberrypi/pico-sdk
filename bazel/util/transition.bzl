@@ -183,7 +183,7 @@ pico_set_binary_type = declare_transtion(
     },
 )
 
-# This transition sets the binary type
+# This transition sets the linker script
 pico_set_linker_script = declare_transtion(
     attrs = {
         "linker_script": attr.string(),
