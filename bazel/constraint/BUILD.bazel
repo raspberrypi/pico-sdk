@@ -273,3 +273,18 @@ config_setting(
     name = "pico_compilation_no_fastbuild_args_set",
     flag_values = {"//bazel/config:PICO_COMPILATION_NO_FASTBUILD_ARGS": "True"},
 )
+
+config_setting(
+    name = "pico_binary_type_no_flash",
+    flag_values = {"//bazel/config:PICO_DEFAULT_BINARY_TYPE": "no_flash"},
+)
+
+config_setting(
+    name = "pico_binary_type_copy_to_ram",
+    flag_values = {"//bazel/config:PICO_DEFAULT_BINARY_TYPE": "copy_to_ram"},
+)
+
+config_setting(
+    name = "pico_binary_type_blocked_ram",
+    flag_values = {"//bazel/config:PICO_DEFAULT_BINARY_TYPE": "blocked_ram"},
+)

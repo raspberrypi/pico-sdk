@@ -217,10 +217,22 @@ string_flag(
     build_setting_default = "Debug",
 )
 
-# PICO_BAZEL_CONFIG: PICO_DEFAULT_LINKER_SCRIPT, [Bazel only] The library that provides a linker script to link into all binaries, default=//src/rp2_common/pico_crt0:default_linker_script, group=pico_standard_link
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BINARY_TYPE, The default binary type to use, type=string, default=default, group=build
+string_flag(
+    name = "PICO_DEFAULT_BINARY_TYPE",
+    build_setting_default = "default",
+    values = [
+        "default",
+        "no_flash",
+        "copy_to_ram",
+        "blocked_ram",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_LINKER_SCRIPT, [Bazel only] The library that provides a linker script to link into all binaries, default=//src/rp2_common/pico_standard_link:default_linker_script, group=pico_standard_link
 label_flag(
     name = "PICO_DEFAULT_LINKER_SCRIPT",
-    build_setting_default = "//src/rp2_common/pico_crt0:default_linker_script",
+    build_setting_default = "//src/rp2_common/pico_standard_link:default_linker_script",
 )
 
 # PICO_BAZEL_CONFIG: PICO_NO_TARGET_NAME, Don't define PICO_TARGET_NAME, type=bool, default=0, group=build

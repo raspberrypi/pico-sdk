@@ -1,0 +1,17 @@
+/* Defines the following symbols for use by code:
+    __binary_info_start, __binary_info_end
+*/
+
+SECTIONS
+{
+    /* Machine inspectable binary information */
+    . = ALIGN(4);
+    __binary_info_start = .;
+    .binary_info :
+    {
+        KEEP(*(.binary_info.keep.*))
+        *(.binary_info.*)
+    } > TEXT_STORE
+    __binary_info_end = .;
+    . = ALIGN(4);
+}

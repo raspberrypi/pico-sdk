@@ -37,8 +37,13 @@ BUILD_CONFIGURATIONS = (
                 "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test",
                 "//test/kitchen_sink:kitchen_sink",
                 "//test/kitchen_sink:kitchen_sink_cpp",
+                "//test/kitchen_sink:kitchen_sink_copy_to_ram",
+                "//test/kitchen_sink:kitchen_sink_no_flash",
+                "//test/kitchen_sink:kitchen_sink_blocked_ram",
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                "//test/kitchen_sink:kitchen_sink_ram_section",
+                "//test/kitchen_sink:kitchen_sink_simple_overlay",
                 "//test/pico_divider_test:pico_divider_test",
                 "//test/pico_divider_test:pico_divider_nesting_test",
                 "//test/pico_float_test:pico_double_test",
@@ -87,7 +92,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
-                # RP2040 only.
+                # RP2040 only
+                "//test/kitchen_sink:kitchen_sink_blocked_ram",
                 "//test/hello_sleep:rtc_clksrc",
                 # TODO: RISC-V support.
                 "//test/pico_float_test:pico_float_test_hazard3",
@@ -111,6 +117,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_float_test:pico_float_test_hazard3",
                 # hardware_sha256 doesn't appear to work on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
+                # not supported by clang
+                "//test/kitchen_sink:kitchen_sink_simple_overlay",
             )
         ),
     },
@@ -127,10 +135,13 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
-                # RP2040 only.
+                # RP2040 only
+                "//test/kitchen_sink:kitchen_sink_blocked_ram",
                 "//test/hello_sleep:rtc_clksrc",
                 # TODO: RISC-V support.
                 "//test/pico_float_test:pico_float_test_hazard3",
+                # not supported by clang
+                "//test/kitchen_sink:kitchen_sink_simple_overlay",
             )
         ),
     },
@@ -163,7 +174,8 @@ BUILD_CONFIGURATIONS = (
             (
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
-                # RP2040 only.
+                # RP2040 only
+                "//test/kitchen_sink:kitchen_sink_blocked_ram",
                 "//test/hello_sleep:rtc_clksrc",
                 # TODO: RISC-V support.
                 "//test/pico_float_test:pico_float_test_hazard3",

@@ -18,6 +18,56 @@ generated_pico_flash_region(
     }),
 )
 
+# It's possible to set linker scripts globally or on a per-binary basis.
+#
+# Setting globally to a custom linker script:
+#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT to point to your
+#     custom linker script - do not use this for SDK linker scripts, you must
+#     use PICO_DEFAULT_BINARY_TYPE instead
+#
+# Setting per-binary to a custom linker script:
+#   * Set --@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT=@pico-sdk//bazel:empty_cc_lib
+#   * Manually add your desired linker script to each cc_binary.
+alias(
+    name = "default_linker_script",
+    actual = select({
+        # Handle selection based on PICO_DEFAULT_BINARY_TYPE here
+        "//bazel/constraint:pico_binary_type_no_flash": "//src/rp2_common/pico_standard_link:no_flash_linker_script",
+        "//bazel/constraint:pico_binary_type_copy_to_ram": "//src/rp2_common/pico_standard_link:copy_to_ram_linker_script",
+        "//bazel/constraint:pico_binary_type_blocked_ram": "//src/rp2_common/pico_standard_link:blocked_ram_linker_script",
+        # Then for the default type
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:default_linker_script",
+        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:default_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "blocked_ram_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:blocked_ram_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "copy_to_ram_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:copy_to_ram_linker_script",
+        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:copy_to_ram_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "no_flash_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:no_flash_linker_script",
+        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:no_flash_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
 cc_library(
     name = "pico_standard_link",
     target_compatible_with = compatible_with_rp2(),

@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #ifndef KITCHEN_SINK_INCLUDE_HEADER
 // provided for backwards compatibility for non CMake build systems - just includes enough to compile
@@ -99,21 +100,9 @@ int main(void) {
         if (bitset_get_bit(&fooper.bitset, i)) printf("Have at %d\n", i);
     }
     printf("%f\n", foox(1.3f, 2.6f));
-#if LIB_PICO_AON_TIMER
-    aon_timer_start_with_timeofday();
-    void spoop(void);
-    struct timespec ts;
-    ts.tv_sec = 6;
-    ts.tv_nsec = 1000000000 / 2;
-    aon_timer_enable_alarm(&ts, spoop, false);
-    while (true) {
-        aon_timer_get_time(&ts);
-        printf("%ld %ld\n", (long)ts.tv_sec, ts.tv_nsec);
-        busy_wait_ms(4000);
-    }
-#endif
-
 #ifdef EXTRA_DATA_SECTION
+    extern uint32_t __extra_end_variable__;
+    printf("__extra_end_variable__ = %p\n", (void *)&__extra_end_variable__);
 #if EXTRA_DATA_SECTION > 1
     extern uint32_t __overlays_start__;
     uint32_t stored_words;
@@ -148,6 +137,19 @@ int main(void) {
 
     printf("extra_data after load = %d\n", extra_data);
 #endif
+#endif
+#if LIB_PICO_AON_TIMER
+    aon_timer_start_with_timeofday();
+    void spoop(void);
+    struct timespec ts;
+    ts.tv_sec = 6;
+    ts.tv_nsec = 1000000000 / 2;
+    aon_timer_enable_alarm(&ts, spoop, false);
+    while (true) {
+        aon_timer_get_time(&ts);
+        printf("%ld %ld\n", (long)ts.tv_sec, ts.tv_nsec);
+        busy_wait_ms(4000);
+    }
 #endif
 #ifndef __riscv
     // this should compile as we are Cortex M0+
