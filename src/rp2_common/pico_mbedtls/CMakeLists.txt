@@ -37,6 +37,7 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
             asn1write.c
             base64.c
             bignum.c
+            block_cipher.c
             camellia.c
             ccm.c
             chacha20.c
