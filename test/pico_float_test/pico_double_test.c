@@ -329,7 +329,7 @@ double __real_fma(double, double, double);
 
 #define FRAC ((double)(1ull << 50))
 #define allowed_range(a) (fabs(a) / FRAC)
-#define assert_close(a, b) test_assert((fabs(a - b) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinf(a) && isinf(b) && (a < 0) == (b < 0)))
+#define assert_close(a, b) test_assert((fabs((a) - (b)) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinf(a) && isinf(b) && ((a) < 0) == ((b) < 0)))
 #define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
 #define check2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
 #define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnan(p0)) assert_nan(r); else assert_close(r, r2); r; })
@@ -367,7 +367,7 @@ int main() {
     for (double x = 0; x < 3; x++) {
         printf("\n ----- %g\n", x);
         printf("SQRT %10.18g\n", check_close1(sqrt, x));
-#if PICO_RP2350 && !LIB_PICO_DOUBLE_COMPILER
+#if PICO_DOUBLE_HAS_SQRT_FAST
         printf("SQRT_FAST %10.18g\n", check_close1(sqrt_fast, x));
 #endif
         printf("COS %10.18g\n", check_close1(cos, x));
@@ -442,10 +442,9 @@ int main() {
     for (double a = -100.0; a < 100.0; a += 53.103) {
         for (double b = -2000000.0; b < 1000000.0; b += 397243.5) {
             for (double c = -700.0; c < 1000.0; c += 287.4) {
-                printf("fma %f %f %f\n", a, b, c);
-                check_close3(fma, a, b, c);
-#if PICO_RP2350 && !LIB_PICO_DOUBLE_COMPILER
-                check_close3(fma_fast, a, b, c);
+                printf("FMA %f\n", check_close3(fma, a, b, c));
+#if PICO_DOUBLE_HAS_FMA_FAST
+                printf("FMAFAST %f\n", check_close3(fma_fast, a, b, c));
 #endif
             }
         }
@@ -531,7 +530,7 @@ int main() {
                x - 0.377777777777777777777777777777, g, 123456789.0 / x);
         check2(__aeabi_dmul, x, x);
         check2(__aeabi_ddiv, 1.0, x);
-#if PICO_RP2350 && !LIB_PICO_DOUBLE_COMPILER
+#if PICO_DOUBLE_HAS_DDIV_FAST
         check2(ddiv_fast, 1.0, x);
 #endif
     }

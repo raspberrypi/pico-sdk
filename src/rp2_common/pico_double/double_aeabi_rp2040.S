@@ -7,6 +7,7 @@
 #if PICO_RP2040
 #include "pico/asm_helper.S"
 #include "pico/runtime_init.h"
+#include "pico/double.h"
 #include "pico/bootrom/sf_table.h"
 #include "hardware/divider_helper.S"
 

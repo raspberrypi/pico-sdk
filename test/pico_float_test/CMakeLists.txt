@@ -70,6 +70,16 @@ foreach (FLOAT_TYPE IN LISTS FLOAT_TYPES)
         target_compile_options(${PICO_FLOAT_TEST} PRIVATE -fno-strict-float-cast-overflow)
         target_compile_options(custom_float_funcs_test_${FLOAT_TYPE} PRIVATE -fno-strict-float-cast-overflow)
     endif()
+
+    if (NOT PICO_RISCV) # todo need risc-v support too
+        add_executable(float_benchmark_${FLOAT_TYPE} float_benchmark.c)
+        pico_set_float_implementation(float_benchmark_${FLOAT_TYPE} ${FLOAT_TYPE})
+        target_link_libraries(float_benchmark_${FLOAT_TYPE} PRIVATE pico_stdlib m)
+        pico_add_extra_outputs(float_benchmark_${FLOAT_TYPE})
+        target_compile_definitions(float_benchmark_${FLOAT_TYPE} PRIVATE PICO_FLOAT_IN_RAM=1)
+        pico_set_printf_implementation(float_benchmark_${FLOAT_TYPE} compiler)
+        pico_set_binary_type(float_benchmark_${FLOAT_TYPE} copy_to_ram)
+    endif()
 endforeach ()
 
 foreach (DOUBLE_TYPE IN LISTS DOUBLE_TYPES)
@@ -115,6 +125,16 @@ foreach (DOUBLE_TYPE IN LISTS DOUBLE_TYPES)
             target_compile_options(${PICO_DOUBLE_TEST} PRIVATE -fno-strict-float-cast-overflow)
             target_compile_options(custom_double_funcs_test_${DOUBLE_TYPE} PRIVATE -fno-strict-float-cast-overflow)
         endif()
+    endif()
+
+    if (NOT PICO_RISCV) # todo need risc-v support too
+        add_executable(double_benchmark_${DOUBLE_TYPE} double_benchmark.c)
+        pico_set_double_implementation(double_benchmark_${DOUBLE_TYPE} ${DOUBLE_TYPE})
+        target_link_libraries(double_benchmark_${DOUBLE_TYPE} PRIVATE pico_stdlib m)
+        pico_add_extra_outputs(double_benchmark_${DOUBLE_TYPE})
+        target_compile_definitions(double_benchmark_${DOUBLE_TYPE} PRIVATE PICO_DOUBLE_IN_RAM=1)
+        pico_set_printf_implementation(double_benchmark_${DOUBLE_TYPE} compiler)
+        pico_set_binary_type(double_benchmark_${DOUBLE_TYPE} copy_to_ram)
     endif()
 endforeach ()
 

@@ -1,0 +1,19 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
+
+linker_scripts(
+    name = "rp2040_linker_script_includes",
+    link_scripts = ["default_locations.ld"],
+    include_scripts = glob(["*.incl"]),
+)
+
+cc_library(
+    name = "rp2040_linker_scripts",
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+    deps = [
+        "rp2040_linker_script_includes",
+    ],
+)

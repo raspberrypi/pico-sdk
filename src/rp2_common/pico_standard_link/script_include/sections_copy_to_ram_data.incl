@@ -1,0 +1,4 @@
+/* Sub-section list for read/write sections in copy_to_ram binaries */
+
+INCLUDE "section_copy_to_ram_data.incl"
+INCLUDE "section_bss.incl"
