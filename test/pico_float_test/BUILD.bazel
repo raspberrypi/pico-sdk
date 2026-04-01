@@ -81,39 +81,10 @@ pico_float_test_binary(
     target_compatible_with = compatible_with_rp2(),
 )
 
-cc_binary(
-    name = "m33_test_actual",
-    testonly = True,
-    srcs = [
-        "m33.c",
-    ],
-    tags = ["manual"],
-    target_compatible_with = compatible_with_rp2() + [
-        "//bazel/constraint:rp2350",
-        "@platforms//cpu:armv8-m",
-    ],
-    deps = [
-        "//src/rp2_common:pico_platform",
-        "//src/rp2_common/pico_double",
-        "//src/rp2_common/pico_float",
-        "//src/rp2_common/pico_stdlib",
-    ],
-)
-
-pico_float_test_binary(
-    name = "m33_test",
-    testonly = True,
-    src = ":m33_test_actual",
-    extra_copts = [
-        "-DPICO_USE_CRT_PRINTF=1",
-        "-DPICO_FLOAT_PROPAGATE_NANS=1",
-        "-DPICO_DOUBLE_PROPAGATE_NANS=1",
-    ],
-    pico_printf_impl = "compiler",
-    target_compatible_with = compatible_with_rp2() + [
-        "//bazel/constraint:rp2350",
-        "@platforms//cpu:armv8-m",
-    ],
+# TODO: Marked in CMake as to-be-removed.
+filegroup(
+    name = "m33",
+    srcs = ["m33.c"],
 )
 
 # TODO: Add these tests to the Bazel build.
