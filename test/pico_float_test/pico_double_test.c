@@ -22,7 +22,7 @@
 #include <sys/types.h>
 #include "inttypes.h"
 
-#if !LIB_PICO_DOUBLE_COMPILER //!LIB_PICO_LLVM_LIBC_INTERFACE
+#if !LIB_PICO_DOUBLE_COMPILER
 #define TEST_SATURATION 1
 #endif
 

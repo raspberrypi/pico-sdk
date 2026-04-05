@@ -385,13 +385,13 @@ regular_func double2int64_z
  vmov r0,r1,d0
 #endif
 wrapper_func __aeabi_d2lz
-double2int64_z_softfp:
+local_func double2int64_z_softfp
  movs r2,#0      @ fall through for softfp build
 #if !defined(__ARM_PCS_VFP)
 regular_func double2fix64_z
 #endif
 @ convert double in r0:r1 to signed fixed point in r0:r1, clamping
-double2fix64_z_softfp:
+local_func double2fix64_z_softfp
  sub r2,#0x3ff+52-1 @ remove exponent bias, compensate for mantissa length
  asrs r12,r1,#20 @ sign and exponent
  sub r3,r12,#1
