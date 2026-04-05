@@ -40,7 +40,7 @@ static inline void uart_unreset(uart_inst_t *uart) {
 
 /// \tag::uart_init[]
 uint uart_init(uart_inst_t *uart, uint baudrate) {
-    invalid_params_if(HARDWARE_UART, uart != uart0 && uart != uart1);
+    valid_params_if(HARDWARE_UART, UART_IS_INSTANCE(uart));
 
     if (uart_clock_get_hz(uart) == 0) {
         return 0;
@@ -93,7 +93,7 @@ uint uart_init(uart_inst_t *uart, uint baudrate) {
 /// \end::uart_init[]
 
 void uart_deinit(uart_inst_t *uart) {
-    invalid_params_if(HARDWARE_UART, uart != uart0 && uart != uart1);
+    valid_params_if(HARDWARE_UART, UART_IS_INSTANCE(uart));
     uart_reset(uart);
 }
 
@@ -141,7 +141,7 @@ static uint32_t uart_disable_before_lcr_write(uart_inst_t *uart) {
 }
 
 static void uart_write_lcr_bits_masked(uart_inst_t *uart, uint32_t values, uint32_t write_mask) {
-    invalid_params_if(HARDWARE_UART, uart != uart0 && uart != uart1);
+    valid_params_if(HARDWARE_UART, UART_IS_INSTANCE(uart));
 
     // (Potentially) Cleanly handle disabling the UART before touching LCR
     uint32_t cr_save = uart_disable_before_lcr_write(uart);

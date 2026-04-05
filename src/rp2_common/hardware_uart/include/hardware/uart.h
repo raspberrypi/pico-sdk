@@ -8,6 +8,7 @@
 #define _HARDWARE_UART_H
 
 #include "pico.h"
+#include "hardware/resets.h"
 #include "hardware/structs/uart.h"
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_UART, Enable/disable assertions in the hardware_uart module, type=bool, default=0, group=hardware_uart
@@ -136,6 +137,19 @@ static_assert(NUM_UARTS == 2, "");
 #endif
 
 /**
+ * \def UART_IS_INSTANCE(uart)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns true if the UART instance is one of the h/w UART instances
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_IS_INSTANCE
+static_assert(NUM_UARTS == 2, "");
+#define UART_IS_INSTANCE(uart) ((uart) == uart0 || (uart) == uart1)
+#endif
+
+/**
  * \def UART_DREQ_NUM(uart, is_tx)
  * \ingroup hardware_uart
  * \hideinitializer
@@ -216,7 +230,7 @@ static_assert(UART1_IRQ == UART0_IRQ + 1, "");
  * \return Number of UART, 0 or 1
  */
 static inline uint uart_get_index(uart_inst_t *uart) {
-    invalid_params_if(HARDWARE_UART, uart != uart0 && uart != uart1);
+    valid_params_if(HARDWARE_UART, UART_IS_INSTANCE(uart));
     return UART_NUM(uart);
 }
 
