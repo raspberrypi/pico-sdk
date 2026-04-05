@@ -1,5 +1,21 @@
 /* Set memory locations either to the already defined value, or to the default value from default_locations.ld */
 
+/* This is the correct way to do this on newer GCC works on all supported llvm */
+PROVIDE( RAM_ORIGIN = RAM_ORIGIN_DEFAULT);
+PROVIDE( RAM_LENGTH = RAM_LENGTH_DEFAULT);
+PROVIDE( SCRATCH_X_ORIGIN = SCRATCH_X_ORIGIN_DEFAULT);
+PROVIDE( SCRATCH_X_LENGTH = SCRATCH_X_LENGTH_DEFAULT);
+PROVIDE( SCRATCH_Y_ORIGIN = SCRATCH_Y_ORIGIN_DEFAULT);
+PROVIDE( SCRATCH_Y_LENGTH = SCRATCH_Y_LENGTH_DEFAULT);
+PROVIDE( XIP_RAM_ORIGIN = XIP_RAM_ORIGIN_DEFAULT);
+PROVIDE( XIP_RAM_LENGTH = XIP_RAM_LENGTH_DEFAULT);
+
+/*
+ * This works on GCC when the above doesn't, but doesn't work on older llvm if the value being checked
+ * is not already defined (it assigns 0 because the LHS creates the var), but fortunately the PROVIDE above
+ * fixes the issue for older llvm - net result is that with both the above and the below, we get
+ * the right answer on all supported linkers!
+ */
 RAM_ORIGIN = DEFINED(RAM_ORIGIN) ? RAM_ORIGIN : RAM_ORIGIN_DEFAULT;
 RAM_LENGTH = DEFINED(RAM_LENGTH) ? RAM_LENGTH : RAM_LENGTH_DEFAULT;
 SCRATCH_X_ORIGIN = DEFINED(SCRATCH_X_ORIGIN) ? SCRATCH_X_ORIGIN : SCRATCH_X_ORIGIN_DEFAULT;
@@ -8,3 +24,4 @@ SCRATCH_Y_ORIGIN = DEFINED(SCRATCH_Y_ORIGIN) ? SCRATCH_Y_ORIGIN : SCRATCH_Y_ORIG
 SCRATCH_Y_LENGTH = DEFINED(SCRATCH_Y_LENGTH) ? SCRATCH_Y_LENGTH : SCRATCH_Y_LENGTH_DEFAULT;
 XIP_RAM_ORIGIN = DEFINED(XIP_RAM_ORIGIN) ? XIP_RAM_ORIGIN : XIP_RAM_ORIGIN_DEFAULT;
 XIP_RAM_LENGTH = DEFINED(XIP_RAM_LENGTH) ? XIP_RAM_LENGTH : XIP_RAM_LENGTH_DEFAULT;
+
