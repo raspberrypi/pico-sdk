@@ -11,7 +11,7 @@ cc_library(
         "queue.c",
     ],
     hdrs = [
-        "include/pico/util/bitset.h",
+        "include/pico/util/fixed_bitset.h",
         "include/pico/util/datetime.h",
         "include/pico/util/pheap.h",
         "include/pico/util/queue.h",
