@@ -26,6 +26,7 @@ int main() {
     for (int i=0;i<47;i++) {
         CHECK(fixed_bitset_get(&b47.bitset, i), "Bit %d should be set", i);
     }
+
     for (int i=46;i>=0;i--) {
         CHECK(fixed_bitset_get(&b47.bitset, i), "Bit %d should be set", i);
         fixed_bitset_clear(&b47.bitset, i);
@@ -33,5 +34,15 @@ int main() {
         CHECK(!i == fixed_bitset_is_empty(&b47.bitset), "Bitset should be empty once last bit is cleared");
     }
 
+    fixed_bitset_init(&b47, bitset47_t, 47, 1);
+    for (int i=0;i<47;i++) {
+        CHECK(fixed_bitset_get(&b47.bitset, i), "Bit %d should be set", i);
+    }
+    for (int i=0;i<47;i++) {
+        CHECK(fixed_bitset_get(&b47.bitset, i), "Bit %d should be set", i);
+        fixed_bitset_clear(&b47.bitset, i);
+        CHECK(!fixed_bitset_get(&b47.bitset, i), "Bit %d should be clear", i);
+        CHECK((i==46) == fixed_bitset_is_empty(&b47.bitset), "Bitset should be empty once last bit is cleared");
+    }
     puts("PASSED");
 }

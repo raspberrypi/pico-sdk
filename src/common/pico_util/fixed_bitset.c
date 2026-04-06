@@ -16,7 +16,7 @@ fixed_bitset_t *fixed_bitset_flip_all(fixed_bitset_t *bitset) {
 
 bool fixed_bitset_is_empty(fixed_bitset_t *bitset) {
     check_fixed_bitset(bitset);
-    uint i=0;
+    int i=0;
     for (i=0;i<bitset->word_size-1;i++) {
         if (bitset->words[i]) return false;
     }
