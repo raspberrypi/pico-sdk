@@ -5,6 +5,11 @@ if (NOT TARGET pico_standard_link)
         target_link_libraries(pico_standard_link INTERFACE boot_stage2_headers)
     endif()
 
+    pico_register_common_scope_var(PICO_LINKER_SCRIPT_INCLUDE_DIRS)
+
+    # add the default linker script include directories
+    list(APPEND PICO_LINKER_SCRIPT_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/script_include)
+
     # pico_add_link_depend(TARGET dependency)
     # \brief\ Add a link time dependency to the target
     #
@@ -70,6 +75,32 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_LINKER_SCRIPT ${LDSCRIPT})
     endfunction()
 
+    # pico_set_linker_script_var(TARGET NAME VALUE)
+    # \brief\ Set the linker script for the target
+    #
+    # \param\ NAME Name of variable to set
+    # \param\ VALUE Value of variable to set
+    function(pico_set_linker_script_var TARGET NAME VALUE)
+        set_property(TARGET ${TARGET} APPEND PROPERTY PICO_TARGET_LINKER_SCRIPT_VARS "${NAME}=${VALUE}")
+    endfunction()
+
+    # pico_add_linker_script_override_path(TARGET PATH)
+    # \brief\ Add an override linker script path to the target
+    #
+    # This can be used to override default linker script files with custom versions.
+    #
+    # For example, to use custom files in ${CMAKE_CURRENT_LIST_DIR}/extra_scripts instead of the default ones,
+    # call pico_add_linker_script_override_path(TARGET ${CMAKE_CURRENT_LIST_DIR}/extra_scripts). This will
+    # include the custom files first, overriding the default ones.
+    #
+    # It will not override prior paths set by pico_add_linker_script_override_path.
+    #
+    # \param\ TARGET The target to add the linker script override path to
+    # \param\ PATH The path containing the overriding linker scripts
+    function(pico_add_linker_script_override_path TARGET PATH)
+        set_property(TARGET ${TARGET} APPEND PROPERTY PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS "${PATH}")
+    endfunction()
+
     # pico_set_binary_type(TARGET TYPE)
     # \brief\ Set the binary type for the target
     #
@@ -78,6 +109,7 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()
 
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_BINARY_TYPE, The default binary type to use, type=string, default=default, group=build
     # slightly messy as we support both the preferred PICO_DEFAULT_BINARY_TYPE and the individual variables
     if (NOT PICO_DEFAULT_BINARY_TYPE)
         if (PICO_NO_FLASH)
@@ -124,8 +156,23 @@ if (NOT TARGET pico_standard_link)
     #math(EXPR PICO_FLASH_SIZE_BYTES_STRING "${PICO_FLASH_SIZE_BYTES}" OUTPUT_FORMAT HEXADECIMAL)
     set(PICO_FLASH_SIZE_BYTES_STRING "${PICO_FLASH_SIZE_BYTES}")
     configure_file(${CMAKE_CURRENT_LIST_DIR}/pico_flash_region.template.ld ${CMAKE_BINARY_DIR}/pico_flash_region.ld)
-    # add include path for linker scripts
-    target_link_options(pico_standard_link INTERFACE "LINKER:-L${CMAKE_BINARY_DIR}")
+    # add include path for linker scripts to find it
+    list(APPEND PICO_LINKER_SCRIPT_INCLUDE_DIRS ${CMAKE_BINARY_DIR})
+    pico_promote_common_scope_vars()
+
+    # add override paths from PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS
+    target_link_options(pico_standard_link INTERFACE "LINKER:$<$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS>>:-L$<JOIN:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS>,,-L>>")
+
+    # add include paths from PICO_LINKER_SCRIPT_INCLUDE_DIRS
+    foreach(DIR IN LISTS PICO_LINKER_SCRIPT_INCLUDE_DIRS)
+        target_link_options(pico_standard_link INTERFACE "LINKER:-L${DIR}")
+    endforeach()
+
+    # add default locations script, so they can be referenced by pico_set_linker_script_var variables
+    target_link_options(pico_standard_link INTERFACE "LINKER:--script=${PICO_LINKER_DEFAULT_LOCATIONS_PATH}")
+
+    # add variables set by pico_set_linker_script_var function
+    target_link_options(pico_standard_link INTERFACE "LINKER:$<$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_VARS>>:--defsym=$<JOIN:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_VARS>,,--defsym=>>")
 
     # LINKER script will be PICO_TARGET_LINKER_SCRIPT if set on target, or ${CMAKE_CURRENT_LIST_DIR}/memmap_foo.ld
     # if PICO_TARGET_BINARY_TYPE is set to foo on the target, otherwise ${CMAKE_CURRENT_LIST_DIR}/memmap_${PICO_DEFAULT_BINARY_TYPE).ld

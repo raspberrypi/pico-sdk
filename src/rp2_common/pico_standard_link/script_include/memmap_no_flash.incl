@@ -1,0 +1,17 @@
+/* Include platform memory locations */
+INCLUDE "set_memory_locations.incl"
+
+/* Include memory regions used */
+INCLUDE "memory_ram.incl"
+INCLUDE "memory_scratch.incl"
+INCLUDE "memory_generated.incl"
+INCLUDE "memory_extra.incl"
+
+/* Include aliases for no_flash storage memory regions (alias to themselves) */
+INCLUDE "memory_aliases_no_flash.incl"
+
+/* Define entry point symbol */
+ENTRY(_entry_point)
+
+/* Include no_flash sections */
+INCLUDE "sections_no_flash.incl"

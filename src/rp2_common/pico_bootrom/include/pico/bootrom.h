@@ -464,9 +464,9 @@ static inline int rom_set_bootrom_stack(bootrom_stack_t *stack) {
  * 
  * The flags field contains one of the following values:
  * 
- * REBOOT_TYPE_NORMAL - reboot into the normal boot path.
+ * \ref REBOOT2_FLAG_REBOOT_TYPE_NORMAL - reboot into the normal boot path.
  * 
- * REBOOT_TYPE_BOOTSEL - reboot into BOOTSEL mode.
+ * \ref REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL - reboot into BOOTSEL mode.
  *  p0 - the GPIO number to use as an activity indicator (enabled by flag in p1).
  *  p1 - a set of flags:
  *   0x01 : DISABLE_MSD_INTERFACE - Disable the BOOTSEL USB drive (see <<section_bootrom_mass_storage>>)
@@ -474,25 +474,25 @@ static inline int rom_set_bootrom_stack(bootrom_stack_t *stack) {
  *   0x10 : GPIO_PIN_ACTIVE_LOW - The GPIO in p0 is active low.
  *   0x20 : GPIO_PIN_ENABLED - Enable the activity indicator on the specified GPIO.
  * 
- * REBOOT_TYPE_RAM_IMAGE - reboot into an image in RAM. The region of RAM or XIP RAM is searched for an image to run. This is the type
+ * \ref REBOOT2_FLAG_REBOOT_TYPE_RAM_IMAGE - reboot into an image in RAM. The region of RAM or XIP RAM is searched for an image to run. This is the type
  * of reboot used when a RAM UF2 is dragged onto the BOOTSEL USB drive.
  *  p0 - the region start address (word-aligned).
  *  p1 - the region size (word-aligned).
  * 
- * REBOOT_TYPE_FLASH_UPDATE - variant of REBOOT_TYPE_NORMAL to use when flash has been updated. This is the type
+ * \ref REBOOT2_FLAG_REBOOT_TYPE_FLASH_UPDATE - variant of \ref REBOOT2_FLAG_REBOOT_TYPE_NORMAL to use when flash has been updated. This is the type
  * of reboot used after dragging a flash UF2 onto the BOOTSEL USB drive.
  *  p0 - the address of the start of the region of flash that was updated. If this address matches the start address of a partition or slot, then that
  *       partition or slot is treated preferentially during boot (when there is a choice). This type of boot facilitates TBYB and version downgrades.
  * 
- * REBOOT_TYPE_PC_SP - reboot to a specific PC and SP. Note: this is not allowed in the ARM-NS variant.
+ * \ref REBOOT2_FLAG_REBOOT_TYPE_PC_SP - reboot to a specific PC and SP. Note: this is not allowed in the ARM-NS variant.
  *  p0 - the initial program counter (PC) to start executing at. This must have the lowest bit set for Arm and clear for RISC-V
  *  p1 - the initial stack pointer (SP).
  * 
  * All of the above, can have optional flags ORed in:
  * 
- * REBOOT_TO_ARM - switch both cores to the Arm architecture (rather than leaving them as is). The call will fail with BOOTROM_ERROR_INVALID_STATE if the Arm architecture is not supported.
- * REBOOT_TO_RISCV - switch both cores to the RISC-V architecture (rather than leaving them as is). The call will fail with BOOTROM_ERROR_INVALID_STATE if the RISC-V architecture is not supported.
- * NO_RETURN_ON_SUCCESS - the watchdog h/w is asynchronous. Setting this bit forces this method not to return if the reboot is successfully initiated.
+ * \ref REBOOT2_FLAG_REBOOT_TO_ARM - switch both cores to the Arm architecture (rather than leaving them as is). The call will fail with BOOTROM_ERROR_INVALID_STATE if the Arm architecture is not supported.
+ * \ref REBOOT2_FLAG_REBOOT_TO_RISCV - switch both cores to the RISC-V architecture (rather than leaving them as is). The call will fail with BOOTROM_ERROR_INVALID_STATE if the RISC-V architecture is not supported.
+ * \ref REBOOT2_FLAG_NO_RETURN_ON_SUCCESS - the watchdog h/w is asynchronous. Setting this bit forces this method not to return if the reboot is successfully initiated.
  * 
  * \param flags the reboot flags, as detailed above
  * \param delay_ms millisecond delay before the reboot occurs
@@ -1009,17 +1009,6 @@ static inline intptr_t rom_set_rom_callback(uint callback_num, bootrom_api_callb
     rom_set_rom_callback_fn func = (rom_set_rom_callback_fn) rom_func_lookup_inline(ROM_FUNC_SET_ROM_CALLBACK);
     return func(callback_num, funcptr);
 }
-
-#define BOOT_TYPE_NORMAL     0
-#define BOOT_TYPE_BOOTSEL    2
-#define BOOT_TYPE_RAM_IMAGE  3
-#define BOOT_TYPE_FLASH_UPDATE 4
-
-// values 8-15 are secure only
-#define BOOT_TYPE_PC_SP      0xd
-
-// ORed in if a bootloader chained into the image
-#define BOOT_TYPE_CHAINED_FLAG 0x80
 
 /*!
  * \brief Get system information

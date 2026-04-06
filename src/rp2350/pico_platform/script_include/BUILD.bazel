@@ -1,0 +1,26 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
+
+filegroup(
+    name = "rp2350_linker_script_incls",
+    srcs = glob([
+        "*.incl",
+    ]),
+)
+
+linker_scripts(
+    name = "rp2350_linker_script_includes",
+    link_scripts = ["default_locations.ld"],
+    include_scripts = glob(["*.incl"]),
+)
+
+cc_library(
+    name = "rp2350_linker_scripts",
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+    deps = [
+        "rp2350_linker_script_includes",
+    ],
+)

@@ -7,13 +7,6 @@
 #ifndef _PICO_DOUBLE_H
 #define _PICO_DOUBLE_H
 
-#include <math.h>
-#include "pico.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /** \file double.h
 * \defgroup pico_double pico_double
 *
@@ -84,7 +77,7 @@ extern "C" {
 *
 * - GNU extensions:
 *
-*   powint, sincos
+*   sincos
 *
 * On Arm, the following additional optimized functions are also provided when using `pico_double_pico`, all of which
 * saturate to the nearest representable value for too large input when converting from floating point types:
@@ -116,6 +109,10 @@ extern "C" {
 *   - double -> (u)fix (round towards -infinity):
 *
 *       double2fix, double2ufix, double2fix64, double2ufix64
+*
+* - Scientific functions:
+*
+*    powint
 * \if rp2350_specific
 *
 * - Even faster versions of divide and square-root functions that do not round correctly:
@@ -124,74 +121,268 @@ extern "C" {
 *
 * - Faster un-fused multiply and accumulate:
 *
-*   mla/fast_fma
+*   mla/fma_fast
 *
 * On RISC-V there is no custom double-precision floating point support, so `pico_double_pico` is equivalent to `pico_double_compiler`
 * \endif
 */
-#if !defined(__riscv) || PICO_COMBINED_DOCS
 
-#if PICO_COMBINED_DOCS || !LIB_PICO_DOUBLE_COMPILER
-double int2double(int32_t i);
-double uint2double(uint32_t i);
-double int642double(int64_t i);
-double uint642double(uint64_t i);
+#include "pico.h"
+
+// PICO_CONFIG: PICO_DOUBLE_IN_RAM, Force placement of SDK provided double-precision floating point code into RAM, type=bool, default=0, group=pico_double
+#ifndef PICO_DOUBLE_IN_RAM
+#define PICO_DOUBLE_IN_RAM 0
+#endif
+
+#if !(LIB_PICO_DOUBLE_COMPILER || defined(__riscv)) || PICO_DOCS
+// private define to simplify this header only - it is undefined at the end
+#define __PICO_DOUBLE_ARM_OPTIMIZED 1
+#endif
+
+//! \addtogroup pico_double
+//! \{
+
+// we always define these for C code, but they are inline
+// funcs except for __PICO_DOUBLE_ARM_OPTIMIZED so wouldn't
+// be callable for assembly
+#if __PICO_DOUBLE_ARM_OPTIMIZED || !defined(__ASSEMBLER__)
+//! Set if \ref int2double and \ref uint2double are available
+#define PICO_DOUBLE_HAS_INT32_TO_DOUBLE_CONVERSIONS 1
+//! Set if \ref int642double and \ref uint642double are available
+#define PICO_DOUBLE_HAS_INT64_TO_DOUBLE_CONVERSIONS 1
+//! Set if \ref double2int_z and \ref double2uint_z are available (rounding towards zero)
+#define PICO_DOUBLE_HAS_DOUBLE_TO_INT32_Z_CONVERSIONS 1
+//! Set if \ref double2int64_z and \ref double2uint64_z are available (rounding towards zero)
+#define PICO_DOUBLE_HAS_DOUBLE_TO_INT64_Z_CONVERSIONS 1
+#endif
+
+#if __PICO_DOUBLE_ARM_OPTIMIZED
+//! Set if \ref fix2double and \ref ufix2double are available
+#define PICO_DOUBLE_HAS_FIX32_TO_DOUBLE_CONVERSIONS 1
+//! Set if \ref fix642double and \ref ufix642double are available
+#define PICO_DOUBLE_HAS_FIX64_TO_DOUBLE_CONVERSIONS 1
+//! Set if \ref double2fix_z and \ref double2ufix_z are available (rounding towards zero)
+#define PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_Z_CONVERSIONS 1
+//! Set if \ref double2fix64_z and \ref double2ufix64_z are available (rounding towards zero)
+#define PICO_DOUBLE_HAS_DOUBLE_TO_FIX64_Z_CONVERSIONS 1
+
+//! Set if \ref double2int and \ref double2uint are available (rounding towards -Infinity)
+#define PICO_DOUBLE_HAS_DOUBLE_TO_INT32_M_CONVERSIONS 1
+//! Set if \ref double2int64 and \ref double2uint64 are available (rounding towards -Infinity)
+#define PICO_DOUBLE_HAS_DOUBLE_TO_INT64_M_CONVERSIONS 1
+
+//! Set if \ref double2fix and \ref double2ufix are available (rounding towards -Infinity)
+#define PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_M_CONVERSIONS 1
+//! Set if \ref double2fix64 and \ref double2ufix64 are available (rounding towards -Infinity)
+#define PICO_DOUBLE_HAS_DOUBLE_TO_FIX64_M_CONVERSIONS 1
+#endif
+
+#if (PICO_RP2350 && LIB_PICO_DOUBLE_PICO_DCP) || PICO_DOCS
+//! Set if \ref ddiv_fast is available
+#define PICO_DOUBLE_HAS_DDIV_FAST 1
+//! Set if \ref sqrt_fast is available
+#define PICO_DOUBLE_HAS_SQRT_FAST 1
+//! Set if \ref fma_fast is available
+#define PICO_DOUBLE_HAS_FMA_FAST 1
+#endif
+
+#if __PICO_DOUBLE_ARM_OPTIMIZED || __builtin_powi || PICO_DOCS
+//! Set if \ref powint is available
+#define PICO_DOUBLE_HAS_POWINT 1
+#endif
+//! \}
+
+#ifndef __ASSEMBLER__
+#include <math.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//! \addtogroup pico_double
+//! \{
+#if PICO_DOUBLE_HAS_INT32_TO_DOUBLE_CONVERSIONS
+#if !__PICO_DOUBLE_ARM_OPTIMIZED
+    // for non Arm-optimized we may as well provide the function and let the compiler handle it
+    static inline double int2double(int32_t i) { return (double)i; }
+    static inline double uint2double(uint32_t i) { return (double)i; }
+#else
+    //! Convert a signed 32-bit integer to the nearest double
+    double int2double(int32_t i);
+    //! Convert an unsigned 32-bit integer to the nearest double
+    double uint2double(uint32_t i);
+#endif
+#endif
+
+#if PICO_DOUBLE_HAS_INT64_TO_DOUBLE_CONVERSIONS
+#if !__PICO_DOUBLE_ARM_OPTIMIZED
+    // for non Arm-optimized we may as well provide the function and let the compiler handle it
+    static inline double int642double(int64_t i) { return (double)i; }
+    static inline double uint642double(uint64_t i) { return (double)i; }
+#else
+    //! Convert a signed 64-bit integer to the nearest double
+    double int642double(int64_t i);
+    //! Convert an unsigned 64-bit integer to the nearest double
+    double uint642double(uint64_t i);
+#endif
+#endif
+
+#if PICO_DOUBLE_HAS_DOUBLE_TO_INT32_Z_CONVERSIONS
+#if !__PICO_DOUBLE_ARM_OPTIMIZED
+    // for non Arm-optimized we may as well provide the function and let the compiler handle it
+    static inline int32_t double2int_z(double f) { return (int32_t)f; }
+    static inline int32_t double2uint_z(double f) { return (uint32_t)f; }
+#else
+    //! \brief Convert a double to a signed 32-bit integer, rounding towards zero.
+    //! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using `pico_double_compiler`
+    int32_t double2int_z(double f);
+    //! \brief Convert a double to an unsigned 32-bit integer, rounding towards zero
+    //! On Arm this conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input except when using `pico_double_compiler`
+    int32_t double2uint_z(double f);
+#endif
+#endif
+
+#if PICO_DOUBLE_HAS_DOUBLE_TO_INT64_Z_CONVERSIONS
+#if !__PICO_DOUBLE_ARM_OPTIMIZED
+    // for non Arm-optimized we may as well provide the function and let the compiler handle it
+    static inline int64_t double2int64_z(double f) { return (int64_t)f; }
+    static inline int64_t double2uint64_z(double f) { return (uint64_t)f; }
+#else
+    //! \brief Convert a double to a signed 64-bit integer, rounding towards zero.
+    //! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using `pico_double_compiler`
+    int64_t double2int64_z(double f);
+    //! \brief Convert a double to an unsigned 64-bit integer, rounding towards zero.
+    //! On Arm this conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input except when using `pico_double_compiler`
+    int64_t double2uint64_z(double f);
+#endif
+#endif
+
+#if PICO_DOUBLE_HAS_FIX32_TO_DOUBLE_CONVERSIONS
+//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest double
+//! Out of range inputs will convert to +/- Infinity
 double fix2double(int32_t m, int e);
+//! \brief Convert an unsigned 32-bit integer with the given number of fractional bits to the nearest double
+//! Out of range inputs will convert to +Infinity
 double ufix2double(uint32_t m, int e);
-double fix642double(int64_t m, int e);
-double ufix642double(uint64_t m, int e);
+#endif
 
-// These methods round towards 0, which IS the C way
-int32_t double2int_z(double f);
-int64_t double2int64_z(double f);
-int32_t double2uint_z(double f);
-int64_t double2uint64_z(double f);
+#if PICO_DOUBLE_HAS_FIX64_TO_DOUBLE_CONVERSIONS
+//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest double
+//! Out of range inputs will convert to +/- Infinity
+double fix642double(int64_t m, int e);
+//! \brief Convert an unsigned 64-bit integer with the given number of fractional bits to the nearest double
+//! Out of range inputs will convert to +Infinity
+double ufix642double(uint64_t m, int e);
+#endif
+
+#if PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_Z_CONVERSIONS
+//! \brief Convert a double to a signed 32-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
+//! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using `pico_double_compiler`
 int32_t double2fix_z(double f, int e);
+//! \brief Convert a double to an unsigned 32-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
+//! This conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input
 uint32_t double2ufix_z(double f, int e);
+#endif
+
+#if PICO_DOUBLE_HAS_DOUBLE_TO_FIX64_Z_CONVERSIONS
+//! \brief Convert a double to a signed 64-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
+//! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using `pico_double_compiler`
 int64_t double2fix64_z(double f, int e);
+//! \brief Convert a double to an unsigned 64-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
+//! This conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input
 uint64_t double2ufix64_z(double f, int e);
+#endif
 
 // These methods round towards -Infinity - which IS NOT the C way for negative numbers;
 // as such the naming is not ideal, however is kept for backwards compatibility
+#if PICO_DOUBLE_HAS_DOUBLE_TO_INT32_M_CONVERSIONS
+//! \brief Convert a double to a signed 32-bit integer, rounding towards -Infinity.
+//! This conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input
 int32_t double2int(double f);
+//! \brief Convert a double to an unsigned 32-bit integer, rounding towards -Infinity.
+//! This conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input
 uint32_t double2uint(double f);
-int64_t double2int64(double f);
-uint64_t double2uint64(double f);
-int32_t double2fix(double f, int e);
-uint32_t double2ufix(double f, int e);
-int64_t double2fix64(double f, int e);
-uint64_t double2ufix64(double f, int e);
-
 #endif
 
-double exp10(double x);
-void sincos(double x, double *sinx, double *cosx);
-double powint(double x, int y);
+#if PICO_DOUBLE_HAS_DOUBLE_TO_INT64_M_CONVERSIONS
+//! \brief Convert a double to a signed 64-bit integer, rounding towards -Infinity.
+//! This conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input
+int64_t double2int64(double f);
+//! \brief Convert a double to an usigned 64-bit integer, rounding towards -Infinity.
+//! This conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input
+uint64_t double2uint64(double f);
+#endif
 
-#if PICO_RP2350 || PICO_COMBINED_DOCS
+#if PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_M_CONVERSIONS
+//! \brief Convert a double to a signed 32-bit fixed-point integer with the given number of fractional bits, rounding towards -Infinity.
+//! This conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input
+int32_t double2fix(double f, int e);
+//! \brief Convert a double to an unsigned 32-bit fixed-point integer with the given number of fractional bits, rounding towards -Infinity.
+//! This conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input
+uint32_t double2ufix(double f, int e);
+#endif
+
+#if PICO_DOUBLE_HAS_DOUBLE_TO_FIX64_M_CONVERSIONS
+//! \brief Convert a double to a signed 64-bit fixed-point integer with the given number of fractional bits, rounding towards -Infinity.
+//! This conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input
+int64_t double2fix64(double f, int e);
+//! \brief Convert a double to an unsigned 64-bit fixed-point integer with the given number of fractional bits, rounding towards -Infinity.
+//! This conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input
+uint64_t double2ufix64(double f, int e);
+#endif
+
+    // exp10 doesn't always appear in math.h but is present on all our platforms even for LIB_PICO_DOUBLE_COMPILER
+    // so we declare it here always
+
+    //! Evaluate 10.0 to the power of the given value
+    double exp10(double x);
+
+    // sincos doesn't always appear in math.h but is present on all our platforms even for LIB_PICO_DOUBLE_COMPILER
+    // so we declare it here always
+#if __PICO_DOUBLE_ARM_OPTIMIZED && PICO_C_COMPILER_IS_CLANG
+    // clang unhelpfully splits sincos into explict calls to sin & cos
+    extern void WRAPPER_FUNC(sincos)(double x, double *sinx, double *cosx);
+    #define sincos(x, sinx, cosx) WRAPPER_FUNC(sincos)(x, sinx, cosx)
+#else
+    //! Return both the sine and cosine of an angle efficiently
+    void sincos(double x, double *sinx, double *cosx);
+#endif
+
+#if PICO_DOUBLE_HAS_POWINT
+#if !__PICO_DOUBLE_ARM_OPTIMIZED && __has_builtin(__builtin_powi)
+    static __force_inline double powint(double f, int32_t p) {
+        return __builtin_powi(f, p);
+    }
+#else
+    //! Raise a floating point number to an integer power
+    double powint(double x, int32_t y);
+#endif
+#endif
+
+#if PICO_DOUBLE_HAS_DDIV_FAST
+//! Perform a fast floating point divide with reduced accuracy
 double ddiv_fast(double n, double d);
+#endif
+
+#if PICO_DOUBLE_HAS_SQRT_FAST
+//! Perform a fast floating point square-root with reduced accuracy
 double sqrt_fast(double f);
-double fma_fast(double x, double y, double z); // this is not fused
+#endif
+
+#if PICO_DOUBLE_HAS_FMA_FAST
+//! Perform a fast (non-fused) multiply-add (x * y + z) with reduced accuracy
+double fma_fast(double x, double y, double z);
+//! Perform a fast multiply-add (x * y + z) with reduced accuracy (not fused multiply-add). This is another name for \ref fma_fast
 double mla(double x, double y, double z); // another name for fma_fast
 #endif
+//! \}
 
-#endif
-
-#if LIB_PICO_DOUBLE_COMPILER || defined(__riscv)
-// when using the compiler; we provide as many functions as we trivially can, though in the double case they are not optimal
-static inline double int2double(int32_t i) { return (double)i; }
-static inline double uint2double(uint32_t i) { return (double)i; }
-static inline double int642double(int64_t i) { return (double)i; }
-static inline double uint642double(uint64_t i) { return (double)i; }
-
-static inline int32_t double2int_z(double d) { return (int32_t)d; }
-static inline int64_t double2int64_z(double d) { return (int64_t)d; }
-static inline int32_t double2uint_z(double d) { return (uint32_t)d; }
-static inline int64_t double2uint64_z(double d) { return (uint64_t)d; }
-#endif
+#undef __PICO_DOUBLE_ARM_OPTIMIZED
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

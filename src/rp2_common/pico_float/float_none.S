@@ -6,6 +6,7 @@
 
 #include "pico/asm_helper.S"
 #include "pico/bootrom/sf_table.h"
+#include "pico/float.h"
 
 pico_default_asm_setup
 

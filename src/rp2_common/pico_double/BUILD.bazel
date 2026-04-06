@@ -72,7 +72,7 @@ alias(
     actual = select({
         "//bazel/constraint:pico_double_auto_enabled": ":pico_double_auto",
         "//bazel/constraint:pico_double_compiler_enabled": ":pico_double_auto",
-        "//bazel/constraint:pico_double_dcp_enabled": ":pico_double_pico",
+        "//bazel/constraint:pico_double_dcp_enabled": ":pico_double_dcp",
         "//bazel/constraint:pico_double_rp2040_enabled": ":pico_double_pico",
         "//conditions:default": ":pico_double_none",
     }),

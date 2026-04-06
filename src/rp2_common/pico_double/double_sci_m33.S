@@ -6,6 +6,7 @@
 
 #if !PICO_RP2040
 #include "pico/asm_helper.S"
+#include "pico/double.h"
 
 pico_default_asm_setup
 

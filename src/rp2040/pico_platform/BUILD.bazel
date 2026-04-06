@@ -54,3 +54,96 @@ cc_library(
         "//src/rp2_common/pico_standard_link",
     ],
 )
+
+load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
+
+exports_files(
+    [
+        "memmap_blocked_ram.ld",
+        "memmap_copy_to_ram.ld",
+        "memmap_default.ld",
+        "memmap_no_flash.ld",
+    ],
+)
+
+linker_scripts(
+    name = "memmap_default",
+    link_scripts = ["memmap_default.ld"],
+)
+
+linker_scripts(
+    name = "memmap_blocked_ram",
+    link_scripts = ["memmap_blocked_ram.ld"],
+)
+
+linker_scripts(
+    name = "memmap_copy_to_ram",
+    link_scripts = ["memmap_copy_to_ram.ld"],
+)
+
+linker_scripts(
+    name = "memmap_no_flash",
+    link_scripts = ["memmap_no_flash.ld"],
+)
+
+cc_library(
+    name = "default_linker_script",
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+    visibility = [
+        "//src/rp2_common/pico_standard_link:__pkg__",
+    ],
+    deps = [
+        "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2040/pico_platform/script_include:rp2040_linker_scripts",
+        "//src/rp2_common/pico_standard_link/script_include:rp2_linker_scripts",
+        "//src/rp2_common/pico_standard_link:default_flash_region",
+        "memmap_default",
+    ],
+)
+
+# PICO_BUILD_DEFINE: PICO_USE_BLOCKED_RAM, whether this is a 'blocked_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "blocked_ram_linker_script",
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+    visibility = [
+        "//src/rp2_common/pico_standard_link:__pkg__",
+    ],
+    deps = [
+        "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2040/pico_platform/script_include:rp2040_linker_scripts",
+        "//src/rp2_common/pico_standard_link/script_include:rp2_linker_scripts",
+        "//src/rp2_common/pico_standard_link:default_flash_region",
+        "memmap_blocked_ram",
+    ],
+)
+
+# PICO_BUILD_DEFINE: PICO_COPY_TO_RAM, whether this is a 'copy_to_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "copy_to_ram_linker_script",
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+    visibility = [
+        "//src/rp2_common/pico_standard_link:__pkg__",
+    ],
+    deps = [
+        "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2040/pico_platform/script_include:rp2040_linker_scripts",
+        "//src/rp2_common/pico_standard_link/script_include:rp2_linker_scripts",
+        "//src/rp2_common/pico_standard_link:default_flash_region",
+        "memmap_copy_to_ram",
+    ],
+)
+
+# PICO_BUILD_DEFINE: PICO_NO_FLASH, whether this is a 'no_flash' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
+cc_library(
+    name = "no_flash_linker_script",
+    target_compatible_with = ["//bazel/constraint:rp2040"],
+    visibility = [
+        "//src/rp2_common/pico_standard_link:__pkg__",
+    ],
+    deps = [
+        "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
+        "//src/rp2040/pico_platform/script_include:rp2040_linker_scripts",
+        "//src/rp2_common/pico_standard_link/script_include:rp2_linker_scripts",
+        "memmap_no_flash",
+    ],
+)

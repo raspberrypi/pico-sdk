@@ -214,6 +214,35 @@ if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
         pico_add_extra_outputs(kitchen_sink_blocked_ram)
         target_compile_definitions(kitchen_sink_blocked_ram PRIVATE KITCHEN_SINK_ID="blocked-ram binary")
     endif()
+
+    add_executable(kitchen_sink_ram_custom ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    # Have ram start from 0x20020000 length 128k, and heap start from 0x20030000
+    pico_set_linker_script_var(kitchen_sink_ram_custom RAM_ORIGIN 0x20020000)
+    pico_set_linker_script_var(kitchen_sink_ram_custom RAM_LENGTH 128k)
+    pico_set_linker_script_var(kitchen_sink_ram_custom HEAP_LOC 0x20030000)
+    # Also swap scratch x and scratch y, to test using defaults
+    pico_set_linker_script_var(kitchen_sink_ram_custom SCRATCH_X_ORIGIN SCRATCH_Y_ORIGIN_DEFAULT)
+    pico_set_linker_script_var(kitchen_sink_ram_custom SCRATCH_Y_ORIGIN SCRATCH_X_ORIGIN_DEFAULT)
+    target_link_libraries(kitchen_sink_ram_custom kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_ram_custom)
+    target_compile_definitions(kitchen_sink_ram_custom PRIVATE KITCHEN_SINK_ID="custom ram binary")
+
+    add_executable(kitchen_sink_ram_section ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    pico_add_linker_script_override_path(kitchen_sink_ram_section ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_ram_section_scripts)
+    pico_add_linker_script_override_path(kitchen_sink_ram_section ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_extra_end_scripts)
+    target_link_libraries(kitchen_sink_ram_section kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_ram_section)
+    target_compile_definitions(kitchen_sink_ram_section PRIVATE KITCHEN_SINK_ID="ram section binary" EXTRA_DATA_SECTION=1)
+
+    if (NOT PICO_C_COMPILER_IS_CLANG)
+        # Clang does not support overlay sections
+        add_executable(kitchen_sink_simple_overlay ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+        pico_add_linker_script_override_path(kitchen_sink_simple_overlay ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_simple_overlay_scripts)
+        pico_add_linker_script_override_path(kitchen_sink_simple_overlay ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_extra_end_scripts)
+        target_link_libraries(kitchen_sink_simple_overlay kitchen_sink_libs kitchen_sink_options)
+        pico_add_extra_outputs(kitchen_sink_simple_overlay)
+        target_compile_definitions(kitchen_sink_simple_overlay PRIVATE KITCHEN_SINK_ID="simple overlay binary" EXTRA_DATA_SECTION=2)
+    endif()
 endif()
 
 add_executable(kitchen_sink_cpp ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink_cpp.cpp)
