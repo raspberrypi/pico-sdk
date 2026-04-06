@@ -182,7 +182,7 @@ static inline pstate_bitset_t *pstate_bitset_remove_all(pstate_bitset_t *domains
 }
 
 static inline pstate_bitset_t *pstate_bitset_add_all(pstate_bitset_t *domains) {
-    bitset_set_all(&domains->bitset);
+    fixed_bitset_set_all(&domains->bitset);
     return domains;
 }
 

@@ -151,7 +151,7 @@ static inline fixed_bitset_t *fixed_bitset_clear_all(fixed_bitset_t *bitset) {
  * \param bitset the bitset
  * \return the bitset
  */
-static inline fixed_bitset_t *bitset_set_all(fixed_bitset_t *bitset) {
+static inline fixed_bitset_t *fixed_bitset_set_all(fixed_bitset_t *bitset) {
     check_fixed_bitset(bitset);
     __builtin_memset(bitset->words, 0xff, bitset->word_size * sizeof(uint32_t));
     return bitset;
