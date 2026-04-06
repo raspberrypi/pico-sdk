@@ -578,14 +578,14 @@ static inline bool set_sys_clock_khz(uint32_t freq_khz, bool required) {
     return false;
 }
 
-#include "pico/util/bitset.h"
+#include "pico/util/fixed_bitset.h"
 
-typedef bitset_type_t(NUM_CLOCK_DESTINATIONS) clock_dest_bitset_t;
-#define clock_dest_bitset_none() bitset_with_value(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 0)
-#define clock_dest_bitset_all() bitset_with_value(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 1)
+typedef fixed_bitset_type(NUM_CLOCK_DESTINATIONS) clock_dest_bitset_t;
+#define clock_dest_bitset_none() fixed_bitset_with_fill(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 0)
+#define clock_dest_bitset_all() fixed_bitset_with_fill(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 1)
 
 static inline clock_dest_bitset_t *clock_dest_bitset_clear(clock_dest_bitset_t *dests) {
-    bitset_clear(&dests->bitset);
+    fixed_bitset_clear_all(&dests->bitset);
     return dests;
 }
 
@@ -595,12 +595,12 @@ static inline clock_dest_bitset_t *clock_dest_bitset_add_all(clock_dest_bitset_t
 }
 
 static inline clock_dest_bitset_t *clock_dest_bitset_add(clock_dest_bitset_t *dests, clock_dest_num_t dest) {
-    bitset_set_bit(&dests->bitset, dest);
+    fixed_bitset_set(&dests->bitset, dest);
     return dests;
 }
 
 static inline clock_dest_bitset_t *clock_dest_bitset_remove(clock_dest_bitset_t *dests, clock_dest_num_t dest) {
-    bitset_clear_bit(&dests->bitset, dest);
+    fixed_bitset_clear(&dests->bitset, dest);
     return dests;
 }
 

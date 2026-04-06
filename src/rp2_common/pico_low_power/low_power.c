@@ -546,7 +546,7 @@ pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate) {
 }
 
 pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
-    pstate_bitset_clear(pstate);
+    pstate_bitset_remove_all(pstate);
 
     if ((uint32_t)__persistent_data_start__ == (uint32_t)__persistent_data_end__) {
         // No persistent data, so power down everything

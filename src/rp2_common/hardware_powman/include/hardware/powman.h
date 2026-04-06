@@ -9,7 +9,7 @@
 
 #include "pico.h"
 #include "hardware/structs/powman.h"
-#include "pico/util/bitset.h"
+#include "pico/util/fixed_bitset.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -172,12 +172,12 @@ typedef enum powman_power_domains powman_power_domain_t;
 
 typedef uint32_t powman_power_state;
 
-typedef bitset_type_t(POWMAN_POWER_DOMAIN_COUNT) pstate_bitset_t;
-#define pstate_bitset_none() bitset_with_value(pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 0)
-#define pstate_bitset_all() bitset_with_value(pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 1)
+typedef fixed_bitset_type(POWMAN_POWER_DOMAIN_COUNT) pstate_bitset_t;
+#define pstate_bitset_none() fixed_bitset_with_fill(pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 0)
+#define pstate_bitset_all() fixed_bitset_with_fill(pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 1)
 
-static inline pstate_bitset_t *pstate_bitset_clear(pstate_bitset_t *domains) {
-    bitset_clear(&domains->bitset);
+static inline pstate_bitset_t *pstate_bitset_remove_all(pstate_bitset_t *domains) {
+    fixed_bitset_clear_all(&domains->bitset);
     return domains;
 }
 
@@ -187,32 +187,31 @@ static inline pstate_bitset_t *pstate_bitset_add_all(pstate_bitset_t *domains) {
 }
 
 static inline pstate_bitset_t *pstate_bitset_add(pstate_bitset_t *domains, powman_power_domain_t domain) {
-    bitset_set_bit(&domains->bitset, domain);
+    fixed_bitset_set(&domains->bitset, domain);
     return domains;
 }
 
 static inline pstate_bitset_t *pstate_bitset_remove(pstate_bitset_t *domains, powman_power_domain_t domain) {
-    bitset_clear_bit(&domains->bitset, domain);
+    fixed_bitset_clear(&domains->bitset, domain);
     return domains;
 }
 
 static inline bool pstate_bitset_is_set(pstate_bitset_t *domains, powman_power_domain_t domain) {
-    return bitset_get_bit(&domains->bitset, domain);
+    return fixed_bitset_get(&domains->bitset, domain);
 }
 
 static inline bool pstate_bitset_none_set(pstate_bitset_t *domains) {
-    pstate_bitset_t none = pstate_bitset_none();
-    return bitset_equal(&domains->bitset, &none.bitset);
+    return fixed_bitset_is_empty(&domains->bitset);
 }
 
 static inline pstate_bitset_t *pstate_bitset_from_powman_power_state(pstate_bitset_t *domains, powman_power_state pstate) {
     static_assert(sizeof(powman_power_state) <= sizeof(uint32_t));
-    bitset_write_word(&domains->bitset, 0, pstate);
+    fixed_bitset_write_word(&domains->bitset, 0, pstate);
     return domains;
 }
 
 static inline powman_power_state pstate_bitset_to_powman_power_state(pstate_bitset_t *domains) {
-    return bitset_read_word(&domains->bitset, 0);
+    return fixed_bitset_read_word(&domains->bitset, 0);
 }
 
 /*! \brief Get the current power state

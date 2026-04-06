@@ -35,9 +35,9 @@ uint rosc_measure_freq_khz(void) {
 
 void rosc_set_div(uint32_t div) {
 #if PICO_RP2040
-    assert(div <= 31 && div >= 0);
+    assert(div <= 31);
 #else
-    assert(div <= 127 && div >= 0);
+    assert(div <= 127);
 #endif
     rosc_write(&rosc_hw->div, ROSC_DIV_VALUE_PASS + div);
 }

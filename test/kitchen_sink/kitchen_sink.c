@@ -89,16 +89,6 @@ int main(void) {
     hard_assert(!mutex_try_enter(&mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
-    typedef bitset_type_t(47) foop_t;
-//#define WOOP encoded_bitset_of3(1, 27, 32)
-#define WOOP encoded_bitset_of5(1, 27, 32, 40, 3)
-    encoded_bitset_foreach(WOOP, printf("Flarn %d\n", bit));
-    foop_t fooper;
-    bitset_init(&fooper, foop_t, 47, 0);
-    encoded_bitset_foreach(WOOP, bitset_set_bit(&fooper.bitset, bit));
-    for(uint i=0;i<bitset_size(&fooper.bitset);i++) {
-        if (bitset_get_bit(&fooper.bitset, i)) printf("Have at %d\n", i);
-    }
     printf("%f\n", foox(1.3f, 2.6f));
 #ifdef EXTRA_DATA_SECTION
     extern uint32_t __extra_end_variable__;
