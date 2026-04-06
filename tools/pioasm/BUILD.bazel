@@ -76,13 +76,6 @@ cc_library(
 )
 
 cc_library(
-    name = "json_output",
-    srcs = ["json_output.cpp"],
-    deps = [":pioasm_core"],
-    alwayslink = True,
-)
-
-cc_library(
     name = "ada_output",
     srcs = ["ada_output.cpp"],
     deps = [":pioasm_core"],
