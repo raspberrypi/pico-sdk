@@ -330,3 +330,9 @@ bool_flag(
     name = "PICO_COMPILATION_NO_FASTBUILD_ARGS",
     build_setting_default = False,
 )
+
+# PICO_BAZEL_CONFIG: PICO_HARD_FLOAT_ABI, use hard floating point ABI, type=bool, default=0, group=build, docref=cmake-toolchain-config
+bool_flag(
+    name = "PICO_HARD_FLOAT_ABI",
+    build_setting_default = False,
+)

@@ -274,7 +274,7 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  *
  *   To be clear, \ref pio_sm_set_config does not change the PIO's GPIO base for you; you must configre the PIO's
  *   GPIO base before calling the method, however you can use \ref pio_claim_free_sm_and_add_program_for_gpio_range
- *   to find/configure a PIO instance suitable for a partiular GPIO range.
+ *   to find/configure a PIO instance suitable for a particular GPIO range.
  *
  * You can set `PARAM_ASSERTIONS_ENABLED_HARDWARE_PIO = 1` to enable parameter checking to debug pin (or other) issues with
  * hardware_pio methods.

@@ -275,6 +275,11 @@ config_setting(
 )
 
 config_setting(
+    name = "pico_hard_float_abi_enabled",
+    flag_values = {"//bazel/config:PICO_HARD_FLOAT_ABI": "True"},
+)
+
+config_setting(
     name = "pico_binary_type_no_flash",
     flag_values = {"//bazel/config:PICO_DEFAULT_BINARY_TYPE": "no_flash"},
 )

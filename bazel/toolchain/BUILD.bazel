@@ -45,10 +45,12 @@ cc_args(
     args = [
         "-mcpu=cortex-m33",
         "-march=armv8-m.main+fp+dsp",
-        "-mfloat-abi=softfp",
         "-mthumb",
         "-mcmse",
-    ],
+    ] + select({
+        "//bazel/constraint:pico_hard_float_abi_enabled": ["-mfloat-abi=hard"],
+        "//conditions:default": ["-mfloat-abi=softfp"],
+    }),
 )
 
 # :no_canonical_system_headers and :no_canonical_prefixes both prevent built-in

@@ -359,11 +359,14 @@ void clock_stop(clock_handle_t clock);
  */
 uint32_t clock_get_hz(clock_handle_t clock);
 
-/*! \brief Measure a clocks frequency using the Frequency counter.
+/*! \brief Measure a clock's frequency using the frequency counter.
  *  \ingroup hardware_clocks
  *
- * Uses the inbuilt frequency counter to measure the specified clocks frequency.
- * Currently, this function is accurate to +-1KHz. See the datasheet for more details.
+ * Uses the builtin frequency counter to measure the specified clock's frequency.
+ * Currently, this function is accurate to +-1kHz. See the datasheet for more details.
+ *
+ * \param src The clock src to measure, see the FC0_SRC register in the datasheet
+ * \return The measured frequency in kHz
  */
 uint32_t frequency_count_khz(uint src);
 
@@ -374,6 +377,15 @@ uint32_t frequency_count_khz(uint src);
  */
 void clock_set_reported_hz(clock_handle_t clock, uint hz);
 
+/*! \brief Measure a clock's frequency using the frequency counter.
+ *  \ingroup hardware_clocks
+ *
+ * Uses the builtin frequency counter to measure the specified clock's frequency.
+ * Currently, this function is accurate to +-1kHz. See the datasheet for more details.
+ *
+ * \param src The clock src to measure, see the FC0_SRC register in the datasheet
+ * \return The measured frequency in MHz
+ */
 /// \tag::frequency_count_mhz[]
 static inline float frequency_count_mhz(uint src) {
     return ((float) (frequency_count_khz(src))) / KHZ;

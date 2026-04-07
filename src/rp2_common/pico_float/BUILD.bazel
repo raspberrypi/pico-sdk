@@ -146,7 +146,7 @@ _PICO_FLOAT_IMPLS = [
             "float_math.c",
             "float_sci_m33.S",
         ],
-        "compatibility": compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + incompatible_with_config("//bazel/constraint:rp2040"),
+        "compatibility": compatible_with_rp2() + incompatible_with_config("@platforms//cpu:riscv32") + incompatible_with_config("//bazel/constraint:rp2040") + incompatible_with_config("//bazel/constraint:pico_hard_float_abi_enabled"),
         "extra_deps": ["//src/rp2_common/hardware_dcp"],
         "linkopts": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS + _WRAP_FLOAT_FMAF_FLAGS + _WRAP_FLOAT_FMAF_FLAGS,
     },
@@ -207,7 +207,10 @@ cc_library(
     hdrs = ["include/pico/float.h"],
     defines = ["LIB_PICO_FLOAT_PICO=0"],
     includes = ["include"],
-    linkopts = _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+    linkopts = select({
+        "//bazel/constraint:pico_hard_float_abi_enabled": [],
+        "//conditions:default": _WRAP_FLOAT_AEABI_ARITHMETIC_FLAGS + _WRAP_FLOAT_AEABI_CMP_FLAGS + _WRAP_FLOAT_AEABI_CONV_32_FLAGS + _WRAP_FLOAT_AEABI_CONV_64_FLAGS + _WRAP_FLOAT_AEABI_CONV_DOUBLE_FLAGS + _WRAP_FLOAT_SQRTF_FLAGS + _WRAP_FLOAT_SCI_FLAGS + _WRAP_FLOAT_SCI_EXTRA_FLAGS,
+    }),
     target_compatible_with = compatible_with_rp2(),
     visibility = ["//visibility:private"],
     deps = [
