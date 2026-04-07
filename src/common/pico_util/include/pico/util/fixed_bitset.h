@@ -102,7 +102,7 @@ static inline uint fixed_bitset_word_size(const fixed_bitset_t *bitset) {
  * This function will assert if the bitset is not valid.
  * \param bitset the bitset to check
  */
-static inline void check_fixed_bitset(const fixed_bitset_t *bitset) {
+static inline void check_fixed_bitset(__unused const fixed_bitset_t *bitset) {
     assert(bitset->word_size == (bitset->size + 31) / 32);
 }
 

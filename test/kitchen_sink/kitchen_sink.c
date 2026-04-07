@@ -12,7 +12,7 @@
 #include "hardware/dma.h"
 #include "pico/sync.h"
 #include "pico/stdlib.h"
-#include "pico/util/bitset.h"
+#include "pico/util/fixed_bitset.h"
 #if LIB_PICO_BINARY_INFO
 #include "pico/binary_info.h"
 #endif
