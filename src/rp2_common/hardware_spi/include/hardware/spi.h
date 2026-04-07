@@ -247,6 +247,17 @@ static inline uint spi_get_index(const spi_inst_t *spi) {
     return SPI_NUM(spi);
 }
 
+/*! \brief Get the SPI instance from an instance number
+ *  \ingroup hardware_spi
+ *
+ * \param num Number of SPI, 0 or 1
+ * \return SPI instance
+ */
+static inline spi_inst_t *spi_get_instance(uint num) {
+    invalid_params_if(HARDWARE_SPI, num >= NUM_SPIS);
+    return SPI_INSTANCE(num);
+}
+
 static inline spi_hw_t *spi_get_hw(spi_inst_t *spi) {
     valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
     return (spi_hw_t *)spi;
