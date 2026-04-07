@@ -30,7 +30,8 @@ INCLUDE "memmap_default.incl"
  *         │   ├── section_ram_vector_table.incl         rp2_common/pico_standard_link
  *         │   ├── section_uninitialized_data.incl       rp2_common/pico_standard_link
  *         │   ├── section_default_data.incl             rp2_common/pico_standard_link
- *         │   └── section_bss.incl                      rp2_common/pico_standard_link
+ *         │   ├── section_bss.incl                      rp2_common/pico_standard_link
+ *         │   └── section_persistent_data.incl          rp2_common/pico_standard_link
  *         ├── section_generated_post_data.incl          rp2_common/pico_standard_link
  *         ├── section_extra_post_data.incl              rp2_common/pico_standard_link
  *         ├── section_heap.incl                         rp2_common/pico_standard_link
