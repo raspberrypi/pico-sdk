@@ -207,6 +207,7 @@ static_assert(PIO2_BASE - PIO0_BASE == (2u << 20), "hardware layout mismatch");
     static_assert(NUM_PIOS == 3, "");
     #define PIO_IS_INSTANCE(pio) ((pio) == pio0 || (pio) == pio1 || (pio) == pio2)
 #else
+    static_assert(NUM_PIOS == 2, "");
     #define PIO_IS_INSTANCE(pio) ((pio) == pio0 || (pio) == pio1)
 #endif
 #endif

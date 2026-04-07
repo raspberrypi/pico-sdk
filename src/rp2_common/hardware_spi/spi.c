@@ -9,13 +9,13 @@
 #include "hardware/spi.h"
 
 static inline void spi_reset(spi_inst_t *spi) {
-    invalid_params_if(HARDWARE_SPI, spi != spi0 && spi != spi1);
-    reset_block_num(spi == spi0 ? RESET_SPI0 : RESET_SPI1);
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
+    reset_block_num(SPI_RESET_NUM(spi));
 }
 
 static inline void spi_unreset(spi_inst_t *spi) {
-    invalid_params_if(HARDWARE_SPI, spi != spi0 && spi != spi1);
-    unreset_block_num_wait_blocking(spi == spi0 ? RESET_SPI0 : RESET_SPI1);
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
+    unreset_block_num_wait_blocking(SPI_RESET_NUM(spi));
 }
 
 uint spi_init(spi_inst_t *spi, uint baudrate) {
