@@ -156,7 +156,8 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
  *
  * \if (!rp2040_specific)
  * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be run from the ROSC while dormant so
- * it can be stopped, while clk_ref will be run from the LPOSC so that continues running for the GPIO interrupt.
+ * it can be stopped, while clk_ref will be run from the LPOSC. For the lowest power consumption, you should use
+ * DORMANT_CLOCK_SOURCE_ROSC instead, as the GPIO interrupt does not require a clock.
  * \endif
  *
  * \param gpio_pin The GPIO pin to use.

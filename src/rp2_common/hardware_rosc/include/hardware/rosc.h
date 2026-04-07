@@ -82,6 +82,7 @@ uint32_t next_rosc_code(uint32_t code);
  *  \ingroup hardware_rosc
  *
  * This function will set the frequency of the Ring Oscillator to the first frequency within the range.
+ * This will only be accurate if clk_ref is currently running from an accurate source (eg the XOSC).
  *
  * \param low_mhz The bottom of the range to search for.
  * \param high_mhz The top of the range to search for.
@@ -91,6 +92,8 @@ uint rosc_find_freq_mhz(uint32_t low_mhz, uint32_t high_mhz);
 
 /*! \brief  Measure the frequency of the Ring Oscillator
  *  \ingroup hardware_rosc
+ *
+ * This will only be accurate if clk_ref is currently running from an accurate source (eg the XOSC).
  *
  * \return The frequency of the Ring Oscillator in kHz.
  */
