@@ -959,7 +959,7 @@ timer_func_def(ffmod)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = fmodf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fdrem)(volatile float a, volatile float b) {
@@ -971,7 +971,7 @@ timer_func_def(fdrem)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = dremf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 #endif
 }
 
@@ -980,7 +980,7 @@ timer_func_def(fremainder)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = remainderf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fremquo)(volatile float a, volatile float b) {
@@ -989,7 +989,7 @@ timer_func_def(fremquo)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = remquof(a, b, &c);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fexp2)(volatile float a) {
@@ -1053,7 +1053,7 @@ timer_func_def(fpow)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = powf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fcbrt)(volatile float a) {
@@ -1085,7 +1085,7 @@ timer_func_def(fhypot)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = hypotf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fasin)(volatile float a) {
