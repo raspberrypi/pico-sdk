@@ -622,8 +622,8 @@ int test() {
     test_checki(float2int(0.5f), 0, "float2int2");
     test_checki(float2int(0.75f), 0, "float2int2b");
     test_checki(float2int(1.0f), 1, "float2int3");
-    test_checki(float2int(-10.0f), -10, "float2int3a");
-    test_checki(float2int(-0.0f), 0, "float2int3b");
+    test_checki(float2int(-10.0f), -10, "float2int3b");
+    test_checki(float2int(-0.0f), 0, "float2int3c");
     test_checki(float2int(-0.25f), -1, "float2int4");
     test_checki(float2int(-0.5f), -1, "float2int4b");
     test_checki(float2int(-0.75f), -1, "float2int5");
@@ -662,8 +662,8 @@ int test() {
     test_checki64(float2int64(0.5f), 0, "float2int642");
     test_checki64(float2int64(0.75f), 0, "float2int642b");
     test_checki64(float2int64(1.0f), 1, "float2int643");
-    test_checki64(float2int64(-10.0f), -10, "float2int643a");
-    test_checki64(float2int64(-0.0f), 0, "float2int643b");
+    test_checki64(float2int64(-10.0f), -10, "float2int643b");
+    test_checki64(float2int64(-0.0f), 0, "float2int643c");
     test_checki64(float2int64(-0.25f), -1, "float2int644");
     test_checki64(float2int64(-0.5f), -1, "float2int644b");
     test_checki64(float2int64(-0.75f), -1, "float2int645");
@@ -702,8 +702,8 @@ int test() {
     test_checki(float2int_z(0.5f), 0, "float2int_z2");
     test_checki(float2int_z(0.75f), 0, "float2int_z2b");
     test_checki(float2int_z(1.0f), 1, "float2int_z3");
-    test_checki(float2int_z(-10.0f), -10, "float2int_z3a");
-    test_checki(float2int_z(-0.0f), 0, "float2int_z3b");
+    test_checki(float2int_z(-10.0f), -10, "float2int_z3b");
+    test_checki(float2int_z(-0.0f), 0, "float2int_z3c");
     test_checki(float2int_z(-0.25f), 0, "float2int_z4");
     test_checki(float2int_z(-0.5f), 0, "float2int_z4b");
     test_checki(float2int_z(-0.75f), 0, "float2int_z5");
@@ -729,8 +729,8 @@ int test() {
     test_checki(call_float2int_z(0.5f), 0, "call_float2int_z2");
     test_checki(call_float2int_z(0.75f), 0, "call_float2int_z2b");
     test_checki(call_float2int_z(1.0f), 1, "call_float2int_z3");
-    test_checki(call_float2int_z(-10.0f), -10, "call_float2int_z3a");
-    test_checki(call_float2int_z(-0.0f), 0, "call_float2int_z3b");
+    test_checki(call_float2int_z(-10.0f), -10, "call_float2int_z3b");
+    test_checki(call_float2int_z(-0.0f), 0, "call_float2int_z3c");
     test_checki(call_float2int_z(-0.25f), 0, "call_float2int_z4");
     test_checki(call_float2int_z(-0.5f), 0, "call_float2int_z4b");
     test_checki(call_float2int_z(-0.75f), 0, "call_float2int_z5");
@@ -790,8 +790,8 @@ int test() {
     test_checki64(float2int64_z(0.5f), 0, "float2int64_z2");
     test_checki64(float2int64_z(0.75f), 0, "float2int64_z2b");
     test_checki64(float2int64_z(1.0f), 1, "float2int64_z3");
-    test_checki64(float2int64_z(-10.0f), -10, "float2int64_z3a");
-    test_checki64(float2int64_z(-0.0f), 0, "float2int64_z3b");
+    test_checki64(float2int64_z(-10.0f), -10, "float2int64_z3b");
+    test_checki64(float2int64_z(-0.0f), 0, "float2int64_z3c");
     test_checki64(float2int64_z(-0.25f), 0, "float2int64_z4");
     test_checki64(float2int64_z(-0.5f), 0, "float2int64_z4b");
     test_checki64(float2int64_z(-0.75f), 0, "float2int64_z5");
