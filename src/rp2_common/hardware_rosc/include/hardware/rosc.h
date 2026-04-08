@@ -26,23 +26,6 @@ extern "C" {
  * more accurate than the ring oscillator.
  */
 
-/*! \brief  Set frequency of the Ring Oscillator
- *  \ingroup hardware_rosc
- *
- * \param code The drive strengths. See the datasheet for information on this value.
- */
-void rosc_set_freq(uint32_t code);
-
-/*! \brief  Set range of the Ring Oscillator
- *  \ingroup hardware_rosc
- *
- * Frequency range. Frequencies will vary with Process, Voltage & Temperature (PVT).
- * Clock output will not glitch when changing the range up one step at a time.
- *
- * \param range 0x01 Low, 0x02 Medium, 0x03 High, 0x04 Too High.
- */
-void rosc_set_range(uint range);
-
 /*! \brief  Disable the Ring Oscillator
  *  \ingroup hardware_rosc
  *
@@ -67,29 +50,6 @@ void rosc_set_dormant(void);
 */
 void rosc_restart(void);
 
-/*! \brief  Get the next ROSC freq code
- *  \ingroup hardware_rosc
- * 
- * Given a ROSC freq code, return the next-numerically-higher code.
- * Top result bit is set when called on maximum ROSC code.
- *
- * \param code The current ROSC freq code.
- * \return The next ROSC freq code.
- */
-uint32_t next_rosc_code(uint32_t code);
-
-/*! \brief  Set the frequency of the Ring Oscillator within a range
- *  \ingroup hardware_rosc
- *
- * This function will set the frequency of the Ring Oscillator to the first frequency within the range.
- * This will only be accurate if clk_ref is currently running from an accurate source (eg the XOSC).
- *
- * \param low_mhz The bottom of the range to search for.
- * \param high_mhz The top of the range to search for.
- * \return The frequency of the Ring Oscillator within the range in MHz, or 0 if no frequency within the range is found.
- */
-uint rosc_find_freq_mhz(uint32_t low_mhz, uint32_t high_mhz);
-
 /*! \brief  Measure the frequency of the Ring Oscillator
  *  \ingroup hardware_rosc
  *
@@ -98,25 +58,6 @@ uint rosc_find_freq_mhz(uint32_t low_mhz, uint32_t high_mhz);
  * \return The frequency of the Ring Oscillator in kHz.
  */
 uint rosc_measure_freq_khz(void);
-
-/*! \brief  Set the output divider of the Ring Oscillator
- *  \ingroup hardware_rosc
- *
- * \if rp2040_specific
- * div = 0 divides by 32
- * div = 1-31 divides by div
- * any other value sets div=31
- * \endif
- *
- * \if rp2350_specific
- * div = 0 divides by 128
- * div = 1-127 divides by div
- * any other value sets div=128
- * \endif
- *
- * \param div The output divider.
- */
-void rosc_set_div(uint32_t div);
 
 inline static void rosc_clear_bad_write(void) {
     hw_clear_bits(&rosc_hw->status, ROSC_STATUS_BADWRITE_BITS);

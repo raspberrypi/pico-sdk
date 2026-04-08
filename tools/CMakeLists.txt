@@ -107,6 +107,12 @@ define_property(TARGET
     BRIEF_DOCS "Ensure a load map is added"
     FULL_DOCS "Ensure a load map is added"
 )
+define_property(TARGET
+    PROPERTY PICO_ALLOW_EXAMPLE_KEYS
+    INHERITED
+    BRIEF_DOCS "Allow use of example keys"
+    FULL_DOCS "Allow use of example keys"
+)
 
 # Check pioasm is installed, or build it if not installed
 function(pico_init_pioasm)
@@ -647,6 +653,10 @@ function(picotool_postprocess_binary TARGET)
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_PROCESSING_CONFIGURED true
     )
+
+    if (NOT DEFINED PICO_ALLOW_EXAMPLE_KEYS)
+        get_target_property(PICO_ALLOW_EXAMPLE_KEYS ${TARGET} PICO_ALLOW_EXAMPLE_KEYS)
+    endif()
 
     # PICO_CMAKE_CONFIG: PICO_ALLOW_EXAMPLE_KEYS, Don't raise a warning when using default signing/encryption keys, type=bool, default=0, group=build
     if (NOT PICO_ALLOW_EXAMPLE_KEYS)

@@ -10,46 +10,9 @@
 #include "hardware/clocks.h"
 #include "hardware/rosc.h"
 
-// Given a ROSC delay stage code, return the next-numerically-higher code.
-// Top result bit is set when called on maximum ROSC code.
-uint32_t next_rosc_code(uint32_t code) {
-    return ((code | 0x08888888u) + 1u) & 0xf7777777u;
-}
-
-uint rosc_find_freq_mhz(uint32_t low_mhz, uint32_t high_mhz) {
-    // TODO: This could be a lot better
-    rosc_set_div(1);
-    for (uint32_t code = 0; code <= 0x77777777u; code = next_rosc_code(code)) {
-        rosc_set_freq(code);
-        uint rosc_mhz = frequency_count_khz(CLOCKS_FC0_SRC_VALUE_ROSC_CLKSRC) / 1000;
-        if ((rosc_mhz >= low_mhz) && (rosc_mhz <= high_mhz)) {
-            return rosc_mhz;
-        }
-    }
-    return 0;
-}
 
 uint rosc_measure_freq_khz(void) {
     return frequency_count_khz(CLOCKS_FC0_SRC_VALUE_ROSC_CLKSRC);
-}
-
-void rosc_set_div(uint32_t div) {
-#if PICO_RP2040
-    assert(div <= 31);
-#else
-    assert(div <= 127);
-#endif
-    rosc_write(&rosc_hw->div, ROSC_DIV_VALUE_PASS + div);
-}
-
-void rosc_set_freq(uint32_t code) {
-    rosc_write(&rosc_hw->freqa, (ROSC_FREQA_PASSWD_VALUE_PASS << ROSC_FREQA_PASSWD_LSB) | (code & 0xffffu));
-    rosc_write(&rosc_hw->freqb, (ROSC_FREQB_PASSWD_VALUE_PASS << ROSC_FREQB_PASSWD_LSB) | (code >> 16u));
-}
-
-void rosc_set_range(uint range) {
-    // Range should use enumvals from the headers and thus have the password correct
-    rosc_write(&rosc_hw->ctrl, (ROSC_CTRL_ENABLE_VALUE_ENABLE << ROSC_CTRL_ENABLE_LSB) | range);
 }
 
 void rosc_disable(void) {

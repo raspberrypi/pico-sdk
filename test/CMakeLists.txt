@@ -1,5 +1,7 @@
 add_subdirectory(pico_test)
 
+set_directory_properties(PROPERTIES PICO_ALLOW_EXAMPLE_KEYS 1)
+
 add_subdirectory(pico_stdlib_test)
 add_subdirectory(pico_stdio_test)
 add_subdirectory(pico_time_test)
