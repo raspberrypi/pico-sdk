@@ -17,6 +17,7 @@
 #include "pico/time.h"
 #include "pico/stdio/driver.h"
 #include "pico/mutex.h"
+#include "pico/critical_section.h"
 #include "hardware/irq.h"
 #include "device/usbd_pvt.h" // for usbd_defer_func
 
