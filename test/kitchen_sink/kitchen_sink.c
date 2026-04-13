@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifndef KITCHEN_SINK_INCLUDE_HEADER
 // provided for backwards compatibility for non CMake build systems - just includes enough to compile
@@ -59,6 +60,11 @@ auto_init_recursive_mutex(recursive_mutex);
 
 float __attribute__((noinline)) foox(float x, float b) {
     return x * b;
+}
+
+void svc_call(void) {
+    puts("PASSED");
+    exit(0);
 }
 
 int main(void) {
@@ -125,7 +131,10 @@ int main(void) {
 #endif
 #endif
 #ifndef __riscv
-    // this should compile as we are Cortex M0+
+    exception_set_exclusive_handler(SVCALL_EXCEPTION, svc_call);
+    // this should compile as we are Cortex-M
     pico_default_asm ("SVC #3");
+#else
+    puts("PASSED");
 #endif
 }
