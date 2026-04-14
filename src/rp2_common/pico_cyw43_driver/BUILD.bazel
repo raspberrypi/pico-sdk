@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_pico_w", "pico_generate_pio_header")
 
 package(default_visibility = ["//visibility:public"])
@@ -40,7 +41,7 @@ cc_library(
     ] + select({
         "//bazel/constraint:pico_btstack_config_unset": [],
         "//conditions:default": [
-            "//src/rp2_common/pico_btstack:pico_btstack",
+            "//src/rp2_common/pico_btstack",
         ],
     }),
     alwayslink = True,
@@ -51,8 +52,8 @@ cc_library(
     srcs = select({
         "//bazel/constraint:pico_btstack_config_unset": [],
         "//conditions:default": [
-            "btstack_cyw43.c",
             "btstack_chipset_cyw43.c",
+            "btstack_cyw43.c",
             "btstack_hci_transport_cyw43.c",
         ],
     }),
@@ -70,10 +71,10 @@ cc_library(
         "//bazel/constraint:pico_btstack_config_unset": [],
         "//conditions:default": [
             "//bazel/config:PICO_BTSTACK_CONFIG",
-            "//src/rp2_common/pico_cyw43_driver/cybt_shared_bus:cybt_shared_bus_driver",
+            "//src/rp2_common/pico_btstack",
             "//src/rp2_common/pico_btstack:btstack_run_loop_async_context",
-            "//src/rp2_common/pico_btstack:pico_btstack",
             "//src/rp2_common/pico_btstack:pico_btstack_flash_bank",
+            "//src/rp2_common/pico_cyw43_driver/cybt_shared_bus:cybt_shared_bus_driver",
         ],
     }),
     alwayslink = True,
@@ -89,7 +90,7 @@ pico_generate_pio_header(
 filegroup(
     name = "pico_use_partition_firmware",
     srcs = [
-        "wifi_firmware.S",
         "include/cyw43_partition_firmware.h",
-    ]
+        "wifi_firmware.S",
+    ],
 )

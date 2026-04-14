@@ -93,7 +93,7 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #define PICO_SD_DAT0_PIN 4
 #endif
 #ifndef PICO_SD_DAT3_PIN
-#define PICO_SD_DAT3_PIN 8 // DAT3 of the SD card is the chip select pin
+#define PICO_SD_DAT3_PIN 9 // DAT3 of the SD card is the chip select pin
 #endif
 #ifndef PICO_SD_DAT_PIN_COUNT
 #define PICO_SD_DAT_PIN_COUNT 1

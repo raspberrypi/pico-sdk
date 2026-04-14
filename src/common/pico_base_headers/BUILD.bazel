@@ -1,4 +1,5 @@
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -72,6 +73,11 @@ cc_library(
     }) + select({
         "//bazel/constraint:rp2040": ["PICO_RP2040=1"],
         "//bazel/constraint:rp2350": ["PICO_RP2350=1"],
+        "//conditions:default": [],
+    }) + select({
+        "//bazel/constraint:pico_binary_type_no_flash": ["PICO_NO_FLASH=1"],
+        "//bazel/constraint:pico_binary_type_copy_to_ram": ["PICO_COPY_TO_RAM=1"],
+        "//bazel/constraint:pico_binary_type_blocked_ram": ["PICO_USE_BLOCKED_RAM=1"],
         "//conditions:default": [],
     }),
 )

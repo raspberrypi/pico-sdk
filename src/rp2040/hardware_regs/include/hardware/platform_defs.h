@@ -36,7 +36,7 @@
 #define NUM_ALARMS _u(4)
 #define ADC_BASE_PIN _u(26)
 #define NUM_ADC_CHANNELS _u(5)
-#define NUM_RESETS _u(24)
+#define NUM_RESETS _u(25)
 #define NUM_BANK0_GPIOS _u(30)
 #define NUM_QSPI_GPIOS _u(6)
 

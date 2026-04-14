@@ -15,6 +15,12 @@
 .thumb
 .endm
 
+.macro local_func x
+.type \x,%function
+.thumb_func
+\x:
+.endm
+
 // do not put align in here as it is used mid function sometimes
 .macro regular_func x
 .global \x

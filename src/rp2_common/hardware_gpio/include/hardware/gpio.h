@@ -558,6 +558,10 @@ void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t event_mask, bool ena
  */
 void gpio_set_dormant_irq_enabled(uint gpio, uint32_t event_mask, bool enabled);
 
+static __force_inline io_bank0_irq_ctrl_hw_t *get_core_irq_ctrl(uint core_num) {
+    return &io_bank0_hw->irq_ctrl[core_num];
+}
+
 /*! \brief Return the current interrupt status (pending events) for the given GPIO
  *  \ingroup hardware_gpio
  *
@@ -567,8 +571,7 @@ void gpio_set_dormant_irq_enabled(uint gpio, uint32_t event_mask, bool enabled);
  */
 static inline uint32_t gpio_get_irq_event_mask(uint gpio) {
     check_gpio_param(gpio);
-    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?
-                                            &io_bank0_hw->proc1_irq_ctrl : &io_bank0_hw->proc0_irq_ctrl;
+    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_irq_ctrl(get_core_num());
     io_ro_32 *status_reg = &irq_ctrl_base->ints[gpio >> 3u];
     return (*status_reg >> (4 * (gpio & 7u))) & 0xfu;
 }
@@ -604,7 +607,7 @@ static inline void gpio_acknowledge_irq(uint gpio, uint32_t event_mask) {
  *
  * \note Multiple raw handlers should not be added for the same GPIOs, and this method will assert if you attempt to.
  * Internally, this function calls \ref irq_add_shared_handler, which will assert if the maximum number of shared handlers
- * (configurable via PICO_MAX_IRQ_SHARED_HANDLERS) would be exceeded.
+ * (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) would be exceeded.
  *
  * A raw handler should check for whichever GPIOs and events it handles, and acknowledge them itself; it might look something like:
  *
@@ -639,7 +642,7 @@ void gpio_add_raw_irq_handler_with_order_priority_masked(uint32_t gpio_mask, irq
  *
  * \note Multiple raw handlers should not be added for the same GPIOs, and this method will assert if you attempt to.
  * Internally, this function calls \ref irq_add_shared_handler, which will assert if the maximum number of shared handlers
- * (configurable via PICO_MAX_IRQ_SHARED_HANDLERS) would be exceeded.
+ * (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) would be exceeded.
  *
  * A raw handler should check for whichever GPIOs and events it handles, and acknowledge them itself; it might look something like:
  *
@@ -674,7 +677,7 @@ void gpio_add_raw_irq_handler_with_order_priority_masked64(uint64_t gpio_mask, i
  *
  * \note Multiple raw handlers should not be added for the same GPIO, and this method will assert if you attempt to.
  * Internally, this function calls \ref irq_add_shared_handler, which will assert if the maximum number of shared handlers
- * (configurable via PICO_MAX_IRQ_SHARED_HANDLERS) would be exceeded.
+ * (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) would be exceeded.
  *
  * A raw handler should check for whichever GPIOs and events it handles, and acknowledge them itself; it might look something like:
  *
@@ -710,7 +713,7 @@ static inline void gpio_add_raw_irq_handler_with_order_priority(uint gpio, irq_h
  *
  * \note Multiple raw handlers should not be added for the same GPIOs, and this method will assert if you attempt to.
  * Internally, this function calls \ref irq_add_shared_handler, which will assert if the maximum number of shared handlers
- * (configurable via PICO_MAX_IRQ_SHARED_HANDLERS) would be exceeded.
+ * (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) would be exceeded.
  *
  * A raw handler should check for whichever GPIOs and events it handles, and acknowledge them itself; it might look something like:
  *
@@ -742,7 +745,7 @@ void gpio_add_raw_irq_handler_masked(uint32_t gpio_mask, irq_handler_t handler);
  *
  * \note Multiple raw handlers should not be added for the same GPIOs, and this method will assert if you attempt to.
  * Internally, this function calls \ref irq_add_shared_handler, which will assert if the maximum number of shared handlers
- * (configurable via PICO_MAX_IRQ_SHARED_HANDLERS) would be exceeded.
+ * (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) would be exceeded.
  *
  * A raw handler should check for whichever GPIOs and events it handles, and acknowledge them itself; it might look something like:
  *
@@ -774,7 +777,7 @@ void gpio_add_raw_irq_handler_masked64(uint64_t gpio_mask, irq_handler_t handler
  *
  * \note Multiple raw handlers should not be added for the same GPIO, and this method will assert if you attempt to.
  * Internally, this function calls \ref irq_add_shared_handler, which will assert if the maximum number of shared handlers
- * (configurable via PICO_MAX_IRQ_SHARED_HANDLERS) would be exceeded.
+ * (configurable via PICO_MAX_SHARED_IRQ_HANDLERS) would be exceeded.
  *
  * A raw handler should check for whichever GPIOs and events it handles, and acknowledge them itself; it might look something like:
  *

@@ -23,6 +23,7 @@
 #define arm_cpu_hw m0plus_hw
 #include "hardware/structs/nvic.h"
 #include "hardware/structs/scb.h"
+#include "hardware/structs/systick.h"
 #endif
 
 #endif

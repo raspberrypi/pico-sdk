@@ -19,15 +19,16 @@
 
 #include "hardware/gpio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(CYW43_WL_GPIO_LED_PIN)
 #include "cyw43.h"
 #endif
 
 struct async_context;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // PICO_CONFIG: PICO_STATUS_LED_AVAILABLE, Indicate whether a single-color status LED is available, type=bool, default=1 if PICO_DEFAULT_LED_PIN or CYW43_WL_GPIO_LED_PIN is defined; may be set by the user to 0 to not use either even if they are available, group=pico_status_led
 #ifndef PICO_STATUS_LED_AVAILABLE

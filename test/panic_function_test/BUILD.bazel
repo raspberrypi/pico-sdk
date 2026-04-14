@@ -1,0 +1,10 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+# TODO: Add these tests to the Bazel build.
+filegroup(
+    name = "unsupported_tests",
+    srcs = [
+        "panic_function_test.c",
+    ],
+)

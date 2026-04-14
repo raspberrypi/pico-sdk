@@ -93,7 +93,7 @@ rp2040_bootloader_binary = declare_transtion(
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),
-	"_link_extra_libs": attr.label(default = "//bazel:empty_cc_lib"),
+        "_link_extra_libs": attr.label(default = "//bazel:empty_cc_lib"),
     },
     flag_overrides = {
         # We don't want --custom_malloc to ever apply to the bootloader, so
@@ -104,7 +104,7 @@ rp2040_bootloader_binary = declare_transtion(
         # binary via `link_extra_libs`, so we must drop these deps when
         # building the bootloader binaries themselves in order to avoid a
         # circular dependency.
-	"@bazel_tools//tools/cpp:link_extra_libs": "_link_extra_libs",
+        "@bazel_tools//tools/cpp:link_extra_libs": "_link_extra_libs",
     },
 )
 
@@ -165,5 +165,35 @@ extra_copts_for_all_deps = declare_transtion(
     },
     append_to_flags = {
         "//command_line_option:copt": "extra_copts",
+    },
+)
+
+# This transition sets the binary type
+pico_set_binary_type = declare_transtion(
+    attrs = {
+        "binary_type": attr.string(),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+    },
+    flag_overrides = {
+        "@pico-sdk//bazel/config:PICO_DEFAULT_BINARY_TYPE": "binary_type",
+    },
+)
+
+# This transition sets the linker script
+pico_set_linker_script = declare_transtion(
+    attrs = {
+        "linker_script": attr.string(),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+    },
+    flag_overrides = {
+        "@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT": "linker_script",
     },
 )

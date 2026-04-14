@@ -108,7 +108,7 @@ cc_library(
         "src/ble/gatt-service/device_information_service_server.c",
         "src/ble/gatt-service/device_information_service_client.c",
         "src/ble/gatt-service/heart_rate_service_server.c",
-        "src/ble/gatt-service/hids_client.c",
+        "src/ble/gatt-service/hids_host.c",
         "src/ble/gatt-service/hids_device.c",
         "src/ble/gatt-service/nordic_spp_service_server.c",
         "src/ble/gatt-service/ublox_spp_service_server.c",

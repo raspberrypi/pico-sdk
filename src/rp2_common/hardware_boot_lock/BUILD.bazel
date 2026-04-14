@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
@@ -8,8 +9,8 @@ cc_library(
     hdrs = ["include/hardware/boot_lock.h"],
     includes = ["include"],
     tags = ["manual"],
-    deps = ["//src:pico_platform_internal"],
     visibility = ["//src/rp2_common/pico_bootrom:__pkg__"],
+    deps = ["//src:pico_platform_internal"],
 )
 
 cc_library(

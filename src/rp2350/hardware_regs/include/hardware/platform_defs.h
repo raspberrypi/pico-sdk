@@ -42,7 +42,7 @@
 #define NUM_ADC_CHANNELS _u(9)
 #define ADC_BASE_PIN _u(40)
 #endif
-#define NUM_RESETS _u(28)
+#define NUM_RESETS _u(29)
 #define NUM_DOORBELLS _u(8)
 
 #if PICO_RP2350A

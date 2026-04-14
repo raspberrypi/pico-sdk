@@ -16,13 +16,13 @@ i2c_inst_t i2c0_inst = {i2c0_hw, false};
 i2c_inst_t i2c1_inst = {i2c1_hw, false};
 
 static inline void i2c_reset(i2c_inst_t *i2c) {
-    invalid_params_if(HARDWARE_I2C, i2c != i2c0 && i2c != i2c1);
-    reset_block_num(i2c == i2c0 ? RESET_I2C0 : RESET_I2C1);
+    valid_params_if(HARDWARE_I2C, I2C_IS_INSTANCE(i2c));
+    reset_block_num(I2C_RESET_NUM(i2c));
 }
 
 static inline void i2c_unreset(i2c_inst_t *i2c) {
-    invalid_params_if(HARDWARE_I2C, i2c != i2c0 && i2c != i2c1);
-    unreset_block_num_wait_blocking(i2c == i2c0 ? RESET_I2C0 : RESET_I2C1);
+    valid_params_if(HARDWARE_I2C, I2C_IS_INSTANCE(i2c));
+    unreset_block_num_wait_blocking(I2C_RESET_NUM(i2c));
 }
 
 // Addresses of the form 000 0xxx or 111 1xxx are reserved. No slave should

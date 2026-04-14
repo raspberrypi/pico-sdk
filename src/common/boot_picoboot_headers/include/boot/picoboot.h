@@ -59,7 +59,6 @@ enum picoboot_cmd_id {
     PC_GET_INFO = 0x8b,
     PC_OTP_READ = 0x8c,
     PC_OTP_WRITE = 0xd,
-    //PC_EXEC2 = 0xe, // currently unused
 };
 
 enum picoboot_status {
@@ -109,11 +108,8 @@ struct __packed picoboot_range_cmd {
     uint32_t dSize;
 };
 
+// remains defined for backwards compatibility with RP2350 bootrom builds
 struct __packed picoboot_exec2_cmd {
-    uint32_t image_base;
-    uint32_t image_size;
-    uint32_t workarea_base;
-    uint32_t workarea_size;
 };
 
 enum picoboot_exclusive_type {
@@ -131,7 +127,6 @@ struct __packed picoboot_otp_cmd {
     uint16_t wRowCount; // number of rows to transfer
     uint8_t bEcc; // use error correction (16 bit per register vs 24 (stored as 32) bit raw)
 };
-
 
 struct __packed picoboot_get_info_cmd {
     uint8_t bType;
@@ -157,7 +152,6 @@ struct __packed __aligned(4) picoboot_cmd {
         struct picoboot_reboot2_cmd reboot2_cmd;
         struct picoboot_otp_cmd otp_cmd;
         struct picoboot_get_info_cmd get_info_cmd;
-        struct picoboot_exec2_cmd exec2_cmd;
     };
 };
 static_assert(32 == sizeof(struct picoboot_cmd), "picoboot_cmd must be 32 bytes big");

@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #ifndef KITCHEN_SINK_INCLUDE_HEADER
 // provided for backwards compatibility for non CMake build systems - just includes enough to compile
@@ -85,6 +86,44 @@ int main(void) {
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     printf("%f\n", foox(1.3f, 2.6f));
+#ifdef EXTRA_DATA_SECTION
+    extern uint32_t __extra_end_variable__;
+    printf("__extra_end_variable__ = %p\n", (void *)&__extra_end_variable__);
+#if EXTRA_DATA_SECTION > 1
+    extern uint32_t __overlays_start__;
+    uint32_t stored_words;
+
+    static int overlay_first __attribute__((section(".overlay_first"))) = 12345678;
+    printf("overlay_first before load = %d\n", overlay_first);
+    static int overlay_second_one __attribute__((section(".overlay_second"))) = 34567890;
+    static int overlay_second_two __attribute__((section(".overlay_second"))) = 56789012;
+    printf("overlay_second before load = %d, %d\n", overlay_second_one, overlay_second_two);
+
+    extern uint32_t __load_start_overlay_second;
+    extern uint32_t __load_stop_overlay_second;
+    stored_words = (uint32_t)(&__load_stop_overlay_second - &__load_start_overlay_second);
+    memcpy(&__overlays_start__, &__load_start_overlay_second, 4 * stored_words);
+    printf("overlay_second after load = %d, %d\n", overlay_second_one, overlay_second_two);
+
+    extern uint32_t __load_start_overlay_first;
+    extern uint32_t __load_stop_overlay_first;
+    stored_words = (uint32_t)(&__load_stop_overlay_first - &__load_start_overlay_first);
+    memcpy(&__overlays_start__, &__load_start_overlay_first, 4 * stored_words);
+    printf("overlay_first after load = %d\n", overlay_first);
+    printf("overlay_second after overlay_first load = %d, %d\n", overlay_second_one, overlay_second_two);
+#else
+    static int extra_data __attribute__((section(".extra_data"))) = 12345678;
+    printf("extra_data before load = %d\n", extra_data);
+
+    extern uint32_t __extra_data_source__;
+    extern uint32_t __extra_data_start__;
+    extern uint32_t __extra_data_end__;
+    uint32_t stored_words = (uint32_t)(&__extra_data_end__ - &__extra_data_start__);
+    memcpy(&__extra_data_start__, &__extra_data_source__, 4 * stored_words);
+
+    printf("extra_data after load = %d\n", extra_data);
+#endif
+#endif
 #ifndef __riscv
     // this should compile as we are Cortex M0+
     pico_default_asm ("SVC #3");

@@ -1,4 +1,6 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "use_cpp_toolchain")
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 
 def _generated_pico_flash_region_impl(ctx):
     flash_region_linker_fragment = ctx.actions.declare_file(ctx.label.name + "/ldinclude/pico_flash_region.ld")

@@ -1,0 +1,6 @@
+/* Sub-section list for read/write sections in default binaries */
+
+INCLUDE "section_ram_vector_table.incl"
+INCLUDE "section_uninitialized_data.incl"
+INCLUDE "section_default_data.incl"
+INCLUDE "section_bss.incl"

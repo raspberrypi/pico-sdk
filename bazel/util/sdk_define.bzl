@@ -1,4 +1,6 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 
 def _pico_sdk_define_impl(ctx):
     val = ctx.attr.from_flag[BuildSettingInfo].value

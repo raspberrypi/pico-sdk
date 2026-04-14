@@ -1,0 +1,8 @@
+load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
+
+package(default_visibility = ["//test/kitchen_sink:__pkg__"])
+
+linker_scripts(
+    name = "kitchen_sink_extra_end_scripts",
+    include_scripts = glob(["*.incl"]),
+)

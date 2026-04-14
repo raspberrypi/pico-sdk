@@ -1,0 +1,31 @@
+/* Defines the following symbols for use by code:
+    __bss_start__, __bss_end__
+    __tls_base, __tls_end
+    __tbss_end
+    __global_pointer$
+*/
+
+SECTIONS
+{
+    .tbss (NOLOAD) : {
+        . = ALIGN(4);
+        __bss_start__ = .;
+        __tls_base = .;
+        *(.tbss .tbss.* .gnu.linkonce.tb.*)
+        *(.tcommon)
+
+        __tls_end = .;
+    } > RAM
+
+    .bss (NOLOAD) : {
+        . = ALIGN(4);
+        __tbss_end = .;
+
+        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
+        *(COMMON)
+        PROVIDE(__global_pointer$ = . + 2K);
+        *(.sbss*)
+        . = ALIGN(4);
+        __bss_end__ = .;
+    } > RAM
+}
