@@ -1,6 +1,0 @@
-INCLUDE "platform/section_no_flash_text.ld"
-INCLUDE "rp2_common/section_no_flash_data.ld"
-INCLUDE "rp2_common/section_heap.ld"
-INCLUDE "rp2_common/section_scratch.ld"
-INCLUDE "rp2_common/section_end.ld"
-INCLUDE "platform/section_platform_end.ld"
