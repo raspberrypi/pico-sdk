@@ -4,6 +4,7 @@
     __embedded_block_end
     __preinit_array_start, __preinit_array_end
     __init_array_start, __init_array_end
+    __bothinit_array_start, __bothinit_array_end
     __fini_array_start, __fini_array_end
 */
 
