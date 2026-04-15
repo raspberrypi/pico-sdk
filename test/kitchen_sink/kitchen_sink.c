@@ -11,6 +11,7 @@
 #ifndef KITCHEN_SINK_INCLUDE_HEADER
 // provided for backwards compatibility for non CMake build systems - just includes enough to compile
 #include "hardware/dma.h"
+#include "hardware/exception.h"
 #include "pico/sync.h"
 #include "pico/stdlib.h"
 #if LIB_PICO_BINARY_INFO
