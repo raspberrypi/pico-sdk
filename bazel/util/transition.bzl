@@ -1,3 +1,5 @@
+"""Utilities for transitions."""
+
 def _normalize_flag_value(val):
     """Converts flag values to transition-safe primitives."""
     if type(val) == "label":
@@ -31,6 +33,16 @@ def declare_transtion(attrs, flag_overrides = None, append_to_flags = None, exec
     dictionary that tells `declare_transition()` which attrs to pull flag values
     from. The common `src` attr tells the transition which build rule to apply
     the transition to.
+
+    Args:
+      attrs: A dictionary of attributes for the rule.
+      flag_overrides: A mapping of flag labels to attribute names that should be
+        overridden by flag values.
+      append_to_flags: A mapping of flag labels to attribute names whose values should be appended to.
+      executable: Whether the rule is executable.
+
+    Returns:
+      A rule that applies the transition to the provided attributes.
     """
 
     def _flag_override_impl(settings, attrs):
