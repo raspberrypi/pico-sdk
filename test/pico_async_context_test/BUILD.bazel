@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
@@ -8,8 +9,8 @@ cc_binary(
     srcs = ["pico_async_context_test.c"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        "//src/rp2_common/pico_stdlib",
         "//src/rp2_common/pico_async_context:pico_async_context_threadsafe_background",
+        "//src/rp2_common/pico_stdlib",
         "//test/pico_test",
     ],
 )

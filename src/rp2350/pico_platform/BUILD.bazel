@@ -1,4 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
 
 package(
     default_visibility = [
@@ -55,8 +56,6 @@ cc_library(
     ],
 )
 
-load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
-
 exports_files(
     [
         "memmap_copy_to_ram.ld",
@@ -86,6 +85,9 @@ cc_library(
     visibility = [
         "//src/rp2_common/pico_standard_link:__pkg__",
     ],
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
     deps = [
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
         "//src/rp2350/pico_platform/script_include:rp2350_linker_scripts",
@@ -102,6 +104,9 @@ cc_library(
     visibility = [
         "//src/rp2_common/pico_standard_link:__pkg__",
     ],
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
     deps = [
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
         "//src/rp2350/pico_platform/script_include:rp2350_linker_scripts",
@@ -118,6 +123,9 @@ cc_library(
     visibility = [
         "//src/rp2_common/pico_standard_link:__pkg__",
     ],
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
     deps = [
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
         "//src/rp2350/pico_platform/script_include:rp2350_linker_scripts",

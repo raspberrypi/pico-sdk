@@ -169,7 +169,7 @@ _PICO_FLOAT_IMPLS = [
         ],
         "compatibility": compatible_with_rp2() + ["@platforms//cpu:riscv32"],
         "extra_deps": ["//src/rp2_common/hardware_hazard3"],
-        "linkopts": []
+        "linkopts": [],
     },
 ]
 
