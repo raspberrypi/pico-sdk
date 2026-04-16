@@ -448,6 +448,22 @@ static __force_inline void runtime_install_stack_guard(void *stack_bottom) {
 
 #endif
 
+// PICO_RUNTIME_INIT_PSRAM is registered automatically by hardware_psram
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_PSRAM, Skip calling of `runtime_init_psram` function during runtime init, type=bool, default=0, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_NO_INIT_PSRAM, Do not include SDK implementation of `runtime_init_psram` function, type=bool, default=0, group=pico_runtime_init
+
+#ifndef PICO_RUNTIME_INIT_PSRAM
+#define PICO_RUNTIME_INIT_PSRAM                 "11001"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_PSRAM
+#define PICO_RUNTIME_SKIP_INIT_PSRAM 0
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_PSRAM
+#define PICO_RUNTIME_NO_INIT_PSRAM 0
+#endif
+
 #ifdef __cplusplus
 }
 #endif

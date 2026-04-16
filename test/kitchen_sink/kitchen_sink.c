@@ -43,6 +43,9 @@ uint32_t *foo = (uint32_t *) 200;
 uint32_t dma_to = 0;
 uint32_t dma_from = 0xaaaa5555;
 
+int __psram("foo") foo_psram = 23;
+char __psram_uninitialised("bar") bar_psram[0x8000];
+
 void __noinline spiggle(void) {
     dma_channel_config c = dma_channel_get_default_config(1);
     channel_config_set_bswap(&c, true);
@@ -131,6 +134,32 @@ int main(void) {
     printf("extra_data after load = %d\n", extra_data);
 #endif
 #endif
+
+#ifdef PICO_PSRAM_SIZE_BYTES
+    memset(bar_psram, 0x55, sizeof(bar_psram));
+    printf("foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+    if (foo_psram != 23 || bar_psram[0] != 0x55) {
+        printf("ERROR: foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+    }
+    xip_cache_clean_all();
+    xip_cache_invalidate_all();
+    if (foo_psram != 23 || bar_psram[0] != 0x55) {
+        printf("ERROR: after flush foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+    }
+    flash_range_erase(PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE);
+    if (foo_psram != 23 || bar_psram[0] != 0x55) {
+        printf("ERROR: after erase foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+    }
+    foo_psram = 27;
+    memset(bar_psram, 0xab, sizeof(bar_psram));
+    xip_cache_clean_all();
+    xip_cache_invalidate_all();
+    printf("foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+    if (foo_psram != 27 || bar_psram[0] != 0xab) {
+        printf("ERROR: after program foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+    }
+#endif
+
 #ifndef __riscv
     exception_set_exclusive_handler(SVCALL_EXCEPTION, svc_call);
     // this should compile as we are Cortex-M

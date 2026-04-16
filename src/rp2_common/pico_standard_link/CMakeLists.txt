@@ -160,6 +160,14 @@ if (NOT TARGET pico_standard_link)
     list(APPEND PICO_LINKER_SCRIPT_INCLUDE_DIRS ${CMAKE_BINARY_DIR})
     pico_promote_common_scope_vars()
 
+    # add PSRAM region if it is enabled
+    if (PICO_PSRAM_SIZE_BYTES)
+        set(PICO_PSRAM_SIZE_BYTES_STRING "${PICO_PSRAM_SIZE_BYTES}")
+    else()
+        set(PICO_PSRAM_SIZE_BYTES_STRING "0")
+    endif()
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/pico_psram_region.template.ld ${CMAKE_BINARY_DIR}/pico_psram_region.ld)
+
     # add override paths from PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS
     target_link_options(pico_standard_link INTERFACE "LINKER:$<$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS>>:-L$<JOIN:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS>,,-L>>")
 

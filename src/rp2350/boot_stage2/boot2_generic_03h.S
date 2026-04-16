@@ -100,6 +100,11 @@ regular_func _stage2_boot
     sw a0, QMI_M0_RCMD_OFFSET(a3)
     li a0, INIT_M0_RFMT
     sw a0, QMI_M0_RFMT_OFFSET(a3)
+
+#ifdef PICO_PSRAM_SIZE_BYTES
+    jal setup_psram
+#endif
+
 #else
     push {lr}
     ldr r3, =XIP_QMI_BASE
@@ -109,10 +114,18 @@ regular_func _stage2_boot
     str r0, [r3, #QMI_M0_RCMD_OFFSET]
     ldr r0, =INIT_M0_RFMT
     str r0, [r3, #QMI_M0_RFMT_OFFSET]
+
+#ifdef PICO_PSRAM_SIZE_BYTES
+    bl setup_psram
+#endif
+
 #endif
 
 // Pull in standard exit routine
 #include "boot2_helpers/exit_from_boot2.S"
+#ifdef PICO_PSRAM_SIZE_BYTES
+#include "boot2_helpers/psram_generic.S"
+#endif
 
 #ifndef __riscv
 .global literals

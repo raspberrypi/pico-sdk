@@ -52,6 +52,15 @@
 
 // PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, default=Usually provided via board header, group=hardware_flash
 
+// PICO_CONFIG: PICO_SAVE_RESTORE_QMI_CS1, Save and restore QMI CS1 configuration when using flash functions, type=bool, default=!PICO_EMBED_XIP_SETUP, group=hardware_flash
+#ifndef PICO_SAVE_RESTORE_QMI_CS1
+#if PICO_EMBED_XIP_SETUP
+#define PICO_SAVE_RESTORE_QMI_CS1 0
+#else
+#define PICO_SAVE_RESTORE_QMI_CS1 1
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -148,6 +157,16 @@ void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count);
 void flash_flush_cache(void);
 
 #if !PICO_RP2040
+
+typedef void (*qmi_setup_function_t)(void);
+/*! \brief Set the function to be called to setup the QMI CS1 configuration
+ *  \ingroup hardware_flash
+ *
+ * \param function The function to be called to setup the QMI CS1 configuration
+ * \return True if the function was set, false if not (eg tried to set a function in flash)
+ */
+bool flash_set_qmi_cs1_setup_function(qmi_setup_function_t function);
+
 typedef enum {
     FLASH_DEVINFO_SIZE_NONE = 0x0,
     FLASH_DEVINFO_SIZE_8K = 0x1,

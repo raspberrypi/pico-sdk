@@ -93,6 +93,7 @@ cc_library(
         "//src/rp2350/pico_platform/script_include:rp2350_linker_scripts",
         "//src/rp2_common/pico_standard_link/script_include:rp2_linker_scripts",
         "//src/rp2_common/pico_standard_link:default_flash_region",
+        "//src/rp2_common/pico_standard_link:default_psram_region",
         "memmap_default",
     ],
 )
@@ -112,6 +113,7 @@ cc_library(
         "//src/rp2350/pico_platform/script_include:rp2350_linker_scripts",
         "//src/rp2_common/pico_standard_link/script_include:rp2_linker_scripts",
         "//src/rp2_common/pico_standard_link:default_flash_region",
+        "//src/rp2_common/pico_standard_link:default_psram_region",
         "memmap_copy_to_ram",
     ],
 )
@@ -130,6 +132,7 @@ cc_library(
         "//src/rp2_common/pico_crt0:no_warn_rwx_flag",
         "//src/rp2350/pico_platform/script_include:rp2350_linker_scripts",
         "//src/rp2_common/pico_standard_link/script_include:rp2_linker_scripts",
+        "//src/rp2_common/pico_standard_link:default_psram_region",
         "memmap_no_flash",
     ],
 )

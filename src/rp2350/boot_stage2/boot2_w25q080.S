@@ -229,6 +229,10 @@ _qmi_config:
     bclri a0, a0, QMI_M0_RFMT_PREFIX_LEN_LSB
     sw a0, QMI_M0_RFMT_OFFSET(a3)
 
+#ifdef PICO_PSRAM_SIZE_BYTES
+    jal setup_psram
+#endif
+
 // ----------------------------------------------------------------------------
 // Arm implementation
 
@@ -323,6 +327,10 @@ _qmi_config:
     bic r0, #QMI_M0_RFMT_PREFIX_LEN_BITS
     str r0, [r3, #QMI_M0_RFMT_OFFSET]
 
+#ifdef PICO_PSRAM_SIZE_BYTES
+    bl setup_psram
+#endif
+
 #endif
 
 // ----------------------------------------------------------------------------
@@ -334,6 +342,9 @@ _qmi_config:
 #include "boot2_helpers/wait_qmi_ready.S"
 #ifdef PROGRAM_STATUS_REG
 #include "boot2_helpers/read_flash_sreg.S"
+#endif
+#ifdef PICO_PSRAM_SIZE_BYTES
+#include "boot2_helpers/psram_generic.S"
 #endif
 
 #ifndef __riscv

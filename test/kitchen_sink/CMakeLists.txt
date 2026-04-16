@@ -18,6 +18,7 @@ set(KITCHEN_SINK_LIBS
     hardware_pio
     hardware_pll
     hardware_powman
+    hardware_psram
     hardware_pwm
     hardware_rcp
     hardware_resets
@@ -150,6 +151,15 @@ target_link_libraries(kitchen_sink kitchen_sink_libs kitchen_sink_options)
 pico_set_program_name(kitchen_sink "Wombat tentacles")
 pico_add_extra_outputs(kitchen_sink)
 target_compile_definitions(kitchen_sink PRIVATE KITCHEN_SINK_ID="regular binary")
+
+if (NOT PICO_RP2040)
+    # RP2040 requires boot2 anyway
+    add_executable(kitchen_sink_xip_setup ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    target_link_libraries(kitchen_sink_xip_setup kitchen_sink_libs kitchen_sink_options)
+    target_compile_definitions(kitchen_sink_xip_setup PRIVATE PICO_EMBED_XIP_SETUP=1)
+    pico_add_extra_outputs(kitchen_sink_xip_setup)
+    target_compile_definitions(kitchen_sink_xip_setup PRIVATE KITCHEN_SINK_ID="xip setup binary")
+endif()
 
 if (TARGET hardware_pio)
     pico_generate_pio_header(kitchen_sink ${CMAKE_CURRENT_LIST_DIR}/trivial.pio)

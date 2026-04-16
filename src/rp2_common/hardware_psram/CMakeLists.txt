@@ -1,0 +1,2 @@
+pico_simple_hardware_target(psram)
+pico_mirrored_target_link_libraries(hardware_psram INTERFACE hardware_flash)

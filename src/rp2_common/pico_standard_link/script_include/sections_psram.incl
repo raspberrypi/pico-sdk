@@ -1,0 +1,15 @@
+SECTIONS
+{
+    .psram_load : {
+        __psram_load_start__ = .;
+        *(.psram_initialised.*)
+        . = ALIGN(4);
+        __psram_load_end__ = .;
+    } > PSRAM AT> PSRAM_STORE
+    __psram_load_source__ = LOADADDR(.psram_load);
+
+    .psram_noload (NOLOAD) : {
+        *(.psram_uninitialised.*)
+        . = ALIGN(4);
+    } > PSRAM
+}
