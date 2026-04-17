@@ -159,6 +159,13 @@ if (NOT PICO_RP2040)
     target_compile_definitions(kitchen_sink_xip_setup PRIVATE PICO_EMBED_XIP_SETUP=1)
     pico_add_extra_outputs(kitchen_sink_xip_setup)
     target_compile_definitions(kitchen_sink_xip_setup PRIVATE KITCHEN_SINK_ID="xip setup binary")
+
+    add_executable(kitchen_sink_psram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    target_link_libraries(kitchen_sink_psram kitchen_sink_libs kitchen_sink_options)
+    target_compile_definitions(kitchen_sink_psram PRIVATE PICO_AUTO_DETECT_PSRAM=1 PICO_PSRAM_CS_PIN=47)
+    pico_override_psram_size(kitchen_sink_psram "(8 * 1024 * 1024)")
+    pico_add_extra_outputs(kitchen_sink_psram)
+    target_compile_definitions(kitchen_sink_psram PRIVATE KITCHEN_SINK_ID="psram binary")
 endif()
 
 if (TARGET hardware_pio)

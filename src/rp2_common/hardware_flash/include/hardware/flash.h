@@ -151,8 +151,22 @@ void flash_get_unique_id(uint8_t *id_out);
  *  \param txbuf Pointer to a byte buffer which will be transmitted to the flash
  *  \param rxbuf Pointer to a byte buffer where data received from the flash will be written. txbuf and rxbuf may be the same buffer.
  *  \param count Length in bytes of txbuf and of rxbuf
+ *  \param cs Chip select index: generally 0 is Flash, 1 is PSRAM.
  */
-void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count);
+void flash_do_cmd_cs(const uint8_t *txbuf, uint8_t *rxbuf, size_t count, uint8_t cs);
+
+/*! \brief Execute bidirectional flash command on chip select 0
+ *  \ingroup hardware_flash
+ *
+ * See \ref flash_do_cmd_cs for more details.
+ *
+ *  \param txbuf Pointer to a byte buffer which will be transmitted to the flash
+ *  \param rxbuf Pointer to a byte buffer where data received from the flash will be written. txbuf and rxbuf may be the same buffer.
+ *  \param count Length in bytes of txbuf and of rxbuf
+ */
+static inline void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count) {
+    flash_do_cmd_cs(txbuf, rxbuf, count, 0);
+}
 
 void flash_flush_cache(void);
 

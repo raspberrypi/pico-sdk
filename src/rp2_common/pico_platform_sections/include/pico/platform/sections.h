@@ -98,10 +98,12 @@
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
  *              garbage-collected independently
  */
- #ifndef __psram
- #define __psram(group) __attribute__((section(".psram_initialised." group)))
- #define __psram_uninitialised(group) __attribute__((section(".psram_uninitialised." group)))
- #endif
+#ifndef __psram
+#define __psram(group) __attribute__((section(".psram_initialised." group)))
+#endif
+#ifndef __psram_uninitialised
+#define __psram_uninitialised(group) __attribute__((section(".psram_uninitialised." group)))
+#endif
 
 /*! \brief Section attribute macro for data that is to be left uninitialized
  *  \ingroup pico_platform

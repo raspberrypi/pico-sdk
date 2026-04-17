@@ -40,7 +40,12 @@
 extern "C" {
 #endif
 
-
+/*! \brief Check if PSRAM is available
+ *  \ingroup hardware_psram
+ *
+ * \return true if PSRAM is available, false otherwise
+ */
+bool psram_is_available(void);
 
 #ifdef __cplusplus
 }

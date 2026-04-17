@@ -264,8 +264,9 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
 #if !PICO_NO_FLASH
 // Bitbanging the chip select using IO overrides, in case RAM-resident IRQs
 // are still running, and the FIFO bottoms out. (the bootrom does the same)
-static void __no_inline_not_in_flash_func(flash_cs_force)(bool high) {
+static void __no_inline_not_in_flash_func(flash_cs_force)(bool high, uint8_t cs) {
 #if PICO_RP2040
+    (void)cs;
     uint32_t field_val = high ?
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_HIGH :
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_LOW;
@@ -275,14 +276,14 @@ static void __no_inline_not_in_flash_func(flash_cs_force)(bool high) {
     );
 #else
     if (high) {
-        hw_clear_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_ASSERT_CS0N_BITS);
+        hw_clear_bits(&qmi_hw->direct_csr, cs == 0 ? QMI_DIRECT_CSR_ASSERT_CS0N_BITS : QMI_DIRECT_CSR_ASSERT_CS1N_BITS);
     } else {
-        hw_set_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_ASSERT_CS0N_BITS);
+        hw_set_bits(&qmi_hw->direct_csr, cs == 0 ? QMI_DIRECT_CSR_ASSERT_CS0N_BITS : QMI_DIRECT_CSR_ASSERT_CS1N_BITS);
     }
 #endif
 }
 
-void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *rxbuf, size_t count) {
+void __no_inline_not_in_flash_func(flash_do_cmd_cs)(const uint8_t *txbuf, uint8_t *rxbuf, size_t count, uint8_t cs) {
     rom_connect_internal_flash_fn connect_internal_flash_func = (rom_connect_internal_flash_fn)rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
     rom_flash_exit_xip_fn flash_exit_xip_func = (rom_flash_exit_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
     rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
@@ -295,7 +296,7 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
     connect_internal_flash_func();
     flash_exit_xip_func();
 
-    flash_cs_force(0);
+    flash_cs_force(0, cs);
     size_t tx_remaining = count;
     size_t rx_remaining = count;
 #if PICO_RP2040
@@ -333,7 +334,7 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
     }
     hw_clear_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_EN_BITS);
 #endif
-    flash_cs_force(1);
+    flash_cs_force(1, cs);
 
     flash_flush_cache_func();
     flash_enable_xip_via_boot2();

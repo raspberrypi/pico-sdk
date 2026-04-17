@@ -136,27 +136,35 @@ int main(void) {
 #endif
 
 #ifdef PICO_PSRAM_SIZE_BYTES
-    memset(bar_psram, 0x55, sizeof(bar_psram));
-    printf("foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
-    if (foo_psram != 23 || bar_psram[0] != 0x55) {
-        printf("ERROR: foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
-    }
-    xip_cache_clean_all();
-    xip_cache_invalidate_all();
-    if (foo_psram != 23 || bar_psram[0] != 0x55) {
-        printf("ERROR: after flush foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
-    }
-    flash_range_erase(PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE);
-    if (foo_psram != 23 || bar_psram[0] != 0x55) {
-        printf("ERROR: after erase foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
-    }
-    foo_psram = 27;
-    memset(bar_psram, 0xab, sizeof(bar_psram));
-    xip_cache_clean_all();
-    xip_cache_invalidate_all();
-    printf("foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
-    if (foo_psram != 27 || bar_psram[0] != 0xab) {
-        printf("ERROR: after program foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+    if (psram_is_available()) {
+        printf("PSRAM is available\n");
+        memset(bar_psram, 0x55, sizeof(bar_psram));
+        printf("foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+        if (foo_psram != 23 || bar_psram[0] != 0x55) {
+            printf("ERROR: foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+        }
+        // Make sure the write actually went to PSRAM
+        xip_cache_clean_all();
+        xip_cache_invalidate_all();
+        if (foo_psram != 23 || bar_psram[0] != 0x55) {
+            printf("ERROR: after flush foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+        }
+        // Check PSRAM still works after flash functions
+        flash_range_erase(PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE);
+        if (foo_psram != 23 || bar_psram[0] != 0x55) {
+            printf("ERROR: after erase foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+        }
+        foo_psram = 27;
+        memset(bar_psram, 0xab, sizeof(bar_psram));
+        // Make sure the write actually went to PSRAM
+        xip_cache_clean_all();
+        xip_cache_invalidate_all();
+        printf("foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+        if (foo_psram != 27 || bar_psram[0] != 0xab) {
+            printf("ERROR: after program foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+        }
+    } else {
+        printf("PSRAM not available\n");
     }
 #endif
 
