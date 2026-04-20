@@ -277,7 +277,6 @@ cc_binary(
     deps = [":kitchen_sink_common"],
     defines = [
         "PICO_AUTO_DETECT_PSRAM=1",
-        "PICO_PSRAM_CS_PIN=47",
         'PICO_PSRAM_SIZE_BYTES="(8 * 1024 * 1024)"',
     ]
 )

@@ -24,7 +24,7 @@
 #define PSRAM_NOOP_CMD 0xFF
 
 
-#if PICO_AUTO_DETECT_PSRAM
+#if PICO_AUTO_DETECT_PSRAM_SIZE
 static size_t __no_inline_not_in_flash_func(detect_psram_size)(void) {
     int psram_size = 0;
 
@@ -54,6 +54,33 @@ static size_t __no_inline_not_in_flash_func(detect_psram_size)(void) {
 
     return psram_size;
 }
+
+#if PICO_AUTO_DETECT_PSRAM_CS
+static size_t detect_psram_cs_and_size(void) {
+    const uint8_t cs_gpios[] = {0, 8, 19, 47};
+    gpio_function_t prev_funcs[4] = {};
+    for (size_t i=0; i < sizeof(cs_gpios); i++) {
+        // Save and clear all CS GPIO functions
+        uint8_t gpio = cs_gpios[i];
+        prev_funcs[i] = gpio_get_function(gpio);
+        gpio_set_function(gpio, GPIO_FUNC_NULL);
+    }
+    for (size_t i=0; i < sizeof(cs_gpios); i++) {
+        uint8_t gpio = cs_gpios[i];
+        gpio_set_function(gpio, GPIO_FUNC_XIP_CS1);
+        size_t psram_size = detect_psram_size();
+        if (psram_size > 0) {
+            // CS GPIO found
+            flash_devinfo_set_cs_gpio(1, gpio);
+            return psram_size;
+        }
+        // Restore previous function
+        gpio_set_function(gpio, prev_funcs[i]);
+    }
+
+    return 0;
+}
+#endif
 #endif
 
 static void __no_inline_not_in_flash_func(reinitialise_psram)(void) {
@@ -139,30 +166,33 @@ bool psram_is_available(void) {
 #if !PICO_RUNTIME_NO_INIT_PSRAM
 void runtime_init_setup_psram(void) {
     // Setup flash_devinfo from compile definitions
-    #ifdef PICO_PSRAM_CS_PIN
+    #if defined(PICO_PSRAM_SIZE_BYTES) && !PICO_AUTO_DETECT_PSRAM_SIZE
+    flash_devinfo_set_cs_size(1, flash_devinfo_bytes_to_size(PICO_PSRAM_SIZE_BYTES));
+    #endif
+    #if defined(PICO_PSRAM_CS_PIN) && !PICO_AUTO_DETECT_PSRAM_CS
     flash_devinfo_set_cs_gpio(1, PICO_PSRAM_CS_PIN);
     #endif
 
-    #if PICO_AUTO_DETECT_PSRAM
-    #ifndef PICO_PSRAM_CS_PIN
-    #error PICO_PSRAM_CS_PIN must be set to use PICO_AUTO_DETECT_PSRAM
-    #else
+    #if PICO_AUTO_DETECT_PSRAM_SIZE
+    #if !defined(PICO_PSRAM_CS_PIN) && !PICO_AUTO_DETECT_PSRAM_CS
+    #error PICO_AUTO_DETECT_PSRAM_SIZE requires a specified PICO_PSRAM_CS_PIN or PICO_AUTO_DETECT_PSRAM_CS
+    #elif defined(PICO_PSRAM_CS_PIN)
     gpio_set_function(PICO_PSRAM_CS_PIN, GPIO_FUNC_XIP_CS1);
     #endif
     if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {  // Check is size is already set by OTP
         // Attempt to auto-detect the PSRAM size
+        #if PICO_AUTO_DETECT_PSRAM_CS
+        size_t psram_size = detect_psram_cs_and_size();
+        #else
         size_t psram_size = detect_psram_size();
+        #endif
         // Set flash_devinfo size
         if (psram_size > 0) flash_devinfo_set_cs_size(1, flash_devinfo_bytes_to_size(psram_size));
     }
-    #else
-    #ifdef PICO_PSRAM_SIZE_BYTES
-    flash_devinfo_set_cs_size(1, flash_devinfo_bytes_to_size(PICO_PSRAM_SIZE_BYTES));
-    #endif
     #endif
 
     if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {
-        // No PSRAM present, so panic if there's any data planned for PSRAM
+        // No PSRAM present, so setup PSRAM to bus fault if there are variables in it
         extern uint32_t __psram_start__;
         extern uint32_t __psram_end__;
         uint32_t psram_words = (uint32_t)(&__psram_end__ - &__psram_start__);

@@ -26,9 +26,21 @@
 // PICO_CONFIG: PICO_PSRAM_SIZE_BYTES, size of psram in bytes, type=int, default=Usually provided via board header, group=hardware_psram
 // PICO_CONFIG: PICO_PSRAM_CS_PIN, chip select pin for psram, type=int, default=Usually provided via board header, group=hardware_psram
 
-// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM, automatically detect psram presence, type=bool, default=0, group=hardware_psram
+// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM, automatically detect if psram is present, type=bool, default=0, group=hardware_psram
 #ifndef PICO_AUTO_DETECT_PSRAM
 #define PICO_AUTO_DETECT_PSRAM 0
+#endif
+
+// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_SIZE, automatically detect psram size, type=bool, default=PICO_AUTO_DETECT_PSRAM, group=hardware_psram
+#ifndef PICO_AUTO_DETECT_PSRAM_SIZE
+#define PICO_AUTO_DETECT_PSRAM_SIZE PICO_AUTO_DETECT_PSRAM
+#endif
+
+// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS, automatically detect psram chip select pin, default=PICO_AUTO_DETECT_PSRAM, group=hardware_psram
+#ifndef PICO_AUTO_DETECT_PSRAM_CS
+#define PICO_AUTO_DETECT_PSRAM_CS PICO_AUTO_DETECT_PSRAM
+#elif PICO_AUTO_DETECT_PSRAM_CS && !PICO_AUTO_DETECT_PSRAM_SIZE
+#error "PICO_AUTO_DETECT_PSRAM_SIZE must be set to use PICO_AUTO_DETECT_PSRAM_CS"
 #endif
 
 // PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_ID, ID of psram, type=int, default=0x5D, group=hardware_psram
