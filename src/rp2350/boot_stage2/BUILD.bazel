@@ -40,7 +40,6 @@ cc_library(
         "asminclude/boot2_helpers/exit_from_boot2.S",
         "asminclude/boot2_helpers/read_flash_sreg.S",
         "asminclude/boot2_helpers/wait_qmi_ready.S",
-        "asminclude/boot2_helpers/psram_generic.S",
         "include/boot_stage2/config.h",
     ] + BOOT2_CHOICE_FILES,
     defines = select(flag_choice(

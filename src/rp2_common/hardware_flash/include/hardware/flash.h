@@ -52,15 +52,6 @@
 
 // PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, default=Usually provided via board header, group=hardware_flash
 
-// PICO_CONFIG: PICO_SAVE_RESTORE_QMI_CS1, Save and restore QMI CS1 configuration when using flash functions, type=bool, default=!PICO_EMBED_XIP_SETUP, group=hardware_flash
-#ifndef PICO_SAVE_RESTORE_QMI_CS1
-#if PICO_EMBED_XIP_SETUP
-#define PICO_SAVE_RESTORE_QMI_CS1 0
-#else
-#define PICO_SAVE_RESTORE_QMI_CS1 1
-#endif
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif

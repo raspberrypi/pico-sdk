@@ -153,13 +153,6 @@ pico_add_extra_outputs(kitchen_sink)
 target_compile_definitions(kitchen_sink PRIVATE KITCHEN_SINK_ID="regular binary")
 
 if (NOT PICO_RP2040)
-    # RP2040 requires boot2 anyway
-    add_executable(kitchen_sink_xip_setup ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
-    target_link_libraries(kitchen_sink_xip_setup kitchen_sink_libs kitchen_sink_options)
-    target_compile_definitions(kitchen_sink_xip_setup PRIVATE PICO_EMBED_XIP_SETUP=1)
-    pico_add_extra_outputs(kitchen_sink_xip_setup)
-    target_compile_definitions(kitchen_sink_xip_setup PRIVATE KITCHEN_SINK_ID="xip setup binary")
-
     add_executable(kitchen_sink_psram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
     target_link_libraries(kitchen_sink_psram kitchen_sink_libs kitchen_sink_options)
     target_compile_definitions(kitchen_sink_psram PRIVATE PICO_AUTO_DETECT_PSRAM=1 PICO_PSRAM_CS_PIN=47)

@@ -56,7 +56,6 @@ static size_t __no_inline_not_in_flash_func(detect_psram_size)(void) {
 }
 #endif
 
-#if PICO_SAVE_RESTORE_QMI_CS1
 static void __no_inline_not_in_flash_func(reinitialise_psram)(void) {
     // Does not need to save/restore interrupts, as it is called from inside flash functions
     // which already require handling around them
@@ -131,7 +130,6 @@ static void __no_inline_not_in_flash_func(reinitialise_psram)(void) {
                         QMI_M1_WFMT_SUFFIX_LEN_VALUE_NONE << QMI_M1_WFMT_SUFFIX_LEN_LSB);
     qmi_hw->m[1].wcmd = PSRAM_QUAD_WRITE_CMD << QMI_M1_WCMD_PREFIX_LSB;
 }
-#endif
 
 static bool has_psram = false;
 bool psram_is_available(void) {
@@ -183,10 +181,8 @@ void runtime_init_setup_psram(void) {
     // Enable writes to PSRAM
     hw_set_bits(&xip_ctrl_hw->ctrl, XIP_CTRL_WRITABLE_M1_BITS);
 
-    #if PICO_SAVE_RESTORE_QMI_CS1
     // Register the function to initialise the QMI CS1 configuration
     flash_set_qmi_cs1_setup_function(reinitialise_psram);
-    #endif
 
     // Now flash_devinfo is correct, just start XIP
     flash_start_xip();
