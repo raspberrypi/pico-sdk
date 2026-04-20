@@ -45,7 +45,7 @@ _INCLUDE_RE = re.compile(
 )
 
 # CMake generates this in the binary dir; skip it so the tree is useful without a build.
-IGNORED_INCLUDE_NAMES = frozenset({"pico_flash_region.ld"})
+IGNORED_INCLUDE_NAMES = frozenset({"pico_flash_region.ld", "pico_psram_region.ld"})
 
 # Shared CLI helpers (argparse help strings, colors, doc folding) for memmap_annotate.py
 CLI_HELP_SDK_ROOT = (

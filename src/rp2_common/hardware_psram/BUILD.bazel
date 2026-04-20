@@ -11,6 +11,8 @@ cc_library(
     deps = [
         "//src/rp2_common:hardware_structs",
         "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_clocks",
         "//src/rp2_common/hardware_flash",
+        "//src/rp2_common/hardware_gpio",
     ],
 )

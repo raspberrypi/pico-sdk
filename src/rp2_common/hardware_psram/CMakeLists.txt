@@ -1,2 +1,4 @@
 pico_simple_hardware_target(psram)
 pico_mirrored_target_link_libraries(hardware_psram INTERFACE hardware_flash)
+
+target_link_libraries(hardware_psram INTERFACE hardware_gpio hardware_clocks pico_runtime_init_headers) # not mirrored as only implementation requires it
