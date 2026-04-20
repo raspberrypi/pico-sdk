@@ -1,9 +1,7 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
 
-# TODO: Needs LIB_FREERTOS_KERNEL defined.
 cc_library(
     name = "hardware_psram",
     srcs = ["psram.c"],
