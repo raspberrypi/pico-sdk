@@ -21,6 +21,6 @@ bool fixed_bitset_is_empty(fixed_bitset_t *bitset) {
         if (bitset->words[i]) return false;
     }
     // we don't guarantee that bits above the size aren't set, so mask them off
-    return !(i && (bitset->words[i] << (32u -(bitset->size & 31u))));
+    return !(bitset->words[i] << (32u -(bitset->size & 31u)));
 }
 
