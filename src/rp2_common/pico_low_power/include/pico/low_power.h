@@ -62,6 +62,9 @@ extern "C" {
 #endif
 
 #include "hardware/clocks.h"
+#if HAS_RP2040_RTC
+#include "hardware/rtc.h"
+#endif
 #if HAS_POWMAN_TIMER
 #include "hardware/powman.h"
 #endif

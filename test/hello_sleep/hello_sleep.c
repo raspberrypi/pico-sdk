@@ -17,6 +17,13 @@
 
 #define RTC_GPIO 22 // must support clock input, see the GPIO function table in the datasheet.
 
+// Set to 1 to continue after an error, 0 to exit
+#if 0
+#define EXIT_TEST
+#else
+#define EXIT_TEST return -1
+#endif
+
 bool repeater(repeating_timer_t *timer) {
     if (aon_timer_is_running()) {
         printf("  Repeating timer %d at %dms (aon: %dms)", *(uint32_t*)timer->user_data, to_ms_since_boot(get_absolute_time()), to_ms_since_boot(aon_timer_get_absolute_time()));
@@ -142,12 +149,16 @@ int main() {
 
     start_time = get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
-    low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, true);
+    ret = low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, true);
+    if (ret != PICO_OK) {
+        printf("ERROR: %d returned by low_power_sleep_until_timer\n", ret);
+        EXIT_TEST;
+    }
     diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
         printf("ERROR: Woke up too soon\n");
-        return -1;
+        EXIT_TEST;
     }
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
@@ -159,12 +170,16 @@ int main() {
 
     start_time = get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
-    low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, false);
+    ret = low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, false);
+    if (ret != PICO_OK) {
+        printf("ERROR: %d returned by low_power_sleep_until_timer\n", ret);
+        EXIT_TEST;
+    }
     diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
         printf("ERROR: Woke up too soon\n");
-        return -1;
+        EXIT_TEST;
     }
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
@@ -180,13 +195,22 @@ int main() {
     aon_timer_start(&ts);
 
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
-    low_power_dormant_until_aon_timer(wakeup_time,
+    ret = low_power_dormant_until_aon_timer(wakeup_time,
                                 #if PICO_RP2040
-                                      DORMANT_CLOCK_SOURCE_XOSC, 46875,
+                                      DORMANT_CLOCK_SOURCE_XOSC, RTC_CLOCK_FREQ_HZ,
                                 #else
                                       DORMANT_CLOCK_SOURCE_LPOSC, XOSC_HZ,
                                 #endif
                                       RTC_GPIO, NULL);
+    if (ret != PICO_OK) {
+        printf("ERROR: %d returned by low_power_dormant_until_aon_timer\n", ret);
+    #if PICO_RP2040
+        if (ret == PICO_ERROR_PRECONDITION_NOT_MET) {
+            printf("ERROR: RTC clock source is not running - connect a device running rtc_clksrc to GPIO %d\n", RTC_GPIO);
+        }
+    #endif
+        EXIT_TEST;
+    }
     // need to use the AON timer for checking time, since the other timer is unclocked
     diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
     if (diff > -1000000
@@ -214,7 +238,7 @@ int main() {
 
     if (my_number != 12345) {
         printf("ERROR: my_number is %d not 12345 - initialisation issue?\n", my_number);
-        return -1;
+        EXIT_TEST;
     }
     my_number = 67890;
 
@@ -223,7 +247,10 @@ int main() {
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_pstate_until_aon_timer(wakeup_time, NULL, pstate_resume_func);
 
-    printf("%d low_power_pstate_until_aon_timer returned\n", ret);
+    if (ret != PICO_OK) {
+        printf("ERROR: %d returned by low_power_pstate_until_aon_timer\n", ret);
+        EXIT_TEST;
+    }
     while (true) {
         printf("Waiting\n");
         busy_wait_ms(1000);
@@ -242,12 +269,12 @@ post_pstate_sram_on:
         #endif
     ) {
         printf("ERROR: Woke up more than %d seconds late\n", (int)(diff / 1000000));
-        return -1;
+        EXIT_TEST;
     }
 
     if (my_number != 67890) {
         printf("ERROR: my_number is %d not 67890 - SRAM has been re-loaded\n", my_number);
-        return -1;
+        EXIT_TEST;
     } else {
         printf("my_number in sram: %d\n", my_number);
     }
@@ -269,7 +296,10 @@ post_pstate_sram_on:
     pstate = pstate_bitset_none();
     ret = low_power_pstate_until_aon_timer(wakeup_time, &pstate, pstate_resume_func);
 
-    printf("%d low_power_pstate_until_aon_timer returned\n", ret);
+    if (ret != PICO_OK) {
+        printf("ERROR: %d returned by low_power_pstate_until_aon_timer\n", ret);
+        EXIT_TEST;
+    }
     while (true) {
         printf("Waiting\n");
         busy_wait_ms(1000);
@@ -290,12 +320,12 @@ post_pstate_sram_off:
         #endif
     ) {
         printf("ERROR: Woke up more than %d seconds late\n", (int)(diff / 1000000));
-        return -1;
+        EXIT_TEST;
     }
 
     if (my_number != 34567) {
         printf("ERROR: my_number is %d not 34567 - SRAM has not been re-loaded\n", my_number);
-        return -1;
+        EXIT_TEST;
     } else {
         printf("my_number in sram: %d\n", my_number);
     }
@@ -305,7 +335,7 @@ post_pstate_sram_off:
 
     if (powman_hw->scratch[3] != 2) {
         printf("ERROR: number of POWMAN reboots was %d not 2\n", powman_hw->scratch[3]);
-        return -1;
+        EXIT_TEST;
     }
 #endif
 

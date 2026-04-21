@@ -382,16 +382,7 @@ static void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_so
 #endif
 
 #if HAS_RP2040_RTC
-    // CLK RTC = ideally XOSC (12MHz) / 256 = 46875Hz but could be rosc
-    uint clk_rtc_src = (dormant_source == DORMANT_CLOCK_SOURCE_XOSC) ?
-                       CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_XOSC_CLKSRC :
-                       CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_ROSC_CLKSRC_PH;
-
-    clock_configure(clk_rtc,
-                    0, // No GLMUX
-                    clk_rtc_src,
-                    clk_sys_src_hz,
-                    46875);
+    // RTC should already be configured to run from the external source
 #endif
 
     // CLK PERI = clk_sys. Used as reference clock for Peripherals. No dividers so just select and enable
@@ -449,14 +440,14 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
         return PICO_ERROR_PRECONDITION_NOT_MET;
     }
 
-    low_power_setup_clocks_for_dormant(dormant_clock_source);
-
     clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
 #if PICO_RP2040
     // The RTC must be run from an external source, since the dormant source will be inactive
-    rtc_run_from_external_source(src_hz, gpio_pin);
+    if (!rtc_run_from_external_source(src_hz, gpio_pin)) {
+        return PICO_ERROR_PRECONDITION_NOT_MET;
+    }
     clock_dest_bitset_add(&local_keep_enabled, CLK_DEST_RTC_RTC);
 #elif PICO_RP2350
     ((void)src_hz);
@@ -470,6 +461,8 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
 #else
     #error Unknown processor
 #endif
+
+    low_power_setup_clocks_for_dormant(dormant_clock_source);
 
     // todo catch race condition here (or just plain in the past)
     struct timespec ts;
