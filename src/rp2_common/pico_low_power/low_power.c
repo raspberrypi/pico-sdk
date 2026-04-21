@@ -118,7 +118,7 @@ static void post_pstate_change(void) {
 }
 #endif
 
-void low_power_enable_processor_deep_sleep(void) {
+static void low_power_enable_processor_deep_sleep(void) {
     // Enable deep sleep at the proc
 #ifdef __riscv
     uint32_t bits = RVCSR_MSLEEP_POWERDOWN_BITS;
@@ -132,7 +132,7 @@ void low_power_enable_processor_deep_sleep(void) {
 #endif
 }
 
-void low_power_disable_processor_deep_sleep(void) {
+static void low_power_disable_processor_deep_sleep(void) {
 #ifdef __riscv
     riscv_clear_csr(RVCSR_MSLEEP_OFFSET, RVCSR_MSLEEP_POWERDOWN_BITS | RVCSR_MSLEEP_DEEPSLEEP_BITS);
 #else
@@ -276,7 +276,7 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
     return 0;
 }
 
-int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
+int low_power_sleep_until_gpio_pin_state(uint gpio_pin, bool edge, bool high,
                                      const clock_dest_bitset_t *keep_enabled, bool exclusive) {
 
     event_happened = false;
@@ -325,7 +325,7 @@ int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high,
 // In order to go into dormant mode we need to be running from a stoppable clock source:
 // either the xosc or rosc with no PLLs running. This means we disable the USB and ADC clocks
 // and all PLLs
-void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_source) {
+static void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_source) {
     prepare_for_clock_switch();
 
     uint clk_ref_src_hz;
@@ -415,7 +415,7 @@ void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_source) {
 }
 
 //To be called after waking up from sleep/dormant mode to restore system clocks properly
-void low_power_wake_from_dormant(void) {
+static void low_power_wake_from_dormant(void) {
     //Re-enable the ring oscillator, which will essentially kickstart the proc
     rosc_restart();
 
@@ -426,7 +426,7 @@ void low_power_wake_from_dormant(void) {
     post_clock_switch();
 }
 
-void low_power_go_dormant(dormant_clock_source_t dormant_clock_source) {
+static void low_power_go_dormant(dormant_clock_source_t dormant_clock_source) {
     assert(
         dormant_clock_source == DORMANT_CLOCK_SOURCE_XOSC || dormant_clock_source == DORMANT_CLOCK_SOURCE_ROSC
     #if !PICO_RP2040
@@ -445,6 +445,10 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
                                       dormant_clock_source_t dormant_clock_source,
                                       uint src_hz, uint gpio_pin,
                                       const clock_dest_bitset_t *keep_enabled) {
+    if (!aon_timer_is_running()) {
+        return PICO_ERROR_PRECONDITION_NOT_MET;
+    }
+
     low_power_setup_clocks_for_dormant(dormant_clock_source);
 
     clock_dest_bitset_t local_keep_enabled;
@@ -489,7 +493,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     return 0;
 }
 
-int low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
+int low_power_dormant_until_gpio_pin_state(uint gpio_pin, bool edge, bool high,
                                        dormant_clock_source_t dormant_clock_source,
                                        const clock_dest_bitset_t *keep_enabled) {
 
@@ -534,13 +538,7 @@ int low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high,
 extern unsigned char __persistent_data_start__[];
 extern unsigned char __persistent_data_end__[];
 
-int low_power_pstate_set(pstate_bitset_t *pstate) {
-    invalid_params_if(PICO_LOW_POWER, !pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SWITCHED_CORE));
-
-    return powman_set_power_state(pstate_bitset_to_powman_power_state(pstate));
-}
-
-pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate) {
+static pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate) {
     pstate_bitset_from_powman_power_state(pstate, powman_get_power_state());
     return pstate;
 }
@@ -570,7 +568,7 @@ pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
     return pstate;
 }
 
-int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
+static int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
     pstate_bitset_t default_pstate = pstate_bitset_none();
     if (pstate == NULL) {
         pstate = &default_pstate;
@@ -613,12 +611,15 @@ int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func re
 }
 
 int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
+    if (!aon_timer_is_running()) {
+        return PICO_ERROR_PRECONDITION_NOT_MET;
+    }
     powman_enable_alarm_wakeup_at_ms(to_ms_since_boot(until));
 
     return low_power_go_pstate(pstate, resume_func);
 }
 
-int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
+int low_power_pstate_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
     powman_enable_gpio_wakeup(0, gpio_pin, edge, high);
 
     return low_power_go_pstate(pstate, resume_func);

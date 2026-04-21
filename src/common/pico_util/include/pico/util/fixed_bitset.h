@@ -30,7 +30,7 @@ typedef struct {
  * \ingroup fixed_bitset
  * This macro is used to declare the type of a fixed-size bitset. It is used as follows:
  * ```
- * typedef fixed_bitset_type_t(17) my_bitset_t;
+ * typedef fixed_bitset_type(17) my_bitset_t;
  * ```
  * will define a new bitset type called `my_bitset_t` that can hold 17 boolean values.
  * 

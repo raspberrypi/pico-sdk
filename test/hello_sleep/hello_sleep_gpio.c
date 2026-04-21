@@ -87,7 +87,7 @@ int main() {
 
     printf("Going to sleep until GPIO wakeup\n");
 
-    low_power_sleep_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, NULL, true);
+    low_power_sleep_until_gpio_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, NULL, true);
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
@@ -102,7 +102,7 @@ int main() {
     clock_dest_bitset_add(&keep_enabled, CLK_DEST_REF_TICKS);
 #endif
 
-    low_power_sleep_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, &keep_enabled, false);
+    low_power_sleep_until_gpio_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, &keep_enabled, false);
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
@@ -119,16 +119,16 @@ int main() {
 
     printf("Going DORMANT until GPIO wakeup\n");
 
-    low_power_dormant_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, DORMANT_CLOCK_SOURCE_ROSC, NULL);
+    low_power_dormant_until_gpio_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, DORMANT_CLOCK_SOURCE_ROSC, NULL);
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
 #if HAS_POWMAN_TIMER
     printf("Going to PSTATE until GPIO wakeup\n");
 
-    ret = low_power_pstate_until_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, NULL, pstate_resume_func);
+    ret = low_power_pstate_until_gpio_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, NULL, pstate_resume_func);
 
-    printf("%d low_power_pstate_until_pin_state returned\n", ret);
+    printf("%d low_power_pstate_until_gpio_pin_state returned\n", ret);
     while (true) {
         printf("Waiting\n");
         busy_wait_ms(1000);

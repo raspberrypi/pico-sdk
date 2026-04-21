@@ -116,7 +116,7 @@ static inline int low_power_sleep_until_default_timer(absolute_time_t until, con
 }
 
 
-/*! \brief  Sleep until pin state changes
+/*! \brief  Sleep until GPIO pin state changes
  *  \ingroup pico_low_power
  * Sleep until the given GPIO pin changes state. The clocks specified in keep_enabled will be kept enabled during sleep.
  * If exclusive is true, only the GPIO interrupt will be listened for, otherwise other interrupts will also be listened for.
@@ -128,7 +128,7 @@ static inline int low_power_sleep_until_default_timer(absolute_time_t until, con
  * \param exclusive Whether to only listen for the GPIO interrupt, or other interrupts.
  * \return 0 on success, non-zero on error.
  */
-int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_bitset_t *keep_enabled, bool exclusive);
+int low_power_sleep_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_bitset_t *keep_enabled, bool exclusive);
 
 /*! \brief  Go dormant until time using AON timer
  *  \ingroup pico_low_power
@@ -149,7 +149,7 @@ int low_power_sleep_until_pin_state(uint gpio_pin, bool edge, bool high, const c
  */
 int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_source_t dormant_clock_source, uint src_hz, uint gpio_pin, const clock_dest_bitset_t *keep_enabled);
 
-/*! \brief  Go dormant until pin state changes
+/*! \brief  Go dormant until GPIO pin state changes
  *  \ingroup pico_low_power
  * Go dormant until the given GPIO pin changes state.
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
@@ -167,7 +167,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
  * \param keep_enabled The clocks to keep enabled during dormant.
  * \return 0 on success, non-zero on error.
  */
-int low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_bitset_t *keep_enabled);
+int low_power_dormant_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, dormant_clock_source_t dormant_clock_source, const clock_dest_bitset_t *keep_enabled);
 
 #if HAS_POWMAN_TIMER
 /*! \brief  Go to Pstate until time using AON timer
@@ -188,7 +188,7 @@ int low_power_dormant_until_pin_state(uint gpio_pin, bool edge, bool high, dorma
  */
 int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
 
-/*! \brief  Go to Pstate until pin state changes
+/*! \brief  Go to Pstate until GPIO pin state changes
  *  \ingroup pico_low_power
  * Go to Pstate until the given GPIO pin changes state. The function specified in resume_func will be called on reboot,
  * with the low power Pstate passed to it.
@@ -204,7 +204,7 @@ int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pst
  * \param resume_func The function to call on reboot.
  * \return 0 on success, non-zero on error.
  */
-int low_power_pstate_until_pin_state(uint gpio_pin, bool edge, bool high, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
+int low_power_pstate_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func);
 
 /*! \brief  Get Pstate which keeps persistent data powered on
  *  \ingroup pico_low_power
