@@ -153,14 +153,23 @@ pico_add_extra_outputs(kitchen_sink)
 target_compile_definitions(kitchen_sink PRIVATE KITCHEN_SINK_ID="regular binary")
 
 if (NOT PICO_RP2040)
-    add_executable(kitchen_sink_psram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
-    target_link_libraries(kitchen_sink_psram kitchen_sink_libs kitchen_sink_options)
-    target_compile_definitions(kitchen_sink_psram PRIVATE PICO_AUTO_DETECT_PSRAM=1)
-    # Override the PSRAM size to allow variables in PSRAM - will be set to the actual
-    # size at runtime.
-    pico_override_psram_size(kitchen_sink_psram "(1 * 1024 * 1024)")
-    pico_add_extra_outputs(kitchen_sink_psram)
-    target_compile_definitions(kitchen_sink_psram PRIVATE KITCHEN_SINK_ID="psram binary")
+    add_executable(kitchen_sink_psram_fixed ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    target_link_libraries(kitchen_sink_psram_fixed kitchen_sink_libs kitchen_sink_options)
+    target_compile_definitions(kitchen_sink_psram_fixed PRIVATE FIXED_PSRAM_SIZE=1)
+    if (NOT DEFINED PICO_PSRAM_SIZE_BYTES)
+        # Override the PSRAM size for boards that usually don't have PSRAM to allow
+        # variables in PSRAM, and auto-detect at runtime if PSRAM is present.
+        target_compile_definitions(kitchen_sink_psram_fixed PRIVATE PICO_AUTO_DETECT_PSRAM=1)
+        pico_override_psram_size(kitchen_sink_psram_fixed "(1 * 1024 * 1024)")
+    endif()
+    pico_add_extra_outputs(kitchen_sink_psram_fixed)
+    target_compile_definitions(kitchen_sink_psram_fixed PRIVATE KITCHEN_SINK_ID="psram fixed size binary")
+
+    add_executable(kitchen_sink_psram_detect ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    target_link_libraries(kitchen_sink_psram_detect kitchen_sink_libs kitchen_sink_options)
+    target_compile_definitions(kitchen_sink_psram_detect PRIVATE PICO_AUTO_DETECT_PSRAM=1)
+    pico_add_extra_outputs(kitchen_sink_psram_detect)
+    target_compile_definitions(kitchen_sink_psram_detect PRIVATE KITCHEN_SINK_ID="psram detect size binary")
 endif()
 
 if (TARGET hardware_pio)

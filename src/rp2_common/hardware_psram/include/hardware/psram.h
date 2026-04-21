@@ -59,9 +59,9 @@
 #error "PICO_AUTO_DETECT_PSRAM_SIZE must be set to use PICO_AUTO_DETECT_PSRAM_CS"
 #endif
 
-// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS, skip default GPIOs when auto-detecting psram chip select pin, type=bool, default=1, group=hardware_psram
+// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS, skip default GPIOs when auto-detecting psram chip select pin, type=bool, default=PICO_AUTO_DETECT_PSRAM_CS, group=hardware_psram
 #ifndef PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS
-#define PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS 1
+#define PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS PICO_AUTO_DETECT_PSRAM_CS
 #endif
 
 #if PICO_AUTO_DETECT_PSRAM_CS
@@ -90,6 +90,30 @@
 // PICO_CONFIG: PICO_DEFAULT_PSRAM_MIN_DESELECT, Default min deselect time in ns of psram, type=int, default=18, group=hardware_psram
 #ifndef PICO_DEFAULT_PSRAM_MIN_DESELECT
 #define PICO_DEFAULT_PSRAM_MIN_DESELECT 18
+#endif
+
+
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_PSRAM, Skip calling of `runtime_init_psram` function during runtime init, type=bool, default=1 if PICO_PSRAM_SIZE_BYTES is not set, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_NO_INIT_PSRAM, Do not include SDK implementation of `runtime_init_psram` function, type=bool, default=1 if PICO_PSRAM_SIZE_BYTES is not set, group=pico_runtime_init
+
+#ifndef PICO_RUNTIME_INIT_PSRAM
+#define PICO_RUNTIME_INIT_PSRAM                 "11001"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_PSRAM
+#if defined(PICO_PSRAM_SIZE_BYTES) || PICO_AUTO_DETECT_PSRAM_SIZE
+#define PICO_RUNTIME_SKIP_INIT_PSRAM 0
+#else
+#define PICO_RUNTIME_SKIP_INIT_PSRAM 1
+#endif
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_PSRAM
+#if defined(PICO_PSRAM_SIZE_BYTES) || PICO_AUTO_DETECT_PSRAM_SIZE
+#define PICO_RUNTIME_NO_INIT_PSRAM 0
+#else
+#define PICO_RUNTIME_NO_INIT_PSRAM 1
+#endif
 #endif
 
 #ifdef __cplusplus
@@ -132,7 +156,7 @@ size_t psram_detect_size(void);
  * This runs \ref psram_detect_size() for each CS GPIO in the array in turn,
  * and returns the size as soon as a PSRAM chip is detected.
  *
- * This will set the CS pin in flash_devinfo if PSRAM is found, and configure the GPIO function.
+ * This will setup the CS GPIO using flash_devinfo if PSRAM is found.
  *
  * \param cs_gpios Array of CS GPIOs to try
  * \param num Number of CS GPIOs in the array
@@ -143,13 +167,31 @@ size_t psram_detect_cs_and_size(uint8_t *cs_gpios, size_t num);
 /*! \brief Configure PSRAM timing parameters
  *  \ingroup hardware_psram
  *
- * This will setup this library to use the given timing parameters.
+ * This will calculate and set the PSRAM timing parameters based on the given values.
+ *
+ * Note: This will also implement the workaround for RP2350-E14 if PICO_RP2350_A2_SUPPORTED is set.
  *
  * \param max_psram_freq Maximum frequency of PSRAM
  * \param max_select_ns Maximum select time in ns
  * \param min_deselect_ns Minimum deselect time in ns
+ * \return PICO_OK on success, PICO_ERROR_INVALID_ARG if unable to calculate valid parameters
  */
-void psram_configure_params(uint32_t max_psram_freq, uint32_t max_select_ns, uint32_t min_deselect_ns);
+int psram_configure_params(uint32_t max_psram_freq, uint32_t max_select_ns, uint32_t min_deselect_ns);
+
+/*! \brief Explicitly set PSRAM timing parameters
+ *  \ingroup hardware_psram
+ *
+ * This will explicitly set the PSRAM timing parameters to the given values.
+ *
+ * This may be necessary if the parameters calculated by \ref psram_configure_params are not suitable.
+ *
+ * \param divisor Divisor for PSRAM clock
+ * \param rxdelay RX delay for PSRAM clock
+ * \param max_select Maximum select time in multiples of 64 system clocks
+ * \param min_deselect Minimum deselect time in system clock cycles - ceil(divisor / 2)
+ * \return PICO_OK on success, PICO_ERROR_INVALID_ARG if any of the parameters are invalid
+ */
+int psram_set_params(uint32_t divisor, uint32_t rxdelay, uint32_t max_select, uint32_t min_deselect);
 
 /*! \brief Re-initialise PSRAM
  *  \ingroup hardware_psram
@@ -157,8 +199,27 @@ void psram_configure_params(uint32_t max_psram_freq, uint32_t max_select_ns, uin
  * This will re-initialise the PSRAM with the parameters set by \ref psram_configure_params.
  *
  * This calls \ref flash_start_xip internally, so will reset any QSPI pads changes you have made.
+ *
+ * \return PICO_OK on success, PICO_ERROR_PRECONDITION_NOT_MET if the PSRAM size is not set in
+ * flash_devinfo or the PSRAM parameters are not set by \ref psram_configure_params
  */
-void psram_reinitialise(void);
+int psram_reinitialise(void);
+
+/*! \brief Convert PSRAM EID to size
+ *  \ingroup hardware_psram
+ *
+ * This will convert the PSRAM EID to the size in bytes.
+ *
+ * This is not intended to be called by the user, but is provided as a weak function so it can
+ * be overridden if other PSRAM chips are used that have different EID to size mapping.
+ *
+ * This is used by \ref psram_detect_size to check the KGD and convert the EID to the size.
+ *
+ * \param kgd Known Good Die
+ * \param eid EID
+ * \return size of PSRAM in bytes, or 0 if the KGD/EID is not recognised
+ */
+size_t psram_eid_to_size(uint8_t kgd, uint8_t eid);
 
 #ifdef __cplusplus
 }

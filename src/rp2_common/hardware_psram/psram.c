@@ -22,9 +22,31 @@
 #define PSRAM_NOOP_CMD 0xFF
 
 
-size_t psram_detect_size(void) {
-    int psram_size = 0;
+size_t __weak psram_eid_to_size(uint8_t kgd, uint8_t eid) {
+    // Weak function to allow overriding if other PSRAM chips
+    // have different EID to size mapping
+    // Currently supports APS6404 and ISSI PSRAM
+    size_t psram_size = 0;
 
+    if (kgd == PICO_DEFAULT_PSRAM_ID) { // Known Good Die - expects 0x5D
+        psram_size = 1024 * 1024; // 1 MiB
+        uint8_t size_id = eid >> 5;
+        if (size_id == 4) { // == 4 is for ISSI PSRAM
+            psram_size *= 16; // 16 MiB
+        } else if (eid == 0x26 || size_id == 2 || size_id == 3) { // == 3 is for ISSI PSRAM
+            psram_size *= 8; // 8 MiB
+        } else if (size_id == 0) {
+            psram_size *= 2; // 2 MiB
+        } else if (size_id == 1) {
+            psram_size *= 4; // 4 MiB
+        }
+    }
+
+    return psram_size;
+}
+
+
+size_t psram_detect_size(void) {
     // Save size to restore later
     flash_devinfo_size_t prev_size = flash_devinfo_get_cs_size(1);
     // Setup with non-zero size, so the bootrom will issue the XIP exit sequence to CS1
@@ -40,22 +62,10 @@ size_t psram_detect_size(void) {
     // Restore previous size
     flash_devinfo_set_cs_size(1, prev_size);
 
-    uint8_t kgd = rxbuffer[5];  // Known Good Die - expects 0x5D on APS6404
+    uint8_t kgd = rxbuffer[5];
     uint8_t eid = rxbuffer[6];
 
-    if (kgd == PICO_DEFAULT_PSRAM_ID) {
-        psram_size = 1024 * 1024; // 1 MiB
-        uint8_t size_id = eid >> 5;
-        if (eid == 0x26 || size_id == 2) {
-            psram_size *= 8; // 8 MiB
-        } else if (size_id == 0) {
-            psram_size *= 2; // 2 MiB
-        } else if (size_id == 1) {
-            psram_size *= 4; // 4 MiB
-        }
-    }
-
-    return psram_size;
+    return psram_eid_to_size(kgd, eid);
 }
 
 size_t psram_detect_cs_and_size(uint8_t *cs_gpios, size_t num) {
@@ -85,6 +95,7 @@ size_t psram_detect_cs_and_size(uint8_t *cs_gpios, size_t num) {
     return 0;
 }
 
+#if PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS
 static size_t remove_defaults_from_cs_gpios(uint8_t *cs_gpios, size_t num) {
     // To prevent trying to use a pin that is already defined for something
     // else by the board header
@@ -153,39 +164,57 @@ static size_t remove_defaults_from_cs_gpios(uint8_t *cs_gpios, size_t num) {
     }
     return new_num;
 }
+#endif
 
 static uint32_t psram_divisor = 0;
 static uint32_t psram_rxdelay = 0;
 static uint32_t psram_max_select = 0;
 static uint32_t psram_min_deselect = 0;
 
-void psram_configure_params(uint32_t max_psram_freq, uint32_t max_select_ns, uint32_t min_deselect_ns) {
+int psram_configure_params(uint32_t max_psram_freq, uint32_t max_select_ns, uint32_t min_deselect_ns) {
     // Set PSRAM timing for APS6404
     //
     // Using an rxdelay equal to the divisor isn't enough when running the APS6404 close to 133MHz.
     // So: don't allow running at divisor 1 above 100MHz (because delay of 2 would be too late),
     // and add an extra 1 to the rxdelay if the divided clock is > 100MHz (i.e. sys clock > 200MHz).
     uint32_t clock_hz = clock_get_hz(clk_sys);
-    psram_divisor = (clock_hz + max_psram_freq - 1) / max_psram_freq;
-    if (psram_divisor == 1 && clock_hz > 100000000) {
-        psram_divisor = 2;
+    uint32_t divisor = (clock_hz + max_psram_freq - 1) / max_psram_freq;
+    if (divisor == 1 && clock_hz > 100000000) {
+        divisor = 2;
     }
-    psram_rxdelay = psram_divisor;
-    if (clock_hz / psram_divisor > 100000000) {
-        psram_rxdelay += 1;
+    uint32_t rxdelay = divisor;
+    if (clock_hz / divisor > 100000000) {
+        rxdelay += 1;
     }
 
     // - Max select is given in multiples of 64 system clocks.
     // - Min deselect is given in system clock cycles - ceil(divisor / 2).
     // Requires 64-bit maths as we're working with femtoseconds
     uint32_t clock_period_fs = 1000000000000000ull / clock_hz;  // 1s = 1000000000000000fs
-    psram_max_select = ((uint64_t)max_select_ns * 1000000ull) / (64ull * (uint64_t)clock_period_fs);  // 1ns = 1000000fs
-    psram_min_deselect = (min_deselect_ns * 1000000 + (clock_period_fs - 1)) / clock_period_fs - (psram_divisor + 1) / 2;
+    uint32_t max_select = ((uint64_t)max_select_ns * 1000000ull) / (64ull * (uint64_t)clock_period_fs);  // 1ns = 1000000fs
+    uint32_t min_deselect = (min_deselect_ns * 1000000 + (clock_period_fs - 1)) / clock_period_fs - (divisor + 1) / 2;
 
 #if PICO_RP2350_A2_SUPPORTED
     // Workaround for RP2350-E14, where the bootrom only does this for GPIO 0 instead of the correct CS pin
     hw_clear_bits(&pads_bank0_hw->io[flash_devinfo_get_cs_gpio(1)], PADS_BANK0_GPIO0_ISO_BITS);
 #endif
+
+    return psram_set_params(divisor, rxdelay, max_select, min_deselect);
+}
+
+int psram_set_params(uint32_t divisor, uint32_t rxdelay, uint32_t max_select, uint32_t min_deselect)
+{
+    invalid_params_if_and_return(HARDWARE_PSRAM, divisor & ~(QMI_M1_TIMING_CLKDIV_BITS >> QMI_M1_TIMING_CLKDIV_LSB), PICO_ERROR_INVALID_ARG);
+    invalid_params_if_and_return(HARDWARE_PSRAM, rxdelay & ~(QMI_M1_TIMING_RXDELAY_BITS >> QMI_M1_TIMING_RXDELAY_LSB), PICO_ERROR_INVALID_ARG);
+    invalid_params_if_and_return(HARDWARE_PSRAM, max_select & ~(QMI_M1_TIMING_MAX_SELECT_BITS >> QMI_M1_TIMING_MAX_SELECT_LSB), PICO_ERROR_INVALID_ARG);
+    invalid_params_if_and_return(HARDWARE_PSRAM, min_deselect & ~(QMI_M1_TIMING_MIN_DESELECT_BITS >> QMI_M1_TIMING_MIN_DESELECT_LSB), PICO_ERROR_INVALID_ARG);
+    // Provide method for explicitly setting the PSRAM parameters
+    psram_divisor = divisor;
+    psram_rxdelay = rxdelay;
+    psram_max_select = max_select;
+    psram_min_deselect = min_deselect;
+
+    return PICO_OK;
 }
 
 static void __no_inline_not_in_flash_func(psram_initialise_internal)(void) {
@@ -241,11 +270,11 @@ static void __no_inline_not_in_flash_func(psram_initialise_internal)(void) {
 
 static bool has_psram = false;
 
-void psram_reinitialise(void) {
+int psram_reinitialise(void) {
     // flash_devinfo must be configured correctly to use this function
-    invalid_params_if(HARDWARE_PSRAM, flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE);
+    invalid_params_if_and_return(HARDWARE_PSRAM, flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE, PICO_ERROR_PRECONDITION_NOT_MET);
     // psram_configure_params must have been called to set the parameters
-    invalid_params_if(HARDWARE_PSRAM, psram_divisor == 0);
+    invalid_params_if_and_return(HARDWARE_PSRAM, psram_divisor == 0, PICO_ERROR_PRECONDITION_NOT_MET);
 
     // Register the function to initialise the QMI CS1 configuration
     flash_set_qmi_cs1_setup_function(psram_initialise_internal);
@@ -254,6 +283,8 @@ void psram_reinitialise(void) {
     flash_start_xip();
 
     has_psram = true;
+
+    return PICO_OK;
 }
 
 bool psram_is_available(void) {
@@ -313,18 +344,21 @@ void runtime_init_setup_psram(void) {
         }
         has_psram = false;
         return;
-    } else{
-        has_psram = true;
     }
 
     // Configure the PSRAM parameters with the default values
-    psram_configure_params(PICO_DEFAULT_PSRAM_MAX_FREQ, PICO_DEFAULT_PSRAM_MAX_SELECT, PICO_DEFAULT_PSRAM_MIN_DESELECT);
+    int ret = psram_configure_params(PICO_DEFAULT_PSRAM_MAX_FREQ, PICO_DEFAULT_PSRAM_MAX_SELECT, PICO_DEFAULT_PSRAM_MIN_DESELECT);
+    if (ret != PICO_OK) {
+        has_psram = false;
+        return;
+    }
 
-    // Register the function to initialise the QMI CS1 configuration
-    flash_set_qmi_cs1_setup_function(psram_initialise_internal);
-
-    // Now flash_devinfo is correct, just start XIP, which calls psram_initialise afterwards
-    flash_start_xip();
+    // Initialise the PSRAM
+    ret = psram_reinitialise();
+    if (ret != PICO_OK) {
+        has_psram = false;
+        return;
+    }
 
     // And load any initialised PSRAM data
     extern uint32_t __psram_load_source__;

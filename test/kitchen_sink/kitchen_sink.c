@@ -48,8 +48,10 @@ uint32_t *foo = (uint32_t *) 200;
 uint32_t dma_to = 0;
 uint32_t dma_from = 0xaaaa5555;
 
+#ifdef FIXED_PSRAM_SIZE
 int __psram("foo") foo_psram = 23;
 char __psram_uninitialised("bar") bar_psram[0x8000];
+#endif
 
 void __noinline spiggle(void) {
     dma_channel_config c = dma_channel_get_default_config(1);
@@ -140,7 +142,7 @@ int main(void) {
 #endif
 #endif
 
-#ifdef PICO_PSRAM_SIZE_BYTES
+#ifdef FIXED_PSRAM_SIZE
     if (psram_is_available()) {
         printf("PSRAM is available\n");
         memset(bar_psram, 0x55, sizeof(bar_psram));
@@ -167,6 +169,39 @@ int main(void) {
         printf("foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
         if (foo_psram != 27 || bar_psram[0] != 0xab) {
             printf("ERROR: after program foo_psram = %d, bar_psram = %02x\n", foo_psram, bar_psram[0]);
+        }
+    } else {
+        printf("PSRAM not available\n");
+    }
+#elif PICO_AUTO_DETECT_PSRAM_SIZE
+    if (psram_is_available()) {
+        printf("PSRAM is available, size = 0x%x\n", psram_get_size());
+        char *bar_psram = (char*)(XIP_BASE + 0x01000000);
+        size_t bar_psram_size = psram_get_size();
+        memset(bar_psram, 0x55, bar_psram_size);
+        printf("bar_psram = %02x\n", bar_psram[0]);
+        if (bar_psram[0] != 0x55) {
+            printf("ERROR: bar_psram = %02x\n", bar_psram[0]);
+        }
+        // Make sure the write actually went to PSRAM
+        xip_cache_clean_all();
+        xip_cache_invalidate_all();
+        if (bar_psram[0] != 0x55) {
+            printf("ERROR: after flush bar_psram = %02x\n", bar_psram[0]);
+        }
+        // Check PSRAM still works after flash functions
+        flash_range_erase(PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE);
+        if (bar_psram[0] != 0x55) {
+            printf("ERROR: after erase bar_psram = %02x\n", bar_psram[0]);
+        }
+        bar_psram[0] = 0xab;
+        memset(bar_psram, 0xab, bar_psram_size);
+        // Make sure the write actually went to PSRAM
+        xip_cache_clean_all();
+        xip_cache_invalidate_all();
+        printf("bar_psram = %02x\n", bar_psram[0]);
+        if (bar_psram[0] != 0xab) {
+            printf("ERROR: after program bar_psram = %02x\n", bar_psram[0]);
         }
     } else {
         printf("PSRAM not available\n");
