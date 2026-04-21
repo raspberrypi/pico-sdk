@@ -595,6 +595,9 @@ static int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_
     powman_hw->scratch[6] = pstate_bitset_to_powman_power_state(pstate);
     powman_hw->scratch[7] = (uint32_t)resume_func;
 
+    // Ensure debugger does not prevent power down
+    powman_set_debug_power_request_ignored(true);
+
     // Switch to required power state
     int rc = powman_set_power_state(pstate_bitset_to_powman_power_state(pstate));
     if (rc != PICO_OK) {
