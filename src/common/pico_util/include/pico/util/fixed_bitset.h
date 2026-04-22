@@ -242,41 +242,6 @@ static inline bool fixed_bitset_equal(const fixed_bitset_t *bitset1, const fixed
     return __builtin_memcmp(bitset1->words, bitset2->words, bitset1->word_size * sizeof(uint32_t)) == 0;
 }
 
-#if 0 // not currently used
-typedef uint32_t tiny_ordinal_list_t; // ordinals must be 0->255
-typedef uint64_t small_ordinal_list_t; // ordinals must be 0->255
-#define ordinal_list_empty() 0
-#define ordinal_list_of1(v) (1u | ((v) << 8))
-#define ordinal_list_of2(v1, v2) (2u | ((v1) << 8) | ((v2) << 16))
-#define ordinal_list_of3(v1, v2, v3) (3u | ((v1) << 8) | ((v2) << 16) | (((v3) << 24)))
-#define ordinal_list_of4(v1, v2, v3, v4) (4u | ((v1) << 8) | ((v2) << 16) | (((v3) << 24)) | (((uint64_t)(v4)) << 32))
-#define ordinal_list_of5(v1, v2, v3, v4, v5) (5u | ((v1) << 8) | ((v2) << 16) | (((v3) << 24)) | (((uint64_t)((v4) | ((v5)<<8u))) << 32))
-
-#define small_ordinal_list_foreach(bitarray, x) ({ \
-    for(uint _i=1;_i<=((bitarray)&0xffu);_i++) { \
-        uint bit = (uint8_t)((bitarray) >> (8 * _i)); \
-        x; \
-    } \
-})
-
-static inline fixed_bitset_t *fixed_bitset_set_bits(fixed_bitset_t *bitset, small_ordinal_list_t list) {
-    small_ordinal_list_foreach(list, fixed_bitset_set(bitset, bit));
-    return bitset;
-}
-
-static inline fixed_bitset_t *fixed_bitset_clear_bits(fixed_bitset_t *bitset, small_ordinal_list_t list) {
-    small_ordinal_list_foreach(list, fixed_bitset_clear(bitset, bit));
-    return bitset;
-}
-
-
-#define fixed_bitset_init_with_bits(ptr, type, N, list) ({ \
-    /* not this performs checks */ \
-    fixed_bitset_init(ptr, type, N, 0); \
-    fixed_bitset_set_bits(&(ptr)->bitset, list); \
-})
-
-#endif
 #ifdef __cplusplus
 }
 #endif
