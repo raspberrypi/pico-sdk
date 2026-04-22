@@ -27,6 +27,18 @@ cc_binary(
 )
 
 cc_binary(
+    name = "low_power_test_simple",
+    testonly = True,
+    srcs = ["low_power_test_simple.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_stdlib",
+        "//src/rp2_common/pico_low_power",
+        "//src/rp2_common/pico_status_led",
+    ],
+)
+
+cc_binary(
     name = "rtc_clksrc",
     testonly = True,
     srcs = ["rtc_clksrc.c"],

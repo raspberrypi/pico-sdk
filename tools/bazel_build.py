@@ -52,9 +52,10 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_sha256_test:pico_sha256_test",
                 "//test/pico_stdio_test:pico_stdio_test",
                 "//test/pico_time_test:pico_time_test",
-                "//test/hello_sleep:hello_sleep",
-                "//test/hello_sleep:hello_sleep_gpio",
-                "//test/hello_sleep:rtc_clksrc",
+                "//test/pico_low_power_test:low_power_test_timers",
+                "//test/pico_low_power_test:low_power_test_gpio",
+                "//test/pico_low_power_test:low_power_test_simple",
+                "//test/pico_low_power_test:rtc_clksrc",
                 "//test/pico_async_context_test:pico_async_context_test",
 
                 # Pretty much only Picotool and pioasm build on Windows.
@@ -95,7 +96,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_float_test:hazard3_test_gen",
                 # RP2040 only
                 "//test/kitchen_sink:kitchen_sink_blocked_ram",
-                "//test/hello_sleep:rtc_clksrc",
+                "//test/pico_low_power_test:rtc_clksrc",
                 # TODO: RISC-V support.
                 "//test/pico_float_test:pico_float_test_hazard3",
             )
@@ -138,7 +139,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_float_test:hazard3_test_gen",
                 # RP2040 only
                 "//test/kitchen_sink:kitchen_sink_blocked_ram",
-                "//test/hello_sleep:rtc_clksrc",
+                "//test/pico_low_power_test:rtc_clksrc",
                 # TODO: RISC-V support.
                 "//test/pico_float_test:pico_float_test_hazard3",
                 # not supported by clang
@@ -177,7 +178,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_float_test:hazard3_test_gen",
                 # RP2040 only
                 "//test/kitchen_sink:kitchen_sink_blocked_ram",
-                "//test/hello_sleep:rtc_clksrc",
+                "//test/pico_low_power_test:rtc_clksrc",
                 # TODO: RISC-V support.
                 "//test/pico_float_test:pico_float_test_hazard3",
             )
