@@ -182,7 +182,7 @@ powman_power_state powman_get_power_state(void) {
 int powman_set_power_state(powman_power_state state) {
     // Clear req ignored in case it has been set
     powman_clear_bits(&powman_hw->state, POWMAN_STATE_REQ_IGNORED_BITS);
-    powman_debug("powman: Requesting state %x\n", state);
+    powman_debug("powman: Requesting state %"PRIx32"\n", state);
     powman_write(&powman_hw->state, (~state << POWMAN_STATE_REQ_LSB) & POWMAN_STATE_REQ_BITS);
 
     // Has it been ignored?
@@ -219,7 +219,7 @@ int powman_set_power_state(powman_power_state state) {
     // Wait while the state is changing then return true as we will be in the new state
     powman_debug("powman: waiting for state change\n");
     while(powman_hw->state & POWMAN_STATE_CHANGING_BITS) tight_loop_contents();
-    powman_debug("powman: state changed to %x\n", state);
+    powman_debug("powman: state changed to %"PRIx32"\n", state);
     return PICO_OK;
 }
 

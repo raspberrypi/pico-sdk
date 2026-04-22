@@ -3,9 +3,9 @@ load("//bazel:defs.bzl", "compatible_with_rp2")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "hello_sleep",
+    name = "low_power_test_timers",
     testonly = True,
-    srcs = ["hello_sleep.c"],
+    srcs = ["low_power_test_timers.c"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/rp2_common/pico_stdlib",
@@ -15,9 +15,9 @@ cc_binary(
 )
 
 cc_binary(
-    name = "hello_sleep_gpio",
+    name = "low_power_test_gpio",
     testonly = True,
-    srcs = ["hello_sleep_gpio.c"],
+    srcs = ["low_power_test_gpio.c"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/rp2_common/pico_stdlib",

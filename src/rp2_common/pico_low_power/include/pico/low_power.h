@@ -9,6 +9,8 @@
 
 #include "pico.h"
 #include "hardware/timer.h"
+#include "pico/time.h"
+#include "pico/aon_timer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,6 +103,18 @@ typedef enum {
     NUM_DORMANT_CLOCK_SOURCES
 } dormant_clock_source_t;
 
+#if PICO_RP2040
+#define DORMANT_CLOCK_SOURCE_DEFAULT DORMANT_CLOCK_SOURCE_XOSC
+#else
+#define DORMANT_CLOCK_SOURCE_DEFAULT DORMANT_CLOCK_SOURCE_LPOSC
+#endif
+
+#if PICO_RP2040
+#define DORMANT_CLOCK_HZ_DEFAULT RTC_CLOCK_FREQ_HZ
+#else
+#define DORMANT_CLOCK_HZ_DEFAULT 0  // ignored
+#endif
+
 #if HAS_POWMAN_TIMER
 typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
 #endif
@@ -168,10 +182,31 @@ int low_power_sleep_until_aon_timer(absolute_time_t until, const clock_dest_bits
  */
 int low_power_sleep_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, const clock_dest_bitset_t *keep_enabled, bool exclusive);
 
+/*! \brief  Set the external clock source for the AON timer
+ *  \ingroup pico_low_power
+ * Set the external clock source for the AON timer. This is only used on RP2040.
+ *
+ * \param src_hz The frequency of the external clock source.
+ * \param gpio_pin The GPIO pin to use for the external clock source.
+ * \return 0 on success, non-zero on error.
+ */
+#if PICO_RP2040
+int low_power_set_external_clock_source(uint src_hz, uint gpio_pin);
+#else
+static inline int low_power_set_external_clock_source(__unused uint src_hz, __unused uint gpio_pin) {
+    return PICO_OK;
+}
+#endif
+
 /*! \brief  Go dormant until time using AON timer
  *  \ingroup pico_low_power
  * Go dormant until the given AON timer reaches the specified value.
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
+ *
+ * \if rp2040_specific
+ * This requires an external clock source to be set using \ref low_power_set_external_clock_source before calling this function.
+ * If the external clock source is not set, or it is not running, this will return PICO_ERROR_PRECONDITION_NOT_MET.
+ * \endif
  *
  * \if (!rp2040_specific)
  * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be switched to the ROSC while dormant so
@@ -180,12 +215,10 @@ int low_power_sleep_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, co
  *
  * \param until The time to go dormant until.
  * \param dormant_clock_source The clock source to use for dormant. Must be DORMANT_CLOCK_SOURCE_LPOSC on RP2350.
- * \param src_hz The frequency of the external RTC clock source on RP2040. Ignored on RP2350.
- * \param gpio_pin The GPIO pin to use for the external RTC clock source on RP2040. Ignored on RP2350.
  * \param keep_enabled The clocks to keep enabled during dormant.
  * \return 0 on success, non-zero on error.
  */
-int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_source_t dormant_clock_source, uint src_hz, uint gpio_pin, const clock_dest_bitset_t *keep_enabled);
+int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_source_t dormant_clock_source, const clock_dest_bitset_t *keep_enabled);
 
 /*! \brief  Go dormant until GPIO pin state changes
  *  \ingroup pico_low_power
@@ -251,6 +284,91 @@ int low_power_pstate_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, p
  * \return The Pstate.
  */
 pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate);
+#endif
+
+
+// Convenience functions to avoid needing the correct absolute_time_t
+
+/*! \brief  Start the AON timer at a specific time in milliseconds
+ *  \ingroup pico_low_power
+ * See \ref aon_timer_start for more information.
+ *
+ * \param ms The time in milliseconds to start the AON timer at.
+ * \return true on success, false on failure.
+ */
+static inline bool low_power_start_aon_timer_at_time_ms(uint64_t ms) {
+    struct timespec ts;
+    ms_to_timespec(ms, &ts);
+    return aon_timer_start(&ts);
+}
+
+/*! \brief  Start the AON timer at the current system time
+ *  \ingroup pico_low_power
+ * See \ref aon_timer_start for more information.
+ *
+ * \return true on success, false on failure.
+ */
+static inline bool low_power_start_aon_timer(void) {
+    struct timespec ts;
+    ms_to_timespec(to_ms_64_since_boot(get_absolute_time()), &ts);
+    return aon_timer_start(&ts);
+}
+
+/*! \brief  Sleep for a number of microseconds
+ *  \ingroup pico_low_power
+ * See \ref low_power_sleep_until_default_timer for more information.
+ *
+ * \param us The number of microseconds to sleep.
+ * \param keep_enabled The clocks to keep enabled during sleep.
+ * \param exclusive Whether to only listen for the timer interrupt, or other interrupts.
+ * \return 0 on success, non-zero on error.
+ */
+static inline int low_power_sleep_for_us(timer_hw_t *timer, uint64_t us, const clock_dest_bitset_t *keep_enabled, bool exclusive) {
+    return low_power_sleep_until_timer(timer, make_timeout_time_us(us), keep_enabled, exclusive);
+}
+
+/*! \brief  Sleep for a number of milliseconds
+ *  \ingroup pico_low_power
+ * See \ref low_power_sleep_until_default_timer for more information.
+ *
+ * \param ms The number of milliseconds to sleep.
+ * \param keep_enabled The clocks to keep enabled during sleep.
+ * \param exclusive Whether to only listen for the timer interrupt, or other interrupts.
+ * \return 0 on success, non-zero on error.
+ */
+static inline int low_power_sleep_for_ms(uint32_t ms, const clock_dest_bitset_t *keep_enabled, bool exclusive) {
+    return low_power_sleep_until_default_timer(make_timeout_time_ms(ms), keep_enabled, exclusive);
+}
+
+/*! \brief  Go dormant for a number of milliseconds
+
+ *  \ingroup pico_low_power
+ * See \ref low_power_dormant_until_aon_timer for more information.
+ *
+ * \param ms The number of milliseconds to go dormant for.
+ * \param dormant_clock_source The clock source to use for dormant.
+ * \param keep_enabled The clocks to keep enabled during dormant.
+ * \return 0 on success, non-zero on error.
+ */
+static inline int low_power_dormant_for_ms(uint32_t ms, dormant_clock_source_t dormant_clock_source, const clock_dest_bitset_t *keep_enabled) {
+    if (!aon_timer_is_running()) low_power_start_aon_timer();
+    return low_power_dormant_until_aon_timer(aon_timer_make_timeout_time_ms(ms), dormant_clock_source, keep_enabled);
+}
+
+#if HAS_POWMAN_TIMER
+/*! \brief  Go to Pstate for a number of milliseconds
+ *  \ingroup pico_low_power
+ * See \ref low_power_pstate_until_aon_timer for more information.
+ *
+ * \param ms The number of milliseconds to go to Pstate for.
+ * \param pstate The Pstate to use.
+ * \param resume_func The function to call on reboot.
+ * \return 0 on success, non-zero on error.
+ */
+static inline int low_power_pstate_for_ms(uint32_t ms, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
+    if (!aon_timer_is_running()) low_power_start_aon_timer();
+    return low_power_pstate_until_aon_timer(aon_timer_make_timeout_time_ms(ms), pstate, resume_func);
+}
 #endif
 
 #ifdef __cplusplus

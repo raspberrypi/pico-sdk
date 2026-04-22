@@ -8,7 +8,6 @@
 #include <string.h>
 #include "pico/stdlib.h"
 #include "pico/low_power.h"
-#include "pico/aon_timer.h"
 #include "pico/status_led.h"
 #include "hardware/structs/xip_ctrl.h"
 
@@ -142,6 +141,8 @@ int main() {
     struct timespec ts;
     int ret;
 
+    low_power_set_external_clock_source(DORMANT_CLOCK_HZ_DEFAULT, RTC_GPIO);
+
 
 
     // exclusive sleep
@@ -191,7 +192,7 @@ int main() {
     us_to_timespec(to_us_since_boot(start_time), &ts);
     aon_timer_start(&ts);
 
-    printf("AON timer started @%dus\n", to_us_since_boot(aon_timer_get_absolute_time()));
+    printf("AON timer started @%dms\n", to_ms_since_boot(aon_timer_get_absolute_time()));
 
 
 
@@ -251,13 +252,7 @@ int main() {
 
     start_time = aon_timer_get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
-    ret = low_power_dormant_until_aon_timer(wakeup_time,
-                                #if PICO_RP2040
-                                      DORMANT_CLOCK_SOURCE_XOSC, RTC_CLOCK_FREQ_HZ,
-                                #else
-                                      DORMANT_CLOCK_SOURCE_LPOSC, XOSC_HZ,
-                                #endif
-                                      RTC_GPIO, NULL);
+    ret = low_power_dormant_until_aon_timer(wakeup_time, DORMANT_CLOCK_SOURCE_DEFAULT, NULL);
     if (ret != PICO_OK) {
         printf("ERROR: %d returned by low_power_dormant_until_aon_timer\n", ret);
     #if PICO_RP2040

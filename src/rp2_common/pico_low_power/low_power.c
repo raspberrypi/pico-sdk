@@ -58,6 +58,10 @@ static void post_clock_gating(void) {
     clock_gate_sleep_en(&all);
 }
 
+static bool is_timestamp_from_aon_timer(absolute_time_t timestamp) {
+    return to_us_since_boot(timestamp) % 1000 == 0;
+}
+
 static uint32_t interrupt_flags;
 
 #if LIB_TINYUSB_DEVICE
@@ -112,6 +116,8 @@ static void post_clock_switch(void) {
 #if HAS_POWMAN_TIMER
 static void prepare_for_pstate_change(void) {
     prepare_for_clock_switch();
+    // Ensure debugger does not prevent power down
+    powman_set_debug_power_request_ignored(true);
 }
 
 static void post_pstate_change(void) {
@@ -202,6 +208,16 @@ static void restore_other_interrupts(void) {
     }
 }
 
+#if PICO_RP2040
+static uint dormant_rtc_src_hz = 0;
+static uint dormant_rtc_gpio_pin;
+int low_power_set_external_clock_source(uint src_hz, uint gpio_pin) {
+    dormant_rtc_src_hz = src_hz;
+    dormant_rtc_gpio_pin = gpio_pin;
+    return PICO_OK;
+}
+#endif  // inline in header for other platforms
+
 int low_power_sleep_until_irq(const clock_dest_bitset_t *keep_enabled) {
     clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
@@ -280,6 +296,10 @@ int low_power_sleep_until_aon_timer(absolute_time_t until,
                                     const clock_dest_bitset_t *keep_enabled, bool exclusive) {
     if (!aon_timer_is_running()) {
         return PICO_ERROR_PRECONDITION_NOT_MET;
+    }
+
+    if (!is_timestamp_from_aon_timer(until)) {
+        return PICO_ERROR_INVALID_DATA;
     }
 
     if (to_ms_64_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_AON_SLEEP_TIME_MS > to_ms_64_since_boot(until)) {
@@ -484,10 +504,13 @@ static void low_power_go_dormant(dormant_clock_source_t dormant_clock_source) {
 
 int low_power_dormant_until_aon_timer(absolute_time_t until,
                                       dormant_clock_source_t dormant_clock_source,
-                                      uint src_hz, uint gpio_pin,
                                       const clock_dest_bitset_t *keep_enabled) {
     if (!aon_timer_is_running()) {
         return PICO_ERROR_PRECONDITION_NOT_MET;
+    }
+
+    if (!is_timestamp_from_aon_timer(until)) {
+        return PICO_ERROR_INVALID_DATA;
     }
 
     if (to_ms_64_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_DORMANT_TIME_MS > to_ms_64_since_boot(until)) {
@@ -500,14 +523,15 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
 #if PICO_RP2040
+    if (dormant_rtc_src_hz == 0) {
+        return PICO_ERROR_PRECONDITION_NOT_MET;
+    }
     // The RTC must be run from an external source, since the dormant source will be inactive
-    if (!rtc_run_from_external_source(src_hz, gpio_pin)) {
+    if (!rtc_run_from_external_source(dormant_rtc_src_hz, dormant_rtc_gpio_pin)) {
         return PICO_ERROR_PRECONDITION_NOT_MET;
     }
     clock_dest_bitset_add(&local_keep_enabled, CLK_DEST_RTC_RTC);
 #elif PICO_RP2350
-    ((void)src_hz);
-    ((void)gpio_pin);
     if (dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC)
         powman_timer_set_1khz_tick_source_lposc();
     else
@@ -647,9 +671,6 @@ static int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_
     powman_hw->scratch[6] = pstate_bitset_to_powman_power_state(pstate);
     powman_hw->scratch[7] = (uint32_t)resume_func;
 
-    // Ensure debugger does not prevent power down
-    powman_set_debug_power_request_ignored(true);
-
     // Switch to required power state
     int rc = powman_set_power_state(pstate_bitset_to_powman_power_state(pstate));
     if (rc != PICO_OK) {
@@ -669,6 +690,11 @@ int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pst
     if (!aon_timer_is_running()) {
         return PICO_ERROR_PRECONDITION_NOT_MET;
     }
+
+    if (!is_timestamp_from_aon_timer(until)) {
+        return PICO_ERROR_INVALID_DATA;
+    }
+
     if (to_ms_64_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_PSTATE_TIME_MS > to_ms_64_since_boot(until)) {
         // Prevent race condition where the timer fires before we can go to pstate
         // by setting a minimum time for pstate
