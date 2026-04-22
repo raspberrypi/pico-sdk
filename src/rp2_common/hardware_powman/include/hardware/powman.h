@@ -27,14 +27,21 @@ extern "C" {
 #define PARAM_ASSERTIONS_ENABLED_HARDWARE_POWMAN 0
 #endif
 
+// PICO_CONFIG: PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP, Use the OTP calibration value for the low power oscillator frequency, type=bool, default=1, group=hardware_powman
+#ifndef PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP
+#define PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP 1
+#endif
+
 /*! \brief Use the ~32KHz low power oscillator as the powman timer source
  *  \ingroup hardware_powman
+ *  \note The frequency is set to the value stored in the OTP, or the reset value if
+ *  there is no OTP value set or PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP is 0
  */
 void powman_timer_set_1khz_tick_source_lposc(void);
 
 /*! \brief Use the low power oscillator (specifying frequency) as the powman timer source
  *  \ingroup hardware_powman
- *  \param lposc_freq_hz specify an exact lposc freq to trim it
+ *  \param lposc_freq_hz specify an exact lposc freq to trim it, or 0 to use the reset values
  */
 void powman_timer_set_1khz_tick_source_lposc_with_hz(uint32_t lposc_freq_hz);
 
@@ -136,9 +143,20 @@ static inline bool powman_timer_is_running(void) {
 
 /*! \brief Stop the powman timer
  * \ingroup hardware_powman
+ * \note On the next start, the timer will resume from the last set time,
+ * so if you want to pause the timer and resume from the current time, you
+ * should use \ref powman_timer_pause
  */
 static inline void powman_timer_stop(void) {
     powman_clear_bits(&powman_hw->timer, POWMAN_TIMER_RUN_BITS);
+}
+
+/*! \brief Pause the powman timer
+ * \ingroup hardware_powman
+ */
+ static inline void powman_timer_pause(void) {
+    powman_clear_bits(&powman_hw->timer, POWMAN_TIMER_RUN_BITS);
+    powman_timer_set_ms(powman_timer_get_ms());
 }
 
 /*! \brief Start the powman timer

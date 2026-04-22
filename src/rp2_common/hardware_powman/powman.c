@@ -12,6 +12,9 @@
 
 #include "hardware/gpio.h"
 #include "hardware/powman.h"
+#if PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP
+#include "hardware/regs/otp_data.h"
+#endif
 
 #ifndef PICO_POWMAN_DEBUG
 #define PICO_POWMAN_DEBUG 0
@@ -62,20 +65,38 @@ uint64_t powman_timer_get_ms(void) {
 }
 
 void powman_timer_set_1khz_tick_source_lposc(void) {
-    powman_timer_set_1khz_tick_source_lposc_with_hz(32768);
+#if PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP
+    uint16_t* lposc_calib_data = (uint16_t*)OTP_DATA_BASE + OTP_DATA_LPOSC_CALIB_ROW;
+    if (*lposc_calib_data == 0) {
+        powman_timer_set_1khz_tick_source_lposc_with_hz(0);
+    } else {
+        powman_timer_set_1khz_tick_source_lposc_with_hz(*lposc_calib_data);
+    }
+#else
+    powman_timer_set_1khz_tick_source_lposc_with_hz(0);
+#endif
 }
 
 void powman_timer_set_1khz_tick_source_lposc_with_hz(uint32_t lposc_freq_hz) {
     bool was_running = powman_timer_is_running();
-    if (was_running) powman_timer_stop();
-    uint32_t lposc_freq_khz = lposc_freq_hz / 1000;
-    uint32_t lposc_freq_khz_frac16 = (lposc_freq_hz % 1000) * 65536 / 1000;
-    powman_write(&powman_hw->lposc_freq_khz_int, lposc_freq_khz);
-    powman_write(&powman_hw->lposc_freq_khz_frac, lposc_freq_khz_frac16);
-    powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_LPOSC_BITS);
-    if (was_running) {
-        powman_timer_start();
-        while(!(powman_hw->timer & POWMAN_TIMER_USING_LPOSC_BITS));
+    uint32_t lposc_freq_khz = lposc_freq_hz == 0 ? POWMAN_LPOSC_FREQ_KHZ_INT_RESET : lposc_freq_hz / 1000;
+    uint32_t lposc_freq_khz_frac16 = lposc_freq_hz == 0 ? POWMAN_LPOSC_FREQ_KHZ_FRAC_RESET : (lposc_freq_hz % 1000) * 65536 / 1000;
+    if (lposc_freq_khz != powman_hw->lposc_freq_khz_int || lposc_freq_khz_frac16 != powman_hw->lposc_freq_khz_frac) {
+        // Frequency change needed, so need to stop the timer, set the frequency, and start the timer with USE_LPOSC
+        if (was_running) powman_timer_pause();
+        powman_write(&powman_hw->lposc_freq_khz_int, lposc_freq_khz);
+        powman_write(&powman_hw->lposc_freq_khz_frac, lposc_freq_khz_frac16);
+        powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_LPOSC_BITS);
+        if (was_running) {
+            powman_timer_start();
+            while(!(powman_hw->timer & POWMAN_TIMER_USING_LPOSC_BITS));
+        }
+    } else {
+        // No frequency change needed, so can just set USE_LPOSC while running
+        powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_LPOSC_BITS);
+        if (was_running) {
+            while(!(powman_hw->timer & POWMAN_TIMER_USING_LPOSC_BITS));
+        }
     }
 }
 
@@ -85,15 +106,24 @@ void powman_timer_set_1khz_tick_source_xosc(void) {
 
 void powman_timer_set_1khz_tick_source_xosc_with_hz(uint32_t xosc_freq_hz) {
     bool was_running = powman_timer_is_running();
-    if (was_running) powman_timer_stop();
     uint32_t xosc_freq_khz = xosc_freq_hz / 1000;
     uint32_t xosc_freq_khz_frac16 = (xosc_freq_hz % 1000) * 65536 / 1000;
-    powman_write(&powman_hw->xosc_freq_khz_int, xosc_freq_khz);
-    powman_write(&powman_hw->xosc_freq_khz_frac, xosc_freq_khz_frac16);
-    powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_XOSC_BITS);
-    if (was_running) {
-        powman_timer_start();
-        while(!(powman_hw->timer & POWMAN_TIMER_USING_XOSC_BITS));
+    if (xosc_freq_khz != powman_hw->xosc_freq_khz_int || xosc_freq_khz_frac16 != powman_hw->xosc_freq_khz_frac) {
+        // Frequency change needed, so need to stop the timer, set the frequency, and start the timer with USE_XOSC
+        if (was_running) powman_timer_pause();
+        powman_write(&powman_hw->xosc_freq_khz_int, xosc_freq_khz);
+        powman_write(&powman_hw->xosc_freq_khz_frac, xosc_freq_khz_frac16);
+        powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_XOSC_BITS);
+        if (was_running) {
+            powman_timer_start();
+            while(!(powman_hw->timer & POWMAN_TIMER_USING_XOSC_BITS));
+        }
+    } else {
+        // No frequency change needed, so can just set USE_XOSC while running
+        powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_XOSC_BITS);
+        if (was_running) {
+            while(!(powman_hw->timer & POWMAN_TIMER_USING_XOSC_BITS));
+        }
     }
 }
 
@@ -112,7 +142,7 @@ static inline uint32_t gpio_to_powman_ext_time_ref_source(uint gpio, uint32_t de
 
 static void powman_timer_use_gpio(uint32_t gpio, uint32_t use, uint32_t using) {
     bool was_running = powman_timer_is_running();
-    if (was_running) powman_timer_stop();
+    if (was_running) powman_timer_pause();
     uint32_t source = gpio_to_powman_ext_time_ref_source(gpio, 0);
     gpio_set_input_enabled(gpio, true);
     powman_write(&powman_hw->ext_time_ref, source);
