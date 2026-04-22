@@ -61,6 +61,20 @@ extern "C" {
 #define PARAM_ASSERTIONS_ENABLED_PICO_LOW_POWER 0
 #endif
 
+// PICO_CONFIG: PICO_LOW_POWER_MIN_DORMANT_TIME_MS, Minimum supported time to spend dormant in milliseconds, type=int, default=2000 on RP2040, 10 otherwise, group=pico_low_power
+#ifndef PICO_LOW_POWER_MIN_DORMANT_TIME_MS
+#if PICO_RP2040
+#define PICO_LOW_POWER_MIN_DORMANT_TIME_MS 2000
+#else
+#define PICO_LOW_POWER_MIN_DORMANT_TIME_MS 10
+#endif
+#endif
+
+// PICO_CONFIG: PICO_LOW_POWER_MIN_PSTATE_TIME_MS, Minimum supported time to spend in Pstate in milliseconds, type=int, default=10, group=pico_low_power
+#ifndef PICO_LOW_POWER_MIN_PSTATE_TIME_MS
+#define PICO_LOW_POWER_MIN_PSTATE_TIME_MS 10
+#endif
+
 #include "hardware/clocks.h"
 #if HAS_RP2040_RTC
 #include "hardware/rtc.h"

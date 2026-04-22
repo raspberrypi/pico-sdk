@@ -279,6 +279,7 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
 int low_power_sleep_until_gpio_pin_state(uint gpio_pin, bool edge, bool high,
                                      const clock_dest_bitset_t *keep_enabled, bool exclusive) {
 
+    invalid_params_if_and_return(PICO_LOW_POWER, gpio_pin >= NUM_BANK0_GPIOS, PICO_ERROR_INVALID_ARG);
     event_happened = false;
 
     clock_dest_bitset_t local_keep_enabled;
@@ -287,7 +288,6 @@ int low_power_sleep_until_gpio_pin_state(uint gpio_pin, bool edge, bool high,
     add_library_clocks(&local_keep_enabled);
 
     // Configure the appropriate IRQ at IO bank 0
-    assert(gpio_pin < NUM_BANK0_GPIOS);
 
     uint32_t event = 0;
 
@@ -418,7 +418,7 @@ static void low_power_wake_from_dormant(void) {
 }
 
 static void low_power_go_dormant(dormant_clock_source_t dormant_clock_source) {
-    assert(
+    invalid_params_if(PICO_LOW_POWER,
         dormant_clock_source == DORMANT_CLOCK_SOURCE_XOSC || dormant_clock_source == DORMANT_CLOCK_SOURCE_ROSC
     #if !PICO_RP2040
         || dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC
@@ -438,6 +438,12 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
                                       const clock_dest_bitset_t *keep_enabled) {
     if (!aon_timer_is_running()) {
         return PICO_ERROR_PRECONDITION_NOT_MET;
+    }
+
+    if (to_ms_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_DORMANT_TIME_MS > to_ms_since_boot(until)) {
+        // Prevent race condition where the timer fires before we can go dormant
+        // by setting a minimum time for dormant
+        return PICO_ERROR_INVALID_ARG;
     }
 
     clock_dest_bitset_t local_keep_enabled;
@@ -464,11 +470,10 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
 
     low_power_setup_clocks_for_dormant(dormant_clock_source);
 
-    // todo catch race condition here (or just plain in the past)
     struct timespec ts;
     us_to_timespec(to_us_since_boot(until), &ts);
     event_happened = false;
-    aon_timer_enable_alarm(&ts, (aon_timer_alarm_handler_t)low_power_wakeup, true);
+    aon_timer_enable_alarm(&ts, NULL, true);
 
     prepare_for_clock_gating();
     // gate clocks
@@ -479,9 +484,12 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     //Go dormant
     low_power_go_dormant(dormant_clock_source);
 
-
-    assert(event_happened);
     low_power_wake_from_dormant();
+
+#if PICO_RP2350
+    if (dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC)
+        powman_timer_set_1khz_tick_source_xosc();
+#endif
 
     return 0;
 }
@@ -490,13 +498,14 @@ int low_power_dormant_until_gpio_pin_state(uint gpio_pin, bool edge, bool high,
                                        dormant_clock_source_t dormant_clock_source,
                                        const clock_dest_bitset_t *keep_enabled) {
 
+    invalid_params_if_and_return(PICO_LOW_POWER, gpio_pin >= NUM_BANK0_GPIOS, PICO_ERROR_INVALID_ARG);
+
     low_power_setup_clocks_for_dormant(dormant_clock_source);
 
     clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
     // Configure the appropriate IRQ at IO bank 0
-    assert(gpio_pin < NUM_BANK0_GPIOS);
 
     uint32_t event = 0;
 
@@ -609,6 +618,11 @@ static int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_
 int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
     if (!aon_timer_is_running()) {
         return PICO_ERROR_PRECONDITION_NOT_MET;
+    }
+    if (to_ms_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_PSTATE_TIME_MS > to_ms_since_boot(until)) {
+        // Prevent race condition where the timer fires before we can go to pstate
+        // by setting a minimum time for pstate
+        return PICO_ERROR_INVALID_ARG;
     }
     powman_enable_alarm_wakeup_at_ms(to_ms_since_boot(until));
 
