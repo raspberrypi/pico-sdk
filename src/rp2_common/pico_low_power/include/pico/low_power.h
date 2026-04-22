@@ -61,6 +61,15 @@ extern "C" {
 #define PARAM_ASSERTIONS_ENABLED_PICO_LOW_POWER 0
 #endif
 
+// PICO_CONFIG: PICO_LOW_POWER_MIN_AON_SLEEP_TIME_MS, Minimum supported time to spend in sleep using the AON timer in milliseconds, type=int, default=2000 on RP2040, 10 otherwise, group=pico_low_power
+#ifndef PICO_LOW_POWER_MIN_AON_SLEEP_TIME_MS
+#if PICO_RP2040
+#define PICO_LOW_POWER_MIN_AON_SLEEP_TIME_MS 2000
+#else
+#define PICO_LOW_POWER_MIN_AON_SLEEP_TIME_MS 10
+#endif
+#endif
+
 // PICO_CONFIG: PICO_LOW_POWER_MIN_DORMANT_TIME_MS, Minimum supported time to spend dormant in milliseconds, type=int, default=2000 on RP2040, 10 otherwise, group=pico_low_power
 #ifndef PICO_LOW_POWER_MIN_DORMANT_TIME_MS
 #if PICO_RP2040
@@ -131,6 +140,18 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until, const 
 static inline int low_power_sleep_until_default_timer(absolute_time_t until, const clock_dest_bitset_t *keep_enabled, bool exclusive) {
     return low_power_sleep_until_timer(PICO_DEFAULT_TIMER_INSTANCE(), until, keep_enabled, exclusive);
 }
+
+/*! \brief  Sleep until time using AON timer
+ *  \ingroup pico_low_power
+ * Sleep until the AON timer reaches the specified value. The clocks specified in keep_enabled will be kept enabled during sleep, along with clocks required
+ * for the AON timer. If exclusive is true, only the AON timer interrupt will be listened for, otherwise other interrupts will also be listened for.
+ *
+ * \param until The time to sleep until.
+ * \param keep_enabled The clocks to keep enabled during sleep.
+ * \param exclusive Whether to only listen for the AON timer interrupt, or other interrupts.
+ * \return 0 on success, non-zero on error.
+ */
+int low_power_sleep_until_aon_timer(absolute_time_t until, const clock_dest_bitset_t *keep_enabled, bool exclusive);
 
 
 /*! \brief  Sleep until GPIO pin state changes

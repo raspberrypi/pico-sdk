@@ -276,6 +276,56 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until,
     return 0;
 }
 
+int low_power_sleep_until_aon_timer(absolute_time_t until,
+                                    const clock_dest_bitset_t *keep_enabled, bool exclusive) {
+    if (!aon_timer_is_running()) {
+        return PICO_ERROR_PRECONDITION_NOT_MET;
+    }
+
+    if (to_ms_64_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_AON_SLEEP_TIME_MS > to_ms_64_since_boot(until)) {
+        // Prevent race condition where the timer fires before we can go to sleep
+        // by setting a minimum time for sleep
+        return PICO_ERROR_INVALID_ARG;
+    }
+
+    clock_dest_bitset_t local_keep_enabled;
+    replace_null_enable_values(keep_enabled, &local_keep_enabled);
+
+#if PICO_RP2040
+    clock_dest_bitset_add(&local_keep_enabled, CLK_DEST_RTC_RTC);
+#elif PICO_RP2350
+    clock_dest_bitset_add(&local_keep_enabled, CLK_DEST_REF_POWMAN);
+#else
+    #error Unknown processor
+#endif
+
+    add_library_clocks(&local_keep_enabled);
+
+    struct timespec ts;
+    us_to_timespec(to_us_since_boot(until), &ts);
+    event_happened = false;
+    aon_timer_enable_alarm(&ts, low_power_wakeup, false);
+
+    if (exclusive) save_and_disable_other_interrupts(aon_timer_get_irq_num());
+
+    prepare_for_clock_gating();
+    // gate clocks
+    clock_gate_sleep_en(&local_keep_enabled);
+
+    low_power_enable_processor_deep_sleep();
+    // Go to sleep until the wakeup event happens (note it may have happened already)
+    while (!event_happened) __wfi();
+    low_power_disable_processor_deep_sleep();
+
+    aon_timer_disable_alarm();
+
+    post_clock_gating();
+
+    if (exclusive) restore_other_interrupts();
+
+    return 0;
+}
+
 int low_power_sleep_until_gpio_pin_state(uint gpio_pin, bool edge, bool high,
                                      const clock_dest_bitset_t *keep_enabled, bool exclusive) {
 
@@ -440,7 +490,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
         return PICO_ERROR_PRECONDITION_NOT_MET;
     }
 
-    if (to_ms_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_DORMANT_TIME_MS > to_ms_since_boot(until)) {
+    if (to_ms_64_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_DORMANT_TIME_MS > to_ms_64_since_boot(until)) {
         // Prevent race condition where the timer fires before we can go dormant
         // by setting a minimum time for dormant
         return PICO_ERROR_INVALID_ARG;
@@ -619,12 +669,12 @@ int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pst
     if (!aon_timer_is_running()) {
         return PICO_ERROR_PRECONDITION_NOT_MET;
     }
-    if (to_ms_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_PSTATE_TIME_MS > to_ms_since_boot(until)) {
+    if (to_ms_64_since_boot(aon_timer_get_absolute_time()) + PICO_LOW_POWER_MIN_PSTATE_TIME_MS > to_ms_64_since_boot(until)) {
         // Prevent race condition where the timer fires before we can go to pstate
         // by setting a minimum time for pstate
         return PICO_ERROR_INVALID_ARG;
     }
-    powman_enable_alarm_wakeup_at_ms(to_ms_since_boot(until));
+    powman_enable_alarm_wakeup_at_ms(to_ms_64_since_boot(until));
 
     return low_power_go_pstate(pstate, resume_func);
 }

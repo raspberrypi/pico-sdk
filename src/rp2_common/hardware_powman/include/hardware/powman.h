@@ -154,7 +154,7 @@ static inline void powman_timer_stop(void) {
 /*! \brief Pause the powman timer
  * \ingroup hardware_powman
  */
- static inline void powman_timer_pause(void) {
+static inline void powman_timer_pause(void) {
     powman_clear_bits(&powman_hw->timer, POWMAN_TIMER_RUN_BITS);
     powman_timer_set_ms(powman_timer_get_ms());
 }

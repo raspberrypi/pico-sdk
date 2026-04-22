@@ -114,7 +114,7 @@ int main() {
 
     // todo, ah; we should start the aon timer; still have to decide what to do about keeping them in sync
     start_time = get_absolute_time();
-    us_to_timespec(start_time, &ts);
+    us_to_timespec(to_us_since_boot(start_time), &ts);
     aon_timer_start(&ts);
 
     printf("Going DORMANT until GPIO wakeup\n");

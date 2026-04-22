@@ -186,14 +186,70 @@ int main() {
 
 
 
+    // start the AON timer
+    start_time = get_absolute_time();
+    us_to_timespec(to_us_since_boot(start_time), &ts);
+    aon_timer_start(&ts);
+
+    printf("AON timer started @%dus\n", to_us_since_boot(aon_timer_get_absolute_time()));
+
+
+
+    // exclusive sleep using the AON timer
+    printf("Going to sleep for %d seconds via AON timer\n", SLEEP_TIME_S);
+
+    start_time = aon_timer_get_absolute_time();
+    wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
+    ret = low_power_sleep_until_aon_timer(wakeup_time, NULL, true);
+    if (ret != PICO_OK) {
+        printf("ERROR: %d returned by low_power_sleep_until_aon_timer\n", ret);
+        EXIT_TEST;
+    }
+    diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
+    printf("Woken up now @%dus since target\n", (int)diff);
+    if (diff < 0) {
+        printf("ERROR: Woke up too soon\n");
+        EXIT_TEST;
+    }
+    printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
+    busy_wait_ms(SLEEP_TIME_MS);
+
+
+
+    // non-exclusive sleep using the AON timer
+    printf("Going to non-exclusive sleep for %d seconds via AON timer\n", SLEEP_TIME_S);
+
+    // leave the system timer running 
+    clock_dest_bitset_t keep_enabled = clock_dest_bitset_none();
+#if PICO_RP2040
+    clock_dest_bitset_add(&keep_enabled, CLK_DEST_SYS_TIMER);
+#else
+    clock_dest_bitset_add(&keep_enabled, CLK_DEST_SYS_TIMER0);
+    clock_dest_bitset_add(&keep_enabled, CLK_DEST_REF_TICKS);
+#endif
+
+    start_time = aon_timer_get_absolute_time();
+    wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
+    ret = low_power_sleep_until_aon_timer(wakeup_time, &keep_enabled, false);
+    if (ret != PICO_OK) {
+        printf("ERROR: %d returned by low_power_sleep_until_aon_timer\n", ret);
+        EXIT_TEST;
+    }
+    diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
+    printf("Woken up now @%dus since target\n", (int)diff);
+    if (diff < 0) {
+        printf("ERROR: Woke up too soon\n");
+        EXIT_TEST;
+    }
+    printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
+    busy_wait_ms(SLEEP_TIME_MS);
+
+
+
     // dormant
     printf("Going DORMANT for %d seconds via AON TIMER\n", SLEEP_TIME_S);
 
-    // todo, ah; we should start the aon timer; still have to decide what to do about keeping them in sync
-    start_time = get_absolute_time();
-    us_to_timespec(start_time, &ts);
-    aon_timer_start(&ts);
-
+    start_time = aon_timer_get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_dormant_until_aon_timer(wakeup_time,
                                 #if PICO_RP2040
