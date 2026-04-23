@@ -9,8 +9,7 @@
 #include "pico/status_led.h"
 #include "pico/low_power.h"
 
-#define SLEEP_TIME_S 2
-#define SLEEP_TIME_MS SLEEP_TIME_S * 1000
+#define SLEEP_TIME_MS 1000
 
 #define RTC_GPIO 22 // must support clock input, see the GPIO function table in the datasheet.
 
@@ -26,22 +25,35 @@ int main() {
 
     low_power_set_external_clock_source(DORMANT_CLOCK_HZ_DEFAULT, RTC_GPIO);
 
+    int ret;
     static int __persistent_data(num_runs);
     for (num_runs++; num_runs < 5; num_runs++) {    // start at 1 to prove the persistent data is working
         printf("Run %d\n", num_runs);
 
-        printf("Going to sleep for %d seconds\n", SLEEP_TIME_S);
-        low_power_sleep_for_ms(SLEEP_TIME_MS, NULL, true);
-        printf("Woken up\n");
+        printf("Going to sleep for %dms\n", SLEEP_TIME_MS);
+        ret = low_power_sleep_for_ms(SLEEP_TIME_MS, NULL, true);
+        if (ret != PICO_OK) {
+            printf("ERROR: low_power_sleep_for_ms returned %d\n", ret);
+        } else {
+            printf("Woken up\n");
+        }
 
-        // printf("Going dormant for %d seconds\n", SLEEP_TIME_S);
-        // low_power_dormant_for_ms(SLEEP_TIME_MS, DORMANT_CLOCK_SOURCE_DEFAULT, NULL);
-        // printf("Woken up\n");
+        printf("Going dormant for %dms\n", SLEEP_TIME_MS);
+        ret = low_power_dormant_for_ms(SLEEP_TIME_MS, DORMANT_CLOCK_SOURCE_DEFAULT, NULL);
+        if (ret != PICO_OK) {
+            printf("ERROR: low_power_dormant_for_ms returned %d\n", ret);
+        } else {
+            printf("Woken up\n");
+        }
 
 #if HAS_POWMAN_TIMER
-        printf("Going to Pstate for %d seconds\n", SLEEP_TIME_S);
-        int ret = low_power_pstate_for_ms(SLEEP_TIME_MS, NULL, NULL);
-        printf("%d ERROR: low_power_pstate_for_ms returned\n", ret);
+        printf("Going to Pstate for %dms\n", SLEEP_TIME_MS);
+        ret = low_power_pstate_for_ms(SLEEP_TIME_MS, NULL, NULL);
+        if (ret != PICO_OK) {
+            printf("%d ERROR: low_power_pstate_for_ms returned\n", ret);
+        } else {
+            printf("ERROR: Woken up from Pstate\n");
+        }
 #endif
     }
 

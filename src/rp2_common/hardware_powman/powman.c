@@ -206,7 +206,7 @@ int powman_set_power_state(powman_power_state state) {
         // Note if the powerdown is being blocked by a pending pwrup request we will break out of this and return a failure
 
         // Clk pow is slow so can take a few clk_pow cycles for waiting to turn up
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 500; i++) {
             if (powman_hw->state & POWMAN_STATE_WAITING_BITS) {
                 return PICO_OK;
             }
