@@ -140,7 +140,7 @@ post_pstate_gpio:
     busy_wait_ms(SLEEP_TIME_MS);
 #endif
 
-    printf("SUCCESS\n");
+    printf("PASSED\n");
 
     return 0;
 }

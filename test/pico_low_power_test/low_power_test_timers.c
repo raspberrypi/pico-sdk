@@ -390,7 +390,7 @@ post_pstate_sram_off:
     }
 #endif
 
-    printf("SUCCESS\n");
+    printf("PASSED\n");
 
     return 0;
 }

@@ -57,6 +57,6 @@ int main() {
 #endif
     }
 
-    printf("SUCCESS\n");
+    printf("PASSED\n");
     return 0;
 }
