@@ -118,6 +118,8 @@ static void prepare_for_pstate_change(void) {
     prepare_for_clock_switch();
     // Ensure debugger does not prevent power down
     powman_set_debug_power_request_ignored(true);
+    // Switch powman timer to lposc explicitly, which will also use the calibrated frequency
+    powman_timer_set_1khz_tick_source_lposc();
 }
 
 static void post_pstate_change(void) {
@@ -724,6 +726,8 @@ void __weak runtime_init_low_power_reboot_check(void) {
             powman_hw->scratch[6] = 0;
             powman_hw->scratch[7] = 0;
         }
+        // Switch powman timer back to xosc
+        powman_timer_set_1khz_tick_source_xosc();
     }
 }
 #endif
