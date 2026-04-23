@@ -858,7 +858,7 @@ void gpio_deinit(uint gpio);
  *
  * \param gpio_mask Mask with 1 bit per GPIO number to initialize
  */
-void gpio_init_mask(uint gpio_mask);
+void gpio_init_mask(uint32_t gpio_mask);
 
 /*! \brief Initialise multiple GPIOs (enabled I/O and set func to GPIO_FUNC_SIO)
  *  \ingroup hardware_gpio

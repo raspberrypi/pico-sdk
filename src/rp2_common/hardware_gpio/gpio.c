@@ -281,8 +281,8 @@ void gpio_deinit(uint gpio) {
     gpio_set_function(gpio, GPIO_FUNC_NULL);
 }
 
-void gpio_init_mask(uint gpio_mask) {
-    for(uint i=0;i<NUM_BANK0_GPIOS;i++) {
+void gpio_init_mask(uint32_t gpio_mask) {
+    for(uint32_t i=0;i<NUM_BANK0_GPIOS;i++) {
         if (gpio_mask & 1) {
             gpio_init(i);
         }

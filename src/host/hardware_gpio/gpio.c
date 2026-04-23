@@ -209,7 +209,7 @@ void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_deinit)(uint gpio) {
 }
 
 PICO_WEAK_FUNCTION_DEF(gpio_init_mask)
-void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_init_mask)(__unused uint gpio_mask) {
+void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_init_mask)(__unused uint32_t gpio_mask) {
 
 }
 
