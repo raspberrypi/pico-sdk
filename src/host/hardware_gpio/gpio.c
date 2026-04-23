@@ -213,6 +213,11 @@ void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_init_mask)(__unused uint gpio_mask) {
 
 }
 
+PICO_WEAK_FUNCTION_DEF(gpio_init_mask64)
+void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_init_mask64)(__unused uint64_t gpio_mask) {
+
+}
+
 PICO_WEAK_FUNCTION_DEF(gpio_get)
 bool PICO_WEAK_FUNCTION_IMPL_NAME(gpio_get)(uint gpio) {
     check_gpio_param(gpio);

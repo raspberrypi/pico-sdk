@@ -290,6 +290,15 @@ void gpio_init_mask(uint gpio_mask) {
     }
 }
 
+void gpio_init_mask64(uint64_t gpio_mask) {
+    for(uint64_t i=0;i<NUM_BANK0_GPIOS;i++) {
+        if (gpio_mask & 1) {
+            gpio_init(i);
+        }
+        gpio_mask >>= 1;
+    }
+}
+
 void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
     for (uint i = 0; i < MIN(NUM_BANK0_GPIOS, 32u); i++) {
         if (gpio_mask & 1u) {
