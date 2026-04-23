@@ -92,10 +92,16 @@
  * 19 | SPI1_IRQ
  * 20 | UART0_IRQ
  * 21 | UART1_IRQ
- * 22 | ADC0_IRQ_FIFO
+ * 22 | ADC_IRQ_FIFO
  * 23 | I2C0_IRQ
  * 24 | I2C1_IRQ
  * 25 | RTC_IRQ
+ * 26 | SPARE_IRQ_0
+ * 27 | SPARE_IRQ_1
+ * 28 | SPARE_IRQ_2
+ * 29 | SPARE_IRQ_3
+ * 30 | SPARE_IRQ_4
+ * 31 | SPARE_IRQ_5
  * \endif
  *
  * \if rp2350_specific
@@ -149,12 +155,12 @@
  * 43 | PLL_USB_IRQ
  * 44 | POWMAN_IRQ_POW
  * 45 | POWMAN_IRQ_TIMER
- * 46 | SPAREIRQ_IRQ_0
- * 47 | SPAREIRQ_IRQ_1
- * 48 | SPAREIRQ_IRQ_2
- * 49 | SPAREIRQ_IRQ_3
- * 50 | SPAREIRQ_IRQ_4
- * 51 | SPAREIRQ_IRQ_5
+ * 46 | SPARE_IRQ_0
+ * 47 | SPARE_IRQ_1
+ * 48 | SPARE_IRQ_2
+ * 49 | SPARE_IRQ_3
+ * 50 | SPARE_IRQ_4
+ * 51 | SPARE_IRQ_5
  * \endif
  */
 
