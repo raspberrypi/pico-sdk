@@ -59,27 +59,29 @@ void rosc_restart(void);
  */
 uint rosc_measure_freq_khz(void);
 
-inline static void rosc_clear_bad_write(void) {
-    hw_clear_bits(&rosc_hw->status, ROSC_STATUS_BADWRITE_BITS);
-}
+// ROSC BADWRITE is not reliable, see RP2040-E10
+// inline static void rosc_clear_bad_write(void) {
+//     hw_clear_bits(&rosc_hw->status, ROSC_STATUS_BADWRITE_BITS);
+// }
 
-inline static bool rosc_write_okay(void) {
-    return !(rosc_hw->status & ROSC_STATUS_BADWRITE_BITS);
-}
+// inline static bool rosc_write_okay(void) {
+//     return !(rosc_hw->status & ROSC_STATUS_BADWRITE_BITS);
+// }
 
 /*! \brief  Checked write to a Ring Oscillator register
  *  \ingroup hardware_rosc
  * 
- * Clears the bad write flag and asserts that the write is okay.
+ * This would normally clear the bad write flag and asserts that the write is okay.
+ * However, ROSC BADWRITE is not reliable (see RP2040-E10) so we don't do this.
  *
  * \param addr The register address.
  * \param value The value to write.
  */
 inline static void rosc_write(io_rw_32 *addr, uint32_t value) {
-    rosc_clear_bad_write();
-    assert(rosc_write_okay());
+    // rosc_clear_bad_write();
+    // assert(rosc_write_okay());
     *addr = value;
-    assert(rosc_write_okay());
+    // assert(rosc_write_okay());
 };
 
 #ifdef __cplusplus
