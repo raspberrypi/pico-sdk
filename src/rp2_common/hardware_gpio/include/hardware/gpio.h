@@ -41,23 +41,23 @@ extern "C" {
  * \brief General Purpose Input/Output (GPIO) API
  *
  * RP-series microcontrollers have two banks of General Purpose Input / Output (GPIO) pins, which are assigned as follows:
- * 
+ *
  * \if rp2040_specific
- * RP2040 has 30 user GPIO pins in bank 0, and 6 QSPI pins in the QSPI bank 1 (QSPI_SS, QSPI_SCLK and QSPI_SD0 to QSPI_SD3). The QSPI 
- * pins are used to execute code from an external flash device, leaving the User bank (GPIO0 to GPIO29) for the programmer to use. 
+ * RP2040 has 30 user GPIO pins in bank 0, and 6 QSPI pins in the QSPI bank 1 (QSPI_SS, QSPI_SCLK and QSPI_SD0 to QSPI_SD3). The QSPI
+ * pins are used to execute code from an external flash device, leaving the User bank (GPIO0 to GPIO29) for the programmer to use.
  * \endif
- * 
+ *
  * \if rp2350_specific
- * The number of GPIO pins available depends on the package. There are 30 user GPIOs in bank 0 in the QFN-60 package (RP2350A), or 48 user GPIOs 
+ * The number of GPIO pins available depends on the package. There are 30 user GPIOs in bank 0 in the QFN-60 package (RP2350A), or 48 user GPIOs
  * in the QFN-80 package. Bank 1 contains the 6 QSPI pins and the USB DP/DM pins.
  * \endif
- *  
+ *
  * All GPIOs support digital input and output, but a subset can also be used as inputs to the chip’s Analogue to Digital
  * Converter (ADC). The allocation of GPIO pins to the ADC depends on the packaging.
- * 
+ *
  * RP2040 and RP2350 QFN-60 GPIO, ADC pins are 26-29.
  * RP2350 QFN-80, ADC pins are 40-47.
- *  
+ *
  * Each GPIO can be controlled directly by software running on the processors, or by a number of other functional blocks.
  *
  * The function allocated to each GPIO is selected by calling the \ref gpio_set_function function. \note Not all functions
