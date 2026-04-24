@@ -34,6 +34,7 @@ if (PICO_TEST_FILE_GENERATOR AND EXISTS ${PICO_TEST_FILE_GENERATOR})
     #   Can be used to force failure even when the test prints the success string
     # - PICO_TEST_BUDDY_FILE: File to run on buddy device for the test (default is NONE)
     #   For example, low power dormant tests on RP2040 require rtc_clksrc running on the buddy device
+    #   This can either be a path relative to the test target, or an absolute path
     # - PICO_TEST_SKIP_IN_CI: Whether to skip the test in ci (default is FALSE)
     #   If TRUE, the test is not included in the ci test suite
     include(${PICO_TEST_FILE_GENERATOR})
