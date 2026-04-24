@@ -192,6 +192,7 @@ add_executable(kitchen_sink_printf_none ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c
 target_link_libraries(kitchen_sink_printf_none kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_printf_none)
 pico_set_printf_implementation(kitchen_sink_printf_none none)
+set_target_properties(kitchen_sink_printf_none PROPERTIES PICO_TEST_SUCCESS_STRING "printf support is disabled")
 
 if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
     add_executable(kitchen_sink_copy_to_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
