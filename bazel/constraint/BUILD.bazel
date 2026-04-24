@@ -181,6 +181,17 @@ config_setting(
 )
 
 config_setting(
+    name = "pico_tls_per_thread_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_TLS_IMPL": "per_thread"},
+)
+
+config_setting(
+    name = "pico_tls_global_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_TLS_IMPL": "global"},
+)
+
+
+config_setting(
     name = "pico_async_context_poll_enabled",
     flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "poll"},
 )
