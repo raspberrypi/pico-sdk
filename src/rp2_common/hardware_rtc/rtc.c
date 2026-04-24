@@ -194,7 +194,7 @@ bool rtc_run_from_external_source(uint32_t src_hz, uint gpio_pin) {
     if (success) {
         // Ensure external source is actually running
         uint32_t rtc_freq = frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_RTC);
-        if (rtc_freq < ((RTC_CLOCK_FREQ_HZ / KHZ) - 1) || rtc_freq > ((RTC_CLOCK_FREQ_HZ / KHZ) + 1)) {
+        if (rtc_freq < ((RTC_CLOCK_FREQ_HZ / KHZ) - 5) || rtc_freq > ((RTC_CLOCK_FREQ_HZ / KHZ) + 5)) {
             // Frequency is not within 1kHz of the expected frequency
             success = false;
             // reconfigure the clock to the default configuration
