@@ -26,7 +26,6 @@ if (PICO_RISCV)
     target_link_libraries(pico_float_test PRIVATE pico_float pico_stdlib)
     target_include_directories(pico_float_test PRIVATE ${CMAKE_CURRENT_LIST_DIR})
     pico_add_extra_outputs(pico_float_test)
-    set_target_properties(pico_float_test PROPERTIES PICO_TEST_SUCCESS_STRING "Well done, you can relax now")
 
     # pico_enable_stdio_usb(pico_float_test 1)
     # pico_enable_stdio_uart(pico_float_test 0)
@@ -139,7 +138,6 @@ if (PICO_RP2350 AND NOT PICO_RISCV)
     add_executable(m33
             m33.c
     )
-    set_target_properties(m33 PROPERTIES PICO_TEST_SUCCESS_STRING "Pass")
     target_compile_definitions(m33 PRIVATE
             PICO_USE_CRT_PRINTF=1 # want full precision output
             PICO_FLOAT_PROPAGATE_NANS=1
