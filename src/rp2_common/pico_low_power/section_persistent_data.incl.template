@@ -1,0 +1,9 @@
+SECTIONS
+{
+    .persistent_data @PERSISTENT_DATA_LOC@ (NOLOAD) : {
+        __persistent_data_start__ = .;
+        *(.persistent_data*)
+        . = ALIGN(4);
+    }
+    PROVIDE(__persistent_data_end__ = .);
+}

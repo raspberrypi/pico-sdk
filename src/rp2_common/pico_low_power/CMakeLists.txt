@@ -19,6 +19,11 @@ pico_mirrored_target_link_libraries(pico_low_power INTERFACE
         pico_stdio
         )
 
+# To work around lack of support for ${CMAKE_CURRENT_FUNCTION_LIST_DIR} in CMake <3.17
+set(PICO_LOW_POWER_CURRENT_PATH ${CMAKE_CURRENT_LIST_DIR})
+pico_register_common_scope_var(PICO_LOW_POWER_CURRENT_PATH)
+pico_promote_common_scope_vars()
+
 # pico_set_persistent_data_loc(TARGET PERSISTENT_DATA_LOC)
 # \brief\ Set the persistent data location for the target
 #
@@ -27,27 +32,26 @@ pico_mirrored_target_link_libraries(pico_low_power INTERFACE
 # to the appropriate values based on the persistent data location.
 #
 # It also sets PICO_CRT0_PIN_XIP_SRAM=1 to pin the XIP_SRAM,
-# if the persistent data is stored in XIP_SRAM on RP2350.
+# if the persistent data is stored in XIP_SRAM.
 #
 # \param\ PERSISTENT_DATA_LOC The persistent data location to set
 function(pico_set_persistent_data_loc TARGET PERSISTENT_DATA_LOC)
-        if (NOT PICO_RP2350)
-                message(FATAL_ERROR "pico_set_persistent_data_loc is only supported on RP2350")
+        if (PICO_RP2040)
+                message(FATAL_ERROR "pico_set_persistent_data_loc is not supported on RP2040")
         endif()
 
-        pico_set_linker_script_var(${TARGET} PERSISTENT_DATA_LOC ${PERSISTENT_DATA_LOC})
+        # Configure override section_persistent_data.incl for the target
+        configure_file(${PICO_LOW_POWER_CURRENT_PATH}/section_persistent_data.incl.template ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}/section_persistent_data.incl @ONLY)
+        pico_add_linker_script_override_path(${TARGET} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET})
 
         if (PERSISTENT_DATA_LOC LESS 0x20000000)
-                # XIP_SRAM, so heap should come after bss
-                pico_set_linker_script_var(${TARGET} HEAP_LOC __bss_end__)
-                # Also pin the XIP_SRAM
+                # XIP_SRAM, so pin the XIP_SRAM
                 target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_PIN_XIP_SRAM=1)
         elseif (PERSISTENT_DATA_LOC LESS 0x20040000)
                 # SRAM0, so heap should come after persistent data
                 pico_set_linker_script_var(${TARGET} HEAP_LOC __persistent_data_end__)
         elseif(PERSISTENT_DATA_LOC LESS 0x20080000)
                 # SRAM1, so heap should come before persistent data
-                pico_set_linker_script_var(${TARGET} HEAP_LOC __bss_end__)
                 pico_set_linker_script_var(${TARGET} HEAP_LIMIT ${PERSISTENT_DATA_LOC})
         else()
                 # Not supported in scratch, as the linker script will overwrite persistent data with scratch data
