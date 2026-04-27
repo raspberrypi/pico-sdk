@@ -81,8 +81,6 @@ int main() {
     printf("Waiting %d seconds\n", SLEEP_TIME_S); // so we can see some repeat printfs
     busy_wait_ms(SLEEP_TIME_MS);
 
-    absolute_time_t start_time;
-    struct timespec ts;
     int ret;
 
     printf("Going to sleep until GPIO wakeup\n");
@@ -112,10 +110,7 @@ int main() {
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
-    // todo, ah; we should start the aon timer; still have to decide what to do about keeping them in sync
-    start_time = get_absolute_time();
-    us_to_timespec(to_us_since_boot(start_time), &ts);
-    aon_timer_start(&ts);
+    low_power_start_aon_timer_at_time_ms(0);
 
     printf("Going DORMANT until GPIO wakeup\n");
 

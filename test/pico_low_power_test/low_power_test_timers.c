@@ -138,7 +138,6 @@ int main() {
     absolute_time_t start_time;
     static absolute_time_t __persistent_data(wakeup_time);
     int64_t diff;
-    struct timespec ts;
     int ret;
 
     low_power_set_external_clock_source(DORMANT_CLOCK_HZ_DEFAULT, RTC_GPIO);
@@ -188,10 +187,7 @@ int main() {
 
 
     // start the AON timer
-    start_time = get_absolute_time();
-    us_to_timespec(to_us_since_boot(start_time), &ts);
-    aon_timer_start(&ts);
-
+    low_power_start_aon_timer_at_time_ms(0);
     printf("AON timer started @%dms\n", to_ms_since_boot(aon_timer_get_absolute_time()));
 
 
@@ -251,6 +247,7 @@ int main() {
     printf("Going DORMANT for %d seconds via AON TIMER\n", SLEEP_TIME_S);
 
     start_time = aon_timer_get_absolute_time();
+    absolute_time_t system_time_before = get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_dormant_until_aon_timer(wakeup_time, DORMANT_CLOCK_SOURCE_DEFAULT, NULL);
     if (ret != PICO_OK) {
@@ -262,14 +259,14 @@ int main() {
     #endif
         EXIT_TEST;
     }
-    // need to use the AON timer for checking time, since the other timer is unclocked
-    diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
-    if (diff > -1000000
+    // check the system timer was stopped while dormant
+    diff = absolute_time_diff_us(system_time_before, get_absolute_time());
+    if (diff > 50 * 1000 // 50ms
         #ifdef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
         + (PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS * 1000)
         #endif
     ) {
-        printf("ERROR: doesn't seem like timer was stopped\n");
+        printf("ERROR: doesn't seem like timer was stopped: diff %lldus\n", diff);
         return - 1;
     }
     diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());

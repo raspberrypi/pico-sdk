@@ -293,6 +293,9 @@ pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate);
  *  \ingroup pico_low_power
  * See \ref aon_timer_start for more information.
  *
+ * If the AON timer is already running, this function will restart it
+ * from the specified time.
+ *
  * \param ms The time in milliseconds to start the AON timer at.
  * \return true on success, false on failure.
  */
@@ -304,14 +307,16 @@ static inline bool low_power_start_aon_timer_at_time_ms(uint64_t ms) {
 
 /*! \brief  Start the AON timer at the current system time
  *  \ingroup pico_low_power
+ *
  * See \ref aon_timer_start for more information.
+ *
+ * If the AON timer is already running, this function will not restart it.
  *
  * \return true on success, false on failure.
  */
 static inline bool low_power_start_aon_timer(void) {
-    struct timespec ts;
-    ms_to_timespec(to_ms_64_since_boot(get_absolute_time()), &ts);
-    return aon_timer_start(&ts);
+    if (aon_timer_is_running()) return true;
+    return low_power_start_aon_timer_at_time_ms(0);
 }
 
 /*! \brief  Sleep for a number of microseconds
@@ -351,7 +356,7 @@ static inline int low_power_sleep_for_ms(uint32_t ms, const clock_dest_bitset_t 
  * \return 0 on success, non-zero on error.
  */
 static inline int low_power_dormant_for_ms(uint32_t ms, dormant_clock_source_t dormant_clock_source, const clock_dest_bitset_t *keep_enabled) {
-    if (!aon_timer_is_running()) low_power_start_aon_timer();
+    low_power_start_aon_timer();
     return low_power_dormant_until_aon_timer(aon_timer_make_timeout_time_ms(ms), dormant_clock_source, keep_enabled);
 }
 
@@ -366,7 +371,7 @@ static inline int low_power_dormant_for_ms(uint32_t ms, dormant_clock_source_t d
  * \return 0 on success, non-zero on error.
  */
 static inline int low_power_pstate_for_ms(uint32_t ms, pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
-    if (!aon_timer_is_running()) low_power_start_aon_timer();
+    low_power_start_aon_timer();
     return low_power_pstate_until_aon_timer(aon_timer_make_timeout_time_ms(ms), pstate, resume_func);
 }
 #endif
