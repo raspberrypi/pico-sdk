@@ -4,14 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdio.h>
-#include "pico/stdlib.h"
-#include "pico/status_led.h"
-#include "pico/low_power.h"
-
-#define SLEEP_TIME_MS 1000
-
-#define RTC_GPIO 22 // must support clock input, see the GPIO function table in the datasheet.
+#include "low_power_test_common.h"
 
 bool repeater(repeating_timer_t *timer) {
     printf("  Repeating timer at %dms\n", to_ms_since_boot(get_absolute_time()));
@@ -23,7 +16,9 @@ int main() {
     stdio_init_all();
     status_led_init();
 
-    low_power_set_external_clock_source(DORMANT_CLOCK_HZ_DEFAULT, RTC_GPIO);
+    init_external_gpios();
+
+    low_power_set_external_clock_source(DORMANT_CLOCK_HZ_DEFAULT, RTC_GPIO_IN);
 
     int ret;
     static int __persistent_data(num_runs);
@@ -31,7 +26,9 @@ int main() {
         printf("Run %d\n", num_runs);
 
         printf("Going to sleep for %dms\n", SLEEP_TIME_MS);
+        gpio_put(SLEEP_MONITOR_PIN, 0);
         ret = low_power_sleep_for_ms(SLEEP_TIME_MS, NULL, true);
+        gpio_put(SLEEP_MONITOR_PIN, 1);
         if (ret != PICO_OK) {
             printf("ERROR: low_power_sleep_for_ms returned %d\n", ret);
         } else {
@@ -39,7 +36,9 @@ int main() {
         }
 
         printf("Going dormant for %dms\n", SLEEP_TIME_MS);
+        gpio_put(SLEEP_MONITOR_PIN, 0);
         ret = low_power_dormant_for_ms(SLEEP_TIME_MS, DORMANT_CLOCK_SOURCE_DEFAULT, NULL);
+        gpio_put(SLEEP_MONITOR_PIN, 1);
         if (ret != PICO_OK) {
             printf("ERROR: low_power_dormant_for_ms returned %d\n", ret);
         } else {
@@ -48,6 +47,9 @@ int main() {
 
 #if HAS_POWMAN_TIMER
         printf("Going to Pstate for %dms\n", SLEEP_TIME_MS);
+        // Setup ext_ctrl0 to output on the SLEEP_MONITOR_PIN
+        init_powman_ext_ctrl();
+        gpio_put(SLEEP_MONITOR_PIN, 0);
         ret = low_power_pstate_for_ms(SLEEP_TIME_MS, NULL, NULL);
         if (ret != PICO_OK) {
             printf("%d ERROR: low_power_pstate_for_ms returned\n", ret);

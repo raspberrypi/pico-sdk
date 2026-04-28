@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdio.h>
-#include <string.h>
-#include "pico/stdlib.h"
-#include "pico/low_power.h"
-#include "pico/aon_timer.h"
-#include "pico/status_led.h"
-
-#define SLEEP_TIME_S 2
-#define SLEEP_TIME_MS SLEEP_TIME_S * 1000
+#include "low_power_test_common.h"
 
 bool repeater(repeating_timer_t *timer) {
     if (aon_timer_is_running()) {
@@ -63,6 +55,7 @@ int main() {
     stdio_init_all();
     status_led_init();
     printf("Hello Sleep!\n");
+    init_external_gpios();
     // use a repeating timer; it should be gated
     // during our sleep (todo not sure how it affects power!)
     repeating_timer_t repeat;
@@ -85,7 +78,9 @@ int main() {
 
     printf("Going to sleep until GPIO wakeup\n");
 
-    low_power_sleep_until_gpio_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, NULL, true);
+    gpio_put(SLEEP_MONITOR_PIN, 0);
+    low_power_sleep_until_gpio_pin_state(WAKE_UP_PIN, true, false, NULL, true);
+    gpio_put(SLEEP_MONITOR_PIN, 1);
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
@@ -100,30 +95,41 @@ int main() {
     clock_dest_bitset_add(&keep_enabled, CLK_DEST_REF_TICKS);
 #endif
 
-    low_power_sleep_until_gpio_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, &keep_enabled, false);
+    gpio_put(SLEEP_MONITOR_PIN, 0);
+    low_power_sleep_until_gpio_pin_state(WAKE_UP_PIN, true, false, &keep_enabled, false);
+    gpio_put(SLEEP_MONITOR_PIN, 1);
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
-    printf("Going to sleep until any wakeup (expecting stdin characters)\n");
+    // Skip this test as it requires stdin characters
+    // printf("Going to sleep until any wakeup (expecting stdin characters)\n");
 
-    low_power_sleep_until_irq(NULL);
-    printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
-    busy_wait_ms(SLEEP_TIME_MS);
+    // gpio_put(SLEEP_MONITOR_PIN, 0);
+    // low_power_sleep_until_irq(NULL);
+    // gpio_put(SLEEP_MONITOR_PIN, 1);
+    // printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
+    // busy_wait_ms(SLEEP_TIME_MS);
 
     low_power_start_aon_timer_at_time_ms(0);
 
     printf("Going DORMANT until GPIO wakeup\n");
 
-    low_power_dormant_until_gpio_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, DORMANT_CLOCK_SOURCE_ROSC, NULL);
+    gpio_put(SLEEP_MONITOR_PIN, 0);
+    low_power_dormant_until_gpio_pin_state(WAKE_UP_PIN, true, false, DORMANT_CLOCK_SOURCE_ROSC, NULL);
+    gpio_put(SLEEP_MONITOR_PIN, 1);
     printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
     busy_wait_ms(SLEEP_TIME_MS);
 
 #if HAS_POWMAN_TIMER
     printf("Going to PSTATE until GPIO wakeup\n");
 
-    ret = low_power_pstate_until_gpio_pin_state(PICO_DEFAULT_UART_RX_PIN, true, false, NULL, pstate_resume_func);
+    // Setup ext_ctrl0 to output on the SLEEP_MONITOR_PIN
+    init_powman_ext_ctrl();
 
-    printf("%d low_power_pstate_until_gpio_pin_state returned\n", ret);
+    gpio_put(SLEEP_MONITOR_PIN, 0);
+    ret = low_power_pstate_until_gpio_pin_state(WAKE_UP_PIN, true, false, NULL, pstate_resume_func);
+
+    printf("ERROR: %d returned by low_power_pstate_until_gpio_pin_state\n", ret);
     while (true) {
         printf("Waiting\n");
         busy_wait_ms(1000);

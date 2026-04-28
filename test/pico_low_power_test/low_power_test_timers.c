@@ -4,17 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdio.h>
-#include <string.h>
-#include "pico/stdlib.h"
-#include "pico/low_power.h"
-#include "pico/status_led.h"
-#include "hardware/structs/xip_ctrl.h"
-
-#define SLEEP_TIME_S 2
-#define SLEEP_TIME_MS SLEEP_TIME_S * 1000
-
-#define RTC_GPIO 22 // must support clock input, see the GPIO function table in the datasheet.
+#include "low_power_test_common.h"
 
 // Set to 1 to continue after an error, 0 to exit
 #if 0
@@ -95,6 +85,8 @@ int main() {
     status_led_init();
     printf("Hello Sleep!\n");
 
+    init_external_gpios();
+
     // use a repeating timer on the same TIMER instance; it should be disabled
     // during exclusive sleep (todo not sure how it affects power!)
     repeating_timer_t repeat;
@@ -140,13 +132,14 @@ int main() {
     int64_t diff;
     int ret;
 
-    low_power_set_external_clock_source(DORMANT_CLOCK_HZ_DEFAULT, RTC_GPIO);
+    low_power_set_external_clock_source(DORMANT_CLOCK_HZ_DEFAULT, RTC_GPIO_IN);
 
 
 
     // exclusive sleep
     printf("Going to sleep for %d seconds via TIMER\n", SLEEP_TIME_S);
 
+    gpio_put(SLEEP_MONITOR_PIN, 0);
     start_time = get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, true);
@@ -154,6 +147,7 @@ int main() {
         printf("ERROR: %d returned by low_power_sleep_until_timer\n", ret);
         EXIT_TEST;
     }
+    gpio_put(SLEEP_MONITOR_PIN, 1);
     diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
@@ -168,6 +162,7 @@ int main() {
     // non-exclusive sleep
     printf("Going to non-exclusive sleep for %d seconds via TIMER\n", SLEEP_TIME_S);
 
+    gpio_put(SLEEP_MONITOR_PIN, 0);
     start_time = get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_sleep_until_timer(timer_hw, wakeup_time, NULL, false);
@@ -175,6 +170,7 @@ int main() {
         printf("ERROR: %d returned by low_power_sleep_until_timer\n", ret);
         EXIT_TEST;
     }
+    gpio_put(SLEEP_MONITOR_PIN, 1);
     diff = absolute_time_diff_us(wakeup_time, get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
@@ -195,6 +191,7 @@ int main() {
     // exclusive sleep using the AON timer
     printf("Going to sleep for %d seconds via AON timer\n", SLEEP_TIME_S);
 
+    gpio_put(SLEEP_MONITOR_PIN, 0);
     start_time = aon_timer_get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_sleep_until_aon_timer(wakeup_time, NULL, true);
@@ -202,6 +199,7 @@ int main() {
         printf("ERROR: %d returned by low_power_sleep_until_aon_timer\n", ret);
         EXIT_TEST;
     }
+    gpio_put(SLEEP_MONITOR_PIN, 1);
     diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
@@ -225,6 +223,7 @@ int main() {
     clock_dest_bitset_add(&keep_enabled, CLK_DEST_REF_TICKS);
 #endif
 
+    gpio_put(SLEEP_MONITOR_PIN, 0);
     start_time = aon_timer_get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_sleep_until_aon_timer(wakeup_time, &keep_enabled, false);
@@ -232,6 +231,7 @@ int main() {
         printf("ERROR: %d returned by low_power_sleep_until_aon_timer\n", ret);
         EXIT_TEST;
     }
+    gpio_put(SLEEP_MONITOR_PIN, 1);
     diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
     printf("Woken up now @%dus since target\n", (int)diff);
     if (diff < 0) {
@@ -246,6 +246,7 @@ int main() {
     // dormant
     printf("Going DORMANT for %d seconds via AON TIMER\n", SLEEP_TIME_S);
 
+    gpio_put(SLEEP_MONITOR_PIN, 0);
     start_time = aon_timer_get_absolute_time();
     absolute_time_t system_time_before = get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
@@ -254,11 +255,12 @@ int main() {
         printf("ERROR: %d returned by low_power_dormant_until_aon_timer\n", ret);
     #if PICO_RP2040
         if (ret == PICO_ERROR_PRECONDITION_NOT_MET) {
-            printf("ERROR: RTC clock source is not running - connect a device running rtc_clksrc to GPIO %d\n", RTC_GPIO);
+            printf("ERROR: RTC clock source is not running - connect a device running external_sleep_timer to GPIO %d\n", RTC_GPIO_IN);
         }
     #endif
         EXIT_TEST;
     }
+    gpio_put(SLEEP_MONITOR_PIN, 1);
     // check the system timer was stopped while dormant
     diff = absolute_time_diff_us(system_time_before, get_absolute_time());
     if (diff > 50 * 1000 // 50ms
@@ -284,14 +286,17 @@ int main() {
     // pstate with sram0 on
     printf("Going to PSTATE with persistent data on for %d seconds\n", SLEEP_TIME_S);
 
+    // Setup ext_ctrl0 to output on the SLEEP_MONITOR_PIN
+    init_powman_ext_ctrl();
+
     if (my_number != 12345) {
         printf("ERROR: my_number is %d not 12345 - initialisation issue?\n", my_number);
         EXIT_TEST;
     }
     my_number = 67890;
 
+    gpio_put(SLEEP_MONITOR_PIN, 0);
     start_time = aon_timer_get_absolute_time();
-
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_pstate_until_aon_timer(wakeup_time, NULL, pstate_resume_func);
 
@@ -335,8 +340,8 @@ post_pstate_sram_on:
     // pstate with sram off
     printf("Going to PSTATE with SRAM off for %d seconds\n", SLEEP_TIME_S);
 
+    gpio_put(SLEEP_MONITOR_PIN, 0);
     start_time = aon_timer_get_absolute_time();
-
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     // store in scratch, as not persisting memory over this reboot
     powman_hw->scratch[0] = to_us_since_boot(wakeup_time) & 0xFFFFFFFF;
