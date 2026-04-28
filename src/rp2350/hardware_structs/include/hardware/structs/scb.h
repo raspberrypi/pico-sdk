@@ -65,8 +65,8 @@ typedef struct {
     // 0x00004000 [14]    PRIS         (0) Prioritize Secure exceptions
     // 0x00002000 [13]    BFHFNMINS    (0) BusFault, HardFault, and NMI Non-secure enable
     // 0x00000700 [10:8]  PRIGROUP     (0x0) Interrupt priority grouping field
-    // 0x00000008 [3]     SYSRESETREQS (0) System reset request, Secure state only
-    // 0x00000004 [2]     SYSRESETREQ  (0) Writing 1 to this bit causes the SYSRESETREQ signal to...
+    // 0x00000008 [3]     SYSRESETREQS (0) This resets only the core on which SYSRESETREQ is...
+    // 0x00000004 [2]     SYSRESETREQ  (0) This resets only the core on which SYSRESETREQ is...
     // 0x00000002 [1]     VECTCLRACTIVE (0) Clears all active state information for fixed and...
     io_rw_32 aircr;
 
@@ -192,7 +192,6 @@ typedef struct {
     // 0x0000000f [3:0]   IMPDEF0      (0x0) IMPLEMENTATION DEFINED meaning
     io_ro_32 id_afr0;
 
-    // (Description copied from array index 0 register M33_ID_MMFR0 applies similarly to other array indexes)
     _REG_(M33_ID_MMFR0_OFFSET) // M33_ID_MMFR0
     // Provides information about the implemented memory model and memory management support
     // 0x00f00000 [23:20] AUXREG       (0x1) Indicates support for Auxiliary Control Registers
@@ -200,7 +199,15 @@ typedef struct {
     // 0x0000f000 [15:12] SHARELVL     (0x1) Indicates the number of shareability levels implemented
     // 0x00000f00 [11:8]  OUTERSHR     (0xf) Indicates the outermost shareability domain implemented
     // 0x000000f0 [7:4]   PMSA         (0x4) Indicates support for the protected memory system...
-    io_ro_32 id_mmfr[4];
+    io_ro_32 id_mmfr0;
+
+    uint32_t _pad1;
+
+    // (Description copied from array index 0 register M33_ID_MMFR2 applies similarly to other array indexes)
+    _REG_(M33_ID_MMFR2_OFFSET) // M33_ID_MMFR2
+    // Provides information about the implemented memory model and memory management support
+    // 0x0f000000 [27:24] WFISTALL     (0x1) Indicates the support for Wait For Interrupt (WFI) stalling
+    io_ro_32 id_mmfr[2];
 
     // (Description copied from array index 0 register M33_ID_ISAR0 applies similarly to other array indexes)
     _REG_(M33_ID_ISAR0_OFFSET) // M33_ID_ISAR0
@@ -211,9 +218,9 @@ typedef struct {
     // 0x0000f000 [15:12] CMPBRANCH    (0x2) Indicates the supported combined Compare and Branch instructions
     // 0x00000f00 [11:8]  BITFIELD     (0x3) Indicates the supported bit field instructions
     // 0x000000f0 [7:4]   BITCOUNT     (0x0) Indicates the supported bit count instructions
-    io_ro_32 id_isar[6];
+    io_ro_32 id_isar[5];
 
-    uint32_t _pad1;
+    uint32_t _pad2[2];
 
     _REG_(M33_CTR_OFFSET) // M33_CTR
     // Provides information about the architecture of the caches
@@ -225,7 +232,7 @@ typedef struct {
     // 0x0000000f [3:0]   IMINLINE     (0x0) Log2 of the number of words in the smallest cache line...
     io_ro_32 ctr;
 
-    uint32_t _pad2[2];
+    uint32_t _pad3[2];
 
     _REG_(M33_CPACR_OFFSET) // M33_CPACR
     // Specifies the access privileges for coprocessors and the FP Extension

@@ -9,7 +9,8 @@
 // Register block : TBMAN
 // Version        : 1
 // Bus type       : apb
-// Description    : For managing simulation testbenches
+// Description    : Testbench manager. Allows the programmer to know what
+//                  platform their software is running on.
 // =============================================================================
 #ifndef _HARDWARE_REGS_TBMAN_H
 #define _HARDWARE_REGS_TBMAN_H

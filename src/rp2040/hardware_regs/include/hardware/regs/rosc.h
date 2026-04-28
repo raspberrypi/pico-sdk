@@ -175,7 +175,7 @@
 //               On power-up this field is initialised to WAKE
 //               An invalid write will also select WAKE
 //               Warning: setup the irq before selecting dormant mode
-//               0x636f6d61 -> dormant
+//               0x636f6d61 -> DORMANT
 //               0x77616b65 -> WAKE
 #define ROSC_DORMANT_OFFSET _u(0x0000000c)
 #define ROSC_DORMANT_BITS   _u(0xffffffff)

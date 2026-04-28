@@ -26,13 +26,14 @@
 typedef struct {
     _REG_(SYSINFO_CHIP_ID_OFFSET) // SYSINFO_CHIP_ID
     // JEDEC JEP-106 compliant chip identifier
-    // 0xf0000000 [31:28] REVISION     (-) 
-    // 0x0ffff000 [27:12] PART         (-) 
-    // 0x00000ffe [11:1]  MANUFACTURER (-) 
+    // 0xf0000000 [31:28] REVISION     (0x3)
+    // 0x0ffff000 [27:12] PART         (0x0004)
+    // 0x00000ffe [11:1]  MANUFACTURER (0x493)
     // 0x00000001 [0]     STOP_BIT     (1)
     io_ro_32 chip_id;
 
     _REG_(SYSINFO_PACKAGE_SEL_OFFSET) // SYSINFO_PACKAGE_SEL
+    // Package selection indicator, 0 = QFN80, 1 = QFN60
     // 0x00000001 [0]     PACKAGE_SEL  (0)
     io_ro_32 package_sel;
 

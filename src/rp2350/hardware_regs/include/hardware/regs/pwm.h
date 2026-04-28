@@ -30,7 +30,7 @@
 #define PWM_CH0_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH0_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH0_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH0_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH0_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH0_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -41,7 +41,7 @@
 #define PWM_CH0_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH0_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH0_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH0_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH0_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH0_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -166,7 +166,7 @@
 #define PWM_CH1_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH1_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH1_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH1_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH1_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH1_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -177,7 +177,7 @@
 #define PWM_CH1_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH1_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH1_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH1_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH1_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH1_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -302,7 +302,7 @@
 #define PWM_CH2_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH2_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH2_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH2_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH2_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH2_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -313,7 +313,7 @@
 #define PWM_CH2_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH2_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH2_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH2_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH2_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH2_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -438,7 +438,7 @@
 #define PWM_CH3_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH3_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH3_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH3_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH3_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH3_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -449,7 +449,7 @@
 #define PWM_CH3_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH3_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH3_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH3_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH3_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH3_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -574,7 +574,7 @@
 #define PWM_CH4_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH4_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH4_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH4_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH4_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH4_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -585,7 +585,7 @@
 #define PWM_CH4_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH4_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH4_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH4_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH4_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH4_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -710,7 +710,7 @@
 #define PWM_CH5_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH5_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH5_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH5_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH5_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH5_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -721,7 +721,7 @@
 #define PWM_CH5_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH5_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH5_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH5_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH5_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH5_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -846,7 +846,7 @@
 #define PWM_CH6_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH6_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH6_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH6_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH6_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH6_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -857,7 +857,7 @@
 #define PWM_CH6_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH6_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH6_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH6_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH6_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH6_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -982,7 +982,7 @@
 #define PWM_CH7_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH7_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH7_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH7_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH7_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH7_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -993,7 +993,7 @@
 #define PWM_CH7_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH7_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH7_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH7_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH7_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH7_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -1118,7 +1118,7 @@
 #define PWM_CH8_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH8_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH8_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH8_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH8_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH8_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -1129,7 +1129,7 @@
 #define PWM_CH8_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH8_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH8_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH8_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH8_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH8_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -1254,7 +1254,7 @@
 #define PWM_CH9_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH9_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH9_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH9_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH9_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH9_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -1265,7 +1265,7 @@
 #define PWM_CH9_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH9_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH9_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH9_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH9_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH9_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -1390,7 +1390,7 @@
 #define PWM_CH10_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH10_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH10_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH10_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH10_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH10_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -1401,7 +1401,7 @@
 #define PWM_CH10_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH10_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH10_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH10_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH10_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH10_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider
@@ -1526,7 +1526,7 @@
 #define PWM_CH11_CSR_PH_ADV_BITS   _u(0x00000080)
 #define PWM_CH11_CSR_PH_ADV_MSB    _u(7)
 #define PWM_CH11_CSR_PH_ADV_LSB    _u(7)
-#define PWM_CH11_CSR_PH_ADV_ACCESS "SC"
+#define PWM_CH11_CSR_PH_ADV_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH11_CSR_PH_RET
 // Description : Retard the phase of the counter by 1 count, while it is
@@ -1537,7 +1537,7 @@
 #define PWM_CH11_CSR_PH_RET_BITS   _u(0x00000040)
 #define PWM_CH11_CSR_PH_RET_MSB    _u(6)
 #define PWM_CH11_CSR_PH_RET_LSB    _u(6)
-#define PWM_CH11_CSR_PH_RET_ACCESS "SC"
+#define PWM_CH11_CSR_PH_RET_ACCESS "WC"
 // -----------------------------------------------------------------------------
 // Field       : PWM_CH11_CSR_DIVMODE
 //               0x0 -> Free-running counting at rate dictated by fractional divider

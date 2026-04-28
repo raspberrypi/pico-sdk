@@ -25,17 +25,17 @@
 
 typedef struct {
     _REG_(TIMER_TIMEHW_OFFSET) // TIMER_TIMEHW
-    // Write to bits 63:32 of time always write timelw before timehw
+    // Write to bits 63:32 of time +
     // 0xffffffff [31:0]  TIMEHW       (0x00000000)
     io_wo_32 timehw;
 
     _REG_(TIMER_TIMELW_OFFSET) // TIMER_TIMELW
-    // Write to bits 31:0 of time writes do not get copied to time until timehw is written
+    // Write to bits 31:0 of time +
     // 0xffffffff [31:0]  TIMELW       (0x00000000)
     io_wo_32 timelw;
 
     _REG_(TIMER_TIMEHR_OFFSET) // TIMER_TIMEHR
-    // Read from bits 63:32 of time always read timelr before timehr
+    // Read from bits 63:32 of time +
     // 0xffffffff [31:0]  TIMEHR       (0x00000000)
     io_ro_32 timehr;
 
@@ -77,7 +77,7 @@ typedef struct {
     io_rw_32 pause;
 
     _REG_(TIMER_LOCKED_OFFSET) // TIMER_LOCKED
-    // Set locked bit to disable write access to timer Once set, cannot be cleared (without a reset)
+    // Set locked bit to disable write access to timer +
     // 0x00000001 [0]     LOCKED       (0)
     io_rw_32 locked;
 

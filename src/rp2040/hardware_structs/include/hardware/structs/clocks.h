@@ -22,7 +22,6 @@
 //
 // Bit-field descriptions are of the form:
 // BITMASK [BITRANGE] FIELDNAME (RESETVALUE) DESCRIPTION
-
 /** \brief Clock numbers on RP2040 (used as typedef \ref clock_num_t)
  *  \ingroup hardware_clocks
  */
@@ -203,7 +202,7 @@ typedef struct {
             // 0x04000000 [26]    CLK_PERI_SPI1 (1)
             // 0x02000000 [25]    CLK_SYS_SPI0 (1)
             // 0x01000000 [24]    CLK_PERI_SPI0 (1)
-            // 0x00800000 [23]    CLK_SYS_SIOB (1) 
+            // 0x00800000 [23]    CLK_SYS_SIO (1)
             // 0x00400000 [22]    CLK_SYS_RTC  (1)
             // 0x00200000 [21]    CLK_RTC_RTC  (1)
             // 0x00100000 [20]    CLK_SYS_ROSC (1)
@@ -298,7 +297,7 @@ typedef struct {
             // 0x04000000 [26]    CLK_PERI_SPI1 (1)
             // 0x02000000 [25]    CLK_SYS_SPI0 (1)
             // 0x01000000 [24]    CLK_PERI_SPI0 (1)
-            // 0x00800000 [23]    CLK_SYS_SIOB (1) 
+            // 0x00800000 [23]    CLK_SYS_SIO (1)
             // 0x00400000 [22]    CLK_SYS_RTC  (1)
             // 0x00200000 [21]    CLK_RTC_RTC  (1)
             // 0x00100000 [20]    CLK_SYS_ROSC (1)
@@ -393,7 +392,7 @@ typedef struct {
             // 0x04000000 [26]    CLK_PERI_SPI1 (0)
             // 0x02000000 [25]    CLK_SYS_SPI0 (0)
             // 0x01000000 [24]    CLK_PERI_SPI0 (0)
-            // 0x00800000 [23]    CLK_SYS_SIOB (0) 
+            // 0x00800000 [23]    CLK_SYS_SIO (0)
             // 0x00400000 [22]    CLK_SYS_RTC  (0)
             // 0x00200000 [21]    CLK_RTC_RTC  (0)
             // 0x00100000 [20]    CLK_SYS_ROSC (0)

@@ -26,9 +26,9 @@
 typedef struct {
     _REG_(SYSINFO_CHIP_ID_OFFSET) // SYSINFO_CHIP_ID
     // JEDEC JEP-106 compliant chip identifier
-    // 0xf0000000 [31:28] REVISION     (-) 
-    // 0x0ffff000 [27:12] PART         (-) 
-    // 0x00000fff [11:0]  MANUFACTURER (-) 
+    // 0xf0000000 [31:28] REVISION     (0x2)
+    // 0x0ffff000 [27:12] PART         (0x0002)
+    // 0x00000fff [11:0]  MANUFACTURER (0x926)
     io_ro_32 chip_id;
 
     _REG_(SYSINFO_PLATFORM_OFFSET) // SYSINFO_PLATFORM
@@ -37,7 +37,7 @@ typedef struct {
     // 0x00000001 [0]     FPGA         (0)
     io_ro_32 platform;
 
-    uint32_t _pad0[2];
+    uint32_t _pad0[14];
 
     _REG_(SYSINFO_GITREF_RP2040_OFFSET) // SYSINFO_GITREF_RP2040
     // Git hash of the chip source
@@ -46,6 +46,6 @@ typedef struct {
 } sysinfo_hw_t;
 
 #define sysinfo_hw ((sysinfo_hw_t *)SYSINFO_BASE)
-static_assert(sizeof (sysinfo_hw_t) == 0x0014, "");
+static_assert(sizeof (sysinfo_hw_t) == 0x0044, "");
 
 #endif // _HARDWARE_STRUCTS_SYSINFO_H

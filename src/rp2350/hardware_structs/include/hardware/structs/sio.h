@@ -249,7 +249,7 @@ typedef struct {
     uint32_t _pad3[2];
 
     _REG_(SIO_MTIME_OFFSET) // SIO_MTIME
-    // Read/write access to the high half of RISC-V Machine-mode timer
+    // Read/write access to the low half of RISC-V Machine-mode timer
     // 0xffffffff [31:0]  MTIME        (0x00000000)
     io_rw_32 mtime;
 

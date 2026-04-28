@@ -109,7 +109,7 @@ typedef struct {
 
     _REG_(USB_INT_EP_CTRL_OFFSET) // USB_INT_EP_CTRL
     // interrupt endpoint control register
-    // 0x0000fffe [15:1]  INT_EP_ACTIVE (0x0000) Host: Enable interrupt endpoint 1 => 15
+    // 0x0000fffe [15:1]  INT_EP_ACTIVE (0x0000) Host: Enable interrupt endpoint 1 -> 15
     io_rw_32 int_ep_ctrl;
 
     _REG_(USB_BUFF_STATUS_OFFSET) // USB_BUFF_STATUS
@@ -323,49 +323,50 @@ typedef struct {
     io_rw_32 pwr;
 
     _REG_(USB_USBPHY_DIRECT_OFFSET) // USB_USBPHY_DIRECT
-    // Note that most functions are driven directly from usb_fsls controller
-    // 0x00400000 [22]    DM_OVV       (0) Status bit from USB PHY
-    // 0x00200000 [21]    DP_OVV       (0) Status bit from USB PHY
-    // 0x00100000 [20]    DM_OVCN      (0) Status bit from USB PHY
-    // 0x00080000 [19]    DP_OVCN      (0) Status bit from USB PHY
-    // 0x00040000 [18]    RX_DM        (0) Status bit from USB PHY +
-    // 0x00020000 [17]    RX_DP        (0) Status bit from USB PHY +
-    // 0x00010000 [16]    RX_DD        (0) Status bit from USB PHY +
-    // 0x00008000 [15]    TX_DIFFMODE  (0) 
-    // 0x00004000 [14]    TX_FSSLEW    (0) 
-    // 0x00002000 [13]    TX_PD        (0) 
-    // 0x00001000 [12]    RX_PD        (0) 
-    // 0x00000800 [11]    TX_DM        (0) Value to drive to USB PHY when override enable is set...
-    // 0x00000400 [10]    TX_DP        (0) Value to drive to USB PHY when override enable is set...
-    // 0x00000200 [9]     TX_DM_OE     (0) Value to drive to USB PHY when override enable is set...
-    // 0x00000100 [8]     TX_DP_OE     (0) Value to drive to USB PHY when override enable is set...
-    // 0x00000040 [6]     DM_PULLDN_EN (0) Value to drive to USB PHY when override enable is set...
-    // 0x00000020 [5]     DM_PULLUP_EN (0) Value to drive to USB PHY when override enable is set...
-    // 0x00000010 [4]     DM_PULLUP_HISEL (0) when dm_pullup_en is set high, this enables second resistor
-    // 0x00000004 [2]     DP_PULLDN_EN (0) Value to drive to USB PHY when override enable is set...
-    // 0x00000002 [1]     DP_PULLUP_EN (0) Value to drive to USB PHY when override enable is set...
-    // 0x00000001 [0]     DP_PULLUP_HISEL (0) when dp_pullup_en is set high, this enables second resistor
+    // This register allows for direct control of the USB phy
+    // 0x00400000 [22]    DM_OVV       (0) DM over voltage
+    // 0x00200000 [21]    DP_OVV       (0) DP over voltage
+    // 0x00100000 [20]    DM_OVCN      (0) DM overcurrent
+    // 0x00080000 [19]    DP_OVCN      (0) DP overcurrent
+    // 0x00040000 [18]    RX_DM        (0) DPM pin state
+    // 0x00020000 [17]    RX_DP        (0) DPP pin state
+    // 0x00010000 [16]    RX_DD        (0) Differential RX
+    // 0x00008000 [15]    TX_DIFFMODE  (0) TX_DIFFMODE=0: Single ended mode +
+    // 0x00004000 [14]    TX_FSSLEW    (0) TX_FSSLEW=0: Low speed slew rate +
+    // 0x00002000 [13]    TX_PD        (0) TX power down override (if override enable is set)
+    // 0x00001000 [12]    RX_PD        (0) RX power down override (if override enable is set)
+    // 0x00000800 [11]    TX_DM        (0) Output data
+    // 0x00000400 [10]    TX_DP        (0) Output data
+    // 0x00000200 [9]     TX_DM_OE     (0) Output enable
+    // 0x00000100 [8]     TX_DP_OE     (0) Output enable
+    // 0x00000040 [6]     DM_PULLDN_EN (0) DM pull down enable
+    // 0x00000020 [5]     DM_PULLUP_EN (0) DM pull up enable
+    // 0x00000010 [4]     DM_PULLUP_HISEL (0) Enable the second DM pull up resistor
+    // 0x00000004 [2]     DP_PULLDN_EN (0) DP pull down enable
+    // 0x00000002 [1]     DP_PULLUP_EN (0) DP pull up enable
+    // 0x00000001 [0]     DP_PULLUP_HISEL (0) Enable the second DP pull up resistor
     io_rw_32 phy_direct;
 
     _REG_(USB_USBPHY_DIRECT_OVERRIDE_OFFSET) // USB_USBPHY_DIRECT_OVERRIDE
+    // Override enable for each control in usbphy_direct
     // 0x00008000 [15]    TX_DIFFMODE_OVERRIDE_EN (0)
     // 0x00001000 [12]    DM_PULLUP_OVERRIDE_EN (0)
     // 0x00000800 [11]    TX_FSSLEW_OVERRIDE_EN (0)
     // 0x00000400 [10]    TX_PD_OVERRIDE_EN (0)
     // 0x00000200 [9]     RX_PD_OVERRIDE_EN (0)
-    // 0x00000100 [8]     TX_DM_OVERRIDE_EN (0) Override default value or value driven from USB Controller to PHY
-    // 0x00000080 [7]     TX_DP_OVERRIDE_EN (0) Override default value or value driven from USB Controller to PHY
-    // 0x00000040 [6]     TX_DM_OE_OVERRIDE_EN (0) Override default value or value driven from USB Controller to PHY
-    // 0x00000020 [5]     TX_DP_OE_OVERRIDE_EN (0) Override default value or value driven from USB Controller to PHY
-    // 0x00000010 [4]     DM_PULLDN_EN_OVERRIDE_EN (0) Override default value or value driven from USB Controller to PHY
-    // 0x00000008 [3]     DP_PULLDN_EN_OVERRIDE_EN (0) Override default value or value driven from USB Controller to PHY
-    // 0x00000004 [2]     DP_PULLUP_EN_OVERRIDE_EN (0) Override default value or value driven from USB Controller to PHY
+    // 0x00000100 [8]     TX_DM_OVERRIDE_EN (0)
+    // 0x00000080 [7]     TX_DP_OVERRIDE_EN (0)
+    // 0x00000040 [6]     TX_DM_OE_OVERRIDE_EN (0)
+    // 0x00000020 [5]     TX_DP_OE_OVERRIDE_EN (0)
+    // 0x00000010 [4]     DM_PULLDN_EN_OVERRIDE_EN (0)
+    // 0x00000008 [3]     DP_PULLDN_EN_OVERRIDE_EN (0)
+    // 0x00000004 [2]     DP_PULLUP_EN_OVERRIDE_EN (0)
     // 0x00000002 [1]     DM_PULLUP_HISEL_OVERRIDE_EN (0)
     // 0x00000001 [0]     DP_PULLUP_HISEL_OVERRIDE_EN (0)
     io_rw_32 phy_direct_override;
 
     _REG_(USB_USBPHY_TRIM_OFFSET) // USB_USBPHY_TRIM
-    // Note that most functions are driven directly from usb_fsls controller
+    // Used to adjust trim values of USB phy pull down resistors
     // 0x00001f00 [12:8]  DM_PULLDN_TRIM (0x1f) Value to drive to USB PHY +
     // 0x0000001f [4:0]   DP_PULLDN_TRIM (0x1f) Value to drive to USB PHY +
     io_rw_32 phy_trim;

@@ -22,7 +22,6 @@
 //
 // Bit-field descriptions are of the form:
 // BITMASK [BITRANGE] FIELDNAME (RESETVALUE) DESCRIPTION
-
 /** \brief Clock numbers on RP2350 (used as typedef \ref clock_num_t)
  *  \ingroup hardware_clocks
  */
@@ -223,7 +222,7 @@ typedef struct {
         struct {
             _REG_(CLOCKS_WAKE_EN0_OFFSET) // CLOCKS_WAKE_EN0
             // enable clock in wake mode
-            // 0x80000000 [31]    CLK_SYS_SIOB (1) 
+            // 0x80000000 [31]    CLK_SYS_SIO (1)
             // 0x40000000 [30]    CLK_SYS_SHA256 (1)
             // 0x20000000 [29]    CLK_SYS_RSM  (1)
             // 0x10000000 [28]    CLK_SYS_ROSC (1)
@@ -334,7 +333,7 @@ typedef struct {
         struct {
             _REG_(CLOCKS_SLEEP_EN0_OFFSET) // CLOCKS_SLEEP_EN0
             // enable clock in sleep mode
-            // 0x80000000 [31]    CLK_SYS_SIOB (1) 
+            // 0x80000000 [31]    CLK_SYS_SIO (1)
             // 0x40000000 [30]    CLK_SYS_SHA256 (1)
             // 0x20000000 [29]    CLK_SYS_RSM  (1)
             // 0x10000000 [28]    CLK_SYS_ROSC (1)
@@ -445,7 +444,7 @@ typedef struct {
         struct {
             _REG_(CLOCKS_ENABLED0_OFFSET) // CLOCKS_ENABLED0
             // indicates the state of the clock enable
-            // 0x80000000 [31]    CLK_SYS_SIOB (0) 
+            // 0x80000000 [31]    CLK_SYS_SIO (0)
             // 0x40000000 [30]    CLK_SYS_SHA256 (0)
             // 0x20000000 [29]    CLK_SYS_RSM  (0)
             // 0x10000000 [28]    CLK_SYS_ROSC (0)

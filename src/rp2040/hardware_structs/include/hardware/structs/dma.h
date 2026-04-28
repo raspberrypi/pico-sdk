@@ -229,7 +229,7 @@ typedef struct {
     _REG_(DMA_CHAN_ABORT_OFFSET) // DMA_CHAN_ABORT
     // Abort an in-progress transfer sequence on one or more channels
     // 0x0000ffff [15:0]  CHAN_ABORT   (0x0000) Each bit corresponds to a channel
-    io_wo_32 abort;
+    io_rw_32 abort;
 } dma_hw_t;
 
 #define dma_hw ((dma_hw_t *)DMA_BASE)
