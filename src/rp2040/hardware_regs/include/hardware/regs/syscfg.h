@@ -249,4 +249,3 @@
 #define SYSCFG_MEMPOWERDOWN_SRAM0_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_SYSCFG_H
-

@@ -2458,4 +2458,3 @@
 #define SIO_TMDS_POP_DOUBLE_L2_ACCESS "RF"
 // =============================================================================
 #endif // _HARDWARE_REGS_SIO_H
-

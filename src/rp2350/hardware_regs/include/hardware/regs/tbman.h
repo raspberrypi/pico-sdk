@@ -45,4 +45,3 @@
 #define TBMAN_PLATFORM_ASIC_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_TBMAN_H
-

@@ -750,4 +750,3 @@
 #define BUSCTRL_PERFSEL3_VALUE_ROM_ACCESS _u(0x43)
 // =============================================================================
 #endif // _HARDWARE_REGS_BUSCTRL_H
-

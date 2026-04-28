@@ -187,4 +187,3 @@
 #define XIP_STREAM_FIFO_ACCESS "RF"
 // =============================================================================
 #endif // _HARDWARE_REGS_XIP_H
-

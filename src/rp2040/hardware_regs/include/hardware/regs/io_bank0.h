@@ -13646,4 +13646,3 @@
 #define IO_BANK0_DORMANT_WAKE_INTS3_GPIO24_LEVEL_LOW_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_IO_BANK0_H
-

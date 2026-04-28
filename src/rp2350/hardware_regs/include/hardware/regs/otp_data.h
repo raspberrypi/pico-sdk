@@ -12370,4 +12370,3 @@
 #define OTP_DATA_PAGE63_LOCK1_LOCK_S_VALUE_INACCESSIBLE _u(0x3)
 // =============================================================================
 #endif // _HARDWARE_REGS_OTP_DATA_H
-

@@ -30,18 +30,18 @@ typedef struct {
     // 0x0ffff000 [27:12] PART         (-) 
     // 0x00000fff [11:0]  MANUFACTURER (-) 
     io_ro_32 chip_id;
- 
+
     _REG_(SYSINFO_PLATFORM_OFFSET) // SYSINFO_PLATFORM
     // Platform register
-    // 0x00000002 [1]     ASIC         (0) 
-    // 0x00000001 [0]     FPGA         (0) 
+    // 0x00000002 [1]     ASIC         (0)
+    // 0x00000001 [0]     FPGA         (0)
     io_ro_32 platform;
- 
+
     uint32_t _pad0[2];
- 
+
     _REG_(SYSINFO_GITREF_RP2040_OFFSET) // SYSINFO_GITREF_RP2040
     // Git hash of the chip source
-    // 0xffffffff [31:0]  GITREF_RP2040 (-) 
+    // 0xffffffff [31:0]  GITREF_RP2040 (-)
     io_ro_32 gitref_rp2040;
 } sysinfo_hw_t;
 
@@ -49,4 +49,3 @@ typedef struct {
 static_assert(sizeof (sysinfo_hw_t) == 0x0014, "");
 
 #endif // _HARDWARE_STRUCTS_SYSINFO_H
-

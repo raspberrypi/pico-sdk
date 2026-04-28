@@ -2192,4 +2192,3 @@
 #define POWMAN_INTS_VREG_OUTPUT_LOW_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_POWMAN_H
-

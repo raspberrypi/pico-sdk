@@ -121,4 +121,3 @@ typedef enum irq_num_rp2040 {
 #define isr_spare_5 isr_irq31
 
 #endif // _INTCTRL_H
-

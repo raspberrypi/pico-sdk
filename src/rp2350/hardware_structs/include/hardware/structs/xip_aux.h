@@ -26,9 +26,9 @@
 typedef struct {
     _REG_(XIP_AUX_STREAM_OFFSET) // XIP_AUX_STREAM
     // Read the XIP stream FIFO (fast bus access to XIP_CTRL_STREAM_FIFO)
-    // 0xffffffff [31:0]  STREAM       (0x00000000) 
+    // 0xffffffff [31:0]  STREAM       (0x00000000)
     io_ro_32 stream;
- 
+
     _REG_(XIP_AUX_QMI_DIRECT_TX_OFFSET) // XIP_AUX_QMI_DIRECT_TX
     // Write to the QMI direct-mode TX FIFO (fast bus access to QMI_DIRECT_TX)
     // 0x00100000 [20]    NOPUSH       (0) Inhibit the RX FIFO push that would correspond to this...
@@ -37,7 +37,7 @@ typedef struct {
     // 0x00030000 [17:16] IWIDTH       (0x0) Configure whether this FIFO record is transferred with...
     // 0x0000ffff [15:0]  DATA         (0x0000) Data pushed here will be clocked out falling edges of...
     io_wo_32 qmi_direct_tx;
- 
+
     _REG_(XIP_AUX_QMI_DIRECT_RX_OFFSET) // XIP_AUX_QMI_DIRECT_RX
     // Read from the QMI direct-mode RX FIFO (fast bus access to QMI_DIRECT_RX)
     // 0x0000ffff [15:0]  QMI_DIRECT_RX (0x0000) With each byte clocked out on the serial interface, one...
@@ -48,4 +48,3 @@ typedef struct {
 static_assert(sizeof (xip_aux_hw_t) == 0x000c, "");
 
 #endif // _HARDWARE_STRUCTS_XIP_AUX_H
-

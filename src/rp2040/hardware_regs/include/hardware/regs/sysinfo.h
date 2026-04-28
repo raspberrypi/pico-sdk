@@ -71,4 +71,3 @@
 #define SYSINFO_GITREF_RP2040_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_SYSINFO_H
-

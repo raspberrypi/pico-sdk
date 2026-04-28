@@ -738,4 +738,3 @@
 #define PSM_DONE_PROC_COLD_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_PSM_H
-

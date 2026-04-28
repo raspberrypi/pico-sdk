@@ -108,4 +108,3 @@
 #define SYSINFO_GITREF_RP2350_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_SYSINFO_H
-

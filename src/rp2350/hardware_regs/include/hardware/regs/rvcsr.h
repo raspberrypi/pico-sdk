@@ -3213,4 +3213,3 @@
 #define RVCSR_MCONFIGPTR_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_RVCSR_H
-

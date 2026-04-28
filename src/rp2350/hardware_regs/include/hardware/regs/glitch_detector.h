@@ -208,4 +208,3 @@
 #define GLITCH_DETECTOR_TRIG_FORCE_ACCESS "SC"
 // =============================================================================
 #endif // _HARDWARE_REGS_GLITCH_DETECTOR_H
-

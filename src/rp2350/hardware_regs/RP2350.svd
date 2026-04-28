@@ -24755,9 +24755,9 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>I2C1</name>
         <baseAddress>0x40098000</baseAddress>
         <interrupt>
-        <name>I2C1_IRQ</name>
-        <value>37</value>
-    </interrupt>
+            <name>I2C1_IRQ</name>
+            <value>37</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>IO_BANK0</name>
@@ -75943,25 +75943,25 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>PIO1</name>
         <baseAddress>0x50300000</baseAddress>
         <interrupt>
-        <name>PIO1_IRQ_0</name>
-        <value>17</value>
-    </interrupt>
+            <name>PIO1_IRQ_0</name>
+            <value>17</value>
+        </interrupt>
         <interrupt>
-        <name>PIO1_IRQ_1</name>
-        <value>18</value>
-    </interrupt>
+            <name>PIO1_IRQ_1</name>
+            <value>18</value>
+        </interrupt>
     </peripheral>
     <peripheral derivedFrom="PIO0">
         <name>PIO2</name>
         <baseAddress>0x50400000</baseAddress>
         <interrupt>
-        <name>PIO2_IRQ_0</name>
-        <value>19</value>
-    </interrupt>
+            <name>PIO2_IRQ_0</name>
+            <value>19</value>
+        </interrupt>
         <interrupt>
-        <name>PIO2_IRQ_1</name>
-        <value>20</value>
-    </interrupt>
+            <name>PIO2_IRQ_1</name>
+            <value>20</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>PLL_SYS</name>
@@ -76148,9 +76148,9 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>PLL_USB</name>
         <baseAddress>0x40058000</baseAddress>
         <interrupt>
-        <name>PLL_USB_IRQ</name>
-        <value>43</value>
-    </interrupt>
+            <name>PLL_USB_IRQ</name>
+            <value>43</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>POWMAN</name>
@@ -90479,9 +90479,9 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>FREQ_RANGE</name>
                         <description>Controls the number of delay stages in the ROSC ring 
                             LOW uses stages 0 to 7 
-                            MEDIUM uses stages 0 to 5
-                            HIGH uses stages 0 to 3
-                            TOOHIGH uses stages 0 to 1 and should not be used because its frequency exceeds design specifications
+                            MEDIUM uses stages 0 to 5 
+                            HIGH uses stages 0 to 3 
+                            TOOHIGH uses stages 0 to 1 and should not be used because its frequency exceeds design specifications 
                             The clock output will not glitch when changing the range up one step at a time 
                             The clock output will glitch when changing the range down 
                             Note: the values here are gray coded which is why HIGH comes before TOOHIGH</description>
@@ -93876,9 +93876,9 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>SPI1</name>
         <baseAddress>0x40088000</baseAddress>
         <interrupt>
-        <name>SPI1_IRQ</name>
-        <value>32</value>
-    </interrupt>
+            <name>SPI1_IRQ</name>
+            <value>32</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>SYSCFG</name>
@@ -94521,9 +94521,9 @@ SPDX-License-Identifier: BSD-3-Clause
     </peripheral>
     <peripheral>
         <name>TIMER0</name>
-        <description>Controls time and alarms
+        <description>Controls time and alarms 
 
-            time is a 64 bit value indicating the time since power-on
+            time is a 64 bit value indicating the time since power-on 
 
             timeh is the top 32 bits of time &amp; timel is the bottom 32 bits to change time write to timelw before timehw to read time read from timelr before timehr
 
@@ -94887,21 +94887,21 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>TIMER1</name>
         <baseAddress>0x400b8000</baseAddress>
         <interrupt>
-        <name>TIMER1_IRQ_0</name>
-        <value>4</value>
-    </interrupt>
+            <name>TIMER1_IRQ_0</name>
+            <value>4</value>
+        </interrupt>
         <interrupt>
-        <name>TIMER1_IRQ_1</name>
-        <value>5</value>
-    </interrupt>
+            <name>TIMER1_IRQ_1</name>
+            <value>5</value>
+        </interrupt>
         <interrupt>
-        <name>TIMER1_IRQ_2</name>
-        <value>6</value>
-    </interrupt>
+            <name>TIMER1_IRQ_2</name>
+            <value>6</value>
+        </interrupt>
         <interrupt>
-        <name>TIMER1_IRQ_3</name>
-        <value>7</value>
-    </interrupt>
+            <name>TIMER1_IRQ_3</name>
+            <value>7</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>TRNG</name>
@@ -96256,9 +96256,9 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>UART1</name>
         <baseAddress>0x40078000</baseAddress>
         <interrupt>
-        <name>UART1_IRQ</name>
-        <value>34</value>
-    </interrupt>
+            <name>UART1_IRQ</name>
+            <value>34</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>USB</name>
@@ -105727,7 +105727,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <field>
                         <name>ENABLE</name>
                         <description>On power-up this field is initialised to DISABLE and the chip runs from the ROSC. 
-                            If the chip has subsequently been programmed to run from the XOSC then setting this field to DISABLE may lock-up the chip. If  this is a concern then run the clk_ref from the ROSC and enable the clk_sys RESUS feature. 
+                            If the chip has subsequently been programmed to run from the XOSC then setting this field to DISABLE may lock-up the chip. If this is a concern then run the clk_ref from the ROSC and enable the clk_sys RESUS feature. 
                             The 12-bit code is intended to give some protection against accidental writes. An invalid setting will retain the previous value. The actual value being used can be read from STATUS_ENABLED</description>
                         <bitRange>[23:12]</bitRange>
                         <access>read-write</access>

@@ -223,4 +223,3 @@
 #define WATCHDOG_TICK_CYCLES_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_WATCHDOG_H
-

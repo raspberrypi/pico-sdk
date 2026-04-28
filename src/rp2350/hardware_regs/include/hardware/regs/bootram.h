@@ -127,4 +127,3 @@
 #define BOOTRAM_BOOTLOCK7_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_BOOTRAM_H
-

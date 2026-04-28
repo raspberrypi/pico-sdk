@@ -77,4 +77,3 @@
 #define M33_EPPB_SLEEPCTRL_LIGHT_SLEEP_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_M33_EPPB_H
-

@@ -4950,4 +4950,3 @@
 #define ACCESSCTRL_XIP_AUX_NSU_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_ACCESSCTRL_H
-

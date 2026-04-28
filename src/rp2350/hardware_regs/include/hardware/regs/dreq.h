@@ -144,4 +144,3 @@ typedef enum dreq_num_rp2350 {
 #endif
 
 #endif // _DREQ_H
-

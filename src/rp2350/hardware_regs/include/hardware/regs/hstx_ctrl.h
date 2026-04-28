@@ -606,4 +606,3 @@
 #define HSTX_CTRL_EXPAND_TMDS_L0_ROT_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_HSTX_CTRL_H
-

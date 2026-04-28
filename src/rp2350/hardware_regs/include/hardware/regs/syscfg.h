@@ -279,4 +279,3 @@
 #define SYSCFG_AUXCTRL_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_SYSCFG_H
-

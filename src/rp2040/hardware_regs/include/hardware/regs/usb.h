@@ -3450,4 +3450,3 @@
 #define USB_INTS_HOST_CONN_DIS_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_USB_H
-

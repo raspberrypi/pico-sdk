@@ -13315,9 +13315,9 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>I2C1</name>
         <baseAddress>0x40048000</baseAddress>
         <interrupt>
-        <name>I2C1_IRQ</name>
-        <value>24</value>
-    </interrupt>
+            <name>I2C1_IRQ</name>
+            <value>24</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>IO_BANK0</name>
@@ -33707,13 +33707,13 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>PIO1</name>
         <baseAddress>0x50300000</baseAddress>
         <interrupt>
-        <name>PIO1_IRQ_0</name>
-        <value>9</value>
-    </interrupt>
+            <name>PIO1_IRQ_0</name>
+            <value>9</value>
+        </interrupt>
         <interrupt>
-        <name>PIO1_IRQ_1</name>
-        <value>10</value>
-    </interrupt>
+            <name>PIO1_IRQ_1</name>
+            <value>10</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>PLL_SYS</name>
@@ -39814,9 +39814,9 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>SPI1</name>
         <baseAddress>0x40040000</baseAddress>
         <interrupt>
-        <name>SPI1_IRQ</name>
-        <value>19</value>
-    </interrupt>
+            <name>SPI1_IRQ</name>
+            <value>19</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>SSI</name>
@@ -42041,9 +42041,9 @@ SPDX-License-Identifier: BSD-3-Clause
         <name>UART1</name>
         <baseAddress>0x40038000</baseAddress>
         <interrupt>
-        <name>UART1_IRQ</name>
-        <value>21</value>
-    </interrupt>
+            <name>UART1_IRQ</name>
+            <value>21</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>USB</name>

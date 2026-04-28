@@ -316,4 +316,3 @@
 #define TIMER_INTS_ALARM_0_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_TIMER_H
-

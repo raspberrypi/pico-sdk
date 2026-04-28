@@ -805,4 +805,3 @@
 #define SSI_TXD_DRIVE_EDGE_TDE_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_SSI_H
-

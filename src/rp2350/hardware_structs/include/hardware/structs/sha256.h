@@ -33,16 +33,16 @@ typedef struct {
     // 0x00000002 [1]     WDATA_RDY    (1) If 1, the SHA-256 core is ready to accept more data...
     // 0x00000001 [0]     START        (0) Write 1 to prepare the SHA-256 core for a new checksum
     io_rw_32 csr;
- 
+
     _REG_(SHA256_WDATA_OFFSET) // SHA256_WDATA
     // Write data register
     // 0xffffffff [31:0]  WDATA        (0x00000000) After pulsing START and writing 16 words of data to this...
     io_wo_32 wdata;
- 
+
     // (Description copied from array index 0 register SHA256_SUM0 applies similarly to other array indexes)
     _REG_(SHA256_SUM0_OFFSET) // SHA256_SUM0
     // 256-bit checksum result
-    // 0xffffffff [31:0]  SUM0         (0x00000000) 
+    // 0xffffffff [31:0]  SUM0         (0x00000000)
     io_ro_32 sum[8];
 } sha256_hw_t;
 
@@ -50,4 +50,3 @@ typedef struct {
 static_assert(sizeof (sha256_hw_t) == 0x0028, "");
 
 #endif // _HARDWARE_STRUCTS_SHA256_H
-

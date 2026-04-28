@@ -25,7 +25,7 @@
 //               runs from the ROSC.
 //               If the chip has subsequently been programmed to run from the
 //               XOSC then setting this field to DISABLE may lock-up the chip.
-//               If  this is a concern then run the clk_ref from the ROSC and
+//               If this is a concern then run the clk_ref from the ROSC and
 //               enable the clk_sys RESUS feature.
 //               The 12-bit code is intended to give some protection against
 //               accidental writes. An invalid setting will retain the previous
@@ -172,4 +172,3 @@
 #define XOSC_COUNT_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_XOSC_H
-

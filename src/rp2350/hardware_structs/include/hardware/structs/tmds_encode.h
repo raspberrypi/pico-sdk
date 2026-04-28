@@ -37,50 +37,50 @@ typedef struct {
     // 0x000000f0 [7:4]   L1_ROT       (0x0) Right-rotate the 16 LSBs of the colour accumulator by...
     // 0x0000000f [3:0]   L0_ROT       (0x0) Right-rotate the 16 LSBs of the colour accumulator by...
     io_rw_32 tmds_ctrl;
- 
+
     _REG_(SIO_TMDS_WDATA_OFFSET) // SIO_TMDS_WDATA
     // Write-only access to the TMDS colour data register
-    // 0xffffffff [31:0]  TMDS_WDATA   (0x00000000) 
+    // 0xffffffff [31:0]  TMDS_WDATA   (0x00000000)
     io_wo_32 tmds_wdata;
- 
+
     _REG_(SIO_TMDS_PEEK_SINGLE_OFFSET) // SIO_TMDS_PEEK_SINGLE
     // Get the encoding of one pixel's worth of colour data, packed into a 32-bit value (3x10-bit symbols)
-    // 0xffffffff [31:0]  TMDS_PEEK_SINGLE (0x00000000) 
+    // 0xffffffff [31:0]  TMDS_PEEK_SINGLE (0x00000000)
     io_ro_32 tmds_peek_single;
- 
+
     _REG_(SIO_TMDS_POP_SINGLE_OFFSET) // SIO_TMDS_POP_SINGLE
     // Get the encoding of one pixel's worth of colour data, packed into a 32-bit value
-    // 0xffffffff [31:0]  TMDS_POP_SINGLE (0x00000000) 
+    // 0xffffffff [31:0]  TMDS_POP_SINGLE (0x00000000)
     io_ro_32 tmds_pop_single;
- 
+
     _REG_(SIO_TMDS_PEEK_DOUBLE_L0_OFFSET) // SIO_TMDS_PEEK_DOUBLE_L0
     // Get lane 0 of the encoding of two pixels' worth of colour data
-    // 0xffffffff [31:0]  TMDS_PEEK_DOUBLE_L0 (0x00000000) 
+    // 0xffffffff [31:0]  TMDS_PEEK_DOUBLE_L0 (0x00000000)
     io_ro_32 tmds_peek_double_l0;
- 
+
     _REG_(SIO_TMDS_POP_DOUBLE_L0_OFFSET) // SIO_TMDS_POP_DOUBLE_L0
     // Get lane 0 of the encoding of two pixels' worth of colour data
-    // 0xffffffff [31:0]  TMDS_POP_DOUBLE_L0 (0x00000000) 
+    // 0xffffffff [31:0]  TMDS_POP_DOUBLE_L0 (0x00000000)
     io_ro_32 tmds_pop_double_l0;
- 
+
     _REG_(SIO_TMDS_PEEK_DOUBLE_L1_OFFSET) // SIO_TMDS_PEEK_DOUBLE_L1
     // Get lane 1 of the encoding of two pixels' worth of colour data
-    // 0xffffffff [31:0]  TMDS_PEEK_DOUBLE_L1 (0x00000000) 
+    // 0xffffffff [31:0]  TMDS_PEEK_DOUBLE_L1 (0x00000000)
     io_ro_32 tmds_peek_double_l1;
- 
+
     _REG_(SIO_TMDS_POP_DOUBLE_L1_OFFSET) // SIO_TMDS_POP_DOUBLE_L1
     // Get lane 1 of the encoding of two pixels' worth of colour data
-    // 0xffffffff [31:0]  TMDS_POP_DOUBLE_L1 (0x00000000) 
+    // 0xffffffff [31:0]  TMDS_POP_DOUBLE_L1 (0x00000000)
     io_ro_32 tmds_pop_double_l1;
- 
+
     _REG_(SIO_TMDS_PEEK_DOUBLE_L2_OFFSET) // SIO_TMDS_PEEK_DOUBLE_L2
     // Get lane 2 of the encoding of two pixels' worth of colour data
-    // 0xffffffff [31:0]  TMDS_PEEK_DOUBLE_L2 (0x00000000) 
+    // 0xffffffff [31:0]  TMDS_PEEK_DOUBLE_L2 (0x00000000)
     io_ro_32 tmds_peek_double_l2;
- 
+
     _REG_(SIO_TMDS_POP_DOUBLE_L2_OFFSET) // SIO_TMDS_POP_DOUBLE_L2
     // Get lane 2 of the encoding of two pixels' worth of colour data
-    // 0xffffffff [31:0]  TMDS_POP_DOUBLE_L2 (0x00000000) 
+    // 0xffffffff [31:0]  TMDS_POP_DOUBLE_L2 (0x00000000)
     io_ro_32 tmds_pop_double_l2;
 } tmds_encode_hw_t;
 
@@ -89,4 +89,3 @@ typedef struct {
 static_assert(sizeof (tmds_encode_hw_t) == 0x0028, "");
 
 #endif // _HARDWARE_STRUCTS_TMDS_ENCODE_H
-

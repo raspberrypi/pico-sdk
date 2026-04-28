@@ -2675,4 +2675,3 @@
 #define PIO_IRQ1_INTS_SM0_RXNEMPTY_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_PIO_H
-

@@ -2697,4 +2697,3 @@
 #define I2C_IC_COMP_TYPE_IC_COMP_TYPE_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_I2C_H
-
