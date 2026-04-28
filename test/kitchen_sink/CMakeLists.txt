@@ -93,6 +93,23 @@ foreach(LIB IN LISTS KITCHEN_SINK_LIBS)
        endif()
     endif()
 endforeach ()
+
+if (PICO_VARIANT_DIR)
+    # add all hardware_structs headers
+    file(GLOB STRUCT_HEADERS "${PICO_VARIANT_DIR}/hardware_structs/include/hardware/structs/*.h")
+    foreach(STRUCT_HEADER IN LISTS STRUCT_HEADERS)
+        get_filename_component(STRUCT_HEADER ${STRUCT_HEADER} NAME)
+        if (PICO_RISCV)
+            file(READ ${PICO_VARIANT_DIR}/hardware_structs/include/hardware/structs/${STRUCT_HEADER} STRUCT_HEADER_CONTENT)
+            if (STRUCT_HEADER_CONTENT MATCHES "PICO_FORBID_ARM_HEADERS_ON_RISCV")
+                #message("Skipping ${STRUCT_HEADER} because it contains PICO_FORBID_ARM_HEADERS_ON_RISCV")
+                continue()
+            endif()
+        endif()
+        string(APPEND KITCHEN_SINK_INCLUDES "#include \"hardware/structs/${STRUCT_HEADER}\"\n")
+    endforeach ()
+endif()
+
 set(KITCHEN_SINK_INCLUDE_HEADER "${CMAKE_CURRENT_BINARY_DIR}/kitchen_sink_includes.h")
 file(GENERATE OUTPUT ${KITCHEN_SINK_INCLUDE_HEADER} CONTENT ${KITCHEN_SINK_INCLUDES})
 
