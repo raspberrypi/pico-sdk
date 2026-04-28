@@ -195,6 +195,24 @@ static_assert(PIO2_BASE - PIO0_BASE == (2u << 20), "hardware layout mismatch");
 #endif
 
 /**
+ * \def PIO_IS_INSTANCE(pio)
+ * \ingroup hardware_pio
+ * \hideinitializer
+ * \brief Returns true if the PIO instance is one of the h/w PIO instances
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef PIO_IS_INSTANCE
+#if NUM_PIOS > 2
+    static_assert(NUM_PIOS == 3, "");
+    #define PIO_IS_INSTANCE(pio) ((pio) == pio0 || (pio) == pio1 || (pio) == pio2)
+#else
+    static_assert(NUM_PIOS == 2, "");
+    #define PIO_IS_INSTANCE(pio) ((pio) == pio0 || (pio) == pio1)
+#endif
+#endif
+
+/**
  * \def PIO_FUNCSEL_NUM(pio, gpio)
  * \ingroup hardware_pio
  * \hideinitializer
@@ -318,11 +336,7 @@ static inline void check_sm_mask(__unused uint mask) {
 }
 
 static inline void check_pio_param(__unused PIO pio) {
-#if NUM_PIOS == 2
-    valid_params_if(HARDWARE_PIO, pio == pio0 || pio == pio1);
-#elif NUM_PIOS == 3
-    valid_params_if(HARDWARE_PIO, pio == pio0 || pio == pio1 || pio == pio2);
-#endif
+    valid_params_if(HARDWARE_PIO, PIO_IS_INSTANCE(pio));
 }
 
 static inline void check_pio_pin_param(__unused uint pin) {

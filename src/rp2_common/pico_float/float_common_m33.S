@@ -356,13 +356,13 @@ regular_func float2int64_z
  vmov r0,s0
 #endif
 wrapper_func __aeabi_f2lz
-float2int64_z_softfp:
+local_func float2int64_z_softfp
  movs r1,#0      @ fall through
 #if !defined(__ARM_PCS_VFP)
 regular_func float2fix64_z
 #endif
 @ convert float in r0 to signed fixed point in r0:r1, clamping
-float2fix64_z_softfp:
+local_func float2fix64_z_softfp
  subs r1,#0x95 @ remove exponent bias, compensate for mantissa length
  asrs r2,r0,#23 @ sign and exponent
  sub r3,r2,#1

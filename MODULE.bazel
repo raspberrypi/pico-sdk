@@ -99,10 +99,10 @@ http_archive(
     url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:910be4ff90d7d07bd4518ea03b85c0974672bf9c",
 )
 
-new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # TODO: Provide tinyusb as a proper Bazel module.
-new_git_repository(
+git_repository(
     name = "tinyusb",
     build_file = "//src/rp2_common/tinyusb:tinyusb.BUILD",
     commit = "86ad6e56c1700e85f1c5678607a762cfe3aa2f47",  # keep-in-sync-with-submodule: lib/tinyusb
@@ -110,7 +110,7 @@ new_git_repository(
 )
 
 # TODO: Provide btstack as a proper Bazel module.
-new_git_repository(
+git_repository(
     name = "btstack",
     build_file = "//src/rp2_common/pico_btstack:btstack.BUILD",
     commit = "420dc137399796c88b0013ee09f157046018923e",  # keep-in-sync-with-submodule: lib/btstack
@@ -118,7 +118,7 @@ new_git_repository(
 )
 
 # TODO: Provide cyw43-driver as a proper Bazel module.
-new_git_repository(
+git_repository(
     name = "cyw43-driver",
     build_file = "//src/rp2_common/pico_cyw43_driver:cyw43-driver.BUILD",
     commit = "dd7568229f3bf7a37737b9e1ef250c26efe75b23",  # keep-in-sync-with-submodule: lib/cyw43-driver
@@ -126,14 +126,14 @@ new_git_repository(
 )
 
 # TODO: Provide lwip as a proper Bazel module.
-new_git_repository(
+git_repository(
     name = "lwip",
     build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
     commit = "77dcd25a72509eb83f72b033d219b1d40cd8eb95",  # keep-in-sync-with-submodule: lib/lwip
     remote = "https://github.com/lwip-tcpip/lwip.git",
 )
 
-new_git_repository(
+git_repository(
     name = "mbedtls",
     build_file = "//src/rp2_common/pico_mbedtls:mbedtls.BUILD",
     commit = "107ea89daaefb9867ea9121002fbbdf926780e98",  # keep-in-sync-with-submodule: lib/mbedtls

@@ -57,7 +57,7 @@ but not sure that is implemented yet.
 #define PICOTEST_END_TEST()       if (picotest_error_code != 0)                                     \
                                       {printf("%s: Failed\n", picotest_description); return -1;}  \
                                   else                                                              \
-                                      {printf("%s: Success\n", picotest_description); return 0;}
+                                      {printf("%s: Success\n", picotest_description); puts("PASSED"); return 0;}
 
 
 #endif

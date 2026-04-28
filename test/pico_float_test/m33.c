@@ -248,6 +248,6 @@ int main() {
     checkd(m33cf_dsqrt_fast(0x030a70b7171e4c51ULL),0x217d166dff1d7836ULL);
     checkd(m33cf_dsqrt_fast(0x5284145a8007521fULL),0x493959345ef6a420ULL);
 
-    if(rc==0) puts("Pass");
+    if(rc==0) puts("PASSED");
     else      puts("Fail");
 }
