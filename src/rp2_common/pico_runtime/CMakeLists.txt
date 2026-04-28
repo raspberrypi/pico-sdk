@@ -36,7 +36,7 @@ set(PICO_RUNTIME_LIBRARIES
         pico_crt0
         pico_clib_interface
         pico_stdio
-        pico_tls
+        pico_thread_local
 )
 
 foreach(LIB IN LISTS PICO_RUNTIME_LIBRARIES)

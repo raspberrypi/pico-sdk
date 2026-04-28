@@ -45,11 +45,11 @@ bool run_test(void) {
     puts("Running on ARM");
 #endif
 
-#if PICO_TLS_MODE_PER_THREAD
+#if PICO_THREAD_LOCAL_MODE_PER_THREAD
     puts("TLS MODE: per thread");
-#elif PICO_TLS_MODE_GLOBAL
+#elif PICO_THREAD_LOCAL_MODE_GLOBAL
     puts("TLS MODE: global");
-#elif PICO_TLS_MODE_NONE
+#elif PICO_THREAD_LOCAL_MODE_NONE
     puts("TLS MODE: none");
 #else
 #error
@@ -59,7 +59,7 @@ bool run_test(void) {
     if (zero != 0) {
         return false;
     }
-#if PICO_TLS_MODE_PER_THREAD
+#if PICO_THREAD_LOCAL_MODE_PER_THREAD
     //printf("AH have %d\n", _tls_size());
     sem_init(&sem, 0, 1);
     multicore_launch_core1(core1_entry);
@@ -80,7 +80,7 @@ bool run_test(void) {
         return false;
         return -1;
     }
-#elif PICO_TLS_MODE_GLOBAL
+#elif PICO_THREAD_LOCAL_MODE_GLOBAL
     int core0_count = do_count(1);
     printf("Core 0: %d (expected %d)\n", core0_count, COUNT + 7);
 #endif

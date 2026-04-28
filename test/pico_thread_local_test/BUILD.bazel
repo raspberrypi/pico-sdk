@@ -5,23 +5,23 @@ load("//bazel/util:transition.bzl", "extra_copts_for_all_deps")
 package(default_visibility = ["//visibility:public"])
 
 #cc_binary(
-#    name = "pico_tls_test_actual",
+#    name = "pico_thread_local_test_actual",
 #    testonly = True,
-#    srcs = ["pico_tls_test.c"],
-#    tags = ["manual"],  # Built via pico_tls_test.
+#    srcs = ["pico_thread_local_test.c"],
+#    tags = ["manual"],  # Built via pico_thread_local_test.
 #    # Doesn't appear to work on host builds yet.
 #    target_compatible_with = compatible_with_rp2(),
 #    deps = [
 #        "//src/rp2_common/pico_multicore",
 #        "//src/rp2_common/pico_stdlib",
-#        "//src/rp2_common/pico_tls",
+#        "//src/rp2_common/pico_thread_local",
 #    ],
 #)
 #
 #extra_copts_for_all_deps(
-#    name = "pico_tls_test",
+#    name = "pico_thread_local_test",
 #    testonly = True,
-#    src = ":pico_tls_test_actual",
+#    src = ":pico_thread_local_test_actual",
 #    # Host doesn't support pico_multicore without pico_host_sdl.
 #    target_compatible_with = compatible_with_rp2(),
 #)
@@ -30,7 +30,7 @@ package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "unsupported_tests",
     srcs = [
-        "pico_tls_test.c",
-        "pico_tls_test_cpp.cpp",
+        "pico_thread_local_test.c",
+        "pico_thread_local_test_cpp.cpp",
     ],
 )

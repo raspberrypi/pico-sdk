@@ -6,4 +6,4 @@
 
 #define __thread thread_local
 
-#include "pico_tls_test.c"
+#include "pico_thread_local_test.c"

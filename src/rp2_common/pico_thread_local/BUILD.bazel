@@ -4,19 +4,19 @@ load("//bazel:defs.bzl", "compatible_with_rp2")
 package(default_visibility = ["//visibility:public"])
 
 alias(
-    name = "pico_tls",
+    name = "pico_thread_local",
     actual = select({
-        "//bazel/constraint:pico_tls_per_thread_enabled": ":pico_tls_per_thread",
-        "//bazel/constraint:pico_tls_global_enabled": ":pico_tls_global",
-        "//conditions:default": ":pico_tls_none",
+        "//bazel/constraint:pico_thread_local_per_thread_enabled": ":pico_thread_local_per_thread",
+        "//bazel/constraint:pico_thread_local_global_enabled": ":pico_thread_local_global",
+        "//conditions:default": ":pico_thread_local_none",
     }),
 )
 
 cc_library(
-    name = "pico_tls_per_thread",
+    name = "pico_thread_local_per_thread",
     srcs = ["tls.c"],
     hdrs = ["include/pico/tls.h", "include/picotls.h"],
-    defines = ["PICO_TLS_MODE_PER_THREAD=1"],
+    defines = ["PICO_THREAD_LOCAL_MODE_PER_THREAD=1"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
@@ -27,10 +27,10 @@ cc_library(
 )
 
 cc_library(
-    name = "pico_tls_global",
+    name = "pico_thread_local_global",
     srcs = ["tls.c"],
     hdrs = ["include/pico/tls.h", "include/picotls.h"],
-    defines = ["PICO_TLS_MODE_GLOBAL=1"],
+    defines = ["PICO_THREAD_LOCAL_MODE_GLOBAL=1"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
@@ -41,10 +41,10 @@ cc_library(
 )
 
 cc_library(
-    name = "pico_tls_none",
+    name = "pico_thread_local_none",
     srcs = ["tls.c"],
     hdrs = ["include/pico/tls.h", "include/picotls.h"],
-    defines = ["PICO_TLS_MODE_NONE=1"],
+    defines = ["PICO_THREAD_LOCAL_MODE_NONE=1"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [

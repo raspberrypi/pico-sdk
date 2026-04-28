@@ -7,35 +7,35 @@
 #include <stdlib.h>
 #include "pico.h"
 #include <picotls.h>
-#include "pico/tls.h"
+#include "pico/thread_local.h"
 #include "pico/runtime_init.h"
 #include "hardware/sync.h"
 
-#if !PICO_TLS_MODE_PER_THREAD
+#if !PICO_THREAD_LOCAL_MODE_PER_THREAD
 // if not using per-thread mode we use tdata and tbss directly, so don't waste space on them.
 // this is a bit of a hacky way of telling the linker this info!
 char __used __attribute__((section(".tlsX_not_needed_marker"))) _tlsX_not_needed_marker;
 #endif
 
-#if PICO_TLS_MODE_PER_THREAD
-#if PICO_TLS_MODE_GLOBAL
-#error PICO_TLS_MODE_PER_THREAD and PICO_TLS_MODE_GLOBAL are both specified
+#if PICO_THREAD_LOCAL_MODE_PER_THREAD
+#if PICO_THREAD_LOCAL_MODE_GLOBAL
+#error PICO_THREAD_LOCAL_MODE_PER_THREAD and PICO_THREAD_LOCAL_MODE_GLOBAL are both specified
 #endif
-#if PICO_TLS_MODE_NONE
-#error PICO_TLS_MODE_PER_THREAD and PICO_TLS_MODE_NONE are both specified
+#if PICO_THREAD_LOCAL_MODE_NONE
+#error PICO_THREAD_LOCAL_MODE_PER_THREAD and PICO_THREAD_LOCAL_MODE_NONE are both specified
 #endif
 // ------------------------------------------------------------
-// Proper TLS support per thread (PICO_TLS_MODE_PER_THREAD = 1)
+// Proper TLS support per thread (PICO_THREAD_LOCAL_MODE_PER_THREAD = 1)
 // -------------------------------------------------------------
 
-#if !PICO_TLS_THREAD_POINTER_VIA_RISCV_REG
+#if !PICO_THREAD_LOCAL_THREAD_POINTER_VIA_RISCV_REG
 // we don't have TP register so need to track one tls region per code
 static_assert(NUM_CORES <= 2, "");
 
 // per core pointers (not needed on RISC-V as we use TP reg)
 static void *__tls_adjusted_by_core[2];
 
-#if PICO_TLS_SUPPORT_THREAD_POINTER && !__riscv
+#if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER && !__riscv
 /* The size of the thread control block.
  * TLS relocations are generated relative to
  * a location this far *before* the first thread
@@ -52,9 +52,9 @@ extern uint8_t __arm32_tls_tcb_offset;
 #define TLS_ADJUST 0
 #endif
 
-// Note our emutls support is only inside of PICO_TLS_MODE_PER_THREAD as
+// Note our emutls support is only inside of PICO_THREAD_LOCAL_MODE_PER_THREAD as
 // the library version suffices otherwise
-#if PICO_TLS_SUPPORT_EMUTLS
+#if PICO_THREAD_LOCAL_SUPPORT_EMUTLS
 // From emutls.c:
 // 'For every TLS variable xyz, there is one __emutls_control variable named __emutls_v.xyz. If xyz has
 // non-zero initial value, __emutls_v.xyz's "value" will point to __emutls_t.xyz, which has the initial value.'
@@ -84,7 +84,7 @@ static uint32_t _emutls_align;
 
 // fill a linear region with data from the tls metadata (either emutls objects or tdata/tbss)
 static inline void _tls_init_from_emutls_or_tdata(void *tls) {
-#if PICO_TLS_SUPPORT_EMUTLS
+#if PICO_THREAD_LOCAL_SUPPORT_EMUTLS
     uint8_t *tls_adjusted = ((uint8_t *)tls) - TLS_ADJUST;
     for (tls_object_t* tls_obj = &__emutls_array_start; tls_obj < &__emutls_array_end; ++tls_obj) {
         if (tls_obj->tplate) {
@@ -94,7 +94,7 @@ static inline void _tls_init_from_emutls_or_tdata(void *tls) {
         }
     }
 #endif
-#if PICO_TLS_SUPPORT_THREAD_POINTER
+#if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER
     // when using thread pointers we expect data to come from tdata/tbss
     extern __weak uint8_t __tdata_source[];
     extern __weak uint8_t __tdata_size[];
@@ -114,7 +114,7 @@ static inline void _tls_init_from_emutls_or_tdata(void *tls) {
 
 static inline void _set_tls_per_thread(void *tls) {
     assert(tls); // we should never be setting 0
-#if !PICO_TLS_THREAD_POINTER_VIA_RISCV_REG
+#if !PICO_THREAD_LOCAL_THREAD_POINTER_VIA_RISCV_REG
     __tls_adjusted_by_core[get_core_num()] = (uint8_t *)tls - TLS_ADJUST;
 #else
     pico_default_asm_volatile("mv tp, %0\n" : : "r" (tls));
@@ -122,7 +122,7 @@ static inline void _set_tls_per_thread(void *tls) {
 }
 #define _SET_TLS_IMPL _set_tls_per_thread
 
-#if PICO_TLS_SUPPORT_THREAD_POINTER
+#if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER
 static __used void *_init_core_local_tls(void) {
     /* Initialized by the linker, one per core */
     extern uint8_t __tls0_base[], __tls1_base[];
@@ -133,7 +133,7 @@ static __used void *_init_core_local_tls(void) {
     return tls - TLS_ADJUST;
 }
 
-#if PICO_TLS_THREAD_POINTER_VIA_ARM_EABI
+#if PICO_THREAD_LOCAL_THREAD_POINTER_VIA_ARM_EABI
 uint32_t __attribute__((naked)) __aeabi_read_tp(void) {
 #if !__ARM_ARCH_6M__
     pico_default_asm_volatile(
@@ -174,9 +174,9 @@ uint32_t __attribute__((naked)) __aeabi_read_tp(void) {
 #endif
 #endif
 
-#if PICO_TLS_SUPPORT_EMUTLS
+#if PICO_THREAD_LOCAL_SUPPORT_EMUTLS
 static inline void *_get_tls_adjusted_for_core(uint core_num) {
-#if !PICO_TLS_THREAD_POINTER_VIA_RISCV_REG
+#if !PICO_THREAD_LOCAL_THREAD_POINTER_VIA_RISCV_REG
     return __tls_adjusted_by_core[core_num];
 #else
 #error unsupported tls configuration // we haven't seen this in the wild so error for now
@@ -217,10 +217,10 @@ static void _emutls_one_time_init(void) {
 
 // When we support EMUTLS we have _tls_size() redirect here (from our replacement <picolibc.h>)
 size_t _runtime_tls_size(void) {
-    static_assert(PICO_TLS_SUPPORT_EMUTLS, ""); // this function is only provided in this case
+    static_assert(PICO_THREAD_LOCAL_SUPPORT_EMUTLS, ""); // this function is only provided in this case
     if (!emutls_one_time_init_done) _emutls_one_time_init();
     size_t tls_size = _emutls_size;
-#if PICO_TLS_SUPPORT_THREAD_POINTER
+#if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER
     extern __weak char __tls_size[];
     // be defensive about having someone put both types of data
     tls_size = MAX(tls_size, (size_t)&__tls_size);
@@ -259,12 +259,12 @@ void* __emutls_get_address(void* obj) {
 }
 #endif
 
-#if PICO_TLS_SUPPORT_THREAD_POINTER && PICO_TLS_THREAD_POINTER_VIA_RISCV_REG
-// on RISC-V we must set up the pointer each time, note we don't actually respect PICO_TLS_CORE1_REINITIALIZE
+#if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER && PICO_THREAD_LOCAL_THREAD_POINTER_VIA_RISCV_REG
+// on RISC-V we must set up the pointer each time, note we don't actually respect PICO_THREAD_LOCAL_CORE1_REINITIALIZE
 // on RISC-V as it is an optimization flag not a bejavioral flag (i.e. it is indended to be set to 0
 // if you don't need it vs don't want it)
 #define _RUNTIME_INIT_PER_CORE_TLS_SETUP_IMPL _init_core_local_tls
-#elif PICO_TLS_CORE1_REINITIALIZE
+#elif PICO_THREAD_LOCAL_CORE1_REINITIALIZE
 static inline void _defer_core_local_init(void) {
     // note that __tls_adjusted is in .bss, so on core 0 init it is definitely 0 already, so no need to set it to 0
     // to save space, we don't call get_core_num() but just clear __tls_adjusted[1], as runtime_init_per_core_tls_setup
@@ -278,9 +278,9 @@ static inline void _defer_core_local_init(void) {
 #define _RUNTIME_INIT_PER_CORE_TLS_SETUP_IMPL _defer_core_local_init
 #endif
 
-#elif PICO_TLS_MODE_GLOBAL
-#if PICO_TLS_MODE_NONE
-#error PICO_TLS_MODE_GLOBAL and PICO_TLS_MODE_NONE are both specified
+#elif PICO_THREAD_LOCAL_MODE_GLOBAL
+#if PICO_THREAD_LOCAL_MODE_NONE
+#error PICO_THREAD_LOCAL_MODE_GLOBAL and PICO_THREAD_LOCAL_MODE_NONE are both specified
 #endif
 
 // ------------------------------------------------------------
@@ -289,8 +289,8 @@ static inline void _defer_core_local_init(void) {
 #define _INIT_TLS_IMPL(tls) ((void)tls)
 #define _SET_TLS_IMPL(tls) ((void)tls)
 
-#if PICO_TLS_SUPPORT_THREAD_POINTER
-#if PICO_TLS_THREAD_POINTER_VIA_ARM_EABI
+#if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER
+#if PICO_THREAD_LOCAL_THREAD_POINTER_VIA_ARM_EABI
 // naked as we must preserve all regs
 uint32_t __weak __attribute__((naked)) __aeabi_read_tp(void) {
     pico_default_asm_volatile(
@@ -302,7 +302,7 @@ uint32_t __weak __attribute__((naked)) __aeabi_read_tp(void) {
         "pop {r1, pc}\n"
     );
 }
-#elif PICO_TLS_THREAD_POINTER_VIA_RISCV_REG
+#elif PICO_THREAD_LOCAL_THREAD_POINTER_VIA_RISCV_REG
 static inline void _global_tp_init(void) {
     extern __weak char __tls_start[];
     pico_default_asm_volatile("mv tp, %0\n" : : "r" (__tls_start));
@@ -312,14 +312,14 @@ static inline void _global_tp_init(void) {
 #endif
 #endif
 
-#if PICO_TLS_PROVIDE_INIT_TLS
+#if PICO_THREAD_LOCAL_PROVIDE_INIT_TLS
 void _init_tls(void *tls) {
     // we expect an impl in this case
     _INIT_TLS_IMPL(tls);
 }
 #endif
 
-#if PICO_TLS_PROVIDE_SET_TLS
+#if PICO_THREAD_LOCAL_PROVIDE_SET_TLS
 void _set_tls(void *tls) {
     // we expect an impl in this case
     _SET_TLS_IMPL(tls);
