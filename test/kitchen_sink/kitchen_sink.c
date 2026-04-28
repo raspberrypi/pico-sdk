@@ -72,6 +72,14 @@ void svc_call(void) {
     exit(0);
 }
 
+#if LIB_PICO_AON_TIMER
+static bool aon_timer_done = false;
+void spoop(void) {
+    printf("XXXX YARGLE XXXX\n");
+    aon_timer_done = true;
+}
+#endif
+
 int main(void) {
     spiggle();
 
@@ -137,15 +145,14 @@ int main(void) {
 #endif
 #if LIB_PICO_AON_TIMER
     aon_timer_start_with_timeofday();
-    void spoop(void);
     struct timespec ts;
-    ts.tv_sec = 6;
+    ts.tv_sec = 2;
     ts.tv_nsec = 1000000000 / 2;
     aon_timer_enable_alarm(&ts, spoop, false);
-    while (true) {
+    while (!aon_timer_done) {
         aon_timer_get_time(&ts);
         printf("%ld %ld\n", (long)ts.tv_sec, ts.tv_nsec);
-        busy_wait_ms(4000);
+        busy_wait_ms(500);
     }
 #endif
 #ifndef __riscv
@@ -156,9 +163,3 @@ int main(void) {
     puts("PASSED");
 #endif
 }
-
-#if LIB_PICO_AON_TIMER
-void spoop(void) {
-    printf("XXXX YARGLE XXXX\n");
-}
-#endif
