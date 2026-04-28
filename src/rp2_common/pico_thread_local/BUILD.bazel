@@ -14,8 +14,8 @@ alias(
 
 cc_library(
     name = "pico_thread_local_per_thread",
-    srcs = ["tls.c"],
-    hdrs = ["include/pico/tls.h", "include/picotls.h"],
+    srcs = ["thread_local.c"],
+    hdrs = ["include/pico/thread_local.h", "include/picotls.h"],
     defines = ["PICO_THREAD_LOCAL_MODE_PER_THREAD=1"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
@@ -28,8 +28,8 @@ cc_library(
 
 cc_library(
     name = "pico_thread_local_global",
-    srcs = ["tls.c"],
-    hdrs = ["include/pico/tls.h", "include/picotls.h"],
+    srcs = ["thread_local.c"],
+    hdrs = ["include/pico/thread_local.h", "include/picotls.h"],
     defines = ["PICO_THREAD_LOCAL_MODE_GLOBAL=1"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
@@ -42,8 +42,8 @@ cc_library(
 
 cc_library(
     name = "pico_thread_local_none",
-    srcs = ["tls.c"],
-    hdrs = ["include/pico/tls.h", "include/picotls.h"],
+    srcs = ["thread_local.c"],
+    hdrs = ["include/pico/thread_local.h", "include/picotls.h"],
     defines = ["PICO_THREAD_LOCAL_MODE_NONE=1"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
