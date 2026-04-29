@@ -14,10 +14,11 @@
 #if PICO_RP2040
 #define TOLERANCE_MS 1000   // The resolution of the AON timer is 1s on RP2040
 #else
-#define TOLERANCE_MS 50
+#define TOLERANCE_MS 100
 #endif
 #define MIN_SLEEP_TIME_MS SLEEP_TIME_MS - TOLERANCE_MS
 #define MAX_SLEEP_TIME_MS SLEEP_TIME_MS + TOLERANCE_MS
+#define RESET_SLEEP_TIME_MS MAX_SLEEP_TIME_MS * 3
 
 uint32_t wakeup_time_ms = 0;
 uint32_t sleep_time_ms = 0;
@@ -40,13 +41,20 @@ void gpio_callback(uint gpio, uint32_t events) {
         printf("Went to sleep at %dms\n", sleep_time_ms);
         wake_up_alarm_id = add_alarm_in_ms(SLEEP_TIME_MS, wake_up_gpio, NULL, false);
     }
-    if (wakeup_time_ms > sleep_time_ms) {
+    if (wakeup_time_ms > sleep_time_ms && sleep_time_ms) {
         uint32_t diff = wakeup_time_ms - sleep_time_ms;
-        if (good_sleep_done && (diff < MIN_SLEEP_TIME_MS || diff > MAX_SLEEP_TIME_MS)) {
+        if (diff > RESET_SLEEP_TIME_MS) {
+            printf("Resetting due to long sleep of %dms\n", diff);
+            good_sleep_done = false;
+        } else if (diff < TOLERANCE_MS) {
+            printf("Ignoring sleep of %dms\n", diff);
+        } else if (good_sleep_done && (diff < MIN_SLEEP_TIME_MS || diff > MAX_SLEEP_TIME_MS)) {
             printf("ERROR: Was asleep for %dms, expected between %dms and %dms\n", diff, MIN_SLEEP_TIME_MS, MAX_SLEEP_TIME_MS);
         } else if (diff >= MIN_SLEEP_TIME_MS && diff <= MAX_SLEEP_TIME_MS){
             printf("Was asleep for %dms\n", diff);
             good_sleep_done = true;
+        } else {
+            printf("Ignoring sleep of %dms as haven't had good sleep yet\n", diff);
         }
     }
 }
