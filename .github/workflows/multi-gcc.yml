@@ -5,7 +5,12 @@ on:
   push:
     branches:
       - 'master'
+      - 'develop'
       - 'test_workflow'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
