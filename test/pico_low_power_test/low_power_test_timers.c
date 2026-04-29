@@ -263,7 +263,7 @@ int main() {
     gpio_put(SLEEP_MONITOR_PIN, 1);
     // check the system timer was stopped while dormant
     diff = absolute_time_diff_us(system_time_before, get_absolute_time());
-    if (diff > 50 * 1000 // 50ms
+    if (diff > 200 * 1000 // 200ms
         #ifdef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
         + (PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS * 1000)
         #endif
