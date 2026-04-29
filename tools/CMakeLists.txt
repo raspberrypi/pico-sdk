@@ -740,8 +740,8 @@ function(picotool_postprocess_binary TARGET)
         # Encryption
         if (picotool_aesfile AND picotool_ivfile)
             get_target_property(enc_no_clear ${TARGET} PICOTOOL_ENC_NO_CLEAR)
-            if (NOT enc_no_clear)
-                list(APPEND picotool_encrypt_args "--clear")
+            if (enc_no_clear)
+                list(APPEND picotool_encrypt_args "--no-clear")
             endif()
 
             get_target_property(picotool_embed_decryption ${TARGET} PICOTOOL_EMBED_DECRYPTION)
