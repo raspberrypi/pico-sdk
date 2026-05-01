@@ -97,23 +97,15 @@
 // PICO_CONFIG: PICO_RUNTIME_NO_INIT_PSRAM, Do not include SDK implementation of `runtime_init_psram` function, type=bool, default=1 if PICO_PSRAM_SIZE_BYTES is not set, group=pico_runtime_init
 
 #ifndef PICO_RUNTIME_INIT_PSRAM
-#define PICO_RUNTIME_INIT_PSRAM                 "11001"
+#define PICO_RUNTIME_INIT_PSRAM                 "11080"
 #endif
 
 #ifndef PICO_RUNTIME_SKIP_INIT_PSRAM
-#if defined(PICO_PSRAM_SIZE_BYTES) || PICO_AUTO_DETECT_PSRAM_SIZE
 #define PICO_RUNTIME_SKIP_INIT_PSRAM 0
-#else
-#define PICO_RUNTIME_SKIP_INIT_PSRAM 1
-#endif
 #endif
 
 #ifndef PICO_RUNTIME_NO_INIT_PSRAM
-#if defined(PICO_PSRAM_SIZE_BYTES) || PICO_AUTO_DETECT_PSRAM_SIZE
 #define PICO_RUNTIME_NO_INIT_PSRAM 0
-#else
-#define PICO_RUNTIME_NO_INIT_PSRAM 1
-#endif
 #endif
 
 #ifdef __cplusplus

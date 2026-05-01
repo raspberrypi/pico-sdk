@@ -194,11 +194,6 @@ int psram_configure_params(uint32_t max_psram_freq, uint32_t max_select_ns, uint
     uint32_t max_select = ((uint64_t)max_select_ns * 1000000ull) / (64ull * (uint64_t)clock_period_fs);  // 1ns = 1000000fs
     uint32_t min_deselect = (min_deselect_ns * 1000000 + (clock_period_fs - 1)) / clock_period_fs - (divisor + 1) / 2;
 
-#if PICO_RP2350_A2_SUPPORTED
-    // Workaround for RP2350-E14, where the bootrom only does this for GPIO 0 instead of the correct CS pin
-    hw_clear_bits(&pads_bank0_hw->io[flash_devinfo_get_cs_gpio(1)], PADS_BANK0_GPIO0_ISO_BITS);
-#endif
-
     return psram_set_params(divisor, rxdelay, max_select, min_deselect);
 }
 
@@ -276,6 +271,11 @@ int psram_reinitialise(void) {
     // psram_configure_params must have been called to set the parameters
     invalid_params_if_and_return(HARDWARE_PSRAM, psram_divisor == 0, PICO_ERROR_PRECONDITION_NOT_MET);
 
+#if PICO_RP2350_A2_SUPPORTED
+    // Workaround for RP2350-E14, where the bootrom only does this for GPIO 0 instead of the correct CS pin
+    hw_clear_bits(&pads_bank0_hw->io[flash_devinfo_get_cs_gpio(1)], PADS_BANK0_GPIO0_ISO_BITS);
+#endif
+
     // Register the function to initialise the QMI CS1 configuration
     flash_set_qmi_cs1_setup_function(psram_initialise_internal);
 
@@ -300,12 +300,16 @@ size_t psram_get_size(void) {
 
 #if !PICO_RUNTIME_NO_INIT_PSRAM
 void runtime_init_setup_psram(void) {
-    // Setup flash_devinfo from compile definitions
-    #if defined(PICO_PSRAM_SIZE_BYTES) && !PICO_AUTO_DETECT_PSRAM_SIZE
-    flash_devinfo_set_cs_size(1, flash_devinfo_bytes_to_size(PICO_PSRAM_SIZE_BYTES));
-    #endif
+    // Setup flash_devinfo from compile definitions if it is unset
     #if defined(PICO_PSRAM_CS_PIN) && !PICO_AUTO_DETECT_PSRAM_CS
-    flash_devinfo_set_cs_gpio(1, PICO_PSRAM_CS_PIN);
+    if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {
+        flash_devinfo_set_cs_gpio(1, PICO_PSRAM_CS_PIN);
+    }
+    #endif
+    #if defined(PICO_PSRAM_SIZE_BYTES) && !PICO_AUTO_DETECT_PSRAM_SIZE
+    if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {
+        flash_devinfo_set_cs_size(1, flash_devinfo_bytes_to_size(PICO_PSRAM_SIZE_BYTES));
+    }
     #endif
 
     #if PICO_AUTO_DETECT_PSRAM_SIZE
@@ -331,18 +335,34 @@ void runtime_init_setup_psram(void) {
     }
     #endif
 
-    if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {
-        // No PSRAM present, so setup PSRAM to bus fault if there are variables in it
-        extern uint32_t __psram_start__;
-        extern uint32_t __psram_end__;
-        uint32_t psram_words = (uint32_t)(&__psram_end__ - &__psram_start__);
-        if (psram_words > 0) {
-            // Clear ATRANS to trigger bus faults on PSRAM accesses
-            for (int i=4; i < 8; i++) {
-                qmi_hw->atrans[i] = 0;
-            }
+    has_psram = flash_devinfo_get_cs_size(1) != FLASH_DEVINFO_SIZE_NONE;
+
+    static_assert(FLASH_DEVINFO_SIZE_MAX == FLASH_DEVINFO_SIZE_16M, "expected max region size of 16M");
+    extern uint32_t __psram_start__;
+    extern uint32_t __psram_end__;
+    uint32_t psram_words = (uint32_t)(&__psram_end__ - &__psram_start__);
+    if (psram_words > (flash_devinfo_size_to_bytes(flash_devinfo_get_cs_size(1)) >> 2)) { // >>2 is /4, for words
+        // Setup to bus fault for variables that don't fit in available PSRAM
+        flash_devinfo_size_t psram_size = flash_devinfo_get_cs_size(1);
+        int clear_start = 8; // Clear no regions by default
+        if (psram_size == FLASH_DEVINFO_SIZE_NONE) {
+            clear_start = 4; // Clear all PSRAM regions
+        } else if (psram_size < FLASH_DEVINFO_SIZE_4M) {
+            clear_start = 5; // Clear last 3x 4M regions
+            // And reduce size of first PSRAM region
+            qmi_hw->atrans[4] = (1u << psram_size) << QMI_ATRANS4_SIZE_LSB; // units are 4 kiB
+        } else if (psram_size == FLASH_DEVINFO_SIZE_4M) {
+            clear_start = 5; // Clear last 3x 4M regions
+        } else if (psram_size == FLASH_DEVINFO_SIZE_8M) {
+            clear_start = 6; // Clear last 2x 4M regions
         }
-        has_psram = false;
+
+        for (int i = clear_start; i < 8; i++) {
+            qmi_hw->atrans[i] = 0;
+        }
+    }
+
+    if (!has_psram) {
         return;
     }
 
@@ -366,6 +386,11 @@ void runtime_init_setup_psram(void) {
     extern uint32_t __psram_load_end__;
     uint32_t stored_words = (uint32_t)(&__psram_load_end__ - &__psram_load_start__);
     if (stored_words > 0) {
+        if (stored_words > (flash_devinfo_size_to_bytes(flash_devinfo_get_cs_size(1)) >> 2)) {
+            // Only copy into available PSRAM, to avoid triggering bus faults here,
+            // they will be triggered later when the variable is accessed
+            stored_words = flash_devinfo_size_to_bytes(flash_devinfo_get_cs_size(1)) >> 2;
+        }
         memcpy(&__psram_load_start__, &__psram_load_source__, stored_words * sizeof(uint32_t));
     }
 }

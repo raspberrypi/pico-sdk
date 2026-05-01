@@ -51,6 +51,13 @@ uint32_t dma_from = 0xaaaa5555;
 #ifdef FIXED_PSRAM_SIZE
 int __psram("foo") foo_psram = 23;
 char __psram_uninitialised("bar") bar_psram[0x8000];
+#ifdef TINY_PSRAM
+void make_tiny_psram(void) {
+    // Override flash_devinfo cs size to be tiny, so bar_psram doesn't fit in it
+    flash_devinfo_set_cs_size(1, FLASH_DEVINFO_SIZE_8K);
+}
+PICO_RUNTIME_INIT_FUNC_RUNTIME(make_tiny_psram, "11000");
+#endif
 #endif
 
 void __noinline spiggle(void) {
@@ -173,38 +180,45 @@ int main(void) {
     } else {
         printf("PSRAM not available\n");
     }
-#elif PICO_AUTO_DETECT_PSRAM_SIZE
+#elif !PICO_RP2040
     if (psram_is_available()) {
         printf("PSRAM is available, size = 0x%x\n", psram_get_size());
-        char *bar_psram = (char*)(XIP_BASE + 0x01000000);
-        size_t bar_psram_size = psram_get_size();
-        memset(bar_psram, 0x55, bar_psram_size);
-        printf("bar_psram = %02x\n", bar_psram[0]);
-        if (bar_psram[0] != 0x55) {
-            printf("ERROR: bar_psram = %02x\n", bar_psram[0]);
+        size_t psram_size = psram_get_size();
+        // Fill each half with different data, to check wrapping isn't ocurring
+        char *foo_psram = (char*)(XIP_BASE + 0x01000000);
+        size_t foo_psram_size = psram_size / 2;
+        char *bar_psram = foo_psram + foo_psram_size;
+        size_t bar_psram_size = foo_psram_size;
+        memset(foo_psram, 0x55, foo_psram_size);
+        memset(bar_psram, 0xab, bar_psram_size);
+        printf("foo_psram = %02x, bar_psram = %02x\n", foo_psram[0], bar_psram[0]);
+        if (foo_psram[0] != 0x55 || bar_psram[0] != 0xab) {
+            printf("ERROR: foo_psram = %02x, bar_psram = %02x\n", foo_psram[0], bar_psram[0]);
         }
         // Make sure the write actually went to PSRAM
         xip_cache_clean_all();
         xip_cache_invalidate_all();
-        if (bar_psram[0] != 0x55) {
-            printf("ERROR: after flush bar_psram = %02x\n", bar_psram[0]);
+        if (foo_psram[0] != 0x55 || bar_psram[0] != 0xab) {
+            printf("ERROR: after flush foo_psram = %02x, bar_psram = %02x\n", foo_psram[0], bar_psram[0]);
         }
         // Check PSRAM still works after flash functions
         flash_range_erase(PICO_FLASH_SIZE_BYTES - FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE);
-        if (bar_psram[0] != 0x55) {
-            printf("ERROR: after erase bar_psram = %02x\n", bar_psram[0]);
+        if (foo_psram[0] != 0x55 || bar_psram[0] != 0xab) {
+            printf("ERROR: after erase foo_psram = %02x, bar_psram = %02x\n", foo_psram[0], bar_psram[0]);
         }
-        bar_psram[0] = 0xab;
-        memset(bar_psram, 0xab, bar_psram_size);
+        memset(foo_psram, 0xac, foo_psram_size);
+        memset(bar_psram, 0x56, bar_psram_size);
         // Make sure the write actually went to PSRAM
         xip_cache_clean_all();
         xip_cache_invalidate_all();
-        printf("bar_psram = %02x\n", bar_psram[0]);
-        if (bar_psram[0] != 0xab) {
+        printf("foo_psram = %02x, bar_psram = %02x\n", foo_psram[0], bar_psram[0]);
+        if (foo_psram[0] != 0xac || bar_psram[0] != 0x56) {
             printf("ERROR: after program bar_psram = %02x\n", bar_psram[0]);
         }
     } else {
+    #if PICO_AUTO_DETECT_PSRAM  // Only printout when trying to autodetect
         printf("PSRAM not available\n");
+    #endif
     }
 #endif
 
