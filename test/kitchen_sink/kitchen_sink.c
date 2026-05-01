@@ -51,10 +51,15 @@ uint32_t dma_from = 0xaaaa5555;
 #ifdef FIXED_PSRAM_SIZE
 int __psram("foo") foo_psram = 23;
 char __psram_uninitialised("bar") bar_psram[0x8000];
-#ifdef TINY_PSRAM
+#if defined(TINY_PSRAM) || defined(SMALL_PSRAM)
 void make_tiny_psram(void) {
+#if defined(TINY_PSRAM)
     // Override flash_devinfo cs size to be tiny, so bar_psram doesn't fit in it
     flash_devinfo_set_cs_size(1, FLASH_DEVINFO_SIZE_8K);
+#elif defined(SMALL_PSRAM)
+    // Override flash_devinfo cs size to be small, so bar_psram fits but int_buffer doesn't
+    flash_devinfo_set_cs_size(1, FLASH_DEVINFO_SIZE_128K);
+#endif
     // Still auto-detect CS pin, as we don't know that
     uint8_t cs_gpios[] = PICO_AVAILABLE_CS1_GPIOS;
     psram_detect_cs_and_size(cs_gpios, sizeof(cs_gpios));
@@ -150,6 +155,17 @@ int main(void) {
 
     printf("extra_data after load = %d\n", extra_data);
 #endif
+#endif
+
+#if PICO_PSRAM_SIZE_BYTES
+    psram_or_malloc("z0000", char, char_buffer, 0x8000);
+    memset(char_buffer, 0x55, 0x8000);
+    printf("char_buffer in %s at %p\n", char_buffer < (char*)SRAM_BASE ? "PSRAM" : "Normal SRAM", char_buffer);
+    psram_or_free(char_buffer);
+    psram_or_malloc("z0001", int, int_buffer, 0x8000);
+    memset(int_buffer, 0x55, 0x8000 * sizeof(int));
+    printf("int_buffer in %s at %p\n", int_buffer < (int*)SRAM_BASE ? "PSRAM" : "Normal SRAM", int_buffer);
+    psram_or_free(int_buffer);
 #endif
 
 #ifdef FIXED_PSRAM_SIZE

@@ -220,6 +220,22 @@ int psram_reinitialise(void);
  */
 size_t psram_eid_to_size(uint8_t kgd, uint8_t eid);
 
+/*! \brief Provide a static PSRAM allocation, or malloc if PSRAM is not available
+ *  \ingroup hardware_psram
+ *
+ * This will allocate a static buffer in PSRAM and if available use that, otherwise it will use the heap.
+ * 
+ * This will fail to compile if PICO_PSRAM_SIZE_BYTES is not set
+ */
+#define psram_or_malloc(group, type, var, size) static type __psram_uninitialised(group) var##_psram[size]; type* var; if (psram_check_address(var##_psram + size)) { var = (type*)var##_psram; } else { var = (type*)malloc(size * sizeof(type)); }
+
+/*! \brief Free a buffer if it is not in PSRAM
+ *  \ingroup hardware_psram
+ *
+ * This will free the buffer from \ref psram_or_malloc if it was created by malloc
+ */
+#define psram_or_free(var) if (!psram_check_address(var##_psram)) { free(var); }
+
 #ifdef __cplusplus
 }
 #endif
