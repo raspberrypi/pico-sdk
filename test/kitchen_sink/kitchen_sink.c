@@ -17,7 +17,7 @@
 #if LIB_PICO_BINARY_INFO
 #include "pico/binary_info.h"
 #endif
-#ifdef PICO_PSRAM_SIZE_BYTES
+#if !PICO_RP2040
 #include "hardware/flash.h"
 #include "hardware/psram.h"
 #include "hardware/xip_cache.h"
