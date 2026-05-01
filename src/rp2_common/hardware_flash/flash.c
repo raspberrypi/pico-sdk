@@ -261,7 +261,6 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
 //-----------------------------------------------------------------------------
 // Lower-level flash access functions
 
-#if !PICO_NO_FLASH
 // Bitbanging the chip select using IO overrides, in case RAM-resident IRQs
 // are still running, and the FIFO bottoms out. (the bootrom does the same)
 static void __no_inline_not_in_flash_func(flash_cs_force)(bool high, uint8_t cs) {
@@ -340,7 +339,6 @@ void __no_inline_not_in_flash_func(flash_do_cmd_cs)(const uint8_t *txbuf, uint8_
     flash_enable_xip_via_boot2();
     flash_restore_hardware_state(&state);
 }
-#endif
 
 // Use standard RUID command to get a unique identifier for the flash (and
 // hence the board)

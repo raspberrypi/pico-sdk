@@ -55,6 +55,9 @@ char __psram_uninitialised("bar") bar_psram[0x8000];
 void make_tiny_psram(void) {
     // Override flash_devinfo cs size to be tiny, so bar_psram doesn't fit in it
     flash_devinfo_set_cs_size(1, FLASH_DEVINFO_SIZE_8K);
+    // Still auto-detect CS pin, as we don't know that
+    uint8_t cs_gpios[] = PICO_AVAILABLE_CS1_GPIOS;
+    psram_detect_cs_and_size(cs_gpios, sizeof(cs_gpios));
 }
 PICO_RUNTIME_INIT_FUNC_RUNTIME(make_tiny_psram, "11000");
 #endif

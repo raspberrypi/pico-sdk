@@ -129,6 +129,13 @@ bool psram_is_available(void);
  */
 size_t psram_get_size(void);
 
+/*! \brief Check if an address is in available PSRAM
+ *  \ingroup hardware_psram
+ *
+ * \return true if the address is in available PSRAM, false otherwise
+ */
+bool psram_check_address(void* addr);
+
 /*! \brief Detect PSRAM size
  *  \ingroup hardware_psram
  *

@@ -298,6 +298,15 @@ size_t psram_get_size(void) {
     return flash_devinfo_size_to_bytes(flash_devinfo_get_cs_size(1));
 }
 
+bool psram_check_address(void* addr) {
+    uint32_t offset = (uint32_t)addr - (XIP_BASE + flash_devinfo_size_to_bytes(FLASH_DEVINFO_SIZE_MAX));
+    if (offset < psram_get_size()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 #if !PICO_RUNTIME_NO_INIT_PSRAM
 void runtime_init_setup_psram(void) {
     // Setup flash_devinfo from compile definitions if it is unset
