@@ -273,12 +273,12 @@ cc_binary(
     name = "kitchen_sink_psram_actual",
     testonly = True,
     srcs = ["kitchen_sink.c"],
-    tags = ["manual"],  # Built via kitchen_sink_psram
-    deps = [":kitchen_sink_common"],
     defines = [
         "PICO_AUTO_DETECT_PSRAM=1",
         'PICO_PSRAM_SIZE_BYTES="(8 * 1024 * 1024)"',
-    ]
+    ],
+    tags = ["manual"],  # Built via kitchen_sink_psram
+    deps = [":kitchen_sink_common"],
 )
 
 generated_pico_psram_region(
@@ -288,6 +288,9 @@ generated_pico_psram_region(
 
 cc_library(
     name = "kitchen_sink_psram_linker_script",
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
     deps = [
         "//test/kitchen_sink:8M_psram_region",
         "//src/rp2_common/pico_standard_link:default_linker_script",
