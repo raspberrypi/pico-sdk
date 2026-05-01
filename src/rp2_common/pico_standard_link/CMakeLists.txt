@@ -101,6 +101,18 @@ if (NOT TARGET pico_standard_link)
         set_property(TARGET ${TARGET} APPEND PROPERTY PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS "${PATH}")
     endfunction()
 
+    # pico_override_flash_size(TARGET FLASH_SIZE)
+    # \brief\ Override the FLASH size for a given target
+    #
+    # \param\ TARGET The target to override the FLASH size for
+    # \param\ FLASH_SIZE The FLASH size to set for the target
+    function(pico_override_flash_size TARGET FLASH_SIZE)
+        set(PICO_FLASH_SIZE_BYTES_STRING "${FLASH_SIZE}")
+        configure_file(${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/pico_flash_region.template.ld ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}/pico_flash_region.ld)
+        pico_add_linker_script_override_path(${TARGET} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET})
+        target_compile_definitions(${TARGET} PRIVATE "PICO_FLASH_SIZE_BYTES=${FLASH_SIZE}")
+    endfunction()
+
     # pico_override_psram_size(TARGET PSRAM_SIZE)
     # \brief\ Override the PSRAM size for a given target
     #

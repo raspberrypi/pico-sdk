@@ -172,6 +172,18 @@ if (NOT PICO_RP2040)
     pico_add_extra_outputs(kitchen_sink_psram_detect)
     target_compile_definitions(kitchen_sink_psram_detect PRIVATE KITCHEN_SINK_ID="psram detect size binary")
     set_target_properties(kitchen_sink_psram_fixed PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
+
+    add_executable(kitchen_sink_psram_flash_fixed ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    target_link_libraries(kitchen_sink_psram_flash_fixed kitchen_sink_libs kitchen_sink_options)
+    target_compile_definitions(kitchen_sink_psram_flash_fixed PRIVATE FIXED_PSRAM_SIZE=1)
+    # Override the FLASH and PSRAM size to check overriding works
+    # variables in PSRAM, and auto-detect at runtime if PSRAM is present.
+    target_compile_definitions(kitchen_sink_psram_flash_fixed PRIVATE PICO_AUTO_DETECT_PSRAM=1)
+    pico_override_flash_size(kitchen_sink_psram_flash_fixed "(1 * 1024 * 1024)")
+    pico_override_psram_size(kitchen_sink_psram_flash_fixed "(1 * 1024 * 1024)")
+    pico_add_extra_outputs(kitchen_sink_psram_flash_fixed)
+    target_compile_definitions(kitchen_sink_psram_flash_fixed PRIVATE KITCHEN_SINK_ID="psram and flash fixed size binary")
+    set_target_properties(kitchen_sink_psram_flash_fixed PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
 endif()
 
 if (TARGET hardware_pio)
