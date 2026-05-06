@@ -63,7 +63,7 @@ float __attribute__((noinline)) foox(float x, float b) {
     return x * b;
 }
 
-uint __noinline const_funcs_returning_int(float x, int n) {
+uint __noinline const_funcs_returning_int(__unused float x, int n) {
     return __fast_mul(n, 7)
 #if PICO_FLOAT_HAS_FLOAT_TO_FIX32_M_CONVERSIONS
            + float2fix(x, 7)
@@ -76,7 +76,7 @@ uint __noinline const_funcs_returning_int(float x, int n) {
         ;
 }
 
-uint __noinline non_const_funcs_returning_int(float x, int n) {
+uint __noinline non_const_funcs_returning_int(__unused float x, int n) {
     return __fast_mul(n, n)
 #if PICO_FLOAT_HAS_FLOAT_TO_FIX32_M_CONVERSIONS
            + float2fix(x, n)
