@@ -63,10 +63,28 @@ def check_buildifier() -> int:
 
     proc = run_bazel(args, check=False, capture_output=True, text=True)
 
+    error_files = []
+    reformat_files = []
+    for line in proc.stderr.splitlines():
+        if SDK_ROOT in line:
+            parts = line.split(maxsplit=1)
+            file = parts[0].replace(SDK_ROOT, "")
+            error = parts[1]
+            if error == "# reformat":
+                reformat_files.append(file)
+            else:
+                error_files.append(line.replace(SDK_ROOT, ""))
+
     if proc.returncode != 0:
         _LOG.error("ERROR: One or more buildifier checks failed.")
-        print_to_stderr("\nTo automatically fix formatting issues in a file, run:")
-        print_to_stderr("  bazel run @buildifier_prebuilt//:buildifier -- <file>")
+        if len(error_files):
+            print_to_stderr("\n{}".format("\n".join(error_files)))
+        if len(reformat_files):
+            print_to_stderr("\nThese files require reformatting:\n  {}".format("\n  ".join(reformat_files)))
+            print_to_stderr("\nTo automatically fix formatting issues in the files requiring reformatting, run:")
+            print_to_stderr(
+                f"  bazel run @buildifier_prebuilt//:buildifier -- $(pwd){' $(pwd)'.join(reformat_files)}"
+            )
         print_to_stderr("\nTo run the checks manually on a file, run:")
         print_to_stderr(
             "  bazel run @buildifier_prebuilt//:buildifier -- --mode=check --lint=warn <file>\n"
