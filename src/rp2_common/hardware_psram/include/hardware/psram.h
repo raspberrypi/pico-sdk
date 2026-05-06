@@ -78,7 +78,7 @@
 #define PICO_DEFAULT_PSRAM_ID 0x5D
 #endif
 
-// PICO_CONFIG: PICO_DEFAULT_PSRAM_MAX_FREQ, Default max frequency of psram, type=int, default=133000000, group=hardware_psram
+// PICO_CONFIG: PICO_DEFAULT_PSRAM_MAX_FREQ, Default max frequency of psram, type=int, default=133 * MHZ, group=hardware_psram
 #ifndef PICO_DEFAULT_PSRAM_MAX_FREQ
 #define PICO_DEFAULT_PSRAM_MAX_FREQ 133 * MHZ
 #endif
