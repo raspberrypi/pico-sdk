@@ -83,6 +83,16 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (8 * 1024 * 1024))
 #define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
 #endif
 
+// --- PSRAM ---
+#ifndef PICO_PSRAM_CS_PIN
+#define PICO_PSRAM_CS_PIN 8
+#endif
+
+// Only some boards have PSRAM fitted, so auto-detect
+#ifndef PICO_AUTO_DETECT_PSRAM_SIZE
+#define PICO_AUTO_DETECT_PSRAM_SIZE 1
+#endif
+
 pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
