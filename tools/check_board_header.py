@@ -37,10 +37,24 @@ chip_interfaces = {
     'RP2350B': "src/rp2350/rp2350b_interface_pins.json",
 }
 
-compulsory_cmake_settings = set(['PICO_PLATFORM'])
-compulsory_cmake_default_settings = set(['PICO_FLASH_SIZE_BYTES'])
-matching_cmake_default_settings = set(['PICO_FLASH_SIZE_BYTES', 'PICO_RP2350_A2_SUPPORTED'])
-compulsory_defines = set(['PICO_FLASH_SIZE_BYTES'])
+# names for which we MUST have a pico_board_cmake_set
+compulsory_cmake_settings = frozenset(['PICO_PLATFORM'])
+
+# names for which we MUST have a pico_board_cmake_set_default
+compulsory_cmake_default_settings = frozenset(['PICO_FLASH_SIZE_BYTES'])
+
+# names for which pico_board_cmake_set_default (if present) needs a matching #define (and vice-versa)
+matching_cmake_default_settings = frozenset(['PICO_FLASH_SIZE_BYTES', 'PICO_RP2350_A2_SUPPORTED', 'PICO_PSRAM_SIZE_BYTES'])
+
+# names for which we MUST have a #define
+compulsory_defines = frozenset(['PICO_FLASH_SIZE_BYTES'])
+
+# names where the presence of one #define requires other #defines to be present too
+# (this is one-way and not bidirectional, so you'll need multiple entries for mutually-dependent #defines)
+linked_defines = {
+    'PICO_PSRAM_SIZE_BYTES': frozenset(['PICO_PSRAM_CS_PIN']),
+    'PICO_AUTO_DETECT_PSRAM_SIZE': frozenset(['PICO_PSRAM_CS_PIN']),
+}
 
 DefineType = namedtuple("DefineType", ["name", "value", "resolved_value", "lineno"])
 
@@ -456,6 +470,11 @@ else:
     for setting in compulsory_defines:
         if setting not in defines:
             errors.append(Exception("{} is missing a #define {}".format(board_header, setting)))
+    for setting in linked_defines:
+        if setting in defines:
+            for linked_define in linked_defines[setting]:
+                if linked_define not in defines:
+                    errors.append(Exception("{} defines {} but is missing a corresponding #define {}".format(board_header, setting, linked_define)))
 
 if chip is None:
     errors.append(Exception("Couldn't determine chip for {}".format(board_header)))
@@ -471,7 +490,7 @@ if not os.path.isfile(interfaces_json):
 with open(interfaces_json) as interfaces_fh:
     interface_pins = json.load(interfaces_fh)
     allowed_interfaces = interface_pins["interfaces"]
-    allowed_pins = set(interface_pins["pins"])
+    allowed_pins = frozenset(interface_pins["pins"])
     # convert instance-keys to integers (allowed by Python but not by JSON)
     for interface in allowed_interfaces:
         instances = allowed_interfaces[interface]["instances"]
@@ -548,6 +567,24 @@ for name, define in defines.items():
                 expected_function_pins = list("{}_{}_PIN".format(name, function) for function in expected_functions["one_of"])
                 if not any(func_pin in defines for func_pin in expected_function_pins):
                     errors.append(Exception("{}:{}  {} is defined but none of {} are defined".format(board_header, define.lineno, name, list_to_string_with(expected_function_pins, "or"))))
+
+    # check for invalid PSRAM CS pin
+    if name == "PICO_PSRAM_CS_PIN":
+        interface = "QMI"
+        instance_num = 0
+        function = "CS1N"
+        if interface not in allowed_interfaces:
+            errors.append(Exception("{}:{}  {} is defined but {} isn't in {}".format(board_header, define.lineno, name, interface, interfaces_json)))
+            continue
+        if instance_num not in allowed_interfaces[interface]["instances"]:
+            errors.append(Exception("{}:{}  {} is set to an invalid instance {}".format(board_header, instance_define.lineno, instance_define, instance_num)))
+            continue
+        interface_instance = allowed_interfaces[interface]["instances"][instance_num]
+        if function not in interface_instance:
+            errors.append(Exception("{}:{}  {} is defined but {} isn't a valid function for {}".format(board_header, define.lineno, name, function, instance_define)))
+            continue
+        if define.resolved_value not in interface_instance[function]:
+            errors.append(Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num)))
 
 if not has_include_guard:
     errors.append(Exception("{} has no include-guard (expected {})".format(board_header, expected_include_guard)))
