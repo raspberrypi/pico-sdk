@@ -8,6 +8,7 @@
 #define _HARDWARE_PSRAM_H
 
 #include "pico.h"
+#include "hardware/clocks.h"
 #include "hardware/flash.h"
 
 /** \file psram.h
@@ -52,7 +53,7 @@
 #define PICO_AUTO_DETECT_PSRAM_SIZE PICO_AUTO_DETECT_PSRAM
 #endif
 
-// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS, automatically detect psram chip select pin, default=PICO_AUTO_DETECT_PSRAM, group=hardware_psram
+// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS, automatically detect psram chip select pin, type=bool, default=PICO_AUTO_DETECT_PSRAM, group=hardware_psram
 #ifndef PICO_AUTO_DETECT_PSRAM_CS
 #define PICO_AUTO_DETECT_PSRAM_CS PICO_AUTO_DETECT_PSRAM
 #elif PICO_AUTO_DETECT_PSRAM_CS && !PICO_AUTO_DETECT_PSRAM_SIZE
@@ -79,22 +80,22 @@
 
 // PICO_CONFIG: PICO_DEFAULT_PSRAM_MAX_FREQ, Default max frequency of psram, type=int, default=133000000, group=hardware_psram
 #ifndef PICO_DEFAULT_PSRAM_MAX_FREQ
-#define PICO_DEFAULT_PSRAM_MAX_FREQ 133000000
+#define PICO_DEFAULT_PSRAM_MAX_FREQ 133 * MHZ
 #endif
 
-// PICO_CONFIG: PICO_DEFAULT_PSRAM_MAX_SELECT, Default max select time in ns of psram, type=int, default=8000, group=hardware_psram
+// PICO_CONFIG: PICO_DEFAULT_PSRAM_MAX_SELECT, Default max select time of psram in ns, type=int, default=8000, group=hardware_psram
 #ifndef PICO_DEFAULT_PSRAM_MAX_SELECT
 #define PICO_DEFAULT_PSRAM_MAX_SELECT 8000
 #endif
 
-// PICO_CONFIG: PICO_DEFAULT_PSRAM_MIN_DESELECT, Default min deselect time in ns of psram, type=int, default=18, group=hardware_psram
+// PICO_CONFIG: PICO_DEFAULT_PSRAM_MIN_DESELECT, Default min deselect time of psram in ns, type=int, default=18, group=hardware_psram
 #ifndef PICO_DEFAULT_PSRAM_MIN_DESELECT
 #define PICO_DEFAULT_PSRAM_MIN_DESELECT 18
 #endif
 
 
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_PSRAM, Skip calling of `runtime_init_psram` function during runtime init, type=bool, default=1 if PICO_PSRAM_SIZE_BYTES is not set, group=pico_runtime_init
-// PICO_CONFIG: PICO_RUNTIME_NO_INIT_PSRAM, Do not include SDK implementation of `runtime_init_psram` function, type=bool, default=1 if PICO_PSRAM_SIZE_BYTES is not set, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_PSRAM, Skip calling of `runtime_init_psram` function during runtime init, type=bool, default=0, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_NO_INIT_PSRAM, Do not include SDK implementation of `runtime_init_psram` function, type=bool, default=0, group=pico_runtime_init
 
 #ifndef PICO_RUNTIME_INIT_PSRAM
 #define PICO_RUNTIME_INIT_PSRAM                 "11080"
@@ -112,10 +113,10 @@
 extern "C" {
 #endif
 
-/*! \brief Check if PSRAM is initialised
+/*! \brief Check if PSRAM is available and initialised
  *  \ingroup hardware_psram
  *
- * \return true if PSRAM is initialised, false otherwise
+ * \return true if PSRAM is available and initialised, false otherwise
  */
 bool psram_is_available(void);
 
@@ -142,8 +143,8 @@ bool psram_check_address(void* addr);
  * This will read the ID of the PSRAM chip and return the size based on the ID.
  *
  * You must configure the GPIO function for the CS pin before calling this function,
- * and should also configure the GPIO in flash_devinfo to prevent toggling of the
- * previously configured GPIO (usually 0, so prints invalid characters to UART).
+ * and should also configure the CS GPIO in flash_devinfo to prevent toggling of the
+ * previously configured GPIO (usually 0, so prints invalid characters to default UART).
  *
  * \return size of PSRAM, or 0 if none found
  */
@@ -200,7 +201,7 @@ int psram_set_params(uint32_t divisor, uint32_t rxdelay, uint32_t max_select, ui
  * This calls \ref flash_start_xip internally, so will reset any QSPI pads changes you have made.
  *
  * \return PICO_OK on success, PICO_ERROR_PRECONDITION_NOT_MET if the PSRAM size is not set in
- * flash_devinfo or the PSRAM parameters are not set by \ref psram_configure_params
+ * flash_devinfo or the PSRAM parameters are not set by \ref psram_configure_params or \ref psram_set_params
  */
 int psram_reinitialise(void);
 

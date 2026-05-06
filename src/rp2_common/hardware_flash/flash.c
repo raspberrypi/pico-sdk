@@ -283,6 +283,7 @@ static void __no_inline_not_in_flash_func(flash_cs_force)(bool high, uint8_t cs)
 }
 
 void __no_inline_not_in_flash_func(flash_do_cmd_cs)(const uint8_t *txbuf, uint8_t *rxbuf, size_t count, uint8_t cs) {
+    invalid_params_if(HARDWARE_FLASH, cs > 1);
     rom_connect_internal_flash_fn connect_internal_flash_func = (rom_connect_internal_flash_fn)rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
     rom_flash_exit_xip_fn flash_exit_xip_func = (rom_flash_exit_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
     rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
