@@ -19,7 +19,7 @@
  * Note some of these functions are *unsafe* if you are using both cores, and the other
  * is executing from flash or psram concurrently with the operation. In this case, you
  * must perform your own synchronisation to make sure that no XIP accesses take
- * place during flash programming. One option is to use the
+ * place while running these functions. One option is to use the
  * \ref multicore_lockout functions.
  *
  * Likewise they are *unsafe* if you have interrupt handlers or an interrupt
@@ -67,7 +67,11 @@
 
 #if PICO_AUTO_DETECT_PSRAM_CS
 #if PICO_RP2350
+#if PICO_RP2350A
+#define PICO_AVAILABLE_CS1_GPIOS {0, 8, 19}
+#else
 #define PICO_AVAILABLE_CS1_GPIOS {0, 8, 19, 47}
+#endif
 #else
 #error "PICO_AVAILABLE_CS1_GPIOS must be defined for this platform to use PICO_AUTO_DETECT_PSRAM_CS"
 #endif
