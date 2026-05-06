@@ -38,6 +38,7 @@ cc_library(
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
+        "pico_runtime_init_extra_link",
         "//src/common/pico_base_headers",
         "//src/rp2_common:hardware_structs",
         "//src/rp2_common:pico_platform_internal",
@@ -48,7 +49,6 @@ cc_library(
         "//src/rp2_common/hardware_vreg",
         "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_runtime",
-        "pico_runtime_init_extra_link",
     ],
     alwayslink = True,
 )

@@ -9,9 +9,9 @@ cc_library(
     hdrs = ["low_power_test_common.h"],
     includes = ["."],
     deps = [
-        "//src/rp2_common/pico_stdlib",
         "//src/rp2_common/pico_low_power",
         "//src/rp2_common/pico_status_led",
+        "//src/rp2_common/pico_stdlib",
     ],
 )
 
