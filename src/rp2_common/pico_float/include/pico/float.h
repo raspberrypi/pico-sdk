@@ -357,8 +357,8 @@ uint64_t float2ufix64(float f, int e);
 // or call the original function
 #if PICO_FLOAT_HAS_FIX32_TO_FLOAT_CONVERSIONS
 // a bit of a hack to inline VFP fixed-point conversion when exponent is constant and in range 1-32
-#define fix2float(m, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _fix2float_inline(m, e) : fix2 ## float(m, e), fix2 ## float(m, e))
-#define ufix2float(m, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _ufix2float_inline(m, e) : ufix2 ## float(m, e), ufix2 ## float(m, e))
+#define fix2float(m, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _fix2float_inline(m, e) : fix2 ## float(m, e))
+#define ufix2float(m, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _ufix2float_inline(m, e) : ufix2 ## float(m, e))
 
 #define _fix2float_inline(m, e) ({ \
     int32_t _m = m; \
@@ -385,8 +385,8 @@ uint64_t float2ufix64(float f, int e);
 
 #endif
 #if PICO_FLOAT_HAS_FLOAT_TO_FIX32_Z_CONVERSIONS
-#define float2fix_z(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _float2fix_z_inline(f, e) : float2 ## fix_z(f, e), float2 ## fix_z(f, e))
-#define float2ufix_z(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _float2ufix_z_inline(f, e) : float2 ## ufix_z(f, e), float2 ## ufix_z(f, e))
+#define float2fix_z(f, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _float2fix_z_inline(f, e) : float2 ## fix_z(f, e))
+#define float2ufix_z(f, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _float2ufix_z_inline(f, e) : float2 ## ufix_z(f, e))
 
 #define _float2fix_z_inline(f, e) ({ \
     int32_t _m; \
@@ -413,8 +413,8 @@ uint64_t float2ufix64(float f, int e);
 
 #endif
 #if PICO_FLOAT_HAS_FLOAT_TO_FIX32_M_CONVERSIONS
-#define float2fix(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _float2fix_inline(f, e) : float2 ## fix(f, e), float2 ## fix(f, e))
-#define float2ufix(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _float2ufix_inline(f, e) : float2 ## ufix(f, e), float2 ## ufix(f, e))
+#define float2fix(f, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _float2fix_inline(f, e) : float2 ## fix(f, e))
+#define float2ufix(f, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _float2ufix_inline(f, e) : float2 ## ufix(f, e))
 
 #define _float2fix_inline(f, e) ({ \
     union { float _f; int32_t _i; } _u; \

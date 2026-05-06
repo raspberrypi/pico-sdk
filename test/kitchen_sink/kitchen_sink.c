@@ -63,6 +63,30 @@ float __attribute__((noinline)) foox(float x, float b) {
     return x * b;
 }
 
+uint __noinline const_funcs_returning_int(float x, int n) {
+    return float2fix_z(x, 7) +
+           float2fix(x, 7) +
+           float2ufix_z(x, 7) +
+           float2ufix(x, 7) +
+           __fast_mul(n, 7);
+}
+
+uint __noinline non_const_funcs_returning_int(float x, int n) {
+    return float2fix_z(x, n) +
+           float2fix(x, n) +
+           float2ufix_z(x, n) +
+           float2ufix(x, n) +
+           __fast_mul(n, n);
+}
+
+float __noinline const_funcs_returning_float(int n) {
+    return fix2float(n, 7) + ufix2float(n, 7);
+}
+
+float __noinline non_const_funcs_returning_float(int n) {
+    return fix2float(n, n) + ufix2float(n, n);
+}
+
 void svc_call(void) {
     puts("PASSED");
     exit(0);
@@ -93,6 +117,8 @@ int main(void) {
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     printf("%f\n", foox(1.3f, 2.6f));
+    printf("%u %u\n", const_funcs_returning_int(3.7f, 7), non_const_funcs_returning_int(3.7f, 7));
+    printf("%f %f\n", const_funcs_returning_float(7), non_const_funcs_returning_float(7));
 #ifdef EXTRA_DATA_SECTION
     extern uint32_t __extra_end_variable__;
     printf("__extra_end_variable__ = %p\n", (void *)&__extra_end_variable__);
