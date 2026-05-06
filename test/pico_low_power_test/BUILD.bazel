@@ -1,0 +1,56 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "low_power_test_common",
+    hdrs = ["low_power_test_common.h"],
+    includes = ["."],
+    deps = [
+        "//src/rp2_common/pico_stdlib",
+        "//src/rp2_common/pico_low_power",
+        "//src/rp2_common/pico_status_led",
+    ],
+)
+
+cc_binary(
+    name = "low_power_test_timers",
+    testonly = True,
+    srcs = ["low_power_test_timers.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "low_power_test_common",
+    ],
+)
+
+cc_binary(
+    name = "low_power_test_gpio",
+    testonly = True,
+    srcs = ["low_power_test_gpio.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "low_power_test_common",
+    ],
+)
+
+cc_binary(
+    name = "low_power_test_simple",
+    testonly = True,
+    srcs = ["low_power_test_simple.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "low_power_test_common",
+    ],
+)
+
+cc_binary(
+    name = "external_sleep_timer",
+    testonly = True,
+    srcs = ["external_sleep_timer.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "low_power_test_common",
+    ],
+)

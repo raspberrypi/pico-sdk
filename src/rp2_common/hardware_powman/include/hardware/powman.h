@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include "hardware/structs/powman.h"
+#include "pico/util/fixed_bitset.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,14 +27,21 @@ extern "C" {
 #define PARAM_ASSERTIONS_ENABLED_HARDWARE_POWMAN 0
 #endif
 
+// PICO_CONFIG: PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP, Use the OTP calibration value for the low power oscillator frequency, type=bool, default=1, group=hardware_powman
+#ifndef PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP
+#define PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP 1
+#endif
+
 /*! \brief Use the ~32KHz low power oscillator as the powman timer source
  *  \ingroup hardware_powman
+ *  \note The frequency is set to the value stored in the OTP, or the reset value if
+ *  there is no OTP value set or PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP is 0
  */
 void powman_timer_set_1khz_tick_source_lposc(void);
 
 /*! \brief Use the low power oscillator (specifying frequency) as the powman timer source
  *  \ingroup hardware_powman
- *  \param lposc_freq_hz specify an exact lposc freq to trim it
+ *  \param lposc_freq_hz specify an exact lposc freq to trim it, or 0 to use the reset values
  */
 void powman_timer_set_1khz_tick_source_lposc_with_hz(uint32_t lposc_freq_hz);
 
@@ -135,9 +143,20 @@ static inline bool powman_timer_is_running(void) {
 
 /*! \brief Stop the powman timer
  * \ingroup hardware_powman
+ * \note On the next start, the timer will resume from the last set time,
+ * so if you want to pause the timer and resume from the current time, you
+ * should use \ref powman_timer_pause
  */
 static inline void powman_timer_stop(void) {
     powman_clear_bits(&powman_hw->timer, POWMAN_TIMER_RUN_BITS);
+}
+
+/*! \brief Pause the powman timer
+ * \ingroup hardware_powman
+ */
+static inline void powman_timer_pause(void) {
+    powman_clear_bits(&powman_hw->timer, POWMAN_TIMER_RUN_BITS);
+    powman_timer_set_ms(powman_timer_get_ms());
 }
 
 /*! \brief Start the powman timer
@@ -167,8 +186,51 @@ enum powman_power_domains {
     POWMAN_POWER_DOMAIN_SWITCHED_CORE = 3, ///< Switched core logic (processors, busfabric, peris etc)
     POWMAN_POWER_DOMAIN_COUNT = 4,
 };
+typedef enum powman_power_domains powman_power_domain_t;
 
 typedef uint32_t powman_power_state;
+
+typedef fixed_bitset_type(POWMAN_POWER_DOMAIN_COUNT) pstate_bitset_t;
+#define pstate_bitset_none() fixed_bitset_with_fill(pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 0)
+#define pstate_bitset_all() fixed_bitset_with_fill(pstate_bitset_t, POWMAN_POWER_DOMAIN_COUNT, 1)
+
+static inline pstate_bitset_t *pstate_bitset_remove_all(pstate_bitset_t *domains) {
+    fixed_bitset_clear_all(&domains->bitset);
+    return domains;
+}
+
+static inline pstate_bitset_t *pstate_bitset_add_all(pstate_bitset_t *domains) {
+    fixed_bitset_set_all(&domains->bitset);
+    return domains;
+}
+
+static inline pstate_bitset_t *pstate_bitset_add(pstate_bitset_t *domains, powman_power_domain_t domain) {
+    fixed_bitset_set(&domains->bitset, domain);
+    return domains;
+}
+
+static inline pstate_bitset_t *pstate_bitset_remove(pstate_bitset_t *domains, powman_power_domain_t domain) {
+    fixed_bitset_clear(&domains->bitset, domain);
+    return domains;
+}
+
+static inline bool pstate_bitset_is_set(pstate_bitset_t *domains, powman_power_domain_t domain) {
+    return fixed_bitset_get(&domains->bitset, domain);
+}
+
+static inline bool pstate_bitset_none_set(pstate_bitset_t *domains) {
+    return fixed_bitset_is_empty(&domains->bitset);
+}
+
+static inline pstate_bitset_t *pstate_bitset_from_powman_power_state(pstate_bitset_t *domains, powman_power_state pstate) {
+    static_assert(sizeof(powman_power_state) <= sizeof(uint32_t));
+    fixed_bitset_write_word(&domains->bitset, 0, pstate);
+    return domains;
+}
+
+static inline powman_power_state pstate_bitset_to_powman_power_state(pstate_bitset_t *domains) {
+    return fixed_bitset_read_word(&domains->bitset, 0);
+}
 
 /*! \brief Get the current power state
  *  \ingroup hardware_powman
@@ -180,8 +242,8 @@ powman_power_state powman_get_power_state(void);
  *
  * Check the desired state is valid. Powman will go to the state if it is valid and there are no pending power up requests.
  *
- * Note that if you are turning off the switched core then this function will never return as the processor will have
- * been turned off at the end.
+ * Note that if you are turning off the switched core then you need to call __wfi() after this function returns, otherwise
+ * the transition will not take place.
  *
  * \param state the power state to go to
  * \returns PICO_OK if the state is valid. Misc PICO_ERRORs are returned if not

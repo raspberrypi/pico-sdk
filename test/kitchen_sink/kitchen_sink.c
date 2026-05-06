@@ -14,8 +14,12 @@
 #include "hardware/exception.h"
 #include "pico/sync.h"
 #include "pico/stdlib.h"
+#include "pico/util/fixed_bitset.h"
 #if LIB_PICO_BINARY_INFO
 #include "pico/binary_info.h"
+#endif
+#if LIB_PICO_AON_TIMER
+#include "pico/aon_timer.h"
 #endif
 #if !PICO_RP2040
 #include "hardware/flash.h"
@@ -93,6 +97,14 @@ void svc_call(void) {
     exit(0);
 }
 
+#if LIB_PICO_AON_TIMER
+static bool aon_timer_done = false;
+void spoop(void) {
+    printf("XXXX YARGLE XXXX\n");
+    aon_timer_done = true;
+}
+#endif
+
 int main(void) {
     spiggle();
 
@@ -155,6 +167,18 @@ int main(void) {
 
     printf("extra_data after load = %d\n", extra_data);
 #endif
+#endif
+#if LIB_PICO_AON_TIMER
+    aon_timer_start_with_timeofday();
+    struct timespec ts;
+    ts.tv_sec = 2;
+    ts.tv_nsec = 1000000000 / 2;
+    aon_timer_enable_alarm(&ts, spoop, false);
+    while (!aon_timer_done) {
+        aon_timer_get_time(&ts);
+        printf("%ld %ld\n", (long)ts.tv_sec, ts.tv_nsec);
+        busy_wait_ms(500);
+    }
 #endif
 
 #if PICO_PSRAM_SIZE_BYTES

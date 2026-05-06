@@ -282,6 +282,21 @@ void irq_set_mask_enabled(uint32_t mask, bool enabled);
  */
 void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled);
 
+/*! \brief Get the current enabled mask on the executing core
+ *  \ingroup hardware_irq
+ *
+ * \return mask 32-bit mask with one bits set for the enabled interrupts \ref interrupt_nums
+ */
+ uint32_t irq_get_mask(void);
+
+ /*! \brief Get the current enabled mask on the executing core
+ *  \ingroup hardware_irq
+ *
+ * \param n the index of the mask to update. n == 0 means 0->31, n == 1 mean 32->63 etc.
+ * \return mask 32-bit mask with one bits set for the enabled interrupts \ref interrupt_nums
+ */
+ uint32_t irq_get_mask_n(uint n);
+
 /*! \brief  Set an exclusive interrupt handler for an interrupt on the executing core.
  *  \ingroup hardware_irq
  *

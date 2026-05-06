@@ -1,0 +1,25 @@
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_low_power",
+    srcs = ["low_power.c"],
+    hdrs = ["include/pico/low_power.h"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_time",
+        "//src/common/pico_util",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common:pico_platform",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_rosc",
+        "//src/rp2_common/hardware_xosc",
+        "//src/rp2_common/hardware_irq",
+        "//src/rp2_common/hardware_timer",
+        "//src/rp2_common/hardware_uart",
+        "//src/rp2_common/pico_aon_timer",
+        "//src/rp2_common/pico_stdio",
+    ],
+)

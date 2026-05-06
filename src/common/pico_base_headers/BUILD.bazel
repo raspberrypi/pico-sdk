@@ -118,6 +118,7 @@ cc_library(
         "//src/rp2_common/hardware_ticks:__pkg__",
         "//src/rp2_common/hardware_timer:__pkg__",
         "//src/rp2_common/hardware_watchdog:__pkg__",
+        "//src/rp2_common/hardware_rosc:__pkg__",
         "//src/rp2_common/hardware_xosc:__pkg__",
         "//src/rp2_common/pico_crt0:__pkg__",
         "//src/rp2_common/pico_platform_common:__pkg__",

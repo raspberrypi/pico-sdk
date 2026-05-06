@@ -38,6 +38,10 @@
 #define PICO_CRT0_IMAGE_TYPE_TBYB 0
 #endif
 
+#ifndef PICO_CRT0_PIN_XIP_SRAM
+#define PICO_CRT0_PIN_XIP_SRAM 0
+#endif
+
 #if PICO_CRT0_IMAGE_TYPE_TBYB
 #define CRT0_TBYB_FLAG PICOBIN_IMAGE_TYPE_EXE_TBYB_BITS
 #else
@@ -118,6 +122,16 @@ embedded_block:
 .byte 0x2
 .hword 0
 .word __vectors
+#endif
+
+#if PICO_CRT0_PIN_XIP_SRAM
+.byte PICOBIN_BLOCK_ITEM_LOAD_MAP
+.byte 0x04 // word size
+.byte 0 // pad
+.byte 0x01 // number of entries
+.word 0 // clear
+.word XIP_SRAM_BASE
+.word 0 // size
 #endif
 
 .byte PICOBIN_BLOCK_ITEM_2BS_LAST

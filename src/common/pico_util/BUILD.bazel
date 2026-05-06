@@ -6,11 +6,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "pico_util",
     srcs = [
+        "fixed_bitset.c",
         "datetime.c",
         "pheap.c",
         "queue.c",
     ],
     hdrs = [
+        "include/pico/util/fixed_bitset.h",
         "include/pico/util/datetime.h",
         "include/pico/util/pheap.h",
         "include/pico/util/queue.h",

@@ -441,3 +441,18 @@ bool check_sys_clock_khz(uint32_t freq_khz, uint *vco_out, uint *postdiv1_out, u
     }
     return false;
 }
+
+
+void clock_get_sleep_en_gate(clock_dest_bitset_t *dests) {
+    static_assert(CLOCKS_SLEEP_EN1_OFFSET == CLOCKS_SLEEP_EN0_OFFSET + 4, "");
+    for(uint i=0;i < fixed_bitset_word_size(&dests->bitset); i++) {
+        fixed_bitset_write_word(&dests->bitset, i, clocks_hw->sleep_en[i]);
+    }
+}
+
+void clock_gate_sleep_en(const clock_dest_bitset_t *dests) {
+    static_assert(CLOCKS_SLEEP_EN1_OFFSET == CLOCKS_SLEEP_EN0_OFFSET + 4, "");
+    for(uint i=0;i < fixed_bitset_word_size(&dests->bitset); i++) {
+        clocks_hw->sleep_en[i] = fixed_bitset_read_word(&dests->bitset, i);
+    }
+}
