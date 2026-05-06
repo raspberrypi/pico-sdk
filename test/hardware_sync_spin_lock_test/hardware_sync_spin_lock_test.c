@@ -220,7 +220,7 @@ int main() {
 		}
 	}
 	if (failed == 0u) {
-		printf("All tests passed.\n");
+		printf("PASSED\n");
 		return 0;
 	} else {
 		printf("%u tests failed. Review log for details.\n", failed);

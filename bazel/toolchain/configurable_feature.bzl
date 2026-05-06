@@ -1,9 +1,25 @@
+"""Rules to create configurable toolchain features."""
+
 load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
 load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 load("@rules_cc//cc/toolchains:feature.bzl", "cc_feature")
 
-def configurable_toolchain_feature(name, copts = [], cxxopts = [], linkopts = []):
+def configurable_toolchain_feature(name, copts = None, cxxopts = None, linkopts = None):
+    """Creates a configurable toolchain feature.
+
+    Configurable toolchain features are features that can be conditionally
+    enabled or disabled on a toolchain.
+
+    Args:
+        name: The name of the feature.
+        copts: C compiler flags.
+        cxxopts: C++ compiler flags.
+        linkopts: Linker flags.
+    """
     all_args = []
+    copts = copts or []
+    cxxopts = cxxopts or []
+    linkopts = linkopts or []
 
     if copts:
         cc_args(

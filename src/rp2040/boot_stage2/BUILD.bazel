@@ -58,8 +58,8 @@ cc_library(
 # Creates a config_setting for each known boot2 option with the name:
 #     PICO_DEFAULT_BOOT_STAGE2_[choice]
 declare_flag_choices(
-    "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
-    BOOT2_CHOICES,
+    choices = BOOT2_CHOICES,
+    flag = "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
 )
 
 filegroup(

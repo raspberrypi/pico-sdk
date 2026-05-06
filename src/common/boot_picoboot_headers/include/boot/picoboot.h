@@ -110,6 +110,7 @@ struct __packed picoboot_range_cmd {
 
 // remains defined for backwards compatibility with RP2350 bootrom builds
 struct __packed picoboot_exec2_cmd {
+    uint32_t dummy;
 };
 
 enum picoboot_exclusive_type {

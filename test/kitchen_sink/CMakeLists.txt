@@ -46,6 +46,7 @@ set(KITCHEN_SINK_LIBS
     pico_float
     pico_i2c_slave
     pico_int64_ops
+    pico_low_power
     pico_malloc
     pico_mem_ops
     pico_multicore
@@ -192,6 +193,12 @@ add_executable(kitchen_sink_printf_none ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c
 target_link_libraries(kitchen_sink_printf_none kitchen_sink_libs kitchen_sink_options)
 pico_add_extra_outputs(kitchen_sink_printf_none)
 pico_set_printf_implementation(kitchen_sink_printf_none none)
+set_target_properties(kitchen_sink_printf_none PROPERTIES PICO_TEST_SUCCESS_STRING "printf support is disabled")
+
+add_executable(kitchen_sink_opaque_absolute_time ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+target_link_libraries(kitchen_sink_opaque_absolute_time kitchen_sink_libs kitchen_sink_options)
+pico_add_extra_outputs(kitchen_sink_opaque_absolute_time)
+target_compile_definitions(kitchen_sink_opaque_absolute_time PRIVATE KITCHEN_SINK_ID="opaque absolute_time binary" PICO_OPAQUE_ABSOLUTE_TIME_T=1)
 
 if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
     add_executable(kitchen_sink_copy_to_ram ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)

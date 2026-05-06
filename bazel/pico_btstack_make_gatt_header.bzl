@@ -1,10 +1,12 @@
+"""Rule to generate Bluetooth GATT header files for BTstack."""
+
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cpp_toolchain", "use_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 
 def _pico_btstack_make_gatt_header_impl(ctx):
     cc_toolchain = find_cpp_toolchain(ctx)
-    feature_configuration = cc_common.configure_features(
+    cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,
         requested_features = ctx.features,

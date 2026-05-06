@@ -4,6 +4,11 @@
 
 SECTIONS
 {
+    .dummy_pre_heap (NOLOAD):
+    {
+        /* Dummy section to make sure we're back in normal RAM for the heap when HEAP_LOC isn't defined */
+        . = .;
+    } > RAM
     .heap DEFINED(HEAP_LOC) ? HEAP_LOC : . (NOLOAD):
     {
         __end__ = .;

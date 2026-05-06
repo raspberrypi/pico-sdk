@@ -178,7 +178,8 @@ if (NOT TARGET pico_standard_link)
     # if PICO_TARGET_BINARY_TYPE is set to foo on the target, otherwise ${CMAKE_CURRENT_LIST_DIR}/memmap_${PICO_DEFAULT_BINARY_TYPE).ld
     set(_LINKER_SCRIPT_EXPRESSION "$<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT>>,$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT>,${PICO_LINKER_SCRIPT_PATH}/memmap_$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,>,${PICO_DEFAULT_BINARY_TYPE},$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>.ld>")
     target_link_options(pico_standard_link INTERFACE
-        "LINKER:--script=${_LINKER_SCRIPT_EXPRESSION}"
+        # use -T instead of --script here, as picolibc.specs looks for any -T not --linker to suppress injection of its own linker script
+        "-T${_LINKER_SCRIPT_EXPRESSION}"
             )
     pico_add_link_depend(pico_standard_link ${_LINKER_SCRIPT_EXPRESSION})
     unset(_LINKER_SCRIPT_EXPRESSION)

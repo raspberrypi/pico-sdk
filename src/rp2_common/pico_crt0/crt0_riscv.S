@@ -12,6 +12,10 @@
 #include "boot/picobin.h"
 #include "pico/bootrom_constants.h"
 
+#if HAS_POWMAN_TIMER
+#include "hardware/regs/powman.h"
+#endif
+
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS
 #define COLLAPSE_IRQS
@@ -369,6 +373,24 @@ bss_fill_loop:
 bss_fill_test:
     bne a1, a2, bss_fill_loop
 
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
+    // Check if we're done
+    la a6, __bss_end__
+    bne a2, a6, 1f
+    // Zero out persistent_data on non-powman boot
+    la a1, __persistent_data_start__
+    la a2, __persistent_data_end__
+    // Skip if there is no persistent data
+    beq a1, a2, 1f
+    // Load previous power state into r6
+    li a6, POWMAN_BASE+POWMAN_SCRATCH6_OFFSET
+    lw a6, 0(a6)
+    // Check if we should skip zeroing
+    jal persistent_zero_check
+    beqz a0, bss_fill_test
+1:
+#endif
+
 platform_entry: // symbol for stack traces
     // Use `call` pseudo-instruction instead of a bare `jal` so that the
     // linker can use longer sequences if these are out of `jal` range. Will
@@ -383,6 +405,8 @@ platform_entry: // symbol for stack traces
     ebreak
     j 1b
 
+
+#if !PICO_NO_FLASH
 data_cpy_loop:
     lw a0, (a1)
     sw a0, (a2)
@@ -391,6 +415,46 @@ data_cpy_loop:
 data_cpy:
     bltu a2, a3, data_cpy_loop
     ret
+#endif
+
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
+persistent_zero_check:
+    // uses a5 and a7 as scratch
+    // uses the powman_power_state in a6
+    // returns in a0
+    li a0, 0
+    // First check __persistent_data_start__
+    la a7, __persistent_data_start__
+check_a7:
+    li a5, SRAM_BASE
+    bgt a5, a7, check_xip_sram
+    li a5, SRAM4_BASE
+    bgt a5, a7, check_sram0
+check_sram1:
+    li a5, 1 << 0 // POWMAN_POWER_DOMAIN_SRAM_BANK1
+    j do_check
+check_xip_sram:
+    li a5, 1 << 2 // POWMAN_POWER_DOMAIN_XIP_CACHE
+    j do_check
+check_sram0:
+    li a5, 1 << 1 // POWMAN_POWER_DOMAIN_SRAM_BANK0
+    j do_check
+do_check:
+    and a7, a5, a6
+    beq a5, a7, skip
+    j noskip
+skip:
+    beqz a0, check_end
+    ret
+check_end:
+    addi a0, a0, 1
+    // If start was skipped, check __persistent_data_end__
+    la a7, __persistent_data_end__
+    j check_a7
+noskip:
+    li a0, 0
+    ret
+#endif
 
 .align 2
 data_cpy_table:

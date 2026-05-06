@@ -138,7 +138,6 @@ if (PICO_RP2350 AND NOT PICO_RISCV)
     add_executable(m33
             m33.c
     )
-
     target_compile_definitions(m33 PRIVATE
             PICO_USE_CRT_PRINTF=1 # want full precision output
             PICO_FLOAT_PROPAGATE_NANS=1

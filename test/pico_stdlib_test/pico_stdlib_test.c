@@ -101,5 +101,5 @@ int main() {
         printf("%" PRIu64 "\n", to_us_since_boot(get_absolute_time()));
         until = delayed_by_us(until, 500000);
     }
-    puts("DONE");
+    puts("PASSED");
 }
