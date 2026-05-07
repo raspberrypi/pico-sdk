@@ -35,10 +35,10 @@ size_t __weak psram_eid_to_size(uint8_t kgd, uint8_t eid) {
             psram_size *= 16; // 16 MiB
         } else if (eid == 0x26 || size_id == 2 || size_id == 3) { // == 3 is for ISSI PSRAM
             psram_size *= 8; // 8 MiB
-        } else if (size_id == 0) {
-            psram_size *= 2; // 2 MiB
         } else if (size_id == 1) {
             psram_size *= 4; // 4 MiB
+        } else if (size_id == 0) {
+            psram_size *= 2; // 2 MiB
         }
     }
 
