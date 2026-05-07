@@ -1042,7 +1042,7 @@ static inline intptr_t rom_set_rom_callback(uint callback_num, bootrom_api_callb
     return func(callback_num, funcptr);
 }
 
-#ifndef __riscv
+#if PICO_SECURE || PICO_NONSECURE
 int rom_secure_call(uint a, uint b, uint c, uint d, uint func);
 
 int rom_default_callback(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t fn);
@@ -1259,7 +1259,7 @@ static inline int unreset_block_reg_mask_wait_blocking(__unused io_rw_32 *reset,
 }
 #endif
 
-#endif  // ifndef __riscv
+#endif  // PICO_SECURE || PICO_NONSECURE
 
 /*!
  * \brief Get system information

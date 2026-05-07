@@ -204,7 +204,7 @@ int rom_get_owned_partition(uint partition_num) {
     int ret;
     uint32_t buffer[(16 * 2) + 1] = {}; // maximum of 16 partitions, each with 2 words returned, plus 1
     // Initially assume that the partition_num is the A partition
-    int partition_a_num = partition_num;
+    uint partition_a_num = partition_num;
     ret = rom_get_b_partition(partition_num);
 
     if (ret < 0) {
