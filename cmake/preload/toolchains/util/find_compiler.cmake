@@ -41,7 +41,7 @@ function(pico_find_compiler_with_triples compiler_path triples compiler_suffix)
 endfunction()
 
 # If no single compiler flags variable is set, then choose first working compiler flags from a list.
-# This is done by doing a test compile via execute_proces, as we can't use check_c_compiler_flag
+# This is done by doing a test compile via execute_process, as we can't use check_c_compiler_flag
 # prior to project_setup.
 # Assuming the single flag variable is not already set, each of the flag_var_list flags are tried in order.
 # If the flags don't cause an error the single flag variable is set to the good flag value. If no valid flags
@@ -68,7 +68,7 @@ function(pico_choose_compiler_flags compiler_path common_lang_flags_var common_l
                     return()
                 endif()
             endforeach()
-            message(FATAL_ERROR "No compiler that supported required compiler flags")
+            message(FATAL_ERROR "No compiler found that supports required compiler flags")
         else()
             if (${common_lang_flags_var_list})
                 message(FATAL_ERROR "Either ${common_lang_flags_var} or ${common_lang_flags_var_list} must be set")
