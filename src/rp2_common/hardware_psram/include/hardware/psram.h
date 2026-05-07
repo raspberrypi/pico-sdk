@@ -62,18 +62,6 @@
 #define PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS PICO_AUTO_DETECT_PSRAM_CS
 #endif
 
-#if PICO_AUTO_DETECT_PSRAM_CS
-#if PICO_RP2350
-#if PICO_RP2350A
-#define PICO_AVAILABLE_CS1_GPIOS {0, 8, 19}
-#else
-#define PICO_AVAILABLE_CS1_GPIOS {0, 8, 19, 47}
-#endif
-#else
-#error "PICO_AVAILABLE_CS1_GPIOS must be defined for this platform to use PICO_AUTO_DETECT_PSRAM_CS"
-#endif
-#endif
-
 // PICO_CONFIG: PICO_DEFAULT_PSRAM_ID, Default ID of psram used for auto-detection, type=int, default=0x5D, group=hardware_psram
 #ifndef PICO_DEFAULT_PSRAM_ID
 #define PICO_DEFAULT_PSRAM_ID 0x5D
