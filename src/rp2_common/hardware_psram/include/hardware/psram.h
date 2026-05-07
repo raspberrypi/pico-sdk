@@ -30,9 +30,6 @@
  * - \ref psram_reinitialise
  * - \ref psram_detect_cs_and_size
  * - \ref psram_detect_size
- *
- * \subsection psram_example Example
- * \include psram_program.c
  */
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_PSRAM, Enable/disable assertions in the hardware_psram module, type=bool, default=0, group=hardware_psram

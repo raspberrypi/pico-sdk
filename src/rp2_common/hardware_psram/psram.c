@@ -69,7 +69,8 @@ size_t psram_detect_size(void) {
 }
 
 size_t psram_detect_cs_and_size(uint8_t *cs_gpios, size_t num) {
-    gpio_function_t prev_funcs[4] = {};
+    gpio_function_t prev_funcs[num];
+    size_t psram_size = 0;
     for (size_t i=0; i < num; i++) {
         // Save and clear all CS GPIO functions
         uint8_t gpio = cs_gpios[i];
@@ -83,16 +84,19 @@ size_t psram_detect_cs_and_size(uint8_t *cs_gpios, size_t num) {
         // Workaround for RP2350-E14, where the bootrom only does this for GPIO 0 instead of the correct CS pin
         hw_clear_bits(&pads_bank0_hw->io[gpio], PADS_BANK0_GPIO0_ISO_BITS);
     #endif
-        size_t psram_size = psram_detect_size();
+        psram_size = psram_detect_size();
         if (psram_size > 0) {
-            // CS GPIO found
-            return psram_size;
+            // CS GPIO found, so will be left configured in flash_devinfo
+            break;
         }
-        // Restore previous function to GPIO
+    }
+    for (size_t i=0; i < num; i++) {
+        // Restore previous function to all CS GPIOs
+        uint8_t gpio = cs_gpios[i];
         gpio_set_function(gpio, prev_funcs[i]);
     }
 
-    return 0;
+    return psram_size;
 }
 
 #if PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS

@@ -142,8 +142,8 @@ void flash_get_unique_id(uint8_t *id_out);
  * On RP2040 the chip select index is ignored, as there is only one chip select.
  * \endif
  *
- *  \param txbuf Pointer to a byte buffer which will be transmitted to the flash
- *  \param rxbuf Pointer to a byte buffer where data received from the flash will be written. txbuf and rxbuf may be the same buffer.
+ *  \param txbuf Pointer to a byte buffer which will be transmitted
+ *  \param rxbuf Pointer to a byte buffer where received data will be written. txbuf and rxbuf may be the same buffer.
  *  \param count Length in bytes of txbuf and of rxbuf
  *  \param cs Chip select index
  */
