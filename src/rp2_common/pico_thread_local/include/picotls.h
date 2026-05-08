@@ -33,12 +33,6 @@
 // PICO_CONFIG: PICO_THREAD_LOCAL_MODE_PER_THREAD, Enable proper thread local support with one value per thread, type=bool, default=1, group=pico_thread_local
 // PICO_CONFIG: PICO_THREAD_LOCAL_MODE_GLOBAL, Support compiling code with thread local variables but only keep one global value, type=bool, default=0, group=pico_thread_local
 // PICO_CONFIG: PICO_THREAD_LOCAL_MODE_NONE, No support for thread local variables. Code using __thread may or may not compile/link or work correctly, type=bool, default=0, group=pico_thread_local
-#ifndef PICO_THREAD_LOCAL_MODE_GLOBAL
-#define PICO_THREAD_LOCAL_MODE_GLOBAL 0
-#endif
-#ifndef PICO_THREAD_LOCAL_MODE_NONE
-#define PICO_THREAD_LOCAL_MODE_NONE 0
-#endif
 
 // PICO_CONFIG: PICO_THREAD_LOCAL_SUPPORT_EMUTLS, Thread local support should work with compilers that use emutls, type=bool, default=1, advanced=true, group=pico_thread_local
 // PICO_CONFIG: PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER, Thread local support should work with compilers that use a per thread pointer and provide .tdata and .tbss, type=bool, default=1, advanced=true, group=pico_thread_local
@@ -46,15 +40,6 @@
 // PICO_CONFIG: PICO_THREAD_LOCAL_EMUTLS_CONFIRMED, Passed from build if the compiler is known to use Emutls and so other types of support are not needed, type=bool, default=0, advanced=true, group=pico_thread_local
 // PICO_CONFIG: PICO_THREAD_LOCAL_THREAD_POINTER_ARM_CONFIRMED, Passed from build if the compiler is known to use a thread pointer accessed via __areabi_read_tp and so other types of support are not needed, type=bool, default=0, advanced=true, group=pico_thread_local
 // PICO_CONFIG: PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED, Passed from build if the compiler is known to use a thread pointer stored in the TP register and so other types of support are not needed, type=bool, default=0, advanced=true, group=pico_thread_local
-#ifndef PICO_THREAD_LOCAL_EMUTLS_CONFIRMED
-#define PICO_THREAD_LOCAL_EMUTLS_CONFIRMED 0
-#endif
-#ifndef PICO_THREAD_LOCAL_THREAD_POINTER_ARM_CONFIRMED
-#define PICO_THREAD_LOCAL_THREAD_POINTER_ARM_CONFIRMED 0
-#endif
-#ifndef PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED
-#define PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED 0
-#endif
 
 // Default is PICO_THREAD_LOCAL_MODE_PER_THREAD if not specified
 #if !PICO_THREAD_LOCAL_MODE_PER_THREAD && !PICO_THREAD_LOCAL_MODE_GLOBAL && !PICO_THREAD_LOCAL_MODE_NONE
