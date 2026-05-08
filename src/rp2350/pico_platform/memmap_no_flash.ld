@@ -9,6 +9,7 @@ INCLUDE "memmap_no_flash.incl"
  * └── memmap_no_flash.incl                              rp2_common/pico_standard_link
  *     ├── set_memory_locations.incl                     rp2_common/pico_standard_link
  *     ├── memory_psram.incl                             rp2_common/pico_standard_link
+ *     ├── memory_xip_ram.incl                           rp2_common/pico_standard_link
  *     ├── memory_ram.incl                               rp2_common/pico_standard_link
  *     ├── memory_scratch.incl                           rp2_common/pico_standard_link
  *     ├── memory_generated.incl                         rp2_common/pico_standard_link

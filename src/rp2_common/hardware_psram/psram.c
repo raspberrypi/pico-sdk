@@ -372,20 +372,20 @@ void runtime_init_setup_psram(void) {
     uint32_t psram_words = (uint32_t)(&__psram_end__ - &__psram_start__);
     if (psram_words > psram_word_size) {
         // Setup to bus fault for variables that don't fit in available PSRAM
-        int clear_start = 8; // Clear no regions by default
+        int clear_regions = 0; // Clear no regions by default
         if (psram_flash_devinfo_size == FLASH_DEVINFO_SIZE_NONE) {
-            clear_start = 4; // Clear all PSRAM regions
+            clear_regions = 4; // Clear all PSRAM regions
         } else if (psram_flash_devinfo_size < FLASH_DEVINFO_SIZE_4M) {
-            clear_start = 5; // Clear last 3x 4M regions
+            clear_regions = 3; // Clear last 3x 4M regions
             // And reduce size of first PSRAM region
             qmi_hw->atrans[4] = (1u << psram_flash_devinfo_size) << QMI_ATRANS4_SIZE_LSB; // units are 4 kiB
         } else if (psram_flash_devinfo_size == FLASH_DEVINFO_SIZE_4M) {
-            clear_start = 5; // Clear last 3x 4M regions
+            clear_regions = 3; // Clear last 3x 4M regions
         } else if (psram_flash_devinfo_size == FLASH_DEVINFO_SIZE_8M) {
-            clear_start = 6; // Clear last 2x 4M regions
+            clear_regions = 2; // Clear last 2x 4M regions
         }
 
-        for (int i = clear_start; i < 8; i++) {
+        for (int i = 8 - clear_regions; i < 8; i++) {
             qmi_hw->atrans[i] = 0;
         }
     }
