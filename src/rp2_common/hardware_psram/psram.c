@@ -53,7 +53,6 @@ size_t psram_detect_size(void) {
     // The GPIO doesn't matter, as the caller must set the correct function for the CS pin
     flash_devinfo_set_cs_size(1, FLASH_DEVINFO_SIZE_8K);
 
-
     // Read ID command, followed by 7 NOOP commands to get the response
     uint8_t txbuffer[8] = { PSRAM_READ_ID_CMD, PSRAM_NOOP_CMD, PSRAM_NOOP_CMD, PSRAM_NOOP_CMD, PSRAM_NOOP_CMD, PSRAM_NOOP_CMD, PSRAM_NOOP_CMD, PSRAM_NOOP_CMD };
     uint8_t rxbuffer[8] = { 0 };
@@ -349,9 +348,9 @@ void runtime_init_setup_psram(void) {
         // Attempt to auto-detect the PSRAM size
         #if PICO_AUTO_DETECT_PSRAM_CS
         uint8_t cs_gpios[] = PICO_AVAILABLE_CS1_GPIOS;
-        size_t num_cs_gpios = sizeof(cs_gpios);
+        size_t num_cs_gpios = count_of(cs_gpios);
         #if PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS
-        num_cs_gpios = remove_defaults_from_cs_gpios(cs_gpios, sizeof(cs_gpios));
+        num_cs_gpios = remove_defaults_from_cs_gpios(cs_gpios, count_of(cs_gpios));
         #endif
         size_t psram_size = psram_detect_cs_and_size(cs_gpios, num_cs_gpios);
         #else

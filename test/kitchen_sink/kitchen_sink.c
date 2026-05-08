@@ -75,7 +75,7 @@ void make_tiny_psram(void) {
     // Unknown platform, just try 0
     uint8_t cs_gpios[] = {0}
     #endif
-    psram_detect_cs_and_size(cs_gpios, sizeof(cs_gpios));
+    psram_detect_cs_and_size(cs_gpios, count_of(cs_gpios));
 }
 PICO_RUNTIME_INIT_FUNC_RUNTIME(make_tiny_psram, "11000");
 #endif

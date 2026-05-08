@@ -9,7 +9,7 @@ def _generated_pico_psram_region_impl(ctx):
     link_include_dir = psram_region_linker_fragment.dirname
 
     file_contents = "\n".join((
-        "PSRAM(rx) : ORIGIN = 0x11000000, LENGTH = " + str(ctx.attr.psram_region_size),
+        "PSRAM(rwx) : ORIGIN = 0x11000000, LENGTH = " + str(ctx.attr.psram_region_size),
     ))
     ctx.actions.write(psram_region_linker_fragment, file_contents)
     linking_inputs = cc_common.create_linker_input(
