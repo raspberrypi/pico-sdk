@@ -11,3 +11,5 @@ pico_add_extra_outputs(hardware_sync_spin_lock_test)
 target_compile_definitions(hardware_sync_spin_lock_test PRIVATE
 	PICO_STDOUT_MUTEX=0
 	)
+
+set_target_properties(hardware_sync_spin_lock_test PROPERTIES PICO_TEST_TIMEOUT 10)
