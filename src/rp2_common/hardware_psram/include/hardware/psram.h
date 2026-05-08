@@ -16,15 +16,42 @@
  *
  * \brief Low level PSRAM setup functions
  *
+ * When using the runtime_init initialisation, this can initialise PSRAM in 3 ways,
+ * listed from highest to lowest priority:
+ *   1. If flash_devinfo is setup (e.g. configured in OTP), it will initialise PSRAM with
+ *      the flash_devinfo CS1 size and GPIO
+ *   2. If `PICO_AUTO_DETECT_PSRAM` is set it will attempt to detect PSRAM size and CS GPIO
+ *      on CS1. This will attempt to use all available CS GPIOs as chip selects, so they
+ *      will be wiggled. By default, it will skip over some which are defined in the board
+ *      header (see `PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS`).
+ *     - If the CS GPIO is know and set in `PICO_PSRAM_CS_PIN`, you can just enable
+ *       `PICO_AUTO_DETECT_PSRAM_SIZE` to only detect the size. Some board headers use
+ *       this behaviour if they have variants both with and without PSRAM fitted
+ *       (e.g. adafruit_feather_rp2350)
+ *   3. If `PICO_PSRAM_SIZE_BYTES` and `PICO_PSRAM_CS_PIN` are set (e.g. configured in the
+ *      board header, or with \ref pico_override_psram_size) it will initialise PSRAM with
+ *      that size and CS GPIO
+ * 
+ * Only the `PICO_AUTO_DETECT_PSRAM` method will verify that PSRAM is present before
+ * using it.
+ * 
+ * Variables can be placed in PSRAM using __psram or __psram_uninitialised macros, and
+ * you can also write directly to the memory addresses.
+ * 
+ * If there are variables placed in PSRAM, it will setup XIP to cause bus faults on any
+ * access to PSRAM addresses greater than the size available. The \ref psram_check_address
+ * function should be used before accessing variables in PSRAM when auto-detection is on,
+ * to prevent these bus faults.
+ *
  * Note some of these functions are *unsafe* if you are using both cores, and the other
  * is executing from flash or psram concurrently with the operation. In this case, you
  * must perform your own synchronisation to make sure that no XIP accesses take
  * place while running these functions. One option is to use the
- * \ref multicore_lockout functions.
+ * \ref flash_safe_execute functions in \ref pico_flash.
  *
  * Likewise they are *unsafe* if you have interrupt handlers or an interrupt
  * vector table in flash or psram, so you must disable interrupts before calling in
- * this case.
+ * this case - \ref flash_safe_execute handles this case too.
  *
  * The unsafe functions are:
  * - \ref psram_reinitialise
@@ -57,7 +84,7 @@
 #error "PICO_AUTO_DETECT_PSRAM_SIZE must be set to use PICO_AUTO_DETECT_PSRAM_CS"
 #endif
 
-// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS, skip default GPIOs when auto-detecting psram chip select pin, type=bool, default=PICO_AUTO_DETECT_PSRAM_CS, group=hardware_psram
+// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS, skip any _DEFAULT_ GPIOs defined in the board header when auto-detecting psram chip select pin, type=bool, default=PICO_AUTO_DETECT_PSRAM_CS, group=hardware_psram
 #ifndef PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS
 #define PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS PICO_AUTO_DETECT_PSRAM_CS
 #endif

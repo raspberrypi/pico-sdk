@@ -323,25 +323,29 @@ bool psram_check_address(void* addr) {
 #endif
 
 void runtime_init_setup_psram(void) {
-    // Setup flash_devinfo from compile definitions if it is unset
+    // Check if flash_devinfo is already configured by OTP (or an earlier runtime_init function, e.g. in kitchen_sink_psram_tiny)
+    bool __unused flash_devinfo_not_configured = flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE;
+
+    // Setup flash_devinfo from compile definitions
     #if defined(PICO_PSRAM_CS_PIN) && !PICO_AUTO_DETECT_PSRAM_CS
-    if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {
+    if (flash_devinfo_not_configured) {
         flash_devinfo_set_cs_gpio(1, PICO_PSRAM_CS_PIN);
     }
     #endif
     #if defined(PICO_PSRAM_SIZE_BYTES) && !PICO_AUTO_DETECT_PSRAM_SIZE
-    if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {
+    if (flash_devinfo_not_configured) {
         flash_devinfo_set_cs_size(1, flash_devinfo_bytes_to_size(PICO_PSRAM_SIZE_BYTES));
     }
     #endif
 
+    // Setup flash_devinfo with auto-detected size
     #if PICO_AUTO_DETECT_PSRAM_SIZE
     #if !defined(PICO_PSRAM_CS_PIN) && !PICO_AUTO_DETECT_PSRAM_CS
     #error PICO_AUTO_DETECT_PSRAM_SIZE requires a specified PICO_PSRAM_CS_PIN or PICO_AUTO_DETECT_PSRAM_CS
     #elif defined(PICO_PSRAM_CS_PIN)
     gpio_set_function(PICO_PSRAM_CS_PIN, GPIO_FUNC_XIP_CS1);
     #endif
-    if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {  // Check if size is already set by OTP
+    if (flash_devinfo_not_configured) {
         // Attempt to auto-detect the PSRAM size
         #if PICO_AUTO_DETECT_PSRAM_CS
         uint8_t cs_gpios[] = PICO_AVAILABLE_CS1_GPIOS;
@@ -358,15 +362,16 @@ void runtime_init_setup_psram(void) {
     }
     #endif
 
+    // The size has now been configured, so can cache the value
     flash_devinfo_size_t psram_flash_devinfo_size = flash_devinfo_get_cs_size(1);
-
+    size_t psram_word_size = flash_devinfo_size_to_bytes(psram_flash_devinfo_size) >> 2; // >>2 is /4, for words
     psram_initialized = psram_flash_devinfo_size != FLASH_DEVINFO_SIZE_NONE;
 
     static_assert(FLASH_DEVINFO_SIZE_MAX == FLASH_DEVINFO_SIZE_16M, "expected max region size of 16M");
     extern uint32_t __psram_start__;
     extern uint32_t __psram_end__;
     uint32_t psram_words = (uint32_t)(&__psram_end__ - &__psram_start__);
-    if (psram_words > (flash_devinfo_size_to_bytes(psram_flash_devinfo_size) >> 2)) { // >>2 is /4, for words
+    if (psram_words > psram_word_size) {
         // Setup to bus fault for variables that don't fit in available PSRAM
         int clear_start = 8; // Clear no regions by default
         if (psram_flash_devinfo_size == FLASH_DEVINFO_SIZE_NONE) {
@@ -410,10 +415,10 @@ void runtime_init_setup_psram(void) {
     extern uint32_t __psram_load_end__;
     uint32_t stored_words = (uint32_t)(&__psram_load_end__ - &__psram_load_start__);
     if (stored_words > 0) {
-        if (stored_words > (flash_devinfo_size_to_bytes(psram_flash_devinfo_size) >> 2)) {
+        if (stored_words > psram_word_size) {
             // Only copy into available PSRAM, to avoid triggering bus faults here,
             // they will be triggered later when the variable is accessed
-            stored_words = flash_devinfo_size_to_bytes(psram_flash_devinfo_size) >> 2;
+            stored_words = psram_word_size;
         }
         memcpy(&__psram_load_start__, &__psram_load_source__, stored_words * sizeof(uint32_t));
     }

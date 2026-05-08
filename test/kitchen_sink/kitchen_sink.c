@@ -65,7 +65,16 @@ void make_tiny_psram(void) {
     flash_devinfo_set_cs_size(1, FLASH_DEVINFO_SIZE_128K);
 #endif
     // Still auto-detect CS pin, as we don't know that
-    uint8_t cs_gpios[] = PICO_AVAILABLE_CS1_GPIOS;
+    #if PICO_RP2350
+    #if PICO_RP2350A
+    uint8_t cs_gpios[] = {0, 8, 19};
+    #else
+    uint8_t cs_gpios[] = {0, 8, 19, 47};
+    #endif
+    #else
+    // Unknown platform, just try 0
+    uint8_t cs_gpios[] = {0}
+    #endif
     psram_detect_cs_and_size(cs_gpios, sizeof(cs_gpios));
 }
 PICO_RUNTIME_INIT_FUNC_RUNTIME(make_tiny_psram, "11000");
