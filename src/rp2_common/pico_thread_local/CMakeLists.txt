@@ -43,14 +43,14 @@ function(pico_detect_tls_type OUTPUT_VAR)
         ")
 
     # Create a temporary file for the source
-    file(WRITE "${CMAKE_BINARY_DIR}/tls_check.c" "${TLS_CHECK_SOURCE}")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/tls_check.c" "${TLS_CHECK_SOURCE}")
 
-    set(TLS_CHECK_LIBRARY "${CMAKE_BINARY_DIR}/tls_check.a")
+    set(TLS_CHECK_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/tls_check.a")
     set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
     # Attempt to compile the source file
     try_compile(CAN_COMPILE_TLS
-            "${CMAKE_BINARY_DIR}"                     # Directory for temporary build files
-            "${CMAKE_BINARY_DIR}/tls_check.c"        # Source file to compile
+            "${CMAKE_CURRENT_BINARY_DIR}"                     # Directory for temporary build files
+            "${CMAKE_CURRENT_BINARY_DIR}/tls_check.c"        # Source file to compile
             COPY_FILE ${TLS_CHECK_LIBRARY}
     )
 
@@ -61,21 +61,22 @@ function(pico_detect_tls_type OUTPUT_VAR)
         )
         if(NM_OUT MATCHES "__emutls_get_address")
             message(STATUS "Detected emulated TLS (__emutls_get_address)")
-            set(TLS_TYPE "emutls" CACHE INTERNAL "TLS Type")
+            set(TLS_TYPE "emutls")
         elseif(NM_OUT MATCHES "__aeabi_read_tp")
             message(STATUS "Detected native TLS (__aeabi_read_tp)")
-            set(TLS_TYPE "arm-aeabi" CACHE INTERNAL "TLS Type")
+            set(TLS_TYPE "arm-aeabi")
         else()
             if (NOT PICO_RISCV)
                 message(WARNING "Could not identify TLS mechanism")
             endif()
-            set(TLS_TYPE "unknown" CACHE INTERNAL "TLS Type")
+            set(TLS_TYPE "unknown")
         endif()
     else()
         message(STATUS "Compiler does not support __thread keyword.")
-        set(TLS_TYPE "unsupported" CACHE INTERNAL "TLS Type")
+        set(TLS_TYPE "unsupported")
     endif()
     set(${OUTPUT_VAR} ${TLS_TYPE} PARENT_SCOPE)
+    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/tls_check.c ${CMAKE_CURRENT_BINARY_DIR}/tls_check.a)
 endfunction()
 
 if (NOT PICO_THREAD_LOCAL_TYPE)
