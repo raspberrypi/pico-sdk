@@ -38,7 +38,7 @@
 // PICO_CONFIG: PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER, Thread local support should work with compilers that use a per thread pointer and provide .tdata and .tbss, type=bool, default=1, advanced=true, group=pico_thread_local
 
 // PICO_CONFIG: PICO_THREAD_LOCAL_EMUTLS_CONFIRMED, Passed from build if the compiler is known to use Emutls and so other types of support are not needed, type=bool, default=0, advanced=true, group=pico_thread_local
-// PICO_CONFIG: PICO_THREAD_LOCAL_THREAD_POINTER_ARM_CONFIRMED, Passed from build if the compiler is known to use a thread pointer accessed via __areabi_read_tp and so other types of support are not needed, type=bool, default=0, advanced=true, group=pico_thread_local
+// PICO_CONFIG: PICO_THREAD_LOCAL_THREAD_POINTER_ARM_AEABI_CONFIRMED, Passed from build if the compiler is known to use a thread pointer accessed via __areabi_read_tp and so other types of support are not needed, type=bool, default=0, advanced=true, group=pico_thread_local
 // PICO_CONFIG: PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED, Passed from build if the compiler is known to use a thread pointer stored in the TP register and so other types of support are not needed, type=bool, default=0, advanced=true, group=pico_thread_local
 
 // Default is PICO_THREAD_LOCAL_MODE_PER_THREAD if not specified
@@ -50,11 +50,11 @@
 // Rest of file is contingent on not being in PICO_THREAD_LOCAL_MODE_NONE...
 #if !PICO_THREAD_LOCAL_MODE_NONE
 #if !PICO_THREAD_LOCAL_SUPPORT_EMUTLS && !PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER
-// PICO_THREAD_LOCAL_EMUTLS_CONFIRMED, PICO_THREAD_LOCAL_THREAD_POINTER_ARM_CONFIRMED PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED are
+// PICO_THREAD_LOCAL_EMUTLS_CONFIRMED, PICO_THREAD_LOCAL_THREAD_POINTER_ARM_AEABI_CONFIRMED PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED are
 // optional defines provided by the build that allow us to improve code size slightly if only one is set
 
-#if PICO_THREAD_LOCAL_EMUTLS_CONFIRMED + PICO_THREAD_LOCAL_THREAD_POINTER_ARM_CONFIRMED + PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED > 1
-#error expected at most one of PICO_THREAD_LOCAL_EMUTLS_CONFIRMED, PICO_THREAD_LOCAL_THREAD_POINTER_ARM_CONFIRMED and PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED to be set
+#if PICO_THREAD_LOCAL_EMUTLS_CONFIRMED + PICO_THREAD_LOCAL_THREAD_POINTER_ARM_AEABI_CONFIRMED + PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED > 1
+#error expected at most one of PICO_THREAD_LOCAL_EMUTLS_CONFIRMED, PICO_THREAD_LOCAL_THREAD_POINTER_ARM_AEABI_CONFIRMED and PICO_THREAD_LOCAL_THREAD_POINTER_RISCV_REG_CONFIRMED to be set
 #endif
 
 #if PICO_THREAD_LOCAL_EMUTLS_CONFIRMED
