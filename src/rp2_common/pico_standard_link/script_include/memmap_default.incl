@@ -3,6 +3,7 @@ INCLUDE "set_memory_locations.incl"
 
 /* Include memory regions used */
 INCLUDE "memory_flash.incl"
+INCLUDE "memory_xip_ram.incl"
 INCLUDE "memory_ram.incl"
 INCLUDE "memory_scratch.incl"
 INCLUDE "memory_generated.incl"
