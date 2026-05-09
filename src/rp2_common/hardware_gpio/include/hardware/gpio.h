@@ -49,7 +49,7 @@ extern "C" {
  *
  * \if rp2350_specific
  * The number of GPIO pins available depends on the package. There are 30 user GPIOs in bank 0 in the QFN-60 package (RP2350A), or 48 user GPIOs
- * in the QFN-80 package. Bank 1 contains the 6 QSPI pins and the USB DP/DM pins.
+ * in the QFN-80 package (RP2350B). Bank 1 contains the 6 QSPI pins and the USB DP/DM pins.
  * \endif
  *
  * All GPIOs support digital input and output, but a subset can also be used as inputs to the chip’s Analogue to Digital
