@@ -30,7 +30,6 @@ SECTIONS
         *(.data*)
         *(.sdata*)
 
-
         . = ALIGN(4);
         *(.after_data.*)
         . = ALIGN(4);
