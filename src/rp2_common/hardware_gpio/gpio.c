@@ -282,25 +282,39 @@ void gpio_deinit(uint gpio) {
 }
 
 void gpio_init_mask(uint32_t gpio_mask) {
-    for(uint32_t i=0;i<NUM_BANK0_GPIOS;i++) {
+    for(uint i=0;i<NUM_BANK0_GPIOS;i++) {
         if (gpio_mask & 1) {
             gpio_init(i);
         }
         gpio_mask >>= 1;
+        if (!gpio_mask) break;
     }
 }
 
 void gpio_init_mask64(uint64_t gpio_mask) {
-    for(uint64_t i=0;i<NUM_BANK0_GPIOS;i++) {
-        if (gpio_mask & 1) {
+#if NUM_BANK0_GPIOS <= 32
+    // code is much smaller in this case, especially for Cortex-M0+ which is convenient since RP2040 has < 32 pins
+    uint32_t gpio_mask32 = (uint32_t)gpio_mask;
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
+        if (gpio_mask32 & 1u) {
+            gpio_init(i);
+        }
+        gpio_mask32 >>= 1;
+        if (!gpio_mask32) break;
+    }
+#else
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
+        if (gpio_mask & 1u) {
             gpio_init(i);
         }
         gpio_mask >>= 1;
+        if (!gpio_mask) break;
     }
+#endif
 }
 
 void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
-    for (uint i = 0; i < MIN(NUM_BANK0_GPIOS, 32u); i++) {
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1u) {
             gpio_set_function(i, fn);
         }
@@ -309,10 +323,23 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
 }
 
 void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
-    for (uint i = 0; i < MIN(NUM_BANK0_GPIOS, 64u); i++) {
+#if NUM_BANK0_GPIOS <= 32
+    // code is much smaller in this case, especially for Cortex-M0+ which is convenient since RP2040 has < 32 pins
+    uint32_t gpio_mask32 = (uint32_t)gpio_mask;
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
+        if (gpio_mask32 & 1u) {
+            gpio_set_function(i, fn);
+        }
+        gpio_mask32 >>= 1;
+        if (!gpio_mask32) break;
+    }
+#else
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1u) {
             gpio_set_function(i, fn);
         }
         gpio_mask >>= 1;
+        if (!gpio_mask) break;
     }
+#endif
 }
