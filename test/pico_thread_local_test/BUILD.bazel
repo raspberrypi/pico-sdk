@@ -25,3 +25,11 @@ extra_copts_for_all_deps(
     # Host doesn't support pico_multicore without pico_host_sdl.
     target_compatible_with = compatible_with_rp2(),
 )
+
+# TODO: Add these tests to the Bazel build.
+filegroup(
+    name = "unsupported_tests",
+    srcs = [
+        "pico_thread_local_test_cpp.cpp",
+    ],
+)
