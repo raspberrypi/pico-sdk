@@ -303,9 +303,11 @@ for applicable, all_configs in chips_all_configs.items():
                     first_define_value = get_first_dict_key(defines_obj)
                     first_define_file_path, first_define_linenum = defines_obj[first_define_value]
                     errors.append(Exception('Found {} at {}:{} with a default of {}, but #define says {} (at {}:{})'.format(config_name, file_path, linenum, config_default, first_define_value, first_define_file_path, first_define_linenum)))
-            else:
+            elif config_default != "0":
                 errors.append(Exception('Found {} at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default)))
-
+            else:
+                logger.info('Found {} at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default))
+                
 # All settings in "host" should also be in "all"
 for config_name, config_obj in chips_all_configs["host"].items():
     if config_name not in chips_all_configs["all"]:
@@ -329,7 +331,7 @@ def build_mismatch_exception_message(name, thing, config_obj1, value1, config_ob
     obj2_filepath = os.path.join(scandir, config_obj2['filename'])
     return "'{}' {} mismatch at {}:{} ({}) and {}:{} ({})".format(name, thing, obj1_filepath, config_obj1['line_number'], value1, obj2_filepath, config_obj2['line_number'], value2)
 
-# Check that any identically-named setttings have appropriate matching attributes
+# Check that any identically-named settings have appropriate matching attributes
 for applicable in chips_all_configs:
     for other in chips_all_configs:
         if other == applicable:
