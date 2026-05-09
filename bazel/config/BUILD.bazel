@@ -151,9 +151,9 @@ string_flag(
     ],
 )
 
-# PICO_BAZEL_CONFIG: PICO_DEFAULT_TLS_IMPL, The default implementation for pico_thread_local to link; per_thread provides per thread locals global provide shared global values, type=string, default=per_thread, group=build
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_THREAD_LOCAL_IMPL, The default implementation for pico_thread_local to link; per_thread provides per thread locals global provide shared global values, type=string, default=per_thread, group=build
 string_flag(
-    name = "PICO_DEFAULT_TLS_IMPL",
+    name = "PICO_DEFAULT_THREAD_LOCAL_IMPL",
     build_setting_default = "per_thread",
     values = [
         "per_thread",

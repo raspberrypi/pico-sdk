@@ -182,12 +182,12 @@ config_setting(
 
 config_setting(
     name = "pico_thread_local_per_thread_enabled",
-    flag_values = {"//bazel/config:PICO_DEFAULT_TLS_IMPL": "per_thread"},
+    flag_values = {"//bazel/config:PICO_DEFAULT_THREAD_LOCAL_IMPL": "per_thread"},
 )
 
 config_setting(
     name = "pico_thread_local_global_enabled",
-    flag_values = {"//bazel/config:PICO_DEFAULT_TLS_IMPL": "global"},
+    flag_values = {"//bazel/config:PICO_DEFAULT_THREAD_LOCAL_IMPL": "global"},
 )
 
 

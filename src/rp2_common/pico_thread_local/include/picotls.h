@@ -27,7 +27,7 @@
  * 2. `pico_thread_local_global` - Thread local variables are allowed in code, but each thread/core shares the same value (i.e. they aren't really thread local). There is very minimial overhead for this option.
  * 3. `pico_thread_local_none` - No support for thread locals is provided. Code using them may not compile or link, and if it does the values won't be shared and may not even be initialized correctly. This mode is however guaranteed to have basically no overhead when thread locals are known not to be used.
  *
- * The TLS provided by the `pico_thread_local` library may be set from CMake via `pico_set_tls_implementation(<TARGET> per_thread|global|none)` and the default for all targets may be set via CMake variable (e.g. `set(PICO_DEFAULT_TLS_IMPL pico_thread_local_none`).
+ * The support provided by the `pico_thread_local` library may be set from CMake via `pico_set_thread_local_implementation(<TARGET> per_thread|global|none)` and the default for all targets may be set via CMake variable (e.g. `set(PICO_DEFAULT_THREAD_LOCAL_IMPL pico_thread_local_none`).
  */
 
 // PICO_CONFIG: PICO_THREAD_LOCAL_MODE_PER_THREAD, Enable proper thread local support with one value per thread, type=bool, default=1, group=pico_thread_local

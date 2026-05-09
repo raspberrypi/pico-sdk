@@ -85,7 +85,7 @@ function(pico_minimize_runtime TARGET)
             FPGA_CHECK
             PANIC
             AUTO_INIT_MUTEX
-            TLS)
+            THREAD_LOCAL)
     cmake_parse_arguments(RUNTIME "" ""
             "INCLUDE;EXCLUDE" ${ARGN} )
     foreach (INCL_EXCL IN ITEMS INCLUDE EXCLUDE)
@@ -116,8 +116,8 @@ function(pico_minimize_runtime TARGET)
     if (NOT RUNTIME_INCLUDE_AUTO_INIT_MUTEX)
         target_compile_definitions(${TARGET} PRIVATE PICO_RUNTIME_SKIP_INIT_MUTEX=1)
     endif()
-    if (NOT RUNTIME_INCLUDE_TLS)
-        pico_set_tls_implementation(${TARGET} none)
+    if (NOT RUNTIME_INCLUDE_THREAD_LOCAL)
+        pico_set_thread_local_implementation(${TARGET} none)
     endif()
 
     if (RUNTIME_INCLUDE_PRINTF)

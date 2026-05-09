@@ -307,7 +307,7 @@ for applicable, all_configs in chips_all_configs.items():
                 errors.append(Exception('Found {} at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default)))
             else:
                 logger.info('Found {} at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default))
-                
+
 # All settings in "host" should also be in "all"
 for config_name, config_obj in chips_all_configs["host"].items():
     if config_name not in chips_all_configs["all"]:

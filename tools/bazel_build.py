@@ -52,6 +52,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_sha256_test:pico_sha256_test",
                 "//test/pico_stdio_test:pico_stdio_test",
                 "//test/pico_thread_local_test:pico_thread_local_test",
+                "//test/pico_thread_local_test:pico_thread_local_test_cpp",
                 "//test/pico_time_test:pico_time_test",
                 "//test/pico_low_power_test:low_power_test_timers",
                 "//test/pico_low_power_test:low_power_test_gpio",

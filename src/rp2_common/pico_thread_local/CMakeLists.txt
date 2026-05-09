@@ -14,13 +14,13 @@ target_sources(pico_thread_local_per_thread INTERFACE ${CMAKE_CURRENT_LIST_DIR}/
 target_include_directories(pico_thread_local_per_thread SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 target_compile_definitions(pico_thread_local_per_thread INTERFACE PICO_THREAD_LOCAL_MODE_PER_THREAD=1)
 
-set(PICO_DEFAULT_TLS_IMPL pico_thread_local_per_thread)
+set(PICO_DEFAULT_THREAD_LOCAL_IMPL pico_thread_local_per_thread)
 
 pico_add_library(pico_thread_local NOFLAG)
 target_link_libraries(pico_thread_local INTERFACE
-        $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_TLS_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_TLS_IMPL>,${PICO_DEFAULT_TLS_IMPL}>)
+        $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_TLS_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_TLS_IMPL>,${PICO_DEFAULT_THREAD_LOCAL_IMPL}>)
 
-macro(pico_set_tls_implementation TARGET IMPL)
+macro(pico_set_thread_local_implementation TARGET IMPL)
     get_target_property(target_type ${TARGET} TYPE)
     if ("EXECUTABLE" STREQUAL "${target_type}")
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_TLS_IMPL "pico_thread_local_${IMPL}")
