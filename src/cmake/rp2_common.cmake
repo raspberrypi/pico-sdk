@@ -167,3 +167,6 @@ pico_add_doxygen(${CMAKE_CURRENT_BINARY_DIR}/extra_doxygen)
 
 #pico_add_doxygen(rp2_common)
 pico_add_doxygen_exclude(rp2_common/cmsis) # very big
+
+set(PICO_VARIANT_DIR ${RP2_VARIANT_DIR})
+pico_register_common_scope_var(PICO_VARIANT_DIR)

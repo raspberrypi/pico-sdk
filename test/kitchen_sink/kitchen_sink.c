@@ -279,6 +279,8 @@ int main(void) {
     // this should compile as we are Cortex-M
     pico_default_asm ("SVC #3");
 #else
-    puts("PASSED");
+    exception_set_exclusive_handler(INSTR_ILLEGAL_EXCEPTION, svc_call);
+    // this is an illegal instruction
+    pico_default_asm (".word 0");
 #endif
 }
