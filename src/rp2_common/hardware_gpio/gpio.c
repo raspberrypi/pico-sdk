@@ -319,6 +319,7 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
             gpio_set_function(i, fn);
         }
         gpio_mask >>= 1;
+        if (!gpio_mask) break;
     }
 }
 
