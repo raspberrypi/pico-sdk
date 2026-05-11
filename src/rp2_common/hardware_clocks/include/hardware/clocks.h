@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include "hardware/structs/clocks.h"
+#include "pico/util/fixed_bitset.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -589,6 +590,33 @@ static inline bool set_sys_clock_khz(uint32_t freq_khz, bool required) {
     }
     return false;
 }
+
+typedef fixed_bitset_type(NUM_CLOCK_DESTINATIONS) clock_dest_bitset_t;
+#define clock_dest_bitset_none() fixed_bitset_with_fill(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 0)
+#define clock_dest_bitset_all() fixed_bitset_with_fill(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 1)
+
+static inline clock_dest_bitset_t *clock_dest_bitset_clear(clock_dest_bitset_t *dests) {
+    fixed_bitset_clear_all(&dests->bitset);
+    return dests;
+}
+
+static inline clock_dest_bitset_t *clock_dest_bitset_add_all(clock_dest_bitset_t *dests) {
+    fixed_bitset_set_all(&dests->bitset);
+    return dests;
+}
+
+static inline clock_dest_bitset_t *clock_dest_bitset_add(clock_dest_bitset_t *dests, clock_dest_num_t dest) {
+    fixed_bitset_set(&dests->bitset, dest);
+    return dests;
+}
+
+static inline clock_dest_bitset_t *clock_dest_bitset_remove(clock_dest_bitset_t *dests, clock_dest_num_t dest) {
+    fixed_bitset_clear(&dests->bitset, dest);
+    return dests;
+}
+
+void clock_get_sleep_en_gate(clock_dest_bitset_t *clocks);
+void clock_gate_sleep_en(const clock_dest_bitset_t *clocks);
 
 #define GPIO_TO_GPOUT_CLOCK_HANDLE_RP2040(gpio, default_clk_handle) \
     ((gpio) == 21 ? clk_gpout0 :                        \

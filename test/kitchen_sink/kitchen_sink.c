@@ -6,14 +6,20 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifndef KITCHEN_SINK_INCLUDE_HEADER
 // provided for backwards compatibility for non CMake build systems - just includes enough to compile
 #include "hardware/dma.h"
+#include "hardware/exception.h"
 #include "pico/sync.h"
 #include "pico/stdlib.h"
+#include "pico/util/fixed_bitset.h"
 #if LIB_PICO_BINARY_INFO
 #include "pico/binary_info.h"
+#endif
+#if LIB_PICO_AON_TIMER
+#include "pico/aon_timer.h"
 #endif
 #else
 #include KITCHEN_SINK_INCLUDE_HEADER
@@ -60,6 +66,19 @@ auto_init_recursive_mutex(recursive_mutex);
 float __attribute__((noinline)) foox(float x, float b) {
     return x * b;
 }
+
+void svc_call(void) {
+    puts("PASSED");
+    exit(0);
+}
+
+#if LIB_PICO_AON_TIMER
+static bool aon_timer_done = false;
+void spoop(void) {
+    printf("XXXX YARGLE XXXX\n");
+    aon_timer_done = true;
+}
+#endif
 
 int main(void) {
     spiggle();
@@ -124,8 +143,25 @@ int main(void) {
     printf("extra_data after load = %d\n", extra_data);
 #endif
 #endif
+#if LIB_PICO_AON_TIMER
+    aon_timer_start_with_timeofday();
+    struct timespec ts;
+    ts.tv_sec = 2;
+    ts.tv_nsec = 1000000000 / 2;
+    aon_timer_enable_alarm(&ts, spoop, false);
+    while (!aon_timer_done) {
+        aon_timer_get_time(&ts);
+        printf("%ld %ld\n", (long)ts.tv_sec, ts.tv_nsec);
+        busy_wait_ms(500);
+    }
+#endif
 #ifndef __riscv
-    // this should compile as we are Cortex M0+
+    exception_set_exclusive_handler(SVCALL_EXCEPTION, svc_call);
+    // this should compile as we are Cortex-M
     pico_default_asm ("SVC #3");
+#else
+    exception_set_exclusive_handler(INSTR_ILLEGAL_EXCEPTION, svc_call);
+    // this is an illegal instruction
+    pico_default_asm (".word 0");
 #endif
 }

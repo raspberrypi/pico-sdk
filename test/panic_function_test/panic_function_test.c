@@ -1,3 +1,9 @@
+/*
+* Copyright (c) 2026 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -63,7 +69,7 @@ void __printflike(1, 0) handle_panic(const char *magic1, ...)
 #endif
 }
 
-void main() {
+int main() {
     stdio_init_all();
 #ifndef PICO_PANIC_FUNCTION
     printf("Using default panic function...\n");
@@ -78,4 +84,5 @@ void main() {
     panic(MAGIC1, MAGIC2, MAGIC3, MAGIC4, MAGIC5, MAGIC6, MAGIC7);
 #endif
     printf("FAILED: expected panic not to return");
+    return 1;
 }

@@ -41,6 +41,11 @@ int settimeofday(__unused const struct timeval *tv, __unused const struct timezo
     return 0;
 }
 
+// Some Clang versions don't support localtime_r, so we use gmtime_r instead.
+__weak struct tm* localtime_r(const time_t* time, struct tm* tm) {
+    return gmtime_r((time_t*)time, tm);
+}
+
 // TODO: This should be a thread-local variable.
 int errno;
 

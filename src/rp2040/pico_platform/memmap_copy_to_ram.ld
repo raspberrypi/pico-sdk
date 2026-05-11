@@ -29,7 +29,8 @@ INCLUDE "memmap_copy_to_ram.incl"
  *         ├── section_extra_post_text.incl              rp2_common/pico_standard_link
  *         ├── sections_copy_to_ram_data.incl            rp2_common/pico_standard_link
  *         │   ├── section_copy_to_ram_data.incl         rp2_common/pico_standard_link
- *         │   └── section_bss.incl                      rp2_common/pico_standard_link
+ *         │   ├── section_bss.incl                      rp2_common/pico_standard_link
+ *         │   └── section_persistent_data.incl          rp2_common/pico_standard_link
  *         ├── section_generated_post_data.incl          rp2_common/pico_standard_link
  *         ├── section_extra_post_data.incl              rp2_common/pico_standard_link
  *         ├── section_heap.incl                         rp2_common/pico_standard_link

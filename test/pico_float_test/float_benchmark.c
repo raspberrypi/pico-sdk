@@ -9,9 +9,17 @@
 #endif
 
 static void init_systick() {
+#ifdef __riscv
+    // Stop, clear then start 64-bit RISC-V platform timer for boot timing
+    sio_hw->mtime_ctrl = 0;
+    sio_hw->mtime = 0;
+    sio_hw->mtimeh = 0;
+    sio_hw->mtime_ctrl = SIO_MTIME_CTRL_FULLSPEED_BITS | SIO_MTIME_CTRL_EN_BITS;
+#else
     systick_hw->csr = 0;
     systick_hw->rvr = ARM_CPU_PREFIXED(SYST_RVR_RELOAD_BITS);
     systick_hw->csr = ARM_CPU_PREFIXED(SYST_CSR_CLKSOURCE_BITS) | ARM_CPU_PREFIXED(SYST_CSR_ENABLE_BITS);
+#endif
 }
 
 // Stop the compiler from constant-folding a hardware base pointer into the
@@ -25,18 +33,22 @@ static void init_systick() {
     __opaque_ptr; \
 })
 
-static __force_inline uint32_t systick_value() {
-    return systick_hw->cvr;
-}
-
 static __force_inline io_ro_32 *systick_value_ptr() {
+#ifdef __riscv
+    return &sio_hw->mtime;
+#else
     return __get_opaque_ptr(&systick_hw->cvr);
+#endif
 }
 
 static int cycle_diff(uint32_t systick1, uint32_t systick2) {
+#ifdef __riscv
+    return systick2 - systick1 - 1;
+#else
     static_assert(ARM_CPU_PREFIXED(SYST_CVR_CURRENT_LSB) == 0, "");
     uint32_t shift = 32 - ARM_CPU_PREFIXED(SYST_CVR_CURRENT_MSB);
     return (((int32_t)((systick1 << shift) - (systick2 << shift))) >> shift) - 1; // -1 since the second systick read costs one
+#endif
 }
 
 #define timer_func_def(name) static __noinline int __not_in_flash_func(time_##name)
@@ -156,8 +168,13 @@ static float time_unary_int64_n_func(int (*timer)(int64_t, int32_t), int64_t *i6
 // #pragma message("EMITS_VFP = " __XSTRING(EMITS_VFP))
 // #pragma message("USING_HARD_FLOAT_ABI = " __XSTRING(USING_HARD_FLOAT_ABI))
 
+#ifdef __riscv
+#define LOAD_COST 1
+#define STORE_COST 1
+#else
 #define LOAD_COST 2
 #define STORE_COST 2
+#endif
 
 #define FLOAT_INPUT_COST LOAD_COST
 #define FLOAT_OUTPUT_COST STORE_COST
@@ -902,7 +919,7 @@ timer_func_def(fcopysign)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = copysignf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(ftrunc)(volatile float a) {
@@ -942,7 +959,7 @@ timer_func_def(ffmod)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = fmodf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fdrem)(volatile float a, volatile float b) {
@@ -954,7 +971,7 @@ timer_func_def(fdrem)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = dremf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 #endif
 }
 
@@ -963,7 +980,7 @@ timer_func_def(fremainder)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = remainderf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fremquo)(volatile float a, volatile float b) {
@@ -972,7 +989,7 @@ timer_func_def(fremquo)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = remquof(a, b, &c);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fexp2)(volatile float a) {
@@ -1036,7 +1053,7 @@ timer_func_def(fpow)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = powf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fcbrt)(volatile float a) {
@@ -1068,7 +1085,7 @@ timer_func_def(fhypot)(volatile float a, volatile float b) {
     uint32_t t0 = *systick_ptr;
     volatile float x = hypotf(a, b);
     uint32_t t1 = *systick_ptr;
-    return cycle_diff(t0, t1) - FLOAT_INPUT_COST - FLOAT_OUTPUT_COST;
+    return cycle_diff(t0, t1) - FLOAT_INPUT_COST * 2 - FLOAT_OUTPUT_COST;
 }
 
 timer_func_def(fasin)(volatile float a) {
@@ -1129,8 +1146,8 @@ timer_func_def(fasinh)(volatile float a) {
 
 
 int main() {
-    stdio_init_all();
     init_systick();
+    stdio_init_all();
 #if PICO_C_COMPILER_IS_CLANG
     printf("================= Clang - ");
 #else

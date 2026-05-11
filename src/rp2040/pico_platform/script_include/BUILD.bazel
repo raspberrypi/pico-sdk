@@ -1,13 +1,12 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
 
 package(default_visibility = ["//visibility:public"])
 
-load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
-
 linker_scripts(
     name = "rp2040_linker_script_includes",
-    link_scripts = ["default_locations.ld"],
     include_scripts = glob(["*.incl"]),
+    link_scripts = ["default_locations.ld"],
 )
 
 cc_library(

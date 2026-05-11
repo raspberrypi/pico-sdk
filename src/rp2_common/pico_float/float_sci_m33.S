@@ -44,7 +44,7 @@ float_section frrcore
 @ r0..r1 preserved
 @ r6 range reduced result
 @ r2,r3,r4,r5 trashed
-frr_core:
+local_func frr_core
  ldr r2,=rtwopi
  asrs r3,r1,#5               @ k=e/32, k<=5 for e offsets up to 9+32
  add r2,r2,r3,lsl#2 @ p
@@ -540,9 +540,9 @@ float_wrapper_section fpack
 @ trashes (r1,)r2
 fnegpack_q31:
  rsbs r0,r0,#0
-fpack_q31:
+local_func fpack_q31
  mov r1,#0x7f-9              @ exponent
-fpack_q:
+local_func fpack_q
  clz r2,r0
  rsbs r2,#8
  bmi 1f
@@ -675,7 +675,7 @@ wrapper_func sincosf
  str r1, [r3]
  pop {pc}
 
-sincosf_raw:
+local_func sincosf_raw
  ands r12,r0,#1<<31
  lsrs r12,#1                 @ save argument sign in r12b30
  orrs r12,r12,#1<<31         @ flag we want both results in r12b31

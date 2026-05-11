@@ -1,6 +1,6 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//bazel:defs.bzl", "compatible_with_rp2", "pico_generate_pio_header", "incompatible_with_config")
+load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config", "pico_generate_pio_header")
 load("//bazel/util:transition.bzl", "kitchen_sink_test_binary", "pico_set_binary_type", "pico_set_linker_script")
 
 package(default_visibility = ["//visibility:public"])
@@ -160,16 +160,19 @@ cc_binary(
     name = "kitchen_sink_ram_section_actual",
     testonly = True,
     srcs = ["kitchen_sink.c"],
+    defines = ["EXTRA_DATA_SECTION=1"],
     tags = ["manual"],  # Built via kitchen_sink_ram_section
     deps = [":kitchen_sink_common"],
-    defines = ["EXTRA_DATA_SECTION=1"]
 )
 
 cc_library(
     name = "kitchen_sink_ram_section_linker_script",
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
     deps = [
-        "//test/kitchen_sink/kitchen_sink_ram_section_scripts:kitchen_sink_ram_section_scripts",
-        "//test/kitchen_sink/kitchen_sink_extra_end_scripts:kitchen_sink_extra_end_scripts",
+        "//test/kitchen_sink/kitchen_sink_ram_section_scripts",
+        "//test/kitchen_sink/kitchen_sink_extra_end_scripts",
         "//src/rp2_common/pico_standard_link:default_linker_script",
     ],
 )
@@ -186,16 +189,19 @@ cc_binary(
     name = "kitchen_sink_simple_overlay_actual",
     testonly = True,
     srcs = ["kitchen_sink.c"],
+    defines = ["EXTRA_DATA_SECTION=2"],
     tags = ["manual"],  # Built via kitchen_sink_simple_overlay
     deps = [":kitchen_sink_common"],
-    defines = ["EXTRA_DATA_SECTION=2"]
 )
 
 cc_library(
     name = "kitchen_sink_simple_overlay_linker_script",
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
     deps = [
-        "//test/kitchen_sink/kitchen_sink_simple_overlay_scripts:kitchen_sink_simple_overlay_scripts",
-        "//test/kitchen_sink/kitchen_sink_extra_end_scripts:kitchen_sink_extra_end_scripts",
+        "//test/kitchen_sink/kitchen_sink_simple_overlay_scripts",
+        "//test/kitchen_sink/kitchen_sink_extra_end_scripts",
         "//src/rp2_common/pico_standard_link:default_linker_script",
     ],
 )

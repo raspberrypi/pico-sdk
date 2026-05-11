@@ -75,6 +75,9 @@ cc_library(
         # When PICO_BARE_METAL is enabled, don't automagically add link-time
         # dependencies.
         "//bazel/constraint:pico_baremetal_enabled": [],
+        # The order of the linker scripts below is important.
+        # Prevent buildifier from reordering them.
+        # buildifier: leave-alone
         "//conditions:default": [
             "//bazel/config:PICO_BOOT_STAGE2_LINK_IMAGE",
             "//bazel/config:PICO_CMSIS_PATH",

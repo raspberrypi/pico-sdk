@@ -1,3 +1,5 @@
+"""Utilities for creating flash regions."""
+
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "use_cpp_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")

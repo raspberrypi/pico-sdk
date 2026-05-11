@@ -177,7 +177,7 @@ static inline uint32_t flash_devinfo_size_to_bytes(flash_devinfo_size_t size) {
 }
 
 /*! \brief Convert an integer flash/PSRAM size in bytes to a size enum, as
-  !  stored in OTP and used by the ROM.
+ * stored in OTP and used by the ROM.
  *  \ingroup hardware_flash
  */
 static inline flash_devinfo_size_t flash_devinfo_bytes_to_size(uint32_t bytes) {
