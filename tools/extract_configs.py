@@ -303,10 +303,11 @@ for applicable, all_configs in chips_all_configs.items():
                     first_define_value = get_first_dict_key(defines_obj)
                     first_define_file_path, first_define_linenum = defines_obj[first_define_value]
                     errors.append(Exception('Found {} at {}:{} with a default of {}, but #define says {} (at {}:{})'.format(config_name, file_path, linenum, config_default, first_define_value, first_define_file_path, first_define_linenum)))
-            elif config_default != "0":
-                errors.append(Exception('Found {} at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default)))
+            elif config_obj['attrs']['type'] == "bool" and config_default == "0":
+                # a bool with a missing #define defaults to 0 (false) anyway
+                logger.info('Found {} (bool) at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default))
             else:
-                logger.info('Found {} at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default))
+                errors.append(Exception('Found {} at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default)))
 
 # All settings in "host" should also be in "all"
 for config_name, config_obj in chips_all_configs["host"].items():

@@ -18,7 +18,7 @@ SECTIONS
     PROVIDE( __tbss_size = SIZEOF(.tbss) );
     PROVIDE( __tbss_offset = ADDR(.tbss) - __tls_start );
 
-    /* this marker is present if the code knows we don't need __tls0 and __tls1... we device
+    /* this marker is present if the code knows we don't need __tls0 and __tls1... we decide
      * to waste 4 bytes in that case rather than possibly large amounts for __tls0 and __tls1
      * which will never be used */
     .tlsX_not_needed_marker (NOLOAD) : {

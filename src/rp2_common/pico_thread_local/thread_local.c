@@ -29,7 +29,7 @@ char __used __attribute__((section(".tlsX_not_needed_marker"))) _tlsX_not_needed
 // -------------------------------------------------------------
 
 #if !PICO_THREAD_LOCAL_THREAD_POINTER_VIA_RISCV_REG
-// we don't have TP register so need to track one tls region per code
+// we don't have TP register so need to track one tls region per core
 static_assert(NUM_CORES <= 2, "");
 
 // per core pointers (not needed on RISC-V as we use TP reg)
@@ -64,7 +64,7 @@ extern uint8_t __arm32_tls_tcb_offset;
 // the storage for each core's thread local variables to be pre-allocated and pre-initialized, which leaves
 // minimal work for __wrap___emutls_get_address.
 //
-// This array is available to other TLS implementations too, such a TLS implementation for an RTOS.
+// This array is available to other TLS implementations too, such as a TLS implementation for an RTOS.
 
 // Same layout as libgcc __emutls_object. Unfortunately, __emutls_object doesn't appear in any header files.
 typedef struct {
@@ -235,7 +235,7 @@ static void *_emutls_per_core_init(void) {
     size_t size = _tls_size();
     assert(size);
     if (size) {
-        // aligned_alloc is not available in all libraries wew support, and it isn't thread safe anyway,
+        // aligned_alloc is not available in all libraries we support, and it isn't thread safe anyway,
         // so we'll just do the padded malloc
         // tls = aligned_alloc(size, _emutls_align);
         void *tls = malloc(size + _emutls_align - 1);
@@ -261,7 +261,7 @@ void* __emutls_get_address(void* obj) {
 
 #if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER && PICO_THREAD_LOCAL_THREAD_POINTER_VIA_RISCV_REG
 // on RISC-V we must set up the pointer each time, note we don't actually respect PICO_THREAD_LOCAL_CORE1_REINITIALIZE
-// on RISC-V as it is an optimization flag not a bejavioral flag (i.e. it is indended to be set to 0
+// on RISC-V as it is an optimization flag not a behavioral flag (i.e. it is intended to be set to 0
 // if you don't need it vs don't want it)
 #define _RUNTIME_INIT_PER_CORE_TLS_SETUP_IMPL _init_core_local_tls
 #elif PICO_THREAD_LOCAL_CORE1_REINITIALIZE
