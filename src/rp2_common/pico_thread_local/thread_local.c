@@ -11,6 +11,10 @@
 #include "pico/runtime_init.h"
 #include "hardware/sync.h"
 
+#if PICO_THREAD_LOCAL_MODE_PER_THREAD + PICO_THREAD_LOCAL_MODE_GLOBAL + PICO_THREAD_LOCAL_MODE_NONE > 1
+#error Only one of PICO_THREAD_LOCAL_MODE_PER_THREAD and PICO_THREAD_LOCAL_MODE_GLOBAL and PICO_THREAD_LOCAL_MODE_NONE may be specified
+#endif
+
 #if !PICO_THREAD_LOCAL_MODE_PER_THREAD
 // if not using per-thread mode we use tdata and tbss directly, so don't waste space on them.
 // this is a bit of a hacky way of telling the linker this info!
@@ -18,12 +22,6 @@ char __used __attribute__((section(".tlsX_not_needed_marker"))) _tlsX_not_needed
 #endif
 
 #if PICO_THREAD_LOCAL_MODE_PER_THREAD
-#if PICO_THREAD_LOCAL_MODE_GLOBAL
-#error PICO_THREAD_LOCAL_MODE_PER_THREAD and PICO_THREAD_LOCAL_MODE_GLOBAL are both specified
-#endif
-#if PICO_THREAD_LOCAL_MODE_NONE
-#error PICO_THREAD_LOCAL_MODE_PER_THREAD and PICO_THREAD_LOCAL_MODE_NONE are both specified
-#endif
 // ------------------------------------------------------------
 // Proper TLS support per thread (PICO_THREAD_LOCAL_MODE_PER_THREAD = 1)
 // -------------------------------------------------------------
@@ -195,8 +193,7 @@ static void _emutls_one_time_init(void) {
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_HARDWARE_CLAIM);
     uint32_t save = spin_lock_blocking(lock);
     if (!emutls_one_time_init_done) {
-        // Three passes:
-        // 1) Calculate the offset of each thread local variable and the total storage to be allocated for each thread.
+        // Calculate the offset of each thread local variable and the total storage to be allocated for each thread.
         assert(!_emutls_size);
         _emutls_align = 1;
         for (tls_object_t* tls_obj = &__emutls_array_start; tls_obj < &__emutls_array_end; ++tls_obj) {
@@ -215,7 +212,7 @@ static void _emutls_one_time_init(void) {
     spin_unlock(lock, save);
 }
 
-// When we support EMUTLS we have _tls_size() redirect here (from our replacement <picolibc.h>)
+// When we support EMUTLS we have _tls_size() redirect here (from our replacement <picotls.h>)
 size_t _runtime_tls_size(void) {
     static_assert(PICO_THREAD_LOCAL_SUPPORT_EMUTLS, ""); // this function is only provided in this case
     if (!emutls_one_time_init_done) _emutls_one_time_init();

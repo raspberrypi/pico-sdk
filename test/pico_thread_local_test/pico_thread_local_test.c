@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+ * Copyright (c) 2026 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -15,7 +15,8 @@
 #include <picotls.h>
 #define COUNT 10000
 
-volatile __thread int counter = 7;
+#define COUNTER_INIT_VALUE 7
+volatile __thread int counter = COUNTER_INIT_VALUE;
 __thread int zero;
 int core1_count;
 
@@ -65,24 +66,22 @@ bool run_test(void) {
     multicore_launch_core1(core1_entry);
     int core0_count = do_count(1);
     sem_acquire_blocking(&sem);
-    printf("Core 0: %d (expected %d)\n", core0_count, COUNT + 7);
-    printf("Core 1: %d (expected %d)\n", core1_count, COUNT*2 + 7);
-    if (core0_count != COUNT + 7 || core1_count != COUNT*2 + 7) {
+    printf("Core 0: %d (expected %d)\n", core0_count, COUNT + COUNTER_INIT_VALUE);
+    printf("Core 1: %d (expected %d)\n", core1_count, COUNT*2 + COUNTER_INIT_VALUE);
+    if (core0_count != COUNT + 7 || core1_count != COUNT*2 + COUNTER_INIT_VALUE) {
         return false;
-        return -1;
     }
     multicore_reset_core1();
     multicore_launch_core1(core1_entry2);
     sem_acquire_blocking(&sem);
-    printf("Core 0: %d (expected %d)\n", counter, COUNT + 7);
-    printf("Restart core1 1: %d (expected %d)\n", core1_count, 14);
-    if (core0_count != COUNT + 7 || core1_count != 14) {
+    printf("Core 0: %d (expected %d)\n", counter, COUNT + COUNTER_INIT_VALUE);
+    printf("Restart core1 1: %d (expected %d)\n", core1_count, COUNTER_INIT_VALUE * 2);
+    if (core0_count != COUNT + COUNTER_INIT_VALUE || core1_count != COUNTER_INIT_VALUE * 2) {
         return false;
-        return -1;
     }
 #elif PICO_THREAD_LOCAL_MODE_GLOBAL
     int core0_count = do_count(1);
-    printf("Core 0: %d (expected %d)\n", core0_count, COUNT + 7);
+    printf("Core 0: %d (expected %d)\n", core0_count, COUNT + COUNTER_INIT_VALUE);
 #endif
     return true;
 }
