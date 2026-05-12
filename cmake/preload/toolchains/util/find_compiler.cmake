@@ -56,7 +56,7 @@ function(pico_choose_compiler_flags compiler_path common_lang_flags_var common_l
                 set(NULL_DEVICE "/dev/null")
             endif()
             foreach(flags IN LISTS ${common_lang_flags_var_list})
-                separate_arguments(COMPILER_CMD NATIVE_COMMAND "${compiler_path} ${flags} -x c -c ${CMAKE_CURRENT_LIST_DIR}/empty.c -o ${NULL_DEVICE}")
+                separate_arguments(COMPILER_CMD NATIVE_COMMAND "${compiler_path} ${flags} -x c -c \"${CMAKE_CURRENT_LIST_DIR}/empty.c\" -o ${NULL_DEVICE}")
                 execute_process(
                         COMMAND ${COMPILER_CMD}
                         RESULT_VARIABLE COMPILE_FAILED
