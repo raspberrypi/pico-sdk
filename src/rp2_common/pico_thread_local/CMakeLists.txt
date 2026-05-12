@@ -35,7 +35,7 @@ function(pico_detect_tls_type OUTPUT_VAR)
     include(CheckCSourceCompiles)
 
     # 1. Try to compile a snippet using TLS
-    set(TLS_CHECK_SOURCE "
+    set(TLS_CHECK_CODE "
             __thread int test_var = 42;
             int tls_check() {
                 return test_var;
@@ -43,20 +43,21 @@ function(pico_detect_tls_type OUTPUT_VAR)
         ")
 
     # Create a temporary file for the source
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/tls_check.c" "${TLS_CHECK_SOURCE}")
+    set(TLS_CHECK_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/tls_check.c")
+    file(WRITE "${TLS_CHECK_SOURCE}" "${TLS_CHECK_CODE}")
 
     set(TLS_CHECK_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/tls_check.a")
     set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
     # Attempt to compile the source file
     try_compile(CAN_COMPILE_TLS
-            "${CMAKE_CURRENT_BINARY_DIR}"                     # Directory for temporary build files
-            "${CMAKE_CURRENT_BINARY_DIR}/tls_check.c"        # Source file to compile
-            COPY_FILE ${TLS_CHECK_LIBRARY}
+            "${CMAKE_CURRENT_BINARY_DIR}"              # Directory for temporary build files
+            "${TLS_CHECK_SOURCE}"                      # Source file to compile
+            COPY_FILE "${TLS_CHECK_LIBRARY}"
     )
 
     if (CAN_COMPILE_TLS)
         execute_process(
-                COMMAND ${CMAKE_NM} ${TLS_CHECK_LIBRARY}
+                COMMAND ${CMAKE_NM} "${TLS_CHECK_LIBRARY}"
                 OUTPUT_VARIABLE NM_OUT
         )
         if(NM_OUT MATCHES "__emutls_get_address")
@@ -76,7 +77,7 @@ function(pico_detect_tls_type OUTPUT_VAR)
         set(TLS_TYPE "unsupported")
     endif()
     set(${OUTPUT_VAR} ${TLS_TYPE} PARENT_SCOPE)
-    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/tls_check.c ${CMAKE_CURRENT_BINARY_DIR}/tls_check.a)
+    file(REMOVE "${TLS_CHECK_SOURCE}" "${TLS_CHECK_LIBRARY}")
 endfunction()
 
 if (NOT PICO_THREAD_LOCAL_TYPE)
