@@ -291,28 +291,6 @@ void gpio_init_mask(uint32_t gpio_mask) {
     }
 }
 
-void gpio_init_mask64(uint64_t gpio_mask) {
-#if NUM_BANK0_GPIOS <= 32
-    // code is much smaller in this case, especially for Cortex-M0+ which is convenient since RP2040 has < 32 pins
-    uint32_t gpio_mask32 = (uint32_t)gpio_mask;
-    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
-        if (gpio_mask32 & 1u) {
-            gpio_init(i);
-        }
-        gpio_mask32 >>= 1;
-        if (!gpio_mask32) break;
-    }
-#else
-    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
-        if (gpio_mask & 1u) {
-            gpio_init(i);
-        }
-        gpio_mask >>= 1;
-        if (!gpio_mask) break;
-    }
-#endif
-}
-
 void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
     for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1u) {
@@ -323,18 +301,19 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
     }
 }
 
-void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
-#if NUM_BANK0_GPIOS <= 32
-    // code is much smaller in this case, especially for Cortex-M0+ which is convenient since RP2040 has < 32 pins
-    uint32_t gpio_mask32 = (uint32_t)gpio_mask;
+#if NUM_BANK0_GPIOS >= 32
+// these functions collapse to the non 64 bit versions as inline funcs if we have < 32 GPIOs
+void gpio_init_mask64(uint64_t gpio_mask) {
     for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
-        if (gpio_mask32 & 1u) {
-            gpio_set_function(i, fn);
+        if (gpio_mask & 1u) {
+            gpio_init(i);
         }
-        gpio_mask32 >>= 1;
-        if (!gpio_mask32) break;
+        gpio_mask >>= 1;
+        if (!gpio_mask) break;
     }
-#else
+}
+
+void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
     for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1u) {
             gpio_set_function(i, fn);
@@ -342,5 +321,5 @@ void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
         gpio_mask >>= 1;
         if (!gpio_mask) break;
     }
-#endif
 }
+#endif

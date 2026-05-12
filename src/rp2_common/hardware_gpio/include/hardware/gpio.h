@@ -274,7 +274,13 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn);
  * \param gpio_mask Mask with 1 bit per GPIO number to set the function for
  * \param fn Which GPIO function select to use from list \ref gpio_function_t
 */
+#if NUM_BANK0_GPIOS <= 32
+static inline void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
+    gpio_set_function_masked((uint32_t)gpio_mask, fn);
+}
+#else
 void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn);
+#endif
 
 /*! \brief Determine current GPIO function
  *  \ingroup hardware_gpio
@@ -868,7 +874,13 @@ void gpio_init_mask(uint32_t gpio_mask);
  *
  * \param gpio_mask Mask with 1 bit per GPIO number to initialize
  */
+#if NUM_BANK0_GPIOS <= 32
+static inline void gpio_init_mask64(uint64_t gpio_mask) {
+    gpio_init_mask((uint32_t)gpio_mask);
+}
+#else
 void gpio_init_mask64(uint64_t gpio_mask);
+#endif
 // ----------------------------------------------------------------------------
 // Input
 // ----------------------------------------------------------------------------
