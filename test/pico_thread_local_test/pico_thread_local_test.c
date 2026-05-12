@@ -68,7 +68,7 @@ bool run_test(void) {
     sem_acquire_blocking(&sem);
     printf("Core 0: %d (expected %d)\n", core0_count, COUNT + COUNTER_INIT_VALUE);
     printf("Core 1: %d (expected %d)\n", core1_count, COUNT*2 + COUNTER_INIT_VALUE);
-    if (core0_count != COUNT + 7 || core1_count != COUNT*2 + COUNTER_INIT_VALUE) {
+    if (core0_count != COUNT + COUNTER_INIT_VALUE || core1_count != COUNT*2 + COUNTER_INIT_VALUE) {
         return false;
     }
     multicore_reset_core1();
