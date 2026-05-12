@@ -5,6 +5,7 @@
  */
 
 #include "pico/asm_helper.S"
+#include "pico/double.h"
 
 #if !HAS_DOUBLE_COPROCESSOR
 #error attempt to compile double_fma_rp2350 when there is no DCP

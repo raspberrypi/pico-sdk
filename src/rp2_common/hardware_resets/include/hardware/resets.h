@@ -106,6 +106,8 @@
 extern "C" {
 #endif
 
+static_assert(RESET_COUNT == NUM_RESETS, "");
+
 static __force_inline  void reset_block_reg_mask(io_rw_32 *reset, uint32_t mask) {
     hw_set_bits(reset, mask);
 }
@@ -174,7 +176,8 @@ static __force_inline void unreset_block_wait(uint32_t bits) {
  *
  * \param block_num the block number
  */
-static inline void reset_block_num(uint32_t block_num) {
+static inline void reset_block_num(reset_num_t block_num) {
+    invalid_params_if(HARDWARE_RESETS, block_num >= RESET_COUNT);
     reset_block_reg_mask(&resets_hw->reset, 1u << block_num);
 }
 
@@ -183,8 +186,8 @@ static inline void reset_block_num(uint32_t block_num) {
  *
  * \param block_num the block number
  */
-static inline void unreset_block_num(uint block_num) {
-    invalid_params_if(HARDWARE_RESETS, block_num > NUM_RESETS);
+static inline void unreset_block_num(reset_num_t block_num) {
+    invalid_params_if(HARDWARE_RESETS, block_num >= RESET_COUNT);
     unreset_block_reg_mask(&resets_hw->reset, 1u << block_num);
 }
 
@@ -193,8 +196,8 @@ static inline void unreset_block_num(uint block_num) {
  *
  * \param block_num the block number
  */
-static inline void unreset_block_num_wait_blocking(uint block_num) {
-    invalid_params_if(HARDWARE_RESETS, block_num > NUM_RESETS);
+static inline void unreset_block_num_wait_blocking(reset_num_t block_num) {
+    invalid_params_if(HARDWARE_RESETS, block_num >= RESET_COUNT);
     unreset_block_reg_mask_wait_blocking(&resets_hw->reset, &resets_hw->reset_done, 1u << block_num);
 }
 
@@ -203,8 +206,8 @@ static inline void unreset_block_num_wait_blocking(uint block_num) {
  *
  * \param block_num the block number
  */
-static inline void reset_unreset_block_num_wait_blocking(uint block_num) {
-    invalid_params_if(HARDWARE_RESETS, block_num > NUM_RESETS);
+static inline void reset_unreset_block_num_wait_blocking(reset_num_t block_num) {
+    invalid_params_if(HARDWARE_RESETS, block_num >= RESET_COUNT);
     reset_block_reg_mask(&resets_hw->reset, 1u << block_num);
     unreset_block_reg_mask_wait_blocking(&resets_hw->reset, &resets_hw->reset_done, 1u << block_num);
 }
@@ -212,5 +215,4 @@ static inline void reset_unreset_block_num_wait_blocking(uint block_num) {
 #ifdef __cplusplus
 }
 #endif
-
 #endif

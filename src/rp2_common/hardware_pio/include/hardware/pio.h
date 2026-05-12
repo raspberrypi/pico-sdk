@@ -195,6 +195,24 @@ static_assert(PIO2_BASE - PIO0_BASE == (2u << 20), "hardware layout mismatch");
 #endif
 
 /**
+ * \def PIO_IS_INSTANCE(pio)
+ * \ingroup hardware_pio
+ * \hideinitializer
+ * \brief Returns true if the PIO instance is one of the h/w PIO instances
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef PIO_IS_INSTANCE
+#if NUM_PIOS > 2
+    static_assert(NUM_PIOS == 3, "");
+    #define PIO_IS_INSTANCE(pio) ((pio) == pio0 || (pio) == pio1 || (pio) == pio2)
+#else
+    static_assert(NUM_PIOS == 2, "");
+    #define PIO_IS_INSTANCE(pio) ((pio) == pio0 || (pio) == pio1)
+#endif
+#endif
+
+/**
  * \def PIO_FUNCSEL_NUM(pio, gpio)
  * \ingroup hardware_pio
  * \hideinitializer
@@ -274,7 +292,7 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  *
  *   To be clear, \ref pio_sm_set_config does not change the PIO's GPIO base for you; you must configre the PIO's
  *   GPIO base before calling the method, however you can use \ref pio_claim_free_sm_and_add_program_for_gpio_range
- *   to find/configure a PIO instance suitable for a partiular GPIO range.
+ *   to find/configure a PIO instance suitable for a particular GPIO range.
  *
  * You can set `PARAM_ASSERTIONS_ENABLED_HARDWARE_PIO = 1` to enable parameter checking to debug pin (or other) issues with
  * hardware_pio methods.
@@ -318,11 +336,7 @@ static inline void check_sm_mask(__unused uint mask) {
 }
 
 static inline void check_pio_param(__unused PIO pio) {
-#if NUM_PIOS == 2
-    valid_params_if(HARDWARE_PIO, pio == pio0 || pio == pio1);
-#elif NUM_PIOS == 3
-    valid_params_if(HARDWARE_PIO, pio == pio0 || pio == pio1 || pio == pio2);
-#endif
+    valid_params_if(HARDWARE_PIO, PIO_IS_INSTANCE(pio));
 }
 
 static inline void check_pio_pin_param(__unused uint pin) {
@@ -741,6 +755,7 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  *
  * Setting | Default
  * --------|--------
+ * Clock Divider | 1
  * Out Pins | 32 starting at 0
  * Set Pins | 0 starting at 0
  * In Pins | 32 starting at 0

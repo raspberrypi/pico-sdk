@@ -1,0 +1,26 @@
+add_executable(panic_function_test_default ${CMAKE_CURRENT_LIST_DIR}/panic_function_test.c)
+target_link_libraries(panic_function_test_default PRIVATE pico_stdlib)
+pico_add_extra_outputs(panic_function_test_default)
+
+add_executable(panic_function_test_bkpt ${CMAKE_CURRENT_LIST_DIR}/panic_function_test.c)
+target_compile_definitions(panic_function_test_bkpt PRIVATE PICO_PANIC_FUNCTION=) # should just bkpt
+target_link_libraries(panic_function_test_bkpt PRIVATE pico_stdlib)
+pico_add_extra_outputs(panic_function_test_bkpt)
+
+add_executable(panic_function_test_user ${CMAKE_CURRENT_LIST_DIR}/panic_function_test.c)
+target_compile_definitions(panic_function_test_user PRIVATE PICO_PANIC_FUNCTION=handle_panic)
+target_link_libraries(panic_function_test_user PRIVATE pico_stdlib)
+pico_add_extra_outputs(panic_function_test_user)
+
+add_executable(panic_function_test_user_all_vaargs ${CMAKE_CURRENT_LIST_DIR}/panic_function_test.c)
+target_compile_definitions(panic_function_test_user_all_vaargs PRIVATE PICO_PANIC_FUNCTION=handle_panic PICO_PANIC_FUNCTION_WITH_ALL_VAARGS=1 PICO_PANIC_FUNCTION_WITH_CALL_STACK=0)
+target_link_libraries(panic_function_test_user_all_vaargs PRIVATE pico_stdlib)
+pico_add_extra_outputs(panic_function_test_user_all_vaargs)
+
+add_executable(panic_function_test_user_not_returning ${CMAKE_CURRENT_LIST_DIR}/panic_function_test.c)
+target_compile_definitions(panic_function_test_user_not_returning PRIVATE PICO_PANIC_FUNCTION=handle_panic
+        PICO_PANIC_FUNCTION_DOES_NOT_RETURN=1
+        PICO_PANIC_FUNCTION_WITH_ALL_VAARGS=1 PICO_PANIC_FUNCTION_WITH_CALL_STACK=1 #these usually conflicting options are now fine
+)
+target_link_libraries(panic_function_test_user_not_returning PRIVATE pico_stdlib)
+pico_add_extra_outputs(panic_function_test_user_not_returning)

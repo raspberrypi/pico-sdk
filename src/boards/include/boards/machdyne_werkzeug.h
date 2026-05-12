@@ -36,7 +36,9 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 // --- LED ---
 #ifndef PICO_DEFAULT_LED_PIN
 #define PICO_DEFAULT_LED_PIN 20
+#ifndef PICO_DEFAULT_LED_PIN_INVERTED
 #define PICO_DEFAULT_LED_PIN_INVERTED 1
+#endif
 #endif
 
 // --- I2C ---

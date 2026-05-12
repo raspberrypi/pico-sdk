@@ -188,7 +188,9 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #endif
 
 // --- PIO USB ---
+#ifndef PICO_DEFAULT_PIO_USB_DP_PIN
 #define PICO_DEFAULT_PIO_USB_DP_PIN ADAFRUIT_FRUIT_JAM_USB_HOST_DATA_PLUS_PIN
+#endif
 
 // --- FLASH ---
 // Winbond W25Q128 (16MB) flash

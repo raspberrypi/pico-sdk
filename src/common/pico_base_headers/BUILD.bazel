@@ -74,6 +74,11 @@ cc_library(
         "//bazel/constraint:rp2040": ["PICO_RP2040=1"],
         "//bazel/constraint:rp2350": ["PICO_RP2350=1"],
         "//conditions:default": [],
+    }) + select({
+        "//bazel/constraint:pico_binary_type_no_flash": ["PICO_NO_FLASH=1"],
+        "//bazel/constraint:pico_binary_type_copy_to_ram": ["PICO_COPY_TO_RAM=1"],
+        "//bazel/constraint:pico_binary_type_blocked_ram": ["PICO_USE_BLOCKED_RAM=1"],
+        "//conditions:default": [],
     }),
 )
 
@@ -108,6 +113,7 @@ cc_library(
         "//src/rp2_common/hardware_gpio:__pkg__",
         "//src/rp2_common/hardware_pll:__pkg__",
         "//src/rp2_common/hardware_resets:__pkg__",
+        "//src/rp2_common/hardware_rosc:__pkg__",
         "//src/rp2_common/hardware_sync:__pkg__",
         "//src/rp2_common/hardware_sync_spin_lock:__pkg__",
         "//src/rp2_common/hardware_ticks:__pkg__",

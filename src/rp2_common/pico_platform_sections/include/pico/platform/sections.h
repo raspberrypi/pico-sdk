@@ -98,6 +98,32 @@
 #define __uninitialized_ram(group) __attribute__((section(".uninitialized_data." #group))) group
 #endif
 
+#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
+/*! \brief Section attribute macro for placement in a section persisted across default POWMAN resets
+ *  \ingroup pico_platform
+ *
+ * Data marked this way will retain its value across a default POWMAN reset, and will be zeroed on
+ * any other reset.
+ *
+ * For example a `uint32_t` foo that will be zeroed initially, then retain its value if the program
+ * is restarted by default POWMAN reset.
+ *
+ *     uint32_t __persistent_data(foo);
+ *
+ * The section attribute is `.persistent_data.<name>`
+ *
+ * \param name  the name of the variable to place in the section
+ */
+#ifndef __persistent_data
+#define __persistent_data(name) __attribute__((section(".persistent_data." #name))) name
+#endif
+#else
+// If not supported, use the .bss section, as that will be zeroed on boot
+#ifndef __persistent_data
+#define __persistent_data(name) __attribute__((section(".bss." #name))) name
+#endif
+#endif
+
 /*! \brief Section attribute macro for placement in flash even in a COPY_TO_RAM binary
  *  \ingroup pico_platform
  *

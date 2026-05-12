@@ -120,6 +120,20 @@ static_assert(NUM_SPIS == 2, "");
 #endif
 
 /**
+ * \def SPI_IS_INSTANCE(spi)
+ * \ingroup hardware_spi
+ * \hideinitializer
+ * \brief Returns true if the SPI instance is one of the h/w SPI instances
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef SPI_IS_INSTANCE
+static_assert(NUM_SPIS == 2, "");
+#define SPI_IS_INSTANCE(spi) ((spi) == spi0 || (spi) == spi1)
+#endif
+
+
+/**
  * \def SPI_DREQ_NUM(spi, is_tx)
  * \ingroup hardware_spi
  * \hideinitializer
@@ -133,6 +147,19 @@ static_assert(DREQ_SPI0_RX == DREQ_SPI0_TX + 1, "");
 static_assert(DREQ_SPI1_RX == DREQ_SPI1_TX + 1, "");
 static_assert(DREQ_SPI1_TX == DREQ_SPI0_TX + 2, "");
 #define SPI_DREQ_NUM(spi, is_tx) (DREQ_SPI0_TX + SPI_NUM(spi) * 2 + !(is_tx))
+#endif
+
+/**
+ * \def SPI_RESET_NUM(spi)
+ * \ingroup hardware_spi
+ * \hideinitializer
+ * \brief Returns the \ref reset_num_t used to reset a given SPI instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef SPI_RESET_NUM
+#include "hardware/resets.h"
+#define SPI_RESET_NUM(spi) (spi_get_index(spi) ? RESET_SPI1 : RESET_SPI0)
 #endif
 
 /** \brief Enumeration of SPI CPHA (clock phase) values.
@@ -216,17 +243,28 @@ uint spi_get_baudrate(const spi_inst_t *spi);
  * \return Number of SPI, 0 or 1.
  */
 static inline uint spi_get_index(const spi_inst_t *spi) {
-    invalid_params_if(HARDWARE_SPI, spi != spi0 && spi != spi1);
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
     return SPI_NUM(spi);
 }
 
+/*! \brief Get the SPI instance from an instance number
+ *  \ingroup hardware_spi
+ *
+ * \param num Number of SPI, 0 or 1
+ * \return SPI instance
+ */
+static inline spi_inst_t *spi_get_instance(uint num) {
+    invalid_params_if(HARDWARE_SPI, num >= NUM_SPIS);
+    return SPI_INSTANCE(num);
+}
+
 static inline spi_hw_t *spi_get_hw(spi_inst_t *spi) {
-    spi_get_index(spi); // check it is a hw spi
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
     return (spi_hw_t *)spi;
 }
 
 static inline const spi_hw_t *spi_get_const_hw(const spi_inst_t *spi) {
-    spi_get_index(spi);  // check it is a hw spi
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
     return (const spi_hw_t *)spi;
 }
 
@@ -242,6 +280,7 @@ static inline const spi_hw_t *spi_get_const_hw(const spi_inst_t *spi) {
  * \param order Must be SPI_MSB_FIRST, no other values supported on the PL022
  */
 static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cpol, spi_cpha_t cpha, __unused spi_order_t order) {
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
     invalid_params_if(HARDWARE_SPI, data_bits < 4 || data_bits > 16);
     // LSB-first not supported on PL022:
     invalid_params_if(HARDWARE_SPI, order != SPI_MSB_FIRST);
@@ -274,6 +313,7 @@ static inline void spi_set_format(spi_inst_t *spi, uint data_bits, spi_cpol_t cp
  * \param slave true to set SPI device as a slave device, false for master.
  */
 static inline void spi_set_slave(spi_inst_t *spi, bool slave) {
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
     // Disable the SPI
     uint32_t enable_mask = spi_get_hw(spi)->cr1 & SPI_SSPCR1_SSE_BITS;
     hw_clear_bits(&spi_get_hw(spi)->cr1, SPI_SSPCR1_SSE_BITS);
@@ -297,6 +337,7 @@ static inline void spi_set_slave(spi_inst_t *spi, bool slave) {
  * \return false if no space is available to write. True if a write is possible
  */
 static inline bool spi_is_writable(const spi_inst_t *spi) {
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
     return (spi_get_const_hw(spi)->sr & SPI_SSPSR_TNF_BITS);
 }
 
@@ -307,6 +348,7 @@ static inline bool spi_is_writable(const spi_inst_t *spi) {
  * \return true if a read is possible i.e. data is present
  */
 static inline bool spi_is_readable(const spi_inst_t *spi) {
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
     return (spi_get_const_hw(spi)->sr & SPI_SSPSR_RNE_BITS);
 }
 
@@ -317,6 +359,7 @@ static inline bool spi_is_readable(const spi_inst_t *spi) {
  * \return true if SPI is busy
  */
 static inline bool spi_is_busy(const spi_inst_t *spi) {
+    valid_params_if(HARDWARE_SPI, SPI_IS_INSTANCE(spi));
     return (spi_get_const_hw(spi)->sr & SPI_SSPSR_BSY_BITS);
 }
 
