@@ -85,7 +85,7 @@ if (PICO_CLIB STREQUAL "llvm_libc")
 endif()
 
 # at least rp2040 does not work with lld.  For rp2350 it seems to work with lld, but not really sure
-set(CMAKE_EXE_LINKER_FLAGS_INIT "${CMAKE_EXE_LINKER_FLAGS_INIT} -fuse-ld=ld -Wl,-z,noexecstack")
+set(CMAKE_EXE_LINKER_FLAGS_INIT "${CMAKE_EXE_LINKER_FLAGS_INIT} -fuse-ld=lld -Wl,-z,noexecstack")
 if(CMAKE_INTERPROCEDURAL_OPTIMIZATION)
     message(FATAL_ERROR "IPO is not supported with the current configuration of the Pico SDK")
 endif()
