@@ -350,7 +350,7 @@ void runtime_init_setup_psram(void) {
         uint8_t cs_gpios[] = PICO_AVAILABLE_CS1_GPIOS;
         size_t num_cs_gpios = count_of(cs_gpios);
         #if PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS
-        num_cs_gpios = remove_defaults_from_cs_gpios(cs_gpios, count_of(cs_gpios));
+        num_cs_gpios = remove_defaults_from_cs_gpios(cs_gpios, num_cs_gpios);
         #endif
         size_t psram_size = psram_detect_cs_and_size(cs_gpios, num_cs_gpios);
         #else

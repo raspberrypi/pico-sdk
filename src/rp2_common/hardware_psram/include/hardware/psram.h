@@ -12,19 +12,19 @@
 #include "hardware/flash.h"
 
 /** \file psram.h
- *  \defgroup pico_psram pico_psram
+ *  \defgroup hardware_psram hardware_psram
  *
  * \brief Low level PSRAM setup functions
  *
  * When using the runtime_init initialisation, this can initialise PSRAM in 3 ways,
  * listed from highest to lowest priority:
  *   1. If flash_devinfo is setup (e.g. configured in OTP), it will initialise PSRAM with
- *      the flash_devinfo CS1 size and GPIO
+ *      the flash_devinfo size and GPIO for CS1
  *   2. If `PICO_AUTO_DETECT_PSRAM` is set it will attempt to detect PSRAM size and CS GPIO
- *      on CS1. This will attempt to use all available CS GPIOs as chip selects, so they
+ *      on CS1. This will attempt to use all available QMI CS1n GPIOs as chip selects, so they
  *      will be wiggled. By default, it will skip over some which are defined in the board
  *      header (see `PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS`).
- *     - If the CS GPIO is know and set in `PICO_PSRAM_CS_PIN`, you can just enable
+ *     - If the CS GPIO is known and set in `PICO_PSRAM_CS_PIN`, you can just enable
  *       `PICO_AUTO_DETECT_PSRAM_SIZE` to only detect the size. Some board headers use
  *       this behaviour if they have variants both with and without PSRAM fitted
  *       (e.g. adafruit_feather_rp2350)
@@ -32,11 +32,11 @@
  *      board header, or with \ref pico_override_psram_size) it will initialise PSRAM with
  *      that size and CS GPIO
  * 
- * Only the `PICO_AUTO_DETECT_PSRAM` method will verify that PSRAM is present before
- * using it.
+ * Only the `PICO_AUTO_DETECT_PSRAM` methods (including `PICO_AUTO_DETECT_PSRAM_SIZE`) will
+ * verify that PSRAM is present before using it.
  * 
  * Variables can be placed in PSRAM using __psram or __psram_uninitialised macros, and
- * you can also write directly to the memory addresses.
+ * you can also read/write the memory addresses directly.
  * 
  * If there are variables placed in PSRAM, it will setup XIP to cause bus faults on any
  * access to PSRAM addresses greater than the size available. The \ref psram_check_address
