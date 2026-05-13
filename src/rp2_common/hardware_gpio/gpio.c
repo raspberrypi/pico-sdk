@@ -301,7 +301,7 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
     }
 }
 
-#if NUM_BANK0_GPIOS >= 32
+#if NUM_BANK0_GPIOS > 32
 // these functions collapse to the non 64 bit versions as inline funcs if we have < 32 GPIOs
 void gpio_init_mask64(uint64_t gpio_mask) {
     for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
