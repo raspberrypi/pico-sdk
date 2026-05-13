@@ -109,6 +109,17 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()
 
+    # pico_include_in_generated_section(TARGET SECTION FILE)
+    # \brief\ Append a linker script include file to a generated section of the linker script
+    #
+    # Arranges for FILE to be INCLUDEd inside the generated SECTION of the target's linker script.
+    #
+    # This is primarily intended for internal SDK use - users should instead override the
+    # section_extra_SECTION.incl files, using pico_add_linker_script_override_path.
+    #
+    # \param\ TARGET  The target whose linker script should be modified
+    # \param\ SECTION The linker script section name to append to (e.g. post_text)
+    # \param\ FILE    Path to the linker script fragment to INCLUDE
     function(pico_include_in_generated_section TARGET SECTION FILE)
         get_target_property(already_generated ${TARGET} PICO_TARGET_LINKER_SCRIPT_INCLUDE_${SECTION})
         set_property(TARGET ${TARGET} APPEND PROPERTY PICO_TARGET_LINKER_SCRIPT_INCLUDE_${SECTION} "${FILE}")
@@ -122,8 +133,17 @@ if (NOT TARGET pico_standard_link)
         endif()
     endfunction()
 
+    # pico_set_compile_definition(TARGET DEFINE VALUE)
+    # \brief\ Set a compile definition on a target, guarding against conflicting redefinitions
+    #
+    # Equivalent to target_compile_definitions(TARGET PRIVATE DEFINE=VALUE) but tracks the value
+    # as a target property so that a second call with the same DEFINE and the same VALUE is silently
+    # ignored, while a second call with a different VALUE is a fatal error.
+    #
+    # \param\ TARGET The target to add the compile definition to
+    # \param\ DEFINE The preprocessor symbol name
+    # \param\ VALUE  The value to assign to the symbol
     function(pico_set_compile_definition TARGET DEFINE VALUE)
-        # To avoid redefined warnings
         get_target_property(already_set ${TARGET} PICO_TARGET_DEFINITION_${DEFINE})
         if (already_set MATCHES "NOTFOUND")
             set_target_properties(${TARGET} PROPERTIES PICO_TARGET_DEFINITION_${DEFINE} ${VALUE})
@@ -135,6 +155,18 @@ if (NOT TARGET pico_standard_link)
         endif()
     endfunction()
 
+    # pico_use_xip_sram_for_time_critical(TARGET)
+    # \brief\ Place time-critical code for the target into XIP SRAM
+    #
+    # Configures the target to run functions marked __time_critical_func() from XIP SRAM rather than
+    # normal SRAM, as it has dedicated ports which are otherwise unused in no_flash and copy_to_ram
+    # binaries. This sets PICO_TIME_CRITICAL_TEXT_IN_XIP_RAM=1, PICO_USE_XIP_CACHE_AS_RAM=1, and
+    # injects the required linker script fragment via pico_include_in_generated_section.
+    #
+    # This should not be used for flash binaries, as the XIP ports are in use there, and therefore
+    # this will just make time-critical functions slower.
+    #
+    # \param\ TARGET The target whose time-critical functions should run from XIP SRAM
     function(pico_use_xip_sram_for_time_critical TARGET)
         target_compile_definitions(${TARGET} PRIVATE PICO_TIME_CRITICAL_TEXT_IN_XIP_RAM=1)
         pico_set_compile_definition(${TARGET} PICO_USE_XIP_CACHE_AS_RAM 1) # may be set elsewhere too
