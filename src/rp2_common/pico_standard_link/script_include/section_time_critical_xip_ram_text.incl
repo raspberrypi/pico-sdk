@@ -1,11 +1,15 @@
+/* Defines the following symbols for use by code:
+    __xip_ram_time_critical_text_start__, __xip_ram_time_critical_text_end__, __xip_ram_time_critical_text_source__
+*/
+
 SECTIONS
 {
-    .xip_ram_text : {
-        __xip_ram_text_start__ = .;
+    .xip_ram_time_critical_text : {
+        __xip_ram_time_critical_text_start__ = .;
         . = ALIGN(4);
         *(.time_critical.text*)
         . = ALIGN(4);
-        __xip_ram_text_end__ = .;
+        __xip_ram_time_critical_text_end__ = .;
     } > XIP_RAM AT> XIP_RAM_STORE
-    __xip_ram_text_source__ = LOADADDR(.xip_ram_text);
+    __xip_ram_time_critical_text_source__ = LOADADDR(.xip_ram_time_critical_text);
 }

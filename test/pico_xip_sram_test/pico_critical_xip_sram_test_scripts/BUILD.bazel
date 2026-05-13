@@ -1,0 +1,8 @@
+load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
+
+package(default_visibility = ["//test/pico_xip_sram_test:__pkg__"])
+
+linker_scripts(
+    name = "pico_critical_xip_sram_test_scripts",
+    include_scripts = glob(["*.incl"]),
+)

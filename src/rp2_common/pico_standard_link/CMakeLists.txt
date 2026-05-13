@@ -109,6 +109,38 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
     endfunction()
 
+    function(pico_include_in_generated_section TARGET SECTION FILE)
+        get_target_property(already_generated ${TARGET} PICO_TARGET_LINKER_SCRIPT_INCLUDE_${SECTION})
+        set_property(TARGET ${TARGET} APPEND PROPERTY PICO_TARGET_LINKER_SCRIPT_INCLUDE_${SECTION} "${FILE}")
+        # Make sure directory is empty before generating files, to avoid stale overrides
+        file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/generated/pico_standard_link/${TARGET})
+        if (NOT already_generated)
+            file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}/generated/pico_standard_link/${TARGET}/section_generated_${SECTION}.incl
+                CONTENT "INCLUDE \"$<JOIN:$<TARGET_PROPERTY:${TARGET},PICO_TARGET_LINKER_SCRIPT_INCLUDE_${SECTION}>,\"\nINCLUDE \">\""
+            )
+            pico_add_linker_script_override_path(${TARGET} ${CMAKE_BINARY_DIR}/generated/pico_standard_link/${TARGET})
+        endif()
+    endfunction()
+
+    function(pico_set_compile_definition TARGET DEFINE VALUE)
+        # To avoid redefined warnings
+        get_target_property(already_set ${TARGET} PICO_TARGET_DEFINITION_${DEFINE})
+        if (already_set MATCHES "NOTFOUND")
+            set_target_properties(${TARGET} PROPERTIES PICO_TARGET_DEFINITION_${DEFINE} ${VALUE})
+            target_compile_definitions(${TARGET} PRIVATE ${DEFINE}=${VALUE})
+        else()
+            if (NOT ${VALUE} STREQUAL ${already_set})
+                message(FATAL_ERROR "Multiple calls to pico_set_compile_definition for ${DEFINE} with different values (${already_set} vs ${VALUE})")
+            endif()
+        endif()
+    endfunction()
+
+    function(pico_use_xip_sram_for_time_critical TARGET)
+        target_compile_definitions(${TARGET} PRIVATE PICO_TIME_CRITICAL_TEXT_IN_XIP_RAM=1)
+        pico_set_compile_definition(${TARGET} PICO_USE_XIP_CACHE_AS_RAM 1) # may be set elsewhere too
+        pico_include_in_generated_section(${TARGET} post_text "section_time_critical_xip_ram_text.incl")
+    endfunction()
+
     # PICO_CMAKE_CONFIG: PICO_DEFAULT_BINARY_TYPE, The default binary type to use, type=string, default=default, group=build
     # slightly messy as we support both the preferred PICO_DEFAULT_BINARY_TYPE and the individual variables
     if (NOT PICO_DEFAULT_BINARY_TYPE)
@@ -184,25 +216,22 @@ if (NOT TARGET pico_standard_link)
     pico_add_link_depend(pico_standard_link ${_LINKER_SCRIPT_EXPRESSION})
     unset(_LINKER_SCRIPT_EXPRESSION)
 
-    set(NO_FLASH_BINARY_TYPES no_flash no_flash_using_xip_ram xip_ram)
-    set(COPY_TO_RAM_BINARY_TYPES copy_to_ram copy_to_ram_using_xip_ram)
-    set(USING_XIP_RAM_BINARY_TYPES no_flash_using_xip_ram copy_to_ram_using_xip_ram)
+    set(NO_FLASH_BINARY_TYPES no_flash xip_ram)
+    set(COPY_TO_RAM_BINARY_TYPES copy_to_ram)
+    set(XIP_RAM_BINARY_TYPES xip_ram)
 
-    # PICO_NO_FLASH will be set based on PICO_TARGET_BUILD_TYPE target property being equal to no_flash if set, otherwise to the value of the PICO_NO_FLASH cmake variable unless PICO_TARGET_TYPE is set to something else
+    # PICO_NO_FLASH will be set based on PICO_TARGET_BUILD_TYPE target property being in NO_FLASH_BINARY_TYPES if set, otherwise to the value of the PICO_NO_FLASH cmake variable unless PICO_TARGET_TYPE is set to something else
     # PICO_BUILD_DEFINE: PICO_NO_FLASH, whether this is a 'no_flash' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
     target_compile_definitions(pico_standard_link INTERFACE PICO_NO_FLASH=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${NO_FLASH_BINARY_TYPES}>,1,$<AND:$<BOOL:${PICO_NO_FLASH}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
     # PICO_USE_BLOCKED_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being equal to use_blocked_ram if set, otherwise to the value of the PICO_USE_BLOCKED_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
     # PICO_BUILD_DEFINE: PICO_USE_BLOCKED_RAM, whether this is a 'blocked_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
     target_compile_definitions(pico_standard_link INTERFACE PICO_USE_BLOCKED_RAM=$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,use_blocked_ram>,1,$<AND:$<BOOL:${PICO_USE_BLOCKED_RAM}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
-    # PICO_COPY_TO_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being equal to copy_to_ram if set, otherwise to the value of the PICO_COPY_TO_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
+    # PICO_COPY_TO_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being in COPY_TO_RAM_BINARY_TYPES if set, otherwise to the value of the PICO_COPY_TO_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
     # PICO_BUILD_DEFINE: PICO_COPY_TO_RAM, whether this is a 'copy_to_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
     target_compile_definitions(pico_standard_link INTERFACE PICO_COPY_TO_RAM=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${COPY_TO_RAM_BINARY_TYPES}>,1,$<AND:$<BOOL:${PICO_COPY_TO_RAM}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
-    # PICO_XIP_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being equal to xip_ram if set, otherwise to the value of the PICO_XIP_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
+    # PICO_XIP_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being in XIP_RAM_BINARY_TYPES if set, otherwise to the value of the PICO_XIP_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
     # PICO_BUILD_DEFINE: PICO_XIP_RAM, whether this is a 'xip_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
-    target_compile_definitions(pico_standard_link INTERFACE PICO_XIP_RAM=$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,xip_ram>,1,$<AND:$<BOOL:${PICO_XIP_RAM}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
-    # PICO_USING_XIP_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being equal to xxx_using_xip_ram if set, otherwise to the value of the PICO_USING_XIP_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
-    # PICO_BUILD_DEFINE: PICO_USING_XIP_RAM, whether this is a 'xxx_using_xip_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
-    target_compile_definitions(pico_standard_link INTERFACE PICO_USING_XIP_RAM=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${USING_XIP_RAM_BINARY_TYPES}>,1,$<AND:$<BOOL:${PICO_USING_XIP_RAM}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
+    target_compile_definitions(pico_standard_link INTERFACE PICO_XIP_RAM=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${XIP_RAM_BINARY_TYPES}>,1,$<AND:$<BOOL:${PICO_XIP_RAM}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
 
     target_compile_definitions(pico_standard_link INTERFACE PICO_CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}")
     if (PICO_DEOPTIMIZED_DEBUG AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")

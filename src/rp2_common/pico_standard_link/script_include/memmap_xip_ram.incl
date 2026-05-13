@@ -19,7 +19,7 @@ INCLUDE "memory_generated.incl"
 INCLUDE "memory_extra.incl"
 
 /* Include aliases for no_flash storage memory regions (alias to themselves) */
-INCLUDE "memory_aliases_no_flash.incl"
+INCLUDE "memory_aliases_xip_ram_only.incl"
 
 /* Define entry point symbol */
 ENTRY(_entry_point)

@@ -57,6 +57,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_low_power_test:low_power_test_simple",
                 "//test/pico_low_power_test:external_sleep_timer",
                 "//test/pico_async_context_test:pico_async_context_test",
+                "//test/pico_xip_sram_test:pico_critical_xip_sram_test",
 
                 # Pretty much only Picotool and pioasm build on Windows.
                 "//..." if os.name == "nt" else "",

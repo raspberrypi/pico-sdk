@@ -1,0 +1,83 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:transition.bzl", "pico_set_binary_type", "pico_set_linker_script")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_critical_xip_sram_test_extra_link",
+    actual = select({
+        "//bazel/constraint:rp2040": "//bazel:empty_cc_lib",
+        "//conditions:default": "//src/rp2_common/hardware_riscv_platform_timer",
+    }),
+    visibility = ["//visibility:private"],
+)
+
+cc_binary(
+    name = "pico_critical_xip_sram_test_actual",
+    testonly = True,
+    srcs = ["pico_critical_xip_sram_test.c"],
+    tags = ["manual"],  # Built via pico_critical_xip_sram_test
+    deps = [
+        ":pico_critical_xip_sram_test_extra_link",
+        "//src/rp2_common/hardware_dma",
+        "//src/rp2_common/pico_multicore",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)
+
+# pico_use_xip_sram_for_time_critical isn't implemented in Bazel, so manually
+# do that function with this linker script
+cc_library(
+    name = "pico_critical_xip_sram_test_linker_script",
+    defines = [
+        "PICO_TIME_CRITICAL_TEXT_IN_XIP_RAM=1",
+        "PICO_USE_XIP_CACHE_AS_RAM=1",
+    ],
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
+    deps = [
+        "//test/pico_xip_sram_test/pico_critical_xip_sram_test_scripts",
+        "//src/rp2_common/pico_standard_link:default_linker_script",
+    ],
+)
+
+pico_set_binary_type(
+    name = "pico_critical_xip_sram_test_typed",
+    testonly = True,
+    src = ":pico_critical_xip_sram_test_actual",
+    binary_type = "copy_to_ram",
+    target_compatible_with = compatible_with_rp2(),
+)
+
+pico_set_linker_script(
+    name = "pico_critical_xip_sram_test",
+    testonly = True,
+    src = ":pico_critical_xip_sram_test_typed",
+    linker_script = "//test/pico_xip_sram_test:pico_critical_xip_sram_test_linker_script",
+    target_compatible_with = compatible_with_rp2(),
+)
+
+# Currently doesn't fit, because bazel doesn't have a pico_minimize_runtime equivalent
+exports_files(["pico_xip_sram_test.c"])
+# cc_binary(
+#     name = "pico_xip_sram_test_actual",
+#     testonly = True,
+#     srcs = ["pico_xip_sram_test.c"],
+#     tags = ["manual"],  # Built via pico_xip_sram_test
+#     deps = [
+#         "//src/rp2_common/pico_stdlib",
+#         "//src/rp2_common/pico_multicore",
+#         "//src/rp2_common/hardware_dma",
+#     ],
+# )
+#
+# pico_set_binary_type(
+#     name = "pico_xip_sram_test",
+#     testonly = True,
+#     src = ":pico_xip_sram_test_actual",
+#     binary_type = "xip_ram",
+#     target_compatible_with = compatible_with_rp2() + incompatible_with_config("//bazel/constraint:rp2040"),
+# )

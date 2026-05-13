@@ -11,6 +11,7 @@ INCLUDE "memmap_copy_to_ram.incl"
  *     ├── memory_flash.incl                             rp2_common/pico_standard_link
  *     ├── memory_ram.incl                               rp2_common/pico_standard_link
  *     ├── memory_scratch.incl                           rp2_common/pico_standard_link
+ *     ├── memory_xip_ram.incl                           rp2_common/pico_standard_link
  *     ├── memory_generated.incl                         rp2_common/pico_standard_link
  *     ├── memory_extra.incl                             rp2_common/pico_standard_link
  *     ├── memory_aliases_flash.incl                     rp2_common/pico_standard_link
