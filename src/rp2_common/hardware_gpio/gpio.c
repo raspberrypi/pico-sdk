@@ -275,7 +275,7 @@ void gpio_init(uint gpio) {
     gpio_set_dir(gpio, GPIO_IN);
     gpio_put(gpio, 0);
     gpio_set_function(gpio, GPIO_FUNC_SIO);
-}
+}7
 
 void gpio_deinit(uint gpio) {
     gpio_set_function(gpio, GPIO_FUNC_NULL);
@@ -292,11 +292,12 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
 }
 
 void gpio_init_mask(uint32_t gpio_mask) {
-    gpio_set_dir_masked(gpio_mask, GPIO_IN);
+    gpio_set_dir_in_masked(gpio_mask);
     gpio_clr_mask(gpio_mask);
     gpio_set_function_masked(gpio_mask, GPIO_FUNC_SIO);
 }
 
+// these functions are provided (in gpio.h) as inlined calls to the 32 bit versions if we have <= 32 GPIOs
 #if NUM_BANK0_GPIOS > 32
 void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
     for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
@@ -308,9 +309,8 @@ void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
     }
 }
 
-// these functions collapse to the non 64 bit versions as inline funcs if we have < 32 GPIOs
 void gpio_init_mask64(uint64_t gpio_mask) {
-    gpio_set_dir_masked64(gpio_mask, GPIO_IN);
+    gpio_set_dir_in_masked64(gpio_mask);
     gpio_clr_mask64(gpio_mask);
     gpio_set_function_masked64(gpio_mask, GPIO_FUNC_SIO);
 }
