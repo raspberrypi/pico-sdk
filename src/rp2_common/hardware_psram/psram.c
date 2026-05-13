@@ -97,70 +97,91 @@ size_t psram_detect_cs_and_size(uint8_t *cs_gpios, size_t num) {
 }
 
 #if PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS
+// Preprocessor hackery to make this simpler and have fewer checks
+#if PICO_RP2350
+#if PICO_RP2350A
+#define is_cs_gpio(gpio) (gpio == 0) || (gpio == 8) || (gpio == 19)
+#else
+#define is_cs_gpio(gpio) (gpio == 0) || (gpio == 8) || (gpio == 19) || (gpio == 47)
+#endif
+#else
+// Default to assume all GPIOs are CS GPIOs
+#define is_cs_gpio(gpio) true
+#endif
+
+static const uint8_t default_pin_cs_gpios[] = {
+#if defined(PICO_DEFAULT_UART_TX_PIN) && is_cs_gpio(PICO_DEFAULT_UART_TX_PIN)
+    PICO_DEFAULT_UART_TX_PIN,
+#endif
+#if defined(PICO_DEFAULT_UART_RX_PIN) && is_cs_gpio(PICO_DEFAULT_UART_RX_PIN)
+    PICO_DEFAULT_UART_RX_PIN,
+#endif
+#if defined(PICO_DEFAULT_I2C_SDA_PIN) && is_cs_gpio(PICO_DEFAULT_I2C_SDA_PIN)
+    PICO_DEFAULT_I2C_SDA_PIN,
+#endif
+#if defined(PICO_DEFAULT_I2C_SCL_PIN) && is_cs_gpio(PICO_DEFAULT_I2C_SCL_PIN)
+    PICO_DEFAULT_I2C_SCL_PIN,
+#endif
+#if defined(PICO_DEFAULT_SPI_SCK_PIN) && is_cs_gpio(PICO_DEFAULT_SPI_SCK_PIN)
+    PICO_DEFAULT_SPI_SCK_PIN,
+#endif
+#if defined(PICO_DEFAULT_SPI_TX_PIN) && is_cs_gpio(PICO_DEFAULT_SPI_TX_PIN)
+    PICO_DEFAULT_SPI_TX_PIN,
+#endif
+#if defined(PICO_DEFAULT_SPI_RX_PIN) && is_cs_gpio(PICO_DEFAULT_SPI_RX_PIN)
+    PICO_DEFAULT_SPI_RX_PIN,
+#endif
+#if defined(PICO_DEFAULT_SPI_CSN_PIN) && is_cs_gpio(PICO_DEFAULT_SPI_CSN_PIN)
+    PICO_DEFAULT_SPI_CSN_PIN,
+#endif
+#if defined(PICO_DEFAULT_LED_PIN) && is_cs_gpio(PICO_DEFAULT_LED_PIN)
+    PICO_DEFAULT_LED_PIN,
+#endif
+#if defined(PICO_DEFAULT_WS2812_PIN) && is_cs_gpio(PICO_DEFAULT_WS2812_PIN)
+    PICO_DEFAULT_WS2812_PIN,
+#endif
+#if defined(PICO_DEFAULT_WS2812_POWER_PIN) && is_cs_gpio(PICO_DEFAULT_WS2812_POWER_PIN)
+    PICO_DEFAULT_WS2812_POWER_PIN,
+#endif
+#if defined(CYW43_DEFAULT_PIN_WL_REG_ON) && is_cs_gpio(CYW43_DEFAULT_PIN_WL_REG_ON)
+    CYW43_DEFAULT_PIN_WL_REG_ON,
+#endif
+#if defined(CYW43_DEFAULT_PIN_WL_DATA_OUT) && is_cs_gpio(CYW43_DEFAULT_PIN_WL_DATA_OUT)
+    CYW43_DEFAULT_PIN_WL_DATA_OUT,
+#endif
+#if defined(CYW43_DEFAULT_PIN_WL_DATA_IN) && is_cs_gpio(CYW43_DEFAULT_PIN_WL_DATA_IN)
+    CYW43_DEFAULT_PIN_WL_DATA_IN,
+#endif
+#if defined(CYW43_DEFAULT_PIN_WL_HOST_WAKE) && is_cs_gpio(CYW43_DEFAULT_PIN_WL_HOST_WAKE)
+    CYW43_DEFAULT_PIN_WL_HOST_WAKE,
+#endif
+#if defined(CYW43_DEFAULT_PIN_WL_CLOCK) && is_cs_gpio(CYW43_DEFAULT_PIN_WL_CLOCK)
+    CYW43_DEFAULT_PIN_WL_CLOCK,
+#endif
+#if defined(CYW43_DEFAULT_PIN_WL_CS) && is_cs_gpio(CYW43_DEFAULT_PIN_WL_CS)
+    CYW43_DEFAULT_PIN_WL_CS,
+#endif
+// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS_SKIP_PINS, comma separated list of extra pins to not check when auto-detecting psram chip select pin, type=bool, default=undefined, group=hardware_psram
+#ifdef PICO_AUTO_DETECT_PSRAM_CS_SKIP_PINS
+    PICO_AUTO_DETECT_PSRAM_CS_SKIP_PINS
+#endif
+};
+
 static size_t remove_defaults_from_cs_gpios(uint8_t *cs_gpios, size_t num) {
     // To prevent trying to use a pin that is already defined for something
     // else by the board header
     size_t new_num = num;
     for (size_t i=0; i < new_num; i++) {
-        if (
-        #ifdef PICO_DEFAULT_UART_TX_PIN
-            cs_gpios[i] == PICO_DEFAULT_UART_TX_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_UART_RX_PIN
-            cs_gpios[i] == PICO_DEFAULT_UART_RX_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_I2C_SDA_PIN
-            cs_gpios[i] == PICO_DEFAULT_I2C_SDA_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_I2C_SCL_PIN
-            cs_gpios[i] == PICO_DEFAULT_I2C_SCL_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_SPI_SCK_PIN
-            cs_gpios[i] == PICO_DEFAULT_SPI_SCK_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_SPI_TX_PIN
-            cs_gpios[i] == PICO_DEFAULT_SPI_TX_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_SPI_RX_PIN
-            cs_gpios[i] == PICO_DEFAULT_SPI_RX_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_SPI_CSN_PIN
-            cs_gpios[i] == PICO_DEFAULT_SPI_CSN_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_LED_PIN
-            cs_gpios[i] == PICO_DEFAULT_LED_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_WS2812_PIN
-            cs_gpios[i] == PICO_DEFAULT_WS2812_PIN ||
-        #endif
-        #ifdef PICO_DEFAULT_WS2812_POWER_PIN
-            cs_gpios[i] == PICO_DEFAULT_WS2812_POWER_PIN ||
-        #endif
-        #ifdef CYW43_DEFAULT_PIN_WL_REG_ON
-            cs_gpios[i] == CYW43_DEFAULT_PIN_WL_REG_ON ||
-        #endif
-        #ifdef CYW43_DEFAULT_PIN_WL_DATA_OUT
-            cs_gpios[i] == CYW43_DEFAULT_PIN_WL_DATA_OUT ||
-        #endif
-        #ifdef CYW43_DEFAULT_PIN_WL_DATA_IN
-            cs_gpios[i] == CYW43_DEFAULT_PIN_WL_DATA_IN ||
-        #endif
-        #ifdef CYW43_DEFAULT_PIN_WL_HOST_WAKE
-            cs_gpios[i] == CYW43_DEFAULT_PIN_WL_HOST_WAKE ||
-        #endif
-        #ifdef CYW43_DEFAULT_PIN_WL_CLOCK
-            cs_gpios[i] == CYW43_DEFAULT_PIN_WL_CLOCK ||
-        #endif
-        #ifdef CYW43_DEFAULT_PIN_WL_CS
-            cs_gpios[i] == CYW43_DEFAULT_PIN_WL_CS ||
-        #endif
-            false // so the || works
-        ) {
-            // Replace with last valid GPIO in the array
-            cs_gpios[i] = cs_gpios[new_num-1];
-            new_num--;
-            // Check the same index again, as it has a new value
-            i--;
+        for (size_t j=0; j < sizeof(default_pin_cs_gpios); j++) {
+            if (cs_gpios[i] == default_pin_cs_gpios[j]) {
+                // Replace with last valid GPIO in the array
+                cs_gpios[i] = cs_gpios[new_num-1];
+                new_num--;
+                // Check the same index again, as it has a new value
+                i--;
+                // Exit the inner loop
+                break;
+            }
         }
     }
     return new_num;
