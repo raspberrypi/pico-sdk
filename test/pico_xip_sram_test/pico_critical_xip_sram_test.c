@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "pico/test.h"
 #include "pico/multicore.h"
 #include "hardware/dma.h"
 #if PICO_RP2040
@@ -8,6 +9,9 @@
 #include "hardware/riscv_platform_timer.h"
 #endif
 #include "hardware/structs/busctrl.h"
+
+
+PICOTEST_MODULE_NAME("XIP_SRAM", "critical xip sram test");
 
 
 int __time_critical_func(test_func_xip)(void) {
@@ -21,6 +25,9 @@ int __time_critical_func(test_func_xip)(void) {
 
     volatile uint32_t i = 0;
     i += 4;
+    i += i;
+    i += 7;
+    i += i;
     i += i;
 
 #if PICO_RP2040
@@ -42,6 +49,9 @@ int __no_inline_not_in_flash_func(test_func_sram)(void) {
     volatile uint32_t i = 0;
     i += 4;
     i += i;
+    i += 7;
+    i += i;
+    i += i;
 
 #if PICO_RP2040
     return systick_hw->rvr - systick_hw->cvr;
@@ -52,19 +62,26 @@ int __no_inline_not_in_flash_func(test_func_sram)(void) {
 
 
 void core1_entry() {
+    // Just read memory from SRAM bank 0 repeatedly
+    // word-striped across 4 banks, so read every 16 bytes
 #ifndef __riscv
-    // Just read memory repeatedly
     pico_default_asm_volatile(
         "1:\n"
         "ldr r0, =%c0\n"
-        "ldmia r0!, {r1-r4}\n"
-        "ldmia r0!, {r1-r4}\n"
-        "ldmia r0!, {r1-r4}\n"
-        "ldmia r0!, {r1-r4}\n"
-        "ldmia r0!, {r1-r4}\n"
-        "ldmia r0!, {r1-r4}\n"
-        "ldmia r0!, {r1-r4}\n"
-        "ldmia r0!, {r1-r4}\n"
+        "ldr r1, [r0, #0]\n"
+        "ldr r2, [r0, #16]\n"
+        "ldr r3, [r0, #32]\n"
+        "ldr r4, [r0, #48]\n"
+        "adds r0, #64\n"
+        "ldr r1, [r0, #0]\n"
+        "ldr r2, [r0, #16]\n"
+        "ldr r3, [r0, #32]\n"
+        "ldr r4, [r0, #48]\n"
+        "adds r0, #64\n"
+        "ldr r1, [r0, #0]\n"
+        "ldr r2, [r0, #16]\n"
+        "ldr r3, [r0, #32]\n"
+        "ldr r4, [r0, #48]\n"
         "b 1b\n"
         : : "i" (SRAM_BASE) : "r0", "r1", "r2", "r3", "r4"
     );
@@ -73,20 +90,19 @@ void core1_entry() {
         "1:\n"
         "li a0, %0\n"
         "lw a1, 0(a0)\n"
-        "lw a2, 4(a0)\n"
-        "lw a3, 8(a0)\n"
-        "lw a4, 12(a0)\n"
-        "addi a0, a0, 16\n"
+        "lw a2, 16(a0)\n"
+        "lw a3, 32(a0)\n"
+        "lw a4, 48(a0)\n"
+        "addi a0, a0, 64\n"
         "lw a1, 0(a0)\n"
-        "lw a2, 4(a0)\n"
-        "lw a3, 8(a0)\n"
-        "lw a4, 12(a0)\n"
-        "addi a0, a0, 16\n"
+        "lw a2, 16(a0)\n"
+        "lw a3, 32(a0)\n"
+        "lw a4, 48(a0)\n"
+        "addi a0, a0, 64\n"
         "lw a1, 0(a0)\n"
-        "lw a2, 4(a0)\n"
-        "lw a3, 8(a0)\n"
-        "lw a4, 12(a0)\n"
-        "addi a0, a0, 16\n"
+        "lw a2, 16(a0)\n"
+        "lw a3, 32(a0)\n"
+        "lw a4, 48(a0)\n"
         "j 1b\n"
         : : "i" (SRAM_BASE) : "a0", "a1", "a2", "a3", "a4"
     );
@@ -105,7 +121,7 @@ void trigger_dma(void) {
         uint32_t from = SRAM_BASE;
         uint32_t to = SRAM_BASE + ((SRAM4_BASE - SRAM_BASE) / 2);
         uint32_t size = ((SRAM4_BASE - SRAM_BASE) / 2) / 4;
-        dma_channel_configure(chan, &c, (uint32_t*)to, (uint32_t*)from, size, true);
+        dma_channel_configure(chan, &c, (uint32_t*)to, (uint32_t*)from, dma_encode_transfer_count(size), true);
         dat[i] = chan;
     }
     for (int i = 0; i < count_of(dat); i++) {
@@ -117,6 +133,16 @@ void trigger_dma(void) {
 int main(void) {
     stdio_init_all();
     printf("pico_xip_sram_test begins\n");
+
+    PICOTEST_START();
+    
+    PICOTEST_START_SECTION("test_func_addresses")
+    printf("test_func_xip at %p\n", test_func_xip);
+    printf("test_func_sram at %p\n", test_func_sram);
+
+    PICOTEST_CHECK((uint32_t)test_func_xip >= XIP_SRAM_BASE && (uint32_t)test_func_xip < XIP_SRAM_END, "test_func_xip is not in XIP SRAM");
+    PICOTEST_CHECK((uint32_t)test_func_sram >= SRAM_STRIPED_BASE && (uint32_t)test_func_sram < SRAM4_BASE, "test_func_sram is not in SRAM 0-3");
+    PICOTEST_END_SECTION()
 
     multicore_launch_core1(core1_entry);
 
@@ -132,6 +158,7 @@ int main(void) {
     hw_set_bits(&busctrl_hw->priority, BUSCTRL_BUS_PRIORITY_PROC1_BITS | BUSCTRL_BUS_PRIORITY_DMA_R_BITS | BUSCTRL_BUS_PRIORITY_DMA_W_BITS);
     hw_clear_bits(&busctrl_hw->priority, BUSCTRL_BUS_PRIORITY_PROC0_BITS);
 
+    PICOTEST_START_SECTION("test_func");
     int test_func_xip_cycles = 0;
     int test_func_sram_cycles = 0;
     for (int i = 0; i < 5; i++) {
@@ -140,19 +167,16 @@ int main(void) {
         int tmp = test_func_xip();
         test_func_xip_cycles += tmp;
         printf("test_func_xip: %d\n", tmp);
+        trigger_dma();
         tmp = test_func_sram();
         test_func_sram_cycles += tmp;
         printf("test_func_sram: %d\n", tmp);
         sleep_ms(500);
     }
 
-    if (test_func_xip_cycles >= test_func_sram_cycles) {
-        printf("ERROR: test_func_xip_cycles (%d) >= test_func_sram_cycles (%d)\n", test_func_xip_cycles, test_func_sram_cycles);
-        return 1;
-    } else {
-        printf("SUCCESS: test_func_xip_cycles (%d) < test_func_sram_cycles (%d)\n", test_func_xip_cycles, test_func_sram_cycles);
-    }
+    PICOTEST_CHECK(test_func_xip_cycles < test_func_sram_cycles, "test_func_xip took longer than test_func_sram");
 
-    printf("pico_xip_sram_test ends\n");
-    return 0;
+    PICOTEST_END_SECTION();
+
+    PICOTEST_END_TEST();
 }

@@ -1,6 +1,6 @@
 # Use XIP SRAM for time critical functions
 add_executable(pico_critical_xip_sram_test pico_critical_xip_sram_test.c)
-target_link_libraries(pico_critical_xip_sram_test PRIVATE pico_stdlib pico_multicore hardware_dma)
+target_link_libraries(pico_critical_xip_sram_test PRIVATE pico_stdlib pico_multicore hardware_dma pico_test)
 if (NOT PICO_RP2040)
     target_link_libraries(pico_critical_xip_sram_test PRIVATE hardware_riscv_platform_timer)
 endif()
@@ -11,7 +11,7 @@ pico_add_extra_outputs(pico_critical_xip_sram_test)
 
 # Use XIP SRAM for time critical functions (no_flash build)
 add_executable(pico_critical_xip_sram_test_no_flash pico_critical_xip_sram_test.c)
-target_link_libraries(pico_critical_xip_sram_test_no_flash PRIVATE pico_stdlib pico_multicore hardware_dma)
+target_link_libraries(pico_critical_xip_sram_test_no_flash PRIVATE pico_stdlib pico_multicore hardware_dma pico_test)
 if (NOT PICO_RP2040)
     target_link_libraries(pico_critical_xip_sram_test_no_flash PRIVATE hardware_riscv_platform_timer)
 endif()
