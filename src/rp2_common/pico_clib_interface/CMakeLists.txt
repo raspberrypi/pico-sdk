@@ -21,10 +21,6 @@ if (NOT TARGET pico_clib_interface)
     #            PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS=0
     #)
 
-    target_include_directories(pico_picolibc_interface SYSTEM INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/include/picolibc
-    )
-    
     #  ---- llvm_libc ----
     pico_add_library(pico_llvm_libc_interface)
 
