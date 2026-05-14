@@ -24,6 +24,7 @@ cc_binary(
         "//src/rp2_common/hardware_dma",
         "//src/rp2_common/pico_multicore",
         "//src/rp2_common/pico_stdlib",
+        "//test/pico_test",
     ],
 )
 
