@@ -162,10 +162,13 @@
  *  \ingroup pico_platform
  *
  * Decorates a function name, such that the function will execute from RAM (assuming it is not inlined
- * into a flash function by the compiler) to avoid possible flash latency. Currently this macro is identical
+ * into a flash function by the compiler) to avoid possible flash latency. By default, this macro is identical
  * in implementation to `__not_in_flash_func`, however the semantics are distinct and a `__time_critical_func`
- * may in the future be treated more specially to reduce the overhead when calling such function from a flash
- * function.
+ * can be treated more specially to reduce the overhead when calling such function.
+ * 
+ * For binaries that are not executing from flash (eg copy_to_ram and no_flash), one special treatment can be
+ * using the \ref`pico_use_xip_sram_for_time_critical` CMake function to place them in XIP RAM instead, as the
+ * XIP ports would be otherwise unused. 
  *
  * For example a function called my_func taking an int parameter:
  *
