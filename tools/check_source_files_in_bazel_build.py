@@ -166,6 +166,7 @@ def git_ls_files_by_extension(file_suffixes: Iterable[str]) -> Iterable[Path]:
     ).stdout
 
     bazel_files = [Path(f) for f in bazel_file_list.splitlines()]
+    bazel_files = [f for f in bazel_files if not f.is_relative_to("cmake")]
     return bazel_files
 
 
