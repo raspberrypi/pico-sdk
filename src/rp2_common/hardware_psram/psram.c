@@ -161,7 +161,6 @@ static const uint8_t default_pin_cs_gpios[] = {
 #if defined(CYW43_DEFAULT_PIN_WL_CS) && is_cs_gpio(CYW43_DEFAULT_PIN_WL_CS)
     CYW43_DEFAULT_PIN_WL_CS,
 #endif
-// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS_SKIP_PINS, comma separated list of extra pins to not check when auto-detecting psram chip select pin, type=list, group=hardware_psram
 #ifdef PICO_AUTO_DETECT_PSRAM_CS_SKIP_PINS
     PICO_AUTO_DETECT_PSRAM_CS_SKIP_PINS
 #endif

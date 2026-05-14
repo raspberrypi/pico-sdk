@@ -85,6 +85,7 @@
 #endif
 
 // PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS, skip any _DEFAULT_ GPIOs defined in the board header when auto-detecting psram chip select pin, type=bool, default=PICO_AUTO_DETECT_PSRAM_CS, group=hardware_psram
+// PICO_CONFIG: PICO_AUTO_DETECT_PSRAM_CS_SKIP_PINS, comma separated list of extra pins to not check when auto-detecting psram chip select pin, type=list, group=hardware_psram
 #ifndef PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS
 #define PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS PICO_AUTO_DETECT_PSRAM_CS
 #endif
