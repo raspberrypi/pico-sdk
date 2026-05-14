@@ -275,7 +275,7 @@ void gpio_init(uint gpio) {
     gpio_set_dir(gpio, GPIO_IN);
     gpio_put(gpio, 0);
     gpio_set_function(gpio, GPIO_FUNC_SIO);
-}7
+}
 
 void gpio_deinit(uint gpio) {
     gpio_set_function(gpio, GPIO_FUNC_NULL);
