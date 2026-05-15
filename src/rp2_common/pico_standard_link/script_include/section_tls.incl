@@ -1,0 +1,63 @@
+/* Sections for proper TLS
+
+    Defines the following symbols for use by code:
+    __tls_start, __tls_size, __tls_align, __tls_size_align
+    __arm32_tls_tcb_offset
+    __tdata_size, __tdata_source, __tbss_size, __tbs_offset
+*/
+
+SECTIONS
+{
+    PROVIDE( __tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
+    PROVIDE( __tls_size = __tls_end - __tls_start );
+    PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+    PROVIDE( __tls_size_align = ALIGN( __tls_size, __tls_align) );
+    PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
+    PROVIDE( __tdata_size = SIZEOF(.tdata) );
+    PROVIDE( __tdata_source = LOADADDR(.tdata) );
+    PROVIDE( __tbss_size = SIZEOF(.tbss) );
+    PROVIDE( __tbss_offset = ADDR(.tbss) - __tls_start );
+
+    /* this marker is present if the code knows we don't need __tls0 and __tls1... we decide
+     * to waste 4 bytes in that case rather than possibly large amounts for __tls0 and __tls1
+     * which will never be used */
+    .tlsX_not_needed_marker (NOLOAD) : {
+        KEEP(*(.tlsX_not_needed_marker))
+    }
+    PROVIDE( __tlsX_align = SIZEOF(.tlsX_not_needed_marker) > 0 ? 4 : __tls_align);
+    PROVIDE( __tlsX_size_align = SIZEOF(.tlsX_not_needed_marker) > 0 ? 0 : __tls_size_align);
+
+    /*
+     * Workaround older toolchain bugs by doing the PROVIDE(x = y) followed by x = DEFINED(x) ? x : y
+     *
+     * Note there is probably a less verbose fix in this case as many of these symbols are
+     * potentially not needed on older GCC for instance which is certainly using emutls
+     * but this fix style is known to be correct, so is likely clearer
+     */
+    __tls_start = DEFINED( __tls_start) ?  __tls_start : SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss);
+    __tls_size = DEFINED( __tls_size) ?  __tls_size : __tls_end - __tls_start;
+    __tls_align = DEFINED( __tls_align) ?  __tls_align : MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
+    __tls_size_align = DEFINED( __tls_size_align) ?  __tls_size_align : ALIGN( __tls_size, __tls_align);
+    __arm32_tls_tcb_offset = DEFINED( __arm32_tls_tcb_offset) ?  __arm32_tls_tcb_offset : MAX(8, __tls_align);
+    __tdata_size = DEFINED( __tdata_size) ?  __tdata_size : SIZEOF(.tdata);
+    __tdata_source = DEFINED( __tdata_source) ?  __tdata_source : LOADADDR(.tdata);
+    __tbss_size = DEFINED( __tbss_size) ?  __tbss_size : SIZEOF(.tbss);
+    __tbss_offset = DEFINED( __tbss_offset) ?  __tbss_offset : ADDR(.tbss) - __tls_start;
+
+    __tlsX_align      = DEFINED(__tlsX_align)      ? __tlsX_align      : (SIZEOF(.tlsX_not_needed_marker) > 0 ? 4 : __tls_align);
+    __tlsX_size_align = DEFINED(__tlsX_size_align) ? __tlsX_size_align : (SIZEOF(.tlsX_not_needed_marker) > 0 ? 0 : __tls_size_align);
+
+    /* Thread local storage static allocations, one per core */
+    .tls0 (NOLOAD) : {
+       . = ALIGN(__tlsX_align);
+       PROVIDE(__tls0_base = .);
+       . = . + __tlsX_size_align;
+    } > RAM
+
+    .tls1 (NOLOAD) : {
+        . = ALIGN(__tlsX_align);
+        PROVIDE(__tls1_base = .);
+        . = . + __tlsX_size_align;
+    } > RAM
+
+}

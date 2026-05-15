@@ -244,9 +244,7 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
  * \param b the second operand
  * \return a * b
  */
-#define __fast_mul(a, b) __builtin_choose_expr(__builtin_constant_p(b) && !__builtin_constant_p(a), \
-    (__builtin_popcount(b) >= 2 ? __mul_instruction(a,b) : (a)*(b)), \
-    (a)*(b))
+#define __fast_mul(a, b) (__builtin_constant_p(b) && !__builtin_constant_p(a) && __builtin_popcount(b) >= 2 ? __mul_instruction(a,b) : (a)*(b))
 
 #ifdef __cplusplus
 }

@@ -109,6 +109,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(rp2_common/pico_malloc)
     pico_add_subdirectory(rp2_common/pico_printf)
     pico_add_subdirectory(rp2_common/pico_rand)
+    pico_add_subdirectory(rp2_common/pico_thread_local)
 
     if (PICO_COMBINED_DOCS OR NOT PICO_RP2040)
         pico_add_subdirectory(rp2_common/pico_sha256)

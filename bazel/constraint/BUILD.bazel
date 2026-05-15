@@ -181,6 +181,16 @@ config_setting(
 )
 
 config_setting(
+    name = "pico_thread_local_per_thread_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_THREAD_LOCAL_IMPL": "per_thread"},
+)
+
+config_setting(
+    name = "pico_thread_local_global_enabled",
+    flag_values = {"//bazel/config:PICO_DEFAULT_THREAD_LOCAL_IMPL": "global"},
+)
+
+config_setting(
     name = "pico_async_context_poll_enabled",
     flag_values = {"//bazel/config:PICO_ASYNC_CONTEXT_IMPL": "poll"},
 )

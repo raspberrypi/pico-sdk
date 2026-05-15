@@ -82,6 +82,7 @@ alias(
         "//src/rp2_common/pico_mem_ops:__pkg__",
         "//src/rp2_common/pico_printf:__pkg__",
         "//src/rp2_common/pico_runtime_init:__pkg__",
+        "//src/rp2_common/pico_thread_local:__pkg__",
     ],
 )
 

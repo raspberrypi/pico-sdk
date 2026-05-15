@@ -67,6 +67,42 @@ float __attribute__((noinline)) foox(float x, float b) {
     return x * b;
 }
 
+uint __noinline const_funcs_returning_int(__unused float x, int n) {
+    return __fast_mul(n, 7)
+#if PICO_FLOAT_HAS_FLOAT_TO_FIX32_M_CONVERSIONS
+           + float2fix(x, 7)
+           + float2ufix(x, 7)
+#endif
+#if PICO_FLOAT_HAS_FLOAT_TO_FIX32_Z_CONVERSIONS
+           + float2fix_z(x, 7)
+           + float2ufix_z(x, 7)
+#endif
+        ;
+}
+
+uint __noinline non_const_funcs_returning_int(__unused float x, int n) {
+    return __fast_mul(n, n)
+#if PICO_FLOAT_HAS_FLOAT_TO_FIX32_M_CONVERSIONS
+           + float2fix(x, n)
+           + float2ufix(x, n)
+#endif
+#if PICO_FLOAT_HAS_FLOAT_TO_FIX32_Z_CONVERSIONS
+           + float2fix_z(x, n)
+           + float2ufix_z(x, n)
+#endif
+        ;
+}
+
+#if PICO_FLOAT_HAS_FIX32_TO_FLOAT_CONVERSIONS
+float __noinline const_funcs_returning_float(int n) {
+    return fix2float(n, 7) + ufix2float(n, 7);
+}
+
+float __noinline non_const_funcs_returning_float(int n) {
+    return fix2float(n, n) + ufix2float(n, n);
+}
+#endif
+
 void svc_call(void) {
     puts("PASSED");
     exit(0);
@@ -105,6 +141,10 @@ int main(void) {
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     hard_assert(recursive_mutex_try_enter(&recursive_mutex, NULL));
     printf("%f\n", foox(1.3f, 2.6f));
+    printf("%u %u\n", const_funcs_returning_int(3.7f, 7), non_const_funcs_returning_int(3.7f, 7));
+#if PICO_FLOAT_HAS_FIX32_TO_FLOAT_CONVERSIONS
+    printf("%f %f\n", const_funcs_returning_float(7), non_const_funcs_returning_float(7));
+#endif
 #ifdef EXTRA_DATA_SECTION
     extern uint32_t __extra_end_variable__;
     printf("__extra_end_variable__ = %p\n", (void *)&__extra_end_variable__);

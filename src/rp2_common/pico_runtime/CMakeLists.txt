@@ -36,6 +36,7 @@ set(PICO_RUNTIME_LIBRARIES
         pico_crt0
         pico_clib_interface
         pico_stdio
+        pico_thread_local
 )
 
 foreach(LIB IN LISTS PICO_RUNTIME_LIBRARIES)
@@ -83,7 +84,8 @@ function(pico_minimize_runtime TARGET)
             DOUBLE
             FPGA_CHECK
             PANIC
-            AUTO_INIT_MUTEX)
+            AUTO_INIT_MUTEX
+            THREAD_LOCAL)
     cmake_parse_arguments(RUNTIME "" ""
             "INCLUDE;EXCLUDE" ${ARGN} )
     foreach (INCL_EXCL IN ITEMS INCLUDE EXCLUDE)
@@ -113,6 +115,9 @@ function(pico_minimize_runtime TARGET)
     endif()
     if (NOT RUNTIME_INCLUDE_AUTO_INIT_MUTEX)
         target_compile_definitions(${TARGET} PRIVATE PICO_RUNTIME_SKIP_INIT_MUTEX=1)
+    endif()
+    if (NOT RUNTIME_INCLUDE_THREAD_LOCAL)
+        pico_set_thread_local_implementation(${TARGET} none)
     endif()
 
     if (RUNTIME_INCLUDE_PRINTF)
