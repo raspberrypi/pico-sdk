@@ -125,6 +125,7 @@ cc_library(
         "//src/rp2_common/pico_printf:__pkg__",
         "//src/rp2_common/pico_runtime:__pkg__",
         "//src/rp2_common/pico_runtime_init:__pkg__",
+        "//src/rp2_common/pico_thread_local:__pkg__",
         "//src/rp2_common/pico_time_adapter:__pkg__",
         "@picotool//:__subpackages__",
     ],

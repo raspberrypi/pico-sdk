@@ -140,13 +140,24 @@ string_flag(
     ],
 )
 
-# PICO_BAZEL_CONFIG: PICO_DEFAULT_PRINTF_IMPL, The default implementation for pico_printf to link. compiler lets the compiler control printf behavior while pico provides a pico-specific implementation, type=string, default=double, group=build
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_PRINTF_IMPL, The default implementation for pico_printf to link. compiler lets the compiler control printf behavior while pico provides a pico-specific implementation, type=string, default=pico, group=build
 string_flag(
     name = "PICO_DEFAULT_PRINTF_IMPL",
     build_setting_default = "pico",
     values = [
         "pico",
         "compiler",
+        "none",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_THREAD_LOCAL_IMPL, The default implementation for pico_thread_local to link; per_thread provides per thread locals while global provides shared global values, type=string, default=per_thread, group=build
+string_flag(
+    name = "PICO_DEFAULT_THREAD_LOCAL_IMPL",
+    build_setting_default = "per_thread",
+    values = [
+        "per_thread",
+        "global",
         "none",
     ],
 )

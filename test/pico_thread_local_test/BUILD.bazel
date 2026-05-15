@@ -1,0 +1,35 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:transition.bzl", "extra_copts_for_all_deps")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_thread_local_test_actual",
+    testonly = True,
+    srcs = ["pico_thread_local_test.c"],
+    tags = ["manual"],  # Built via pico_thread_local_test.
+    # Doesn't appear to work on host builds yet.
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_multicore",
+        "//src/rp2_common/pico_stdlib",
+        "//src/rp2_common/pico_thread_local",
+    ],
+)
+
+extra_copts_for_all_deps(
+    name = "pico_thread_local_test",
+    testonly = True,
+    src = ":pico_thread_local_test_actual",
+    # Host doesn't support pico_multicore without pico_host_sdl.
+    target_compatible_with = compatible_with_rp2(),
+)
+
+# TODO: Add these tests to the Bazel build.
+filegroup(
+    name = "unsupported_tests",
+    srcs = [
+        "pico_thread_local_test_cpp.cpp",
+    ],
+)

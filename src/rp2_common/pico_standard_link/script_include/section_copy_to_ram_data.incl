@@ -7,6 +7,10 @@
     __fini_array_start, __fini_array_end
     __tdata_end
     __etext
+    __bss_start__, __bss_end__
+    __tls_base, __tls_end
+    __tbss_end
+    __global_pointer$
 */
 
 SECTIONS
@@ -24,6 +28,11 @@ SECTIONS
 
         *(.data*)
         *(.sdata*)
+
+        . = ALIGN(4);
+        PROVIDE_HIDDEN (__emutls_array_start = .);
+        *(.*.__emutls_v.*)
+        PROVIDE_HIDDEN (__emutls_array_end = .);
 
         . = ALIGN(4);
         *(.after_data.*)
@@ -71,4 +80,33 @@ SECTIONS
 
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
     __etext = LOADADDR(.data);
+
+    . = ALIGN(4);
+    /* note that .tbss is expected to directly follow .tdata */
+    .tbss (NOLOAD) : {
+        __bss_start__ = .;
+        __tls_base = .;
+        *(.tbss .tbss.* .gnu.linkonce.tb.*)
+        *(.tcommon)
+
+        . = ALIGN(4);
+        __tls_end = .;
+    } > RAM
+
+    /* workaround RISC-V GNU linker bug with spacer section (otherwise it places .bss over .tbss) */
+    .tbss_space (NOLOAD) : {
+        . = __bss_start__ + SIZEOF(.tbss);
+    } > RAM
+
+    .bss (NOLOAD) : {
+        . = ALIGN(4);
+        __tbss_end = .;
+
+        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
+        *(COMMON)
+        PROVIDE(__global_pointer$ = . + 2K);
+        *(.sbss*)
+        . = ALIGN(4);
+        __bss_end__ = .;
+    } > RAM
 }
