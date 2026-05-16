@@ -44,7 +44,7 @@ static bool colored_status_led_on;
 #define PICO_COLORED_STATUS_LED_WS2812_FREQ 800000
 #endif
 
-// PICO_CONFIG: PICO_COLORED_STATUS_LED_RESET_DELAY_US, Required reset delay in microseconds for the WS2812 colored status LED, type=int, default=50, group=pico_status_led
+// PICO_CONFIG: PICO_COLORED_STATUS_LED_RESET_DELAY_US, Required reset delay in microseconds for the WS2812 colored status LED, type=int, default=100, group=pico_status_led
 #ifndef PICO_COLORED_STATUS_LED_RESET_DELAY_US
 #define PICO_COLORED_STATUS_LED_RESET_DELAY_US 100
 #endif
