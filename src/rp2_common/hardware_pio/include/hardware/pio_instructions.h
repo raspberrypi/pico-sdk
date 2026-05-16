@@ -55,6 +55,29 @@ enum pio_instr_bits {
 #define _PIO_INVALID_MOV_DEST 0u
 #endif
 
+// Disambiguation marker for pio_pindirs (always present, not NDEBUG-gated)
+//
+// pio_pindirs and pio_exec_mov both occupy the low-3-bit value 4 in this enum:
+// SET/IN/OUT all encode PINDIRS as field 4, and MOV encodes EXEC as 4. Without
+// a marker, the two are numerically identical in release builds (where the
+// _PIO_INVALID_* flags are zero), so the MOV encoder cannot tell them apart.
+//
+// On RP2350+, MOV PINDIRS exists and encodes as field 3 instead of 4; the
+// encoder uses this marker to remap pio_pindirs to 3 without also remapping
+// pio_exec_mov. All existing encoders mask the destination with `& 7u` before
+// emitting it, so the high marker bit is safely discarded everywhere it isn't
+// being checked.
+#define _PIO_MARKER_PINDIRS 0x100u
+
+// On RP2040, PINDIRS is not a valid MOV destination - keep the debug-mode
+// assert. On RP2350+, MOV PINDIRS is valid (encoded as field 3 via the marker
+// remap below), so don't flag it as invalid.
+#if PICO_PIO_VERSION > 0
+#define _PIO_INVALID_MOV_DEST_PINDIRS 0u
+#else
+#define _PIO_INVALID_MOV_DEST_PINDIRS _PIO_INVALID_MOV_DEST
+#endif
+
 /*! \brief Enumeration of values to pass for source/destination args for instruction encoding functions
  *  \ingroup pio_instructions
  *
@@ -66,7 +89,7 @@ enum pio_src_dest {
     pio_x = 1u,
     pio_y = 2u,
     pio_null = 3u | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_DEST,
-    pio_pindirs = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC | _PIO_INVALID_MOV_DEST,
+    pio_pindirs = 4u | _PIO_MARKER_PINDIRS | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC | _PIO_INVALID_MOV_DEST_PINDIRS,
     pio_exec_mov = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_OUT_DEST | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC,
     pio_status = 5u | _PIO_INVALID_IN_SRC | _PIO_INVALID_OUT_DEST | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_DEST,
     pio_pc = 5u | _PIO_INVALID_IN_SRC | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC,
@@ -74,6 +97,16 @@ enum pio_src_dest {
     pio_osr = 7u | _PIO_INVALID_OUT_DEST | _PIO_INVALID_SET_DEST,
     pio_exec_out = 7u | _PIO_INVALID_IN_SRC | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC | _PIO_INVALID_MOV_DEST,
 };
+
+// Map a pio_src_dest to its 3-bit MOV destination field. Only pio_pindirs
+// (distinguished from pio_exec_mov by _PIO_MARKER_PINDIRS) needs remapping;
+// it uses field 3 on RP2350+ instead of the 4 used by SET/IN/OUT.
+static inline uint _pio_mov_dest_bits(enum pio_src_dest dest) {
+#if PICO_PIO_VERSION > 0
+    if (dest & _PIO_MARKER_PINDIRS) return 3u;
+#endif
+    return dest & 7u;
+}
 
 static inline uint _pio_major_instr_bits(uint instr) {
     return instr & 0xe000u;
@@ -398,7 +431,7 @@ static inline uint pio_encode_pull(bool if_empty, bool block) {
 static inline uint pio_encode_mov(enum pio_src_dest dest, enum pio_src_dest src) {
     valid_params_if(PIO_INSTRUCTIONS, !(dest & _PIO_INVALID_MOV_DEST));
     valid_params_if(PIO_INSTRUCTIONS, !(src & _PIO_INVALID_MOV_SRC));
-    return _pio_encode_instr_and_src_dest(pio_instr_bits_mov, dest, src & 7u);
+    return _pio_encode_instr_and_args(pio_instr_bits_mov, _pio_mov_dest_bits(dest), src & 7u);
 }
 
 /*! \brief Encode a MOV instruction with bit invert
@@ -414,7 +447,7 @@ static inline uint pio_encode_mov(enum pio_src_dest dest, enum pio_src_dest src)
 static inline uint pio_encode_mov_not(enum pio_src_dest dest, enum pio_src_dest src) {
     valid_params_if(PIO_INSTRUCTIONS, !(dest & _PIO_INVALID_MOV_DEST));
     valid_params_if(PIO_INSTRUCTIONS, !(src & _PIO_INVALID_MOV_SRC));
-    return _pio_encode_instr_and_src_dest(pio_instr_bits_mov, dest, (1u << 3u) | (src & 7u));
+    return _pio_encode_instr_and_args(pio_instr_bits_mov, _pio_mov_dest_bits(dest), (1u << 3u) | (src & 7u));
 }
 
 /*! \brief Encode a MOV instruction with bit reverse
@@ -430,7 +463,7 @@ static inline uint pio_encode_mov_not(enum pio_src_dest dest, enum pio_src_dest 
 static inline uint pio_encode_mov_reverse(enum pio_src_dest dest, enum pio_src_dest src) {
     valid_params_if(PIO_INSTRUCTIONS, !(dest & _PIO_INVALID_MOV_DEST));
     valid_params_if(PIO_INSTRUCTIONS, !(src & _PIO_INVALID_MOV_SRC));
-    return _pio_encode_instr_and_src_dest(pio_instr_bits_mov, dest, (2u << 3u) | (src & 7u));
+    return _pio_encode_instr_and_args(pio_instr_bits_mov, _pio_mov_dest_bits(dest), (2u << 3u) | (src & 7u));
 }
 
 /*! \brief Encode a IRQ SET instruction
