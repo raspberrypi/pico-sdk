@@ -168,6 +168,7 @@ bool colored_status_led_set_state(bool led_on) {
         return true;
 #endif
     }
+    ((void)led_on);
     return false;
 }
 
