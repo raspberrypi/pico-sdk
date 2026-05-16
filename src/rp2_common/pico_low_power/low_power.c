@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <string.h>
+
 #include "pico.h"
 
-#include <string.h>
 #include "pico/low_power.h"
 #include "pico/aon_timer.h"
 #include "pico/runtime_init.h"
