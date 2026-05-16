@@ -1108,11 +1108,19 @@ static inline void pio_set_sm_multi_mask_enabled(PIO pio, uint32_t mask_prev, ui
 }
 #endif
 
-/*! \brief Restart a state machine with a known state
+/*! \brief Restart a state machine with a known internal state
  *  \ingroup hardware_pio
  *
- * This method clears the ISR, shift counters, clock divider counter
- * pin write flags, delay counter, latched EXEC instruction, and IRQ wait condition.
+ * Clears the following on the selected state machine: input and output shift
+ * counters, the contents of the input shift register, the delay counter, the
+ * waiting-on-IRQ state, any stalled instruction written to `SMx_INSTR` or run
+ * by `OUT/MOV EXEC`, and any pin write left asserted due to `OUT_STICKY`.
+ *
+ * Not affected: the state machine's enable/running state (see
+ * \ref pio_sm_set_enabled), its program counter, the contents of its output
+ * shift register, and its X and Y scratch registers. To restart the clock
+ * divider use \ref pio_sm_clkdiv_restart; to set the program counter to a
+ * specific value, follow this call with a `JMP` via \ref pio_sm_exec.
  *
  * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
@@ -1123,14 +1131,16 @@ static inline void pio_sm_restart(PIO pio, uint sm) {
     hw_set_bits(&pio->ctrl, 1u << (PIO_CTRL_SM_RESTART_LSB + sm));
 }
 
-/*! \brief Restart multiple state machine with a known state
+/*! \brief Restart multiple state machines with a known internal state
  *  \ingroup hardware_pio
  *
- * This method clears the ISR, shift counters, clock divider counter
- * pin write flags, delay counter, latched EXEC instruction, and IRQ wait condition.
+ * Performs the same operation as \ref pio_sm_restart for each state machine
+ * selected in \p mask. See \ref pio_sm_restart for the exact list of internal
+ * state that is cleared and what is left untouched (notably, the enable/running
+ * state and program counter are preserved).
  *
  * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
- * \param mask bit mask of state machine indexes to modify the enabled state of
+ * \param mask bit mask of state machine indexes to restart (bit 0 = state machine 0, etc.)
  */
 static inline void pio_restart_sm_mask(PIO pio, uint32_t mask) {
     check_pio_param(pio);
