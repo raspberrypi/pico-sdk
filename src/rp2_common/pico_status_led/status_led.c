@@ -99,7 +99,7 @@ static int64_t deferred_set_ws2812(__unused alarm_id_t id, __unused  void *user_
 }
 #endif
 
-static bool set_ws2812(uint32_t value) {
+static void set_ws2812(uint32_t value) {
     spin_lock_t *spin_lock = spin_lock_instance(PICO_SPINLOCK_ID_ATOMIC);
     uint32_t save = spin_lock_blocking(spin_lock);
     next_value = value;
@@ -143,7 +143,6 @@ static bool set_ws2812(uint32_t value) {
         }
 #endif
     }
-    return true;
 }
 #endif
 
@@ -157,20 +156,19 @@ uint32_t colored_status_led_get_on_color(void) {
 }
 
 bool colored_status_led_set_state(bool led_on) {
-    bool success = false;
     if (colored_status_led_supported()) {
 #if COLORED_STATUS_LED_USING_WS2812_PIO
-        success = true;
         if (led_on) {
             // Turn the LED "on" even if it was already on, as the color might have changed
-            success = set_ws2812(colored_status_led_on_color);
-        } else if (!led_on && colored_status_led_on) {
-            success = set_ws2812(0);
+            set_ws2812(colored_status_led_on_color);
+        } else if (colored_status_led_on) {
+            set_ws2812(0);
         }
+        colored_status_led_on = led_on;
+        return true;
 #endif
     }
-    if (success) colored_status_led_on = led_on;
-    return success;
+    return false;
 }
 
 bool colored_status_led_get_state(void) {
