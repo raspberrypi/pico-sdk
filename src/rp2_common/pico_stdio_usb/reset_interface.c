@@ -125,8 +125,18 @@ static bool resetd_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_
             bool active_low = false;
 #endif
 #if !PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED
+            // wValue layout:
+            //   bits 0-6  : forwarded as the bootrom disable_interface_mask
+            //   bit 8     : 1 if an activity-LED GPIO is being specified
+            //   bit 9     : 1 if the activity-LED GPIO is active-low
+            //   bits 10-15: activity-LED GPIO number (0-63; enough for RP2040
+            //               and RP2350 which have at most 48 GPIOs)
+            // Previously the GPIO was extracted as (wValue >> 9), which made
+            // its low bit alias the active_low flag at bit 9 - any odd-numbered
+            // GPIO would force active_low and any active_low request would
+            // round the GPIO down. See #2713.
             if (request->wValue & 0x100) {
-                gpio = request->wValue >> 9u;
+                gpio = request->wValue >> 10u;
             }
             active_low = request->wValue & 0x200;
 #endif
