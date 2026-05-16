@@ -44,7 +44,7 @@ static bool colored_status_led_on;
 #define PICO_COLORED_STATUS_LED_WS2812_FREQ 800000
 #endif
 
-// PICO_CONFIG: PICO_COLORED_STATUS_LED_RESET_DELAY_US, Required reset delay in microseconds for the WS2812 colored status LED , type=int, default=50, group=pico_status_led
+// PICO_CONFIG: PICO_COLORED_STATUS_LED_RESET_DELAY_US, Required reset delay in microseconds for the WS2812 colored status LED, type=int, default=50, group=pico_status_led
 #ifndef PICO_COLORED_STATUS_LED_RESET_DELAY_US
 #define PICO_COLORED_STATUS_LED_RESET_DELAY_US 50
 #endif
@@ -75,7 +75,7 @@ static int8_t alarm_pending;
 
 static void unsafe_set_ws2812(uint32_t value, uint64_t now) {
     if (pio) {
-        pio_sm_drain_tx_fifo(pio, sm); // want to jump passed any previous queued values
+        pio_sm_drain_tx_fifo(pio, sm); // want to jump past any previous queued values
 #if PICO_COLORED_STATUS_LED_USES_WRGB
         // Convert to 0xWWGGRRBB
         pio_sm_put_blocking(pio, sm, WHITE(value) << 24 | GREEN(value) << 16 | RED(value) << 8 | BLUE(value));
