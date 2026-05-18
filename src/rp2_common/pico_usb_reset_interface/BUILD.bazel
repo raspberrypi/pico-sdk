@@ -1,5 +1,5 @@
-load("//bazel:defs.bzl", "compatible_with_config", "compatible_with_rp2", "incompatible_with_config")
-load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,8 +13,8 @@ cc_library(
     ],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        "//src/common/pico_usb_reset_interface_headers",
         "//bazel/config:PICO_TINYUSB_LIB",
+        "//src/common/pico_usb_reset_interface_headers",
         "//src/rp2_common/hardware_watchdog",
         "//src/rp2_common/pico_bootrom",
     ],

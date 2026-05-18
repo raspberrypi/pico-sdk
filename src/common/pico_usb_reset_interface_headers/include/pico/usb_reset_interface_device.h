@@ -18,14 +18,14 @@
  *
  * To add this functionality to a project using TinyUSB directly, you need to:
  * 1. Link the pico_usb_reset_interface library, and include the `pico/usb_reset_interface_device.h` header file where needed.
- * 2. Define PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE=1
+ * 2. Define PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE=1
  * 3. Add `TUD_RPI_RESET_DESCRIPTOR(<ITF_NUM>, <STR_IDX>)` to your USB descriptors (length is `TUD_RPI_RESET_DESC_LEN`)
  * 4. Check if your project has an existing `usbd_app_driver_get_cb` function:
  *    - If it does, you need to add the `usb_reset_interface_driver` to the drivers returned
- *    - If it does not, and you aren't using the `pico_stdio_usb` library, you need to define `PICO_STDIO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB=1`
+ *    - If it does not, and you aren't using the `pico_stdio_usb` library, you need to define `PICO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB=1`
  * 5. Check if your project has an existing Microsoft OS 2.0 Descriptor:
  *    - If it does, you need to add the Function Subset header `RPI_RESET_MS_OS_20_DESCRIPTOR(<ITF_NUM>)` to your Microsoft OS 2.0 Descriptor (length is `RPI_RESET_MS_OS_20_DESC_LEN`)
- *    - If it does not, you need to define `PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR=1` and `PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF=<ITF_NUM>`
+ *    - If it does not, you need to define `PICO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR=1` and `PICO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF=<ITF_NUM>`
  */
 
 #include "pico/usb_reset_interface.h"

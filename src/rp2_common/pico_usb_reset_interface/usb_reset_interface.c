@@ -9,16 +9,16 @@
 #include "pico/bootrom.h"
 #include "pico/usb_reset_interface_device.h"
 
-#if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE && !(PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL || PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT)
-#warning PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE has been selected but neither PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL nor PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT have been selected.
+#if PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE && !(PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL || PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT)
+#warning PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE has been selected but neither PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL nor PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT have been selected.
 #endif
 
-#if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
+#if PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE
 #include "hardware/watchdog.h"
 
 static uint8_t itf_num;
 
-#if PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR
+#if PICO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR
 // Support for Microsoft OS 2.0 descriptor
 #define BOS_TOTAL_LEN      (TUD_BOS_DESC_LEN + TUD_BOS_MICROSOFT_OS_DESC_LEN)
 
@@ -45,7 +45,7 @@ static const uint8_t desc_ms_os_20[] =
     // Set header: length, type, windows version, total length
     U16_TO_U8S_LE(0x000A), U16_TO_U8S_LE(MS_OS_20_SET_HEADER_DESCRIPTOR), U32_TO_U8S_LE(0x06030000), U16_TO_U8S_LE(MS_OS_20_DESC_LEN),
 
-    RPI_RESET_MS_OS_20_DESCRIPTOR(PICO_STDIO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF)
+    RPI_RESET_MS_OS_20_DESCRIPTOR(PICO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF)
 };
 
 TU_VERIFY_STATIC(sizeof(desc_ms_os_20) == MS_OS_20_DESC_LEN, "Incorrect size");
@@ -93,29 +93,29 @@ bool usb_reset_interface_control_xfer_cb(uint8_t __unused rhport, uint8_t stage,
 
     if (request->wIndex == itf_num) {
 
-#if PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL
+#if PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL
         if (request->bRequest == RESET_REQUEST_BOOTSEL) {
-#ifdef PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED
-            int gpio = PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED;
-            bool active_low = PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW;
+#ifdef PICO_USB_RESET_BOOTSEL_ACTIVITY_LED
+            int gpio = PICO_USB_RESET_BOOTSEL_ACTIVITY_LED;
+            bool active_low = PICO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW;
 #else
             int gpio = -1;
             bool active_low = false;
 #endif
-#if !PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED
+#if !PICO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED
             if (request->wValue & 0x100) {
                 gpio = request->wValue >> 9u;
             }
             active_low = request->wValue & 0x200;
 #endif
-            rom_reset_usb_boot_extra(gpio, (request->wValue & 0x7f) | PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK, active_low);
+            rom_reset_usb_boot_extra(gpio, (request->wValue & 0x7f) | PICO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK, active_low);
             // does not return, otherwise we'd return true
         }
 #endif
 
-#if PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT
+#if PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT
         if (request->bRequest == RESET_REQUEST_FLASH) {
-            watchdog_reboot(0, 0, PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS);
+            watchdog_reboot(0, 0, PICO_USB_RESET_RESET_TO_FLASH_DELAY_MS);
             return true;
         }
 #endif
@@ -128,7 +128,7 @@ bool usb_reset_interface_xfer_cb(uint8_t __unused rhport, uint8_t __unused ep_ad
     return true;
 }
 
-#if PICO_STDIO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB
+#if PICO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB
 // Implement callback to add our custom driver
 usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count) {
     *driver_count = 1;
@@ -137,18 +137,18 @@ usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count) {
 #endif
 #endif
 
-#if PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE
+#if PICO_ENABLE_USB_RESET_VIA_BAUD_RATE
 // Support for default BOOTSEL reset by changing baud rate
 void tud_cdc_line_coding_cb(__unused uint8_t itf, cdc_line_coding_t const* p_line_coding) {
-    if (p_line_coding->bit_rate == PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE) {
-#ifdef PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED
-        int gpio = PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED;
-        bool active_low = PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW;
+    if (p_line_coding->bit_rate == PICO_USB_RESET_MAGIC_BAUD_RATE) {
+#ifdef PICO_USB_RESET_BOOTSEL_ACTIVITY_LED
+        int gpio = PICO_USB_RESET_BOOTSEL_ACTIVITY_LED;
+        bool active_low = PICO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW;
 #else
         int gpio = -1;
         bool active_low = false;
 #endif
-        rom_reset_usb_boot_extra(gpio, PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK, active_low);
+        rom_reset_usb_boot_extra(gpio, PICO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK, active_low);
     }
 }
 #endif

@@ -62,20 +62,6 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE, Enable/disable resetting into BOOTSEL mode if the host sets the baud rate to a magic value (PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE), type=bool, default=1 if application is not using TinyUSB directly, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE
-#if !LIB_TINYUSB_HOST && !LIB_TINYUSB_DEVICE
-#define PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE 1
-#else
-#define PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE 0
-#endif
-#endif
-
-// PICO_CONFIG: PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE, Baud rate that if selected causes a reset into BOOTSEL mode (if PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE is set), default=1200, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE
-#define PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE 1200
-#endif
-
 // PICO_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) during initialization, default=0, group=pico_stdio_usb
 #ifndef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
 #define PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS 0
