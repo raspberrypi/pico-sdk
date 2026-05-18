@@ -1,0 +1,17 @@
+/* Empty file
+
+   This file can be overridden to add extra memory regions.
+
+   For example, to add a PSRAM region, you would replace
+   this file with:
+
+   MEMORY
+   {
+      PSRAM(rwx) : ORIGIN =  0x11000000, LENGTH = 8M
+   }
+
+   Or to include a XIP_RAM region, you would replace
+   this file with:
+
+   INCLUDE "memory_xip_ram.incl"
+*/

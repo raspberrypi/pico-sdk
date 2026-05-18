@@ -21,6 +21,10 @@
 extern "C" {
 #endif
 
+#ifndef __XSTRING
+#define __XSTRING(s) __STRING(s)
+#endif
+
 #define __not_in_flash(group)
 #define __not_in_flash_func(func) func
 #define __no_inline_not_in_flash_func(func) func

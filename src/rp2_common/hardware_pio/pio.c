@@ -82,10 +82,10 @@ static int find_offset_for_program(PIO pio, const pio_program_t *program) {
 }
 
 static int pio_set_gpio_base_unsafe(PIO pio, uint gpio_base) {
-    invalid_params_if_and_return(PIO, gpio_base != 0 && (!PICO_PIO_VERSION || gpio_base != 16), PICO_ERROR_BAD_ALIGNMENT);
+    invalid_params_if_and_return(HARDWARE_PIO, gpio_base != 0 && (!PICO_PIO_VERSION || gpio_base != 16), PICO_ERROR_BAD_ALIGNMENT);
 #if PICO_PIO_VERSION > 0
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
-    invalid_params_if_and_return(PIO, used_mask, PICO_ERROR_INVALID_STATE);
+    invalid_params_if_and_return(HARDWARE_PIO, used_mask, PICO_ERROR_INVALID_STATE);
     pio->gpiobase = gpio_base;
 #else
     ((void)pio);
@@ -251,6 +251,7 @@ void pio_sm_set_pins_internal(PIO pio, uint sm, uint32_t pins) {
 
 #ifndef pio_sm_set_pins_internal
 void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
+    check_pio_pin_mask(pio, sm, pins);
 #if PICO_PIO_USE_GPIO_BASE
     pins >>= pio_get_gpio_base(pio);
 #endif
@@ -287,9 +288,11 @@ void pio_sm_set_pins_with_mask_internal(PIO pio, uint sm, uint32_t pin_values, u
 
 #ifndef pio_sm_set_pins_with_mask_internal
 void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pin_values, uint32_t pin_mask) {
+    check_pio_pin_mask(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
-    pin_values >>= pio_get_gpio_base(pio);
-    pin_mask >>= pio_get_gpio_base(pio);
+    uint gpio_base = pio_get_gpio_base(pio);
+    pin_values >>= gpio_base;
+    pin_mask >>= gpio_base;
 #endif
     pio_sm_set_pins_with_mask_internal(pio, sm, pin_values, pin_mask);
 }
@@ -298,8 +301,9 @@ void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pin_values, uint32_t p
 void pio_sm_set_pins_with_mask64(PIO pio, uint sm, uint64_t pin_values, uint64_t pin_mask) {
     check_pio_pin_mask64(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
-    pin_values >>= pio_get_gpio_base(pio);
-    pin_mask >>= pio_get_gpio_base(pio);
+    uint gpio_base = pio_get_gpio_base(pio);
+    pin_values >>= gpio_base;
+    pin_mask >>= gpio_base;
 #endif
     pio_sm_set_pins_with_mask_internal(pio, sm, (uint32_t)pin_values, (uint32_t)pin_mask);
 }
@@ -324,18 +328,22 @@ void pio_sm_set_pindirs_with_mask_internal(PIO pio, uint sm, uint32_t pindirs, u
 
 #ifndef pio_sm_set_pindirs_with_mask_internal
 void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t pin_mask) {
+    check_pio_pin_mask(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
-    pindirs >>= pio_get_gpio_base(pio);
-    pin_mask >>= pio_get_gpio_base(pio);
+    uint gpio_base = pio_get_gpio_base(pio);
+    pindirs >>= gpio_base;
+    pin_mask >>= gpio_base;
 #endif
     pio_sm_set_pindirs_with_mask_internal(pio, sm, pindirs, pin_mask);
 }
 #endif
 
 void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pindirs, uint64_t pin_mask) {
+    check_pio_pin_mask64(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
-    pindirs >>= pio_get_gpio_base(pio);
-    pin_mask >>= pio_get_gpio_base(pio);
+    uint gpio_base = pio_get_gpio_base(pio);
+    pindirs >>= gpio_base;
+    pin_mask >>= gpio_base;
 #endif
     pio_sm_set_pindirs_with_mask_internal(pio, sm, (uint32_t)pindirs, (uint32_t)pin_mask);
 }
@@ -343,8 +351,10 @@ void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pindirs, uint64_t
 int pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pin, uint count, bool is_out) {
     check_pio_param(pio);
     check_sm_param(sm);
+#if PICO_PIO_USE_GPIO_BASE
     pin -= pio_get_gpio_base(pio);
-    invalid_params_if_and_return(PIO, pin >= 32u, PICO_ERROR_INVALID_ARG);
+#endif
+    invalid_params_if_and_return(HARDWARE_PIO, pin >= 32u, PICO_ERROR_INVALID_ARG);
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
     hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
@@ -409,12 +419,12 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
     invalid_params_if(HARDWARE_PIO, (gpio_start + gpio_count) > NUM_BANK0_GPIOS);
 
 #if !PICO_PIO_USE_GPIO_BASE
-    // short-circuit some logic when not using GIO_BASE
+    // short-circuit some logic when not using GPIO_BASE
     set_gpio_base = 0;
     gpio_count = 0;
 #endif
 
-    // note if we gpio_count == 0, we don't care about GPIOs so use a zero mask for what we require
+    // note if gpio_count == 0, we don't care about GPIOs so use a zero mask for what we require
     // if gpio_count > 0, then we just set used mask for the ends, since that is all that is checked at the moment
     uint32_t required_gpio_ranges;
     if (gpio_count) required_gpio_ranges = (1u << (gpio_start >> 4)) | (1u << ((gpio_start + gpio_count - 1) >> 4));

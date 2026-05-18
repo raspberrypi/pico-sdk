@@ -171,11 +171,13 @@ __soft_vector_table:
 .word isr_irq\n
 .endm
 
+.altmacro
 .set IRQN, 0
 .rept PICO_NUM_VTABLE_IRQS
-vtable_irq_n IRQN
+vtable_irq_n %IRQN
 .set IRQN, IRQN + 1
 .endr
+.noaltmacro
 
 // all default trap handlers do nothing, and we can check for them being set to our
 // default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
@@ -222,11 +224,13 @@ decl_isr_bkpt isr_riscv_machine_soft_irq
 .endif
 .endm
 
+.altmacro
 .set IRQN, 0
 .rept PICO_NUM_VTABLE_IRQS
-decl_isr_n IRQN
+decl_isr_n %IRQN
 .set IRQN, IRQN + 1
 .endr
+.noaltmacro
     // fall through
 
 // All unhandled USER IRQs fall through to here. Note there is no way to get
@@ -379,6 +383,8 @@ platform_entry: // symbol for stack traces
     ebreak
     j 1b
 
+
+#if !PICO_NO_FLASH
 data_cpy_loop:
     lw a0, (a1)
     sw a0, (a2)
@@ -387,6 +393,7 @@ data_cpy_loop:
 data_cpy:
     bltu a2, a3, data_cpy_loop
     ret
+#endif
 
 .align 2
 data_cpy_table:

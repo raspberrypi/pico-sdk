@@ -1,3 +1,5 @@
+"""Defines common rules and macros for the Pico SDK Bazel build."""
+
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
@@ -101,6 +103,11 @@ def pico_board_config(name, platform_includes, **kwargs):
     includes provided in `platform_includes`, and the final artifact is
     a cc_library that you can configure //bazel/config:PICO_CONFIG_HEADER to
     point to.
+
+    Args:
+        name: The name of the rule.
+        platform_includes: A list of platform include paths.
+        **kwargs: Additional attributes to pass through to cc_library.
     """
     _hdr_dir = "{}_generated_includes".format(name)
     _hdr_path = "{}/pico_config_platform_headers.h".format(_hdr_dir)

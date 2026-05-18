@@ -1,0 +1,4 @@
+add_executable(fixed_bitset_test fixed_bitset_test.c)
+
+target_link_libraries(fixed_bitset_test PRIVATE pico_stdlib pico_util)
+pico_add_extra_outputs(fixed_bitset_test)

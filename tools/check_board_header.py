@@ -42,7 +42,7 @@ compulsory_cmake_default_settings = set(['PICO_FLASH_SIZE_BYTES'])
 matching_cmake_default_settings = set(['PICO_FLASH_SIZE_BYTES', 'PICO_RP2350_A2_SUPPORTED'])
 compulsory_defines = set(['PICO_FLASH_SIZE_BYTES'])
 
-DefineType = namedtuple("DefineType", ["name", "value", "resolved_value", "lineno"])
+DefineType = namedtuple("DefineType", ["name", "value", "resolved_value", "lineno", "has_ifndef"])
 
 def list_to_string_with(lst, joiner):
     elems = len(lst)
@@ -112,7 +112,7 @@ def read_defines_from(header_file, defines_dict):
                         if show_warnings:
                             warnings.warn("{}:{}  Multiple values for pico_board_cmake_set({}) ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
                 else:
-                   cmake_settings[name] = DefineType(name, value, None, lineno)
+                   cmake_settings[name] = DefineType(name, value, None, lineno, False)
                 continue
 
             # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
@@ -125,7 +125,7 @@ def read_defines_from(header_file, defines_dict):
                 if name != name.upper():
                     errors.append(Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name)))
                 if name not in cmake_default_settings:
-                   cmake_default_settings[name] = DefineType(name, value, None, lineno)
+                   cmake_default_settings[name] = DefineType(name, value, None, lineno, False)
                 continue
 
             # look for "#else"
@@ -211,13 +211,13 @@ def read_defines_from(header_file, defines_dict):
                             if show_warnings:
                                 warnings.warn("{}:{}  Multiple definitions for {} ({} and {})".format(board_header, lineno, name, defines_dict[name].value, value))
                     else:
-                        defines_dict[name] = DefineType(name, value, resolved_value, lineno)
+                        defines_dict[name] = DefineType(name, value, resolved_value, lineno, last_ifndef == name)
     return errors
 
 
 if board_header_basename == "amethyst_fpga.h":
-    defines['PICO_RP2350'] = DefineType('PICO_RP2350', 1, 1, -1)
-    defines['PICO_RP2350A'] = DefineType('PICO_RP2350A', 0, 0, -1)
+    defines['PICO_RP2350'] = DefineType('PICO_RP2350', 1, 1, -1, False)
+    defines['PICO_RP2350A'] = DefineType('PICO_RP2350A', 0, 0, -1, False)
 
 errors = []
 
@@ -276,7 +276,7 @@ with open(board_header) as header_fh:
                         value = int(value, 0)
                     except ValueError:
                         pass
-                cmake_settings[name] = DefineType(name, value, None, lineno)
+                cmake_settings[name] = DefineType(name, value, None, lineno, False)
             continue
 
         # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
@@ -298,7 +298,7 @@ with open(board_header) as header_fh:
                         value = int(value, 0)
                     except ValueError:
                         pass
-                cmake_default_settings[name] = DefineType(name, value, None, lineno)
+                cmake_default_settings[name] = DefineType(name, value, None, lineno, False)
             continue
 
         # look for "#else"
@@ -402,7 +402,7 @@ with open(board_header) as header_fh:
                 if name in defines:
                     errors.append(Exception("{}:{}  Multiple definitions for {} ({} and {})".format(board_header, lineno, name, defines[name].value, value)))
                 else:
-                    defines[name] = DefineType(name, value, resolved_value, lineno)
+                    defines[name] = DefineType(name, value, resolved_value, lineno, last_ifndef == name)
                 continue
 
 
@@ -548,6 +548,10 @@ for name, define in defines.items():
                 expected_function_pins = list("{}_{}_PIN".format(name, function) for function in expected_functions["one_of"])
                 if not any(func_pin in defines for func_pin in expected_function_pins):
                     errors.append(Exception("{}:{}  {} is defined but none of {} are defined".format(board_header, define.lineno, name, list_to_string_with(expected_function_pins, "or"))))
+
+    # check that relevant defines are inside an ifndef clause
+    if (name in cmake_default_settings or name.startswith("PICO_DEFAULT_")) and not define.has_ifndef:
+        errors.append(Exception("{}:{}  {} isn't enclosed in an #ifndef {} guard".format(board_header, define.lineno, name, name)))
 
 if not has_include_guard:
     errors.append(Exception("{} has no include-guard (expected {})".format(board_header, expected_include_guard)))

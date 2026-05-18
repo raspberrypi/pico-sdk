@@ -50,7 +50,7 @@ typedef uint64_t absolute_time_t;
  * \ingroup timestamp
  */
 static inline uint64_t to_us_since_boot(absolute_time_t t) {
-#ifdef PICO_DEBUG_ABSOLUTE_TIME_T
+#if PICO_OPAQUE_ABSOLUTE_TIME_T
     return t._private_us_since_boot;
 #else
     return t;
@@ -65,7 +65,7 @@ static inline uint64_t to_us_since_boot(absolute_time_t t) {
  * \ingroup timestamp
  */
 static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
-#ifdef PICO_DEBUG_ABSOLUTE_TIME_T
+#if PICO_OPAQUE_ABSOLUTE_TIME_T
     assert(us_since_boot <= INT64_MAX);
     t->_private_us_since_boot = us_since_boot;
 #else
@@ -85,7 +85,7 @@ static inline absolute_time_t from_us_since_boot(uint64_t us_since_boot) {
     return t;
 }
 
-#ifdef NDEBUG
+#if !PICO_OPAQUE_ABSOLUTE_TIME_T
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = value
 #else
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = {value}

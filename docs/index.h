@@ -118,6 +118,7 @@
  * \cond pico_stdio \defgroup pico_stdio pico_stdio \endcond
  * \cond pico_standard_binary_info \defgroup pico_standard_binary_info pico_standard_binary_info \endcond
  * \cond pico_standard_link \defgroup pico_standard_link pico_standard_link \endcond
+ * \cond pico_thread_local \defgroup pico_thread_local pico_thread_local \endcond
  * @}
  *
  * \defgroup misc External API Headers

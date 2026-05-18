@@ -21,6 +21,9 @@
 
 #if defined __GNUC__
 #include <sys/cdefs.h>
+#if !defined(__printflike) && defined(__picolibc_format)
+#define __printflike(a,b) __picolibc_format(printf,a,b)
+#endif
 // note LLVM defines __GNUC__
 #ifdef __clang__
 #define PICO_C_COMPILER_IS_CLANG 1

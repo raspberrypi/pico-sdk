@@ -18,10 +18,10 @@ void __weak runtime_init_mutex(void) {
     static_assert(!(sizeof(recursive_mutex_t)&3), "");
     static_assert(!offsetof(mutex_t, core), "");
     static_assert(!offsetof(recursive_mutex_t, core), "");
-    extern lock_core_t __mutex_array_start;
+    extern lock_core_t __mutex_array_start[];
     extern lock_core_t __mutex_array_end;
 
-    for (lock_core_t *l = &__mutex_array_start; l < &__mutex_array_end; ) {
+    for (lock_core_t *l = &__mutex_array_start[0]; l < &__mutex_array_end; ) {
         if (l->spin_lock) {
             assert(1 == (uintptr_t)l->spin_lock); // indicator for a recursive mutex
             recursive_mutex_t *rm = (recursive_mutex_t *)l;
