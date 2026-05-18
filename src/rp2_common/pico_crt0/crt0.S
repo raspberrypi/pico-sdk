@@ -15,10 +15,6 @@
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
 
-#if HAS_POWMAN_TIMER
-#include "hardware/regs/powman.h"
-#endif
-
 // PICO_CONFIG: PICO_CRT0_NEAR_CALLS, Whether calls from crt0 into the binary are near (<16M away) - ignored for PICO_COPY_TO_RAM, default=0, type=bool, group=pico_crt0
 #ifndef PICO_CRT0_NEAR_CALLS
 #define PICO_CRT0_NEAR_CALLS 0
@@ -497,7 +493,6 @@ _call_xip_setup:
     // Zero out the BSS
     ldr r1, =__bss_start__
     ldr r2, =__bss_end__
-1:
     movs r0, #0
     b bss_fill_test
 bss_fill_loop:
@@ -505,27 +500,6 @@ bss_fill_loop:
 bss_fill_test:
     cmp r1, r2
     bne bss_fill_loop
-
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
-    // Check if we're done
-    ldr r6, =__bss_end__
-    cmp r2, r6
-    bne 1f
-    // Zero out persistent_data on non-powman boot
-    ldr r1, =__persistent_data_start__
-    ldr r2, =__persistent_data_end__
-    // Skip if there is no persistent data
-    cmp r1, r2
-    beq 1f
-    // Load previous power state into r6
-    ldr r6, =(POWMAN_BASE+POWMAN_SCRATCH6_OFFSET)
-    ldr r6, [r6]
-    // Check if we should skip zeroing
-    bl persistent_zero_check
-    cmp r0, #0
-    beq 1b
-1:
-#endif
 
 platform_entry: // symbol for stack traces
 #if PICO_CRT0_NEAR_CALLS && !PICO_COPY_TO_RAM
@@ -555,49 +529,6 @@ data_cpy_loop:
 data_cpy:
     cmp r2, r3
     blo data_cpy_loop
-    bx lr
-#endif
-
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
-persistent_zero_check:
-    // uses r5 and r7 as scratch
-    // uses the powman_power_state in r6
-    // returns in r0
-    mov r0, #0
-    // First check __persistent_data_start__
-    ldr r7, =__persistent_data_start__
-check_r7:
-    ldr r5, =SRAM_BASE
-    cmp r5, r7
-    bgt check_xip_sram
-    ldr r5, =SRAM4_BASE
-    cmp r5, r7
-    bgt check_sram0
-check_sram1:
-    mov r5, #(1 << 0) // POWMAN_POWER_DOMAIN_SRAM_BANK1
-    b do_check
-check_xip_sram:
-    mov r5, #(1 << 2) // POWMAN_POWER_DOMAIN_XIP_CACHE
-    b do_check
-check_sram0:
-    mov r5, #(1 << 1) // POWMAN_POWER_DOMAIN_SRAM_BANK0
-    b do_check
-do_check:
-    and r7, r5, r6
-    cmp r5, r7
-    beq skip
-    b noskip
-skip:
-    cmp r0, #1
-    bne check_end
-    bx lr
-check_end:
-    add r0, #1
-    // If start was skipped, check __persistent_data_end__
-    ldr r7, =__persistent_data_end__
-    b check_r7
-noskip:
-    mov r0, #0
     bx lr
 #endif
 

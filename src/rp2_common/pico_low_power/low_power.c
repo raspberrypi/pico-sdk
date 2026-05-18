@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <string.h>
+
 #include "pico.h"
 
 #include "pico/low_power.h"
@@ -714,20 +716,44 @@ int low_power_pstate_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, p
 }
 
 #if !PICO_RUNTIME_NO_INIT_LOW_POWER_REBOOT_CHECK
+
+static inline void reset_persistent_data(void) {
+    size_t persistent_data_size = (uint32_t)__persistent_data_end__ - (uint32_t)__persistent_data_start__;
+    __builtin_memset((void*)(uint32_t)__persistent_data_start__, 0, persistent_data_size);
+}
+
 void __weak runtime_init_low_power_reboot_check(void) {
     // check if we came from powman reboot
     if (powman_hw->chip_reset & POWMAN_CHIP_RESET_HAD_SWCORE_PD_BITS) {
-        // we came from powman reboot, so execute the resume function
-        if (powman_hw->scratch[7]) {
-            pstate_bitset_t pstate = pstate_bitset_none();
-            pstate_bitset_from_powman_power_state(&pstate, powman_hw->scratch[6]);
-            ((low_power_pstate_resume_func)powman_hw->scratch[7])(&pstate);
-            // clear the scratch registers
-            powman_hw->scratch[6] = 0;
-            powman_hw->scratch[7] = 0;
+        pstate_bitset_t persistent_pstate = pstate_bitset_none();
+        low_power_persistent_pstate_get(&persistent_pstate);
+        pstate_bitset_t pstate = pstate_bitset_none();
+        pstate_bitset_from_powman_power_state(&pstate, powman_hw->scratch[6]);
+
+        // check if persistent data was turned off
+        if (!pstate_bitset_none_set(&persistent_pstate)) {
+            for (int i=0; i < POWMAN_POWER_DOMAIN_COUNT; i++) {
+                if (!pstate_bitset_is_set(&pstate, (powman_power_domain_t)i) && pstate_bitset_is_set(&persistent_pstate, (powman_power_domain_t)i)) {
+                    reset_persistent_data();
+                    break;
+                }
+            }
         }
+
+        // execute the resume function, if present
+        if (powman_hw->scratch[7]) {
+            ((low_power_pstate_resume_func)powman_hw->scratch[7])(&pstate);
+        }
+
+        // clear the scratch registers
+        powman_hw->scratch[6] = 0;
+        powman_hw->scratch[7] = 0;
+
         // Switch powman timer back to xosc
         powman_timer_set_1khz_tick_source_xosc();
+    } else {
+        // not a powman reboot, so clear persistent data
+        reset_persistent_data();
     }
 }
 #endif

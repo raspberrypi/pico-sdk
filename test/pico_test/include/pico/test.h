@@ -54,10 +54,17 @@ but not sure that is implemented yet.
                                         return -1;                                                  \
                                     }
 
-#define PICOTEST_END_TEST()       if (picotest_error_code != 0)                                     \
-                                      {printf("%s: Failed\n", picotest_description); return -1;}  \
-                                  else                                                              \
-                                      {printf("%s: Success\n", picotest_description); puts("PASSED"); return 0;}
+// Calls stdio_deinit_all before exiting, to avoid losing final output
+#define PICOTEST_END_TEST()         if (picotest_error_code != 0) {                                 \
+                                        printf("%s: Failed\n", picotest_description);               \
+                                        stdio_deinit_all();                                         \
+                                        return -1;                                                  \
+                                    } else {                                                        \
+                                        printf("%s: Success\n", picotest_description);              \
+                                        puts("PASSED");                                             \
+                                        stdio_deinit_all();                                         \
+                                        return 0;                                                   \
+                                    }
 
 
 #endif

@@ -80,6 +80,7 @@ static uint32_t _emutls_size;
 static uint32_t _emutls_align;
 #endif
 
+#if PICO_THREAD_LOCAL_PROVIDE_INIT_TLS
 // fill a linear region with data from the tls metadata (either emutls objects or tdata/tbss)
 static inline void _tls_init_from_emutls_or_tdata(void *tls) {
 #if PICO_THREAD_LOCAL_SUPPORT_EMUTLS
@@ -109,7 +110,9 @@ static inline void _tls_init_from_emutls_or_tdata(void *tls) {
 #endif
 }
 #define _INIT_TLS_IMPL _tls_init_from_emutls_or_tdata
+#endif
 
+#if PICO_THREAD_LOCAL_PROVIDE_SET_TLS
 static inline void _set_tls_per_thread(void *tls) {
     assert(tls); // we should never be setting 0
 #if !PICO_THREAD_LOCAL_THREAD_POINTER_VIA_RISCV_REG
@@ -119,6 +122,7 @@ static inline void _set_tls_per_thread(void *tls) {
 #endif
 }
 #define _SET_TLS_IMPL _set_tls_per_thread
+#endif
 
 #if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER
 static __used void *_init_core_local_tls(void) {
