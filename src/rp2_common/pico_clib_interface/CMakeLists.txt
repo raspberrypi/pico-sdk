@@ -54,7 +54,7 @@ if (NOT TARGET pico_clib_interface)
         file(WRITE "${CLIB_DETECT_SOURCE}" "${CLIB_DETECT_CODE}")
 
         set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-        foreach(CLIB picolibc newlib)
+        foreach(CLIB newlib picolibc)
             # Attempt to compile the source file
             try_compile(CLIB_MATCHED
                     "${CMAKE_CURRENT_BINARY_DIR}"              # Directory for temporary build files
