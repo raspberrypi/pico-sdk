@@ -44,9 +44,9 @@ static bool colored_status_led_on;
 #define PICO_COLORED_STATUS_LED_WS2812_FREQ 800000
 #endif
 
-// PICO_CONFIG: PICO_COLORED_STATUS_LED_RESET_DELAY_US, Required reset delay in microseconds for the WS2812 colored status LED, type=int, default=100, group=pico_status_led
+// PICO_CONFIG: PICO_COLORED_STATUS_LED_RESET_DELAY_US, Required reset delay in microseconds for the WS2812 colored status LED, type=int, default=50, group=pico_status_led
 #ifndef PICO_COLORED_STATUS_LED_RESET_DELAY_US
-#define PICO_COLORED_STATUS_LED_RESET_DELAY_US 100
+#define PICO_COLORED_STATUS_LED_RESET_DELAY_US 50
 #endif
 
 #ifndef PICO_COLORED_STATUS_LED_USE_DEFAULT_ALARM_POOL
@@ -65,7 +65,7 @@ static int8_t alarm_pending;
 #define alarm_pending false
 #endif
 
-#define COLOR_STATUS_LED_UPDATE_TIME_US (1 + (1000000 * (PICO_COLORED_STATUS_LED_USES_WRGB ? 32 : 24)) / PICO_COLORED_STATUS_LED_WS2812_FREQ)
+#define COLOR_STATUS_LED_UPDATE_TIME_US (2 + (1000000 * (PICO_COLORED_STATUS_LED_USES_WRGB ? 32 : 24)) / PICO_COLORED_STATUS_LED_WS2812_FREQ)
 
 // Extract from 0xWWRRGGBB
 #define RED(c) (((c) >> 16) & 0xff)
@@ -118,6 +118,7 @@ static void set_ws2812(uint32_t value) {
 #else
         if (alarm_pending) {
             // we defer the set to the already waiting alarm
+            spin_unlock(spin_lock, save);
             break;
         } else {
             uint64_t now = time_us_64();
@@ -250,7 +251,7 @@ void status_led_deinit(void) {
         cancel_alarm(alarm_id);
         alarm_id = 0;
     }
-    alarm_pending = false;
+    alarm_pending = 0;
 #endif
     if (pio) {
         pio_remove_program_and_unclaim_sm(&ws2812_program, pio, sm, offset);
