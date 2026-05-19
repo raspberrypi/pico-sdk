@@ -467,12 +467,12 @@ static inline int rom_set_bootrom_stack(bootrom_stack_t *stack) {
  * \ref REBOOT2_FLAG_REBOOT_TYPE_NORMAL - reboot into the normal boot path.
  * 
  * \ref REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL - reboot into BOOTSEL mode.
- *  p0 - the GPIO number to use as an activity indicator (enabled by flag in p1).
- *  p1 - a set of flags:
+ *  p0 - a set of flags:
  *   0x01 : DISABLE_MSD_INTERFACE - Disable the BOOTSEL USB drive (see <<section_bootrom_mass_storage>>)
  *   0x02 : DISABLE_PICOBOOT_INTERFACE - Disable the {picoboot} interface (see <<section_bootrom_picoboot>>).
- *   0x10 : GPIO_PIN_ACTIVE_LOW - The GPIO in p0 is active low.
+ *   0x10 : GPIO_PIN_ACTIVE_LOW - The GPIO in p1 is active low.
  *   0x20 : GPIO_PIN_ENABLED - Enable the activity indicator on the specified GPIO.
+ *  p1 - the GPIO number to use as an activity indicator (enabled by GPIO_PIN_ENABLED flag in p0).
  * 
  * \ref REBOOT2_FLAG_REBOOT_TYPE_RAM_IMAGE - reboot into an image in RAM. The region of RAM or XIP RAM is searched for an image to run. This is the type
  * of reboot used when a RAM UF2 is dragged onto the BOOTSEL USB drive.
