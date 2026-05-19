@@ -1,0 +1,47 @@
+/* Defines the following symbols for use by code:
+    __logical_binary_start
+    __binary_info_header_end
+    __embedded_block_end
+    __reset_start, __reset_end
+*/
+
+SECTIONS
+{
+    /* Note in NO_FLASH builds the entry point for both the bootrom, and debugger
+       entry (ELF entry point), are *first* in the image, and the vector table
+       follows immediately afterward. This is because the bootrom enters RAM
+       binaries directly at their lowest address (preferring main RAM over XIP
+       cache-as-SRAM if both are used).
+    */
+
+    .text : {
+        __logical_binary_start = .;
+        __reset_start = .;
+        KEEP (*(.reset))
+        __reset_end = .;
+        KEEP (*(.binary_info_header))
+        __binary_info_header_end = .;
+        KEEP (*(.embedded_block))
+        __embedded_block_end = .;
+        . = ALIGN(256);
+        KEEP (*(.vectors))
+        *(.text*)
+        . = ALIGN(4);
+        *(.init)
+        *(.fini)
+        /* Pull all c'tors into .text */
+        *crtbegin.o(.ctors)
+        *crtbegin?.o(.ctors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+        *(SORT(.ctors.*))
+        *(.ctors)
+        /* Followed by destructors */
+        *crtbegin.o(.dtors)
+        *crtbegin?.o(.dtors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+        *(SORT(.dtors.*))
+        *(.dtors)
+
+        *(.eh_frame*)
+    } > RAM
+}

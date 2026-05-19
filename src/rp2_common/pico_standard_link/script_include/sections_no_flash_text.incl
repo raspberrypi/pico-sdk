@@ -1,0 +1,6 @@
+/* Sub-section list for read-only sections in no_flash binaries */
+
+INCLUDE "section_no_flash_text.incl"
+INCLUDE "section_no_flash_rodata.incl"
+INCLUDE "sections_arm_ex.incl"
+INCLUDE "section_binary_info.incl"

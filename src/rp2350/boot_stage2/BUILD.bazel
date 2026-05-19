@@ -3,6 +3,8 @@
 
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//bazel/toolchain:objcopy.bzl", "objcopy_to_bin")
 load("//bazel/util:multiple_choice_flag.bzl", "declare_flag_choices", "flag_choice")
@@ -56,8 +58,8 @@ cc_library(
 # Creates a config_setting for each known boot2 option with the name:
 #     PICO_DEFAULT_BOOT_STAGE2_[choice]
 declare_flag_choices(
-    "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
-    BOOT2_CHOICES,
+    choices = BOOT2_CHOICES,
+    flag = "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
 )
 
 filegroup(

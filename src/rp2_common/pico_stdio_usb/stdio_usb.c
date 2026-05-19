@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef LIB_TINYUSB_HOST
 #include "tusb.h"
+
+#if !defined(LIB_TINYUSB_HOST) || (defined(LIB_TINYUSB_HOST) && defined(CFG_TUH_RPI_PIO_USB))
 #include "pico/stdio_usb.h"
 
 // these may not be set if the user is providing tud support (i.e. LIB_TINYUSB_DEVICE is 1 because
@@ -16,6 +17,7 @@
 #include "pico/time.h"
 #include "pico/stdio/driver.h"
 #include "pico/mutex.h"
+#include "pico/critical_section.h"
 #include "hardware/irq.h"
 #include "device/usbd_pvt.h" // for usbd_defer_func
 
@@ -260,14 +262,19 @@ bool stdio_usb_deinit(void) {
         return false;
     }
 
-    assert(tud_inited()); // we expect the caller to have initialized when calling sdio_usb_init
-
     bool rc = true;
 
     stdio_set_driver_enabled(&stdio_usb, false);
 
 #if PICO_STDIO_USB_DEINIT_DELAY_MS != 0
     sleep_ms(PICO_STDIO_USB_DEINIT_DELAY_MS);
+#endif
+
+#if PICO_STDIO_USB_ENABLE_TINYUSB_INIT
+    // deinitialize TinyUSB
+    tud_deinit(0);
+#else
+    assert(!tud_inited()); // we expect the caller to have deinitialized if they are using TinyUSB
 #endif
 
 #if PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK
@@ -302,9 +309,9 @@ bool stdio_usb_init(void) {
 }
 #endif // CFG_TUD_ENABLED && CFG_TUD_CDC
 #else
-#warning stdio USB was configured, but is being disabled as TinyUSB host is explicitly linked
+#warning stdio USB was configured, but is being disabled as TinyUSB host is explicitly linked and is not using PIO-USB
 bool stdio_usb_init(void) {
     return false;
 }
-#endif // !LIB_TINYUSB_HOST
+#endif // !defined(LIB_TINYUSB_HOST) || (defined(LIB_TINYUSB_HOST) && defined(CFG_TUH_RPI_PIO_USB))
 

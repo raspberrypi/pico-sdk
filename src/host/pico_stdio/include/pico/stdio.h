@@ -14,6 +14,7 @@ typedef struct stdio_driver stdio_driver_t;
 static inline void stdio_usb_init() {}
 void stdio_uart_init();
 static inline void stdio_init_all() { stdio_uart_init(); }
+static inline void stdio_deinit_all() {}
 static inline void stdio_filter_driver(stdio_driver_t *driver) {}
 static inline void stdio_set_translate_crlf(stdio_driver_t *driver, bool enabled) {}
 static inline bool stdio_usb_connected(void) { return true; }

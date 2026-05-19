@@ -41,23 +41,23 @@ extern "C" {
  * \brief General Purpose Input/Output (GPIO) API
  *
  * RP-series microcontrollers have two banks of General Purpose Input / Output (GPIO) pins, which are assigned as follows:
- * 
+ *
  * \if rp2040_specific
- * RP2040 has 30 user GPIO pins in bank 0, and 6 QSPI pins in the QSPI bank 1 (QSPI_SS, QSPI_SCLK and QSPI_SD0 to QSPI_SD3). The QSPI 
- * pins are used to execute code from an external flash device, leaving the User bank (GPIO0 to GPIO29) for the programmer to use. 
+ * RP2040 has 30 user GPIO pins in bank 0, and 6 QSPI pins in the QSPI bank 1 (QSPI_SS, QSPI_SCLK and QSPI_SD0 to QSPI_SD3). The QSPI
+ * pins are used to execute code from an external flash device, leaving the User bank (GPIO0 to GPIO29) for the programmer to use.
  * \endif
- * 
+ *
  * \if rp2350_specific
- * The number of GPIO pins available depends on the package. There are 30 user GPIOs in bank 0 in the QFN-60 package (RP2350A), or 48 user GPIOs 
- * in the QFN-80 package. Bank 1 contains the 6 QSPI pins and the USB DP/DM pins.
+ * The number of GPIO pins available depends on the package. There are 30 user GPIOs in bank 0 in the QFN-60 package (RP2350A), or 48 user GPIOs
+ * in the QFN-80 package (RP2350B). Bank 1 contains the 6 QSPI pins and the USB DP/DM pins.
  * \endif
- *  
+ *
  * All GPIOs support digital input and output, but a subset can also be used as inputs to the chip’s Analogue to Digital
  * Converter (ADC). The allocation of GPIO pins to the ADC depends on the packaging.
- * 
+ *
  * RP2040 and RP2350 QFN-60 GPIO, ADC pins are 26-29.
  * RP2350 QFN-80, ADC pins are 40-47.
- *  
+ *
  * Each GPIO can be controlled directly by software running on the processors, or by a number of other functional blocks.
  *
  * The function allocated to each GPIO is selected by calling the \ref gpio_set_function function. \note Not all functions
@@ -274,7 +274,13 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn);
  * \param gpio_mask Mask with 1 bit per GPIO number to set the function for
  * \param fn Which GPIO function select to use from list \ref gpio_function_t
 */
+#if NUM_BANK0_GPIOS <= 32
+static inline void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
+    gpio_set_function_masked((uint32_t)gpio_mask, fn);
+}
+#else
 void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn);
+#endif
 
 /*! \brief Determine current GPIO function
  *  \ingroup hardware_gpio
@@ -541,6 +547,10 @@ void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t event_mask, bool ena
  */
 void gpio_set_dormant_irq_enabled(uint gpio, uint32_t event_mask, bool enabled);
 
+static __force_inline io_bank0_irq_ctrl_hw_t *get_core_irq_ctrl(uint core_num) {
+    return &io_bank0_hw->irq_ctrl[core_num];
+}
+
 /*! \brief Return the current interrupt status (pending events) for the given GPIO
  *  \ingroup hardware_gpio
  *
@@ -550,8 +560,7 @@ void gpio_set_dormant_irq_enabled(uint gpio, uint32_t event_mask, bool enabled);
  */
 static inline uint32_t gpio_get_irq_event_mask(uint gpio) {
     check_gpio_param(gpio);
-    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?
-                                            &io_bank0_hw->proc1_irq_ctrl : &io_bank0_hw->proc0_irq_ctrl;
+    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_irq_ctrl(get_core_num());
     io_ro_32 *status_reg = &irq_ctrl_base->ints[gpio >> 3u];
     return (*status_reg >> (4 * (gpio & 7u))) & 0xfu;
 }
@@ -855,7 +864,23 @@ void gpio_deinit(uint gpio);
  *
  * \param gpio_mask Mask with 1 bit per GPIO number to initialize
  */
-void gpio_init_mask(uint gpio_mask);
+void gpio_init_mask(uint32_t gpio_mask);
+
+/*! \brief Initialise multiple GPIOs (enabled I/O and set func to GPIO_FUNC_SIO)
+ *  \ingroup hardware_gpio
+ *
+ * Clear the output enable (i.e. set to input).
+ * Clear any output value.
+ *
+ * \param gpio_mask Mask with 1 bit per GPIO number to initialize
+ */
+#if NUM_BANK0_GPIOS <= 32
+static inline void gpio_init_mask64(uint64_t gpio_mask) {
+    gpio_init_mask((uint32_t)gpio_mask);
+}
+#else
+void gpio_init_mask64(uint64_t gpio_mask);
+#endif
 // ----------------------------------------------------------------------------
 // Input
 // ----------------------------------------------------------------------------

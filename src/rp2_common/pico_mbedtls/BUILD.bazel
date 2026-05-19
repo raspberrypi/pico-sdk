@@ -1,12 +1,13 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pico_mbedtls_config",
-    includes = ["include"],
     hdrs = ["include/pico_mbedtls_config.h"],
     defines = ['MBEDTLS_CONFIG_FILE=\\"pico_mbedtls_config.h\\"'],
+    includes = ["include"],
 )
 
 cc_library(
@@ -16,13 +17,13 @@ cc_library(
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
-        ":pico_mbedtls_library",
         ":pico_mbedtls_config",
+        ":pico_mbedtls_library",
         "//src/rp2_common:pico_platform",
         "//src/rp2_common/pico_rand",
     ] + select({
-        "//bazel/constraint:rp2350": [ "//src/rp2_common/pico_sha256" ],
-        "//conditions:default": [ ],
+        "//bazel/constraint:rp2350": ["//src/rp2_common/pico_sha256"],
+        "//conditions:default": [],
     }),
 )
 

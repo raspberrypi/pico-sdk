@@ -1,6 +1,8 @@
 # Always include these libraries through //src/rp2_common:*!
 # This ensures that you'll get the right headers for the MCU you're targeting.
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(
     default_visibility = [
         "//src/rp2040:__subpackages__",

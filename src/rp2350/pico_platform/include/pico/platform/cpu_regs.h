@@ -25,6 +25,7 @@
 #define arm_cpu_hw m33_hw
 #include "hardware/structs/nvic.h"
 #include "hardware/structs/scb.h"
+#include "hardware/structs/systick.h"
 #endif
 #endif
 #endif

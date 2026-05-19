@@ -1,0 +1,31 @@
+/* Defines the following symbols for use by code:
+    __logical_binary_start
+    __binary_info_header_end
+    __embedded_block_end
+*/
+
+SECTIONS
+{
+    /* The bootrom will enter the image at the entry point indicated in your
+       IMAGE_DEF, which is usually the reset handler of your vector table.
+       If there is no entry point indicated in the IMAGE_DEF, it expects a VT
+       at the start of the image, and will use the entry point from that.
+
+       The debugger will use the ELF entry point, which is the _entry_point
+       symbol, and in our case is *different from the bootrom's entry point.*
+       This is used to go back through the bootrom on debugger launches only,
+       to perform the same initial flash setup that would be performed on a
+       cold boot.
+    */
+
+    .flashtext : {
+        __logical_binary_start = .;
+        KEEP (*(.vectors))
+        KEEP (*(.binary_info_header))
+        __binary_info_header_end = .;
+        KEEP (*(.embedded_block))
+        __embedded_block_end = .;
+        KEEP (*(.reset))
+        . = ALIGN(4);
+    } > TEXT_STORE
+}

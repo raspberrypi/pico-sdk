@@ -8,6 +8,7 @@
 // Override the standard allocators to use regular malloc/free
 
 #if !PICO_CXX_DISABLE_ALLOCATION_OVERRIDES // Let user override
+#include <stdlib.h> // weird looking but it is required if dropping picolibc on top of GCC+newlib (reent issue)
 #include <cstdlib>
 #include "pico.h"
 

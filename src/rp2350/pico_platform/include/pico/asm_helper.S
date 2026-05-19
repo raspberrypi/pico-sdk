@@ -27,6 +27,15 @@
 .endm
 
 // do not put align in here as it is used mid function sometimes
+.macro local_func x
+.type \x,%function
+#ifndef __riscv
+.thumb_func
+#endif
+\x:
+.endm
+
+// do not put align in here as it is used mid function sometimes
 .macro regular_func x
 .global \x
 .type \x,%function

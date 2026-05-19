@@ -388,7 +388,7 @@ int main() {
 
   test_random();
 
-  ostr("END\n");
+  ostr("PASSED\n");
   return 0;
 #endif
 }

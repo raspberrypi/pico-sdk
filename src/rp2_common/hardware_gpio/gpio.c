@@ -153,7 +153,7 @@ enum gpio_drive_strength gpio_get_drive_strength(uint gpio) {
 static void gpio_default_irq_handler(void) {
     uint core = get_core_num();
     gpio_irq_callback_t callback = callbacks[core];
-    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = core ? &io_bank0_hw->proc1_irq_ctrl : &io_bank0_hw->proc0_irq_ctrl;
+    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_irq_ctrl(core);
     for (uint gpio = 0; gpio < NUM_BANK0_GPIOS; gpio+=8) {
         uint32_t events8 = irq_ctrl_base->ints[gpio >> 3u];
         // note we assume events8 is 0 for non-existent GPIO
@@ -190,8 +190,7 @@ void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled) {
 
     // Separate mask/force/status per-core, so check which core called, and
     // set the relevant IRQ controls.
-    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?
-                                      &io_bank0_hw->proc1_irq_ctrl : &io_bank0_hw->proc0_irq_ctrl;
+    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_irq_ctrl(get_core_num());
     _gpio_set_irq_enabled(gpio, events, enabled, irq_ctrl_base);
 }
 
@@ -282,29 +281,38 @@ void gpio_deinit(uint gpio) {
     gpio_set_function(gpio, GPIO_FUNC_NULL);
 }
 
-void gpio_init_mask(uint gpio_mask) {
-    for(uint i=0;i<NUM_BANK0_GPIOS;i++) {
-        if (gpio_mask & 1) {
-            gpio_init(i);
-        }
-        gpio_mask >>= 1;
-    }
-}
-
 void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
-    for (uint i = 0; i < MIN(NUM_BANK0_GPIOS, 32u); i++) {
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1u) {
             gpio_set_function(i, fn);
         }
         gpio_mask >>= 1;
+        if (!gpio_mask) break;
     }
 }
 
+void gpio_init_mask(uint32_t gpio_mask) {
+    gpio_set_dir_in_masked(gpio_mask);
+    gpio_clr_mask(gpio_mask);
+    gpio_set_function_masked(gpio_mask, GPIO_FUNC_SIO);
+}
+
+// these functions are provided (in gpio.h) as inlined calls to the 32 bit versions if we have <= 32 GPIOs
+#if NUM_BANK0_GPIOS > 32
 void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
-    for (uint i = 0; i < MIN(NUM_BANK0_GPIOS, 64u); i++) {
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1u) {
             gpio_set_function(i, fn);
         }
         gpio_mask >>= 1;
+        if (!gpio_mask) break;
     }
 }
+
+void gpio_init_mask64(uint64_t gpio_mask) {
+    gpio_set_dir_in_masked64(gpio_mask);
+    gpio_clr_mask64(gpio_mask);
+    gpio_set_function_masked64(gpio_mask, GPIO_FUNC_SIO);
+}
+
+#endif

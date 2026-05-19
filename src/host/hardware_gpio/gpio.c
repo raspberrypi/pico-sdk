@@ -209,7 +209,12 @@ void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_deinit)(uint gpio) {
 }
 
 PICO_WEAK_FUNCTION_DEF(gpio_init_mask)
-void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_init_mask)(__unused uint gpio_mask) {
+void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_init_mask)(__unused uint32_t gpio_mask) {
+
+}
+
+PICO_WEAK_FUNCTION_DEF(gpio_init_mask64)
+void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_init_mask64)(__unused uint64_t gpio_mask) {
 
 }
 
@@ -224,7 +229,7 @@ uint32_t PICO_WEAK_FUNCTION_IMPL_NAME(gpio_get_all)(void) {
     return 0;
 }
 
-PICO_WEAK_FUNCTION_DEF(gpio_get_all46)
+PICO_WEAK_FUNCTION_DEF(gpio_get_all64)
 uint64_t PICO_WEAK_FUNCTION_IMPL_NAME(gpio_get_all64)(void) {
     return 0;
 }
@@ -243,7 +248,6 @@ PICO_WEAK_FUNCTION_DEF(gpio_set_mask_n)
 void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_set_mask_n)(__unused uint n, __unused uint32_t mask) {
 
 }
-
 
 PICO_WEAK_FUNCTION_DEF(gpio_clr_mask)
 void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_clr_mask)(__unused uint32_t mask) {

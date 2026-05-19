@@ -1,0 +1,13 @@
+/* Defines the following symbols for use by code:
+    __persistent_data_start__, __persistent_data_end__
+*/
+
+SECTIONS
+{
+    .persistent_data (NOLOAD) : {
+        __persistent_data_start__ = .;
+        *(.persistent_data*)
+        . = ALIGN(4);
+    } > RAM
+    PROVIDE(__persistent_data_end__ = .);
+}

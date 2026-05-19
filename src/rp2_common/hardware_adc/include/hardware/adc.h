@@ -25,16 +25,15 @@
  * - RP2040 5 input mux:
  *  - 4 inputs that are available on package pins shared with GPIO[29:26]
  *  - 1 input is dedicated to the internal temperature sensor
- *  - 4 element receive sample FIFO
  * \endif
  *
  * \if rp2350_specific
  * - RP2350 5 or 9 input mux:
  *  - 4 inputs available on QFN-60 package pins shared with GPIO[29:26]
  *  - 8 inputs available on QFN-80 package pins shared with GPIO[47:40]
- *  - 8 element receive sample FIFO
+ *  - One input dedicated to the internal temperature sensor (see Section 12.4.6)
  * \endif
- * - One input dedicated to the internal temperature sensor (see Section 12.4.6)
+ * - 8 element receive sample FIFO
  * - Interrupt generation
  * - DMA interface
  *
@@ -213,14 +212,7 @@ static inline void adc_set_clkdiv(float clkdiv) {
 /*! \brief Setup the ADC FIFO
  *  \ingroup hardware_adc
  *
- * \if rp2040_specific
- * On RP2040 the FIFO is 4 samples long.
- * \endif
- *
- * \if rp2350_specific
- * On RP2350 the FIFO is 8 samples long.
- * \endif
- * 
+ * The FIFO is 8 samples long.
  * If a conversion is completed and the FIFO is full, the result is dropped.
  *
  * \param en Enables write each conversion result to the FIFO
@@ -256,13 +248,7 @@ static inline bool adc_fifo_is_empty(void) {
 /*! \brief Get number of entries in the ADC FIFO
  *  \ingroup hardware_adc
  *
- * \if rp2040_specific
- * On RP2040 the FIFO is 4 samples long.
- * \endif
- * \if rp2350_specific
- * On RP2350 the FIFO is 8 samples long.
- * \endif
- * 
+ * The FIFO is 8 samples long.
  * This function will return how many samples are currently present.
  */
 static inline uint8_t adc_fifo_get_level(void) {
