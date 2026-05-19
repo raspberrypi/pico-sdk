@@ -129,7 +129,7 @@ static bool resetd_control_xfer_cb(uint8_t __unused rhport, uint8_t stage, tusb_
             //   bits 0-1  : forwarded as the bootrom disable_interface_mask
             //   bit 7     : 1 if the activity-LED GPIO is active-low
             //   bit 8     : 1 if an activity-LED GPIO is being specified
-            //   bits 9-15 : activity-LED GPIO number (0-63
+            //   bits 9-15 : activity-LED GPIO number (0-63)
             if (request->wValue & 0x100) {
                 gpio = request->wValue >> 9u;
                 active_low = request->wValue & 0x80;
