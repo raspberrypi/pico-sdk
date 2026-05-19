@@ -433,7 +433,8 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
                 sm_index[num_claimed] = (int8_t)pio_claim_unused_sm(*pio, false);
                 if (sm_index[num_claimed] < 0) break;
             }
-            int rc = num_claimed && (!pass || num_claimed == NUM_PIO_STATE_MACHINES) ? 0 : -1;
+            // rc = 0 if we claimed all the required state machines for the pass, <0 otherwise
+            int rc = num_claimed - (pass ? NUM_PIO_STATE_MACHINES : 1)
             if (rc >= 0) {
                 uint32_t save = hw_claim_lock();
                 if (pass) {
