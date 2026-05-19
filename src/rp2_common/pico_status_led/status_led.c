@@ -65,7 +65,8 @@ static int8_t alarm_pending;
 #define alarm_pending false
 #endif
 
-#define COLOR_STATUS_LED_UPDATE_TIME_US (2 + (1000000 * (PICO_COLORED_STATUS_LED_USES_WRGB ? 32 : 24)) / PICO_COLORED_STATUS_LED_WS2812_FREQ)
+// 2 + is empirical and allows WS2812 reset delay of 50us to work 
+#define COLORED_STATUS_LED_UPDATE_TIME_US (2 + (1000000 * (PICO_COLORED_STATUS_LED_USES_WRGB ? 32 : 24)) / PICO_COLORED_STATUS_LED_WS2812_FREQ)
 
 // Extract from 0xWWRRGGBB
 #define RED(c) (((c) >> 16) & 0xff)
@@ -83,7 +84,7 @@ static void unsafe_set_ws2812(uint32_t value, uint64_t now) {
         // Convert to 0xGGRRBB00
         pio_sm_put_blocking(pio, sm, GREEN(value) << 24 | RED(value) << 16 | BLUE(value) << 8);
 #endif
-        next_safe_set_time = now + COLOR_STATUS_LED_UPDATE_TIME_US + PICO_COLORED_STATUS_LED_RESET_DELAY_US;
+        next_safe_set_time = now + COLORED_STATUS_LED_UPDATE_TIME_US + PICO_COLORED_STATUS_LED_RESET_DELAY_US;
     }
 }
 
