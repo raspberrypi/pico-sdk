@@ -16,9 +16,9 @@
  *
  * \brief Low level PSRAM setup functions
  *
- * When using the runtime_init initialisation, this can initialise PSRAM in 3 ways,
+ * When using the runtime_init initialization, this can initialize PSRAM in 3 ways,
  * listed from highest to lowest priority:
- *   1. If flash_devinfo is setup (e.g. configured in OTP), it will initialise PSRAM with
+ *   1. If flash_devinfo is setup (e.g. configured in OTP), it will initialize PSRAM with
  *      the flash_devinfo size and GPIO for CS1
  *   2. If `PICO_AUTO_DETECT_PSRAM` is set it will attempt to detect PSRAM size and CS GPIO
  *      on CS1. This will attempt to use all available QMI CS1n GPIOs as chip selects, so they
@@ -26,26 +26,26 @@
  *      header (see `PICO_AUTO_DETECT_PSRAM_CS_SKIP_DEFAULTS`).
  *     - If the CS GPIO is known and set in `PICO_PSRAM_CS_PIN`, you can just enable
  *       `PICO_AUTO_DETECT_PSRAM_SIZE` to only detect the size. Some board headers use
- *       this behaviour if they have variants both with and without PSRAM fitted
+ *       this behavior if they have variants both with and without PSRAM fitted
  *       (e.g. adafruit_feather_rp2350)
  *   3. If `PICO_PSRAM_SIZE_BYTES` and `PICO_PSRAM_CS_PIN` are set (e.g. configured in the
- *      board header, or with \ref pico_override_psram_size) it will initialise PSRAM with
+ *      board header, or with \ref pico_override_psram_size) it will initialize PSRAM with
  *      that size and CS GPIO
  * 
  * Only the `PICO_AUTO_DETECT_PSRAM` methods (including `PICO_AUTO_DETECT_PSRAM_SIZE`) will
  * verify that PSRAM is present before using it.
  * 
- * Variables can be placed in PSRAM using __psram or __psram_uninitialised macros, and
+ * Variables can be placed in PSRAM using __in_psram or __uninitialized_psram macros, and
  * you can also read/write the memory addresses directly.
  * 
- * If there are variables placed in PSRAM, it will setup XIP to cause bus faults on any
+ * If there are variables placed in PSRAM, XIP will be set up to cause bus faults on any
  * access to PSRAM addresses greater than the size available. The \ref psram_check_address
  * function should be used before accessing variables in PSRAM when auto-detection is on,
  * to prevent these bus faults.
  *
  * Note some of these functions are *unsafe* if you are using both cores, and the other
  * is executing from flash or psram concurrently with the operation. In this case, you
- * must perform your own synchronisation to make sure that no XIP accesses take
+ * must perform your own synchronization to make sure that no XIP accesses take
  * place while running these functions. One option is to use the
  * \ref flash_safe_execute functions in \ref pico_flash.
  *
@@ -54,7 +54,7 @@
  * this case - \ref flash_safe_execute handles this case too.
  *
  * The unsafe functions are:
- * - \ref psram_reinitialise
+ * - \ref psram_reinitialize
  * - \ref psram_detect_cs_and_size
  * - \ref psram_detect_size
  */
@@ -97,7 +97,7 @@
 
 // PICO_CONFIG: PICO_DEFAULT_PSRAM_MAX_FREQ, Default max frequency of psram, type=int, default=133 * MHZ, group=hardware_psram
 #ifndef PICO_DEFAULT_PSRAM_MAX_FREQ
-#define PICO_DEFAULT_PSRAM_MAX_FREQ 133 * MHZ
+#define PICO_DEFAULT_PSRAM_MAX_FREQ (133 * MHZ)
 #endif
 
 // PICO_CONFIG: PICO_DEFAULT_PSRAM_MAX_SELECT, Default max select time of psram in ns, type=int, default=8000, group=hardware_psram
@@ -130,10 +130,10 @@
 extern "C" {
 #endif
 
-/*! \brief Check if PSRAM is available and initialised
+/*! \brief Check if PSRAM is available and initialized
  *  \ingroup hardware_psram
  *
- * \return true if PSRAM is available and initialised, false otherwise
+ * \return true if PSRAM is available and initialized, false otherwise
  */
 bool psram_is_available(void);
 
@@ -210,17 +210,17 @@ int psram_configure_params(uint32_t max_psram_freq, uint32_t max_select_ns, uint
  */
 int psram_set_params(uint32_t divisor, uint32_t rxdelay, uint32_t max_select, uint32_t min_deselect);
 
-/*! \brief Re-initialise PSRAM
+/*! \brief Re-initialize PSRAM
  *  \ingroup hardware_psram
  *
- * This will re-initialise the PSRAM with the parameters set by \ref psram_configure_params.
+ * This will re-initialize the PSRAM with the parameters set by \ref psram_configure_params.
  *
  * This calls \ref flash_start_xip internally, so will reset any QSPI pads changes you have made.
  *
  * \return PICO_OK on success, PICO_ERROR_PRECONDITION_NOT_MET if the PSRAM size is not set in
  * flash_devinfo or the PSRAM parameters are not set by \ref psram_configure_params or \ref psram_set_params
  */
-int psram_reinitialise(void);
+int psram_reinitialize(void);
 
 /*! \brief Convert PSRAM EID to size
  *  \ingroup hardware_psram
@@ -245,7 +245,15 @@ size_t psram_eid_to_size(uint8_t kgd, uint8_t eid);
  * 
  * This will fail to compile if PICO_PSRAM_SIZE_BYTES is not set
  */
-#define psram_or_malloc(group, type, var, size) static type __psram_uninitialised(group) var##_psram[size]; type* var; if (psram_check_address(var##_psram + size)) { var = (type*)var##_psram; } else { var = (type*)malloc(size * sizeof(type)); }
+#define psram_or_malloc(group, type, var, size) \
+    static type __uninitialized_psram(group) var##_psram[size]; static type* var; \
+    if (!var) { \
+        if (psram_check_address(var##_psram + (size))) { \
+           var = (type*)var##_psram; \
+        } else { \
+            var = (type*)malloc((size) * sizeof(type)); \
+        } \
+    }
 
 /*! \brief Free a buffer if it is not in PSRAM
  *  \ingroup hardware_psram

@@ -233,7 +233,7 @@ int psram_set_params(uint32_t divisor, uint32_t rxdelay, uint32_t max_select, ui
     return PICO_OK;
 }
 
-static void __no_inline_not_in_flash_func(psram_initialise_internal)(void) {
+static void __no_inline_not_in_flash_func(psram_initialize_internal)(void) {
     // Send QUAD_ENABLE command manually, as using flash_do_cmd_cs would call this function again,
     // if it has been registered using flash_set_qmi_cs1_setup_function
     // Enable direct mode, auto CS1, clkdiv of 10
@@ -286,7 +286,7 @@ static void __no_inline_not_in_flash_func(psram_initialise_internal)(void) {
 
 static bool psram_initialized = false;
 
-int psram_reinitialise(void) {
+int psram_reinitialize(void) {
     // flash_devinfo must be configured correctly to use this function
     invalid_params_if_and_return(HARDWARE_PSRAM, flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE, PICO_ERROR_PRECONDITION_NOT_MET);
     // psram_configure_params must have been called to set the parameters
@@ -297,10 +297,10 @@ int psram_reinitialise(void) {
     hw_clear_bits(&pads_bank0_hw->io[flash_devinfo_get_cs_gpio(1)], PADS_BANK0_GPIO0_ISO_BITS);
 #endif
 
-    // Register the function to initialise the QMI CS1 configuration
-    flash_set_qmi_cs1_setup_function(psram_initialise_internal);
+    // Register the function to initialize the QMI CS1 configuration
+    flash_set_qmi_cs1_setup_function(psram_initialize_internal);
 
-    // Call flash_start_xip, which calls psram_initialise_internal
+    // Call flash_start_xip, which calls psram_initialize_internal
     flash_start_xip();
 
     psram_initialized = true;
@@ -387,9 +387,9 @@ void runtime_init_setup_psram(void) {
     psram_initialized = psram_flash_devinfo_size != FLASH_DEVINFO_SIZE_NONE;
 
     static_assert(FLASH_DEVINFO_SIZE_MAX == FLASH_DEVINFO_SIZE_16M, "expected max region size of 16M");
-    extern uint32_t __psram_start__;
-    extern uint32_t __psram_end__;
-    uint32_t psram_words = (uint32_t)(&__psram_end__ - &__psram_start__);
+    extern uint32_t __in_psram_start__;
+    extern uint32_t __in_psram_end__;
+    uint32_t psram_words = (uint32_t)(&__in_psram_end__ - &__in_psram_start__);
     if (psram_words > psram_word_size) {
         // Setup to bus fault for variables that don't fit in available PSRAM
         int clear_regions = 0; // Clear no regions by default
@@ -421,25 +421,25 @@ void runtime_init_setup_psram(void) {
         return;
     }
 
-    // Initialise the PSRAM
-    ret = psram_reinitialise();
+    // Initialize the PSRAM
+    ret = psram_reinitialize();
     if (ret != PICO_OK) {
         psram_initialized = false;
         return;
     }
 
-    // And load any initialised PSRAM data
-    extern uint32_t __psram_load_source__;
-    extern uint32_t __psram_load_start__;
-    extern uint32_t __psram_load_end__;
-    uint32_t stored_words = (uint32_t)(&__psram_load_end__ - &__psram_load_start__);
+    // And load any initialized PSRAM data
+    extern uint32_t __in_psram_load_source__;
+    extern uint32_t __in_psram_load_start__;
+    extern uint32_t __in_psram_load_end__;
+    uint32_t stored_words = (uint32_t)(&__in_psram_load_end__ - &__in_psram_load_start__);
     if (stored_words > 0) {
         if (stored_words > psram_word_size) {
             // Only copy into available PSRAM, to avoid triggering bus faults here,
             // they will be triggered later when the variable is accessed
             stored_words = psram_word_size;
         }
-        memcpy(&__psram_load_start__, &__psram_load_source__, stored_words * sizeof(uint32_t));
+        memcpy(&__in_psram_load_start__, &__in_psram_load_source__, stored_words * sizeof(uint32_t));
     }
 }
 

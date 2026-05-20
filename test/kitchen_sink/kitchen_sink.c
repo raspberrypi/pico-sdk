@@ -53,8 +53,8 @@ uint32_t dma_to = 0;
 uint32_t dma_from = 0xaaaa5555;
 
 #ifdef FIXED_PSRAM_SIZE
-int __psram("foo") foo_psram = 23;
-char __psram_uninitialised("bar") bar_psram[0x8000];
+int __in_psram("foo") foo_psram = 23;
+char __uninitialized_psram("bar") bar_psram[0x8000];
 #if defined(TINY_PSRAM) || defined(SMALL_PSRAM)
 void make_tiny_psram(void) {
 #if defined(TINY_PSRAM)

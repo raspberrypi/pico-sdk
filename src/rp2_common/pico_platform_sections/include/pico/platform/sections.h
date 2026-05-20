@@ -87,22 +87,22 @@
  *
  * For example a `uint32_t` variable placed in PSRAM
  *
- *     uint32_t __psram("my_group_name") foo = 23;
+ *     uint32_t __in_psram("my_group_name") foo = 23;
  *
  * Or placed in uninitialised PSRAM
  *
- *     uint32_t __psram_uninitialised("my_group_name") foo;
+ *     uint32_t __uninitialized_psram("my_group_name") foo;
  *
  * The section attribute is `.psram_initialised.<group>` or `.psram_uninitialised.<group>`
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
  *              garbage-collected independently
  */
-#ifndef __psram
-#define __psram(group) __attribute__((section(".psram_initialised." group)))
+#ifndef __in_psram
+#define __in_psram(group) __attribute__((section(".psram_initialised." group)))
 #endif
-#ifndef __psram_uninitialised
-#define __psram_uninitialised(group) __attribute__((section(".psram_uninitialised." group)))
+#ifndef __uninitialized_psram
+#define __uninitialized_psram(group) __attribute__((section(".psram_uninitialised." group)))
 #endif
 
 /*! \brief Section attribute macro for data that is to be left uninitialized

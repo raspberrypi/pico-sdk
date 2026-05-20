@@ -147,7 +147,7 @@ void flash_get_unique_id(uint8_t *id_out);
  *  \param count Length in bytes of txbuf and of rxbuf
  *  \param cs Chip select index
  */
-void flash_do_cmd_cs(const uint8_t *txbuf, uint8_t *rxbuf, size_t count, uint8_t cs);
+void flash_do_cmd_cs(const uint8_t *txbuf, uint8_t *rxbuf, size_t count, uint cs);
 
 /*! \brief Execute bidirectional flash command on chip select 0
  *  \ingroup hardware_flash
@@ -165,8 +165,8 @@ static inline void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t cou
 void flash_flush_cache(void);
 
 #if !PICO_RP2040
-
 typedef void (*qmi_setup_function_t)(void);
+
 /*! \brief Set the function to be called to setup the QMI CS1 configuration
  *  \ingroup hardware_flash
  *
