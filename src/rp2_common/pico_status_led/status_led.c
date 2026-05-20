@@ -113,7 +113,7 @@ static void set_ws2812(uint32_t value) {
             break;
         } else {
             spin_unlock(spin_lock, save);
-            busy_wait_until(next_safe_set_time);
+            busy_wait_until(from_ms_since_boot(next_safe_set_time));
             save = spin_lock_blocking(spin_lock);
         }
 #else
@@ -136,9 +136,9 @@ static void set_ws2812(uint32_t value) {
                 // before adding the alarm since that is a slowish call
                 alarm_pending++;
                 spin_unlock(spin_lock, save);
-                alarm_id = add_alarm_at(next_safe_set_time, deferred_set_ws2812, NULL, true);
+                alarm_id = add_alarm_at(from_ms_since_boot(next_safe_set_time), deferred_set_ws2812, NULL, true);
                 if (alarm_id > 0) break;
-                busy_wait_until(next_safe_set_time);
+                busy_wait_until(from_ms_since_boot(next_safe_set_time));
                 save = spin_lock_blocking(spin_lock);
                 alarm_pending--;
             }
