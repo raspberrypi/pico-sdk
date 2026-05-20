@@ -101,7 +101,7 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #endif
 
 // The following pins are used internally between 
-// the RP2040 and W5500 chip and should NOT be used
+// the RP2040 and W5500 chip and should NOT be used for other purposes
 #ifndef W5500_DEFAULT_PIN_ETH_SPI_CS
 #define W5500_DEFAULT_PIN_ETH_SPI_CS 20
 #endif
