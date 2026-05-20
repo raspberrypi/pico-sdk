@@ -372,6 +372,11 @@ with open(board_header) as header_fh:
                     resolved_value = value
                     while resolved_value in defines:
                         resolved_value = defines[resolved_value].resolved_value
+                    # resolve unsigned ints
+                    if isinstance(resolved_value, str):
+                        m = re.match(r"^(\d+)u$", resolved_value)
+                        if m:
+                            resolved_value = int(m.group(1))
                 else:
                     resolved_value = None
 
@@ -489,7 +494,7 @@ for name, define in defines.items():
         errors.append(Exception("{}:{}  Header is for {} and so shouldn't have settings for {} ({})".format(board_header, define.lineno, chip, other_chip, name)))
 
     # check for pin-conflicts
-    if name.endswith("_PIN"):
+    if name.endswith("_PIN") or name.endswith("_PIN_BASE") or "_DEFAULT_PIN_" in name:
         if define.resolved_value is None:
             errors.append(Exception("{}:{}  {} is set to an undefined value".format(board_header, define.lineno, name)))
         elif not isinstance(define.resolved_value, int):
