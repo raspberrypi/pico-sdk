@@ -83,7 +83,7 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
 
-// Soldered NULA Max has an SD Card.
+// Soldered NULA Ethernet has an SD Card.
 #ifndef PICO_SD_CLK_PIN
 #define PICO_SD_CLK_PIN 10
 #endif
@@ -98,6 +98,27 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #endif
 #ifndef PICO_SD_DAT_PIN_COUNT
 #define PICO_SD_DAT_PIN_COUNT 1
+#endif
+
+// The following pins are used internally between 
+// the RP2040 and W5500 chip and should NOT be used
+#ifndef PICO_INTERNAL_SPI_CS
+#define PICO_INTERNAL_SPI_CS 20
+#endif
+#ifndef PICO_INTERNAL_SPI_SCK
+#define PICO_INTERNAL_SPI_SCK 21
+#endif
+#ifndef PICO_INTERNAL_SPI_MISO
+#define PICO_INTERNAL_SPI_MISO 22
+#endif
+#ifndef PICO_INTERNAL_SPI_MOSI
+#define PICO_INTERNAL_SPI_MOSI 23
+#endif
+#ifndef PICO_INTERNAL_INT
+#define PICO_INTERNAL_INT 24
+#endif
+#ifndef PICO_INTERNAL_RST
+#define PICO_INTERNAL_RST 25
 #endif
 
 #endif
