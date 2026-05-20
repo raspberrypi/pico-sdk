@@ -472,7 +472,7 @@ static inline int rom_set_bootrom_stack(bootrom_stack_t *stack) {
  *   0x02 : DISABLE_PICOBOOT_INTERFACE - Disable the {picoboot} interface (see <<section_bootrom_picoboot>>).
  *   0x10 : GPIO_PIN_ACTIVE_LOW - The GPIO specified in p1 is active low (GPIO_PIN_SPECIFIED must also be set).
  *   0x20 : GPIO_PIN_SPECIFIED - Enable the activity indicator on the GPIO specified in p1.
- *  p1 - the GPIO number to use as an activity indicator (enabled by GPIO_PIN_ENABLED flag in p0).
+ *  p1 - the GPIO number to use as an activity indicator (enabled by GPIO_PIN_SPECIFIED flag in p0).
  * 
  * \ref REBOOT2_FLAG_REBOOT_TYPE_RAM_IMAGE - reboot into an image in RAM. The region of RAM or XIP RAM is searched for an image to run. This is the type
  * of reboot used when a RAM UF2 is dragged onto the BOOTSEL USB drive.
