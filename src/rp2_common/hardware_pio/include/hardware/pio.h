@@ -23,11 +23,6 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_PIO_VERSION, PIO hardware version, type=int, default=0 on RP2040 and 1 on RP2350, group=hardware_pio
-#ifndef PICO_PIO_VERSION
-#define PICO_PIO_VERSION PIO_VERSION
-#endif
-
 // PICO_CONFIG: PICO_PIO_CLKDIV_ROUND_NEAREST, True if floating point PIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_pio
 #ifndef PICO_PIO_CLKDIV_ROUND_NEAREST
 #define PICO_PIO_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
