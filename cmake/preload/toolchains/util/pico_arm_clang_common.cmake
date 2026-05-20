@@ -45,7 +45,7 @@ list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES PICO_CLIB)
 
 if (NOT PICO_COMPILER_SYSROOT)
     # Note we explicitly look for the correct libraries, because we don't necessarily trust multilib (even
-    # in newer Arm LLVM ETfA to correctly pick the right one
+    # in newer Arm LLVM ATfE to correctly pick the right one
     foreach(PICO_CLANG_RUNTIME IN LISTS PICO_CLANG_RUNTIMES)
         # LLVM embedded-toolchain for ARM style
         find_path(PICO_COMPILER_SYSROOT NAMES lib
@@ -93,13 +93,13 @@ else()
     find_path(_CLANG_HEADERS_DIR NAMES include/stdio.h
             HINTS
             ${PICO_COMPILER_SYSROOT}
-            ${PICO_COMPILER_SYSROOT}/.. # new style LLVM ETfA (21+)
+            ${PICO_COMPILER_SYSROOT}/.. # new style LLVM ATfE (21+)
     )
     if (NOT _CLANG_HEADERS_DIR)
         message(FATAL_ERROR "Could not find llvm headers (searched ${PICO_COMPILER_SYSROOT}/include and ${PICO_COMPILER_SYSROOT}/../include)")
     else()
         if (NOT _CLANG_HEADERS_DIR STREQUAL PICO_COMPILER_SYSROOT)
-            # LLVM ETfA moves the headers out of the multilib so we need to explicitly add C++/C headers (in that order)
+            # LLVM ATfE 21+ moves the headers out of the multilib so we need to explicitly add C++/C headers (in that order)
             set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -isystem ${_CLANG_HEADERS_DIR}/include/c++/v1 -isystem ${_CLANG_HEADERS_DIR}/include")
         endif()
     endif()
