@@ -7,15 +7,11 @@
 #ifndef _BOOT_PICOBIN_H
 #define _BOOT_PICOBIN_H
 
-#ifndef NO_PICO_PLATFORM
-#include "pico/platform.h"
-#else
 #ifndef _u
 #ifdef __ASSEMBLER__
 #define _u(x) x
 #else
 #define _u(x) x ## u
-#endif
 #endif
 #endif
 
@@ -149,6 +145,7 @@
 #ifndef __ASSEMBLER__
 
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct {
     // these must all be word aligned

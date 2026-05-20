@@ -1,4 +1,7 @@
 # PICO_CMAKE_CONFIG: PICO_TOOLCHAIN_PATH, Path to search for compiler, type=string, default=none (i.e. search system paths), group=build, docref=cmake-toolchain-config
+if (NOT PICO_TOOLCHAIN_PATH AND DEFINED ENV{PICO_TOOLCHAIN_PATH})
+    set(PICO_TOOLCHAIN_PATH $ENV{PICO_TOOLCHAIN_PATH})
+endif()
 set(PICO_TOOLCHAIN_PATH "${PICO_TOOLCHAIN_PATH}" CACHE INTERNAL "")
 
 # Set a default build type if none was specified
@@ -19,13 +22,30 @@ if (CMAKE_BUILD_TYPE STREQUAL "Default")
 endif()
 
 if (NOT (DEFINED PICO_COMPILER OR DEFINED CMAKE_TOOLCHAIN_FILE))
-    if (DEFINED PICO_DEFAULT_COMPILER)
-        pico_message("Defaulting compiler (PICO_COMPILER) to '${PICO_DEFAULT_COMPILER}' since not specified.")
+    if (PICO_TOOLCHAIN_PATH)
+        if (PICO_DEFAULT_GCC_COMPILER)
+            file(GLOB _COMPILER "${PICO_TOOLCHAIN_PATH}/bin/*gcc*" "${PICO_TOOLCHAIN_PATH}/*gcc*")
+            if (_COMPILER)
+                set(PICO_COMPILER ${PICO_DEFAULT_GCC_COMPILER})
+                message("Detected GCC so defaulting PICO_COMPILER to `${PICO_COMPILER}`")
+            endif()
+        endif()
+        if (NOT PICO_COMPILER AND PICO_DEFAULT_CLANG_COMPILER)
+            file(GLOB _COMPILER "${PICO_TOOLCHAIN_PATH}/bin/*llvm*" "${PICO_TOOLCHAIN_PATH}/*llvm*")
+            if (_COMPILER)
+                set(PICO_COMPILER ${PICO_DEFAULT_CLANG_COMPILER})
+                message("Detected Clang/LLVM so defaulting PICO_COMPILER to `${PICO_COMPILER}`")
+            endif()
+        endif()
+        unset(_COMPILER)
+    endif()
+    if (NOT PICO_COMPILER AND DEFINED PICO_DEFAULT_COMPILER)
+        pico_message("Defaulting compiler (PICO_COMPILER) to '${PICO_DEFAULT_COMPILER}' since not specified or detected.")
         set(PICO_COMPILER ${PICO_DEFAULT_COMPILER})
     endif()
 endif ()
 
-# PICO_CMAKE_CONFIG: PICO_COMPILER, Specifies the compiler family to use, type=string, group=build, default=PICO_DEFAULT_COMPILER which is set based on PICO_PLATFORM, docref=cmake-toolchain-config
+# PICO_CMAKE_CONFIG: PICO_COMPILER, Specifies the compiler family to use, type=string, group=build, default=autodetected or PICO_DEFAULT_COMPILER which is set based on PICO_PLATFORM, docref=cmake-toolchain-config
 # If PICO_COMPILER is specified, set toolchain file to ${PICO_COMPILER}.cmake.
 if (DEFINED PICO_COMPILER)
     # maintain backwards compatibility with RP2040 SDK compilers
