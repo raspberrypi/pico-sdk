@@ -32,18 +32,28 @@ bool rom_funcs_lookup(uint32_t *table, unsigned int count) {
 }
 
 
+// When REBOOT_TYPE is BOOTSEL, the bootrom requires bit 0x20 to be set in
+// the reboot-flags word (the first argument to rom_reboot) for the GPIO
+// number in p1 to be honoured for the activity indicator. Numerically this
+// is the same bit as REBOOT2_FLAG_REBOOT_TO_RISCV, which is overloaded by
+// reboot type and means "BOOTSEL GPIO info valid" in this context — see
+// pico-sdk issue #2957 for the empirical confirmation on RP2350.
+#define _REBOOT2_BOOTSEL_GPIO_INFO_VALID 0x20u
+
 void __attribute__((noreturn)) rom_reset_usb_boot(uint32_t usb_activity_gpio_pin_mask, uint32_t disable_interface_mask) {
 #ifdef ROM_FUNC_RESET_USB_BOOT
     rom_reset_usb_boot_fn func = (rom_reset_usb_boot_fn) rom_func_lookup(ROM_FUNC_RESET_USB_BOOT);
     func(usb_activity_gpio_pin_mask, disable_interface_mask);
 #elif defined(ROM_FUNC_REBOOT)
+    uint32_t reboot_flags = REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | REBOOT2_FLAG_NO_RETURN_ON_SUCCESS;
     uint32_t flags = disable_interface_mask;
     if (usb_activity_gpio_pin_mask) {
         flags |= BOOTSEL_FLAG_GPIO_PIN_SPECIFIED;
+        reboot_flags |= _REBOOT2_BOOTSEL_GPIO_INFO_VALID;
         // the parameter is actually the gpio number, but we only care if BOOTSEL_FLAG_GPIO_PIN_SPECIFIED
         usb_activity_gpio_pin_mask = (uint32_t)__builtin_ctz(usb_activity_gpio_pin_mask);
     }
-    rom_reboot(REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | REBOOT2_FLAG_NO_RETURN_ON_SUCCESS, 10, flags, usb_activity_gpio_pin_mask);
+    rom_reboot(reboot_flags, 10, flags, usb_activity_gpio_pin_mask);
     __builtin_unreachable();
 #else
     panic_unsupported();
@@ -56,14 +66,16 @@ void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pi
     rom_reset_usb_boot_fn func = (rom_reset_usb_boot_fn) rom_func_lookup(ROM_FUNC_RESET_USB_BOOT);
     func(usb_activity_gpio_pin < 0 ? 0 : (1u << usb_activity_gpio_pin), disable_interface_mask);
 #elif defined(ROM_FUNC_REBOOT)
+    uint32_t reboot_flags = REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | REBOOT2_FLAG_NO_RETURN_ON_SUCCESS;
     uint32_t flags = disable_interface_mask;
     if (usb_activity_gpio_pin >= 0) {
         flags |= BOOTSEL_FLAG_GPIO_PIN_SPECIFIED;
+        reboot_flags |= _REBOOT2_BOOTSEL_GPIO_INFO_VALID;
         if (usb_activity_gpio_pin_active_low) {
             flags |= BOOTSEL_FLAG_GPIO_PIN_ACTIVE_LOW;
         }
     }
-    rom_reboot(REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | REBOOT2_FLAG_NO_RETURN_ON_SUCCESS, 10, flags, (uint)usb_activity_gpio_pin);
+    rom_reboot(reboot_flags, 10, flags, (uint)usb_activity_gpio_pin);
     __builtin_unreachable();
 #else
     panic_unsupported();
