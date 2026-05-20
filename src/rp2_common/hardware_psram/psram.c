@@ -387,9 +387,9 @@ void runtime_init_setup_psram(void) {
     psram_initialized = psram_flash_devinfo_size != FLASH_DEVINFO_SIZE_NONE;
 
     static_assert(FLASH_DEVINFO_SIZE_MAX == FLASH_DEVINFO_SIZE_16M, "expected max region size of 16M");
-    extern uint32_t __in_psram_start__;
-    extern uint32_t __in_psram_end__;
-    uint32_t psram_words = (uint32_t)(&__in_psram_end__ - &__in_psram_start__);
+    extern uint32_t __psram_start__;
+    extern uint32_t __psram_end__;
+    uint32_t psram_words = (uint32_t)(&__psram_end__ - &__psram_start__);
     if (psram_words > psram_word_size) {
         // Setup to bus fault for variables that don't fit in available PSRAM
         int clear_regions = 0; // Clear no regions by default
@@ -429,17 +429,17 @@ void runtime_init_setup_psram(void) {
     }
 
     // And load any initialized PSRAM data
-    extern uint32_t __in_psram_load_source__;
-    extern uint32_t __in_psram_load_start__;
-    extern uint32_t __in_psram_load_end__;
-    uint32_t stored_words = (uint32_t)(&__in_psram_load_end__ - &__in_psram_load_start__);
+    extern uint32_t __psram_load_source__;
+    extern uint32_t __psram_load_start__;
+    extern uint32_t __psram_load_end__;
+    uint32_t stored_words = (uint32_t)(&__psram_load_end__ - &__psram_load_start__);
     if (stored_words > 0) {
         if (stored_words > psram_word_size) {
             // Only copy into available PSRAM, to avoid triggering bus faults here,
             // they will be triggered later when the variable is accessed
             stored_words = psram_word_size;
         }
-        memcpy(&__in_psram_load_start__, &__in_psram_load_source__, stored_words * sizeof(uint32_t));
+        memcpy(&__psram_load_start__, &__psram_load_source__, stored_words * sizeof(uint32_t));
     }
 }
 
