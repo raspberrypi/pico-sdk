@@ -194,7 +194,7 @@
  * 
  * For binaries that are not executing from flash (eg copy_to_ram and no_flash), one special treatment can be
  * using the \ref`pico_use_xip_sram_for_time_critical` CMake function to place them in XIP RAM instead, as the
- * XIP ports would be otherwise unused. 
+ * XIP AHB ports would be otherwise unused. 
  *
  * For example a function called my_func taking an int parameter:
  *
