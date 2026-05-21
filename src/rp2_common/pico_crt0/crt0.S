@@ -28,11 +28,7 @@
 
 // PICO_CONFIG: PICO_CRT0_NO_DATA_COPY, Whether crt0 should perform the data copies - usually copying from flash into sram, default=1 for no_flash builds, 0 otherwise, type=bool, group=pico_crt0
 #ifndef PICO_CRT0_NO_DATA_COPY
-#if PICO_RP2040
-#define PICO_CRT0_NO_DATA_COPY (PICO_NO_FLASH && !PICO_USE_XIP_CACHE_AS_RAM)
-#else
 #define PICO_CRT0_NO_DATA_COPY PICO_NO_FLASH
-#endif
 #endif
 
 #ifdef NDEBUG
