@@ -264,8 +264,8 @@ function(pico_generate_pio_header TARGET)
 
         add_custom_target(${HEADER_GEN_TARGET} DEPENDS ${HEADER})
 
-        if (PICO_PIO_VERSION)
-            set(VERSION_STRING "${PICO_PIO_VERSION}")
+        if (PIO_VERSION)
+            set(VERSION_STRING "${PIO_VERSION}")
         else()
             set(VERSION_STRING "0")
         endif()

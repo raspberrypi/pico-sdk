@@ -66,7 +66,7 @@ enum pio_src_dest {
     pio_x = 1u,
     pio_y = 2u,
     pio_null = 3u | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_DEST,
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     pio_pindirs_mov = 3u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC,
     pio_pindirs = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC,
 #else
@@ -317,7 +317,7 @@ static inline uint pio_encode_wait_irq(bool polarity, bool relative, uint irq) {
     return _pio_encode_instr_and_args(pio_instr_bits_wait, 2u | (polarity ? 4u : 0u), _pio_encode_irq(relative, irq));
 }
 
-#if PICO_PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
 /*! \brief Encode a WAIT for jmppin instruction
  *  \ingroup pio_instructions
  *
@@ -409,7 +409,7 @@ static inline uint pio_encode_mov(enum pio_src_dest dest, enum pio_src_dest src)
     valid_params_if(PIO_INSTRUCTIONS, !(src & _PIO_INVALID_MOV_SRC));
     // generic constants aren't the same as the MOV ones
     if (dest == pio_exec) dest = pio_exec_mov;
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     if (dest == pio_pindirs) dest = pio_pindirs_mov;
 #endif
     return _pio_encode_instr_and_src_dest(pio_instr_bits_mov, dest, src & 7u);

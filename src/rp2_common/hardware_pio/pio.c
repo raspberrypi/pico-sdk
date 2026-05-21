@@ -25,7 +25,7 @@ void pio_sm_claim(PIO pio, uint sm) {
     check_sm_param(sm);
     uint which = pio_get_index(pio);
     const char *msg =
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
         which == 2 ? "PIO 2 SM (%d - 8) already claimed" :
 #endif
         which == 1 ? "PIO 1 SM (%d - 4) already claimed" :
@@ -82,8 +82,8 @@ static int find_offset_for_program(PIO pio, const pio_program_t *program) {
 }
 
 static int pio_set_gpio_base_unsafe(PIO pio, uint gpio_base) {
-    invalid_params_if_and_return(HARDWARE_PIO, gpio_base != 0 && (!PICO_PIO_VERSION || gpio_base != 16), PICO_ERROR_BAD_ALIGNMENT);
-#if PICO_PIO_VERSION > 0
+    invalid_params_if_and_return(HARDWARE_PIO, gpio_base != 0 && (!PIO_VERSION || gpio_base != 16), PICO_ERROR_BAD_ALIGNMENT);
+#if PIO_VERSION > 0
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     invalid_params_if_and_return(HARDWARE_PIO, used_mask, PICO_ERROR_INVALID_STATE);
     pio->gpiobase = gpio_base;
@@ -96,7 +96,7 @@ static int pio_set_gpio_base_unsafe(PIO pio, uint gpio_base) {
 
 int pio_set_gpio_base(PIO pio, uint gpio_base) {
     int rc = PICO_OK;
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     uint32_t save = hw_claim_lock();
     rc = pio_set_gpio_base_unsafe(pio, gpio_base);
     hw_claim_unlock(save);
@@ -108,7 +108,7 @@ int pio_set_gpio_base(PIO pio, uint gpio_base) {
 }
 
 static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     bool gpio_base = pio_get_gpio_base(pio);
     return !((gpio_base && (used_gpio_ranges & 1)) ||
              (!gpio_base && (used_gpio_ranges & 4)));
@@ -120,7 +120,7 @@ static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
 }
 
 static bool is_program_gpio_compatible(PIO pio, const pio_program_t *program) {
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     return is_gpio_compatible(pio, program->used_gpio_ranges);
 #else
     ((void)pio);
@@ -132,7 +132,7 @@ static bool is_program_gpio_compatible(PIO pio, const pio_program_t *program) {
 static int add_program_at_offset_check(PIO pio, const pio_program_t *program, uint offset) {
     valid_params_if(HARDWARE_PIO, offset < PIO_INSTRUCTION_COUNT);
     valid_params_if(HARDWARE_PIO, offset + program->length <= PIO_INSTRUCTION_COUNT);
-#if PICO_PIO_VERSION == 0
+#if PIO_VERSION == 0
     if (program->pio_version) return PICO_ERROR_VERSION_MISMATCH;
 #endif
     if (!is_program_gpio_compatible(pio, program)) return PICO_ERROR_BAD_ALIGNMENT; // todo better error?

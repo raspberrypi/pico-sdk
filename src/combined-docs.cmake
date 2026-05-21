@@ -8,7 +8,7 @@ set(PICO_COMBINED_DOCS "1" CACHE INTERNAL "")
 # have to pick one for platform stuff, so lets go with rp2350
 set(RP2_VARIANT_DIR ${CMAKE_CURRENT_LIST_DIR}/rp2350)
 # pick latest version
-set(PICO_PIO_VERSION "1" CACHE INTERNAL "")
+set(PIO_VERSION "1" CACHE INTERNAL "")
 set(PICO_CMSIS_DEVICE "RP2350" CACHE INTERNAL "")
 
 # Add RP2040 structs too, since there are distinct enums in there

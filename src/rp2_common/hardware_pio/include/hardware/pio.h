@@ -23,6 +23,9 @@
 #endif
 #endif
 
+// Backwards-compatibility define
+#define PICO_PIO_VERSION PIO_VERSION
+
 // PICO_CONFIG: PICO_PIO_CLKDIV_ROUND_NEAREST, True if floating point PIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_pio
 #ifndef PICO_PIO_CLKDIV_ROUND_NEAREST
 #define PICO_PIO_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
@@ -100,7 +103,7 @@ enum pio_fifo_join {
     PIO_FIFO_JOIN_NONE = 0,    ///< TX FIFO length=4 is used for transmit, RX FIFO length=4 is used for receive
     PIO_FIFO_JOIN_TX = 1,      ///< TX FIFO length=8 is used for transmit, RX FIFO is disabled
     PIO_FIFO_JOIN_RX = 2,      ///< RX FIFO length=8 is used for receive, TX FIFO is disabled
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     PIO_FIFO_JOIN_TXGET = 4,   ///< TX FIFO length=4 is used for transmit, RX FIFO is disabled; space is used for "get" instructions or processor writes
     PIO_FIFO_JOIN_TXPUT = 8,   ///< TX FIFO length=4 is used for transmit, RX FIFO is disabled; space is used for "put" instructions or processor reads
     PIO_FIFO_JOIN_PUTGET = 12, ///< TX FIFO length=4 is used for transmit, RX FIFO is disabled; space is used for "put"/"get" instructions with no processor access
@@ -113,7 +116,7 @@ enum pio_fifo_join {
 enum pio_mov_status_type {
     STATUS_TX_LESSTHAN = 0,
     STATUS_RX_LESSTHAN = 1,
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     STATUS_IRQ_SET = 2
 #endif
 };
@@ -146,7 +149,7 @@ typedef pio_hw_t *PIO;
 #define pio2 pio2_hw
 #endif
 
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
 #ifndef PICO_PIO_USE_GPIO_BASE
 // PICO_CONFIG: PICO_PIO_USE_GPIO_BASE, Enable code for handling more than 32 PIO pins, type=bool, default=true when supported and when the device has more than 32 pins, group=hardware_pio
 #define PICO_PIO_USE_GPIO_BASE ((NUM_BANK0_GPIOS) > 32)
@@ -475,7 +478,7 @@ static inline void sm_config_set_in_pins(pio_sm_config *c, uint in_base) {
  * \param in_count 1-32 The number of pins to include when reading via the IN pin mapping
  */
 static inline void sm_config_set_in_pin_count(pio_sm_config *c, uint in_count) {
-#if PICO_PIO_VERSION == 0
+#if PIO_VERSION == 0
     // can't be changed from 32 on PIO v0
     ((void)c);
     valid_params_if(HARDWARE_PIO, in_count == 32);
@@ -689,11 +692,11 @@ static inline void sm_config_set_out_shift(pio_sm_config *c, bool shift_right, b
  */
 static inline void sm_config_set_fifo_join(pio_sm_config *c, enum pio_fifo_join join) {
     valid_params_if(HARDWARE_PIO, join == PIO_FIFO_JOIN_NONE || join == PIO_FIFO_JOIN_TX || join == PIO_FIFO_JOIN_RX
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
         || join == PIO_FIFO_JOIN_TXPUT || join == PIO_FIFO_JOIN_TXGET || join == PIO_FIFO_JOIN_PUTGET
 #endif
     );
-#if PICO_PIO_VERSION == 0
+#if PIO_VERSION == 0
     c->shiftctrl = (c->shiftctrl & (uint)~(PIO_SM0_SHIFTCTRL_FJOIN_TX_BITS | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS)) |
                    (((uint)join) << PIO_SM0_SHIFTCTRL_FJOIN_TX_LSB);
 #else
@@ -731,7 +734,7 @@ static inline void sm_config_set_out_special(pio_sm_config *c, bool sticky, bool
 static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_status_type status_sel, uint status_n) {
     valid_params_if(HARDWARE_PIO,
                     status_sel == STATUS_TX_LESSTHAN || status_sel == STATUS_RX_LESSTHAN
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
                     || status_sel == STATUS_IRQ_SET
 #endif
     );
@@ -784,7 +787,7 @@ static inline pio_sm_config pio_get_default_sm_config(void) {
  * \return the current GPIO base for the PIO instance
   */
 static inline uint pio_get_gpio_base(PIO pio) {
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     return pio->gpiobase;
 #else
     ((void)pio);
@@ -932,7 +935,7 @@ typedef struct pio_program {
     uint8_t length;
     int8_t origin; // required instruction memory origin or -1
     uint8_t pio_version;
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     uint8_t used_gpio_ranges; // bitmap with one bit per 16 pins
 #endif
 } pio_program_t;
@@ -1071,7 +1074,7 @@ static inline void pio_set_sm_mask_enabled(PIO pio, uint32_t mask, bool enabled)
     pio->ctrl = (pio->ctrl & ~mask) | (enabled ? mask : 0u);
 }
 
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
 /*! \brief Enable or disable multiple PIO state machines
  *  \ingroup hardware_pio
  *
@@ -1191,7 +1194,7 @@ static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
     hw_set_bits(&pio->ctrl, (mask << PIO_CTRL_CLKDIV_RESTART_LSB) & PIO_CTRL_CLKDIV_RESTART_BITS);
 }
 
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
 /*! \brief Restart multiple state machines' clock dividers on multiple PIOs from a phase of 0.
  *  \ingroup hardware_pio
  *
@@ -1252,7 +1255,7 @@ static inline void pio_enable_sm_mask_in_sync(PIO pio, uint32_t mask) {
         ((mask << PIO_CTRL_SM_ENABLE_LSB) & PIO_CTRL_SM_ENABLE_BITS));
 }
 
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
 /*! \brief Enable multiple PIO state machines on multiple PIOs synchronizing their clock dividers
  *  \ingroup hardware_pio
  *
@@ -1287,7 +1290,7 @@ typedef enum pio_interrupt_source {
     pis_interrupt1 = PIO_INTR_SM1_LSB,                        ///< PIO interrupt 1 is raised
     pis_interrupt2 = PIO_INTR_SM2_LSB,                        ///< PIO interrupt 2 is raised
     pis_interrupt3 = PIO_INTR_SM3_LSB,                        ///< PIO interrupt 3 is raised
-#if PICO_PIO_VERSION > 0
+#if PIO_VERSION > 0
     pis_interrupt4 = PIO_INTR_SM4_LSB,                        ///< PIO interrupt 4 is raised
     pis_interrupt5 = PIO_INTR_SM5_LSB,                        ///< PIO interrupt 5 is raised
     pis_interrupt6 = PIO_INTR_SM6_LSB,                        ///< PIO interrupt 6 is raised
