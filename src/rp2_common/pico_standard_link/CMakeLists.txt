@@ -30,6 +30,16 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES ${PROP} "${_LINK_DEPENDS}")
     endfunction()
 
+    
+    # pico_add_memmap_link_depends(TARGET TYPE)
+    # \brief\ Add link dependencies for the binary type to the target
+    #
+    # \param\ TYPE The binary type to use
+    function(pico_add_memmap_link_depends TARGET TYPE)
+        include(${PICO_LINKER_SCRIPT_PATH}/memmap_${TYPE}.cmake)
+        pico_add_memmap_link_depends_internal(${TARGET})
+    endfunction()
+
     # pico_check_linker_script(LDSCRIPT)
     # \brief_nodesc\ Check the linker script for compatibility
     #
@@ -131,6 +141,7 @@ if (NOT TARGET pico_standard_link)
     # \param\ TYPE The binary type to set
     function(pico_set_binary_type TARGET TYPE)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_BINARY_TYPE ${TYPE})
+        pico_add_memmap_link_depends(${TARGET} ${TYPE})
     endfunction()
 
     # PICO_CMAKE_CONFIG: PICO_DEFAULT_BINARY_TYPE, The default binary type to use, type=string, default=default, group=build
@@ -215,6 +226,8 @@ if (NOT TARGET pico_standard_link)
             )
     pico_add_link_depend(pico_standard_link ${_LINKER_SCRIPT_EXPRESSION})
     unset(_LINKER_SCRIPT_EXPRESSION)
+
+    pico_add_memmap_link_depends(pico_standard_link ${PICO_DEFAULT_BINARY_TYPE})
 
     # PICO_NO_FLASH will be set based on PICO_TARGET_BUILD_TYPE target property being equal to no_flash if set, otherwise to the value of the PICO_NO_FLASH cmake variable unless PICO_TARGET_TYPE is set to something else
     # PICO_BUILD_DEFINE: PICO_NO_FLASH, whether this is a 'no_flash' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
