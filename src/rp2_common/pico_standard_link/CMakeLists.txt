@@ -107,7 +107,7 @@ if (NOT TARGET pico_standard_link)
     #
     # \param\ TARGET The target to add the linker script override path to
     # \param\ PATH The path containing the overriding linker scripts
-    # \param\ FILES... The files in PATH - this is only used to calculate dependencies
+    # \param\ FILES The files in PATH - this is only used to calculate dependencies
     # \param\ GLOB_FILES Instead of passing FILES, just glob for all .incl files in directory
     function(pico_add_linker_script_override_path TARGET PATH)
         set(options GLOB_FILES)
