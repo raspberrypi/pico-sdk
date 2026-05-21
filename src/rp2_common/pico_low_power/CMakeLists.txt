@@ -59,5 +59,5 @@ function(pico_set_persistent_data_loc TARGET PERSISTENT_DATA_LOC)
 
         # Configure override section_persistent_data.incl for the target
         configure_file(${PICO_LOW_POWER_CURRENT_PATH}/section_persistent_data.incl.template ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}/section_persistent_data.incl @ONLY)
-        pico_add_linker_script_override_path(${TARGET} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET})
+        pico_add_linker_script_override_path(${TARGET} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET} FILES section_persistent_data.incl)
 endfunction()
