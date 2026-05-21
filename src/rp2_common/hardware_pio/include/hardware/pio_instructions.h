@@ -317,7 +317,7 @@ static inline uint pio_encode_wait_irq(bool polarity, bool relative, uint irq) {
     return _pio_encode_instr_and_args(pio_instr_bits_wait, 2u | (polarity ? 4u : 0u), _pio_encode_irq(relative, irq));
 }
 
-#if PICO_PICO_PIO_VERSION > 0
+#if PICO_PIO_VERSION > 0
 /*! \brief Encode a WAIT for jmppin instruction
  *  \ingroup pio_instructions
  *
