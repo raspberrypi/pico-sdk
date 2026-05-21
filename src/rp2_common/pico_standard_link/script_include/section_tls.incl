@@ -23,7 +23,7 @@ SECTIONS
      * which will never be used */
     .tlsX_not_needed_marker (NOLOAD) : {
         KEEP(*(.tlsX_not_needed_marker))
-    }
+    } > RAM
     PROVIDE( __tlsX_align = SIZEOF(.tlsX_not_needed_marker) > 0 ? 4 : __tls_align);
     PROVIDE( __tlsX_size_align = SIZEOF(.tlsX_not_needed_marker) > 0 ? 0 : __tls_size_align);
 

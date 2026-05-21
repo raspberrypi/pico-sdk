@@ -120,15 +120,14 @@ void flash_range_program(uint32_t flash_offs, const uint8_t *data, size_t count)
  */
 void flash_get_unique_id(uint8_t *id_out);
 
-/*! \brief Execute bidirectional flash command
+/*! \brief Execute bidirectional QSPI command
  *  \ingroup hardware_flash
  *
- * Low-level function to execute a serial command on a flash device attached
+ * Low-level function to execute a serial command on a device attached
  * to the QSPI interface. Bytes are simultaneously transmitted and received
  * from txbuf and to rxbuf. Therefore, both buffers must be the same length,
  * count, which is the length of the overall transaction. This is useful for
- * reading metadata from the flash chip, such as device ID or SFDP
- * parameters.
+ * reading metadata from the chip, such as device ID or SFDP parameters.
  *
  * The XIP cache is flushed following each command, in case flash state
  * has been modified. Like other hardware_flash functions, the flash is not
@@ -138,16 +137,44 @@ void flash_get_unique_id(uint8_t *id_out);
  * it is recommended that this function only be used to extract flash metadata
  * during startup, before the main application begins to run: see the
  * implementation of pico_get_unique_id() for an example of this.
+ * 
+ * \if rp2040_specific
+ * On RP2040 the chip select index is ignored, as there is only one chip select.
+ * \endif
+ *
+ *  \param txbuf Pointer to a byte buffer which will be transmitted
+ *  \param rxbuf Pointer to a byte buffer where received data will be written. txbuf and rxbuf may be the same buffer.
+ *  \param count Length in bytes of txbuf and of rxbuf
+ *  \param cs Chip select index
+ */
+void flash_do_cmd_cs(const uint8_t *txbuf, uint8_t *rxbuf, size_t count, uint cs);
+
+/*! \brief Execute bidirectional flash command on chip select 0
+ *  \ingroup hardware_flash
+ *
+ * See \ref flash_do_cmd_cs for more details.
  *
  *  \param txbuf Pointer to a byte buffer which will be transmitted to the flash
  *  \param rxbuf Pointer to a byte buffer where data received from the flash will be written. txbuf and rxbuf may be the same buffer.
  *  \param count Length in bytes of txbuf and of rxbuf
  */
-void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count);
+static inline void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count) {
+    flash_do_cmd_cs(txbuf, rxbuf, count, 0);
+}
 
 void flash_flush_cache(void);
 
 #if !PICO_RP2040
+typedef void (*qmi_setup_function_t)(void);
+
+/*! \brief Set the function to be called to setup the QMI CS1 configuration
+ *  \ingroup hardware_flash
+ *
+ * \param function The function to be called to setup the QMI CS1 configuration
+ * \return true if the function was set, false if not (e.g. tried to set a function in flash)
+ */
+bool flash_set_qmi_cs1_setup_function(qmi_setup_function_t function);
+
 typedef enum {
     FLASH_DEVINFO_SIZE_NONE = 0x0,
     FLASH_DEVINFO_SIZE_8K = 0x1,

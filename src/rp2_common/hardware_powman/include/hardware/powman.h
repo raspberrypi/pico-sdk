@@ -223,7 +223,7 @@ static inline bool pstate_bitset_none_set(pstate_bitset_t *domains) {
 }
 
 static inline pstate_bitset_t *pstate_bitset_from_powman_power_state(pstate_bitset_t *domains, powman_power_state pstate) {
-    static_assert(sizeof(powman_power_state) <= sizeof(uint32_t));
+    static_assert(sizeof(powman_power_state) <= sizeof(uint32_t), "");
     fixed_bitset_write_word(&domains->bitset, 0, pstate);
     return domains;
 }

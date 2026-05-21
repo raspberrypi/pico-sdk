@@ -1,6 +1,7 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2")
 load("pico_flash_region.bzl", "generated_pico_flash_region")
+load("pico_psram_region.bzl", "generated_pico_psram_region")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,6 +17,11 @@ generated_pico_flash_region(
         "//bazel/constraint:rp2350": 4 * 1024 * 1024,
         "//conditions:default": 2 * 1024 * 1024,
     }),
+)
+
+generated_pico_psram_region(
+    name = "default_psram_region",
+    psram_region_size = 0,
 )
 
 # It's possible to set linker scripts globally or on a per-binary basis.

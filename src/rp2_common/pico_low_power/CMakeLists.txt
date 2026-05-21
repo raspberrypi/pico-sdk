@@ -40,21 +40,24 @@ function(pico_set_persistent_data_loc TARGET PERSISTENT_DATA_LOC)
                 message(FATAL_ERROR "pico_set_persistent_data_loc is not supported on RP2040")
         endif()
 
-        # Configure override section_persistent_data.incl for the target
-        configure_file(${PICO_LOW_POWER_CURRENT_PATH}/section_persistent_data.incl.template ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}/section_persistent_data.incl @ONLY)
-        pico_add_linker_script_override_path(${TARGET} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET})
-
         if (PERSISTENT_DATA_LOC LESS 0x20000000)
                 # XIP_SRAM, so pin the XIP_SRAM
                 target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_PIN_XIP_SRAM=1)
+                set(PERSISTENT_DATA_SECTION "XIP_RAM")
         elseif (PERSISTENT_DATA_LOC LESS 0x20040000)
                 # SRAM0, so heap should come after persistent data
                 pico_set_linker_script_var(${TARGET} HEAP_LOC __persistent_data_end__)
+                set(PERSISTENT_DATA_SECTION "RAM")
         elseif(PERSISTENT_DATA_LOC LESS 0x20080000)
                 # SRAM1, so heap should come before persistent data
                 pico_set_linker_script_var(${TARGET} HEAP_LIMIT ${PERSISTENT_DATA_LOC})
+                set(PERSISTENT_DATA_SECTION "RAM")
         else()
                 # Not supported in scratch, as the linker script will overwrite persistent data with scratch data
                 message(FATAL_ERROR "pico_set_persistent_data_loc only supports persistent data in XIP_SRAM or SRAM0-7")
         endif()
+
+        # Configure override section_persistent_data.incl for the target
+        configure_file(${PICO_LOW_POWER_CURRENT_PATH}/section_persistent_data.incl.template ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}/section_persistent_data.incl @ONLY)
+        pico_add_linker_script_override_path(${TARGET} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET})
 endfunction()

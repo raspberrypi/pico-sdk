@@ -66,6 +66,7 @@ pico_add_subdirectory(rp2_common/hardware_xosc)
 
 if (PICO_COMBINED_DOCS OR NOT PICO_RP2040)
     pico_add_subdirectory(rp2_common/hardware_powman)
+    pico_add_subdirectory(rp2_common/hardware_psram)
     # Note in spite of the name this is usable on Arm as well as RISC-V:
     pico_add_subdirectory(rp2_common/hardware_riscv_platform_timer)
     pico_add_subdirectory(rp2_common/hardware_sha256)

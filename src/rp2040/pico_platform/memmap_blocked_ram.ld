@@ -12,6 +12,7 @@ INCLUDE "memmap_default.incl"
  * └── memmap_default.incl                               rp2_common/pico_standard_link
  *     ├── set_memory_locations.incl                     rp2_common/pico_standard_link
  *     ├── memory_flash.incl                             rp2_common/pico_standard_link
+ *     ├── memory_psram.incl                             rp2040/pico_platform
  *     ├── memory_xip_ram.incl                           rp2_common/pico_standard_link
  *     ├── memory_ram.incl                               rp2_common/pico_standard_link
  *     ├── memory_scratch.incl                           rp2_common/pico_standard_link
@@ -43,6 +44,7 @@ INCLUDE "memmap_default.incl"
  *         ├── section_generated_post_scratch.incl       rp2_common/pico_standard_link
  *         ├── section_extra_post_scratch.incl           rp2_common/pico_standard_link
  *         ├── sections_stack.incl                       rp2_common/pico_standard_link
+ *         ├── sections_psram.incl                       rp2040/pico_platform
  *         ├── section_flash_end.incl                    rp2_common/pico_standard_link
  *         ├── section_end.incl                          rp2_common/pico_standard_link
  *         ├── section_generated_post_end.incl           rp2_common/pico_standard_link

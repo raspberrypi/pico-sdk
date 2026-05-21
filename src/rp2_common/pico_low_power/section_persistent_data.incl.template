@@ -4,6 +4,6 @@ SECTIONS
         __persistent_data_start__ = .;
         *(.persistent_data*)
         . = ALIGN(4);
-    }
+    } > @PERSISTENT_DATA_SECTION@
     PROVIDE(__persistent_data_end__ = .);
 }

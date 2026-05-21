@@ -60,6 +60,7 @@ ALLOWED_CONFIG_PROPERTIES = set([PROPERTY_TYPE, PROPERTY_DEFAULT, PROPERTY_MIN, 
 PROPERTY_TYPE_INT = 'int'
 PROPERTY_TYPE_BOOL = 'bool'
 PROPERTY_TYPE_ENUM = 'enum'
+PROPERTY_TYPE_LIST = 'list'
 
 CHIP_NAMES = ["rp2040", "rp2350"]
 
@@ -167,6 +168,14 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum, applicable):
         if str_values[attr_name] is not None:
             if str_values[attr_name] not in _enumvalues:
                 errors.append(Exception('{} at {}:{} has {} value {} which isn\'t in list of {} {}'.format(config_name, file_path, linenum, attr_name, str_values[attr_name], PROPERTY_ENUMVALUES, str_values[PROPERTY_ENUMVALUES])))
+
+    elif type_str == PROPERTY_TYPE_LIST:
+        assert PROPERTY_MIN not in config_attrs
+        assert PROPERTY_MAX not in config_attrs
+        assert PROPERTY_ENUMVALUES not in config_attrs
+
+        attr_name = PROPERTY_DEFAULT
+        str_values[attr_name] = config_attrs.get(attr_name, None)
 
     else:
         errors.append(Exception("Found unknown {} type {} at {}:{}".format(BASE_CONFIG_NAME, type_str, file_path, linenum)))

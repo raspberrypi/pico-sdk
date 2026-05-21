@@ -2,6 +2,7 @@ load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config", "pico_generate_pio_header")
 load("//bazel/util:transition.bzl", "kitchen_sink_test_binary", "pico_set_binary_type", "pico_set_linker_script")
+load("//src/rp2_common/pico_standard_link:pico_psram_region.bzl", "generated_pico_psram_region")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -86,6 +87,7 @@ cc_library(
         "//test/pico_test",
     ] + select({
         "//bazel/constraint:rp2350": [
+            "//src/rp2_common/hardware_psram",
             "//src/rp2_common/hardware_sha256",
         ],
         "//conditions:default": [
@@ -265,4 +267,40 @@ kitchen_sink_test_binary(
     lwip_config = ":lwip_config",
     mbedtls_config = ":mbedtls_config",
     target_compatible_with = compatible_with_rp2(),
+)
+
+cc_binary(
+    name = "kitchen_sink_psram_actual",
+    testonly = True,
+    srcs = ["kitchen_sink.c"],
+    defines = [
+        "PICO_AUTO_DETECT_PSRAM=1",
+        'PICO_PSRAM_SIZE_BYTES="(8 * 1024 * 1024)"',
+    ],
+    tags = ["manual"],  # Built via kitchen_sink_psram
+    deps = [":kitchen_sink_common"],
+)
+
+generated_pico_psram_region(
+    name = "8M_psram_region",
+    psram_region_size = (8 * 1024 * 1024),
+)
+
+cc_library(
+    name = "kitchen_sink_psram_linker_script",
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
+    deps = [
+        "//test/kitchen_sink:8M_psram_region",
+        "//src/rp2_common/pico_standard_link:default_linker_script",
+    ],
+)
+
+pico_set_linker_script(
+    name = "kitchen_sink_psram",
+    testonly = True,
+    src = ":kitchen_sink_psram_actual",
+    linker_script = "//test/kitchen_sink:kitchen_sink_psram_linker_script",
+    target_compatible_with = ["//bazel/constraint:rp2350"],
 )

@@ -73,7 +73,7 @@ ssize_t __llvm_libc_stdio_write(__unused void *cookie, const char *buf, size_t s
 }
 
 bool __llvm_libc_timespec_get_utc(struct timespec *ts) {
-    int64_t absolute_time = (int64_t)get_absolute_time();
+    int64_t absolute_time = to_us_since_boot(get_absolute_time());
     ts->tv_sec = (time_t)(absolute_time / 1000000);
     ts->tv_nsec = (long)(absolute_time % 1000000 * 1000);
     return true;

@@ -82,6 +82,16 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
 
+// --- PSRAM ---
+#ifndef PICO_PSRAM_CS_PIN
+#define PICO_PSRAM_CS_PIN 8
+#endif
+
+pico_board_cmake_set_default(PICO_PSRAM_SIZE_BYTES, (8 * 1024 * 1024))
+#ifndef PICO_PSRAM_SIZE_BYTES
+#define PICO_PSRAM_SIZE_BYTES (8 * 1024 * 1024)
+#endif
+
 // The thing plus has a SD Card.
 #ifndef PICO_SD_CLK_PIN
 #define PICO_SD_CLK_PIN 2

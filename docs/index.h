@@ -31,6 +31,7 @@
  * \cond hardware_pio \defgroup hardware_pio hardware_pio \endcond
  * \cond hardware_pll \defgroup hardware_pll hardware_pll \endcond
  * \cond hardware_powman \defgroup hardware_powman hardware_powman \endcond
+ * \cond hardware_psram \defgroup hardware_psram hardware_psram \endcond
  * \cond hardware_pwm \defgroup hardware_pwm hardware_pwm \endcond
  * \cond hardware_resets \defgroup hardware_resets hardware_resets \endcond
  * \cond hardware_riscv \defgroup hardware_riscv hardware_riscv \endcond

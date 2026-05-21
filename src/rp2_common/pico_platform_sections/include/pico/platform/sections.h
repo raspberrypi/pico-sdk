@@ -79,6 +79,32 @@
 #define __scratch_y(group) __attribute__((section(".scratch_y." group)))
 #endif
 
+/*! \brief Section attribute macro for placement in PSRAM
+ *  \ingroup pico_platform
+ *
+ * PSRAM is commonly used for extra data sections. You can place data in initialised or
+ * uninitialised PSRAM, depending on how the data is loaded into the PSRAM.
+ *
+ * For example a `uint32_t` variable placed in PSRAM
+ *
+ *     uint32_t __in_psram("my_group_name") foo = 23;
+ *
+ * Or placed in uninitialised PSRAM
+ *
+ *     uint32_t __uninitialized_psram("my_group_name") foo;
+ *
+ * The section attribute is `.psram_initialised.<group>` or `.psram_uninitialised.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
+#ifndef __in_psram
+#define __in_psram(group) __attribute__((section(".psram_initialised." group)))
+#endif
+#ifndef __uninitialized_psram
+#define __uninitialized_psram(group) __attribute__((section(".psram_uninitialised." group)))
+#endif
+
 /*! \brief Section attribute macro for data that is to be left uninitialized
  *  \ingroup pico_platform
  *

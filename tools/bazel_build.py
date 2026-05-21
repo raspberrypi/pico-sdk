@@ -44,6 +44,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
                 "//test/kitchen_sink:kitchen_sink_ram_section",
                 "//test/kitchen_sink:kitchen_sink_simple_overlay",
+                "//test/kitchen_sink:kitchen_sink_psram",
                 "//test/pico_divider_test:pico_divider_test",
                 "//test/pico_divider_test:pico_divider_nesting_test",
                 "//test/pico_float_test:pico_double_test",
@@ -82,8 +83,10 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_float_test:hazard3_test_gen",
                 # No RISC-V on RP2040.
                 "//test/pico_float_test:pico_float_test_hazard3",
-                # hardware_sha256 doesn't appear to work on RP2040.
+                # No sha256 on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
+                # No PSRAM on RP2040
+                "//test/kitchen_sink:kitchen_sink_psram",
             )
         ),
     },
@@ -119,10 +122,12 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_float_test:hazard3_test_gen",
                 # No RISC-V on RP2040.
                 "//test/pico_float_test:pico_float_test_hazard3",
-                # hardware_sha256 doesn't appear to work on RP2040.
+                # No sha256 on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
                 # not supported by clang
                 "//test/kitchen_sink:kitchen_sink_simple_overlay",
+                # No PSRAM on RP2040
+                "//test/kitchen_sink:kitchen_sink_psram",
             )
         ),
     },
@@ -161,8 +166,10 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_float_test:hazard3_test_gen",
                 # No RISC-V on RP2040.
                 "//test/pico_float_test:pico_float_test_hazard3",
-                # hardware_sha256 doesn't appear to work on RP2040.
+                # No sha256 on RP2040.
                 "//test/pico_sha256_test:pico_sha256_test",
+                # No PSRAM on RP2040
+                "//test/kitchen_sink:kitchen_sink_psram",
             )
         ),
     },

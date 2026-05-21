@@ -101,6 +101,30 @@ if (NOT TARGET pico_standard_link)
         set_property(TARGET ${TARGET} APPEND PROPERTY PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS "${PATH}")
     endfunction()
 
+    # pico_override_flash_size(TARGET FLASH_SIZE)
+    # \brief\ Override the FLASH size for a given target
+    #
+    # \param\ TARGET The target to override the FLASH size for
+    # \param\ FLASH_SIZE The FLASH size to set for the target
+    function(pico_override_flash_size TARGET FLASH_SIZE)
+        set(PICO_FLASH_SIZE_BYTES_STRING "${FLASH_SIZE}")
+        configure_file(${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/pico_flash_region.template.ld ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}/pico_flash_region.ld)
+        pico_add_linker_script_override_path(${TARGET} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET})
+        target_compile_definitions(${TARGET} PRIVATE "PICO_FLASH_SIZE_BYTES=${FLASH_SIZE}")
+    endfunction()
+
+    # pico_override_psram_size(TARGET PSRAM_SIZE)
+    # \brief\ Override the PSRAM size for a given target
+    #
+    # \param\ TARGET The target to override the PSRAM size for
+    # \param\ PSRAM_SIZE The PSRAM size to set for the target
+    function(pico_override_psram_size TARGET PSRAM_SIZE)
+        set(PICO_PSRAM_SIZE_BYTES_STRING "${PSRAM_SIZE}")
+        configure_file(${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/pico_psram_region.template.ld ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}/pico_psram_region.ld)
+        pico_add_linker_script_override_path(${TARGET} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET})
+        target_compile_definitions(${TARGET} PRIVATE "PICO_PSRAM_SIZE_BYTES=${PSRAM_SIZE}")
+    endfunction()
+
     # pico_set_binary_type(TARGET TYPE)
     # \brief\ Set the binary type for the target
     #
@@ -219,10 +243,18 @@ if (NOT TARGET pico_standard_link)
     # since linker script can handle expressions; may as well leave it as one
     #math(EXPR PICO_FLASH_SIZE_BYTES_STRING "${PICO_FLASH_SIZE_BYTES}" OUTPUT_FORMAT HEXADECIMAL)
     set(PICO_FLASH_SIZE_BYTES_STRING "${PICO_FLASH_SIZE_BYTES}")
-    configure_file(${CMAKE_CURRENT_LIST_DIR}/pico_flash_region.template.ld ${CMAKE_BINARY_DIR}/pico_flash_region.ld)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/pico_flash_region.template.ld ${CMAKE_CURRENT_BINARY_DIR}/pico_flash_region.ld)
     # add include path for linker scripts to find it
-    list(APPEND PICO_LINKER_SCRIPT_INCLUDE_DIRS ${CMAKE_BINARY_DIR})
+    list(APPEND PICO_LINKER_SCRIPT_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR})
     pico_promote_common_scope_vars()
+
+    # add PSRAM region if it is enabled
+    if (PICO_PSRAM_SIZE_BYTES)
+        set(PICO_PSRAM_SIZE_BYTES_STRING "${PICO_PSRAM_SIZE_BYTES}")
+    else()
+        set(PICO_PSRAM_SIZE_BYTES_STRING "0")
+    endif()
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/pico_psram_region.template.ld ${CMAKE_CURRENT_BINARY_DIR}/pico_psram_region.ld)
 
     # add override paths from PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS
     target_link_options(pico_standard_link INTERFACE "LINKER:$<$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS>>:-L$<JOIN:$<TARGET_PROPERTY:PICO_TARGET_LINKER_SCRIPT_OVERRIDE_PATHS>,,-L>>")
