@@ -30,7 +30,6 @@ if (NOT TARGET pico_standard_link)
         set_target_properties(${TARGET} PROPERTIES ${PROP} "${_LINK_DEPENDS}")
     endfunction()
 
-
     # pico_add_memmap_link_depends(TARGET TYPE)
     # \brief\ Add link dependencies for the binary type to the target
     #

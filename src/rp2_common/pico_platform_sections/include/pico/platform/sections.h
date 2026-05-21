@@ -192,9 +192,9 @@
  * in implementation to `__not_in_flash_func`, however the semantics are distinct and a `__time_critical_func`
  * can be treated more specially to reduce the overhead when calling such a function.
  * 
- * For binaries that are not executing from flash (eg copy_to_ram and no_flash), one special treatment can be
- * using the \ref`pico_use_xip_sram_for_time_critical` CMake function to place them in XIP RAM instead, as the
- * XIP AHB ports would be otherwise unused. 
+ * For binaries that are not executing from flash (eg copy_to_ram and no_flash), there is the option
+ * to use the \ref`pico_use_xip_sram_for_time_critical` CMake function to place them in XIP RAM instead, as the
+ * XIP AHB ports would be otherwise unused.
  *
  * For example a function called my_func taking an int parameter:
  *

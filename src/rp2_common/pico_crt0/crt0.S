@@ -550,8 +550,7 @@ platform_entry: // symbol for stack traces
 data_cpy:
     // skip copies with same source and destination
     cmp r1, r2
-    bne data_cpy_start
-    bx lr
+    beq data_cpy_done
 #else
     // go straight into the copy
     #define data_cpy_start data_cpy
@@ -562,6 +561,7 @@ data_cpy_loop:
 data_cpy_start:
     cmp r2, r3
     blo data_cpy_loop
+data_cpy_done:
     bx lr
 #endif
 

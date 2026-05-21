@@ -395,8 +395,7 @@ platform_entry: // symbol for stack traces
 #if PICO_NO_FLASH
 data_cpy:
     // skip copies with same source and destination
-    bne a0, a1, data_cpy_start
-    ret
+    beq a0, a1, data_cpy_done
 #else
     // go straight into the copy
     #define data_cpy_start data_cpy
@@ -408,6 +407,7 @@ data_cpy_loop:
     addi a2, a2, 4
 data_cpy_start:
     bltu a2, a3, data_cpy_loop
+data_cpy_done:
     ret
 #endif
 
