@@ -17,7 +17,6 @@ if (NOT PICO_RP2040)
 endif()
 pico_set_binary_type(pico_critical_xip_sram_test_no_flash no_flash)
 pico_use_xip_sram_for_time_critical(pico_critical_xip_sram_test_no_flash)
-pico_enable_stdio_usb(pico_critical_xip_sram_test 1)
 pico_add_extra_outputs(pico_critical_xip_sram_test_no_flash)
 
 if (NOT PICO_RP2040 AND NOT PICO_C_COMPILER_IS_CLANG)
