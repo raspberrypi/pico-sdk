@@ -936,13 +936,22 @@ static inline uint pio_get_dreq(PIO pio, uint sm, bool is_tx) {
     return PIO_DREQ_NUM(pio, sm, is_tx);
 }
 
+/** \brief PIO program definition
+ *  \ingroup hardware_pio
+ *
+ * This structure describes a PIO program: the array of encoded instructions plus the
+ * metadata needed to load it onto a PIO instance. It is the type emitted by the `pioasm`
+ * tool (as `<program_name>_program`) and consumed by \ref pio_add_program, \ref
+ * pio_can_add_program and related functions. It may also be populated by hand when
+ * assembling programs at runtime with the helpers in `pio_instructions.h`.
+ */
 typedef struct pio_program {
-    const uint16_t *instructions;
-    uint8_t length;
-    int8_t origin; // required instruction memory origin or -1
-    uint8_t pio_version;
+    const uint16_t *instructions;   ///< the array of \ref length encoded instructions that make up the program
+    uint8_t length;                 ///< the number of instructions in \ref instructions (also the amount of instruction memory the program occupies)
+    int8_t origin;                  ///< the required load offset in PIO instruction memory, or -1 if the program is relocatable and may be loaded at any free offset
+    uint8_t pio_version;            ///< the minimum PIO hardware version the program requires (0 for any PIO); loading a program that requires a newer version than the target PIO fails with \ref PICO_ERROR_VERSION_MISMATCH
 #if PICO_PIO_VERSION > 0
-    uint8_t used_gpio_ranges; // bitmap with one bit per 16 pins
+    uint8_t used_gpio_ranges;       ///< bitmap of the 16-pin GPIO ranges the program uses (bit 0 = pins 0-15, bit 1 = pins 16-31, bit 2 = pins 32-47), checked against the PIO instance's GPIO base (see \ref pio_set_gpio_base) so that an incompatible program is rejected
 #endif
 } pio_program_t;
 
