@@ -34,13 +34,19 @@ pico_promote_common_scope_vars()
 # It also sets PICO_CRT0_PIN_XIP_SRAM=1 to pin the XIP_SRAM,
 # if the persistent data is stored in XIP_SRAM.
 #
-# \param\ PERSISTENT_DATA_LOC The persistent data location to set
+# \param\ PERSISTENT_DATA_LOC The persistent data location to set - optionally pass the memory region name (supports xip_ram)
 function(pico_set_persistent_data_loc TARGET PERSISTENT_DATA_LOC)
         if (PICO_RP2040)
                 message(FATAL_ERROR "pico_set_persistent_data_loc is not supported on RP2040")
         endif()
 
-        if (PERSISTENT_DATA_LOC LESS 0x20000000)
+        if (PERSISTENT_DATA_LOC STREQUAL xip_ram)
+                # XIP_SRAM, so pin the XIP_SRAM
+                target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_PIN_XIP_SRAM=1)
+                set(PERSISTENT_DATA_SECTION "XIP_RAM")
+                # Clear PERSISTENT_DATA_LOC, so the section is placed normally
+                unset(PERSISTENT_DATA_LOC)
+        elseif (PERSISTENT_DATA_LOC LESS 0x20000000)
                 # XIP_SRAM, so pin the XIP_SRAM
                 target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_PIN_XIP_SRAM=1)
                 set(PERSISTENT_DATA_SECTION "XIP_RAM")

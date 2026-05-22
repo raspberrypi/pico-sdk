@@ -27,4 +27,12 @@ if (NOT PICO_RP2040 AND NOT PICO_C_COMPILER_IS_CLANG)
     pico_minimize_runtime(pico_xip_sram_test INCLUDE PRINTF PRINTF_MINIMAL DEFAULT_ALARM_POOL PANIC FLOAT)
     target_compile_definitions(pico_xip_sram_test PRIVATE PICO_HEAP_SIZE=0x200)
     pico_add_extra_outputs(pico_xip_sram_test)
+
+    # Low power and critical XIP SRAM
+    add_executable(pico_critical_xip_sram_test_low_power pico_critical_xip_sram_test.c)
+    target_link_libraries(pico_critical_xip_sram_test_low_power PRIVATE pico_stdlib pico_multicore hardware_dma pico_test hardware_riscv_platform_timer pico_low_power)
+    pico_set_binary_type(pico_critical_xip_sram_test_low_power copy_to_ram)
+    pico_use_xip_sram_for_time_critical(pico_critical_xip_sram_test_low_power)
+    pico_set_persistent_data_loc(pico_critical_xip_sram_test_low_power xip_ram)
+    pico_add_extra_outputs(pico_critical_xip_sram_test_low_power)
 endif()

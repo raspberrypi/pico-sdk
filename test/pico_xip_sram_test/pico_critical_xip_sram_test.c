@@ -10,6 +10,10 @@
 #endif
 #include "hardware/structs/busctrl.h"
 
+#if LIB_PICO_LOW_POWER
+int __persistent_data(some_data);
+#endif
+
 
 PICOTEST_MODULE_NAME("XIP_SRAM", "critical xip sram test");
 
@@ -135,6 +139,12 @@ int main(void) {
     printf("pico_xip_sram_test begins\n");
 
     PICOTEST_START();
+
+    #if LIB_PICO_LOW_POWER
+    PICOTEST_START_SECTION("test_low_power")
+    PICOTEST_CHECK(some_data == 0, "persistent some_data is not 0");
+    PICOTEST_END_SECTION()
+    #endif
     
     PICOTEST_START_SECTION("test_func_addresses")
     printf("test_func_xip at %p\n", test_func_xip);
