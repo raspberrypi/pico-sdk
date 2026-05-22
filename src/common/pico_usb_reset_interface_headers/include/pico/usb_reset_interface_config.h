@@ -71,7 +71,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB, Set to 0 if your application defines its own usbd_app_driver_get_cb function, type=bool, default=1 when using pico_usb_reset_interface, 0 otherwise, group=pico_usb_reset_interface
+// PICO_CONFIG: PICO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB, Set to 0 if your application defines its own usbd_app_driver_get_cb function, type=bool, default=1 when using pico_stdio_usb, 0 otherwise, group=pico_usb_reset_interface
 #ifndef PICO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB
 #ifdef PICO_STDIO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB // backwards compatibility with SDK <= 2.2.0
 #define PICO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB PICO_STDIO_USB_RESET_INCLUDE_DEFAULT_APP_DRIVER_CB
