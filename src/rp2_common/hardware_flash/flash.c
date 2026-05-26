@@ -263,7 +263,7 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
 
 // Bitbanging the chip select using IO overrides, in case RAM-resident IRQs
 // are still running, and the FIFO bottoms out. (the bootrom does the same)
-static __force_inline void flash_cs_force(bool high, uint8_t cs) {
+static __force_inline void flash_cs_force(bool high, uint cs) {
 #if PICO_RP2040
     (void)cs;
     uint32_t field_val = high ?
