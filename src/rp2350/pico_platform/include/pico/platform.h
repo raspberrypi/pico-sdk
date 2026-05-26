@@ -203,7 +203,7 @@ static inline uint8_t rp2040_chip_version(void) {
 
 /*! \brief Returns the RP2350 rom version number
  *  \ingroup pico_platform
- * @return the RP2350 rom version number (2 for RP2350-A2, 3 for RP2350-A3, 3 for RP2350-A4)
+ * @return the RP2350 rom version number (2 for RP2350-A2, 3 for RP2350-A3, 4 for RP2350-A4)
  */
 static inline uint8_t rp2350_rom_version(void) {
     GCC_Pragma("GCC diagnostic push")
