@@ -12,6 +12,7 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 #include "hardware/regs/xip.h"
+#include "hardware/regs/watchdog.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
@@ -29,6 +30,15 @@
 // PICO_CONFIG: PICO_CRT0_NO_DATA_COPY, Whether crt0 should perform the data copies - usually copying from flash into sram, default=1 for no_flash builds, 0 otherwise, type=bool, group=pico_crt0
 #ifndef PICO_CRT0_NO_DATA_COPY
 #define PICO_CRT0_NO_DATA_COPY PICO_NO_FLASH
+#endif
+
+// PICO_CONFIG: PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM, Whether crt0 should always reset through the bootrom when loaded using a debugger - not supported on RP2040, default=1, type=bool, advanced=true, group=pico_crt0
+#if PICO_RP2040
+#define PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM 0
+#else
+#ifndef PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM
+#define PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM 1
+#endif
 #endif
 
 #ifdef NDEBUG
@@ -393,7 +403,7 @@ binary_info_header:
 .global _entry_point
 _entry_point:
 
-#if PICO_NO_FLASH
+#if PICO_NO_FLASH && !PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM
     // on the NO_FLASH case, we do not do a rest thru bootrom below, so the RCP may or may not have been initialized:
     //
     // in the normal (e.g. UF2 download etc. case) we will have passed thru bootrom initialization, but if
@@ -425,9 +435,28 @@ _entry_point:
     ldr r0, =__vectors
     // Vector through our own table (SP, VTOR will not have been set up at
     // this point). Same path for debugger entry and bootloader entry.
-#else
-    // Debugger tried to run code after loading, so SSI is in 03h-only mode.
-    // Go back through bootrom + boot2 to properly initialise flash.
+#else // PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM or !PICO_NOFLASH
+    #if PICO_NO_FLASH // PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM is always 0 on RP2040, so this code doesn't support RP2040
+        // Launch this no_flash binary using a RAM image boot
+        ldr r1, =(WATCHDOG_BASE + WATCHDOG_SCRATCH2_OFFSET) // offsets start from here, to fit in str immediate
+        // scratch 2 = __logical_binary_start
+        ldr r0, =__logical_binary_start
+        str r0, [r1, #0]
+        // scratch 3 = size
+        ldr r0, =(SRAM_END - SRAM_BASE) // assume maximum size for block loop
+        str r0, [r1, #4]
+        // scratch 4&7 = magic number
+        ldr r0, =0xb007c0d3
+        str r0, [r1, #8]
+        str r0, [r1, #20]
+        // scratch 5 = magic number xored with -(magic number) == -2
+        ldr r0, =(-2)
+        str r0, [r1, #12]
+        // scratch 6 = ram image boot == 3
+        ldr r0, =3
+        str r0, [r1, #16]
+    #endif
+    // Go back through bootrom to finish the boot.
     ldr r0, =BOOTROM_VTABLE_OFFSET
 #endif
 
