@@ -40,6 +40,24 @@ if (NOT PICO_RP2040)
                 set_target_properties(low_power_test_timers_encrypted PROPERTIES PICO_TEST_BUDDY_FILE external_sleep_timer.elf)
                 # create map/bin/hex file etc.
                 pico_add_extra_outputs(low_power_test_timers_encrypted)
+
+                add_executable(low_power_test_timers_encrypted_xip_sram
+                        low_power_test_timers.c
+                        )
+                target_link_libraries(low_power_test_timers_encrypted_xip_sram low_power_test_common)
+                pico_set_binary_type(low_power_test_timers_encrypted_xip_sram no_flash)
+                pico_package_uf2_output(low_power_test_timers_encrypted_xip_sram)
+                pico_sign_binary(low_power_test_timers_encrypted_xip_sram ${PICO_SDK_PATH}/tools/example_keys/private.pem)
+                # Encrypted binaries don't clear xip_sram, so NO_CLEAR can be omitted when persistent data is in xip_sram
+                pico_encrypt_binary(low_power_test_timers_encrypted_xip_sram ${PICO_SDK_PATH}/tools/example_keys/privateaes.bin ${PICO_SDK_PATH}/tools/example_keys/ivsalt.bin EMBED)
+                pico_set_persistent_data_loc(low_power_test_timers_encrypted_xip_sram xip_ram)
+                # Also check encrypting with code in xip_sram
+                pico_use_xip_sram_for_time_critical(low_power_test_timers_encrypted_xip_sram)
+                set_target_properties(low_power_test_timers_encrypted_xip_sram PROPERTIES PICO_TEST_TIMEOUT 35)
+                set_target_properties(low_power_test_timers_encrypted_xip_sram PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
+                set_target_properties(low_power_test_timers_encrypted_xip_sram PROPERTIES PICO_TEST_BUDDY_FILE external_sleep_timer.elf)
+                # create map/bin/hex file etc.
+                pico_add_extra_outputs(low_power_test_timers_encrypted_xip_sram)
         endif()
 
 
