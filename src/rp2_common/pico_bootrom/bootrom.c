@@ -72,14 +72,13 @@ void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pi
     func(usb_activity_gpio_pin < 0 ? 0 : (1u << usb_activity_gpio_pin), disable_interface_mask);
 #elif defined(ROM_FUNC_REBOOT)
     uint32_t flags = disable_interface_mask;
-    uint reboot2_flags = REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | REBOOT2_FLAG_NO_RETURN_ON_SUCCESS;
     if (usb_activity_gpio_pin >= 0) {
         flags |= BOOTSEL_FLAG_GPIO_PIN_SPECIFIED;
         if (usb_activity_gpio_pin_active_low) {
             flags |= BOOTSEL_FLAG_GPIO_PIN_ACTIVE_LOW;
         }
     }
-    rom_reboot_workaround(reboot2_flags, 10, flags, (uint)usb_activity_gpio_pin);
+    rom_reboot_workaround(REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | REBOOT2_FLAG_NO_RETURN_ON_SUCCESS, 10, flags, (uint)usb_activity_gpio_pin);
     __builtin_unreachable();
 #else
     panic_unsupported();
