@@ -37,7 +37,7 @@ bool rom_funcs_lookup(uint32_t *table, unsigned int count) {
 // really, really wants the activity LED
 #if PICO_RP2350_A2_SUPPORTED && PICO_RP2350A && !PICO_RISCV && PICO_BOOTROM_WORKAROUND_A2_ACTIVITY_LED_BUG
 #define rom_reboot_workaround(flags, delay_ms, p0, p1) ({ \
-    if (rp2350_rom_version() == 2 && ((p0) & BOOTSEL_FLAG_GPIO_PIN_SPECIFIED)) \
+    if (((p0) & BOOTSEL_FLAG_GPIO_PIN_SPECIFIED) && rp2350_rom_version() == 2) \
         rom_reboot((flags) | REBOOT2_FLAG_REBOOT_TO_RISCV, delay_ms, p0, p1); \
     else \
         rom_reboot(flags, delay_ms, p0, p1); \
