@@ -77,7 +77,7 @@
 #define PICO_USB_RESET_BOOTSEL_ACTIVITY_LED PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED
 #endif // default is undefined
 
-// PICO_CONFIG: PICO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW, Whether pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE) is active low, type=bool, default=0, group=pico_usb_reset
+// PICO_CONFIG: PICO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW, Whether pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE) is active low (ignored on RP2040), type=bool, default=0, group=pico_usb_reset
 #ifndef PICO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW
 #ifdef PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW // backwards compatibility with SDK <= 2.2.0
 #define PICO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW
