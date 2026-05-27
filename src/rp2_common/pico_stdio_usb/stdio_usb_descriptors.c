@@ -27,7 +27,7 @@
  */
 
 #include "pico/stdio_usb.h"
-#include "pico/usb_reset_interface_device.h"
+#include "pico/usb_reset.h"
 #include "pico/unique_id.h"
 #include "tusb.h"
 
@@ -71,7 +71,7 @@
 #define USBD_ITF_MAX       (2)
 #else
 #define USBD_ITF_RPI_RESET (2)
-static_assert(USBD_ITF_RPI_RESET == PICO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF, "USBD_ITF_RPI_RESET must be equal to PICO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF");
+static_assert(USBD_ITF_RPI_RESET == PICO_USB_RESET_MS_OS_20_DESCRIPTOR_ITF, "USBD_ITF_RPI_RESET must be equal to PICO_USB_RESET_MS_OS_20_DESCRIPTOR_ITF");
 #define USBD_ITF_MAX       (3)
 #endif
 
@@ -97,7 +97,7 @@ static const tusb_desc_device_t usbd_desc_device = {
 // This is only needed for driverless access to the reset interface - the CDC interface doesn't require these descriptors
 // for driverless access, but will still not work if bcdUSB = 0x210 and no descriptor is provided. Therefore always
 // use bcdUSB = 0x200 if the Microsoft OS 2.0 descriptor isn't enabled
-#if PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE && PICO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR
+#if PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE && PICO_USB_RESET_SUPPORT_MS_OS_20_DESCRIPTOR
     .bcdUSB = 0x0210,
 #else
     .bcdUSB = 0x0200,

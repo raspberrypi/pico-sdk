@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef _PICO_USB_RESET_INTERFACE_TUSB_H
-#define _PICO_USB_RESET_INTERFACE_TUSB_H
+#ifndef _PICO_USB_RESET_TUSB_H
+#define _PICO_USB_RESET_TUSB_H
 
 // Interface descriptor
 #define TUD_RPI_RESET_DESC_LEN  9

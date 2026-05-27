@@ -7,10 +7,10 @@
 
 #if !defined(LIB_TINYUSB_HOST) || (defined(LIB_TINYUSB_HOST) && defined(CFG_TUH_RPI_PIO_USB))
 #include "pico/bootrom.h"
-#include "pico/usb_reset_interface_device.h"
+#include "pico/usb_reset.h"
 
-#if PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE && !(PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL || PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT)
-#warning PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE has been selected but neither PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL nor PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT have been selected.
+#if PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE && !(PICO_USB_RESET_SUPPORT_RESET_TO_BOOTSEL || PICO_USB_RESET_SUPPORT_RESET_TO_FLASH_BOOT)
+#warning PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE has been selected but neither PICO_USB_RESET_SUPPORT_RESET_TO_BOOTSEL nor PICO_USB_RESET_SUPPORT_RESET_TO_FLASH_BOOT have been selected.
 #endif
 
 #if PICO_ENABLE_USB_RESET_VIA_VENDOR_INTERFACE
@@ -18,7 +18,7 @@
 
 static uint8_t itf_num;
 
-#if PICO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR
+#if PICO_USB_RESET_SUPPORT_MS_OS_20_DESCRIPTOR
 // Support for Microsoft OS 2.0 descriptor
 #define BOS_TOTAL_LEN      (TUD_BOS_DESC_LEN + TUD_BOS_MICROSOFT_OS_DESC_LEN)
 
@@ -45,7 +45,7 @@ static const uint8_t desc_ms_os_20[] =
     // Set header: length, type, windows version, total length
     U16_TO_U8S_LE(0x000A), U16_TO_U8S_LE(MS_OS_20_SET_HEADER_DESCRIPTOR), U32_TO_U8S_LE(0x06030000), U16_TO_U8S_LE(MS_OS_20_DESC_LEN),
 
-    RPI_RESET_MS_OS_20_DESCRIPTOR(PICO_USB_RESET_INTERFACE_MS_OS_20_DESCRIPTOR_ITF)
+    RPI_RESET_MS_OS_20_DESCRIPTOR(PICO_USB_RESET_MS_OS_20_DESCRIPTOR_ITF)
 };
 
 TU_VERIFY_STATIC(sizeof(desc_ms_os_20) == MS_OS_20_DESC_LEN, "Incorrect size");
@@ -93,7 +93,7 @@ bool usb_reset_interface_control_xfer_cb(uint8_t __unused rhport, uint8_t stage,
 
     if (request->wIndex == itf_num) {
 
-#if PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL
+#if PICO_USB_RESET_SUPPORT_RESET_TO_BOOTSEL
         if (request->bRequest == RESET_REQUEST_BOOTSEL) {
 #ifdef PICO_USB_RESET_BOOTSEL_ACTIVITY_LED
             int gpio = PICO_USB_RESET_BOOTSEL_ACTIVITY_LED;
@@ -118,7 +118,7 @@ bool usb_reset_interface_control_xfer_cb(uint8_t __unused rhport, uint8_t stage,
         }
 #endif
 
-#if PICO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT
+#if PICO_USB_RESET_SUPPORT_RESET_TO_FLASH_BOOT
         if (request->bRequest == RESET_REQUEST_FLASH) {
             watchdog_reboot(0, 0, PICO_USB_RESET_RESET_TO_FLASH_DELAY_MS);
             return true;

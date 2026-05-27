@@ -12,7 +12,7 @@ if (TARGET tinyusb_device_unmarked)
         pico_stdio
         pico_time
         pico_unique_id
-        pico_usb_reset_interface
+        pico_usb_reset
     )
     target_link_libraries(pico_stdio_usb INTERFACE
         tinyusb_device_unmarked
