@@ -108,9 +108,9 @@ bool usb_reset_interface_control_xfer_cb(uint8_t __unused rhport, uint8_t stage,
             //   bit 7     : 1 if the activity-LED GPIO is active-low
             //   bit 8     : 1 if an activity-LED GPIO is being specified
             //   bits 9-15 : activity-LED GPIO number (0-127)
-            if (request->wValue & 0x100) {
+            if (request->wValue & (1u << 8)) {
+                active_low = request->wValue & (1u << 7);
                 gpio = request->wValue >> 9u;
-                active_low = request->wValue & 0x80;
             }
 #endif
             rom_reset_usb_boot_extra(gpio, (request->wValue & 0x3) | PICO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK, active_low);
