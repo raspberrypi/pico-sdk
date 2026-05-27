@@ -13,10 +13,10 @@ cc_library(
         "include/pico/usb_reset_config.h",
         "include/pico/usb_reset_tusb.h",
     ],
-    includes = ["include"],
     defines = [
         "LIB_PICO_USB_RESET=1",
     ],
+    includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
         "//bazel/config:PICO_TINYUSB_LIB",
