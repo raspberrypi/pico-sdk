@@ -14,6 +14,7 @@ pico_find_in_paths(PICO_BOARD_HEADER_FILE PICO_BOARD_HEADER_DIRS ${PICO_BOARD}.h
 if (EXISTS ${PICO_BOARD_HEADER_FILE})
     message("Using board configuration from ${PICO_BOARD_HEADER_FILE}")
     list(APPEND PICO_CONFIG_HEADER_FILES ${PICO_BOARD_HEADER_FILE})
+    list(APPEND PICO_BOARD_INCLUDED_FILES ${PICO_BOARD_HEADER_FILE})
 
     # we parse the header file to configure the defaults
     file(STRINGS ${PICO_BOARD_HEADER_FILE} HEADER_FILE_CONTENTS)
