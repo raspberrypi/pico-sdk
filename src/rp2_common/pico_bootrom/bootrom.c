@@ -33,21 +33,8 @@ bool rom_funcs_lookup(uint32_t *table, unsigned int count) {
 
 
 void __attribute__((noreturn)) rom_reset_usb_boot(uint32_t usb_activity_gpio_pin_mask, uint32_t disable_interface_mask) {
-#ifdef ROM_FUNC_RESET_USB_BOOT
-    rom_reset_usb_boot_fn func = (rom_reset_usb_boot_fn) rom_func_lookup(ROM_FUNC_RESET_USB_BOOT);
-    func(usb_activity_gpio_pin_mask, disable_interface_mask);
-#elif defined(ROM_FUNC_REBOOT)
-    uint32_t flags = disable_interface_mask;
-    if (usb_activity_gpio_pin_mask) {
-        flags |= BOOTSEL_FLAG_GPIO_PIN_SPECIFIED;
-        // the parameter is actually the gpio number, but we only care if BOOTSEL_FLAG_GPIO_PIN_SPECIFIED
-        usb_activity_gpio_pin_mask = (uint32_t)__builtin_ctz(usb_activity_gpio_pin_mask);
-    }
-    rom_reboot(REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | REBOOT2_FLAG_NO_RETURN_ON_SUCCESS, 10, flags, usb_activity_gpio_pin_mask);
-    __builtin_unreachable();
-#else
-    panic_unsupported();
-#endif
+    int usb_activity_gpio_pin = usb_activity_gpio_pin_mask ? __builtin_ctz(usb_activity_gpio_pin_mask) : -1;
+    rom_reset_usb_boot_extra(usb_activity_gpio_pin, disable_interface_mask, false);
 }
 
 void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pin, uint32_t disable_interface_mask, bool usb_activity_gpio_pin_active_low) {
