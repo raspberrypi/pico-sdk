@@ -444,11 +444,7 @@ _entry_point:
     #endif
 
     // Go back through bootrom to finish the boot.
-    #if BOOTROM_VTABLE_OFFSET < 255 // fits in 8-bit immediate
-        movs r0, #BOOTROM_VTABLE_OFFSET
-    #else
-        ldr r0, =BOOTROM_VTABLE_OFFSET
-    #endif
+    movs r0, #BOOTROM_VTABLE_OFFSET
 #endif
 
 _enter_vtable_in_r0:
@@ -484,11 +480,7 @@ _reset_handler:
 #endif
 hold_non_core0_in_bootrom:
     // Send back to the ROM to wait for core 0 to launch it.
-    #if BOOTROM_VTABLE_OFFSET < 255 // fits in 8-bit immediate
-        movs r0, #BOOTROM_VTABLE_OFFSET
-    #else
-        ldr r0, =BOOTROM_VTABLE_OFFSET
-    #endif
+    movs r0, #BOOTROM_VTABLE_OFFSET
     b _enter_vtable_in_r0
 1:
 
