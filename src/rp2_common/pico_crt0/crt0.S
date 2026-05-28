@@ -440,7 +440,7 @@ _entry_point:
         // scratch 5 = magic number xored with -(magic number) == -2
         subs r5, r6, #5 // 3 - 5 = -2
         // load the watchdog registers
-        stm r1, {r2, r3, r4, r5, r6, r7}
+        stm r1!, {r2, r3, r4, r5, r6, r7}
     #endif
 
     // Go back through bootrom to finish the boot.
