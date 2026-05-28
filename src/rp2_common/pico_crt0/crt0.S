@@ -393,9 +393,9 @@ binary_info_header:
 _entry_point:
 
 #if PICO_NO_FLASH && !PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM
-    // on the NO_FLASH case, we do not do a rest thru bootrom below, so the RCP may or may not have been initialized:
+    // in the NO_FLASH case, we do not do a rest thru bootrom below, so the RCP may or may not have been initialized:
     //
-    // in the normal (e.g. UF2 download etc. case) we will have passed thru bootrom initialization, but if
+    // in the normal case (UF2 download, etc.), we will have passed thru bootrom initialization, but if
     // a NO_FLASH binary is loaded by the debugger, and run directly after a reset, then we won't have.
     //
     // we must therefore initialize the RCP if it hasn't already been
