@@ -254,7 +254,7 @@ static __force_inline void *rom_data_lookup_inline(uint32_t code) {
  *       PICO_BOOTROM_WORKAROUND_A2_ACTIVITY_LED_BUG=1 to have this method reboot to RISC-V USB boot to display
  *       the activity LED correctly.
  *
- * * \param usb_activity_gpio_pin_mask 0 No pins are used as per a cold boot. Otherwise, a single bit set indicating which
+ * \param usb_activity_gpio_pin_mask 0 No pins are used as per a cold boot. Otherwise, a single bit set indicating which
  *                               GPIO pin should be set to output and raised whenever there is mass storage activity
  *                               from the host.
  * \param disable_interface_mask value to control exposed interfaces

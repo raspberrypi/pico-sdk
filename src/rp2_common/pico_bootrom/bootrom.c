@@ -33,7 +33,7 @@ bool rom_funcs_lookup(uint32_t *table, unsigned int count) {
     return ok;
 }
 
-// The activity LED on A2 QDN60 chips doesn't work in Arm mode, so boot into RISC-V if the user
+// The activity LED on RP2350 A2 QFN60 chips doesn't work in Arm mode, so boot into RISC-V if the user
 // really, really wants the activity LED
 #if PICO_RP2350_A2_SUPPORTED && PICO_RP2350A && !PICO_RISCV && PICO_BOOTROM_WORKAROUND_A2_ACTIVITY_LED_BUG
 #define rom_reboot_workaround(flags, delay_ms, p0, p1) ({ \

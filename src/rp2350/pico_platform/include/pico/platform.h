@@ -189,7 +189,7 @@ __force_inline static bool pico_processor_state_is_nonsecure(void) {
 
 /*! \brief Returns the RP2350 chip revision number
  *  \ingroup pico_platform
- * @return the RP2350 chip revision number (1 for B0/B1, 2 for B2)
+ * @return the RP2350 chip revision number (2 for A2, 3 for A3/A4)
  */
 uint8_t rp2350_chip_version(void);
 
