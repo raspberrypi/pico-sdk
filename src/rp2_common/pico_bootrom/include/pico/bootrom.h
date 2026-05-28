@@ -276,7 +276,7 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
  * Facilities are provided to enable an "activity light" via GPIO attached LED for the USB Mass Storage Device,
  * and to limit the USB interfaces exposed.
  *
- * \note On RP2350A-A2 chips, there is a bootrom bug that prevents the activity LED working under Arm. You can define
+ * \note On RP2350A-A2 chips, errata RP2350-E3 prevents the activity LED working under Arm. You can define
  *       PICO_BOOTROM_WORKAROUND_A2_ACTIVITY_LED_BUG=1 to have this method reboot to RISC-V USB boot to display
  *       the activity LED correctly.
  *
