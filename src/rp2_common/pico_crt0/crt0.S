@@ -427,26 +427,28 @@ _entry_point:
 #else // PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM or !PICO_NOFLASH
     #if PICO_NO_FLASH // PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM is always 0 on RP2040, so this code doesn't support RP2040
         // Launch this no_flash binary using a RAM image boot
-        ldr r1, =(WATCHDOG_BASE + WATCHDOG_SCRATCH2_OFFSET) // offsets start from here, to fit in str immediate
+        ldr r1, =(WATCHDOG_BASE + WATCHDOG_SCRATCH2_OFFSET) // registers start from here
         // scratch 2 = __logical_binary_start
-        ldr r0, =__logical_binary_start
-        str r0, [r1, #0]
+        ldr r2, =__logical_binary_start
         // scratch 3 = size
-        ldr r0, =(SRAM_END - SRAM_BASE) // assume maximum size for block loop
-        str r0, [r1, #4]
+        ldr r3, =(SRAM_END - SRAM_BASE) // assume maximum size for block loop
         // scratch 4&7 = magic number
-        ldr r0, =0xb007c0d3
-        str r0, [r1, #8]
-        str r0, [r1, #20]
-        // scratch 5 = magic number xored with -(magic number) == -2
-        ldr r0, =(-2)
-        str r0, [r1, #12]
+        ldr r4, =0xb007c0d3
+        mov r7, r4
         // scratch 6 = ram image boot == 3
-        ldr r0, =3
-        str r0, [r1, #16]
+        movs r6, #3
+        // scratch 5 = magic number xored with -(magic number) == -2
+        subs r5, r6, #5 // 3 - 5 = -2
+        // load the watchdog registers
+        stm r1, {r2, r3, r4, r5, r6, r7}
     #endif
+
     // Go back through bootrom to finish the boot.
-    ldr r0, =BOOTROM_VTABLE_OFFSET
+    #if BOOTROM_VTABLE_OFFSET < 255 // fits in 8-bit immediate
+        movs r0, #BOOTROM_VTABLE_OFFSET
+    #else
+        ldr r0, =BOOTROM_VTABLE_OFFSET
+    #endif
 #endif
 
 _enter_vtable_in_r0:
@@ -482,7 +484,11 @@ _reset_handler:
 #endif
 hold_non_core0_in_bootrom:
     // Send back to the ROM to wait for core 0 to launch it.
-    ldr r0, =BOOTROM_VTABLE_OFFSET
+    #if BOOTROM_VTABLE_OFFSET < 255 // fits in 8-bit immediate
+        movs r0, #BOOTROM_VTABLE_OFFSET
+    #else
+        ldr r0, =BOOTROM_VTABLE_OFFSET
+    #endif
     b _enter_vtable_in_r0
 1:
 
