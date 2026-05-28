@@ -224,6 +224,13 @@ if (NOT TARGET pico_standard_link)
 
     # PICO_CMAKE_CONFIG: PICO_DEFAULT_BINARY_TYPE, The default binary type to use, type=string, default=default, group=build
     # slightly messy as we support both the preferred PICO_DEFAULT_BINARY_TYPE and the individual variables
+    # first check that PICO_DEFAULT_BINARY_TYPE hasn't been set along with a legacy variable
+    if (PICO_DEFAULT_BINARY_TYPE AND (PICO_NO_FLASH OR PICO_USE_BLOCKED_RAM OR PICO_COPY_TO_RAM))
+        message(FATAL_ERROR
+            "Cannot specify both PICO_DEFAULT_BINARY_TYPE and PICO_NO_FLASH/PICO_USE_BLOCKED_RAM/PICO_COPY_TO_RAM - just use PICO_DEFAULT_BINARY_TYPE instead"
+        )
+    endif()
+    # then propogate legacy variables to PICO_DEFAULT_BINARY_TYPE, defaulting it to `default`
     if (NOT PICO_DEFAULT_BINARY_TYPE)
         if (PICO_NO_FLASH)
             set(PICO_DEFAULT_BINARY_TYPE no_flash)
@@ -234,23 +241,12 @@ if (NOT TARGET pico_standard_link)
         else()
             set(PICO_DEFAULT_BINARY_TYPE default)
         endif()
-    else()
-        # we must set the individual variables here, as they are used in generator expressions,
-        # but also for our checks below
-        if (PICO_DEFAULT_BINARY_TYPE STREQUAL no_flash)
-            set(PICO_NO_FLASH 1)
-        endif()
-        if (PICO_DEFAULT_BINARY_TYPE STREQUAL blocked_ram)
-            set(PICO_USE_BLOCKED_RAM 1)
-        endif()
-        if (PICO_DEFAULT_BINARY_TYPE STREQUAL copy_to_ram)
-            set(PICO_COPY_TO_RAM 1)
-        endif()
     endif()
+    # finally check multiple legacy variables haven't been set
     if ((PICO_NO_FLASH AND PICO_USE_BLOCKED_RAM) OR
         (PICO_USE_BLOCKED_RAM AND PICO_COPY_TO_RAM) OR
         (PICO_COPY_TO_RAM AND PICO_NO_FLASH))
-        message(FATAL_ERROR "Conflicting binary types specified amongst PICO_DEFAULT_BINARY_TYPE, PICO_NO_FLASH, PICO_USE_BLOCKED_RAM and PICO_COPY_TO_RAM")
+        message(FATAL_ERROR "Conflicting binary types specified amongst PICO_NO_FLASH, PICO_USE_BLOCKED_RAM and PICO_COPY_TO_RAM")
     endif()
 
     # todo only needed if not using a custom linker script
@@ -307,23 +303,22 @@ if (NOT TARGET pico_standard_link)
 
     pico_add_memmap_link_depends(pico_standard_link ${PICO_DEFAULT_BINARY_TYPE})
 
-    # PICO_NO_FLASH will be set based on PICO_TARGET_BUILD_TYPE target property being equal to no_flash if set, otherwise to the value of the PICO_NO_FLASH cmake variable unless PICO_TARGET_TYPE is set to something else
     set(NO_FLASH_BINARY_TYPES no_flash xip_ram)
     set(COPY_TO_RAM_BINARY_TYPES copy_to_ram)
     set(XIP_RAM_BINARY_TYPES xip_ram)
 
-    # PICO_NO_FLASH will be set based on PICO_TARGET_BUILD_TYPE target property being in NO_FLASH_BINARY_TYPES if set, otherwise to the value of the PICO_NO_FLASH cmake variable unless PICO_TARGET_TYPE is set to something else
+    # PICO_NO_FLASH will be set based on PICO_TARGET_BINARY_TYPE target property being in NO_FLASH_BINARY_TYPES if PICO_TARGET_BINARY_TYPE is set, otherwise it is set based on PICO_DEFAULT_BINARY_TYPE being in NO_FLASH_BINARY_TYPES
     # PICO_BUILD_DEFINE: PICO_NO_FLASH, whether this is a 'no_flash' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
-    target_compile_definitions(pico_standard_link INTERFACE PICO_NO_FLASH=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${NO_FLASH_BINARY_TYPES}>,1,$<AND:$<BOOL:${PICO_NO_FLASH}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
-    # PICO_USE_BLOCKED_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being equal to use_blocked_ram if set, otherwise to the value of the PICO_USE_BLOCKED_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
+    target_compile_definitions(pico_standard_link INTERFACE PICO_NO_FLASH=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${NO_FLASH_BINARY_TYPES}>,1,$<AND:$<IN_LIST:${PICO_DEFAULT_BINARY_TYPE},${NO_FLASH_BINARY_TYPES}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
+    # PICO_USE_BLOCKED_RAM will be set based on PICO_TARGET_BINARY_TYPE target property being equal to blocked_ram if PICO_TARGET_BINARY_TYPE is set, otherwise it is set based on PICO_DEFAULT_BINARY_TYPE being equal to blocked_ram
     # PICO_BUILD_DEFINE: PICO_USE_BLOCKED_RAM, whether this is a 'blocked_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
-    target_compile_definitions(pico_standard_link INTERFACE PICO_USE_BLOCKED_RAM=$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,use_blocked_ram>,1,$<AND:$<BOOL:${PICO_USE_BLOCKED_RAM}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
-    # PICO_COPY_TO_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being in COPY_TO_RAM_BINARY_TYPES if set, otherwise to the value of the PICO_COPY_TO_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
+    target_compile_definitions(pico_standard_link INTERFACE PICO_USE_BLOCKED_RAM=$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,blocked_ram>,1,$<AND:$<STREQUAL:${PICO_DEFAULT_BINARY_TYPE},blocked_ram>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
+    # PICO_COPY_TO_RAM will be set based on PICO_TARGET_BINARY_TYPE target property being in COPY_TO_RAM_BINARY_TYPES if PICO_TARGET_BINARY_TYPE is set, otherwise it is set based on PICO_DEFAULT_BINARY_TYPE being in COPY_TO_RAM_BINARY_TYPES
     # PICO_BUILD_DEFINE: PICO_COPY_TO_RAM, whether this is a 'copy_to_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
-    target_compile_definitions(pico_standard_link INTERFACE PICO_COPY_TO_RAM=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${COPY_TO_RAM_BINARY_TYPES}>,1,$<AND:$<BOOL:${PICO_COPY_TO_RAM}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
-    # PICO_XIP_RAM will be set based on PICO_TARGET_BUILD_TYPE target property being in XIP_RAM_BINARY_TYPES if set, otherwise to the value of the PICO_XIP_RAM cmake variable unless PICO_TARGET_TYPE is set to something else
+    target_compile_definitions(pico_standard_link INTERFACE PICO_COPY_TO_RAM=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${COPY_TO_RAM_BINARY_TYPES}>,1,$<AND:$<IN_LIST:${PICO_DEFAULT_BINARY_TYPE},${COPY_TO_RAM_BINARY_TYPES}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
+    # PICO_XIP_RAM will be set based on PICO_TARGET_BINARY_TYPE target property being in XIP_RAM_BINARY_TYPES if PICO_TARGET_BINARY_TYPE is set, otherwise it is set based on PICO_DEFAULT_BINARY_TYPE being in XIP_RAM_BINARY_TYPES
     # PICO_BUILD_DEFINE: PICO_XIP_RAM, whether this is a 'xip_ram' build, type=bool, default=0, but dependent on CMake options, group=pico_standard_link
-    target_compile_definitions(pico_standard_link INTERFACE PICO_XIP_RAM=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${XIP_RAM_BINARY_TYPES}>,1,$<AND:$<BOOL:${PICO_XIP_RAM}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
+    target_compile_definitions(pico_standard_link INTERFACE PICO_XIP_RAM=$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${XIP_RAM_BINARY_TYPES}>,1,$<AND:$<IN_LIST:${PICO_DEFAULT_BINARY_TYPE},${XIP_RAM_BINARY_TYPES}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>)
 
     target_compile_definitions(pico_standard_link INTERFACE PICO_CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}")
     if (PICO_DEOPTIMIZED_DEBUG AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -332,10 +327,10 @@ if (NOT TARGET pico_standard_link)
 
     # this (arguably wrong) code is restored for 1.5.1 as setting -nostartfiles on many C++ binaries causes link errors. see issue #1368
     # -nostartfiles will be added if PICO_NO_FLASH would be defined to 1
-    target_link_options(pico_standard_link INTERFACE $<$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,no_flash>,1,$<AND:$<BOOL:${PICO_NO_FLASH}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>:-nostartfiles>)
+    target_link_options(pico_standard_link INTERFACE $<$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${NO_FLASH_BINARY_TYPES}>,1,$<AND:$<IN_LIST:${PICO_DEFAULT_BINARY_TYPE},${NO_FLASH_BINARY_TYPES}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>:-nostartfiles>)
     # boot_stage2 will be linked if PICO_NO_FLASH would be defined to 0; note if boot_stage2 headers not present, then boot_stage2 is omitted from build anyway
     if (TARGET boot_stage2_headers)
-        target_link_libraries(pico_standard_link INTERFACE $<$<NOT:$<IF:$<STREQUAL:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,no_flash>,1,$<AND:$<BOOL:${PICO_NO_FLASH}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>>:$<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_BOOT_STAGE2>>,$<TARGET_PROPERTY:PICO_TARGET_BOOT_STAGE2>,bs2_default>_library>)
+        target_link_libraries(pico_standard_link INTERFACE $<$<NOT:$<IF:$<IN_LIST:$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>,${NO_FLASH_BINARY_TYPES}>,1,$<AND:$<IN_LIST:${PICO_DEFAULT_BINARY_TYPE},${NO_FLASH_BINARY_TYPES}>,$<STREQUAL:,$<TARGET_PROPERTY:PICO_TARGET_BINARY_TYPE>>>>>:$<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_BOOT_STAGE2>>,$<TARGET_PROPERTY:PICO_TARGET_BOOT_STAGE2>,bs2_default>_library>)
     endif()
 
     # PICO_CMAKE_CONFIG: PICO_USE_DEFAULT_MAX_PAGE_SIZE, Don't shrink linker max page to 4096, type=bool, default=0, advanced=true, group=pico_standard_link
