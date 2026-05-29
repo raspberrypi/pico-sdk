@@ -295,9 +295,8 @@ binary_info_header:
 _entry_point:
 
 #if PICO_NO_FLASH && !PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM
-    // Go through our own reset handler. Same path for debugger entry and
+    // Fall through to _reset_handler. Same path for debugger entry and
     // bootloader entry.
-    j _reset_handler
 #else
     #if PICO_NO_FLASH
         // Launch this no_flash binary using a RAM image boot
