@@ -213,6 +213,9 @@ if (NOT TARGET pico_standard_link)
     # This sets PICO_TIME_CRITICAL_PLACEMENT=__in_<MEMORY>, and any necessary defines required to use
     # <MEMORY> (e.g. PICO_USE_XIP_CACHE_AS_RAM=1 for xip_ram).
     #
+    # The xip_ram memory should not be used for flash binaries, as using the XIP cache as SRAM will
+    # have a large performance penalty.
+    #
     # \param\ TARGET The target whose time-critical functions should run from <MEMORY>
     # \param\ MEMORY The memory block to place the functions in (e.g. xip_ram, scratch_x, scratch_y)
     function(pico_place_time_critical_functions TARGET MEMORY)
@@ -222,7 +225,7 @@ if (NOT TARGET pico_standard_link)
         endif()
     endfunction()
 
-    # pico_use_xip_cache_as_sram(TARGET)
+    # pico_use_xip_cache_as_ram(TARGET)
     # \brief\ Allow placing data for the target into XIP SRAM
     #
     # Configures the target to use the XIP Cache as SRAM, allowing data to be placed there using the
@@ -232,7 +235,7 @@ if (NOT TARGET pico_standard_link)
     # performance penalty.
     #
     # \param\ TARGET The target which can place data into XIP SRAM
-    function(pico_use_xip_cache_as_sram TARGET)
+    function(pico_use_xip_cache_as_ram TARGET)
         pico_set_compile_definition(${TARGET} PICO_USE_XIP_CACHE_AS_RAM 1)
     endfunction()
 
