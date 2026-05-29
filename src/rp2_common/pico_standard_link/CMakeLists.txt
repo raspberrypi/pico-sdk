@@ -204,22 +204,36 @@ if (NOT TARGET pico_standard_link)
         endif()
     endfunction()
 
-    # pico_use_xip_sram_for_time_critical(TARGET)
-    # \brief\ Place time-critical code for the target into XIP SRAM
+    # pico_place_time_critical_functions(TARGET MEMORY)
+    # \brief\ Place time-critical code for the target into <MEMORY>
     #
-    # Configures the target to run functions marked __time_critical_func() from XIP SRAM rather than
-    # normal SRAM, as it has dedicated ports which are otherwise unused in no_flash and copy_to_ram
-    # binaries. This sets PICO_TIME_CRITICAL_TEXT_IN_XIP_RAM=1, PICO_USE_XIP_CACHE_AS_RAM=1, and
-    # injects the required linker script fragment via pico_include_in_generated_section.
+    # Configures the target to run functions marked __time_critical_func() from <MEMORY> rather than
+    # normal SRAM, useful if <MEMORY> has dedicated AHB ports which are otherwise unused. For example, 
+    # xip_ram could be used in no_flash and copy_to_ram binaries, as the XIP AHB ports are unused.
+    # This sets PICO_TIME_CRITICAL_PLACEMENT=__in_<MEMORY>, and any necessary defines required to use
+    # <MEMORY> (e.g. PICO_USE_XIP_CACHE_AS_RAM=1 for xip_ram).
     #
-    # This should not be used for flash binaries, as the XIP ports are in use there, and therefore
-    # this will just make time-critical functions slower.
+    # \param\ TARGET The target whose time-critical functions should run from <MEMORY>
+    # \param\ MEMORY The memory block to place the functions in (e.g. xip_ram, scratch_x, scratch_y)
+    function(pico_place_time_critical_functions TARGET MEMORY)
+        target_compile_definitions(${TARGET} PRIVATE PICO_TIME_CRITICAL_PLACEMENT=__in_${MEMORY})
+        if (${MEMORY} STREQUAL "xip_ram")
+            pico_set_compile_definition(${TARGET} PICO_USE_XIP_CACHE_AS_RAM 1)
+        endif()
+    endfunction()
+
+    # pico_use_xip_cache_as_sram(TARGET)
+    # \brief\ Allow placing data for the target into XIP SRAM
     #
-    # \param\ TARGET The target whose time-critical functions should run from XIP SRAM
-    function(pico_use_xip_sram_for_time_critical TARGET)
-        target_compile_definitions(${TARGET} PRIVATE PICO_TIME_CRITICAL_TEXT_IN_XIP_RAM=1)
-        pico_set_compile_definition(${TARGET} PICO_USE_XIP_CACHE_AS_RAM 1) # may be set elsewhere too
-        pico_include_in_generated_section(${TARGET} post_text "section_time_critical_xip_ram_text.incl")
+    # Configures the target to use the XIP Cache as SRAM, allowing data to be placed there using the
+    # __in_xip_ram macro. This sets PICO_USE_XIP_CACHE_AS_RAM=1.
+    #
+    # This should not be used for flash binaries, as using the XIP cache as SRAM will have a large
+    # performance penalty.
+    #
+    # \param\ TARGET The target which can place data into XIP SRAM
+    function(pico_use_xip_cache_as_sram TARGET)
+        pico_set_compile_definition(${TARGET} PICO_USE_XIP_CACHE_AS_RAM 1)
     endfunction()
 
     # PICO_CMAKE_CONFIG: PICO_DEFAULT_BINARY_TYPE, The default binary type to use, type=string, default=default, group=build

@@ -20,6 +20,12 @@
 #error pico/platform.h should not be included directly; include pico.h instead
 #endif
 
+// this is used by sections.h, so comes before the includes
+// PICO_CONFIG: PICO_USE_XIP_CACHE_AS_RAM, Whether to use xip cache as ram, default=0, type=bool, group=pico_platform
+#ifndef PICO_USE_XIP_CACHE_AS_RAM
+#define PICO_USE_XIP_CACHE_AS_RAM 0
+#endif
+
 #include "pico/platform/compiler.h"
 #include "pico/platform/sections.h"
 #include "pico/platform/panic.h"

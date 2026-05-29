@@ -40,8 +40,11 @@
 #ifndef __not_in_flash
 #define __not_in_flash(group) __attribute__((section(".time_critical." group)))
 #endif
+#ifndef __in_ram
+#define __in_ram(group) __not_in_flash(group)
+#endif
 
-/*! \brief Section attribute macro for placement in the SRAM bank 4 (known as "scratch X")
+/*! \brief Section attribute macro for placement in the penultimate SRAM bank (known as "scratch X")
  *  \ingroup pico_platform
  *
  * Scratch X is commonly used for critical data and functions accessed only by one core (when only
@@ -59,8 +62,11 @@
 #ifndef __scratch_x
 #define __scratch_x(group) __attribute__((section(".scratch_x." group)))
 #endif
+#ifndef __in_scratch_x
+#define __in_scratch_x(group) __scratch_x(group)
+#endif
 
-/*! \brief Section attribute macro for placement in the SRAM bank 5 (known as "scratch Y")
+/*! \brief Section attribute macro for placement in the final SRAM bank (known as "scratch Y")
  *  \ingroup pico_platform
  *
  * Scratch Y is commonly used for critical data and functions accessed only by one core (when only
@@ -77,6 +83,9 @@
  */
 #ifndef __scratch_y
 #define __scratch_y(group) __attribute__((section(".scratch_y." group)))
+#endif
+#ifndef __in_scratch_y
+#define __in_scratch_y(group) __scratch_y(group)
 #endif
 
 /*! \brief Section attribute macro for placement in PSRAM
@@ -103,6 +112,31 @@
 #endif
 #ifndef __uninitialized_psram
 #define __uninitialized_psram(group) __attribute__((section(".psram_uninitialised." group)))
+#endif
+
+/*! \brief Section attribute macro for placement in XIP SRAM
+ *  \ingroup pico_platform
+ *
+ * The XIP Cache can be used as SRAM for extra data sections, however it will give a performance
+ * penalty if your binary runs from Flash (e.g. the default binary type).
+ *
+ * For example a `uint32_t` variable placed in XIP SRAM
+ *
+ *     uint32_t __in_xip_ram("my_group_name") foo = 23;
+ *
+ * The section attribute is `.xip_ram.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
+#ifndef __in_xip_ram
+#if PICO_USE_XIP_CACHE_AS_RAM
+#define __in_xip_ram(group) __attribute__((section(".xip_ram." group)))
+#elif PICO_XIP_RAM
+#define __in_xip_ram(group) __in_ram(group)
+#else
+#define __in_xip_ram(group) x; static_assert(false, "Must set PICO_USE_XIP_CACHE_AS_RAM=1 to use the __in_xip_ram macro");
+#endif
 #endif
 
 /*! \brief Section attribute macro for data that is to be left uninitialized
@@ -183,29 +217,37 @@
 #ifndef __not_in_flash_func
 #define __not_in_flash_func(func_name) __not_in_flash(__STRING(func_name)) func_name
 #endif
+#ifndef __in_ram_func
+#define __in_ram_func(func_name) __in_ram(__STRING(func_name)) func_name
+#endif
 
 /*! \brief Indicates a function is time/latency critical and should not run from flash
  *  \ingroup pico_platform
  *
  * Decorates a function name, such that the function will execute from RAM (assuming it is not inlined
  * into a flash function by the compiler) to avoid possible flash latency. By default, this macro is identical
- * in implementation to `__not_in_flash_func`, however the semantics are distinct and a `__time_critical_func`
+ * in implementation to `__no_inline_not_in_flash_func`, however the semantics are distinct and a `__time_critical_func`
  * can be treated more specially to reduce the overhead when calling such a function.
- * 
- * For binaries that are not executing from flash (eg copy_to_ram and no_flash), there is the option
- * to use the \ref`pico_use_xip_sram_for_time_critical` CMake function to place them in XIP RAM instead, as the
- * XIP AHB ports would be otherwise unused.
  *
  * For example a function called my_func taking an int parameter:
  *
  *     void __time_critical_func(my_func)(int some_arg) {
  *
- * The function is placed in the `.time_critical.text.<func_name>` linker section
+ * By default, the function is placed in the `.time_critical.<func_name>` linker section, but this can be
+ * adjusted using the `PICO_TIME_CRITICAL_PLACEMENT` define. This define can be set using the
+ * \ref`pico_place_time_critical_functions` CMake function.
+ * 
+ * For example, for binaries that are not executing from flash (e.g. copy_to_ram and no_flash), there is the option
+ * to use `pico_place_time_critical_functions(TARGET xip_ram)` to place these functions in XIP RAM, as the XIP AHB
+ * ports would be otherwise unused.
  *
- * \see __not_in_flash_func
+ * \see __not_in_flash
  */
 #ifndef __time_critical_func
-#define __time_critical_func(func_name) __noinline __attribute__((section(".time_critical.text." __STRING(func_name)))) func_name
+#ifndef PICO_TIME_CRITICAL_PLACEMENT
+#define PICO_TIME_CRITICAL_PLACEMENT __not_in_flash
+#endif
+#define __time_critical_func(func_name) __noinline PICO_TIME_CRITICAL_PLACEMENT(__STRING(func_name)) func_name
 #endif
 
 /*! \brief Indicate a function should not be stored in flash and should not be inlined
@@ -227,7 +269,7 @@
 #else
 
 #ifndef RAM_SECTION_NAME
-#define RAM_SECTION_NAME(x) .time_critical.text.##x
+#define RAM_SECTION_NAME(x) .time_critical.##x
 #endif
 
 #ifndef SECTION_NAME

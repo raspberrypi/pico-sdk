@@ -9,6 +9,7 @@ INCLUDE "memmap_xip_ram.incl"
  * └── memmap_xip_ram.incl                               rp2_common/pico_standard_link
  *     ├── set_memory_locations.incl                     rp2_common/pico_standard_link
  *     ├── memory_psram.incl                             rp2_common/pico_standard_link
+ *     ├── memory_xip_ram.incl                           rp2_common/pico_standard_link
  *     ├── memory_ram.incl                               rp2_common/pico_standard_link
  *     ├── memory_scratch.incl                           rp2_common/pico_standard_link
  *     ├── memory_generated.incl                         rp2_common/pico_standard_link
@@ -35,6 +36,7 @@ INCLUDE "memmap_xip_ram.incl"
  *         ├── section_extra_post_scratch.incl           rp2_common/pico_standard_link
  *         ├── sections_stack.incl                       rp2_common/pico_standard_link
  *         ├── sections_psram.incl                       rp2_common/pico_standard_link
+ *         ├── section_xip_ram.incl                      rp2_common/pico_standard_link
  *         ├── section_end.incl                          rp2_common/pico_standard_link
  *         ├── section_generated_post_end.incl           rp2_common/pico_standard_link
  *         ├── section_extra_post_end.incl               rp2_common/pico_standard_link

@@ -12,8 +12,13 @@ SCRATCH_X_LENGTH = XIP_RAM_SCRATCH_SIZE;
 SCRATCH_Y_ORIGIN = XIP_RAM_ORIGIN + XIP_RAM_LENGTH - XIP_RAM_SCRATCH_SIZE;
 SCRATCH_Y_LENGTH = XIP_RAM_SCRATCH_SIZE;
 
+/* Zero XIP_RAM origin and size to prevent placement there */
+XIP_RAM_ORIGIN = 0;
+XIP_RAM_LENGTH = 0;
+
 /* Include memory regions used */
 INCLUDE "memory_psram.incl"
+INCLUDE "memory_xip_ram.incl"
 INCLUDE "memory_ram.incl"
 INCLUDE "memory_scratch.incl"
 INCLUDE "memory_generated.incl"

@@ -1,3 +1,8 @@
+/* Defines the following symbols for use by code:
+    __psram_start__, __psram_end__
+    __psram_load_start__, __psram_load_end__, __psram_load_source__
+*/
+
 SECTIONS
 {
     .psram_load : {

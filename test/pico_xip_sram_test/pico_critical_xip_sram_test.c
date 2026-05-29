@@ -134,6 +134,15 @@ void trigger_dma(void) {
 }
 
 
+#ifndef TEXT_FUNC_XIP_BASE
+#define TEXT_FUNC_XIP_BASE XIP_SRAM_BASE
+#endif
+
+#ifndef TEXT_FUNC_XIP_END
+#define TEXT_FUNC_XIP_END XIP_SRAM_END
+#endif
+
+
 int main(void) {
     stdio_init_all();
     printf("pico_xip_sram_test begins\n");
@@ -150,7 +159,7 @@ int main(void) {
     printf("test_func_xip at %p\n", test_func_xip);
     printf("test_func_sram at %p\n", test_func_sram);
 
-    PICOTEST_CHECK((uint32_t)test_func_xip >= XIP_SRAM_BASE && (uint32_t)test_func_xip < XIP_SRAM_END, "test_func_xip is not in XIP SRAM");
+    PICOTEST_CHECK((uint32_t)test_func_xip >= TEXT_FUNC_XIP_BASE && (uint32_t)test_func_xip < TEXT_FUNC_XIP_END, "test_func_xip is not in XIP SRAM");
     PICOTEST_CHECK((uint32_t)test_func_sram >= SRAM_STRIPED_BASE && (uint32_t)test_func_sram < SRAM4_BASE, "test_func_sram is not in SRAM 0-3");
     PICOTEST_END_SECTION()
 
