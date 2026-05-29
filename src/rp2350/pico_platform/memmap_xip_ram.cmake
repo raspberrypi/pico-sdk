@@ -2,7 +2,7 @@
 function(pico_add_memmap_link_depends_internal TARGET)
     pico_add_link_depend(${TARGET} ${PICO_SDK_PATH}/src/rp2350/pico_platform/script_include/section_platform_end.incl)
     pico_add_link_depend(${TARGET} ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/script_include/memmap_xip_ram.incl)
-    pico_add_link_depend(${TARGET} ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/script_include/memory_aliases_xip_ram_only.incl)
+    pico_add_link_depend(${TARGET} ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/script_include/memory_aliases_no_flash.incl)
     pico_add_link_depend(${TARGET} ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/script_include/memory_extra.incl)
     pico_add_link_depend(${TARGET} ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/script_include/memory_generated.incl)
     pico_add_link_depend(${TARGET} ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/script_include/memory_psram.incl)
