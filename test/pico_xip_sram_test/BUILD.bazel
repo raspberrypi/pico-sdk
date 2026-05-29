@@ -1,7 +1,6 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2")
-load("//bazel/util:transition.bzl", "extra_copts_for_all_deps", "pico_set_binary_type", "pico_set_linker_script")
+load("//bazel/util:transition.bzl", "extra_copts_for_all_deps", "pico_set_binary_type")
 
 package(default_visibility = ["//visibility:public"])
 
