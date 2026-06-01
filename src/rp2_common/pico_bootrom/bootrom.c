@@ -11,8 +11,6 @@
 #include "hardware/rcp.h"
 #endif
 
-// PICO_CONFIG: PICO_BOOTROM_WORKAROUND_A2_ACTIVITY_LED_BUG, Workaround RP2350A-A2 (QFN60) bug not displaying USB boot activity LED under Arm by making rom_reset_usb_boot functions reboot to RISC-V when the activity LED is specified, type=bool, default=0, group=pico_bootrom
-
 /// \tag::table_lookup[]
 
 void *rom_func_lookup(uint32_t code) {
@@ -35,7 +33,7 @@ bool rom_funcs_lookup(uint32_t *table, unsigned int count) {
 
 // The activity LED on RP2350 A2 QFN60 chips doesn't work in Arm mode, so boot into RISC-V if the user
 // really, really wants the activity LED
-#if PICO_RP2350_A2_SUPPORTED && PICO_RP2350A && !PICO_RISCV && PICO_BOOTROM_WORKAROUND_A2_ACTIVITY_LED_BUG
+#if PICO_RP2350_A2_SUPPORTED && PICO_RP2350A && !PICO_RISCV && PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG
 #define rom_reboot_workaround(flags, delay_ms, p0, p1) ({ \
     if (((p0) & BOOTSEL_FLAG_GPIO_PIN_SPECIFIED) && rp2350_rom_version() == 2) \
         rom_reboot((flags) | REBOOT2_FLAG_REBOOT_TO_RISCV, delay_ms, p0, p1); \
