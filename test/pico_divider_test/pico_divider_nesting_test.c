@@ -209,8 +209,6 @@ void test_nesting() {
             z += (int)dd;
 
         }
-        // todo this still seems broken on RP2350
-#if 1 || PICO_RP2040
         // these use the divider
         for(uint i=0;i<=100;i+=20) {
             // both in and out bootrom range (we perform mod in wrapper code if necessarry)
@@ -221,7 +219,6 @@ void test_nesting() {
             d0c = cos(i * 1000);
             d0s = sin(i * 1000);
         }
-#endif
         count_local++;
     }
     done = true;
@@ -253,19 +250,19 @@ void test_unsafe_32() {
                 FAILED();
             }
             int zz = (int)z;
-            r = divmod_u32u32_unsafe(zz, -11);
+            r = divmod_s32s32_unsafe(zz, -11);
             int aa = to_quotient_s32(r);
             int bb = to_remainder_s32(r);
             if (zz != aa * -11 + bb) {
                 FAILED();
             }
-            r = divmod_u32u32_unsafe(-zz, -11);
+            r = divmod_s32s32_unsafe(-zz, -11);
             aa = to_quotient_s32(r);
             bb = to_remainder_s32(r);
             if (-zz != aa * -11 + bb) {
                 FAILED();
             }
-            r = divmod_u32u32_unsafe(-zz, 11);
+            r = divmod_s32s32_unsafe(-zz, 11);
             aa = to_quotient_s32(r);
             bb = to_remainder_s32(r);
             if (-zz != aa * 11 + bb) {
