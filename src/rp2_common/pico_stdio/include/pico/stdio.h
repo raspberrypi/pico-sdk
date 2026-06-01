@@ -176,8 +176,7 @@ int stdio_get_until(char *buf, int len, absolute_time_t until);
  * \ingroup pico_stdio
  *
  * Writes \p s to every registered stdio driver. The call returns once
- * each driver has accepted the bytes; it may block if a driver applies
- * back-pressure.
+ * each driver has accepted the bytes
  *
  * \param s the characters to print
  * \param len the length of \p s, or `-1` to compute it with `strlen`
