@@ -182,7 +182,7 @@ regular_func divmod_s32s32_unsafe
     bl __aeabi_idiv0
 #endif
     movs r1, #0 // remainder 0
-    // need to restore saved r2 as it hold SIO ptr
+    // need to restore saved r2 as it holds SIO ptr
     pop {r2, pc}
 
 // since uidiv and uidivmod only differ by a cycle, we'll make them the same!
@@ -264,7 +264,7 @@ regular_func divmod_u32u32_unsafe
     bl __aeabi_idiv0
 #endif
     movs r1, #0 // remainder 0
-    // need to restore saved r2 as it hold SIO ptr
+    // need to restore saved r2 as it holds SIO ptr
     pop {r2, pc}
 
 div_section WRAPPER_FUNC_NAME(__aeabi_ldiv)
