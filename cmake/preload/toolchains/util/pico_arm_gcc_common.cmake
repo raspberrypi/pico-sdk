@@ -4,6 +4,9 @@
 # wrongly emit .fpu softvfp regardless of any other options! go figure!!!
 if (PICO_HARD_FLOAT_ABI)
     set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -mfloat-abi=hard")
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL cortex-m0plus)
+    # older GCC dont accept softfp for M0+ and end up picking wrong libraries in multilib
+    set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -mfloat-abi=soft")
 else()
     set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -mfloat-abi=softfp")
 endif()

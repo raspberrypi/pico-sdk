@@ -85,6 +85,15 @@ void __attribute__((noreturn)) __weak _exit(__unused int status) {
 #endif
 }
 
+int __weak getpid(void) {
+    return 0;
+}
+
+int __weak kill(__unused int pid, __unused int sig) {
+    __breakpoint();
+    return -1;
+}
+
 static int64_t epoch_time_us_since_boot;
 
 __weak int gettimeofday (struct timeval *__restrict tv, __unused void *__restrict tz) {

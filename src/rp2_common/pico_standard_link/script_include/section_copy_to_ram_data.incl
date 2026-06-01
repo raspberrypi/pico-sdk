@@ -11,6 +11,7 @@
     __tls_base, __tls_end
     __tbss_end
     __global_pointer$
+    __dso_handle
 */
 
 SECTIONS
@@ -65,6 +66,7 @@ SECTIONS
         *(SORT(.fini_array.*))
         *(.fini_array)
         PROVIDE_HIDDEN (__fini_array_end = .);
+        PROVIDE(__dso_handle = 0);
 
         *(.jcr)
         . = ALIGN(4);

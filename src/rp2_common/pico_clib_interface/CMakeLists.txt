@@ -6,7 +6,9 @@ if (NOT TARGET pico_clib_interface)
 
     target_sources(pico_newlib_interface INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/newlib_interface.c
+            ${CMAKE_CURRENT_LIST_DIR}/cxa_guard.c
     )
+    pico_mirrored_target_link_libraries(pico_newlib_interface INTERFACE pico_stdio pico_atomic pico_cxx_options)
 
     # ---- picolibc ----
 
@@ -14,8 +16,10 @@ if (NOT TARGET pico_clib_interface)
 
     target_sources(pico_picolibc_interface INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/picolibc_interface.c
+            ${CMAKE_CURRENT_LIST_DIR}/cxa_guard.c
     )
 
+    pico_mirrored_target_link_libraries(pico_picolibc_interface INTERFACE pico_stdio pico_atomic pico_cxx_options)
     # replacing the functions is fine it seems
     #target_compile_definitions(pico_picolibc_interface INTERFACE
     #            PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS=0
@@ -26,13 +30,14 @@ if (NOT TARGET pico_clib_interface)
 
     target_sources(pico_llvm_libc_interface INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/llvm_libc_interface.c
+            ${CMAKE_CURRENT_LIST_DIR}/llvm_libc_interface_cpp.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/cxa_guard.c
     )
 
     target_include_directories(pico_llvm_libc_interface SYSTEM INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/include/llvm_libc
     )
-    target_link_libraries(pico_llvm_libc_interface INTERFACE pico_atomic)
-    pico_mirrored_target_link_libraries(pico_llvm_libc_interface INTERFACE pico_stdio)
+    pico_mirrored_target_link_libraries(pico_llvm_libc_interface INTERFACE pico_stdio pico_atomic pico_cxx_options)
 
     if (NOT PICO_CLIB)
         # PICO_CMAKE_CONFIG: PICO_CLIB, The C library to use e.g. newlib/picolibc/llvm_libc, type=string, default=based on PICO_COMPILER, group=build, docref=cmake-toolchain-config

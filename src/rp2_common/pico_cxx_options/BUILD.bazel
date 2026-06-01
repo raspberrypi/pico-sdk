@@ -14,9 +14,14 @@ pico_sdk_define(
 cc_library(
     name = "pico_cxx_options",
     srcs = ["new_delete.cpp"],
+    hdrs = [
+        "include/pico/cxx_options.h",
+    ],
+    includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
         ":PICO_CXX_ENABLE_EXCEPTIONS",
-        "//src/rp2_common:pico_platform",
+        "//src:pico_platform_internal",
+        "//src/common/pico_base_headers",
     ],
 )

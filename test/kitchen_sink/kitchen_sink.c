@@ -314,6 +314,11 @@ int main(void) {
     }
 #endif
 
+#ifdef EXTRA_FUNC
+    extern void EXTRA_FUNC(void);
+    EXTRA_FUNC();
+#endif
+
 #ifndef __riscv
     exception_set_exclusive_handler(SVCALL_EXCEPTION, svc_call);
     // this should compile as we are Cortex-M

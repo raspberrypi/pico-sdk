@@ -47,6 +47,10 @@ void __attribute__((noreturn)) __weak _exit(__unused int status) {
 #endif
 }
 
+void __weak _fini(void) {
+    __breakpoint();
+}
+
 __weak void *_sbrk(int incr) {
     extern char end; /* Set by linker.  */
     static char *heap_end;

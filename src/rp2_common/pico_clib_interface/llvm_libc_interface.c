@@ -9,7 +9,6 @@
 #include <stddef.h>
 #include <sys/time.h>
 #include <time.h>
-
 #include <llvm-libc-types/ssize_t.h>
 
 #include "pico/runtime_init.h"
@@ -79,7 +78,12 @@ bool __llvm_libc_timespec_get_utc(struct timespec *ts) {
     return true;
 }
 
-void __cxa_finalize(__unused void *dso) {}
+__weak void __cxa_finalize(__unused void *dso) {}
+
+__weak int atexit(void (*function)(void)) {
+    (void)function;
+    return 0;
+}
 
 void __attribute__((noreturn)) __llvm_libc_exit(__unused int status) {
 #if PICO_ENTER_USB_BOOT_ON_EXIT
@@ -121,4 +125,3 @@ void runtime_init(void) {
         (*p)();
     }
 }
-

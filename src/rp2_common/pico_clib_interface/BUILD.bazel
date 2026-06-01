@@ -63,11 +63,16 @@ cc_library(
 
 cc_library(
     name = "llvm_libc_interface_link",
-    srcs = ["llvm_libc_interface.c"],
+    srcs = [
+        "cxa_guard.c",
+        "llvm_libc_interface.c",
+        "llvm_libc_interface_cpp.cpp",
+    ],
     implementation_deps = [
         ":llvm_libc_interface",
         "//src/rp2_common/pico_atomic",
         "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_cxx_options",
         "//src/rp2_common/pico_runtime_init",
         "//src/rp2_common/pico_stdio:pico_stdio_headers",
     ],
@@ -85,10 +90,15 @@ alias(
 
 cc_library(
     name = "newlib_interface_link",
-    srcs = ["newlib_interface.c"],
+    srcs = [
+        "cxa_guard.c",
+        "newlib_interface.c",
+    ],
     implementation_deps = [
         "//src/common/pico_time",
+        "//src/rp2_common/pico_atomic",
         "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_cxx_options",
         "//src/rp2_common/pico_printf",
         "//src/rp2_common/pico_runtime_init",
         "//src/rp2_common/pico_stdio:pico_stdio_headers",
@@ -107,10 +117,15 @@ alias(
 
 cc_library(
     name = "picolibc_interface_link",
-    srcs = ["picolibc_interface.c"],
+    srcs = [
+        "cxa_guard.c",
+        "picolibc_interface.c",
+    ],
     implementation_deps = [
         "//src/common/pico_time",
+        "//src/rp2_common/pico_atomic",
         "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_cxx_options",
         "//src/rp2_common/pico_printf",
         "//src/rp2_common/pico_runtime_init",
         "//src/rp2_common/pico_stdio:pico_stdio_headers",
