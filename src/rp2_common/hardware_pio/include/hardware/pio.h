@@ -948,7 +948,7 @@ static inline uint pio_get_dreq(PIO pio, uint sm, bool is_tx) {
 typedef struct pio_program {
     const uint16_t *instructions;   ///< the array of \ref length encoded instructions that make up the program
     uint8_t length;                 ///< the number of instructions in \ref instructions (also the amount of instruction memory the program occupies)
-    int8_t origin;                  ///< the required load offset in PIO instruction memory, or -1 if the program is relocatable and may be loaded at any free offset
+    int8_t origin;                  ///< the required load offset in PIO instruction memory, or -1 if the program is relocatable and may be loaded at any offset
     uint8_t pio_version;            ///< the minimum PIO hardware version the program requires (0 for any PIO); loading a program that requires a newer version than the target PIO fails with \ref PICO_ERROR_VERSION_MISMATCH
 #if PICO_PIO_VERSION > 0
     uint8_t used_gpio_ranges;       ///< bitmap of the 16-pin GPIO ranges the program uses (bit 0 = pins 0-15, bit 1 = pins 16-31, bit 2 = pins 32-47), checked against the PIO instance's GPIO base (see \ref pio_set_gpio_base) so that an incompatible program is rejected
