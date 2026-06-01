@@ -83,7 +83,7 @@ static int find_offset_for_program(PIO pio, const pio_program_t *program) {
 
 static int pio_set_gpio_base_unsafe(PIO pio, uint gpio_base) {
     invalid_params_if_and_return(HARDWARE_PIO, gpio_base != 0 && (!PICO_PIO_VERSION || gpio_base != 16), PICO_ERROR_BAD_ALIGNMENT);
-#if PICO_PIO_VERSION > 0
+#if PICO_PIO_USE_GPIO_BASE
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     invalid_params_if_and_return(HARDWARE_PIO, used_mask, PICO_ERROR_INVALID_STATE);
     pio->gpiobase = gpio_base;
@@ -96,7 +96,7 @@ static int pio_set_gpio_base_unsafe(PIO pio, uint gpio_base) {
 
 int pio_set_gpio_base(PIO pio, uint gpio_base) {
     int rc = PICO_OK;
-#if PICO_PIO_VERSION > 0
+#if PICO_PIO_USE_GPIO_BASE
     uint32_t save = hw_claim_lock();
     rc = pio_set_gpio_base_unsafe(pio, gpio_base);
     hw_claim_unlock(save);
@@ -108,7 +108,7 @@ int pio_set_gpio_base(PIO pio, uint gpio_base) {
 }
 
 static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
-#if PICO_PIO_VERSION > 0
+#if PICO_PIO_USE_GPIO_BASE
     bool gpio_base = pio_get_gpio_base(pio);
     return !((gpio_base && (used_gpio_ranges & 1)) ||
              (!gpio_base && (used_gpio_ranges & 4)));
