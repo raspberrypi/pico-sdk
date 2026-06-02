@@ -57,6 +57,7 @@
 #define NUM_OTP_ROWS (NUM_OTP_PAGES * NUM_OTP_PAGE_ROWS)
 
 #define PIO_INSTRUCTION_COUNT _u(32)
+#define PICO_PIO_VERSION _u(1)
 
 #define NUM_MPU_REGIONS _u(8)
 #define NUM_SAU_REGIONS _u(8)

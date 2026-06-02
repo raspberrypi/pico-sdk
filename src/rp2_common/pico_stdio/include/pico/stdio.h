@@ -172,17 +172,18 @@ void stdio_set_chars_available_callback(void (*fn)(void*), void *param);
  */
 int stdio_get_until(char *buf, int len, absolute_time_t until);
 
-/*! \brief Prints a buffer to stdout with optional newline and carriage return insertion
+/*! \brief Prints a buffer to stdout, optionally appending a newline
  * \ingroup pico_stdio
  *
- * This method returns as soon as input is available, but more characters may
- * be returned up to the end of the buffer.
+ * Writes \p s to every registered stdio driver. The call returns once
+ * each driver has accepted the bytes
  *
  * \param s the characters to print
- * \param len the length of s
- * \param newline true if a newline should be added after the string
- * \param cr_translation true if line feed to carriage return translation should be performed
- * \return the number of characters written
+ * \param len the length of \p s, or `-1` to compute it with `strlen`
+ * \param newline true if a newline should be appended after the string
+ * \param cr_translation true if line-feed to carriage-return translation should be performed
+ * \return the number of characters from \p s that were written (excluding any appended newline);
+ *         `0` if a concurrent stdout write was in progress and `PICO_STDIO_IGNORE_NESTED_STDOUT` is set
  */
 int stdio_put_string(const char *s, int len, bool newline, bool cr_translation);
 

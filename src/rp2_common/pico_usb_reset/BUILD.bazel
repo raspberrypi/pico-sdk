@@ -1,0 +1,27 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_usb_reset",
+    srcs = [
+        "usb_reset.c",
+    ],
+    hdrs = [
+        "include/pico/usb_reset.h",
+        "include/pico/usb_reset_config.h",
+        "include/pico/usb_reset_tusb.h",
+    ],
+    defines = [
+        "LIB_PICO_USB_RESET=1",
+    ],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//bazel/config:PICO_TINYUSB_LIB",
+        "//src/common/pico_usb_reset_interface_headers",
+        "//src/rp2_common/hardware_watchdog",
+        "//src/rp2_common/pico_bootrom",
+    ],
+)

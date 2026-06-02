@@ -524,8 +524,15 @@ for name, define in defines.items():
                     warnings.warn("{}:{}  Both {} and {} claim to be pin {}".format(board_header, define.lineno, pins[define.resolved_value][0].name, name, define.resolved_value))
                 pins[define.resolved_value].append(define)
             else:
-                if define.resolved_value not in allowed_pins:
-                    errors.append(Exception("{}:{}  Pin {} for {} isn't a valid pin-number".format(board_header, define.lineno, define.resolved_value, name)))
+                if name.startswith("CYW43_WL_GPIO_"):
+                    if "CYW43_WL_GPIO_COUNT" not in defines:
+                            errors.append(Exception("{}:{}  {} is defined but {} is missing".format(board_header, define.lineno, name, "CYW43_WL_GPIO_COUNT")))
+                    else:
+                        if define.resolved_value < 0 or define.resolved_value >= defines["CYW43_WL_GPIO_COUNT"].resolved_value:
+                            errors.append(Exception("{}:{}  Pin {} for {} isn't a valid pin-number for {}".format(board_header, define.lineno, define.resolved_value, name, "CYW43")))
+                else:
+                    if define.resolved_value not in allowed_pins:
+                        errors.append(Exception("{}:{}  Pin {} for {} isn't a valid pin-number for {}".format(board_header, define.lineno, define.resolved_value, name, chip)))
                 pins[define.resolved_value] = [define]
 
     # check for invalid DEFAULT mappings

@@ -8,6 +8,7 @@
 
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/rvcsr.h"
+#include "hardware/regs/watchdog.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom_constants.h"
@@ -28,6 +29,10 @@
 
 #ifndef PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK
 #define PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK (PICO_CRT0_INCLUDE_PICOBIN_BLOCK && !PICO_NO_FLASH)
+#endif
+
+#ifndef PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+#define PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM 1
 #endif
 
 #ifndef PICO_CRT0_NO_DATA_COPY
@@ -293,11 +298,30 @@ binary_info_header:
 .global _entry_point
 _entry_point:
 
-#if PICO_NO_FLASH
-    // Go through our own reset handler. Same path for debugger entry and
+#if !PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+    // Fall through to _reset_handler. Same path for debugger entry and
     // bootloader entry.
-    j _reset_handler
 #else
+    #if PICO_NO_FLASH
+        // Launch this no_flash binary using a RAM image boot
+        la a1, WATCHDOG_BASE + WATCHDOG_SCRATCH2_OFFSET // offsets start from here, to fit in sw immediate
+        // scratch 2 = __logical_binary_start
+        la a0, __logical_binary_start
+        sw a0, 0(a1)
+        // scratch 3 = size
+        li a0, SRAM_END - SRAM_BASE // assume maximum size for block loop
+        sw a0, 4(a1)
+        // scratch 4&7 = magic number
+        li a0, 0xb007c0d3
+        sw a0, 8(a1)
+        sw a0, 20(a1)
+        // scratch 5 = magic number xored with -(magic number) == -2
+        li a0, -2
+        sw a0, 12(a1)
+        // scratch 6 = ram image boot == 3
+        li a0, 3
+        sw a0, 16(a1)
+    #endif
     // Debugger tried to run code after loading, so SSI is in 03h-only mode.
     // Go back through bootrom + boot2 to properly initialise flash.
     j reenter_bootrom

@@ -9,7 +9,7 @@
 
 #include "pico.h"
 
-/** \brief PIO instruction encoding 
+/** \brief PIO instruction encoding
  *  \defgroup pio_instructions pio_instructions
  *  \ingroup hardware_pio
  * 
@@ -66,13 +66,20 @@ enum pio_src_dest {
     pio_x = 1u,
     pio_y = 2u,
     pio_null = 3u | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_DEST,
+#if PICO_PIO_VERSION > 0
+    pio_pindirs_mov = 3u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC,
+    pio_pindirs = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC,
+#else
     pio_pindirs = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC | _PIO_INVALID_MOV_DEST,
+#endif
+    pio_pindirs_out = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC | _PIO_INVALID_MOV_DEST,
     pio_exec_mov = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_OUT_DEST | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC,
     pio_status = 5u | _PIO_INVALID_IN_SRC | _PIO_INVALID_OUT_DEST | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_DEST,
     pio_pc = 5u | _PIO_INVALID_IN_SRC | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC,
     pio_isr = 6u | _PIO_INVALID_SET_DEST,
     pio_osr = 7u | _PIO_INVALID_OUT_DEST | _PIO_INVALID_SET_DEST,
     pio_exec_out = 7u | _PIO_INVALID_IN_SRC | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC | _PIO_INVALID_MOV_DEST,
+    pio_exec = 7u | _PIO_INVALID_IN_SRC | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC,
 };
 
 static inline uint _pio_major_instr_bits(uint instr) {
@@ -354,6 +361,8 @@ static inline uint pio_encode_in(enum pio_src_dest src, uint count) {
  */
 static inline uint pio_encode_out(enum pio_src_dest dest, uint count) {
     valid_params_if(PIO_INSTRUCTIONS, !(dest & _PIO_INVALID_OUT_DEST));
+    static_assert((pio_pindirs & 7) == (pio_pindirs_out & 7), ""); // no need to convert
+    static_assert((pio_exec & 7) == (pio_exec_out & 7), ""); // no need to convert
     return _pio_encode_instr_and_src_dest(pio_instr_bits_out, dest, count);
 }
 
@@ -398,6 +407,11 @@ static inline uint pio_encode_pull(bool if_empty, bool block) {
 static inline uint pio_encode_mov(enum pio_src_dest dest, enum pio_src_dest src) {
     valid_params_if(PIO_INSTRUCTIONS, !(dest & _PIO_INVALID_MOV_DEST));
     valid_params_if(PIO_INSTRUCTIONS, !(src & _PIO_INVALID_MOV_SRC));
+    // generic constants aren't the same as the MOV ones
+    if (dest == pio_exec) dest = pio_exec_mov;
+#if PICO_PIO_VERSION > 0
+    if (dest == pio_pindirs) dest = pio_pindirs_mov;
+#endif
     return _pio_encode_instr_and_src_dest(pio_instr_bits_mov, dest, src & 7u);
 }
 

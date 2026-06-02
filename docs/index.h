@@ -129,5 +129,6 @@
  * \cond boot_picoboot_headers \defgroup boot_picoboot_headers boot_picoboot_headers \endcond
  * \cond boot_uf2_headers \defgroup boot_uf2_headers boot_uf2_headers \endcond
  * \cond pico_usb_reset_interface_headers \defgroup pico_usb_reset_interface_headers pico_usb_reset_interface_headers \endcond
+ * \cond pico_usb_reset \defgroup pico_usb_reset pico_usb_reset \endcond
  * @}
 */

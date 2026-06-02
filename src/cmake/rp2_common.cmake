@@ -125,6 +125,7 @@ if (NOT PICO_BARE_METAL)
     endif()
     pico_add_subdirectory(rp2_common/tinyusb)
     pico_add_subdirectory(rp2_common/pico_stdio_usb)
+    pico_add_subdirectory(rp2_common/pico_usb_reset)
     pico_add_subdirectory(rp2_common/pico_i2c_slave)
 
     # networking libraries - note dependency order is important
