@@ -21,12 +21,12 @@
 #define PICO_CRT0_NEAR_CALLS 0
 #endif
 
-// PICO_CONFIG: PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM, Whether crt0 should always reset through the bootrom when loaded using a debugger - not supported on RP2040, default=1, type=bool, advanced=true, group=pico_crt0
+// PICO_CONFIG: PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM, Whether crt0 should reset through the bootrom when loaded using a debugger - defining this variable is not supported on RP2040, default=1, type=bool, advanced=true, group=pico_crt0
 #if PICO_RP2040
-#define PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM 0
+#define PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM (!PICO_NO_FLASH)
 #else
-#ifndef PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM
-#define PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM 1
+#ifndef PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+#define PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM 1
 #endif
 #endif
 
@@ -392,7 +392,7 @@ binary_info_header:
 .global _entry_point
 _entry_point:
 
-#if PICO_NO_FLASH && !PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM
+#if !PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
     // in the NO_FLASH case, we do not do a rest thru bootrom below, so the RCP may or may not have been initialized:
     //
     // in the normal case (UF2 download, etc.), we will have passed thru bootrom initialization, but if
@@ -424,8 +424,10 @@ _entry_point:
     ldr r0, =__vectors
     // Vector through our own table (SP, VTOR will not have been set up at
     // this point). Same path for debugger entry and bootloader entry.
-#else // PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM or !PICO_NOFLASH
-    #if PICO_NO_FLASH // PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM is always 0 on RP2040, so this code doesn't support RP2040
+#else // PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+    #if PICO_NO_FLASH
+        // PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM is always !PICO_NO_FLASH on RP2040, so this code doesn't support RP2040,
+        // because RP2040 doesn't have special watchdog boot types
         // Launch this no_flash binary using a RAM image boot
         ldr r1, =(WATCHDOG_BASE + WATCHDOG_SCRATCH2_OFFSET) // registers start from here
         // scratch 2 = __logical_binary_start
@@ -440,7 +442,7 @@ _entry_point:
         // scratch 5 = magic number xored with -(magic number) == -2
         subs r5, r6, #5 // 3 - 5 = -2
         // load the watchdog registers
-        stm r1!, {r2, r3, r4, r5, r6, r7}
+        stmia r1!, {r2, r3, r4, r5, r6, r7}
     #endif
 
     // Go back through bootrom to finish the boot.

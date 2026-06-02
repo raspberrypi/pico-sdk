@@ -31,8 +31,8 @@
 #define PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK (PICO_CRT0_INCLUDE_PICOBIN_BLOCK && !PICO_NO_FLASH)
 #endif
 
-#ifndef PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM
-#define PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM 1
+#ifndef PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+#define PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM 1
 #endif
 
 // If vectors are in RAM, we put them in the .data section, so that they are
@@ -294,7 +294,7 @@ binary_info_header:
 .global _entry_point
 _entry_point:
 
-#if PICO_NO_FLASH && !PICO_CRT0_ALWAYS_RESET_THROUGH_BOOTROM
+#if !PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
     // Fall through to _reset_handler. Same path for debugger entry and
     // bootloader entry.
 #else
