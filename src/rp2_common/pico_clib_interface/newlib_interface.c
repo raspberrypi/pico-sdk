@@ -48,7 +48,6 @@ void __attribute__((noreturn)) __weak _exit(__unused int status) {
 }
 
 void __weak _fini(void) {
-    __breakpoint();
 }
 
 __weak void *_sbrk(int incr) {
