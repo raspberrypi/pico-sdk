@@ -142,6 +142,14 @@ void trigger_dma(void) {
 #define TEXT_FUNC_XIP_END XIP_SRAM_END
 #endif
 
+#ifndef TEXT_FUNC_SRAM_BASE
+#define TEXT_FUNC_SRAM_BASE SRAM_STRIPED_BASE
+#endif
+
+#ifndef TEXT_FUNC_SRAM_END
+#define TEXT_FUNC_SRAM_END SRAM4_BASE
+#endif
+
 
 int main(void) {
     stdio_init_all();
@@ -160,7 +168,7 @@ int main(void) {
     printf("test_func_sram at %p\n", test_func_sram);
 
     PICOTEST_CHECK((uint32_t)test_func_xip >= TEXT_FUNC_XIP_BASE && (uint32_t)test_func_xip < TEXT_FUNC_XIP_END, "test_func_xip is not in XIP SRAM");
-    PICOTEST_CHECK((uint32_t)test_func_sram >= SRAM_STRIPED_BASE && (uint32_t)test_func_sram < SRAM4_BASE, "test_func_sram is not in SRAM 0-3");
+    PICOTEST_CHECK((uint32_t)test_func_sram >= TEXT_FUNC_SRAM_BASE && (uint32_t)test_func_sram < TEXT_FUNC_SRAM_END, "test_func_sram is not in SRAM 0-3");
     PICOTEST_END_SECTION()
 
     multicore_launch_core1(core1_entry);
@@ -193,7 +201,9 @@ int main(void) {
         sleep_ms(500);
     }
 
+#if TEXT_FUNC_SRAM_BASE == SRAM_STRIPED_BASE
     PICOTEST_CHECK(test_func_xip_cycles < test_func_sram_cycles, "test_func_xip took longer than test_func_sram");
+#endif
 
     PICOTEST_END_SECTION();
 

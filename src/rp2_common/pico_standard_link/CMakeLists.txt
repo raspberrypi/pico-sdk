@@ -204,7 +204,7 @@ if (NOT TARGET pico_standard_link)
         endif()
     endfunction()
 
-    # pico_place_time_critical_functions(TARGET MEMORY)
+    # pico_set_time_critical_placement(TARGET MEMORY)
     # \brief\ Place time-critical code for the target into <MEMORY>
     #
     # Configures the target to run functions marked __time_critical_func() from <MEMORY> rather than
@@ -218,8 +218,29 @@ if (NOT TARGET pico_standard_link)
     #
     # \param\ TARGET The target whose time-critical functions should run from <MEMORY>
     # \param\ MEMORY The memory block to place the functions in (e.g. xip_ram, scratch_x, scratch_y)
-    function(pico_place_time_critical_functions TARGET MEMORY)
+    function(pico_set_time_critical_placement TARGET MEMORY)
         target_compile_definitions(${TARGET} PRIVATE PICO_TIME_CRITICAL_PLACEMENT=__in_${MEMORY})
+        if (${MEMORY} STREQUAL "xip_ram")
+            pico_set_compile_definition(${TARGET} PICO_USE_XIP_CACHE_AS_RAM 1)
+        endif()
+    endfunction()
+
+    # pico_set_not_in_flash_placement(TARGET MEMORY)
+    # \brief\ Place time-critical code for the target into <MEMORY>
+    #
+    # Configures the target to place data (and code) marked __not_in_flash() in <MEMORY> rather than
+    # normal SRAM, useful if <MEMORY> has dedicated AHB ports which are otherwise unused. For example, 
+    # xip_ram could be used in no_flash and copy_to_ram binaries, as the XIP AHB ports are unused.
+    # This sets PICO_NOT_IN_FLASH_PLACEMENT=__in_<MEMORY>, and any necessary defines required to use
+    # <MEMORY> (e.g. PICO_USE_XIP_CACHE_AS_RAM=1 for xip_ram).
+    #
+    # The xip_ram memory should not be used for flash binaries, as using the XIP cache as SRAM will
+    # have a large performance penalty.
+    #
+    # \param\ TARGET The target whose __not_in_flash data should be placed in <MEMORY>
+    # \param\ MEMORY The memory block to place the data in (e.g. xip_ram, scratch_x, scratch_y)
+    function(pico_set_not_in_flash_placement TARGET MEMORY)
+        target_compile_definitions(${TARGET} PRIVATE PICO_NOT_IN_FLASH_PLACEMENT=__in_${MEMORY})
         if (${MEMORY} STREQUAL "xip_ram")
             pico_set_compile_definition(${TARGET} PICO_USE_XIP_CACHE_AS_RAM 1)
         endif()
