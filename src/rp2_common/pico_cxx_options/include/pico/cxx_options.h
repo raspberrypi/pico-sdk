@@ -11,7 +11,7 @@
 
 // PICO_CONFIG: PICO_CXX_DISABLE_ALLOCATION_OVERRIDES, Disable SDK overrides of C++ new/delete operators, type=bool, default=0, advanced=true, group=pico_cxx_options
 
-// PICO_CONFIG: PICO_CXX_THREAD_SAFE_STATIC_INIT, Enable thread/IRQ safe locks for C++ static initializers , type=bool, default=1 when using pico_multicore, advanced=true, group=pico_cxx_options
+// PICO_CONFIG: PICO_CXX_THREAD_SAFE_STATIC_INIT, Enable thread/IRQ safe locks for C++ static initializers, type=bool, default=1 when using pico_multicore, advanced=true, group=pico_cxx_options
 #ifndef PICO_CXX_THREAD_SAFE_STATIC_INIT
 #define PICO_CXX_THREAD_SAFE_STATIC_INIT LIB_PICO_MULTICORE
 #endif
