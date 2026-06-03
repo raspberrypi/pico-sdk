@@ -25,23 +25,24 @@
 #define __after_data(group) __attribute__((section(".after_data." group)))
 #endif
 
-/*! \brief Section attribute macro for placement not in flash (i.e in RAM)
+/*! \brief Section attribute macro for placement in RAM
  *  \ingroup pico_platform
  *
  * For example a 3 element `uint32_t` array placed in RAM (even though it is `static const`)
  *
  *     static const uint32_t __not_in_flash("my_group_name") an_array[3];
  *
- * The section attribute is `.time_critical.<group>`
+ * The section attribute is `.time_critical.<group>`, which is used to maintain compatibility
+ * with older linker scripts
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
  *              garbage-collected independently
  */
-#ifndef __not_in_flash
-#define __not_in_flash(group) __attribute__((section(".time_critical." group)))
+#ifndef __in_ram
+#define __in_ram(group) __attribute__((section(".time_critical." group)))
 #endif
 
-/*! \brief Section attribute macro for placement in the SRAM bank 4 (known as "scratch X")
+/*! \brief Section attribute macro for placement in the penultimate SRAM bank (known as "scratch X")
  *  \ingroup pico_platform
  *
  * Scratch X is commonly used for critical data and functions accessed only by one core (when only
@@ -49,18 +50,30 @@
  *
  * For example a `uint32_t` variable placed in "scratch X"
  *
- *     uint32_t __scratch_x("my_group_name") foo = 23;
+ *     uint32_t __in_scratch_x("my_group_name") foo = 23;
  *
  * The section attribute is `.scratch_x.<group>`
  *
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
  *              garbage-collected independently
  */
-#ifndef __scratch_x
-#define __scratch_x(group) __attribute__((section(".scratch_x." group)))
+#ifndef __in_scratch_x
+#define __in_scratch_x(group) __attribute__((section(".scratch_x." group)))
 #endif
 
-/*! \brief Section attribute macro for placement in the SRAM bank 5 (known as "scratch Y")
+/*! \brief Section attribute macro for placement in the penultimate SRAM bank (known as "scratch X")
+ *  \ingroup pico_platform
+ *
+ * Alias for \ref __in_scratch_x
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
+#ifndef __scratch_x
+#define __scratch_x(group) __in_scratch_x(group)
+#endif
+
+/*! \brief Section attribute macro for placement in the final SRAM bank (known as "scratch Y")
  *  \ingroup pico_platform
  *
  * Scratch Y is commonly used for critical data and functions accessed only by one core (when only
@@ -75,8 +88,20 @@
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
  *              garbage-collected independently
  */
+#ifndef __in_scratch_y
+#define __in_scratch_y(group) __attribute__((section(".scratch_y." group)))
+#endif
+
+/*! \brief Section attribute macro for placement in the final SRAM bank (known as "scratch Y")
+ *  \ingroup pico_platform
+ *
+ * Alias for \ref __in_scratch_y
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
 #ifndef __scratch_y
-#define __scratch_y(group) __attribute__((section(".scratch_y." group)))
+#define __scratch_y(group) __in_scratch_y(group)
 #endif
 
 /*! \brief Section attribute macro for placement in PSRAM
@@ -101,8 +126,42 @@
 #ifndef __in_psram
 #define __in_psram(group) __attribute__((section(".psram_initialised." group)))
 #endif
+
+/*! \brief Section attribute macro for placement in uninitialised PSRAM
+ *  \ingroup pico_platform
+ *
+ * The version of \ref __in_psram to use for uninitialised data
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
 #ifndef __uninitialized_psram
 #define __uninitialized_psram(group) __attribute__((section(".psram_uninitialised." group)))
+#endif
+
+/*! \brief Section attribute macro for placement in XIP SRAM
+ *  \ingroup pico_platform
+ *
+ * The XIP Cache can be used as SRAM for extra data sections, however it will give a performance
+ * penalty if your binary runs from Flash (e.g. the default binary type).
+ *
+ * For example a `uint32_t` variable placed in XIP SRAM
+ *
+ *     uint32_t __in_xip_ram("my_group_name") foo = 23;
+ *
+ * The section attribute is `.xip_ram.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
+#ifndef __in_xip_ram
+#if PICO_USE_XIP_CACHE_AS_RAM
+#define __in_xip_ram(group) __attribute__((section(".xip_ram." group)))
+#elif PICO_XIP_RAM
+#define __in_xip_ram(group) __in_ram(group)
+#else
+#define __in_xip_ram(group) x; static_assert(false, "Must set PICO_USE_XIP_CACHE_AS_RAM=1 to use the __in_xip_ram macro");
+#endif
 #endif
 
 /*! \brief Section attribute macro for data that is to be left uninitialized
@@ -166,6 +225,30 @@
 #define __in_flash(group) __attribute__((section(".flashdata." group)))
 #endif
 
+/*! \brief Section attribute macro for placement not in flash
+ *  \ingroup pico_platform
+ *
+ * For example a 3 element `uint32_t` array placed in RAM (even though it is `static const`)
+ *
+ *     static const uint32_t __not_in_flash("my_group_name") an_array[3];
+ *
+ * By default, this is identical to \ref __in_ram, but this can be adjusted using the `PICO_NOT_IN_FLASH_PLACEMENT` define.
+ * This define can be set using the \ref pico_set_not_in_flash_placement CMake function.
+ *
+ * For example, for binaries that only use core 0, there is the option to use
+ * `pico_set_not_in_flash_placement(TARGET scratch_x)` to place this code/data in scratch X to move it
+ * out of the striped SRAM.
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
+#ifndef PICO_NOT_IN_FLASH_PLACEMENT
+#define PICO_NOT_IN_FLASH_PLACEMENT __in_ram
+#endif
+#ifndef __not_in_flash
+#define __not_in_flash(group) PICO_NOT_IN_FLASH_PLACEMENT(group)
+#endif
+
 /*! \brief Indicates a function should not be stored in flash
  *  \ingroup pico_platform
  *
@@ -176,33 +259,12 @@
  *
  *     void __not_in_flash_func(my_func)(int some_arg) {
  *
- * The function is placed in the `.time_critical.<func_name>` linker section
+ * The function is placed using \ref __not_in_flash, which defaults to \ref __in_ram
  *
  * \see __no_inline_not_in_flash_func
  */
 #ifndef __not_in_flash_func
 #define __not_in_flash_func(func_name) __not_in_flash(__STRING(func_name)) func_name
-#endif
-
-/*! \brief Indicates a function is time/latency critical and should not run from flash
- *  \ingroup pico_platform
- *
- * Decorates a function name, such that the function will execute from RAM (assuming it is not inlined
- * into a flash function by the compiler) to avoid possible flash latency. Currently this macro is identical
- * in implementation to `__not_in_flash_func`, however the semantics are distinct and a `__time_critical_func`
- * may in the future be treated more specially to reduce the overhead when calling such function from a flash
- * function.
- *
- * For example a function called my_func taking an int parameter:
- *
- *     void __time_critical_func(my_func)(int some_arg) {
- *
- * The function is placed in the `.time_critical.<func_name>` linker section
- *
- * \see __not_in_flash_func
- */
-#ifndef __time_critical_func
-#define __time_critical_func(func_name) __not_in_flash_func(func_name)
 #endif
 
 /*! \brief Indicate a function should not be stored in flash and should not be inlined
@@ -215,10 +277,39 @@
  *
  *     void __no_inline_not_in_flash_func(my_func)(int some_arg) {
  *
- * The function is placed in the `.time_critical.<func_name>` linker section
+ * The function is placed using \ref __not_in_flash, which defaults to \ref __in_ram
  */
 #ifndef __no_inline_not_in_flash_func
 #define __no_inline_not_in_flash_func(func_name) __noinline __not_in_flash_func(func_name)
+#endif
+
+
+/*! \brief Indicates a function is time/latency critical and should not run from flash
+ *  \ingroup pico_platform
+ *
+ * Decorates a function name, such that the function will execute from RAM to avoid possible flash latency. By default,
+ * this macro is identical in implementation to `__no_inline_not_in_flash_func`, however the semantics are distinct and
+ * a `__time_critical_func` can be treated more specially to reduce the overhead when calling such a function.
+ *
+ * For example a function called my_func taking an int parameter:
+ *
+ *     void __time_critical_func(my_func)(int some_arg) {
+ *
+ * By default, the function is placed using \ref __in_ram, but this can be adjusted using the
+ * `PICO_TIME_CRITICAL_PLACEMENT` define. This define can be set using the \ref pico_set_time_critical_placement
+ * CMake function.
+ * 
+ * For example, for binaries that are not executing from flash (e.g. copy_to_ram and no_flash), there is the option
+ * to use `pico_set_time_critical_placement(TARGET xip_ram)` to place these functions in XIP RAM, as the XIP AHB
+ * ports would be otherwise unused.
+ *
+ * \see __not_in_flash
+ */
+#ifndef __time_critical_func
+#ifndef PICO_TIME_CRITICAL_PLACEMENT
+#define PICO_TIME_CRITICAL_PLACEMENT __in_ram
+#endif
+#define __time_critical_func(func_name) __noinline PICO_TIME_CRITICAL_PLACEMENT(__STRING(func_name)) func_name
 #endif
 
 #else

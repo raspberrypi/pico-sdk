@@ -151,6 +151,8 @@ typedef pio_hw_t *PIO;
 // PICO_CONFIG: PICO_PIO_USE_GPIO_BASE, Enable code for handling more than 32 PIO pins, type=bool, default=true when supported and when the device has more than 32 pins, group=hardware_pio
 #define PICO_PIO_USE_GPIO_BASE ((NUM_BANK0_GPIOS) > 32)
 #endif
+#else
+#define PICO_PIO_USE_GPIO_BASE 0
 #endif
 
 /**
@@ -784,7 +786,7 @@ static inline pio_sm_config pio_get_default_sm_config(void) {
  * \return the current GPIO base for the PIO instance
   */
 static inline uint pio_get_gpio_base(PIO pio) {
-#if PICO_PIO_VERSION > 0
+#if PICO_PIO_USE_GPIO_BASE
     return pio->gpiobase;
 #else
     ((void)pio);

@@ -2,16 +2,16 @@
 
    This file can be overridden to add extra memory regions.
 
-   For example, to add a PSRAM region, you would replace
-   this file with:
+   For example, to add an extra flash region for the second 4MiB
+   of flash, you could replace this file with:
 
    MEMORY
    {
-      PSRAM(rwx) : ORIGIN =  0x11000000, LENGTH = 8M
+      EXTRA_FLASH(rx) : ORIGIN = 0x10400000, LENGTH = 4M
    }
 
-   Or to include a XIP_RAM region, you would replace
-   this file with:
+   Or to include the FLASH region in a no_flash build, you could
+   replace this file with:
 
-   INCLUDE "memory_xip_ram.incl"
+   INCLUDE "memory_flash.incl"
 */

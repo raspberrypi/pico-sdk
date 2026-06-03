@@ -10,6 +10,7 @@
 #if PICO_RP2040
 #include "hardware/structs/io_qspi.h"
 #include "hardware/structs/ssi.h"
+#include "hardware/structs/xip.h"
 #else
 #include "hardware/structs/qmi.h"
 #include "hardware/regs/otp_data.h"
@@ -140,7 +141,9 @@ static void __no_inline_not_in_flash_func(flash_rp2350_restore_qmi_cs1)(const fl
 
 
 typedef struct flash_hardware_save_state {
-#if !PICO_RP2040
+#if PICO_RP2040
+    uint32_t xip_ctrl;
+#else
     flash_rp2350_qmi_save_state_t qmi_save;
 #endif
     uint32_t qspi_pads[count_of(pads_qspi_hw->io)];
@@ -152,7 +155,9 @@ static void __no_inline_not_in_flash_func(flash_save_hardware_state)(flash_hardw
     for (size_t i = 0; i < count_of(pads_qspi_hw->io); ++i) {
         state->qspi_pads[i] = pads_qspi_hw->io[i];
     }
-#if !PICO_RP2040
+#if PICO_RP2040
+    state->xip_ctrl = xip_ctrl_hw->ctrl;
+#else
     flash_rp2350_save_qmi_cs1(&state->qmi_save);
 #endif
 }
@@ -161,7 +166,9 @@ static void __no_inline_not_in_flash_func(flash_restore_hardware_state)(flash_ha
     for (size_t i = 0; i < count_of(pads_qspi_hw->io); ++i) {
         pads_qspi_hw->io[i] = state->qspi_pads[i];
     }
-#if !PICO_RP2040
+#if PICO_RP2040
+    xip_ctrl_hw->ctrl = state->xip_ctrl;
+#else
     // Tail call!
     flash_rp2350_restore_qmi_cs1(&state->qmi_save);
 #endif

@@ -41,6 +41,7 @@ alias(
         "//bazel/constraint:pico_binary_type_no_flash": "//src/rp2_common/pico_standard_link:no_flash_linker_script",
         "//bazel/constraint:pico_binary_type_copy_to_ram": "//src/rp2_common/pico_standard_link:copy_to_ram_linker_script",
         "//bazel/constraint:pico_binary_type_blocked_ram": "//src/rp2_common/pico_standard_link:blocked_ram_linker_script",
+        "//bazel/constraint:pico_binary_type_xip_ram": "//src/rp2_common/pico_standard_link:xip_ram_linker_script",
         # Then for the default type
         "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:default_linker_script",
         "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:default_linker_script",
@@ -70,6 +71,14 @@ alias(
     actual = select({
         "//bazel/constraint:rp2040": "//src/rp2040/pico_platform:no_flash_linker_script",
         "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:no_flash_linker_script",
+        "//conditions:default": "//bazel:incompatible_cc_lib",
+    }),
+)
+
+alias(
+    name = "xip_ram_linker_script",
+    actual = select({
+        "//bazel/constraint:rp2350": "//src/rp2350/pico_platform:xip_ram_linker_script",
         "//conditions:default": "//bazel:incompatible_cc_lib",
     }),
 )

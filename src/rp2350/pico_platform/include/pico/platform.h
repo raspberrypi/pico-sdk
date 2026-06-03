@@ -20,6 +20,12 @@
 #error pico/platform.h should not be included directly; include pico.h instead
 #endif
 
+// this is used by sections.h, so comes before the includes
+// PICO_CONFIG: PICO_USE_XIP_CACHE_AS_RAM, Whether to use xip cache as ram, default=0, type=bool, group=pico_platform
+#ifndef PICO_USE_XIP_CACHE_AS_RAM
+#define PICO_USE_XIP_CACHE_AS_RAM 0
+#endif
+
 #include "pico/platform/compiler.h"
 #include "pico/platform/sections.h"
 #include "pico/platform/panic.h"
@@ -189,7 +195,7 @@ __force_inline static bool pico_processor_state_is_nonsecure(void) {
 
 /*! \brief Returns the RP2350 chip revision number
  *  \ingroup pico_platform
- * @return the RP2350 chip revision number (1 for B0/B1, 2 for B2)
+ * @return the RP2350 chip revision number (2 for A2, 3 for A3/A4)
  */
 uint8_t rp2350_chip_version(void);
 
@@ -201,11 +207,11 @@ static inline uint8_t rp2040_chip_version(void) {
     return 2;
 }
 
-/*! \brief Returns the RP2040 rom version number
+/*! \brief Returns the RP2350 rom version number
  *  \ingroup pico_platform
- * @return the RP2040 rom version number (1 for RP2040-B0, 2 for RP2040-B1, 3 for RP2040-B2)
+ * @return the RP2350 rom version number (2 for RP2350-A2, 3 for RP2350-A3, 4 for RP2350-A4)
  */
-static inline uint8_t rp2040_rom_version(void) {
+static inline uint8_t rp2350_rom_version(void) {
     GCC_Pragma("GCC diagnostic push")
     GCC_Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
     return *(uint8_t*)0x13;

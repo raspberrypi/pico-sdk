@@ -78,6 +78,10 @@ cc_library(
         "//bazel/constraint:pico_binary_type_no_flash": ["PICO_NO_FLASH=1"],
         "//bazel/constraint:pico_binary_type_copy_to_ram": ["PICO_COPY_TO_RAM=1"],
         "//bazel/constraint:pico_binary_type_blocked_ram": ["PICO_USE_BLOCKED_RAM=1"],
+        "//bazel/constraint:pico_binary_type_xip_ram": [
+            "PICO_XIP_RAM=1",
+            "PICO_NO_FLASH=1",
+        ],
         "//conditions:default": [],
     }),
 )

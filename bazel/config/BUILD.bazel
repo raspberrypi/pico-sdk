@@ -237,6 +237,7 @@ string_flag(
         "no_flash",
         "copy_to_ram",
         "blocked_ram",
+        "xip_ram",
     ],
 )
 

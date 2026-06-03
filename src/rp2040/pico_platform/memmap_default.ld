@@ -42,6 +42,7 @@ INCLUDE "memmap_default.incl"
  *         ├── section_extra_post_scratch.incl           rp2_common/pico_standard_link
  *         ├── sections_stack.incl                       rp2_common/pico_standard_link
  *         ├── sections_psram.incl                       rp2040/pico_platform
+ *         ├── section_xip_ram.incl                      rp2_common/pico_standard_link
  *         ├── section_flash_end.incl                    rp2_common/pico_standard_link
  *         ├── section_end.incl                          rp2_common/pico_standard_link
  *         ├── section_generated_post_end.incl           rp2_common/pico_standard_link

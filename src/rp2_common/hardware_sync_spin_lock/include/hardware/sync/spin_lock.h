@@ -13,7 +13,7 @@
 // PICO_CONFIG: PICO_USE_SW_SPIN_LOCKS, Use software implementation for spin locks, type=bool, default=1 on RP2350 due to errata E2, group=hardware_sync
 #ifndef PICO_USE_SW_SPIN_LOCKS
 #if PICO_RP2350
-#define PICO_USE_SW_SPIN_LOCKS 1
+#define PICO_USE_SW_SPIN_LOCKS (!PICO_XIP_RAM)
 #endif
 #endif
 

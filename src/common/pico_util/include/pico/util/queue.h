@@ -47,9 +47,10 @@ typedef struct {
  * \param q Pointer to a queue_t structure, used as a handle
  * \param element_size Size of each value in the queue
  * \param element_count Maximum number of entries in the queue
- * \param spinlock_num The spin ID used to protect the queue
+ * \param spinlock_num The spinlock ID used to protect the queue
+ * \return true if the queue was initialized; false if it couldn't be (e.g. memory allocation failed)
  */
-void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num);
+bool queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num);
 
 /*! \brief Initialise a queue, allocating a (possibly shared) spinlock
  *  \ingroup queue
@@ -57,9 +58,10 @@ void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count,
  * \param q Pointer to a queue_t structure, used as a handle
  * \param element_size Size of each value in the queue
  * \param element_count Maximum number of entries in the queue
+ * \return true if the queue was initialized; false if it couldn't be (e.g. malloc failed)
  */
-static inline void queue_init(queue_t *q, uint element_size, uint element_count) {
-    queue_init_with_spinlock(q, element_size, element_count, next_striped_spin_lock_num());
+static inline bool queue_init(queue_t *q, uint element_size, uint element_count) {
+    return queue_init_with_spinlock(q, element_size, element_count, next_striped_spin_lock_num());
 }
 
 /*! \brief Destroy the specified queue.

@@ -303,3 +303,8 @@ config_setting(
     name = "pico_binary_type_blocked_ram",
     flag_values = {"//bazel/config:PICO_DEFAULT_BINARY_TYPE": "blocked_ram"},
 )
+
+config_setting(
+    name = "pico_binary_type_xip_ram",
+    flag_values = {"//bazel/config:PICO_DEFAULT_BINARY_TYPE": "xip_ram"},
+)
