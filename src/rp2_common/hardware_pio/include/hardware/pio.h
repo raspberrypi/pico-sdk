@@ -1083,7 +1083,7 @@ static inline void pio_set_sm_mask_enabled(PIO pio, uint32_t mask, bool enabled)
 }
 
 #if PICO_PIO_VERSION > 0
-/*! \brief Enable or disable multiple PIO state machines
+/*! \brief Enable or disable multiple PIO state machines on multiple PIOs
  *  \ingroup hardware_pio
  *
  * Note that this method just sets the enabled state of the state machine;
@@ -1100,7 +1100,9 @@ static inline void pio_set_sm_mask_enabled(PIO pio, uint32_t mask, bool enabled)
  */
 static inline void pio_set_sm_multi_mask_enabled(PIO pio, uint32_t mask_prev, uint32_t mask, uint32_t mask_next, bool enabled) {
     check_pio_param(pio);
+    check_sm_mask(mask_prev);
     check_sm_mask(mask);
+    check_sm_mask(mask_next);
     pio->ctrl = (pio->ctrl & ~(mask << PIO_CTRL_SM_ENABLE_LSB)) |
                 (enabled ? ((mask << PIO_CTRL_SM_ENABLE_LSB) & PIO_CTRL_SM_ENABLE_BITS) : 0) |
                 (enabled ? PIO_CTRL_NEXTPREV_SM_ENABLE_BITS : PIO_CTRL_NEXTPREV_SM_DISABLE_BITS) |
@@ -1236,7 +1238,9 @@ static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
  */
 static inline void pio_clkdiv_restart_sm_multi_mask(PIO pio, uint32_t mask_prev, uint32_t mask, uint32_t mask_next) {
     check_pio_param(pio);
+    check_sm_mask(mask_prev);
     check_sm_mask(mask);
+    check_sm_mask(mask_next);
     hw_set_bits(&pio->ctrl, ((mask << PIO_CTRL_CLKDIV_RESTART_LSB) & PIO_CTRL_CLKDIV_RESTART_BITS) |
                             PIO_CTRL_NEXTPREV_CLKDIV_RESTART_BITS |
                             ((mask_prev << PIO_CTRL_PREV_PIO_MASK_LSB) & PIO_CTRL_PREV_PIO_MASK_BITS) |
@@ -1279,9 +1283,9 @@ static inline void pio_enable_sm_mask_in_sync(PIO pio, uint32_t mask) {
  */
 static inline void pio_enable_sm_multi_mask_in_sync(PIO pio, uint32_t mask_prev, uint32_t mask, uint32_t mask_next) {
     check_pio_param(pio);
+    check_sm_mask(mask_prev);
     check_sm_mask(mask);
-    check_pio_param(pio);
-    check_sm_mask(mask);
+    check_sm_mask(mask_next);
     hw_set_bits(&pio->ctrl, ((mask << PIO_CTRL_CLKDIV_RESTART_LSB) & PIO_CTRL_CLKDIV_RESTART_BITS) |
                             ((mask << PIO_CTRL_SM_ENABLE_LSB) & PIO_CTRL_SM_ENABLE_BITS) |
                             PIO_CTRL_NEXTPREV_CLKDIV_RESTART_BITS | PIO_CTRL_NEXTPREV_SM_ENABLE_BITS |
