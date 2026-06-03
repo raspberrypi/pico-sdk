@@ -258,9 +258,9 @@ static __force_inline void *rom_data_lookup_inline(uint32_t code) {
  * and to limit the USB interfaces exposed.
  *
  * \if rp2350_specific
- * \note On RP2350A-A2 chips, errata RP2350-E3 prevents the activity LED working under Arm. You can define
- *       PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG=1 to have this method reboot to RISC-V USB boot to display
- *       the activity LED correctly.
+ * \note On RP2350A-A2 chips, errata RP2350-E3 prevents the activity LED working under Arm.
+ *       PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG=1 is defined by default to have this method reboot to
+ *       RISC-V USB boot to display the activity LED correctly.
  * \endif
  *
  * \param usb_activity_gpio_pin_mask 0 No pins are used as per a cold boot. Otherwise, a single bit set indicating which
@@ -286,9 +286,9 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
  * and to limit the USB interfaces exposed.
  *
  * \if rp2350_specific
- * \note On RP2350A-A2 chips, errata RP2350-E3 prevents the activity LED working under Arm. You can define
- *       PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG=1 to have this method reboot to RISC-V USB boot to display
- *       the activity LED correctly.
+ * \note On RP2350A-A2 chips, errata RP2350-E3 prevents the activity LED working under Arm.
+ *       PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG=1 is defined by default to have this method reboot to
+ *       RISC-V USB boot to display the activity LED correctly.
  * \endif
  *
  * \param usb_activity_gpio_pin  GPIO pin to be used as an activitiy pin, or -1 for none
