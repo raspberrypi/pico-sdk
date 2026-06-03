@@ -10,10 +10,13 @@
 #include "pico.h"
 
 // PICO_CONFIG: PICO_CXX_ENABLE_EXCEPTIONS, Whether C++ exceptions are enabled in the build, type=bool, default=value of CMake var PICO_CXX_ENABLE_EXCEPTIONS, group=pico_cxx_options
+#if 0 // make tooling checks happy
+#define PICO_CXX_ENABLE_EXCEPTIONS 0
+#endif
 
-// PICO_CONFIG: PICO_CXX_DISABLE_ALLOCATION_OVERRIDES, Disable SDK overrides of C++ new/delete operators, type=bool, default=0, group=pico_cxx_options
+// PICO_CONFIG: PICO_CXX_DISABLE_ALLOCATION_OVERRIDES, Disable SDK overrides of C++ new/delete operators, type=bool, default=0, advanced=true, group=pico_cxx_options
 
-// PICO_CONFIG: PICO_CXX_THREAD_SAFE_STATIC_INIT, Enable thread/IRQ safe locks for C++ static initializers , type=bool, default=1 when using pico_multicore, group=pico_cxx_options
+// PICO_CONFIG: PICO_CXX_THREAD_SAFE_STATIC_INIT, Enable thread/IRQ safe locks for C++ static initializers , type=bool, default=1 when using pico_multicore, advanced=true, group=pico_cxx_options
 #ifndef PICO_CXX_THREAD_SAFE_STATIC_INIT
 #define PICO_CXX_THREAD_SAFE_STATIC_INIT LIB_PICO_MULTICORE
 #endif
