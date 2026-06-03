@@ -107,7 +107,6 @@ cc_binary(
     name = "kitchen_sink_cpp",
     testonly = True,
     srcs = ["kitchen_sink_cpp.cpp"],
-    deps = [":kitchen_sink_common"],
     # todo - seems like the bazel clang build omits important library(s) containing new/delete (or we end
     #        up not providing them via new_delete.cpp for some reason).
     #        I'm leaving as a todo for now as building wil llvm-libc and clang outside of bazel work fine
@@ -116,6 +115,7 @@ cc_binary(
         "//bazel/constraint:pico_toolchain_clang_enabled": ["DISABLE_VECTOR_TEST=1"],
         "//conditions:default": [],
     }),
+    deps = [":kitchen_sink_common"],
 )
 
 cc_binary(

@@ -15,7 +15,7 @@
 
 // PICO_CONFIG: PICO_CXX_THREAD_SAFE_STATIC_INIT, Enable thread/IRQ safe locks for C++ static initializers , type=bool, default=1 when using pico_multicore, group=pico_cxx_options
 #ifndef PICO_CXX_THREAD_SAFE_STATIC_INIT
-//#define PICO_CXX_THREAD_SAFE_STATIC_INIT LIB_PICO_MULTICORE
+#define PICO_CXX_THREAD_SAFE_STATIC_INIT LIB_PICO_MULTICORE
 #endif
 
 #endif
