@@ -39,6 +39,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_cpp",
                 "//test/kitchen_sink:kitchen_sink_copy_to_ram",
                 "//test/kitchen_sink:kitchen_sink_no_flash",
+                "//test/kitchen_sink:kitchen_sink_cpp_no_flash",
                 "//test/kitchen_sink:kitchen_sink_blocked_ram",
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",

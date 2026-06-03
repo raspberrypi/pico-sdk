@@ -135,6 +135,22 @@ cc_binary(
 )
 
 cc_binary(
+    name = "kitchen_sink_cpp_no_flash_actual",
+    testonly = True,
+    srcs = ["kitchen_sink_cpp.cpp"],
+    # todo - seems like the bazel clang build omits important library(s) containing new/delete (or we end
+    #        up not providing them via new_delete.cpp for some reason).
+    #        I'm leaving as a todo for now as building wil llvm-libc and clang outside of bazel work fine
+    #        (note DISABLE_VECTOR_TEST avoids use of std::vector in kitchen_sink_test_cpp)
+    defines = select({
+        "//bazel/constraint:pico_toolchain_clang_enabled": ["DISABLE_VECTOR_TEST=1"],
+        "//conditions:default": [],
+    }),
+    tags = ["manual"],  # Built via kitchen_sink_cpp_no_flash
+    deps = [":kitchen_sink_common"],
+)
+
+cc_binary(
     name = "kitchen_sink_blocked_ram_actual",
     testonly = True,
     srcs = ["kitchen_sink.c"],
@@ -154,6 +170,14 @@ pico_set_binary_type(
     name = "kitchen_sink_no_flash",
     testonly = True,
     src = ":kitchen_sink_no_flash_actual",
+    binary_type = "no_flash",
+    target_compatible_with = compatible_with_rp2(),
+)
+
+pico_set_binary_type(
+    name = "kitchen_sink_cpp_no_flash",
+    testonly = True,
+    src = ":kitchen_sink_cpp_no_flash_actual",
     binary_type = "no_flash",
     target_compatible_with = compatible_with_rp2(),
 )
