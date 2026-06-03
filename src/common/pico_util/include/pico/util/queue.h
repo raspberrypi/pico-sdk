@@ -47,7 +47,7 @@ typedef struct {
  * \param q Pointer to a queue_t structure, used as a handle
  * \param element_size Size of each value in the queue
  * \param element_count Maximum number of entries in the queue
- * \param spinlock_num The spin ID used to protect the queue
+ * \param spinlock_num The spinlock ID used to protect the queue
  * \return true if the queue was initialized; false if it couldn't be (e.g. malloc failed)
  */
 bool queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num);
