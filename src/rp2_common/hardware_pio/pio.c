@@ -431,7 +431,12 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
     uint32_t required_gpio_ranges;
     if (gpio_count) required_gpio_ranges = (1u << (gpio_start >> 4)) | (1u << ((gpio_start + gpio_count - 1) >> 4));
     else            required_gpio_ranges = 0;
+#if PICO_PIO_USE_GPIO_BASE
     int passes = set_gpio_base ? 2 : 1;
+#else
+    ((void)set_gpio_base); // silently ignore parameter rather than error
+    int passes = 1;
+#endif
 
     for(int pass = 0; pass < passes; pass++) {
         int pio_num = NUM_PIOS;
