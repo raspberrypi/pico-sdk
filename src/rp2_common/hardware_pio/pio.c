@@ -107,15 +107,16 @@ int pio_set_gpio_base(PIO pio, uint gpio_base) {
     return rc;
 }
 
+// note this function checks compatibility of GPIO ranges even on PIO_VERSION 0;
+// i.e. it will fail if you try to ask for pins 32-47 on RP2040
 static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
 #if PICO_PIO_USE_GPIO_BASE
     bool gpio_base = pio_get_gpio_base(pio);
     return !((gpio_base && (used_gpio_ranges & 1)) ||
              (!gpio_base && (used_gpio_ranges & 4)));
-#else
+#else// PIO_VERSION 0, so no stored
     ((void)pio);
-    ((void)used_gpio_ranges);
-    return true;
+    return used_gpio_ranges < 4; // only using pins 0--31
 #endif
 }
 
@@ -123,6 +124,7 @@ static bool is_program_gpio_compatible(PIO pio, const pio_program_t *program) {
 #if PICO_PIO_VERSION > 0
     return is_gpio_compatible(pio, program->used_gpio_ranges);
 #else
+    // no stored gpio_ranges, os we assume we're good
     ((void)pio);
     ((void)program);
     return true;
@@ -448,6 +450,8 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
             if (rc >= 0) {
                 uint32_t save = hw_claim_lock();
                 if (pass) {
+                    // note that when PICO_PIO_USE_GPIO_BASE is false, this function
+                    // is a no-op, so is_gpio_compatible will fail below if offset 16 is required
                     pio_set_gpio_base_unsafe(*pio, required_gpio_ranges & 4 ? 16 : 0);
                 }
                 rc = is_gpio_compatible(*pio, required_gpio_ranges) ? 0 : -1;
