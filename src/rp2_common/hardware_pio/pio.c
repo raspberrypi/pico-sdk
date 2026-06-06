@@ -114,7 +114,7 @@ static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
     bool gpio_base = pio_get_gpio_base(pio);
     return !((gpio_base && (used_gpio_ranges & 1)) ||
              (!gpio_base && (used_gpio_ranges & 4)));
-#else// PIO_VERSION 0, so no stored
+#else
     ((void)pio);
     return used_gpio_ranges < 4; // only using pins 0--31
 #endif
