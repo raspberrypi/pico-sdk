@@ -124,7 +124,7 @@ static bool is_program_gpio_compatible(PIO pio, const pio_program_t *program) {
 #if PICO_PIO_VERSION > 0
     return is_gpio_compatible(pio, program->used_gpio_ranges);
 #else
-    // no stored gpio_ranges, os we assume we're good
+    // there are no stored gpio_ranges, so we assume we're good
     ((void)pio);
     ((void)program);
     return true;
