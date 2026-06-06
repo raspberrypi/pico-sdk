@@ -438,13 +438,13 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
             // We need to claim an SM on the PIO
             int8_t sm_index[NUM_PIO_STATE_MACHINES];
             // on second pass, if there is one, we try and claim all the state machines so that we can change the GPIO base
-            uint num_claimed;
-            for(num_claimed = 0; num_claimed < (pass ? NUM_PIO_STATE_MACHINES : 1u) ; num_claimed++) {
+            int num_claimed;
+            for(num_claimed = 0; num_claimed < (pass ? (int)NUM_PIO_STATE_MACHINES : 1) ; num_claimed++) {
                 sm_index[num_claimed] = (int8_t)pio_claim_unused_sm(*pio, false);
                 if (sm_index[num_claimed] < 0) break;
             }
             // rc = 0 if we claimed all the required state machines for the pass, <0 otherwise
-            int rc = num_claimed - (pass ? NUM_PIO_STATE_MACHINES : 1);
+            int rc = num_claimed - (pass ? (int)NUM_PIO_STATE_MACHINES : 1);
             if (rc >= 0) {
                 uint32_t save = hw_claim_lock();
                 if (pass) {
@@ -461,7 +461,7 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
             }
             // always un-claim all SMs other than the one we need (array index 0),
             // or all of them if we had an error
-            for (uint i = (rc >= 0); i < num_claimed; i++) {
+            for (int i = (rc >= 0); i < num_claimed; i++) {
                 pio_sm_unclaim(*pio, (uint) sm_index[i]);
             }
             if (rc >= 0) {
