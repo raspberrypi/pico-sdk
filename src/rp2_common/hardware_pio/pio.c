@@ -455,8 +455,6 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
             if (rc >= 0) {
                 uint32_t save = hw_claim_lock();
                 if (pass) {
-                    // note that when PICO_PIO_USE_GPIO_BASE is false, this function
-                    // is a no-op, so is_gpio_compatible will fail below if offset 16 is required
                     pio_set_gpio_base_unsafe(*pio, required_gpio_ranges & 4 ? 16 : 0);
                 }
                 rc = is_gpio_compatible(*pio, required_gpio_ranges) ? 0 : -1;
