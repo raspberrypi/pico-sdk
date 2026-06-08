@@ -28,6 +28,7 @@ typedef struct {
 
 /*! \brief Macro used to define a fixed-size bitset of a given size
  * \ingroup fixed_bitset
+ *
  * This macro is used to declare the type of a fixed-size bitset. It is used as follows:
  * ```
  * typedef fixed_bitset_type(17) my_bitset_t;
@@ -99,6 +100,7 @@ static inline uint fixed_bitset_word_size(const fixed_bitset_t *bitset) {
 
 /*! \brief Check that the bitset is valid
  * \ingroup fixed_bitset
+ *
  * This function will assert if the bitset is not valid.
  * \param bitset the bitset to check
  */

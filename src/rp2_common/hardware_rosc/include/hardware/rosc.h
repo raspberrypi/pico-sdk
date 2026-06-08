@@ -17,7 +17,7 @@ extern "C" {
 /** \file rosc.h
  *  \defgroup hardware_rosc hardware_rosc
  *
- * Ring Oscillator (ROSC) API
+ * \brief Ring Oscillator (ROSC) API
  *
  * A Ring Oscillator is an on-chip oscillator that requires no external crystal. Instead, the output is generated from a series of
  * inverters that are chained together to create a feedback loop. RP2 chips boot from the ring oscillator initially, meaning the

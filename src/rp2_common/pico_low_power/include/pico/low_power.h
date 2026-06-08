@@ -19,7 +19,7 @@ extern "C" {
 /** \file low_power.h
  *  \defgroup pico_low_power pico_low_power
  *
- * Lower Power APIs
+ * \brief Lower Power APIs
  *
  * There are three modes of operation: sleep, dormant, and Pstate, with the lowest power consumption being Pstate.
  *
@@ -53,9 +53,6 @@ extern "C" {
  *   so can be used for other persistent data.
  * \endif
  *
- * \subsection sleep_example Example
- * \addtogroup pico_sleep
- * \include hello_sleep.c
  */
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PICO_LOW_POWER, Enable/disable assertions in the pico_low_power module, type=bool, default=0, group=pico_low_power
@@ -122,6 +119,7 @@ typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
 
 /*! \brief  Sleep until an interrupt occurs
  *  \ingroup pico_low_power
+ *
  * Sleep until any interrupt occurs. The clocks specified in keep_enabled will be kept enabled during sleep.
  *
  * \param keep_enabled The clocks to keep enabled during sleep.
@@ -131,6 +129,7 @@ int low_power_sleep_until_irq(const clock_dest_bitset_t *keep_enabled);
 
 /*! \brief  Sleep until time using timer
  *  \ingroup pico_low_power
+ *
  * Sleep until the given timer reaches the specified value. The clocks specified in keep_enabled will be kept enabled during sleep, along with clocks required
  * for the timer. If exclusive is true, only the timer interrupt will be listened for, otherwise other interrupts will also be listened for.
  *
@@ -144,6 +143,7 @@ int low_power_sleep_until_timer(timer_hw_t *timer, absolute_time_t until, const 
 
 /*! \brief  Sleep until time using default timer
  *  \ingroup pico_low_power
+ *
  * See \ref low_power_sleep_until_timer for more information.
  *
  * \param until The time to sleep until.
@@ -157,6 +157,7 @@ static inline int low_power_sleep_until_default_timer(absolute_time_t until, con
 
 /*! \brief  Sleep until time using AON timer
  *  \ingroup pico_low_power
+ *
  * Sleep until the AON timer reaches the specified value. The clocks specified in keep_enabled will be kept enabled during sleep, along with clocks required
  * for the AON timer. If exclusive is true, only the AON timer interrupt will be listened for, otherwise other interrupts will also be listened for.
  *
@@ -170,6 +171,7 @@ int low_power_sleep_until_aon_timer(absolute_time_t until, const clock_dest_bits
 
 /*! \brief  Sleep until GPIO pin state changes
  *  \ingroup pico_low_power
+ *
  * Sleep until the given GPIO pin changes state. The clocks specified in keep_enabled will be kept enabled during sleep.
  * If exclusive is true, only the GPIO interrupt will be listened for, otherwise other interrupts will also be listened for.
  *
@@ -184,6 +186,7 @@ int low_power_sleep_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, co
 
 /*! \brief  Set the external clock source for the AON timer
  *  \ingroup pico_low_power
+ *
  * Set the external clock source for the AON timer. This is only used on RP2040.
  *
  * \param src_hz The frequency of the external clock source.
@@ -200,6 +203,7 @@ static inline int low_power_set_external_clock_source(__unused uint src_hz, __un
 
 /*! \brief  Go dormant until time using AON timer
  *  \ingroup pico_low_power
+ *
  * Go dormant until the given AON timer reaches the specified value.
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
  *
@@ -222,6 +226,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
 
 /*! \brief  Go dormant until GPIO pin state changes
  *  \ingroup pico_low_power
+ *
  * Go dormant until the given GPIO pin changes state.
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
  *
@@ -243,6 +248,7 @@ int low_power_dormant_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, 
 #if HAS_POWMAN_TIMER
 /*! \brief  Go to Pstate until time using AON timer
  *  \ingroup pico_low_power
+ *
  * Go to Pstate until the given AON timer reaches the specified value. The function specified in resume_func will be called on reboot,
  * with the low power Pstate passed to it.
  *
@@ -261,6 +267,7 @@ int low_power_pstate_until_aon_timer(absolute_time_t until, pstate_bitset_t *pst
 
 /*! \brief  Go to Pstate until GPIO pin state changes
  *  \ingroup pico_low_power
+ *
  * Go to Pstate until the given GPIO pin changes state. The function specified in resume_func will be called on reboot,
  * with the low power Pstate passed to it.
  *
@@ -291,6 +298,7 @@ pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate);
 
 /*! \brief  Start the AON timer at a specific time in milliseconds
  *  \ingroup pico_low_power
+ *
  * See \ref aon_timer_start for more information.
  *
  * If the AON timer is already running, this function will restart it
@@ -321,6 +329,7 @@ static inline bool low_power_start_aon_timer(void) {
 
 /*! \brief  Sleep for a number of microseconds
  *  \ingroup pico_low_power
+ *
  * See \ref low_power_sleep_until_default_timer for more information.
  *
  * \param us The number of microseconds to sleep.
@@ -334,6 +343,7 @@ static inline int low_power_sleep_for_us(timer_hw_t *timer, uint64_t us, const c
 
 /*! \brief  Sleep for a number of milliseconds
  *  \ingroup pico_low_power
+ *
  * See \ref low_power_sleep_until_default_timer for more information.
  *
  * \param ms The number of milliseconds to sleep.
@@ -348,6 +358,7 @@ static inline int low_power_sleep_for_ms(uint32_t ms, const clock_dest_bitset_t 
 /*! \brief  Go dormant for a number of milliseconds
 
  *  \ingroup pico_low_power
+ *
  * See \ref low_power_dormant_until_aon_timer for more information.
  *
  * \param ms The number of milliseconds to go dormant for.
@@ -363,6 +374,7 @@ static inline int low_power_dormant_for_ms(uint32_t ms, dormant_clock_source_t d
 #if HAS_POWMAN_TIMER
 /*! \brief  Go to Pstate for a number of milliseconds
  *  \ingroup pico_low_power
+ *
  * See \ref low_power_pstate_until_aon_timer for more information.
  *
  * \param ms The number of milliseconds to go to Pstate for.
