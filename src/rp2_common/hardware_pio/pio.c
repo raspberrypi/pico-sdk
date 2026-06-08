@@ -108,7 +108,7 @@ int pio_set_gpio_base(PIO pio, uint gpio_base) {
 }
 
 // note this function checks compatibility of GPIO ranges even on PIO_VERSION 0;
-// i.e. it will fail if you try to ask for pins 32-47 on RP2040
+// i.e. it will fail if you try to ask for pins 32-47 on RP2040 (or RP2350A)
 static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
 #if PICO_PIO_USE_GPIO_BASE
     bool gpio_base = pio_get_gpio_base(pio);
@@ -116,7 +116,7 @@ static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
              (!gpio_base && (used_gpio_ranges & 4)));
 #else
     ((void)pio);
-    return used_gpio_ranges < 4; // only using pins 0--31
+    return used_gpio_ranges < 4; // only using pins 0-31
 #endif
 }
 
