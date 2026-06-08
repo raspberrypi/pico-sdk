@@ -831,21 +831,34 @@ static inline int pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *confi
     // 0b00000 - pin is in range 0-15
     // 0b00001 - pin is in range 16-31
     // 0b00010 - pin is in range 32-47
-    uint32_t used = (~config->pinhi >> 4) & PINHI_ALL_PIN_LSBS; // checks if bit 5 of any field is 0
-    // configs that use pins 0-15
-    uint32_t gpio_under_16 = (~config->pinhi) & (~config->pinhi >> 1) & used; // checks if bits 0 and 1 of any field are both 0
-    // configs that use pins 32-47
-    uint32_t gpio_over_32 = (config->pinhi >> 1) & used; // checks if bit 1 of any field is 1
+
+    // boolean (in bit 0 of each field) 1=field_used
+    uint32_t field_used_flags = (~config->pinhi >> 4) & PINHI_ALL_PIN_LSBS;
+    // boolean (in bit 0 of each field) 1=no_used_pins_greather_than_15
+    // not,e we assume that if the field is used and no pins are used in the range 16-47, then pins 0-15 must be used
+    uint32_t gpio_under_16_flags = (~config->pinhi) & (~config->pinhi >> 1) & field_used_flags;
+    // boolean (in bit 0 of each field) 1=some_used_pins_greather_than_31
+    uint32_t gpio_over_32_flag = (config->pinhi >> 1) & field_used_flags;
     uint gpio_base = pio_get_gpio_base(pio);
-    invalid_params_if_and_return(PIO, gpio_under_16 && gpio_base, PICO_ERROR_BAD_ALIGNMENT);
-    invalid_params_if_and_return(PIO, gpio_over_32 && !gpio_base, PICO_ERROR_BAD_ALIGNMENT);
-    // flip the top bit of any used (execctrl/pinctrl) values to turn:
-    // bit6(32) + 0-15  -> base(16) + 16-31
-    // bit6(0)  + 16-31 -> base(16) + 0-15
-    static_assert(PINHI_EXECCTRL_LSB == 20, ""); // we use shifts to mask off bits below
-    pio->sm[sm].execctrl = config->execctrl ^ (gpio_base ? ((used >> PINHI_EXECCTRL_LSB) << (PIO_SM0_EXECCTRL_JMP_PIN_LSB + 4)) : 0);
-    // the "12" here is a result of "sizeof(used) - PINHI_EXECCTRL_LSB" (i.e. 32 - 20) and is used to shift off the execctrl bits
-    pio->sm[sm].pinctrl = config->pinctrl ^ (gpio_base ? ((used << 12) >> 8) : 0);
+    invalid_params_if_and_return(PIO, gpio_under_16_flags && gpio_base, PICO_ERROR_BAD_ALIGNMENT);
+    invalid_params_if_and_return(PIO, gpio_over_32_flag && !gpio_base, PICO_ERROR_BAD_ALIGNMENT);
+    // flip bit 4 of (execctrl/pinctrl) values, if gpio_base is non-zero (i.e. 16), to turn:
+    // pin & 32 | pin & 0x1f || base | pin_value
+    //     0    +    16-31   -> 16   + 0-15
+    //    32    +    0-15    -> 16   + 16-31
+    //
+    // note, that for gpio_base of zero we have:
+    // pin & 32 | pin & 0x1f || base | pin_value
+    //     0    +    0-15    -> 0    + 0-15
+    //     0    +    16-31   -> 0    + 16-31
+
+    // note we already checked (above) via static_assert( (1u << PINHI_EXECCTRL_LSB) > (PINHI_ALL_PINCTRL_LSBS * 0x1f), "")
+    // that PINHI_EXECTTRL_LSB is above all the pinctrl fields...
+
+    // ... so shift pinctrl bits off top, and flip EXECCTRL_JMP_PIN_MSB if used
+    pio->sm[sm].execctrl = config->execctrl ^ (gpio_base ? ((field_used_flags >> PINHI_EXECCTRL_LSB) << PIO_SM0_EXECCTRL_JMP_PIN_MSB) : 0);
+    // ... so shift exectrl bits off the top, and flip pinctrl MSBs if used
+    pio->sm[sm].pinctrl = config->pinctrl ^ (gpio_base ? ((field_used_flags << (32 - PINHI_EXECCTRL_LSB)) >> (32 - PINHI_EXECCTRL_LSB - 4)) : 0);
 #else
     pio->sm[sm].execctrl = config->execctrl;
     pio->sm[sm].pinctrl = config->pinctrl;
