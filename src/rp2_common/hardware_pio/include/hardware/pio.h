@@ -283,9 +283,14 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  *   and will return PICO_ERROR_BAD_ALIGNMENT if the configuration cannot be applied due to the above problem,
  *   or if the PIO's GPIO base (see \ref pio_set_gpio_base) does not allow access to the required pins.
  *
- *   To be clear, \ref pio_sm_set_config does not change the PIO's GPIO base for you; you must configre the PIO's
+ *   To be clear, \ref pio_sm_set_config does not change the PIO's GPIO base for you; you must configure the PIO's
  *   GPIO base before calling the method, however you can use \ref pio_claim_free_sm_and_add_program_for_gpio_range
  *   to find/configure a PIO instance suitable for a particular GPIO range.
+ *
+ * \note when `PICO_PIO_USE_GPIO_BASE == 1` \ref pio_sm_set_config ignores fields which haven't had the corresponding
+ * `sm_config_` pin function called, so that you don't have to move settings for unused pin sets into the correct
+ * pin range. Therefore it is always a best practice to explicitly configure a pin range starting at pon zero to 0,
+ * rather than relying on the default value being 0.
  *
  * You can set `PARAM_ASSERTIONS_ENABLED_HARDWARE_PIO = 1` to enable parameter checking to debug pin (or other) issues with
  * hardware_pio methods.
@@ -813,7 +818,7 @@ static inline void check_pio_pin_mask64(__unused PIO pio, __unused uint sm, __un
  *  \ingroup hardware_pio
  *
  * \if rp2350_specific
- * See \ref sm_config_pins "sm_config_ pins" for more detail on why this method might fail on RP2350B
+ * See \ref sm_config_pins "sm_config_pins" for more detail on why this method might fail on RP2350B
  * \endif
  * \param pio Handle to PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
@@ -835,14 +840,14 @@ static inline int pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *confi
     // boolean (in bit 0 of each field) 1=field_used
     uint32_t field_used_flags = (~config->pinhi >> 4) & PINHI_ALL_PIN_LSBS;
     // boolean (in bit 0 of each field) 1=no_used_pins_greather_than_15
-    // not,e we assume that if the field is used and no pins are used in the range 16-47, then pins 0-15 must be used
+    // note: we assume that if the field is used and no pins are used in the range 16-47, then pins 0-15 must be used
     uint32_t gpio_under_16_flags = (~config->pinhi) & (~config->pinhi >> 1) & field_used_flags;
     // boolean (in bit 0 of each field) 1=some_used_pins_greather_than_31
     uint32_t gpio_over_32_flag = (config->pinhi >> 1) & field_used_flags;
     uint gpio_base = pio_get_gpio_base(pio);
     invalid_params_if_and_return(PIO, gpio_under_16_flags && gpio_base, PICO_ERROR_BAD_ALIGNMENT);
     invalid_params_if_and_return(PIO, gpio_over_32_flag && !gpio_base, PICO_ERROR_BAD_ALIGNMENT);
-    // flip bit 4 of (execctrl/pinctrl) values, if gpio_base is non-zero (i.e. 16), to turn:
+    // flip bit 4 of used (execctrl/pinctrl) values if gpio_base is non-zero (i.e. 16), to turn:
     // pin & 32 | pin & 0x1f || base | pin_value
     //     0    +    16-31   -> 16   + 0-15
     //    32    +    0-15    -> 16   + 16-31
