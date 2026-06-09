@@ -848,14 +848,14 @@ static inline int pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *confi
     invalid_params_if_and_return(PIO, gpio_under_16_flags && gpio_base, PICO_ERROR_BAD_ALIGNMENT);
     invalid_params_if_and_return(PIO, gpio_over_32_flag && !gpio_base, PICO_ERROR_BAD_ALIGNMENT);
     // flip bit 4 of used (execctrl/pinctrl) values if gpio_base is non-zero (i.e. 16), to turn:
-    // pin & 32 | pin & 0x1f || base | pin_value
-    //     0    +    16-31   -> 16   + 0-15
-    //    32    +    0-15    -> 16   + 16-31
+    // pin    pin & 32 | pin & 0x1f || base | pin_value
+    // 16-31      0    +    16-31   -> 16   + 0-15
+    // 32-47     32    +    0-15    -> 16   + 16-31
     //
     // note, that for gpio_base of zero we have:
-    // pin & 32 | pin & 0x1f || base | pin_value
-    //     0    +    0-15    -> 0    + 0-15
-    //     0    +    16-31   -> 0    + 16-31
+    // pin    pin & 32 | pin & 0x1f || base | pin_value
+    // 0-15       0    +    0-15    -> 0    + 0-15
+    // 16-31      0    +    16-31   -> 0    + 16-31
 
     // note we already checked (above) via static_assert( (1u << PINHI_EXECCTRL_LSB) > (PINHI_ALL_PINCTRL_LSBS * 0x1f), "")
     // that PINHI_EXECTTRL_LSB is above all the pinctrl fields...
