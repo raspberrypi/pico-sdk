@@ -84,8 +84,8 @@ typedef struct async_context async_context_t;
  *  A "timeout" represents some future action that must be taken at a specific time.
  *  Its methods are called from the async_context under lock at the given time
  *
- * \see async_context_add_worker_at
- * \see async_context_add_worker_in_ms
+ * \see async_context_add_at_time_worker_at
+ * \see async_context_add_at_time_worker_in_ms
  */
 typedef struct async_work_on_timeout {
     /*!
@@ -119,8 +119,8 @@ typedef struct async_work_on_timeout {
  *  to some external stimulus (usually an IRQ).
  *  Its methods are called from the async_context under lock at the given time
  *
- * \see async_context_add_worker_at
- * \see async_context_add_worker_in_ms
+ * \see async_context_add_at_time_worker_at
+ * \see async_context_add_at_time_worker_in_ms
  */
 typedef struct async_when_pending_worker {
     /*!

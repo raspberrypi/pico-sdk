@@ -21,6 +21,10 @@
 extern "C" {
 #endif
 
+#ifndef __XSTRING
+#define __XSTRING(s) __STRING(s)
+#endif
+
 #define __not_in_flash(group)
 #define __not_in_flash_func(func) func
 #define __no_inline_not_in_flash_func(func) func
@@ -58,6 +62,12 @@ extern void tight_loop_contents();
 
 #ifndef __noinline
 #define __noinline __attribute__((noinline))
+#endif
+
+#ifndef __force_inline
+// don't think it is critical to inline in host mode, and this is simpler than picking the
+// correct attribute incantation for always_inline on different compiler versions
+#define __force_inline inline
 #endif
 
 #ifndef __aligned
@@ -152,6 +162,11 @@ static inline uint __get_current_exception(void) {
 }
 
 void busy_wait_at_least_cycles(uint32_t minimum_cycles);
+
+// PICO_CONFIG: PICO_NUM_VTABLE_IRQS, Number of IRQ handlers in the vector table - can be lowered to save space if you aren't using some higher IRQs, type=int, default=NUM_IRQS, group=hardware_irq
+#ifndef PICO_NUM_VTABLE_IRQS
+#define PICO_NUM_VTABLE_IRQS NUM_IRQS
+#endif
 
 #ifdef __cplusplus
 }

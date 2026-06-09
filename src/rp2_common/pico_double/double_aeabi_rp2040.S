@@ -7,6 +7,7 @@
 #if PICO_RP2040
 #include "pico/asm_helper.S"
 #include "pico/runtime_init.h"
+#include "pico/double.h"
 #include "pico/bootrom/sf_table.h"
 #include "hardware/divider_helper.S"
 
@@ -44,11 +45,9 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(__aeabi_double_init, PICO_RUNTIME_INIT_AEABI_DOUB
 #endif
 .endm
 
-.section .text
-
 #if PICO_DOUBLE_PROPAGATE_NANS
-.thumb_func
-__check_nan_d1:
+double_section __check_nan_d1
+regular_func __check_nan_d1
    movs r3, #1
    lsls r3, #21
    lsls r2, r1, #1
@@ -58,8 +57,8 @@ __check_nan_d1:
 1:
    bx ip
 
-.thumb_func
-__check_nan_d2:
+double_section __check_nan_d2
+regular_func __check_nan_d2
    push {r0, r2}
    movs r2, #1
    lsls r2, #21
@@ -649,7 +648,7 @@ regular_func double2fix_z
   lsrs r3, #21
   // adjust
   adds r3, r2
-  ble 2f // adjusted input is zero or dedornmal or < 1
+  ble 2f // adjusted input is zero or denormal or < 1
   lsrs r3, r3, #11
   bne 3f // adjusted input is > infinite
 

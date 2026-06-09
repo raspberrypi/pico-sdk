@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_pico_w", "incompatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,7 +8,7 @@ alias(
     actual = select({
         "//bazel/constraint:pico_lwip_config_unset": ":select_no_lwip",
         "//conditions:default": ":select_lwip",
-    })
+    }),
 )
 
 alias(

@@ -156,8 +156,8 @@ static const struct _binary_info_named_group __bi_lineno_var_name = { \
             .tag = _parent_tag, \
         },\
         .parent_id = _parent_id, \
-        .group_tag = _group_tag, \
         .flags = _flags, \
+        .group_tag = _group_tag, \
         .group_id = _group_id, \
         .label = _label \
     }

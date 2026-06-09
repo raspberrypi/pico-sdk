@@ -11,13 +11,16 @@
 
 // This header may be included by other board headers as "boards/pimoroni_pico_plus2_rp2350.h"
 
-// pico_cmake_set PICO_PLATFORM=rp2350
-
 #ifndef _BOARDS_PIMORONI_PICO_PLUS2_RP2350_H
 #define _BOARDS_PIMORONI_PICO_PLUS2_RP2350_H
 
+pico_board_cmake_set(PICO_PLATFORM, rp2350)
+
 // For board detection
 #define PIMORONI_PICO_PLUS2_RP2350
+
+// --- RP2350 VARIANT ---
+#define PICO_RP2350A 0
 
 // --- BOARD SPECIFIC ---
 #define SPCE_SPI 0
@@ -83,9 +86,19 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
+#endif
+
+// --- PSRAM ---
+#ifndef PICO_PSRAM_CS_PIN
+#define PICO_PSRAM_CS_PIN PIMORONI_PICO_PLUS2_PSRAM_CS_PIN
+#endif
+
+pico_board_cmake_set_default(PICO_PSRAM_SIZE_BYTES, (8 * 1024 * 1024))
+#ifndef PICO_PSRAM_SIZE_BYTES
+#define PICO_PSRAM_SIZE_BYTES (8 * 1024 * 1024)
 #endif
 
 // The GPIO Pin used to read VBUS to determine if the device is battery powered.
@@ -99,7 +112,7 @@
 #define PICO_VSYS_PIN 43
 #endif
 
-// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
+pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

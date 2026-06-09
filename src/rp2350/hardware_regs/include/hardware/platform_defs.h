@@ -42,7 +42,7 @@
 #define NUM_ADC_CHANNELS _u(9)
 #define ADC_BASE_PIN _u(40)
 #endif
-#define NUM_RESETS _u(28)
+#define NUM_RESETS _u(29)
 #define NUM_DOORBELLS _u(8)
 
 #if PICO_RP2350A
@@ -57,6 +57,7 @@
 #define NUM_OTP_ROWS (NUM_OTP_PAGES * NUM_OTP_PAGE_ROWS)
 
 #define PIO_INSTRUCTION_COUNT _u(32)
+#define PICO_PIO_VERSION _u(1)
 
 #define NUM_MPU_REGIONS _u(8)
 #define NUM_SAU_REGIONS _u(8)
@@ -73,6 +74,16 @@
 #define HAS_POWMAN_TIMER 1
 #define HAS_RP2350_TRNG 1
 #define HAS_HSTX 1
+#define HAS_PADS_BANK0_ISOLATION 1
+#define __RISCV_PMP_CHECKED 1
+
+#ifndef FPGA_CLK_SYS_HZ
+#define FPGA_CLK_SYS_HZ (48 * MHZ)
+#endif
+
+#ifndef FPGA_CLK_REF_HZ
+#define FPGA_CLK_REF_HZ (12 * MHZ)
+#endif
 
 // PICO_CONFIG: XOSC_HZ, Crystal oscillator frequency in Hz, type=int, default=12000000, advanced=true, group=hardware_base
 // NOTE:  The system and USB clocks are generated from the frequency using two PLLs.

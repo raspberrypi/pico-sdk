@@ -94,6 +94,9 @@ __force_inline static void __sev(void) {
     pico_default_asm_volatile ("sev");
 #endif
 }
+#else
+// Forward declare so we don't have to #include <arm_acle.h>.
+void __sev(void);
 #endif
 
 /*! \brief Insert a WFE instruction in to the code path.
@@ -110,6 +113,9 @@ __force_inline static void __wfe(void) {
     pico_default_asm_volatile ("wfe");
 #endif
 }
+#else
+// Forward declare so we don't have to #include <arm_acle.h>.
+void __wfe(void);
 #endif
 
 /*! \brief Insert a WFI instruction in to the code path.
@@ -121,6 +127,9 @@ __force_inline static void __wfe(void) {
 __force_inline static void __wfi(void) {
     pico_default_asm_volatile("wfi");
 }
+#else
+// Forward declare so we don't have to #include <arm_acle.h>.
+void __wfi(void);
 #endif
 
 /*! \brief Insert a DMB instruction in to the code path.
@@ -201,7 +210,7 @@ __force_inline static void __mem_fence_release(void) {
 /*! \brief Explicitly disable interrupts on the calling core
  *  \ingroup hardware_sync
  */
-__force_inline static uint32_t disable_interrupts(void) {
+__force_inline static void disable_interrupts(void) {
 #ifdef __riscv
     __compiler_memory_barrier();
     riscv_clear_csr(mstatus, 8);
@@ -214,7 +223,7 @@ __force_inline static uint32_t disable_interrupts(void) {
 /*! \brief Explicitly enable interrupts on the calling core
  *  \ingroup hardware_sync
  */
-__force_inline static uint32_t enable_interrupts(void) {
+__force_inline static void enable_interrupts(void) {
 #ifdef __riscv
     __compiler_memory_barrier();
     riscv_set_csr(mstatus, 8);
@@ -363,8 +372,8 @@ bool spin_lock_is_claimed(uint lock_num);
 #define remove_volatile_cast(t, x) (t)(x)
 #define remove_volatile_cast_no_barrier(t, x) (t)(x)
 #else
-#define remove_volatile_cast(t, x) ({__compiler_memory_barrier(); Clang_Pragma("clang diagnostic push"); Clang_Pragma("clang diagnostic ignored \"-Wcast-qual\""); (t)(x); Clang_Pragma("clang diagnostic pop"); })
-#define remove_volatile_cast_no_barrier(t, x) ({ Clang_Pragma("clang diagnostic push"); Clang_Pragma("clang diagnostic ignored \"-Wcast-qual\""); (t)(x); Clang_Pragma("clang diagnostic pop"); })
+#define remove_volatile_cast(t, x) (__compiler_memory_barrier(), Clang_Pragma("clang diagnostic push") Clang_Pragma("clang diagnostic ignored \"-Wcast-qual\"") (t)(x) Clang_Pragma("clang diagnostic pop"))
+#define remove_volatile_cast_no_barrier(t, x) Clang_Pragma("clang diagnostic push") Clang_Pragma("clang diagnostic ignored \"-Wcast-qual\"") (t)(x) Clang_Pragma("clang diagnostic pop")
 #endif
 
 #ifdef __cplusplus

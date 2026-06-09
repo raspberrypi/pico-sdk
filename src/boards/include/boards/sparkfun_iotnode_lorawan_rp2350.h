@@ -12,10 +12,10 @@
 //
 // This header may be included by other board headers as "boards/sparkfun_iotnode_lorawan_rp2350.h"
 
-// pico_cmake_set PICO_PLATFORM=rp2350
-
 #ifndef _BOARDS_SPARKFUN_IOTNODE_LORAWAN_RP2350_H
 #define _BOARDS_SPARKFUN_IOTNODE_LORAWAN_RP2350_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
 // For board detection
 #define SPARKFUN_IOTNODE_LORAWAN_RP2350
@@ -75,12 +75,22 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
 
-// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
+// --- PSRAM ---
+#ifndef PICO_PSRAM_CS_PIN
+#define PICO_PSRAM_CS_PIN 0
+#endif
+
+pico_board_cmake_set_default(PICO_PSRAM_SIZE_BYTES, (8 * 1024 * 1024))
+#ifndef PICO_PSRAM_SIZE_BYTES
+#define PICO_PSRAM_SIZE_BYTES (8 * 1024 * 1024)
+#endif
+
+pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

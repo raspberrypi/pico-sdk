@@ -41,8 +41,8 @@ static struct timeout {
     alarm_id_t alarm_id;
     absolute_time_t target;
     absolute_time_t fired_at;
-    uint pool;
     uint fired_count;
+    uint8_t pool;
     bool cancelled;
     bool not_cancelled; // tried to cancel but it was done
 } timeouts[NUM_TIMEOUTS];
@@ -85,6 +85,7 @@ static int issue_1953_test(void);
 static int issue_2118_test(void);
 static int issue_2148_test(void);
 static int issue_2186_test(void);
+static int issue_2374_test(void);
 
 int main() {
     setup_default_uart();
@@ -263,6 +264,8 @@ int main() {
     
     issue_2186_test();
 
+    issue_2374_test();
+
     PICOTEST_END_TEST();
 }
 
@@ -417,6 +420,45 @@ static int issue_2148_test(void) {
     PICOTEST_CHECK(tm.tm_year == tm_check.tm_year, "failed to get year");
 
     aon_timer_stop();
+    PICOTEST_END_SECTION();
+#endif
+    return 0;
+}
+
+static void fill_stack(int val) {
+    uint8_t array[50];
+    memset(array, val, sizeof(array));
+}
+
+// aon_timer_get_time called aon_timer_get_time_calendar which called datetime_to_tm
+// which didn't initialise tm_isdst
+static int issue_2374_test(void) {
+#if HAS_RP2040_RTC && !__clang__
+    PICOTEST_START_SECTION("Issue #2374 defect - time goes backwards");
+    setenv("TZ", "PST8PDT7,M3.2.0/2,M11.1.0/02:00:00", 1);
+    tzset();
+
+    struct timespec ts = { .tv_sec = 1743055938, .tv_nsec = 0 };
+    aon_timer_start(&ts);
+
+    struct timespec ts1;
+    fill_stack(1); // Setting tm_isdst if it's uninitialised
+    hard_assert(aon_timer_get_time(&ts1));
+
+    sleep_ms(1000);
+
+    struct timespec ts2;
+    fill_stack(0); // Setting tm_isdst if it's uninitialised
+    hard_assert(aon_timer_get_time(&ts2));
+
+    // Check time hasn't been adjusted due to dst
+    hard_assert(ts1.tv_sec == ts2.tv_sec - 1);
+
+    setenv("TZ", "", 1);
+    tzset();
+
+    aon_timer_stop();
+
     PICOTEST_END_SECTION();
 #endif
     return 0;

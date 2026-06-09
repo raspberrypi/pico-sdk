@@ -92,10 +92,16 @@
  * 19 | SPI1_IRQ
  * 20 | UART0_IRQ
  * 21 | UART1_IRQ
- * 22 | ADC0_IRQ_FIFO
+ * 22 | ADC_IRQ_FIFO
  * 23 | I2C0_IRQ
  * 24 | I2C1_IRQ
  * 25 | RTC_IRQ
+ * 26 | SPARE_IRQ_0
+ * 27 | SPARE_IRQ_1
+ * 28 | SPARE_IRQ_2
+ * 29 | SPARE_IRQ_3
+ * 30 | SPARE_IRQ_4
+ * 31 | SPARE_IRQ_5
  * \endif
  *
  * \if rp2350_specific
@@ -149,12 +155,12 @@
  * 43 | PLL_USB_IRQ
  * 44 | POWMAN_IRQ_POW
  * 45 | POWMAN_IRQ_TIMER
- * 46 | SPAREIRQ_IRQ_0
- * 47 | SPAREIRQ_IRQ_1
- * 48 | SPAREIRQ_IRQ_2
- * 49 | SPAREIRQ_IRQ_3
- * 50 | SPAREIRQ_IRQ_4
- * 51 | SPAREIRQ_IRQ_5
+ * 46 | SPARE_IRQ_0
+ * 47 | SPARE_IRQ_1
+ * 48 | SPARE_IRQ_2
+ * 49 | SPARE_IRQ_3
+ * 50 | SPARE_IRQ_4
+ * 51 | SPARE_IRQ_5
  * \endif
  */
 
@@ -195,7 +201,7 @@ extern "C" {
 typedef void (*irq_handler_t)(void);
 
 static inline void check_irq_param(__unused uint num) {
-    invalid_params_if(HARDWARE_IRQ, num >= NUM_IRQS);
+    invalid_params_if(HARDWARE_IRQ, num >= PICO_NUM_VTABLE_IRQS);
 }
 
 /*! \brief Set specified interrupt's priority
@@ -275,6 +281,21 @@ void irq_set_mask_enabled(uint32_t mask, bool enabled);
  * \param enabled true to enable the interrupts, false to disable them.
  */
 void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled);
+
+/*! \brief Get the current enabled mask on the executing core
+ *  \ingroup hardware_irq
+ *
+ * \return mask 32-bit mask with one bits set for the enabled interrupts \ref interrupt_nums
+ */
+ uint32_t irq_get_mask(void);
+
+ /*! \brief Get the current enabled mask on the executing core
+ *  \ingroup hardware_irq
+ *
+ * \param n the index of the mask to update. n == 0 means 0->31, n == 1 mean 32->63 etc.
+ * \return mask 32-bit mask with one bits set for the enabled interrupts \ref interrupt_nums
+ */
+ uint32_t irq_get_mask_n(uint n);
 
 /*! \brief  Set an exclusive interrupt handler for an interrupt on the executing core.
  *  \ingroup hardware_irq

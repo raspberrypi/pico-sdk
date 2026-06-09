@@ -11,10 +11,10 @@
 
 // This header may be included by other board headers as "boards/switchscience_picossci2_micro.h"
 
-// pico_cmake_set PICO_PLATFORM=rp2350
-
 #ifndef _BOARDS_SWITCHSCIENCE_PICOSSCI2_MICRO_H
 #define _BOARDS_SWITCHSCIENCE_PICOSSCI2_MICRO_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
 // For board detection
 #define SWITCHSCIENCE_PICOSSCI2_MICRO
@@ -61,12 +61,12 @@
 #endif
 
 // board has 4MB onboard flash
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (4 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (4 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
 #endif
 
-// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
+pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

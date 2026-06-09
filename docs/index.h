@@ -15,7 +15,7 @@
  * @{
  * \cond hardware_adc \defgroup hardware_adc hardware_adc \endcond
  * \cond hardware_base \defgroup hardware_base hardware_base \endcond
- * \cond hardware_bootlock \defgroup hardware_bootlock hardware_bootlock \endcond
+ * \cond hardware_boot_lock \defgroup hardware_boot_lock hardware_boot_lock \endcond
  * \cond hardware_claim \defgroup hardware_claim hardware_claim \endcond
  * \cond hardware_clocks \defgroup hardware_clocks hardware_clocks \endcond
  * \cond hardware_divider \defgroup hardware_divider hardware_divider \endcond
@@ -31,26 +31,25 @@
  * \cond hardware_pio \defgroup hardware_pio hardware_pio \endcond
  * \cond hardware_pll \defgroup hardware_pll hardware_pll \endcond
  * \cond hardware_powman \defgroup hardware_powman hardware_powman \endcond
+ * \cond hardware_psram \defgroup hardware_psram hardware_psram \endcond
  * \cond hardware_pwm \defgroup hardware_pwm hardware_pwm \endcond
- * \cond hardware_pwm \defgroup hardware_pwm hardware_pwm \endcond
+ * \cond hardware_rcp \defgroup hardware_rcp hardware_rcp \endcond
  * \cond hardware_resets \defgroup hardware_resets hardware_resets \endcond
  * \cond hardware_riscv \defgroup hardware_riscv hardware_riscv \endcond
  * \cond hardware_riscv_platform_timer \defgroup hardware_riscv_platform_timer hardware_riscv_platform_timer \endcond
+ * \cond hardware_rosc \defgroup hardware_rosc hardware_rosc \endcond
  * \cond hardware_rtc \defgroup hardware_rtc hardware_rtc \endcond
- * \cond hardware_rcp \defgroup hardware_rcp hardware_rcp \endcond
  * \cond hardware_spi \defgroup hardware_spi hardware_spi \endcond
  * \cond hardware_sha256 \defgroup hardware_sha256 hardware_sha256 \endcond
  * \cond hardware_sync \defgroup hardware_sync hardware_sync \endcond
  * \cond hardware_ticks \defgroup hardware_ticks hardware_ticks \endcond
  * \cond hardware_timer \defgroup hardware_timer hardware_timer \endcond
  * \cond hardware_uart \defgroup hardware_uart hardware_uart \endcond
+ * \cond hardware_usb \defgroup hardware_usb hardware_usb \endcond
  * \cond hardware_vreg \defgroup hardware_vreg hardware_vreg \endcond
  * \cond hardware_watchdog \defgroup hardware_watchdog hardware_watchdog \endcond
  * \cond hardware_xip_cache \defgroup hardware_xip_cache hardware_xip_cache \endcond
  * \cond hardware_xosc \defgroup hardware_xosc hardware_xosc \endcond
- * \cond hardware_powman hardware_powman
- * \cond hardware_hazard3 hardware_hazard3
- * \cond hardware_riscv hardware_riscv
 
  * @}
  *
@@ -61,11 +60,14 @@
  * \cond pico_aon_timer \defgroup pico_aon_timer pico_aon_timer \endcond
  * \cond pico_async_context \defgroup pico_async_context pico_async_context \endcond
  * \cond pico_bootsel_via_double_reset \defgroup pico_bootsel_via_double_reset pico_bootsel_via_double_reset \endcond
+ * \cond pico_fix \defgroup pico_fix pico_fix \endcond
  * \cond pico_flash \defgroup pico_flash pico_flash \endcond
  * \cond pico_i2c_slave \defgroup pico_i2c_slave pico_i2c_slave \endcond
+ * \cond pico_low_power \defgroup pico_low_power pico_low_power \endcond
  * \cond pico_multicore \defgroup pico_multicore pico_multicore \endcond
  * \cond pico_rand \defgroup pico_rand pico_rand \endcond
  * \cond pico_sha256 \defgroup pico_sha256 pico_sha256 \endcond
+ * \cond pico_status_led \defgroup pico_status_led pico_status_led \endcond
  * \cond pico_stdlib \defgroup pico_stdlib pico_stdlib \endcond
  * \cond pico_sync \defgroup pico_sync pico_sync \endcond
  * \cond pico_time \defgroup pico_time pico_time \endcond
@@ -80,6 +82,7 @@
  * \defgroup tinyusb_device tinyusb_device
  * \defgroup tinyusb_host tinyusb_host
  * \endcond
+ * \cond pico_mbedtls \defgroup pico_mbedtls pico_mbedtls \endcond
  * @}
  *
  * \defgroup networking Networking Libraries
@@ -118,6 +121,7 @@
  * \cond pico_stdio \defgroup pico_stdio pico_stdio \endcond
  * \cond pico_standard_binary_info \defgroup pico_standard_binary_info pico_standard_binary_info \endcond
  * \cond pico_standard_link \defgroup pico_standard_link pico_standard_link \endcond
+ * \cond pico_thread_local \defgroup pico_thread_local pico_thread_local \endcond
  * @}
  *
  * \defgroup misc External API Headers
@@ -127,5 +131,6 @@
  * \cond boot_picoboot_headers \defgroup boot_picoboot_headers boot_picoboot_headers \endcond
  * \cond boot_uf2_headers \defgroup boot_uf2_headers boot_uf2_headers \endcond
  * \cond pico_usb_reset_interface_headers \defgroup pico_usb_reset_interface_headers pico_usb_reset_interface_headers \endcond
+ * \cond pico_usb_reset \defgroup pico_usb_reset pico_usb_reset \endcond
  * @}
 */

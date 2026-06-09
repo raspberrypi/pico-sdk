@@ -8,6 +8,7 @@
 
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/rvcsr.h"
+#include "hardware/regs/watchdog.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom_constants.h"
@@ -28,6 +29,14 @@
 
 #ifndef PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK
 #define PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK (PICO_CRT0_INCLUDE_PICOBIN_BLOCK && !PICO_NO_FLASH)
+#endif
+
+#ifndef PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+#define PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM 1
+#endif
+
+#ifndef PICO_CRT0_NO_DATA_COPY
+#define PICO_CRT0_NO_DATA_COPY PICO_NO_FLASH
 #endif
 
 // If vectors are in RAM, we put them in the .data section, so that they are
@@ -160,64 +169,24 @@ check_irq_before_exit:
     addi sp, sp, 80
     mret
 
+
 // Default software vector table for system interrupts, routed through
 // mip.meip. Note this is assumed in e.g. hardware_irq to begin exactly 0x34
 // words after the hardware vector table indicated by mtvec (defined above).
 .p2align 4
 .global __soft_vector_table
 __soft_vector_table:
-.word isr_irq0
-.word isr_irq1
-.word isr_irq2
-.word isr_irq3
-.word isr_irq4
-.word isr_irq5
-.word isr_irq6
-.word isr_irq7
-.word isr_irq8
-.word isr_irq9
-.word isr_irq10
-.word isr_irq11
-.word isr_irq12
-.word isr_irq13
-.word isr_irq14
-.word isr_irq15
-.word isr_irq16
-.word isr_irq17
-.word isr_irq18
-.word isr_irq19
-.word isr_irq20
-.word isr_irq21
-.word isr_irq22
-.word isr_irq23
-.word isr_irq24
-.word isr_irq25
-.word isr_irq26
-.word isr_irq27
-.word isr_irq28
-.word isr_irq29
-.word isr_irq30
-.word isr_irq31
-.word isr_irq32
-.word isr_irq33
-.word isr_irq34
-.word isr_irq35
-.word isr_irq36
-.word isr_irq37
-.word isr_irq38
-.word isr_irq39
-.word isr_irq40
-.word isr_irq41
-.word isr_irq42
-.word isr_irq43
-.word isr_irq44
-.word isr_irq45
-.word isr_irq46
-.word isr_irq47
-.word isr_irq48
-.word isr_irq49
-.word isr_irq50
-.word isr_irq51
+.macro vtable_irq_n n
+.word isr_irq\n
+.endm
+
+.altmacro
+.set IRQN, 0
+.rept PICO_NUM_VTABLE_IRQS
+vtable_irq_n %IRQN
+.set IRQN, IRQN + 1
+.endr
+.noaltmacro
 
 // all default trap handlers do nothing, and we can check for them being set to our
 // default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
@@ -252,58 +221,25 @@ decl_isr isr_riscv_machine_exception
 decl_isr_bkpt isr_riscv_machine_timer
 decl_isr_bkpt isr_riscv_machine_soft_irq
 
-decl_isr isr_irq0
-decl_isr isr_irq1
-decl_isr isr_irq2
-decl_isr isr_irq3
-decl_isr isr_irq4
-decl_isr isr_irq5
-decl_isr isr_irq6
-decl_isr isr_irq7
-decl_isr isr_irq8
-decl_isr isr_irq9
-decl_isr isr_irq10
-decl_isr isr_irq11
-decl_isr isr_irq12
-decl_isr isr_irq13
-decl_isr isr_irq14
-decl_isr isr_irq15
-decl_isr isr_irq16
-decl_isr isr_irq17
-decl_isr isr_irq18
-decl_isr isr_irq19
-decl_isr isr_irq20
-decl_isr isr_irq21
-decl_isr isr_irq22
-decl_isr isr_irq23
-decl_isr isr_irq24
-decl_isr isr_irq25
-decl_isr isr_irq26
-decl_isr isr_irq27
-decl_isr isr_irq28
-decl_isr isr_irq29
-decl_isr isr_irq30
-decl_isr isr_irq31
-decl_isr isr_irq32
-decl_isr isr_irq33
-decl_isr isr_irq34
-decl_isr isr_irq35
-decl_isr isr_irq36
-decl_isr isr_irq37
-decl_isr isr_irq38
-decl_isr isr_irq39
-decl_isr isr_irq40
-decl_isr isr_irq41
-decl_isr isr_irq42
-decl_isr isr_irq43
-decl_isr isr_irq44
-decl_isr isr_irq45
-decl_isr isr_irq46
-decl_isr isr_irq47
-decl_isr isr_irq48
-decl_isr isr_irq49
-decl_isr isr_irq50
-decl_isr isr_irq51
+// Declare all the ISR labels
+.macro decl_isr_n n
+.if \n < PICO_NUM_VTABLE_IRQS
+    decl_isr isr_irq\n
+.elseif \n < NUM_IRQS
+    // We declare a strong label, so user can't override, since there is no vtable entry
+    .type isr_irq\n,%function
+    .thumb_func
+    isr_irq\n:
+.endif
+.endm
+
+.altmacro
+.set IRQN, 0
+.rept PICO_NUM_VTABLE_IRQS
+decl_isr_n %IRQN
+.set IRQN, IRQN + 1
+.endr
+.noaltmacro
     // fall through
 
 // All unhandled USER IRQs fall through to here. Note there is no way to get
@@ -362,11 +298,30 @@ binary_info_header:
 .global _entry_point
 _entry_point:
 
-#if PICO_NO_FLASH
-    // Go through our own reset handler. Same path for debugger entry and
+#if !PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+    // Fall through to _reset_handler. Same path for debugger entry and
     // bootloader entry.
-    j _reset_handler
 #else
+    #if PICO_NO_FLASH
+        // Launch this no_flash binary using a RAM image boot
+        la a1, WATCHDOG_BASE + WATCHDOG_SCRATCH2_OFFSET // offsets start from here, to fit in sw immediate
+        // scratch 2 = __logical_binary_start
+        la a0, __logical_binary_start
+        sw a0, 0(a1)
+        // scratch 3 = size
+        li a0, SRAM_END - SRAM_BASE // assume maximum size for block loop
+        sw a0, 4(a1)
+        // scratch 4&7 = magic number
+        li a0, 0xb007c0d3
+        sw a0, 8(a1)
+        sw a0, 20(a1)
+        // scratch 5 = magic number xored with -(magic number) == -2
+        li a0, -2
+        sw a0, 12(a1)
+        // scratch 6 = ram image boot == 3
+        li a0, 3
+        sw a0, 16(a1)
+    #endif
     // Debugger tried to run code after loading, so SSI is in 03h-only mode.
     // Go back through bootrom + boot2 to properly initialise flash.
     j reenter_bootrom
@@ -417,7 +372,7 @@ _call_xip_setup:
 
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
-#if !PICO_NO_FLASH
+#if !PICO_CRT0_NO_DATA_COPY
     la a4, data_cpy_table
 
     // assume there is at least one entry
@@ -456,14 +411,25 @@ platform_entry: // symbol for stack traces
     ebreak
     j 1b
 
+#if !PICO_CRT0_NO_DATA_COPY
+#if PICO_NO_FLASH
+data_cpy:
+    // skip copies with same source and destination
+    beq a0, a1, data_cpy_done
+#else
+    // go straight into the copy
+    #define data_cpy_start data_cpy
+#endif
 data_cpy_loop:
     lw a0, (a1)
     sw a0, (a2)
     addi a1, a1, 4
     addi a2, a2, 4
-data_cpy:
+data_cpy_start:
     bltu a2, a3, data_cpy_loop
+data_cpy_done:
     ret
+#endif
 
 .align 2
 data_cpy_table:
@@ -488,6 +454,12 @@ data_cpy_table:
 .word __scratch_y_source__
 .word __scratch_y_start__
 .word __scratch_y_end__
+
+#if PICO_USE_XIP_CACHE_AS_RAM
+.word __xip_ram_source__
+.word __xip_ram_start__
+.word __xip_ram_end__
+#endif
 
 .word 0 // null terminator
 

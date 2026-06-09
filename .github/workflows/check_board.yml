@@ -1,0 +1,27 @@
+name: Check Board Headers
+
+on:
+  push:
+    paths:
+      - 'src/boards/include/boards/**'
+      - 'tools/check_board_header.py'
+      - 'tools/check_all_board_headers.sh'
+      - '.github/workflows/check_board.yml'
+  pull_request:
+    paths:
+      - 'src/boards/include/boards/**'
+      - 'tools/check_board_header.py'
+      - 'tools/check_all_board_headers.sh'
+      - '.github/workflows/check_board.yml'
+
+jobs:
+  check-board-headers:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Board Headers
+        run: |
+          tools/check_all_board_headers.sh

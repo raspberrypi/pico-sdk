@@ -11,4 +11,10 @@
 #define LWIP_DNS                    1
 #define LWIP_SOCKET                 0
 #define LWIP_NETCONN                0
+
+// For testing mbedtls
+#define LWIP_ALTCP               	1
+#define LWIP_ALTCP_TLS           	1
+#define LWIP_ALTCP_TLS_MBEDTLS   	1
+
 #endif

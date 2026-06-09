@@ -109,8 +109,6 @@ extern "C" {
 
 void __sev();
 
-void __wev();
-
 void __wfi();
 
 void __wfe();
@@ -120,6 +118,10 @@ uint32_t save_and_disable_interrupts();
 void restore_interrupts(uint32_t status);
 
 void restore_interrupts_from_disabled(uint32_t status);
+
+void disable_interrupts(void);
+
+void enable_interrupts(void);
 
 uint spin_lock_get_num(spin_lock_t *lock);
 

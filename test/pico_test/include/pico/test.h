@@ -39,11 +39,13 @@ but not sure that is implemented yet.
 
 #define PICOTEST_CHECK_AND_ABORT(COND, MESSAGE) if (!(COND)) {                                     \
                                         printf("Module %s: %s\n", picotest_module, MESSAGE);       \
+                                        picotest_error_code = -1;                                   \
                                         return -1;                                                  \
                                     }
 
 #define PICOTEST_CHECK_CHANNEL_AND_ABORT(CHANNEL, COND, MESSAGE) if (!(COND)) {                    \
                                         printf("Module %s, channel %d: %s\n", picotest_module, CHANNEL, MESSAGE);  \
+                                        picotest_error_code = -1;                                   \
                                         return -1;                                                  \
                                     }
 
@@ -52,10 +54,17 @@ but not sure that is implemented yet.
                                         return -1;                                                  \
                                     }
 
-#define PICOTEST_END_TEST()       if (picotest_error_code != 0)                                     \
-                                      {printf("%s: Failed\n", picotest_description); return -1;}  \
-                                  else                                                              \
-                                      {printf("%s: Success\n", picotest_description); return 0;}
+// Calls stdio_deinit_all before exiting, to avoid losing final output
+#define PICOTEST_END_TEST()         if (picotest_error_code != 0) {                                 \
+                                        printf("%s: Failed\n", picotest_description);               \
+                                        stdio_deinit_all();                                         \
+                                        return -1;                                                  \
+                                    } else {                                                        \
+                                        printf("%s: Success\n", picotest_description);              \
+                                        puts("PASSED");                                             \
+                                        stdio_deinit_all();                                         \
+                                        return 0;                                                   \
+                                    }
 
 
 #endif

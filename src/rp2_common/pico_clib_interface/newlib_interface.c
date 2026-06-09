@@ -47,6 +47,9 @@ void __attribute__((noreturn)) __weak _exit(__unused int status) {
 #endif
 }
 
+void __weak _fini(void) {
+}
+
 __weak void *_sbrk(int incr) {
     extern char end; /* Set by linker.  */
     static char *heap_end;
@@ -150,6 +153,12 @@ int __attribute__((weak)) _fstat(__unused int fd, __unused struct stat *buf) {
 
 int __attribute__((weak)) _isatty(int fd) {
     return fd == STDIO_HANDLE_STDIN || fd == STDIO_HANDLE_STDOUT || fd == STDIO_HANDLE_STDERR;
+}
+
+int __attribute__((weak)) _getentropy (__unused void *buffer, __unused size_t length) {
+    // note we don't hook this up as it isn't clear if/where it is used, and we don't particularly
+    // want to pull in pico_rand. the user can supply their own strong implementation if they need it!
+    return -1;
 }
 
 // exit is not useful... no desire to pull in __call_exitprocs

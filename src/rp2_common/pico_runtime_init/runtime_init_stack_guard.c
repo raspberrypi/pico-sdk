@@ -32,7 +32,7 @@ void runtime_init_per_core_install_stack_guard(void *stack_bottom) {
                    | 0x10000000; // XN = disable instruction fetch; no other bits means no permissions
 
 #elif defined(__riscv)
-    #if !PICO_RP2350
+#if !__RISCV_PMP_CHECKED
 #error "Check PMP configuration for new platform"
 #endif
     // RISC-V PMP, RP2350 configuration of Hazard3: 8 non-hardwired regions,

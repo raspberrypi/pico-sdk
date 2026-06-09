@@ -63,10 +63,14 @@ extern "C" {
 #endif
 
 #ifndef CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE
+#if CYW43_USE_FIRMWARE_PARTITION
+#define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "cyw43_partition_firmware.h"
+#else
 #if CYW43_ENABLE_BLUETOOTH
 #define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "wb43439A0_7_95_49_00_combined.h"
 #else
 #define CYW43_CHIPSET_FIRMWARE_INCLUDE_FILE "w43439A0_7_95_49_00_combined.h"
+#endif
 #endif
 #endif
 
@@ -196,6 +200,20 @@ void cyw43_post_poll_hook(void);
 #endif
 #ifndef cyw43_free
 #define cyw43_free free
+#endif
+
+// PICO_CONFIG: PICO_CYW43_LOGGING_ENABLED, Enable/disable CYW43_PRINTF used for logging in cyw43 components. Has no effect if CYW43_PRINTF is defined by the user, default=1, type=bool, group=pico_cyw43_driver
+#ifndef PICO_CYW43_LOGGING_ENABLED
+#define PICO_CYW43_LOGGING_ENABLED 1
+#endif
+
+#if !defined(CYW43_PRINTF) && !PICO_CYW43_LOGGING_ENABLED
+#define CYW43_PRINTF(...) (void)0
+#endif
+
+// PICO_CONFIG: CYW43_LWIP_DEFAULT, Sets the default value of CYW43_LWIP if it's undefined. CYW43_LWIP defines if cyw43-driver uses LwIP. The default behavior - if it's not defined anywhere - is to set it to 1 and cyw43-driver will use lwIP requiring you to provide an lwipopts.h header file. You can set CYW43_LWIP_DEFAULT to change the default to 0 and avoid using lwIP if CYW43_LWIP is undefined, type=bool, group=pico_cyw43_driver
+#if !defined CYW43_LWIP && defined CYW43_LWIP_DEFAULT
+#define CYW43_LWIP CYW43_LWIP_DEFAULT
 #endif
 
 #ifdef __cplusplus

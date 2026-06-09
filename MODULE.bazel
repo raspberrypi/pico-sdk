@@ -1,13 +1,15 @@
 module(
     name = "pico-sdk",
-    version = "2.1.2-develop",
+    version = "2.2.1-develop",
 )
 
 bazel_dep(name = "platforms", version = "0.0.9")
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
 bazel_dep(name = "rules_python", version = "0.36.0")
-bazel_dep(name = "picotool", version = "2.1.1")
+bazel_dep(name = "picotool", version = "2.2.0")
 bazel_dep(name = "rules_cc", version = "0.0.10")
+
+bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2", dev_dependency = True)
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
@@ -16,7 +18,10 @@ http_archive(
     build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
     sha256 = "8fd8b4a0a8d44ab2e195ccfbeef42223dfb3ede29d80f14dcf2183c34b8d199a",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-aarch64-arm-none-eabi",
-    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-aarch64-arm-none-eabi.tar.xz",
+    urls = [
+        "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-aarch64-arm-none-eabi.tar.xz",
+        "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-aarch64-arm-none-eabi.tar.xz",
+    ],
 )
 
 http_archive(
@@ -24,7 +29,10 @@ http_archive(
     build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
     sha256 = "6cd1bbc1d9ae57312bcd169ae283153a9572bd6a8e4eeae2fedfbc33b115fdbb",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi",
-    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
+    urls = [
+        "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
+        "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz",
+    ],
 )
 
 http_archive(
@@ -32,7 +40,10 @@ http_archive(
     build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
     sha256 = "51d933f00578aa28016c5e3c84f94403274ea7915539f8e56c13e2196437d18f",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi",
-    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip",
+    urls = [
+        "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip",
+        "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.zip",
+    ],
 )
 
 http_archive(
@@ -40,7 +51,10 @@ http_archive(
     build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
     sha256 = "075faa4f3e8eb45e59144858202351a28706f54a6ec17eedd88c9fb9412372cc",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-x86_64-arm-none-eabi",
-    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-x86_64-arm-none-eabi.tar.xz",
+    urls = [
+        "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-x86_64-arm-none-eabi.tar.xz",
+        "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-x86_64-arm-none-eabi.tar.xz",
+    ],
 )
 
 http_archive(
@@ -48,7 +62,10 @@ http_archive(
     build_file = "//bazel/toolchain:gcc_arm_none_eabi.BUILD",
     sha256 = "39c44f8af42695b7b871df42e346c09fee670ea8dfc11f17083e296ea2b0d279",
     strip_prefix = "arm-gnu-toolchain-13.2.Rel1-darwin-arm64-arm-none-eabi",
-    url = "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-arm64-arm-none-eabi.tar.xz",
+    urls = [
+        "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-arm64-arm-none-eabi.tar.xz",
+        "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-darwin-arm64-arm-none-eabi.tar.xz",
+    ],
 )
 
 http_archive(
@@ -84,10 +101,10 @@ http_archive(
     url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:910be4ff90d7d07bd4518ea03b85c0974672bf9c",
 )
 
-new_git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # TODO: Provide tinyusb as a proper Bazel module.
-new_git_repository(
+git_repository(
     name = "tinyusb",
     build_file = "//src/rp2_common/tinyusb:tinyusb.BUILD",
     commit = "86ad6e56c1700e85f1c5678607a762cfe3aa2f47",  # keep-in-sync-with-submodule: lib/tinyusb
@@ -95,27 +112,34 @@ new_git_repository(
 )
 
 # TODO: Provide btstack as a proper Bazel module.
-new_git_repository(
+git_repository(
     name = "btstack",
     build_file = "//src/rp2_common/pico_btstack:btstack.BUILD",
-    commit = "501e6d2b86e6c92bfb9c390bcf55709938e25ac1",  # keep-in-sync-with-submodule: lib/btstack
+    commit = "420dc137399796c88b0013ee09f157046018923e",  # keep-in-sync-with-submodule: lib/btstack
     remote = "https://github.com/bluekitchen/btstack.git",
 )
 
 # TODO: Provide cyw43-driver as a proper Bazel module.
-new_git_repository(
+git_repository(
     name = "cyw43-driver",
     build_file = "//src/rp2_common/pico_cyw43_driver:cyw43-driver.BUILD",
-    commit = "c1075d4bc440422cf2b2fd12c64a1f53f77660ee",  # keep-in-sync-with-submodule: lib/cyw43-driver
+    commit = "dd7568229f3bf7a37737b9e1ef250c26efe75b23",  # keep-in-sync-with-submodule: lib/cyw43-driver
     remote = "https://github.com/georgerobotics/cyw43-driver.git",
 )
 
 # TODO: Provide lwip as a proper Bazel module.
-new_git_repository(
+git_repository(
     name = "lwip",
     build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
-    commit = "0a0452b2c39bdd91e252aef045c115f88f6ca773",  # keep-in-sync-with-submodule: lib/lwip
+    commit = "77dcd25a72509eb83f72b033d219b1d40cd8eb95",  # keep-in-sync-with-submodule: lib/lwip
     remote = "https://github.com/lwip-tcpip/lwip.git",
+)
+
+git_repository(
+    name = "mbedtls",
+    build_file = "//src/rp2_common/pico_mbedtls:mbedtls.BUILD",
+    commit = "107ea89daaefb9867ea9121002fbbdf926780e98",  # keep-in-sync-with-submodule: lib/mbedtls
+    remote = "https://github.com/Mbed-TLS/mbedtls.git",
 )
 
 register_toolchains(
@@ -138,12 +162,13 @@ python.toolchain(
     configure_coverage_tool = True,
     python_version = "3.9",
 )
-
 use_repo(python, "pythons_hub")
+
 register_toolchains(
     "@pythons_hub//:all",
     dev_dependency = True,
 )
+
 register_toolchains(
     "@rules_python//python/runtime_env_toolchains:all",
     dev_dependency = True,

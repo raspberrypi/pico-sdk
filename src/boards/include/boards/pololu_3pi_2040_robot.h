@@ -9,19 +9,23 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// pico_cmake_set PICO_PLATFORM=rp2040
-
 #ifndef _BOARDS_POLOLU_3PI_2040_ROBOT_H
 #define _BOARDS_POLOLU_3PI_2040_ROBOT_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
 #define POLOLU_3PI_2040_ROBOT
 
+#ifndef PICO_DEFAULT_LED_PIN
 #define PICO_DEFAULT_LED_PIN 25
+#endif
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
 #define PICO_FLASH_SPI_CLKDIV 2
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
+#ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
+#endif
 
 // All boards have at least the B1 revision
 #define PICO_RP2040_B0_SUPPORTED 0

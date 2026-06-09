@@ -7,6 +7,11 @@
 #ifndef _PICO_CYW43_ARCH_ARCH_FREERTOS_H
 #define _PICO_CYW43_ARCH_ARCH_FREERTOS_H
 
+// PICO_CONFIG: CYW43_NO_DEFAULT_TASK_STACK, Disables the default static allocation of the CYW43 FreeRTOS task stack, type=bool, default=0, group=pico_cyw43_arch
+#ifndef CYW43_NO_DEFAULT_TASK_STACK
+#define CYW43_NO_DEFAULT_TASK_STACK 0
+#endif
+
 // PICO_CONFIG: CYW43_TASK_STACK_SIZE, Stack size for the CYW43 FreeRTOS task in 4-byte words, type=int, default=1024, group=pico_cyw43_arch
 #ifndef CYW43_TASK_STACK_SIZE
 #define CYW43_TASK_STACK_SIZE 1024

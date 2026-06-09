@@ -16,8 +16,12 @@
 
 // ----------------------------------------------------------------------------
 // RCP instructions (this header is Arm-only)
-#if defined(PICO_RP2350) && !defined(__riscv)
+#if HAS_REDUNDANCY_COPROCESSOR
+#ifdef __riscv
+#error "HAS_REDUNDANCY_COPROCESSOR should be false on RISC-V"
+#endif
 
+#define rcp_is_true(x) ((x) == RCP_MASK_TRUE)
 #define RCP_MASK_TRUE   _u(0xa500a500)
 #define RCP_MASK_FALSE  _u(0x00c300c3)
 #define RCP_MASK_INTXOR _u(0x96009600)
@@ -84,6 +88,7 @@ static __rcpinline void rcp_salt_core1_nodelay(uint64_t salt) {
 
 // Get a 32-bit canary value. `tag` must be a constant expression.
 #define rcp_canary_get(tag) ({ \
+    static_assert(!((tag) & ~0xffu), "Tag out of range"); \
     uint32_t __canary_u32; \
     rcp_asm ( \
         "mrc p7, #0, %0, c%c1, c%c2, #1\n" \
@@ -94,6 +99,7 @@ static __rcpinline void rcp_salt_core1_nodelay(uint64_t salt) {
 })
 
 #define rcp_canary_get_nodelay(tag) ({ \
+    static_assert(!((tag) & ~0xffu), "Tag out of range"); \
     uint32_t __canary_u32; \
     rcp_asm ( \
         "mrc2 p7, #0, %0, c%c1, c%c2, #1\n" \
@@ -105,6 +111,7 @@ static __rcpinline void rcp_salt_core1_nodelay(uint64_t salt) {
 
 // Assert that canary matches result of rcp_canary_get with the same tags:
 #define rcp_canary_check(tag, canary) ({ \
+    static_assert(!((tag) & ~0xffu), "Tag out of range"); \
     rcp_asm ( \
         "mcr p7, #0, %0, c%c1, c%c2, #1\n" \
         : : "r" (canary), \
@@ -113,6 +120,7 @@ static __rcpinline void rcp_salt_core1_nodelay(uint64_t salt) {
 })
 
 #define rcp_canary_check_nodelay(tag, canary) ({ \
+    static_assert(!((tag) & ~0xffu), "Tag out of range"); \
     rcp_asm ( \
         "mcr2 p7, #0, %0, c%c1, c%c2, #1\n" \
         : : "r" (canary), \
@@ -138,6 +146,9 @@ static __rcpinline uint32_t rcp_canary_status_nodelay(void) {
 
 // ----------------------------------------------------------------------------
 // RCP Boolean instructions
+
+// These instructions assert that all their arguments are valid booleans, in
+// addition to any other logical conditions
 
 // Assert b is a valid boolean (0xa500a500u or 0x00c300c3u)
 static __rcpinline void rcp_bvalid(uint32_t b) {
@@ -306,106 +317,8 @@ static __rcpinline __attribute__((noreturn)) void rcp_panic(void) {
 #else // __ASSEMBLER__
 #ifndef __riscv
 
-// Assert b is a valid boolean (0xa500a500u or 0x00c300c3u)
-.macro rcp_bvalid r
-    mcr p7, #1, \r , c0, c0, #0
-.endm
-
-.macro rcp_bvalid_nodelay r
-    mcr2 p7, #1, \r , c0, c0, #0
-.endm
-
-// Assert b is true (0xa500a500u)
-.macro rcp_btrue r
-    mcr p7, #2, \r , c0, c0, #0
-.endm
-
-.macro rcp_btrue_nodelay r
-    mcr2 p7, #2, \r , c0, c0, #0
-.endm
-
-// Assert b is false (0x00c300c3u)
-.macro rcp_bfalse r
-    mcr p7, #3, \r , c0, c0, #1
-.endm
-
-.macro rcp_bfalse_nodelay r
-    mcr2 p7, #3, \r , c0, c0, #1
-.endm
-
-// Assert b0 and b1 are both valid booleans
-.macro rcp_b2valid b0, b1
-    mcrr p7, #0, \b0 , \b1 , c8
-.endm
-
-.macro rcp_b2valid_nodelay b0, b1
-    mcrr2 p7, #0, \b0 , \b1 , c8
-.endm
-
-// Assert b0 and b1 are both true
-.macro rcp_b2and b0, b1
-    mcrr p7, #1, \b0 , \b1 , c0
-.endm
-
-.macro rcp_b2and_nodelay b0, b1
-    mcrr2 p7, #1, \b0 , \b1 , c0
-.endm
-
-// Assert b0 and b1 are valid, and at least one is true
-.macro rcp_b2or b0, b1
-    mcrr p7, #2, \b0 , \b1 , c0
-.endm
-
-.macro rcp_b2or_nodelay b0, b1
-    mcrr2 p7, #2, \b0 , \b1 , c0
-.endm
-
-// Assert (b ^ mask) is a valid boolean
-.macro rcp_bxorvalid b, mask
-    mcrr p7, #3, \b , \mask , c8
-.endm
-
-.macro rcp_bxorvalid_nodelay b, mask
-    mcrr2 p7, #3, \b , \mask , c8
-.endm
-
-// Assert (b ^ mask) is true
-.macro rcp_bxortrue b, mask
-    mcrr p7, #4, \b , \mask , c0
-.endm
-
-.macro rcp_bxortrue_nodelay b, mask
-    mcrr2 p7, #4, \b , \mask , c0
-.endm
-
-// Assert (b ^ mask) is false
-.macro rcp_bxorfalse b, mask
-    mcrr p7, #5, \b , \mask , c8
-.endm
-
-.macro rcp_bxorfalse_nodelay b, mask
-    mcrr2 p7, #5, \b , \mask , c8
-.endm
-
-// Assert (x ^ parity) == 0x96009600u
-.macro rcp_ivalid x, parity
-    mcrr p7, #6, \x , \parity , c8
-.endm
-
-.macro rcp_ivalid_nodelay x, parity
-    mcrr2 p7, #6, \x , \parity , c8
-.endm
-
-// Assert x == y
-.macro rcp_iequal x, y
-    mcrr p7, #7, \x , \y , c0
-.endm
-
-.macro rcp_iequal_nodelay x, y
-    mcrr2 p7, #7, \x , \y , c0
-.endm
-
-// They call this "metaprogramming" I think
+// Meta-macro for evaluating assembler constant expressions and encoding as
+// coprocessor register pairs:
 .macro rcp_switch_u8_to_ch_cl macro_name, x, args:vararg
 .if (\x) == 0
 \macro_name  c0,  c0, \args
@@ -924,6 +837,114 @@ static __rcpinline __attribute__((noreturn)) void rcp_panic(void) {
 .endif
 .endm
 
+// ----------------------------------------------------------------------------
+// RCP Boolean instructions
+
+// Assert b is a valid boolean (0xa500a500u or 0x00c300c3u)
+.macro rcp_bvalid r
+    mcr p7, #1, \r , c0, c0, #0
+.endm
+
+.macro rcp_bvalid_nodelay r
+    mcr2 p7, #1, \r , c0, c0, #0
+.endm
+
+// Assert b is true (0xa500a500u)
+.macro rcp_btrue r
+    mcr p7, #2, \r , c0, c0, #0
+.endm
+
+.macro rcp_btrue_nodelay r
+    mcr2 p7, #2, \r , c0, c0, #0
+.endm
+
+// Assert b is false (0x00c300c3u)
+.macro rcp_bfalse r
+    mcr p7, #3, \r , c0, c0, #1
+.endm
+
+.macro rcp_bfalse_nodelay r
+    mcr2 p7, #3, \r , c0, c0, #1
+.endm
+
+// Assert b0 and b1 are both valid booleans
+.macro rcp_b2valid b0, b1
+    mcrr p7, #0, \b0 , \b1 , c8
+.endm
+
+.macro rcp_b2valid_nodelay b0, b1
+    mcrr2 p7, #0, \b0 , \b1 , c8
+.endm
+
+// Assert b0 and b1 are both true
+.macro rcp_b2and b0, b1
+    mcrr p7, #1, \b0 , \b1 , c0
+.endm
+
+.macro rcp_b2and_nodelay b0, b1
+    mcrr2 p7, #1, \b0 , \b1 , c0
+.endm
+
+// Assert b0 and b1 are valid, and at least one is true
+.macro rcp_b2or b0, b1
+    mcrr p7, #2, \b0 , \b1 , c0
+.endm
+
+.macro rcp_b2or_nodelay b0, b1
+    mcrr2 p7, #2, \b0 , \b1 , c0
+.endm
+
+// Assert (b ^ mask) is a valid boolean
+.macro rcp_bxorvalid b, mask
+    mcrr p7, #3, \b , \mask , c8
+.endm
+
+.macro rcp_bxorvalid_nodelay b, mask
+    mcrr2 p7, #3, \b , \mask , c8
+.endm
+
+// Assert (b ^ mask) is true
+.macro rcp_bxortrue b, mask
+    mcrr p7, #4, \b , \mask , c0
+.endm
+
+.macro rcp_bxortrue_nodelay b, mask
+    mcrr2 p7, #4, \b , \mask , c0
+.endm
+
+// Assert (b ^ mask) is false
+.macro rcp_bxorfalse b, mask
+    mcrr p7, #5, \b , \mask , c8
+.endm
+
+.macro rcp_bxorfalse_nodelay b, mask
+    mcrr2 p7, #5, \b , \mask , c8
+.endm
+
+// ----------------------------------------------------------------------------
+// RCP Integer instructions
+
+// Assert (x ^ parity) == 0x96009600u
+.macro rcp_ivalid x, parity
+    mcrr p7, #6, \x , \parity , c8
+.endm
+
+.macro rcp_ivalid_nodelay x, parity
+    mcrr2 p7, #6, \x , \parity , c8
+.endm
+
+// Assert x == y
+.macro rcp_iequal x, y
+    mcrr p7, #7, \x , \y , c0
+.endm
+
+.macro rcp_iequal_nodelay x, y
+    mcrr2 p7, #7, \x , \y , c0
+.endm
+
+// ----------------------------------------------------------------------------
+// RCP Sequence count instructions
+
 // Directly write 8-bit constant expression cnt to the sequence counter.
 .macro rcp_count_set_impl h, l
 mcr p7, #4, r0, \h , \l , #0
@@ -955,20 +976,20 @@ rcp_switch_u8_to_ch_cl rcp_count_check_impl, \cnt
 rcp_switch_u8_to_ch_cl rcp_count_check_nodelay_impl, \cnt
 .endm
 
+// ----------------------------------------------------------------------------
+// RCP Canary instructions
+
 // Get a 32-bit canary value. `tag` must be a constant expression.
 .macro rcp_canary_get_impl h, l, x
    mrc p7, #0, \x, \h, \l, #1
 .endm
-
 .macro rcp_canary_get x, tag
 rcp_switch_u8_to_ch_cl rcp_canary_get_impl \tag, \x
 .endm
 
-// Get a 32-bit canary value. `tag` must be a constant expression.
 .macro rcp_canary_get_nodelay_impl h, l, x
    mrc2 p7, #0, \x, \h, \l, #1
 .endm
-
 .macro rcp_canary_get_nodelay x, tag
 rcp_switch_u8_to_ch_cl rcp_canary_get_nodelay_impl \tag, \x
 .endm
@@ -977,7 +998,6 @@ rcp_switch_u8_to_ch_cl rcp_canary_get_nodelay_impl \tag, \x
 .macro rcp_canary_check_impl h, l, x
    mcr p7, #0, \x, \h, \l, #1
 .endm
-
 .macro rcp_canary_check x, tag
 rcp_switch_u8_to_ch_cl rcp_canary_check_impl \tag, \x
 .endm
@@ -985,7 +1005,6 @@ rcp_switch_u8_to_ch_cl rcp_canary_check_impl \tag, \x
 .macro rcp_canary_check_nodelay_impl h, l, x
    mcr2 p7, #0, \x, \h, \l, #1
 .endm
-
 .macro rcp_canary_check_nodelay x, tag
 rcp_switch_u8_to_ch_cl rcp_canary_check_nodelay_impl \tag, \x
 .endm
@@ -1001,5 +1020,7 @@ rcp_switch_u8_to_ch_cl rcp_canary_check_nodelay_impl \tag, \x
 #ifdef __cplusplus
 }
 #endif
+#else
+#define rcp_is_true(x) ((int32_t)(x) < 0)
 #endif
 #endif

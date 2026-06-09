@@ -8,6 +8,15 @@
 #include "pico/runtime_init.h"
 
 
+/*! \brief  Handle a hard_assert condition failure
+*  \ingroup pico_runtime
+*
+* This weak function provides the default implementation (call \ref panic with "Hard assert") for if a \ref hard_assert
+* condition fail in non debug builds. You can provide your own strong implementation to replace the default behavior
+*
+* \sa hard_assert
+*/
+
 void __weak hard_assertion_failure(void) {
     panic("Hard assert");
 }

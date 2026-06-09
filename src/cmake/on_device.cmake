@@ -15,18 +15,38 @@ function(pico_get_runtime_output_directory TARGET output_path_name)
     set(${output_path_name} ${output_path} PARENT_SCOPE)
 endfunction()
 
+function(pico_get_output_name TARGET output_name_var)
+    get_target_property(output_name ${TARGET} OUTPUT_NAME)
+    # Generator expressions not supported in byproducts
+    set(output_name_copy ${output_name})
+    string(GENEX_STRIP "${output_name}" output_name)
+    if (NOT output_name OR (NOT output_name STREQUAL output_name_copy))
+        get_target_property(output_name ${TARGET} NAME)
+    endif()
+    set(${output_name_var} ${output_name} PARENT_SCOPE)
+endfunction()
+
+# pico_add_hex_output(TARGET)
+# \brief\ Generate a hex file for the target
 function(pico_add_hex_output TARGET)
     pico_get_runtime_output_directory(${TARGET} output_path)
-    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${TARGET}> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.hex VERBATIM)
+    pico_get_output_name(${TARGET} output_name)
+    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${TARGET}> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.hex VERBATIM BYPRODUCTS "${output_path}${output_name}.hex")
 endfunction()
 
+# pico_add_bin_output(TARGET)
+# \brief\ Generate a bin file for the target
 function(pico_add_bin_output TARGET)
     pico_get_runtime_output_directory(${TARGET} output_path)
-    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${TARGET}> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.bin VERBATIM)
+    pico_get_output_name(${TARGET} output_name)
+    add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${TARGET}> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.bin VERBATIM BYPRODUCTS "${output_path}${output_name}.bin")
 endfunction()
 
+# pico_add_dis_output(TARGET)
+# \brief\ Generate a disassembly file for the target
 function(pico_add_dis_output TARGET)
     pico_get_runtime_output_directory(${TARGET} output_path)
+    pico_get_output_name(${TARGET} output_name)
 
     # PICO_CMAKE_CONFIG: PICO_NO_COPRO_DIS, Disable disassembly listing postprocessing that disassembles RP2350 coprocessor instructions, type=bool, default=0, group=build
     if (NOT (PICO_NO_COPRO_DIS OR PICO_NO_PICOTOOL OR PICO_RISCV OR PICO_RP2040))
@@ -42,9 +62,14 @@ function(pico_add_dis_output TARGET)
             COMMAND ${CMAKE_OBJDUMP} -d ${PICO_DISASM_OBJDUMP_ARGS} $<TARGET_FILE:${TARGET}> >> ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.dis
             ${EXTRA_COMMAND}
             VERBATIM
+            BYPRODUCTS "${output_path}${output_name}.dis"
             )
 endfunction()
 
+# pico_add_extra_outputs(TARGET)
+# \brief_nodesc\ Perform post-build actions for the target
+#
+# Perform picotool processing and add disassembly, hex, bin, map, and uf2 outputs for the target
 function(pico_add_extra_outputs TARGET)
     # Disassembly will be nonsense for encrypted binaries,
     # so disassemble before picotool processing
@@ -78,6 +103,7 @@ function(pico_add_extra_outputs TARGET)
                 COMMAND rm -f "${PICO_SYMLINK_ELF_AS_FILENAME}"
                 COMMAND ln -s -r $<TARGET_FILE:${TARGET}> "${PICO_SYMLINK_ELF_AS_FILENAME}"
                 COMMENT "Symlinking from ${PICO_SYMLINK_ELF_AS_FILENAME} to ${TARGET}"
+                BYPRODUCTS "${PICO_SYMLINK_ELF_AS_FILENAME}"
                 )
     endif ()
     # PICO_CMAKE_CONFIG: PICO_NO_UF2, Disable UF2 output, type=bool, default=0, group=build

@@ -45,10 +45,12 @@ cc_args(
     args = [
         "-mcpu=cortex-m33",
         "-march=armv8-m.main+fp+dsp",
-        "-mfloat-abi=softfp",
         "-mthumb",
         "-mcmse",
-    ],
+    ] + select({
+        "//bazel/constraint:pico_hard_float_abi_enabled": ["-mfloat-abi=hard"],
+        "//conditions:default": ["-mfloat-abi=softfp"],
+    }),
 )
 
 # :no_canonical_system_headers and :no_canonical_prefixes both prevent built-in
@@ -89,15 +91,46 @@ cc_args(
 )
 
 cc_args(
-    name = "opt_debug_args",
+    name = "debug_args",
     actions = [
         "@rules_cc//cc/toolchains/actions:compile_actions",
         "@rules_cc//cc/toolchains/actions:link_actions",
     ],
-    args = [
-        "-Og",  # TODO: Make this configurable.
-        "-g3",
+    args = select({
+        "//bazel/constraint:pico_compilation_no_debug_args_set": [],
+        "//conditions:default": [
+            "-Og",
+            "-g3",
+        ],
+    }),
+)
+
+cc_args(
+    name = "opt_args",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
     ],
+    args = select({
+        "//bazel/constraint:pico_compilation_no_opt_args_set": [],
+        "//conditions:default": [
+            "-O2",
+            "-DNDEBUG",
+        ],
+    }),
+)
+
+cc_args(
+    name = "fastbuild_args",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:compile_actions",
+        "@rules_cc//cc/toolchains/actions:link_actions",
+    ],
+    args = select({
+        "//bazel/constraint:pico_compilation_no_fastbuild_args_set": [],
+        # The conditions default are kept as nothing here, The bazel docs default are -gmlt -Wl,-S.
+        "//conditions:default": [],
+    }),
 )
 
 configurable_toolchain_feature(
@@ -132,16 +165,22 @@ configurable_toolchain_feature(
     linkopts = ["-Wl,-z,max-page-size=4096"],
 )
 
-# TODO: Make this shim unnecessary.
-cc_args_list(
-    name = "all_opt_debug_args",
-    args = [":opt_debug_args"],
+cc_feature(
+    name = "dbg",
+    args = [":debug_args"],
+    overrides = "@rules_cc//cc/toolchains/features:dbg",
 )
 
 cc_feature(
-    name = "override_debug",
-    args = [":all_opt_debug_args"],
-    overrides = "@rules_cc//cc/toolchains/features:dbg",
+    name = "opt",
+    args = [":opt_args"],
+    overrides = "@rules_cc//cc/toolchains/features:opt",
+)
+
+cc_feature(
+    name = "fastbuild",
+    args = [":fastbuild_args"],
+    overrides = "@rules_cc//cc/toolchains/features:fastbuild",
 )
 
 HOSTS = (
@@ -165,7 +204,6 @@ _HOST_CPU_CONSTRAINTS = {
 
 [cc_toolchain(
     name = "arm_gcc_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
-    tool_map = "@arm_gcc_{}-{}//:all_tools".format(host_os, host_cpu),
     args = select({
         "//bazel/constraint:rp2040": [":cortex-m0"],
         "//bazel/constraint:rp2350": [":cortex-m33"],
@@ -173,23 +211,8 @@ _HOST_CPU_CONSTRAINTS = {
     }) + [
         ":bazel_no_absolute_paths",
     ],
-    exec_compatible_with = [
-        _HOST_CPU_CONSTRAINTS[host_cpu],
-        _HOST_OS_CONSTRAINTS[host_os],
-    ],
-    tags = ["manual"],  # Don't try to build this in wildcard builds.
-    known_features = [
-        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
-        "@pico-sdk//bazel/toolchain:override_debug",
-        "@pico-sdk//bazel/toolchain:gc_sections",
-        "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
-        "@pico-sdk//bazel/toolchain:cxx_no_rtti",
-        "@pico-sdk//bazel/toolchain:cxx_no_cxa_atexit",
-        "@pico-sdk//bazel/toolchain:override_max_page_size",
-    ],
     enabled_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
-        "@pico-sdk//bazel/toolchain:override_debug",
     ] + select({
         "//bazel/constraint:pico_no_gc_sections_enabled": [],
         "//conditions:default": [":gc_sections"],
@@ -206,11 +229,27 @@ _HOST_CPU_CONSTRAINTS = {
         "//bazel/constraint:pico_use_default_max_page_size_enabled": [],
         "//conditions:default": [":override_max_page_size"],
     }),
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    known_features = [
+        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
+        "@pico-sdk//bazel/toolchain:dbg",
+        "@pico-sdk//bazel/toolchain:opt",
+        "@pico-sdk//bazel/toolchain:fastbuild",
+        "@pico-sdk//bazel/toolchain:gc_sections",
+        "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
+        "@pico-sdk//bazel/toolchain:cxx_no_rtti",
+        "@pico-sdk//bazel/toolchain:cxx_no_cxa_atexit",
+        "@pico-sdk//bazel/toolchain:override_max_page_size",
+    ],
+    tags = ["manual"],  # Don't try to build this in wildcard builds.
+    tool_map = "@arm_gcc_{}-{}//:all_tools".format(host_os, host_cpu),
 ) for host_os, host_cpu in HOSTS]
 
 [cc_toolchain(
     name = "clang_{}-{}_toolchain_cortex-m".format(host_os, host_cpu),
-    tool_map = "@clang_{}-{}//:all_tools".format(host_os, host_cpu),
     args = select({
         "//bazel/constraint:rp2040": [
             ":armv6m-none-eabi",
@@ -225,23 +264,8 @@ _HOST_CPU_CONSTRAINTS = {
         ":bazel_no_absolute_paths",
         ":llvm-libc_args",
     ],
-    exec_compatible_with = [
-        _HOST_CPU_CONSTRAINTS[host_cpu],
-        _HOST_OS_CONSTRAINTS[host_os],
-    ],
-    tags = ["manual"],  # Don't try to build this in wildcard builds.
-    known_features = [
-        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
-        "@pico-sdk//bazel/toolchain:override_debug",
-        "@pico-sdk//bazel/toolchain:gc_sections",
-        "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
-        "@pico-sdk//bazel/toolchain:cxx_no_rtti",
-        "@pico-sdk//bazel/toolchain:cxx_no_cxa_atexit",
-        "@pico-sdk//bazel/toolchain:override_max_page_size",
-    ],
     enabled_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
-        "@pico-sdk//bazel/toolchain:override_debug",
     ] + select({
         "//bazel/constraint:pico_no_gc_sections_enabled": [],
         "//conditions:default": [":gc_sections"],
@@ -258,6 +282,23 @@ _HOST_CPU_CONSTRAINTS = {
         "//bazel/constraint:pico_use_default_max_page_size_enabled": [],
         "//conditions:default": [":override_max_page_size"],
     }),
+    exec_compatible_with = [
+        _HOST_CPU_CONSTRAINTS[host_cpu],
+        _HOST_OS_CONSTRAINTS[host_os],
+    ],
+    known_features = [
+        "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
+        "@pico-sdk//bazel/toolchain:dbg",
+        "@pico-sdk//bazel/toolchain:opt",
+        "@pico-sdk//bazel/toolchain:fastbuild",
+        "@pico-sdk//bazel/toolchain:gc_sections",
+        "@pico-sdk//bazel/toolchain:cxx_no_exceptions",
+        "@pico-sdk//bazel/toolchain:cxx_no_rtti",
+        "@pico-sdk//bazel/toolchain:cxx_no_cxa_atexit",
+        "@pico-sdk//bazel/toolchain:override_max_page_size",
+    ],
+    tags = ["manual"],  # Don't try to build this in wildcard builds.
+    tool_map = "@clang_{}-{}//:all_tools".format(host_os, host_cpu),
 ) for host_os, host_cpu in HOSTS]
 
 [toolchain(

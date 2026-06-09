@@ -9,10 +9,10 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// pico_cmake_set PICO_PLATFORM=rp2040
-
 #ifndef _BOARDS_METROTECH_XERXES_RP2040_H
 #define _BOARDS_METROTECH_XERXES_RP2040_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 #define USR_SW_PIN 18
 #define USR_BTN_PIN 24
@@ -144,7 +144,7 @@
 #define PICO_XOSC_STARTUP_DELAY_MULTIPLIER 16
 #endif // !PICO_XOSC_STARTUP_DELAY_MULTIPLIER
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (16 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 /**
  * @brief 16MiB, Flash size in bytes

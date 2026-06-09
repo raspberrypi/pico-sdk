@@ -23,6 +23,12 @@ extern "C" {
  */
 const btstack_run_loop_t *btstack_run_loop_async_context_get_instance(async_context_t *context);
 
+/**
+ * \brief Deinitialize the BTstack state to stop it using the async_context API
+ * \ingroup pico_btstack
+ */
+void btstack_run_loop_async_context_deinit(void);
+
 #ifdef __cplusplus
 }
 #endif

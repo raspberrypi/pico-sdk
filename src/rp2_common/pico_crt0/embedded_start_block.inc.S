@@ -1,16 +1,45 @@
-#if !defined(PICO_CRT0_INCLUDE_PICOBIN_IMAGE_TYPE_ITEM)
+// PICO_CONFIG: PICO_CRT0_INCLUDE_PICOBIN_IMAGE_TYPE_ITEM, Include an image type item in the metadata block, default=0 on RP2040, 1 otherwise, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_INCLUDE_PICOBIN_IMAGE_TYPE_ITEM
 // todo decide whether we want this item for RP2040 by default, probably not (there are a zilloon binaries out there without it)
 #if !PICO_RP2040
 #define PICO_CRT0_INCLUDE_PICOBIN_IMAGE_TYPE_ITEM 1
 #endif
 #endif
 
+// PICO_CONFIG: PICO_CRT0_INCLUDE_PICOBIN_VECTOR_TABLE_ITEM, Include a vector table item in the metadata block, default=1 for no_flash binaries, 0 otherwise or on RP2040, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_INCLUDE_PICOBIN_VECTOR_TABLE_ITEM
+// If no_flash bin, then include a vector table item
+#if PICO_NO_FLASH && !PICO_RP2040
+#define PICO_CRT0_INCLUDE_PICOBIN_VECTOR_TABLE_ITEM 1
+#endif
+#endif
+
+// PICO_CONFIG: PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM, Include an entry point item in the metadata block, default=1 for Risc-V, 0 otherwise, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM
+// On RISC-V the default entry point from bootrom is the start of the binary, but
+// we have our vtable at the start, so we must include an entry point
+#ifdef __riscv
+#define PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM 1
+#endif
+#endif
+
+// PICO_CONFIG: PICO_CRT0_INCLUDE_PICOBIN_BLOCK, Include a metadata block at the start of the image, default=PICO_CRT0_INCLUDE_PICOBIN_IMAGE_TYPE_ITEM, type=bool, group=pico_crt0
 #ifndef PICO_CRT0_INCLUDE_PICOBIN_BLOCK
 #define PICO_CRT0_INCLUDE_PICOBIN_BLOCK PICO_CRT0_INCLUDE_PICOBIN_IMAGE_TYPE_ITEM
 #endif
 
+// PICO_CONFIG: PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK, Include a metadata block at the end of the image, default=1 for flash binaries with a metadata block at the start, type=bool, group=pico_crt0
 #ifndef PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK
 #define PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK (PICO_CRT0_INCLUDE_PICOBIN_BLOCK && !PICO_NO_FLASH)
+#endif
+
+// PICO_CONFIG: PICO_CRT0_IMAGE_TYPE_TBYB, Set the TBYB flag for the IMAGE_DEF which requires a flash update boot to boot it, default=0, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_IMAGE_TYPE_TBYB
+#define PICO_CRT0_IMAGE_TYPE_TBYB 0
+#endif
+
+#ifndef PICO_CRT0_PIN_XIP_SRAM
+#define PICO_CRT0_PIN_XIP_SRAM (PICO_USE_XIP_CACHE_AS_RAM || PICO_XIP_RAM)
 #endif
 
 #if PICO_CRT0_IMAGE_TYPE_TBYB
@@ -19,8 +48,37 @@
 #define CRT0_TBYB_FLAG 0
 #endif
 
+// PICO_CONFIG: PICO_CRT0_VERSION_MAJOR, The major version for the metadata block (ignored if 0), default=0, type=int, group=pico_crt0
+// PICO_CONFIG: PICO_CRT0_VERSION_MINOR, The minor version for the metadata block (ignored if 0), default=0, type=int, group=pico_crt0
 #if defined(PICO_CRT0_VERSION_MINOR) && !defined(PICO_CRT0_VERSION_MAJOR)
 #define PICO_CRT0_VERSION_MAJOR 0
+#elif defined(PICO_CRT0_VERSION_MAJOR) && !defined(PICO_CRT0_VERSION_MINOR)
+#define PICO_CRT0_VERSION_MINOR 0
+#endif
+
+// PICO_CONFIG: PICO_CRT0_IMAGE_TYPE_ITEM_VALUE, The IMAGE_TYPE value for the IMAGE_DEF, default=matching the PICO_PLATFORM, type=int, group=pico_crt0
+#ifndef PICO_CRT0_IMAGE_TYPE_ITEM_VALUE
+#if defined(__riscv)
+#define PICO_CRT0_IMAGE_TYPE_ITEM_VALUE \
+       PICOBIN_IMAGE_TYPE_IMAGE_TYPE_AS_BITS(EXE) | \
+       PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(RISCV) | \
+       PICOBIN_IMAGE_TYPE_EXE_CHIP_AS_BITS(RP2350) | \
+       CRT0_TBYB_FLAG
+#elif PICO_RP2040
+#define PICO_CRT0_IMAGE_TYPE_ITEM_VALUE \
+       PICOBIN_IMAGE_TYPE_IMAGE_TYPE_AS_BITS(EXE) | \
+       PICOBIN_IMAGE_TYPE_EXE_SECURITY_AS_BITS(NS) | \
+       PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(ARM) | \
+       PICOBIN_IMAGE_TYPE_EXE_CHIP_AS_BITS(RP2040) | \
+       CRT0_TBYB_FLAG
+#else
+#define PICO_CRT0_IMAGE_TYPE_ITEM_VALUE \
+       PICOBIN_IMAGE_TYPE_IMAGE_TYPE_AS_BITS(EXE) | \
+       PICOBIN_IMAGE_TYPE_EXE_SECURITY_AS_BITS(S) | \
+       PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(ARM) | \
+       PICOBIN_IMAGE_TYPE_EXE_CHIP_AS_BITS(RP2350) | \
+       CRT0_TBYB_FLAG
+#endif
 #endif
 
 #if PICO_CRT0_INCLUDE_PICOBIN_BLOCK
@@ -34,26 +92,7 @@ embedded_block:
 // for booting the binary with a known type.
 .byte PICOBIN_BLOCK_ITEM_1BS_IMAGE_TYPE
 .byte 0x1 // 1 word
-#ifdef PICO_CRT0_IMAGE_TYPE_ITEM_VALUE
 .hword PICO_CRT0_IMAGE_TYPE_ITEM_VALUE
-#elif defined(__riscv)
-.hword PICOBIN_IMAGE_TYPE_IMAGE_TYPE_AS_BITS(EXE) | \
-       PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(RISCV) | \
-       PICOBIN_IMAGE_TYPE_EXE_CHIP_AS_BITS(RP2350) | \
-       CRT0_TBYB_FLAG
-#elif defined(PICO_RP2040)
-.hword PICOBIN_IMAGE_TYPE_IMAGE_TYPE_AS_BITS(EXE) | \
-       PICOBIN_IMAGE_TYPE_EXE_SECURITY_AS_BITS(NS) | \
-       PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(ARM) | \
-       PICOBIN_IMAGE_TYPE_EXE_CHIP_AS_BITS(RP2040) | \
-       CRT0_TBYB_FLAG
-#else
-.hword PICOBIN_IMAGE_TYPE_IMAGE_TYPE_AS_BITS(EXE) | \
-       PICOBIN_IMAGE_TYPE_EXE_SECURITY_AS_BITS(S) | \
-       PICOBIN_IMAGE_TYPE_EXE_CPU_AS_BITS(ARM) | \
-       PICOBIN_IMAGE_TYPE_EXE_CHIP_AS_BITS(RP2350) | \
-       CRT0_TBYB_FLAG
-#endif
 #else
 // if no image type, then add ignored item
 .byte PICOBIN_BLOCK_ITEM_2BS_IGNORED
@@ -65,17 +104,11 @@ embedded_block:
 .byte PICOBIN_BLOCK_ITEM_1BS_VERSION
 .byte 0x2 // 2 words
 .hword 0
-#ifdef PICO_CRT0_VERSION_MINOR
 .hword PICO_CRT0_VERSION_MINOR
-#else
-.hword 0
-#endif
 .hword PICO_CRT0_VERSION_MAJOR
 #endif
 
-#ifdef __riscv
-// On RISC-V the default entry point from bootrom is the start of the binary, but
-// we have our vtable at the start, so we must include an entry point
+#if PICO_CRT0_INCLUDE_PICOBIN_ENTRY_POINT_ITEM
 .byte PICOBIN_BLOCK_ITEM_1BS_ENTRY_POINT
 .byte 0x3 // word size to next item
 .byte 0 // pad
@@ -84,14 +117,21 @@ embedded_block:
 .word SRAM_END // stack pointer
 #endif
 
-#ifndef PICO_RP2040
-#if PICO_NO_FLASH
-// If no_flash bin, then include a vector table item
+#if PICO_CRT0_INCLUDE_PICOBIN_VECTOR_TABLE_ITEM
 .byte PICOBIN_BLOCK_ITEM_1BS_VECTOR_TABLE
 .byte 0x2
 .hword 0
 .word __vectors
 #endif
+
+#if PICO_CRT0_PIN_XIP_SRAM
+.byte PICOBIN_BLOCK_ITEM_LOAD_MAP
+.byte 0x04 // word size
+.byte 0 // pad
+.byte 0x01 // number of entries
+.word 0 // clear
+.word XIP_SRAM_BASE
+.word 0 // size
 #endif
 
 .byte PICOBIN_BLOCK_ITEM_2BS_LAST

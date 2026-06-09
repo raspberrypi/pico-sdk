@@ -9,10 +9,10 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// pico_cmake_set PICO_PLATFORM=rp2040
-
 #ifndef _BOARDS_MACHDYNE_WERKZEUG_H
 #define _BOARDS_MACHDYNE_WERKZEUG_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
 #define MACHDYNE_WERKZEUG
@@ -36,7 +36,9 @@
 // --- LED ---
 #ifndef PICO_DEFAULT_LED_PIN
 #define PICO_DEFAULT_LED_PIN 20
+#ifndef PICO_DEFAULT_LED_PIN_INVERTED
 #define PICO_DEFAULT_LED_PIN_INVERTED 1
+#endif
 #endif
 
 // --- I2C ---
@@ -75,7 +77,7 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (1 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (1 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (1 * 1024 * 1024)
 #endif

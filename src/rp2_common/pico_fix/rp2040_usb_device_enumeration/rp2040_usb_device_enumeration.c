@@ -5,6 +5,7 @@
  */
 
 #include "pico.h"
+#if PICO_RP2040_B0_SUPPORTED || PICO_RP2040_B1_SUPPORTED
 #include "pico/time.h"
 #include "hardware/structs/usb.h"
 #include "hardware/gpio.h"
@@ -17,7 +18,6 @@
 #define LS_K   0b10
 #define LS_SE1 0b11
 
-#if PICO_RP2040_B0_SUPPORTED || PICO_RP2040_B1_SUPPORTED
 static void hw_enumeration_fix_wait_se0(void);
 static void hw_enumeration_fix_force_ls_j(void);
 static void hw_enumeration_fix_finish(void);

@@ -177,12 +177,11 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 1. Setup a CMake build directory.
       For example, if not using an IDE:
       ```
-      $ mkdir build
-      $ cd build
-      $ cmake ..
-      ```   
+      $ cmake -S . -B build
+      ```
+      > The cmake -S flag indicates the source directory, and the -B flag tells cmake the name of the output-directory to create. This doesn't have to be named "build", you can call it whatever you want.
    
-   When building for a board other than the Raspberry Pi Pico, you should pass `-DPICO_BOARD=board_name` to the `cmake` command above, e.g. `cmake -DPICO_BOARD=pico2 ..` or `cmake -DPICO_BOARD=pico_w ..` to configure the SDK and build options accordingly for that particular board.
+   When building for a board other than the Raspberry Pi Pico, you should pass `-DPICO_BOARD=board_name` to the `cmake` command above, e.g. `cmake -S . -B build -DPICO_BOARD=pico2` or `cmake -S . -B build -DPICO_BOARD=pico_w` to configure the SDK and build options accordingly for that particular board.
 
    Specifying `PICO_BOARD=<boardname>` sets up various compiler defines (e.g. default pin numbers for UART and other hardware) and in certain 
    cases also enables the use of additional libraries (e.g. wireless support when building for `PICO_BOARD=pico_w`) which cannot
@@ -193,11 +192,32 @@ instructions for other platforms, and just in general, we recommend you see [Ras
 
 1. Make your target from the build directory you created.
       ```sh
-      $ make hello_world
+      $ cmake --build build --target hello_world
       ```
+      > The directory-name supplied to the `--build` flag needs to match the directory-name that was passed to the `-B` flag in the earlier cmake command.
 
 1. You now have `hello_world.elf` to load via a debugger, or `hello_world.uf2` that can be installed and run on your Raspberry Pi Pico-series device via drag and drop.
 
 # RISC-V support on RP2350
 
 See [Raspberry Pi Pico-series C/C++ SDK](https://rptl.io/pico-c-sdk) for information on setting up a build environment for RISC-V on RP2350.
+
+## RISC-V quick start
+
+The [pico-sdk-tools](https://github.com/raspberrypi/pico-sdk-tools/releases) repository contains some prebuilt versions of the RISC-V compiler.
+
+You can use these to get a working RISC-V compiler on Raspberry Pi OS for example.
+
+```
+wget https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.0.0-5/riscv-toolchain-14-aarch64-lin.tar.gz
+sudo mkdir -p /opt/riscv/riscv-toolchain-14
+sudo chown $USER /opt/riscv/riscv-toolchain-14
+tar xvf riscv-toolchain-14-aarch64-lin.tar.gz -C /opt/riscv/riscv-toolchain-14
+```
+
+To use the RISC-V compiler to build code you need to set a couple of environment variables and run cmake from fresh.
+
+```
+export PICO_TOOLCHAIN_PATH=/opt/riscv/riscv-toolchain-14/
+export PICO_PLATFORM=rp2350-riscv
+```

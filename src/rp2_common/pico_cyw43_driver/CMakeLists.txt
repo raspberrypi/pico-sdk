@@ -1,3 +1,4 @@
+# PICO_CMAKE_CONFIG: PICO_CYW43_DRIVER_PATH, Path to cyw43-driver. Can be passed to CMake or set in your environment if you do not wish to use the version included with the SDK, type=string, default=<PICO_SDK_PATH>/lib/cyw43-driver, group=pico_cyw43_driver
 if (DEFINED ENV{PICO_CYW43_DRIVER_PATH} AND (NOT PICO_CYW43_DRIVER_PATH))
     set(PICO_CYW43_DRIVER_PATH $ENV{PICO_CYW43_DRIVER_PATH})
     message("Using PICO_CYW43_DRIVER_PATH from environment ('${PICO_CYW43_DRIVER_PATH}')")
@@ -40,7 +41,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
     target_sources(pico_cyw43_driver INTERFACE
             cyw43_driver.c)
     target_include_directories(pico_cyw43_driver_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-    pico_mirrored_target_link_libraries(pico_cyw43_driver INTERFACE cyw43_driver)
+    pico_mirrored_target_link_libraries(pico_cyw43_driver INTERFACE cyw43_driver pico_unique_id)
 
     # cyw43_driver_picow is cyw43_driver plus Pico W specific bus implementation
     pico_add_library(cyw43_driver_picow NOFLAG)
@@ -130,16 +131,22 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
                 )
     endif()
 
-    # Set an ip address in a compile definition
-    # target name, target type, compile definition name to set then address in a string
-    # This can be used to set the following compile definitions
-    # CYW43_DEFAULT_IP_STA_ADDRESS
-    # CYW43_DEFAULT_IP_STA_GATEWAY
-    # CYW43_DEFAULT_IP_AP_ADDRESS
-    # CYW43_DEFAULT_IP_AP_GATEWAY
-    # CYW43_DEFAULT_IP_MASK
-    # CYW43_DEFAULT_IP_DNS
+    # pico_configure_ip4_address(TARGET_LIB TARGET_TYPE DEF_NAME IP_ADDRESS_STR)
+    # \brief\ Set an ip address in a compile definition
+    #
+    # This can be used to set the following compile definitions;
+    # CYW43_DEFAULT_IP_STA_ADDRESS;
+    # CYW43_DEFAULT_IP_STA_GATEWAY;
+    # CYW43_DEFAULT_IP_AP_ADDRESS;
+    # CYW43_DEFAULT_IP_AP_GATEWAY;
+    # CYW43_DEFAULT_IP_MASK;
+    # CYW43_DEFAULT_IP_DNS;
     # e.g. pico_configure_ip4_address(picow_tcpip_server_background PRIVATE CYW43_DEFAULT_IP_STA_ADDRESS "10.3.15.204")
+    #
+    # \param\ TARGET_LIB The target library to set the ip address for
+    # \param\ TARGET_TYPE The type of target library
+    # \param\ DEF_NAME The name of the compile definition to set
+    # \param\ IP_ADDRESS_STR The ip address to set
     function(pico_configure_ip4_address TARGET_LIB TARGET_TYPE DEF_NAME IP_ADDRESS_STR)
             string(REGEX MATCHALL "[0-9]+" IP_ADDRESS_LIST ${IP_ADDRESS_STR})
             list(LENGTH IP_ADDRESS_LIST IP_ADDRESS_COMPONENT_COUNT)
@@ -158,5 +165,100 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
                     )
     endfunction()
 
+    set(PICO_CYW43_DRIVER_CURRENT_PATH ${CMAKE_CURRENT_LIST_DIR})
+    pico_register_common_scope_var(PICO_CYW43_DRIVER_CURRENT_PATH)
+
     pico_promote_common_scope_vars()
+
+    # pico_use_wifi_firmware_partition(TARGET [NO_EMBEDDED_PT])
+    # \brief\ Use a partition for the Wi-Fi firmware
+    #
+    # This will read the CYW43 firmware from a partition with the ID 0x776966696669726d,
+    # instead of embedding the firmware blob in the binary. By default it will also embed
+    # a compatible partition table in the binary, but this can be disabled by passing the
+    # NO_EMBEDDED_PT argument (for example, if you need to chain into the binary, it
+    # can't contain a partition table).
+    #
+    # This will create additional UF2 files for the CYW43 firmware - both a regular version,
+    # and a TBYB version to use if you're updating it using the TBYB feature (see section
+    # 5.1.17 of the RP2350 datasheet). You will need to flash your chosen version to each
+    # new device once, after loading the partition table. For example using picotool:
+    #
+    # `picotool load TARGET.uf2`;
+    # `picotool reboot -u`;
+    # `picotool load -ux TARGET_wifi_firmware.uf2`;
+    #
+    # Then on subsequent updates, you can just flash the TARGET.uf2 file to the device.
+    #
+    # \param\ NO_EMBEDDED_PT If set, will not embed a partition table in the binary
+    function(pico_use_wifi_firmware_partition TARGET)
+        set(options NO_EMBEDDED_PT)
+        cmake_parse_arguments(PARSE_ARGV 1 OPTS "${options}" "" "")
+        if (PICO_PLATFORM STREQUAL "rp2040")
+                message(FATAL_ERROR "RP2040 does not support storing wi-fi firmware in partitions")
+        endif()
+        target_compile_definitions(${TARGET} PRIVATE CYW43_USE_FIRMWARE_PARTITION=1)
+
+        if (NOT OPTS_NO_EMBEDDED_PT)
+            get_target_property(picotool_embed_pt ${TARGET} PICOTOOL_EMBED_PT)
+            if (NOT picotool_embed_pt)
+                pico_embed_pt_in_binary(${TARGET} ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_pt.json)
+            endif()
+        endif()
+
+        find_package (Python3 REQUIRED COMPONENTS Interpreter)
+
+        # CYW43 firmware blob
+        add_custom_target(${TARGET}_firmware_blob DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S)
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S
+                COMMAND ${Python3_EXECUTABLE} ${PICO_CYW43_DRIVER_CURRENT_PATH}/cyw43_firmware.py ${PICO_CYW43_DRIVER_PATH}/firmware/wb43439A0_7_95_49_00_combined.h ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S
+                )
+
+        # Create UF2s for regular and TBYB firmwares
+        add_executable(${TARGET}_wifi_firmware
+                ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+        add_executable(${TARGET}_wifi_firmware_tbyb
+                ${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.S)
+
+        add_dependencies(${TARGET}_wifi_firmware ${TARGET}_firmware_blob)
+        add_dependencies(${TARGET}_wifi_firmware_tbyb ${TARGET}_firmware_blob)
+
+        target_include_directories(${TARGET}_wifi_firmware PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+        target_include_directories(${TARGET}_wifi_firmware_tbyb PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
+        target_compile_definitions(${TARGET}_wifi_firmware PRIVATE
+                NO_PICO_PLATFORM=1
+                )
+        target_compile_definitions(${TARGET}_wifi_firmware_tbyb PRIVATE
+                NO_PICO_PLATFORM=1
+                PICO_CRT0_IMAGE_TYPE_TBYB=1
+                )
+
+        target_link_options(${TARGET}_wifi_firmware PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
+        target_link_options(${TARGET}_wifi_firmware_tbyb PRIVATE -nostartfiles -nodefaultlibs LINKER:--script=${PICO_CYW43_DRIVER_CURRENT_PATH}/wifi_firmware.ld)
+
+        target_link_libraries(${TARGET}_wifi_firmware boot_picobin_headers)
+        target_link_libraries(${TARGET}_wifi_firmware_tbyb boot_picobin_headers)
+
+        get_target_property(hasSigfile ${TARGET} PICOTOOL_SIGFILE)
+        if (hasSigfile)
+                pico_sign_binary(${TARGET}_wifi_firmware ${sigfile})
+                pico_sign_binary(${TARGET}_wifi_firmware_tbyb ${sigfile})
+        endif()
+
+        pico_hash_binary(${TARGET}_wifi_firmware)
+        pico_hash_binary(${TARGET}_wifi_firmware_tbyb)
+
+        pico_set_uf2_family(${TARGET}_wifi_firmware cyw43-firmware)
+        pico_set_uf2_family(${TARGET}_wifi_firmware_tbyb cyw43-firmware)
+
+        pico_package_uf2_output(${TARGET}_wifi_firmware 0x10000000)
+        pico_package_uf2_output(${TARGET}_wifi_firmware_tbyb 0x10000000)
+
+        pico_add_extra_outputs(${TARGET}_wifi_firmware)
+        pico_add_extra_outputs(${TARGET}_wifi_firmware_tbyb)
+
+        add_dependencies(${TARGET}
+                ${TARGET}_wifi_firmware ${TARGET}_wifi_firmware_tbyb)
+    endfunction()
 endif()

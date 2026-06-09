@@ -140,13 +140,24 @@ string_flag(
     ],
 )
 
-# PICO_BAZEL_CONFIG: PICO_DEFAULT_PRINTF_IMPL, The default implementation for pico_printf to link. compiler lets the compiler control printf behavior while pico provides a pico-specific implementation, type=string, default=double, group=build
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_PRINTF_IMPL, The default implementation for pico_printf to link. compiler lets the compiler control printf behavior while pico provides a pico-specific implementation, type=string, default=pico, group=build
 string_flag(
     name = "PICO_DEFAULT_PRINTF_IMPL",
     build_setting_default = "pico",
     values = [
         "pico",
         "compiler",
+        "none",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_THREAD_LOCAL_IMPL, The default implementation for pico_thread_local to link; per_thread provides per thread locals while global provides shared global values, type=string, default=per_thread, group=build
+string_flag(
+    name = "PICO_DEFAULT_THREAD_LOCAL_IMPL",
+    build_setting_default = "per_thread",
+    values = [
+        "per_thread",
+        "global",
         "none",
     ],
 )
@@ -186,6 +197,12 @@ int_flag(
     build_setting_default = 0,
 )
 
+# PICO_BAZEL_CONFIG: PICO_TINYUSB_CONFIG, [Bazel only] The library that provides TinyUSB config header (e.g. tusb_config.h), default=//src/rp2_common/pico_stdio_usb:tusb_config, group=build
+label_flag(
+    name = "PICO_TINYUSB_CONFIG",
+    build_setting_default = "//src/rp2_common/pico_stdio_usb:tusb_config",
+)
+
 # PICO_BAZEL_CONFIG: PICO_TINYUSB_LIB, [Bazel only] The library that provides TinyUSB, default=@tinyusb//:tinyusb, group=build
 label_flag(
     name = "PICO_TINYUSB_LIB",
@@ -211,10 +228,23 @@ string_flag(
     build_setting_default = "Debug",
 )
 
-# PICO_BAZEL_CONFIG: PICO_DEFAULT_LINKER_SCRIPT, [Bazel only] The library that provides a linker script to link into all binaries, default=//src/rp2_common/pico_crt0:default_linker_script, group=pico_standard_link
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_BINARY_TYPE, The default binary type to use, type=string, default=default, group=build
+string_flag(
+    name = "PICO_DEFAULT_BINARY_TYPE",
+    build_setting_default = "default",
+    values = [
+        "default",
+        "no_flash",
+        "copy_to_ram",
+        "blocked_ram",
+        "xip_ram",
+    ],
+)
+
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_LINKER_SCRIPT, [Bazel only] The library that provides a linker script to link into all binaries, default=//src/rp2_common/pico_standard_link:default_linker_script, group=pico_standard_link
 label_flag(
     name = "PICO_DEFAULT_LINKER_SCRIPT",
-    build_setting_default = "//src/rp2_common/pico_crt0:default_linker_script",
+    build_setting_default = "//src/rp2_common/pico_standard_link:default_linker_script",
 )
 
 # PICO_BAZEL_CONFIG: PICO_NO_TARGET_NAME, Don't define PICO_TARGET_NAME, type=bool, default=0, group=build
@@ -241,7 +271,7 @@ label_flag(
     build_setting_default = "//bazel:generate_config_header",
 )
 
-# PICO_BAZEL_CONFIG: PICO_CLIB, [Bazel only] The flavor of libc porting layer to use. auto infers the correct value to use from PICO_TOOLCHAIN, group=pico_standard_link
+# PICO_BAZEL_CONFIG: PICO_CLIB, The C library to use e.g. newlib/picolibc/llvm_libc, type=string, default=based on PICO_COMPILER, group=build, docref=cmake-toolchain-config
 string_flag(
     name = "PICO_CLIB",
     build_setting_default = "auto",
@@ -287,4 +317,34 @@ label_flag(
 label_flag(
     name = "PICO_FREERTOS_LIB",
     build_setting_default = "//bazel:empty_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_MBEDTL_CONFIG, [Bazel only] The cc_library that provides mbedtls_config.h, default=//bazel:empty_cc_lib, group=pico_mbedtls
+label_flag(
+    name = "PICO_MBEDTLS_CONFIG",
+    build_setting_default = "//bazel:empty_cc_lib",
+)
+
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_OPT_ARGS, Makes the opt compilation mode a no-op so custom optimization arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_COMPILATION_NO_OPT_ARGS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_DEBUG_ARGS, Makes the debug compilation mode a no-op so custom debug arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_COMPILATION_NO_DEBUG_ARGS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_COMPILATION_NO_FASTBUILD_ARGS, Makes the fastbuild compilation mode a no-op so custom fastbuild arguments can be injected via the --copt flag instead, type=bool, default=0, group=build
+bool_flag(
+    name = "PICO_COMPILATION_NO_FASTBUILD_ARGS",
+    build_setting_default = False,
+)
+
+# PICO_BAZEL_CONFIG: PICO_HARD_FLOAT_ABI, use hard floating point ABI, type=bool, default=0, group=build, docref=cmake-toolchain-config
+bool_flag(
+    name = "PICO_HARD_FLOAT_ABI",
+    build_setting_default = False,
 )

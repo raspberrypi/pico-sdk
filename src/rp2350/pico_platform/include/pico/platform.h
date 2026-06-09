@@ -20,16 +20,23 @@
 #error pico/platform.h should not be included directly; include pico.h instead
 #endif
 
+// this is used by sections.h, so comes before the includes
+// PICO_CONFIG: PICO_USE_XIP_CACHE_AS_RAM, Whether to use xip cache as ram, default=0, type=bool, group=pico_platform
+#ifndef PICO_USE_XIP_CACHE_AS_RAM
+#define PICO_USE_XIP_CACHE_AS_RAM 0
+#endif
+
 #include "pico/platform/compiler.h"
 #include "pico/platform/sections.h"
 #include "pico/platform/panic.h"
+#include "pico/platform/common.h"
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 #ifdef __riscv
 #include "hardware/regs/rvcsr.h"
 #endif
 
-// PICO_CONFIG: PICO_RP2350A, Whether the current board has an RP2350 in an A (30 GPIO) package, type=bool, default=Usually provided via board header, group=pico_platform
+// PICO_CONFIG: PICO_RP2350A, Whether the current board has an RP2350 in an A (30 GPIO) package - set to 0 for RP2350 in a B (48 GPIO) package, type=bool, default=Usually provided via board header, group=pico_platform
 #if 0 // make tooling checks happy
 #define PICO_RP2350A 0
 #endif
@@ -54,10 +61,6 @@
 #define PICO_NO_RAM_VECTOR_TABLE 0
 #endif
 
-#ifndef PICO_RAM_VECTOR_TABLE_SIZE
-#define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + NUM_IRQS)
-#endif
-
 // PICO_CONFIG: PICO_USE_STACK_GUARDS, Enable/disable stack guards, type=bool, default=0, advanced=true, group=pico_platform
 #ifndef PICO_USE_STACK_GUARDS
 #define PICO_USE_STACK_GUARDS 0
@@ -73,16 +76,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*! \brief No-op function for the body of tight loops
- *  \ingroup pico_platform
- *
- * No-op function intended to be called by any tight hardware polling loop. Using this ubiquitously
- * makes it much easier to find tight loops, but also in the future \#ifdef-ed support for lockup
- * debugging might be added
- */
-static __force_inline void tight_loop_contents(void) {}
-
 /*! \brief Helper method to busy-wait for at least the given number of cycles
  *  \ingroup pico_platform
  *
@@ -115,27 +108,6 @@ static inline void busy_wait_at_least_cycles(uint32_t minimum_cycles) {
     : "+r" (minimum_cycles) : : "cc", "memory"
     );
 }
-
-// PICO_CONFIG: PICO_NO_FPGA_CHECK, Remove the FPGA platform check for small code size reduction, type=bool, default=1, advanced=true, group=pico_runtime
-#ifndef PICO_NO_FPGA_CHECK
-#define PICO_NO_FPGA_CHECK 1
-#endif
-
-// PICO_CONFIG: PICO_NO_SIM_CHECK, Remove the SIM platform check for small code size reduction, type=bool, default=1, advanced=true, group=pico_runtime
-#ifndef PICO_NO_SIM_CHECK
-#define PICO_NO_SIM_CHECK 1
-#endif
-
-#if PICO_NO_FPGA_CHECK
-static inline bool running_on_fpga(void) {return false;}
-#else
-bool running_on_fpga(void);
-#endif
-#if PICO_NO_SIM_CHECK
-static inline bool running_in_sim(void) {return false;}
-#else
-bool running_in_sim(void);
-#endif
 
 /*! \brief Execute a breakpoint instruction
  *  \ingroup pico_platform
@@ -221,12 +193,9 @@ __force_inline static bool pico_processor_state_is_nonsecure(void) {
 #endif
 }
 
-#define host_safe_hw_ptr(x) ((uintptr_t)(x))
-#define native_safe_hw_ptr(x) host_safe_hw_ptr(x)
-
 /*! \brief Returns the RP2350 chip revision number
  *  \ingroup pico_platform
- * @return the RP2350 chip revision number (1 for B0/B1, 2 for B2)
+ * @return the RP2350 chip revision number (2 for A2, 3 for A3/A4)
  */
 uint8_t rp2350_chip_version(void);
 
@@ -238,11 +207,11 @@ static inline uint8_t rp2040_chip_version(void) {
     return 2;
 }
 
-/*! \brief Returns the RP2040 rom version number
+/*! \brief Returns the RP2350 rom version number
  *  \ingroup pico_platform
- * @return the RP2040 rom version number (1 for RP2040-B0, 2 for RP2040-B1, 3 for RP2040-B2)
+ * @return the RP2350 rom version number (2 for RP2350-A2, 3 for RP2350-A3, 4 for RP2350-A4)
  */
-static inline uint8_t rp2040_rom_version(void) {
+static inline uint8_t rp2350_rom_version(void) {
     GCC_Pragma("GCC diagnostic push")
     GCC_Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
     return *(uint8_t*)0x13;
@@ -281,9 +250,7 @@ __force_inline static int32_t __mul_instruction(int32_t a, int32_t b) {
  * \param b the second operand
  * \return a * b
  */
-#define __fast_mul(a, b) __builtin_choose_expr(__builtin_constant_p(b) && !__builtin_constant_p(a), \
-    (__builtin_popcount(b) >= 2 ? __mul_instruction(a,b) : (a)*(b)), \
-    (a)*(b))
+#define __fast_mul(a, b) (__builtin_constant_p(b) && !__builtin_constant_p(a) && __builtin_popcount(b) >= 2 ? __mul_instruction(a,b) : (a)*(b))
 
 #ifdef __cplusplus
 }

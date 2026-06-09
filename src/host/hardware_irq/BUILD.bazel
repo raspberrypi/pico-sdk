@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -8,7 +10,7 @@ cc_library(
     tags = ["manual"],  # TODO: No hardware/regs/intctrl.h for host yet.
     target_compatible_with = ["//bazel/constraint:host"],
     deps = [
-        "//src/host/hardware_claim",
+        "//src/common/hardware_claim",
         "//src/host/pico_platform",
     ],
 )

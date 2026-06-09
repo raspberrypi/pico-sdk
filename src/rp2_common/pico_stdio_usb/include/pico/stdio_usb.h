@@ -44,16 +44,22 @@
 // this variable is no longer set by default (one is claimed dynamically), but will be respected if specified
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE, Enable/disable resetting into BOOTSEL mode if the host sets the baud rate to a magic value (PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE), type=bool, default=1 if application is not using TinyUSB directly, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE
-#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
-#define PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE 1
+// PICO_CONFIG: PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK, Enable/disable the use of a background task to call tud_task(), type=bool, default=1 if the application is not using tinyUSB directly, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK
+#if !LIB_TINYUSB_HOST && !LIB_TINYUSB_DEVICE
+#define PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK 1
+#else
+#define PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK 0
 #endif
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE, Baud rate that if selected causes a reset into BOOTSEL mode (if PICO_STDIO_USB_ENABLE_RESET_VIA_BAUD_RATE is set), default=1200, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE
-#define PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE 1200
+// PICO_CONFIG: PICO_STDIO_USB_ENABLE_TINYUSB_INIT, Enable/disable calling tinyUSB tusb_init() during initialization, type=bool, default=1 if the application is not using tinyUSB directly, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_ENABLE_TINYUSB_INIT
+#if !LIB_TINYUSB_HOST && !LIB_TINYUSB_DEVICE
+#define PICO_STDIO_USB_ENABLE_TINYUSB_INIT 1
+#else
+#define PICO_STDIO_USB_ENABLE_TINYUSB_INIT 0
+#endif
 #endif
 
 // PICO_CONFIG: PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS, Maximum number of milliseconds to wait during initialization for a CDC connection from the host (negative means indefinite) during initialization, default=0, group=pico_stdio_usb
@@ -71,49 +77,13 @@
 #define PICO_STDIO_USB_DEINIT_DELAY_MS 110
 #endif
 
-// PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED, Optionally define a pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE), type=int, min=0, max=47 on RP2350B, 29 otherwise, group=pico_stdio_usb
-
-// PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW, Whether pin to use as bootloader activity LED when BOOTSEL mode is entered via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE) is active low, type=bool, default=0, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW
-#define PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED_ACTIVE_LOW 0
+// PICO_CONFIG: PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS, Whether `pico_stdio_usb` provides the USB descriptors needed for USB communication, type=bool, default=1 if the application is not using tinyUSB directly, group=pico_stdio_usb
+#ifndef PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS
+#if !LIB_TINYUSB_HOST && !LIB_TINYUSB_DEVICE
+#define PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS 1
+#else
+#define PICO_STDIO_USB_USE_DEFAULT_DESCRIPTORS 0
 #endif
-
-// PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED, Whether the pin specified by PICO_STDIO_USB_RESET_BOOTSEL_ACTIVITY_LED is fixed or can be modified by picotool over the VENDOR USB interface, type=bool, default=0, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED
-#define PICO_STDIO_USB_RESET_BOOTSEL_FIXED_ACTIVITY_LED 0
-#endif
-
-// Any modes disabled here can't be re-enabled by picotool via VENDOR_INTERFACE.
-// PICO_CONFIG: PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK, Optionally disable either the mass storage interface (bit 0) or the PICOBOOT interface (bit 1) when entering BOOTSEL mode via USB (either VIA_BAUD_RATE or VIA_VENDOR_INTERFACE), type=int, min=0, max=3, default=0, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK
-#define PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK 0u
-#endif
-
-// PICO_CONFIG: PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE, Enable/disable resetting into BOOTSEL mode via an additional VENDOR USB interface - enables picotool based reset, type=bool, default=1 if application is not using TinyUSB directly, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
-#if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
-#define PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE 1
-#endif
-#endif
-
-// PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL, If vendor reset interface is included allow rebooting to BOOTSEL mode, type=bool, default=1, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL
-#define PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_BOOTSEL 1
-#endif
-
-// PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT, If vendor reset interface is included allow rebooting with regular flash boot, type=bool, default=1, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT
-#define PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_RESET_TO_FLASH_BOOT 1
-#endif
-
-// PICO_CONFIG: PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR, If vendor reset interface is included add support for Microsoft OS 2.0 Descriptor, type=bool, default=1, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR
-#define PICO_STDIO_USB_RESET_INTERFACE_SUPPORT_MS_OS_20_DESCRIPTOR 1
-#endif
-
-// PICO_CONFIG: PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS, Delay in ms before rebooting via regular flash boot, default=100, group=pico_stdio_usb
-#ifndef PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS
-#define PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS 100
 #endif
 
 // PICO_CONFIG: PICO_STDIO_USB_CONNECTION_WITHOUT_DTR, Disable use of DTR for connection checking meaning connection is assumed to be valid, type=bool, default=0, group=pico_stdio_usb
@@ -161,6 +131,19 @@ bool stdio_usb_deinit(void);
  *  \return true if stdio is connected over CDC
  */
 bool stdio_usb_connected(void);
+
+#if PICO_STDIO_USB_SUPPORT_CHARS_AVAILABLE_CALLBACK
+/*! \brief Explicitly calls the registered USB stdio chars_available_callback
+ *  \ingroup pico_stdio_usb
+ *
+ * This method is normally called by the internal USB stdio background thread when there is new USB CDC
+ * data available to read. However, if the internal background thread is disabled (e.g. when the user
+ * directly links tinyUSB), the user will need to implement their own background thread and call this
+ * method directly.
+ */
+void stdio_usb_call_chars_available_callback(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

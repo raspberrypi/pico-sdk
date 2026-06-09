@@ -15,22 +15,28 @@ set(PICO_SAVED_PLATFORM "${PICO_PLATFORM}")
 
 # If PICO_PLATFORM is specified but not PICO_BOARD, we'll make a stab at defaulting
 if (NOT PICO_DEFAULT_BOARD_rp2040)
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_BOARD_rp2040, The default PICO_BOARD when PICO_PLATFORM is rp2040, type=string, default=pico, group=build, docref=cmake-platform-board-config
     set(PICO_DEFAULT_BOARD_rp2040 "pico")
 endif()
 if (NOT PICO_DEFAULT_BOARD_rp2350)
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_BOARD_rp2350, The default PICO_BOARD when PICO_PLATFORM is rp2350, type=string, default=pico2, group=build, docref=cmake-platform-board-config
     set(PICO_DEFAULT_BOARD_rp2350 "pico2")
 endif()
 if (NOT PICO_DEFAULT_BOARD_rp2350-arm-s)
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_BOARD_rp2350-arm-s, The default PICO_BOARD when PICO_PLATFORM is rp2350-arm-s, type=string, default=pico2, group=build, docref=cmake-platform-board-config
     set(PICO_DEFAULT_BOARD_rp2350-arm-s "pico2")
 endif()
 if (NOT PICO_DEFAULT_BOARD_rp2350-riscv)
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_BOARD_rp2350-riscv, The default PICO_BOARD when PICO_PLATFORM is rp2350-riscv, type=string, default=pico2, group=build, docref=cmake-platform-board-config
     set(PICO_DEFAULT_BOARD_rp2350-riscv "pico2")
 endif()
 if (NOT PICO_DEFAULT_BOARD_host)
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_BOARD_host, The default PICO_BOARD when PICO_PLATFORM is host, type=string, default=none, group=build, docref=cmake-platform-board-config
     set(PICO_DEFAULT_BOARD_host "none")
 endif()
 
 if (NOT PICO_DEFAULT_PLATFORM)
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_PLATFORM, The default for PICO_PLATFORM if not specified, type=string, default=rp2040, group=build, docref=cmake-platform-board-config
     set(PICO_DEFAULT_PLATFORM "rp2040")
 endif()
 
@@ -72,7 +78,7 @@ endif()
 
 list(APPEND PICO_INCLUDE_DIRS ${PICO_SDK_PATH}/src/boards/include) # so boards/foo.h can be explicitly included
 
-# PICO_CMAKE_CONFIG: PICO_DEFAULT_RP2350_PLATFORM, Default actual platform to build for if rp2350 is specified for PICO_PLATFORM e.g. rp2350-arm-s/rp2350-riscv, type=string, default=rp2350-arm-s, group=build
+# PICO_CMAKE_CONFIG: PICO_DEFAULT_RP2350_PLATFORM, Default actual platform to build for if rp2350 is specified for PICO_PLATFORM e.g. rp2350-arm-s/rp2350-riscv, type=string, default=rp2350-arm-s, group=build, docref=cmake-platform-board-config
 if (DEFINED ENV{PICO_DEFAULT_RP2350_PLATFORM} AND NOT PICO_DEFAULT_RP2350_PLATFORM)
     set(PICO_DEFAULT_RP2350_PLATFORM $ENV{PICO_DEFAULT_RP2350_PLATFORM})
 endif()
@@ -122,7 +128,7 @@ if (PICO_PREVIOUS_PLATFORM AND NOT PICO_PREVIOUS_PLATFORM STREQUAL PICO_PLATFORM
                 The best practice is to use separate build directories for different platforms.")
 endif()
 set(PICO_PLATFORM ${PICO_PLATFORM} CACHE STRING "PICO Build platform (e.g. rp2040, rp2350, rp2350-riscv,  host)" FORCE)
-set(PICO_PREVIOUS_PLATFORM ${PICO_PLATFORM} CACHE STRING "Saved PICO Build platform (e.g. rp2040, rp2350, rp2350-riscv,  host)" INTERNAL)
+set(PICO_PREVIOUS_PLATFORM ${PICO_PLATFORM} CACHE INTERNAL "Saved PICO Build platform (e.g. rp2040, rp2350, rp2350-riscv,  host)")
 
 # PICO_CMAKE_CONFIG: PICO_CMAKE_PRELOAD_PLATFORM_FILE, Custom CMake file to use to set up the platform environment, type=string, group=build
 set(PICO_CMAKE_PRELOAD_PLATFORM_FILE ${PICO_CMAKE_PRELOAD_PLATFORM_FILE} CACHE INTERNAL "")

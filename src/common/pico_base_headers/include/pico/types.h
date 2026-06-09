@@ -23,18 +23,18 @@ typedef unsigned int uint;
 #endif
 
 /*! \typedef absolute_time_t
-    \brief An opaque 64 bit timestamp in microseconds
-
-    The type is used instead of a raw uint64_t to prevent accidentally passing relative times or times in the wrong
-    time units where an absolute time is required.
-
-    note: As of SDK 2.0.0 this type defaults to being a uin64_t (i.e. no protection); it is enabled
-    by setting PICO_OPAQUE_ABSOLUTE_TIME_T to 1
-
-    \see to_us_since_boot()
-    \see update_us_since_boot()
-    \ingroup timestamp
-*/
+ *  \brief An opaque 64 bit timestamp in microseconds
+ *
+ * The type is used instead of a raw uint64_t to prevent accidentally passing relative times or times in the wrong
+ * time units where an absolute time is required.
+ *
+ * note: As of SDK 2.0.0 this type defaults to being a uin64_t (i.e. no protection); it is enabled
+ * by setting PICO_OPAQUE_ABSOLUTE_TIME_T to 1
+ *
+ * \see to_us_since_boot()
+ * \see update_us_since_boot()
+ * \ingroup timestamp
+ */
 #if PICO_OPAQUE_ABSOLUTE_TIME_T
 typedef struct {
     uint64_t _private_us_since_boot;
@@ -50,7 +50,7 @@ typedef uint64_t absolute_time_t;
  * \ingroup timestamp
  */
 static inline uint64_t to_us_since_boot(absolute_time_t t) {
-#ifdef PICO_DEBUG_ABSOLUTE_TIME_T
+#if PICO_OPAQUE_ABSOLUTE_TIME_T
     return t._private_us_since_boot;
 #else
     return t;
@@ -65,7 +65,7 @@ static inline uint64_t to_us_since_boot(absolute_time_t t) {
  * \ingroup timestamp
  */
 static inline void update_us_since_boot(absolute_time_t *t, uint64_t us_since_boot) {
-#ifdef PICO_DEBUG_ABSOLUTE_TIME_T
+#if PICO_OPAQUE_ABSOLUTE_TIME_T
     assert(us_since_boot <= INT64_MAX);
     t->_private_us_since_boot = us_since_boot;
 #else
@@ -85,7 +85,7 @@ static inline absolute_time_t from_us_since_boot(uint64_t us_since_boot) {
     return t;
 }
 
-#ifdef NDEBUG
+#if !PICO_OPAQUE_ABSOLUTE_TIME_T
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = value
 #else
 #define ABSOLUTE_TIME_INITIALIZED_VAR(name, value) name = {value}

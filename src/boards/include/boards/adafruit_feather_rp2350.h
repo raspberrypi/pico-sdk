@@ -11,10 +11,10 @@
 
 // This header may be included by other board headers as "boards/adafruit_feather_rp2350.h"
 
-// pico_cmake_set PICO_PLATFORM=rp2350
-
 #ifndef _BOARDS_ADAFRUIT_FEATHER_RP2350_H
 #define _BOARDS_ADAFRUIT_FEATHER_RP2350_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
 // On some samples, the xosc can take longer to stabilize than is usual
 #ifndef PICO_XOSC_STARTUP_DELAY_MULTIPLIER
@@ -78,12 +78,22 @@
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-// pico_cmake_set_default PICO_FLASH_SIZE_BYTES = (8 * 1024 * 1024)
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (8 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
 #endif
 
-// pico_cmake_set_default PICO_RP2350_A2_SUPPORTED = 1
+// --- PSRAM ---
+#ifndef PICO_PSRAM_CS_PIN
+#define PICO_PSRAM_CS_PIN 8
+#endif
+
+// Only some boards have PSRAM fitted, so auto-detect
+#ifndef PICO_AUTO_DETECT_PSRAM_SIZE
+#define PICO_AUTO_DETECT_PSRAM_SIZE 1
+#endif
+
+pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #ifndef PICO_RP2350_A2_SUPPORTED
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif

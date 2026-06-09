@@ -46,7 +46,7 @@ void gpio_set_function(uint gpio, gpio_function_t fn) {
     // Zero all fields apart from fsel; we want this IO to do what the peripheral tells it.
     // This doesn't affect e.g. pullup/pulldown, as these are in pad controls.
     io_bank0_hw->io[gpio].ctrl = fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB;
-#if !PICO_RP2040
+#if HAS_PADS_BANK0_ISOLATION
     // Remove pad isolation now that the correct peripheral is in control of the pad
     hw_clear_bits(&pads_bank0_hw->io[gpio], PADS_BANK0_GPIO0_ISO_BITS);
 #endif
@@ -153,7 +153,7 @@ enum gpio_drive_strength gpio_get_drive_strength(uint gpio) {
 static void gpio_default_irq_handler(void) {
     uint core = get_core_num();
     gpio_irq_callback_t callback = callbacks[core];
-    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = core ? &io_bank0_hw->proc1_irq_ctrl : &io_bank0_hw->proc0_irq_ctrl;
+    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_irq_ctrl(core);
     for (uint gpio = 0; gpio < NUM_BANK0_GPIOS; gpio+=8) {
         uint32_t events8 = irq_ctrl_base->ints[gpio >> 3u];
         // note we assume events8 is 0 for non-existent GPIO
@@ -190,15 +190,16 @@ void gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled) {
 
     // Separate mask/force/status per-core, so check which core called, and
     // set the relevant IRQ controls.
-    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_num() ?
-                                      &io_bank0_hw->proc1_irq_ctrl : &io_bank0_hw->proc0_irq_ctrl;
+    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_irq_ctrl(get_core_num());
     _gpio_set_irq_enabled(gpio, events, enabled, irq_ctrl_base);
 }
 
 void gpio_set_irq_enabled_with_callback(uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback) {
-    // first set callback, then enable the interrupt
-    gpio_set_irq_callback(callback);
+    // when enabling, first set callback, then enable the interrupt
+    // when disabling, first disable the interrupt, then clear callback
+    if (enabled) gpio_set_irq_callback(callback);
     gpio_set_irq_enabled(gpio, events, enabled);
+    if (!enabled) gpio_set_irq_callback(callback);
     if (enabled) irq_set_enabled(IO_IRQ_BANK0, true);
 }
 
@@ -253,11 +254,6 @@ void gpio_set_dormant_irq_enabled(uint gpio, uint32_t events, bool enabled) {
     _gpio_set_irq_enabled(gpio, events, enabled, irq_ctrl_base);
 }
 
-void gpio_acknowledge_irq(uint gpio, uint32_t events) {
-    check_gpio_param(gpio);
-    io_bank0_hw->intr[gpio / 8] = events << (4 * (gpio % 8));
-}
-
 #define DEBUG_PIN_MASK (((1u << PICO_DEBUG_PIN_COUNT)-1) << PICO_DEBUG_PIN_BASE)
 void gpio_debug_pins_init(void) {
     gpio_init_mask(DEBUG_PIN_MASK);
@@ -285,29 +281,38 @@ void gpio_deinit(uint gpio) {
     gpio_set_function(gpio, GPIO_FUNC_NULL);
 }
 
-void gpio_init_mask(uint gpio_mask) {
-    for(uint i=0;i<NUM_BANK0_GPIOS;i++) {
-        if (gpio_mask & 1) {
-            gpio_init(i);
-        }
-        gpio_mask >>= 1;
-    }
-}
-
 void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
-    for (uint i = 0; i < MIN(NUM_BANK0_GPIOS, 32u); i++) {
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1u) {
             gpio_set_function(i, fn);
         }
         gpio_mask >>= 1;
+        if (!gpio_mask) break;
     }
 }
 
+void gpio_init_mask(uint32_t gpio_mask) {
+    gpio_set_dir_in_masked(gpio_mask);
+    gpio_clr_mask(gpio_mask);
+    gpio_set_function_masked(gpio_mask, GPIO_FUNC_SIO);
+}
+
+// these functions are provided (in gpio.h) as inlined calls to the 32 bit versions if we have <= 32 GPIOs
+#if NUM_BANK0_GPIOS > 32
 void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
-    for (uint i = 0; i < MIN(NUM_BANK0_GPIOS, 64u); i++) {
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1u) {
             gpio_set_function(i, fn);
         }
         gpio_mask >>= 1;
+        if (!gpio_mask) break;
     }
 }
+
+void gpio_init_mask64(uint64_t gpio_mask) {
+    gpio_set_dir_in_masked64(gpio_mask);
+    gpio_clr_mask64(gpio_mask);
+    gpio_set_function_masked64(gpio_mask, GPIO_FUNC_SIO);
+}
+
+#endif

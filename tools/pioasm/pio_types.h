@@ -7,6 +7,7 @@
 #ifndef _PIO_TYPES_H
 #define _PIO_TYPES_H
 
+#include <cstdint>
 #include <string>
 #include <map>
 #include <set>

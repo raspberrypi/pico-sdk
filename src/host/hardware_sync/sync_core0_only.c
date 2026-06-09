@@ -31,6 +31,15 @@ PICO_WEAK_FUNCTION_DEF(restore_interrupts_from_disabled)
 void PICO_WEAK_FUNCTION_IMPL_NAME(restore_interrupts_from_disabled)(uint32_t status) {
 }
 
+PICO_WEAK_FUNCTION_DEF(disable_interrupts)
+
+void PICO_WEAK_FUNCTION_IMPL_NAME(disable_interrupts)(void) {
+}
+
+PICO_WEAK_FUNCTION_DEF(enable_interrupts)
+
+void PICO_WEAK_FUNCTION_IMPL_NAME(enable_interrupts)(void) {
+}
 
 PICO_WEAK_FUNCTION_DEF(spin_lock_instance)
 
@@ -84,23 +93,44 @@ void PICO_WEAK_FUNCTION_IMPL_NAME(spin_unlock)(spin_lock_t *lock, uint32_t saved
     spin_unlock_unsafe(lock);
 }
 
-PICO_WEAK_FUNCTION_DEF(__sev)
+// These are defined on ARM hosts, but don't do what we want for the host
+// since this is a simulated build.
+
+#if PICO_C_COMPILER_IS_GNU || !__has_builtin(__sev)
+#define __sev_c __sev
+#else
+#pragma redefine_extname __sev_c __sev
+#endif
+
+#if PICO_C_COMPILER_IS_GNU || !__has_builtin(__wfi)
+#define __wfi_c __wfi
+#else
+#pragma redefine_extname __wfi_c __wfi
+#endif
+
+#if PICO_C_COMPILER_IS_GNU || !__has_builtin(__wfe)
+#define __wfe_c __wfe
+#else
+#pragma redefine_extname __wfe_c __wfe
+#endif
+
+PICO_WEAK_FUNCTION_DEF(__sev_c)
 
 volatile bool event_fired;
 
-void PICO_WEAK_FUNCTION_IMPL_NAME(__sev)() {
+void PICO_WEAK_FUNCTION_IMPL_NAME(__sev_c)() {
     event_fired = true;
 }
 
-PICO_WEAK_FUNCTION_DEF(__wfi)
+PICO_WEAK_FUNCTION_DEF(__wfi_c)
 
-void PICO_WEAK_FUNCTION_IMPL_NAME(__wfi)() {
+void PICO_WEAK_FUNCTION_IMPL_NAME(__wfi_c)() {
     panic("Can't wait on irq for host core0 only implementation");
 }
 
-PICO_WEAK_FUNCTION_DEF(__wfe)
+PICO_WEAK_FUNCTION_DEF(__wfe_c)
 
-void PICO_WEAK_FUNCTION_IMPL_NAME(__wfe)() {
+void PICO_WEAK_FUNCTION_IMPL_NAME(__wfe_c)() {
     while (!event_fired) tight_loop_contents();
 }
 

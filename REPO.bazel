@@ -1,0 +1,12 @@
+"""Global settings for the Pico SDK Bazel build."""
+
+ignore_directories(
+    [
+        # Don't accidentally pick up external CMake deps with Bazel build files.
+        "cmake-*",
+        "build",
+        "build-*",
+        # Don't treat submodules as part of this project.
+        "lib",
+    ],
+)

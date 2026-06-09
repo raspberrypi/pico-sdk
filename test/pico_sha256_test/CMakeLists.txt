@@ -1,4 +1,5 @@
-if (NOT TARGET hardware_sha256)
+if (NOT TARGET pico_sha256)
+    message("Skipping pico_sha256_test as pico_sha256 is unavailable on this platform")
     return()
 endif()
 

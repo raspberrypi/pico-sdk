@@ -16,7 +16,7 @@
 #endif
 
 #if PICO_CMSIS_RENAME_EXCEPTIONS
-#if PICO_RP2040
+#if __ARM_ARCH_6M__
 #define isr_nmi NMI_Handler
 #define isr_hardfault HardFault_Handler
 #define isr_svcall SVC_Handler
@@ -48,11 +48,15 @@
 #define isr_irq23 I2C0_IRQ_Handler
 #define isr_irq24 I2C1_IRQ_Handler
 #define isr_irq25 RTC_IRQ_Handler
-#endif
-#if PICO_RP2350
+#elif __ARM_ARCH_8M_MAIN__
 #define isr_nmi NMI_Handler
 #define isr_hardfault HardFault_Handler
+#define isr_memmanage MemManage_Handler
+#define isr_busfault BusFault_Handler
+#define isr_usagefault UsageFault_Handler
+#define isr_securefault SecureFault_Handler
 #define isr_svcall SVC_Handler
+#define isr_debugmonitor DebugMon_Handler
 #define isr_pendsv PendSV_Handler
 #define isr_systick SysTick_Handler
 #define isr_irq0 TIMER0_IRQ_0_Handler

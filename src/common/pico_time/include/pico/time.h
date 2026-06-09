@@ -89,6 +89,18 @@ static inline uint32_t to_ms_since_boot(absolute_time_t t) {
     return us_to_ms(us);
 }
 
+/*! fn to_ms_64_since_boot
+ * \ingroup timestamp
+ * \brief Convert a timestamp into a number of 64-bit milliseconds since boot.
+ * \param t an absolute_time_t value to convert
+ * \return the number of milliseconds since boot represented by t
+ * \sa to_us_since_boot()
+ */
+ static inline uint64_t to_ms_64_since_boot(absolute_time_t t) {
+    uint64_t us = to_us_since_boot(t);
+    return us / 1000ull;
+}
+
 /*! \brief Return a timestamp value obtained by adding a number of microseconds to another timestamp
  * \ingroup timestamp
  *
@@ -216,7 +228,7 @@ static inline bool is_nil_time(absolute_time_t t) {
  * \note  These functions should not be called from an IRQ handler.
  *
  * \note  Lower powered sleep requires use of the \link alarm_pool_get_default default alarm pool\endlink which may
- * be disabled by the PICO_TIME_DEFAULT_ALARM_POOL_DISABLED #define or currently full in which case these functions
+ * be disabled by the PICO_TIME_DEFAULT_ALARM_POOL_DISABLED \#define or currently full in which case these functions
  * become busy waits instead.
  *
  * \note  Whilst \a sleep_ functions are preferable to \a busy_wait functions from a power perspective, the \a busy_wait equivalent function
@@ -420,7 +432,7 @@ alarm_pool_timer_t *alarm_pool_get_default_timer(void);
  * \param max_timers the maximum number of timers
  *        \note For implementation reasons this is limited to PICO_PHEAP_MAX_ENTRIES which defaults to 255
  * \sa alarm_pool_get_default()
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 static inline alarm_pool_t *alarm_pool_create(uint timer_alarm_num, uint max_timers) {
     return alarm_pool_create_on_timer(alarm_pool_get_default_timer(), timer_alarm_num, max_timers);
@@ -443,7 +455,7 @@ alarm_pool_t *alarm_pool_create_on_timer_with_unused_hardware_alarm(alarm_pool_t
  * \param max_timers the maximum number of timers
  *        \note For implementation reasons this is limited to PICO_PHEAP_MAX_ENTRIES which defaults to 255
  * \sa alarm_pool_get_default()
- * \sa hardware_claiming
+ * \sa hardware_claim
  */
 static inline alarm_pool_t *alarm_pool_create_with_unused_hardware_alarm(uint max_timers) {
     return alarm_pool_create_on_timer_with_unused_hardware_alarm(alarm_pool_get_default_timer(), max_timers);

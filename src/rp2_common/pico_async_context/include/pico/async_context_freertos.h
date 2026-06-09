@@ -56,6 +56,12 @@ typedef struct async_context_freertos_config {
      * \brief Stack size for the async_context task
      */
     configSTACK_DEPTH_TYPE task_stack_size;
+     /**
+     * \brief Pointer to stack memory for the async_context task.
+     */
+#if configSUPPORT_STATIC_ALLOCATION
+    StackType_t *task_stack;
+#endif
     /**
      * \brief the core ID (see \ref portGET_CORE_ID()) to pin the task to.
      * This is only relevant in SMP mode.
@@ -69,8 +75,16 @@ struct async_context_freertos {
     async_context_t core;
     SemaphoreHandle_t lock_mutex;
     SemaphoreHandle_t work_needed_sem;
+    SemaphoreHandle_t task_complete_sem;
     TimerHandle_t timer_handle;
     TaskHandle_t task_handle;
+#if configSUPPORT_STATIC_ALLOCATION
+    StaticSemaphore_t lock_mutex_buf;
+    StaticSemaphore_t work_needed_sem_buf;
+    StaticSemaphore_t task_complete_sem_buf;
+    StaticTimer_t timer_buf;
+    StaticTask_t task_buf;
+#endif
     uint8_t nesting;
     volatile bool task_should_exit;
 };

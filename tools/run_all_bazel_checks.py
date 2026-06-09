@@ -18,6 +18,7 @@ from bazel_common import (
 )
 from compare_build_systems import compare_build_systems
 from check_source_files_in_bazel_build import check_sources_in_bazel_build
+from bazel_buildifier_lint_check import check_buildifier
 
 
 def main():
@@ -53,6 +54,11 @@ def main():
             "step_name": "check_srcs_in_build",
             "description": "Ensure source files are present in Bazel build",
             "action": lambda : check_sources_in_bazel_build(args.picotool_dir),
+        },
+        {
+            "step_name": "check_buildifier",
+            "description": "Run buildifier check",
+            "action": check_buildifier,
         },
     )
     steps_to_run = []

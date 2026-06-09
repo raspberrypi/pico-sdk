@@ -26,18 +26,34 @@ if (NOT TARGET pico_stdio)
         pico_mirrored_target_link_libraries(pico_stdio INTERFACE pico_printf)
     endif()
 
+    # pico_enable_stdio_uart(TARGET ENABLED)
+    # \brief\ Enable stdio UART for the target
+    #
+    # \param\ ENABLED Whether to enable stdio UART
     function(pico_enable_stdio_uart TARGET ENABLED)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_STDIO_UART ${ENABLED})
     endfunction()
 
+    # pico_enable_stdio_usb(TARGET ENABLED)
+    # \brief\ Enable stdio USB for the target
+    #
+    # \param\ ENABLED Whether to enable stdio USB
     function(pico_enable_stdio_usb TARGET ENABLED)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_STDIO_USB ${ENABLED})
     endfunction()
 
+    # pico_enable_stdio_semihosting(TARGET ENABLED)
+    # \brief\ Enable stdio semi-hosting for the target
+    #
+    # \param\ ENABLED Whether to enable stdio semi-hosting
     function(pico_enable_stdio_semihosting TARGET ENABLED)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_STDIO_SEMIHOSTING ${ENABLED})
     endfunction()
 
+    # pico_enable_stdio_rtt(TARGET ENABLED)
+    # \brief\ Enable stdio RTT for the target
+    #
+    # \param\ ENABLED Whether to enable stdio RTT
     function(pico_enable_stdio_rtt TARGET ENABLED)
         set_target_properties(${TARGET} PROPERTIES PICO_TARGET_STDIO_RTT ${ENABLED})
     endfunction()

@@ -5,7 +5,9 @@
  */
 
 #include "pico/asm_helper.S"
+#if PICO_RP2040
 #include "pico/bootrom.h"
+#endif
 #include "pico/runtime_init.h"
 
 pico_default_asm_setup

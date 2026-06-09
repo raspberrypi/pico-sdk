@@ -315,8 +315,8 @@ int PRIMARY_STDIO_FUNC(puts)(const char *s) {
 int REAL_FUNC(vprintf)(const char *format, va_list va);
 
 int PRIMARY_STDIO_FUNC(vprintf)(const char *format, va_list va) {
-    bool serialzed = stdout_serialize_begin();
-    if (!serialzed) {
+    bool serialized = stdout_serialize_begin();
+    if (!serialized) {
 #if PICO_STDIO_IGNORE_NESTED_STDOUT
         return 0;
 #endif
@@ -336,8 +336,23 @@ int PRIMARY_STDIO_FUNC(vprintf)(const char *format, va_list va) {
     ret = 0;
 #else
     ret = REAL_FUNC(vprintf)(format, va);
+    // if we're using PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS, then vprintf is short-circuited to here,
+    // but we just go ahead and call the library function anyway as we're PICO_PRINTF_COMPILER.
+    // therefore we should flush stdout here in case the next thing is a puts/putchar which DO still
+    // short-circuit the c library completely.
+    //
+    // note the more correct place to handle this would be in the short-circuited functions
+    // but that would cause infinite recursion as they are called during flush of stdout!
+    // this is reasonable best-effort solution (if you really care you can set
+    // PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS=0 when using pico_printf_compiler)
+#if PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS
+    // llvm libc doesn't have fflush, nor does it buffer separately
+#if !LIB_PICO_LLVM_LIBC_INTERFACE
+    fflush(stdout);
 #endif
-    if (serialzed) {
+#endif
+#endif
+    if (serialized) {
         stdout_serialize_end();
     }
     return ret;

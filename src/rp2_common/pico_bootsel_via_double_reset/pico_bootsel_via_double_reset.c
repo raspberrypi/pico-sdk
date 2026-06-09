@@ -97,11 +97,11 @@ static inline bool double_tap_flag_is_set(void) {
 }
 
 static inline void set_double_tap_flag(void) {
-    hw_set_bits(&powman_hw->chip_reset, POWMAN_CHIP_RESET_DOUBLE_TAP_BITS);
+    hw_set_bits(&powman_hw->chip_reset, POWMAN_CHIP_RESET_DOUBLE_TAP_BITS | POWMAN_PASSWORD_BITS);
 }
 
 static inline void clear_double_tap_flag(void) {
-    hw_clear_bits(&powman_hw->chip_reset, POWMAN_CHIP_RESET_DOUBLE_TAP_BITS);
+    hw_clear_bits(&powman_hw->chip_reset, POWMAN_CHIP_RESET_DOUBLE_TAP_BITS | POWMAN_PASSWORD_BITS);
 }
 
 #endif

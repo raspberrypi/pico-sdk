@@ -28,16 +28,21 @@ void watchdog_update(void) {
 }
 // end::watchdog_update[]
 
-uint32_t watchdog_get_time_remaining_ms(void) {
-    return watchdog_hw->ctrl & WATCHDOG_CTRL_TIME_BITS;
-}
-
 #if PICO_RP2040
-// Note, we have x2 here as the watchdog HW currently decrements twice per tick
+// Note, we have x2 here as the watchdog HW currently decrements twice per tick (errata RP2040-E1)
 #define WATCHDOG_XFACTOR 2
 #else
 #define WATCHDOG_XFACTOR 1
 #endif
+
+uint32_t watchdog_get_time_remaining_us(void) {
+    return (watchdog_hw->ctrl & WATCHDOG_CTRL_TIME_BITS) / WATCHDOG_XFACTOR;
+}
+
+uint32_t watchdog_get_time_remaining_ms(void) {
+    return (watchdog_hw->ctrl & WATCHDOG_CTRL_TIME_BITS) / (1000 * WATCHDOG_XFACTOR);
+}
+
 // tag::watchdog_enable[]
 // Helper function used by both watchdog_enable and watchdog_reboot
 void _watchdog_enable(uint32_t delay_ms, bool pause_on_debug) {
@@ -60,10 +65,7 @@ void _watchdog_enable(uint32_t delay_ms, bool pause_on_debug) {
     if (!delay_ms) {
         hw_set_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_TRIGGER_BITS);
     } else {
-        load_value = delay_ms * 1000;
-#if PICO_RP2040
-        load_value *= 2;
-#endif
+        load_value = delay_ms * (1000 * WATCHDOG_XFACTOR);
         if (load_value > WATCHDOG_LOAD_BITS)
             load_value = WATCHDOG_LOAD_BITS;
 

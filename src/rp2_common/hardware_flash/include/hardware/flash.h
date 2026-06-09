@@ -56,6 +56,32 @@
 extern "C" {
 #endif
 
+/*! \brief  Initialise QSPI interface and external QSPI devices for execute-in-place
+ *  \ingroup hardware_flash
+ *
+ * This function performs the same first-time flash setup that would normally occur over the course
+ * of the bootrom locating a flash binary and booting it, and that flash binary executing the SDK
+ * crt0. Specifically:
+ *
+ * * Initialise QSPI pads to their default states, and (non-RP2040) disable pad isolation latches
+ * * Issue a hardcoded sequence to attached QSPI devices to return them to a serial command state
+ * * Flush the XIP cache
+ * * Configure the QSPI interface for low-speed 03h reads
+ * * If this is not a PICO_NO_FLASH=1 binary:
+ *      * (RP2040) load a boot2 stage from the first 256 bytes of RAM and execute it
+ *      * (non-RP2040) execute an XIP setup function stored in boot RAM by either the bootrom or by crt0
+ *
+ * This is mostly useful for initialising flash on a PICO_NO_FLASH=1 binary. (In spite of the name,
+ * this binary type really means "preloaded to RAM" and there may still be a flash device.)
+ *
+ * This function does not preserve the QSPI interface state or pad state. This is in contrast to
+ * most other functions in this library, which preserve at least the QSPI pad state. However, on
+ * RP2350 it does preserve the QMI window 1 configuration if you have not opted into bootrom CS1
+ * support via FLASH_DEVINFO.
+ */
+void flash_start_xip(void);
+
+
 /*! \brief  Erase areas of flash
  *  \ingroup hardware_flash
  *
@@ -94,15 +120,14 @@ void flash_range_program(uint32_t flash_offs, const uint8_t *data, size_t count)
  */
 void flash_get_unique_id(uint8_t *id_out);
 
-/*! \brief Execute bidirectional flash command
+/*! \brief Execute bidirectional QSPI command
  *  \ingroup hardware_flash
  *
- * Low-level function to execute a serial command on a flash device attached
+ * Low-level function to execute a serial command on a device attached
  * to the QSPI interface. Bytes are simultaneously transmitted and received
  * from txbuf and to rxbuf. Therefore, both buffers must be the same length,
  * count, which is the length of the overall transaction. This is useful for
- * reading metadata from the flash chip, such as device ID or SFDP
- * parameters.
+ * reading metadata from the chip, such as device ID or SFDP parameters.
  *
  * The XIP cache is flushed following each command, in case flash state
  * has been modified. Like other hardware_flash functions, the flash is not
@@ -112,16 +137,44 @@ void flash_get_unique_id(uint8_t *id_out);
  * it is recommended that this function only be used to extract flash metadata
  * during startup, before the main application begins to run: see the
  * implementation of pico_get_unique_id() for an example of this.
+ * 
+ * \if rp2040_specific
+ * On RP2040 the chip select index is ignored, as there is only one chip select.
+ * \endif
+ *
+ *  \param txbuf Pointer to a byte buffer which will be transmitted
+ *  \param rxbuf Pointer to a byte buffer where received data will be written. txbuf and rxbuf may be the same buffer.
+ *  \param count Length in bytes of txbuf and of rxbuf
+ *  \param cs Chip select index
+ */
+void flash_do_cmd_cs(const uint8_t *txbuf, uint8_t *rxbuf, size_t count, uint cs);
+
+/*! \brief Execute bidirectional flash command on chip select 0
+ *  \ingroup hardware_flash
+ *
+ * See \ref flash_do_cmd_cs for more details.
  *
  *  \param txbuf Pointer to a byte buffer which will be transmitted to the flash
  *  \param rxbuf Pointer to a byte buffer where data received from the flash will be written. txbuf and rxbuf may be the same buffer.
  *  \param count Length in bytes of txbuf and of rxbuf
  */
-void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count);
+static inline void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t count) {
+    flash_do_cmd_cs(txbuf, rxbuf, count, 0);
+}
 
 void flash_flush_cache(void);
 
 #if !PICO_RP2040
+typedef void (*qmi_setup_function_t)(void);
+
+/*! \brief Set the function to be called to setup the QMI CS1 configuration
+ *  \ingroup hardware_flash
+ *
+ * \param function The function to be called to setup the QMI CS1 configuration
+ * \return true if the function was set, false if not (e.g. tried to set a function in flash)
+ */
+bool flash_set_qmi_cs1_setup_function(qmi_setup_function_t function);
+
 typedef enum {
     FLASH_DEVINFO_SIZE_NONE = 0x0,
     FLASH_DEVINFO_SIZE_8K = 0x1,
@@ -151,7 +204,7 @@ static inline uint32_t flash_devinfo_size_to_bytes(flash_devinfo_size_t size) {
 }
 
 /*! \brief Convert an integer flash/PSRAM size in bytes to a size enum, as
-  !  stored in OTP and used by the ROM.
+ * stored in OTP and used by the ROM.
  *  \ingroup hardware_flash
  */
 static inline flash_devinfo_size_t flash_devinfo_bytes_to_size(uint32_t bytes) {

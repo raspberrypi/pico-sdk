@@ -1759,7 +1759,7 @@ SPDX-License-Identifier: BSD-3-Clause
                 <name>CLK_SYS_CTRL</name>
                 <addressOffset>0x0000003c</addressOffset>
                 <description>Clock control, can be changed on-the-fly (except for auxsrc)</description>
-                <resetValue>0x00000000</resetValue>
+                <resetValue>0x00000041</resetValue>
                 <fields>
                     <field>
                         <name>AUXSRC</name>
@@ -43232,7 +43232,8 @@ SPDX-License-Identifier: BSD-3-Clause
                 <fields>
                     <field>
                         <name>AUXCTRL</name>
-                        <description>* Bits 7:2: Reserved
+                        <description>* Bits 7:3: Reserved
+                            * Bit 2: Set to mask OTP power analogue power supply detection from resetting OTP controller and PSM
 
                             * Bit 1: When clear, the LPOSC output is XORed into the TRNG ROSC output as an additional, uncorrelated entropy source. When set, this behaviour is disabled.
 
@@ -47936,9 +47937,9 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>FREQ_RANGE</name>
                         <description>Controls the number of delay stages in the ROSC ring 
                             LOW uses stages 0 to 7 
-                            MEDIUM uses stages 2 to 7 
-                            HIGH uses stages 4 to 7 
-                            TOOHIGH uses stages 6 to 7 and should not be used because its frequency exceeds design specifications 
+                            MEDIUM uses stages 0 to 5
+                            HIGH uses stages 0 to 3
+                            TOOHIGH uses stages 0 to 1 and should not be used because its frequency exceeds design specifications
                             The clock output will not glitch when changing the range up one step at a time 
                             The clock output will glitch when changing the range down 
                             Note: the values here are gray coded which is why HIGH comes before TOOHIGH</description>
@@ -47976,7 +47977,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     2 bits set triples drive strength 
                     3 bits set quadruples drive strength 
                     For frequency randomisation set both DS0_RANDOM=1 &amp; DS1_RANDOM=1</description>
-                <resetValue>0x00000000</resetValue>
+                <resetValue>0x00000088</resetValue>
                 <fields>
                     <field>
                         <name>PASSWD</name>
@@ -49053,51 +49054,56 @@ SPDX-License-Identifier: BSD-3-Clause
                     bit 0 = SRAM1 
                     0 = powered up 
                     1 = powered down 
-                    When POWMAN_STATE_REQ is written, the POWMAN_STATE_WAITING flag is set while the Power Manager determines what is required. If an invalid transition is requested the Power Manager will still register the request in POWMAN_STATE_REQ but will also set the POWMAN_BAD_REQ flag. It will then implement the power-up requests and ignore the power down requests. To do nothing would risk entering an unrecoverable lock-up state. Invalid requests are: any combination of power up and power down requests any request that results in swcore boing powered and xip unpowered If the request is to power down the switched-core domain then POWMAN_STATE_WAITING stays active until the processors halt. During this time the POWMAN_STATE_REQ field can be re-written to change or cancel the request. When the power state transition begins the POWMAN_STATE_WAITING_flag is cleared, the POWMAN_STATE_CHANGING flag is set and POWMAN register writes are ignored until the transition completes.</description>
+                    When POWMAN_STATE_REQ is written, the POWMAN_STATE_WAITING flag is set while the Power Manager determines what is required. If an invalid transition is requested the Power Manager will still register the request in POWMAN_STATE_REQ but will also set the POWMAN_BAD_REQ flag. It will then implement the power-up requests and ignore the power down requests. To do nothing would risk entering an unrecoverable lock-up state. Invalid requests are: any combination of power up and power down requests any request that results in swcore being powered and xip unpowered If the request is to power down the switched-core domain then POWMAN_STATE_WAITING stays active until the processors halt. During this time the POWMAN_STATE_REQ field can be re-written to change or cancel the request. When the power state transition begins the POWMAN_STATE_WAITING_flag is cleared, the POWMAN_STATE_CHANGING flag is set and POWMAN register writes are ignored until the transition completes.</description>
                 <resetValue>0x0000000f</resetValue>
                 <fields>
                     <field>
                         <name>CHANGING</name>
+                        <description>Indicates a power state change is in progress</description>
                         <bitRange>[13:13]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>WAITING</name>
+                        <description>Indicates the power manager has received a state change request and is waiting for other actions to complete before executing it</description>
                         <bitRange>[12:12]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>BAD_HW_REQ</name>
-                        <description>Bad hardware initiated state request. Went back to state 0 (i.e. everything powered up)</description>
+                        <description>Invalid hardware initiated state request, power up requests actioned, power down requests ignored</description>
                         <bitRange>[11:11]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>BAD_SW_REQ</name>
-                        <description>Bad software initiated state request. No action taken.</description>
+                        <description>Invalid software initiated state request ignored</description>
                         <bitRange>[10:10]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>PWRUP_WHILE_WAITING</name>
-                        <description>Request ignored because of a pending pwrup request. See current_pwrup_req. Note this blocks powering up AND powering down.</description>
+                        <description>Indicates that a power state change request was ignored because of a pending power state change request</description>
                         <bitRange>[9:9]</bitRange>
                         <access>read-write</access>
                         <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>REQ_IGNORED</name>
+                        <description>Indicates that a software state change request was ignored because it clashed with an ongoing hardware or debugger request</description>
                         <bitRange>[8:8]</bitRange>
                         <access>read-write</access>
                         <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>REQ</name>
+                        <description>This is written by software or hardware to request a new power state</description>
                         <bitRange>[7:4]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>CURRENT</name>
+                        <description>Indicates the current power state</description>
                         <bitRange>[3:0]</bitRange>
                         <access>read-only</access>
                     </field>
@@ -77606,7 +77612,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>SUSPENDED</name>
-                        <description>Bus in suspended state. Valid for device. Device will go into suspend if neither Keep Alive / SOF frames are enabled.</description>
+                        <description>Bus in suspended state. Valid for device and host. Host and device will go into suspend if neither Keep Alive / SOF frames are enabled.</description>
                         <bitRange>[4:4]</bitRange>
                         <access>read-write</access>
                         <modifiedWriteValues>oneToClear</modifiedWriteValues>
@@ -105846,5 +105852,40 @@ SPDX-License-Identifier: BSD-3-Clause
             </register>
         </registers>
     </peripheral>
+
+    <peripheral>
+        <name>SPARE_IRQ</name>
+        <baseAddress>0x00000000</baseAddress>
+        <addressBlock>
+            <offset>0</offset>
+            <size>4</size>
+            <usage>reserved</usage>
+        </addressBlock>
+        <interrupt>
+            <name>SPARE_IRQ_0</name>
+            <value>46</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_1</name>
+            <value>47</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_2</name>
+            <value>48</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_3</name>
+            <value>49</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_4</name>
+            <value>50</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_5</name>
+            <value>51</value>
+        </interrupt>
+    </peripheral>
+
     </peripherals>
 </device>

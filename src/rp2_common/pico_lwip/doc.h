@@ -44,3 +44,47 @@
  * \ingroup pico_lwip
  * \brief lwIP compiler adapters. This is not included by default in \c \b pico_lwip in case you wish to implement your own.
  */
+
+/** \defgroup pico_lwip_http pico_lwip_http
+ * \ingroup pico_lwip
+ * \brief LwIP HTTP client and server library
+ *
+ * This library enables you to make use of the LwIP HTTP client and server library
+ *
+ * \par LwIP HTTP server
+ *
+ * To make use of the LwIP HTTP server you need to provide the HTML that the server will return to the client.
+ * This is done by compiling the content directly into the executable.
+ *
+ * \par makefsdata
+ *
+ * LwIP provides a c-library tool `makefsdata` to compile your HTML into a source file for inclusion into your program.
+ * This is quite hard to use as you need to compile the tool as a native binary, then run the tool to generate a source file
+ * before compiling your code for the Pico device.
+ *
+ * \par pico_set_lwip_httpd_content
+ *
+ * To make this whole process easier, a python script `makefsdata.py` is provided to generate a source file for your HTML content.
+ * A CMake function `pico_set_lwip_httpd_content` takes care of running the `makefsdata.py` python script for you.
+ * To make use of this, specify the name of the source file as `pico_fsdata.inc` in `lwipopts.h`.
+ *
+ * \code
+ * #define HTTPD_FSDATA_FILE "pico_fsdata.inc"
+ * \endcode
+ *
+ * Then call the CMake function `pico_set_lwip_httpd_content` in your `CMakeLists.txt` to add your content to a library.
+ * Make sure you add this library to your executable by adding it to your target_link_libraries list.
+ * Here is an example from the httpd example in pico-examples.
+  *
+ * \code
+ * pico_add_library(pico_httpd_content NOFLAG)
+ * pico_set_lwip_httpd_content(pico_httpd_content INTERFACE
+ *        ${CMAKE_CURRENT_LIST_DIR}/content/404.html
+ *        ${CMAKE_CURRENT_LIST_DIR}/content/index.shtml
+ *        ${CMAKE_CURRENT_LIST_DIR}/content/test.shtml
+ *        ${CMAKE_CURRENT_LIST_DIR}/content/ledpass.shtml
+ *        ${CMAKE_CURRENT_LIST_DIR}/content/ledfail.shtml
+ *        ${CMAKE_CURRENT_LIST_DIR}/content/img/rpi.png
+ *        )
+ * \endcode
+ */

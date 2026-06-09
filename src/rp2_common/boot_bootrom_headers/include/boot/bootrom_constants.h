@@ -70,18 +70,19 @@
 // note this is deliberately > MAX_PARTITIONs is likely to be, and also -1 as a signed byte
 #define PARTITION_TABLE_NO_PARTITION_INDEX 0xff
 
-// todo these are duplicated in picoboot_constants.h
+// values returned from \ref rom_get_last_boot_type()
+// --- note these match the REBOOT2_FLAG_REBOOT_TYPE_ constants in pico/picoboot_constants.h
 // values 0-7 are secure/non-secure
 #define BOOT_TYPE_NORMAL     0
 #define BOOT_TYPE_BOOTSEL    2
 #define BOOT_TYPE_RAM_IMAGE  3
 #define BOOT_TYPE_FLASH_UPDATE 4
-
 // values 8-15 are secure only
 #define BOOT_TYPE_PC_SP      0xd
 
 // ORed in if a bootloader chained into the image
 #define BOOT_TYPE_CHAINED_FLAG 0x80
+// ---
 
 // call from NS to S
 #ifndef __riscv
@@ -230,7 +231,7 @@ typedef int (*bootrom_api_callback_generic_t)(uint32_t r0, uint32_t r1, uint32_t
 #define PT_INFO_PARTITION_NAME                  0x0080
 
 // items are returned in order
-// 3 words package_id, device_id, wafer_id
+// 3 words package_id, device_id_lo, device_id_hi
 #define SYS_INFO_CHIP_INFO                      0x0001
 // 1 word: chip specific critical bits
 #define SYS_INFO_CRITICAL                       0x0002
@@ -255,11 +256,11 @@ typedef int (*bootrom_api_callback_generic_t)(uint32_t r0, uint32_t r1, uint32_t
 #define BOOTROM_NS_API_get_b_partition 7
 #define BOOTROM_NS_API_COUNT 8
 
-#define OTP_CMD_ROW_BITS                    0x0000ffffu
+#define OTP_CMD_ROW_BITS                    _u(0x0000ffff)
 #define OTP_CMD_ROW_LSB                     _u(0)
-#define OTP_CMD_WRITE_BITS                  0x00010000u
+#define OTP_CMD_WRITE_BITS                  _u(0x00010000)
 #define OTP_CMD_WRITE_LSB                   _u(16)
-#define OTP_CMD_ECC_BITS                    0x00020000u
+#define OTP_CMD_ECC_BITS                    _u(0x00020000)
 #define OTP_CMD_ECC_LSB                     _u(17)
 
 #ifndef __ASSEMBLER__

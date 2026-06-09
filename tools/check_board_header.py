@@ -20,6 +20,14 @@ import warnings
 
 from collections import namedtuple
 
+if sys.version_info < (3, 11):
+    # Python <3.11 doesn't have ExceptionGroup, so define a simple one
+    class ExceptionGroup(Exception):
+        def __init__(self, message, errors):
+            message += "\n" + "\n".join(str(e) for e in errors)
+            super().__init__(message)
+
+
 # warnings off by default, because some boards use the same pin for multiple purposes
 show_warnings = False
 
@@ -29,12 +37,26 @@ chip_interfaces = {
     'RP2350B': "src/rp2350/rp2350b_interface_pins.json",
 }
 
-compulsory_cmake_settings = set(['PICO_PLATFORM'])
-compulsory_cmake_default_settings = set(['PICO_FLASH_SIZE_BYTES'])
-matching_cmake_default_settings = set(['PICO_FLASH_SIZE_BYTES', 'PICO_RP2350_A2_SUPPORTED'])
-compulsory_defines = set(['PICO_FLASH_SIZE_BYTES'])
+# names for which we MUST have a pico_board_cmake_set
+compulsory_cmake_settings = frozenset(['PICO_PLATFORM'])
 
-DefineType = namedtuple("DefineType", ["name", "value", "resolved_value", "lineno"])
+# names for which we MUST have a pico_board_cmake_set_default
+compulsory_cmake_default_settings = frozenset(['PICO_FLASH_SIZE_BYTES'])
+
+# names for which pico_board_cmake_set_default (if present) needs a matching #define (and vice-versa)
+matching_cmake_default_settings = frozenset(['PICO_FLASH_SIZE_BYTES', 'PICO_RP2350_A2_SUPPORTED', 'PICO_PSRAM_SIZE_BYTES'])
+
+# names for which we MUST have a #define
+compulsory_defines = frozenset(['PICO_FLASH_SIZE_BYTES'])
+
+# names where the presence of one #define requires other #defines to be present too
+# (this is one-way and not bidirectional, so you'll need multiple entries for mutually-dependent #defines)
+linked_defines = {
+    'PICO_PSRAM_SIZE_BYTES': frozenset(['PICO_PSRAM_CS_PIN']),
+    'PICO_AUTO_DETECT_PSRAM_SIZE': frozenset(['PICO_PSRAM_CS_PIN']),
+}
+
+DefineType = namedtuple("DefineType", ["name", "value", "resolved_value", "lineno", "has_ifndef"])
 
 def list_to_string_with(lst, joiner):
     elems = len(lst)
@@ -65,6 +87,7 @@ has_include_suggestion = False
 
 
 def read_defines_from(header_file, defines_dict):
+    errors = []
     with open(header_file) as fh:
         last_ifndef = None
         last_ifndef_lineno = -1
@@ -75,37 +98,48 @@ def read_defines_from(header_file, defines_dict):
             # strip trailing comments
             line = re.sub(r"(?<=\S)\s*//.*$", "", line)
 
-            # look for "// pico_cmake_set BLAH_BLAH=42"
-            m = re.match(r"^\s*//\s*pico_cmake_set\s+(\w+)\s*=\s*(.+?)\s*$", line)
+            # look for "// old_comment BLAH_BLAH=42" and suggest changing it to "new_macro(BLAH_BLAH, 42)"
+            for (old_comment, new_macro) in (
+                ('pico_cmake_set', 'pico_board_cmake_set'),
+                ('pico_cmake_set_default', 'pico_board_cmake_set_default')
+            ):
+                m = re.match(r"^\s*//\s*{}\s+(\w+)\s*=\s*(.+?)\s*$".format(old_comment), line)
+                if m:
+                    name = m.group(1)
+                    value = m.group(2)
+                    errors.append(Exception("{}:{}  \"// {} {}={}\" should be replaced with \"{}({}, {})\"".format(board_header, lineno, old_comment, name, value, new_macro, name, value)))
+
+            # look for "pico_board_cmake_set(BLAH_BLAH, 42)"
+            m = re.match(r"^\s*pico_board_cmake_set\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
             if m:
                 #print(m.groups())
                 name = m.group(1)
                 value = m.group(2)
                 # check all uppercase
                 if name != name.upper():
-                    raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
+                    errors.append(Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name)))
                 # check for multiply-defined values
                 if name in cmake_settings:
                     if cmake_settings[name].value != value:
-                        raise Exception("{}:{}  Conflicting values for pico_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
+                        errors.append(Exception("{}:{}  Conflicting values for pico_board_cmake_set({}) ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value)))
                     else:
                         if show_warnings:
-                            warnings.warn("{}:{}  Multiple values for pico_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
+                            warnings.warn("{}:{}  Multiple values for pico_board_cmake_set({}) ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
                 else:
-                   cmake_settings[name] = DefineType(name, value, None, lineno)
+                   cmake_settings[name] = DefineType(name, value, None, lineno, False)
                 continue
 
-            # look for "// pico_cmake_set_default BLAH_BLAH=42"
-            m = re.match(r"^\s*//\s*pico_cmake_set_default\s+(\w+)\s*=\s*(.+?)\s*$", line)
+            # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
+            m = re.match(r"^\s*pico_board_cmake_set_default\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
             if m:
                 #print(m.groups())
                 name = m.group(1)
                 value = m.group(2)
                 # check all uppercase
                 if name != name.upper():
-                    raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
+                    errors.append(Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name)))
                 if name not in cmake_default_settings:
-                   cmake_default_settings[name] = DefineType(name, value, None, lineno)
+                   cmake_default_settings[name] = DefineType(name, value, None, lineno, False)
                 continue
 
             # look for "#else"
@@ -119,7 +153,7 @@ def read_defines_from(header_file, defines_dict):
             if m:
                 validity_stack.pop()
                 continue
-            
+
             if validity_stack[-1]:
                 # look for "#include "foo.h"
                 m = re.match(r"""^\s*#include\s+"(.+?)"\s*$""", line)
@@ -129,7 +163,7 @@ def read_defines_from(header_file, defines_dict):
                     assert include.endswith(".h")
                     # assume that the include is also in the boards directory
                     assert "/" not in include or include.startswith("boards/")
-                    read_defines_from(os.path.join(os.path.dirname(board_header), os.path.basename(include)), defines)
+                    errors.extend(read_defines_from(os.path.join(os.path.dirname(board_header), os.path.basename(include)), defines))
                     continue
 
                 # look for "#if BLAH_BLAH"
@@ -164,11 +198,11 @@ def read_defines_from(header_file, defines_dict):
                     value = m.group(2)
                     # check all uppercase
                     if name != name.upper():
-                        raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
+                        errors.append(Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name)))
                     # check that adjacent #ifndef and #define lines match up
                     if last_ifndef_lineno + 1 == lineno:
                         if last_ifndef != name:
-                            raise Exception("{}:{}  #ifndef {} / #define {} mismatch".format(board_header, last_ifndef_lineno, last_ifndef, name))
+                            errors.append(Exception("{}:{}  #ifndef {} / #define {} mismatch".format(board_header, last_ifndef_lineno, last_ifndef, name)))
                     if value:
                         try:
                             # most board-defines are integer values
@@ -186,16 +220,20 @@ def read_defines_from(header_file, defines_dict):
                     # check for multiply-defined values
                     if name in defines_dict:
                         if defines_dict[name].value != value:
-                            raise Exception("{}:{}  Conflicting definitions for {} ({} and {})".format(board_header, lineno, name, defines_dict[name].value, value))
+                            errors.append(Exception("{}:{}  Conflicting definitions for {} ({} and {})".format(board_header, lineno, name, defines_dict[name].value, value)))
                         else:
                             if show_warnings:
                                 warnings.warn("{}:{}  Multiple definitions for {} ({} and {})".format(board_header, lineno, name, defines_dict[name].value, value))
                     else:
-                        defines_dict[name] = DefineType(name, value, resolved_value, lineno)
+                        defines_dict[name] = DefineType(name, value, resolved_value, lineno, last_ifndef == name)
+    return errors
 
 
 if board_header_basename == "amethyst_fpga.h":
-    defines['PICO_RP2350'] = DefineType('PICO_RP2350', 1, 1, -1)
+    defines['PICO_RP2350'] = DefineType('PICO_RP2350', 1, 1, -1, False)
+    defines['PICO_RP2350A'] = DefineType('PICO_RP2350A', 0, 0, -1, False)
+
+errors = []
 
 with open(board_header) as header_fh:
     last_ifndef = None
@@ -208,32 +246,43 @@ with open(board_header) as header_fh:
         line = re.sub(r"(?<=\S)\s*//.*$", "", line)
 
         # look for board-detection comment
-        if re.match("^\s*// For board detection", line):
+        if re.match(r"^\s*// For board detection", line):
             board_detection_is_next = True
             continue
 
         # check include-suggestion
-        m = re.match("^\s*// This header may be included by other board headers as \"(.+?)\"", line)
+        m = re.match(r"""^\s*// This header may be included by other board headers as "(.+?)"$""", line)
         if m:
             include_suggestion = m.group(1)
             if include_suggestion == expected_include_suggestion:
                 has_include_suggestion = True
             else:
-                raise Exception("{}:{}  Suggests including \"{}\" but file is named \"{}\"".format(board_header, lineno, include_suggestion, expected_include_suggestion))
+                errors.append(Exception("{}:{}  Suggests including \"{}\" but file is named \"{}\"".format(board_header, lineno, include_suggestion, expected_include_suggestion)))
             continue
 
-        # look for "// pico_cmake_set BLAH_BLAH=42"
-        m = re.match(r"^\s*//\s*pico_cmake_set\s+(\w+)\s*=\s*(.+?)\s*$", line)
+        # look for "// old_comment BLAH_BLAH=42" and suggest changing it to "new_macro(BLAH_BLAH, 42)"
+        for (old_comment, new_macro) in (
+            ('pico_cmake_set', 'pico_board_cmake_set'),
+            ('pico_cmake_set_default', 'pico_board_cmake_set_default')
+        ):
+            m = re.match(r"^\s*//\s*{}\s+(\w+)\s*=\s*(.+?)\s*$".format(old_comment), line)
+            if m:
+                name = m.group(1)
+                value = m.group(2)
+                errors.append(Exception("{}:{}  \"// {} {}={}\" should be replaced with \"{}({}, {})\"".format(board_header, lineno, old_comment, name, value, new_macro, name, value)))
+
+        # look for "pico_board_cmake_set(BLAH_BLAH, 42)"
+        m = re.match(r"^\s*pico_board_cmake_set\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
         if m:
             #print(m.groups())
             name = m.group(1)
             value = m.group(2)
             # check all uppercase
             if name != name.upper():
-                raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
+                errors.append(Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name)))
             # check for multiply-defined values
             if name in cmake_settings:
-                raise Exception("{}:{}  Multiple values for pico_cmake_set {} ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
+                errors.append(Exception("{}:{}  Multiple values for pico_board_cmake_set({}) ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value)))
             else:
                 if value:
                     try:
@@ -241,21 +290,21 @@ with open(board_header) as header_fh:
                         value = int(value, 0)
                     except ValueError:
                         pass
-                cmake_settings[name] = DefineType(name, value, None, lineno)
+                cmake_settings[name] = DefineType(name, value, None, lineno, False)
             continue
 
-        # look for "// pico_cmake_set_default BLAH_BLAH=42"
-        m = re.match(r"^\s*//\s*pico_cmake_set_default\s+(\w+)\s*=\s*(.+?)\s*$", line)
+        # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
+        m = re.match(r"^\s*pico_board_cmake_set_default\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*(.*)\s*\)\s*$", line)
         if m:
             #print(m.groups())
             name = m.group(1)
             value = m.group(2)
             # check all uppercase
             if name != name.upper():
-                raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
+                errors.append(Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name)))
             # check for multiply-defined values
             if name in cmake_default_settings:
-                raise Exception("{}:{}  Multiple values for pico_cmake_set_default {} ({} and {})".format(board_header, lineno, name, cmake_default_settings[name].value, value))
+                errors.append(Exception("{}:{}  Multiple values for pico_board_cmake_set_default({}) ({} and {})".format(board_header, lineno, name, cmake_default_settings[name].value, value)))
             else:
                 if value:
                     try:
@@ -263,7 +312,7 @@ with open(board_header) as header_fh:
                         value = int(value, 0)
                     except ValueError:
                         pass
-                cmake_default_settings[name] = DefineType(name, value, None, lineno)
+                cmake_default_settings[name] = DefineType(name, value, None, lineno, False)
             continue
 
         # look for "#else"
@@ -277,7 +326,7 @@ with open(board_header) as header_fh:
         if m:
             validity_stack.pop()
             continue
-        
+
         if validity_stack[-1]:
             # look for "#include "foo.h"
             m = re.match(r"""^\s*#include\s+"(.+?)"\s*$""", line)
@@ -287,7 +336,7 @@ with open(board_header) as header_fh:
                 assert include.endswith(".h")
                 # assume that the include is also in the boards directory
                 assert "/" not in include or include.startswith("boards/")
-                read_defines_from(os.path.join(os.path.dirname(board_header), os.path.basename(include)), defines)
+                errors.extend(read_defines_from(os.path.join(os.path.dirname(board_header), os.path.basename(include)), defines))
                 continue
 
             # look for "#if BLAH_BLAH"
@@ -321,11 +370,11 @@ with open(board_header) as header_fh:
                 value = m.group(2)
                 # check all uppercase
                 if name != name.upper():
-                    raise Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name))
+                    errors.append(Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name)))
                 # check that adjacent #ifndef and #define lines match up
                 if last_ifndef_lineno + 1 == lineno:
                     if last_ifndef != name:
-                        raise Exception("{}:{}  #ifndef {} / #define {} mismatch".format(board_header, last_ifndef_lineno, last_ifndef, name))
+                        errors.append(Exception("{}:{}  #ifndef {} / #define {} mismatch".format(board_header, last_ifndef_lineno, last_ifndef, name)))
                 if value:
                     try:
                         # most board-defines are integer values
@@ -337,6 +386,11 @@ with open(board_header) as header_fh:
                     resolved_value = value
                     while resolved_value in defines:
                         resolved_value = defines[resolved_value].resolved_value
+                    # resolve unsigned ints
+                    if isinstance(resolved_value, str):
+                        m = re.match(r"^(\d+)u$", resolved_value)
+                        if m:
+                            resolved_value = int(m.group(1))
                 else:
                     resolved_value = None
 
@@ -344,30 +398,30 @@ with open(board_header) as header_fh:
                 if re.match(r"^_BOARDS_(\w+)_H$", name):
                     # check it has an #ifndef
                     if last_ifndef_lineno +1 != lineno:
-                        raise Exception("{}:{}  Include-guard #define {} is missing an #ifndef".format(board_header, lineno, name))
+                        errors.append(Exception("{}:{}  Include-guard #define {} is missing an #ifndef".format(board_header, lineno, name)))
                     if value:
-                        raise Exception("{}:{}  Include-guard #define {} shouldn't have a value".format(board_header, lineno, name))
-                    if len(defines) and not (len(defines) == 1 and defines[list(defines.keys())[0]].lineno < 0):
-                        raise Exception("{}:{}  Include-guard #define {} should be the first define".format(board_header, lineno, name))
+                        errors.append(Exception("{}:{}  Include-guard #define {} shouldn't have a value".format(board_header, lineno, name)))
+                    if any(defines[d].lineno >= 0 for d in defines):
+                        errors.append(Exception("{}:{}  Include-guard #define {} should be the first define".format(board_header, lineno, name)))
                     if name == expected_include_guard:
                         has_include_guard = True
                     else:
-                        raise Exception("{}:{}  Found include-guard #define {} but expected {}".format(board_header, lineno, name, expected_include_guard))
+                        errors.append(Exception("{}:{}  Found include-guard #define {} but expected {}".format(board_header, lineno, name, expected_include_guard)))
                 # check board-detection define
                 if board_detection_is_next:
                     board_detection_is_next = False
                     if value:
-                        raise Exception("{}:{}  Board-detection #define {} shouldn't have a value".format(board_header, lineno, name))
+                        errors.append(Exception("{}:{}  Board-detection #define {} shouldn't have a value".format(board_header, lineno, name)))
                     # this is a bit messy because pico.h does "#define RASPBERRYPI_PICO" and metrotech_xerxes_rp2040.h does "#define XERXES_RP2040"
                     if name.endswith(expected_board_detection) or expected_board_detection.endswith(name):
                         has_board_detection = True
                     else:
-                        raise Exception("{}:{}  Board-detection #define {} should end with {}".format(board_header, lineno, name, expected_board_detection))
+                        errors.append(Exception("{}:{}  Board-detection #define {} should end with {}".format(board_header, lineno, name, expected_board_detection)))
                 # check for multiply-defined values
                 if name in defines:
-                    raise Exception("{}:{}  Multiple definitions for {} ({} and {})".format(board_header, lineno, name, defines[name].value, value))
+                    errors.append(Exception("{}:{}  Multiple definitions for {} ({} and {})".format(board_header, lineno, name, defines[name].value, value)))
                 else:
-                    defines[name] = DefineType(name, value, resolved_value, lineno)
+                    defines[name] = DefineType(name, value, resolved_value, lineno, last_ifndef == name)
                 continue
 
 
@@ -381,40 +435,59 @@ if board_header_basename == "none.h":
 else:
     for setting in compulsory_cmake_settings:
         if setting not in cmake_settings:
-            raise Exception("{} is missing a pico_cmake_set {} comment".format(board_header, setting))
+            errors.append(Exception("{} is missing a pico_board_cmake_set({}, XXX) call".format(board_header, setting)))
+
+    # Must be raised before continuing, in case compulsory settings are missing
+    if errors:
+        raise ExceptionGroup("Errors in {}".format(board_header), errors)
     if cmake_settings['PICO_PLATFORM'].value == "rp2040":
         chip = 'RP2040'
         other_chip = 'RP2350'
     elif cmake_settings['PICO_PLATFORM'].value == "rp2350":
         other_chip = 'RP2040'
-        if 'PICO_RP2350A' in defines and defines['PICO_RP2350A'].resolved_value == 1:
-            chip = 'RP2350A'
+        if 'PICO_RP2350B' in defines:
+            errors.append(Exception("{} sets #define {} {} (should probably be #define {} {})".format(board_header, 'PICO_RP2350B', defines['PICO_RP2350B'].resolved_value, 'PICO_RP2350A', 1 - defines['PICO_RP2350B'].resolved_value)))
+        if 'PICO_RP2350A' not in defines:
+            errors.append(Exception("{} has no #define for {} (set to 1 for RP2350A, or 0 for RP2350B)".format(board_header, 'PICO_RP2350A')))
         else:
-            chip = 'RP2350B'
+            if defines['PICO_RP2350A'].resolved_value == 1:
+                chip = 'RP2350A'
+            else:
+                chip = 'RP2350B'
         if not board_header.endswith("amethyst_fpga.h"):
             if 'PICO_RP2350_A2_SUPPORTED' not in cmake_default_settings:
-                raise Exception("{} uses chip {} but is missing a pico_cmake_set_default {} comment".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
+                errors.append(Exception("{} uses chip {} but is missing a pico_board_cmake_set_default({}, XXX) call".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED')))
             if 'PICO_RP2350_A2_SUPPORTED' not in defines:
-                raise Exception("{} uses chip {} but is missing a #define {}".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED'))
-            if defines['PICO_RP2350_A2_SUPPORTED'].resolved_value != 1:
-                raise Exception("{} sets #define {} {} (should be 1)".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED', defines['PICO_RP2350_A2_SUPPORTED'].resolved_value))
+                errors.append(Exception("{} uses chip {} but is missing a #define {}".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED')))
+            elif defines['PICO_RP2350_A2_SUPPORTED'].resolved_value != 1:
+                errors.append(Exception("{} sets #define {} {} (should be 1)".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED', defines['PICO_RP2350_A2_SUPPORTED'].resolved_value)))
     for setting in compulsory_cmake_default_settings:
         if setting not in cmake_default_settings:
-            raise Exception("{} is missing a pico_cmake_set_default {} comment".format(board_header, setting))
+            errors.append(Exception("{} is missing a pico_board_cmake_set_default({}, XXX) call".format(board_header, setting)))
     for setting in matching_cmake_default_settings:
         if setting in cmake_default_settings and setting not in defines:
-            raise Exception("{} has pico_cmake_set_default {} but is missing a matching #define".format(board_header, setting))
+            errors.append(Exception("{} has pico_board_cmake_set_default({}, XXX) but is missing a matching #define".format(board_header, setting)))
         elif setting in defines and setting not in cmake_default_settings:
-            raise Exception("{} has #define {} but is missing a matching pico_cmake_set_default comment".format(board_header, setting))
+            errors.append(Exception("{} has #define {} but is missing a matching pico_board_cmake_set_default({}, XXX) call".format(board_header, setting, setting)))
         elif setting in defines and setting in cmake_default_settings:
             if cmake_default_settings[setting].value != defines[setting].resolved_value:
-                raise Exception("{} has mismatched pico_cmake_set_default and #define values for {}".format(board_header, setting))
+                errors.append(Exception("{} has mismatched pico_board_cmake_set_default and #define values for {}".format(board_header, setting)))
     for setting in compulsory_defines:
         if setting not in defines:
-            raise Exception("{} is missing a #define {}".format(board_header, setting))
+            errors.append(Exception("{} is missing a #define {}".format(board_header, setting)))
+    for setting in linked_defines:
+        if setting in defines:
+            for linked_define in linked_defines[setting]:
+                if linked_define not in defines:
+                    errors.append(Exception("{} defines {} but is missing a corresponding #define {}".format(board_header, setting, linked_define)))
 
 if chip is None:
-    raise Exception("Couldn't determine chip for {}".format(board_header))
+    errors.append(Exception("Couldn't determine chip for {}".format(board_header)))
+
+# Must be raised before continuing, in case chip is not determined
+if errors:
+    raise ExceptionGroup("Errors in {}".format(board_header), errors)
+
 interfaces_json = chip_interfaces[chip]
 if not os.path.isfile(interfaces_json):
     raise Exception("{} doesn't exist".format(interfaces_json))
@@ -422,7 +495,7 @@ if not os.path.isfile(interfaces_json):
 with open(interfaces_json) as interfaces_fh:
     interface_pins = json.load(interfaces_fh)
     allowed_interfaces = interface_pins["interfaces"]
-    allowed_pins = set(interface_pins["pins"])
+    allowed_pins = frozenset(interface_pins["pins"])
     # convert instance-keys to integers (allowed by Python but not by JSON)
     for interface in allowed_interfaces:
         instances = allowed_interfaces[interface]["instances"]
@@ -437,22 +510,29 @@ for name, define in defines.items():
 
     # check for other-chip defines
     if other_chip in name:
-        raise Exception("{}:{}  Header is for {} and so shouldn't have settings for {} ({})".format(board_header, define.lineno, chip, other_chip, name))
+        errors.append(Exception("{}:{}  Header is for {} and so shouldn't have settings for {} ({})".format(board_header, define.lineno, chip, other_chip, name)))
 
     # check for pin-conflicts
-    if name.endswith("_PIN"):
+    if name.endswith("_PIN") or name.endswith("_PIN_BASE") or "_DEFAULT_PIN_" in name:
         if define.resolved_value is None:
-            raise Exception("{}:{}  {} is set to an undefined value".format(board_header, define.lineno, name))
+            errors.append(Exception("{}:{}  {} is set to an undefined value".format(board_header, define.lineno, name)))
         elif not isinstance(define.resolved_value, int):
-            raise Exception("{}:{}  {} resolves to a non-integer value {}".format(board_header, define.lineno, name, define.resolved_value))
+            errors.append(Exception("{}:{}  {} resolves to a non-integer value {}".format(board_header, define.lineno, name, define.resolved_value)))
         else:
             if define.resolved_value in pins and define.resolved_value == define.value:
                 if show_warnings:
                     warnings.warn("{}:{}  Both {} and {} claim to be pin {}".format(board_header, define.lineno, pins[define.resolved_value][0].name, name, define.resolved_value))
                 pins[define.resolved_value].append(define)
             else:
-                if define.resolved_value not in allowed_pins:
-                    raise Exception("{}:{}  Pin {} for {} isn't a valid pin-number".format(board_header, define.lineno, define.resolved_value, name))
+                if name.startswith("CYW43_WL_GPIO_"):
+                    if "CYW43_WL_GPIO_COUNT" not in defines:
+                            errors.append(Exception("{}:{}  {} is defined but {} is missing".format(board_header, define.lineno, name, "CYW43_WL_GPIO_COUNT")))
+                    else:
+                        if define.resolved_value < 0 or define.resolved_value >= defines["CYW43_WL_GPIO_COUNT"].resolved_value:
+                            errors.append(Exception("{}:{}  Pin {} for {} isn't a valid pin-number for {}".format(board_header, define.lineno, define.resolved_value, name, "CYW43")))
+                else:
+                    if define.resolved_value not in allowed_pins:
+                        errors.append(Exception("{}:{}  Pin {} for {} isn't a valid pin-number for {}".format(board_header, define.lineno, define.resolved_value, name, chip)))
                 pins[define.resolved_value] = [define]
 
     # check for invalid DEFAULT mappings
@@ -464,44 +544,74 @@ for name, define in defines.items():
         if interface == "WS2812":
             continue
         if interface not in allowed_interfaces:
-            raise Exception("{}:{}  {} is defined but {} isn't in {}".format(board_header, define.lineno, name, interface, interfaces_json))
+            errors.append(Exception("{}:{}  {} is defined but {} isn't in {}".format(board_header, define.lineno, name, interface, interfaces_json)))
+            continue
         if instance_name not in defines:
-            raise Exception("{}:{}  {} is defined but {} isn't defined".format(board_header, define.lineno, name, instance_name))
+            errors.append(Exception("{}:{}  {} is defined but {} isn't defined".format(board_header, define.lineno, name, instance_name)))
+            continue
         instance_define = defines[instance_name]
         instance_num = instance_define.resolved_value
         if instance_num not in allowed_interfaces[interface]["instances"]:
-            raise Exception("{}:{}  {} is set to an invalid instance {}".format(board_header, instance_define.lineno, instance_define, instance_num))
+            errors.append(Exception("{}:{}  {} is set to an invalid instance {}".format(board_header, instance_define.lineno, instance_define, instance_num)))
+            continue
         interface_instance = allowed_interfaces[interface]["instances"][instance_num]
         if function not in interface_instance:
-            raise Exception("{}:{}  {} is defined but {} isn't a valid function for {}".format(board_header, define.lineno, name, function, instance_define))
+            errors.append(Exception("{}:{}  {} is defined but {} isn't a valid function for {}".format(board_header, define.lineno, name, function, instance_define)))
+            continue
         if define.resolved_value not in interface_instance[function]:
-            raise Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num))
+            errors.append(Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num)))
 
     # check that each used DEFAULT interface includes (at least) the expected pin-functions
     m = re.match("^PICO_DEFAULT_([A-Z0-9]+)$", name)
     if m:
         interface = m.group(1)
         if interface not in allowed_interfaces:
-            raise Exception("{}:{}  {} is defined but {} isn't in {}".format(board_header, define.lineno, name, interface, interfaces_json))
+            errors.append(Exception("{}:{}  {} is defined but {} isn't in {}".format(board_header, define.lineno, name, interface, interfaces_json)))
+            continue
         if "expected_functions" in allowed_interfaces[interface]:
             expected_functions = allowed_interfaces[interface]["expected_functions"]
             if "required" in expected_functions:
                 for function in expected_functions["required"]:
                     expected_function_pin = "{}_{}_PIN".format(name, function)
                     if expected_function_pin not in defines:
-                        raise Exception("{}:{}  {} is defined but {} isn't defined".format(board_header, define.lineno, name, expected_function_pin))
+                        errors.append(Exception("{}:{}  {} is defined but {} isn't defined".format(board_header, define.lineno, name, expected_function_pin)))
             if "one_of" in expected_functions:
                 expected_function_pins = list("{}_{}_PIN".format(name, function) for function in expected_functions["one_of"])
                 if not any(func_pin in defines for func_pin in expected_function_pins):
-                    raise Exception("{}:{}  {} is defined but none of {} are defined".format(board_header, define.lineno, name, list_to_string_with(expected_function_pins, "or")))
+                    errors.append(Exception("{}:{}  {} is defined but none of {} are defined".format(board_header, define.lineno, name, list_to_string_with(expected_function_pins, "or"))))
+
+    # check that relevant defines are inside an ifndef clause
+    if (name in cmake_default_settings or name.startswith("PICO_DEFAULT_")) and not define.has_ifndef:
+        errors.append(Exception("{}:{}  {} isn't enclosed in an #ifndef {} guard".format(board_header, define.lineno, name, name)))
+
+    # check for invalid PSRAM CS pin
+    if name == "PICO_PSRAM_CS_PIN":
+        interface = "QMI"
+        instance_num = 0
+        function = "CS1N"
+        if interface not in allowed_interfaces:
+            errors.append(Exception("{}:{}  {} is defined but {} isn't in {}".format(board_header, define.lineno, name, interface, interfaces_json)))
+            continue
+        if instance_num not in allowed_interfaces[interface]["instances"]:
+            errors.append(Exception("{}:{}  {} is set to an invalid instance {}".format(board_header, instance_define.lineno, instance_define, instance_num)))
+            continue
+        interface_instance = allowed_interfaces[interface]["instances"][instance_num]
+        if function not in interface_instance:
+            errors.append(Exception("{}:{}  {} is defined but {} isn't a valid function for {}".format(board_header, define.lineno, name, function, instance_define)))
+            continue
+        if define.resolved_value not in interface_instance[function]:
+            errors.append(Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num)))
 
 if not has_include_guard:
-    raise Exception("{} has no include-guard (expected {})".format(board_header, expected_include_guard))
+    errors.append(Exception("{} has no include-guard (expected {})".format(board_header, expected_include_guard)))
 if not has_board_detection and expected_board_detection != "NONE":
-    raise Exception("{} has no board-detection #define (expected {})".format(board_header, expected_board_detection))
+    errors.append(Exception("{} has no board-detection #define (expected {})".format(board_header, expected_board_detection)))
 # lots of headers don't have this
 #if not has_include_suggestion:
 #    raise Exception("{} has no include-suggestion (expected {})".format(board_header, expected_include_suggestion))
+
+if errors:
+    raise ExceptionGroup("Errors in {}".format(board_header), errors)
 
 # Check that #if / #ifdef / #ifndef / #else / #endif are correctly balanced
 assert len(validity_stack) == 1 and validity_stack[0]

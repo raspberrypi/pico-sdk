@@ -24,7 +24,8 @@
 #endif
 
 #include "pico.h"
-#include "hardware/regs/intctrl.h"
+// TODO: No hardware/regs/intctrl.h for host yet.
+// #include "hardware/regs/intctrl.h"
 
 /** \file irq.h
  *  \defgroup hardware_irq hardware_irq
@@ -84,10 +85,16 @@
  * 19 | SPI1_IRQ
  * 20 | UART0_IRQ
  * 21 | UART1_IRQ
- * 22 | ADC0_IRQ_FIFO
+ * 22 | ADC_IRQ_FIFO
  * 23 | I2C0_IRQ
  * 24 | I2C1_IRQ
  * 25 | RTC_IRQ
+ * 26 | SPARE_IRQ_0 26
+ * 27 | SPARE_IRQ_1 27
+ * 28 | SPARE_IRQ_2 28
+ * 29 | SPARE_IRQ_3 29
+ * 30 | SPARE_IRQ_4 30
+ * 31 | SPARE_IRQ_5 31
  *
  */
 
@@ -128,7 +135,7 @@ extern "C" {
 typedef void (*irq_handler_t)(void);
 
 static inline void check_irq_param(__unused uint num) {
-    invalid_params_if(HARDWARE_IRQ, num >= NUM_IRQS);
+    invalid_params_if(HARDWARE_IRQ, num >= PICO_NUM_VTABLE_IRQS);
 }
 
 /*! \brief Set specified interrupt's priority

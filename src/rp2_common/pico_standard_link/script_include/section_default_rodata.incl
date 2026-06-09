@@ -1,0 +1,10 @@
+SECTIONS
+{
+    .rodata : {
+        INCLUDE "default_rodata_excludes.incl"
+        *(.srodata*)
+        . = ALIGN(4);
+        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
+        . = ALIGN(4);
+    } > TEXT_STORE
+}

@@ -11,6 +11,7 @@
 
 #include "cyw43_ll.h"
 #include "cybt_shared_bus_driver.h"
+#include "cybt_logging.h"
 
 // Bluetooth register corruption occurs if both wifi and bluetooth are fully utilised.
 #define CYBT_CORRUPTION_TEST 1
@@ -21,23 +22,6 @@ static uint32_t last_bt_ctrl_reg;
 
 #include <stdio.h>
 
-#endif
-
-#ifndef NDEBUG
-#define cybt_printf(format, args ...) printf(format,##args)
-#else
-#define cybt_printf(...)
-#endif
-
-#ifndef CYBT_DEBUG
-#define CYBT_DEBUG 0
-#endif
-
-#if CYBT_DEBUG
-#include <stdio.h>
-#define cybt_debug(format, args ...) printf(format,##args)
-#else
-#define cybt_debug(format, ...) ((void)0)
 #endif
 
 
@@ -319,7 +303,7 @@ cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware,
     uint8_t version_len = *p_bt_firmware;
     assert(*(p_bt_firmware + version_len) == 0);
 #ifndef NDEBUG
-    cybt_printf("BT FW download, version = %s\n", p_bt_firmware + 1);
+    cybt_info("BT FW download, version = %s\n", p_bt_firmware + 1);
 #endif
     p_bt_firmware += version_len + 1; // skip over version
     p_bt_firmware += 1; // skip over record count
@@ -409,7 +393,7 @@ cybt_result_t cybt_toggle_bt_intr(void) {
     cybt_reg_read(HOST_CTRL_REG_ADDR, &reg_val);
 #if CYBT_CORRUPTION_TEST
     if ((reg_val & ~(BTSDIO_REG_SW_RDY_BITMASK | BTSDIO_REG_WAKE_BT_BITMASK | BTSDIO_REG_DATA_VALID_BITMASK)) != 0) {
-        cybt_printf("cybt_toggle_bt_intr read HOST_CTRL_REG_ADDR as 0x%08lx\n", reg_val);
+        cybt_error("cybt_toggle_bt_intr read HOST_CTRL_REG_ADDR as 0x%08lx\n", reg_val);
         cybt_debug_dump();
         panic("cyw43 btsdio register corruption");
     }
@@ -485,32 +469,32 @@ void cybt_debug_dump(void) {
     uint32_t reg_val = 0;
     cybt_fw_membuf_index_t buf_index;
 
-    cybt_printf("WLAN_RAM_BASE_ADDR: 0x%08lx\n", WLAN_RAM_BASE_ADDR);
-    cybt_printf("H2B_BUF_ADDR: 0x%08lx\n", H2B_BUF_ADDR);
-    cybt_printf("B2H_BUF_ADDR: 0x%08lx\n", B2H_BUF_ADDR);
+    cybt_debug("WLAN_RAM_BASE_ADDR: 0x%08lx\n", WLAN_RAM_BASE_ADDR);
+    cybt_debug("H2B_BUF_ADDR: 0x%08lx\n", H2B_BUF_ADDR);
+    cybt_debug("B2H_BUF_ADDR: 0x%08lx\n", B2H_BUF_ADDR);
 
     cybt_reg_read(H2B_BUF_IN_ADDR, &buf_index.host2bt_in_val);
-    cybt_printf("H2B_BUF_IN_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", H2B_BUF_IN_ADDR, buf_index.host2bt_in_val,
+    cybt_debug("H2B_BUF_IN_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", H2B_BUF_IN_ADDR, buf_index.host2bt_in_val,
                 last_buf_index.host2bt_in_val);
 
     cybt_reg_read(H2B_BUF_OUT_ADDR, &buf_index.host2bt_out_val);
-    cybt_printf("H2B_BUF_OUT_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", H2B_BUF_OUT_ADDR, buf_index.host2bt_out_val,
+    cybt_debug("H2B_BUF_OUT_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", H2B_BUF_OUT_ADDR, buf_index.host2bt_out_val,
                 last_buf_index.host2bt_out_val);
 
     cybt_reg_read(B2H_BUF_IN_ADDR, &buf_index.bt2host_in_val);
-    cybt_printf("B2H_BUF_IN_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", B2H_BUF_IN_ADDR, buf_index.bt2host_in_val,
+    cybt_debug("B2H_BUF_IN_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", B2H_BUF_IN_ADDR, buf_index.bt2host_in_val,
                 last_buf_index.bt2host_in_val);
 
     cybt_reg_read(B2H_BUF_OUT_ADDR, &buf_index.bt2host_out_val);
-    cybt_printf("B2H_BUF_OUT_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", B2H_BUF_OUT_ADDR, buf_index.bt2host_out_val,
+    cybt_debug("B2H_BUF_OUT_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", B2H_BUF_OUT_ADDR, buf_index.bt2host_out_val,
                 last_buf_index.bt2host_out_val);
 
     cybt_reg_read(HOST_CTRL_REG_ADDR, &reg_val);
-    cybt_printf("HOST_CTRL_REG_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", HOST_CTRL_REG_ADDR, reg_val,
+    cybt_debug("HOST_CTRL_REG_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", HOST_CTRL_REG_ADDR, reg_val,
                 last_host_ctrl_reg);
 
     cybt_reg_read(BT_CTRL_REG_ADDR, &reg_val);
-    cybt_printf("BT_CTRL_REG_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", BT_CTRL_REG_ADDR, reg_val, last_bt_ctrl_reg);
+    cybt_debug("BT_CTRL_REG_ADDR: 0x%08lx = 0x%08lx (last 0x%08lx)\n", BT_CTRL_REG_ADDR, reg_val, last_bt_ctrl_reg);
 #endif
 }
 
@@ -533,7 +517,7 @@ cybt_result_t cybt_get_bt_buf_index(cybt_fw_membuf_index_t *p_buf_index) {
 #if CYBT_CORRUPTION_TEST
     if (p_buf_index->host2bt_in_val >= BTSDIO_FWBUF_SIZE || p_buf_index->host2bt_out_val >= BTSDIO_FWBUF_SIZE ||
         p_buf_index->bt2host_in_val >= BTSDIO_FWBUF_SIZE || p_buf_index->bt2host_out_val >= BTSDIO_FWBUF_SIZE) {
-        cybt_printf("cybt_get_bt_buf_index invalid buffer value\n");
+        cybt_error("cybt_get_bt_buf_index invalid buffer value\n");
         cybt_debug_dump();
     } else {
         memcpy((uint8_t *) &last_buf_index, (uint8_t *) p_buf_index, sizeof(cybt_fw_membuf_index_t));
@@ -567,7 +551,7 @@ static cybt_result_t cybt_reg_read(uint32_t reg_addr, uint32_t *p_value) {
     return CYBT_SUCCESS;
 }
 
-#if CYBT_DEBUG
+#if 0
 static void dump_bytes(const uint8_t *bptr, uint32_t len) {
     unsigned int i = 0;
 

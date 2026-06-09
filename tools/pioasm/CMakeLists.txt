@@ -41,7 +41,13 @@ if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND
     target_compile_options(pioasm PRIVATE -Wno-psabi)
 endif()
 
-target_include_directories(pioasm PRIVATE ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_LIST_DIR}/gen)
+if (NOT PIOASM_VERSION_STRING)
+    message(FATAL_ERROR "PIOASM_VERSION_STRING must be provided when building pioasm")
+endif()
+
+configure_file( ${CMAKE_CURRENT_LIST_DIR}/version.h.in ${CMAKE_BINARY_DIR}/version.h)
+
+target_include_directories(pioasm PRIVATE ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_LIST_DIR}/gen ${CMAKE_BINARY_DIR})
 
 if (MSVC OR
     (WIN32 AND NOT MINGW AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")))

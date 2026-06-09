@@ -13,16 +13,8 @@
 #include "hardware/timer.h"
 #include "hardware/vreg.h"
 #include "hardware/xosc.h"
-#if PICO_RP2040
-#include "hardware/regs/rtc.h"
-#endif
-
-#if PICO_RP2040
-// The RTC clock frequency is 48MHz divided by power of 2 (to ensure an integer
-// division ratio will be used in the clocks block).  A divisor of 1024 generates
-// an RTC clock tick of 46875Hz.  This frequency is relatively close to the
-// customary 32 or 32.768kHz 'slow clock' crystals and provides good timing resolution.
-#define RTC_CLOCK_FREQ_HZ       (USB_CLK_HZ / 1024)
+#if HAS_RP2040_RTC
+#include "hardware/rtc.h"
 #endif
 
 static void start_all_ticks(void) {
@@ -41,10 +33,10 @@ void __weak runtime_init_clocks(void) {
     // Note: These need setting *before* the ticks are started
     if (running_on_fpga()) {
         for (uint i = 0; i < CLK_COUNT; i++) {
-            clock_set_reported_hz(i, 48 * MHZ);
+            clock_set_reported_hz(i, FPGA_CLK_SYS_HZ);
         }
         // clk_ref is 12MHz in both RP2040 and RP2350 FPGA
-        clock_set_reported_hz(clk_ref, 12 * MHZ);
+        clock_set_reported_hz(clk_ref, FPGA_CLK_REF_HZ);
         // RP2040 has an extra clock, the rtc
 #if HAS_RP2040_RTC
         clock_set_reported_hz(clk_rtc, RTC_CLOCK_FREQ_HZ);

@@ -14,10 +14,10 @@
 //
 // This header may be included by other board headers as "boards/solderparty_rp2040_stamp_round_carrier.h"
 
-// pico_cmake_set PICO_PLATFORM=rp2040
-
 #ifndef _BOARDS_SOLDERPARTY_RP2040_STAMP_ROUND_CARRIER_H
 #define _BOARDS_SOLDERPARTY_RP2040_STAMP_ROUND_CARRIER_H
+
+pico_board_cmake_set(PICO_PLATFORM, rp2040)
 
 // For board detection
 #define SOLDERPARTY_RP2040_STAMP_ROUND_CARRIER

@@ -12,6 +12,9 @@
 
 #include "hardware/gpio.h"
 #include "hardware/powman.h"
+#if PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP
+#include "hardware/regs/otp_data.h"
+#endif
 
 #ifndef PICO_POWMAN_DEBUG
 #define PICO_POWMAN_DEBUG 0
@@ -62,20 +65,38 @@ uint64_t powman_timer_get_ms(void) {
 }
 
 void powman_timer_set_1khz_tick_source_lposc(void) {
-    powman_timer_set_1khz_tick_source_lposc_with_hz(32768);
+#if PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP
+    uint16_t* lposc_calib_data = (uint16_t*)OTP_DATA_BASE + OTP_DATA_LPOSC_CALIB_ROW;
+    if (*lposc_calib_data == 0) {
+        powman_timer_set_1khz_tick_source_lposc_with_hz(0);
+    } else {
+        powman_timer_set_1khz_tick_source_lposc_with_hz(*lposc_calib_data);
+    }
+#else
+    powman_timer_set_1khz_tick_source_lposc_with_hz(0);
+#endif
 }
 
 void powman_timer_set_1khz_tick_source_lposc_with_hz(uint32_t lposc_freq_hz) {
     bool was_running = powman_timer_is_running();
-    if (was_running) powman_timer_stop();
-    uint32_t lposc_freq_khz = lposc_freq_hz / 1000;
-    uint32_t lposc_freq_khz_frac16 = (lposc_freq_khz % 1000) * 65536 / 1000;
-    powman_write(&powman_hw->lposc_freq_khz_int, lposc_freq_khz);
-    powman_write(&powman_hw->lposc_freq_khz_frac, lposc_freq_khz_frac16);
-    powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_LPOSC_BITS);
-    if (was_running) {
-        powman_timer_start();
-        while(!(powman_hw->timer & POWMAN_TIMER_USING_LPOSC_BITS));
+    uint32_t lposc_freq_khz = lposc_freq_hz == 0 ? POWMAN_LPOSC_FREQ_KHZ_INT_RESET : lposc_freq_hz / 1000;
+    uint32_t lposc_freq_khz_frac16 = lposc_freq_hz == 0 ? POWMAN_LPOSC_FREQ_KHZ_FRAC_RESET : (lposc_freq_hz % 1000) * 65536 / 1000;
+    if (lposc_freq_khz != powman_hw->lposc_freq_khz_int || lposc_freq_khz_frac16 != powman_hw->lposc_freq_khz_frac) {
+        // Frequency change needed, so need to stop the timer, set the frequency, and start the timer with USE_LPOSC
+        if (was_running) powman_timer_pause();
+        powman_write(&powman_hw->lposc_freq_khz_int, lposc_freq_khz);
+        powman_write(&powman_hw->lposc_freq_khz_frac, lposc_freq_khz_frac16);
+        powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_LPOSC_BITS);
+        if (was_running) {
+            powman_timer_start();
+            while(!(powman_hw->timer & POWMAN_TIMER_USING_LPOSC_BITS));
+        }
+    } else {
+        // No frequency change needed, so can just set USE_LPOSC while running
+        powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_LPOSC_BITS);
+        if (was_running) {
+            while(!(powman_hw->timer & POWMAN_TIMER_USING_LPOSC_BITS));
+        }
     }
 }
 
@@ -85,24 +106,46 @@ void powman_timer_set_1khz_tick_source_xosc(void) {
 
 void powman_timer_set_1khz_tick_source_xosc_with_hz(uint32_t xosc_freq_hz) {
     bool was_running = powman_timer_is_running();
-    if (was_running) powman_timer_stop();
     uint32_t xosc_freq_khz = xosc_freq_hz / 1000;
-    uint32_t xosc_freq_khz_frac16 = (xosc_freq_khz % 1000) * 65536 / 1000;
-    powman_write(&powman_hw->xosc_freq_khz_int, xosc_freq_khz);
-    powman_write(&powman_hw->xosc_freq_khz_frac, xosc_freq_khz_frac16);
-    powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_XOSC_BITS);
-    if (was_running) {
-        powman_timer_start();
-        while(!(powman_hw->timer & POWMAN_TIMER_USING_XOSC_BITS));
+    uint32_t xosc_freq_khz_frac16 = (xosc_freq_hz % 1000) * 65536 / 1000;
+    if (xosc_freq_khz != powman_hw->xosc_freq_khz_int || xosc_freq_khz_frac16 != powman_hw->xosc_freq_khz_frac) {
+        // Frequency change needed, so need to stop the timer, set the frequency, and start the timer with USE_XOSC
+        if (was_running) powman_timer_pause();
+        powman_write(&powman_hw->xosc_freq_khz_int, xosc_freq_khz);
+        powman_write(&powman_hw->xosc_freq_khz_frac, xosc_freq_khz_frac16);
+        powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_XOSC_BITS);
+        if (was_running) {
+            powman_timer_start();
+            while(!(powman_hw->timer & POWMAN_TIMER_USING_XOSC_BITS));
+        }
+    } else {
+        // No frequency change needed, so can just set USE_XOSC while running
+        powman_set_bits(&powman_hw->timer, POWMAN_TIMER_USE_XOSC_BITS);
+        if (was_running) {
+            while(!(powman_hw->timer & POWMAN_TIMER_USING_XOSC_BITS));
+        }
     }
+}
+
+#ifndef GPIO_TO_POWMAN_EXT_TIME_REF_SOURCE
+#define GPIO_TO_POWMAN_EXT_TIME_REF_SOURCE(gpio, default_ext_time_ref_source) \
+    ((gpio) == 12 ? 0 :                                 \
+        ((gpio) == 20 ? 1 :                             \
+            ((gpio) == 14 ? 2 :                         \
+                ((gpio) == 22 ? 3 :                     \
+                    (default_ext_time_ref_source)))))
+#endif
+
+static inline uint32_t gpio_to_powman_ext_time_ref_source(uint gpio, uint32_t default_ext_time_ref_source) {
+    return GPIO_TO_POWMAN_EXT_TIME_REF_SOURCE(gpio, ({invalid_params_if(HARDWARE_POWMAN, true); default_ext_time_ref_source;}));
 }
 
 static void powman_timer_use_gpio(uint32_t gpio, uint32_t use, uint32_t using) {
     bool was_running = powman_timer_is_running();
-    if (was_running) powman_timer_stop();
-    invalid_params_if(HARDWARE_POWMAN, !((gpio == 12) || (gpio == 14) || (gpio == 20) || (gpio == 22)));
+    if (was_running) powman_timer_pause();
+    uint32_t source = gpio_to_powman_ext_time_ref_source(gpio, 0);
     gpio_set_input_enabled(gpio, true);
-    powman_write(&powman_hw->ext_time_ref, gpio);
+    powman_write(&powman_hw->ext_time_ref, source);
     powman_set_bits(&powman_hw->timer, use);
     if (was_running) {
         powman_timer_start();
@@ -125,7 +168,7 @@ void powman_timer_disable_gpio_1hz_sync(void) {
 }
 
 powman_power_state powman_get_power_state(void) {
-    uint32_t state_reg = powman_hw->state & POWMAN_STATE_CURRENT_BITS;
+    uint32_t state_reg = ~powman_hw->state & POWMAN_STATE_CURRENT_BITS;
     // todo we should have hardware/regs/powman.h values for these
     static_assert(POWMAN_POWER_DOMAIN_SRAM_BANK1 == 0, "");
     static_assert(POWMAN_POWER_DOMAIN_SRAM_BANK0 == 1, "");
@@ -139,7 +182,7 @@ powman_power_state powman_get_power_state(void) {
 int powman_set_power_state(powman_power_state state) {
     // Clear req ignored in case it has been set
     powman_clear_bits(&powman_hw->state, POWMAN_STATE_REQ_IGNORED_BITS);
-    powman_debug("powman: Requesting state %x\n", state);
+    powman_debug("powman: Requesting state %"PRIx32"\n", state);
     powman_write(&powman_hw->state, (~state << POWMAN_STATE_REQ_LSB) & POWMAN_STATE_REQ_BITS);
 
     // Has it been ignored?
@@ -163,7 +206,7 @@ int powman_set_power_state(powman_power_state state) {
         // Note if the powerdown is being blocked by a pending pwrup request we will break out of this and return a failure
 
         // Clk pow is slow so can take a few clk_pow cycles for waiting to turn up
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 500; i++) {
             if (powman_hw->state & POWMAN_STATE_WAITING_BITS) {
                 return PICO_OK;
             }
@@ -176,24 +219,35 @@ int powman_set_power_state(powman_power_state state) {
     // Wait while the state is changing then return true as we will be in the new state
     powman_debug("powman: waiting for state change\n");
     while(powman_hw->state & POWMAN_STATE_CHANGING_BITS) tight_loop_contents();
-    powman_debug("powman: state changed to %x\n", state);
+    powman_debug("powman: state changed to %"PRIx32"\n", state);
     return PICO_OK;
 }
 
 bool powman_configure_wakeup_state(powman_power_state sleep_state, powman_power_state wakeup_state) {
-    // When powman wakes up it can keep the state of the sram0 and sram1 banks. Note, it can't
-    // explicitly
-    bool valid = powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_XIP_CACHE);
+    // Must be entering a P1 low-power state (SWCORE OFF).
+    bool valid = !powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SWITCHED_CORE);
+    // Must be waking up in a P0 state (SWCORE ON).
     valid &= powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SWITCHED_CORE);
-    valid &= powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK0) ==
-             powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SRAM_BANK0);
-    valid &= powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK1) ==
-             powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    powman_power_state current_state = powman_get_power_state();
+    bool current_sram0 = powman_power_state_is_domain_on(current_state, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    bool current_sram1 = powman_power_state_is_domain_on(current_state, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    bool sleep_sram0 = powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    bool sleep_sram1 = powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    bool wakeup_sram0 = powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    bool wakeup_sram1 = powman_power_state_is_domain_on(wakeup_state, POWMAN_POWER_DOMAIN_SRAM_BANK1);
+    // Sleep state cannot turn ON SRAM0 or SRAM1 if it is OFF in the current state.
+    if (!current_sram0) valid &= !sleep_sram0;
+    if (!current_sram1) valid &= !sleep_sram1;
+    // Wakeup state cannot turn OFF SRAM0 or SRAM1 if it is ON in the sleep state.
+    if (sleep_sram0) valid &= wakeup_sram0;
+    if (sleep_sram1) valid &= wakeup_sram1;
     if (valid) {
+        // Prepare power sequencer to power SRAM domains on wakeup.
         powman_clear_bits(&powman_hw->seq_cfg, POWMAN_SEQ_CFG_HW_PWRUP_SRAM0_BITS | POWMAN_SEQ_CFG_HW_PWRUP_SRAM1_BITS);
         uint32_t seq_cfg_set = 0;
-        if (!powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK0)) seq_cfg_set |= POWMAN_SEQ_CFG_HW_PWRUP_SRAM0_BITS;
-        if (!powman_power_state_is_domain_on(sleep_state, POWMAN_POWER_DOMAIN_SRAM_BANK1)) seq_cfg_set |= POWMAN_SEQ_CFG_HW_PWRUP_SRAM1_BITS;
+        // Sequencer SRAM power transitions from sleep to wakeup are: OFF->ON (0), ON->ON (1) and OFF->OFF (1)
+        if (sleep_sram0 == wakeup_sram0) seq_cfg_set |= POWMAN_SEQ_CFG_HW_PWRUP_SRAM0_BITS;
+        if (sleep_sram1 == wakeup_sram1) seq_cfg_set |= POWMAN_SEQ_CFG_HW_PWRUP_SRAM1_BITS;
         powman_set_bits(&powman_hw->seq_cfg, seq_cfg_set);
     }
     return valid;

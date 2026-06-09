@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_config", "compatible_with_rp2", "incompatible_with_config")
 load("//bazel/util:sdk_define.bzl", "pico_sdk_define")
 
@@ -24,6 +25,9 @@ cc_library(
     hdrs = ["include/tusb_config.h"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":pico_stdio_usb_headers",
+    ],
 )
 
 pico_sdk_define(
@@ -43,10 +47,6 @@ cc_library(
     hdrs = ["include/pico/stdio_usb.h"],
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
-    visibility = [
-        ":__pkg__",
-        "//src/rp2_common/tinyusb:__pkg__",
-    ],
     deps = [
         ":LIB_PICO_STDIO_USB",
         ":PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS",
@@ -56,7 +56,6 @@ cc_library(
 cc_library(
     name = "pico_stdio_usb_enabled",
     srcs = [
-        "reset_interface.c",
         "stdio_usb.c",
         "stdio_usb_descriptors.c",
     ],
@@ -72,10 +71,9 @@ cc_library(
         "//src/common/pico_binary_info",
         "//src/common/pico_sync",
         "//src/rp2_common/hardware_irq",
-        "//src/rp2_common/hardware_watchdog",
-        "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_stdio:pico_stdio_headers",
         "//src/rp2_common/pico_unique_id",
+        "//src/rp2_common/pico_usb_reset_interface",
     ],
     # Ensure `stdio_usb_descriptors.c` isn't affected by link order.
     alwayslink = True,

@@ -15,6 +15,7 @@
 #include "cybt_shared_bus_driver.h"
 
 #include "cyw43_btfw_43439.h"
+#include "cybt_logging.h"
 
 #if CYW43_USE_HEX_BTFW
 extern const char    brcm_patch_version[];
@@ -30,16 +31,6 @@ extern const int     brcm_patch_ram_length;
 
 #define  BTSDIO_FWBUF_OPER_DELAY_US            (250)
 #define  BTFW_WAIT_TIME_MS                     (150)
-
-#define CYBT_DEBUG 0
-#define CYBT_VDEBUG 0
-
-#if CYBT_DEBUG
-#define cybt_debug(format,args...) printf("%d.%d: " format, (int)cyw43_hal_ticks_ms() / 1000, (int)cyw43_hal_ticks_ms() % 1000, ## args)
-#else
-#define cybt_debug(format, ...) ((void)0)
-#endif
-#define cybt_printf(format, args...) printf("%d.%d: " format, (int)cyw43_hal_ticks_ms() / 1000, (int)cyw43_hal_ticks_ms() % 1000, ## args)
 
 #define ROUNDUP(x, a)               ((((x) + ((a) - 1)) / (a)) * (a))
 #define ROUNDDN(x, a)               ((x) & ~((a) - 1))
@@ -119,7 +110,7 @@ int cyw43_btbus_init(cyw43_ll_t *self) {
 
     ret = cybt_fw_download_prepare(&p_write_buf, &p_hex_buf);
     if (CYBT_SUCCESS != ret) {
-        cybt_printf("Could not allocate memory\n");
+        cybt_error("Could not allocate memory\n");
         return ret;
     }
 
@@ -127,9 +118,9 @@ int cyw43_btbus_init(cyw43_ll_t *self) {
     const uint8_t *fw_data_buf;
     uint32_t fw_data_len;
 #if CYW43_USE_HEX_BTFW
-    cybt_printf("CYW43_USE_HEX_BTFW is true\n");
+    cybt_error("CYW43_USE_HEX_BTFW is true\n");
 #ifndef NDEBUG
-    cybt_printf("BT FW download, version = %s\n", brcm_patch_version);
+    cybt_info("BT FW download, version = %s\n", brcm_patch_version);
 #endif
     fw_data_len = brcm_patch_ram_length;
     fw_data_buf = brcm_patchram_buf;
@@ -147,7 +138,7 @@ int cyw43_btbus_init(cyw43_ll_t *self) {
     cybt_fw_download_finish(p_write_buf, p_hex_buf);
 
     if (CYBT_SUCCESS != ret) {
-        cybt_printf("hci_open(): FW download failed (0x%x)\n", ret);
+        cybt_error("hci_open(): FW download failed (0x%x)\n", ret);
         return CYBT_ERR_HCI_INIT_FAILED;
     }
 
@@ -157,7 +148,7 @@ int cyw43_btbus_init(cyw43_ll_t *self) {
     if (CYBT_SUCCESS == ret) {
         cybt_debug("hci_open(): FW download successfully\n");
     } else {
-        cybt_printf("hci_open(): Failed to download FW\n");
+        cybt_error("hci_open(): Failed to download FW\n");
         return CYBT_ERR_HCI_INIT_FAILED;
     }
 
@@ -178,7 +169,7 @@ int cyw43_btbus_init(cyw43_ll_t *self) {
     return CYBT_SUCCESS;
 }
 
-#if CYBT_VDEBUG
+#if 0
 static void dump_bytes(const uint8_t *bptr, uint32_t len) {
     unsigned int i = 0;
 
@@ -194,6 +185,9 @@ static void dump_bytes(const uint8_t *bptr, uint32_t len) {
     }
     printf("\n");
 }
+#define DUMP_BYTES dump_bytes
+#else
+#define DUMP_BYTES(...)
 #endif
 
 static cybt_result_t cybt_hci_write_buf(const uint8_t *p_data, uint32_t length) {
@@ -202,7 +196,7 @@ static cybt_result_t cybt_hci_write_buf(const uint8_t *p_data, uint32_t length) 
 
     assert(ISALIGNED(p_data, 4));
     if (!ISALIGNED(p_data, 4)) {
-        cybt_printf("cybt_hci_write_hdr: buffer not aligned\n");
+        cybt_error("cybt_hci_write_hdr: buffer not aligned\n");
         return CYBT_ERR_BADARG;
     }
 
@@ -256,7 +250,7 @@ static cybt_result_t cybt_hci_read(uint8_t *p_data, uint32_t *p_length) {
     assert(ISALIGNED(p_data, 4));
     if (!ISALIGNED(p_data, 4)) {
         assert(false);
-        cybt_printf("cybt_hci_read: buffer not aligned\n");
+        cybt_error("cybt_hci_read: buffer not aligned\n");
         return CYBT_ERR_BADARG;
     }
 
@@ -268,9 +262,9 @@ static cybt_result_t cybt_hci_read(uint8_t *p_data, uint32_t *p_length) {
     cybt_debug("cybt_hci_read: bt2host_in_val=%lu bt2host_out_val=%lu fw_b2h_buf_count=%ld\n",
                fw_membuf_info.bt2host_in_val, fw_membuf_info.bt2host_out_val, fw_b2h_buf_count);
     if (fw_b2h_buf_count < available) {
-        cybt_printf("error: cybt_hci_read buffer overflow fw_b2h_buf_count=%ld available=%lu\n", fw_b2h_buf_count,
+        cybt_error("error: cybt_hci_read buffer overflow fw_b2h_buf_count=%ld available=%lu\n", fw_b2h_buf_count,
                     available);
-        cybt_printf("error: cybt_hci_read bt2host_in_val=%lu bt2host_out_val=%lu\n", fw_membuf_info.bt2host_in_val,
+        cybt_error("error: cybt_hci_read bt2host_in_val=%lu bt2host_out_val=%lu\n", fw_membuf_info.bt2host_in_val,
                     fw_membuf_info.bt2host_out_val);
         panic("cyw43 buffer overflow");
     }
@@ -351,9 +345,7 @@ int cyw43_btbus_write(uint8_t *buf, uint32_t size) {
     cybt_bus_request();
 
     cybt_debug("cyw43_btbus_write: %d\n", cmd_len);
-#if CYBT_VDEBUG
-    dump_bytes(buf, size); // dump header and data
-#endif
+    DUMP_BYTES(buf, size); // dump header and data
 
     cybt_hci_write_buf(buf, size);
     cybt_bus_release();
@@ -372,7 +364,7 @@ static bool cybt_hci_read_packet(uint8_t *buf, uint32_t max_buf_size, uint32_t *
 
     if (bt_result != CYBT_SUCCESS) {
         *size = 0;
-        cybt_printf("cybt_hci_read_packet: error %d", bt_result);
+        cybt_error("cybt_hci_read_packet: error %d", bt_result);
         return true;
     }
 
@@ -386,7 +378,7 @@ static bool cybt_hci_read_packet(uint8_t *buf, uint32_t max_buf_size, uint32_t *
     uint32_t hci_read_len = ((buf[2] << 16) & 0xFFFF00) | ((buf[1] << 8) & 0xFF00) | (buf[0] & 0xFF);
     if (hci_read_len > max_buf_size - 4) {
         *size = 0;
-        cybt_printf("cybt_hci_read_packet: too much data len %" PRId32"\n", hci_read_len);
+        cybt_error("cybt_hci_read_packet: too much data len %" PRId32"\n", hci_read_len);
         assert(false);
         return false;
     }
@@ -397,7 +389,7 @@ static bool cybt_hci_read_packet(uint8_t *buf, uint32_t max_buf_size, uint32_t *
     bt_result = cybt_hci_read(buf + 4, &total_read_len);
     if (bt_result != CYBT_SUCCESS) {
         *size = 0;
-        cybt_printf("cybt_hci_read_packet: read failed\n");
+        cybt_error("cybt_hci_read_packet: read failed\n");
         assert(false);
         return false;
     }
@@ -409,15 +401,13 @@ static bool cybt_hci_read_packet(uint8_t *buf, uint32_t max_buf_size, uint32_t *
     } else {
         assert(total_read_len > 0);
         *size = total_read_len + 4;
-        cybt_printf("cybt_hci_read_packet: failed to read all data %lu < %lu\n", total_read_len, hci_read_len);
+        cybt_error("cybt_hci_read_packet: failed to read all data %lu < %lu\n", total_read_len, hci_read_len);
         //assert(false);
         return true;
     }
 
     cybt_debug("cybt_hci_read_packet: %ld\n", *size);
-#if CYBT_VDEBUG
-    dump_bytes(buf, *size);
-#endif
+    DUMP_BYTES(buf, *size);
 
     return true;
 }

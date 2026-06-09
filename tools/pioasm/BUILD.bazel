@@ -1,3 +1,7 @@
+load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 # TODO: No support for building the parser.
@@ -10,7 +14,6 @@ cc_library(
         "gen/parser.cpp",
         "gen/parser.hpp",
         "go_output.cpp",
-        "json_output.cpp",
         "main.cpp",
         "output_format.h",
         "pio_assembler.cpp",
@@ -19,6 +22,7 @@ cc_library(
         "pio_disassembler.h",
         "pio_enums.h",
         "pio_types.h",
+        ":version",
     ],
     copts = select({
         "@rules_cc//cc/compiler:msvc-cl": ["/std:c++20"],
@@ -33,6 +37,13 @@ cc_library(
         "gen",
     ],
     target_compatible_with = ["//bazel/constraint:host"],
+)
+
+cc_library(
+    name = "json_output",
+    srcs = ["json_output.cpp"],
+    deps = [":pioasm_core"],
+    alwayslink = True,
 )
 
 cc_library(
@@ -63,12 +74,22 @@ cc_library(
     alwayslink = True,
 )
 
+expand_template(
+    name = "version",
+    out = "gen/version.h",
+    substitutions = {
+        "${PIOASM_VERSION_STRING}": module_version() if module_version() != None else "0.0.1-WORKSPACE",
+    },
+    template = "version.h.in",
+)
+
 cc_binary(
     name = "pioasm",
     deps = [
         ":ada_output",
         ":c_sdk_output",
         ":hex_output",
+        ":json_output",
         ":pioasm_core",
         ":python_output",
     ],

@@ -107,7 +107,7 @@ void interp_unclaim_lane(interp_hw_t *interp, uint lane);
  */
 bool interp_lane_is_claimed(interp_hw_t *interp, uint lane);
 
-/*! \brief Release previously claimed interpolator lanes \see interp_claim_lane_mask
+/*! \brief Release previously claimed interpolator lanes, see \ref interp_claim_lane_mask
  *  \ingroup hardware_interp
  *
  * \param interp Interpolator on which to release lanes. interp0 or interp1
