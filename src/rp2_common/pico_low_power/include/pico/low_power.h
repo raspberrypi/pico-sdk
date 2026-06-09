@@ -40,7 +40,7 @@ extern "C" {
  * - You can only wake up from dormant using the AON timer, or a GPIO interrupt configured using \ref gpio_set_dormant_irq_enabled.
  *   All other interrupts will be disabled during dormant.
  *
- * \if (!rp2040_specific)
+ * \if (!rp2040_specific || combined_docs)
  * In Pstate mode:
  * - Some power domains are switched off and don't retain state (eg specified SRAMs). By default, only the power domains
  *   required to keep persistent data powered on will be kept on.
@@ -212,7 +212,7 @@ static inline int low_power_set_external_clock_source(__unused uint src_hz, __un
  * If the external clock source is not set, or it is not running, this will return PICO_ERROR_PRECONDITION_NOT_MET.
  * \endif
  *
- * \if (!rp2040_specific)
+ * \if (!rp2040_specific || combined_docs)
  * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be switched to the ROSC while dormant so
  * it can be stopped, while clk_ref will be run from the LPOSC so that it continues running for the timer.
  * \endif
@@ -230,7 +230,7 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
  * Go dormant until the given GPIO pin changes state.
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
  *
- * \if (!rp2040_specific)
+ * \if (!rp2040_specific || combined_docs)
  * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be run from the ROSC while dormant so
  * it can be stopped, while clk_ref will be run from the LPOSC. For the lowest power consumption, you should use
  * DORMANT_CLOCK_SOURCE_ROSC instead, as the GPIO interrupt does not require a clock.
