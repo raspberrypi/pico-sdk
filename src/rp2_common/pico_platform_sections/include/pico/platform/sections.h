@@ -155,7 +155,7 @@
  *              garbage-collected independently
  */
 #ifndef __in_xip_ram
-#if PICO_USE_XIP_CACHE_AS_RAM
+#if PICO_USE_XIP_CACHE_AS_RAM || PICO_COMBINED_DOCS
 #define __in_xip_ram(group) __attribute__((section(".xip_ram." group)))
 #elif PICO_XIP_RAM
 #define __in_xip_ram(group) __in_ram(group)
@@ -198,7 +198,7 @@
  *
  * \param name  the name of the variable to place in the section
  */
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
+#if (LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER) || PICO_COMBINED_DOCS
 #ifndef __persistent_data
 #define __persistent_data(name) __attribute__((section(".persistent_data." #name))) name
 #endif
