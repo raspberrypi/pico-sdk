@@ -862,9 +862,9 @@ static inline int pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *confi
     // note we already checked (above) via static_assert( (1u << PINHI_EXECCTRL_LSB) > (PINHI_ALL_PINCTRL_LSBS * 0x1f), "")
     // that PINHI_EXECTTRL_LSB is above all the pinctrl fields...
 
-    // ... so shift pinctrl bits off top, and flip EXECCTRL_JMP_PIN_MSB if used
+    // ... so shift pinctrl bits off the bottom, and flip EXECCTRL_JMP_PIN_MSB if used
     pio->sm[sm].execctrl = config->execctrl ^ (gpio_base ? ((field_used_flags >> PINHI_EXECCTRL_LSB) << PIO_SM0_EXECCTRL_JMP_PIN_MSB) : 0);
-    // ... so shift exectrl bits off the top, and flip pinctrl MSBs if used
+    // ... so shift execctrl bits off the top, and flip pinctrl MSBs if used
     pio->sm[sm].pinctrl = config->pinctrl ^ (gpio_base ? ((field_used_flags << (32 - PINHI_EXECCTRL_LSB)) >> (32 - PINHI_EXECCTRL_LSB - 4)) : 0);
 #else
     pio->sm[sm].execctrl = config->execctrl;
