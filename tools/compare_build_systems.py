@@ -101,10 +101,6 @@ CMAKE_ONLY_ALLOWLIST = (
     "PICO_DEFAULT_BOARD_rp2040",
     "PICO_DEFAULT_BOARD_rp2350",
     "PICO_DEFAULT_BOARD_host",
-    # Bazel doesn't provide a way of overriding the defaults for this.
-    # TODO: Provide a way to customise these toolchain flags.
-    "PICO_HARD_FLOAT_ABI",
-    "PICO_NO_CMSE",
     # Bazel supports this differently.
     # TODO: Provide a helper rule for explicitly generating a UF2 so users don't
     # have to write out a bespoke run_binary.
@@ -181,6 +177,7 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_DEFAULT_DIVIDER_IMPL",
     "PICO_DEFAULT_PRINTF_IMPL",
     "PICO_DEFAULT_RAND_IMPL",
+    "PICO_DEFAULT_THREAD_LOCAL_IMPL",
     "PICO_BINARY_INFO_ENABLED",
     "PICO_ASYNC_CONTEXT_IMPL",
     # Allows selection of clang/gcc when using the dynamically fetched

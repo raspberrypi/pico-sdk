@@ -290,6 +290,11 @@ config_setting(
 )
 
 config_setting(
+    name = "pico_no_cmse_enabled",
+    flag_values = {"//bazel/config:PICO_NO_CMSE": "True"},
+)
+
+config_setting(
     name = "pico_binary_type_no_flash",
     flag_values = {"//bazel/config:PICO_DEFAULT_BINARY_TYPE": "no_flash"},
 )
