@@ -18,6 +18,10 @@ LWIP_HTTPD_SSI_EXTENSIONS = [".shtml", ".shtm", ".ssi", ".xml", ".json"]
 def process_file(input_dir, file):
     results = []
 
+    # Ignore hdr files
+    if file.suffix == ".hdr":
+        return None
+
     # Check content type
     content_type, content_encoding = mimetypes.guess_type(file)
     if content_type is None:
@@ -37,9 +41,21 @@ def process_file(input_dir, file):
         if file.name.startswith(f"{response_id}."):
             response_type = response_id
             break
-    data = f"{response_types[response_type]}\r\n"
-    comment = f"\"{response_types[response_type]}\" ({len(data)} chars)"
+
+    # If we find a file with the same name and a hdr extension - use its contents for the header
+    header_file = file.with_suffix('.hdr')
+    if header_file.is_file():
+        data = header_file.read_text()
+        comment = f"\"{response_types[response_type]}\" ({len(data)} chars) from {header_file.name}"
+    else:
+        data = f"{response_types[response_type]}\r\n"
+        comment = f"\"{response_types[response_type]}\" ({len(data)} chars)"
     results.append({'data': bytes(data, "utf-8"), 'comment': comment});
+
+    # load file contents
+    file_contents = file.read_bytes()
+    if len(file_contents) == 0:
+        return results
 
     # user agent
     data = f"Server: {HTTPD_SERVER_AGENT}\r\n"
@@ -64,10 +80,9 @@ def process_file(input_dir, file):
         comment = f"\"{content_type_header} {content_encoding_header}\" ({len(data)} chars)"
     results.append({'data': bytes(data, "utf-8"), 'comment': comment});
 
-    # file contents
-    data = file.read_bytes()
-    comment = f"raw file data ({len(data)} bytes)"
-    results.append({'data': data, 'comment': comment});
+    # add file contents
+    comment = f"raw file data ({len(file_contents)} bytes)"
+    results.append({'data': file_contents, 'comment': comment});
 
     return results;
 
@@ -85,6 +100,8 @@ def process_file_list(fd, input):
         if input_dir is None:
             input_dir = file.parent
         results = process_file(input_dir, file)
+        if not results:
+            continue
 
         # make a variable name
         var_name = str(file.relative_to(input_dir))
