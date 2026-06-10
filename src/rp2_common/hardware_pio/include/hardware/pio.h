@@ -2043,8 +2043,9 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, u
  * \param gpio_start the lowest GPIO number required (0-47 on RP2350B, 0-31 otherwise)
  * \param gpio_count the count of consecutive GPIOs required
  * \param set_gpio_base if there is no free SM on a PIO instance with the right GPIO base, and there IS an unused PIO
- *                      instance, then that PIO will be reconfigured so that this method can succeed
- *
+ *                      instance, then that PIO will be reconfigured so that this method can succeed. Note
+ *                      this parameter is ignored when PICO_PIO_USE_GPIO_BASE=0; i.e. by default on anything other than RP2350B
+0 *
  * \return true on success, false otherwise
  * \see pio_remove_program_and_unclaim_sm
  */
