@@ -126,7 +126,7 @@ static uint64_t sdbm_hash64_sram(uint64_t hash) {
 }
 #endif
 
-#if PICO_RAND_SEED_ENTROPY_SRC_TRNG | PICO_RAND_ENTROPY_SRC_TRNG
+#if PICO_RAND_SEED_ENTROPY_SRC_TRNG || PICO_RAND_ENTROPY_SRC_TRNG
 #if !HAS_RP2350_TRNG
 #error PICO_RAND_SEED_ENTROPY_SRC_TRNG and PICO_RAND_ENTROPY_SRC_TRNG are only valid on RP2350
 #endif
@@ -365,9 +365,10 @@ uint64_t get_rand_64(void) {
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_RAND);
     uint32_t save = spin_lock_blocking(lock);
     if (local_check_byte != check_byte) {
-        // someone got a random number in the interim, so mix it in
-        local_rng_state.r[0] ^= rng_state.r[0];
-        local_rng_state.r[1] ^= rng_state.r[1];
+        // Someone got a random number in the interim, so mix in their state
+        // updates. Splitmix to avoid XOR cancelling of original state
+        local_rng_state.r[0] ^= splitmix64(rng_state.r[0]);
+        local_rng_state.r[1] ^= splitmix64(rng_state.r[1]);
     }
     // Generate a 64-bit RN from the modified PRNG state.
     // Note: This also "churns" the 128-bit state for next time.

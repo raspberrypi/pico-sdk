@@ -5,6 +5,7 @@
  */
 
 #include "pico/asm_helper.S"
+#include "pico/double.h"
 
 #if !HAS_DOUBLE_COPROCESSOR
 #error attempt to compile double_aeabi_dcp when there is no DCP

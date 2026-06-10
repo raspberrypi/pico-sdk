@@ -23,15 +23,6 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_PIO_VERSION, PIO hardware version, type=int, default=0 on RP2040 and 1 on RP2350, group=hardware_pio
-#ifndef PICO_PIO_VERSION
-#if PIO_GPIOBASE_BITS
-#define PICO_PIO_VERSION 1
-#else
-#define PICO_PIO_VERSION 0
-#endif
-#endif
-
 // PICO_CONFIG: PICO_PIO_CLKDIV_ROUND_NEAREST, True if floating point PIO clock divisors should be rounded to the nearest possible clock divisor rather than rounding down, type=bool, default=PICO_CLKDIV_ROUND_NEAREST, group=hardware_pio
 #ifndef PICO_PIO_CLKDIV_ROUND_NEAREST
 #define PICO_PIO_CLKDIV_ROUND_NEAREST PICO_CLKDIV_ROUND_NEAREST
@@ -82,7 +73,7 @@
  * instance either addresses pins 0-31 or 16-47 based on \ref pio_set_gpio_base). The
  * `pio_sm_` methods that directly affect the hardware always take _real_ pin numbers in the full range, however:
  *
- * * If `PICO_PIO_USE_GPIO_BASE != 1` then the 5th bit of the pin number is ignored. This is done so
+ * * If `PICO_PIO_USE_GPIO_BASE != 1` then bit 5 of the pin number is ignored. This is done so
  *   that programs compiled for boards with RP2350A do not incur the extra overhead of dealing with higher pins that don't exist.
  *   Effectively these functions behave exactly like RP2040 in this case.
  *   Note that `PICO_PIO_USE_GPIO_BASE` is defaulted to 0 if `PICO_RP2350A` is 1
@@ -160,6 +151,8 @@ typedef pio_hw_t *PIO;
 // PICO_CONFIG: PICO_PIO_USE_GPIO_BASE, Enable code for handling more than 32 PIO pins, type=bool, default=true when supported and when the device has more than 32 pins, group=hardware_pio
 #define PICO_PIO_USE_GPIO_BASE ((NUM_BANK0_GPIOS) > 32)
 #endif
+#else
+#define PICO_PIO_USE_GPIO_BASE 0
 #endif
 
 /**
@@ -192,6 +185,24 @@ static_assert(PIO1_BASE - PIO0_BASE == (1u << 20), "hardware layout mismatch");
 static_assert(PIO2_BASE - PIO0_BASE == (2u << 20), "hardware layout mismatch");
 #endif
 #define PIO_INSTANCE(instance) ((pio_hw_t *)(PIO0_BASE + (instance) * (1u << 20)))
+#endif
+
+/**
+ * \def PIO_IS_INSTANCE(pio)
+ * \ingroup hardware_pio
+ * \hideinitializer
+ * \brief Returns true if the PIO instance is one of the h/w PIO instances
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef PIO_IS_INSTANCE
+#if NUM_PIOS > 2
+    static_assert(NUM_PIOS == 3, "");
+    #define PIO_IS_INSTANCE(pio) ((pio) == pio0 || (pio) == pio1 || (pio) == pio2)
+#else
+    static_assert(NUM_PIOS == 2, "");
+    #define PIO_IS_INSTANCE(pio) ((pio) == pio0 || (pio) == pio1)
+#endif
 #endif
 
 /**
@@ -260,7 +271,7 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  * instance either addresses pins 0-31 or 16-47 based on \ref pio_set_gpio_base). The
  * `sm_config_` state machine configuration always take _real_ pin numbers in the full range, however:
  *
- * * If `PICO_PIO_USE_GPIO_BASE != 1` then the 5th bit of the pin number is ignored. This is done so
+ * * If `PICO_PIO_USE_GPIO_BASE != 1` then bit 5 of the pin number is ignored. This is done so
  *   that programs compiled for boards with RP2350A do not incur the extra overhead of dealing with higher pins that don't exist.
  *   Effectively these functions behave exactly like RP2040 in this case.
  *   Note that `PICO_PIO_USE_GPIO_BASE` is defaulted to 0 if `PICO_RP2350A` is 1
@@ -274,7 +285,7 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  *
  *   To be clear, \ref pio_sm_set_config does not change the PIO's GPIO base for you; you must configre the PIO's
  *   GPIO base before calling the method, however you can use \ref pio_claim_free_sm_and_add_program_for_gpio_range
- *   to find/configure a PIO instance suitable for a partiular GPIO range.
+ *   to find/configure a PIO instance suitable for a particular GPIO range.
  *
  * You can set `PARAM_ASSERTIONS_ENABLED_HARDWARE_PIO = 1` to enable parameter checking to debug pin (or other) issues with
  * hardware_pio methods.
@@ -298,8 +309,7 @@ typedef struct {
 // note we put the out_special pin starting at bit 20
 #define PINHI_EXECCTRL_LSB 20
 static_assert( (1u << PINHI_EXECCTRL_LSB) > (PINHI_ALL_PINCTRL_LSBS * 0x1f), "");
-#define PINHI_ALL_PIN_LSBS ((1u << PINHI_EXECCTRL_LSB) |(1u << PIO_SM0_PINCTRL_IN_BASE_LSB) | (1u << PIO_SM0_PINCTRL_OUT_BASE_LSB) | \
-                               (1u << PIO_SM0_PINCTRL_SET_BASE_LSB) | (1u << PIO_SM0_PINCTRL_SIDESET_BASE_LSB))
+#define PINHI_ALL_PIN_LSBS ((1u << PINHI_EXECCTRL_LSB) | PINHI_ALL_PINCTRL_LSBS)
     // each 5-bit field which would usually be used for the pin_base in pin_ctrl, is used for:
     // 0b11111 - corresponding field not specified
     // 0b00000 - pin is in range 0-15
@@ -318,11 +328,7 @@ static inline void check_sm_mask(__unused uint mask) {
 }
 
 static inline void check_pio_param(__unused PIO pio) {
-#if NUM_PIOS == 2
-    valid_params_if(HARDWARE_PIO, pio == pio0 || pio == pio1);
-#elif NUM_PIOS == 3
-    valid_params_if(HARDWARE_PIO, pio == pio0 || pio == pio1 || pio == pio2);
-#endif
+    valid_params_if(HARDWARE_PIO, PIO_IS_INSTANCE(pio));
 }
 
 static inline void check_pio_pin_param(__unused uint pin) {
@@ -633,8 +639,8 @@ static inline void sm_config_set_jmp_pin(pio_sm_config *c, uint pin) {
     c->execctrl = (c->execctrl & ~PIO_SM0_EXECCTRL_JMP_PIN_BITS) |
                   ((pin & 31) << PIO_SM0_EXECCTRL_JMP_PIN_LSB);
 #if PICO_PIO_USE_GPIO_BASE
-    c->pinhi = (c->pinhi & ~(31u << 20)) |
-               ((pin >> 4) << 20);
+    c->pinhi = (c->pinhi & ~(31u << PINHI_EXECCTRL_LSB)) |
+               ((pin >> 4) << PINHI_EXECCTRL_LSB);
 #endif
 }
 
@@ -779,7 +785,7 @@ static inline pio_sm_config pio_get_default_sm_config(void) {
  * \return the current GPIO base for the PIO instance
   */
 static inline uint pio_get_gpio_base(PIO pio) {
-#if PICO_PIO_VERSION > 0
+#if PICO_PIO_USE_GPIO_BASE
     return pio->gpiobase;
 #else
     ((void)pio);
@@ -820,11 +826,16 @@ static inline int pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *confi
     pio->sm[sm].clkdiv = config->clkdiv;
     pio->sm[sm].shiftctrl = config->shiftctrl;
 #if PICO_PIO_USE_GPIO_BASE
-    uint used = (~config->pinhi >> 4) & PINHI_ALL_PIN_LSBS;
+    // definition of the 5-bit fields within config->pinhi:
+    // 0b11111 - corresponding field not specified
+    // 0b00000 - pin is in range 0-15
+    // 0b00001 - pin is in range 16-31
+    // 0b00010 - pin is in range 32-47
+    uint32_t used = (~config->pinhi >> 4) & PINHI_ALL_PIN_LSBS; // checks if bit 5 of any field is 0
     // configs that use pins 0-15
-    uint gpio_under_16 = (~config->pinhi) & (~config->pinhi >> 1) & used;
+    uint32_t gpio_under_16 = (~config->pinhi) & (~config->pinhi >> 1) & used; // checks if bits 0 and 1 of any field are both 0
     // configs that use pins 32-47
-    uint gpio_over_32 = (config->pinhi >> 1) & used;
+    uint32_t gpio_over_32 = (config->pinhi >> 1) & used; // checks if bit 1 of any field is 1
     uint gpio_base = pio_get_gpio_base(pio);
     invalid_params_if_and_return(PIO, gpio_under_16 && gpio_base, PICO_ERROR_BAD_ALIGNMENT);
     invalid_params_if_and_return(PIO, gpio_over_32 && !gpio_base, PICO_ERROR_BAD_ALIGNMENT);
@@ -832,7 +843,8 @@ static inline int pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *confi
     // bit6(32) + 0-15  -> base(16) + 16-31
     // bit6(0)  + 16-31 -> base(16) + 0-15
     static_assert(PINHI_EXECCTRL_LSB == 20, ""); // we use shifts to mask off bits below
-    pio->sm[sm].execctrl = config->execctrl ^ (gpio_base ? ((used >> 20) << (PIO_SM0_EXECCTRL_JMP_PIN_LSB + 4)) : 0);
+    pio->sm[sm].execctrl = config->execctrl ^ (gpio_base ? ((used >> PINHI_EXECCTRL_LSB) << (PIO_SM0_EXECCTRL_JMP_PIN_LSB + 4)) : 0);
+    // the "12" here is a result of "sizeof(used) - PINHI_EXECCTRL_LSB" (i.e. 32 - 20) and is used to shift off the execctrl bits
     pio->sm[sm].pinctrl = config->pinctrl ^ (gpio_base ? ((used << 12) >> 8) : 0);
 #else
     pio->sm[sm].execctrl = config->execctrl;
@@ -922,13 +934,22 @@ static inline uint pio_get_dreq(PIO pio, uint sm, bool is_tx) {
     return PIO_DREQ_NUM(pio, sm, is_tx);
 }
 
+/** \brief PIO program definition
+ *  \ingroup hardware_pio
+ *
+ * This structure describes a PIO program: the array of encoded instructions plus the
+ * metadata needed to load it onto a PIO instance. It is the type emitted by the `pioasm`
+ * tool (as `<program_name>_program`) and consumed by \ref pio_add_program, \ref
+ * pio_can_add_program and related functions. It may also be populated by hand when
+ * assembling programs at runtime with the helpers in `pio_instructions.h`.
+ */
 typedef struct pio_program {
-    const uint16_t *instructions;
-    uint8_t length;
-    int8_t origin; // required instruction memory origin or -1
-    uint8_t pio_version;
+    const uint16_t *instructions;   ///< the array of \ref length encoded instructions that make up the program
+    uint8_t length;                 ///< the number of instructions in \ref instructions (also the amount of instruction memory the program occupies)
+    int8_t origin;                  ///< the required load offset in PIO instruction memory, or -1 if the program is relocatable and may be loaded at any offset
+    uint8_t pio_version;            ///< the minimum PIO hardware version the program requires (0 for any PIO); loading a program that requires a newer version than the target PIO fails with \ref PICO_ERROR_VERSION_MISMATCH
 #if PICO_PIO_VERSION > 0
-    uint8_t used_gpio_ranges; // bitmap with one bit per 16 pins
+    uint8_t used_gpio_ranges;       ///< bitmap of the 16-pin GPIO ranges the program uses (bit 0 = pins 0-15, bit 1 = pins 16-31, bit 2 = pins 32-47), checked against the PIO instance's GPIO base (see \ref pio_set_gpio_base) so that an incompatible program is rejected
 #endif
 } pio_program_t;
 
@@ -1067,7 +1088,7 @@ static inline void pio_set_sm_mask_enabled(PIO pio, uint32_t mask, bool enabled)
 }
 
 #if PICO_PIO_VERSION > 0
-/*! \brief Enable or disable multiple PIO state machines
+/*! \brief Enable or disable multiple PIO state machines on multiple PIOs
  *  \ingroup hardware_pio
  *
  * Note that this method just sets the enabled state of the state machine;
@@ -1084,7 +1105,9 @@ static inline void pio_set_sm_mask_enabled(PIO pio, uint32_t mask, bool enabled)
  */
 static inline void pio_set_sm_multi_mask_enabled(PIO pio, uint32_t mask_prev, uint32_t mask, uint32_t mask_next, bool enabled) {
     check_pio_param(pio);
+    check_sm_mask(mask_prev);
     check_sm_mask(mask);
+    check_sm_mask(mask_next);
     pio->ctrl = (pio->ctrl & ~(mask << PIO_CTRL_SM_ENABLE_LSB)) |
                 (enabled ? ((mask << PIO_CTRL_SM_ENABLE_LSB) & PIO_CTRL_SM_ENABLE_BITS) : 0) |
                 (enabled ? PIO_CTRL_NEXTPREV_SM_ENABLE_BITS : PIO_CTRL_NEXTPREV_SM_DISABLE_BITS) |
@@ -1220,7 +1243,9 @@ static inline void pio_clkdiv_restart_sm_mask(PIO pio, uint32_t mask) {
  */
 static inline void pio_clkdiv_restart_sm_multi_mask(PIO pio, uint32_t mask_prev, uint32_t mask, uint32_t mask_next) {
     check_pio_param(pio);
+    check_sm_mask(mask_prev);
     check_sm_mask(mask);
+    check_sm_mask(mask_next);
     hw_set_bits(&pio->ctrl, ((mask << PIO_CTRL_CLKDIV_RESTART_LSB) & PIO_CTRL_CLKDIV_RESTART_BITS) |
                             PIO_CTRL_NEXTPREV_CLKDIV_RESTART_BITS |
                             ((mask_prev << PIO_CTRL_PREV_PIO_MASK_LSB) & PIO_CTRL_PREV_PIO_MASK_BITS) |
@@ -1263,9 +1288,9 @@ static inline void pio_enable_sm_mask_in_sync(PIO pio, uint32_t mask) {
  */
 static inline void pio_enable_sm_multi_mask_in_sync(PIO pio, uint32_t mask_prev, uint32_t mask, uint32_t mask_next) {
     check_pio_param(pio);
+    check_sm_mask(mask_prev);
     check_sm_mask(mask);
-    check_pio_param(pio);
-    check_sm_mask(mask);
+    check_sm_mask(mask_next);
     hw_set_bits(&pio->ctrl, ((mask << PIO_CTRL_CLKDIV_RESTART_LSB) & PIO_CTRL_CLKDIV_RESTART_BITS) |
                             ((mask << PIO_CTRL_SM_ENABLE_LSB) & PIO_CTRL_SM_ENABLE_BITS) |
                             PIO_CTRL_NEXTPREV_CLKDIV_RESTART_BITS | PIO_CTRL_NEXTPREV_SM_ENABLE_BITS |

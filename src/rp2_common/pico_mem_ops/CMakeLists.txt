@@ -11,7 +11,7 @@ if (NOT TARGET pico_mem_ops)
         # RP2040 bootrom has optimized versions
         target_link_libraries(pico_mem_ops_default INTERFACE pico_mem_ops_pico)
     else()
-        # beware commpiler memcpy cannot be used for unaligned copies in peripheral space
+        # beware compiler memcpy cannot be used for unaligned copies in peripheral space
         target_link_libraries(pico_mem_ops_default INTERFACE pico_mem_ops_compiler)
     endif()
 

@@ -1,3 +1,9 @@
+/*
+* Copyright (c) 2026 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -17,7 +23,7 @@ void __printflike(1, 0) handle_panic(const char *magic1, ...)
 {
     printf("checking first arg...\n");
     if (magic1 != MAGIC1) {
-        printf("magic1 (%08x) != 0x%08x\n", magic1, MAGIC1);
+        printf("magic1 (%p) != %p\n", magic1, MAGIC1);
         return;
     }
     va_list args;
@@ -63,7 +69,7 @@ void __printflike(1, 0) handle_panic(const char *magic1, ...)
 #endif
 }
 
-void main() {
+int main() {
     stdio_init_all();
 #ifndef PICO_PANIC_FUNCTION
     printf("Using default panic function...\n");
@@ -78,4 +84,5 @@ void main() {
     panic(MAGIC1, MAGIC2, MAGIC3, MAGIC4, MAGIC5, MAGIC6, MAGIC7);
 #endif
     printf("FAILED: expected panic not to return");
+    return 1;
 }

@@ -172,5 +172,5 @@ int main() {
     run_test(false);
     run_test(true);
 
-    printf("Test passed\n");
+    printf("PASSED\n");
 }

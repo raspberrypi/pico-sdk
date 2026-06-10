@@ -17,6 +17,7 @@
 #include "pico/time.h"
 #include "pico/stdio/driver.h"
 #include "pico/mutex.h"
+#include "pico/critical_section.h"
 #include "hardware/irq.h"
 #include "device/usbd_pvt.h" // for usbd_defer_func
 
@@ -261,8 +262,6 @@ bool stdio_usb_deinit(void) {
         return false;
     }
 
-    assert(tud_inited()); // we expect the caller to have initialized when calling sdio_usb_init
-
     bool rc = true;
 
     stdio_set_driver_enabled(&stdio_usb, false);
@@ -271,9 +270,15 @@ bool stdio_usb_deinit(void) {
     sleep_ms(PICO_STDIO_USB_DEINIT_DELAY_MS);
 #endif
 
+#if PICO_STDIO_USB_ENABLE_TINYUSB_INIT
+    // deinitialize TinyUSB
+    tud_deinit(0);
+#else
+    assert(!tud_inited()); // we expect the caller to have deinitialized if they are using TinyUSB
+#endif
+
 #if PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK
     if (irq_has_shared_handler(USBCTRL_IRQ)) {
-        spin_lock_unclaim(spin_lock_get_num(one_shot_timer_crit_sec.spin_lock));
         critical_section_deinit(&one_shot_timer_crit_sec);
         // we can use a shared handler to notice when there may be work to do
         irq_remove_handler(USBCTRL_IRQ, usb_irq);

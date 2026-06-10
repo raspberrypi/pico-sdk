@@ -18,6 +18,15 @@ cc_library(
     ],
 )
 
+alias(
+    name = "pico_runtime_init_extra_link",
+    actual = select({
+        "//bazel/constraint:rp2040": "//src/rp2_common/hardware_rtc",
+        "//conditions:default": "//bazel:empty_cc_lib",
+    }),
+    visibility = ["//visibility:private"],
+)
+
 cc_library(
     name = "pico_runtime_init_link",
     srcs = [
@@ -29,6 +38,7 @@ cc_library(
     includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     deps = [
+        "pico_runtime_init_extra_link",
         "//src/common/pico_base_headers",
         "//src/rp2_common:hardware_structs",
         "//src/rp2_common:pico_platform_internal",

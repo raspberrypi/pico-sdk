@@ -180,6 +180,19 @@ static_assert(NUM_I2CS == 2, "");
 #endif
 
 /**
+ * \def I2C_IS_INSTANCE(i2c)
+ * \ingroup hardware_i2c
+ * \hideinitializer
+ * \brief Returns true if the I2C instance is one of the h/w I2C instances
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef I2C_IS_INSTANCE
+static_assert(NUM_I2CS == 2, "");
+#define I2C_IS_INSTANCE(i2c) ((i2c) == i2c0 || (i2c) == i2c1)
+#endif
+
+/**
  * \def I2C_DREQ_NUM(i2c, is_tx)
  * \ingroup hardware_i2c
  * \hideinitializer
@@ -195,6 +208,19 @@ static_assert(DREQ_I2C1_TX == DREQ_I2C0_TX + 2, "");
 #define I2C_DREQ_NUM(i2c,is_tx) (DREQ_I2C0_TX + I2C_NUM(i2c) * 2 + !(is_tx))
 #endif
 
+/**
+ * \def I2C_RESET_NUM(i2c)
+ * \ingroup hardware_i2c
+ * \hideinitializer
+ * \brief Returns the \ref reset_num_t used to reset a given I2C instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef I2C_RESET_NUM
+#include "hardware/resets.h"
+#define I2C_RESET_NUM(i2c) (i2c_get_index(i2c) ? RESET_I2C1 : RESET_I2C0)
+#endif
+
 /*! \brief Convert I2C instance to hardware instance number
  *  \ingroup hardware_i2c
  *
@@ -202,7 +228,7 @@ static_assert(DREQ_I2C1_TX == DREQ_I2C0_TX + 2, "");
  * \return Number of I2C, 0 or 1.
  */
 static inline uint i2c_get_index(i2c_inst_t *i2c) {
-    invalid_params_if(HARDWARE_I2C, i2c != i2c0 && i2c != i2c1);
+    valid_params_if(HARDWARE_I2C, I2C_IS_INSTANCE(i2c));
     return I2C_NUM(i2c);
 }
 

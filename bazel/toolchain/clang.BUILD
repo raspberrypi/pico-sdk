@@ -1,9 +1,6 @@
 load("@bazel_skylib//rules/directory:directory.bzl", "directory")
-load("@bazel_skylib//rules/directory:subdirectory.bzl", "subdirectory")
 load("@rules_cc//cc/toolchains:tool.bzl", "cc_tool")
 load("@rules_cc//cc/toolchains:tool_map.bzl", "cc_tool_map")
-load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
-load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -45,8 +42,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/clang.exe",
         "//conditions:default": "//:bin/clang",
     }),
-    data = glob([
-        "bin/llvm",
+    data = ["bin/llvm"] + glob([
         "lib/clang/*/include/**",
         "include/armv*-unknown-none-eabi/**",
     ]),
@@ -58,8 +54,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/clang++.exe",
         "//conditions:default": "//:bin/clang++",
     }),
-    data = glob([
-        "bin/llvm",
+    data = ["bin/llvm"] + glob([
         "lib/clang/*/include/**",
         "include/armv*-unknown-none-eabi/**",
         "include/c++/v1/**",
@@ -72,8 +67,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/clang++.exe",
         "//conditions:default": "//:bin/clang++",
     }),
-    data = glob([
-        "bin/llvm",
+    data = ["bin/llvm"] + glob([
         "bin/lld*",
         "bin/ld*",
         "lib/**/*.a",
@@ -90,7 +84,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/llvm-ar.exe",
         "//conditions:default": "//:bin/llvm-ar",
     }),
-    data = glob(["bin/llvm"]),
+    data = ["bin/llvm"],
 )
 
 cc_tool(
@@ -99,7 +93,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/llvm-libtool-darwin.exe",
         "//conditions:default": "//:bin/llvm-libtool-darwin",
     }),
-    data = glob(["bin/llvm"]),
+    data = ["bin/llvm"],
 )
 
 cc_tool(
@@ -108,7 +102,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/llvm-objcopy.exe",
         "//conditions:default": "//:bin/llvm-objcopy",
     }),
-    data = glob(["bin/llvm"]),
+    data = ["bin/llvm"],
 )
 
 cc_tool(
@@ -117,7 +111,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/llvm-objdump.exe",
         "//conditions:default": "//:bin/llvm-objdump",
     }),
-    data = glob(["bin/llvm"]),
+    data = ["bin/llvm"],
 )
 
 cc_tool(
@@ -126,7 +120,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/llvm-cov.exe",
         "//conditions:default": "//:bin/llvm-cov",
     }),
-    data = glob(["bin/llvm"]),
+    data = ["bin/llvm"],
 )
 
 cc_tool(
@@ -135,7 +129,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/llvm-strip.exe",
         "//conditions:default": "//:bin/llvm-strip",
     }),
-    data = glob(["bin/llvm"]),
+    data = ["bin/llvm"],
 )
 
 cc_tool(
@@ -144,8 +138,7 @@ cc_tool(
         "@platforms//os:windows": "//:bin/clang-tidy.exe",
         "//conditions:default": "//:bin/clang-tidy",
     }),
-    data = glob([
-        "bin/llvm",
+    data = ["bin/llvm"] + glob([
         "include/**",
         "lib/clang/**/include/**",
     ]),

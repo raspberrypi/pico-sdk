@@ -36,8 +36,8 @@ BOARD_CHOICE_MAP = {c: [":{}".format(c)] for c in BOARD_CHOICES}
 # Creates a config_setting for each known board option with the name:
 #     PICO_BOARD_[choice]
 declare_flag_choices(
-    "//bazel/config:PICO_BOARD",
-    BOARD_CHOICES,
+    choices = BOARD_CHOICES,
+    flag = "//bazel/config:PICO_BOARD",
 )
 
 cc_library(

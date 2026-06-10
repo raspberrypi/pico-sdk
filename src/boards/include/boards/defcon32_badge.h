@@ -95,6 +95,16 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_AUDIO_PWM_MONO_PIN PICO_AUDIO_PWM_L_PIN
 #endif
 
+// --- PSRAM ---
+#ifndef PICO_PSRAM_CS_PIN
+#define PICO_PSRAM_CS_PIN DEFCON32_BADGE_SRAM_CS_PIN
+#endif
+
+// PSRAM not fitted by default, so auto-detect
+#ifndef PICO_AUTO_DETECT_PSRAM_SIZE
+#define PICO_AUTO_DETECT_PSRAM_SIZE 1
+#endif
+
 // --- FLASH ---
 
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1

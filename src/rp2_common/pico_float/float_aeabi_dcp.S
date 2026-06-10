@@ -5,6 +5,7 @@
  */
 
 #include "pico/asm_helper.S"
+#include "pico/float.h"
 
 #if !HAS_DOUBLE_COPROCESSOR
 #error attempt to compile float_aeabi_dcp when there is no DCP

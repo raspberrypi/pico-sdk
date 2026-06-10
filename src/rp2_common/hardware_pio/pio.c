@@ -83,7 +83,7 @@ static int find_offset_for_program(PIO pio, const pio_program_t *program) {
 
 static int pio_set_gpio_base_unsafe(PIO pio, uint gpio_base) {
     invalid_params_if_and_return(HARDWARE_PIO, gpio_base != 0 && (!PICO_PIO_VERSION || gpio_base != 16), PICO_ERROR_BAD_ALIGNMENT);
-#if PICO_PIO_VERSION > 0
+#if PICO_PIO_USE_GPIO_BASE
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     invalid_params_if_and_return(HARDWARE_PIO, used_mask, PICO_ERROR_INVALID_STATE);
     pio->gpiobase = gpio_base;
@@ -96,7 +96,7 @@ static int pio_set_gpio_base_unsafe(PIO pio, uint gpio_base) {
 
 int pio_set_gpio_base(PIO pio, uint gpio_base) {
     int rc = PICO_OK;
-#if PICO_PIO_VERSION > 0
+#if PICO_PIO_USE_GPIO_BASE
     uint32_t save = hw_claim_lock();
     rc = pio_set_gpio_base_unsafe(pio, gpio_base);
     hw_claim_unlock(save);
@@ -108,7 +108,7 @@ int pio_set_gpio_base(PIO pio, uint gpio_base) {
 }
 
 static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
-#if PICO_PIO_VERSION > 0
+#if PICO_PIO_USE_GPIO_BASE
     bool gpio_base = pio_get_gpio_base(pio);
     return !((gpio_base && (used_gpio_ranges & 1)) ||
              (!gpio_base && (used_gpio_ranges & 4)));
@@ -443,27 +443,29 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
                 sm_index[num_claimed] = (int8_t)pio_claim_unused_sm(*pio, false);
                 if (sm_index[num_claimed] < 0) break;
             }
-            if (num_claimed && (!pass || num_claimed == NUM_PIO_STATE_MACHINES)) {
+            // rc = 0 if we claimed all the required state machines for the pass, <0 otherwise
+            int rc = num_claimed - (pass ? NUM_PIO_STATE_MACHINES : 1);
+            if (rc >= 0) {
                 uint32_t save = hw_claim_lock();
                 if (pass) {
                     pio_set_gpio_base_unsafe(*pio, required_gpio_ranges & 4 ? 16 : 0);
                 }
-                int rc = is_gpio_compatible(*pio, required_gpio_ranges) ? PICO_OK : PICO_ERROR_BAD_ALIGNMENT;
-                if (rc == PICO_OK) rc = find_offset_for_program(*pio, program);
+                rc = is_gpio_compatible(*pio, required_gpio_ranges) ? 0 : -1;
+                if (rc >= 0) rc = find_offset_for_program(*pio, program);
                 if (rc >= 0) rc = add_program_at_offset(*pio, program, (uint)rc);
                 if (rc >= 0) {
                     *sm = (uint) sm_index[0];
                     *offset = (uint) rc;
                 }
                 hw_claim_unlock(save);
-                // always un-claim all SMs other than the one we need (array index 0),
-                // or all of them if we had an error
-                for (uint i = (rc >= 0); i < num_claimed; i++) {
-                    pio_sm_unclaim(*pio, (uint) sm_index[i]);
-                }
-                if (rc >= 0) {
-                    return true;
-                }
+            }
+            // always un-claim all SMs other than the one we need (array index 0),
+            // or all of them if we had an error
+            for (uint i = (rc >= 0); i < num_claimed; i++) {
+                pio_sm_unclaim(*pio, (uint) sm_index[i]);
+            }
+            if (rc >= 0) {
+                return true;
             }
         }
     }

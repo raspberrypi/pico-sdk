@@ -1,0 +1,18 @@
+/* Defines the following symbols for use by code:
+    __exidx_start, __exidx_end
+*/
+
+SECTIONS
+{
+    .ARM.extab :
+    {
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
+    } > TEXT_STORE
+
+    __exidx_start = .;
+    .ARM.exidx :
+    {
+        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+    } > TEXT_STORE
+    __exidx_end = .;
+}

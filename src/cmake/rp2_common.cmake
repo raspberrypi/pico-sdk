@@ -49,6 +49,7 @@ pico_add_subdirectory(rp2_common/hardware_pio)
 pico_add_subdirectory(rp2_common/hardware_pll)
 pico_add_subdirectory(rp2_common/hardware_pwm)
 pico_add_subdirectory(rp2_common/hardware_resets)
+pico_add_subdirectory(rp2_common/hardware_rosc)
 if (PICO_RP2040 OR PICO_COMBINED_DOCS)
     pico_add_subdirectory(rp2_common/hardware_rtc)
 endif()
@@ -65,6 +66,7 @@ pico_add_subdirectory(rp2_common/hardware_xosc)
 
 if (PICO_COMBINED_DOCS OR NOT PICO_RP2040)
     pico_add_subdirectory(rp2_common/hardware_powman)
+    pico_add_subdirectory(rp2_common/hardware_psram)
     # Note in spite of the name this is usable on Arm as well as RISC-V:
     pico_add_subdirectory(rp2_common/hardware_riscv_platform_timer)
     pico_add_subdirectory(rp2_common/hardware_sha256)
@@ -103,10 +105,12 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(rp2_common/pico_int64_ops)
     pico_add_subdirectory(rp2_common/pico_flash)
     pico_add_subdirectory(rp2_common/pico_float)
+    pico_add_subdirectory(rp2_common/pico_low_power)
     pico_add_subdirectory(rp2_common/pico_mem_ops)
     pico_add_subdirectory(rp2_common/pico_malloc)
     pico_add_subdirectory(rp2_common/pico_printf)
     pico_add_subdirectory(rp2_common/pico_rand)
+    pico_add_subdirectory(rp2_common/pico_thread_local)
 
     if (PICO_COMBINED_DOCS OR NOT PICO_RP2040)
         pico_add_subdirectory(rp2_common/pico_sha256)
@@ -121,6 +125,7 @@ if (NOT PICO_BARE_METAL)
     endif()
     pico_add_subdirectory(rp2_common/tinyusb)
     pico_add_subdirectory(rp2_common/pico_stdio_usb)
+    pico_add_subdirectory(rp2_common/pico_usb_reset)
     pico_add_subdirectory(rp2_common/pico_i2c_slave)
 
     # networking libraries - note dependency order is important
@@ -164,3 +169,6 @@ pico_add_doxygen(${CMAKE_CURRENT_BINARY_DIR}/extra_doxygen)
 
 #pico_add_doxygen(rp2_common)
 pico_add_doxygen_exclude(rp2_common/cmsis) # very big
+
+set(PICO_VARIANT_DIR ${RP2_VARIANT_DIR})
+pico_register_common_scope_var(PICO_VARIANT_DIR)

@@ -7,17 +7,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+#include "hardware/divider.h"
 #include "pico/stdlib.h"
 #include "hardware/dma.h"
 #include "hardware/irq.h"
 #include "hardware/sync.h"
+#include "pico/divider.h"
 
 volatile bool failed;
 volatile uint32_t count[3];
 volatile bool done;
 
 #define FAILED() ({ failed = true; })
-//#define FAILED() ({ failed = true; __breakpoint(); })
+// #define FAILED() ({ failed = true; __breakpoint(); })
 
 //#define DOUBLE_ONLY 1
 
@@ -43,27 +46,11 @@ bool timer_callback(repeating_timer_t *t) {
 #endif
     float fz = (float) z;
     float fa = fz / 11.0f;
-//    float fb = fmodf(fz, 11.0f);
-//    if (fabs(fz - (fa * 11.0f + fb)) > 1e-9f) {
-//        FAILED();
-//    }
-    union {
-        float f;
-        uint32_t i;
-    } fi, fi2;
-    fi.f = fabsf(fz - fa * 11.0f);
-    // make a float which is close to 1ulp
-    fi2.i = fi.i & 0x7f800000u;
-    fi2.i++;
-    if (fi.f > fi2.f) {
+    if (fabsf(fz - fa * 11.0f) / fz > 0.2f) {
         FAILED();
     }
     double dz = z;
     double da = dz / 11.0;
-//    double db = fmod(dz, 11.0);
-//    if (abs(dz - (da * 11.0 + db)) > 1e-9) {
-//        FAILED();
-//    }
     if (fabs(dz - da * 11.0) > 1e-6f) {
         FAILED();
     }
@@ -77,10 +64,6 @@ void do_dma_start(uint ch) {
     static uint32_t word[2];
     assert(ch < 2);
     dma_channel_config c = dma_channel_get_default_config(ch);
-    // todo remove this; landing in a separate PR
-#ifndef DREQ_DMA_TIMER0
-#define DREQ_DMA_TIMER0 0x3b
-#endif
     channel_config_set_dreq(&c, DREQ_DMA_TIMER0);
     dma_channel_configure(ch, &c, &word[ch], &word[ch], 513 + ch * 23, true);
 }
@@ -226,8 +209,6 @@ void test_nesting() {
             z += (int)dd;
 
         }
-        // todo this still seems broken on RP2350
-#if PICO_RP2040
         // these use the divider
         for(uint i=0;i<=100;i+=20) {
             // both in and out bootrom range (we perform mod in wrapper code if necessarry)
@@ -238,7 +219,6 @@ void test_nesting() {
             d0c = cos(i * 1000);
             d0s = sin(i * 1000);
         }
-#endif
         count_local++;
     }
     done = true;
@@ -256,6 +236,49 @@ void test_nesting() {
     }
 }
 
+void test_unsafe_32() {
+    int count_local=0;
+    absolute_time_t end = delayed_by_ms(get_absolute_time(), 2000);
+    uint z = 0;
+    while (!time_reached(end)) {
+        for(uint i=0;i<100;i++) {
+            z += 31;
+            divmod_result_t r = divmod_u32u32_unsafe(z, 11);
+            uint a = to_quotient_u32(r);
+            uint b = to_remainder_u32(r);
+            if (z != a * 11 + b) {
+                FAILED();
+            }
+            int zz = (int)z;
+            r = divmod_s32s32_unsafe(zz, -11);
+            int aa = to_quotient_s32(r);
+            int bb = to_remainder_s32(r);
+            if (zz != aa * -11 + bb) {
+                FAILED();
+            }
+            r = divmod_s32s32_unsafe(-zz, -11);
+            aa = to_quotient_s32(r);
+            bb = to_remainder_s32(r);
+            if (-zz != aa * -11 + bb) {
+                FAILED();
+            }
+            r = divmod_s32s32_unsafe(-zz, 11);
+            aa = to_quotient_s32(r);
+            bb = to_remainder_s32(r);
+            if (-zz != aa * 11 + bb) {
+                FAILED();
+            }
+            r = divmod_u32u32_unsafe(0xffffffffu, 11);
+            a = to_quotient_u32(r);
+            b = to_remainder_u32(r);
+            if (0xffffffffu != a * 11 + b) {
+                FAILED();
+            }
+        }
+        count_local++;
+    }
+}
+
 int main() {
 #ifndef uart_default
 #warning test/pico_divider requires a default uart
@@ -263,6 +286,8 @@ int main() {
     stdio_init_all();
 #endif
     test_nesting();
+    // not strictly a nesting test, but it's a copy/paste basically, so doing it here
+    test_unsafe_32();
     printf("PASSED\n");
     return 0;
 }

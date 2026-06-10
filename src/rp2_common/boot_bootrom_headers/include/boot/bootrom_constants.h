@@ -71,7 +71,7 @@
 #define PARTITION_TABLE_NO_PARTITION_INDEX 0xff
 
 // values returned from \ref rom_get_last_boot_type()
-// --- note these match the REBOOT2_FLAG_REBOOT_TYPE_ constants in pico/bootrom_constants.h
+// --- note these match the REBOOT2_FLAG_REBOOT_TYPE_ constants in pico/picoboot_constants.h
 // values 0-7 are secure/non-secure
 #define BOOT_TYPE_NORMAL     0
 #define BOOT_TYPE_BOOTSEL    2

@@ -43,39 +43,34 @@ endforeach()
 
 list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES PICO_CLIB)
 
-foreach(PICO_CLANG_RUNTIME IN LISTS PICO_CLANG_RUNTIMES)
-    # LLVM embedded-toolchain for ARM style
-    find_path(PICO_COMPILER_SYSROOT NAMES include/stdio.h
-            HINTS
-            ${PICO_COMPILER_DIR}/../lib/clang-runtimes/arm-none-eabi/${PICO_CLANG_RUNTIME}
-            ${PICO_COMPILER_DIR}/../lib/clang-runtimes/${PICO_CLANG_RUNTIME}
-    )
+if (NOT PICO_COMPILER_SYSROOT)
+    # Note we explicitly look for the correct libraries, because we don't necessarily trust multilib (even
+    # in newer Arm LLVM ATfE to correctly pick the right one
+    foreach(PICO_CLANG_RUNTIME IN LISTS PICO_CLANG_RUNTIMES)
+        # LLVM embedded-toolchain for ARM style
+        find_path(PICO_COMPILER_SYSROOT NAMES lib
+                HINTS
+                ${PICO_COMPILER_DIR}/../lib/clang-runtimes/arm-none-eabi/${PICO_CLANG_RUNTIME}
+                ${PICO_COMPILER_DIR}/../lib/clang-runtimes/${PICO_CLANG_RUNTIME}
+        )
 
-    if (PICO_COMPILER_SYSROOT)
-        if (NOT PICO_CLIB)
-            # this is a bit of a hack; to try to autodetect the C library used:
-            # `picolibc.h` seems to exist on the newer versions of LLVM embedded toolchain for ARM using picolibc whereas
-            # `newlib.h` appears in all versions, so isn't very useful
-            if (EXISTS "${PICO_COMPILER_SYSROOT}/include/picolibc.h")
-                message("Setting default C library to picolibc as LLVM appears to be using it")
-                set(PICO_CLIB "picolibc" CACHE INTERNAL "")
+        if (PICO_COMPILER_SYSROOT)
+            break()
+        endif()
+        # llvm_libc style
+        find_path(PICO_COMPILER_SYSROOT NAMES stdio.h
+                HINTS
+                ${PICO_COMPILER_DIR}/../include/${PICO_CLANG_RUNTIME}
+        )
+        if (PICO_COMPILER_SYSROOT)
+            if (NOT PICO_CLIB)
+                message("Setting default C library to llvm_libc as LLVM appears to be using it")
+                set(PICO_CLIB "llvm_libc" CACHE INTERNAL "")
             endif()
+            break()
         endif()
-        break()
-    endif()
-    # llvm_libc style
-    find_path(PICO_COMPILER_SYSROOT NAMES stdio.h
-            HINTS
-            ${PICO_COMPILER_DIR}/../include/${PICO_CLANG_RUNTIME}
-    )
-    if (PICO_COMPILER_SYSROOT)
-        if (NOT PICO_CLIB)
-            message("Setting default C library to llvm_libc as LLVM appears to be using it")
-            set(PICO_CLIB "llvm_libc" CACHE INTERNAL "")
-        endif()
-        break()
-    endif()
-endforeach()
+    endforeach()
+endif()
 
 # moving this here as a reminder from pico_standard_link; it was commented out theee, but if ever needed,
 # it belongs here as part of LINKER_FLAGS_INIT
@@ -91,9 +86,22 @@ if (PICO_CLIB STREQUAL "llvm_libc")
     endforeach()
 else()
     if (NOT PICO_COMPILER_SYSROOT)
-        message(FATAL_ERROR "Could not find an llvm runtime for '${PICO_CLANG_RUNTIME}'")
+        message(FATAL_ERROR "Could not find an llvm runtime")
     endif()
-
     set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} --sysroot ${PICO_COMPILER_SYSROOT}")
+
+    find_path(_CLANG_HEADERS_DIR NAMES include/stdio.h
+            HINTS
+            ${PICO_COMPILER_SYSROOT}
+            ${PICO_COMPILER_SYSROOT}/.. # new style LLVM ATfE (21+)
+    )
+    if (NOT _CLANG_HEADERS_DIR)
+        message(FATAL_ERROR "Could not find llvm headers (searched ${PICO_COMPILER_SYSROOT}/include and ${PICO_COMPILER_SYSROOT}/../include)")
+    else()
+        if (NOT _CLANG_HEADERS_DIR STREQUAL PICO_COMPILER_SYSROOT)
+            # LLVM ATfE 21+ moves the headers out of the multilib so we need to explicitly add C++/C headers (in that order)
+            set(PICO_COMMON_LANG_FLAGS "${PICO_COMMON_LANG_FLAGS} -isystem ${_CLANG_HEADERS_DIR}/include/c++/v1 -isystem ${_CLANG_HEADERS_DIR}/include")
+        endif()
+    endif()
 endif()
 include(${CMAKE_CURRENT_LIST_DIR}/set_flags.cmake)
