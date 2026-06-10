@@ -29,6 +29,8 @@ INCLUDE "memmap_copy_to_ram.incl"
  *         │   └── section_copy_to_ram_text.incl         rp2_common/pico_standard_link
  *         ├── section_generated_post_text.incl          rp2_common/pico_standard_link
  *         ├── section_extra_post_text.incl              rp2_common/pico_standard_link
+ *         ├── sections_psram.incl                       rp2040/pico_platform
+ *         ├── section_xip_ram.incl                      rp2_common/pico_standard_link
  *         ├── sections_copy_to_ram_data.incl            rp2_common/pico_standard_link
  *         │   ├── section_copy_to_ram_data.incl         rp2_common/pico_standard_link
  *         │   ├── section_tls.incl                      rp2_common/pico_standard_link
@@ -40,8 +42,6 @@ INCLUDE "memmap_copy_to_ram.incl"
  *         ├── section_generated_post_scratch.incl       rp2_common/pico_standard_link
  *         ├── section_extra_post_scratch.incl           rp2_common/pico_standard_link
  *         ├── sections_stack.incl                       rp2_common/pico_standard_link
- *         ├── sections_psram.incl                       rp2040/pico_platform
- *         ├── section_xip_ram.incl                      rp2_common/pico_standard_link
  *         ├── section_flash_end.incl                    rp2_common/pico_standard_link
  *         ├── section_end.incl                          rp2_common/pico_standard_link
  *         ├── section_generated_post_end.incl           rp2_common/pico_standard_link

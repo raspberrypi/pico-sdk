@@ -23,6 +23,8 @@ INCLUDE "memmap_no_flash.incl"
  *         │   └── section_binary_info.incl              rp2_common/pico_standard_link
  *         ├── section_generated_post_text.incl          rp2_common/pico_standard_link
  *         ├── section_extra_post_text.incl              rp2_common/pico_standard_link
+ *         ├── sections_psram.incl                       rp2_common/pico_standard_link
+ *         ├── section_xip_ram.incl                      rp2_common/pico_standard_link
  *         ├── sections_no_flash_data.incl               rp2_common/pico_standard_link
  *         │   ├── section_no_flash_data.incl            rp2_common/pico_standard_link
  *         │   ├── section_uninitialized_data.incl       rp2_common/pico_standard_link
@@ -35,8 +37,6 @@ INCLUDE "memmap_no_flash.incl"
  *         ├── section_generated_post_scratch.incl       rp2_common/pico_standard_link
  *         ├── section_extra_post_scratch.incl           rp2_common/pico_standard_link
  *         ├── sections_stack.incl                       rp2_common/pico_standard_link
- *         ├── sections_psram.incl                       rp2_common/pico_standard_link
- *         ├── section_xip_ram.incl                      rp2_common/pico_standard_link
  *         ├── section_end.incl                          rp2_common/pico_standard_link
  *         ├── section_generated_post_end.incl           rp2_common/pico_standard_link
  *         ├── section_extra_post_end.incl               rp2_common/pico_standard_link
