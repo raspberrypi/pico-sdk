@@ -52,7 +52,7 @@ if (NOT PICO_RP2040)
                 pico_encrypt_binary(low_power_test_timers_encrypted_xip_sram ${PICO_SDK_PATH}/tools/example_keys/privateaes.bin ${PICO_SDK_PATH}/tools/example_keys/ivsalt.bin EMBED)
                 pico_set_persistent_data_loc(low_power_test_timers_encrypted_xip_sram xip_ram)
                 # Also check encrypting with code in xip_sram
-                pico_use_xip_sram_for_time_critical(low_power_test_timers_encrypted_xip_sram)
+                pico_set_time_critical_placement(low_power_test_timers_encrypted_xip_sram xip_ram)
                 set_target_properties(low_power_test_timers_encrypted_xip_sram PROPERTIES PICO_TEST_TIMEOUT 35)
                 set_target_properties(low_power_test_timers_encrypted_xip_sram PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
                 set_target_properties(low_power_test_timers_encrypted_xip_sram PROPERTIES PICO_TEST_BUDDY_FILE external_sleep_timer.elf)
