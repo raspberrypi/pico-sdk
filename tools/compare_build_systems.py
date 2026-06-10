@@ -122,19 +122,6 @@ CMAKE_ONLY_ALLOWLIST = (
     # These are legacy CMake options that should not be used.
     "PICO_NO_FLASH",
     "PICO_COPY_TO_RAM",
-    # These aren't supported as build flags in CMake either, but they appear
-    # as comments which this script can't tell.
-    "CYW43_PIN_WL_DYNAMIC",
-    "CYW43_DEFAULT_PIN_WL_REG_ON",
-    "CYW43_DEFAULT_PIN_WL_DATA_OUT",
-    "CYW43_DEFAULT_PIN_WL_DATA_IN",
-    "CYW43_DEFAULT_PIN_WL_HOST_WAKE",
-    "CYW43_DEFAULT_PIN_WL_CLOCK",
-    "CYW43_DEFAULT_PIN_WL_CS",
-    "CYW43_PIO_CLOCK_DIV_INT",
-    "CYW43_PIO_CLOCK_DIV_FRAC",
-    "CYW43_PIO_CLOCK_DIV_FRAC8",
-    "CYW43_PIO_CLOCK_DIV_DYNAMIC",
 )
 
 BAZEL_ONLY_ALLOWLIST = (
@@ -193,6 +180,8 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_COMPILATION_NO_OPT_ARGS",
     "PICO_COMPILATION_NO_DEBUG_ARGS",
     "PICO_COMPILATION_NO_FASTBUILD_ARGS",
+    # This is commented out in CMake
+    "PICO_CMSIS_PATH",
 )
 
 
@@ -218,6 +207,10 @@ def FindKnownOptions(option_pattern_matcher, file_paths):
     for p in file_paths:
         with open(p, "r") as f:
             for line in f:
+                if re.match("\s*#\s*#", line):
+                    # Ignore commented out defines
+                    continue
+
                 match = re.search(pattern, line)
                 if not match:
                     continue
