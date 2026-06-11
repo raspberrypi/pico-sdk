@@ -92,6 +92,7 @@ static void clock_configure_internal(clock_handle_t clock, uint32_t src, uint32_
     // Now that the source is configured, we can trust that the user-supplied
     // divisor is a safe value.
     clock_hw->div = div;
+    // Store the configured frequency
     configured_freq[clock] = actual_freq;
 }
 
@@ -119,7 +120,6 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
     }
 
     clock_configure_internal(clock, src, auxsrc, actual_freq, div);
-    // Store the configured frequency
     return true;
 }
 
@@ -144,7 +144,6 @@ bool clock_configure_mhz(clock_handle_t clock, uint32_t src, uint32_t auxsrc, ui
     uint32_t actual_freq = (uint32_t) ((((uint32_t) src_freq_mhz) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / div) * MHZ;
 
     clock_configure_internal(clock, src, auxsrc, actual_freq, div);
-    // Store the configured frequency
     return true;
 }
 
