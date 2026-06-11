@@ -35,26 +35,25 @@ def process_file(input_dir, file):
         data += "\x00"
     results.append({'data': bytes(data, "utf-8"), 'comment': comment});
 
-    # Header
-    response_type = 200
-    for response_id in response_types:
-        if file.name.startswith(f"{response_id}."):
-            response_type = response_id
-            break
-
-    # If we find a file with the same name and a hdr extension - use its contents for the header
-    header_file = file.with_suffix('.hdr')
-    if header_file.is_file():
-        data = header_file.read_text()
-        comment = f"\"{response_types[response_type]}\" ({len(data)} chars) from {header_file.name}"
+    # If we find a file with the same name and a "response" extension - use its contents for the response
+    response_file = file.with_suffix('.response')
+    if response_file.is_file():
+        data = response_file.read_text()
+        comment = f"content from {response_file.name} ({len(data)} chars)"
     else:
+        # response result
+        response_type = 200
+        for response_id in response_types:
+            if file.name.startswith(f"{response_id}."):
+                response_type = response_id
+                break
         data = f"{response_types[response_type]}\r\n"
         comment = f"\"{response_types[response_type]}\" ({len(data)} chars)"
     results.append({'data': bytes(data, "utf-8"), 'comment': comment});
 
     # load file contents
     file_contents = file.read_bytes()
-    if len(file_contents) == 0:
+    if len(file_contents) == 0 and response_file.is_file():
         return results
 
     # user agent
