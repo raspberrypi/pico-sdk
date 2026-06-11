@@ -123,7 +123,7 @@ git_repository(
 git_repository(
     name = "cyw43-driver",
     build_file = "//src/rp2_common/pico_cyw43_driver:cyw43-driver.BUILD",
-    commit = "dd7568229f3bf7a37737b9e1ef250c26efe75b23",  # keep-in-sync-with-submodule: lib/cyw43-driver
+    commit = "055d64274b014dd7b1c2fc94d26e8a18face7124",  # keep-in-sync-with-submodule: lib/cyw43-driver
     remote = "https://github.com/georgerobotics/cyw43-driver.git",
 )
 
