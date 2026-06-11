@@ -343,7 +343,7 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
  * \param freq_mhz Requested frequency in MHz
  * \return true if the clock is updated, false if freq > src_freq
  */
-bool clock_configure_mhz(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint16_t src_freq_mhz, uint16_t freq_mhz);
+bool clock_configure_mhz(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq_mhz, uint32_t freq_mhz);
 
 /*! \brief Configure the specified clock to use the undivided input source
  *  \ingroup hardware_clocks
