@@ -32,25 +32,40 @@ extern "C" {
 #define PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP 1
 #endif
 
+/*! \brief Get the calibrated frequency of the low power oscillator
+ *  \ingroup hardware_powman
+ *
+ * The frequency returned is the value stored in the OTP, or 0 if there is no OTP value
+ * set, the OTP value is out of range, or PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP is 0
+ *
+ * \note This is a weak function, so can be overriden to provide a custom calibration
+ * method (for example using \ref frequency_count_khz)
+ *
+ * \return The LPOSC frequency, or 0 if unknown
+ */
+uint32_t powman_timer_get_lposc_calib_freq(void);
+
 /*! \brief Use the ~32KHz low power oscillator as the powman timer source
  *  \ingroup hardware_powman
- *  \note The frequency is set to the value stored in the OTP, or the reset value if
- *  there is no OTP value set or PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP is 0
+ *
+ * \note The frequency is set to the value returned by \ref powman_timer_get_lposc_calib_freq
  */
 void powman_timer_set_1khz_tick_source_lposc(void);
 
 /*! \brief Use the low power oscillator (specifying frequency) as the powman timer source
  *  \ingroup hardware_powman
- *  \param lposc_freq_hz specify an exact lposc freq to trim it, or 0 to use the reset values
+ *  \param lposc_freq_hz specify an exact lposc freq to trim it, or 0 to use the existing value
  */
 void powman_timer_set_1khz_tick_source_lposc_with_hz(uint32_t lposc_freq_hz);
 
 /*! \brief Use the crystal oscillator as the powman timer source
  *  \ingroup hardware_powman
+ *
+ * \note The frequency is set to the value of XOSC_HZ
  */
 void powman_timer_set_1khz_tick_source_xosc(void);
 
-/*! \brief Use the crystal oscillator as the powman timer source
+/*! \brief Use the crystal oscillator (specifying frequency) as the powman timer source
  *  \ingroup hardware_powman
  *  \param xosc_freq_hz specify a crystal frequency
  */
