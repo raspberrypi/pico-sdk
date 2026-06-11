@@ -18,8 +18,8 @@ LWIP_HTTPD_SSI_EXTENSIONS = [".shtml", ".shtm", ".ssi", ".xml", ".json"]
 def process_file(input_dir, file):
     results = []
 
-    # Ignore hdr files
-    if file.suffix == ".hdr":
+    # Ignore response files
+    if file.suffix == ".response":
         return None
 
     # Check content type
