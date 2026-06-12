@@ -291,4 +291,8 @@ void __attribute__((weak)) cyw43_cb_tcpip_set_link_down(__unused cyw43_t *self, 
 void __attribute__((weak)) cyw43_cb_process_ethernet(__unused void *cb_data, __unused int itf, __unused size_t len, __unused const uint8_t *buf) {
     no_lwip_fail();
 }
+int __attribute__((weak)) cyw43_tcpip_link_status(cyw43_t *self, int itf) {
+    no_lwip_fail();
+    return 0;
+}
 #endif
