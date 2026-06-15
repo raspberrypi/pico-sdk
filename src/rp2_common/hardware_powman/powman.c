@@ -70,7 +70,7 @@ uint32_t __weak powman_timer_get_lposc_calib_freq(void) {
     if (*lposc_calib_data == 0) {
         return 0;
 #if PICO_RP2350
-    } else if (*lposc_calib_data > (40 * 1000) || *lposc_calib_data < (26 * 1000)) {
+    } else if (*lposc_calib_data > LPOSC_MAX_EXPECTED_HZ || *lposc_calib_data < LPOSC_MIN_EXPECTED_HZ) {
         // Ignore OTP value if it is out of range
         return 0;
 #endif
