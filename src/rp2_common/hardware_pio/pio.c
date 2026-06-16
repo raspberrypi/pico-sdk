@@ -435,7 +435,7 @@ bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *progr
     (void)gpio_start;
     (void)gpio_count;
     (void)set_gpio_base;
-    return pico_claim_free_sm_and_add_program_for_gpio_range(program, pio, sm, offset);
+    return pico_claim_free_sm_and_add_program(program, pio, sm, offset);
 #else
     invalid_params_if(HARDWARE_PIO, (gpio_start + gpio_count) > NUM_BANK0_GPIOS);
 
