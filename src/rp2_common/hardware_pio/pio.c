@@ -81,18 +81,15 @@ static int find_offset_for_program(PIO pio, const pio_program_t *program) {
     }
 }
 
+#if PICO_PIO_USE_GPIO_BASE
 static int pio_set_gpio_base_unsafe(PIO pio, uint gpio_base) {
     invalid_params_if_and_return(HARDWARE_PIO, gpio_base != 0 && (!PICO_PIO_VERSION || gpio_base != 16), PICO_ERROR_BAD_ALIGNMENT);
-#if PICO_PIO_USE_GPIO_BASE
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     invalid_params_if_and_return(HARDWARE_PIO, used_mask, PICO_ERROR_INVALID_STATE);
     pio->gpiobase = gpio_base;
-#else
-    ((void)pio);
-    ((void)gpio_base);
-#endif
     return PICO_OK;
 }
+#endif
 
 int pio_set_gpio_base(PIO pio, uint gpio_base) {
     int rc = PICO_OK;
@@ -107,18 +104,13 @@ int pio_set_gpio_base(PIO pio, uint gpio_base) {
     return rc;
 }
 
-// note this function checks compatibility of GPIO ranges even on PIO_VERSION 0;
-// i.e. it will fail if you try to ask for pins 32-47 on RP2040 (or RP2350A)
-static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
 #if PICO_PIO_USE_GPIO_BASE
+static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
     bool gpio_base = pio_get_gpio_base(pio);
     return !((gpio_base && (used_gpio_ranges & 1)) ||
              (!gpio_base && (used_gpio_ranges & 4)));
-#else
-    ((void)pio);
-    return used_gpio_ranges < 4; // only using pins 0-31
-#endif
 }
+#endif
 
 static bool is_program_gpio_compatible(PIO pio, const pio_program_t *program) {
 #if PICO_PIO_VERSION > 0
@@ -432,10 +424,9 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, u
 
 bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio, uint *sm, uint *offset, uint gpio_start, uint gpio_count, bool set_gpio_base) {
 #if !PICO_PIO_USE_GPIO_BASE
-    (void)gpio_start;
-    (void)gpio_count;
+    if (gpio_start + gpio_count > 32) return false;
     (void)set_gpio_base;
-    return pico_claim_free_sm_and_add_program(program, pio, sm, offset);
+    return pio_claim_free_sm_and_add_program(program, pio, sm, offset);
 #else
     invalid_params_if(HARDWARE_PIO, (gpio_start + gpio_count) > NUM_BANK0_GPIOS);
 
