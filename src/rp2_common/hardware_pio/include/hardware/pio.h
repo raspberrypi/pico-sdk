@@ -2045,9 +2045,12 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, u
  * \param set_gpio_base if there is no free SM on a PIO instance with the right GPIO base, and there IS an unused PIO
  *                      instance, then that PIO will be reconfigured so that this method can succeed. Note
  *                      this parameter is ignored when PICO_PIO_USE_GPIO_BASE=0; i.e. by default on anything other than RP2350B
-0 *
+ *
  * \return true on success, false otherwise
  * \see pio_remove_program_and_unclaim_sm
+ *
+ * \note on RP2050 or RP2350A (strictly when PICO_PIO_USE_GPIO_BASE == 0), the last 3 parameters are ignored
+ * and this call is equivalent to \ref pio_claim_free_sm_and_add_program
  */
 bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio, uint *sm, uint *offset, uint gpio_start, uint gpio_count, bool set_gpio_base);
 
