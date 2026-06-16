@@ -289,8 +289,9 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  *
  * \note when `PICO_PIO_USE_GPIO_BASE == 1` \ref pio_sm_set_config ignores fields which haven't had the corresponding
  * `sm_config_` pin function called, so that you don't have to move settings for unused pin sets into the correct
- * pin range. Therefore it is always a best practice to explicitly configure a pin range starting at pin zero to 0
- * via the corresponding sm_config_ function, as the default is now actually `GPIO_BASE + 0` not 0 on RP2350B.
+ * pin range. Therefore, it is always a best practice to explicitly configure a pin range starting at pin zero to 0
+ * via the corresponding sm_config_ function (e.g. `sm_config_set_out_pin_base(config, 0)`), as the default
+ * values for pin ranges from \ref pio_get_default_sm_config are now `GPIO_BASE + 0` not 0 on RP2350B.
  *
  * You can set `PARAM_ASSERTIONS_ENABLED_HARDWARE_PIO = 1` to enable parameter checking to debug pin (or other) issues with
  * hardware_pio methods.
@@ -753,10 +754,10 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  * Setting | Default
  * --------|--------
  * Clock Divider | 1
- * Out Pins | 32 starting at 0
- * Set Pins | 0 starting at 0
- * In Pins | 32 starting at 0
- * Side Set Pins (base) | 0
+ * Out Pins | 32 starting at 0 (see note below)
+ * Set Pins | 0 starting at 0 (see note below)
+ * In Pins | 32 starting at 0 (see note below)
+ * Side Set Pins (base) | 0 (see note below)
  * Side Set | disabled
  * Wrap | wrap=31, wrap_to=0
  * In Shift | shift_direction=right, autopush=false, push_threshold=32
@@ -764,6 +765,15 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  * Jmp Pin | 0
  * Out Special | sticky=false, has_enable_pin=false, enable_pin_index=0
  * Mov Status | status_sel=STATUS_TX_LESSTHAN, n=0
+ *
+ * \note on RP2350B with PICO_PIO_USE_GPIO_BASE = 1, the default out/set/in/side set pin
+ * bases are actually 0 relative to the GPIO_BASE of the PIO instance the pio_sm_config
+ * is applied to, so that the non-user-specified 0 is not included in logic related to
+ * choosing a compatible PIO instance.
+ *
+ * Therefore, for example, if you intend to use Out pins starting at pin 0 on
+ * RP2350B, you should call `sm_config_set_out_pin_base(config, 0)`, or
+ * `sm_config_set_out_pins(config, 0, count)` explicitly.
  *
  * \return the default state machine configuration which can then be modified.
  */
