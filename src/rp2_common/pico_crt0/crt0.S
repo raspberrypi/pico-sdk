@@ -439,7 +439,7 @@ _entry_point:
         // scratch 2 = __logical_binary_start
         ldr r2, =__logical_binary_start
         // scratch 3 = size
-        ldr r3, =(SRAM_END - SRAM_BASE) // assume maximum size for block loop
+        ldr r3, =__ram_window_size // assume maximum size for block loop
         // scratch 4&7 = magic number
         ldr r4, =0xb007c0d3
         mov r7, r4
