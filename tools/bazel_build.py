@@ -36,6 +36,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/hardware_pwm_test:hardware_pwm_test",
                 "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test",
                 "//test/kitchen_sink:kitchen_sink",
+                "//test/kitchen_sink:kitchen_sink_embed_xip_setup",
                 "//test/kitchen_sink:kitchen_sink_cpp",
                 "//test/kitchen_sink:kitchen_sink_copy_to_ram",
                 "//test/kitchen_sink:kitchen_sink_no_flash",
