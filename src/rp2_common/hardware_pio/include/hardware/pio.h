@@ -2049,7 +2049,7 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, u
  * \return true on success, false otherwise
  * \see pio_remove_program_and_unclaim_sm
  *
- * \note on RP2050 or RP2350A (strictly when PICO_PIO_USE_GPIO_BASE == 0), gpio_start + gpio_count must be <= 32
+ * \note on RP2040 or RP2350A (strictly when PICO_PIO_USE_GPIO_BASE == 0), gpio_start + gpio_count must be <= 32
  * for success, and the set_gpio_base parameter is ignored
  */
 bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio, uint *sm, uint *offset, uint gpio_start, uint gpio_count, bool set_gpio_base);
