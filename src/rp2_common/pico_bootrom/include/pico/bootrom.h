@@ -519,6 +519,10 @@ static inline int rom_set_bootrom_stack(bootrom_stack_t *stack) {
  * \param p1 parameter 1, depends on flags
  */
 static inline int rom_reboot(uint32_t flags, uint32_t delay_ms, uint32_t p0, uint32_t p1) {
+#if PICO_RP2350
+    // work around bootrom bug with 0 timeout
+    if (!delay_ms) delay_ms = 1;
+#endif
     rom_reboot_fn func = (rom_reboot_fn) rom_func_lookup_inline(ROM_FUNC_REBOOT);
     return func(flags, delay_ms, p0, p1);
 }
