@@ -766,9 +766,9 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  * Out Special | sticky=false, has_enable_pin=false, enable_pin_index=0
  * Mov Status | status_sel=STATUS_TX_LESSTHAN, n=0
  *
- * \note on RP2350B with PICO_PIO_USE_GPIO_BASE = 1, the default out/set/in/side set pin
+ * \note on RP2350B with PICO_PIO_USE_GPIO_BASE = 1, the default Out/Set/In/Side Set pin
  * bases are actually 0 relative to the GPIO_BASE of the PIO instance the pio_sm_config
- * is applied to, so that the non-user-specified 0 is not included in logic related to
+ * is applied to, so that any pin bases which aren't explicitly specified are not included in logic related to
  * choosing a compatible PIO instance.
  *
  * Therefore, for example, if you intend to use Out pins starting at pin 0 on
