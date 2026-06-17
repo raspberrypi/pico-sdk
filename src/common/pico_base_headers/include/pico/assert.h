@@ -34,7 +34,7 @@ extern "C" {
 #define invalid_params_if(x, test) ({if (PARAM_ASSERTIONS_ENABLED(x)) assert(!(test));})
 #define valid_params_if(x, test) ({if (PARAM_ASSERTIONS_ENABLED(x)) assert(test);})
 #define hard_assert_if(x, test) ({if (PARAM_ASSERTIONS_ENABLED(x)) hard_assert(!(test));})
-#define invalid_params_if_and_return(x, test, rc) ({/*if (PARAM_ASSERTIONS_ENABLED(x)) assert(!(test)); */ if (test) return rc; })
+#define invalid_params_if_and_return(x, test, rc) ({if (PARAM_ASSERTIONS_ENABLED(x)) assert(!(test)); if (test) return rc; })
 
 #ifdef NDEBUG
 extern void hard_assertion_failure(void);

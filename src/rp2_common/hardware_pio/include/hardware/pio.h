@@ -833,8 +833,8 @@ static inline int pio_sm_set_config(PIO pio, uint sm, const pio_sm_config *confi
     // configs that use pins 32-47
     uint gpio_over_32 = (config->pinhi >> 1) & used;
     uint gpio_base = pio_get_gpio_base(pio);
-    invalid_params_if_and_return(PIO, gpio_under_16 && gpio_base, PICO_ERROR_BAD_ALIGNMENT);
-    invalid_params_if_and_return(PIO, gpio_over_32 && !gpio_base, PICO_ERROR_BAD_ALIGNMENT);
+    invalid_params_if_and_return(HARDWARE_PIO, gpio_under_16 && gpio_base, PICO_ERROR_BAD_ALIGNMENT);
+    invalid_params_if_and_return(HARDWARE_PIO, gpio_over_32 && !gpio_base, PICO_ERROR_BAD_ALIGNMENT);
     // flip the top bit of any used (execctrl/pinctrl) values to turn:
     // bit6(32) + 0-15  -> base(16) + 16-31
     // bit6(0)  + 16-31 -> base(16) + 0-15
@@ -2018,13 +2018,13 @@ bool pio_sm_is_claimed(PIO pio, uint sm);
  *  \ingroup hardware_pio
  *
  * \param program PIO program to add
- * \param pio Returns the PIO hardware instance or NULL if no PIO is available
- * \param sm Returns the index of the PIO state machine that was claimed
- * \param offset Returns the instruction memory offset of the start of the program
+ * \param pio_out Returns the PIO hardware instance or NULL if no PIO is available
+ * \param sm_out Returns the index of the PIO state machine that was claimed
+ * \param offset_out Returns the instruction memory offset of the start of the program
  * \return true on success, false otherwise
  * \see pio_remove_program_and_unclaim_sm
  */
-bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, uint *sm, uint *offset);
+bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio_out, uint *sm_out, uint *offset_out);
 
 /*! \brief Finds a PIO and statemachine and adds a program into PIO memory
  *  \ingroup hardware_pio
@@ -2037,9 +2037,9 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, u
  * and optionally will set the GPIO base (see \ref pio_set_gpio_base) of an unused PIO instance if necessary
  *
  * \param program PIO program to add
- * \param pio Returns the PIO hardware instance or NULL if no PIO is available
- * \param sm Returns the index of the PIO state machine that was claimed
- * \param offset Returns the instruction memory offset of the start of the program
+ * \param pio_out Returns the PIO hardware instance or NULL if no PIO is available
+ * \param sm_out Returns the index of the PIO state machine that was claimed
+ * \param offset_out Returns the instruction memory offset of the start of the program
  * \param gpio_start the lowest GPIO number required (0-47 on RP2350B, 0-31 otherwise)
  * \param gpio_count the count of consecutive GPIOs required
  * \param set_gpio_base if there is no free SM on a PIO instance with the right GPIO base, and there IS an unused PIO
@@ -2052,7 +2052,7 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, u
  * \note on RP2040 or RP2350A (strictly when PICO_PIO_USE_GPIO_BASE == 0), gpio_start + gpio_count must be <= 32
  * for success, and the set_gpio_base parameter is ignored
  */
-bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio, uint *sm, uint *offset, uint gpio_start, uint gpio_count, bool set_gpio_base);
+bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio_out, uint *sm_out, uint *offset_out, uint gpio_start, uint gpio_count, bool set_gpio_base);
 
 /*! \brief Removes a program from PIO memory and unclaims the state machine
  *  \ingroup hardware_pio
