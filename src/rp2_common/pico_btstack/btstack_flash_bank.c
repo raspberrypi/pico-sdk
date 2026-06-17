@@ -90,7 +90,7 @@ static void pico_flash_bank_read(void *context, int bank, uint32_t offset, uint8
     if ((offset + size) > PICO_FLASH_BANK_SIZE) return;
 
     // Flash is xip
-    memcpy(buffer, (void *)(XIP_BASE + pico_flash_bank_get_storage_offset_func() + (PICO_FLASH_BANK_SIZE * bank) + offset), size);
+    memcpy(buffer, (void *)(XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + pico_flash_bank_get_storage_offset_func() + (PICO_FLASH_BANK_SIZE * bank) + offset), size);
 }
 
 static void pico_flash_bank_write(void * context, int bank, uint32_t offset, const uint8_t *data, uint32_t size) {
