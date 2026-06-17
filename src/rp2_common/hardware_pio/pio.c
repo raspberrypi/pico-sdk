@@ -51,7 +51,7 @@ int pio_claim_unused_sm(PIO pio, bool required) {
     uint base = which * NUM_PIO_STATE_MACHINES;
     int index = hw_claim_unused_from_range((uint8_t*)&claimed[0], required, base,
                                       base + NUM_PIO_STATE_MACHINES - 1, "No PIO state machines are available");
-    return index >= (int)base ? index - (int)base : -1;
+    return index >= (int)base ? index - (int)base : PICO_ERROR_GENERIC;
 }
 
 bool pio_sm_is_claimed(PIO pio, uint sm) {
@@ -81,18 +81,15 @@ static int find_offset_for_program(PIO pio, const pio_program_t *program) {
     }
 }
 
+#if PICO_PIO_USE_GPIO_BASE
 static int pio_set_gpio_base_unsafe(PIO pio, uint gpio_base) {
     invalid_params_if_and_return(HARDWARE_PIO, gpio_base != 0 && (!PICO_PIO_VERSION || gpio_base != 16), PICO_ERROR_BAD_ALIGNMENT);
-#if PICO_PIO_USE_GPIO_BASE
     uint32_t used_mask = _used_instruction_space[pio_get_index(pio)];
     invalid_params_if_and_return(HARDWARE_PIO, used_mask, PICO_ERROR_INVALID_STATE);
     pio->gpiobase = gpio_base;
-#else
-    ((void)pio);
-    ((void)gpio_base);
-#endif
     return PICO_OK;
 }
+#endif
 
 int pio_set_gpio_base(PIO pio, uint gpio_base) {
     int rc = PICO_OK;
@@ -107,22 +104,19 @@ int pio_set_gpio_base(PIO pio, uint gpio_base) {
     return rc;
 }
 
+#if PICO_PIO_VERSION > 0 || PICO_PIO_USE_GPIO_BASE
 static bool is_gpio_compatible(PIO pio, uint32_t used_gpio_ranges) {
-#if PICO_PIO_USE_GPIO_BASE
     bool gpio_base = pio_get_gpio_base(pio);
     return !((gpio_base && (used_gpio_ranges & 1)) ||
              (!gpio_base && (used_gpio_ranges & 4)));
-#else
-    ((void)pio);
-    ((void)used_gpio_ranges);
-    return true;
-#endif
 }
+#endif
 
 static bool is_program_gpio_compatible(PIO pio, const pio_program_t *program) {
 #if PICO_PIO_VERSION > 0
     return is_gpio_compatible(pio, program->used_gpio_ranges);
 #else
+    // there are no stored gpio_ranges, so we assume we're good
     ((void)pio);
     ((void)program);
     return true;
@@ -178,7 +172,6 @@ static int add_program_at_offset(PIO pio, const pio_program_t *program, uint off
     return (int)offset;
 }
 
-// these assert if unable
 int pio_add_program(PIO pio, const pio_program_t *program) {
     uint32_t save = hw_claim_lock();
     int offset = find_offset_for_program(pio, program);
@@ -411,66 +404,79 @@ void pio_sm_drain_tx_fifo(PIO pio, uint sm) {
     }
 }
 
-bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio, uint *sm, uint *offset) {
-    return pio_claim_free_sm_and_add_program_for_gpio_range(program, pio, sm, offset, 0, 0, false);
+bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio_out, uint *sm_out, uint *offset_out) {
+    int pio_num = NUM_PIOS;
+    while (pio_num--) {
+        PIO pio = pio_get_instance((uint)pio_num);
+        int sm_or_error = pio_claim_unused_sm(pio, false);
+        if (sm_or_error >= 0) {
+            int offset_or_error = pio_add_program(pio, program);
+            if (offset_or_error >= 0) {
+                *pio_out = pio;
+                *sm_out = sm_or_error;
+                *offset_out = offset_or_error;
+                return true;
+            }
+            pio_sm_unclaim(pio, sm_or_error);
+        }
+    }
+    return false;
 }
 
-bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio, uint *sm, uint *offset, uint gpio_start, uint gpio_count, bool set_gpio_base) {
-    invalid_params_if(HARDWARE_PIO, (gpio_start + gpio_count) > NUM_BANK0_GPIOS);
-
+bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio_out, uint *sm_out, uint *offset_out, uint gpio_start, uint gpio_count, bool set_gpio_base) {
+    invalid_params_if_and_return(HARDWARE_PIO, (gpio_start + gpio_count) > MAX(32, NUM_BANK0_GPIOS), false);
 #if !PICO_PIO_USE_GPIO_BASE
-    // short-circuit some logic when not using GPIO_BASE
-    set_gpio_base = 0;
-    gpio_count = 0;
-#endif
+    invalid_params_if(HARDWARE_PIO, (gpio_start + gpio_count) > 32);
+    (void)set_gpio_base;
+    return pio_claim_free_sm_and_add_program(program, pio_out, sm_out, offset_out);
+#else
+    invalid_params_if_and_return(HARDWARE_PIO, !gpio_count, false); // 0 gpio_count breaks logic below, so return false
 
-    // note if gpio_count == 0, we don't care about GPIOs so use a zero mask for what we require
-    // if gpio_count > 0, then we just set used mask for the ends, since that is all that is checked at the moment
-    uint32_t required_gpio_ranges;
-    if (gpio_count) required_gpio_ranges = (1u << (gpio_start >> 4)) | (1u << ((gpio_start + gpio_count - 1) >> 4));
-    else            required_gpio_ranges = 0;
+    // we just set used mask for the ends, since that is all that is checked at the moment
+    uint32_t required_gpio_ranges = (1u << (gpio_start >> 4)) | (1u << ((gpio_start + gpio_count - 1) >> 4));
     int passes = set_gpio_base ? 2 : 1;
 
     for(int pass = 0; pass < passes; pass++) {
         int pio_num = NUM_PIOS;
         while (pio_num--) {
-            *pio = pio_get_instance((uint)pio_num);
+            PIO pio = pio_get_instance((uint)pio_num);
             // We need to claim an SM on the PIO
             int8_t sm_index[NUM_PIO_STATE_MACHINES];
             // on second pass, if there is one, we try and claim all the state machines so that we can change the GPIO base
-            uint num_claimed;
-            for(num_claimed = 0; num_claimed < (pass ? NUM_PIO_STATE_MACHINES : 1u) ; num_claimed++) {
-                sm_index[num_claimed] = (int8_t)pio_claim_unused_sm(*pio, false);
+            int num_claimed;
+            for(num_claimed = 0; num_claimed < (pass ? (int)NUM_PIO_STATE_MACHINES : 1) ; num_claimed++) {
+                sm_index[num_claimed] = (int8_t)pio_claim_unused_sm(pio, false);
                 if (sm_index[num_claimed] < 0) break;
             }
             // rc = 0 if we claimed all the required state machines for the pass, <0 otherwise
-            int rc = num_claimed - (pass ? NUM_PIO_STATE_MACHINES : 1);
+            int rc = num_claimed - (pass ? (int)NUM_PIO_STATE_MACHINES : 1);
             if (rc >= 0) {
                 uint32_t save = hw_claim_lock();
                 if (pass) {
-                    pio_set_gpio_base_unsafe(*pio, required_gpio_ranges & 4 ? 16 : 0);
+                    pio_set_gpio_base_unsafe(pio, required_gpio_ranges & 4 ? 16 : 0);
                 }
-                rc = is_gpio_compatible(*pio, required_gpio_ranges) ? 0 : -1;
-                if (rc >= 0) rc = find_offset_for_program(*pio, program);
-                if (rc >= 0) rc = add_program_at_offset(*pio, program, (uint)rc);
+                rc = is_gpio_compatible(pio, required_gpio_ranges) ? 0 : -1;
+                if (rc >= 0) rc = find_offset_for_program(pio, program);
+                if (rc >= 0) rc = add_program_at_offset(pio, program, (uint)rc);
                 if (rc >= 0) {
-                    *sm = (uint) sm_index[0];
-                    *offset = (uint) rc;
+                    *pio_out = pio;
+                    *sm_out = (uint) sm_index[0];
+                    *offset_out = (uint) rc;
                 }
                 hw_claim_unlock(save);
             }
             // always un-claim all SMs other than the one we need (array index 0),
             // or all of them if we had an error
-            for (uint i = (rc >= 0); i < num_claimed; i++) {
-                pio_sm_unclaim(*pio, (uint) sm_index[i]);
+            for (int i = (rc >= 0); i < num_claimed; i++) {
+                pio_sm_unclaim(pio, (uint) sm_index[i]);
             }
             if (rc >= 0) {
                 return true;
             }
         }
     }
-    *pio = NULL;
     return false;
+#endif
 }
 
 void pio_remove_program_and_unclaim_sm(const pio_program_t *program, PIO pio, uint sm, uint offset) {

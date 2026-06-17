@@ -8,8 +8,6 @@ cc_library(
     srcs = ["bit_ops_aeabi.S"],
     linkopts = select({
         "//bazel/constraint:rp2040": [
-            "-Wl,--wrap=__clzsi2",
-            "-Wl,--wrap=__clzsi2",
             "-Wl,--wrap=__clzdi2",
             "-Wl,--wrap=__ctzsi2",
             "-Wl,--wrap=__popcountsi2",

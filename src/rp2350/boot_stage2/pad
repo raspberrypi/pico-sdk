@@ -11,18 +11,11 @@ def any_int(x):
         raise argparse.ArgumentTypeError("expected an integer, not '{!r}'".format(x))
 
 
-def bitrev(x, width):
-    return int("{:0{w}b}".format(x, w=width)[::-1], 2)
-
-
 parser = argparse.ArgumentParser()
 parser.add_argument("ifile", help="Input file (binary)")
 parser.add_argument("ofile", help="Output file (assembly)")
-parser.add_argument("-p", "--pad", help="Padded size (bytes), including 4-byte checksum, default 256",
+parser.add_argument("-p", "--pad", help="Padded size (bytes), default 256",
                     type=any_int, default=256)
-parser.add_argument("-s", "--seed", help="Checksum seed value, default 0",
-                    type=any_int, default=0)
-parser.add_argument("-a", "--arch", default="arm", choices=["arm", "riscv"])
 args = parser.parse_args()
 
 try:
@@ -35,17 +28,12 @@ if len(idata) > args.pad:
 
 odata = idata + bytes(args.pad - len(idata))
 
-# No CRC, as "boot2" is entered by crt0 rather than the bootrom. The bootrom
-# can optionally perform a SHA-256 hash check of the entire image, and will
-# always at least check for a metadata block which is a valid IMAGE_DEF, so
-# the boot2 CRC is redundant.
+# No CRC on RP2350, as "boot2" is just a generic function that can be copied
+# anywhere and used
 
 # try:
 with open(args.ofile, "w") as ofile:
-    ofile.write("// Padded and checksummed version of: {}\n\n".format(args.ifile))
-    if args.arch == "arm":
-        ofile.write(".cpu cortex-m0plus\n")
-        ofile.write(".thumb\n\n")
+    ofile.write("// Padded version of: {}\n\n".format(args.ifile))
     ofile.write(".section .boot2, \"ax\"\n\n")
     ofile.write(".global __boot2_entry_point\n")
     ofile.write("__boot2_entry_point:\n")

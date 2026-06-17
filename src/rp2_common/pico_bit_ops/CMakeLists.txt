@@ -24,8 +24,6 @@ if (NOT TARGET pico_bit_ops)
     if (PICO_RP2040)
         target_link_libraries(pico_bit_ops_pico INTERFACE pico_bootrom)
         # gcc
-        pico_wrap_function(pico_bit_ops_pico __clzsi2)
-        pico_wrap_function(pico_bit_ops_pico __clzsi2)
         pico_wrap_function(pico_bit_ops_pico __clzdi2)
         pico_wrap_function(pico_bit_ops_pico __ctzsi2)
         pico_wrap_function(pico_bit_ops_pico __popcountsi2)

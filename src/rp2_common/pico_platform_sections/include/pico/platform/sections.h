@@ -155,7 +155,7 @@
  *              garbage-collected independently
  */
 #ifndef __in_xip_ram
-#if PICO_USE_XIP_CACHE_AS_RAM
+#if PICO_USE_XIP_CACHE_AS_RAM || PICO_COMBINED_DOCS
 #define __in_xip_ram(group) __attribute__((section(".xip_ram." group)))
 #elif PICO_XIP_RAM
 #define __in_xip_ram(group) __in_ram(group)
@@ -183,7 +183,6 @@
 #define __uninitialized_ram(group) __attribute__((section(".uninitialized_data." #group))) group
 #endif
 
-#if LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER
 /*! \brief Section attribute macro for placement in a section persisted across default POWMAN resets
  *  \ingroup pico_platform
  *
@@ -199,6 +198,7 @@
  *
  * \param name  the name of the variable to place in the section
  */
+#if (LIB_PICO_LOW_POWER && HAS_POWMAN_TIMER) || PICO_COMBINED_DOCS
 #ifndef __persistent_data
 #define __persistent_data(name) __attribute__((section(".persistent_data." #name))) name
 #endif
@@ -225,6 +225,10 @@
 #define __in_flash(group) __attribute__((section(".flashdata." group)))
 #endif
 
+// Above the doxygen, to avoid confusing it
+#ifndef PICO_NOT_IN_FLASH_PLACEMENT
+#define PICO_NOT_IN_FLASH_PLACEMENT __in_ram
+#endif
 /*! \brief Section attribute macro for placement not in flash
  *  \ingroup pico_platform
  *
@@ -242,9 +246,6 @@
  * \param group a string suffix to use in the section name to distinguish groups that can be linker
  *              garbage-collected independently
  */
-#ifndef PICO_NOT_IN_FLASH_PLACEMENT
-#define PICO_NOT_IN_FLASH_PLACEMENT __in_ram
-#endif
 #ifndef __not_in_flash
 #define __not_in_flash(group) PICO_NOT_IN_FLASH_PLACEMENT(group)
 #endif
@@ -283,7 +284,10 @@
 #define __no_inline_not_in_flash_func(func_name) __noinline __not_in_flash_func(func_name)
 #endif
 
-
+// Above the doxygen, to avoid confusing it
+#ifndef PICO_TIME_CRITICAL_PLACEMENT
+#define PICO_TIME_CRITICAL_PLACEMENT __in_ram
+#endif
 /*! \brief Indicates a function is time/latency critical and should not run from flash
  *  \ingroup pico_platform
  *
@@ -298,7 +302,7 @@
  * By default, the function is placed using \ref __in_ram, but this can be adjusted using the
  * `PICO_TIME_CRITICAL_PLACEMENT` define. This define can be set using the \ref pico_set_time_critical_placement
  * CMake function.
- * 
+ *
  * For example, for binaries that are not executing from flash (e.g. copy_to_ram and no_flash), there is the option
  * to use `pico_set_time_critical_placement(TARGET xip_ram)` to place these functions in XIP RAM, as the XIP AHB
  * ports would be otherwise unused.
@@ -306,9 +310,6 @@
  * \see __not_in_flash
  */
 #ifndef __time_critical_func
-#ifndef PICO_TIME_CRITICAL_PLACEMENT
-#define PICO_TIME_CRITICAL_PLACEMENT __in_ram
-#endif
 #define __time_critical_func(func_name) __noinline PICO_TIME_CRITICAL_PLACEMENT(__STRING(func_name)) func_name
 #endif
 
