@@ -436,10 +436,10 @@ _entry_point:
         // because RP2040 doesn't have special watchdog boot types
         // Launch this no_flash binary using a RAM image boot
         ldr r1, =(WATCHDOG_BASE + WATCHDOG_SCRATCH2_OFFSET) // registers start from here
-        // scratch 2 = __logical_binary_start
-        ldr r2, =__logical_binary_start
-        // scratch 3 = size
-        ldr r3, =__ram_window_size // assume maximum size for block loop
+        // scratch 2 = start of RAM window, from section_no_flash_end.incl
+        ldr r2, =__ram_window_start
+        // scratch 3 = size of RAM window, from section_no_flash_end.incl
+        ldr r3, =__ram_window_size
         // scratch 4&7 = magic number
         ldr r4, =0xb007c0d3
         mov r7, r4

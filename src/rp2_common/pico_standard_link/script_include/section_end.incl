@@ -17,9 +17,6 @@ SECTIONS
     __StackBottom = __StackTop - SIZEOF(.stack_dummy);
     PROVIDE(__stack = __StackTop);
 
-    /* provide the maximum ram window size for crt0 */
-    __ram_window_size = LENGTH(RAM);
-
     /* picolibc and LLVM */
     PROVIDE (__heap_start = __end__);
     PROVIDE (__heap_end = __HeapLimit);

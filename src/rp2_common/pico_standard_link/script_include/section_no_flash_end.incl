@@ -1,0 +1,22 @@
+/* Defines the following symbols for use by code:
+    __ram_window_start, __ram_window_size
+*/
+
+SECTIONS
+{
+    /*
+        Provide the ram window start & size for block loop searches
+
+        The window is from __logical_binary_start to ORIGIN(RAM) + LENGTH(RAM),
+        plus scratch X & Y if they are contiguous - this assumes __logical_binary_start
+        is located in RAM, which should always be the case for no_flash binaries
+
+        This is used by the _entry_point in crt0 
+    */
+    __ram_window_start = __logical_binary_start;
+    __ram_window_size = (ORIGIN(RAM) + LENGTH(RAM)) - __logical_binary_start;
+    __ram_window_size += (((ORIGIN(RAM) + LENGTH(RAM)) == ORIGIN(SCRATCH_X))
+        ? (LENGTH(SCRATCH_X) + (((ORIGIN(SCRATCH_X) + LENGTH(SCRATCH_X)) == ORIGIN(SCRATCH_Y)) ? LENGTH(SCRATCH_Y) : 0))
+        : 0
+    );
+}

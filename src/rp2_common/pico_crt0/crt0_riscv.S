@@ -305,11 +305,11 @@ _entry_point:
     #if PICO_NO_FLASH
         // Launch this no_flash binary using a RAM image boot
         la a1, WATCHDOG_BASE + WATCHDOG_SCRATCH2_OFFSET // offsets start from here, to fit in sw immediate
-        // scratch 2 = __logical_binary_start
-        la a0, __logical_binary_start
+        // scratch 2 = start of RAM window, from section_no_flash_end.incl
+        la a0, __ram_window_start
         sw a0, 0(a1)
-        // scratch 3 = size
-        li a0, SRAM_END - SRAM_BASE // assume maximum size for block loop
+        // scratch 3 = size of RAM window, from section_no_flash_end.incl
+        la a0, __ram_window_size
         sw a0, 4(a1)
         // scratch 4&7 = magic number
         li a0, 0xb007c0d3
