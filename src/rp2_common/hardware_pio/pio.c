@@ -424,13 +424,13 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio_ou
 }
 
 bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio_out, uint *sm_out, uint *offset_out, uint gpio_start, uint gpio_count, bool set_gpio_base) {
+    invalid_params_if_and_return(HARDWARE_PIO, (gpio_start + gpio_count) > MAX(32, NUM_BANK0_GPIOS), false);
 #if !PICO_PIO_USE_GPIO_BASE
     invalid_params_if(HARDWARE_PIO, (gpio_start + gpio_count) > 32);
     (void)set_gpio_base;
-    return pio_claim_free_sm_and_add_program(program, pio, sm, offset);
+    return pio_claim_free_sm_and_add_program(program, pio_out, sm_out, offset_out);
 #else
     invalid_params_if_and_return(HARDWARE_PIO, !gpio_count, false); // 0 gpio_count breaks logic below, so return false
-    invalid_params_if(HARDWARE_PIO, (gpio_start + gpio_count) > NUM_BANK0_GPIOS);
 
     // we just set used mask for the ends, since that is all that is checked at the moment
     uint32_t required_gpio_ranges = (1u << (gpio_start >> 4)) | (1u << ((gpio_start + gpio_count - 1) >> 4));
