@@ -64,24 +64,33 @@ uint64_t powman_timer_get_ms(void) {
     return ((uint64_t) hi << 32u) | lo;
 }
 
-void powman_timer_set_1khz_tick_source_lposc(void) {
+uint32_t __weak powman_timer_get_lposc_calib_freq(void) {
 #if PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP
     uint16_t* lposc_calib_data = (uint16_t*)OTP_DATA_BASE + OTP_DATA_LPOSC_CALIB_ROW;
     if (*lposc_calib_data == 0) {
-        powman_timer_set_1khz_tick_source_lposc_with_hz(0);
+        return 0;
+#if PICO_RP2350
+    } else if (*lposc_calib_data > LPOSC_MAX_EXPECTED_HZ || *lposc_calib_data < LPOSC_MIN_EXPECTED_HZ) {
+        // Ignore OTP value if it is out of range
+        return 0;
+#endif
     } else {
-        powman_timer_set_1khz_tick_source_lposc_with_hz(*lposc_calib_data);
+        return *lposc_calib_data;
     }
 #else
-    powman_timer_set_1khz_tick_source_lposc_with_hz(0);
+    return 0;
 #endif
+}
+
+void powman_timer_set_1khz_tick_source_lposc(void) {
+    powman_timer_set_1khz_tick_source_lposc_with_hz(powman_timer_get_lposc_calib_freq());
 }
 
 void powman_timer_set_1khz_tick_source_lposc_with_hz(uint32_t lposc_freq_hz) {
     bool was_running = powman_timer_is_running();
-    uint32_t lposc_freq_khz = lposc_freq_hz == 0 ? POWMAN_LPOSC_FREQ_KHZ_INT_RESET : lposc_freq_hz / 1000;
-    uint32_t lposc_freq_khz_frac16 = lposc_freq_hz == 0 ? POWMAN_LPOSC_FREQ_KHZ_FRAC_RESET : (lposc_freq_hz % 1000) * 65536 / 1000;
-    if (lposc_freq_khz != powman_hw->lposc_freq_khz_int || lposc_freq_khz_frac16 != powman_hw->lposc_freq_khz_frac) {
+    uint32_t lposc_freq_khz = lposc_freq_hz / 1000;
+    uint32_t lposc_freq_khz_frac16 = (lposc_freq_hz % 1000) * 65536 / 1000;
+    if (lposc_freq_hz && (lposc_freq_khz != powman_hw->lposc_freq_khz_int || lposc_freq_khz_frac16 != powman_hw->lposc_freq_khz_frac)) {
         // Frequency change needed, so need to stop the timer, set the frequency, and start the timer with USE_LPOSC
         if (was_running) powman_timer_pause();
         powman_write(&powman_hw->lposc_freq_khz_int, lposc_freq_khz);

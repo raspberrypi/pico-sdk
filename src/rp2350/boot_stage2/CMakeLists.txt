@@ -49,10 +49,6 @@ function(pico_define_boot_stage2 NAME SOURCES)
     if (PICO_C_COMPILER_IS_CLANG)
         target_link_options(${NAME} PRIVATE "-nostdlib")
     elseif (PICO_C_COMPILER_IS_GNU)
-        if (PICO_LIBC STREQUAL "newlib")
-            # this disables newlib's implementation of syscalls such as _read
-            target_link_options(${NAME} PRIVATE "--specs=nosys.specs")
-        endif()
         target_link_options(${NAME} PRIVATE "-nostartfiles")
     endif ()
 
@@ -67,7 +63,7 @@ function(pico_define_boot_stage2 NAME SOURCES)
     pico_add_map_output(${NAME})
 
     set(ORIGINAL_BIN ${CMAKE_CURRENT_BINARY_DIR}/${NAME}.bin)
-    set(PADDED_CHECKSUMMED_ASM ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_padded_checksummed.S)
+    set(PADDED_ASM ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_padded.S)
 
     find_package (Python3 REQUIRED COMPONENTS Interpreter)
 
@@ -75,11 +71,11 @@ function(pico_define_boot_stage2 NAME SOURCES)
     add_custom_command(OUTPUT ${ORIGINAL_BIN} DEPENDS ${NAME} COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${NAME}> ${ORIGINAL_BIN}
         VERBATIM)
 
-    add_custom_command(OUTPUT ${PADDED_CHECKSUMMED_ASM} DEPENDS ${ORIGINAL_BIN}
-            COMMAND ${Python3_EXECUTABLE} ${PICO_BOOT_STAGE2_DIR}/pad_checksum -s 0xffffffff -a $<IF:${PICO_RISCV},riscv,arm> ${ORIGINAL_BIN} ${PADDED_CHECKSUMMED_ASM}
+    add_custom_command(OUTPUT ${PADDED_ASM} DEPENDS ${ORIGINAL_BIN}
+            COMMAND ${Python3_EXECUTABLE} ${PICO_BOOT_STAGE2_DIR}/pad ${ORIGINAL_BIN} ${PADDED_ASM}
             VERBATIM)
 
-    add_library(${NAME}_library OBJECT ${PADDED_CHECKSUMMED_ASM})
+    add_library(${NAME}_library OBJECT ${PADDED_ASM})
     target_link_libraries(${NAME}_library INTERFACE "$<TARGET_OBJECTS:${NAME}_library>")
     target_link_libraries(${NAME}_library INTERFACE boot_stage2_headers)
 

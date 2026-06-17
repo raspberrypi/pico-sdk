@@ -46,10 +46,12 @@ cc_args(
         "-mcpu=cortex-m33",
         "-march=armv8-m.main+fp+dsp",
         "-mthumb",
-        "-mcmse",
     ] + select({
         "//bazel/constraint:pico_hard_float_abi_enabled": ["-mfloat-abi=hard"],
         "//conditions:default": ["-mfloat-abi=softfp"],
+    }) + select({
+        "//bazel/constraint:pico_no_cmse_enabled": [""],
+        "//conditions:default": ["-mcmse"],
     }),
 )
 

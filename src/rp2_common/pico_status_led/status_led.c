@@ -202,6 +202,8 @@ static bool status_led_init_internal(__unused struct async_context *context) {
                 async_context_deinit(&status_led_owned_context.core);
                 return false;
             }
+        } else {
+            return false;
         }
     }
     status_led_context = context;

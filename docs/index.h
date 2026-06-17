@@ -33,11 +33,12 @@
  * \cond hardware_powman \defgroup hardware_powman hardware_powman \endcond
  * \cond hardware_psram \defgroup hardware_psram hardware_psram \endcond
  * \cond hardware_pwm \defgroup hardware_pwm hardware_pwm \endcond
+ * \cond hardware_rcp \defgroup hardware_rcp hardware_rcp \endcond
  * \cond hardware_resets \defgroup hardware_resets hardware_resets \endcond
  * \cond hardware_riscv \defgroup hardware_riscv hardware_riscv \endcond
  * \cond hardware_riscv_platform_timer \defgroup hardware_riscv_platform_timer hardware_riscv_platform_timer \endcond
+ * \cond hardware_rosc \defgroup hardware_rosc hardware_rosc \endcond
  * \cond hardware_rtc \defgroup hardware_rtc hardware_rtc \endcond
- * \cond hardware_rcp \defgroup hardware_rcp hardware_rcp \endcond
  * \cond hardware_spi \defgroup hardware_spi hardware_spi \endcond
  * \cond hardware_sha256 \defgroup hardware_sha256 hardware_sha256 \endcond
  * \cond hardware_sync \defgroup hardware_sync hardware_sync \endcond
@@ -62,6 +63,7 @@
  * \cond pico_fix \defgroup pico_fix pico_fix \endcond
  * \cond pico_flash \defgroup pico_flash pico_flash \endcond
  * \cond pico_i2c_slave \defgroup pico_i2c_slave pico_i2c_slave \endcond
+ * \cond pico_low_power \defgroup pico_low_power pico_low_power \endcond
  * \cond pico_multicore \defgroup pico_multicore pico_multicore \endcond
  * \cond pico_rand \defgroup pico_rand pico_rand \endcond
  * \cond pico_sha256 \defgroup pico_sha256 pico_sha256 \endcond

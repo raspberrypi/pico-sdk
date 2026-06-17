@@ -121,6 +121,14 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
                 sha3.c
             )
         endif()
+
+        # block_cipher.c was only added with v3.6.0. Support versions without it as well
+        if (EXISTS ${PICO_MBEDTLS_PATH}/library/block_cipher.c)
+            list(APPEND src_crypto
+                block_cipher.c
+            )
+        endif()
+
         list(TRANSFORM src_crypto PREPEND ${PICO_MBEDTLS_PATH}/library/)
         set(src_crypto ${src_crypto} PARENT_SCOPE)
     endfunction()

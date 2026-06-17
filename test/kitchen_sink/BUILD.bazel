@@ -104,6 +104,14 @@ cc_binary(
 )
 
 cc_binary(
+    name = "kitchen_sink_embed_xip_setup",
+    testonly = True,
+    srcs = ["kitchen_sink.c"],
+    defines = ["PICO_EMBED_XIP_SETUP=1"],
+    deps = [":kitchen_sink_common"],
+)
+
+cc_binary(
     name = "kitchen_sink_cpp",
     testonly = True,
     srcs = ["kitchen_sink_cpp.cpp"],

@@ -68,8 +68,18 @@ CMAKE_ONLY_ALLOWLIST = (
     "PICO_TOOLCHAIN_PATH",
     # Bazel uses native --platforms mechanics.
     "PICO_PLATFORM",
+    "PICO_DEFAULT_PLATFORM",
+    "PICO_DEFAULT_RP2350_PLATFORM",
     # Named PICO_TOOLCHAIN in Bazel.
     "PICO_COMPILER",
+    # Bazel uses PICO_COMPILATION_NO_OPT_ARGS and PICO_COMPILATION_NO_DEBUG_ARGS
+    # to allow overriding these flags instead.
+    "PICO_DEOPTIMIZED_DEBUG",
+    "PICO_DEBUG_INFO_IN_RELEASE",
+    # Entirely irrelevant to Bazel, use Bazel toolchains:
+    #     https://bazel.build/extending/toolchains
+    "PICO_TOOLCHAIN_DIR",
+    "PICO_GCC_TRIPLE",
     # Entirely irrelevant to Bazel, use Bazel platforms:
     #     https://bazel.build/extending/platforms
     "PICO_CMAKE_PRELOAD_PLATFORM_FILE",
@@ -81,31 +91,37 @@ CMAKE_ONLY_ALLOWLIST = (
     "PICO_CONFIG_HEADER_FILES",
     "PICO_RP2040_CONFIG_HEADER_FILES",
     "PICO_HOST_CONFIG_HEADER_FILES",
+    "PICO_RP2350_ARM_S_CONFIG_HEADER_FILES",
+    "PICO_RP2350_RISCV_CONFIG_HEADER_FILES",
     # Bazel uses PICO_CONFIG_HEADER.
     "PICO_BOARD_CMAKE_DIRS",
     "PICO_BOARD_HEADER_FILE",
     "PICO_BOARD_HEADER_DIRS",
+    # Bazel handles default boards differently.
+    "PICO_DEFAULT_BOARD_rp2040",
+    "PICO_DEFAULT_BOARD_rp2350",
+    "PICO_DEFAULT_BOARD_host",
     # Bazel supports this differently.
     # TODO: Provide a helper rule for explicitly generating a UF2 so users don't
     # have to write out a bespoke run_binary.
     "PICO_NO_UF2",
+    "PICO_NO_COPRO_DIS",
+    "PICO_ALLOW_EXAMPLE_KEYS",
     # Bazel will not provide a default for this.
     # TODO: Provide handy rules for PIOASM so users don't have to write out a
     # bespoke run_binary.
     "PICO_DEFAULT_PIOASM_OUTPUT_FORMAT",
     # Bazel always has picotool.
     "PICO_NO_PICOTOOL",
-    # These aren't supported as build flags in Bazel. Prefer to
-    # set these in board header files like other SDK defines.
-    "CYW43_DEFAULT_PIN_WL_REG_ON",
-    "CYW43_DEFAULT_PIN_WL_DATA_OUT",
-    "CYW43_DEFAULT_PIN_WL_DATA_IN",
-    "CYW43_DEFAULT_PIN_WL_HOST_WAKE",
-    "CYW43_DEFAULT_PIN_WL_CLOCK",
-    "CYW43_DEFAULT_PIN_WL_CS",
-    "CYW43_PIO_CLOCK_DIV_INT",
-    "CYW43_PIO_CLOCK_DIV_FRAC",
-    "CYW43_PIO_CLOCK_DIV_DYNAMIC",
+    # Bazel includes these differently.
+    "PICO_TINYUSB_PATH",
+    "PICO_BTSTACK_PATH",
+    "PICO_CYW43_DRIVER_PATH",
+    "PICO_MBEDTLS_PATH",
+    "PICO_LWIP_PATH",
+    # These are legacy CMake options that should not be used.
+    "PICO_NO_FLASH",
+    "PICO_COPY_TO_RAM",
 )
 
 BAZEL_ONLY_ALLOWLIST = (
@@ -133,6 +149,7 @@ BAZEL_ONLY_ALLOWLIST = (
     # - PICO_BOARD_HEADER_DIRS
     "PICO_CONFIG_HEADER",
     # Bazel configuration for 3p deps.
+    "PICO_TINYUSB_CONFIG",
     "PICO_BTSTACK_CONFIG",
     "PICO_LWIP_CONFIG",
     "PICO_MBEDTLS_CONFIG",
@@ -147,6 +164,7 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_DEFAULT_DIVIDER_IMPL",
     "PICO_DEFAULT_PRINTF_IMPL",
     "PICO_DEFAULT_RAND_IMPL",
+    "PICO_DEFAULT_THREAD_LOCAL_IMPL",
     "PICO_BINARY_INFO_ENABLED",
     "PICO_ASYNC_CONTEXT_IMPL",
     # Allows selection of clang/gcc when using the dynamically fetched
@@ -162,6 +180,8 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_COMPILATION_NO_OPT_ARGS",
     "PICO_COMPILATION_NO_DEBUG_ARGS",
     "PICO_COMPILATION_NO_FASTBUILD_ARGS",
+    # This is commented out in CMake
+    "PICO_CMSIS_PATH",
 )
 
 
@@ -187,6 +207,10 @@ def FindKnownOptions(option_pattern_matcher, file_paths):
     for p in file_paths:
         with open(p, "r") as f:
             for line in f:
+                if re.match("\s*#\s*#", line):
+                    # Ignore commented out defines
+                    continue
+
                 match = re.search(pattern, line)
                 if not match:
                     continue

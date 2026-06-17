@@ -18,6 +18,14 @@ int main() {
 
     init_external_gpios();
 
+#if HAS_POWMAN_TIMER
+    // quick test for https://github.com/raspberrypi/pico-sdk/issues/2824
+    powman_set_debug_power_request_ignored(true);
+    hard_assert(powman_hw->dbg_pwrcfg & POWMAN_DBG_PWRCFG_IGNORE_BITS);
+    powman_set_debug_power_request_ignored(false);
+    hard_assert((powman_hw->dbg_pwrcfg & POWMAN_DBG_PWRCFG_IGNORE_BITS) == 0);
+#endif
+
     low_power_set_external_clock_source(DORMANT_CLOCK_HZ_DEFAULT, RTC_GPIO_IN);
 
     int ret;
