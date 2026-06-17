@@ -85,6 +85,8 @@ static uint32_t _emutls_align;
 static inline void _tls_init_from_emutls_or_tdata(void *tls) {
 #if PICO_THREAD_LOCAL_SUPPORT_EMUTLS
     uint8_t *tls_adjusted = ((uint8_t *)tls) - TLS_ADJUST;
+GCC_Pragma("GCC diagnostic push")
+GCC_Pragma("GCC diagnostic ignored \"-Wanalyzer-out-of-bounds\"")
     for (tls_object_t* tls_obj = &__emutls_array_start; tls_obj < &__emutls_array_end; ++tls_obj) {
         if (tls_obj->tplate) {
             memcpy(tls_adjusted + tls_obj->offset, tls_obj->tplate, tls_obj->size);
@@ -92,6 +94,7 @@ static inline void _tls_init_from_emutls_or_tdata(void *tls) {
             memset(tls_adjusted + tls_obj->offset, 0, tls_obj->size);
         }
     }
+GCC_Pragma("GCC diagnostic pop")
 #endif
 #if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER
     // when using thread pointers we expect data to come from tdata/tbss
@@ -239,15 +242,18 @@ static void *_emutls_per_core_init(void) {
         // aligned_alloc is not available in all libraries we support, and it isn't thread safe anyway,
         // so we'll just do the padded malloc
         // tls = aligned_alloc(size, _emutls_align);
-        void *tls = malloc(size + _emutls_align - 1);
-        // note we never free the memory, so bumping the pointer is fine
-        tls = (void *)((((uintptr_t)tls) + (_emutls_align - 1)) & ~(_emutls_align - 1));
-        if (tls) {
+        void *raw = malloc(size + _emutls_align - 1);
+        if (raw) {
+            // note we never free the memory, so bumping the pointer is fine
+            void *tls = (void *)((((uintptr_t)raw) + (_emutls_align - 1)) & ~(_emutls_align - 1));
             _init_tls(tls);
             _set_tls(tls);
         }
     }
+GCC_Pragma("GCC diagnostic push")
+GCC_Pragma("GCC diagnostic ignored \"-Wanalyzer-malloc-leak\"")
     return _get_tls_adjusted_for_core(core_num);
+GCC_Pragma("GCC diagnostic pop")
 }
 
 void* __emutls_get_address(void* obj) {

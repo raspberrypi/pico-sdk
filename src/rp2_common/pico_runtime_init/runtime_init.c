@@ -216,7 +216,7 @@ void runtime_init_install_ram_vector_table(void) {
 #if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH)
     extern uint32_t __vectors;
     extern uint32_t __vectors_end;
-    uint32_t stored_words = (uint32_t)(&__vectors_end - &__vectors);
+    uint32_t stored_words = ((uintptr_t)&__vectors_end - (uintptr_t)&__vectors) / sizeof(uint32_t);
     __builtin_memcpy(ram_vector_table, &__vectors, 4 * MIN(stored_words, PICO_RAM_VECTOR_TABLE_SIZE));
     for(uint i = stored_words; i<count_of(ram_vector_table); i++) {
         ram_vector_table[i] = (uintptr_t)__unhandled_user_irq;

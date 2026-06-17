@@ -126,8 +126,8 @@ int main() {
     }
     PICOTEST_CHECK(absolute_time_diff_us(time_base, get_absolute_time()) < init_ms * 1000, "This is a flaky test :-(");
 
-    uint64_t last_fired_at[NUM_ALARMS];
-    uint64_t last_target[NUM_ALARMS];
+    uint64_t last_fired_at[NUM_ALARMS] = {};
+    uint64_t last_target[NUM_ALARMS] = {};
     memset(&last_fired_at, 0, sizeof(last_fired_at));
     printf("Sleeping...\n");
     sleep_us(TEST_LENGTH_US + 250000);

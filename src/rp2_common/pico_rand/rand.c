@@ -224,7 +224,8 @@ static uint64_t capture_additional_rosc_samples(uint n) {
                 bit_done = true;
                 if (i == n - 1) {
                     // samples has our random bits, so let's mix them in now
-                    samples = rosc_samples = (rosc_samples << n) | samples;
+                    if (n < 64) samples |= rosc_samples << n;
+                    rosc_samples = samples;
                 }
             }
             spin_unlock(lock, save);

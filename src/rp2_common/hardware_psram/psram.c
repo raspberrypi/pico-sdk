@@ -389,7 +389,7 @@ void runtime_init_setup_psram(void) {
     static_assert(FLASH_DEVINFO_SIZE_MAX == FLASH_DEVINFO_SIZE_16M, "expected max region size of 16M");
     extern uint32_t __psram_start__;
     extern uint32_t __psram_end__;
-    uint32_t psram_words = (uint32_t)(&__psram_end__ - &__psram_start__);
+    uint32_t psram_words = ((uintptr_t)&__psram_end__ - (uintptr_t)&__psram_start__) / sizeof(uint32_t);
     if (psram_words > psram_word_size) {
         // Setup to bus fault for variables that don't fit in available PSRAM
         int clear_regions = 0; // Clear no regions by default

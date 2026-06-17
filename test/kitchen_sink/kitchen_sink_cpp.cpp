@@ -16,8 +16,13 @@ void test_vector() {
     for (const auto &x : sv) {
         puts(x);
     }
+    // false positive
+GCC_Pragma("GCC diagnostic push")
+GCC_Pragma("GCC diagnostic ignored \"-Wanalyzer-possible-null-dereference\"")
     for (const auto &x : vec) {
         printf("Number %d\n", x);
     }
+GCC_Pragma("GCC diagnostic pop")
 }
+
 #endif

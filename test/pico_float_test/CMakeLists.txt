@@ -63,6 +63,9 @@ foreach (FLOAT_TYPE IN LISTS FLOAT_TYPES)
     target_link_libraries(custom_float_funcs_test_${FLOAT_TYPE} PRIVATE pico_stdlib)
     pico_add_extra_outputs(custom_float_funcs_test_${FLOAT_TYPE})
     pico_set_printf_implementation(custom_float_funcs_test_${FLOAT_TYPE} compiler)
+    if (PICO_C_COMPILER_IS_GNU)
+        target_compile_options(custom_float_funcs_test_${FLOAT_TYPE} PRIVATE -Wno-analyzer-use-of-uninitialized-value)
+    endif()
     if (PICO_C_COMPILER_IS_CLANG)
         # llvm by default will treat our out of range float->int conversions as undefined behavior
         # and may just decide the function is too broken to bother even with the function epilogue, so we

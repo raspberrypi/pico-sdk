@@ -32,41 +32,42 @@ void __printflike(1, 0) handle_panic(const char *magic1, ...)
     int magic2 = va_arg(args, int);
     if (magic2 != MAGIC2) {
         printf("magic2 (%08x) != 0x%08x\n", magic2, MAGIC2);
-        return;
+        goto done;
     }
     double magic3 = va_arg(args, double);
     if (magic3 != MAGIC3) {
         printf("magic3 (%f) != 0x%f\n", magic3, MAGIC3);
-        return;
+        goto done;
     }
 #if PICO_PANIC_FUNCTION_WITH_ALL_VAARGS
     printf("checking remaining vaargs...\n");
     int magic4 = va_arg(args, int);
     if (magic4 != MAGIC4) {
         printf("magic4 (%08x) != 0x%08x\n", magic4, MAGIC4);
-        return;
+        goto done;
     }
     int magic5 = va_arg(args, int);
     if (magic5 != MAGIC5) {
         printf("magic5 (%08x) != 0x%08x\n", magic5, MAGIC5);
-        return;
+        goto done;
     }
     int magic6 = va_arg(args, int);
     if (magic6 != MAGIC6) {
         printf("magic6 (%08x) != 0x%08x\n", magic6, MAGIC6);
-        return;
+        goto done;
     }
     int magic7 = va_arg(args, int);
     if (magic7 != MAGIC7) {
         printf("magic7 (%08x) != 0x%08x\n", magic7, MAGIC7);
-        return;
+        goto done;
     }
 #endif
-    va_end(args);
     puts("PASSED");
 #if PICO_PANIC_FUNCTION_DOES_NOT_RETURN
     __breakpoint();
 #endif
+    done:
+    va_end(args);
 }
 
 int main() {

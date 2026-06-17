@@ -194,13 +194,13 @@ int main(void) {
 
     extern uint32_t __load_start_overlay_second;
     extern uint32_t __load_stop_overlay_second;
-    stored_words = (uint32_t)(&__load_stop_overlay_second - &__load_start_overlay_second);
+    stored_words = ((uintptr_t)&__load_stop_overlay_second - (uintptr_t)&__load_start_overlay_second) / sizeof(uint32_t);
     memcpy(&__overlays_start__, &__load_start_overlay_second, 4 * stored_words);
     printf("overlay_second after load = %d, %d\n", overlay_second_one, overlay_second_two);
 
     extern uint32_t __load_start_overlay_first;
     extern uint32_t __load_stop_overlay_first;
-    stored_words = (uint32_t)(&__load_stop_overlay_first - &__load_start_overlay_first);
+    stored_words = ((uintptr_t)&__load_stop_overlay_first - (uintptr_t)&__load_start_overlay_first) / sizeof(uint32_t);
     memcpy(&__overlays_start__, &__load_start_overlay_first, 4 * stored_words);
     printf("overlay_first after load = %d\n", overlay_first);
     printf("overlay_second after overlay_first load = %d, %d\n", overlay_second_one, overlay_second_two);
@@ -211,7 +211,7 @@ int main(void) {
     extern uint32_t __extra_data_source__;
     extern uint32_t __extra_data_start__;
     extern uint32_t __extra_data_end__;
-    uint32_t stored_words = (uint32_t)(&__extra_data_end__ - &__extra_data_start__);
+    uint32_t stored_words = ((uintptr_t)&__extra_data_end__ - (uintptr_t)&__extra_data_start__) / sizeof(uint32_t);
     memcpy(&__extra_data_start__, &__extra_data_source__, 4 * stored_words);
 
     printf("extra_data after load = %d\n", extra_data);
