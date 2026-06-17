@@ -289,7 +289,7 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  *
  * \note when `PICO_PIO_USE_GPIO_BASE == 1` \ref pio_sm_set_config ignores fields which haven't had the corresponding
  * `sm_config_` pin function called, so that you don't have to move settings for unused pin sets into the correct
- * pin range. Therefore, it is always a best practice to explicitly configure a pin range starting at pin zero to 0
+ * pin range. Therefore, it is always a best practice to explicitly configure a pin range starting at pin zero
  * via the corresponding sm_config_ function (e.g. `sm_config_set_out_pin_base(config, 0)`), as the default
  * values for pin ranges from \ref pio_get_default_sm_config are now `GPIO_BASE + 0` not 0 on RP2350B.
  *
