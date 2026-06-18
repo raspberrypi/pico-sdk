@@ -108,10 +108,13 @@ int flash_safe_execute(void (*func)(void *), void *param, uint32_t enter_exit_ti
 #endif
 #endif
 
-// PICO_CONFIG: PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT, Support using multicore_lockout functions to make the other core safe during flash_safe_execute, type=bool, default=1 when using pico_multicore, group=pico_flash
-#ifndef PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
-#if LIB_PICO_MULTICORE
-#define PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT 1
+// PICO_CONFIG: PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT, Support using multicore_lockout functions to make the other core safe during flash_safe_execute, type=bool, default=1 when using pico_multicore, group=pico_flash
+#ifndef PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT
+#ifdef PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
+// support old misspelling
+#define PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
+#elif LIB_PICO_MULTICORE
+#define PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT 1
 #endif
 #endif
 
