@@ -27,9 +27,15 @@ extern "C" {
  *  should be as short as possible.
  */
 
+/*! \brief Critical section instance
+ *  \ingroup critical_section
+ *
+ * Structure holding the state for a single critical section, including
+ * the associated spin lock and the saved interrupt state.
+ */
 typedef struct __packed_aligned critical_section {
-    spin_lock_t *spin_lock;
-    uint32_t save;
+    spin_lock_t *spin_lock; ///< Spin lock used to prevent concurrent access from the other core
+    uint32_t save;          ///< Saved interrupt state, restored on exit
 } critical_section_t;
 
 /*! \brief  Initialise a critical_section structure allowing the system to assign a spin lock number

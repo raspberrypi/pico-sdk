@@ -746,11 +746,11 @@ typedef bool (*repeating_timer_callback_t)(repeating_timer_t *rt);
  * \return
  */
 struct repeating_timer {
-    int64_t delay_us;
-    alarm_pool_t *pool;
-    alarm_id_t alarm_id;
-    repeating_timer_callback_t callback;
-    void *user_data;
+    int64_t delay_us;                      ///< The delay in microseconds between callbacks (negative if measured between starts)
+    alarm_pool_t *pool;                    ///< The alarm pool used to back this repeating timer
+    alarm_id_t alarm_id;                   ///< The alarm id of the underlying alarm backing this repeating timer
+    repeating_timer_callback_t callback;   ///< The callback to call each time the repeating timer fires
+    void *user_data;                       ///< User data passed to the callback
 };
 
 /*!

@@ -305,10 +305,10 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  * state machine later using pio_sm_set_config() or pio_sm_init().
  */
 typedef struct {
-    uint32_t clkdiv;
-    uint32_t execctrl;
-    uint32_t shiftctrl;
-    uint32_t pinctrl;
+    uint32_t clkdiv;    ///< Clock divider register value
+    uint32_t execctrl;  ///< Execution control register value
+    uint32_t shiftctrl; ///< Shift control register value
+    uint32_t pinctrl;   ///< Pin control register value
 #if PICO_PIO_USE_GPIO_BASE
 #define PINHI_ALL_PINCTRL_LSBS ((1u << PIO_SM0_PINCTRL_IN_BASE_LSB) | (1u << PIO_SM0_PINCTRL_OUT_BASE_LSB) | \
                                (1u << PIO_SM0_PINCTRL_SET_BASE_LSB) | (1u << PIO_SM0_PINCTRL_SIDESET_BASE_LSB))
@@ -321,7 +321,7 @@ static_assert( (1u << PINHI_EXECCTRL_LSB) > (PINHI_ALL_PINCTRL_LSBS * 0x1f), "")
     // 0b00000 - pin is in range 0-15
     // 0b00001 - pin is in range 16-31
     // 0b00010 - pin is in range 32-47
-    uint32_t pinhi;
+    uint32_t pinhi;     ///< High bits encoding which 16-pin GPIO range each pin field belongs to (only present when PICO_PIO_USE_GPIO_BASE is set)
 #endif
 } pio_sm_config;
 

@@ -39,7 +39,7 @@ extern "C" {
  * flexible configuration make it possible to optimise many other tasks such as quantization and
  * dithering, table lookup address generation, affine texture mapping, decompression and linear feedback.
  *
- * Please refer to the appropriate RP-series microcontroller datasheet for more information on the HW 
+ * Please refer to the appropriate RP-series microcontroller datasheet for more information on the HW
  * interpolators and how they work.
  */
 
@@ -55,8 +55,15 @@ extern "C" {
  *
  */
 
+/*! \brief Holds the configuration for an interpolator lane
+ *  \ingroup interp_config
+ *
+ * Stores the packed control register value for a single interpolator lane.
+ * Use the interp_config_set_* functions to modify the fields, then apply
+ * with interp_set_config().
+ */
 typedef struct {
-    uint32_t ctrl;
+    uint32_t ctrl; ///< Packed control register value for the interpolator lane
 } interp_config;
 
 static inline uint interp_index(interp_hw_t *interp) {
@@ -164,7 +171,7 @@ static inline void interp_config_set_cross_input(interp_config *c, bool cross_in
 /*! \brief Enable cross results
  *  \ingroup interp_config
  *
- *  Allows feeding of the other lane’s result into this lane’s accumulator on a POP operation.
+ *  Allows feeding of the other lane's result into this lane's accumulator on a POP operation.
  *
  * \param c Pointer to interpolation config
  * \param cross_result If true, enables the cross result
@@ -304,10 +311,17 @@ static inline void interp_set_force_bits(interp_hw_t *interp, uint lane, uint bi
     interp->ctrl[lane] = interp->ctrl[lane] | (bits << SIO_INTERP0_CTRL_LANE0_FORCE_MSB_LSB);
 }
 
+/*! \brief Saved interpolator hardware state
+ *  \ingroup hardware_interp
+ *
+ * Holds a snapshot of all interpolator registers so that the interpolator
+ * state can be saved and restored around code that needs to use it for a
+ * different purpose.
+ */
 typedef struct {
-    uint32_t accum[2];
-    uint32_t base[3];
-    uint32_t ctrl[2];
+    uint32_t accum[2]; ///< Saved accumulator values for lanes 0 and 1
+    uint32_t base[3];  ///< Saved base register values for lanes 0, 1 and 2
+    uint32_t ctrl[2];  ///< Saved control register values for lanes 0 and 1
 } interp_hw_save_t;
 
 /*! \brief Save the specified interpolator state
@@ -355,7 +369,7 @@ static inline uint32_t interp_get_base(interp_hw_t *interp, uint lane) {
  *  \ingroup hardware_interp
  *
  *  The lower 16 bits go to BASE0, upper bits to BASE1 simultaneously.
- *  Each half is sign-extended to 32 bits if that lane’s SIGNED flag is set.
+ *  Each half is sign-extended to 32 bits if that lane's SIGNED flag is set.
  *
  * \param interp Interpolator instance, interp0 or interp1.
  * \param val The value to apply to the register

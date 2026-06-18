@@ -37,7 +37,7 @@ typedef unsigned int uint;
  */
 #if PICO_OPAQUE_ABSOLUTE_TIME_T
 typedef struct {
-    uint64_t _private_us_since_boot;
+    uint64_t _private_us_since_boot; ///< Private implementation detail
 } absolute_time_t;
 #else
 typedef uint64_t absolute_time_t;

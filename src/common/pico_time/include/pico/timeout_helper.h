@@ -13,9 +13,15 @@
 extern "C" {
 #endif
 
+/*! \brief State used to track a timeout condition
+ *  \ingroup pico_time
+ *
+ * Holds the deadline and an optional per-iteration parameter used by
+ * the check_timeout_fn callbacks returned by the init functions.
+ */
 typedef struct timeout_state {
-    absolute_time_t next_timeout;
-    uint64_t param;
+    absolute_time_t next_timeout; ///< Absolute time at which the timeout expires
+    uint64_t param;               ///< Optional parameter (e.g. per-iteration duration in microseconds)
 } timeout_state_t;
 
 typedef bool (*check_timeout_fn)(timeout_state_t *ts, bool reset);

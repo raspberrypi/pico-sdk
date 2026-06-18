@@ -20,10 +20,16 @@
 extern "C" {
 #endif
 
+/*! \brief Base type for a fixed-size bitset
+ *  \ingroup fixed_bitset
+ *
+ * This struct holds the metadata and storage for a fixed-size bitset. It is
+ * typically used via the \ref fixed_bitset_type macro rather than directly.
+ */
 typedef struct {
-    uint16_t size;           \
-    uint16_t word_size;     \
-    uint32_t words[];
+    uint16_t size;           ///< Number of bits in the bitset
+    uint16_t word_size;      ///< Number of 32-bit words used to store the bits
+    uint32_t words[];        ///< Storage array for the bitset words
 } fixed_bitset_t;
 
 /*! \brief Macro used to define a fixed-size bitset of a given size
@@ -34,9 +40,9 @@ typedef struct {
  * typedef fixed_bitset_type(17) my_bitset_t;
  * ```
  * will define a new bitset type called `my_bitset_t` that can hold 17 boolean values.
- * 
+ *
  * The type can be used as `my_bitset_t bitset;` to declare a new bitset.
- * 
+ *
  * \param N the number of boolean values in the bitset
  */
 #define fixed_bitset_type(N) union { \
