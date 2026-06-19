@@ -489,7 +489,7 @@ bool multicore_lockout_victim_is_initialized(uint core_num);
  * the same value as `multicore_lockout_victim_is_initialized(other_core)`. This behavior is intended to make it easier
  * for applications which may want to perform operations on core 0 only, but may or may not yet have launched core 1.
  */
-bool multicore_lockout_ready();
+bool multicore_lockout_ready(void);
 
 /*! \brief Request the other core to pause in a known state and wait for it to do so
  *  \ingroup multicore_lockout
