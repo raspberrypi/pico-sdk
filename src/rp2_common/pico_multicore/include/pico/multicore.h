@@ -487,7 +487,7 @@ bool multicore_lockout_victim_is_initialized(uint core_num);
  * \note that when PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED=1 this returns true when called from core 0 if core 1 has
  * not been launched via a multicore_launch_core1 function, or has since been reset via \ref multicore_reset_core1. Otherwise, it returns
  * the same value as `multicore_lockout_victim_is_initialized(other_core)`. This behavior is intended to make it easier
- * for applications which may want to perform operations on core 0 only, but may or may not yet have launched core 1.
+ * for applications which may want to perform operations on core 0, but may or may not yet have launched core 1.
  */
 bool multicore_lockout_ready(void);
 
