@@ -29,9 +29,6 @@
 // the reset before calling `multicore_lockout_victim_init()` again, so that is good. We will reset the flag
 // for core1 in `multicore_reset_core1()` though as a convenience since most people will use that to reset core 1.
 
-#undef PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
-#define PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED 0
-
 #define CORE_STATUS_NOT_RUNNING         ((uint8_t)0)
 // not needed when PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED==0
 #if PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
@@ -372,6 +369,16 @@ void multicore_lockout_end_blocking(void) {
 
 bool multicore_lockout_victim_is_initialized(uint core_num) {
     return core_status[core_num] == CORE_STATUS_LOCKOUT_ENABLED;
+}
+
+bool multicore_lockout_ready() {
+    uint core_num = get_core_num();
+#if PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
+    if (!core_num && core_status[1] == CORE_STATUS_NOT_RUNNING) {
+        return true;
+    }
+#endif
+    return multicore_lockout_victim_is_initialized(core_num ^ 1);
 }
 
 #if NUM_DOORBELLS

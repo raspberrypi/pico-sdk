@@ -181,7 +181,7 @@ static int default_enter_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
 #endif
         rc = PICO_ERROR_NOT_PERMITTED;
 #else // !LIB_FREERTOS_KERNEL
-        if (multicore_lockout_victim_is_initialized(get_core_num()^1)) {
+        if (multicore_lockout_ready()) {
             if (!multicore_lockout_start_timeout_us(timeout_ms * 1000ull)) {
                 rc = PICO_ERROR_TIMEOUT;
             }
