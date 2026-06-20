@@ -73,7 +73,7 @@ void make_tiny_psram(void) {
     #endif
     #else
     // Unknown platform, just try 0
-    uint8_t cs_gpios[] = {0}
+    uint8_t cs_gpios[] = {0};
     #endif
     psram_detect_cs_and_size(cs_gpios, count_of(cs_gpios));
 }
@@ -82,12 +82,14 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(make_tiny_psram, "11000");
 #endif
 
 void __noinline spiggle(void) {
+#if NUM_DMA_CHANNELS > 1
     dma_channel_config c = dma_channel_get_default_config(1);
     channel_config_set_bswap(&c, true);
     channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
     channel_config_set_ring(&c, true, 13);
     dma_channel_set_config(1, &c, false);
     dma_channel_transfer_from_buffer_now(1, foo, 23);
+#endif
 }
 
 __force_inline int something_inlined(int x) {
