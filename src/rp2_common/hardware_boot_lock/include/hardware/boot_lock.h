@@ -9,6 +9,12 @@
 
 #include "pico.h"
 
+/** \file boot_lock.h
+*  \defgroup hardware_boot_lock hardware_boot_lock
+*
+* \brief Helpers for locking and unlocking hardware boot locks
+*/
+
 #ifdef __cplusplus
 extern "C" {
 #endif
