@@ -212,7 +212,6 @@ void pio_clear_instruction_memory(PIO pio) {
 #define pio_sm_set_pins_internal pio_sm_set_pins
 #define pio_sm_set_pins_with_mask_internal pio_sm_set_pins_with_mask
 #define pio_sm_set_pindirs_with_mask_internal pio_sm_set_pindirs_with_mask
-#define pio_sm_set_pindirs_with_mask_internal pio_sm_set_pindirs_with_mask
 #define pio_sm_set_input_sync_bypass_with_mask_internal pio_sm_set_input_sync_bypass_with_mask
 #endif
 
@@ -246,7 +245,7 @@ void pio_sm_set_pins_internal(PIO pio, uint sm, uint32_t pins) {
 
 #ifndef pio_sm_set_pins_internal
 void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
-    check_pio_pin_mask(pio, pins);
+    check_pio_pin_mask(pio, sm, pins);
 #if PICO_PIO_USE_GPIO_BASE
     pins >>= pio_get_gpio_base(pio);
 #endif
@@ -255,7 +254,7 @@ void pio_sm_set_pins(PIO pio, uint sm, uint32_t pins) {
 #endif
 
 void pio_sm_set_pins64(PIO pio, uint sm, uint64_t pins) {
-    check_pio_pin_mask64(pio, pins);
+    check_pio_pin_mask64(pio, sm, pins);
 #if PICO_PIO_USE_GPIO_BASE
     pins >>= pio_get_gpio_base(pio);
 #endif
@@ -283,7 +282,7 @@ void pio_sm_set_pins_with_mask_internal(PIO pio, uint sm, uint32_t pin_values, u
 
 #ifndef pio_sm_set_pins_with_mask_internal
 void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pin_values, uint32_t pin_mask) {
-    check_pio_pin_mask(pio, pin_mask);
+    check_pio_pin_mask(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
     uint gpio_base = pio_get_gpio_base(pio);
     pin_values >>= gpio_base;
@@ -294,7 +293,7 @@ void pio_sm_set_pins_with_mask(PIO pio, uint sm, uint32_t pin_values, uint32_t p
 #endif
 
 void pio_sm_set_pins_with_mask64(PIO pio, uint sm, uint64_t pin_values, uint64_t pin_mask) {
-    check_pio_pin_mask64(pio, pin_mask);
+    check_pio_pin_mask64(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
     uint gpio_base = pio_get_gpio_base(pio);
     pin_values >>= gpio_base;
@@ -323,7 +322,7 @@ void pio_sm_set_pindirs_with_mask_internal(PIO pio, uint sm, uint32_t pindirs, u
 
 #ifndef pio_sm_set_pindirs_with_mask_internal
 void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t pin_mask) {
-    check_pio_pin_mask(pio, pin_mask);
+    check_pio_pin_mask(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
     uint gpio_base = pio_get_gpio_base(pio);
     pindirs >>= gpio_base;
@@ -334,7 +333,7 @@ void pio_sm_set_pindirs_with_mask(PIO pio, uint sm, uint32_t pindirs, uint32_t p
 #endif
 
 void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pindirs, uint64_t pin_mask) {
-    check_pio_pin_mask64(pio, pin_mask);
+    check_pio_pin_mask64(pio, sm, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
     uint gpio_base = pio_get_gpio_base(pio);
     pindirs >>= gpio_base;
@@ -350,7 +349,7 @@ void pio_sm_set_input_sync_bypass_with_mask_internal(PIO pio, uint32_t bypass_va
 
 #ifndef pio_sm_set_input_sync_bypass_with_mask_internal
 void pio_sm_set_input_sync_bypass_with_mask(PIO pio, uint32_t bypass_values, uint32_t pin_mask) {
-    check_pio_pin_mask(pio, pin_mask);
+    check_pio_pin_mask(pio,0, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
     uint gpio_base = pio_get_gpio_base(pio);
     bypass_values >>= gpio_base;
@@ -361,7 +360,7 @@ void pio_sm_set_input_sync_bypass_with_mask(PIO pio, uint32_t bypass_values, uin
 #endif
 
 void pio_sm_set_input_sync_bypass_with_mask64(PIO pio, uint64_t bypass_values, uint64_t pin_mask) {
-    check_pio_pin_mask64(pio, pin_mask);
+    check_pio_pin_mask64(pio, 0, pin_mask);
 #if PICO_PIO_USE_GPIO_BASE
     uint gpio_base = pio_get_gpio_base(pio);
     bypass_values >>= gpio_base;
