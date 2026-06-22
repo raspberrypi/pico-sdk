@@ -250,14 +250,14 @@ extern "C" {
 #if !__PICO_FLOAT_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline int32_t float2int_z(float f) { return (int32_t)f; }
-    static inline int32_t float2uint_z(float f) { return (uint32_t)f; }
+    static inline uint32_t float2uint_z(float f) { return (uint32_t)f; }
 #else
     //! \brief Convert a float to a signed 32-bit integer, rounding towards zero.
     //! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using `pico_float_compiler`
     int32_t float2int_z(float f);
     //! \brief Convert a float to an unsigned 32-bit integer, rounding towards zero
     //! On Arm this conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input except when using `pico_float_compiler`
-    int32_t float2uint_z(float f);
+    uint32_t float2uint_z(float f);
 #endif
 #endif
 
@@ -265,14 +265,14 @@ extern "C" {
 #if !__PICO_FLOAT_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline int64_t float2int64_z(float f) { return (int64_t)f; }
-    static inline int64_t float2uint64_z(float f) { return (uint64_t)f; }
+    static inline uint64_t float2uint64_z(float f) { return (uint64_t)f; }
 #else
     //! \brief Convert a float to a signed 64-bit integer, rounding towards zero.
     //! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using `pico_float_compiler`
     int64_t float2int64_z(float f);
     //! \brief Convert a float to an unsigned 64-bit integer, rounding towards zero.
     //! On Arm this conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input except when using `pico_float_compiler`
-    int64_t float2uint64_z(float f);
+    uint64_t float2uint64_z(float f);
 #endif
 #endif
 

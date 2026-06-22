@@ -231,7 +231,7 @@ extern "C" {
 #if !__PICO_DOUBLE_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline int32_t double2int_z(double d) { return (int32_t)d; }
-    static inline int32_t double2uint_z(double d) { return (uint32_t)d; }
+    static inline uint32_t double2uint_z(double d) { return (uint32_t)d; }
 #else
     //! \brief Convert a double to a signed 32-bit integer, rounding towards zero.
     //! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using `pico_double_compiler`
