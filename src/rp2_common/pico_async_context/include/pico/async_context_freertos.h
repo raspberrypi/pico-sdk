@@ -78,15 +78,15 @@ struct async_context_freertos {
     SemaphoreHandle_t task_complete_sem;
     TimerHandle_t timer_handle;
     TaskHandle_t task_handle;
+    uint8_t nesting;
+    volatile bool task_should_exit;
 #if configSUPPORT_STATIC_ALLOCATION
-    StaticSemaphore_t lock_mutex_buf;
+    StaticSemaphore_t lock_mutex_buf; // keep static memory at the end and this as the first entry
     StaticSemaphore_t work_needed_sem_buf;
     StaticSemaphore_t task_complete_sem_buf;
     StaticTimer_t timer_buf;
     StaticTask_t task_buf;
 #endif
-    uint8_t nesting;
-    volatile bool task_should_exit;
 };
 
 /*!

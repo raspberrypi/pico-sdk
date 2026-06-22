@@ -190,7 +190,12 @@ void async_context_freertos_deinit(async_context_t *self_base) {
     if (self->task_complete_sem) {
         vSemaphoreDelete(self->task_complete_sem);
     }
+#if configSUPPORT_STATIC_ALLOCATION
+    // the timer task might still be running on the other core, so don't clear static memory
+    memset(self, 0, offsetof(async_context_freertos_t, lock_mutex_buf));
+#else
     memset(self, 0, sizeof(*self));
+#endif
 }
 
 void async_context_freertos_acquire_lock_blocking(async_context_t *self_base) {
