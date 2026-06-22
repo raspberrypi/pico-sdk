@@ -258,19 +258,19 @@ extern "C" {
 #endif
 
 #if PICO_DOUBLE_HAS_FIX32_TO_DOUBLE_CONVERSIONS
-//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest double
+//! \brief Convert a signed 32-bit fixed-point integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +/- Infinity
 double fix2double(int32_t m, int e);
-//! \brief Convert an unsigned 32-bit integer with the given number of fractional bits to the nearest double
+//! \brief Convert an unsigned 32-bit fixed-point integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +Infinity
 double ufix2double(uint32_t m, int e);
 #endif
 
 #if PICO_DOUBLE_HAS_FIX64_TO_DOUBLE_CONVERSIONS
-//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest double
+//! \brief Convert a signed 64-bit fixed-point integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +/- Infinity
 double fix642double(int64_t m, int e);
-//! \brief Convert an unsigned 64-bit integer with the given number of fractional bits to the nearest double
+//! \brief Convert an unsigned 64-bit fixed-point integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +Infinity
 double ufix642double(uint64_t m, int e);
 #endif

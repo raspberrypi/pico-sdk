@@ -277,19 +277,19 @@ extern "C" {
 #endif
 
 #if PICO_FLOAT_HAS_FIX32_TO_FLOAT_CONVERSIONS
-//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert a signed 32-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +/- Infinity
 float fix2float(int32_t m, int e);
-//! \brief Convert an unsigned 32-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 32-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +Infinity
 float ufix2float(uint32_t m, int e);
 #endif
 
 #if PICO_FLOAT_HAS_FIX64_TO_FLOAT_CONVERSIONS
-//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert a signed 64-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +/- Infinity
 float fix642float(int64_t m, int e);
-//! \brief Convert an unsigned 64-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 64-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +Infinity
 float ufix642float(uint64_t m, int e);
 #endif
