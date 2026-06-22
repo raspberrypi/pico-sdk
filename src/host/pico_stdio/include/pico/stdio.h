@@ -6,6 +6,10 @@
 #ifndef _PICO_STDIO_H
 #define _PICO_STDIO_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct stdio_driver stdio_driver_t;
 
 #define STDIO_ERROR -1
@@ -21,5 +25,9 @@ static inline bool stdio_usb_connected(void) { return true; }
 int getchar_timeout_us(uint32_t timeout_us);
 #define puts_raw puts
 #define putchar_raw putchar
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

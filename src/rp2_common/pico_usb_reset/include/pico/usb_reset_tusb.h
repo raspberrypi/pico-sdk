@@ -7,6 +7,10 @@
 #ifndef _PICO_USB_RESET_TUSB_H
 #define _PICO_USB_RESET_TUSB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Interface descriptor
 #define TUD_RPI_RESET_DESC_LEN  9
 #define TUD_RPI_RESET_DESCRIPTOR(_itfnum, _stridx) \
@@ -60,5 +64,9 @@ static usbd_class_driver_t const usb_reset_interface_driver =
     .xfer_cb          = usb_reset_interface_xfer_cb,
     .sof              = NULL
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
