@@ -808,14 +808,14 @@ static inline uint pio_get_gpio_base(PIO pio) {
 #endif
 }
 
-static inline void check_pio_pin_mask(__unused PIO pio, __unused uint sm, __unused uint32_t pinmask) {
+static inline void check_pio_pin_mask(__unused PIO pio, __unused uint32_t pinmask) {
     // check no pins are set in the mask which are incompatible with the pio
 #if PICO_PIO_USE_GPIO_BASE
     valid_params_if(HARDWARE_PIO, (pinmask & ~(0xffffffffu << pio_get_gpio_base(pio))) == 0);
 #endif
 }
 
-static inline void check_pio_pin_mask64(__unused PIO pio, __unused uint sm, __unused uint64_t pinmask) {
+static inline void check_pio_pin_mask64(__unused PIO pio, __unused uint64_t pinmask) {
     // check no pins are set in the mask which are incompatible with the pio
 #if PICO_PIO_USE_GPIO_BASE
     valid_params_if(HARDWARE_PIO, (pinmask & ~(0xffffffffull << pio_get_gpio_base(pio))) == 0);
@@ -1997,6 +1997,24 @@ void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pin_dirs, uint64_
  * \return PICO_OK (0) on success, error code otherwise
  */
 int pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pins_base, uint pin_count, bool is_out);
+
+/*! \brief Enable/disable the input synchronizer bypass for multiple pins for the PIO instance
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
+ * \param bypass_enables the values to set - 1 = enable bypass, 0 = disable bypass (if the corresponding bit in pin_mask is set)
+ * \param pin_mask a bit for each pin to indicate whether the corresponding bypass enable bit for that pin should be updated.
+ */
+void pio_set_input_sync_bypass_with_mask(PIO pio, uint32_t bypass_enables, uint32_t pin_mask);
+
+/*! \brief Enable/disable the input synchronizer bypass for multiple pins for the PIO instance
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
+ * \param bypass_enables the values to set - 1 = enable bypass, 0 = disable bypass (if the corresponding bit in pin_mask is set)
+ * \param pin_mask a bit for each pin to indicate whether the corresponding bypass enable bit for that pin should be updated.
+ */
+void pio_set_input_sync_bypass_with_mask64(PIO pio, uint64_t bypass_enables, uint64_t pin_mask);
 
 /*! \brief Mark a state machine as used
  *  \ingroup hardware_pio
