@@ -109,6 +109,7 @@ PICO_RUNTIME_INIT_FUNC_HW(runtime_init_usb_power_down, PICO_RUNTIME_INIT_USB_POW
 
 #if !PICO_RUNTIME_NO_INIT_PER_CORE_ENABLE_COPROCESSORS
 #include "hardware/gpio.h" // PICO_USE_GPIO_COPROCESSOR is defined here
+#include "pico/platform/cpu_regs.h"
 // ----------------------------------------------------
 // 00200 PICO_RUNTIME_INIT_PER_CORE_ENABLE_COPROCESSORS
 // ----------------------------------------------------
