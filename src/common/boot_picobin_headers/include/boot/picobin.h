@@ -154,9 +154,9 @@
  */
 typedef struct {
     // these must all be word aligned
-    uint32_t storage_address_rel; ///< Storage address of the region, relative to the load map base
+    uint32_t storage_address_rel; ///< Storage address of the region - if absolute then an absolute address, otherwise relative to the address of the LOAD_MAP item containing this entry
     uint32_t runtime_address;     ///< Target runtime address to which the region is loaded
-    uint32_t size;                ///< Size of the region in bytes
+    uint32_t size;                ///< If absolute then the end of the runtime address region, otherwise the size of the region in bytes
 } picobin_load_map_entry;
 
 /*! \brief PICOBIN load map describing regions to copy from storage to RAM
@@ -165,7 +165,7 @@ typedef struct {
  * Contains a header word followed by a variable-length array of load map entries.
  */
 typedef struct {
-    uint32_t header;                  ///< Encodes the entry count and whether addresses are relative
+    uint32_t header;                  ///< Encodes the item type, item size, entry count, and whether addresses are absolute or relative
     picobin_load_map_entry entries[]; ///< Array of load map entries
 } picobin_load_map;
 

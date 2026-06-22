@@ -60,7 +60,7 @@ struct uf2_block {
     uint32_t payload_size; ///< Number of valid data bytes in the payload field
     uint32_t block_no;     ///< Zero-based index of this block within the UF2 file
     uint32_t num_blocks;   ///< Total number of blocks in the UF2 file
-    uint32_t file_size; // or familyID;
+    uint32_t file_size;    ///< When UF2_FLAG_FAMILY_ID_PRESENT is set in flags, this contains the UF2 family ID
     uint8_t  data[476];    ///< Raw payload data written to target_addr
     uint32_t magic_end;    ///< Magic number marking the end of the block (UF2_MAGIC_END)
 };

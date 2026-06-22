@@ -82,23 +82,21 @@ enum picoboot_status {
     PICOBOOT_UNSUPPORTED_MODIFICATION = 17,
 };
 
-/*! \brief Parameters for a reboot command
+/*! \brief Parameters for a reboot command (RP2040 only)
  *  \ingroup boot_picoboot_headers
  *
  * Sent as the argument payload of a PC_REBOOT command.
  */
 struct __packed picoboot_reboot_cmd {
-    uint32_t dPC; ///< Program counter to reboot to; 0 means reset into the regular boot path
-    uint32_t dSP; ///< Stack pointer value at reboot
+    uint32_t dPC; ///< Program counter to reboot to; 0 means reset into the regular boot path, otherwise must be a RAM address
+    uint32_t dSP; ///< Stack pointer value at reboot; ignored unless dPC is a RAM address
     uint32_t dDelayMS; ///< Delay in milliseconds before rebooting
 };
 
-/*! \brief Parameters for an extended reboot command (RP2350 only)
+/*! \brief Parameters for an extended reboot command (not available on RP2040)
  *  \ingroup boot_picoboot_headers
  *
- * Sent as the argument payload of a PC_REBOOT2 command. Has the same
- * layout as picoboot_reboot_cmd at the dSP/dDelayMS offsets but adds
- * a flags word and two extra parameters.
+ * Sent as the argument payload of a PC_REBOOT2 command.
  */
 struct __packed picoboot_reboot2_cmd {
     uint32_t dFlags; ///< Reboot flags controlling the boot path
@@ -107,11 +105,11 @@ struct __packed picoboot_reboot2_cmd {
     uint32_t dParam1; ///< Second reboot parameter (interpretation depends on flags)
 };
 
-// used for EXEC, VECTORIZE_FLASH
-/*! \brief Parameters for a command that operates on a single address
+/*! \brief Parameters for a command that operates on a single address (RP2040 only)
  *  \ingroup boot_picoboot_headers
  *
- * Sent as the argument payload of PC_EXEC and PC_VECTORIZE_FLASH commands.
+ * Sent as the argument payload of PC_EXEC and PC_VECTORIZE_FLASH commands,
+ * which are not supported on RP2350.
  */
 struct __packed picoboot_address_only_cmd {
     uint32_t dAddr; ///< Target address
@@ -128,17 +126,18 @@ struct __packed picoboot_range_cmd {
     uint32_t dSize; ///< Size of the range in bytes
 };
 
-/*! \brief Placeholder command retained for backwards compatibility with RP2350 bootrom builds
- *  \ingroup boot_picoboot_headers
- */
+// remains defined for backwards compatibility with RP2350 bootrom builds
 struct __packed picoboot_exec2_cmd {
-    uint32_t dummy; ///< Unused; present for backwards compatibility
+    uint32_t dummy;
 };
 
+/*! \brief Exclusivity level for a PC_EXCLUSIVE_ACCESS command
+ *  \ingroup boot_picoboot_headers
+ */
 enum picoboot_exclusive_type {
-    NOT_EXCLUSIVE = 0,
-    EXCLUSIVE,
-    EXCLUSIVE_AND_EJECT
+    NOT_EXCLUSIVE = 0,   ///< No restriction on USB Mass Storage operation
+    EXCLUSIVE,           ///< Disable USB Mass Storage writes (any active UF2 download will be aborted)
+    EXCLUSIVE_AND_EJECT  ///< Lock out USB Mass Storage by marking the drive media as not present (eject the drive)
 };
 
 /*! \brief Parameters for an exclusive-access command
@@ -150,7 +149,7 @@ struct __packed picoboot_exclusive_cmd {
     uint8_t bExclusive; ///< Exclusivity level; one of the picoboot_exclusive_type values
 };
 
-/*! \brief Parameters for an OTP read or write command (RP2350 only)
+/*! \brief Parameters for an OTP read or write command (not available on RP2040)
  *  \ingroup boot_picoboot_headers
  *
  * Sent as the argument payload of PC_OTP_READ and PC_OTP_WRITE commands.
@@ -161,7 +160,7 @@ struct __packed picoboot_otp_cmd {
     uint8_t bEcc; ///< Non-zero to use ECC (16-bit per register); zero for raw 24-bit access (stored as 32-bit)
 };
 
-/*! \brief Parameters for a get-info command (RP2350 only)
+/*! \brief Parameters for a get-info command (not available on RP2040)
  *  \ingroup boot_picoboot_headers
  *
  * Sent as the argument payload of a PC_GET_INFO command.
