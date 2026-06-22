@@ -371,7 +371,7 @@ bool multicore_lockout_victim_is_initialized(uint core_num) {
     return core_status[core_num] == CORE_STATUS_LOCKOUT_ENABLED;
 }
 
-bool multicore_lockout_ready() {
+bool multicore_lockout_ready(void) {
     uint core_num = get_core_num();
 #if PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
     if (!core_num && core_status[1] == CORE_STATUS_NOT_RUNNING) {
