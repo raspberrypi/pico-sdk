@@ -351,7 +351,7 @@ uint64_t double2ufix64(double d, int e);
 #if PICO_DOUBLE_HAS_POWINT
 #if !__PICO_DOUBLE_ARM_OPTIMIZED && __has_builtin(__builtin_powi)
     static __force_inline double powint(double d, int32_t p) {
-        return __builtin_powi(f, p);
+        return __builtin_powi(d, p);
     }
 #else
     //! Raise a floating point number to an integer power
