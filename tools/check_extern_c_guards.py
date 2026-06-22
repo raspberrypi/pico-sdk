@@ -32,6 +32,9 @@ Usage:
     # Skip files listed in an ignore list (reviewed, don't need guards)
     python check_extern_c_guards.py --ignore-list .extern_c_ignore
 
+    # Check only specific files from a list (e.g. to verify your ignore list)
+    python check_extern_c_guards.py /path/to/pico-sdk --include-list .extern_c_ignore
+
     # Exclude specific files or directories
     python check_extern_c_guards.py --exclude "test/**" --exclude "host/**"
 
@@ -114,28 +117,26 @@ def is_matched(filepath: str, matches: list[str]) -> bool:
     return any(fnmatch.fnmatch(filepath, pat) for pat in matches)
 
 
-def load_ignore_list(filepath: str) -> set[str]:
-    """Load an ignore list file and return a set of normalised paths.
+def load_path_list(filepath: str) -> list[str]:
+    """Load a file containing one path per line.
 
-    The file format is one path per line, relative to the repo / scan root.
-    Blank lines and lines starting with ``#`` are ignored.  Leading and
-    trailing whitespace is stripped, and paths are normalised with forward
-    slashes so that the file works cross-platform.
+    Blank lines and lines starting with ``#`` are treated as comments.
+    Leading/trailing whitespace is stripped and paths are normalised to
+    forward slashes so the file works cross-platform.
     """
-    entries: set[str] = set()
+    entries: list[str] = []
     try:
         with open(filepath, encoding="utf-8") as fh:
             for raw_line in fh:
                 line = raw_line.strip()
                 if not line or line.startswith("#"):
                     continue
-                # Normalise separators and remove trailing slashes
                 normalised = line.replace("\\", "/").rstrip("/")
-                entries.add(normalised)
+                entries.append(normalised)
     except FileNotFoundError:
-        print(f"Warning: ignore list not found: {filepath}", file=sys.stderr)
+        print(f"Warning: path list not found: {filepath}", file=sys.stderr)
     except Exception as exc:
-        print(f"Warning: could not read ignore list {filepath}: {exc}", file=sys.stderr)
+        print(f"Warning: could not read path list {filepath}: {exc}", file=sys.stderr)
     return entries
 
 
@@ -418,6 +419,17 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--include-list",
+        metavar="FILE",
+        help=(
+            "Path to a file listing headers to check (one per line). "
+            "When given, ONLY these files are checked — the normal directory "
+            "walk or git diff is skipped. Paths are resolved relative to the "
+            "scan root. Useful for re-verifying your ignore list. "
+            "Uses the same file format as --ignore-list (# comments, blanks ok)."
+        ),
+    )
+    parser.add_argument(
         "-v", "--verbose",
         action="store_true",
         help="Show passing files as well",
@@ -434,10 +446,23 @@ def main() -> int:
 
     excludes = DEFAULT_EXCLUDES + args.exclude
     matches = args.match  # empty list means "match everything"
-    ignore_set = load_ignore_list(args.ignore_list) if args.ignore_list else set()
+    ignore_set = set(load_path_list(args.ignore_list)) if args.ignore_list else set()
 
     # Collect files based on mode
-    if args.staged:
+    if args.include_list:
+        # --include-list: check exactly these files, resolved against root
+        root = os.path.abspath(args.path) if not (args.staged or args.commit or args.range) else os.path.abspath(".")
+        raw_paths = load_path_list(args.include_list)
+        files = []
+        for p in raw_paths:
+            full = os.path.join(root, p)
+            rel = os.path.relpath(full, root)
+            if is_header_file(rel) and not is_excluded(rel, excludes) and is_matched(rel, matches or []):
+                files.append(full)
+        files.sort()
+        label = f"headers from {args.include_list}"
+        rel_root = root
+    elif args.staged:
         files = collect_staged(excludes, matches)
         label = "staged headers"
         rel_root = None
