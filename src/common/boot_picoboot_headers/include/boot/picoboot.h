@@ -135,6 +135,12 @@ struct __packed picoboot_exec2_cmd {
     uint32_t dummy; ///< Unused; present for backwards compatibility
 };
 
+enum picoboot_exclusive_type {
+    NOT_EXCLUSIVE = 0,
+    EXCLUSIVE,
+    EXCLUSIVE_AND_EJECT
+};
+
 /*! \brief Parameters for an exclusive-access command
  *  \ingroup boot_picoboot_headers
  *
