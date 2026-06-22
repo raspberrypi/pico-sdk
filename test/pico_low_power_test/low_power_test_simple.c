@@ -17,6 +17,7 @@ int main() {
     status_led_init();
 
     init_external_gpios();
+    sleep_ms(10);
 
 #if HAS_POWMAN_TIMER
     // quick test for https://github.com/raspberrypi/pico-sdk/issues/2824
