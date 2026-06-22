@@ -25,8 +25,6 @@ src/common/pico_binary_info/include/pico/binary_info/defs.h
 src/common/pico_sync/include/pico/lock_core.h
 src/common/pico_sync/include/pico/sync.h
 src/common/pico_usb_reset_interface_headers/include/pico/usb_reset_interface.h
-src/host/pico_stdio/include/pico/stdio.h
-src/host/pico_time_adapter/include/pico/time_adapter.h
 src/rp2040/pico_platform/include/pico/platform/cpu_regs.h
 src/rp2350/pico_platform/include/pico/platform/cpu_regs.h
 src/rp2_common/pico_bootrom/include/pico/bootrom/lock.h
@@ -36,8 +34,6 @@ src/rp2_common/pico_cxx_options/include/pico/cxx_options.h
 src/rp2_common/pico_cyw43_arch/include/pico/cyw43_arch/arch_freertos.h
 src/rp2_common/pico_cyw43_arch/include/pico/cyw43_arch/arch_poll.h
 src/rp2_common/pico_cyw43_arch/include/pico/cyw43_arch/arch_threadsafe_background.h
-src/rp2_common/pico_cyw43_driver/include/pico/btstack_chipset_cyw43.h
-src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include/pico/fix/rp2040_usb_device_enumeration.h
 src/rp2_common/pico_int64_ops/include/pico/int64_ops.h
 src/rp2_common/pico_malloc/include/pico/malloc.h
 src/rp2_common/pico_mem_ops/include/pico/mem_ops.h
@@ -45,9 +41,7 @@ src/rp2_common/pico_platform_sections/include/pico/platform/sections.h
 src/rp2_common/pico_stdio/include/pico/stdio/driver.h
 src/rp2_common/pico_stdio_usb/include/pico/stdio_usb/reset_interface.h
 src/rp2_common/pico_thread_local/include/pico/thread_local.h
-src/rp2_common/pico_time_adapter/include/pico/time_adapter.h
 src/rp2_common/pico_usb_reset/include/pico/usb_reset.h
 src/rp2_common/pico_usb_reset/include/pico/usb_reset_config.h
-src/rp2_common/pico_usb_reset/include/pico/usb_reset_tusb.h
 test/pico_test/include/pico/test.h
 test/pico_test/include/pico/test/xrand.h
