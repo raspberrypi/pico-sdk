@@ -1,0 +1,49 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_config")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_rpi_connect_ota",
+    srcs = ["rpi_connect_ota.c"],
+    hdrs = ["include/pico/rpi_connect_ota.h"],
+    includes = ["include"],
+    # OTP row holding the 32-byte P-256 device identity private key.
+    # Override on the command line with
+    # --copt=-DRPI_CONNECT_IDENTITY_OTP_ROW=0x... (a later -D wins).
+    local_defines = ["RPI_CONNECT_IDENTITY_OTP_ROW=0xc0"],
+    # OTA uses RP2350-only bootrom flash-update APIs (boot_info_t,
+    # BOOT_TYPE_FLASH_UPDATE, reboot params) and OTP_DATA_RAW_BASE, so it does
+    # not compile for RP2040.
+    target_compatible_with = compatible_with_config("//bazel/constraint:rp2350"),
+    deps = [
+        # connect_crypto.h is pulled in via pico_rpi_connect's exported headers.
+        "//src/common/boot_picoboot_headers",
+        "//src/common/pico_rpi_connect",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_ffs",
+        "//src/rp2_common/pico_flash_image",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)
+
+# Host build: the same OTA state machine with host stand-ins for the
+# bootrom/flash-image parts, over the host pico_ffs and pico_rpi_connect_host.
+# Tagged manual for the same reason as pico_rpi_connect_host.
+cc_library(
+    name = "pico_rpi_connect_ota_host",
+    srcs = [
+        "rpi_connect_ota.c",
+        "rpi_connect_ota_host.c",
+    ],
+    hdrs = ["include/pico/rpi_connect_ota.h"],
+    includes = ["include"],
+    local_defines = ["RPI_CONNECT_IDENTITY_OTP_ROW=0xc0"],
+    tags = ["manual"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = [
+        "//src/common/pico_rpi_connect:pico_rpi_connect_host",
+        "//src/host/pico_ffs",
+        "//src/host/pico_stdlib",
+    ],
+)
