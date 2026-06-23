@@ -147,6 +147,11 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(rp2_common/pico_fix)
     pico_add_subdirectory(rp2_common/pico_status_led)
 
+    if (PICO_COMBINED_DOCS OR NOT PICO_RP2040)
+        # this requires pico_standard_link
+        pico_add_subdirectory(rp2_common/pico_aes)
+    endif()
+
     # at the end as it includes a lot of other stuff
     pico_add_subdirectory(rp2_common/pico_runtime_init)
     pico_add_subdirectory(rp2_common/pico_runtime)

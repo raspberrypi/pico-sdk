@@ -1,0 +1,8 @@
+# pico_aes is not supported in Bazel, as it requires encryption
+
+exports_files(
+    [
+        "aes.c",
+        "aes.S",
+    ] + glob(["include/**"]),
+)
