@@ -46,6 +46,8 @@
 
 int pico_aes_try_decrypt(uint8_t(*data)[16], size_t data_size, uint32_t otp_key_page, uint8_t* iv_public);
 
+void pico_aes_lock_all(void);
+
 #endif
 
 #endif

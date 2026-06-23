@@ -1,0 +1,14 @@
+/* Defines the following symbols for use by code:
+    __aes_scratch_y_start__, __aes_scratch_y_end__, __aes_scratch_y_source__
+*/
+
+SECTIONS
+{
+    .aes_scratch_y : {
+        __aes_scratch_y_start__ = .;
+        *(.aes_scratch_y.*)
+        . = ALIGN(4);
+        __aes_scratch_y_end__ = .;
+    } > SCRATCH_Y AT> RAM_STORE
+    __aes_scratch_y_source__ = LOADADDR(.aes_scratch_y);
+}

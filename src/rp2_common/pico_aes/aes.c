@@ -38,9 +38,10 @@ static pico_aes_context_t aes_context = {};
 })
 
 
+#if PICO_AES_SINGLE_USE
 // The function lock_key() is called from pico_aes_decrypt_internal() after key initialisation is complete and before decryption begins.
 // That is a suitable point to lock the OTP area where key information is stored.
-__weak void pico_aes_lock_key() {
+void pico_aes_lock_key() {
     io_rw_32 *sw_lock = __get_opaque_ptr(&otp_hw->sw_lock[0]) + aes_context.otp_key_page;
 #if PICO_AES_HARDENING
     // prevent compiler from re-using sw_lock pointer
@@ -79,7 +80,15 @@ __weak void pico_aes_lock_key() {
 #endif
 }
 
-__weak void pico_aes_lock_all(void) {
+#else // not PICO_AES_SINGLE_USE
+void pico_aes_lock_key(void) {
+#if RC_COUNT
+    rcp_count_check_nodelay(31 + PICO_AES256_RCP_COUNT_DELTA);
+#endif
+}
+#endif // PICO_AES_SINGLE_USE
+
+void pico_aes_lock_all(void) {
     io_rw_32 *sw_lock = __get_opaque_ptr(&otp_hw->sw_lock[0]) + aes_context.otp_key_page;
 #if PICO_AES_HARDENING
     // we only actually need to lock page 2 but we lock and check 0, 1, 2 anyway
@@ -116,7 +125,7 @@ __weak void pico_aes_lock_all(void) {
 #endif
 }
 
-#include <stdio.h>
+
 int pico_aes_try_decrypt(uint8_t(*data)[16], size_t data_size, uint32_t otp_key_page, uint8_t* iv_public) {
     if (!bootrom_try_acquire_lock(BOOTROM_LOCK_SHA_256)) return PICO_ERROR_RESOURCE_IN_USE;
 
@@ -124,6 +133,7 @@ int pico_aes_try_decrypt(uint8_t(*data)[16], size_t data_size, uint32_t otp_key_
 
     uint16_t* otp_data = (uint16_t*)OTP_DATA_GUARDED_BASE;
 
+#if !PICO_AES_SINGLE_USE
     // Restore aes_scratch_y from stored location in RAM_STORE
     extern uint32_t __aes_scratch_y_source__;
     extern uint32_t __aes_scratch_y_start__;
@@ -131,6 +141,7 @@ int pico_aes_try_decrypt(uint8_t(*data)[16], size_t data_size, uint32_t otp_key_
 
     uint32_t stored_words = (uint32_t)(&__aes_scratch_y_end__ - &__aes_scratch_y_start__);
     memcpy(&__aes_scratch_y_start__, &__aes_scratch_y_source__, stored_words * sizeof(uint32_t));
+#endif // !PICO_AES_SINGLE_USE
 
     pico_aes_decrypt_internal(
         (uint8_t*)&(otp_data[otp_key_page * 0x40]),

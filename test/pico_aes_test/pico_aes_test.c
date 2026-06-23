@@ -21,18 +21,25 @@
 #define BUFFER_WORD_SIZE (BUFFER_SIZE/sizeof(uint32_t))
 
 
-void pico_aes_lock_key(void) {
-#if RC_COUNT
-    rcp_count_check_nodelay(31 + PICO_AES256_RCP_COUNT_DELTA);
-#endif
-}
-void pico_aes_lock_all(void) {}
-
 int main() {
     stdio_init_all();
     printf("AES Test Starting\n");
 
     bool passing = true;
+#if PICO_AES_SINGLE_USE
+    uint32_t *data = malloc(BUFFER_SIZE);
+    hard_assert(data);
+    for (int i=0; i < BUFFER_WORD_SIZE; i++) data[i] = get_rand_32();
+    printf("Buffer start   %08x %08x %08x\n", data[0], data[1], data[2]);
+
+    uint32_t* iv_public = malloc(16);
+    hard_assert(iv_public);
+    for (int i=0; i < 16/sizeof(uint32_t); i++) iv_public[i] = get_rand_32();
+
+    pico_aes_try_decrypt((void*)data, BUFFER_SIZE, 29, (uint8_t*)iv_public);
+
+    printf("Buffer encrypt %08x %08x %08x\n", data[0], data[1], data[2]);
+#else
     for (int n=0; n < 10; n++) {
         uint32_t *data = malloc(BUFFER_SIZE);
         uint32_t *data_orig = malloc(BUFFER_SIZE);
@@ -65,6 +72,10 @@ int main() {
         if (!passing) break;
         else printf("run %d passed\n", n);
     }
+#endif
+
+    // Lock all keys now decryption is finished
+    pico_aes_lock_all();
 
     if (passing) printf("PASSED\n");
     else printf("FAILED\n");

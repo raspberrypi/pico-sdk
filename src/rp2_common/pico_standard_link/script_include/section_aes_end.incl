@@ -1,0 +1,7 @@
+/* Contains some assertions for use with pico_aes */
+
+SECTIONS
+{
+    ASSERT(chaff==0x20081000, "Chaff array must be located at 0x20081000")
+    ASSERT(__scratch_y_start__ == __scratch_y_end__, "Cannot use scratch_y when using pico_aes")
+}

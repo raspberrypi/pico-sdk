@@ -175,7 +175,11 @@ rcp_iequal_nodelay r1, r0
 @ Put workspace in the second scratch area
 @ The "a"=allocatable attribute (and possibly the %progbits attribute) are necessary to store the murmur3 constants,
 @ otherwise they may end up silently replaced with 0 or 0xffffffff
+#if PICO_AES_SINGLE_USE
+.section .scratch_y.aes,"aw",%progbits
+#else
 .section .aes_scratch_y.aes,"aw",%progbits
+#endif
 
 aes_workspace_start:
 
