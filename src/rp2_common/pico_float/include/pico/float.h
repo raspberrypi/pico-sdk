@@ -224,12 +224,12 @@ extern "C" {
     // for VFP the C cast is an assembly instruction anyway, so we prefer that over a function call
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline float int2float(int32_t i) { return (float)i; }
-    static inline float uint2float(uint32_t i) { return (float)i; }
+    static inline float uint2float(uint32_t u) { return (float)u; }
 #else
     //! Convert a signed 32-bit integer to the nearest float
     float int2float(int32_t i);
     //! Convert an unsigned 32-bit integer to the nearest float
-    float uint2float(uint32_t i);
+    float uint2float(uint32_t u);
 #endif
 #endif
 
@@ -237,12 +237,12 @@ extern "C" {
 #if !__PICO_FLOAT_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline float int642float(int64_t i) { return (float)i; }
-    static inline float uint642float(uint64_t i) { return (float)i; }
+    static inline float uint642float(uint64_t u) { return (float)u; }
 #else
     //! Convert a signed 64-bit integer to the nearest float
     float int642float(int64_t i);
     //! Convert an unsigned 64-bit integer to the nearest float
-    float uint642float(uint64_t i);
+    float uint642float(uint64_t u);
 #endif
 #endif
 

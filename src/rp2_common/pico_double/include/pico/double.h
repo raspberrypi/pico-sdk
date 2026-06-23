@@ -205,12 +205,12 @@ extern "C" {
 #if !__PICO_DOUBLE_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline double int2double(int32_t i) { return (double)i; }
-    static inline double uint2double(uint32_t i) { return (double)i; }
+    static inline double uint2double(uint32_t u) { return (double)u; }
 #else
     //! Convert a signed 32-bit integer to the nearest double
     double int2double(int32_t i);
     //! Convert an unsigned 32-bit integer to the nearest double
-    double uint2double(uint32_t i);
+    double uint2double(uint32_t u);
 #endif
 #endif
 
@@ -218,12 +218,12 @@ extern "C" {
 #if !__PICO_DOUBLE_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline double int642double(int64_t i) { return (double)i; }
-    static inline double uint642double(uint64_t i) { return (double)i; }
+    static inline double uint642double(uint64_t u) { return (double)u; }
 #else
     //! Convert a signed 64-bit integer to the nearest double
     double int642double(int64_t i);
     //! Convert an unsigned 64-bit integer to the nearest double
-    double uint642double(uint64_t i);
+    double uint642double(uint64_t u);
 #endif
 #endif
 

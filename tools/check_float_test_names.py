@@ -118,6 +118,14 @@ def check_func_args(func, args, from_type, to_type, return_type, filename, linen
     implied_from_type = type_to_base_type(from_type)
     if arg_type != implied_from_type:
         raise Exception(f"{filename}:{lineno} Expected {func} to have {implied_from_type} type for it's first argument, not {arg_type}")
+    expected_name = type_to_short_type(arg_type)
+    if expected_name == "i64":
+        expected_name = "i"
+    elif expected_name == "u64":
+        expected_name = "u"
+    if not (re.match("u?fix(?:64)?2", func) and arg_name == "m"): # ignore the mantissa argument of fixed-point conversion functions
+        if arg_name != expected_name:
+            raise Exception(f"{filename}:{lineno} Expected first argument of {func} (of type {arg_type}) to be named {expected_name}, not {arg_name}")
 
 @dataclass
 class TestMacro:
