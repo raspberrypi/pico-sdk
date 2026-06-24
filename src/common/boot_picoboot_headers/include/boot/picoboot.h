@@ -168,7 +168,7 @@ struct __packed picoboot_otp_cmd {
 struct __packed picoboot_get_info_cmd {
     uint8_t bType; ///< Info type selector
     uint8_t bParam; ///< Unused
-    uint16_t wParam; ///< Secondary parameter for the selected info type
+    uint16_t wParam; ///< Unused
     uint32_t dParams[3]; ///< Additional parameters for the selected info type
 };
 
