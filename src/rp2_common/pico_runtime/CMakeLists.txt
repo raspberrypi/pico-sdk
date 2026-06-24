@@ -64,7 +64,7 @@ endforeach()
 # AUTO_INIT_MUTEX       - auto init mutexes, without this you get no printf mutex either;
 # CRT0_FAR_CALLS        - use blx not bl for calls from crt0 to user overridable functions;
 # THREAD_LOCAL          - support for thread locals;
-# MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED - allow multicore_lockout_start to be called on core 0 before core 1 is startes
+# MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED - allow multicore_lockout_start to be called on core 0 before core 1 is started
 #
 # \param\ INCLUDE The items to include
 # \param\ EXCLUDE The items to exclude
