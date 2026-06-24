@@ -172,8 +172,8 @@ static int default_enter_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
         // todo we may get preempted here, but I think that is OK unless what is pre-empts requires
         //      the other core to be running.
 #elif PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT
-        // we cannot mix multicore_lockout and FreeRTOS RP2040 as they both use the multicore FIFO...
-        // the user, will have to roll their own mechanism in this case. FreeRTOS on RP2350 uses doorbells
+        // we cannot mix multicore_lockout and FreeRTOS on RP2040 as they both use the multicore FIFO...
+        // the user will have to roll their own mechanism in this case. FreeRTOS on RP2350 uses doorbells
 #if LIB_FREERTOS_KERNEL && PICO_RP2040
 #if PICO_FLASH_ASSERT_ON_UNSAFE
         assert(false); // we expect the other core to have been initialized via flash_safe_execute_core_init()

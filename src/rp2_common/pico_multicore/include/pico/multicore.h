@@ -38,7 +38,7 @@ extern "C" {
 #endif
 #endif
 
-// PICO_CONFIG: PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED, Allow multicore_lockout functions called from core 0 to succeed if core1 has not been started, default=1, group=pico_multicore
+// PICO_CONFIG: PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED, Allow multicore_lockout functions called from core 0 to succeed if core1 has not been started, type=bool, default=1, group=pico_multicore
 #ifndef PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
 #define PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED 1
 #endif
@@ -448,7 +448,7 @@ static inline uint multicore_doorbell_irq_num(uint doorbell_num) {
  *
  * \note By default, for convenience, multicore_lockout_start_ functions will succeed on core 0, if core 1 has either not been started
  * via multicore_launch_core1 functions, or has subsequently been reset via multicore_reset_core1. Therefore, it is not safe to
- * (though equally not very likely that you would) call multicore_launch1 while core 0 is inside of a multicore_lockout_ function.
+ * (though equally not very likely that you would) call multicore_launch_core1 while core 0 is inside of a multicore_lockout_ function.
  * This default behavior can be disabled by setting PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED=0 in which case core 1 must be running
  * and in the "victim initialized" state before multicore_lockout_start functions can be called on core 0
  */
