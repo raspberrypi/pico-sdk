@@ -30,12 +30,12 @@
 // for core1 in `multicore_reset_core1()` though as a convenience since most people will use that to reset core 1.
 
 #define CORE_STATUS_NOT_RUNNING         ((uint8_t)0)
-// not needed when PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED==0
 #if PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
 #define CORE_STATUS_LOCKOUT_DISABLED    ((uint8_t)1)
 #define CORE_STATUS_LOCKOUT_ENABLED     ((uint8_t)2)
 #else
 // we don't care about the distinction between NOT_RUNNING & LOCKOUT_DISABLED
+// when PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED == 0
 #define CORE_STATUS_LOCKOUT_DISABLED    CORE_STATUS_NOT_RUNNING
 #define CORE_STATUS_LOCKOUT_ENABLED     ((uint8_t)1)
 #endif
