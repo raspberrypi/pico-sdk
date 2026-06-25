@@ -492,7 +492,7 @@ static void low_power_wake_from_dormant(void) {
 }
 
 static void low_power_go_dormant(dormant_clock_source_t dormant_clock_source) {
-    invalid_params_if(PICO_LOW_POWER,
+    valid_params_if(PICO_LOW_POWER,
         dormant_clock_source == DORMANT_CLOCK_SOURCE_XOSC || dormant_clock_source == DORMANT_CLOCK_SOURCE_ROSC
     #if !PICO_RP2040
         || dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC

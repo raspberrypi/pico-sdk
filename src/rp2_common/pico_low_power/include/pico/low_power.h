@@ -24,7 +24,8 @@ extern "C" {
  * There are three modes of operation: sleep, dormant, and Pstate, with the lowest power consumption being Pstate.
  *
  * \if rp2040_specific
- * NOTE: On RP2040, there is no Pstate mode.
+ * NOTE: On RP2040, there is no Pstate mode, and going dormant using the AON timer requires an external clock
+ * source for the RTC (see \ref low_power_set_external_clock_source).
  * \endif
  *
  * In sleep mode:
@@ -52,7 +53,15 @@ extern "C" {
  * - The Pstate APIs will overwrite the last 2 powman scratch registers - the other scratch registers are not modified,
  *   so can be used for other persistent data.
  * \endif
+ * 
+ * Some rough power consumption values when going to low power modes using timers, measured on Pico-series boards
+ * (powered either from VSYS at 5.2V, or from 3V3 at 3.3V):
  *
+ * Mode       | Pico (VSYS)    | Pico 2 (VSYS)  | Pico (3V3)     | Pico 2 (3V3)
+ * -----------|----------------|----------------|----------------|----------------
+ * Sleep      | 7.4mA (39.0mW) | 5.9mA (30.7mW) | 9.1mA (29.9mW) | 6.9mA (22.7mW)
+ * Dormant    | 1.2mA (6.3mW)  | 3.3mA (17.3mW) | 1.2mA (4.0mW)  | 3.6mA (12.0mW)
+ * Pstate     | N/A            | 0.45mA (2.4mW) | N/A            | 0.34mA (1.1mW)
  */
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_PICO_LOW_POWER, Enable/disable assertions in the pico_low_power module, type=bool, default=0, group=pico_low_power
