@@ -184,6 +184,14 @@ BAZEL_ONLY_ALLOWLIST = (
     "PICO_CMSIS_PATH",
 )
 
+CMAKE_BAZEL_MISMATCH_ALLOWLIST = (
+    # These actually have different options, and descriptions
+    "PICO_DEFAULT_DIVIDER_IMPL",
+    "PICO_DEFAULT_DOUBLE_IMPL",
+    "PICO_DEFAULT_FLOAT_IMPL",
+    "PICO_DEFAULT_PRINTF_IMPL",
+    "PICO_DEFAULT_THREAD_LOCAL_IMPL",
+)
 
 @dataclass
 class Option:
@@ -240,6 +248,8 @@ def OptionsAreEqual(bazel_option, cmake_option, warnings_as_errors):
         _LOG.warning(f"    {bazel_option.name} does not exist in CMake")
         return not warnings_as_errors
     elif not bazel_option.matches(cmake_option):
+        if bazel_option.name in CMAKE_BAZEL_MISMATCH_ALLOWLIST:
+            return True
         _LOG.error("    Bazel and CMAKE definitions do not match:")
         _LOG.error(f"    [CMAKE]    {bazel_option}")
         _LOG.error(f"    [BAZEL]    {cmake_option}")
