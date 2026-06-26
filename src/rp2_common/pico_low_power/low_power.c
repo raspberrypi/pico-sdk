@@ -122,6 +122,8 @@ static void prepare_for_pstate_change(void) {
     powman_set_debug_power_request_ignored(true);
     // Switch powman timer to lposc explicitly, which will also use the calibrated frequency
     powman_timer_set_1khz_tick_source_lposc();
+    // Unlock VREG, so it can switch to low power mode
+    hw_set_bits(&powman_hw->vreg_ctrl, POWMAN_PASSWORD_BITS | POWMAN_VREG_CTRL_UNLOCK_BITS);
 }
 
 static void post_pstate_change(void) {
