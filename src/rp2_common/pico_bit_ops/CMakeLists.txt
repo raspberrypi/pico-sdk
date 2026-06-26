@@ -9,7 +9,7 @@ if (NOT TARGET pico_bit_ops)
     add_library(pico_bit_ops_default INTERFACE)
     target_link_libraries(pico_bit_ops_default INTERFACE pico_bit_ops_pico)
 
-    set(PICO_DEFAULT_BIT_OPS_IMPL pico_bit_ops_default)
+    pico_fixup_default_impl(PICO_DEFAULT_BIT_OPS_IMPL pico_bit_ops_ default)
 
     pico_add_library(pico_bit_ops_pico)
     target_link_libraries(pico_bit_ops INTERFACE

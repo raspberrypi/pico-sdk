@@ -23,11 +23,11 @@
  *
  * The pico_thread_local library comes in three main flavors:
  *
- * 1. `pico_thread_local_per_thread` (default) - Full support for thread local variables. Each thread/core gets its own copy of the variable initialized when it starts executing. The library tries to minimize the overhead if there are no thread locals used, however particularly on RISC-V there is always a small overhead.
- * 2. `pico_thread_local_global` - Thread local variables are allowed in code, but each thread/core shares the same value (i.e. they aren't really thread local). There is very minimial overhead for this option.
- * 3. `pico_thread_local_none` - No support for thread locals is provided. Code using them may not compile or link, and if it does the values won't be shared and may not even be initialized correctly. This mode is however guaranteed to have basically no overhead when thread locals are known not to be used.
+ * 1. `per_thread` (default) - Full support for thread local variables. Each thread/core gets its own copy of the variable initialized when it starts executing. The library tries to minimize the overhead if there are no thread locals used, however particularly on RISC-V there is always a small overhead.
+ * 2. `global` - Thread local variables are allowed in code, but each thread/core shares the same value (i.e. they aren't really thread local). There is very minimial overhead for this option.
+ * 3. `none` - No support for thread locals is provided. Code using them may not compile or link, and if it does the values won't be shared and may not even be initialized correctly. This mode is however guaranteed to have basically no overhead when thread locals are known not to be used.
  *
- * The support provided by the `pico_thread_local` library may be set from CMake via `pico_set_thread_local_implementation(<TARGET> per_thread|global|none)` and the default for all targets may be set via CMake variable (e.g. `set(PICO_DEFAULT_THREAD_LOCAL_IMPL pico_thread_local_none)`).
+ * The support provided by the `pico_thread_local` library may be set from CMake via `pico_set_thread_local_implementation(<TARGET> per_thread|global|none)` and the default for all targets may be set via CMake variable (e.g. `set(PICO_DEFAULT_THREAD_LOCAL_IMPL global)`).
  */
 
 // PICO_CONFIG: PICO_THREAD_LOCAL_MODE_PER_THREAD, Enable proper thread local support with one value per thread, type=bool, default=1, group=pico_thread_local
