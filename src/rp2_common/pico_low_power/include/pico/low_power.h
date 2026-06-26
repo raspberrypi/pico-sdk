@@ -57,11 +57,13 @@ extern "C" {
  * Some rough power consumption values when going to low power modes using timers, measured on Pico-series boards
  * (powered either from VSYS at 5.2V, or from 3V3 at 3.3V, running low_power_test_simple):
  *
- * Mode       | Pico (VSYS)    | Pico 2 (VSYS)   | Pico (3V3)     | Pico 2 (3V3)
- * -----------|----------------|---------------- |----------------|----------------
- * Sleep      | 7.3mA (37.9mW) | 5.9mA (30.7mW)  | 8.7mA (28.5mW) | 6.9mA (22.7mW)
- * Dormant    | 0.76mA (4.0mW) | 3.3mA (17.0mW)  | 0.75mA (2.5mW) | 3.7mA (12.0mW)
- * Pstate     | N/A            | 0.25mA (1.32mW) | N/A            | 0.14mA (0.47mW)
+ * Mode                  | Pico (VSYS)    | Pico 2 (VSYS)   | Pico (3V3)     | Pico 2 (3V3)
+ * ----------------------|----------------|-----------------|----------------|----------------
+ * Sleep                 | 7.3mA (37.9mW) | 5.9mA (30.7mW)  | 8.7mA (28.5mW) | 6.9mA (22.7mW)
+ * Dormant               | 0.76mA (4.0mW) | 3.3mA (17.0mW)  | 0.75mA (2.5mW) | 3.7mA (12.0mW)
+ * Pstate (SRAM0 On)     | N/A            | 0.25mA (1.32mW) | N/A            | 0.14mA (0.47mW)
+ * Pstate (XIP SRAM On)  | N/A            | 0.22mA (1.21mW) | N/A            | 0.10mA (0.44mW)
+ * Pstate (All SRAM Off) | N/A            | 0.18mA (1.10mW) | N/A            | 0.08mA (0.40mW)
  * 
  * NOTE: The RP2350 dormant values are higher than the RP2040 ones because RP2350 continues running clk_ref from the LPOSC to run the timer,
  * whereas RP2040 requires an external clock input.
