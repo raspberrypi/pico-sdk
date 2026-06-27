@@ -82,30 +82,48 @@ enum picoboot_status {
     PICOBOOT_UNSUPPORTED_MODIFICATION = 17,
 };
 
+/*! \brief Parameters for a reboot command (RP2040 only)
+ *  \ingroup boot_picoboot_headers
+ *
+ * Sent as the argument payload of a PC_REBOOT command.
+ */
 struct __packed picoboot_reboot_cmd {
-    uint32_t dPC; // 0 means reset into regular boot path
-    uint32_t dSP;
-    uint32_t dDelayMS;
+    uint32_t dPC; ///< Program counter to reboot to; 0 means reset into the regular boot path, otherwise must be a RAM address
+    uint32_t dSP; ///< Stack pointer value at reboot; ignored unless dPC is a RAM address
+    uint32_t dDelayMS; ///< Delay in milliseconds before rebooting
 };
 
-
-// note this (with pc_sp) union member has the same layout as picoboot_reboot_cmd except with extra dFlags
+/*! \brief Parameters for an extended reboot command (not available on RP2040)
+ *  \ingroup boot_picoboot_headers
+ *
+ * Sent as the argument payload of a PC_REBOOT2 command.
+ */
 struct __packed picoboot_reboot2_cmd {
-    uint32_t dFlags;
-    uint32_t dDelayMS;
-    uint32_t dParam0;
-    uint32_t dParam1;
+    uint32_t dFlags; ///< Reboot flags controlling the boot path
+    uint32_t dDelayMS; ///< Delay in milliseconds before rebooting
+    uint32_t dParam0; ///< First reboot parameter (interpretation depends on flags)
+    uint32_t dParam1; ///< Second reboot parameter (interpretation depends on flags)
 };
 
-// used for EXEC, VECTORIZE_FLASH
+/*! \brief Parameters for a command that operates on a single address (RP2040 only)
+ *  \ingroup boot_picoboot_headers
+ *
+ * Sent as the argument payload of PC_EXEC and PC_VECTORIZE_FLASH commands,
+ * which are not supported on RP2350.
+ */
 struct __packed picoboot_address_only_cmd {
-    uint32_t dAddr;
+    uint32_t dAddr; ///< Target address
 };
 
 // used for READ, WRITE, FLASH_ERASE
+/*! \brief Parameters for a command that operates on an address range
+ *  \ingroup boot_picoboot_headers
+ *
+ * Sent as the argument payload of PC_READ, PC_WRITE, and PC_FLASH_ERASE commands.
+ */
 struct __packed picoboot_range_cmd {
-    uint32_t dAddr;
-    uint32_t dSize;
+    uint32_t dAddr; ///< Start address of the range
+    uint32_t dSize; ///< Size of the range in bytes
 };
 
 // remains defined for backwards compatibility with RP2350 bootrom builds
@@ -113,56 +131,88 @@ struct __packed picoboot_exec2_cmd {
     uint32_t dummy;
 };
 
+/*! \brief Exclusivity level for a PC_EXCLUSIVE_ACCESS command
+ *  \ingroup boot_picoboot_headers
+ */
 enum picoboot_exclusive_type {
-    NOT_EXCLUSIVE = 0,
-    EXCLUSIVE,
-    EXCLUSIVE_AND_EJECT
+    NOT_EXCLUSIVE = 0,   ///< No restriction on USB Mass Storage operation
+    EXCLUSIVE,           ///< Disable USB Mass Storage writes (any active UF2 download will be aborted)
+    EXCLUSIVE_AND_EJECT  ///< Lock out USB Mass Storage by marking the drive media as not present (eject the drive)
 };
 
+/*! \brief Parameters for an exclusive-access command
+ *  \ingroup boot_picoboot_headers
+ *
+ * Sent as the argument payload of a PC_EXCLUSIVE_ACCESS command.
+ */
 struct __packed picoboot_exclusive_cmd {
-    uint8_t bExclusive;
+    uint8_t bExclusive; ///< Exclusivity level; one of the picoboot_exclusive_type values
 };
 
+/*! \brief Parameters for an OTP read or write command (not available on RP2040)
+ *  \ingroup boot_picoboot_headers
+ *
+ * Sent as the argument payload of PC_OTP_READ and PC_OTP_WRITE commands.
+ */
 struct __packed picoboot_otp_cmd {
-    uint16_t wRow; // OTP row
-    uint16_t wRowCount; // number of rows to transfer
-    uint8_t bEcc; // use error correction (16 bit per register vs 24 (stored as 32) bit raw)
+    uint16_t wRow; ///< OTP row index to start from
+    uint16_t wRowCount; ///< Number of rows to transfer
+    uint8_t bEcc; ///< Non-zero to use ECC (16-bit per register); zero for raw 24-bit access (stored as 32-bit)
 };
 
+/*! \brief Parameters for a get-info command (not available on RP2040)
+ *  \ingroup boot_picoboot_headers
+ *
+ * Sent as the argument payload of a PC_GET_INFO command.
+ */
 struct __packed picoboot_get_info_cmd {
-    uint8_t bType;
-    uint8_t bParam;
-    uint16_t wParam;
-    uint32_t dParams[3];
+    uint8_t bType; ///< Info type selector
+    uint8_t bParam; ///< Unused
+    uint16_t wParam; ///< Unused
+    uint32_t dParams[3]; ///< Additional parameters for the selected info type
 };
 
 // little endian
+/*! \brief A PICOBOOT command packet sent to the OUT endpoint
+ *  \ingroup boot_picoboot_headers
+ *
+ * A 32-byte packet written to the PICOBOOT OUT endpoint to initiate any
+ * supported command.  After sending this packet, transfer_length bytes are
+ * exchanged via the IN or OUT endpoint as appropriate, followed by a
+ * zero-length ACK packet.
+ */
 struct __packed __aligned(4) picoboot_cmd {
-    uint32_t dMagic;
-    uint32_t dToken; // an identifier for this token to correlate with a status response
-    uint8_t bCmdId; // top bit set for IN
-    uint8_t bCmdSize; // bytes of actual data in the arg part of this structure
-    uint16_t _unused;
-    uint32_t dTransferLength; // length of IN/OUT transfer (or 0) if none
+    uint32_t dMagic; ///< Must be PICOBOOT_MAGIC
+    uint32_t dToken; ///< Caller-chosen identifier used to correlate this command with its status response
+    uint8_t bCmdId; ///< Command identifier from picoboot_cmd_id; top bit set indicates an IN transfer
+    uint8_t bCmdSize; ///< Number of valid argument bytes within the args union
+    uint16_t _unused; ///< Reserved; must be zero
+    uint32_t dTransferLength; ///< Length of the subsequent IN/OUT data transfer, or 0 if none
     union {
-        uint8_t args[16];
-        struct picoboot_reboot_cmd reboot_cmd;
-        struct picoboot_range_cmd range_cmd;
-        struct picoboot_address_only_cmd address_only_cmd;
-        struct picoboot_exclusive_cmd exclusive_cmd;
-        struct picoboot_reboot2_cmd reboot2_cmd;
-        struct picoboot_otp_cmd otp_cmd;
-        struct picoboot_get_info_cmd get_info_cmd;
+        uint8_t args[16]; ///< Raw argument bytes
+        struct picoboot_reboot_cmd reboot_cmd; ///< Arguments for PC_REBOOT
+        struct picoboot_range_cmd range_cmd; ///< Arguments for PC_READ, PC_WRITE, and PC_FLASH_ERASE
+        struct picoboot_address_only_cmd address_only_cmd; ///< Arguments for PC_EXEC and PC_VECTORIZE_FLASH
+        struct picoboot_exclusive_cmd exclusive_cmd; ///< Arguments for PC_EXCLUSIVE_ACCESS
+        struct picoboot_reboot2_cmd reboot2_cmd; ///< Arguments for PC_REBOOT2
+        struct picoboot_otp_cmd otp_cmd; ///< Arguments for PC_OTP_READ and PC_OTP_WRITE
+        struct picoboot_get_info_cmd get_info_cmd; ///< Arguments for PC_GET_INFO
     };
 };
 static_assert(32 == sizeof(struct picoboot_cmd), "picoboot_cmd must be 32 bytes big");
 
+/*! \brief Status response returned by the PICOBOOT_IF_CMD_STATUS control request
+ *  \ingroup boot_picoboot_headers
+ *
+ * A 16-byte structure read back from the device to determine the outcome of
+ * the most recently issued command.
+ */
 struct __packed __aligned(4) picoboot_cmd_status {
-    uint32_t dToken;
-    uint32_t dStatusCode;
-    uint8_t bCmdId;
-    uint8_t bInProgress;
-    uint8_t _pad[6];
+    uint32_t dToken; ///< Token copied from the corresponding picoboot_cmd
+    uint32_t dStatusCode; ///< Result code; one of the picoboot_status values
+    uint8_t bCmdId; ///< Command identifier of the command this status relates to
+    uint8_t bInProgress; ///< Non-zero if the command is still being processed
+    uint8_t _pad[6]; ///< Padding to reach 16 bytes
 };
 
 static_assert(16 == sizeof(struct picoboot_cmd_status), "picoboot_cmd_status must be 16 bytes big");

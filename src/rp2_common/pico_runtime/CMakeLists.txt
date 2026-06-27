@@ -63,6 +63,8 @@ endforeach()
 # PANIC                 - default panic impl which brings in stdio;
 # AUTO_INIT_MUTEX       - auto init mutexes, without this you get no printf mutex either;
 # CRT0_FAR_CALLS        - use blx not bl for calls from crt0 to user overridable functions;
+# THREAD_LOCAL          - support for thread locals;
+# MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED - allow multicore_lockout_start to be called on core 0 before core 1 is started
 #
 # \param\ INCLUDE The items to include
 # \param\ EXCLUDE The items to exclude
@@ -75,7 +77,9 @@ function(pico_minimize_runtime TARGET)
             FPGA_CHECK
             PANIC
             AUTO_INIT_MUTEX
-            THREAD_LOCAL)
+            CRT0_FAR_CALLS
+            THREAD_LOCAL
+            MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED)
     cmake_parse_arguments(RUNTIME "" ""
             "INCLUDE;EXCLUDE" ${ARGN} )
     foreach (INCL_EXCL IN ITEMS INCLUDE EXCLUDE)
@@ -147,7 +151,10 @@ function(pico_minimize_runtime TARGET)
     if (NOT RUNTIME_INCLUDE_FPGA_CHECK)
         target_compile_definitions(${TARGET} PRIVATE PICO_NO_FPGA_CHECK=1)
     endif()
-    if (NOT RUNTIME_CRT0_FAR_CALLS)
+    if (NOT RUNTIME_INCLUDE_CRT0_FAR_CALLS)
         target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_NEAR_CALLS=1)
+    endif()
+    if (NOT RUNTIME_INCLUDE_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED)
+        target_compile_definitions(${TARGET} PRIVATE PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED=0)
     endif()
 endfunction()

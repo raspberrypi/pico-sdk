@@ -11,6 +11,10 @@
 #include "hardware/timer.h"
 #include "pico/assert.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TA_NUM_TIMERS NUM_GENERIC_TIMERS
 #define TA_NUM_TIMER_ALARMS NUM_ALARMS
 
@@ -102,4 +106,9 @@ static inline uint ta_timer_num(alarm_pool_timer_t *timer) {
 static inline alarm_pool_timer_t *ta_default_timer_instance(void) {
     return PICO_DEFAULT_TIMER_INSTANCE();
 }
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

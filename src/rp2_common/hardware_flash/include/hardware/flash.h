@@ -52,6 +52,11 @@
 
 // PICO_CONFIG: PICO_FLASH_SIZE_BYTES, size of primary flash in bytes, type=int, default=Usually provided via board header, group=hardware_flash
 
+// PICO_CONFIG: PICO_ALWAYS_INCLUDE_FLASH_ID_FUNCTIONS, Force inclusion of flash unique id functionality in PICO_NO_FLASH binaries, type=bool, default=0, group=hardware_flash
+#ifndef PICO_ALWAYS_INCLUDE_FLASH_ID_FUNCTIONS
+#define PICO_ALWAYS_INCLUDE_FLASH_ID_FUNCTIONS 0
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

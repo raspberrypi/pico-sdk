@@ -153,21 +153,21 @@ typedef struct async_when_pending_worker {
  * \ingroup pico_async_context
  */
 typedef struct async_context_type {
-    uint16_t type;
+    uint16_t type; ///< Numeric type identifier for this async_context implementation
     // see wrapper functions for documentation
-    void (*acquire_lock_blocking)(async_context_t *self);
-    void (*release_lock)(async_context_t *self);
-    void (*lock_check)(async_context_t *self);
-    uint32_t (*execute_sync)(async_context_t *context, uint32_t (*func)(void *param), void *param);
-    bool (*add_at_time_worker)(async_context_t *self, async_at_time_worker_t *worker);
-    bool (*remove_at_time_worker)(async_context_t *self, async_at_time_worker_t *worker);
-    bool (*add_when_pending_worker)(async_context_t *self, async_when_pending_worker_t *worker);
-    bool (*remove_when_pending_worker)(async_context_t *self, async_when_pending_worker_t *worker);
-    void (*set_work_pending)(async_context_t *self, async_when_pending_worker_t *worker);
-    void (*poll)(async_context_t *self); // may be NULL
-    void (*wait_until)(async_context_t *self, absolute_time_t until);
-    void (*wait_for_work_until)(async_context_t *self, absolute_time_t until);
-    void (*deinit)(async_context_t *self);
+    void (*acquire_lock_blocking)(async_context_t *self); ///< Acquire the context lock, blocking until available
+    void (*release_lock)(async_context_t *self); ///< Release the context lock
+    void (*lock_check)(async_context_t *self); ///< Assert that the caller holds the context lock
+    uint32_t (*execute_sync)(async_context_t *context, uint32_t (*func)(void *param), void *param); ///< Execute a function synchronously on the context's core
+    bool (*add_at_time_worker)(async_context_t *self, async_at_time_worker_t *worker); ///< Add an at-time worker to the context
+    bool (*remove_at_time_worker)(async_context_t *self, async_at_time_worker_t *worker); ///< Remove an at-time worker from the context
+    bool (*add_when_pending_worker)(async_context_t *self, async_when_pending_worker_t *worker); ///< Add a when-pending worker to the context
+    bool (*remove_when_pending_worker)(async_context_t *self, async_when_pending_worker_t *worker); ///< Remove a when-pending worker from the context
+    void (*set_work_pending)(async_context_t *self, async_when_pending_worker_t *worker); ///< Mark a when-pending worker as having work to do
+    void (*poll)(async_context_t *self); ///< Poll for work; may be NULL for non-polled contexts
+    void (*wait_until)(async_context_t *self, absolute_time_t until); ///< Sleep until the specified time in a callback-safe manner
+    void (*wait_for_work_until)(async_context_t *self, absolute_time_t until); ///< Block until work is pending or the specified time is reached
+    void (*deinit)(async_context_t *self); ///< Deinitialise and free resources associated with the context
 } async_context_type_t;
 
 /*!
@@ -177,12 +177,12 @@ typedef struct async_context_type {
  * Individual async_context_types with additional state, should contain this structure at the start.
  */
 struct async_context {
-    const async_context_type_t *type;
-    async_when_pending_worker_t *when_pending_list;
-    async_at_time_worker_t *at_time_list;
-    absolute_time_t next_time;
-    uint16_t flags;
-    uint8_t  core_num;
+    const async_context_type_t *type; ///< Pointer to the type implementation for this context
+    async_when_pending_worker_t *when_pending_list; ///< Linked list of registered when-pending workers
+    async_at_time_worker_t *at_time_list; ///< Linked list of registered at-time workers, ordered by next_time
+    absolute_time_t next_time; ///< Time at which the next at-time worker should be called
+    uint16_t flags; ///< Context flags (see ASYNC_CONTEXT_FLAG_* defines)
+    uint8_t core_num; ///< Index of the processor core this context belongs to
 };
 
 /*!

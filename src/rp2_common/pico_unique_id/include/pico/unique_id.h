@@ -81,7 +81,7 @@ extern "C" {
  *
  */
 typedef struct {
-	uint8_t id[PICO_UNIQUE_BOARD_ID_SIZE_BYTES];
+	uint8_t id[PICO_UNIQUE_BOARD_ID_SIZE_BYTES]; ///< The identifier bytes
 } pico_unique_board_id_t;
 
 /*! \brief Get unique ID

@@ -11,6 +11,6 @@ int main(void) {
         sleep_ms(500);
     }
 
-    printf("pico_xip_sram_test ends\n");
+    printf("PASSED\n");
     return 0;
 }

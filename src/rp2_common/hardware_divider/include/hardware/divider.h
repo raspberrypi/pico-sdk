@@ -468,9 +468,15 @@ static inline int32_t hw_divider_s32_remainder_inlined(int32_t a, int32_t b) {
 #endif
 }
 
+/*! \brief Saved hardware divider state
+ *  \ingroup hardware_divider
+ *
+ * Holds a snapshot of the hardware divider registers so they can be
+ * saved and restored around code that uses the divider.
+ */
 #if !PICO_EMULATE_DIVIDER
 typedef struct {
-    uint32_t values[4];
+    uint32_t values[4]; ///< Saved divider register values (dividend, divisor, quotient, remainder)
 } hw_divider_state_t;
 #else
 typedef uint64_t hw_divider_state_t;

@@ -408,7 +408,7 @@ _entry_point:
 
 #if HAS_REDUNDANCY_COPROCESSOR
     // just enable the RCP which is fine if it already was (we assume no other co-processors are enabled at this point to save space)
-    ldr r0, = PPB_BASE + M33_CPACR_OFFSET
+    ldr r0, = PPB_BASE + ARM_CPU_PREFIXED(CPACR_OFFSET)
     movs r1, #ARM_CPU_PREFIXED(CPACR_CP7_BITS)
     str r1, [r0]
     // only initialize canary seeds if they haven't been (as to do so twice is a fault)

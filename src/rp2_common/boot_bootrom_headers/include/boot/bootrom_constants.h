@@ -133,6 +133,12 @@
 #define BOOT_TBYB_AND_UPDATE_FLAG_OTP_VERSION_APPLIED              0x2
 #define BOOT_TBYB_AND_UPDATE_FLAG_OTHER_ERASED                     0x4
 
+// PICO_CONFIG: BLOCK_DEVICE_DEFAULT_PARTITION_ID, default ID of block device partition which must match the ID used in the partition table JSON, type=int, default=0x626C6F636B646576, group=pico_bootrom
+#ifndef BLOCK_DEVICE_DEFAULT_PARTITION_ID
+// The default 0x626C6F636B646576 value is the ASCII encoding of "blockdev"
+#define BLOCK_DEVICE_DEFAULT_PARTITION_ID 0x626C6F636B646576
+#endif
+
 #ifndef __ASSEMBLER__
 // Limited to 3 arguments in case of varm multiplex hint (trashes Arm r3)
 typedef int (*bootrom_api_callback_generic_t)(uint32_t r0, uint32_t r1, uint32_t r2);

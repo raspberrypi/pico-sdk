@@ -108,17 +108,26 @@ int flash_safe_execute(void (*func)(void *), void *param, uint32_t enter_exit_ti
 #endif
 #endif
 
-// PICO_CONFIG: PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT, Support using multicore_lockout functions to make the other core safe during flash_safe_execute, type=bool, default=1 when using pico_multicore, group=pico_flash
-#ifndef PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
-#if LIB_PICO_MULTICORE
-#define PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT 1
+// PICO_CONFIG: PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT, Support using multicore_lockout functions to make the other core safe during flash_safe_execute, type=bool, default=1 when using pico_multicore, group=pico_flash
+#ifndef PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT
+#ifdef PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
+// support old misspelling
+#define PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
+#elif LIB_PICO_MULTICORE
+#define PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT 1
 #endif
 #endif
 
+/*! \brief Helper interface for coordinating safe flash access across cores
+ *  \ingroup pico_flash
+ *
+ * Provides the callbacks used by \ref flash_safe_execute to initialize per-core
+ * state and to enter/exit the safe zone in which flash may be written or erased.
+ */
 typedef struct {
-    bool (*core_init_deinit)(bool init);
-    int (*enter_safe_zone_timeout_ms)(uint32_t timeout_ms);
-    int (*exit_safe_zone_timeout_ms)(uint32_t timeout_ms);
+    bool (*core_init_deinit)(bool init); ///< Initialize (init=true) or de-initialise (init=false) this core's participation in flash safety
+    int (*enter_safe_zone_timeout_ms)(uint32_t timeout_ms); ///< Enter the safe zone, blocking until safe or until timeout_ms milliseconds elapse
+    int (*exit_safe_zone_timeout_ms)(uint32_t timeout_ms); ///< Exit the safe zone, unblocking the other core, waiting up to timeout_ms milliseconds
 } flash_safety_helper_t;
 
 /**

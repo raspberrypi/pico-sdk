@@ -109,18 +109,18 @@ PICO_RUNTIME_INIT_FUNC_HW(runtime_init_usb_power_down, PICO_RUNTIME_INIT_USB_POW
 
 #if !PICO_RUNTIME_NO_INIT_PER_CORE_ENABLE_COPROCESSORS
 #include "hardware/gpio.h" // PICO_USE_GPIO_COPROCESSOR is defined here
-#include "hardware/structs/m33.h"
+#include "pico/platform/cpu_regs.h"
 // ----------------------------------------------------
 // 00200 PICO_RUNTIME_INIT_PER_CORE_ENABLE_COPROCESSORS
 // ----------------------------------------------------
 void __weak runtime_init_per_core_enable_coprocessors(void) {
     // VFP copro (float)
-    uint32_t cpacr = M33_CPACR_CP10_BITS;
+    uint32_t cpacr = ARM_CPU_PREFIXED(CPACR_CP10_BITS);
 #if HAS_DOUBLE_COPROCESSOR
-    cpacr |= M33_CPACR_CP4_BITS;
+    cpacr |= ARM_CPU_PREFIXED(CPACR_CP4_BITS);
 #endif
 #if PICO_USE_GPIO_COPROCESSOR
-    cpacr |= M33_CPACR_CP0_BITS;
+    cpacr |= ARM_CPU_PREFIXED(CPACR_CP0_BITS);
 #endif
     arm_cpu_hw->cpacr |= cpacr;
 #if HAS_DOUBLE_COPROCESSOR

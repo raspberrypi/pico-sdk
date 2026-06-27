@@ -23,7 +23,7 @@ spin_lock_t _sw_spin_locks[NUM_SPIN_LOCKS];
 
 #if __ARM_ARCH_8M_MAIN__ && !PICO_SW_SPIN_LOCKS_NO_EXTEXCLALL
 #include "pico/runtime_init.h"
-#include "hardware/structs/m33.h"
+#include "pico/platform/cpu_regs.h"
 
 static void spinlock_set_extexclall(void) {
     // Force use of global exclusive monitor for all exclusive load/stores:
@@ -34,7 +34,7 @@ static void spinlock_set_extexclall(void) {
     // Shareable regions.
     //
     // Setting PICO_SW_SPIN_LOCKS_NO_EXTEXCLALL == 1 will disable this code
-    m33_hw->actlr |= M33_ACTLR_EXTEXCLALL_BITS;
+    arm_cpu_hw->actlr |= ARM_CPU_PREFIXED(ACTLR_EXTEXCLALL_BITS);
 }
 
 // PICO_RUNTIME_INIT_SPIN_LOCKS_RESET is fine as resetting them does not require EXTEXCLALL

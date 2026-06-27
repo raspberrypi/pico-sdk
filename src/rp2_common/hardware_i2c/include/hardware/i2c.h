@@ -148,9 +148,15 @@ void i2c_set_slave_mode(i2c_inst_t *i2c, bool slave, uint8_t addr);
 // ----------------------------------------------------------------------------
 // Generic input/output
 
+/*! \brief I2C controller instance
+ *  \ingroup hardware_i2c
+ *
+ * Represents a single I2C hardware controller instance, containing a pointer
+ * to the hardware registers and transfer state.
+ */
 struct i2c_inst {
-    i2c_hw_t *hw;
-    bool restart_on_next;
+    i2c_hw_t *hw;          ///< Pointer to the I2C hardware registers
+    bool restart_on_next;  ///< If true, the next transfer will begin with a Restart rather than a Start
 };
 
 /**

@@ -28,7 +28,19 @@
 // and is a no-op if set. We DO have a new `multicore_lockout_victim_deinit()` method, which can be called in a pinch after
 // the reset before calling `multicore_lockout_victim_init()` again, so that is good. We will reset the flag
 // for core1 in `multicore_reset_core1()` though as a convenience since most people will use that to reset core 1.
-static bool lockout_victim_initialized[NUM_CORES];
+
+#define CORE_STATUS_NOT_RUNNING         ((uint8_t)0)
+#if PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
+#define CORE_STATUS_LOCKOUT_DISABLED    ((uint8_t)1)
+#define CORE_STATUS_LOCKOUT_ENABLED     ((uint8_t)2)
+#else
+// we don't care about the distinction between NOT_RUNNING & LOCKOUT_DISABLED
+// when PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED == 0
+#define CORE_STATUS_LOCKOUT_DISABLED    CORE_STATUS_NOT_RUNNING
+#define CORE_STATUS_LOCKOUT_ENABLED     ((uint8_t)1)
+#endif
+
+static uint8_t core_status[NUM_CORES];
 
 void multicore_fifo_push_blocking(uint32_t data) {
     multicore_fifo_push_blocking_inline(data);
@@ -123,7 +135,7 @@ void multicore_reset_core1(void) {
     irq_set_enabled(irq_num, false);
 
     // Core 1 will be in un-initialized state
-    lockout_victim_initialized[1] = false;
+    core_status[1] = CORE_STATUS_NOT_RUNNING;
 
     // Bring core 1 back out of reset. It will drain its own mailbox FIFO, then push
     // a 0 to our mailbox to tell us it has done this.
@@ -176,7 +188,7 @@ void multicore_launch_core1(void (*entry)(void)) {
 void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vector_table) {
     // Allow for the fact that the caller may have already enabled the FIFO IRQ for their
     // own purposes (expecting FIFO content after core 1 is launched). We must disable
-    // the IRQ during the handshake, then restore afterwards.
+    // the IRQ during the handshake, then restore afterward.
     uint irq_num = SIO_FIFO_IRQ_NUM(0);
     bool enabled = irq_is_enabled(irq_num);
     irq_set_enabled(irq_num, false);
@@ -189,6 +201,9 @@ void multicore_launch_core1_raw(void (*entry)(void), uint32_t *sp, uint32_t vect
     const uint32_t cmd_sequence[] =
             {0, 0, 1, (uintptr_t) vector_table, (uintptr_t) sp, (uintptr_t) entry};
 
+#if PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
+    core_status[1] = CORE_STATUS_LOCKOUT_DISABLED; // we'll assume up front
+#endif
     uint seq = 0;
     do {
         uint cmd = cmd_sequence[seq];
@@ -249,23 +264,31 @@ void multicore_lockout_victim_init(void) {
     uint fifo_irq_this_core = SIO_FIFO_IRQ_NUM(core_num);
     irq_set_exclusive_handler(fifo_irq_this_core, multicore_lockout_handler);
     irq_set_enabled(fifo_irq_this_core, true);
-    lockout_victim_initialized[core_num] = true;
+    core_status[core_num] = CORE_STATUS_LOCKOUT_ENABLED;
 }
 
 void multicore_lockout_victim_deinit(void) {
     uint core_num = get_core_num();
-    if (lockout_victim_initialized[core_num]) {
+    if (core_status[core_num] == CORE_STATUS_LOCKOUT_ENABLED) {
         // On platforms other than RP2040, these are actually the same IRQ number
         // (each core only sees its own IRQ, always at the same IRQ number).
         uint fifo_irq_this_core = SIO_FIFO_IRQ_NUM(core_num);
         irq_remove_handler(fifo_irq_this_core, multicore_lockout_handler);
         irq_set_enabled(fifo_irq_this_core, false);
-        lockout_victim_initialized[core_num] = false;
+        core_status[core_num] = CORE_STATUS_LOCKOUT_DISABLED;
     }
 }
 
 static bool multicore_lockout_handshake(uint32_t request_id, absolute_time_t until) {
-    uint irq_num = SIO_FIFO_IRQ_NUM(get_core_num());
+    uint core_num = get_core_num();
+#if PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
+    if (!core_num && core_status[1] == CORE_STATUS_NOT_RUNNING) {
+        return true;
+    }
+#else
+    ((void)core_num); // SIO_FIFO_IRQ_NUM doesn't necessarily reference it
+#endif
+    uint irq_num = SIO_FIFO_IRQ_NUM(core_num);
     bool enabled = irq_is_enabled(irq_num);
     if (enabled) irq_set_enabled(irq_num, false);
     bool rc = false;
@@ -345,7 +368,17 @@ void multicore_lockout_end_blocking(void) {
 }
 
 bool multicore_lockout_victim_is_initialized(uint core_num) {
-    return lockout_victim_initialized[core_num];
+    return core_status[core_num] == CORE_STATUS_LOCKOUT_ENABLED;
+}
+
+bool multicore_lockout_ready(void) {
+    uint core_num = get_core_num();
+#if PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
+    if (!core_num && core_status[1] == CORE_STATUS_NOT_RUNNING) {
+        return true;
+    }
+#endif
+    return multicore_lockout_victim_is_initialized(core_num ^ 1);
 }
 
 #if NUM_DOORBELLS

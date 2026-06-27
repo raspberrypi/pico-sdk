@@ -29,15 +29,22 @@ extern "C" {
 
 #include "pico/lock_core.h"
 
+/*! \brief A multi-core and IRQ safe queue instance
+ *  \ingroup queue
+ *
+ * Stores a fixed number of elements of a fixed size. All operations are
+ * protected by a spinlock, making the queue safe to use from multiple cores
+ * and from interrupt handlers.
+ */
 typedef struct {
-    lock_core_t core;
-    uint8_t *data;
-    uint16_t wptr;
-    uint16_t rptr;
-    uint16_t element_size;
-    uint16_t element_count;
+    lock_core_t core; ///< Core lock state used for synchronisation
+    uint8_t *data; ///< Pointer to the backing data buffer
+    uint16_t wptr; ///< Write pointer (index of next slot to write)
+    uint16_t rptr; ///< Read pointer (index of next slot to read)
+    uint16_t element_size; ///< Size in bytes of each element
+    uint16_t element_count; ///< Maximum number of elements the queue can hold
 #if PICO_QUEUE_MAX_LEVEL
-    uint16_t max_level;
+    uint16_t max_level; ///< Highest number of elements seen in the queue since initialisation or last reset
 #endif
 } queue_t;
 

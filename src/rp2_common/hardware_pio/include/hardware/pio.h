@@ -305,10 +305,10 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  * state machine later using pio_sm_set_config() or pio_sm_init().
  */
 typedef struct {
-    uint32_t clkdiv;
-    uint32_t execctrl;
-    uint32_t shiftctrl;
-    uint32_t pinctrl;
+    uint32_t clkdiv;    ///< Clock divider register value
+    uint32_t execctrl;  ///< Execution control register value
+    uint32_t shiftctrl; ///< Shift control register value
+    uint32_t pinctrl;   ///< Pin control register value
 #if PICO_PIO_USE_GPIO_BASE
 #define PINHI_ALL_PINCTRL_LSBS ((1u << PIO_SM0_PINCTRL_IN_BASE_LSB) | (1u << PIO_SM0_PINCTRL_OUT_BASE_LSB) | \
                                (1u << PIO_SM0_PINCTRL_SET_BASE_LSB) | (1u << PIO_SM0_PINCTRL_SIDESET_BASE_LSB))
@@ -321,7 +321,7 @@ static_assert( (1u << PINHI_EXECCTRL_LSB) > (PINHI_ALL_PINCTRL_LSBS * 0x1f), "")
     // 0b00000 - pin is in range 0-15
     // 0b00001 - pin is in range 16-31
     // 0b00010 - pin is in range 32-47
-    uint32_t pinhi;
+    uint32_t pinhi;     ///< High bits encoding which 16-pin GPIO range each pin field belongs to (only present when PICO_PIO_USE_GPIO_BASE is set)
 #endif
 } pio_sm_config;
 
@@ -1147,11 +1147,19 @@ static inline void pio_set_sm_multi_mask_enabled(PIO pio, uint32_t mask_prev, ui
 }
 #endif
 
-/*! \brief Restart a state machine with a known state
+/*! \brief Restart a state machine with a known internal state
  *  \ingroup hardware_pio
  *
- * This method clears the ISR, shift counters, clock divider counter
- * pin write flags, delay counter, latched EXEC instruction, and IRQ wait condition.
+ * Clears the following on the selected state machine: input and output shift
+ * counters, the contents of the input shift register, the delay counter, the
+ * waiting-on-IRQ state, any stalled instruction written to `SMx_INSTR` or run
+ * by `OUT/MOV EXEC`, and any pin write left asserted due to `OUT_STICKY`.
+ *
+ * Not affected: the state machine's enable/running state (see
+ * \ref pio_sm_set_enabled), its program counter, the contents of its output
+ * shift register, and its X and Y scratch registers. To restart the clock
+ * divider use \ref pio_sm_clkdiv_restart; to set the program counter to a
+ * specific value, follow this call with a `JMP` via \ref pio_sm_exec.
  *
  * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
@@ -1162,14 +1170,16 @@ static inline void pio_sm_restart(PIO pio, uint sm) {
     hw_set_bits(&pio->ctrl, 1u << (PIO_CTRL_SM_RESTART_LSB + sm));
 }
 
-/*! \brief Restart multiple state machine with a known state
+/*! \brief Restart multiple state machines with a known internal state
  *  \ingroup hardware_pio
  *
- * This method clears the ISR, shift counters, clock divider counter
- * pin write flags, delay counter, latched EXEC instruction, and IRQ wait condition.
+ * Performs the same operation as \ref pio_sm_restart for each state machine
+ * selected in \p mask. See \ref pio_sm_restart for the exact list of internal
+ * state that is cleared and what is left untouched (notably, the enable/running
+ * state and program counter are preserved).
  *
  * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
- * \param mask bit mask of state machine indexes to modify the enabled state of
+ * \param mask bit mask of state machine indexes to restart (bit 0 = state machine 0, etc.)
  */
 static inline void pio_restart_sm_mask(PIO pio, uint32_t mask) {
     check_pio_param(pio);
@@ -1997,6 +2007,24 @@ void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pin_dirs, uint64_
  * \return PICO_OK (0) on success, error code otherwise
  */
 int pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pins_base, uint pin_count, bool is_out);
+
+/*! \brief Enable/disable the input synchronizer bypass for multiple pins for the PIO instance
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
+ * \param bypass_enables the values to set - 1 = enable bypass, 0 = disable bypass (if the corresponding bit in pin_mask is set)
+ * \param pin_mask a bit for each pin to indicate whether the corresponding bypass enable bit for that pin should be updated.
+ */
+void pio_set_input_sync_bypass_with_mask(PIO pio, uint32_t bypass_enables, uint32_t pin_mask);
+
+/*! \brief Enable/disable the input synchronizer bypass for multiple pins for the PIO instance
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
+ * \param bypass_enables the values to set - 1 = enable bypass, 0 = disable bypass (if the corresponding bit in pin_mask is set)
+ * \param pin_mask a bit for each pin to indicate whether the corresponding bypass enable bit for that pin should be updated.
+ */
+void pio_set_input_sync_bypass_with_mask64(PIO pio, uint64_t bypass_enables, uint64_t pin_mask);
 
 /*! \brief Mark a state machine as used
  *  \ingroup hardware_pio

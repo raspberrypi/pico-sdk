@@ -7,6 +7,10 @@
 #ifndef _PICO_TIME_ADAPTER_H
 #define _PICO_TIME_ADAPTER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef TA_NUM_TIMERS
 #define TA_NUM_TIMERS 1
 #endif
@@ -31,5 +35,9 @@ static inline uint64_t ta_time_us_64(__unused alarm_pool_timer_t *timer) {
 }
 alarm_pool_timer_t *ta_timer_instance(uint instance_num);
 alarm_pool_timer_t *ta_default_timer_instance(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

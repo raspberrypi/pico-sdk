@@ -95,9 +95,15 @@ typedef int (*rom_func_secure_call)(uintptr_t a0, ...);
 #endif
 
 #ifdef __riscv
+/*! \brief Stack descriptor passed to the bootrom for RISC-V Arm emulation
+ *  \ingroup pico_bootrom
+ *
+ * Specifies a region of RAM to use as the Arm emulation stack for the current core.
+ * The previous values are written back into this struct before the call returns.
+ */
 typedef struct {
-    uint32_t *base;
-    uint32_t size;
+    uint32_t *base; ///< Word-aligned base address of the stack region
+    uint32_t size;  ///< Size of the stack region in bytes (must be a multiple of 4)
 } bootrom_stack_t;
 // passed in, and out.
 typedef int (*rom_set_bootrom_stack_fn)(bootrom_stack_t *stack);
@@ -586,12 +592,18 @@ static inline void rom_flash_select_xip_read_mode(bootrom_xip_mode_t mode, uint8
     func(mode, clkdiv);
 }
 
+/*! \brief Parameters for the flash operation helper used with flash_safe_execute
+ *  \ingroup pico_bootrom
+ *
+ * Bundles the arguments for rom_flash_op so they can be passed through the
+ * flash_safe_execute callback interface as a single pointer.
+ */
 typedef struct {
-    cflash_flags_t flags;
-    uintptr_t addr;
-    uint32_t size_bytes;
-    uint8_t *buf;
-    int *res;
+    cflash_flags_t flags;  ///< Flags controlling the security level, address space, and flash operation
+    uintptr_t addr;        ///< Address of the first flash byte to be accessed
+    uint32_t size_bytes;   ///< Size of the buffer in bytes
+    uint8_t *buf;          ///< Buffer for data to be written to or read from flash
+    int *res;              ///< Pointer to store the return code from the flash operation
 } rom_helper_flash_op_params_t;
 
 static inline void rom_helper_flash_op(void *param) {
@@ -915,10 +927,16 @@ static inline int rom_chain_image(uint8_t *workarea_base, uint32_t workarea_size
     return rc;
 }
 
+/*! \brief Parameters for the explicit buy helper used with flash_safe_execute
+ *  \ingroup pico_bootrom
+ *
+ * Bundles the arguments for rom_explicit_buy so they can be passed through the
+ * flash_safe_execute callback interface as a single pointer.
+ */
 typedef struct {
-    uint8_t *buffer;
-    uint32_t buffer_size;
-    int *res;
+    uint8_t *buffer;      ///< Word-aligned base address of the scratch space buffer
+    uint32_t buffer_size; ///< Size of the scratch space buffer in bytes (at least 4 KiB)
+    int *res;             ///< Pointer to store the return code from the explicit buy operation
 } rom_helper_explicit_buy_params_t;
 
 static inline void rom_helper_explicit_buy(void *param) {
@@ -1070,18 +1088,24 @@ static inline int rom_get_sys_info(uint32_t *out_buffer, uint32_t out_buffer_wor
     return func(out_buffer, out_buffer_word_size, flags);
 }
 
+/*! \brief Boot information returned by the bootrom SYS_INFO_BOOT_INFO query
+ *  \ingroup pico_bootrom
+ *
+ * Contains details about the most recent boot, including the boot type, the
+ * partition that was booted, and any diagnostic or reboot parameters.
+ */
 typedef struct {
     union {
         struct __packed {
-            int8_t diagnostic_partition_index; // used BOOT_PARTITION constants
-            uint8_t boot_type;
-            int8_t partition;
-            uint8_t tbyb_and_update_info;
+            int8_t diagnostic_partition_index; ///< Partition index used for diagnostics; uses BOOT_PARTITION constants
+            uint8_t boot_type;                 ///< The type of boot that occurred (e.g. BOOT_TYPE_NORMAL, BOOT_TYPE_BOOTSEL)
+            int8_t partition;                  ///< The partition that was booted, or -1 if not applicable
+            uint8_t tbyb_and_update_info;      ///< Try-before-you-buy and flash update status flags
         };
-        uint32_t boot_word;
+        uint32_t boot_word; ///< The four boot fields packed into a single 32-bit word
     };
-    uint32_t boot_diagnostic;
-    uint32_t reboot_params[2];
+    uint32_t boot_diagnostic;   ///< Diagnostic word describing the outcome of the most recent boot attempt
+    uint32_t reboot_params[2];  ///< Parameters passed to the reboot call that initiated this boot
 } boot_info_t;
 
 static inline int rom_get_boot_info(boot_info_t *info) {

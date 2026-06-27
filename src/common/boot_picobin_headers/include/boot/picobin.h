@@ -147,16 +147,26 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/*! \brief A single entry in a PICOBIN load map
+ *  \ingroup boot_picobin_headers
+ *
+ * Describes the mapping of one contiguous region from its storage location to its runtime address.
+ */
 typedef struct {
     // these must all be word aligned
-    uint32_t storage_address_rel;
-    uint32_t runtime_address;
-    uint32_t size;
+    uint32_t storage_address_rel; ///< Storage address of the region - if absolute then an absolute address, otherwise relative to the address of the LOAD_MAP item containing this entry
+    uint32_t runtime_address;     ///< Target runtime address to which the region is loaded
+    uint32_t size;                ///< If absolute then the end of the runtime address region, otherwise the size of the region in bytes
 } picobin_load_map_entry;
 
+/*! \brief PICOBIN load map describing regions to copy from storage to RAM
+ *  \ingroup boot_picobin_headers
+ *
+ * Contains a header word followed by a variable-length array of load map entries.
+ */
 typedef struct {
-    uint32_t header;
-    picobin_load_map_entry entries[];
+    uint32_t header;                  ///< Encodes the item type, item size, entry count, and whether addresses are absolute or relative
+    picobin_load_map_entry entries[]; ///< Array of load map entries
 } picobin_load_map;
 
 static inline unsigned int picobin_load_map_entry_count(const picobin_load_map *lm) {
