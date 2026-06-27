@@ -1438,7 +1438,7 @@ static inline void pio_set_irq1_source_mask_enabled(PIO pio, uint32_t source_mas
  * \param enabled true to enable the source on the specified IRQ, false to disable.
  */
 static inline void pio_set_irqn_source_enabled(PIO pio, uint irq_index, pio_interrupt_source_t source, bool enabled) {
-    invalid_params_if(HARDWARE_PIO, irq_index > NUM_PIO_IRQS);
+    invalid_params_if(HARDWARE_PIO, irq_index >= NUM_PIO_IRQS);
     invalid_params_if(HARDWARE_PIO, source >= 32 || (1u << source) > PIO_INTR_BITS);
     if (enabled)
         hw_set_bits(&pio->irq_ctrl[irq_index].inte, 1u << source);
@@ -1455,7 +1455,7 @@ static inline void pio_set_irqn_source_enabled(PIO pio, uint irq_index, pio_inte
  * \param enabled true to enable all the sources specified in the mask on the specified IRQ, false to disable all the sources specified in the mask on the specified IRQ
  */
 static inline void pio_set_irqn_source_mask_enabled(PIO pio, uint irq_index, uint32_t source_mask, bool enabled) {
-    invalid_params_if(HARDWARE_PIO, irq_index > NUM_PIO_IRQS);
+    invalid_params_if(HARDWARE_PIO, irq_index >= NUM_PIO_IRQS);
     static_assert(NUM_PIO_IRQS == 2, "");
     invalid_params_if(HARDWARE_PIO, source_mask > PIO_INTR_BITS);
     if (enabled) {
