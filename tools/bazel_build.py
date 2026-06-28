@@ -134,6 +134,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_simple_overlay",
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
+                # No SW spinlocks on RP2040
+                "//test/pico_sync_test:pico_sync_test_sw",
             )
         ),
     },
@@ -176,6 +178,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_sha256_test:pico_sha256_test",
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
+                # No SW spinlocks on RP2040
+                "//test/pico_sync_test:pico_sync_test_sw",
             )
         ),
     },
