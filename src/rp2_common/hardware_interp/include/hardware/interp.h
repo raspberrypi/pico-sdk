@@ -350,8 +350,8 @@ void interp_restore(interp_hw_t *interp, interp_hw_save_t *saver);
  * \param index The base register index, 0 or 1 or 2
  * \param val The value to apply to the register
  */
-static inline void interp_set_base(interp_hw_t *interp, uint lane, uint32_t val) {
-    interp->base[lane] = val;
+static inline void interp_set_base(interp_hw_t *interp, uint index, uint32_t val) {
+    interp->base[index] = val;
 }
 
 /*! \brief Gets the content of interpolator base register by index
@@ -361,8 +361,8 @@ static inline void interp_set_base(interp_hw_t *interp, uint lane, uint32_t val)
  * \param lane The base register index, 0 or 1 or 2
  * \return  The current content of the base register
  */
-static inline uint32_t interp_get_base(interp_hw_t *interp, uint lane) {
-    return interp->base[lane];
+static inline uint32_t interp_get_base(interp_hw_t *interp, uint index) {
+    return interp->base[index];
 }
 
 /*! \brief Sets the interpolator base registers simultaneously
