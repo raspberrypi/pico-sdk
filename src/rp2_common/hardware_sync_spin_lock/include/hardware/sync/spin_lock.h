@@ -169,6 +169,9 @@ typedef SW_SPIN_LOCK_TYPE spin_lock_t;
     );                                                         \
     __mem_fence_acquire();                                     \
     })
+#if PICO_RP2350
+#define PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV 1
+#endif
 #elif __riscv && (defined(__riscv_a) || defined(__riscv_zaamo))
 #define SW_SPIN_LOCK_LOCK(lock) ({                                              \
     uint32_t _tmp0, _tmp1;                                                      \

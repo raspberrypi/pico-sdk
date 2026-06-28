@@ -19,7 +19,8 @@ but not sure that is implemented yet.
 
 #define PICOTEST_START() printf("Starting Picotest for %s\n", picotest_description);
 
-#define PICOTEST_START_SECTION(NAME) if (1) {const char *picotest_section_name=NAME; picotest_error_code = 0;
+#define PICOTEST_START_SECTION(NAME) if (1) {const char *picotest_section_name=NAME; picotest_error_code = 0; \
+                                     printf("Module %s: Section %s: ...\n", picotest_module, picotest_section_name);
 
 #define PICOTEST_END_SECTION() if (picotest_error_code != 0) {                                      \
                                     printf("Module %s: Section %s : Failed test\n", picotest_module, picotest_section_name);\
