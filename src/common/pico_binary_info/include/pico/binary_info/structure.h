@@ -155,7 +155,7 @@ typedef struct __packed _binary_info_block_device {
 #define BI_PINS_ENCODING_RANGE 1
 #define BI_PINS_ENCODING_MULTI 2
 
-/*! \brief Binary info entry describing one or more GPIO pins and their assigned function
+/*! \brief Binary info entry describing one or more GPIO pins and their assigned function, supporting pin numbers <32, and up to 5 pins
  *  \ingroup pico_binary_info
  */
 typedef struct __packed _binary_info_pins_with_func {
