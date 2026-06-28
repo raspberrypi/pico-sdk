@@ -6,7 +6,7 @@
 
 #include "pico/lock_core.h"
 
-#if PICO_SYNC_RP2350_SPINLOCK_WORKAROUND
+#if PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND
 volatile uint8_t lock_internal_notify_count;
 #endif
 
