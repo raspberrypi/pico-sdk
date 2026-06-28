@@ -140,7 +140,7 @@ string_flag(
     ],
 )
 
-# PICO_BAZEL_CONFIG: PICO_DEFAULT_PRINTF_IMPL, The default implementation for pico_printf to link. compiler lets the compiler control printf behavior while pico provides a compact pico-specific implementation, type=string, default=pico, group=pico_printf
+# PICO_BAZEL_CONFIG: PICO_DEFAULT_PRINTF_IMPL, The default implementation for pico_printf to link. 'compiler' lets the compiler control printf behavior while 'pico' provides a compact pico-specific implementation, type=string, default=pico, group=pico_printf
 string_flag(
     name = "PICO_DEFAULT_PRINTF_IMPL",
     build_setting_default = "pico",

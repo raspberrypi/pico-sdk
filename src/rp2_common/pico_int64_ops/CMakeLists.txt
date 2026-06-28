@@ -14,7 +14,7 @@ if (NOT TARGET pico_int64_ops)
         target_link_libraries(pico_int64_ops_default INTERFACE pico_int64_ops_compiler)
     endif()
 
-    pico_fixup_default_impl(PICO_DEFAULT_DIVIDER_IMPL pico_divider_ default)
+    pico_fixup_default_impl(PICO_DEFAULT_INT64_OPS_IMPL pico_int64_ops_ default)
 
     target_link_libraries(pico_int64_ops INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_INT64_OPS_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_INT64_OPS_IMPL>,${PICO_DEFAULT_INT64_OPS_IMPL}>)

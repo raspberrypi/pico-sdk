@@ -197,7 +197,7 @@ endfunction()
 
 # e.g. pico_fixup_default_impl PICO_DEFAULT_FLOAT_IMPL pico_float_ default)
 # if the passed variable is undefined it will set it to the default value, and then if not already prefixed
-# will prefend the prefix
+# will prepend the prefix
 function(pico_fixup_default_impl DEFAULT_IMPL_VAR_NAME PREFIX DEFAULT_VALUE)
     if (NOT ${DEFAULT_IMPL_VAR_NAME})
         set(${DEFAULT_IMPL_VAR_NAME} "${DEFAULT_VALUE}")
