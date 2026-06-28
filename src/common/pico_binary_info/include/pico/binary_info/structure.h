@@ -165,7 +165,7 @@ typedef struct __packed _binary_info_pins_with_func {
     uint32_t pin_encoding;          ///< Encoded pin numbers and function (see BI_PINS_ENCODING_* for format)
 } binary_info_pins_with_func_t;
 
-/*! \brief Binary info entry describing one or more GPIO pins (more than 32) and their assigned function
+/*! \brief Binary info entry describing one or more GPIO pins and their assigned function, supporting pin numbers <256, and up to 7 pins
  *  \ingroup pico_binary_info
  */
 typedef struct __packed _binary_info_pins64_with_func {
