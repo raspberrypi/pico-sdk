@@ -8,7 +8,7 @@
 #define _HARDWARE_IRQ_H
 
 // These two config items are also used by assembler, so keeping separate
-// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum number of shared IRQ handlers, default=4, advanced=true, group=hardware_irq
+// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum number of shared IRQ handlers, default=6 if using stdio_usb otherwise 4, advanced=true, group=hardware_irq
 #ifndef PICO_MAX_SHARED_IRQ_HANDLERS
 #define _PICO_MAX_SHARED_IRQ_HANDLERS 4
 #if LIB_PICO_STDIO_USB
