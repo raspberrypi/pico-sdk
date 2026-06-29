@@ -1,4 +1,5 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -6,6 +7,7 @@ cc_binary(
     name = "pico_sync_test_hw",
     testonly = True,
     srcs = ["pico_sync_test.c"],
+    target_compatible_with = compatible_with_rp2(),
     defines = [
         "PICO_USE_SW_SPIN_LOCKS=0",
     ],
