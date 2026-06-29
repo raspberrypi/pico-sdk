@@ -7,10 +7,10 @@ cc_binary(
     name = "pico_sync_test_hw",
     testonly = True,
     srcs = ["pico_sync_test.c"],
-    target_compatible_with = compatible_with_rp2(),
     defines = [
         "PICO_USE_SW_SPIN_LOCKS=0",
     ],
+    target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/common/pico_sync",
         "//test/pico_test",
