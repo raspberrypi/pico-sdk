@@ -94,7 +94,7 @@ http_archive(
 http_archive(
     name = "clang_mac-aarch64",
     build_file = "//bazel/toolchain:clang.BUILD",
-    sha256 = "717d41447ff1a947dd376feddb9798155b575f7e642a5cd4582d0f3dad9067d4",
+    sha256 = "7c27b1e73cc98c547fdfb104f7071ff29ba1ef132b0e9f8cf802222db480e771",
     type = "zip",
     url = "https://chrome-infra-packages.appspot.com/dl/fuchsia/third_party/clang/mac-arm64/+/git_revision:9431920bfaee50f4b1552fc01ea081a5c18a5a3b",
 )
