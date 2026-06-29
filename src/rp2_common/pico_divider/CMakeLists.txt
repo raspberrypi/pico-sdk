@@ -20,7 +20,7 @@ if (NOT TARGET pico_divider)
     target_link_libraries(pico_divider_default INTERFACE pico_divider_pico)
 
     # PICO_CMAKE_CONFIG: PICO_DEFAULT_DIVIDER_IMPL, The default implementation for pico_divider to link. 'pico' selects the fastest implementation for the current platform; 'hardware' selects the hardware divider on RP2040; 'compiler' uses the default compiler/C library versions, type=string, default=pico, group=pico_divider
-    pico_fixup_default_impl(PICO_DEFAULT_DIVIDER_IMPL pico_divider_ default)
+    pico_fixup_default_impl(PICO_DEFAULT_DIVIDER_IMPL pico_divider default)
 
     target_link_libraries(pico_divider INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_DIVIDER_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_DIVIDER_IMPL>,${PICO_DEFAULT_DIVIDER_IMPL}>)

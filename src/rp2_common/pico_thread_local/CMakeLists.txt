@@ -15,7 +15,7 @@ target_include_directories(pico_thread_local_per_thread SYSTEM INTERFACE ${CMAKE
 target_compile_definitions(pico_thread_local_per_thread INTERFACE PICO_THREAD_LOCAL_MODE_PER_THREAD=1)
 
 # PICO_CMAKE_CONFIG: PICO_DEFAULT_THREAD_LOCAL_IMPL, The default implementation for pico_thread_local to link; 'per_thread' provides per thread locals while 'global' provides shared global values and 'none' makes thread local behavior undefined to save space in the binary, type=string, default=per_thread, group=pico_thread_local
-pico_fixup_default_impl(PICO_DEFAULT_THREAD_LOCAL_IMPL pico_thread_local_ per_thread)
+pico_fixup_default_impl(PICO_DEFAULT_THREAD_LOCAL_IMPL pico_thread_local per_thread)
 
 pico_add_library(pico_thread_local NOFLAG)
 target_link_libraries(pico_thread_local INTERFACE
