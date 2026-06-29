@@ -42,7 +42,7 @@ typedef struct _binary_info_core binary_info_t;
 // note plan is to reserve c1 = 0->31 for "collision tags"; i.e.
 // for which you should always use random IDs with the binary_info,
 // giving you 4 + 8 + 32 = 44 bits to avoid collisions
-#define BINARY_INFO_MAKE_TAG(c1, c2) ((((unsigned int)c2&0xffu)<<8u)|((unsigned int)c1&0xffu))
+#define BINARY_INFO_MAKE_TAG(c1, c2) ((uint16_t)((((c2)&0xffu)<<8u)|((c1)&0xffu)))
 
 // Raspberry Pi defined. do not use
 #define BINARY_INFO_TAG_RASPBERRY_PI BINARY_INFO_MAKE_TAG('R','P')
