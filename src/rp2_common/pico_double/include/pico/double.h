@@ -26,19 +26,19 @@
 * 2. `compiler` - no custom functions are provided; all double-precision floating point is handled by the C compiler/library
 * 3. `pico` - the smallest and fastest available for the platform, along with additional functionality (e.g. fixed point conversions) which are detailed below
 *
-* The user can control which version they want (e.g. pico_double 'compiler' by either setting the CMake global variable
+* The user can control which version they want (e.g. pico_double `compiler` by either setting the CMake global variable
 * `PICO_DEFAULT_DOUBLE_IMPL=compiler`, or by using the CMake function `pico_set_double_implementation(<TARGET> compiler)`. Note that in the absence
-* of either, pico_double 'pico' is used by default.
+* of either, pico_double `pico` is used by default.
 *
 * \if rp2040_specific
-* On RP2040, `pco_double `pico` uses optimized hand coded implementations from the bootrom and the SDK for both
+* On RP2040, pico_double `pico` uses optimized hand coded implementations from the bootrom and the SDK for both
 * basic double-precision floating point operations and floating point math library functions. These implementations
 * are generally faster and smaller than those provided by the C compiler/library, though they don't support all the features of a fully compliant
 * floating point implementation; they are however usually fine for the majority of cases
 * \endif
 *
 * \if rp2350_specific
-* On RP2350, pico_double `pico` uses RP2350 DCP instructions (double co-processor) to implement fast version of the basic
+* On RP2350, pico_double `pico` uses RP2350 DCP instructions (double co-processor) to implement fast versions of the basic
 * arithmetic functions, and provides optimized M33 implementations of trignometric and scientific functions.
 * These implementations are generally faster and smaller than those provided by the C compiler/library, though they don't support all the features of a fully compliant
 * floating point implementation; they are however usually fine for the majority of cases
@@ -123,7 +123,7 @@
 *
 *   mla/fma_fast
 *
-* On RISC-V there is no custom double-precision floating point support, so pico_double `pico` is equivalent to `pico_double_compiler`
+* On RISC-V there is no custom double-precision floating point support, so pico_double `pico` is equivalent to pico_double `compiler`
 * \endif
 */
 

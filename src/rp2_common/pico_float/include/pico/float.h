@@ -28,7 +28,7 @@
 *
 * The user can control which version they want (e.g. pico_float `compiler` by either setting the CMake global variable
 * `PICO_DEFAULT_FLOAT_IMPL=xxx`, or by using the CMake function `pico_set_float_implementation(<TARGET> xxx)`. Note that in the absence
-* of either, pico_float_pico is used by default.
+* of either, pico_float `pico` is used by default.
 *
 * \if rp2040_specific
 * On RP2040, pico_float `pico` uses optimized hand coded implementations from the bootrom and the SDK for both
@@ -45,7 +45,7 @@
 * No DCP (RP2350 Double co-processor) instructions are used.
 * 2. pico_float `pico_dcp` - this library prevents the compiler injecting inlined VFP code, and also implements
 * all single-precision floating point operations in optimized DCP or M33 code. This option is not quite as fast
-* as pico_float_pico_vfp, however it allows floating point operations without enabling the floating point co-processor
+* as pico_float `pico_vfp`, however it allows floating point operations without enabling the floating point co-processor
 * on the CPU; this can be beneficial in certain circumstances, e.g. where leaving stack in tasks or interrupts
 * for the floating point state is undesirable.
 *
