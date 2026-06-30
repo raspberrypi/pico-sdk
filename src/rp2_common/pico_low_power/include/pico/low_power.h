@@ -226,6 +226,7 @@ static inline int low_power_set_external_clock_source(__unused uint src_hz, __un
  * \if rp2040_specific
  * If the clock source is set to DORMANT_CLOCK_SOURCE_RTC, all clocks will be switched to the ROSC while dormant so
  * they can be stopped, except clk_rtc which will be run from the XOSC so that it continues running for the timer.
+ * In this case the XOSC will not be stopped.
  *
  * Otherwise, this requires an external clock source to be set using \ref low_power_set_external_clock_source before
  * calling this function. If the external clock source is not set, or it is not running, this will return
