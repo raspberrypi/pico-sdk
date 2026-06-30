@@ -73,7 +73,7 @@ static_assert(SIO_IRQ_PROC1 == SIO_IRQ_PROC0 + 1, "");
  *
  * This function can be used to reset core 1 into its initial state (ready for launching code against via \ref multicore_launch_core1 and similar methods)
  *
- * \note this function should only be called from core 0
+ * \note This function should only be called from core 0
  */
 void multicore_reset_core1(void);
 
@@ -470,7 +470,7 @@ void multicore_lockout_victim_deinit(void);
 /*! \brief Determine if \ref multicore_lockout_victim_init() has been called on the specified core.
  *  \ingroup multicore_lockout
  *
- * \note this state persists even if the core is subsequently reset (other than via  reset via pico_multicore_reset_core1);
+ * \note This state persists even if the core is subsequently reset (other than via  reset via pico_multicore_reset_core1);
  * therefore you are advised to always call \ref multicore_lockout_victim_init() again after resetting a core, which had previously
  * been initialized.
  *
@@ -484,7 +484,7 @@ bool multicore_lockout_victim_is_initialized(uint core_num);
  *
  * \return true if \ref multicore_lockout_start_blocking() and \ref multicore_lockout_start_timeout_us() may safely be called from this core
  *
- * \note that when PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED=1 this returns true when called from core 0 if core 1 has
+ * \note When PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED=1 this returns true when called from core 0 if core 1 has
  * not been launched via a multicore_launch_core1 function, or has since been reset via \ref multicore_reset_core1. Otherwise, it returns
  * the same value as `multicore_lockout_victim_is_initialized(other_core)`. This behavior is intended to make it easier
  * for applications which may want to perform operations on core 0, but may or may not yet have launched core 1.

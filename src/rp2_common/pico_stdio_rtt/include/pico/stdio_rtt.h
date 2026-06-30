@@ -31,14 +31,14 @@ extern stdio_driver_t stdio_rtt;
 /*! \brief Explicitly initialize stdin/stdout over RTT and add it to the current set of stdin/stdout drivers
  *  \ingroup pico_stdio_rtt
  *
- * \note this method is automatically called by \ref stdio_init_all() if `pico_stdio_rtt` is included in the build
+ * \note This method is automatically called by \ref stdio_init_all() if `pico_stdio_rtt` is included in the build
  */
 void stdio_rtt_init(void);
 
 /*! \brief Explicitly deinitialize stdin/stdout over RTT and remove it from the current set of stdin/stdout drivers
  *  \ingroup pico_stdio_rtt
  *
- * \note this method is automatically called by \ref stdio_deinit_all() if `pico_stdio_rtt` is included in the build
+ * \note This method is automatically called by \ref stdio_deinit_all() if `pico_stdio_rtt` is included in the build
  */
 void stdio_rtt_deinit(void);
 

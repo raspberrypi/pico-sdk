@@ -10,7 +10,7 @@
 /** \file pico/async_context.h
  *  \defgroup async_context_threadsafe_background async_context_threadsafe_background
  *  \ingroup pico_async_context
- *  
+ *
  * \brief async_context_threadsafe_background provides an implementation of \ref async_context that handles asynchronous
  * work in a low priority IRQ, and there is no need for the user to poll for work
  *
@@ -43,7 +43,7 @@ typedef struct async_context_threadsafe_background_config {
     /**
      * \brief a specific alarm pool to use (or NULL to use ta default)
      *
-     * \note this alarm pool MUST be on the same core as the async_context
+     * \note This alarm pool MUST be on the same core as the async_context
      *
      * The default alarm pool used is the "default alarm pool" (see
      * \ref alarm_pool_get_default()) if available, and if that is on the same
@@ -80,7 +80,7 @@ struct async_context_threadsafe_background {
  *
  * If this method succeeds (returns true), then the async_context is available for use
  * and can be de-initialized by calling async_context_deinit().
- * 
+ *
  * \param self a pointer to async_context_threadsafe_background structure to initialize
  * \param config the configuration object specifying characteristics for the async_context
  * \return true if initialization is successful, false otherwise
@@ -88,7 +88,7 @@ struct async_context_threadsafe_background {
 bool async_context_threadsafe_background_init(async_context_threadsafe_background_t *self, async_context_threadsafe_background_config_t *config);
 
 /*!
- * \brief Return a copy of the default configuration object used by \ref async_context_threadsafe_background_init_with_defaults() 
+ * \brief Return a copy of the default configuration object used by \ref async_context_threadsafe_background_init_with_defaults()
  * \ingroup async_context_threadsafe_background
  *
  * The caller can then modify just the settings it cares about, and call \ref async_context_threadsafe_background_init()
@@ -102,7 +102,7 @@ async_context_threadsafe_background_config_t async_context_threadsafe_background
  *
  * If this method succeeds (returns true), then the async_context is available for use
  * and can be de-initialized by calling async_context_deinit().
- * 
+ *
  * \param self a pointer to async_context_threadsafe_background structure to initialize
  * \return true if initialization is successful, false otherwise
  */

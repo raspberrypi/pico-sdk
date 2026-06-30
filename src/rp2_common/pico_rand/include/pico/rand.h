@@ -31,7 +31,7 @@ extern "C" {
  *    \ref PICO_RAND_ROSC_BIT_SAMPLE_COUNT bits are gathered from the ring oscillator "random bit" and mixed in each
  *    time. This should not be used if the ROSC is off, or the processor is running from
  *    the ROSC.
- *    \note the maximum throughput of ROSC bit sampling is controlled by PICO_RAND_MIN_ROSC_BIT_SAMPLE_TIME_US which defaults
+ *    \note The maximum throughput of ROSC bit sampling is controlled by PICO_RAND_MIN_ROSC_BIT_SAMPLE_TIME_US which defaults
  *    to 10us, i.e. 100,000 bits per second.
  *  - Time (\ref PICO_RAND_ENTROPY_SRC_TIME == 1): The 64-bit microsecond timer is mixed in each time.
  *  - Bus Performance Counter (\ref PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER == 1): One of the bus fabric's performance

@@ -101,7 +101,7 @@ static inline int getchar_timeout_us(uint32_t timeout_us) {
 /*! \brief Adds or removes a driver from the list of active drivers used for input/output
  * \ingroup pico_stdio
  *
- * \note this method should always be called on an initialized driver and is not re-entrant
+ * \note This method should always be called on an initialized driver and is not re-entrant
  * \param driver the driver
  * \param enabled true to add, false to remove
  */
@@ -110,7 +110,7 @@ void stdio_set_driver_enabled(stdio_driver_t *driver, bool enabled);
 /*! \brief Control limiting of output to a single driver
  * \ingroup pico_stdio
  *
- * \note this method should always be called on an initialized driver
+ * \note This method should always be called on an initialized driver
  *
  * \param driver if non-null then output only that driver will be used for input/output (assuming it is in the list of enabled drivers).
  *               if NULL then all enabled drivers will be used
@@ -120,7 +120,7 @@ void stdio_filter_driver(stdio_driver_t *driver);
 /*! \brief control conversion of line feeds to carriage return on transmissions
  * \ingroup pico_stdio
  *
- * \note this method should always be called on an initialized driver
+ * \note This method should always be called on an initialized driver
  *
  * \param driver the driver
  * \param translate If true, convert line feeds to carriage return on transmissions

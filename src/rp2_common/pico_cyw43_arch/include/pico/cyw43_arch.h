@@ -122,7 +122,7 @@ extern "C" {
  *    Calls into the \c cyw43_driver high level API (cyw43.h) may be made from any task or from lwIP callbacks, but not from IRQs. Calls into the lwIP RAW API (which is not thread safe)
  *    must be bracketed with \ref cyw43_arch_lwip_begin and \ref cyw43_arch_lwip_end. It is fine to bracket calls made from within lwIP callbacks too; you just don't have to.
  *
- *    \note this wrapper library requires you to link FreeRTOS functionality with your application yourself.
+ *    \note This wrapper library requires you to link FreeRTOS functionality with your application yourself.
  *
  * * \b pico_cyw43_arch_none - If you do not need the TCP/IP stack but wish to use the on-board LED.
  *
@@ -161,7 +161,7 @@ extern "C" {
  * was enabled at build time). This method must be called prior to using any other \c pico_cyw43_arch,
  * \c cyw43_driver or lwIP functions.
  *
- * \note this method initializes wireless with a country code of \c PICO_CYW43_ARCH_DEFAULT_COUNTRY_CODE
+ * \note This method initializes wireless with a country code of \c PICO_CYW43_ARCH_DEFAULT_COUNTRY_CODE
  * which defaults to \c CYW43_COUNTRY_WORLDWIDE. Worldwide settings may not give the best performance; consider
  * setting PICO_CYW43_ARCH_DEFAULT_COUNTRY_CODE to a different value or calling \ref cyw43_arch_init_with_country
  *
@@ -266,7 +266,7 @@ void cyw43_arch_wait_for_work_until(absolute_time_t until);
  * If you are using single-core polling only (pico_cyw43_arch_poll) then these calls are no-ops
  * anyway it is good practice to call them anyway where they are necessary.
  *
- * \note as of SDK release 1.5.0, this is now equivalent to calling \ref async_context_acquire_lock_blocking
+ * \note As of SDK release 1.5.0, this is now equivalent to calling \ref async_context_acquire_lock_blocking
  * on the async_context associated with cyw43_arch and lwIP.
  *
  * \sa cyw43_arch_lwip_end
@@ -289,7 +289,7 @@ static inline void cyw43_arch_lwip_begin(void) {
  * If you are using single-core polling only (pico_cyw43_arch_poll) then these calls are no-ops
  * anyway it is good practice to call them anyway where they are necessary.
  *
- * \note as of SDK release 1.5.0, this is now equivalent to calling \ref async_context_release_lock
+ * \note As of SDK release 1.5.0, this is now equivalent to calling \ref async_context_release_lock
  * on the async_context associated with cyw43_arch and lwIP.
  *
  * \sa cyw43_arch_lwip_begin
@@ -336,7 +336,7 @@ static inline int cyw43_arch_lwip_protect(int (*func)(void *param), void *param)
  * This method will assert in debug mode, if the above conditions are not met (i.e. it is not safe to
  * call into the lwIP API)
  *
- * \note as of SDK release 1.5.0, this is now equivalent to calling \ref async_context_lock_check
+ * \note As of SDK release 1.5.0, this is now equivalent to calling \ref async_context_lock_check
  * on the async_context associated with cyw43_arch and lwIP.
  *
  * \sa cyw43_arch_lwip_begin
@@ -381,7 +381,7 @@ void cyw43_arch_disable_sta_mode(void);
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
  */
 void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t auth);
-    
+
 /*!
  * \brief Disables Wi-Fi AP (Access point) mode.
  * \ingroup pico_cyw43_arch
@@ -492,7 +492,7 @@ int cyw43_arch_wifi_connect_bssid_async(const char *ssid, const uint8_t *bssid, 
 /*!
  * \brief Set a GPIO pin on the wireless chip to a given value
  * \ingroup pico_cyw43_arch
- * \note this method does not check for errors setting the GPIO. You can use the lower level \ref cyw43_gpio_set instead if you wish
+ * \note This method does not check for errors setting the GPIO. You can use the lower level \ref cyw43_gpio_set instead if you wish
  * to check for errors.
  *
  * \param wl_gpio the GPIO number on the wireless chip
@@ -503,7 +503,7 @@ void cyw43_arch_gpio_put(uint wl_gpio, bool value);
 /*!
  * \brief Read the value of a GPIO pin on the wireless chip
  * \ingroup pico_cyw43_arch
- * \note this method does not check for errors setting the GPIO. You can use the lower level \ref cyw43_gpio_get instead if you wish
+ * \note This method does not check for errors setting the GPIO. You can use the lower level \ref cyw43_gpio_get instead if you wish
  * to check for errors.
  *
  * \param wl_gpio the GPIO number on the wireless chip
