@@ -65,6 +65,16 @@ int main() {
         } else {
             printf("ERROR: Woken up from Pstate\n");
         }
+#else
+        printf("Going dormant from the RTC for %dms\n", SLEEP_TIME_MS);
+        gpio_put(SLEEP_MONITOR_PIN, 0);
+        ret = low_power_dormant_for_ms(SLEEP_TIME_MS, DORMANT_CLOCK_SOURCE_RTC, NULL);
+        gpio_put(SLEEP_MONITOR_PIN, 1);
+        if (ret != PICO_OK) {
+            printf("ERROR: low_power_dormant_for_ms returned %d\n", ret);
+        } else {
+            printf("Woken up\n");
+        }
 #endif
     }
 

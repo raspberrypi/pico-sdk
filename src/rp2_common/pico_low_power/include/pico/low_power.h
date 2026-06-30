@@ -108,7 +108,9 @@ extern "C" {
 typedef enum {
     DORMANT_CLOCK_SOURCE_XOSC,
     DORMANT_CLOCK_SOURCE_ROSC,
-#if !PICO_RP2040
+#if PICO_RP2040
+    DORMANT_CLOCK_SOURCE_RTC,
+#else
     DORMANT_CLOCK_SOURCE_LPOSC,
 #endif
     NUM_DORMANT_CLOCK_SOURCES
@@ -222,13 +224,17 @@ static inline int low_power_set_external_clock_source(__unused uint src_hz, __un
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
  *
  * \if rp2040_specific
- * This requires an external clock source to be set using \ref low_power_set_external_clock_source before calling this function.
- * If the external clock source is not set, or it is not running, this will return PICO_ERROR_PRECONDITION_NOT_MET.
+ * If the clock source is set to DORMANT_CLOCK_SOURCE_RTC, all clocks will be switched to the ROSC while dormant so
+ * they can be stopped, except clk_rtc which will be run from the XOSC so that it continues running for the timer.
+ *
+ * Otherwise, this requires an external clock source to be set using \ref low_power_set_external_clock_source before
+ * calling this function. If the external clock source is not set, or it is not running, this will return
+ * PICO_ERROR_PRECONDITION_NOT_MET.
  * \endif
  *
  * \if (!rp2040_specific || combined_docs)
- * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be switched to the ROSC while dormant so
- * it can be stopped, while clk_ref will be run from the LPOSC so that it continues running for the timer.
+ * The clock source must be set to DORMANT_CLOCK_SOURCE_LPOSC, which means clk_sys will be switched to the ROSC while
+ * dormant so it can be stopped, while clk_ref will be run from the LPOSC so that it continues running for the timer.
  * \endif
  *
  * \param until The time to go dormant until.
@@ -243,6 +249,12 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
  *
  * Go dormant until the given GPIO pin changes state.
  * The clocks specified in keep_enabled will be kept enabled during dormant, but XOSC and ROSC will be stopped.
+ * 
+ * \if rp2040_specific
+ * If the clock source is set to DORMANT_CLOCK_SOURCE_RTC, all clocks will be switched to the ROSC while dormant so
+ * they can be stopped, except clk_rtc which will be run from the XOSC. For the lowest power consumption, you should use
+ * DORMANT_CLOCK_SOURCE_ROSC instead, as the GPIO interrupt does not require a clock.
+ * \endif
  *
  * \if (!rp2040_specific || combined_docs)
  * If the clock source is set to DORMANT_CLOCK_SOURCE_LPOSC, clk_sys will be run from the ROSC while dormant so
