@@ -225,26 +225,22 @@ int low_power_set_external_clock_source(uint src_hz, uint gpio_pin) {
 #endif  // inline in header for other platforms
 
 void low_power_set_pins_low_leakage(uint32_t exclude_mask) {
-    uint32_t include_mask = ~exclude_mask;
-    gpio_set_dir_masked(include_mask, 0);
     for (uint i=0; i < NUM_BANK0_GPIOS; i++) {
         if (exclude_mask & (1u << i)) continue;
-        gpio_set_function(i, GPIO_FUNC_SIO);
         gpio_disable_pulls(i);
         gpio_set_input_enabled(i, false);
+        gpio_set_oeover(i, IO_BANK0_GPIO0_CTRL_OEOVER_VALUE_DISABLE);
     }
 }
 
 // this function is provided (in low_power.h) as an inlined call to the 32 bit version if we have <= 32 GPIOs
 #if NUM_BANK0_GPIOS > 32
 void low_power_set_pins_low_leakage64(uint64_t exclude_mask) {
-    uint64_t include_mask = ~exclude_mask;
-    gpio_set_dir_masked64(include_mask, 0);
     for (uint i=0; i < NUM_BANK0_GPIOS; i++) {
         if (exclude_mask & (1ull << i)) continue;
-        gpio_set_function(i, GPIO_FUNC_SIO);
         gpio_disable_pulls(i);
         gpio_set_input_enabled(i, false);
+        gpio_set_oeover(i, IO_BANK0_GPIO0_CTRL_OEOVER_VALUE_DISABLE);
     }
 }
 #endif
