@@ -42,7 +42,7 @@ SPDX-License-Identifier: BSD-3-Clause
         <vtorPresent>1</vtorPresent>
         <nvicPrioBits>2</nvicPrioBits>
         <vendorSystickConfig>false</vendorSystickConfig>
-        <deviceNumInterrupts>26</deviceNumInterrupts>
+        <deviceNumInterrupts>32</deviceNumInterrupts>
     </cpu>
     <addressUnitBits>8</addressUnitBits>
     <peripherals>
@@ -51006,6 +51006,20 @@ SPDX-License-Identifier: BSD-3-Clause
     <peripheral>
         <name>VIRTUAL</name>
         <baseAddress>0x00000000</baseAddress>
+        <addressBlock>
+            <offset>0</offset>
+            <size>4</size>
+            <usage>registers</usage>
+        </addressBlock>
+        <registers>
+            <register>
+              <name>DUMMY</name>
+              <description>Dummy register for schema compliance</description>
+              <addressOffset>0x0</addressOffset>
+              <access>read-only</access>
+              <resetValue>0x00000000</resetValue>
+            </register>
+        </registers>
         <interrupt>
             <name>SPARE_IRQ_0</name>
             <value>26</value>

@@ -105722,6 +105722,20 @@ SPDX-License-Identifier: BSD-3-Clause
     <peripheral>
         <name>VIRTUAL</name>
         <baseAddress>0x00000000</baseAddress>
+        <addressBlock>
+            <offset>0</offset>
+            <size>4</size>
+            <usage>registers</usage>
+        </addressBlock>
+        <registers>
+            <register>
+              <name>DUMMY</name>
+              <description>Dummy register for schema compliance</description>
+              <addressOffset>0x0</addressOffset>
+              <access>read-only</access>
+              <resetValue>0x00000000</resetValue>
+            </register>
+        </registers>
         <interrupt>
             <name>PROC0_IRQ_CTI</name>
             <value>40</value>
