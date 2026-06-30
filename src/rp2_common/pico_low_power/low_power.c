@@ -241,7 +241,7 @@ void low_power_set_pins_low_leakage64(uint64_t exclude_mask) {
     uint64_t include_mask = ~exclude_mask;
     gpio_set_dir_masked64(include_mask, 0);
     for (uint i=0; i < NUM_BANK0_GPIOS; i++) {
-        if (exclude_mask & (1u << i)) continue;
+        if (exclude_mask & (1ull << i)) continue;
         gpio_set_function(i, GPIO_FUNC_SIO);
         gpio_disable_pulls(i);
         gpio_set_input_enabled(i, false);
