@@ -234,10 +234,10 @@ extern "C" {
     static inline int32_t double2uint_z(double d) { return (uint32_t)d; }
 #else
     //! \brief Convert a double to a signed 32-bit integer, rounding towards zero.
-    //! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using `pico_double_compiler`
+    //! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using pico_double `compiler`
     int32_t double2int_z(double d);
     //! \brief Convert a double to an unsigned 32-bit integer, rounding towards zero
-    //! On Arm this conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input except when using `pico_double_compiler`
+    //! On Arm this conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input except when using pico_double `compiler`
     uint32_t double2uint_z(double d);
 #endif
 #endif
@@ -249,10 +249,10 @@ extern "C" {
     static inline uint64_t double2uint64_z(double d) { return (uint64_t)d; }
 #else
     //! \brief Convert a double to a signed 64-bit integer, rounding towards zero.
-    //! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using `pico_double_compiler`
+    //! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using pico_double `compiler`
     int64_t double2int64_z(double d);
     //! \brief Convert a double to an unsigned 64-bit integer, rounding towards zero.
-    //! On Arm this conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input except when using `pico_double_compiler`
+    //! On Arm this conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input except when using pico_double `compiler`
     uint64_t double2uint64_z(double d);
 #endif
 #endif
@@ -277,7 +277,7 @@ double ufix642double(uint64_t m, int e);
 
 #if PICO_DOUBLE_HAS_DOUBLE_TO_FIX32_Z_CONVERSIONS
 //! \brief Convert a double to a signed 32-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
-//! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using `pico_double_compiler`
+//! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using pico_double `compiler`
 int32_t double2fix_z(double d, int e);
 //! \brief Convert a double to an unsigned 32-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
 //! This conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input
@@ -286,7 +286,7 @@ uint32_t double2ufix_z(double d, int e);
 
 #if PICO_DOUBLE_HAS_DOUBLE_TO_FIX64_Z_CONVERSIONS
 //! \brief Convert a double to a signed 64-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
-//! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using `pico_double_compiler`
+//! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using pico_double `compiler`
 int64_t double2fix64_z(double d, int e);
 //! \brief Convert a double to an unsigned 64-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
 //! This conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input
