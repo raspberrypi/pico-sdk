@@ -30,8 +30,8 @@ static inline double ufix2double_16(uint32_t m) { return ufix2double(m, 16); }
 static inline double ufix2double_24(uint32_t m) { return ufix2double(m, 24); }
 static inline double ufix2double_32(uint32_t m) { return ufix2double(m, 32); }
 
-static inline double double2fix_12(int32_t m) { return double2fix(m, 12); }
-static inline double double2ufix_12(int32_t m) { return double2ufix(m, 12); }
+static inline int32_t double2fix_12(double d) { return double2fix(d, 12); }
+static inline uint32_t double2ufix_12(double d) { return double2ufix(d, 12); }
 #endif
 
 #if LIB_PICO_DOUBLE_COMPILER || defined(__riscv)

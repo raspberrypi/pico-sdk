@@ -42,7 +42,7 @@ typedef struct _binary_info_core binary_info_t;
 // note plan is to reserve c1 = 0->31 for "collision tags"; i.e.
 // for which you should always use random IDs with the binary_info,
 // giving you 4 + 8 + 32 = 44 bits to avoid collisions
-#define BINARY_INFO_MAKE_TAG(c1, c2) ((((uint)c2&0xffu)<<8u)|((uint)c1&0xffu))
+#define BINARY_INFO_MAKE_TAG(c1, c2) ((uint16_t)((((c2)&0xffu)<<8u)|((c1)&0xffu)))
 
 // Raspberry Pi defined. do not use
 #define BINARY_INFO_TAG_RASPBERRY_PI BINARY_INFO_MAKE_TAG('R','P')
@@ -145,34 +145,34 @@ typedef struct __packed _binary_info_ptr_string_with_name {
  */
 typedef struct __packed _binary_info_block_device {
         struct _binary_info_core core;       ///< Common binary info header
-        bi_ptr_of(const char) name; // optional static name (independent of what is formatted)
+        bi_ptr_of(const char) name;          ///< optional static name (independent of what is formatted)
         uint32_t address;                    ///< Start address of the block device in flash
         uint32_t size;                       ///< Size of the block device in bytes
-        bi_ptr_of(binary_info_t) extra; // additional info
+        bi_ptr_of(binary_info_t) extra;      ///< additional info
         uint16_t flags;                      ///< Block device capability flags (BINARY_INFO_BLOCK_DEV_FLAG_*)
 } binary_info_block_device_t;
 
 #define BI_PINS_ENCODING_RANGE 1
 #define BI_PINS_ENCODING_MULTI 2
 
-/*! \brief Binary info entry describing one or more GPIO pins and their assigned function
+/*! \brief Binary info entry describing one or more GPIO pins and their assigned function, supporting pin numbers <32, and up to 5 pins
  *  \ingroup pico_binary_info
  */
 typedef struct __packed _binary_info_pins_with_func {
     struct _binary_info_core core;  ///< Common binary info header
-    // p4_5 : p3_5 : p2_5 : p1_5 : p0_5 : func_4 : 010_3 //individual pins p0,p1,p2,p3,p4 ... if fewer than 5 then duplicate p
+    // p4_5 : p3_5 : p2_5 : p1_5 : p0_5 : func_4 : 010_3 //individual pins p0,p1,p2,p3,p4 ... if fewer than 5 then duplicate last pin
     //                    phi_5 : plo_5 : func_4 : 001_3 // pin range plo-phi inclusive
     uint32_t pin_encoding;          ///< Encoded pin numbers and function (see BI_PINS_ENCODING_* for format)
 } binary_info_pins_with_func_t;
 
-/*! \brief Binary info entry describing one or more GPIO pins (up to 64) and their assigned function
+/*! \brief Binary info entry describing one or more GPIO pins and their assigned function, supporting pin numbers <256, and up to 7 pins
  *  \ingroup pico_binary_info
  */
 typedef struct __packed _binary_info_pins64_with_func {
     struct _binary_info_core core;  ///< Common binary info header
-    // p6_8 : p5_8 : p4_8 : p3_8 : p2_8 : p1_8 : p0_8 : func_5 : 010_3 //individual pins p0,p1,p2 ... if fewer than 7 then duplicate p
+    // p6_8 : p5_8 : p4_8 : p3_8 : p2_8 : p1_8 : p0_8 : func_5 : 010_3 //individual pins p0,p1,p2 ... if fewer than 7 then duplicate last pin
     //                    phi_8 : plo_8 : func_5 : 001_3 // pin range plo-phi inclusive
-    uint64_t pin_encoding;          ///< Encoded pin numbers and function for up to 64 pins (see BI_PINS_ENCODING_* for format)
+    uint64_t pin_encoding;          ///< Encoded pin numbers and function for more than 32 pins (see BI_PINS_ENCODING_* for format)
 } binary_info_pins64_with_func_t;
 
 /*! \brief Binary info entry associating a human-readable label with a set of GPIO pins

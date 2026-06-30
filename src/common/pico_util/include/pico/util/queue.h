@@ -32,7 +32,7 @@ extern "C" {
 /*! \brief A multi-core and IRQ safe queue instance
  *  \ingroup queue
  *
- * Stores a fixed number of elements of a fixed size. All operations are
+ * Stores a maximum number of elements of a fixed size. All operations are
  * protected by a spinlock, making the queue safe to use from multiple cores
  * and from interrupt handlers.
  */

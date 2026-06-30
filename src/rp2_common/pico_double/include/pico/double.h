@@ -205,12 +205,12 @@ extern "C" {
 #if !__PICO_DOUBLE_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline double int2double(int32_t i) { return (double)i; }
-    static inline double uint2double(uint32_t i) { return (double)i; }
+    static inline double uint2double(uint32_t u) { return (double)u; }
 #else
     //! Convert a signed 32-bit integer to the nearest double
     double int2double(int32_t i);
     //! Convert an unsigned 32-bit integer to the nearest double
-    double uint2double(uint32_t i);
+    double uint2double(uint32_t u);
 #endif
 #endif
 
@@ -218,12 +218,12 @@ extern "C" {
 #if !__PICO_DOUBLE_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline double int642double(int64_t i) { return (double)i; }
-    static inline double uint642double(uint64_t i) { return (double)i; }
+    static inline double uint642double(uint64_t u) { return (double)u; }
 #else
     //! Convert a signed 64-bit integer to the nearest double
     double int642double(int64_t i);
     //! Convert an unsigned 64-bit integer to the nearest double
-    double uint642double(uint64_t i);
+    double uint642double(uint64_t u);
 #endif
 #endif
 
@@ -231,7 +231,7 @@ extern "C" {
 #if !__PICO_DOUBLE_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline int32_t double2int_z(double d) { return (int32_t)d; }
-    static inline int32_t double2uint_z(double d) { return (uint32_t)d; }
+    static inline uint32_t double2uint_z(double d) { return (uint32_t)d; }
 #else
     //! \brief Convert a double to a signed 32-bit integer, rounding towards zero.
     //! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using pico_double `compiler`
@@ -258,19 +258,19 @@ extern "C" {
 #endif
 
 #if PICO_DOUBLE_HAS_FIX32_TO_DOUBLE_CONVERSIONS
-//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest double
+//! \brief Convert a signed 32-bit fixed-point integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +/- Infinity
 double fix2double(int32_t m, int e);
-//! \brief Convert an unsigned 32-bit integer with the given number of fractional bits to the nearest double
+//! \brief Convert an unsigned 32-bit fixed-point integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +Infinity
 double ufix2double(uint32_t m, int e);
 #endif
 
 #if PICO_DOUBLE_HAS_FIX64_TO_DOUBLE_CONVERSIONS
-//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest double
+//! \brief Convert a signed 64-bit fixed-point integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +/- Infinity
 double fix642double(int64_t m, int e);
-//! \brief Convert an unsigned 64-bit integer with the given number of fractional bits to the nearest double
+//! \brief Convert an unsigned 64-bit fixed-point integer with the given number of fractional bits to the nearest double
 //! Out of range inputs will convert to +Infinity
 double ufix642double(uint64_t m, int e);
 #endif

@@ -224,12 +224,12 @@ extern "C" {
     // for VFP the C cast is an assembly instruction anyway, so we prefer that over a function call
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline float int2float(int32_t i) { return (float)i; }
-    static inline float uint2float(uint32_t i) { return (float)i; }
+    static inline float uint2float(uint32_t u) { return (float)u; }
 #else
     //! Convert a signed 32-bit integer to the nearest float
     float int2float(int32_t i);
     //! Convert an unsigned 32-bit integer to the nearest float
-    float uint2float(uint32_t i);
+    float uint2float(uint32_t u);
 #endif
 #endif
 
@@ -237,12 +237,12 @@ extern "C" {
 #if !__PICO_FLOAT_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline float int642float(int64_t i) { return (float)i; }
-    static inline float uint642float(uint64_t i) { return (float)i; }
+    static inline float uint642float(uint64_t u) { return (float)u; }
 #else
     //! Convert a signed 64-bit integer to the nearest float
     float int642float(int64_t i);
     //! Convert an unsigned 64-bit integer to the nearest float
-    float uint642float(uint64_t i);
+    float uint642float(uint64_t u);
 #endif
 #endif
 
@@ -250,14 +250,14 @@ extern "C" {
 #if !__PICO_FLOAT_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline int32_t float2int_z(float f) { return (int32_t)f; }
-    static inline int32_t float2uint_z(float f) { return (uint32_t)f; }
+    static inline uint32_t float2uint_z(float f) { return (uint32_t)f; }
 #else
     //! \brief Convert a float to a signed 32-bit integer, rounding towards zero.
     //! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using pico_float `compiler`
     int32_t float2int_z(float f);
     //! \brief Convert a float to an unsigned 32-bit integer, rounding towards zero
     //! On Arm this conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input except when using pico_float `compiler`
-    int32_t float2uint_z(float f);
+    uint32_t float2uint_z(float f);
 #endif
 #endif
 
@@ -265,31 +265,31 @@ extern "C" {
 #if !__PICO_FLOAT_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline int64_t float2int64_z(float f) { return (int64_t)f; }
-    static inline int64_t float2uint64_z(float f) { return (uint64_t)f; }
+    static inline uint64_t float2uint64_z(float f) { return (uint64_t)f; }
 #else
     //! \brief Convert a float to a signed 64-bit integer, rounding towards zero.
     //! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using pico_float `compiler`
     int64_t float2int64_z(float f);
     //! \brief Convert a float to an unsigned 64-bit integer, rounding towards zero.
     //! On Arm this conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input except when using pico_float `compiler`
-    int64_t float2uint64_z(float f);
+    uint64_t float2uint64_z(float f);
 #endif
 #endif
 
 #if PICO_FLOAT_HAS_FIX32_TO_FLOAT_CONVERSIONS
-//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert a signed 32-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +/- Infinity
 float fix2float(int32_t m, int e);
-//! \brief Convert an unsigned 32-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 32-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +Infinity
 float ufix2float(uint32_t m, int e);
 #endif
 
 #if PICO_FLOAT_HAS_FIX64_TO_FLOAT_CONVERSIONS
-//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert a signed 64-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +/- Infinity
 float fix642float(int64_t m, int e);
-//! \brief Convert an unsigned 64-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 64-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +Infinity
 float ufix642float(uint64_t m, int e);
 #endif

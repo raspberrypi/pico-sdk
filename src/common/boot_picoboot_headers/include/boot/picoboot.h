@@ -46,14 +46,14 @@
 
 enum picoboot_cmd_id {
     PC_EXCLUSIVE_ACCESS = 0x1,
-    PC_REBOOT = 0x2,
+    PC_REBOOT = 0x2, // RP2040 only
     PC_FLASH_ERASE = 0x3,
-    PC_READ = 0x84, // either RAM or FLASH
+    PC_READ = 0x84, // either ROM or RAM or FLASH
     PC_WRITE = 0x5, // either RAM or FLASH (does no erase)
-    PC_EXIT_XIP = 0x6,
-    PC_ENTER_CMD_XIP = 0x7,
-    PC_EXEC = 0x8,
-    PC_VECTORIZE_FLASH = 0x9,
+    PC_EXIT_XIP = 0x6, // has no additional parameters (bCmdSize == 0)
+    PC_ENTER_CMD_XIP = 0x7, // has no additional parameters (bCmdSize == 0)
+    PC_EXEC = 0x8, // RP2040 only
+    PC_VECTORIZE_FLASH = 0x9, // RP2040 only
     // RP2350 only below here
     PC_REBOOT2 = 0xa,
     PC_GET_INFO = 0x8b,
@@ -115,7 +115,6 @@ struct __packed picoboot_address_only_cmd {
     uint32_t dAddr; ///< Target address
 };
 
-// used for READ, WRITE, FLASH_ERASE
 /*! \brief Parameters for a command that operates on an address range
  *  \ingroup boot_picoboot_headers
  *

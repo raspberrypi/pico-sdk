@@ -349,8 +349,8 @@ float __real_fmodf(float, float);
 #ifdef LLVM_LIBC_MATH_H
 #define isinff isinf
 #endif
-#define assert_close(a, b) test_assert((fabsf(a - b) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && (a < 0) == (b < 0)))
-#define assert_close_fma(a, b) test_assert((fabsf(a - b) <= allowed_range_fma(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && (a < 0) == (b < 0)))
+#define assert_close(a, b) test_assert((isinf(a) && isinf(b) && signbit(a) == signbit(b)) || fabsf((a) - (b)) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; }) || (isinff(a) && isinff(b) && ((a) < 0) == ((b) < 0)))
+#define assert_close_fma(a, b) test_assert((fabsf((a) - (b)) <= allowed_range_fma(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && ((a) < 0) == ((b) < 0)))
 #define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
 #if !LIB_PICO_FLOAT_PICO_VFP
 #define check1_vfp_unwrapped(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
@@ -458,7 +458,7 @@ int main() {
         sincosf(x, &s, &c);
         printf("SINCOS %10.18f %10.18f\n", s, c);
         if (s != sinf(x) || c != cosf(x)) {
-            printf("SINCOS mismatch\n");
+            printf("SINCOS mismatch %10.18f %10.18f\n", sinf(x), cosf(x));
             fail = true;
         }
     }

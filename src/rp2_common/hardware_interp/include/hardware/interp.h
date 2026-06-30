@@ -320,7 +320,7 @@ static inline void interp_set_force_bits(interp_hw_t *interp, uint lane, uint bi
  */
 typedef struct {
     uint32_t accum[2]; ///< Saved accumulator values for lanes 0 and 1
-    uint32_t base[3];  ///< Saved base register values for lanes 0, 1 and 2
+    uint32_t base[3];  ///< Saved base register values
     uint32_t ctrl[2];  ///< Saved control register values for lanes 0 and 1
 } interp_hw_save_t;
 
@@ -343,26 +343,26 @@ void interp_save(interp_hw_t *interp, interp_hw_save_t *saver);
  */
 void interp_restore(interp_hw_t *interp, interp_hw_save_t *saver);
 
-/*! \brief Sets the interpolator base register by lane
+/*! \brief Sets the interpolator base register by index
  *  \ingroup hardware_interp
  *
  * \param interp Interpolator instance, interp0 or interp1.
- * \param lane The lane number, 0 or 1 or 2
+ * \param index The base register index, 0 or 1 or 2
  * \param val The value to apply to the register
  */
-static inline void interp_set_base(interp_hw_t *interp, uint lane, uint32_t val) {
-    interp->base[lane] = val;
+static inline void interp_set_base(interp_hw_t *interp, uint index, uint32_t val) {
+    interp->base[index] = val;
 }
 
-/*! \brief Gets the content of interpolator base register by lane
+/*! \brief Gets the content of interpolator base register by index
  *  \ingroup hardware_interp
  *
  * \param interp Interpolator instance, interp0 or interp1.
- * \param lane The lane number, 0 or 1 or 2
- * \return  The current content of the lane base register
+ * \param lane The base register index, 0 or 1 or 2
+ * \return  The current content of the base register
  */
-static inline uint32_t interp_get_base(interp_hw_t *interp, uint lane) {
-    return interp->base[lane];
+static inline uint32_t interp_get_base(interp_hw_t *interp, uint index) {
+    return interp->base[index];
 }
 
 /*! \brief Sets the interpolator base registers simultaneously
@@ -461,7 +461,7 @@ static inline void interp_add_accumulator(interp_hw_t *interp, uint lane, uint32
 /*! \brief Get raw lane value
  *  \ingroup hardware_interp
  *
- * Returns the raw shift and mask value from the specified lane, BASE0 is NOT added
+ * Returns the raw shift and mask value from the specified lane, BASE0/BASE1 is NOT added
  *
  * \param interp Interpolator instance, interp0 or interp1.
  * \param lane The lane number, 0 or 1
