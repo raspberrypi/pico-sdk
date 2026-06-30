@@ -57,7 +57,7 @@
  *  * DMA interface, sustained throughput up to 1 word per clock from system DMA
  *  * IRQ flag set/clear/status
  *
- * Full details of the PIO can be found in the appropriate RP-series datasheet. Note that there are
+ * Full details of the PIO can be found in the datasheet for the appropriate RP-series microcontroller. Note that there are
  * additional features in the RP2350 PIO implementation that mean care should be taken when writing PIO
  * code that needs to run on both the RP2040 and the RP2350.
  *
