@@ -133,7 +133,7 @@ typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
 /*! \brief  Set all pins to a low leakage state
  *  \ingroup pico_low_power
  *
- * Disables pulls & inputs on the pads, and sets the IO function to GPIO_FUNC_SIO
+ * Disables pulls & inputs on the pads, and disables the IO output
  * with all pins set to inputs. This results in the lowest leakage current.
  * 
  * Does not change the state of pins in the exclude_mask
