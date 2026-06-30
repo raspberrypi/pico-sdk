@@ -296,7 +296,7 @@ int main() {
     my_number = 67890;
 
     gpio_put(SLEEP_MONITOR_PIN, 0);
-    low_power_set_pins_low_leakage((1u << SLEEP_MONITOR_PIN) | (1u << PICO_DEFAULT_UART_TX_PIN));
+    low_power_set_pins_low_leakage(USED_PIN_MASK);
     start_time = aon_timer_get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_pstate_until_aon_timer(wakeup_time, NULL, pstate_resume_func);
@@ -342,7 +342,7 @@ post_pstate_sram_on:
     printf("Going to PSTATE with SRAM off for %d seconds\n", SLEEP_TIME_S);
 
     gpio_put(SLEEP_MONITOR_PIN, 0);
-    low_power_set_pins_low_leakage((1u << SLEEP_MONITOR_PIN) | (1u << PICO_DEFAULT_UART_TX_PIN));
+    low_power_set_pins_low_leakage(USED_PIN_MASK);
     start_time = aon_timer_get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     // store in scratch, as not persisting memory over this reboot

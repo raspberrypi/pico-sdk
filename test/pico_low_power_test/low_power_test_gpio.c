@@ -127,7 +127,7 @@ int main() {
     init_powman_ext_ctrl();
 
     gpio_put(SLEEP_MONITOR_PIN, 0);
-    low_power_set_pins_low_leakage((1u << SLEEP_MONITOR_PIN) | (1u << WAKE_UP_PIN) | (1u << PICO_DEFAULT_UART_TX_PIN));
+    low_power_set_pins_low_leakage(USED_PIN_MASK);
     ret = low_power_pstate_until_gpio_pin_state(WAKE_UP_PIN, true, false, NULL, pstate_resume_func);
 
     printf("ERROR: %d returned by low_power_pstate_until_gpio_pin_state\n", ret);

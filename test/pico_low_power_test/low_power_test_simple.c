@@ -59,7 +59,7 @@ int main() {
         // Setup ext_ctrl0 to output on the SLEEP_MONITOR_PIN
         init_powman_ext_ctrl();
         gpio_put(SLEEP_MONITOR_PIN, 0);
-        low_power_set_pins_low_leakage((1u << SLEEP_MONITOR_PIN) | (1u << PICO_DEFAULT_UART_TX_PIN));
+        low_power_set_pins_low_leakage(USED_PIN_MASK);
         ret = low_power_pstate_for_ms(SLEEP_TIME_MS, NULL, NULL);
         if (ret != PICO_OK) {
             printf("%d ERROR: low_power_pstate_for_ms returned\n", ret);
