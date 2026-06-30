@@ -253,8 +253,9 @@ int low_power_dormant_until_aon_timer(absolute_time_t until, dormant_clock_sourc
  * 
  * \if rp2040_specific
  * If the clock source is set to DORMANT_CLOCK_SOURCE_RTC, all clocks will be switched to the ROSC while dormant so
- * they can be stopped, except clk_rtc which will be run from the XOSC. For the lowest power consumption, you should use
- * DORMANT_CLOCK_SOURCE_ROSC instead, as the GPIO interrupt does not require a clock.
+ * they can be stopped, except clk_rtc which will be run from the XOSC. In this case the XOSC will not be stopped.
+ * For the lowest power consumption, you should use DORMANT_CLOCK_SOURCE_ROSC instead, as the GPIO interrupt does
+ * not require a clock.
  * \endif
  *
  * \if (!rp2040_specific || combined_docs)
