@@ -120,4 +120,3 @@
 #define XIP_AUX_QMI_DIRECT_RX_ACCESS "RF"
 // =============================================================================
 #endif // _HARDWARE_REGS_XIP_AUX_H
-

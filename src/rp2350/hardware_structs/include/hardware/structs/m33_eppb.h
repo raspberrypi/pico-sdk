@@ -26,15 +26,14 @@
 #if defined(__riscv) && PICO_FORBID_ARM_HEADERS_ON_RISCV
 #error "Arm header included in a RISC-V build with PICO_FORBID_ARM_HEADERS_ON_RISCV=1"
 #endif
-  
 
 typedef struct {
     // (Description copied from array index 0 register M33_EPPB_NMI_MASK0 applies similarly to other array indexes)
     _REG_(M33_EPPB_NMI_MASK0_OFFSET) // M33_EPPB_NMI_MASK0
     // NMI mask for IRQs 0 through 31
-    // 0xffffffff [31:0]  NMI_MASK0    (0x00000000) 
+    // 0xffffffff [31:0]  NMI_MASK0    (0x00000000)
     io_rw_32 nmi_mask[2];
- 
+
     _REG_(M33_EPPB_SLEEPCTRL_OFFSET) // M33_EPPB_SLEEPCTRL
     // Nonstandard sleep control register
     // 0x00000004 [2]     WICENACK     (0) Status signal from the processor's interrupt controller
@@ -47,4 +46,3 @@ typedef struct {
 static_assert(sizeof (m33_eppb_hw_t) == 0x000c, "");
 
 #endif // _HARDWARE_STRUCTS_M33_EPPB_H
-

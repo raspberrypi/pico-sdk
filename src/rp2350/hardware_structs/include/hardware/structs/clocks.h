@@ -22,8 +22,7 @@
 //
 // Bit-field descriptions are of the form:
 // BITMASK [BITRANGE] FIELDNAME (RESETVALUE) DESCRIPTION
-
-/** \brief Clock numbers on RP2350 (used as typedef \ref clock_num_t) 
+/** \brief Clock numbers on RP2350 (used as typedef \ref clock_num_t)
  *  \ingroup hardware_clocks
  */
 /// \tag::clkenum[]
@@ -124,12 +123,12 @@ typedef struct {
     // 0x00000400 [10]    KILL         (0) Asynchronously kills the clock generator, enable must be...
     // 0x000001e0 [8:5]   AUXSRC       (0x0) Selects the auxiliary clock source, will glitch when switching
     io_rw_32 ctrl;
- 
+
     _REG_(CLOCKS_CLK_GPOUT0_DIV_OFFSET) // CLOCKS_CLK_GPOUT0_DIV
     // 0xffff0000 [31:16] INT          (0x0001) Integer part of clock divisor, 0 -> max+1, can be...
     // 0x0000ffff [15:0]  FRAC         (0x0000) Fractional component of the divisor, can be changed on-the-fly
     io_rw_32 div;
- 
+
     _REG_(CLOCKS_CLK_GPOUT0_SELECTED_OFFSET) // CLOCKS_CLK_GPOUT0_SELECTED
     // Indicates which src is currently selected (one-hot)
     // 0x00000001 [0]     CLK_GPOUT0_SELECTED (1) This slice does not have a glitchless mux (only the...
@@ -144,7 +143,7 @@ typedef struct {
     // 0x00000100 [8]     ENABLE       (0) Enable resus
     // 0x000000ff [7:0]   TIMEOUT      (0xff) This is expressed as a number of clk_ref cycles +
     io_rw_32 ctrl;
- 
+
     _REG_(CLOCKS_CLK_SYS_RESUS_STATUS_OFFSET) // CLOCKS_CLK_SYS_RESUS_STATUS
     // 0x00000001 [0]     RESUSSED     (0) Clock has been resuscitated, correct the error then send...
     io_ro_32 status;
@@ -153,34 +152,34 @@ typedef struct {
 typedef struct {
     _REG_(CLOCKS_FC0_REF_KHZ_OFFSET) // CLOCKS_FC0_REF_KHZ
     // Reference clock frequency in kHz
-    // 0x000fffff [19:0]  FC0_REF_KHZ  (0x00000) 
+    // 0x000fffff [19:0]  FC0_REF_KHZ  (0x00000)
     io_rw_32 ref_khz;
- 
+
     _REG_(CLOCKS_FC0_MIN_KHZ_OFFSET) // CLOCKS_FC0_MIN_KHZ
     // Minimum pass frequency in kHz
-    // 0x01ffffff [24:0]  FC0_MIN_KHZ  (0x0000000) 
+    // 0x01ffffff [24:0]  FC0_MIN_KHZ  (0x0000000)
     io_rw_32 min_khz;
- 
+
     _REG_(CLOCKS_FC0_MAX_KHZ_OFFSET) // CLOCKS_FC0_MAX_KHZ
     // Maximum pass frequency in kHz
-    // 0x01ffffff [24:0]  FC0_MAX_KHZ  (0x1ffffff) 
+    // 0x01ffffff [24:0]  FC0_MAX_KHZ  (0x1ffffff)
     io_rw_32 max_khz;
- 
+
     _REG_(CLOCKS_FC0_DELAY_OFFSET) // CLOCKS_FC0_DELAY
-    // Delays the start of frequency counting to allow the mux to settle +
-    // 0x00000007 [2:0]   FC0_DELAY    (0x1) 
+    // Delays the start of frequency counting to allow the mux to settle
+    // 0x00000007 [2:0]   FC0_DELAY    (0x1)
     io_rw_32 delay;
- 
+
     _REG_(CLOCKS_FC0_INTERVAL_OFFSET) // CLOCKS_FC0_INTERVAL
     // The test interval is 0
-    // 0x0000000f [3:0]   FC0_INTERVAL (0x8) 
+    // 0x0000000f [3:0]   FC0_INTERVAL (0x8)
     io_rw_32 interval;
- 
+
     _REG_(CLOCKS_FC0_SRC_OFFSET) // CLOCKS_FC0_SRC
-    // Clock sent to frequency counter, set to 0 when not required +
-    // 0x000000ff [7:0]   FC0_SRC      (0x00) 
+    // Clock sent to frequency counter, set to 0 when not required
+    // 0x000000ff [7:0]   FC0_SRC      (0x00)
     io_rw_32 src;
- 
+
     _REG_(CLOCKS_FC0_STATUS_OFFSET) // CLOCKS_FC0_STATUS
     // Frequency counter status
     // 0x10000000 [28]    DIED         (0) Test clock stopped during test
@@ -192,384 +191,384 @@ typedef struct {
     // 0x00000010 [4]     DONE         (0) Test complete
     // 0x00000001 [0]     PASS         (0) Test passed
     io_ro_32 status;
- 
+
     _REG_(CLOCKS_FC0_RESULT_OFFSET) // CLOCKS_FC0_RESULT
     // Result of frequency measurement, only valid when status_done=1
-    // 0x3fffffe0 [29:5]  KHZ          (0x0000000) 
-    // 0x0000001f [4:0]   FRAC         (0x00) 
+    // 0x3fffffe0 [29:5]  KHZ          (0x0000000)
+    // 0x0000001f [4:0]   FRAC         (0x00)
     io_ro_32 result;
 } fc_hw_t;
 
 typedef struct {
     clock_hw_t clk[10];
- 
+
     _REG_(CLOCKS_DFTCLK_XOSC_CTRL_OFFSET) // CLOCKS_DFTCLK_XOSC_CTRL
-    // 0x00000003 [1:0]   SRC          (0x0) 
+    // 0x00000003 [1:0]   SRC          (0x0)
     io_rw_32 dftclk_xosc_ctrl;
- 
+
     _REG_(CLOCKS_DFTCLK_ROSC_CTRL_OFFSET) // CLOCKS_DFTCLK_ROSC_CTRL
-    // 0x00000003 [1:0]   SRC          (0x0) 
+    // 0x00000003 [1:0]   SRC          (0x0)
     io_rw_32 dftclk_rosc_ctrl;
- 
+
     _REG_(CLOCKS_DFTCLK_LPOSC_CTRL_OFFSET) // CLOCKS_DFTCLK_LPOSC_CTRL
-    // 0x00000003 [1:0]   SRC          (0x0) 
+    // 0x00000003 [1:0]   SRC          (0x0)
     io_rw_32 dftclk_lposc_ctrl;
- 
+
     clock_resus_hw_t resus;
- 
+
     fc_hw_t fc0;
- 
+
     union {
         struct {
             _REG_(CLOCKS_WAKE_EN0_OFFSET) // CLOCKS_WAKE_EN0
             // enable clock in wake mode
-            // 0x80000000 [31]    CLK_SYS_SIOB (1) 
-            // 0x40000000 [30]    CLK_SYS_SHA256 (1) 
-            // 0x20000000 [29]    CLK_SYS_RSM  (1) 
-            // 0x10000000 [28]    CLK_SYS_ROSC (1) 
-            // 0x08000000 [27]    CLK_SYS_ROM  (1) 
-            // 0x04000000 [26]    CLK_SYS_RESETS (1) 
-            // 0x02000000 [25]    CLK_SYS_PWM  (1) 
-            // 0x01000000 [24]    CLK_SYS_POWMAN (1) 
-            // 0x00800000 [23]    CLK_REF_POWMAN (1) 
-            // 0x00400000 [22]    CLK_SYS_PLL_USB (1) 
-            // 0x00200000 [21]    CLK_SYS_PLL_SYS (1) 
-            // 0x00100000 [20]    CLK_SYS_PIO2 (1) 
-            // 0x00080000 [19]    CLK_SYS_PIO1 (1) 
-            // 0x00040000 [18]    CLK_SYS_PIO0 (1) 
-            // 0x00020000 [17]    CLK_SYS_PADS (1) 
-            // 0x00010000 [16]    CLK_SYS_OTP  (1) 
-            // 0x00008000 [15]    CLK_REF_OTP  (1) 
-            // 0x00004000 [14]    CLK_SYS_JTAG (1) 
-            // 0x00002000 [13]    CLK_SYS_IO   (1) 
-            // 0x00001000 [12]    CLK_SYS_I2C1 (1) 
-            // 0x00000800 [11]    CLK_SYS_I2C0 (1) 
-            // 0x00000400 [10]    CLK_SYS_HSTX (1) 
-            // 0x00000200 [9]     CLK_HSTX     (1) 
-            // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (1) 
-            // 0x00000080 [7]     CLK_SYS_DMA  (1) 
-            // 0x00000040 [6]     CLK_SYS_BUSFABRIC (1) 
-            // 0x00000020 [5]     CLK_SYS_BUSCTRL (1) 
-            // 0x00000010 [4]     CLK_SYS_BOOTRAM (1) 
-            // 0x00000008 [3]     CLK_SYS_ADC  (1) 
-            // 0x00000004 [2]     CLK_ADC      (1) 
-            // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (1) 
-            // 0x00000001 [0]     CLK_SYS_CLOCKS (1) 
-            io_rw_32 wake_en0; 
+            // 0x80000000 [31]    CLK_SYS_SIO (1)
+            // 0x40000000 [30]    CLK_SYS_SHA256 (1)
+            // 0x20000000 [29]    CLK_SYS_RSM  (1)
+            // 0x10000000 [28]    CLK_SYS_ROSC (1)
+            // 0x08000000 [27]    CLK_SYS_ROM  (1)
+            // 0x04000000 [26]    CLK_SYS_RESETS (1)
+            // 0x02000000 [25]    CLK_SYS_PWM  (1)
+            // 0x01000000 [24]    CLK_SYS_POWMAN (1)
+            // 0x00800000 [23]    CLK_REF_POWMAN (1)
+            // 0x00400000 [22]    CLK_SYS_PLL_USB (1)
+            // 0x00200000 [21]    CLK_SYS_PLL_SYS (1)
+            // 0x00100000 [20]    CLK_SYS_PIO2 (1)
+            // 0x00080000 [19]    CLK_SYS_PIO1 (1)
+            // 0x00040000 [18]    CLK_SYS_PIO0 (1)
+            // 0x00020000 [17]    CLK_SYS_PADS (1)
+            // 0x00010000 [16]    CLK_SYS_OTP  (1)
+            // 0x00008000 [15]    CLK_REF_OTP  (1)
+            // 0x00004000 [14]    CLK_SYS_JTAG (1)
+            // 0x00002000 [13]    CLK_SYS_IO   (1)
+            // 0x00001000 [12]    CLK_SYS_I2C1 (1)
+            // 0x00000800 [11]    CLK_SYS_I2C0 (1)
+            // 0x00000400 [10]    CLK_SYS_HSTX (1)
+            // 0x00000200 [9]     CLK_HSTX     (1)
+            // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (1)
+            // 0x00000080 [7]     CLK_SYS_DMA  (1)
+            // 0x00000040 [6]     CLK_SYS_BUSFABRIC (1)
+            // 0x00000020 [5]     CLK_SYS_BUSCTRL (1)
+            // 0x00000010 [4]     CLK_SYS_BOOTRAM (1)
+            // 0x00000008 [3]     CLK_SYS_ADC  (1)
+            // 0x00000004 [2]     CLK_ADC      (1)
+            // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (1)
+            // 0x00000001 [0]     CLK_SYS_CLOCKS (1)
+            io_rw_32 wake_en0;
 
             _REG_(CLOCKS_WAKE_EN1_OFFSET) // CLOCKS_WAKE_EN1
             // enable clock in wake mode
-            // 0x40000000 [30]    CLK_SYS_XOSC (1) 
-            // 0x20000000 [29]    CLK_SYS_XIP  (1) 
-            // 0x10000000 [28]    CLK_SYS_WATCHDOG (1) 
-            // 0x08000000 [27]    CLK_USB      (1) 
-            // 0x04000000 [26]    CLK_SYS_USBCTRL (1) 
-            // 0x02000000 [25]    CLK_SYS_UART1 (1) 
-            // 0x01000000 [24]    CLK_PERI_UART1 (1) 
-            // 0x00800000 [23]    CLK_SYS_UART0 (1) 
-            // 0x00400000 [22]    CLK_PERI_UART0 (1) 
-            // 0x00200000 [21]    CLK_SYS_TRNG (1) 
-            // 0x00100000 [20]    CLK_SYS_TIMER1 (1) 
-            // 0x00080000 [19]    CLK_SYS_TIMER0 (1) 
-            // 0x00040000 [18]    CLK_SYS_TICKS (1) 
-            // 0x00020000 [17]    CLK_REF_TICKS (1) 
-            // 0x00010000 [16]    CLK_SYS_TBMAN (1) 
-            // 0x00008000 [15]    CLK_SYS_SYSINFO (1) 
-            // 0x00004000 [14]    CLK_SYS_SYSCFG (1) 
-            // 0x00002000 [13]    CLK_SYS_SRAM9 (1) 
-            // 0x00001000 [12]    CLK_SYS_SRAM8 (1) 
-            // 0x00000800 [11]    CLK_SYS_SRAM7 (1) 
-            // 0x00000400 [10]    CLK_SYS_SRAM6 (1) 
-            // 0x00000200 [9]     CLK_SYS_SRAM5 (1) 
-            // 0x00000100 [8]     CLK_SYS_SRAM4 (1) 
-            // 0x00000080 [7]     CLK_SYS_SRAM3 (1) 
-            // 0x00000040 [6]     CLK_SYS_SRAM2 (1) 
-            // 0x00000020 [5]     CLK_SYS_SRAM1 (1) 
-            // 0x00000010 [4]     CLK_SYS_SRAM0 (1) 
-            // 0x00000008 [3]     CLK_SYS_SPI1 (1) 
-            // 0x00000004 [2]     CLK_PERI_SPI1 (1) 
-            // 0x00000002 [1]     CLK_SYS_SPI0 (1) 
-            // 0x00000001 [0]     CLK_PERI_SPI0 (1) 
-            io_rw_32 wake_en1; 
+            // 0x40000000 [30]    CLK_SYS_XOSC (1)
+            // 0x20000000 [29]    CLK_SYS_XIP  (1)
+            // 0x10000000 [28]    CLK_SYS_WATCHDOG (1)
+            // 0x08000000 [27]    CLK_USB      (1)
+            // 0x04000000 [26]    CLK_SYS_USBCTRL (1)
+            // 0x02000000 [25]    CLK_SYS_UART1 (1)
+            // 0x01000000 [24]    CLK_PERI_UART1 (1)
+            // 0x00800000 [23]    CLK_SYS_UART0 (1)
+            // 0x00400000 [22]    CLK_PERI_UART0 (1)
+            // 0x00200000 [21]    CLK_SYS_TRNG (1)
+            // 0x00100000 [20]    CLK_SYS_TIMER1 (1)
+            // 0x00080000 [19]    CLK_SYS_TIMER0 (1)
+            // 0x00040000 [18]    CLK_SYS_TICKS (1)
+            // 0x00020000 [17]    CLK_REF_TICKS (1)
+            // 0x00010000 [16]    CLK_SYS_TBMAN (1)
+            // 0x00008000 [15]    CLK_SYS_SYSINFO (1)
+            // 0x00004000 [14]    CLK_SYS_SYSCFG (1)
+            // 0x00002000 [13]    CLK_SYS_SRAM9 (1)
+            // 0x00001000 [12]    CLK_SYS_SRAM8 (1)
+            // 0x00000800 [11]    CLK_SYS_SRAM7 (1)
+            // 0x00000400 [10]    CLK_SYS_SRAM6 (1)
+            // 0x00000200 [9]     CLK_SYS_SRAM5 (1)
+            // 0x00000100 [8]     CLK_SYS_SRAM4 (1)
+            // 0x00000080 [7]     CLK_SYS_SRAM3 (1)
+            // 0x00000040 [6]     CLK_SYS_SRAM2 (1)
+            // 0x00000020 [5]     CLK_SYS_SRAM1 (1)
+            // 0x00000010 [4]     CLK_SYS_SRAM0 (1)
+            // 0x00000008 [3]     CLK_SYS_SPI1 (1)
+            // 0x00000004 [2]     CLK_PERI_SPI1 (1)
+            // 0x00000002 [1]     CLK_SYS_SPI0 (1)
+            // 0x00000001 [0]     CLK_PERI_SPI0 (1)
+            io_rw_32 wake_en1;
         };
         // (Description copied from array index 0 register CLOCKS_WAKE_EN0 applies similarly to other array indexes)
         _REG_(CLOCKS_WAKE_EN0_OFFSET) // CLOCKS_WAKE_EN0
         // enable clock in wake mode
-        // 0x80000000 [31]    CLK_SYS_SIO  (1) 
-        // 0x40000000 [30]    CLK_SYS_SHA256 (1) 
-        // 0x20000000 [29]    CLK_SYS_PSM  (1) 
-        // 0x10000000 [28]    CLK_SYS_ROSC (1) 
-        // 0x08000000 [27]    CLK_SYS_ROM  (1) 
-        // 0x04000000 [26]    CLK_SYS_RESETS (1) 
-        // 0x02000000 [25]    CLK_SYS_PWM  (1) 
-        // 0x01000000 [24]    CLK_SYS_POWMAN (1) 
-        // 0x00800000 [23]    CLK_REF_POWMAN (1) 
-        // 0x00400000 [22]    CLK_SYS_PLL_USB (1) 
-        // 0x00200000 [21]    CLK_SYS_PLL_SYS (1) 
-        // 0x00100000 [20]    CLK_SYS_PIO2 (1) 
-        // 0x00080000 [19]    CLK_SYS_PIO1 (1) 
-        // 0x00040000 [18]    CLK_SYS_PIO0 (1) 
-        // 0x00020000 [17]    CLK_SYS_PADS (1) 
-        // 0x00010000 [16]    CLK_SYS_OTP  (1) 
-        // 0x00008000 [15]    CLK_REF_OTP  (1) 
-        // 0x00004000 [14]    CLK_SYS_JTAG (1) 
-        // 0x00002000 [13]    CLK_SYS_IO   (1) 
-        // 0x00001000 [12]    CLK_SYS_I2C1 (1) 
-        // 0x00000800 [11]    CLK_SYS_I2C0 (1) 
-        // 0x00000400 [10]    CLK_SYS_HSTX (1) 
-        // 0x00000200 [9]     CLK_HSTX     (1) 
-        // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (1) 
-        // 0x00000080 [7]     CLK_SYS_DMA  (1) 
-        // 0x00000040 [6]     CLK_SYS_BUSFABRIC (1) 
-        // 0x00000020 [5]     CLK_SYS_BUSCTRL (1) 
-        // 0x00000010 [4]     CLK_SYS_BOOTRAM (1) 
-        // 0x00000008 [3]     CLK_SYS_ADC  (1) 
-        // 0x00000004 [2]     CLK_ADC      (1) 
-        // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (1) 
-        // 0x00000001 [0]     CLK_SYS_CLOCKS (1) 
+        // 0x80000000 [31]    CLK_SYS_SIO  (1)
+        // 0x40000000 [30]    CLK_SYS_SHA256 (1)
+        // 0x20000000 [29]    CLK_SYS_PSM  (1)
+        // 0x10000000 [28]    CLK_SYS_ROSC (1)
+        // 0x08000000 [27]    CLK_SYS_ROM  (1)
+        // 0x04000000 [26]    CLK_SYS_RESETS (1)
+        // 0x02000000 [25]    CLK_SYS_PWM  (1)
+        // 0x01000000 [24]    CLK_SYS_POWMAN (1)
+        // 0x00800000 [23]    CLK_REF_POWMAN (1)
+        // 0x00400000 [22]    CLK_SYS_PLL_USB (1)
+        // 0x00200000 [21]    CLK_SYS_PLL_SYS (1)
+        // 0x00100000 [20]    CLK_SYS_PIO2 (1)
+        // 0x00080000 [19]    CLK_SYS_PIO1 (1)
+        // 0x00040000 [18]    CLK_SYS_PIO0 (1)
+        // 0x00020000 [17]    CLK_SYS_PADS (1)
+        // 0x00010000 [16]    CLK_SYS_OTP  (1)
+        // 0x00008000 [15]    CLK_REF_OTP  (1)
+        // 0x00004000 [14]    CLK_SYS_JTAG (1)
+        // 0x00002000 [13]    CLK_SYS_IO   (1)
+        // 0x00001000 [12]    CLK_SYS_I2C1 (1)
+        // 0x00000800 [11]    CLK_SYS_I2C0 (1)
+        // 0x00000400 [10]    CLK_SYS_HSTX (1)
+        // 0x00000200 [9]     CLK_HSTX     (1)
+        // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (1)
+        // 0x00000080 [7]     CLK_SYS_DMA  (1)
+        // 0x00000040 [6]     CLK_SYS_BUSFABRIC (1)
+        // 0x00000020 [5]     CLK_SYS_BUSCTRL (1)
+        // 0x00000010 [4]     CLK_SYS_BOOTRAM (1)
+        // 0x00000008 [3]     CLK_SYS_ADC  (1)
+        // 0x00000004 [2]     CLK_ADC      (1)
+        // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (1)
+        // 0x00000001 [0]     CLK_SYS_CLOCKS (1)
         io_rw_32 wake_en[2];
     };
- 
+
     union {
         struct {
             _REG_(CLOCKS_SLEEP_EN0_OFFSET) // CLOCKS_SLEEP_EN0
             // enable clock in sleep mode
-            // 0x80000000 [31]    CLK_SYS_SIOB (1) 
-            // 0x40000000 [30]    CLK_SYS_SHA256 (1) 
-            // 0x20000000 [29]    CLK_SYS_RSM  (1) 
-            // 0x10000000 [28]    CLK_SYS_ROSC (1) 
-            // 0x08000000 [27]    CLK_SYS_ROM  (1) 
-            // 0x04000000 [26]    CLK_SYS_RESETS (1) 
-            // 0x02000000 [25]    CLK_SYS_PWM  (1) 
-            // 0x01000000 [24]    CLK_SYS_POWMAN (1) 
-            // 0x00800000 [23]    CLK_REF_POWMAN (1) 
-            // 0x00400000 [22]    CLK_SYS_PLL_USB (1) 
-            // 0x00200000 [21]    CLK_SYS_PLL_SYS (1) 
-            // 0x00100000 [20]    CLK_SYS_PIO2 (1) 
-            // 0x00080000 [19]    CLK_SYS_PIO1 (1) 
-            // 0x00040000 [18]    CLK_SYS_PIO0 (1) 
-            // 0x00020000 [17]    CLK_SYS_PADS (1) 
-            // 0x00010000 [16]    CLK_SYS_OTP  (1) 
-            // 0x00008000 [15]    CLK_REF_OTP  (1) 
-            // 0x00004000 [14]    CLK_SYS_JTAG (1) 
-            // 0x00002000 [13]    CLK_SYS_IO   (1) 
-            // 0x00001000 [12]    CLK_SYS_I2C1 (1) 
-            // 0x00000800 [11]    CLK_SYS_I2C0 (1) 
-            // 0x00000400 [10]    CLK_SYS_HSTX (1) 
-            // 0x00000200 [9]     CLK_HSTX     (1) 
-            // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (1) 
-            // 0x00000080 [7]     CLK_SYS_DMA  (1) 
-            // 0x00000040 [6]     CLK_SYS_BUSFABRIC (1) 
-            // 0x00000020 [5]     CLK_SYS_BUSCTRL (1) 
-            // 0x00000010 [4]     CLK_SYS_BOOTRAM (1) 
-            // 0x00000008 [3]     CLK_SYS_ADC  (1) 
-            // 0x00000004 [2]     CLK_ADC      (1) 
-            // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (1) 
-            // 0x00000001 [0]     CLK_SYS_CLOCKS (1) 
-            io_rw_32 sleep_en0; 
+            // 0x80000000 [31]    CLK_SYS_SIO (1)
+            // 0x40000000 [30]    CLK_SYS_SHA256 (1)
+            // 0x20000000 [29]    CLK_SYS_RSM  (1)
+            // 0x10000000 [28]    CLK_SYS_ROSC (1)
+            // 0x08000000 [27]    CLK_SYS_ROM  (1)
+            // 0x04000000 [26]    CLK_SYS_RESETS (1)
+            // 0x02000000 [25]    CLK_SYS_PWM  (1)
+            // 0x01000000 [24]    CLK_SYS_POWMAN (1)
+            // 0x00800000 [23]    CLK_REF_POWMAN (1)
+            // 0x00400000 [22]    CLK_SYS_PLL_USB (1)
+            // 0x00200000 [21]    CLK_SYS_PLL_SYS (1)
+            // 0x00100000 [20]    CLK_SYS_PIO2 (1)
+            // 0x00080000 [19]    CLK_SYS_PIO1 (1)
+            // 0x00040000 [18]    CLK_SYS_PIO0 (1)
+            // 0x00020000 [17]    CLK_SYS_PADS (1)
+            // 0x00010000 [16]    CLK_SYS_OTP  (1)
+            // 0x00008000 [15]    CLK_REF_OTP  (1)
+            // 0x00004000 [14]    CLK_SYS_JTAG (1)
+            // 0x00002000 [13]    CLK_SYS_IO   (1)
+            // 0x00001000 [12]    CLK_SYS_I2C1 (1)
+            // 0x00000800 [11]    CLK_SYS_I2C0 (1)
+            // 0x00000400 [10]    CLK_SYS_HSTX (1)
+            // 0x00000200 [9]     CLK_HSTX     (1)
+            // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (1)
+            // 0x00000080 [7]     CLK_SYS_DMA  (1)
+            // 0x00000040 [6]     CLK_SYS_BUSFABRIC (1)
+            // 0x00000020 [5]     CLK_SYS_BUSCTRL (1)
+            // 0x00000010 [4]     CLK_SYS_BOOTRAM (1)
+            // 0x00000008 [3]     CLK_SYS_ADC  (1)
+            // 0x00000004 [2]     CLK_ADC      (1)
+            // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (1)
+            // 0x00000001 [0]     CLK_SYS_CLOCKS (1)
+            io_rw_32 sleep_en0;
 
             _REG_(CLOCKS_SLEEP_EN1_OFFSET) // CLOCKS_SLEEP_EN1
             // enable clock in sleep mode
-            // 0x40000000 [30]    CLK_SYS_XOSC (1) 
-            // 0x20000000 [29]    CLK_SYS_XIP  (1) 
-            // 0x10000000 [28]    CLK_SYS_WATCHDOG (1) 
-            // 0x08000000 [27]    CLK_USB      (1) 
-            // 0x04000000 [26]    CLK_SYS_USBCTRL (1) 
-            // 0x02000000 [25]    CLK_SYS_UART1 (1) 
-            // 0x01000000 [24]    CLK_PERI_UART1 (1) 
-            // 0x00800000 [23]    CLK_SYS_UART0 (1) 
-            // 0x00400000 [22]    CLK_PERI_UART0 (1) 
-            // 0x00200000 [21]    CLK_SYS_TRNG (1) 
-            // 0x00100000 [20]    CLK_SYS_TIMER1 (1) 
-            // 0x00080000 [19]    CLK_SYS_TIMER0 (1) 
-            // 0x00040000 [18]    CLK_SYS_TICKS (1) 
-            // 0x00020000 [17]    CLK_REF_TICKS (1) 
-            // 0x00010000 [16]    CLK_SYS_TBMAN (1) 
-            // 0x00008000 [15]    CLK_SYS_SYSINFO (1) 
-            // 0x00004000 [14]    CLK_SYS_SYSCFG (1) 
-            // 0x00002000 [13]    CLK_SYS_SRAM9 (1) 
-            // 0x00001000 [12]    CLK_SYS_SRAM8 (1) 
-            // 0x00000800 [11]    CLK_SYS_SRAM7 (1) 
-            // 0x00000400 [10]    CLK_SYS_SRAM6 (1) 
-            // 0x00000200 [9]     CLK_SYS_SRAM5 (1) 
-            // 0x00000100 [8]     CLK_SYS_SRAM4 (1) 
-            // 0x00000080 [7]     CLK_SYS_SRAM3 (1) 
-            // 0x00000040 [6]     CLK_SYS_SRAM2 (1) 
-            // 0x00000020 [5]     CLK_SYS_SRAM1 (1) 
-            // 0x00000010 [4]     CLK_SYS_SRAM0 (1) 
-            // 0x00000008 [3]     CLK_SYS_SPI1 (1) 
-            // 0x00000004 [2]     CLK_PERI_SPI1 (1) 
-            // 0x00000002 [1]     CLK_SYS_SPI0 (1) 
-            // 0x00000001 [0]     CLK_PERI_SPI0 (1) 
-            io_rw_32 sleep_en1; 
+            // 0x40000000 [30]    CLK_SYS_XOSC (1)
+            // 0x20000000 [29]    CLK_SYS_XIP  (1)
+            // 0x10000000 [28]    CLK_SYS_WATCHDOG (1)
+            // 0x08000000 [27]    CLK_USB      (1)
+            // 0x04000000 [26]    CLK_SYS_USBCTRL (1)
+            // 0x02000000 [25]    CLK_SYS_UART1 (1)
+            // 0x01000000 [24]    CLK_PERI_UART1 (1)
+            // 0x00800000 [23]    CLK_SYS_UART0 (1)
+            // 0x00400000 [22]    CLK_PERI_UART0 (1)
+            // 0x00200000 [21]    CLK_SYS_TRNG (1)
+            // 0x00100000 [20]    CLK_SYS_TIMER1 (1)
+            // 0x00080000 [19]    CLK_SYS_TIMER0 (1)
+            // 0x00040000 [18]    CLK_SYS_TICKS (1)
+            // 0x00020000 [17]    CLK_REF_TICKS (1)
+            // 0x00010000 [16]    CLK_SYS_TBMAN (1)
+            // 0x00008000 [15]    CLK_SYS_SYSINFO (1)
+            // 0x00004000 [14]    CLK_SYS_SYSCFG (1)
+            // 0x00002000 [13]    CLK_SYS_SRAM9 (1)
+            // 0x00001000 [12]    CLK_SYS_SRAM8 (1)
+            // 0x00000800 [11]    CLK_SYS_SRAM7 (1)
+            // 0x00000400 [10]    CLK_SYS_SRAM6 (1)
+            // 0x00000200 [9]     CLK_SYS_SRAM5 (1)
+            // 0x00000100 [8]     CLK_SYS_SRAM4 (1)
+            // 0x00000080 [7]     CLK_SYS_SRAM3 (1)
+            // 0x00000040 [6]     CLK_SYS_SRAM2 (1)
+            // 0x00000020 [5]     CLK_SYS_SRAM1 (1)
+            // 0x00000010 [4]     CLK_SYS_SRAM0 (1)
+            // 0x00000008 [3]     CLK_SYS_SPI1 (1)
+            // 0x00000004 [2]     CLK_PERI_SPI1 (1)
+            // 0x00000002 [1]     CLK_SYS_SPI0 (1)
+            // 0x00000001 [0]     CLK_PERI_SPI0 (1)
+            io_rw_32 sleep_en1;
         };
         // (Description copied from array index 0 register CLOCKS_SLEEP_EN0 applies similarly to other array indexes)
         _REG_(CLOCKS_SLEEP_EN0_OFFSET) // CLOCKS_SLEEP_EN0
         // enable clock in sleep mode
-        // 0x80000000 [31]    CLK_SYS_SIO  (1) 
-        // 0x40000000 [30]    CLK_SYS_SHA256 (1) 
-        // 0x20000000 [29]    CLK_SYS_PSM  (1) 
-        // 0x10000000 [28]    CLK_SYS_ROSC (1) 
-        // 0x08000000 [27]    CLK_SYS_ROM  (1) 
-        // 0x04000000 [26]    CLK_SYS_RESETS (1) 
-        // 0x02000000 [25]    CLK_SYS_PWM  (1) 
-        // 0x01000000 [24]    CLK_SYS_POWMAN (1) 
-        // 0x00800000 [23]    CLK_REF_POWMAN (1) 
-        // 0x00400000 [22]    CLK_SYS_PLL_USB (1) 
-        // 0x00200000 [21]    CLK_SYS_PLL_SYS (1) 
-        // 0x00100000 [20]    CLK_SYS_PIO2 (1) 
-        // 0x00080000 [19]    CLK_SYS_PIO1 (1) 
-        // 0x00040000 [18]    CLK_SYS_PIO0 (1) 
-        // 0x00020000 [17]    CLK_SYS_PADS (1) 
-        // 0x00010000 [16]    CLK_SYS_OTP  (1) 
-        // 0x00008000 [15]    CLK_REF_OTP  (1) 
-        // 0x00004000 [14]    CLK_SYS_JTAG (1) 
-        // 0x00002000 [13]    CLK_SYS_IO   (1) 
-        // 0x00001000 [12]    CLK_SYS_I2C1 (1) 
-        // 0x00000800 [11]    CLK_SYS_I2C0 (1) 
-        // 0x00000400 [10]    CLK_SYS_HSTX (1) 
-        // 0x00000200 [9]     CLK_HSTX     (1) 
-        // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (1) 
-        // 0x00000080 [7]     CLK_SYS_DMA  (1) 
-        // 0x00000040 [6]     CLK_SYS_BUSFABRIC (1) 
-        // 0x00000020 [5]     CLK_SYS_BUSCTRL (1) 
-        // 0x00000010 [4]     CLK_SYS_BOOTRAM (1) 
-        // 0x00000008 [3]     CLK_SYS_ADC  (1) 
-        // 0x00000004 [2]     CLK_ADC      (1) 
-        // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (1) 
-        // 0x00000001 [0]     CLK_SYS_CLOCKS (1) 
+        // 0x80000000 [31]    CLK_SYS_SIO  (1)
+        // 0x40000000 [30]    CLK_SYS_SHA256 (1)
+        // 0x20000000 [29]    CLK_SYS_PSM  (1)
+        // 0x10000000 [28]    CLK_SYS_ROSC (1)
+        // 0x08000000 [27]    CLK_SYS_ROM  (1)
+        // 0x04000000 [26]    CLK_SYS_RESETS (1)
+        // 0x02000000 [25]    CLK_SYS_PWM  (1)
+        // 0x01000000 [24]    CLK_SYS_POWMAN (1)
+        // 0x00800000 [23]    CLK_REF_POWMAN (1)
+        // 0x00400000 [22]    CLK_SYS_PLL_USB (1)
+        // 0x00200000 [21]    CLK_SYS_PLL_SYS (1)
+        // 0x00100000 [20]    CLK_SYS_PIO2 (1)
+        // 0x00080000 [19]    CLK_SYS_PIO1 (1)
+        // 0x00040000 [18]    CLK_SYS_PIO0 (1)
+        // 0x00020000 [17]    CLK_SYS_PADS (1)
+        // 0x00010000 [16]    CLK_SYS_OTP  (1)
+        // 0x00008000 [15]    CLK_REF_OTP  (1)
+        // 0x00004000 [14]    CLK_SYS_JTAG (1)
+        // 0x00002000 [13]    CLK_SYS_IO   (1)
+        // 0x00001000 [12]    CLK_SYS_I2C1 (1)
+        // 0x00000800 [11]    CLK_SYS_I2C0 (1)
+        // 0x00000400 [10]    CLK_SYS_HSTX (1)
+        // 0x00000200 [9]     CLK_HSTX     (1)
+        // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (1)
+        // 0x00000080 [7]     CLK_SYS_DMA  (1)
+        // 0x00000040 [6]     CLK_SYS_BUSFABRIC (1)
+        // 0x00000020 [5]     CLK_SYS_BUSCTRL (1)
+        // 0x00000010 [4]     CLK_SYS_BOOTRAM (1)
+        // 0x00000008 [3]     CLK_SYS_ADC  (1)
+        // 0x00000004 [2]     CLK_ADC      (1)
+        // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (1)
+        // 0x00000001 [0]     CLK_SYS_CLOCKS (1)
         io_rw_32 sleep_en[2];
     };
- 
+
     union {
         struct {
             _REG_(CLOCKS_ENABLED0_OFFSET) // CLOCKS_ENABLED0
             // indicates the state of the clock enable
-            // 0x80000000 [31]    CLK_SYS_SIOB (0) 
-            // 0x40000000 [30]    CLK_SYS_SHA256 (0) 
-            // 0x20000000 [29]    CLK_SYS_RSM  (0) 
-            // 0x10000000 [28]    CLK_SYS_ROSC (0) 
-            // 0x08000000 [27]    CLK_SYS_ROM  (0) 
-            // 0x04000000 [26]    CLK_SYS_RESETS (0) 
-            // 0x02000000 [25]    CLK_SYS_PWM  (0) 
-            // 0x01000000 [24]    CLK_SYS_POWMAN (0) 
-            // 0x00800000 [23]    CLK_REF_POWMAN (0) 
-            // 0x00400000 [22]    CLK_SYS_PLL_USB (0) 
-            // 0x00200000 [21]    CLK_SYS_PLL_SYS (0) 
-            // 0x00100000 [20]    CLK_SYS_PIO2 (0) 
-            // 0x00080000 [19]    CLK_SYS_PIO1 (0) 
-            // 0x00040000 [18]    CLK_SYS_PIO0 (0) 
-            // 0x00020000 [17]    CLK_SYS_PADS (0) 
-            // 0x00010000 [16]    CLK_SYS_OTP  (0) 
-            // 0x00008000 [15]    CLK_REF_OTP  (0) 
-            // 0x00004000 [14]    CLK_SYS_JTAG (0) 
-            // 0x00002000 [13]    CLK_SYS_IO   (0) 
-            // 0x00001000 [12]    CLK_SYS_I2C1 (0) 
-            // 0x00000800 [11]    CLK_SYS_I2C0 (0) 
-            // 0x00000400 [10]    CLK_SYS_HSTX (0) 
-            // 0x00000200 [9]     CLK_HSTX     (0) 
-            // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (0) 
-            // 0x00000080 [7]     CLK_SYS_DMA  (0) 
-            // 0x00000040 [6]     CLK_SYS_BUSFABRIC (0) 
-            // 0x00000020 [5]     CLK_SYS_BUSCTRL (0) 
-            // 0x00000010 [4]     CLK_SYS_BOOTRAM (0) 
-            // 0x00000008 [3]     CLK_SYS_ADC  (0) 
-            // 0x00000004 [2]     CLK_ADC      (0) 
-            // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (0) 
-            // 0x00000001 [0]     CLK_SYS_CLOCKS (0) 
-            io_ro_32 enabled0; 
+            // 0x80000000 [31]    CLK_SYS_SIO (0)
+            // 0x40000000 [30]    CLK_SYS_SHA256 (0)
+            // 0x20000000 [29]    CLK_SYS_RSM  (0)
+            // 0x10000000 [28]    CLK_SYS_ROSC (0)
+            // 0x08000000 [27]    CLK_SYS_ROM  (0)
+            // 0x04000000 [26]    CLK_SYS_RESETS (0)
+            // 0x02000000 [25]    CLK_SYS_PWM  (0)
+            // 0x01000000 [24]    CLK_SYS_POWMAN (0)
+            // 0x00800000 [23]    CLK_REF_POWMAN (0)
+            // 0x00400000 [22]    CLK_SYS_PLL_USB (0)
+            // 0x00200000 [21]    CLK_SYS_PLL_SYS (0)
+            // 0x00100000 [20]    CLK_SYS_PIO2 (0)
+            // 0x00080000 [19]    CLK_SYS_PIO1 (0)
+            // 0x00040000 [18]    CLK_SYS_PIO0 (0)
+            // 0x00020000 [17]    CLK_SYS_PADS (0)
+            // 0x00010000 [16]    CLK_SYS_OTP  (0)
+            // 0x00008000 [15]    CLK_REF_OTP  (0)
+            // 0x00004000 [14]    CLK_SYS_JTAG (0)
+            // 0x00002000 [13]    CLK_SYS_IO   (0)
+            // 0x00001000 [12]    CLK_SYS_I2C1 (0)
+            // 0x00000800 [11]    CLK_SYS_I2C0 (0)
+            // 0x00000400 [10]    CLK_SYS_HSTX (0)
+            // 0x00000200 [9]     CLK_HSTX     (0)
+            // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (0)
+            // 0x00000080 [7]     CLK_SYS_DMA  (0)
+            // 0x00000040 [6]     CLK_SYS_BUSFABRIC (0)
+            // 0x00000020 [5]     CLK_SYS_BUSCTRL (0)
+            // 0x00000010 [4]     CLK_SYS_BOOTRAM (0)
+            // 0x00000008 [3]     CLK_SYS_ADC  (0)
+            // 0x00000004 [2]     CLK_ADC      (0)
+            // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (0)
+            // 0x00000001 [0]     CLK_SYS_CLOCKS (0)
+            io_ro_32 enabled0;
 
             _REG_(CLOCKS_ENABLED1_OFFSET) // CLOCKS_ENABLED1
             // indicates the state of the clock enable
-            // 0x40000000 [30]    CLK_SYS_XOSC (0) 
-            // 0x20000000 [29]    CLK_SYS_XIP  (0) 
-            // 0x10000000 [28]    CLK_SYS_WATCHDOG (0) 
-            // 0x08000000 [27]    CLK_USB      (0) 
-            // 0x04000000 [26]    CLK_SYS_USBCTRL (0) 
-            // 0x02000000 [25]    CLK_SYS_UART1 (0) 
-            // 0x01000000 [24]    CLK_PERI_UART1 (0) 
-            // 0x00800000 [23]    CLK_SYS_UART0 (0) 
-            // 0x00400000 [22]    CLK_PERI_UART0 (0) 
-            // 0x00200000 [21]    CLK_SYS_TRNG (0) 
-            // 0x00100000 [20]    CLK_SYS_TIMER1 (0) 
-            // 0x00080000 [19]    CLK_SYS_TIMER0 (0) 
-            // 0x00040000 [18]    CLK_SYS_TICKS (0) 
-            // 0x00020000 [17]    CLK_REF_TICKS (0) 
-            // 0x00010000 [16]    CLK_SYS_TBMAN (0) 
-            // 0x00008000 [15]    CLK_SYS_SYSINFO (0) 
-            // 0x00004000 [14]    CLK_SYS_SYSCFG (0) 
-            // 0x00002000 [13]    CLK_SYS_SRAM9 (0) 
-            // 0x00001000 [12]    CLK_SYS_SRAM8 (0) 
-            // 0x00000800 [11]    CLK_SYS_SRAM7 (0) 
-            // 0x00000400 [10]    CLK_SYS_SRAM6 (0) 
-            // 0x00000200 [9]     CLK_SYS_SRAM5 (0) 
-            // 0x00000100 [8]     CLK_SYS_SRAM4 (0) 
-            // 0x00000080 [7]     CLK_SYS_SRAM3 (0) 
-            // 0x00000040 [6]     CLK_SYS_SRAM2 (0) 
-            // 0x00000020 [5]     CLK_SYS_SRAM1 (0) 
-            // 0x00000010 [4]     CLK_SYS_SRAM0 (0) 
-            // 0x00000008 [3]     CLK_SYS_SPI1 (0) 
-            // 0x00000004 [2]     CLK_PERI_SPI1 (0) 
-            // 0x00000002 [1]     CLK_SYS_SPI0 (0) 
-            // 0x00000001 [0]     CLK_PERI_SPI0 (0) 
-            io_ro_32 enabled1; 
+            // 0x40000000 [30]    CLK_SYS_XOSC (0)
+            // 0x20000000 [29]    CLK_SYS_XIP  (0)
+            // 0x10000000 [28]    CLK_SYS_WATCHDOG (0)
+            // 0x08000000 [27]    CLK_USB      (0)
+            // 0x04000000 [26]    CLK_SYS_USBCTRL (0)
+            // 0x02000000 [25]    CLK_SYS_UART1 (0)
+            // 0x01000000 [24]    CLK_PERI_UART1 (0)
+            // 0x00800000 [23]    CLK_SYS_UART0 (0)
+            // 0x00400000 [22]    CLK_PERI_UART0 (0)
+            // 0x00200000 [21]    CLK_SYS_TRNG (0)
+            // 0x00100000 [20]    CLK_SYS_TIMER1 (0)
+            // 0x00080000 [19]    CLK_SYS_TIMER0 (0)
+            // 0x00040000 [18]    CLK_SYS_TICKS (0)
+            // 0x00020000 [17]    CLK_REF_TICKS (0)
+            // 0x00010000 [16]    CLK_SYS_TBMAN (0)
+            // 0x00008000 [15]    CLK_SYS_SYSINFO (0)
+            // 0x00004000 [14]    CLK_SYS_SYSCFG (0)
+            // 0x00002000 [13]    CLK_SYS_SRAM9 (0)
+            // 0x00001000 [12]    CLK_SYS_SRAM8 (0)
+            // 0x00000800 [11]    CLK_SYS_SRAM7 (0)
+            // 0x00000400 [10]    CLK_SYS_SRAM6 (0)
+            // 0x00000200 [9]     CLK_SYS_SRAM5 (0)
+            // 0x00000100 [8]     CLK_SYS_SRAM4 (0)
+            // 0x00000080 [7]     CLK_SYS_SRAM3 (0)
+            // 0x00000040 [6]     CLK_SYS_SRAM2 (0)
+            // 0x00000020 [5]     CLK_SYS_SRAM1 (0)
+            // 0x00000010 [4]     CLK_SYS_SRAM0 (0)
+            // 0x00000008 [3]     CLK_SYS_SPI1 (0)
+            // 0x00000004 [2]     CLK_PERI_SPI1 (0)
+            // 0x00000002 [1]     CLK_SYS_SPI0 (0)
+            // 0x00000001 [0]     CLK_PERI_SPI0 (0)
+            io_ro_32 enabled1;
         };
         // (Description copied from array index 0 register CLOCKS_ENABLED0 applies similarly to other array indexes)
         _REG_(CLOCKS_ENABLED0_OFFSET) // CLOCKS_ENABLED0
         // indicates the state of the clock enable
-        // 0x80000000 [31]    CLK_SYS_SIO  (0) 
-        // 0x40000000 [30]    CLK_SYS_SHA256 (0) 
-        // 0x20000000 [29]    CLK_SYS_PSM  (0) 
-        // 0x10000000 [28]    CLK_SYS_ROSC (0) 
-        // 0x08000000 [27]    CLK_SYS_ROM  (0) 
-        // 0x04000000 [26]    CLK_SYS_RESETS (0) 
-        // 0x02000000 [25]    CLK_SYS_PWM  (0) 
-        // 0x01000000 [24]    CLK_SYS_POWMAN (0) 
-        // 0x00800000 [23]    CLK_REF_POWMAN (0) 
-        // 0x00400000 [22]    CLK_SYS_PLL_USB (0) 
-        // 0x00200000 [21]    CLK_SYS_PLL_SYS (0) 
-        // 0x00100000 [20]    CLK_SYS_PIO2 (0) 
-        // 0x00080000 [19]    CLK_SYS_PIO1 (0) 
-        // 0x00040000 [18]    CLK_SYS_PIO0 (0) 
-        // 0x00020000 [17]    CLK_SYS_PADS (0) 
-        // 0x00010000 [16]    CLK_SYS_OTP  (0) 
-        // 0x00008000 [15]    CLK_REF_OTP  (0) 
-        // 0x00004000 [14]    CLK_SYS_JTAG (0) 
-        // 0x00002000 [13]    CLK_SYS_IO   (0) 
-        // 0x00001000 [12]    CLK_SYS_I2C1 (0) 
-        // 0x00000800 [11]    CLK_SYS_I2C0 (0) 
-        // 0x00000400 [10]    CLK_SYS_HSTX (0) 
-        // 0x00000200 [9]     CLK_HSTX     (0) 
-        // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (0) 
-        // 0x00000080 [7]     CLK_SYS_DMA  (0) 
-        // 0x00000040 [6]     CLK_SYS_BUSFABRIC (0) 
-        // 0x00000020 [5]     CLK_SYS_BUSCTRL (0) 
-        // 0x00000010 [4]     CLK_SYS_BOOTRAM (0) 
-        // 0x00000008 [3]     CLK_SYS_ADC  (0) 
-        // 0x00000004 [2]     CLK_ADC      (0) 
-        // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (0) 
-        // 0x00000001 [0]     CLK_SYS_CLOCKS (0) 
+        // 0x80000000 [31]    CLK_SYS_SIO  (0)
+        // 0x40000000 [30]    CLK_SYS_SHA256 (0)
+        // 0x20000000 [29]    CLK_SYS_PSM  (0)
+        // 0x10000000 [28]    CLK_SYS_ROSC (0)
+        // 0x08000000 [27]    CLK_SYS_ROM  (0)
+        // 0x04000000 [26]    CLK_SYS_RESETS (0)
+        // 0x02000000 [25]    CLK_SYS_PWM  (0)
+        // 0x01000000 [24]    CLK_SYS_POWMAN (0)
+        // 0x00800000 [23]    CLK_REF_POWMAN (0)
+        // 0x00400000 [22]    CLK_SYS_PLL_USB (0)
+        // 0x00200000 [21]    CLK_SYS_PLL_SYS (0)
+        // 0x00100000 [20]    CLK_SYS_PIO2 (0)
+        // 0x00080000 [19]    CLK_SYS_PIO1 (0)
+        // 0x00040000 [18]    CLK_SYS_PIO0 (0)
+        // 0x00020000 [17]    CLK_SYS_PADS (0)
+        // 0x00010000 [16]    CLK_SYS_OTP  (0)
+        // 0x00008000 [15]    CLK_REF_OTP  (0)
+        // 0x00004000 [14]    CLK_SYS_JTAG (0)
+        // 0x00002000 [13]    CLK_SYS_IO   (0)
+        // 0x00001000 [12]    CLK_SYS_I2C1 (0)
+        // 0x00000800 [11]    CLK_SYS_I2C0 (0)
+        // 0x00000400 [10]    CLK_SYS_HSTX (0)
+        // 0x00000200 [9]     CLK_HSTX     (0)
+        // 0x00000100 [8]     CLK_SYS_GLITCH_DETECTOR (0)
+        // 0x00000080 [7]     CLK_SYS_DMA  (0)
+        // 0x00000040 [6]     CLK_SYS_BUSFABRIC (0)
+        // 0x00000020 [5]     CLK_SYS_BUSCTRL (0)
+        // 0x00000010 [4]     CLK_SYS_BOOTRAM (0)
+        // 0x00000008 [3]     CLK_SYS_ADC  (0)
+        // 0x00000004 [2]     CLK_ADC      (0)
+        // 0x00000002 [1]     CLK_SYS_ACCESSCTRL (0)
+        // 0x00000001 [0]     CLK_SYS_CLOCKS (0)
         io_ro_32 enabled[2];
     };
- 
+
     _REG_(CLOCKS_INTR_OFFSET) // CLOCKS_INTR
     // Raw Interrupts
-    // 0x00000001 [0]     CLK_SYS_RESUS (0) 
+    // 0x00000001 [0]     CLK_SYS_RESUS (0)
     io_ro_32 intr;
- 
+
     _REG_(CLOCKS_INTE_OFFSET) // CLOCKS_INTE
     // Interrupt Enable
-    // 0x00000001 [0]     CLK_SYS_RESUS (0) 
+    // 0x00000001 [0]     CLK_SYS_RESUS (0)
     io_rw_32 inte;
- 
+
     _REG_(CLOCKS_INTF_OFFSET) // CLOCKS_INTF
     // Interrupt Force
-    // 0x00000001 [0]     CLK_SYS_RESUS (0) 
+    // 0x00000001 [0]     CLK_SYS_RESUS (0)
     io_rw_32 intf;
- 
+
     _REG_(CLOCKS_INTS_OFFSET) // CLOCKS_INTS
     // Interrupt status after masking & forcing
-    // 0x00000001 [0]     CLK_SYS_RESUS (0) 
+    // 0x00000001 [0]     CLK_SYS_RESUS (0)
     io_ro_32 ints;
 } clocks_hw_t;
 
@@ -577,4 +576,3 @@ typedef struct {
 static_assert(sizeof (clocks_hw_t) == 0x00d4, "");
 
 #endif // _HARDWARE_STRUCTS_CLOCKS_H
-

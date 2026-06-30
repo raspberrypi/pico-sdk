@@ -33,19 +33,19 @@ typedef struct {
     // 0x0000ff00 [15:8]  DREGION      (0x08) Number of regions supported by the MPU
     // 0x00000001 [0]     SEPARATE     (0) Indicates support for separate instructions and data...
     io_ro_32 type;
- 
+
     _REG_(M33_MPU_CTRL_OFFSET) // M33_MPU_CTRL
     // Enables the MPU and, when the MPU is enabled, controls whether the default memory map is enabled...
     // 0x00000004 [2]     PRIVDEFENA   (0) Controls whether the default memory map is enabled for...
     // 0x00000002 [1]     HFNMIENA     (0) Controls whether handlers executing with priority less...
     // 0x00000001 [0]     ENABLE       (0) Enables the MPU
     io_rw_32 ctrl;
- 
+
     _REG_(M33_MPU_RNR_OFFSET) // M33_MPU_RNR
     // Selects the region currently accessed by MPU_RBAR and MPU_RLAR
     // 0x00000007 [2:0]   REGION       (0x0) Indicates the memory region accessed by MPU_RBAR and MPU_RLAR
     io_rw_32 rnr;
- 
+
     _REG_(M33_MPU_RBAR_OFFSET) // M33_MPU_RBAR
     // Provides indirect read and write access to the base address of the currently selected MPU region `FTSSS
     // 0xffffffe0 [31:5]  BASE         (0x0000000) Contains bits [31:5] of the lower inclusive limit of the...
@@ -53,14 +53,14 @@ typedef struct {
     // 0x00000006 [2:1]   AP           (0x0) Defines the access permissions for this region
     // 0x00000001 [0]     XN           (0) Defines whether code can be executed from this region
     io_rw_32 rbar;
- 
+
     _REG_(M33_MPU_RLAR_OFFSET) // M33_MPU_RLAR
     // Provides indirect read and write access to the limit address of the currently selected MPU region `FTSSS
     // 0xffffffe0 [31:5]  LIMIT        (0x0000000) Contains bits [31:5] of the upper inclusive limit of the...
     // 0x0000000e [3:1]   ATTRINDX     (0x0) Associates a set of attributes in the MPU_MAIR0 and...
     // 0x00000001 [0]     EN           (0) Region enable
     io_rw_32 rlar;
- 
+
     _REG_(M33_MPU_RBAR_A1_OFFSET) // M33_MPU_RBAR_A1
     // Provides indirect read and write access to the base address of the MPU region selected by...
     // 0xffffffe0 [31:5]  BASE         (0x0000000) Contains bits [31:5] of the lower inclusive limit of the...
@@ -68,14 +68,14 @@ typedef struct {
     // 0x00000006 [2:1]   AP           (0x0) Defines the access permissions for this region
     // 0x00000001 [0]     XN           (0) Defines whether code can be executed from this region
     io_rw_32 rbar_a1;
- 
+
     _REG_(M33_MPU_RLAR_A1_OFFSET) // M33_MPU_RLAR_A1
     // Provides indirect read and write access to the limit address of the currently selected MPU...
     // 0xffffffe0 [31:5]  LIMIT        (0x0000000) Contains bits [31:5] of the upper inclusive limit of the...
     // 0x0000000e [3:1]   ATTRINDX     (0x0) Associates a set of attributes in the MPU_MAIR0 and...
     // 0x00000001 [0]     EN           (0) Region enable
     io_rw_32 rlar_a1;
- 
+
     _REG_(M33_MPU_RBAR_A2_OFFSET) // M33_MPU_RBAR_A2
     // Provides indirect read and write access to the base address of the MPU region selected by...
     // 0xffffffe0 [31:5]  BASE         (0x0000000) Contains bits [31:5] of the lower inclusive limit of the...
@@ -83,14 +83,14 @@ typedef struct {
     // 0x00000006 [2:1]   AP           (0x0) Defines the access permissions for this region
     // 0x00000001 [0]     XN           (0) Defines whether code can be executed from this region
     io_rw_32 rbar_a2;
- 
+
     _REG_(M33_MPU_RLAR_A2_OFFSET) // M33_MPU_RLAR_A2
     // Provides indirect read and write access to the limit address of the currently selected MPU...
     // 0xffffffe0 [31:5]  LIMIT        (0x0000000) Contains bits [31:5] of the upper inclusive limit of the...
     // 0x0000000e [3:1]   ATTRINDX     (0x0) Associates a set of attributes in the MPU_MAIR0 and...
     // 0x00000001 [0]     EN           (0) Region enable
     io_rw_32 rlar_a2;
- 
+
     _REG_(M33_MPU_RBAR_A3_OFFSET) // M33_MPU_RBAR_A3
     // Provides indirect read and write access to the base address of the MPU region selected by...
     // 0xffffffe0 [31:5]  BASE         (0x0000000) Contains bits [31:5] of the lower inclusive limit of the...
@@ -98,16 +98,16 @@ typedef struct {
     // 0x00000006 [2:1]   AP           (0x0) Defines the access permissions for this region
     // 0x00000001 [0]     XN           (0) Defines whether code can be executed from this region
     io_rw_32 rbar_a3;
- 
+
     _REG_(M33_MPU_RLAR_A3_OFFSET) // M33_MPU_RLAR_A3
     // Provides indirect read and write access to the limit address of the currently selected MPU...
     // 0xffffffe0 [31:5]  LIMIT        (0x0000000) Contains bits [31:5] of the upper inclusive limit of the...
     // 0x0000000e [3:1]   ATTRINDX     (0x0) Associates a set of attributes in the MPU_MAIR0 and...
     // 0x00000001 [0]     EN           (0) Region enable
     io_rw_32 rlar_a3;
- 
+
     uint32_t _pad0;
- 
+
     // (Description copied from array index 0 register M33_MPU_MAIR0 applies similarly to other array indexes)
     _REG_(M33_MPU_MAIR0_OFFSET) // M33_MPU_MAIR0
     // Along with MPU_MAIR1, provides the memory attribute encodings corresponding to the AttrIndex values
@@ -123,4 +123,3 @@ typedef struct {
 static_assert(sizeof (mpu_hw_t) == 0x0038, "");
 
 #endif // _HARDWARE_STRUCTS_MPU_H
-

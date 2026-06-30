@@ -25,7 +25,7 @@
 //               runs from the ROSC.
 //               If the chip has subsequently been programmed to run from the
 //               XOSC then setting this field to DISABLE may lock-up the chip.
-//               If  this is a concern then run the clk_ref from the ROSC and
+//               If this is a concern then run the clk_ref from the ROSC and
 //               enable the clk_sys RESUS feature.
 //               The 12-bit code is intended to give some protection against
 //               accidental writes. An invalid setting will retain the previous
@@ -113,9 +113,9 @@
 //               This is used to save power by pausing the XOSC
 //               On power-up this field is initialised to WAKE
 //               An invalid write will also select WAKE
-//               Warning: stop the PLLs before selecting dormant mode
-//               Warning: setup the irq before selecting dormant mode
-//               0x636f6d61 -> dormant
+//               WARNING: stop the PLLs before selecting dormant mode
+//               WARNING: setup the irq before selecting dormant mode
+//               0x636f6d61 -> DORMANT
 //               0x77616b65 -> WAKE
 #define XOSC_DORMANT_OFFSET _u(0x00000008)
 #define XOSC_DORMANT_BITS   _u(0xffffffff)
@@ -136,7 +136,7 @@
 // Description : Multiplies the startup_delay by 4, just in case. The reset
 //               value is controlled by a mask-programmable tiecell and is
 //               provided in case we are booting from XOSC and the default
-//               startup delay is insufficient. The reset value is 0x0.
+//               startup delay is insufficient
 #define XOSC_STARTUP_X4_RESET  "-"
 #define XOSC_STARTUP_X4_BITS   _u(0x00100000)
 #define XOSC_STARTUP_X4_MSB    _u(20)
@@ -172,4 +172,3 @@
 #define XOSC_COUNT_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_XOSC_H
-

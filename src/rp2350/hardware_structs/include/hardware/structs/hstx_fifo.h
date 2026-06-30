@@ -27,14 +27,14 @@ typedef struct {
     _REG_(HSTX_FIFO_STAT_OFFSET) // HSTX_FIFO_STAT
     // FIFO status
     // 0x00000400 [10]    WOF          (0) FIFO was written when full
-    // 0x00000200 [9]     EMPTY        (-) 
-    // 0x00000100 [8]     FULL         (-) 
-    // 0x000000ff [7:0]   LEVEL        (0x00) 
+    // 0x00000200 [9]     EMPTY        (-)
+    // 0x00000100 [8]     FULL         (-)
+    // 0x000000ff [7:0]   LEVEL        (0x00)
     io_rw_32 stat;
- 
+
     _REG_(HSTX_FIFO_FIFO_OFFSET) // HSTX_FIFO_FIFO
     // Write access to FIFO
-    // 0xffffffff [31:0]  FIFO         (0x00000000) 
+    // 0xffffffff [31:0]  FIFO         (0x00000000)
     io_wo_32 fifo;
 } hstx_fifo_hw_t;
 
@@ -42,4 +42,3 @@ typedef struct {
 static_assert(sizeof (hstx_fifo_hw_t) == 0x0008, "");
 
 #endif // _HARDWARE_STRUCTS_HSTX_FIFO_H
-

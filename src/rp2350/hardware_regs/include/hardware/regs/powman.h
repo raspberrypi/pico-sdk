@@ -493,7 +493,7 @@
 #define POWMAN_CHIP_RESET_BITS   _u(0x1fef0011)
 #define POWMAN_CHIP_RESET_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
-// Field       : POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_RSM
+// Field       : POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_PSM
 // Description : Last reset was a watchdog timeout which was configured to reset
 //               the power-on state machine
 //               This resets:
@@ -506,11 +506,11 @@
 //               swcore             no
 //               psm                yes
 //               and does not change the power state
-#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_RSM_RESET  _u(0x0)
-#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_RSM_BITS   _u(0x10000000)
-#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_RSM_MSB    _u(28)
-#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_RSM_LSB    _u(28)
-#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_RSM_ACCESS "RO"
+#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_PSM_RESET  _u(0x0)
+#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_PSM_BITS   _u(0x10000000)
+#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_PSM_MSB    _u(28)
+#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_PSM_LSB    _u(28)
+#define POWMAN_CHIP_RESET_HAD_WATCHDOG_RESET_PSM_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : POWMAN_CHIP_RESET_HAD_HZD_SYS_RESET_REQ
 // Description : Last reset was a system reset from the hazard debugger
@@ -747,25 +747,25 @@
 #define POWMAN_WDSEL_BITS   _u(0x00001111)
 #define POWMAN_WDSEL_RESET  _u(0x00000000)
 // -----------------------------------------------------------------------------
-// Field       : POWMAN_WDSEL_RESET_RSM
+// Field       : POWMAN_WDSEL_RESET_PSM
 // Description : If set to 1, a watchdog reset will run the full power-on state
 //               machine (PSM) sequence
 //               From a user perspective it is the same as setting
-//               RSM_WDSEL_PROC_COLD
+//               PSM_WDSEL_PROC_COLD
 //               From a hardware debug perspective it has the same effect as a
 //               reset from a glitch detector
-#define POWMAN_WDSEL_RESET_RSM_RESET  _u(0x0)
-#define POWMAN_WDSEL_RESET_RSM_BITS   _u(0x00001000)
-#define POWMAN_WDSEL_RESET_RSM_MSB    _u(12)
-#define POWMAN_WDSEL_RESET_RSM_LSB    _u(12)
-#define POWMAN_WDSEL_RESET_RSM_ACCESS "RW"
+#define POWMAN_WDSEL_RESET_PSM_RESET  _u(0x0)
+#define POWMAN_WDSEL_RESET_PSM_BITS   _u(0x00001000)
+#define POWMAN_WDSEL_RESET_PSM_MSB    _u(12)
+#define POWMAN_WDSEL_RESET_PSM_LSB    _u(12)
+#define POWMAN_WDSEL_RESET_PSM_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : POWMAN_WDSEL_RESET_SWCORE
 // Description : If set to 1, a watchdog reset will reset the switched core
 //               power domain and run the full power-on state machine (PSM)
 //               sequence
 //               From a user perspective it is the same as setting
-//               RSM_WDSEL_PROC_COLD
+//               PSM_WDSEL_PROC_COLD
 //               From a hardware debug perspective it has the same effect as a
 //               power-on reset for the switched core power domain
 #define POWMAN_WDSEL_RESET_SWCORE_RESET  _u(0x0)
@@ -1185,10 +1185,10 @@
 #define POWMAN_EXT_TIME_REF_DRIVE_LPCK_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : POWMAN_EXT_TIME_REF_SOURCE_SEL
-// Description : 0 ->  gpio12
-//               1 ->  gpio20
-//               2 ->  gpio14
-//               3 ->  gpio22
+//               0x0 -> gpio12
+//               0x1 -> gpio20
+//               0x2 -> gpio14
+//               0x3 -> gpio22
 #define POWMAN_EXT_TIME_REF_SOURCE_SEL_RESET  _u(0x0)
 #define POWMAN_EXT_TIME_REF_SOURCE_SEL_BITS   _u(0x00000003)
 #define POWMAN_EXT_TIME_REF_SOURCE_SEL_MSB    _u(1)
@@ -1458,9 +1458,9 @@
 #define POWMAN_TIMER_CLEAR_ACCESS "SC"
 // -----------------------------------------------------------------------------
 // Field       : POWMAN_TIMER_RUN
-// Description : Timer enable. Setting this bit causes the timer to begin
-//               counting up from its current value. Clearing this bit stops the
-//               timer from counting.
+// Description : Timer enable. Setting this bit loads the timer with the values
+//               within the SET_TIME registers, and causes the timer to begin
+//               counting up. Clearing this bit stops the timer from counting.
 //
 //               Before enabling the timer, set the POWMAN_LPOSC_FREQ* and
 //               POWMAN_XOSC_FREQ* registers to configure the count rate, and
@@ -1875,7 +1875,7 @@
 // =============================================================================
 // Register    : POWMAN_BOOTDIS
 // Description : Tell the bootrom to ignore the BOOT0..3 registers following the
-//               next RSM reset (e.g. the next core power down/up).
+//               next PSM reset (e.g. the next core power down/up).
 //
 //               If an early boot stage has soft-locked some OTP pages in order
 //               to protect their contents from later stages, there is a risk
@@ -1898,7 +1898,7 @@
 //               The BOOTDIS_NEXT bit is OR'd into the BOOTDIS_NOW bit when the
 //               core is powered down. Simultaneously, the BOOTDIS_NEXT bit is
 //               cleared. Setting this bit means that the BOOT0..3 registers
-//               will be ignored following the next reset of the RSM by powman.
+//               will be ignored following the next reset of the PSM by powman.
 //
 //               This flag should be set by an early boot stage that has soft-
 //               locked OTP pages, to prevent later stages from unlocking it by
@@ -1910,7 +1910,7 @@
 #define POWMAN_BOOTDIS_NEXT_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : POWMAN_BOOTDIS_NOW
-// Description : When powman resets the RSM, the current value of BOOTDIS_NEXT
+// Description : When powman resets the PSM, the current value of BOOTDIS_NEXT
 //               is OR'd into BOOTDIS_NOW, and BOOTDIS_NEXT is cleared.
 //
 //               The bootrom checks this flag before reading the BOOT0..3
@@ -2192,4 +2192,3 @@
 #define POWMAN_INTS_VREG_OUTPUT_LOW_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_POWMAN_H
-

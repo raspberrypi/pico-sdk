@@ -220,9 +220,9 @@
 // Register    : ROSC_DIV
 // Description : Controls the output divider
 //               set to 0xaa00 + div where
-//               div = 0 divides by 128
-//               div = 1-127 divides by div
-//               any other value sets div=128
+//               div = 0 divides by 256
+//               div = 1-255 divides by div
+//               any other value sets div=256
 //               this register resets to div=32
 //               0xaa00 -> PASS
 #define ROSC_DIV_OFFSET _u(0x00000014)
@@ -342,4 +342,3 @@
 #define ROSC_COUNT_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_ROSC_H
-

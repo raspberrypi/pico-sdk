@@ -29,7 +29,7 @@ typedef struct {
     // 0x00000002 [1]     TRACE_CAPTURE_FIFO_OVERFLOW (0) This status flag is set high when trace data has been...
     // 0x00000001 [0]     TRACE_CAPTURE_FIFO_FLUSH (1) Set to 1 to continuously hold the trace FIFO in a...
     io_rw_32 ctrl_status;
- 
+
     _REG_(CORESIGHT_TRACE_TRACE_CAPTURE_FIFO_OFFSET) // CORESIGHT_TRACE_TRACE_CAPTURE_FIFO
     // FIFO for trace data captured from the TPIU
     // 0xffffffff [31:0]  RDATA        (0x00000000) Read from an 8 x 32-bit FIFO containing trace data...
@@ -40,4 +40,3 @@ typedef struct {
 static_assert(sizeof (coresight_trace_hw_t) == 0x0008, "");
 
 #endif // _HARDWARE_STRUCTS_CORESIGHT_TRACE_H
-

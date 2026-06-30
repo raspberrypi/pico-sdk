@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -84,7 +84,7 @@ typedef struct {
     io_ro_32 rtc_1;
  
     _REG_(RTC_RTC_0_OFFSET) // RTC_RTC_0
-    // RTC register 0 +
+    // RTC register 0
     // 0x07000000 [26:24] DOTW         (-) Day of the week
     // 0x001f0000 [20:16] HOUR         (-) Hours
     // 0x00003f00 [13:8]  MIN          (-) Minutes
