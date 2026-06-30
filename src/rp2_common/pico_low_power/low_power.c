@@ -235,6 +235,20 @@ void low_power_set_pins_low_leakage(uint32_t exclude_mask) {
     }
 }
 
+// this function is provided (in low_power.h) as an inlined call to the 32 bit version if we have <= 32 GPIOs
+#if NUM_BANK0_GPIOS > 32
+void low_power_set_pins_low_leakage64(uint64_t exclude_mask) {
+    uint64_t include_mask = ~exclude_mask;
+    gpio_set_dir_masked64(include_mask, 0);
+    for (int i=0; i < NUM_BANK0_GPIOS; i++) {
+        if (exclude_mask & (1u << i)) continue;
+        gpio_set_function(i, GPIO_FUNC_SIO);
+        gpio_disable_pulls(i);
+        gpio_set_input_enabled(i, false);
+    }
+}
+#endif
+
 int low_power_sleep_until_irq(const clock_dest_bitset_t *keep_enabled) {
     clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
