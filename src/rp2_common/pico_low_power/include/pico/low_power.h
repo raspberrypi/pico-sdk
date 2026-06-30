@@ -130,6 +130,12 @@ typedef enum {
 typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
 #endif
 
+/*! \brief  Set all pins to a low leakage state
+ *  \ingroup pico_low_power
+ *
+ * \param exclude_mask The pins to exclude from this
+ */
+void low_power_set_pins_low_leakage(uint32_t exclude_mask);
 
 /*! \brief  Sleep until an interrupt occurs
  *  \ingroup pico_low_power

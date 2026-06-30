@@ -224,6 +224,17 @@ int low_power_set_external_clock_source(uint src_hz, uint gpio_pin) {
 }
 #endif  // inline in header for other platforms
 
+void low_power_set_pins_low_leakage(uint32_t exclude_mask) {
+    uint32_t include_mask = ~exclude_mask;
+    gpio_set_dir_masked(include_mask, 0);
+    for (int i=0; i < NUM_BANK0_GPIOS; i++) {
+        if (exclude_mask & (1u << i)) continue;
+        gpio_set_function(i, GPIO_FUNC_SIO);
+        gpio_disable_pulls(i);
+        gpio_set_input_enabled(i, false);
+    }
+}
+
 int low_power_sleep_until_irq(const clock_dest_bitset_t *keep_enabled) {
     clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
