@@ -65,7 +65,7 @@ int main() {
         } else {
             printf("ERROR: Woken up from Pstate\n");
         }
-#else
+#elif PICO_RP2040
         printf("Going dormant from the RTC for %dms\n", SLEEP_TIME_MS);
         gpio_put(SLEEP_MONITOR_PIN, 0);
         ret = low_power_dormant_for_ms(SLEEP_TIME_MS, DORMANT_CLOCK_SOURCE_RTC, NULL);
