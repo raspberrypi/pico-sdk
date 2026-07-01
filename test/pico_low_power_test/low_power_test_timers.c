@@ -129,6 +129,7 @@ int main() {
 
     absolute_time_t start_time;
     static absolute_time_t __persistent_data(wakeup_time);
+    absolute_time_t system_time_before;
     int64_t diff;
     int ret;
 
@@ -243,21 +244,16 @@ int main() {
 
 
 
-    // dormant
+    // dormant using default clock source
     printf("Going DORMANT for %d seconds via AON TIMER\n", SLEEP_TIME_S);
 
     gpio_put(SLEEP_MONITOR_PIN, 0);
     start_time = aon_timer_get_absolute_time();
-    absolute_time_t system_time_before = get_absolute_time();
+    system_time_before = get_absolute_time();
     wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
     ret = low_power_dormant_until_aon_timer(wakeup_time, DORMANT_CLOCK_SOURCE_DEFAULT, NULL);
     if (ret != PICO_OK) {
         printf("ERROR: %d returned by low_power_dormant_until_aon_timer\n", ret);
-    #if PICO_RP2040
-        if (ret == PICO_ERROR_PRECONDITION_NOT_MET) {
-            printf("ERROR: RTC clock source is not running - connect a device running external_sleep_timer to GPIO %d\n", RTC_GPIO_IN);
-        }
-    #endif
         EXIT_TEST;
     }
     gpio_put(SLEEP_MONITOR_PIN, 1);
@@ -390,6 +386,42 @@ post_pstate_sram_off:
         printf("ERROR: number of POWMAN reboots was %d not 2\n", powman_hw->scratch[3]);
         EXIT_TEST;
     }
+#else
+    // dormant using XOSC clock source
+    printf("Going DORMANT from the XOSC for %d seconds via AON TIMER\n", SLEEP_TIME_S);
+
+    gpio_put(SLEEP_MONITOR_PIN, 0);
+    start_time = aon_timer_get_absolute_time();
+    system_time_before = get_absolute_time();
+    wakeup_time = delayed_by_ms(start_time, SLEEP_TIME_MS);
+    ret = low_power_dormant_until_aon_timer(wakeup_time, DORMANT_CLOCK_SOURCE_XOSC, NULL);
+    if (ret != PICO_OK) {
+        printf("ERROR: %d returned by low_power_dormant_until_aon_timer\n", ret);
+    #if PICO_RP2040
+        if (ret == PICO_ERROR_PRECONDITION_NOT_MET) {
+            printf("ERROR: RTC clock source is not running - connect a device running external_sleep_timer to GPIO %d\n", RTC_GPIO_IN);
+        }
+    #endif
+        EXIT_TEST;
+    }
+    gpio_put(SLEEP_MONITOR_PIN, 1);
+    // check the system timer was stopped while dormant
+    diff = absolute_time_diff_us(system_time_before, get_absolute_time());
+    if (diff > 200 * 1000 // 200ms
+        #ifdef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
+        + (PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS * 1000)
+        #endif
+    ) {
+        printf("ERROR: doesn't seem like timer was stopped: diff %lldus\n", diff);
+        return - 1;
+    }
+    diff = absolute_time_diff_us(wakeup_time, aon_timer_get_absolute_time());
+    printf("Woken up now @%dus since target\n", (int)diff);
+    if (diff < 0) {
+        printf("WARNING: Woke up too soon - is this within the resolution of the aon timer?\n");
+    }
+    printf("Doing %d second pause to prove timer running\n", SLEEP_TIME_S);
+    busy_wait_ms(SLEEP_TIME_MS);
 #endif
 
     printf("PASSED\n");
