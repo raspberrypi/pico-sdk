@@ -566,7 +566,7 @@ static inline void pwm_set_mask_enabled(uint32_t mask) {
 /** \brief Get PWM slice enabled status
  *  \ingroup hardware_pwm
  *
- * \param Bitmask of all PWM slices currently enabled
+ * \return Bitmask of all PWM slices currently enabled
  */
 static inline uint32_t pwm_get_mask_enabled(void) {
     return pwm_hw->en;
