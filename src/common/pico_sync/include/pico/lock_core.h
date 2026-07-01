@@ -176,6 +176,7 @@ extern volatile uint8_t lock_internal_notify_count;
 #define lock_internal_spin_unlock_with_notify(lock, save) ({ \
     lock_internal_notify_count++;                            \
     spin_unlock((lock)->spin_lock, save);                    \
+    __sev();                                                 \
     })
 #endif
 #endif

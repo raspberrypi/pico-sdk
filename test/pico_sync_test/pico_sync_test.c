@@ -28,6 +28,14 @@ int64_t notify_lock_with_flag(__unused alarm_id_t id, void *user_data) {
     return 0;
 }
 
+static lock_core_t sleep_notifier;
+
+static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
+    uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
+    lock_internal_spin_unlock_with_notify(&sleep_notifier, save);
+    return 0;
+}
+
 int main() {
     stdio_init_all();
 
@@ -73,6 +81,40 @@ int main() {
     } while (true);
     printf("Waited %d times\n", wait_count);
     PICOTEST_CHECK(wait_count == 1, "Expected exactly 1 wait");
+    PICOTEST_END_SECTION();
+
+    PICOTEST_START_SECTION("check low power sleep loop");
+    // note sleep implementation taken from pico_ime
+    lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
+    int wait_count = 0;
+    absolute_time_t t = make_timeout_time_ms(500);
+    uint64_t t_us = to_us_since_boot(t);
+    uint64_t t_before_us = t_us - PICO_TIME_SLEEP_OVERHEAD_ADJUST_US;
+    // needs to work in the first PICO_TIME_SLEEP_OVERHEAD_ADJUST_US of boot
+    if (t_before_us > t_us) t_before_us = 0;
+    absolute_time_t t_before;
+    update_us_since_boot(&t_before, t_before_us);
+    if (absolute_time_diff_us(get_absolute_time(), t_before) > 0) {
+        if (add_alarm_at(t_before, sleep_until_callback, NULL, false) >= 0) {
+            // able to add alarm for just before the time
+            while (!time_reached(t_before)) {
+                uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
+                lock_internal_spin_unlock_with_wait(&sleep_notifier, save);
+                wait_count++;
+            }
+        }
+    }
+    printf("Waited %d times\n", wait_count);
+    #undef EXPECTED_TIMEOUT_WAITS
+    #if PICO_USE_SW_SPIN_LOCKS
+        // looping twice (rather than once) is an implementation detail, however we shouldn't loop continuously (i.e. we should __wfe)
+    #define EXPECTED_TIMEOUT_WAITS 1
+    #else
+        // note that without sw spin locks we wait an extra time (an extra SEV doesn't get eaten)
+    #define EXPECTED_TIMEOUT_WAITS 2
+    #endif
+
+        PICOTEST_CHECK(wait_count == EXPECTED_TIMEOUT_WAITS, "Expected exactly " __XSTRING(EXPECTED_TIMEOUT_WAITS) " waits");
     PICOTEST_END_SECTION();
 
     PICOTEST_END_TEST();
