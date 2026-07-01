@@ -140,21 +140,21 @@ typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
  *
  * \param exclude_mask Mask of the pins to exclude from this
  */
-void low_power_set_pins_low_leakage(uint32_t exclude_mask);
+void low_power_set_all_pins_low_leakage(uint32_t exclude_mask);
 
 /*! \brief  Set all pins to a low leakage state (64-bit mask version)
  *  \ingroup pico_low_power
  *
- * \see low_power_set_pins_low_leakage
+ * \see low_power_set_all_pins_low_leakage
  *
  * \param exclude_mask Mask of the pins to exclude from this
  */
 #if NUM_BANK0_GPIOS <= 32
-static inline void low_power_set_pins_low_leakage64(uint64_t exclude_mask) {
-    low_power_set_pins_low_leakage((uint32_t)exclude_mask);
+static inline void low_power_set_all_pins_low_leakage64(uint64_t exclude_mask) {
+    low_power_set_all_pins_low_leakage((uint32_t)exclude_mask);
 }
 #else
-void low_power_set_pins_low_leakage64(uint64_t exclude_mask);
+void low_power_set_all_pins_low_leakage64(uint64_t exclude_mask);
 #endif
 
 /*! \brief  Sleep until an interrupt occurs
