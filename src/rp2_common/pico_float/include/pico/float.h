@@ -22,56 +22,56 @@
 *
 * The pico_float library comes in three main flavors:
 *
-* 1. `pico_float_none` - all floating point operations cause a \ref panic - no single-precision floating point code is included
-* 2. `pico_float_compiler` - no custom functions are provided; all single-precision floating point is handled by the C compiler/library
-* 3. `pico_float_pico` - the smallest and fastest available for the platform, along with additional functionality (e.g. fixed-point conversions) which are detailed below
+* 1. `none` - all floating point operations cause a \ref panic - no single-precision floating point code is included
+* 2. `compiler` - no custom functions are provided; all single-precision floating point is handled by the C compiler/library
+* 3. `pico` - the smallest and fastest available for the platform, along with additional functionality (e.g. fixed-point conversions) which are detailed below
 *
-* The user can control which version they want (e.g. **pico_float_xxx** by either setting the CMake global variable
+* The user can control which version they want (e.g. pico_float `compiler` by either setting the CMake global variable
 * `PICO_DEFAULT_FLOAT_IMPL=xxx`, or by using the CMake function `pico_set_float_implementation(<TARGET> xxx)`. Note that in the absence
-* of either, pico_float_pico is used by default.
+* of either, pico_float `pico` is used by default.
 *
 * \if rp2040_specific
-* On RP2040, `pico_float_pico` uses optimized hand coded implementations from the bootrom and the SDK for both
+* On RP2040, pico_float `pico` uses optimized hand coded implementations from the bootrom and the SDK for both
 * basic single-precision floating point operations and floating point math library functions. These implementations
 * are generally faster and smaller than those provided by the C compiler/library, though they don't support all the features of a fully compliant
 * floating point implementation; they are however usually fine for the majority of cases
 * \endif
 *
 * \if rp2350_specific
-* On Arm on RP2350, there are multiple options for `pico_float_pico`:
+* On Arm on RP2350, there are multiple options for pico_float `pico`:
 *
-* 1. `pico_float_pico_vfp` - this library leaves basic C single-precision floating point operations to the compiler
+* 1. pico_float `pico_vfp` - this library leaves basic C single-precision floating point operations to the compiler
 * which can use inlined VFP (Arm FPU) code. Custom optimized versions of trigonometric and scientific functions are provided.
 * No DCP (RP2350 Double co-processor) instructions are used.
-* 2. `pico_float_pico_dcp` - this library prevents the compiler injecting inlined VFP code, and also implements
+* 2. pico_float `pico_dcp` - this library prevents the compiler injecting inlined VFP code, and also implements
 * all single-precision floating point operations in optimized DCP or M33 code. This option is not quite as fast
-* as pico_float_pico_vfp, however it allows floating point operations without enabling the floating point co-processor
+* as pico_float `pico_vfp`, however it allows floating point operations without enabling the floating point co-processor
 * on the CPU; this can be beneficial in certain circumstances, e.g. where leaving stack in tasks or interrupts
 * for the floating point state is undesirable.
 *
-* Note: `pico_float_pico` is equivalent to `pico_float_pico_vfp` on RP2350, as this is the most sensible default
+* Note: pico_float `pico` is equivalent to pico_float `pico_vfp` on RP2350, as this is the most sensible default
 * \endif
 *
 * On Arm, (replacement) optimized implementations are provided for the following compiler built-ins
 * and math library functions when using `_pico` variants of `pico_float`:
 *
-* - basic arithmetic: (except `pico_float_pico_vfp`)
+* - basic arithmetic: (except pico_float `pico_vfp`)
 *
 *   __aeabi_fadd, __aeabi_fdiv, __aeabi_fmul, __aeabi_frsub, __aeabi_fsub
 *
-* - comparison: (except `pico_float_pico_vfp`)
+* - comparison: (except pico_float `pico_vfp`)
 *
 *   __aeabi_cfcmpeq, __aeabi_cfrcmple, __aeabi_cfcmple, __aeabi_fcmpeq, __aeabi_fcmplt, __aeabi_fcmple, __aeabi_fcmpge, __aeabi_fcmpgt, __aeabi_fcmpun
 *
-* - (u)int32 <-> float: (except `pico_float_pico_vfp`)
+* - (u)int32 <-> float: (except pico_float `pico_vfp`)
 *
 *    __aeabi_i2f, __aeabi_ui2f, __aeabi_f2iz, __aeabi_f2uiz
 *
-* - (u)int64 <-> float: (except `pico_float_pico_vfp`)
+* - (u)int64 <-> float: (except pico_float `pico_vfp`)
 *
 *   __aeabi_l2f, __aeabi_ul2f, __aeabi_f2lz, __aeabi_f2ulz
 *
-* - float -> double: (except `pico_float_pico_vfp`)
+* - float -> double: (except pico_float `pico_vfp`)
 *
 *   __aeabi_f2d
 *
@@ -96,13 +96,13 @@
 *
 *     int2float, uint2float, int642float, uint642float
 *
-*     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they map to inline VFP code
+*     note: on pico_float `pico_vfp` the 32-bit functions are also provided as C macros since they map to inline VFP code
 *
 *   - (u)float -> int (round towards zero):
 *
 *     float2int_z, float2uint_z, float2int64_z, float2uint64_z
 *
-*     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they map to inline VFP code
+*     note: on pico_float `pico_vfp` the 32-bit functions are also provided as C macros since they map to inline VFP code
 *
 *   - (u)float -> int (round towards -infinity):
 *
@@ -118,14 +118,14 @@
 *
 *       float2fix_z, float2ufix_z, float2fix64_z, float2ufix64_z
 *
-*     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
+*     note: on pico_float `pico_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
 *     when the number of fractional bits is a compile time constant between 1 and 32
 *
 *   - float -> (u)fix (round towards -infinity):
 *
 *       float2fix, float2ufix, float2fix64, float2ufix64
 *
-*     note: on `pico_float_pico_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
+*     note: on pico_float `pico_vfp` the 32-bit functions are also provided as C macros since they can map to inline VFP code
 *     when the number of fractional bits is a compile time constant between 1 and 32
 *
 * - Scientific functions:
@@ -133,11 +133,11 @@
 *    powintf
 * \if rp2350_specific
 *
-* - Even faster versions of divide and square-root functions that do not round correctly: (`pico_float_pico_dcp` only)
+* - Even faster versions of divide and square-root functions that do not round correctly: (pico_float `pico_dcp` only)
 *
 *    fdiv_fast, sqrtf_fast
 *
-* On RISC-V, (replacement) optimized implementations are provided for the following compiler built-ins when using the `pico_float_pico`
+* On RISC-V, (replacement) optimized implementations are provided for the following compiler built-ins when using the pico_float `pico`
 * library (note that there are no variants of this library like there are on Arm):
 *
 * - Basic arithmetic:
@@ -224,12 +224,12 @@ extern "C" {
     // for VFP the C cast is an assembly instruction anyway, so we prefer that over a function call
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline float int2float(int32_t i) { return (float)i; }
-    static inline float uint2float(uint32_t i) { return (float)i; }
+    static inline float uint2float(uint32_t u) { return (float)u; }
 #else
     //! Convert a signed 32-bit integer to the nearest float
     float int2float(int32_t i);
     //! Convert an unsigned 32-bit integer to the nearest float
-    float uint2float(uint32_t i);
+    float uint2float(uint32_t u);
 #endif
 #endif
 
@@ -237,12 +237,12 @@ extern "C" {
 #if !__PICO_FLOAT_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline float int642float(int64_t i) { return (float)i; }
-    static inline float uint642float(uint64_t i) { return (float)i; }
+    static inline float uint642float(uint64_t u) { return (float)u; }
 #else
     //! Convert a signed 64-bit integer to the nearest float
     float int642float(int64_t i);
     //! Convert an unsigned 64-bit integer to the nearest float
-    float uint642float(uint64_t i);
+    float uint642float(uint64_t u);
 #endif
 #endif
 
@@ -250,14 +250,14 @@ extern "C" {
 #if !__PICO_FLOAT_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline int32_t float2int_z(float f) { return (int32_t)f; }
-    static inline int32_t float2uint_z(float f) { return (uint32_t)f; }
+    static inline uint32_t float2uint_z(float f) { return (uint32_t)f; }
 #else
     //! \brief Convert a float to a signed 32-bit integer, rounding towards zero.
-    //! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using `pico_float_compiler`
+    //! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using pico_float `compiler`
     int32_t float2int_z(float f);
     //! \brief Convert a float to an unsigned 32-bit integer, rounding towards zero
-    //! On Arm this conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input except when using `pico_float_compiler`
-    int32_t float2uint_z(float f);
+    //! On Arm this conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input except when using pico_float `compiler`
+    uint32_t float2uint_z(float f);
 #endif
 #endif
 
@@ -265,38 +265,38 @@ extern "C" {
 #if !__PICO_FLOAT_ARM_OPTIMIZED
     // for non Arm-optimized we may as well provide the function and let the compiler handle it
     static inline int64_t float2int64_z(float f) { return (int64_t)f; }
-    static inline int64_t float2uint64_z(float f) { return (uint64_t)f; }
+    static inline uint64_t float2uint64_z(float f) { return (uint64_t)f; }
 #else
     //! \brief Convert a float to a signed 64-bit integer, rounding towards zero.
-    //! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using `pico_float_compiler`
+    //! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using pico_float `compiler`
     int64_t float2int64_z(float f);
     //! \brief Convert a float to an unsigned 64-bit integer, rounding towards zero.
-    //! On Arm this conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input except when using `pico_float_compiler`
-    int64_t float2uint64_z(float f);
+    //! On Arm this conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input except when using pico_float `compiler`
+    uint64_t float2uint64_z(float f);
 #endif
 #endif
 
 #if PICO_FLOAT_HAS_FIX32_TO_FLOAT_CONVERSIONS
-//! \brief Convert a signed 32-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert a signed 32-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +/- Infinity
 float fix2float(int32_t m, int e);
-//! \brief Convert an unsigned 32-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 32-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +Infinity
 float ufix2float(uint32_t m, int e);
 #endif
 
 #if PICO_FLOAT_HAS_FIX64_TO_FLOAT_CONVERSIONS
-//! \brief Convert a signed 64-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert a signed 64-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +/- Infinity
 float fix642float(int64_t m, int e);
-//! \brief Convert an unsigned 64-bit integer with the given number of fractional bits to the nearest float
+//! \brief Convert an unsigned 64-bit fixed-point integer with the given number of fractional bits to the nearest float
 //! Out of range inputs will convert to +Infinity
 float ufix642float(uint64_t m, int e);
 #endif
 
 #if PICO_FLOAT_HAS_FLOAT_TO_FIX32_Z_CONVERSIONS
 //! \brief Convert a float to a signed 32-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
-//! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using `pico_float_compiler`
+//! On Arm this conversion is saturating (to INT32_MAX/INT32_MIN) for out of range input except when using pico_float `compiler`
 int32_t float2fix_z(float f, int e);
 //! \brief Convert a float to an unsigned 32-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
 //! This conversion is saturating (to UINT32_MAX/UINT32_MIN) for out of range input
@@ -305,7 +305,7 @@ uint32_t float2ufix_z(float f, int e);
 
 #if PICO_FLOAT_HAS_FLOAT_TO_FIX64_Z_CONVERSIONS
 //! \brief Convert a float to a signed 64-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
-//! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using `pico_float_compiler`
+//! On Arm this conversion is saturating (to INT64_MAX/INT64_MIN) for out of range input except when using pico_float `compiler`
 int64_t float2fix64_z(float f, int e);
 //! \brief Convert a float to an unsigned 64-bit fixed-point integer with the given number of fractional bits, rounding towards zero.
 //! This conversion is saturating (to UINT64_MAX/UINT64_MIN) for out of range input
@@ -357,8 +357,8 @@ uint64_t float2ufix64(float f, int e);
 // or call the original function
 #if PICO_FLOAT_HAS_FIX32_TO_FLOAT_CONVERSIONS
 // a bit of a hack to inline VFP fixed-point conversion when exponent is constant and in range 1-32
-#define fix2float(m, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _fix2float_inline(m, e) : fix2 ## float(m, e), fix2 ## float(m, e))
-#define ufix2float(m, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _ufix2float_inline(m, e) : ufix2 ## float(m, e), ufix2 ## float(m, e))
+#define fix2float(m, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _fix2float_inline(m, e) : fix2 ## float(m, e))
+#define ufix2float(m, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _ufix2float_inline(m, e) : ufix2 ## float(m, e))
 
 #define _fix2float_inline(m, e) ({ \
     int32_t _m = m; \
@@ -385,8 +385,8 @@ uint64_t float2ufix64(float f, int e);
 
 #endif
 #if PICO_FLOAT_HAS_FLOAT_TO_FIX32_Z_CONVERSIONS
-#define float2fix_z(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _float2fix_z_inline(f, e) : float2 ## fix_z(f, e), float2 ## fix_z(f, e))
-#define float2ufix_z(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _float2ufix_z_inline(f, e) : float2 ## ufix_z(f, e), float2 ## ufix_z(f, e))
+#define float2fix_z(f, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _float2fix_z_inline(f, e) : float2 ## fix_z(f, e))
+#define float2ufix_z(f, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _float2ufix_z_inline(f, e) : float2 ## ufix_z(f, e))
 
 #define _float2fix_z_inline(f, e) ({ \
     int32_t _m; \
@@ -413,8 +413,8 @@ uint64_t float2ufix64(float f, int e);
 
 #endif
 #if PICO_FLOAT_HAS_FLOAT_TO_FIX32_M_CONVERSIONS
-#define float2fix(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _float2fix_inline(f, e) : float2 ## fix(f, e), float2 ## fix(f, e))
-#define float2ufix(f, e) __builtin_choose_expr(__builtin_constant_p(e), (e) >= 1 && (e) <= 32 ? _float2ufix_inline(f, e) : float2 ## ufix(f, e), float2 ## ufix(f, e))
+#define float2fix(f, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _float2fix_inline(f, e) : float2 ## fix(f, e))
+#define float2ufix(f, e) (__builtin_constant_p(e) && (e) >= 1 && (e) <= 32 ? _float2ufix_inline(f, e) : float2 ## ufix(f, e))
 
 #define _float2fix_inline(f, e) ({ \
     union { float _f; int32_t _i; } _u; \

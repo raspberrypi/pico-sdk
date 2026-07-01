@@ -3,6 +3,8 @@
 INCLUDE "sections_default_text.incl"
 INCLUDE "section_generated_post_text.incl"
 INCLUDE "section_extra_post_text.incl"
+INCLUDE "sections_psram.incl"
+INCLUDE "section_xip_ram.incl"
 INCLUDE "sections_default_data.incl"
 INCLUDE "section_generated_post_data.incl"
 INCLUDE "section_extra_post_data.incl"

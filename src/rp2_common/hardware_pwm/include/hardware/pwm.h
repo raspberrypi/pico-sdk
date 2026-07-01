@@ -65,10 +65,16 @@ enum pwm_chan
     PWM_CHAN_B = 1
 };
 
+/*! \brief PWM configuration structure
+ *  \ingroup hardware_pwm
+ *
+ * Holds the configuration for a PWM slice. Use \ref pwm_get_default_config() to
+ * initialise and the pwm_config_set_* functions to modify, then pass to \ref pwm_init().
+ */
 typedef struct {
-    uint32_t csr;
-    uint32_t div;
-    uint32_t top;
+    uint32_t csr; ///< Control and status register value
+    uint32_t div; ///< Clock divider register value
+    uint32_t top; ///< Counter wrap (TOP) value
 } pwm_config;
 
 /**

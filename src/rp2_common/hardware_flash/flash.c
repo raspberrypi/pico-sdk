@@ -10,6 +10,7 @@
 #if PICO_RP2040
 #include "hardware/structs/io_qspi.h"
 #include "hardware/structs/ssi.h"
+#include "hardware/structs/xip.h"
 #else
 #include "hardware/structs/qmi.h"
 #include "hardware/regs/otp_data.h"
@@ -89,6 +90,17 @@ static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
 // application.
 
 #if !PICO_RP2040
+static qmi_setup_function_t qmi_cs1_setup_function;
+
+bool flash_set_qmi_cs1_setup_function(qmi_setup_function_t function) {
+    if ((void*)function > (void*)SRAM_BASE) {
+        qmi_cs1_setup_function = function;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 // This is specifically for saving/restoring the registers modified by RP2350
 // flash_exit_xip() ROM func, not the entirety of the QMI window state.
 typedef struct flash_rp2350_qmi_save_state {
@@ -104,7 +116,9 @@ static void __no_inline_not_in_flash_func(flash_rp2350_save_qmi_cs1)(flash_rp235
 }
 
 static void __no_inline_not_in_flash_func(flash_rp2350_restore_qmi_cs1)(const flash_rp2350_qmi_save_state_t *state) {
-    if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {
+    if (qmi_cs1_setup_function != NULL) {
+        qmi_cs1_setup_function();
+    } else if (flash_devinfo_get_cs_size(1) == FLASH_DEVINFO_SIZE_NONE) {
         // Case 1: The RP2350 ROM sets QMI to a clean (03h read) configuration
         // during flash_exit_xip(), even though when CS1 is not enabled via
         // FLASH_DEVINFO it does not issue an XIP exit sequence to CS1. In
@@ -127,7 +141,9 @@ static void __no_inline_not_in_flash_func(flash_rp2350_restore_qmi_cs1)(const fl
 
 
 typedef struct flash_hardware_save_state {
-#if !PICO_RP2040
+#if PICO_RP2040
+    uint32_t xip_ctrl;
+#else
     flash_rp2350_qmi_save_state_t qmi_save;
 #endif
     uint32_t qspi_pads[count_of(pads_qspi_hw->io)];
@@ -139,7 +155,9 @@ static void __no_inline_not_in_flash_func(flash_save_hardware_state)(flash_hardw
     for (size_t i = 0; i < count_of(pads_qspi_hw->io); ++i) {
         state->qspi_pads[i] = pads_qspi_hw->io[i];
     }
-#if !PICO_RP2040
+#if PICO_RP2040
+    state->xip_ctrl = xip_ctrl_hw->ctrl;
+#else
     flash_rp2350_save_qmi_cs1(&state->qmi_save);
 #endif
 }
@@ -148,7 +166,9 @@ static void __no_inline_not_in_flash_func(flash_restore_hardware_state)(flash_ha
     for (size_t i = 0; i < count_of(pads_qspi_hw->io); ++i) {
         pads_qspi_hw->io[i] = state->qspi_pads[i];
     }
-#if !PICO_RP2040
+#if PICO_RP2040
+    xip_ctrl_hw->ctrl = state->xip_ctrl;
+#else
     // Tail call!
     flash_rp2350_restore_qmi_cs1(&state->qmi_save);
 #endif
@@ -248,11 +268,11 @@ void __no_inline_not_in_flash_func(flash_range_program)(uint32_t flash_offs, con
 //-----------------------------------------------------------------------------
 // Lower-level flash access functions
 
-#if !PICO_NO_FLASH
 // Bitbanging the chip select using IO overrides, in case RAM-resident IRQs
 // are still running, and the FIFO bottoms out. (the bootrom does the same)
-static void __no_inline_not_in_flash_func(flash_cs_force)(bool high) {
+static __force_inline void flash_cs_force(bool high, uint cs) {
 #if PICO_RP2040
+    (void)cs;
     uint32_t field_val = high ?
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_HIGH :
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_LOW;
@@ -261,15 +281,16 @@ static void __no_inline_not_in_flash_func(flash_cs_force)(bool high) {
         IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_BITS
     );
 #else
+    invalid_params_if(HARDWARE_FLASH, cs > 1);
     if (high) {
-        hw_clear_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_ASSERT_CS0N_BITS);
+        hw_clear_bits(&qmi_hw->direct_csr, cs == 0 ? QMI_DIRECT_CSR_ASSERT_CS0N_BITS : QMI_DIRECT_CSR_ASSERT_CS1N_BITS);
     } else {
-        hw_set_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_ASSERT_CS0N_BITS);
+        hw_set_bits(&qmi_hw->direct_csr, cs == 0 ? QMI_DIRECT_CSR_ASSERT_CS0N_BITS : QMI_DIRECT_CSR_ASSERT_CS1N_BITS);
     }
 #endif
 }
 
-void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *rxbuf, size_t count) {
+void __no_inline_not_in_flash_func(flash_do_cmd_cs)(const uint8_t *txbuf, uint8_t *rxbuf, size_t count, uint cs) {
     rom_connect_internal_flash_fn connect_internal_flash_func = (rom_connect_internal_flash_fn)rom_func_lookup_inline(ROM_FUNC_CONNECT_INTERNAL_FLASH);
     rom_flash_exit_xip_fn flash_exit_xip_func = (rom_flash_exit_xip_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_EXIT_XIP);
     rom_flash_flush_cache_fn flash_flush_cache_func = (rom_flash_flush_cache_fn)rom_func_lookup_inline(ROM_FUNC_FLASH_FLUSH_CACHE);
@@ -282,7 +303,7 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
     connect_internal_flash_func();
     flash_exit_xip_func();
 
-    flash_cs_force(0);
+    flash_cs_force(0, cs);
     size_t tx_remaining = count;
     size_t rx_remaining = count;
 #if PICO_RP2040
@@ -320,13 +341,12 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
     }
     hw_clear_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_EN_BITS);
 #endif
-    flash_cs_force(1);
+    flash_cs_force(1, cs);
 
     flash_flush_cache_func();
     flash_enable_xip_via_boot2();
     flash_restore_hardware_state(&state);
 }
-#endif
 
 // Use standard RUID command to get a unique identifier for the flash (and
 // hence the board)
@@ -334,7 +354,7 @@ void __no_inline_not_in_flash_func(flash_do_cmd)(const uint8_t *txbuf, uint8_t *
 static_assert(FLASH_UNIQUE_ID_SIZE_BYTES == FLASH_RUID_DATA_BYTES, "");
 
 void flash_get_unique_id(uint8_t *id_out) {
-#if PICO_NO_FLASH
+#if PICO_NO_FLASH && !PICO_ALWAYS_INCLUDE_FLASH_ID_FUNCTIONS
     __unused uint8_t *ignore = id_out;
     panic_unsupported();
 #else

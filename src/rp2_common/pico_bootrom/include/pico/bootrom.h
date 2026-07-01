@@ -95,9 +95,15 @@ typedef int (*rom_func_secure_call)(uintptr_t a0, ...);
 #endif
 
 #ifdef __riscv
+/*! \brief Stack descriptor passed to the bootrom for RISC-V Arm emulation
+ *  \ingroup pico_bootrom
+ *
+ * Specifies a region of RAM to use as the Arm emulation stack for the current core.
+ * The previous values are written back into this struct before the call returns.
+ */
 typedef struct {
-    uint32_t *base;
-    uint32_t size;
+    uint32_t *base; ///< Word-aligned base address of the stack region
+    uint32_t size;  ///< Size of the stack region in bytes (must be a multiple of 4)
 } bootrom_stack_t;
 // passed in, and out.
 typedef int (*rom_set_bootrom_stack_fn)(bootrom_stack_t *stack);
@@ -241,6 +247,13 @@ static __force_inline void *rom_data_lookup_inline(uint32_t code) {
 }
 #pragma GCC diagnostic pop
 
+#if PICO_RP2350
+// PICO_CONFIG: PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG, Workaround RP2350A-A2 (QFN60) bug not displaying USB boot activity LED under Arm by making rom_reset_usb_boot functions reboot to RISC-V when the activity LED is specified, type=bool, default=1, group=pico_bootrom
+#ifndef PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG
+#define PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG 1
+#endif
+#endif
+
 /*!
  * \brief Reboot the device into BOOTSEL mode
  * \ingroup pico_bootrom
@@ -250,7 +263,13 @@ static __force_inline void *rom_data_lookup_inline(uint32_t code) {
  * Facilities are provided to enable an "activity light" via GPIO attached LED for the USB Mass Storage Device,
  * and to limit the USB interfaces exposed.
  *
- * \param usb_activity_gpio_pin_mask 0 No pins are used as per a cold boot. Otherwise a single bit set indicating which
+ * \if rp2350_specific
+ * \note On RP2350A-A2 chips, errata RP2350-E3 prevents the activity LED working under Arm.
+ *       PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG=1 is defined by default to have this method reboot to
+ *       RISC-V USB boot to display the activity LED correctly.
+ * \endif
+ *
+ * \param usb_activity_gpio_pin_mask 0 No pins are used as per a cold boot. Otherwise, a single bit set indicating which
  *                               GPIO pin should be set to output and raised whenever there is mass storage activity
  *                               from the host.
  * \param disable_interface_mask value to control exposed interfaces
@@ -272,13 +291,19 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
  * Facilities are provided to enable an "activity light" via GPIO attached LED for the USB Mass Storage Device,
  * and to limit the USB interfaces exposed.
  *
+ * \if rp2350_specific
+ * \note On RP2350A-A2 chips, errata RP2350-E3 prevents the activity LED working under Arm.
+ *       PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG=1 is defined by default to have this method reboot to
+ *       RISC-V USB boot to display the activity LED correctly.
+ * \endif
+ *
  * \param usb_activity_gpio_pin  GPIO pin to be used as an activitiy pin, or -1 for none
- *                               from the host.
  * \param disable_interface_mask value to control exposed interfaces
  *  - 0 To enable both interfaces (as per a cold boot)
  *  - 1 To disable the USB Mass Storage Interface
  *  - 2 To disable the USB PICOBOOT Interface
- * \param usb_activity_gpio_pin_active_low Activity GPIO is active low (ignored on RP2040)
+ * \param usb_activity_gpio_pin_active_low Activity GPIO is active low (ignored on RP2040). A bug in the bootrom of RP2350
+ *                                         A4 chips means this parameter has no effect on that version of the RP2350.
  */
 void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pin, uint32_t disable_interface_mask, bool usb_activity_gpio_pin_active_low);
 
@@ -467,12 +492,12 @@ static inline int rom_set_bootrom_stack(bootrom_stack_t *stack) {
  * \ref REBOOT2_FLAG_REBOOT_TYPE_NORMAL - reboot into the normal boot path.
  * 
  * \ref REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL - reboot into BOOTSEL mode.
- *  p0 - the GPIO number to use as an activity indicator (enabled by flag in p1).
- *  p1 - a set of flags:
+ *  p0 - a set of flags:
  *   0x01 : DISABLE_MSD_INTERFACE - Disable the BOOTSEL USB drive (see <<section_bootrom_mass_storage>>)
  *   0x02 : DISABLE_PICOBOOT_INTERFACE - Disable the {picoboot} interface (see <<section_bootrom_picoboot>>).
- *   0x10 : GPIO_PIN_ACTIVE_LOW - The GPIO in p0 is active low.
- *   0x20 : GPIO_PIN_ENABLED - Enable the activity indicator on the specified GPIO.
+ *   0x10 : GPIO_PIN_ACTIVE_LOW - The GPIO specified in p1 is active low (GPIO_PIN_SPECIFIED must also be set).
+ *   0x20 : GPIO_PIN_SPECIFIED - Enable the activity indicator on the GPIO specified in p1.
+ *  p1 - the GPIO number to use as an activity indicator (enabled by GPIO_PIN_SPECIFIED flag in p0).
  * 
  * \ref REBOOT2_FLAG_REBOOT_TYPE_RAM_IMAGE - reboot into an image in RAM. The region of RAM or XIP RAM is searched for an image to run. This is the type
  * of reboot used when a RAM UF2 is dragged onto the BOOTSEL USB drive.
@@ -500,6 +525,10 @@ static inline int rom_set_bootrom_stack(bootrom_stack_t *stack) {
  * \param p1 parameter 1, depends on flags
  */
 static inline int rom_reboot(uint32_t flags, uint32_t delay_ms, uint32_t p0, uint32_t p1) {
+#if PICO_RP2350
+    // work around bootrom bug with 0 timeout
+    if (!delay_ms) delay_ms = 1;
+#endif
     rom_reboot_fn func = (rom_reboot_fn) rom_func_lookup_inline(ROM_FUNC_REBOOT);
     return func(flags, delay_ms, p0, p1);
 }
@@ -563,12 +592,18 @@ static inline void rom_flash_select_xip_read_mode(bootrom_xip_mode_t mode, uint8
     func(mode, clkdiv);
 }
 
+/*! \brief Parameters for the flash operation helper used with flash_safe_execute
+ *  \ingroup pico_bootrom
+ *
+ * Bundles the arguments for rom_flash_op so they can be passed through the
+ * flash_safe_execute callback interface as a single pointer.
+ */
 typedef struct {
-    cflash_flags_t flags;
-    uintptr_t addr;
-    uint32_t size_bytes;
-    uint8_t *buf;
-    int *res;
+    cflash_flags_t flags;  ///< Flags controlling the security level, address space, and flash operation
+    uintptr_t addr;        ///< Address of the first flash byte to be accessed
+    uint32_t size_bytes;   ///< Size of the buffer in bytes
+    uint8_t *buf;          ///< Buffer for data to be written to or read from flash
+    int *res;              ///< Pointer to store the return code from the flash operation
 } rom_helper_flash_op_params_t;
 
 static inline void rom_helper_flash_op(void *param) {
@@ -892,10 +927,16 @@ static inline int rom_chain_image(uint8_t *workarea_base, uint32_t workarea_size
     return rc;
 }
 
+/*! \brief Parameters for the explicit buy helper used with flash_safe_execute
+ *  \ingroup pico_bootrom
+ *
+ * Bundles the arguments for rom_explicit_buy so they can be passed through the
+ * flash_safe_execute callback interface as a single pointer.
+ */
 typedef struct {
-    uint8_t *buffer;
-    uint32_t buffer_size;
-    int *res;
+    uint8_t *buffer;      ///< Word-aligned base address of the scratch space buffer
+    uint32_t buffer_size; ///< Size of the scratch space buffer in bytes (at least 4 KiB)
+    int *res;             ///< Pointer to store the return code from the explicit buy operation
 } rom_helper_explicit_buy_params_t;
 
 static inline void rom_helper_explicit_buy(void *param) {
@@ -1047,18 +1088,24 @@ static inline int rom_get_sys_info(uint32_t *out_buffer, uint32_t out_buffer_wor
     return func(out_buffer, out_buffer_word_size, flags);
 }
 
+/*! \brief Boot information returned by the bootrom SYS_INFO_BOOT_INFO query
+ *  \ingroup pico_bootrom
+ *
+ * Contains details about the most recent boot, including the boot type, the
+ * partition that was booted, and any diagnostic or reboot parameters.
+ */
 typedef struct {
     union {
         struct __packed {
-            int8_t diagnostic_partition_index; // used BOOT_PARTITION constants
-            uint8_t boot_type;
-            int8_t partition;
-            uint8_t tbyb_and_update_info;
+            int8_t diagnostic_partition_index; ///< Partition index used for diagnostics; uses BOOT_PARTITION constants
+            uint8_t boot_type;                 ///< The type of boot that occurred (e.g. BOOT_TYPE_NORMAL, BOOT_TYPE_BOOTSEL)
+            int8_t partition;                  ///< The partition that was booted, or -1 if not applicable
+            uint8_t tbyb_and_update_info;      ///< Try-before-you-buy and flash update status flags
         };
-        uint32_t boot_word;
+        uint32_t boot_word; ///< The four boot fields packed into a single 32-bit word
     };
-    uint32_t boot_diagnostic;
-    uint32_t reboot_params[2];
+    uint32_t boot_diagnostic;   ///< Diagnostic word describing the outcome of the most recent boot attempt
+    uint32_t reboot_params[2];  ///< Parameters passed to the reboot call that initiated this boot
 } boot_info_t;
 
 static inline int rom_get_boot_info(boot_info_t *info) {

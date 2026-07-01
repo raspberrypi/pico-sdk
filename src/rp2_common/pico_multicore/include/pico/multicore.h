@@ -38,6 +38,11 @@ extern "C" {
 #endif
 #endif
 
+// PICO_CONFIG: PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED, Allow multicore_lockout functions called from core 0 to succeed if core1 has not been started, type=bool, default=1, group=pico_multicore
+#ifndef PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED
+#define PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED 1
+#endif
+
 /**
  * \def SIO_FIFO_IRQ_NUM(core)
  * \ingroup pico_multicore
@@ -424,7 +429,7 @@ static inline uint multicore_doorbell_irq_num(uint doorbell_num) {
  * system that is not sufficient, and unless the other core is polling in some way, then it will need to be interrupted
  * in order to cooperatively enter a blocked state.
  *
- * These "lockout" functions use the inter core FIFOs to cause an interrupt on one core from the other, and manage
+ * These "lockout" functions use the inter-core FIFOs to cause an interrupt on one core from the other, and manage
  * waiting for the other core to enter the "locked out" state.
  *
  * The usage is that the "victim" core ... i.e the core that can be "locked out" by the other core calls
@@ -440,6 +445,12 @@ static inline uint multicore_doorbell_irq_num(uint doorbell_num) {
  * \ref multicore_lockout_end_timeout_us to release the lockout.
  *
  * \note Because multicore lockout uses the intercore FIFOs, the FIFOs <b>cannot</b> be used for any other purpose
+ *
+ * \note By default, for convenience, multicore_lockout_start_ functions will succeed on core 0, if core 1 has either not been started
+ * via multicore_launch_core1 functions, or has subsequently been reset via multicore_reset_core1. Therefore, it is not safe to
+ * (though equally not very likely that you would) call multicore_launch_core1 while core 0 is inside of a multicore_lockout_ function.
+ * This default behavior can be disabled by setting PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED=0 in which case core 1 must be running
+ * and in the "victim initialized" state before multicore_lockout_start functions can be called on core 0
  */
 
 /*! \brief Initialize the current core such that it can be a "victim" of lockout (i.e. forced to pause in a known state by the other core)
@@ -459,14 +470,26 @@ void multicore_lockout_victim_deinit(void);
 /*! \brief Determine if \ref multicore_lockout_victim_init() has been called on the specified core.
  *  \ingroup multicore_lockout
  *
- * \note this state persists even if the core is subsequently reset; therefore you are advised to
- * always call \ref multicore_lockout_victim_init() again after resetting a core, which had previously
+ * \note this state persists even if the core is subsequently reset (other than via  reset via pico_multicore_reset_core1);
+ * therefore you are advised to always call \ref multicore_lockout_victim_init() again after resetting a core, which had previously
  * been initialized.
  *
  * \param core_num the core number (0 or 1)
  * \return true if \ref multicore_lockout_victim_init() has been called on the specified core, false otherwise.
  */
 bool multicore_lockout_victim_is_initialized(uint core_num);
+
+/*! \brief Determine whether it is safe to call multicore_lockout_start functions from this core.
+ *  \ingroup multicore_lockout
+ *
+ * \return true if \ref multicore_lockout_start_blocking() and \ref multicore_lockout_start_timeout_us() may safely be called from this core
+ *
+ * \note that when PICO_MULTICORE_LOCKOUT_BEFORE_CORE1_STARTED=1 this returns true when called from core 0 if core 1 has
+ * not been launched via a multicore_launch_core1 function, or has since been reset via \ref multicore_reset_core1. Otherwise, it returns
+ * the same value as `multicore_lockout_victim_is_initialized(other_core)`. This behavior is intended to make it easier
+ * for applications which may want to perform operations on core 0, but may or may not yet have launched core 1.
+ */
+bool multicore_lockout_ready(void);
 
 /*! \brief Request the other core to pause in a known state and wait for it to do so
  *  \ingroup multicore_lockout

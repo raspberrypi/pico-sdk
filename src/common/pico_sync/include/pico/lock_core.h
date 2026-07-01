@@ -50,9 +50,15 @@
  * access to the remaining lock state (in primitives using lock_core); it is never left locked outside
  * of the function implementations
  */
+
+/*! \brief Core state shared by all lock primitives
+ *  \ingroup lock_core
+ *
+ * Contains the spin lock used to protect the internal state of a locking primitive.
+ * The spin lock is released before any function returns; it is never held on exit.
+ */
 struct lock_core {
-    // spin lock protecting this lock's state
-    spin_lock_t *spin_lock;
+    spin_lock_t *spin_lock; ///< Spin lock protecting this lock's state
 
     // note any lock members in containing structures need not be volatile;
     // they are protected by memory/compiler barriers when gaining and release spin locks

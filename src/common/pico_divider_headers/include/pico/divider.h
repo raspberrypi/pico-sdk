@@ -122,6 +122,7 @@ int64_t div_s64s64(int64_t a, int64_t b);
  */
 int64_t divmod_s64s64_rem(int64_t a, int64_t b, int64_t *rem);
 
+#if PICO_RP2040 && !LIB_PICO_DIVIDER_COMPILER
 /**
  * \brief Integer divide of two signed 64-bit values
  * \ingroup pico_divider
@@ -131,6 +132,7 @@ int64_t divmod_s64s64_rem(int64_t a, int64_t b, int64_t *rem);
  * \return quotient in result (r0,r1), remainder in regs (r2, r3)
  */
 int64_t divmod_s64s64(int64_t a, int64_t b);
+#endif
 
 /**
  * \brief Integer divide of two unsigned 64-bit values
@@ -153,9 +155,9 @@ uint64_t div_u64u64(uint64_t a, uint64_t b);
  */
 uint64_t divmod_u64u64_rem(uint64_t a, uint64_t b, uint64_t *rem);
 
-
+#if PICO_RP2040 && !LIB_PICO_DIVIDER_COMPILER
 /**
- * \brief Integer divide of two signed 64-bit values
+ * \brief Integer divide of two unsigned 64-bit values
  * \ingroup pico_divider
  *
  * \param a Dividend
@@ -163,6 +165,7 @@ uint64_t divmod_u64u64_rem(uint64_t a, uint64_t b, uint64_t *rem);
  * \return quotient in result (r0,r1), remainder in regs (r2, r3)
  */
 uint64_t divmod_u64u64(uint64_t a, uint64_t b);
+#endif
 
 // -----------------------------------------------------------------------
 // these "unsafe" functions are slightly faster, but do not save the divider state,
@@ -195,7 +198,7 @@ int32_t div_s32s32_unsafe(int32_t a, int32_t b);
 int32_t divmod_s32s32_rem_unsafe(int32_t a, int32_t b, int32_t *rem);
 
 /**
- * \brief Unsafe integer divide of two unsigned 32-bit values
+ * \brief Unsafe integer divide of two signed 32-bit values
  * \ingroup pico_divider
  *
  * \param a Dividend
@@ -306,7 +309,7 @@ uint64_t div_u64u64_unsafe(uint64_t a, uint64_t b);
 uint64_t divmod_u64u64_rem_unsafe(uint64_t a, uint64_t b, uint64_t *rem);
 
 /**
- * \brief Unsafe integer divide of two signed 64-bit values
+ * \brief Unsafe integer divide of two unsigned 64-bit values
  * \ingroup pico_divider
  *
  * \param a Dividend

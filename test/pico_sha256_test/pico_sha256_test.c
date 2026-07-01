@@ -87,6 +87,7 @@ static void run_test(bool use_dma) {
 
     // nist 3
     uint8_t *buffer = malloc(10000);
+    hard_assert(buffer);
     memset(buffer, 0x61, BUFFER_SIZE);
     const uint8_t nist_3_expected[] = { \
         0xcd, 0xc7, 0x6e, 0x5c, 0x99, 0x14, 0xfb, 0x92, 0x81, 0xa1, \

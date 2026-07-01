@@ -329,7 +329,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
             if (NOT GATT_PATH)
                 set(GATT_PATH "${CMAKE_CURRENT_LIST_DIR}")
             endif()
-            set(TARGET_GATT "${TARGET_LIB}_gatt_header")
+            set(TARGET_GATT "${TARGET_LIB}_${GATT_NAME}_gatt_header")
             set(GATT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/${TARGET_GATT}")
             set(GATT_HEADER "${GATT_BINARY_DIR}/${GATT_NAME}.h")
             list(TRANSFORM ARGN PREPEND "-I")
@@ -339,7 +339,7 @@ if (EXISTS ${PICO_BTSTACK_PATH}/${BTSTACK_TEST_PATH})
                     DEPENDS ${GATT_FILE}
                     WORKING_DIRECTORY ${GATT_PATH}
                     COMMAND ${CMAKE_COMMAND} -E make_directory ${GATT_BINARY_DIR} &&
-                            ${Python3_EXECUTABLE} ${PICO_SDK_PATH}/lib/btstack/tool/compile_gatt.py ${GATT_FILE} ${GATT_HEADER} ${ARGN}
+                            ${Python3_EXECUTABLE} ${PICO_BTSTACK_PATH}/tool/compile_gatt.py ${GATT_FILE} ${GATT_HEADER} ${ARGN}
                     VERBATIM)
             add_dependencies(${TARGET_LIB}
                     ${TARGET_GATT}

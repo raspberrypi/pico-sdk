@@ -1,7 +1,7 @@
 MEMORY {
-    /* We are loaded to the top 256 bytes of SRAM, which is above the bootrom
-       stack. Note 4 bytes occupied by checksum. */
-    SRAM(rx) : ORIGIN = 0x20081f00, LENGTH = 252
+    /* We don't know where we'll be loaded, so use an invalid address as code
+       should be location invariant */
+    SRAM(rx) : ORIGIN = 0x0, LENGTH = 256
 }
 
 SECTIONS {

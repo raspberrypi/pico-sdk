@@ -55,8 +55,8 @@ extern "C" {
  *
  * Here is an example of C++ static initializers that will run before, and then after, pico_unique_id is loaded:
  *
- * [[gnu::init_priority(500)]] my_class before_instance;
- * [[gnu::init_priority(2000)]] my_class after_instance;
+ * 		[[gnu::init_priority(500)]] my_class before_instance;
+ * 		[[gnu::init_priority(2000)]] my_class after_instance;
  *
  */
 #ifndef PICO_UNIQUE_BOARD_ID_INIT_PRIORITY
@@ -81,7 +81,7 @@ extern "C" {
  *
  */
 typedef struct {
-	uint8_t id[PICO_UNIQUE_BOARD_ID_SIZE_BYTES];
+	uint8_t id[PICO_UNIQUE_BOARD_ID_SIZE_BYTES]; ///< The identifier bytes
 } pico_unique_board_id_t;
 
 /*! \brief Get unique ID

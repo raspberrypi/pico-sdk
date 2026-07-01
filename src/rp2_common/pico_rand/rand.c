@@ -170,7 +170,7 @@ static uint64_t capture_additional_trng_samples(void) {
         // TRNG is now sampling again, having started after we read the last
         // EHR word. Grab some random bits and use them to modulate
         // the chain length, to reduce chance of injection locking:
-        trng_hw->trng_config = rng_state.r[0];
+        trng_hw->trng_config = (uint32_t)rng_state.r[0];
     }
     trng_sample_word_count -= 2;
     uint64_t rc = trng_sample_words[trng_sample_word_count] |
@@ -224,7 +224,8 @@ static uint64_t capture_additional_rosc_samples(uint n) {
                 bit_done = true;
                 if (i == n - 1) {
                     // samples has our random bits, so let's mix them in now
-                    samples = rosc_samples = (rosc_samples << n) | samples;
+                    if (n < 64) samples |= rosc_samples << n;
+                    rosc_samples = samples;
                 }
             }
             spin_unlock(lock, save);

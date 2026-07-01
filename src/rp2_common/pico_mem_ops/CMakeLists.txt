@@ -15,7 +15,7 @@ if (NOT TARGET pico_mem_ops)
         target_link_libraries(pico_mem_ops_default INTERFACE pico_mem_ops_compiler)
     endif()
 
-    set(PICO_DEFAULT_MEM_OPS_IMPL pico_mem_ops_default)
+    pico_fixup_default_impl(PICO_DEFAULT_MEM_OPS_IMPL pico_mem_ops default)
 
     pico_add_library(pico_mem_ops_pico)
     target_link_libraries(pico_mem_ops INTERFACE

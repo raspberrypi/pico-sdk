@@ -18,29 +18,66 @@ CHECKS = (
     Check("double", "src/rp2_common/pico_double/include/pico/double.h", "test/pico_float_test/custom_double_funcs_test.c"),
 )
 
-CONVERSION_TYPES = set((
+BASE_TYPES = {
     # integral types
-    "int", "uint", "int64", "uint64",
+    "int32_t": "i",
+    "uint32_t": "u",
+    "int64_t": "i64",
+    "uint64_t": "u64",
     # floating-point types
-    "float", "double",
+    "float": "f",
+    "double": "d",
+}
+
+CONVERSION_TYPES = {
+    # integral types
+    "int": "int32_t",
+    "uint":  "uint32_t",
+    "int64": "int64_t",
+    "uint64": "uint64_t",
+    # floating-point types
+    "float": "float",
+    "double": "double",
     # fixed-point types
-    "fix", "ufix", "fix64", "ufix64",
+    "fix": "int32_t",
+    "ufix": "uint32_t",
+    "fix64": "int64_t",
+    "ufix64": "uint64_t",
     # integral types that round towards zero
-    "int_z", "uint_z", "int64_z", "uint64_z",
+    "int_z": "int32_t",
+    "uint_z":  "uint32_t",
+    "int64_z": "int64_t",
+    "uint64_z": "uint64_t",
     # fixed-point types that round towards zero
-    "fix_z", "ufix_z", "fix64_z", "ufix64_z",
+    "fix_z": "int32_t",
+    "ufix_z": "uint32_t",
+    "fix64_z": "int64_t",
+    "ufix64_z": "uint64_t",
     # other "types" used in the test functions
-    "float_8", "float_12", "float_16", "float_24", "float_28", "float_32",
-    "double_8", "double_12", "double_16", "double_24", "double_28", "double_32",
-    "fix_12", "ufix_12",
-))
+    "float_8": "float",
+    "float_12": "float",
+    "float_16": "float",
+    "float_24": "float",
+    "float_28": "float",
+    "float_32": "float",
+    "double_8": "double",
+    "double_12": "double",
+    "double_16": "double",
+    "double_24": "double",
+    "double_28": "double",
+    "double_32": "double",
+    "fix_12": "int32_t",
+    "ufix_12": "uint32_t",
+}
 
 if ENFORCE_SEQUENTIAL_SUFFIXES:
     @dataclass
     class ConversionFunc:
         name: str
+        return_type: str
         from_type: str
         to_type: str
+        input_args: list
         num_input_args: int
         tested: bool = False
         last_test: str = ""
@@ -49,20 +86,46 @@ else:
     @dataclass
     class ConversionFunc:
         name: str
+        return_type: str
         from_type: str
         to_type: str
+        input_args: list
         num_input_args: int
         tested: bool = False
 
-def add_conversion_function(conversion_functions, conversion_function, from_type, to_type, num_input_args, filename, lineno):
+def add_conversion_function(conversion_functions, conversion_function, return_type, from_type, to_type, input_args, filename, lineno):
     if conversion_function in conversion_functions:
         raise Exception(f"{filename}:{lineno} Conversion function {conversion_function} appears twice")
     else:
-        if from_type not in CONVERSION_TYPES:
-            raise Exception(f"{filename}:{lineno} Conversion function {conversion_function} converts from unknown type {from_type}")
-        if to_type not in CONVERSION_TYPES:
-            raise Exception(f"{filename}:{lineno} Conversion function {conversion_function} converts to unknown type {to_type}")
-        conversion_functions[conversion_function] = ConversionFunc(conversion_function, from_type, to_type, num_input_args)
+        check_func_args(conversion_function, input_args, from_type, to_type, return_type, filename, lineno)
+        conversion_functions[conversion_function] = ConversionFunc(conversion_function, return_type, from_type, to_type, input_args, len(input_args))
+
+def parse_func_args(s):
+    # converts e.g. "float f, int e" to (("float", "f"), ("int", "e"))
+    return list(a.strip().split(' ') for a in s.split(","))
+
+def check_func_args(func, args, from_type, to_type, return_type, filename, lineno):
+#    print(func, args)
+    if from_type not in CONVERSION_TYPES:
+        raise Exception(f"{filename}:{lineno} Conversion function {conversion_function} converts from unknown type {from_type}")
+    if to_type not in CONVERSION_TYPES:
+        raise Exception(f"{filename}:{lineno} Conversion function {conversion_function} converts to unknown type {to_type}")
+    implied_return_type = type_to_base_type(to_type)
+    if return_type != implied_return_type:
+        raise Exception(f"{filename}:{lineno} Expected {conversion_function} to return {implied_return_type}, not {return_type}")
+    first_arg = args[0]
+    arg_type, arg_name = first_arg
+    implied_from_type = type_to_base_type(from_type)
+    if arg_type != implied_from_type:
+        raise Exception(f"{filename}:{lineno} Expected {func} to have {implied_from_type} type for it's first argument, not {arg_type}")
+    expected_name = type_to_short_type(arg_type)
+    if expected_name == "i64":
+        expected_name = "i"
+    elif expected_name == "u64":
+        expected_name = "u"
+    if not (re.match("u?fix(?:64)?2", func) and arg_name == "m"): # ignore the mantissa argument of fixed-point conversion functions
+        if arg_name != expected_name:
+            raise Exception(f"{filename}:{lineno} Expected first argument of {func} (of type {arg_type}) to be named {expected_name}, not {arg_name}")
 
 @dataclass
 class TestMacro:
@@ -140,22 +203,14 @@ def suffix_one_more_than(suffix1, suffix2):
             else:
                 return ord(alpha1) - ord(alpha2) == 1
 
+def type_to_base_type(t):
+    if t in BASE_TYPES:
+        return t
+    return CONVERSION_TYPES[t]
+
 def type_to_short_type(t):
-    assert(t in CONVERSION_TYPES)
-    if t in ("int", "fix", "int_z", "fix_z") or t.startswith("fix_"):
-        return "i"
-    elif t in ("uint", "ufix", "uint_z", "ufix_z") or t.startswith("ufix_"):
-        return "u"
-    elif t in ("int64", "fix64", "int64_z", "fix64_z"):
-        return "i64"
-    elif t in ("uint64", "ufix64", "uint64_z", "ufix64_z"):
-        return "u64"
-    elif t == "float" or t.startswith("float_"):
-        return "f"
-    elif t == "double" or t.startswith("double_"):
-        return "d"
-    else:
-        raise Exception(f"Couldn't determine short_type for {t}")
+    b = type_to_base_type(t)
+    return BASE_TYPES[b]
 
 
 if __name__ == "__main__":
@@ -169,13 +224,22 @@ if __name__ == "__main__":
                 # strip trailing comments
                 line = re.sub(r"\s*//.*$", "", line)
                 if line:
-                    if m := re.match(r"^\w+ ((\w+)2(\w+))\(([^\)]+)\);$", line):
-                        conversion_function = m.group(1)
-                        from_type = m.group(2)
-                        to_type = m.group(3)
-                        num_input_args = len(m.group(4).split(","))
+                    if m := re.match(r"^(\w+) ((\w+)2(\w+))\(([^\)]+)\);$", line):
+                        return_type = m.group(1)
+                        conversion_function = m.group(2)
+                        from_type = m.group(3)
+                        to_type = m.group(4)
+                        input_args = parse_func_args(m.group(5))
                         #print(lineno, line, conversion_function)
-                        add_conversion_function(conversion_functions, conversion_function, from_type, to_type, num_input_args, check.header_file, lineno)
+                        add_conversion_function(conversion_functions, conversion_function, return_type, from_type, to_type, input_args, check.header_file, lineno)
+                    elif m := re.search(r"static inline (\w+) ((\w+)2(\w+))\(([^\)]+)\)", line):
+                        return_type = m.group(1)
+                        conversion_function = m.group(2)
+                        from_type = m.group(3)
+                        to_type = m.group(4)
+                        input_args = parse_func_args(m.group(5))
+                        check_func_args(conversion_function, input_args, from_type, to_type, return_type, check.header_file, lineno)
+                        #print(lineno, line, conversion_function)
 
         test_macros = dict()
         function_groups = dict()
@@ -252,37 +316,45 @@ if __name__ == "__main__":
                         conversion_function = m.group(1)
                         from_type = m.group(2)
                         to_type = m.group(3)
-                        num_input_args = len(m.group(4).split(","))
+                        input_args = parse_func_args(m.group(4))
+                        num_input_args = len(input_args)
                         #print(lineno, line, conversion_function)
                         if conversion_function not in conversion_functions:
                             raise Exception(f"{check.tests_file}:{lineno} {conversion_function} has no counterpart in {check.header_file}")
                         else:
                             if num_input_args != conversion_functions[conversion_function].num_input_args:
-                                raise Exception(f"{check.tests_file}:{lineno} {conversion_function} has a different number of arguments to the counterpart in {check.header_file}")
-                    elif m := re.match(r"^\w+ __attribute__\(\(naked\)\) (call_((\w+)2(\w+)))\(([^\)]+)\)", line):
-                        conversion_function = m.group(1)
-                        base_function = m.group(2)
-                        from_type = m.group(3)
-                        to_type = m.group(4)
-                        num_input_args = len(m.group(5).split(","))
+                                raise Exception(f"{check.tests_file}:{lineno} {conversion_function} has a different number of arguments ({num_input_args}) to the counterpart in {check.header_file} ({conversion_functions[conversion_function].num_input_args})")
+                    elif m := re.match(r"^(\w+) __attribute__\(\(naked\)\) (call_((\w+)2(\w+)))\(([^\)]+)\)", line):
+                        return_type = m.group(1)
+                        conversion_function = m.group(2)
+                        base_function = m.group(3)
+                        from_type = m.group(4)
+                        to_type = m.group(5)
+                        input_args = parse_func_args(m.group(6))
+                        num_input_args = len(input_args)
                         #print(lineno, line, conversion_function)
                         if base_function not in conversion_functions:
                             raise Exception(f"{check.tests_file}:{lineno} {conversion_function} exists but {base_function} doesn't exist")
                         else:
                             if num_input_args != conversion_functions[base_function].num_input_args:
-                                raise Exception(f"{check.tests_file}:{lineno} {conversion_function} has a different number of arguments to {base_function}")
-                        add_conversion_function(conversion_functions, conversion_function, from_type, to_type, num_input_args, check.tests_file, lineno)
-                    elif m := re.match(r"^static inline (?:float|double) ((\w+)2(\w+_\d+))\(([^\)]+)\)", line):
-                        conversion_function = m.group(1)
-                        from_type = m.group(2)
-                        to_type = m.group(3)
-                        num_input_args = len(m.group(4).split(","))
+                                raise Exception(f"{check.tests_file}:{lineno} {conversion_function} has a different number of arguments ({num_input_args}) to {base_function} ({conversion_functions[base_function].num_input_args})")
+                        add_conversion_function(conversion_functions, conversion_function, return_type, from_type, to_type, input_args, check.tests_file, lineno)
+                    elif m := re.match(r"^static inline (\w+) ((\w+)2(\w+_\d+))\(([^\)]+)\)", line):
+                        return_type = m.group(1)
+                        conversion_function = m.group(2)
+                        from_type = m.group(3)
+                        to_type = m.group(4)
+                        input_args = parse_func_args(m.group(5))
+                        num_input_args = len(input_args)
                         #print(lineno, line, conversion_function)
-                        m = re.match(r"^static inline (?:float|double) (\w+2\w+)_\d+\(", line)
+                        m = re.match(r"^static inline (?:\w+) (\w+2\w+)_\d+\(", line)
                         base_function = m.group(1)
                         if base_function not in conversion_functions:
                             raise Exception(f"{check.tests_file}:{lineno} {conversion_function} exists but {base_function} doesn't exist")
-                        add_conversion_function(conversion_functions, conversion_function, from_type, to_type, num_input_args, check.tests_file, lineno)
+                        else:
+                            if num_input_args != conversion_functions[base_function].num_input_args and not re.search(r'_\d+$', conversion_function):
+                                raise Exception(f"{check.tests_file}:{lineno} {conversion_function} has a different number of arguments ({num_input_args}) to {base_function} ({conversion_functions[base_function].num_input_args})")
+                        add_conversion_function(conversion_functions, conversion_function, return_type, from_type, to_type, input_args, check.tests_file, lineno)
                     elif m := re.match(r"^printf\(\"((\w+)2(\w+))\\n\"\);$", line):
                         function_group = m.group(1)
                         from_type = m.group(2)

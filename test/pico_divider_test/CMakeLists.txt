@@ -16,6 +16,8 @@ if (PICO_ON_DEVICE)
         pico_set_divider_implementation(pico_divider_test hardware_explicit) # want to compare against compiler impl
     endif()
 
+    target_compile_options(pico_divider_test PRIVATE -Wno-analyzer-use-of-uninitialized-value)
+
     pico_add_extra_outputs(pico_divider_test)
 
     target_compile_definitions(pico_divider_test PRIVATE

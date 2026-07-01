@@ -45,11 +45,11 @@ extern "C" {
  * \ingroup mutex
  */
 typedef struct {
-    lock_core_t core;
+    lock_core_t core;           ///< Core lock primitive shared by all lock types
     lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
     uint8_t enter_count;        //! ownership count
 #if PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY
-    bool recursive;
+    bool recursive;             ///< True if this mutex is being used as a recursive mutex
 #endif
 } recursive_mutex_t;
 
@@ -58,7 +58,7 @@ typedef struct {
  */
 #if !PICO_MUTEX_ENABLE_SDK120_COMPATIBILITY
 typedef struct mutex {
-    lock_core_t core;
+    lock_core_t core;           ///< Core lock primitive shared by all lock types
     lock_owner_id_t owner;      //! owner id LOCK_INVALID_OWNER_ID for unowned
 } mutex_t;
 #else

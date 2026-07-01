@@ -28,8 +28,8 @@ static inline float ufix2float_8(uint32_t m) { return ufix2float(m, 8); }
 static inline float ufix2float_16(uint32_t m) { return ufix2float(m, 16); }
 static inline float ufix2float_24(uint32_t m) { return ufix2float(m, 24); }
 
-static inline float float2fix_12(int32_t m) { return float2fix(m, 12); }
-static inline float float2ufix_12(int32_t m) { return float2ufix(m, 12); }
+static inline int32_t float2fix_12(float f) { return float2fix(f, 12); }
+static inline uint32_t float2ufix_12(float f) { return float2ufix(f, 12); }
 #endif
 
 #if LIB_PICO_FLOAT_COMPILER || defined(__riscv)
@@ -72,7 +72,7 @@ float __attribute__((naked)) call_int2float(int32_t i) {
     pico_default_asm_volatile("b int2float");
 }
 
-float __attribute__((naked)) call_uint2float(uint32_t i) {
+float __attribute__((naked)) call_uint2float(uint32_t u) {
     pico_default_asm_volatile("b uint2float");
 }
 
@@ -88,7 +88,7 @@ float __attribute__((naked)) call_fix2float(int32_t i, uint32_t n) {
     pico_default_asm_volatile("b fix2float");
 }
 
-float __attribute__((naked)) call_ufix2float(int32_t i, uint32_t n) {
+float __attribute__((naked)) call_ufix2float(uint32_t u, uint32_t n) {
     pico_default_asm_volatile("b ufix2float");
 }
 

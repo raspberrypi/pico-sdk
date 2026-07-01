@@ -1,4 +1,5 @@
-load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config", "compatible_with_config")
+load("@pico-sdk//bazel:defs.bzl", "incompatible_with_config")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -22,19 +23,18 @@ cc_library(
 cc_library(
     name = "pico_lwip_core",
     srcs = glob(["src/core/*.c"]),
+    target_compatible_with = incompatible_with_config("@pico-sdk//bazel/constraint:pico_lwip_config_unset"),
     deps = [
         ":pico_lwip_headers",
         "@pico-sdk//bazel/config:PICO_LWIP_CONFIG",
-    ]
+    ] +
     # altcp_alloc.c *might* depend on mbedtls
-    + select({
+    select({
         "@pico-sdk//bazel/constraint:pico_mbedtls_config_unset": [],
         "//conditions:default": [
             "@pico-sdk//src/rp2_common/pico_mbedtls:pico_mbedtls_library",
-        ]
-    })
-    ,
-    target_compatible_with = incompatible_with_config("@pico-sdk//bazel/constraint:pico_lwip_config_unset")
+        ],
+    }),
 )
 
 cc_library(
@@ -155,7 +155,7 @@ cc_library(
     includes = ["src/apps/altcp_tls"],
     deps = [
         ":pico_lwip_core",
-        "@pico-sdk//src/rp2_common/pico_mbedtls:pico_mbedtls_config"
+        "@pico-sdk//src/rp2_common/pico_mbedtls:pico_mbedtls_config",
     ],
 )
 

@@ -29,15 +29,22 @@ extern "C" {
 
 #include "pico/lock_core.h"
 
+/*! \brief A multi-core and IRQ safe queue instance
+ *  \ingroup queue
+ *
+ * Stores a maximum number of elements of a fixed size. All operations are
+ * protected by a spinlock, making the queue safe to use from multiple cores
+ * and from interrupt handlers.
+ */
 typedef struct {
-    lock_core_t core;
-    uint8_t *data;
-    uint16_t wptr;
-    uint16_t rptr;
-    uint16_t element_size;
-    uint16_t element_count;
+    lock_core_t core; ///< Core lock state used for synchronisation
+    uint8_t *data; ///< Pointer to the backing data buffer
+    uint16_t wptr; ///< Write pointer (index of next slot to write)
+    uint16_t rptr; ///< Read pointer (index of next slot to read)
+    uint16_t element_size; ///< Size in bytes of each element
+    uint16_t element_count; ///< Maximum number of elements the queue can hold
 #if PICO_QUEUE_MAX_LEVEL
-    uint16_t max_level;
+    uint16_t max_level; ///< Highest number of elements seen in the queue since initialisation or last reset
 #endif
 } queue_t;
 
@@ -47,9 +54,10 @@ typedef struct {
  * \param q Pointer to a queue_t structure, used as a handle
  * \param element_size Size of each value in the queue
  * \param element_count Maximum number of entries in the queue
- * \param spinlock_num The spin ID used to protect the queue
+ * \param spinlock_num The spinlock ID used to protect the queue
+ * \return true if the queue was initialized; false if it couldn't be (e.g. memory allocation failed)
  */
-void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num);
+bool queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num);
 
 /*! \brief Initialise a queue, allocating a (possibly shared) spinlock
  *  \ingroup queue
@@ -57,9 +65,10 @@ void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count,
  * \param q Pointer to a queue_t structure, used as a handle
  * \param element_size Size of each value in the queue
  * \param element_count Maximum number of entries in the queue
+ * \return true if the queue was initialized; false if it couldn't be (e.g. malloc failed)
  */
-static inline void queue_init(queue_t *q, uint element_size, uint element_count) {
-    queue_init_with_spinlock(q, element_size, element_count, next_striped_spin_lock_num());
+static inline bool queue_init(queue_t *q, uint element_size, uint element_count) {
+    return queue_init_with_spinlock(q, element_size, element_count, next_striped_spin_lock_num());
 }
 
 /*! \brief Destroy the specified queue.

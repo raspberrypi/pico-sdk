@@ -162,7 +162,7 @@ typedef enum dma_address_update_type {
  *  \ingroup channel_config
  */
 typedef struct {
-    uint32_t ctrl;
+    uint32_t ctrl; ///< Raw control register value encoding all channel configuration bits
 } dma_channel_config_t;
 
 // backwards compatibility

@@ -1,5 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,7 +7,7 @@ cc_library(
     name = "hardware_riscv_platform_timer",
     hdrs = ["include/hardware/riscv_platform_timer.h"],
     includes = ["include"],
-    target_compatible_with = compatible_with_rp2() + ["@platforms//cpu:riscv32"],
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config("//bazel/constraint:rp2040"),
     deps = [
         "//src/rp2_common:hardware_structs",
         "//src/rp2_common:pico_platform",

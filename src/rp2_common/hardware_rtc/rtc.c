@@ -188,3 +188,33 @@ void rtc_disable_alarm(void) {
         tight_loop_contents();
     }
 }
+
+bool rtc_run_from_external_source(uint32_t src_hz, uint gpio_pin) {
+    bool success = clock_configure_gpin(clk_rtc, gpio_pin, src_hz, RTC_CLOCK_FREQ_HZ);
+    if (success) {
+        // Ensure external source is actually running
+        uint32_t rtc_freq = frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_RTC);
+        if (rtc_freq < ((RTC_CLOCK_FREQ_HZ / KHZ) - 5) || rtc_freq > ((RTC_CLOCK_FREQ_HZ / KHZ) + 5)) {
+            // Frequency is not within 1kHz of the expected frequency
+            success = false;
+            // reconfigure the clock to the default configuration
+        #if (USB_CLK_HZ % RTC_CLOCK_FREQ_HZ == 0)
+            // this doesn't pull in 64 bit arithmetic
+            clock_configure_int_divider(clk_rtc,
+                            0, // No GLMUX
+                            CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
+                            USB_CLK_HZ,
+                            USB_CLK_HZ / RTC_CLOCK_FREQ_HZ);
+
+        #else
+            clock_configure(clk_rtc,
+                            0, // No GLMUX
+                            CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_CLKSRC_PLL_USB,
+                            USB_CLK_HZ,
+                            RTC_CLOCK_FREQ_HZ);
+
+        #endif
+        }
+    }
+    return success;
+}

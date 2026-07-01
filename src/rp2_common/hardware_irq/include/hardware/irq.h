@@ -8,9 +8,14 @@
 #define _HARDWARE_IRQ_H
 
 // These two config items are also used by assembler, so keeping separate
-// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum number of shared IRQ handlers, default=4, advanced=true, group=hardware_irq
+// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum number of shared IRQ handlers, default=6 if using stdio_usb otherwise 4, advanced=true, group=hardware_irq
 #ifndef PICO_MAX_SHARED_IRQ_HANDLERS
-#define PICO_MAX_SHARED_IRQ_HANDLERS 4
+#define _PICO_MAX_SHARED_IRQ_HANDLERS 4
+#if LIB_PICO_STDIO_USB
+#define PICO_MAX_SHARED_IRQ_HANDLERS (_PICO_MAX_SHARED_IRQ_HANDLERS + 2)
+#else
+#define PICO_MAX_SHARED_IRQ_HANDLERS _PICO_MAX_SHARED_IRQ_HANDLERS
+#endif
 #endif
 
 // PICO_CONFIG: PICO_DISABLE_SHARED_IRQ_HANDLERS, Disable shared IRQ handlers, type=bool, default=0, group=hardware_irq
@@ -281,6 +286,21 @@ void irq_set_mask_enabled(uint32_t mask, bool enabled);
  * \param enabled true to enable the interrupts, false to disable them.
  */
 void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled);
+
+/*! \brief Get the current enabled mask on the executing core
+ *  \ingroup hardware_irq
+ *
+ * \return mask 32-bit mask with one bits set for the enabled interrupts \ref interrupt_nums
+ */
+ uint32_t irq_get_mask(void);
+
+ /*! \brief Get the current enabled mask on the executing core
+ *  \ingroup hardware_irq
+ *
+ * \param n the index of the mask to update. n == 0 means 0->31, n == 1 mean 32->63 etc.
+ * \return mask 32-bit mask with one bits set for the enabled interrupts \ref interrupt_nums
+ */
+ uint32_t irq_get_mask_n(uint n);
 
 /*! \brief  Set an exclusive interrupt handler for an interrupt on the executing core.
  *  \ingroup hardware_irq

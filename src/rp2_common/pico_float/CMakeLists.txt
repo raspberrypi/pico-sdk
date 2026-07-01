@@ -12,7 +12,8 @@
     add_library(pico_float_default INTERFACE)
     target_link_libraries(pico_float_default INTERFACE pico_float_pico)
 
-    set(PICO_DEFAULT_FLOAT_IMPL pico_float_default)
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_FLOAT_IMPL, The default implementation for pico_float to link. 'pico' selects the fastest implementation for the current platform; 'compiler' uses the default C library versions but omits additional functions provided when using 'pico'/'pico_vfp'/'pico_dcp'; 'none' removes all single-precision floating point functions altogether; on RP2350 'pico_vfp' and 'pico_dcp' can also be used to select between using the Arm hardware floating point instructions or the RP2350 double coprocessor for single-precision floating point operations, type=string, default=pico, group=pico_float
+    pico_fixup_default_impl(PICO_DEFAULT_FLOAT_IMPL pico_float default)
 
     target_link_libraries(pico_float INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_FLOAT_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_FLOAT_IMPL>,${PICO_DEFAULT_FLOAT_IMPL}>)

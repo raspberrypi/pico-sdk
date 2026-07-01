@@ -175,9 +175,14 @@ extern "C" {
 #define PICO_RAND_RAM_HASH_START   (PICO_RAND_RAM_HASH_END - 1024u)
 #endif
 
+/*! \brief A 128-bit random number value
+ *  \ingroup pico_rand
+ *
+ * Holds up to 128 bits of entropy returned by \ref get_rand_128.
+ */
 // We provide a maximum of 128 bits entropy in one go
 typedef struct rng_128 {
-    uint64_t r[2];
+    uint64_t r[2]; ///< Two 64-bit words comprising the 128-bit random value
 } rng_128_t;
 
 /*! \brief Get 128-bit random number

@@ -104,23 +104,18 @@ wrapper_func __aeabi_idiv
 wrapper_func __aeabi_idivmod
 regular_func div_s32s32
 regular_func divmod_s32s32
+    ldr r2, =SIO_BASE
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
     // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
-    ldr r2, =SIO_BASE
     ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_s32s32_savestate
-regular_func divmod_s32s32_unsafe
 #else
-// to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
-// in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
-// are the hardware_divider functions that can be used instead anyway
-regular_func divmod_s32s32_unsafe
     // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
-    ldr r2, =SIO_BASE
     mrs r3, PRIMASK
     cpsid i
 #endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
+divmod_s32s32_core:
     str r0, [r2, #SIO_DIV_SDIVIDEND_OFFSET]
     str r1, [r2, #SIO_DIV_SDIVISOR_OFFSET]
     cmp r1, #0
@@ -156,9 +151,39 @@ regular_func divmod_s32s32_unsafe
 .align 2
 regular_func divmod_s32s32_savestate
     save_div_state_and_lr
-    bl divmod_s32s32_unsafe
+    bl divmod_s32s32_core
     restore_div_state_and_return
 #endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
+
+div_section divmod_s32s32_unsafe
+.align 2
+regular_func divmod_s32s32_unsafe
+    ldr r2, =SIO_BASE
+    str r0, [r2, #SIO_DIV_SDIVIDEND_OFFSET]
+    str r1, [r2, #SIO_DIV_SDIVISOR_OFFSET]
+    cmp r1, #0
+    beq 1f
+    wait_div 2
+    // return 64 bit value so we can efficiently return both (note read order is important since QUOTIENT must be read last)
+    ldr r1, [r2, #SIO_DIV_REMAINDER_OFFSET]
+    ldr r0, [r2, #SIO_DIV_QUOTIENT_OFFSET]
+    bx lr
+1:
+    push {r2, lr}
+    movs r1, #0x80
+    lsls r1, #24
+    asrs r2, r0, #31
+    eors r1, r2
+    cmp r0, #0
+    beq 1f
+    mvns r0, r1
+1:
+#if PICO_DIVIDER_CALL_IDIV0
+    bl __aeabi_idiv0
+#endif
+    movs r1, #0 // remainder 0
+    // need to restore saved r2 as it holds SIO ptr
+    pop {r2, pc}
 
 // since uidiv and uidivmod only differ by a cycle, we'll make them the same!
 div_section WRAPPER_FUNC_NAME(__aeabi_uidiv)
@@ -166,23 +191,19 @@ regular_func div_u32u32
 regular_func divmod_u32u32
 wrapper_func __aeabi_uidiv
 wrapper_func __aeabi_uidivmod
+    ldr r2, =SIO_BASE
 #if !PICO_DIVIDER_DISABLE_INTERRUPTS
     // to support IRQ usage (or context switch) we must save/restore divider state around call if state is dirty
-    ldr r2, =SIO_BASE
     ldr r3, [r2, #SIO_DIV_CSR_OFFSET]
     lsrs r3, #SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
     bcs divmod_u32u32_savestate
-regular_func divmod_u32u32_unsafe
 #else
-// to avoid too much source code spaghetti with restoring interrupts, we make this the same as the other funcs
-// in the PICO_DIVIDER_DISABLE_INTERRUPTS case; i.e. it is not a faster function; this seems reasonable as there
-// are the hardware_divider functions that can be used instead anyway
-regular_func divmod_u32u32_unsafe
     // to avoid worrying about IRQs (or context switches), simply disable interrupts around call
     ldr r2, =SIO_BASE
     mrs r3, PRIMASK
     cpsid i
 #endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
+divmod_u32u32_core:
     str r0, [r2, #SIO_DIV_UDIVIDEND_OFFSET]
     str r1, [r2, #SIO_DIV_UDIVISOR_OFFSET]
     cmp r1, #0
@@ -215,9 +236,36 @@ regular_func divmod_u32u32_unsafe
 .align 2
 regular_func divmod_u32u32_savestate
     save_div_state_and_lr
-    bl divmod_u32u32_unsafe
+    bl divmod_u32u32_core
     restore_div_state_and_return
 #endif /* !PICO_DIVIDER_DISABLE_INTERRUPTS */
+
+div_section divmod_u32u32_unsafe
+.align 2
+regular_func divmod_u32u32_unsafe
+    ldr r2, =SIO_BASE
+    str r0, [r2, #SIO_DIV_UDIVIDEND_OFFSET]
+    str r1, [r2, #SIO_DIV_UDIVISOR_OFFSET]
+    cmp r1, #0
+    beq 1f
+    wait_div 2
+    // return 64 bit value so we can efficiently return both (note read order is important since QUOTIENT must be read last)
+    ldr r1, [r2, #SIO_DIV_REMAINDER_OFFSET]
+    ldr r0, [r2, #SIO_DIV_QUOTIENT_OFFSET]
+    bx lr
+1:
+    push {r2, lr}
+    cmp r0, #0
+    beq 1f
+    movs r0, #0
+    mvns r0, r0
+1:
+#if PICO_DIVIDER_CALL_IDIV0
+    bl __aeabi_idiv0
+#endif
+    movs r1, #0 // remainder 0
+    // need to restore saved r2 as it holds SIO ptr
+    pop {r2, pc}
 
 div_section WRAPPER_FUNC_NAME(__aeabi_ldiv)
 

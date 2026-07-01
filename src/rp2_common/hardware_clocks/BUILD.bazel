@@ -13,10 +13,12 @@ cc_library(
     target_compatible_with = compatible_with_rp2(),
     visibility = [
         "//src/rp2_common/hardware_pll:__pkg__",
+        "//src/rp2_common/hardware_rosc:__pkg__",
         "//src/rp2_common/hardware_xosc:__pkg__",
     ],
     deps = [
         "//src/common/pico_base_headers",
+        "//src/common/pico_util",
         "//src/rp2_common:hardware_structs",
         "//src/rp2_common/hardware_base",
     ],

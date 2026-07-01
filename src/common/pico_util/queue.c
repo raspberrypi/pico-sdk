@@ -8,13 +8,14 @@
 #include <string.h>
 #include "pico/util/queue.h"
 
-void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num) {
+bool queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num) {
     lock_init(&q->core, spinlock_num);
-    q->data = (uint8_t *)calloc(element_count + 1, element_size);
     q->element_count = (uint16_t)element_count;
     q->element_size = (uint16_t)element_size;
     q->wptr = 0;
     q->rptr = 0;
+    q->data = (uint8_t *)calloc(element_count + 1, element_size);
+    return q->data != NULL;
 }
 
 void queue_free(queue_t *q) {

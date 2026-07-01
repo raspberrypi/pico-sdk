@@ -75,6 +75,11 @@ extern "C" {
  */
 
 // Currently always a pointer to hw but it might not be in the future
+/*! \brief Opaque type representing a UART instance
+ *  \ingroup hardware_uart
+ *
+ * Use \ref uart0 or \ref uart1 rather than constructing this directly.
+ */
 typedef struct uart_inst uart_inst_t;
 
 /** The UART identifiers for use in UART functions.

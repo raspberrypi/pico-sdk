@@ -6,6 +6,7 @@
     __init_array_start, __init_array_end
     __bothinit_array_start, __bothinit_array_end
     __fini_array_start, __fini_array_end
+    __dso_handle
 */
 
 SECTIONS
@@ -72,6 +73,7 @@ SECTIONS
         *(SORT(.fini_array.*))
         *(.fini_array)
         PROVIDE_HIDDEN (__fini_array_end = .);
+        PROVIDE(__dso_handle = 0);
 
         *(.eh_frame*)
         . = ALIGN(4);

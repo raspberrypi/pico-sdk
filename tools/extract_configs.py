@@ -60,6 +60,7 @@ ALLOWED_CONFIG_PROPERTIES = set([PROPERTY_TYPE, PROPERTY_DEFAULT, PROPERTY_MIN, 
 PROPERTY_TYPE_INT = 'int'
 PROPERTY_TYPE_BOOL = 'bool'
 PROPERTY_TYPE_ENUM = 'enum'
+PROPERTY_TYPE_LIST = 'list'
 
 CHIP_NAMES = ["rp2040", "rp2350"]
 
@@ -167,6 +168,14 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum, applicable):
         if str_values[attr_name] is not None:
             if str_values[attr_name] not in _enumvalues:
                 errors.append(Exception('{} at {}:{} has {} value {} which isn\'t in list of {} {}'.format(config_name, file_path, linenum, attr_name, str_values[attr_name], PROPERTY_ENUMVALUES, str_values[PROPERTY_ENUMVALUES])))
+
+    elif type_str == PROPERTY_TYPE_LIST:
+        assert PROPERTY_MIN not in config_attrs
+        assert PROPERTY_MAX not in config_attrs
+        assert PROPERTY_ENUMVALUES not in config_attrs
+
+        attr_name = PROPERTY_DEFAULT
+        str_values[attr_name] = config_attrs.get(attr_name, None)
 
     else:
         errors.append(Exception("Found unknown {} type {} at {}:{}".format(BASE_CONFIG_NAME, type_str, file_path, linenum)))
@@ -303,6 +312,9 @@ for applicable, all_configs in chips_all_configs.items():
                     first_define_value = get_first_dict_key(defines_obj)
                     first_define_file_path, first_define_linenum = defines_obj[first_define_value]
                     errors.append(Exception('Found {} at {}:{} with a default of {}, but #define says {} (at {}:{})'.format(config_name, file_path, linenum, config_default, first_define_value, first_define_file_path, first_define_linenum)))
+            elif config_obj['attrs']['type'] == "bool" and config_default == "0":
+                # a bool with a missing #define defaults to 0 (false) anyway
+                logger.info('Found {} (bool) at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default))
             else:
                 errors.append(Exception('Found {} at {}:{} with a default of {}, but no matching #define found'.format(config_name, file_path, linenum, config_default)))
 
@@ -329,7 +341,7 @@ def build_mismatch_exception_message(name, thing, config_obj1, value1, config_ob
     obj2_filepath = os.path.join(scandir, config_obj2['filename'])
     return "'{}' {} mismatch at {}:{} ({}) and {}:{} ({})".format(name, thing, obj1_filepath, config_obj1['line_number'], value1, obj2_filepath, config_obj2['line_number'], value2)
 
-# Check that any identically-named setttings have appropriate matching attributes
+# Check that any identically-named settings have appropriate matching attributes
 for applicable in chips_all_configs:
     for other in chips_all_configs:
         if other == applicable:

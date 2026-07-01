@@ -58,8 +58,8 @@ cc_library(
 # Creates a config_setting for each known boot2 option with the name:
 #     PICO_DEFAULT_BOOT_STAGE2_[choice]
 declare_flag_choices(
-    "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
-    BOOT2_CHOICES,
+    choices = BOOT2_CHOICES,
+    flag = "//bazel/config:PICO_DEFAULT_BOOT_STAGE2",
 )
 
 filegroup(
@@ -118,14 +118,14 @@ objcopy_to_bin(
 # WORKAROUND: Python rules always require a .py extension.
 copy_file(
     name = "copy_tool_to_py",
-    src = "pad_checksum",
-    out = "pad_checksum_tool.py",
+    src = "pad",
+    out = "pad_tool.py",
     target_compatible_with = ["//bazel/constraint:host"],
 )
 
 py_binary(
-    name = "pad_checksum_tool",
-    srcs = ["pad_checksum_tool.py"],
+    name = "pad_tool",
+    srcs = ["pad_tool.py"],
     target_compatible_with = ["//bazel/constraint:host"],
 )
 
@@ -134,12 +134,11 @@ run_binary(
     srcs = [":boot_stage2_bin"],
     outs = ["boot_stage2.S"],
     args = [
-        "-s 0xffffffff",
         "$(location boot_stage2_bin)",
         "$(location boot_stage2.S)",
     ],
     target_compatible_with = ["//bazel/constraint:rp2350"],
-    tool = ":pad_checksum_tool",
+    tool = ":pad_tool",
 )
 
 cc_library(

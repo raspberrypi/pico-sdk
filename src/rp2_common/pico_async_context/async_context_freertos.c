@@ -170,6 +170,11 @@ static uint32_t end_task_func(void *param) {
     return 0;
 }
 
+static void timer_delete_sync_helper(__unused void *param1, __unused uint32_t param2) {
+    TaskHandle_t xTaskToNotify = (TaskHandle_t)param1;
+    xTaskNotifyGive(xTaskToNotify);
+}
+
 void async_context_freertos_deinit(async_context_t *self_base) {
     async_context_freertos_t *self = (async_context_freertos_t *)self_base;
     if (self->task_handle) {
@@ -180,6 +185,15 @@ void async_context_freertos_deinit(async_context_t *self_base) {
     }
     if (self->timer_handle) {
         xTimerDelete(self->timer_handle, 0);
+
+        // slight hoops to jump thru to make sure the timer is actually deleted before we
+        // free the remaining items below. this is needed for SMP and also if
+        // the current task has a higher/equal priority to the timer task
+
+        // 1. queue function which will notify us back to the timer task queue
+        xTimerPendFunctionCall(timer_delete_sync_helper, (void *)xTaskGetCurrentTaskHandle(), 0, portMAX_DELAY);
+        // 2. wait for that function to execute (which will be after the timer deletion completes)
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
     if (self->lock_mutex) {
         vSemaphoreDelete(self->lock_mutex);

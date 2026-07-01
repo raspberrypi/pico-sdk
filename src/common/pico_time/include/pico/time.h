@@ -89,6 +89,18 @@ static inline uint32_t to_ms_since_boot(absolute_time_t t) {
     return us_to_ms(us);
 }
 
+/*! fn to_ms_64_since_boot
+ * \ingroup timestamp
+ * \brief Convert a timestamp into a number of 64-bit milliseconds since boot.
+ * \param t an absolute_time_t value to convert
+ * \return the number of milliseconds since boot represented by t
+ * \sa to_us_since_boot()
+ */
+ static inline uint64_t to_ms_64_since_boot(absolute_time_t t) {
+    uint64_t us = to_us_since_boot(t);
+    return us / 1000ull;
+}
+
 /*! \brief Return a timestamp value obtained by adding a number of microseconds to another timestamp
  * \ingroup timestamp
  *
@@ -734,11 +746,11 @@ typedef bool (*repeating_timer_callback_t)(repeating_timer_t *rt);
  * \return
  */
 struct repeating_timer {
-    int64_t delay_us;
-    alarm_pool_t *pool;
-    alarm_id_t alarm_id;
-    repeating_timer_callback_t callback;
-    void *user_data;
+    int64_t delay_us;                      ///< The delay in microseconds between callbacks (negative if measured between starts)
+    alarm_pool_t *pool;                    ///< The alarm pool used to back this repeating timer
+    alarm_id_t alarm_id;                   ///< The alarm id of the underlying alarm backing this repeating timer
+    repeating_timer_callback_t callback;   ///< The callback to call each time the repeating timer fires
+    void *user_data;                       ///< User data passed to the callback
 };
 
 /*!

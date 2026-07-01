@@ -9,7 +9,6 @@
 #include <stddef.h>
 #include <sys/time.h>
 #include <time.h>
-
 #include <llvm-libc-types/ssize_t.h>
 
 #include "pico/runtime_init.h"
@@ -41,6 +40,11 @@ int settimeofday(__unused const struct timeval *tv, __unused const struct timezo
     return 0;
 }
 
+// Some Clang versions don't support localtime_r, so we use gmtime_r instead.
+__weak struct tm* localtime_r(const time_t* time, struct tm* tm) {
+    return gmtime_r((time_t*)time, tm);
+}
+
 // TODO: This should be a thread-local variable.
 int errno;
 
@@ -68,13 +72,18 @@ ssize_t __llvm_libc_stdio_write(__unused void *cookie, const char *buf, size_t s
 }
 
 bool __llvm_libc_timespec_get_utc(struct timespec *ts) {
-    int64_t absolute_time = (int64_t)get_absolute_time();
+    int64_t absolute_time = to_us_since_boot(get_absolute_time());
     ts->tv_sec = (time_t)(absolute_time / 1000000);
     ts->tv_nsec = (long)(absolute_time % 1000000 * 1000);
     return true;
 }
 
-void __cxa_finalize(__unused void *dso) {}
+__weak void __cxa_finalize(__unused void *dso) {}
+
+__weak int atexit(void (*function)(void)) {
+    (void)function;
+    return 0;
+}
 
 void __attribute__((noreturn)) __llvm_libc_exit(__unused int status) {
 #if PICO_ENTER_USB_BOOT_ON_EXIT
@@ -116,4 +125,3 @@ void runtime_init(void) {
         (*p)();
     }
 }
-

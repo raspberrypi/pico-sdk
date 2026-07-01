@@ -9,15 +9,18 @@ if (NOT TARGET pico_divider)
             )
     target_link_libraries(pico_divider_compiler_headers INTERFACE pico_divider_headers)
 
-    # add alias "default" which is hardware for RP2040 and compiler for RP2350
-    add_library(pico_divider_default INTERFACE)
+    # add alias "pico" which is hardware for RP2040 and compiler for RP2350
+    add_library(pico_divider_pico INTERFACE)
     if (PICO_RP2040)
-        target_link_libraries(pico_divider_default INTERFACE pico_divider_hardware)
+        target_link_libraries(pico_divider_pico INTERFACE pico_divider_hardware)
     else()
-        target_link_libraries(pico_divider_default INTERFACE pico_divider_compiler)
+        target_link_libraries(pico_divider_pico INTERFACE pico_divider_compiler)
     endif()
+    add_library(pico_divider_default INTERFACE)
+    target_link_libraries(pico_divider_default INTERFACE pico_divider_pico)
 
-    set(PICO_DEFAULT_DIVIDER_IMPL pico_divider_default)
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_DIVIDER_IMPL, The default implementation for pico_divider to link. 'pico' selects the fastest implementation for the current platform; 'hardware' selects the hardware divider on RP2040; 'compiler' uses the default compiler/C library versions, type=string, default=pico, group=pico_divider
+    pico_fixup_default_impl(PICO_DEFAULT_DIVIDER_IMPL pico_divider default)
 
     target_link_libraries(pico_divider INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_DIVIDER_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_DIVIDER_IMPL>,${PICO_DEFAULT_DIVIDER_IMPL}>)

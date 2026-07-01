@@ -265,7 +265,6 @@ uint64_t pico_div_u64(uint64_t a, uint64_t b) {
     return div_u64u64(a, b);
 }
 
-
 void perf_test() {
     *(volatile unsigned int *)0xe000e010=5; // enable SYSTICK at core clock
 

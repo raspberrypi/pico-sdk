@@ -41,6 +41,7 @@
 #define NUM_QSPI_GPIOS _u(6)
 
 #define PIO_INSTRUCTION_COUNT _u(32)
+#define PICO_PIO_VERSION _u(0)
 
 #define USBCTRL_DPRAM_SIZE _u(4096)
 

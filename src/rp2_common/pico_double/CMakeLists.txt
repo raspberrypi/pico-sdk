@@ -15,9 +15,8 @@ if (NOT TARGET pico_double)
         target_link_libraries(pico_double_default INTERFACE pico_double_pico)
     endif()
 
-    if (NOT PICO_DEFAULT_DOUBLE_IMPL)
-        set(PICO_DEFAULT_DOUBLE_IMPL pico_double_default)
-    endif()
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_DOUBLE_IMPL, The default implementation for pico_double to link. 'pico' selects the fastest implementation for the current platform; 'compiler' uses the default C library versions but omits additional functions provided when using 'pico'/'pico_dcp'; 'none' removes all double-precision floating point functions altogether; on RP2350 'pico_dcp' can also be used to explicitly select the RP2350 double coprocessor for double-precision floating point operations, type=string, default=pico, group=pico_double
+    pico_fixup_default_impl(PICO_DEFAULT_DOUBLE_IMPL pico_double default)
 
     target_link_libraries(pico_double INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_DOUBLE_IMPL>,${PICO_DEFAULT_DOUBLE_IMPL}>)
