@@ -142,7 +142,7 @@ typedef void (*low_power_pstate_resume_func)(pstate_bitset_t *pstate);
  */
 void low_power_set_pins_low_leakage(uint32_t exclude_mask);
 
-/*! \brief  Set all pins to a low leakage state (64-bit version)
+/*! \brief  Set all pins to a low leakage state (64-bit mask version)
  *  \ingroup pico_low_power
  *
  * \see low_power_set_pins_low_leakage
