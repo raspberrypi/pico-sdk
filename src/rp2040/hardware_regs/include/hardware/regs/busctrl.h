@@ -324,4 +324,3 @@
 #define BUSCTRL_PERFSEL3_VALUE_ROM _u(0x13)
 // =============================================================================
 #endif // _HARDWARE_REGS_BUSCTRL_H
-

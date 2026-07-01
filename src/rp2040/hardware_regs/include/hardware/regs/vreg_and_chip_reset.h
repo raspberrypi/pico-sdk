@@ -151,4 +151,3 @@
 #define VREG_AND_CHIP_RESET_CHIP_RESET_HAD_POR_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_VREG_AND_CHIP_RESET_H
-

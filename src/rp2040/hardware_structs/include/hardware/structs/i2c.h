@@ -37,21 +37,21 @@ typedef struct {
     // 0x00000006 [2:1]   SPEED        (0x2) These bits control at which speed the DW_apb_i2c...
     // 0x00000001 [0]     MASTER_MODE  (1) This bit controls whether the DW_apb_i2c master is enabled
     io_rw_32 con;
- 
+
     _REG_(I2C_IC_TAR_OFFSET) // I2C_IC_TAR
     // I2C Target Address Register
     // 0x00000800 [11]    SPECIAL      (0) This bit indicates whether software performs a Device-ID...
     // 0x00000400 [10]    GC_OR_START  (0) If bit 11 (SPECIAL) is set to 1 and bit 13(Device-ID) is...
     // 0x000003ff [9:0]   IC_TAR       (0x055) This is the target address for any master transaction
     io_rw_32 tar;
- 
+
     _REG_(I2C_IC_SAR_OFFSET) // I2C_IC_SAR
     // I2C Slave Address Register
     // 0x000003ff [9:0]   IC_SAR       (0x055) The IC_SAR holds the slave address when the I2C is...
     io_rw_32 sar;
- 
+
     uint32_t _pad0;
- 
+
     _REG_(I2C_IC_DATA_CMD_OFFSET) // I2C_IC_DATA_CMD
     // I2C Rx/Tx Data Buffer and Command Register
     // 0x00000800 [11]    FIRST_DATA_BYTE (0) Indicates the first data byte received after the address...
@@ -60,29 +60,29 @@ typedef struct {
     // 0x00000100 [8]     CMD          (0) This bit controls whether a read or a write is performed
     // 0x000000ff [7:0]   DAT          (0x00) This register contains the data to be transmitted or...
     io_rw_32 data_cmd;
- 
+
     _REG_(I2C_IC_SS_SCL_HCNT_OFFSET) // I2C_IC_SS_SCL_HCNT
     // Standard Speed I2C Clock SCL High Count Register
     // 0x0000ffff [15:0]  IC_SS_SCL_HCNT (0x0028) This register must be set before any I2C bus transaction...
     io_rw_32 ss_scl_hcnt;
- 
+
     _REG_(I2C_IC_SS_SCL_LCNT_OFFSET) // I2C_IC_SS_SCL_LCNT
     // Standard Speed I2C Clock SCL Low Count Register
     // 0x0000ffff [15:0]  IC_SS_SCL_LCNT (0x002f) This register must be set before any I2C bus transaction...
     io_rw_32 ss_scl_lcnt;
- 
+
     _REG_(I2C_IC_FS_SCL_HCNT_OFFSET) // I2C_IC_FS_SCL_HCNT
     // Fast Mode or Fast Mode Plus I2C Clock SCL High Count Register
     // 0x0000ffff [15:0]  IC_FS_SCL_HCNT (0x0006) This register must be set before any I2C bus transaction...
     io_rw_32 fs_scl_hcnt;
- 
+
     _REG_(I2C_IC_FS_SCL_LCNT_OFFSET) // I2C_IC_FS_SCL_LCNT
     // Fast Mode or Fast Mode Plus I2C Clock SCL Low Count Register
     // 0x0000ffff [15:0]  IC_FS_SCL_LCNT (0x000d) This register must be set before any I2C bus transaction...
     io_rw_32 fs_scl_lcnt;
- 
+
     uint32_t _pad1[2];
- 
+
     _REG_(I2C_IC_INTR_STAT_OFFSET) // I2C_IC_INTR_STAT
     // I2C Interrupt Status Register
     // 0x00001000 [12]    R_RESTART_DET (0) See IC_RAW_INTR_STAT for a detailed description of...
@@ -99,7 +99,7 @@ typedef struct {
     // 0x00000002 [1]     R_RX_OVER    (0) See IC_RAW_INTR_STAT for a detailed description of R_RX_OVER bit
     // 0x00000001 [0]     R_RX_UNDER   (0) See IC_RAW_INTR_STAT for a detailed description of R_RX_UNDER bit
     io_ro_32 intr_stat;
- 
+
     _REG_(I2C_IC_INTR_MASK_OFFSET) // I2C_IC_INTR_MASK
     // I2C Interrupt Mask Register
     // 0x00001000 [12]    M_RESTART_DET (0) This bit masks the R_RESTART_DET interrupt in...
@@ -116,7 +116,7 @@ typedef struct {
     // 0x00000002 [1]     M_RX_OVER    (1) This bit masks the R_RX_OVER interrupt in IC_INTR_STAT register
     // 0x00000001 [0]     M_RX_UNDER   (1) This bit masks the R_RX_UNDER interrupt in IC_INTR_STAT register
     io_rw_32 intr_mask;
- 
+
     _REG_(I2C_IC_RAW_INTR_STAT_OFFSET) // I2C_IC_RAW_INTR_STAT
     // I2C Raw Interrupt Status Register
     // 0x00001000 [12]    RESTART_DET  (0) Indicates whether a RESTART condition has occurred on...
@@ -133,79 +133,79 @@ typedef struct {
     // 0x00000002 [1]     RX_OVER      (0) Set if the receive buffer is completely filled to...
     // 0x00000001 [0]     RX_UNDER     (0) Set if the processor attempts to read the receive buffer...
     io_ro_32 raw_intr_stat;
- 
+
     _REG_(I2C_IC_RX_TL_OFFSET) // I2C_IC_RX_TL
     // I2C Receive FIFO Threshold Register
     // 0x000000ff [7:0]   RX_TL        (0x00) Receive FIFO Threshold Level
     io_rw_32 rx_tl;
- 
+
     _REG_(I2C_IC_TX_TL_OFFSET) // I2C_IC_TX_TL
     // I2C Transmit FIFO Threshold Register
     // 0x000000ff [7:0]   TX_TL        (0x00) Transmit FIFO Threshold Level
     io_rw_32 tx_tl;
- 
+
     _REG_(I2C_IC_CLR_INTR_OFFSET) // I2C_IC_CLR_INTR
     // Clear Combined and Individual Interrupt Register
     // 0x00000001 [0]     CLR_INTR     (0) Read this register to clear the combined interrupt, all...
     io_ro_32 clr_intr;
- 
+
     _REG_(I2C_IC_CLR_RX_UNDER_OFFSET) // I2C_IC_CLR_RX_UNDER
     // Clear RX_UNDER Interrupt Register
     // 0x00000001 [0]     CLR_RX_UNDER (0) Read this register to clear the RX_UNDER interrupt (bit...
     io_ro_32 clr_rx_under;
- 
+
     _REG_(I2C_IC_CLR_RX_OVER_OFFSET) // I2C_IC_CLR_RX_OVER
     // Clear RX_OVER Interrupt Register
     // 0x00000001 [0]     CLR_RX_OVER  (0) Read this register to clear the RX_OVER interrupt (bit...
     io_ro_32 clr_rx_over;
- 
+
     _REG_(I2C_IC_CLR_TX_OVER_OFFSET) // I2C_IC_CLR_TX_OVER
     // Clear TX_OVER Interrupt Register
     // 0x00000001 [0]     CLR_TX_OVER  (0) Read this register to clear the TX_OVER interrupt (bit...
     io_ro_32 clr_tx_over;
- 
+
     _REG_(I2C_IC_CLR_RD_REQ_OFFSET) // I2C_IC_CLR_RD_REQ
     // Clear RD_REQ Interrupt Register
     // 0x00000001 [0]     CLR_RD_REQ   (0) Read this register to clear the RD_REQ interrupt (bit 5)...
     io_ro_32 clr_rd_req;
- 
+
     _REG_(I2C_IC_CLR_TX_ABRT_OFFSET) // I2C_IC_CLR_TX_ABRT
     // Clear TX_ABRT Interrupt Register
     // 0x00000001 [0]     CLR_TX_ABRT  (0) Read this register to clear the TX_ABRT interrupt (bit...
     io_ro_32 clr_tx_abrt;
- 
+
     _REG_(I2C_IC_CLR_RX_DONE_OFFSET) // I2C_IC_CLR_RX_DONE
     // Clear RX_DONE Interrupt Register
     // 0x00000001 [0]     CLR_RX_DONE  (0) Read this register to clear the RX_DONE interrupt (bit...
     io_ro_32 clr_rx_done;
- 
+
     _REG_(I2C_IC_CLR_ACTIVITY_OFFSET) // I2C_IC_CLR_ACTIVITY
     // Clear ACTIVITY Interrupt Register
     // 0x00000001 [0]     CLR_ACTIVITY (0) Reading this register clears the ACTIVITY interrupt if...
     io_ro_32 clr_activity;
- 
+
     _REG_(I2C_IC_CLR_STOP_DET_OFFSET) // I2C_IC_CLR_STOP_DET
     // Clear STOP_DET Interrupt Register
     // 0x00000001 [0]     CLR_STOP_DET (0) Read this register to clear the STOP_DET interrupt (bit...
     io_ro_32 clr_stop_det;
- 
+
     _REG_(I2C_IC_CLR_START_DET_OFFSET) // I2C_IC_CLR_START_DET
     // Clear START_DET Interrupt Register
     // 0x00000001 [0]     CLR_START_DET (0) Read this register to clear the START_DET interrupt (bit...
     io_ro_32 clr_start_det;
- 
+
     _REG_(I2C_IC_CLR_GEN_CALL_OFFSET) // I2C_IC_CLR_GEN_CALL
     // Clear GEN_CALL Interrupt Register
     // 0x00000001 [0]     CLR_GEN_CALL (0) Read this register to clear the GEN_CALL interrupt (bit...
     io_ro_32 clr_gen_call;
- 
+
     _REG_(I2C_IC_ENABLE_OFFSET) // I2C_IC_ENABLE
     // I2C ENABLE Register
     // 0x00000004 [2]     TX_CMD_BLOCK (0) In Master mode: - 1'b1: Blocks the transmission of data...
     // 0x00000002 [1]     ABORT        (0) When set, the controller initiates the transfer abort
     // 0x00000001 [0]     ENABLE       (0) Controls whether the DW_apb_i2c is enabled
     io_rw_32 enable;
- 
+
     _REG_(I2C_IC_STATUS_OFFSET) // I2C_IC_STATUS
     // I2C STATUS Register
     // 0x00000040 [6]     SLV_ACTIVITY (0) Slave FSM Activity Status
@@ -216,23 +216,23 @@ typedef struct {
     // 0x00000002 [1]     TFNF         (1) Transmit FIFO Not Full
     // 0x00000001 [0]     ACTIVITY     (0) I2C Activity Status
     io_ro_32 status;
- 
+
     _REG_(I2C_IC_TXFLR_OFFSET) // I2C_IC_TXFLR
     // I2C Transmit FIFO Level Register
     // 0x0000001f [4:0]   TXFLR        (0x00) Transmit FIFO Level
     io_ro_32 txflr;
- 
+
     _REG_(I2C_IC_RXFLR_OFFSET) // I2C_IC_RXFLR
     // I2C Receive FIFO Level Register
     // 0x0000001f [4:0]   RXFLR        (0x00) Receive FIFO Level
     io_ro_32 rxflr;
- 
+
     _REG_(I2C_IC_SDA_HOLD_OFFSET) // I2C_IC_SDA_HOLD
     // I2C SDA Hold Time Length Register
     // 0x00ff0000 [23:16] IC_SDA_RX_HOLD (0x00) Sets the required SDA hold time in units of ic_clk...
     // 0x0000ffff [15:0]  IC_SDA_TX_HOLD (0x0001) Sets the required SDA hold time in units of ic_clk...
     io_rw_32 sda_hold;
- 
+
     _REG_(I2C_IC_TX_ABRT_SOURCE_OFFSET) // I2C_IC_TX_ABRT_SOURCE
     // I2C Transmit Abort Source Register
     // 0xff800000 [31:23] TX_FLUSH_CNT (0x000) This field indicates the number of Tx FIFO Data Commands...
@@ -254,59 +254,59 @@ typedef struct {
     // 0x00000002 [1]     ABRT_10ADDR1_NOACK (0) This field indicates that the Master is in 10-bit...
     // 0x00000001 [0]     ABRT_7B_ADDR_NOACK (0) This field indicates that the Master is in 7-bit...
     io_ro_32 tx_abrt_source;
- 
+
     _REG_(I2C_IC_SLV_DATA_NACK_ONLY_OFFSET) // I2C_IC_SLV_DATA_NACK_ONLY
     // Generate Slave Data NACK Register
     // 0x00000001 [0]     NACK         (0) Generate NACK
     io_rw_32 slv_data_nack_only;
- 
+
     _REG_(I2C_IC_DMA_CR_OFFSET) // I2C_IC_DMA_CR
     // DMA Control Register
     // 0x00000002 [1]     TDMAE        (0) Transmit DMA Enable
     // 0x00000001 [0]     RDMAE        (0) Receive DMA Enable
     io_rw_32 dma_cr;
- 
+
     _REG_(I2C_IC_DMA_TDLR_OFFSET) // I2C_IC_DMA_TDLR
     // DMA Transmit Data Level Register
     // 0x0000000f [3:0]   DMATDL       (0x0) Transmit Data Level
     io_rw_32 dma_tdlr;
- 
+
     _REG_(I2C_IC_DMA_RDLR_OFFSET) // I2C_IC_DMA_RDLR
     // DMA Transmit Data Level Register
     // 0x0000000f [3:0]   DMARDL       (0x0) Receive Data Level
     io_rw_32 dma_rdlr;
- 
+
     _REG_(I2C_IC_SDA_SETUP_OFFSET) // I2C_IC_SDA_SETUP
     // I2C SDA Setup Register
     // 0x000000ff [7:0]   SDA_SETUP    (0x64) SDA Setup
     io_rw_32 sda_setup;
- 
+
     _REG_(I2C_IC_ACK_GENERAL_CALL_OFFSET) // I2C_IC_ACK_GENERAL_CALL
     // I2C ACK General Call Register
     // 0x00000001 [0]     ACK_GEN_CALL (1) ACK General Call
     io_rw_32 ack_general_call;
- 
+
     _REG_(I2C_IC_ENABLE_STATUS_OFFSET) // I2C_IC_ENABLE_STATUS
     // I2C Enable Status Register
     // 0x00000004 [2]     SLV_RX_DATA_LOST (0) Slave Received Data Lost
     // 0x00000002 [1]     SLV_DISABLED_WHILE_BUSY (0) Slave Disabled While Busy (Transmit, Receive)
     // 0x00000001 [0]     IC_EN        (0) ic_en Status
     io_ro_32 enable_status;
- 
+
     _REG_(I2C_IC_FS_SPKLEN_OFFSET) // I2C_IC_FS_SPKLEN
     // I2C SS, FS or FM+ spike suppression limit
     // 0x000000ff [7:0]   IC_FS_SPKLEN (0x07) This register must be set before any I2C bus transaction...
     io_rw_32 fs_spklen;
- 
+
     uint32_t _pad2;
- 
+
     _REG_(I2C_IC_CLR_RESTART_DET_OFFSET) // I2C_IC_CLR_RESTART_DET
     // Clear RESTART_DET Interrupt Register
     // 0x00000001 [0]     CLR_RESTART_DET (0) Read this register to clear the RESTART_DET interrupt...
     io_ro_32 clr_restart_det;
- 
+
     uint32_t _pad3[18];
- 
+
     _REG_(I2C_IC_COMP_PARAM_1_OFFSET) // I2C_IC_COMP_PARAM_1
     // Component Parameter Register 1
     // 0x00ff0000 [23:16] TX_BUFFER_DEPTH (0x00) TX Buffer Depth = 16
@@ -318,12 +318,12 @@ typedef struct {
     // 0x0000000c [3:2]   MAX_SPEED_MODE (0x0) MAX SPEED MODE = FAST MODE
     // 0x00000003 [1:0]   APB_DATA_WIDTH (0x0) APB data bus width is 32 bits
     io_ro_32 comp_param_1;
- 
+
     _REG_(I2C_IC_COMP_VERSION_OFFSET) // I2C_IC_COMP_VERSION
     // I2C Component Version Register
-    // 0xffffffff [31:0]  IC_COMP_VERSION (0x3230312a) 
+    // 0xffffffff [31:0]  IC_COMP_VERSION (0x3230312a)
     io_ro_32 comp_version;
- 
+
     _REG_(I2C_IC_COMP_TYPE_OFFSET) // I2C_IC_COMP_TYPE
     // I2C Component Type Register
     // 0xffffffff [31:0]  IC_COMP_TYPE (0x44570140) Designware Component Type number = 0x44_57_01_40
@@ -335,4 +335,3 @@ typedef struct {
 static_assert(sizeof (i2c_hw_t) == 0x0100, "");
 
 #endif // _HARDWARE_STRUCTS_I2C_H
-

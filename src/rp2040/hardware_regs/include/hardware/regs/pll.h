@@ -134,4 +134,3 @@
 #define PLL_PRIM_POSTDIV2_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_PLL_H
-

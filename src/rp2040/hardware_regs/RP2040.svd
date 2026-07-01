@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (c) 2026 Raspberry Pi Ltd.
+Copyright (c) 2021 Raspberry Pi Ltd.
 
 SPDX-License-Identifier: BSD-3-Clause
 -->
@@ -29,7 +29,7 @@ SPDX-License-Identifier: BSD-3-Clause
     <resetValue>0x00000000</resetValue>
     <access>read-write</access>
     <licenseText>
-        Copyright (c) 2026 Raspberry Pi Ltd.
+        Copyright (c) 2021 Raspberry Pi Ltd.
 
         SPDX-License-Identifier: BSD-3-Clause
     </licenseText>
@@ -51013,11 +51013,17 @@ SPDX-License-Identifier: BSD-3-Clause
         </addressBlock>
         <registers>
             <register>
-              <name>DUMMY</name>
-              <description>Dummy register for schema compliance</description>
-              <addressOffset>0x0</addressOffset>
-              <access>read-only</access>
-              <resetValue>0x00000000</resetValue>
+                <name>DUMMY</name>
+                <addressOffset>0x00000000</addressOffset>
+                <description>Dummy register for schema compliance</description>
+                <resetValue>0x00000000</resetValue>
+                <fields>
+                    <field>
+                        <name>DUMMY</name>
+                        <bitRange>[31:0]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                </fields>
             </register>
         </registers>
         <interrupt>

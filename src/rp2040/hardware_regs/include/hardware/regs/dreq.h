@@ -105,8 +105,8 @@ typedef enum dreq_num_rp2040 {
     DREQ_XIP_SSITX = 38, ///< Select the XIP SSI TX FIFO as DREQ
     DREQ_XIP_SSIRX = 39, ///< Select the XIP SSI RX FIFO as DREQ
     DREQ_DMA_TIMER0 = 59, ///< Select DMA_TIMER0 as DREQ
-    DREQ_DMA_TIMER1 = 60, ///< Select DMA_TIMER0 as DREQ
-    DREQ_DMA_TIMER2 = 61, ///< Select DMA_TIMER1 as DREQ
+    DREQ_DMA_TIMER1 = 60, ///< Select DMA_TIMER1 as DREQ
+    DREQ_DMA_TIMER2 = 61, ///< Select DMA_TIMER2 as DREQ
     DREQ_DMA_TIMER3 = 62, ///< Select DMA_TIMER3 as DREQ
     DREQ_FORCE = 63, ///< Select FORCE as DREQ
     DREQ_COUNT
@@ -114,4 +114,3 @@ typedef enum dreq_num_rp2040 {
 #endif
 
 #endif // _DREQ_H
-
