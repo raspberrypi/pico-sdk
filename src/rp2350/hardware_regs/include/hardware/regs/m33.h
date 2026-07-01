@@ -3521,8 +3521,10 @@
 #define M33_AIRCR_PRIGROUP_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : M33_AIRCR_SYSRESETREQS
-// Description : This resets only the core on which SYSRESETREQ is asserted, and
-//               not the wider system.
+// Description : System reset request, Secure state only.
+//               0	SYSRESETREQ functionality is available to both Security
+//               states.
+//               1 SYSRESETREQ functionality is only available to Secure state.
 #define M33_AIRCR_SYSRESETREQS_RESET  _u(0x0)
 #define M33_AIRCR_SYSRESETREQS_BITS   _u(0x00000008)
 #define M33_AIRCR_SYSRESETREQS_MSB    _u(3)

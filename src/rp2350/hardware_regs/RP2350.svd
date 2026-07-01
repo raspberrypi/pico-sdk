@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (c) 2026 Raspberry Pi Ltd.
+Copyright (c) 2024 Raspberry Pi Ltd.
 
 SPDX-License-Identifier: BSD-3-Clause
 -->
@@ -42,7 +42,7 @@ SPDX-License-Identifier: BSD-3-Clause
     <resetValue>0x00000000</resetValue>
     <access>read-write</access>
     <licenseText>
-        Copyright (c) 2026 Raspberry Pi Ltd.
+        Copyright (c) 2024 Raspberry Pi Ltd.
 
         SPDX-License-Identifier: BSD-3-Clause
     </licenseText>
@@ -54110,6 +54110,56 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
             <register>
+                <name>MAC0</name>
+                <addressOffset>0x00c4</addressOffset>
+                <description>Bytes 0 and 1 of MAC address (ECC)
+
+                    The MAC is stored as bytes in network order, so bits 7:0 of this register are the aa in aa:bb:cc:dd:ee:ff, and bits 15:8 are the bb.
+
+                    Multiple interfaces are assigned consecutive addresses from the single MAC stored in OTP.</description>
+                <size>16</size>
+                <resetMask>0x0000</resetMask>
+                <fields>
+                    <field>
+                        <name>MAC0</name>
+                        <bitRange>[15:0]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                </fields>
+            </register>
+            <register>
+                <name>MAC1</name>
+                <addressOffset>0x00c6</addressOffset>
+                <description>Bytes 2 and 3 of MAC address (ECC)
+
+                    The MAC is stored as bytes in network order, so bits 7:0 of this register are the cc in aa:bb:cc:dd:ee:ff, and bits 15:8 are the dd.</description>
+                <size>16</size>
+                <resetMask>0x0000</resetMask>
+                <fields>
+                    <field>
+                        <name>MAC1</name>
+                        <bitRange>[15:0]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                </fields>
+            </register>
+            <register>
+                <name>MAC2</name>
+                <addressOffset>0x00c8</addressOffset>
+                <description>Bytes 4 and 5 of MAC address (ECC)
+
+                    The MAC is stored as bytes in network order, so bits 7:0 of this register are the ee in aa:bb:cc:dd:ee:ff, and bits 15:8 are the ff.</description>
+                <size>16</size>
+                <resetMask>0x0000</resetMask>
+                <fields>
+                    <field>
+                        <name>MAC2</name>
+                        <bitRange>[15:0]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                </fields>
+            </register>
+            <register>
                 <name>BOOTKEY0_0</name>
                 <addressOffset>0x0100</addressOffset>
                 <description>Bits 15:0 of SHA-256 hash of boot key 0 (ECC)</description>
@@ -55700,8 +55750,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>CHIPID0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55713,8 +55768,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>CHIPID1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55726,8 +55786,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>CHIPID2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55739,8 +55804,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>CHIPID3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55756,8 +55826,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>RANDID0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55769,8 +55844,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>RANDID1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55782,8 +55862,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>RANDID2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55795,8 +55880,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>RANDID3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55808,8 +55898,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>RANDID4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55821,8 +55916,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>RANDID5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55834,8 +55934,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>RANDID6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55847,8 +55952,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>RANDID7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55862,8 +55972,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>ROSC_CALIB</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55877,8 +55992,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>LPOSC_CALIB</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55890,8 +56010,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>NUM_GPIOS</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[7:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55903,8 +56028,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>INFO_CRC0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -55916,8 +56046,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>INFO_CRC1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -56498,13 +56633,18 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetValue>0x00000000</resetValue>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>CS1_SIZE</name>
                         <description>The size of the flash/PSRAM device on chip select 1 (addressable at 0x11000000 through 0x11ffffff).
 
                             A value of zero is decoded as a size of zero (no device). Nonzero values are decoded as 4kiB &lt;&lt; CS1_SIZE. For example, four megabytes is encoded with a CS1_SIZE value of 10, and 16 megabytes is encoded with a CS1_SIZE value of 12.
 
                             When BOOT_FLAGS0_FLASH_DEVINFO_ENABLE is not set, a default of zero is used.</description>
-                        <bitRange>[23:12]</bitRange>
+                        <bitRange>[15:12]</bitRange>
                         <access>read-only</access>
                         <enumeratedValues>
                             <enumeratedValue>
@@ -56654,8 +56794,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>FLASH_PARTITION_SLOT_SIZE</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -56668,9 +56813,14 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetValue>0x00000000</resetValue>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>ACTIVELOW</name>
                         <description>LED is active-low. (Default: active-high.)</description>
-                        <bitRange>[23:8]</bitRange>
+                        <bitRange>[8:8]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
@@ -56704,11 +56854,16 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetValue>0x00000000</resetValue>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>REFDIV</name>
                         <description>PLL reference divisor, minus one.
 
                             Programming a value of 0 means a reference divisor of 1. Programming a value of 1 means a reference divisor of 2 (for exceptionally fast XIN inputs)</description>
-                        <bitRange>[23:15]</bitRange>
+                        <bitRange>[15:15]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
@@ -56742,9 +56897,14 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetValue>0x00000000</resetValue>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>RANGE</name>
                         <description>Value of the XOSC_CTRL_FREQ_RANGE register.</description>
-                        <bitRange>[23:14]</bitRange>
+                        <bitRange>[15:14]</bitRange>
                         <access>read-only</access>
                         <enumeratedValues>
                             <enumeratedValue>
@@ -56936,8 +57096,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>USB_WHITE_LABEL_ADDR</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                         <enumeratedValues>
                             <enumeratedValue>
@@ -57019,8 +57184,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>OTPBOOT_SRC</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57034,8 +57204,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>OTPBOOT_LEN</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57049,8 +57224,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>OTPBOOT_DST0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57064,8 +57244,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>OTPBOOT_DST1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57080,6 +57265,11 @@ SPDX-License-Identifier: BSD-3-Clause
                     Multiple interfaces are assigned consecutive addresses from the single MAC stored in OTP.</description>
                 <resetMask>0x00000000</resetMask>
                 <fields>
+                    <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
                     <field>
                         <name>MAC0</name>
                         <bitRange>[15:0]</bitRange>
@@ -57096,6 +57286,11 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>MAC1</name>
                         <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
@@ -57111,6 +57306,11 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>MAC2</name>
                         <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
@@ -57124,8 +57324,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57137,8 +57342,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57150,8 +57360,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57163,8 +57378,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57176,8 +57396,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57189,8 +57414,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57202,8 +57432,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57215,8 +57450,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57228,8 +57468,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_8</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57241,8 +57486,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_9</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57254,8 +57504,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_10</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57267,8 +57522,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_11</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57280,8 +57540,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_12</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57293,8 +57558,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_13</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57306,8 +57576,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_14</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57319,8 +57594,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY0_15</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57332,8 +57612,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57345,8 +57630,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57358,8 +57648,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57371,8 +57666,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57384,8 +57684,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57397,8 +57702,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57410,8 +57720,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57423,8 +57738,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57436,8 +57756,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_8</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57449,8 +57774,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_9</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57462,8 +57792,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_10</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57475,8 +57810,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_11</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57488,8 +57828,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_12</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57501,8 +57846,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_13</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57514,8 +57864,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_14</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57527,8 +57882,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY1_15</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57540,8 +57900,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57553,8 +57918,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57566,8 +57936,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57579,8 +57954,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57592,8 +57972,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57605,8 +57990,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57618,8 +58008,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57631,8 +58026,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57644,8 +58044,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_8</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57657,8 +58062,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_9</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57670,8 +58080,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_10</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57683,8 +58098,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_11</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57696,8 +58116,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_12</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57709,8 +58134,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_13</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57722,8 +58152,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_14</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57735,8 +58170,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY2_15</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57748,8 +58188,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57761,8 +58206,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57774,8 +58224,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57787,8 +58242,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57800,8 +58260,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57813,8 +58278,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57826,8 +58296,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57839,8 +58314,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57852,8 +58332,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_8</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57865,8 +58350,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_9</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57878,8 +58368,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_10</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57891,8 +58386,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_11</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57904,8 +58404,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_12</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57917,8 +58422,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_13</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57930,8 +58440,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_14</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57943,8 +58458,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>BOOTKEY3_15</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57956,8 +58476,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY1_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57969,8 +58494,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY1_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57982,8 +58512,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY1_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -57995,8 +58530,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY1_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58008,8 +58548,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY1_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58021,8 +58566,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY1_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58034,8 +58584,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY1_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58047,8 +58602,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY1_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58060,8 +58620,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY2_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58073,8 +58638,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY2_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58086,8 +58656,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY2_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58099,8 +58674,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY2_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58112,8 +58692,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY2_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58125,8 +58710,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY2_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58138,8 +58728,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY2_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58151,8 +58746,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY2_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58164,8 +58764,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY3_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58177,8 +58782,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY3_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58190,8 +58800,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY3_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58203,8 +58818,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY3_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58216,8 +58836,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY3_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58229,8 +58854,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY3_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58242,8 +58872,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY3_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58255,8 +58890,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY3_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58268,8 +58908,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY4_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58281,8 +58926,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY4_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58294,8 +58944,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY4_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58307,8 +58962,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY4_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58320,8 +58980,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY4_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58333,8 +58998,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY4_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58346,8 +59016,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY4_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58359,8 +59034,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY4_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58372,8 +59052,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY5_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58385,8 +59070,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY5_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58398,8 +59088,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY5_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58411,8 +59106,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY5_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58424,8 +59124,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY5_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58437,8 +59142,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY5_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58450,8 +59160,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY5_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58463,8 +59178,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY5_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58476,8 +59196,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY6_0</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58489,8 +59214,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY6_1</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58502,8 +59232,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY6_2</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58515,8 +59250,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY6_3</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58528,8 +59268,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY6_4</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58541,8 +59286,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY6_5</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58554,8 +59304,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY6_6</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -58567,8 +59322,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 <resetMask>0x00000000</resetMask>
                 <fields>
                     <field>
+                        <name>ECC</name>
+                        <bitRange>[23:16]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                    <field>
                         <name>KEY6_7</name>
-                        <bitRange>[23:0]</bitRange>
+                        <bitRange>[15:0]</bitRange>
                         <access>read-only</access>
                     </field>
                 </fields>
@@ -81051,7 +81811,9 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>SYSRESETREQS</name>
-                        <description>This resets only the core on which SYSRESETREQ is asserted, and not the wider system.</description>
+                        <description>System reset request, Secure state only. 
+                            0	SYSRESETREQ functionality is available to both Security states. 
+                            1 SYSRESETREQ functionality is only available to Secure state.</description>
                         <bitRange>[3:3]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -105729,11 +106491,17 @@ SPDX-License-Identifier: BSD-3-Clause
         </addressBlock>
         <registers>
             <register>
-              <name>DUMMY</name>
-              <description>Dummy register for schema compliance</description>
-              <addressOffset>0x0</addressOffset>
-              <access>read-only</access>
-              <resetValue>0x00000000</resetValue>
+                <name>DUMMY</name>
+                <addressOffset>0x00000000</addressOffset>
+                <description>Dummy register for schema compliance</description>
+                <resetValue>0x00000000</resetValue>
+                <fields>
+                    <field>
+                        <name>DUMMY</name>
+                        <bitRange>[31:0]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                </fields>
             </register>
         </registers>
         <interrupt>

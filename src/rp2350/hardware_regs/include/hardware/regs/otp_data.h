@@ -1452,6 +1452,7 @@
 #define OTP_DATA_MAC0_ROW _u(0x00000062)
 #define OTP_DATA_MAC0_BITS   _u(0x0000ffff)
 #define OTP_DATA_MAC0_RESET  "-"
+#define OTP_DATA_MAC0_WIDTH  _u(16)
 #define OTP_DATA_MAC0_MSB    _u(15)
 #define OTP_DATA_MAC0_LSB    _u(0)
 #define OTP_DATA_MAC0_ACCESS "RO"
@@ -1465,6 +1466,7 @@
 #define OTP_DATA_MAC1_ROW _u(0x00000063)
 #define OTP_DATA_MAC1_BITS   _u(0x0000ffff)
 #define OTP_DATA_MAC1_RESET  "-"
+#define OTP_DATA_MAC1_WIDTH  _u(16)
 #define OTP_DATA_MAC1_MSB    _u(15)
 #define OTP_DATA_MAC1_LSB    _u(0)
 #define OTP_DATA_MAC1_ACCESS "RO"
@@ -1478,6 +1480,7 @@
 #define OTP_DATA_MAC2_ROW _u(0x00000064)
 #define OTP_DATA_MAC2_BITS   _u(0x0000ffff)
 #define OTP_DATA_MAC2_RESET  "-"
+#define OTP_DATA_MAC2_WIDTH  _u(16)
 #define OTP_DATA_MAC2_MSB    _u(15)
 #define OTP_DATA_MAC2_LSB    _u(0)
 #define OTP_DATA_MAC2_ACCESS "RO"

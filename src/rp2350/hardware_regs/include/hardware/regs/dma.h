@@ -200,11 +200,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -260,16 +255,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -325,6 +320,11 @@
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH0_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -763,11 +763,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -823,16 +818,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -888,6 +883,11 @@
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH1_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -1326,11 +1326,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -1386,16 +1381,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -1451,6 +1446,11 @@
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH2_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -1889,11 +1889,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -1949,16 +1944,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -2014,6 +2009,11 @@
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH3_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -2452,11 +2452,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -2512,16 +2507,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -2577,6 +2572,11 @@
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH4_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -3015,11 +3015,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -3075,16 +3070,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -3140,6 +3135,11 @@
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH5_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -3578,11 +3578,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -3638,16 +3633,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -3703,6 +3698,11 @@
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH6_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -4141,11 +4141,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -4201,16 +4196,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -4266,6 +4261,11 @@
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH7_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -4704,11 +4704,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -4764,16 +4759,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -4829,6 +4824,11 @@
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH8_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -5267,11 +5267,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -5327,16 +5322,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -5392,6 +5387,11 @@
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH9_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -5830,11 +5830,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -5890,16 +5885,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -5955,6 +5950,11 @@
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH10_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -6393,11 +6393,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -6453,16 +6448,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -6518,6 +6513,11 @@
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH11_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -6956,11 +6956,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -7016,16 +7011,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -7081,6 +7076,11 @@
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH12_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -7519,11 +7519,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -7579,16 +7574,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -7644,6 +7639,11 @@
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH13_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -8082,11 +8082,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -8142,16 +8137,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -8207,6 +8202,11 @@
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH14_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
@@ -8645,11 +8645,6 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
-//               0x3b -> Select Timer 0 as TREQ
-//               0x3c -> Select Timer 1 as TREQ
-//               0x3d -> Select Timer 2 as TREQ (Optional)
-//               0x3e -> Select Timer 3 as TREQ (Optional)
-//               0x3f -> Permanent request, for unpaced transfers.
 //               0x00 -> Select PIO0's TX FIFO 0 as TREQ
 //               0x01 -> Select PIO0's TX FIFO 1 as TREQ
 //               0x02 -> Select PIO0's TX FIFO 2 as TREQ
@@ -8705,16 +8700,16 @@
 //               0x34 -> Select HSTX as TREQ
 //               0x35 -> Select CORESIGHT as TREQ
 //               0x36 -> Select SHA256 as TREQ
+//               0x3b -> Select Timer 0 as TREQ
+//               0x3c -> Select Timer 1 as TREQ
+//               0x3d -> Select Timer 2 as TREQ (Optional)
+//               0x3e -> Select Timer 3 as TREQ (Optional)
+//               0x3f -> Permanent request, for unpaced transfers.
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_RESET  _u(0x00)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_BITS   _u(0x007e0000)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
-#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
-#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
-#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
-#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
-#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
@@ -8770,6 +8765,11 @@
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER3 _u(0x3e)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PERMANENT _u(0x3f)
 // -----------------------------------------------------------------------------
 // Field       : DMA_CH15_CTRL_TRIG_CHAIN_TO
 // Description : When this channel completes, it will trigger the channel
