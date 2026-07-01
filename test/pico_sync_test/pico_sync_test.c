@@ -114,7 +114,7 @@ int main() {
     #define EXPECTED_TIMEOUT_WAITS 2
     #endif
 
-        PICOTEST_CHECK(wait_count == EXPECTED_TIMEOUT_WAITS, "Expected exactly " __XSTRING(EXPECTED_TIMEOUT_WAITS) " waits");
+    PICOTEST_CHECK(wait_count == EXPECTED_TIMEOUT_WAITS, "Expected exactly " __XSTRING(EXPECTED_TIMEOUT_WAITS) " waits");
     PICOTEST_END_SECTION();
 
     PICOTEST_END_TEST();
