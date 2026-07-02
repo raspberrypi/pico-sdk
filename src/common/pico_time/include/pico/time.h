@@ -162,7 +162,7 @@ static inline absolute_time_t make_timeout_time_ms(uint32_t ms) {
 /*! \brief Return the difference in microseconds between two timestamps
  * \ingroup timestamp
  *
- * \note be careful when diffing against large timestamps (e.g. \ref at_the_end_of_time)
+ * \note Be careful when diffing against large timestamps (e.g. \ref at_the_end_of_time)
  * as the signed integer may overflow.
  *
  * \param from the first timestamp
@@ -291,7 +291,7 @@ void sleep_ms(uint32_t ms);
  *             // do something
  *             return true;
  *         }
- *         // will try to sleep until timeout or the next processor event 
+ *         // will try to sleep until timeout or the next processor event
  *     } while (!best_effort_wfe_or_timeout(timeout_time));
  *     return false; // timed out
  * }
@@ -365,11 +365,11 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp);
 /**
  * \brief The identifier for an alarm
  *
- * \note this identifier is signed because <0 is used as an error condition when creating alarms
+ * \note This identifier is signed because <0 is used as an error condition when creating alarms
  *
- * \note alarm ids may be reused, however for convenience the implementation makes an attempt to defer
- * reusing as long as possible. You should certainly expect it to be hundreds of ids before one is
- * reused, although in most cases it is more. Nonetheless care must still be taken when cancelling
+ * \note Alarm IDs may be reused, however for convenience the implementation makes an attempt to defer
+ * reusing as long as possible. You should certainly expect it to be hundreds of IDs before one is
+ * reused, although in most cases it is more. Nonetheless, care must still be taken when cancelling
  * alarms or other functionality based on alarms when the alarm may have expired, as eventually
  * the alarm id may be reused for another alarm.
  *
@@ -503,7 +503,7 @@ void alarm_pool_destroy(alarm_pool_t *pool);
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls before or during this call before the alarm can be set,
- *                     then the callback should be called during (by) this function instead 
+ *                     then the callback should be called during (by) this function instead
  * @return >0 the alarm id for an active (at the time of return) alarm
  * @return 0 if the alarm time passed before or during the call and fire_if_past was false
  * @return <0 if there were no alarm slots available, or other error occurred
@@ -545,7 +545,7 @@ alarm_id_t alarm_pool_add_alarm_at_force_in_context(alarm_pool_t *pool, absolute
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls during this call before the alarm can be set,
- *                     then the callback should be called during (by) this function instead 
+ *                     then the callback should be called during (by) this function instead
  * @return >0 the alarm id
  * @return 0 if the alarm time passed before or during the call and fire_if_past was false
  * @return <0 if there were no alarm slots available, or other error occurred
@@ -570,7 +570,7 @@ static inline alarm_id_t alarm_pool_add_alarm_in_us(alarm_pool_t *pool, uint64_t
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls before or during this call before the alarm can be set,
- *                     then the callback should be called during (by) this function instead 
+ *                     then the callback should be called during (by) this function instead
  * @return >0 the alarm id
  * @return 0 if the alarm time passed before or during the call and fire_if_past was false
  * @return <0 if there were no alarm slots available, or other error occurred
@@ -629,7 +629,7 @@ bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id);
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls before or during this call before the alarm can be set,
- *                     then the callback should be called during (by) this function instead 
+ *                     then the callback should be called during (by) this function instead
  * @return >0 the alarm id
  * @return 0 if the alarm time passed before or during the call and fire_if_past was false
  * @return <0 if there were no alarm slots available, or other error occurred
@@ -653,7 +653,7 @@ static inline alarm_id_t add_alarm_at(absolute_time_t time, alarm_callback_t cal
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls during this call before the alarm can be set,
- *                     then the callback should be called during (by) this function instead 
+ *                     then the callback should be called during (by) this function instead
  * @return >0 the alarm id
  * @return 0 if the alarm time passed before or during the call and fire_if_past was false
  * @return <0 if there were no alarm slots available, or other error occurred
@@ -677,7 +677,7 @@ static inline alarm_id_t add_alarm_in_us(uint64_t us, alarm_callback_t callback,
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls during this call before the alarm can be set,
- *                     then the callback should be called during (by) this function instead 
+ *                     then the callback should be called during (by) this function instead
  * @return >0 the alarm id
  * @return 0 if the alarm time passed before or during the call and fire_if_past was false
  * @return <0 if there were no alarm slots available, or other error occurred

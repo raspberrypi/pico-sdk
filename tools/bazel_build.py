@@ -62,6 +62,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_low_power_test:low_power_test_simple",
                 "//test/pico_low_power_test:external_sleep_timer",
                 "//test/pico_async_context_test:pico_async_context_test",
+                "//test/pico_sync_test:pico_sync_test_sw",
+                "//test/pico_sync_test:pico_sync_test_hw",
                 "//test/pico_xip_sram_test:pico_critical_xip_sram_test",
 
                 # Pretty much only Picotool and pioasm build on Windows.
@@ -89,6 +91,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_sha256_test:pico_sha256_test",
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
+                # No SW spinlocks on RP2040
+                "//test/pico_sync_test:pico_sync_test_sw",
             )
         ),
     },
@@ -130,6 +134,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_simple_overlay",
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
+                # No SW spinlocks on RP2040
+                "//test/pico_sync_test:pico_sync_test_sw",
             )
         ),
     },
@@ -172,6 +178,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_sha256_test:pico_sha256_test",
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
+                # No SW spinlocks on RP2040
+                "//test/pico_sync_test:pico_sync_test_sw",
             )
         ),
     },

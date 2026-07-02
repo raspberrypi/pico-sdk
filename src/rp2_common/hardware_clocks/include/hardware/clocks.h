@@ -27,7 +27,7 @@ extern "C" {
  * it uses multiple clock generators to provide the required clocks. This architecture allows the user flexibility to start and
  * stop clocks independently and to vary some clock frequencies whilst maintaining others at their optimum frequencies
  *
- * Please refer to the appropriate datasheet for more details on the RP-series clocks.
+ * Please refer to the appropriate datasheet for more details on the clocks in RP-series microcontroller.
  *
  * The clock source depends on which clock you are attempting to configure. The first table below shows main clock sources. If
  * you are not setting the Reference clock or the System clock, or you are specifying that one of those two will be using an auxiliary
@@ -333,7 +333,7 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
  * \if rp2040_specific
  * Note: The RP2040 clock hardware only supports divisors of exactly 1.0 or 2.0->16777216.0 in steps of 1/256
  * \endif
- * 
+ *
  * See the tables in the description for details on the possible values for clock sources.
  *
  * \param clock The clock to configure
@@ -671,7 +671,7 @@ void clock_gate_sleep_en(const clock_dest_bitset_t *clocks);
 #define GPIO_TO_GPOUT_CLOCK_HANDLE GPIO_TO_GPOUT_CLOCK_HANDLE_RP2350
 #endif
 #endif
-    
+
 /**
  * \brief return the associated GPOUT clock for a given GPIO if any
  * \ingroup hardware_clocks

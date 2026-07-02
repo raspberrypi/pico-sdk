@@ -81,7 +81,7 @@ bool flash_safe_execute_core_deinit(void);
  *         PICO_ERROR_TIMEOUT on timeout (the function may have been called).
  *         PICO_ERROR_NOT_PERMITTED if safe execution is not possible (the function will not have been called).
  *         PICO_ERROR_INSUFFICIENT_RESOURCES if the method fails due to dynamic resource exhaustion (the function will not have been called)
- * \note if \ref PICO_FLASH_ASSERT_ON_UNSAFE is 1, this function will assert in debug mode vs returning
+ * \note If \ref PICO_FLASH_ASSERT_ON_UNSAFE is 1, this function will assert in debug mode vs returning
  *       PICO_ERROR_NOT_PERMITTED
  */
 int flash_safe_execute(void (*func)(void *), void *param, uint32_t enter_exit_timeout_ms);

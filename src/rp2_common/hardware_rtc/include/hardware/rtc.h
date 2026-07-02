@@ -55,7 +55,7 @@ void rtc_init(void);
 /*! \brief Set the RTC to the specified time
  *  \ingroup hardware_rtc
  *
- * \note Note that after setting the RTC date and time, a subsequent read of the values (e.g. via rtc_get_datetime()) may not
+ * \note After setting the RTC date and time, a subsequent read of the values (e.g. via rtc_get_datetime()) may not
  * reflect the new setting until up to three cycles of the potentially-much-slower RTC clock domain have passed. This represents a period
  * of 64 microseconds with the default RTC clock configuration.
  *

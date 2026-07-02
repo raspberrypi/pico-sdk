@@ -1,0 +1,35 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_sync_test_hw",
+    testonly = True,
+    srcs = ["pico_sync_test.c"],
+    defines = [
+        "PICO_USE_SW_SPIN_LOCKS=0",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_sync",
+        "//test/pico_test",
+    ] + select({
+        "//bazel/constraint:host": ["//src/host/pico_stdlib"],
+        "//conditions:default": ["//src/rp2_common/pico_stdlib"],
+    }),
+)
+
+cc_binary(
+    name = "pico_sync_test_sw",
+    testonly = True,
+    srcs = ["pico_sync_test.c"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+    deps = [
+        "//src/common/pico_sync",
+        "//test/pico_test",
+    ] + select({
+        "//bazel/constraint:host": ["//src/host/pico_stdlib"],
+        "//conditions:default": ["//src/rp2_common/pico_stdlib"],
+    }),
+)

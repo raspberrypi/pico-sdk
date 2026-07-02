@@ -59,11 +59,22 @@ int main() {
         // Setup ext_ctrl0 to output on the SLEEP_MONITOR_PIN
         init_powman_ext_ctrl();
         gpio_put(SLEEP_MONITOR_PIN, 0);
+        low_power_set_pins_low_leakage_exclude_mask(USED_PIN_MASK);
         ret = low_power_pstate_for_ms(SLEEP_TIME_MS, NULL, NULL);
         if (ret != PICO_OK) {
             printf("%d ERROR: low_power_pstate_for_ms returned\n", ret);
         } else {
             printf("ERROR: Woken up from Pstate\n");
+        }
+#elif PICO_RP2040
+        printf("Going dormant from the XOSC for %dms\n", SLEEP_TIME_MS);
+        gpio_put(SLEEP_MONITOR_PIN, 0);
+        ret = low_power_dormant_for_ms(SLEEP_TIME_MS, DORMANT_CLOCK_SOURCE_XOSC, NULL);
+        gpio_put(SLEEP_MONITOR_PIN, 1);
+        if (ret != PICO_OK) {
+            printf("ERROR: low_power_dormant_for_ms returned %d\n", ret);
+        } else {
+            printf("Woken up\n");
         }
 #endif
     }

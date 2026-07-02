@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -134,4 +134,3 @@
 #define PLL_PRIM_POSTDIV2_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_PLL_H
-

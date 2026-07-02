@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -316,4 +316,3 @@
 #define TIMER_INTS_ALARM_0_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_TIMER_H
-

@@ -25,8 +25,8 @@
 #define M33_EPPB_NMI_MASK0_ACCESS "RW"
 // =============================================================================
 // Register    : M33_EPPB_NMI_MASK1
-// Description : NMI mask for IRQs 0 though 51. This register is core-local, and
-//               is reset by a processor warm reset.
+// Description : NMI mask for IRQs 32 though 51. This register is core-local,
+//               and is reset by a processor warm reset.
 #define M33_EPPB_NMI_MASK1_OFFSET _u(0x00000004)
 #define M33_EPPB_NMI_MASK1_BITS   _u(0x000fffff)
 #define M33_EPPB_NMI_MASK1_RESET  _u(0x00000000)
@@ -77,4 +77,3 @@
 #define M33_EPPB_SLEEPCTRL_LIGHT_SLEEP_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_M33_EPPB_H
-

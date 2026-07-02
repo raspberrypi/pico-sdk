@@ -200,6 +200,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -210,6 +265,61 @@
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -653,6 +763,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -663,6 +828,61 @@
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH1_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -1106,6 +1326,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -1116,6 +1391,61 @@
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH2_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -1559,6 +1889,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -1569,6 +1954,61 @@
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH3_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -2012,6 +2452,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -2022,6 +2517,61 @@
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH4_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -2465,6 +3015,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -2475,6 +3080,61 @@
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH5_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -2918,6 +3578,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -2928,6 +3643,61 @@
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH6_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -3371,6 +4141,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -3381,6 +4206,61 @@
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH7_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -3824,6 +4704,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -3834,6 +4769,61 @@
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH8_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -4277,6 +5267,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -4287,6 +5332,61 @@
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH9_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -4730,6 +5830,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -4740,6 +5895,61 @@
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH10_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -5183,6 +6393,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -5193,6 +6458,61 @@
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH11_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -5636,6 +6956,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -5646,6 +7021,61 @@
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH12_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -6089,6 +7519,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -6099,6 +7584,61 @@
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH13_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -6542,6 +8082,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -6552,6 +8147,61 @@
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH14_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -6995,6 +8645,61 @@
 //               transfer rate. Sources for TREQ signals are internal (TIMERS)
 //               or external (DREQ, a Data Request from the system).
 //               0x0 to 0x3a -> select DREQ n as TREQ
+//               0x00 -> Select PIO0's TX FIFO 0 as TREQ
+//               0x01 -> Select PIO0's TX FIFO 1 as TREQ
+//               0x02 -> Select PIO0's TX FIFO 2 as TREQ
+//               0x03 -> Select PIO0's TX FIFO 3 as TREQ
+//               0x04 -> Select PIO0's RX FIFO 0 as TREQ
+//               0x05 -> Select PIO0's RX FIFO 1 as TREQ
+//               0x06 -> Select PIO0's RX FIFO 2 as TREQ
+//               0x07 -> Select PIO0's RX FIFO 3 as TREQ
+//               0x08 -> Select PIO1's TX FIFO 0 as TREQ
+//               0x09 -> Select PIO1's TX FIFO 1 as TREQ
+//               0x0a -> Select PIO1's TX FIFO 2 as TREQ
+//               0x0b -> Select PIO1's TX FIFO 3 as TREQ
+//               0x0c -> Select PIO1's RX FIFO 0 as TREQ
+//               0x0d -> Select PIO1's RX FIFO 1 as TREQ
+//               0x0e -> Select PIO1's RX FIFO 2 as TREQ
+//               0x0f -> Select PIO1's RX FIFO 3 as TREQ
+//               0x10 -> Select PIO2's TX FIFO 0 as TREQ
+//               0x11 -> Select PIO2's TX FIFO 1 as TREQ
+//               0x12 -> Select PIO2's TX FIFO 2 as TREQ
+//               0x13 -> Select PIO2's TX FIFO 3 as TREQ
+//               0x14 -> Select PIO2's RX FIFO 0 as TREQ
+//               0x15 -> Select PIO2's RX FIFO 1 as TREQ
+//               0x16 -> Select PIO2's RX FIFO 2 as TREQ
+//               0x17 -> Select PIO2's RX FIFO 3 as TREQ
+//               0x18 -> Select SPI0's TX FIFO as TREQ
+//               0x19 -> Select SPI0's RX FIFO as TREQ
+//               0x1a -> Select SPI1's TX FIFO as TREQ
+//               0x1b -> Select SPI1's RX FIFO as TREQ
+//               0x1c -> Select UART0's TX FIFO as TREQ
+//               0x1d -> Select UART0's RX FIFO as TREQ
+//               0x1e -> Select UART1's TX FIFO as TREQ
+//               0x1f -> Select UART1's RX FIFO as TREQ
+//               0x20 -> Select PWM Counter 0's Wrap Value as TREQ
+//               0x21 -> Select PWM Counter 1's Wrap Value as TREQ
+//               0x22 -> Select PWM Counter 2's Wrap Value as TREQ
+//               0x23 -> Select PWM Counter 3's Wrap Value as TREQ
+//               0x24 -> Select PWM Counter 4's Wrap Value as TREQ
+//               0x25 -> Select PWM Counter 5's Wrap Value as TREQ
+//               0x26 -> Select PWM Counter 6's Wrap Value as TREQ
+//               0x27 -> Select PWM Counter 7's Wrap Value as TREQ
+//               0x28 -> Select PWM Counter 8's Wrap Value as TREQ
+//               0x29 -> Select PWM Counter 9's Wrap Value as TREQ
+//               0x2a -> Select PWM Counter 10's Wrap Value as TREQ
+//               0x2b -> Select PWM Counter 11's Wrap Value as TREQ
+//               0x2c -> Select I2C0's TX FIFO as TREQ
+//               0x2d -> Select I2C0's RX FIFO as TREQ
+//               0x2e -> Select I2C1's TX FIFO as TREQ
+//               0x2f -> Select I2C1's RX FIFO as TREQ
+//               0x30 -> Select the ADC as TREQ
+//               0x31 -> Select the XIP Streaming FIFO as TREQ
+//               0x32 -> Select XIP_QMITX as TREQ
+//               0x33 -> Select XIP_QMIRX as TREQ
+//               0x34 -> Select HSTX as TREQ
+//               0x35 -> Select CORESIGHT as TREQ
+//               0x36 -> Select SHA256 as TREQ
 //               0x3b -> Select Timer 0 as TREQ
 //               0x3c -> Select Timer 1 as TREQ
 //               0x3d -> Select Timer 2 as TREQ (Optional)
@@ -7005,6 +8710,61 @@
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_MSB    _u(22)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_LSB    _u(17)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_ACCESS "RW"
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX0 _u(0x00)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX1 _u(0x01)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX2 _u(0x02)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_TX3 _u(0x03)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX0 _u(0x04)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX1 _u(0x05)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX2 _u(0x06)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO0_RX3 _u(0x07)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX0 _u(0x08)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX1 _u(0x09)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX2 _u(0x0a)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_TX3 _u(0x0b)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX0 _u(0x0c)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX1 _u(0x0d)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX2 _u(0x0e)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO1_RX3 _u(0x0f)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX0 _u(0x10)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX1 _u(0x11)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX2 _u(0x12)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_TX3 _u(0x13)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX0 _u(0x14)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX1 _u(0x15)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX2 _u(0x16)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PIO2_RX3 _u(0x17)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_TX _u(0x18)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_SPI0_RX _u(0x19)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_TX _u(0x1a)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_SPI1_RX _u(0x1b)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_UART0_TX _u(0x1c)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_UART0_RX _u(0x1d)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_UART1_TX _u(0x1e)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_UART1_RX _u(0x1f)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP0 _u(0x20)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP1 _u(0x21)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP2 _u(0x22)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP3 _u(0x23)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP4 _u(0x24)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP5 _u(0x25)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP6 _u(0x26)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP7 _u(0x27)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP8 _u(0x28)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP9 _u(0x29)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP10 _u(0x2a)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_PWM_WRAP11 _u(0x2b)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_TX _u(0x2c)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_I2C0_RX _u(0x2d)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_TX _u(0x2e)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_I2C1_RX _u(0x2f)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_ADC _u(0x30)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_XIP_STREAM _u(0x31)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMITX _u(0x32)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_XIP_QMIRX _u(0x33)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_HSTX _u(0x34)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_CORESIGHT _u(0x35)
+#define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_SHA256 _u(0x36)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0 _u(0x3b)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1 _u(0x3c)
 #define DMA_CH15_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2 _u(0x3d)
@@ -7619,11 +9379,14 @@
 // -----------------------------------------------------------------------------
 // Field       : DMA_SNIFF_CTRL_CALC
 //               0x0 -> Calculate a CRC-32 (IEEE802.3 polynomial)
-//               0x1 -> Calculate a CRC-32 (IEEE802.3 polynomial) with bit reversed data
+//               0x1 -> Calculate a CRC-32 (IEEE802.3 polynomial) with bit reversed
+//               data
 //               0x2 -> Calculate a CRC-16-CCITT
 //               0x3 -> Calculate a CRC-16-CCITT with bit reversed data
-//               0xe -> XOR reduction over all data. == 1 if the total 1 population count is odd.
-//               0xf -> Calculate a simple 32-bit checksum (addition with a 32 bit accumulator)
+//               0xe -> XOR reduction over all data. == 1 if the total 1 population
+//               count is odd.
+//               0xf -> Calculate a simple 32-bit checksum (addition with a 32 bit
+//               accumulator)
 #define DMA_SNIFF_CTRL_CALC_RESET  _u(0x0)
 #define DMA_SNIFF_CTRL_CALC_BITS   _u(0x000001e0)
 #define DMA_SNIFF_CTRL_CALC_MSB    _u(8)
@@ -9911,4 +11674,3 @@
 #define DMA_CH15_DBG_TCR_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_DMA_H
-

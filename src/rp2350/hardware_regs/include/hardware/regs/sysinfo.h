@@ -17,24 +17,24 @@
 // Description : JEDEC JEP-106 compliant chip identifier.
 #define SYSINFO_CHIP_ID_OFFSET _u(0x00000000)
 #define SYSINFO_CHIP_ID_BITS   _u(0xffffffff)
-#define SYSINFO_CHIP_ID_RESET  _u(0x00000001)
+#define SYSINFO_CHIP_ID_RESET  _u(0x30004927)
 // -----------------------------------------------------------------------------
 // Field       : SYSINFO_CHIP_ID_REVISION
-#define SYSINFO_CHIP_ID_REVISION_RESET  "-"
+#define SYSINFO_CHIP_ID_REVISION_RESET  _u(0x3)
 #define SYSINFO_CHIP_ID_REVISION_BITS   _u(0xf0000000)
 #define SYSINFO_CHIP_ID_REVISION_MSB    _u(31)
 #define SYSINFO_CHIP_ID_REVISION_LSB    _u(28)
 #define SYSINFO_CHIP_ID_REVISION_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : SYSINFO_CHIP_ID_PART
-#define SYSINFO_CHIP_ID_PART_RESET  "-"
+#define SYSINFO_CHIP_ID_PART_RESET  _u(0x0004)
 #define SYSINFO_CHIP_ID_PART_BITS   _u(0x0ffff000)
 #define SYSINFO_CHIP_ID_PART_MSB    _u(27)
 #define SYSINFO_CHIP_ID_PART_LSB    _u(12)
 #define SYSINFO_CHIP_ID_PART_ACCESS "RO"
 // -----------------------------------------------------------------------------
 // Field       : SYSINFO_CHIP_ID_MANUFACTURER
-#define SYSINFO_CHIP_ID_MANUFACTURER_RESET  "-"
+#define SYSINFO_CHIP_ID_MANUFACTURER_RESET  _u(0x493)
 #define SYSINFO_CHIP_ID_MANUFACTURER_BITS   _u(0x00000ffe)
 #define SYSINFO_CHIP_ID_MANUFACTURER_MSB    _u(11)
 #define SYSINFO_CHIP_ID_MANUFACTURER_LSB    _u(1)
@@ -48,6 +48,7 @@
 #define SYSINFO_CHIP_ID_STOP_BIT_ACCESS "RO"
 // =============================================================================
 // Register    : SYSINFO_PACKAGE_SEL
+// Description : Package selection indicator, 0 = QFN80, 1 = QFN60
 #define SYSINFO_PACKAGE_SEL_OFFSET _u(0x00000004)
 #define SYSINFO_PACKAGE_SEL_BITS   _u(0x00000001)
 #define SYSINFO_PACKAGE_SEL_RESET  _u(0x00000000)
@@ -108,4 +109,3 @@
 #define SYSINFO_GITREF_RP2350_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_SYSINFO_H
-

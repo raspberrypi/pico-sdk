@@ -4207,4 +4207,3 @@
 #define USB_DEV_SM_WATCHDOG_LIMIT_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_USB_H
-

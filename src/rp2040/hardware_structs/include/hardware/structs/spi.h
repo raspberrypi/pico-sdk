@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -32,7 +32,7 @@ typedef struct {
     // 0x00000030 [5:4]   FRF          (0x0) Frame format: 00 Motorola SPI frame format
     // 0x0000000f [3:0]   DSS          (0x0) Data Size Select: 0000 Reserved, undefined operation
     io_rw_32 cr0;
- 
+
     _REG_(SPI_SSPCR1_OFFSET) // SPI_SSPCR1
     // Control register 1, SSPCR1 on page 3-5
     // 0x00000008 [3]     SOD          (0) Slave-mode output disable
@@ -40,12 +40,12 @@ typedef struct {
     // 0x00000002 [1]     SSE          (0) Synchronous serial port enable: 0 SSP operation disabled
     // 0x00000001 [0]     LBM          (0) Loop back mode: 0 Normal serial port operation enabled
     io_rw_32 cr1;
- 
+
     _REG_(SPI_SSPDR_OFFSET) // SPI_SSPDR
     // Data register, SSPDR on page 3-6
     // 0x0000ffff [15:0]  DATA         (-) Transmit/Receive FIFO: Read Receive FIFO
     io_rw_32 dr;
- 
+
     _REG_(SPI_SSPSR_OFFSET) // SPI_SSPSR
     // Status register, SSPSR on page 3-7
     // 0x00000010 [4]     BSY          (0) PrimeCell SSP busy flag, RO: 0 SSP is idle
@@ -54,12 +54,12 @@ typedef struct {
     // 0x00000002 [1]     TNF          (1) Transmit FIFO not full, RO: 0 Transmit FIFO is full
     // 0x00000001 [0]     TFE          (1) Transmit FIFO empty, RO: 0 Transmit FIFO is not empty
     io_ro_32 sr;
- 
+
     _REG_(SPI_SSPCPSR_OFFSET) // SPI_SSPCPSR
     // Clock prescale register, SSPCPSR on page 3-8
     // 0x000000ff [7:0]   CPSDVSR      (0x00) Clock prescale divisor
     io_rw_32 cpsr;
- 
+
     _REG_(SPI_SSPIMSC_OFFSET) // SPI_SSPIMSC
     // Interrupt mask set or clear register, SSPIMSC on page 3-9
     // 0x00000008 [3]     TXIM         (0) Transmit FIFO interrupt mask: 0 Transmit FIFO half empty...
@@ -67,7 +67,7 @@ typedef struct {
     // 0x00000002 [1]     RTIM         (0) Receive timeout interrupt mask: 0 Receive FIFO not empty...
     // 0x00000001 [0]     RORIM        (0) Receive overrun interrupt mask: 0 Receive FIFO written...
     io_rw_32 imsc;
- 
+
     _REG_(SPI_SSPRIS_OFFSET) // SPI_SSPRIS
     // Raw interrupt status register, SSPRIS on page 3-10
     // 0x00000008 [3]     TXRIS        (1) Gives the raw interrupt state, prior to masking, of the...
@@ -75,7 +75,7 @@ typedef struct {
     // 0x00000002 [1]     RTRIS        (0) Gives the raw interrupt state, prior to masking, of the...
     // 0x00000001 [0]     RORRIS       (0) Gives the raw interrupt state, prior to masking, of the...
     io_ro_32 ris;
- 
+
     _REG_(SPI_SSPMIS_OFFSET) // SPI_SSPMIS
     // Masked interrupt status register, SSPMIS on page 3-11
     // 0x00000008 [3]     TXMIS        (0) Gives the transmit FIFO masked interrupt state, after...
@@ -83,13 +83,13 @@ typedef struct {
     // 0x00000002 [1]     RTMIS        (0) Gives the receive timeout masked interrupt state, after...
     // 0x00000001 [0]     RORMIS       (0) Gives the receive over run masked interrupt status,...
     io_ro_32 mis;
- 
+
     _REG_(SPI_SSPICR_OFFSET) // SPI_SSPICR
     // Interrupt clear register, SSPICR on page 3-11
     // 0x00000002 [1]     RTIC         (0) Clears the SSPRTINTR interrupt
     // 0x00000001 [0]     RORIC        (0) Clears the SSPRORINTR interrupt
     io_rw_32 icr;
- 
+
     _REG_(SPI_SSPDMACR_OFFSET) // SPI_SSPDMACR
     // DMA control register, SSPDMACR on page 3-12
     // 0x00000002 [1]     TXDMAE       (0) Transmit DMA Enable
@@ -102,4 +102,3 @@ typedef struct {
 static_assert(sizeof (spi_hw_t) == 0x0028, "");
 
 #endif // _HARDWARE_STRUCTS_SPI_H
-

@@ -260,4 +260,3 @@
 #define TICKS_RISCV_COUNT_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_TICKS_H
-

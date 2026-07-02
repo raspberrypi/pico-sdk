@@ -16,7 +16,9 @@ if (PICO_ON_DEVICE)
         pico_set_divider_implementation(pico_divider_test hardware_explicit) # want to compare against compiler impl
     endif()
 
-    target_compile_options(pico_divider_test PRIVATE -Wno-analyzer-use-of-uninitialized-value)
+    if (PICO_C_COMPILER_IS_GNU)
+        target_compile_options(pico_divider_test PRIVATE -Wno-analyzer-use-of-uninitialized-value)
+    endif()
 
     pico_add_extra_outputs(pico_divider_test)
 

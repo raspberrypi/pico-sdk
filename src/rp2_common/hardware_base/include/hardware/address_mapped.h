@@ -34,7 +34,7 @@
  *  When dealing with these types, you will always use a pointer, i.e. `io_rw_32 *some_reg` is a pointer to a read/write
  *  32 bit register that you can write with `*some_reg = value`, or read with `value = *some_reg`.
  *
- *  RP-series hardware is also aliased to provide atomic setting, clear or flipping of a subset of the bits within
+ *  RP-series microcontroller hardware is also aliased to provide atomic setting, clear or flipping of a subset of the bits within
  *  a hardware register so that concurrent access by two cores is always consistent with one atomic operation
  *  being performed first, followed by the second.
  *

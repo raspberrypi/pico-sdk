@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -561,4 +561,3 @@
 #define RESETS_RESET_DONE_ADC_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_RESETS_H
-

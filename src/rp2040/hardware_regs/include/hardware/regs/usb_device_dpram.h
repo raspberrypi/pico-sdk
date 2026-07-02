@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -6750,4 +6750,3 @@
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_LENGTH_0_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_USB_DEVICE_DPRAM_H
-

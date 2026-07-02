@@ -26,14 +26,14 @@
 typedef struct {
     _REG_(DMA_CH0_DBG_CTDREQ_OFFSET) // DMA_CH0_DBG_CTDREQ
     // Read: get channel DREQ counter (i
-    // 0x0000003f [5:0]   CH0_DBG_CTDREQ (0x00) 
+    // 0x0000003f [5:0]   CH0_DBG_CTDREQ (0x00)
     io_rw_32 dbg_ctdreq;
- 
+
     _REG_(DMA_CH0_DBG_TCR_OFFSET) // DMA_CH0_DBG_TCR
     // Read to get channel TRANS_COUNT reload value, i
-    // 0xffffffff [31:0]  CH0_DBG_TCR  (0x00000000) 
+    // 0xffffffff [31:0]  CH0_DBG_TCR  (0x00000000)
     io_ro_32 dbg_tcr;
- 
+
     uint32_t _pad0[14];
 } dma_debug_channel_hw_t;
 
@@ -44,4 +44,3 @@ typedef struct {
 #define dma_debug_hw ((dma_debug_hw_t *)(DMA_BASE + DMA_CH0_DBG_CTDREQ_OFFSET))
 
 #endif // _HARDWARE_STRUCTS_DMA_DEBUG_H
-

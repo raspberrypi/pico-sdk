@@ -551,7 +551,8 @@
 // Field       : HSTX_CTRL_EXPAND_TMDS_L2_NBITS
 // Description : Number of valid data bits for the lane 2 TMDS encoder, starting
 //               from bit 7 of the rotated data. Field values of 0 -> 7 encode
-//               counts of 1 -> 8 bits.
+//               counts of 1 -> 8 bits. Remaining LSBs are masked to 0 after the
+//               rotate.
 #define HSTX_CTRL_EXPAND_TMDS_L2_NBITS_RESET  _u(0x0)
 #define HSTX_CTRL_EXPAND_TMDS_L2_NBITS_BITS   _u(0x00e00000)
 #define HSTX_CTRL_EXPAND_TMDS_L2_NBITS_MSB    _u(23)
@@ -560,7 +561,8 @@
 // -----------------------------------------------------------------------------
 // Field       : HSTX_CTRL_EXPAND_TMDS_L2_ROT
 // Description : Right-rotate applied to the current shifter data before the
-//               lane 2 TMDS encoder.
+//               lane 2 TMDS encoder. Remaining LSBs are masked to 0 after the
+//               rotate.
 #define HSTX_CTRL_EXPAND_TMDS_L2_ROT_RESET  _u(0x00)
 #define HSTX_CTRL_EXPAND_TMDS_L2_ROT_BITS   _u(0x001f0000)
 #define HSTX_CTRL_EXPAND_TMDS_L2_ROT_MSB    _u(20)
@@ -570,7 +572,8 @@
 // Field       : HSTX_CTRL_EXPAND_TMDS_L1_NBITS
 // Description : Number of valid data bits for the lane 1 TMDS encoder, starting
 //               from bit 7 of the rotated data. Field values of 0 -> 7 encode
-//               counts of 1 -> 8 bits.
+//               counts of 1 -> 8 bits. Remaining LSBs are masked to 0 after the
+//               rotate.
 #define HSTX_CTRL_EXPAND_TMDS_L1_NBITS_RESET  _u(0x0)
 #define HSTX_CTRL_EXPAND_TMDS_L1_NBITS_BITS   _u(0x0000e000)
 #define HSTX_CTRL_EXPAND_TMDS_L1_NBITS_MSB    _u(15)
@@ -579,7 +582,8 @@
 // -----------------------------------------------------------------------------
 // Field       : HSTX_CTRL_EXPAND_TMDS_L1_ROT
 // Description : Right-rotate applied to the current shifter data before the
-//               lane 1 TMDS encoder.
+//               lane 1 TMDS encoder. Remaining LSBs are masked to 0 after the
+//               rotate.
 #define HSTX_CTRL_EXPAND_TMDS_L1_ROT_RESET  _u(0x00)
 #define HSTX_CTRL_EXPAND_TMDS_L1_ROT_BITS   _u(0x00001f00)
 #define HSTX_CTRL_EXPAND_TMDS_L1_ROT_MSB    _u(12)
@@ -589,7 +593,8 @@
 // Field       : HSTX_CTRL_EXPAND_TMDS_L0_NBITS
 // Description : Number of valid data bits for the lane 0 TMDS encoder, starting
 //               from bit 7 of the rotated data. Field values of 0 -> 7 encode
-//               counts of 1 -> 8 bits.
+//               counts of 1 -> 8 bits. Remaining LSBs are masked to 0 after the
+//               rotate.
 #define HSTX_CTRL_EXPAND_TMDS_L0_NBITS_RESET  _u(0x0)
 #define HSTX_CTRL_EXPAND_TMDS_L0_NBITS_BITS   _u(0x000000e0)
 #define HSTX_CTRL_EXPAND_TMDS_L0_NBITS_MSB    _u(7)
@@ -598,7 +603,8 @@
 // -----------------------------------------------------------------------------
 // Field       : HSTX_CTRL_EXPAND_TMDS_L0_ROT
 // Description : Right-rotate applied to the current shifter data before the
-//               lane 0 TMDS encoder.
+//               lane 0 TMDS encoder. Remaining LSBs are masked to 0 after the
+//               rotate.
 #define HSTX_CTRL_EXPAND_TMDS_L0_ROT_RESET  _u(0x00)
 #define HSTX_CTRL_EXPAND_TMDS_L0_ROT_BITS   _u(0x0000001f)
 #define HSTX_CTRL_EXPAND_TMDS_L0_ROT_MSB    _u(4)
@@ -606,4 +612,3 @@
 #define HSTX_CTRL_EXPAND_TMDS_L0_ROT_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_HSTX_CTRL_H
-

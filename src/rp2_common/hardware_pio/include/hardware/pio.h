@@ -34,8 +34,8 @@
  * \brief Programmable I/O (PIO) API
  *
  * A programmable input/output block (PIO) is a versatile hardware interface which
- * can support a number of different IO standards. 
- * 
+ * can support a number of different IO standards.
+ *
  * \if rp2040_specific
  * There are two PIO blocks in the RP2040.
  * \endif
@@ -57,7 +57,7 @@
  *  * DMA interface, sustained throughput up to 1 word per clock from system DMA
  *  * IRQ flag set/clear/status
  *
- * Full details of the PIO can be found in the appropriate RP-series datasheet. Note that there are
+ * Full details of the PIO can be found in the datasheet for the appropriate RP-series microcontroller. Note that there are
  * additional features in the RP2350 PIO implementation that mean care should be taken when writing PIO
  * code that needs to run on both the RP2040 and the RP2350.
  *
@@ -287,7 +287,7 @@ static_assert(DREQ_PIO2_RX0 == DREQ_PIO2_TX0 + NUM_PIO_STATE_MACHINES, "");
  *   GPIO base before calling the method, however you can use \ref pio_claim_free_sm_and_add_program_for_gpio_range
  *   to find/configure a PIO instance suitable for a particular GPIO range.
  *
- * \note when `PICO_PIO_USE_GPIO_BASE == 1` \ref pio_sm_set_config ignores fields which haven't had the corresponding
+ * \note When `PICO_PIO_USE_GPIO_BASE == 1` \ref pio_sm_set_config ignores fields which haven't had the corresponding
  * `sm_config_` pin function called, so that you don't have to move settings for unused pin sets into the correct
  * pin range. Therefore, it is always a best practice to explicitly configure a pin range starting at pin zero
  * via the corresponding sm_config_ function (e.g. `sm_config_set_out_pin_base(config, 0)`), as the default
@@ -766,7 +766,7 @@ static inline void sm_config_set_mov_status(pio_sm_config *c, enum pio_mov_statu
  * Out Special | sticky=false, has_enable_pin=false, enable_pin_index=0
  * Mov Status | status_sel=STATUS_TX_LESSTHAN, n=0
  *
- * \note on RP2350B with PICO_PIO_USE_GPIO_BASE = 1, the default Out/Set/In/Side Set pin
+ * \note On RP2350B with PICO_PIO_USE_GPIO_BASE = 1, the default Out/Set/In/Side Set pin
  * bases are actually 0 relative to the GPIO_BASE of the PIO instance the pio_sm_config
  * is applied to, so that any pin bases which aren't explicitly specified are not included in logic related to
  * choosing a compatible PIO instance.
@@ -2116,7 +2116,7 @@ bool pio_claim_free_sm_and_add_program(const pio_program_t *program, PIO *pio_ou
  * \return true on success, false otherwise
  * \see pio_remove_program_and_unclaim_sm
  *
- * \note on RP2040 or RP2350A (strictly when PICO_PIO_USE_GPIO_BASE == 0), gpio_start + gpio_count must be <= 32
+ * \note On RP2040 or RP2350A (strictly when PICO_PIO_USE_GPIO_BASE == 0), gpio_start + gpio_count must be <= 32
  * for success, and the set_gpio_base parameter is ignored
  */
 bool pio_claim_free_sm_and_add_program_for_gpio_range(const pio_program_t *program, PIO *pio_out, uint *sm_out, uint *offset_out, uint gpio_start, uint gpio_count, bool set_gpio_base);

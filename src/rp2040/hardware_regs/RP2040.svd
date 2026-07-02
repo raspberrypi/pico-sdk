@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (c) 2024 Raspberry Pi Ltd.
+Copyright (c) 2021 Raspberry Pi Ltd.
 
 SPDX-License-Identifier: BSD-3-Clause
 -->
@@ -29,7 +29,7 @@ SPDX-License-Identifier: BSD-3-Clause
     <resetValue>0x00000000</resetValue>
     <access>read-write</access>
     <licenseText>
-        Copyright (c) 2024 Raspberry Pi Ltd.
+        Copyright (c) 2021 Raspberry Pi Ltd.
 
         SPDX-License-Identifier: BSD-3-Clause
     </licenseText>
@@ -42,23 +42,19 @@ SPDX-License-Identifier: BSD-3-Clause
         <vtorPresent>1</vtorPresent>
         <nvicPrioBits>2</nvicPrioBits>
         <vendorSystickConfig>false</vendorSystickConfig>
-        <deviceNumInterrupts>26</deviceNumInterrupts>
+        <deviceNumInterrupts>32</deviceNumInterrupts>
     </cpu>
     <addressUnitBits>8</addressUnitBits>
     <peripherals>
     <peripheral>
         <name>ADC</name>
-        <description>Control and data interface to SAR ADC</description>
         <baseAddress>0x4004c000</baseAddress>
+        <description>Control and data interface to SAR ADC</description>
         <addressBlock>
             <offset>0</offset>
             <size>36</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>ADC_IRQ_FIFO</name>
-            <value>22</value>
-        </interrupt>
         <registers>
             <register>
                 <name>CS</name>
@@ -111,7 +107,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>START_ONCE</name>
                         <description>Start a single conversion. Self-clearing. Ignored if start_many is asserted.</description>
                         <bitRange>[2:2]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>TS_EN</name>
@@ -314,11 +311,15 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>ADC_IRQ_FIFO</name>
+            <value>22</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>BUSCTRL</name>
-        <description>Register block for busfabric control signals and performance counters</description>
         <baseAddress>0x40030000</baseAddress>
+        <description>Register block for busfabric control signals and performance counters</description>
         <addressBlock>
             <offset>0</offset>
             <size>40</size>
@@ -835,10 +836,6 @@ SPDX-License-Identifier: BSD-3-Clause
             <size>200</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>CLOCKS_IRQ</name>
-            <value>17</value>
-        </interrupt>
         <registers>
             <register>
                 <name>CLK_GPOUT0_CTRL</name>
@@ -1563,26 +1560,6 @@ SPDX-License-Identifier: BSD-3-Clause
                                 <value>6</value>
                             </enumeratedValue>
                         </enumeratedValues>
-                    </field>
-                </fields>
-            </register>
-            <register>
-                <name>CLK_PERI_DIV</name>
-                <addressOffset>0x0000004c</addressOffset>
-                <description>Clock divisor, can be changed on-the-fly</description>
-                <resetValue>0x00000100</resetValue>
-                <fields>
-                    <field>
-                        <name>INT</name>
-                        <description>Integer component of the divisor, 0 -&gt; divide by 2^16</description>
-                        <bitRange>[31:8]</bitRange>
-                        <access>read-write</access>
-                    </field>
-                    <field>
-                        <name>FRAC</name>
-                        <description>Fractional component of the divisor</description>
-                        <bitRange>[7:0]</bitRange>
-                        <access>read-write</access>
                     </field>
                 </fields>
             </register>
@@ -2952,24 +2929,20 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>CLOCKS_IRQ</name>
+            <value>17</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>DMA</name>
-        <description>DMA with separate read and write masters</description>
         <baseAddress>0x50000000</baseAddress>
+        <description>DMA with separate read and write masters</description>
         <addressBlock>
             <offset>0</offset>
             <size>2760</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>DMA_IRQ_0</name>
-            <value>11</value>
-        </interrupt>
-        <interrupt>
-            <name>DMA_IRQ_1</name>
-            <value>12</value>
-        </interrupt>
         <registers>
             <register>
                 <name>CH0_READ_ADDR</name>
@@ -10045,27 +10018,6 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
             <register>
-                <name>INTR1</name>
-                <addressOffset>0x00000410</addressOffset>
-                <description>Interrupt Status (raw)</description>
-                <resetValue>0x00000000</resetValue>
-                <fields>
-                    <field>
-                        <name>INTR1</name>
-                        <description>Raw interrupt status for DMA Channels 0..15. Bit n corresponds to channel n. Ignores any masking or forcing. Channel interrupts can be cleared by writing a bit mask to INTR, INTS0 or INTS1.
-
-                            Channel interrupts can be routed to either of two system-level IRQs based on INTE0 and INTE1.
-
-                            This can be used vector different channel interrupts to different ISRs: this might be done to allow NVIC IRQ preemption for more time-critical channels, or to spread IRQ load across different cores.
-
-                            It is also valid to ignore this behaviour and just use INTE0/INTS0/IRQ 0.</description>
-                        <bitRange>[15:0]</bitRange>
-                        <access>read-write</access>
-                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
-                    </field>
-                </fields>
-            </register>
-            <register>
                 <name>INTE1</name>
                 <addressOffset>0x00000414</addressOffset>
                 <description>Interrupt Enables for IRQ 1</description>
@@ -10203,7 +10155,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>MULTI_CHAN_TRIGGER</name>
                         <description>Each bit in this register corresponds to a DMA channel. Writing a 1 to the relevant bit is the same as writing to that channel's trigger register; the channel will start if it is currently enabled and not already busy.</description>
                         <bitRange>[15:0]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                 </fields>
             </register>
@@ -10679,9 +10632,18 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>DMA_IRQ_0</name>
+            <value>11</value>
+        </interrupt>
+        <interrupt>
+            <name>DMA_IRQ_1</name>
+            <value>12</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>I2C0</name>
+        <baseAddress>0x40044000</baseAddress>
         <description>DW_apb_i2c address block
 
             List of configuration constants for the Synopsys I2C hardware (you may see references to these in I2C register header; these are *fixed* values, set at hardware design time):
@@ -10754,16 +10716,11 @@ SPDX-License-Identifier: BSD-3-Clause
             IC_STOP_DET_IF_MASTER_ACTIVE ...... 0x0 
             IC_DEFAULT_UFM_SPKLEN ............. 0x1 
             IC_TX_BUFFER_DEPTH ................ 16</description>
-        <baseAddress>0x40044000</baseAddress>
         <addressBlock>
             <offset>0</offset>
             <size>256</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>I2C0_IRQ</name>
-            <value>23</value>
-        </interrupt>
         <registers>
             <register>
                 <name>IC_CON</name>
@@ -11094,7 +11051,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
                             Reset value: 0x0</description>
                         <bitRange>[10:10]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         <enumeratedValues>
                             <enumeratedValue>
                                 <name>DISABLE</name>
@@ -11114,7 +11072,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
                             - 1 - STOP is issued after this byte, regardless of whether or not the Tx FIFO is empty. If the Tx FIFO is not empty, the master immediately tries to start a new transfer by issuing a START and arbitrating for the bus. - 0 - STOP is not issued after this byte, regardless of whether or not the Tx FIFO is empty. If the Tx FIFO is not empty, the master continues the current transfer by sending/receiving data bytes according to the value of the CMD bit. If the Tx FIFO is empty, the master holds the SCL line low and stalls the bus until a new command is available in the Tx FIFO. Reset value: 0x0</description>
                         <bitRange>[9:9]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         <enumeratedValues>
                             <enumeratedValue>
                                 <name>DISABLE</name>
@@ -11138,7 +11097,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
                             Reset value: 0x0</description>
                         <bitRange>[8:8]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                         <enumeratedValues>
                             <enumeratedValue>
                                 <name>WRITE</name>
@@ -13310,14 +13270,18 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>I2C0_IRQ</name>
+            <value>23</value>
+        </interrupt>
     </peripheral>
     <peripheral derivedFrom="I2C0">
         <name>I2C1</name>
         <baseAddress>0x40048000</baseAddress>
         <interrupt>
-        <name>I2C1_IRQ</name>
-        <value>24</value>
-    </interrupt>
+            <name>I2C1_IRQ</name>
+            <value>24</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>IO_BANK0</name>
@@ -13327,10 +13291,6 @@ SPDX-License-Identifier: BSD-3-Clause
             <size>400</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>IO_IRQ_BANK0</name>
-            <value>13</value>
-        </interrupt>
         <registers>
             <register>
                 <name>GPIO0_STATUS</name>
@@ -26307,6 +26267,10 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>IO_IRQ_BANK0</name>
+            <value>13</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>IO_QSPI</name>
@@ -26316,10 +26280,6 @@ SPDX-License-Identifier: BSD-3-Clause
             <size>88</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>IO_IRQ_QSPI</name>
-            <value>14</value>
-        </interrupt>
         <registers>
             <register>
                 <name>GPIO_QSPI_SCLK_STATUS</name>
@@ -28772,6 +28732,10 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>IO_IRQ_QSPI</name>
+            <value>14</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>PADS_BANK0</name>
@@ -31431,21 +31395,13 @@ SPDX-License-Identifier: BSD-3-Clause
     </peripheral>
     <peripheral>
         <name>PIO0</name>
-        <description>Programmable IO block</description>
         <baseAddress>0x50200000</baseAddress>
+        <description>Programmable IO block</description>
         <addressBlock>
             <offset>0</offset>
             <size>324</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>PIO0_IRQ_0</name>
-            <value>7</value>
-        </interrupt>
-        <interrupt>
-            <name>PIO0_IRQ_1</name>
-            <value>8</value>
-        </interrupt>
         <registers>
             <register>
                 <name>CTRL</name>
@@ -31461,7 +31417,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
                             Note also that CLKDIV_RESTART can be written to whilst the state machine is running, and this is useful to resynchronise clock dividers after the divisors (SMx_CLKDIV) have been changed on-the-fly.</description>
                         <bitRange>[11:8]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>SM_RESTART</name>
@@ -31471,7 +31428,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
                             The program counter, the contents of the output shift register and the X/Y scratch registers are not affected.</description>
                         <bitRange>[7:4]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>SM_ENABLE</name>
@@ -33702,18 +33660,26 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>PIO0_IRQ_0</name>
+            <value>7</value>
+        </interrupt>
+        <interrupt>
+            <name>PIO0_IRQ_1</name>
+            <value>8</value>
+        </interrupt>
     </peripheral>
     <peripheral derivedFrom="PIO0">
         <name>PIO1</name>
         <baseAddress>0x50300000</baseAddress>
         <interrupt>
-        <name>PIO1_IRQ_0</name>
-        <value>9</value>
-    </interrupt>
+            <name>PIO1_IRQ_0</name>
+            <value>9</value>
+        </interrupt>
         <interrupt>
-        <name>PIO1_IRQ_1</name>
-        <value>10</value>
-    </interrupt>
+            <name>PIO1_IRQ_1</name>
+            <value>10</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>PLL_SYS</name>
@@ -35103,17 +35069,13 @@ SPDX-License-Identifier: BSD-3-Clause
     </peripheral>
     <peripheral>
         <name>PWM</name>
-        <description>Simple PWM</description>
         <baseAddress>0x40050000</baseAddress>
+        <description>Simple PWM</description>
         <addressBlock>
             <offset>0</offset>
             <size>180</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>PWM_IRQ_WRAP</name>
-            <value>4</value>
-        </interrupt>
         <registers>
             <register>
                 <name>CH0_CSR</name>
@@ -35127,14 +35089,16 @@ SPDX-License-Identifier: BSD-3-Clause
                             Self-clearing. Write a 1, and poll until low. Counter must be running 
                             at less than full speed (div_int + div_frac / 16 &gt; 1)</description>
                         <bitRange>[7:7]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>PH_RET</name>
                         <description>Retard the phase of the counter by 1 count, while it is running. 
                             Self-clearing. Write a 1, and poll until low. Counter must be running.</description>
                         <bitRange>[6:6]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>DIVMODE</name>
@@ -35265,14 +35229,16 @@ SPDX-License-Identifier: BSD-3-Clause
                             Self-clearing. Write a 1, and poll until low. Counter must be running 
                             at less than full speed (div_int + div_frac / 16 &gt; 1)</description>
                         <bitRange>[7:7]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>PH_RET</name>
                         <description>Retard the phase of the counter by 1 count, while it is running. 
                             Self-clearing. Write a 1, and poll until low. Counter must be running.</description>
                         <bitRange>[6:6]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>DIVMODE</name>
@@ -35403,14 +35369,16 @@ SPDX-License-Identifier: BSD-3-Clause
                             Self-clearing. Write a 1, and poll until low. Counter must be running 
                             at less than full speed (div_int + div_frac / 16 &gt; 1)</description>
                         <bitRange>[7:7]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>PH_RET</name>
                         <description>Retard the phase of the counter by 1 count, while it is running. 
                             Self-clearing. Write a 1, and poll until low. Counter must be running.</description>
                         <bitRange>[6:6]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>DIVMODE</name>
@@ -35541,14 +35509,16 @@ SPDX-License-Identifier: BSD-3-Clause
                             Self-clearing. Write a 1, and poll until low. Counter must be running 
                             at less than full speed (div_int + div_frac / 16 &gt; 1)</description>
                         <bitRange>[7:7]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>PH_RET</name>
                         <description>Retard the phase of the counter by 1 count, while it is running. 
                             Self-clearing. Write a 1, and poll until low. Counter must be running.</description>
                         <bitRange>[6:6]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>DIVMODE</name>
@@ -35679,14 +35649,16 @@ SPDX-License-Identifier: BSD-3-Clause
                             Self-clearing. Write a 1, and poll until low. Counter must be running 
                             at less than full speed (div_int + div_frac / 16 &gt; 1)</description>
                         <bitRange>[7:7]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>PH_RET</name>
                         <description>Retard the phase of the counter by 1 count, while it is running. 
                             Self-clearing. Write a 1, and poll until low. Counter must be running.</description>
                         <bitRange>[6:6]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>DIVMODE</name>
@@ -35817,14 +35789,16 @@ SPDX-License-Identifier: BSD-3-Clause
                             Self-clearing. Write a 1, and poll until low. Counter must be running 
                             at less than full speed (div_int + div_frac / 16 &gt; 1)</description>
                         <bitRange>[7:7]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>PH_RET</name>
                         <description>Retard the phase of the counter by 1 count, while it is running. 
                             Self-clearing. Write a 1, and poll until low. Counter must be running.</description>
                         <bitRange>[6:6]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>DIVMODE</name>
@@ -35955,14 +35929,16 @@ SPDX-License-Identifier: BSD-3-Clause
                             Self-clearing. Write a 1, and poll until low. Counter must be running 
                             at less than full speed (div_int + div_frac / 16 &gt; 1)</description>
                         <bitRange>[7:7]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>PH_RET</name>
                         <description>Retard the phase of the counter by 1 count, while it is running. 
                             Self-clearing. Write a 1, and poll until low. Counter must be running.</description>
                         <bitRange>[6:6]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>DIVMODE</name>
@@ -36093,14 +36069,16 @@ SPDX-License-Identifier: BSD-3-Clause
                             Self-clearing. Write a 1, and poll until low. Counter must be running 
                             at less than full speed (div_int + div_frac / 16 &gt; 1)</description>
                         <bitRange>[7:7]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>PH_RET</name>
                         <description>Retard the phase of the counter by 1 count, while it is running. 
                             Self-clearing. Write a 1, and poll until low. Counter must be running.</description>
                         <bitRange>[6:6]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>DIVMODE</name>
@@ -36472,6 +36450,10 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>PWM_IRQ_WRAP</name>
+            <value>4</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>RESETS</name>
@@ -37061,7 +37043,7 @@ SPDX-License-Identifier: BSD-3-Clause
                         <access>read-write</access>
                         <enumeratedValues>
                             <enumeratedValue>
-                                <name>dormant</name>
+                                <name>DORMANT</name>
                                 <value>1668246881</value>
                             </enumeratedValue>
                             <enumeratedValue>
@@ -37200,17 +37182,13 @@ SPDX-License-Identifier: BSD-3-Clause
     </peripheral>
     <peripheral>
         <name>RTC</name>
-        <description>Register block to control RTC</description>
         <baseAddress>0x4005c000</baseAddress>
+        <description>Register block to control RTC</description>
         <addressBlock>
             <offset>0</offset>
             <size>48</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>RTC_IRQ</name>
-            <value>25</value>
-        </interrupt>
         <registers>
             <register>
                 <name>CLKDIV_M1</name>
@@ -37300,7 +37278,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>LOAD</name>
                         <description>Load RTC</description>
                         <bitRange>[4:4]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>RTC_ACTIVE</name>
@@ -37543,25 +37522,21 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>RTC_IRQ</name>
+            <value>25</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>SIO</name>
+        <baseAddress>0xd0000000</baseAddress>
         <description>Single-cycle IO block 
             Provides core-local and inter-core hardware for the two processors, with single-cycle access.</description>
-        <baseAddress>0xd0000000</baseAddress>
         <addressBlock>
             <offset>0</offset>
             <size>384</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>SIO_IRQ_PROC0</name>
-            <value>15</value>
-        </interrupt>
-        <interrupt>
-            <name>SIO_IRQ_PROC1</name>
-            <value>16</value>
-        </interrupt>
         <registers>
             <register>
                 <name>CPUID</name>
@@ -39362,38 +39337,13 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
-    </peripheral>
-    <peripheral>
-        <name>SPARE_IRQ</name>
-        <baseAddress>0x00000000</baseAddress>
-        <addressBlock>
-            <offset>0</offset>
-            <size>4</size>
-            <usage>reserved</usage>
-        </addressBlock>
         <interrupt>
-            <name>SPARE_IRQ_0</name>
-            <value>26</value>
+            <name>SIO_IRQ_PROC0</name>
+            <value>15</value>
         </interrupt>
         <interrupt>
-            <name>SPARE_IRQ_1</name>
-            <value>27</value>
-        </interrupt>
-        <interrupt>
-            <name>SPARE_IRQ_2</name>
-            <value>28</value>
-        </interrupt>
-        <interrupt>
-            <name>SPARE_IRQ_3</name>
-            <value>29</value>
-        </interrupt>
-        <interrupt>
-            <name>SPARE_IRQ_4</name>
-            <value>30</value>
-        </interrupt>
-        <interrupt>
-            <name>SPARE_IRQ_5</name>
-            <value>31</value>
+            <name>SIO_IRQ_PROC1</name>
+            <value>16</value>
         </interrupt>
     </peripheral>
     <peripheral>
@@ -39404,10 +39354,6 @@ SPDX-License-Identifier: BSD-3-Clause
             <size>4096</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>SPI0_IRQ</name>
-            <value>18</value>
-        </interrupt>
         <registers>
             <register>
                 <name>SSPCR0</name>
@@ -39809,17 +39755,22 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>SPI0_IRQ</name>
+            <value>18</value>
+        </interrupt>
     </peripheral>
     <peripheral derivedFrom="SPI0">
         <name>SPI1</name>
         <baseAddress>0x40040000</baseAddress>
         <interrupt>
-        <name>SPI1_IRQ</name>
-        <value>19</value>
-    </interrupt>
+            <name>SPI1_IRQ</name>
+            <value>19</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>SSI</name>
+        <baseAddress>0x18000000</baseAddress>
         <description>DW_apb_ssi has the following features: 
             * APB interface – Allows for easy integration into a DesignWare Synthesizable Components for AMBA 2 implementation. 
             * APB3 and APB4 protocol support. 
@@ -39846,7 +39797,6 @@ SPDX-License-Identifier: BSD-3-Clause
             - Interrupt polarity – active high interrupt lines. 
             - Serial clock polarity – low serial-clock polarity directly after reset. 
             - Serial clock phase – capture on first edge of serial-clock directly after reset.</description>
-        <baseAddress>0x18000000</baseAddress>
         <addressBlock>
             <offset>0</offset>
             <size>252</size>
@@ -40577,8 +40527,8 @@ SPDX-License-Identifier: BSD-3-Clause
     </peripheral>
     <peripheral>
         <name>SYSCFG</name>
-        <description>Register block for various chip control signals</description>
         <baseAddress>0x40004000</baseAddress>
+        <description>Register block for various chip control signals</description>
         <addressBlock>
             <offset>0</offset>
             <size>28</size>
@@ -40795,7 +40745,7 @@ SPDX-License-Identifier: BSD-3-Clause
         <baseAddress>0x40000000</baseAddress>
         <addressBlock>
             <offset>0</offset>
-            <size>20</size>
+            <size>68</size>
             <usage>registers</usage>
         </addressBlock>
         <registers>
@@ -40803,7 +40753,7 @@ SPDX-License-Identifier: BSD-3-Clause
                 <name>CHIP_ID</name>
                 <addressOffset>0x00000000</addressOffset>
                 <description>JEDEC JEP-106 compliant chip identifier.</description>
-                <resetValue>0x00000000</resetValue>
+                <resetValue>0x20002927</resetValue>
                 <fields>
                     <field>
                         <name>REVISION</name>
@@ -40842,7 +40792,7 @@ SPDX-License-Identifier: BSD-3-Clause
             </register>
             <register>
                 <name>GITREF_RP2040</name>
-                <addressOffset>0x00000010</addressOffset>
+                <addressOffset>0x00000040</addressOffset>
                 <description>Git hash of the chip source. Used to identify chip version.</description>
                 <resetMask>0x00000000</resetMask>
                 <fields>
@@ -40857,8 +40807,8 @@ SPDX-License-Identifier: BSD-3-Clause
     </peripheral>
     <peripheral>
         <name>TBMAN</name>
-        <description>Testbench manager. Allows the programmer to know what platform their software is running on.</description>
         <baseAddress>0x4006c000</baseAddress>
+        <description>Testbench manager. Allows the programmer to know what platform their software is running on.</description>
         <addressBlock>
             <offset>0</offset>
             <size>4</size>
@@ -40889,6 +40839,7 @@ SPDX-License-Identifier: BSD-3-Clause
     </peripheral>
     <peripheral>
         <name>TIMER</name>
+        <baseAddress>0x40054000</baseAddress>
         <description>Controls time and alarms 
             time is a 64 bit value indicating the time in usec since power-on 
             timeh is the top 32 bits of time &amp; timel is the bottom 32 bits 
@@ -40899,28 +40850,11 @@ SPDX-License-Identifier: BSD-3-Clause
             An alarm can be cancelled before it has finished by clearing the alarm_enable 
             When an alarm fires, the corresponding alarm_irq is set and alarm_running is cleared 
             To clear the interrupt write a 1 to the corresponding alarm_irq</description>
-        <baseAddress>0x40054000</baseAddress>
         <addressBlock>
             <offset>0</offset>
             <size>68</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>TIMER_IRQ_0</name>
-            <value>0</value>
-        </interrupt>
-        <interrupt>
-            <name>TIMER_IRQ_1</name>
-            <value>1</value>
-        </interrupt>
-        <interrupt>
-            <name>TIMER_IRQ_2</name>
-            <value>2</value>
-        </interrupt>
-        <interrupt>
-            <name>TIMER_IRQ_3</name>
-            <value>3</value>
-        </interrupt>
         <registers>
             <register>
                 <name>TIMEHW</name>
@@ -41235,6 +41169,22 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>TIMER_IRQ_0</name>
+            <value>0</value>
+        </interrupt>
+        <interrupt>
+            <name>TIMER_IRQ_1</name>
+            <value>1</value>
+        </interrupt>
+        <interrupt>
+            <name>TIMER_IRQ_2</name>
+            <value>2</value>
+        </interrupt>
+        <interrupt>
+            <name>TIMER_IRQ_3</name>
+            <value>3</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>UART0</name>
@@ -41244,10 +41194,6 @@ SPDX-License-Identifier: BSD-3-Clause
             <size>4096</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>UART0_IRQ</name>
-            <value>20</value>
-        </interrupt>
         <registers>
             <register>
                 <name>UARTDR</name>
@@ -42036,28 +41982,28 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>UART0_IRQ</name>
+            <value>20</value>
+        </interrupt>
     </peripheral>
     <peripheral derivedFrom="UART0">
         <name>UART1</name>
         <baseAddress>0x40038000</baseAddress>
         <interrupt>
-        <name>UART1_IRQ</name>
-        <value>21</value>
-    </interrupt>
+            <name>UART1_IRQ</name>
+            <value>21</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>USB</name>
-        <description>USB FS/LS controller device registers</description>
         <baseAddress>0x50110000</baseAddress>
+        <description>USB FS/LS controller device registers</description>
         <addressBlock>
             <offset>0</offset>
             <size>156</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>USBCTRL_IRQ</name>
-            <value>5</value>
-        </interrupt>
         <registers>
             <register>
                 <name>ADDR_ENDP</name>
@@ -42693,13 +42639,15 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>RESET_BUS</name>
                         <description>Host: Reset bus</description>
                         <bitRange>[13:13]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>RESUME</name>
                         <description>Device: Remote wakeup. Device can initiate its own resume after suspend.</description>
                         <bitRange>[12:12]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>VBUS_EN</name>
@@ -42735,7 +42683,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>STOP_TRANS</name>
                         <description>Host: Stop transaction</description>
                         <bitRange>[4:4]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>RECEIVE_DATA</name>
@@ -42759,7 +42708,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>START_TRANS</name>
                         <description>Host: Start transaction</description>
                         <bitRange>[0:0]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                 </fields>
             </register>
@@ -42866,7 +42816,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>CONNECTED</name>
                         <description>Device: connected</description>
                         <bitRange>[16:16]</bitRange>
-                        <access>read-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>RESUME</name>
@@ -42885,13 +42836,15 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>SPEED</name>
                         <description>Host: device speed. Disconnected = 00, LS = 01, FS = 10</description>
                         <bitRange>[9:8]</bitRange>
-                        <access>read-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>SUSPENDED</name>
                         <description>Bus in suspended state. Valid for device and host. Host and device will go into suspend if neither Keep Alive / SOF frames are enabled.</description>
                         <bitRange>[4:4]</bitRange>
-                        <access>read-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>LINE_STATE</name>
@@ -42915,7 +42868,7 @@ SPDX-License-Identifier: BSD-3-Clause
                 <fields>
                     <field>
                         <name>INT_EP_ACTIVE</name>
-                        <description>Host: Enable interrupt endpoint 1 =&gt; 15</description>
+                        <description>Host: Enable interrupt endpoint 1 -&gt; 15</description>
                         <bitRange>[15:1]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -43926,7 +43879,7 @@ SPDX-License-Identifier: BSD-3-Clause
             <register>
                 <name>USB_PWR</name>
                 <addressOffset>0x00000078</addressOffset>
-                <description>Overrides for the power signals in the event that the VBUS signals are not hooked up to GPIO. Set the value of the override and then the override enable so switch over to the override value.</description>
+                <description>Overrides for the power signals in the event that the VBUS signals are not hooked up to GPIO. Set the value of the override and then the override enable to switch over to the override value.</description>
                 <resetValue>0x00000000</resetValue>
                 <fields>
                     <field>
@@ -43964,143 +43917,138 @@ SPDX-License-Identifier: BSD-3-Clause
             <register>
                 <name>USBPHY_DIRECT</name>
                 <addressOffset>0x0000007c</addressOffset>
-                <description>Note that most functions are driven directly from usb_fsls controller.  This register allows more detailed control/status from the USB PHY. Useful for debug but not expected to be used in normal operation 
-                    Use in conjunction with usbphy_direct_override register</description>
+                <description>This register allows for direct control of the USB phy. Use in conjunction with usbphy_direct_override register to enable each override bit.</description>
                 <resetValue>0x00000000</resetValue>
                 <fields>
                     <field>
                         <name>DM_OVV</name>
-                        <description>Status bit from USB PHY</description>
+                        <description>DM over voltage</description>
                         <bitRange>[22:22]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>DP_OVV</name>
-                        <description>Status bit from USB PHY</description>
+                        <description>DP over voltage</description>
                         <bitRange>[21:21]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>DM_OVCN</name>
-                        <description>Status bit from USB PHY</description>
+                        <description>DM overcurrent</description>
                         <bitRange>[20:20]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>DP_OVCN</name>
-                        <description>Status bit from USB PHY</description>
+                        <description>DP overcurrent</description>
                         <bitRange>[19:19]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>RX_DM</name>
-                        <description>Status bit from USB PHY 
-                            DPM pin state</description>
+                        <description>DPM pin state</description>
                         <bitRange>[18:18]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>RX_DP</name>
-                        <description>Status bit from USB PHY 
-                            DPP pin state</description>
+                        <description>DPP pin state</description>
                         <bitRange>[17:17]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>RX_DD</name>
-                        <description>Status bit from USB PHY 
-                            RX Diff data</description>
+                        <description>Differential RX</description>
                         <bitRange>[16:16]</bitRange>
                         <access>read-only</access>
                     </field>
                     <field>
                         <name>TX_DIFFMODE</name>
+                        <description>TX_DIFFMODE=0: Single ended mode 
+                            TX_DIFFMODE=1: Differential drive mode (TX_DM, TX_DM_OE ignored)</description>
                         <bitRange>[15:15]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>TX_FSSLEW</name>
+                        <description>TX_FSSLEW=0: Low speed slew rate 
+                            TX_FSSLEW=1: Full speed slew rate</description>
                         <bitRange>[14:14]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>TX_PD</name>
+                        <description>TX power down override (if override enable is set). 1 = powered down.</description>
                         <bitRange>[13:13]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>RX_PD</name>
+                        <description>RX power down override (if override enable is set). 1 = powered down.</description>
                         <bitRange>[12:12]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>TX_DM</name>
-                        <description>Value to drive to USB PHY when override enable is set (which will override the default value or value driven from USB controller 
-                            TX_SEMODE=0, Ignored 
-                            TX_SEMODE=1, Drives DPM only. TX_DM_OE=1 to enable drive. DPM=TX_DM</description>
+                        <description>Output data. TX_DIFFMODE=1, Ignored 
+                            TX_DIFFMODE=0, Drives DPM only. TX_DM_OE=1 to enable drive. DPM=TX_DM</description>
                         <bitRange>[11:11]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>TX_DP</name>
-                        <description>Value to drive to USB PHY when override enable is set (which will override the default value or value driven from USB controller 
-                            TX_SEMODE=0, Drives DPP/DPM diff pair. TX_DP_OE=1 to enable drive. DPP=TX_DP, DPM=~TX_DP 
-                            TX_SEMODE=1, Drives DPP only. TX_DP_OE=1 to enable drive. DPP=TX_DP</description>
+                        <description>Output data. If TX_DIFFMODE=1, Drives DPP/DPM diff pair. TX_DP_OE=1 to enable drive. DPP=TX_DP, DPM=~TX_DP 
+                            If TX_DIFFMODE=0, Drives DPP only. TX_DP_OE=1 to enable drive. DPP=TX_DP</description>
                         <bitRange>[10:10]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>TX_DM_OE</name>
-                        <description>Value to drive to USB PHY when override enable is set (which will override the default value or value driven from USB controller 
-                            TX_SEMODE=0, Ignored. 
-                            TX_SEMODE=1, OE for DPM only. 0 - DPM in Hi-Z state; 1 - DPM driving</description>
+                        <description>Output enable. If TX_DIFFMODE=1, Ignored. 
+                            If TX_DIFFMODE=0, OE for DPM only. 0 - DPM in Hi-Z state; 1 - DPM driving</description>
                         <bitRange>[9:9]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>TX_DP_OE</name>
-                        <description>Value to drive to USB PHY when override enable is set (which will override the default value or value driven from USB controller 
-                            TX_SEMODE=0, OE for DPP/DPM diff pair. 0 - DPP/DPM in Hi-Z state; 1 - DPP/DPM driving 
-                            TX_SEMODE=1, OE for DPP only. 0 - DPP in Hi-Z state; 1 - DPP driving</description>
+                        <description>Output enable. If TX_DIFFMODE=1, OE for DPP/DPM diff pair. 0 - DPP/DPM in Hi-Z state; 1 - DPP/DPM driving 
+                            If TX_DIFFMODE=0, OE for DPP only. 0 - DPP in Hi-Z state; 1 - DPP driving</description>
                         <bitRange>[8:8]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>DM_PULLDN_EN</name>
-                        <description>Value to drive to USB PHY when override enable is set (which will override the default value or value driven from USB controller 
-                            1 - Enable Rpd on DPM</description>
+                        <description>DM pull down enable</description>
                         <bitRange>[6:6]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>DM_PULLUP_EN</name>
-                        <description>Value to drive to USB PHY when override enable is set (which will override the default value or value driven from USB controller 
-                            1 - Enable Rpu on DPM</description>
+                        <description>DM pull up enable</description>
                         <bitRange>[5:5]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>DM_PULLUP_HISEL</name>
-                        <description>when dm_pullup_en is set high, this enables second resistor. 0 - Pull = Rpu2; 1 - Pull = Rpu1 + Rpu2</description>
+                        <description>Enable the second DM pull up resistor. 0 - Pull = Rpu2; 1 - Pull = Rpu1 + Rpu2</description>
                         <bitRange>[4:4]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>DP_PULLDN_EN</name>
-                        <description>Value to drive to USB PHY when override enable is set (which will override the default value or value driven from USB controller 
-                            1 - Enable Rpd on DPP</description>
+                        <description>DP pull down enable</description>
                         <bitRange>[2:2]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>DP_PULLUP_EN</name>
-                        <description>Value to drive to USB PHY when override enable is set (which will override the default value or value driven from USB controller</description>
+                        <description>DP pull up enable</description>
                         <bitRange>[1:1]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>DP_PULLUP_HISEL</name>
-                        <description>when dp_pullup_en is set high, this enables second resistor. 0 - Pull = Rpu2; 1 - Pull = Rpu1 + Rpu2</description>
+                        <description>Enable the second DP pull up resistor. 0 - Pull = Rpu2; 1 - Pull = Rpu1 + Rpu2</description>
                         <bitRange>[0:0]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -44109,6 +44057,7 @@ SPDX-License-Identifier: BSD-3-Clause
             <register>
                 <name>USBPHY_DIRECT_OVERRIDE</name>
                 <addressOffset>0x00000080</addressOffset>
+                <description>Override enable for each control in usbphy_direct</description>
                 <resetValue>0x00000000</resetValue>
                 <fields>
                     <field>
@@ -44138,43 +44087,36 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>TX_DM_OVERRIDE_EN</name>
-                        <description>Override default value or value driven from USB Controller to PHY</description>
                         <bitRange>[8:8]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>TX_DP_OVERRIDE_EN</name>
-                        <description>Override default value or value driven from USB Controller to PHY</description>
                         <bitRange>[7:7]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>TX_DM_OE_OVERRIDE_EN</name>
-                        <description>Override default value or value driven from USB Controller to PHY</description>
                         <bitRange>[6:6]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>TX_DP_OE_OVERRIDE_EN</name>
-                        <description>Override default value or value driven from USB Controller to PHY</description>
                         <bitRange>[5:5]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>DM_PULLDN_EN_OVERRIDE_EN</name>
-                        <description>Override default value or value driven from USB Controller to PHY</description>
                         <bitRange>[4:4]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>DP_PULLDN_EN_OVERRIDE_EN</name>
-                        <description>Override default value or value driven from USB Controller to PHY</description>
                         <bitRange>[3:3]</bitRange>
                         <access>read-write</access>
                     </field>
                     <field>
                         <name>DP_PULLUP_EN_OVERRIDE_EN</name>
-                        <description>Override default value or value driven from USB Controller to PHY</description>
                         <bitRange>[2:2]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -44193,7 +44135,7 @@ SPDX-License-Identifier: BSD-3-Clause
             <register>
                 <name>USBPHY_TRIM</name>
                 <addressOffset>0x00000084</addressOffset>
-                <description>Note that most functions are driven directly from usb_fsls controller.  This register allows more detailed control/status from the USB PHY. Useful for debug but not expected to be used in normal operation</description>
+                <description>Used to adjust trim values of USB phy pull down resistors.</description>
                 <resetValue>0x00001f1f</resetValue>
                 <fields>
                     <field>
@@ -44246,7 +44188,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>DEV_RESUME_FROM_HOST</name>
-                        <description>Set when the device receives a resume from the host. Cleared by writing to SIE_STATUS.RESUME_REMOTE</description>
+                        <description>Set when the device receives a resume from the host. Cleared by writing to SIE_STATUS.RESUME</description>
                         <bitRange>[15:15]</bitRange>
                         <access>read-only</access>
                     </field>
@@ -44270,7 +44212,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>VBUS_DETECT</name>
-                        <description>Source: SIE_STATUS.VBUS_DETECT</description>
+                        <description>Source: SIE_STATUS.VBUS_DETECTED</description>
                         <bitRange>[11:11]</bitRange>
                         <access>read-only</access>
                     </field>
@@ -44330,7 +44272,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>HOST_RESUME</name>
-                        <description>Host: raised when a device wakes up the host. Cleared by writing to SIE_STATUS.RESUME_REMOTE</description>
+                        <description>Host: raised when a device wakes up the host. Cleared by writing to SIE_STATUS.RESUME</description>
                         <bitRange>[1:1]</bitRange>
                         <access>read-only</access>
                     </field>
@@ -44374,7 +44316,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>DEV_RESUME_FROM_HOST</name>
-                        <description>Set when the device receives a resume from the host. Cleared by writing to SIE_STATUS.RESUME_REMOTE</description>
+                        <description>Set when the device receives a resume from the host. Cleared by writing to SIE_STATUS.RESUME</description>
                         <bitRange>[15:15]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -44398,7 +44340,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>VBUS_DETECT</name>
-                        <description>Source: SIE_STATUS.VBUS_DETECT</description>
+                        <description>Source: SIE_STATUS.VBUS_DETECTED</description>
                         <bitRange>[11:11]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -44458,7 +44400,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>HOST_RESUME</name>
-                        <description>Host: raised when a device wakes up the host. Cleared by writing to SIE_STATUS.RESUME_REMOTE</description>
+                        <description>Host: raised when a device wakes up the host. Cleared by writing to SIE_STATUS.RESUME</description>
                         <bitRange>[1:1]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -44502,7 +44444,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>DEV_RESUME_FROM_HOST</name>
-                        <description>Set when the device receives a resume from the host. Cleared by writing to SIE_STATUS.RESUME_REMOTE</description>
+                        <description>Set when the device receives a resume from the host. Cleared by writing to SIE_STATUS.RESUME</description>
                         <bitRange>[15:15]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -44526,7 +44468,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>VBUS_DETECT</name>
-                        <description>Source: SIE_STATUS.VBUS_DETECT</description>
+                        <description>Source: SIE_STATUS.VBUS_DETECTED</description>
                         <bitRange>[11:11]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -44586,7 +44528,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>HOST_RESUME</name>
-                        <description>Host: raised when a device wakes up the host. Cleared by writing to SIE_STATUS.RESUME_REMOTE</description>
+                        <description>Host: raised when a device wakes up the host. Cleared by writing to SIE_STATUS.RESUME</description>
                         <bitRange>[1:1]</bitRange>
                         <access>read-write</access>
                     </field>
@@ -44630,7 +44572,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>DEV_RESUME_FROM_HOST</name>
-                        <description>Set when the device receives a resume from the host. Cleared by writing to SIE_STATUS.RESUME_REMOTE</description>
+                        <description>Set when the device receives a resume from the host. Cleared by writing to SIE_STATUS.RESUME</description>
                         <bitRange>[15:15]</bitRange>
                         <access>read-only</access>
                     </field>
@@ -44654,7 +44596,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>VBUS_DETECT</name>
-                        <description>Source: SIE_STATUS.VBUS_DETECT</description>
+                        <description>Source: SIE_STATUS.VBUS_DETECTED</description>
                         <bitRange>[11:11]</bitRange>
                         <access>read-only</access>
                     </field>
@@ -44714,7 +44656,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>HOST_RESUME</name>
-                        <description>Host: raised when a device wakes up the host. Cleared by writing to SIE_STATUS.RESUME_REMOTE</description>
+                        <description>Host: raised when a device wakes up the host. Cleared by writing to SIE_STATUS.RESUME</description>
                         <bitRange>[1:1]</bitRange>
                         <access>read-only</access>
                     </field>
@@ -44727,11 +44669,15 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>USBCTRL_IRQ</name>
+            <value>5</value>
+        </interrupt>
     </peripheral>
     <peripheral>
-        <name>USB_DPRAM</name>
-        <description>DPRAM layout for USB device.</description>
+        <name>USB_DEVICE_DPRAM</name>
         <baseAddress>0x50100000</baseAddress>
+        <description>DPRAM layout for USB device.</description>
         <addressBlock>
             <offset>0</offset>
             <size>256</size>
@@ -50335,8 +50281,8 @@ SPDX-License-Identifier: BSD-3-Clause
     </peripheral>
     <peripheral>
         <name>VREG_AND_CHIP_RESET</name>
-        <description>control and status for on-chip voltage regulator and chip level reset subsystem</description>
         <baseAddress>0x40064000</baseAddress>
+        <description>control and status for on-chip voltage regulator and chip level reset subsystem</description>
         <addressBlock>
             <offset>0</offset>
             <size>12</size>
@@ -50484,7 +50430,8 @@ SPDX-License-Identifier: BSD-3-Clause
                         <name>TRIGGER</name>
                         <description>Trigger a watchdog reset</description>
                         <bitRange>[31:31]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                     <field>
                         <name>ENABLE</name>
@@ -50689,17 +50636,13 @@ SPDX-License-Identifier: BSD-3-Clause
     </peripheral>
     <peripheral>
         <name>XIP_CTRL</name>
-        <description>QSPI flash execute-in-place block</description>
         <baseAddress>0x14000000</baseAddress>
+        <description>QSPI flash execute-in-place block</description>
         <addressBlock>
             <offset>0</offset>
             <size>32</size>
             <usage>registers</usage>
         </addressBlock>
-        <interrupt>
-            <name>XIP_IRQ</name>
-            <value>6</value>
-        </interrupt>
         <registers>
             <register>
                 <name>CTRL</name>
@@ -50755,7 +50698,8 @@ SPDX-License-Identifier: BSD-3-Clause
                             Reading will hold the bus (stall the processor) until the flush 
                             completes. Alternatively STAT can be polled until completion.</description>
                         <bitRange>[0:0]</bitRange>
-                        <access>write-only</access>
+                        <access>read-write</access>
+                        <modifiedWriteValues>oneToClear</modifiedWriteValues>
                     </field>
                 </fields>
             </register>
@@ -50878,11 +50822,15 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+        <interrupt>
+            <name>XIP_IRQ</name>
+            <value>6</value>
+        </interrupt>
     </peripheral>
     <peripheral>
         <name>XOSC</name>
-        <description>Controls the crystal oscillator</description>
         <baseAddress>0x40024000</baseAddress>
+        <description>Controls the crystal oscillator</description>
         <addressBlock>
             <offset>0</offset>
             <size>32</size>
@@ -50898,7 +50846,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     <field>
                         <name>ENABLE</name>
                         <description>On power-up this field is initialised to DISABLE and the chip runs from the ROSC. 
-                            If the chip has subsequently been programmed to run from the XOSC then DISABLE may lock-up the chip. If this is a concern then run the clk_ref from the ROSC and enable the clk_sys RESUS feature. 
+                            If the chip has subsequently been programmed to run from the XOSC then setting this field to DISABLE may lock-up the chip. If this is a concern then run the clk_ref from the ROSC and enable the clk_sys RESUS feature. 
                             The 12-bit code is intended to give some protection against accidental writes. An invalid setting will enable the oscillator.</description>
                         <bitRange>[23:12]</bitRange>
                         <access>read-write</access>
@@ -50915,7 +50863,7 @@ SPDX-License-Identifier: BSD-3-Clause
                     </field>
                     <field>
                         <name>FREQ_RANGE</name>
-                        <description>Frequency range. An invalid setting will retain the previous value. The actual value being used can be read from STATUS_FREQ_RANGE. This resets to 0xAA0 and cannot be changed.</description>
+                        <description>Frequency range. This resets to 0xAA0 and cannot be changed.</description>
                         <bitRange>[11:0]</bitRange>
                         <access>read-write</access>
                         <enumeratedValues>
@@ -51001,13 +50949,13 @@ SPDX-License-Identifier: BSD-3-Clause
                         <description>This is used to save power by pausing the XOSC 
                             On power-up this field is initialised to WAKE 
                             An invalid write will also select WAKE 
-                            Warning: stop the PLLs before selecting dormant mode 
-                            Warning: setup the irq before selecting dormant mode</description>
+                            WARNING: stop the PLLs before selecting dormant mode 
+                            WARNING: setup the irq before selecting dormant mode</description>
                         <bitRange>[31:0]</bitRange>
                         <access>read-write</access>
                         <enumeratedValues>
                             <enumeratedValue>
-                                <name>dormant</name>
+                                <name>DORMANT</name>
                                 <value>1668246881</value>
                             </enumeratedValue>
                             <enumeratedValue>
@@ -51054,6 +51002,54 @@ SPDX-License-Identifier: BSD-3-Clause
                 </fields>
             </register>
         </registers>
+    </peripheral>
+    <peripheral>
+        <name>VIRTUAL</name>
+        <baseAddress>0x00000000</baseAddress>
+        <addressBlock>
+            <offset>0</offset>
+            <size>4</size>
+            <usage>registers</usage>
+        </addressBlock>
+        <registers>
+            <register>
+                <name>DUMMY</name>
+                <addressOffset>0x00000000</addressOffset>
+                <description>Dummy register for schema compliance</description>
+                <resetValue>0x00000000</resetValue>
+                <fields>
+                    <field>
+                        <name>DUMMY</name>
+                        <bitRange>[31:0]</bitRange>
+                        <access>read-only</access>
+                    </field>
+                </fields>
+            </register>
+        </registers>
+        <interrupt>
+            <name>SPARE_IRQ_0</name>
+            <value>26</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_1</name>
+            <value>27</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_2</name>
+            <value>28</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_3</name>
+            <value>29</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_4</name>
+            <value>30</value>
+        </interrupt>
+        <interrupt>
+            <name>SPARE_IRQ_5</name>
+            <value>31</value>
+        </interrupt>
     </peripheral>
     </peripherals>
 </device>

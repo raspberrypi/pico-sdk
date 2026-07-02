@@ -2132,9 +2132,9 @@
 #define SIO_MTIME_CTRL_EN_ACCESS "RW"
 // =============================================================================
 // Register    : SIO_MTIME
-// Description : Read/write access to the high half of RISC-V Machine-mode
-//               timer. This register is shared between both cores. If both
-//               cores write on the same cycle, core 1 takes precedence.
+// Description : Read/write access to the low half of RISC-V Machine-mode timer.
+//               This register is shared between both cores. If both cores write
+//               on the same cycle, core 1 takes precedence.
 #define SIO_MTIME_OFFSET _u(0x000001b0)
 #define SIO_MTIME_BITS   _u(0xffffffff)
 #define SIO_MTIME_RESET  _u(0x00000000)
@@ -2458,4 +2458,3 @@
 #define SIO_TMDS_POP_DOUBLE_L2_ACCESS "RF"
 // =============================================================================
 #endif // _HARDWARE_REGS_SIO_H
-

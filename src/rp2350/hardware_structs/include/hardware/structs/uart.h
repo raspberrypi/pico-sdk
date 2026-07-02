@@ -32,7 +32,7 @@ typedef struct {
     // 0x00000100 [8]     FE           (-) Framing error
     // 0x000000ff [7:0]   DATA         (-) Receive (read) data character
     io_rw_32 dr;
- 
+
     _REG_(UART_UARTRSR_OFFSET) // UART_UARTRSR
     // Receive Status Register/Error Clear Register, UARTRSR/UARTECR
     // 0x00000008 [3]     OE           (0) Overrun error
@@ -40,9 +40,9 @@ typedef struct {
     // 0x00000002 [1]     PE           (0) Parity error
     // 0x00000001 [0]     FE           (0) Framing error
     io_rw_32 rsr;
- 
+
     uint32_t _pad0[4];
- 
+
     _REG_(UART_UARTFR_OFFSET) // UART_UARTFR
     // Flag Register, UARTFR
     // 0x00000100 [8]     RI           (-) Ring indicator
@@ -55,24 +55,24 @@ typedef struct {
     // 0x00000002 [1]     DSR          (-) Data set ready
     // 0x00000001 [0]     CTS          (-) Clear to send
     io_ro_32 fr;
- 
+
     uint32_t _pad1;
- 
+
     _REG_(UART_UARTILPR_OFFSET) // UART_UARTILPR
     // IrDA Low-Power Counter Register, UARTILPR
     // 0x000000ff [7:0]   ILPDVSR      (0x00) 8-bit low-power divisor value
     io_rw_32 ilpr;
- 
+
     _REG_(UART_UARTIBRD_OFFSET) // UART_UARTIBRD
     // Integer Baud Rate Register, UARTIBRD
     // 0x0000ffff [15:0]  BAUD_DIVINT  (0x0000) The integer baud rate divisor
     io_rw_32 ibrd;
- 
+
     _REG_(UART_UARTFBRD_OFFSET) // UART_UARTFBRD
     // Fractional Baud Rate Register, UARTFBRD
     // 0x0000003f [5:0]   BAUD_DIVFRAC (0x00) The fractional baud rate divisor
     io_rw_32 fbrd;
- 
+
     _REG_(UART_UARTLCR_H_OFFSET) // UART_UARTLCR_H
     // Line Control Register, UARTLCR_H
     // 0x00000080 [7]     SPS          (0) Stick parity select
@@ -83,7 +83,7 @@ typedef struct {
     // 0x00000002 [1]     PEN          (0) Parity enable: 0 = parity is disabled and no parity bit...
     // 0x00000001 [0]     BRK          (0) Send break
     io_rw_32 lcr_h;
- 
+
     _REG_(UART_UARTCR_OFFSET) // UART_UARTCR
     // Control Register, UARTCR
     // 0x00008000 [15]    CTSEN        (0) CTS hardware flow control enable
@@ -99,13 +99,13 @@ typedef struct {
     // 0x00000002 [1]     SIREN        (0) SIR enable: 0 = IrDA SIR ENDEC is disabled
     // 0x00000001 [0]     UARTEN       (0) UART enable: 0 = UART is disabled
     io_rw_32 cr;
- 
+
     _REG_(UART_UARTIFLS_OFFSET) // UART_UARTIFLS
     // Interrupt FIFO Level Select Register, UARTIFLS
     // 0x00000038 [5:3]   RXIFLSEL     (0x2) Receive interrupt FIFO level select
     // 0x00000007 [2:0]   TXIFLSEL     (0x2) Transmit interrupt FIFO level select
     io_rw_32 ifls;
- 
+
     _REG_(UART_UARTIMSC_OFFSET) // UART_UARTIMSC
     // Interrupt Mask Set/Clear Register, UARTIMSC
     // 0x00000400 [10]    OEIM         (0) Overrun error interrupt mask
@@ -120,7 +120,7 @@ typedef struct {
     // 0x00000002 [1]     CTSMIM       (0) nUARTCTS modem interrupt mask
     // 0x00000001 [0]     RIMIM        (0) nUARTRI modem interrupt mask
     io_rw_32 imsc;
- 
+
     _REG_(UART_UARTRIS_OFFSET) // UART_UARTRIS
     // Raw Interrupt Status Register, UARTRIS
     // 0x00000400 [10]    OERIS        (0) Overrun error interrupt status
@@ -135,7 +135,7 @@ typedef struct {
     // 0x00000002 [1]     CTSRMIS      (-) nUARTCTS modem interrupt status
     // 0x00000001 [0]     RIRMIS       (-) nUARTRI modem interrupt status
     io_ro_32 ris;
- 
+
     _REG_(UART_UARTMIS_OFFSET) // UART_UARTMIS
     // Masked Interrupt Status Register, UARTMIS
     // 0x00000400 [10]    OEMIS        (0) Overrun error masked interrupt status
@@ -150,7 +150,7 @@ typedef struct {
     // 0x00000002 [1]     CTSMMIS      (-) nUARTCTS modem masked interrupt status
     // 0x00000001 [0]     RIMMIS       (-) nUARTRI modem masked interrupt status
     io_ro_32 mis;
- 
+
     _REG_(UART_UARTICR_OFFSET) // UART_UARTICR
     // Interrupt Clear Register, UARTICR
     // 0x00000400 [10]    OEIC         (-) Overrun error interrupt clear
@@ -165,7 +165,7 @@ typedef struct {
     // 0x00000002 [1]     CTSMIC       (-) nUARTCTS modem interrupt clear
     // 0x00000001 [0]     RIMIC        (-) nUARTRI modem interrupt clear
     io_rw_32 icr;
- 
+
     _REG_(UART_UARTDMACR_OFFSET) // UART_UARTDMACR
     // DMA Control Register, UARTDMACR
     // 0x00000004 [2]     DMAONERR     (0) DMA on error
@@ -179,4 +179,3 @@ typedef struct {
 static_assert(sizeof (uart_hw_t) == 0x004c, "");
 
 #endif // _HARDWARE_STRUCTS_UART_H
-

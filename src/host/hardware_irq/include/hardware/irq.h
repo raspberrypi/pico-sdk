@@ -42,7 +42,7 @@
  * where there is one IO interrupt per bank, per core. These are completely independent, so, for example, processor 0 can be
  * interrupted by GPIO 0 in bank 0, and processor 1 by GPIO 1 in the same bank.
  *
- * \note That all IRQ APIs affect the executing core only (i.e. the core calling the function).
+ * \note All IRQ APIs affect the executing core only (i.e. the core calling the function).
  *
  * \note You should not enable the same (shared) IRQ number on both cores, as this will lead to race conditions
  * or starvation of one of the cores. Additionally, don't forget that disabling interrupts on one core does not disable interrupts
@@ -319,12 +319,12 @@ void irq_init_priorities(void);
 
 /*! \brief Claim ownership of a user IRQ on the calling core
  *  \ingroup hardware_irq
- *  
+ *
  * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
  * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therefore all functions
  * dealing with Uer IRQs affect only the calling core
- * 
+ *
  * This method explicitly claims ownership of a user IRQ, so other code can know it is being used.
  *
  * \param irq_num the user IRQ to claim
@@ -338,10 +338,10 @@ void user_irq_claim(uint irq_num);
  *
  * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therefore all functions
  * dealing with Uer IRQs affect only the calling core
- * 
+ *
  * This method explicitly releases ownership of a user IRQ, so other code can know it is free to use.
- * 
- * \note it is customary to have disabled the irq and removed the handler prior to calling this method.
+ *
+ * \note It is customary to have disabled the irq and removed the handler prior to calling this method.
  *
  * \param irq_num the irq irq_num to unclaim
  */
@@ -349,12 +349,12 @@ void user_irq_unclaim(uint irq_num);
 
 /*! \brief Claim ownership of a free user IRQ on the calling core
  *  \ingroup hardware_irq
- *  
+ *
  * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
  * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therefore all functions
  * dealing with Uer IRQs affect only the calling core
- * 
+ *
  * This method explicitly claims ownership of an unused user IRQ if there is one, so other code can know it is being used.
  *
  * \param required if true the function will panic if none are available
@@ -365,7 +365,7 @@ int user_irq_claim_unused(bool required);
 /*
 *! \brief Check if a user IRQ is in use on the calling core
  *  \ingroup hardware_irq
- *  
+ *
  * User IRQs are numbered 26-31 and are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
  * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therefore all functions

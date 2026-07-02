@@ -10,27 +10,29 @@
 // Version        : 1
 // Bus type       : apb
 // Description    : Controls time and alarms
-//
 //                  time is a 64 bit value indicating the time since power-on
-//
 //                  timeh is the top 32 bits of time & timel is the bottom 32
-//                  bits to change time write to timelw before timehw to read
-//                  time read from timelr before timehr
-//
+//                  bits
+//                  to change time write to timelw before timehw
+//                  to read time read from timelr before timehr
 //                  An alarm is set by setting alarm_enable and writing to the
-//                  corresponding alarm register When an alarm is pending, the
-//                  corresponding alarm_running signal will be high An alarm can
-//                  be cancelled before it has finished by clearing the
-//                  alarm_enable When an alarm fires, the corresponding
-//                  alarm_irq is set and alarm_running is cleared To clear the
-//                  interrupt write a 1 to the corresponding alarm_irq The timer
-//                  can be locked to prevent writing
+//                  corresponding alarm register
+//                  When an alarm is pending, the corresponding alarm_running
+//                  signal will be high
+//                  An alarm can be cancelled before it has finished by clearing
+//                  the alarm_enable
+//                  When an alarm fires, the corresponding alarm_irq is set and
+//                  alarm_running is cleared
+//                  To clear the interrupt write a 1 to the corresponding
+//                  alarm_irq
+//                  The timer can be locked to prevent writing
 // =============================================================================
 #ifndef _HARDWARE_REGS_TIMER_H
 #define _HARDWARE_REGS_TIMER_H
 // =============================================================================
 // Register    : TIMER_TIMEHW
-// Description : Write to bits 63:32 of time always write timelw before timehw
+// Description : Write to bits 63:32 of time
+//               always write timelw before timehw
 #define TIMER_TIMEHW_OFFSET _u(0x00000000)
 #define TIMER_TIMEHW_BITS   _u(0xffffffff)
 #define TIMER_TIMEHW_RESET  _u(0x00000000)
@@ -39,8 +41,8 @@
 #define TIMER_TIMEHW_ACCESS "WF"
 // =============================================================================
 // Register    : TIMER_TIMELW
-// Description : Write to bits 31:0 of time writes do not get copied to time
-//               until timehw is written
+// Description : Write to bits 31:0 of time
+//               writes do not get copied to time until timehw is written
 #define TIMER_TIMELW_OFFSET _u(0x00000004)
 #define TIMER_TIMELW_BITS   _u(0xffffffff)
 #define TIMER_TIMELW_RESET  _u(0x00000000)
@@ -49,7 +51,8 @@
 #define TIMER_TIMELW_ACCESS "WF"
 // =============================================================================
 // Register    : TIMER_TIMEHR
-// Description : Read from bits 63:32 of time always read timelr before timehr
+// Description : Read from bits 63:32 of time
+//               always read timelr before timehr
 #define TIMER_TIMEHR_OFFSET _u(0x00000008)
 #define TIMER_TIMEHR_BITS   _u(0xffffffff)
 #define TIMER_TIMEHR_RESET  _u(0x00000000)
@@ -67,10 +70,10 @@
 #define TIMER_TIMELR_ACCESS "RO"
 // =============================================================================
 // Register    : TIMER_ALARM0
-// Description : Arm alarm 0, and configure the time it will fire. Once armed,
-//               the alarm fires when TIMER_ALARM0 == TIMELR. The alarm will
-//               disarm itself once it fires, and can be disarmed early using
-//               the ARMED status register.
+// Description : Arm alarm 0, and configure the time it will fire.
+//               Once armed, the alarm fires when TIMER_ALARM0 == TIMELR.
+//               The alarm will disarm itself once it fires, and can
+//               be disarmed early using the ARMED status register.
 #define TIMER_ALARM0_OFFSET _u(0x00000010)
 #define TIMER_ALARM0_BITS   _u(0xffffffff)
 #define TIMER_ALARM0_RESET  _u(0x00000000)
@@ -79,10 +82,10 @@
 #define TIMER_ALARM0_ACCESS "RW"
 // =============================================================================
 // Register    : TIMER_ALARM1
-// Description : Arm alarm 1, and configure the time it will fire. Once armed,
-//               the alarm fires when TIMER_ALARM1 == TIMELR. The alarm will
-//               disarm itself once it fires, and can be disarmed early using
-//               the ARMED status register.
+// Description : Arm alarm 1, and configure the time it will fire.
+//               Once armed, the alarm fires when TIMER_ALARM1 == TIMELR.
+//               The alarm will disarm itself once it fires, and can
+//               be disarmed early using the ARMED status register.
 #define TIMER_ALARM1_OFFSET _u(0x00000014)
 #define TIMER_ALARM1_BITS   _u(0xffffffff)
 #define TIMER_ALARM1_RESET  _u(0x00000000)
@@ -91,10 +94,10 @@
 #define TIMER_ALARM1_ACCESS "RW"
 // =============================================================================
 // Register    : TIMER_ALARM2
-// Description : Arm alarm 2, and configure the time it will fire. Once armed,
-//               the alarm fires when TIMER_ALARM2 == TIMELR. The alarm will
-//               disarm itself once it fires, and can be disarmed early using
-//               the ARMED status register.
+// Description : Arm alarm 2, and configure the time it will fire.
+//               Once armed, the alarm fires when TIMER_ALARM2 == TIMELR.
+//               The alarm will disarm itself once it fires, and can
+//               be disarmed early using the ARMED status register.
 #define TIMER_ALARM2_OFFSET _u(0x00000018)
 #define TIMER_ALARM2_BITS   _u(0xffffffff)
 #define TIMER_ALARM2_RESET  _u(0x00000000)
@@ -103,10 +106,10 @@
 #define TIMER_ALARM2_ACCESS "RW"
 // =============================================================================
 // Register    : TIMER_ALARM3
-// Description : Arm alarm 3, and configure the time it will fire. Once armed,
-//               the alarm fires when TIMER_ALARM3 == TIMELR. The alarm will
-//               disarm itself once it fires, and can be disarmed early using
-//               the ARMED status register.
+// Description : Arm alarm 3, and configure the time it will fire.
+//               Once armed, the alarm fires when TIMER_ALARM3 == TIMELR.
+//               The alarm will disarm itself once it fires, and can
+//               be disarmed early using the ARMED status register.
 #define TIMER_ALARM3_OFFSET _u(0x0000001c)
 #define TIMER_ALARM3_BITS   _u(0xffffffff)
 #define TIMER_ALARM3_RESET  _u(0x00000000)
@@ -115,10 +118,10 @@
 #define TIMER_ALARM3_ACCESS "RW"
 // =============================================================================
 // Register    : TIMER_ARMED
-// Description : Indicates the armed/disarmed status of each alarm. A write to
-//               the corresponding ALARMx register arms the alarm. Alarms
-//               automatically disarm upon firing, but writing ones here will
-//               disarm immediately without waiting to fire.
+// Description : Indicates the armed/disarmed status of each alarm.
+//               A write to the corresponding ALARMx register arms the alarm.
+//               Alarms automatically disarm upon firing, but writing ones here
+//               will disarm immediately without waiting to fire.
 #define TIMER_ARMED_OFFSET _u(0x00000020)
 #define TIMER_ARMED_BITS   _u(0x0000000f)
 #define TIMER_ARMED_RESET  _u(0x00000000)
@@ -177,8 +180,8 @@
 #define TIMER_PAUSE_ACCESS "RW"
 // =============================================================================
 // Register    : TIMER_LOCKED
-// Description : Set locked bit to disable write access to timer Once set,
-//               cannot be cleared (without a reset)
+// Description : Set locked bit to disable write access to timer
+//               Once set, cannot be cleared (without a reset)
 #define TIMER_LOCKED_OFFSET _u(0x00000034)
 #define TIMER_LOCKED_BITS   _u(0x00000001)
 #define TIMER_LOCKED_RESET  _u(0x00000000)
@@ -343,4 +346,3 @@
 #define TIMER_INTS_ALARM_0_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_TIMER_H
-

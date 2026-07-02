@@ -227,7 +227,7 @@ inline static uint32_t to_remainder_u32(divmod_result_t r) {
  * \param r A pair of 32-bit quotient/remainder values.
  * \return Signed remainder
  *
- * \note On arm this is just a 32 bit register move or a nop
+ * \note On Arm this is just a 32 bit register move or a nop
  */
 inline static int32_t to_remainder_s32(divmod_result_t r) {
     return (int32_t)(r >> 32u);

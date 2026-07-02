@@ -22,6 +22,8 @@
 // On RP2040 this must be a GPIO that supports clock output, see the GPIO function table in the datasheet.
 #define RTC_GPIO_OUT 21
 
+#define USED_PIN_MASK ((1u << SLEEP_MONITOR_PIN)|(1u << WAKE_UP_PIN)|(1u << PICO_DEFAULT_UART_TX_PIN)|(1u << PICO_DEFAULT_UART_RX_PIN))
+
 
 static inline void init_external_gpios(void) {
     gpio_init(SLEEP_MONITOR_PIN);

@@ -224,6 +224,27 @@ int low_power_set_external_clock_source(uint src_hz, uint gpio_pin) {
 }
 #endif  // inline in header for other platforms
 
+void low_power_set_pins_low_leakage_exclude_mask(uint32_t exclude_mask) {
+    for (uint i=0; i < NUM_BANK0_GPIOS; i++) {
+        if (exclude_mask & (1u << i)) continue;
+        gpio_disable_pulls(i);
+        gpio_set_input_enabled(i, false);
+        gpio_set_oeover(i, IO_BANK0_GPIO0_CTRL_OEOVER_VALUE_DISABLE);
+    }
+}
+
+// this function is provided (in low_power.h) as an inlined call to the 32 bit version if we have <= 32 GPIOs
+#if NUM_BANK0_GPIOS > 32
+void low_power_set_pins_low_leakage_exclude_mask64(uint64_t exclude_mask) {
+    for (uint i=0; i < NUM_BANK0_GPIOS; i++) {
+        if (exclude_mask & (1ull << i)) continue;
+        gpio_disable_pulls(i);
+        gpio_set_input_enabled(i, false);
+        gpio_set_oeover(i, IO_BANK0_GPIO0_CTRL_OEOVER_VALUE_DISABLE);
+    }
+}
+#endif
+
 int low_power_sleep_until_irq(const clock_dest_bitset_t *keep_enabled) {
     clock_dest_bitset_t local_keep_enabled;
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
@@ -424,7 +445,15 @@ static void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_so
             clk_sys_src = CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLK_REF;
             clk_sys_aux_src = 0;
             break;
-#if !PICO_RP2040
+#if PICO_RP2040
+        case DORMANT_CLOCK_SOURCE_RTC:
+            clk_ref_src_hz = rosc_measure_freq_khz() * KHZ;
+            clk_ref_src = CLOCKS_CLK_REF_CTRL_SRC_VALUE_ROSC_CLKSRC_PH;
+            clk_sys_src_hz = clk_ref_src_hz;
+            clk_sys_src = CLOCKS_CLK_SYS_CTRL_SRC_VALUE_CLK_REF;
+            clk_sys_aux_src = 0;
+            break;
+#else
         case DORMANT_CLOCK_SOURCE_LPOSC:
             clk_ref_src_hz = 32 * KHZ;
             clk_ref_src = CLOCKS_CLK_REF_CTRL_SRC_VALUE_LPOSC_CLKSRC;
@@ -475,6 +504,26 @@ static void low_power_setup_clocks_for_dormant(dormant_clock_source_t dormant_so
     if (dormant_source == DORMANT_CLOCK_SOURCE_XOSC) {
         // Safe to disable rosc
         rosc_disable();
+#if PICO_RP2040
+    } else if (dormant_source == DORMANT_CLOCK_SOURCE_RTC) {
+        // Run RTC directly from XOSC
+    #if (XOSC_HZ % RTC_CLOCK_FREQ_HZ == 0)
+        // this doesn't pull in 64 bit arithmetic
+        clock_configure_int_divider(clk_rtc,
+                        0, // No GLMUX
+                        CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_XOSC_CLKSRC,
+                        XOSC_HZ,
+                        XOSC_HZ / RTC_CLOCK_FREQ_HZ);
+
+    #else
+        clock_configure(clk_rtc,
+                        0, // No GLMUX
+                        CLOCKS_CLK_RTC_CTRL_AUXSRC_VALUE_XOSC_CLKSRC,
+                        XOSC_HZ,
+                        RTC_CLOCK_FREQ_HZ);
+
+    #endif
+#endif
     } else {
         // Safe to disable xosc
         xosc_disable();
@@ -496,7 +545,9 @@ static void low_power_wake_from_dormant(void) {
 static void low_power_go_dormant(dormant_clock_source_t dormant_clock_source) {
     valid_params_if(PICO_LOW_POWER,
         dormant_clock_source == DORMANT_CLOCK_SOURCE_XOSC || dormant_clock_source == DORMANT_CLOCK_SOURCE_ROSC
-    #if !PICO_RP2040
+    #if PICO_RP2040
+        || dormant_clock_source == DORMANT_CLOCK_SOURCE_RTC
+    #else
         || dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC
     #endif
     );
@@ -529,12 +580,14 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     replace_null_enable_values(keep_enabled, &local_keep_enabled);
 
 #if PICO_RP2040
-    if (dormant_rtc_src_hz == 0) {
-        return PICO_ERROR_PRECONDITION_NOT_MET;
-    }
-    // The RTC must be run from an external source, since the dormant source will be inactive
-    if (!rtc_run_from_external_source(dormant_rtc_src_hz, dormant_rtc_gpio_pin)) {
-        return PICO_ERROR_PRECONDITION_NOT_MET;
+    if (dormant_clock_source != DORMANT_CLOCK_SOURCE_RTC) {
+        if (dormant_rtc_src_hz == 0) {
+            return PICO_ERROR_PRECONDITION_NOT_MET;
+        }
+        // The RTC must be run from an external source, since the dormant source will be inactive
+        if (!rtc_run_from_external_source(dormant_rtc_src_hz, dormant_rtc_gpio_pin)) {
+            return PICO_ERROR_PRECONDITION_NOT_MET;
+        }
     }
     clock_dest_bitset_add(&local_keep_enabled, CLK_DEST_RTC_RTC);
 #elif PICO_RP2350

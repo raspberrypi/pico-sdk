@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -175,7 +175,7 @@
 //               On power-up this field is initialised to WAKE
 //               An invalid write will also select WAKE
 //               Warning: setup the irq before selecting dormant mode
-//               0x636f6d61 -> dormant
+//               0x636f6d61 -> DORMANT
 //               0x77616b65 -> WAKE
 #define ROSC_DORMANT_OFFSET _u(0x0000000c)
 #define ROSC_DORMANT_BITS   _u(0xffffffff)
@@ -311,4 +311,3 @@
 #define ROSC_COUNT_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_ROSC_H
-

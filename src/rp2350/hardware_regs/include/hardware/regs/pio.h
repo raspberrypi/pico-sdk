@@ -461,7 +461,8 @@
 // =============================================================================
 // Register    : PIO_DBG_PADOUT
 // Description : Read to sample the pad output values PIO is currently driving
-//               to the GPIOs.
+//               to the GPIOs. On RP2040 there are 30 GPIOs, so the two most
+//               significant bits are hardwired to 0.
 #define PIO_DBG_PADOUT_OFFSET _u(0x0000003c)
 #define PIO_DBG_PADOUT_BITS   _u(0xffffffff)
 #define PIO_DBG_PADOUT_RESET  _u(0x00000000)
@@ -471,7 +472,8 @@
 // =============================================================================
 // Register    : PIO_DBG_PADOE
 // Description : Read to sample the pad output enables (direction) PIO is
-//               currently driving to the GPIOs.
+//               currently driving to the GPIOs. On RP2040 there are 30 GPIOs,
+//               so the two most significant bits are hardwired to 0.
 #define PIO_DBG_PADOE_OFFSET _u(0x00000040)
 #define PIO_DBG_PADOE_BITS   _u(0xffffffff)
 #define PIO_DBG_PADOE_RESET  _u(0x00000000)
@@ -941,7 +943,8 @@
 // Description : Comparison used for the MOV x, STATUS instruction.
 //               0x0 -> All-ones if TX FIFO level < N, otherwise all-zeroes
 //               0x1 -> All-ones if RX FIFO level < N, otherwise all-zeroes
-//               0x2 -> All-ones if the indexed IRQ flag is raised, otherwise all-zeroes
+//               0x2 -> All-ones if the indexed IRQ flag is raised, otherwise all-
+//               zeroes
 #define PIO_SM0_EXECCTRL_STATUS_SEL_RESET  _u(0x0)
 #define PIO_SM0_EXECCTRL_STATUS_SEL_BITS   _u(0x00000060)
 #define PIO_SM0_EXECCTRL_STATUS_SEL_MSB    _u(6)
@@ -1340,7 +1343,8 @@
 // Description : Comparison used for the MOV x, STATUS instruction.
 //               0x0 -> All-ones if TX FIFO level < N, otherwise all-zeroes
 //               0x1 -> All-ones if RX FIFO level < N, otherwise all-zeroes
-//               0x2 -> All-ones if the indexed IRQ flag is raised, otherwise all-zeroes
+//               0x2 -> All-ones if the indexed IRQ flag is raised, otherwise all-
+//               zeroes
 #define PIO_SM1_EXECCTRL_STATUS_SEL_RESET  _u(0x0)
 #define PIO_SM1_EXECCTRL_STATUS_SEL_BITS   _u(0x00000060)
 #define PIO_SM1_EXECCTRL_STATUS_SEL_MSB    _u(6)
@@ -1739,7 +1743,8 @@
 // Description : Comparison used for the MOV x, STATUS instruction.
 //               0x0 -> All-ones if TX FIFO level < N, otherwise all-zeroes
 //               0x1 -> All-ones if RX FIFO level < N, otherwise all-zeroes
-//               0x2 -> All-ones if the indexed IRQ flag is raised, otherwise all-zeroes
+//               0x2 -> All-ones if the indexed IRQ flag is raised, otherwise all-
+//               zeroes
 #define PIO_SM2_EXECCTRL_STATUS_SEL_RESET  _u(0x0)
 #define PIO_SM2_EXECCTRL_STATUS_SEL_BITS   _u(0x00000060)
 #define PIO_SM2_EXECCTRL_STATUS_SEL_MSB    _u(6)
@@ -2138,7 +2143,8 @@
 // Description : Comparison used for the MOV x, STATUS instruction.
 //               0x0 -> All-ones if TX FIFO level < N, otherwise all-zeroes
 //               0x1 -> All-ones if RX FIFO level < N, otherwise all-zeroes
-//               0x2 -> All-ones if the indexed IRQ flag is raised, otherwise all-zeroes
+//               0x2 -> All-ones if the indexed IRQ flag is raised, otherwise all-
+//               zeroes
 #define PIO_SM3_EXECCTRL_STATUS_SEL_RESET  _u(0x0)
 #define PIO_SM3_EXECCTRL_STATUS_SEL_BITS   _u(0x00000060)
 #define PIO_SM3_EXECCTRL_STATUS_SEL_MSB    _u(6)
@@ -3412,4 +3418,3 @@
 #define PIO_IRQ1_INTS_SM0_RXNEMPTY_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_PIO_H
-

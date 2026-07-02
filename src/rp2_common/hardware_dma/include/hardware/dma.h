@@ -233,7 +233,7 @@ static inline void channel_config_set_write_address_update_type(dma_channel_conf
 /*! \brief  Set DMA channel read increment in a channel configuration object
 *  \ingroup channel_config
 *
-* \note this method is equivalent to
+* \note This method is equivalent to
 * \code
 * channel_config_set_read_address_update_type(c, incr ? DMA_ADDRESS_UPDATE_INCREMENT : DMA_ADDRESS_UPDATE_NONE)
 * \endcode
@@ -250,7 +250,7 @@ static inline void channel_config_set_read_increment(dma_channel_config_t *c, bo
 /*! \brief  Set DMA channel write increment in a channel configuration object
  *  \ingroup channel_config
  *
- * \note this method is equivalent to
+ * \note This method is equivalent to
  * \code
  * channel_config_set_write_address_update_type(c, incr ? DMA_ADDRESS_UPDATE_INCREMENT : DMA_ADDRESS_UPDATE_NONE)
  * \endcode
@@ -664,7 +664,7 @@ static inline void dma_channel_configure(uint channel, const dma_channel_config_
  * The best practice is always to use either \ref dma_encode_transfer_count, \ref dma_encode_transfer_count_with_self_trigger, or \ref dma_encode_endless_transfer_count to generate a value
  * to pass for this argument
  */
-inline static void __attribute__((always_inline)) dma_channel_transfer_from_buffer_now(uint channel, 
+inline static void __attribute__((always_inline)) dma_channel_transfer_from_buffer_now(uint channel,
                                                                                        const volatile void *read_addr,
                                                                                        uint32_t encoded_transfer_count) {
 //    check_dma_channel_param(channel);

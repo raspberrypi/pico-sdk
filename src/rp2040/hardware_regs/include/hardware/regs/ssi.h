@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -141,7 +141,8 @@
 //               0x0 -> Both transmit and receive
 //               0x1 -> Transmit only (not for FRF == 0, standard SPI mode)
 //               0x2 -> Receive only (not for FRF == 0, standard SPI mode)
-//               0x3 -> EEPROM read mode (TX then RX; RX starts after control data TX'd)
+//               0x3 -> EEPROM read mode (TX then RX; RX starts after control data
+//               TX'd)
 #define SSI_CTRLR0_TMOD_RESET  _u(0x0)
 #define SSI_CTRLR0_TMOD_BITS   _u(0x00000300)
 #define SSI_CTRLR0_TMOD_MSB    _u(9)
@@ -779,8 +780,10 @@
 // Field       : SSI_SPI_CTRLR0_TRANS_TYPE
 // Description : Address and instruction transfer format
 //               0x0 -> Command and address both in standard SPI frame format
-//               0x1 -> Command in standard SPI format, address in format specified by FRF
-//               0x2 -> Command and address both in format specified by FRF (e.g. Dual-SPI)
+//               0x1 -> Command in standard SPI format, address in format specified by
+//               FRF
+//               0x2 -> Command and address both in format specified by FRF (e.g. Dual-
+//               SPI)
 #define SSI_SPI_CTRLR0_TRANS_TYPE_RESET  _u(0x0)
 #define SSI_SPI_CTRLR0_TRANS_TYPE_BITS   _u(0x00000003)
 #define SSI_SPI_CTRLR0_TRANS_TYPE_MSB    _u(1)
@@ -805,4 +808,3 @@
 #define SSI_TXD_DRIVE_EDGE_TDE_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_SSI_H
-
