@@ -190,10 +190,17 @@ static void stdio_stack_buffer_flush(stdio_stack_buffer_t *buffer) {
 
 static void stdio_buffered_printer(char c, void *arg) {
     stdio_stack_buffer_t *buffer = (stdio_stack_buffer_t *)arg;
+    // Invariant: buffer is never full at this point, as:
+    // * It's initially empty.
+    // * It's flushed if the following write makes it full.
+    // Therefore it's safe to perform this write *before* the `if (full)`:
+    buffer->buf[buffer->used++] = c;
+    // Hoisting the buffer write above the flush check lets the compiler omit
+    // stack setup/teardown in the early-out case. Savings add up because
+    // this function is called per char and cannot be inlined.
     if (buffer->used == PICO_STDIO_STACK_BUFFER_SIZE) {
         stdio_stack_buffer_flush(buffer);
     }
-    buffer->buf[buffer->used++] = c;
 }
 #endif
 
