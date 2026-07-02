@@ -19,7 +19,7 @@ extern "C" {
 /** \file low_power.h
  *  \defgroup pico_low_power pico_low_power
  *
- * \brief Lower Power APIs
+ * \brief APIs for using lower power states.
  *
  * There are three modes of operation: sleep, dormant, and Pstate, with the lowest power consumption being Pstate.
  *
