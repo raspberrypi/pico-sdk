@@ -23,7 +23,7 @@ set(ENV{_SAVED_PICO_GCC_TRIPLE} "${PICO_GCC_TRIPLE}")
 
 # Find GCC
 pico_find_compiler_with_triples(PICO_COMPILER_CC "${PICO_GCC_TRIPLE}" gcc)
-pico_choose_compiler_flags(${PICO_COMPILER_CC} PICO_COMMON_LANG_FLAGS PICO_COMMON_LANG_FLAGS_LIST)
+pico_choose_compiler_flags(${PICO_COMPILER_CC} PICO_COMMON_LANG_FLAGS PICO_COMMON_LANG_FLAGS_LIST PICO_COMMON_LANG_FLAGS_TEST_FILES)
 pico_find_compiler_with_triples(PICO_COMPILER_CXX "${PICO_GCC_TRIPLE}" g++)
 set(PICO_COMPILER_ASM "${PICO_COMPILER_CC}" CACHE INTERNAL "")
 pico_find_compiler_with_triples(PICO_OBJCOPY "${PICO_GCC_TRIPLE}" objcopy)
