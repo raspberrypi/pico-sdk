@@ -208,8 +208,23 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_spin_locks_reset, PICO_RUNTIME_INIT_
 #define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + PICO_NUM_VTABLE_IRQS)
 #endif
 
+#ifndef PICO_RAM_VECTOR_TABLE_ALIGNMENT
+#if PICO_RAM_VECTOR_TABLE_SIZE <= 64
+#define PICO_RAM_VECTOR_TABLE_ALIGNMENT 256
+#elif PICO_RAM_VECTOR_TABLE_SIZE <= 128
+#define PICO_RAM_VECTOR_TABLE_ALIGNMENT 512
+#else
+// crt0.S only supports 80 IRQs at the moment anyway, giving max size of (16 + 80) = 96
+#error "Need to add PICO_RAM_VECTOR_TABLE_ALIGNMENT setting support for PICO_RAM_VECTOR_TABLE_SIZE > 128"
+#endif
+#endif
+
 
 uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[PICO_RAM_VECTOR_TABLE_SIZE];
+#if PICO_VTABLE_PER_CORE
+// core1 vector table can just be placed at an aligned address, rather than in a specific section
+uint32_t __aligned(PICO_RAM_VECTOR_TABLE_ALIGNMENT) ram_vector_table_core1[PICO_RAM_VECTOR_TABLE_SIZE];
+#endif
 
 void runtime_init_install_ram_vector_table(void) {
     // Note on RISC-V the RAM vector table is initialised during crt0
@@ -217,17 +232,35 @@ void runtime_init_install_ram_vector_table(void) {
     extern uint32_t __vectors;
     extern uint32_t __vectors_end;
     uint32_t stored_words = ((uintptr_t)&__vectors_end - (uintptr_t)&__vectors) / sizeof(uint32_t);
-    __builtin_memcpy(ram_vector_table, &__vectors, 4 * MIN(stored_words, PICO_RAM_VECTOR_TABLE_SIZE));
-    for(uint i = stored_words; i<count_of(ram_vector_table); i++) {
-        ram_vector_table[i] = (uintptr_t)__unhandled_user_irq;
+#if PICO_VTABLE_PER_CORE
+    uint32_t* ram_vector_table_ptr = get_core_num() ? ram_vector_table_core1 : ram_vector_table;
+#else
+    uint32_t* ram_vector_table_ptr = ram_vector_table;
+#endif
+    __builtin_memcpy(ram_vector_table_ptr, &__vectors, 4 * MIN(stored_words, PICO_RAM_VECTOR_TABLE_SIZE));
+    for(uint i = stored_words; i<PICO_RAM_VECTOR_TABLE_SIZE; i++) {
+        ram_vector_table_ptr[i] = (uintptr_t)__unhandled_user_irq;
     }
-    scb_hw->vtor = (uintptr_t) ram_vector_table;
+    scb_hw->vtor = (uintptr_t) ram_vector_table_ptr;
 #endif
 }
-#endif
+
+#if PICO_VTABLE_PER_CORE
+void runtime_init_install_ram_vector_table_core1(void) {
+    if (get_core_num()) runtime_init_install_ram_vector_table();
+}
 #endif
 
+#endif // !PICO_RUNTIME_NO_INIT_INSTALL_RAM_VECTOR_TABLE
+#endif // !__riscv
+
 #if !PICO_RUNTIME_SKIP_INIT_INSTALL_RAM_VECTOR_TABLE
-// todo this wants to be per core if we decide to support per core vector tables
+#if PICO_VTABLE_PER_CORE
+// core0 version must run at normal time, as other runtime init functions depend on it
 PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_install_ram_vector_table, PICO_RUNTIME_INIT_INSTALL_RAM_VECTOR_TABLE);
+// core1 version has to be in per core initialisers, but this would be too late for core0
+PICO_RUNTIME_INIT_FUNC_PER_CORE(runtime_init_install_ram_vector_table_core1, PICO_RUNTIME_INIT_INSTALL_RAM_VECTOR_TABLE);
+#else
+PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_install_ram_vector_table, PICO_RUNTIME_INIT_INSTALL_RAM_VECTOR_TABLE);
+#endif
 #endif

@@ -153,23 +153,29 @@ void multicore_reset_core1(void) {
 void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bottom, size_t stack_size_bytes) {
     assert(!(stack_size_bytes & 3u));
     uint32_t *stack_ptr = stack_bottom + stack_size_bytes / sizeof(uint32_t);
-    // Push values onto top of stack for core1_trampoline
 #ifdef __riscv
+#if PICO_VTABLE_PER_CORE
+    #warning PICO_VTABLE_PER_CORE==1 is not currently supported in pico_multicore on Risc-V
+    panic_unsupported();
+#endif
     // On RISC-V we also need to initialise the global pointer
     stack_ptr -= 4;
     uint32_t vector_table = riscv_read_csr(mtvec);
     asm volatile ("mv %0, gp" : "=r"(stack_ptr[3]));
 #else
     stack_ptr -= 3;
+#if PICO_VTABLE_PER_CORE
+    // core1 will add it's own vector table, so start it with the base one
+    extern uint32_t __vectors;
+    uint32_t vector_table = (uint32_t)&__vectors;
+#else
     uint32_t vector_table = scb_hw->vtor;
 #endif
+#endif
+    // Push values onto top of stack for core1_trampoline
     stack_ptr[0] = (uintptr_t) entry;
     stack_ptr[1] = (uintptr_t) stack_bottom;
     stack_ptr[2] = (uintptr_t) core1_wrapper;
-#if PICO_VTABLE_PER_CORE
-    #warning PICO_VTABLE_PER_CORE==1 is not currently supported in pico_multicore
-    panic_unsupported();
-#endif
     multicore_launch_core1_raw(core1_trampoline, stack_ptr, vector_table);
 }
 
