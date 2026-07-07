@@ -9,6 +9,7 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/rvcsr.h"
 #include "hardware/regs/watchdog.h"
+#include "hardware/irq.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom_constants.h"
@@ -48,10 +49,15 @@
 .section .data
 #endif
 
+.macro vtable_irq_n n
+.word isr_irq\n
+.endm
+
+.macro vector_table suffix
 .p2align 6
-.global __vectors, __VECTOR_TABLE
-__VECTOR_TABLE:
-__vectors:
+.global __vectors\suffix, __VECTOR_TABLE\suffix
+__VECTOR_TABLE\suffix:
+__vectors\suffix:
 
 // Hardware vector table for standard RISC-V interrupts, indicated by `mtvec`.
 
@@ -75,9 +81,9 @@ j isr_riscv_machine_timer
 // External IRQ dispatch, inlined into the last vector table slot. Note if
 // this code is modified, the VTABLE_FIRST_IRQ define in platform_defs.h also
 // needs to be modified (it identifies the beginning of the soft vector table)
-.global isr_riscv_machine_external_irq
-.weak isr_riscv_machine_external_irq
-isr_riscv_machine_external_irq:
+.global isr_riscv_machine_external_irq\suffix
+.weak isr_riscv_machine_external_irq\suffix
+isr_riscv_machine_external_irq\suffix:
     // Save caller saves and exception return state whilst IRQs are disabled.
     // We can't be preempted during this time, but if a higher-priority IRQ
     // arrives before we read meinext, that will be the one we enter.
@@ -102,39 +108,39 @@ isr_riscv_machine_external_irq:
     csrr a1, mstatus
     sw a0, 64(sp)
     sw a1, 68(sp)
-save_meicontext:
+save_meicontext\@:
     // Make sure to set meicontext.clearts to clear+save mie.msie/mtie along
     // with ext IRQ context. We don't let these preempt ext IRQs because they
     // clear meicontext.mreteirq, which breaks __get_current_exception().
     csrrsi a2, RVCSR_MEICONTEXT_OFFSET, RVCSR_MEICONTEXT_CLEARTS_BITS
     sw a2, 72(sp)
 
-get_first_irq:
+get_first_irq\@:
     // Sample the current highest-priority active IRQ (left-shifted by 2) from
     // meinext, and write 1 to meinext.update to update meicontext with the
     // preemption priority and IRQ number of this IRQ
     csrrsi a0, RVCSR_MEINEXT_OFFSET, RVCSR_MEINEXT_UPDATE_BITS
     // MSB will be set if there is no active IRQ at the current priority level
-    bltz a0, no_more_irqs
-dispatch_irq:
+    bltz a0, no_more_irqs\@
+dispatch_irq\@:
     // Preemption priority was configured by meinext update, so enable preemption:
     csrsi mstatus, 0x8
     // <- from this point we can be preempted by a higher-priority interrupt.
     // meinext is pre-shifted by 2, so only an add is required to index table
-    lui a1, %hi(__soft_vector_table)
+    lui a1, %hi(__soft_vector_table\suffix)
     add a1, a1, a0
-    lw a1, %lo(__soft_vector_table)(a1)
+    lw a1, %lo(__soft_vector_table\suffix)(a1)
     jalr ra, a1
     // Disable IRQs on returning so we can sample the next IRQ
     csrci mstatus, 0x8
-get_next_irq:
+get_next_irq\@:
     // Get the next-highest-priority IRQ that is active at this level. If
     // there is such an IRQ, update meicontext with new preemption priority.
     csrrsi a0, RVCSR_MEINEXT_OFFSET, RVCSR_MEINEXT_UPDATE_BITS
     // MSB will be set if there is no active IRQ at the current priority level
-    bgez a0, dispatch_irq
+    bgez a0, dispatch_irq\@
 
-no_more_irqs:
+no_more_irqs\@:
     // Restore saved context and return from IRQ
     lw a0, 64(sp)
     lw a1, 68(sp)
@@ -162,9 +168,9 @@ no_more_irqs:
     // abandon the mret and take the IRQ. This avoids a worst-case (restore ->
     // mret -> enter -> save) latency. Note since we have already restored
     // meicontext, we will have to re-save it, to re-clear mtie/msie.
-check_irq_before_exit:
+check_irq_before_exit\@:
     csrr a0, RVCSR_MEINEXT_OFFSET
-    bgez a0, save_meicontext
+    bgez a0, save_meicontext\@
     lw a0, 16(sp)
     addi sp, sp, 80
     mret
@@ -174,11 +180,8 @@ check_irq_before_exit:
 // mip.meip. Note this is assumed in e.g. hardware_irq to begin exactly 0x34
 // words after the hardware vector table indicated by mtvec (defined above).
 .p2align 4
-.global __soft_vector_table
-__soft_vector_table:
-.macro vtable_irq_n n
-.word isr_irq\n
-.endm
+.global __soft_vector_table\suffix
+__soft_vector_table\suffix:
 
 .altmacro
 .set IRQN, 0
@@ -187,6 +190,14 @@ vtable_irq_n %IRQN
 .set IRQN, IRQN + 1
 .endr
 .noaltmacro
+
+.endm // vector_table
+
+vector_table
+
+#if PICO_VTABLE_PER_CORE
+vector_table _core1
+#endif
 
 // all default trap handlers do nothing, and we can check for them being set to our
 // default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end

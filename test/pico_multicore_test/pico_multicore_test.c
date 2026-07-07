@@ -9,6 +9,7 @@
 #include "pico/multicore.h"
 #include "pico/test.h"
 #include "pico/time.h"
+#include "hardware/irq.h"
 
 #define CORE0_GPIO 7
 #define CORE1_GPIO 8
@@ -62,7 +63,15 @@ irq_handler_t test_gpio_irq_handler_core0 = &test_gpio;
 irq_handler_t test_gpio_irq_handler_core1 = &test_gpio;
 #endif
 
+static volatile uint32_t core1_vtor;
 static void main_core1(void) {
+#ifdef __riscv
+    core1_vtor = riscv_read_csr(RVCSR_MTVEC_OFFSET) & ~0x3u;
+#else
+    core1_vtor = scb_hw->vtor;
+#endif
+    printf("core1 vtor %p\n", (uint32_t*)core1_vtor);
+
     alarm_pool_t *core1_alarm_pool = alarm_pool_create_on_timer_with_unused_hardware_alarm(PICO_DEFAULT_TIMER_INSTANCE(), PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS);
 
     alarm_id_t alarm_id = alarm_pool_add_alarm_in_ms(core1_alarm_pool, 500, test_alarm, NULL, false);
@@ -78,6 +87,13 @@ static void main_core1(void) {
 
 int main() {
     stdio_init_all();
+
+#ifdef __riscv
+    uint32_t core0_vtor = riscv_read_csr(RVCSR_MTVEC_OFFSET) & ~0x3u;
+#else
+    uint32_t core0_vtor = scb_hw->vtor;
+#endif
+    printf("core0 vtor %p\n", (uint32_t*)core0_vtor);
 
     printf("pico_multicore_test begins\n");
     PICOTEST_START();
@@ -95,6 +111,11 @@ int main() {
     irq_set_enabled(IO_IRQ_BANK0, true);
     sleep_ms(1500);
 
+#if PICO_VTABLE_PER_CORE
+    PICOTEST_CHECK(core0_vtor != core1_vtor, "core0 and core1 have same vtor");
+#else
+    PICOTEST_CHECK(core0_vtor == core1_vtor, "core0 and core1 have different vtors");
+#endif
     PICOTEST_CHECK(test_alarm_called_core0, "test_alarm was not called on core0");
     PICOTEST_CHECK(test_alarm_called_core1, "test_alarm was not called on core1");
     PICOTEST_CHECK(test_gpio_called_core0, "test_gpio was not called on core0");

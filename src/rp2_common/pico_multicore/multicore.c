@@ -154,13 +154,15 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
     assert(!(stack_size_bytes & 3u));
     uint32_t *stack_ptr = stack_bottom + stack_size_bytes / sizeof(uint32_t);
 #ifdef __riscv
-#if PICO_VTABLE_PER_CORE
-    #warning PICO_VTABLE_PER_CORE==1 is not currently supported in pico_multicore on Risc-V
-    panic_unsupported();
-#endif
     // On RISC-V we also need to initialise the global pointer
     stack_ptr -= 4;
+#if PICO_VTABLE_PER_CORE
+    // core1 has a separate vector table from crt0_riscv.S
+    extern uint32_t __vectors_core1;
+    uint32_t vector_table = 1 + (uint32_t)&__vectors_core1;
+#else
     uint32_t vector_table = riscv_read_csr(mtvec);
+#endif
     asm volatile ("mv %0, gp" : "=r"(stack_ptr[3]));
 #else
     stack_ptr -= 3;
