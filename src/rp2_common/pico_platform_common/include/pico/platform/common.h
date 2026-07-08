@@ -36,6 +36,42 @@
 #endif
 #endif
 
+// note that this is not a safely overridable value, you should use override PICO_NUM_VTABLE_IRQs instead.
+// keeping around as a #define though as it used to be supported
+#ifdef PICO_RAM_VECTOR_TABLE_SIZE
+#warning Overriding PICO_RAM_VECTOR_TABLE_SIZE is deprecated; specify PICO_NUM_VTABLE_IRQS instead
+#endif
+#ifndef PICO_RAM_VECTOR_TABLE_SIZE
+#define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + PICO_NUM_VTABLE_IRQS)
+#endif
+
+#ifndef PICO_RAM_VECTOR_TABLE_ALIGNMENT
+#if PICO_RAM_VECTOR_TABLE_SIZE <= 64
+#define PICO_RAM_VECTOR_TABLE_ALIGNMENT 256
+#define PICO_RAM_VECTOR_TABLE_P2ALIGNMENT 8
+#elif PICO_RAM_VECTOR_TABLE_SIZE <= 128
+#define PICO_RAM_VECTOR_TABLE_ALIGNMENT 512
+#define PICO_RAM_VECTOR_TABLE_P2ALIGNMENT 9
+#else
+// crt0.S only supports 80 IRQs at the moment anyway, giving max size of (16 + 80) = 96
+#error "Need to add PICO_RAM_VECTOR_TABLE_ALIGNMENT defines for PICO_RAM_VECTOR_TABLE_SIZE > 128"
+#endif
+#endif
+
+// PICO_CONFIG: PICO_VTABLE_PER_CORE, Use separate vector tables per core, type=bool, default=0, group=hardware_irq
+#ifndef PICO_VTABLE_PER_CORE
+#define PICO_VTABLE_PER_CORE 0
+#endif
+
+// PICO_CONFIG: PICO_CORE1_VTABLE_PLACEMENT, Placement macro for the core 1 vector table on Arm (ignored on RISC-V), type=string, default=__in_data for no_flash binary types, __in_bss otherwise, group=hardware_irq
+#ifndef PICO_CORE1_VTABLE_PLACEMENT
+#if PICO_NO_FLASH
+#define PICO_CORE1_VTABLE_PLACEMENT __in_data
+#else
+#define PICO_CORE1_VTABLE_PLACEMENT __in_bss
+#endif
+#endif
+
 #ifndef __ASSEMBLER__
 
 // PICO_CONFIG: PICO_NO_FPGA_CHECK, Remove the FPGA platform check for small code size reduction, type=bool, default=1, advanced=true, group=pico_runtime

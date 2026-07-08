@@ -9,7 +9,6 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/rvcsr.h"
 #include "hardware/regs/watchdog.h"
-#include "hardware/irq.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom_constants.h"

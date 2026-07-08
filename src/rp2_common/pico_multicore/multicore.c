@@ -167,9 +167,15 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
 #else
     stack_ptr -= 3;
 #if PICO_VTABLE_PER_CORE
+#if PICO_NO_FLASH
+    // core1 has a separate vector table from crt0.S
+    extern uint32_t __vectors_core1;
+    uint32_t vector_table = 1 + (uint32_t)&__vectors_core1;
+#else
     // core1 will add it's own vector table, so start it with the base one
     extern uint32_t __vectors;
     uint32_t vector_table = (uint32_t)&__vectors;
+#endif
 #else
     uint32_t vector_table = scb_hw->vtor;
 #endif

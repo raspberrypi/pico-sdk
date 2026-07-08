@@ -199,31 +199,10 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_spin_locks_reset, PICO_RUNTIME_INIT_
 #include "hardware/irq.h"
 
 #if !PICO_RUNTIME_NO_INIT_INSTALL_RAM_VECTOR_TABLE
-// note that this is not a safely overridable value, you should use override PICO_NUM_VTABLE_IRQs instead.
-// keeping around as a #define though as it used to be supported
-#ifdef PICO_RAM_VECTOR_TABLE_SIZE
-#warning Overriding PICO_RAM_VECTOR_TABLE_SIZE is deprecated; specify PICO_NUM_VTABLE_IRQS instead
-#endif
-#ifndef PICO_RAM_VECTOR_TABLE_SIZE
-#define PICO_RAM_VECTOR_TABLE_SIZE (VTABLE_FIRST_IRQ + PICO_NUM_VTABLE_IRQS)
-#endif
-
-#ifndef PICO_RAM_VECTOR_TABLE_ALIGNMENT
-#if PICO_RAM_VECTOR_TABLE_SIZE <= 64
-#define PICO_RAM_VECTOR_TABLE_ALIGNMENT 256
-#elif PICO_RAM_VECTOR_TABLE_SIZE <= 128
-#define PICO_RAM_VECTOR_TABLE_ALIGNMENT 512
-#else
-// crt0.S only supports 80 IRQs at the moment anyway, giving max size of (16 + 80) = 96
-#error "Need to add PICO_RAM_VECTOR_TABLE_ALIGNMENT setting support for PICO_RAM_VECTOR_TABLE_SIZE > 128"
-#endif
-#endif
-
-
 uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[PICO_RAM_VECTOR_TABLE_SIZE];
 #if PICO_VTABLE_PER_CORE
-// core1 vector table can just be placed at an aligned address, rather than in a specific section
-uint32_t __aligned(PICO_RAM_VECTOR_TABLE_ALIGNMENT) ram_vector_table_core1[PICO_RAM_VECTOR_TABLE_SIZE];
+// Core 1 vector table can be placed anywhere by defining PICO_CORE1_VTABLE_PLACEMENT (defaults to __in_bss here)
+uint32_t __aligned(PICO_RAM_VECTOR_TABLE_ALIGNMENT) PICO_CORE1_VTABLE_PLACEMENT("ram_vector_table_core1") ram_vector_table_core1[PICO_RAM_VECTOR_TABLE_SIZE];
 #endif
 
 void runtime_init_install_ram_vector_table(void) {

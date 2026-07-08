@@ -53,12 +53,18 @@ pico_default_asm_setup
 #warning PICO_NO_STORED_VECTOR_TABLE is no longer used. PICO_MINIMAL_STORED_VECTOR_TABLE is not identical but usually serves the same purpose
 #endif
 
-.section .vectors, "ax"
-.align 2
+.macro if_irq_word num func
+.if \num < PICO_NUM_VTABLE_IRQS
+.word \func
+.endif
+.endm
 
-.global __vectors, __VECTOR_TABLE, __vectors_end
-__VECTOR_TABLE:
-__vectors:
+.macro vector_table suffix
+.align PICO_RAM_VECTOR_TABLE_P2ALIGNMENT // calculated in pico/platform/common.h
+
+.global __vectors\suffix, __VECTOR_TABLE\suffix, __vectors_end\suffix
+__VECTOR_TABLE\suffix:
+__vectors\suffix:
 .word __StackTop
 .word _reset_handler
 
@@ -91,12 +97,6 @@ __vectors:
 .word isr_invalid // Reserved, should never fire
 .word isr_pendsv
 .word isr_systick
-
-.macro if_irq_word num func
-.if \num < PICO_NUM_VTABLE_IRQS
-.word \func
-.endif
-.endm
 
 // we include a lot of these to allow for different number of IRQs.
 // if_irq_word will only include IRQs that are valid, but we can't
@@ -186,7 +186,11 @@ if_irq_word 79 isr_irq79
 #error more IRQ entries required
 #endif
 #endif  // #if !PICO_MINIMAL_STORED_VECTOR_TABLE
-__vectors_end:
+__vectors_end\suffix:
+.endm
+
+.section .vectors, "ax"
+vector_table
 
 // all default exception handlers do nothing, and we can check for them being set to our
 // default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
@@ -354,6 +358,12 @@ decl_isr_bkpt isr_systick
 
 .global __default_isrs_end
 __default_isrs_end:
+
+#if PICO_NO_FLASH && PICO_VTABLE_PER_CORE
+// Core 1 vector table can be placed anywhere by defining PICO_CORE1_VTABLE_PLACEMENT (defaults to __in_data here)
+.section PICO_CORE1_VTABLE_PLACEMENT(core1_vector_table), "a"
+vector_table _core1
+#endif
 
 // ----------------------------------------------------------------------------
 

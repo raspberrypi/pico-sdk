@@ -7,7 +7,50 @@
 #ifndef _PICO_PLATFORM_SECTION_MACROS_H
 #define _PICO_PLATFORM_SECTION_MACROS_H
 
+// Used by both C and ASM macros
+#ifndef PICO_NOT_IN_FLASH_PLACEMENT
+#define PICO_NOT_IN_FLASH_PLACEMENT __in_ram
+#endif
+#ifndef PICO_TIME_CRITICAL_PLACEMENT
+#define PICO_TIME_CRITICAL_PLACEMENT __in_ram
+#endif
+
 #ifndef __ASSEMBLER__
+
+/*! \brief Section attribute macro for placement in RAM in the `.data` section
+ *  \ingroup pico_platform
+ *
+ * For example a 400 element `uint32_t` array placed in the .data section
+ *
+ *     uint32_t __in_data("my_group_name") a_big_array[400];
+ *
+ * The section attribute is `.data.<group>`
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
+#ifndef __in_data
+#define __in_data(group) __attribute__((section(".data." group)))
+#endif
+
+/*! \brief Section attribute macro for placement in RAM in the `.bss` section
+ *  \ingroup pico_platform
+ *
+ * For example a 400 element `uint32_t` array placed in the .bss section
+ *
+ *     uint32_t __in_bss("my_group_name") a_big_array[400];
+ *
+ * The section attribute is `.bss.<group>`
+ * 
+ * \note You will get a compile error if you attempt to place data using __in_bss which isn't
+ * initialized to 0
+ *
+ * \param group a string suffix to use in the section name to distinguish groups that can be linker
+ *              garbage-collected independently
+ */
+#ifndef __in_bss
+#define __in_bss(group) __attribute__((section(".bss." group)))
+#endif
 
 /*! \brief Section attribute macro for placement in RAM after the `.data` section
  *  \ingroup pico_platform
@@ -225,10 +268,6 @@
 #define __in_flash(group) __attribute__((section(".flashdata." group)))
 #endif
 
-// Above the doxygen, to avoid confusing it
-#ifndef PICO_NOT_IN_FLASH_PLACEMENT
-#define PICO_NOT_IN_FLASH_PLACEMENT __in_ram
-#endif
 /*! \brief Section attribute macro for placement not in flash
  *  \ingroup pico_platform
  *
@@ -284,10 +323,6 @@
 #define __no_inline_not_in_flash_func(func_name) __noinline __not_in_flash_func(func_name)
 #endif
 
-// Above the doxygen, to avoid confusing it
-#ifndef PICO_TIME_CRITICAL_PLACEMENT
-#define PICO_TIME_CRITICAL_PLACEMENT __in_ram
-#endif
 /*! \brief Indicates a function is time/latency critical and should not run from flash
  *  \ingroup pico_platform
  *
@@ -315,8 +350,49 @@
 
 #else
 
+// ASM versions of the C macros above - same name as they can be used in PICO_XXX_PLACEMENT defines
+#ifndef __in_data
+#define __in_data(x) .data.##x
+#endif
+
+#ifndef __in_bss
+#define __in_bss(x) .bss.##x
+#endif
+
+#ifndef __after_data
+#define __after_data(x) .after_data.##x
+#endif
+
+#ifndef __in_ram
+#define __in_ram(x) .time_critical.##x
+#endif
+
+#ifndef __in_scratch_x
+#define __in_scratch_x(x) .scratch_x.##x
+#endif
+
+#ifndef __in_scratch_y
+#define __in_scratch_y(x) .scratch_y.##x
+#endif
+
+#ifndef __in_psram
+#define __in_psram(x) .psram_initialised.##x
+#endif
+
+#ifndef __in_xip_ram
+#if PICO_XIP_RAM
+#define __in_xip_ram(x) __in_ram(x)
+#else
+#define __in_xip_ram(x) .xip_ram.##x
+#endif
+#endif
+
+#ifndef __in_flash
+#define __in_flash(x) .flashdata.##x
+#endif
+
 #ifndef RAM_SECTION_NAME
-#define RAM_SECTION_NAME(x) .time_critical.##x
+#define RAM_SECTION_NAME(x) PICO_TIME_CRITICAL_PLACEMENT(x)
 #endif
 
 #ifndef SECTION_NAME
