@@ -189,7 +189,14 @@ if_irq_word 79 isr_irq79
 __vectors_end\suffix:
 .endm
 
+#if !PICO_NO_FLASH || !defined(PICO_VTABLE_PLACEMENT)
 .section .vectors, "ax"
+#else
+// __vectors and __default_isrs can be placed anywhere by defining PICO_VTABLE_PLACEMENT, but only for no_flash binary types
+// For other binary types, the PICO_VTABLE_PLACEMENT only affects the ram_vector_table
+.section PICO_VTABLE_PLACEMENT(vector_table), "ax"
+#endif
+
 vector_table
 
 // all default exception handlers do nothing, and we can check for them being set to our

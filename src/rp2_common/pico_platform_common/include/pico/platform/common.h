@@ -63,6 +63,11 @@
 #define PICO_VTABLE_PER_CORE 0
 #endif
 
+// PICO_CONFIG: PICO_VTABLE_PLACEMENT, Placement macro for the default vector table, type=string, default=undefined, group=hardware_irq
+#if 0 // make tooling checks happy
+#define PICO_VTABLE_PLACEMENT undefined
+#endif
+
 // PICO_CONFIG: PICO_CORE1_VTABLE_PLACEMENT, Placement macro for the core 1 vector table on Arm (ignored on RISC-V), type=string, default=__in_data for no_flash binary types, __in_bss otherwise, group=hardware_irq
 #ifndef PICO_CORE1_VTABLE_PLACEMENT
 #if PICO_NO_FLASH

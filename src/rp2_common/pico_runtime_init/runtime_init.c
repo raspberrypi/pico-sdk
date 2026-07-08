@@ -199,7 +199,12 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(runtime_init_spin_locks_reset, PICO_RUNTIME_INIT_
 #include "hardware/irq.h"
 
 #if !PICO_RUNTIME_NO_INIT_INSTALL_RAM_VECTOR_TABLE
+#ifndef PICO_VTABLE_PLACEMENT
 uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[PICO_RAM_VECTOR_TABLE_SIZE];
+#else
+// Default RAM vector table can be placed anywhere by defining PICO_VTABLE_PLACEMENT
+uint32_t __aligned(PICO_RAM_VECTOR_TABLE_ALIGNMENT) PICO_VTABLE_PLACEMENT("ram_vector_table") ram_vector_table[PICO_RAM_VECTOR_TABLE_SIZE];
+#endif
 #if PICO_VTABLE_PER_CORE
 // Core 1 vector table can be placed anywhere by defining PICO_CORE1_VTABLE_PLACEMENT (defaults to __in_bss here)
 uint32_t __aligned(PICO_RAM_VECTOR_TABLE_ALIGNMENT) PICO_CORE1_VTABLE_PLACEMENT("ram_vector_table_core1") ram_vector_table_core1[PICO_RAM_VECTOR_TABLE_SIZE];

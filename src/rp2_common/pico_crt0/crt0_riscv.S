@@ -42,7 +42,10 @@
 // If vectors are in RAM, we put them in the .data section, so that they are
 // preloaded by _reset_handler (assuming this is not a loaded-in-place
 // binary).
-#if PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH
+#ifdef PICO_VTABLE_PLACEMENT
+// Vector tables can be placed anywhere by defining PICO_VTABLE_PLACEMENT
+.section PICO_VTABLE_PLACEMENT(vector_table), "a"
+#elif PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH
 .section .vectors, "ax"
 #else
 .section .data
