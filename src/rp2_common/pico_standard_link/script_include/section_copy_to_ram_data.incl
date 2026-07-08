@@ -29,6 +29,8 @@ SECTIONS
 
         *(.data*)
         *(.sdata*)
+        *(.got)
+        *(.got.*)
 
         . = ALIGN(4);
         PROVIDE_HIDDEN (__emutls_array_start = .);
