@@ -142,9 +142,22 @@ void irq_set_pending(uint num) {
     hazard3_irqarray_set(RVCSR_MEIFA_OFFSET, num / 16, 1u << (num % 16));
 #else
 #if PICO_RP2040
-    *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ISPR_OFFSET)) = 1u << num;
+    nvic_hw->ispr = 1u << num;
 #else
     nvic_hw->ispr[num/32] = 1 << (num % 32);
+#endif
+#endif
+}
+
+bool irq_is_pending(uint num) {
+    check_irq_param(num);
+#ifdef __riscv
+    return hazard3_irqarray_read(RVCSR_MEIPA_OFFSET, num / 16u) & (1u << (num % 16u));
+#else
+#if PICO_RP2040
+    return nvic_hw->ispr & (1u << num);
+#else
+    return nvic_hw->ispr[num / 32u] & (1u << (num % 32u));
 #endif
 #endif
 }
