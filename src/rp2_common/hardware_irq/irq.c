@@ -149,6 +149,14 @@ void irq_set_pending(uint num) {
 #endif
 }
 
+bool irq_is_pending(uint num) {
+#ifdef __riscv
+    return hazard3_irqarray_read(RVCSR_MEIPA_OFFSET, num / 16u) & (1u << (num % 16u));
+#else
+    return nvic_hw->ispr[num / 32u] & (1u << (num % 32u));
+#endif
+}
+
 #if !PICO_NO_RAM_VECTOR_TABLE
 static void set_raw_irq_handler_and_unlock(uint num, irq_handler_t handler, uint32_t save) {
     // update vtable (vtable_handler may be same or updated depending on cases, but we do it anyway for compactness)
