@@ -633,6 +633,15 @@ function(pico_add_uf2_output TARGET)
                 set(picotool_family ${PICO_PLATFORM})
             endif()
         endif()
+        get_target_property(picotool_platform ${TARGET} PICOTOOL_UF2_PLATFORM)
+        if (NOT picotool_platform)
+            if (PICOTOOL_DEFAULT_PLATFORM)
+                set(picotool_platform ${PICOTOOL_DEFAULT_PLATFORM})
+            else()
+                # Set picotool_platform to the part of PICO_PLATFORM before the first -
+                string(REGEX MATCH "^[^-]+" picotool_platform ${PICO_PLATFORM})
+            endif()
+        endif()
         add_custom_command(TARGET ${TARGET} POST_BUILD
             COMMAND picotool
             ARGS uf2 convert
@@ -641,6 +650,7 @@ function(pico_add_uf2_output TARGET)
                 $<TARGET_FILE:${TARGET}>
                 ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2
                 --family ${picotool_family}
+                --platform ${picotool_platform}
                 ${extra_uf2_args}
             COMMAND_EXPAND_LISTS
             VERBATIM
