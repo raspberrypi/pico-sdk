@@ -306,13 +306,13 @@ for pat, rep in replacements:
         mid = pat.split('\t')[1]
         left, right = mid.split(' ')[0:2]
         if len(right) > 6:
-            new_pat = f"([0-9a-f]{{8}}:\s*{left[2:]} {left[0:2]} {right[4:]} {right[:4]} \s*).*"
+            new_pat = rf"([0-9a-f]{{8}}:\s*{left[2:]} {left[0:2]} {right[4:]} {right[:4]} \s*).*"
             new_rep = rep.replace('3', '7')
             new_rep = new_rep.replace('4', '3')
             new_rep = new_rep.replace('7', '4')
             replacements.append((new_pat, new_rep))
         else:
-            replacements.append((f"([0-9a-f]{{8}}:\s*{left[2:]} {left[0:2]} {right[-2:]} {right[:-2]} \s*).*", rep))
+            replacements.append((rf"([0-9a-f]{{8}}:\s*{left[2:]} {left[0:2]} {right[-2:]} {right[:-2]} \s*).*", rep))
 
 for pat, rep in replacements:
     contents = re.sub(pat, rep, contents)

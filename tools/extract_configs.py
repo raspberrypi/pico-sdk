@@ -75,7 +75,7 @@ def get_first_dict_key(some_dict):
 
 def look_for_integer_define(config_name, attr_name, attr_str, file_path, linenum, applicable):
     defined_str = None
-    if re.match('^\w+$', attr_str):
+    if re.match(r'^\w+$', attr_str):
         # See if we have a matching define
         all_defines = chips_all_defines[applicable]
         if attr_str in all_defines:
