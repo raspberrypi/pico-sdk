@@ -1,4 +1,5 @@
 /* Test that the toolchain can assemble Zcmp instructions */
 void _start(void) {
-    asm volatile ("cm.mvsa01 s0, s1" : : : "s0", "s1");
+    // Cannot use s0 as it is also fp, so use s1 & s2 instead
+    asm volatile ("cm.mvsa01 s1, s2" : : : "s1", "s2");
 }
