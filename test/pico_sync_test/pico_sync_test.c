@@ -31,8 +31,7 @@ int64_t notify_lock_with_flag(__unused alarm_id_t id, void *user_data) {
 static lock_core_t sleep_notifier;
 
 static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
-    uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
-    lock_internal_spin_unlock_with_notify(&sleep_notifier, save);
+    __sev();
     return 0;
 }
 
@@ -98,8 +97,7 @@ int main() {
         if (add_alarm_at(t_before, sleep_until_callback, NULL, false) >= 0) {
             // able to add alarm for just before the time
             while (!time_reached(t_before)) {
-                uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
-                lock_internal_spin_unlock_with_wait(&sleep_notifier, save);
+                __wfe();
                 wait_count++;
             }
         }

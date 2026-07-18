@@ -54,7 +54,6 @@ static inline bool default_alarm_pool_initialized(void) {
     return default_alarm_pool.lock != NULL;
 }
 
-static lock_core_t sleep_notifier;
 #endif
 
 #include "pico/time_adapter.h"
@@ -87,7 +86,6 @@ void __weak runtime_init_default_alarm_pool(void) {
                                    PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM,
                                    PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS);
     }
-    lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
 #endif
 }
 #endif
@@ -393,8 +391,7 @@ uint alarm_pool_core_num(alarm_pool_t *pool) {
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
-    uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
-    lock_internal_spin_unlock_with_notify(&sleep_notifier, save);
+    __sev(); // signal event in case the waiter is on the other core
     return 0;
 }
 #endif
@@ -416,8 +413,9 @@ void sleep_until(absolute_time_t t) {
         if (add_alarm_at(t_before, sleep_until_callback, NULL, false) >= 0) {
             // able to add alarm for just before the time
             while (!time_reached(t_before)) {
-                uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
-                lock_internal_spin_unlock_with_wait(&sleep_notifier, save);
+                // note __wfe() is sufficient here because the add_alarm always causes an IRQ which calls
+                // sleep_until_callback() which also does a __sev() - the irq itself will wake us up if on the same core
+                __wfe();
             }
         }
     }
