@@ -57,14 +57,18 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_thread_local_test:pico_thread_local_test",
                 "//test/pico_thread_local_test:pico_thread_local_test_cpp",
                 "//test/pico_time_test:pico_time_test",
+                "//test/pico_time_test:pico_time_test_sw",
+                "//test/pico_time_test:pico_time_test_sw",
                 "//test/pico_low_power_test:low_power_test_timers",
                 "//test/pico_low_power_test:low_power_test_gpio",
                 "//test/pico_low_power_test:low_power_test_simple",
                 "//test/pico_low_power_test:external_sleep_timer",
                 "//test/pico_async_context_test:pico_async_context_test",
+                "//test/pico_sync_test:pico_sync_test",
                 "//test/pico_sync_test:pico_sync_test_sw",
-                "//test/pico_sync_test:pico_sync_test_hw",
                 "//test/pico_xip_sram_test:pico_critical_xip_sram_test",
+                "//test/short_sleep_test:short_sleep_test",
+                "//test/short_sleep_test:short_sleep_test_sw",
 
                 # Pretty much only Picotool and pioasm build on Windows.
                 "//..." if os.name == "nt" else "",
@@ -93,6 +97,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_psram",
                 # No SW spinlocks on RP2040
                 "//test/pico_sync_test:pico_sync_test_sw",
+                "//test/pico_time_test:pico_time_test_sw",
+                "//test/short_sleep_test:short_sleep_test_sw",
             )
         ),
     },
@@ -136,6 +142,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_psram",
                 # No SW spinlocks on RP2040
                 "//test/pico_sync_test:pico_sync_test_sw",
+                "//test/pico_time_test:pico_time_test_sw",
+                "//test/short_sleep_test:short_sleep_test_sw",
             )
         ),
     },
@@ -180,6 +188,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_psram",
                 # No SW spinlocks on RP2040
                 "//test/pico_sync_test:pico_sync_test_sw",
+                "//test/pico_time_test:pico_time_test_sw",
+                "//test/short_sleep_test:short_sleep_test_sw",
             )
         ),
     },

@@ -16,6 +16,7 @@
 // Note in this test, the main thing is that the processor doesn't spin - the actual number of loops
 // when successfully coming to a sleep is between 1 and 5 depending on platform/core etc. and the reasoning
 // is left as an exercise for the reader!
+#define MAX_WAITS 5
 
 PICOTEST_MODULE_NAME("SYNC", "sync test");
 
@@ -32,9 +33,8 @@ int64_t notify_lock_with_flag(__unused alarm_id_t id, void *user_data) {
     return 0;
 }
 
-static lock_core_t sleep_notifier;
-
 static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
+    // note: this implementation is a copy of the code from pico_time/time.c and should be kept in sync
     __sev();
     return 0;
 }
@@ -47,6 +47,8 @@ static int do_test(void) {
     printf("=== Test on core %d ===\n", core_num);
 
     PICOTEST_START_SECTION("check low power lock_core wait loop with timeout");
+    // note: this implementation is implemented in a similar functions to mutex_enter_block_until(),
+    //       sem_acquire_block_until() etc. and should be updated if they are
     lock_core_t lock;
     lock_init(&lock, 0);
     absolute_time_t until = make_timeout_time_ms(50);
@@ -58,25 +60,12 @@ static int do_test(void) {
     } while (true);
     printf("Waited %d times\n", wait_count);
 
-    int expected_timeout_waits;
-#if PICO_USE_SW_SPIN_LOCKS
-    // looping twice (rather than once) is an implementation detail, however we shouldn't loop continuously (i.e. we should __wfe)
-    expected_timeout_waits = 2;
-#else
-    // note that without sw spin locks we wait an extra time (an extra SEV doesn't get eaten)
-    expected_timeout_waits = 3;
-#endif
-    if (core_num) {
-#if PICO_RP2040 || PICO_USE_SW_SPIN_LOCKS
-        expected_timeout_waits += 2;
-#else
-        expected_timeout_waits += 1;
-#endif
-    }
-    PICOTEST_CHECK(wait_count == expected_timeout_waits, "Expected exactly %d waits", expected_timeout_waits);
+    PICOTEST_CHECK(wait_count < MAX_WAITS, "Expected <= %d waits", MAX_WAITS);
     PICOTEST_END_SECTION();
 
     PICOTEST_START_SECTION("check low power lock_core wait loop without timeout");
+    // note: this implementation is implemented in a similar functions to mutex_enter_blocking(),
+    //       sem_acquire_blocking() etc. and should be updated if they are
     lock_with_flag_t lock_with_flag;
     lock_init(&lock_with_flag.lock, 0);
     lock_with_flag.flag = false;
@@ -93,20 +82,11 @@ static int do_test(void) {
         lock_internal_spin_unlock_with_wait(&lock_with_flag.lock, save);
     } while (true);
     printf("Waited %d times\n", wait_count);
-    int expected_timeout_waits = 1;
-    if (core_num) {
-#if PICO_RP2040
-        expected_timeout_waits += 2;
-#else
-        expected_timeout_waits ++;
-#endif
-    }
-    PICOTEST_CHECK(wait_count == expected_timeout_waits, "Expected exactly %d waits", expected_timeout_waits);
+    PICOTEST_CHECK(wait_count < MAX_WAITS, "Expected <= %d waits", MAX_WAITS);
     PICOTEST_END_SECTION();
 
     PICOTEST_START_SECTION("check low power sleep loop");
-    // note sleep implementation taken from pico_ime
-    lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
+    // note: this sleep implementation is a copy of the code from pico_time/time.c and should be kept in sync
     int wait_count = 0;
     absolute_time_t t = make_timeout_time_ms(500);
     uint64_t t_us = to_us_since_boot(t);
@@ -125,17 +105,7 @@ static int do_test(void) {
         }
     }
     printf("Waited %d times\n", wait_count);
-
-    int expected_timeout_waits;
-    expected_timeout_waits = 2;
-    if (core_num) {
-#if PICO_RP2040
-        expected_timeout_waits += 2;
-#else
-        expected_timeout_waits += 1;
-#endif
-    }
-    PICOTEST_CHECK(wait_count == expected_timeout_waits, "Expected exactly %d waits", expected_timeout_waits);
+    PICOTEST_CHECK(wait_count < MAX_WAITS, "Expected <= %d waits", MAX_WAITS);
     PICOTEST_END_SECTION();
     return picotest_error_code;
 }

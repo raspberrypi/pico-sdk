@@ -395,6 +395,7 @@ uint alarm_pool_core_num(alarm_pool_t *pool) {
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
+    // note this implementation is copied in pico_sync_test.c and should be updated if this code is
     __sev(); // signal event in case the waiter is on the other core
     return 0;
 }
@@ -407,6 +408,7 @@ void sleep_until(absolute_time_t t) {
     }
 #endif
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
+    // note this implementation is copied in pico_sync_test.c and should be updated if this code is
     uint64_t t_us = to_us_since_boot(t);
     uint64_t t_before_us = t_us - PICO_TIME_SLEEP_OVERHEAD_ADJUST_US;
     // needs to work in the first PICO_TIME_SLEEP_OVERHEAD_ADJUST_US of boot

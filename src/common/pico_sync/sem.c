@@ -24,6 +24,7 @@ int __time_critical_func(sem_available)(semaphore_t *sem) {
 }
 
 void __time_critical_func(sem_acquire_blocking)(semaphore_t *sem) {
+    // note: if you change the implementation here, please update the similar code in pico_sync_test.c
     do {
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);
         if (sem->permits > 0) {
@@ -44,6 +45,7 @@ bool __time_critical_func(sem_acquire_timeout_us)(semaphore_t *sem, uint32_t tim
 }
 
 bool __time_critical_func(sem_acquire_block_until)(semaphore_t *sem, absolute_time_t until) {
+    // note: if you change the implementation here, please update the similar code in pico_sync_test.c
     do {
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);
         if (sem->permits > 0) {
