@@ -6,12 +6,16 @@
 
 #include <stdio.h>
 
-#include "../../src/common/pico_base_headers/include/pico/types.h"
-#include "../../src/common/pico_time/include/pico/time.h"
-#include "../../src/rp2_common/hardware_sync_spin_lock/include/hardware/sync/spin_lock.h"
+#include "pico/time.h"
 #include "pico/lock_core.h"
+#include "pico/multicore.h"
 #include "pico/test.h"
 #include "pico/stdio.h"
+#include "pico/sync.h"
+
+// Note in this test, the main thing is that the processor doesn't spin - the actual number of loops
+// when successfully coming to a sleep is between 1 and 5 depending on platform/core etc. and the reasoning
+// is left as an exercise for the reader!
 
 PICOTEST_MODULE_NAME("SYNC", "sync test");
 
@@ -35,31 +39,41 @@ static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_
     return 0;
 }
 
-int main() {
-    stdio_init_all();
+static semaphore_t core1_sem;
 
-    PICOTEST_START();
 
+static int do_test(void) {
+    int core_num = get_core_num();
+    printf("=== Test on core %d ===\n", core_num);
 
     PICOTEST_START_SECTION("check low power lock_core wait loop with timeout");
-        #if PICO_USE_SW_SPIN_LOCKS
-            // looping twice (rather than once) is an implementation detail, however we shouldn't loop continuously (i.e. we should __wfe)
-            #define EXPECTED_TIMEOUT_WAITS 2
-        #else
-            // note that without sw spin locks we wait an extra time (an extra SEV doesn't get eaten)
-            #define EXPECTED_TIMEOUT_WAITS 3
-        #endif
-        lock_core_t lock;
-        lock_init(&lock, 0);
-        absolute_time_t until = make_timeout_time_ms(50);
-        int wait_count = 0;
-        do {
-            uint32_t save = spin_lock_blocking(lock.spin_lock);
-            wait_count++;
-            if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&lock, save, until)) break;
-        } while (true);
-        printf("Waited %d times\n", wait_count);
-        PICOTEST_CHECK(wait_count == EXPECTED_TIMEOUT_WAITS, "Expected exactly " __XSTRING(EXPECTED_TIMEOUT_WAITS) " waits");
+    lock_core_t lock;
+    lock_init(&lock, 0);
+    absolute_time_t until = make_timeout_time_ms(50);
+    int wait_count = 0;
+    do {
+        uint32_t save = spin_lock_blocking(lock.spin_lock);
+        wait_count++;
+        if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&lock, save, until)) break;
+    } while (true);
+    printf("Waited %d times\n", wait_count);
+
+    int expected_timeout_waits;
+#if PICO_USE_SW_SPIN_LOCKS
+    // looping twice (rather than once) is an implementation detail, however we shouldn't loop continuously (i.e. we should __wfe)
+    expected_timeout_waits = 2;
+#else
+    // note that without sw spin locks we wait an extra time (an extra SEV doesn't get eaten)
+    expected_timeout_waits = 3;
+#endif
+    if (core_num) {
+#if PICO_RP2040 || PICO_USE_SW_SPIN_LOCKS
+        expected_timeout_waits += 2;
+#else
+        expected_timeout_waits += 1;
+#endif
+    }
+    PICOTEST_CHECK(wait_count == expected_timeout_waits, "Expected exactly %d waits", expected_timeout_waits);
     PICOTEST_END_SECTION();
 
     PICOTEST_START_SECTION("check low power lock_core wait loop without timeout");
@@ -79,7 +93,15 @@ int main() {
         lock_internal_spin_unlock_with_wait(&lock_with_flag.lock, save);
     } while (true);
     printf("Waited %d times\n", wait_count);
-    PICOTEST_CHECK(wait_count == 1, "Expected exactly 1 wait");
+    int expected_timeout_waits = 1;
+    if (core_num) {
+#if PICO_RP2040
+        expected_timeout_waits += 2;
+#else
+        expected_timeout_waits ++;
+#endif
+    }
+    PICOTEST_CHECK(wait_count == expected_timeout_waits, "Expected exactly %d waits", expected_timeout_waits);
     PICOTEST_END_SECTION();
 
     PICOTEST_START_SECTION("check low power sleep loop");
@@ -103,17 +125,39 @@ int main() {
         }
     }
     printf("Waited %d times\n", wait_count);
-    #undef EXPECTED_TIMEOUT_WAITS
-    #if PICO_USE_SW_SPIN_LOCKS
-        // looping twice (rather than once) is an implementation detail, however we shouldn't loop continuously (i.e. we should __wfe)
-    #define EXPECTED_TIMEOUT_WAITS 1
-    #else
-        // note that without sw spin locks we wait an extra time (an extra SEV doesn't get eaten)
-    #define EXPECTED_TIMEOUT_WAITS 2
-    #endif
 
-    PICOTEST_CHECK(wait_count == EXPECTED_TIMEOUT_WAITS, "Expected exactly " __XSTRING(EXPECTED_TIMEOUT_WAITS) " waits");
+    int expected_timeout_waits;
+    expected_timeout_waits = 2;
+    if (core_num) {
+#if PICO_RP2040
+        expected_timeout_waits += 2;
+#else
+        expected_timeout_waits += 1;
+#endif
+    }
+    PICOTEST_CHECK(wait_count == expected_timeout_waits, "Expected exactly %d waits", expected_timeout_waits);
     PICOTEST_END_SECTION();
+    return picotest_error_code;
+}
+
+int core1_picotest_error_code;
+void core1_func() {
+    core1_picotest_error_code = do_test();
+    sem_release(&core1_sem);
+}
+
+int main() {
+    stdio_init_all();
+
+    PICOTEST_START();
+
+    picotest_error_code = do_test();
+    if (!picotest_error_code) {
+        multicore_launch_core1(core1_func);
+        sem_init(&core1_sem, 0, 1);
+        sem_acquire_blocking(&core1_sem);
+        picotest_error_code = core1_picotest_error_code;
+    }
 
     PICOTEST_END_TEST();
 }
