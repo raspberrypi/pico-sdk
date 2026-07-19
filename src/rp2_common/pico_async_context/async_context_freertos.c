@@ -109,7 +109,18 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
     memset(self, 0, sizeof(*self));
     self->core.type = &template;
     self->core.flags = ASYNC_CONTEXT_FLAG_CALLBACK_FROM_NON_IRQ;
+#if configNUMBER_OF_CORES > 1
+    // sample the core once: core_num must match the core the task is pinned to
+    UBaseType_t core_id = config->task_core_id;
+    if (core_id == (UBaseType_t)-1) {
+        core_id = portGET_CORE_ID();
+    }
+    assert(core_id < configNUMBER_OF_CORES);
+    self->core.core_num = (uint8_t)core_id;
+    const UBaseType_t core_affinity_mask = 1u << core_id;
+#else
     self->core.core_num = get_core_num();
+#endif
 #if configSUPPORT_STATIC_ALLOCATION
     assert(config->task_stack);
     self->lock_mutex = xSemaphoreCreateRecursiveMutexStatic(&self->lock_mutex_buf);
@@ -121,6 +132,17 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
                                              self,
                                              timer_handler,
                                              &self->timer_buf);
+#if configNUMBER_OF_CORES > 1
+    // create the task pre-pinned so it can't run on the wrong core first
+    self->task_handle = xTaskCreateStaticAffinitySet( async_context_task,
+                                                      "async_context_task",
+                                                      config->task_stack_size,
+                                                      self,
+                                                      config->task_priority,
+                                                      config->task_stack,
+                                                      &self->task_buf,
+                                                      core_affinity_mask);
+#else
     self->task_handle = xTaskCreateStatic( async_context_task,
                                            "async_context_task",
                                            config->task_stack_size,
@@ -128,6 +150,7 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
                                            config->task_priority,
                                            config->task_stack,
                                            &self->task_buf);
+#endif
 #else
     self->lock_mutex = xSemaphoreCreateRecursiveMutex();
     self->work_needed_sem = xSemaphoreCreateBinary();
@@ -144,6 +167,9 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
         !self->timer_handle ||
 #if configSUPPORT_STATIC_ALLOCATION
         !self->task_handle
+#elif configNUMBER_OF_CORES > 1
+        pdPASS != xTaskCreateAffinitySet(async_context_task, "async_context_task", config->task_stack_size, self,
+                config->task_priority, core_affinity_mask, &self->task_handle)
 #else
         pdPASS != xTaskCreate(async_context_task, "async_context_task", config->task_stack_size, self,
                 config->task_priority, &self->task_handle)
@@ -152,14 +178,6 @@ bool async_context_freertos_init(async_context_freertos_t *self, async_context_f
         async_context_deinit(&self->core);
         return false;
     }
-#if configNUMBER_OF_CORES > 1
-    UBaseType_t core_id = config->task_core_id;
-    if (core_id == (UBaseType_t)-1) {
-        core_id = portGET_CORE_ID();
-    }
-    // we must run on a single core
-    vTaskCoreAffinitySet(self->task_handle, 1u << core_id);
-#endif
     return true;
 }
 
