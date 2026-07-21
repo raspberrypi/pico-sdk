@@ -587,7 +587,7 @@ static inline uint timer_get_index(timer_hw_t *timer) {
  * \param timer_num the timer number
  * \return the timer instance
  */
-static inline timer_hw_t *timer_get_instance(uint timer_num) {
+static inline timer_hw_t *timer_get_instance(__unused uint timer_num) {
     invalid_params_if(HARDWARE_TIMER, timer_num >= NUM_GENERIC_TIMERS);
     return TIMER_INSTANCE(timer_num);
 }
