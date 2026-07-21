@@ -9,6 +9,7 @@ cc_binary(
     srcs = ["short_sleep_test.c"],
     defines = [
         "PICO_USE_SW_SPIN_LOCKS=0",
+        "PICO_TIME_SLEEP_OVERHEAD_ADJUST_US=0",
     ],
     target_compatible_with = compatible_with_rp2(),
     deps = [
@@ -27,6 +28,7 @@ cc_binary(
     srcs = ["short_sleep_test.c"],
     defines = [
         "PICO_USE_SW_SPIN_LOCKS=1",
+        "PICO_TIME_SLEEP_OVERHEAD_ADJUST_US=0",
     ],
     target_compatible_with = ["//bazel/constraint:rp2350"],
     deps = [
