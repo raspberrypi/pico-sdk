@@ -1111,7 +1111,7 @@ typedef struct {
 static inline int rom_get_boot_info(boot_info_t *info) {
     uint32_t result[5];
     int words_returned = rom_get_sys_info(result, 5, SYS_INFO_BOOT_INFO);
-    if (words_returned == (sizeof(result)/sizeof(result[0])) && result[0] == SYS_INFO_BOOT_INFO) {
+    if (words_returned == count_of(result) && result[0] == SYS_INFO_BOOT_INFO) {
         memcpy(info, &result[1], sizeof(boot_info_t));
         return true;
     } else {
