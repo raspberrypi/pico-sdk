@@ -1,0 +1,35 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+# Public API header, shared with the host implementation in //src/host/pico_ffs.
+cc_library(
+    name = "pico_ffs_headers",
+    hdrs = ["include/pico/ffs.h"],
+    includes = ["include"],
+    deps = ["//src:pico_platform"],
+)
+
+# On-flash format helpers, shared with the host-side //tools/ffsgen tool.
+cc_library(
+    name = "ffs_internal",
+    srcs = ["ffs_internal.c"],
+    hdrs = ["ffs_internal.h"],
+    includes = ["."],
+)
+
+cc_library(
+    name = "pico_ffs",
+    srcs = ["ffs.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":ffs_internal",
+        ":pico_ffs_headers",
+        "//src/common/boot_picobin_headers",
+        "//src/rp2_common/hardware_flash",
+        "//src/rp2_common/pico_bootrom",
+        "//src/rp2_common/pico_flash",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)

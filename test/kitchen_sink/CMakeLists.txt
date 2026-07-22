@@ -43,6 +43,7 @@ set(KITCHEN_SINK_LIBS
     pico_cJSON
     pico_divider
     pico_double
+    pico_ffs
     pico_fix_rp2040_usb_device_enumeration
     pico_flash
     pico_float
