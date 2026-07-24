@@ -73,7 +73,7 @@ cc_library(
         "//src/rp2_common/hardware_irq",
         "//src/rp2_common/pico_stdio:pico_stdio_headers",
         "//src/rp2_common/pico_unique_id",
-        "//src/rp2_common/pico_usb_reset_interface",
+        "//src/rp2_common/pico_usb_reset",
     ],
     # Ensure `stdio_usb_descriptors.c` isn't affected by link order.
     alwayslink = True,
