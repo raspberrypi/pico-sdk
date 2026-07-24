@@ -327,4 +327,5 @@ py_binary(
     ],
     # TODO: Add pip pins.
     # deps = ["@python_packages//pycryptodomex"]
+    legacy_create_init = False,
 )
