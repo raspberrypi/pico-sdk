@@ -1,0 +1,38 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_config", "pico_generate_pio_header")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_flash_image",
+    srcs = [
+        "flash_image.c",
+        "flashlog.c",
+    ],
+    hdrs = ["include/pico/flash_image.h"],
+    implementation_deps = [
+        ":debug_uart_tx",
+        "//src/rp2_common/hardware_clocks",
+        "//src/rp2_common/hardware_pio",
+        "//src/rp2_common/pico_bootrom",
+    ],
+    includes = ["include"],
+    # Uses RP2350-only bootrom APIs (rom_flash_op, rom_get_uf2_target_partition),
+    # matching the PICO_RP2040 exclusion in src/cmake/rp2_common.cmake.
+    target_compatible_with = compatible_with_config("//bazel/constraint:rp2350"),
+    deps = [
+        "//src/common/boot_picobin_headers",
+        "//src/common/boot_picoboot_headers",
+        "//src/common/boot_uf2_headers",
+        "//src/common/pico_time",
+        "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/hardware_flash",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)
+
+# PIO UART used by flashlog.c for FIMG_DEBUG_PRINTF output.
+pico_generate_pio_header(
+    name = "debug_uart_tx",
+    srcs = ["debug_uart_tx.pio"],
+)

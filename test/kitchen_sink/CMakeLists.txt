@@ -46,6 +46,7 @@ set(KITCHEN_SINK_LIBS
     pico_ffs
     pico_fix_rp2040_usb_device_enumeration
     pico_flash
+    pico_flash_image
     pico_float
     pico_i2c_slave
     pico_int64_ops
