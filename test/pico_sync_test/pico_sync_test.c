@@ -107,6 +107,32 @@ static int do_test(void) {
     printf("Waited %d times\n", wait_count);
     PICOTEST_CHECK(wait_count < MAX_WAITS, "Expected <= %d waits", MAX_WAITS);
     PICOTEST_END_SECTION();
+
+    PICOTEST_START_SECTION("check repeated deadline issue");
+    // Run one wait to completion so the deadline is cached inside
+    // best_effort_wfe_or_timeout() and its one-shot alarm has fired, leaving the
+    // default alarm pool empty and the hardware alarm disarmed.
+    absolute_time_t deadline = make_timeout_time_ms(100);
+    while (!best_effort_wfe_or_timeout(deadline)) tight_loop_contents();
+    PICOTEST_CHECK(time_reached(deadline), "Expected to reach timeout");
+    printf("deadline %lld us cached and expired\n", (long long)to_us_since_boot(deadline));
+
+    // Wait on the same, now expired, deadline again. Several iterations are needed to
+    // drain any latched events before the hang shows itself.
+    for (int i = 1; i <= 5; i++) {
+        printf("call %d\n", i);
+        bool reached = best_effort_wfe_or_timeout(deadline);
+        PICOTEST_CHECK(reached, "Expected to reach timeout");
+    }
+
+    // The same hole via the path seen in the field.
+    printf("sem_acquire_block_until on the expired deadline\n");
+    semaphore_t sem;
+    sem_init(&sem, 0, 1);
+    bool acquired = sem_acquire_block_until(&sem, deadline);
+    PICOTEST_CHECK(!acquired, "Expected not to acquire semaphore");
+
+    PICOTEST_END_SECTION();
     return picotest_error_code;
 }
 
