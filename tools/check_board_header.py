@@ -42,6 +42,11 @@ compulsory_cmake_settings = frozenset(['PICO_PLATFORM'])
 
 # names for which we MUST have a pico_board_cmake_set_default
 compulsory_cmake_default_settings = frozenset(['PICO_FLASH_SIZE_BYTES'])
+# chip-specific version of the above
+chip_specific_compulsory_cmake_default_settings = {
+    'RP2350A': frozenset(['PICO_RP2350_A2_SUPPORTED']),
+    'RP2350B': frozenset(['PICO_RP2350_A2_SUPPORTED']),
+}
 
 # names for which pico_board_cmake_set_default (if present) needs a matching #define (and vice-versa)
 matching_cmake_default_settings = frozenset(['PICO_FLASH_SIZE_BYTES', 'PICO_RP2350_A2_SUPPORTED', 'PICO_PSRAM_SIZE_BYTES'])
@@ -454,16 +459,14 @@ else:
                 chip = 'RP2350A'
             else:
                 chip = 'RP2350B'
-        if not board_header.endswith("amethyst_fpga.h"):
-            if 'PICO_RP2350_A2_SUPPORTED' not in cmake_default_settings:
-                errors.append(Exception("{} uses chip {} but is missing a pico_board_cmake_set_default({}, XXX) call".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED')))
-            if 'PICO_RP2350_A2_SUPPORTED' not in defines:
-                errors.append(Exception("{} uses chip {} but is missing a #define {}".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED')))
-            elif defines['PICO_RP2350_A2_SUPPORTED'].resolved_value != 1:
-                errors.append(Exception("{} sets #define {} {} (should be 1)".format(board_header, chip, 'PICO_RP2350_A2_SUPPORTED', defines['PICO_RP2350_A2_SUPPORTED'].resolved_value)))
     for setting in compulsory_cmake_default_settings:
         if setting not in cmake_default_settings:
             errors.append(Exception("{} is missing a pico_board_cmake_set_default({}, XXX) call".format(board_header, setting)))
+    if board_header_basename != "amethyst_fpga.h":
+        if chip in chip_specific_compulsory_cmake_default_settings:
+            for setting in chip_specific_compulsory_cmake_default_settings[chip]:
+                if setting not in cmake_default_settings:
+                    errors.append(Exception("{} uses chip {} but is missing a pico_board_cmake_set_default({}, XXX) call".format(board_header, chip, setting)))
     for setting in matching_cmake_default_settings:
         if setting in cmake_default_settings and setting not in defines:
             errors.append(Exception("{} has pico_board_cmake_set_default({}, XXX) but is missing a matching #define".format(board_header, setting)))
