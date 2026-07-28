@@ -9,7 +9,7 @@
 #
 # Usage:
 #
-# tools/check_board_header.py src/boards/include/boards/<board.h> [path/to/pico_configs.tsv]
+# tools/check_board_header.py src/boards/include/boards/<board.h> [path/to/pico_configs.tsv [path/to/cmake_configs.tsv]]
 
 
 import re
@@ -89,6 +89,16 @@ if len(sys.argv) > 2:
         reader = csv.DictReader(tsv_fh, dialect=csv.excel_tab)
         for row in reader:
             pico_configs[row['name']] = row
+
+cmake_configs = dict()
+if len(sys.argv) > 3:
+    cmake_configs_file = sys.argv[3]
+    if not os.path.isfile(cmake_configs_file):
+        raise Exception("{} doesn't exist".format(cmake_configs_file))
+    with open(cmake_configs_file, newline='') as tsv_fh:
+        reader = csv.DictReader(tsv_fh, dialect=csv.excel_tab)
+        for row in reader:
+            cmake_configs[row['name']] = row
 
 expected_include_suggestion = "/".join(board_header.split("/")[-2:])
 expected_include_guard = "_" + re.sub(r"\W", "_", expected_include_suggestion.upper())
@@ -643,6 +653,66 @@ for name, define in defines.items():
             if define.resolved_value not in (0, 1):
                 errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should be {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], "type", name_config["type"])))
         elif name_config["type"] == "enum":
+            pass
+        elif name_config["type"] == "list":
+            pass
+        else:
+            raise Exception("{} {}={} isn't handled".format(directive, "type", name_config["type"]))
+
+for name, setting in cmake_settings.items():
+    # check cmake_settings against the PICO_CMAKE_CONFIG definitions
+    if name in cmake_configs:
+        name_config = cmake_configs[name]
+        directive = "PICO_CMAKE_CONFIG"
+        if name_config["type"] in ("", "int"):
+            config_key = "min"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if setting.value < int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+            config_key = "max"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if setting.value > int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+        elif name_config["type"] == "bool":
+            if setting.value not in (0, 1):
+                errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should be {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], "type", name_config["type"])))
+        elif name_config["type"] == "string":
+            pass
+        elif name_config["type"] == "list":
+            pass
+        else:
+            raise Exception("{} {}={} isn't handled".format(directive, "type", name_config["type"]))
+
+for name, setting in cmake_default_settings.items():
+    # check cmake_default_settings against the PICO_CMAKE_CONFIG definitions
+    if name in cmake_configs:
+        name_config = cmake_configs[name]
+        directive = "PICO_CMAKE_CONFIG"
+        if name_config["type"] in ("", "int"):
+            config_key = "min"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if setting.value < int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+            config_key = "max"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if setting.value > int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+        elif name_config["type"] == "bool":
+            if setting.value not in (0, 1):
+                errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should be {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], "type", name_config["type"])))
+        elif name_config["type"] == "string":
             pass
         elif name_config["type"] == "list":
             pass
