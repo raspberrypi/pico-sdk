@@ -9,7 +9,7 @@
 #
 # Usage:
 #
-# tools/check_board_header.py src/boards/include/boards/<board.h>
+# tools/check_board_header.py src/boards/include/boards/<board.h> [path/to/pico_configs.tsv]
 
 
 import re
@@ -17,6 +17,7 @@ import sys
 import os.path
 import json
 import warnings
+import csv
 
 from collections import namedtuple
 
@@ -78,6 +79,16 @@ board_header = sys.argv[1]
 if not os.path.isfile(board_header):
     raise Exception("{} doesn't exist".format(board_header))
 board_header_basename = os.path.basename(board_header)
+
+pico_configs = dict()
+if len(sys.argv) > 2:
+    configs_file = sys.argv[2]
+    if not os.path.isfile(configs_file):
+        raise Exception("{} doesn't exist".format(configs_file))
+    with open(configs_file, newline='') as tsv_fh:
+        reader = csv.DictReader(tsv_fh, dialect=csv.excel_tab)
+        for row in reader:
+            pico_configs[row['name']] = row
 
 expected_include_suggestion = "/".join(board_header.split("/")[-2:])
 expected_include_guard = "_" + re.sub(r"\W", "_", expected_include_suggestion.upper())
@@ -607,6 +618,36 @@ for name, define in defines.items():
             continue
         if define.resolved_value not in interface_instance[function]:
             errors.append(Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num)))
+
+    # check defines against the PICO_CONFIG definitions
+    if name in pico_configs:
+        name_config = pico_configs[name]
+        directive = "PICO_CONFIG"
+        if name_config["type"] in ("", "int"):
+            config_key = "min"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if define.resolved_value < int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+            config_key = "max"
+            if config_key in name_config and name_config[config_key] != "":
+                if board_header_basename != "amethyst_fpga.h": # amethyst_fpga sets a PICO_DEFAULT_UART_BAUD_RATE of 1000000, but uart.h says PICO_DEFAULT_UART_BAUD_RATE should have max=921600
+                    try:
+                        if define.resolved_value > int(name_config[config_key]):
+                            errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                    except ValueError:
+                        pass
+        elif name_config["type"] == "bool":
+            if define.resolved_value not in (0, 1):
+                errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should be {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], "type", name_config["type"])))
+        elif name_config["type"] == "enum":
+            pass
+        elif name_config["type"] == "list":
+            pass
+        else:
+            raise Exception("{} {}={} isn't handled".format(directive, "type", name_config["type"]))
 
 if uses_some_cyw43_pins and ("PICO_CYW43_SUPPORTED" not in cmake_settings or cmake_settings["PICO_CYW43_SUPPORTED"].value != 1):
     errors.append(Exception("{} uses some CYW43 GPIO pins, but doesn't have pico_board_cmake_set({}, 1)".format(board_header, "PICO_CYW43_SUPPORTED")))
