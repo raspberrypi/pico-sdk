@@ -62,6 +62,7 @@ linked_defines = {
 }
 
 DefineType = namedtuple("DefineType", ["name", "value", "resolved_value", "lineno", "has_ifndef"])
+CMakeSetting = namedtuple("CMakeSetting", ["name", "value", "lineno"])
 
 def list_to_string_with(lst, joiner):
     elems = len(lst)
@@ -131,7 +132,7 @@ def read_defines_from(header_file, defines_dict):
                         if show_warnings:
                             warnings.warn("{}:{}  Multiple values for pico_board_cmake_set({}) ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
                 else:
-                   cmake_settings[name] = DefineType(name, value, None, lineno, False)
+                   cmake_settings[name] = CMakeSetting(name, value, lineno)
                 continue
 
             # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
@@ -144,7 +145,7 @@ def read_defines_from(header_file, defines_dict):
                 if name != name.upper():
                     errors.append(Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name)))
                 if name not in cmake_default_settings:
-                   cmake_default_settings[name] = DefineType(name, value, None, lineno, False)
+                   cmake_default_settings[name] = CMakeSetting(name, value, lineno)
                 continue
 
             # look for "#else"
@@ -295,7 +296,7 @@ with open(board_header) as header_fh:
                         value = int(value, 0)
                     except ValueError:
                         pass
-                cmake_settings[name] = DefineType(name, value, None, lineno, False)
+                cmake_settings[name] = CMakeSetting(name, value, lineno)
             continue
 
         # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
@@ -317,7 +318,7 @@ with open(board_header) as header_fh:
                         value = int(value, 0)
                     except ValueError:
                         pass
-                cmake_default_settings[name] = DefineType(name, value, None, lineno, False)
+                cmake_default_settings[name] = CMakeSetting(name, value, lineno)
             continue
 
         # look for "#else"
