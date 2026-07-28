@@ -96,7 +96,7 @@ void __weak runtime_init_default_alarm_pool(void) {
                                    PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM,
                                    PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS);
     }
-#if USE_SLEEP_NOTIFIFER
+#if PICO_TIME_USE_SLEEP_NOTIFIFER
     lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
 #endif
 #endif
@@ -512,7 +512,6 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
             // we already are waking up at or before when we want to (possibly due to us having been called
             // before in a loop), so we can do an actual WFE. Note we rely on the fact that the alarm pool IRQ
             // handler always does an explicit SEV, since it may be on the other core.
-            //
             __wfe();
             return time_reached(timeout_timestamp);
         } else {
