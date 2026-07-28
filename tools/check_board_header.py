@@ -510,6 +510,7 @@ with open(interfaces_json) as interfaces_fh:
             instances[instance_num] = instances.pop(instance)
 
 pins = dict() # dict of lists
+uses_some_cyw43_pins = False
 for name, define in defines.items():
 
     # check for other-chip defines
@@ -529,6 +530,7 @@ for name, define in defines.items():
                 pins[define.resolved_value].append(define)
             else:
                 if name.startswith("CYW43_WL_GPIO_"):
+                    uses_some_cyw43_pins = True
                     if "CYW43_WL_GPIO_COUNT" not in defines:
                             errors.append(Exception("{}:{}  {} is defined but {} is missing".format(board_header, define.lineno, name, "CYW43_WL_GPIO_COUNT")))
                     else:
@@ -606,6 +608,8 @@ for name, define in defines.items():
         if define.resolved_value not in interface_instance[function]:
             errors.append(Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num)))
 
+if uses_some_cyw43_pins and ("PICO_CYW43_SUPPORTED" not in cmake_settings or cmake_settings["PICO_CYW43_SUPPORTED"].value != 1):
+    errors.append(Exception("{} uses some CYW43 GPIO pins, but doesn't have pico_board_cmake_set({}, 1)".format(board_header, "PICO_CYW43_SUPPORTED")))
 if not has_include_guard:
     errors.append(Exception("{} has no include-guard (expected {})".format(board_header, expected_include_guard)))
 if not has_board_detection and expected_board_detection != "NONE":
