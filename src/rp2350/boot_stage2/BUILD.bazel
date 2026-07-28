@@ -126,8 +126,8 @@ copy_file(
 py_binary(
     name = "pad_tool",
     srcs = ["pad_tool.py"],
-    target_compatible_with = ["//bazel/constraint:host"],
     legacy_create_init = False,
+    target_compatible_with = ["//bazel/constraint:host"],
 )
 
 run_binary(
