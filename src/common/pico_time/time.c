@@ -96,7 +96,7 @@ void __weak runtime_init_default_alarm_pool(void) {
                                    PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM,
                                    PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS);
     }
-#if PICO_TIME_USE_SLEEP_NOTIFIFER
+#if PICO_TIME_USE_SLEEP_NOTIFIER
     lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
 #endif
 #endif
