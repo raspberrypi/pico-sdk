@@ -64,19 +64,10 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
 #define ADAFRUIT_METRO_SD_CARD_DETECT_PIN 40
 
-#ifndef PICO_SD_CARD_DETECT_PIN
-#define PICO_SD_CARD_DETECT_PIN ADAFRUIT_METRO_SD_CARD_DETECT_PIN
-#endif
-
 // USB host
 #define ADAFRUIT_METRO_USB_HOST_DATA_PLUS_PIN 32
 #define ADAFRUIT_METRO_USB_HOST_DATA_MINUS_PIN 33
 #define ADAFRUIT_METRO_USB_HOST_5V_POWER_PIN 29
-
-// --- PIO USB ---
-#ifndef PICO_DEFAULT_PIO_USB_DP_PIN
-#define PICO_DEFAULT_PIO_USB_DP_PIN ADAFRUIT_METRO_USB_HOST_DATA_PLUS_PIN
-#endif
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
@@ -94,6 +85,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_DEFAULT_LED_PIN 23
 #endif
 
+// --- RGB (NeoPixel) LED ---
 #ifndef PICO_DEFAULT_WS2812_PIN
 #define PICO_DEFAULT_WS2812_PIN 25
 #endif
@@ -110,6 +102,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #endif
 
 // --- SPI ---
+// SPI 6 pin connector adjacent to the SD card
 #ifndef PICO_DEFAULT_SPI
 #define PICO_DEFAULT_SPI 1
 #endif
@@ -123,8 +116,38 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_DEFAULT_SPI_RX_PIN 28
 #endif
 
-// --- FLASH ---
+//------------- SD ------------
+#ifndef PICO_SD_CARD_DETECT_PIN
+#define PICO_SD_CARD_DETECT_PIN ADAFRUIT_METRO_SD_CARD_DETECT_PIN
+#endif
 
+#ifndef PICO_SD_CLK_PIN
+#define PICO_SD_CLK_PIN ADAFRUIT_METRO_SDIO_CLOCK_PIN
+#endif
+
+#ifndef PICO_SD_CMD_PIN
+#define PICO_SD_CMD_PIN ADAFRUIT_METRO_SDIO_COMMAND_PIN
+#endif
+
+#ifndef PICO_SD_DAT0_PIN
+#define PICO_SD_DAT0_PIN ADAFRUIT_METRO_SDIO_DATA0_PIN
+#endif
+
+#ifndef PICO_SD_DAT_PIN_INCREMENT
+#define PICO_SD_DAT_PIN_INCREMENT 1
+#endif
+
+#ifndef PICO_SD_DAT_PIN_COUNT
+#define PICO_SD_DAT_PIN_COUNT 4
+#endif
+
+// --- PIO USB ---
+#ifndef PICO_DEFAULT_PIO_USB_DP_PIN
+#define PICO_DEFAULT_PIO_USB_DP_PIN ADAFRUIT_METRO_USB_HOST_DATA_PLUS_PIN
+#endif
+
+// --- FLASH ---
+// Winbond W25Q128 (16MB) flash
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
 
 #ifndef PICO_FLASH_SPI_CLKDIV
