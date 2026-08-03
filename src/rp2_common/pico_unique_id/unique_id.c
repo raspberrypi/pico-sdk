@@ -45,12 +45,12 @@ static void __attribute__((PICO_UNIQUE_BOARD_ID_INIT_ATTRIBUTES)) _retrieve_uniq
 #else
     #if PICO_UNIQUE_BOARD_ID_SIZE_BYTES <= SYS_INFO_DEVICE_ID_SIZE_BYTES
         union {
-            uint32_t words[SYS_INFO_CHIP_INFO_WORDS_RETURNED + 1];
-            uint8_t bytes[(SYS_INFO_CHIP_INFO_WORDS_RETURNED + 1) * 4];
+            uint32_t words[SYS_INFO_CHIP_INFO_WORD_COUNT + 1];
+            uint8_t bytes[(SYS_INFO_CHIP_INFO_WORD_COUNT + 1) * 4];
         } out;
         int words_returned = rom_get_sys_info(out.words, count_of(out.words), SYS_INFO_CHIP_INFO);
-        assert(words_returned == SYS_INFO_CHIP_INFO_WORDS_RETURNED + 1);
-        if ((words_returned - 1) == SYS_INFO_CHIP_INFO_WORDS_RETURNED && out.words[0] == SYS_INFO_CHIP_INFO) {
+        assert(words_returned == SYS_INFO_CHIP_INFO_WORD_COUNT + 1);
+        if (words_returned == (SYS_INFO_CHIP_INFO_WORD_COUNT + 1) && out.words[0] == SYS_INFO_CHIP_INFO) {
             for (int i = 0; i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES; i++) {
                 // The device ID is in words 3 and 4, so skip the first two words (i.e. the first 8 bytes)
                 retrieved_id.id[i] = out.bytes[PICO_UNIQUE_BOARD_ID_SIZE_BYTES - 1 + 2 * 4 - i];
