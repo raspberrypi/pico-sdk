@@ -81,7 +81,7 @@ void powman_timer_set_1khz_tick_source_xosc(void);
  */
 void powman_timer_set_1khz_tick_source_xosc_with_hz(uint32_t xosc_freq_hz);
 
-inline void powman_timer_set_1khz_tick_source_default(void) {
+static inline void powman_timer_set_1khz_tick_source_default(void) {
 #if PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC + PICO_POWMAN_DEFAULT_TICK_SOURCE_LPOSC != 1
     #error Exactly one of PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC and PICO_POWMAN_DEFAULT_TICK_SOURCE_LPOSC must be specified
 #endif
