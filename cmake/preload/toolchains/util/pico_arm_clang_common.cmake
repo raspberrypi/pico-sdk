@@ -105,3 +105,8 @@ else()
     endif()
 endif()
 include(${CMAKE_CURRENT_LIST_DIR}/set_flags.cmake)
+
+# Fix for https://github.com/raspberrypi/pico-sdk/issues/3112
+#foreach(LANG IN ITEMS C CXX)
+#    set(CMAKE_${LANG}_FLAGS_INIT "${CMAKE_${LANG}_FLAGS_INIT} -ftls-model=local-exec")
+#endforeach()
