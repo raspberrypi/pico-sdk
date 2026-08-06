@@ -155,7 +155,6 @@ static void alarm_pool_irq_handler(void);
 #define repeating_timer_marker ((alarm_callback_t)(uintptr_t)2)
 #define deleted_timer_marker ((alarm_callback_t)(uintptr_t)4)
 
-#include "hardware/gpio.h"
 static void alarm_pool_irq_handler(void) {
     // This IRQ handler does the main work, as it always (assuming the IRQ hasn't been enabled on both cores
     // which is unsupported) run on the alarm pool's core, and can't be preempted by itself, meaning
@@ -348,15 +347,15 @@ alarm_id_t alarm_pool_add_alarm_at_force_in_context(alarm_pool_t *pool, absolute
     // ---- take a free pool entry
     uint32_t save = spin_lock_blocking(pool->lock);
     int16_t index = pool->free_head;
-    alarm_pool_entry_t *entry = &pool->entries[index];
     if (index >= 0) {
         // remove from free list
-        pool->free_head = entry->next;
+        pool->free_head = pool->entries[index].next;
     }
     spin_unlock(pool->lock, save);
     if (index < 0) return PICO_ERROR_GENERIC; // PICO_ERROR_INSUFFICIENT_RESOURCES - not using to preserve previous -1 return code
 
     // ---- initialize the pool entry
+    alarm_pool_entry_t *entry = &pool->entries[index];
     entry->callback = callback;
     entry->user_data = user_data;
     entry->target = (int64_t)to_us_since_boot(time);

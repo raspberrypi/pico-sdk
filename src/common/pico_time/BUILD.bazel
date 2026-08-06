@@ -53,13 +53,11 @@ cc_library(
         "//src/common/pico_util",
     ] + select({
         "//bazel/constraint:host": [
-            "//src/host/hardware_gpio",
             "//src/host/hardware_timer",
             "//src/host/pico_runtime",
             "//src/host/pico_time_adapter",
         ],
         "//conditions:default": [
-            "//src/rp2_common/hardware_gpio",
             "//src/rp2_common/hardware_timer",
             "//src/rp2_common/pico_runtime_init",
             "//src/rp2_common/pico_time_adapter",
