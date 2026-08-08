@@ -166,6 +166,26 @@ static void sdk_core_agent(void) {
             case AGENT_SEM_RELEASE:
                 result = sem_release(&test_sem);
                 break;
+            case AGENT_EXPIRED_DEADLINE: {
+                /* Mirrors pico_sync_test's "check repeated deadline issue": run one wait to
+                 * completion so the deadline is cached in best_effort_wfe_or_timeout()'s
+                 * last_added and its alarm has fired, then call again on the now-expired
+                 * deadline. Without the fix that short-circuits to a bare __wfe() with no
+                 * event coming, and hangs. Run here rather than locally so agent_wait() can
+                 * bound it and report instead of wedging the run. */
+                absolute_time_t deadline = make_timeout_time_ms(arg);
+                while (!best_effort_wfe_or_timeout(deadline)) {
+                    tight_loop_contents();
+                }
+                for (uint i = 0; i < 5; i++) {
+                    best_effort_wfe_or_timeout(deadline);
+                }
+                /* and the variant seen in the field: a timed acquire on an expired deadline */
+                semaphore_t s;
+                sem_init(&s, 0, 1);
+                result = !sem_acquire_block_until(&s, deadline);
+                break;
+            }
             case AGENT_KNOWN_SLEEP: {
                 /* Exactly what harness_calibrate_cycles_local() does, but reported through
                  * the normal command-boundary instrumentation as well. If the inline delta

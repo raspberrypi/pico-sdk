@@ -175,6 +175,7 @@ uint32_t harness_cycles(void) {
 static void cycles_enable(void) { /* mcycle is always running */ }
 static uint32_t cycle_delta(uint32_t before, uint32_t after) { return after - before; }
 uint32_t harness_sleep_counter(void) { return 0; }   /* no DWT on RISC-V */
+bool harness_sleep_counter_present(void) { return false; }
 
 #elif !defined(__ARM_ARCH_6M__)
 #define HARNESS_HAS_CYCLE_COUNTER 1
@@ -210,6 +211,7 @@ uint32_t harness_cycles(void) { return DWT_CYCCNT; }
  * Note also that the PPB is per core, so this must be read on the core being judged.
  */
 uint32_t harness_sleep_counter(void) { return DWT_SLEEPCNT & 0xffu; }
+bool harness_sleep_counter_present(void) { return true; }
 static void cycles_enable(void) {
     SCB_DEMCR |= (1u << 24);   /* TRCENA */
     DWT_CYCCNT = 0;
@@ -235,6 +237,7 @@ static void cycles_enable(void) {
     systick_hw->csr = ARM_CPU_PREFIXED(SYST_CSR_CLKSOURCE_BITS) | ARM_CPU_PREFIXED(SYST_CSR_ENABLE_BITS);
 }
 uint32_t harness_sleep_counter(void) { return 0; }   /* no DWT on Cortex-M0+ */
+bool harness_sleep_counter_present(void) { return false; }
 static uint32_t cycle_delta(uint32_t before, uint32_t after) {
     static_assert(ARM_CPU_PREFIXED(SYST_CVR_CURRENT_LSB) == 0, "");
     const uint32_t shift = 32 - HARNESS_CYCLE_BITS;

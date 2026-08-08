@@ -317,6 +317,10 @@ static void d0_sleepcnt_selftest(void) {
 #else
     /* Isolates instrumentation from hardware: one known 20ms WFE on the agent core,
      * measured inline AND at the command boundary. */
+    if (!harness_sleep_counter_present()) {
+        harness_record("D0", RESULT_SKIP, "no DWT sleep counter on this platform");
+        return;
+    }
     if (!agent_run(AGENT_KNOWN_SLEEP, 20, 2000)) {
         harness_record("D0", RESULT_FAIL, "known-sleep probe never returned");
         return;
@@ -396,6 +400,26 @@ static void d1_8_recursive(void) {
     } else {
         harness_record("D1.8", RESULT_PASS, "3-deep nesting released correctly");
     }
+}
+
+static void d2_9_expired_deadline(void) {
+#if !INTEROP_HAS_SDK_CORE
+    harness_record("D2.9", RESULT_SKIP, "no bare-SDK core in this configuration");
+#else
+    /* Repeated waits on an already-expired deadline - the fff4363b3 case. Every other D2
+     * case takes a fresh future deadline each iteration, so last_added never matches and the
+     * short-circuit branch is never entered. Bounded via the agent so a regression reports
+     * rather than hangs (pico_sync_test catches this too, but by hanging). */
+    if (!agent_run(AGENT_EXPIRED_DEADLINE, TIMEOUT_MS, TIMEOUT_MS * 20)) {
+        harness_record("D2.9", RESULT_FAIL,
+                       "wedged on an already-expired deadline - no event is coming, so the"
+                       " bare __wfe() never returns");
+        return;
+    }
+    harness_record("D2.9", agent_result() ? RESULT_PASS : RESULT_FAIL,
+                   "repeated waits on an expired deadline returned promptly (%uus)",
+                   agent_elapsed_us());
+#endif
 }
 
 /* ==================================================================================== */
@@ -777,6 +801,9 @@ static void d2_8_repeated_deadline(void) {
 
 static void test_body(void) {
     printf("\n=== pico-sdk sync interop test ===\n");
+#ifdef PICO_PROCESSOR_NAME
+    printf("cpu: " ## PICO_PROCESSOR_NAME "\n");
+#endif
     printf("config: %s\n", plat_config_name());
     printf("spin locks: %s, unlock %s the event; workaround %s\n",
            PICO_USE_SW_SPIN_LOCKS ? "software" : "hardware",
@@ -817,6 +844,7 @@ static void test_body(void) {
     d2_6_try_from_isr_uncontended();
     d2_7_sdk_core_timed();
     d2_8_repeated_deadline();
+    d2_9_expired_deadline();
 
     printf("\n--- D3: sleep_ms / sleep_until (ms-scale, concurrent, cross-core) ---\n");
     d3_1_sleep_accuracy_ms();

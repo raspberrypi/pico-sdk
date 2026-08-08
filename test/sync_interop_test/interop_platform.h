@@ -118,6 +118,7 @@ enum {
     AGENT_MUTEX_TIMED_COUNTED,        /* mutex_enter_block_until, ditto; arg = timeout ms */
     AGENT_MUTEX_ENTER_BARE,           /* bare spin_unlock(); __wfe() loop, counted */
     AGENT_SLEEP_MS,                   /* sleep_ms(arg) on the bare-SDK core */
+    AGENT_EXPIRED_DEADLINE,           /* repeated waits on an already-expired deadline */
     AGENT_KNOWN_SLEEP,                /* diagnostic: a bare known WFE, measured BOTH inline
                                        * and at the command boundary, to tell an
                                        * instrumentation bug from a hardware one */

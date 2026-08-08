@@ -83,6 +83,9 @@ uint32_t harness_cycles(void);
  * change is inconclusive rather than proof it did not (~1/256 of sleeps are an exact
  * multiple of 256 cycles and read back unchanged, whatever the duration).
  * Per core: must be read on the core being judged. */
+/* 1 only where a DWT sleep counter exists at all (Armv7-M/Armv8-M); 0 on RISC-V and
+ * Cortex-M0+, where harness_sleep_counter() is a constant 0. */
+bool     harness_sleep_counter_present(void);
 uint32_t harness_sleep_counter(void);
 /* 8-bit wrapping delta between two harness_sleep_counter() reads */
 uint32_t harness_sleep_delta(uint32_t before, uint32_t after);
