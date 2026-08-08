@@ -1,5 +1,10 @@
 SECTIONS
 {
+    /* The location counter before .persistent_data is placed
+       A user that wants the heap to sit *below* the persistent data
+       has to pass this as HEAP_LOC */
+    __pre_persistent_data__ = .;
+
     .persistent_data @PERSISTENT_DATA_LOC@ (NOLOAD) : {
         __persistent_data_start__ = .;
         *(.persistent_data*)
