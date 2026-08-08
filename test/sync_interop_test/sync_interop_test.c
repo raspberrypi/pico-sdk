@@ -45,6 +45,7 @@
 #include "pico/sync.h"
 #include "pico/lock_core.h"
 #include "pico/time.h"
+#include "hardware/clocks.h"
 
 #include "interop_platform.h"
 #include "interop_harness.h"
@@ -311,33 +312,62 @@ static void d1_7_blocking_acquire_from_isr(void) {
 #endif
 }
 
-static void d0_sleepcnt_selftest(void) {
+/*
+ * Assert that this platform has the counters we expect it to have, and that they work.
+ *
+ * Without this the suite degrades silently: a counter that stops working just makes the
+ * calibration report "unusable" and every case still passes. That is exactly what happened
+ * with mcycle on Hazard3, where RVCSR_MCOUNTINHIBIT resets with the CY inhibit bit set - the
+ * cycle rate read 0/us for a whole run and nothing flagged it.
+ */
+static void d0_counter_selftest(void) {
 #if !INTEROP_HAS_SDK_CORE
-    harness_record("D0", RESULT_SKIP, "no bare-SDK core in this configuration");
+    harness_record("D0", RESULT_SKIP, "counters are calibrated on the agent core; none here");
 #else
-    /* Isolates instrumentation from hardware: one known 20ms WFE on the agent core,
-     * measured inline AND at the command boundary. */
-    if (!harness_sleep_counter_present()) {
-        harness_record("D0", RESULT_SKIP, "no DWT sleep counter on this platform");
+    /* 1. the cycle counter must actually count, at roughly clk_sys */
+    uint32_t expected = (uint32_t)(clock_get_hz(clk_sys) / 1000000u);
+    uint32_t actual = harness_cal_cycles_per_us();
+    if (actual < expected * 3 / 4 || actual > expected * 5 / 4) {
+        harness_record("D0", RESULT_FAIL,
+                       "cycle counter reads %u/us, expected ~%u (clk_sys); is it enabled?",
+                       actual, expected);
         return;
     }
+
+    /* 2. Where this platform is expected to have a sleep counter, prove it actually works.
+     *    (There is nothing to assert where none is expected: harness_sleep_counter_present()
+     *    is derived from the same architecture macros as the expectation, so comparing them
+     *    would only restate a compile-time constant. The runtime probe below is the real
+     *    check - it is what would have caught the mcycle inhibit had it applied to SLEEPCNT.)
+     */
+    if (!HARNESS_EXPECT_SLEEP_COUNTER) {
+        harness_record("D0", RESULT_PASS,
+                       "cycle counter %u/us; no DWT sleep counter on this architecture",
+                       actual);
+        return;
+    }
+
+    /*    one known WFE, measured inline
+     *    and at the command boundary, so an instrumentation fault is distinguishable from a
+     *    hardware one. */
     if (!agent_run(AGENT_KNOWN_SLEEP, 20, 2000)) {
         harness_record("D0", RESULT_FAIL, "known-sleep probe never returned");
         return;
     }
     uint32_t inl = agent_inline_sleep_delta();
     uint32_t bnd = agent_sleep_delta();
-    if (inl && !bnd) {
+    if (!inl) {
+        harness_record("D0", RESULT_FAIL,
+                       "sleep counter present but did not move across a known 20ms WFE"
+                       " (inline d=0, boundary d=%u)", bnd);
+    } else if (!bnd) {
         harness_record("D0", RESULT_INFO,
-                       "SLEEPCNT inline d=%u but boundary d=0 - the boundary read is at"
-                       " fault, not the counter", inl);
-    } else if (!inl && !bnd) {
-        harness_record("D0", RESULT_INFO,
-                       "SLEEPCNT saw nothing for a known 20ms WFE (inline and boundary both"
-                       " 0) - counter not counting this WFE");
+                       "sleep counter works (inline d=%u) but the boundary read is 0"
+                       " - instrumentation, not hardware", inl);
     } else {
-        harness_record("D0", RESULT_INFO, "SLEEPCNT known 20ms WFE: inline d=%u, boundary d=%u",
-                       inl, bnd);
+        harness_record("D0", RESULT_PASS,
+                       "cycle counter %u/us; sleep counter moved (inline d=%u, boundary d=%u)",
+                       actual, inl, bnd);
     }
 #endif
 }
@@ -804,6 +834,7 @@ static void test_body(void) {
 #ifdef PICO_PROCESSOR_NAME
     printf("cpu: " ## PICO_PROCESSOR_NAME "\n");
 #endif
+    printf("platform: %s\n", PICO_PLATFORM_NAME);
     printf("config: %s\n", plat_config_name());
     printf("spin locks: %s, unlock %s the event; workaround %s\n",
            PICO_USE_SW_SPIN_LOCKS ? "software" : "hardware",
@@ -824,7 +855,7 @@ static void test_body(void) {
     harness_print_calibration();
 
     printf("\n--- D1: blocking discipline (mutex_enter_blocking, as pico_malloc) ---\n");
-    d0_sleepcnt_selftest();
+    d0_counter_selftest();
     d1_1_uncontended();
     d1_2_contended();
     d1_3_priority_asymmetric();

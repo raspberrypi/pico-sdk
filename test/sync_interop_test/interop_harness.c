@@ -9,6 +9,9 @@
 #include <string.h>
 
 #include "pico/stdlib.h"
+#ifdef __riscv
+#include "hardware/regs/rvcsr.h"
+#endif
 #include "hardware/structs/systick.h"
 #include "pico/platform/cpu_regs.h"
 
@@ -172,7 +175,13 @@ uint32_t harness_cycles(void) {
     __asm volatile ("csrr %0, mcycle" : "=r" (c));
     return c;
 }
-static void cycles_enable(void) { /* mcycle is always running */ }
+static void cycles_enable(void) {
+    /* mcycle does NOT run by default on Hazard3: RVCSR_MCOUNTINHIBIT resets to 0x5, i.e. the
+     * CY (cycle) and IR (instret) inhibit bits are both set. Clear CY so mcycle advances,
+     * otherwise every reading is 0 and the calibration correctly declares it unusable. */
+    __asm volatile ("csrci %0, %1" :: "i" (RVCSR_MCOUNTINHIBIT_OFFSET),
+                                      "i" (RVCSR_MCOUNTINHIBIT_CY_BITS));
+}
 static uint32_t cycle_delta(uint32_t before, uint32_t after) { return after - before; }
 uint32_t harness_sleep_counter(void) { return 0; }   /* no DWT on RISC-V */
 bool harness_sleep_counter_present(void) { return false; }
@@ -180,7 +189,9 @@ bool harness_sleep_counter_present(void) { return false; }
 #elif !defined(__ARM_ARCH_6M__)
 #define HARNESS_HAS_CYCLE_COUNTER 1
 #define HARNESS_CYCLE_BITS 32
-/* Armv7-M/Armv8-M DWT, which FreeRTOS does not use, so this is safe on any core. */
+/* Armv7-M/Armv8-M DWT, which FreeRTOS does not use, so this is safe on any core.
+ * Note CYCCNT is present across Armv7-M/Armv8-M, but the *profiling* counters (SLEEPCNT et
+ * al) are Mainline-only - hence harness_sleep_counter_present() uses the narrower predicate. */
 #define DWT_CTRL     (*(volatile uint32_t *)0xE0001000u)
 #define DWT_CYCCNT   (*(volatile uint32_t *)0xE0001004u)
 #define DWT_SLEEPCNT (*(volatile uint32_t *)0xE0001010u)
@@ -211,7 +222,7 @@ uint32_t harness_cycles(void) { return DWT_CYCCNT; }
  * Note also that the PPB is per core, so this must be read on the core being judged.
  */
 uint32_t harness_sleep_counter(void) { return DWT_SLEEPCNT & 0xffu; }
-bool harness_sleep_counter_present(void) { return true; }
+bool harness_sleep_counter_present(void) { return HARNESS_EXPECT_SLEEP_COUNTER; }
 static void cycles_enable(void) {
     SCB_DEMCR |= (1u << 24);   /* TRCENA */
     DWT_CYCCNT = 0;
@@ -269,6 +280,10 @@ void harness_set_cycle_calibration(uint32_t busy_per_us, uint32_t sleep_per_us) 
 
 uint32_t harness_sleep_delta(uint32_t before, uint32_t after) {
     return (after - before) & 0xffu;
+}
+
+uint32_t harness_cal_cycles_per_us(void) {
+    return cal_cyc_busy_per_us;
 }
 
 bool harness_sleep_counter_usable(void) {
@@ -378,7 +393,9 @@ void harness_print_calibration(void) {
     }
     printf("  sleep detection: wait-loop iteration count (<=%d means it blocked)\n",
            MAX_BLOCKING_WAITS);
-    if (harness_sleep_counter_usable()) {
+    if (!harness_sleep_counter_present()) {
+        printf("    DWT_SLEEPCNT: not present on this platform (no DWT)\n");
+    } else if (harness_sleep_counter_usable()) {
         printf("    DWT_SLEEPCNT: moved across a known sleep and held still while busy"
                " - a direct sleep signal is available\n");
     } else if (sleepcnt_moved_awake) {

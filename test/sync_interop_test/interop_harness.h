@@ -83,8 +83,23 @@ uint32_t harness_cycles(void);
  * change is inconclusive rather than proof it did not (~1/256 of sleeps are an exact
  * multiple of 256 cycles and read back unchanged, whatever the duration).
  * Per core: must be read on the core being judged. */
-/* 1 only where a DWT sleep counter exists at all (Armv7-M/Armv8-M); 0 on RISC-V and
- * Cortex-M0+, where harness_sleep_counter() is a constant 0. */
+/*
+ * Whether this platform is expected to have the DWT profiling counters (of which SLEEPCNT is
+ * one). Positively specified - name the architectures that have them - so an unrecognised
+ * future platform defaults to "not expected" rather than raising a false failure.
+ *
+ * Absent on Armv6-M (Cortex-M0+) and, importantly, on Armv8-M *Baseline* (Cortex-M23) - the
+ * profiling counters come with Mainline, which is why the SDK gates its software spin lock on
+ * __ARM_ARCH_8M_MAIN__ rather than on Armv8-M generally. Absent on RISC-V, which has no DWT.
+ */
+#if defined(__ARM_ARCH_8M_MAIN__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+#define HARNESS_EXPECT_SLEEP_COUNTER 1
+#else
+#define HARNESS_EXPECT_SLEEP_COUNTER 0
+#endif
+
+/* 1 only where a DWT sleep counter exists at all; 0 elsewhere, where
+ * harness_sleep_counter() is a constant 0. Should agree with the expectation above. */
 bool     harness_sleep_counter_present(void);
 uint32_t harness_sleep_counter(void);
 /* 8-bit wrapping delta between two harness_sleep_counter() reads */
@@ -104,6 +119,9 @@ uint32_t harness_cycle_delta(uint32_t before, uint32_t after);
 /* The counter is per core, and on Arm SysTick belongs to FreeRTOS - so this may only be
  * called on a core that is not running FreeRTOS. */
 void     harness_cycles_enable_this_core(void);
+/* Measured cycles/us while spinning, from the calibration. Should be ~clk_sys in MHz; a
+ * wildly wrong value (notably 0) means the counter is not running. */
+uint32_t harness_cal_cycles_per_us(void);
 /* Measure this core's busy and asleep cycle rates; run on the core to be judged. */
 void     harness_calibrate_cycles_local(uint32_t *busy_per_us, uint32_t *sleep_per_us);
 /* Install a calibration measured elsewhere (i.e. on the agent core). */
