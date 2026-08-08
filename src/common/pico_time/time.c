@@ -527,6 +527,16 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
                     __wfe();
                 }
                 // we need to clean up if it wasn't us that caused the wfe; if it was this will be a noop.
+                //
+                // note this cancel is deliberately unconditional, and is not merely tidying up: a caller
+                // which recomputes its deadline on each iteration takes this branch every time (as
+                // last_added won't match), and so adds a fresh alarm on every pass. Without the cancel
+                // that leaks a pool entry per iteration until the pool is exhausted - which has been seen
+                // in practice, with one core spinning here whilst the other owns the alarm IRQ.
+                //
+                // guarding it on "has it already fired?" would race with the IRQ handler, and buys
+                // nothing: cancelling an already fired alarm costs one spurious forced IRQ, and is
+                // otherwise a noop, since the sequence check fails once the entry has been reallocated.
                 cancel_alarm(id);
                 return time_reached(timeout_timestamp);
             }
