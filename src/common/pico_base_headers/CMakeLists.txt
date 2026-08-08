@@ -6,6 +6,10 @@ if (NOT TARGET pico_base_headers)
     target_compile_definitions(pico_base_headers INTERFACE
             PICO_BOARD="${PICO_BOARD}")
 
+    # PICO_BUILD_DEFINE: PICO_PLATFORM_NAME, Name of the platform being built for e.g. rp2040, rp2350-arm-s, rp2350-riscv, host, type=string, default=CMake PICO_PLATFORM variable, group=pico_base
+    target_compile_definitions(pico_base_headers INTERFACE
+            PICO_PLATFORM_NAME="${PICO_PLATFORM}")
+
     foreach(override ${PICO_BOARD_CMAKE_OVERRIDES})
         target_compile_definitions(pico_base_headers INTERFACE
                 ${override}=${${override}})
