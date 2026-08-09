@@ -484,35 +484,207 @@ void plat_start_background_sleeper(uint32_t period_ms, volatile int64_t *worst_l
     xTaskCreate(sleeper_task, "sleeper", configMINIMAL_STACK_SIZE, a, HOLDER_PRIORITY, NULL);
 }
 
+/*
+ * Two long-lived acquirers, signalled per round.
+ *
+ * They used to be created and deleted per round, which quietly turned the D1.10 sweep into a
+ * heap-exhaustion test: 320 tasks with configMINIMAL_STACK_SIZE stacks against a 64KB heap,
+ * whose stacks are only returned when the idle task runs. Creation began failing part-way
+ * through the sweep, and a waiter that was never created looks exactly like one that was
+ * stranded - which is what it was reported as, at the same attempt number on two consecutive
+ * runs, until xTaskCreate's return value was checked.
+ */
+#define ACQUIRERS 2
 static volatile uint acquirers_done;
+static volatile uint acquirers_mask;
+static volatile bool acquirer_create_failed;
+static SemaphoreHandle_t acq_go[ACQUIRERS];
+static void (* volatile acq_hook[ACQUIRERS])(void);
+static TaskHandle_t acq_task[ACQUIRERS];
 
 static void acquirer_task(void *param) {
-    void (*hook)(void) = (void (*)(void))param;
-    if (hook) hook();
-    sem_acquire_blocking(&test_sem);
-    acquirers_done++;
-    vTaskDelete(NULL);
+    uint idx = (uint)(uintptr_t)param;
+    for (;;) {
+        xSemaphoreTake(acq_go[idx], portMAX_DELAY);
+        void (*hook)(void) = acq_hook[idx];
+        if (hook) hook();
+        sem_acquire_blocking(&test_sem);
+        acquirers_mask |= 1u << idx;
+        acquirers_done++;
+    }
+}
+
+static void ensure_acquirers(void) {
+    if (acq_task[0]) return;
+    for (uint i = 0; i < ACQUIRERS; i++) {
+        acq_go[i] = xSemaphoreCreateBinary();
+        if (!acq_go[i] ||
+            xTaskCreate(acquirer_task, "acq", configMINIMAL_STACK_SIZE, (void *)(uintptr_t)i,
+                        HOLDER_PRIORITY, &acq_task[i]) != pdPASS) {
+            acquirer_create_failed = true;
+        }
+    }
 }
 
 void plat_start_sem_acquirers(uint n) {
+    ensure_acquirers();
     acquirers_done = 0;
+    acquirers_mask = 0;
     __compiler_memory_barrier();
-    for (uint i = 0; i < n; i++) {
-        xTaskCreate(acquirer_task, "acq", configMINIMAL_STACK_SIZE, NULL, HOLDER_PRIORITY, NULL);
+    for (uint i = 0; i < n && i < ACQUIRERS; i++) {
+        acq_hook[i] = NULL;
+        xSemaphoreGive(acq_go[i]);
     }
 }
 
 void plat_start_one_sem_acquirer(void) {
-    xTaskCreate(acquirer_task, "acq", configMINIMAL_STACK_SIZE, NULL, HOLDER_PRIORITY, NULL);
+    ensure_acquirers();
+    acq_hook[1] = NULL;
+    xSemaphoreGive(acq_go[1]);
 }
 
 void plat_start_one_sem_acquirer_with_hook(void (*hook)(void)) {
-    xTaskCreate(acquirer_task, "acq", configMINIMAL_STACK_SIZE, (void *)hook, HOLDER_PRIORITY,
-                NULL);
+    ensure_acquirers();
+    acq_hook[1] = hook;
+    xSemaphoreGive(acq_go[1]);
+}
+
+uint plat_sem_acquirers_mask(void) {
+    return acquirers_mask;
+}
+
+bool plat_sem_acquirer_create_failed(void) {
+    return acquirer_create_failed;
+}
+
+uint32_t plat_free_heap(void) {
+    return (uint32_t)xPortGetFreeHeapSize();
 }
 
 uint plat_sem_acquirers_done(void) {
     return acquirers_done;
+}
+
+/*
+ * Continuous churn, for the D1.10 invariant probe: n consumers looping on the semaphore, each
+ * counting its own acquires. Rather than trying to land inside a few-instruction window, this
+ * lets the window be hit naturally and watches for its consequence - a consumer making no
+ * progress while permits are available.
+ */
+#define CHURN_MAX 3
+static volatile uint32_t churn_count[CHURN_MAX];
+static volatile bool     churn_stop;
+static volatile uint     churn_exited;
+static bool              churn_started;
+
+static TaskHandle_t churn_handle[CHURN_MAX];
+
+static void churn_task_fn(void *param) {
+    uint idx = (uint)(uintptr_t)param;
+    while (!churn_stop) {
+        sem_acquire_blocking(&test_sem);
+        churn_count[idx]++;
+    }
+    churn_exited++;
+    vTaskSuspend(NULL);
+}
+
+/*
+ * Whether this consumer is actually blocked, as opposed to merely losing the race for permits.
+ * "Has not progressed while permits are available" is not sufficient on its own: permits
+ * arrive in pairs and a sample can land while the consumer is ready and about to run, so a
+ * consumer that loses a few round-robin turns looks identical to one that was stranded.
+ */
+bool plat_sem_churn_blocked(uint i) {
+    return i < CHURN_MAX && churn_handle[i] && eTaskGetState(churn_handle[i]) == eBlocked;
+}
+
+/*
+ * The releaser runs in task context on purpose.
+ *
+ * Releasing from an alarm ISR goes through xEventGroupSetBitsFromISR, which defers the set to
+ * the timer/daemon task rather than applying it inline. That scheduling hop gives a waiter
+ * which is still between its spin_unlock() and xEventGroupWaitBits() ample time to arrive and
+ * register properly, so it tends to close the very window under test - which is likely why
+ * four ISR-driven probe designs never provoked anything. From a task the bits are set inline,
+ * and this task runs above the consumers so it can preempt one inside that window.
+ *
+ * The gap within a pair is swept, since it decides where the second release lands; the gap
+ * after a pair is long, because a stranded waiter is rescued by the next release and the stall
+ * is only observable during silence.
+ */
+static void releaser_task_fn(__unused void *param) {
+    uint32_t gap_us = 1;
+    while (!churn_stop) {
+        /*
+         * Two phases, because the two requirements pull against each other.
+         *
+         * A consumer only occupies the vulnerable window in the microseconds just after it
+         * consumes a permit and loops round. Releases spaced milliseconds apart therefore
+         * always land with every consumer parked, and one xEventGroupSetBits wakes them all
+         * together - nobody is ever mid-window, so the interleaving under test never arises.
+         * Hence a rapid phase, many pairs close together, so a release lands while another
+         * consumer is still cycling.
+         *
+         * But a stranded waiter is rescued by the next release, so the stall is only visible
+         * once the releases stop. Hence the silent phase, during which the invariant is
+         * checked: a permit still available with a consumer genuinely blocked.
+         */
+        for (uint i = 0; i < 10 && !churn_stop; i++) {
+            /*
+             * To soak this harder: raise D1_10_SECONDS, and call xip_cache_invalidate_all()
+             * here (link hardware_xip_cache). The vulnerable window is spin_unlock() to the
+             * vTaskSuspendAll() at the top of xEventGroupWaitBits(), so its width is however
+             * long that prologue takes to fetch, and a churn loop keeps it hot - the test
+             * optimising against itself. Neither is on by default: a five minute soak with the
+             * cache flushed on every pair found nothing either, and it is far too slow to
+             * leave in the suite.
+             */
+            sem_release(&test_sem);
+            busy_wait_us(gap_us);          /* swept: where the second release lands */
+            sem_release(&test_sem);
+            gap_us = 1 + (gap_us % 40);
+            busy_wait_us(30);              /* just enough for a consumer to cycle */
+        }
+        /* Long enough for a stall to be *confirmed*, not merely glimpsed. While releases keep
+         * coming a stranded waiter is rescued by the next one, so with a short silence the
+         * probe can watch the bug happen and then disqualify it for recovering. */
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+    churn_exited++;
+    vTaskSuspend(NULL);
+}
+
+void plat_sem_churn_start(uint n) {
+    if (churn_started) return;
+    churn_started = true;
+    churn_stop = false;
+    churn_exited = 0;
+    if (xTaskCreate(releaser_task_fn, "rel", configMINIMAL_STACK_SIZE, NULL,
+                    MAIN_PRIORITY, NULL) != pdPASS) {
+        acquirer_create_failed = true;
+    }
+    for (uint i = 0; i < n && i < CHURN_MAX; i++) {
+        churn_count[i] = 0;
+        if (xTaskCreate(churn_task_fn, "churn", configMINIMAL_STACK_SIZE,
+                        (void *)(uintptr_t)i, HOLDER_PRIORITY, &churn_handle[i]) != pdPASS) {
+            acquirer_create_failed = true;
+        }
+    }
+}
+
+uint32_t plat_sem_churn_count(uint i) {
+    return i < CHURN_MAX ? churn_count[i] : 0;
+}
+
+bool plat_sem_churn_stop(uint n) {
+    churn_stop = true;
+    /* n consumers plus the releaser; consumers may be blocked in the acquire, so feed them out */
+    for (uint i = 0; i < 200 && churn_exited < n + 1; i++) {
+        sem_release(&test_sem);
+        vTaskDelay(pdMS_TO_TICKS(2));
+    }
+    return churn_exited >= n + 1;
 }
 
 static mutex_t       alias_mutex;
@@ -666,6 +838,33 @@ void plat_start_one_sem_acquirer_with_hook(__unused void (*hook)(void)) {
 
 uint plat_sem_acquirers_done(void) {
     return 0;
+}
+
+uint plat_sem_acquirers_mask(void) {
+    return 0;
+}
+
+bool plat_sem_acquirer_create_failed(void) {
+    return false;
+}
+
+uint32_t plat_free_heap(void) {
+    return 0;
+}
+
+void plat_sem_churn_start(__unused uint n) {
+}
+
+uint32_t plat_sem_churn_count(__unused uint i) {
+    return 0;
+}
+
+bool plat_sem_churn_stop(__unused uint n) {
+    return true;
+}
+
+bool plat_sem_churn_blocked(__unused uint i) {
+    return false;
 }
 
 void plat_start_bit_thief(__unused uint spin_lock_num) {

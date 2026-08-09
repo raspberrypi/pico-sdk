@@ -982,49 +982,86 @@ static void d1_10_two_waiters_two_releases(void) {
     harness_record("D1.10", RESULT_SKIP,
                    "needs two tasks blocked on one semaphore's event-group bit");
 #else
-    /* Sweep the offset at which the two releases land relative to B's acquire. The path from
-     * "B starts" to "B is inside xEventGroupWaitBits" is a few microseconds, so a
-     * microsecond-granularity sweep across that span crosses the window.
-     *
-     * B arms the alarm itself, so the offset is measured from B's own execution. Timing it
-     * from here instead only works where B cannot run until this task blocks - true on a
-     * single-core scheduler, false under SMP, where B starts at once on the other core and has
-     * long since parked by the time the alarm fires. That difference, not immunity, is why an
-     * earlier version of this probe failed on _core0/_core1 and passed under SMP. */
-    const uint32_t scan_us = 160;
-    uint attempts = 0;
-    for (uint32_t offset_us = 0; offset_us < scan_us; offset_us++) {
-        sem_reset(&test_sem, 0);
-        plat_start_sem_acquirers(1);        /* A */
-        plat_delay_ms(2);                   /* let A park on the event group */
+    const uint consumers = 3;              /* >2, so one can be cycling while another parks */
+    const uint window_ms = 5;
+    /* Dial up for a soak - 300 has been run, and found nothing. */
+#ifndef D1_10_SECONDS
+#define D1_10_SECONDS 5
+#endif
+    const uint windows = (D1_10_SECONDS * 1000) / window_ms;
+    const uint stall_windows = 3;          /* 15ms of no progress with permits available */
 
-        d1_10_offset_us = offset_us + 1;
-        plat_start_one_sem_acquirer_with_hook(d1_10_arm_releases);   /* B */
-        plat_delay_ms(15);
-        attempts++;
+    sem_reset(&test_sem, 0);
+    plat_sem_churn_start(consumers);     /* also starts the task-context releaser */
 
-        for (uint i = 0; i < 20 && plat_sem_acquirers_done() < 2; i++) {
-            plat_delay_ms(2);
-        }
-
-        uint done = plat_sem_acquirers_done();
-        if (done < 2) {
-            harness_record("D1.10", RESULT_FAIL,
-                           "only %u of 2 waiters woke from 2 releases (releases at +%uus,"
-                           " attempt %u): a permit remains but the shared event bit was"
-                           " consumed by the other waiter", done, offset_us, attempts);
-            /* free the stranded waiter so nothing after this is skewed */
-            for (uint i = 0; i < 20 && plat_sem_acquirers_done() < 2; i++) {
-                sem_release(&test_sem);
-                plat_delay_ms(2);
+    uint32_t last[3] = { 0, 0, 0 };
+    uint stalled[3] = { 0, 0, 0 };
+    uint worst_stall = 0;
+    uint transients = 0;                   /* stalls that recovered before the threshold */
+    uint stalled_idx = 0;
+    int16_t stalled_permits = 0;
+    for (uint w = 0; w < windows; w++) {
+        plat_delay_ms(window_ms);
+        for (uint i = 0; i < consumers; i++) {
+            uint32_t now = plat_sem_churn_count(i);
+            /* A consumer that has not acquired anything for a whole window, while permits are
+             * sitting available, is the bug: a release notifies every *parked* waiter, so one
+             * that is making no progress with permits there has been missed. */
+            if (now == last[i] && sem_available(&test_sem) > 0 && plat_sem_churn_blocked(i)) {
+                stalled[i]++;
+                if (stalled[i] > worst_stall) {
+                    worst_stall = stalled[i];
+                    stalled_idx = i;
+                    stalled_permits = sem_available(&test_sem);
+                }
+            } else {
+                /* A recovered stall is still the bug happening - it was rescued by a later
+                 * release rather than never occurring - so count it rather than discard it. */
+                if (stalled[i]) transients++;
+                stalled[i] = 0;
             }
-            return;
+            last[i] = now;
+        }
+        if (worst_stall >= stall_windows) break;
+    }
+    /* Does one more release get it moving? A lost notification wakes on the next set of the
+     * bit; something stuck for another reason does not. This distinguishes the two without
+     * guessing, which has not gone well. */
+    bool woke_on_poke = false;
+    if (worst_stall >= stall_windows) {
+        uint32_t before = plat_sem_churn_count(stalled_idx);
+        sem_release(&test_sem);
+        for (uint i = 0; i < 10 && !woke_on_poke; i++) {
+            plat_delay_ms(2);
+            woke_on_poke = plat_sem_churn_count(stalled_idx) > before;
         }
     }
-    harness_record("D1.10", RESULT_PASS,
-                   "no waiter stranded in %u attempts sweeping the release offset over"
-                   " 1-%uus; the window is a few instructions, so this is weak evidence",
-                   attempts, scan_us);
+    uint32_t total = plat_sem_churn_count(0) + plat_sem_churn_count(1) + plat_sem_churn_count(2);
+    bool drained = plat_sem_churn_stop(consumers);
+
+    if (plat_sem_acquirer_create_failed()) {
+        harness_record("D1.10", RESULT_FAIL,
+                       "could not create the churn tasks (%u bytes of FreeRTOS heap free)",
+                       plat_free_heap());
+    } else if (worst_stall >= stall_windows) {
+        harness_record("D1.10", RESULT_FAIL,
+                       "consumer %u made no progress for %ums with %d permits available"
+                       " after %u acquires; one more release %s - %s",
+                       stalled_idx, worst_stall * window_ms, stalled_permits, total,
+                       woke_on_poke ? "woke it" : "did NOT wake it",
+                       woke_on_poke ? "a lost notification, as expected"
+                                    : "so it is not simply a missed event-group set");
+    } else if (!drained) {
+        harness_record("D1.10", RESULT_FAIL,
+                       "churn tasks did not all exit after %u acquires - one is still blocked"
+                       " with permits released to it", total);
+    } else {
+        harness_record("D1.10", RESULT_PASS,
+                       "%u acquires across %u consumers, no confirmed stall (worst %ums,"
+                       " %u transient stalls seen - each one a waiter blocked with a permit"
+                       " available that a later release rescued)", total, consumers,
+                       worst_stall * window_ms, transients);
+    }
 #endif
 }
 

@@ -208,6 +208,19 @@ void     plat_start_one_sem_acquirer(void);
  * the new task may start on the other core before the caller has finished setting up. */
 void     plat_start_one_sem_acquirer_with_hook(void (*hook)(void));
 uint     plat_sem_acquirers_done(void);
+/* Bit per acquirer in creation order, so a failure can name which one did not finish. */
+uint     plat_sem_acquirers_mask(void);
+/* True if any acquirer task could not be created - which otherwise looks exactly like a
+ * waiter that was stranded, and would be reported as the bug under test. */
+bool     plat_sem_acquirer_create_failed(void);
+uint32_t plat_free_heap(void);
+
+/* D1.10 churn: n consumers looping on test_sem, each counting its own acquires. */
+void     plat_sem_churn_start(uint n);
+uint32_t plat_sem_churn_count(uint i);
+bool     plat_sem_churn_stop(uint n);
+/* True only if that consumer is genuinely blocked, not merely waiting its turn. */
+bool     plat_sem_churn_blocked(uint i);
 
 void     plat_start_bit_thief(uint spin_lock_num);
 void     plat_stop_bit_thief(void);

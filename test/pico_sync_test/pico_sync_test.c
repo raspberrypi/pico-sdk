@@ -65,7 +65,13 @@ static int do_test(void) {
 
     PICOTEST_START_SECTION("check low power lock_core wait loop without timeout");
     // note: this implementation is implemented in a similar functions to mutex_enter_blocking(),
-    //       sem_acquire_blocking() etc. and should be updated if they are
+    //       sem_acquire_blocking() etc. and should be updated if they are.
+    //       Deliberately not mirroring sem_acquire_blocking()'s
+    //       lock_internal_spin_unlock_maybe_notify(): that exists because an acquirer consumes a
+    //       permit and may leave others, so on an implementation whose notify does not reach a
+    //       waiter that has started but not yet blocked, it owes them one. A flag is not
+    //       consumed - once set it stays set and every waiter sees it - so there is nothing to
+    //       re-notify, and adding one would only perturb the wait count measured here.
     lock_with_flag_t lock_with_flag;
     lock_init(&lock_with_flag.lock, 0);
     lock_with_flag.flag = false;

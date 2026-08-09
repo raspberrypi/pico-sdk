@@ -174,9 +174,17 @@ extern volatile uint8_t lock_internal_notify_count;
  * a missed notification). In other words this method should always wake up any lock_internal_spin_unlock_with_wait
  * which started before this call completes.
  *
- * In an ideal implementation, this method would wake up only the corresponding lock_internal_spin_unlock_with_wait
- * that has been called on the same lock instance, however it is free to wake up any of them, as they will check
- * their condition and then re-wait if necessary/
+ * Note that a wait has *started* as soon as it has released the spin lock, whether or not it has reached
+ * whatever it blocks on. Waking too many is harmless - an implementation is free to wake waiters on other
+ * lock instances too, as each rechecks its condition and re-waits if necessary - but waking too few is not:
+ * a waiter which is missed has nothing left to tell it that the state it wanted has become available.
+ *
+ * LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL records whether the implementation in use actually
+ * achieves that, and lock_internal_spin_unlock_maybe_notify() lets a primitive cope where it does not.
+ * The SDK's own implementation does, because a SEV's event latch is per core and sticky, so it also
+ * covers a waiter which has not yet reached its __wfe(). The FreeRTOS ports currently do not: they
+ * consume a shared event-group bit, so a waiter still between its spin unlock and its block finds
+ * nothing left.
  *
  * By default this macro simply unlocks the spin lock, and then performs a SEV, but may be overridden
  * (e.g. to actually un-block RTOS task(s)).
@@ -239,6 +247,74 @@ extern volatile uint8_t lock_internal_notify_count;
                                                 : time_reached(until);                   \
 })
 #endif
+#endif
+
+/*! \brief Whether a notify reaches every waiter, including one that has not yet parked
+ *  \ingroup lock_core
+ *
+ * The SDK's own notify is a __sev(), whose event latch is per core and sticky: a waiter that
+ * has not yet reached its __wfe() still sees it, and one waiter consuming its latch cannot
+ * take another's. Nothing is lost, so a waiter which consumes state and returns need not
+ * notify anybody.
+ *
+ * An RTOS override need not have that property. The FreeRTOS ports multiplex every spin lock
+ * onto bits of one event group and consume the bit (xClearOnExit), so a notify is taken by
+ * whoever is already parked, and a waiter arriving a moment later finds nothing - which
+ * strands it if state it could have used is still available.
+ *
+ * This is simply whether the implementation meets the contract documented on
+ * lock_internal_spin_unlock_with_notify() above; the flag exists because the FreeRTOS ports
+ * currently do not, and primitives which leave usable state behind have to cope.
+ *
+ * Defaults to 1 only when none of the lock_internal_* primitives are overridden, i.e. when the
+ * SDK's own SEV-based implementation is in use. A port whose notify genuinely reaches every
+ * waiter may define it to 1 itself - but note carefully what that asserts, because the obvious
+ * reading is not the useful one. Waking every *parked* waiter is not sufficient, and an
+ * implementation which does only that will set this wrongly in good faith: the FreeRTOS ports
+ * wake every task on the event group and still do not qualify. What is required is that a
+ * waiter which has *started* - released the spin lock, per lock_internal_spin_unlock_with_wait
+ * above - is reached even if it has not yet blocked. Setting this to 1 without that property
+ * silently reintroduces the loss it exists to prevent, since the primitives will then skip the
+ * notify that was covering for it.
+ */
+#ifndef LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL
+#if !(LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN)
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL 1
+#else
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL 0
+#endif
+#endif
+
+/*! \brief Release a spin lock, notifying only if other waiters may still be able to proceed
+ *  \ingroup lock_core
+ *
+ * For use where the caller has consumed some of a lock's state and left the rest - a semaphore
+ * acquirer taking one of several permits, say. Where a notify reaches every waiter this is just
+ * a spin_unlock and `others_may_proceed` is not evaluated at all; where it does not, the
+ * condition decides whether the remaining waiters must be re-notified.
+ *
+ * Bounded by construction: at most one extra notify per consume that leaves something behind,
+ * and never more, since a notify cannot create state and the chain therefore stops when the
+ * state runs out. What it can amplify is *wakeups* - on an implementation whose notify wakes
+ * every waiter on the lock, consuming n units with w waiters parked costs up to n broadcasts
+ * of w wakes, against the single broadcast it would otherwise be. The common cases are free or
+ * exact: a caller which did not have to wait never notifies, and with one waiter the notify
+ * wakes precisely the task it is for.
+ *
+ * \param lock the lock_core
+ * \param save the uint32_t value returned by the corresponding spin_lock_blocking()
+ * \param others_may_proceed true if state remains which another waiter could still consume
+ */
+#if LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL
+#define lock_internal_spin_unlock_maybe_notify(lock, save, others_may_proceed) spin_unlock((lock)->spin_lock, save)
+#else
+#define lock_internal_spin_unlock_maybe_notify(lock, save, others_may_proceed) ({ \
+    if (others_may_proceed) {                                                     \
+        lock_internal_spin_unlock_with_notify(lock, save);                        \
+    } else {                                                                      \
+        spin_unlock((lock)->spin_lock, save);                                     \
+    }                                                                             \
+})
 #endif
 
 #ifndef sync_internal_yield_until_before

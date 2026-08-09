@@ -25,14 +25,18 @@ int __time_critical_func(sem_available)(semaphore_t *sem) {
 
 void __time_critical_func(sem_acquire_blocking)(semaphore_t *sem) {
     // note: if you change the implementation here, please update the similar code in pico_sync_test.c
+    // only a caller which waited can have consumed a notification, so only it can owe one to
+    // the waiters it left behind; taking a permit on the first pass consumes nothing
+    bool __unused waited = false;
     do {
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);
         if (sem->permits > 0) {
             sem->permits--;
-            spin_unlock(sem->core.spin_lock, save);
+            lock_internal_spin_unlock_maybe_notify(&sem->core, save, waited && sem->permits != 0);
             break;
         }
         lock_internal_spin_unlock_with_wait(&sem->core, save);
+        waited = true;
     } while (true);
 }
 
@@ -46,16 +50,18 @@ bool __time_critical_func(sem_acquire_timeout_us)(semaphore_t *sem, uint32_t tim
 
 bool __time_critical_func(sem_acquire_block_until)(semaphore_t *sem, absolute_time_t until) {
     // note: if you change the implementation here, please update the similar code in pico_sync_test.c
+    bool __unused waited = false;
     do {
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);
         if (sem->permits > 0) {
             sem->permits--;
-            spin_unlock(sem->core.spin_lock, save);
+            lock_internal_spin_unlock_maybe_notify(&sem->core, save, waited && sem->permits != 0);
             return true;
         }
         if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&sem->core, save, until)) {
             return false;
         }
+        waited = true;
     } while (true);
 }
 
@@ -63,6 +69,8 @@ bool __time_critical_func(sem_try_acquire)(semaphore_t *sem) {
     uint32_t save = spin_lock_blocking(sem->core.spin_lock);
     if (sem->permits > 0) {
         sem->permits--;
+        // no notify: this never waits, so it cannot have consumed one. A waiter it beat to the
+        // permit is still parked with its own notification intact.
         spin_unlock(sem->core.spin_lock, save);
         return true;
     }
