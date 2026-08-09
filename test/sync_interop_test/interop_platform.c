@@ -423,8 +423,25 @@ static void holder_task(__unused void *params) {
 }
 
 static void spinner_task(__unused void *params) {
+    /*
+     * Yields periodically, and must keep doing so.
+     *
+     * A loop that never yields is a permanently-runnable lower-priority task, which can only
+     * be dislodged by preemption - and on the RP2350 RISC-V single-core-scheduler path it
+     * never is. Measured 2026-08-08: the tick advanced normally (31 -> 83 over a 50ms busy
+     * wait) and portASM.S calls vTaskSwitchContext() when xTaskIncrementTick() reports an
+     * unblocked task, yet a task returning from vTaskDelay() never got the core back. Every
+     * other task here blocks voluntarily, so the spinner was the only thing exposing it, and
+     * it hung the whole run at the first plat_delay_ms().
+     *
+     * Yielding every 256 iterations keeps the loop overwhelmingly spinning, so the idle and
+     * busy calibration poles still separate (measured 16791/ms vs 0/ms). Do not remove the
+     * yield to "make the spinner busier" without re-testing that configuration.
+     */
+    uint32_t i = 0;
     for (;;) {
         spinner_counter++;
+        if (!(++i & 0xffu)) taskYIELD();
     }
 }
 
