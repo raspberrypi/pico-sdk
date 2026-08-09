@@ -502,8 +502,34 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         //
         // Note also, that the use of software spin locks on RP2350 to access state would always cause a SEV
         // due to use of LDREX etc., so actually using spin locks to protect the state would be worse.
-        static uint64_t last_added = INT64_MAX; // initialised to at_the_end_of_time (INT64_MAX), in case the first call has timeout_timestamp 0
-        if (last_added == to_us_since_boot(timeout_timestamp) || ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
+        // This exists to stop the loop re-adding an alarm on every pass: add_alarm_at() always
+        // causes a SEV, which the __wfe() below would then immediately eat, so a caller polling
+        // this function would spin instead of sleeping. The hardware state cannot be used to
+        // decide that on its own - it lags an add (the IRQ that programs it runs on the pool's
+        // own core), and after our cancel it may be rearmed later or not at all - so we have to
+        // remember that we already asked.
+        //
+        // Recorded to the adapter's compare width, not to 64 bits. Where the timer compares 32
+        // bits a target is only honoured to that resolution anyway - an alarm armed for low word
+        // L fires at any time whose low word is L - so a wider record would claim precision the
+        // hardware cannot act on. Matching the width also makes this safe to share between the
+        // cores unsynchronised, which it always has been: a 32-bit aligned access is atomic on
+        // both Armv8-M and Hazard3 so it cannot tear, and every value either core can observe is
+        // one that some core really did arm, the SEV-no-later-than invariant being global. The
+        // worst a cross-core overwrite costs is one extra add on the other core's next pass.
+        //
+        // (A 64-bit compare width has no such atomicity, but the only adapter with one is the
+        // host build, which is not racing two real cores.)
+#if TA_COMPARE_BITS == 32
+        typedef uint32_t last_added_t;
+        // ~0 rather than 0, so that a first call with timeout_timestamp 0 does not match
+        static volatile last_added_t last_added = (last_added_t)~0u;
+#else
+        typedef uint64_t last_added_t;
+        static last_added_t last_added = INT64_MAX; // at_the_end_of_time, for the same reason
+#endif
+        const last_added_t this_target = (last_added_t)to_us_since_boot(timeout_timestamp);
+        if (last_added == this_target || ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
                                      (int64_t)to_us_since_boot(timeout_timestamp))) {
             // if we are called repeatedly for a timeout in the past, we won't have an event - but in any case, it has already past!
             if (time_reached(timeout_timestamp)) return true;
@@ -519,7 +545,7 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
                 tight_loop_contents();
                 return time_reached(timeout_timestamp);
             } else {
-                last_added = to_us_since_boot(timeout_timestamp);
+                last_added = this_target;
                 if (!time_reached(timeout_timestamp)) {
                     // ^ at the point above the timer hadn't fired, so it is safe
                     // to wait; the event will happen due to IRQ at some point between

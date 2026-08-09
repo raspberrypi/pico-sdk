@@ -22,6 +22,12 @@ extern "C" {
 void ta_clear_force_irq(alarm_pool_timer_t *timer, uint hardware_alarm_num);
 void ta_clear_irq(alarm_pool_timer_t *timer, uint hardware_alarm_num);
 void ta_force_irq(alarm_pool_timer_t *timer, uint hardware_alarm_num);
+// This implementation compares full 64-bit microseconds. See TA_COMPARE_BITS in the rp2_common
+// adapter for what this governs and why 32 is preferred where an adapter has the choice; 64 is
+// used here only because the host has no 32-bit compare to match, and it is not racing two real
+// cores.
+#define TA_COMPARE_BITS 64
+
 void ta_set_timeout(alarm_pool_timer_t *timer, uint hardware_alarm_num, int64_t target);
 bool ta_wakes_up_on_or_before(alarm_pool_timer_t *timer, uint alarm_num, int64_t target);
 void ta_enable_irq_handler(alarm_pool_timer_t *timer, uint hardware_alarm_num, void (*irq_handler)(void));
