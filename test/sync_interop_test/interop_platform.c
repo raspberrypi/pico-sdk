@@ -484,6 +484,37 @@ void plat_start_background_sleeper(uint32_t period_ms, volatile int64_t *worst_l
     xTaskCreate(sleeper_task, "sleeper", configMINIMAL_STACK_SIZE, a, HOLDER_PRIORITY, NULL);
 }
 
+static volatile uint acquirers_done;
+
+static void acquirer_task(void *param) {
+    void (*hook)(void) = (void (*)(void))param;
+    if (hook) hook();
+    sem_acquire_blocking(&test_sem);
+    acquirers_done++;
+    vTaskDelete(NULL);
+}
+
+void plat_start_sem_acquirers(uint n) {
+    acquirers_done = 0;
+    __compiler_memory_barrier();
+    for (uint i = 0; i < n; i++) {
+        xTaskCreate(acquirer_task, "acq", configMINIMAL_STACK_SIZE, NULL, HOLDER_PRIORITY, NULL);
+    }
+}
+
+void plat_start_one_sem_acquirer(void) {
+    xTaskCreate(acquirer_task, "acq", configMINIMAL_STACK_SIZE, NULL, HOLDER_PRIORITY, NULL);
+}
+
+void plat_start_one_sem_acquirer_with_hook(void (*hook)(void)) {
+    xTaskCreate(acquirer_task, "acq", configMINIMAL_STACK_SIZE, (void *)hook, HOLDER_PRIORITY,
+                NULL);
+}
+
+uint plat_sem_acquirers_done(void) {
+    return acquirers_done;
+}
+
 static mutex_t       alias_mutex;
 static volatile bool thief_run;
 
@@ -621,6 +652,20 @@ void plat_delay_ms(uint32_t ms) {
 void plat_hold_for_ms(uint32_t ms) {
     /* no tasks here, so the holder is always the other core */
     plat_sdk_core_hold_for_ms(ms);
+}
+
+void plat_start_sem_acquirers(__unused uint n) {
+    /* no tasks, so there is no shared event-group bit to contend for; D1.10 skips */
+}
+
+void plat_start_one_sem_acquirer(void) {
+}
+
+void plat_start_one_sem_acquirer_with_hook(__unused void (*hook)(void)) {
+}
+
+uint plat_sem_acquirers_done(void) {
+    return 0;
 }
 
 void plat_start_bit_thief(__unused uint spin_lock_num) {

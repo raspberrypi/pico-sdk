@@ -197,6 +197,18 @@ void     plat_calibrate_agent_cycles(void);
  * oversleep. FreeRTOS only - the Q2 bug needs more than one concurrent sleeper. */
 /* D3.4: hammer a mutex bound to `spin_lock_num` from two tasks, so its waiters keep
  * consuming that spin lock's event-group bit. No-op without a scheduler. */
+/* D1.10: n tasks each blocking in sem_acquire_blocking(&test_sem), counting completions.
+ * Needs a scheduler - two waiters must be blocked on the same event-group bit. */
+void     plat_start_sem_acquirers(uint n);
+/* Add one more acquirer without resetting the completion count - used to introduce a second
+ * waiter at a controlled moment relative to the releases. */
+void     plat_start_one_sem_acquirer(void);
+/* As above, but the task runs `hook` immediately before it acquires. Lets a probe time
+ * something relative to *this* waiter's own execution rather than to the caller's - under SMP
+ * the new task may start on the other core before the caller has finished setting up. */
+void     plat_start_one_sem_acquirer_with_hook(void (*hook)(void));
+uint     plat_sem_acquirers_done(void);
+
 void     plat_start_bit_thief(uint spin_lock_num);
 void     plat_stop_bit_thief(void);
 

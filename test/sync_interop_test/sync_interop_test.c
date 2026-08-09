@@ -936,6 +936,98 @@ static void d3_3_sleep_on_sdk_core(void) {
 #endif
 }
 
+/*
+ * D1.10 - two waiters, two releases: can one be stranded with a permit available?
+ *
+ * The FreeRTOS ports multiplex every SDK spin lock onto one event group, and a waiter consumes
+ * the bit (xClearOnExit=pdTRUE). The port argues that is safe because "any intervening blocked
+ * lock ... will need to unlock it before we proceed, which will set the event bit again". That
+ * holds for a mutex - the thief's mutex_exit() notifies - but not for a semaphore: on success
+ * sem_acquire_blocking() takes a plain spin_unlock() (sem.c:32) and never notifies. A waiter
+ * that consumes a permit leaves the shared bit clear behind it.
+ *
+ * Two releases collapse onto one bit, so the damaging interleaving is:
+ *
+ *   A parked on the event group; B between its spin_unlock() and xEventGroupWaitBits()
+ *   (port.c:2584-2586); release, release -> permits=2, bit set once; A wakes, clears the bit,
+ *   takes a permit; B then parks on a bit that is now clear, with permits=1 and nothing left
+ *   to notify it.
+ *
+ * That window is a few instructions wide, so it must be *scanned* rather than hoped for: the
+ * releases are issued from an alarm at a swept offset, while B is started just before this task
+ * blocks (so B runs, and the alarm lands somewhere inside its acquire). An earlier version of
+ * this case simply parked both waiters and released twice - which is the safe ordering by
+ * construction, and passed whether or not the bug exists. A test that cannot fail is worse than
+ * no test, so note what a pass here does and does not mean: not provoking it is weak evidence,
+ * exactly as in D3.4.
+ */
+static void release_twice_from_isr(__unused alarm_id_t id, __unused void *ud) {
+    sem_release(&test_sem);
+    sem_release(&test_sem);
+}
+
+static int64_t release_twice_alarm(alarm_id_t id, void *ud) {
+    release_twice_from_isr(id, ud);
+    return 0;
+}
+
+/* Run by waiter B as its first act, so the releases are timed from B's own execution. */
+static volatile uint32_t d1_10_offset_us;
+static void d1_10_arm_releases(void) {
+    local_alarm_in_us(d1_10_offset_us, release_twice_alarm);
+}
+
+static void d1_10_two_waiters_two_releases(void) {
+#if !INTEROP_HAS_SCHEDULER
+    harness_record("D1.10", RESULT_SKIP,
+                   "needs two tasks blocked on one semaphore's event-group bit");
+#else
+    /* Sweep the offset at which the two releases land relative to B's acquire. The path from
+     * "B starts" to "B is inside xEventGroupWaitBits" is a few microseconds, so a
+     * microsecond-granularity sweep across that span crosses the window.
+     *
+     * B arms the alarm itself, so the offset is measured from B's own execution. Timing it
+     * from here instead only works where B cannot run until this task blocks - true on a
+     * single-core scheduler, false under SMP, where B starts at once on the other core and has
+     * long since parked by the time the alarm fires. That difference, not immunity, is why an
+     * earlier version of this probe failed on _core0/_core1 and passed under SMP. */
+    const uint32_t scan_us = 160;
+    uint attempts = 0;
+    for (uint32_t offset_us = 0; offset_us < scan_us; offset_us++) {
+        sem_reset(&test_sem, 0);
+        plat_start_sem_acquirers(1);        /* A */
+        plat_delay_ms(2);                   /* let A park on the event group */
+
+        d1_10_offset_us = offset_us + 1;
+        plat_start_one_sem_acquirer_with_hook(d1_10_arm_releases);   /* B */
+        plat_delay_ms(15);
+        attempts++;
+
+        for (uint i = 0; i < 20 && plat_sem_acquirers_done() < 2; i++) {
+            plat_delay_ms(2);
+        }
+
+        uint done = plat_sem_acquirers_done();
+        if (done < 2) {
+            harness_record("D1.10", RESULT_FAIL,
+                           "only %u of 2 waiters woke from 2 releases (releases at +%uus,"
+                           " attempt %u): a permit remains but the shared event bit was"
+                           " consumed by the other waiter", done, offset_us, attempts);
+            /* free the stranded waiter so nothing after this is skewed */
+            for (uint i = 0; i < 20 && plat_sem_acquirers_done() < 2; i++) {
+                sem_release(&test_sem);
+                plat_delay_ms(2);
+            }
+            return;
+        }
+    }
+    harness_record("D1.10", RESULT_PASS,
+                   "no waiter stranded in %u attempts sweeping the release offset over"
+                   " 1-%uus; the window is a few instructions, so this is weak evidence",
+                   attempts, scan_us);
+#endif
+}
+
 /* ==================================================================================== */
 /* D2 - try-then-timed discipline (as pico_stdio)                                       */
 /* ==================================================================================== */
@@ -1252,6 +1344,7 @@ static void test_body(void) {
     d1_7_blocking_acquire_from_isr();
     d1_8_recursive();
     d1_9_bare_wfe_pattern();
+    d1_10_two_waiters_two_releases();
 
     printf("\n--- D2: try-then-timed discipline (mutex_try_enter_block_until, as pico_stdio) ---\n");
     d2_1_uncontended_try();
