@@ -860,25 +860,51 @@ static void d3_2_concurrent_sleepers(void) {
     plat_start_background_sleeper(500, &bg_sleeper_worst);
     plat_delay_ms(20);
 
+    /*
+     * Sleep durations just above the busy-wait threshold, swept.
+     *
+     * sleep_until() waits until t - PICO_TIME_SLEEP_OVERHEAD_ADJUST_US, so a sleep of about
+     * that length leaves its alarm due within microseconds of the wait starting - which is the
+     * only way for it to fire while this task is still between its spin unlock and its block.
+     * A sleep_ms(2) arms an alarm two milliseconds after the task has already parked, so it
+     * cannot reach the window at all; that is what this case used to do, and why it never
+     * caught anything.
+     *
+     * If the notification is stolen the symptom is unmistakable - the sleeper waits for the
+     * 500ms sleeper's alarm instead of its own - so unlike the semaphore probe, detection is
+     * free and only provocation is hard. It has not been provoked, and probably cannot be from
+     * here: the stolen notification has to be this sleeper's *own* alarm (another sleeper's
+     * landing in the window is harmless, since our own alarm would still wake us), so t_before
+     * must fall inside the few instructions between the wait's spin unlock and its block. The
+     * loop only enters the wait if time_reached(t_before) is still false at the top, so the
+     * target interval and "the wait is skipped entirely" are adjacent, separated by less than
+     * the jitter in add_alarm_at() itself. A caller cannot aim that finely, and the window
+     * cannot be widened from outside because lock_internal_spin_unlock_with_wait() performs
+     * the unlock and the block as one macro.
+     */
+    const uint32_t adjust = PICO_TIME_SLEEP_OVERHEAD_ADJUST_US;
     latency_t lat;
     latency_reset(&lat);
-    for (uint i = 0; i < 40; i++) {
-        absolute_time_t target = make_timeout_time_ms(2);
-        sleep_ms(2);
+    for (uint i = 0; i < 4000; i++) {
+        uint32_t us = adjust + 5 + (i % 250);      /* alarm due 5-254us into the wait */
+        absolute_time_t target = make_timeout_time_us(us);
+        sleep_us(us);
         latency_add(&lat, absolute_time_diff_us(target, get_absolute_time()));
     }
-    latency_print(&lat, "2ms sleep alongside a 500ms sleeper");
+    latency_print(&lat, "short sleeps alongside a 500ms sleeper");
 
     if (lat.early) {
         harness_record("D3.2", RESULT_FAIL, "sleep_ms returned EARLY %u times", lat.early);
     } else if (lat.max_us > 50000) {
         harness_record("D3.2", RESULT_FAIL,
-                       "2ms sleep overslept %lldus beside a 500ms sleeper - wakeup stolen",
+                       "a %u-%uus sleep overslept %lldus beside a 500ms sleeper - its own"
+                       " alarm had already fired, so its wakeup was stolen and it waited for"
+                       " the other sleeper's", adjust + 5, adjust + 254,
                        (long long)lat.max_us);
     } else {
         harness_record("D3.2", RESULT_PASS,
-                       "worst oversleep %lldus with a concurrent 500ms sleeper",
-                       (long long)lat.max_us);
+                       "4000 sleeps of %u-%uus alongside a 500ms sleeper, worst oversleep"
+                       " %lldus", adjust + 5, adjust + 254, (long long)lat.max_us);
     }
 #endif
 }
