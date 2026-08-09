@@ -834,7 +834,7 @@ static void test_body(void) {
 #ifdef PICO_PROCESSOR_NAME
     printf("cpu: " ## PICO_PROCESSOR_NAME "\n");
 #endif
-    printf("platform: %s\n", PICO_PLATFORM_NAME);
+    printf("platform: %s\n", PICO_PLATFORM_STRING);
     printf("config: %s\n", plat_config_name());
     printf("spin locks: %s, unlock %s the event; workaround %s\n",
            PICO_USE_SW_SPIN_LOCKS ? "software" : "hardware",
