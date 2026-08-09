@@ -13,9 +13,23 @@
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(nil_time, 0);
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(at_the_end_of_time, INT64_MAX);
 
-// not currently documented as the user isn't really expected to change this
+// Whether sleep_until() waits on a lock_core rather than on a bare __wfe().
+//
+// It exists for RTOS integration and for nothing else. Where the lock_internal_* primitives
+// are overridden, waiting on the notifier lets the RTOS block the *task*, so other tasks keep
+// running for the duration of a sleep; a bare __wfe() would leave the sleeping task ready but
+// parked, starving every lower-priority task until it woke.
+//
+// On bare metal it buys nothing and should not be turned on. The callback's __sev() already
+// sets a per-core, sticky event latch, which reaches a waiter that has not yet reached its
+// __wfe() and cannot be consumed by anyone else - which is precisely the property the notifier
+// would be reintroducing at the cost of a spin lock round trip and a notify count. Worse than
+// redundant, in fact: forcing it on for bare metal on RP2350 with software spin locks is known
+// to break sleeping, so this is not a "no benefit" setting but one to leave alone.
+//
+// Hence the default: on exactly when something has overridden the primitives, off otherwise.
+// Not documented as a user config, as there is no good reason to set it by hand.
 #ifndef PICO_TIME_USE_SLEEP_NOTIFIER
-// we don't want to circumvent use of spin_unlock_with_xxx when using for example FreeRTOS
 #if LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN
 #define PICO_TIME_USE_SLEEP_NOTIFIER 1
 #endif
