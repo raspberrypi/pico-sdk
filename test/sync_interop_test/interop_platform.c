@@ -119,6 +119,11 @@ static struct {
     volatile uint32_t irq_num;
     volatile bool     irq_enabled;
     volatile uint32_t t_inte, t_intr, t_armed, t_alarm, t_now;
+    volatile int32_t  probe_id;
+    volatile uint32_t probe_armed, probe_alarm, probe_now;
+    volatile uint32_t probe_intf, probe_ints;
+    volatile uint32_t probe_primask, probe_basepri;
+    volatile uint32_t probe_intf_late, probe_ints_late, probe_armed_late;
     volatile uint32_t cal_dwt_ctrl;
     volatile uint32_t cal_demcr;
     volatile bool     cal_sleepcnt_moved;
@@ -226,6 +231,45 @@ static void sdk_core_agent(void) {
                         &test_mutex, make_timeout_time_ms(arg), &result);
                 if (result) mutex_exit(&test_mutex);   /* as above */
                 break;
+            case AGENT_ARM_PROBE: {
+                /* Add on this core - the pool's own core - and read the compare register
+                 * back at once. If armed is set here the add does arm and something clears
+                 * it later; if not, the pool never programmed the hardware. */
+                timer_hw_t *tp  = alarm_pool_get_default_timer();
+                uint anum       = alarm_pool_timer_alarm_num(alarm_pool_get_default());
+                alarm_id_t pid  = add_alarm_in_us(20000, agent_known_sleep_alarm, NULL, true);
+                agent.probe_armed = tp->armed;
+                agent.probe_alarm = tp->alarm[anum];
+                agent.probe_now   = tp->timerawl;
+                /* Read the core's own interrupt masks. An enabled, asserted IRQ that is not
+                 * taken means this core is masking it: PRIMASK masks everything, BASEPRI
+                 * masks at or below its priority value (FreeRTOS's mechanism, and the SDK
+                 * puts the timer at PICO_DEFAULT_IRQ_PRIORITY 0x80). */
+#if defined(__riscv)
+                agent.probe_primask = 0xffffffffu;   /* n/a */
+                agent.probe_basepri = 0xffffffffu;
+#elif defined(__ARM_ARCH_6M__)
+                { uint32_t pm; __asm volatile ("mrs %0, primask" : "=r"(pm));
+                  agent.probe_primask = pm; agent.probe_basepri = 0xffffffffu; }
+#else
+                { uint32_t pm, bp;
+                  __asm volatile ("mrs %0, primask" : "=r"(pm));
+                  __asm volatile ("mrs %0, basepri" : "=r"(bp));
+                  agent.probe_primask = pm; agent.probe_basepri = bp; }
+#endif
+                agent.probe_intf  = tp->intf;
+                agent.probe_ints  = tp->ints;
+                agent.probe_id    = (int32_t)pid;
+                /* Sample again after the interrupt has had ample time to be taken. Nothing
+                 * here waits on an event, so this cannot itself be blocked by the fault. */
+                busy_wait_us(200);
+                agent.probe_intf_late  = tp->intf;
+                agent.probe_ints_late  = tp->ints;
+                agent.probe_armed_late = tp->armed;
+                if (pid > 0) cancel_alarm(pid);
+                result = pid > 0;
+                break;
+            }
             case AGENT_IRQ_STATE: {
                 uint alarm_num = alarm_pool_timer_alarm_num(alarm_pool_get_default());
                 uint irq = timer_hardware_alarm_get_irq_num(alarm_pool_get_default_timer(),
@@ -307,6 +351,17 @@ uint32_t agent_timer_intr(void)        { return agent.t_intr; }
 uint32_t agent_timer_armed(void)       { return agent.t_armed; }
 uint32_t agent_timer_alarm_val(void)   { return agent.t_alarm; }
 uint32_t agent_timer_now(void)         { return agent.t_now; }
+int32_t  agent_probe_id(void)          { return agent.probe_id; }
+uint32_t agent_probe_armed(void)       { return agent.probe_armed; }
+uint32_t agent_probe_alarm(void)       { return agent.probe_alarm; }
+uint32_t agent_probe_now(void)         { return agent.probe_now; }
+uint32_t agent_probe_primask(void)     { return agent.probe_primask; }
+uint32_t agent_probe_basepri(void)     { return agent.probe_basepri; }
+uint32_t agent_probe_intf(void)        { return agent.probe_intf; }
+uint32_t agent_probe_ints(void)        { return agent.probe_ints; }
+uint32_t agent_probe_intf_late(void)   { return agent.probe_intf_late; }
+uint32_t agent_probe_ints_late(void)   { return agent.probe_ints_late; }
+uint32_t agent_probe_armed_late(void)  { return agent.probe_armed_late; }
 
 void plat_calibrate_agent_cycles(void) {
     if (agent_run(AGENT_CALIBRATE_CYCLES, 0, 2000)) {
@@ -412,6 +467,37 @@ void plat_start_background_sleeper(uint32_t period_ms, volatile int64_t *worst_l
     xTaskCreate(sleeper_task, "sleeper", configMINIMAL_STACK_SIZE, a, HOLDER_PRIORITY, NULL);
 }
 
+static mutex_t       alias_mutex;
+static volatile bool thief_run;
+
+static void thief_task(__unused void *param) {
+    while (thief_run) {
+        mutex_enter_blocking(&alias_mutex);
+        busy_wait_us(50);
+        mutex_exit(&alias_mutex);
+        taskYIELD();
+    }
+    vTaskDelete(NULL);
+}
+
+void plat_start_bit_thief(uint spin_lock_num) {
+    /* Initialise normally first so every field is valid, then re-point the lock_core at the
+     * spin lock whose event-group bit we want contended. */
+    mutex_init(&alias_mutex);
+    lock_init(&alias_mutex.core, spin_lock_num);
+    thief_run = true;
+    /* Two, so each genuinely blocks on the other and its waiter consumes the bit. Below
+     * MAIN_PRIORITY, so they run while the case under test is sleeping. */
+    for (uint i = 0; i < 2; i++) {
+        xTaskCreate(thief_task, "thief", configMINIMAL_STACK_SIZE, NULL, HOLDER_PRIORITY, NULL);
+    }
+}
+
+void plat_stop_bit_thief(void) {
+    thief_run = false;
+    vTaskDelay(pdMS_TO_TICKS(5));
+}
+
 void plat_spinner_start(void) {
     TaskHandle_t t;
     xTaskCreate(spinner_task, "spin", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &t);
@@ -435,17 +521,55 @@ const char *plat_config_name(void) {
 }
 
 static void start_scheduler(void) {
-    xTaskCreate(main_task, "main", configMINIMAL_STACK_SIZE * 2, NULL, MAIN_PRIORITY, NULL);
+    /* Created here, on the core about to call vTaskStartScheduler(), so that the critical
+     * section this takes is repaired by xPortStartScheduler() - see plat_init(). */
+    go_sem = xSemaphoreCreateBinary();
+    held_sem = xSemaphoreCreateBinary();
+
+    TaskHandle_t xMain;
+    xTaskCreate(main_task, "main", configMINIMAL_STACK_SIZE * 2, NULL, MAIN_PRIORITY, &xMain);
+#if configNUMBER_OF_CORES > 1 && configUSE_CORE_AFFINITY
+    /* Pin the cases to the same core as the spinner. The yield metric compares the spinner's
+     * progress against its idle rate, so it can only see starvation if the two are on one
+     * core; unpinned under SMP the spinner just runs on the other one and every wait looks
+     * like it yielded. SMP is the configuration where a scheduler-core spin would matter
+     * most, so leaving it unmeasurable was the wrong trade. The holder is left unpinned, so
+     * cross-core contention is still exercised. */
+    vTaskCoreAffinitySet(xMain, 1u << 0);
+#else
+    (void)xMain;
+#endif
     xTaskCreate(holder_task, "holder", configMINIMAL_STACK_SIZE, NULL, HOLDER_PRIORITY, NULL);
     vTaskStartScheduler();
 }
 
 void plat_init(void) {
+    /*
+     * SDK primitives only. The FreeRTOS objects are deliberately NOT created here.
+     *
+     * plat_init() runs on core 0, which under RUN_FREE_RTOS_ON_CORE=1 never starts a
+     * scheduler. Creating a queue or semaphore takes a FreeRTOS critical section, and
+     * ulCriticalNesting is initialised to 0xaaaaaaaa (port.c) rather than 0 - so
+     * vPortEnterCritical() sets BASEPRI, vPortExitCritical() decrements the count without
+     * reaching zero, and interrupts are never re-enabled. Only xPortStartScheduler() repairs
+     * it, by zeroing the count. On the core that starts the scheduler that happens moments
+     * later and nothing is noticed; on a core that stays bare, BASEPRI stays set for the
+     * whole run, masking every IRQ at or below configMAX_SYSCALL_INTERRUPT_PRIORITY - the
+     * timer included, at PICO_DEFAULT_IRQ_PRIORITY 0x80 against a threshold of 16.
+     *
+     * That is what made every alarm on the bare core silently fail to arm: ta_force_irq()
+     * asserted INTS and the core simply would not take it.
+     *
+     * NOTE the port does the same thing to itself, and this test cannot avoid that one:
+     * prvRuntimeInitializer() is a constructor, so it runs on core 0 before main and calls
+     * xEventGroupCreate(). Until the port is fixed - by normalising the sentinel in
+     * vPortEnterCritical(), or by using the static event group - the RUN_FREE_RTOS_ON_CORE=1
+     * variants will fail D0/D1.6/D2.6/D2.7 for that reason and not for any fault of the SDK.
+     * Deliberately not worked around here: clearing the mask would hide the defect.
+     */
     mutex_init(&test_mutex);
     recursive_mutex_init(&test_rmutex);
     sem_init(&test_sem, 0, 16);
-    go_sem = xSemaphoreCreateBinary();
-    held_sem = xSemaphoreCreateBinary();
 }
 
 void plat_run(void (*body)(void)) {
@@ -480,6 +604,13 @@ void plat_delay_ms(uint32_t ms) {
 void plat_hold_for_ms(uint32_t ms) {
     /* no tasks here, so the holder is always the other core */
     plat_sdk_core_hold_for_ms(ms);
+}
+
+void plat_start_bit_thief(__unused uint spin_lock_num) {
+    /* no tasks, so no waiter can consume a bit; D3.4 skips */
+}
+
+void plat_stop_bit_thief(void) {
 }
 
 void plat_start_background_sleeper(__unused uint32_t period_ms,

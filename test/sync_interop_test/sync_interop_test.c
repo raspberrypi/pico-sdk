@@ -460,6 +460,36 @@ static void d0_counter_selftest(void) {
          * NVIC enable is per core, so this is the one question no other core can answer, and
          * it separates "the IRQ was never enabled on that core" from "it is enabled but the
          * alarm is never armed". */
+        /* Print the detail as its own lines - the verdict has to fit in detail[200], and
+         * these numbers are what actually localise the fault. */
+        if (agent_run(AGENT_ARM_PROBE, 0, 1000)) {
+            uint abit2 = 1u << alarm_pool_timer_alarm_num(alarm_pool_get_default());
+            bool armed_now  = agent_probe_armed() & abit2;
+            bool armed_late = agent_probe_armed_late() & abit2;
+            bool asserted   = agent_probe_ints() & abit2;
+            bool still_up   = agent_probe_ints_late() & abit2;
+            printf("    arm probe on the bare core: add returned %ld, armed=0x%x->0x%x,"
+                   " alarm=%u now=%u, intf=0x%x->0x%x ints=0x%x->0x%x\n",
+                   (long)agent_probe_id(), agent_probe_armed(), agent_probe_armed_late(),
+                   agent_probe_alarm(), agent_probe_now(),
+                   agent_probe_intf(), agent_probe_intf_late(),
+                   agent_probe_ints(), agent_probe_ints_late());
+            printf("    bare core masks: PRIMASK=0x%x BASEPRI=0x%x (timer irq priority"
+                   " 0x%x, configMAX_SYSCALL 16 -> BASEPRI>=1 masks it)\n",
+                   agent_probe_primask(), agent_probe_basepri(), PICO_DEFAULT_IRQ_PRIORITY);
+            printf("    -> %s\n",
+                   armed_now || armed_late
+                       ? "the add does arm it; something clears it later"
+                   : still_up
+                       ? "IRQ asserted and still asserted 200us later, though enabled on this"
+                         " core - the core is not taking it (masked, or no handler vectored)"
+                   : asserted
+                       ? "IRQ was asserted then cleared, but nothing was armed - something"
+                         " serviced it without doing the pool's work"
+                       : "the force never reached INTS - ta_force_irq() is being defeated");
+        } else {
+            printf("    arm probe on the bare core: the agent did not answer\n");
+        }
         if (agent_run(AGENT_IRQ_STATE, 0, 1000)) {
             /* Verdict first: harness_record() truncates at detail[120], and putting the
              * ENABLED/DISABLED word last once cost a whole hardware run. */
@@ -567,7 +597,11 @@ static void d1_9_bare_wfe_pattern(void) {
 
     const bool expect_poll = INTEROP_UNLOCK_SEVS;
     if (polled == expect_poll) {
-        harness_record("D1.9", expect_poll ? RESULT_EXPECTED_FAIL : RESULT_PASS,
+        /* PASS either way: this case is a control, and confirming its prediction is a
+         * success whichever way the prediction went. It is not an expected *failure* - the
+         * naive pattern busy-polling where a spin unlock sets the calling core's own event
+         * is the correct observation, and is the whole reason the workaround exists. */
+        harness_record("D1.9", RESULT_PASS,
                        "bare spin_unlock()+__wfe() %s as predicted: %u wait iterations%s",
                        expect_poll ? "busy-polls" : "blocks", waits, sc_note);
     } else {
@@ -617,6 +651,147 @@ static void d2_9_expired_deadline(void) {
 #endif
 }
 
+static void d2_10_subtick_deadline(void) {
+#if !INTEROP_HAS_SCHEDULER
+    harness_record("D2.10", RESULT_SKIP,
+                   "needs a scheduler: a sub-tick deadline only means something against a tick");
+#else
+    /*
+     * A deadline shorter than one tick. prvGetTicksToWaitBefore() then returns 0, so the port
+     * cannot block on the event group at all and falls through to spin_unlock() + portYIELD(),
+     * leaving the SDK's caller to loop. That spins at *this task's* priority, which starves
+     * every lower-priority task on this core - a busy-wait that costs more than power.
+     *
+     * Every other D2 case uses TIMEOUT_MS = 50, i.e. fifty ticks, so none of them reach this
+     * branch. Short timeouts are not exotic - pico_stdio takes them - and this is where
+     * "sub-tick precision under FreeRTOS" and "task starvation" turn out to be one question.
+     *
+     * Repeated rather than measured once: the spinner rate is per millisecond, so a single
+     * 300us window cannot be resolved.
+     */
+    const uint32_t deadline_us = 300;
+    plat_hold_for_ms(HOLD_MS);
+    uint32_t sp0 = harness_spinner_count();
+    absolute_time_t t0 = get_absolute_time();
+    uint iters = 0, waits = 0;
+    bool got = false;
+    while (absolute_time_diff_us(t0, get_absolute_time()) < (int64_t)(HOLD_MS - 4) * 1000) {
+        waits += counted_mutex_enter_block_until(&test_mutex,
+                                                 make_timeout_time_us(deadline_us), &got);
+        iters++;
+        if (got) {                 /* holder let go early; nothing more to measure */
+            mutex_exit(&test_mutex);
+            break;
+        }
+    }
+    int64_t us = absolute_time_diff_us(t0, get_absolute_time());
+    int y = harness_yield_pct(harness_spinner_count() - sp0, (uint32_t)(us / 1000));
+
+    if (got) {
+        harness_record("D2.10", RESULT_INFO,
+                       "holder released early after %u sub-tick attempts; not measured", iters);
+    } else if (y < 0) {
+        harness_record("D2.10", RESULT_PASS,
+                       "%u sub-tick (%uus) deadlines, %u waits over %lldus (no yield metric)",
+                       iters, deadline_us, waits, (long long)us);
+    } else if (y < 25) {
+        /* INFO, not FAIL: the port cannot block for less than a tick, so spinning here buys
+         * sub-tick precision at the cost of the lower-priority tasks on this core. That is a
+         * design trade-off to decide on, not a defect to assert - but it must be visible. */
+        harness_record("D2.10", RESULT_INFO,
+                       "%u sub-tick (%uus) deadlines spun at task priority: yield %d%%, %u"
+                       " waits over %lldus - lower-priority tasks starved throughout",
+                       iters, deadline_us, y, waits, (long long)us);
+    } else {
+        harness_record("D2.10", RESULT_PASS,
+                       "%u sub-tick (%uus) deadlines, yield %d%%, %u waits over %lldus",
+                       iters, deadline_us, y, waits, (long long)us);
+    }
+#endif
+}
+
+/*
+ * D3.4 - event-bit aliasing against the sleep_notifier (Q5a).
+ *
+ * The FreeRTOS ports multiplex every SDK spin lock onto one event group:
+ *
+ *     32-bit ticks: bit = 1u << (spin_lock_num % 24)
+ *     16-bit ticks: bit = 1u << (spin_lock_num & 0x7)
+ *
+ * A waiter uses xClearOnExit=pdTRUE, so it *consumes* the bit. For locks that is harmless -
+ * the port's own comment argues any thief must itself unlock, which re-sets the bit. The
+ * sleep_notifier is the exception: its notify is one-shot (an alarm callback) and its
+ * predicate is the clock, so a stolen bit is not re-set by anything and the sleeper waits for
+ * unrelated traffic that may never come.
+ *
+ * Whether that is reachable at all depends on the arithmetic, so compute it rather than
+ * assume it. With 32-bit ticks and 32 spin locks nothing can alias PICO_SPINLOCK_ID_TIMER
+ * (it would need lock 10 or 34, and 34 does not exist), so the only possible thief is another
+ * sleeper - which is D3.2. With 16-bit ticks locks 2/10/18/26 all collide and the hazard is
+ * real.
+ *
+ * NOTE: this duplicates prvGetEventGroupBit(), which is static inside the port. If the port
+ * changes its mapping this case will quietly describe the wrong thing - it reports the
+ * mapping it used so that is at least visible in the log.
+ */
+static uint alias_bit_of(uint lock_num) {
+#if INTEROP_HAVE_FREERTOS && ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS )
+    return lock_num & 0x7u;
+#else
+    return lock_num % 24u;
+#endif
+}
+
+static void d3_4_notifier_bit_aliasing(void) {
+#if !INTEROP_HAS_SCHEDULER
+    harness_record("D3.4", RESULT_SKIP, "needs tasks: a thief must block on an aliasing lock");
+#else
+    const uint timer_lock = PICO_SPINLOCK_ID_TIMER;
+    const uint timer_bit  = alias_bit_of(timer_lock);
+    uint aliases[8];
+    uint n_alias = 0;
+    for (uint i = 0; i < (uint)NUM_SPIN_LOCKS && n_alias < count_of(aliases); i++) {
+        if (i != timer_lock && alias_bit_of(i) == timer_bit) aliases[n_alias++] = i;
+    }
+
+    if (!n_alias) {
+        /* Not a skip: the absence is the result, and it is what makes the sleep_notifier
+         * safe from everything except another sleeper in this configuration. */
+        harness_record("D3.4", RESULT_PASS,
+                       "no lock of %d aliases the notifier's bit %u (timer lock %u): the only"
+                       " possible thief is another sleeper, which is D3.2",
+                       NUM_SPIN_LOCKS, timer_bit, timer_lock);
+        return;
+    }
+
+    /* A thief exists: contend on it hard while sleeping, so its waiters keep consuming the
+     * shared bit, and see whether any sleep is left stranded. */
+    plat_start_bit_thief(aliases[0]);
+    latency_t lat;
+    latency_reset(&lat);
+    for (uint i = 0; i < 40; i++) {
+        absolute_time_t target = make_timeout_time_ms(2);
+        sleep_ms(2);
+        latency_add(&lat, absolute_time_diff_us(target, get_absolute_time()));
+    }
+    plat_stop_bit_thief();
+    latency_print(&lat, "2ms sleeps while an aliasing lock is contended");
+
+    if (lat.early) {
+        harness_record("D3.4", RESULT_FAIL, "sleep_ms returned EARLY %u times", lat.early);
+    } else if (lat.max_us > 50000) {
+        harness_record("D3.4", RESULT_FAIL,
+                       "a 2ms sleep overslept by %lldus with lock %u contending bit %u - the"
+                       " notifier's wakeup was consumed by an aliasing waiter",
+                       (long long)lat.max_us, aliases[0], timer_bit);
+    } else {
+        harness_record("D3.4", RESULT_PASS,
+                       "%u lock(s) alias bit %u; worst oversleep %lldus under contention",
+                       n_alias, timer_bit, (long long)lat.max_us);
+    }
+#endif
+}
+
 /* ==================================================================================== */
 /* D3 - sleep_until / sleep_ms                                                          */
 /*                                                                                      */
@@ -647,6 +822,13 @@ static void d3_1_sleep_accuracy_ms(void) {
                        "sleep_ms returned EARLY %u times (contract violation)", lat.early);
     } else if (lat.max_us > 2000) {
         harness_record("D3.1", RESULT_FAIL, "worst oversleep %lldus", (long long)lat.max_us);
+    } else if (harness_sleep_counter_usable() && slept_count == 0 && INTEROP_HAS_SCHEDULER) {
+        /* Not a fault, and not a doubtful signal either: under an RTOS sleep_ms blocks the
+         * *task*, and with configUSE_TICKLESS_IDLE=0 the idle task spins, so the core is
+         * never idled. SLEEPCNT is right to see no sleep. */
+        harness_record("D3.1", RESULT_PASS,
+                       "never early, worst oversleep %lldus; no core sleep, as expected with"
+                       " the task blocked and a spinning idle task", (long long)lat.max_us);
     } else if (harness_sleep_counter_usable() && slept_count == 0) {
         /* INFO not FAIL: SLEEPCNT is corroboration on probation, never a verdict */
         harness_record("D3.1", RESULT_INFO,
@@ -705,25 +887,50 @@ static void d3_3_sleep_on_sdk_core(void) {
 #if !INTEROP_HAS_SDK_CORE
     harness_record("D3.3", RESULT_SKIP, "no bare-SDK core in this configuration");
 #else
-    /* the bare-SDK core sleeps while this core hammers the same alarm pool */
-    agent_start(AGENT_SLEEP_MS, 50);
-    for (uint i = 0; i < 20; i++) {
-        sleep_ms(2);
+    /*
+     * The bare-SDK core sleeps while this core hammers the same alarm pool.
+     *
+     * Repeated, because a single sample cannot support a verdict: DWT_SLEEPCNT is 8 bits and
+     * wraps, so any one sleep of an exact multiple of 256 cycles reads back unchanged - about
+     * 1/256, and a longer sleep does not help. N independent sleeps all reading unchanged is
+     * (1/256)^N, so three rounds put a false "never slept" at about 1 in 16 million. That is
+     * enough to fail on, where one sample was only enough to note.
+     */
+    const uint rounds = 3;
+    uint slept_rounds = 0, worst_us = 0;
+    for (uint r = 0; r < rounds; r++) {
+        agent_start(AGENT_SLEEP_MS, 50);
+        for (uint i = 0; i < 20; i++) {
+            sleep_ms(2);
+        }
+        if (!agent_wait(2000)) {
+            harness_record("D3.3", RESULT_FAIL, "sleep on the other core never returned");
+            return;
+        }
+        uint32_t us = agent_elapsed_us();
+        if (us < 50000) {
+            harness_record("D3.3", RESULT_FAIL, "50ms sleep on the other core took only %uus"
+                           " (returned EARLY)", us);
+            return;
+        }
+        if (us > worst_us) worst_us = us;
+        if (agent_slept()) slept_rounds++;
     }
-    if (!agent_wait(2000)) {
-        harness_record("D3.3", RESULT_FAIL, "sleep on the other core never returned");
-        return;
-    }
-    uint32_t us = agent_elapsed_us();
-    if (us < 50000) {
-        harness_record("D3.3", RESULT_FAIL, "50ms sleep on the other core took only %uus"
-                       " (returned EARLY)", us);
-    } else if (harness_sleep_counter_usable() && !agent_slept()) {
-        harness_record("D3.3", RESULT_INFO,
-                       "50ms sleep on the other core took %uus but SLEEPCNT saw no sleep", us);
+
+    if (worst_us > 60000) {
+        harness_record("D3.3", RESULT_FAIL, "50ms sleep on the other core took %uus",
+                       worst_us);
+    } else if (harness_sleep_counter_usable() && slept_rounds == 0) {
+        /* A hard failure, and the same defect D1.4 reports: on a core the RTOS does not
+         * schedule, sleep_until() waits via lock_internal_spin_unlock_with_wait() on the
+         * sleep_notifier, so a port branch that omits the RP2350 workaround busy-waits the
+         * whole sleep. There is no idle task here to excuse it - this core has no scheduler. */
+        harness_record("D3.3", RESULT_FAIL,
+                       "50ms sleep on the other core took %uus but never slept in %u rounds -"
+                       " it busy-waited", worst_us, rounds);
     } else {
-        harness_record("D3.3", us > 60000 ? RESULT_FAIL : RESULT_PASS,
-                       "50ms sleep on the other core took %uus%s", us,
+        harness_record("D3.3", RESULT_PASS,
+                       "50ms sleep on the other core took %uus%s", worst_us,
                        harness_sleep_counter_usable() ? " (confirmed asleep)" : "");
     }
 #endif
@@ -1056,11 +1263,13 @@ static void test_body(void) {
     d2_7_sdk_core_timed();
     d2_8_repeated_deadline();
     d2_9_expired_deadline();
+    d2_10_subtick_deadline();
 
     printf("\n--- D3: sleep_ms / sleep_until (ms-scale, concurrent, cross-core) ---\n");
     d3_1_sleep_accuracy_ms();
     d3_2_concurrent_sleepers();
     d3_3_sleep_on_sdk_core();
+    d3_4_notifier_bit_aliasing();
 
     int failed = harness_summary();
     printf("%s\n", failed ? "FAILED" : "PASSED");

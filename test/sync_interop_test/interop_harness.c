@@ -420,7 +420,14 @@ void harness_print_calibration(void) {
     }
     printf("  sleep detection: wait-loop iteration count (<=%d means it blocked)\n",
            MAX_BLOCKING_WAITS);
-    if (!harness_sleep_counter_present()) {
+    /* Only the agent core's counter is ever calibrated, so with no agent - or with one that
+     * never answered - there is no verdict to report. Saying "did not move across a known
+     * sleep" here would state as an observation something that was never measured. */
+    if (INTEROP_HAS_SDK_CORE && !agent_cal_valid) {
+        printf("    DWT_SLEEPCNT: not measured - the agent core returned no calibration\n");
+    } else if (!INTEROP_HAS_SDK_CORE) {
+        printf("    DWT_SLEEPCNT: not measured - no bare-SDK core to calibrate on\n");
+    } else if (!harness_sleep_counter_present()) {
         printf("    DWT_SLEEPCNT: not present on this platform (no DWT)\n");
     } else if (harness_sleep_counter_usable()) {
         printf("    DWT_SLEEPCNT (agent core): moved across a known sleep and held still while"

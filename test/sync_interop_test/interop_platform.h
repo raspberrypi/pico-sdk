@@ -124,6 +124,9 @@ enum {
     AGENT_SEM_ACQUIRE_BLOCKING,
     AGENT_SEM_RELEASE,
     AGENT_CALIBRATE_CYCLES,   /* measure this core's busy/asleep cycle rates */
+    AGENT_ARM_PROBE,          /* diagnostic: add an alarm and read the hardware straight
+                               * back, to tell "the add never armed it" from "something
+                               * disarmed it afterwards" */
     AGENT_IRQ_STATE,          /* diagnostic: is the default pool's alarm IRQ live on this
                                * core? Read from the core itself - the NVIC enable is per
                                * core, so no other core can answer this question. */
@@ -168,6 +171,22 @@ uint32_t agent_timer_intr(void);         /* raw (latched) interrupt status */
 uint32_t agent_timer_armed(void);        /* which alarms are armed */
 uint32_t agent_timer_alarm_val(void);    /* the alarm's compare value */
 uint32_t agent_timer_now(void);          /* timerawl at the same moment */
+/* AGENT_ARM_PROBE results: the hardware read back immediately after a successful add. */
+int32_t  agent_probe_id(void);           /* what add_alarm_in_us() returned */
+uint32_t agent_probe_armed(void);
+uint32_t agent_probe_alarm(void);
+uint32_t agent_probe_now(void);
+/* INTF is what ta_force_irq() sets; INTS is what the NVIC actually sees ("status after
+ * masking & forcing"). Sampled immediately after the add and again 200us later: still
+ * asserted means the core is not taking an enabled interrupt; cleared with nothing armed
+ * means something serviced it without doing the pool's work. */
+uint32_t agent_probe_primask(void);      /* 0xffffffff = not applicable on this arch */
+uint32_t agent_probe_basepri(void);
+uint32_t agent_probe_intf(void);
+uint32_t agent_probe_ints(void);
+uint32_t agent_probe_intf_late(void);
+uint32_t agent_probe_ints_late(void);
+uint32_t agent_probe_armed_late(void);
 /* Have the agent core calibrate its own cycle counter and install the result. */
 void     plat_calibrate_agent_cycles(void);
 #endif
@@ -176,6 +195,11 @@ void     plat_calibrate_agent_cycles(void);
 
 /* Start a background task looping sleep_ms(period_ms) forever, recording its worst
  * oversleep. FreeRTOS only - the Q2 bug needs more than one concurrent sleeper. */
+/* D3.4: hammer a mutex bound to `spin_lock_num` from two tasks, so its waiters keep
+ * consuming that spin lock's event-group bit. No-op without a scheduler. */
+void     plat_start_bit_thief(uint spin_lock_num);
+void     plat_stop_bit_thief(void);
+
 void     plat_start_background_sleeper(uint32_t period_ms, volatile int64_t *worst_late_us);
 
 void     plat_spinner_start(void);
