@@ -522,14 +522,30 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         // host build, which is not racing two real cores.)
 #if TA_COMPARE_BITS == 32
         typedef uint32_t last_added_t;
-        // ~0 rather than 0, so that a first call with timeout_timestamp 0 does not match
-        static volatile last_added_t last_added = (last_added_t)~0u;
+        static volatile last_added_t last_added;
+        // Truncating to the compare width leaves no value free to mean "nothing armed yet":
+        // every 32-bit value is a reachable low word, so any sentinel could be matched by a
+        // genuine first call, which would then take the bare __wfe() below with nothing ever
+        // having been armed. (At 64 bits INT64_MAX is safe, being unreachable in practice.)
+        // tested second: it is false exactly once in the life of the program, so it never
+        // short-circuits, whereas the comparison usually does
+        static volatile bool last_added_valid;
+#define last_added_matches(target) (last_added == (target) && last_added_valid)
 #else
+        // A 64-bit record cannot be read or written atomically on a 32-bit core, so this one is
+        // kept per core: one writer and one reader, both here, and the early return above for
+        // exception context means no ISR can observe a half-written value either. Correct
+        // rather than optimal - it costs a second slot, and a core no longer benefits from the
+        // other having already armed the same deadline - but no adapter has a 64-bit compare on
+        // a dual-core part today, so this path exists to be right rather than to be fast.
         typedef uint64_t last_added_t;
-        static last_added_t last_added = INT64_MAX; // at_the_end_of_time, for the same reason
+        static last_added_t last_added_per_core[NUM_CORES] = { INT64_MAX, INT64_MAX };
+        static_assert(NUM_CORES == 2, "initialiser assumes two cores");
+        #define last_added last_added_per_core[get_core_num()]
+#define last_added_matches(target) (last_added == (target))
 #endif
         const last_added_t this_target = (last_added_t)to_us_since_boot(timeout_timestamp);
-        if (last_added == this_target || ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
+        if (last_added_matches(this_target) || ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
                                      (int64_t)to_us_since_boot(timeout_timestamp))) {
             // if we are called repeatedly for a timeout in the past, we won't have an event - but in any case, it has already past!
             if (time_reached(timeout_timestamp)) return true;
@@ -546,6 +562,9 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
                 return time_reached(timeout_timestamp);
             } else {
                 last_added = this_target;
+#if TA_COMPARE_BITS == 32
+                last_added_valid = true;    // set after the value, never before
+#endif
                 if (!time_reached(timeout_timestamp)) {
                     // ^ at the point above the timer hadn't fired, so it is safe
                     // to wait; the event will happen due to IRQ at some point between
