@@ -26,7 +26,8 @@ int __time_critical_func(sem_available)(semaphore_t *sem) {
 void __time_critical_func(sem_acquire_blocking)(semaphore_t *sem) {
     // note: if you change the implementation here, please update the similar code in pico_sync_test.c
     // only a caller which waited can have consumed a notification, so only it can owe one to
-    // the waiters it left behind; taking a permit on the first pass consumes nothing
+    // the waiters it did not exclude - taking one of several permits leaves the others able to
+    // proceed. Taking a permit on the first pass consumes no notification, so owes nothing.
     bool __unused waited = false;
     do {
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);

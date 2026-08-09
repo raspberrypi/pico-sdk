@@ -288,14 +288,16 @@ extern volatile uint8_t lock_internal_notify_count;
 /*! \brief Release a spin lock, notifying only if other waiters may still be able to proceed
  *  \ingroup lock_core
  *
- * For use where the caller has consumed some of a lock's state and left the rest - a semaphore
- * acquirer taking one of several permits, say. Where a notify reaches every waiter this is just
- * a spin_unlock and `others_may_proceed` is not evaluated at all; where it does not, the
- * condition decides whether the remaining waiters must be re-notified.
+ * For use by a primitive where one waiter proceeding does not preclude another - a semaphore
+ * acquirer taking one of several permits, say. An exclusive primitive does not need this: a
+ * mutex waiter which acquires necessarily blocks the rest, and re-notifies them when it
+ * releases. Where a notify reaches every waiter this is just a spin_unlock and
+ * `others_may_proceed` is not evaluated at all; where it does not, the condition decides
+ * whether the waiters this one did not exclude must be re-notified.
  *
- * Bounded by construction: at most one extra notify per consume that leaves something behind,
- * and never more, since a notify cannot create state and the chain therefore stops when the
- * state runs out. What it can amplify is *wakeups* - on an implementation whose notify wakes
+ * Bounded by construction: at most one extra notify per acquire which leaves another waiter
+ * able to proceed, and never more, since a notify cannot create the state that lets them - so
+ * the chain stops when that runs out. What it can amplify is *wakeups* - on an implementation whose notify wakes
  * every waiter on the lock, consuming n units with w waiters parked costs up to n broadcasts
  * of w wakes, against the single broadcast it would otherwise be. The common cases are free or
  * exact: a caller which did not have to wait never notifies, and with one waiter the notify
@@ -303,7 +305,8 @@ extern volatile uint8_t lock_internal_notify_count;
  *
  * \param lock the lock_core
  * \param save the uint32_t value returned by the corresponding spin_lock_blocking()
- * \param others_may_proceed true if state remains which another waiter could still consume
+ * \param others_may_proceed true if another waiter could still proceed - i.e. this caller has
+ *                            not excluded them
  */
 #if LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL
 #define lock_internal_spin_unlock_maybe_notify(lock, save, others_may_proceed) spin_unlock((lock)->spin_lock, save)
