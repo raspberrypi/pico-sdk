@@ -192,6 +192,10 @@ for dirpath, dirnames, filenames in os.walk(scandir):
     if 'CMakeCache.txt' in filenames:
         dirnames[:] = []
         continue
+    # lib/ holds third-party submodules, which don't use these markers.
+    if os.path.relpath(dirpath, scandir) == 'lib':
+        dirnames[:] = []
+        continue
     for filename in filenames:
         file_ext = os.path.splitext(filename)[1]
         if file_ext in ('.c', '.h', '.S'):
