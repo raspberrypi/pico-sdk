@@ -48,6 +48,16 @@
 #define RUN_FREE_RTOS_ON_CORE 0
 #endif
 
+/*
+ * Which core runs the test cases in the baseline (no-RTOS) build; the other one agents.
+ * Reversing it is the control for anything that looks core-specific: without it, "core 0 is
+ * the agent" and "FreeRTOS is on core 1" only ever occur together, so a failure cannot be
+ * attributed to either.
+ */
+#ifndef INTEROP_TESTS_ON_CORE
+#define INTEROP_TESTS_ON_CORE 0
+#endif
+
 /* the objects under test, shared with the second core */
 extern mutex_t           test_mutex;
 extern recursive_mutex_t test_rmutex;
@@ -114,6 +124,9 @@ enum {
     AGENT_SEM_ACQUIRE_BLOCKING,
     AGENT_SEM_RELEASE,
     AGENT_CALIBRATE_CYCLES,   /* measure this core's busy/asleep cycle rates */
+    AGENT_IRQ_STATE,          /* diagnostic: is the default pool's alarm IRQ live on this
+                               * core? Read from the core itself - the NVIC enable is per
+                               * core, so no other core can answer this question. */
     AGENT_MUTEX_ENTER_COUNTED,        /* mutex_enter_blocking, counting wait iterations */
     AGENT_MUTEX_TIMED_COUNTED,        /* mutex_enter_block_until, ditto; arg = timeout ms */
     AGENT_MUTEX_ENTER_BARE,           /* bare spin_unlock(); __wfe() loop, counted */
@@ -144,6 +157,17 @@ bool     agent_slept(void);
 uint32_t agent_sleep_delta(void);
 /* AGENT_KNOWN_SLEEP: the delta measured *inline*, immediately around the WFE */
 uint32_t agent_inline_sleep_delta(void);
+
+/* AGENT_IRQ_STATE results, valid after a successful AGENT_IRQ_STATE command. */
+uint32_t agent_alarm_irq_num(void);      /* the IRQ the default pool's alarm uses */
+bool     agent_alarm_irq_enabled(void);  /* enabled in *that core's* NVIC */
+/* The timer peripheral's own view, read on the agent core. The NVIC enable says only that the
+ * core would take the interrupt; these say whether the timer is set up to raise it at all. */
+uint32_t agent_timer_inte(void);         /* per-alarm interrupt enable */
+uint32_t agent_timer_intr(void);         /* raw (latched) interrupt status */
+uint32_t agent_timer_armed(void);        /* which alarms are armed */
+uint32_t agent_timer_alarm_val(void);    /* the alarm's compare value */
+uint32_t agent_timer_now(void);          /* timerawl at the same moment */
 /* Have the agent core calibrate its own cycle counter and install the result. */
 void     plat_calibrate_agent_cycles(void);
 #endif

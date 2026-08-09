@@ -23,7 +23,7 @@
 typedef struct {
     const char *id;
     result_kind_t kind;
-    char detail[120];
+    char detail[200];
 } result_t;
 
 static result_t results[MAX_RESULTS];
@@ -42,7 +42,7 @@ static const char *kind_name(result_kind_t k) {
 void harness_record(const char *id, result_kind_t kind, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    char detail[120];
+    char detail[200];
     vsnprintf(detail, sizeof(detail), fmt, args);
     va_end(args);
 
@@ -192,6 +192,7 @@ bool harness_sleep_counter_present(void) { return false; }
 /* Armv7-M/Armv8-M DWT, which FreeRTOS does not use, so this is safe on any core.
  * Note CYCCNT is present across Armv7-M/Armv8-M, but the *profiling* counters (SLEEPCNT et
  * al) are Mainline-only - hence harness_sleep_counter_present() uses the narrower predicate. */
+#define HARNESS_HAS_DWT 1
 #define DWT_CTRL     (*(volatile uint32_t *)0xE0001000u)
 #define DWT_CYCCNT   (*(volatile uint32_t *)0xE0001004u)
 #define DWT_SLEEPCNT (*(volatile uint32_t *)0xE0001010u)
@@ -258,11 +259,13 @@ static uint32_t cycle_delta(uint32_t before, uint32_t after) {
 }
 #endif
 
-static bool     cycles_ok;
-static bool     sleepcnt_moved;
-static bool     sleepcnt_moved_awake;   /* moved while busy => not a sleep counter */
-static uint32_t cal_cyc_busy_per_us;   /* cycles/us while spinning */
-static uint32_t cal_cyc_sleep_per_us;  /* cycles/us while in WFE   */
+/* The agent core's measurement, and nothing else: see harness_cal_t. */
+static harness_cal_t agent_cal;
+static bool          cycles_ok;
+/* False until the agent core actually reports. Without this, an agent that never answered is
+ * indistinguishable from one whose counters read zero - and the two have completely different
+ * causes (a dead probe on the agent core vs a disabled counter). */
+static bool          agent_cal_valid;
 
 void harness_cycles_enable_this_core(void) {
     cycles_enable();
@@ -272,36 +275,41 @@ uint32_t harness_cycle_delta(uint32_t before, uint32_t after) {
     return cycle_delta(before, after);
 }
 
-void harness_set_cycle_calibration(uint32_t busy_per_us, uint32_t sleep_per_us) {
-    cal_cyc_busy_per_us = busy_per_us;
-    cal_cyc_sleep_per_us = sleep_per_us;
-    cycles_ok = busy_per_us > sleep_per_us * 2 + 1;
+void harness_set_agent_calibration(const harness_cal_t *cal) {
+    agent_cal = *cal;
+    agent_cal_valid = true;
+    cycles_ok = cal->busy_per_us > cal->sleep_per_us * 2 + 1;
 }
+
+bool harness_agent_calibrated(void) { return agent_cal_valid; }
+
+uint32_t harness_agent_dwt_ctrl(void) { return agent_cal.dwt_ctrl; }
+uint32_t harness_agent_demcr(void)    { return agent_cal.demcr; }
 
 uint32_t harness_sleep_delta(uint32_t before, uint32_t after) {
     return (after - before) & 0xffu;
 }
 
 uint32_t harness_cal_cycles_per_us(void) {
-    return cal_cyc_busy_per_us;
+    return agent_cal.busy_per_us;
 }
 
 bool harness_sleep_counter_usable(void) {
     /* Observed movement across a known sleep is the only signal worth acting on. DWT_CTRL's
      * NOPRFCNT bit is not used: it governs the profiling counters as a group and reads clear
      * on the RP2350 M33 even though SLEEPCNT is not there, so it is a false positive here. */
-    return sleepcnt_moved;
+    return agent_cal.sleepcnt_moved;
 }
 
 int harness_occupancy_pct(uint32_t cycle_delta_cycles, uint64_t elapsed_us) {
     if (!cycles_ok || !elapsed_us) return -1;
     /* a narrow counter wraps: refuse to guess rather than report a bogus figure */
-    if (cal_cyc_busy_per_us &&
-        elapsed_us > ((1ull << HARNESS_CYCLE_BITS) * 4 / 5) / cal_cyc_busy_per_us) {
+    if (agent_cal.busy_per_us &&
+        elapsed_us > ((1ull << HARNESS_CYCLE_BITS) * 4 / 5) / agent_cal.busy_per_us) {
         return -1;
     }
-    uint32_t busy = (uint32_t)(cal_cyc_busy_per_us * elapsed_us);
-    uint32_t sleep = (uint32_t)(cal_cyc_sleep_per_us * elapsed_us);
+    uint32_t busy = (uint32_t)(agent_cal.busy_per_us * elapsed_us);
+    uint32_t sleep = (uint32_t)(agent_cal.sleep_per_us * elapsed_us);
     if (busy <= sleep) return -1;
     if (cycle_delta_cycles <= sleep) return 0;
     if (cycle_delta_cycles >= busy) return 100;
@@ -317,8 +325,19 @@ static int64_t cal_wfe_alarm(__unused alarm_id_t id, __unused void *ud) {
     return 0;
 }
 
-void harness_calibrate_cycles_local(uint32_t *busy_per_us, uint32_t *sleep_per_us) {
+void harness_calibrate_cycles_local(harness_cal_t *out) {
     cycles_enable();
+
+    /* Read back what cycles_enable() actually achieved on THIS core, so that a counter which
+     * reads zero can say whether it was never enabled or is enabled and simply not counting.
+     * Guessing between those two cost a debugging session. */
+#if HARNESS_HAS_DWT
+    out->dwt_ctrl = DWT_CTRL;
+    out->demcr    = SCB_DEMCR;
+#else
+    out->dwt_ctrl = 0;
+    out->demcr    = 0;
+#endif
 
     absolute_time_t t0 = get_absolute_time();
     uint32_t c0 = harness_cycles();
@@ -332,7 +351,7 @@ void harness_calibrate_cycles_local(uint32_t *busy_per_us, uint32_t *sleep_per_u
      * mistaken for a working sleep counter. */
     bool sleepcnt_moved_while_busy = (sb0 != sb1);
     int64_t us = absolute_time_diff_us(t0, get_absolute_time());
-    *busy_per_us = us > 0 ? (uint32_t)(cycle_delta(c0, c1) / (uint64_t)us) : 0;
+    out->busy_per_us = us > 0 ? (uint32_t)(cycle_delta(c0, c1) / (uint64_t)us) : 0;
 
     /* Asleep pole: WFE against an alarm 20ms out. add_alarm_in_us() forces the timer IRQ and
      * takes spin locks, all of which latch events, so drain once before measuring. No need
@@ -348,10 +367,10 @@ void harness_calibrate_cycles_local(uint32_t *busy_per_us, uint32_t *sleep_per_u
     uint32_t s1 = harness_sleep_counter();
     c1 = harness_cycles();
     /* Usable only if it moved across a known sleep AND stayed put while demonstrably busy. */
-    sleepcnt_moved = (s0 != s1) && !sleepcnt_moved_while_busy;
-    sleepcnt_moved_awake = sleepcnt_moved_while_busy;
+    out->sleepcnt_moved = (s0 != s1) && !sleepcnt_moved_while_busy;
+    out->sleepcnt_moved_awake = sleepcnt_moved_while_busy;
     us = absolute_time_diff_us(t0, get_absolute_time());
-    *sleep_per_us = us > 0 ? (uint32_t)(cycle_delta(c0, c1) / (uint64_t)us) : UINT32_MAX;
+    out->sleep_per_us = us > 0 ? (uint32_t)(cycle_delta(c0, c1) / (uint64_t)us) : UINT32_MAX;
 }
 
 void harness_calibrate(void) {
@@ -382,26 +401,35 @@ void harness_print_calibration(void) {
      * cycle counter is only ever a secondary note, so its absence skips nothing important. */
     if (!INTEROP_HAS_SDK_CORE) {
         printf("  cycles:  no bare-SDK core in this configuration, so not measured\n");
+    } else if (!agent_cal_valid) {
+        printf("  cycles:  the agent core never returned a calibration - its probe arms an"
+               " alarm and waits on it, so alarms are not reaching that core\n");
     } else if (cycles_ok) {
         printf("  cycles (agent core, %d-bit): busy %u/us, asleep %u/us"
                " -> separates, will be reported as a secondary note\n",
-               (int)HARNESS_CYCLE_BITS, cal_cyc_busy_per_us, cal_cyc_sleep_per_us);
+               (int)HARNESS_CYCLE_BITS, agent_cal.busy_per_us, agent_cal.sleep_per_us);
     } else {
         printf("  cycles (agent core, %d-bit): busy %u/us, asleep %u/us"
                " -> does not separate, so the counter cannot see sleep; note omitted\n",
-               (int)HARNESS_CYCLE_BITS, cal_cyc_busy_per_us, cal_cyc_sleep_per_us);
+               (int)HARNESS_CYCLE_BITS, agent_cal.busy_per_us, agent_cal.sleep_per_us);
+        if (agent_cal.dwt_ctrl || agent_cal.demcr) {
+            printf("           agent core DWT_CTRL=0x%08x DEMCR=0x%08x (CYCCNTENA=%u"
+                   " TRCENA=%u)\n", agent_cal.dwt_ctrl, agent_cal.demcr,
+                   agent_cal.dwt_ctrl & 1u, (agent_cal.demcr >> 24) & 1u);
+        }
     }
     printf("  sleep detection: wait-loop iteration count (<=%d means it blocked)\n",
            MAX_BLOCKING_WAITS);
     if (!harness_sleep_counter_present()) {
         printf("    DWT_SLEEPCNT: not present on this platform (no DWT)\n");
     } else if (harness_sleep_counter_usable()) {
-        printf("    DWT_SLEEPCNT: moved across a known sleep and held still while busy"
-               " - a direct sleep signal is available\n");
-    } else if (sleepcnt_moved_awake) {
-        printf("    DWT_SLEEPCNT: moved while demonstrably BUSY - not a sleep counter"
-               " (0x%08x is not defined in m33.h); not usable\n", 0xE0001010u);
+        printf("    DWT_SLEEPCNT (agent core): moved across a known sleep and held still while"
+               " busy - a direct sleep signal is available\n");
+    } else if (agent_cal.sleepcnt_moved_awake) {
+        printf("    DWT_SLEEPCNT (agent core): moved while demonstrably BUSY - not a sleep"
+               " counter (0x%08x is not defined in m33.h); not usable\n", 0xE0001010u);
     } else {
-        printf("    DWT_SLEEPCNT: did not move across a known sleep - not usable\n");
+        printf("    DWT_SLEEPCNT (agent core): did not move across a known sleep - not"
+               " usable\n");
     }
 }

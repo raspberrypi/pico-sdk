@@ -122,10 +122,33 @@ void     harness_cycles_enable_this_core(void);
 /* Measured cycles/us while spinning, from the calibration. Should be ~clk_sys in MHz; a
  * wildly wrong value (notably 0) means the counter is not running. */
 uint32_t harness_cal_cycles_per_us(void);
-/* Measure this core's busy and asleep cycle rates; run on the core to be judged. */
-void     harness_calibrate_cycles_local(uint32_t *busy_per_us, uint32_t *sleep_per_us);
-/* Install a calibration measured elsewhere (i.e. on the agent core). */
-void     harness_set_cycle_calibration(uint32_t busy_per_us, uint32_t sleep_per_us);
+/*
+ * A counter verdict belongs to the core that measured it - DWT is per core, and on Arm
+ * SysTick belongs to FreeRTOS. Keeping the measurement in a value rather than in harness
+ * globals is what stops one core's result being reported as a program-wide fact: that is how
+ * a run once printed "DWT_SLEEPCNT ... not usable" in its banner and then "SLEEPCNT agrees"
+ * in D1.4, from two different cores' counters.
+ */
+typedef struct {
+    uint32_t busy_per_us;           /* cycles/us while spinning */
+    uint32_t sleep_per_us;          /* cycles/us while in WFE   */
+    uint32_t dwt_ctrl;              /* 0 where there is no DWT; diagnoses a dead counter */
+    uint32_t demcr;
+    bool     sleepcnt_moved;        /* moved across a known sleep */
+    bool     sleepcnt_moved_awake;  /* moved while busy => not a sleep counter at all */
+} harness_cal_t;
+
+/* Measure this core's counters; must run on the core being judged. Writes nothing global. */
+void     harness_calibrate_cycles_local(harness_cal_t *out);
+/* Install the agent core's measurement. The queries above report the agent's numbers, since
+ * the agent core is the only one whose sleeping the cases ever judge. */
+void     harness_set_agent_calibration(const harness_cal_t *cal);
+uint32_t harness_agent_dwt_ctrl(void);
+uint32_t harness_agent_demcr(void);
+/* False if the agent core never reported one - its probe arms an alarm and waits on it, so
+ * this fails whenever alarms are not reaching that core. Distinguishing that from "counters
+ * read zero" is the difference between a broken timer and a disabled counter. */
+bool     harness_agent_calibrated(void);
 
 /*
  * 100 = the core executed instructions for the whole window (spinning)

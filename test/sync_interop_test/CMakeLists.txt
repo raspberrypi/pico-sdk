@@ -48,6 +48,10 @@ endfunction()
 set(INTEROP_EXTRA_LIBS "")
 add_interop_variants(sync_interop_test_baseline)
 
+# Same core assignment as the _core1 FreeRTOS build (cases on core 1, agent on core 0) but
+# with no RTOS, so that a core-specific failure can be told apart from an interop one.
+add_interop_variants(sync_interop_test_baseline_rev INTEROP_TESTS_ON_CORE=1)
+
 # note: check for an empty value too, since FreeRTOS_Kernel_import.cmake picks up a
 # defined-but-empty environment variable and then hard-errors rather than skipping
 if (NOT FREERTOS_KERNEL_PATH AND "$ENV{FREERTOS_KERNEL_PATH}" STREQUAL "")

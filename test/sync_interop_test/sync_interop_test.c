@@ -32,10 +32,22 @@
  * they are separate cases throughout.
  *
  * Build variants (see CMakeLists.txt):
- *   _baseline  no RTOS; core 0 drives, core 1 holds/agents
- *   _smp       FreeRTOS SMP; both cores are FreeRTOS, so cross-core cases skip
- *   _core0     FreeRTOS on core 0, bare SDK code on core 1
- *   _core1     FreeRTOS on core 1, bare SDK code on core 0
+ *   _baseline      no RTOS; core 0 drives, core 1 holds/agents
+ *   _baseline_rev  no RTOS; core 1 drives, core 0 agents
+ *   _smp           FreeRTOS SMP; both cores are FreeRTOS, so cross-core cases skip
+ *   _core0         FreeRTOS on core 0, bare SDK code on core 1
+ *   _core1         FreeRTOS on core 1, bare SDK code on core 0
+ *
+ * _baseline_rev exists so that "core 0 is the agent" and "FreeRTOS is on core 1" do not only
+ * ever occur together: without it a failure in _core1 cannot be attributed to either. It is
+ * the control that showed the _core1 alarm failures to be FreeRTOS's rather than the SDK's.
+ *
+ * Note the default alarm pool stays on core 0 in BOTH baseline directions - it is created
+ * during runtime init, before either core is chosen as the driver. That is deliberate and
+ * must stay that way: if the pool followed the driving core, the reversed baseline would
+ * differ from the forward one in two respects at once and would no longer be a control. It
+ * also means the reversed baseline shares its pool arrangement with _core1 exactly, so the
+ * only remaining difference between those two is the RTOS.
  */
 
 #include <stdio.h>
@@ -58,17 +70,22 @@
 #endif
 
 /*
- * A bare-SDK core that busy-polls instead of blocking is *predicted* under FreeRTOS: the
- * port's !portIS_FREE_RTOS_CORE() branch is a plain spin_unlock(); __wfe(), with no
- * equivalent of lock_internal_notify_count, so on RP2350 with software spin locks the WFE
- * falls straight through. In the baseline there is no such excuse - the SDK's own workaround
- * is meant to handle exactly this - so there it is a hard failure and must fail the run.
+ * Busy-polling where the code should block is always a hard failure, under FreeRTOS as much
+ * as in the baseline.
+ *
+ * It used to be RESULT_EXPECTED_FAIL under FreeRTOS, on the grounds that the port's
+ * !portIS_FREE_RTOS_CORE() branch is a plain spin_unlock(); __wfe() with no equivalent of
+ * lock_internal_notify_count, so on RP2350 with software spin locks the WFE falls straight
+ * through. That is a *diagnosis*, not an excuse: RESULT_EXPECTED_FAIL is for behaviour that
+ * merely looks wrong and is in fact correct, never for a defect we happen to have explained
+ * already. Marking a known bug as expected is how a suite goes green over the very thing it
+ * was written to catch.
+ *
+ * Note this does not fire for the RTOS core's timed path, which waits on the event group
+ * bounded by the tick and then yields: that blocks, just at tick granularity, so its wait
+ * counts stay low.
  */
-#if INTEROP_HAVE_FREERTOS
-#define BUSY_POLL_VERDICT RESULT_EXPECTED_FAIL
-#else
 #define BUSY_POLL_VERDICT RESULT_FAIL
-#endif
 
 /*
  * These must be resolved in the preprocessor, not in C: PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND
@@ -85,10 +102,77 @@
 #else
 #define INTEROP_WORKAROUND 0
 #endif
+/*
+ * When an RTOS supplies its own lock_internal_* macros, lock_core.h's versions - and with
+ * them the whole RP2350 workaround - are never compiled. Reporting "workaround enabled" in
+ * that case is a lie that made two builds look meaningfully different when only the raw
+ * spin_lock/unlock fast path differed. It also decides whether pico_time uses its
+ * sleep_notifier: time.c enables that on exactly this condition.
+ */
+#if LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN
+#define INTEROP_LOCK_MACROS_OVERRIDDEN 1
+#else
+#define INTEROP_LOCK_MACROS_OVERRIDDEN 0
+#endif
 
 #define HOLD_MS     20      /* how long a holder holds a contended lock */
 #define ITERS       20      /* contended iterations per case */
 #define TIMEOUT_MS  50      /* deadline used by the D2 timed cases */
+
+/*
+ * Rescue alarm.
+ *
+ * A notify that raises a semaphore's count but fails to wake the waiter deadlocks a blocking
+ * acquire, and a run that hangs reports nothing about the cases after it. The rescue pool is
+ * created on the core that runs the cases, so its callback always takes that core's own
+ * notify path - even when the default pool is serviced by the other core, which is exactly
+ * the configuration under suspicion. If it has to fire, that *is* the finding.
+ */
+#define RESCUE_GRACE_US 20000   /* a legitimate ISR->waiter wake measures tens of us */
+static alarm_pool_t *local_pool;
+static volatile bool rescue_flag;
+
+static int64_t rescue_alarm(__unused alarm_id_t id, __unused void *ud) {
+    rescue_flag = true;
+    sem_release(&test_sem);
+    return 0;
+}
+
+static void rescue_init(void) {
+    /* This claims the hardware alarm itself - do not claim one first and pass it to
+     * alarm_pool_create(), which claims internally and would assert on the double claim. */
+    local_pool = alarm_pool_create_on_timer_with_unused_hardware_alarm(
+            alarm_pool_get_default_timer(), 4);
+}
+
+/*
+ * Fire a callback on the core running the cases. The default pool belongs to whichever core
+ * created it (core 0), which is not necessarily this one - and an ISR that blocks on a mutex
+ * held by the core it fired on deadlocks against the thread it interrupted. That is what took
+ * out D1.7 the first time the reversed baseline ran.
+ */
+static alarm_id_t local_alarm_in_us(uint64_t us, alarm_callback_t cb) {
+    return local_pool ? alarm_pool_add_alarm_in_us(local_pool, us, cb, NULL, true)
+                      : add_alarm_in_us(us, cb, NULL, true);
+}
+
+static alarm_id_t rescue_arm(uint64_t us) {
+    if (!local_pool) return -1;
+    rescue_flag = false;
+    return alarm_pool_add_alarm_in_us(local_pool, us, rescue_alarm, NULL, true);
+}
+
+/* True only if the rescue actually ran, i.e. the notify under test failed to wake us.
+ *
+ * The flag is the authority, not alarm_pool_cancel_alarm()'s return value: that was observed
+ * returning true for an alarm which had demonstrably already run (the wake latency was the
+ * full RESCUE_GRACE_US), which made every rescue count as a normal wake and hid the finding.
+ * Cancelling is still worth doing so a pending alarm cannot fire into the next iteration. */
+static bool rescue_fired(alarm_id_t id) {
+    if (id <= 0) return false;
+    alarm_pool_cancel_alarm(local_pool, id);
+    return rescue_flag;
+}
 
 static int64_t sem_release_alarm(__unused alarm_id_t id, __unused void *ud) {
     sem_release(&test_sem);
@@ -260,21 +344,65 @@ static void d1_5_sdk_core_notifies(void) {
 static void d1_6_notify_from_isr(void) {
     latency_t lat;
     latency_reset(&lat);
-    sem_reset(&test_sem, 0);
 
+    uint rescued = 0;
+    bool add_failed = false;
+    int  add_result = 0;
+    uint add_fail_iter = 0;
     for (uint i = 0; i < ITERS; i++) {
         uint32_t delay_us = 2000 + (i % 7) * 250;
+        sem_reset(&test_sem, 0);
         absolute_time_t target = make_timeout_time_us(delay_us);
-        if (add_alarm_in_us(delay_us, sem_release_alarm, NULL, true) <= 0) {
-            harness_record("D1.6", RESULT_FAIL, "could not add alarm");
-            return;
+        /* Report the id: the two failure modes are indistinguishable without it. -1 means
+         * the pool had no free slot; 0 means the deadline was already past and fire_if_past
+         * ran the callback inline, which is not a failure of the notify path at all. */
+        alarm_id_t primary = add_alarm_in_us(delay_us, sem_release_alarm, NULL, true);
+        if (primary <= 0) {
+            /* Do not return: if earlier iterations were rescued, THAT is the finding and a
+             * full pool is merely its consequence - the entries pile up precisely because
+             * their callbacks never ran. Losing that to an early return reported the symptom
+             * and hid the cause. */
+            add_failed = true;
+            add_result = (int)primary;
+            add_fail_iter = i;
+            break;
         }
+        /* The wait must stay sem_acquire_blocking(): a timed acquire would re-check the count
+         * when the tick expired and so turn a lost notify into a slightly late success, which
+         * is precisely the bug we are looking for. Instead the deadlock is broken from
+         * outside, by an alarm on a pool this core services - see local_pool. */
+        alarm_id_t rescue = rescue_arm(delay_us + RESCUE_GRACE_US);
         sem_acquire_blocking(&test_sem);
-        latency_add(&lat, absolute_time_diff_us(target, get_absolute_time()));
+        if (rescue_fired(rescue)) {
+            rescued++;
+        } else {
+            latency_add(&lat, absolute_time_diff_us(target, get_absolute_time()));
+        }
     }
     latency_print(&lat, "ISR notify -> waiter wake");
 
-    if (lat.count != ITERS) {
+    if (rescued && add_failed) {
+        harness_record("D1.6", RESULT_FAIL,
+                       "%u of %u ISR notifies never woke the waiter; pool then full at"
+                       " iteration %u (%d) as those alarms never ran - callbacks not serviced"
+                       " on core %u",
+                       rescued, ITERS, add_fail_iter, add_result,
+                       alarm_pool_core_num(alarm_pool_get_default()));
+    } else if (add_failed) {
+        harness_record("D1.6", RESULT_FAIL,
+                       "could not add alarm on iteration %u: add_alarm_in_us() returned %d"
+                       " (%s)", add_fail_iter, add_result,
+                       add_result == 0 ? "deadline already past, fired inline"
+                                       : "no free slot in the default pool");
+    } else if (rescued) {
+        /* The notify raised the semaphore count but never woke the waiter; only the rescue
+         * alarm, whose callback runs on this core, got it moving again. */
+        harness_record("D1.6", RESULT_FAIL,
+                       "%u of %u ISR notifies did not wake the waiter (rescued after %ums);"
+                       " alarm callback runs on core %u, this core is %u",
+                       rescued, ITERS, RESCUE_GRACE_US / 1000,
+                       alarm_pool_core_num(alarm_pool_get_default()), get_core_num());
+    } else if (lat.count != ITERS) {
         harness_record("D1.6", RESULT_FAIL, "only %u of %u wakeups", lat.count, ITERS);
     } else if (lat.max_us > 20000) {
         harness_record("D1.6", RESULT_FAIL, "worst ISR->waiter wake %lldus",
@@ -304,7 +432,7 @@ static void d1_7_blocking_acquire_from_isr(void) {
      * is what the port forbids, which is exactly the contrast worth documenting. */
     d1_7_returned = false;
     plat_sdk_core_hold_for_ms(HOLD_MS);
-    add_alarm_in_us(1000, blocking_acquire_in_isr, NULL, true);
+    local_alarm_in_us(1000, blocking_acquire_in_isr);
     plat_delay_ms(HOLD_MS * 3);
     harness_record("D1.7", d1_7_returned ? RESULT_PASS : RESULT_FAIL,
                    "blocking acquire from ISR %s",
@@ -324,13 +452,50 @@ static void d0_counter_selftest(void) {
 #if !INTEROP_HAS_SDK_CORE
     harness_record("D0", RESULT_SKIP, "counters are calibrated on the agent core; none here");
 #else
+    /* 0. a calibration that never arrived is not a counter fault, and reporting it as one
+     *    sends you looking at DWT enables instead of at the agent core's alarms. Note this
+     *    runs before rescue_init(), so a failure here cannot be the rescue pool's claim. */
+    if (!harness_agent_calibrated()) {
+        /* Ask the bare core itself whether the default pool's alarm IRQ is live there. The
+         * NVIC enable is per core, so this is the one question no other core can answer, and
+         * it separates "the IRQ was never enabled on that core" from "it is enabled but the
+         * alarm is never armed". */
+        if (agent_run(AGENT_IRQ_STATE, 0, 1000)) {
+            /* Verdict first: harness_record() truncates at detail[120], and putting the
+             * ENABLED/DISABLED word last once cost a whole hardware run. */
+            /* The NVIC enable only says the core would take the interrupt. Whether the
+             * timer is set up to raise one is a separate question, so read its own state:
+             * INTE not set means the pool never enabled it; ARMED not set means the alarm
+             * was never programmed; INTR set means it fired and was never serviced. */
+            uint abit = 1u << alarm_pool_timer_alarm_num(alarm_pool_get_default());
+            const char *why =
+                    !agent_alarm_irq_enabled()          ? "NVIC irq disabled on that core" :
+                    !(agent_timer_inte() & abit)        ? "timer INTE clear: irq never enabled" :
+                    (agent_timer_intr() & abit)         ? "INTR set: fired but never serviced" :
+                    !(agent_timer_armed() & abit)       ? "not armed: alarm never programmed" :
+                                                          "armed and pending, simply not firing";
+            harness_record("D0", RESULT_FAIL,
+                           "no calibration from bare core - %s (irq %u inte=%x intr=%x"
+                           " armed=%x alarm=%u now=%u)", why, agent_alarm_irq_num(),
+                           agent_timer_inte(), agent_timer_intr(), agent_timer_armed(),
+                           agent_timer_alarm_val(), agent_timer_now());
+        } else {
+            harness_record("D0", RESULT_FAIL,
+                           "the agent core never returned a calibration, and did not answer"
+                           " the IRQ-state probe either");
+        }
+        return;
+    }
+
     /* 1. the cycle counter must actually count, at roughly clk_sys */
     uint32_t expected = (uint32_t)(clock_get_hz(clk_sys) / 1000000u);
     uint32_t actual = harness_cal_cycles_per_us();
     if (actual < expected * 3 / 4 || actual > expected * 5 / 4) {
         harness_record("D0", RESULT_FAIL,
-                       "cycle counter reads %u/us, expected ~%u (clk_sys); is it enabled?",
-                       actual, expected);
+                       "cycle counter reads %u/us, expected ~%u (clk_sys);"
+                       " agent core DWT_CTRL=0x%08x DEMCR=0x%08x (CYCCNTENA=%u TRCENA=%u)",
+                       actual, expected, harness_agent_dwt_ctrl(), harness_agent_demcr(),
+                       harness_agent_dwt_ctrl() & 1u, (harness_agent_demcr() >> 24) & 1u);
         return;
     }
 
@@ -701,7 +866,7 @@ static void d2_5_timed_from_isr_contended(void) {
 #else
     d2_5_returned = false;
     plat_sdk_core_hold_for_ms(HOLD_MS);
-    add_alarm_in_us(1000, timed_acquire_in_isr, NULL, true);
+    local_alarm_in_us(1000, timed_acquire_in_isr);
     plat_delay_ms(HOLD_MS * 3);
     if (!d2_5_returned) {
         harness_record("D2.5", RESULT_FAIL, "timed acquire from ISR never returned");
@@ -729,7 +894,7 @@ static void d2_6_try_from_isr_uncontended(void) {
     /* the ordinary printf-from-ISR case: nothing holds the lock, the try succeeds, no wait
      * path is entered. This one must keep working everywhere. */
     d2_6_ran = false;
-    add_alarm_in_us(1000, try_in_isr_uncontended, NULL, true);
+    local_alarm_in_us(1000, try_in_isr_uncontended);
     plat_delay_ms(50);
 
     if (!d2_6_ran) {
@@ -836,10 +1001,24 @@ static void test_body(void) {
 #endif
     printf("platform: %s\n", PICO_PLATFORM_STRING);
     printf("config: %s\n", plat_config_name());
-    printf("spin locks: %s, unlock %s the event; workaround %s\n",
+    printf("spin locks: %s, unlock %s the event\n",
            PICO_USE_SW_SPIN_LOCKS ? "software" : "hardware",
-           INTEROP_UNLOCK_SEVS ? "sets" : "does not set",
-           INTEROP_WORKAROUND ? "enabled" : "disabled");
+           INTEROP_UNLOCK_SEVS ? "sets" : "does not set");
+    if (INTEROP_LOCK_MACROS_OVERRIDDEN) {
+        /* Say this plainly: it means the SDK's WFE machinery, workaround and all, is not the
+         * code under test here - the RTOS port's event-group implementation is. */
+        printf("lock_core: overridden by the RTOS, so the SDK's RP2350 workaround is NOT"
+               " compiled; pico_time uses its sleep_notifier\n");
+    } else {
+        printf("lock_core: the SDK's own; RP2350 workaround %s; pico_time sleeps on a bare"
+               " __wfe()\n", INTEROP_WORKAROUND ? "enabled" : "disabled");
+    }
+#if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
+    /* Which core services the default pool decides whether an alarm callback notifies from
+     * the RTOS core or has to cross over to it - the difference between the _core0 and
+     * _core1 configurations. */
+    printf("default alarm pool: core %u\n", alarm_pool_core_num(alarm_pool_get_default()));
+#endif
 
     /* DWT is per core: the driving core needs its own enable, or SLEEPCNT here reads a dead
      * value and every local sleep looks like a busy-wait */
@@ -853,6 +1032,7 @@ static void test_body(void) {
     plat_calibrate_agent_cycles();
 #endif
     harness_print_calibration();
+    rescue_init();
 
     printf("\n--- D1: blocking discipline (mutex_enter_blocking, as pico_malloc) ---\n");
     d0_counter_selftest();

@@ -116,6 +116,13 @@ static struct {
     volatile uint32_t inline_sleep_delta;
     volatile uint32_t cal_busy_per_us;
     volatile uint32_t cal_sleep_per_us;
+    volatile uint32_t irq_num;
+    volatile bool     irq_enabled;
+    volatile uint32_t t_inte, t_intr, t_armed, t_alarm, t_now;
+    volatile uint32_t cal_dwt_ctrl;
+    volatile uint32_t cal_demcr;
+    volatile bool     cal_sleepcnt_moved;
+    volatile bool     cal_sleepcnt_awake;
 } agent;
 
 static int64_t agent_known_sleep_alarm(__unused alarm_id_t id, __unused void *ud) {
@@ -219,11 +226,32 @@ static void sdk_core_agent(void) {
                         &test_mutex, make_timeout_time_ms(arg), &result);
                 if (result) mutex_exit(&test_mutex);   /* as above */
                 break;
+            case AGENT_IRQ_STATE: {
+                uint alarm_num = alarm_pool_timer_alarm_num(alarm_pool_get_default());
+                uint irq = timer_hardware_alarm_get_irq_num(alarm_pool_get_default_timer(),
+                                                            alarm_num);
+                agent.irq_num     = irq;
+                agent.irq_enabled = irq_is_enabled(irq);
+                timer_hw_t *t     = alarm_pool_get_default_timer();
+                agent.t_inte      = t->inte;
+                agent.t_intr      = t->intr;
+                agent.t_armed     = t->armed;
+                agent.t_alarm     = t->alarm[alarm_num];
+                agent.t_now       = t->timerawl;
+                result = true;
+                break;
+            }
             case AGENT_CALIBRATE_CYCLES: {
-                uint32_t busy, slp;
-                harness_calibrate_cycles_local(&busy, &slp);
-                agent.cal_busy_per_us = busy;
-                agent.cal_sleep_per_us = slp;
+                /* Measured here, on the agent core, and reported back as a value - the harness
+                 * must not learn it from a global written on the wrong core. */
+                harness_cal_t cal;
+                harness_calibrate_cycles_local(&cal);
+                agent.cal_busy_per_us     = cal.busy_per_us;
+                agent.cal_sleep_per_us    = cal.sleep_per_us;
+                agent.cal_dwt_ctrl        = cal.dwt_ctrl;
+                agent.cal_demcr           = cal.demcr;
+                agent.cal_sleepcnt_moved  = cal.sleepcnt_moved;
+                agent.cal_sleepcnt_awake  = cal.sleepcnt_moved_awake;
                 result = true;
                 break;
             }
@@ -272,9 +300,25 @@ bool agent_run(uint32_t cmd, uint32_t arg, uint32_t timeout_ms) {
     return agent_wait(timeout_ms);
 }
 
+uint32_t agent_alarm_irq_num(void)     { return agent.irq_num; }
+bool     agent_alarm_irq_enabled(void) { return agent.irq_enabled; }
+uint32_t agent_timer_inte(void)        { return agent.t_inte; }
+uint32_t agent_timer_intr(void)        { return agent.t_intr; }
+uint32_t agent_timer_armed(void)       { return agent.t_armed; }
+uint32_t agent_timer_alarm_val(void)   { return agent.t_alarm; }
+uint32_t agent_timer_now(void)         { return agent.t_now; }
+
 void plat_calibrate_agent_cycles(void) {
     if (agent_run(AGENT_CALIBRATE_CYCLES, 0, 2000)) {
-        harness_set_cycle_calibration(agent.cal_busy_per_us, agent.cal_sleep_per_us);
+        harness_cal_t cal = {
+                .busy_per_us          = agent.cal_busy_per_us,
+                .sleep_per_us         = agent.cal_sleep_per_us,
+                .dwt_ctrl             = agent.cal_dwt_ctrl,
+                .demcr                = agent.cal_demcr,
+                .sleepcnt_moved       = agent.cal_sleepcnt_moved,
+                .sleepcnt_moved_awake = agent.cal_sleepcnt_awake,
+        };
+        harness_set_agent_calibration(&cal);
     }
 }
 
@@ -452,7 +496,11 @@ uint32_t plat_spinner_count(void) {
 }
 
 const char *plat_config_name(void) {
+#if INTEROP_TESTS_ON_CORE == 1
+    return "baseline, no RTOS (SDK lock_core macros, core 1 drives, core 0 agents)";
+#else
     return "baseline, no RTOS (SDK lock_core macros, core 0 drives, core 1 agents)";
+#endif
 }
 
 void plat_init(void) {
@@ -461,9 +509,20 @@ void plat_init(void) {
     sem_init(&test_sem, 0, 16);
 }
 
+static void (*baseline_body)(void);
+static void baseline_body_trampoline(void) { baseline_body(); }
+
 void plat_run(void (*body)(void)) {
+#if INTEROP_TESTS_ON_CORE == 1
+    /* Cases on core 1, agent on core 0 - the same core assignment as the _core1 FreeRTOS
+     * build, but with no RTOS in the picture at all. */
+    baseline_body = body;
+    multicore_launch_core1(baseline_body_trampoline);
+    sdk_core_agent();
+#else
     multicore_launch_core1(sdk_core_agent);
     body();
+#endif
     for (;;) {
         tight_loop_contents();
     }
