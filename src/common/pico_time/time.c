@@ -516,12 +516,33 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         //
         // Note also, that the use of software spin locks on RP2350 to access state would always cause a SEV
         // due to use of LDREX etc., so actually using spin locks to protect the state would be worse.
-        // This exists to stop the loop re-adding an alarm on every pass: add_alarm_at() always
-        // causes a SEV, which the __wfe() below would then immediately eat, so a caller polling
-        // this function would spin instead of sleeping. The hardware state cannot be used to
-        // decide that on its own - it lags an add (the IRQ that programs it runs on the pool's
-        // own core), and after our cancel it may be rearmed later or not at all - so we have to
-        // remember that we already asked.
+        // This exists to stop the loop re-adding an alarm on every pass: add_alarm_at() leaves
+        // this core's own event set, so the __wfe() below eats it and a polling caller spins
+        // rather than sleeps. Two routes set it, and which applies depends on the build and on
+        // where the caller runs: the spin unlock inside the add, where a spin unlock sets the
+        // calling core's event (PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV), and taking the forced IRQ
+        // locally, where this core owns the pool. Measured to cost the same either way, and to
+        // saturate rather than add when both apply - the event is a single sticky bit.
+        //
+        // It records that we asked for a deadline; it does NOT establish that a wakeup for that
+        // deadline is still pending, and must never be the sole reason for waiting. Those two
+        // come apart whenever somebody else's earlier alarm fires first: our own alarm is then
+        // dropped by the unconditional cancel below, and because the hardware alarm has *fired*
+        // the "never move the timeout later" guard in ta_set_timeout() no longer holds
+        // (time_til_alarm has wrapped), so the handler is free to re-arm past our deadline. A
+        // record consulted on its own then authorises a bare __wfe() with nothing coming, which
+        // is pico-sdk#3124 - a USB IRQ adding one earlier alarm was enough to hang a 10ms poll.
+        //
+        // So the two tests are ANDed, not ORed, and it is ta_wakes_up_on_or_before() that
+        // authorises the wait: the record can only ever withhold one, never grant it. A stale
+        // record therefore costs an extra add, never a missed wakeup. Note this does not
+        // reintroduce the spin above, because a cancel alone does not disturb the hardware. On
+        // the handler pass our cancel triggers, ta_set_timeout() still runs with our own target
+        // - the pending-cancellation scan that marks the entry deleted comes *after* that call,
+        // not before it - and on any later pass the marked entry sits at the head, where the
+        // call is skipped. Either way the alarm we cancelled goes on covering its own deadline
+        // until it fires. The predicate only turns false once the coverage has genuinely gone,
+        // which is exactly when re-adding is the right thing to do.
         //
         // Recorded to the adapter's compare width, not to 64 bits. Where the timer compares 32
         // bits a target is only honoured to that resolution anyway - an alarm armed for low word
@@ -559,7 +580,7 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
 #define last_added_matches(target) (last_added == (target))
 #endif
         const last_added_t this_target = (last_added_t)to_us_since_boot(timeout_timestamp);
-        if (last_added_matches(this_target) || ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
+        if (last_added_matches(this_target) && ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
                                      (int64_t)to_us_since_boot(timeout_timestamp))) {
             // if we are called repeatedly for a timeout in the past, we won't have an event - but in any case, it has already past!
             if (time_reached(timeout_timestamp)) return true;
