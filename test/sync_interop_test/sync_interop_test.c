@@ -651,6 +651,219 @@ static void d2_9_expired_deadline(void) {
 #endif
 }
 
+/* D2.11 timings, in ms. The interfering alarm must land after the agent's first call has
+ * armed the deadline and fire well before it. */
+#define POLL_DEADLINE_MS     20   /* D2.12 */
+/* Which core owns the pool IRQ relative to the waiter decides whether an add is
+ * synchronous, so every D2.12 result names it - the number means something different
+ * in each regime, and "non-alarm core" is plainly wrong in the reversed builds. */
+#define REGIME(local) ((local) ? "pool IRQ local, adds synchronous" \
+                               : "pool IRQ on the other core, adds async")
+#define STOLEN_DEADLINE_MS   20
+#define STOLEN_INJECT_AT_MS   8   /* when the test core adds the interfering alarm */
+#define STOLEN_INJECT_IN_MS   4   /* how far ahead it sets it, so it fires at 12ms of 20 */
+
+static volatile int64_t stolen_fired_at_us;
+
+static int64_t stolen_interferer(__unused alarm_id_t id, __unused void *ud) {
+    stolen_fired_at_us = (int64_t)to_us_since_boot(get_absolute_time());
+    return 0;
+}
+
+static void d2_11_stolen_wakeup(void) {
+#if !INTEROP_HAS_SDK_CORE
+    harness_record("D2.11", RESULT_SKIP, "no bare-SDK core in this configuration");
+#else
+    /*
+     * pico-sdk#3124 - a repeated deadline whose wakeup is spent by somebody else's earlier
+     * alarm. See AGENT_STOLEN_WAKEUP for the interleaving; here we play the part TinyUSB
+     * plays in the report, adding one earlier alarm from this core once the agent's loop is
+     * already running.
+     *
+     * Note this is the OPPOSITE precondition to D2.9: that case needs last_added to match on
+     * an expired deadline, this one needs it to match on a live one that nothing is armed
+     * for. Both go through the same short-circuit.
+     */
+    stolen_fired_at_us = 0;
+    absolute_time_t t_start = get_absolute_time();
+
+    agent_start(AGENT_STOLEN_WAKEUP, STOLEN_DEADLINE_MS);
+
+    /* busy_wait, not sleep: sleeping would put our own alarms in the pool and change what the
+     * handler re-arms to, which is the very thing under test */
+    busy_wait_until(delayed_by_ms(t_start, STOLEN_INJECT_AT_MS));
+    alarm_id_t interferer = add_alarm_in_ms(STOLEN_INJECT_IN_MS, stolen_interferer, NULL, true);
+
+    if (!agent_wait(STOLEN_DEADLINE_MS * STOLEN_FAR_MULTIPLE * 4)) {
+        harness_record("D2.11", RESULT_FAIL,
+                       "wait on a %ums deadline never returned at all", STOLEN_DEADLINE_MS);
+        if (interferer > 0) cancel_alarm(interferer);
+        return;
+    }
+    if (interferer > 0) cancel_alarm(interferer);
+
+    uint32_t elapsed_us = agent_elapsed_us();
+    int64_t  fired_at   = stolen_fired_at_us;
+    int64_t  fired_off  = fired_at ? fired_at - (int64_t)to_us_since_boot(t_start) : 0;
+
+    /* Controls first: if the interference did not actually land inside the window, the case
+     * proves nothing and must say so rather than passing. */
+    if (!agent_stolen_far_armed()) {
+        harness_record("D2.11", RESULT_SKIP,
+                       "could not queue an alarm beyond the deadline - pool full?");
+        return;
+    }
+    if (!fired_at || fired_off <= 0 || fired_off >= STOLEN_DEADLINE_MS * 1000) {
+        harness_record("D2.11", RESULT_SKIP,
+                       "interfering alarm did not fire inside the window (at %lldus of %ums)",
+                       (long long)fired_off, STOLEN_DEADLINE_MS);
+        return;
+    }
+
+    if (elapsed_us < STOLEN_DEADLINE_MS * 1000u) {
+        harness_record("D2.11", RESULT_FAIL,
+                       "returned EARLY: %uus against a %ums deadline",
+                       elapsed_us, STOLEN_DEADLINE_MS);
+    } else if (elapsed_us > STOLEN_DEADLINE_MS * 1000u + STOLEN_SLACK_US) {
+        harness_record("D2.11", RESULT_FAIL,
+                       "overslept %ums deadline by %uus (earlier alarm at %lldus spent its"
+                       " wakeup; %u iterations)",
+                       STOLEN_DEADLINE_MS, elapsed_us - STOLEN_DEADLINE_MS * 1000u,
+                       (long long)fired_off, agent_poll_iterations());
+    } else if (agent_poll_iterations() > STOLEN_MAX_WAITS) {
+        /* Meeting the deadline is not enough: a fix which re-adds an alarm every pass would
+         * arrive on time by spinning, and elapsed time cannot tell that from sleeping. Same
+         * hole D2.3/D2.8 had. */
+        harness_record("D2.11", RESULT_FAIL,
+                       "met the %ums deadline but BUSY-WAITED to it - %u iterations against a"
+                       " ceiling of %u",
+                       STOLEN_DEADLINE_MS, agent_poll_iterations(), STOLEN_MAX_WAITS);
+    } else {
+        harness_record("D2.11", RESULT_PASS,
+                       "%ums deadline met by sleeping (%uus, %u iterations) with an earlier"
+                       " alarm firing at %lldus",
+                       STOLEN_DEADLINE_MS, elapsed_us, agent_poll_iterations(),
+                       (long long)fired_off);
+    }
+#endif
+}
+
+static void d2_12_poll_fixed_deadline(void) {
+#if !INTEROP_HAS_SDK_CORE
+    harness_record("D2.12", RESULT_SKIP, "no bare-SDK core in this configuration");
+#else
+    /*
+     * pico-sdk#3039, which bd8fca022 fixed and nothing has pinned since. Poll one fixed
+     * deadline from a core that does NOT own the alarm pool's IRQ, with nothing else going
+     * on. add_alarm_at() is asynchronous from such a core - it only forces the IRQ, and the
+     * owning core programs the hardware - so a wait predicate consulting the hardware alone
+     * can re-add and re-cancel an alarm that never gets armed, and the loop busy-waits.
+     *
+     * The iteration count is the criterion, not the elapsed time: both a sleeping and a
+     * spinning loop leave at the deadline, which is exactly why this went unpinned.
+     *
+     * Establishing the precondition matters as much as the measurement - if the pool's IRQ
+     * turns out to be live on the agent core, the add is synchronous and the case is testing
+     * nothing, so it skips rather than passing.
+     */
+    /* Which regime this ran in is reported, NOT used to decide whether to run. Skipping when
+     * the pool's IRQ is live on the agent core would encode the very belief under test - that
+     * synchronous arming makes #3039 impossible there - so the one configuration able to
+     * refute it would be the one that never looks. Bounded by agent_run() either way, so
+     * running it costs nothing but a few ms. */
+    bool irq_local = agent_run(AGENT_IRQ_STATE, 0, 1000) && agent_alarm_irq_enabled();
+    if (!agent_run(AGENT_POLL_DEADLINE, POLL_DEADLINE_MS, POLL_DEADLINE_MS * 20)) {
+        harness_record("D2.12", RESULT_FAIL,
+                       "polling a %ums deadline never returned (%s)", POLL_DEADLINE_MS,
+                       irq_local ? "pool IRQ local" : "pool IRQ on the other core");
+        return;
+    }
+    uint32_t elapsed_us = agent_elapsed_us();
+    if (elapsed_us < POLL_DEADLINE_MS * 1000u) {
+        harness_record("D2.12", RESULT_FAIL, "returned EARLY: %uus against %ums",
+                       elapsed_us, POLL_DEADLINE_MS);
+    } else if (agent_poll_iterations() > STOLEN_MAX_WAITS) {
+        harness_record("D2.12", RESULT_FAIL,
+                       "BUSY-WAITED a %ums deadline (%s) - %u iterations against a ceiling"
+                       " of %u; the alarm is not being armed",
+                       POLL_DEADLINE_MS, REGIME(irq_local), agent_poll_iterations(),
+                       STOLEN_MAX_WAITS);
+    } else {
+        harness_record("D2.12", RESULT_PASS,
+                       "slept a %ums deadline (%s): %uus, %u iterations",
+                       POLL_DEADLINE_MS, REGIME(irq_local), elapsed_us,
+                       agent_poll_iterations());
+    }
+#endif
+}
+
+/* D2.13 - sustained interference. Deliberately one-shot and spaced, not a repeating timer:
+ * a repeating timer would keep something armed before the deadline at all times, so coverage
+ * would never lapse and nothing would be re-added. The cost being measured only appears when
+ * coverage repeatedly lapses and has to be restored. */
+#define INTERFERE_DEADLINE_MS 20
+#define INTERFERE_PERIOD_US   2000
+#define INTERFERE_LEAD_US      500
+
+static volatile uint32_t interferer_fires;
+
+static int64_t interferer_cb(__unused alarm_id_t id, __unused void *ud) {
+    interferer_fires++;
+    return 0;
+}
+
+static void d2_13_sustained_interference(void) {
+#if !INTEROP_HAS_SDK_CORE
+    harness_record("D2.13", RESULT_SKIP, "no bare-SDK core in this configuration");
+#else
+    /*
+     * Measurement, not a verdict - hence RESULT_INFO. It exists to compare candidate fixes
+     * for pico-sdk#3124 against each other, and the number that matters is the RATIO of wait
+     * iterations to interferer fires.
+     *
+     * Every fire wakes the waiter, so one iteration per fire is the floor for any
+     * implementation. What differs is whether the waiter must also re-add its own alarm each
+     * time coverage lapses: on a build where a spin unlock sets the calling core's own event
+     * (PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV), the __wfe() after an add is eaten immediately, so an
+     * add costs an EXTRA pass that does not sleep. So ~1x fires means the waiter kept its own
+     * coverage; ~2x means it is re-adding on every lapse.
+     *
+     * This is the cost the fable review predicted for the `&&` shape and could not measure.
+     */
+    interferer_fires = 0;
+    agent_start(AGENT_POLL_DEADLINE, INTERFERE_DEADLINE_MS);
+
+    absolute_time_t stop = make_timeout_time_ms(INTERFERE_DEADLINE_MS);
+    uint32_t added = 0, add_failures = 0;
+    while (!time_reached(stop)) {
+        /* busy_wait, never sleep_*: sleeping would use the machinery under test */
+        busy_wait_us(INTERFERE_PERIOD_US);
+        if (add_alarm_in_us(INTERFERE_LEAD_US, interferer_cb, NULL, true) > 0) added++;
+        else add_failures++;
+    }
+
+    if (!agent_wait(INTERFERE_DEADLINE_MS * 20)) {
+        harness_record("D2.13", RESULT_FAIL,
+                       "polling a %ums deadline under interference never returned",
+                       INTERFERE_DEADLINE_MS);
+        return;
+    }
+    uint32_t fires = interferer_fires;
+    if (!added || !fires) {
+        harness_record("D2.13", RESULT_SKIP,
+                       "no interference landed (%u added, %u failed, %u fired)",
+                       added, add_failures, fires);
+        return;
+    }
+    harness_record("D2.13", RESULT_INFO,
+                   "%u iterations for %u interferer fires (%u.%02ux) over %uus",
+                   agent_poll_iterations(), fires,
+                   agent_poll_iterations() / fires,
+                   (agent_poll_iterations() * 100u / fires) % 100u,
+                   agent_elapsed_us());
+#endif
+}
+
 static void d2_10_subtick_deadline(void) {
 #if !INTEROP_HAS_SCHEDULER
     harness_record("D2.10", RESULT_SKIP,
@@ -1420,6 +1633,9 @@ static void test_body(void) {
     d2_8_repeated_deadline();
     d2_9_expired_deadline();
     d2_10_subtick_deadline();
+    d2_11_stolen_wakeup();
+    d2_12_poll_fixed_deadline();
+    d2_13_sustained_interference();
 
     printf("\n--- D3: sleep_ms / sleep_until (ms-scale, concurrent, cross-core) ---\n");
     d3_1_sleep_accuracy_ms();

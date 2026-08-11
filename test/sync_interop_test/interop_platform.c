@@ -128,7 +128,13 @@ static struct {
     volatile uint32_t cal_demcr;
     volatile bool     cal_sleepcnt_moved;
     volatile bool     cal_sleepcnt_awake;
+    volatile uint32_t poll_iterations;
+    volatile bool     stolen_far_armed;
 } agent;
+
+static int64_t agent_stolen_far_alarm(__unused alarm_id_t id, __unused void *ud) {
+    return 0;   /* exists only to be queued beyond the deadline, and as the backstop */
+}
 
 static int64_t agent_known_sleep_alarm(__unused alarm_id_t id, __unused void *ud) {
     __sev();
@@ -196,6 +202,75 @@ static void sdk_core_agent(void) {
                 semaphore_t s;
                 sem_init(&s, 0, 1);
                 result = !sem_acquire_block_until(&s, deadline);
+                break;
+            }
+            case AGENT_POLL_DEADLINE: {
+                /*
+                 * The pico-sdk#3039 shape, with nothing else going on: poll one fixed deadline
+                 * from a core that does not own the alarm pool's IRQ. add_alarm_at() is
+                 * asynchronous from here - it only forces the IRQ, and the owning core
+                 * programs the hardware - so a wait predicate that consults the hardware alone
+                 * can keep re-adding an alarm it then cancels, and the loop busy-waits instead
+                 * of sleeping. bd8fca022 fixed that and nothing has pinned it since.
+                 *
+                 * The iteration count is the criterion, exactly as for D1/D2: sleeping takes a
+                 * couple of passes, spinning takes thousands. Elapsed time alone cannot tell
+                 * them apart, since both arrive at the deadline on time.
+                 */
+                absolute_time_t deadline = make_timeout_time_ms(arg);
+                uint32_t iterations = 0;
+                while (!best_effort_wfe_or_timeout(deadline)) {
+                    iterations++;
+                    tight_loop_contents();
+                }
+                agent.poll_iterations = iterations;
+                result = true;
+                break;
+            }
+            case AGENT_STOLEN_WAKEUP: {
+                /*
+                 * pico-sdk#3124. best_effort_wfe_or_timeout() caches the deadline it armed in
+                 * last_added, and a later call whose deadline matches short-circuits straight
+                 * to a bare __wfe() - skipping ta_wakes_up_on_or_before() entirely, since the
+                 * test is an ||. That is sound only while a wakeup at or before the deadline
+                 * is still pending, and the single SEV the alarm was worth can be spent by
+                 * somebody else's earlier alarm:
+                 *
+                 *   1. we add at T; the pool arms T; last_added = T
+                 *   2. another party adds at T' < T; the pool moves the hardware earlier
+                 *   3. T' fires, waking our __wfe() early; the deadline is not reached
+                 *   4. we reach the unconditional cancel_alarm(), so OUR entry is gone - and
+                 *      because the alarm has just fired, ta_set_timeout()'s "never move later"
+                 *      guard no longer holds (time_til_alarm has wrapped huge), so the handler
+                 *      re-arms to the next live entry, which may be well past T
+                 *   5. the next call matches last_added and parks with nothing armed before T
+                 *
+                 * So the case needs three things, and the FAR alarm is the one that is easy to
+                 * forget: without something queued beyond T, step 4 leaves the fired register
+                 * alone (the handler breaks out before ta_set_timeout when the pool is empty)
+                 * and the stale value keeps working as a ghost.
+                 *
+                 * The earlier alarm is added by the *test* core while this loop runs, because
+                 * it has to arrive after step 1 - anything queued before the first call would
+                 * be seen by ta_wakes_up_on_or_before(), which would take the short-circuit on
+                 * pass one and never populate last_added at all.
+                 *
+                 * Reported by elapsed rather than by hanging: the far alarm doubles as the
+                 * backstop, so a failure oversleeps to it and returns.
+                 */
+                absolute_time_t t0 = get_absolute_time();
+                absolute_time_t deadline = delayed_by_ms(t0, arg);
+                alarm_id_t far_id = add_alarm_at(delayed_by_ms(t0, arg * STOLEN_FAR_MULTIPLE),
+                                                 agent_stolen_far_alarm, NULL, true);
+                agent.stolen_far_armed = (far_id > 0);
+                uint32_t iterations = 0;
+                while (!best_effort_wfe_or_timeout(deadline)) {
+                    iterations++;
+                    tight_loop_contents();
+                }
+                agent.poll_iterations = iterations;
+                if (far_id > 0) cancel_alarm(far_id);
+                result = true;
                 break;
             }
             case AGENT_KNOWN_SLEEP: {
@@ -394,6 +469,8 @@ uint32_t agent_wait_count(void) { return agent.wait_count; }
 bool     agent_slept(void)      { return agent.slept; }
 uint32_t agent_sleep_delta(void) { return agent.sleep_delta; }
 uint32_t agent_inline_sleep_delta(void) { return agent.inline_sleep_delta; }
+uint32_t agent_poll_iterations(void) { return agent.poll_iterations; }
+bool     agent_stolen_far_armed(void)  { return agent.stolen_far_armed; }
 
 #endif /* INTEROP_HAS_SDK_CORE */
 

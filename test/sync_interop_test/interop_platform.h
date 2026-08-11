@@ -138,11 +138,33 @@ enum {
     AGENT_KNOWN_SLEEP,                /* diagnostic: a bare known WFE, measured BOTH inline
                                        * and at the command boundary, to tell an
                                        * instrumentation bug from a hardware one */
+    AGENT_STOLEN_WAKEUP,              /* repeated waits on ONE future deadline while another
+                                       * party's earlier alarm fires; arg = deadline ms.
+                                       * pico-sdk#3124 */
+    AGENT_POLL_DEADLINE,              /* undisturbed polling on one fixed deadline; arg = ms.
+                                       * pico-sdk#3039 */
 };
 
 /* How many wait-loop iterations still count as "it really blocked". pico_sync_test uses 5;
  * 1-5 is normal depending on platform and core, a busy-poll runs to thousands. */
 #define MAX_BLOCKING_WAITS 8
+
+/* AGENT_STOLEN_WAKEUP queues an alarm this many times its deadline out, so that the pool has
+ * somewhere later to re-arm to once the earlier alarm has fired. Large enough that an
+ * oversleep to it cannot be mistaken for jitter, small enough to keep the case short. */
+#define STOLEN_FAR_MULTIPLE 20
+/* Tolerance on meeting the deadline. Generous: the failure it must not swallow is an
+ * oversleep by nineteen further deadlines, so precision buys nothing here. */
+#define STOLEN_SLACK_US 2000
+/*
+ * D2.11's own wait-iteration ceiling. It cannot use MAX_BLOCKING_WAITS: that is calibrated for
+ * a wait with no other alarm traffic, whereas this case deliberately creates some, so its floor
+ * is structurally higher (observed 7 with hardware spin locks, 10 with software ones, where an
+ * add costs an extra non-sleeping pass). Set far above both, because the failure it has to
+ * catch is not marginal - D1.9 busy-polls at ~5e4 iterations in the same run. A ceiling tight
+ * enough to argue about is a ceiling measuring the wrong thing.
+ */
+#define STOLEN_MAX_WAITS 100
 
 #if INTEROP_HAS_SDK_CORE
 /* Have the bare-SDK core take test_mutex and hold it for `ms`; returns once it is held. */
@@ -160,6 +182,13 @@ bool     agent_slept(void);
 uint32_t agent_sleep_delta(void);
 /* AGENT_KNOWN_SLEEP: the delta measured *inline*, immediately around the WFE */
 uint32_t agent_inline_sleep_delta(void);
+/* AGENT_STOLEN_WAKEUP / AGENT_POLL_DEADLINE: how many times the wait loop went round. The failure is few
+ * iterations and a long elapsed, so the two together separate "parked past the deadline"
+ * from "spun to it". */
+uint32_t agent_poll_iterations(void);
+/* False if add_alarm_at() failed to queue the far alarm, i.e. the precondition that
+ * something is queued *beyond* the deadline was never established. */
+bool     agent_stolen_far_armed(void);
 
 /* AGENT_IRQ_STATE results, valid after a successful AGENT_IRQ_STATE command. */
 uint32_t agent_alarm_irq_num(void);      /* the IRQ the default pool's alarm uses */
