@@ -9,8 +9,8 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-#ifndef _BOARDS_JAEBLOG_RP2350_BELLSNWHISTLES_H
-#define _BOARDS_JAEBLOG_RP2350_BELLSNWHISTLES_H
+#ifndef _BOARDS_RP2350_BELLSNWHISTLES_H
+#define _BOARDS_RP2350_BELLSNWHISTLES_H
 
 pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
@@ -106,9 +106,9 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_AUTO_DETECT_PSRAM_SIZE 1
 #endif
 
-        pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
+        pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 0)
 #ifndef PICO_RP2350_A2_SUPPORTED
-#define PICO_RP2350_A2_SUPPORTED 1
+#define PICO_RP2350_A2_SUPPORTED 0
 #endif
 
 #endif
