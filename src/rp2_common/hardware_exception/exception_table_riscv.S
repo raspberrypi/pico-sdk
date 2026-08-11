@@ -117,7 +117,7 @@ __unhandled_exception:
     // Restore original registers and stack pointer so debugger can backtrace
     csrr ra, mscratch
     lw t6, 60(sp)
-    addi sp, sp, -64
+    addi sp, sp, 64
     // Second symbol here just to make it clearer in the debugger why you got
     // here; the entry point can appear labelled with the name of any one of the
     // unhandled exceptions, which is less clear.
