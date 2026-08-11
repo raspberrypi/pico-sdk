@@ -54,6 +54,7 @@ enum pio_instr_bits {
 #define _PIO_INVALID_MOV_SRC  0u
 #define _PIO_INVALID_MOV_DEST 0u
 #endif
+#define _PIO_AMBIGUOUS_SRC_DEST 0x100u
 
 /*! \brief Enumeration of values to pass for source/destination args for instruction encoding functions
  *  \ingroup pio_instructions
@@ -68,7 +69,7 @@ enum pio_src_dest {
     pio_null = 3u | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_DEST,
 #if PICO_PIO_VERSION > 0
     pio_pindirs_mov = 3u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC,
-    pio_pindirs = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC,
+    pio_pindirs = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC | _PIO_AMBIGUOUS_SRC_DEST,
 #else
     pio_pindirs = 4u | _PIO_INVALID_IN_SRC | _PIO_INVALID_MOV_SRC | _PIO_INVALID_MOV_DEST,
 #endif
@@ -79,7 +80,7 @@ enum pio_src_dest {
     pio_isr = 6u | _PIO_INVALID_SET_DEST,
     pio_osr = 7u | _PIO_INVALID_OUT_DEST | _PIO_INVALID_SET_DEST,
     pio_exec_out = 7u | _PIO_INVALID_IN_SRC | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC | _PIO_INVALID_MOV_DEST,
-    pio_exec = 7u | _PIO_INVALID_IN_SRC | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC,
+    pio_exec = 7u | _PIO_INVALID_IN_SRC | _PIO_INVALID_SET_DEST | _PIO_INVALID_MOV_SRC | _PIO_AMBIGUOUS_SRC_DEST,
 };
 
 static inline uint _pio_major_instr_bits(uint instr) {

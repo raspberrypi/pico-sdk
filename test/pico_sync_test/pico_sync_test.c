@@ -6,12 +6,9 @@
 
 #include <stdio.h>
 
-#include "../../src/common/pico_base_headers/include/pico/types.h"
-#include "../../src/common/pico_time/include/pico/time.h"
-#include "../../src/rp2_common/hardware_sync_spin_lock/include/hardware/sync/spin_lock.h"
-#include "pico/lock_core.h"
+#include "pico/stdlib.h"
+#include "pico/sync.h"
 #include "pico/test.h"
-#include "pico/stdio.h"
 
 PICOTEST_MODULE_NAME("SYNC", "sync test");
 
