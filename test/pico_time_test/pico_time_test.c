@@ -373,9 +373,18 @@ static int issue_2118_test(void) {
     }
     PICOTEST_CHECK(counter_2118 >= 100, "Repeating timer failure");
 
+#if PICO_ON_DEVICE
+    uint pool_alarm_num = alarm_pool_hardware_alarm_num(pool);
+#endif
     alarm_pool_destroy(pool);
 #if PICO_ON_DEVICE
-    hard_assert(timer_hw->armed == 0); // check destroying the pool unarms its timer
+    // check destroying the pool unarms its timer.
+    //
+    // Only its own alarm: every pool on this timer shares the armed register, and a live pool
+    // deliberately keeps an alarm armed even when it holds nothing (see alarm_pool_irq_handler),
+    // so asserting the whole register were zero would be asserting something about the default
+    // pool rather than about destruction.
+    hard_assert(!(timer_hw->armed & (1u << pool_alarm_num)));
     set_sys_clock_hz(SYS_CLK_HZ, true);
     setup_default_uart();
 #endif
