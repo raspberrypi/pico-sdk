@@ -549,6 +549,9 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         // so the pool cannot be exhausted.
         if (ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
                                      (int64_t)to_us_since_boot(timeout_timestamp))) {
+            // if we are called repeatedly for a timeout in the past, we won't have an event - but in any case, it has already past!
+            if (time_reached(timeout_timestamp)) return true;
+
             // we already are waking up at or before when we want to (possibly due to us having been called
             // before in a loop), so we can do an actual WFE. Note we rely on the fact that the alarm pool IRQ
             // handler always does an explicit SEV, since it may be on the other core.
