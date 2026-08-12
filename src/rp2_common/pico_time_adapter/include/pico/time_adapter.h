@@ -80,9 +80,12 @@ static inline void ta_enable_irq_handler(alarm_pool_timer_t *timer, uint alarm_n
 
 static inline void ta_disable_irq_handler(alarm_pool_timer_t *timer, uint alarm_num, irq_handler_t irq_handler) {
     uint irq_num = timer_hardware_alarm_get_irq_num(timer, alarm_num);
-    timer_hw_from_timer(timer)->armed = 1u << alarm_num; // disarm the timer
+    // stop the alarm raising the interrupt
     hw_clear_bits(&timer_hw_from_timer(timer)->inte, 1u << alarm_num);
-    irq_set_enabled(irq_num, true);
+    // and stop this core taking one already pending
+    irq_set_enabled(irq_num, false);
+    // the handler cannot be running on this core now, so the rest is safe
+    timer_hw_from_timer(timer)->armed = 1u << alarm_num;
     irq_remove_handler(irq_num, irq_handler);
     timer_hardware_alarm_unclaim(timer, alarm_num);
 }
