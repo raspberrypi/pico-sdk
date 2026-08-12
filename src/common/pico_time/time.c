@@ -275,7 +275,27 @@ static void alarm_pool_irq_handler(void) {
             }
         }
         earliest_index = pool->ordered_head;
-        if (earliest_index < 0) break;
+        if (earliest_index < 0) {
+            // Nothing left to schedule, but we must still leave an alarm armed.
+            //
+            // This pool guarantees that a wakeup happens no later than every 2^32 us, in every
+            // state and not merely while something is pending. That is what allows
+            // ta_wakes_up_on_or_before() to answer from the timeout value alone, and what makes
+            // its answer meaningful for a target further out than the timer can express.
+            //
+            // The guarantee is upheld by ta_set_timeout(), which is required never to leave
+            // without an alarm armed. An alarm that has already fired carries no such promise,
+            // so the pool has to ask for one even when it has nothing of its own to schedule -
+            // otherwise emptying the pool silently ends the guarantee, and a waiter can be told
+            // a wakeup is due when nothing will deliver it.
+            //
+            // The target is arbitrary: ta_set_timeout() must not move an existing timeout
+            // later, so this cannot disturb one, and any value satisfies the bound. Half the
+            // representable range keeps it clear of both ends - a target already elapsed risks
+            // firing at once and returning straight back here.
+            ta_set_timeout(timer, timer_alarm_num, (int64_t)ta_time_us_64(timer) + (1u << 31));
+            break;
+        }
         alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
         //printf("NOW EARLIEST INDEX %d timeout %lld\n", earliest_index, earliest_entry->target);
         earliest_target = earliest_entry->target;
