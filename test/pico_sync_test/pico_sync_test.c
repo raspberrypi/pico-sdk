@@ -8,6 +8,7 @@
 
 #include "pico/stdlib.h"
 #include "pico/sync.h"
+#include "pico/multicore.h"
 #include "pico/test.h"
 
 // Note in this test, the main thing is that the processor doesn't spin - the actual number of loops
@@ -36,11 +37,10 @@ static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_
     return 0;
 }
 
-int main() {
-    stdio_init_all();
+static semaphore_t core1_sem;
 
-    PICOTEST_START();
-
+static int do_test(void) {
+    printf("=== Test on core %d ===\n", get_core_num());
 
     PICOTEST_START_SECTION("check low power lock_core wait loop with timeout");
     // note: this implementation is implemented in a similar functions to mutex_enter_block_until(),
@@ -126,6 +126,30 @@ int main() {
     bool acquired = sem_acquire_block_until(&sem, deadline);
     PICOTEST_CHECK(!acquired, "Expected not to acquire semaphore");
     PICOTEST_END_SECTION();
+
+    return picotest_error_code;
+}
+
+static int core1_picotest_error_code;
+
+static void core1_func(void) {
+    core1_picotest_error_code = do_test();
+    sem_release(&core1_sem);
+}
+
+int main() {
+    stdio_init_all();
+
+    PICOTEST_START();
+
+    // core 0 first; only then core 1, since the sections share picotest's globals
+    picotest_error_code = do_test();
+    if (!picotest_error_code) {
+        sem_init(&core1_sem, 0, 1);
+        multicore_launch_core1(core1_func);
+        sem_acquire_blocking(&core1_sem);
+        picotest_error_code = core1_picotest_error_code;
+    }
 
     PICOTEST_END_TEST();
 }
