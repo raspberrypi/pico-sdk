@@ -104,5 +104,28 @@ int main() {
     PICOTEST_CHECK(wait_count <= MAX_WAITS, "Expected <= %d waits", MAX_WAITS);
     PICOTEST_END_SECTION();
 
+    PICOTEST_START_SECTION("check repeated deadline issue");
+    // wait one deadline out, so it is in the past and its one-shot alarm has fired
+    absolute_time_t deadline = make_timeout_time_ms(100);
+    while (!best_effort_wfe_or_timeout(deadline)) tight_loop_contents();
+    PICOTEST_CHECK(time_reached(deadline), "Expected to reach timeout");
+    printf("deadline %lld us expired\n", (long long)to_us_since_boot(deadline));
+
+    // waiting on it again must return at once, every time; repeated because a latched event
+    // can carry the first call or two before anything actually parks
+    for (int i = 1; i <= 5; i++) {
+        printf("call %d\n", i);
+        bool reached = best_effort_wfe_or_timeout(deadline);
+        PICOTEST_CHECK(reached, "Expected to reach timeout");
+    }
+
+    // the same, via the API the field report used
+    printf("sem_acquire_block_until on the expired deadline\n");
+    semaphore_t sem;
+    sem_init(&sem, 0, 1);
+    bool acquired = sem_acquire_block_until(&sem, deadline);
+    PICOTEST_CHECK(!acquired, "Expected not to acquire semaphore");
+    PICOTEST_END_SECTION();
+
     PICOTEST_END_TEST();
 }
