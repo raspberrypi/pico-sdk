@@ -363,6 +363,7 @@ void alarm_pool_destroy(alarm_pool_t *pool) {
         return;
     }
 #endif
+    assert(pool->core_num == get_core_num());
     ta_disable_irq_handler(pool->timer, pool->timer_alarm_num, alarm_pool_irq_handler);
     assert(pools[ta_timer_num(pool->timer)][pool->timer_alarm_num] == pool);
     pools[ta_timer_num(pool->timer)][pool->timer_alarm_num] = NULL;
