@@ -141,7 +141,9 @@ static void alarm_pool_irq_handler(void);
 
 // marker which we can use in place of handler function to indicate we are a repeating timer
 
-#define repeating_timer_marker ((alarm_callback_t)alarm_pool_irq_handler)
+#define repeating_timer_marker ((alarm_callback_t)(uintptr_t)2)
+#define deleted_timer_marker ((alarm_callback_t)(uintptr_t)4)
+
 #include "hardware/gpio.h"
 static void alarm_pool_irq_handler(void) {
     // This IRQ handler does the main work, as it always (assuming the IRQ hasn't been enabled on both cores
@@ -170,15 +172,15 @@ static void alarm_pool_irq_handler(void) {
         if (earliest_index >= 0) {
             alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
             earliest_target = earliest_entry->target;
-            if (((int64_t)ta_time_us_64(timer) - earliest_target) >= 0) {
-                // time to call the callback now (or in the past)
-                // note that an entry->target of < 0 means the entry has been canceled (not this is set
-                // by this function, in response to the entry having been queued by the cancel_alarm API
-                // meaning that we don't need to worry about tearing of the 64 bit value)
+            // delete_timer flag is set by this function, and then the item is moved to the front
+            // of the queue for deletion now
+            bool delete_timer = earliest_entry->callback == deleted_timer_marker;
+            if (delete_timer || ((int64_t)ta_time_us_64(timer) - earliest_target) >= 0) {
                 int64_t delta;
-                if (earliest_target >= 0) {
-                    // special case repeating timer without making another function call which adds overhead
+                if (!delete_timer) {
+                    // time to call the callback now (or in the past)
                     if (earliest_entry->callback == repeating_timer_marker) {
+                        // special case repeating timer without making another function call which adds overhead
                         repeating_timer_t *rpt = (repeating_timer_t *)earliest_entry->user_data;
                         delta = rpt->callback(rpt) ? rpt->delay_us : 0;
                     } else {
@@ -186,7 +188,7 @@ static void alarm_pool_irq_handler(void) {
                         delta = earliest_entry->callback(id, earliest_entry->user_data);
                     }
                 } else {
-                    // negative target means cancel alarm
+                    // cancel alarm
                     delta = 0;
                 }
                 if (delta) {
@@ -245,6 +247,19 @@ static void alarm_pool_irq_handler(void) {
                 new_entry->next = next;
             }
         }
+        earliest_index = pool->ordered_head;
+        if (earliest_index < 0) break;
+        alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
+        //printf("NOW EARLIEST INDEX %d timeout %lld\n", earliest_index, earliest_entry->target);
+        earliest_target = earliest_entry->target;
+        if (earliest_entry->callback != deleted_timer_marker) {
+            // we are leaving a timeout every 2^32 microseconds anyway if there is no valid target, so we can choose any value.
+            // best_effort_wfe_or_timeout now relies on it being the last value set, and arguably this is the
+            // best value anyway, as it is the furthest away from the last fire.
+            //printf("SET TIMEOUT %lld\n", earliest_target);
+            ta_set_timeout(timer, timer_alarm_num, earliest_target);
+        }
+
         // if we have any canceled alarms, then mark them for removal by setting their due time to -1 (which will
         // cause them to be handled the next time round and removed)
         if (pool->has_pending_cancellations) {
@@ -257,7 +272,7 @@ static void alarm_pool_irq_handler(void) {
                 int16_t next = entry->next;
                 if ((int16_t)entry->sequence < 0) {
                     // mark for deletion
-                    entry->target = -1;
+                    entry->callback = deleted_timer_marker;
                     if (index != pool->ordered_head) {
                         // move to start of queue
                         *prev = entry->next;
@@ -269,17 +284,6 @@ static void alarm_pool_irq_handler(void) {
                 }
                 index = next;
             }
-        }
-        earliest_index = pool->ordered_head;
-        if (earliest_index < 0) break;
-        // need to wait
-        alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
-        earliest_target = earliest_entry->target;
-        // we are leaving a timeout every 2^32 microseconds anyway if there is no valid target, so we can choose any value.
-        // best_effort_wfe_or_timeout now relies on it being the last value set, and arguably this is the
-        // best value anyway, as it is the furthest away from the last fire.
-        if (earliest_target != -1) { // cancelled alarm has target of -1
-            ta_set_timeout(timer, timer_alarm_num, earliest_target);
         }
         // check we haven't now passed the target time; if not we don't want to loop again
     } while ((earliest_target - (int64_t)ta_time_us_64(timer)) <= 0);
