@@ -58,6 +58,7 @@
 #include "pico/lock_core.h"
 #include "pico/time.h"
 #include "hardware/clocks.h"
+#include "pico/time_adapter.h"
 
 #include "interop_platform.h"
 #include "interop_harness.h"
@@ -918,6 +919,62 @@ static void d2_14_far_alarm_only(void) {
 #endif
 }
 
+/* D4.1 - the alarm pool must leave its hardware alarm armed even when it holds nothing.
+ *
+ * ta_wakes_up_on_or_before() reads only the compare register, not the ARMED bit, so the whole
+ * design rests on an alarm always being armed: the handler's own comment says it is "leaving a
+ * timeout every 2^32 microseconds anyway". That was not true once the pool emptied - the
+ * hardware clears ARMED when an alarm fires, and the handler returned at `earliest_index < 0`
+ * without calling ta_set_timeout(), so the register kept a stale value with nothing pending.
+ * The predicate then answers "a wakeup is due before then" for any target more than 2^32us out,
+ * and best_effort_wfe_or_timeout() waits for an event that never comes.
+ *
+ * Tested as the invariant rather than the symptom: the symptom needs a deadline over 71 minutes
+ * away, the invariant is one register bit and takes a couple of milliseconds. Uses local_pool
+ * so the default pool's own traffic (stdio and friends) cannot keep it accidentally armed and
+ * hide the failure.
+ */
+static volatile bool d4_alarm_fired;
+
+static int64_t d4_alarm_cb(__unused alarm_id_t id, __unused void *ud) {
+    d4_alarm_fired = true;
+    return 0;
+}
+
+static void d4_1_pool_leaves_alarm_armed(void) {
+    if (!local_pool) {
+        harness_record("D4.1", RESULT_SKIP, "no private alarm pool available");
+        return;
+    }
+    uint alarm_num = alarm_pool_hardware_alarm_num(local_pool);
+    d4_alarm_fired = false;
+    if (alarm_pool_add_alarm_in_us(local_pool, 2000, d4_alarm_cb, NULL, true) <= 0) {
+        harness_record("D4.1", RESULT_SKIP, "could not add an alarm to the private pool");
+        return;
+    }
+    /* busy_wait, never sleep_*: sleeping would put alarms in the default pool, not this one,
+     * but it also runs the very machinery under test */
+    absolute_time_t bail = make_timeout_time_ms(200);
+    while (!d4_alarm_fired && !time_reached(bail)) tight_loop_contents();
+    if (!d4_alarm_fired) {
+        harness_record("D4.1", RESULT_FAIL, "private pool alarm never fired");
+        return;
+    }
+    busy_wait_us(2000);   /* let the handler finish emptying the pool */
+
+    uint32_t armed = timer_hw_from_timer(alarm_pool_get_default_timer())->armed;
+    if (armed & (1u << alarm_num)) {
+        harness_record("D4.1", RESULT_PASS,
+                       "pool left hardware alarm %u armed after emptying (armed=0x%02x)",
+                       alarm_num, armed);
+    } else {
+        harness_record("D4.1", RESULT_FAIL,
+                       "pool left hardware alarm %u DISARMED after emptying (armed=0x%02x) -"
+                       " ta_wakes_up_on_or_before() can now report a wakeup that will not happen",
+                       alarm_num, armed);
+    }
+}
+
 static void d2_10_subtick_deadline(void) {
 #if !INTEROP_HAS_SCHEDULER
     harness_record("D2.10", RESULT_SKIP,
@@ -1697,6 +1754,9 @@ static void test_body(void) {
     d3_2_concurrent_sleepers();
     d3_3_sleep_on_sdk_core();
     d3_4_notifier_bit_aliasing();
+
+    printf("\n--- D4: alarm pool state ---\n");
+    d4_1_pool_leaves_alarm_armed();
 
     int failed = harness_summary();
     printf("%s\n", failed ? "FAILED" : "PASSED");
