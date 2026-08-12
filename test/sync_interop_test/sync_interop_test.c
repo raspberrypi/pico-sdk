@@ -864,6 +864,60 @@ static void d2_13_sustained_interference(void) {
 #endif
 }
 
+/* D2.14 - a deadline polled while a single much LATER alarm sits in the pool, and nothing else
+ * is queued. Reuses AGENT_STOLEN_WAKEUP, which queues exactly that alarm and polls the
+ * deadline; D2.11 is the same op with interference added on top.
+ *
+ * This case exists to pin a property that is easy to get backwards, and was: the later alarm
+ * PREVENTS the pico-sdk#2706 busy-poll rather than causing it. Measured, by restoring the
+ * pre-8b3c94fdb handler ordering - D2.7 and D2.12, which have no later alarm, busy-polled 7e3
+ * to 1.7e4 times, while this case and D2.11 slept normally throughout.
+ *
+ * The reason is that a live later entry keeps the handler's arming path reachable: it loops
+ * past the freed cancellation and calls ta_set_timeout() again, which the "never move the
+ * timeout later" guard then refuses while our own deadline is still armed and unfired - so the
+ * register goes on covering us. With an empty pool the handler breaks out at `earliest_index <
+ * 0` before reaching the arming at all, and the deadline is left uncovered.
+ *
+ * It also explains #2706's reporter finding that adding a second timer at ~50ms made their
+ * stall disappear, which no other account of that bug predicts.
+ */
+static void d2_14_far_alarm_only(void) {
+#if !INTEROP_HAS_SDK_CORE
+    harness_record("D2.14", RESULT_SKIP, "no bare-SDK core in this configuration");
+#else
+    if (!agent_run(AGENT_STOLEN_WAKEUP, STOLEN_DEADLINE_MS,
+                   STOLEN_DEADLINE_MS * STOLEN_FAR_MULTIPLE * 4)) {
+        harness_record("D2.14", RESULT_FAIL,
+                       "polling a %ums deadline with a later alarm queued never returned",
+                       STOLEN_DEADLINE_MS);
+        return;
+    }
+    if (!agent_stolen_far_armed()) {
+        harness_record("D2.14", RESULT_SKIP,
+                       "could not queue the later alarm - pool full?");
+        return;
+    }
+    uint32_t elapsed_us = agent_elapsed_us();
+    if (elapsed_us < STOLEN_DEADLINE_MS * 1000u) {
+        harness_record("D2.14", RESULT_FAIL, "returned EARLY: %uus against %ums",
+                       elapsed_us, STOLEN_DEADLINE_MS);
+    } else if (elapsed_us > STOLEN_DEADLINE_MS * 1000u + STOLEN_SLACK_US) {
+        harness_record("D2.14", RESULT_FAIL, "overslept %ums deadline by %uus",
+                       STOLEN_DEADLINE_MS, elapsed_us - STOLEN_DEADLINE_MS * 1000u);
+    } else if (agent_poll_iterations() > STOLEN_MAX_WAITS) {
+        harness_record("D2.14", RESULT_FAIL,
+                       "BUSY-WAITED a %ums deadline with only a later alarm queued - %u"
+                       " iterations against a ceiling of %u; this is #2706",
+                       STOLEN_DEADLINE_MS, agent_poll_iterations(), STOLEN_MAX_WAITS);
+    } else {
+        harness_record("D2.14", RESULT_PASS,
+                       "slept a %ums deadline with a later alarm queued (%uus, %u iterations)",
+                       STOLEN_DEADLINE_MS, elapsed_us, agent_poll_iterations());
+    }
+#endif
+}
+
 static void d2_10_subtick_deadline(void) {
 #if !INTEROP_HAS_SCHEDULER
     harness_record("D2.10", RESULT_SKIP,
@@ -1636,6 +1690,7 @@ static void test_body(void) {
     d2_11_stolen_wakeup();
     d2_12_poll_fixed_deadline();
     d2_13_sustained_interference();
+    d2_14_far_alarm_only();
 
     printf("\n--- D3: sleep_ms / sleep_until (ms-scale, concurrent, cross-core) ---\n");
     d3_1_sleep_accuracy_ms();
