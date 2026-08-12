@@ -10,6 +10,11 @@
 #include "pico/sync.h"
 #include "pico/test.h"
 
+// Note in this test, the main thing is that the processor doesn't spin - the actual number of loops
+// when successfully coming to a sleep is between 1 and 5 depending on platform/core etc. and the reasoning
+// is left as an exercise for the reader!
+#define MAX_WAITS 5
+
 PICOTEST_MODULE_NAME("SYNC", "sync test");
 
 typedef struct {
@@ -25,11 +30,9 @@ int64_t notify_lock_with_flag(__unused alarm_id_t id, void *user_data) {
     return 0;
 }
 
-static lock_core_t sleep_notifier;
-
 static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
-    uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
-    lock_internal_spin_unlock_with_notify(&sleep_notifier, save);
+    // note: this implementation is a copy of the code from pico_time/time.c and should be kept in sync
+    __sev();
     return 0;
 }
 
@@ -40,27 +43,25 @@ int main() {
 
 
     PICOTEST_START_SECTION("check low power lock_core wait loop with timeout");
-        #if PICO_USE_SW_SPIN_LOCKS
-            // looping twice (rather than once) is an implementation detail, however we shouldn't loop continuously (i.e. we should __wfe)
-            #define EXPECTED_TIMEOUT_WAITS 2
-        #else
-            // note that without sw spin locks we wait an extra time (an extra SEV doesn't get eaten)
-            #define EXPECTED_TIMEOUT_WAITS 3
-        #endif
-        lock_core_t lock;
-        lock_init(&lock, 0);
-        absolute_time_t until = make_timeout_time_ms(50);
-        int wait_count = 0;
-        do {
-            uint32_t save = spin_lock_blocking(lock.spin_lock);
-            wait_count++;
-            if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&lock, save, until)) break;
-        } while (true);
-        printf("Waited %d times\n", wait_count);
-        PICOTEST_CHECK(wait_count == EXPECTED_TIMEOUT_WAITS, "Expected exactly " __XSTRING(EXPECTED_TIMEOUT_WAITS) " waits");
+    // note: this implementation is implemented in a similar functions to mutex_enter_block_until(),
+    //       sem_acquire_block_until() etc. and should be updated if they are
+    lock_core_t lock;
+    lock_init(&lock, 0);
+    absolute_time_t until = make_timeout_time_ms(50);
+    int wait_count = 0;
+    do {
+        uint32_t save = spin_lock_blocking(lock.spin_lock);
+        wait_count++;
+        if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&lock, save, until)) break;
+    } while (true);
+    printf("Waited %d times\n", wait_count);
+
+    PICOTEST_CHECK(wait_count <= MAX_WAITS, "Expected <= %d waits", MAX_WAITS);
     PICOTEST_END_SECTION();
 
     PICOTEST_START_SECTION("check low power lock_core wait loop without timeout");
+    // note: this implementation is implemented in a similar functions to mutex_enter_blocking(),
+    //       sem_acquire_blocking() etc. and should be updated if they are
     lock_with_flag_t lock_with_flag;
     lock_init(&lock_with_flag.lock, 0);
     lock_with_flag.flag = false;
@@ -77,12 +78,11 @@ int main() {
         lock_internal_spin_unlock_with_wait(&lock_with_flag.lock, save);
     } while (true);
     printf("Waited %d times\n", wait_count);
-    PICOTEST_CHECK(wait_count == 1, "Expected exactly 1 wait");
+    PICOTEST_CHECK(wait_count <= MAX_WAITS, "Expected <= %d waits", MAX_WAITS);
     PICOTEST_END_SECTION();
 
     PICOTEST_START_SECTION("check low power sleep loop");
-    // note sleep implementation taken from pico_ime
-    lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
+    // note: this sleep implementation is a copy of the code from pico_time/time.c and should be kept in sync
     int wait_count = 0;
     absolute_time_t t = make_timeout_time_ms(500);
     uint64_t t_us = to_us_since_boot(t);
@@ -95,23 +95,13 @@ int main() {
         if (add_alarm_at(t_before, sleep_until_callback, NULL, false) >= 0) {
             // able to add alarm for just before the time
             while (!time_reached(t_before)) {
-                uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
-                lock_internal_spin_unlock_with_wait(&sleep_notifier, save);
+                __wfe();
                 wait_count++;
             }
         }
     }
     printf("Waited %d times\n", wait_count);
-    #undef EXPECTED_TIMEOUT_WAITS
-    #if PICO_USE_SW_SPIN_LOCKS
-        // looping twice (rather than once) is an implementation detail, however we shouldn't loop continuously (i.e. we should __wfe)
-    #define EXPECTED_TIMEOUT_WAITS 1
-    #else
-        // note that without sw spin locks we wait an extra time (an extra SEV doesn't get eaten)
-    #define EXPECTED_TIMEOUT_WAITS 2
-    #endif
-
-    PICOTEST_CHECK(wait_count == EXPECTED_TIMEOUT_WAITS, "Expected exactly " __XSTRING(EXPECTED_TIMEOUT_WAITS) " waits");
+    PICOTEST_CHECK(wait_count <= MAX_WAITS, "Expected <= %d waits", MAX_WAITS);
     PICOTEST_END_SECTION();
 
     PICOTEST_END_TEST();
