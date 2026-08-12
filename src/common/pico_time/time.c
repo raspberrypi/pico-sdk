@@ -13,6 +13,29 @@
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(nil_time, 0);
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(at_the_end_of_time, INT64_MAX);
 
+// Whether sleep_until() waits via lock_internal_spin_unlock_with_wait on a lock
+// primitive (sleep_notifier) vs just doing a __wfe().
+//
+// It exists for RTOS integration and for nothing else. Where the lock_internal_* primitives
+// are overridden, waiting on the notifier lets the RTOS block the *task*, so other tasks keep
+// running for the duration of a sleep; a bare __wfe() would leave the sleeping task ready but
+// parked, starving every lower-priority task until it woke.
+//
+// On bare metal it buys nothing and should not be turned on. The callback's __sev() already
+// sets a per-core, sticky event latch, which reaches a waiter that has not yet reached its
+// __wfe() and cannot be consumed by anyone else - which is precisely the property the notifier
+// would be reintroducing at the cost of a spin lock round trip and a notify count. Worse than
+// redundant, in fact: using it on for bare metal on RP2350 with software spin locks prevents
+// sleep.
+//
+// Hence the default: on exactly when something has overridden the primitives, off otherwise.
+// Not documented as a user config, as there is no good reason to set it by hand.
+#ifndef PICO_TIME_USE_SLEEP_NOTIFIER
+#if LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN
+#define PICO_TIME_USE_SLEEP_NOTIFIER 1
+#endif
+#endif
+
 typedef struct alarm_pool_entry {
     // next entry link or -1
     int16_t next;
@@ -54,7 +77,9 @@ static inline bool default_alarm_pool_initialized(void) {
     return default_alarm_pool.lock != NULL;
 }
 
+#if PICO_TIME_USE_SLEEP_NOTIFIER
 static lock_core_t sleep_notifier;
+#endif
 #endif
 
 #include "pico/time_adapter.h"
@@ -87,7 +112,9 @@ void __weak runtime_init_default_alarm_pool(void) {
                                    PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM,
                                    PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS);
     }
+#if PICO_TIME_USE_SLEEP_NOTIFIER
     lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
+#endif
 #endif
 }
 #endif
@@ -397,8 +424,13 @@ uint alarm_pool_core_num(alarm_pool_t *pool) {
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
+#if PICO_TIME_USE_SLEEP_NOTIFIER
     uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
     lock_internal_spin_unlock_with_notify(&sleep_notifier, save);
+#else
+    // note this implementation is copied in pico_sync_test.c and should be updated if this code is
+    __sev(); // signal event in case the waiter is on the other core
+#endif
     return 0;
 }
 #endif
@@ -420,8 +452,14 @@ void sleep_until(absolute_time_t t) {
         if (add_alarm_at(t_before, sleep_until_callback, NULL, false) >= 0) {
             // able to add alarm for just before the time
             while (!time_reached(t_before)) {
+#if PICO_TIME_USE_SLEEP_NOTIFIER
                 uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
                 lock_internal_spin_unlock_with_wait(&sleep_notifier, save);
+#else
+                // note __wfe() is sufficient here because the add_alarm always causes an IRQ which calls
+                // sleep_until_callback() which also does a __sev() - the irq itself will wake us up if on the same core
+                __wfe();
+#endif
             }
         }
     }

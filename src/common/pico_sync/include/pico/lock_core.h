@@ -115,7 +115,9 @@ void lock_init(lock_core_t *core, uint lock_num);
 #define lock_is_owner_id_valid(id) ((id) != LOCK_INVALID_OWNER_ID)
 #endif
 
-#ifndef lock_internal_spin_unlock_with_wait
+#ifdef lock_internal_spin_unlock_with_wait
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN 1
+#else
 /*! \brief   Atomically unlock the lock's spin lock, and wait for a notification.
  *  \ingroup lock_core
  *
@@ -149,7 +151,9 @@ extern volatile uint8_t lock_internal_notify_count;
 #endif
 #endif
 
-#ifndef lock_internal_spin_unlock_with_notify
+#ifdef lock_internal_spin_unlock_with_notify
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN 1
+#else
 /*! \brief   Atomically unlock the lock's spin lock, and send a notification
  *  \ingroup lock_core
  *
@@ -181,7 +185,9 @@ extern volatile uint8_t lock_internal_notify_count;
 #endif
 #endif
 
-#ifndef lock_internal_spin_unlock_with_best_effort_wait_or_timeout
+#ifdef lock_internal_spin_unlock_with_best_effort_wait_or_timeout
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN 1
+#else
 /*! \brief   Atomically unlock the lock's spin lock, and wait for a notification or a timeout
  *  \ingroup lock_core
  *
