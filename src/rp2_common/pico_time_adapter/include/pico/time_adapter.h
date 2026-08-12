@@ -39,20 +39,6 @@ static inline alarm_pool_timer_t *ta_from_current_irq(uint *alarm_num) {
     return timer;
 }
 
-// How many bits of a target this adapter actually compares. The hardware alarm compares only
-// the low 32 bits of the timer, so a target is honoured to that resolution and no better: an
-// alarm armed for low word L fires at any time whose low word is L.
-//
-// Callers that record a target for later comparison should record exactly this many bits.
-// Keeping more buys nothing - the extra bits describe a precision the timer cannot act on - and
-// 32 is positively preferable to 64 where an adapter has the choice: a 32-bit aligned access is
-// atomic on every core we target, so such a record can be shared between cores without locks,
-// barriers or tearing, whereas a 64-bit one can be torn on a 32-bit core. An adapter backed by
-// something other than the RP2 timer should prefer 32 unless it genuinely compares more.
-//
-// See best_effort_wfe_or_timeout() in pico_time, which records last_added at this width.
-#define TA_COMPARE_BITS 32
-
 static inline void ta_set_timeout(alarm_pool_timer_t *timer, uint alarm_num, int64_t target) {
     // We never want to set the timeout to be later than our current one.
     uint32_t current = timer_time_us_32(timer_hw_from_timer(timer));

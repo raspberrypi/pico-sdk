@@ -516,71 +516,37 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         //
         // Note also, that the use of software spin locks on RP2350 to access state would always cause a SEV
         // due to use of LDREX etc., so actually using spin locks to protect the state would be worse.
-        // This exists to stop the loop re-adding an alarm on every pass: add_alarm_at() leaves
-        // this core's own event set, so the __wfe() below eats it and a polling caller spins
-        // rather than sleeps. Two routes set it, and which applies depends on the build and on
-        // where the caller runs: the spin unlock inside the add, where a spin unlock sets the
-        // calling core's event (PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV), and taking the forced IRQ
-        // locally, where this core owns the pool. Measured to cost the same either way, and to
-        // saturate rather than add when both apply - the event is a single sticky bit.
+        // We wait only when the hardware itself says a wakeup is due at or before the target.
+        // The alarm register is the one thing that knows, so it is asked directly rather than
+        // inferred from what this function did last time.
         //
-        // It records that we asked for a deadline; it does NOT establish that a wakeup for that
-        // deadline is still pending, and must never be the sole reason for waiting. Those two
-        // come apart whenever somebody else's earlier alarm fires first: our own alarm is then
-        // dropped by the unconditional cancel below, and because the hardware alarm has *fired*
-        // the "never move the timeout later" guard in ta_set_timeout() no longer holds
-        // (time_til_alarm has wrapped), so the handler is free to re-arm past our deadline. A
-        // record consulted on its own then authorises a bare __wfe() with nothing coming, which
-        // is pico-sdk#3124 - a USB IRQ adding one earlier alarm was enough to hang a 10ms poll.
+        // There used to be a record of the last deadline armed here, consulted as an ALTERNATIVE
+        // to that test so a polling caller would not re-add an alarm on every pass. It came from
+        // bd8fca022, for pico-sdk#2706 and #3039: on a core that does not own the pool,
+        // add_alarm_at() is asynchronous - it only forces the IRQ, and the owning core programs
+        // the register - and back then a cancel processed in the same handler pass as the add
+        // suppressed the arming completely, so the alarm was *never* armed and the loop re-added
+        // indefinitely instead of sleeping.
         //
-        // So the two tests are ANDed, not ORed, and it is ta_wakes_up_on_or_before() that
-        // authorises the wait: the record can only ever withhold one, never grant it. A stale
-        // record therefore costs an extra add, never a missed wakeup. Note this does not
-        // reintroduce the spin above, because a cancel alone does not disturb the hardware. On
-        // the handler pass our cancel triggers, ta_set_timeout() still runs with our own target
-        // - the pending-cancellation scan that marks the entry deleted comes *after* that call,
-        // not before it - and on any later pass the marked entry sits at the head, where the
-        // call is skipped. Either way the alarm we cancelled goes on covering its own deadline
-        // until it fires. The predicate only turns false once the coverage has genuinely gone,
-        // which is exactly when re-adding is the right thing to do.
+        // That was fixed at source by 8b3c94fdb, which moved the arming ahead of the pending-
+        // cancellation scan so an entry is armed before it can be marked deleted. The record
+        // outlived its reason and became harmful: it said only that we had *asked*, never that
+        // the wakeup was still coming, and those come apart as soon as another party's earlier
+        // alarm fires first. It then authorised a bare __wfe() with nothing armed - pico-sdk#3124,
+        // where one USB IRQ adding a single earlier alarm hung a 10ms poll indefinitely.
         //
-        // Recorded to the adapter's compare width, not to 64 bits. Where the timer compares 32
-        // bits a target is only honoured to that resolution anyway - an alarm armed for low word
-        // L fires at any time whose low word is L - so a wider record would claim precision the
-        // hardware cannot act on. Matching the width also makes this safe to share between the
-        // cores unsynchronised, which it always has been: a 32-bit aligned access is atomic on
-        // both Armv8-M and Hazard3 so it cannot tear, and every value either core can observe is
-        // one that some core really did arm, the SEV-no-later-than invariant being global. The
-        // worst a cross-core overwrite costs is one extra add on the other core's next pass.
+        // Verified rather than assumed: with the record already removed, restoring only
+        // 8b3c94fdb's ordering reproduces the original busy-poll - 7e3 to 1.7e4 iterations
+        // against an expected handful - on whichever core does not own the pool, and it does so
+        // in all four core and spin-lock combinations, while today's ordering is clean in all
+        // four. The spin lock type makes no difference, so this was never about
+        // PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV.
         //
-        // (A 64-bit compare width has no such atomicity, but the only adapter with one is the
-        // host build, which is not racing two real cores.)
-#if TA_COMPARE_BITS == 32
-        typedef uint32_t last_added_t;
-        static volatile last_added_t last_added;
-        // Truncating to the compare width leaves no value free to mean "nothing armed yet":
-        // every 32-bit value is a reachable low word, so any sentinel could be matched by a
-        // genuine first call, which would then take the bare __wfe() below with nothing ever
-        // having been armed. (At 64 bits INT64_MAX is safe, being unreachable in practice.)
-        // tested second: it is false exactly once in the life of the program, so it never
-        // short-circuits, whereas the comparison usually does
-        static volatile bool last_added_valid;
-#define last_added_matches(target) (last_added == (target) && last_added_valid)
-#else
-        // A 64-bit record cannot be read or written atomically on a 32-bit core, so this one is
-        // kept per core: one writer and one reader, both here, and the early return above for
-        // exception context means no ISR can observe a half-written value either. Correct
-        // rather than optimal - it costs a second slot, and a core no longer benefits from the
-        // other having already armed the same deadline - but no adapter has a 64-bit compare on
-        // a dual-core part today, so this path exists to be right rather than to be fast.
-        typedef uint64_t last_added_t;
-        static last_added_t last_added_per_core[NUM_CORES] = { INT64_MAX, INT64_MAX };
-        static_assert(NUM_CORES == 2, "initialiser assumes two cores");
-        #define last_added last_added_per_core[get_core_num()]
-#define last_added_matches(target) (last_added == (target))
-#endif
-        const last_added_t this_target = (last_added_t)to_us_since_boot(timeout_timestamp);
-        if (last_added_matches(this_target) && ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
+        // What remains is the bounded re-adding: on the non-owning core the register can lag an
+        // add by an IRQ latency, costing a few extra passes before the loop settles. A handful
+        // of iterations, not the unbounded spin, and every add is paired with the cancel below
+        // so the pool cannot be exhausted.
+        if (ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
                                      (int64_t)to_us_since_boot(timeout_timestamp))) {
             // if we are called repeatedly for a timeout in the past, we won't have an event - but in any case, it has already past!
             if (time_reached(timeout_timestamp)) return true;
@@ -596,10 +562,6 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
                 tight_loop_contents();
                 return time_reached(timeout_timestamp);
             } else {
-                last_added = this_target;
-#if TA_COMPARE_BITS == 32
-                last_added_valid = true;    // set after the value, never before
-#endif
                 if (!time_reached(timeout_timestamp)) {
                     // ^ at the point above the timer hadn't fired, so it is safe
                     // to wait; the event will happen due to IRQ at some point between
@@ -609,8 +571,8 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
                 // we need to clean up if it wasn't us that caused the wfe; if it was this will be a noop.
                 //
                 // note this cancel is deliberately unconditional, and is not merely tidying up: a caller
-                // which recomputes its deadline on each iteration takes this branch every time (as
-                // last_added won't match), and so adds a fresh alarm on every pass. Without the cancel
+                // whose deadline the hardware does not already cover takes this branch every pass,
+                // and so adds a fresh alarm each time. Without the cancel
                 // that leaks a pool entry per iteration until the pool is exhausted - which has been seen
                 // in practice, with one core spinning here whilst the other owns the alarm IRQ.
                 //
