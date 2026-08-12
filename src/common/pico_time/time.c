@@ -480,8 +480,36 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         //
         // Note also, that the use of software spin locks on RP2350 to access state would always cause a SEV
         // due to use of LDREX etc., so actually using spin locks to protect the state would be worse.
-        static uint64_t last_added = INT64_MAX; // initialised to at_the_end_of_time (INT64_MAX), in case the first call has timeout_timestamp 0
-        if (last_added == to_us_since_boot(timeout_timestamp) || ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
+        // We wait only when the hardware itself says a wakeup is due at or before the target.
+        // The alarm register is the one thing that knows, so it is asked directly rather than
+        // inferred from what this function did last time.
+        //
+        // There used to be a record of the last deadline armed here, consulted as an ALTERNATIVE
+        // to that test so a polling caller would not re-add an alarm on every pass. It came from
+        // bd8fca022, for pico-sdk#2706 and #3039: on a core that does not own the pool,
+        // add_alarm_at() is asynchronous - it only forces the IRQ, and the owning core programs
+        // the register - and back then a cancel processed in the same handler pass as the add
+        // suppressed the arming completely, so the alarm was *never* armed and the loop re-added
+        // indefinitely instead of sleeping.
+        //
+        // That was fixed at source by arming ahead of the pending-cancellation scan, so an entry
+        // is armed before it can be marked deleted. The record outlived its reason and became
+        // harmful: it said only that we had *asked*, never that the wakeup was still coming, and
+        // those come apart as soon as another party's earlier alarm fires first. It then
+        // authorised a bare __wfe() with nothing armed - pico-sdk#3124, where one USB IRQ adding
+        // a single earlier alarm hung a 10ms poll indefinitely.
+        //
+        // Verified rather than assumed: with the record removed, restoring only the old ordering
+        // reproduces the original busy-poll - 7e3 to 1.7e4 iterations against an expected handful
+        // - on whichever core does not own the pool, in all four core and spin-lock combinations,
+        // while the current ordering is clean in all four. The spin lock type makes no difference,
+        // so this was never about PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV.
+        //
+        // What remains is the bounded re-adding: on the non-owning core the register can lag an
+        // add by an IRQ latency, costing a few extra passes before the loop settles. A handful
+        // of iterations, not the unbounded spin, and every add is paired with the cancel below
+        // so the pool cannot be exhausted.
+        if (ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
                                      (int64_t)to_us_since_boot(timeout_timestamp))) {
             // we already are waking up at or before when we want to (possibly due to us having been called
             // before in a loop), so we can do an actual WFE. Note we rely on the fact that the alarm pool IRQ
@@ -494,7 +522,6 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
                 tight_loop_contents();
                 return time_reached(timeout_timestamp);
             } else {
-                last_added = to_us_since_boot(timeout_timestamp);
                 if (!time_reached(timeout_timestamp)) {
                     // ^ at the point above the timer hadn't fired, so it is safe
                     // to wait; the event will happen due to IRQ at some point between
