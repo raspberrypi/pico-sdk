@@ -35,6 +35,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/hardware_irq_test:hardware_irq_test",
                 "//test/hardware_pwm_test:hardware_pwm_test",
                 "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test",
+                "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/kitchen_sink:kitchen_sink",
                 "//test/kitchen_sink:kitchen_sink_embed_xip_setup",
                 "//test/kitchen_sink:kitchen_sink_cpp",
@@ -97,6 +98,7 @@ BUILD_CONFIGURATIONS = (
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
                 # No SW spinlocks on RP2040
+                "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/short_sleep_test:short_sleep_test_sw",
@@ -143,6 +145,7 @@ BUILD_CONFIGURATIONS = (
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
                 # No SW spinlocks on RP2040
+                "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/short_sleep_test:short_sleep_test_sw",
@@ -190,6 +193,7 @@ BUILD_CONFIGURATIONS = (
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
                 # No SW spinlocks on RP2040
+                "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/short_sleep_test:short_sleep_test_sw",

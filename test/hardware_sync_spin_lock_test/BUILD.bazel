@@ -22,6 +22,20 @@ extra_copts_for_all_deps(
     name = "hardware_sync_spin_lock_test",
     testonly = True,
     src = ":hardware_sync_spin_lock_test_actual",
-    extra_copts = ["-DPICO_STDOUT_MUTEX=0"],
+    extra_copts = [
+        "-DPICO_STDOUT_MUTEX=0",
+        "-DPICO_USE_SW_SPIN_LOCKS=0",
+    ],
     target_compatible_with = compatible_with_rp2(),
+)
+
+extra_copts_for_all_deps(
+    name = "hardware_sync_spin_lock_test_sw",
+    testonly = True,
+    src = ":hardware_sync_spin_lock_test_actual",
+    extra_copts = [
+        "-DPICO_STDOUT_MUTEX=0",
+        "-DPICO_USE_SW_SPIN_LOCKS=1",
+    ],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
 )
