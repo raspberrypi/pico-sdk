@@ -18,6 +18,11 @@
 
 #include "pico/config_autogen.h"
 
+// PICO_CONFIG: PICO_PLATFORM_STRING, Name of platform as a string; defaulted to "unknown" if the build does not set it, group=pico_base
+#ifndef PICO_PLATFORM_STRING
+#define PICO_PLATFORM_STRING "unknown"
+#endif
+
 // PICO_CONFIG: PICO_CONFIG_RTOS_ADAPTER_HEADER, Unquoted path to header include in the default pico/config.h for RTOS integration defines that must be included in all sources, group=pico_base
 #ifdef PICO_CONFIG_RTOS_ADAPTER_HEADER
 #include __PICO_XSTRING(PICO_CONFIG_RTOS_ADAPTER_HEADER)
