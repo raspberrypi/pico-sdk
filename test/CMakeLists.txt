@@ -25,6 +25,8 @@ if (PICO_ON_DEVICE)
     add_subdirectory(pio_encoding_test)
     add_subdirectory(short_sleep_test)
     add_subdirectory(sync_interop_test)
+    # only builds if FREERTOS_KERNEL_PATH is set
+    add_subdirectory(freertos_sync_alias_test)
 endif()
 
 # PICO_TEST_FILE_GENERATOR: Path to the a CMake script to generate test files for ci
