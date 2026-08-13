@@ -68,6 +68,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_xip_sram_test:pico_critical_xip_sram_test",
                 "//test/short_sleep_test:short_sleep_test",
                 "//test/short_sleep_test:short_sleep_test_sw",
+                "//test/sync_interop_test:sync_interop_test",
+                "//test/sync_interop_test:sync_interop_test_sw",
 
                 # Pretty much only Picotool and pioasm build on Windows.
                 "//..." if os.name == "nt" else "",
@@ -98,6 +100,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/short_sleep_test:short_sleep_test_sw",
+                "//test/sync_interop_test:sync_interop_test_sw",
             )
         ),
     },
@@ -143,6 +146,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/short_sleep_test:short_sleep_test_sw",
+                "//test/sync_interop_test:sync_interop_test_sw",
             )
         ),
     },
@@ -189,6 +193,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/short_sleep_test:short_sleep_test_sw",
+                "//test/sync_interop_test:sync_interop_test_sw",
             )
         ),
     },
