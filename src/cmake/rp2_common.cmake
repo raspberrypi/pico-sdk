@@ -119,6 +119,7 @@ if (NOT PICO_BARE_METAL)
     pico_add_subdirectory(rp2_common/pico_stdio_semihosting)
     pico_add_subdirectory(rp2_common/pico_stdio_uart)
     pico_add_subdirectory(rp2_common/pico_stdio_rtt)
+    pico_add_subdirectory(rp2_common/pico_ubsan)
 
     if (NOT PICO_RISCV)
          pico_add_subdirectory(rp2_common/cmsis)

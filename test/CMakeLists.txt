@@ -23,6 +23,7 @@ if (PICO_ON_DEVICE)
     add_subdirectory(pico_async_context_test)
     add_subdirectory(pico_thread_local_test)
     add_subdirectory(pio_encoding_test)
+    add_subdirectory(pico_ubsan_test)
 endif()
 
 # PICO_TEST_FILE_GENERATOR: Path to the a CMake script to generate test files for ci

@@ -46,6 +46,41 @@ if (NOT TARGET _pico_sdk_pre_init_marker)
             message(WARNING "pico_sdk_init() should be called after the project is created (and languages added)")
         endif()
         add_subdirectory(${PICO_SDK_PATH} pico-sdk)
+
+        pico_apply_ubsan_options()
+    endmacro()
+
+    # PICO_CMAKE_CONFIG: PICO_UBSAN_ALIGNMENT_CHECKS, Check every load and store for correct alignment at runtime, type=bool, default=0, group=build
+    # PICO_CMAKE_CONFIG: PICO_UBSAN_NULL_CHECKS, Check every load and store for a null pointer at runtime, type=bool, default=0, group=build
+    # PICO_CMAKE_CONFIG: PICO_UBSAN_RECOVER, Report and continue rather than panicking on the first failure, type=bool, default=0, group=build
+    macro(pico_apply_ubsan_options)
+        set(_pico_ubsan_checks "")
+        if (PICO_UBSAN_ALIGNMENT_CHECKS)
+            list(APPEND _pico_ubsan_checks alignment)
+        endif()
+        if (PICO_UBSAN_NULL_CHECKS)
+            list(APPEND _pico_ubsan_checks null)
+        endif()
+        if (_pico_ubsan_checks)
+            # Refuse to apply checks in release builds
+            if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
+                message(FATAL_ERROR "UBSan checks are not supported with"
+                        " CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}: Use CMAKE_BUILD_TYPE=Debug, or"
+                        " drop PICO_UBSAN_ALIGNMENT_CHECKS/PICO_UBSAN_NULL_CHECKS.")
+            endif()
+            list(JOIN _pico_ubsan_checks "," _pico_ubsan_list)
+            get_property(_pico_ubsan_announced GLOBAL PROPERTY PICO_UBSAN_ANNOUNCED)
+            if (NOT _pico_ubsan_announced)
+                message("Enabling UBSan checks: ${_pico_ubsan_list}")
+                set_property(GLOBAL PROPERTY PICO_UBSAN_ANNOUNCED 1)
+            endif()
+            add_compile_options(-fsanitize=${_pico_ubsan_list})
+            if (NOT PICO_UBSAN_RECOVER)
+                # Picks the _abort handlers, which panic
+                add_compile_options(-fno-sanitize-recover=${_pico_ubsan_list})
+            endif()
+            link_libraries(pico_ubsan)
+        endif()
     endmacro()
 
     macro(add_sub_list_dirs var)
