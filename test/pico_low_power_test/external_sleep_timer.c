@@ -26,6 +26,7 @@ uint32_t sleep_time_ms = 0;
 bool good_sleep_done = false;
 
 int64_t wake_up_gpio(__unused alarm_id_t id, __unused void *param) {
+    printf("Sending wake up at %dms\n", to_ms_since_boot(get_absolute_time()));
     gpio_put(WAKE_UP_PIN, 0);
     return 0;
 }
