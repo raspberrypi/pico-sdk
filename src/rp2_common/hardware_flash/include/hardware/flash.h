@@ -169,7 +169,7 @@ static inline void flash_do_cmd(const uint8_t *txbuf, uint8_t *rxbuf, size_t cou
 
 void flash_flush_cache(void);
 
-#if !PICO_RP2040
+#if !PICO_RP2040 || PICO_COMBINED_DOCS
 typedef void (*qmi_setup_function_t)(void);
 
 /*! \brief Set the function to be called to setup the QMI CS1 configuration
@@ -303,7 +303,7 @@ uint flash_devinfo_get_cs_gpio(uint cs);
  */
 void flash_devinfo_set_cs_gpio(uint cs, uint gpio);
 
-#endif // !PICO_RP2040
+#endif // !PICO_RP2040 || PICO_COMBINED_DOCS
 
 #ifdef __cplusplus
 }

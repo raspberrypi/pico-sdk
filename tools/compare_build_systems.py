@@ -215,7 +215,7 @@ def FindKnownOptions(option_pattern_matcher, file_paths):
     for p in file_paths:
         with open(p, "r") as f:
             for line in f:
-                if re.match("\s*#\s*#", line):
+                if re.match(r"\s*#\s*#", line):
                     # Ignore commented out defines
                     continue
 

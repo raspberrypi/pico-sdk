@@ -310,6 +310,26 @@ void irq_clear(uint int_num);
  */
 void irq_set_pending(uint num);
 
+/*! \brief Check whether an IRQ is pending on the current core.
+ *  \ingroup hardware_irq
+ *
+ * Returns true if the external system IRQ line is currently asserted, or if
+ * the IRQ has been forced high inside the core using irq_set_pending().
+ *
+ * This function can be used to poll IRQ flags that are currently disabled
+ * (via a previous call to irq_set_enabled(num, false);).
+ *
+ * Do not use this function for an IRQ that is enabled at any priority that
+ * might preempt the core; it is useless in such cases because the core may
+ * enter the IRQ handler without this function ever returning true.
+ *
+ * When polling for external IRQ assertion on an Arm core equipped with an
+ * NVIC, it's recommended to call irq_clear() once before calling this
+ * function, to clear any stale assertions from the internal pending latch.
+ *
+ * \param num Interrupt number \ref interrupt_nums
+ */
+bool irq_is_pending(uint num);
 
 /*! \brief Perform IRQ priority initialization for the current core
  *

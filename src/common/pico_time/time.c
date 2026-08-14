@@ -476,7 +476,7 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         //
         // Note also, that the use of software spin locks on RP2350 to access state would always cause a SEV
         // due to use of LDREX etc., so actually using spin locks to protect the state would be worse.
-        static uint64_t last_added;
+        static uint64_t last_added = INT64_MAX; // initialised to at_the_end_of_time (INT64_MAX), in case the first call has timeout_timestamp 0
         if (last_added == to_us_since_boot(timeout_timestamp) || ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
                                      (int64_t)to_us_since_boot(timeout_timestamp))) {
             // we already are waking up at or before when we want to (possibly due to us having been called

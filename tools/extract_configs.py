@@ -75,7 +75,7 @@ def get_first_dict_key(some_dict):
 
 def look_for_integer_define(config_name, attr_name, attr_str, file_path, linenum, applicable):
     defined_str = None
-    if re.match('^\w+$', attr_str):
+    if re.match(r'^\w+$', attr_str):
         # See if we have a matching define
         all_defines = chips_all_defines[applicable]
         if attr_str in all_defines:
@@ -187,6 +187,15 @@ errors = []
 # Scan all .c and .h and .S files in the specific path, recursively.
 
 for dirpath, dirnames, filenames in os.walk(scandir):
+    # Don't descend into CMake build trees; they hold generated copies of the files we are
+    # scanning for, and a developer may have several of them inside the source tree.
+    if 'CMakeCache.txt' in filenames:
+        dirnames[:] = []
+        continue
+    # lib/ holds third-party submodules, which don't use these markers.
+    if os.path.relpath(dirpath, scandir) == 'lib':
+        dirnames[:] = []
+        continue
     for filename in filenames:
         file_ext = os.path.splitext(filename)[1]
         if file_ext in ('.c', '.h', '.S'):

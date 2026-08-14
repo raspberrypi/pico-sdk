@@ -55,7 +55,12 @@ function(pico_set_persistent_data_loc TARGET PERSISTENT_DATA_LOC)
                 pico_set_linker_script_var(${TARGET} HEAP_LOC __persistent_data_end__)
                 set(PERSISTENT_DATA_SECTION "RAM")
         elseif(PERSISTENT_DATA_LOC LESS 0x20080000)
-                # SRAM1, so heap should come before persistent data
+                # SRAM1, so heap should come before persistent data. This needs HEAP_LOC as
+                # well as HEAP_LIMIT: the fixed address is above where the heap would start,
+                # and placing the section there leaves the location counter above, so
+                # without HEAP_LOC the heap lands after the persistent data - and therefore
+                # above the limit set below, giving a heap of zero or negative size
+                pico_set_linker_script_var(${TARGET} HEAP_LOC __pre_persistent_data__)
                 pico_set_linker_script_var(${TARGET} HEAP_LIMIT ${PERSISTENT_DATA_LOC})
                 set(PERSISTENT_DATA_SECTION "RAM")
         else()

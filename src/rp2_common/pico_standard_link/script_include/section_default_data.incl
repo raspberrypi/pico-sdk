@@ -30,6 +30,10 @@ SECTIONS
         *(.data*)
         *(.sdata*)
 
+	    /* if linked against non PIC archives, ARM targets may generate dynamic data relocations via got sections */
+        *(.got)
+        *(.got.*)
+
         . = ALIGN(4);
         *(.after_data.*)
         . = ALIGN(4);

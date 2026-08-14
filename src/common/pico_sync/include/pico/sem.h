@@ -45,7 +45,7 @@ typedef struct semaphore {
  *  \ingroup sem
  *
  * \param sem Pointer to semaphore structure
- * \param initial_permits How many permits are initially acquired
+ * \param initial_permits How many permits are initially available
  * \param max_permits  Total number of permits allowed for this semaphore
  */
 void sem_init(semaphore_t *sem, int16_t initial_permits, int16_t max_permits);

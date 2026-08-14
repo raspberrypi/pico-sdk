@@ -72,6 +72,7 @@
  * \cond pico_sync \defgroup pico_sync pico_sync \endcond
  * \cond pico_time \defgroup pico_time pico_time \endcond
  * \cond pico_unique_id \defgroup pico_unique_id pico_unique_id \endcond
+ * \cond pico_usb_reset \defgroup pico_usb_reset pico_usb_reset \endcond
  * \cond pico_util \defgroup pico_util pico_util \endcond
  * @}
  *
@@ -131,6 +132,5 @@
  * \cond boot_picoboot_headers \defgroup boot_picoboot_headers boot_picoboot_headers \endcond
  * \cond boot_uf2_headers \defgroup boot_uf2_headers boot_uf2_headers \endcond
  * \cond pico_usb_reset_interface_headers \defgroup pico_usb_reset_interface_headers pico_usb_reset_interface_headers \endcond
- * \cond pico_usb_reset \defgroup pico_usb_reset pico_usb_reset \endcond
  * @}
 */

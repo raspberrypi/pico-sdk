@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 py_binary(
     name = "generate_version_header",
     srcs = ["generate_version_header.py"],
+    legacy_create_init = False,
     visibility = ["//:__subpackages__"],
 )
 

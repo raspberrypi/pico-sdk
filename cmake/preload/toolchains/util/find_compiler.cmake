@@ -46,7 +46,7 @@ endfunction()
 # Assuming the single flag variable is not already set, each of the flag_var_list flags are tried in order.
 # If the flags don't cause an error the single flag variable is set to the good flag value. If no valid flags
 # are found, a fatal error is raised.
-function(pico_choose_compiler_flags compiler_path common_lang_flags_var common_lang_flags_var_list)
+function(pico_choose_compiler_flags compiler_path common_lang_flags_var common_lang_flags_var_list test_files_var)
     # simplify logic by not complaining if both set, since CMake calls compiler setup repeatedly
     if (NOT ${common_lang_flags_var})
         if (${common_lang_flags_var_list})
@@ -55,8 +55,18 @@ function(pico_choose_compiler_flags compiler_path common_lang_flags_var common_l
             else()
                 set(NULL_DEVICE "/dev/null")
             endif()
+
+            set(idx 0)
             foreach(flags IN LISTS ${common_lang_flags_var_list})
-                separate_arguments(COMPILER_CMD NATIVE_COMMAND "${compiler_path} ${flags} -x c -c \"${CMAKE_CURRENT_LIST_DIR}/empty.c\" -o ${NULL_DEVICE}")
+                # Use per-entry test file if provided, otherwise empty.c
+                if (${test_files_var})
+                    list(GET ${test_files_var} ${idx} test_file)
+                else()
+                    set(test_file "${CMAKE_CURRENT_LIST_DIR}/empty.c")
+                endif()
+
+                separate_arguments(COMPILER_CMD NATIVE_COMMAND
+                    "${compiler_path} ${flags} -x c -c \"${test_file}\" -o ${NULL_DEVICE}")
                 execute_process(
                         COMMAND ${COMPILER_CMD}
                         RESULT_VARIABLE COMPILE_FAILED
@@ -67,6 +77,7 @@ function(pico_choose_compiler_flags compiler_path common_lang_flags_var common_l
                     set(${common_lang_flags_var} ${flags} PARENT_SCOPE)
                     return()
                 endif()
+                math(EXPR idx "${idx} + 1")
             endforeach()
             message(FATAL_ERROR "No compiler found that supports required compiler flags")
         else()

@@ -1,3 +1,7 @@
+# This file exists for reproducing the RP2350 bootrom build, which depends on the CORE-V development toolchain, as mainline support for Zcmp did not exist at the time.
+
+# Do not use this file for new development. The default toolchain file supports Zcmp.
+
 # todo there is probably a more "cmake" way of doing this going thru the standard path with our "PICO" platform
 #  i.e. CMake<Lang>Information and whatnot
 

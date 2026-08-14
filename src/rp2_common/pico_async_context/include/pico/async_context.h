@@ -21,7 +21,7 @@
  * with IRQs which are themselves core-specific.
  * </ol>
  *
- * THe async_context provides two mechanisms for asynchronous work:
+ * The async_context provides two mechanisms for asynchronous work:
  *
  * * <em>when_pending</em> workers, which are processed whenever they have work pending. See \ref async_context_add_when_pending_worker,
  * \ref async_context_remove_when_pending_worker, and \ref async_context_set_work_pending, the latter of which can be used from an interrupt handler

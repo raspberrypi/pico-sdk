@@ -1,12 +1,12 @@
 module(
     name = "pico-sdk",
-    version = "2.2.1-develop",
+    version = "2.3.1-develop",
 )
 
 bazel_dep(name = "platforms", version = "0.0.9")
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
 bazel_dep(name = "rules_python", version = "0.36.0")
-bazel_dep(name = "picotool", version = "2.2.0")
+bazel_dep(name = "picotool", version = "2.3.0")
 bazel_dep(name = "rules_cc", version = "0.0.10")
 
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2", dev_dependency = True)
@@ -115,7 +115,7 @@ git_repository(
 git_repository(
     name = "btstack",
     build_file = "//src/rp2_common/pico_btstack:btstack.BUILD",
-    commit = "075a0780f0fad7ff67d58ac19f46e8953656a752",  # keep-in-sync-with-submodule: lib/btstack
+    commit = "7fa68bd9ea40aa86672e6a47bef0ab9afc27506d",  # keep-in-sync-with-submodule: lib/btstack
     remote = "https://github.com/bluekitchen/btstack.git",
 )
 

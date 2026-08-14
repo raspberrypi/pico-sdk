@@ -46,6 +46,11 @@ void PICO_WEAK_FUNCTION_IMPL_NAME(irq_set_pending)(uint num) {
     panic_unsupported();
 }
 
+PICO_WEAK_FUNCTION_DEF(irq_is_pending)
+bool PICO_WEAK_FUNCTION_IMPL_NAME(irq_is_pending)(uint num) {
+    panic_unsupported();
+}
+
 PICO_WEAK_FUNCTION_DEF(irq_has_shared_handler)
 bool PICO_WEAK_FUNCTION_IMPL_NAME(irq_has_shared_handler)(uint irq_num) {
     return false;
