@@ -59,6 +59,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_time_test:pico_time_test",
                 "//test/pico_low_power_test:low_power_test_timers",
                 "//test/pico_low_power_test:low_power_test_gpio",
+                "//test/pico_low_power_test:low_power_test_timers_gpio",
                 "//test/pico_low_power_test:low_power_test_simple",
                 "//test/pico_low_power_test:external_sleep_timer",
                 "//test/pico_async_context_test:pico_async_context_test",
