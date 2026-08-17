@@ -142,23 +142,30 @@ void lock_init(lock_core_t *core, uint lock_num);
 #define lock_internal_spin_unlock_with_wait(lock, save) spin_unlock((lock)->spin_lock, save), __wfe()
 #else
 extern volatile uint8_t lock_internal_notify_count;
-// Note the ordering here matters. The event register is a single bit, so every event source
-// (our own spin_unlock, a SEV from a notifier, an exception entry/return on this core) collapses
-// into the same latch. We must therefore drain the event left by the spin_unlock *before* deciding
-// whether we still need to wait: if we tested the count first, a notify arriving between that test
-// and the first __wfe() (a window which is widened arbitrarily by any IRQ taken on this core, since
-// spin_unlock re-enables interrupts) would have its SEV swallowed by the draining __wfe(), and the
-// second __wfe() would then block with the notification already gone.
+// Note the ordering here matters. The event register is a single bit, with multiple sources: our
+// own spin_unlock, an SEV from a notifier, an SEV from some other unrelated code, or (on Arm) an
+// exception entry + return on this core. We must drain the event left by the spin_unlock *before*
+// deciding whether we still need to wait for a second event from a notifier.
 //
-// With the drain first, a notify occurring at any point after _notify_count is sampled either
-// (a) bumps the count before we test it, so we skip the wait entirely, or (b) happens after the
-// test, in which case its SEV sets the event register and the wait returns immediately.
-#define lock_internal_spin_unlock_with_wait(lock, save) ({    \
-    uint8_t _notify_count = lock_internal_notify_count;       \
-    spin_unlock((lock)->spin_lock, save);                     \
-    /* consume the event caused by the spin_unlock; cannot block */ \
-    __wfe();                                                  \
-    if (_notify_count == lock_internal_notify_count) __wfe(); \
+// The first (draining) __wfe() is inside the lock's IRQ critical section. Return-from-interrupt
+// generates an event on Armv8-M, but not on Hazard3 v1.0, so IRQs can swallow events on RISC-V.
+// This first __wfe() always completes promptly, because spin_unlock_unsafe() generates an event.
+//
+// With the drain first, a notify occurring after _notify_count is sampled either: (a) bumps the
+// count before we test it, so we skip the second __wfe(), or (b) happens after the test, in which
+// case its SEV sets the event register and the second __wfe() returns immediately.
+//
+// (Also note: the increment cannot happen between the _notify_count and the spin_unlock_unsafe()
+// because the increment must hold the lock *we are initially holding*.)
+//
+// See comment on `lock_internal_notify_count` declation in lock_core.c for background details on
+// interactions between events and exclusives on RP2350.
+#define lock_internal_spin_unlock_with_wait(lock, save) ({         \
+    uint8_t _notify_count = lock_internal_notify_count;            \
+    spin_unlock_unsafe((lock)->spin_lock);                         \
+    __wfe(); /* consume event from unlock, without interruption */ \
+    restore_interrupts_from_disabled(save);                        \
+    if (_notify_count == lock_internal_notify_count) __wfe();      \
     })
 #endif
 #endif
@@ -240,9 +247,9 @@ extern volatile uint8_t lock_internal_notify_count;
 // spin_unlock must be drained before the notify count is tested
 #define lock_internal_spin_unlock_with_best_effort_wait_or_timeout(lock, save, until) ({ \
     uint8_t _notify_count = lock_internal_notify_count;                                  \
-    spin_unlock((lock)->spin_lock, save);                                                \
-    /* consume the event caused by the spin_unlock; cannot block */                      \
-    __wfe();                                                                             \
+    spin_unlock_unsafe((lock)->spin_lock);                                               \
+    __wfe(); /* consume event from spin_unlock_unsafe() without interruption */          \
+    restore_interrupts_from_disabled(save);                                              \
     _notify_count == lock_internal_notify_count ? best_effort_wfe_or_timeout(until)      \
                                                 : time_reached(until);                   \
 })
