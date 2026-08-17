@@ -44,6 +44,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/kitchen_sink:kitchen_sink_blocked_ram",
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                "//test/pico_btstack/bond:pico_btstack_bond_test",
                 "//test/kitchen_sink:kitchen_sink_ram_section",
                 "//test/kitchen_sink:kitchen_sink_simple_overlay",
                 "//test/kitchen_sink:kitchen_sink_psram",
@@ -83,6 +84,7 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                "//test/pico_btstack/bond:pico_btstack_bond_test",
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
                 # No RISC-V on RP2040.
@@ -104,6 +106,7 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                "//test/pico_btstack/bond:pico_btstack_bond_test",
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
                 # RP2040 only
@@ -124,6 +127,7 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                "//test/pico_btstack/bond:pico_btstack_bond_test",
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
                 # No RISC-V on RP2040.
@@ -150,6 +154,7 @@ BUILD_CONFIGURATIONS = (
             (
                 "//test/kitchen_sink:kitchen_sink_lwip_poll",
                 "//test/kitchen_sink:kitchen_sink_lwip_background",
+                "//test/pico_btstack/bond:pico_btstack_bond_test",
                 # Host only.
                 "//test/pico_float_test:hazard3_test_gen",
                 # RP2040 only
