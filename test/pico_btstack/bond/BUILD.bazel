@@ -1,0 +1,50 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel:pico_btstack_make_gatt_header.bzl", "pico_btstack_make_gatt_header")
+load("//bazel/util:transition.bzl", "btstack_test_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "btstack_config",
+    hdrs = ["btstack_config.h"],
+    includes = ["."],
+)
+
+# bond_dut.c includes the generated bond_dut.h from this.
+pico_btstack_make_gatt_header(
+    name = "bond_dut_gatt",
+    src = "bond_dut.gatt",
+)
+
+cc_binary(
+    name = "pico_btstack_bond_test_actual",
+    testonly = True,
+    srcs = [
+        "bond_dut.c",
+        "main.c",
+    ],
+    defines = ["WANT_HCI_DUMP=1"],
+    tags = ["manual"],  # Built via pico_btstack_bond_test
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        ":bond_dut_gatt",
+        "//src/rp2_common/pico_btstack",
+        "//src/rp2_common/pico_cyw43_arch:pico_cyw43_arch_none",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)
+
+# Classic and BLE are both enabled so that
+# ENABLE_CROSS_TRANSPORT_KEY_DERIVATION is compiled in -- that is the path the
+# bond/reconnect test exercises.
+btstack_test_binary(
+    name = "pico_btstack_bond_test",
+    testonly = True,
+    src = ":pico_btstack_bond_test_actual",
+    bt_stack_config = ":btstack_config",
+    enable_ble = True,
+    enable_bt_classic = True,
+    target_compatible_with = compatible_with_rp2(),
+)

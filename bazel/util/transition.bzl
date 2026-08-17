@@ -144,6 +144,35 @@ kitchen_sink_test_binary = declare_transtion(
     },
 )
 
+# This transition sets the SDK configuration options required to build a BTstack
+# test binary: which btstack_config.h to use, and which transports to enable.
+#
+# stdio defaults differ from the CMake build, where they are set per target.
+# USB stdio is on by default here because the bond test uses picotool to reboot
+# the board between runs, which needs the reset interface the USB stdio driver
+# provides.
+btstack_test_binary = declare_transtion(
+    attrs = {
+        "bt_stack_config": attr.label(mandatory = True),
+        "enable_ble": attr.bool(default = False),
+        "enable_bt_classic": attr.bool(default = False),
+        "enable_stdio_usb": attr.bool(default = True),
+        "enable_stdio_uart": attr.bool(default = True),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+    },
+    flag_overrides = {
+        "@pico-sdk//bazel/config:PICO_BTSTACK_CONFIG": "bt_stack_config",
+        "@pico-sdk//bazel/config:PICO_BT_ENABLE_BLE": "enable_ble",
+        "@pico-sdk//bazel/config:PICO_BT_ENABLE_CLASSIC": "enable_bt_classic",
+        "@pico-sdk//bazel/config:PICO_STDIO_USB": "enable_stdio_usb",
+        "@pico-sdk//bazel/config:PICO_STDIO_UART": "enable_stdio_uart",
+    },
+)
+
 # This transition sets SDK configuration options required to build test binaries
 # for the pico_float_test suite of tests.
 pico_float_test_binary = declare_transtion(
