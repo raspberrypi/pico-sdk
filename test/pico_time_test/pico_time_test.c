@@ -86,6 +86,7 @@ static int issue_2118_test(void);
 static int issue_2148_test(void);
 static int issue_2186_test(void);
 static int issue_2374_test(void);
+static int batch_cancel_test(void);
 
 int main() {
     setup_default_uart();
@@ -266,7 +267,95 @@ int main() {
 
     issue_2374_test();
 
+    batch_cancel_test();
+
     PICOTEST_END_TEST();
+}
+
+// Cancelling several alarms before the pool's handler gets a chance to run. Both bugs this
+// covers need the head of the ordered list cancelled along with at least one entry behind it,
+// which is why they are cancelled as a batch:
+//
+//  - the scan left prev pointing at ordered_head while the head itself was cancelled, so moving
+//    the next cancelled entry to the front unlinked the head. It then belonged to neither the
+//    ordered list nor the free list, and the pool lost an entry for good.
+//  - a cancelled entry has to keep a target in the past, or the handler stops with entries still
+//    marked and, since it does not arm for a marked head, with nothing armed at all.
+//
+// Disabling interrupts around the cancels is what makes this deterministic on one core: each
+// cancel_alarm() forces the pool IRQ, so without it the handler runs in between and there is
+// never a batch to get wrong.
+#define BATCH_CANCEL_ALARMS 8
+#define BATCH_CANCEL_ROUNDS 4
+
+static int64_t batch_cancel_callback(__unused alarm_id_t id, __unused void *user_data) {
+    return 0;   // these are cancelled long before they are due
+}
+
+static volatile bool batch_cancel_live_fired;
+
+static int64_t batch_cancel_live_callback(__unused alarm_id_t id, __unused void *user_data) {
+    batch_cancel_live_fired = true;
+    return 0;
+}
+
+// fill the default pool, returning how many alarms it accepted
+static uint batch_cancel_fill(alarm_id_t *ids, uint max) {
+    uint n = 0;
+    while (n < max) {
+        alarm_id_t id = add_alarm_in_ms(60000, batch_cancel_callback, NULL, true);
+        if (id <= 0) break;
+        ids[n++] = id;
+    }
+    return n;
+}
+
+static void batch_cancel_free(alarm_id_t *ids, uint n) {
+    for (uint i = 0; i < n; i++) cancel_alarm(ids[i]);
+    sleep_ms(2);    // let the handler retire them
+}
+
+static int batch_cancel_test(void) {
+    PICOTEST_START_SECTION("Cancelling a batch of alarms must not lose pool entries");
+    static alarm_id_t ids[MAX_TIMERS_PER_POOL];
+
+    // how many the pool takes when nothing has gone wrong yet
+    uint capacity = batch_cancel_fill(ids, MAX_TIMERS_PER_POOL);
+    batch_cancel_free(ids, capacity);
+    printf("pool capacity %u\n", capacity);
+    PICOTEST_CHECK_AND_ABORT(capacity > BATCH_CANCEL_ALARMS, "pool too small to test with");
+
+    for (uint round = 0; round < BATCH_CANCEL_ROUNDS; round++) {
+        // An alarm that is NOT cancelled, to prove the pool still arms for it afterwards.
+        // It is deliberately later than the batch, so the head of the ordered list is one of
+        // the cancelled entries - that is what both bugs need. Nothing is added after the
+        // cancels either, as an add would force the IRQ and hide a handler that returned with
+        // nothing armed.
+        batch_cancel_live_fired = false;
+        for (uint i = 0; i < BATCH_CANCEL_ALARMS; i++) {
+            ids[i] = add_alarm_in_ms(100, batch_cancel_callback, NULL, true);
+            PICOTEST_CHECK_AND_ABORT(ids[i] > 0, "could not fill the batch");
+        }
+        alarm_id_t live = add_alarm_in_ms(200, batch_cancel_live_callback, NULL, true);
+        PICOTEST_CHECK_AND_ABORT(live > 0, "could not add the live alarm");
+        uint32_t save = save_and_disable_interrupts();
+        for (uint i = 0; i < BATCH_CANCEL_ALARMS; i++) cancel_alarm(ids[i]);
+        restore_interrupts(save);
+
+        absolute_time_t deadline = make_timeout_time_ms(1000);
+        while (!batch_cancel_live_fired && !time_reached(deadline)) tight_loop_contents();
+        PICOTEST_CHECK(batch_cancel_live_fired,
+                       "round %u: the uncancelled alarm never fired - nothing was left armed",
+                       round);
+
+        uint now = batch_cancel_fill(ids, MAX_TIMERS_PER_POOL);
+        batch_cancel_free(ids, now);
+        PICOTEST_CHECK(now == capacity, "round %u: pool holds %u alarms, expected %u - %u lost",
+                       round, now, capacity, capacity - now);
+        if (now != capacity) break;
+    }
+    PICOTEST_END_SECTION();
+    return 0;
 }
 
 #define ISSUE_195_TIMER_DELAY 50
