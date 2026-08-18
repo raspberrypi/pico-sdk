@@ -15,15 +15,6 @@ if (NOT TARGET pico_btstack_classic)
     return()
 endif()
 
-# pico_btstack sets PICO_BTSTACK_PATH in its own directory scope, so work it out
-# again here rather than relying on it leaking.
-if (DEFINED ENV{PICO_BTSTACK_PATH} AND (NOT PICO_BTSTACK_PATH))
-    set(PICO_BTSTACK_PATH $ENV{PICO_BTSTACK_PATH})
-endif()
-if (NOT PICO_BTSTACK_PATH)
-    set(PICO_BTSTACK_PATH ${PICO_SDK_PATH}/lib/btstack)
-endif()
-
 add_executable(pico_btstack_bond_test
     main.c
     bond_dut.c
