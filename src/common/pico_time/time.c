@@ -13,23 +13,9 @@
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(nil_time, 0);
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(at_the_end_of_time, INT64_MAX);
 
-// Whether sleep_until() waits via lock_internal_spin_unlock_with_wait on a lock
-// primitive (sleep_notifier) vs just doing a __wfe().
-//
-// It exists for RTOS integration and for nothing else. Where the lock_internal_* primitives
-// are overridden, waiting on the notifier lets the RTOS block the *task*, so other tasks keep
-// running for the duration of a sleep; a bare __wfe() would leave the sleeping task ready but
-// parked, starving every lower-priority task until it woke.
-//
-// On bare metal it buys nothing and should not be turned on. The callback's __sev() already
-// sets a per-core, sticky event latch, which reaches a waiter that has not yet reached its
-// __wfe() and cannot be consumed by anyone else - which is precisely the property the notifier
-// would be reintroducing at the cost of a spin lock round trip and a notify count. Worse than
-// redundant, in fact: using it on for bare metal on RP2350 with software spin locks prevents
-// sleep.
-//
-// Hence the default: on exactly when something has overridden the primitives, off otherwise.
-// Not documented as a user config, as there is no good reason to set it by hand.
+// If cooperative lock/sleep routines are overridden (e.g. for RTOS integration), use them. This
+// lets an RTOS schedule out sleeping tasks for active ones. Otherwise use SEV/WFE directly, to
+// allow a core to sleep until a timer IRQ fires (including when the IRQ is on a different core).
 #ifndef PICO_TIME_USE_SLEEP_NOTIFIER
 #if LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN
 #define PICO_TIME_USE_SLEEP_NOTIFIER 1
@@ -276,23 +262,9 @@ static void alarm_pool_irq_handler(void) {
         }
         earliest_index = pool->ordered_head;
         if (earliest_index < 0) {
-            // Nothing left to schedule, but we must still leave an alarm armed.
-            //
-            // This pool guarantees that a wakeup happens no later than every 2^32 us, in every
-            // state and not merely while something is pending. That is what allows
-            // ta_wakes_up_on_or_before() to answer from the timeout value alone, and what makes
-            // its answer meaningful for a target further out than the timer can express.
-            //
-            // The guarantee is upheld by ta_set_timeout(), which is required never to leave
-            // without an alarm armed. An alarm that has already fired carries no such promise,
-            // so the pool has to ask for one even when it has nothing of its own to schedule -
-            // otherwise emptying the pool silently ends the guarantee, and a waiter can be told
-            // a wakeup is due when nothing will deliver it.
-            //
-            // The target is arbitrary: ta_set_timeout() must not move an existing timeout
-            // later, so this cannot disturb one, and any value satisfies the bound. Half the
-            // representable range keeps it clear of both ends - a target already elapsed risks
-            // firing at once and returning straight back here.
+            // Invariant: there is always an alarm. Therefore you can always ask "when is the next alarm?", and get a
+            // sensible answer (useful in best_effort_wfe_or_timeout()). To keep the invariant, if there's nothing to
+            // schedule, set a dummy alarm in the far future. Use half of 32-bit range, to minimise risk of wrapping.
             ta_set_timeout(timer, timer_alarm_num, (int64_t)ta_time_us_64(timer) + (1u << 31));
             break;
         }
@@ -300,20 +272,20 @@ static void alarm_pool_irq_handler(void) {
         //printf("NOW EARLIEST INDEX %d timeout %lld\n", earliest_index, earliest_entry->target);
         earliest_target = earliest_entry->target;
         if (earliest_entry->callback != deleted_timer_marker) {
-            // we are leaving a timeout every 2^32 microseconds anyway if there is no valid target, so we can choose any value.
+            // we are leaving a timeout every 2^31 microseconds anyway if there is no valid target, so we can choose any value.
             // best_effort_wfe_or_timeout now relies on it being the last value set, and arguably this is the
             // best value anyway, as it is the furthest away from the last fire.
             //printf("SET TIMEOUT %lld\n", earliest_target);
             ta_set_timeout(timer, timer_alarm_num, earliest_target);
         }
 
-        // if we have any canceled alarms, then mark them for removal by setting their due time to -1 (which will
-        // cause them to be handled the next time round and removed)
+        // if we have any canceled alarms, then mark them for removal by setting their callback to deleted_timer_marker
+        // (which will cause them to be handled the next time round and removed)
         if (pool->has_pending_cancellations) {
             pool->has_pending_cancellations = false;
             __compiler_memory_barrier();
             int16_t *prev = &pool->ordered_head;
-            // set target for canceled items to -1, and move to front of the list
+            // set callback for canceled items to deleted_timer_marker, and move to front of the list
             for(int16_t index = pool->ordered_head; index != -1; ) {
                 alarm_pool_entry_t *entry = &pool->entries[index];
                 int16_t next = entry->next;
@@ -539,35 +511,10 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         //
         // Note also, that the use of software spin locks on RP2350 to access state would always cause a SEV
         // due to use of LDREX etc., so actually using spin locks to protect the state would be worse.
-        // We wait only when the hardware itself says a wakeup is due at or before the target.
-        // The alarm register is the one thing that knows, so it is asked directly rather than
-        // inferred from what this function did last time.
         //
-        // There used to be a record of the last deadline armed here, consulted as an ALTERNATIVE
-        // to that test so a polling caller would not re-add an alarm on every pass. It came from
-        // bd8fca022, for pico-sdk#2706 and #3039: on a core that does not own the pool,
-        // add_alarm_at() is asynchronous - it only forces the IRQ, and the owning core programs
-        // the register - and back then a cancel processed in the same handler pass as the add
-        // suppressed the arming completely, so the alarm was *never* armed and the loop re-added
-        // indefinitely instead of sleeping.
-        //
-        // That was fixed at source by arming ahead of the pending-cancellation scan, so an entry
-        // is armed before it can be marked deleted. The record outlived its reason and became
-        // harmful: it said only that we had *asked*, never that the wakeup was still coming, and
-        // those come apart as soon as another party's earlier alarm fires first. It then
-        // authorised a bare __wfe() with nothing armed - pico-sdk#3124, where one USB IRQ adding
-        // a single earlier alarm hung a 10ms poll indefinitely.
-        //
-        // Verified rather than assumed: with the record removed, restoring only the old ordering
-        // reproduces the original busy-poll - 7e3 to 1.7e4 iterations against an expected handful
-        // - on whichever core does not own the pool, in all four core and spin-lock combinations,
-        // while the current ordering is clean in all four. The spin lock type makes no difference,
-        // so this was never about PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV.
-        //
-        // What remains is the bounded re-adding: on the non-owning core the register can lag an
-        // add by an IRQ latency, costing a few extra passes before the loop settles. A handful
-        // of iterations, not the unbounded spin, and every add is paired with the cancel below
-        // so the pool cannot be exhausted.
+        // alarm_pool_irq_handler() maintains the invariant that there is *always* a pending alarm
+        // (if there are no scheduled callbacks then it adds a dummy alarm with a long interval),
+        // so we can directly query the hardware to determine the next wakeup:
         if (ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
                                      (int64_t)to_us_since_boot(timeout_timestamp))) {
             // if we are called repeatedly for a timeout in the past, we won't have an event - but in any case, it has already past!

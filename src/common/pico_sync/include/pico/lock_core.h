@@ -158,8 +158,8 @@ extern volatile uint8_t lock_internal_notify_count;
 // (Also note: the increment cannot happen between the _notify_count and the spin_unlock_unsafe()
 // because the increment must hold the lock *we are initially holding*.)
 //
-// See comment on `lock_internal_notify_count` declation in lock_core.c for background details on
-// interactions between events and exclusives on RP2350.
+// See comment on `lock_internal_notify_count` declaration in lock_core.c for background details
+// on interactions between events and exclusives on RP2350.
 #define lock_internal_spin_unlock_with_wait(lock, save) ({         \
     uint8_t _notify_count = lock_internal_notify_count;            \
     spin_unlock_unsafe((lock)->spin_lock);                         \
