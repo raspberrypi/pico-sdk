@@ -8,6 +8,9 @@
 #
 # Drive it with test.sh (all modes) or bond_reconnect_test.py in this directory.
 
+if (NOT PICO_CYW43_SUPPORTED)
+    return()
+endif()
 if (NOT TARGET pico_btstack_classic)
     return()
 endif()
