@@ -8,6 +8,7 @@
 #include "pico/flash.h"
 #include "hardware/sync.h"
 #include "hardware/flash.h"
+#include "btstack_debug.h"
 #include <string.h>
 
 // Check sizes
@@ -69,6 +70,11 @@ static inline uint32_t pico_flash_bank_get_fixed_storage_offset(void) {
 extern uint32_t pico_flash_bank_get_storage_offset_func(void);
 #endif
 
+// A failed flash_safe_execute() means nothing was written
+static void pico_flash_bank_report_failure(const char *what, int rc) {
+    log_error("BTstack TLV %s failed: flash_safe_execute returned %d, nothing was stored. ", what, rc);
+}
+
 static void pico_flash_bank_erase(void * context, int bank) {
     (void)(context);
     DEBUG_PRINT("erase: bank %d\n", bank);
@@ -76,10 +82,12 @@ static void pico_flash_bank_erase(void * context, int bank) {
             .op_is_erase = true,
             .p0 = pico_flash_bank_get_storage_offset_func() + (PICO_FLASH_BANK_SIZE * bank),
     };
-    // todo choice of timeout and check return code... currently we have no way to return an error
-    //      to the caller anyway. flash_safe_execute asserts by default on problem other than timeout,
-    //      so that's fine for now, and UINT32_MAX is a timeout of 49 days which seems long enough
-    flash_safe_execute(pico_flash_bank_perform_flash_mutation_operation, &mop, UINT32_MAX);
+    // todo choice of timeout... the hal_flash_bank_t API has no way to return an error to the
+    //      caller, so all we can do is log. UINT32_MAX is a timeout of 49 days which seems long enough
+    int rc = flash_safe_execute(pico_flash_bank_perform_flash_mutation_operation, &mop, UINT32_MAX);
+    if (rc != PICO_OK) {
+        pico_flash_bank_report_failure("erase", rc);
+    }
 }
 
 static void pico_flash_bank_read(void *context, int bank, uint32_t offset, uint8_t *buffer, uint32_t size) {
@@ -164,10 +172,11 @@ static void pico_flash_bank_write(void * context, int bank, uint32_t offset, con
                 .p0 = bank_start_pos + (page * FLASH_PAGE_SIZE),
                 .p1 = (uintptr_t)page_data
         };
-        // todo choice of timeout and check return code... currently we have no way to return an error
-        //      to the caller anyway. flash_safe_execute asserts by default on problem other than timeout,
-        //      so that's fine for now, and UINT32_MAX is a timeout of 49 days which seems long enough
-        flash_safe_execute(pico_flash_bank_perform_flash_mutation_operation, &mop, UINT32_MAX);
+        // todo choice of timeout... see pico_flash_bank_erase above
+        int rc = flash_safe_execute(pico_flash_bank_perform_flash_mutation_operation, &mop, UINT32_MAX);
+        if (rc != PICO_OK) {
+            pico_flash_bank_report_failure("write", rc);
+        }
     }
 }
 
