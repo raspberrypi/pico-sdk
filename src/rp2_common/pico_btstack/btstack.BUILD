@@ -10,6 +10,15 @@ exports_files(
     visibility = ["@pico-sdk//bazel:__pkg__"],
 )
 
+# Expose example sources used by SDK tests.
+exports_files(
+    [
+        "example/spp_and_gatt_counter.c",
+        "example/spp_and_gatt_counter.gatt",
+    ],
+    visibility = ["@pico-sdk//test/pico_btstack/bond:__pkg__"],
+)
+
 _DISABLE_WARNINGS = [
     "-Wno-cast-qual",
     "-Wno-format",

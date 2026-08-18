@@ -12,18 +12,19 @@ cc_library(
     includes = ["."],
 )
 
-# bond_dut.c includes the generated bond_dut.h from this.
+# Generates spp_and_gatt_counter.h
 pico_btstack_make_gatt_header(
     name = "bond_dut_gatt",
-    src = "bond_dut.gatt",
+    src = "@btstack//:example/spp_and_gatt_counter.gatt",
 )
 
 cc_binary(
     name = "pico_btstack_bond_test_actual",
     testonly = True,
+    # Using the BTStack spp_and_gatt_counter example
     srcs = [
-        "bond_dut.c",
         "main.c",
+        "@btstack//:example/spp_and_gatt_counter.c",
     ],
     defines = ["WANT_HCI_DUMP=1"],
     tags = ["manual"],  # Built via pico_btstack_bond_test

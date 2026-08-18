@@ -21,11 +21,8 @@ Modes (--mode):
 
 Run all three, see test.sh
 
-DUT firmware: pico_btstack_bond_test, built from bond_dut.c in this directory.
-That is BTstack's spp_and_gatt_counter with bonding requested in
-sm_set_authentication_requirements(), giving SPP over BR/EDR and an advertising
-GATT server over LE, so one image serves all three modes. It advertises as
-"PicoBondTest", which --name matches, so no per-board address is needed.
+DUT firmware: pico_btstack_bond_test. The Bluetooth application is the BTstack
+spp_and_gatt_counter example.
 
 Usage:
     ./test.sh                                     # all modes, DUT found by name

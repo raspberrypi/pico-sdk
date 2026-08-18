@@ -1,7 +1,6 @@
 # DUT for the bond-survives-disconnect regression test.
 #
-# Built from bond_dut.c here, with the settings the test needs, so nothing in
-# pico-examples has to be modified:
+# Built from BTstack spp_and_gatt_counter example, with the settings the test needs
 #   - USB stdio, so picotool can reboot the board between runs
 #   - UART stdio, for a serial console on a rig that has one
 #   - WANT_HCI_DUMP, so failures come with a packet log
@@ -15,18 +14,16 @@ if (NOT TARGET pico_btstack_classic)
     return()
 endif()
 
+# BTstack's spp_and_gatt_counter example is the Bluetooth application: it gives
+# SPP over BR/EDR *and* an advertising GATT server over LE, so one DUT covers
+# all three modes of bond_reconnect_test.py (ctkd / classic / le).
 add_executable(pico_btstack_bond_test
     main.c
-    bond_dut.c
+    ${PICO_BTSTACK_PATH}/example/spp_and_gatt_counter.c
 )
 
-# bond_dut.c is a vendored copy of btstack's spp_and_gatt_counter example. It
-# provides SPP over BR/EDR *and* an advertising GATT server over LE, so one DUT
-# covers all three modes of bond_reconnect_test.py (ctkd / classic / le).
-# The only change from upstream is sm_set_authentication_requirements(), which
-# must request bonding for LE keys to persist.
 pico_btstack_make_gatt_header(pico_btstack_bond_test PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/bond_dut.gatt)
+    ${PICO_BTSTACK_PATH}/example/spp_and_gatt_counter.gatt)
 
 target_link_libraries(pico_btstack_bond_test PRIVATE
     pico_stdlib
