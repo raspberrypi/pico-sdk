@@ -143,7 +143,21 @@ enum {
                                        * pico-sdk#3124 */
     AGENT_POLL_DEADLINE,              /* undisturbed polling on one fixed deadline; arg = ms.
                                        * pico-sdk#3039 */
+    AGENT_CANCEL_BURST,               /* add arg alarms and cancel them all as fast as possible,
+                                       * so that several are marked before the pool's core gets
+                                       * to scan them */
 };
+
+/* How many alarms AGENT_CANCEL_BURST adds and cancels per round, and how many rounds D2.15
+ * runs. The burst has to be at least two for the pool to see a batch at all, and small enough
+ * that several rounds fit in the default pool if entries are being lost. */
+#define CANCEL_BURST_ALARMS 6
+/* Enough rounds that a leak has to exhaust the pool well before the last one: losing the whole
+ * burst but one per round, a 16 entry pool runs out on round 3. */
+#define CANCEL_BURST_ROUNDS 6
+/* Far enough out that the burst is cancelled long before any of it is due, near enough that it
+ * sorts to the front of the pool's list - the case needs the head itself to be cancelled. */
+#define CANCEL_BURST_MS 100
 
 /* How many wait-loop iterations still count as "it really blocked". pico_sync_test uses 5;
  * 1-5 is normal depending on platform and core, a busy-poll runs to thousands. */
@@ -186,6 +200,8 @@ uint32_t agent_inline_sleep_delta(void);
  * iterations and a long elapsed, so the two together separate "parked past the deadline"
  * from "spun to it". */
 uint32_t agent_poll_iterations(void);
+/* AGENT_CANCEL_BURST: how many alarms the agent actually managed to add. */
+uint32_t agent_burst_added(void);
 /* False if add_alarm_at() failed to queue the far alarm, i.e. the precondition that
  * something is queued *beyond* the deadline was never established. */
 bool     agent_stolen_far_armed(void);

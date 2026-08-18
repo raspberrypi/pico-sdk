@@ -884,6 +884,58 @@ static void d2_13_sustained_interference(void) {
  * It also explains #2706's reporter finding that adding a second timer at ~50ms made their
  * stall disappear, which no other account of that bug predicts.
  */
+/* D2.15 - a burst of cancellations issued from the other core.
+ *
+ * Cancelling several alarms before the pool's core can scan them is the one case where the head
+ * of its ordered list is cancelled alongside entries behind it. That is what it takes to reach
+ * the scan's linking, and a mistake there loses entries into neither the ordered list nor the
+ * free list, where nothing ever recovers them.
+ *
+ * The agent both adds and cancels, so where its core does not own the pool the cancels are only
+ * requests and several land before the handler runs. Where it does own the pool the handler runs
+ * between them and no batch forms; the case still runs, and reports which regime it saw, on the
+ * same reasoning as D2.12 - skipping the configuration that cannot reproduce it would encode the
+ * belief being tested.
+ *
+ * The detector is that the agent can keep adding: an entry lost per round retires the pool a
+ * little at a time, so a later round fails to place the whole burst. No timing is involved.
+ */
+static void d2_15_cancel_burst(void) {
+#if !INTEROP_HAS_SDK_CORE
+    harness_record("D2.15", RESULT_SKIP, "no bare-SDK core in this configuration");
+#else
+    bool irq_local = agent_run(AGENT_IRQ_STATE, 0, 1000) && agent_alarm_irq_enabled();
+    for (uint round = 0; round < CANCEL_BURST_ROUNDS; round++) {
+        if (!agent_run(AGENT_CANCEL_BURST, CANCEL_BURST_ALARMS, TIMEOUT_MS * 20)) {
+            harness_record("D2.15", RESULT_FAIL,
+                           "round %u: the agent never returned from the burst (%s)",
+                           round, REGIME(irq_local));
+            return;
+        }
+        if (agent_burst_added() != CANCEL_BURST_ALARMS) {
+            if (!round) {
+                harness_record("D2.15", RESULT_SKIP,
+                               "pool only took %u of %u alarms, so there is no batch to test"
+                               " with", agent_burst_added(), CANCEL_BURST_ALARMS);
+            } else {
+                harness_record("D2.15", RESULT_FAIL,
+                               "round %u placed only %u of %u alarms - the pool is losing"
+                               " entries to the cancellations (%s)",
+                               round, agent_burst_added(), CANCEL_BURST_ALARMS,
+                               REGIME(irq_local));
+            }
+            return;
+        }
+        /* let the pool retire the round before starting the next, so a leak shows as a smaller
+         * pool rather than as entries still in flight */
+        sleep_ms(2);
+    }
+    harness_record("D2.15", RESULT_PASS,
+                   "%u rounds of %u cancellations, pool still places every one (%s)",
+                   CANCEL_BURST_ROUNDS, CANCEL_BURST_ALARMS, REGIME(irq_local));
+#endif
+}
+
 static void d2_14_far_alarm_only(void) {
 #if !INTEROP_HAS_SDK_CORE
     harness_record("D2.14", RESULT_SKIP, "no bare-SDK core in this configuration");
@@ -1748,6 +1800,7 @@ static void test_body(void) {
     d2_12_poll_fixed_deadline();
     d2_13_sustained_interference();
     d2_14_far_alarm_only();
+    d2_15_cancel_burst();
 
     printf("\n--- D3: sleep_ms / sleep_until (ms-scale, concurrent, cross-core) ---\n");
     d3_1_sleep_accuracy_ms();

@@ -130,6 +130,7 @@ static struct {
     volatile bool     cal_sleepcnt_awake;
     volatile uint32_t poll_iterations;
     volatile bool     stolen_far_armed;
+    volatile uint32_t burst_added;
 } agent;
 
 static int64_t agent_stolen_far_alarm(__unused alarm_id_t id, __unused void *ud) {
@@ -137,6 +138,10 @@ static int64_t agent_stolen_far_alarm(__unused alarm_id_t id, __unused void *ud)
 }
 
 static volatile bool agent_known_sleep_fired;
+
+static int64_t agent_burst_alarm(__unused alarm_id_t id, __unused void *ud) {
+    return 0;   /* never reached; the burst is cancelled long before it is due */
+}
 
 static int64_t agent_known_sleep_alarm(__unused alarm_id_t id, __unused void *ud) {
     agent_known_sleep_fired = true;
@@ -291,6 +296,29 @@ static void sdk_core_agent(void) {
                 }
                 agent.inline_sleep_delta = harness_sleep_delta(i0, harness_sleep_counter());
                 result = true;
+                break;
+            }
+            case AGENT_CANCEL_BURST: {
+                /*
+                 * Add a run of alarms and cancel them all without pausing. Run from this core
+                 * so that, where the pool's IRQ is on the other one, the cancels are only
+                 * requests - several get marked before the pool's core scans, which is what it
+                 * takes for the head of its list to be cancelled alongside entries behind it.
+                 * Cancelled one at a time, or from the pool's own core, the handler runs in
+                 * between and there is never a batch.
+                 */
+                alarm_id_t ids[CANCEL_BURST_ALARMS];
+                uint n = 0;
+                for (uint i = 0; i < arg && i < count_of(ids); i++) {
+                    alarm_id_t id = add_alarm_in_ms(CANCEL_BURST_MS, agent_burst_alarm, NULL, true);
+                    if (id <= 0) break;
+                    ids[n++] = id;
+                }
+                agent.burst_added = n;
+                for (uint i = 0; i < n; i++) {
+                    cancel_alarm(ids[i]);
+                }
+                result = (n == arg);
                 break;
             }
             case AGENT_SLEEP_MS:
@@ -476,6 +504,7 @@ bool     agent_slept(void)      { return agent.slept; }
 uint32_t agent_sleep_delta(void) { return agent.sleep_delta; }
 uint32_t agent_inline_sleep_delta(void) { return agent.inline_sleep_delta; }
 uint32_t agent_poll_iterations(void) { return agent.poll_iterations; }
+uint32_t agent_burst_added(void)       { return agent.burst_added; }
 bool     agent_stolen_far_armed(void)  { return agent.stolen_far_armed; }
 
 #endif /* INTEROP_HAS_SDK_CORE */
