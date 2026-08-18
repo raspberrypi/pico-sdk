@@ -136,7 +136,10 @@ static int64_t agent_stolen_far_alarm(__unused alarm_id_t id, __unused void *ud)
     return 0;   /* exists only to be queued beyond the deadline, and as the backstop */
 }
 
+static volatile bool agent_known_sleep_fired;
+
 static int64_t agent_known_sleep_alarm(__unused alarm_id_t id, __unused void *ud) {
+    agent_known_sleep_fired = true;
     __sev();
     return 0;
 }
@@ -274,11 +277,18 @@ static void sdk_core_agent(void) {
                  * the normal command-boundary instrumentation as well. If the inline delta
                  * is non-zero and the boundary delta is zero for the *same* WFE, the bug is
                  * in the boundary read, not in DWT_SLEEPCNT. */
+                agent_known_sleep_fired = false;
                 add_alarm_in_us(arg * 1000ull, agent_known_sleep_alarm, NULL, true);
                 __sev();
                 __wfe();                      /* drain */
                 uint32_t i0 = harness_sleep_counter();
-                __wfe();                      /* the real sleep */
+                /* wait on the flag, not on a bare __wfe(): the add forces the pool IRQ, whose
+                 * handler ends in __sev(), and if that lands after the drain a single __wfe()
+                 * returns at once and the core never sleeps. A spurious wake then costs an
+                 * iteration rather than reading d=0 and failing. */
+                while (!agent_known_sleep_fired) {
+                    __wfe();
+                }
                 agent.inline_sleep_delta = harness_sleep_delta(i0, harness_sleep_counter());
                 result = true;
                 break;
