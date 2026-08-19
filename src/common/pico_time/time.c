@@ -13,6 +13,15 @@
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(nil_time, 0);
 const absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(at_the_end_of_time, INT64_MAX);
 
+// If cooperative lock/sleep routines are overridden (e.g. for RTOS integration), use them. This
+// lets an RTOS schedule out sleeping tasks for active ones. Otherwise use SEV/WFE directly, to
+// allow a core to sleep until a timer IRQ fires (including when the IRQ is on a different core).
+#ifndef PICO_TIME_USE_SLEEP_NOTIFIER
+#if LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN
+#define PICO_TIME_USE_SLEEP_NOTIFIER 1
+#endif
+#endif
+
 typedef struct alarm_pool_entry {
     // next entry link or -1
     int16_t next;
@@ -54,7 +63,9 @@ static inline bool default_alarm_pool_initialized(void) {
     return default_alarm_pool.lock != NULL;
 }
 
+#if PICO_TIME_USE_SLEEP_NOTIFIER
 static lock_core_t sleep_notifier;
+#endif
 #endif
 
 #include "pico/time_adapter.h"
@@ -87,7 +98,9 @@ void __weak runtime_init_default_alarm_pool(void) {
                                    PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM,
                                    PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS);
     }
+#if PICO_TIME_USE_SLEEP_NOTIFIER
     lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
+#endif
 #endif
 }
 #endif
@@ -141,55 +154,74 @@ static void alarm_pool_irq_handler(void);
 
 // marker which we can use in place of handler function to indicate we are a repeating timer
 
-#define repeating_timer_marker ((alarm_callback_t)alarm_pool_irq_handler)
-#include "hardware/gpio.h"
+#define repeating_timer_marker ((alarm_callback_t)(uintptr_t)2)
+
 static void alarm_pool_irq_handler(void) {
-    // This IRQ handler does the main work, as it always (assuming the IRQ hasn't been enabled on both cores
-    // which is unsupported) run on the alarm pool's core, and can't be preempted by itself, meaning
-    // that it doesn't need locks except to protect against linked list, or other state access.
-    // This simplifies the code considerably, and makes it much faster in general, even though we are forced to take
-    // two IRQs per alarm.
+    // This IRQ handler is the main engine for the timer code. It runs on the core that created the alarm pool.
+    //
+    // It is fired:
+    //
+    // i. by the timer alarm h/w
+    // ii. forced by the timer code when an alarm is added or removed.
+    //
+    // The IRQ handler is responsible for maintaining an ordered list of alarms, and configuring the next
+    // hardware alarm via the time_adapter (ta_ functions). Because this IRQ handler runs on a single core
+    // and isn't re-entrant, we don't need locks within the handler. Locks _are_ however needed to walk or modify
+    // the "free" or "new" alarm lists which are also touched by clients.
+    //
+    // This layout has proved to be (somewhat) easier to reason about.
+    //
+    // As a further wrinkle, this IRQ handler maintains an invariant that:
+    //
+    // once an alarm is added, an event (SEV) will be fired either on or before that time, even if the
+    // alarm is subsequently canceled. This invariant is relied on by best_effort_wfe_or_timeout() (for
+    // details see comment there)
+
+    // Figure out correct alarm_pool instance
     uint timer_alarm_num;
     alarm_pool_timer_t *timer = ta_from_current_irq(&timer_alarm_num);
     uint timer_num = ta_timer_num(timer);
     alarm_pool_t *pool = pools[timer_num][timer_alarm_num];
     assert(pool->timer_alarm_num == timer_alarm_num);
-    int64_t earliest_target;
-    // 1. clear force bits if we were forced (do this outside the loop, as forcing is hopefully rare)
+
+    // Clear any forced irq from a client before processing any add/cancel requests from the client code, which
+    //    adds the requests before forcing the IRQ to make sure we don't race
     ta_clear_force_irq(timer, timer_alarm_num);
+
+    int64_t earliest_target;
+    // This loop (more than one pass) really just serves the purpose of avoiding having to leave and re-enter the IRQ
+    // if the next alarm is already due. We might call it a "logical" IRQ, or "due" wakeup
+    //
+    // Note that cancellations are applied at the end of a pass, after the hardware has been armed,
+    // so a canceled alarm still contributes the timeout it was added with (see the invariant above)
     do {
-        // 2. clear the IRQ if it was fired
+        // 1. Clear the hardware alarm if any, as we're servicing it, and will re-configure the alarm later
         ta_clear_irq(timer, timer_alarm_num);
-        // 3. we look at the earliest existing alarm first; the reasoning here is that we
-        //    don't want to delay an existing callback because a later one is added, and
-        //    if both are due now, then we have a race anyway (but we prefer to fire existing
-        //    timers before new ones anyway.
+
+        // 2. Look at the earliest existing alarm before dealing with anything else. If two alarms are due, we have
+        //    a race anyway, so the ordering is somewhat arbitrary, and this way we do as little work as possible
+        //    before firing an alarm
+
         int16_t earliest_index = pool->ordered_head;
-        // by default, we loop if there was any event pending (we will mark it false
-        // later if there is no work to do)
         if (earliest_index >= 0) {
+            // We have an existing alarm ...
             alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
             earliest_target = earliest_entry->target;
+
             if (((int64_t)ta_time_us_64(timer) - earliest_target) >= 0) {
-                // time to call the callback now (or in the past)
-                // note that an entry->target of < 0 means the entry has been canceled (not this is set
-                // by this function, in response to the entry having been queued by the cancel_alarm API
-                // meaning that we don't need to worry about tearing of the 64 bit value)
+                // ... which is due ...
                 int64_t delta;
-                if (earliest_target >= 0) {
-                    // special case repeating timer without making another function call which adds overhead
-                    if (earliest_entry->callback == repeating_timer_marker) {
-                        repeating_timer_t *rpt = (repeating_timer_t *)earliest_entry->user_data;
-                        delta = rpt->callback(rpt) ? rpt->delay_us : 0;
-                    } else {
-                        alarm_id_t id = make_alarm_id(pool->ordered_head, earliest_entry->sequence);
-                        delta = earliest_entry->callback(id, earliest_entry->user_data);
-                    }
+                // ... so fire it and figure the delta to the next timeout
+                if (earliest_entry->callback == repeating_timer_marker) {
+                    // Special case repeating timer without making another function call which adds overhead
+                    repeating_timer_t *rpt = (repeating_timer_t *)earliest_entry->user_data;
+                    delta = rpt->callback(rpt) ? rpt->delay_us : 0;
                 } else {
-                    // negative target means cancel alarm
-                    delta = 0;
+                    alarm_id_t id = make_alarm_id(pool->ordered_head, earliest_entry->sequence);
+                    delta = earliest_entry->callback(id, earliest_entry->user_data);
                 }
                 if (delta) {
+                    // Non-zero delta means the entry should be kept to fire again
                     int64_t next_time;
                     if (delta < 0) {
                         // delta is (positive) delta from last fire time
@@ -198,13 +230,16 @@ static void alarm_pool_irq_handler(void) {
                         // delta is relative to now
                         next_time = (int64_t) ta_time_us_64(timer) + delta;
                     }
+                    // Record the new timeout
                     earliest_entry->target = next_time;
-                    // need to re-add, unless we are the only entry or already at the front
+
+                    // Move to the right point in the ordered list, which is a no-op if we're the only item,
+                    // or belong first anyway.
                     if (earliest_entry->next >= 0 && next_time - pool->entries[earliest_entry->next].target >= 0) {
-                        // unlink this item
+                        // Unlink this item
                         pool->ordered_head = earliest_entry->next;
                         int16_t *prev = &pool->ordered_head;
-                        // find insertion point; note >= as if we add a new item for the same time as another, then it follows
+                        // Find insertion point; note >= as if we add a new item for the same time as another, then it follows
                         while (*prev >= 0 && (next_time - pool->entries[*prev].target) >= 0) {
                             prev = &pool->entries[*prev].next;
                         }
@@ -212,9 +247,10 @@ static void alarm_pool_irq_handler(void) {
                         *prev = earliest_index;
                     }
                 } else {
-                    // need to remove the item
+                    // delta == 0, means we need to remove the item (now rather than with the cancellations below
+                    // as, having fired, its existence has no bearing on the future timeout)
                     pool->ordered_head = earliest_entry->next;
-                    // and add it back to the free list (under lock)
+                    // We must take the lock to modify the free list
                     uint32_t save = spin_lock_blocking(pool->lock);
                     earliest_entry->next = pool->free_head;
                     pool->free_head = earliest_index;
@@ -222,7 +258,7 @@ static void alarm_pool_irq_handler(void) {
                 }
             }
         }
-        // if we have any new alarms, add them to the ordered list
+        // 3. If we have any new alarms, add them to the ordered list in the correct place
         if (pool->new_head >= 0) {
             uint32_t save = spin_lock_blocking(pool->lock);
             // must re-read new head under lock
@@ -245,46 +281,63 @@ static void alarm_pool_irq_handler(void) {
                 new_entry->next = next;
             }
         }
-        // if we have any canceled alarms, then mark them for removal by setting their due time to -1 (which will
-        // cause them to be handled the next time round and removed)
+
+        // Now the ordered list is correctly sorted and includes all the alarms including any recently cancelled ones
+
+        // 4. Look at the next alarm
+        earliest_index = pool->ordered_head;
+        if (earliest_index < 0) {
+            // If there is none, set a dummy timeout. This maintains the invariant that there is always
+            // a pending underlying ta_ alarm, such that you can ask the hardware (ta_) "when is the next alarm?",
+            // and get a sensible answer (useful in best_effort_wfe_or_timeout()).
+            //
+            // Since at this point we have nothing to schedule, uphold this invariant by setting a dummy alarm
+            // in the far future. We use half of 32-bit range, to minimise risk of wrapping. Note also
+            // that the default ta_wakes_up_on_or_before using the 32 bit hardware timer alarms requires that
+            // the next timeout be within the next 2^32 us anyway.
+            ta_set_timeout(timer, timer_alarm_num, (int64_t)ta_time_us_64(timer) + (1u << 31));
+            break;
+        }
+
+        // 5. We actually have an item at the head of the ordered list
+        alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
+        earliest_target = earliest_entry->target;
+
+        // 6. Reconfigure the time adapter (hardware) for the next up time
+        ta_set_timeout(timer, timer_alarm_num, earliest_target);
+
+        // 7. Finally remove any pending cancellations now that they (can have) contributed
+        // to the timeout configured above.
         if (pool->has_pending_cancellations) {
             pool->has_pending_cancellations = false;
             __compiler_memory_barrier();
             int16_t *prev = &pool->ordered_head;
-            // set target for canceled items to -1, and move to front of the list
             for(int16_t index = pool->ordered_head; index != -1; ) {
                 alarm_pool_entry_t *entry = &pool->entries[index];
                 int16_t next = entry->next;
+                // A pending cancellation is marked by a sequence number with bit 15 set
                 if ((int16_t)entry->sequence < 0) {
-                    // mark for deletion
-                    entry->target = -1;
-                    if (index != pool->ordered_head) {
-                        // move to start of queue
-                        *prev = entry->next;
-                        entry->next = pool->ordered_head;
-                        pool->ordered_head = index;
-                    }
+                    // Unlink...
+                    *prev = entry->next;
+                    // ... and add it back to the free list (under lock)
+                    uint32_t save = spin_lock_blocking(pool->lock);
+                    entry->next = pool->free_head;
+                    pool->free_head = index;
+                    spin_unlock(pool->lock, save);
                 } else {
                     prev = &entry->next;
                 }
                 index = next;
             }
         }
-        earliest_index = pool->ordered_head;
-        if (earliest_index < 0) break;
-        // need to wait
-        alarm_pool_entry_t *earliest_entry = &pool->entries[earliest_index];
-        earliest_target = earliest_entry->target;
-        // we are leaving a timeout every 2^32 microseconds anyway if there is no valid target, so we can choose any value.
-        // best_effort_wfe_or_timeout now relies on it being the last value set, and arguably this is the
-        // best value anyway, as it is the furthest away from the last fire.
-        if (earliest_target != -1) { // cancelled alarm has target of -1
-            ta_set_timeout(timer, timer_alarm_num, earliest_target);
-        }
-        // check we haven't now passed the target time; if not we don't want to loop again
+        // We will loop if there is another alarm due already
     } while ((earliest_target - (int64_t)ta_time_us_64(timer)) <= 0);
     // We always want the timer IRQ to wake a WFE so that best_effort_wfe_or_timeout() will wake up. It will wake
     // a WFE on its own core by nature of having taken an IRQ, but we do an explicit SEV so it wakes the other core
+    //
+    // Note that it seems tempting to add a __sev() inside the loop, but its not yet clear it has any provable
+    // benefit (and it could only help the other core since our core is pre-empted by thie IRQ), and it defintitely
+    // would cause more wakes to actual waiters on the other core.
     __sev();
 }
 
@@ -312,7 +365,9 @@ void alarm_pool_destroy(alarm_pool_t *pool) {
         return;
     }
 #endif
+    assert(pool->core_num == get_core_num());
     ta_disable_irq_handler(pool->timer, pool->timer_alarm_num, alarm_pool_irq_handler);
+    ta_hardware_alarm_unclaim(pool->timer, pool->timer_alarm_num);
     assert(pools[ta_timer_num(pool->timer)][pool->timer_alarm_num] == pool);
     pools[ta_timer_num(pool->timer)][pool->timer_alarm_num] = NULL;
     free(pool->entries);
@@ -393,8 +448,13 @@ uint alarm_pool_core_num(alarm_pool_t *pool) {
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
+#if PICO_TIME_USE_SLEEP_NOTIFIER
     uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
     lock_internal_spin_unlock_with_notify(&sleep_notifier, save);
+#else
+    // note this implementation is copied in pico_sync_test.c and should be updated if this code is
+    __sev(); // signal event in case the waiter is on the other core
+#endif
     return 0;
 }
 #endif
@@ -416,8 +476,14 @@ void sleep_until(absolute_time_t t) {
         if (add_alarm_at(t_before, sleep_until_callback, NULL, false) >= 0) {
             // able to add alarm for just before the time
             while (!time_reached(t_before)) {
+#if PICO_TIME_USE_SLEEP_NOTIFIER
                 uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
                 lock_internal_spin_unlock_with_wait(&sleep_notifier, save);
+#else
+                // note __wfe() is sufficient here because the add_alarm always causes an IRQ which calls
+                // sleep_until_callback() which also does a __sev() - the irq itself will wake us up if on the same core
+                __wfe();
+#endif
             }
         }
     }
@@ -476,9 +542,15 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
         //
         // Note also, that the use of software spin locks on RP2350 to access state would always cause a SEV
         // due to use of LDREX etc., so actually using spin locks to protect the state would be worse.
-        static uint64_t last_added = INT64_MAX; // initialised to at_the_end_of_time (INT64_MAX), in case the first call has timeout_timestamp 0
-        if (last_added == to_us_since_boot(timeout_timestamp) || ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
+        //
+        // alarm_pool_irq_handler() maintains the invariant that there is *always* a pending alarm
+        // (if there are no scheduled callbacks then it adds a dummy alarm with a long interval),
+        // so we can directly query the hardware to determine the next wakeup:
+        if (ta_wakes_up_on_or_before(alarm_pool_get_default()->timer, alarm_pool_get_default()->timer_alarm_num,
                                      (int64_t)to_us_since_boot(timeout_timestamp))) {
+            // if we are called repeatedly for a timeout in the past, we won't have an event - but in any case, it has already past!
+            if (time_reached(timeout_timestamp)) return true;
+
             // we already are waking up at or before when we want to (possibly due to us having been called
             // before in a loop), so we can do an actual WFE. Note we rely on the fact that the alarm pool IRQ
             // handler always does an explicit SEV, since it may be on the other core.
@@ -490,7 +562,6 @@ bool best_effort_wfe_or_timeout(absolute_time_t timeout_timestamp) {
                 tight_loop_contents();
                 return time_reached(timeout_timestamp);
             } else {
-                last_added = to_us_since_boot(timeout_timestamp);
                 if (!time_reached(timeout_timestamp)) {
                     // ^ at the point above the timer hadn't fired, so it is safe
                     // to wait; the event will happen due to IRQ at some point between

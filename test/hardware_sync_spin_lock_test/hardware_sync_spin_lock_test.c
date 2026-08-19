@@ -190,6 +190,100 @@ static const test_t tests[] = {
 	},
 };
 
+// ---------------------------------------------------------------------------
+// Verify the PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV setting
+//
+// Clear the event flag, do a lock/unlock pair, then __wfe() and see whether it returned of its
+// own accord or only once core 1's backstop arrived. A control pass with the lock/unlock
+// omitted runs first and must block, otherwise ambient interrupt activity is doing the waking
+// and the measurement means nothing -- reported as inconclusive rather than as a failure.
+//
+// Only core 0 is probed: the event register is per core, but both cores run the same spin lock
+// code against the same fabric.
+// ---------------------------------------------------------------------------
+
+#ifndef PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV
+#define PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV 0
+#endif
+
+// long enough that core 0 is certainly parked in its __wfe() before this expires
+static const uint SEV_PROBE_BACKSTOP_CYCLES = 2000000;
+static const uint SEV_PROBE_ROUNDS = 5;
+#define SEV_PROBE_LOCK_NUM 0
+
+static volatile bool sev_probe_backstop_fired;
+
+// runs on core 1
+void sev_probe_backstop(void) {
+	busy_wait_at_least_cycles(SEV_PROBE_BACKSTOP_CYCLES);
+	sev_probe_backstop_fired = true;
+	__mem_fence_release();
+	__sev();
+}
+
+// returns true if the __wfe() blocked until the backstop, false if it returned earlier
+static bool sev_probe_wfe_blocked(bool with_lock_unlock) {
+	sev_probe_backstop_fired = false;
+	__mem_fence_release();
+	// this SEVs, so it must happen before we clear the event flag below
+	multicore_fifo_push_blocking((uintptr_t)sev_probe_backstop);
+
+	// clear our event flag: the __sev() sets it and the __wfe() consumes it without blocking
+	__sev();
+	__wfe();
+
+	if (with_lock_unlock) {
+		spin_lock_t *lock = spin_lock_instance(SEV_PROBE_LOCK_NUM);
+		uint32_t save = spin_lock_blocking(lock);
+		spin_unlock(lock, save);
+	}
+	__wfe();
+	__mem_fence_acquire();
+	bool blocked = sev_probe_backstop_fired;
+
+	// resynchronise with core 1, which may still be spinning
+	(void)multicore_fifo_pop_blocking();
+	return blocked;
+}
+
+static bool sev_probe_run(void) {
+	spin_lock_init(SEV_PROBE_LOCK_NUM);
+	uint control_blocked = 0;
+	uint probe_blocked = 0;
+	for (uint i = 0; i < SEV_PROBE_ROUNDS; ++i) {
+		control_blocked += sev_probe_wfe_blocked(false);
+		probe_blocked += sev_probe_wfe_blocked(true);
+	}
+	printf("control (no lock/unlock): blocked %u/%u\n", control_blocked, SEV_PROBE_ROUNDS);
+	printf("probe   (lock + unlock):  blocked %u/%u\n", probe_blocked, SEV_PROBE_ROUNDS);
+
+	if (control_blocked != SEV_PROBE_ROUNDS) {
+		printf("INCONCLUSIVE: a bare __wfe() did not always block, so something else is\n"
+			"setting this core's event flag; cannot attribute anything to the spin lock.\n");
+		// not a failure of the code under test
+		return true;
+	}
+	bool observed;
+	if (probe_blocked == 0) {
+		observed = true;
+	} else if (probe_blocked == SEV_PROBE_ROUNDS) {
+		observed = false;
+	} else {
+		printf("Failed: spin lock unlock set the event flag inconsistently (%u/%u blocked)\n",
+			probe_blocked, SEV_PROBE_ROUNDS);
+		return false;
+	}
+	printf("observed: spin lock lock/unlock %s the calling core's event flag\n",
+		observed ? "DOES set" : "does NOT set");
+	if (observed != (bool)PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV) {
+		printf("Failed: PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV is %d but hardware says %d.\n"
+			"The lock_core wait/notify primitives in pico/lock_core.h rely on this.\n",
+			PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV, observed);
+		return false;
+	}
+	return true;
+}
+
 void core1_main(void) {
 	while (true) {
 		void (*f)() = (void(*)())multicore_fifo_pop_blocking();
@@ -203,6 +297,17 @@ int main() {
 	printf("Hello world\n");
 	multicore_launch_core1(core1_main);
 	uint failed = 0;
+
+	printf(">>> Starting test: PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV probe (core 0)\n");
+	spin_locks_reset();
+	if (sev_probe_run()) {
+		printf("OK.\n");
+	} else {
+		printf("Failed.\n");
+		++failed;
+	}
+	printf(">>> Finished test: PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV probe\n");
+
 	for (int i = 0; i < count_of(tests); ++i) {
 		const test_t *t = &tests[i];
 		printf(">>> Starting test: %s\n", t->name);

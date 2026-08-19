@@ -35,6 +35,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/hardware_irq_test:hardware_irq_test",
                 "//test/hardware_pwm_test:hardware_pwm_test",
                 "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test",
+                "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/kitchen_sink:kitchen_sink",
                 "//test/kitchen_sink:kitchen_sink_embed_xip_setup",
                 "//test/kitchen_sink:kitchen_sink_cpp",
@@ -57,15 +58,20 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_thread_local_test:pico_thread_local_test",
                 "//test/pico_thread_local_test:pico_thread_local_test_cpp",
                 "//test/pico_time_test:pico_time_test",
+                "//test/pico_time_test:pico_time_test_sw",
                 "//test/pico_low_power_test:low_power_test_timers",
                 "//test/pico_low_power_test:low_power_test_gpio",
                 "//test/pico_low_power_test:low_power_test_timers_gpio",
                 "//test/pico_low_power_test:low_power_test_simple",
                 "//test/pico_low_power_test:external_sleep_timer",
                 "//test/pico_async_context_test:pico_async_context_test",
+                "//test/pico_sync_test:pico_sync_test",
                 "//test/pico_sync_test:pico_sync_test_sw",
-                "//test/pico_sync_test:pico_sync_test_hw",
                 "//test/pico_xip_sram_test:pico_critical_xip_sram_test",
+                "//test/short_sleep_test:short_sleep_test",
+                "//test/short_sleep_test:short_sleep_test_sw",
+                "//test/sync_interop_test:sync_interop_test",
+                "//test/sync_interop_test:sync_interop_test_sw",
                 "//test/pico_unaligned_string_test:pico_unaligned_string_test",
 
                 # Pretty much only Picotool and pioasm build on Windows.
@@ -94,7 +100,11 @@ BUILD_CONFIGURATIONS = (
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
                 # No SW spinlocks on RP2040
+                "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/pico_sync_test:pico_sync_test_sw",
+                "//test/pico_time_test:pico_time_test_sw",
+                "//test/short_sleep_test:short_sleep_test_sw",
+                "//test/sync_interop_test:sync_interop_test_sw",
             )
         ),
     },
@@ -137,7 +147,11 @@ BUILD_CONFIGURATIONS = (
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
                 # No SW spinlocks on RP2040
+                "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/pico_sync_test:pico_sync_test_sw",
+                "//test/pico_time_test:pico_time_test_sw",
+                "//test/short_sleep_test:short_sleep_test_sw",
+                "//test/sync_interop_test:sync_interop_test_sw",
             )
         ),
     },
@@ -181,7 +195,11 @@ BUILD_CONFIGURATIONS = (
                 # No PSRAM on RP2040
                 "//test/kitchen_sink:kitchen_sink_psram",
                 # No SW spinlocks on RP2040
+                "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/pico_sync_test:pico_sync_test_sw",
+                "//test/pico_time_test:pico_time_test_sw",
+                "//test/short_sleep_test:short_sleep_test_sw",
+                "//test/sync_interop_test:sync_interop_test_sw",
             )
         ),
     },

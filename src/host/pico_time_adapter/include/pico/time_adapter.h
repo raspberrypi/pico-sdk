@@ -28,6 +28,7 @@ void ta_enable_irq_handler(alarm_pool_timer_t *timer, uint hardware_alarm_num, v
 void ta_disable_irq_handler(alarm_pool_timer_t *timer, uint hardware_alarm_num, void (*irq_handler)(void));
 void ta_hardware_alarm_claim(alarm_pool_timer_t *timer, uint hardware_alarm_num);
 int ta_hardware_alarm_claim_unused(alarm_pool_timer_t *timer, bool required);
+void ta_hardware_alarm_unclaim(alarm_pool_timer_t *timer, uint hardware_alarm_num);
 alarm_pool_timer_t *ta_from_current_irq(uint *alarm_num);
 uint ta_timer_num(alarm_pool_timer_t *timer);
 static inline uint64_t ta_time_us_64(__unused alarm_pool_timer_t *timer) {

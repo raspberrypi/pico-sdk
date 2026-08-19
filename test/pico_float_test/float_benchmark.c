@@ -1174,16 +1174,7 @@ int main() {
 #else
     printf("abi               soft(fp)\n");
 #endif
-#if PICO_RP2040
-    printf("platform          rp2040\n");
-#elif PICO_RP2350
-    printf("platform          rp2350\n");
-#endif
-#if PICO_RISCV
-    printf("arch              risc-v\n");
-#else
-    printf("arch              arm\n");
-#endif
+    printf("platform          " PICO_PLATFORM_STRING "\n");
     printf("----------------- Basic ---\n");
     printf("fadd              %g\n", time_binary_func(time_fadd, f_a, f_b, count_of(f_a)));
     printf("fsub              %g\n", time_binary_func(time_fsub, f_a, f_b, count_of(f_a)));
