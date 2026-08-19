@@ -176,7 +176,8 @@ void aon_timer_disable_alarm(void) {
 #if HAS_RP2040_RTC
     rtc_disable_alarm();
 #elif HAS_POWMAN_TIMER
-    powman_timer_disable_alarm();
+    // This calls powman_timer_disable_alarm()
+    powman_disable_alarm_wakeup();
 #else
     panic_unsupported();
 #endif
