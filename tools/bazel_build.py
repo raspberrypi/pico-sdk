@@ -61,6 +61,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/pico_low_power_test:low_power_test_timers",
                 "//test/pico_low_power_test:low_power_test_gpio",
+                "//test/pico_low_power_test:low_power_test_timers_gpio",
                 "//test/pico_low_power_test:low_power_test_simple",
                 "//test/pico_low_power_test:external_sleep_timer",
                 "//test/pico_async_context_test:pico_async_context_test",
@@ -71,6 +72,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/short_sleep_test:short_sleep_test_sw",
                 "//test/sync_interop_test:sync_interop_test",
                 "//test/sync_interop_test:sync_interop_test_sw",
+                "//test/pico_unaligned_string_test:pico_unaligned_string_test",
 
                 # Pretty much only Picotool and pioasm build on Windows.
                 "//..." if os.name == "nt" else "",

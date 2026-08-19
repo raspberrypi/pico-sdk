@@ -131,6 +131,15 @@ errors = []
 # Scan all CMakeLists.txt and .cmake files in the specific path, recursively.
 
 for dirpath, dirnames, filenames in os.walk(scandir):
+    # Don't descend into CMake build trees; they hold generated copies of the files we are
+    # scanning for, and a developer may have several of them inside the source tree.
+    if 'CMakeCache.txt' in filenames:
+        dirnames[:] = []
+        continue
+    # lib/ holds third-party submodules, which don't use these markers.
+    if os.path.relpath(dirpath, scandir) == 'lib':
+        dirnames[:] = []
+        continue
     for filename in filenames:
         file_ext = os.path.splitext(filename)[1]
         if filename == 'CMakeLists.txt' or file_ext == '.cmake':

@@ -36,6 +36,16 @@ cc_binary(
 )
 
 cc_binary(
+    name = "low_power_test_timers_gpio",
+    testonly = True,
+    srcs = ["low_power_test_timers_gpio.c"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "low_power_test_common",
+    ],
+)
+
+cc_binary(
     name = "low_power_test_simple",
     testonly = True,
     srcs = ["low_power_test_simple.c"],

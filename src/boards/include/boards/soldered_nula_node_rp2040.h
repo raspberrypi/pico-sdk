@@ -9,16 +9,16 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/pico_w.h"
+// This header may be included by other board headers as "boards/soldered_nula_node_rp2040.h"
 
-#ifndef _BOARDS_PICO_W_H
-#define _BOARDS_PICO_W_H
+#ifndef _BOARDS_SOLDERED_NULA_NODE_RP2040_H
+#define _BOARDS_SOLDERED_NULA_NODE_RP2040_H
 
 pico_board_cmake_set(PICO_PLATFORM, rp2040)
 pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 
 // For board detection
-#define RASPBERRYPI_PICO_W
+#define SOLDERED_NULA_NODE_RP2040
 
 // --- UART ---
 #ifndef PICO_DEFAULT_UART
@@ -32,18 +32,19 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #endif
 
 // --- LED ---
-// no PICO_DEFAULT_LED_PIN - LED is on Wireless chip
-// no PICO_DEFAULT_WS2812_PIN
+#ifndef PICO_DEFAULT_WS2812_PIN
+#define PICO_DEFAULT_WS2812_PIN 2
+#endif
 
 // --- I2C ---
 #ifndef PICO_DEFAULT_I2C
 #define PICO_DEFAULT_I2C 0
 #endif
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
-#define PICO_DEFAULT_I2C_SDA_PIN 4
+#define PICO_DEFAULT_I2C_SDA_PIN 8
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
-#define PICO_DEFAULT_I2C_SCL_PIN 5
+#define PICO_DEFAULT_I2C_SCL_PIN 9
 #endif
 
 // --- SPI ---
@@ -71,12 +72,10 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #define PICO_FLASH_SPI_CLKDIV 2
 #endif
 
-pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
+pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
-#define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
+#define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
-// note the SMPS mode pin is on WL_GPIO1
-// #define PICO_SMPS_MODE_PIN
 
 #ifndef PICO_RP2040_B0_SUPPORTED
 #define PICO_RP2040_B0_SUPPORTED 0
@@ -90,35 +89,6 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #define CYW43_WL_GPIO_COUNT 3
 #endif
 
-#ifndef CYW43_WL_GPIO_LED_PIN
-#define CYW43_WL_GPIO_LED_PIN 0
-#endif
-
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-// As this is a CYW43 pin you can do this by calling cyw43_gpio_set
-#ifndef CYW43_WL_GPIO_SMPS_PIN
-#define CYW43_WL_GPIO_SMPS_PIN 1
-#endif
-
-// If CYW43_WL_GPIO_VBUS_PIN is defined then a CYW43 GPIO has to be used to read VBUS.
-// This can be passed to cyw43_arch_gpio_get to determine if the device is battery powered.
-// PICO_VBUS_PIN and CYW43_WL_GPIO_VBUS_PIN should not both be defined.
-#ifndef CYW43_WL_GPIO_VBUS_PIN
-#define CYW43_WL_GPIO_VBUS_PIN 2
-#endif
-
-// If CYW43_USES_VSYS_PIN is defined then CYW43 uses the VSYS GPIO (defined by PICO_VSYS_PIN) for other purposes.
-// If this is the case, to use the VSYS GPIO it's necessary to ensure CYW43 is not using it.
-// This can be achieved by wrapping the use of the VSYS GPIO in cyw43_thread_enter / cyw43_thread_exit.
-#ifndef CYW43_USES_VSYS_PIN
-#define CYW43_USES_VSYS_PIN 1
-#endif
-
-// The GPIO Pin used to monitor VSYS. Typically you would use this with ADC.
-// There is an example in adc/read_vsys in pico-examples.
-#ifndef PICO_VSYS_PIN
-#define PICO_VSYS_PIN 29
-#endif
 
 // cyw43 SPI pins can't be changed at runtime
 #ifndef CYW43_PIN_WL_DYNAMIC
