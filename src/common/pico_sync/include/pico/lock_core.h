@@ -203,7 +203,9 @@ extern volatile uint8_t lock_internal_notify_count;
 #if !PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND
 #define lock_internal_spin_unlock_with_notify(lock, save) spin_unlock((lock)->spin_lock, save), __sev()
 #else
-// note that spin_unlock already causes a SEV
+// note that spin_lock_blocking() already posts an event to the current core: ldaexb/strex on Arm,
+// amoor.w.aq on RISC-V, so creates + retires a reservation. (spin_unlock() doesn't as it's just a
+// release-ordered store, but the point is a lock+unlock will always cause a core-local event.)
 #define lock_internal_spin_unlock_with_notify(lock, save) ({ \
     lock_internal_notify_count++;                            \
     spin_unlock((lock)->spin_lock, save);                    \
