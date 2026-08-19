@@ -7,7 +7,12 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "pico_thread_local_test_actual",
     testonly = True,
-    srcs = ["pico_thread_local_test.c"],
+    srcs = [
+        "pico_thread_local_test.c",
+        # holds a thread local the main file only has a declaration for
+        "pico_thread_local_test_extern.c",
+        "pico_thread_local_test_extern.h",
+    ],
     tags = ["manual"],  # Built via pico_thread_local_test.
     # Doesn't appear to work on host builds yet.
     target_compatible_with = compatible_with_rp2(),

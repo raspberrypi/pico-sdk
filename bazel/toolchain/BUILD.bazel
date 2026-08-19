@@ -59,6 +59,15 @@ cc_args(
 # compiler include directories from resolving to absolute paths. Prefer to use
 # :bazel_no_absolute_paths, since it correctly guides based on the current
 # compiler type.
+# Without this, a thread local that a translation unit only has a declaration for is reached
+# through a GOT entry rather than straight off the thread pointer, and neither linker relaxes it
+# away. Matches set_flags.cmake.
+cc_args(
+    name = "tls_local_exec",
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = ["-ftls-model=local-exec"],
+)
+
 cc_args(
     name = "no_canonical_system_headers",
     actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
@@ -212,6 +221,7 @@ _HOST_CPU_CONSTRAINTS = {
         "//conditions:default": [],
     }) + [
         ":bazel_no_absolute_paths",
+        ":tls_local_exec",
     ],
     enabled_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
@@ -265,6 +275,7 @@ _HOST_CPU_CONSTRAINTS = {
     }) + [
         ":bazel_no_absolute_paths",
         ":llvm-libc_args",
+        ":tls_local_exec",
     ],
     enabled_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
