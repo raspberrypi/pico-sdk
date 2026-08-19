@@ -191,16 +191,7 @@ static const test_t tests[] = {
 };
 
 // ---------------------------------------------------------------------------
-// PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV probe
-//
-// The RP2350 lock_core wait/notify primitives (see PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND in
-// pico/lock_core.h) are built on taking and releasing a software spin lock setting the calling
-// core's own event flag, so that a following __wfe() returns immediately and a second one is
-// needed to actually wait. PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV asserts that at compile time, and
-// nothing checks it against the hardware. Worth checking, because the Arm and RISC-V software
-// implementations use different instructions -- ldaexb/strexb, which takes a reservation,
-// against amoor.w.aq, which does not -- so it does not follow that both engage whatever
-// generates the event.
+// Verify the PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV setting
 //
 // Clear the event flag, do a lock/unlock pair, then __wfe() and see whether it returned of its
 // own accord or only once core 1's backstop arrived. A control pass with the lock/unlock

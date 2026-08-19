@@ -276,12 +276,6 @@ int main() {
 // covers need the head of the ordered list cancelled along with at least one entry behind it,
 // which is why they are cancelled as a batch:
 //
-//  - the scan left prev pointing at ordered_head while the head itself was cancelled, so moving
-//    the next cancelled entry to the front unlinked the head. It then belonged to neither the
-//    ordered list nor the free list, and the pool lost an entry for good.
-//  - a cancelled entry has to keep a target in the past, or the handler stops with entries still
-//    marked and, since it does not arm for a marked head, with nothing armed at all.
-//
 // Disabling interrupts around the cancels is what makes this deterministic on one core: each
 // cancel_alarm() forces the pool IRQ, so without it the handler runs in between and there is
 // never a batch to get wrong.
