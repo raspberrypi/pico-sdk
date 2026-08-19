@@ -176,22 +176,20 @@ extern volatile uint8_t lock_internal_notify_count;
 /*! \brief   Atomically unlock the lock's spin lock, and send a notification
  *  \ingroup lock_core
  *
- * _Atomic_ here refers to the fact that it should not be possible for this notification to happen during a
- * lock_internal_spin_unlock_with_wait in a way that that wait does not see the notification (i.e. causing
- * a missed notification). In other words this method should always wake up any lock_internal_spin_unlock_with_wait
- * which started before this call completes.
+ * _Atomic_ here refers to the fact that it should not be possible for this notification to happen
+ * during a lock_internal_spin_unlock_with_wait in a way that that wait does not see the
+ * notification (i.e. causing a missed notification).
  *
- * Note that a wait has *started* as soon as it has released the spin lock, whether or not it has reached
- * whatever it blocks on. Waking too many is harmless - an implementation is free to wake waiters on other
- * lock instances too, as each rechecks its condition and re-waits if necessary - but waking too few is not:
- * a waiter which is missed has nothing left to tell it that the state it wanted has become available.
+ * Restating the above in terms of lock ordering: if lock_internal_spin_unlock_with_notify()
+ * releases a lock acquired after lock_internal_spin_unlock_with_wait() released the same lock, the
+ * waiter must be notified. Failure to notify can cause lockup. Excess notifications are harmless.
  *
- * LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL records whether the implementation in use actually
- * achieves that, and lock_internal_spin_unlock_maybe_notify() lets a primitive cope where it does not.
- * The SDK's own implementation does, because a SEV's event latch is per core and sticky, so it also
- * covers a waiter which has not yet reached its __wfe(). The FreeRTOS ports currently do not: they
- * consume a shared event-group bit, so a waiter still between its spin unlock and its block finds
- * nothing left.
+ * The macro LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL records whether the implementation
+ * upholds the above guarantee. It's set by default when the SDK's built-in implementation is used:
+ * this is plain SEV/WFE on RP2040, and slightly more complex on RP2350 due to interactions between
+ * events and exclusives. The macros injected by FreeRTOS ports currently do not uphold the
+ * guarantee: they consume a shared event-group bit, so a waiter still between its spin unlock and
+ * its block finds nothing left.
  *
  * By default this macro simply unlocks the spin lock, and then performs a SEV, but may be overridden
  * (e.g. to actually un-block RTOS task(s)).
@@ -223,7 +221,7 @@ extern volatile uint8_t lock_internal_notify_count;
  * _Atomic_ here refers to the fact that it should not be possible for a concurrent lock_internal_spin_unlock_with_notify
  * to insert itself between the spin unlock and this wait in a way that the wait does not see the notification (i.e. causing
  * a missed notification). In other words this method should always wake up in response to a lock_internal_spin_unlock_with_notify
- * for the same lock, which completes after this call starts.
+ * whose acquisition of the same lock is ordered after this method's lock release.
  *
  * In an ideal implementation, this method would return exactly after the corresponding lock_internal_spin_unlock_with_notify
  * has subsequently been called on the same lock instance or the timeout has been reached, however this method is free to return
@@ -258,33 +256,26 @@ extern volatile uint8_t lock_internal_notify_count;
 #endif
 #endif
 
-/*! \brief Whether a notify reaches every waiter, including one that has not yet parked
+/*! \brief Whether a notify reaches all earlier waiters
  *  \ingroup lock_core
  *
- * The SDK's own notify is a __sev(), whose event latch is per core and sticky: a waiter that
- * has not yet reached its __wfe() still sees it, and one waiter consuming its latch cannot
- * take another's. Nothing is lost, so a waiter which consumes state and returns need not
- * notify anybody.
+ * The SDK's built-in notify/wait implementation guarantees the following: if
+ * lock_internal_spin_unlock_with_wait() releases a lock, and that same lock is subsequently
+ * acquired and then later released by lock_internal_spin_unlock_with_notify(), the waiter is
+ * notified. **Only the lock acquisition order matters.** Even if there are multiple wait calls
+ * before the notify call, all waiters are notified. Even if the waiter has released the lock but
+ * not yet gone to sleep, once it sleeps, it must be woken.
  *
- * An RTOS override need not have that property. The FreeRTOS ports multiplex every spin lock
- * onto bits of one event group and consume the bit (xClearOnExit), so a notify is taken by
- * whoever is already parked, and a waiter arriving a moment later finds nothing - which
- * strands it if state it could have used is still available.
+ * An RTOS override may not have that property. The FreeRTOS ports multiplex every spin lock onto
+ * bits of one event group and consume the bit (xClearOnExit), so each notification is consumed by
+ * exactly one waiter.
  *
- * This is simply whether the implementation meets the contract documented on
- * lock_internal_spin_unlock_with_notify() above; the flag exists because the FreeRTOS ports
- * currently do not, and primitives which leave usable state behind have to cope.
+ * If any notify/wait primitives are overridden, conservatively mark them as *not* upholding the
+ * same guarantee. In this case we patch things up by emitting extra notifications so the first
+ * waiter can wake the next waiter, and so on -- see lock_internal_spin_unlock_maybe_notify().
  *
- * Defaults to 1 only when none of the lock_internal_* primitives are overridden, i.e. when the
- * SDK's own SEV-based implementation is in use. A port whose notify genuinely reaches every
- * waiter may define it to 1 itself - but note carefully what that asserts, because the obvious
- * reading is not the useful one. Waking every *parked* waiter is not sufficient, and an
- * implementation which does only that will set this wrongly in good faith: the FreeRTOS ports
- * wake every task on the event group and still do not qualify. What is required is that a
- * waiter which has *started* - released the spin lock, per lock_internal_spin_unlock_with_wait
- * above - is reached even if it has not yet blocked. Setting this to 1 without that property
- * silently reintroduces the loss it exists to prevent, since the primitives will then skip the
- * notify that was covering for it.
+ * You can redefine this to 1 if you are certain your implementations uphold the same contract as
+ * the SDK versions.
  */
 #ifndef LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL
 #if !(LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN)
@@ -294,23 +285,24 @@ extern volatile uint8_t lock_internal_notify_count;
 #endif
 #endif
 
-/*! \brief Release a spin lock, notifying only if other waiters may still be able to proceed
+/*! \brief Release a spin lock, notifying other waiters if the implementation does not guarantee
+ *         that an earlier notification will have reached them.
  *  \ingroup lock_core
  *
- * For use by a primitive where one waiter proceeding does not preclude another - a semaphore
- * acquirer taking one of several permits, say. An exclusive primitive does not need this: a
- * mutex waiter which acquires necessarily blocks the rest, and re-notifies them when it
- * releases. Where a notify reaches every waiter this is just a spin_unlock and
- * `others_may_proceed` is not evaluated at all; where it does not, the condition decides
- * whether the waiters this one did not exclude must be re-notified.
+ * The purpose of this primitive is: if multiple waiters are the target of a single notification,
+ * but the implementation does not guarantee that the notification reaches all waiters
+ * (so LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL = 0), *generate additional notifications* on
+ * the first waiter's lock release, to propagate the original notification to the remaining
+ * waiters.
  *
- * Bounded by construction: at most one extra notify per acquire which leaves another waiter
- * able to proceed, and never more, since a notify cannot create the state that lets them - so
- * the chain stops when that runs out. What it can amplify is *wakeups* - on an implementation whose notify wakes
- * every waiter on the lock, consuming n units with w waiters parked costs up to n broadcasts
- * of w wakes, against the single broadcast it would otherwise be. The common cases are free or
- * exact: a caller which did not have to wait never notifies, and with one waiter the notify
- * wakes precisely the task it is for.
+ * If LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL = 1 then no extra propagation is required, so
+ * it's just a regular spin_unlock().
+ *
+ * The others_may_proceed parameter controls whether a notification is generated. For example, when
+ * a semaphore has multiple outstanding permits, the first waiter consumes a permit and then passes
+ * others_may_proceed = true, which notifies the next waiter. The chain of notifications continues
+ * until others_may_proceed = false is passed: in this example, when the number of outstanding
+ * semaphore permits reaches zero.
  *
  * \param lock the lock_core
  * \param save the uint32_t value returned by the corresponding spin_lock_blocking()
