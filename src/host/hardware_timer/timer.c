@@ -89,12 +89,12 @@ static uint8_t claimed_alarms;
 
 void hardware_alarm_claim(uint alarm_num) {
     assert(!(claimed_alarms & (1u << alarm_num)));
-    claimed_alarms |= 1u <<alarm_num;
+    claimed_alarms |= 1u << alarm_num;
 }
 
 void hardware_alarm_unclaim(uint alarm_num) {
     assert(claimed_alarms & (1u << alarm_num));
-    claimed_alarms &= ~(1u <<alarm_num);
+    claimed_alarms &= ~(1u << alarm_num);
 }
 
 int hardware_alarm_claim_unused(bool required) {

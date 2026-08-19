@@ -87,7 +87,6 @@ static inline void ta_disable_irq_handler(alarm_pool_timer_t *timer, uint alarm_
     // the handler cannot be running on this core now, so the rest is safe
     timer_hw_from_timer(timer)->armed = 1u << alarm_num;
     irq_remove_handler(irq_num, irq_handler);
-    timer_hardware_alarm_unclaim(timer, alarm_num);
 }
 
 static inline void ta_hardware_alarm_claim(alarm_pool_timer_t *timer, uint hardware_alaram_num) {
@@ -96,6 +95,10 @@ static inline void ta_hardware_alarm_claim(alarm_pool_timer_t *timer, uint hardw
 
 static inline int ta_hardware_alarm_claim_unused(alarm_pool_timer_t *timer, bool required) {
     return timer_hardware_alarm_claim_unused(timer, required);
+}
+
+static inline void ta_hardware_alarm_unclaim(alarm_pool_timer_t *timer, uint hardware_alaram_num) {
+    timer_hardware_alarm_unclaim(timer_hw_from_timer(timer), hardware_alaram_num);
 }
 
 static inline alarm_pool_timer_t *ta_timer_instance(uint timer_num) {

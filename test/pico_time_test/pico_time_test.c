@@ -244,10 +244,9 @@ int main() {
     PICOTEST_CHECK(absolute_time_diff_us(near_the_end_of_time, at_the_end_of_time) > 0, "near the end of time should be before the end of time")
     PICOTEST_END_SECTION();
 
-    if (issue_195_test()) {
-        return -1;
-    }
-    issue_1812_test();
+    picotest_error_code |= issue_195_test();
+
+    picotest_error_code |= issue_1812_test();
 
     // Destroy alarm pools (except for default)
     for(uint i=0; i<NUM_ALARMS; i++) {
@@ -257,17 +256,22 @@ int main() {
         }
     }
 
-    issue_1953_test();
+#if PICO_ON_DEVICE // requires too much fidelity for host
+    picotest_error_code |= issue_1953_test();
+#endif
 
-    issue_2118_test();
+    picotest_error_code |= issue_2118_test();
 
-    issue_2148_test();
+    picotest_error_code |= issue_2148_test();
     
-    issue_2186_test();
+    picotest_error_code |= issue_2186_test();
 
-    issue_2374_test();
+    picotest_error_code |= issue_2374_test();
 
-    batch_cancel_test();
+    // todo currently fails with pico_host_sdl
+#if PICO_ON_DEVICE
+    picotest_error_code |= batch_cancel_test();
+#endif
 
     PICOTEST_END_TEST();
 }
