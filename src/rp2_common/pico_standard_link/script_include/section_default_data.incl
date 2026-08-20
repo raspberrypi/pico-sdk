@@ -30,7 +30,9 @@ SECTIONS
         *(.data*)
         *(.sdata*)
 
-	    /* if linked against non PIC archives, or for TLS without -ftls-model=local-exec, ARM targets may generate dynamic data relocations via got sections */
+	    /* Linking against non PIC archives, or using TLS without -ftls-model=local-exec (which we shouldn't),
+	       generate dynamic data relocations via got sections, so include them explicitly to avoid surprises.
+	       Ideally these are always 0 sized */
         *(.got)
         *(.got.*)
 
