@@ -315,7 +315,7 @@ static inline void check_doorbell_num_param(__unused uint doorbell_num) {
 }
 
 static inline void check_core_mask_param(__unused uint core_mask) {
-    invalid_params_if(PICO_MULTICORE, core_mask >= (1 << NUM_CORES));
+    invalid_params_if(PICO_MULTICORE, core_mask >= (1u << NUM_CORES));
 }
 
 /*! \brief Cooperatively claim the use of this hardware alarm_num
