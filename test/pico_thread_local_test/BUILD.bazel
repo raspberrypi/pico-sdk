@@ -9,7 +9,6 @@ cc_binary(
     testonly = True,
     srcs = [
         "pico_thread_local_test.c",
-        # holds a thread local the main file only has a declaration for
         "pico_thread_local_test_extern.c",
         "pico_thread_local_test_extern.h",
     ],
