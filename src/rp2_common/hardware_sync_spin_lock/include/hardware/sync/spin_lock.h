@@ -17,7 +17,16 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_IRQ, Spinlock ID for IRQ protection, min=0, max=31, default=9, group=hardware_sync
+// Two sets of IDs follow. On RP2350 with hardware spin locks, erratum RP2350-E2 makes a write to
+// any SIO register at offset +0x180 or above spuriously release the spin lock at
+// (offset - 0x180) / 4. That configuration therefore uses only the IDs whose aliased register
+// cannot be written: 5-7, 10-11 and 26-31 have no register at that offset, and 18-25 alias the
+// read-only TMDS PEEK/POP registers. The rest alias a writable one and are avoided - 0-4
+// DOORBELL_*/PERI_NONSEC, 8-9 RISCV_SOFTIRQ/MTIME_CTRL, 12-15 MTIME*, 16-17 TMDS_CTRL/WDATA.
+//
+// Every ID below therefore needs a value in both sets.
+
+// PICO_CONFIG: PICO_SPINLOCK_ID_IRQ, Spinlock ID for IRQ protection, min=0, max=31, default=9 (5 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_IRQ
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_IRQ 5
@@ -26,7 +35,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_TIMER, Spinlock ID for Timer protection, min=0, max=31, default=10, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_TIMER, Spinlock ID for Timer protection, min=0, max=31, default=10 (6 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_TIMER
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_TIMER 6
@@ -35,7 +44,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_HARDWARE_CLAIM, Spinlock ID for Hardware claim protection, min=0, max=31, default=11, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_HARDWARE_CLAIM, Spinlock ID for Hardware claim protection, min=0, max=31, default=11 (7 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_HARDWARE_CLAIM
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_HARDWARE_CLAIM 7
@@ -44,7 +53,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_RAND, Spinlock ID for Random Number Generator, min=0, max=31, default=12, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_RAND, Spinlock ID for Random Number Generator, min=0, max=31, default=12 (10 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_RAND
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_RAND 10
@@ -53,7 +62,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_ATOMIC, Spinlock ID for atomics, min=0, max=31, default=13, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_ATOMIC, Spinlock ID for atomics, min=0, max=31, default=13 (11 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_ATOMIC
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_ATOMIC 11
@@ -62,7 +71,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_OS1, First Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=14, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS1, First Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=14 (18 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_OS1
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_OS1 18
@@ -71,7 +80,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_OS2, Second Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=15, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_OS2, Second Spinlock ID reserved for use by low level OS style software, min=0, max=31, default=15 (19 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_OS2
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_OS2 19
@@ -80,7 +89,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_FIRST, Lowest Spinlock ID in the 'striped' range, min=0, max=31, default=16, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_FIRST, Lowest Spinlock ID in the 'striped' range, min=0, max=31, default=16 (20 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_STRIPED_FIRST
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_STRIPED_FIRST 20
@@ -89,7 +98,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_LAST, Highest Spinlock ID in the 'striped' range, min=0, max=31, default=23, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_STRIPED_LAST, Highest Spinlock ID in the 'striped' range, min=0, max=31, default=23 (25 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_STRIPED_LAST
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_STRIPED_LAST 25
@@ -98,7 +107,7 @@
 #endif
 #endif
 
-// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, Lowest Spinlock ID in the 'claim free' range, min=0, max=31, default=24, group=hardware_sync
+// PICO_CONFIG: PICO_SPINLOCK_ID_CLAIM_FREE_FIRST, Lowest Spinlock ID in the 'claim free' range, min=0, max=31, default=24 (26 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_CLAIM_FREE_FIRST
 #if PICO_RP2350 && !PICO_USE_SW_SPIN_LOCKS
 #define PICO_SPINLOCK_ID_CLAIM_FREE_FIRST 26
@@ -132,6 +141,7 @@ typedef SW_SPIN_LOCK_TYPE spin_lock_t;
 
 #if PICO_USE_SW_SPIN_LOCKS
 #if PICO_RP2350
+// Indicates that taking and releasing a software spin lock sets the calling core's own event flag,
 #define PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV 1
 #endif
 

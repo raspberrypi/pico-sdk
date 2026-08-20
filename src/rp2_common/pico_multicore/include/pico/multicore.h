@@ -314,10 +314,10 @@ static inline void check_doorbell_num_param(__unused uint doorbell_num) {
     invalid_params_if(PICO_MULTICORE, doorbell_num >= NUM_DOORBELLS);
 }
 
-/*! \brief Cooperatively claim the use of this hardware doorbell_num
+/*! \brief Cooperatively claim the use of this doorbell
  *  \ingroup multicore_doorbell
  *
- * This method hard asserts if the hardware doorbell is currently claimed.
+ * This method hard asserts if the doorbell is currently claimed.
  *
  * \param doorbell_num the doorbell number to claim
  * \param core_mask 0b01: core 0, 0b10: core 1, 0b11 both core 0 and core 1
@@ -325,10 +325,10 @@ static inline void check_doorbell_num_param(__unused uint doorbell_num) {
  */
 void multicore_doorbell_claim(uint doorbell_num, uint core_mask);
 
-/*! \brief Cooperatively claim an unused hardware doorbell, optionally panicing if there are none available
+/*! \brief Cooperatively claim the use of an unused doorbell
  *  \ingroup multicore_doorbell
  *
- * This method attempts to claim an unused hardware doorbell
+ * This method attempts to claim an unused doorbell
  *
  * \param core_mask 0b01: core 0, 0b10: core 1, 0b11 both core 0 and core 1
  * \param required if true the function will panic if none are available
@@ -337,7 +337,7 @@ void multicore_doorbell_claim(uint doorbell_num, uint core_mask);
  */
 int multicore_doorbell_claim_unused(uint core_mask, bool required);
 
-/*! \brief Cooperatively release the claim on use of this hardware doorbell_num
+/*! \brief Cooperatively release the claim on use of this doorbell
  *  \ingroup multicore_doorbell
  *
  * \param doorbell_num the doorbell number to unclaim
