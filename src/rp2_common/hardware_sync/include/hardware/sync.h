@@ -53,10 +53,9 @@ extern "C" {
  * 24-31       | (\ref PICO_SPINLOCK_ID_CLAIM_FREE_FIRST - \ref PICO_SPINLOCK_ID_CLAIM_FREE_LAST). These are reserved for exclusive use and are allocated on a first come first served basis at runtime via \ref spin_lock_claim_unused()
  *
  * \if rp2350_specific
- * Note these are the assignments for software spin locks. Building RP2350 with
- * PICO_USE_SW_SPIN_LOCKS=0 shifts them, to keep clear of the spin locks that erratum RP2350-E2
- * aliases - the OS pair becomes 18,19, the striped range 20-25 and the claim-free range 26-31.
- * The PICO_SPINLOCK_ID_* macros give the values in use either way.
+ * On RP2350, when PICO_USE_SW_SPIN_LOCKS=0, the default lock numbering is altered to avoid locks
+ * affected by erratum RP2350-E2. The OS pair becomes 18-19, the striped range 20-25, and the
+ * claimable range 26-31. The PICO_SPINLOCK_ID_* macros reflect the actual numbering.
  * \endif
  */
 

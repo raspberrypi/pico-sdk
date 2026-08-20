@@ -17,14 +17,17 @@
 #endif
 #endif
 
-// Two sets of IDs follow. On RP2350 with hardware spin locks, erratum RP2350-E2 makes a write to
-// any SIO register at offset +0x180 or above spuriously release the spin lock at
-// (offset - 0x180) / 4. That configuration therefore uses only the IDs whose aliased register
-// cannot be written: 5-7, 10-11 and 26-31 have no register at that offset, and 18-25 alias the
-// read-only TMDS PEEK/POP registers. The rest alias a writable one and are avoided - 0-4
+// Default spinlock assignments
+//
+// On RP2350, writes to SIO register offsets +0x180..0x1fc spuriously release the spinlock addressed
+// 0x80 bytes lower (erratum RP2350-E2). By default we use software spinlocks to work around this.
+// Otherwise (PICO_USE_SW_SPIN_LOCKS=0) we change the default numbering to avoid locks which alias
+// with writable registers: 5-7, 10-11 and 26-31 have no register at that offset, and 18-25 alias
+// the read-only TMDS PEEK/POP registers. The rest alias a writable register: 0-4
 // DOORBELL_*/PERI_NONSEC, 8-9 RISCV_SOFTIRQ/MTIME_CTRL, 12-15 MTIME*, 16-17 TMDS_CTRL/WDATA.
 //
-// Every ID below therefore needs a value in both sets.
+// On RP2040 we preserve the original default lock numbers existing since SDK v1.0, since they are a
+// compatibility detail that out-of-tree code might rely on.
 
 // PICO_CONFIG: PICO_SPINLOCK_ID_IRQ, Spinlock ID for IRQ protection, min=0, max=31, default=9 (5 on RP2350 when PICO_USE_SW_SPIN_LOCKS is 0), group=hardware_sync
 #ifndef PICO_SPINLOCK_ID_IRQ
