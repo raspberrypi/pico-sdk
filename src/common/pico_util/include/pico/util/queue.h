@@ -207,6 +207,8 @@ bool queue_try_peek(queue_t *q, void *data);
  * \param data Pointer to value to be copied into the queue
  *
  * If the queue is full this function will block, until a removal happens on the queue
+ *
+ * \note Because this method can block, prefer \ref queue_try_add in an IRQ context
  */
 void queue_add_blocking(queue_t *q, const void *data);
 
@@ -217,6 +219,8 @@ void queue_add_blocking(queue_t *q, const void *data);
  * \param data Pointer to the location to receive the removed value, or NULL if the data isn't required
  *
  * If the queue is empty this function will block until a value is added.
+ *
+ * \note Because this method can block, prefer \ref queue_try_remove in an IRQ context
  */
 void queue_remove_blocking(queue_t *q, void *data);
 
@@ -227,6 +231,8 @@ void queue_remove_blocking(queue_t *q, void *data);
  * \param data Pointer to the location to receive the peeked value, or NULL if the data isn't required
  *
  * If the queue is empty function will block until a value is added
+ *
+ * \note Because this method can block, prefer \ref queue_try_peek in an IRQ context
  */
 void queue_peek_blocking(queue_t *q, void *data);
 

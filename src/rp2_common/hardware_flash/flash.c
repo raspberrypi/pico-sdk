@@ -28,9 +28,11 @@
 
 //-----------------------------------------------------------------------------
 // Infrastructure for reentering XIP mode after exiting for programming (take
-// a copy of boot2 before XIP exit). Calling boot2 as a function works because
-// it accepts a return vector in LR (and doesn't trash r4-r7). Bootrom passes
-// NULL in LR, instructing boot2 to enter flash vector table's reset handler.
+// a copy of boot2 before XIP exit). boot2 may be called as a function
+// and preserves registers according to the regular C calling convention
+//
+// On RP2040, if LR is NULL on entry, boot2 enters the flash binary via the
+// vector table at 0x10000100 instead of returning
 
 #if !PICO_NO_FLASH
 
@@ -57,6 +59,7 @@ static void __no_inline_not_in_flash_func(flash_init_boot2_copyout)(void) {
 
 
 static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
+    // +1 is the Thumb bit; harmless on RISC-V, where JALR clears bit 0 of the target
     ((void (*)(void))((intptr_t)boot2_copyout+1))();
 }
 
