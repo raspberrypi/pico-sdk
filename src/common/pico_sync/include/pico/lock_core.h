@@ -115,7 +115,9 @@ void lock_init(lock_core_t *core, uint lock_num);
 #define lock_is_owner_id_valid(id) ((id) != LOCK_INVALID_OWNER_ID)
 #endif
 
-#ifndef lock_internal_spin_unlock_with_wait
+#ifdef lock_internal_spin_unlock_with_wait
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN 1
+#else
 /*! \brief   Atomically unlock the lock's spin lock, and wait for a notification.
  *  \ingroup lock_core
  *
@@ -140,27 +142,54 @@ void lock_init(lock_core_t *core, uint lock_num);
 #define lock_internal_spin_unlock_with_wait(lock, save) spin_unlock((lock)->spin_lock, save), __wfe()
 #else
 extern volatile uint8_t lock_internal_notify_count;
-#define lock_internal_spin_unlock_with_wait(lock, save) ({    \
-    uint8_t _notify_count = lock_internal_notify_count;       \
-    spin_unlock((lock)->spin_lock, save);                     \
-    if (_notify_count == lock_internal_notify_count) __wfe(); \
-    __wfe();                                                  \
+// Note the ordering here matters. The event register is a single bit, with multiple sources: our
+// own spin_unlock, an SEV from a notifier, an SEV from some other unrelated code, or (on Arm) an
+// exception entry + return on this core. We must drain the event left by the spin_unlock *before*
+// deciding whether we still need to wait for a second event from a notifier.
+//
+// The first (draining) __wfe() is inside the lock's IRQ critical section. Return-from-interrupt
+// generates an event on Armv8-M, but not on Hazard3 v1.0, so IRQs can swallow events on RISC-V.
+// This first __wfe() always completes promptly, because spin_unlock_unsafe() generates an event.
+//
+// With the drain first, a notify occurring after _notify_count is sampled either: (a) bumps the
+// count before we test it, so we skip the second __wfe(), or (b) happens after the test, in which
+// case its SEV sets the event register and the second __wfe() returns immediately.
+//
+// (Also note: the increment cannot happen between the _notify_count and the spin_unlock_unsafe()
+// because the increment must hold the lock *we are initially holding*.)
+//
+// See comment on `lock_internal_notify_count` declaration in lock_core.c for background details
+// on interactions between events and exclusives on RP2350.
+#define lock_internal_spin_unlock_with_wait(lock, save) ({         \
+    uint8_t _notify_count = lock_internal_notify_count;            \
+    spin_unlock_unsafe((lock)->spin_lock);                         \
+    __wfe(); /* consume event from unlock, without interruption */ \
+    restore_interrupts_from_disabled(save);                        \
+    if (_notify_count == lock_internal_notify_count) __wfe();      \
     })
 #endif
 #endif
 
-#ifndef lock_internal_spin_unlock_with_notify
+#ifdef lock_internal_spin_unlock_with_notify
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN 1
+#else
 /*! \brief   Atomically unlock the lock's spin lock, and send a notification
  *  \ingroup lock_core
  *
- * _Atomic_ here refers to the fact that it should not be possible for this notification to happen during a
- * lock_internal_spin_unlock_with_wait in a way that that wait does not see the notification (i.e. causing
- * a missed notification). In other words this method should always wake up any lock_internal_spin_unlock_with_wait
- * which started before this call completes.
+ * _Atomic_ here refers to the fact that it should not be possible for this notification to happen
+ * during a lock_internal_spin_unlock_with_wait in a way that that wait does not see the
+ * notification (i.e. causing a missed notification).
  *
- * In an ideal implementation, this method would wake up only the corresponding lock_internal_spin_unlock_with_wait
- * that has been called on the same lock instance, however it is free to wake up any of them, as they will check
- * their condition and then re-wait if necessary/
+ * Restating the above in terms of lock ordering: if lock_internal_spin_unlock_with_notify()
+ * releases a lock acquired after lock_internal_spin_unlock_with_wait() released the same lock, the
+ * waiter must be notified. Failure to notify can cause lockup. Excess notifications are harmless.
+ *
+ * The macro LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL records whether the implementation
+ * upholds the above guarantee. It's set by default when the SDK's built-in implementation is used:
+ * this is plain SEV/WFE on RP2040, and slightly more complex on RP2350 due to interactions between
+ * events and exclusives. The macros injected by FreeRTOS ports currently do not uphold the
+ * guarantee: they consume a shared event-group bit, so a waiter still between its spin unlock and
+ * its block finds nothing left.
  *
  * By default this macro simply unlocks the spin lock, and then performs a SEV, but may be overridden
  * (e.g. to actually un-block RTOS task(s)).
@@ -172,7 +201,9 @@ extern volatile uint8_t lock_internal_notify_count;
 #if !PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND
 #define lock_internal_spin_unlock_with_notify(lock, save) spin_unlock((lock)->spin_lock, save), __sev()
 #else
-// note that spin_unlock already causes a SEV
+// note that spin_lock_blocking() already posts an event to the current core: ldaexb/strex on Arm,
+// amoor.w.aq on RISC-V, so creates + retires a reservation. (spin_unlock() doesn't as it's just a
+// release-ordered store, but the point is a lock+unlock will always cause a core-local event.)
 #define lock_internal_spin_unlock_with_notify(lock, save) ({ \
     lock_internal_notify_count++;                            \
     spin_unlock((lock)->spin_lock, save);                    \
@@ -181,14 +212,16 @@ extern volatile uint8_t lock_internal_notify_count;
 #endif
 #endif
 
-#ifndef lock_internal_spin_unlock_with_best_effort_wait_or_timeout
+#ifdef lock_internal_spin_unlock_with_best_effort_wait_or_timeout
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN 1
+#else
 /*! \brief   Atomically unlock the lock's spin lock, and wait for a notification or a timeout
  *  \ingroup lock_core
  *
  * _Atomic_ here refers to the fact that it should not be possible for a concurrent lock_internal_spin_unlock_with_notify
  * to insert itself between the spin unlock and this wait in a way that the wait does not see the notification (i.e. causing
  * a missed notification). In other words this method should always wake up in response to a lock_internal_spin_unlock_with_notify
- * for the same lock, which completes after this call starts.
+ * whose acquisition of the same lock is ordered after this method's lock release.
  *
  * In an ideal implementation, this method would return exactly after the corresponding lock_internal_spin_unlock_with_notify
  * has subsequently been called on the same lock instance or the timeout has been reached, however this method is free to return
@@ -210,13 +243,82 @@ extern volatile uint8_t lock_internal_notify_count;
     best_effort_wfe_or_timeout(until);                                                   \
 })
 #else
+// see the comment on lock_internal_spin_unlock_with_wait above for why the event left by the
+// spin_unlock must be drained before the notify count is tested
 #define lock_internal_spin_unlock_with_best_effort_wait_or_timeout(lock, save, until) ({ \
     uint8_t _notify_count = lock_internal_notify_count;                                  \
-    spin_unlock((lock)->spin_lock, save);                                                \
-    if (_notify_count == lock_internal_notify_count) __wfe();                            \
-    best_effort_wfe_or_timeout(until);                                                   \
+    spin_unlock_unsafe((lock)->spin_lock);                                               \
+    __wfe(); /* consume event from spin_unlock_unsafe() without interruption */          \
+    restore_interrupts_from_disabled(save);                                              \
+    _notify_count == lock_internal_notify_count ? best_effort_wfe_or_timeout(until)      \
+                                                : time_reached(until);                   \
 })
 #endif
+#endif
+
+/*! \brief Whether a notify reaches all earlier waiters
+ *  \ingroup lock_core
+ *
+ * The SDK's built-in notify/wait implementation guarantees the following: if
+ * lock_internal_spin_unlock_with_wait() releases a lock, and that same lock is subsequently
+ * acquired and then later released by lock_internal_spin_unlock_with_notify(), the waiter is
+ * notified. **Only the lock acquisition order matters.** Even if there are multiple wait calls
+ * before the notify call, all waiters are notified. Even if the waiter has released the lock but
+ * not yet gone to sleep, once it sleeps, it must be woken.
+ *
+ * An RTOS override may not have that property. The FreeRTOS ports multiplex every spin lock onto
+ * bits of one event group and consume the bit (xClearOnExit), so each notification is consumed by
+ * exactly one waiter.
+ *
+ * If any notify/wait primitives are overridden, conservatively mark them as *not* upholding the
+ * same guarantee. In this case we patch things up by emitting extra notifications so the first
+ * waiter can wake the next waiter, and so on -- see lock_internal_spin_unlock_maybe_notify().
+ *
+ * You can redefine this to 1 if you are certain your implementations uphold the same contract as
+ * the SDK versions.
+ */
+#ifndef LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL
+#if !(LOCK_INTERNAL_SPIN_UNLOCK_WITH_WAIT_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_OVERRIDDEN | LOCK_INTERNAL_SPIN_UNLOCK_WITH_BEST_EFFORT_WAIT_OR_TIMEOUT_OVERRIDDEN)
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL 1
+#else
+#define LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL 0
+#endif
+#endif
+
+/*! \brief Release a spin lock, notifying other waiters if the implementation does not guarantee
+ *         that an earlier notification will have reached them.
+ *  \ingroup lock_core
+ *
+ * The purpose of this primitive is: if multiple waiters are the target of a single notification,
+ * but the implementation does not guarantee that the notification reaches all waiters
+ * (so LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL = 0), *generate additional notifications* on
+ * the first waiter's lock release, to propagate the original notification to the remaining
+ * waiters.
+ *
+ * If LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL = 1 then no extra propagation is required, so
+ * it's just a regular spin_unlock().
+ *
+ * The others_may_proceed parameter controls whether a notification is generated. For example, when
+ * a semaphore has multiple outstanding permits, the first waiter consumes a permit and then passes
+ * others_may_proceed = true, which notifies the next waiter. The chain of notifications continues
+ * until others_may_proceed = false is passed: in this example, when the number of outstanding
+ * semaphore permits reaches zero.
+ *
+ * \param lock the lock_core
+ * \param save the uint32_t value returned by the corresponding spin_lock_blocking()
+ * \param others_may_proceed true if another waiter could still proceed - i.e. this caller has
+ *                            not excluded them
+ */
+#if LOCK_INTERNAL_SPIN_UNLOCK_WITH_NOTIFY_WAKES_ALL
+#define lock_internal_spin_unlock_maybe_notify(lock, save, others_may_proceed) spin_unlock((lock)->spin_lock, save)
+#else
+#define lock_internal_spin_unlock_maybe_notify(lock, save, others_may_proceed) ({ \
+    if (others_may_proceed) {                                                     \
+        lock_internal_spin_unlock_with_notify(lock, save);                        \
+    } else {                                                                      \
+        spin_unlock((lock)->spin_lock, save);                                     \
+    }                                                                             \
+})
 #endif
 
 #ifndef sync_internal_yield_until_before

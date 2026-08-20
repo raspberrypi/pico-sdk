@@ -619,6 +619,8 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
 
     low_power_wake_from_dormant();
 
+    aon_timer_disable_alarm();
+
 #if PICO_RP2350
     if (dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC)
         powman_timer_set_1khz_tick_source_xosc();
@@ -794,6 +796,9 @@ void __weak runtime_init_low_power_reboot_check(void) {
                 }
             }
         }
+
+        // disable whatever woke us up
+        powman_disable_all_wakeups();
 
         // execute the resume function, if present
         if (powman_hw->scratch[7]) {
