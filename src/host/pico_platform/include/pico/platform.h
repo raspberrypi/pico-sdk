@@ -46,6 +46,7 @@ extern "C" {
 
 //int running_on_fpga() { return false; }
 extern void tight_loop_contents();
+static inline void blocked_waiter_wakeup() {}
 
 #ifndef __STRING
 #define __STRING(x) #x

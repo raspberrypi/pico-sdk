@@ -16,6 +16,7 @@ function(add_interop_variant NAME)
     # with our own mutexes so that no case depends on the value of PICO_STDOUT_MUTEX.
     target_compile_definitions(${NAME} PRIVATE
             PICO_STDOUT_MUTEX=0
+            PICO_PLATFORM_TEST_HEADER=interop_test_hook.h
             ${ARGN}
             )
     # D1.7/D2.5 do a blocking lock_core wait from ISR context. That is legal bare (and so

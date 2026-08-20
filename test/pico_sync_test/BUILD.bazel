@@ -1,15 +1,14 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:transition.bzl", "extra_copts_for_all_deps")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "pico_sync_test",
+    name = "pico_sync_test_actual",
     testonly = True,
     srcs = ["pico_sync_test.c"],
-    defines = [
-        "PICO_USE_SW_SPIN_LOCKS=0",
-    ],
+    tags = ["manual"],  # Built via pico_sync_test / pico_sync_test_sw.
     target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/common/pico_sync",
@@ -21,20 +20,18 @@ cc_binary(
     }),
 )
 
-cc_binary(
+extra_copts_for_all_deps(
+    name = "pico_sync_test",
+    testonly = True,
+    src = ":pico_sync_test_actual",
+    extra_copts = ["-DPICO_USE_SW_SPIN_LOCKS=0"],
+    target_compatible_with = compatible_with_rp2(),
+)
+
+extra_copts_for_all_deps(
     name = "pico_sync_test_sw",
     testonly = True,
-    srcs = ["pico_sync_test.c"],
-    defines = [
-        "PICO_USE_SW_SPIN_LOCKS=1",
-    ],
+    src = ":pico_sync_test_actual",
+    extra_copts = ["-DPICO_USE_SW_SPIN_LOCKS=1"],
     target_compatible_with = ["//bazel/constraint:rp2350"],
-    deps = [
-        "//src/common/pico_sync",
-        "//src/rp2_common/pico_multicore",
-        "//test/pico_test",
-    ] + select({
-        "//bazel/constraint:host": ["//src/host/pico_stdlib"],
-        "//conditions:default": ["//src/rp2_common/pico_stdlib"],
-    }),
 )

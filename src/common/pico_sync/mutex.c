@@ -66,7 +66,6 @@ void __time_critical_func(mutex_enter_blocking)(mutex_t *mtx) {
         return;
     }
 #endif
-    // note: if you change the implementation here, please update the similar code in pico_sync_test.c
     lock_owner_id_t caller = lock_get_caller_owner_id();
     do {
         uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
@@ -76,6 +75,7 @@ void __time_critical_func(mutex_enter_blocking)(mutex_t *mtx) {
             break;
         }
         lock_internal_spin_unlock_with_wait(&mtx->core, save);
+        blocked_waiter_wakeup();
     } while (true);
 }
 
@@ -92,6 +92,7 @@ void __time_critical_func(recursive_mutex_enter_blocking)(recursive_mutex_t *mtx
         } else {
             lock_internal_spin_unlock_with_wait(&mtx->core, save);
         }
+        blocked_waiter_wakeup();
     } while (true);
 }
 
@@ -164,7 +165,6 @@ bool __time_critical_func(mutex_enter_block_until)(mutex_t *mtx, absolute_time_t
         return recursive_mutex_enter_block_until(mtx, until);
     }
 #endif
-    // note: if you change the implementation here, please update the similar code in pico_sync_test.c
     assert(mtx->core.spin_lock);
     lock_owner_id_t caller = lock_get_caller_owner_id();
     do {
@@ -175,17 +175,17 @@ bool __time_critical_func(mutex_enter_block_until)(mutex_t *mtx, absolute_time_t
             return true;
         } else {
             if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&mtx->core, save, until)) {
-                // timed out
+                blocked_waiter_wakeup();
                 return false;
             }
             // not timed out; spin lock already unlocked, so loop again
         }
+        blocked_waiter_wakeup();
     } while (true);
 }
 
 bool __time_critical_func(recursive_mutex_enter_block_until)(recursive_mutex_t *mtx, absolute_time_t until) {
     assert(mtx->core.spin_lock);
-    // note: if you change the implementation here, please update the similar code in pico_sync_test.c
     lock_owner_id_t caller = lock_get_caller_owner_id();
     do {
         uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
@@ -197,11 +197,12 @@ bool __time_critical_func(recursive_mutex_enter_block_until)(recursive_mutex_t *
             return true;
         } else {
             if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&mtx->core, save, until)) {
-                // timed out
+                blocked_waiter_wakeup();
                 return false;
             }
             // not timed out; spin lock already unlocked, so loop again
         }
+        blocked_waiter_wakeup();
     } while (true);
 }
 
