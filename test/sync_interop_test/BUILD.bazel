@@ -1,26 +1,23 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:transition.bzl", "extra_copts_for_all_deps")
 
 package(default_visibility = ["//visibility:public"])
 
 # Only the baseline (no RTOS) variants are built here. The FreeRTOS variants need a kernel
 # that the Bazel build does not provide, and are CMake-only - see CMakeLists.txt.
 cc_binary(
-    name = "sync_interop_test",
+    name = "sync_interop_test_actual",
     testonly = True,
     srcs = [
         "interop_harness.c",
         "interop_harness.h",
         "interop_platform.c",
         "interop_platform.h",
+        "interop_test_hook.h",
         "sync_interop_test.c",
     ],
-    defines = [
-        "PICO_USE_SW_SPIN_LOCKS=0",
-        # printf is instrumentation here, not the subject: the two disciplines are modelled
-        # with the suite's own mutexes so no case depends on PICO_STDOUT_MUTEX.
-        "PICO_STDOUT_MUTEX=0",
-    ],
+    tags = ["manual"],  # Built via sync_interop_test / sync_interop_test_sw.
     target_compatible_with = compatible_with_rp2(),
     deps = [
         "//src/common/pico_sync",
@@ -31,29 +28,28 @@ cc_binary(
     ],
 )
 
-cc_binary(
+extra_copts_for_all_deps(
+    name = "sync_interop_test",
+    testonly = True,
+    src = ":sync_interop_test_actual",
+    extra_copts = [
+        "-DPICO_USE_SW_SPIN_LOCKS=0",
+        # printf is instrumentation here, not the subject: the two disciplines are modelled
+        # with the suite's own mutexes so no case depends on PICO_STDOUT_MUTEX.
+        "-DPICO_STDOUT_MUTEX=0",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+)
+
+extra_copts_for_all_deps(
     name = "sync_interop_test_sw",
     testonly = True,
-    srcs = [
-        "interop_harness.c",
-        "interop_harness.h",
-        "interop_platform.c",
-        "interop_platform.h",
-        "sync_interop_test.c",
+    src = ":sync_interop_test_actual",
+    extra_copts = [
+        "-DPICO_USE_SW_SPIN_LOCKS=1",
+        "-DPICO_STDOUT_MUTEX=0",
     ],
-    defines = [
-        "PICO_USE_SW_SPIN_LOCKS=1",
-        "PICO_STDOUT_MUTEX=0",
-    ],
-    # software spin locks need Armv8-M or RISC-V atomics, so there is no RP2040 variant
     target_compatible_with = ["//bazel/constraint:rp2350"],
-    deps = [
-        "//src/common/pico_sync",
-        "//src/common/pico_time",
-        "//src/rp2_common/hardware_clocks",
-        "//src/rp2_common/pico_multicore",
-        "//src/rp2_common/pico_stdlib",
-    ],
 )
 
 # Used only by the CMake FreeRTOS variants; listed so the file is accounted for.

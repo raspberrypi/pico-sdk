@@ -86,12 +86,13 @@ void plat_delay_ms(uint32_t ms);
  */
 void plat_hold_for_ms(uint32_t ms);
 
-/* ---- counted copies of the SDK primitives ------------------------------------------
- * Faithful copies of mutex_enter_blocking() / mutex_enter_block_until() with the wait
- * iterations counted. Counting is the only reliable way to tell sleeping from spinning:
- * a timeout that fires exactly on time looks the same either way. Available locally as
- * well as via the agent, so the driving core's waits can be judged too.
- * NOTE: keep in step with src/common/pico_sync/mutex.c.
+/* ---- counted calls of the SDK primitives -------------------------------------------
+ * mutex_enter_blocking() / mutex_enter_block_until() with the wait iterations counted, via
+ * the blocked_waiter_wakeup hook those primitives call. Counting is the only reliable way to tell
+ * sleeping from spinning: a timeout that fires exactly on time looks the same either way.
+ * Available locally as well as via the agent, so the driving core's waits can be judged too.
+ * Not reentrant, and it counts every contended wait in the program, so nothing else may wait
+ * while one of these is in progress.
  */
 uint32_t counted_mutex_enter_blocking(mutex_t *mtx);
 uint32_t counted_mutex_enter_block_until(mutex_t *mtx, absolute_time_t until, bool *acquired);

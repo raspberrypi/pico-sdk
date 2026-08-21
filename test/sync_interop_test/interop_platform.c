@@ -35,28 +35,31 @@ semaphore_t       test_sem;
  * distinguish the two. A wait that really blocks takes 1-5 iterations; a busy-poll runs to
  * thousands.
  *
- * NOTE: keep these in step with mutex.c, as pico_sync_test.c already has to.
  */
 static uint32_t inline_wait_sleep_delta;
 uint32_t last_inline_wait_sleep_delta(void) { return inline_wait_sleep_delta; }
 
-uint32_t counted_mutex_enter_blocking(mutex_t *mtx) {
-    uint32_t waits = 0;
+static uint32_t interop_wakeups[NUM_CORES];
+static uint32_t interop_sleep_mark[NUM_CORES];
+
+void interop_wait_wakeup(__unused bool timed_out) {
+    uint core = get_core_num();
+    uint32_t sc = harness_sleep_counter();
+    inline_wait_sleep_delta += harness_sleep_delta(interop_sleep_mark[core], sc);
+    interop_sleep_mark[core] = sc;
+    interop_wakeups[core]++;
+}
+
+static void interop_count_reset(void) {
     inline_wait_sleep_delta = 0;
-    lock_owner_id_t caller = lock_get_caller_owner_id();
-    do {
-        uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
-        if (!lock_is_owner_id_valid(mtx->owner)) {
-            mtx->owner = caller;
-            spin_unlock(mtx->core.spin_lock, save);
-            break;
-        }
-        waits++;
-        uint32_t sc0 = harness_sleep_counter();
-        lock_internal_spin_unlock_with_wait(&mtx->core, save);
-        inline_wait_sleep_delta += harness_sleep_delta(sc0, harness_sleep_counter());
-    } while (true);
-    return waits;
+    interop_sleep_mark[get_core_num()] = harness_sleep_counter();
+    interop_wakeups[get_core_num()] = 0;
+}
+
+uint32_t counted_mutex_enter_blocking(mutex_t *mtx) {
+    interop_count_reset();
+    mutex_enter_blocking(mtx);
+    return interop_wakeups[get_core_num()];
 }
 
 uint32_t bare_mutex_enter_blocking(mutex_t *mtx) {
@@ -71,7 +74,7 @@ uint32_t bare_mutex_enter_blocking(mutex_t *mtx) {
             break;
         }
         waits++;
-        /* deliberately NOT lock_internal_spin_unlock_with_wait() */
+        /* deliberately NOT lock_internal_spin_unlock_with_wait(), so this one stays a copy */
         uint32_t sc0 = harness_sleep_counter();
         spin_unlock(mtx->core.spin_lock, save);
         __wfe();
@@ -82,22 +85,9 @@ uint32_t bare_mutex_enter_blocking(mutex_t *mtx) {
 
 uint32_t counted_mutex_enter_block_until(mutex_t *mtx, absolute_time_t until,
                                                 bool *acquired) {
-    uint32_t waits = 0;
-    lock_owner_id_t caller = lock_get_caller_owner_id();
-    *acquired = false;
-    do {
-        uint32_t save = spin_lock_blocking(mtx->core.spin_lock);
-        if (!lock_is_owner_id_valid(mtx->owner)) {
-            mtx->owner = caller;
-            spin_unlock(mtx->core.spin_lock, save);
-            *acquired = true;
-            return waits;
-        }
-        waits++;
-        if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&mtx->core, save, until)) {
-            return waits;   /* timed out */
-        }
-    } while (true);
+    interop_count_reset();
+    *acquired = mutex_enter_block_until(mtx, until);
+    return interop_wakeups[get_core_num()];
 }
 
 #if INTEROP_HAS_SDK_CORE
