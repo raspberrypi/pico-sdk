@@ -13,29 +13,35 @@
 #include "pico/sem.h"
 
 #include <picotls.h>
+#include "pico_thread_local_test_extern.h"
 #define COUNT 10000
 
 #define COUNTER_INIT_VALUE 7
 volatile __thread int counter = COUNTER_INIT_VALUE;
 __thread int zero;
 int core1_count;
+int core1_extern;
 
 semaphore_t sem;
 
 int do_count(int delta) {
     for (int i=0;i<COUNT;i++) {
         counter += delta;
+        // the same thing again, but on a thread local this TU only has a declaration for
+        extern_bump(delta);
     }
     return counter;
 }
 
 void core1_entry() {
     core1_count = do_count(2);
+    core1_extern = extern_counter;
     sem_release(&sem);
 }
 
 void core1_entry2() {
     core1_count = counter * 2;
+    core1_extern = extern_counter;
     sem_release(&sem);
 }
 
@@ -71,12 +77,20 @@ bool run_test(void) {
     if (core0_count != COUNT + COUNTER_INIT_VALUE || core1_count != COUNT*2 + COUNTER_INIT_VALUE) {
         return false;
     }
+    printf("Core 0 extern TU: %d (expected %d)\n", extern_counter, COUNT + EXTERN_COUNTER_INIT_VALUE);
+    printf("Core 1 extern TU: %d (expected %d)\n", core1_extern, COUNT*2 + EXTERN_COUNTER_INIT_VALUE);
+    if (extern_counter != COUNT + EXTERN_COUNTER_INIT_VALUE ||
+        core1_extern != COUNT*2 + EXTERN_COUNTER_INIT_VALUE) {
+        return false;
+    }
     multicore_reset_core1();
     multicore_launch_core1(core1_entry2);
     sem_acquire_blocking(&sem);
     printf("Core 0: %d (expected %d)\n", counter, COUNT + COUNTER_INIT_VALUE);
     printf("Restart core1 1: %d (expected %d)\n", core1_count, COUNTER_INIT_VALUE * 2);
-    if (core0_count != COUNT + COUNTER_INIT_VALUE || core1_count != COUNTER_INIT_VALUE * 2) {
+    printf("Restart core1 extern TU: %d (expected %d)\n", core1_extern, EXTERN_COUNTER_INIT_VALUE);
+    if (core0_count != COUNT + COUNTER_INIT_VALUE || core1_count != COUNTER_INIT_VALUE * 2 ||
+        core1_extern != EXTERN_COUNTER_INIT_VALUE) {
         return false;
     }
 #elif PICO_THREAD_LOCAL_MODE_GLOBAL

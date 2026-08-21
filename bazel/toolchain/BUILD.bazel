@@ -55,6 +55,13 @@ cc_args(
     }),
 )
 
+# :tls_local_exec configure local-exec tls model during compilation, so it doesn't use GOT indirection
+cc_args(
+    name = "tls_local_exec",
+    actions = ["@rules_cc//cc/toolchains/actions:compile_actions"],
+    args = ["-ftls-model=local-exec"],
+)
+
 # :no_canonical_system_headers and :no_canonical_prefixes both prevent built-in
 # compiler include directories from resolving to absolute paths. Prefer to use
 # :bazel_no_absolute_paths, since it correctly guides based on the current
@@ -212,6 +219,7 @@ _HOST_CPU_CONSTRAINTS = {
         "//conditions:default": [],
     }) + [
         ":bazel_no_absolute_paths",
+        ":tls_local_exec",
     ],
     enabled_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
@@ -265,6 +273,7 @@ _HOST_CPU_CONSTRAINTS = {
     }) + [
         ":bazel_no_absolute_paths",
         ":llvm-libc_args",
+        ":tls_local_exec",
     ],
     enabled_features = [
         "@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features",
