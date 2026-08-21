@@ -14,6 +14,7 @@ cc_binary(
         "interop_harness.h",
         "interop_platform.c",
         "interop_platform.h",
+        "interop_test_hook.h",
         "sync_interop_test.c",
     ],
     tags = ["manual"],  # Built via sync_interop_test / sync_interop_test_sw.

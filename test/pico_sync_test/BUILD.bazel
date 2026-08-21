@@ -7,7 +7,10 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "pico_sync_test_actual",
     testonly = True,
-    srcs = ["pico_sync_test.c"],
+    srcs = [
+        "pico_sync_test.c",
+        "pico_sync_test_hook.h",
+    ],
     tags = ["manual"],  # Built via pico_sync_test / pico_sync_test_sw.
     target_compatible_with = compatible_with_rp2(),
     deps = [
