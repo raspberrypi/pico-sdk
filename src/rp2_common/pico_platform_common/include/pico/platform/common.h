@@ -88,7 +88,7 @@ static __force_inline void tight_loop_contents(void) {}
  * polling. This is mostly intended to be overridden for debugging or test cases
  */
 #ifndef blocked_waiter_wakeup
-static __force_inline void blocked_waiter_wakeup(void) {}
+static __force_inline void blocked_waiter_wakeup(__unused bool timed_out) {}
 #endif
 
 #define host_safe_hw_ptr(x) ((uintptr_t)(x))

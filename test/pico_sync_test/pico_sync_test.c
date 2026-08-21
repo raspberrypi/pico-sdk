@@ -21,7 +21,7 @@ PICOTEST_MODULE_NAME("SYNC", "sync test");
 // Counts wakeups from the wait loops inside pico_sync and pico_time, via the blocked_waiter_wakeup hook
 volatile int wakeups[NUM_CORES];
 
-void pico_sync_test_wakeup(void) {
+void pico_sync_test_wakeup(__unused bool timed_out) {
     wakeups[get_core_num()]++;
 }
 

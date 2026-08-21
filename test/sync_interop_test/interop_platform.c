@@ -42,7 +42,7 @@ uint32_t last_inline_wait_sleep_delta(void) { return inline_wait_sleep_delta; }
 static uint32_t interop_wakeups[NUM_CORES];
 static uint32_t interop_sleep_mark[NUM_CORES];
 
-void interop_wait_wakeup(void) {
+void interop_wait_wakeup(__unused bool timed_out) {
     uint core = get_core_num();
     uint32_t sc = harness_sleep_counter();
     inline_wait_sleep_delta += harness_sleep_delta(interop_sleep_mark[core], sc);

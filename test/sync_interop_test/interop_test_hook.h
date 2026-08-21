@@ -11,7 +11,7 @@
 #define _INTEROP_TEST_HOOK_H
 
 #ifndef __ASSEMBLER__
-extern void interop_wait_wakeup(void);
+extern void interop_wait_wakeup(bool);
 #endif
 
 #define blocked_waiter_wakeup interop_wait_wakeup

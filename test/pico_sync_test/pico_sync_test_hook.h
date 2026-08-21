@@ -11,7 +11,7 @@
 #define _PICO_SYNC_TEST_HOOK_H
 
 #ifndef __ASSEMBLER__
-extern void pico_sync_test_wakeup(void);
+extern void pico_sync_test_wakeup(bool);
 #endif
 
 #define blocked_waiter_wakeup pico_sync_test_wakeup

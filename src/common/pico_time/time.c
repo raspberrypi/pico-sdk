@@ -484,7 +484,7 @@ void sleep_until(absolute_time_t t) {
                 // sleep_until_callback() which also does a __sev() - the irq itself will wake us up if on the same core
                 __wfe();
 #endif
-                blocked_waiter_wakeup();
+                blocked_waiter_wakeup(false);
             }
         }
     }

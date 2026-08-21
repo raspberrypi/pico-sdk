@@ -37,7 +37,7 @@ void __time_critical_func(sem_acquire_blocking)(semaphore_t *sem) {
         }
         lock_internal_spin_unlock_with_wait(&sem->core, save);
         waited = true;
-        blocked_waiter_wakeup();
+        blocked_waiter_wakeup(false);
     } while (true);
 }
 
@@ -59,11 +59,11 @@ bool __time_critical_func(sem_acquire_block_until)(semaphore_t *sem, absolute_ti
             return true;
         }
         if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&sem->core, save, until)) {
-            blocked_waiter_wakeup();
+            blocked_waiter_wakeup(true);
             return false;
         }
         waited = true;
-        blocked_waiter_wakeup();
+        blocked_waiter_wakeup(false);
     } while (true);
 }
 
