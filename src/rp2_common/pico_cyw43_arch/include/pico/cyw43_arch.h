@@ -53,9 +53,9 @@ extern "C" {
  *
  * \c pico_cyw43_arch attempts to abstract these complications into several behavioral groups:
  *
- * * \em 'poll' - This not multi-core/IRQ safe, and requires the user to call \ref cyw43_arch_poll periodically from their main loop
+ * * \em 'poll' - This is not multi-core/IRQ safe, and requires the user to call \ref cyw43_arch_poll periodically from their main loop
  * * \em 'thread_safe_background' - This is multi-core/thread/task safe, and maintenance of the driver and TCP/IP stack is handled automatically in the background
- * * \em 'freertos' - This is multi-core/thread/task safe, and uses a separate FreeRTOS task to handle lwIP and and driver work.
+ * * \em 'freertos' - This is multi-core/thread/task safe, and uses a separate FreeRTOS task to handle lwIP and driver work.
  *
  * As of right now, lwIP is the only supported TCP/IP stack, however the use of \c pico_cyw43_arch is intended to be independent of
  * the particular TCP/IP stack used (and possibly Bluetooth stack used) in the future. For this reason, the integration of lwIP
