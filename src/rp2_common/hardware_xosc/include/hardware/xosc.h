@@ -10,6 +10,9 @@
 #include "pico.h"
 #include "hardware/structs/xosc.h"
 
+// For frequency related definitions etc
+#include "hardware/clocks.h"
+
 
 // Allow lengthening startup delay to accommodate slow-starting oscillators
 
@@ -18,12 +21,12 @@
 #define PICO_XOSC_STARTUP_DELAY_MULTIPLIER 6
 #endif
 
-// PICO_CONFIG: PICO_XOSC_FREQ_RANGE_MAX, The maximum frequency in MHz for the XOSC to support (not required when using CMOS clock input instead of XOSC) - defining this variable is not supported on RP2040 as it only has one range, type=int, min=1, max=100, default=XOSC_HZ/1000000, group=hardware_xosc
+// PICO_CONFIG: PICO_XOSC_FREQ_RANGE_MAX, The maximum frequency in MHz for the XOSC to support (not required when using CMOS clock input instead of XOSC) - defining this variable is not supported on RP2040 as it only has one range, type=int, min=1, max=100, default=XOSC_HZ/MHZ, group=hardware_xosc
 #if PICO_RP2040
 #define PICO_XOSC_FREQ_RANGE_MAX 15
 #else
 #ifndef PICO_XOSC_FREQ_RANGE_MAX
-#define PICO_XOSC_FREQ_RANGE_MAX (XOSC_HZ / 1000000)
+#define PICO_XOSC_FREQ_RANGE_MAX (XOSC_HZ / MHZ)
 #endif
 #endif
 
