@@ -94,6 +94,9 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PICO_DEFAULT_UART_RX_PIN 1
 #endif
 
+
+#define MOTION_2350_PRO_BUZZER_PIN 22
+
 // --- LED ---
 #ifndef PICO_DEFAULT_WS2812_PIN
 #define PICO_DEFAULT_WS2812_PIN 23
