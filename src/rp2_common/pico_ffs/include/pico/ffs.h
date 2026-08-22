@@ -28,13 +28,13 @@ extern "C" {
 #endif
 
 #else
-// On RP2040 there's no flash partitioning , the ffs flash area neads to be hardcoded.
+// On RP2040 there's no flash partitioning, the ffs flash area needs to be hardcoded.
 // The defaults make it minimum size and right at the end of the flash memory.
 // PICO_CONFIG: FFS_RP2040_FLASH_END_OFFSET, End of ffs flash area + 1, type=int, default=Offset to end of flash + 1, group=pico_ffs
 #ifndef FFS_RP2040_FLASH_END_OFFSET
 #define FFS_RP2040_FLASH_END_OFFSET  PICO_FLASH_SIZE_BYTES
 #endif
-// PICO_CONFIG: FFS_RP2040_FLASH_START_OFFSET, Start offset of ffs flash area. type=int, default=Two flash sectors less than end of flash + 1, group=pico_ffs
+// PICO_CONFIG: FFS_RP2040_FLASH_START_OFFSET, Start offset of ffs flash area, type=int, default=Two flash sectors less than end of flash + 1, group=pico_ffs
 #ifndef FFS_RP2040_FLASH_START_OFFSET
 // Note: This defines the minimum ffs flash area - two sectors
 #define FFS_RP2040_FLASH_START_OFFSET (PICO_FLASH_SIZE_BYTES - (2 * FLASH_SECTOR_SIZE))
