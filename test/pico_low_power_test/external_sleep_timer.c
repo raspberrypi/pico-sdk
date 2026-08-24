@@ -14,7 +14,7 @@
 #if PICO_RP2040
 #define TOLERANCE_MS 1000   // The resolution of the AON timer is 1s on RP2040
 #elif PICO_RISCV
-#define TOLERANCE_MS 200    // Can take longer to wake up that Arm
+#define TOLERANCE_MS 200    // Can take longer to wake up than Arm
 #else
 #define TOLERANCE_MS 100
 #endif
