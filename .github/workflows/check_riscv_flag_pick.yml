@@ -1,4 +1,4 @@
-name: Check RISCV Flag Choices
+name: Check RISC-V flag choices
 on:
   push:
     branches-ignore:
@@ -29,35 +29,35 @@ jobs:
       shell: bash
       run: |
         cd ${{ github.workspace }}
-        mkdir -p build && rm -rf build/* && cd build
-        cmake ../ -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=rp2350-riscv -DPICO_TOOLCHAIN_PATH=/opt/riscv/gcc-riscv-32-pico-elf-16.1.0
-        cat CMakeCache.txt | grep "CMAKE_ASM_FLAGS"
-        cat CMakeCache.txt | grep "cpu=hazard3-rp2350"
+        rm -rf build
+        cmake -S . -B build -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=rp2350-riscv -DPICO_TOOLCHAIN_PATH=/opt/riscv/gcc-riscv-32-pico-elf-16.1.0
+        grep "CMAKE_ASM_FLAGS" build/CMakeCache.txt
+        grep "cpu=hazard3-rp2350" build/CMakeCache.txt
 
     - name: Check RISCV GCC 15.1.0 gives arch=rv32ima_zicsr_zifencei_zba_zbb_zbs_zbkb_zca_zcb_zcmp
       if: ${{ !cancelled() }}
       run: |
         cd ${{ github.workspace }}
-        mkdir -p build && rm -rf build/* && cd build
-        cmake ../ -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=rp2350-riscv -DPICO_TOOLCHAIN_PATH=/opt/riscv/riscv32-unknown-elf-gcc-15.1.0
-        cat CMakeCache.txt | grep "CMAKE_ASM_FLAGS"
-        cat CMakeCache.txt | grep "arch=rv32ima_zicsr_zifencei_zba_zbb_zbs_zbkb_zca_zcb_zcmp"
+        rm -rf build
+        cmake -S . -B build -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=rp2350-riscv -DPICO_TOOLCHAIN_PATH=/opt/riscv/riscv32-unknown-elf-gcc-15.1.0
+        grep "CMAKE_ASM_FLAGS" build/CMakeCache.txt
+        grep "arch=rv32ima_zicsr_zifencei_zba_zbb_zbs_zbkb_zca_zcb_zcmp" build/CMakeCache.txt
     
     - name: Check RISCV GCC 14.1.0 gives arch=rv32imac_zicsr_zifencei_zba_zbb_zbs_zbkb
       if: ${{ !cancelled() }}
       shell: bash
       run: |
         cd ${{ github.workspace }}
-        mkdir -p build && rm -rf build/* && cd build
-        cmake ../ -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=rp2350-riscv -DPICO_TOOLCHAIN_PATH=/opt/riscv/riscv32-unknown-elf-gcc-14.1.0
-        cat CMakeCache.txt | grep "CMAKE_ASM_FLAGS"
-        cat CMakeCache.txt | grep "arch=rv32imac_zicsr_zifencei_zba_zbb_zbs_zbkb"
+        rm -rf build
+        cmake -S . -B build -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=rp2350-riscv -DPICO_TOOLCHAIN_PATH=/opt/riscv/riscv32-unknown-elf-gcc-14.1.0
+        grep "CMAKE_ASM_FLAGS" build/CMakeCache.txt
+        grep "arch=rv32imac_zicsr_zifencei_zba_zbb_zbs_zbkb" build/CMakeCache.txt
 
     - name: Check RISCV GCC 12.1.0 gives arch=rv32imac_zicsr_zifencei_zba_zbb_zbs_zbkb
       if: ${{ !cancelled() }}
       run: |
         cd ${{ github.workspace }}
-        mkdir -p build && rm -rf build/* && cd build
-        cmake ../ -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=rp2350-riscv -DPICO_TOOLCHAIN_PATH=/opt/riscv/riscv32-unknown-elf-gcc-12.1.0
-        cat CMakeCache.txt | grep "CMAKE_ASM_FLAGS"
-        cat CMakeCache.txt | grep "arch=rv32imac_zicsr_zifencei_zba_zbb_zbs_zbkb"
+        rm -rf build
+        cmake -S . -B build -DPICO_NO_PICOTOOL=1 -DPICO_PLATFORM=rp2350-riscv -DPICO_TOOLCHAIN_PATH=/opt/riscv/riscv32-unknown-elf-gcc-12.1.0
+        grep "CMAKE_ASM_FLAGS" build/CMakeCache.txt
+        grep "arch=rv32imac_zicsr_zifencei_zba_zbb_zbs_zbkb" build/CMakeCache.txt
