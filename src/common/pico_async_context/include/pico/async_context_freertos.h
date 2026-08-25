@@ -44,6 +44,13 @@ typedef struct async_context_freertos async_context_freertos_t;
 #endif
 #endif
 
+// On PICO_PLATFORM=host don't have ISR.
+#if !PICO_ON_DEVICE
+#ifndef portCHECK_IF_IN_ISR
+#define portCHECK_IF_IN_ISR() (0)
+#endif
+#endif
+
 /** 
  * \brief Configuration object for async_context_freertos instances.
  */
