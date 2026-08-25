@@ -22,6 +22,7 @@ IGNORE_DIRS.add('common/boot_picoboot')
 IGNORE_DIRS.add('common/boot_uf2')
 IGNORE_DIRS.add('common/pico_async_context')
 IGNORE_DIRS.add('common/pico_lwip')
+IGNORE_DIRS.add('common/pico_mbedtls')
 IGNORE_DIRS.add('common/pico_usb_reset_interface')
 IGNORE_DIRS.add('rp2_common/cmsis')
 IGNORE_DIRS.add('rp2_common/pico_btstack')
@@ -30,7 +31,6 @@ IGNORE_DIRS.add('rp2_common/pico_cyw43_driver')
 IGNORE_DIRS.add('rp2_common/pico_stdio_semihosting')
 IGNORE_DIRS.add('rp2_common/pico_stdio_usb')
 IGNORE_DIRS.add('rp2_common/pico_clib_interface')
-IGNORE_DIRS.add('rp2_common/pico_mbedtls')
 
 SORT_HEADERS_BY_DIRECTORY = True # if False, sort by filename
 

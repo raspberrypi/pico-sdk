@@ -32,7 +32,7 @@ cc_library(
     select({
         "@pico-sdk//bazel/constraint:pico_mbedtls_config_unset": [],
         "//conditions:default": [
-            "@pico-sdk//src/rp2_common/pico_mbedtls:pico_mbedtls_library",
+            "@pico-sdk//src/common/pico_mbedtls:pico_mbedtls_library",
         ],
     }),
 )
@@ -155,7 +155,7 @@ cc_library(
     includes = ["src/apps/altcp_tls"],
     deps = [
         ":pico_lwip_core",
-        "@pico-sdk//src/rp2_common/pico_mbedtls:pico_mbedtls_config",
+        "@pico-sdk//src/common/pico_mbedtls:pico_mbedtls_config",
     ],
 )
 
