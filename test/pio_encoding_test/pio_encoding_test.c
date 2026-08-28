@@ -24,8 +24,8 @@ int main() {
     PICOTEST_CHECK(0xa0e1 == encodings_program_instructions[encodings_offset_mov_osr_x], "mov osr, x");
     PICOTEST_CHECK(0xa0e1 == pio_encode_mov(pio_osr, pio_x), "pio_encode_mov(pio_osr, pio_x)");
     PICOTEST_CHECK(0xa061 == encodings_program_instructions[encodings_offset_mov_pindirs_x], "mov pindirs, x");
-    PICOTEST_CHECK(0xa061 == pio_encode_mov(pio_pindirs, pio_x), "pio_encode_mov(pio_pindirs, pio_x)");
 #if PICO_PIO_VERSION > 0
+    PICOTEST_CHECK(0xa061 == pio_encode_mov(pio_pindirs, pio_x), "pio_encode_mov(pio_pindirs, pio_x)");
     PICOTEST_CHECK(0xa061 == pio_encode_mov(pio_pindirs_mov, pio_x), "pio_encode_mov(pio_pindirs_mov, pio_x)");
 #endif
     PICOTEST_CHECK(0xa081 == encodings_program_instructions[encodings_offset_mov_exec_x], "mov exec, x");
