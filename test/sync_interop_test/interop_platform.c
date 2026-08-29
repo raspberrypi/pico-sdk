@@ -90,6 +90,13 @@ uint32_t counted_mutex_enter_block_until(mutex_t *mtx, absolute_time_t until,
     return interop_wakeups[get_core_num()];
 }
 
+uint32_t counted_sem_acquire_block_until(semaphore_t *sem, absolute_time_t until,
+                                                bool *acquired) {
+    interop_count_reset();
+    *acquired = sem_acquire_block_until(sem, until);
+    return interop_wakeups[get_core_num()];
+}
+
 #if INTEROP_HAS_SDK_CORE
 
 static struct {
@@ -129,6 +136,8 @@ static int64_t agent_stolen_far_alarm(__unused alarm_id_t id, __unused void *ud)
 
 static volatile bool agent_known_sleep_fired;
 
+static semaphore_t agent_done_sem;
+
 static int64_t agent_burst_alarm(__unused alarm_id_t id, __unused void *ud) {
     return 0;   /* never reached; the burst is cancelled long before it is due */
 }
@@ -140,6 +149,7 @@ static int64_t agent_known_sleep_alarm(__unused alarm_id_t id, __unused void *ud
 }
 
 static void sdk_core_agent(void) {
+    sem_init(&agent_done_sem, 0, 1);
     harness_cycles_enable_this_core();
     for (;;) {
         while (!agent.cmd) {
@@ -311,6 +321,15 @@ static void sdk_core_agent(void) {
                 result = (n == arg);
                 break;
             }
+            case AGENT_SEM_TIMED_COUNTED: {
+                /* A semaphore nobody ever releases, so this waits the deadline out. Local, so
+                 * it cannot be disturbed by the semaphore ops the other cases use. */
+                semaphore_t s;
+                sem_init(&s, 0, 1);
+                agent.wait_count = counted_sem_acquire_block_until(
+                        &s, make_timeout_time_ms(arg), &result);
+                break;
+            }
             case AGENT_SLEEP_MS:
                 sleep_ms(arg);
                 result = true;
@@ -410,6 +429,7 @@ static void sdk_core_agent(void) {
         agent.bool_result = result;
         agent.cmd = AGENT_IDLE;
         agent.done = true;
+        sem_release(&agent_done_sem);
         __sev();
     }
 }
@@ -427,6 +447,19 @@ void agent_start(uint32_t cmd, uint32_t arg) {
     __compiler_memory_barrier();
     agent.cmd = cmd;
     __sev();
+}
+
+/* Waits for the agent by blocking on a lock_core primitive rather than polling, so this core
+ * sits in a wait loop of its own while the agent works. That is pico_sync_test's arrangement
+ * and it is the one environment this suite otherwise never creates: with software spin locks
+ * each core's lock traffic can raise an event on the other, so two cores in wait loops can keep
+ * each other awake. Reset first, because the polling agent_wait() leaves permits behind. */
+bool agent_wait_blocking(uint32_t timeout_ms) {
+    return sem_acquire_block_until(&agent_done_sem, make_timeout_time_ms(timeout_ms));
+}
+
+void agent_wait_blocking_arm(void) {
+    sem_reset(&agent_done_sem, 0);
 }
 
 bool agent_wait(uint32_t timeout_ms) {

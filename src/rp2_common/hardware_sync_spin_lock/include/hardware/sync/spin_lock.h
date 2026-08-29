@@ -143,10 +143,6 @@ typedef SW_SPIN_LOCK_TYPE spin_lock_t;
 #endif
 
 #if PICO_USE_SW_SPIN_LOCKS
-#if PICO_RP2350
-// Indicates that taking and releasing a software spin lock sets the calling core's own event flag,
-#define PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV 1
-#endif
 
 #ifndef SW_SPIN_LOCK_INSTANCE
 #define SW_SPIN_LOCK_INSTANCE(lock_num) ({             \

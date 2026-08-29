@@ -90,16 +90,16 @@
 #define BUSY_POLL_VERDICT RESULT_FAIL
 
 /*
- * These must be resolved in the preprocessor, not in C: PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND
- * is #defined *to* PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV, which is simply undefined when using
+ * These must be resolved in the preprocessor, not in C: PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND
+ * is #defined *to* PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT, which is simply undefined when using
  * hardware spin locks. #if treats that as 0; C code would see an undeclared identifier.
  */
-#if PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV
+#if PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT
 #define INTEROP_UNLOCK_SEVS 1
 #else
 #define INTEROP_UNLOCK_SEVS 0
 #endif
-#if PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND
+#if PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND
 #define INTEROP_WORKAROUND 1
 #else
 #define INTEROP_WORKAROUND 0
@@ -519,6 +519,13 @@ static void d0_counter_selftest(void) {
         return;
     }
 
+    if (!harness_cycle_counter_present()) {
+        /* Not a failure: the part has no usable cycle counter, so there is nothing to
+         * calibrate. Occupancy figures are simply absent from the other cases. */
+        harness_record("D0", RESULT_SKIP, "no cycle counter on this platform");
+        return;
+    }
+
     /* 1. the cycle counter must actually count, at roughly clk_sys */
     uint32_t expected = (uint32_t)(clock_get_hz(clk_sys) / 1000000u);
     uint32_t actual = harness_cal_cycles_per_us();
@@ -608,7 +615,7 @@ static void d1_9_bare_wfe_pattern(void) {
                        expect_poll ? "busy-polls" : "blocks", waits, sc_note);
     } else {
         harness_record("D1.9", RESULT_FAIL,
-                       "bare pattern %s (%u iterations) but PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV"
+                       "bare pattern %s (%u iterations) but PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT"
                        " predicts it would %s", polled ? "busy-polled" : "blocked", waits,
                        expect_poll ? "busy-poll" : "block");
     }
@@ -826,7 +833,7 @@ static void d2_13_sustained_interference(void) {
      * Every fire wakes the waiter, so one iteration per fire is the floor for any
      * implementation. What differs is whether the waiter must also re-add its own alarm each
      * time coverage lapses: on a build where a spin unlock sets the calling core's own event
-     * (PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV), the __wfe() after an add is eaten immediately, so an
+     * (PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT), the __wfe() after an add is eaten immediately, so an
      * add costs an EXTRA pass that does not sleep. So ~1x fires means the waiter kept its own
      * coverage; ~2x means it is re-adding on every lapse.
      *
@@ -1555,6 +1562,10 @@ static void d2_3_contended_times_out(void) {
                        lat.early);
     } else if (lat.max_us > 5000) {
         harness_record("D2.3", RESULT_FAIL, "timeout overshot by %lldus", (long long)lat.max_us);
+    } else if (worst_waits == 0) {
+        harness_record("D2.3", RESULT_FAIL,
+                       "no waits recorded - it never blocked, or the wakeup hook is not"
+                       " reaching pico_sync");
     } else if (worst_waits > MAX_BLOCKING_WAITS) {
         harness_record("D2.3", BUSY_POLL_VERDICT,
                        "timeout accurate (max %lldus) but busy-polled: %u wait iterations",
@@ -1669,6 +1680,10 @@ static void d2_7_sdk_core_timed(void) {
     } else if (us < (uint32_t)TIMEOUT_MS * 1000) {
         harness_record("D2.7", RESULT_FAIL, "timed out EARLY after %uus (deadline %dms)",
                        us, TIMEOUT_MS);
+    } else if (waits == 0) {
+        harness_record("D2.7", RESULT_FAIL,
+                       "no waits recorded - it never blocked, or the wakeup hook is not"
+                       " reaching pico_sync");
     } else if (waits > MAX_BLOCKING_WAITS) {
         harness_record("D2.7", BUSY_POLL_VERDICT,
                        "timed out at %uus but busy-polled: %u wait iterations", us, waits);
@@ -1677,6 +1692,80 @@ static void d2_7_sdk_core_timed(void) {
         if (occ >= 0) snprintf(occ_note, sizeof(occ_note), ", %d%% occupancy", occ);
         harness_record("D2.7", RESULT_PASS, "timed out at %uus, %u wait iterations%s",
                        us, waits, occ_note);
+    }
+#endif
+}
+
+/* D2.16 - a timed acquire on a semaphore with no permits, on the bare-SDK core.
+ *
+ * D2.7 is the same experiment on a mutex. Both reach the same lock_core macro, but they are
+ * different call sites in pico_sync, and sem_acquire_block_until() alone carries the `waited`
+ * flag and lock_internal_spin_unlock_maybe_notify(). This is the shape pico_sync_test's
+ * "wait loop with timeout" section uses, which this suite otherwise never exercised.
+ */
+static void d2_16_sdk_core_sem_timed(void) {
+#if !INTEROP_HAS_SDK_CORE
+    harness_record("D2.16", RESULT_SKIP, "no bare-SDK core in this configuration");
+#else
+    if (!agent_run(AGENT_SEM_TIMED_COUNTED, TIMEOUT_MS, TIMEOUT_MS * 4)) {
+        harness_record("D2.16", RESULT_FAIL, "timed acquire on the other core never returned");
+        return;
+    }
+    const uint32_t us = agent_elapsed_us();
+    const uint32_t waits = agent_wait_count();
+    if (agent_result()) {
+        harness_record("D2.16", RESULT_FAIL, "acquired a semaphore that has no permits");
+    } else if (us < (uint32_t)TIMEOUT_MS * 1000) {
+        harness_record("D2.16", RESULT_FAIL, "timed out EARLY after %uus (deadline %dms)",
+                       us, TIMEOUT_MS);
+    } else if (waits == 0) {
+        harness_record("D2.16", RESULT_FAIL,
+                       "no waits recorded - it never blocked, or the wakeup hook is not"
+                       " reaching pico_sync");
+    } else if (waits > MAX_BLOCKING_WAITS) {
+        harness_record("D2.16", BUSY_POLL_VERDICT,
+                       "timed out at %uus but busy-polled: %u wait iterations", us, waits);
+    } else {
+        harness_record("D2.16", RESULT_PASS, "timed out at %uus, %u wait iterations", us, waits);
+    }
+#endif
+}
+
+/* D2.17 - the agent does D2.16's timed wait while THIS core is blocked in a lock_core wait of
+ * its own, rather than polling. That is pico_sync_test's arrangement, and the one environment
+ * this suite otherwise never creates: every other case leaves the test core spinning on a plain
+ * flag, so only one core is ever in a wait loop. With software spin locks two cores in wait
+ * loops can keep each other awake, which is invisible to every other case here.
+ */
+static void d2_17_both_cores_waiting(void) {
+#if !INTEROP_HAS_SDK_CORE
+    harness_record("D2.17", RESULT_SKIP, "no bare-SDK core in this configuration");
+#else
+    agent_wait_blocking_arm();
+    agent_start(AGENT_SEM_TIMED_COUNTED, TIMEOUT_MS);
+    if (!agent_wait_blocking(TIMEOUT_MS * 4)) {
+        harness_record("D2.17", RESULT_FAIL, "agent never finished while this core blocked");
+        return;
+    }
+    const uint32_t us = agent_elapsed_us();
+    const uint32_t waits = agent_wait_count();
+    if (agent_result()) {
+        harness_record("D2.17", RESULT_FAIL, "acquired a semaphore that has no permits");
+    } else if (us < (uint32_t)TIMEOUT_MS * 1000) {
+        harness_record("D2.17", RESULT_FAIL, "timed out EARLY after %uus (deadline %dms)",
+                       us, TIMEOUT_MS);
+    } else if (waits == 0) {
+        harness_record("D2.17", RESULT_FAIL,
+                       "no waits recorded - it never blocked, or the wakeup hook is not"
+                       " reaching pico_sync");
+    } else if (waits > MAX_BLOCKING_WAITS) {
+        harness_record("D2.17", BUSY_POLL_VERDICT,
+                       "timed out at %uus but busy-polled while this core also waited:"
+                       " %u wait iterations", us, waits);
+    } else {
+        harness_record("D2.17", RESULT_PASS,
+                       "timed out at %uus, %u wait iterations with both cores waiting",
+                       us, waits);
     }
 #endif
 }
@@ -1801,6 +1890,8 @@ static void test_body(void) {
     d2_13_sustained_interference();
     d2_14_far_alarm_only();
     d2_15_cancel_burst();
+    d2_16_sdk_core_sem_timed();
+    d2_17_both_cores_waiting();
 
     printf("\n--- D3: sleep_ms / sleep_until (ms-scale, concurrent, cross-core) ---\n");
     d3_1_sleep_accuracy_ms();

@@ -124,6 +124,10 @@
 #endif
 #endif
 
+// An exclusive access pair leaves the calling core's own event register set, so a following
+// __wfe() does not block. See PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND in pico/lock_core.h.
+#define PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT 1
+
 // PICO_CONFIG: USB_CLK_HZ, USB clock frequency. Must be 48MHz for the USB interface to operate correctly, type=int, default=48000000, advanced=true, group=hardware_base
 #ifndef USB_CLK_HZ
 #ifdef USB_CLK_KHZ
