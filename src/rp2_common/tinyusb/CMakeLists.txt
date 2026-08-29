@@ -56,23 +56,31 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     target_include_directories(tinyusb_board INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
     target_link_libraries(tinyusb_board INTERFACE tinyusb_bsp)
 
-    # Override suppress_tinyusb_warnings to add suppression of (falsely) reported GCC 11.2 warnings
-    function(suppress_tinyusb_warnings)
-        _suppress_tinyusb_warnings()
-        if (PICO_C_COMPILER_IS_GNU)
-            set_source_files_properties(
-                    ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/rp2040/rp2040_usb.c
-                    PROPERTIES
-                    COMPILE_FLAGS "-Wno-stringop-overflow -Wno-array-bounds")
-            # suppress warning in our copy of LWIP in case it is used by TinyUSB
-            set_source_files_properties(
-                    ${PICO_LWIP_PATH}/src/core/tcp_in.c
-                    ${PICO_LWIP_PATH}/src/core/tcp_out.c
-                    ${PICO_LWIP_PATH}/src/core/pbuf.c
-                    PROPERTIES
-                    COMPILE_FLAGS "-Wno-conversion")
-        endif()
-    endfunction()
+    # Latest TinyUSB has removed the suppress_tinyusb_warnings() function. If the function is present
+    # we assume we want to override it to suppress more warnings; if not we will define an empty
+    # version since SDK users may assume it exists
+    if (TARGET suppress_tinyusb_warnings)
+        # Override existing suppress_tinyusb_warnings to add suppression of (falsely) reported GCC 11.2 warnings
+        function(suppress_tinyusb_warnings)
+            _suppress_tinyusb_warnings()
+            if (PICO_C_COMPILER_IS_GNU)
+                set_source_files_properties(
+                        ${PICO_TINYUSB_PATH}/src/portable/raspberrypi/rp2040/rp2040_usb.c
+                        PROPERTIES
+                        COMPILE_FLAGS "-Wno-stringop-overflow -Wno-array-bounds")
+                # suppress warning in our copy of LWIP in case it is used by TinyUSB
+                set_source_files_properties(
+                        ${PICO_LWIP_PATH}/src/core/tcp_in.c
+                        ${PICO_LWIP_PATH}/src/core/tcp_out.c
+                        ${PICO_LWIP_PATH}/src/core/pbuf.c
+                        PROPERTIES
+                        COMPILE_FLAGS "-Wno-conversion")
+            endif()
+        endfunction()
+    else()
+        function(suppress_tinyusb_warnings)
+        endfunction()
+    endif()
 
     pico_promote_common_scope_vars()
 endif()
