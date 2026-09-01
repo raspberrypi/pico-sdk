@@ -14,7 +14,7 @@
 #if PICO_RP2040
 #define TOLERANCE_MS 1000   // The resolution of the AON timer is 1s on RP2040
 #elif PICO_RISCV
-#define TOLERANCE_MS 200    // Can take longer to wake up that Arm
+#define TOLERANCE_MS 200    // Can take longer to wake up than Arm
 #else
 #define TOLERANCE_MS 100
 #endif
@@ -25,18 +25,26 @@ uint32_t wakeup_time_ms = 0;
 uint32_t sleep_time_ms = 0;
 bool good_sleep_done = false;
 
+static alarm_id_t wake_up_alarm_id;
+
 int64_t wake_up_gpio(__unused alarm_id_t id, __unused void *param) {
     printf("Sending wake up at %dms\n", to_ms_since_boot(get_absolute_time()));
+    wake_up_alarm_id = 0;
     gpio_put(WAKE_UP_PIN, 0);
     return 0;
 }
-
-static alarm_id_t wake_up_alarm_id;
 
 void gpio_callback(uint gpio, uint32_t events) {
     if (events & GPIO_IRQ_EDGE_RISE) {
         wakeup_time_ms = to_ms_since_boot(get_absolute_time());
         printf("Woke up at %dms\n", wakeup_time_ms);
+        // The device may have woken itself up (e.g. from a timer), so cancel any pending wake up;
+        // otherwise it would drive the pin low again and leave it there, and the next
+        // edge triggered sleep would never see an edge
+        if (wake_up_alarm_id > 0) {
+            cancel_alarm(wake_up_alarm_id);
+            wake_up_alarm_id = 0;
+        }
         gpio_put(WAKE_UP_PIN, 1);
     } else if (events & GPIO_IRQ_EDGE_FALL) {
         sleep_time_ms = to_ms_since_boot(get_absolute_time());
