@@ -89,15 +89,12 @@
  */
 #define BUSY_POLL_VERDICT RESULT_FAIL
 
-/*
- * These must be resolved in the preprocessor, not in C: PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND
- * is #defined *to* PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT, which is simply undefined when using
- * hardware spin locks. #if treats that as 0; C code would see an undeclared identifier.
- */
-#if PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT
-#define INTEROP_UNLOCK_SEVS 1
+/* Resolved in the preprocessor as these macros are undefined on platforms without the behaviour.
+ * Only a software spin lock unlocks with an exclusive access, so both terms are needed. */
+#if PICO_USE_SW_SPIN_LOCKS && PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT
+#define INTEROP_SPIN_UNLOCK_SETS_OWN_EVENT 1
 #else
-#define INTEROP_UNLOCK_SEVS 0
+#define INTEROP_SPIN_UNLOCK_SETS_OWN_EVENT 0
 #endif
 #if PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND
 #define INTEROP_WORKAROUND 1
@@ -604,7 +601,7 @@ static void d1_9_bare_wfe_pattern(void) {
                  agent_inline_sleep_delta());
     }
 
-    const bool expect_poll = INTEROP_UNLOCK_SEVS;
+    const bool expect_poll = INTEROP_SPIN_UNLOCK_SETS_OWN_EVENT;
     if (polled == expect_poll) {
         /* PASS either way: this case is a control, and confirming its prediction is a
          * success whichever way the prediction went. It is not an expected *failure* - the
@@ -615,7 +612,7 @@ static void d1_9_bare_wfe_pattern(void) {
                        expect_poll ? "busy-polls" : "blocks", waits, sc_note);
     } else {
         harness_record("D1.9", RESULT_FAIL,
-                       "bare pattern %s (%u iterations) but PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT"
+                       "bare pattern %s (%u iterations) but this spin lock configuration"
                        " predicts it would %s", polled ? "busy-polled" : "blocked", waits,
                        expect_poll ? "busy-poll" : "block");
     }
@@ -1828,9 +1825,9 @@ static void test_body(void) {
 #endif
     printf("platform: %s\n", PICO_PLATFORM_STRING);
     printf("config: %s\n", plat_config_name());
-    printf("spin locks: %s, unlock %s the event\n",
+    printf("spin locks: %s, unlock %s the calling core's own event\n",
            PICO_USE_SW_SPIN_LOCKS ? "software" : "hardware",
-           INTEROP_UNLOCK_SEVS ? "sets" : "does not set");
+           INTEROP_SPIN_UNLOCK_SETS_OWN_EVENT ? "sets" : "does not set");
     if (INTEROP_LOCK_MACROS_OVERRIDDEN) {
         /* Say this plainly: it means the SDK's WFE machinery, workaround and all, is not the
          * code under test here - the RTOS port's event-group implementation is. */
