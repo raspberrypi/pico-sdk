@@ -1,5 +1,5 @@
 # PICO_CMAKE_CONFIG: PICO_HARD_FLOAT_ABI, use hard floating point ABI, type=bool, default=0, group=build, docref=cmake-toolchain-config
-# PICO_CMAKE_CONFIG: PICO_NO_HARD_FLOAT_ABI_WARNING, disable warning when PICO_HARD_FLOAT_ABI is set when not supported, type=bool, default=0, group=build, docref=cmake-toolchain-config
+# PICO_CMAKE_CONFIG: PICO_NO_HARD_FLOAT_ABI_WARNING, disable warning when PICO_HARD_FLOAT_ABI is set when not supported (e.g. on RP2040), type=bool, default=0, group=build, docref=cmake-toolchain-config
 
 # note to future self - putting the -mfloat-abi before the other -mcpu/-march/-mfpu cause GCC to
 # wrongly emit .fpu softvfp regardless of any other options! go figure!!!
