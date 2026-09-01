@@ -45,7 +45,11 @@
 
 // PICO_CONFIG: PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND, Enable workaround to preserve low power waits in synchronization primitives where an exclusive access sets the calling core's own event, type=bool, default=1 when using software spin locks on such a platform, advanced=true, group=pico_sync
 #ifndef PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND
+#ifdef PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND
+#define PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND
+#else
 #define PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND (PICO_USE_SW_SPIN_LOCKS && PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT)
+#endif
 #endif
 
 /** \file lock_core.h
