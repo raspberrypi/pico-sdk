@@ -68,4 +68,8 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
     if (NOT PICO_SDK_TOP_LEVEL_PROJECT)
         pico_promote_common_scope_vars()
     endif()
+
+    # silence warning about unused variable (it is only used in toolchain setup)
+    if (PICO_NO_HARD_FLOAT_ABI_WARNING)
+    endif()
 endif()
