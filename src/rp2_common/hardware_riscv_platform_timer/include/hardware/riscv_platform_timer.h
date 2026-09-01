@@ -125,7 +125,7 @@ static inline uint64_t riscv_timer_get_mtimecmp(void) {
  * mtime value (stored in 32-bit mtime/mtimeh registers) is greater than or
  * equal to this core's current mtime/mtimecmph value.
  *
- * \param mtime New value to set the RISC-V platform timer to
+ * \param mtimecmp New value to set the RISC-V platform timer to
  */
 static inline void riscv_timer_set_mtimecmp(uint64_t mtimecmp) {
     // Use write procedure from RISC-V ISA manual to avoid causing a spurious
