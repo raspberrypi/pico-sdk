@@ -191,7 +191,13 @@ static const test_t tests[] = {
 };
 
 // ---------------------------------------------------------------------------
-// Verify the PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV setting
+#if PICO_USE_SW_SPIN_LOCKS && PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT
+#define SEV_PROBE_EXPECT_OWN_EVENT 1
+#else
+#define SEV_PROBE_EXPECT_OWN_EVENT 0
+#endif
+
+// Verify the PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT setting
 //
 // Clear the event flag, do a lock/unlock pair, then __wfe() and see whether it returned of its
 // own accord or only once core 1's backstop arrived. A control pass with the lock/unlock
@@ -202,12 +208,8 @@ static const test_t tests[] = {
 // code against the same fabric.
 // ---------------------------------------------------------------------------
 
-#ifndef PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV
-#define PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV 0
-#endif
-
 // long enough that core 0 is certainly parked in its __wfe() before this expires
-static const uint SEV_PROBE_BACKSTOP_CYCLES = 2000000;
+static const uint SEV_PROBE_BACKSTOP_CYCLES = 200000;
 static const uint SEV_PROBE_ROUNDS = 5;
 #define SEV_PROBE_LOCK_NUM 0
 
@@ -251,7 +253,9 @@ static bool sev_probe_run(void) {
 	uint control_blocked = 0;
 	uint probe_blocked = 0;
 	for (uint i = 0; i < SEV_PROBE_ROUNDS; ++i) {
+		printf("  round %u: control...\n", i);
 		control_blocked += sev_probe_wfe_blocked(false);
+		printf("  round %u: probe...\n", i);
 		probe_blocked += sev_probe_wfe_blocked(true);
 	}
 	printf("control (no lock/unlock): blocked %u/%u\n", control_blocked, SEV_PROBE_ROUNDS);
@@ -275,12 +279,117 @@ static bool sev_probe_run(void) {
 	}
 	printf("observed: spin lock lock/unlock %s the calling core's event flag\n",
 		observed ? "DOES set" : "does NOT set");
-	if (observed != (bool)PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV) {
-		printf("Failed: PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV is %d but hardware says %d.\n"
+	if (observed != (bool)SEV_PROBE_EXPECT_OWN_EVENT) {
+		printf("Failed: PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT is %d but hardware says %d.\n"
 			"The lock_core wait/notify primitives in pico/lock_core.h rely on this.\n",
-			PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV, observed);
+			SEV_PROBE_EXPECT_OWN_EVENT, observed);
 		return false;
 	}
+	return true;
+}
+
+// ---------------------------------------------------------------------------
+// Remote spin lock traffic probe
+//
+// The probe above asks whether THIS core's own lock/unlock sets its own event. It cannot see
+// the other question the lock_core wait primitives depend on: whether ANOTHER core's ordinary
+// spin lock traffic sets this core's event. If it does, a core sitting in the usual
+// "check condition, WFE" loop is woken by unrelated lock activity elsewhere and cannot stay
+// asleep - and two cores both in wait loops can hold each other awake indefinitely.
+//
+// Measured the same way: core 1 does N lock/unlock pairs on a DIFFERENT lock (so this is about
+// remote traffic, not contention), then flags and SEVs as a backstop. If core 0's __wfe()
+// returns while the flag is still clear, remote traffic woke it.
+//
+// Note core 0 takes and releases a lock of its own before waiting, so this measures the pattern
+// the wait primitives actually use. What comes out is therefore a property of pattern AND
+// hardware together: a negative result means only that remote traffic cannot reach a core that
+// waits this way, not that the part has no cross-core wake path. Where a core's own exclusive
+// store clears its own reservation, it holds none by the time it waits, and the path - which is
+// still there - has nothing to act on.
+//
+// Reported, not asserted: what the right expectation is per platform is exactly what this is
+// here to establish.
+// ---------------------------------------------------------------------------
+
+#ifndef SEV_PROBE_SKIP_REMOTE
+#define SEV_PROBE_SKIP_REMOTE 0
+#endif
+
+#define SEV_PROBE_REMOTE_LOCK_NUM 1
+static const uint SEV_PROBE_REMOTE_PAIRS = 2000;
+
+// runs on core 1
+void sev_probe_remote_traffic(void) {
+	// let core 0 reach its __wfe() first
+	busy_wait_at_least_cycles(SEV_PROBE_BACKSTOP_CYCLES / 4);
+	spin_lock_t *lock = spin_lock_instance(SEV_PROBE_REMOTE_LOCK_NUM);
+	for (uint i = 0; i < SEV_PROBE_REMOTE_PAIRS; i++) {
+		uint32_t save = spin_lock_blocking(lock);
+		spin_unlock(lock, save);
+	}
+	sev_probe_backstop_fired = true;
+	__mem_fence_release();
+	__sev();
+}
+
+// runs on core 1: the control, same shape with no lock traffic
+void sev_probe_remote_quiet(void) {
+	busy_wait_at_least_cycles(SEV_PROBE_BACKSTOP_CYCLES / 4);
+	busy_wait_at_least_cycles(SEV_PROBE_BACKSTOP_CYCLES);
+	sev_probe_backstop_fired = true;
+	__mem_fence_release();
+	__sev();
+}
+
+static bool sev_probe_remote_blocked(bool with_traffic) {
+	sev_probe_backstop_fired = false;
+	__mem_fence_release();
+	multicore_fifo_push_blocking((uintptr_t)(with_traffic ? sev_probe_remote_traffic
+	                                                     : sev_probe_remote_quiet));
+	// Take and release a lock of our own before waiting, exactly as every lock_core wait does.
+	// This matters: a cross-PE store can only clear a reservation we actually hold, and whether
+	// our own exclusive store left one behind is the implementation-defined part.
+	spin_lock_t *own = spin_lock_instance(SEV_PROBE_LOCK_NUM);
+	uint32_t save = spin_lock_blocking(own);
+	spin_unlock(own, save);
+
+	// clear our event flag, including any self-ping from the pair above
+	__sev();
+	__wfe();
+
+	__wfe();
+	__mem_fence_acquire();
+	bool blocked = sev_probe_backstop_fired;
+	(void)multicore_fifo_pop_blocking();
+	return blocked;
+}
+
+static bool sev_probe_remote_run(void) {
+	spin_lock_init(SEV_PROBE_LOCK_NUM);
+	spin_lock_init(SEV_PROBE_REMOTE_LOCK_NUM);
+	uint control_blocked = 0, traffic_blocked = 0;
+	for (uint i = 0; i < SEV_PROBE_ROUNDS; ++i) {
+		printf("  round %u: control...\n", i);
+		control_blocked += sev_probe_remote_blocked(false);
+		printf("  round %u: traffic...\n", i);
+		traffic_blocked += sev_probe_remote_blocked(true);
+	}
+	printf("control (core 1 quiet):        blocked %u/%u\n", control_blocked, SEV_PROBE_ROUNDS);
+	printf("probe   (core 1 lock traffic): blocked %u/%u\n", traffic_blocked, SEV_PROBE_ROUNDS);
+	if (control_blocked != SEV_PROBE_ROUNDS) {
+		printf("INCONCLUSIVE: a bare __wfe() did not always block even with core 1 quiet.\n");
+		return true;
+	}
+	const bool woken = traffic_blocked != SEV_PROBE_ROUNDS;
+	printf("observed: after using a spin lock itself, this core %s woken by another core's\n"
+		"  spin lock traffic, so a lock_core wait loop %s stay asleep while another core\n"
+		"  uses spin locks\n",
+		woken ? "IS" : "is NOT", woken ? "CANNOT" : "can");
+	printf("  note this is the composite of the access pattern and the hardware, not a\n"
+		"  statement about the part: a cross-core wake path may exist and simply not be\n"
+		"  reachable this way, e.g. where a core's own exclusive store has already cleared\n"
+		"  its reservation by the time it waits\n");
 	return true;
 }
 
@@ -298,7 +407,7 @@ int main() {
 	multicore_launch_core1(core1_main);
 	uint failed = 0;
 
-	printf(">>> Starting test: PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV probe (core 0)\n");
+	printf(">>> Starting test: PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT probe (core 0)\n");
 	spin_locks_reset();
 	if (sev_probe_run()) {
 		printf("OK.\n");
@@ -306,7 +415,19 @@ int main() {
 		printf("Failed.\n");
 		++failed;
 	}
-	printf(">>> Finished test: PICO_SPIN_LOCK_UNLOCK_CAUSES_SEV probe\n");
+	printf(">>> Finished test: PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT probe\n");
+
+#if !SEV_PROBE_SKIP_REMOTE
+	printf(">>> Starting test: remote spin lock traffic probe (core 0)\n");
+	spin_locks_reset();
+	if (sev_probe_remote_run()) {
+		printf("OK.\n");
+	} else {
+		printf("Failed.\n");
+		++failed;
+	}
+	printf(">>> Finished test: remote spin lock traffic probe\n");
+#endif
 
 	for (int i = 0; i < count_of(tests); ++i) {
 		const test_t *t = &tests[i];

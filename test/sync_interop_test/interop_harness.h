@@ -101,6 +101,8 @@ uint32_t harness_cycles(void);
 /* 1 only where a DWT sleep counter exists at all; 0 elsewhere, where
  * harness_sleep_counter() is a constant 0. Should agree with the expectation above. */
 bool     harness_sleep_counter_present(void);
+/* false where the part has no usable cycle counter, so D0 reports rather than fails */
+bool     harness_cycle_counter_present(void);
 uint32_t harness_sleep_counter(void);
 /* 8-bit wrapping delta between two harness_sleep_counter() reads */
 uint32_t harness_sleep_delta(uint32_t before, uint32_t after);

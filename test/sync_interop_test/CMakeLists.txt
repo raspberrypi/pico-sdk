@@ -31,7 +31,7 @@ function(add_interop_variant NAME)
 endfunction()
 
 # Every variant is built twice, following the pico_time_test/_sw convention. This matters a
-# great deal here: PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND only exists under software spin
+# great deal here: PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND only exists under software spin
 # locks (a hardware unlock is a plain SIO write and does not set the event), so a run that
 # does not pin this is testing whichever implementation the platform defaulted to.
 # Software spin locks need Armv8-M or RISC-V atomics, so there is no _sw twin on RP2040 -
