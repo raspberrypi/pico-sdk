@@ -82,11 +82,5 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
         endfunction()
     endif()
 
-    if (LINKERMAP_PY AND NOT EXISTS "${LINKERMAP_PY}")
-        # this new TinyUSB function currently failes if file pointed to by LINKERMAP_PY doesn't exist
-        # so make it a no-op so pico-examples can build in this case
-        function(family_add_linkermap TARGET)
-        endfunction()
-    endif()
     pico_promote_common_scope_vars()
 endif()
