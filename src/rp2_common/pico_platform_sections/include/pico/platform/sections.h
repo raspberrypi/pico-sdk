@@ -30,7 +30,7 @@
  *
  * For example a 3 element `uint32_t` array placed in RAM (even though it is `static const`)
  *
- *     static const uint32_t __not_in_flash("my_group_name") an_array[3];
+ *     static const uint32_t __in_ram("my_group_name") an_array[3];
  *
  * The section attribute is `.time_critical.<group>`, which is used to maintain compatibility
  * with older linker scripts
@@ -260,7 +260,7 @@
  *
  *     void __not_in_flash_func(my_func)(int some_arg) {
  *
- * The function is placed using \ref __not_in_flash, which defaults to \ref __in_ram
+ * The function is placed using \ref __not_in_flash, which itself defaults to \ref __in_ram
  *
  * \see __no_inline_not_in_flash_func
  */
@@ -278,7 +278,7 @@
  *
  *     void __no_inline_not_in_flash_func(my_func)(int some_arg) {
  *
- * The function is placed using \ref __not_in_flash, which defaults to \ref __in_ram
+ * The function is placed using \ref __not_in_flash, which itself defaults to \ref __in_ram
  */
 #ifndef __no_inline_not_in_flash_func
 #define __no_inline_not_in_flash_func(func_name) __noinline __not_in_flash_func(func_name)
@@ -288,14 +288,15 @@
 #ifndef PICO_TIME_CRITICAL_PLACEMENT
 #define PICO_TIME_CRITICAL_PLACEMENT __in_ram
 #endif
+
 /*! \brief Indicates a function is time/latency critical and should not run from flash
  *  \ingroup pico_platform
  *
- * Decorates a function name, such that the function will execute from RAM to avoid possible flash latency. By default,
- * this macro is identical in implementation to `__not_in_flash_func`, however the semantics are distinct and
- * a `__time_critical_func` can be treated more specially to reduce the overhead when calling such a function.
+ * Decorates a function name, such that, by default, the function will execute from RAM to avoid possible flash latency
+ * (assuming it is not inlined into a flash function by the compiler). By default, this macro is equivalent to `__not_in_flash_func`,
+ * however the semantics are distinct, and a `__time_critical_func` can be configured differently.
  *
- * For example a function called my_func taking an int parameter:
+ * For example, a function called my_func taking an int parameter:
  *
  *     void __time_critical_func(my_func)(int some_arg) {
  *
