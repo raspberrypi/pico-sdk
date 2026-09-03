@@ -25,9 +25,16 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define TUFTY2040_SW_B_PIN 8
 #define TUFTY2040_SW_C_PIN 9
 #define TUFTY2040_SW_UP_PIN 22
+#define TUFTY2040_USER_SW_PIN 23
 
 #define TUFTY2040_LED_PIN 25
 #define TUFTY2040_BACKLIGHT_PIN 2
+
+// routed to Qw/ST connector
+#define TUFTY2040_I2C 0
+#define TUFTY2040_INT_PIN 3
+#define TUFTY2040_SDA_PIN 4
+#define TUFTY2040_SCL_PIN 5
 
 // 8 bit parallel display interface, data on GPIO 14 through 21
 #define TUFTY2040_LCD_CS_PIN 10
@@ -43,10 +50,23 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define TUFTY2040_LCD_D6_PIN 20
 #define TUFTY2040_LCD_D7_PIN 21
 
+#define TUFTY2040_VBUS_DETECT_PIN 24
+#define TUFTY2040_LIGHT_SENSE_PIN 26
+// powers the light sensor
+#define TUFTY2040_SENSOR_POWER_PIN 27
+#define TUFTY2040_VREF_1V24_PIN 28
+#define TUFTY2040_VBAT_SENSE_PIN 29
+
 // --- UART ---
-// no PICO_DEFAULT_UART
-// no PICO_DEFAULT_UART_TX_PIN
-// no PICO_DEFAULT_UART_RX_PIN
+#ifndef PICO_DEFAULT_UART
+#define PICO_DEFAULT_UART 0
+#endif
+#ifndef PICO_DEFAULT_UART_TX_PIN
+#define PICO_DEFAULT_UART_TX_PIN 0
+#endif
+#ifndef PICO_DEFAULT_UART_RX_PIN
+#define PICO_DEFAULT_UART_RX_PIN 1
+#endif
 
 // --- LED ---
 #ifndef PICO_DEFAULT_LED_PIN
@@ -55,15 +75,14 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 // no PICO_DEFAULT_WS2812_PIN
 
 // --- I2C ---
-// routed to Qw/St connector
 #ifndef PICO_DEFAULT_I2C
-#define PICO_DEFAULT_I2C 0
+#define PICO_DEFAULT_I2C TUFTY2040_I2C
 #endif
 #ifndef PICO_DEFAULT_I2C_SDA_PIN
-#define PICO_DEFAULT_I2C_SDA_PIN 4
+#define PICO_DEFAULT_I2C_SDA_PIN TUFTY2040_SDA_PIN
 #endif
 #ifndef PICO_DEFAULT_I2C_SCL_PIN
-#define PICO_DEFAULT_I2C_SCL_PIN 5
+#define PICO_DEFAULT_I2C_SCL_PIN TUFTY2040_SCL_PIN
 #endif
 
 // --- SPI ---
@@ -84,6 +103,10 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (8 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (8 * 1024 * 1024)
+#endif
+
+#ifndef PICO_VBUS_PIN
+#define PICO_VBUS_PIN TUFTY2040_VBUS_DETECT_PIN
 #endif
 
 // All boards have B1 RP2040

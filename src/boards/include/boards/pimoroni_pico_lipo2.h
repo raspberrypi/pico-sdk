@@ -15,7 +15,6 @@
 #define _BOARDS_PIMORONI_PICO_LIPO2_H
 
 pico_board_cmake_set(PICO_PLATFORM, rp2350)
-pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 
 // For board detection
 #define PIMORONI_PICO_LIPO2
@@ -31,6 +30,7 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 
 #define PIMORONI_PICO_LIPO2_USER_SW_PIN 45
 #define PIMORONI_PICO_LIPO2_PSRAM_CS_PIN 47
+#define PIMORONI_PICO_LIPO2_VBAT_SENSE_PIN 43
 
 // --- RP2350 VARIANT ---
 #define PICO_RP2350A 0
@@ -47,7 +47,9 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #endif
 
 // --- LED ---
-// no PICO_DEFAULT_LED_PIN
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN 25
+#endif
 // no PICO_DEFAULT_WS2812_PIN
 
 // --- I2C ---
@@ -106,49 +108,10 @@ pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #endif
 
 // no PICO_SMPS_MODE_PIN
-// no PICO_VBUS_PIN
+#ifndef PICO_VBUS_PIN
+#define PICO_VBUS_PIN 24
+#endif
+
 // no PICO_VSYS_PIN
-
-// --- CYW43 ---
-// only reachable through the SP/CE port
-
-#ifndef CYW43_WL_GPIO_COUNT
-#define CYW43_WL_GPIO_COUNT 3
-#endif
-
-// cyw43 SPI pins can't be changed at runtime
-#ifndef CYW43_PIN_WL_DYNAMIC
-#define CYW43_PIN_WL_DYNAMIC 0
-#endif
-
-// gpio pin to power up the cyw43 chip
-#ifndef CYW43_DEFAULT_PIN_WL_REG_ON
-#define CYW43_DEFAULT_PIN_WL_REG_ON SPCE_TX_MISO_PIN
-#endif
-
-// gpio pin for spi data out to the cyw43 chip
-#ifndef CYW43_DEFAULT_PIN_WL_DATA_OUT
-#define CYW43_DEFAULT_PIN_WL_DATA_OUT SPCE_RESET_MOSI_PIN
-#endif
-
-// gpio pin for spi data in from the cyw43 chip
-#ifndef CYW43_DEFAULT_PIN_WL_DATA_IN
-#define CYW43_DEFAULT_PIN_WL_DATA_IN SPCE_RESET_MOSI_PIN
-#endif
-
-// gpio (irq) pin for the irq line from the cyw43 chip
-#ifndef CYW43_DEFAULT_PIN_WL_HOST_WAKE
-#define CYW43_DEFAULT_PIN_WL_HOST_WAKE SPCE_RESET_MOSI_PIN
-#endif
-
-// gpio pin for the spi clock line to the cyw43 chip
-#ifndef CYW43_DEFAULT_PIN_WL_CLOCK
-#define CYW43_DEFAULT_PIN_WL_CLOCK SPCE_NETLIGHT_SCK_PIN
-#endif
-
-// gpio pin for the spi chip select to the cyw43 chip
-#ifndef CYW43_DEFAULT_PIN_WL_CS
-#define CYW43_DEFAULT_PIN_WL_CS SPCE_RX_CS_PIN
-#endif
 
 #endif

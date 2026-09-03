@@ -20,17 +20,25 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define PIMORONI_EXPLORER
 
 // --- BOARD SPECIFIC ---
-#define EXPLORER_SERVO_4_PIN 6
-#define EXPLORER_SERVO_3_PIN 7
-#define EXPLORER_SERVO_2_PIN 8
+#define EXPLORER_GPIO_0_PIN 0
+#define EXPLORER_GPIO_1_PIN 1
+#define EXPLORER_GPIO_2_PIN 2
+#define EXPLORER_GPIO_3_PIN 3
+#define EXPLORER_GPIO_4_PIN 4
+#define EXPLORER_GPIO_5_PIN 5
+#define EXPLORER_NUM_GPIOS 6
+
 #define EXPLORER_SERVO_1_PIN 9
+#define EXPLORER_SERVO_2_PIN 8
+#define EXPLORER_SERVO_3_PIN 7
+#define EXPLORER_SERVO_4_PIN 6
 
 #define EXPLORER_PWM_AUDIO_PIN 12
 #define EXPLORER_AMP_EN_PIN 13
 
-#define EXPLORER_SW_C_PIN 14
-#define EXPLORER_SW_B_PIN 15
 #define EXPLORER_SW_A_PIN 16
+#define EXPLORER_SW_B_PIN 15
+#define EXPLORER_SW_C_PIN 14
 #define EXPLORER_SW_X_PIN 17
 #define EXPLORER_SW_Y_PIN 18
 #define EXPLORER_SW_Z_PIN 19
@@ -41,7 +49,20 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 
 #define EXPLORER_USER_SW_PIN 22
 
-#define EXPLORER_LED_PIN 25
+// 8 bit parallel display interface, data on GPIO 32 through 39
+#define EXPLORER_BACKLIGHT_PIN 26
+#define EXPLORER_LCD_CS_PIN 27
+#define EXPLORER_LCD_RS_PIN 28
+#define EXPLORER_LCD_WR_PIN 30
+#define EXPLORER_LCD_RD_PIN 31
+#define EXPLORER_LCD_DB0_PIN 32
+#define EXPLORER_LCD_DB1_PIN 33
+#define EXPLORER_LCD_DB2_PIN 34
+#define EXPLORER_LCD_DB3_PIN 35
+#define EXPLORER_LCD_DB4_PIN 36
+#define EXPLORER_LCD_DB5_PIN 37
+#define EXPLORER_LCD_DB6_PIN 38
+#define EXPLORER_LCD_DB7_PIN 39
 
 #define EXPLORER_ADC_0_PIN 40
 #define EXPLORER_ADC_1_PIN 41
@@ -50,6 +71,9 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #define EXPLORER_ADC_4_PIN 44
 #define EXPLORER_ADC_5_PIN 45
 #define EXPLORER_NUM_ADC_PINS 6
+
+#define EXPLORER_VSYS_SENSE_PIN 46
+#define EXPLORER_1V1_SENSE_PIN 47
 
 // --- RP2350 VARIANT ---
 #define PICO_RP2350A 0
@@ -66,13 +90,11 @@ pico_board_cmake_set(PICO_PLATFORM, rp2350)
 #endif
 
 // --- LED ---
-#ifndef PICO_DEFAULT_LED_PIN
-#define PICO_DEFAULT_LED_PIN EXPLORER_LED_PIN
-#endif
+// no PICO_DEFAULT_LED_PIN
 // no PICO_DEFAULT_WS2812_PIN
 
 // --- I2C ---
-// routed to Qw/St and Breakout Garden connectors
+// routed to Qw/ST and Breakout Garden connectors
 #ifndef PICO_DEFAULT_I2C
 #define PICO_DEFAULT_I2C EXPLORER_I2C
 #endif
@@ -109,6 +131,8 @@ pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 
 // no PICO_SMPS_MODE_PIN
 // no PICO_VBUS_PIN
-// no PICO_VSYS_PIN
+#ifndef PICO_VSYS_PIN
+#define PICO_VSYS_PIN EXPLORER_VSYS_SENSE_PIN
+#endif
 
 #endif

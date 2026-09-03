@@ -46,7 +46,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define TINYFX_VSENSE_PIN 28
 
 // --- UART ---
-// UART0 is only reachable on the I2C pins, which are the Qw/St connector
+// UART0 is only reachable on the I2C pins, which are the Qw/ST connector
 // no PICO_DEFAULT_UART
 // no PICO_DEFAULT_UART_TX_PIN
 // no PICO_DEFAULT_UART_RX_PIN
@@ -56,7 +56,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 // no PICO_DEFAULT_WS2812_PIN
 
 // --- I2C ---
-// routed to Qw/St connector
+// routed to Qw/ST connector
 #ifndef PICO_DEFAULT_I2C
 #define PICO_DEFAULT_I2C TINYFX_I2C
 #endif

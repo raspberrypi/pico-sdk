@@ -49,12 +49,15 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #define PRESTO_LCD_SPI 1
 #define PRESTO_LCD_CLK_PIN 26
 #define PRESTO_LCD_DAT_PIN 27
+// GPIO 28 is not an SPI1 CSn pin, so the chip select must be driven manually
 #define PRESTO_LCD_CS_PIN 28
+#define PRESTO_LCD_RESET_PIN 44
 
 #define PRESTO_TOUCH_I2C 1
 #define PRESTO_TOUCH_SDA_PIN 30
 #define PRESTO_TOUCH_SCL_PIN 31
 #define PRESTO_TOUCH_INT_PIN 32
+#define PRESTO_TOUCH_RESET_PIN 42
 
 #define PRESTO_LED_DAT_PIN 33
 
@@ -63,6 +66,9 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #define PRESTO_SD_MOSI_PIN 35
 #define PRESTO_SD_MISO_PIN 36
 #define PRESTO_SD_CS_PIN 39
+// in 4 bit SDIO mode MISO and CS carry data 0 and data 3
+#define PRESTO_SD_DAT1_PIN 37
+#define PRESTO_SD_DAT2_PIN 38
 
 #define PRESTO_I2C 0
 #define PRESTO_SDA_PIN 40
@@ -70,6 +76,7 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 
 #define PRESTO_BUZZER_PIN 43
 #define PRESTO_BACKLIGHT_PIN 45
+#define PRESTO_USER_SW_PIN 46
 #define PRESTO_PSRAM_CS_PIN 47
 
 // --- RP2350 VARIANT ---
@@ -82,9 +89,7 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 // no PICO_DEFAULT_UART_RX_PIN
 
 // --- LED ---
-#ifndef PICO_DEFAULT_LED_PIN
-#define PICO_DEFAULT_LED_PIN 25
-#endif
+// no PICO_DEFAULT_LED_PIN
 
 // ambient LEDs behind the display
 #ifndef PICO_DEFAULT_WS2812_PIN
@@ -92,7 +97,7 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #endif
 
 // --- I2C ---
-// routed to Qw/St connector
+// routed to Qw/ST connector
 #ifndef PICO_DEFAULT_I2C
 #define PICO_DEFAULT_I2C PRESTO_I2C
 #endif
@@ -152,6 +157,9 @@ pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 // no PICO_VSYS_PIN
 
 // --- CYW43 ---
+#ifndef CYW43_WL_GPIO_COUNT
+#define CYW43_WL_GPIO_COUNT 3
+#endif
 
 // cyw43 SPI pins can't be changed at runtime
 #ifndef CYW43_PIN_WL_DYNAMIC

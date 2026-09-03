@@ -21,13 +21,6 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #define PIMORONI_PLASMA2350_W
 
 // --- BOARD SPECIFIC ---
-#define SPCE_SPI 1
-#define SPCE_TX_MISO_PIN 8
-#define SPCE_RX_CS_PIN 9
-#define SPCE_NETLIGHT_SCK_PIN 10
-#define SPCE_RESET_MOSI_PIN 11
-#define SPCE_PWRKEY_BL_PIN 7
-
 #define PLASMA2350_SW_A_PIN 12
 
 #define PLASMA2350_CLK_PIN 14
@@ -53,9 +46,15 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #define PICO_RP2350A 1
 
 // --- UART ---
-// no PICO_DEFAULT_UART
-// no PICO_DEFAULT_UART_TX_PIN
-// no PICO_DEFAULT_UART_RX_PIN
+#ifndef PICO_DEFAULT_UART
+#define PICO_DEFAULT_UART 0
+#endif
+#ifndef PICO_DEFAULT_UART_TX_PIN
+#define PICO_DEFAULT_UART_TX_PIN 0
+#endif
+#ifndef PICO_DEFAULT_UART_RX_PIN
+#define PICO_DEFAULT_UART_RX_PIN 1
+#endif
 
 // --- LED ---
 #ifndef PICO_DEFAULT_LED_PIN
@@ -68,7 +67,7 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #endif
 
 // --- I2C ---
-// routed to Qw/St connector
+// routed to Qw/ST connector
 #ifndef PICO_DEFAULT_I2C
 #define PICO_DEFAULT_I2C PLASMA2350_I2C
 #endif
@@ -80,21 +79,11 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 #endif
 
 // --- SPI ---
-#ifndef PICO_DEFAULT_SPI
-#define PICO_DEFAULT_SPI SPCE_SPI
-#endif
-#ifndef PICO_DEFAULT_SPI_SCK_PIN
-#define PICO_DEFAULT_SPI_SCK_PIN SPCE_NETLIGHT_SCK_PIN
-#endif
-#ifndef PICO_DEFAULT_SPI_TX_PIN
-#define PICO_DEFAULT_SPI_TX_PIN SPCE_RESET_MOSI_PIN
-#endif
-#ifndef PICO_DEFAULT_SPI_RX_PIN
-#define PICO_DEFAULT_SPI_RX_PIN SPCE_TX_MISO_PIN
-#endif
-#ifndef PICO_DEFAULT_SPI_CSN_PIN
-#define PICO_DEFAULT_SPI_CSN_PIN SPCE_RX_CS_PIN
-#endif
+// no PICO_DEFAULT_SPI
+// no PICO_DEFAULT_SPI_SCK_PIN
+// no PICO_DEFAULT_SPI_TX_PIN
+// no PICO_DEFAULT_SPI_RX_PIN
+// no PICO_DEFAULT_SPI_CSN_PIN
 
 // --- FLASH ---
 #define PICO_BOOT_STAGE2_CHOOSE_W25Q080 1
@@ -113,6 +102,7 @@ pico_board_cmake_set_default(PICO_RP2350_A2_SUPPORTED, 1)
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif
 
+// no PICO_SMPS_MODE_PIN
 // no PICO_VBUS_PIN
 // no PICO_VSYS_PIN
 

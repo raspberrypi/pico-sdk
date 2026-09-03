@@ -81,7 +81,9 @@ pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 // no PICO_DEFAULT_UART_RX_PIN
 
 // --- LED ---
-// no PICO_DEFAULT_LED_PIN - LED is on the wireless chip
+#ifndef PICO_DEFAULT_LED_PIN
+#define PICO_DEFAULT_LED_PIN TUFTY2350_LED_0_PIN
+#endif
 // no PICO_DEFAULT_WS2812_PIN
 
 // --- I2C ---
