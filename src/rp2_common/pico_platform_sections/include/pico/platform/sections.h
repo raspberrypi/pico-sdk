@@ -250,11 +250,16 @@
 #define __not_in_flash(group) PICO_NOT_IN_FLASH_PLACEMENT(group)
 #endif
 
-/*! \brief Indicates a function should not be stored in flash
+/*! \brief Indicates a function should not be placed in flash
  *  \ingroup pico_platform
  *
- * Decorates a function name, such that the function will execute from RAM (assuming it is not inlined
- * into a flash function by the compiler)
+ * Decorates a function name, such that the function will not be placed to be executed from flash
+ * (it is place via \ref __not_in_flash).
+ *
+ * \note This macro does not add __no_inline, which means the function may still inlined (either explicitly
+ * by the user, or by compiler optimization) leading to the the code ending up inside of wherever the calling
+ * function is. This behavior is maintained for backwards compatibility with prior SDK versions, however
+ * \ref __no_inline_not_in_flash_func is also provided for cases where you want to be explicit.
  *
  * For example a function called my_func taking an int parameter:
  *
@@ -268,17 +273,11 @@
 #define __not_in_flash_func(func_name) __not_in_flash(__STRING(func_name)) func_name
 #endif
 
-/*! \brief Indicate a function should not be stored in flash and should not be inlined
+/*! \brief Indicate a function should not be placed in flash and should not be inlined
  *  \ingroup pico_platform
  *
- * Decorates a function name, such that the function will execute from RAM, explicitly marking it as
- * noinline to prevent it being inlined into a flash function by the compiler
- *
- * For example a function called my_func taking an int parameter:
- *
- *     void __no_inline_not_in_flash_func(my_func)(int some_arg) {
- *
- * The function is placed using \ref __not_in_flash, which itself defaults to \ref __in_ram
+ * This is equivalent to \ref __not_in_flash_func, but also adds a __noinline attribute
+ * to prevent the compiler inlining the function (possibly into a flash function!)
  */
 #ifndef __no_inline_not_in_flash_func
 #define __no_inline_not_in_flash_func(func_name) __noinline __not_in_flash_func(func_name)
@@ -289,12 +288,17 @@
 #define PICO_TIME_CRITICAL_PLACEMENT __in_ram
 #endif
 
-/*! \brief Indicates a function is time/latency critical and should not run from flash
+/*! \brief Indicates a function is time/latency critical and should not be placed to execute from flash
  *  \ingroup pico_platform
  *
  * Decorates a function name, such that, by default, the function will execute from RAM to avoid possible flash latency
- * (assuming it is not inlined into a flash function by the compiler). By default, this macro is equivalent to `__not_in_flash_func`,
- * however the semantics are distinct, and a `__time_critical_func` can be configured differently.
+ * By default, this macro is equivalent to `__not_in_flash_func`, however the semantics are distinct,
+ * and `__time_critical_func` may be configured with different function placement.
+ *
+ * \note This macro does not add __no_inline, which means the function may still inlined (either explicitly
+ * by the user, or by compiler optimization) leading to the the code ending up inside of wherever the calling
+ * function is. This behavior is maintained for backwards compatibility with prior SDK versions, however
+ * \ref __no_inline_time_critical_func is also provided for cases where you want to be explicit.
  *
  * For example, a function called my_func taking an int parameter:
  *
@@ -309,9 +313,23 @@
  * ports would be otherwise unused.
  *
  * \see __not_in_flash
+ * \see __no_inline_time_critical_func
  */
 #ifndef __time_critical_func
 #define __time_critical_func(func_name) PICO_TIME_CRITICAL_PLACEMENT(__STRING(func_name)) func_name
+#endif
+
+/*! \brief Indicates a function is time/latency critical and should not be placed to execute from flash, and should
+ * not be inlined
+ *  \ingroup pico_platform
+ *
+ * This is equivalent to \ref __time_critical_func, but also adds a __noinline attribute
+ * to prevent the compiler inlining the function (possibly into a flash function!)
+ *
+ * \see __time_critical_func
+ */
+#ifndef __no_inline_time_critical_func
+#define __no_inline_time_critical_func(func_name) __noinline __time_critical_func(func_name)
 #endif
 
 #else
