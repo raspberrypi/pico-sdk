@@ -59,7 +59,7 @@ if (EXISTS ${PICO_TINYUSB_PATH}/${TINYUSB_TEST_PATH})
     # Latest TinyUSB has removed the suppress_tinyusb_warnings() function. If the function is present
     # we assume we want to override it to suppress more warnings; if not we will define an empty
     # version since SDK users may assume it exists
-    if (TARGET suppress_tinyusb_warnings)
+    if (COMMAND suppress_tinyusb_warnings)
         # Override existing suppress_tinyusb_warnings to add suppression of (falsely) reported GCC 11.2 warnings
         function(suppress_tinyusb_warnings)
             _suppress_tinyusb_warnings()
