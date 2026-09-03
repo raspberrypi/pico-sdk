@@ -310,7 +310,7 @@
  * \see __not_in_flash
  */
 #ifndef __time_critical_func
-#define __time_critical_func(func_name) __noinline PICO_TIME_CRITICAL_PLACEMENT(__STRING(func_name)) func_name
+#define __time_critical_func(func_name) PICO_TIME_CRITICAL_PLACEMENT(__STRING(func_name)) func_name
 #endif
 
 #else
