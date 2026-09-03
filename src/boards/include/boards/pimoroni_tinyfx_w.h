@@ -9,15 +9,16 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/pimoroni_tinyfx.h"
+// This header may be included by other board headers as "boards/pimoroni_tinyfx_w.h"
 
-#ifndef _BOARDS_PIMORONI_TINYFX_H
-#define _BOARDS_PIMORONI_TINYFX_H
+#ifndef _BOARDS_PIMORONI_TINYFX_W_H
+#define _BOARDS_PIMORONI_TINYFX_W_H
 
 pico_board_cmake_set(PICO_PLATFORM, rp2040)
+pico_board_cmake_set(PICO_CYW43_SUPPORTED, 1)
 
 // For board detection
-#define PIMORONI_TINYFX
+#define PIMORONI_TINYFX_W
 
 // --- BOARD SPECIFIC ---
 #define TINYFX_OUT1_PIN 3
@@ -52,7 +53,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 // no PICO_DEFAULT_UART_RX_PIN
 
 // --- LED ---
-// no PICO_DEFAULT_LED_PIN
+// no PICO_DEFAULT_LED_PIN - LED is on the wireless chip
 // no PICO_DEFAULT_WS2812_PIN
 
 // --- I2C ---
@@ -89,6 +90,50 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (4 * 1024 * 1024))
 // All boards have B1 RP2040
 #ifndef PICO_RP2040_B0_SUPPORTED
 #define PICO_RP2040_B0_SUPPORTED 0
+#endif
+
+// --- CYW43 ---
+#ifndef CYW43_WL_GPIO_COUNT
+#define CYW43_WL_GPIO_COUNT 3
+#endif
+
+#ifndef CYW43_WL_GPIO_LED_PIN
+#define CYW43_WL_GPIO_LED_PIN 0
+#endif
+
+// cyw43 SPI pins can't be changed at runtime
+#ifndef CYW43_PIN_WL_DYNAMIC
+#define CYW43_PIN_WL_DYNAMIC 0
+#endif
+
+// gpio pin to power up the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_REG_ON
+#define CYW43_DEFAULT_PIN_WL_REG_ON 23u
+#endif
+
+// gpio pin for spi data out to the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_DATA_OUT
+#define CYW43_DEFAULT_PIN_WL_DATA_OUT 24u
+#endif
+
+// gpio pin for spi data in from the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_DATA_IN
+#define CYW43_DEFAULT_PIN_WL_DATA_IN 24u
+#endif
+
+// gpio (irq) pin for the irq line from the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_HOST_WAKE
+#define CYW43_DEFAULT_PIN_WL_HOST_WAKE 24u
+#endif
+
+// gpio pin for the spi clock line to the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_CLOCK
+#define CYW43_DEFAULT_PIN_WL_CLOCK 29u
+#endif
+
+// gpio pin for the spi chip select to the cyw43 chip
+#ifndef CYW43_DEFAULT_PIN_WL_CS
+#define CYW43_DEFAULT_PIN_WL_CS 25u
 #endif
 
 #endif
