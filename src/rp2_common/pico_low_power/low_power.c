@@ -186,7 +186,7 @@ static void add_library_clocks(clock_dest_bitset_t *local_keep_enabled) {
     #endif
 #endif
 
-#if LIB_PICO_STDIO_UART
+#if LIB_PICO_STDIO_UART && defined(PICO_DEFAULT_UART)
     // this is only needed to prevent losing stdin while sleeping
     clock_dest_bitset_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_PERI_UART1 : CLK_DEST_PERI_UART0);
     clock_dest_bitset_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_SYS_UART1 : CLK_DEST_SYS_UART0);
