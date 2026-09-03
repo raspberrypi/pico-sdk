@@ -292,7 +292,7 @@
  *  \ingroup pico_platform
  *
  * Decorates a function name, such that the function will execute from RAM to avoid possible flash latency. By default,
- * this macro is identical in implementation to `__no_inline_not_in_flash_func`, however the semantics are distinct and
+ * this macro is identical in implementation to `__not_in_flash_func`, however the semantics are distinct and
  * a `__time_critical_func` can be treated more specially to reduce the overhead when calling such a function.
  *
  * For example a function called my_func taking an int parameter:
