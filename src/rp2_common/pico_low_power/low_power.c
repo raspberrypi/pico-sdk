@@ -172,7 +172,7 @@ static void replace_null_enable_values(const clock_dest_bitset_t *keep_enabled,
     }
 }
 
-static void add_library_clocks(clock_dest_bitset_t *local_keep_enabled) {
+static void add_library_clocks(__unused clock_dest_bitset_t *local_keep_enabled) {
 #if LIB_PICO_STDIO_USB || LIB_TINYUSB_HOST || LIB_TINYUSB_DEVICE
     // this is necessary to prevent dropping the connection
     #if PICO_RP2040
