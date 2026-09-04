@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include "hardware/resets.h"
+#include "hardware/structs/clocks.h"
 #include "hardware/structs/uart.h"
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_UART, Enable/disable assertions in the hardware_uart module, type=bool, default=0, group=hardware_uart
@@ -183,6 +184,30 @@ static_assert(DREQ_UART1_TX == DREQ_UART0_TX + 2, "");
  */
 #ifndef UART_CLOCK_NUM
 #define UART_CLOCK_NUM(uart) clk_peri
+#endif
+
+/**
+ * \def UART_CLK_DEST_PERI(uart)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns \ref clock_dest_num_t of the clk_peri dest for the given UART instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_CLK_DEST_PERI
+#define UART_CLK_DEST_PERI(uart) (uart_get_index(uart) ? CLK_DEST_PERI_UART1 : CLK_DEST_PERI_UART0)
+#endif
+
+/**
+ * \def UART_CLK_DEST_SYS(uart)
+ * \ingroup hardware_uart
+ * \hideinitializer
+ * \brief Returns \ref clock_dest_num_t of the clk_peri dest for the given UART instance
+ *
+ * Note this macro is intended to resolve at compile time, and does no parameter checking
+ */
+#ifndef UART_CLK_DEST_SYS
+#define UART_CLK_DEST_SYS(uart) (uart_get_index(uart) ? CLK_DEST_SYS_UART1 : CLK_DEST_SYS_UART0)
 #endif
 
 /**
