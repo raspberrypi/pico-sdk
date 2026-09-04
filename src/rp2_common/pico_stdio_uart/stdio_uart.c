@@ -22,14 +22,16 @@ static void *chars_available_param;
 #define stdio_bi_decl_if_func_used bi_decl_if_func_used
 #endif
 
+// even, or mulitple of 4 on RP2040
 #ifdef PICO_DEFAULT_UART_TX_PIN
-#if (PICO_DEFAULT_UART_TX_PIN & 0x1) || (PICO_RP2040 && (PICO_DEFAULT_UART_TX_PIN & 0x2))
+#if (PICO_DEFAULT_UART_TX_PIN % 2) || (PICO_RP2040 && (PICO_DEFAULT_UART_TX_PIN % 4))
 #error "Specified PICO_DEFAULT_UART_TX_PIN does not support UART TX"
 #endif
 #endif
 
+// odd, or (multiple of 4) + 1 on RP2040
 #ifdef PICO_DEFAULT_UART_RX_PIN
-#if !(PICO_DEFAULT_UART_RX_PIN & 0x1) || (PICO_RP2040 && (PICO_DEFAULT_UART_TX_PIN & 0x2))
+#if ((PICO_DEFAULT_UART_RX_PIN % 2) != 1) || (PICO_RP2040 && ((PICO_DEFAULT_UART_RX_PIN % 4) != 1))
 #error "Specified PICO_DEFAULT_UART_RX_PIN does not support UART RX"
 #endif
 #endif
