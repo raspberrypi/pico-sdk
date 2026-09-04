@@ -42,6 +42,7 @@ extern "C" {
 #endif
 
 #define __time_critical_func(x) x
+#define __sdk_time_critical_func(x) x
 #define __after_data(group)
 
 //int running_on_fpga() { return false; }

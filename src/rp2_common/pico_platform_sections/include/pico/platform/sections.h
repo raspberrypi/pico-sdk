@@ -332,6 +332,20 @@
 #define __no_inline_time_critical_func(func_name) __noinline __time_critical_func(func_name)
 #endif
 
+// PICO_CONFIG: PICO_TIME_CRITICAL_SDK_NO_INLINE, Mark SDK time critical functions as __noinline, type=bool, default=0, group=pico_platform
+#ifndef PICO_TIME_CRITICAL_SDK_NO_INLINE
+#define PICO_TIME_CRITICAL_SDK_NO_INLINE 0
+#endif
+
+// For internal SDK use only, hence no doxygen
+#ifndef __sdk_time_critical_func
+#if PICO_TIME_CRITICAL_SDK_NO_INLINE
+#define __sdk_time_critical_func(func_name) __no_inline_time_critical_func(func_name)
+#else
+#define __sdk_time_critical_func(func_name) __time_critical_func(func_name)
+#endif
+#endif
+
 #else
 
 #ifndef RAM_SECTION_NAME

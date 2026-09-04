@@ -211,7 +211,8 @@ if (NOT TARGET pico_standard_link)
     # normal SRAM, useful if <MEMORY> has dedicated AHB ports which are otherwise unused. For example,
     # xip_ram could be used in no_flash and copy_to_ram binaries, as the XIP AHB ports are unused.
     # This sets PICO_TIME_CRITICAL_PLACEMENT=__in_<MEMORY>, and any necessary defines required to use
-    # <MEMORY> (e.g. PICO_USE_XIP_CACHE_AS_RAM=1 for xip_ram).
+    # <MEMORY> (e.g. PICO_USE_XIP_CACHE_AS_RAM=1 for xip_ram). Also sets PICO_TIME_CRITICAL_SDK_NO_INLINE=1
+    # to ensure SDK time-critical functions are not inlined
     #
     # The xip_ram memory should not be used for flash binaries, as using the XIP cache as SRAM will
     # have a large performance penalty.
@@ -223,6 +224,7 @@ if (NOT TARGET pico_standard_link)
         if (${MEMORY} STREQUAL "xip_ram")
             pico_set_compile_definition(${TARGET} PICO_USE_XIP_CACHE_AS_RAM 1)
         endif()
+        pico_set_compile_definition(${TARGET} PICO_TIME_CRITICAL_SDK_NO_INLINE 1)
     endfunction()
 
     # pico_set_not_in_flash_placement(TARGET MEMORY)

@@ -14,7 +14,7 @@ void sem_init(semaphore_t *sem, int16_t initial_permits, int16_t max_permits) {
     __mem_fence_release();
 }
 
-int __time_critical_func(sem_available)(semaphore_t *sem) {
+int __sdk_time_critical_func(sem_available)(semaphore_t *sem) {
 #if defined(__GNUC__) && !defined(__STRICT_ANSI__)
     return *(volatile typeof(sem->permits) *) &sem->permits;
 #else
@@ -23,7 +23,7 @@ int __time_critical_func(sem_available)(semaphore_t *sem) {
 #endif
 }
 
-void __time_critical_func(sem_acquire_blocking)(semaphore_t *sem) {
+void __sdk_time_critical_func(sem_acquire_blocking)(semaphore_t *sem) {
     // only a caller which waited can have consumed a notification, so only it can owe one to
     // the waiters it did not exclude - taking one of several permits leaves the others able to
     // proceed. Taking a permit on the first pass consumes no notification, so owes nothing.
@@ -41,15 +41,15 @@ void __time_critical_func(sem_acquire_blocking)(semaphore_t *sem) {
     } while (true);
 }
 
-bool __time_critical_func(sem_acquire_timeout_ms)(semaphore_t *sem, uint32_t timeout_ms) {
+bool __sdk_time_critical_func(sem_acquire_timeout_ms)(semaphore_t *sem, uint32_t timeout_ms) {
     return sem_acquire_block_until(sem, make_timeout_time_ms(timeout_ms));
 }
 
-bool __time_critical_func(sem_acquire_timeout_us)(semaphore_t *sem, uint32_t timeout_us) {
+bool __sdk_time_critical_func(sem_acquire_timeout_us)(semaphore_t *sem, uint32_t timeout_us) {
     return sem_acquire_block_until(sem, make_timeout_time_us(timeout_us));
 }
 
-bool __time_critical_func(sem_acquire_block_until)(semaphore_t *sem, absolute_time_t until) {
+bool __sdk_time_critical_func(sem_acquire_block_until)(semaphore_t *sem, absolute_time_t until) {
     bool __unused waited = false;
     do {
         uint32_t save = spin_lock_blocking(sem->core.spin_lock);
@@ -67,7 +67,7 @@ bool __time_critical_func(sem_acquire_block_until)(semaphore_t *sem, absolute_ti
     } while (true);
 }
 
-bool __time_critical_func(sem_try_acquire)(semaphore_t *sem) {
+bool __sdk_time_critical_func(sem_try_acquire)(semaphore_t *sem) {
     uint32_t save = spin_lock_blocking(sem->core.spin_lock);
     if (sem->permits > 0) {
         sem->permits--;
@@ -81,7 +81,7 @@ bool __time_critical_func(sem_try_acquire)(semaphore_t *sem) {
 }
 
 // todo this should really have a blocking variant for when permits are maxed out
-bool __time_critical_func(sem_release)(semaphore_t *sem) {
+bool __sdk_time_critical_func(sem_release)(semaphore_t *sem) {
     uint32_t save = spin_lock_blocking(sem->core.spin_lock);
     int32_t count = sem->permits;
     if (count < sem->max_permits) {
@@ -94,7 +94,7 @@ bool __time_critical_func(sem_release)(semaphore_t *sem) {
     }
 }
 
-void __time_critical_func(sem_reset)(semaphore_t *sem, int16_t permits) {
+void __sdk_time_critical_func(sem_reset)(semaphore_t *sem, int16_t permits) {
     assert(permits >= 0 && permits <= sem->max_permits);
     uint32_t save = spin_lock_blocking(sem->core.spin_lock);
     if (permits > sem->permits) {
