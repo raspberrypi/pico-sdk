@@ -1,0 +1,66 @@
+// run: pioasm input.pio
+.program expr_arith
+.define a 10
+.define b 2
+    set pins, (a + b)
+    set pins, (a - b)
+    set pins, (a * b)
+    set pins, (a / b)
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ---------- //
+// // expr_arith //
+// // ---------- //
+// 
+// #define expr_arith_wrap_target 0
+// #define expr_arith_wrap 3
+// #define expr_arith_pio_version 0
+// 
+// static __pio_const uint16_t expr_arith_program_instructions[] = {
+//             //     .wrap_target
+//     0xe00c, //  0: set    pins, 12
+//     0xe008, //  1: set    pins, 8
+//     0xe014, //  2: set    pins, 20
+//     0xe005, //  3: set    pins, 5
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program expr_arith_program = {
+//     .instructions = expr_arith_program_instructions,
+//     .length = 4,
+//     .origin = -1,
+//     .pio_version = expr_arith_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config expr_arith_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + expr_arith_wrap_target, offset + expr_arith_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

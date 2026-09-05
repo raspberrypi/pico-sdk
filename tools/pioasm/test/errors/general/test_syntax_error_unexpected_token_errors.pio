@@ -1,0 +1,12 @@
+// run: pioasm input.pio
+.program syntax_unexpected
+    jmp ,
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.10: syntax error, unexpected end of line
+//     3 |     jmp ,
+//       |          ^
+// 

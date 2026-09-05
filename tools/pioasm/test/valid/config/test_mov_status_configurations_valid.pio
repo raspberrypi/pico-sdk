@@ -1,0 +1,367 @@
+// run: pioasm -v 1 input.pio
+.program mov_status_tx_lessthan
+.pio_version 1
+.mov_status txfifo < 4
+    mov x, status
+    nop
+
+.program mov_status_tx_zero
+.pio_version 1
+.mov_status txfifo < 0
+    mov x, status
+
+.program mov_status_tx_max
+.pio_version 1
+.mov_status txfifo < 31
+    mov x, status
+
+.program mov_status_rx_lessthan
+.pio_version 1
+.mov_status rxfifo < 8
+    mov y, status
+
+.program mov_status_rx_max
+.pio_version 1
+.mov_status rxfifo < 31
+    mov y, status
+
+.program mov_status_irq_set
+.pio_version 1
+.mov_status irq set 5
+    mov isr, status
+
+.program mov_status_irq_zero
+.pio_version 1
+.mov_status irq set 0
+    mov isr, status
+
+.program mov_status_irq_max
+.pio_version 1
+.mov_status irq set 7
+    mov isr, status
+
+.program mov_status_irq_rel
+.pio_version 1
+.mov_status irq prev set 3
+    mov osr, status
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ---------------------- //
+// // mov_status_tx_lessthan //
+// // ---------------------- //
+// 
+// #define mov_status_tx_lessthan_wrap_target 0
+// #define mov_status_tx_lessthan_wrap 1
+// #define mov_status_tx_lessthan_pio_version 1
+// 
+// static __pio_const uint16_t mov_status_tx_lessthan_program_instructions[] = {
+//             //     .wrap_target
+//     0xa025, //  0: mov    x, status
+//     0xa042, //  1: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_status_tx_lessthan_program = {
+//     .instructions = mov_status_tx_lessthan_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = mov_status_tx_lessthan_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_status_tx_lessthan_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_status_tx_lessthan_wrap_target, offset + mov_status_tx_lessthan_wrap);
+//     sm_config_set_mov_status(&c, STATUS_TX_LESSTHAN, 4);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------ //
+// // mov_status_tx_zero //
+// // ------------------ //
+// 
+// #define mov_status_tx_zero_wrap_target 0
+// #define mov_status_tx_zero_wrap 0
+// #define mov_status_tx_zero_pio_version 1
+// 
+// static __pio_const uint16_t mov_status_tx_zero_program_instructions[] = {
+//             //     .wrap_target
+//     0xa025, //  0: mov    x, status
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_status_tx_zero_program = {
+//     .instructions = mov_status_tx_zero_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = mov_status_tx_zero_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_status_tx_zero_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_status_tx_zero_wrap_target, offset + mov_status_tx_zero_wrap);
+//     sm_config_set_mov_status(&c, STATUS_TX_LESSTHAN, 0);
+//     return c;
+// }
+// #endif
+// 
+// // ----------------- //
+// // mov_status_tx_max //
+// // ----------------- //
+// 
+// #define mov_status_tx_max_wrap_target 0
+// #define mov_status_tx_max_wrap 0
+// #define mov_status_tx_max_pio_version 1
+// 
+// static __pio_const uint16_t mov_status_tx_max_program_instructions[] = {
+//             //     .wrap_target
+//     0xa025, //  0: mov    x, status
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_status_tx_max_program = {
+//     .instructions = mov_status_tx_max_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = mov_status_tx_max_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_status_tx_max_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_status_tx_max_wrap_target, offset + mov_status_tx_max_wrap);
+//     sm_config_set_mov_status(&c, STATUS_TX_LESSTHAN, 31);
+//     return c;
+// }
+// #endif
+// 
+// // ---------------------- //
+// // mov_status_rx_lessthan //
+// // ---------------------- //
+// 
+// #define mov_status_rx_lessthan_wrap_target 0
+// #define mov_status_rx_lessthan_wrap 0
+// #define mov_status_rx_lessthan_pio_version 1
+// 
+// static __pio_const uint16_t mov_status_rx_lessthan_program_instructions[] = {
+//             //     .wrap_target
+//     0xa045, //  0: mov    y, status
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_status_rx_lessthan_program = {
+//     .instructions = mov_status_rx_lessthan_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = mov_status_rx_lessthan_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_status_rx_lessthan_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_status_rx_lessthan_wrap_target, offset + mov_status_rx_lessthan_wrap);
+//     sm_config_set_mov_status(&c, STATUS_RX_LESSTHAN, 8);
+//     return c;
+// }
+// #endif
+// 
+// // ----------------- //
+// // mov_status_rx_max //
+// // ----------------- //
+// 
+// #define mov_status_rx_max_wrap_target 0
+// #define mov_status_rx_max_wrap 0
+// #define mov_status_rx_max_pio_version 1
+// 
+// static __pio_const uint16_t mov_status_rx_max_program_instructions[] = {
+//             //     .wrap_target
+//     0xa045, //  0: mov    y, status
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_status_rx_max_program = {
+//     .instructions = mov_status_rx_max_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = mov_status_rx_max_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_status_rx_max_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_status_rx_max_wrap_target, offset + mov_status_rx_max_wrap);
+//     sm_config_set_mov_status(&c, STATUS_RX_LESSTHAN, 31);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------ //
+// // mov_status_irq_set //
+// // ------------------ //
+// 
+// #define mov_status_irq_set_wrap_target 0
+// #define mov_status_irq_set_wrap 0
+// #define mov_status_irq_set_pio_version 1
+// 
+// static __pio_const uint16_t mov_status_irq_set_program_instructions[] = {
+//             //     .wrap_target
+//     0xa0c5, //  0: mov    isr, status
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_status_irq_set_program = {
+//     .instructions = mov_status_irq_set_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = mov_status_irq_set_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_status_irq_set_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_status_irq_set_wrap_target, offset + mov_status_irq_set_wrap);
+//     sm_config_set_mov_status(&c, STATUS_IRQ_SET, 5);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------- //
+// // mov_status_irq_zero //
+// // ------------------- //
+// 
+// #define mov_status_irq_zero_wrap_target 0
+// #define mov_status_irq_zero_wrap 0
+// #define mov_status_irq_zero_pio_version 1
+// 
+// static __pio_const uint16_t mov_status_irq_zero_program_instructions[] = {
+//             //     .wrap_target
+//     0xa0c5, //  0: mov    isr, status
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_status_irq_zero_program = {
+//     .instructions = mov_status_irq_zero_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = mov_status_irq_zero_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_status_irq_zero_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_status_irq_zero_wrap_target, offset + mov_status_irq_zero_wrap);
+//     sm_config_set_mov_status(&c, STATUS_IRQ_SET, 0);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------ //
+// // mov_status_irq_max //
+// // ------------------ //
+// 
+// #define mov_status_irq_max_wrap_target 0
+// #define mov_status_irq_max_wrap 0
+// #define mov_status_irq_max_pio_version 1
+// 
+// static __pio_const uint16_t mov_status_irq_max_program_instructions[] = {
+//             //     .wrap_target
+//     0xa0c5, //  0: mov    isr, status
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_status_irq_max_program = {
+//     .instructions = mov_status_irq_max_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = mov_status_irq_max_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_status_irq_max_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_status_irq_max_wrap_target, offset + mov_status_irq_max_wrap);
+//     sm_config_set_mov_status(&c, STATUS_IRQ_SET, 7);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------ //
+// // mov_status_irq_rel //
+// // ------------------ //
+// 
+// #define mov_status_irq_rel_wrap_target 0
+// #define mov_status_irq_rel_wrap 0
+// #define mov_status_irq_rel_pio_version 1
+// 
+// static __pio_const uint16_t mov_status_irq_rel_program_instructions[] = {
+//             //     .wrap_target
+//     0xa0e5, //  0: mov    osr, status
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_status_irq_rel_program = {
+//     .instructions = mov_status_irq_rel_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = mov_status_irq_rel_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_status_irq_rel_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_status_irq_rel_wrap_target, offset + mov_status_irq_rel_wrap);
+//     sm_config_set_mov_status(&c, STATUS_IRQ_SET, 11);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

@@ -1,0 +1,58 @@
+// run: pioasm -o c-sdk input.pio
+.program format_test
+    nop
+
+// -- Output
+// Command: pioasm -o c-sdk input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ----------- //
+// // format_test //
+// // ----------- //
+// 
+// #define format_test_wrap_target 0
+// #define format_test_wrap 0
+// #define format_test_pio_version 0
+// 
+// static __pio_const uint16_t format_test_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program format_test_program = {
+//     .instructions = format_test_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = format_test_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config format_test_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + format_test_wrap_target, offset + format_test_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

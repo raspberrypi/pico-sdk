@@ -1,0 +1,13 @@
+// run: pioasm -o hex input.pio
+.program hex_one
+    nop
+
+.program hex_two
+    nop
+// -- Output
+// Command: pioasm -o hex input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// error: hex output only supports a single program input
+// 

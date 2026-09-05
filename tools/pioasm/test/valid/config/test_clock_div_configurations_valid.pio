@@ -1,0 +1,244 @@
+// run: pioasm input.pio
+.program clock_div_integer
+.clock_div 1
+    nop
+
+.program clock_div_fractional
+.clock_div 2.5
+    nop
+
+.program clock_div_small_fraction
+.clock_div 1.125
+    nop
+
+.program clock_div_large_fraction
+.clock_div 123.75
+    nop
+
+.program clock_div_max_integer
+.clock_div 65535
+    nop
+
+.program clock_div_complex
+.clock_div 3.14159
+    nop
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ----------------- //
+// // clock_div_integer //
+// // ----------------- //
+// 
+// #define clock_div_integer_wrap_target 0
+// #define clock_div_integer_wrap 0
+// #define clock_div_integer_pio_version 0
+// 
+// static __pio_const uint16_t clock_div_integer_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program clock_div_integer_program = {
+//     .instructions = clock_div_integer_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = clock_div_integer_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config clock_div_integer_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + clock_div_integer_wrap_target, offset + clock_div_integer_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // -------------------- //
+// // clock_div_fractional //
+// // -------------------- //
+// 
+// #define clock_div_fractional_wrap_target 0
+// #define clock_div_fractional_wrap 0
+// #define clock_div_fractional_pio_version 0
+// 
+// static __pio_const uint16_t clock_div_fractional_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program clock_div_fractional_program = {
+//     .instructions = clock_div_fractional_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = clock_div_fractional_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config clock_div_fractional_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + clock_div_fractional_wrap_target, offset + clock_div_fractional_wrap);
+//     sm_config_set_clkdiv_int_frac(&c, 2, 128);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------------ //
+// // clock_div_small_fraction //
+// // ------------------------ //
+// 
+// #define clock_div_small_fraction_wrap_target 0
+// #define clock_div_small_fraction_wrap 0
+// #define clock_div_small_fraction_pio_version 0
+// 
+// static __pio_const uint16_t clock_div_small_fraction_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program clock_div_small_fraction_program = {
+//     .instructions = clock_div_small_fraction_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = clock_div_small_fraction_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config clock_div_small_fraction_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + clock_div_small_fraction_wrap_target, offset + clock_div_small_fraction_wrap);
+//     sm_config_set_clkdiv_int_frac(&c, 1, 32);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------------ //
+// // clock_div_large_fraction //
+// // ------------------------ //
+// 
+// #define clock_div_large_fraction_wrap_target 0
+// #define clock_div_large_fraction_wrap 0
+// #define clock_div_large_fraction_pio_version 0
+// 
+// static __pio_const uint16_t clock_div_large_fraction_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program clock_div_large_fraction_program = {
+//     .instructions = clock_div_large_fraction_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = clock_div_large_fraction_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config clock_div_large_fraction_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + clock_div_large_fraction_wrap_target, offset + clock_div_large_fraction_wrap);
+//     sm_config_set_clkdiv_int_frac(&c, 123, 192);
+//     return c;
+// }
+// #endif
+// 
+// // --------------------- //
+// // clock_div_max_integer //
+// // --------------------- //
+// 
+// #define clock_div_max_integer_wrap_target 0
+// #define clock_div_max_integer_wrap 0
+// #define clock_div_max_integer_pio_version 0
+// 
+// static __pio_const uint16_t clock_div_max_integer_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program clock_div_max_integer_program = {
+//     .instructions = clock_div_max_integer_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = clock_div_max_integer_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config clock_div_max_integer_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + clock_div_max_integer_wrap_target, offset + clock_div_max_integer_wrap);
+//     sm_config_set_clkdiv_int_frac(&c, 65535, 0);
+//     return c;
+// }
+// #endif
+// 
+// // ----------------- //
+// // clock_div_complex //
+// // ----------------- //
+// 
+// #define clock_div_complex_wrap_target 0
+// #define clock_div_complex_wrap 0
+// #define clock_div_complex_pio_version 0
+// 
+// static __pio_const uint16_t clock_div_complex_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program clock_div_complex_program = {
+//     .instructions = clock_div_complex_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = clock_div_complex_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config clock_div_complex_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + clock_div_complex_wrap_target, offset + clock_div_complex_wrap);
+//     sm_config_set_clkdiv_int_frac(&c, 3, 36);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

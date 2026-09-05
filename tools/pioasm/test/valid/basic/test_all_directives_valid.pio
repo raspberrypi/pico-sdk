@@ -1,0 +1,90 @@
+// run: pioasm -v 1 input.pio
+.program directives_test
+.pio_version 1
+.clock_div 2.5
+.side_set 2 opt
+.origin 3
+.define PUBLIC myconst 42
+.mov_status txfifo < 4
+.fifo txrx
+.out 4
+.in 3
+.set 5
+.wrap_target
+    nop side 1
+    pull
+    out pins, 4
+    in pins, 3
+    set pins, 5
+    .word 0xa042
+.wrap
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // --------------- //
+// // directives_test //
+// // --------------- //
+// 
+// #define directives_test_wrap_target 0
+// #define directives_test_wrap 5
+// #define directives_test_pio_version 1
+// 
+// #define directives_test_myconst 42
+// 
+// static __pio_const uint16_t directives_test_program_instructions[] = {
+//             //     .wrap_target
+//     0xb442, //  0: nop                    side 1
+//     0x80a0, //  1: pull   block
+//     0x6004, //  2: out    pins, 4
+//     0x4003, //  3: in     pins, 3
+//     0xe005, //  4: set    pins, 5
+//     0xa042, //  5: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program directives_test_program = {
+//     .instructions = directives_test_program_instructions,
+//     .length = 6,
+//     .origin = 3,
+//     .pio_version = directives_test_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config directives_test_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + directives_test_wrap_target, offset + directives_test_wrap);
+//     sm_config_set_in_pin_count(&c, 3);
+//     sm_config_set_in_shift(&c, 1, 0, 32);
+//     sm_config_set_out_pin_count(&c, 4);
+//     sm_config_set_out_shift(&c, 1, 0, 32);
+//     sm_config_set_set_pin_count(&c, 5);
+//     sm_config_set_sideset(&c, 3, true, false);
+//     sm_config_set_mov_status(&c, STATUS_TX_LESSTHAN, 4);
+//     sm_config_set_clkdiv_int_frac(&c, 2, 128);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

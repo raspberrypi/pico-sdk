@@ -1,0 +1,52 @@
+// run: pioasm -o python input.pio
+.define PUBLIC global_const 1
+.program python_opts
+.pio_version 1
+.side_set 1 opt
+.lang_opt python out_shiftdir = 1
+.lang_opt python autopull = 1
+.define PUBLIC local_const 2
+.wrap_target
+public entry:
+    nop side 1
+    jmp entry
+    .word 0xffff
+.wrap
+%python {
+# python block for output
+%}
+// -- Output
+// Command: pioasm -o python input.pio
+// Exit code: 0
+// Stdout:
+// # ------------------------------------------------------------------------ #
+//?
+// # ------------------------------------------------------------------------ #
+// 
+// import rp2
+// from machine import Pin
+// global_const = 1
+// 
+// # ----------- #
+// # python_opts #
+// # ----------- #
+// 
+// python_opts_local_const = 2
+// 
+// python_opts_offset_entry = 0
+// 
+// @rp2.asm_pio(out_shiftdir=1, autopull=1)
+// def python_opts():
+//     wrap_target()
+//     label("0")
+//     nop()                   .side(1)      # 0
+//     jmp("0")                              # 1
+//     word(0xffff)            .side(1) [7]  # 2
+//     wrap()
+// 
+// 
+// # python block for output
+// 
+// 
+// 
+// Stderr:

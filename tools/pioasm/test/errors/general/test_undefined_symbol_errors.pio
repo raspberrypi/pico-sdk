@@ -1,0 +1,12 @@
+// run: pioasm input.pio
+.program undefined_symbol
+    .word missing_symbol
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.11-24: undefined symbol 'missing_symbol'
+//     3 |     .word missing_symbol
+//       |           ^~~~~~~~~~~~~~
+// 

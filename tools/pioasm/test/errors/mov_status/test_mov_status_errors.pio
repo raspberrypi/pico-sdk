@@ -1,0 +1,15 @@
+// run: pioasm -v 1 input.pio
+.program mov_status_invalid_n
+.pio_version 1
+.mov_status txfifo < 33
+    mov x, status
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.22-23: fido depth should be >= 0 and <= 31
+//     4 | .mov_status txfifo < 33
+//       |                      ^~
+// 

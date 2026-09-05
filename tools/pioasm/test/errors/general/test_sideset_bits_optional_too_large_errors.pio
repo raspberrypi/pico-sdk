@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program sideset_bits_optional_too_large
+.side_set 5 opt
+    nop side 0
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.11: maximum number of side set bits with optional is 4
+//     3 | .side_set 5 opt
+//       |           ^
+// 

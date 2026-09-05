@@ -1,0 +1,27 @@
+// run: pioasm -o python input.pio
+.program format_test
+    nop
+
+// -- Output
+// Command: pioasm -o python input.pio
+// Exit code: 0
+// Stdout:
+// # ------------------------------------------------------------------------ #
+//?
+// # ------------------------------------------------------------------------ #
+// 
+// import rp2
+// from machine import Pin
+// # ----------- #
+// # format_test #
+// # ----------- #
+// 
+// @rp2.asm_pio()
+// def format_test():
+//     wrap_target()
+//     nop()                                 # 0
+//     wrap()
+// 
+// 
+// 
+// Stderr:

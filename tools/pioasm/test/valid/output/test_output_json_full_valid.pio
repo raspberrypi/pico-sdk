@@ -1,0 +1,142 @@
+// run: pioasm -o json input.pio
+.define PUBLIC global_const 7
+.program format_test
+.origin 4
+.side_set 2 opt pindirs
+.define PUBLIC prog_const 3
+public entry:
+.wrap_target
+    nop side 1
+.wrap
+
+.lang_opt lang1 opt1 = "this is a test 1"
+.lang_opt lang2 opt1 = "this is a test 2"
+.lang_opt lang1 opt2 = test_3
+.lang_opt lang1 opt2 = test_4
+
+% lang1 {
+    foo
+%}
+
+% lang2 {
+    bar
+%}
+
+% lang1 {
+    foobar
+%}
+
+.lang_opt lang1 opt3 = test_5
+
+.program second_prog
+    nop
+// -- Output
+// Command: pioasm -o json input.pio
+// Exit code: 0
+// Stdout:
+// {
+// 	"pioASMVersion": "2.2.1-develop",
+// 	"publicSymbols": {
+// 		"global_const": 7
+// 	},
+// 	"programs": [
+// 		{
+// 			"name": "format_test",
+// 			"pioVersion": 0,
+// 			"wrapTarget": 0,
+// 			"wrap": 0,
+// 			"origin": 4,
+// 			"usedGPIORanges": 0,
+// 			"publicSymbols": {
+// 				"prog_const": 3
+// 			},
+// 			"publicLabels": {
+// 				"entry": 0
+// 			},
+// 			"in": null,
+// 			"out": null,
+// 			"setCount": null,
+// 			"sideset": {"size": 3, "optional": true, "pindirs": true},
+// 			"movStatus": null,
+// 			"fifoConfig": null,
+// 			"clockDiv": null,
+// 			"instructions": [
+// 				{"hex": "B442", "instruction": "nop                    side 1"}
+// 			],
+// 			"codeBlocks": [
+// 				{
+// 					"lang": "lang1",
+// 					"contents": "    foo\n"
+// 				},
+// 				{
+// 					"lang": "lang1",
+// 					"contents": "    foobar\n"
+// 				},
+// 				{
+// 					"lang": "lang2",
+// 					"contents": "    bar\n"
+// 				}
+// 			],
+// 			"langOpts": [
+// 				{
+// 					"lang": "lang1",
+// 					"name": "opt1",
+// 					"value": "\"this is a test 1\""
+// 				},
+// 				{
+// 					"lang": "lang1",
+// 					"name": "opt2",
+// 					"value": "test_3"
+// 				},
+// 				{
+// 					"lang": "lang1",
+// 					"name": "opt2",
+// 					"value": "test_4"
+// 				},
+// 				{
+// 					"lang": "lang1",
+// 					"name": "opt3",
+// 					"value": "test_5"
+// 				},
+// 				{
+// 					"lang": "lang2",
+// 					"name": "opt1",
+// 					"value": "\"this is a test 2\""
+// 				}
+// 			]
+// 		},
+// 		{
+// 			"name": "second_prog",
+// 			"pioVersion": 0,
+// 			"wrapTarget": 0,
+// 			"wrap": 0,
+// 			"origin": -1,
+// 			"usedGPIORanges": 0,
+// 			"publicSymbols": {
+// 			},
+// 			"publicLabels": {
+// 			},
+// 			"in": null,
+// 			"out": null,
+// 			"setCount": null,
+// 			"sideset": null,
+// 			"movStatus": null,
+// 			"fifoConfig": null,
+// 			"clockDiv": null,
+// 			"instructions": [
+// 				{"hex": "A042", "instruction": "nop"}
+// 			],
+// 			"codeBlocks": [
+// 
+// 			],
+// 			"langOpts": [
+// 
+// 			]
+// 		}
+// 	]
+// }
+// 
+// Stderr:
+// input.pio:17.1-19.2: warning, unknown code block output type 'lang1'
+// input.pio:21.1-23.2: warning, unknown code block output type 'lang2'
+// 

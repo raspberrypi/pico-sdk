@@ -1,0 +1,11 @@
+// run: pioasm -o hex input.pio
+.program format_test
+    nop
+
+// -- Output
+// Command: pioasm -o hex input.pio
+// Exit code: 0
+// Stdout:
+// a042
+// 
+// Stderr:
