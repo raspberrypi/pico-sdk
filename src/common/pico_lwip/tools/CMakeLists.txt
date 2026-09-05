@@ -13,7 +13,7 @@ function(pico_set_lwip_httpd_content TARGET_LIB TARGET_TYPE)
     set(HTTPD_CONTENT_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
     set(HTTPD_CONTENT_TARGET "${TARGET_LIB}_pico_set_lwip_httpd_content")
     set(HTTPD_CONTENT_OUTPUT_NAME "pico_fsdata.inc")
-    set(HTTPD_CONTENT_TOOL "${PICO_SDK_PATH}/src/rp2_common/pico_lwip/tools/makefsdata.py")
+    set(HTTPD_CONTENT_TOOL "${PICO_SDK_PATH}/src/common/pico_lwip/tools/makefsdata.py")
     add_custom_target(${HTTPD_CONTENT_TARGET} DEPENDS ${HTTPD_CONTENT_BINARY_DIR}/${HTTPD_CONTENT_OUTPUT_NAME})
     add_custom_command(
         OUTPUT ${HTTPD_CONTENT_BINARY_DIR}/${HTTPD_CONTENT_OUTPUT_NAME}
