@@ -9,7 +9,7 @@
 #
 # Usage:
 #
-# tools/check_board_header.py src/boards/include/boards/<board.h>
+# tools/check_board_header.py src/boards/include/boards/<board.h> [path/to/pico_configs.tsv [path/to/cmake_configs.tsv]]
 
 
 import re
@@ -17,6 +17,7 @@ import sys
 import os.path
 import json
 import warnings
+import csv
 
 from collections import namedtuple
 
@@ -62,6 +63,7 @@ linked_defines = {
 }
 
 DefineType = namedtuple("DefineType", ["name", "value", "resolved_value", "lineno", "has_ifndef"])
+CMakeSetting = namedtuple("CMakeSetting", ["name", "value", "lineno"])
 
 def list_to_string_with(lst, joiner):
     elems = len(lst)
@@ -77,6 +79,26 @@ board_header = sys.argv[1]
 if not os.path.isfile(board_header):
     raise Exception("{} doesn't exist".format(board_header))
 board_header_basename = os.path.basename(board_header)
+
+pico_configs = dict()
+if len(sys.argv) > 2:
+    configs_file = sys.argv[2]
+    if not os.path.isfile(configs_file):
+        raise Exception("{} doesn't exist".format(configs_file))
+    with open(configs_file, newline='') as tsv_fh:
+        reader = csv.DictReader(tsv_fh, dialect=csv.excel_tab)
+        for row in reader:
+            pico_configs[row['name']] = row
+
+cmake_configs = dict()
+if len(sys.argv) > 3:
+    cmake_configs_file = sys.argv[3]
+    if not os.path.isfile(cmake_configs_file):
+        raise Exception("{} doesn't exist".format(cmake_configs_file))
+    with open(cmake_configs_file, newline='') as tsv_fh:
+        reader = csv.DictReader(tsv_fh, dialect=csv.excel_tab)
+        for row in reader:
+            cmake_configs[row['name']] = row
 
 expected_include_suggestion = "/".join(board_header.split("/")[-2:])
 expected_include_guard = "_" + re.sub(r"\W", "_", expected_include_suggestion.upper())
@@ -131,7 +153,7 @@ def read_defines_from(header_file, defines_dict):
                         if show_warnings:
                             warnings.warn("{}:{}  Multiple values for pico_board_cmake_set({}) ({} and {})".format(board_header, lineno, name, cmake_settings[name].value, value))
                 else:
-                   cmake_settings[name] = DefineType(name, value, None, lineno, False)
+                   cmake_settings[name] = CMakeSetting(name, value, lineno)
                 continue
 
             # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
@@ -144,7 +166,7 @@ def read_defines_from(header_file, defines_dict):
                 if name != name.upper():
                     errors.append(Exception("{}:{}  Expected \"{}\" to be all uppercase".format(board_header, lineno, name)))
                 if name not in cmake_default_settings:
-                   cmake_default_settings[name] = DefineType(name, value, None, lineno, False)
+                   cmake_default_settings[name] = CMakeSetting(name, value, lineno)
                 continue
 
             # look for "#else"
@@ -295,7 +317,7 @@ with open(board_header) as header_fh:
                         value = int(value, 0)
                     except ValueError:
                         pass
-                cmake_settings[name] = DefineType(name, value, None, lineno, False)
+                cmake_settings[name] = CMakeSetting(name, value, lineno)
             continue
 
         # look for "pico_board_cmake_set_default(BLAH_BLAH, 42)"
@@ -317,7 +339,7 @@ with open(board_header) as header_fh:
                         value = int(value, 0)
                     except ValueError:
                         pass
-                cmake_default_settings[name] = DefineType(name, value, None, lineno, False)
+                cmake_default_settings[name] = CMakeSetting(name, value, lineno)
             continue
 
         # look for "#else"
@@ -509,6 +531,7 @@ with open(interfaces_json) as interfaces_fh:
             instances[instance_num] = instances.pop(instance)
 
 pins = dict() # dict of lists
+uses_some_cyw43_pins = False
 for name, define in defines.items():
 
     # check for other-chip defines
@@ -528,6 +551,7 @@ for name, define in defines.items():
                 pins[define.resolved_value].append(define)
             else:
                 if name.startswith("CYW43_WL_GPIO_"):
+                    uses_some_cyw43_pins = True
                     if "CYW43_WL_GPIO_COUNT" not in defines:
                             errors.append(Exception("{}:{}  {} is defined but {} is missing".format(board_header, define.lineno, name, "CYW43_WL_GPIO_COUNT")))
                     else:
@@ -605,6 +629,98 @@ for name, define in defines.items():
         if define.resolved_value not in interface_instance[function]:
             errors.append(Exception("{}:{}  {} is set to {} which isn't a valid pin for {} on {} {}".format(board_header, define.lineno, name, define.resolved_value, function, interface, instance_num)))
 
+    # check defines against the PICO_CONFIG definitions
+    if name in pico_configs:
+        name_config = pico_configs[name]
+        directive = "PICO_CONFIG"
+        if name_config["type"] in ("", "int"):
+            config_key = "min"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if define.resolved_value < int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+            config_key = "max"
+            if config_key in name_config and name_config[config_key] != "":
+                if board_header_basename != "amethyst_fpga.h": # amethyst_fpga sets a PICO_DEFAULT_UART_BAUD_RATE of 1000000, but uart.h says PICO_DEFAULT_UART_BAUD_RATE should have max=921600
+                    try:
+                        if define.resolved_value > int(name_config[config_key]):
+                            errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                    except ValueError:
+                        pass
+        elif name_config["type"] == "bool":
+            if define.resolved_value not in (0, 1):
+                errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should be {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], "type", name_config["type"])))
+        elif name_config["type"] == "enum":
+            pass
+        elif name_config["type"] == "list":
+            pass
+        else:
+            raise Exception("{} {}={} isn't handled".format(directive, "type", name_config["type"]))
+
+for name, setting in cmake_settings.items():
+    # check cmake_settings against the PICO_CMAKE_CONFIG definitions
+    if name in cmake_configs:
+        name_config = cmake_configs[name]
+        directive = "PICO_CMAKE_CONFIG"
+        if name_config["type"] in ("", "int"):
+            config_key = "min"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if setting.value < int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+            config_key = "max"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if setting.value > int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+        elif name_config["type"] == "bool":
+            if setting.value not in (0, 1):
+                errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should be {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], "type", name_config["type"])))
+        elif name_config["type"] == "string":
+            pass
+        elif name_config["type"] == "list":
+            pass
+        else:
+            raise Exception("{} {}={} isn't handled".format(directive, "type", name_config["type"]))
+
+for name, setting in cmake_default_settings.items():
+    # check cmake_default_settings against the PICO_CMAKE_CONFIG definitions
+    if name in cmake_configs:
+        name_config = cmake_configs[name]
+        directive = "PICO_CMAKE_CONFIG"
+        if name_config["type"] in ("", "int"):
+            config_key = "min"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if setting.value < int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+            config_key = "max"
+            if config_key in name_config and name_config[config_key] != "":
+                try:
+                    if setting.value > int(name_config[config_key]):
+                        errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should have {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], config_key, name_config[config_key])))
+                except ValueError:
+                    pass
+        elif name_config["type"] == "bool":
+            if setting.value not in (0, 1):
+                errors.append(Exception("{}:{}  {} is set to {}, which the {} at {} says should be {}={}".format(board_header, define.lineno, name, define.resolved_value, directive, name_config["location"], "type", name_config["type"])))
+        elif name_config["type"] == "string":
+            pass
+        elif name_config["type"] == "list":
+            pass
+        else:
+            raise Exception("{} {}={} isn't handled".format(directive, "type", name_config["type"]))
+
+if uses_some_cyw43_pins and ("PICO_CYW43_SUPPORTED" not in cmake_settings or cmake_settings["PICO_CYW43_SUPPORTED"].value != 1):
+    errors.append(Exception("{} uses some CYW43 GPIO pins, but doesn't have pico_board_cmake_set({}, 1)".format(board_header, "PICO_CYW43_SUPPORTED")))
 if not has_include_guard:
     errors.append(Exception("{} has no include-guard (expected {})".format(board_header, expected_include_guard)))
 if not has_board_detection and expected_board_detection != "NONE":

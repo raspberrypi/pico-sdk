@@ -166,7 +166,7 @@ def ValidateAttrs(config_name, config_attrs, file_path, linenum, applicable):
         attr_name = PROPERTY_DEFAULT
         str_values[attr_name] = config_attrs.get(attr_name, None)
         if str_values[attr_name] is not None:
-            if str_values[attr_name] not in _enumvalues:
+            if str_values[attr_name] not in parsed_values[PROPERTY_ENUMVALUES]:
                 errors.append(Exception('{} at {}:{} has {} value {} which isn\'t in list of {} {}'.format(config_name, file_path, linenum, attr_name, str_values[attr_name], PROPERTY_ENUMVALUES, str_values[PROPERTY_ENUMVALUES])))
 
     elif type_str == PROPERTY_TYPE_LIST:
