@@ -449,14 +449,16 @@ static inline uint async_context_core_num(const async_context_t *context) {
 }
 
 /*!
- * \brief End async_context processing, and free any resources
+ * \brief End async_context processing, and free any resources owned by the context
  * \ingroup pico_async_context
  *
- * \note The user should clean up any resources associated with workers
- * in the async_context themselves.
+ * It is the callers responsibility to ensure that no external async_context_ calls
+ * to this context (i.e. those not originating as a direct synchronous result of active
+ * pending/at_time work within this context) are made after (or concurrently with) calling this method.
  *
- * Asynchronous (non-polled) async_contexts guarantee that no
- * callback is being called once this method returns.
+ * The context, in turn, guarantees that on return, no active calls are being made, and no
+ * subsequent calls will be made, to any workers registered in this context
+ * so the caller can free any resources associated with those workers.
  *
  * \param context the async_context
  */
