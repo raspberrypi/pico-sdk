@@ -321,6 +321,8 @@ struct program : public src_item {
 
     void set_wrap(const yy::location &l);
 
+    void set_wrap(const yy::location &l, rvalue target);
+
     void set_sideset(const yy::location &l, rvalue _sideset, bool optional, bool pindirs) {
         sideset = rvalue_loc(_sideset, l);
         sideset_opt = optional;
@@ -486,7 +488,7 @@ struct instr_word : public instruction {
 
     instr_word(const yy::location &l, rvalue encoding) : instruction(l), encoding(std::move(encoding)) {}
 
-    uint encode(program &program) override;
+    raw_encoding raw_encode(program &program) override;
 };
 
 #endif
