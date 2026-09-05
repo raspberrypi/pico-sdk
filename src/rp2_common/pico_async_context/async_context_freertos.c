@@ -74,21 +74,32 @@ static void async_context_task(__unused void *vself) {
         __sev(); // it is possible regular code is waiting on a WFE on the other core
     } while (!self->task_should_exit);
     xSemaphoreGive(self->task_complete_sem);
-    vTaskDelete(NULL);
+    // Previously we called vTaskDelete(NULL) here, however this (self-delete) is always asynchronous and deferred
+    // to the idle task, which is a problem with static allocation, as async_context_freertos_deinit zeroes
+    // the context which actually contains the TCB, thus stomping on FreeRTOS's own internal (active) data structures,
+    // before the idle task gets a chance to clean it up. async_context_freertos_deinit must therefore be responsible
+    // for destroying this task in that case (and indeed it is simpler to do so there in all cases to make sure
+    // the timer is quiesced too)
+
+    // We must however do something other than return from a task, so we suspend ourself. Note however, that
+    // there is no guarantee this code actually executes before async_context_freertos_deinit proceeds since
+    // we have posted it a semaphore above, so the de-init code must not rely on this having happened.
+    vTaskSuspend(NULL);
 }
 
 static void async_context_freertos_wake_up(async_context_t *self_base) {
     async_context_freertos_t *self = (async_context_freertos_t *)self_base;
-    if (self->task_handle) {
+    TaskHandle_t task_handle = self->task_handle;
+    if (task_handle) {
         if (portCHECK_IF_IN_ISR()) {
-            vTaskNotifyGiveFromISR(self->task_handle, NULL);
+            vTaskNotifyGiveFromISR(task_handle, NULL);
             xSemaphoreGiveFromISR(self->work_needed_sem, NULL);
         } else {
             // we don't want to wake ourselves up (we will only ever be called
             // from the async_context_task if we own the lock, in which case processing
             // will already happen when the lock is finally unlocked
-            if (xTaskGetCurrentTaskHandle() != self->task_handle) {
-                xTaskNotifyGive(self->task_handle);
+            if (xTaskGetCurrentTaskHandle() != task_handle) {
+                xTaskNotifyGive(task_handle);
                 xSemaphoreGive(self->work_needed_sem);
             } else {
 #ifndef NDEBUG
@@ -195,23 +206,54 @@ static void timer_delete_sync_helper(__unused void *param1, __unused uint32_t pa
 
 void async_context_freertos_deinit(async_context_t *self_base) {
     async_context_freertos_t *self = (async_context_freertos_t *)self_base;
-    if (self->task_handle) {
+    TaskHandle_t task_handle = self->task_handle;
+    // Ask the task to exit its loop, and wait for it to do so.
+    if (task_handle) {
         async_context_execute_sync(self_base, end_task_func, self_base);
         if (self->task_complete_sem) {
             xSemaphoreTake(self->task_complete_sem, portMAX_DELAY);
         }
     }
+    // Now the task has exited its loop, it will neither call worker functions nor re-arm
+    // the timer. At this point though both:
+    // a. The task may still be running on core (having not yet made it to the vTaskSuspend(NULL).
+    // b. Be targeted for notifications by the timer which is still active. This is fine though
+    //    as the task either is, or is about to be in vTaskSuspend(NULL) which isn't woken by notifications.
+
+    // First things first, let's now synchronously stop the timer...
     if (self->timer_handle) {
         xTimerDelete(self->timer_handle, 0);
 
-        // slight hoops to jump thru to make sure the timer is actually deleted before we
-        // free the remaining items below. this is needed for SMP and also if
-        // the current task has a higher/equal priority to the timer task
+        // Slight hoops to jump thru to make sure the timer has actually been deleted BEFORE we proceed
 
-        // 1. queue function which will notify us back to the timer task queue
+        // 1. Queue function which will notify us back to the timer task queue
         xTimerPendFunctionCall(timer_delete_sync_helper, (void *)xTaskGetCurrentTaskHandle(), 0, portMAX_DELAY);
-        // 2. wait for that function to execute (which will be after the timer deletion completes)
+        // 2. Wait for that function to execute (which will be after the timer deletion completes)
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        self->timer_handle = NULL;
+    }
+
+    // With the timer now stopped, there are no other current/future execution units referencing self->task_handle
+    // and we can proceed to delete the task...
+    if (task_handle) {
+        // ... however vTaskDelete is only synchronous if the task is not currently executing (on core) during the call
+
+        // 1. We don't care if not using static allocation, since nothing related to the task is stored in our
+        //    soon to be zeroed context.
+        // 2. We don't care if not using SMP since if the only core is currently executing vTaskDelete from this task,
+        //   then clearly the other task is not currently executing
+#if configSUPPORT_STATIC_ALLOCATION && ( configNUMBER_OF_CORES > 1 )
+        // Make sure the task cannot be re-scheduled again. This is asynchronous across cores...
+        vTaskSuspend(task_handle);
+        // ... so actually wait until it actually leaves the core if it was on it
+        while (xTaskGetCurrentTaskHandleForCore((BaseType_t)self->core.core_num) == task_handle) {
+            taskYIELD();
+        }
+#endif
+        // Now we can call vTaskDelete because in the static allocation case we know the task is
+        // no longer executing, so this call is guaranteed to complete synchronously, and in the non
+        // static allocation case we don't care if the call is asynchronous anyway.
+        vTaskDelete(task_handle);
     }
     if (self->lock_mutex) {
         vSemaphoreDelete(self->lock_mutex);
@@ -222,6 +264,7 @@ void async_context_freertos_deinit(async_context_t *self_base) {
     if (self->task_complete_sem) {
         vSemaphoreDelete(self->task_complete_sem);
     }
+    // Finally clear the context now we know nothing is referencing it.
     memset(self, 0, sizeof(*self));
 }
 
