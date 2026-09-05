@@ -167,7 +167,7 @@ const uint16_t *tud_descriptor_string_cb(uint8_t index, __unused uint16_t langid
         desc_str[1] = 0x0409; // supported language is English
         len = 1;
     } else {
-        if (index >= sizeof(usbd_desc_str) / sizeof(usbd_desc_str[0])) {
+        if (index >= count_of(usbd_desc_str)) {
             return NULL;
         }
         const char *str = usbd_desc_str[index];

@@ -85,9 +85,9 @@ void __attribute__((noreturn)) rom_reset_usb_boot_extra(int usb_activity_gpio_pi
 
 #if !PICO_RP2040
 bool rom_get_boot_random(uint32_t out[4]) {
-    uint32_t result[5];
-    rom_get_sys_info_fn func = (rom_get_sys_info_fn) rom_func_lookup_inline(ROM_FUNC_GET_SYS_INFO);
-    if (5 == func(result, count_of(result), SYS_INFO_BOOT_RANDOM)) {
+    uint32_t result[SYS_INFO_BOOT_RANDOM_WORD_COUNT + 1];
+    int words_returned = rom_get_sys_info(result, count_of(result), SYS_INFO_BOOT_RANDOM);
+    if (words_returned == (SYS_INFO_BOOT_RANDOM_WORD_COUNT + 1) && result[0] == SYS_INFO_BOOT_RANDOM) {
         for(uint i=0;i<4;i++) {
             out[i] = result[i+1];
         }
