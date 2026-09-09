@@ -34,6 +34,13 @@ pico_promote_common_scope_vars()
 # It also sets PICO_CRT0_PIN_XIP_SRAM=1 to pin the XIP_SRAM,
 # if the persistent data is stored in XIP_SRAM.
 #
+# Note that if PERSISTENT_DATA_LOC is an address, this may not work correctly with
+# the --print-memory-usage linker option, as that does not handle gaps - it will
+# either report over-usage if placed in SRAM0, or under-usage if placed in SRAM1.
+# Additionally, this will reduce the available SRAM for the rest of the binary, as
+# all statically allocated data in SRAM must come before PERSISTENT_DATA_LOC, and
+# if in SRAM1 the heap must also fit before PERSISTENT_DATA_LOC.
+#
 # \param\ PERSISTENT_DATA_LOC The persistent data location to set (e.g. 0x20040000), or the memory region name (currently supports xip_ram)
 function(pico_set_persistent_data_loc TARGET PERSISTENT_DATA_LOC)
         if (PICO_RP2040)
