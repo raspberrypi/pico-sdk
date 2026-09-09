@@ -1,0 +1,14 @@
+// run: pioasm input.pio
+.program circular_dependency
+.define a b + 1
+.define b a + 1
+    .word a
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:5.11: circular dependency in definition of 'a'; detected at input.pio:4.11)
+//     5 |     .word a
+//       |           ^
+// 

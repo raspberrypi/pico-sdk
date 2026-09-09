@@ -1,0 +1,31 @@
+// run: pioasm -v 1 input.pio
+.program fifo_push_error
+.pio_version 1
+.fifo tx
+    push
+
+.program fifo_get_error
+.pio_version 1
+.fifo txput
+    mov osr, rxfifo[0]
+
+.program fifo_put_error
+.pio_version 1
+.fifo txget
+    mov rxfifo[0], isr
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:5.5-8: FIFO must be configured for 'txrx' or 'rx' to use this instruction
+//     5 |     push
+//       |     ^~~~
+// input.pio:10.5-22: FIFO must be configured for 'txget' or 'putget' to use this instruction
+//    10 |     mov osr, rxfifo[0]
+//       |     ^~~~~~~~~~~~~~~~~~
+// input.pio:15.5-22: FIFO must be configured for 'txput' or 'putget' to use this instruction
+//    15 |     mov rxfifo[0], isr
+//       |     ^~~~~~~~~~~~~~~~~~
+// 

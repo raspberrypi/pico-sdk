@@ -1,0 +1,12 @@
+// run: pioasm input.pio
+.program syntax_missing_operand
+    mov , x
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.9: syntax error, unexpected ","
+//     3 |     mov , x
+//       |         ^
+// 

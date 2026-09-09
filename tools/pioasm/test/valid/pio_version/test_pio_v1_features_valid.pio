@@ -1,0 +1,67 @@
+// run: pioasm -v 1 input.pio
+.program pio_v1_features
+.pio_version 1
+    wait 0 jmppin
+    wait 1 jmppin + 2
+    irq next 0
+    irq prev 0
+    mov pindirs, x
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // --------------- //
+// // pio_v1_features //
+// // --------------- //
+// 
+// #define pio_v1_features_wrap_target 0
+// #define pio_v1_features_wrap 4
+// #define pio_v1_features_pio_version 1
+// 
+// static __pio_const uint16_t pio_v1_features_program_instructions[] = {
+//             //     .wrap_target
+//     0x2060, //  0: wait   0 jmppin
+//     0x20e2, //  1: wait   1 jmppin + 2
+//     0xc018, //  2: irq    next nowait 0
+//     0xc008, //  3: irq    prev nowait 0
+//     0xa061, //  4: mov    pindirs, x
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program pio_v1_features_program = {
+//     .instructions = pio_v1_features_program_instructions,
+//     .length = 5,
+//     .origin = -1,
+//     .pio_version = pio_v1_features_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config pio_v1_features_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + pio_v1_features_wrap_target, offset + pio_v1_features_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

@@ -1,0 +1,64 @@
+// run: pioasm input.pio
+.program expr_complex
+.define a 3
+.define b 5
+.define c 2
+.define d 1
+    set pins, ((a + b) * (c - d))
+    set pins, ((a + b + c) >> d)
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ------------ //
+// // expr_complex //
+// // ------------ //
+// 
+// #define expr_complex_wrap_target 0
+// #define expr_complex_wrap 1
+// #define expr_complex_pio_version 0
+// 
+// static __pio_const uint16_t expr_complex_program_instructions[] = {
+//             //     .wrap_target
+//     0xe008, //  0: set    pins, 8
+//     0xe005, //  1: set    pins, 5
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program expr_complex_program = {
+//     .instructions = expr_complex_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = expr_complex_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config expr_complex_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + expr_complex_wrap_target, offset + expr_complex_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

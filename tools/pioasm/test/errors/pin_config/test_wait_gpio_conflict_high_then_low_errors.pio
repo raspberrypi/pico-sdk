@@ -1,0 +1,14 @@
+// run: pioasm -v 1 input.pio
+.program wait_gpio_conflict_high_then_low
+.pio_version 1
+    wait 0 gpio 40
+    wait 0 gpio 0
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:5.17: absolute GPIO number must be must be >= 16 and <= 47 as a GPIO number >32 has already been used
+//     5 |     wait 0 gpio 0
+//       |                 ^
+// 

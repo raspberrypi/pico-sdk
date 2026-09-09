@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program autopush_threshold_invalid
+.in 8 auto 33
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.5: in pin count must be 32 for PIO version 0
+//     3 | .in 8 auto 33
+//       |     ^
+// 

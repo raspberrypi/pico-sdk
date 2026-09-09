@@ -1,0 +1,55 @@
+// run: pioasm -o json input.pio
+.define PUBLIC global_const 7
+.program format_test
+public entry:
+    nop
+.lang_opt json foo = 1
+// -- Output
+// Command: pioasm -o json input.pio
+// Exit code: 0
+// Stdout:
+// {
+// 	"pioASMVersion": "2.2.1-develop",
+// 	"publicSymbols": {
+// 		"global_const": 7
+// 	},
+// 	"programs": [
+// 		{
+// 			"name": "format_test",
+// 			"pioVersion": 0,
+// 			"wrapTarget": 0,
+// 			"wrap": 0,
+// 			"origin": -1,
+// 			"usedGPIORanges": 0,
+// 			"publicSymbols": {
+// 			},
+// 			"publicLabels": {
+// 				"entry": 0
+// 			},
+// 			"in": null,
+// 			"out": null,
+// 			"setCount": null,
+// 			"sideset": null,
+// 			"movStatus": null,
+// 			"fifoConfig": null,
+// 			"clockDiv": null,
+// 			"instructions": [
+// 				{"hex": "A042", "instruction": "nop"}
+// 			],
+// 			"codeBlocks": [
+// 
+// 			],
+// 			"langOpts": [
+// 				{
+// 					"lang": "json",
+// 					"name": "foo",
+// 					"value": "1"
+// 				}
+// 			]
+// 		}
+// 	]
+// }
+// 
+// Stderr:
+// warning: json does not support output options; json lang_opt ignored.
+// 

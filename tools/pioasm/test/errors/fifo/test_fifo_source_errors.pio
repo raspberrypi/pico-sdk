@@ -1,0 +1,23 @@
+// run: pioasm -v 1 input.pio
+.program fifo_invalid_source
+.pio_version 1
+.fifo txput
+    mov rxfifo[0], x
+
+.program fifo_invalid_dest
+.pio_version 1
+.fifo txget
+    mov x, rxfifo[0]
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:5.5-20: mov rxfifo[] source must be isr
+//     5 |     mov rxfifo[0], x
+//       |     ^~~~~~~~~~~~~~~~
+// input.pio:10.5-20: mov ,txfifo[] target must be osr
+//    10 |     mov x, rxfifo[0]
+//       |     ^~~~~~~~~~~~~~~~
+// 

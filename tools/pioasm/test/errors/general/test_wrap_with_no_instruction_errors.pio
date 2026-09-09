@@ -1,0 +1,14 @@
+// run: pioasm input.pio
+.program wrap_same_instruction
+.wrap_target
+.wrap
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.1-5: .wrap cannot be placed before the first program instruction
+//     4 | .wrap
+//       | ^~~~~
+// 

@@ -1,0 +1,136 @@
+// run: pioasm -o c-sdk input.pio
+.program fifo_txput
+.pio_version 1
+.fifo txput
+    nop
+
+.program fifo_txget
+.pio_version 1
+.fifo txget
+    nop
+
+.program fifo_putget
+.pio_version 1
+.fifo putget
+    nop
+// -- Output
+// Command: pioasm -o c-sdk input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ---------- //
+// // fifo_txput //
+// // ---------- //
+// 
+// #define fifo_txput_wrap_target 0
+// #define fifo_txput_wrap 0
+// #define fifo_txput_pio_version 1
+// 
+// static __pio_const uint16_t fifo_txput_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program fifo_txput_program = {
+//     .instructions = fifo_txput_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = fifo_txput_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config fifo_txput_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + fifo_txput_wrap_target, offset + fifo_txput_wrap);
+//     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TXPUT);
+//     return c;
+// }
+// #endif
+// 
+// // ---------- //
+// // fifo_txget //
+// // ---------- //
+// 
+// #define fifo_txget_wrap_target 0
+// #define fifo_txget_wrap 0
+// #define fifo_txget_pio_version 1
+// 
+// static __pio_const uint16_t fifo_txget_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program fifo_txget_program = {
+//     .instructions = fifo_txget_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = fifo_txget_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config fifo_txget_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + fifo_txget_wrap_target, offset + fifo_txget_wrap);
+//     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TXGET);
+//     return c;
+// }
+// #endif
+// 
+// // ----------- //
+// // fifo_putget //
+// // ----------- //
+// 
+// #define fifo_putget_wrap_target 0
+// #define fifo_putget_wrap 0
+// #define fifo_putget_pio_version 1
+// 
+// static __pio_const uint16_t fifo_putget_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program fifo_putget_program = {
+//     .instructions = fifo_putget_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = fifo_putget_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config fifo_putget_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + fifo_putget_wrap_target, offset + fifo_putget_wrap);
+//     sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_PUTGET);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:
