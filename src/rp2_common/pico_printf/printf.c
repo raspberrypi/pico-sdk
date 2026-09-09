@@ -99,6 +99,7 @@
 #define FLAGS_LONG_LONG (1U <<  9U)
 #define FLAGS_PRECISION (1U << 10U)
 #define FLAGS_ADAPT_EXP (1U << 11U)
+#define FLAGS_TRIM_ZERO (1U << 12U)
 
 // import float.h for DBL_MAX
 #if PICO_PRINTF_SUPPORT_FLOAT
@@ -360,7 +361,7 @@ static size_t _ftoa(out_fct_type out, char *buffer, size_t idx, size_t maxlen, d
     }
     // limit precision to 9, cause a prec >= 10 can lead to overflow errors
     while ((len < PICO_PRINTF_FTOA_BUFFER_SIZE) && (prec > 9U)) {
-        buf[len++] = '0';
+        if (!(flags & FLAGS_TRIM_ZERO)) buf[len++] = '0';
         prec--;
     }
 
@@ -391,21 +392,30 @@ static size_t _ftoa(out_fct_type out, char *buffer, size_t idx, size_t maxlen, d
         }
     } else {
         unsigned int count = prec;
+        bool nonzero = false;
         // now do fractional part, as an unsigned number
         while (len < PICO_PRINTF_FTOA_BUFFER_SIZE) {
             --count;
-            buf[len++] = (char) (48U + (frac % 10U));
+            char digit = (frac % 10U);
+            // only print the digit if trimming isn't desired,
+            // a non-zero digit has already been printed, or it's non-zero
+            if (!(flags & FLAGS_TRIM_ZERO) || nonzero || digit != 0) {
+                buf[len++] = (char) (48U + digit);
+                nonzero = true;
+            }
             if (!(frac /= 10U)) {
                 break;
             }
         }
-        // add extra 0s
-        while ((len < PICO_PRINTF_FTOA_BUFFER_SIZE) && (count-- > 0U)) {
-            buf[len++] = '0';
-        }
-        if (len < PICO_PRINTF_FTOA_BUFFER_SIZE) {
-            // add decimal
-            buf[len++] = '.';
+        if (!(flags & FLAGS_TRIM_ZERO) || nonzero) {
+            // add extra 0s
+            while ((len < PICO_PRINTF_FTOA_BUFFER_SIZE) && (count-- > 0U)) {
+                buf[len++] = '0';
+            }
+            if (len < PICO_PRINTF_FTOA_BUFFER_SIZE) {
+                // add decimal
+                buf[len++] = '.';
+            }
         }
     }
 
@@ -777,7 +787,7 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
             case 'g':
             case 'G':
 #if PICO_PRINTF_SUPPORT_FLOAT && PICO_PRINTF_SUPPORT_EXPONENTIAL
-                if ((*format == 'g') || (*format == 'G')) flags |= FLAGS_ADAPT_EXP;
+                if ((*format == 'g') || (*format == 'G')) flags |= FLAGS_ADAPT_EXP | FLAGS_TRIM_ZERO;
                 if ((*format == 'E') || (*format == 'G')) flags |= FLAGS_UPPERCASE;
                 idx = _etoa(out, buffer, idx, maxlen, va_arg(va, double), precision, width, flags);
 #else
