@@ -11,6 +11,11 @@ if (DEFINED ENV{PICO_PLATFORM} AND NOT PICO_PLATFORM)
     set(PICO_PLATFORM $ENV{PICO_PLATFORM})
     message("Initializing PICO_PLATFORM from environment ('${PICO_PLATFORM}')")
 endif()
+
+if (${PICO_PLATFORM} STREQUAL "host")
+    set(PICO_PLATFORM "host-rp2040")
+endif()
+
 set(PICO_SAVED_PLATFORM "${PICO_PLATFORM}")
 
 # If PICO_PLATFORM is specified but not PICO_BOARD, we'll make a stab at defaulting
@@ -88,11 +93,12 @@ endif()
 
 if (NOT COMMAND pico_expand_pico_platform)
     function(pico_expand_pico_platform FUNC DO_MESSAGE)
-        if (${FUNC} STREQUAL "rp2350")
+        if (${FUNC} MATCHES "rp2350$")
+            string(REGEX REPLACE "rp2350$" "${PICO_DEFAULT_RP2350_PLATFORM}" NEW_PLATFORM ${${FUNC}})
             if (DO_MESSAGE)
-                message("Auto-converting non-specific PICO_PLATFORM='rp2350' to '${PICO_DEFAULT_RP2350_PLATFORM}'")
+                message("Auto-converting non-specific PICO_PLATFORM='${${FUNC}}' to '${NEW_PLATFORM}'")
             endif()
-            set(${FUNC} "${PICO_DEFAULT_RP2350_PLATFORM}" PARENT_SCOPE)
+            set(${FUNC} "${NEW_PLATFORM}" PARENT_SCOPE)
         endif()
     endfunction()
 endif()
@@ -105,8 +111,9 @@ else()
         pico_expand_pico_platform(PICO_PLATFORM 1)
         pico_message("Defaulting platform (PICO_PLATFORM) to '${PICO_PLATFORM}' based on PICO_BOARD setting.")
     else()
-        string(REGEX REPLACE "-.*" "" PICO_PLATFORM_PREFIX ${PICO_PLATFORM})
-        string(REGEX REPLACE "-.*" "" PICO_SAVED_PLATFORM_PREFIX ${PICO_SAVED_PLATFORM})
+        string(REGEX REPLACE "((host-)?(rp[0-9]+))(-.*)?" "\\3" PICO_PLATFORM_PREFIX ${PICO_PLATFORM})
+        string(REGEX REPLACE "((host-)?(rp[0-9]+))(-.*)?" "\\3" PICO_SAVED_PLATFORM_PREFIX ${PICO_SAVED_PLATFORM})
+
         if (PICO_PLATFORM_PREFIX STREQUAL PICO_SAVED_PLATFORM_PREFIX)
             # the PICO_PLATFORM specified based on the board is compatible based on the one we were
             # already using, so use that
