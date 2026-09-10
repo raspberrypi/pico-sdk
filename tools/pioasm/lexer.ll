@@ -220,6 +220,8 @@ output_fmt    [^%\n]+
 
 {comment}                           { }
 
+"."                                 return yy::parser::make_DOT(loc);
+
 .                                   { throw yy::parser::syntax_error(loc, "invalid character: " + std::string(yytext)); }
 
 %%
