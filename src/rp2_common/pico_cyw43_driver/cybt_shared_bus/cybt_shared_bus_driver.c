@@ -498,38 +498,47 @@ void cybt_debug_dump(void) {
 #endif
 }
 
+/*
+ * The BT controller's ring indices are read over the shared gSPI backplane,
+ * which carries WiFi traffic concurrently. Under bus contention a single read
+ * can return a transiently out-of-range value; asserting on it turns a
+ * recoverable glitch into a system abort. Re-read up to
+ * CYBT_BUF_INDEX_REREAD_MAX times (the corruption does not persist) and, only
+ * if it still does not validate, return an error so the caller drops the cycle
+ * gracefully (cyw43_bluetooth_has_pending -> "no pending"; an HCI read ->
+ * CYBT_ERR_HCI_READ_FAILED) instead of aborting.
+ */
+#define CYBT_BUF_INDEX_REREAD_MAX 8
+
 cybt_result_t cybt_get_bt_buf_index(cybt_fw_membuf_index_t *p_buf_index) {
     uint32_t buf[4];
 
-    cybt_mem_read(H2B_BUF_IN_ADDR, (uint8_t *) buf, sizeof(buf));
+    for (int attempt = 0; attempt < CYBT_BUF_INDEX_REREAD_MAX; attempt++) {
+        cybt_mem_read(H2B_BUF_IN_ADDR, (uint8_t *) buf, sizeof(buf));
 
-    p_buf_index->host2bt_in_val = buf[0];
-    p_buf_index->host2bt_out_val = buf[1];
-    p_buf_index->bt2host_in_val = buf[2];
-    p_buf_index->bt2host_out_val = buf[3];
+        p_buf_index->host2bt_in_val = buf[0];
+        p_buf_index->host2bt_out_val = buf[1];
+        p_buf_index->bt2host_in_val = buf[2];
+        p_buf_index->bt2host_out_val = buf[3];
 
-    cybt_debug("cybt_get_bt_buf_index: h2b_in = 0x%08lx, h2b_out = 0x%08lx, b2h_in = 0x%08lx, b2h_out = 0x%08lx\n",
-               p_buf_index->host2bt_in_val,
-               p_buf_index->host2bt_out_val,
-               p_buf_index->bt2host_in_val,
-               p_buf_index->bt2host_out_val);
-
+        if (p_buf_index->host2bt_in_val < BTSDIO_FWBUF_SIZE &&
+            p_buf_index->host2bt_out_val < BTSDIO_FWBUF_SIZE &&
+            p_buf_index->bt2host_in_val < BTSDIO_FWBUF_SIZE &&
+            p_buf_index->bt2host_out_val < BTSDIO_FWBUF_SIZE) {
 #if CYBT_CORRUPTION_TEST
-    if (p_buf_index->host2bt_in_val >= BTSDIO_FWBUF_SIZE || p_buf_index->host2bt_out_val >= BTSDIO_FWBUF_SIZE ||
-        p_buf_index->bt2host_in_val >= BTSDIO_FWBUF_SIZE || p_buf_index->bt2host_out_val >= BTSDIO_FWBUF_SIZE) {
-        cybt_error("cybt_get_bt_buf_index invalid buffer value\n");
-        cybt_debug_dump();
-    } else {
-        memcpy((uint8_t *) &last_buf_index, (uint8_t *) p_buf_index, sizeof(cybt_fw_membuf_index_t));
-    }
+            memcpy((uint8_t *) &last_buf_index, (uint8_t *) p_buf_index,
+                   sizeof(cybt_fw_membuf_index_t));
 #endif
+            return CYBT_SUCCESS;
+        }
 
-    assert(p_buf_index->host2bt_in_val < BTSDIO_FWBUF_SIZE);
-    assert(p_buf_index->host2bt_out_val < BTSDIO_FWBUF_SIZE);
-    assert(p_buf_index->bt2host_in_val < BTSDIO_FWBUF_SIZE);
-    assert(p_buf_index->bt2host_out_val < BTSDIO_FWBUF_SIZE);
+        cybt_error("cybt_get_bt_buf_index: out-of-range index (attempt %d/%d), re-reading\n",
+                   attempt + 1, CYBT_BUF_INDEX_REREAD_MAX);
+    }
 
-    return CYBT_SUCCESS;
+    cybt_error("cybt_get_bt_buf_index: index still corrupt after %d reads; dropping cycle\n",
+               CYBT_BUF_INDEX_REREAD_MAX);
+    return CYBT_ERR_HCI_READ_FAILED;
 }
 
 static cybt_result_t cybt_reg_write(uint32_t reg_addr, uint32_t value) {
