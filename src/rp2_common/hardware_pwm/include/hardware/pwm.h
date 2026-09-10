@@ -557,10 +557,19 @@ static inline void pwm_set_enabled(uint slice_num, bool enabled) {
 /** \brief Enable/Disable multiple PWM slices simultaneously
  *  \ingroup hardware_pwm
  *
- * \param mask Bitmap of PWMs to enable/disable. Bits 0 to 7 enable slices 0-7 respectively
+ * \param mask Bitmask of PWMs to enable/disable. Bits 0 to 7 enable slices 0-7 respectively
  */
 static inline void pwm_set_mask_enabled(uint32_t mask) {
     pwm_hw->en = mask;
+}
+
+/** \brief Get PWM slice enabled status
+ *  \ingroup hardware_pwm
+ *
+ * \return Bitmask of all PWM slices currently enabled
+ */
+static inline uint32_t pwm_get_mask_enabled(void) {
+    return pwm_hw->en;
 }
 
 /**
