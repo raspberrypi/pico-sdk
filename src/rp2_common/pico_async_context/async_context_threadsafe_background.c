@@ -233,10 +233,24 @@ static void async_context_threadsafe_background_set_work_pending(async_context_t
 
 static void async_context_threadsafe_background_deinit(async_context_t *self_base) {
     async_context_threadsafe_background_t *self = (async_context_threadsafe_background_t *)self_base;
-    // todo we do not currently handle this correctly; we could, but seems like a rare case
+    // todo we do not currently handle this correctly; we could, but it seems like a rare use case
     assert(get_core_num() == self_base->core_num);
+
+    // todo this cleanup orderd is incorrect, because:
+    //      - low_priority_irq_handler() -> process_under_lock() re-arms the alarm
+    //      - alarm_handler() -> wake_up() set ths irq pending
+    //
+    //      i.e. there is no ordering of these two calls that is correct, and they must be split
+    //
+
     low_prio_irq_deinit(self);
+
+    // alarm_pool_cancel_alarm() is asynchronous when called from a different core to the pool owner,
+    // so we rely on the fact that the alarm_pool core is the same as our core (which is asserted on during init)
+    // to make this synchronous
     if (self->alarm_id > 0) alarm_pool_cancel_alarm(self->alarm_pool, self->alarm_id);
+
+    // todo also force_alarm_id is never cancelled, which is a leak if we dont own the alarm pool
 #if ASYNC_CONTEXT_THREADSAFE_BACKGROUND_MULTI_CORE
     if (self->alarm_pool_owned) {
         alarm_pool_destroy(self->alarm_pool);
@@ -373,5 +387,3 @@ static const async_context_type_t template = {
         .wait_for_work_until = async_context_threadsafe_background_wait_for_work_until,
         .deinit = async_context_threadsafe_background_deinit,
 };
-
-
