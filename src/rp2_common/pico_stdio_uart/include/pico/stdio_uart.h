@@ -37,8 +37,10 @@ extern stdio_driver_t stdio_uart;
 /*! \brief Explicitly initialize stdin/stdout over UART and add it to the current set of stdin/stdout drivers
  *  \ingroup pico_stdio_uart
  *
- * This method sets up PICO_DEFAULT_UART_TX_PIN for UART output (if defined), PICO_DEFAULT_UART_RX_PIN for input (if defined)
+ * This method sets up PICO_DEFAULT_UART_TX_PIN for UART output (if defined), PICO_DEFAULT_UART_RX_PIN for input (if defined),
  * and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE.
+ * 
+ * See \ref stdio_uart_deinit() for the inverse function
  *
  * \note This method is automatically called by \ref stdio_init_all() if `pico_stdio_uart` is included in the build
  */
@@ -47,14 +49,18 @@ void stdio_uart_init(void);
 /*! \brief Explicitly initialize stdout only (no stdin) over UART and add it to the current set of stdout drivers
  *  \ingroup pico_stdio_uart
  *
- * This method sets up PICO_DEFAULT_UART_TX_PIN for UART output (if defined) , and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE
+ * This method sets up PICO_DEFAULT_UART_TX_PIN for UART output (if defined), and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE
+ * 
+ * See \ref stdout_uart_deinit() for the inverse function
  */
 void stdout_uart_init(void);
 
 /*! \brief Explicitly initialize stdin only (no stdout) over UART and add it to the current set of stdin drivers
  *  \ingroup pico_stdio_uart
  *
- * This method sets up PICO_DEFAULT_UART_RX_PIN for UART input (if defined) , and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE
+ * This method sets up PICO_DEFAULT_UART_RX_PIN for UART input (if defined), and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE
+ * 
+ * See \ref stdin_uart_deinit() for the inverse function
  */
 void stdin_uart_init(void);
 
@@ -71,8 +77,10 @@ void stdio_uart_init_full(uart_inst_t *uart, uint baud_rate, int tx_pin, int rx_
 /*! \brief Explicitly deinitialize stdin/stdout over UART and remove it from the current set of stdin/stdout drivers
  *  \ingroup pico_stdio_uart
  *
- * This method disables PICO_DEFAULT_UART_TX_PIN for UART output (if defined), PICO_DEFAULT_UART_RX_PIN for input (if defined)
+ * This method disables PICO_DEFAULT_UART_TX_PIN for UART output (if defined), PICO_DEFAULT_UART_RX_PIN for input (if defined),
  * and leaves the pads isolated.
+ * 
+ * See \ref stdio_uart_init() for the inverse function
  *
  * \note This method is automatically called by \ref stdio_deinit_all() if `pico_stdio_uart` is included in the build
  */
@@ -82,6 +90,8 @@ void stdio_uart_deinit(void);
  *  \ingroup pico_stdio_uart
  *
  * This method disables PICO_DEFAULT_UART_TX_PIN for UART output (if defined), and leaves the pad isolated
+ * 
+ * See \ref stdout_uart_init() for the inverse function
  */
 void stdout_uart_deinit(void);
 
@@ -89,6 +99,8 @@ void stdout_uart_deinit(void);
  *  \ingroup pico_stdio_uart
  *
  * This method disables PICO_DEFAULT_UART_RX_PIN for UART input (if defined), and leaves the pads isolated
+ * 
+ * See \ref stdin_uart_init() for the inverse function
  */
 void stdin_uart_deinit(void);
 
