@@ -133,6 +133,52 @@ if (TARGET pico_low_power)
                 set_target_properties(low_power_test_timers_xip_sram_no_flash PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
                 set_target_properties(low_power_test_timers_xip_sram_no_flash PROPERTIES PICO_TEST_BUDDY_FILE external_sleep_timer.elf)
                 pico_add_extra_outputs(low_power_test_timers_xip_sram_no_flash)
+
+
+                # These tests just print that the correct persistent data is selected
+                add_executable(low_power_test_persistent_sram0
+                        low_power_test_persistent.c
+                )
+                target_link_libraries(low_power_test_persistent_sram0 low_power_test_common)
+                target_compile_definitions(low_power_test_persistent_sram0 PRIVATE PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC=0)
+                pico_set_persistent_data_loc(low_power_test_persistent_sram0 0x20020000)
+                # create map/bin/hex file etc.
+                set_target_properties(low_power_test_persistent_sram0 PROPERTIES PICO_TEST_SUCCESS_STRING "Persistent data would keep (SRAM_BANK0, ) memory on")
+                set_target_properties(low_power_test_persistent_sram0 PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
+                pico_add_extra_outputs(low_power_test_persistent_sram0)
+
+                add_executable(low_power_test_persistent_sram1
+                        low_power_test_persistent.c
+                )
+                target_link_libraries(low_power_test_persistent_sram1 low_power_test_common)
+                target_compile_definitions(low_power_test_persistent_sram1 PRIVATE PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC=0)
+                pico_set_persistent_data_loc(low_power_test_persistent_sram1 0x20040000)
+                # create map/bin/hex file etc.
+                set_target_properties(low_power_test_persistent_sram1 PROPERTIES PICO_TEST_SUCCESS_STRING "Persistent data would keep (SRAM_BANK1, ) memory on")
+                set_target_properties(low_power_test_persistent_sram1 PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
+                pico_add_extra_outputs(low_power_test_persistent_sram1)
+
+                add_executable(low_power_test_persistent_xip_sram
+                        low_power_test_persistent.c
+                )
+                target_link_libraries(low_power_test_persistent_xip_sram low_power_test_common)
+                target_compile_definitions(low_power_test_persistent_xip_sram PRIVATE PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC=0)
+                pico_set_persistent_data_loc(low_power_test_persistent_xip_sram 0x13ffc000)
+                # create map/bin/hex file etc.
+                set_target_properties(low_power_test_persistent_xip_sram PROPERTIES PICO_TEST_SUCCESS_STRING "Persistent data would keep (XIP_CACHE, ) memory on")
+                set_target_properties(low_power_test_persistent_xip_sram PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
+                pico_add_extra_outputs(low_power_test_persistent_xip_sram)
+
+                add_executable(low_power_test_persistent_sram_border
+                        low_power_test_persistent.c
+                )
+                target_link_libraries(low_power_test_persistent_sram_border low_power_test_common)
+                target_compile_definitions(low_power_test_persistent_sram_border PRIVATE PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC=0)
+                pico_set_persistent_data_loc(low_power_test_persistent_sram_border 0x2003ff00)
+                # create map/bin/hex file etc.
+                set_target_properties(low_power_test_persistent_sram_border PROPERTIES PICO_TEST_SUCCESS_STRING "Persistent data would keep (SRAM_BANK0, SRAM_BANK1, ) memory on")
+                set_target_properties(low_power_test_persistent_sram_border PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
+                pico_add_extra_outputs(low_power_test_persistent_sram_border)
         endif()
 
         add_executable(external_sleep_timer
