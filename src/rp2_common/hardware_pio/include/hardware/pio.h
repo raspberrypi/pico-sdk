@@ -1098,6 +1098,19 @@ static inline void pio_sm_set_enabled(PIO pio, uint sm, bool enabled) {
     pio->ctrl = (pio->ctrl & ~(1u << sm)) | (bool_to_bit(enabled) << sm);
 }
 
+/*! \brief Check if a PIO state machine is enabled or disabled
+ *  \ingroup hardware_pio
+ *
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
+ * \param sm State machine index (0..3)
+ * \return true if the SM is enabled
+ */
+static inline bool pio_sm_get_enabled(PIO pio, uint sm) {
+    check_pio_param(pio);
+    check_sm_param(sm);
+    return pio->ctrl & (1u << sm);
+}
+
 /*! \brief Enable or disable multiple PIO state machines
  *  \ingroup hardware_pio
  *
