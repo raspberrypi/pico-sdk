@@ -1,6 +1,6 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config")
 load("//bazel/util:transition.bzl", "extra_copts_for_all_deps")
 
 package(default_visibility = ["//visibility:public"])
@@ -31,7 +31,6 @@ cc_binary(
     testonly = True,
     srcs = ["low_power_test_persistent.c"],
     tags = ["manual"],
-    target_compatible_with = compatible_with_rp2(),
     deps = [
         "low_power_test_common",
     ],
@@ -44,7 +43,7 @@ extra_copts_for_all_deps(
     extra_copts = [
         "-DPICO_LOW_POWER_PERSISTENT_PSTATE_STATIC=0",
     ],
-    target_compatible_with = compatible_with_rp2(),
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config("//bazel/constraint:rp2040"),
 )
 
 cc_binary(
