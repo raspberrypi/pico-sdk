@@ -1103,7 +1103,7 @@ static inline void pio_sm_set_enabled(PIO pio, uint sm, bool enabled) {
  *
  * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
  * \param sm State machine index (0..3)
- * \return true if the SM is enabled
+ * \return true if the state machine is enabled
  */
 static inline bool pio_sm_get_enabled(PIO pio, uint sm) {
     check_pio_param(pio);
