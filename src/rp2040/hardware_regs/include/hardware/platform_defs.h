@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -36,11 +36,12 @@
 #define NUM_ALARMS _u(4)
 #define ADC_BASE_PIN _u(26)
 #define NUM_ADC_CHANNELS _u(5)
-#define NUM_RESETS _u(24)
+#define NUM_RESETS _u(25)
 #define NUM_BANK0_GPIOS _u(30)
 #define NUM_QSPI_GPIOS _u(6)
 
 #define PIO_INSTRUCTION_COUNT _u(32)
+#define PICO_PIO_VERSION _u(0)
 
 #define USBCTRL_DPRAM_SIZE _u(4096)
 
@@ -55,7 +56,7 @@
 #define FPGA_CLK_REF_HZ (12 * MHZ)
 #endif
 
-// PICO_CONFIG: XOSC_HZ, Crystal oscillator frequency in Hz, type=int, default=12000000, advanced=true, group=hardware_base
+// PICO_CONFIG: XOSC_HZ, Crystal oscillator frequency in Hz, type=int, min=1000000, max=50000000, default=12000000, advanced=true, group=hardware_base
 // NOTE:  The system and USB clocks are generated from the frequency using two PLLs.
 // If you override this define, or SYS_CLK_HZ/USB_CLK_HZ below, you will *also* need to add your own adjusted PLL set-up defines to
 // override the defaults which live in src/rp2_common/hardware_clocks/include/hardware/clocks.h

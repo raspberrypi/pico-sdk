@@ -58,6 +58,12 @@ static FILE __stdio = FDEV_SETUP_STREAM(picolibc_putc,
                                         picolibc_flush,
                                         _FDEV_SETUP_RW);
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#endif
+
 FILE *const stdin = &__stdio; __strong_reference(stdin, stdout); __strong_reference(stdin, stderr);
 
 void __weak __assert_func(const char *file, int line, const char *func, const char *failedexpr) {
@@ -77,6 +83,15 @@ void __attribute__((noreturn)) __weak _exit(__unused int status) {
         __breakpoint();
     }
 #endif
+}
+
+int __weak getpid(void) {
+    return 0;
+}
+
+int __weak kill(__unused int pid, __unused int sig) {
+    __breakpoint();
+    return -1;
 }
 
 static int64_t epoch_time_us_since_boot;
@@ -128,27 +143,3 @@ void runtime_init(void) {
     extern void __libc_init_array(void);
     __libc_init_array();
 }
-
-#if !PICO_RUNTIME_NO_INIT_PER_CORE_TLS_SETUP
-__weak void runtime_init_pre_core_tls_setup(void) {
-    // for now we just set the same global area on both cores
-    // note: that this is superfluous with the stock picolibc it seems, since it is itself
-    // using a version of __aeabi_read_tp that returns the same pointer on both cores
-    extern char __tls_base[];
-    extern void _set_tls(void *tls);
-    _set_tls(__tls_base);
-}
-#endif
-
-#if !PICO_RUNTIME_SKIP_INIT_PER_CORE_TLS_SETUP
-PICO_RUNTIME_INIT_FUNC_PER_CORE(runtime_init_pre_core_tls_setup, PICO_RUNTIME_INIT_PER_CORE_TLS_SETUP);
-#endif
-
-//// naked as it must preserve everything except r0 and lr
-//uint32_t __attribute__((naked)) WRAPPER_FUNC(__aeabi_read_tp)() {
-//    // note for now we are just returning a shared instance on both cores
-//    pico_default_asm_volatile(
-//            "ldr r0, =__tls_base\n"
-//            "bx lr\n"
-//            );
-//}

@@ -55,7 +55,11 @@ int mbedtls_sha256_update(mbedtls_sha256_context *ctx, const unsigned char *inpu
     return 0;
 }
 
+#if MBEDTLS_VERSION_MAJOR < 3
 int mbedtls_sha256_finish( mbedtls_sha256_context *ctx, unsigned char output[32]) {
+#else
+int mbedtls_sha256_finish( mbedtls_sha256_context *ctx, unsigned char *output) {
+#endif
     sha256_result_t result;
     pico_sha256_finish(ctx, &result);
     memcpy(output, result.bytes, 32);

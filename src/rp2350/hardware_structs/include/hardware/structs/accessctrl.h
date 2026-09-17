@@ -26,28 +26,28 @@
 typedef struct {
     _REG_(ACCESSCTRL_LOCK_OFFSET) // ACCESSCTRL_LOCK
     // Once a LOCK bit is written to 1, ACCESSCTRL silently ignores writes from that master
-    // 0x00000008 [3]     DEBUG        (0) 
-    // 0x00000004 [2]     DMA          (1) 
-    // 0x00000002 [1]     CORE1        (0) 
-    // 0x00000001 [0]     CORE0        (0) 
+    // 0x00000008 [3]     DEBUG        (0)
+    // 0x00000004 [2]     DMA          (1)
+    // 0x00000002 [1]     CORE1        (0)
+    // 0x00000001 [0]     CORE0        (0)
     io_rw_32 lock;
- 
+
     _REG_(ACCESSCTRL_FORCE_CORE_NS_OFFSET) // ACCESSCTRL_FORCE_CORE_NS
     // Force core 1's bus accesses to always be Non-secure, no matter the core's internal state
-    // 0x00000002 [1]     CORE1        (0) 
+    // 0x00000002 [1]     CORE1        (0)
     io_rw_32 force_core_ns;
- 
+
     _REG_(ACCESSCTRL_CFGRESET_OFFSET) // ACCESSCTRL_CFGRESET
     // Write 1 to reset all ACCESSCTRL configuration, except for the LOCK and FORCE_CORE_NS registers
-    // 0x00000001 [0]     CFGRESET     (0) 
+    // 0x00000001 [0]     CFGRESET     (0)
     io_wo_32 cfgreset;
- 
+
     // (Description copied from array index 0 register ACCESSCTRL_GPIO_NSMASK0 applies similarly to other array indexes)
     _REG_(ACCESSCTRL_GPIO_NSMASK0_OFFSET) // ACCESSCTRL_GPIO_NSMASK0
     // Control whether GPIO0
-    // 0xffffffff [31:0]  GPIO_NSMASK0 (0x00000000) 
+    // 0xffffffff [31:0]  GPIO_NSMASK0 (0x00000000)
     io_rw_32 gpio_nsmask[2];
- 
+
     _REG_(ACCESSCTRL_ROM_OFFSET) // ACCESSCTRL_ROM
     // Control access to ROM. Defaults to fully open access.
     // 0x00000080 [7]     DBG          (1) If 1, ROM can be accessed by the debugger, at...
@@ -59,7 +59,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (1) If 1, ROM can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (1) If 1, and NSP is also set, ROM can be accessed from a...
     io_rw_32 rom;
- 
+
     _REG_(ACCESSCTRL_XIP_MAIN_OFFSET) // ACCESSCTRL_XIP_MAIN
     // Control access to XIP_MAIN. Defaults to fully open access.
     // 0x00000080 [7]     DBG          (1) If 1, XIP_MAIN can be accessed by the debugger, at...
@@ -71,7 +71,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (1) If 1, XIP_MAIN can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (1) If 1, and NSP is also set, XIP_MAIN can be accessed from...
     io_rw_32 xip_main;
- 
+
     // (Description copied from array index 0 register ACCESSCTRL_SRAM0 applies similarly to other array indexes)
     _REG_(ACCESSCTRL_SRAM0_OFFSET) // ACCESSCTRL_SRAM0
     // Control access to SRAM0. Defaults to fully open access.
@@ -84,7 +84,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (1) If 1, SRAM0 can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (1) If 1, and NSP is also set, SRAM0 can be accessed from a...
     io_rw_32 sram[10];
- 
+
     _REG_(ACCESSCTRL_DMA_OFFSET) // ACCESSCTRL_DMA
     // Control access to DMA. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, DMA can be accessed by the debugger, at...
@@ -96,7 +96,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, DMA can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, DMA can be accessed from a...
     io_rw_32 dma;
- 
+
     _REG_(ACCESSCTRL_USBCTRL_OFFSET) // ACCESSCTRL_USBCTRL
     // Control access to USBCTRL. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, USBCTRL can be accessed by the debugger, at...
@@ -108,7 +108,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, USBCTRL can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, USBCTRL can be accessed from...
     io_rw_32 usbctrl;
- 
+
     // (Description copied from array index 0 register ACCESSCTRL_PIO0 applies similarly to other array indexes)
     _REG_(ACCESSCTRL_PIO0_OFFSET) // ACCESSCTRL_PIO0
     // Control access to PIO0. Defaults to Secure access from any master.
@@ -121,7 +121,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, PIO0 can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, PIO0 can be accessed from a...
     io_rw_32 pio[3];
- 
+
     _REG_(ACCESSCTRL_CORESIGHT_TRACE_OFFSET) // ACCESSCTRL_CORESIGHT_TRACE
     // Control access to CORESIGHT_TRACE. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, CORESIGHT_TRACE can be accessed by the debugger,...
@@ -133,7 +133,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, CORESIGHT_TRACE can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, CORESIGHT_TRACE can be...
     io_rw_32 coresight_trace;
- 
+
     _REG_(ACCESSCTRL_CORESIGHT_PERIPH_OFFSET) // ACCESSCTRL_CORESIGHT_PERIPH
     // Control access to CORESIGHT_PERIPH. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, CORESIGHT_PERIPH can be accessed by the debugger,...
@@ -145,7 +145,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, CORESIGHT_PERIPH can be accessed from a...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, CORESIGHT_PERIPH can be...
     io_rw_32 coresight_periph;
- 
+
     _REG_(ACCESSCTRL_SYSINFO_OFFSET) // ACCESSCTRL_SYSINFO
     // Control access to SYSINFO. Defaults to fully open access.
     // 0x00000080 [7]     DBG          (1) If 1, SYSINFO can be accessed by the debugger, at...
@@ -157,7 +157,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (1) If 1, SYSINFO can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (1) If 1, and NSP is also set, SYSINFO can be accessed from...
     io_rw_32 sysinfo;
- 
+
     _REG_(ACCESSCTRL_RESETS_OFFSET) // ACCESSCTRL_RESETS
     // Control access to RESETS. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, RESETS can be accessed by the debugger, at...
@@ -169,7 +169,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, RESETS can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, RESETS can be accessed from a...
     io_rw_32 resets;
- 
+
     // (Description copied from array index 0 register ACCESSCTRL_IO_BANK0 applies similarly to other array indexes)
     _REG_(ACCESSCTRL_IO_BANK0_OFFSET) // ACCESSCTRL_IO_BANK0
     // Control access to IO_BANK0. Defaults to Secure access from any master.
@@ -182,7 +182,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, IO_BANK0 can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, IO_BANK0 can be accessed from...
     io_rw_32 io_bank[2];
- 
+
     _REG_(ACCESSCTRL_PADS_BANK0_OFFSET) // ACCESSCTRL_PADS_BANK0
     // Control access to PADS_BANK0. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, PADS_BANK0 can be accessed by the debugger, at...
@@ -194,7 +194,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, PADS_BANK0 can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, PADS_BANK0 can be accessed...
     io_rw_32 pads_bank0;
- 
+
     _REG_(ACCESSCTRL_PADS_QSPI_OFFSET) // ACCESSCTRL_PADS_QSPI
     // Control access to PADS_QSPI. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, PADS_QSPI can be accessed by the debugger, at...
@@ -206,7 +206,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, PADS_QSPI can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, PADS_QSPI can be accessed...
     io_rw_32 pads_qspi;
- 
+
     _REG_(ACCESSCTRL_BUSCTRL_OFFSET) // ACCESSCTRL_BUSCTRL
     // Control access to BUSCTRL. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, BUSCTRL can be accessed by the debugger, at...
@@ -218,19 +218,19 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, BUSCTRL can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, BUSCTRL can be accessed from...
     io_rw_32 busctrl;
- 
-    _REG_(ACCESSCTRL_ADC0_OFFSET) // ACCESSCTRL_ADC0
-    // Control access to ADC0. Defaults to Secure access from any master.
-    // 0x00000080 [7]     DBG          (1) If 1, ADC0 can be accessed by the debugger, at...
-    // 0x00000040 [6]     DMA          (1) If 1, ADC0 can be accessed by the DMA, at...
-    // 0x00000020 [5]     CORE1        (1) If 1, ADC0 can be accessed by core 1, at...
-    // 0x00000010 [4]     CORE0        (1) If 1, ADC0 can be accessed by core 0, at...
-    // 0x00000008 [3]     SP           (1) If 1, ADC0 can be accessed from a Secure, Privileged context
-    // 0x00000004 [2]     SU           (1) If 1, and SP is also set, ADC0 can be accessed from a...
-    // 0x00000002 [1]     NSP          (0) If 1, ADC0 can be accessed from a Non-secure, Privileged context
-    // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, ADC0 can be accessed from a...
-    io_rw_32 adc0;
- 
+
+    _REG_(ACCESSCTRL_ADC_OFFSET) // ACCESSCTRL_ADC
+    // Control access to ADC. Defaults to Secure access from any master.
+    // 0x00000080 [7]     DBG          (1) If 1, ADC can be accessed by the debugger, at...
+    // 0x00000040 [6]     DMA          (1) If 1, ADC can be accessed by the DMA, at...
+    // 0x00000020 [5]     CORE1        (1) If 1, ADC can be accessed by core 1, at...
+    // 0x00000010 [4]     CORE0        (1) If 1, ADC can be accessed by core 0, at...
+    // 0x00000008 [3]     SP           (1) If 1, ADC can be accessed from a Secure, Privileged context
+    // 0x00000004 [2]     SU           (1) If 1, and SP is also set, ADC can be accessed from a...
+    // 0x00000002 [1]     NSP          (0) If 1, ADC can be accessed from a Non-secure, Privileged context
+    // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, ADC can be accessed from a...
+    io_rw_32 adc;
+
     _REG_(ACCESSCTRL_HSTX_OFFSET) // ACCESSCTRL_HSTX
     // Control access to HSTX. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, HSTX can be accessed by the debugger, at...
@@ -242,7 +242,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, HSTX can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, HSTX can be accessed from a...
     io_rw_32 hstx;
- 
+
     // (Description copied from array index 0 register ACCESSCTRL_I2C0 applies similarly to other array indexes)
     _REG_(ACCESSCTRL_I2C0_OFFSET) // ACCESSCTRL_I2C0
     // Control access to I2C0. Defaults to Secure access from any master.
@@ -255,7 +255,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, I2C0 can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, I2C0 can be accessed from a...
     io_rw_32 i2c[2];
- 
+
     _REG_(ACCESSCTRL_PWM_OFFSET) // ACCESSCTRL_PWM
     // Control access to PWM. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, PWM can be accessed by the debugger, at...
@@ -267,7 +267,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, PWM can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, PWM can be accessed from a...
     io_rw_32 pwm;
- 
+
     // (Description copied from array index 0 register ACCESSCTRL_SPI0 applies similarly to other array indexes)
     _REG_(ACCESSCTRL_SPI0_OFFSET) // ACCESSCTRL_SPI0
     // Control access to SPI0. Defaults to Secure access from any master.
@@ -280,7 +280,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, SPI0 can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, SPI0 can be accessed from a...
     io_rw_32 spi[2];
- 
+
     // (Description copied from array index 0 register ACCESSCTRL_TIMER0 applies similarly to other array indexes)
     _REG_(ACCESSCTRL_TIMER0_OFFSET) // ACCESSCTRL_TIMER0
     // Control access to TIMER0. Defaults to Secure access from any master.
@@ -293,7 +293,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, TIMER0 can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, TIMER0 can be accessed from a...
     io_rw_32 timer[2];
- 
+
     // (Description copied from array index 0 register ACCESSCTRL_UART0 applies similarly to other array indexes)
     _REG_(ACCESSCTRL_UART0_OFFSET) // ACCESSCTRL_UART0
     // Control access to UART0. Defaults to Secure access from any master.
@@ -306,7 +306,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, UART0 can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, UART0 can be accessed from a...
     io_rw_32 uart[2];
- 
+
     _REG_(ACCESSCTRL_OTP_OFFSET) // ACCESSCTRL_OTP
     // Control access to OTP. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, OTP can be accessed by the debugger, at...
@@ -318,7 +318,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, OTP can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, OTP can be accessed from a...
     io_rw_32 otp;
- 
+
     _REG_(ACCESSCTRL_TBMAN_OFFSET) // ACCESSCTRL_TBMAN
     // Control access to TBMAN. Defaults to Secure access from any master.
     // 0x00000080 [7]     DBG          (1) If 1, TBMAN can be accessed by the debugger, at...
@@ -330,7 +330,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, TBMAN can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, TBMAN can be accessed from a...
     io_rw_32 tbman;
- 
+
     _REG_(ACCESSCTRL_POWMAN_OFFSET) // ACCESSCTRL_POWMAN
     // Control access to POWMAN. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, POWMAN can be accessed by the debugger, at...
@@ -342,7 +342,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, POWMAN can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, POWMAN can be accessed from a...
     io_rw_32 powman;
- 
+
     _REG_(ACCESSCTRL_TRNG_OFFSET) // ACCESSCTRL_TRNG
     // Control access to TRNG. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, TRNG can be accessed by the debugger, at...
@@ -354,7 +354,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, TRNG can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, TRNG can be accessed from a...
     io_rw_32 trng;
- 
+
     _REG_(ACCESSCTRL_SHA256_OFFSET) // ACCESSCTRL_SHA256
     // Control access to SHA256. Defaults to Secure, Privileged access only.
     // 0x00000080 [7]     DBG          (1) If 1, SHA256 can be accessed by the debugger, at...
@@ -366,7 +366,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, SHA256 can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, SHA256 can be accessed from a...
     io_rw_32 sha256;
- 
+
     _REG_(ACCESSCTRL_SYSCFG_OFFSET) // ACCESSCTRL_SYSCFG
     // Control access to SYSCFG. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, SYSCFG can be accessed by the debugger, at...
@@ -378,7 +378,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, SYSCFG can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, SYSCFG can be accessed from a...
     io_rw_32 syscfg;
- 
+
     _REG_(ACCESSCTRL_CLOCKS_OFFSET) // ACCESSCTRL_CLOCKS
     // Control access to CLOCKS. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, CLOCKS can be accessed by the debugger, at...
@@ -390,7 +390,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, CLOCKS can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, CLOCKS can be accessed from a...
     io_rw_32 clocks;
- 
+
     _REG_(ACCESSCTRL_XOSC_OFFSET) // ACCESSCTRL_XOSC
     // Control access to XOSC. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, XOSC can be accessed by the debugger, at...
@@ -402,7 +402,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, XOSC can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, XOSC can be accessed from a...
     io_rw_32 xosc;
- 
+
     _REG_(ACCESSCTRL_ROSC_OFFSET) // ACCESSCTRL_ROSC
     // Control access to ROSC. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, ROSC can be accessed by the debugger, at...
@@ -414,7 +414,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, ROSC can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, ROSC can be accessed from a...
     io_rw_32 rosc;
- 
+
     _REG_(ACCESSCTRL_PLL_SYS_OFFSET) // ACCESSCTRL_PLL_SYS
     // Control access to PLL_SYS. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, PLL_SYS can be accessed by the debugger, at...
@@ -426,7 +426,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, PLL_SYS can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, PLL_SYS can be accessed from...
     io_rw_32 pll_sys;
- 
+
     _REG_(ACCESSCTRL_PLL_USB_OFFSET) // ACCESSCTRL_PLL_USB
     // Control access to PLL_USB. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, PLL_USB can be accessed by the debugger, at...
@@ -438,7 +438,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, PLL_USB can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, PLL_USB can be accessed from...
     io_rw_32 pll_usb;
- 
+
     _REG_(ACCESSCTRL_TICKS_OFFSET) // ACCESSCTRL_TICKS
     // Control access to TICKS. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, TICKS can be accessed by the debugger, at...
@@ -450,7 +450,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, TICKS can be accessed from a Non-secure, Privileged context
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, TICKS can be accessed from a...
     io_rw_32 ticks;
- 
+
     _REG_(ACCESSCTRL_WATCHDOG_OFFSET) // ACCESSCTRL_WATCHDOG
     // Control access to WATCHDOG. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, WATCHDOG can be accessed by the debugger, at...
@@ -462,19 +462,19 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, WATCHDOG can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, WATCHDOG can be accessed from...
     io_rw_32 watchdog;
- 
-    _REG_(ACCESSCTRL_RSM_OFFSET) // ACCESSCTRL_RSM
-    // Control access to RSM. Defaults to Secure, Privileged processor or debug access only.
-    // 0x00000080 [7]     DBG          (1) If 1, RSM can be accessed by the debugger, at...
-    // 0x00000040 [6]     DMA          (0) If 1, RSM can be accessed by the DMA, at...
-    // 0x00000020 [5]     CORE1        (1) If 1, RSM can be accessed by core 1, at...
-    // 0x00000010 [4]     CORE0        (1) If 1, RSM can be accessed by core 0, at...
-    // 0x00000008 [3]     SP           (1) If 1, RSM can be accessed from a Secure, Privileged context
-    // 0x00000004 [2]     SU           (0) If 1, and SP is also set, RSM can be accessed from a...
-    // 0x00000002 [1]     NSP          (0) If 1, RSM can be accessed from a Non-secure, Privileged context
-    // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, RSM can be accessed from a...
-    io_rw_32 rsm;
- 
+
+    _REG_(ACCESSCTRL_PSM_OFFSET) // ACCESSCTRL_PSM
+    // Control access to PSM. Defaults to Secure, Privileged processor or debug access only.
+    // 0x00000080 [7]     DBG          (1) If 1, PSM can be accessed by the debugger, at...
+    // 0x00000040 [6]     DMA          (0) If 1, PSM can be accessed by the DMA, at...
+    // 0x00000020 [5]     CORE1        (1) If 1, PSM can be accessed by core 1, at...
+    // 0x00000010 [4]     CORE0        (1) If 1, PSM can be accessed by core 0, at...
+    // 0x00000008 [3]     SP           (1) If 1, PSM can be accessed from a Secure, Privileged context
+    // 0x00000004 [2]     SU           (0) If 1, and SP is also set, PSM can be accessed from a...
+    // 0x00000002 [1]     NSP          (0) If 1, PSM can be accessed from a Non-secure, Privileged context
+    // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, PSM can be accessed from a...
+    io_rw_32 psm;
+
     _REG_(ACCESSCTRL_XIP_CTRL_OFFSET) // ACCESSCTRL_XIP_CTRL
     // Control access to XIP_CTRL. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, XIP_CTRL can be accessed by the debugger, at...
@@ -486,7 +486,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, XIP_CTRL can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, XIP_CTRL can be accessed from...
     io_rw_32 xip_ctrl;
- 
+
     _REG_(ACCESSCTRL_XIP_QMI_OFFSET) // ACCESSCTRL_XIP_QMI
     // Control access to XIP_QMI. Defaults to Secure, Privileged processor or debug access only.
     // 0x00000080 [7]     DBG          (1) If 1, XIP_QMI can be accessed by the debugger, at...
@@ -498,7 +498,7 @@ typedef struct {
     // 0x00000002 [1]     NSP          (0) If 1, XIP_QMI can be accessed from a Non-secure,...
     // 0x00000001 [0]     NSU          (0) If 1, and NSP is also set, XIP_QMI can be accessed from...
     io_rw_32 xip_qmi;
- 
+
     _REG_(ACCESSCTRL_XIP_AUX_OFFSET) // ACCESSCTRL_XIP_AUX
     // Control access to XIP_AUX. Defaults to Secure, Privileged access only.
     // 0x00000080 [7]     DBG          (1) If 1, XIP_AUX can be accessed by the debugger, at...
@@ -516,4 +516,3 @@ typedef struct {
 static_assert(sizeof (accessctrl_hw_t) == 0x00ec, "");
 
 #endif // _HARDWARE_STRUCTS_ACCESSCTRL_H
-

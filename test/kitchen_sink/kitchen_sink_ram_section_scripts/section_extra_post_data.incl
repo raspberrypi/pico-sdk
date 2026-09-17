@@ -1,0 +1,10 @@
+SECTIONS
+{
+    .extra_data : {
+        __extra_data_start__ = .;
+        *(.extra_data*)
+        . = ALIGN(4);
+        __extra_data_end__ = .;
+    } > RAM AT> RAM_STORE
+    __extra_data_source__ = LOADADDR(.extra_data);
+}

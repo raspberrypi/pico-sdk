@@ -96,7 +96,11 @@ static void write_to_hardware(pico_sha256_state_t *state, const uint8_t *data, s
             while (data_size_bytes >= 4) {
                 // write a whole word
                 sha256_wait_ready_blocking();
+                // false positive; data_size_bytes does indeed prevent us reading off the end
+GCC_Pragma("GCC diagnostic push")
+GCC_Pragma("GCC diagnostic ignored \"-Wanalyzer-out-of-bounds\"")
                 sha256_put_word(*data32++);
+GCC_Pragma("GCC diagnostic pop")
                 data_size_bytes -= 4;
             }
             data = (const uint8_t *)data32;
@@ -166,7 +170,7 @@ static void write_padding(pico_sha256_state_t *state) {
     add_zero_bytes(state, padding_size_bytes - SHA256_PADDING_DATA_BYTES);
 
     // Add size in bits, big endian
-    size = __builtin_bswap64(user_data_size * 8);
+    size = __builtin_bswap64((uint64_t)user_data_size * 8);
     update_internal(state, (uint8_t*)&size, sizeof(uint64_t)); // last write
 }
 

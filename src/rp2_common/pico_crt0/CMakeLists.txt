@@ -11,9 +11,4 @@ if (NOT TARGET pico_crt0)
     target_link_libraries(pico_crt0 INTERFACE boot_picobin_headers pico_bootrom_headers)
 endif()
 
-pico_register_common_scope_var(PICO_LINKER_SCRIPT_PATH)
-if (NOT PICO_LINKER_SCRIPT_PATH)
-    set(PICO_LINKER_SCRIPT_PATH ${CMAKE_CURRENT_LIST_DIR}/${PICO_CHIP})
-endif()
-
 pico_promote_common_scope_vars()

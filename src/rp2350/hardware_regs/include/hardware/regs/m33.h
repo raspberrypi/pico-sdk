@@ -810,7 +810,7 @@
 #define M33_ITM_PIDR5_RESET  _u(0x00000000)
 #define M33_ITM_PIDR5_MSB    _u(31)
 #define M33_ITM_PIDR5_LSB    _u(0)
-#define M33_ITM_PIDR5_ACCESS "RW"
+#define M33_ITM_PIDR5_ACCESS "-"
 // =============================================================================
 // Register    : M33_ITM_PIDR6
 // Description : Provides CoreSight discovery information for the ITM
@@ -819,7 +819,7 @@
 #define M33_ITM_PIDR6_RESET  _u(0x00000000)
 #define M33_ITM_PIDR6_MSB    _u(31)
 #define M33_ITM_PIDR6_LSB    _u(0)
-#define M33_ITM_PIDR6_ACCESS "RW"
+#define M33_ITM_PIDR6_ACCESS "-"
 // =============================================================================
 // Register    : M33_ITM_PIDR7
 // Description : Provides CoreSight discovery information for the ITM
@@ -828,7 +828,7 @@
 #define M33_ITM_PIDR7_RESET  _u(0x00000000)
 #define M33_ITM_PIDR7_MSB    _u(31)
 #define M33_ITM_PIDR7_LSB    _u(0)
-#define M33_ITM_PIDR7_ACCESS "RW"
+#define M33_ITM_PIDR7_ACCESS "-"
 // =============================================================================
 // Register    : M33_ITM_PIDR0
 // Description : Provides CoreSight discovery information for the ITM
@@ -1552,7 +1552,7 @@
 #define M33_DWT_PIDR5_RESET  _u(0x00000000)
 #define M33_DWT_PIDR5_MSB    _u(31)
 #define M33_DWT_PIDR5_LSB    _u(0)
-#define M33_DWT_PIDR5_ACCESS "RW"
+#define M33_DWT_PIDR5_ACCESS "-"
 // =============================================================================
 // Register    : M33_DWT_PIDR6
 // Description : Provides CoreSight discovery information for the DWT
@@ -1561,7 +1561,7 @@
 #define M33_DWT_PIDR6_RESET  _u(0x00000000)
 #define M33_DWT_PIDR6_MSB    _u(31)
 #define M33_DWT_PIDR6_LSB    _u(0)
-#define M33_DWT_PIDR6_ACCESS "RW"
+#define M33_DWT_PIDR6_ACCESS "-"
 // =============================================================================
 // Register    : M33_DWT_PIDR7
 // Description : Provides CoreSight discovery information for the DWT
@@ -1570,7 +1570,7 @@
 #define M33_DWT_PIDR7_RESET  _u(0x00000000)
 #define M33_DWT_PIDR7_MSB    _u(31)
 #define M33_DWT_PIDR7_LSB    _u(0)
-#define M33_DWT_PIDR7_ACCESS "RW"
+#define M33_DWT_PIDR7_ACCESS "-"
 // =============================================================================
 // Register    : M33_DWT_PIDR0
 // Description : Provides CoreSight discovery information for the DWT
@@ -2047,7 +2047,7 @@
 #define M33_FP_PIDR5_RESET  _u(0x00000000)
 #define M33_FP_PIDR5_MSB    _u(31)
 #define M33_FP_PIDR5_LSB    _u(0)
-#define M33_FP_PIDR5_ACCESS "RW"
+#define M33_FP_PIDR5_ACCESS "-"
 // =============================================================================
 // Register    : M33_FP_PIDR6
 // Description : Provides CoreSight discovery information for the FP
@@ -2056,7 +2056,7 @@
 #define M33_FP_PIDR6_RESET  _u(0x00000000)
 #define M33_FP_PIDR6_MSB    _u(31)
 #define M33_FP_PIDR6_LSB    _u(0)
-#define M33_FP_PIDR6_ACCESS "RW"
+#define M33_FP_PIDR6_ACCESS "-"
 // =============================================================================
 // Register    : M33_FP_PIDR7
 // Description : Provides CoreSight discovery information for the FP
@@ -2065,7 +2065,7 @@
 #define M33_FP_PIDR7_RESET  _u(0x00000000)
 #define M33_FP_PIDR7_MSB    _u(31)
 #define M33_FP_PIDR7_LSB    _u(0)
-#define M33_FP_PIDR7_ACCESS "RW"
+#define M33_FP_PIDR7_ACCESS "-"
 // =============================================================================
 // Register    : M33_FP_PIDR0
 // Description : Provides CoreSight discovery information for the FP
@@ -3532,12 +3532,8 @@
 #define M33_AIRCR_SYSRESETREQS_ACCESS "RW"
 // -----------------------------------------------------------------------------
 // Field       : M33_AIRCR_SYSRESETREQ
-// Description : Writing 1 to this bit causes the SYSRESETREQ signal to the
-//               outer system to be asserted to request a reset. The intention
-//               is to force a large system reset of all major components except
-//               for debug. The C_HALT bit in the DHCSR is cleared as a result
-//               of the system reset requested. The debugger does not lose
-//               contact with the device.
+// Description : This resets only the core on which SYSRESETREQ is asserted, and
+//               not the wider system.
 #define M33_AIRCR_SYSRESETREQ_RESET  _u(0x0)
 #define M33_AIRCR_SYSRESETREQ_BITS   _u(0x00000004)
 #define M33_AIRCR_SYSRESETREQ_MSB    _u(2)
@@ -4411,7 +4407,7 @@
 #define M33_ID_MMFR1_RESET  _u(0x00000000)
 #define M33_ID_MMFR1_MSB    _u(31)
 #define M33_ID_MMFR1_LSB    _u(0)
-#define M33_ID_MMFR1_ACCESS "RW"
+#define M33_ID_MMFR1_ACCESS "-"
 // =============================================================================
 // Register    : M33_ID_MMFR2
 // Description : Provides information about the implemented memory model and
@@ -4749,7 +4745,7 @@
 #define M33_ID_ISAR5_RESET  _u(0x00000000)
 #define M33_ID_ISAR5_MSB    _u(31)
 #define M33_ID_ISAR5_LSB    _u(0)
-#define M33_ID_ISAR5_ACCESS "RW"
+#define M33_ID_ISAR5_ACCESS "-"
 // =============================================================================
 // Register    : M33_CTR
 // Description : Provides information about the architecture of the caches. CTR
@@ -6460,7 +6456,7 @@
 #define M33_DPIDR5_RESET  _u(0x00000000)
 #define M33_DPIDR5_MSB    _u(31)
 #define M33_DPIDR5_LSB    _u(0)
-#define M33_DPIDR5_ACCESS "RW"
+#define M33_DPIDR5_ACCESS "-"
 // =============================================================================
 // Register    : M33_DPIDR6
 // Description : Provides CoreSight discovery information for the SCS
@@ -6469,7 +6465,7 @@
 #define M33_DPIDR6_RESET  _u(0x00000000)
 #define M33_DPIDR6_MSB    _u(31)
 #define M33_DPIDR6_LSB    _u(0)
-#define M33_DPIDR6_ACCESS "RW"
+#define M33_DPIDR6_ACCESS "-"
 // =============================================================================
 // Register    : M33_DPIDR7
 // Description : Provides CoreSight discovery information for the SCS
@@ -6478,7 +6474,7 @@
 #define M33_DPIDR7_RESET  _u(0x00000000)
 #define M33_DPIDR7_MSB    _u(31)
 #define M33_DPIDR7_LSB    _u(0)
-#define M33_DPIDR7_ACCESS "RW"
+#define M33_DPIDR7_ACCESS "-"
 // =============================================================================
 // Register    : M33_DPIDR0
 // Description : Provides CoreSight discovery information for the SCS
@@ -7531,7 +7527,7 @@
 #define M33_TRCIDR6_RESET  _u(0x00000000)
 #define M33_TRCIDR6_MSB    _u(31)
 #define M33_TRCIDR6_LSB    _u(0)
-#define M33_TRCIDR6_ACCESS "RW"
+#define M33_TRCIDR6_ACCESS "-"
 // =============================================================================
 // Register    : M33_TRCIDR7
 // Description : TRCIDR7
@@ -7540,7 +7536,7 @@
 #define M33_TRCIDR7_RESET  _u(0x00000000)
 #define M33_TRCIDR7_MSB    _u(31)
 #define M33_TRCIDR7_LSB    _u(0)
-#define M33_TRCIDR7_ACCESS "RW"
+#define M33_TRCIDR7_ACCESS "-"
 // =============================================================================
 // Register    : M33_TRCRSCTLR2
 // Description : The TRCRSCTLR controls the trace resources
@@ -7957,7 +7953,7 @@
 #define M33_TRCDEVID_RESET  _u(0x00000000)
 #define M33_TRCDEVID_MSB    _u(31)
 #define M33_TRCDEVID_LSB    _u(0)
-#define M33_TRCDEVID_ACCESS "RW"
+#define M33_TRCDEVID_ACCESS "-"
 // =============================================================================
 // Register    : M33_TRCDEVTYPE
 // Description : TRCDEVTYPE
@@ -8010,7 +8006,7 @@
 #define M33_TRCPIDR5_RESET  _u(0x00000000)
 #define M33_TRCPIDR5_MSB    _u(31)
 #define M33_TRCPIDR5_LSB    _u(0)
-#define M33_TRCPIDR5_ACCESS "RW"
+#define M33_TRCPIDR5_ACCESS "-"
 // =============================================================================
 // Register    : M33_TRCPIDR6
 // Description : TRCPIDR6
@@ -8019,7 +8015,7 @@
 #define M33_TRCPIDR6_RESET  _u(0x00000000)
 #define M33_TRCPIDR6_MSB    _u(31)
 #define M33_TRCPIDR6_LSB    _u(0)
-#define M33_TRCPIDR6_ACCESS "RW"
+#define M33_TRCPIDR6_ACCESS "-"
 // =============================================================================
 // Register    : M33_TRCPIDR7
 // Description : TRCPIDR7
@@ -8028,7 +8024,7 @@
 #define M33_TRCPIDR7_RESET  _u(0x00000000)
 #define M33_TRCPIDR7_MSB    _u(31)
 #define M33_TRCPIDR7_LSB    _u(0)
-#define M33_TRCPIDR7_ACCESS "RW"
+#define M33_TRCPIDR7_ACCESS "-"
 // =============================================================================
 // Register    : M33_TRCPIDR0
 // Description : TRCPIDR0
@@ -8606,7 +8602,7 @@
 #define M33_ASICCTL_RESET  _u(0x00000000)
 #define M33_ASICCTL_MSB    _u(31)
 #define M33_ASICCTL_LSB    _u(0)
-#define M33_ASICCTL_ACCESS "RW"
+#define M33_ASICCTL_ACCESS "-"
 // =============================================================================
 // Register    : M33_ITCHOUT
 // Description : Integration Test Channel Output register
@@ -8793,7 +8789,7 @@
 #define M33_PIDR5_RESET  _u(0x00000000)
 #define M33_PIDR5_MSB    _u(31)
 #define M33_PIDR5_LSB    _u(0)
-#define M33_PIDR5_ACCESS "RW"
+#define M33_PIDR5_ACCESS "-"
 // =============================================================================
 // Register    : M33_PIDR6
 // Description : CoreSight Peripheral ID6
@@ -8802,7 +8798,7 @@
 #define M33_PIDR6_RESET  _u(0x00000000)
 #define M33_PIDR6_MSB    _u(31)
 #define M33_PIDR6_LSB    _u(0)
-#define M33_PIDR6_ACCESS "RW"
+#define M33_PIDR6_ACCESS "-"
 // =============================================================================
 // Register    : M33_PIDR7
 // Description : CoreSight Peripheral ID7
@@ -8811,7 +8807,7 @@
 #define M33_PIDR7_RESET  _u(0x00000000)
 #define M33_PIDR7_MSB    _u(31)
 #define M33_PIDR7_LSB    _u(0)
-#define M33_PIDR7_ACCESS "RW"
+#define M33_PIDR7_ACCESS "-"
 // =============================================================================
 // Register    : M33_PIDR0
 // Description : CoreSight Peripheral ID0
@@ -8985,4 +8981,3 @@
 #define M33_CIDR3_PRMBL_3_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_M33_H
-

@@ -2477,93 +2477,93 @@
 #define ACCESSCTRL_BUSCTRL_NSU_LSB    _u(0)
 #define ACCESSCTRL_BUSCTRL_NSU_ACCESS "RW"
 // =============================================================================
-// Register    : ACCESSCTRL_ADC0
+// Register    : ACCESSCTRL_ADC
 // Description : Control whether debugger, DMA, core 0 and core 1 can access
-//               ADC0, and at what security/privilege levels they can do so.
+//               ADC, and at what security/privilege levels they can do so.
 //
 //               Defaults to Secure access from any master.
 //
 //               This register is writable only from a Secure, Privileged
 //               processor or debugger, with the exception of the NSU bit, which
 //               becomes Non-secure-Privileged-writable when the NSP bit is set.
-#define ACCESSCTRL_ADC0_OFFSET _u(0x0000007c)
-#define ACCESSCTRL_ADC0_BITS   _u(0x000000ff)
-#define ACCESSCTRL_ADC0_RESET  _u(0x000000fc)
+#define ACCESSCTRL_ADC_OFFSET _u(0x0000007c)
+#define ACCESSCTRL_ADC_BITS   _u(0x000000ff)
+#define ACCESSCTRL_ADC_RESET  _u(0x000000fc)
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_ADC0_DBG
-// Description : If 1, ADC0 can be accessed by the debugger, at
+// Field       : ACCESSCTRL_ADC_DBG
+// Description : If 1, ADC can be accessed by the debugger, at
 //               security/privilege levels permitted by SP/NSP/SU/NSU in this
 //               register.
-#define ACCESSCTRL_ADC0_DBG_RESET  _u(0x1)
-#define ACCESSCTRL_ADC0_DBG_BITS   _u(0x00000080)
-#define ACCESSCTRL_ADC0_DBG_MSB    _u(7)
-#define ACCESSCTRL_ADC0_DBG_LSB    _u(7)
-#define ACCESSCTRL_ADC0_DBG_ACCESS "RW"
+#define ACCESSCTRL_ADC_DBG_RESET  _u(0x1)
+#define ACCESSCTRL_ADC_DBG_BITS   _u(0x00000080)
+#define ACCESSCTRL_ADC_DBG_MSB    _u(7)
+#define ACCESSCTRL_ADC_DBG_LSB    _u(7)
+#define ACCESSCTRL_ADC_DBG_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_ADC0_DMA
-// Description : If 1, ADC0 can be accessed by the DMA, at security/privilege
+// Field       : ACCESSCTRL_ADC_DMA
+// Description : If 1, ADC can be accessed by the DMA, at security/privilege
 //               levels permitted by SP/NSP/SU/NSU in this register.
-#define ACCESSCTRL_ADC0_DMA_RESET  _u(0x1)
-#define ACCESSCTRL_ADC0_DMA_BITS   _u(0x00000040)
-#define ACCESSCTRL_ADC0_DMA_MSB    _u(6)
-#define ACCESSCTRL_ADC0_DMA_LSB    _u(6)
-#define ACCESSCTRL_ADC0_DMA_ACCESS "RW"
+#define ACCESSCTRL_ADC_DMA_RESET  _u(0x1)
+#define ACCESSCTRL_ADC_DMA_BITS   _u(0x00000040)
+#define ACCESSCTRL_ADC_DMA_MSB    _u(6)
+#define ACCESSCTRL_ADC_DMA_LSB    _u(6)
+#define ACCESSCTRL_ADC_DMA_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_ADC0_CORE1
-// Description : If 1, ADC0 can be accessed by core 1, at security/privilege
+// Field       : ACCESSCTRL_ADC_CORE1
+// Description : If 1, ADC can be accessed by core 1, at security/privilege
 //               levels permitted by SP/NSP/SU/NSU in this register.
-#define ACCESSCTRL_ADC0_CORE1_RESET  _u(0x1)
-#define ACCESSCTRL_ADC0_CORE1_BITS   _u(0x00000020)
-#define ACCESSCTRL_ADC0_CORE1_MSB    _u(5)
-#define ACCESSCTRL_ADC0_CORE1_LSB    _u(5)
-#define ACCESSCTRL_ADC0_CORE1_ACCESS "RW"
+#define ACCESSCTRL_ADC_CORE1_RESET  _u(0x1)
+#define ACCESSCTRL_ADC_CORE1_BITS   _u(0x00000020)
+#define ACCESSCTRL_ADC_CORE1_MSB    _u(5)
+#define ACCESSCTRL_ADC_CORE1_LSB    _u(5)
+#define ACCESSCTRL_ADC_CORE1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_ADC0_CORE0
-// Description : If 1, ADC0 can be accessed by core 0, at security/privilege
+// Field       : ACCESSCTRL_ADC_CORE0
+// Description : If 1, ADC can be accessed by core 0, at security/privilege
 //               levels permitted by SP/NSP/SU/NSU in this register.
-#define ACCESSCTRL_ADC0_CORE0_RESET  _u(0x1)
-#define ACCESSCTRL_ADC0_CORE0_BITS   _u(0x00000010)
-#define ACCESSCTRL_ADC0_CORE0_MSB    _u(4)
-#define ACCESSCTRL_ADC0_CORE0_LSB    _u(4)
-#define ACCESSCTRL_ADC0_CORE0_ACCESS "RW"
+#define ACCESSCTRL_ADC_CORE0_RESET  _u(0x1)
+#define ACCESSCTRL_ADC_CORE0_BITS   _u(0x00000010)
+#define ACCESSCTRL_ADC_CORE0_MSB    _u(4)
+#define ACCESSCTRL_ADC_CORE0_LSB    _u(4)
+#define ACCESSCTRL_ADC_CORE0_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_ADC0_SP
-// Description : If 1, ADC0 can be accessed from a Secure, Privileged context.
-#define ACCESSCTRL_ADC0_SP_RESET  _u(0x1)
-#define ACCESSCTRL_ADC0_SP_BITS   _u(0x00000008)
-#define ACCESSCTRL_ADC0_SP_MSB    _u(3)
-#define ACCESSCTRL_ADC0_SP_LSB    _u(3)
-#define ACCESSCTRL_ADC0_SP_ACCESS "RW"
+// Field       : ACCESSCTRL_ADC_SP
+// Description : If 1, ADC can be accessed from a Secure, Privileged context.
+#define ACCESSCTRL_ADC_SP_RESET  _u(0x1)
+#define ACCESSCTRL_ADC_SP_BITS   _u(0x00000008)
+#define ACCESSCTRL_ADC_SP_MSB    _u(3)
+#define ACCESSCTRL_ADC_SP_LSB    _u(3)
+#define ACCESSCTRL_ADC_SP_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_ADC0_SU
-// Description : If 1, and SP is also set, ADC0 can be accessed from a Secure,
+// Field       : ACCESSCTRL_ADC_SU
+// Description : If 1, and SP is also set, ADC can be accessed from a Secure,
 //               Unprivileged context.
-#define ACCESSCTRL_ADC0_SU_RESET  _u(0x1)
-#define ACCESSCTRL_ADC0_SU_BITS   _u(0x00000004)
-#define ACCESSCTRL_ADC0_SU_MSB    _u(2)
-#define ACCESSCTRL_ADC0_SU_LSB    _u(2)
-#define ACCESSCTRL_ADC0_SU_ACCESS "RW"
+#define ACCESSCTRL_ADC_SU_RESET  _u(0x1)
+#define ACCESSCTRL_ADC_SU_BITS   _u(0x00000004)
+#define ACCESSCTRL_ADC_SU_MSB    _u(2)
+#define ACCESSCTRL_ADC_SU_LSB    _u(2)
+#define ACCESSCTRL_ADC_SU_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_ADC0_NSP
-// Description : If 1, ADC0 can be accessed from a Non-secure, Privileged
+// Field       : ACCESSCTRL_ADC_NSP
+// Description : If 1, ADC can be accessed from a Non-secure, Privileged
 //               context.
-#define ACCESSCTRL_ADC0_NSP_RESET  _u(0x0)
-#define ACCESSCTRL_ADC0_NSP_BITS   _u(0x00000002)
-#define ACCESSCTRL_ADC0_NSP_MSB    _u(1)
-#define ACCESSCTRL_ADC0_NSP_LSB    _u(1)
-#define ACCESSCTRL_ADC0_NSP_ACCESS "RW"
+#define ACCESSCTRL_ADC_NSP_RESET  _u(0x0)
+#define ACCESSCTRL_ADC_NSP_BITS   _u(0x00000002)
+#define ACCESSCTRL_ADC_NSP_MSB    _u(1)
+#define ACCESSCTRL_ADC_NSP_LSB    _u(1)
+#define ACCESSCTRL_ADC_NSP_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_ADC0_NSU
-// Description : If 1, and NSP is also set, ADC0 can be accessed from a Non-
+// Field       : ACCESSCTRL_ADC_NSU
+// Description : If 1, and NSP is also set, ADC can be accessed from a Non-
 //               secure, Unprivileged context.
 //
 //               This bit is writable from a Non-secure, Privileged context, if
 //               and only if the NSP bit is set.
-#define ACCESSCTRL_ADC0_NSU_RESET  _u(0x0)
-#define ACCESSCTRL_ADC0_NSU_BITS   _u(0x00000001)
-#define ACCESSCTRL_ADC0_NSU_MSB    _u(0)
-#define ACCESSCTRL_ADC0_NSU_LSB    _u(0)
-#define ACCESSCTRL_ADC0_NSU_ACCESS "RW"
+#define ACCESSCTRL_ADC_NSU_RESET  _u(0x0)
+#define ACCESSCTRL_ADC_NSU_BITS   _u(0x00000001)
+#define ACCESSCTRL_ADC_NSU_MSB    _u(0)
+#define ACCESSCTRL_ADC_NSU_LSB    _u(0)
+#define ACCESSCTRL_ADC_NSU_ACCESS "RW"
 // =============================================================================
 // Register    : ACCESSCTRL_HSTX
 // Description : Control whether debugger, DMA, core 0 and core 1 can access
@@ -4593,93 +4593,93 @@
 #define ACCESSCTRL_WATCHDOG_NSU_LSB    _u(0)
 #define ACCESSCTRL_WATCHDOG_NSU_ACCESS "RW"
 // =============================================================================
-// Register    : ACCESSCTRL_RSM
+// Register    : ACCESSCTRL_PSM
 // Description : Control whether debugger, DMA, core 0 and core 1 can access
-//               RSM, and at what security/privilege levels they can do so.
+//               PSM, and at what security/privilege levels they can do so.
 //
 //               Defaults to Secure, Privileged processor or debug access only.
 //
 //               This register is writable only from a Secure, Privileged
 //               processor or debugger, with the exception of the NSU bit, which
 //               becomes Non-secure-Privileged-writable when the NSP bit is set.
-#define ACCESSCTRL_RSM_OFFSET _u(0x000000dc)
-#define ACCESSCTRL_RSM_BITS   _u(0x000000ff)
-#define ACCESSCTRL_RSM_RESET  _u(0x000000b8)
+#define ACCESSCTRL_PSM_OFFSET _u(0x000000dc)
+#define ACCESSCTRL_PSM_BITS   _u(0x000000ff)
+#define ACCESSCTRL_PSM_RESET  _u(0x000000b8)
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_RSM_DBG
-// Description : If 1, RSM can be accessed by the debugger, at
+// Field       : ACCESSCTRL_PSM_DBG
+// Description : If 1, PSM can be accessed by the debugger, at
 //               security/privilege levels permitted by SP/NSP/SU/NSU in this
 //               register.
-#define ACCESSCTRL_RSM_DBG_RESET  _u(0x1)
-#define ACCESSCTRL_RSM_DBG_BITS   _u(0x00000080)
-#define ACCESSCTRL_RSM_DBG_MSB    _u(7)
-#define ACCESSCTRL_RSM_DBG_LSB    _u(7)
-#define ACCESSCTRL_RSM_DBG_ACCESS "RW"
+#define ACCESSCTRL_PSM_DBG_RESET  _u(0x1)
+#define ACCESSCTRL_PSM_DBG_BITS   _u(0x00000080)
+#define ACCESSCTRL_PSM_DBG_MSB    _u(7)
+#define ACCESSCTRL_PSM_DBG_LSB    _u(7)
+#define ACCESSCTRL_PSM_DBG_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_RSM_DMA
-// Description : If 1, RSM can be accessed by the DMA, at security/privilege
+// Field       : ACCESSCTRL_PSM_DMA
+// Description : If 1, PSM can be accessed by the DMA, at security/privilege
 //               levels permitted by SP/NSP/SU/NSU in this register.
-#define ACCESSCTRL_RSM_DMA_RESET  _u(0x0)
-#define ACCESSCTRL_RSM_DMA_BITS   _u(0x00000040)
-#define ACCESSCTRL_RSM_DMA_MSB    _u(6)
-#define ACCESSCTRL_RSM_DMA_LSB    _u(6)
-#define ACCESSCTRL_RSM_DMA_ACCESS "RW"
+#define ACCESSCTRL_PSM_DMA_RESET  _u(0x0)
+#define ACCESSCTRL_PSM_DMA_BITS   _u(0x00000040)
+#define ACCESSCTRL_PSM_DMA_MSB    _u(6)
+#define ACCESSCTRL_PSM_DMA_LSB    _u(6)
+#define ACCESSCTRL_PSM_DMA_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_RSM_CORE1
-// Description : If 1, RSM can be accessed by core 1, at security/privilege
+// Field       : ACCESSCTRL_PSM_CORE1
+// Description : If 1, PSM can be accessed by core 1, at security/privilege
 //               levels permitted by SP/NSP/SU/NSU in this register.
-#define ACCESSCTRL_RSM_CORE1_RESET  _u(0x1)
-#define ACCESSCTRL_RSM_CORE1_BITS   _u(0x00000020)
-#define ACCESSCTRL_RSM_CORE1_MSB    _u(5)
-#define ACCESSCTRL_RSM_CORE1_LSB    _u(5)
-#define ACCESSCTRL_RSM_CORE1_ACCESS "RW"
+#define ACCESSCTRL_PSM_CORE1_RESET  _u(0x1)
+#define ACCESSCTRL_PSM_CORE1_BITS   _u(0x00000020)
+#define ACCESSCTRL_PSM_CORE1_MSB    _u(5)
+#define ACCESSCTRL_PSM_CORE1_LSB    _u(5)
+#define ACCESSCTRL_PSM_CORE1_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_RSM_CORE0
-// Description : If 1, RSM can be accessed by core 0, at security/privilege
+// Field       : ACCESSCTRL_PSM_CORE0
+// Description : If 1, PSM can be accessed by core 0, at security/privilege
 //               levels permitted by SP/NSP/SU/NSU in this register.
-#define ACCESSCTRL_RSM_CORE0_RESET  _u(0x1)
-#define ACCESSCTRL_RSM_CORE0_BITS   _u(0x00000010)
-#define ACCESSCTRL_RSM_CORE0_MSB    _u(4)
-#define ACCESSCTRL_RSM_CORE0_LSB    _u(4)
-#define ACCESSCTRL_RSM_CORE0_ACCESS "RW"
+#define ACCESSCTRL_PSM_CORE0_RESET  _u(0x1)
+#define ACCESSCTRL_PSM_CORE0_BITS   _u(0x00000010)
+#define ACCESSCTRL_PSM_CORE0_MSB    _u(4)
+#define ACCESSCTRL_PSM_CORE0_LSB    _u(4)
+#define ACCESSCTRL_PSM_CORE0_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_RSM_SP
-// Description : If 1, RSM can be accessed from a Secure, Privileged context.
-#define ACCESSCTRL_RSM_SP_RESET  _u(0x1)
-#define ACCESSCTRL_RSM_SP_BITS   _u(0x00000008)
-#define ACCESSCTRL_RSM_SP_MSB    _u(3)
-#define ACCESSCTRL_RSM_SP_LSB    _u(3)
-#define ACCESSCTRL_RSM_SP_ACCESS "RW"
+// Field       : ACCESSCTRL_PSM_SP
+// Description : If 1, PSM can be accessed from a Secure, Privileged context.
+#define ACCESSCTRL_PSM_SP_RESET  _u(0x1)
+#define ACCESSCTRL_PSM_SP_BITS   _u(0x00000008)
+#define ACCESSCTRL_PSM_SP_MSB    _u(3)
+#define ACCESSCTRL_PSM_SP_LSB    _u(3)
+#define ACCESSCTRL_PSM_SP_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_RSM_SU
-// Description : If 1, and SP is also set, RSM can be accessed from a Secure,
+// Field       : ACCESSCTRL_PSM_SU
+// Description : If 1, and SP is also set, PSM can be accessed from a Secure,
 //               Unprivileged context.
-#define ACCESSCTRL_RSM_SU_RESET  _u(0x0)
-#define ACCESSCTRL_RSM_SU_BITS   _u(0x00000004)
-#define ACCESSCTRL_RSM_SU_MSB    _u(2)
-#define ACCESSCTRL_RSM_SU_LSB    _u(2)
-#define ACCESSCTRL_RSM_SU_ACCESS "RW"
+#define ACCESSCTRL_PSM_SU_RESET  _u(0x0)
+#define ACCESSCTRL_PSM_SU_BITS   _u(0x00000004)
+#define ACCESSCTRL_PSM_SU_MSB    _u(2)
+#define ACCESSCTRL_PSM_SU_LSB    _u(2)
+#define ACCESSCTRL_PSM_SU_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_RSM_NSP
-// Description : If 1, RSM can be accessed from a Non-secure, Privileged
+// Field       : ACCESSCTRL_PSM_NSP
+// Description : If 1, PSM can be accessed from a Non-secure, Privileged
 //               context.
-#define ACCESSCTRL_RSM_NSP_RESET  _u(0x0)
-#define ACCESSCTRL_RSM_NSP_BITS   _u(0x00000002)
-#define ACCESSCTRL_RSM_NSP_MSB    _u(1)
-#define ACCESSCTRL_RSM_NSP_LSB    _u(1)
-#define ACCESSCTRL_RSM_NSP_ACCESS "RW"
+#define ACCESSCTRL_PSM_NSP_RESET  _u(0x0)
+#define ACCESSCTRL_PSM_NSP_BITS   _u(0x00000002)
+#define ACCESSCTRL_PSM_NSP_MSB    _u(1)
+#define ACCESSCTRL_PSM_NSP_LSB    _u(1)
+#define ACCESSCTRL_PSM_NSP_ACCESS "RW"
 // -----------------------------------------------------------------------------
-// Field       : ACCESSCTRL_RSM_NSU
-// Description : If 1, and NSP is also set, RSM can be accessed from a Non-
+// Field       : ACCESSCTRL_PSM_NSU
+// Description : If 1, and NSP is also set, PSM can be accessed from a Non-
 //               secure, Unprivileged context.
 //
 //               This bit is writable from a Non-secure, Privileged context, if
 //               and only if the NSP bit is set.
-#define ACCESSCTRL_RSM_NSU_RESET  _u(0x0)
-#define ACCESSCTRL_RSM_NSU_BITS   _u(0x00000001)
-#define ACCESSCTRL_RSM_NSU_MSB    _u(0)
-#define ACCESSCTRL_RSM_NSU_LSB    _u(0)
-#define ACCESSCTRL_RSM_NSU_ACCESS "RW"
+#define ACCESSCTRL_PSM_NSU_RESET  _u(0x0)
+#define ACCESSCTRL_PSM_NSU_BITS   _u(0x00000001)
+#define ACCESSCTRL_PSM_NSU_MSB    _u(0)
+#define ACCESSCTRL_PSM_NSU_LSB    _u(0)
+#define ACCESSCTRL_PSM_NSU_ACCESS "RW"
 // =============================================================================
 // Register    : ACCESSCTRL_XIP_CTRL
 // Description : Control whether debugger, DMA, core 0 and core 1 can access
@@ -4950,4 +4950,3 @@
 #define ACCESSCTRL_XIP_AUX_NSU_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_ACCESSCTRL_H
-

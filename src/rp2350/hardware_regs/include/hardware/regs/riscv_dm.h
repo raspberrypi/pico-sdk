@@ -1022,4 +1022,3 @@
 #define RISCV_DM_HALTSUM0_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_RISCV_DM_H
-

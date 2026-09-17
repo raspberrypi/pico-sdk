@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -36,53 +36,53 @@ typedef struct {
     // 0x00000002 [1]     TS_EN        (0) Power on temperature sensor
     // 0x00000001 [0]     EN           (0) Power on ADC and enable its clock
     io_rw_32 cs;
- 
+
     _REG_(ADC_RESULT_OFFSET) // ADC_RESULT
     // Result of most recent ADC conversion
-    // 0x00000fff [11:0]  RESULT       (0x000) 
+    // 0x00000fff [11:0]  RESULT       (0x000)
     io_ro_32 result;
- 
+
     _REG_(ADC_FCS_OFFSET) // ADC_FCS
     // FIFO control and status
     // 0x0f000000 [27:24] THRESH       (0x0) DREQ/IRQ asserted when level >= threshold
     // 0x000f0000 [19:16] LEVEL        (0x0) The number of conversion results currently waiting in the FIFO
     // 0x00000800 [11]    OVER         (0) 1 if the FIFO has been overflowed
     // 0x00000400 [10]    UNDER        (0) 1 if the FIFO has been underflowed
-    // 0x00000200 [9]     FULL         (0) 
-    // 0x00000100 [8]     EMPTY        (0) 
+    // 0x00000200 [9]     FULL         (0)
+    // 0x00000100 [8]     EMPTY        (0)
     // 0x00000008 [3]     DREQ_EN      (0) If 1: assert DMA requests when FIFO contains data
     // 0x00000004 [2]     ERR          (0) If 1: conversion error bit appears in the FIFO alongside...
     // 0x00000002 [1]     SHIFT        (0) If 1: FIFO results are right-shifted to be one byte in size
     // 0x00000001 [0]     EN           (0) If 1: write result to the FIFO after each conversion
     io_rw_32 fcs;
- 
+
     _REG_(ADC_FIFO_OFFSET) // ADC_FIFO
     // Conversion result FIFO
     // 0x00008000 [15]    ERR          (-) 1 if this particular sample experienced a conversion error
-    // 0x00000fff [11:0]  VAL          (-) 
+    // 0x00000fff [11:0]  VAL          (-)
     io_ro_32 fifo;
- 
+
     _REG_(ADC_DIV_OFFSET) // ADC_DIV
     // Clock divider
     // 0x00ffff00 [23:8]  INT          (0x0000) Integer part of clock divisor
     // 0x000000ff [7:0]   FRAC         (0x00) Fractional part of clock divisor
     io_rw_32 div;
- 
+
     _REG_(ADC_INTR_OFFSET) // ADC_INTR
     // Raw Interrupts
     // 0x00000001 [0]     FIFO         (0) Triggered when the sample FIFO reaches a certain level
     io_ro_32 intr;
- 
+
     _REG_(ADC_INTE_OFFSET) // ADC_INTE
     // Interrupt Enable
     // 0x00000001 [0]     FIFO         (0) Triggered when the sample FIFO reaches a certain level
     io_rw_32 inte;
- 
+
     _REG_(ADC_INTF_OFFSET) // ADC_INTF
     // Interrupt Force
     // 0x00000001 [0]     FIFO         (0) Triggered when the sample FIFO reaches a certain level
     io_rw_32 intf;
- 
+
     _REG_(ADC_INTS_OFFSET) // ADC_INTS
     // Interrupt status after masking & forcing
     // 0x00000001 [0]     FIFO         (0) Triggered when the sample FIFO reaches a certain level
@@ -93,4 +93,3 @@ typedef struct {
 static_assert(sizeof (adc_hw_t) == 0x0024, "");
 
 #endif // _HARDWARE_STRUCTS_ADC_H
-

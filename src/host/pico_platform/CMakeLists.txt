@@ -23,7 +23,7 @@ if (NOT TARGET pico_platform)
         ${CMAKE_CURRENT_LIST_DIR}/platform_base.c
     )
 
-    target_link_libraries(pico_platform INTERFACE pico_platform_headers pico_bit_ops ${PICO_PLATFORM_EXTRA_LIBRARIES})
+    target_link_libraries(pico_platform INTERFACE pico_platform_headers pico_bit_ops hardware_timer ${PICO_PLATFORM_EXTRA_LIBRARIES})
 endif()
 
 function(pico_add_platform_library TARGET)

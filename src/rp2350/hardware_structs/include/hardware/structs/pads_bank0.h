@@ -26,9 +26,9 @@
 typedef struct {
     _REG_(PADS_BANK0_VOLTAGE_SELECT_OFFSET) // PADS_BANK0_VOLTAGE_SELECT
     // Voltage select
-    // 0x00000001 [0]     VOLTAGE_SELECT (0) 
+    // 0x00000001 [0]     VOLTAGE_SELECT (0)
     io_rw_32 voltage_select;
- 
+
     // (Description copied from array index 0 register PADS_BANK0_GPIO0 applies similarly to other array indexes)
     _REG_(PADS_BANK0_GPIO0_OFFSET) // PADS_BANK0_GPIO0
     // 0x00000100 [8]     ISO          (1) Pad isolation control
@@ -46,4 +46,3 @@ typedef struct {
 static_assert(sizeof (pads_bank0_hw_t) == 0x00c4, "");
 
 #endif // _HARDWARE_STRUCTS_PADS_BANK0_H
-

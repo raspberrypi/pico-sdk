@@ -13,6 +13,8 @@ set(PICO_DEFAULT_FLASH_SIZE_BYTES "4 * 1024 * 1024")
 pico_add_doxygen_pre_define("PICO_RP2040=0")
 pico_add_doxygen_pre_define("PICO_RP2350=1")
 pico_add_doxygen_pre_define("NUM_DOORBELLS=1") # we have functions that are gated by this
+pico_add_doxygen_pre_define("NUM_BOOT_LOCKS=1") # we have functions that are gated by this
+pico_add_doxygen_pre_define("HAS_POWMAN_TIMER=1") # we have functions that are gated by this
 pico_add_doxygen_enabled_section(rp2350_specific)
 
 # for now we are building RISC-V into RP2350 docs, so document these too

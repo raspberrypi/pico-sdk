@@ -106,11 +106,6 @@ static void hci_transport_cyw43_register_packet_handler(void (*handler)(uint8_t 
     hci_transport_cyw43_packet_handler = handler;
 }
 
-static int hci_transport_cyw43_can_send_now(uint8_t packet_type) {
-    UNUSED(packet_type);
-    return true;
-}
-
 static int hci_transport_cyw43_send_packet(uint8_t packet_type, uint8_t *packet, int size) {
     // store packet type before actual data and increase size
     // This relies on HCI_OUTGOING_PRE_BUFFER_SIZE being set
@@ -126,8 +121,6 @@ static int hci_transport_cyw43_send_packet(uint8_t packet_type, uint8_t *packet,
         assert(false);
     } else {
         BT_DEBUG("bt sent %lu\n", buffer_size);
-        static uint8_t packet_sent_event[] = { HCI_EVENT_TRANSPORT_PACKET_SENT, 0};
-        hci_transport_cyw43_packet_handler(HCI_EVENT_PACKET, &packet_sent_event[0], sizeof(packet_sent_event));
     }
     CYW43_THREAD_EXIT
     return err;
@@ -140,7 +133,7 @@ static const hci_transport_t hci_transport_cyw43 = {
         /* int    (*open)(void); */                                     &hci_transport_cyw43_open,
         /* int    (*close)(void); */                                    &hci_transport_cyw43_close,
         /* void   (*register_packet_handler)(void (*handler)(...); */   &hci_transport_cyw43_register_packet_handler,
-        /* int    (*can_send_packet_now)(uint8_t packet_type); */       &hci_transport_cyw43_can_send_now,
+        /* int    (*can_send_packet_now)(uint8_t packet_type); */       NULL,
         /* int    (*send_packet)(...); */                               &hci_transport_cyw43_send_packet,
         /* int    (*set_baudrate)(uint32_t baudrate); */                NULL,
         /* void   (*reset_link)(void); */                               NULL,

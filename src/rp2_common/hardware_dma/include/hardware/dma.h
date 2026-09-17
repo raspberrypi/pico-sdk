@@ -162,7 +162,7 @@ typedef enum dma_address_update_type {
  *  \ingroup channel_config
  */
 typedef struct {
-    uint32_t ctrl;
+    uint32_t ctrl; ///< Raw control register value encoding all channel configuration bits
 } dma_channel_config_t;
 
 // backwards compatibility
@@ -233,7 +233,7 @@ static inline void channel_config_set_write_address_update_type(dma_channel_conf
 /*! \brief  Set DMA channel read increment in a channel configuration object
 *  \ingroup channel_config
 *
-* \note this method is equivalent to
+* \note This method is equivalent to
 * \code
 * channel_config_set_read_address_update_type(c, incr ? DMA_ADDRESS_UPDATE_INCREMENT : DMA_ADDRESS_UPDATE_NONE)
 * \endcode
@@ -250,7 +250,7 @@ static inline void channel_config_set_read_increment(dma_channel_config_t *c, bo
 /*! \brief  Set DMA channel write increment in a channel configuration object
  *  \ingroup channel_config
  *
- * \note this method is equivalent to
+ * \note This method is equivalent to
  * \code
  * channel_config_set_write_address_update_type(c, incr ? DMA_ADDRESS_UPDATE_INCREMENT : DMA_ADDRESS_UPDATE_NONE)
  * \endcode
@@ -664,7 +664,7 @@ static inline void dma_channel_configure(uint channel, const dma_channel_config_
  * The best practice is always to use either \ref dma_encode_transfer_count, \ref dma_encode_transfer_count_with_self_trigger, or \ref dma_encode_endless_transfer_count to generate a value
  * to pass for this argument
  */
-inline static void __attribute__((always_inline)) dma_channel_transfer_from_buffer_now(uint channel, 
+inline static void __attribute__((always_inline)) dma_channel_transfer_from_buffer_now(uint channel,
                                                                                        const volatile void *read_addr,
                                                                                        uint32_t encoded_transfer_count) {
 //    check_dma_channel_param(channel);
@@ -726,7 +726,6 @@ static inline void dma_channel_start(uint channel) {
  * in-flight (i.e. an individual read has taken place but the corresponding write has not), the ABORT
  * status bit will clear prematurely, and subsequently the in-flight
  * transfers will trigger a completion interrupt once they complete.
- *\endif
  *
  * The effect of this is that you \em may see a spurious completion interrupt
  * on the channel as a result of calling this method.
@@ -748,6 +747,7 @@ static inline void dma_channel_start(uint channel) {
  *  // re-enable the channel on IRQ0
  *  dma_channel_set_irq0_enabled(channel, true);
  *\endcode
+ *\endif
  *
  * \if rp2350_specific
  * RP2350 only: Due to errata RP2350-E5 (see the RP2350 datasheet for further detail), it is necessary to clear the enable bit of

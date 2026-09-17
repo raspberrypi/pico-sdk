@@ -1,0 +1,5 @@
+add_executable(pio_encoding_test ${CMAKE_CURRENT_LIST_DIR}/pio_encoding_test.c)
+target_link_libraries(pio_encoding_test PRIVATE pico_stdlib pico_test hardware_pio)
+pico_add_extra_outputs(pio_encoding_test)
+
+pico_generate_pio_header(pio_encoding_test ${CMAKE_CURRENT_LIST_DIR}/encodings.pio)

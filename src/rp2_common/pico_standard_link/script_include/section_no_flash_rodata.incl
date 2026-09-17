@@ -1,0 +1,11 @@
+SECTIONS
+{
+    .rodata : {
+        . = ALIGN(4);
+        *(.rodata*)
+        *(.srodata*)
+        . = ALIGN(4);
+        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
+        . = ALIGN(4);
+    } > RAM
+}

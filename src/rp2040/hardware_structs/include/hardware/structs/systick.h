@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -31,17 +31,17 @@ typedef struct {
     // 0x00000002 [1]     TICKINT      (0) Enables SysTick exception request: +
     // 0x00000001 [0]     ENABLE       (0) Enable SysTick counter: +
     io_rw_32 csr;
- 
+
     _REG_(M0PLUS_SYST_RVR_OFFSET) // M0PLUS_SYST_RVR
     // SysTick Reload Value Register
     // 0x00ffffff [23:0]  RELOAD       (0x000000) Value to load into the SysTick Current Value Register...
     io_rw_32 rvr;
- 
+
     _REG_(M0PLUS_SYST_CVR_OFFSET) // M0PLUS_SYST_CVR
     // SysTick Current Value Register
     // 0x00ffffff [23:0]  CURRENT      (0x000000) Reads return the current value of the SysTick counter
     io_rw_32 cvr;
- 
+
     _REG_(M0PLUS_SYST_CALIB_OFFSET) // M0PLUS_SYST_CALIB
     // SysTick Calibration Value Register
     // 0x80000000 [31]    NOREF        (0) If reads as 1, the Reference clock is not provided - the...
@@ -54,4 +54,3 @@ typedef struct {
 static_assert(sizeof (systick_hw_t) == 0x0010, "");
 
 #endif // _HARDWARE_STRUCTS_SYSTICK_H
-

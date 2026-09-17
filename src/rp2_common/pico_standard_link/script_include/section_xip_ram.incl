@@ -1,0 +1,15 @@
+/* Defines the following symbols for use by code:
+    __xip_ram_start__, __xip_ram_end__, __xip_ram_source__
+*/
+
+SECTIONS
+{
+    .xip_ram : {
+        __xip_ram_start__ = .;
+        . = ALIGN(4);
+        *(.xip_ram*)
+        . = ALIGN(4);
+        __xip_ram_end__ = .;
+    } > XIP_RAM AT> XIP_RAM_STORE
+    __xip_ram_source__ = LOADADDR(.xip_ram);
+}

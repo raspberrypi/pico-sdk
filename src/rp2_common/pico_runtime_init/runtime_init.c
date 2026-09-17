@@ -109,18 +109,18 @@ PICO_RUNTIME_INIT_FUNC_HW(runtime_init_usb_power_down, PICO_RUNTIME_INIT_USB_POW
 
 #if !PICO_RUNTIME_NO_INIT_PER_CORE_ENABLE_COPROCESSORS
 #include "hardware/gpio.h" // PICO_USE_GPIO_COPROCESSOR is defined here
-#include "hardware/structs/m33.h"
+#include "pico/platform/cpu_regs.h"
 // ----------------------------------------------------
 // 00200 PICO_RUNTIME_INIT_PER_CORE_ENABLE_COPROCESSORS
 // ----------------------------------------------------
 void __weak runtime_init_per_core_enable_coprocessors(void) {
     // VFP copro (float)
-    uint32_t cpacr = M33_CPACR_CP10_BITS;
+    uint32_t cpacr = ARM_CPU_PREFIXED(CPACR_CP10_BITS);
 #if HAS_DOUBLE_COPROCESSOR
-    cpacr |= M33_CPACR_CP4_BITS;
+    cpacr |= ARM_CPU_PREFIXED(CPACR_CP4_BITS);
 #endif
 #if PICO_USE_GPIO_COPROCESSOR
-    cpacr |= M33_CPACR_CP0_BITS;
+    cpacr |= ARM_CPU_PREFIXED(CPACR_CP0_BITS);
 #endif
     arm_cpu_hw->cpacr |= cpacr;
 #if HAS_DOUBLE_COPROCESSOR
@@ -216,7 +216,7 @@ void runtime_init_install_ram_vector_table(void) {
 #if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH)
     extern uint32_t __vectors;
     extern uint32_t __vectors_end;
-    uint32_t stored_words = (uint32_t)(&__vectors_end - &__vectors);
+    uint32_t stored_words = ((uintptr_t)&__vectors_end - (uintptr_t)&__vectors) / sizeof(uint32_t);
     __builtin_memcpy(ram_vector_table, &__vectors, 4 * MIN(stored_words, PICO_RAM_VECTOR_TABLE_SIZE));
     for(uint i = stored_words; i<count_of(ram_vector_table); i++) {
         ram_vector_table[i] = (uintptr_t)__unhandled_user_irq;

@@ -73,6 +73,7 @@ group_names_descriptions = {
     'pico_standard_link': ('Pico Standard Link', 'CMake functions to configure the linker'),
     'pico_stdio': ('Pico Standard I/O', 'CMake functions to configure the standard I/O library'),
     'pico_pio': ('Pico PIO', 'CMake functions to generate PIO headers'),
+    'pico_low_power': ('Pico Low Power', 'CMake functions to configure the low power library'),
     'other': ('Other', 'Other CMake functions'),
 }
 

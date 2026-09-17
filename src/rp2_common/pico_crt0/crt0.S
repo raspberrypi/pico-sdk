@@ -11,6 +11,8 @@
 
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
+#include "hardware/regs/xip.h"
+#include "hardware/regs/watchdog.h"
 #include "pico/binary_info/defs.h"
 #include "boot/picobin.h"
 #include "pico/bootrom.h"
@@ -18,6 +20,20 @@
 // PICO_CONFIG: PICO_CRT0_NEAR_CALLS, Whether calls from crt0 into the binary are near (<16M away) - ignored for PICO_COPY_TO_RAM, default=0, type=bool, group=pico_crt0
 #ifndef PICO_CRT0_NEAR_CALLS
 #define PICO_CRT0_NEAR_CALLS 0
+#endif
+
+// PICO_CONFIG: PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM, Whether crt0 should reset through the bootrom when loaded using a debugger - defining this variable is not supported on RP2040, default=1, type=bool, advanced=true, group=pico_crt0
+#if PICO_RP2040
+#define PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM (!PICO_NO_FLASH)
+#else
+#ifndef PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+#define PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM 1
+#endif
+#endif
+
+// PICO_CONFIG: PICO_CRT0_NO_DATA_COPY, Whether crt0 should perform the data copies - usually copying from flash into sram, default=1 for no_flash builds, 0 otherwise, type=bool, group=pico_crt0
+#ifndef PICO_CRT0_NO_DATA_COPY
+#define PICO_CRT0_NO_DATA_COPY PICO_NO_FLASH
 #endif
 
 #ifdef NDEBUG
@@ -382,17 +398,17 @@ binary_info_header:
 .global _entry_point
 _entry_point:
 
-#if PICO_NO_FLASH
-    // on the NO_FLASH case, we do not do a rest thru bootrom below, so the RCP may or may not have been initialized:
+#if !PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+    // in the NO_FLASH case, we do not do a rest thru bootrom below, so the RCP may or may not have been initialized:
     //
-    // in the normal (e.g. UF2 download etc. case) we will have passed thru bootrom initialization, but if
+    // in the normal case (UF2 download, etc.), we will have passed thru bootrom initialization, but if
     // a NO_FLASH binary is loaded by the debugger, and run directly after a reset, then we won't have.
     //
     // we must therefore initialize the RCP if it hasn't already been
 
 #if HAS_REDUNDANCY_COPROCESSOR
     // just enable the RCP which is fine if it already was (we assume no other co-processors are enabled at this point to save space)
-    ldr r0, = PPB_BASE + M33_CPACR_OFFSET
+    ldr r0, = PPB_BASE + ARM_CPU_PREFIXED(CPACR_OFFSET)
     movs r1, #ARM_CPU_PREFIXED(CPACR_CP7_BITS)
     str r1, [r0]
     // only initialize canary seeds if they haven't been (as to do so twice is a fault)
@@ -414,10 +430,29 @@ _entry_point:
     ldr r0, =__vectors
     // Vector through our own table (SP, VTOR will not have been set up at
     // this point). Same path for debugger entry and bootloader entry.
-#else
-    // Debugger tried to run code after loading, so SSI is in 03h-only mode.
-    // Go back through bootrom + boot2 to properly initialise flash.
-    ldr r0, =BOOTROM_VTABLE_OFFSET
+#else // PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM
+    #if PICO_NO_FLASH
+        // PICO_CRT0_DEBUG_ENTRY_RESETS_VIA_BOOTROM is always !PICO_NO_FLASH on RP2040, so this code doesn't support RP2040,
+        // because RP2040 doesn't have special watchdog boot types
+        // Launch this no_flash binary using a RAM image boot
+        ldr r1, =(WATCHDOG_BASE + WATCHDOG_SCRATCH2_OFFSET) // registers start from here
+        // scratch 2 = start of RAM window, from section_no_flash_end.incl
+        ldr r2, =__ram_window_start
+        // scratch 3 = size of RAM window, from section_no_flash_end.incl
+        ldr r3, =__ram_window_size
+        // scratch 4&7 = magic number
+        ldr r4, =0xb007c0d3
+        mov r7, r4
+        // scratch 6 = ram image boot == 3
+        movs r6, #3
+        // scratch 5 = magic number xored with -(magic number) == -2
+        subs r5, r6, #5 // 3 - 5 = -2
+        // load the watchdog registers
+        stmia r1!, {r2, r3, r4, r5, r6, r7}
+    #endif
+
+    // Go back through bootrom to finish the boot.
+    movs r0, #BOOTROM_VTABLE_OFFSET
 #endif
 
 _enter_vtable_in_r0:
@@ -453,9 +488,17 @@ _reset_handler:
 #endif
 hold_non_core0_in_bootrom:
     // Send back to the ROM to wait for core 0 to launch it.
-    ldr r0, =BOOTROM_VTABLE_OFFSET
+    movs r0, #BOOTROM_VTABLE_OFFSET
     b _enter_vtable_in_r0
 1:
+
+#if PICO_RP2040 && PICO_USE_XIP_CACHE_AS_RAM
+_disable_xip_cache:
+    // Disable the XIP cache on RP2040 making its SRAM available for use
+    ldr r0, =(REG_ALIAS_CLR_BITS + XIP_CTRL_BASE + XIP_CTRL_OFFSET)
+    movs r1, #XIP_CTRL_EN_BITS
+    str r1, [r0]
+#endif
 
 #if !PICO_RP2040 && PICO_EMBED_XIP_SETUP && !PICO_NO_FLASH
     // Execute boot2 on the core 0 stack (it also gets copied into BOOTRAM due
@@ -477,7 +520,7 @@ _call_xip_setup:
 
     // In a NO_FLASH binary, don't perform .data etc copy, since it's loaded
     // in-place by the SRAM load. Still need to clear .bss
-#if !PICO_NO_FLASH
+#if !PICO_CRT0_NO_DATA_COPY
     adr r4, data_cpy_table
 
     // assume there is at least one entry
@@ -522,13 +565,23 @@ platform_entry: // symbol for stack traces
     b 1b
 
 
-#if !PICO_NO_FLASH
+#if !PICO_CRT0_NO_DATA_COPY
+#if PICO_NO_FLASH
+data_cpy:
+    // skip copies with same source and destination
+    cmp r1, r2
+    beq data_cpy_done
+#else
+    // go straight into the copy
+    #define data_cpy_start data_cpy
+#endif
 data_cpy_loop:
     ldm r1!, {r0}
     stm r2!, {r0}
-data_cpy:
+data_cpy_start:
     cmp r2, r3
     blo data_cpy_loop
+data_cpy_done:
     bx lr
 #endif
 
@@ -559,6 +612,12 @@ data_cpy_table:
 .word __scratch_y_source__
 .word __scratch_y_start__
 .word __scratch_y_end__
+
+#if PICO_USE_XIP_CACHE_AS_RAM
+.word __xip_ram_source__
+.word __xip_ram_start__
+.word __xip_ram_end__
+#endif
 
 .word 0 // null terminator
 

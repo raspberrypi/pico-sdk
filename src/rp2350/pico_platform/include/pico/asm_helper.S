@@ -27,6 +27,15 @@
 .endm
 
 // do not put align in here as it is used mid function sometimes
+.macro local_func x
+.type \x,%function
+#ifndef __riscv
+.thumb_func
+#endif
+\x:
+.endm
+
+// do not put align in here as it is used mid function sometimes
 .macro regular_func x
 .global \x
 .type \x,%function
@@ -67,5 +76,5 @@ weak_func WRAPPER_FUNC_NAME(\x)
 
 // backwards compatibility
 .macro __pre_init func, priority_string1
-__pre_init_with_offset func, 0, priority_string1
+__pre_init_with_offset \func, 0, \priority_string1
 .endm

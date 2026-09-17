@@ -42,7 +42,7 @@
 #define NUM_ADC_CHANNELS _u(9)
 #define ADC_BASE_PIN _u(40)
 #endif
-#define NUM_RESETS _u(28)
+#define NUM_RESETS _u(29)
 #define NUM_DOORBELLS _u(8)
 
 #if PICO_RP2350A
@@ -57,6 +57,7 @@
 #define NUM_OTP_ROWS (NUM_OTP_PAGES * NUM_OTP_PAGE_ROWS)
 
 #define PIO_INSTRUCTION_COUNT _u(32)
+#define PICO_PIO_VERSION _u(1)
 
 #define NUM_MPU_REGIONS _u(8)
 #define NUM_SAU_REGIONS _u(8)
@@ -84,7 +85,15 @@
 #define FPGA_CLK_REF_HZ (12 * MHZ)
 #endif
 
-// PICO_CONFIG: XOSC_HZ, Crystal oscillator frequency in Hz, type=int, default=12000000, advanced=true, group=hardware_base
+#ifndef LPOSC_MIN_EXPECTED_HZ
+#define LPOSC_MIN_EXPECTED_HZ _u(26000)
+#endif
+
+#ifndef LPOSC_MAX_EXPECTED_HZ
+#define LPOSC_MAX_EXPECTED_HZ _u(40000)
+#endif
+
+// PICO_CONFIG: XOSC_HZ, Crystal oscillator frequency in Hz, type=int, min=1000000, max=50000000, default=12000000, advanced=true, group=hardware_base
 // NOTE:  The system and USB clocks are generated from the frequency using two PLLs.
 // If you override this define, or SYS_CLK_HZ/USB_CLK_HZ below, you will *also* need to add your own adjusted PLL set-up defines to
 // override the defaults which live in src/rp2_common/hardware_clocks/include/hardware/clocks.h
@@ -114,6 +123,10 @@
 #define SYS_CLK_HZ _u(150000000)
 #endif
 #endif
+
+// An exclusive access pair leaves the calling core's own event register set, so a following
+// __wfe() does not block. See PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND in pico/lock_core.h.
+#define PICO_EXCLUSIVE_ACCESS_SETS_OWN_EVENT 1
 
 // PICO_CONFIG: USB_CLK_HZ, USB clock frequency. Must be 48MHz for the USB interface to operate correctly, type=int, default=48000000, advanced=true, group=hardware_base
 #ifndef USB_CLK_HZ

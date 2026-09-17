@@ -1347,11 +1347,11 @@ namespace yy {
     break;
 
   case 77: // base_instruction: "irq" "prev" irq_modifiers value "rel"
-                                                          { pioasm.check_version(1, yylhs.location, "irq prev"); error(yystack_[0].location, "'rel' is not supported for 'irq prev'"); }
+                                                         { pioasm.check_version(1, yylhs.location, "irq prev"); throw syntax_error(yystack_[0].location, "'rel' is not supported for 'irq prev'"); }
     break;
 
   case 78: // base_instruction: "irq" "next" irq_modifiers value "rel"
-                                                          { pioasm.check_version(1, yylhs.location, "irq next"); error(yystack_[0].location, "'rel' is not supported for 'irq next'"); }
+                                                         { pioasm.check_version(1, yylhs.location, "irq next"); throw syntax_error(yystack_[0].location, "'rel' is not supported for 'irq next'"); }
     break;
 
   case 79: // base_instruction: "irq" irq_modifiers value
@@ -1415,11 +1415,11 @@ namespace yy {
     break;
 
   case 94: // wait_source: "irq" "prev" comma value "rel"
-                             { pioasm.check_version(1, yylhs.location, "irq prev"); error(yystack_[0].location, "'rel' is not supported for 'irq prev'"); }
+                            { pioasm.check_version(1, yylhs.location, "irq prev"); throw syntax_error(yystack_[0].location, "'rel' is not supported for 'irq prev'"); }
     break;
 
   case 95: // wait_source: "irq" "next" comma value "rel"
-                             { pioasm.check_version(1, yylhs.location, "irq next"); error(yystack_[0].location, "'rel' is not supported for 'irq next'"); }
+                            { pioasm.check_version(1, yylhs.location, "irq next"); throw syntax_error(yystack_[0].location, "'rel' is not supported for 'irq next'"); }
     break;
 
   case 96: // wait_source: "irq" comma value

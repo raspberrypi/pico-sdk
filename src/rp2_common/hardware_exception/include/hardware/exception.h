@@ -20,7 +20,7 @@
  *
  * There is one set of exception handlers per core, so the exception handlers for each core as set by these methods are independent.
  *
- * \note That all exception APIs affect the executing core only (i.e. the core calling the function).
+ * \note All exception APIs affect the executing core only (i.e. the core calling the function).
  */
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_EXCEPTION, Enable/disable assertions in the hardware_exception module, type=bool, default=0, group=hardware_exception
@@ -126,7 +126,7 @@ typedef void (*exception_handler_t)(void);
  * This method will assert if an exception handler has been set for this exception number on this core via
  * this method, without an intervening restore via exception_restore_handler.
  *
- * \note this method may not be used to override an exception handler that was specified at link time by
+ * \note This method may not be used to override an exception handler that was specified at link time by
  * providing a strong replacement for the weakly defined stub exception handlers. It will assert in this case too.
  *
  * \param num Exception number

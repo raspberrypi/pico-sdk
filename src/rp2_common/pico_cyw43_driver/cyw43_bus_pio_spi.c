@@ -139,7 +139,7 @@ int cyw43_spi_init(cyw43_int_t *self) {
     sm_config_set_sideset_pins(&config, CYW43_PIN_WL_CLOCK);
     sm_config_set_in_shift(&config, false, true, 32);
     sm_config_set_out_shift(&config, false, true, 32);
-    hw_set_bits(&bus_data->pio->input_sync_bypass, 1u << (CYW43_PIN_WL_DATA_IN - pio_get_gpio_base(bus_data->pio)));
+    pio_set_input_sync_bypass_with_mask64(bus_data->pio, 1ull << CYW43_PIN_WL_DATA_IN, 1ull << CYW43_PIN_WL_DATA_IN);
     pio_sm_set_config(bus_data->pio, bus_data->pio_sm, &config);
     pio_sm_set_consecutive_pindirs(bus_data->pio, bus_data->pio_sm, CYW43_PIN_WL_CLOCK, 1, true);
     gpio_set_function(CYW43_PIN_WL_DATA_OUT, pio_get_funcsel(bus_data->pio));

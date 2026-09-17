@@ -41,6 +41,11 @@ if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND
     target_compile_options(pioasm PRIVATE -Wno-psabi)
 endif()
 
+# Just GCC 15.1 I think, but harmless on other versions
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_definitions(pioasm PRIVATE _GTHREAD_USE_COND_INIT_FUNC)
+endif()
+
 if (NOT PIOASM_VERSION_STRING)
     message(FATAL_ERROR "PIOASM_VERSION_STRING must be provided when building pioasm")
 endif()

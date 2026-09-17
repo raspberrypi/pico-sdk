@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -24,9 +24,9 @@
 // Description : On power-up this field is initialised to DISABLE and the chip
 //               runs from the ROSC.
 //               If the chip has subsequently been programmed to run from the
-//               XOSC then DISABLE may lock-up the chip. If this is a concern
-//               then run the clk_ref from the ROSC and enable the clk_sys RESUS
-//               feature.
+//               XOSC then setting this field to DISABLE may lock-up the chip.
+//               If this is a concern then run the clk_ref from the ROSC and
+//               enable the clk_sys RESUS feature.
 //               The 12-bit code is intended to give some protection against
 //               accidental writes. An invalid setting will enable the
 //               oscillator.
@@ -41,9 +41,7 @@
 #define XOSC_CTRL_ENABLE_VALUE_ENABLE _u(0xfab)
 // -----------------------------------------------------------------------------
 // Field       : XOSC_CTRL_FREQ_RANGE
-// Description : Frequency range. An invalid setting will retain the previous
-//               value. The actual value being used can be read from
-//               STATUS_FREQ_RANGE. This resets to 0xAA0 and cannot be changed.
+// Description : Frequency range. This resets to 0xAA0 and cannot be changed.
 //               0xaa0 -> 1_15MHZ
 //               0xaa1 -> RESERVED_1
 //               0xaa2 -> RESERVED_2
@@ -111,9 +109,9 @@
 //               This is used to save power by pausing the XOSC
 //               On power-up this field is initialised to WAKE
 //               An invalid write will also select WAKE
-//               Warning: stop the PLLs before selecting dormant mode
-//               Warning: setup the irq before selecting dormant mode
-//               0x636f6d61 -> dormant
+//               WARNING: stop the PLLs before selecting dormant mode
+//               WARNING: setup the irq before selecting dormant mode
+//               0x636f6d61 -> DORMANT
 //               0x77616b65 -> WAKE
 #define XOSC_DORMANT_OFFSET _u(0x00000008)
 #define XOSC_DORMANT_BITS   _u(0xffffffff)
@@ -162,4 +160,3 @@
 #define XOSC_COUNT_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_XOSC_H
-

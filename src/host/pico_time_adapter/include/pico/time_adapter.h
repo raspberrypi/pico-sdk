@@ -7,6 +7,10 @@
 #ifndef _PICO_TIME_ADAPTER_H
 #define _PICO_TIME_ADAPTER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef TA_NUM_TIMERS
 #define TA_NUM_TIMERS 1
 #endif
@@ -24,6 +28,7 @@ void ta_enable_irq_handler(alarm_pool_timer_t *timer, uint hardware_alarm_num, v
 void ta_disable_irq_handler(alarm_pool_timer_t *timer, uint hardware_alarm_num, void (*irq_handler)(void));
 void ta_hardware_alarm_claim(alarm_pool_timer_t *timer, uint hardware_alarm_num);
 int ta_hardware_alarm_claim_unused(alarm_pool_timer_t *timer, bool required);
+void ta_hardware_alarm_unclaim(alarm_pool_timer_t *timer, uint hardware_alarm_num);
 alarm_pool_timer_t *ta_from_current_irq(uint *alarm_num);
 uint ta_timer_num(alarm_pool_timer_t *timer);
 static inline uint64_t ta_time_us_64(__unused alarm_pool_timer_t *timer) {
@@ -31,5 +36,9 @@ static inline uint64_t ta_time_us_64(__unused alarm_pool_timer_t *timer) {
 }
 alarm_pool_timer_t *ta_timer_instance(uint instance_num);
 alarm_pool_timer_t *ta_default_timer_instance(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

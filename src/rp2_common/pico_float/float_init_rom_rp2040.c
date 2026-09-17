@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include "pico/bootrom.h"
+#include "pico/float.h"
 #include "pico/bootrom/sf_table.h"
 
 // NOTE THIS FUNCTION TABLE IS NOT PUBLIC OR NECESSARILY COMPLETE...

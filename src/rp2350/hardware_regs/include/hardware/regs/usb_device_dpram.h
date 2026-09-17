@@ -6750,4 +6750,3 @@
 #define USB_DEVICE_DPRAM_EP15_OUT_BUFFER_CONTROL_LENGTH_0_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_USB_DEVICE_DPRAM_H
-

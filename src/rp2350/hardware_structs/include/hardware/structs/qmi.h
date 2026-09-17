@@ -35,7 +35,7 @@ typedef struct {
     // 0x00000700 [10:8]  RXDELAY      (0x0) Delay the read data sample timing, in units of one half...
     // 0x000000ff [7:0]   CLKDIV       (0x04) Clock divisor
     io_rw_32 timing;
- 
+
     _REG_(QMI_M0_RFMT_OFFSET) // QMI_M0_RFMT
     // Read transfer format configuration for memory address window 0.
     // 0x10000000 [28]    DTR          (0) Enable double transfer rate (DTR) for read commands:...
@@ -48,13 +48,13 @@ typedef struct {
     // 0x0000000c [3:2]   ADDR_WIDTH   (0x0) The transfer width used for the address
     // 0x00000003 [1:0]   PREFIX_WIDTH (0x0) The transfer width used for the command prefix, if any
     io_rw_32 rfmt;
- 
+
     _REG_(QMI_M0_RCMD_OFFSET) // QMI_M0_RCMD
     // Command constants used for reads from memory address window 0.
     // 0x0000ff00 [15:8]  SUFFIX       (0xa0) The command suffix bits following the address, if...
     // 0x000000ff [7:0]   PREFIX       (0x03) The command prefix bits to prepend on each new transfer,...
     io_rw_32 rcmd;
- 
+
     _REG_(QMI_M0_WFMT_OFFSET) // QMI_M0_WFMT
     // Write transfer format configuration for memory address window 0.
     // 0x10000000 [28]    DTR          (0) Enable double transfer rate (DTR) for write commands:...
@@ -67,7 +67,7 @@ typedef struct {
     // 0x0000000c [3:2]   ADDR_WIDTH   (0x0) The transfer width used for the address
     // 0x00000003 [1:0]   PREFIX_WIDTH (0x0) The transfer width used for the command prefix, if any
     io_rw_32 wfmt;
- 
+
     _REG_(QMI_M0_WCMD_OFFSET) // QMI_M0_WCMD
     // Command constants used for writes to memory address window 0.
     // 0x0000ff00 [15:8]  SUFFIX       (0xa0) The command suffix bits following the address, if...
@@ -93,7 +93,7 @@ typedef struct {
     // 0x00000002 [1]     BUSY         (0) Direct mode busy flag
     // 0x00000001 [0]     EN           (0) Enable direct mode
     io_rw_32 direct_csr;
- 
+
     _REG_(QMI_DIRECT_TX_OFFSET) // QMI_DIRECT_TX
     // Transmit FIFO for direct mode
     // 0x00100000 [20]    NOPUSH       (0) Inhibit the RX FIFO push that would correspond to this...
@@ -102,14 +102,14 @@ typedef struct {
     // 0x00030000 [17:16] IWIDTH       (0x0) Configure whether this FIFO record is transferred with...
     // 0x0000ffff [15:0]  DATA         (0x0000) Data pushed here will be clocked out falling edges of...
     io_wo_32 direct_tx;
- 
+
     _REG_(QMI_DIRECT_RX_OFFSET) // QMI_DIRECT_RX
     // Receive FIFO for direct mode
     // 0x0000ffff [15:0]  DIRECT_RX    (0x0000) With each byte clocked out on the serial interface, one...
     io_ro_32 direct_rx;
- 
+
     qmi_mem_hw_t m[2];
- 
+
     // (Description copied from array index 0 register QMI_ATRANS0 applies similarly to other array indexes)
     _REG_(QMI_ATRANS0_OFFSET) // QMI_ATRANS0
     // Configure address translation for XIP virtual addresses 0x000000 through 0x3fffff (a 4 MiB window starting at +0 MiB).
@@ -122,4 +122,3 @@ typedef struct {
 static_assert(sizeof (qmi_hw_t) == 0x0054, "");
 
 #endif // _HARDWARE_STRUCTS_QMI_H
-

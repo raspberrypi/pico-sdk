@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,8 +8,6 @@ cc_library(
     srcs = ["bit_ops_aeabi.S"],
     linkopts = select({
         "//bazel/constraint:rp2040": [
-            "-Wl,--wrap=__clzsi2",
-            "-Wl,--wrap=__clzsi2",
             "-Wl,--wrap=__clzdi2",
             "-Wl,--wrap=__ctzsi2",
             "-Wl,--wrap=__popcountsi2",

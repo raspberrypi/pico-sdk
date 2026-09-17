@@ -1,0 +1,18 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
+
+package(default_visibility = ["//visibility:public"])
+
+linker_scripts(
+    name = "rp2_linker_script_includes",
+    include_scripts = glob(["*.incl"]),
+)
+
+cc_library(
+    name = "rp2_linker_scripts",
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "rp2_linker_script_includes",
+    ],
+)

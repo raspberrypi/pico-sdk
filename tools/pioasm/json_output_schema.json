@@ -1,0 +1,289 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "pioasm JSON output",
+    "type": "object",
+    "required": [
+        "pioASMVersion",
+        "publicSymbols",
+        "programs"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {},
+        "pioASMVersion": {
+            "type": "string"
+        },
+        "publicSymbols": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "integer"
+            }
+        },
+        "programs": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/program"
+            }
+        }
+    },
+    "definitions": {
+        "symbolMap": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "integer"
+            }
+        },
+        "program": {
+            "type": "object",
+            "required": [
+                "name",
+                "pioVersion",
+                "wrapTarget",
+                "wrap",
+                "origin",
+                "usedGPIORanges",
+                "publicSymbols",
+                "publicLabels",
+                "in",
+                "out",
+                "setCount",
+                "sideset",
+                "movStatus",
+                "fifoConfig",
+                "clockDiv",
+                "instructions",
+                "codeBlocks",
+                "langOpts"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "pioVersion": {
+                    "type": "integer"
+                },
+                "wrapTarget": {
+                    "type": "integer"
+                },
+                "wrap": {
+                    "type": "integer"
+                },
+                "origin": {
+                    "type": "integer"
+                },
+                "usedGPIORanges": {
+                    "type": "integer"
+                },
+                "publicSymbols": {
+                    "$ref": "#/definitions/symbolMap"
+                },
+                "publicLabels": {
+                    "$ref": "#/definitions/symbolMap"
+                },
+                "in": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "required": [
+                        "pinCount",
+                        "right",
+                        "autopush",
+                        "threshold"
+                    ],
+                    "properties": {
+                        "pinCount": {
+                            "type": "integer"
+                        },
+                        "right": {
+                            "type": "boolean"
+                        },
+                        "autopush": {
+                            "type": "boolean"
+                        },
+                        "threshold": {
+                            "type": "integer"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "out": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "required": [
+                        "pinCount",
+                        "right",
+                        "autopull",
+                        "threshold"
+                    ],
+                    "properties": {
+                        "pinCount": {
+                            "type": "integer"
+                        },
+                        "right": {
+                            "type": "boolean"
+                        },
+                        "autopull": {
+                            "type": "boolean"
+                        },
+                        "threshold": {
+                            "type": "integer"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "setCount": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "sideset": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "required": [
+                        "size",
+                        "optional",
+                        "pindirs"
+                    ],
+                    "properties": {
+                        "size": {
+                            "type": "integer"
+                        },
+                        "optional": {
+                            "type": "boolean"
+                        },
+                        "pindirs": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "movStatus": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "required": [
+                        "type",
+                        "n"
+                    ],
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "STATUS_TX_LESSTHAN",
+                                "STATUS_RX_LESSTHAN",
+                                "STATUS_IRQ_SET"
+                            ]
+                        },
+                        "n": {
+                            "type": "integer"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "fifoConfig": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "PIO_FIFO_JOIN_TX",
+                        "PIO_FIFO_JOIN_RX",
+                        "PIO_FIFO_JOIN_TXPUT",
+                        "PIO_FIFO_JOIN_TXGET",
+                        "PIO_FIFO_JOIN_PUTGET",
+                        null
+                    ]
+                },
+                "clockDiv": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "required": [
+                        "int",
+                        "frac"
+                    ],
+                    "properties": {
+                        "int": {
+                            "type": "integer"
+                        },
+                        "frac": {
+                            "type": "integer"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "instructions": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "hex",
+                            "instruction"
+                        ],
+                        "properties": {
+                            "hex": {
+                                "type": "string",
+                                "pattern": "^[0-9A-F]{4}$"
+                            },
+                            "instruction": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "codeBlocks": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "lang",
+                            "contents"
+                        ],
+                        "properties": {
+                            "lang": {
+                                "type": "string"
+                            },
+                            "contents": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "langOpts": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "lang",
+                            "name",
+                            "value"
+                        ],
+                        "properties": {
+                            "lang": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                }
+            }
+        }
+    }
+}

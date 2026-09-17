@@ -105,14 +105,14 @@
 //               a stall on the downstream bus; STALL_UPSTREAM, count cycles
 //               where any master stalled for any reason, including contention
 //               from other masters.
-//               0x00 -> siob_proc1_stall_upstream
-//               0x01 -> siob_proc1_stall_downstream
-//               0x02 -> siob_proc1_access_contested
-//               0x03 -> siob_proc1_access
-//               0x04 -> siob_proc0_stall_upstream
-//               0x05 -> siob_proc0_stall_downstream
-//               0x06 -> siob_proc0_access_contested
-//               0x07 -> siob_proc0_access
+//               0x00 -> sio_proc1_stall_upstream
+//               0x01 -> sio_proc1_stall_downstream
+//               0x02 -> sio_proc1_access_contested
+//               0x03 -> sio_proc1_access
+//               0x04 -> sio_proc0_stall_upstream
+//               0x05 -> sio_proc0_stall_downstream
+//               0x06 -> sio_proc0_access_contested
+//               0x07 -> sio_proc0_access
 //               0x08 -> apb_stall_upstream
 //               0x09 -> apb_stall_downstream
 //               0x0a -> apb_access_contested
@@ -179,14 +179,14 @@
 #define BUSCTRL_PERFSEL0_MSB    _u(6)
 #define BUSCTRL_PERFSEL0_LSB    _u(0)
 #define BUSCTRL_PERFSEL0_ACCESS "RW"
-#define BUSCTRL_PERFSEL0_VALUE_SIOB_PROC1_STALL_UPSTREAM _u(0x00)
-#define BUSCTRL_PERFSEL0_VALUE_SIOB_PROC1_STALL_DOWNSTREAM _u(0x01)
-#define BUSCTRL_PERFSEL0_VALUE_SIOB_PROC1_ACCESS_CONTESTED _u(0x02)
-#define BUSCTRL_PERFSEL0_VALUE_SIOB_PROC1_ACCESS _u(0x03)
-#define BUSCTRL_PERFSEL0_VALUE_SIOB_PROC0_STALL_UPSTREAM _u(0x04)
-#define BUSCTRL_PERFSEL0_VALUE_SIOB_PROC0_STALL_DOWNSTREAM _u(0x05)
-#define BUSCTRL_PERFSEL0_VALUE_SIOB_PROC0_ACCESS_CONTESTED _u(0x06)
-#define BUSCTRL_PERFSEL0_VALUE_SIOB_PROC0_ACCESS _u(0x07)
+#define BUSCTRL_PERFSEL0_VALUE_SIO_PROC1_STALL_UPSTREAM _u(0x00)
+#define BUSCTRL_PERFSEL0_VALUE_SIO_PROC1_STALL_DOWNSTREAM _u(0x01)
+#define BUSCTRL_PERFSEL0_VALUE_SIO_PROC1_ACCESS_CONTESTED _u(0x02)
+#define BUSCTRL_PERFSEL0_VALUE_SIO_PROC1_ACCESS _u(0x03)
+#define BUSCTRL_PERFSEL0_VALUE_SIO_PROC0_STALL_UPSTREAM _u(0x04)
+#define BUSCTRL_PERFSEL0_VALUE_SIO_PROC0_STALL_DOWNSTREAM _u(0x05)
+#define BUSCTRL_PERFSEL0_VALUE_SIO_PROC0_ACCESS_CONTESTED _u(0x06)
+#define BUSCTRL_PERFSEL0_VALUE_SIO_PROC0_ACCESS _u(0x07)
 #define BUSCTRL_PERFSEL0_VALUE_APB_STALL_UPSTREAM _u(0x08)
 #define BUSCTRL_PERFSEL0_VALUE_APB_STALL_DOWNSTREAM _u(0x09)
 #define BUSCTRL_PERFSEL0_VALUE_APB_ACCESS_CONTESTED _u(0x0a)
@@ -272,14 +272,14 @@
 //               a stall on the downstream bus; STALL_UPSTREAM, count cycles
 //               where any master stalled for any reason, including contention
 //               from other masters.
-//               0x00 -> siob_proc1_stall_upstream
-//               0x01 -> siob_proc1_stall_downstream
-//               0x02 -> siob_proc1_access_contested
-//               0x03 -> siob_proc1_access
-//               0x04 -> siob_proc0_stall_upstream
-//               0x05 -> siob_proc0_stall_downstream
-//               0x06 -> siob_proc0_access_contested
-//               0x07 -> siob_proc0_access
+//               0x00 -> sio_proc1_stall_upstream
+//               0x01 -> sio_proc1_stall_downstream
+//               0x02 -> sio_proc1_access_contested
+//               0x03 -> sio_proc1_access
+//               0x04 -> sio_proc0_stall_upstream
+//               0x05 -> sio_proc0_stall_downstream
+//               0x06 -> sio_proc0_access_contested
+//               0x07 -> sio_proc0_access
 //               0x08 -> apb_stall_upstream
 //               0x09 -> apb_stall_downstream
 //               0x0a -> apb_access_contested
@@ -346,14 +346,14 @@
 #define BUSCTRL_PERFSEL1_MSB    _u(6)
 #define BUSCTRL_PERFSEL1_LSB    _u(0)
 #define BUSCTRL_PERFSEL1_ACCESS "RW"
-#define BUSCTRL_PERFSEL1_VALUE_SIOB_PROC1_STALL_UPSTREAM _u(0x00)
-#define BUSCTRL_PERFSEL1_VALUE_SIOB_PROC1_STALL_DOWNSTREAM _u(0x01)
-#define BUSCTRL_PERFSEL1_VALUE_SIOB_PROC1_ACCESS_CONTESTED _u(0x02)
-#define BUSCTRL_PERFSEL1_VALUE_SIOB_PROC1_ACCESS _u(0x03)
-#define BUSCTRL_PERFSEL1_VALUE_SIOB_PROC0_STALL_UPSTREAM _u(0x04)
-#define BUSCTRL_PERFSEL1_VALUE_SIOB_PROC0_STALL_DOWNSTREAM _u(0x05)
-#define BUSCTRL_PERFSEL1_VALUE_SIOB_PROC0_ACCESS_CONTESTED _u(0x06)
-#define BUSCTRL_PERFSEL1_VALUE_SIOB_PROC0_ACCESS _u(0x07)
+#define BUSCTRL_PERFSEL1_VALUE_SIO_PROC1_STALL_UPSTREAM _u(0x00)
+#define BUSCTRL_PERFSEL1_VALUE_SIO_PROC1_STALL_DOWNSTREAM _u(0x01)
+#define BUSCTRL_PERFSEL1_VALUE_SIO_PROC1_ACCESS_CONTESTED _u(0x02)
+#define BUSCTRL_PERFSEL1_VALUE_SIO_PROC1_ACCESS _u(0x03)
+#define BUSCTRL_PERFSEL1_VALUE_SIO_PROC0_STALL_UPSTREAM _u(0x04)
+#define BUSCTRL_PERFSEL1_VALUE_SIO_PROC0_STALL_DOWNSTREAM _u(0x05)
+#define BUSCTRL_PERFSEL1_VALUE_SIO_PROC0_ACCESS_CONTESTED _u(0x06)
+#define BUSCTRL_PERFSEL1_VALUE_SIO_PROC0_ACCESS _u(0x07)
 #define BUSCTRL_PERFSEL1_VALUE_APB_STALL_UPSTREAM _u(0x08)
 #define BUSCTRL_PERFSEL1_VALUE_APB_STALL_DOWNSTREAM _u(0x09)
 #define BUSCTRL_PERFSEL1_VALUE_APB_ACCESS_CONTESTED _u(0x0a)
@@ -439,14 +439,14 @@
 //               a stall on the downstream bus; STALL_UPSTREAM, count cycles
 //               where any master stalled for any reason, including contention
 //               from other masters.
-//               0x00 -> siob_proc1_stall_upstream
-//               0x01 -> siob_proc1_stall_downstream
-//               0x02 -> siob_proc1_access_contested
-//               0x03 -> siob_proc1_access
-//               0x04 -> siob_proc0_stall_upstream
-//               0x05 -> siob_proc0_stall_downstream
-//               0x06 -> siob_proc0_access_contested
-//               0x07 -> siob_proc0_access
+//               0x00 -> sio_proc1_stall_upstream
+//               0x01 -> sio_proc1_stall_downstream
+//               0x02 -> sio_proc1_access_contested
+//               0x03 -> sio_proc1_access
+//               0x04 -> sio_proc0_stall_upstream
+//               0x05 -> sio_proc0_stall_downstream
+//               0x06 -> sio_proc0_access_contested
+//               0x07 -> sio_proc0_access
 //               0x08 -> apb_stall_upstream
 //               0x09 -> apb_stall_downstream
 //               0x0a -> apb_access_contested
@@ -513,14 +513,14 @@
 #define BUSCTRL_PERFSEL2_MSB    _u(6)
 #define BUSCTRL_PERFSEL2_LSB    _u(0)
 #define BUSCTRL_PERFSEL2_ACCESS "RW"
-#define BUSCTRL_PERFSEL2_VALUE_SIOB_PROC1_STALL_UPSTREAM _u(0x00)
-#define BUSCTRL_PERFSEL2_VALUE_SIOB_PROC1_STALL_DOWNSTREAM _u(0x01)
-#define BUSCTRL_PERFSEL2_VALUE_SIOB_PROC1_ACCESS_CONTESTED _u(0x02)
-#define BUSCTRL_PERFSEL2_VALUE_SIOB_PROC1_ACCESS _u(0x03)
-#define BUSCTRL_PERFSEL2_VALUE_SIOB_PROC0_STALL_UPSTREAM _u(0x04)
-#define BUSCTRL_PERFSEL2_VALUE_SIOB_PROC0_STALL_DOWNSTREAM _u(0x05)
-#define BUSCTRL_PERFSEL2_VALUE_SIOB_PROC0_ACCESS_CONTESTED _u(0x06)
-#define BUSCTRL_PERFSEL2_VALUE_SIOB_PROC0_ACCESS _u(0x07)
+#define BUSCTRL_PERFSEL2_VALUE_SIO_PROC1_STALL_UPSTREAM _u(0x00)
+#define BUSCTRL_PERFSEL2_VALUE_SIO_PROC1_STALL_DOWNSTREAM _u(0x01)
+#define BUSCTRL_PERFSEL2_VALUE_SIO_PROC1_ACCESS_CONTESTED _u(0x02)
+#define BUSCTRL_PERFSEL2_VALUE_SIO_PROC1_ACCESS _u(0x03)
+#define BUSCTRL_PERFSEL2_VALUE_SIO_PROC0_STALL_UPSTREAM _u(0x04)
+#define BUSCTRL_PERFSEL2_VALUE_SIO_PROC0_STALL_DOWNSTREAM _u(0x05)
+#define BUSCTRL_PERFSEL2_VALUE_SIO_PROC0_ACCESS_CONTESTED _u(0x06)
+#define BUSCTRL_PERFSEL2_VALUE_SIO_PROC0_ACCESS _u(0x07)
 #define BUSCTRL_PERFSEL2_VALUE_APB_STALL_UPSTREAM _u(0x08)
 #define BUSCTRL_PERFSEL2_VALUE_APB_STALL_DOWNSTREAM _u(0x09)
 #define BUSCTRL_PERFSEL2_VALUE_APB_ACCESS_CONTESTED _u(0x0a)
@@ -606,14 +606,14 @@
 //               a stall on the downstream bus; STALL_UPSTREAM, count cycles
 //               where any master stalled for any reason, including contention
 //               from other masters.
-//               0x00 -> siob_proc1_stall_upstream
-//               0x01 -> siob_proc1_stall_downstream
-//               0x02 -> siob_proc1_access_contested
-//               0x03 -> siob_proc1_access
-//               0x04 -> siob_proc0_stall_upstream
-//               0x05 -> siob_proc0_stall_downstream
-//               0x06 -> siob_proc0_access_contested
-//               0x07 -> siob_proc0_access
+//               0x00 -> sio_proc1_stall_upstream
+//               0x01 -> sio_proc1_stall_downstream
+//               0x02 -> sio_proc1_access_contested
+//               0x03 -> sio_proc1_access
+//               0x04 -> sio_proc0_stall_upstream
+//               0x05 -> sio_proc0_stall_downstream
+//               0x06 -> sio_proc0_access_contested
+//               0x07 -> sio_proc0_access
 //               0x08 -> apb_stall_upstream
 //               0x09 -> apb_stall_downstream
 //               0x0a -> apb_access_contested
@@ -680,14 +680,14 @@
 #define BUSCTRL_PERFSEL3_MSB    _u(6)
 #define BUSCTRL_PERFSEL3_LSB    _u(0)
 #define BUSCTRL_PERFSEL3_ACCESS "RW"
-#define BUSCTRL_PERFSEL3_VALUE_SIOB_PROC1_STALL_UPSTREAM _u(0x00)
-#define BUSCTRL_PERFSEL3_VALUE_SIOB_PROC1_STALL_DOWNSTREAM _u(0x01)
-#define BUSCTRL_PERFSEL3_VALUE_SIOB_PROC1_ACCESS_CONTESTED _u(0x02)
-#define BUSCTRL_PERFSEL3_VALUE_SIOB_PROC1_ACCESS _u(0x03)
-#define BUSCTRL_PERFSEL3_VALUE_SIOB_PROC0_STALL_UPSTREAM _u(0x04)
-#define BUSCTRL_PERFSEL3_VALUE_SIOB_PROC0_STALL_DOWNSTREAM _u(0x05)
-#define BUSCTRL_PERFSEL3_VALUE_SIOB_PROC0_ACCESS_CONTESTED _u(0x06)
-#define BUSCTRL_PERFSEL3_VALUE_SIOB_PROC0_ACCESS _u(0x07)
+#define BUSCTRL_PERFSEL3_VALUE_SIO_PROC1_STALL_UPSTREAM _u(0x00)
+#define BUSCTRL_PERFSEL3_VALUE_SIO_PROC1_STALL_DOWNSTREAM _u(0x01)
+#define BUSCTRL_PERFSEL3_VALUE_SIO_PROC1_ACCESS_CONTESTED _u(0x02)
+#define BUSCTRL_PERFSEL3_VALUE_SIO_PROC1_ACCESS _u(0x03)
+#define BUSCTRL_PERFSEL3_VALUE_SIO_PROC0_STALL_UPSTREAM _u(0x04)
+#define BUSCTRL_PERFSEL3_VALUE_SIO_PROC0_STALL_DOWNSTREAM _u(0x05)
+#define BUSCTRL_PERFSEL3_VALUE_SIO_PROC0_ACCESS_CONTESTED _u(0x06)
+#define BUSCTRL_PERFSEL3_VALUE_SIO_PROC0_ACCESS _u(0x07)
 #define BUSCTRL_PERFSEL3_VALUE_APB_STALL_UPSTREAM _u(0x08)
 #define BUSCTRL_PERFSEL3_VALUE_APB_STALL_DOWNSTREAM _u(0x09)
 #define BUSCTRL_PERFSEL3_VALUE_APB_ACCESS_CONTESTED _u(0x0a)
@@ -750,4 +750,3 @@
 #define BUSCTRL_PERFSEL3_VALUE_ROM_ACCESS _u(0x43)
 // =============================================================================
 #endif // _HARDWARE_REGS_BUSCTRL_H
-

@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -31,13 +31,13 @@ typedef struct {
     // 0x00000002 [1]     HIZ          (0) high impedance mode select +
     // 0x00000001 [0]     EN           (1) enable +
     io_rw_32 vreg;
- 
+
     _REG_(VREG_AND_CHIP_RESET_BOD_OFFSET) // VREG_AND_CHIP_RESET_BOD
     // brown-out detection control
     // 0x000000f0 [7:4]   VSEL         (0x9) threshold select +
     // 0x00000001 [0]     EN           (1) enable +
     io_rw_32 bod;
- 
+
     _REG_(VREG_AND_CHIP_RESET_CHIP_RESET_OFFSET) // VREG_AND_CHIP_RESET_CHIP_RESET
     // Chip reset control and status
     // 0x01000000 [24]    PSM_RESTART_FLAG (0) This is set by psm_restart from the debugger
@@ -51,4 +51,3 @@ typedef struct {
 static_assert(sizeof (vreg_and_chip_reset_hw_t) == 0x000c, "");
 
 #endif // _HARDWARE_STRUCTS_VREG_AND_CHIP_RESET_H
-

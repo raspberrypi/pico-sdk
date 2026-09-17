@@ -21,6 +21,10 @@
 extern "C" {
 #endif
 
+#ifndef __XSTRING
+#define __XSTRING(s) __STRING(s)
+#endif
+
 #define __not_in_flash(group)
 #define __not_in_flash_func(func) func
 #define __no_inline_not_in_flash_func(func) func
@@ -158,6 +162,8 @@ static inline uint __get_current_exception(void) {
 }
 
 void busy_wait_at_least_cycles(uint32_t minimum_cycles);
+
+static inline void blocked_waiter_wakeup(__unused bool timed_out) {}
 
 // PICO_CONFIG: PICO_NUM_VTABLE_IRQS, Number of IRQ handlers in the vector table - can be lowered to save space if you aren't using some higher IRQs, type=int, default=NUM_IRQS, group=hardware_irq
 #ifndef PICO_NUM_VTABLE_IRQS

@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -123,7 +123,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO0_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO0_CTRL_OEOVER_RESET  _u(0x0)
@@ -138,7 +139,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO0_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO0_CTRL_OUTOVER_RESET  _u(0x0)
@@ -290,7 +292,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO1_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO1_CTRL_OEOVER_RESET  _u(0x0)
@@ -305,7 +308,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO1_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO1_CTRL_OUTOVER_RESET  _u(0x0)
@@ -457,7 +461,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO2_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO2_CTRL_OEOVER_RESET  _u(0x0)
@@ -472,7 +477,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO2_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO2_CTRL_OUTOVER_RESET  _u(0x0)
@@ -624,7 +630,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO3_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO3_CTRL_OEOVER_RESET  _u(0x0)
@@ -639,7 +646,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO3_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO3_CTRL_OUTOVER_RESET  _u(0x0)
@@ -791,7 +799,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO4_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO4_CTRL_OEOVER_RESET  _u(0x0)
@@ -806,7 +815,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO4_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO4_CTRL_OUTOVER_RESET  _u(0x0)
@@ -956,7 +966,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO5_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO5_CTRL_OEOVER_RESET  _u(0x0)
@@ -971,7 +982,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO5_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO5_CTRL_OUTOVER_RESET  _u(0x0)
@@ -1121,7 +1133,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO6_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO6_CTRL_OEOVER_RESET  _u(0x0)
@@ -1136,7 +1149,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO6_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO6_CTRL_OUTOVER_RESET  _u(0x0)
@@ -1288,7 +1302,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO7_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO7_CTRL_OEOVER_RESET  _u(0x0)
@@ -1303,7 +1318,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO7_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO7_CTRL_OUTOVER_RESET  _u(0x0)
@@ -1455,7 +1471,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO8_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO8_CTRL_OEOVER_RESET  _u(0x0)
@@ -1470,7 +1487,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO8_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO8_CTRL_OUTOVER_RESET  _u(0x0)
@@ -1622,7 +1640,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO9_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO9_CTRL_OEOVER_RESET  _u(0x0)
@@ -1637,7 +1656,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO9_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO9_CTRL_OUTOVER_RESET  _u(0x0)
@@ -1789,7 +1809,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO10_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO10_CTRL_OEOVER_RESET  _u(0x0)
@@ -1804,7 +1825,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO10_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO10_CTRL_OUTOVER_RESET  _u(0x0)
@@ -1956,7 +1978,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO11_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO11_CTRL_OEOVER_RESET  _u(0x0)
@@ -1971,7 +1994,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO11_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO11_CTRL_OUTOVER_RESET  _u(0x0)
@@ -2123,7 +2147,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO12_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO12_CTRL_OEOVER_RESET  _u(0x0)
@@ -2138,7 +2163,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO12_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO12_CTRL_OUTOVER_RESET  _u(0x0)
@@ -2290,7 +2316,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO13_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO13_CTRL_OEOVER_RESET  _u(0x0)
@@ -2305,7 +2332,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO13_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO13_CTRL_OUTOVER_RESET  _u(0x0)
@@ -2457,7 +2485,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO14_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO14_CTRL_OEOVER_RESET  _u(0x0)
@@ -2472,7 +2501,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO14_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO14_CTRL_OUTOVER_RESET  _u(0x0)
@@ -2624,7 +2654,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO15_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO15_CTRL_OEOVER_RESET  _u(0x0)
@@ -2639,7 +2670,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO15_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO15_CTRL_OUTOVER_RESET  _u(0x0)
@@ -2791,7 +2823,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO16_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO16_CTRL_OEOVER_RESET  _u(0x0)
@@ -2806,7 +2839,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO16_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO16_CTRL_OUTOVER_RESET  _u(0x0)
@@ -2958,7 +2992,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO17_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO17_CTRL_OEOVER_RESET  _u(0x0)
@@ -2973,7 +3008,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO17_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO17_CTRL_OUTOVER_RESET  _u(0x0)
@@ -3123,7 +3159,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO18_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO18_CTRL_OEOVER_RESET  _u(0x0)
@@ -3138,7 +3175,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO18_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO18_CTRL_OUTOVER_RESET  _u(0x0)
@@ -3288,7 +3326,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO19_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO19_CTRL_OEOVER_RESET  _u(0x0)
@@ -3303,7 +3342,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO19_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO19_CTRL_OUTOVER_RESET  _u(0x0)
@@ -3453,7 +3493,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO20_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO20_CTRL_OEOVER_RESET  _u(0x0)
@@ -3468,7 +3509,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO20_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO20_CTRL_OUTOVER_RESET  _u(0x0)
@@ -3620,7 +3662,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO21_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO21_CTRL_OEOVER_RESET  _u(0x0)
@@ -3635,7 +3678,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO21_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO21_CTRL_OUTOVER_RESET  _u(0x0)
@@ -3787,7 +3831,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO22_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO22_CTRL_OEOVER_RESET  _u(0x0)
@@ -3802,7 +3847,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO22_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO22_CTRL_OUTOVER_RESET  _u(0x0)
@@ -3954,7 +4000,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO23_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO23_CTRL_OEOVER_RESET  _u(0x0)
@@ -3969,7 +4016,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO23_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO23_CTRL_OUTOVER_RESET  _u(0x0)
@@ -4121,7 +4169,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO24_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO24_CTRL_OEOVER_RESET  _u(0x0)
@@ -4136,7 +4185,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO24_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO24_CTRL_OUTOVER_RESET  _u(0x0)
@@ -4288,7 +4338,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO25_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO25_CTRL_OEOVER_RESET  _u(0x0)
@@ -4303,7 +4354,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO25_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO25_CTRL_OUTOVER_RESET  _u(0x0)
@@ -4455,7 +4507,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO26_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO26_CTRL_OEOVER_RESET  _u(0x0)
@@ -4470,7 +4523,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO26_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO26_CTRL_OUTOVER_RESET  _u(0x0)
@@ -4620,7 +4674,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO27_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO27_CTRL_OEOVER_RESET  _u(0x0)
@@ -4635,7 +4690,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO27_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO27_CTRL_OUTOVER_RESET  _u(0x0)
@@ -4785,7 +4841,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO28_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO28_CTRL_OEOVER_RESET  _u(0x0)
@@ -4800,7 +4857,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO28_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO28_CTRL_OUTOVER_RESET  _u(0x0)
@@ -4950,7 +5008,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO29_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_BANK0_GPIO29_CTRL_OEOVER_RESET  _u(0x0)
@@ -4965,7 +5024,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_BANK0_GPIO29_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_BANK0_GPIO29_CTRL_OUTOVER_RESET  _u(0x0)
@@ -13646,4 +13706,3 @@
 #define IO_BANK0_DORMANT_WAKE_INTS3_GPIO24_LEVEL_LOW_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_IO_BANK0_H
-

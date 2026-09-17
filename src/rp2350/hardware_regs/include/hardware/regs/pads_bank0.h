@@ -3977,4 +3977,3 @@
 #define PADS_BANK0_SWD_SLEWFAST_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_PADS_BANK0_H
-

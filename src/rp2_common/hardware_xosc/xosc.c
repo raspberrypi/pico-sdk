@@ -27,8 +27,17 @@
 #endif
 
 void xosc_init(void) {
-    // Assumes 1-15 MHz input, checked above.
+#if PICO_RP2040 || PICO_XOSC_FREQ_RANGE_MAX <= 15 // RP2040 only has this range
     xosc_hw->ctrl = XOSC_CTRL_FREQ_RANGE_VALUE_1_15MHZ;
+#elif PICO_XOSC_FREQ_RANGE_MAX <= 30
+    xosc_hw->ctrl = XOSC_CTRL_FREQ_RANGE_VALUE_10_30MHZ;
+#elif PICO_XOSC_FREQ_RANGE_MAX <= 60
+    xosc_hw->ctrl = XOSC_CTRL_FREQ_RANGE_VALUE_25_60MHZ;
+#elif PICO_XOSC_FREQ_RANGE_MAX <= 100
+    xosc_hw->ctrl = XOSC_CTRL_FREQ_RANGE_VALUE_40_100MHZ;
+#else
+    #error PICO_XOSC_FREQ_RANGE_MAX is too large, maximum is 100
+#endif
 
     // Set xosc startup delay
     xosc_hw->startup = STARTUP_DELAY;

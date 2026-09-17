@@ -1,0 +1,64 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_thread_local",
+    actual = select({
+        "//bazel/constraint:pico_thread_local_per_thread_enabled": ":pico_thread_local_per_thread",
+        "//bazel/constraint:pico_thread_local_global_enabled": ":pico_thread_local_global",
+        "//conditions:default": ":pico_thread_local_none",
+    }),
+)
+
+cc_library(
+    name = "pico_thread_local_per_thread",
+    srcs = ["thread_local.c"],
+    hdrs = [
+        "include/pico/thread_local.h",
+        "include/picotls.h",
+    ],
+    defines = ["PICO_THREAD_LOCAL_MODE_PER_THREAD=1"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:pico_platform_internal",
+        "//src/rp2_common/pico_runtime_init:pico_runtime_init_link",
+    ],
+)
+
+cc_library(
+    name = "pico_thread_local_global",
+    srcs = ["thread_local.c"],
+    hdrs = [
+        "include/pico/thread_local.h",
+        "include/picotls.h",
+    ],
+    defines = ["PICO_THREAD_LOCAL_MODE_GLOBAL=1"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:pico_platform_internal",
+        "//src/rp2_common/pico_runtime_init:pico_runtime_init_link",
+    ],
+)
+
+cc_library(
+    name = "pico_thread_local_none",
+    srcs = ["thread_local.c"],
+    hdrs = [
+        "include/pico/thread_local.h",
+        "include/picotls.h",
+    ],
+    defines = ["PICO_THREAD_LOCAL_MODE_NONE=1"],
+    includes = ["include"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/common/pico_base_headers",
+        "//src/rp2_common:pico_platform_internal",
+        "//src/rp2_common/pico_runtime_init:pico_runtime_init_link",
+    ],
+)

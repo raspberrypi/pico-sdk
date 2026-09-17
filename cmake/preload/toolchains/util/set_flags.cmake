@@ -3,9 +3,17 @@ option(PICO_DEOPTIMIZED_DEBUG "Build debug builds with -O0" 0)
 # PICO_CMAKE_CONFIG: PICO_DEBUG_INFO_IN_RELEASE, Include debug information in release builds, type=bool, default=1, group=build, docref=cmake-toolchain-config
 option(PICO_DEBUG_INFO_IN_RELEASE "Include debug info in release builds" 1)
 
+if (NOT PICO_COMMON_LANG_FLAGS)
+    message(FATAL_ERROR "PICO_COMMON_LANG_FLAGS not set")
+endif()
+
 get_property(IS_IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)
 foreach(LANG IN ITEMS C CXX ASM)
     set(CMAKE_${LANG}_FLAGS_INIT "${PICO_COMMON_LANG_FLAGS}")
+
+    # all thread-local variables are in the executable so never use GOT entries
+    set(CMAKE_${LANG}_FLAGS_INIT "${CMAKE_${LANG}_FLAGS_INIT} -ftls-model=local-exec")
+
     unset(CMAKE_${LANG}_FLAGS_DEBUG CACHE)
     if (PICO_DEOPTIMIZED_DEBUG)
         set(CMAKE_${LANG}_FLAGS_DEBUG_INIT "-O0")

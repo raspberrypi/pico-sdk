@@ -18,6 +18,11 @@
  * but making an explicit library dependency does not make sense.
  */
 
+// PICO_CONFIG: PICO_PLATFORM_TEST_HEADER, Unquoted path to a header to include here so a test can inject code/defines into every translation unit, group=pico_platform
+#ifdef PICO_PLATFORM_TEST_HEADER
+#include __PICO_XSTRING(PICO_PLATFORM_TEST_HEADER)
+#endif
+
 // PICO_CONFIG: PICO_MINIMAL_STORED_VECTOR_TABLE, Only store a very minimal vector table in the binary on Arm, type=bool, default=0, advanced=true, group=pico_crt0
 #ifndef PICO_MINIMAL_STORED_VECTOR_TABLE
 #define PICO_MINIMAL_STORED_VECTOR_TABLE 0
@@ -68,10 +73,23 @@ bool running_in_sim(void);
  *  \ingroup pico_platform
  *
  * No-op function intended to be called by any tight hardware polling loop. Using this ubiquitously
- * makes it much easier to find tight loops, but also in the future \#ifdef-ed support for lockup
- * debugging might be added
+ * makes it much easier to find tight loops, and may be #ifdef-ed for debugging
  */
+#ifndef tight_loop_contents
 static __force_inline void tight_loop_contents(void) {}
+#endif
+
+/*! \brief No-op function to record that a blocked waiter has woken up
+ *  \ingroup pico_platform
+ *
+ * No-op function intended to be called by any primitive which has just completed a wait for a condition to be
+ * satisfied - including a wait that ended in a timeout rather than the condition. This is distinct from
+ * \ref tight_loop_contents in that this operation follows some sort of actual wait (e.g. `__wfe()`) vs
+ * polling. This is mostly intended to be overridden for debugging or test cases
+ */
+#ifndef blocked_waiter_wakeup
+static __force_inline void blocked_waiter_wakeup(__unused bool timed_out) {}
+#endif
 
 #define host_safe_hw_ptr(x) ((uintptr_t)(x))
 #define native_safe_hw_ptr(x) host_safe_hw_ptr(x)

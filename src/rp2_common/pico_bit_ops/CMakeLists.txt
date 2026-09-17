@@ -9,7 +9,7 @@ if (NOT TARGET pico_bit_ops)
     add_library(pico_bit_ops_default INTERFACE)
     target_link_libraries(pico_bit_ops_default INTERFACE pico_bit_ops_pico)
 
-    set(PICO_DEFAULT_BIT_OPS_IMPL pico_bit_ops_default)
+    pico_fixup_default_impl(PICO_DEFAULT_BIT_OPS_IMPL pico_bit_ops default)
 
     pico_add_library(pico_bit_ops_pico)
     target_link_libraries(pico_bit_ops INTERFACE
@@ -24,8 +24,6 @@ if (NOT TARGET pico_bit_ops)
     if (PICO_RP2040)
         target_link_libraries(pico_bit_ops_pico INTERFACE pico_bootrom)
         # gcc
-        pico_wrap_function(pico_bit_ops_pico __clzsi2)
-        pico_wrap_function(pico_bit_ops_pico __clzsi2)
         pico_wrap_function(pico_bit_ops_pico __clzdi2)
         pico_wrap_function(pico_bit_ops_pico __ctzsi2)
         pico_wrap_function(pico_bit_ops_pico __popcountsi2)

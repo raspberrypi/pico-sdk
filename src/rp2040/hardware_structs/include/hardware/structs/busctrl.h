@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -53,7 +53,7 @@ typedef struct {
     // Bus fabric performance counter 0
     // 0x00ffffff [23:0]  PERFCTR0     (0x000000) Busfabric saturating performance counter 0 +
     io_rw_32 value;
- 
+
     _REG_(BUSCTRL_PERFSEL0_OFFSET) // BUSCTRL_PERFSEL0
     // Bus fabric performance event select for PERFCTR0
     // 0x0000001f [4:0]   PERFSEL0     (0x1f) Select an event for PERFCTR0
@@ -68,12 +68,12 @@ typedef struct {
     // 0x00000010 [4]     PROC1        (0) 0 - low priority, 1 - high priority
     // 0x00000001 [0]     PROC0        (0) 0 - low priority, 1 - high priority
     io_rw_32 priority;
- 
+
     _REG_(BUSCTRL_BUS_PRIORITY_ACK_OFFSET) // BUSCTRL_BUS_PRIORITY_ACK
     // Bus priority acknowledge
     // 0x00000001 [0]     BUS_PRIORITY_ACK (0) Goes to 1 once all arbiters have registered the new...
     io_ro_32 priority_ack;
- 
+
     bus_ctrl_perf_hw_t counter[4];
 } busctrl_hw_t;
 
@@ -81,4 +81,3 @@ typedef struct {
 static_assert(sizeof (busctrl_hw_t) == 0x0028, "");
 
 #endif // _HARDWARE_STRUCTS_BUSCTRL_H
-

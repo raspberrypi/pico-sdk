@@ -1,0 +1,39 @@
+name: Check extern C guards
+
+on:
+  push:
+    branches-ignore:
+      - 'iar/**'
+    paths:
+      - '**.h'
+      - '.extern_c_ignore'
+      - 'tools/check_extern_c_guards.py'
+      - '.github/workflows/check-extern-c-guards.yml'
+  pull_request:
+    paths:
+      - '**.h'
+      - '.extern_c_ignore'
+      - 'tools/check_extern_c_guards.py'
+      - '.github/workflows/check-extern-c-guards.yml'
+
+jobs:
+  check-guards:
+    if: github.repository_owner == 'raspberrypi'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check extern C guards
+        run: |
+          python3 tools/check_extern_c_guards.py \
+            --match "**/include/pico/**" \
+            --ignore-list .extern_c_ignore \
+            .
+

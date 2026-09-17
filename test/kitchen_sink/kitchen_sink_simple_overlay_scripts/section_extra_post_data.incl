@@ -1,0 +1,15 @@
+SECTIONS
+{
+    PROVIDE(__overlays_start__ = .);
+    OVERLAY : {
+        .overlay_first {
+            KEEP (*(.first*))
+            . = ALIGN(4);
+        }
+        .overlay_second {
+            KEEP (*(.second*))
+            . = ALIGN(4);
+        }
+    } > RAM AT> RAM_STORE
+    PROVIDE(__overlays_end__ = .);
+}

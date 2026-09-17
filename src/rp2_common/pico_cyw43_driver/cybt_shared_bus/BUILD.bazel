@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -6,7 +8,10 @@ cc_library(
         "cybt_shared_bus.c",
         "cybt_shared_bus_driver.c",
     ],
-    hdrs = ["cybt_shared_bus_driver.h", "cybt_logging.h"],
+    hdrs = [
+        "cybt_logging.h",
+        "cybt_shared_bus_driver.h",
+    ],
     includes = ["."],
     deps = [
         "@cyw43-driver//:cyw43_driver",

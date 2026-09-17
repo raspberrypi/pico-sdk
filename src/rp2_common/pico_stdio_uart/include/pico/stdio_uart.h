@@ -40,7 +40,7 @@ extern stdio_driver_t stdio_uart;
  * This method sets up PICO_DEFAULT_UART_TX_PIN for UART output (if defined), PICO_DEFAULT_UART_RX_PIN for input (if defined)
  * and configures the baud rate as PICO_DEFAULT_UART_BAUD_RATE.
  *
- * \note this method is automatically called by \ref stdio_init_all() if `pico_stdio_uart` is included in the build
+ * \note This method is automatically called by \ref stdio_init_all() if `pico_stdio_uart` is included in the build
  */
 void stdio_uart_init(void);
 
@@ -74,7 +74,7 @@ void stdio_uart_init_full(uart_inst_t *uart, uint baud_rate, int tx_pin, int rx_
  * This method disables PICO_DEFAULT_UART_TX_PIN for UART output (if defined), PICO_DEFAULT_UART_RX_PIN for input (if defined)
  * and leaves the pads isolated.
  *
- * \note this method is automatically called by \ref stdio_deinit_all() if `pico_stdio_uart` is included in the build
+ * \note This method is automatically called by \ref stdio_deinit_all() if `pico_stdio_uart` is included in the build
  */
 void stdio_uart_deinit(void);
 

@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -324,4 +324,3 @@
 #define BUSCTRL_PERFSEL3_VALUE_ROM _u(0x13)
 // =============================================================================
 #endif // _HARDWARE_REGS_BUSCTRL_H
-

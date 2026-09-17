@@ -46,16 +46,16 @@ extern "C" {
  *  \ingroup pico_sha256
  */
 typedef struct pico_sha256_state {
-    enum sha256_endianness endianness;
-    int8_t channel;
-    bool locked;
-    uint8_t cache_used;
+    enum sha256_endianness endianness; ///< Endianness for data in and data out
+    int8_t channel;                    ///< DMA channel in use, or -1 if DMA is not being used
+    bool locked;                       ///< Whether the SHA-256 hardware lock is currently held
+    uint8_t cache_used;                ///< Number of bytes currently stored in the partial-word cache
     union {
-        uint32_t word;
-        uint8_t bytes[4];
-    } cache;
-    dma_channel_config config;
-    size_t total_data_size;
+        uint32_t word;                 ///< Cache contents as a 32-bit word
+        uint8_t bytes[4];              ///< Cache contents as individual bytes
+    } cache;                           ///< Partial-word cache for data not yet written to hardware
+    dma_channel_config config;         ///< DMA channel configuration
+    size_t total_data_size;            ///< Total number of bytes added to the calculation so far
 } pico_sha256_state_t;
 
 /*! \brief Release the internal lock on the SHA-256 hardware

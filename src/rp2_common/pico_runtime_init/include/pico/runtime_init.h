@@ -45,7 +45,7 @@ extern "C" {
  * void runtime_init_bootrom_reset(void);
  * \endcode
  *
- * If PICO_RUNTIME_NO_INIT_BOOTOROM_RESET define is set (NO vs SKIP above), then the function
+ * If PICO_RUNTIME_NO_INIT_BOOTROM_RESET define is set (NO vs SKIP above), then the function
  * is not defined, allowing the user to provide a replacement (and also avoiding
  * cases where the default implementation won't compile due to missing dependencies)
  */
@@ -56,8 +56,8 @@ extern "C" {
 // -----------------------------------------------------------------------------------------------
 // Reset of global bootrom state (can be skipped if boot path was via bootrom); not used on RP2040
 // -----------------------------------------------------------------------------------------------
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_BOOTROM_RESET, Skip calling of `runtime_init_bootrom_reset` function during runtime init, type=bool, default=1 on RP2040, group=pico_runtime_init
-// PICO_CONFIG: PICO_RUNTIME_NO_INIT_BOOTROM_RESET, Do not include SDK implementation of `runtime_init_bootrom_reset` function, type=bool, default=1 on RP2040, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_BOOTROM_RESET, Skip calling of `runtime_init_bootrom_reset` function during runtime init, type=bool, default=1 on RP2040 or in a single-core no-flash binary, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_NO_INIT_BOOTROM_RESET, Do not include SDK implementation of `runtime_init_bootrom_reset` function, type=bool, default=1 on RP2040 or in a single-core no-flash binary, group=pico_runtime_init
 
 #ifndef PICO_RUNTIME_INIT_BOOTROM_RESET
 #define PICO_RUNTIME_INIT_BOOTROM_RESET   "00050"
@@ -127,8 +127,8 @@ void runtime_init_per_core_bootrom_reset(void);
 #define PICO_RUNTIME_INIT_EARLY_RESETS          "00100"
 #endif
 
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_EARLY_RESETS, Skip calling of `runtime_init_early_resets` function during runtime init, type=bool, default=1 on RP2040, group=pico_runtime_init
-// PICO_CONFIG: PICO_RUNTIME_NO_INIT_EARLY_RESETS, Do not include SDK implementation of `runtime_init_early_resets` function, type=bool, default=1 on RP2040, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_EARLY_RESETS, Skip calling of `runtime_init_early_resets` function during runtime init, type=bool, default=0, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_NO_INIT_EARLY_RESETS, Do not include SDK implementation of `runtime_init_early_resets` function, type=bool, default=0, group=pico_runtime_init
 #ifndef PICO_RUNTIME_SKIP_INIT_EARLY_RESETS
 #define PICO_RUNTIME_SKIP_INIT_EARLY_RESETS 0
 #endif
@@ -259,7 +259,7 @@ void runtime_init_post_clock_resets(void);
 // RP2040 IE disable for GPIO 26-29
 // ----------------------------------------
 
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_RP2040_GPIO_IE_DISABLE, Skip calling of `runtime_init_rp2040_gpio_ie_disable` function during runtime init, type=bool, default=0 on RP2040, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_RP2040_GPIO_IE_DISABLE, Skip calling of `runtime_init_rp2040_gpio_ie_disable` function during runtime init, type=bool, default=0 on RP2040 unless PICO_IE_26_29_UNCHANGED_ON_RESET is 1, group=pico_runtime_init
 // PICO_CONFIG: PICO_RUNTIME_NO_INIT_RP2040_GPIO_IE_DISABLE, Do not include SDK implementation of `runtime_init_rp2040_gpio_ie_disable` function, type=bool, default=0 on RP2040, group=pico_runtime_init
 
 #ifndef PICO_RUNTIME_INIT_RP2040_GPIO_IE_DISABLE
@@ -475,8 +475,8 @@ void runtime_init_bootrom_locking_enable(void);
 #define PICO_RUNTIME_INIT_PER_CORE_TLS_SETUP                 "10060"
 #endif
 
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_INSTALL_RAM_VECTOR_TABLE, Skip calling of `runtime_init_install_ram_vector_table` function during runtime init, type=bool, default=0 unless RISC-V or RAM binary, group=pico_runtime_init
-// PICO_CONFIG: PICO_RUNTIME_NO_INIT_INSTALL_RAM_VECTOR_TABLE, Do not include SDK implementation of `runtime_init_install_ram_vector_table` function, type=bool, default=0 unless RISC-V or RAM binary, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_INSTALL_RAM_VECTOR_TABLE, Skip calling of `runtime_init_install_ram_vector_table` function during runtime init, type=bool, default=0 unless RISC-V or a RAM binary or PICO_NO_RAM_VECTOR_TABLE is 1, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_NO_INIT_INSTALL_RAM_VECTOR_TABLE, Do not include SDK implementation of `runtime_init_install_ram_vector_table` function, type=bool, default=0 unless RISC-V or a RAM binary or PICO_NO_RAM_VECTOR_TABLE is 1, group=pico_runtime_init
 #ifndef PICO_RUNTIME_INIT_INSTALL_RAM_VECTOR_TABLE
 #define PICO_RUNTIME_INIT_INSTALL_RAM_VECTOR_TABLE "10080"
 #endif
@@ -518,6 +518,60 @@ void runtime_init_bootrom_locking_enable(void);
 #if PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 #define PICO_RUNTIME_NO_INIT_DEFAULT_ALARM_POOL 1
 #endif
+#endif
+
+// ------------------------------------------------------------
+// RP2350 sleep fix
+// ------------------------------------------------------------
+
+#ifndef PICO_RUNTIME_INIT_RP2350_SLEEP_FIX
+#define PICO_RUNTIME_INIT_RP2350_SLEEP_FIX "00070"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX
+#if PICO_RP2350 && !defined(__riscv)
+#define PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX 0
+#else
+#define PICO_RUNTIME_SKIP_INIT_RP2350_SLEEP_FIX 1
+#endif
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX
+#if PICO_RP2350 && !defined(__riscv)
+#define PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX 0
+#else
+#define PICO_RUNTIME_NO_INIT_RP2350_SLEEP_FIX 1
+#endif
+#endif
+
+// ------------------------------------------------------------
+// Low power initialization
+// ------------------------------------------------------------
+
+// Unpin cache if persistent data is in xip_sram - do this early for performance
+#ifndef PICO_RUNTIME_INIT_LOW_POWER_CACHE_UNPIN
+#define PICO_RUNTIME_INIT_LOW_POWER_CACHE_UNPIN "00650"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_LOW_POWER_CACHE_UNPIN
+#define PICO_RUNTIME_SKIP_INIT_LOW_POWER_CACHE_UNPIN (!HAS_POWMAN_TIMER || PICO_NO_FLASH || PICO_USE_XIP_CACHE_AS_RAM || !PICO_CRT0_PIN_XIP_SRAM)
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_LOW_POWER_CACHE_UNPIN
+#define PICO_RUNTIME_NO_INIT_LOW_POWER_CACHE_UNPIN (!HAS_POWMAN_TIMER || PICO_NO_FLASH || PICO_USE_XIP_CACHE_AS_RAM || !PICO_CRT0_PIN_XIP_SRAM)
+#endif
+
+// Run user callback if this is a powman reboot - do this later, so user has a full SDK to work with
+#ifndef PICO_RUNTIME_INIT_LOW_POWER_REBOOT_CHECK
+#define PICO_RUNTIME_INIT_LOW_POWER_REBOOT_CHECK "11020"
+#endif
+
+#ifndef PICO_RUNTIME_SKIP_INIT_LOW_POWER_REBOOT_CHECK
+#define PICO_RUNTIME_SKIP_INIT_LOW_POWER_REBOOT_CHECK !HAS_POWMAN_TIMER
+#endif
+
+#ifndef PICO_RUNTIME_NO_INIT_LOW_POWER_REBOOT_CHECK
+#define PICO_RUNTIME_NO_INIT_LOW_POWER_REBOOT_CHECK !HAS_POWMAN_TIMER
 #endif
 
 // ------------------------------------------------------------------------------------------------

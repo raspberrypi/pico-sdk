@@ -1147,4 +1147,3 @@
 #define UART_UARTPCELLID3_UARTPCELLID3_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_UART_H
-

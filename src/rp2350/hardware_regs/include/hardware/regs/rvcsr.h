@@ -727,14 +727,25 @@
 //               mip that caused the trap (3=soft IRQ, 7=timer IRQ, 11=external
 //               IRQ). Otherwise, `code` is set according to the cause of the
 //               exception.
-//               0x0 -> Instruction fetch was misaligned. Will never fire on RP2350, since the C extension is enabled.
-//               0x1 -> Instruction access fault. Instruction fetch failed a PMP check, or encountered a downstream bus fault, and then passed the point of no speculation.
-//               0x2 -> Illegal instruction was executed (including illegal CSR accesses)
-//               0x3 -> Breakpoint. An ebreak instruction was executed when the relevant dcsr.ebreak bit was clear.
-//               0x4 -> Load address misaligned. Hazard3 requires natural alignment of all accesses.
-//               0x5 -> Load access fault. A load failed a PMP check, or encountered a downstream bus error.
-//               0x6 -> Store/AMO address misaligned. Hazard3 requires natural alignment of all accesses.
-//               0x7 -> Store/AMO access fault. A store/AMO failed a PMP check, or encountered a downstream bus error. Also set if an AMO is attempted on a region that does not support atomics (on RP2350, anything but SRAM).
+//               0x0 -> Instruction fetch was misaligned. Will never fire on RP2350,
+//               since the C extension is enabled.
+//               0x1 -> Instruction access fault. Instruction fetch failed a PMP check,
+//               or encountered a downstream bus fault, and then passed the
+//               point of no speculation.
+//               0x2 -> Illegal instruction was executed (including illegal CSR
+//               accesses)
+//               0x3 -> Breakpoint. An ebreak instruction was executed when the
+//               relevant dcsr.ebreak bit was clear.
+//               0x4 -> Load address misaligned. Hazard3 requires natural alignment of
+//               all accesses.
+//               0x5 -> Load access fault. A load failed a PMP check, or encountered a
+//               downstream bus error.
+//               0x6 -> Store/AMO address misaligned. Hazard3 requires natural
+//               alignment of all accesses.
+//               0x7 -> Store/AMO access fault. A store/AMO failed a PMP check, or
+//               encountered a downstream bus error. Also set if an AMO is
+//               attempted on a region that does not support atomics (on RP2350,
+//               anything but SRAM).
 //               0x8 -> Environment call from U-mode.
 //               0xb -> Environment call from M-mode.
 #define RVCSR_MCAUSE_CODE_RESET  _u(0x0)
@@ -1903,8 +1914,10 @@
 // -----------------------------------------------------------------------------
 // Field       : RVCSR_TDATA1_ACTION
 // Description : Select action to be taken when the trigger fires.
-//               0x0 -> Raise a breakpoint exception, which can be handled by the M-mode exception handler
-//               0x1 -> Enter debug mode. This action is only selectable when `tdata1.dmode` is 1.
+//               0x0 -> Raise a breakpoint exception, which can be handled by the
+//               M-mode exception handler
+//               0x1 -> Enter debug mode. This action is only selectable when
+//               `tdata1.dmode` is 1.
 #define RVCSR_TDATA1_ACTION_RESET  _u(0x0)
 #define RVCSR_TDATA1_ACTION_BITS   _u(0x0000f000)
 #define RVCSR_TDATA1_ACTION_MSB    _u(15)
@@ -2049,10 +2062,13 @@
 // -----------------------------------------------------------------------------
 // Field       : RVCSR_DCSR_CAUSE
 // Description : Set by hardware when entering debug mode.
-//               0x1 -> An ebreak instruction was executed when the relevant `dcsr.ebreakx` bit was set.
+//               0x1 -> An ebreak instruction was executed when the relevant
+//               `dcsr.ebreakx` bit was set.
 //               0x2 -> The trigger module caused a breakpoint exception.
-//               0x3 -> Processor entered Debug Mode due to a halt request, or a reset-halt request present when the core reset was released.
-//               0x4 -> Processor entered Debug Mode after executing one instruction with single-stepping enabled.
+//               0x3 -> Processor entered Debug Mode due to a halt request, or a reset-
+//               halt request present when the core reset was released.
+//               0x4 -> Processor entered Debug Mode after executing one instruction
+//               with single-stepping enabled.
 #define RVCSR_DCSR_CAUSE_RESET  _u(0x0)
 #define RVCSR_DCSR_CAUSE_BITS   _u(0x000001c0)
 #define RVCSR_DCSR_CAUSE_MSB    _u(8)
@@ -3153,7 +3169,7 @@
 // Description : Vendor ID
 #define RVCSR_MVENDORID_OFFSET _u(0x00000f11)
 #define RVCSR_MVENDORID_BITS   _u(0xffffffff)
-#define RVCSR_MVENDORID_RESET  _u(0x00000000)
+#define RVCSR_MVENDORID_RESET  _u(0x00000493)
 // -----------------------------------------------------------------------------
 // Field       : RVCSR_MVENDORID_BANK
 // Description : Value of 9 indicates 9 continuation codes, which is JEP106 bank
@@ -3213,4 +3229,3 @@
 #define RVCSR_MCONFIGPTR_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_RVCSR_H
-

@@ -13,16 +13,8 @@
 #include "hardware/timer.h"
 #include "hardware/vreg.h"
 #include "hardware/xosc.h"
-#if PICO_RP2040
-#include "hardware/regs/rtc.h"
-#endif
-
-#if PICO_RP2040
-// The RTC clock frequency is 48MHz divided by power of 2 (to ensure an integer
-// division ratio will be used in the clocks block).  A divisor of 1024 generates
-// an RTC clock tick of 46875Hz.  This frequency is relatively close to the
-// customary 32 or 32.768kHz 'slow clock' crystals and provides good timing resolution.
-#define RTC_CLOCK_FREQ_HZ       (USB_CLK_HZ / 1024)
+#if HAS_RP2040_RTC
+#include "hardware/rtc.h"
 #endif
 
 static void start_all_ticks(void) {

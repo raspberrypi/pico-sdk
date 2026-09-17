@@ -102,6 +102,12 @@ bool aon_timer_get_time_calendar(struct tm *tm) {
 #endif
 }
 
+absolute_time_t aon_timer_get_absolute_time(void) {
+    struct timespec ts;
+    aon_timer_get_time(&ts);
+    return from_us_since_boot(timespec_to_us(&ts));
+}
+
 aon_timer_alarm_handler_t aon_timer_enable_alarm(const struct timespec *ts, aon_timer_alarm_handler_t handler, bool wakeup_from_low_power) {
 #if HAS_RP2040_RTC
     struct tm tm;
@@ -170,7 +176,8 @@ void aon_timer_disable_alarm(void) {
 #if HAS_RP2040_RTC
     rtc_disable_alarm();
 #elif HAS_POWMAN_TIMER
-    powman_timer_disable_alarm();
+    // This calls powman_timer_disable_alarm()
+    powman_disable_alarm_wakeup();
 #else
     panic_unsupported();
 #endif

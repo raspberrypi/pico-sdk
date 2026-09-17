@@ -1,0 +1,28 @@
+name: Check Memmap Annotations
+
+on:
+  push:
+    paths:
+      - 'src/*/pico_platform/memmap*.ld'
+      - 'src/*/pico_platform/script_include/**'
+      - 'src/rp2_common/pico_standard_link/script_include/**'
+      - 'tools/memmap_annotate.py'
+      - 'tools/memmap_include_tree.py'
+  pull_request:
+    paths:
+      - 'src/*/pico_platform/memmap*.ld'
+      - 'src/*/pico_platform/script_include/**'
+      - 'src/rp2_common/pico_standard_link/script_include/**'
+      - 'tools/memmap_annotate.py'
+      - 'tools/memmap_include_tree.py'
+
+jobs:
+  check-memmap-annotations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Memmap Annotations
+        run: |
+          tools/memmap_annotate.py --ci

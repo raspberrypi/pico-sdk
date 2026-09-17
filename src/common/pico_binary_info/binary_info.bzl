@@ -1,3 +1,5 @@
+"""Utilities for creating binary info objects."""
+
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 # PICO_BUILD_DEFINE: PICO_PROGRAM_NAME, Provided by PICO_DEFAULT_BINARY_INFO or a manually linked custom_pico_binary_info target, type=string, group=pico_binary_info
@@ -6,6 +8,16 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 # PICO_BUILD_DEFINE: PICO_PROGRAM_VERSION_STRING, Provided by PICO_DEFAULT_BINARY_INFO or a manually linked custom_pico_binary_info target, type=string, group=pico_binary_info
 # PICO_BUILD_DEFINE: PICO_TARGET_NAME, The name of the build target being compiled, type=string, default=target name, group=build
 def custom_pico_binary_info(name = None, program_name = None, program_description = None, program_url = None, program_version_string = None, build_target_name = None):
+    """Create a cc_library that provides binary info for a program.
+
+    Args:
+        name: The name of the rule.
+        program_name: The name of the program.
+        program_description: The description of the program.
+        program_url: The URL of the program.
+        program_version_string: The version string of the program.
+        build_target_name: The name of the build target.
+    """
     _all_defines = []
     if program_name != None:
         _all_defines.append('PICO_PROGRAM_NAME=\\"{}\\"'.format(program_name))

@@ -196,4 +196,3 @@
 #define PLL_INTS_LOCK_N_STICKY_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_PLL_H
-

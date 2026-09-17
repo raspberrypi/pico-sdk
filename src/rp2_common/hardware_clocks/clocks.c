@@ -92,6 +92,7 @@ static void clock_configure_internal(clock_handle_t clock, uint32_t src, uint32_
     // Now that the source is configured, we can trust that the user-supplied
     // divisor is a safe value.
     clock_hw->div = div;
+    // Store the configured frequency
     configured_freq[clock] = actual_freq;
 }
 
@@ -119,7 +120,30 @@ bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32
     }
 
     clock_configure_internal(clock, src, auxsrc, actual_freq, div);
-    // Store the configured frequency
+    return true;
+}
+
+bool clock_configure_mhz(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq_mhz, uint32_t freq_mhz) {
+    assert(src_freq_mhz >= freq_mhz);
+
+    if (freq_mhz > src_freq_mhz)
+        return false;
+
+    assert(src_freq_mhz <= (uint32_t)(CLOCKS_CLK_GPOUT0_DIV_INT_BITS >> CLOCKS_CLK_GPOUT0_DIV_INT_LSB));
+
+    if (src_freq_mhz > (uint32_t)(CLOCKS_CLK_GPOUT0_DIV_INT_BITS >> CLOCKS_CLK_GPOUT0_DIV_INT_LSB))
+        return false;
+
+    uint32_t div = (uint32_t)((((uint32_t) src_freq_mhz) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / freq_mhz);
+#if PICO_RP2040
+    // on RP2040 only clock divider of 1, or  >= 2 are supported
+    if (div < (2u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB)) {
+        div = (1u << CLOCKS_CLK_GPOUT0_DIV_INT_LSB);
+    }
+#endif
+    uint32_t actual_freq = (uint32_t) ((((uint32_t) src_freq_mhz) << CLOCKS_CLK_GPOUT0_DIV_INT_LSB) / div) * MHZ;
+
+    clock_configure_internal(clock, src, auxsrc, actual_freq, div);
     return true;
 }
 
@@ -440,4 +464,19 @@ bool check_sys_clock_khz(uint32_t freq_khz, uint *vco_out, uint *postdiv1_out, u
         }
     }
     return false;
+}
+
+
+void clock_get_sleep_en_gate(clock_dest_bitset_t *dests) {
+    static_assert(CLOCKS_SLEEP_EN1_OFFSET == CLOCKS_SLEEP_EN0_OFFSET + 4, "");
+    for(uint i=0;i < fixed_bitset_word_size(&dests->bitset); i++) {
+        fixed_bitset_write_word(&dests->bitset, i, clocks_hw->sleep_en[i]);
+    }
+}
+
+void clock_gate_sleep_en(const clock_dest_bitset_t *dests) {
+    static_assert(CLOCKS_SLEEP_EN1_OFFSET == CLOCKS_SLEEP_EN0_OFFSET + 4, "");
+    for(uint i=0;i < fixed_bitset_word_size(&dests->bitset); i++) {
+        clocks_hw->sleep_en[i] = fixed_bitset_read_word(&dests->bitset, i);
+    }
 }

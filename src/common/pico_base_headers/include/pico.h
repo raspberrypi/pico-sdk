@@ -34,9 +34,9 @@
  * very early in the build configuration process. This allows setting CMake variables like `PICO_PLATFORM` from the board header, and thus
  * affecting, for example, the choice of compiler made by the build
  *
- * \note use of this macro will overwrite the CMake variable if it is already set
+ * \note Use of this macro will overwrite the CMake variable if it is already set
  *
- * \note this macro's definition is empty as it is not intended to have any effect on actual compilation
+ * \note This macro's definition is empty as it is not intended to have any effect on actual compilation
  */
 #define pico_board_cmake_set(x, y)
 
@@ -49,9 +49,9 @@
  * very early in the build configuration process. This allows setting CMake variables like `PICO_PLATFORM` from the board header, and thus
  * affecting, for example, the choice of compiler made by the build
  *
- * \note use of this macro will not overwrite the CMake variable if it is already set
+ * \note Use of this macro will not overwrite the CMake variable if it is already set
  *
- * \note this macro's definition is empty as it is not intended to have any effect on actual compilation
+ * \note This macro's definition is empty as it is not intended to have any effect on actual compilation
  */
 #define pico_board_cmake_set_default(x, y)
 

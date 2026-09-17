@@ -1,0 +1,1 @@
+*(EXCLUDE_FILE(*libgcc.a: *libm.a:) .text*)

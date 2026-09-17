@@ -520,4 +520,3 @@
 #define SPI_SSPPCELLID3_SSPPCELLID3_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_SPI_H
-

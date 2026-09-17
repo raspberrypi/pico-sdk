@@ -1,0 +1,17 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "pico_unaligned_string_test",
+    testonly = True,
+    srcs = ["pico_unaligned_string_test.c"],
+    # Without this the compiler expands or constant-folds most of the calls
+    # under test, and the test stops exercising libc at all.
+    copts = ["-fno-builtin"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_stdlib",
+    ],
+)

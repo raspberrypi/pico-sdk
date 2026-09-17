@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -123,7 +123,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SCLK_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_QSPI_GPIO_QSPI_SCLK_CTRL_OEOVER_RESET  _u(0x0)
@@ -138,7 +139,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SCLK_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_QSPI_GPIO_QSPI_SCLK_CTRL_OUTOVER_RESET  _u(0x0)
@@ -276,7 +278,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SS_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_QSPI_GPIO_QSPI_SS_CTRL_OEOVER_RESET  _u(0x0)
@@ -291,7 +294,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_RESET  _u(0x0)
@@ -429,7 +433,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SD0_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_QSPI_GPIO_QSPI_SD0_CTRL_OEOVER_RESET  _u(0x0)
@@ -444,7 +449,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SD0_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_QSPI_GPIO_QSPI_SD0_CTRL_OUTOVER_RESET  _u(0x0)
@@ -582,7 +588,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SD1_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_QSPI_GPIO_QSPI_SD1_CTRL_OEOVER_RESET  _u(0x0)
@@ -597,7 +604,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SD1_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_QSPI_GPIO_QSPI_SD1_CTRL_OUTOVER_RESET  _u(0x0)
@@ -735,7 +743,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SD2_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_QSPI_GPIO_QSPI_SD2_CTRL_OEOVER_RESET  _u(0x0)
@@ -750,7 +759,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SD2_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_QSPI_GPIO_QSPI_SD2_CTRL_OUTOVER_RESET  _u(0x0)
@@ -888,7 +898,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SD3_CTRL_OEOVER
 //               0x0 -> drive output enable from peripheral signal selected by funcsel
-//               0x1 -> drive output enable from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output enable from inverse of peripheral signal selected
+//               by funcsel
 //               0x2 -> disable output
 //               0x3 -> enable output
 #define IO_QSPI_GPIO_QSPI_SD3_CTRL_OEOVER_RESET  _u(0x0)
@@ -903,7 +914,8 @@
 // -----------------------------------------------------------------------------
 // Field       : IO_QSPI_GPIO_QSPI_SD3_CTRL_OUTOVER
 //               0x0 -> drive output from peripheral signal selected by funcsel
-//               0x1 -> drive output from inverse of peripheral signal selected by funcsel
+//               0x1 -> drive output from inverse of peripheral signal selected by
+//               funcsel
 //               0x2 -> drive output low
 //               0x3 -> drive output high
 #define IO_QSPI_GPIO_QSPI_SD3_CTRL_OUTOVER_RESET  _u(0x0)
@@ -2672,4 +2684,3 @@
 #define IO_QSPI_DORMANT_WAKE_INTS_GPIO_QSPI_SCLK_LEVEL_LOW_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_IO_QSPI_H
-

@@ -66,6 +66,12 @@ define_property(TARGET
     FULL_DOCS "OTP page storing the AES key"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_ENC_NO_CLEAR
+    INHERITED
+    BRIEF_DOCS "Do not clear SRAM when loading encrypted binary"
+    FULL_DOCS "Do not clear SRAM when loading encrypted binary"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_ENC_SIGFILE
     INHERITED
     BRIEF_DOCS "Private key for signing encrypted binaries"
@@ -101,6 +107,12 @@ define_property(TARGET
     BRIEF_DOCS "Ensure a load map is added"
     FULL_DOCS "Ensure a load map is added"
 )
+define_property(TARGET
+    PROPERTY PICO_ALLOW_EXAMPLE_KEYS
+    INHERITED
+    BRIEF_DOCS "Allow use of example keys"
+    FULL_DOCS "Allow use of example keys"
+)
 
 # Check pioasm is installed, or build it if not installed
 function(pico_init_pioasm)
@@ -131,7 +143,7 @@ endfunction()
 
 # Check picotool is installed, or download and build it if not installed
 function(pico_init_picotool)
-    set(picotool_VERSION_REQUIRED 2.1.1)
+    set(picotool_VERSION_REQUIRED 2.3.0)
     if (NOT TARGET picotool AND NOT DEFINED picotool_FOUND)
         # Build path of local install dir
         if (DEFINED ENV{PICOTOOL_FETCH_FROM_GIT_PATH} AND (NOT PICOTOOL_FETCH_FROM_GIT_PATH))
@@ -209,6 +221,7 @@ function(picotool_check_default_keys TARGET)
     picotool_compare_keys(${TARGET} ${picotool_sigfile} private.pem "signing")
     get_target_property(picotool_aesfile ${TARGET} PICOTOOL_AESFILE)
     picotool_compare_keys(${TARGET} ${picotool_aesfile} privateaes.bin "encryption")
+    picotool_compare_keys(${TARGET} ${picotool_aesfile} privateaes_old.bin "encryption")
     get_target_property(picotool_enc_sigfile ${TARGET} PICOTOOL_ENC_SIGFILE)
     picotool_compare_keys(${TARGET} ${picotool_enc_sigfile} private.pem "encrypted signing")
 endfunction()
@@ -480,7 +493,7 @@ function(pico_embed_pt_in_binary TARGET PTFILE)
     )
 endfunction()
 
-# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [MBEDTLS] [OTP_KEY_PAGE <page>])
+# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [MBEDTLS] [OTP_KEY_PAGE <page>] [NO_CLEAR])
 # \brief_nodesc\ Encrypt the taget binary
 #
 # Encrypt the target binary with the given AES key (should be a binary
@@ -510,8 +523,9 @@ endfunction()
 # \param\ EMBED Embed a decryption stage into the encrypted binary
 # \param\ MBEDTLS Use MbedTLS based decryption stage (faster, but less secure)
 # \param\ OTP_KEY_PAGE The OTP page storing the AES key
+# \param\ NO_CLEAR Do not clear SRAM when loading encrypted binary
 function(pico_encrypt_binary TARGET AESFILE IVFILE)
-    set(options EMBED MBEDTLS)
+    set(options EMBED MBEDTLS NO_CLEAR)
     set(oneValueArgs OTP_KEY_PAGE SIGFILE)
     # set(multiValueArgs )
     cmake_parse_arguments(PARSE_ARGV 3 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
@@ -540,6 +554,12 @@ function(pico_encrypt_binary TARGET AESFILE IVFILE)
     if (ENC_MBEDTLS)
         set_target_properties(${TARGET} PROPERTIES
             PICOTOOL_USE_MBEDTLS_DECRYPTION TRUE
+        )
+    endif()
+
+    if (ENC_NO_CLEAR)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENC_NO_CLEAR TRUE
         )
     endif()
 
@@ -613,6 +633,15 @@ function(pico_add_uf2_output TARGET)
                 set(picotool_family ${PICO_PLATFORM})
             endif()
         endif()
+        get_target_property(picotool_platform ${TARGET} PICOTOOL_UF2_PLATFORM)
+        if (NOT picotool_platform)
+            if (PICOTOOL_DEFAULT_PLATFORM)
+                set(picotool_platform ${PICOTOOL_DEFAULT_PLATFORM})
+            else()
+                # Set picotool_platform to the part of PICO_PLATFORM before the first -
+                string(REGEX MATCH "^[^-]+" picotool_platform ${PICO_PLATFORM})
+            endif()
+        endif()
         add_custom_command(TARGET ${TARGET} POST_BUILD
             COMMAND picotool
             ARGS uf2 convert
@@ -621,6 +650,7 @@ function(pico_add_uf2_output TARGET)
                 $<TARGET_FILE:${TARGET}>
                 ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2
                 --family ${picotool_family}
+                --platform ${picotool_platform}
                 ${extra_uf2_args}
             COMMAND_EXPAND_LISTS
             VERBATIM
@@ -634,6 +664,10 @@ function(picotool_postprocess_binary TARGET)
     set_target_properties(${TARGET} PROPERTIES
         PICOTOOL_PROCESSING_CONFIGURED true
     )
+
+    if (NOT DEFINED PICO_ALLOW_EXAMPLE_KEYS)
+        get_target_property(PICO_ALLOW_EXAMPLE_KEYS ${TARGET} PICO_ALLOW_EXAMPLE_KEYS)
+    endif()
 
     # PICO_CMAKE_CONFIG: PICO_ALLOW_EXAMPLE_KEYS, Don't raise a warning when using default signing/encryption keys, type=bool, default=0, group=build
     if (NOT PICO_ALLOW_EXAMPLE_KEYS)
@@ -709,9 +743,17 @@ function(picotool_postprocess_binary TARGET)
                     ${picotool_args}
                 COMMAND_EXPAND_LISTS
                 VERBATIM)
+
+            # tag that this binary will be sealed
+            target_compile_definitions(${TARGET} PRIVATE PICO_PICOTOOL_SEALED=1)
         endif()
         # Encryption
         if (picotool_aesfile AND picotool_ivfile)
+            get_target_property(enc_no_clear ${TARGET} PICOTOOL_ENC_NO_CLEAR)
+            if (enc_no_clear)
+                list(APPEND picotool_encrypt_args "--no-clear")
+            endif()
+
             get_target_property(picotool_embed_decryption ${TARGET} PICOTOOL_EMBED_DECRYPTION)
             if (picotool_embed_decryption)
                 list(APPEND picotool_encrypt_args "--embed")

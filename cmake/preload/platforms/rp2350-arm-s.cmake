@@ -1,3 +1,5 @@
-set(PICO_DEFAULT_COMPILER "pico_arm_cortex_m33_gcc")
+set(PICO_DEFAULT_GCC_COMPILER "pico_arm_cortex_m33_gcc")
+set(PICO_DEFAULT_CLANG_COMPILER "pico_arm_cortex_m33_clang")
+set(PICO_DEFAULT_COMPILER ${PICO_DEFAULT_GCC_COMPILER})
 set(PICO_CHIP rp2350)
 

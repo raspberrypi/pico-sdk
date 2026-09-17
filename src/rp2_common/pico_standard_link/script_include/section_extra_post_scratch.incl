@@ -1,0 +1,6 @@
+/* Empty file
+
+   This file is included between the end of scratch and the start of the stack.
+
+   It can be overridden to add extra sections in the scratch memory, before the stack.
+*/

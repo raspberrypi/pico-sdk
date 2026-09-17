@@ -1,0 +1,7 @@
+# TODO: Add these tests to the Bazel build.
+filegroup(
+    name = "unsupported_tests",
+    srcs = [
+        "panic_function_test.c",
+    ],
+)

@@ -28,10 +28,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*! \brief A semaphore for controlling access to a shared resource
+ *  \ingroup sem
+ *
+ * Holds the current number of available permits and the maximum permitted count.
+ */
 typedef struct semaphore {
-    struct lock_core core;
-    int16_t permits;
-    int16_t max_permits;
+    struct lock_core core; ///< Core lock primitive used for blocking and signalling
+    int16_t permits; ///< Current number of available permits
+    int16_t max_permits; ///< Maximum number of permits allowed
 } semaphore_t;
 
 
@@ -39,7 +45,7 @@ typedef struct semaphore {
  *  \ingroup sem
  *
  * \param sem Pointer to semaphore structure
- * \param initial_permits How many permits are initially acquired
+ * \param initial_permits How many permits are initially available
  * \param max_permits  Total number of permits allowed for this semaphore
  */
 void sem_init(semaphore_t *sem, int16_t initial_permits, int16_t max_permits);

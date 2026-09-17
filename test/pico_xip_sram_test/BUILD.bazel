@@ -1,0 +1,69 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel/util:transition.bzl", "extra_copts_for_all_deps", "pico_set_binary_type")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_critical_xip_sram_test_extra_link",
+    actual = select({
+        "//bazel/constraint:rp2040": "//bazel:empty_cc_lib",
+        "//conditions:default": "//src/rp2_common/hardware_riscv_platform_timer",
+    }),
+    visibility = ["//visibility:private"],
+)
+
+cc_binary(
+    name = "pico_critical_xip_sram_test_actual",
+    testonly = True,
+    srcs = ["pico_critical_xip_sram_test.c"],
+    tags = ["manual"],  # Built via pico_critical_xip_sram_test
+    deps = [
+        ":pico_critical_xip_sram_test_extra_link",
+        "//src/rp2_common/hardware_dma",
+        "//src/rp2_common/pico_multicore",
+        "//src/rp2_common/pico_stdlib",
+        "//test/pico_test",
+    ],
+)
+
+pico_set_binary_type(
+    name = "pico_critical_xip_sram_test_typed",
+    testonly = True,
+    src = ":pico_critical_xip_sram_test_actual",
+    binary_type = "copy_to_ram",
+    target_compatible_with = compatible_with_rp2(),
+)
+
+extra_copts_for_all_deps(
+    name = "pico_critical_xip_sram_test",
+    testonly = True,
+    src = ":pico_critical_xip_sram_test_typed",
+    extra_copts = [
+        "-DPICO_TIME_CRITICAL_PLACEMENT=__in_xip_ram",
+        "-DPICO_USE_XIP_CACHE_AS_RAM=1",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+)
+
+# Currently doesn't fit, because bazel doesn't have a pico_minimize_runtime equivalent
+exports_files(["pico_xip_sram_test.c"])
+# cc_binary(
+#     name = "pico_xip_sram_test_actual",
+#     testonly = True,
+#     srcs = ["pico_xip_sram_test.c"],
+#     tags = ["manual"],  # Built via pico_xip_sram_test
+#     deps = [
+#         "//src/rp2_common/pico_stdlib",
+#         "//src/rp2_common/pico_multicore",
+#         "//src/rp2_common/hardware_dma",
+#     ],
+# )
+#
+# pico_set_binary_type(
+#     name = "pico_xip_sram_test",
+#     testonly = True,
+#     src = ":pico_xip_sram_test_actual",
+#     binary_type = "xip_ram",
+#     target_compatible_with = compatible_with_rp2() + incompatible_with_config("//bazel/constraint:rp2040"),
+# )

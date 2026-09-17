@@ -59,4 +59,3 @@
 #define HSTX_FIFO_FIFO_ACCESS "WF"
 // =============================================================================
 #endif // _HARDWARE_REGS_HSTX_FIFO_H
-

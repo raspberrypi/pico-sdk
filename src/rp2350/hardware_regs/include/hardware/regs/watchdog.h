@@ -189,4 +189,3 @@
 #define WATCHDOG_SCRATCH7_ACCESS "RW"
 // =============================================================================
 #endif // _HARDWARE_REGS_WATCHDOG_H
-

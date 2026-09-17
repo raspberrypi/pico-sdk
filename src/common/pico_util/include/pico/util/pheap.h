@@ -48,8 +48,16 @@ typedef uint16_t pheap_node_id_t;
 #error invalid PICO_PHEAP_MAX_ENTRIES
 #endif
 
+/*! \brief A node within a pairing heap
+ *  \ingroup util_pheap
+ *
+ * Stores the linkage indices for a single node in the heap tree.
+ * User state for each node is maintained separately in a companion array.
+ */
 typedef struct pheap_node {
-    pheap_node_id_t child, sibling, parent;
+    pheap_node_id_t child;   ///< Id of the first child node, or 0 if none
+    pheap_node_id_t sibling; ///< Id of the next sibling node, or 0 if none
+    pheap_node_id_t parent;  ///< Id of the parent node, or 0 if this is the root
 } pheap_node_t;
 
 /**
@@ -60,15 +68,21 @@ typedef struct pheap_node {
  */
 typedef bool (*pheap_comparator)(void *user_data, pheap_node_id_t a, pheap_node_id_t b);
 
+/*! \brief A pairing heap instance
+ *  \ingroup util_pheap
+ *
+ * Maintains the state for a pairing heap. Create with ph_create() or initialise
+ * statically with PHEAP_DEFINE_STATIC() and ph_post_alloc_init().
+ */
 typedef struct pheap {
-    pheap_node_t *nodes;
-    pheap_comparator comparator;
-    void *user_data;
-    pheap_node_id_t max_nodes;
-    pheap_node_id_t root_id;
+    pheap_node_t *nodes;          ///< Array of all nodes, indexed by node id minus one
+    pheap_comparator comparator;  ///< Comparator used to determine relative ordering of nodes
+    void *user_data;              ///< User data pointer passed to the comparator
+    pheap_node_id_t max_nodes;    ///< Maximum number of nodes the heap can hold
+    pheap_node_id_t root_id;      ///< Id of the current root (minimum) node, or 0 if the heap is empty
     // we remove from head and add to tail to stop reusing the same ids
-    pheap_node_id_t free_head_id;
-    pheap_node_id_t free_tail_id;
+    pheap_node_id_t free_head_id; ///< Id of the first node in the free list, or 0 if none
+    pheap_node_id_t free_tail_id; ///< Id of the last node in the free list, or 0 if none
 } pheap_t;
 
 /**

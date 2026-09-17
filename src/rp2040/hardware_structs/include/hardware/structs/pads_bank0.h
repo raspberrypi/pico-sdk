@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -26,9 +26,9 @@
 typedef struct {
     _REG_(PADS_BANK0_VOLTAGE_SELECT_OFFSET) // PADS_BANK0_VOLTAGE_SELECT
     // Voltage select
-    // 0x00000001 [0]     VOLTAGE_SELECT (0) 
+    // 0x00000001 [0]     VOLTAGE_SELECT (0)
     io_rw_32 voltage_select;
- 
+
     // (Description copied from array index 0 register PADS_BANK0_GPIO0 applies similarly to other array indexes)
     _REG_(PADS_BANK0_GPIO0_OFFSET) // PADS_BANK0_GPIO0
     // Pad control register
@@ -46,4 +46,3 @@ typedef struct {
 static_assert(sizeof (pads_bank0_hw_t) == 0x007c, "");
 
 #endif // _HARDWARE_STRUCTS_PADS_BANK0_H
-

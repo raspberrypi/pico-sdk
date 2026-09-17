@@ -11,8 +11,8 @@ if (NOT TARGET pico_printf)
     add_library(pico_printf_default INTERFACE)
     target_link_libraries(pico_printf_default INTERFACE pico_printf_pico)
 
-    set(PICO_DEFAULT_PRINTF_IMPL pico_printf_default)
-
+    # PICO_CMAKE_CONFIG: PICO_DEFAULT_PRINTF_IMPL, The default implementation for pico_printf to link; 'compiler' lets the C compiler/library control printf behavior while 'pico' provides a compact pico-specific implementation, type=string, default=pico, group=pico_printf
+    pico_fixup_default_impl(PICO_DEFAULT_PRINTF_IMPL pico_printf default)
     target_link_libraries(pico_printf INTERFACE
             $<IF:$<BOOL:$<TARGET_PROPERTY:PICO_TARGET_PRINTF_IMPL>>,$<TARGET_PROPERTY:PICO_TARGET_PRINTF_IMPL>,${PICO_DEFAULT_PRINTF_IMPL}>)
 

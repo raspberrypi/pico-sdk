@@ -12,7 +12,7 @@
 static bool exception_is_compile_time_default(exception_handler_t handler) {
 #ifdef __riscv
     extern char __unhandled_exception;
-    return (uintptr_t)handler == (uintptr_t)__unhandled_exception;
+    return (uintptr_t)handler == (uintptr_t)&__unhandled_exception;
 #else
     extern char __default_isrs_start;
     extern char __default_isrs_end;

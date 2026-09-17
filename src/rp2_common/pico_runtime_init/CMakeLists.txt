@@ -21,6 +21,9 @@ endif()
 if (TARGET hardware_vreg)
     pico_mirrored_target_link_libraries(pico_runtime_init INTERFACE hardware_vreg)
 endif()
+if (TARGET hardware_rtc)
+    pico_mirrored_target_link_libraries(pico_runtime_init INTERFACE hardware_rtc)
+endif()
 
 # pico/runtime_init.h includes pico/runtime.h
 target_link_libraries(pico_runtime_init_headers INTERFACE pico_runtime_headers)

@@ -4,6 +4,7 @@ if (NOT TARGET pico_cxx_options)
     target_sources(pico_cxx_options INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/new_delete.cpp
     )
+    target_include_directories(pico_cxx_options SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
     # PICO_CMAKE_CONFIG: PICO_CXX_ENABLE_EXCEPTIONS, Enable CXX exception handling, type=bool, default=0, group=pico_cxx_options
     # PICO_BUILD_DEFINE: PICO_CXX_ENABLE_EXCEPTIONS, value of CMake var PICO_CXX_ENABLE_EXCEPTIONS, type=string, default=0, group=pico_cxx_options

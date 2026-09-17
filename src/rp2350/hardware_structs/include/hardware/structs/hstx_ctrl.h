@@ -34,7 +34,7 @@ typedef struct {
     // 0x00000002 [1]     EXPAND_EN    (0) Enable the command expander
     // 0x00000001 [0]     EN           (0) When EN is 1, the HSTX will shift out data as it appears...
     io_rw_32 csr;
- 
+
     // (Description copied from array index 0 register HSTX_CTRL_BIT0 applies similarly to other array indexes)
     _REG_(HSTX_CTRL_BIT0_OFFSET) // HSTX_CTRL_BIT0
     // Data control register for output bit 0
@@ -43,7 +43,7 @@ typedef struct {
     // 0x00001f00 [12:8]  SEL_N        (0x00) Shift register data bit select for the second half of...
     // 0x0000001f [4:0]   SEL_P        (0x00) Shift register data bit select for the first half of the...
     io_rw_32 bit[8];
- 
+
     _REG_(HSTX_CTRL_EXPAND_SHIFT_OFFSET) // HSTX_CTRL_EXPAND_SHIFT
     // Configure the optional shifter inside the command expander
     // 0x1f000000 [28:24] ENC_N_SHIFTS (0x01) Number of times to consume from the shift register...
@@ -51,7 +51,7 @@ typedef struct {
     // 0x00001f00 [12:8]  RAW_N_SHIFTS (0x01) Number of times to consume from the shift register...
     // 0x0000001f [4:0]   RAW_SHIFT    (0x00) How many bits to right-rotate the shift register by each...
     io_rw_32 expand_shift;
- 
+
     _REG_(HSTX_CTRL_EXPAND_TMDS_OFFSET) // HSTX_CTRL_EXPAND_TMDS
     // Configure the optional TMDS encoder inside the command expander
     // 0x00e00000 [23:21] L2_NBITS     (0x0) Number of valid data bits for the lane 2 TMDS encoder,...
@@ -67,4 +67,3 @@ typedef struct {
 static_assert(sizeof (hstx_ctrl_hw_t) == 0x002c, "");
 
 #endif // _HARDWARE_STRUCTS_HSTX_CTRL_H
-

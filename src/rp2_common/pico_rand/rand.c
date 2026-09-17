@@ -126,7 +126,7 @@ static uint64_t sdbm_hash64_sram(uint64_t hash) {
 }
 #endif
 
-#if PICO_RAND_SEED_ENTROPY_SRC_TRNG | PICO_RAND_ENTROPY_SRC_TRNG
+#if PICO_RAND_SEED_ENTROPY_SRC_TRNG || PICO_RAND_ENTROPY_SRC_TRNG
 #if !HAS_RP2350_TRNG
 #error PICO_RAND_SEED_ENTROPY_SRC_TRNG and PICO_RAND_ENTROPY_SRC_TRNG are only valid on RP2350
 #endif
@@ -170,7 +170,7 @@ static uint64_t capture_additional_trng_samples(void) {
         // TRNG is now sampling again, having started after we read the last
         // EHR word. Grab some random bits and use them to modulate
         // the chain length, to reduce chance of injection locking:
-        trng_hw->trng_config = rng_state.r[0];
+        trng_hw->trng_config = (uint32_t)rng_state.r[0];
     }
     trng_sample_word_count -= 2;
     uint64_t rc = trng_sample_words[trng_sample_word_count] |
@@ -224,7 +224,8 @@ static uint64_t capture_additional_rosc_samples(uint n) {
                 bit_done = true;
                 if (i == n - 1) {
                     // samples has our random bits, so let's mix them in now
-                    samples = rosc_samples = (rosc_samples << n) | samples;
+                    if (n < 64) samples |= rosc_samples << n;
+                    rosc_samples = samples;
                 }
             }
             spin_unlock(lock, save);
@@ -239,7 +240,7 @@ static uint64_t capture_additional_rosc_samples(uint n) {
 #endif
 
 static void initialise_rand(void) {
-    rng_128_t local_rng_state = local_rng_state;
+    rng_128_t local_rng_state = {0};
     uint which = 0;
 #if PICO_RAND_SEED_ENTROPY_SRC_RAM_HASH
     ram_hash = sdbm_hash64_sram(ram_hash);
@@ -365,9 +366,10 @@ uint64_t __weak get_rand_64(void) {
     spin_lock_t *lock = spin_lock_instance(PICO_SPINLOCK_ID_RAND);
     uint32_t save = spin_lock_blocking(lock);
     if (local_check_byte != check_byte) {
-        // someone got a random number in the interim, so mix it in
-        local_rng_state.r[0] ^= rng_state.r[0];
-        local_rng_state.r[1] ^= rng_state.r[1];
+        // Someone got a random number in the interim, so mix in their state
+        // updates. Splitmix to avoid XOR cancelling of original state
+        local_rng_state.r[0] ^= splitmix64(rng_state.r[0]);
+        local_rng_state.r[1] ^= splitmix64(rng_state.r[1]);
     }
     // Generate a 64-bit RN from the modified PRNG state.
     // Note: This also "churns" the 128-bit state for next time.

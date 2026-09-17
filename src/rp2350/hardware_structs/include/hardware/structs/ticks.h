@@ -23,7 +23,7 @@
 // Bit-field descriptions are of the form:
 // BITMASK [BITRANGE] FIELDNAME (RESETVALUE) DESCRIPTION
 
-/*! \brief Tick generator numbers on RP2350 (used as typedef \ref tick_gen_num_t) 
+/*! \brief Tick generator numbers on RP2350 (used as typedef \ref tick_gen_num_t)
  *  \ingroup hardware_ticks
  */
 typedef enum tick_gen_num_rp2350 {
@@ -42,11 +42,11 @@ typedef struct {
     // 0x00000002 [1]     RUNNING      (-) Is the tick generator running?
     // 0x00000001 [0]     ENABLE       (0) start / stop tick generation
     io_rw_32 ctrl;
- 
+
     _REG_(TICKS_PROC0_CYCLES_OFFSET) // TICKS_PROC0_CYCLES
     // 0x000001ff [8:0]   PROC0_CYCLES (0x000) Total number of clk_tick cycles before the next tick
     io_rw_32 cycles;
- 
+
     _REG_(TICKS_PROC0_COUNT_OFFSET) // TICKS_PROC0_COUNT
     // 0x000001ff [8:0]   PROC0_COUNT  (-) Count down timer: the remaining number clk_tick cycles...
     io_ro_32 count;
@@ -60,4 +60,3 @@ typedef struct {
 static_assert(sizeof (ticks_hw_t) == 0x0048, "");
 
 #endif // _HARDWARE_STRUCTS_TICKS_H
-

@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include <time.h>
+#include "pico/time.h"
 #include "pico/util/datetime.h"
 #include "hardware/regs/intctrl.h"
 
@@ -179,6 +180,23 @@ bool aon_timer_get_time(struct timespec *ts);
  * \sa aon_timer_get_time
  */
 bool aon_timer_get_time_calendar(struct tm *tm);
+
+/**
+ * \brief Get the current time of the AON timer as an absolute time
+ * \ingroup pico_aon_timer
+ * \return the current time of the AON timer as an absolute time
+ */
+absolute_time_t aon_timer_get_absolute_time(void);
+
+/*! \brief Convenience method to get the timestamp a number of milliseconds from the current time of the AON timer
+ * \ingroup pico_aon_timer
+ *
+ * \param ms the number of milliseconds to add to the current timestamp
+ * \return the future timestamp
+ */
+ static inline absolute_time_t aon_timer_make_timeout_time_ms(uint32_t ms) {
+    return delayed_by_ms(aon_timer_get_absolute_time(), ms);
+}
 
 /**
  * \brief Get the resolution of the AON timer

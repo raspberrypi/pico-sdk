@@ -190,10 +190,17 @@ static void stdio_stack_buffer_flush(stdio_stack_buffer_t *buffer) {
 
 static void stdio_buffered_printer(char c, void *arg) {
     stdio_stack_buffer_t *buffer = (stdio_stack_buffer_t *)arg;
+    // Invariant: buffer is never full at this point, as:
+    // * It's initially empty.
+    // * It's flushed if the following write makes it full.
+    // Therefore it's safe to perform this write *before* the `if (full)`:
+    buffer->buf[buffer->used++] = c;
+    // Hoisting the buffer write above the flush check lets the compiler omit
+    // stack setup/teardown in the early-out case. Savings add up because
+    // this function is called per char and cannot be inlined.
     if (buffer->used == PICO_STDIO_STACK_BUFFER_SIZE) {
         stdio_stack_buffer_flush(buffer);
     }
-    buffer->buf[buffer->used++] = c;
 }
 #endif
 
@@ -336,6 +343,21 @@ int PRIMARY_STDIO_FUNC(vprintf)(const char *format, va_list va) {
     ret = 0;
 #else
     ret = REAL_FUNC(vprintf)(format, va);
+    // if we're using PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS, then vprintf is short-circuited to here,
+    // but we just go ahead and call the library function anyway as we're PICO_PRINTF_COMPILER.
+    // therefore we should flush stdout here in case the next thing is a puts/putchar which DO still
+    // short-circuit the c library completely.
+    //
+    // note the more correct place to handle this would be in the short-circuited functions
+    // but that would cause infinite recursion as they are called during flush of stdout!
+    // this is reasonable best-effort solution (if you really care you can set
+    // PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS=0 when using pico_printf `compiler`)
+#if PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS
+    // llvm libc doesn't have fflush, nor does it buffer separately
+#if !LIB_PICO_LLVM_LIBC_INTERFACE
+    fflush(stdout);
+#endif
+#endif
 #endif
     if (serialized) {
         stdout_serialize_end();

@@ -9,6 +9,7 @@
 
 #include "pico.h"
 #include "hardware/structs/clocks.h"
+#include "pico/util/fixed_bitset.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +27,7 @@ extern "C" {
  * it uses multiple clock generators to provide the required clocks. This architecture allows the user flexibility to start and
  * stop clocks independently and to vary some clock frequencies whilst maintaining others at their optimum frequencies
  *
- * Please refer to the appropriate datasheet for more details on the RP-series clocks.
+ * Please refer to the appropriate datasheet for more details on the clocks in RP-series microcontroller.
  *
  * The clock source depends on which clock you are attempting to configure. The first table below shows main clock sources. If
  * you are not setting the Reference clock or the System clock, or you are specifying that one of those two will be using an auxiliary
@@ -318,6 +319,32 @@ typedef clock_num_t clock_handle_t;
  */
 bool clock_configure(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq, uint32_t freq);
 
+/*! \brief Configure the specified clock with 1MHz accuracy
+ *  \ingroup hardware_clocks
+ *
+ * This function differs from clock_configure in that it does not configure the clocks as accurately,
+ * but therefore doesn't need to bring in 64-bit division functions, reducing the code size if 64-bit
+ * division is not otherwise used by the application.
+ *
+ * \if rp2350_specific
+ * Note: The RP2350 clock hardware supports divisors from 1.0->65536.0 in steps of 1/65536
+ *
+ * \endif
+ * \if rp2040_specific
+ * Note: The RP2040 clock hardware only supports divisors of exactly 1.0 or 2.0->16777216.0 in steps of 1/256
+ * \endif
+ *
+ * See the tables in the description for details on the possible values for clock sources.
+ *
+ * \param clock The clock to configure
+ * \param src The main clock source, can be 0.
+ * \param auxsrc The auxiliary clock source, which depends on which clock is being set. Can be 0
+ * \param src_freq_mhz Frequency of the input clock source in MHz
+ * \param freq_mhz Requested frequency in MHz
+ * \return true if the clock is updated, false if freq > src_freq
+ */
+bool clock_configure_mhz(clock_handle_t clock, uint32_t src, uint32_t auxsrc, uint32_t src_freq_mhz, uint32_t freq_mhz);
+
 /*! \brief Configure the specified clock to use the undivided input source
  *  \ingroup hardware_clocks
  *
@@ -358,11 +385,14 @@ void clock_stop(clock_handle_t clock);
  */
 uint32_t clock_get_hz(clock_handle_t clock);
 
-/*! \brief Measure a clocks frequency using the Frequency counter.
+/*! \brief Measure a clock's frequency using the frequency counter.
  *  \ingroup hardware_clocks
  *
- * Uses the inbuilt frequency counter to measure the specified clocks frequency.
- * Currently, this function is accurate to +-1KHz. See the datasheet for more details.
+ * Uses the builtin frequency counter to measure the specified clock's frequency.
+ * Currently, this function is accurate to +-1kHz. See the datasheet for more details.
+ *
+ * \param src The clock src to measure, see the FC0_SRC register in the datasheet
+ * \return The measured frequency in kHz
  */
 uint32_t frequency_count_khz(uint src);
 
@@ -373,6 +403,15 @@ uint32_t frequency_count_khz(uint src);
  */
 void clock_set_reported_hz(clock_handle_t clock, uint hz);
 
+/*! \brief Measure a clock's frequency using the frequency counter.
+ *  \ingroup hardware_clocks
+ *
+ * Uses the builtin frequency counter to measure the specified clock's frequency.
+ * Currently, this function is accurate to +-1kHz. See the datasheet for more details.
+ *
+ * \param src The clock src to measure, see the FC0_SRC register in the datasheet
+ * \return The measured frequency in MHz
+ */
 /// \tag::frequency_count_mhz[]
 static inline float frequency_count_mhz(uint src) {
     return ((float) (frequency_count_khz(src))) / KHZ;
@@ -490,6 +529,7 @@ static inline void clock_gpio_init(uint gpio, uint src, float div)
  * \param gpio The GPIO pin to run the clock from. Valid GPIOs are: 20 and 22.
  * \param src_freq Frequency of the input clock source
  * \param freq Requested frequency
+ * \return true if the clock is updated, false if freq > src_freq
  */
 bool clock_configure_gpin(clock_handle_t clock, uint gpio, uint32_t src_freq, uint32_t freq);
 
@@ -577,6 +617,33 @@ static inline bool set_sys_clock_khz(uint32_t freq_khz, bool required) {
     return false;
 }
 
+typedef fixed_bitset_type(NUM_CLOCK_DESTINATIONS) clock_dest_bitset_t;
+#define clock_dest_bitset_none() fixed_bitset_with_fill(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 0)
+#define clock_dest_bitset_all() fixed_bitset_with_fill(clock_dest_bitset_t, NUM_CLOCK_DESTINATIONS, 1)
+
+static inline clock_dest_bitset_t *clock_dest_bitset_clear(clock_dest_bitset_t *dests) {
+    fixed_bitset_clear_all(&dests->bitset);
+    return dests;
+}
+
+static inline clock_dest_bitset_t *clock_dest_bitset_add_all(clock_dest_bitset_t *dests) {
+    fixed_bitset_set_all(&dests->bitset);
+    return dests;
+}
+
+static inline clock_dest_bitset_t *clock_dest_bitset_add(clock_dest_bitset_t *dests, clock_dest_num_t dest) {
+    fixed_bitset_set(&dests->bitset, dest);
+    return dests;
+}
+
+static inline clock_dest_bitset_t *clock_dest_bitset_remove(clock_dest_bitset_t *dests, clock_dest_num_t dest) {
+    fixed_bitset_clear(&dests->bitset, dest);
+    return dests;
+}
+
+void clock_get_sleep_en_gate(clock_dest_bitset_t *clocks);
+void clock_gate_sleep_en(const clock_dest_bitset_t *clocks);
+
 #define GPIO_TO_GPOUT_CLOCK_HANDLE_RP2040(gpio, default_clk_handle) \
     ((gpio) == 21 ? clk_gpout0 :                        \
         ((gpio) == 23 ? clk_gpout1 :                    \
@@ -604,7 +671,7 @@ static inline bool set_sys_clock_khz(uint32_t freq_khz, bool required) {
 #define GPIO_TO_GPOUT_CLOCK_HANDLE GPIO_TO_GPOUT_CLOCK_HANDLE_RP2350
 #endif
 #endif
-    
+
 /**
  * \brief return the associated GPOUT clock for a given GPIO if any
  * \ingroup hardware_clocks

@@ -49,7 +49,6 @@ function(pico_define_boot_stage2 NAME SOURCES)
     if (PICO_C_COMPILER_IS_CLANG)
         target_link_options(${NAME} PRIVATE "-nostdlib")
     elseif (PICO_C_COMPILER_IS_GNU)
-        target_link_options(${NAME} PRIVATE "--specs=nosys.specs")
         target_link_options(${NAME} PRIVATE "-nostartfiles")
     endif ()
 

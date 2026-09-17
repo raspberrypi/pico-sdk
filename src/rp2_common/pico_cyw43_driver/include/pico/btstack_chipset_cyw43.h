@@ -9,10 +9,18 @@
 
 #include "btstack_chipset.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief Return the singleton BTstack chipset CY43 API instance
  * \ingroup pico_btstack
  */
 const btstack_chipset_t * btstack_chipset_cyw43_instance(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

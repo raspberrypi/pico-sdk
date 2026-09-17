@@ -10,6 +10,12 @@
 #include "pico.h"
 #if HAS_RP2040_RTC
 #include "hardware/structs/rtc.h"
+
+// The RTC clock frequency is 48MHz divided by power of 2 (to ensure an integer
+// division ratio will be used in the clocks block).  A divisor of 1024 generates
+// an RTC clock tick of 46875Hz.  This frequency is relatively close to the
+// customary 32 or 32.768kHz 'slow clock' crystals and provides good timing resolution.
+#define RTC_CLOCK_FREQ_HZ       (USB_CLK_HZ / 1024)
 #endif
 
 /** \file hardware/rtc.h
@@ -49,7 +55,7 @@ void rtc_init(void);
 /*! \brief Set the RTC to the specified time
  *  \ingroup hardware_rtc
  *
- * \note Note that after setting the RTC date and time, a subsequent read of the values (e.g. via rtc_get_datetime()) may not
+ * \note After setting the RTC date and time, a subsequent read of the values (e.g. via rtc_get_datetime()) may not
  * reflect the new setting until up to three cycles of the potentially-much-slower RTC clock domain have passed. This represents a period
  * of 64 microseconds with the default RTC clock configuration.
  *
@@ -89,6 +95,17 @@ void rtc_enable_alarm(void);
  *  \ingroup hardware_rtc
  */
 void rtc_disable_alarm(void);
+
+/*! \brief Run the RTC from an external clock source through GPIO
+ *  \ingroup hardware_rtc
+ *
+ * \note This function will return false if the external clock source is not running.
+ *
+ * \param src_hz The frequency of the external clock source
+ * \param gpio_pin The input pin providing the external clock (GP20 or GP22)
+ * \return true if it is possible to run the RTC from the external clock frequency, false otherwise.
+ */
+bool rtc_run_from_external_source(uint32_t src_hz, uint gpio_pin);
 
 #ifdef __cplusplus
 }

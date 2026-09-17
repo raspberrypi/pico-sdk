@@ -1,0 +1,7 @@
+/* Empty file
+
+   This file is included after the section_end file.
+
+   It can be overridden to override any symbols provided by the linker scripts,
+   or to add custom asserts.
+*/

@@ -71,22 +71,29 @@ typedef struct async_context_freertos_config {
 #endif
 } async_context_freertos_config_t;
 
+/*! \brief Internal state for an async_context_freertos instance
+ *  \ingroup async_context_freertos
+ *
+ * Holds all runtime state for an async_context backed by a dedicated FreeRTOS task.
+ * Users should treat this as an opaque type and initialise it via
+ * \ref async_context_freertos_init() or \ref async_context_freertos_init_with_defaults().
+ */
 struct async_context_freertos {
-    async_context_t core;
-    SemaphoreHandle_t lock_mutex;
-    SemaphoreHandle_t work_needed_sem;
-    SemaphoreHandle_t task_complete_sem;
-    TimerHandle_t timer_handle;
-    TaskHandle_t task_handle;
+    async_context_t core; ///< Base async_context structure (must be first)
+    SemaphoreHandle_t lock_mutex; ///< Mutex used to serialise access to the context
+    SemaphoreHandle_t work_needed_sem; ///< Semaphore signalled when work is pending
+    SemaphoreHandle_t task_complete_sem; ///< Semaphore signalled when the task has exited
+    TimerHandle_t timer_handle; ///< FreeRTOS timer used to schedule time-based work
+    TaskHandle_t task_handle; ///< Handle of the worker task
 #if configSUPPORT_STATIC_ALLOCATION
-    StaticSemaphore_t lock_mutex_buf;
-    StaticSemaphore_t work_needed_sem_buf;
-    StaticSemaphore_t task_complete_sem_buf;
-    StaticTimer_t timer_buf;
-    StaticTask_t task_buf;
+    StaticSemaphore_t lock_mutex_buf; ///< Static storage for the lock mutex
+    StaticSemaphore_t work_needed_sem_buf; ///< Static storage for the work semaphore
+    StaticSemaphore_t task_complete_sem_buf; ///< Static storage for the completion semaphore
+    StaticTimer_t timer_buf; ///< Static storage for the timer
+    StaticTask_t task_buf; ///< Static storage for the worker task
 #endif
-    uint8_t nesting;
-    volatile bool task_should_exit;
+    uint8_t nesting; ///< Lock nesting depth
+    volatile bool task_should_exit; ///< Set to true to request the worker task to exit
 };
 
 /*!

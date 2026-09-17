@@ -18,10 +18,10 @@ void __weak runtime_init_mutex(void) {
     static_assert(!(sizeof(recursive_mutex_t)&3), "");
     static_assert(!offsetof(mutex_t, core), "");
     static_assert(!offsetof(recursive_mutex_t, core), "");
-    extern lock_core_t __mutex_array_start;
+    extern lock_core_t __mutex_array_start[];
     extern lock_core_t __mutex_array_end;
 
-    for (lock_core_t *l = &__mutex_array_start; l < &__mutex_array_end; ) {
+    for (lock_core_t *l = &__mutex_array_start[0]; l < &__mutex_array_end; ) {
         if (l->spin_lock) {
             assert(1 == (uintptr_t)l->spin_lock); // indicator for a recursive mutex
             recursive_mutex_t *rm = (recursive_mutex_t *)l;
@@ -75,6 +75,7 @@ void __time_critical_func(mutex_enter_blocking)(mutex_t *mtx) {
             break;
         }
         lock_internal_spin_unlock_with_wait(&mtx->core, save);
+        blocked_waiter_wakeup(false);
     } while (true);
 }
 
@@ -91,6 +92,7 @@ void __time_critical_func(recursive_mutex_enter_blocking)(recursive_mutex_t *mtx
         } else {
             lock_internal_spin_unlock_with_wait(&mtx->core, save);
         }
+        blocked_waiter_wakeup(false);
     } while (true);
 }
 
@@ -173,11 +175,12 @@ bool __time_critical_func(mutex_enter_block_until)(mutex_t *mtx, absolute_time_t
             return true;
         } else {
             if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&mtx->core, save, until)) {
-                // timed out
+                blocked_waiter_wakeup(true);
                 return false;
             }
             // not timed out; spin lock already unlocked, so loop again
         }
+        blocked_waiter_wakeup(false);
     } while (true);
 }
 
@@ -194,11 +197,12 @@ bool __time_critical_func(recursive_mutex_enter_block_until)(recursive_mutex_t *
             return true;
         } else {
             if (lock_internal_spin_unlock_with_best_effort_wait_or_timeout(&mtx->core, save, until)) {
-                // timed out
+                blocked_waiter_wakeup(true);
                 return false;
             }
             // not timed out; spin lock already unlocked, so loop again
         }
+        blocked_waiter_wakeup(false);
     } while (true);
 }
 

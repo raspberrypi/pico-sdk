@@ -203,7 +203,7 @@ int main() {
 
     printf("%d tests failed.\n", failed);
     if (failed == 0) {
-        printf("Well done, you can relax now\n");
+        printf("PASSED\n");
     }
 done:
     while (true) {asm volatile ("wfi\n");} // keep USB stdout alive

@@ -78,8 +78,8 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (4 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (4 * 1024 * 1024)
 #endif
-// Drive high to force power supply into PWM mode (lower ripple on 3V3 at light loads)
-// note the SMSP mode pin is on WL_GPIO1
+// note the SMPS mode pin is on WL_GPIO1
+// #define PICO_SMPS_MODE_PIN
 
 #ifndef CYW43_WL_GPIO_COUNT
 #define CYW43_WL_GPIO_COUNT 3

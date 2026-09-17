@@ -1,3 +1,5 @@
+"""Utilities for building UF2 images."""
+
 # TODO: Default to a list of known compatible rules until the toolchain emits
 # firmware images with a .elf extension. When binaries have a .elf suffix,
 # this can change to ["*"] and another attribute that allows extension-based

@@ -70,18 +70,19 @@
 // note this is deliberately > MAX_PARTITIONs is likely to be, and also -1 as a signed byte
 #define PARTITION_TABLE_NO_PARTITION_INDEX 0xff
 
-// todo these are duplicated in picoboot_constants.h
+// values returned from \ref rom_get_last_boot_type()
+// --- note these match the REBOOT2_FLAG_REBOOT_TYPE_ constants in pico/picoboot_constants.h
 // values 0-7 are secure/non-secure
 #define BOOT_TYPE_NORMAL     0
 #define BOOT_TYPE_BOOTSEL    2
 #define BOOT_TYPE_RAM_IMAGE  3
 #define BOOT_TYPE_FLASH_UPDATE 4
-
 // values 8-15 are secure only
 #define BOOT_TYPE_PC_SP      0xd
 
 // ORed in if a bootloader chained into the image
 #define BOOT_TYPE_CHAINED_FLAG 0x80
+// ---
 
 // call from NS to S
 #ifndef __riscv
@@ -131,6 +132,12 @@
 #define BOOT_TBYB_AND_UPDATE_FLAG_BUY_PENDING                      0x1
 #define BOOT_TBYB_AND_UPDATE_FLAG_OTP_VERSION_APPLIED              0x2
 #define BOOT_TBYB_AND_UPDATE_FLAG_OTHER_ERASED                     0x4
+
+// PICO_CONFIG: BLOCK_DEVICE_DEFAULT_PARTITION_ID, default ID of block device partition which must match the ID used in the partition table JSON, type=int, default=0x626C6F636B646576, group=pico_bootrom
+#ifndef BLOCK_DEVICE_DEFAULT_PARTITION_ID
+// The default 0x626C6F636B646576 value is the ASCII encoding of "blockdev"
+#define BLOCK_DEVICE_DEFAULT_PARTITION_ID 0x626C6F636B646576
+#endif
 
 #ifndef __ASSEMBLER__
 // Limited to 3 arguments in case of varm multiplex hint (trashes Arm r3)

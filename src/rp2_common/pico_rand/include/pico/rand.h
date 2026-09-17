@@ -31,7 +31,7 @@ extern "C" {
  *    \ref PICO_RAND_ROSC_BIT_SAMPLE_COUNT bits are gathered from the ring oscillator "random bit" and mixed in each
  *    time. This should not be used if the ROSC is off, or the processor is running from
  *    the ROSC.
- *    \note the maximum throughput of ROSC bit sampling is controlled by PICO_RAND_MIN_ROSC_BIT_SAMPLE_TIME_US which defaults
+ *    \note The maximum throughput of ROSC bit sampling is controlled by PICO_RAND_MIN_ROSC_BIT_SAMPLE_TIME_US which defaults
  *    to 10us, i.e. 100,000 bits per second.
  *  - Time (\ref PICO_RAND_ENTROPY_SRC_TIME == 1): The 64-bit microsecond timer is mixed in each time.
  *  - Bus Performance Counter (\ref PICO_RAND_ENTROPY_SRC_BUS_PERF_COUNTER == 1): One of the bus fabric's performance
@@ -175,9 +175,14 @@ extern "C" {
 #define PICO_RAND_RAM_HASH_START   (PICO_RAND_RAM_HASH_END - 1024u)
 #endif
 
+/*! \brief A 128-bit random number value
+ *  \ingroup pico_rand
+ *
+ * Holds up to 128 bits of entropy returned by \ref get_rand_128.
+ */
 // We provide a maximum of 128 bits entropy in one go
 typedef struct rng_128 {
-    uint64_t r[2];
+    uint64_t r[2]; ///< Two 64-bit words comprising the 128-bit random value
 } rng_128_t;
 
 /*! \brief Get 128-bit random number

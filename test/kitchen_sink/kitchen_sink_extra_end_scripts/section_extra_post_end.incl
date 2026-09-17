@@ -1,0 +1,4 @@
+SECTIONS
+{
+    PROVIDE(__extra_end_variable__ = 4M);
+}

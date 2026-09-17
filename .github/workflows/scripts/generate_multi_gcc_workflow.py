@@ -56,7 +56,7 @@ for toolchain in toolchains:
     assert(len(stderr) == 0)
     # Version should be on first line
     version_line = stdout.split("\n")[0]
-    m = re.search("(\d+\.\d+\.\d+)", version_line)
+    m = re.search(r"(\d+\.\d+\.\d+)", version_line)
     assert(m is not None)
     version = m.group(1)
 

@@ -89,7 +89,7 @@ void watchdog_update(void);
  * return false.
  *
  * \param delay_ms Number of milliseconds before watchdog will reboot without watchdog_update being called
- * \param pause_on_debug If the watchdog should be paused when the debugger is stepping through code
+ * \param pause_on_debug If the watchdog should be paused when the processor is halted by the debugger
  */
 void watchdog_enable(uint32_t delay_ms, bool pause_on_debug);
 

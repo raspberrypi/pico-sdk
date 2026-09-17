@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -55,7 +55,7 @@ typedef enum irq_num_rp2040 {
     TIMER_IRQ_1 = 1, ///< Select TIMER's IRQ 1 output
     TIMER_IRQ_2 = 2, ///< Select TIMER's IRQ 2 output
     TIMER_IRQ_3 = 3, ///< Select TIMER's IRQ 3 output
-    PWM_IRQ_WRAP = 4, ///< Select PWM's IRQ_WRAP output
+    PWM_IRQ_WRAP = 4, ///< Select PWM's WRAP IRQ output
     USBCTRL_IRQ = 5, ///< Select USBCTRL's IRQ output
     XIP_IRQ = 6, ///< Select XIP's IRQ output
     PIO0_IRQ_0 = 7, ///< Select PIO0's IRQ 0 output
@@ -66,14 +66,14 @@ typedef enum irq_num_rp2040 {
     DMA_IRQ_1 = 12, ///< Select DMA's IRQ 1 output
     IO_IRQ_BANK0 = 13, ///< Select IO_BANK0's IRQ output
     IO_IRQ_QSPI = 14, ///< Select IO_QSPI's IRQ output
-    SIO_IRQ_PROC0 = 15, ///< Select SIO_PROC0's IRQ output
-    SIO_IRQ_PROC1 = 16, ///< Select SIO_PROC1's IRQ output
+    SIO_IRQ_PROC0 = 15, ///< Select SIO's PROC0 IRQ output
+    SIO_IRQ_PROC1 = 16, ///< Select SIO's PROC1 IRQ output
     CLOCKS_IRQ = 17, ///< Select CLOCKS's IRQ output
     SPI0_IRQ = 18, ///< Select SPI0's IRQ output
     SPI1_IRQ = 19, ///< Select SPI1's IRQ output
     UART0_IRQ = 20, ///< Select UART0's IRQ output
     UART1_IRQ = 21, ///< Select UART1's IRQ output
-    ADC_IRQ_FIFO = 22, ///< Select ADC's IRQ_FIFO output
+    ADC_IRQ_FIFO = 22, ///< Select ADC's FIFO IRQ output
     I2C0_IRQ = 23, ///< Select I2C0's IRQ output
     I2C1_IRQ = 24, ///< Select I2C1's IRQ output
     RTC_IRQ = 25, ///< Select RTC's IRQ output
@@ -121,4 +121,3 @@ typedef enum irq_num_rp2040 {
 #define isr_spare_5 isr_irq31
 
 #endif // _INTCTRL_H
-

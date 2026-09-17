@@ -17,6 +17,12 @@ static_assert(PICO_FLASH_BANK_TOTAL_SIZE <= PICO_FLASH_SIZE_BYTES, "PICO_FLASH_B
 // Size of one bank
 #define PICO_FLASH_BANK_SIZE (PICO_FLASH_BANK_TOTAL_SIZE / 2)
 
+#if PICO_RP2040
+#define PICO_FLASH_BANK_READ_BASE XIP_BASE
+#else
+#define PICO_FLASH_BANK_READ_BASE XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE
+#endif
+
 #if 0
 #define DEBUG_PRINT(format,args...) printf(format, ## args)
 #else
@@ -90,7 +96,7 @@ static void pico_flash_bank_read(void *context, int bank, uint32_t offset, uint8
     if ((offset + size) > PICO_FLASH_BANK_SIZE) return;
 
     // Flash is xip
-    memcpy(buffer, (void *)(XIP_BASE + pico_flash_bank_get_storage_offset_func() + (PICO_FLASH_BANK_SIZE * bank) + offset), size);
+    memcpy(buffer, (void *)(PICO_FLASH_BANK_READ_BASE + pico_flash_bank_get_storage_offset_func() + (PICO_FLASH_BANK_SIZE * bank) + offset), size);
 }
 
 static void pico_flash_bank_write(void * context, int bank, uint32_t offset, const uint8_t *data, uint32_t size) {
@@ -131,14 +137,14 @@ static void pico_flash_bank_write(void * context, int bank, uint32_t offset, con
         // Copy data we're not going to overwrite in the first page
         if (page == first_page && offset > 0) {
             memcpy(page_data,
-                (void *)(XIP_BASE + bank_start_pos + (page * FLASH_PAGE_SIZE)),
+                (void *)(PICO_FLASH_BANK_READ_BASE + bank_start_pos + (page * FLASH_PAGE_SIZE)),
                 offset);
         }
 
         // Copy the data we're not going to overwrite in the last page
         if (page == last_page - 1 && (offset + size_left) < FLASH_PAGE_SIZE) {
             memcpy(page_data + offset + size_left,
-                (void *)(XIP_BASE + bank_start_pos + (page * FLASH_PAGE_SIZE) + offset + size_left),
+                (void *)(PICO_FLASH_BANK_READ_BASE + bank_start_pos + (page * FLASH_PAGE_SIZE) + offset + size_left),
                 FLASH_PAGE_SIZE - offset - size_left);
         }
 

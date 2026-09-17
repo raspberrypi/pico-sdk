@@ -1,0 +1,12 @@
+.pio_version 1
+
+.program encodings
+
+public mov_osr_x:
+    mov osr, x
+public mov_pindirs_x:
+    mov pindirs, x
+public mov_exec_x:
+    mov exec, x
+public mov_y_x:
+    mov y, x

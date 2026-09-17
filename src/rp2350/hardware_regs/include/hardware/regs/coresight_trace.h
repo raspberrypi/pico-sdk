@@ -82,4 +82,3 @@
 #define CORESIGHT_TRACE_TRACE_CAPTURE_FIFO_RDATA_ACCESS "RF"
 // =============================================================================
 #endif // _HARDWARE_REGS_CORESIGHT_TRACE_H
-

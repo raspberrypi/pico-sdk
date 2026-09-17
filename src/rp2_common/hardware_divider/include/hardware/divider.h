@@ -227,7 +227,7 @@ inline static uint32_t to_remainder_u32(divmod_result_t r) {
  * \param r A pair of 32-bit quotient/remainder values.
  * \return Signed remainder
  *
- * \note On arm this is just a 32 bit register move or a nop
+ * \note On Arm this is just a 32 bit register move or a nop
  */
 inline static int32_t to_remainder_s32(divmod_result_t r) {
     return (int32_t)(r >> 32u);
@@ -468,9 +468,15 @@ static inline int32_t hw_divider_s32_remainder_inlined(int32_t a, int32_t b) {
 #endif
 }
 
+/*! \brief Saved hardware divider state
+ *  \ingroup hardware_divider
+ *
+ * Holds a snapshot of the hardware divider registers so they can be
+ * saved and restored around code that uses the divider.
+ */
 #if !PICO_EMULATE_DIVIDER
 typedef struct {
-    uint32_t values[4];
+    uint32_t values[4]; ///< Saved divider register values (dividend, divisor, quotient, remainder)
 } hw_divider_state_t;
 #else
 typedef uint64_t hw_divider_state_t;

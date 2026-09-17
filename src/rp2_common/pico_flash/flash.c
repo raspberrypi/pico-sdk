@@ -6,7 +6,7 @@
 
 #include "pico/flash.h"
 #include "hardware/sync.h"
-#if PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
+#if PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT
 #include "pico/multicore.h"
 #endif
 #include "pico/time.h"
@@ -30,7 +30,7 @@
 // 2. Regular pico_multicore - we need to use multicore lockout.
 // 3. FreeRTOS on core 0, no use of core 1 - we just want to disable IRQs
 // 4. FreeRTOS SMP on both cores - we need to schedule a high priority task on the other core to disable IRQs.
-// 5. FreeRTOS on one core, but application is using the other core. ** WE CANNOT SUPPORT THIS TODAY ** without
+// 5. FreeRTOS on one core, but application is using the other core. ** WE CANNOT SUPPORT THIS TODAY on RP2040 ** without
 //    the equivalent PICO_FLASH_ASSUME_COREx_SAFE (i.e. the user making sure the other core is fine)
 
 static bool default_core_init_deinit(bool init);
@@ -93,7 +93,7 @@ static bool default_core_init_deinit(__unused bool init) {
 #if PICO_FLASH_SAFE_EXECUTE_USE_FREERTOS_SMP
     return true;
 #endif
-#if PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
+#if PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT
     if (!init) {
         return false;
     }
@@ -171,17 +171,17 @@ static int default_enter_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
         }
         // todo we may get preempted here, but I think that is OK unless what is pre-empts requires
         //      the other core to be running.
-#elif PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
-        // we cannot mix multicore_lockout and FreeRTOS as they both use the multicore FIFO...
-        // the user, will have to roll their own mechanism in this case.
-#if LIB_FREERTOS_KERNEL
+#elif PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT
+        // we cannot mix multicore_lockout and FreeRTOS on RP2040 as they both use the multicore FIFO...
+        // the user will have to roll their own mechanism in this case. FreeRTOS on RP2350 uses doorbells
+#if LIB_FREERTOS_KERNEL && PICO_RP2040
 #if PICO_FLASH_ASSERT_ON_UNSAFE
         assert(false); // we expect the other core to have been initialized via flash_safe_execute_core_init()
                        // unless PICO_FLASH_ASSUME_COREX_SAFE is set
 #endif
         rc = PICO_ERROR_NOT_PERMITTED;
 #else // !LIB_FREERTOS_KERNEL
-        if (multicore_lockout_victim_is_initialized(get_core_num()^1)) {
+        if (multicore_lockout_ready()) {
             if (!multicore_lockout_start_timeout_us(timeout_ms * 1000ull)) {
                 rc = PICO_ERROR_TIMEOUT;
             }
@@ -220,7 +220,7 @@ static int default_exit_safe_zone_timeout_ms(__unused uint32_t timeout_ms) {
         if (lockout_state[core_num] != FREERTOS_LOCKOUT_LOCKEE_DONE) {
             return PICO_ERROR_TIMEOUT;
         }
-#elif PICO_FLASH_SAFE_EXECUTE_PICO_SUPPORT_MULTICORE_LOCKOUT
+#elif PICO_FLASH_SAFE_EXECUTE_SUPPORT_MULTICORE_LOCKOUT
         return multicore_lockout_end_timeout_us(timeout_ms * 1000ull) ? PICO_OK : PICO_ERROR_TIMEOUT;
 #endif
     }

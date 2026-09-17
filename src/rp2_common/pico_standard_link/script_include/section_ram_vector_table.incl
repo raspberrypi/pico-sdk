@@ -1,0 +1,6 @@
+SECTIONS
+{
+    .ram_vector_table (NOLOAD): {
+        *(.ram_vector_table)
+    } > RAM
+}

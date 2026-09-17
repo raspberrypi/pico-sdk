@@ -1,0 +1,31 @@
+name: Check floating-point tests
+
+on:
+  push:
+    paths:
+      - .github/workflows/check_float_tests.yml
+      - tools/check_float_test_names.py
+      - src/rp2_common/pico_float/include/pico/float.h
+      - src/rp2_common/pico_double/include/pico/double.h
+      - test/pico_float_test/custom_float_funcs_test.c
+      - test/pico_float_test/custom_double_funcs_test.c
+  pull_request:
+    paths:
+      - .github/workflows/check_float_tests.yml
+      - tools/check_float_test_names.py
+      - src/rp2_common/pico_float/include/pico/float.h
+      - src/rp2_common/pico_double/include/pico/double.h
+      - test/pico_float_test/custom_float_funcs_test.c
+      - test/pico_float_test/custom_double_funcs_test.c
+
+jobs:
+  check-float-tests:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check float tests
+        run: |
+          tools/check_float_test_names.py

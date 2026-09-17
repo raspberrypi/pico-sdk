@@ -113,6 +113,27 @@ void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled) {
     irq_set_mask_n_enabled_internal(n, mask, enabled);
 }
 
+static inline uint32_t irq_get_mask_n_internal(uint n) {
+    invalid_params_if(HARDWARE_IRQ, n * 32u >= ((PICO_NUM_VTABLE_IRQS + 31u) & ~31u));
+#if defined(__riscv)
+    return (hazard3_irqarray_read(RVCSR_MEIEA_OFFSET, 2 * n) & 0xffffu) | (hazard3_irqarray_read(RVCSR_MEIEA_OFFSET, 2 * n + 1) << 16);
+#elif PICO_RP2040
+    ((void)n);
+    return nvic_hw->iser;
+#else
+    // >32 IRQs
+    return nvic_hw->iser[n];
+#endif
+}
+
+uint32_t irq_get_mask(void) {
+    return irq_get_mask_n_internal(0);
+}
+
+uint32_t irq_get_mask_n(uint n) {
+    return irq_get_mask_n_internal(n);
+}
+
 void irq_set_pending(uint num) {
     check_irq_param(num);
 #ifdef __riscv
@@ -121,9 +142,22 @@ void irq_set_pending(uint num) {
     hazard3_irqarray_set(RVCSR_MEIFA_OFFSET, num / 16, 1u << (num % 16));
 #else
 #if PICO_RP2040
-    *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ISPR_OFFSET)) = 1u << num;
+    nvic_hw->ispr = 1u << num;
 #else
     nvic_hw->ispr[num/32] = 1 << (num % 32);
+#endif
+#endif
+}
+
+bool irq_is_pending(uint num) {
+    check_irq_param(num);
+#ifdef __riscv
+    return hazard3_irqarray_read(RVCSR_MEIPA_OFFSET, num / 16u) & (1u << (num % 16u));
+#else
+#if PICO_RP2040
+    return nvic_hw->ispr & (1u << num);
+#else
+    return nvic_hw->ispr[num / 32u] & (1u << (num % 32u));
 #endif
 #endif
 }

@@ -134,5 +134,5 @@ static uint ph_dump_node(pheap_t *heap, pheap_node_id_t id, void (*dump_key)(phe
 
 void ph_dump(pheap_t *heap, void (*dump_key)(pheap_node_id_t, void *), void *user_data) {
     uint count = ph_dump_node(heap, heap->root_id, dump_key, user_data, 0);
-    printf("node_count %d\n", count);
+    printf("node_count %u\n", count);
 }

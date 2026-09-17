@@ -36,4 +36,3 @@ typedef struct {
 static_assert(sizeof (tbman_hw_t) == 0x0004, "");
 
 #endif // _HARDWARE_STRUCTS_TBMAN_H
-

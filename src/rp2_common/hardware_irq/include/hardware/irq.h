@@ -8,9 +8,14 @@
 #define _HARDWARE_IRQ_H
 
 // These two config items are also used by assembler, so keeping separate
-// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum number of shared IRQ handlers, default=4, advanced=true, group=hardware_irq
+// PICO_CONFIG: PICO_MAX_SHARED_IRQ_HANDLERS, Maximum number of shared IRQ handlers, default=6 if using stdio_usb otherwise 4, advanced=true, group=hardware_irq
 #ifndef PICO_MAX_SHARED_IRQ_HANDLERS
-#define PICO_MAX_SHARED_IRQ_HANDLERS 4
+#define _PICO_MAX_SHARED_IRQ_HANDLERS 4
+#if LIB_PICO_STDIO_USB
+#define PICO_MAX_SHARED_IRQ_HANDLERS (_PICO_MAX_SHARED_IRQ_HANDLERS + 2)
+#else
+#define PICO_MAX_SHARED_IRQ_HANDLERS _PICO_MAX_SHARED_IRQ_HANDLERS
+#endif
 #endif
 
 // PICO_CONFIG: PICO_DISABLE_SHARED_IRQ_HANDLERS, Disable shared IRQ handlers, type=bool, default=0, group=hardware_irq
@@ -92,10 +97,16 @@
  * 19 | SPI1_IRQ
  * 20 | UART0_IRQ
  * 21 | UART1_IRQ
- * 22 | ADC0_IRQ_FIFO
+ * 22 | ADC_IRQ_FIFO
  * 23 | I2C0_IRQ
  * 24 | I2C1_IRQ
  * 25 | RTC_IRQ
+ * 26 | SPARE_IRQ_0
+ * 27 | SPARE_IRQ_1
+ * 28 | SPARE_IRQ_2
+ * 29 | SPARE_IRQ_3
+ * 30 | SPARE_IRQ_4
+ * 31 | SPARE_IRQ_5
  * \endif
  *
  * \if rp2350_specific
@@ -149,12 +160,12 @@
  * 43 | PLL_USB_IRQ
  * 44 | POWMAN_IRQ_POW
  * 45 | POWMAN_IRQ_TIMER
- * 46 | SPAREIRQ_IRQ_0
- * 47 | SPAREIRQ_IRQ_1
- * 48 | SPAREIRQ_IRQ_2
- * 49 | SPAREIRQ_IRQ_3
- * 50 | SPAREIRQ_IRQ_4
- * 51 | SPAREIRQ_IRQ_5
+ * 46 | SPARE_IRQ_0
+ * 47 | SPARE_IRQ_1
+ * 48 | SPARE_IRQ_2
+ * 49 | SPARE_IRQ_3
+ * 50 | SPARE_IRQ_4
+ * 51 | SPARE_IRQ_5
  * \endif
  */
 
@@ -275,6 +286,21 @@ void irq_set_mask_enabled(uint32_t mask, bool enabled);
  * \param enabled true to enable the interrupts, false to disable them.
  */
 void irq_set_mask_n_enabled(uint n, uint32_t mask, bool enabled);
+
+/*! \brief Get the current enabled mask on the executing core
+ *  \ingroup hardware_irq
+ *
+ * \return mask 32-bit mask with one bits set for the enabled interrupts \ref interrupt_nums
+ */
+ uint32_t irq_get_mask(void);
+
+ /*! \brief Get the current enabled mask on the executing core
+ *  \ingroup hardware_irq
+ *
+ * \param n the index of the mask to update. n == 0 means 0->31, n == 1 mean 32->63 etc.
+ * \return mask 32-bit mask with one bits set for the enabled interrupts \ref interrupt_nums
+ */
+ uint32_t irq_get_mask_n(uint n);
 
 /*! \brief  Set an exclusive interrupt handler for an interrupt on the executing core.
  *  \ingroup hardware_irq
@@ -463,6 +489,26 @@ static inline void irq_clear(uint int_num) {
  */
 void irq_set_pending(uint num);
 
+/*! \brief Check whether an IRQ is pending on the current core.
+ *  \ingroup hardware_irq
+ *
+ * Returns true if the external system IRQ line is currently asserted, or if
+ * the IRQ has been forced high inside the core using irq_set_pending().
+ *
+ * This function can be used to poll IRQ flags that are currently disabled
+ * (via a previous call to irq_set_enabled(num, false);).
+ *
+ * Do not use this function for an IRQ that is enabled at any priority that
+ * might preempt the core; it is useless in such cases because the core may
+ * enter the IRQ handler without this function ever returning true.
+ *
+ * When polling for external IRQ assertion on an Arm core equipped with an
+ * NVIC, it's recommended to call irq_clear() once before calling this
+ * function, to clear any stale assertions from the internal pending latch.
+ *
+ * \param num Interrupt number \ref interrupt_nums
+ */
+bool irq_is_pending(uint num);
 
 /*! \brief Perform IRQ priority initialization for the current core
  *
@@ -476,12 +522,12 @@ static __force_inline void irq_init_priorities(void) {
 
 /*! \brief Claim ownership of a user IRQ on the calling core
  *  \ingroup hardware_irq
- *  
+ *
  * User IRQs starting from FIRST_USER_IRQ are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
  * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therefore all functions
  * dealing with Uer IRQs affect only the calling core
- * 
+ *
  * This method explicitly claims ownership of a user IRQ, so other code can know it is being used.
  *
  * \param irq_num the user IRQ to claim
@@ -495,10 +541,10 @@ void user_irq_claim(uint irq_num);
  *
  * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therefore all functions
  * dealing with Uer IRQs affect only the calling core
- * 
+ *
  * This method explicitly releases ownership of a user IRQ, so other code can know it is free to use.
- * 
- * \note it is customary to have disabled the irq and removed the handler prior to calling this method.
+ *
+ * \note It is customary to have disabled the irq and removed the handler prior to calling this method.
  *
  * \param irq_num the irq irq_num to unclaim
  */
@@ -506,12 +552,12 @@ void user_irq_unclaim(uint irq_num);
 
 /*! \brief Claim ownership of a free user IRQ on the calling core
  *  \ingroup hardware_irq
- *  
+ *
  * User IRQs starting from FIRST_USER_IRQ are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
  * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therefore all functions
  * dealing with Uer IRQs affect only the calling core
- * 
+ *
  * This method explicitly claims ownership of an unused user IRQ if there is one, so other code can know it is being used.
  *
  * \param required if true the function will panic if none are available
@@ -522,7 +568,7 @@ int user_irq_claim_unused(bool required);
 /*
 *! \brief Check if a user IRQ is in use on the calling core
  *  \ingroup hardware_irq
- *  
+ *
  * User IRQs starting from FIRST_USER_IRQ are not connected to any hardware, but can be triggered by \ref irq_set_pending.
  *
  * \note User IRQs are a core local feature; they cannot be used to communicate between cores. Therefore all functions

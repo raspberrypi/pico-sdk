@@ -8,13 +8,14 @@
 #include <string.h>
 #include "pico/util/queue.h"
 
-void queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num) {
+bool queue_init_with_spinlock(queue_t *q, uint element_size, uint element_count, uint spinlock_num) {
     lock_init(&q->core, spinlock_num);
-    q->data = (uint8_t *)calloc(element_count + 1, element_size);
     q->element_count = (uint16_t)element_count;
     q->element_size = (uint16_t)element_size;
     q->wptr = 0;
     q->rptr = 0;
+    q->data = (uint8_t *)calloc(element_count + 1, element_size);
+    return q->data != NULL;
 }
 
 void queue_free(queue_t *q) {
@@ -52,6 +53,7 @@ static bool queue_add_internal(queue_t *q, const void *data, bool block) {
         }
         if (block) {
             lock_internal_spin_unlock_with_wait(&q->core, save);
+            blocked_waiter_wakeup(false);
         } else {
             spin_unlock(q->core.spin_lock, save);
             return false;
@@ -72,6 +74,7 @@ static bool queue_remove_internal(queue_t *q, void *data, bool block) {
         }
         if (block) {
             lock_internal_spin_unlock_with_wait(&q->core, save);
+            blocked_waiter_wakeup(false);
         } else {
             spin_unlock(q->core.spin_lock, save);
             return false;
@@ -91,6 +94,7 @@ static bool queue_peek_internal(queue_t *q, void *data, bool block) {
         }
         if (block) {
             lock_internal_spin_unlock_with_wait(&q->core, save);
+            blocked_waiter_wakeup(false);
         } else {
             spin_unlock(q->core.spin_lock, save);
             return false;

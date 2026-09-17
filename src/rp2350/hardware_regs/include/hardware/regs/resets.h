@@ -638,4 +638,3 @@
 #define RESETS_RESET_DONE_ADC_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_RESETS_H
-

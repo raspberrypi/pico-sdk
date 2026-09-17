@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+
+import argparse
+import sys
+
+
+def any_int(x):
+    try:
+        return int(x, 0)
+    except:
+        raise argparse.ArgumentTypeError("expected an integer, not '{!r}'".format(x))
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("ifile", help="Input file (binary)")
+parser.add_argument("ofile", help="Output file (assembly)")
+parser.add_argument("-p", "--pad", help="Padded size (bytes), default 256",
+                    type=any_int, default=256)
+args = parser.parse_args()
+
+try:
+    idata = open(args.ifile, "rb").read()
+except:
+    sys.exit("Could not open input file '{}'".format(args.ifile))
+
+if len(idata) > args.pad:
+    sys.exit("Input file size ({} bytes) too large for final size ({} bytes)".format(len(idata), args.pad))
+
+odata = idata + bytes(args.pad - len(idata))
+
+# No CRC on RP2350, as "boot2" is just a generic function that can be copied
+# anywhere and used
+
+# try:
+with open(args.ofile, "w") as ofile:
+    ofile.write("// Padded version of: {}\n\n".format(args.ifile))
+    ofile.write(".section .boot2, \"ax\"\n\n")
+    ofile.write(".global __boot2_entry_point\n")
+    ofile.write("__boot2_entry_point:\n")
+    for offs in range(0, len(odata), 16):
+        chunk = odata[offs:min(offs + 16, len(odata))]
+        ofile.write(".byte {}\n".format(", ".join("0x{:02x}".format(b) for b in chunk)))
+# except:
+    # sys.exit("Could not open output file '{}'".format(args.ofile))

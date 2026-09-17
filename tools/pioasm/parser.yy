@@ -269,8 +269,8 @@ base_instruction:
     | IRQ irq_modifiers value REL                         { $$ = std::shared_ptr<instruction>(new instr_irq(@$, $2, $3, 2)); }
     | IRQ PREV irq_modifiers value                        { pioasm.check_version(1, @$, "irq prev"); $$ = std::shared_ptr<instruction>(new instr_irq(@$, $3, $4, 1)); }
     | IRQ NEXT irq_modifiers value                        { pioasm.check_version(1, @$, "irq next"); $$ = std::shared_ptr<instruction>(new instr_irq(@$, $3, $4, 3)); }
-    | IRQ PREV irq_modifiers value REL                    { pioasm.check_version(1, @$, "irq prev"); error(@5, "'rel' is not supported for 'irq prev'"); }
-    | IRQ NEXT irq_modifiers value REL                    { pioasm.check_version(1, @$, "irq next"); error(@5, "'rel' is not supported for 'irq next'"); }
+    | IRQ PREV irq_modifiers value REL                    { pioasm.check_version(1, @$, "irq prev"); throw syntax_error(@5, "'rel' is not supported for 'irq prev'"); }
+    | IRQ NEXT irq_modifiers value REL                    { pioasm.check_version(1, @$, "irq next"); throw syntax_error(@5, "'rel' is not supported for 'irq next'"); }
     | IRQ irq_modifiers value                             { $$ = std::shared_ptr<instruction>(new instr_irq(@$, $2, $3)); }
     | SET set_target comma value                          { $$ = std::shared_ptr<instruction>(new instr_set(@$, $2, $4)); }
 ;
@@ -299,8 +299,8 @@ wait_source:
     IRQ comma value REL     { $$ = std::shared_ptr<wait_source>(new wait_source(wait_source::irq, $3, 2)); }
   | IRQ PREV comma value    { pioasm.check_version(1, @$, "irq prev"); $$ = std::shared_ptr<wait_source>(new wait_source(wait_source::irq, $4, 1)); }
   | IRQ NEXT comma value    { pioasm.check_version(1, @$, "irq next"); $$ = std::shared_ptr<wait_source>(new wait_source(wait_source::irq, $4, 3)); }
-  | IRQ PREV comma value REL { pioasm.check_version(1, @$, "irq prev"); error(@5, "'rel' is not supported for 'irq prev'"); }
-  | IRQ NEXT comma value REL { pioasm.check_version(1, @$, "irq next"); error(@5, "'rel' is not supported for 'irq next'"); }
+  | IRQ PREV comma value REL { pioasm.check_version(1, @$, "irq prev"); throw syntax_error(@5, "'rel' is not supported for 'irq prev'"); }
+  | IRQ NEXT comma value REL { pioasm.check_version(1, @$, "irq next"); throw syntax_error(@5, "'rel' is not supported for 'irq next'"); }
   | IRQ comma value         { $$ = std::shared_ptr<wait_source>(new wait_source(wait_source::irq, $3, 0)); }
   | GPIO comma value        { $$ = std::shared_ptr<wait_source>(new wait_source(wait_source::gpio, $3)); }
   | PIN comma value         { $$ = std::shared_ptr<wait_source>(new wait_source(wait_source::pin, $3)); }

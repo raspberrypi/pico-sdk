@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+# This test needs a FreeRTOS kernel, which the Bazel build does not provide, so it is
+# CMake-only - see CMakeLists.txt, which skips itself unless FREERTOS_KERNEL_PATH is set.
+# The sources are listed here so that they are accounted for by
+# tools/check_source_files_in_bazel_build.py.
+filegroup(
+    name = "freertos_only_srcs",
+    srcs = [
+        "FreeRTOSConfig.h",
+        "freertos_sync_alias_test.c",
+    ],
+)

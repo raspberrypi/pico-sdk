@@ -1,0 +1,2 @@
+pico_simple_hardware_target(rosc)
+pico_mirrored_target_link_libraries(hardware_rosc INTERFACE hardware_clocks)

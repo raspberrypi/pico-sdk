@@ -6,6 +6,7 @@
 
 #include "pico/asm_helper.S"
 #include "hardware/hazard3.h"
+#include "pico/float.h"
 
 // This file reimplements some common single-precision soft float routines
 // from libgcc. It targets the RV32IMBZbkb dialect (plus optionally Xh3bextm)

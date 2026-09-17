@@ -148,7 +148,8 @@ void gpio_init(uint gpio);
 
 void gpio_deinit(uint gpio);
 
-void gpio_init_mask(uint gpio_mask);
+void gpio_init_mask(uint32_t gpio_mask);
+void gpio_init_mask64(uint64_t gpio_mask);
 
 // ----------------------------------------------------------------------------
 // Input

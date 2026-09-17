@@ -25,7 +25,7 @@
 
 typedef struct {
     _REG_(WATCHDOG_CTRL_OFFSET) // WATCHDOG_CTRL
-    // Watchdog control +
+    // Watchdog control
     // 0x80000000 [31]    TRIGGER      (0) Trigger a watchdog reset
     // 0x40000000 [30]    ENABLE       (0) When not enabled the watchdog timer is paused
     // 0x04000000 [26]    PAUSE_DBG1   (1) Pause the watchdog timer when processor 1 is in debug mode
@@ -33,22 +33,22 @@ typedef struct {
     // 0x01000000 [24]    PAUSE_JTAG   (1) Pause the watchdog timer when JTAG is accessing the bus fabric
     // 0x00ffffff [23:0]  TIME         (0x000000) Indicates the time in usec before a watchdog reset will...
     io_rw_32 ctrl;
- 
+
     _REG_(WATCHDOG_LOAD_OFFSET) // WATCHDOG_LOAD
     // Load the watchdog timer
-    // 0x00ffffff [23:0]  LOAD         (0x000000) 
+    // 0x00ffffff [23:0]  LOAD         (0x000000)
     io_wo_32 load;
- 
+
     _REG_(WATCHDOG_REASON_OFFSET) // WATCHDOG_REASON
     // Logs the reason for the last reset
-    // 0x00000002 [1]     FORCE        (0) 
-    // 0x00000001 [0]     TIMER        (0) 
+    // 0x00000002 [1]     FORCE        (0)
+    // 0x00000001 [0]     TIMER        (0)
     io_ro_32 reason;
- 
+
     // (Description copied from array index 0 register WATCHDOG_SCRATCH0 applies similarly to other array indexes)
     _REG_(WATCHDOG_SCRATCH0_OFFSET) // WATCHDOG_SCRATCH0
     // Scratch register
-    // 0xffffffff [31:0]  SCRATCH0     (0x00000000) 
+    // 0xffffffff [31:0]  SCRATCH0     (0x00000000)
     io_rw_32 scratch[8];
 } watchdog_hw_t;
 
@@ -56,4 +56,3 @@ typedef struct {
 static_assert(sizeof (watchdog_hw_t) == 0x002c, "");
 
 #endif // _HARDWARE_STRUCTS_WATCHDOG_H
-

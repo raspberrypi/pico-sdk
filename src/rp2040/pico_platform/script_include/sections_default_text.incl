@@ -1,0 +1,8 @@
+/* This swaps section_boot2 and section_default_text, because RP2040 binaries must begin with boot2 */
+
+INCLUDE "section_flash_begin.incl"
+INCLUDE "section_boot2.incl"
+INCLUDE "section_default_text.incl"
+INCLUDE "section_default_rodata.incl"
+INCLUDE "sections_arm_ex.incl"
+INCLUDE "section_binary_info.incl"

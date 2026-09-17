@@ -83,6 +83,16 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (16 * 1024 * 1024))
 #define PICO_FLASH_SIZE_BYTES (16 * 1024 * 1024)
 #endif
 
+// --- PSRAM ---
+#ifndef PICO_PSRAM_CS_PIN
+#define PICO_PSRAM_CS_PIN PIMORONI_PICO_PLUS2_W_PSRAM_CS_PIN
+#endif
+
+pico_board_cmake_set_default(PICO_PSRAM_SIZE_BYTES, (8 * 1024 * 1024))
+#ifndef PICO_PSRAM_SIZE_BYTES
+#define PICO_PSRAM_SIZE_BYTES (8 * 1024 * 1024)
+#endif
+
 // The GPIO Pin used to monitor VSYS. Typically you would use this with ADC.
 // There is an example in adc/read_vsys in pico-examples.
 #ifndef PICO_VSYS_PIN

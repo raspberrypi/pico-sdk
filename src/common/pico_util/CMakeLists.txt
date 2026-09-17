@@ -8,6 +8,7 @@ if (NOT TARGET pico_util)
     pico_add_impl_library(pico_util)
     target_sources(pico_util INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/datetime.c
+            ${CMAKE_CURRENT_LIST_DIR}/fixed_bitset.c
             ${CMAKE_CURRENT_LIST_DIR}/pheap.c
             ${CMAKE_CURRENT_LIST_DIR}/queue.c
     )

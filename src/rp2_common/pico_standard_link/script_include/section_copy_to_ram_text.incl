@@ -1,0 +1,31 @@
+/* Defines the following symbols for use by code:
+    __ram_text_start__, __ram_text_end__, __ram_text_source__
+*/
+
+SECTIONS
+{
+    .text : {
+        __ram_text_start__ = .;
+        *(.init)
+        *(.text*)
+        *(.fini)
+        /* Pull all c'tors into .text */
+        *crtbegin.o(.ctors)
+        *crtbegin?.o(.ctors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+        *(SORT(.ctors.*))
+        *(.ctors)
+        /* Followed by destructors */
+        *crtbegin.o(.dtors)
+        *crtbegin?.o(.dtors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+        *(SORT(.dtors.*))
+        *(.dtors)
+
+        *(.eh_frame*)
+        . = ALIGN(4);
+        __ram_text_end__ = .;
+    } > RAM AT> RAM_STORE
+    __ram_text_source__ = LOADADDR(.text);
+    . = ALIGN(4);
+}

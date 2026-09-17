@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -32,7 +32,7 @@ typedef struct {
     // 0x0000fff0 [15:4]  PARTNO       (0xc60) Number of processor within family: 0xC60 = Cortex-M0+
     // 0x0000000f [3:0]   REVISION     (0x1) Minor revision number m in the rnpm revision status: +
     io_ro_32 cpuid;
- 
+
     _REG_(M0PLUS_ICSR_OFFSET) // M0PLUS_ICSR
     // Interrupt Control and State Register
     // 0x80000000 [31]    NMIPENDSET   (0) Setting this bit will activate an NMI
@@ -45,12 +45,12 @@ typedef struct {
     // 0x001ff000 [20:12] VECTPENDING  (0x000) Indicates the exception number for the highest priority...
     // 0x000001ff [8:0]   VECTACTIVE   (0x000) Active exception number field
     io_rw_32 icsr;
- 
+
     _REG_(M0PLUS_VTOR_OFFSET) // M0PLUS_VTOR
     // Vector Table Offset Register
     // 0xffffff00 [31:8]  TBLOFF       (0x000000) Bits [31:8] of the indicate the vector table offset address
     io_rw_32 vtor;
- 
+
     _REG_(M0PLUS_AIRCR_OFFSET) // M0PLUS_AIRCR
     // Application Interrupt and Reset Control Register
     // 0xffff0000 [31:16] VECTKEY      (0x0000) Register key: +
@@ -58,7 +58,7 @@ typedef struct {
     // 0x00000004 [2]     SYSRESETREQ  (0) Writing 1 to this bit causes the SYSRESETREQ signal to...
     // 0x00000002 [1]     VECTCLRACTIVE (0) Clears all active state information for fixed and...
     io_rw_32 aircr;
- 
+
     _REG_(M0PLUS_SCR_OFFSET) // M0PLUS_SCR
     // System Control Register
     // 0x00000010 [4]     SEVONPEND    (0) Send Event on Pending bit: +
@@ -71,4 +71,3 @@ typedef struct {
 static_assert(sizeof (armv6m_scb_hw_t) == 0x0014, "");
 
 #endif // _HARDWARE_STRUCTS_SCB_H
-

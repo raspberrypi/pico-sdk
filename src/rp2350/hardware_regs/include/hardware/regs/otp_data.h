@@ -444,7 +444,7 @@
 //               there are other configurations in OTP that must be valid.
 //               (RBIT-3)
 #define OTP_DATA_BOOT_FLAGS0_ROW _u(0x00000048)
-#define OTP_DATA_BOOT_FLAGS0_BITS   _u(0x003fffff)
+#define OTP_DATA_BOOT_FLAGS0_BITS   _u(0x003ffffe)
 #define OTP_DATA_BOOT_FLAGS0_RESET  _u(0x00000000)
 #define OTP_DATA_BOOT_FLAGS0_WIDTH  _u(24)
 // -----------------------------------------------------------------------------
@@ -648,13 +648,6 @@
 #define OTP_DATA_BOOT_FLAGS0_ENABLE_BOOTSEL_LED_MSB    _u(1)
 #define OTP_DATA_BOOT_FLAGS0_ENABLE_BOOTSEL_LED_LSB    _u(1)
 #define OTP_DATA_BOOT_FLAGS0_ENABLE_BOOTSEL_LED_ACCESS "RO"
-// -----------------------------------------------------------------------------
-// Field       : OTP_DATA_BOOT_FLAGS0_DISABLE_BOOTSEL_EXEC2
-#define OTP_DATA_BOOT_FLAGS0_DISABLE_BOOTSEL_EXEC2_RESET  "-"
-#define OTP_DATA_BOOT_FLAGS0_DISABLE_BOOTSEL_EXEC2_BITS   _u(0x00000001)
-#define OTP_DATA_BOOT_FLAGS0_DISABLE_BOOTSEL_EXEC2_MSB    _u(0)
-#define OTP_DATA_BOOT_FLAGS0_DISABLE_BOOTSEL_EXEC2_LSB    _u(0)
-#define OTP_DATA_BOOT_FLAGS0_DISABLE_BOOTSEL_EXEC2_ACCESS "RO"
 // =============================================================================
 // Register    : OTP_DATA_BOOT_FLAGS0_R1
 // Description : Redundant copy of BOOT_FLAGS0
@@ -1446,6 +1439,51 @@
 #define OTP_DATA_OTPBOOT_DST1_MSB    _u(15)
 #define OTP_DATA_OTPBOOT_DST1_LSB    _u(0)
 #define OTP_DATA_OTPBOOT_DST1_ACCESS "RO"
+// =============================================================================
+// Register    : OTP_DATA_MAC0
+// Description : Bytes 0 and 1 of MAC address (ECC)
+//
+//               The MAC is stored as bytes in network order, so bits 7:0 of
+//               this register are the aa in aa:bb:cc:dd:ee:ff, and bits 15:8
+//               are the bb.
+//
+//               Multiple interfaces are assigned consecutive addresses from the
+//               single MAC stored in OTP.
+#define OTP_DATA_MAC0_ROW _u(0x00000062)
+#define OTP_DATA_MAC0_BITS   _u(0x0000ffff)
+#define OTP_DATA_MAC0_RESET  "-"
+#define OTP_DATA_MAC0_WIDTH  _u(16)
+#define OTP_DATA_MAC0_MSB    _u(15)
+#define OTP_DATA_MAC0_LSB    _u(0)
+#define OTP_DATA_MAC0_ACCESS "RO"
+// =============================================================================
+// Register    : OTP_DATA_MAC1
+// Description : Bytes 2 and 3 of MAC address (ECC)
+//
+//               The MAC is stored as bytes in network order, so bits 7:0 of
+//               this register are the cc in aa:bb:cc:dd:ee:ff, and bits 15:8
+//               are the dd.
+#define OTP_DATA_MAC1_ROW _u(0x00000063)
+#define OTP_DATA_MAC1_BITS   _u(0x0000ffff)
+#define OTP_DATA_MAC1_RESET  "-"
+#define OTP_DATA_MAC1_WIDTH  _u(16)
+#define OTP_DATA_MAC1_MSB    _u(15)
+#define OTP_DATA_MAC1_LSB    _u(0)
+#define OTP_DATA_MAC1_ACCESS "RO"
+// =============================================================================
+// Register    : OTP_DATA_MAC2
+// Description : Bytes 4 and 5 of MAC address (ECC)
+//
+//               The MAC is stored as bytes in network order, so bits 7:0 of
+//               this register are the ee in aa:bb:cc:dd:ee:ff, and bits 15:8
+//               are the ff.
+#define OTP_DATA_MAC2_ROW _u(0x00000064)
+#define OTP_DATA_MAC2_BITS   _u(0x0000ffff)
+#define OTP_DATA_MAC2_RESET  "-"
+#define OTP_DATA_MAC2_WIDTH  _u(16)
+#define OTP_DATA_MAC2_MSB    _u(15)
+#define OTP_DATA_MAC2_LSB    _u(0)
+#define OTP_DATA_MAC2_ACCESS "RO"
 // =============================================================================
 // Register    : OTP_DATA_BOOTKEY0_0
 // Description : Bits 15:0 of SHA-256 hash of boot key 0 (ECC)
@@ -2875,7 +2913,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -3025,7 +3064,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -3175,7 +3215,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -3325,7 +3366,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -3475,7 +3517,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -3625,7 +3668,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -3775,7 +3819,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -3925,7 +3970,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -4075,7 +4121,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -4225,7 +4272,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -4375,7 +4423,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -4525,7 +4574,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -4675,7 +4725,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -4825,7 +4876,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -4975,7 +5027,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -5125,7 +5178,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -5275,7 +5329,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -5425,7 +5480,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -5575,7 +5631,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -5725,7 +5782,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -5875,7 +5933,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -6025,7 +6084,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -6175,7 +6235,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -6325,7 +6386,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -6475,7 +6537,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -6625,7 +6688,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -6775,7 +6839,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -6925,7 +6990,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -7075,7 +7141,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -7225,7 +7292,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -7375,7 +7443,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -7525,7 +7594,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -7675,7 +7745,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -7825,7 +7896,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -7975,7 +8047,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -8125,7 +8198,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -8275,7 +8349,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -8425,7 +8500,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -8575,7 +8651,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -8725,7 +8802,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -8875,7 +8953,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -9025,7 +9104,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -9175,7 +9255,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -9325,7 +9406,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -9475,7 +9557,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -9625,7 +9708,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -9775,7 +9859,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -9925,7 +10010,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -10075,7 +10161,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -10225,7 +10312,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -10375,7 +10463,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -10525,7 +10614,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -10675,7 +10765,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -10825,7 +10916,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -10975,7 +11067,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -11125,7 +11218,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -11275,7 +11369,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -11425,7 +11520,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -11575,7 +11671,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -11725,7 +11822,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -11875,7 +11973,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -12025,7 +12124,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -12175,7 +12275,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -12335,7 +12436,8 @@
 //               as the SBPI programming interface is not accessible to Non-
 //               secure software. However, Secure software may check these bits
 //               to apply write permissions to a Non-secure OTP programming API.
-//               0x0 -> Page can be read by Non-secure software, and Secure software may permit Non-secure writes.
+//               0x0 -> Page can be read by Non-secure software, and Secure software
+//               may permit Non-secure writes.
 //               0x1 -> Page can be read by Non-secure software
 //               0x2 -> Do not use. Behaves the same as INACCESSIBLE.
 //               0x3 -> Page can not be accessed by Non-secure software.
@@ -12370,4 +12472,3 @@
 #define OTP_DATA_PAGE63_LOCK1_LOCK_S_VALUE_INACCESSIBLE _u(0x3)
 // =============================================================================
 #endif // _HARDWARE_REGS_OTP_DATA_H
-

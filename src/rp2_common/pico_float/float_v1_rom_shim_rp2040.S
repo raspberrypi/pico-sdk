@@ -5,12 +5,9 @@
  */
 
 #include "pico/asm_helper.S"
+#include "pico/float.h"
 
 #if PICO_FLOAT_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
-
-#ifndef PICO_FLOAT_IN_RAM
-#define PICO_FLOAT_IN_RAM 0
-#endif
 
 pico_default_asm_setup
 

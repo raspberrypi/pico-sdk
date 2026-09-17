@@ -1,7 +1,7 @@
 // THIS HEADER FILE IS AUTOMATICALLY GENERATED -- DO NOT EDIT
 
 /**
- * Copyright (c) 2024 Raspberry Pi Ltd.
+ * Copyright (c) 2021 Raspberry Pi Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -1960,7 +1960,8 @@
 //               Reset value: 0x0
 //
 //               Role of DW_apb_i2c:  Slave-Transmitter
-//               0x0 -> Slave trying to transmit to remote master in read mode- scenario not present
+//               0x0 -> Slave trying to transmit to remote master in read mode-
+//               scenario not present
 //               0x1 -> Slave trying to transmit to remote master in read mode
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_SLVRD_INTX_RESET  _u(0x0)
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_SLVRD_INTX_BITS   _u(0x00008000)
@@ -2001,8 +2002,10 @@
 //               Reset value: 0x0
 //
 //               Role of DW_apb_i2c:  Slave-Transmitter
-//               0x0 -> Slave flushes existing data in TX-FIFO upon getting read command- scenario not present
-//               0x1 -> Slave flushes existing data in TX-FIFO upon getting read command
+//               0x0 -> Slave flushes existing data in TX-FIFO upon getting read
+//               command- scenario not present
+//               0x1 -> Slave flushes existing data in TX-FIFO upon getting read
+//               command
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_SLVFLUSH_TXFIFO_RESET  _u(0x0)
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_SLVFLUSH_TXFIFO_BITS   _u(0x00002000)
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_SLVFLUSH_TXFIFO_MSB    _u(13)
@@ -2019,7 +2022,8 @@
 //               Reset value: 0x0
 //
 //               Role of DW_apb_i2c:  Master-Transmitter or Slave-Transmitter
-//               0x0 -> Master or Slave-Transmitter lost arbitration- scenario not present
+//               0x0 -> Master or Slave-Transmitter lost arbitration- scenario not
+//               present
 //               0x1 -> Master or Slave-Transmitter lost arbitration
 #define I2C_IC_TX_ABRT_SOURCE_ARB_LOST_RESET  _u(0x0)
 #define I2C_IC_TX_ABRT_SOURCE_ARB_LOST_BITS   _u(0x00001000)
@@ -2036,7 +2040,8 @@
 //               Reset value: 0x0
 //
 //               Role of DW_apb_i2c:  Master-Transmitter or Master-Receiver
-//               0x0 -> User initiating master operation when MASTER disabled- scenario not present
+//               0x0 -> User initiating master operation when MASTER disabled- scenario
+//               not present
 //               0x1 -> User initiating master operation when MASTER disabled
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_MASTER_DIS_RESET  _u(0x0)
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_MASTER_DIS_BITS   _u(0x00000800)
@@ -2054,8 +2059,10 @@
 //               Reset value: 0x0
 //
 //               Role of DW_apb_i2c:  Master-Receiver
-//               0x0 -> Master not trying to read in 10Bit addressing mode when RESTART disabled
-//               0x1 -> Master trying to read in 10Bit addressing mode when RESTART disabled
+//               0x0 -> Master not trying to read in 10Bit addressing mode when RESTART
+//               disabled
+//               0x1 -> Master trying to read in 10Bit addressing mode when RESTART
+//               disabled
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_10B_RD_NORSTRT_RESET  _u(0x0)
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_10B_RD_NORSTRT_BITS   _u(0x00000400)
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_10B_RD_NORSTRT_MSB    _u(10)
@@ -2080,7 +2087,8 @@
 //               Reset value: 0x0
 //
 //               Role of DW_apb_i2c:  Master
-//               0x0 -> User trying to send START byte when RESTART disabled- scenario not present
+//               0x0 -> User trying to send START byte when RESTART disabled- scenario
+//               not present
 //               0x1 -> User trying to send START byte when RESTART disabled
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_SBYTE_NORSTRT_RESET  _u(0x0)
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_SBYTE_NORSTRT_BITS   _u(0x00000200)
@@ -2098,7 +2106,8 @@
 //               Reset value: 0x0
 //
 //               Role of DW_apb_i2c:  Master-Transmitter or Master-Receiver
-//               0x0 -> User trying to switch Master to HS mode when RESTART disabled- scenario not present
+//               0x0 -> User trying to switch Master to HS mode when RESTART disabled-
+//               scenario not present
 //               0x1 -> User trying to switch Master to HS mode when RESTART disabled
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_HS_NORSTRT_RESET  _u(0x0)
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_HS_NORSTRT_BITS   _u(0x00000100)
@@ -2188,7 +2197,8 @@
 //               Reset value: 0x0
 //
 //               Role of DW_apb_i2c:  Master-Transmitter
-//               0x0 -> Transmitted data non-ACKed by addressed slave-scenario not present
+//               0x0 -> Transmitted data non-ACKed by addressed slave-scenario not
+//               present
 //               0x1 -> Transmitted data not ACKed by addressed slave
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_TXDATA_NOACK_RESET  _u(0x0)
 #define I2C_IC_TX_ABRT_SOURCE_ABRT_TXDATA_NOACK_BITS   _u(0x00000008)
@@ -2697,4 +2707,3 @@
 #define I2C_IC_COMP_TYPE_IC_COMP_TYPE_ACCESS "RO"
 // =============================================================================
 #endif // _HARDWARE_REGS_I2C_H
-

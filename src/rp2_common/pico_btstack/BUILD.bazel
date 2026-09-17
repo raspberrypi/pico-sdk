@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//bazel:defs.bzl", "compatible_with_pico_w", "incompatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,6 +12,7 @@ package(default_visibility = ["//visibility:public"])
 #   --@pico-sdk//bazel/constraint:PICO_BT_ENABLE_MESH
 cc_library(
     name = "pico_btstack",
+    target_compatible_with = incompatible_with_config("//bazel/constraint:pico_btstack_config_unset"),
     deps = ["pico_btstack_base"] + select({
         "//bazel/constraint:pico_bt_enable_ble_enabled": [":pico_btstack_ble"],
         "//conditions:default": [],
@@ -21,7 +23,6 @@ cc_library(
         "//bazel/constraint:pico_bt_enable_mesh_enabled": [":pico_btstack_mesh"],
         "//conditions:default": [],
     }),
-    target_compatible_with = incompatible_with_config("//bazel/constraint:pico_btstack_config_unset"),
 )
 
 # Prefer these aliases to directly referencing @btstack, as it's possible that

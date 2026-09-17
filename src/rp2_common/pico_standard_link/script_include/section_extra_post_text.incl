@@ -1,0 +1,6 @@
+/* Empty file
+
+   This file is included between the end of text and the start of data.
+
+   It can be overridden to add extra sections into flash.
+*/

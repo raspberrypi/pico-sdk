@@ -30,7 +30,7 @@ typedef struct {
     // 0x000f0000 [19:16] ENDPOINT     (0x0) Device endpoint to send data to
     // 0x0000007f [6:0]   ADDRESS      (0x00) In device mode, the address that the device should respond to
     io_rw_32 dev_addr_ctrl;
- 
+
     // (Description copied from array index 0 register USB_ADDR_ENDP1 applies similarly to other array indexes)
     _REG_(USB_ADDR_ENDP1_OFFSET) // USB_ADDR_ENDP1
     // Interrupt endpoint 1
@@ -39,7 +39,7 @@ typedef struct {
     // 0x000f0000 [19:16] ENDPOINT     (0x0) Endpoint number of the interrupt endpoint
     // 0x0000007f [6:0]   ADDRESS      (0x00) Device address
     io_rw_32 int_ep_addr_ctrl[15];
- 
+
     _REG_(USB_MAIN_CTRL_OFFSET) // USB_MAIN_CTRL
     // Main control register
     // 0x80000000 [31]    SIM_TIMING   (0) Reduced timings for simulation
@@ -47,17 +47,17 @@ typedef struct {
     // 0x00000002 [1]     HOST_NDEVICE (0) Device mode = 0, Host mode = 1
     // 0x00000001 [0]     CONTROLLER_EN (0) Enable controller
     io_rw_32 main_ctrl;
- 
+
     _REG_(USB_SOF_WR_OFFSET) // USB_SOF_WR
     // Set the SOF (Start of Frame) frame number in the host controller
-    // 0x000007ff [10:0]  COUNT        (0x000) 
+    // 0x000007ff [10:0]  COUNT        (0x000)
     io_wo_32 sof_wr;
- 
+
     _REG_(USB_SOF_RD_OFFSET) // USB_SOF_RD
     // Read the last SOF (Start of Frame) frame number seen
-    // 0x000007ff [10:0]  COUNT        (0x000) 
+    // 0x000007ff [10:0]  COUNT        (0x000)
     io_ro_32 sof_rd;
- 
+
     _REG_(USB_SIE_CTRL_OFFSET) // USB_SIE_CTRL
     // SIE control register
     // 0x80000000 [31]    EP0_INT_STALL (0) Device: Set bit in EP_STATUS_STALL_NAK when EP0 sends a STALL
@@ -86,7 +86,7 @@ typedef struct {
     // 0x00000002 [1]     SEND_SETUP   (0) Host: Send Setup packet
     // 0x00000001 [0]     START_TRANS  (0) Host: Start transaction
     io_rw_32 sie_ctrl;
- 
+
     _REG_(USB_SIE_STATUS_OFFSET) // USB_SIE_STATUS
     // SIE status register
     // 0x80000000 [31]    DATA_SEQ_ERROR (0) Data Sequence Error
@@ -110,162 +110,162 @@ typedef struct {
     // 0x0000000c [3:2]   LINE_STATE   (0x0) USB bus line state
     // 0x00000001 [0]     VBUS_DETECTED (0) Device: VBUS Detected
     io_rw_32 sie_status;
- 
+
     _REG_(USB_INT_EP_CTRL_OFFSET) // USB_INT_EP_CTRL
     // interrupt endpoint control register
     // 0x0000fffe [15:1]  INT_EP_ACTIVE (0x0000) Host: Enable interrupt endpoint 1 -> 15
     io_rw_32 int_ep_ctrl;
- 
+
     _REG_(USB_BUFF_STATUS_OFFSET) // USB_BUFF_STATUS
     // Buffer status register
-    // 0x80000000 [31]    EP15_OUT     (0) 
-    // 0x40000000 [30]    EP15_IN      (0) 
-    // 0x20000000 [29]    EP14_OUT     (0) 
-    // 0x10000000 [28]    EP14_IN      (0) 
-    // 0x08000000 [27]    EP13_OUT     (0) 
-    // 0x04000000 [26]    EP13_IN      (0) 
-    // 0x02000000 [25]    EP12_OUT     (0) 
-    // 0x01000000 [24]    EP12_IN      (0) 
-    // 0x00800000 [23]    EP11_OUT     (0) 
-    // 0x00400000 [22]    EP11_IN      (0) 
-    // 0x00200000 [21]    EP10_OUT     (0) 
-    // 0x00100000 [20]    EP10_IN      (0) 
-    // 0x00080000 [19]    EP9_OUT      (0) 
-    // 0x00040000 [18]    EP9_IN       (0) 
-    // 0x00020000 [17]    EP8_OUT      (0) 
-    // 0x00010000 [16]    EP8_IN       (0) 
-    // 0x00008000 [15]    EP7_OUT      (0) 
-    // 0x00004000 [14]    EP7_IN       (0) 
-    // 0x00002000 [13]    EP6_OUT      (0) 
-    // 0x00001000 [12]    EP6_IN       (0) 
-    // 0x00000800 [11]    EP5_OUT      (0) 
-    // 0x00000400 [10]    EP5_IN       (0) 
-    // 0x00000200 [9]     EP4_OUT      (0) 
-    // 0x00000100 [8]     EP4_IN       (0) 
-    // 0x00000080 [7]     EP3_OUT      (0) 
-    // 0x00000040 [6]     EP3_IN       (0) 
-    // 0x00000020 [5]     EP2_OUT      (0) 
-    // 0x00000010 [4]     EP2_IN       (0) 
-    // 0x00000008 [3]     EP1_OUT      (0) 
-    // 0x00000004 [2]     EP1_IN       (0) 
-    // 0x00000002 [1]     EP0_OUT      (0) 
-    // 0x00000001 [0]     EP0_IN       (0) 
+    // 0x80000000 [31]    EP15_OUT     (0)
+    // 0x40000000 [30]    EP15_IN      (0)
+    // 0x20000000 [29]    EP14_OUT     (0)
+    // 0x10000000 [28]    EP14_IN      (0)
+    // 0x08000000 [27]    EP13_OUT     (0)
+    // 0x04000000 [26]    EP13_IN      (0)
+    // 0x02000000 [25]    EP12_OUT     (0)
+    // 0x01000000 [24]    EP12_IN      (0)
+    // 0x00800000 [23]    EP11_OUT     (0)
+    // 0x00400000 [22]    EP11_IN      (0)
+    // 0x00200000 [21]    EP10_OUT     (0)
+    // 0x00100000 [20]    EP10_IN      (0)
+    // 0x00080000 [19]    EP9_OUT      (0)
+    // 0x00040000 [18]    EP9_IN       (0)
+    // 0x00020000 [17]    EP8_OUT      (0)
+    // 0x00010000 [16]    EP8_IN       (0)
+    // 0x00008000 [15]    EP7_OUT      (0)
+    // 0x00004000 [14]    EP7_IN       (0)
+    // 0x00002000 [13]    EP6_OUT      (0)
+    // 0x00001000 [12]    EP6_IN       (0)
+    // 0x00000800 [11]    EP5_OUT      (0)
+    // 0x00000400 [10]    EP5_IN       (0)
+    // 0x00000200 [9]     EP4_OUT      (0)
+    // 0x00000100 [8]     EP4_IN       (0)
+    // 0x00000080 [7]     EP3_OUT      (0)
+    // 0x00000040 [6]     EP3_IN       (0)
+    // 0x00000020 [5]     EP2_OUT      (0)
+    // 0x00000010 [4]     EP2_IN       (0)
+    // 0x00000008 [3]     EP1_OUT      (0)
+    // 0x00000004 [2]     EP1_IN       (0)
+    // 0x00000002 [1]     EP0_OUT      (0)
+    // 0x00000001 [0]     EP0_IN       (0)
     io_rw_32 buf_status;
- 
+
     _REG_(USB_BUFF_CPU_SHOULD_HANDLE_OFFSET) // USB_BUFF_CPU_SHOULD_HANDLE
     // Which of the double buffers should be handled
-    // 0x80000000 [31]    EP15_OUT     (0) 
-    // 0x40000000 [30]    EP15_IN      (0) 
-    // 0x20000000 [29]    EP14_OUT     (0) 
-    // 0x10000000 [28]    EP14_IN      (0) 
-    // 0x08000000 [27]    EP13_OUT     (0) 
-    // 0x04000000 [26]    EP13_IN      (0) 
-    // 0x02000000 [25]    EP12_OUT     (0) 
-    // 0x01000000 [24]    EP12_IN      (0) 
-    // 0x00800000 [23]    EP11_OUT     (0) 
-    // 0x00400000 [22]    EP11_IN      (0) 
-    // 0x00200000 [21]    EP10_OUT     (0) 
-    // 0x00100000 [20]    EP10_IN      (0) 
-    // 0x00080000 [19]    EP9_OUT      (0) 
-    // 0x00040000 [18]    EP9_IN       (0) 
-    // 0x00020000 [17]    EP8_OUT      (0) 
-    // 0x00010000 [16]    EP8_IN       (0) 
-    // 0x00008000 [15]    EP7_OUT      (0) 
-    // 0x00004000 [14]    EP7_IN       (0) 
-    // 0x00002000 [13]    EP6_OUT      (0) 
-    // 0x00001000 [12]    EP6_IN       (0) 
-    // 0x00000800 [11]    EP5_OUT      (0) 
-    // 0x00000400 [10]    EP5_IN       (0) 
-    // 0x00000200 [9]     EP4_OUT      (0) 
-    // 0x00000100 [8]     EP4_IN       (0) 
-    // 0x00000080 [7]     EP3_OUT      (0) 
-    // 0x00000040 [6]     EP3_IN       (0) 
-    // 0x00000020 [5]     EP2_OUT      (0) 
-    // 0x00000010 [4]     EP2_IN       (0) 
-    // 0x00000008 [3]     EP1_OUT      (0) 
-    // 0x00000004 [2]     EP1_IN       (0) 
-    // 0x00000002 [1]     EP0_OUT      (0) 
-    // 0x00000001 [0]     EP0_IN       (0) 
+    // 0x80000000 [31]    EP15_OUT     (0)
+    // 0x40000000 [30]    EP15_IN      (0)
+    // 0x20000000 [29]    EP14_OUT     (0)
+    // 0x10000000 [28]    EP14_IN      (0)
+    // 0x08000000 [27]    EP13_OUT     (0)
+    // 0x04000000 [26]    EP13_IN      (0)
+    // 0x02000000 [25]    EP12_OUT     (0)
+    // 0x01000000 [24]    EP12_IN      (0)
+    // 0x00800000 [23]    EP11_OUT     (0)
+    // 0x00400000 [22]    EP11_IN      (0)
+    // 0x00200000 [21]    EP10_OUT     (0)
+    // 0x00100000 [20]    EP10_IN      (0)
+    // 0x00080000 [19]    EP9_OUT      (0)
+    // 0x00040000 [18]    EP9_IN       (0)
+    // 0x00020000 [17]    EP8_OUT      (0)
+    // 0x00010000 [16]    EP8_IN       (0)
+    // 0x00008000 [15]    EP7_OUT      (0)
+    // 0x00004000 [14]    EP7_IN       (0)
+    // 0x00002000 [13]    EP6_OUT      (0)
+    // 0x00001000 [12]    EP6_IN       (0)
+    // 0x00000800 [11]    EP5_OUT      (0)
+    // 0x00000400 [10]    EP5_IN       (0)
+    // 0x00000200 [9]     EP4_OUT      (0)
+    // 0x00000100 [8]     EP4_IN       (0)
+    // 0x00000080 [7]     EP3_OUT      (0)
+    // 0x00000040 [6]     EP3_IN       (0)
+    // 0x00000020 [5]     EP2_OUT      (0)
+    // 0x00000010 [4]     EP2_IN       (0)
+    // 0x00000008 [3]     EP1_OUT      (0)
+    // 0x00000004 [2]     EP1_IN       (0)
+    // 0x00000002 [1]     EP0_OUT      (0)
+    // 0x00000001 [0]     EP0_IN       (0)
     io_ro_32 buf_cpu_should_handle;
- 
+
     _REG_(USB_EP_ABORT_OFFSET) // USB_EP_ABORT
     // Device only: Can be set to ignore the buffer control register for this endpoint in case you...
-    // 0x80000000 [31]    EP15_OUT     (0) 
-    // 0x40000000 [30]    EP15_IN      (0) 
-    // 0x20000000 [29]    EP14_OUT     (0) 
-    // 0x10000000 [28]    EP14_IN      (0) 
-    // 0x08000000 [27]    EP13_OUT     (0) 
-    // 0x04000000 [26]    EP13_IN      (0) 
-    // 0x02000000 [25]    EP12_OUT     (0) 
-    // 0x01000000 [24]    EP12_IN      (0) 
-    // 0x00800000 [23]    EP11_OUT     (0) 
-    // 0x00400000 [22]    EP11_IN      (0) 
-    // 0x00200000 [21]    EP10_OUT     (0) 
-    // 0x00100000 [20]    EP10_IN      (0) 
-    // 0x00080000 [19]    EP9_OUT      (0) 
-    // 0x00040000 [18]    EP9_IN       (0) 
-    // 0x00020000 [17]    EP8_OUT      (0) 
-    // 0x00010000 [16]    EP8_IN       (0) 
-    // 0x00008000 [15]    EP7_OUT      (0) 
-    // 0x00004000 [14]    EP7_IN       (0) 
-    // 0x00002000 [13]    EP6_OUT      (0) 
-    // 0x00001000 [12]    EP6_IN       (0) 
-    // 0x00000800 [11]    EP5_OUT      (0) 
-    // 0x00000400 [10]    EP5_IN       (0) 
-    // 0x00000200 [9]     EP4_OUT      (0) 
-    // 0x00000100 [8]     EP4_IN       (0) 
-    // 0x00000080 [7]     EP3_OUT      (0) 
-    // 0x00000040 [6]     EP3_IN       (0) 
-    // 0x00000020 [5]     EP2_OUT      (0) 
-    // 0x00000010 [4]     EP2_IN       (0) 
-    // 0x00000008 [3]     EP1_OUT      (0) 
-    // 0x00000004 [2]     EP1_IN       (0) 
-    // 0x00000002 [1]     EP0_OUT      (0) 
-    // 0x00000001 [0]     EP0_IN       (0) 
+    // 0x80000000 [31]    EP15_OUT     (0)
+    // 0x40000000 [30]    EP15_IN      (0)
+    // 0x20000000 [29]    EP14_OUT     (0)
+    // 0x10000000 [28]    EP14_IN      (0)
+    // 0x08000000 [27]    EP13_OUT     (0)
+    // 0x04000000 [26]    EP13_IN      (0)
+    // 0x02000000 [25]    EP12_OUT     (0)
+    // 0x01000000 [24]    EP12_IN      (0)
+    // 0x00800000 [23]    EP11_OUT     (0)
+    // 0x00400000 [22]    EP11_IN      (0)
+    // 0x00200000 [21]    EP10_OUT     (0)
+    // 0x00100000 [20]    EP10_IN      (0)
+    // 0x00080000 [19]    EP9_OUT      (0)
+    // 0x00040000 [18]    EP9_IN       (0)
+    // 0x00020000 [17]    EP8_OUT      (0)
+    // 0x00010000 [16]    EP8_IN       (0)
+    // 0x00008000 [15]    EP7_OUT      (0)
+    // 0x00004000 [14]    EP7_IN       (0)
+    // 0x00002000 [13]    EP6_OUT      (0)
+    // 0x00001000 [12]    EP6_IN       (0)
+    // 0x00000800 [11]    EP5_OUT      (0)
+    // 0x00000400 [10]    EP5_IN       (0)
+    // 0x00000200 [9]     EP4_OUT      (0)
+    // 0x00000100 [8]     EP4_IN       (0)
+    // 0x00000080 [7]     EP3_OUT      (0)
+    // 0x00000040 [6]     EP3_IN       (0)
+    // 0x00000020 [5]     EP2_OUT      (0)
+    // 0x00000010 [4]     EP2_IN       (0)
+    // 0x00000008 [3]     EP1_OUT      (0)
+    // 0x00000004 [2]     EP1_IN       (0)
+    // 0x00000002 [1]     EP0_OUT      (0)
+    // 0x00000001 [0]     EP0_IN       (0)
     io_rw_32 abort;
- 
+
     _REG_(USB_EP_ABORT_DONE_OFFSET) // USB_EP_ABORT_DONE
     // Device only: Used in conjunction with `EP_ABORT`
-    // 0x80000000 [31]    EP15_OUT     (0) 
-    // 0x40000000 [30]    EP15_IN      (0) 
-    // 0x20000000 [29]    EP14_OUT     (0) 
-    // 0x10000000 [28]    EP14_IN      (0) 
-    // 0x08000000 [27]    EP13_OUT     (0) 
-    // 0x04000000 [26]    EP13_IN      (0) 
-    // 0x02000000 [25]    EP12_OUT     (0) 
-    // 0x01000000 [24]    EP12_IN      (0) 
-    // 0x00800000 [23]    EP11_OUT     (0) 
-    // 0x00400000 [22]    EP11_IN      (0) 
-    // 0x00200000 [21]    EP10_OUT     (0) 
-    // 0x00100000 [20]    EP10_IN      (0) 
-    // 0x00080000 [19]    EP9_OUT      (0) 
-    // 0x00040000 [18]    EP9_IN       (0) 
-    // 0x00020000 [17]    EP8_OUT      (0) 
-    // 0x00010000 [16]    EP8_IN       (0) 
-    // 0x00008000 [15]    EP7_OUT      (0) 
-    // 0x00004000 [14]    EP7_IN       (0) 
-    // 0x00002000 [13]    EP6_OUT      (0) 
-    // 0x00001000 [12]    EP6_IN       (0) 
-    // 0x00000800 [11]    EP5_OUT      (0) 
-    // 0x00000400 [10]    EP5_IN       (0) 
-    // 0x00000200 [9]     EP4_OUT      (0) 
-    // 0x00000100 [8]     EP4_IN       (0) 
-    // 0x00000080 [7]     EP3_OUT      (0) 
-    // 0x00000040 [6]     EP3_IN       (0) 
-    // 0x00000020 [5]     EP2_OUT      (0) 
-    // 0x00000010 [4]     EP2_IN       (0) 
-    // 0x00000008 [3]     EP1_OUT      (0) 
-    // 0x00000004 [2]     EP1_IN       (0) 
-    // 0x00000002 [1]     EP0_OUT      (0) 
-    // 0x00000001 [0]     EP0_IN       (0) 
+    // 0x80000000 [31]    EP15_OUT     (0)
+    // 0x40000000 [30]    EP15_IN      (0)
+    // 0x20000000 [29]    EP14_OUT     (0)
+    // 0x10000000 [28]    EP14_IN      (0)
+    // 0x08000000 [27]    EP13_OUT     (0)
+    // 0x04000000 [26]    EP13_IN      (0)
+    // 0x02000000 [25]    EP12_OUT     (0)
+    // 0x01000000 [24]    EP12_IN      (0)
+    // 0x00800000 [23]    EP11_OUT     (0)
+    // 0x00400000 [22]    EP11_IN      (0)
+    // 0x00200000 [21]    EP10_OUT     (0)
+    // 0x00100000 [20]    EP10_IN      (0)
+    // 0x00080000 [19]    EP9_OUT      (0)
+    // 0x00040000 [18]    EP9_IN       (0)
+    // 0x00020000 [17]    EP8_OUT      (0)
+    // 0x00010000 [16]    EP8_IN       (0)
+    // 0x00008000 [15]    EP7_OUT      (0)
+    // 0x00004000 [14]    EP7_IN       (0)
+    // 0x00002000 [13]    EP6_OUT      (0)
+    // 0x00001000 [12]    EP6_IN       (0)
+    // 0x00000800 [11]    EP5_OUT      (0)
+    // 0x00000400 [10]    EP5_IN       (0)
+    // 0x00000200 [9]     EP4_OUT      (0)
+    // 0x00000100 [8]     EP4_IN       (0)
+    // 0x00000080 [7]     EP3_OUT      (0)
+    // 0x00000040 [6]     EP3_IN       (0)
+    // 0x00000020 [5]     EP2_OUT      (0)
+    // 0x00000010 [4]     EP2_IN       (0)
+    // 0x00000008 [3]     EP1_OUT      (0)
+    // 0x00000004 [2]     EP1_IN       (0)
+    // 0x00000002 [1]     EP0_OUT      (0)
+    // 0x00000001 [0]     EP0_IN       (0)
     io_rw_32 abort_done;
- 
+
     _REG_(USB_EP_STALL_ARM_OFFSET) // USB_EP_STALL_ARM
     // Device: this bit must be set in conjunction with the `STALL` bit in the buffer control register...
-    // 0x00000002 [1]     EP0_OUT      (0) 
-    // 0x00000001 [0]     EP0_IN       (0) 
+    // 0x00000002 [1]     EP0_OUT      (0)
+    // 0x00000001 [0]     EP0_IN       (0)
     io_rw_32 ep_stall_arm;
- 
+
     _REG_(USB_NAK_POLL_OFFSET) // USB_NAK_POLL
     // Used by the host controller
     // 0xf0000000 [31:28] RETRY_COUNT_HI (0x0) Bits 9:6 of nak_retry count
@@ -275,63 +275,63 @@ typedef struct {
     // 0x0000fc00 [15:10] RETRY_COUNT_LO (0x00) Bits 5:0 of nak_retry_count
     // 0x000003ff [9:0]   DELAY_LS     (0x010) NAK polling interval for a low speed device
     io_rw_32 nak_poll;
- 
+
     _REG_(USB_EP_STATUS_STALL_NAK_OFFSET) // USB_EP_STATUS_STALL_NAK
     // Device: bits are set when the `IRQ_ON_NAK` or `IRQ_ON_STALL` bits are set
-    // 0x80000000 [31]    EP15_OUT     (0) 
-    // 0x40000000 [30]    EP15_IN      (0) 
-    // 0x20000000 [29]    EP14_OUT     (0) 
-    // 0x10000000 [28]    EP14_IN      (0) 
-    // 0x08000000 [27]    EP13_OUT     (0) 
-    // 0x04000000 [26]    EP13_IN      (0) 
-    // 0x02000000 [25]    EP12_OUT     (0) 
-    // 0x01000000 [24]    EP12_IN      (0) 
-    // 0x00800000 [23]    EP11_OUT     (0) 
-    // 0x00400000 [22]    EP11_IN      (0) 
-    // 0x00200000 [21]    EP10_OUT     (0) 
-    // 0x00100000 [20]    EP10_IN      (0) 
-    // 0x00080000 [19]    EP9_OUT      (0) 
-    // 0x00040000 [18]    EP9_IN       (0) 
-    // 0x00020000 [17]    EP8_OUT      (0) 
-    // 0x00010000 [16]    EP8_IN       (0) 
-    // 0x00008000 [15]    EP7_OUT      (0) 
-    // 0x00004000 [14]    EP7_IN       (0) 
-    // 0x00002000 [13]    EP6_OUT      (0) 
-    // 0x00001000 [12]    EP6_IN       (0) 
-    // 0x00000800 [11]    EP5_OUT      (0) 
-    // 0x00000400 [10]    EP5_IN       (0) 
-    // 0x00000200 [9]     EP4_OUT      (0) 
-    // 0x00000100 [8]     EP4_IN       (0) 
-    // 0x00000080 [7]     EP3_OUT      (0) 
-    // 0x00000040 [6]     EP3_IN       (0) 
-    // 0x00000020 [5]     EP2_OUT      (0) 
-    // 0x00000010 [4]     EP2_IN       (0) 
-    // 0x00000008 [3]     EP1_OUT      (0) 
-    // 0x00000004 [2]     EP1_IN       (0) 
-    // 0x00000002 [1]     EP0_OUT      (0) 
-    // 0x00000001 [0]     EP0_IN       (0) 
+    // 0x80000000 [31]    EP15_OUT     (0)
+    // 0x40000000 [30]    EP15_IN      (0)
+    // 0x20000000 [29]    EP14_OUT     (0)
+    // 0x10000000 [28]    EP14_IN      (0)
+    // 0x08000000 [27]    EP13_OUT     (0)
+    // 0x04000000 [26]    EP13_IN      (0)
+    // 0x02000000 [25]    EP12_OUT     (0)
+    // 0x01000000 [24]    EP12_IN      (0)
+    // 0x00800000 [23]    EP11_OUT     (0)
+    // 0x00400000 [22]    EP11_IN      (0)
+    // 0x00200000 [21]    EP10_OUT     (0)
+    // 0x00100000 [20]    EP10_IN      (0)
+    // 0x00080000 [19]    EP9_OUT      (0)
+    // 0x00040000 [18]    EP9_IN       (0)
+    // 0x00020000 [17]    EP8_OUT      (0)
+    // 0x00010000 [16]    EP8_IN       (0)
+    // 0x00008000 [15]    EP7_OUT      (0)
+    // 0x00004000 [14]    EP7_IN       (0)
+    // 0x00002000 [13]    EP6_OUT      (0)
+    // 0x00001000 [12]    EP6_IN       (0)
+    // 0x00000800 [11]    EP5_OUT      (0)
+    // 0x00000400 [10]    EP5_IN       (0)
+    // 0x00000200 [9]     EP4_OUT      (0)
+    // 0x00000100 [8]     EP4_IN       (0)
+    // 0x00000080 [7]     EP3_OUT      (0)
+    // 0x00000040 [6]     EP3_IN       (0)
+    // 0x00000020 [5]     EP2_OUT      (0)
+    // 0x00000010 [4]     EP2_IN       (0)
+    // 0x00000008 [3]     EP1_OUT      (0)
+    // 0x00000004 [2]     EP1_IN       (0)
+    // 0x00000002 [1]     EP0_OUT      (0)
+    // 0x00000001 [0]     EP0_IN       (0)
     io_rw_32 ep_nak_stall_status;
- 
+
     _REG_(USB_USB_MUXING_OFFSET) // USB_USB_MUXING
     // Where to connect the USB controller
     // 0x80000000 [31]    SWAP_DPDM    (0) Swap the USB PHY DP and DM pins and all related controls...
     // 0x00000010 [4]     USBPHY_AS_GPIO (0) Use the usb DP and DM pins as GPIO pins instead of...
-    // 0x00000008 [3]     SOFTCON      (0) 
-    // 0x00000004 [2]     TO_DIGITAL_PAD (0) 
-    // 0x00000002 [1]     TO_EXTPHY    (0) 
-    // 0x00000001 [0]     TO_PHY       (1) 
+    // 0x00000008 [3]     SOFTCON      (0)
+    // 0x00000004 [2]     TO_DIGITAL_PAD (0)
+    // 0x00000002 [1]     TO_EXTPHY    (0)
+    // 0x00000001 [0]     TO_PHY       (1)
     io_rw_32 muxing;
- 
+
     _REG_(USB_USB_PWR_OFFSET) // USB_USB_PWR
     // Overrides for the power signals in the event that the VBUS signals are not hooked up to GPIO
-    // 0x00000020 [5]     OVERCURR_DETECT_EN (0) 
-    // 0x00000010 [4]     OVERCURR_DETECT (0) 
-    // 0x00000008 [3]     VBUS_DETECT_OVERRIDE_EN (0) 
-    // 0x00000004 [2]     VBUS_DETECT  (0) 
-    // 0x00000002 [1]     VBUS_EN_OVERRIDE_EN (0) 
-    // 0x00000001 [0]     VBUS_EN      (0) 
+    // 0x00000020 [5]     OVERCURR_DETECT_EN (0)
+    // 0x00000010 [4]     OVERCURR_DETECT (0)
+    // 0x00000008 [3]     VBUS_DETECT_OVERRIDE_EN (0)
+    // 0x00000004 [2]     VBUS_DETECT  (0)
+    // 0x00000002 [1]     VBUS_EN_OVERRIDE_EN (0)
+    // 0x00000001 [0]     VBUS_EN      (0)
     io_rw_32 pwr;
- 
+
     _REG_(USB_USBPHY_DIRECT_OFFSET) // USB_USBPHY_DIRECT
     // This register allows for direct control of the USB phy
     // 0x02000000 [25]    RX_DM_OVERRIDE (0) Override rx_dm value into controller
@@ -359,37 +359,37 @@ typedef struct {
     // 0x00000002 [1]     DP_PULLUP_EN (0) DP pull up enable
     // 0x00000001 [0]     DP_PULLUP_HISEL (0) Enable the second DP pull up resistor
     io_rw_32 phy_direct;
- 
+
     _REG_(USB_USBPHY_DIRECT_OVERRIDE_OFFSET) // USB_USBPHY_DIRECT_OVERRIDE
     // Override enable for each control in usbphy_direct
-    // 0x00040000 [18]    RX_DM_OVERRIDE_EN (0) 
-    // 0x00020000 [17]    RX_DP_OVERRIDE_EN (0) 
-    // 0x00010000 [16]    RX_DD_OVERRIDE_EN (0) 
-    // 0x00008000 [15]    TX_DIFFMODE_OVERRIDE_EN (0) 
-    // 0x00001000 [12]    DM_PULLUP_OVERRIDE_EN (0) 
-    // 0x00000800 [11]    TX_FSSLEW_OVERRIDE_EN (0) 
-    // 0x00000400 [10]    TX_PD_OVERRIDE_EN (0) 
-    // 0x00000200 [9]     RX_PD_OVERRIDE_EN (0) 
-    // 0x00000100 [8]     TX_DM_OVERRIDE_EN (0) 
-    // 0x00000080 [7]     TX_DP_OVERRIDE_EN (0) 
-    // 0x00000040 [6]     TX_DM_OE_OVERRIDE_EN (0) 
-    // 0x00000020 [5]     TX_DP_OE_OVERRIDE_EN (0) 
-    // 0x00000010 [4]     DM_PULLDN_EN_OVERRIDE_EN (0) 
-    // 0x00000008 [3]     DP_PULLDN_EN_OVERRIDE_EN (0) 
-    // 0x00000004 [2]     DP_PULLUP_EN_OVERRIDE_EN (0) 
-    // 0x00000002 [1]     DM_PULLUP_HISEL_OVERRIDE_EN (0) 
-    // 0x00000001 [0]     DP_PULLUP_HISEL_OVERRIDE_EN (0) 
+    // 0x00040000 [18]    RX_DM_OVERRIDE_EN (0)
+    // 0x00020000 [17]    RX_DP_OVERRIDE_EN (0)
+    // 0x00010000 [16]    RX_DD_OVERRIDE_EN (0)
+    // 0x00008000 [15]    TX_DIFFMODE_OVERRIDE_EN (0)
+    // 0x00001000 [12]    DM_PULLUP_OVERRIDE_EN (0)
+    // 0x00000800 [11]    TX_FSSLEW_OVERRIDE_EN (0)
+    // 0x00000400 [10]    TX_PD_OVERRIDE_EN (0)
+    // 0x00000200 [9]     RX_PD_OVERRIDE_EN (0)
+    // 0x00000100 [8]     TX_DM_OVERRIDE_EN (0)
+    // 0x00000080 [7]     TX_DP_OVERRIDE_EN (0)
+    // 0x00000040 [6]     TX_DM_OE_OVERRIDE_EN (0)
+    // 0x00000020 [5]     TX_DP_OE_OVERRIDE_EN (0)
+    // 0x00000010 [4]     DM_PULLDN_EN_OVERRIDE_EN (0)
+    // 0x00000008 [3]     DP_PULLDN_EN_OVERRIDE_EN (0)
+    // 0x00000004 [2]     DP_PULLUP_EN_OVERRIDE_EN (0)
+    // 0x00000002 [1]     DM_PULLUP_HISEL_OVERRIDE_EN (0)
+    // 0x00000001 [0]     DP_PULLUP_HISEL_OVERRIDE_EN (0)
     io_rw_32 phy_direct_override;
- 
+
     _REG_(USB_USBPHY_TRIM_OFFSET) // USB_USBPHY_TRIM
     // Used to adjust trim values of USB phy pull down resistors
     // 0x00001f00 [12:8]  DM_PULLDN_TRIM (0x1f) Value to drive to USB PHY +
     // 0x0000001f [4:0]   DP_PULLDN_TRIM (0x1f) Value to drive to USB PHY +
     io_rw_32 phy_trim;
- 
+
     _REG_(USB_LINESTATE_TUNING_OFFSET) // USB_LINESTATE_TUNING
     // Used for debug only
-    // 0x00000f00 [11:8]  SPARE_FIX    (0x0) 
+    // 0x00000f00 [11:8]  SPARE_FIX    (0x0)
     // 0x00000080 [7]     DEV_LS_WAKE_FIX (1) Device - exit suspend on any non-idle signalling, not...
     // 0x00000040 [6]     DEV_RX_ERR_QUIESCE (1) Device - suppress repeated errors until the device FSM...
     // 0x00000020 [5]     SIE_RX_CHATTER_SE0_FIX (1) RX - when recovering from line chatter or bitstuff...
@@ -399,7 +399,7 @@ typedef struct {
     // 0x00000002 [1]     LINESTATE_DELAY (0) Device/Host - add an extra 1-bit debounce of linestate sampling
     // 0x00000001 [0]     RCV_DELAY    (0) Device - register the received data to account for hub...
     io_rw_32 linestate_tuning;
- 
+
     _REG_(USB_INTR_OFFSET) // USB_INTR
     // Raw Interrupts
     // 0x00800000 [23]    EPX_STOPPED_ON_NAK (0) Source: NAK_POLL
@@ -427,7 +427,7 @@ typedef struct {
     // 0x00000002 [1]     HOST_RESUME  (0) Host: raised when a device wakes up the host
     // 0x00000001 [0]     HOST_CONN_DIS (0) Host: raised when a device is connected or disconnected (i
     io_ro_32 intr;
- 
+
     _REG_(USB_INTE_OFFSET) // USB_INTE
     // Interrupt Enable
     // 0x00800000 [23]    EPX_STOPPED_ON_NAK (0) Source: NAK_POLL
@@ -455,7 +455,7 @@ typedef struct {
     // 0x00000002 [1]     HOST_RESUME  (0) Host: raised when a device wakes up the host
     // 0x00000001 [0]     HOST_CONN_DIS (0) Host: raised when a device is connected or disconnected (i
     io_rw_32 inte;
- 
+
     _REG_(USB_INTF_OFFSET) // USB_INTF
     // Interrupt Force
     // 0x00800000 [23]    EPX_STOPPED_ON_NAK (0) Source: NAK_POLL
@@ -483,7 +483,7 @@ typedef struct {
     // 0x00000002 [1]     HOST_RESUME  (0) Host: raised when a device wakes up the host
     // 0x00000001 [0]     HOST_CONN_DIS (0) Host: raised when a device is connected or disconnected (i
     io_rw_32 intf;
- 
+
     _REG_(USB_INTS_OFFSET) // USB_INTS
     // Interrupt status after masking & forcing
     // 0x00800000 [23]    EPX_STOPPED_ON_NAK (0) Source: NAK_POLL
@@ -511,87 +511,87 @@ typedef struct {
     // 0x00000002 [1]     HOST_RESUME  (0) Host: raised when a device wakes up the host
     // 0x00000001 [0]     HOST_CONN_DIS (0) Host: raised when a device is connected or disconnected (i
     io_ro_32 ints;
- 
+
     uint32_t _pad0[25];
- 
+
     _REG_(USB_SOF_TIMESTAMP_RAW_OFFSET) // USB_SOF_TIMESTAMP_RAW
     // Device only
-    // 0x001fffff [20:0]  SOF_TIMESTAMP_RAW (0x000000) 
+    // 0x001fffff [20:0]  SOF_TIMESTAMP_RAW (0x000000)
     io_ro_32 sof_timestamp_raw;
- 
+
     _REG_(USB_SOF_TIMESTAMP_LAST_OFFSET) // USB_SOF_TIMESTAMP_LAST
     // Device only
-    // 0x001fffff [20:0]  SOF_TIMESTAMP_LAST (0x000000) 
+    // 0x001fffff [20:0]  SOF_TIMESTAMP_LAST (0x000000)
     io_ro_32 sof_timestamp_last;
- 
+
     _REG_(USB_SM_STATE_OFFSET) // USB_SM_STATE
-    // 0x00000f00 [11:8]  RX_DASM      (0x0) 
-    // 0x000000e0 [7:5]   BC_STATE     (0x0) 
-    // 0x0000001f [4:0]   STATE        (0x00) 
+    // 0x00000f00 [11:8]  RX_DASM      (0x0)
+    // 0x000000e0 [7:5]   BC_STATE     (0x0)
+    // 0x0000001f [4:0]   STATE        (0x00)
     io_ro_32 sm_state;
- 
+
     _REG_(USB_EP_TX_ERROR_OFFSET) // USB_EP_TX_ERROR
     // TX error count for each endpoint
-    // 0xc0000000 [31:30] EP15         (0x0) 
-    // 0x30000000 [29:28] EP14         (0x0) 
-    // 0x0c000000 [27:26] EP13         (0x0) 
-    // 0x03000000 [25:24] EP12         (0x0) 
-    // 0x00c00000 [23:22] EP11         (0x0) 
-    // 0x00300000 [21:20] EP10         (0x0) 
-    // 0x000c0000 [19:18] EP9          (0x0) 
-    // 0x00030000 [17:16] EP8          (0x0) 
-    // 0x0000c000 [15:14] EP7          (0x0) 
-    // 0x00003000 [13:12] EP6          (0x0) 
-    // 0x00000c00 [11:10] EP5          (0x0) 
-    // 0x00000300 [9:8]   EP4          (0x0) 
-    // 0x000000c0 [7:6]   EP3          (0x0) 
-    // 0x00000030 [5:4]   EP2          (0x0) 
-    // 0x0000000c [3:2]   EP1          (0x0) 
-    // 0x00000003 [1:0]   EP0          (0x0) 
+    // 0xc0000000 [31:30] EP15         (0x0)
+    // 0x30000000 [29:28] EP14         (0x0)
+    // 0x0c000000 [27:26] EP13         (0x0)
+    // 0x03000000 [25:24] EP12         (0x0)
+    // 0x00c00000 [23:22] EP11         (0x0)
+    // 0x00300000 [21:20] EP10         (0x0)
+    // 0x000c0000 [19:18] EP9          (0x0)
+    // 0x00030000 [17:16] EP8          (0x0)
+    // 0x0000c000 [15:14] EP7          (0x0)
+    // 0x00003000 [13:12] EP6          (0x0)
+    // 0x00000c00 [11:10] EP5          (0x0)
+    // 0x00000300 [9:8]   EP4          (0x0)
+    // 0x000000c0 [7:6]   EP3          (0x0)
+    // 0x00000030 [5:4]   EP2          (0x0)
+    // 0x0000000c [3:2]   EP1          (0x0)
+    // 0x00000003 [1:0]   EP0          (0x0)
     io_rw_32 ep_tx_error;
- 
+
     _REG_(USB_EP_RX_ERROR_OFFSET) // USB_EP_RX_ERROR
     // RX error count for each endpoint
-    // 0x80000000 [31]    EP15_SEQ     (0) 
-    // 0x40000000 [30]    EP15_TRANSACTION (0) 
-    // 0x20000000 [29]    EP14_SEQ     (0) 
-    // 0x10000000 [28]    EP14_TRANSACTION (0) 
-    // 0x08000000 [27]    EP13_SEQ     (0) 
-    // 0x04000000 [26]    EP13_TRANSACTION (0) 
-    // 0x02000000 [25]    EP12_SEQ     (0) 
-    // 0x01000000 [24]    EP12_TRANSACTION (0) 
-    // 0x00800000 [23]    EP11_SEQ     (0) 
-    // 0x00400000 [22]    EP11_TRANSACTION (0) 
-    // 0x00200000 [21]    EP10_SEQ     (0) 
-    // 0x00100000 [20]    EP10_TRANSACTION (0) 
-    // 0x00080000 [19]    EP9_SEQ      (0) 
-    // 0x00040000 [18]    EP9_TRANSACTION (0) 
-    // 0x00020000 [17]    EP8_SEQ      (0) 
-    // 0x00010000 [16]    EP8_TRANSACTION (0) 
-    // 0x00008000 [15]    EP7_SEQ      (0) 
-    // 0x00004000 [14]    EP7_TRANSACTION (0) 
-    // 0x00002000 [13]    EP6_SEQ      (0) 
-    // 0x00001000 [12]    EP6_TRANSACTION (0) 
-    // 0x00000800 [11]    EP5_SEQ      (0) 
-    // 0x00000400 [10]    EP5_TRANSACTION (0) 
-    // 0x00000200 [9]     EP4_SEQ      (0) 
-    // 0x00000100 [8]     EP4_TRANSACTION (0) 
-    // 0x00000080 [7]     EP3_SEQ      (0) 
-    // 0x00000040 [6]     EP3_TRANSACTION (0) 
-    // 0x00000020 [5]     EP2_SEQ      (0) 
-    // 0x00000010 [4]     EP2_TRANSACTION (0) 
-    // 0x00000008 [3]     EP1_SEQ      (0) 
-    // 0x00000004 [2]     EP1_TRANSACTION (0) 
-    // 0x00000002 [1]     EP0_SEQ      (0) 
-    // 0x00000001 [0]     EP0_TRANSACTION (0) 
+    // 0x80000000 [31]    EP15_SEQ     (0)
+    // 0x40000000 [30]    EP15_TRANSACTION (0)
+    // 0x20000000 [29]    EP14_SEQ     (0)
+    // 0x10000000 [28]    EP14_TRANSACTION (0)
+    // 0x08000000 [27]    EP13_SEQ     (0)
+    // 0x04000000 [26]    EP13_TRANSACTION (0)
+    // 0x02000000 [25]    EP12_SEQ     (0)
+    // 0x01000000 [24]    EP12_TRANSACTION (0)
+    // 0x00800000 [23]    EP11_SEQ     (0)
+    // 0x00400000 [22]    EP11_TRANSACTION (0)
+    // 0x00200000 [21]    EP10_SEQ     (0)
+    // 0x00100000 [20]    EP10_TRANSACTION (0)
+    // 0x00080000 [19]    EP9_SEQ      (0)
+    // 0x00040000 [18]    EP9_TRANSACTION (0)
+    // 0x00020000 [17]    EP8_SEQ      (0)
+    // 0x00010000 [16]    EP8_TRANSACTION (0)
+    // 0x00008000 [15]    EP7_SEQ      (0)
+    // 0x00004000 [14]    EP7_TRANSACTION (0)
+    // 0x00002000 [13]    EP6_SEQ      (0)
+    // 0x00001000 [12]    EP6_TRANSACTION (0)
+    // 0x00000800 [11]    EP5_SEQ      (0)
+    // 0x00000400 [10]    EP5_TRANSACTION (0)
+    // 0x00000200 [9]     EP4_SEQ      (0)
+    // 0x00000100 [8]     EP4_TRANSACTION (0)
+    // 0x00000080 [7]     EP3_SEQ      (0)
+    // 0x00000040 [6]     EP3_TRANSACTION (0)
+    // 0x00000020 [5]     EP2_SEQ      (0)
+    // 0x00000010 [4]     EP2_TRANSACTION (0)
+    // 0x00000008 [3]     EP1_SEQ      (0)
+    // 0x00000004 [2]     EP1_TRANSACTION (0)
+    // 0x00000002 [1]     EP0_SEQ      (0)
+    // 0x00000001 [0]     EP0_TRANSACTION (0)
     io_rw_32 ep_rx_error;
- 
+
     _REG_(USB_DEV_SM_WATCHDOG_OFFSET) // USB_DEV_SM_WATCHDOG
     // Watchdog that forces the device state machine to idle and raises an interrupt if the device...
-    // 0x00100000 [20]    FIRED        (0) 
+    // 0x00100000 [20]    FIRED        (0)
     // 0x00080000 [19]    RESET        (0) Set to 1 to forcibly reset the device state machine on...
-    // 0x00040000 [18]    ENABLE       (0) 
-    // 0x0003ffff [17:0]  LIMIT        (0x00000) 
+    // 0x00040000 [18]    ENABLE       (0)
+    // 0x0003ffff [17:0]  LIMIT        (0x00000)
     io_rw_32 dev_sm_watchdog;
 } usb_hw_t;
 
@@ -599,4 +599,3 @@ typedef struct {
 static_assert(sizeof (usb_hw_t) == 0x0118, "");
 
 #endif // _HARDWARE_STRUCTS_USB_H
-

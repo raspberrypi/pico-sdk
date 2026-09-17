@@ -1,2 +1,1 @@
 pico_simple_hardware_target(irq)
-target_link_libraries(hardware_irq INTERFACE hardware_claim)

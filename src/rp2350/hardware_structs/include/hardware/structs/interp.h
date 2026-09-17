@@ -27,27 +27,27 @@ typedef struct {
     // (Description copied from array index 0 register SIO_INTERP0_ACCUM0 applies similarly to other array indexes)
     _REG_(SIO_INTERP0_ACCUM0_OFFSET) // SIO_INTERP0_ACCUM0
     // Read/write access to accumulator 0
-    // 0xffffffff [31:0]  INTERP0_ACCUM0 (0x00000000) 
+    // 0xffffffff [31:0]  INTERP0_ACCUM0 (0x00000000)
     io_rw_32 accum[2];
- 
+
     // (Description copied from array index 0 register SIO_INTERP0_BASE0 applies similarly to other array indexes)
     _REG_(SIO_INTERP0_BASE0_OFFSET) // SIO_INTERP0_BASE0
     // Read/write access to BASE0 register
-    // 0xffffffff [31:0]  INTERP0_BASE0 (0x00000000) 
+    // 0xffffffff [31:0]  INTERP0_BASE0 (0x00000000)
     io_rw_32 base[3];
- 
+
     // (Description copied from array index 0 register SIO_INTERP0_POP_LANE0 applies similarly to other array indexes)
     _REG_(SIO_INTERP0_POP_LANE0_OFFSET) // SIO_INTERP0_POP_LANE0
     // Read LANE0 result, and simultaneously write lane results to both accumulators (POP)
-    // 0xffffffff [31:0]  INTERP0_POP_LANE0 (0x00000000) 
+    // 0xffffffff [31:0]  INTERP0_POP_LANE0 (0x00000000)
     io_ro_32 pop[3];
- 
+
     // (Description copied from array index 0 register SIO_INTERP0_PEEK_LANE0 applies similarly to other array indexes)
     _REG_(SIO_INTERP0_PEEK_LANE0_OFFSET) // SIO_INTERP0_PEEK_LANE0
     // Read LANE0 result, without altering any internal state (PEEK)
-    // 0xffffffff [31:0]  INTERP0_PEEK_LANE0 (0x00000000) 
+    // 0xffffffff [31:0]  INTERP0_PEEK_LANE0 (0x00000000)
     io_ro_32 peek[3];
- 
+
     // (Description copied from array index 0 register SIO_INTERP0_CTRL_LANE0 applies similarly to other array indexes)
     _REG_(SIO_INTERP0_CTRL_LANE0_OFFSET) // SIO_INTERP0_CTRL_LANE0
     // Control register for lane 0
@@ -64,16 +64,16 @@ typedef struct {
     // 0x000003e0 [9:5]   MASK_LSB     (0x00) The least-significant bit allowed to pass by the mask (inclusive)
     // 0x0000001f [4:0]   SHIFT        (0x00) Right-rotate applied to accumulator before masking
     io_rw_32 ctrl[2];
- 
+
     // (Description copied from array index 0 register SIO_INTERP0_ACCUM0_ADD applies similarly to other array indexes)
     _REG_(SIO_INTERP0_ACCUM0_ADD_OFFSET) // SIO_INTERP0_ACCUM0_ADD
     // Values written here are atomically added to ACCUM0
-    // 0x00ffffff [23:0]  INTERP0_ACCUM0_ADD (0x000000) 
+    // 0x00ffffff [23:0]  INTERP0_ACCUM0_ADD (0x000000)
     io_rw_32 add_raw[2];
- 
+
     _REG_(SIO_INTERP0_BASE_1AND0_OFFSET) // SIO_INTERP0_BASE_1AND0
     // On write, the lower 16 bits go to BASE0, upper bits to BASE1 simultaneously.
-    // 0xffffffff [31:0]  INTERP0_BASE_1AND0 (0x00000000) 
+    // 0xffffffff [31:0]  INTERP0_BASE_1AND0 (0x00000000)
     io_wo_32 base01;
 } interp_hw_t;
 
@@ -84,4 +84,3 @@ static_assert(sizeof (interp_hw_t) == 0x0040, "");
 #define interp1_hw (&interp_hw_array[1])
 
 #endif // _HARDWARE_STRUCTS_INTERP_H
-

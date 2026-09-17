@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
@@ -5,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 py_binary(
     name = "generate_version_header",
     srcs = ["generate_version_header.py"],
+    legacy_create_init = False,
     visibility = ["//:__subpackages__"],
 )
 

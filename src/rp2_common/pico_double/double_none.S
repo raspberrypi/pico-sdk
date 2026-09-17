@@ -5,6 +5,7 @@
  */
 
 #include "pico/asm_helper.S"
+#include "pico/double.h"
 #include "pico/bootrom/sf_table.h"
 
 pico_default_asm_setup
