@@ -56,14 +56,16 @@ if (NOT TARGET _pico_sdk_inclusion_marker)
     if (PICO_SDK_TOP_LEVEL_PROJECT AND NOT DEFINED PICO_SDK_TESTS_ENABLED)
         set(PICO_SDK_TESTS_ENABLED 1)
     endif()
-    if (PICO_SDK_TESTS_ENABLED)
+    if (PICO_SDK_TESTS_ENABLED AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/test")
         add_subdirectory(test)
-    endif ()
+    endif()
 
     set(PICO_SDK_TESTS_ENABLED "${PICO_SDK_TESTS_ENABLED}" CACHE INTERNAL "Enable build of SDK tests")
 
-    # add docs at the end, as we gather documentation dirs as we go
-    add_subdirectory(docs)
+    if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/docs")
+        # add docs at the end, as we gather documentation dirs as we go
+        add_subdirectory(docs)
+    endif()
 
     if (NOT PICO_SDK_TOP_LEVEL_PROJECT)
         pico_promote_common_scope_vars()
