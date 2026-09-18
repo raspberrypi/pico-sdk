@@ -1,0 +1,143 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("//bazel:defs.bzl", "compatible_with_rp2", "pico_generate_pio_header")
+load("//bazel/util:transition.bzl", "extra_copts_for_all_deps", "pico_set_binary_type", "pico_set_linker_script", "pico_set_stdio_enabled")
+
+package(default_visibility = ["//visibility:public"])
+
+pico_generate_pio_header(
+    name = "addition_pio",
+    srcs = ["addition.pio"],
+)
+
+cc_binary(
+    name = "pico_secure_test_s_actual",
+    testonly = True,
+    srcs = ["pico_secure_test_s.c", "secure_call_user_callbacks.h"],
+    tags = ["manual"],
+    deps = [
+        "//src/rp2_common/pico_secure",
+        "//src/rp2_common/pico_stdlib",
+        "//src/rp2_common/hardware_watchdog",
+        "//test/pico_test",
+        "//src/rp2_common/hardware_flash",
+        ":addition_pio",
+    ],
+)
+
+cc_binary(
+    name = "pico_secure_test_ns_actual",
+    testonly = True,
+    srcs = ["pico_secure_test_ns.c", "secure_call_user_callbacks.h"],
+    tags = ["manual"],
+    deps = [
+        "//src/rp2_common/pico_secure",
+        "//src/rp2_common/pico_stdlib",
+        "//test/pico_test",
+        "//src/rp2_common/hardware_flash",
+        "//src/rp2_common/pico_stdio_usb",
+        ":addition_pio",
+    ],
+)
+
+# Equivalent of pico_set_security_options(pico_secure_test_s pico_secure_test_ns USER_IRQ USB STDIO PIO NONSECURE_TIMER 1)
+# and pico_set_security_ram_split(pico_secure_test_s pico_secure_test_ns SIMPLE 64k 2k)
+extra_copts_for_all_deps(
+    name = "pico_secure_test_s_optioned",
+    testonly = True,
+    src = ":pico_secure_test_s_actual",
+    extra_copts = [
+        "-DPICO_ALLOW_NONSECURE_STDIO=1",
+        "-DPICO_ALLOW_NONSECURE_RAND=1",
+        "-DPICO_ALLOW_NONSECURE_DMA=1",
+        "-DPICO_ALLOW_NONSECURE_USER_IRQ=1",
+        "-DPICO_ALLOW_NONSECURE_PIO=1",
+        "-DPICO_ALLOW_NONSECURE_GPIO=1",
+        "-DPICO_ALLOW_NONSECURE_USB=1",
+        "-DPICO_ALLOW_NONSECURE_RESETS=1",
+        "-DPICO_ASSIGN_NONSECURE_TIMER=1",
+        "-DPICO_SECURE=1",
+        "-DPICO_USE_STACK_GUARDS=1",
+        "-DPICO_SECURITY_SPLIT_SIMPLE=1",
+        "-DPICO_SECURITY_SPLIT_CONFIGURED=1",
+    ],
+    tags = ["manual"],
+)
+
+extra_copts_for_all_deps(
+    name = "pico_secure_test_ns_optioned",
+    testonly = True,
+    src = ":pico_secure_test_ns_actual",
+    extra_copts = [
+        "-DPICO_ALLOW_NONSECURE_STDIO=1",
+        "-DPICO_ALLOW_NONSECURE_RAND=1",
+        "-DPICO_ALLOW_NONSECURE_DMA=1",
+        "-DPICO_ALLOW_NONSECURE_USER_IRQ=1",
+        "-DPICO_ALLOW_NONSECURE_PIO=1",
+        "-DPICO_ALLOW_NONSECURE_GPIO=1",
+        "-DPICO_ALLOW_NONSECURE_USB=1",
+        "-DPICO_ALLOW_NONSECURE_RESETS=1",
+        "-DPICO_DEFAULT_TIMER=1",
+        "-DPICO_NONSECURE=1",
+    ],
+    tags = ["manual"],
+)
+
+pico_set_binary_type(
+    name = "pico_secure_test_s_typed",
+    testonly = True,
+    src = ":pico_secure_test_s_optioned",
+    binary_type = "no_flash",
+    tags = ["manual"],
+)
+
+cc_library(
+    name = "pico_secure_test_s_linker_script",
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
+    deps = [
+        "//src/rp2350/pico_platform/script_include:rp2350_linker_scripts",
+        "//src/rp2_common/pico_standard_link/script_include:rp2_linker_scripts",
+        "//src/rp2_common/pico_standard_link:default_psram_region",
+        "//test/pico_secure_test/pico_secure_test_scripts:pico_secure_test_s_scripts",
+    ],
+)
+
+pico_set_linker_script(
+    name = "pico_secure_test_s",
+    testonly = True,
+    src = ":pico_secure_test_s_typed",
+    linker_script = "//test/pico_secure_test:pico_secure_test_s_linker_script",
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+)
+
+cc_library(
+    name = "pico_secure_test_ns_linker_script",
+    # The order of the linker scripts below is important.
+    # Prevent buildifier from reordering them.
+    # buildifier: leave-alone
+    deps = [
+        "//src/rp2350/pico_platform/script_include:rp2350_linker_scripts",
+        "//src/rp2_common/pico_standard_link/script_include:rp2_linker_scripts",
+        "//src/rp2_common/pico_standard_link:default_psram_region",
+        "//src/rp2_common/pico_standard_link:default_flash_region",
+        "//test/pico_secure_test/pico_secure_test_scripts:pico_secure_test_ns_scripts",
+    ],
+)
+
+pico_set_stdio_enabled(
+    name = "pico_secure_test_ns_stdio",
+    testonly = True,
+    src = ":pico_secure_test_ns_optioned",
+    tags = ["manual"],
+    uart = False,
+    usb = True,
+)
+
+pico_set_linker_script(
+    name = "pico_secure_test_ns",
+    testonly = True,
+    src = ":pico_secure_test_ns_stdio",
+    linker_script = "//test/pico_secure_test:pico_secure_test_ns_linker_script",
+    target_compatible_with = ["//bazel/constraint:rp2350"],
+)

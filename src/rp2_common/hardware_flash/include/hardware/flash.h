@@ -306,6 +306,20 @@ uint flash_devinfo_get_cs_gpio(uint cs);
  */
 void flash_devinfo_set_cs_gpio(uint cs, uint gpio);
 
+/*!
+ * \brief Roll QMI to a partition
+ * \ingroup pico_bootrom
+ *
+ * Rolls the QMI to the specified partition, enabling access to the partition via the translated XIP windows.
+ *
+ * This is necessary when the partition is not stored at the flash address it was linked at, e.g. when
+ * using A/B partitions.
+ * 
+ * \param partition_num the partition number
+ * \return BOOTROM_OK on success, otherwise a negative error code
+ */
+int flash_roll_qmi_to_partition(uint partition_num);
+
 #endif // !PICO_RP2040 || PICO_COMBINED_DOCS
 
 #ifdef __cplusplus

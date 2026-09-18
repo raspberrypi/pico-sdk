@@ -7,6 +7,12 @@ if (NOT TARGET pico_secure)
 
     pico_mirrored_target_link_libraries(pico_secure INTERFACE
             hardware_exception
+            hardware_flash
+            pico_rand
+            hardware_dma
+            hardware_irq
+            pico_stdio
+            hardware_pio
             pico_bootrom)
 
 

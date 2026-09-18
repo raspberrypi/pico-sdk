@@ -354,13 +354,13 @@ typedef struct cflash_flags {
  *
  * These codes are used to call well known secure functions from non-secure code.
  *
- * NOTE: ASCII characters are all < 0x80, so will always start with `0b0xxx`, as required by the rom_secure_call() documentation.
+ * NOTE: ASCII characters are all < 0x80, so will always start with `0b0xxx`, as required by the \ref rom_secure_call() documentation.
  *
  * \param c1 the first character
  * \param c2 the second character
  * \param c3 the third character
  * \param c4 the fourth character
- * \return the 'code' to use in rom_secure_call(), and handled by rom_default_callback()
+ * \return the 'code' to use in \ref rom_secure_call()
  */
 #define SECURE_CALL_WELL_KNOWN_CODE(c1, c2, c3, c4) ((c1) | ((c2) << 8) | ((c3) << 16) | ((c4) << 24))
 

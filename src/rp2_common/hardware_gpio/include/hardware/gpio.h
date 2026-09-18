@@ -30,8 +30,13 @@
 #include "hardware/gpio_coproc.h"
 #endif
 
-#if PICO_SECURE || PICO_NONSECURE
-#include "pico/bootrom.h" // uses helper functions due to Errata RP2350-E3
+#if PICO_ADD_NONSECURE_PADS_HELPER && PICO_NONSECURE
+#include "pico/bootrom.h"
+// These all return BOOTROM_ERROR_NOT_PERMITTED if NonSecure doesn't have access to the GPIO
+#define pads_bank0_set_bits(gpio, bits) rom_secure_call(gpio, bits, 0, 0, SECURE_CALL_pads_bank0_set_bits)
+#define pads_bank0_clear_bits(gpio, bits) rom_secure_call(gpio, bits, 0, 0, SECURE_CALL_pads_bank0_clear_bits)
+#define pads_bank0_write_masked(gpio, bits, mask) rom_secure_call(gpio, bits, mask, 0, SECURE_CALL_pads_bank0_write_masked)
+#define pads_bank0_read(gpio) rom_secure_call(gpio, 0, 0, 0, SECURE_CALL_pads_bank0_read)
 #else
 #define pads_bank0_set_bits(gpio, bits) hw_set_bits(&pads_bank0_hw->io[gpio], bits)
 #define pads_bank0_clear_bits(gpio, bits) hw_clear_bits(&pads_bank0_hw->io[gpio], bits)
