@@ -655,6 +655,17 @@ function(pico_add_uf2_output TARGET)
             COMMAND_EXPAND_LISTS
             VERBATIM
             BYPRODUCTS "${output_path}${output_name}.uf2")
+
+        # Set PICO_UF2_FILE target property to the full path
+        if (output_path)
+            set_target_properties(${TARGET} PROPERTIES
+                PICO_UF2_FILE "${output_path}${output_name}.uf2"
+            )
+        else()
+            set_target_properties(${TARGET} PROPERTIES
+                PICO_UF2_FILE "${CMAKE_CURRENT_BINARY_DIR}/${output_name}.uf2"
+            )
+        endif()
     endif()
 endfunction()
 
@@ -782,5 +793,188 @@ function(picotool_postprocess_binary TARGET)
                 set(${ARGV1} TRUE PARENT_SCOPE)
             endif()
         endif()
+    endif()
+endfunction()
+
+
+# pico_combine_uf2_outputs(COMBINED_TARGET ROOT_TARGET <TARGETS>... [PARTITIONS <partitions>...] [OFFSETS <offsets>...] [FAMILY <family>)
+# \brief_nodesc\ Combine UF2 outputs into a single UF2 file
+#
+# Combine UF2 outputs from multiple targets into a single UF2 file with a single family ID
+#
+# This can be used to create a single UF2 file containing a partition table and binaries in the partitions
+#
+# The UF2s can optionally be placed at offsets or in partitions in the final UF2 using the PARTITIONS and OFFSETS
+# arguments - you cannot specify both an offset and a partition for a given UF2, and must specify a value for all
+# UF2s if passing the argument (use 'n' to not specify an offset/partition).
+#
+# For example, to combine a bootloader that contains an embedded partition table (bootloader), a binary in the first
+# partition (binary), and erase the start of the second partition (erase, created with pico_create_erase_partition_uf2),
+# you could use:
+#
+# `pico_combine_uf2_outputs(combined bootloader binary erase PARTITIONS 0 1)`
+#
+# \param\ COMBINED_TARGET The name of the combined UF2 target
+# \param\ ROOT_TARGET The root target to use for combining
+# \param\ TARGETS The other targets to combine
+# \param\ PARTITIONS The partitions to place those targets in (use 'n' to not place a specific target in a partition)
+# \param\ OFFSETS The offsets to place those targets at (use 'n' to not place a specific target at an offset)
+# \param\ FAMILY Specify the family for the output UF2 (default is the same family as ROOT_TARGET)
+function(pico_combine_uf2_outputs COMBINED_TARGET ROOT_TARGET)
+    pico_init_picotool()
+    if (picotool_FOUND)
+        set(oneValueArgs FAMILY)
+        set(multiValueArgs PARTITIONS OFFSETS)
+        cmake_parse_arguments(PARSE_ARGV 2 UF2 "" "${oneValueArgs}" "${multiValueArgs}")
+
+        set(UF2_TARGETS ${UF2_UNPARSED_ARGUMENTS})
+
+        list(LENGTH UF2_TARGETS NUM_UF2S)
+
+        if (UF2_PARTITIONS)
+            list(LENGTH UF2_PARTITIONS NUM_PARTITION_ARGS)
+            if (NOT (NUM_PARTITION_ARGS EQUAL NUM_UF2S))
+                message(FATAL_ERROR "Specified ${NUM_UF2S} UF2 files but ${NUM_PARTITION_ARGS} partitions")
+            endif()
+        endif()
+
+        if (UF2_OFFSETS)
+            list(LENGTH UF2_OFFSETS NUM_OFFSET_ARGS)
+            if (NOT (NUM_OFFSET_ARGS EQUAL NUM_UF2S))
+                message(FATAL_ERROR "Specified ${NUM_UF2S} UF2 files but ${NUM_OFFSET_ARGS} offsets")
+            endif()
+        endif()
+
+        math(EXPR IDX_LAST "${NUM_UF2S} - 1")
+
+        foreach(IDX RANGE ${IDX_LAST})
+            math(EXPR IDX_PREV "${IDX} - 1")
+            unset(picotool_args)
+            list(GET UF2_TARGETS ${IDX} IN_TARGET)
+
+            if (UF2_PARTITIONS)
+                list(GET UF2_PARTITIONS ${IDX} PARTITION)
+                if (NOT "${PARTITION}" STREQUAL "n")
+                    list(APPEND picotool_args "--partition" "${PARTITION}")
+                endif()
+            endif()
+            if (UF2_OFFSETS)
+                list(GET UF2_OFFSETS ${IDX} OFFSET)
+                if (NOT "${OFFSET}" STREQUAL "n")
+                    list(APPEND picotool_args "--offset" "${OFFSET}")
+                endif()
+            endif()
+
+            if (UF2_PARTITIONS AND UF2_OFFSETS)
+                list(LENGTH picotool_args num_picotool_args)
+                if (num_picotool_args GREATER 2)
+                    message(FATAL_ERROR "Both offset and partition specified for UF2 number ${IDX} (${IN_TARGET})")
+                endif()
+            endif()
+
+            if (UF2_FAMILY)
+                list(APPEND picotool_args "--family" "${UF2_FAMILY}")
+            endif()
+
+            get_target_property(INFILE ${IN_TARGET} PICO_UF2_FILE)
+            if (NOT INFILE)
+                message(WARNING "PICO_UF2_FILE property not set on ${IN_TARGET} - guessing location to be ${CMAKE_CURRENT_BINARY_DIR}/${IN_TARGET}.uf2")
+                set(INFILE ${CMAKE_CURRENT_BINARY_DIR}/${IN_TARGET}.uf2)
+            endif()
+            if (IDX EQUAL 0)
+                get_target_property(ROOTFILE ${ROOT_TARGET} PICO_UF2_FILE)
+                if (NOT ROOTFILE)
+                    message(WARNING "PICO_UF2_FILE property not set on ${ROOT_TARGET} - guessing location to be ${CMAKE_CURRENT_BINARY_DIR}/${ROOT_TARGET}.uf2")
+                    set(ROOTFILE ${CMAKE_CURRENT_BINARY_DIR}/${ROOT_TARGET}.uf2)
+                endif()
+            else()
+                set(ROOTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}_${IDX_PREV}.uf2)
+            endif()
+            if (IDX EQUAL IDX_LAST)
+                set(OUTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}.uf2)
+            else()
+                set(OUTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}_${IDX}.uf2)
+            endif()
+
+            add_custom_command(OUTPUT ${OUTFILE}
+                COMMAND picotool uf2 combine
+                    ${ROOTFILE} ${INFILE} ${OUTFILE}
+                    ${picotool_args}
+                DEPENDS ${IN_TARGET} ${INFILE} ${ROOTFILE}
+                COMMAND_EXPAND_LISTS
+                VERBATIM)
+
+            if (IDX EQUAL IDX_LAST)
+                add_custom_target(${COMBINED_TARGET} ALL
+                    DEPENDS ${OUTFILE})
+            endif()
+        endforeach()
+    endif()
+endfunction()
+
+
+# pico_create_partition_table_uf2(TARGET PTFILE [FAMILY <family>])
+# \brief_nodesc\ Create a partition table UF2 file
+#
+# Create a UF2 containing the specified partition table from JSON
+#
+# \param\ TARGET The name of the target to create
+# \param\ PTFILE The partition table JSON file to use
+# \param\ FAMILY Specify the family for the output UF2 (default is absolute)
+function(pico_create_partition_table_uf2 TARGET PTFILE)
+    set(oneValueArgs FAMILY OFFSET )
+    cmake_parse_arguments(PARSE_ARGV 1 UF2 "" "${oneValueArgs}" "")
+
+    if (NOT UF2_FAMILY)
+        set(UF2_FAMILY "absolute")
+    endif()
+
+    pico_init_picotool()
+    if (picotool_FOUND)
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+            COMMAND picotool partition create --quiet
+                ${PTFILE} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+                --family ${UF2_FAMILY}
+            VERBATIM)
+
+        add_custom_target(${TARGET}
+            DEPENDS ${PTFILE} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2)
+
+        set_target_properties(${TARGET} PROPERTIES
+            PICO_UF2_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+        )
+    endif()
+endfunction()
+
+
+# pico_create_erase_partition_uf2(TARGET [FAMILY <family>])
+# \brief_nodesc\ Create a UF2 file which can erase the start of a partition
+#
+# Create a UF2 containing 4096 0xff bytes, which will erase the start of a given partition,
+# and therefore mark the partition as invalid
+#
+# \param\ TARGET The name of the target to create
+# \param\ FAMILY Specify the family for the output UF2 (default is absolute)
+function(pico_create_erase_partition_uf2 TARGET)
+    set(oneValueArgs FAMILY OFFSET )
+    cmake_parse_arguments(PARSE_ARGV 1 UF2 "" "${oneValueArgs}" "")
+
+    if (NOT UF2_FAMILY)
+        set(UF2_FAMILY "absolute")
+    endif()
+
+    pico_init_picotool()
+    if (picotool_FOUND)
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+            COMMAND picotool uf2 convert --quiet --family ${UF2_FAMILY}
+                ${PICO_SDK_PATH}/tools/ff.bin ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+            VERBATIM)
+
+        add_custom_target(${TARGET}
+            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2)
+
+        set_target_properties(${TARGET} PROPERTIES
+            PICO_UF2_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+        )
     endif()
 endfunction()
