@@ -835,7 +835,7 @@ function(pico_concatenate_uf2_outputs COMBINED_TARGET)
 endfunction()
 
 
-# pico_combine_uf2_outputs(COMBINED_TARGET ROOT_TARGET <TARGETS>...)
+# pico_combine_uf2_outputs(COMBINED_TARGET ROOT_TARGET <TARGETS>... [PARTITIONS <partitions>...] [OFFSETS <offsets>...] [FAMILY <family>)
 # \brief_nodesc\ Combine UF2 outputs into a single UF2 file
 #
 # Combine UF2 outputs from multiple targets into a single UF2 file with a single family ID
@@ -845,6 +845,12 @@ endfunction()
 # The UF2s can optionally be placed at offsets or in partitions in the final UF2 using the PARTITIONS and OFFSETS
 # arguments - you cannot specify both an offset and a partition for a given UF2, and must specify a value for all
 # UF2s if passing the argument (use 'n' to not specify an offset/partition).
+#
+# For example, to combine a bootloader that contains an embedded partition table (bootloader), a binary in the first
+# partition (binary), and erase the start of the second partition (erase, created with pico_create_erase_partition_uf2),
+# you could use:
+#
+# `pico_combine_uf2_outputs(combined bootloader binary erase PARTITIONS 0 1)`
 #
 # \param\ COMBINED_TARGET The name of the combined UF2 target
 # \param\ ROOT_TARGET The root target to use for combining
@@ -986,7 +992,6 @@ endfunction()
 # and therefore mark the partition as invalid
 #
 # \param\ TARGET The name of the target to create
-# \param\ PTFILE The partition table JSON file to use
 # \param\ FAMILY Specify the family for the output UF2 (default is absolute)
 function(pico_create_erase_partition_uf2 TARGET)
     set(oneValueArgs FAMILY OFFSET )
