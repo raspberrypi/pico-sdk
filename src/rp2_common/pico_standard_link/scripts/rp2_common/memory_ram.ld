@@ -1,4 +1,0 @@
-MEMORY
-{
-    RAM(rwx) : ORIGIN =  RAM_ORIGIN, LENGTH = RAM_LENGTH
-}

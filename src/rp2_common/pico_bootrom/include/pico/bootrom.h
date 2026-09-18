@@ -21,7 +21,6 @@
 #include <string.h>
 #include "pico/bootrom/lock.h"
 #include "pico/flash.h"
-
 // ROM FUNCTION SIGNATURES
 
 #if PICO_RP2040
