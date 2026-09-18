@@ -1,5 +1,5 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//bazel:defs.bzl", "compatible_with_rp2")
+load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,7 +8,7 @@ cc_library(
     srcs = ["secure.c"],
     hdrs = ["include/pico/secure.h"],
     includes = ["include"],
-    target_compatible_with = compatible_with_rp2(),
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config("//bazel/constraint:rp2040"),
     deps = [
         "//src/rp2_common/hardware_dma",
         "//src/rp2_common/hardware_exception",

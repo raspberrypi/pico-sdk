@@ -1,6 +1,6 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("//bazel:defs.bzl", "pico_generate_pio_header")
+load("//bazel:defs.bzl", "compatible_with_rp2", "incompatible_with_config", "pico_generate_pio_header")
 load("//bazel/util:transition.bzl", "extra_copts_for_all_deps", "pico_set_binary_type", "pico_set_linker_script", "pico_set_stdio_enabled")
 
 package(default_visibility = ["//visibility:public"])
@@ -18,7 +18,6 @@ cc_binary(
         "secure_call_user_callbacks.h",
     ],
     tags = ["manual"],
-    target_compatible_with = ["//bazel/constraint:rp2350"],
     deps = [
         ":addition_pio",
         "//src/rp2_common/hardware_flash",
@@ -37,7 +36,6 @@ cc_binary(
         "secure_call_user_callbacks.h",
     ],
     tags = ["manual"],
-    target_compatible_with = ["//bazel/constraint:rp2350"],
     deps = [
         ":addition_pio",
         "//src/rp2_common/hardware_flash",
@@ -117,7 +115,7 @@ pico_set_linker_script(
     testonly = True,
     src = ":pico_secure_test_s_typed",
     linker_script = "//test/pico_secure_test:pico_secure_test_s_linker_script",
-    target_compatible_with = ["//bazel/constraint:rp2350"],
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config("//bazel/constraint:rp2040"),
 )
 
 cc_library(
@@ -148,5 +146,5 @@ pico_set_linker_script(
     testonly = True,
     src = ":pico_secure_test_ns_stdio",
     linker_script = "//test/pico_secure_test:pico_secure_test_ns_linker_script",
-    target_compatible_with = ["//bazel/constraint:rp2350"],
+    target_compatible_with = compatible_with_rp2() + incompatible_with_config("//bazel/constraint:rp2040"),
 )
