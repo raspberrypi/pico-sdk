@@ -1,0 +1,33 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+.pio_version 0 // only requires PIO version 0
+.program addition
+
+; Pop two 32 bit integers from the TX FIFO, add them together, and push the
+; result to the TX FIFO. Autopush/pull should be disabled as we're using
+; explicit push and pull instructions.
+;
+; This program uses the two's complement identity x + y == ~(~x - y)
+
+	pull
+	mov x, ~osr
+	pull
+	mov y, osr
+	jmp test        ; this loop is equivalent to the following C code:
+incr:               ; while (y--)
+	jmp x-- test    ;     x--;
+test:               ; This has the effect of subtracting y from x, eventually.
+	jmp y-- incr
+	mov isr, ~x
+	push
+
+% c-sdk {
+static inline void addition_program_init(PIO pio, uint sm, uint offset) {
+	pio_sm_config c = addition_program_get_default_config(offset);
+	pio_sm_init(pio, sm, offset, &c);
+	pio_sm_set_enabled(pio, sm, true);
+}
+%}

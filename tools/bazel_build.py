@@ -65,6 +65,8 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_low_power_test:low_power_test_simple",
                 "//test/pico_low_power_test:external_sleep_timer",
                 "//test/pico_async_context_test:pico_async_context_test",
+                "//test/pico_secure_test:pico_secure_test_s",
+                "//test/pico_secure_test:pico_secure_test_ns",
                 "//test/pico_sync_test:pico_sync_test",
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_xip_sram_test:pico_critical_xip_sram_test",
@@ -105,6 +107,9 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/short_sleep_test:short_sleep_test_sw",
                 "//test/sync_interop_test:sync_interop_test_sw",
+                # No trustzone on RP2040
+                "//test/pico_secure_test:pico_secure_test_s",
+                "//test/pico_secure_test:pico_secure_test_ns",
             )
         ),
     },
@@ -152,6 +157,9 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/short_sleep_test:short_sleep_test_sw",
                 "//test/sync_interop_test:sync_interop_test_sw",
+                # No trustzone on RP2040
+                "//test/pico_secure_test:pico_secure_test_s",
+                "//test/pico_secure_test:pico_secure_test_ns",
             )
         ),
     },
@@ -200,6 +208,9 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/short_sleep_test:short_sleep_test_sw",
                 "//test/sync_interop_test:sync_interop_test_sw",
+                # No trustzone on RP2040
+                "//test/pico_secure_test:pico_secure_test_s",
+                "//test/pico_secure_test:pico_secure_test_ns",
             )
         ),
     },

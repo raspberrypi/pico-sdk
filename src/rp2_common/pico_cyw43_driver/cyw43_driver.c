@@ -66,7 +66,7 @@ uint32_t cyw43_irq_init(__unused void *param) {
 #endif
     gpio_add_raw_irq_handler_with_order_priority(CYW43_PIN_WL_HOST_WAKE, cyw43_gpio_irq_handler, CYW43_GPIO_IRQ_HANDLER_PRIORITY);
     cyw43_set_irq_enabled(true);
-    irq_set_enabled(IO_IRQ_BANK0, true);
+    irq_set_enabled(DEFAULT_IO_IRQ_BANK0, true);
     return 0;
 }
 
