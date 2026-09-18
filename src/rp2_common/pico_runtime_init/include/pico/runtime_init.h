@@ -351,7 +351,7 @@ void runtime_init_bootrom_locking_enable(void);
 // ------------------------------
 // Set default bootrom secure callback
 // ------------------------------
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_BOOTROM_API_CALLBACK, Skip calling of `runtime_init_rom_set_default_callback` function during runtime init, type=bool, default=0, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_BOOTROM_API_CALLBACK, Skip calling of `runtime_init_rom_set_default_callback` function during runtime init, type=bool, default=!PICO_SECURE, group=pico_runtime_init
 #ifndef PICO_RUNTIME_INIT_BOOTROM_API_CALLBACK
 #define PICO_RUNTIME_INIT_BOOTROM_API_CALLBACK "01020"
 #endif
@@ -367,7 +367,7 @@ void runtime_init_bootrom_locking_enable(void);
 // ------------------------------
 // Initialise non-secure claimed resources
 // ------------------------------
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_CLAIMS, Skip calling of `runtime_init_nonsecure_claims` function during runtime init, type=bool, default=0, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_CLAIMS, Skip calling of `runtime_init_nonsecure_claims` function during runtime init, type=bool, default=!PICO_NONSECURE, group=pico_runtime_init
 #ifndef PICO_RUNTIME_INIT_NONSECURE_CLAIMS
 #define PICO_RUNTIME_INIT_NONSECURE_CLAIMS "01020"
 #endif
@@ -383,7 +383,7 @@ void runtime_init_bootrom_locking_enable(void);
 // ------------------------------
 // Initialise non-secure stdio
 // ------------------------------
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_STDIO, Skip calling of `runtime_init_nonsecure_stdio` function during runtime init, type=bool, default=0, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_STDIO, Skip calling of `runtime_init_nonsecure_stdio` function during runtime init, type=bool, default=!PICO_NONSECURE, group=pico_runtime_init
 #ifndef PICO_RUNTIME_INIT_NONSECURE_STDIO
 #define PICO_RUNTIME_INIT_NONSECURE_STDIO "20000"
 #endif
@@ -399,7 +399,7 @@ void runtime_init_bootrom_locking_enable(void);
 // ------------------------------
 // Initialise non-secure clocks
 // ------------------------------
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_CLOCKS, Skip calling of `runtime_init_nonsecure_clocks` function during runtime init, type=bool, default=0, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_CLOCKS, Skip calling of `runtime_init_nonsecure_clocks` function during runtime init, type=bool, default=!PICO_NONSECURE, group=pico_runtime_init
 #ifndef PICO_RUNTIME_INIT_NONSECURE_CLOCKS
 #define PICO_RUNTIME_INIT_NONSECURE_CLOCKS "00500"
 #endif
@@ -415,7 +415,7 @@ void runtime_init_bootrom_locking_enable(void);
 // ------------------------------
 // Initialise non-secure coprocessors
 // ------------------------------
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_COPROCESSORS, Skip calling of `runtime_init_nonsecure_coprocessors` function during runtime init, type=bool, default=0, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_COPROCESSORS, Skip calling of `runtime_init_nonsecure_coprocessors` function during runtime init, type=bool, default=!PICO_SECURE, group=pico_runtime_init
 #ifndef PICO_RUNTIME_INIT_NONSECURE_COPROCESSORS
 #define PICO_RUNTIME_INIT_NONSECURE_COPROCESSORS "00210"
 #endif
@@ -431,7 +431,7 @@ void runtime_init_bootrom_locking_enable(void);
 // ------------------------------
 // Initialise non-secure accessctrl
 // ------------------------------
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_ACCESSCTRL_AND_IRQS, Skip calling of `runtime_init_nonsecure_accessctrl_and_irqs` function during runtime init, type=bool, default=0, group=pico_runtime_init
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_NONSECURE_ACCESSCTRL_AND_IRQS, Skip calling of `runtime_init_nonsecure_accessctrl_and_irqs` function during runtime init, type=bool, default=!PICO_SECURE, group=pico_runtime_init
 #ifndef PICO_RUNTIME_INIT_NONSECURE_ACCESSCTRL_AND_IRQS
 #define PICO_RUNTIME_INIT_NONSECURE_ACCESSCTRL_AND_IRQS "00220"
 #endif
