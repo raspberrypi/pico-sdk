@@ -1,5 +1,6 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
-load("//bazel:defs.bzl", "compatible_with_rp2", "pico_generate_pio_header")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "pico_generate_pio_header")
 load("//bazel/util:transition.bzl", "extra_copts_for_all_deps", "pico_set_binary_type", "pico_set_linker_script", "pico_set_stdio_enabled")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,30 +13,38 @@ pico_generate_pio_header(
 cc_binary(
     name = "pico_secure_test_s_actual",
     testonly = True,
-    srcs = ["pico_secure_test_s.c", "secure_call_user_callbacks.h"],
+    srcs = [
+        "pico_secure_test_s.c",
+        "secure_call_user_callbacks.h",
+    ],
     tags = ["manual"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
     deps = [
+        ":addition_pio",
+        "//src/rp2_common/hardware_flash",
+        "//src/rp2_common/hardware_watchdog",
         "//src/rp2_common/pico_secure",
         "//src/rp2_common/pico_stdlib",
-        "//src/rp2_common/hardware_watchdog",
         "//test/pico_test",
-        "//src/rp2_common/hardware_flash",
-        ":addition_pio",
     ],
 )
 
 cc_binary(
     name = "pico_secure_test_ns_actual",
     testonly = True,
-    srcs = ["pico_secure_test_ns.c", "secure_call_user_callbacks.h"],
+    srcs = [
+        "pico_secure_test_ns.c",
+        "secure_call_user_callbacks.h",
+    ],
     tags = ["manual"],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
     deps = [
+        ":addition_pio",
+        "//src/rp2_common/hardware_flash",
         "//src/rp2_common/pico_secure",
+        "//src/rp2_common/pico_stdio_usb",
         "//src/rp2_common/pico_stdlib",
         "//test/pico_test",
-        "//src/rp2_common/hardware_flash",
-        "//src/rp2_common/pico_stdio_usb",
-        ":addition_pio",
     ],
 )
 
