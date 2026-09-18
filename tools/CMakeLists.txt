@@ -919,29 +919,27 @@ function(pico_combine_uf2_outputs COMBINED_TARGET ROOT_TARGET)
                     message(WARNING "PICO_UF2_FILE property not set on ${ROOT_TARGET} - guessing location to be ${CMAKE_CURRENT_BINARY_DIR}/${ROOT_TARGET}.uf2")
                     set(ROOTFILE ${CMAKE_CURRENT_BINARY_DIR}/${ROOT_TARGET}.uf2)
                 endif()
-                set(PREV_TARGET ${ROOT_TARGET})
             else()
                 set(ROOTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}_${IDX_PREV}.uf2)
-                set(PREV_TARGET ${COMBINED_TARGET}_${IDX_PREV})
             endif()
             if (IDX EQUAL IDX_LAST)
                 set(OUTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}.uf2)
-                add_custom_target(${COMBINED_TARGET} ALL
-                    DEPENDS ${OUTFILE})
             else()
                 set(OUTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}_${IDX}.uf2)
-                add_custom_target(${COMBINED_TARGET}_${IDX}
-                    DEPENDS ${OUTFILE})
             endif()
 
             add_custom_command(OUTPUT ${OUTFILE}
                 COMMAND picotool uf2 combine
                     ${ROOTFILE} ${INFILE} ${OUTFILE}
                     ${picotool_args}
-                DEPENDS ${IN_TARGET} ${PREV_TARGET}
+                DEPENDS ${IN_TARGET} ${INFILE} ${ROOTFILE}
                 COMMAND_EXPAND_LISTS
                 VERBATIM)
 
+            if (IDX EQUAL IDX_LAST)
+                add_custom_target(${COMBINED_TARGET} ALL
+                    DEPENDS ${OUTFILE})
+            endif()
         endforeach()
     endif()
 endfunction()
