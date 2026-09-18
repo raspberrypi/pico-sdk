@@ -137,8 +137,10 @@ pico_set_stdio_enabled(
     testonly = True,
     src = ":pico_secure_test_ns_optioned",
     tags = ["manual"],
-    uart = False,
     usb = True,
+    # tinyusb family.c cannot deal with LIB_PICO_STDIO_UART=0, as it just checks if it's defined,
+    # so need to leave uart driver available but unused
+    uart = True,
 )
 
 pico_set_linker_script(
