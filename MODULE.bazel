@@ -128,11 +128,13 @@ git_repository(
 )
 
 # TODO: Provide lwip as a proper Bazel module.
+# Raspberry Pi fork of lwIP 2.2.1: STABLE-2_2_1_RELEASE plus the http_client
+# patches needed by pico_rpi_connect (see the rpi-connect branch).
 git_repository(
     name = "lwip",
     build_file = "//src/rp2_common/pico_lwip:lwip.BUILD",
-    commit = "77dcd25a72509eb83f72b033d219b1d40cd8eb95",  # keep-in-sync-with-submodule: lib/lwip
-    remote = "https://github.com/lwip-tcpip/lwip.git",
+    commit = "ccc54e13bf21d6af6a111dd7d678e12b0b295f64",  # keep-in-sync-with-submodule: lib/lwip
+    remote = "https://github.com/raspberrypi/lwip.git",
 )
 
 git_repository(
@@ -140,6 +142,13 @@ git_repository(
     build_file = "//src/rp2_common/pico_mbedtls:mbedtls.BUILD",
     commit = "0bebf8b8c7f07abe3571ded48a11aa907a1ffb20",  # keep-in-sync-with-submodule: lib/mbedtls
     remote = "https://github.com/Mbed-TLS/mbedtls.git",
+)
+
+git_repository(
+    name = "cJSON",
+    build_file = "//src/common/pico_cjson:cJSON.BUILD",
+    commit = "c859b25da02955fef659d658b8f324b5cde87be3",  # keep-in-sync-with-submodule: lib/cJSON
+    remote = "https://github.com/DaveGamble/cJSON.git",
 )
 
 register_toolchains(
