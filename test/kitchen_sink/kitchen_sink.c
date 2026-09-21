@@ -232,6 +232,20 @@ int main(void) {
     }
 #endif
 
+#if READ_FFS_DATA
+    ffs_initialise();
+    file_info_t file_infos[4] = {};
+    ffs_list(file_infos, count_of(file_infos));
+    for (uint i=0; i < count_of(file_infos); i++) {
+        file_info_t file_info = file_infos[i];
+        if (file_info.data_len) {
+            const char* filedata = NULL;
+            ffs_read(file_info.file_id, &filedata);
+            printf("File id %d size %d contents:\n----------\n%.*s\n----------\n", file_info.file_id, file_info.data_len, file_info.data_len, filedata);
+        }
+    }
+#endif
+
 #if PICO_PSRAM_SIZE_BYTES
     psram_or_malloc("z0000", char, char_buffer, 0x8000);
     memset(char_buffer, 0x55, 0x8000);

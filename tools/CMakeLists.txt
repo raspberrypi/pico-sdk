@@ -141,6 +141,33 @@ function(pico_init_pioasm)
     endif()
 endfunction()
 
+# Check ffsgen is installed, or build it if not installed
+function(pico_init_ffsgen)
+    # Assemble the version string from components instead of using PICO_SDK_VERSION_STRING, because the version string
+    # potentially has a PRE_RELEASE_ID suffix, which will trip up the find_package call.
+    set(ffsgen_VERSION_REQUIRED "${PICO_SDK_VERSION_MAJOR}.${PICO_SDK_VERSION_MINOR}.${PICO_SDK_VERSION_REVISION}")
+    if (NOT TARGET ffsgen AND NOT DEFINED ffsgen_FOUND)
+        set(ffsgen_INSTALL_DIR ${CMAKE_BINARY_DIR}/ffsgen-install)
+        if (NOT ffsgen_DIR AND EXISTS ${ffsgen_INSTALL_DIR}/ffsgen)
+            set(ffsgen_DIR ${ffsgen_INSTALL_DIR}/ffsgen)
+        endif()
+        # Find package - will find installed ffsgen, either at ffsgen_DIR or system
+        find_package(ffsgen ${ffsgen_VERSION_REQUIRED} QUIET CONFIG NO_CMAKE_FIND_ROOT_PATH)
+
+        if (NOT ffsgen_FOUND)
+            set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PICO_SDK_PATH}/tools)
+            # todo CMAKE_CURRENT_FUNCTION_LIST_DIR ... what version?
+            find_package(ffsgen MODULE REQUIRED)
+        endif()
+    endif()
+
+    if (TARGET ffsgen)
+        set(ffsgen_FOUND 1 PARENT_SCOPE)
+    else()
+        message("No ffsgen found")
+    endif()
+endfunction()
+
 # Check picotool is installed, or download and build it if not installed
 function(pico_init_picotool)
     set(picotool_VERSION_REQUIRED 2.3.0)
@@ -939,6 +966,77 @@ function(pico_create_partition_table_uf2 TARGET PTFILE)
 
         add_custom_target(${TARGET}
             DEPENDS ${PTFILE} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2)
+
+        set_target_properties(${TARGET} PROPERTIES
+            PICO_UF2_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+        )
+    endif()
+endfunction()
+
+
+# pico_create_ffs_blob_uf2(TARGET <FILES>... [FILE_IDS <file_ids>...] [CHUNK_SIZE <size>] [FAMILY <family>] [OFFSET <offset>])
+# \brief_nodesc\ Create an ffs blob UF2 file
+#
+# Create a UF2 containing the generated ffs blob
+#
+# \param\ TARGET The name of the target to create
+# \param\ FILES The files to include in the ffs
+# \param\ FILE_IDS The file IDs to use for each file
+# \param\ CHUNK_SIZE Specify the ffs chunk size (default is 4096)
+# \param\ FAMILY Specify the family for the output UF2 (default is absolute)
+# \param\ OFFSET Specify the address to target the UF2 at (default is start of flash)
+function(pico_create_ffs_blob_uf2 TARGET)
+    set(oneValueArgs FAMILY CHUNK_SIZE OFFSET)
+    set(multiValueArgs FILE_IDS)
+    cmake_parse_arguments(PARSE_ARGV 1 FFS "" "${oneValueArgs}" "${multiValueArgs}")
+
+    set(FILES ${FFS_UNPARSED_ARGUMENTS})
+
+    # Create config file
+    list(LENGTH FILES NUM_FILES)
+
+    if (NOT FFS_FILE_IDS)
+        message(FATAL_ERROR "Must specify FILE_IDS")
+    else()
+        list(LENGTH FFS_FILE_IDS NUM_FILE_IDS)
+        if (NOT (NUM_FILE_IDS EQUAL NUM_FILES))
+            message(FATAL_ERROR "Specified ${NUM_FILES} files but ${NUM_FILE_IDS} file IDs")
+        endif()
+    endif()
+
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt "# autogenenerated ffs config file for ${TARGET}\n")
+    math(EXPR IDX_LAST "${NUM_FILES} - 1")
+    foreach(IDX RANGE ${IDX_LAST})
+        list(GET FILES ${IDX} file)
+        list(GET FFS_FILE_IDS ${IDX} file_id)
+        file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt "${file_id} ${file}\n")
+    endforeach()
+
+    if (NOT FFS_FAMILY)
+        set(FFS_FAMILY "absolute")
+    endif()
+
+    if (FFS_OFFSET)
+        list(APPEND picotool_args "--offset" "${FFS_OFFSET}")
+    endif()
+
+    pico_init_ffsgen()
+    pico_init_picotool()
+    if (ffsgen_FOUND AND picotool_FOUND)
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bin
+            COMMAND ffsgen ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bin ${FFS_CHUNKSIZE}
+            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt ${FILES}
+            VERBATIM)
+
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+            COMMAND picotool uf2 convert --quiet --family ${FFS_FAMILY} ${picotool_args}
+                ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bin ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bin
+            COMMAND_EXPAND_LISTS
+            VERBATIM)
+
+        add_custom_target(${TARGET}
+            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2)
 
         set_target_properties(${TARGET} PROPERTIES
             PICO_UF2_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
