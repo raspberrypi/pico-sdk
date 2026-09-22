@@ -93,6 +93,8 @@
  * \cond pico_lwip \defgroup pico_lwip pico_lwip \endcond
  * \cond pico_cyw43_driver \defgroup pico_cyw43_driver pico_cyw43_driver \endcond
  * \cond pico_cyw43_arch \defgroup pico_cyw43_arch pico_cyw43_arch \endcond
+ * \cond pico_rpi_connect \defgroup pico_rpi_connect pico_rpi_connect \endcond
+ * \cond pico_rpi_connect_ota \defgroup pico_rpi_connect_ota pico_rpi_connect_ota \endcond
  * @}
  *
  * \defgroup runtime Runtime Infrastructure

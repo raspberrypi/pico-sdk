@@ -40,10 +40,13 @@ set(KITCHEN_SINK_LIBS
     pico_bit_ops
     pico_bootrom
     pico_bootsel_via_double_reset
+    pico_cjson
     pico_divider
     pico_double
+    pico_ffs
     pico_fix_rp2040_usb_device_enumeration
     pico_flash
+    pico_flash_image
     pico_float
     pico_i2c_slave
     pico_int64_ops
@@ -71,6 +74,7 @@ set(KITCHEN_SINK_NO_HEADER_LIBS
     pico_bootsel_via_double_reset
     pico_int64_ops # currently empty, and only included by _pico variant
     pico_mem_ops # currently empty, and only included by _pico variant
+    pico_cjson
 )
 
 set(KITCHEN_SINK_INCLUDES "#pragma once\n")
@@ -84,6 +88,7 @@ foreach(LIB IN LISTS KITCHEN_SINK_LIBS)
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/datetime.h\"\n")
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/pheap.h\"\n")
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/queue.h\"\n")
+               string(APPEND KITCHEN_SINK_INCLUDES "#include \"cJSON.h\"\n")
            else()
                if ("${CMAKE_MATCH_2}" STREQUAL "fix_rp2040_usb_device_enumeration")
                    set(CMAKE_MATCH_2 "fix/rp2040_usb_device_enumeration")
@@ -170,8 +175,25 @@ pico_set_program_name(kitchen_sink "Wombat tentacles")
 pico_add_extra_outputs(kitchen_sink)
 target_compile_definitions(kitchen_sink PRIVATE KITCHEN_SINK_ID="regular binary")
 
+if (COMMAND suppress_cjson_warnings)
+   suppress_cjson_warnings()
+endif()
+
 if (TARGET hardware_pio)
     pico_generate_pio_header(kitchen_sink ${CMAKE_CURRENT_LIST_DIR}/trivial.pio)
+endif()
+
+if (TARGET pico_ffs)
+    add_executable(kitchen_sink_ffs ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    target_link_libraries(kitchen_sink_ffs kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_ffs)
+    target_compile_definitions(kitchen_sink_ffs PRIVATE KITCHEN_SINK_ID="ffs binary" READ_FFS_DATA=1)
+
+    pico_create_ffs_blob_uf2(kitchen_sink_ffs_blob ${CMAKE_CURRENT_LIST_DIR}/ffs_file1.txt ${CMAKE_CURRENT_LIST_DIR}/ffs_file2.txt FILE_IDS 1 4)
+    pico_create_partition_table_uf2(kitchen_sink_ffs_pt ${CMAKE_CURRENT_LIST_DIR}/ffs_pt.json)
+    pico_combine_uf2_outputs(kitchen_sink_ffs_combined kitchen_sink_ffs_pt
+        kitchen_sink_ffs kitchen_sink_ffs_blob
+        PARTITIONS 0 2)
 endif()
 
 add_executable(kitchen_sink_extra_stdio ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
@@ -359,7 +381,10 @@ if (TARGET pico_cyw43_arch)
     target_link_libraries(kitchen_sink_lwip_poll kitchen_sink_libs kitchen_sink_options)
     pico_add_extra_outputs(kitchen_sink_lwip_poll)
     target_link_libraries(kitchen_sink_lwip_poll
-            pico_cyw43_arch_lwip_poll)
+            pico_cyw43_arch_lwip_poll pico_rpi_connect)
+    if (TARGET pico_rpi_connect_ota) # RP2350 only
+        target_link_libraries(kitchen_sink_lwip_poll pico_rpi_connect_ota)
+    endif()
     if (TARGET pico_btstack)
         target_link_libraries(kitchen_sink_lwip_poll
             pico_btstack_ble pico_btstack_classic pico_btstack_cyw43)

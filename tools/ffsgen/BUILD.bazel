@@ -1,0 +1,10 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "ffsgen",
+    srcs = ["ffsgen.c"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = ["//src/rp2_common/pico_ffs:ffs_internal"],
+)

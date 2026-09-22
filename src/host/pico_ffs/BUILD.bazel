@@ -1,0 +1,15 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+# Host implementation of the FFS API (files in a directory), sharing the API
+# header with the device implementation.
+cc_library(
+    name = "pico_ffs",
+    srcs = ["ffs.c"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = [
+        "//src/host/pico_platform",
+        "//src/rp2_common/pico_ffs:pico_ffs_headers",
+    ],
+)

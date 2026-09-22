@@ -1,0 +1,47 @@
+{
+  "version": [1, 0],
+  "unpartitioned": {
+    "families": ["absolute"],
+    "permissions": {
+      "secure": "rw",
+      "nonsecure": "rw",
+      "bootloader": "rw"
+    }
+  },
+  "partitions": [
+    {
+      "name": "Main A",
+      "id": 0,
+      "size": "1980K",
+      "families": ["rp2350-arm-s", "rp2350-riscv"],
+      "permissions": {
+        "secure": "rw",
+        "nonsecure": "rw",
+        "bootloader": "rw"
+      }
+    },
+    {
+      "name": "Main B",
+      "id": 1,
+      "size": "1980K",
+      "families": ["rp2350-arm-s", "rp2350-riscv"],
+      "permissions": {
+        "secure": "rw",
+        "nonsecure": "rw",
+        "bootloader": "rw"
+      },
+      "link": ["a", 0]
+    },
+    {
+      "name": "FFS storage area",
+      "id": "0x746d656673665f6f",
+      "size": "8K",
+      "families": ["data"],
+      "permissions": {
+        "secure": "rw",
+        "nonsecure": "rw",
+        "bootloader": "rw"
+      }
+    }
+  ]
+}
