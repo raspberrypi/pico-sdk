@@ -183,6 +183,19 @@ if (TARGET hardware_pio)
     pico_generate_pio_header(kitchen_sink ${CMAKE_CURRENT_LIST_DIR}/trivial.pio)
 endif()
 
+if (TARGET pico_ffs)
+    add_executable(kitchen_sink_ffs ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+    target_link_libraries(kitchen_sink_ffs kitchen_sink_libs kitchen_sink_options)
+    pico_add_extra_outputs(kitchen_sink_ffs)
+    target_compile_definitions(kitchen_sink_ffs PRIVATE KITCHEN_SINK_ID="ffs binary" READ_FFS_DATA=1)
+
+    pico_create_ffs_blob_uf2(kitchen_sink_ffs_blob ${CMAKE_CURRENT_LIST_DIR}/ffs_file1.txt ${CMAKE_CURRENT_LIST_DIR}/ffs_file2.txt FILE_IDS 1 4)
+    pico_create_partition_table_uf2(kitchen_sink_ffs_pt ${CMAKE_CURRENT_LIST_DIR}/ffs_pt.json)
+    pico_combine_uf2_outputs(kitchen_sink_ffs_combined kitchen_sink_ffs_pt
+        kitchen_sink_ffs kitchen_sink_ffs_blob
+        PARTITIONS 0 2)
+endif()
+
 add_executable(kitchen_sink_extra_stdio ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 if (COMMAND suppress_tinyusb_warnings)
     # Explicitly suppress warnings in TinyUSB files which have them (this has to be done
