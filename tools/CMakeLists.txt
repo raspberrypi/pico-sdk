@@ -983,7 +983,7 @@ endfunction()
 # \param\ FILES The files to include in the ffs
 # \param\ FILE_IDS The file IDs to use for each file
 # \param\ CHUNK_SIZE Specify the ffs chunk size (default is 4096)
-# \param\ FAMILY Specify the family for the output UF2 (default is absolute)
+# \param\ FAMILY Specify the family for the output UF2 (default is data)
 # \param\ OFFSET Specify the address to target the UF2 at (default is start of flash)
 function(pico_create_ffs_blob_uf2 TARGET)
     set(oneValueArgs FAMILY CHUNK_SIZE OFFSET)
@@ -1013,7 +1013,7 @@ function(pico_create_ffs_blob_uf2 TARGET)
     endforeach()
 
     if (NOT FFS_FAMILY)
-        set(FFS_FAMILY "absolute")
+        set(FFS_FAMILY "data")
     endif()
 
     if (FFS_OFFSET)

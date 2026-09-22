@@ -6,7 +6,7 @@
 #
 
 if (NOT TARGET ffsgen)
-    # todo we would like to use pckgconfig to look for it first
+    # todo we would like to use pkg-config to look for it first
     # see https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
 
     include(ExternalProject)
