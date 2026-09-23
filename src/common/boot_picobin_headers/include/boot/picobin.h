@@ -177,6 +177,28 @@ static inline bool picobin_load_map_is_relative(const picobin_load_map *lm) {
     return (int32_t)lm->header >= 0;
 }
 
+/*! \brief PICOBIN block which is invalid
+ *  \ingroup boot_picobin_headers
+ *
+ * Contains a block with and invalid IMAGE_DEF item
+ * 
+ * This define is a braced list, so can be used as:
+ *      uint32_t invalid_block[] = PICOBIN_INVALID_BLOCK;
+ * 
+ * or if you need a larger buffer (e.g. FLASH_PAGE_SIZE):
+ *      uint32_t invalid_block[FLASH_PAGE_SIZE/sizeof(uint32_t)] = PICOBIN_INVALID_BLOCK;
+ * 
+ * This could be useful when you need to put a block loop in a partition to use \ref rom_pick_ab_partition(),
+ * but do not want that block loop to be bootable (e.g. see \ref flash_program_invalid_block_to_b_partition())
+ */
+#define PICOBIN_INVALID_BLOCK { \
+    PICOBIN_BLOCK_MARKER_START, \
+    PICOBIN_BLOCK_ITEM_1BS_IMAGE_TYPE | 1u << 8u | (PICOBIN_IMAGE_TYPE_IMAGE_TYPE_AS_BITS(INVALID) << 16u), \
+    PICOBIN_BLOCK_ITEM_2BS_LAST | 1u << 8u, \
+    0, \
+    PICOBIN_BLOCK_MARKER_END \
+}
+
 #endif
 
 #endif

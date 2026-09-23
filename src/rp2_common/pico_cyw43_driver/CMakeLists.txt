@@ -242,8 +242,8 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
 
         get_target_property(hasSigfile ${TARGET} PICOTOOL_SIGFILE)
         if (hasSigfile)
-                pico_sign_binary(${TARGET}_wifi_firmware ${sigfile})
-                pico_sign_binary(${TARGET}_wifi_firmware_tbyb ${sigfile})
+                pico_sign_binary(${TARGET}_wifi_firmware ${hasSigfile})
+                pico_sign_binary(${TARGET}_wifi_firmware_tbyb ${hasSigfile})
         endif()
 
         pico_hash_binary(${TARGET}_wifi_firmware)
