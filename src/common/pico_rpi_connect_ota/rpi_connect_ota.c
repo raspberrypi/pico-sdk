@@ -863,13 +863,13 @@ int rpi_connect_ota_install_update(const char *uri, const char *expected_checksu
 }
 
 int rpi_connect_ota_read_identity_key_otp(unsigned int start_row, unsigned char out_key[32]) {
-    volatile uint32_t *otp_raw = (volatile uint32_t *)OTP_DATA_RAW_BASE;
+    volatile uint16_t *otp_data = (volatile uint16_t *)OTP_DATA_GUARDED_BASE;
     size_t key_offset = 0;
-    unsigned int rows = (32 + 2) / 3; // 11 rows of 3 bytes covers 33 bytes >= 32
+    unsigned int rows = 32 / 2; // 16 rows of 2 bytes
 
     for (unsigned int i = 0; i < rows && key_offset < 32; i++) {
-        uint32_t row = otp_raw[start_row + i] & 0x00ffffff;
-        for (int b = 0; b < 3 && key_offset < 32; b++) {
+        uint16_t row = otp_data[start_row + i];
+        for (int b = 0; b < 2 && key_offset < 32; b++) {
             out_key[key_offset++] = (unsigned char)(row & 0xff);
             row >>= 8;
         }
