@@ -51,8 +51,7 @@ int rpi_connect_ota_get_workarea(uint8_t **buffer, size_t *size) {
     return 0;
 }
 
-static char *ffs_get_string(uint8_t file_id);
-static int ffs_update_string(uint8_t file_id, const char *data);
+static int ffs_update_string_with_error(uint8_t file_id, const char *data);
 
 // Run a device-identity-exchange using the supplied raw P-256 private key.
 // Derives the matching public key, calls the exchange, returns a strdup of
@@ -133,36 +132,17 @@ int rpi_connect_ota_init(const char *client_id, const char *serial_number,
         return -1;
     }
     RPI_CONNECT_OTA_DEBUG("Caching new auth token in FFS\n");
-    ffs_update_string(RPI_CONNECT_FFS_AUTH_TOKEN, g_active_auth_token);
+    ffs_update_string_with_error(RPI_CONNECT_FFS_AUTH_TOKEN, g_active_auth_token);
     return 0;
 }
 
-// Updates the FFS file data if the new value is different from the existing value.
-// If the file does not exist, it is created.
-static int ffs_update_string(uint8_t file_id, const char *data) {
-    int data_len = strlen(data);
-    const char *existing_data;
-    int rc = ffs_read(file_id, &existing_data);
-    if (rc == 0 && existing_data) {
-        if (memcmp(existing_data, data, data_len + 1) == 0)
-            return 0;
-    }
-
-    rc = ffs_write(file_id, data, data_len + 1); // Include the null terminator
+static int ffs_update_string_with_error(uint8_t file_id, const char *data) {
+    int rc = ffs_update_string(file_id, data);
     if (rc != 0) {
-        RPI_CONNECT_OTA_ERROR("FFS: Failed to write file (%d) length %d\n", rc, data_len);
+        RPI_CONNECT_OTA_ERROR("FFS: Failed to write file (%d)\n", rc);
         return -1;
     }
     return 0;
-}
-
-static char *ffs_get_string(uint8_t file_id) {
-    const char *data;
-    int rc = ffs_read(file_id, &data);
-    if (rc >= 0 && data) {
-        return strdup(data);
-    }
-    return NULL;
 }
 
 // Returns the active auth token chosen by rpi_connect_ota_init (caller frees),
@@ -172,11 +152,11 @@ char *rpi_connect_ota_get_auth_token(void) {
 }
 
 int rpi_connect_ota_store_auth_token(const char *token) {
-    return ffs_update_string(RPI_CONNECT_FFS_AUTH_TOKEN, token);
+    return ffs_update_string_with_error(RPI_CONNECT_FFS_AUTH_TOKEN, token);
 }
 
 int rpi_connect_ota_store_deployment_id(const char *deployment_id) {
-    return ffs_update_string(RPI_CONNECT_FFS_DEPLOYMENT_ID, deployment_id);
+    return ffs_update_string_with_error(RPI_CONNECT_FFS_DEPLOYMENT_ID, deployment_id);
 }
 
 char *rpi_connect_ota_get_deployment_id(void) {
@@ -211,7 +191,7 @@ int rpi_connect_ota_set_deployment_status(rpi_connect_ota_deployment_status_t st
         ffs_delete(RPI_CONNECT_FFS_DEPLOYMENT_STATUS);
         return 0;
     }
-    return ffs_update_string(RPI_CONNECT_FFS_DEPLOYMENT_STATUS, s);
+    return ffs_update_string_with_error(RPI_CONNECT_FFS_DEPLOYMENT_STATUS, s);
 }
 
 int rpi_connect_ota_start_deployment(const char *token, const char *deployment_id, char **uri, char **checksum) {
@@ -232,8 +212,8 @@ int rpi_connect_ota_start_deployment(const char *token, const char *deployment_i
             rpi_connect_ota_fail_deployment(token, deployment_id, "missing artefact uri or checksum");
             return -1;
         }
-        ffs_update_string(RPI_CONNECT_FFS_DEPLOYMENT_URI, *uri);
-        ffs_update_string(RPI_CONNECT_FFS_DEPLOYMENT_CHECKSUM, *checksum);
+        ffs_update_string_with_error(RPI_CONNECT_FFS_DEPLOYMENT_URI, *uri);
+        ffs_update_string_with_error(RPI_CONNECT_FFS_DEPLOYMENT_CHECKSUM, *checksum);
         rpi_connect_ota_set_deployment_status(RPI_CONNECT_OTA_DEPLOYMENT_DOWNLOADING);
     } else {
         RPI_CONNECT_OTA_DEBUG("Failed to start deployment for ID=%s (%d)\n", deployment_id, rc);
