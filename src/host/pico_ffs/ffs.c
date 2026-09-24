@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <dirent.h>
+#include <string.h>
 
 static char read_buffer[FFS_API_MAX_WRITE_LENGTH];
 
@@ -137,4 +138,30 @@ int ffs_list(file_info_t file_info[], uint max_infos) {
 
     closedir(dir);
     return (int)count;
+}
+
+
+char *ffs_get_string(uint8_t file_id) {
+    const char *data;
+    int rc = ffs_read(file_id, &data);
+    if (rc >= 0 && data) {
+        return strndup(data, rc);
+    }
+    return NULL;
+}
+
+
+// Updates the FFS file data if the new value is different from the existing value.
+// If the file does not exist, it is created.
+int ffs_update_string(uint8_t file_id, const char *data) {
+    int data_len = strlen(data);
+    const char *existing_data;
+    int rc = ffs_read(file_id, &existing_data);
+    if (rc == 0 && existing_data) {
+        if (memcmp(existing_data, data, data_len + 1) == 0)
+            return 0;
+    }
+
+    rc = ffs_write(file_id, data, data_len + 1); // Include the null terminator
+    return rc;
 }

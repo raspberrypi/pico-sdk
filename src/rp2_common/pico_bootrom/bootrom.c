@@ -174,8 +174,13 @@ int rom_pick_ab_partition_during_update(uint32_t *workarea_base, uint32_t workar
     int rc = rom_pick_ab_partition((uint8_t*)workarea_base, workarea_size, partition_a_num, flash_update_base);
 
     if (!rcp_is_true(IMAGE_DEF_VERIFIED(workarea_base))) {
-        // Chosen partition failed verification
-        return BOOTROM_ERROR_NOT_FOUND;
+        if (IMAGE_DEF_VERIFIED(workarea_base) == 0) {
+            // Bootrom did not perform verification due to no block loop in the B partition
+            return BOOTROM_ERROR_INVALID_DATA;
+        } else {
+            // Chosen partition failed verification
+            return BOOTROM_ERROR_NOT_FOUND;
+        }
     }
 
     if (IMAGE_DEF_TBYB_FLAGGED(workarea_base)) {

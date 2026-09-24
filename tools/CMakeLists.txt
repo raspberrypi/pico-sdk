@@ -858,14 +858,14 @@ function(pico_combine_uf2_outputs COMBINED_TARGET ROOT_TARGET)
 
         list(LENGTH UF2_TARGETS NUM_UF2S)
 
-        if (UF2_PARTITIONS)
+        if (NOT "${UF2_PARTITIONS}" STREQUAL "")
             list(LENGTH UF2_PARTITIONS NUM_PARTITION_ARGS)
             if (NOT (NUM_PARTITION_ARGS EQUAL NUM_UF2S))
                 message(FATAL_ERROR "Specified ${NUM_UF2S} UF2 files but ${NUM_PARTITION_ARGS} partitions")
             endif()
         endif()
 
-        if (UF2_OFFSETS)
+        if (NOT "${UF2_OFFSETS}" STREQUAL "")
             list(LENGTH UF2_OFFSETS NUM_OFFSET_ARGS)
             if (NOT (NUM_OFFSET_ARGS EQUAL NUM_UF2S))
                 message(FATAL_ERROR "Specified ${NUM_UF2S} UF2 files but ${NUM_OFFSET_ARGS} offsets")
@@ -879,20 +879,20 @@ function(pico_combine_uf2_outputs COMBINED_TARGET ROOT_TARGET)
             unset(picotool_args)
             list(GET UF2_TARGETS ${IDX} IN_TARGET)
 
-            if (UF2_PARTITIONS)
+            if (NOT "${UF2_PARTITIONS}" STREQUAL "")
                 list(GET UF2_PARTITIONS ${IDX} PARTITION)
                 if (NOT "${PARTITION}" STREQUAL "n")
                     list(APPEND picotool_args "--partition" "${PARTITION}")
                 endif()
             endif()
-            if (UF2_OFFSETS)
+            if (NOT "${UF2_OFFSETS}" STREQUAL "")
                 list(GET UF2_OFFSETS ${IDX} OFFSET)
                 if (NOT "${OFFSET}" STREQUAL "n")
                     list(APPEND picotool_args "--offset" "${OFFSET}")
                 endif()
             endif()
 
-            if (UF2_PARTITIONS AND UF2_OFFSETS)
+            if (NOT "${UF2_PARTITIONS}" STREQUAL "" AND NOT "${UF2_OFFSETS}" STREQUAL "")
                 list(LENGTH picotool_args num_picotool_args)
                 if (num_picotool_args GREATER 2)
                     message(FATAL_ERROR "Both offset and partition specified for UF2 number ${IDX} (${IN_TARGET})")
@@ -940,7 +940,7 @@ function(pico_combine_uf2_outputs COMBINED_TARGET ROOT_TARGET)
 endfunction()
 
 
-# pico_create_partition_table_uf2(TARGET PTFILE [FAMILY <family>])
+# pico_create_partition_table_uf2(TARGET PTFILE [FAMILY <family>] [OFFSET <offset>])
 # \brief_nodesc\ Create a partition table UF2 file
 #
 # Create a UF2 containing the specified partition table from JSON
@@ -948,6 +948,7 @@ endfunction()
 # \param\ TARGET The name of the target to create
 # \param\ PTFILE The partition table JSON file to use
 # \param\ FAMILY Specify the family for the output UF2 (default is absolute)
+# \param\ OFFSET Specify the address to target the UF2 at (default is start of flash)
 function(pico_create_partition_table_uf2 TARGET PTFILE)
     set(oneValueArgs FAMILY OFFSET )
     cmake_parse_arguments(PARSE_ARGV 1 UF2 "" "${oneValueArgs}" "")
@@ -956,12 +957,17 @@ function(pico_create_partition_table_uf2 TARGET PTFILE)
         set(UF2_FAMILY "absolute")
     endif()
 
+    if (NOT "${UF2_OFFSET}" STREQUAL "")
+        list(APPEND picotool_args "--offset" "${UF2_OFFSET}")
+    endif()
+
     pico_init_picotool()
     if (picotool_FOUND)
         add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
             COMMAND picotool partition create --quiet
                 ${PTFILE} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
-                --family ${UF2_FAMILY}
+                --family ${UF2_FAMILY} ${picotool_args}
+            COMMAND_EXPAND_LISTS
             VERBATIM)
 
         add_custom_target(${TARGET}
@@ -995,7 +1001,7 @@ function(pico_create_ffs_blob_uf2 TARGET)
     # Create config file
     list(LENGTH FILES NUM_FILES)
 
-    if (NOT FFS_FILE_IDS)
+    if ("${FFS_FILE_IDS}" STREQUAL "")
         message(FATAL_ERROR "Must specify FILE_IDS")
     else()
         list(LENGTH FFS_FILE_IDS NUM_FILE_IDS)
@@ -1045,7 +1051,7 @@ function(pico_create_ffs_blob_uf2 TARGET)
 endfunction()
 
 
-# pico_create_erase_partition_uf2(TARGET [FAMILY <family>])
+# pico_create_erase_partition_uf2(TARGET [FAMILY <family>] [OFFSET <offset>])
 # \brief_nodesc\ Create a UF2 file which can erase the start of a partition
 #
 # Create a UF2 containing 4096 0xff bytes, which will erase the start of a given partition,
@@ -1053,6 +1059,7 @@ endfunction()
 #
 # \param\ TARGET The name of the target to create
 # \param\ FAMILY Specify the family for the output UF2 (default is absolute)
+# \param\ OFFSET Specify the address to target the UF2 at (default is start of flash)
 function(pico_create_erase_partition_uf2 TARGET)
     set(oneValueArgs FAMILY OFFSET )
     cmake_parse_arguments(PARSE_ARGV 1 UF2 "" "${oneValueArgs}" "")
@@ -1061,11 +1068,17 @@ function(pico_create_erase_partition_uf2 TARGET)
         set(UF2_FAMILY "absolute")
     endif()
 
+    if (NOT "${UF2_OFFSET}" STREQUAL "")
+        list(APPEND picotool_args "--offset" "${UF2_OFFSET}")
+    endif()
+
     pico_init_picotool()
     if (picotool_FOUND)
         add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
             COMMAND picotool uf2 convert --quiet --family ${UF2_FAMILY}
                 ${PICO_SDK_PATH}/tools/ff.bin ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
+                ${picotool_args}
+            COMMAND_EXPAND_LISTS
             VERBATIM)
 
         add_custom_target(${TARGET}

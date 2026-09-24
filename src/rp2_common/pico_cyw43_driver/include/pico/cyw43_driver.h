@@ -26,6 +26,11 @@
 // The default 0x776966696669726d value is the ASCII encoding of "wififirm"
 #define CYW43_FIRMWARE_PARTITION_ID 0x776966696669726d
 #endif
+
+// PICO_CONFIG: CYW43_FIRMWARE_PARTITION_ENSURE_VERIFICATION, Ensure that verification is always performed by writing to the B partition if necessary, type=bool, default=1, group=pico_cyw43_driver
+#ifndef CYW43_FIRMWARE_PARTITION_ENSURE_VERIFICATION
+#define CYW43_FIRMWARE_PARTITION_ENSURE_VERIFICATION 1
+#endif
 #endif
 
 #ifdef __cplusplus

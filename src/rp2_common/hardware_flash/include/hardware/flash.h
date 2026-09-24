@@ -303,6 +303,18 @@ uint flash_devinfo_get_cs_gpio(uint cs);
  */
 void flash_devinfo_set_cs_gpio(uint cs, uint gpio);
 
+/*! \brief Program an invalid block to a B partition
+ *  \ingroup hardware_flash
+ *
+ * Programs a \ref PICOBIN_INVALID_BLOCK to the B partition of a given A/B pair
+ * 
+ * This could be useful when you need to put a block loop in a partition to use \ref rom_pick_ab_partition(),
+ * but do not want that block loop to be bootable
+ *
+ * \param pi_a The A partition index
+ */
+void flash_program_invalid_block_to_b_partition(uint pi_a);
+
 #endif // !PICO_RP2040 || PICO_COMBINED_DOCS
 
 #ifdef __cplusplus
