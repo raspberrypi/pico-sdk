@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <dirent.h>
+#include <string.h>
 
 static char read_buffer[FFS_API_MAX_WRITE_LENGTH];
 
