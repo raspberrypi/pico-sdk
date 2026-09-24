@@ -1193,18 +1193,23 @@ struct rpi_connect_download_context {
     size_t content_len; // response Content-Length, 0 if unknown (POSIX path)
 };
 
-// Parse https://hostname/path into hostname (allocated) and path (pointer into uri)
+// Parse scheme://hostname/path into hostname (allocated) and path (pointer into uri).
+// For http:// the scheme is kept on the hostname. The scheme dictates transport
+// selection.
 static int parse_url(const char *uri, char **out_hostname, const char **out_path) {
     const char *p = uri;
+    size_t scheme_len;
 
-    if (strncmp(p, "https://", 8) == 0)
+    if (strncmp(p, "https://", 8) == 0) {
         p += 8;
-    else if (strncmp(p, "http://", 7) == 0)
-        p += 7;
-    else
+        scheme_len = 0;
+    } else if (strncmp(p, "http://", 7) == 0) {
+        scheme_len = 7;
+    } else {
         return -1;
+    }
 
-    const char *slash = strchr(p, '/');
+    const char *slash = strchr(p + scheme_len, '/');
     if (!slash)
         return -1;
 
