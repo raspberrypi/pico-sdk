@@ -48,6 +48,18 @@ define_property(TARGET
     FULL_DOCS "IV OTP salt for encrypting"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_ENCRYPT_KEY_DIR
+    INHERITED
+    BRIEF_DOCS "Directory with per-device AES keys and IV OTP salts for encrypting"
+    FULL_DOCS "Directory with per-device AES keys and IV OTP salts for encrypting"
+)
+define_property(TARGET
+    PROPERTY PICOTOOL_ENCRYPT_OUTPUT_DIR
+    INHERITED
+    BRIEF_DOCS "Directory to output per-device encrypted files"
+    FULL_DOCS "Directory to output per-device encrypted files"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_EMBED_DECRYPTION
     INHERITED
     BRIEF_DOCS "Embed decryption stage into encrypted binary"
@@ -493,7 +505,7 @@ function(pico_embed_pt_in_binary TARGET PTFILE)
     )
 endfunction()
 
-# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [MBEDTLS] [OTP_KEY_PAGE <page>] [NO_CLEAR])
+# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [MBEDTLS] [OTP_KEY_PAGE <page>] [NO_CLEAR] [MULTI_KEY_DIR <dir>] [MULTI_OUTPUT_DIR <dir>] [MULTI_DEVICES <devices...>)
 # \brief_nodesc\ Encrypt the taget binary
 #
 # Encrypt the target binary with the given AES key (should be a binary
@@ -505,6 +517,13 @@ endfunction()
 #
 # This sets the target properties PICOTOOL_AESFILE to AESFILE, PICOTOOL_IVFILE to IVFILE, and
 # PICOTOOL_ENC_SIGFILE to SIGFILE if specified, else PICOTOOL_SIGFILE.
+#
+# Optionally, also specify MULTI_KEY_DIR, MULTI_OUTPUT_DIR and MULTI_DEVICES
+# to encrypt the same binary with multiple keys. The MULTI_KEY_DIR should contain
+# one subdirectory per device in MULTI_DEVICES, containing the privateaes.bin and
+# ivsalt.bin files for that device. The UF2s will be output to one subdirectory
+# per device under MULTI_OUTPUT_DIR.
+# This sets the target properties 
 #
 # Optionally, use EMBED to embed a decryption stage into the encrypted binary.
 # This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
@@ -526,8 +545,8 @@ endfunction()
 # \param\ NO_CLEAR Do not clear SRAM when loading encrypted binary
 function(pico_encrypt_binary TARGET AESFILE IVFILE)
     set(options EMBED MBEDTLS NO_CLEAR)
-    set(oneValueArgs OTP_KEY_PAGE SIGFILE)
-    # set(multiValueArgs )
+    set(oneValueArgs OTP_KEY_PAGE SIGFILE MULTI_KEY_DIR MULTI_OUTPUT_DIR)
+    set(multiValueArgs MULTI_DEVICES)
     cmake_parse_arguments(PARSE_ARGV 3 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -586,26 +605,44 @@ function(pico_encrypt_binary TARGET AESFILE IVFILE)
             endif()
         endif()
     endif()
+
+    if (ENC_MULTI_KEY_DIR AND ENC_MULTI_OUTPUT_DIR AND ENC_MULTI_DEVICES)
+        set_target_properties(${TARGET} PROPERTIES 
+            PICOTOOL_ENCRYPT_KEY_DIR ${ENC_MULTI_KEY_DIR}
+        )
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENCRYPT_OUTPUT_DIR ${ENC_MULTI_OUTPUT_DIR}
+        )
+        # Clear then append to list
+        set_target_properties(${TARGET} PROPERTIES PICOTOOL_ENCRYPT_DEVICES "")
+        set_property(TARGET ${TARGET} APPEND PROPERTY
+            PICOTOOL_ENCRYPT_DEVICES ${ENC_MULTI_DEVICES}
+        )
+        message(${ENC_MULTI_DEVICES})
+    elseif(ENC_MULTI_KEY_DIR OR ENC_MULTI_OUTPUT_DIR OR ENC_MULTI_DEVICES)
+        message(FATAL_ERROR "Must specify MULTI_KEY_DIR, MULTI_OUTPUT_DIR and MULTI_DEVICES when encrypting per-device")
+    endif()
 endfunction()
 
-# pico_add_uf2_output(TARGET)
-# \brief_nodesc\ Add a UF2 output using picotool
+# pico_create_uf2_output(TARGET INFILE OUTFILE [OUTFILE_NOGEN])
+# \brief_nodesc\ Create a UF2 output using picotool
 #
-# Add a UF2 output using picotool - must be called after
-# all required properties have been set
-function(pico_add_uf2_output TARGET)
-    pico_init_picotool()
-    get_target_property(${TARGET}_archive_directory ${TARGET} ARCHIVE_OUTPUT_DIRECTORY)
-    if (${TARGET}_archive_directory)
-        get_filename_component(output_path "${${TARGET}_archive_directory}"
-                REALPATH BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-        file(MAKE_DIRECTORY "${output_path}")
-        set(output_path "${output_path}/")
+# Create a UF2 output using picotool - must be called after
+# all required properties have been set on TARGET
+#
+# If OUTFILE contains generator expressions, must also pass the best guess
+# without using generator expressions as OUTFILE_NOGEN, for use in BYPRODUCTS
+#
+# \param\ TARGET Target to read the properties from (e.g. PICOTOOL_EXTRA_UF2_ARGS)
+# \param\ INFILE Input ELF/BIN file (can contain generator expressions)
+# \param\ OUTFILE Output UF2 file (can contain generator expressions)
+# \param\ OUTFILE_NOGEN Output UF2 file without generator expressions
+function(pico_create_uf2_output TARGET INFILE OUTFILE)
+    if (ARGC EQUAL 4)
+        set(OUTFILE_NOGEN ${ARGV3})
     else()
-        set(output_path "")
+        set(OUTFILE_NOGEN ${OUTFILE})
     endif()
-    pico_get_output_name(${TARGET} output_name)
-
     get_target_property(${TARGET}_uf2_package_addr ${TARGET} PICOTOOL_UF2_PACKAGE_ADDR)
     if (${TARGET}_uf2_package_addr)
         set(uf2_package_args "-o;${${TARGET}_uf2_package_addr}")
@@ -624,6 +661,7 @@ function(pico_add_uf2_output TARGET)
         endif()
     endif()
 
+    pico_init_picotool()
     if (picotool_FOUND)
         get_target_property(picotool_family ${TARGET} PICOTOOL_UF2_FAMILY)
         if (NOT picotool_family)
@@ -647,15 +685,40 @@ function(pico_add_uf2_output TARGET)
             ARGS uf2 convert
                 --quiet
                 ${uf2_package_args}
-                $<TARGET_FILE:${TARGET}>
-                ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2
+                ${INFILE}
+                ${OUTFILE}
                 --family ${picotool_family}
                 --platform ${picotool_platform}
                 ${extra_uf2_args}
             COMMAND_EXPAND_LISTS
             VERBATIM
-            BYPRODUCTS "${output_path}${output_name}.uf2")
+            BYPRODUCTS ${OUTFILE_NOGEN})
     endif()
+endfunction()
+
+# pico_add_uf2_output(TARGET)
+# \brief_nodesc\ Add a UF2 output using picotool
+#
+# Add a UF2 output for TARGET using picotool - must be called after
+# all required properties have been set
+#
+# Calls pico_create_uf2_output internally
+function(pico_add_uf2_output TARGET)
+    get_target_property(${TARGET}_archive_directory ${TARGET} ARCHIVE_OUTPUT_DIRECTORY)
+    if (${TARGET}_archive_directory)
+        get_filename_component(output_path "${${TARGET}_archive_directory}"
+                REALPATH BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+        file(MAKE_DIRECTORY "${output_path}")
+        set(output_path "${output_path}/")
+    else()
+        set(output_path "")
+    endif()
+    pico_get_output_name(${TARGET} output_name)
+
+    pico_create_uf2_output(${TARGET}
+        $<TARGET_FILE:${TARGET}>
+        ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2
+        ${output_path}${output_name})
 endfunction()
 
 # Run picotool post-processing on the binary - must be called after
@@ -767,6 +830,28 @@ function(picotool_postprocess_binary TARGET)
             get_target_property(otp_key_page ${TARGET} PICOTOOL_OTP_KEY_PAGE)
             if (otp_key_page)
                 list(APPEND picotool_encrypt_args "--otp-key-page" ${otp_key_page})
+            endif()
+
+            get_target_property(picotool_key_dir ${TARGET} PICOTOOL_ENCRYPT_KEY_DIR)
+            get_target_property(picotool_output_dir ${TARGET} PICOTOOL_ENCRYPT_OUTPUT_DIR)
+            if (picotool_key_dir AND picotool_output_dir)
+                get_target_property(picotool_enc_devices ${TARGET} PICOTOOL_ENCRYPT_DEVICES)
+                message("Devices ${picotool_enc_devices}")
+                foreach(device IN LISTS picotool_enc_devices)
+                    add_custom_command(TARGET ${TARGET} POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E make_directory "${picotool_output_dir}/${device}"
+                        COMMAND ${CMAKE_COMMAND} -E copy ${otp_file} "${picotool_output_dir}/${device}/${TARGET}.otp.json"
+                        COMMAND picotool
+                        ARGS encrypt
+                            --quiet --hash --sign
+                            ${picotool_encrypt_args}
+                            $<TARGET_FILE:${TARGET}> "${picotool_output_dir}/${device}/${TARGET}.elf"
+                            "${picotool_key_dir}/${device}/privateaes.bin" "${picotool_key_dir}/${device}/ivsalt.bin" ${picotool_enc_sigfile} "${picotool_output_dir}/${device}/${TARGET}.otp.json"
+                        COMMAND_EXPAND_LISTS
+                        VERBATIM
+                        BYPRODUCTS "${picotool_output_dir}/${device}/${TARGET}.elf" "${picotool_output_dir}/${device}/${TARGET}.otp.json")
+                    pico_create_uf2_output(${TARGET} "${picotool_output_dir}/${device}/${TARGET}.elf" "${picotool_output_dir}/${device}/${TARGET}.uf2")
+                endforeach()
             endif()
 
             add_custom_command(TARGET ${TARGET} POST_BUILD

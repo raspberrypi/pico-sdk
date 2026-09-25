@@ -337,6 +337,19 @@ if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
         pico_add_extra_outputs(kitchen_sink_psram_flash_fixed)
         target_compile_definitions(kitchen_sink_psram_flash_fixed PRIVATE KITCHEN_SINK_ID="psram and flash fixed size binary")
         set_target_properties(kitchen_sink_psram_flash_fixed PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
+
+        add_executable(kitchen_sink_encrypted ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+        target_link_libraries(kitchen_sink_encrypted kitchen_sink_libs kitchen_sink_options)
+        pico_set_binary_type(kitchen_sink_encrypted no_flash)
+        pico_package_uf2_output(kitchen_sink_encrypted)
+        pico_sign_binary(kitchen_sink_encrypted ${PICO_SDK_PATH}/tools/example_keys/private.pem)
+        pico_encrypt_binary(kitchen_sink_encrypted ${PICO_SDK_PATH}/tools/example_keys/privateaes.bin ${PICO_SDK_PATH}/tools/example_keys/ivsalt.bin EMBED MBEDTLS
+            MULTI_KEY_DIR ${CMAKE_CURRENT_LIST_DIR}/per_device_enc_keys
+            MULTI_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/encrypted_outputs
+            MULTI_DEVICES example_dev dev1 dev2
+        )
+        pico_add_extra_outputs(kitchen_sink_encrypted)
+        target_compile_definitions(kitchen_sink_encrypted PRIVATE KITCHEN_SINK_ID="no-flash binary")
     endif()
 endif()
 
