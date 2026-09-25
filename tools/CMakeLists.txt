@@ -896,7 +896,17 @@ function(picotool_postprocess_binary TARGET)
             if (picotool_key_dir AND picotool_output_dir)
                 get_target_property(picotool_enc_devices ${TARGET} PICOTOOL_ENCRYPT_DEVICES)
                 foreach(device IN LISTS picotool_enc_devices)
-                    if (enc_external_sign)
+                    set(tmp_external_sign FALSE)
+                    if (EXISTS ${picotool_key_dir}/${device}/private.pem)
+                        # Using per-device private keys for signing the encrypted binary
+                        set(sigfile_arg "${picotool_key_dir}/${device}/private.pem")
+                        set(otpfile_arg "${picotool_output_dir}/${device}/${TARGET}.otp.json")
+                        if (enc_external_sign)
+                            list(FIND picotool_encrypt_args "--external-sign" external_sign_idx)
+                            list(REMOVE_ITEM picotool_encrypt_args "--external-sign")
+                        endif()
+                    elseif (enc_external_sign)
+                        set(tmp_external_sign TRUE) # using external signing for this device
                         set(HASH ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.hash.bin)
                         set(SIG ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.sig.der)
                         set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.pubkey.pem)
@@ -921,9 +931,12 @@ function(picotool_postprocess_binary TARGET)
                         VERBATIM
                         BYPRODUCTS "${picotool_output_dir}/${device}/${TARGET}.elf" "${picotool_output_dir}/${device}/${TARGET}.otp.json")
                     
-                    if (enc_external_sign)
+                    if (tmp_external_sign)
                         picotool_reseal_binary(${TARGET} "${picotool_output_dir}/${device}/${TARGET}.elf"
                             ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} "${picotool_output_dir}/${device}/${TARGET}.otp.json")
+                    elseif(external_sign) # external signing being used, but not for this device
+                        # Put --external-sign back in the list
+                        list(INSERT picotool_encrypt_args ${external_sign_idx} "--external-sign")
                     endif()
 
                     pico_create_uf2_output(${TARGET} "${picotool_output_dir}/${device}/${TARGET}.elf" "${picotool_output_dir}/${device}/${TARGET}.uf2")

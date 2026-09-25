@@ -1,7 +1,7 @@
 # Delete existing sig if present
 file(REMOVE ${SIG})
 
-if (TRUE)
+if(1)
     # OpenSSL variant, for example with keys that require a password
     # You must use the Make generator if you need to pass input to
     # the shell (e.g. entering a password), as Ninja doesn't support that
