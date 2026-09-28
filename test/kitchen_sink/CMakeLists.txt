@@ -74,7 +74,6 @@ set(KITCHEN_SINK_NO_HEADER_LIBS
     pico_bootsel_via_double_reset
     pico_int64_ops # currently empty, and only included by _pico variant
     pico_mem_ops # currently empty, and only included by _pico variant
-    pico_cjson
 )
 
 set(KITCHEN_SINK_INCLUDES "#pragma once\n")
@@ -88,6 +87,7 @@ foreach(LIB IN LISTS KITCHEN_SINK_LIBS)
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/datetime.h\"\n")
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/pheap.h\"\n")
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"pico/util/queue.h\"\n")
+           elseif (LIB STREQUAL "pico_cjson")
                string(APPEND KITCHEN_SINK_INCLUDES "#include \"cJSON.h\"\n")
            else()
                if ("${CMAKE_MATCH_2}" STREQUAL "fix_rp2040_usb_device_enumeration")
