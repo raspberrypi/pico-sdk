@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef __FFS_H__
-#define __FFS_H__
+#ifndef _PICO_FFS_H
+#define _PICO_FFS_H
 
 #include "pico.h"
 

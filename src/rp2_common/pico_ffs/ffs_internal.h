@@ -6,7 +6,14 @@
  * Definitions shared between `pico_ffs` SDK library and the utility `ffsgen`
  */
 
+#ifndef _PICO_FFS_INTERNAL_H
+#define _PICO_FFS_INTERNAL_H
+
 #include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // If *not* an SDK build, this is assumed to be a "host build" i.e. for `ffsgen`
 #ifndef PICO_SDK_VERSION_MAJOR
@@ -56,3 +63,9 @@ uint32_t file_hdr_calc_crc0(ffs_file_hdr_t *pfile_hdr, const char *data, uint da
 uint32_t file_hdr_calc_crc1(ffs_file_hdr_t *pfile_hdr);
 void     file_header_generate(void *fhdr_buff, uint file_id, const char *wrdata, uint data_len);
 void     file_header_validate(ffs_file_hdr_t *pfile_hdr);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
