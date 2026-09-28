@@ -121,6 +121,25 @@ int ffs_delete(uint file_id);
  */
 int ffs_list(file_info_t file_info[], uint max_infos);
 
+
+/*! \brief Returns a malloc'd copy of a NUL-terminated string stored in FFS
+ *  \ingroup pico_ffs
+ *
+ * \param file_id   The file ID to read the string from. This must be <= FFS_MAX_VALID_FILE_ID
+ * \return          Pointer to the copy, or NULL if there was an error
+ */
+char *ffs_get_string(uint8_t file_id);
+
+
+/*! \brief Updates the FFS file data if the new value is different from the existing value
+ *  \ingroup pico_ffs
+ *
+ * \param file_id   The file ID to update the string in. If the file does not exist, it is created. This must be <= FFS_MAX_VALID_FILE_ID
+ * \param data      The string to write to the file
+ * \return          PICO_OK on success or PICO_ERROR_xxx
+ */
+int ffs_update_string(uint8_t file_id, const char *data);
+
 #ifdef __cplusplus
 }
 #endif

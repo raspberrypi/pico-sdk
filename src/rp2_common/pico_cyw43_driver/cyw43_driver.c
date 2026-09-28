@@ -152,7 +152,19 @@ bool cyw43_driver_init(async_context_t *context) {
                 rom_set_bootrom_stack(&stack);
             #endif
             uint32_t* workarea = malloc(0x1000);
-            picked_p = rom_pick_ab_partition_during_update(workarea, 0x1000, picked_p);
+            int check_p = rom_pick_ab_partition_during_update(workarea, 0x1000, picked_p);
+            if (check_p == BOOTROM_ERROR_INVALID_DATA) {
+            #if CYW43_FIRMWARE_PARTITION_ENSURE_VERIFICATION
+                CYW43_DEBUG("No block loop in CYW43 firmware B partition, so writing an invalid block there in order to verify the A partition\n");
+                flash_program_invalid_block_to_b_partition(picked_p);
+                picked_p = rom_pick_ab_partition_during_update(workarea, 0x1000, picked_p);
+            #else
+                // Allow an unverified A partition to be used
+                CYW43_DEBUG("No block loop in CYW43 firmware B partition, so using unverified A partition\n");
+            #endif
+            } else {
+                picked_p = check_p;
+            }
             free(workarea);
             #ifdef __riscv
                 // Reset bootrom stack
@@ -162,9 +174,9 @@ bool cyw43_driver_init(async_context_t *context) {
 
             if (picked_p < 0) {
                 if (picked_p == BOOTROM_ERROR_NOT_FOUND) {
-                    CYW43_DEBUG("Chosen CYW43 firmware partition was not verified\n");
+                    CYW43_DEBUG("Chosen CYW43 firmware partition failed verification\n");
                 } else if (picked_p == BOOTROM_ERROR_NOT_PERMITTED) {
-                    CYW43_DEBUG("Too many update boots going on at once\n");
+                    CYW43_DEBUG("Too many update boots going on at once, so cannot choose CYW43 firmware partition\n");
                 }
                 return false;
             }

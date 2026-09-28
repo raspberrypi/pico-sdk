@@ -224,7 +224,7 @@ static int read_partition_info(void) {
     uint32_t last_sector_number = LAST_SECTOR_NUMBER(uf2_target_partition.permissions_and_location);
     uint32_t total_sector_count = 1 + last_sector_number - first_sector_number;
     uint32_t maximum_code_size = FLASH_SECTOR_SIZE * total_sector_count;
-    uint32_t update_size = UF2_BLOCK_SIZE * fimg_state->total_num_blocks;
+    uint32_t update_size = UF2_DATA_PAGE_SIZE * fimg_state->total_num_blocks;
 
     // check if the image is too large for the partition
     if (update_size > maximum_code_size) {

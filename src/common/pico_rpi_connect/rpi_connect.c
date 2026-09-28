@@ -985,6 +985,7 @@ char *rpi_connect_create_device_identity(
     snprintf(sig_header, sizeof(sig_header),
              "X-Connect-Identity-Signature: %s", signature);
     additional_headers = curl_slist_append(additional_headers, sig_header);
+    additional_headers = curl_slist_append(additional_headers, "Accept: */*");
     free(signature);
 
     long http_code = rpi_connect_request_perform_http(
