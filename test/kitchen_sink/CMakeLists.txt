@@ -345,7 +345,7 @@ if (NOT KITCHEN_SINK_NO_BINARY_TYPE_VARIANTS)
         find_program(openssl_found NAMES openssl)
         if(openssl_found)
             # test external signing using openssl
-            pico_sign_binary(kitchen_sink_encrypted ${PICO_SDK_PATH}/tools//example_keys/example_external_sign.cmake)
+            pico_sign_binary(kitchen_sink_encrypted ${PICO_SDK_PATH}/tools/default_external_sign.cmake)
         else()
             message("Not testing external signing due to no openssl")
             pico_sign_binary(kitchen_sink_encrypted ${PICO_SDK_PATH}/tools/example_keys/private.pem)

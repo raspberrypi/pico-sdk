@@ -455,7 +455,8 @@ endfunction()
 # To sign the binary externally (so you don't have to expose your SIGFILE to
 # the SDK), pass a CMake script instead. This script should take the inputs HASH
 # (BIN file containing the hash to sign), SIG (file to write the DER signature),
-# and PUBKEY (file containing the PEM public key), and write files to SIG and PUBKEY
+# and PUBKEY (file to write the public key), and write files to SIG and PUBKEY
+# (PUBKEY can be a PEM or DER format file, but will end with extension .pubkey).
 #
 # \param\ SIGFILE The PEM signature file to use, or a cmake script for external signing
 function(pico_sign_binary TARGET)
@@ -842,7 +843,7 @@ function(picotool_postprocess_binary TARGET)
             if (external_sign)
                 set(HASH ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.hash.bin)
                 set(SIG ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.sig.der)
-                set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.pubkey.pem)
+                set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.pubkey)
                 set(SCRIPT ${picotool_sigfile})
                 set(sigfile_arg ${HASH})
                 set(otpfile_arg "")
@@ -909,7 +910,7 @@ function(picotool_postprocess_binary TARGET)
                         set(tmp_external_sign TRUE) # using external signing for this device
                         set(HASH ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.hash.bin)
                         set(SIG ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.sig.der)
-                        set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.pubkey.pem)
+                        set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.pubkey)
                         set(SCRIPT ${picotool_enc_sigfile})
                         set(sigfile_arg ${HASH})
                         set(otpfile_arg "")
@@ -946,7 +947,7 @@ function(picotool_postprocess_binary TARGET)
             if (enc_external_sign)
                 set(HASH ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.enc.hash.bin)
                 set(SIG ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.enc.sig.der)
-                set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.enc.pubkey.pem)
+                set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.enc.pubkey)
                 set(SCRIPT ${picotool_enc_sigfile})
                 set(sigfile_arg ${HASH})
                 set(otpfile_arg "")
