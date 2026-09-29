@@ -69,7 +69,7 @@ void program::set_clock_div(const yy::location &l, float clock_div) {
     if (clock_div_int == 0) {
         clock_div_frac = 0;
     } else {
-        clock_div_frac = (uint8_t)((clock_div - (float)clock_div_frac) * (1u << 8u));
+        clock_div_frac = (uint8_t)((clock_div - (float)clock_div_int) * (1u << 8u));
     }
 }
 
