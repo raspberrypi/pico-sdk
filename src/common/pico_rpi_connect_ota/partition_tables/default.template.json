@@ -33,6 +33,31 @@
       "link": ["a", 0]
     },
     {
+      "name": "Firmware A",
+      "id": "0x776966696669726d",
+      "size": "@WIFI_FW_SIZE@K",
+      "families": ["cyw43-firmware"],
+      "permissions": {
+        "secure": "rw",
+        "nonsecure": "rw",
+        "bootloader": "rw"
+      },
+      "ignored_during_riscv_boot": true
+    },
+    {
+      "name": "Firmware B",
+      "id": "0x776966696669726d",
+      "size": "@WIFI_FW_SIZE@K",
+      "families": ["cyw43-firmware"],
+      "permissions": {
+        "secure": "rw",
+        "nonsecure": "rw",
+        "bootloader": "rw"
+      },
+      "link": ["a", 2],
+      "ignored_during_riscv_boot": true
+    },
+    {
       "name": "FFS storage area",
       "id": "0x746d656673665f6f",
       "size": "@FFS_SIZE@K",

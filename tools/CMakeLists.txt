@@ -977,6 +977,7 @@ function(pico_create_partition_table_uf2 TARGET PTFILE)
             COMMAND picotool partition create --quiet
                 ${PTFILE} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
                 --family ${UF2_FAMILY} ${picotool_args}
+            DEPENDS ${PTFILE}
             COMMAND_EXPAND_LISTS
             VERBATIM)
 
