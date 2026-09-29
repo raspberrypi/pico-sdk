@@ -21,7 +21,7 @@
 // 4k is often one SPI flash sector size and is on Pico boards
 #define FFSGEN_EXPECTED_SECTOR_SIZE     4096
 #define NUM_OF_FIDS                     (FFS_MAX_VALID_FILE_ID + 1)
-#define MAX_LINE_LEN                    100
+#define MAX_LINE_LEN                    256
 
 // Collect module globals into a single struct
 typedef struct {
