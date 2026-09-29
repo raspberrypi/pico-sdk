@@ -1111,8 +1111,8 @@ endfunction()
 # The new target will be named <TARGET>_tbyb by default
 #
 # \param\ TARGET The name of the target to create the TBYB file from
-# \param\ FAMILY Specify the family for the output UF2 (default is absolute)
-# \param\ OFFSET Specify the address to target the UF2 at (default is start of flash)
+# \param\ OUTTARGET Specify the name of the output target (default is <TARGET>_tbyb)
+# \param\ OUTFILE Specify the filename to output (default is ${CMAKE_CURRENT_BINARY_DIR}/<OUTTARGET>.uf2)
 function(pico_add_tbyb_uf2 TARGET)
     set(oneValueArgs OUTTARGET OUTFILE)
     cmake_parse_arguments(PARSE_ARGV 1 UF2 "" "${oneValueArgs}" "")
