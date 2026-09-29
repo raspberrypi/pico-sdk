@@ -8,6 +8,7 @@
 #define _PICO_FFS_H
 
 #include "pico.h"
+#include "pico/ffs_file_ids.h"
 
 #ifdef __cplusplus
 extern "C" {

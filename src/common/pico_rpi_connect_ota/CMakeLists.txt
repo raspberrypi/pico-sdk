@@ -119,17 +119,19 @@ function(pico_add_rpi_connect_ota_outputs TARGET CONFIGURATION)
 
     pico_create_partition_table_uf2(${TARGET}_pt ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.pt.json)
 
+    pico_ffs_set_file_id_vars()
+
     file(CONFIGURE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.wifi_ssid CONTENT "${OPT_WIFI_SSID}")
     list(APPEND ffs_files ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.wifi_ssid)
-    list(APPEND ffs_file_ids 16)
+    list(APPEND ffs_file_ids ${FFS_WIFI_SSID_FILE_ID})
     file(CONFIGURE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.wifi_password CONTENT "${OPT_WIFI_PASSWORD}")
     list(APPEND ffs_files ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.wifi_password)
-    list(APPEND ffs_file_ids 17)
+    list(APPEND ffs_file_ids ${FFS_WIFI_PASSWORD_FILE_ID})
 
     if (OPT_CONNECT_TOKEN)
         file(CONFIGURE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.connect_token CONTENT "${OPT_CONNECT_TOKEN}")
         list(APPEND ffs_files ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.connect_token)
-        list(APPEND ffs_file_ids 1)
+        list(APPEND ffs_file_ids ${FFS_AUTH_TOKEN_FILE_ID})
     endif()
 
     pico_create_ffs_blob_uf2(${TARGET}_ffs_blob ${ffs_files} FILE_IDS ${ffs_file_ids})

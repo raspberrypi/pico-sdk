@@ -64,13 +64,6 @@ extern "C" {
 #define RPI_CONNECT_OTA_ERROR(...) do { if (0) { RPI_CONNECT_PRINTF(__VA_ARGS__); } } while (0)
 #endif
 
-// FFS file ids used for persisted OTA state
-#define RPI_CONNECT_FFS_AUTH_TOKEN 0x1
-#define RPI_CONNECT_FFS_DEPLOYMENT_ID 0x2
-#define RPI_CONNECT_FFS_DEPLOYMENT_URI 0x3
-#define RPI_CONNECT_FFS_DEPLOYMENT_CHECKSUM 0x4
-#define RPI_CONNECT_FFS_DEPLOYMENT_STATUS 0x5
-
 /*! \brief OTA deployment lifecycle, persisted in FFS
  *  \ingroup pico_rpi_connect_ota
  *

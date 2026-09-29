@@ -150,7 +150,7 @@ static int process_config_file(FILE *fp_config) {
             continue; // skip
         }
 
-        if (2 != sscanf(line, "%u %s", &file_id, file_name)) {
+        if (2 != sscanf(line, "%i %s", &file_id, file_name)) {
             printf("error - bad line arguments: '%s'\n", line);
             printf("        must be: 'file_id filename'\n");
             return -1;
