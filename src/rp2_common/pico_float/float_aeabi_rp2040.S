@@ -39,6 +39,22 @@ float_section WRAPPER_FUNC_NAME(\func)
 #endif
 .endm
 
+// the ROM gives -Inf for a negative argument to log and sqrt; return NaN instead
+// (-0 and negative denormals are left to the ROM)
+.macro nan_if_negative_f
+#if PICO_FLOAT_PROPAGATE_NANS
+    lsls r1, r0, #1
+    bcc 3f
+    lsrs r1, #24
+    beq 3f
+    movs r0, #0
+    mvns r0, r0
+    lsls r0, #22                // 0xffc00000
+    bx lr
+3:
+#endif
+.endm
+
 .macro wrapper_func_f2 x
    _float_wrapper_func \x
 #if PICO_FLOAT_PROPAGATE_NANS
@@ -616,6 +632,7 @@ wrapper_func __aeabi_f2d
 
 float_wrapper_section sqrtf
 wrapper_func_f1 sqrtf
+    nan_if_negative_f
 #if PICO_FLOAT_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
     // check for negative
     asrs r1, r0, #23
@@ -800,4 +817,5 @@ wrapper_func_f1 expf
 
 float_wrapper_section logf
 wrapper_func_f1 logf
+    nan_if_negative_f
     table_tail_call SF_TABLE_FLN

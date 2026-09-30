@@ -36,6 +36,22 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(__aeabi_double_init, PICO_RUNTIME_INIT_AEABI_DOUB
 #endif
 .endm
 
+// the ROM gives -Inf for a negative argument to log and sqrt; return NaN instead
+// (-0 and negative denormals are left to the ROM)
+.macro nan_if_negative_d
+#if PICO_DOUBLE_PROPAGATE_NANS
+    lsls r2, r1, #1
+    bcc 3f
+    lsrs r2, #21
+    beq 3f
+    movs r0, #0
+    mvns r1, r0
+    lsls r1, #19                // 0xfff80000
+    bx lr
+3:
+#endif
+.endm
+
 .macro wrapper_func_d2 x
     _double_wrapper_func \x
 #if PICO_DOUBLE_PROPAGATE_NANS
@@ -699,6 +715,7 @@ wrapper_func __aeabi_d2f
 
 double_wrapper_section srqt
 wrapper_func_d1 sqrt
+    nan_if_negative_d
     shimmable_table_tail_call SF_TABLE_FSQRT dsqrt_shim
 
 double_wrapper_section sincostan_remainder
@@ -930,6 +947,7 @@ wrapper_func_d1 exp
 
 double_wrapper_section log
 wrapper_func_d1 log
+    nan_if_negative_d
     shimmable_table_tail_call SF_TABLE_FLN dln_shim
 
 #endif
