@@ -150,6 +150,28 @@ foreach (DOUBLE_TYPE IN LISTS DOUBLE_TYPES)
 endforeach ()
 
 if (PICO_RP2350 AND NOT PICO_RISCV)
+    # Check the relocatable objects, before a linker can mask insufficient
+    # section alignment by placing the tables at suitably aligned addresses.
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    foreach (IN_RAM IN ITEMS 0 1)
+        set(ALIGNMENT_TARGET pico_double_table_alignment_${IN_RAM})
+        add_library(${ALIGNMENT_TARGET} OBJECT
+                ${PICO_SDK_PATH}/src/rp2_common/pico_double/double_sci_m33.S)
+        target_link_libraries(${ALIGNMENT_TARGET} PRIVATE pico_base_headers pico_double_headers)
+        target_compile_definitions(${ALIGNMENT_TARGET} PRIVATE PICO_DOUBLE_IN_RAM=${IN_RAM})
+        if (IN_RAM)
+            set(SECTION_PREFIX .time_critical.)
+        else()
+            set(SECTION_PREFIX .text.)
+        endif()
+        add_custom_target(${ALIGNMENT_TARGET}_check ALL
+                COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/check_double_table_alignment.py
+                        --section-prefix ${SECTION_PREFIX} $<TARGET_OBJECTS:${ALIGNMENT_TARGET}>
+                DEPENDS ${ALIGNMENT_TARGET} ${CMAKE_CURRENT_LIST_DIR}/check_double_table_alignment.py
+                COMMAND_EXPAND_LISTS
+                VERBATIM)
+    endforeach()
+
     add_executable(m33
             m33.c
     )
