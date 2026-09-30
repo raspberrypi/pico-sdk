@@ -14,6 +14,9 @@ import struct
 import sys
 
 
+TABLE_NAMES = {"rtwopi", "trigtab"}
+
+
 def check_object(path, section_prefix):
     data = path.read_bytes()
     # This source is assembled only for little-endian, 32-bit Arm. Reading the
@@ -46,7 +49,7 @@ def check_object(path, section_prefix):
         strings = section_data(sections[section[6]])
         for name, value, size, info, other, index in struct.iter_unpack("<IIIBBH", section_data(section)):
             name = string_at(strings, name)
-            if name not in ("rtwopi", "trigtab"):
+            if name not in TABLE_NAMES:
                 continue
             if name in found or not 0 < index < section_count:
                 raise ValueError(f"{name}: missing or ambiguous section definition")
@@ -59,8 +62,8 @@ def check_object(path, section_prefix):
                 raise ValueError(f"{name}: section alignment {alignment}, symbol offset {value:#x}; "
                                  "both must be word-aligned")
             found.add(name)
-    if found != {"rtwopi", "trigtab"}:
-        raise ValueError("missing table symbols: " + ", ".join(sorted({"rtwopi", "trigtab"} - found)))
+    if found != TABLE_NAMES:
+        raise ValueError("missing table symbols: " + ", ".join(sorted(TABLE_NAMES - found)))
 
 
 def main():
