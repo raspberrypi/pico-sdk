@@ -179,8 +179,8 @@ uint32_t frequency_count_khz(uint src) {
     // Set reference freq
     fc->ref_khz = clock_get_hz(clk_ref) / 1000;
 
-    // FIXME: Don't pick random interval. Use best interval
-    fc->interval = 10;
+    // Accuracy is 2048 kHz / 2**interval; 12 gives 0.5 kHz (in about 4 ms)
+    fc->interval = 12;
 
     // No min or max
     fc->min_khz = 0;
@@ -193,8 +193,8 @@ uint32_t frequency_count_khz(uint src) {
         tight_loop_contents();
     }
 
-    // Return the result
-    return fc->result >> CLOCKS_FC0_RESULT_KHZ_LSB;
+    // Return the result, rounded to the nearest kHz
+    return (fc->result + (1u << (CLOCKS_FC0_RESULT_KHZ_LSB - 1))) >> CLOCKS_FC0_RESULT_KHZ_LSB;
 }
 /// \end::frequency_count_khz[]
 
