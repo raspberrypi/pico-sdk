@@ -167,6 +167,7 @@ static void request_http_cleanup(request_context_t *request_context) {
         // and any later network teardown fires callbacks into freed memory.
         if (!request_context->http_req->complete && request_context->http_req->http_state)
             httpc_abort(request_context->http_req->http_state);
+        rpi_connect_http_request_free(request_context->http_req);
         free(request_context->http_req);
     }
 
@@ -321,6 +322,8 @@ long rpi_connect_request_perform_http(
     ctx->http_req->result_fn_arg = NULL;
     ctx->http_req->recv_fn = http_client_recv_fn;
     ctx->http_req->recv_fn_arg = ctx;
+    // Redirects are followed with a GET, so only follow them for GET requests
+    ctx->http_req->max_redirects = method == HTTP_GET ? RPI_CONNECT_MAX_REDIRECTS : 0;
 
     if (ctx->headers) {
         ctx->http_req->extra_headers_fn = http_extra_headers_fn;

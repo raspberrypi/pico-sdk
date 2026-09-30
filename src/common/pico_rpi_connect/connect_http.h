@@ -127,6 +127,41 @@ typedef struct CONNECT_HTTP_REQUEST {
      */
     u32_t content_len;
 
+    /*!
+     * Maximum number of HTTP redirects (301, 302, 303, 307 and 308 with a
+     * Location header) to follow. 0 disables redirect handling, so redirect
+     * responses are returned to the caller. Redirects are always followed
+     * with a GET request, so only enable this for GET requests.
+     */
+    u8_t max_redirects;
+
+    /*!
+     * Number of redirects followed so far, used internally
+     */
+    u8_t redirect_count;
+
+    /*!
+     * Set when the current response is a redirect to be followed, used internally
+     */
+    u8_t redirect_pending;
+
+    /*!
+     * Port of the current connection, used internally
+     */
+    u16_t port;
+
+    /*!
+     * Host and URI to request after a redirect, used internally. Freed by
+     * rpi_connect_http_request_free().
+     */
+    char *redirect_host;
+    char *redirect_uri;
+
+    /*!
+     * Worker that starts the request after a redirect, used internally
+     */
+    async_at_time_worker_t redirect_worker;
+
 } connect_http_request_t;
 
 /*! \brief Perform a http request asynchronously
@@ -142,6 +177,16 @@ typedef struct CONNECT_HTTP_REQUEST {
  * @see async_context
  */
 int rpi_connect_http_request_async(async_context_t *context, connect_http_request_t *req, const char *uri, u16_t data_len, const char *data);
+
+/*! \brief Free memory allocated internally for a http request
+ *  \ingroup pico_lwip
+ *
+ * Does not free \em req itself, or abort a request in progress. Call with
+ * the async context lock held.
+ *
+ * @param req HTTP request parameters
+ */
+void rpi_connect_http_request_free(connect_http_request_t *req);
 
 /*! \brief Set the hostname to use for http requests
  *  \ingroup pico_lwip

@@ -66,7 +66,9 @@ long rpi_connect_request_http_async_poll(request_async_context_t *request_async_
     if (request_context->streaming && !request_context->complete && still_running) {
         long response_code = 0;
         curl_easy_getinfo(request_context->curl, CURLINFO_RESPONSE_CODE, &response_code);
-        if (response_code > 0) {
+        // A redirect's headers don't establish the stream: libcurl goes on to follow it
+        bool redirect = request_context->follow_redirects && response_code >= 300 && response_code < 400;
+        if (response_code > 0 && !redirect) {
             // We have response headers, mark as complete for streaming
             request_context->http_code = response_code;
             request_context->complete = true;
@@ -185,6 +187,21 @@ long rpi_connect_request_perform_http(
 
     // Set up request
     curl_easy_setopt(ctx->curl, CURLOPT_URL, ctx->url);
+
+    // Follow redirects for GET requests only, matching the lwIP implementation.
+    // Keep to the original scheme so https cannot be downgraded to http.
+    // libcurl doesn't send the Authorization header to a different host.
+    if (method == HTTP_GET && RPI_CONNECT_MAX_REDIRECTS > 0) {
+        ctx->follow_redirects = true;
+        curl_easy_setopt(ctx->curl, CURLOPT_FOLLOWLOCATION, 1L);
+        curl_easy_setopt(ctx->curl, CURLOPT_MAXREDIRS, (long)RPI_CONNECT_MAX_REDIRECTS);
+        bool plain_http = strncmp(ctx->url, "http://", 7) == 0;
+#if LIBCURL_VERSION_NUM >= 0x075500
+        curl_easy_setopt(ctx->curl, CURLOPT_REDIR_PROTOCOLS_STR, plain_http ? "http" : "https");
+#else
+        curl_easy_setopt(ctx->curl, CURLOPT_REDIR_PROTOCOLS, plain_http ? CURLPROTO_HTTP : CURLPROTO_HTTPS);
+#endif
+    }
 
     // Test hook: verify TLS against a local CA bundle instead of the system
     // trust store, so the test suite can run against a self-signed mock server.
