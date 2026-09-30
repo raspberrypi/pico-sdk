@@ -92,38 +92,39 @@ typedef ioptr const const_ioptr;
 //    return rc;
 //}
 
-#if PICO_RP2040
 // Helper method used by xip_alias macros to optionally check input validity
 __force_inline static uint32_t xip_alias_check_addr(const void *addr) {
     uint32_t rc = (uintptr_t)addr;
-    valid_params_if(ADDRESS_ALIAS, rc >= XIP_MAIN_BASE && rc < XIP_NOALLOC_BASE);
+#if PICO_RP2040
+    valid_params_if(ADDRESS_ALIAS, rc >= XIP_BASE && rc < XIP_NOALLOC_BASE);
+#else
+    valid_params_if(ADDRESS_ALIAS, rc >= XIP_BASE && rc < XIP_SRAM_BASE);
+#endif
     return rc;
 }
-#else
-//static __force_inline uint32_t xip_alias_check_addr(const void *addr) {
-//    uint32_t rc = (uintptr_t)addr;
-//    valid_params_if(ADDRESS_ALIAS, rc >= XIP_BASE && rc < XIP_END);
-//    return rc;
-//}
-#endif
 
 // Untyped conversion alias pointer generation macros
 #define hw_set_alias_untyped(addr) ((void *)(REG_ALIAS_SET_BITS + hw_alias_check_addr(addr)))
 #define hw_clear_alias_untyped(addr) ((void *)(REG_ALIAS_CLR_BITS + hw_alias_check_addr(addr)))
 #define hw_xor_alias_untyped(addr) ((void *)(REG_ALIAS_XOR_BITS + hw_alias_check_addr(addr)))
 
+// XIP window aliases of an address in the cached XIP window (XIP_BASE; XIP_MAIN_BASE in the RP2040
+// headers is the same). RP2350 only has the uncached non-allocating window, so the separate
+// no-allocate and uncached aliases are RP2040 only.
 #if PICO_RP2040
 #define xip_noalloc_alias_untyped(addr) ((void *)(XIP_NOALLOC_BASE | xip_alias_check_addr(addr)))
 #define xip_nocache_alias_untyped(addr) ((void *)(XIP_NOCACHE_BASE | xip_alias_check_addr(addr)))
-#define xip_nocache_noalloc_alias_untyped(addr) ((void *)(XIP_NOCACHE_NOALLOC_BASE | xip_alias_check_addr(addr)))
 #endif
+#define xip_nocache_noalloc_alias_untyped(addr) ((void *)(XIP_NOCACHE_NOALLOC_BASE | xip_alias_check_addr(addr)))
 
 // Typed conversion alias pointer generation macros
 #define hw_set_alias(p) ((typeof(p))hw_set_alias_untyped(p))
 #define hw_clear_alias(p) ((typeof(p))hw_clear_alias_untyped(p))
 #define hw_xor_alias(p) ((typeof(p))hw_xor_alias_untyped(p))
+#if PICO_RP2040
 #define xip_noalloc_alias(p) ((typeof(p))xip_noalloc_alias_untyped(p))
 #define xip_nocache_alias(p) ((typeof(p))xip_nocache_alias_untyped(p))
+#endif
 #define xip_nocache_noalloc_alias(p) ((typeof(p))xip_nocache_noalloc_alias_untyped(p))
 
 /*! \brief Atomically set the specified bits to 1 in a HW register
