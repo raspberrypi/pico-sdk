@@ -1050,9 +1050,25 @@ double_wrapper_section log
  eors r1,r1,#0x80000000
  pop {r4-r8,r15}
 
+#if PICO_DOUBLE_PROPAGATE_NANS
+@ x<0: -0 and negative denormals give -Inf, -NaN stays NaN, anything else gives NaN
+20:
+ cmp r12,#0x00200000         @ -0 or negative denormal?
+ blo 1b
+ cmp r12,#0xffe00000         @ -NaN?
+ bhi 4b
+ movlong r1,0xfff80000       @ return NaN
+ movs r0,#0
+ bx r14
+#endif
+
 hardabi_wrapper_func wrapper log 1
  lsls r12,r1,#1
- bcs 1b                      @ x<0?
+#if PICO_DOUBLE_PROPAGATE_NANS
+ bcs 20b                     @ x<0?
+#else
+ bcs 1b                      @ x<0? smaller to return -Inf when not propagating NaNs
+#endif
  lsrs r12,#21
  beq 1b                      @ x==0/denormal?
  sub r12,#0x3ff

@@ -238,9 +238,24 @@ float_wrapper_section logf
  rsb r1,r12,#117
  b 9f
 
+#if PICO_FLOAT_PROPAGATE_NANS
+@ x<0: -0 and negative denormals give -Inf, -NaN stays NaN, anything else gives NaN
+20:
+ cmp r3,#0x01000000          @ -0 or negative denormal?
+ blo 1b
+ cmp r3,#0xff000000          @ -NaN?
+ bhi 4b
+ movlong r0,0xffc00000       @ return NaN
+ bx r14
+#endif
+
 wrapper_func logf
  lsls r3,r0,#1
- bcs 1b                      @ x<0?
+#if PICO_FLOAT_PROPAGATE_NANS
+ bcs 20b                     @ x<0?
+#else
+ bcs 1b                      @ x<0? smaller to return -Inf when not propagating NaNs
+#endif
  lsrs r3,#24
  beq 1b                      @ x==0/denormal?
  sub r12,r3,#0x7e
