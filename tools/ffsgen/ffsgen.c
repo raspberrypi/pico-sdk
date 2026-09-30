@@ -21,7 +21,7 @@
 // 4k is often one SPI flash sector size and is on Pico boards
 #define FFSGEN_EXPECTED_SECTOR_SIZE     4096
 #define NUM_OF_FIDS                     (FFS_MAX_VALID_FILE_ID + 1)
-#define MAX_LINE_LEN                    100
+#define MAX_LINE_LEN                    256
 
 // Collect module globals into a single struct
 typedef struct {
@@ -150,7 +150,7 @@ static int process_config_file(FILE *fp_config) {
             continue; // skip
         }
 
-        if (2 != sscanf(line, "%u %s", &file_id, file_name)) {
+        if (2 != sscanf(line, "%i %s", &file_id, file_name)) {
             printf("error - bad line arguments: '%s'\n", line);
             printf("        must be: 'file_id filename'\n");
             return -1;

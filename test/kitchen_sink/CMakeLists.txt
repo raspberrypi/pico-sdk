@@ -189,6 +189,8 @@ if (TARGET pico_ffs)
     pico_add_extra_outputs(kitchen_sink_ffs)
     target_compile_definitions(kitchen_sink_ffs PRIVATE KITCHEN_SINK_ID="ffs binary" READ_FFS_DATA=1)
 
+    pico_ffs_check_cmake_matches_header()
+
     pico_create_ffs_blob_uf2(kitchen_sink_ffs_blob ${CMAKE_CURRENT_LIST_DIR}/ffs_file1.txt ${CMAKE_CURRENT_LIST_DIR}/ffs_file2.txt FILE_IDS 1 4)
     pico_create_partition_table_uf2(kitchen_sink_ffs_pt ${CMAKE_CURRENT_LIST_DIR}/ffs_pt.json)
     pico_combine_uf2_outputs(kitchen_sink_ffs_combined kitchen_sink_ffs_pt

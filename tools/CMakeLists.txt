@@ -413,17 +413,23 @@ function(pico_set_binary_version TARGET)
             set_property(TARGET ${TARGET} APPEND PROPERTY
                 PICOTOOL_EXTRA_PROCESS_ARGS "--major" "${SV_MAJOR}"
             )
+            # also set PICOTOOL_MAJOR_VERSION
+            set_target_properties(${TARGET} PROPERTIES PICOTOOL_MAJOR_VERSION ${SV_MAJOR})
         endif()
         if (SV_MINOR)
             # append minor version
             set_property(TARGET ${TARGET} APPEND PROPERTY
                 PICOTOOL_EXTRA_PROCESS_ARGS "--minor" "${SV_MINOR}"
             )
+            # also set PICOTOOL_MINOR_VERSION
+            set_target_properties(${TARGET} PROPERTIES PICOTOOL_MINOR_VERSION ${SV_MINOR})
         endif()
         # append rollback version
         set_property(TARGET ${TARGET} APPEND PROPERTY
             PICOTOOL_EXTRA_PROCESS_ARGS "--rollback" "${SV_ROLLBACK}"
         )
+        # also set PICOTOOL_ROLLBACK_VERSION
+        set_target_properties(${TARGET} PROPERTIES PICOTOOL_ROLLBACK_VERSION ${SV_ROLLBACK})
         if (SV_ROWS)
             # append rollback rows
             foreach(row IN LISTS SV_ROWS)
@@ -436,10 +442,14 @@ function(pico_set_binary_version TARGET)
         if (SV_MAJOR)
             # set major version
             target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_VERSION_MAJOR=${SV_MAJOR})
+            # also set PICOTOOL_MAJOR_VERSION
+            set_target_properties(${TARGET} PROPERTIES PICOTOOL_MAJOR_VERSION ${SV_MAJOR})
         endif()
         if (SV_MINOR)
             # append minor version
             target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_VERSION_MINOR=${SV_MINOR})
+            # also set PICOTOOL_MINOR_VERSION
+            set_target_properties(${TARGET} PROPERTIES PICOTOOL_MINOR_VERSION ${SV_MINOR})
         endif()
     endif()
 endfunction()
@@ -967,6 +977,7 @@ function(pico_create_partition_table_uf2 TARGET PTFILE)
             COMMAND picotool partition create --quiet
                 ${PTFILE} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
                 --family ${UF2_FAMILY} ${picotool_args}
+            DEPENDS ${PTFILE}
             COMMAND_EXPAND_LISTS
             VERBATIM)
 
@@ -1010,13 +1021,15 @@ function(pico_create_ffs_blob_uf2 TARGET)
         endif()
     endif()
 
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt "# autogenenerated ffs config file for ${TARGET}\n")
+    set(ffs_file_contents "# autogenenerated ffs config file for ${TARGET}\n")
     math(EXPR IDX_LAST "${NUM_FILES} - 1")
     foreach(IDX RANGE ${IDX_LAST})
         list(GET FILES ${IDX} file)
         list(GET FFS_FILE_IDS ${IDX} file_id)
-        file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt "${file_id} ${file}\n")
+        set(ffs_file_contents "${ffs_file_contents}${file_id} ${file}\n")
     endforeach()
+
+    file(CONFIGURE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt CONTENT "${ffs_file_contents}")
 
     if (NOT FFS_FAMILY)
         set(FFS_FAMILY "data")
@@ -1088,4 +1101,77 @@ function(pico_create_erase_partition_uf2 TARGET)
             PICO_UF2_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2
         )
     endif()
+endfunction()
+
+
+# pico_add_tbyb_uf2(TARGET [OUTTARGET <target>] [OUTFILE <file>])
+# \brief_nodesc\ Create a TBYB version of a UF2 file
+#
+# Create a UF2 with the TBYB bit set in all image defs in the file
+#
+# The new target will be named <TARGET>_tbyb by default
+#
+# \param\ TARGET The name of the target to create the TBYB file from
+# \param\ OUTTARGET Specify the name of the output target (default is <TARGET>_tbyb)
+# \param\ OUTFILE Specify the filename to output (default is ${CMAKE_CURRENT_BINARY_DIR}/<OUTTARGET>.uf2)
+function(pico_add_tbyb_uf2 TARGET)
+    set(oneValueArgs OUTTARGET OUTFILE)
+    cmake_parse_arguments(PARSE_ARGV 1 UF2 "" "${oneValueArgs}" "")
+
+    get_target_property(INFILE ${TARGET} PICO_UF2_FILE)
+    if (NOT INFILE)
+        message(WARNING "PICO_UF2_FILE property not set on ${TARGET} - guessing location to be ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2")
+        set(INFILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2)
+    endif()
+
+    if (NOT UF2_OUTTARGET)
+        set(UF2_OUTTARGET ${TARGET}_tbyb)
+    endif()
+
+    if (NOT UF2_OUTFILE)
+        set(UF2_OUTFILE ${CMAKE_CURRENT_BINARY_DIR}/${UF2_OUTTARGET}.uf2)
+    endif()
+
+    pico_init_picotool()
+    if (picotool_FOUND)
+        add_custom_command(OUTPUT ${UF2_OUTFILE}
+            COMMAND ${CMAKE_COMMAND} -E copy ${INFILE} ${UF2_OUTFILE}
+            COMMAND picotool tbyb --quiet ${UF2_OUTFILE}
+            DEPENDS ${INFILE}
+            VERBATIM)
+
+        add_custom_target(${UF2_OUTTARGET}
+            DEPENDS ${TARGET} ${INFILE} ${UF2_OUTFILE})
+
+        set_target_properties(${UF2_OUTTARGET} PROPERTIES
+            PICO_UF2_FILE ${UF2_OUTFILE}
+        )
+    endif()
+endfunction()
+
+
+# pico_add_uf2_sha256sum(TARGET)
+# \brief_nodesc\ Create a sha256sum of a UF2 file
+#
+# Create a sha256sum of a UF2 file, written to a
+# .sha256sum file next to the target UF2 file
+#
+# Note that this is the sha256sum of the UF2 file,
+# not the hash from the metedata block added by
+# pico_hash_binary
+function(pico_add_uf2_sha256sum TARGET)
+    get_target_property(INFILE ${TARGET} PICO_UF2_FILE)
+    if (NOT INFILE)
+        message(WARNING "PICO_UF2_FILE property not set on ${TARGET} - guessing location to be ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2")
+        set(INFILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.uf2)
+    endif()
+
+    add_custom_command(OUTPUT ${INFILE}.sha256sum
+        COMMAND ${CMAKE_COMMAND} -Duf2_file="${INFILE}" -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/write_sha256sum.cmake"
+        DEPENDS ${INFILE}
+        )
+
+    add_custom_target(${TARGET}_sha256sum
+        DEPENDS ${INFILE}.sha256sum
+        )
 endfunction()

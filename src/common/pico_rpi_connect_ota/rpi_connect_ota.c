@@ -94,7 +94,7 @@ int rpi_connect_ota_init(const char *client_id, const char *serial_number,
 
     // Priority 1: FFS token, either cached by a previous boot or provisioned
     // (never built into the firmware image - tokens are secrets).
-    char *ffs_token = ffs_get_string(RPI_CONNECT_FFS_AUTH_TOKEN);
+    char *ffs_token = ffs_get_string(FFS_AUTH_TOKEN_FILE_ID);
     if (ffs_token) {
         RPI_CONNECT_OTA_DEBUG("Using auth token from FFS\n");
         g_active_auth_token = ffs_token;
@@ -132,7 +132,7 @@ int rpi_connect_ota_init(const char *client_id, const char *serial_number,
         return -1;
     }
     RPI_CONNECT_OTA_DEBUG("Caching new auth token in FFS\n");
-    ffs_update_string_with_error(RPI_CONNECT_FFS_AUTH_TOKEN, g_active_auth_token);
+    ffs_update_string_with_error(FFS_AUTH_TOKEN_FILE_ID, g_active_auth_token);
     return 0;
 }
 
@@ -152,20 +152,20 @@ char *rpi_connect_ota_get_auth_token(void) {
 }
 
 int rpi_connect_ota_store_auth_token(const char *token) {
-    return ffs_update_string_with_error(RPI_CONNECT_FFS_AUTH_TOKEN, token);
+    return ffs_update_string_with_error(FFS_AUTH_TOKEN_FILE_ID, token);
 }
 
 int rpi_connect_ota_store_deployment_id(const char *deployment_id) {
-    return ffs_update_string_with_error(RPI_CONNECT_FFS_DEPLOYMENT_ID, deployment_id);
+    return ffs_update_string_with_error(FFS_DEPLOYMENT_ID_FILE_ID, deployment_id);
 }
 
 char *rpi_connect_ota_get_deployment_id(void) {
-    return ffs_get_string(RPI_CONNECT_FFS_DEPLOYMENT_ID);
+    return ffs_get_string(FFS_DEPLOYMENT_ID_FILE_ID);
 }
 
 rpi_connect_ota_deployment_status_t rpi_connect_ota_get_deployment_status(void) {
     rpi_connect_ota_deployment_status_t status = RPI_CONNECT_OTA_DEPLOYMENT_IDLE;
-    char *s = ffs_get_string(RPI_CONNECT_FFS_DEPLOYMENT_STATUS);
+    char *s = ffs_get_string(FFS_DEPLOYMENT_STATUS_FILE_ID);
     if (s) {
         if (strcmp(s, "DOWNLOADING") == 0)
             status = RPI_CONNECT_OTA_DEPLOYMENT_DOWNLOADING;
@@ -188,10 +188,10 @@ int rpi_connect_ota_set_deployment_status(rpi_connect_ota_deployment_status_t st
     RPI_CONNECT_OTA_DEBUG("Deployment status -> %s\n", s ? s : "IDLE");
     if (!s) {
         // empty == IDLE
-        ffs_delete(RPI_CONNECT_FFS_DEPLOYMENT_STATUS);
+        ffs_delete(FFS_DEPLOYMENT_STATUS_FILE_ID);
         return 0;
     }
-    return ffs_update_string_with_error(RPI_CONNECT_FFS_DEPLOYMENT_STATUS, s);
+    return ffs_update_string_with_error(FFS_DEPLOYMENT_STATUS_FILE_ID, s);
 }
 
 int rpi_connect_ota_start_deployment(const char *token, const char *deployment_id, char **uri, char **checksum) {
@@ -212,8 +212,8 @@ int rpi_connect_ota_start_deployment(const char *token, const char *deployment_i
             rpi_connect_ota_fail_deployment(token, deployment_id, "missing artefact uri or checksum");
             return -1;
         }
-        ffs_update_string_with_error(RPI_CONNECT_FFS_DEPLOYMENT_URI, *uri);
-        ffs_update_string_with_error(RPI_CONNECT_FFS_DEPLOYMENT_CHECKSUM, *checksum);
+        ffs_update_string_with_error(FFS_DEPLOYMENT_URI_FILE_ID, *uri);
+        ffs_update_string_with_error(FFS_DEPLOYMENT_CHECKSUM_FILE_ID, *checksum);
         rpi_connect_ota_set_deployment_status(RPI_CONNECT_OTA_DEPLOYMENT_DOWNLOADING);
     } else {
         RPI_CONNECT_OTA_DEBUG("Failed to start deployment for ID=%s (%d)\n", deployment_id, rc);
@@ -224,8 +224,8 @@ int rpi_connect_ota_start_deployment(const char *token, const char *deployment_i
 int rpi_connect_ota_resume_deployment(const char *token, const char *deployment_id, char **uri, char **checksum) {
     RPI_CONNECT_OTA_INFO("Resuming deployment ID=%s\n", deployment_id);
 
-    *uri = ffs_get_string(RPI_CONNECT_FFS_DEPLOYMENT_URI);
-    *checksum = ffs_get_string(RPI_CONNECT_FFS_DEPLOYMENT_CHECKSUM);
+    *uri = ffs_get_string(FFS_DEPLOYMENT_URI_FILE_ID);
+    *checksum = ffs_get_string(FFS_DEPLOYMENT_CHECKSUM_FILE_ID);
 
     if (*uri && **uri && *checksum && **checksum)
         return 0;
@@ -252,9 +252,9 @@ static bool deployment_error_is_terminal(int rc) {
 }
 
 static void deployment_clear_local_state(void) {
-    ffs_delete(RPI_CONNECT_FFS_DEPLOYMENT_ID);
-    ffs_delete(RPI_CONNECT_FFS_DEPLOYMENT_URI);
-    ffs_delete(RPI_CONNECT_FFS_DEPLOYMENT_CHECKSUM);
+    ffs_delete(FFS_DEPLOYMENT_ID_FILE_ID);
+    ffs_delete(FFS_DEPLOYMENT_URI_FILE_ID);
+    ffs_delete(FFS_DEPLOYMENT_CHECKSUM_FILE_ID);
     rpi_connect_ota_set_deployment_status(RPI_CONNECT_OTA_DEPLOYMENT_IDLE);
 }
 

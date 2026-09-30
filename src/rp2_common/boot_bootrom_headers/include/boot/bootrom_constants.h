@@ -139,6 +139,18 @@
 #define BLOCK_DEVICE_DEFAULT_PARTITION_ID 0x626C6F636B646576
 #endif
 
+// PICO_CONFIG: FFS_DATA_PARTITION_ID, ID of the partition used for the femto filing system. This must match the ID used in the partition table JSON, type=int, default=0x746d656673665f6f, group=pico_ffs
+#ifndef FFS_DATA_PARTITION_ID
+// The default value is a fixed magic identifier reserved for the femto filing system partition
+#define FFS_DATA_PARTITION_ID 0x746d656673665f6f
+#endif
+
+// PICO_CONFIG: CYW43_FIRMWARE_PARTITION_ID, ID of Wi-Fi firmware partition which must match the ID used in the partition table JSON, type=int, default=0x776966696669726d, group=pico_cyw43_driver
+#ifndef CYW43_FIRMWARE_PARTITION_ID
+// The default 0x776966696669726d value is the ASCII encoding of "wififirm"
+#define CYW43_FIRMWARE_PARTITION_ID 0x776966696669726d
+#endif
+
 #ifndef __ASSEMBLER__
 // Limited to 3 arguments in case of varm multiplex hint (trashes Arm r3)
 typedef int (*bootrom_api_callback_generic_t)(uint32_t r0, uint32_t r1, uint32_t r2);

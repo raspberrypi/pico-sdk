@@ -58,7 +58,7 @@ Lines beginning with `#` are treated as comments and ignored.  A minimal example
 ```
 
 **Rules:**
-- `file_id` must be a decimal integer in the range `0`–`254` (inclusive).
+- `file_id` must be an integer in the range `0`–`254` (inclusive), given either in decimal or in hex with a `0x` prefix (e.g. `0x1f`).
 - Each `file_id` must be unique within the configuration file.
 - `filename` may include a relative or absolute path.  Relative paths are resolved from the directory in which `ffsgen` is invoked.
 

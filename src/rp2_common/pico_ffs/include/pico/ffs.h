@@ -8,6 +8,7 @@
 #define _PICO_FFS_H
 
 #include "pico.h"
+#include "pico/ffs_file_ids.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,14 +21,7 @@ extern "C" {
  *  Please see pico_ffs/README_ffs.md for design details.
  */
 
-#if !PICO_RP2040
-// PICO_CONFIG: FFS_DATA_PARTITION_ID, ID of the partition used for the femto filing system. This must match the ID used in the partition table JSON, type=int, default=0x746d656673665f6f, group=pico_ffs
-#ifndef FFS_DATA_PARTITION_ID
-// The default value is a fixed magic identifier reserved for the femto filing system partition
-#define FFS_DATA_PARTITION_ID  0x746d656673665f6f
-#endif
-
-#else
+#if PICO_RP2040
 // On RP2040 there's no flash partitioning, the ffs flash area needs to be hardcoded.
 // The defaults make it minimum size and right at the end of the flash memory.
 // PICO_CONFIG: FFS_RP2040_FLASH_END_OFFSET, End of ffs flash area + 1, type=int, default=Offset to end of flash + 1, group=pico_ffs

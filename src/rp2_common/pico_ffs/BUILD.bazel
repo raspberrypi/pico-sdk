@@ -6,7 +6,10 @@ package(default_visibility = ["//visibility:public"])
 # Public API header, shared with the host implementation in //src/host/pico_ffs.
 cc_library(
     name = "pico_ffs_headers",
-    hdrs = ["include/pico/ffs.h"],
+    hdrs = [
+        "include/pico/ffs.h",
+        "include/pico/ffs_file_ids.h",
+    ],
     includes = ["include"],
     deps = ["//src:pico_platform"],
 )

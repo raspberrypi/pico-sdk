@@ -47,3 +47,15 @@ cc_library(
         "//src/host/pico_stdlib",
     ],
 )
+
+# Default lwipopts.h and mbedtls_config.h for use with pico_rpi_connect_ota.
+# Point --@pico-sdk//bazel/config:PICO_LWIP_CONFIG and
+# --@pico-sdk//bazel/config:PICO_MBEDTLS_CONFIG at this target to use them.
+cc_library(
+    name = "pico_rpi_connect_ota_default_config_headers",
+    hdrs = [
+        "default_config_headers/lwipopts.h",
+        "default_config_headers/mbedtls_config.h",
+    ],
+    includes = ["default_config_headers"],
+)
