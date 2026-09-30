@@ -1,0 +1,93 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//bazel:defs.bzl", "compatible_with_rp2")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pico_rpi_connect",
+    srcs = [
+        "connect_crypto.c",
+        "connect_http.h",
+        "connect_time.c",
+        "connect_time.h",
+        "request.c",
+        "request.h",
+        "request_internal.h",
+        "request_lwip.c",
+        "rpi_connect.c",
+        "rpi_connect_ca_cert.h",
+        "rpi_connect_http.c",
+        "slist.c",
+        "slist.h",
+    ],
+    hdrs = [
+        "include/pico/rpi_connect.h",
+        "include/pico/rpi_connect_util.h",
+        # connect_crypto.h is not part of the public include/ dir, but the
+        # OTA library uses it for deriving the public key during the
+        # device-identity-exchange, so it is exported here.
+        "connect_crypto.h",
+    ],
+    # "include" exposes the public pico/ headers; "." exposes connect_crypto.h
+    # to the OTA library (matching the CMake target_include_directories).
+    includes = [
+        ".",
+        "include",
+    ],
+    target_compatible_with = compatible_with_rp2(),
+    # rpi_connect_default_async_context() is declared in rpi_connect_util.h
+    # but must be provided by the application (typically returning
+    # cyw43_arch_async_context()), so this library does not depend on any
+    # particular pico_cyw43_arch flavour.
+    deps = [
+        "//src/common/pico_cjson",
+        "//src/rp2_common/pico_async_context",
+        "//src/rp2_common/pico_lwip",
+        "//src/rp2_common/pico_lwip:pico_lwip_http",
+        "//src/rp2_common/pico_mbedtls",
+        "//src/rp2_common/pico_stdlib",
+    ],
+)
+
+# Host build of the same library over system libcurl/OpenSSL instead of
+# lwIP/mbedTLS (as used by the registration/debug CLI in pico-examples).
+# Tagged manual because it needs the libcurl and OpenSSL development packages
+# installed on the host.
+cc_library(
+    name = "pico_rpi_connect_host",
+    srcs = [
+        "connect_crypto.c",
+        "connect_time.c",
+        "connect_time.h",
+        "request.c",
+        "request.h",
+        "request_curl.c",
+        "request_internal.h",
+        "rpi_connect.c",
+        "rpi_connect_ca_cert.h",
+        "slist.c",
+        "slist.h",
+    ],
+    hdrs = [
+        "connect_crypto.h",
+        "include/pico/rpi_connect.h",
+        "include/pico/rpi_connect_util.h",
+    ],
+    includes = [
+        ".",
+        "include",
+    ],
+    linkopts = [
+        "-lcurl",
+        "-lcrypto",
+    ],
+    tags = ["manual"],
+    target_compatible_with = ["//bazel/constraint:host"],
+    deps = [
+        "//src/common/pico_base_headers:version",
+        "//src/common/pico_cjson",
+        "//src/common/pico_time",
+        "//src/host/pico_platform",
+        "//src/host/pico_stdlib",
+    ],
+)

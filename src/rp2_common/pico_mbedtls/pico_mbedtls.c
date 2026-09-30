@@ -7,13 +7,27 @@
 #include <string.h>
 #include "pico.h"
 #include "pico/rand.h"
+#include "pico/time.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/version.h"
+#include "mbedtls/build_info.h"
+#if defined(MBEDTLS_PLATFORM_MS_TIME_ALT)
+#include "mbedtls/platform_time.h"
+#endif
 
 #if MBEDTLS_VERSION_MAJOR < 3
 #define mbedtls_sha256_starts mbedtls_sha256_starts_ret
 #define mbedtls_sha256_update mbedtls_sha256_update_ret
 #define mbedtls_sha256_finish mbedtls_sha256_finish_ret
+#endif
+
+#if defined(MBEDTLS_PLATFORM_MS_TIME_ALT)
+/* mbedtls 3.6 needs a millisecond clock for TLS 1.3 session-ticket lifetimes.
+ * Monotonic since boot is fine - tickets only need a stable elapsed-time
+ * comparison, not wall time. */
+mbedtls_ms_time_t mbedtls_ms_time(void) {
+    return (mbedtls_ms_time_t)to_ms_since_boot(get_absolute_time());
+}
 #endif
 
 /* Function to feed mbedtls entropy. */

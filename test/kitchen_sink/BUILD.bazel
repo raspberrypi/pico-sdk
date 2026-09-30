@@ -39,6 +39,7 @@ cc_library(
         "//src/common/hardware_claim",
         "//src/common/pico_binary_info",
         "//src/common/pico_bit_ops_headers",
+        "//src/common/pico_cjson",
         "//src/common/pico_sync",
         "//src/common/pico_time",
         "//src/common/pico_util",
@@ -70,6 +71,7 @@ cc_library(
         "//src/rp2_common/pico_bootrom",
         "//src/rp2_common/pico_divider",
         "//src/rp2_common/pico_double",
+        "//src/rp2_common/pico_ffs",
         "//src/rp2_common/pico_fix/rp2040_usb_device_enumeration",
         "//src/rp2_common/pico_flash",
         "//src/rp2_common/pico_float",
@@ -89,6 +91,7 @@ cc_library(
         "//bazel/constraint:rp2350": [
             "//src/rp2_common/hardware_psram",
             "//src/rp2_common/hardware_sha256",
+            "//src/rp2_common/pico_flash_image",
         ],
         "//conditions:default": [
             "//src/rp2_common/hardware_rtc",
@@ -264,11 +267,16 @@ cc_binary(
     tags = ["manual"],  # Built via kitchen_sink_lwip_poll
     deps = [
         ":kitchen_sink_common",
+        "//src/common/pico_rpi_connect",
         "//src/rp2_common/pico_btstack",
         "//src/rp2_common/pico_cyw43_arch:pico_cyw43_arch_lwip_poll",
         "//src/rp2_common/pico_lwip:pico_lwip_mbedtls",
         "//src/rp2_common/pico_mbedtls",
-    ],
+    ] + select({
+        # OTA uses RP2350-only bootrom flash-update and OTP APIs.
+        "//bazel/constraint:rp2350": ["//src/common/pico_rpi_connect_ota"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_binary(

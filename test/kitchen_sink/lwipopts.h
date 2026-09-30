@@ -17,4 +17,8 @@
 #define LWIP_ALTCP_TLS           	1
 #define LWIP_ALTCP_TLS_MBEDTLS   	1
 
+// Required by pico_rpi_connect (see rpi_connect_http.c)
+#define HTTPC_SEND_ACCEPT_HEADER    0
+#define HTTPC_SEND_CONNECTION_CLOSE 0
+
 #endif
