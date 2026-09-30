@@ -84,9 +84,10 @@ endif()
 # \param\ NO_BOARD Don't include the board name in the update filename
 # \param\ NO_DATE Don't include the current date in the update filename
 # \param\ UPDATE_DIR Directory to place the update UF2 in - defaults to ${CMAKE_CURRENT_LIST_DIR}/updates
+# \param\ PARTITION_TABLE Specify custom path to partition table to use - must match the partition layout expected by the configuration
 function(pico_add_rpi_connect_ota_outputs TARGET CONFIGURATION)
     set(options NO_DATE NO_BOARD)
-    set(oneValueArgs WIFI_SSID WIFI_PASSWORD CONNECT_TOKEN COMBINED_TARGET UPDATE_DIR)
+    set(oneValueArgs WIFI_SSID WIFI_PASSWORD CONNECT_TOKEN COMBINED_TARGET UPDATE_DIR PARTITION_TABLE)
     cmake_parse_arguments(PARSE_ARGV 2 OPT "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
     if (NOT OPT_COMBINED_TARGET)
@@ -97,32 +98,36 @@ function(pico_add_rpi_connect_ota_outputs TARGET CONFIGURATION)
         set(OPT_UPDATE_DIR "${CMAKE_CURRENT_LIST_DIR}/updates")
     endif()
 
-    # 8k at start for 2 slots, 8k at end for btstack flash bank, plus 4k if E10 applies
-    if (PICO_RP2350_A2_SUPPORTED)
-        set(USED_SIZE "20")
+    if (OPT_PARTITION_TABLE)
+        pico_create_partition_table_uf2(${TARGET}_pt ${OPT_PARTITION_TABLE})
     else()
-        set(USED_SIZE "16")
-    endif()
-
-    set(FFS_SIZE "8")
-    set(WIFI_FW_SIZE "256")
-    math(EXPR FLASH_SIZE_K "(${PICO_FLASH_SIZE_BYTES})/1024")
-    if (CONFIGURATION STREQUAL "default")
-        math(EXPR MAIN_SIZE "(${FLASH_SIZE_K} - (${WIFI_FW_SIZE}*2) - ${FFS_SIZE} - ${USED_SIZE}) / 2")
-        if (NOT TARGET ${TARGET}_wifi_firmware)
-            # Ensure TARGET is configured to use wifi firmware from partition
-            # (no embedded PT as using FFS one, and no TBYB variant as that's created below)
-            pico_use_wifi_firmware_partition(${TARGET} NO_EMBEDDED_PT NO_TBYB)
+        # 8k at start for 2 slots, 8k at end for btstack flash bank, plus 4k if E10 applies
+        if (PICO_RP2350_A2_SUPPORTED)
+            set(USED_SIZE "20")
+        else()
+            set(USED_SIZE "16")
         endif()
-    elseif (CONFIGURATION STREQUAL "no_wifi_firmware")
-        math(EXPR MAIN_SIZE "(${FLASH_SIZE_K} - ${FFS_SIZE} - ${USED_SIZE}) / 2")
-    else()
-        message(FATAL_ERROR "Unknown rpi_connect_ota configuration '${CONFIGURATION}'")
+
+        set(FFS_SIZE "8")
+        set(WIFI_FW_SIZE "256")
+        math(EXPR FLASH_SIZE_K "(${PICO_FLASH_SIZE_BYTES})/1024")
+        if (CONFIGURATION STREQUAL "default")
+            math(EXPR MAIN_SIZE "(${FLASH_SIZE_K} - (${WIFI_FW_SIZE}*2) - ${FFS_SIZE} - ${USED_SIZE}) / 2")
+            if (NOT TARGET ${TARGET}_wifi_firmware)
+                # Ensure TARGET is configured to use wifi firmware from partition
+                # (no embedded PT as using FFS one, and no TBYB variant as that's created below)
+                pico_use_wifi_firmware_partition(${TARGET} NO_EMBEDDED_PT NO_TBYB)
+            endif()
+        elseif (CONFIGURATION STREQUAL "no_wifi_firmware")
+            math(EXPR MAIN_SIZE "(${FLASH_SIZE_K} - ${FFS_SIZE} - ${USED_SIZE}) / 2")
+        else()
+            message(FATAL_ERROR "Unknown rpi_connect_ota configuration '${CONFIGURATION}'")
+        endif()
+
+        configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/partition_tables/${CONFIGURATION}.template.json ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.pt.json @ONLY)
+
+        pico_create_partition_table_uf2(${TARGET}_pt ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.pt.json)
     endif()
-
-    configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/partition_tables/${CONFIGURATION}.template.json ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.pt.json @ONLY)
-
-    pico_create_partition_table_uf2(${TARGET}_pt ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.pt.json)
 
     pico_ffs_set_file_id_vars()
 
