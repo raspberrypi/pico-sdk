@@ -77,7 +77,7 @@ def main():
         except (OSError, ValueError, IndexError, struct.error) as error:
             print(f"{path}: {error}", file=sys.stderr)
             return 1
-        print(f"{path}: rtwopi and trigtab are word-aligned")
+        print(f"{path}: {' and '.join(sorted(TABLE_NAMES))} are word-aligned")
     return 0
 
 
