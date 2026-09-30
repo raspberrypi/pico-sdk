@@ -36,6 +36,8 @@ float_section frrcore_v
 rtwopi:
 .long 0,0
 .long 0x28BE60DB, 0x9391054A, 0x7F09D5F4, 0x7D4D3770, 0x36D8A566, 0x4F10E410
+@ frr_core reads the word after this table when k=5, but that only happens for e=160 or 161,
+@ where u1=0, so the word's value is never used
 
 @ input:
 @ r0 mantissa m Q23
