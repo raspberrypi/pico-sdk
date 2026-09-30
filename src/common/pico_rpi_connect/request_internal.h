@@ -34,6 +34,7 @@ struct request_context {
     long http_code;
     bool complete;
     bool streaming; // true for SSE/event-stream: return early once headers arrive
+    bool follow_redirects;
     memory_struct_t *response;
 };
 #endif

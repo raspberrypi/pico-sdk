@@ -23,6 +23,13 @@ extern "C" {
 #define RPI_CONNECT_MBEDTLS_DEBUG_LEVEL 0
 #endif
 
+// Maximum number of HTTP redirects followed by a GET request made with
+// rpi_connect_request_perform_http(). Redirects of other methods are not
+// followed, and 0 disables redirect handling.
+#ifndef RPI_CONNECT_MAX_REDIRECTS
+#define RPI_CONNECT_MAX_REDIRECTS 5
+#endif
+
 // Structure to hold response data
 typedef struct memory_struct {
     char *memory;
@@ -89,6 +96,11 @@ typedef struct request_async_context {
  * connection is encrypted but the peer is unauthenticated. Only for requests
  * whose response integrity is guaranteed by other means, e.g. a checksum.
  * @return HTTP status code (200, 204, etc.) on success, -1 on error, or 0 for async requests
+ *
+ * GET requests follow up to RPI_CONNECT_MAX_REDIRECTS redirects, keeping the
+ * original scheme (http or https); the status code is that of the final
+ * response, and exceeding the limit is an error. The Authorization header is
+ * not sent to a different host.
  */
 long rpi_connect_request_perform_http(
     http_method_t method,
