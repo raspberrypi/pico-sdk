@@ -55,7 +55,7 @@ if (NOT TARGET pico_rpi_connect_ota)
 endif()
 
 
-# pico_add_rpi_connect_ota_outputs(TARGET CONFIGURATION [WIFI_SSID <ssid>] [WIFI_PASSWORD <password>] [CONNECT_TOKEN <token>] [COMBINED_TARGET <name>] [NO_BOARD] [NO_DATE] [UPDATE_DIR <directory>])
+# pico_add_rpi_connect_ota_outputs(TARGET CONFIGURATION [WIFI_SSID <ssid>] [WIFI_PASSWORD <password>] [CONNECT_TOKEN <token>] [COMBINED_TARGET <name>] [NO_BOARD] [NO_DATE] [UPDATE_DIR <directory>] [PARTITION_TABLE <path>])
 # \brief_nodesc\ Add UF2 outputs for use with rpi_connect_ota
 #
 # Adds UF2 outputs created from TARGET for use with rpi_connect_ota,
