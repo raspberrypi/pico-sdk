@@ -259,7 +259,12 @@ void runtime_init_post_clock_resets(void);
 // RP2040 IE disable for GPIO 26-29
 // ----------------------------------------
 
-// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_RP2040_GPIO_IE_DISABLE, Skip calling of `runtime_init_rp2040_gpio_ie_disable` function during runtime init, type=bool, default=0 on RP2040 unless PICO_IE_26_29_UNCHANGED_ON_RESET is 1, group=pico_runtime_init
+// PICO_CONFIG: PICO_IE_26_29_UNCHANGED_ON_RESET, Leave the input enable of GPIOs 26-29 unchanged after reset even when RP2040 B0 or B1 is supported. Only those revisions need it disabling as later ones already have the correct reset state, type=bool, default=0, advanced=true, group=pico_runtime_init
+#ifndef PICO_IE_26_29_UNCHANGED_ON_RESET
+#define PICO_IE_26_29_UNCHANGED_ON_RESET 0
+#endif
+
+// PICO_CONFIG: PICO_RUNTIME_SKIP_INIT_RP2040_GPIO_IE_DISABLE, Skip calling of `runtime_init_rp2040_gpio_ie_disable` function during runtime init, type=bool, default=0 if RP2040 B0 or B1 is supported unless PICO_IE_26_29_UNCHANGED_ON_RESET is 1, group=pico_runtime_init
 // PICO_CONFIG: PICO_RUNTIME_NO_INIT_RP2040_GPIO_IE_DISABLE, Do not include SDK implementation of `runtime_init_rp2040_gpio_ie_disable` function, type=bool, default=0 on RP2040, group=pico_runtime_init
 
 #ifndef PICO_RUNTIME_INIT_RP2040_GPIO_IE_DISABLE
@@ -267,7 +272,8 @@ void runtime_init_post_clock_resets(void);
 #endif
 
 #ifndef PICO_RUNTIME_SKIP_INIT_RP2040_GPIO_IE_DISABLE
-#if !PICO_RP2040 || PICO_IE_26_29_UNCHANGED_ON_RESET
+// only RP2040 B0 and B1 leave input enabled on GPIOs 26-29 after reset
+#if !(PICO_RP2040_B0_SUPPORTED || PICO_RP2040_B1_SUPPORTED) || PICO_IE_26_29_UNCHANGED_ON_RESET
 #define PICO_RUNTIME_SKIP_INIT_RP2040_GPIO_IE_DISABLE 1
 #endif
 #endif
