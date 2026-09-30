@@ -1067,6 +1067,10 @@ double_wrapper_section log
  blo 1b
  cmp r12,#0xffe00000         @ -NaN?
  bhi 4b
+ bne 21f
+ cmp r0,#0                   @ -NaN with only low mantissa bits?
+ bne 4b
+21:
  movlong r1,0xfff80000       @ return NaN
  movs r0,#0
  bx r14
