@@ -302,6 +302,8 @@ int test_fcmpun() {
 
 #define assert_nan(a) test_assert(isnanf(a))
 #define check_nan(a) ({ assert_nan(a); a; })
+// records a failure but carries on, so every domain error is reported
+#define check_domain_nan(a) ({ __typeof__(a) r = (a); if (!isnan(r)) { printf("Expected NaN: %s = %g\n", #a, (double)r); fail = true; } r; })
 
 float __attribute__((pcs("aapcs"))) __aeabi_i2f(int32_t);
 float __attribute__((pcs("aapcs"))) __aeabi_ui2f(int32_t);
@@ -479,21 +481,34 @@ int main() {
     {
         float x = NAN;
         printf("NANO %10.18f\n", x);
-        printf("FSQRT %10.18f\n", sqrtf(x));
-        printf("FCOS %10.18f\n", cosf(x));
-        printf("FSIN %10.18f\n", sinf(x));
-        printf("FTAN %10.18f\n", tanf(x));
-        printf("FATAN2 %10.18f\n", atan2f(x, 10));
-        printf("FATAN2 %10.18f\n", atan2f(10, x));
-        printf("FEXP %10.18f\n", expf(x));
-        printf("FLN %10.18f\n", logf(x));
-        printf("POWF %10.18f\n", powf(x, x));
-        printf("TRUNCF %10.18f\n", truncf(x));
-        printf("LDEXPF %10.18f\n", ldexpf(x, x));
-        printf("FMODF %10.18f\n", fmodf(x, 3.0f));
+        printf("FSQRT %10.18f\n", check_nan(sqrtf(x)));
+        printf("FCOS %10.18f\n", check_nan(cosf(x)));
+        printf("FSIN %10.18f\n", check_nan(sinf(x)));
+        printf("FTAN %10.18f\n", check_nan(tanf(x)));
+        printf("FATAN2 %10.18f\n", check_nan(atan2f(x, 10)));
+        printf("FATAN2 %10.18f\n", check_nan(atan2f(10, x)));
+        printf("FEXP %10.18f\n", check_nan(expf(x)));
+        printf("FLN %10.18f\n", check_nan(logf(x)));
+        printf("POWF %10.18f\n", check_nan(powf(x, x)));
+        printf("TRUNCF %10.18f\n", check_nan(truncf(x)));
+        printf("LDEXPF %10.18f\n", check_nan(ldexpf(x, 1)));
+        printf("FMODF %10.18f\n", check_nan(fmodf(x, 3.0f)));
         float s, c;
-//        sincosf(x, &s, &c);
-        printf("FSINCOS %10.18f %10.18f\n", s, c);
+        sincosf(x, &s, &c);
+        printf("FSINCOS %10.18f %10.18f\n", check_nan(s), check_nan(c));
+
+        // domain errors
+        printf("FACOSH %10.18f\n", check_domain_nan(acoshf(0.5f)));
+        printf("FACOSH %10.18f\n", check_domain_nan(acoshf(-1.0f)));
+        printf("FASIN %10.18f\n", check_domain_nan(asinf(2.0f)));
+        printf("FACOS %10.18f\n", check_domain_nan(acosf(2.0f)));
+        printf("FSQRT %10.18f\n", check_domain_nan(sqrtf(-1.0f)));
+        printf("FLN %10.18f\n", check_domain_nan(logf(-1.0f)));
+        printf("FLOG2 %10.18f\n", check_domain_nan(log2f(-1.0f)));
+        printf("FLOG10 %10.18f\n", check_domain_nan(log10f(-1.0f)));
+        printf("FLN %10.18f\n", check_domain_nan(logf(-INFINITY)));
+        printf("FLN %10.18f\n", check_domain_nan(logf(-NAN)));
+        test_assert(logf(-0.0f) == -INFINITY);
 
         for(int j=0;j<2;j++) {
             for (int i = 1; i < 4; i++) {

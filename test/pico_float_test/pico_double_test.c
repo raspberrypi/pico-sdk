@@ -17,6 +17,10 @@
 #include <math.h>
 #include <pico/double.h>
 #include "pico/stdlib.h"
+
+#if defined(LLVM_LIBC_COMMON_H) && !defined(__LLVM_LIBC__)
+#define __LLVM_LIBC__ 1
+#endif
 // Include sys/types.h before inttypes.h to work around issue with
 // certain versions of GCC and newlib which causes omission of PRIx64
 #include <sys/types.h>
@@ -293,6 +297,8 @@ int test_dcmpun() {
 
 #define assert_nan(a) test_assert(isnan(a))
 #define check_nan(a) ({ assert_nan(a); a; })
+// records a failure but carries on, so every domain error is reported
+#define check_domain_nan(a) ({ __typeof__(a) r = (a); if (!isnan(r)) { printf("Expected NaN: %s = %g\n", #a, (double)r); fail = true; } r; })
 
 double __attribute__((pcs("aapcs"))) __aeabi_i2d(int32_t);
 double __attribute__((pcs("aapcs"))) __aeabi_ui2d(int32_t);
@@ -399,7 +405,7 @@ int main() {
 
 #if PICO_DOUBLE_PROPAGATE_NANS
     {
-        float x = NAN;
+        double x = NAN;
         printf("SQRT %10.18g\n", check_close1(sqrt, x));
         printf("COS %10.18g\n", check_close1(cos, x));
         printf("SIN %10.18g\n", check_close1(sin, x));
@@ -415,6 +421,24 @@ int main() {
         double s, c;
         sincos(x, &s, &c);
         printf("SINCOS %10.18f %10.18f\n", check_nan(s), check_nan(c));
+
+        // domain errors
+        // LLVM libc doesn't provide these (asin and acos arrived in clang 23)
+#if !(defined(__LLVM_LIBC__) && defined(__llvm__))
+        printf("ACOSH %10.18f\n", check_domain_nan(acosh(0.5)));
+        printf("ACOSH %10.18f\n", check_domain_nan(acosh(-1.0)));
+#endif
+#if !(defined(__LLVM_LIBC__) && defined(__llvm__) && (__clang_major__ < 23))
+        printf("ASIN %10.18f\n", check_domain_nan(asin(2.0)));
+        printf("ACOS %10.18f\n", check_domain_nan(acos(2.0)));
+#endif
+        printf("SQRT %10.18f\n", check_domain_nan(sqrt(-1.0)));
+        printf("LN %10.18f\n", check_domain_nan(log(-1.0)));
+        printf("LOG2 %10.18f\n", check_domain_nan(log2(-1.0)));
+        printf("LOG10 %10.18f\n", check_domain_nan(log10(-1.0)));
+        printf("LN %10.18f\n", check_domain_nan(log(-INFINITY)));
+        printf("LN %10.18f\n", check_domain_nan(log(-NAN)));
+        test_assert(log(-0.0) == -INFINITY);
 
         for(int j=0;j<2;j++) {
             for (int i = 1; i < 4; i++) {
