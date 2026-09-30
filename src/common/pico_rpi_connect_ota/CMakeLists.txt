@@ -123,6 +123,8 @@ function(pico_add_rpi_connect_ota_outputs TARGET CONFIGURATION)
         else()
             message(FATAL_ERROR "Unknown rpi_connect_ota configuration '${CONFIGURATION}'")
         endif()
+        # round down to nearest 4k
+        math(EXPR MAIN_SIZE "(${MAIN_SIZE} / 4) * 4")
 
         configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/partition_tables/${CONFIGURATION}.template.json ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.pt.json @ONLY)
 
