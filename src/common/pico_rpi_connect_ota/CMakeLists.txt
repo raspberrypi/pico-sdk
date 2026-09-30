@@ -47,6 +47,11 @@ if (NOT TARGET pico_rpi_connect_ota)
             pico_stdlib
         )
     endif()
+
+
+    # Default header libraries
+    add_library(pico_rpi_connect_ota_default_config_headers INTERFACE)
+    target_include_directories(pico_rpi_connect_ota_default_config_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/default_config_headers)
 endif()
 
 

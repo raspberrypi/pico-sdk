@@ -96,7 +96,7 @@
         .len = _len, \
     }
 
-#define bi_ptr_string(_tag, _id, _var, _default, _max_len) static char _var[_max_len] = _default; __bi_ptr_string_with_name(_tag, _id, __STRING(_var), _var, _max_len)
+#define bi_ptr_string(_tag, _id, _var, _default, _max_len) __attribute__((section(".data"))) static char _var[_max_len] = _default; __bi_ptr_string_with_name(_tag, _id, __STRING(_var), _var, _max_len)
 
 #define bi_block_device(_tag, _name, _address, _size, _extra, _flags) \
     static const struct _binary_info_block_device __bi_lineno_var_name = { \
