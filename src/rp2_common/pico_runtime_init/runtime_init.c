@@ -124,7 +124,7 @@ void __weak runtime_init_per_core_enable_coprocessors(void) {
 #endif
     arm_cpu_hw->cpacr |= cpacr;
 #if HAS_DOUBLE_COPROCESSOR
-    asm volatile ("mrc p4,#0,r0,c0,c0,#1" : : : "r0"); // clear engaged flag via RCMP
+    pico_default_asm_volatile("mrc p4,#0,r0,c0,c0,#1" : : : "r0"); // clear engaged flag via RCMP
 #endif
 }
 #endif
