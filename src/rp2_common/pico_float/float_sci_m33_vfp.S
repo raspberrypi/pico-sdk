@@ -119,6 +119,7 @@ wrapper_func expf
  movlong r2,0x42B17218
  cmp r0,r2
  blo 10b                     @ in range after all
+#if PICO_FLOAT_PROPAGATE_NANS
  cmp r0,#0x7f800000
  bls 4f                      @ not NaN?
  orrs r0,#0x00400000
@@ -126,6 +127,7 @@ wrapper_func expf
  vmov s0,r0
 #endif
  bx r14
+#endif
 
 4:
  movlong r0,0x7f800000       @ return +Inf
@@ -157,6 +159,7 @@ wrapper_func expf
  movlong r2,0xC2AEAC4F
  cmp r0,r2
  bls 13b
+#if PICO_FLOAT_PROPAGATE_NANS
  cmp r0,#0xff800000
  bls 14f
  orrs r0,#0x00400000
@@ -164,6 +167,7 @@ wrapper_func expf
  vmov s0,r0
 #endif
  bx r14
+#endif
 14:
  mov r0,#0
 #if defined(__ARM_PCS_VFP)
@@ -262,6 +266,7 @@ wrapper_func logf
  bx r14
 
 1:
+#if PICO_FLOAT_PROPAGATE_NANS
  bgt 3f                      @ +NaN?
  beq 10f                     @ +Inf?
 2:
@@ -278,9 +283,16 @@ wrapper_func logf
 #endif
  bx r14
 11:
- movlong r0,0xff800000
+#else
+ bge 10f                     @ +Inf/NaN: return it
+2:
+#endif
+ movlong r0,0xff800000       @ -Inf for ±0 and, without NaN propagation, all negatives
 #if defined(__ARM_PCS_VFP)
  vmov s0,r0
+#endif
+#if !PICO_FLOAT_PROPAGATE_NANS
+10:
 #endif
  bx r14
 
@@ -321,6 +333,7 @@ logtab3:
 
 float_wrapper_section fsin_fcos
 
+#if PICO_FLOAT_PROPAGATE_NANS
 30:
  lsls r1,r0,#9
  bne 1f                      @ NaN? return it
@@ -331,6 +344,7 @@ float_wrapper_section fsin_fcos
  vmov s0,r0
 #endif
  bx r14
+#endif
 
 @ heavy-duty range reduction
 @ here x≥256, -e in r1
@@ -390,8 +404,10 @@ float_wrapper_section fsin_fcos
 @ r12: quadrant count
 @ required result is sin(r0+r12*π/2)
 10:
+#if PICO_FLOAT_PROPAGATE_NANS
  cmn r1,#0x80
  beq 30b                     @ Inf/NaN
+#endif
  bics r2,r0,r12,lsl#31       @ negative argument,doing sin -> +2 quadrants
  it mi
  addmi r12,r12,#2
@@ -433,9 +449,11 @@ wrapper_func sincosf
  vmov r0,s0
 #endif
  push {r0-r2,r14}
+#if PICO_FLOAT_PROPAGATE_NANS
  ubfx r1,r0,#23,#8
  cmp r1,#0xff                @ Inf/NaN?
  beq 2f
+#endif
  bl cosf_entry               @ this will exit via 1f or 2f...
 #if defined(__ARM_PCS_VFP)
  vmov r0,s0
@@ -469,6 +487,7 @@ wrapper_func sincosf
  str r0,[r2]                 @ save cos result
  pop {r15}
 
+#if PICO_FLOAT_PROPAGATE_NANS
 @ sincos of Inf or NaN
 2:
  lsls r1,r0,#9
@@ -480,6 +499,7 @@ wrapper_func sincosf
  str r0,[r2]                 @ both sin and cos results
  str r0,[r3]
  bx r14
+#endif
 
 wrapper_func sinf
 #if defined(__ARM_PCS_VFP)
@@ -615,9 +635,11 @@ wrapper_func tanf
  vmov r0,s0
 #endif
  push {r0,r14}
+#if PICO_FLOAT_PROPAGATE_NANS
  ubfx r1,r0,#23,#8
  cmp r1,#0xff                @ Inf/NaN?
  beq 2f
+#endif
  bl cosf_entry               @ this will exit via sintail or costail...
 #if defined(__ARM_PCS_VFP)
  vmov r0,s0
@@ -658,6 +680,7 @@ wrapper_func tanf
 #endif
  pop {r1,r15}
 
+#if PICO_FLOAT_PROPAGATE_NANS
 @ tan of Inf or NaN
 2:
  lsls r1,r0,#9
@@ -669,10 +692,12 @@ wrapper_func tanf
  vmov s0,r0
 #endif
  pop {r3,r15}
+#endif
 
 
 float_wrapper_section atan2f
 
+#if PICO_FLOAT_PROPAGATE_NANS
 50:
 60:
  orrs r0,r1,#0x00400000
@@ -700,6 +725,7 @@ float_wrapper_section atan2f
  bne 62b                     @ NaN?
  cmp r3,#0x7f800000          @ y an infinity; x an infinity too?
  bne 65f                     @ no: carry on
+#endif
 66:
 @ here x and y are both infinities
  subs r0,r0,#1               @ make both finite (and equal) with same sign and retry
@@ -752,10 +778,15 @@ wrapper_func atan2f
  cmp r2,#0x00800000
  blo 71b                     @ y 0 or denormal?
 73:
+#if PICO_FLOAT_PROPAGATE_NANS
  cmp r3,#0x7f800000
  bhi 50b                     @ x NaN?
  cmp r2,#0x7f800000
  bhs 51b                     @ y Inf or NaN?
+#else
+ cmp r2,#0x7f800000          @ y an infinity? then so is x (or it's a NaN)
+ beq 66b
+#endif
 55:
  cmp r1,#0
  ite mi
@@ -772,10 +803,12 @@ wrapper_func atan2f
  cmp r2,#0x00800000
  blo 81b                     @ y 0 or denormal?
 83:
+#if PICO_FLOAT_PROPAGATE_NANS
  cmp r3,#0x7f800000
  bhi 60b                     @ x NaN?
  cmp r2,#0x7f800000
  bhs 61b                     @ y Inf or NaN?
+#endif
 65:
  ldr r12,piover2             @ always one extra quadrant in this path
  eors r1,r1,#0x80000000      @ inner negation is the complement of the sign of x

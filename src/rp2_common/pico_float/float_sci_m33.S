@@ -115,7 +115,11 @@ wrapper_func expf
  subs r3,r3,#0x7f
  bmi 7b                      @ e<0?
  cmp r3,#7
+#if PICO_FLOAT_PROPAGATE_NANS
  bge 20f                     @ overflow, Inf or NaN?
+#else
+ bge 22f                     @ overflow or Inf (or NaN)?
+#endif
  movs r1,#1
  bfi r0,r1,#23,#9            @ implied 1, clear sign bit
  lsls r0,r3                  @ x Q23
@@ -172,6 +176,7 @@ wrapper_func expf
  adds r12,#1
  b 2b
 
+#if PICO_FLOAT_PROPAGATE_NANS
 20:
 @ process Inf/NaN for fexp
  cmp r3,#0x80
@@ -181,6 +186,7 @@ wrapper_func expf
  biceq r0,r0,r0,asr#31       @ +Inf -> + Inf; -Inf -> +0
  orrne r0,r0,#0x00400000
  bx r14
+#endif
 
 23:
  ands r12,r12,#1<<31
@@ -400,20 +406,24 @@ float_wrapper_section atan2f
  subne r6,#6                 @ fix up when in quadrants ±0
  b 80f
 
+#if PICO_FLOAT_PROPAGATE_NANS
 90:
  movs r0,r1
 91:
  orrs r0,r0,#0x00400000
  pop {r4-r6,r15}
+#endif
 
 wrapper_func atan2f
  push {r4-r6,r14}
+#if PICO_FLOAT_PROPAGATE_NANS
  lsls r4,r1,#1
  cmp r4,#0xff000000
- bhi 90b                     @ y NaN?
+ bhi 90b                     @ x NaN?
  lsls r4,r0,#1
  cmp r4,#0xff000000
- bhi 91b                     @ x NaN?
+ bhi 91b                     @ y NaN?
+#endif
  lsrs r6,r0,#31              @ b31..2: quadrant count; b1: sign to apply before addition; b0: sign to apply after addition
  bic r0,#1<<31
 @ y now positive
@@ -583,6 +593,7 @@ wrapper_func tanf
 
 float_wrapper_section fsin_fcos
 
+#if PICO_FLOAT_PROPAGATE_NANS
 10: @ process Inf/NaN for sinf and fcos
  lsls r1,r0,#9
  it eq
@@ -590,6 +601,7 @@ float_wrapper_section fsin_fcos
  orr r0,#0x00400000          @ turn Inf into NaN
  movs r1,r0                  @ copy result to cosine output
  bx r14
+#endif
 
 @ case where angle is very small (<2^-32) before reduction
 32:
@@ -706,8 +718,10 @@ wrapper_func cosf
 1:
  ubfx r1,r0,#23,#8           @ get exponent
  sub r1,r1,#0x7f
+#if PICO_FLOAT_PROPAGATE_NANS
  cmp r1,#0x80
  beq 10b                     @ Inf or NaN?
+#endif
  cmn r1,#32
  blt 32b                     @ very small argument?
  movs r3,#1

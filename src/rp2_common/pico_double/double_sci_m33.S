@@ -133,6 +133,7 @@ wrapper_func tan
 
 double_wrapper_section sin_cos
 
+#if PICO_DOUBLE_PROPAGATE_NANS
 10:                          @ process Inf/NaN for dsin and dcos
  orrs r2,r0,r1,lsl#12
  it eq
@@ -141,6 +142,7 @@ double_wrapper_section sin_cos
  movs r3,r1                  @ copy results to cosine output
  movs r2,r0
  bx r14
+#endif
 
 @ case where angle is very small (<2^-32) before reduction
 32:
@@ -348,8 +350,10 @@ hardabi_wrapper_func wrapper cos 1
 1:
  ubfx r3,r1,#20,#11          @ get exponent
  sub r2,r3,#0x3ff
+#if PICO_DOUBLE_PROPAGATE_NANS
  cmp r2,#0x400
  beq 10b                     @ Inf or NaN?
+#endif
  cmn r2,#32
  blt 32b                     @ very small argument?
  movs r3,#1
@@ -782,7 +786,11 @@ hardabi_wrapper_func wrapper exp 1
  ubfx r3,r1,#20,#11          @ get exponent
  sub r3,r3,#0x3ff
  cmp r3,#12
+#if PICO_DOUBLE_PROPAGATE_NANS
  bge 20f                     @ overflow, Inf or NaN?
+#else
+ bge 22f                     @ overflow or Inf (or NaN)?
+#endif
  cmn r3,#0x20
  ble 2b                      @ <2^-32? return x+1
  push {r4-r8,r14}
@@ -851,6 +859,7 @@ hardabi_wrapper_func wrapper exp 1
  adcs r1,r1,r12,lsl#20
  pop {r4-r8,r15}
 
+#if PICO_DOUBLE_PROPAGATE_NANS
 20:
 @ process Inf/NaN for dexp
  cmp r3,#0x400
@@ -860,6 +869,7 @@ hardabi_wrapper_func wrapper exp 1
  biceq r1,r1,r1,asr#31       @ +Inf -> + Inf; -Inf -> +0
  orrne r1,r1,#0x00080000
  bx r14
+#endif
 
 22:
  movs r0,#0
@@ -1357,22 +1367,26 @@ double_wrapper_section atan2
  subne r7,#6                 @ fix up when in quadrants ±0
  b 80f
 
+#if PICO_DOUBLE_PROPAGATE_NANS
 90:
  movs r0,r2
  movs r1,r3
 91:
  orrs r1,r1,#0x00080000
  bx r14
+#endif
 
 hardabi_wrapper_func wrapper atan2 2
+#if PICO_DOUBLE_PROPAGATE_NANS
  cmp r2,#1                   @ set C if low word is non-zero
  adc r12,r3,r3
- cmn r12,#0x00200000         @ y NaN?
+ cmn r12,#0x00200000         @ x NaN?
  bhi 90b
  cmp r0,#1                   @ set C if low word is non-zero
  adc r12,r1,r1
- cmn r12,#0x00200000         @ x NaN?
+ cmn r12,#0x00200000         @ y NaN?
  bhi 91b
+#endif
  push {r4-r11,r14}
  lsrs r7,r1,#31              @ b31..2: quadrant count; b1: sign to apply before addition; b0: sign to apply after addition
  bic r1,#1<<31
