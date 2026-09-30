@@ -313,7 +313,7 @@ float WRAPPER_FUNC(asinhf)(float x) {
 float WRAPPER_FUNC(acoshf)(float x) {
     check_nan_f1(x);
     int e;
-    if(fisneg(x)) x=fneg(x);
+    if(x<1) return fnan_or(FPINF);
     e=fgetexp(x);
     if(e>=16+0x7f) return logf(x)+LOG2f;           // |x|>=2^16?
     return (float)log(sqrt(((double)x+1.0)*((double)x-1.0))+(double)x);
