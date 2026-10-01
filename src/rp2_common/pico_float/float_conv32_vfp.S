@@ -64,6 +64,21 @@ regular_func float2uint_z
 	vmov r0, s0
 	bx lr
 
+// AEABI helpers always pass the argument in r0, even with the hard-float ABI
+float_section WRAPPER_FUNC_NAME(__aeabi_f2iz)
+wrapper_func __aeabi_f2iz
+	vmov s0, r0
+	vcvt.s32.f32 s0, s0
+	vmov r0, s0
+	bx lr
+
+float_section WRAPPER_FUNC_NAME(__aeabi_f2uiz)
+wrapper_func __aeabi_f2uiz
+	vmov s0, r0
+	vcvt.u32.f32 s0, s0
+	vmov r0, s0
+	bx lr
+
 float_section float2fix_z
 regular_func float2fix_z
 #if defined(__ARM_PCS_VFP)
