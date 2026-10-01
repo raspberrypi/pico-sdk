@@ -430,6 +430,8 @@ int main() {
     printf("%f\n", 0.5);
     printf("SQRT %10.18g\n", 0.5);
     printf("SQRT %10.18g\n", 0.333333333333333333333333);
+    // asinh(+0) must keep its sign
+    test_assert(!signbit(asinhf(0.0f)) && signbit(asinhf(-0.0f)));
 
 #if 1
     for (float x = 0; x < 3; x++) {

@@ -306,7 +306,7 @@ float WRAPPER_FUNC(asinhf)(float x) {
         if(!fisneg(x)) return      logf(     x )+LOG2f;  // 1/x^2 << 1
         else           return fneg(logf(fneg(x))+LOG2f); // 1/x^2 << 1
     }
-    if(x>0) return      (float)log(sqrt((double)x*(double)x+1.0)+(double)x);
+    if(!fisneg(x)) return (float)log(sqrt((double)x*(double)x+1.0)+(double)x);
     else    return fneg((float)log(sqrt((double)x*(double)x+1.0)-(double)x));
 }
 

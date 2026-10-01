@@ -357,6 +357,11 @@ int main() {
 
     bool fail = false;
 
+#if !(defined(__LLVM_LIBC__) && defined(__llvm__))
+    // asinh(+0) must keep its sign
+    test_assert(!signbit(asinh(0.0)) && signbit(asinh(-0.0)));
+#endif
+
     printf("%d\n", aa < bb);
     for(double a = -1; a <= 1; a++) {
         for(double b = -1; b <= 1; b++) {
