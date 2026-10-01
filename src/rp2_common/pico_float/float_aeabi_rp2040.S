@@ -477,22 +477,6 @@ regular_func float2int_z
     subs r0, #1
     bx lr
 
-    cmn r0, r0
-    bcc float2int
-    push {lr}
-    lsls r0, #1
-    lsrs r0, #1
-    movs r1, #0
-    bl __aeabi_f2uiz
-    cmp r0, #0
-    bmi 1f
-    negs r0, r0
-    pop {pc}
-1:
-    movs r0, #128
-    lsls r0, #24
-    pop {pc}
-
 float_section float2int
 regular_func float2int
     shimmable_table_tail_call SF_TABLE_FLOAT2INT float2int_shim
