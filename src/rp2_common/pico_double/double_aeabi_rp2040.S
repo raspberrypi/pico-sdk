@@ -489,46 +489,36 @@ regular_func int2double
 double_wrapper_section __aeabi_d2iz
 wrapper_func __aeabi_d2iz
 regular_func double2int_z
-    push {r4, lr}
-    lsls r4, r1, #1
-    lsrs r2, r4, #21
+    lsls r2, r1, #1
+    lsrs r2, #21
     movs r3, #0x80
     adds r2, r3
     lsls r3, #3
-    subs r2, r3
-    lsls r3, #21
+    subs r2, r3                 // exponent rebased to float bias
+    lsls r3, #21                // 0x80000000
     cmp r2, #126
-    ble 1f
+    ble 1f                      // |x| < 1
     subs r2, #158
-    bge 2f
-    asrs r4, r1, #31
-    lsls r1, #12
-    lsrs r1, #1
-    orrs r1, r3
+    bge 2f                      // |x| >= 2^31, Inf or NaN
     negs r2, r2
-    lsrs r1, r2
-    lsls r4, #1
-    adds r4, #1
-    adds r2, #21
-    cmp r2, #32
-    bge 3f
+    lsrs r0, #21
+    orrs r0, r3
+    lsls r3, r1, #11
+    orrs r0, r3                 // top 32 bits of the mantissa, with the implied 1
     lsrs r0, r2
-    orrs r0, r1
-    muls r0, r4
-    pop {r4, pc}
+    asrs r1, #31
+    eors r0, r1
+    subs r0, r1                 // apply the sign
+    bx lr
 1:
     movs r0, #0
-    pop {r4, pc}
-3:
-    mov r0, r1
-    muls r0, r4
-    pop {r4, pc}
+    bx lr
 2:
     // overflow
     lsrs r0, r1, #31
     adds r0, r3
     subs r0, #1
-    pop {r4, pc}
+    bx lr
 
 double_section double2int
 regular_func double2int
