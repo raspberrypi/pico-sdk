@@ -56,6 +56,7 @@ double_section WRAPPER_FUNC_NAME(\func)
 .endm
 
 double_section rtwopi
+.align 2
 
 // 1/2π to plenty of accuracy, 256 bits per line
 .long 0                      @ this allows values of e down to -32
@@ -1217,6 +1218,7 @@ hardabi_wrapper_func wrapper log 1
 @===========================================
 
 double_section trigtab
+.align 2
 trigtab:
 //     φ Q64 lo    φ Q64 hi    sin φ Q31   cos φ Q31
 .long 0x25735c0b, 0x03f574a9, 0x01fab529, 0x7ffc1500
