@@ -359,7 +359,10 @@ int main() {
 
 #if !(defined(__LLVM_LIBC__) && defined(__llvm__))
     // asinh(+0) must keep its sign
-    test_assert(!signbit(asinh(0.0)) && signbit(asinh(-0.0)));
+    {
+        volatile double zero = 0.0;
+        test_assert(!signbit(asinh(zero)) && signbit(asinh(-zero)));
+    }
 #endif
 
     printf("%d\n", aa < bb);
@@ -427,23 +430,24 @@ int main() {
         sincos(x, &s, &c);
         printf("SINCOS %10.18f %10.18f\n", check_nan(s), check_nan(c));
 
-        // domain errors
+        // domain errors (volatile so the compiler can't fold the results)
+        volatile double half = 0.5, minus_one = -1.0, two = 2.0, minus_inf = -INFINITY, minus_nan = -NAN, minus_zero = -0.0;
         // LLVM libc doesn't provide these (asin and acos arrived in clang 23)
 #if !(defined(__LLVM_LIBC__) && defined(__llvm__))
-        printf("ACOSH %10.18f\n", check_domain_nan(acosh(0.5)));
-        printf("ACOSH %10.18f\n", check_domain_nan(acosh(-1.0)));
+        printf("ACOSH %10.18f\n", check_domain_nan(acosh(half)));
+        printf("ACOSH %10.18f\n", check_domain_nan(acosh(minus_one)));
 #endif
 #if !(defined(__LLVM_LIBC__) && defined(__llvm__) && (__clang_major__ < 23))
-        printf("ASIN %10.18f\n", check_domain_nan(asin(2.0)));
-        printf("ACOS %10.18f\n", check_domain_nan(acos(2.0)));
+        printf("ASIN %10.18f\n", check_domain_nan(asin(two)));
+        printf("ACOS %10.18f\n", check_domain_nan(acos(two)));
 #endif
-        printf("SQRT %10.18f\n", check_domain_nan(sqrt(-1.0)));
-        printf("LN %10.18f\n", check_domain_nan(log(-1.0)));
-        printf("LOG2 %10.18f\n", check_domain_nan(log2(-1.0)));
-        printf("LOG10 %10.18f\n", check_domain_nan(log10(-1.0)));
-        printf("LN %10.18f\n", check_domain_nan(log(-INFINITY)));
-        printf("LN %10.18f\n", check_domain_nan(log(-NAN)));
-        test_assert(log(-0.0) == -INFINITY);
+        printf("SQRT %10.18f\n", check_domain_nan(sqrt(minus_one)));
+        printf("LN %10.18f\n", check_domain_nan(log(minus_one)));
+        printf("LOG2 %10.18f\n", check_domain_nan(log2(minus_one)));
+        printf("LOG10 %10.18f\n", check_domain_nan(log10(minus_one)));
+        printf("LN %10.18f\n", check_domain_nan(log(minus_inf)));
+        printf("LN %10.18f\n", check_domain_nan(log(minus_nan)));
+        test_assert(log(minus_zero) == -INFINITY);
 
         for(int j=0;j<2;j++) {
             for (int i = 1; i < 4; i++) {

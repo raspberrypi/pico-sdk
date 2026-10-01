@@ -431,7 +431,10 @@ int main() {
     printf("SQRT %10.18g\n", 0.5);
     printf("SQRT %10.18g\n", 0.333333333333333333333333);
     // asinh(+0) must keep its sign
-    test_assert(!signbit(asinhf(0.0f)) && signbit(asinhf(-0.0f)));
+    {
+        volatile float zero = 0.0f;
+        test_assert(!signbit(asinhf(zero)) && signbit(asinhf(-zero)));
+    }
 
 #if 1
     for (float x = 0; x < 3; x++) {
@@ -499,18 +502,19 @@ int main() {
         sincosf(x, &s, &c);
         printf("FSINCOS %10.18f %10.18f\n", check_nan(s), check_nan(c));
 
-        // domain errors
-        printf("FACOSH %10.18f\n", check_domain_nan(acoshf(0.5f)));
-        printf("FACOSH %10.18f\n", check_domain_nan(acoshf(-1.0f)));
-        printf("FASIN %10.18f\n", check_domain_nan(asinf(2.0f)));
-        printf("FACOS %10.18f\n", check_domain_nan(acosf(2.0f)));
-        printf("FSQRT %10.18f\n", check_domain_nan(sqrtf(-1.0f)));
-        printf("FLN %10.18f\n", check_domain_nan(logf(-1.0f)));
-        printf("FLOG2 %10.18f\n", check_domain_nan(log2f(-1.0f)));
-        printf("FLOG10 %10.18f\n", check_domain_nan(log10f(-1.0f)));
-        printf("FLN %10.18f\n", check_domain_nan(logf(-INFINITY)));
-        printf("FLN %10.18f\n", check_domain_nan(logf(-NAN)));
-        test_assert(logf(-0.0f) == -INFINITY);
+        // domain errors (volatile so the compiler can't fold the results)
+        volatile float half = 0.5f, minus_one = -1.0f, two = 2.0f, minus_inf = -INFINITY, minus_nan = -NAN, minus_zero = -0.0f;
+        printf("FACOSH %10.18f\n", check_domain_nan(acoshf(half)));
+        printf("FACOSH %10.18f\n", check_domain_nan(acoshf(minus_one)));
+        printf("FASIN %10.18f\n", check_domain_nan(asinf(two)));
+        printf("FACOS %10.18f\n", check_domain_nan(acosf(two)));
+        printf("FSQRT %10.18f\n", check_domain_nan(sqrtf(minus_one)));
+        printf("FLN %10.18f\n", check_domain_nan(logf(minus_one)));
+        printf("FLOG2 %10.18f\n", check_domain_nan(log2f(minus_one)));
+        printf("FLOG10 %10.18f\n", check_domain_nan(log10f(minus_one)));
+        printf("FLN %10.18f\n", check_domain_nan(logf(minus_inf)));
+        printf("FLN %10.18f\n", check_domain_nan(logf(minus_nan)));
+        test_assert(logf(minus_zero) == -INFINITY);
 
         for(int j=0;j<2;j++) {
             for (int i = 1; i < 4; i++) {
