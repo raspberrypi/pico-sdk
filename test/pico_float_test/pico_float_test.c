@@ -312,19 +312,23 @@ float __attribute__((pcs("aapcs"))) __aeabi_l2f(int64_t);
 float __attribute__((pcs("aapcs"))) __aeabi_ul2f(int64_t);
 int32_t __attribute__((pcs("aapcs"))) __aeabi_f2iz(float);
 int64_t __attribute__((pcs("aapcs"))) __aeabi_f2lz(float);
+uint32_t __attribute__((pcs("aapcs"))) __aeabi_f2uiz(float);
+uint64_t __attribute__((pcs("aapcs"))) __aeabi_f2ulz(float);
 float __attribute__((pcs("aapcs"))) __aeabi_fmul(float, float);
 float __attribute__((pcs("aapcs"))) __aeabi_fdiv(float, float);
 #if !LIB_PICO_FLOAT_COMPILER
 #if !LIB_PICO_FLOAT_PICO_VFP
 float __attribute__((pcs("aapcs"))) __real___aeabi_i2f(int);
 float __attribute__((pcs("aapcs"))) __real___aeabi_ui2f(int);
-float __attribute__((pcs("aapcs"))) __real___aeabi_l2f(int64_t);
-float __attribute__((pcs("aapcs"))) __real___aeabi_ul2f(int64_t);
 float __attribute__((pcs("aapcs"))) __real___aeabi_fmul(float, float);
 float __attribute__((pcs("aapcs"))) __real___aeabi_fdiv(float, float);
+#endif
+float __attribute__((pcs("aapcs"))) __real___aeabi_l2f(int64_t);
+float __attribute__((pcs("aapcs"))) __real___aeabi_ul2f(int64_t);
 int32_t __attribute__((pcs("aapcs"))) __real___aeabi_f2iz(float);
 int64_t __attribute__((pcs("aapcs"))) __real___aeabi_f2lz(float);
-#endif
+uint32_t __attribute__((pcs("aapcs"))) __real___aeabi_f2uiz(float);
+uint64_t __attribute__((pcs("aapcs"))) __real___aeabi_f2ulz(float);
 float __real_sqrtf(float);
 float __real_fmaf(float, float, float);
 float __real_cosf(float);
@@ -354,10 +358,10 @@ float __real_fmodf(float, float);
 #endif
 #define assert_close(a, b) test_assert((isinf(a) && isinf(b) && signbit(a) == signbit(b)) || fabsf((a) - (b)) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; }) || (isinff(a) && isinff(b) && ((a) < 0) == ((b) < 0)))
 #define assert_close_fma(a, b) test_assert((fabsf((a) - (b)) <= allowed_range_fma(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinff(a) && isinff(b) && ((a) < 0) == ((b) < 0)))
-#define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
+#define check1(func,p0) ({ __typeof__(func(p0)) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
 #if !LIB_PICO_FLOAT_PICO_VFP
-#define check1_vfp_unwrapped(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
-#define check2_vfp_unwrapped(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
+#define check1_vfp_unwrapped(func,p0) ({ __typeof__(func(p0)) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
+#define check2_vfp_unwrapped(func,p0,p1) ({ __typeof__(func(p0,p1)) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
 #else
 #define check1_vfp_unwrapped(func,p0) ({ typeof(p0) r = func(p0), r2 = func(p0); test_assert(r == r2); r; })
 #define check2_vfp_unwrapped(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = func(p0,p1); test_assert(r == r2); r; })
@@ -596,12 +600,12 @@ int main() {
         }
         for (int64_t x = 1; x; x <<= 1) {
             printf("i %lld->%f\n", x, (float) x);
-            check1_vfp_unwrapped(__aeabi_l2f, x);
+            check1(__aeabi_l2f, x);
             y = x << 1;
         }
         for (int64_t x = -1; x; x <<= 1) {
             printf("i %lld->%f\n", x, (float) x);
-            check1_vfp_unwrapped(__aeabi_l2f, x);
+            check1(__aeabi_l2f, x);
             y = x << 1;
         }
         printf("d %d->%f\n", y, (float) y);
@@ -618,44 +622,72 @@ int main() {
     }
     for(int64_t x = 1; x !=0; x <<= 1u) {
         printf("%lld->%f\n", x, (float)x);
-        check1_vfp_unwrapped(__aeabi_l2f, x);
+        check1(__aeabi_l2f, x);
     }
-    for(float x = -4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
-        printf("f %f->%lld\n", x, (int64_t)x);
-        check1_vfp_unwrapped(__aeabi_f2lz, x);
+    // out of range conversions saturate (and negative ones give 0 when unsigned)
+    for(float x = -4294967296.f * 4294967296.f * 2.f; x<=-0.5f; x/=2.f) {
+        printf("f2i64 %f\n", x);
+        if ((double)x < (double)INT64_MIN) {
+#if TEST_SATURATION
+            test_assert(__aeabi_f2lz(x) == INT64_MIN);
+#endif
+        } else {
+            check1(__aeabi_f2lz, x);
+        }
     }
     for(float x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
-        printf("f2i64 %f->%lld\n", x, (int64_t)x);
-        if ((double)x >= (double)INT64_MAX) {
+        printf("f2i64 %f\n", x);
+        if ((double)x >= 9223372036854775808.0) {
 #if TEST_SATURATION
             test_assert(__aeabi_f2lz(x) == INT64_MAX);
 #endif
         } else {
-#if PICO_RP2040
             check1(__aeabi_f2lz, x);
-#else
-            check1_vfp_unwrapped(__aeabi_f2lz, x);
-#endif
         }
     }
     for(float x = -4294967296.f * 4294967296.f; x<=-0.5f; x/=2.f) {
-        printf("f2i32 %f->%d\n", x, (int32_t)x);
-        check1_vfp_unwrapped(__aeabi_f2iz, x);
+        printf("f2i32 %f\n", x);
+        if ((double)x < (double)INT32_MIN) {
+#if TEST_SATURATION
+            test_assert(__aeabi_f2iz(x) == INT32_MIN);
+#endif
+        } else {
+            check1(__aeabi_f2iz, x);
+        }
     }
     for(float x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
-        printf("f2i32 %f->%d\n", x, (int32_t)x);
-        if ((double)x >= (double)INT32_MAX) {
+        printf("f2i32 %f\n", x);
+        if ((double)x >= 2147483648.0) {
 #if TEST_SATURATION
             test_assert(__aeabi_f2iz(x) == INT32_MAX);
 #endif
         } else {
-#if PICO_RP2040
             check1(__aeabi_f2iz, x);
-#else
-            check1_vfp_unwrapped(__aeabi_f2iz, x);
-#endif
         }
     }
+    for(float x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
+        printf("f2u %f\n", x);
+        if ((double)x >= 4294967296.0) {
+#if TEST_SATURATION
+            test_assert(__aeabi_f2uiz(x) == UINT32_MAX);
+#endif
+        } else {
+            check1(__aeabi_f2uiz, x);
+        }
+        if ((double)x >= 18446744073709551616.0) {
+#if TEST_SATURATION
+            test_assert(__aeabi_f2ulz(x) == UINT64_MAX);
+#endif
+        } else {
+            check1(__aeabi_f2ulz, x);
+        }
+    }
+#if TEST_SATURATION
+    for(float x = -0.5f; x>=-4294967296.f * 4294967296.f * 2.f; x*=2.f) {
+        test_assert(__aeabi_f2uiz(x) == 0);
+        test_assert(__aeabi_f2ulz(x) == 0);
+    }
+#endif
 
     for (float x = 1; x < 11; x += 2) {
         float f = x * x;

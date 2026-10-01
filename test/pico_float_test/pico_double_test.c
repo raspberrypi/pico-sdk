@@ -307,6 +307,8 @@ double __attribute__((pcs("aapcs"))) __aeabi_l2d(int64_t);
 double __attribute__((pcs("aapcs"))) __aeabi_ul2d(int64_t);
 int32_t __attribute__((pcs("aapcs")))__aeabi_d2iz(double);
 int64_t __attribute__((pcs("aapcs"))) __aeabi_d2lz(double);
+uint32_t __attribute__((pcs("aapcs"))) __aeabi_d2uiz(double);
+uint64_t __attribute__((pcs("aapcs"))) __aeabi_d2ulz(double);
 double __attribute__((pcs("aapcs"))) __aeabi_dmul(double, double);
 double __attribute__((pcs("aapcs"))) __aeabi_ddiv(double, double);
 #if LIB_PICO_DOUBLE_PICO
@@ -318,6 +320,8 @@ double __attribute__((pcs("aapcs"))) __real___aeabi_dmul(double, double);
 double __attribute__((pcs("aapcs"))) __real___aeabi_ddiv(double, double);
 int32_t __attribute__((pcs("aapcs"))) __real___aeabi_d2iz(double);
 int64_t __attribute__((pcs("aapcs"))) __real___aeabi_d2lz(double);
+uint32_t __attribute__((pcs("aapcs"))) __real___aeabi_d2uiz(double);
+uint64_t __attribute__((pcs("aapcs"))) __real___aeabi_d2ulz(double);
 double __real_sqrt(double);
 double __real_cos(double);
 double __real_sin(double);
@@ -337,8 +341,8 @@ double __real_fma(double, double, double);
 #define FRAC ((double)(1ull << 50))
 #define allowed_range(a) (fabs(a) / FRAC)
 #define assert_close(a, b) test_assert((isinf(a) && isinf(b) && ((a) < 0) == ((b) < 0)) || fabs((a) - (b)) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; }))
-#define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
-#define check2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
+#define check1(func,p0) ({ __typeof__(func(p0)) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
+#define check2(func,p0,p1) ({ __typeof__(func(p0,p1)) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
 #define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnan(p0)) assert_nan(r); else assert_close(r, r2); r; })
 #define check_close2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); if (isnan(p0) || isnan(p1)) assert_nan(r); else assert_close(r, r2); r; })
 #define check_close3(func,p0,p1,p2) ({ typeof(p0) r = func(p0,p1,p2), r2 = __CONCAT(__real_, func)(p0,p1,p2); if (isnan(p0) || isnan(p1) || isnan(p2)) assert_nan(r); else assert_close(r, r2); r; })
@@ -573,12 +577,18 @@ int main() {
         }
     }
     for(double x = -4294967296.f * 4294967296.f; x<=-0.5f; x/=2.f) {
-        printf("d2i32 %f->%d\n", x, (int32_t)x);
-        check1(__aeabi_d2iz, x);
+        printf("d2i32 %f\n", x);
+        if (x < (double) INT32_MIN) {
+#if TEST_SATURATION
+            test_assert(__aeabi_d2iz(x) == INT32_MIN);
+#endif
+        } else {
+            check1(__aeabi_d2iz, x);
+        }
     }
     for(double x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
-        printf("d2i32 %f->%d\n", x, (int32_t)x);
-        if (x >= (double) INT32_MAX - 1 && x <= (double) INT32_MAX + 1) {
+        printf("d2i32 %f\n", x);
+        if (x >= 2147483648.0) {
 #if TEST_SATURATION
             test_assert(__aeabi_d2iz(x) == INT32_MAX);
 #endif
@@ -586,6 +596,30 @@ int main() {
             check1(__aeabi_d2iz, x);
         }
     }
+    for(double x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
+        printf("d2u %f\n", x);
+        if (x >= 4294967296.0) {
+#if TEST_SATURATION
+            test_assert(__aeabi_d2uiz(x) == UINT32_MAX);
+#endif
+        } else {
+            check1(__aeabi_d2uiz, x);
+        }
+        if (x >= 18446744073709551616.0) {
+#if TEST_SATURATION
+            test_assert(__aeabi_d2ulz(x) == UINT64_MAX);
+#endif
+        } else {
+            check1(__aeabi_d2ulz, x);
+        }
+    }
+#if TEST_SATURATION
+    // negative values give 0 when converted to unsigned
+    for(double x = -0.5; x>=-4294967296.f * 4294967296.f * 2.f; x*=2.0) {
+        test_assert(__aeabi_d2uiz(x) == 0);
+        test_assert(__aeabi_d2ulz(x) == 0);
+    }
+#endif
     for (double x = 1; x < 11.0; x += 2.0) {
         double f = x * x;
         double g = 1.0 / x;
