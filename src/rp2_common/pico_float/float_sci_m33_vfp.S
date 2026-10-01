@@ -438,6 +438,7 @@ float_wrapper_section fsin_fcos
 @ prepare to re-enter with no risk of looping
  b 5f
 
+.p2align 2
 k_sc4:
 @ 2/π=0.A2F9836E4E441529FC...
 .word 0x3f22f983             @ 2/π
@@ -930,6 +931,7 @@ wrapper_func atan2f
 #endif
  bx r14
 
+.p2align 2
 piover2:  .word 0x3243f6a9   @ Q29
 pi:       .word 0x6487ed51   @ Q29
 onethird: .float 0.33333333
