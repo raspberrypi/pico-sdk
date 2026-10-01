@@ -376,11 +376,11 @@ int __printflike(1, 0) PRIMARY_STDIO_FUNC(printf)(const char* format, ...)
 
 #if PICO_STDIO_SHORT_CIRCUIT_CLIB_FUNCS
 // define the stdio_ versions to be the same as our wrappers
-int stdio_getchar(void) __attribute__((alias(__XSTRING(WRAPPER_FUNC(getchar)))));
-int stdio_putchar(int) __attribute__((alias(__XSTRING(WRAPPER_FUNC(putchar)))));
-int stdio_puts(const char *s) __attribute__((alias(__XSTRING(WRAPPER_FUNC(puts)))));
-int stdio_vprintf(const char *format, va_list va) __attribute__((alias(__XSTRING(WRAPPER_FUNC(vprintf)))));
-int __printflike(1, 0) stdio_printf(const char* format, ...) __attribute__((alias(__XSTRING(WRAPPER_FUNC(printf)))));
+int stdio_getchar(void) __attribute__((alias(__XSTRING(WRAPPER_FUNC_NAME(getchar)))));
+int stdio_putchar(int) __attribute__((alias(__XSTRING(WRAPPER_FUNC_NAME(putchar)))));
+int stdio_puts(const char *s) __attribute__((alias(__XSTRING(WRAPPER_FUNC_NAME(puts)))));
+int stdio_vprintf(const char *format, va_list va) __attribute__((alias(__XSTRING(WRAPPER_FUNC_NAME(vprintf)))));
+int __printflike(1, 0) stdio_printf(const char* format, ...) __attribute__((alias(__XSTRING(WRAPPER_FUNC_NAME(printf)))));
 #else
 // todo there is no easy way to avoid the wrapper functions since they are in the CMake, so lets just forward for now
 

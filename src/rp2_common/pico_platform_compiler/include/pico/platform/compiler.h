@@ -185,7 +185,11 @@ __force_inline static void __compiler_memory_barrier(void) {
  */
 #define __check_type_compatible(type_a, type_b) static_assert(__builtin_types_compatible_p(type_a, type_b), __STRING(type_a) " is not compatible with " __STRING(type_b));
 
-#define WRAPPER_FUNC(x) __wrap_ ## x
+// The name of the wrapper function for x (e.g. for use when calling it, or in an alias attribute)
+#define WRAPPER_FUNC_NAME(x) __wrap_ ## x
+// For use when defining a wrapper function for x. Wrapper functions are marked __used, as with LTO, calls to them
+// may only be generated during link time code generation (after unreferenced definitions have been discarded)
+#define WRAPPER_FUNC(x) __used WRAPPER_FUNC_NAME(x)
 #define REAL_FUNC(x) __real_ ## x
 
 #ifdef __cplusplus

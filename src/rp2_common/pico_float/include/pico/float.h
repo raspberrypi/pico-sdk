@@ -457,8 +457,8 @@ uint64_t float2ufix64(float f, int e);
     // so we declare it here always
 #if __PICO_FLOAT_ARM_OPTIMIZED && PICO_C_COMPILER_IS_CLANG
     // clang unhelpfully splits sincosf into explict calls to sin & cos
-    extern void WRAPPER_FUNC(sincosf)(float x, float *sinx, float *cosx);
-    #define sincosf(x, sinx, cosx) WRAPPER_FUNC(sincosf)(x, sinx, cosx)
+    extern void WRAPPER_FUNC_NAME(sincosf)(float x, float *sinx, float *cosx);
+    #define sincosf(x, sinx, cosx) WRAPPER_FUNC_NAME(sincosf)(x, sinx, cosx)
 #else
     //! Return both the sine and cosine of an angle efficiently
     void sincosf(float x, float *sinx, float *cosx);

@@ -58,6 +58,8 @@ function(pico_define_boot_stage2 NAME SOURCES)
     target_link_libraries(${NAME} hardware_regs boot_stage2_headers)
     target_link_options(${NAME} PRIVATE "LINKER:--script=${PICO_BOOT_STAGE2_DIR}/boot_stage2.ld")
     set_target_properties(${NAME} PROPERTIES LINK_DEPENDS ${PICO_BOOT_STAGE2_DIR}/boot_stage2.ld)
+    # boot stage 2 is a small standalone binary with a fixed layout, so never build it with LTO
+    set_target_properties(${NAME} PROPERTIES INTERPROCEDURAL_OPTIMIZATION FALSE)
 
     pico_add_dis_output(${NAME})
     pico_add_map_output(${NAME})

@@ -19,9 +19,12 @@ static inline void atomic_unlock(__unused const volatile void *ptr, uint32_t sav
     spin_unlock(spin_lock_instance(PICO_SPINLOCK_ID_ATOMIC), save);
 }
 
+// note: these functions are marked __used, as with LTO, calls to them may only be generated during link time
+// code generation (after unreferenced definitions have been discarded)
+
 #if PICO_C_COMPILER_IS_GNU
 
-_Bool __atomic_test_and_set_c(volatile void *mem, __unused int model) {
+_Bool __used __atomic_test_and_set_c(volatile void *mem, __unused int model) {
     uint32_t save = atomic_lock(mem);
     bool result = *(volatile bool *) mem;
     *(volatile bool *) mem = true;
@@ -44,7 +47,7 @@ _Bool __atomic_test_and_set_c(volatile void *mem, __unused int model) {
 #endif
 
 // Whether atomic operations for the given size (and alignment) are lock-free.
-bool __atomic_is_lock_free_c(__unused size_t size, __unused const volatile void *ptr) {
+bool __used __atomic_is_lock_free_c(__unused size_t size, __unused const volatile void *ptr) {
 #if !__ARM_ARCH_6M__
     if (size == 1 || size == 2 || size == 4) {
         size_t align = size - 1;
@@ -57,7 +60,7 @@ bool __atomic_is_lock_free_c(__unused size_t size, __unused const volatile void 
 
 
 // An atomic load operation.  This is atomic with respect to the source pointer only.
-void __atomic_load_c(uint size, const volatile void *src, void *dest, __unused int model) {
+void __used __atomic_load_c(uint size, const volatile void *src, void *dest, __unused int model) {
     uint32_t save = atomic_lock(src);
     memcpy(dest, remove_volatile_cast_no_barrier(const void *, src), size);
     atomic_unlock(src, save);
@@ -65,7 +68,7 @@ void __atomic_load_c(uint size, const volatile void *src, void *dest, __unused i
 
 // An atomic store operation.  This is atomic with respect to the destination
 // pointer only.
-void __atomic_store_c(uint size, volatile void *dest, void *src, __unused int model) {
+void __used __atomic_store_c(uint size, volatile void *dest, void *src, __unused int model) {
     uint32_t save = atomic_lock(src);
     memcpy(remove_volatile_cast_no_barrier(void *, dest), src, size);
     atomic_unlock(src, save);
@@ -76,7 +79,7 @@ void __atomic_store_c(uint size, volatile void *dest, void *src, __unused int mo
 // they  are not, then this stores the current value from *ptr in *expected.
 //
 // This function returns 1 if the exchange takes place or 0 if it fails.
-_Bool __atomic_compare_exchange_c(uint size, volatile void *ptr, void *expected,
+_Bool __used __atomic_compare_exchange_c(uint size, volatile void *ptr, void *expected,
                                   void *desired, __unused int success, __unused int failure) {
     uint32_t save = atomic_lock(ptr);
     if (memcmp(remove_volatile_cast_no_barrier(void *, ptr), expected, size) == 0) {
@@ -91,7 +94,7 @@ _Bool __atomic_compare_exchange_c(uint size, volatile void *ptr, void *expected,
 
 // Performs an atomic exchange operation between two pointers.  This is atomic
 // with respect to the target address.
-void __atomic_exchange_c(uint size, volatile void *ptr, void *val, void *old, __unused int model) {
+void __used __atomic_exchange_c(uint size, volatile void *ptr, void *val, void *old, __unused int model) {
 
     uint32_t save = atomic_lock(ptr);
     memcpy(old, remove_volatile_cast_no_barrier(void *, ptr), size);
@@ -111,7 +114,7 @@ void __atomic_exchange_c(uint size, volatile void *ptr, void *val, void *old, __
 #endif
 
 #define ATOMIC_OPTIMIZED_CASE(n, type)                                               \
-  type __atomic_load_##n(const volatile void *src, __unused int memorder) {   \
+  type __used __atomic_load_##n(const volatile void *src, __unused int memorder) {   \
     uint32_t save = atomic_lock(src);                                         \
     type val = *(const volatile type *)src;                                   \
     atomic_unlock(src, save);                                                 \
@@ -123,7 +126,7 @@ ATOMIC_OPTIMIZED_CASES
 #undef ATOMIC_OPTIMIZED_CASE
 
 #define ATOMIC_OPTIMIZED_CASE(n, type)                                               \
-  void __atomic_store_##n(volatile void *dest, type val, __unused  int model) { \
+  void __used __atomic_store_##n(volatile void *dest, type val, __unused  int model) { \
     uint32_t save = atomic_lock(dest);                                        \
     *(volatile type *)dest = val;                                             \
     atomic_unlock(dest, save);                                                \
@@ -134,7 +137,7 @@ ATOMIC_OPTIMIZED_CASES
 #undef ATOMIC_OPTIMIZED_CASE
 
 #define ATOMIC_OPTIMIZED_CASE(n, type)                                               \
-  bool __atomic_compare_exchange_##n(volatile void *ptr, void  *expected, type desired, \
+  bool __used __atomic_compare_exchange_##n(volatile void *ptr, void  *expected, type desired, \
                                      __unused bool weak, __unused int success, __unused int failure) { \
     uint32_t save = atomic_lock(ptr);                                         \
     if (*(volatile type *)ptr == *(type *)expected) {                         \
@@ -152,7 +155,7 @@ ATOMIC_OPTIMIZED_CASES
 #undef ATOMIC_OPTIMIZED_CASE
 
 #define ATOMIC_OPTIMIZED_CASE(n, type)                                      \
-  type __atomic_exchange_##n(volatile void *dest, type val, __unused int model) { \
+  type __used __atomic_exchange_##n(volatile void *dest, type val, __unused int model) { \
     uint32_t save = atomic_lock(dest);                               \
     type tmp = *(volatile type *)dest;                               \
     *(volatile type *)dest = val;                                    \
@@ -167,7 +170,7 @@ ATOMIC_OPTIMIZED_CASES
 // Atomic read-modify-write operations for integers of various sizes.
 
 #define ATOMIC_RMW(n, type, opname, op)                                \
-  type __atomic_fetch_##opname##_##n(volatile void *ptr, type val, __unused int model) { \
+  type __used __atomic_fetch_##opname##_##n(volatile void *ptr, type val, __unused int model) { \
     uint32_t save = atomic_lock(ptr);                                  \
     type tmp = *(volatile type *)ptr;                                  \
     *(volatile type *)ptr = tmp op val;                                \
@@ -176,7 +179,7 @@ ATOMIC_OPTIMIZED_CASES
   }
 
 #define ATOMIC_RMW_NAND(n, type)                                     \
-  type __atomic_fetch_nand_##n(type *ptr, type val, __unused int model) { \
+  type __used __atomic_fetch_nand_##n(type *ptr, type val, __unused int model) { \
     uint32_t save = atomic_lock(ptr);                                \
     type tmp = *ptr;                                                 \
     *ptr = ~(tmp & val);                                             \

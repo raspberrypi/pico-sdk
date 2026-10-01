@@ -128,7 +128,10 @@ static inline void _set_tls_per_thread(void *tls) {
 #endif
 
 #if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER
-static __used void *_init_core_local_tls(void) {
+// note: not static, as it is called by name from the inline asm in __aeabi_read_tp below; with LTO, a static
+// function may otherwise end up in a different partition from its caller and be renamed
+void *_init_core_local_tls(void);
+__used void *_init_core_local_tls(void) {
     /* Initialized by the linker, one per core */
     extern uint8_t __tls0_base[], __tls1_base[];
     static void * const __tls_bases[2] = { __tls0_base, __tls1_base };
@@ -139,7 +142,7 @@ static __used void *_init_core_local_tls(void) {
 }
 
 #if PICO_THREAD_LOCAL_THREAD_POINTER_VIA_ARM_EABI
-uint32_t __attribute__((naked)) __aeabi_read_tp(void) {
+uint32_t __used __attribute__((naked)) __aeabi_read_tp(void) {
 #if !__ARM_ARCH_6M__
     pico_default_asm_volatile(
         "push {r1,lr}           /* Save R1 (and LR) */\n"
@@ -256,7 +259,7 @@ GCC_Pragma("GCC diagnostic ignored \"-Wanalyzer-malloc-leak\"")
 GCC_Pragma("GCC diagnostic pop")
 }
 
-void* __emutls_get_address(void* obj) {
+void* __used __emutls_get_address(void* obj) {
     void *tls_adjusted = _get_tls_adjusted_for_core(get_core_num());
     if (!tls_adjusted) {
         tls_adjusted = _emutls_per_core_init();
@@ -299,7 +302,7 @@ static inline void _defer_core_local_init(void) {
 #if PICO_THREAD_LOCAL_SUPPORT_THREAD_POINTER
 #if PICO_THREAD_LOCAL_THREAD_POINTER_VIA_ARM_EABI
 // naked as we must preserve all regs
-uint32_t __weak __attribute__((naked)) __aeabi_read_tp(void) {
+uint32_t __used __weak __attribute__((naked)) __aeabi_read_tp(void) {
     pico_default_asm_volatile(
         ".weak __tls_start\n"
         "push {r1,lr}\n"

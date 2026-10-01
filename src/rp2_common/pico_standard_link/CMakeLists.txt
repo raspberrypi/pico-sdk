@@ -386,6 +386,11 @@ if (NOT TARGET pico_standard_link)
     if (NOT PICO_NO_GC_SECTIONS)
         target_compile_options(pico_standard_link INTERFACE -ffunction-sections -fdata-sections)
         target_link_options(pico_standard_link INTERFACE "LINKER:--gc-sections")
+        if (PICO_C_COMPILER_IS_GNU)
+            # with LTO, GCC generates the final code at link time, so needs these flags again there (they are
+            # ignored when not using LTO)
+            target_link_options(pico_standard_link INTERFACE -ffunction-sections -fdata-sections)
+        endif()
     endif()
 
     if (PICO_C_COMPILER_IS_GNU)

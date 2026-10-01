@@ -341,8 +341,8 @@ uint64_t double2ufix64(double d, int e);
     // so we declare it here always
 #if __PICO_DOUBLE_ARM_OPTIMIZED && PICO_C_COMPILER_IS_CLANG
     // clang unhelpfully splits sincos into explict calls to sin & cos
-    extern void WRAPPER_FUNC(sincos)(double x, double *sinx, double *cosx);
-    #define sincos(x, sinx, cosx) WRAPPER_FUNC(sincos)(x, sinx, cosx)
+    extern void WRAPPER_FUNC_NAME(sincos)(double x, double *sinx, double *cosx);
+    #define sincos(x, sinx, cosx) WRAPPER_FUNC_NAME(sincos)(x, sinx, cosx)
 #else
     //! Return both the sine and cosine of an angle efficiently
     void sincos(double x, double *sinx, double *cosx);
