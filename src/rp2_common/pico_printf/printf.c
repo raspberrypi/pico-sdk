@@ -560,7 +560,10 @@ static size_t _etoa(out_fct_type out, char *buffer, size_t idx, size_t maxlen, d
 // internal vsnprintf
 static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const char *format, va_list va) {
 #if !PICO_PRINTF_ALWAYS_INCLUDED
-    lazy_vsnprintf = _vsnprintf;
+    int (*vsnprintf_fn)(out_fct_type, char *, const size_t, const char *, va_list) = _vsnprintf;
+    // stop the compiler (Clang does) turning lazy_vsnprintf into a flag plus a direct call, which links printf into panic
+    __asm__ ("" : "+r" (vsnprintf_fn));
+    lazy_vsnprintf = vsnprintf_fn;
 #endif
     unsigned int flags, width, precision, n;
     size_t idx = 0U;
