@@ -335,7 +335,7 @@ double __real_fma(double, double, double);
 
 #define FRAC ((double)(1ull << 50))
 #define allowed_range(a) (fabs(a) / FRAC)
-#define assert_close(a, b) test_assert((fabs((a) - (b)) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinf(a) && isinf(b) && ((a) < 0) == ((b) < 0)))
+#define assert_close(a, b) test_assert((isinf(a) && isinf(b) && ((a) < 0) == ((b) < 0)) || fabs((a) - (b)) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; }))
 #define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
 #define check2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
 #define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnan(p0)) assert_nan(r); else assert_close(r, r2); r; })
@@ -448,6 +448,14 @@ int main() {
         printf("LN %10.18f\n", check_domain_nan(log(minus_inf)));
         printf("LN %10.18f\n", check_domain_nan(log(minus_nan)));
         test_assert(log(minus_zero) == -INFINITY);
+        volatile double inf = INFINITY, big = 1e307;
+        printf("DADD %10.18f\n", check_domain_nan(inf + minus_inf));
+        printf("DADD %10.18f\n", check_domain_nan(minus_inf + inf));
+        printf("DSUB %10.18f\n", check_domain_nan(inf - inf));
+        printf("DSUB %10.18f\n", check_domain_nan(minus_inf - minus_inf));
+        test_assert(inf + big == INFINITY);
+        test_assert(inf - big == INFINITY);
+        test_assert(minus_inf + big == -INFINITY);
 
         for(int j=0;j<2;j++) {
             for (int i = 1; i < 4; i++) {

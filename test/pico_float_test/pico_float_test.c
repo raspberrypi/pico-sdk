@@ -515,6 +515,14 @@ int main() {
         printf("FLN %10.18f\n", check_domain_nan(logf(minus_inf)));
         printf("FLN %10.18f\n", check_domain_nan(logf(minus_nan)));
         test_assert(logf(minus_zero) == -INFINITY);
+        volatile float inf = INFINITY, big = 3e38f;
+        printf("FADD %10.18f\n", check_domain_nan(inf + minus_inf));
+        printf("FADD %10.18f\n", check_domain_nan(minus_inf + inf));
+        printf("FSUB %10.18f\n", check_domain_nan(inf - inf));
+        printf("FSUB %10.18f\n", check_domain_nan(minus_inf - minus_inf));
+        test_assert(inf + big == INFINITY);
+        test_assert(inf - big == INFINITY);
+        test_assert(minus_inf + big == -INFINITY);
 
         for(int j=0;j<2;j++) {
             for (int i = 1; i < 4; i++) {

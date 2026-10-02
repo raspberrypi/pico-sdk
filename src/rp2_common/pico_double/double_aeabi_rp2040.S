@@ -183,6 +183,20 @@ wrapper_func_d2 __aeabi_dsub
    shimmable_table_tail_call SF_TABLE_FSUB dsub_shim
 
 wrapper_func_d2 __aeabi_dadd
+#if PICO_DOUBLE_PROPAGATE_NANS
+    // likewise for inf + -inf
+    mov ip, r0
+    mov r0, r1
+    eors r0, r3
+    bpl 1f // same signs
+    mov r0, ip
+    push {r0-r3, lr}
+    bl 2f
+    b ddiv_dsub_nan_helper
+1:
+    mov r0, ip
+2:
+#endif
    shimmable_table_tail_call SF_TABLE_FADD dadd_shim
 
 // double FUNC_NAME(__aeabi_ddiv)(double n, double d)     double-precision division, n / d
@@ -239,7 +253,7 @@ ddiv_dsub_nan_helper:
     lsls r2, #1
     asrs r2, r2, #21
     lsls r3, #1
-    asrs r3, r3, #24
+    asrs r3, r3, #21
     ands r2, r3
     adds r2, #1
     bne 3f

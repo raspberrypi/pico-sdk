@@ -152,6 +152,16 @@ wrapper_func_f2 __aeabi_fsub
     table_tail_call SF_TABLE_FSUB
 
 wrapper_func_f2 __aeabi_fadd
+#if PICO_FLOAT_PROPAGATE_NANS
+    // likewise for inf + -inf
+    mov r2, r0
+    eors r2, r1
+    bpl 1f // same signs
+    push {r0, r1, lr}
+    bl 1f
+    b fdiv_fsub_nan_helper
+1:
+#endif
     table_tail_call SF_TABLE_FADD
 
 // float FUNC_NAME(__aeabi_fdiv)(float n, float d)     single-precision division, n / d
