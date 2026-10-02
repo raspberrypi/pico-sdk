@@ -8,8 +8,8 @@
 // a dependency on curl to the SDK itself. It is provided for convenience so
 // the same code also works with host builds that use libcurl.
 
-#ifndef _SLIST_H
-#define _SLIST_H
+#ifndef _PICO_RPI_CONNECT_SLIST_H
+#define _PICO_RPI_CONNECT_SLIST_H
 
 // Only define our own curl_slist if we're not using real libcurl
 #if PICO_ON_DEVICE
@@ -39,4 +39,4 @@ char *curl_slist_to_string(struct curl_slist *list);
 #include <curl/curl.h>
 #endif // PICO_ON_DEVICE
 
-#endif // _SLIST_H
+#endif // _PICO_RPI_CONNECT_SLIST_H
