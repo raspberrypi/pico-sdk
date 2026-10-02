@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 #include <pico/double.h>
 #include "pico/stdlib.h"
 
@@ -407,6 +408,27 @@ int main() {
         printf("SINCOS %10.18f %10.18f\n", s, c);
         if (s != sin(x) || c != cos(x)) {
             printf("SINCOS mismatch\n");
+            fail = true;
+        }
+    }
+
+    // large arguments against exact values (x, sin, cos, tan); the last is the closest double to a multiple
+    // of 2*pi. The tolerance allows for the RP2040 ROM's absolute error
+    static const double big_trig[][4] = {
+        {1e4, -0.30561438888825215, -0.9521553682590148, 0.3209711346238147},
+        {-3.7e15, 0.9988434852896376, -0.04808005713858381, -20.774590230011913},
+        {1e22, -0.8522008497671888, 0.523214785395139, -1.6287782256068988},
+        {1e300, -0.8178819121159085, -0.5753861119575491, 1.4214488238747245},
+        {DBL_MAX, 0.004961954789184062, -0.9999876894265599, -0.004962015874444895},
+        {2.1277490593306166e+256, 1.874866369701851e-18, 1.0, 1.874866369701851e-18},
+    };
+    for (uint i = 0; i < count_of(big_trig); i++) {
+        volatile double vx = big_trig[i][0];
+        double x = vx, t = big_trig[i][3], s, c;
+        sincos(x, &s, &c);
+        if (fabs(sin(x) - big_trig[i][1]) > 1e-15 || fabs(cos(x) - big_trig[i][2]) > 1e-15 ||
+            fabs(tan(x) - t) > 1e-15 * (1 + t * t) || s != sin(x) || c != cos(x)) {
+            printf("Large argument trig error at %g: %.17g %.17g %.17g\n", x, sin(x), cos(x), tan(x));
             fail = true;
         }
     }

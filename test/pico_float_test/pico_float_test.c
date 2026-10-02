@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 #include <pico/float.h>
 #include "pico/stdlib.h"
 // Include sys/types.h before inttypes.h to work around issue with
@@ -466,6 +467,27 @@ int main() {
         printf("SINCOS %10.18f %10.18f\n", s, c);
         if (s != sinf(x) || c != cosf(x)) {
             printf("SINCOS mismatch %10.18f %10.18f\n", sinf(x), cosf(x));
+            fail = true;
+        }
+    }
+
+    // large arguments against exact values (x, sin, cos, tan); the last is the closest float to a multiple
+    // of 2*pi. The tolerance allows for the RP2040 ROM's absolute error
+    static const float big_trig[][4] = {
+        {200.0f, -0.87329730f, 0.48718768f, -1.7925275f},
+        {1e5f, 0.035748798f, -0.99936081f, -0.035771663f},
+        {-7.3e20f, 0.038249186f, 0.99926823f, 0.038277196f},
+        {3e38f, 0.87490489f, -0.48429478f, -1.8065544f},
+        {FLT_MAX, -0.52187652f, 0.85302104f, -0.61179795f},
+        {0x1.f37c8ap+97f, 6.4590792e-09f, 1.0f, 6.4590792e-09f},
+    };
+    for (uint i = 0; i < count_of(big_trig); i++) {
+        volatile float vx = big_trig[i][0];
+        float x = vx, t = big_trig[i][3], s, c;
+        sincosf(x, &s, &c);
+        if (fabsf(sinf(x) - big_trig[i][1]) > 1e-6f || fabsf(cosf(x) - big_trig[i][2]) > 1e-6f ||
+            fabsf(tanf(x) - t) > 1e-6f * (1 + t * t) || s != sinf(x) || c != cosf(x)) {
+            printf("Large argument trig error at %g: %.9g %.9g %.9g\n", x, sinf(x), cosf(x), tanf(x));
             fail = true;
         }
     }
