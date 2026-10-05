@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "request.h"
+#include "pico/rpi_connect/internal/request.h"
 
 #include "pico/rpi_connect.h"
 
-#include "request_internal.h"
-#include "slist.h"
+#include "pico/rpi_connect/internal/request_internal.h"
+#include "pico/rpi_connect/internal/slist.h"
 
 void rpi_connect_memory_struct_init(memory_struct_t *mem) {
     mem->memory = calloc(1,1);

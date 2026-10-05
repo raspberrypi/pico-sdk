@@ -13,10 +13,10 @@
 #ifndef NDEBUG
 #include "mbedtls/debug.h"
 #endif
-#include "connect_time.h"
-#include "request.h"
-#include "request_internal.h"
-#include "slist.h"
+#include "pico/rpi_connect/internal/connect_time.h"
+#include "pico/rpi_connect/internal/request.h"
+#include "pico/rpi_connect/internal/request_internal.h"
+#include "pico/rpi_connect/internal/slist.h"
 
 static const char *http_extra_headers_fn(void *arg) {
     return arg ? (const char *)arg : "";

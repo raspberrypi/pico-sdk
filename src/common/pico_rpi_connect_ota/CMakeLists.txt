@@ -19,9 +19,6 @@ if (NOT TARGET pico_rpi_connect_ota)
 
     add_library(pico_rpi_connect_ota INTERFACE)
     target_include_directories(pico_rpi_connect_ota SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
-    # connect_crypto.h lives in the pico_rpi_connect source dir (not its public include).
-    # The OTA library uses it for deriving the public key during device-identity-exchange.
-    target_include_directories(pico_rpi_connect_ota INTERFACE ${CMAKE_CURRENT_LIST_DIR}/../pico_rpi_connect)
     target_sources(pico_rpi_connect_ota INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/rpi_connect_ota.c
     )

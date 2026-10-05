@@ -8,10 +8,10 @@
 #include "pico/rpi_connect_util.h"
 #include <cJSON.h>
 
-#include "connect_crypto.h"
-#include "request.h"
-#include "rpi_connect_ca_cert.h"
-#include "slist.h"
+#include "pico/rpi_connect/internal/connect_crypto.h"
+#include "pico/rpi_connect/internal/request.h"
+#include "pico/rpi_connect/internal/rpi_connect_ca_cert.h"
+#include "pico/rpi_connect/internal/slist.h"
 
 #if PICO_ON_DEVICE
 #include "pico/version.h"

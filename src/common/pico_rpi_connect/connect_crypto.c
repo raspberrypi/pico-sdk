@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "connect_crypto.h"
+#include "pico/rpi_connect/internal/connect_crypto.h"
 #include "pico/rpi_connect_util.h"
 
 #if !PICO_ON_DEVICE

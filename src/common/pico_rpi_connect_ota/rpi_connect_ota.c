@@ -7,7 +7,7 @@
 #include "pico/rpi_connect_ota.h"
 #include "pico/rpi_connect.h"
 #include "pico/rpi_connect_util.h"
-#include "connect_crypto.h"
+#include "pico/rpi_connect/internal/connect_crypto.h"
 
 #if PICO_ON_DEVICE
 #include "boot/picoboot.h"

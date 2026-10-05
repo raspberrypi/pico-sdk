@@ -8,7 +8,7 @@
 #include <string.h>
 #include <strings.h>
 
-#include "connect_http.h"
+#include "pico/rpi_connect/internal/connect_http.h"
 
 #include "pico/rpi_connect_util.h"
 #include "lwip/altcp.h"
