@@ -85,7 +85,7 @@ char *rpi_connect_retrieve_token_with_device_code(const char *client_id, const c
  *
  * \param token access token
  * \param capability a packed RPI_CONNECT_CAPABILITY_* value
- * \return 0 on success
+ * \return 0 on success, non-zero on error
  */
 int rpi_connect_send_capability(const char *token, unsigned int capability);
 

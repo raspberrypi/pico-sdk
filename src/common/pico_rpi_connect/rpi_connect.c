@@ -510,7 +510,7 @@ int rpi_connect_send_capability(const char *token, unsigned int capability) {
 
     if (http_code != 200 && http_code != 204) {
         RPI_CONNECT_ERROR("Request failed with HTTP code %ld\n", http_code);
-        return -1;
+        return -http_code;
     }
 
     return 0;
