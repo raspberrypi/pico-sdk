@@ -464,9 +464,11 @@ void flash_program_invalid_block_to_b_partition(uint pi_a) {
 
     int pi_b = rom_get_b_partition(pi_a);
     invalid_params_if(HARDWARE_FLASH, pi_b < 0);
+    if (pi_b < 0)
+        return;
 
     uint32_t buffer[4 + 1] = {}; // single partition, with maximum of 4 words returned, plus 1
-    int ret = rom_get_partition_table_info(buffer, count_of(buffer), PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION | (pi_b << 24));
+    int ret = rom_get_partition_table_info(buffer, count_of(buffer), PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION | ((uint32_t)pi_b << 24));
     hard_assert(buffer[0] == (PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION));
     hard_assert(ret == 3);
 
