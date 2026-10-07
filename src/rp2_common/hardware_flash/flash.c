@@ -460,8 +460,6 @@ void flash_devinfo_set_cs_gpio(uint cs, uint gpio) {
 }
 
 int flash_program_invalid_block_to_b_partition(uint pi_a) {
-    uint32_t invalid_block[FLASH_PAGE_SIZE/sizeof(uint32_t)] = PICOBIN_INVALID_BLOCK;
-
     int pi_b = rom_get_b_partition(pi_a);
     invalid_params_if_and_return(HARDWARE_FLASH, pi_b < 0, pi_b);
 
@@ -472,6 +470,8 @@ int flash_program_invalid_block_to_b_partition(uint pi_a) {
 
     uint32_t location_and_permissions = buffer[1];
     uint32_t saddr = ((location_and_permissions >> PICOBIN_PARTITION_LOCATION_FIRST_SECTOR_LSB) & 0x1fffu) * FLASH_SECTOR_SIZE;
+
+    uint32_t invalid_block[FLASH_PAGE_SIZE/sizeof(uint32_t)] = PICOBIN_INVALID_BLOCK;
 
     saddr += XIP_BASE;
     cflash_flags_t flags = {
