@@ -312,8 +312,9 @@ void flash_devinfo_set_cs_gpio(uint cs, uint gpio);
  * but do not want that block loop to be bootable
  *
  * \param pi_a The A partition index
+ * \return 0 on success, non-zero on error
  */
-void flash_program_invalid_block_to_b_partition(uint pi_a);
+int flash_program_invalid_block_to_b_partition(uint pi_a);
 
 #endif // !PICO_RP2040 || PICO_COMBINED_DOCS
 

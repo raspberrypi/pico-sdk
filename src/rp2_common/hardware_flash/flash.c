@@ -459,13 +459,11 @@ void flash_devinfo_set_cs_gpio(uint cs, uint gpio) {
     );
 }
 
-void flash_program_invalid_block_to_b_partition(uint pi_a) {
+int flash_program_invalid_block_to_b_partition(uint pi_a) {
     uint32_t invalid_block[FLASH_PAGE_SIZE/sizeof(uint32_t)] = PICOBIN_INVALID_BLOCK;
 
     int pi_b = rom_get_b_partition(pi_a);
-    invalid_params_if(HARDWARE_FLASH, pi_b < 0);
-    if (pi_b < 0)
-        return;
+    invalid_params_if_and_return(HARDWARE_FLASH, pi_b < 0, pi_b);
 
     uint32_t buffer[4 + 1] = {}; // single partition, with maximum of 4 words returned, plus 1
     int ret = rom_get_partition_table_info(buffer, count_of(buffer), PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION | ((uint32_t)pi_b << 24));
@@ -482,6 +480,7 @@ void flash_program_invalid_block_to_b_partition(uint pi_a) {
         | (CFLASH_ASPACE_VALUE_STORAGE << CFLASH_ASPACE_LSB)
     };
     ret = rom_flash_op(flags, saddr, sizeof(invalid_block), (uint8_t*)invalid_block);
+    return ret;
 }
 
 #endif // !PICO_RP2040
