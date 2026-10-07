@@ -7,33 +7,27 @@ cc_library(
     name = "pico_rpi_connect",
     srcs = [
         "connect_crypto.c",
-        "connect_http.h",
         "connect_time.c",
-        "connect_time.h",
+        "include/pico/rpi_connect/internal/connect_http.h",
+        "include/pico/rpi_connect/internal/connect_time.h",
+        "include/pico/rpi_connect/internal/request.h",
+        "include/pico/rpi_connect/internal/request_internal.h",
+        "include/pico/rpi_connect/internal/rpi_connect_ca_cert.h",
+        "include/pico/rpi_connect/internal/slist.h",
         "request.c",
-        "request.h",
-        "request_internal.h",
         "request_lwip.c",
         "rpi_connect.c",
-        "rpi_connect_ca_cert.h",
         "rpi_connect_http.c",
         "slist.c",
-        "slist.h",
     ],
     hdrs = [
         "include/pico/rpi_connect.h",
         "include/pico/rpi_connect_util.h",
-        # connect_crypto.h is not part of the public include/ dir, but the
-        # OTA library uses it for deriving the public key during the
-        # device-identity-exchange, so it is exported here.
-        "connect_crypto.h",
+        # Internal header, but the OTA library uses it for deriving the public
+        # key during the device-identity-exchange, so it is exported here.
+        "include/pico/rpi_connect/internal/connect_crypto.h",
     ],
-    # "include" exposes the public pico/ headers; "." exposes connect_crypto.h
-    # to the OTA library (matching the CMake target_include_directories).
-    includes = [
-        ".",
-        "include",
-    ],
+    includes = ["include"],
     target_compatible_with = compatible_with_rp2(),
     # rpi_connect_default_async_context() is declared in rpi_connect_util.h
     # but must be provided by the application (typically returning
@@ -58,25 +52,22 @@ cc_library(
     srcs = [
         "connect_crypto.c",
         "connect_time.c",
-        "connect_time.h",
+        "include/pico/rpi_connect/internal/connect_time.h",
+        "include/pico/rpi_connect/internal/request.h",
+        "include/pico/rpi_connect/internal/request_internal.h",
+        "include/pico/rpi_connect/internal/rpi_connect_ca_cert.h",
+        "include/pico/rpi_connect/internal/slist.h",
         "request.c",
-        "request.h",
         "request_curl.c",
-        "request_internal.h",
         "rpi_connect.c",
-        "rpi_connect_ca_cert.h",
         "slist.c",
-        "slist.h",
     ],
     hdrs = [
-        "connect_crypto.h",
         "include/pico/rpi_connect.h",
+        "include/pico/rpi_connect/internal/connect_crypto.h",
         "include/pico/rpi_connect_util.h",
     ],
-    includes = [
-        ".",
-        "include",
-    ],
+    includes = ["include"],
     linkopts = [
         "-lcurl",
         "-lcrypto",

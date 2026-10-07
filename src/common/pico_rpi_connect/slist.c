@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "slist.h"
+#include "pico/rpi_connect/internal/slist.h"
 
 #include "pico/rpi_connect_util.h"
 

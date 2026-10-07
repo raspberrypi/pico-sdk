@@ -17,7 +17,7 @@ cc_library(
     # not compile for RP2040.
     target_compatible_with = compatible_with_config("//bazel/constraint:rp2350"),
     deps = [
-        # connect_crypto.h is pulled in via pico_rpi_connect's exported headers.
+        # pico/rpi_connect/internal/connect_crypto.h is pulled in via pico_rpi_connect's exported headers.
         "//src/common/boot_picoboot_headers",
         "//src/common/pico_rpi_connect",
         "//src/rp2_common/pico_bootrom",

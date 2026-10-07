@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "request.h"
+#include "pico/rpi_connect/internal/request.h"
 #include "pico/rpi_connect.h"
 #include "pico/rpi_connect_util.h"
 
-#include "connect_time.h"
-#include "request_internal.h"
+#include "pico/rpi_connect/internal/connect_time.h"
+#include "pico/rpi_connect/internal/request_internal.h"
 
 int g_verbose = 0;
 void rpi_connect_request_set_verbose(int v) {

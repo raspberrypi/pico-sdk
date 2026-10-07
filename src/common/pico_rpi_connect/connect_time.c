@@ -13,10 +13,10 @@
 // the offset between that and the boot clock. Wall time is then the boot
 // clock plus the offset.
 
-#include "connect_time.h"
+#include "pico/rpi_connect/internal/connect_time.h"
 
 #include "pico/rpi_connect.h"
-#include "request.h"
+#include "pico/rpi_connect/internal/request.h"
 
 // Microseconds from the boot clock to the Unix epoch. Written from network
 // callbacks (possibly in IRQ context on the other core) and read from the
