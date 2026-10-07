@@ -345,6 +345,18 @@ long rpi_connect_request_perform_http(
             ctx->tls_config = altcp_tls_create_config_client((const u8_t *)ca_cert, strlen(ca_cert) + 1);
         else
             ctx->tls_config = altcp_tls_create_config_client(NULL, 0);
+        // lwIP's default authmode (ALTCP_MBEDTLS_AUTHMODE) is VERIFY_OPTIONAL,
+        // under which the handshake completes against an unverified server and
+        // httpc sends the request - Authorization header included - before the
+        // verify result is checked below. Set the mode per request instead:
+        // REQUIRED fails the handshake itself so nothing is sent to a server
+        // that did not verify (and fails closed if no CA is configured); NONE is
+        // only for downloads whose integrity rests on a checksum. The
+        // mbedtls_ssl_config is the first field of struct altcp_tls_config.
+        if (ctx->tls_config) {
+            mbedtls_ssl_conf_authmode((mbedtls_ssl_config *)ctx->tls_config,
+                tls_no_verify ? MBEDTLS_SSL_VERIFY_NONE : MBEDTLS_SSL_VERIFY_REQUIRED);
+        }
     }
 
 #if defined(MBEDTLS_SSL_PROTO_TLS1_3) && defined(MBEDTLS_SSL_SESSION_TICKETS)
@@ -383,8 +395,10 @@ long rpi_connect_request_perform_http(
     async_context_acquire_lock_blocking(ctx->async_context);
     // On the first request to a host the slot's session is empty, so
     // altcp_tls_set_session() is a no-op; the completion callback then saves
-    // the negotiated session here for the next request to resume.
-    if (!plain_http)
+    // the negotiated session here for the next request to resume. A resumed
+    // session skips certificate verification, so sessions from unverified
+    // downloads are neither saved nor resumed.
+    if (!plain_http && !tls_no_verify)
         ctx->http_req->tls_session = tls_session_for_host(hostname);
     rpi_connect_http_set_hostname(hostname);
     int rc = rpi_connect_http_request_async(ctx->async_context, ctx->http_req, endpoint, post_data_len, post_data);
