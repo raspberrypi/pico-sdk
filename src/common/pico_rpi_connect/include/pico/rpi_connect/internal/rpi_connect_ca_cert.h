@@ -11,7 +11,8 @@
 extern "C" {
 #endif
 
-// ISRG Root X1 - Let's Encrypt root CA
+#if RPI_CONNECT_OTA_CONFIG_SUPPORT_RSA
+// ISRG Root X1 - Let's Encrypt root CA RSA
 // Valid until 2035-06-04
 // Validates both production (connect.raspberrypi.com) and staging (connect-staging.raspberrypi.com)
 #define RPI_CONNECT_CA_CERT \
@@ -46,6 +47,26 @@ extern "C" {
 "mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d\n" \
 "emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=\n" \
 "-----END CERTIFICATE-----\n"
+#else
+// ISRG Root X2 - Let's Encrypt root CA ECC
+// Valid until 2040-09-17
+// Validates both production (connect.raspberrypi.com) and staging (connect-staging.raspberrypi.com)
+#define RPI_CONNECT_CA_CERT \
+"-----BEGIN CERTIFICATE-----\n" \
+"MIICGzCCAaGgAwIBAgIQQdKd0XLq7qeAwSxs6S+HUjAKBggqhkjOPQQDAzBPMQsw\n" \
+"CQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJuZXQgU2VjdXJpdHkgUmVzZWFyY2gg\n" \
+"R3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBYMjAeFw0yMDA5MDQwMDAwMDBaFw00\n" \
+"MDA5MTcxNjAwMDBaME8xCzAJBgNVBAYTAlVTMSkwJwYDVQQKEyBJbnRlcm5ldCBT\n" \
+"ZWN1cml0eSBSZXNlYXJjaCBHcm91cDEVMBMGA1UEAxMMSVNSRyBSb290IFgyMHYw\n" \
+"EAYHKoZIzj0CAQYFK4EEACIDYgAEzZvVn4CDCuwJSvMWSj5cz3es3mcFDR0HttwW\n" \
+"+1qLFNvicWDEukWVEYmO6gbf9yoWHKS5xcUy4APgHoIYOIvXRdgKam7mAHf7AlF9\n" \
+"ItgKbppbd9/w+kHsOdx1ymgHDB/qo0IwQDAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0T\n" \
+"AQH/BAUwAwEB/zAdBgNVHQ4EFgQUfEKWrt5LSDv6kviejM9ti6lyN5UwCgYIKoZI\n" \
+"zj0EAwMDaAAwZQIwe3lORlCEwkSHRhtFcP9Ymd70/aTSVaYgLXTWNLxBo1BfASdW\n" \
+"tL4ndQavEi51mI38AjEAi/V3bNTIZargCyzuFJ0nN6T5U6VR5CmD1/iQMVtCnwr1\n" \
+"/q4AaOeMSQ+2b1tbFfLn\n" \
+"-----END CERTIFICATE-----\n"
+#endif
 
 #ifdef __cplusplus
 }
