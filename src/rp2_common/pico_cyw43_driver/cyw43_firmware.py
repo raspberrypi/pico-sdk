@@ -39,10 +39,15 @@ with open(sys.argv[1], "r") as f:
 # Map each C array initialiser in the header, e.g. "name[123] ... = { 0x00, 0x01, ... }", to its bytes
 arrays = {}
 for match in re.finditer(r"\b(\w+)\s*\[\s*(\d*)\s*\][^=;]*=\s*\{([^}]*)\}", text):
-    data = bytes(int(b, base=0) for b in match[3].replace(" ", "").split(","))
-    if match[2] and int(match[2]) != len(data):
-        sys.exit("%s: %s has %d bytes, expected %s" % (sys.argv[1], match[1], len(data), match[2]))
-    arrays[match[1]] = data
+
+    array_name = match[1]
+    array_len = int(match[2]) if match[2] else None
+    array_bytes = match[3]
+
+    data = bytes(int(b, base=0) for b in array_bytes.replace(" ", "").split(","))
+    if array_len and array_len != len(data):
+        sys.exit("%s: %s has %d bytes, expected %s" % (sys.argv[1], array_name, len(data), array_len))
+    arrays[array_name] = data
 
 # Find the arrays whose names end in _firmware and _clm (None if there isn't one)
 firmware = None
