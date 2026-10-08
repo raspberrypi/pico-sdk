@@ -222,6 +222,9 @@ void uart_set_translate_crlf(uart_inst_t *uart, bool crlf) {
 #if PICO_UART_ENABLE_CRLF_SUPPORT
     uart_char_to_line_feed[uart_get_index(uart)] = crlf ? '\n' : 0x100;
 #else
+    (void) uart;
+    (void) crlf;
+
     panic_unsupported();
 #endif
 }
