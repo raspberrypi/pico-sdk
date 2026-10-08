@@ -56,6 +56,13 @@
 #define MBEDTLS_DEBUG_C
 #endif
 
+#if RPI_CONNECT_OTA_CONFIG_SUPPORT_RSA
+#define MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
+#define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
+#define MBEDTLS_PKCS1_V15
+#define MBEDTLS_RSA_C
+#endif
+
 // The following significantly speeds up mbedtls due to NIST optimizations.
 #define MBEDTLS_ECP_NIST_OPTIM
 
