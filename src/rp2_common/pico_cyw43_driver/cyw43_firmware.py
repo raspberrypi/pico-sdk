@@ -39,7 +39,7 @@ with open(sys.argv[1], "r") as f:
 # Map each C array initialiser in the header, e.g. "name[123] ... = { 0x00, 0x01, ... }", to its bytes
 arrays = {}
 for match in re.finditer(r"\b(\w+)\s*\[\s*(\d*)\s*\][^=;]*=\s*\{([^}]*)\}", text):
-    data = bytes(int(b, base=0) for b in match[3].replace(",", " ").split())
+    data = bytes(int(b, base=0) for b in match[3].replace(" ", "").split(","))
     if match[2] and int(match[2]) != len(data):
         sys.exit("%s: %s has %d bytes, expected %s" % (sys.argv[1], match[1], len(data), match[2]))
     arrays[match[1]] = data
