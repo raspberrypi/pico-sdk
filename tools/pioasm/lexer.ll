@@ -56,6 +56,7 @@ output_fmt    [^%\n]+
 %%
         std::string code_block_contents;
         yy::location code_block_start;
+        yy::location c_comment_start;
 %{
   // A handy shortcut to the location held by the pio_assembler.
   yy::location& loc = pioasm.location;
@@ -89,6 +90,7 @@ output_fmt    [^%\n]+
     "*"                             { }
     [^\n\*]*                        { }
     \n+                             { auto loc_newline = loc; loc_newline.end = loc_newline.begin; loc.lines(yyleng); loc.step(); }
+    <<EOF>>                         { BEGIN(INITIAL); throw yy::parser::syntax_error(c_comment_start, "unterminated comment"); }
 }
 
 <lang_opt>{
@@ -103,7 +105,7 @@ output_fmt    [^%\n]+
 .                                   { throw yy::parser::syntax_error(loc, "invalid character: " + std::string(yytext)); }
 }
 
-"/*"                                { BEGIN(c_comment); }
+"/*"                                { BEGIN(c_comment); c_comment_start = loc; }
 ","	                                return yy::parser::make_COMMA(loc);
 "::"                                return yy::parser::make_REVERSE(loc);
 ":"	                                return yy::parser::make_COLON(loc);
