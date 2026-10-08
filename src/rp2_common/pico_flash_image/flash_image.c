@@ -61,6 +61,7 @@ typedef struct {
     uint32_t update_family_id;
     uint32_t flash_write_address;
     uint32_t update_start_addr;
+    uint32_t maximum_code_size;
     uint32_t dnld_crc32;
 } flash_image_state_t;
 
@@ -224,13 +225,21 @@ static int read_partition_info(void) {
     uint32_t last_sector_number = LAST_SECTOR_NUMBER(uf2_target_partition.permissions_and_location);
     uint32_t total_sector_count = 1 + last_sector_number - first_sector_number;
     uint32_t maximum_code_size = FLASH_SECTOR_SIZE * total_sector_count;
-    uint32_t update_size = UF2_DATA_PAGE_SIZE * fimg_state->total_num_blocks;
 
-    // check if the image is too large for the partition
-    if (update_size > maximum_code_size) {
+    // an image must contain at least one block
+    if (0 == fimg_state->total_num_blocks) {
+        FIMG_DEBUG_PRINTF("error - %s() returned: %i\n", __FUNCTION__, PICO_ERROR_INVALID_DATA);
+        return PICO_ERROR_INVALID_DATA;
+    }
+
+    // check if the image is too large for the partition (division avoids overflow
+    // of the multiplication for a huge, attacker supplied, block count)
+    if (fimg_state->total_num_blocks > maximum_code_size / UF2_DATA_PAGE_SIZE) {
         FIMG_DEBUG_PRINTF("error - %s() returned: %i\n", __FUNCTION__, PICO_ERROR_BUFFER_TOO_SMALL);
         return PICO_ERROR_BUFFER_TOO_SMALL;
     }
+
+    fimg_state->maximum_code_size = maximum_code_size;
 
     // execution and programming start address is the start of the code
     uint32_t code_start_offset = FLASH_SECTOR_SIZE * first_sector_number;
@@ -284,13 +293,33 @@ static int process_a_uf2_block(void) {
         }
     }
 
+    // never program more blocks than the image declared
+    if (fimg_state->rxed_block_count >= fimg_state->total_num_blocks) {
+        FIMG_DEBUG_PRINTF("error - %s() excess block, returned: %i\n", __FUNCTION__, PICO_ERROR_INVALID_DATA);
+        return PICO_ERROR_INVALID_DATA;
+    }
+
+    // The block's target address must be a flash page inside the image: addresses are
+    // relative to XIP_BASE and are relocated to the target partition below. The data
+    // may come from an untrusted source (e.g. an unverified download) and the image
+    // checksum is only compared after programming, so each block is bounds checked
+    // here before any flash is touched.
+    uint32_t target_addr = fimg_state->rxed_data.uf2_block.target_addr;
+    if (target_addr < XIP_BASE ||
+        0 != (target_addr % FLASH_PAGE_SIZE) ||
+        (target_addr - XIP_BASE) > (fimg_state->maximum_code_size - FLASH_PAGE_SIZE)) {
+        FIMG_DEBUG_PRINTF("error - %s() target_addr %08lx out of range, returned: %i\n",
+            __FUNCTION__, target_addr, PICO_ERROR_INVALID_ADDRESS);
+        return PICO_ERROR_INVALID_ADDRESS;
+    }
+
     // roll crc32 algo over the latest block to program
     fimg_state->dnld_crc32 = crc32_chunk(fimg_state->dnld_crc32,
                                          fimg_state->rxed_data.bytes,
                                          UF2_BLOCK_SIZE);
 
     // per-block, calculate write address as the target address relative to the start of the code
-    uint32_t target_offset = fimg_state->rxed_data.uf2_block.target_addr - XIP_BASE;
+    uint32_t target_offset = target_addr - XIP_BASE;
     fimg_state->flash_write_address = fimg_state->update_start_addr + target_offset;
 
     // showtime: program the block's data to flash
