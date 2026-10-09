@@ -8,16 +8,11 @@ cc_library(
     srcs = ["rpi_connect_ota.c"],
     hdrs = ["include/pico/rpi_connect_ota.h"],
     includes = ["include"],
-    # OTP row holding the 32-byte P-256 device identity private key.
-    # Override on the command line with
-    # --copt=-DRPI_CONNECT_IDENTITY_OTP_ROW=0x... (a later -D wins).
-    local_defines = ["RPI_CONNECT_IDENTITY_OTP_ROW=0xc0"],
     # OTA uses RP2350-only bootrom flash-update APIs (boot_info_t,
     # BOOT_TYPE_FLASH_UPDATE, reboot params) and OTP_DATA_RAW_BASE, so it does
     # not compile for RP2040.
     target_compatible_with = compatible_with_config("//bazel/constraint:rp2350"),
     deps = [
-        # pico/rpi_connect/internal/connect_crypto.h is pulled in via pico_rpi_connect's exported headers.
         "//src/common/boot_picoboot_headers",
         "//src/common/pico_rpi_connect",
         "//src/rp2_common/pico_bootrom",
@@ -38,7 +33,6 @@ cc_library(
     ],
     hdrs = ["include/pico/rpi_connect_ota.h"],
     includes = ["include"],
-    local_defines = ["RPI_CONNECT_IDENTITY_OTP_ROW=0xc0"],
     tags = ["manual"],
     target_compatible_with = ["//bazel/constraint:host"],
     deps = [

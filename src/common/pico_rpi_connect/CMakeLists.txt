@@ -1,3 +1,26 @@
+if (PICO_ON_DEVICE AND NOT TARGET pico_rpi_connect_identity_key)
+    # OTP row holding the 32-byte P-256 device identity private key.
+    # Override on the cmake command line (-DRPI_CONNECT_IDENTITY_OTP_ROW=0xd0)
+    # or by adding RPI_CONNECT_IDENTITY_OTP_ROW=... to the consuming target's
+    # PRIVATE compile definitions (later -D wins over the INTERFACE default).
+    set(RPI_CONNECT_IDENTITY_OTP_ROW "0xc0" CACHE STRING
+        "OTP row where the device identity P-256 private key is stored")
+
+    # The only code which handles the device identity private key.
+    add_library(pico_rpi_connect_identity_key INTERFACE)
+    target_include_directories(pico_rpi_connect_identity_key SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_sources(pico_rpi_connect_identity_key INTERFACE
+        ${CMAKE_CURRENT_LIST_DIR}/rpi_connect_identity.c
+        ${CMAKE_CURRENT_LIST_DIR}/rpi_connect_identity_key.c
+    )
+    target_compile_definitions(pico_rpi_connect_identity_key INTERFACE
+        RPI_CONNECT_IDENTITY_OTP_ROW=${RPI_CONNECT_IDENTITY_OTP_ROW}
+    )
+    target_link_libraries(pico_rpi_connect_identity_key INTERFACE
+        pico_mbedtls
+    )
+endif()
+
 if (NOT TARGET pico_rpi_connect)
     if (NOT PICO_ON_DEVICE)
         # Host build: the same library over libcurl/OpenSSL instead of lwip/mbedtls.
@@ -33,11 +56,14 @@ if (NOT TARGET pico_rpi_connect)
             pico_cjson
             pico_lwip_http
             pico_mbedtls
+            pico_rpi_connect_identity_key
             pico_stdlib
         )
     else()
         target_sources(pico_rpi_connect INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/request_curl.c
+            ${CMAKE_CURRENT_LIST_DIR}/rpi_connect_identity.c
+            ${CMAKE_CURRENT_LIST_DIR}/rpi_connect_identity_key_host.c
         )
         target_link_libraries(pico_rpi_connect INTERFACE
             pico_cjson
