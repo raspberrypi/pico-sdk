@@ -257,7 +257,7 @@
  * (it is place via \ref __not_in_flash).
  *
  * \note This macro does not add __no_inline, which means the function may still be inlined (either explicitly
- * by the user, or by compiler optimization) leading to the the code ending up inside of wherever the calling
+ * by the user, or by compiler optimization) leading to the code ending up inside of wherever the calling
  * function is. This behavior is maintained for backwards compatibility with prior SDK versions, however
  * \ref __no_inline_not_in_flash_func is also provided for cases where you want to be explicit.
  *
@@ -296,7 +296,7 @@
  * and `__time_critical_func` may be configured with different function placement.
  *
  * \note This macro does not add __no_inline, which means the function may still be inlined (either explicitly
- * by the user, or by compiler optimization) leading to the the code ending up inside of wherever the calling
+ * by the user, or by compiler optimization) leading to the code ending up inside of wherever the calling
  * function is. This behavior is maintained for backwards compatibility with prior SDK versions, however
  * \ref __no_inline_time_critical_func is also provided for cases where you want to be explicit.
  *
