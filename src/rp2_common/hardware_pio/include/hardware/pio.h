@@ -1105,7 +1105,7 @@ static inline void pio_sm_set_enabled(PIO pio, uint sm, bool enabled) {
  * \param sm State machine index (0..3)
  * \return true if the state machine is enabled
  */
-static inline bool pio_sm_get_enabled(PIO pio, uint sm) {
+static inline bool pio_sm_is_enabled(PIO pio, uint sm) {
     check_pio_param(pio);
     check_sm_param(sm);
     return pio->ctrl & (1u << sm);
