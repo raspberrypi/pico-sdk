@@ -56,13 +56,13 @@ cc_library(
     # cyw43_arch_async_context()), so this library does not depend on any
     # particular pico_cyw43_arch flavour.
     deps = [
+        ":pico_rpi_connect_identity_key",
         "//src/common/pico_cjson",
         "//src/rp2_common/pico_async_context",
         "//src/rp2_common/pico_lwip",
         "//src/rp2_common/pico_lwip:pico_lwip_http",
         "//src/rp2_common/pico_mbedtls",
         "//src/rp2_common/pico_stdlib",
-        ":pico_rpi_connect_identity_key",
     ],
 )
 
