@@ -39,6 +39,22 @@ float_section WRAPPER_FUNC_NAME(\func)
 #endif
 .endm
 
+// the ROM gives -Inf for a negative argument to log and sqrt; return NaN instead
+// (-0 and negative denormals are left to the ROM)
+.macro nan_if_negative_f
+#if PICO_FLOAT_PROPAGATE_NANS
+    lsls r1, r0, #1
+    bcc 3f
+    lsrs r1, #24
+    beq 3f
+    movs r0, #0
+    mvns r0, r0
+    lsls r0, #22                // 0xffc00000
+    bx lr
+3:
+#endif
+.endm
+
 .macro wrapper_func_f2 x
    _float_wrapper_func \x
 #if PICO_FLOAT_PROPAGATE_NANS
@@ -136,6 +152,16 @@ wrapper_func_f2 __aeabi_fsub
     table_tail_call SF_TABLE_FSUB
 
 wrapper_func_f2 __aeabi_fadd
+#if PICO_FLOAT_PROPAGATE_NANS
+    // likewise for inf + -inf
+    mov r2, r0
+    eors r2, r1
+    bpl 1f // same signs
+    push {r0, r1, lr}
+    bl 1f
+    b fdiv_fsub_nan_helper
+1:
+#endif
     table_tail_call SF_TABLE_FADD
 
 // float FUNC_NAME(__aeabi_fdiv)(float n, float d)     single-precision division, n / d
@@ -451,22 +477,6 @@ regular_func float2int_z
     subs r0, #1
     bx lr
 
-    cmn r0, r0
-    bcc float2int
-    push {lr}
-    lsls r0, #1
-    lsrs r0, #1
-    movs r1, #0
-    bl __aeabi_f2uiz
-    cmp r0, #0
-    bmi 1f
-    negs r0, r0
-    pop {pc}
-1:
-    movs r0, #128
-    lsls r0, #24
-    pop {pc}
-
 float_section float2int
 regular_func float2int
     shimmable_table_tail_call SF_TABLE_FLOAT2INT float2int_shim
@@ -616,6 +626,7 @@ wrapper_func __aeabi_f2d
 
 float_wrapper_section sqrtf
 wrapper_func_f1 sqrtf
+    nan_if_negative_f
 #if PICO_FLOAT_SUPPORT_ROM_V1 && PICO_RP2040_B0_SUPPORTED
     // check for negative
     asrs r1, r0, #23
@@ -636,6 +647,139 @@ wrapper_func_f1 sqrtf
     lsls r0, #23
     bx lr
 #endif
+
+float_section float_reduce_2pi
+// For finite |x| >= 128, returns x reduced to [-pi, pi] to within an ulp, for the ROM sin/cos/tan which need
+// |x| < 128. |x| = m * 2^(e - 150), so frac(|x| / 2pi) only needs the bits of 1/(2*pi) from 2^(149 - e) down;
+// a 96 bit window of them, from the byte holding that bit, is multiplied by m a byte at a time.
+.type float_reduce_2pi,%function
+.thumb_func
+float_reduce_2pi:
+    lsls r1, r0, #1
+    lsrs r1, #24
+    cmp r1, #255
+    beq 9f
+    push {r4-r7}
+    subs r1, #118
+    lsrs r1, #3
+    ldr r6, =inv_2pi_bytes - 2
+    adds r6, r1
+    movs r7, #12
+    adds r7, r6
+    // m
+    lsls r1, r0, #9
+    lsrs r1, #9
+    movs r2, #1
+    lsls r2, #23
+    orrs r1, r2
+    // r4:r3:r2 = (m * window) mod 2^96
+    movs r2, #0
+    movs r3, #0
+    movs r4, #0
+1:
+    lsls r4, #8
+    lsrs r5, r3, #24
+    orrs r4, r5
+    lsls r3, #8
+    lsrs r5, r2, #24
+    orrs r3, r5
+    lsls r2, #8
+    ldrb r5, [r6, #0]
+    muls r5, r1
+    adds r2, r5
+    movs r5, #0
+    adcs r3, r5
+    adcs r4, r5
+    lsls r4, #8
+    lsrs r5, r3, #24
+    orrs r4, r5
+    lsls r3, #8
+    lsrs r5, r2, #24
+    orrs r3, r5
+    lsls r2, #8
+    ldrb r5, [r6, #1]
+    muls r5, r1
+    adds r2, r5
+    movs r5, #0
+    adcs r3, r5
+    adcs r4, r5
+    adds r6, #2
+    cmp r6, r7
+    bne 1b
+    // shift out the s bits above the window start (s = (e - 118) & 7) to give r4:r3 = frac(|x| / 2pi) as 0.64
+    lsls r5, r0, #1
+    lsrs r5, #24
+    adds r5, #2
+    movs r6, #7
+    ands r5, r6
+    movs r6, #32
+    subs r6, r5
+    lsls r4, r5
+    movs r7, r3
+    lsrs r7, r6
+    lsls r3, r5
+    lsrs r2, r6
+    orrs r3, r2
+    orrs r4, r7
+    // a fraction of 0.5 or more is negative, i.e. in [-0.5, 0)
+    bpl 2f
+    negs r3, r3
+    mvns r4, r4
+    movs r2, #0
+    adcs r4, r2
+    movs r2, #1
+    lsls r2, #31
+    eors r0, r2
+2:
+    // normalize, counting down the exponent
+    movs r5, #129
+3:
+    subs r5, #1
+    adds r3, r3
+    adcs r4, r4
+    bpl 3b
+    // r4 = top 32 bits of r4 * 2*pi * 2^29, from 16 bit pieces
+    ldr r6, =0xc90fdaa2
+    uxth r7, r6
+    lsrs r6, #16
+    uxth r2, r4
+    lsrs r4, #16
+    muls r7, r4
+    lsrs r7, #16
+    muls r2, r6
+    lsrs r2, #16
+    muls r4, r6
+    adds r4, r7
+    adds r4, r2
+    bmi 4f
+    adds r4, r4
+    subs r5, #1
+4:
+    // round to 24 bits; a carry out of the mantissa goes into the exponent
+    lsrs r4, #7
+    adds r4, #1
+    lsrs r4, #1
+    subs r5, #1
+    lsls r5, #23
+    adds r4, r5
+    lsrs r0, #31
+    lsls r0, #31
+    orrs r0, r4
+    pop {r4-r7}
+    bx lr
+9:
+    // nan
+    movs r1, #1
+    lsls r1, #22
+    orrs r0, r1
+    bx lr
+
+.ltorg
+// the bits of 1/(2*pi) after two zero bytes, which are read for exponents below 2^23
+inv_2pi_bytes:
+.byte 0x00, 0x00, 0x28, 0xbe, 0x60, 0xdb, 0x93, 0x91, 0x05
+.byte 0x4a, 0x7f, 0x09, 0xd5, 0xf4, 0x7d, 0x4d, 0x37, 0x70
+.byte 0x36, 0xd8, 0xa5, 0x66, 0x4f, 0x10, 0xe4, 0x10, 0x7f
 
 float_wrapper_section cosf
 // note we don't use _f1 since we do an infinity/nan check for outside of range
@@ -659,9 +803,8 @@ wrapper_func cosf
     bx lr
 3:
 #endif
-    ldr r1, =0x40c90fdb // 2 * M_PI
     push {lr}
-    bl remainderf
+    bl float_reduce_2pi
     pop {r1}
     mov lr, r1
     b 2b
@@ -688,9 +831,8 @@ wrapper_func sinf
     bx lr
 3:
 #endif
-    ldr r1, =0x40c90fdb // 2 * M_PI
     push {lr}
-    bl remainderf
+    bl float_reduce_2pi
     pop {r1}
     mov lr, r1
     b 2b
@@ -731,9 +873,8 @@ wrapper_func sincosf
     bx lr
 4:
 #endif
-    ldr r1, =0x40c90fdb // 2 * M_PI
     push {lr}
-    bl remainderf
+    bl float_reduce_2pi
     pop {r1}
     mov lr, r1
     b 2b
@@ -783,9 +924,8 @@ ftan_out_of_range:
     bx lr
 3:
 #endif
-    ldr r1, =0x40c90fdb // 2 * M_PI
     push {lr}
-    bl remainderf
+    bl float_reduce_2pi
     pop {r1}
     mov lr, r1
     b ftan_in_range
@@ -800,4 +940,5 @@ wrapper_func_f1 expf
 
 float_wrapper_section logf
 wrapper_func_f1 logf
+    nan_if_negative_f
     table_tail_call SF_TABLE_FLN

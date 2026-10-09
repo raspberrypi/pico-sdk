@@ -15,8 +15,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 #include <pico/double.h>
 #include "pico/stdlib.h"
+
+#if defined(LLVM_LIBC_COMMON_H) && !defined(__LLVM_LIBC__)
+#define __LLVM_LIBC__ 1
+#endif
 // Include sys/types.h before inttypes.h to work around issue with
 // certain versions of GCC and newlib which causes omission of PRIx64
 #include <sys/types.h>
@@ -293,6 +298,8 @@ int test_dcmpun() {
 
 #define assert_nan(a) test_assert(isnan(a))
 #define check_nan(a) ({ assert_nan(a); a; })
+// records a failure but carries on, so every domain error is reported
+#define check_domain_nan(a) ({ __typeof__(a) r = (a); if (!isnan(r)) { printf("Expected NaN: %s = %g\n", #a, (double)r); fail = true; } r; })
 
 double __attribute__((pcs("aapcs"))) __aeabi_i2d(int32_t);
 double __attribute__((pcs("aapcs"))) __aeabi_ui2d(int32_t);
@@ -300,6 +307,8 @@ double __attribute__((pcs("aapcs"))) __aeabi_l2d(int64_t);
 double __attribute__((pcs("aapcs"))) __aeabi_ul2d(int64_t);
 int32_t __attribute__((pcs("aapcs")))__aeabi_d2iz(double);
 int64_t __attribute__((pcs("aapcs"))) __aeabi_d2lz(double);
+uint32_t __attribute__((pcs("aapcs"))) __aeabi_d2uiz(double);
+uint64_t __attribute__((pcs("aapcs"))) __aeabi_d2ulz(double);
 double __attribute__((pcs("aapcs"))) __aeabi_dmul(double, double);
 double __attribute__((pcs("aapcs"))) __aeabi_ddiv(double, double);
 #if LIB_PICO_DOUBLE_PICO
@@ -311,6 +320,8 @@ double __attribute__((pcs("aapcs"))) __real___aeabi_dmul(double, double);
 double __attribute__((pcs("aapcs"))) __real___aeabi_ddiv(double, double);
 int32_t __attribute__((pcs("aapcs"))) __real___aeabi_d2iz(double);
 int64_t __attribute__((pcs("aapcs"))) __real___aeabi_d2lz(double);
+uint32_t __attribute__((pcs("aapcs"))) __real___aeabi_d2uiz(double);
+uint64_t __attribute__((pcs("aapcs"))) __real___aeabi_d2ulz(double);
 double __real_sqrt(double);
 double __real_cos(double);
 double __real_sin(double);
@@ -329,9 +340,9 @@ double __real_fma(double, double, double);
 
 #define FRAC ((double)(1ull << 50))
 #define allowed_range(a) (fabs(a) / FRAC)
-#define assert_close(a, b) test_assert((fabs((a) - (b)) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; })) || (isinf(a) && isinf(b) && ((a) < 0) == ((b) < 0)))
-#define check1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
-#define check2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
+#define assert_close(a, b) test_assert((isinf(a) && isinf(b) && ((a) < 0) == ((b) < 0)) || fabs((a) - (b)) <= allowed_range(a) || ({ printf("  error: %f != %f\n", a, b); 0; }))
+#define check1(func,p0) ({ __typeof__(func(p0)) r = func(p0), r2 = __CONCAT(__real_, func)(p0); test_assert(r == r2); r; })
+#define check2(func,p0,p1) ({ __typeof__(func(p0,p1)) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); test_assert(r == r2); r; })
 #define check_close1(func,p0) ({ typeof(p0) r = func(p0), r2 = __CONCAT(__real_, func)(p0); if (isnan(p0)) assert_nan(r); else assert_close(r, r2); r; })
 #define check_close2(func,p0,p1) ({ typeof(p0) r = func(p0,p1), r2 = __CONCAT(__real_, func)(p0,p1); if (isnan(p0) || isnan(p1)) assert_nan(r); else assert_close(r, r2); r; })
 #define check_close3(func,p0,p1,p2) ({ typeof(p0) r = func(p0,p1,p2), r2 = __CONCAT(__real_, func)(p0,p1,p2); if (isnan(p0) || isnan(p1) || isnan(p2)) assert_nan(r); else assert_close(r, r2); r; })
@@ -350,6 +361,14 @@ int main() {
     setup_default_uart();
 
     bool fail = false;
+
+#if !(defined(__LLVM_LIBC__) && defined(__llvm__))
+    // asinh(+0) must keep its sign
+    {
+        volatile double zero = 0.0;
+        test_assert(!signbit(asinh(zero)) && signbit(asinh(-zero)));
+    }
+#endif
 
     printf("%d\n", aa < bb);
     for(double a = -1; a <= 1; a++) {
@@ -397,9 +416,30 @@ int main() {
         }
     }
 
+    // large arguments against exact values (x, sin, cos, tan); the last is the closest double to a multiple
+    // of 2*pi. The tolerance allows for the RP2040 ROM's absolute error
+    static const double big_trig[][4] = {
+        {1e4, -0.30561438888825215, -0.9521553682590148, 0.3209711346238147},
+        {-3.7e15, 0.9988434852896376, -0.04808005713858381, -20.774590230011913},
+        {1e22, -0.8522008497671888, 0.523214785395139, -1.6287782256068988},
+        {1e300, -0.8178819121159085, -0.5753861119575491, 1.4214488238747245},
+        {DBL_MAX, 0.004961954789184062, -0.9999876894265599, -0.004962015874444895},
+        {2.1277490593306166e+256, 1.874866369701851e-18, 1.0, 1.874866369701851e-18},
+    };
+    for (uint i = 0; i < count_of(big_trig); i++) {
+        volatile double vx = big_trig[i][0];
+        double x = vx, t = big_trig[i][3], s, c;
+        sincos(x, &s, &c);
+        if (fabs(sin(x) - big_trig[i][1]) > 1e-15 || fabs(cos(x) - big_trig[i][2]) > 1e-15 ||
+            fabs(tan(x) - t) > 1e-15 * (1 + t * t) || s != sin(x) || c != cos(x)) {
+            printf("Large argument trig error at %g: %.17g %.17g %.17g\n", x, sin(x), cos(x), tan(x));
+            fail = true;
+        }
+    }
+
 #if PICO_DOUBLE_PROPAGATE_NANS
     {
-        float x = NAN;
+        double x = NAN;
         printf("SQRT %10.18g\n", check_close1(sqrt, x));
         printf("COS %10.18g\n", check_close1(cos, x));
         printf("SIN %10.18g\n", check_close1(sin, x));
@@ -415,6 +455,33 @@ int main() {
         double s, c;
         sincos(x, &s, &c);
         printf("SINCOS %10.18f %10.18f\n", check_nan(s), check_nan(c));
+
+        // domain errors (volatile so the compiler can't fold the results)
+        volatile double half = 0.5, minus_one = -1.0, two = 2.0, minus_inf = -INFINITY, minus_nan = -NAN, minus_zero = -0.0;
+        // LLVM libc doesn't provide these (asin and acos arrived in clang 23)
+#if !(defined(__LLVM_LIBC__) && defined(__llvm__))
+        printf("ACOSH %10.18f\n", check_domain_nan(acosh(half)));
+        printf("ACOSH %10.18f\n", check_domain_nan(acosh(minus_one)));
+#endif
+#if !(defined(__LLVM_LIBC__) && defined(__llvm__) && (__clang_major__ < 23))
+        printf("ASIN %10.18f\n", check_domain_nan(asin(two)));
+        printf("ACOS %10.18f\n", check_domain_nan(acos(two)));
+#endif
+        printf("SQRT %10.18f\n", check_domain_nan(sqrt(minus_one)));
+        printf("LN %10.18f\n", check_domain_nan(log(minus_one)));
+        printf("LOG2 %10.18f\n", check_domain_nan(log2(minus_one)));
+        printf("LOG10 %10.18f\n", check_domain_nan(log10(minus_one)));
+        printf("LN %10.18f\n", check_domain_nan(log(minus_inf)));
+        printf("LN %10.18f\n", check_domain_nan(log(minus_nan)));
+        test_assert(log(minus_zero) == -INFINITY);
+        volatile double inf = INFINITY, big = 1e307;
+        printf("DADD %10.18f\n", check_domain_nan(inf + minus_inf));
+        printf("DADD %10.18f\n", check_domain_nan(minus_inf + inf));
+        printf("DSUB %10.18f\n", check_domain_nan(inf - inf));
+        printf("DSUB %10.18f\n", check_domain_nan(minus_inf - minus_inf));
+        test_assert(inf + big == INFINITY);
+        test_assert(inf - big == INFINITY);
+        test_assert(minus_inf + big == -INFINITY);
 
         for(int j=0;j<2;j++) {
             for (int i = 1; i < 4; i++) {
@@ -510,12 +577,18 @@ int main() {
         }
     }
     for(double x = -4294967296.f * 4294967296.f; x<=-0.5f; x/=2.f) {
-        printf("d2i32 %f->%d\n", x, (int32_t)x);
-        check1(__aeabi_d2iz, x);
+        printf("d2i32 %f\n", x);
+        if (x < (double) INT32_MIN) {
+#if TEST_SATURATION
+            test_assert(__aeabi_d2iz(x) == INT32_MIN);
+#endif
+        } else {
+            check1(__aeabi_d2iz, x);
+        }
     }
     for(double x = 4294967296.f * 4294967296.f; x>=0.5f; x/=2.f) {
-        printf("d2i32 %f->%d\n", x, (int32_t)x);
-        if (x >= (double) INT32_MAX - 1 && x <= (double) INT32_MAX + 1) {
+        printf("d2i32 %f\n", x);
+        if (x >= 2147483648.0) {
 #if TEST_SATURATION
             test_assert(__aeabi_d2iz(x) == INT32_MAX);
 #endif
@@ -523,6 +596,30 @@ int main() {
             check1(__aeabi_d2iz, x);
         }
     }
+    for(double x = 4294967296.f * 4294967296.f * 2.f; x>=0.5f; x/=2.f) {
+        printf("d2u %f\n", x);
+        if (x >= 4294967296.0) {
+#if TEST_SATURATION
+            test_assert(__aeabi_d2uiz(x) == UINT32_MAX);
+#endif
+        } else {
+            check1(__aeabi_d2uiz, x);
+        }
+        if (x >= 18446744073709551616.0) {
+#if TEST_SATURATION
+            test_assert(__aeabi_d2ulz(x) == UINT64_MAX);
+#endif
+        } else {
+            check1(__aeabi_d2ulz, x);
+        }
+    }
+#if TEST_SATURATION
+    // negative values give 0 when converted to unsigned
+    for(double x = -0.5; x>=-4294967296.f * 4294967296.f * 2.f; x*=2.0) {
+        test_assert(__aeabi_d2uiz(x) == 0);
+        test_assert(__aeabi_d2ulz(x) == 0);
+    }
+#endif
     for (double x = 1; x < 11.0; x += 2.0) {
         double f = x * x;
         double g = 1.0 / x;

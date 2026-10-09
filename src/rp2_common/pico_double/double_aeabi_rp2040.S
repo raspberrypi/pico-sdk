@@ -36,6 +36,22 @@ PICO_RUNTIME_INIT_FUNC_RUNTIME(__aeabi_double_init, PICO_RUNTIME_INIT_AEABI_DOUB
 #endif
 .endm
 
+// the ROM gives -Inf for a negative argument to log and sqrt; return NaN instead
+// (-0 and negative denormals are left to the ROM)
+.macro nan_if_negative_d
+#if PICO_DOUBLE_PROPAGATE_NANS
+    lsls r2, r1, #1
+    bcc 3f
+    lsrs r2, #21
+    beq 3f
+    movs r0, #0
+    mvns r1, r0
+    lsls r1, #19                // 0xfff80000
+    bx lr
+3:
+#endif
+.endm
+
 .macro wrapper_func_d2 x
     _double_wrapper_func \x
 #if PICO_DOUBLE_PROPAGATE_NANS
@@ -167,6 +183,20 @@ wrapper_func_d2 __aeabi_dsub
    shimmable_table_tail_call SF_TABLE_FSUB dsub_shim
 
 wrapper_func_d2 __aeabi_dadd
+#if PICO_DOUBLE_PROPAGATE_NANS
+    // likewise for inf + -inf
+    mov ip, r0
+    mov r0, r1
+    eors r0, r3
+    bpl 1f // same signs
+    mov r0, ip
+    push {r0-r3, lr}
+    bl 2f
+    b ddiv_dsub_nan_helper
+1:
+    mov r0, ip
+2:
+#endif
    shimmable_table_tail_call SF_TABLE_FADD dadd_shim
 
 // double FUNC_NAME(__aeabi_ddiv)(double n, double d)     double-precision division, n / d
@@ -223,7 +253,7 @@ ddiv_dsub_nan_helper:
     lsls r2, #1
     asrs r2, r2, #21
     lsls r3, #1
-    asrs r3, r3, #24
+    asrs r3, r3, #21
     ands r2, r3
     adds r2, #1
     bne 3f
@@ -459,46 +489,36 @@ regular_func int2double
 double_wrapper_section __aeabi_d2iz
 wrapper_func __aeabi_d2iz
 regular_func double2int_z
-    push {r4, lr}
-    lsls r4, r1, #1
-    lsrs r2, r4, #21
+    lsls r2, r1, #1
+    lsrs r2, #21
     movs r3, #0x80
     adds r2, r3
     lsls r3, #3
-    subs r2, r3
-    lsls r3, #21
+    subs r2, r3                 // exponent rebased to float bias
+    lsls r3, #21                // 0x80000000
     cmp r2, #126
-    ble 1f
+    ble 1f                      // |x| < 1
     subs r2, #158
-    bge 2f
-    asrs r4, r1, #31
-    lsls r1, #12
-    lsrs r1, #1
-    orrs r1, r3
+    bge 2f                      // |x| >= 2^31, Inf or NaN
     negs r2, r2
-    lsrs r1, r2
-    lsls r4, #1
-    adds r4, #1
-    adds r2, #21
-    cmp r2, #32
-    bge 3f
+    lsrs r0, #21
+    orrs r0, r3
+    lsls r3, r1, #11
+    orrs r0, r3                 // top 32 bits of the mantissa, with the implied 1
     lsrs r0, r2
-    orrs r0, r1
-    muls r0, r4
-    pop {r4, pc}
+    asrs r1, #31
+    eors r0, r1
+    subs r0, r1                 // apply the sign
+    bx lr
 1:
     movs r0, #0
-    pop {r4, pc}
-3:
-    mov r0, r1
-    muls r0, r4
-    pop {r4, pc}
+    bx lr
 2:
     // overflow
     lsrs r0, r1, #31
     adds r0, r3
     subs r0, #1
-    pop {r4, pc}
+    bx lr
 
 double_section double2int
 regular_func double2int
@@ -699,17 +719,222 @@ wrapper_func __aeabi_d2f
 
 double_wrapper_section srqt
 wrapper_func_d1 sqrt
+    nan_if_negative_d
     shimmable_table_tail_call SF_TABLE_FSQRT dsqrt_shim
 
-double_wrapper_section sincostan_remainder
+double_section sincostan_remainder
+// For finite |x| >= 1024, returns x reduced to [-pi, pi] to within about half an ulp, for the ROM sin/cos/tan which
+// need |x| < 1024. |x| = m * 2^(e - 1075), so frac(|x| / 2pi) only needs the bits of 1/(2*pi) from 2^(1074 - e) down;
+// a 224 bit window of them, from the word holding that bit, is multiplied by m into p on the stack.
+// stack: p[-1] = 0, p[0..6] at sp+4, then &window low word, the window shift, hi(x), m_hi
+9:
+    // nan
+    movs r2, #1
+    lsls r2, #19
+    orrs r1, r2
+    bx lr
 regular_func sincostan_remainder
-    ldr r2, =0x54442D18 // 2 * M_PI
-    ldr r3, =0x401921FB
-    push {lr}
-    // note remainder only uses the divider thru integer divider functions
-    // which save and restore themselves
-    bl remainder
-    pop {pc}
+    lsls r2, r1, #1
+    asrs r2, #21
+    adds r2, #1
+    beq 9b
+    push {r4-r7, lr}
+    sub sp, #48
+    movs r2, #0
+    movs r3, #0
+    movs r4, #0
+    movs r5, #0
+    mov r7, sp
+    stmia r7!, {r2-r5}
+    stmia r7!, {r2-r5}
+    lsls r2, r1, #1
+    lsrs r2, #21
+    ldr r3, =1011
+    subs r2, r3
+    lsrs r4, r2, #5
+    lsls r4, #2
+    ldr r3, =inv_2pi_words + 24
+    adds r4, r3
+    str r4, [sp, #32]
+    lsls r2, #27
+    lsrs r2, #27
+    str r2, [sp, #36]
+    str r1, [sp, #40]
+    lsls r3, r1, #12
+    lsrs r3, #12
+    movs r2, #1
+    lsls r2, #20
+    orrs r3, r2
+    str r3, [sp, #44]
+    // p += m_lo * window, then p[1..] += m_hi * window, mod 2^224
+    movs r5, r0
+    add r7, sp, #4
+1:
+    movs r6, #0
+2:
+    ldr r0, [r4]
+    subs r4, #4
+    movs r1, r5
+    bl umul32
+    ldr r2, [r7]
+    adds r0, r2
+    movs r2, #0
+    adcs r1, r2
+    adds r0, r6
+    adcs r1, r2
+    stmia r7!, {r0}
+    movs r6, r1
+    add r0, sp, #32
+    cmp r7, r0
+    bne 2b
+    ldr r5, [sp, #44]
+    cmp r5, #0
+    beq 3f
+    movs r0, #0
+    str r0, [sp, #44]
+    ldr r4, [sp, #32]
+    add r7, sp, #8
+    b 1b
+3:
+    // shift out the s bits above the window start to give frac(|x| / 2pi) as 0.224; a fraction of 0.5 or more
+    // is negative, so is inverted (the missing +1 is below the precision of the window)
+    ldr r2, [sp, #36]
+    movs r3, #32
+    subs r3, r2
+    ldr r0, [sp, #28]
+    ldr r1, [sp, #24]
+    lsls r0, r2
+    lsrs r1, r3
+    orrs r0, r1
+    asrs r6, r0, #31
+    add r7, sp, #28
+4:
+    ldr r0, [r7]
+    subs r7, #4
+    ldr r1, [r7]
+    lsls r0, r2
+    lsrs r1, r3
+    orrs r0, r1
+    eors r0, r6
+    str r0, [r7, #4]
+    mov r0, sp
+    cmp r7, r0
+    bne 4b
+    ldr r0, [sp, #40]
+    eors r0, r6
+    lsrs r0, #31
+    lsls r0, #31
+    str r0, [sp, #40]
+    // normalize, counting the shift in r6: skip zero words, then load the top 96 bits as r5:r4:r3
+    movs r6, #0
+    add r7, sp, #28
+    add r3, sp, #12
+5:
+    ldr r0, [r7]
+    cmp r0, #0
+    bne 6f
+    cmp r7, r3
+    beq 6f
+    subs r7, #4
+    adds r6, #32
+    b 5b
+6:
+    subs r7, #8
+    ldmia r7!, {r3, r4, r5}
+    movs r0, r3
+    orrs r0, r4
+    orrs r0, r5
+    beq 8f
+    b 7f
+6:
+    adds r6, #1
+    adds r3, r3
+    adcs r4, r4
+    adcs r5, r5
+7:
+    cmp r5, #0
+    bge 6b
+    // r1:r0 = top 64 bits of r5:r4 * 2*pi * 2^61
+    movs r0, r5
+    ldr r1, =0x2168c235
+    bl umul32
+    movs r7, r1
+    movs r0, r4
+    ldr r1, =0xc90fdaa2
+    bl umul32
+    movs r4, r1
+    movs r0, r5
+    ldr r1, =0xc90fdaa2
+    bl umul32
+    movs r2, #0
+    adds r0, r7
+    adcs r1, r2
+    adds r0, r4
+    adcs r1, r2
+    bmi 1f
+    adds r0, r0
+    adcs r1, r1
+    adds r6, #1
+1:
+    // round to 53 bits; a carry out of the mantissa goes into the exponent
+    movs r2, #1
+    lsls r2, #10
+    adds r0, r2
+    movs r2, #0
+    adcs r1, r2
+    lsls r2, r1, #21
+    lsrs r0, #11
+    orrs r0, r2
+    lsrs r1, #11
+    movs r2, #1
+    lsls r2, #10
+    subs r2, r6
+    lsls r2, #20
+    adds r1, r2
+8:
+    ldr r2, [sp, #40]
+    orrs r1, r2
+    add sp, #48
+    pop {r4-r7, pc}
+
+// r1:r0 = r0 * r1, using r2, r3 and ip
+.thumb_func
+umul32:
+    lsrs r2, r0, #16
+    uxth r0, r0
+    lsrs r3, r1, #16
+    uxth r1, r1
+    mov ip, r2
+    muls r2, r1
+    muls r1, r0
+    muls r0, r3
+    adds r0, r2
+    mov r2, ip
+    muls r3, r2
+    movs r2, #0
+    adcs r2, r2
+    lsls r2, #16
+    adds r3, r2
+    lsls r2, r0, #16
+    lsrs r0, #16
+    adds r1, r2
+    adcs r3, r0
+    movs r0, r1
+    movs r1, r3
+    bx lr
+
+.ltorg
+.align 2
+// the bits of 1/(2*pi) after two zero words, which are read for |x| < 2^52
+inv_2pi_words:
+.word 0, 0
+.word 0x28be60db, 0x9391054a, 0x7f09d5f4, 0x7d4d3770, 0x36d8a566, 0x4f10e410
+.word 0x7f9458ea, 0xf7aef158, 0x6dc91b8e, 0x909374b8, 0x01924bba, 0x82746487
+.word 0x3f877ac7, 0x2c4a69cf, 0xba208d7d, 0x4baed121, 0x3a671c09, 0xad17df90
+.word 0x4e64758e, 0x60d4ce7d, 0x272117e2, 0xef7e4a0e, 0xc7fe25ff, 0xf7816603
+.word 0xfbcbc462, 0xd6829b47, 0xdb4d9fb3, 0xc9f2c26d, 0xd3d18fd9, 0xa797fa8b
+.word 0x5d49eeb1, 0xfaf97c5e, 0xcf41ce7d, 0xe294a4ba, 0x9afed7ec, 0x47e35742
+.word 0x1580cc11
 
 double_wrapper_section cos
 #don't use _d1 as we're doing a range check anyway and infinites/nans are bigger than 1024
@@ -930,6 +1155,7 @@ wrapper_func_d1 exp
 
 double_wrapper_section log
 wrapper_func_d1 log
+    nan_if_negative_d
     shimmable_table_tail_call SF_TABLE_FLN dln_shim
 
 #endif

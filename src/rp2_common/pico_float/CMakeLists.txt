@@ -167,7 +167,7 @@
                 # version for explicit AEABI calls
                 NO_AEABI_ARITHMETIC # direct VFP instruction support
                 NO_AEABI_CMP        # direct VFP instruction support
-                NO_AEABI_CONV_32    # direct VFP instruction support
+                NO_AEABI_CONV_32    # direct VFP instruction support (f2iz/f2uiz are wrapped below)
                 #NO_AEABI_CONV_64   # we have optimized M33 versions
                 NO_AEABI_CONV_DOUBLE# direct VFP instruction support
                 NO_SQRTF            # direct VFP instruction support
@@ -175,6 +175,9 @@
                 #NO_SCI_EXTRA       # todo - are our versions better than what GCC proides?
                 NO_FMAF             # direct VFP instruction support
         )
+        # explicit calls get our saturating versions; not all compilers' runtime versions saturate
+        pico_wrap_function(pico_float_pico_vfp __aeabi_f2iz)
+        pico_wrap_function(pico_float_pico_vfp __aeabi_f2uiz)
         # this allows inlining of sqrtf for example - if you really want errno support, use pico_float_compiler
         target_compile_options(pico_float_pico_vfp INTERFACE -fno-math-errno)
 
