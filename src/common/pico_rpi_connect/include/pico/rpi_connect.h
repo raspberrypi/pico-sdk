@@ -284,34 +284,32 @@ int rpi_connect_complete_deployment(const char *token, const char *deployment_id
  */
 int rpi_connect_fail_deployment(const char *token, const char *deployment_id, const char *reason);
 
-/*! \brief Register a device identity with an organisation via
+/*! \brief Register the device identity with an organisation via
  *  POST /organisation/device-identities
  *  \ingroup pico_rpi_connect
  *
+ * Registers the public key of the device identity key (see pico/rpi_connect_identity.h),
+ * signing the request with its private key.
+ *
  * \param org_token organisation token
- * \param private_key 32-byte raw P-256 private key
- * \param public_key_pem PEM-encoded public key to register
  * \param description description for the device identity
  * \param device_name optional device name, or NULL
  * \return The new identity's id (caller frees), or NULL on error
  */
 char *rpi_connect_create_device_identity(
     const char *org_token,
-    const unsigned char *private_key,
-    const char *public_key_pem,
     const char *description,
     const char *device_name);
 
-/*! \brief Exchange a registered device identity for a Connect access token
+/*! \brief Exchange the registered device identity for a Connect access token
  *  \ingroup pico_rpi_connect
  *
- * POST /client/device-identity-exchange, signed with the device's P-256
- * private key (X-Connect-Identity-Signature).
+ * POST /client/device-identity-exchange, with the public key of the device identity key
+ * (see pico/rpi_connect_identity.h), signed with its private key (X-Connect-Identity-Signature).
+ * The request is dated (X-Connect-Timestamp), so if the time hasn't been set it is fetched with
+ * rpi_connect_update_time() first.
  *
  * \param client_id       fixed Connect client UUID
- * \param private_key     32-byte raw P-256 private key matching the
- *                        registered identity's public_key
- * \param public_key_pem  PEM-encoded public key matching a registered identity
  * \param hostname        used as device name when the identity has none set
  * \param serial_number   32- or 64-bit hex serial used to identify the device
  * \param out_device_id   if non-NULL, set to a strdup() of the returned
@@ -321,8 +319,6 @@ char *rpi_connect_create_device_identity(
  */
 char *rpi_connect_device_identity_exchange(
     const char *client_id,
-    const unsigned char *private_key,
-    const char *public_key_pem,
     const char *hostname,
     const char *serial_number,
     char **out_device_id);

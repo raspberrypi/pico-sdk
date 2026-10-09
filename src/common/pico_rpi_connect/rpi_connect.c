@@ -8,7 +8,9 @@
 #include "pico/rpi_connect_util.h"
 #include <cJSON.h>
 
+#include "pico/rpi_connect_identity.h"
 #include "pico/rpi_connect/internal/connect_crypto.h"
+#include "pico/rpi_connect/internal/connect_identity.h"
 #include "pico/rpi_connect/internal/request.h"
 #include "pico/rpi_connect/internal/rpi_connect_ca_cert.h"
 #include "pico/rpi_connect/internal/slist.h"
@@ -878,10 +880,10 @@ static char *base64_encode(const unsigned char *data, size_t len) {
     return out;
 }
 
+// Sign the request with the device identity key (which is never handled here)
 static char *rpi_calculate_identity_signature(
     http_method_t method, const char *url, struct curl_slist *headers,
-    const void *data, size_t data_size,
-    const unsigned char *private_key) {
+    const void *data, size_t data_size) {
     char *buf = calloc(1, 4096);
     if (!buf) return NULL;
 
@@ -927,9 +929,9 @@ static char *rpi_calculate_identity_signature(
     }
     free(buf);
 
-    unsigned char sig[RPI_CONNECT_CRYPTO_ECDSA_P256_SIG_MAX_SIZE];
+    uint8_t sig[RPI_CONNECT_IDENTITY_SIG_MAX_SIZE];
     size_t sig_len = sizeof(sig);
-    if (rpi_connect_crypto_ecdsa_p256_sign(payload_hash, private_key, sig, &sig_len) != 0)
+    if (rpi_connect_identity_sign_hash(payload_hash, sig, &sig_len) != 0)
         return NULL;
 
     return base64_encode(sig, sig_len);
@@ -937,13 +939,18 @@ static char *rpi_calculate_identity_signature(
 
 char *rpi_connect_create_device_identity(
     const char *org_token,
-    const unsigned char *private_key,
-    const char *public_key_pem,
     const char *description,
     const char *device_name) {
     char *id = NULL;
     memory_struct_t chunk;
     rpi_connect_memory_struct_init(&chunk);
+
+    char *public_key_pem = rpi_connect_identity_public_key_pem();
+    if (!public_key_pem) {
+        RPI_CONNECT_ERROR("Failed to get device identity public key\n");
+        rpi_connect_memory_struct_free(&chunk);
+        return NULL;
+    }
 
     cJSON *json = cJSON_CreateObject();
     cJSON_AddStringToObject(json, "public_key", public_key_pem);
@@ -952,6 +959,7 @@ char *rpi_connect_create_device_identity(
         cJSON_AddStringToObject(json, "device_name", device_name);
     char *json_str = cJSON_PrintUnformatted(json);
     cJSON_Delete(json);
+    free(public_key_pem);
     if (!json_str) {
         rpi_connect_memory_struct_free(&chunk);
         return NULL;
@@ -970,7 +978,7 @@ char *rpi_connect_create_device_identity(
     sig_headers = curl_slist_append(sig_headers, "Accept: */*");
 
     char *signature = rpi_calculate_identity_signature(
-        HTTP_POST, url, sig_headers, json_str, strlen(json_str), private_key);
+        HTTP_POST, url, sig_headers, json_str, strlen(json_str));
     curl_slist_free_all(sig_headers);
 
     if (!signature) {
@@ -1054,8 +1062,6 @@ char *rpi_connect_create_device_identity(
 
 char *rpi_connect_device_identity_exchange(
     const char *client_id,
-    const unsigned char *private_key,
-    const char *public_key_pem,
     const char *hostname,
     const char *serial_number,
     char **out_device_id) {
@@ -1066,60 +1072,58 @@ char *rpi_connect_device_identity_exchange(
     if (out_device_id)
         *out_device_id = NULL;
 
-    cJSON *json = cJSON_CreateObject();
-    cJSON_AddStringToObject(json, "client_id", client_id);
-    cJSON_AddStringToObject(json, "public_key", public_key_pem);
-    cJSON_AddStringToObject(json, "hostname", hostname);
-    cJSON_AddStringToObject(json, "serial_number", serial_number);
-    char *json_str = cJSON_PrintUnformatted(json);
-    cJSON_Delete(json);
-    if (!json_str) {
+    // The device identity key functions build and sign the request body, so the signer knows
+    // what it is signing
+    rpi_connect_identity_exchange_t *exchange = calloc(1, sizeof(*exchange));
+    if (!exchange) {
+        rpi_connect_memory_struct_free(&chunk);
+        return NULL;
+    }
+    if (!client_id || !hostname || !serial_number ||
+        snprintf(exchange->api_host, sizeof(exchange->api_host), "%s", rpi_connect_api_host()) >= (int)sizeof(exchange->api_host) ||
+        snprintf(exchange->client_id, sizeof(exchange->client_id), "%s", client_id) >= (int)sizeof(exchange->client_id) ||
+        snprintf(exchange->hostname, sizeof(exchange->hostname), "%s", hostname) >= (int)sizeof(exchange->hostname) ||
+        snprintf(exchange->serial_number, sizeof(exchange->serial_number), "%s", serial_number) >= (int)sizeof(exchange->serial_number)) {
+        RPI_CONNECT_ERROR("Invalid device identity exchange argument\n");
+        free(exchange);
         rpi_connect_memory_struct_free(&chunk);
         return NULL;
     }
 
-    const char *endpoint = "/client/device-identity-exchange";
+    // The request must be dated (X-Connect-Timestamp), so it is only valid for a short time. The
+    // server rejects a timestamp more than a few minutes from its own clock with a 403.
+    exchange->timestamp = rpi_connect_time();
+    if (exchange->timestamp <= 0)
+        exchange->timestamp = rpi_connect_update_time();
+    if (exchange->timestamp <= 0) {
+        RPI_CONNECT_ERROR("Device identity exchange needs the time (see rpi_connect_update_time())\n");
+        free(exchange);
+        rpi_connect_memory_struct_free(&chunk);
+        return NULL;
+    }
 
-    char url[512];
-    snprintf(url, sizeof(url), "https://%s%s", rpi_connect_api_host(), endpoint);
-
-    // Optional replay protection: date the request when wall-clock time
-    // is known (rpi_connect_update_time()). The server rejects a
-    // timestamp more than a few minutes from its own clock with a 403.
-    char ts_header[48];
-    int64_t now = rpi_connect_time();
-    if (now > 0)
-        snprintf(ts_header, sizeof(ts_header),
-                 "X-Connect-Timestamp: %lld", (long long)now);
-
-    // Headers used to compute the X-Connect-Identity-Signature. The set must
-    // mirror what the underlying HTTP client actually transmits so that the
-    // server can recreate and verify the same signed payload.
-    struct curl_slist *sig_headers = NULL;
-    sig_headers = curl_slist_append(sig_headers, "Content-Type: application/json");
-    sig_headers = curl_slist_append(sig_headers, "Accept: */*");
-    if (now > 0)
-        sig_headers = curl_slist_append(sig_headers, ts_header);
-
-    char *signature = rpi_calculate_identity_signature(
-        HTTP_POST, url, sig_headers, json_str, strlen(json_str), private_key);
-    curl_slist_free_all(sig_headers);
-
+    int rc = rpi_connect_identity_sign_exchange(exchange);
+    char *signature = rc == 0 ? base64_encode(exchange->sig, exchange->sig_len) : NULL;
     if (!signature) {
-        RPI_CONNECT_ERROR("Failed to calculate identity signature\n");
-        free(json_str);
+        RPI_CONNECT_ERROR("Failed to sign device identity exchange (%d)\n", rc);
+        free(exchange);
         rpi_connect_memory_struct_free(&chunk);
         return NULL;
     }
 
+    const char *endpoint = RPI_CONNECT_IDENTITY_EXCHANGE_ENDPOINT;
+    const char *json_str = exchange->body;
+
+    // These must match the headers signed by rpi_connect_identity_sign_exchange()
+    char ts_header[48];
+    snprintf(ts_header, sizeof(ts_header), "X-Connect-Timestamp: %lld", (long long)exchange->timestamp);
     struct curl_slist *additional_headers = NULL;
     char sig_header[512];
     snprintf(sig_header, sizeof(sig_header),
              "X-Connect-Identity-Signature: %s", signature);
     additional_headers = curl_slist_append(additional_headers, sig_header);
     additional_headers = curl_slist_append(additional_headers, "Accept: */*");
-    if (now > 0)
-        additional_headers = curl_slist_append(additional_headers, ts_header);
+    additional_headers = curl_slist_append(additional_headers, ts_header);
     free(signature);
 
     long http_code = rpi_connect_request_perform_http(
@@ -1139,7 +1143,7 @@ char *rpi_connect_device_identity_exchange(
     );
 
     curl_slist_free_all(additional_headers);
-    free(json_str);
+    free(exchange);
 
     if (http_code != 200) {
         RPI_CONNECT_ERROR("device identity exchange failed with HTTP code %ld\n",

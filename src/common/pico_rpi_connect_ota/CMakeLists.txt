@@ -10,20 +10,10 @@ if (PICO_ON_DEVICE AND PICO_RP2040)
 endif()
 
 if (NOT TARGET pico_rpi_connect_ota)
-    # OTP row holding the 32-byte P-256 device identity private key.
-    # Override on the cmake command line (-DRPI_CONNECT_IDENTITY_OTP_ROW=0xd0)
-    # or by adding RPI_CONNECT_IDENTITY_OTP_ROW=... to the consuming target's
-    # PRIVATE compile definitions (later -D wins over the INTERFACE default).
-    set(RPI_CONNECT_IDENTITY_OTP_ROW "0xc0" CACHE STRING
-        "OTP row where the device identity P-256 private key is stored")
-
     add_library(pico_rpi_connect_ota INTERFACE)
     target_include_directories(pico_rpi_connect_ota SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
     target_sources(pico_rpi_connect_ota INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/rpi_connect_ota.c
-    )
-    target_compile_definitions(pico_rpi_connect_ota INTERFACE
-        RPI_CONNECT_IDENTITY_OTP_ROW=${RPI_CONNECT_IDENTITY_OTP_ROW}
     )
     if (PICO_ON_DEVICE)
         target_link_libraries(pico_rpi_connect_ota INTERFACE

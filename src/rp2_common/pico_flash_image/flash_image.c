@@ -58,9 +58,12 @@ typedef struct {
     fimg_op_state_e op_state;
     uint32_t total_num_blocks;
     uint32_t rxed_block_count;
-    uint32_t update_family_id;
+    uint32_t config_family_id;      // family_id filter, 0 if any family is permitted
+    uint32_t update_family_id;      // family_id of the current uf2 image
     uint32_t flash_write_address;
-    uint32_t update_start_addr;
+    uint32_t update_start_addr;     // start address of the current uf2 image's partition
+    uint32_t reboot_start_addr;     // start address of the image to reboot into, 0 if none
+    bool     update_no_reboot;      // current image's partition has no_reboot_on_uf2_download
     uint32_t dnld_crc32;
 } flash_image_state_t;
 
@@ -236,9 +239,13 @@ static int read_partition_info(void) {
     uint32_t code_start_offset = FLASH_SECTOR_SIZE * first_sector_number;
     fimg_state->update_start_addr = XIP_BASE + code_start_offset;
 
+    // As for a BOOTSEL uf2 download, some partitions shouldn't cause a reboot
+    fimg_state->update_no_reboot = 0 != (uf2_target_partition.permissions_and_flags &
+                                         PICOBIN_PARTITION_FLAGS_UF2_DOWNLOAD_NO_REBOOT_BITS);
+
     FIMG_DEBUG_PRINTF("info - update partition: %d, family id: %08lx, start addr: %08lx, max "
-        "code size: %08lx\n", target_part_idx, fimg_state->update_family_id,
-        fimg_state->update_start_addr, maximum_code_size);
+        "code size: %08lx, no reboot: %d\n", target_part_idx, fimg_state->update_family_id,
+        fimg_state->update_start_addr, maximum_code_size, fimg_state->update_no_reboot);
 
     return PICO_OK;
 }
@@ -252,20 +259,24 @@ static int process_a_uf2_block(void) {
         return status;
     }
 
-    if (fimg_state->rxed_block_count == 0) { // First block?
+    // First block of a uf2 image? Either the first image, or the next of multiple
+    // concatenated uf2 images, following on from a completed image.
+    if (fimg_state->rxed_block_count == 0 ||
+        fimg_state->rxed_block_count == fimg_state->total_num_blocks) {
 
         if (check_for_rp2350_e10_block()) {
             return STATUS_DISCARD_UF2_BLOCK;  // ignore erata mitigation block
         }
 
          // If a specific family ID is specified, it must match the family ID in the block
-        if (fimg_state->update_family_id != 0 &&
-            fimg_state->update_family_id != fimg_state->rxed_data.uf2_block.file_size) {
+        if (fimg_state->config_family_id != 0 &&
+            fimg_state->config_family_id != fimg_state->rxed_data.uf2_block.file_size) {
             FIMG_DEBUG_PRINTF("error - %s() returned: %i\n", __FUNCTION__, PICO_ERROR_NOT_PERMITTED);
             return PICO_ERROR_NOT_PERMITTED;
         }
 
         // Snapshot metadata
+        fimg_state->rxed_block_count = 0;
         fimg_state->total_num_blocks = fimg_state->rxed_data.uf2_block.num_blocks;
         fimg_state->update_family_id = fimg_state->rxed_data.uf2_block.file_size;
 
@@ -453,8 +464,11 @@ int pico_flash_image_config_for_update(void *state, uint32_t update_family_id) {
     fimg_set_op_state(FIMG_STATE_WAITING_FOR_DATA);
 
     // initialise internal state variables
-    fimg_state->update_family_id = update_family_id;
+    fimg_state->config_family_id = update_family_id;
+    fimg_state->update_family_id = 0;
+    fimg_state->total_num_blocks = 0;
     fimg_state->rxed_block_count = 0;
+    fimg_state->reboot_start_addr = 0;
     fimg_state->rxed_data_index = 0;
     fimg_state->dnld_crc32 = CRC32_INIT;
 
@@ -475,9 +489,11 @@ int pico_flash_image_write_data(void *state, const char *data, uint length) {
 
     if (FIMG_STATE_WRITING_IN_PROGRESS != fimg_state->op_state) {
 
-        if (FIMG_STATE_WAITING_FOR_DATA == fimg_state->op_state) {
-            fimg_set_op_state(FIMG_STATE_WRITING_IN_PROGRESS);
-            // First time only, now drop through to the programming loop
+        if (FIMG_STATE_WAITING_FOR_DATA == fimg_state->op_state ||
+            FIMG_STATE_WRITE_SUCCESS == fimg_state->op_state) {
+            // First time, or more data following completed uf2 image(s) - which
+            // must be another concatenated uf2 image.
+            // Drop through to the programming loop
         }
         else {
             // wrong state, return error, but don't change state
@@ -488,6 +504,18 @@ int pico_flash_image_write_data(void *state, const char *data, uint length) {
 
     // while data to write and no error ...
     while (0 < length && PICO_OK == status) {
+
+        // Like a BOOTSEL uf2 download, which reboots as soon as an image not for a
+        // no_reboot_on_uf2_download partition has been written, ignore any further data
+        if (0 != fimg_state->reboot_start_addr) {
+            FIMG_DEBUG_PRINTF("info - ignoring %u bytes following image requiring reboot\n", length);
+            break;
+        }
+
+        // Any data, other than for a completed image, means writing is in progress
+        if (FIMG_STATE_WRITING_IN_PROGRESS != fimg_state->op_state) {
+            fimg_set_op_state(FIMG_STATE_WRITING_IN_PROGRESS);
+        }
 
         // Copy in as many bytes as we have and/or we can fit into the uf2 block buffer
         uint32_t space_left = UF2_BLOCK_SIZE - fimg_state->rxed_data_index;
@@ -514,9 +542,15 @@ int pico_flash_image_write_data(void *state, const char *data, uint length) {
             // check if we have now received all the expected blocks
             if (PICO_OK == status &&
                 fimg_state->rxed_block_count == fimg_state->total_num_blocks) {
-                // ... and we're done
+                // ... and we're done, unless another uf2 image follows
                 fimg_set_op_state(FIMG_STATE_WRITE_SUCCESS);
                 FIMG_DEBUG_PRINTF("info - download success, crc32: %08lx\n", fimg_state->dnld_crc32);
+
+                // An image not for a no_reboot_on_uf2_download partition is the one to
+                // reboot into, and is the last image written
+                if (!fimg_state->update_no_reboot) {
+                    fimg_state->reboot_start_addr = fimg_state->update_start_addr;
+                }
             }
         }
     }
@@ -547,7 +581,7 @@ int pico_flash_image_check_write_complete(void *state, bool *complete, uint32_t 
 
     if (FIMG_STATE_WRITE_SUCCESS == fimg_state->op_state) {
         *complete = true;
-        *update_start_addr = fimg_state->update_start_addr;
+        *update_start_addr = fimg_state->reboot_start_addr;
     }
     else {
         *complete = false;

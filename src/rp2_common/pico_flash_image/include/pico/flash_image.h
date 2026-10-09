@@ -46,9 +46,9 @@ typedef enum {
 // Structure used to return the current state information, see pico_flash_image_get_op_status()
 typedef struct {
     fimg_op_state_e op_state;   // The current operational state of the flash uf2 module.
-    uint32_t update_family_id;  // The family_id of the update.
-    uint32_t total_num_blocks;  // The total number of blocks to be updated.
-    uint32_t rxed_block_count;  // The number of blocks received & processed (written to flash) thus far.
+    uint32_t update_family_id;  // The family_id of the current (or last) uf2 image.
+    uint32_t total_num_blocks;  // The total number of blocks in the current (or last) uf2 image.
+    uint32_t rxed_block_count;  // The number of blocks of the current (or last) uf2 image received & processed (written to flash) thus far.
     uint32_t rxed_data_index;   // Count of the uf2 block byte data buffered but not yet written to flash (0-511).
 } fimg_update_info_t;
 
@@ -67,14 +67,24 @@ typedef struct {
  * erased.  The design supports programming integral uf2 blocks arriving in any
  * order, the blocks need *not* be in a monotonically increasing address order.
  *
+ * Multiple uf2 images can be concatenated together in the data stream, e.g. to
+ * update several partitions at once.  Each uf2 image must be complete before
+ * the next begins.  As for a uf2 download in BOOTSEL mode, the target partition
+ * of each image is chosen according to the image's `family_id`, and an image
+ * only continues to be followed by another if it was written to a partition
+ * with the `no_reboot_on_uf2_download` flag.  Once an image has been written
+ * to a partition without that flag (where BOOTSEL mode would reboot), any
+ * further data is ignored.
+ *
  * Optionally, the specific *image type* permitted to be programmed can be
  * specified so that only uf2 blocks arriving with that specific `family_id`
  * will be programmed into flash.  The desired family_id is specified when
  * calling pico_flash_image_config_for_update().
  *
  * The selected family_id value will be checked against the field in the first
- * incoming uf2 block and if they do not match, programming will fail with an
- * error code, leaving the flash contents totally unchanged.
+ * incoming uf2 block of each image and if they do not match, programming will
+ * fail with an error code, leaving the flash contents of that image's target
+ * partition unchanged.
  *
  * If 0 is used as the family_id argument, programming of any incoming image
  * type is permitted, as extracted from the first incoming uf2 block header.
@@ -88,6 +98,9 @@ typedef struct {
  * after new image(s) has/have been programmed.  Newly programmed images
  * can be "tried" by the bootrom during the subsequent boot up using the
  * "try before you buy" mechanism, please see the RP2350 datasheet.
+ * pico_flash_image_check_write_complete() returns the address to use for a
+ * flash update reboot.  As for a BOOTSEL uf2 download, images written to
+ * partitions with the `no_reboot_on_uf2_download` flag do not require a reboot.
  *
  * The library maintains an internal operating state which can be checked by
  * application code using the pico_flash_image_get_op_status() function.
@@ -111,7 +124,12 @@ typedef struct {
  *                          The user can call pico_flash_image_write_data(),
  *                          repeatedly, to write data to flash.
  *
- * FIMG_STATE_WRITE_SUCCESS Programming has completed successfully.
+ * FIMG_STATE_WRITE_SUCCESS Programming of the uf2 image(s) has completed
+ *                          successfully.  If the last image was written to a
+ *                          `no_reboot_on_uf2_download` partition, more data can
+ *                          be written, which must be another concatenated uf2
+ *                          image, using pico_flash_image_write_data(), otherwise
+ *                          any more data written is ignored.
  *                          Another programming session can be started using
  *                          pico_flash_image_config_for_update(), or if programming
  *                          is complete, the state storage can be removed by
@@ -285,10 +303,17 @@ int pico_flash_image_write_data(void *state, const char *data, uint length);
  *
  * This function should be called after all octets have been programmed in flash.
  *
+ * The update is complete when all of the uf2 images written have been
+ * completely received and programmed.
+ *
  * \param state     Pointer to module's state holding work area
  * \param complete  Pointer to a bool to indicate if the update is complete.
- * \param update_start_addr  Pointer to a uint32_t ready to hold the execution
- *                           address of the (just updated) image.
+ * \param update_start_addr  Pointer to a uint32_t ready to hold the address
+ *                           to pass to a flash update reboot: the start of the
+ *                           partition of the image written which wasn't to a
+ *                           partition with the `no_reboot_on_uf2_download` flag.
+ *                           Set to 0 if the update isn't complete, or if none of
+ *                           the images written require a reboot.
  *
  * \return PICO_OK  Following successful finalisation, an error code otherwise
  *         PICO_ERROR_INVALID_ARG       The supplied state pointer is NULL,
