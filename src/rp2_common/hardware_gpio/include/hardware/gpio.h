@@ -907,7 +907,7 @@ static inline bool gpio_get(uint gpio) {
  *  \ingroup hardware_gpio
  *
  * This reads the signal coming from the pad, before any GPIO function muxing or input override
- * (see \ref gpio_set_inover) is applied, so it reflects the pin even when it is not assigned to SIO.
+ * (see \ref gpio_set_inover) is applied, so it reflects the state of the pin even when it is not assigned to SIO.
  *
  * \note As a side effect this enables input on the pad (see \ref gpio_set_input_enabled) and leaves it enabled.
  *
