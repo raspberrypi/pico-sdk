@@ -6,10 +6,13 @@
 	url = https://github.com/georgerobotics/cyw43-driver.git
 [submodule "lib/lwip"]
 	path = lib/lwip
-	url = https://github.com/lwip-tcpip/lwip.git
+	url = https://github.com/raspberrypi/lwip.git
 [submodule "lib/mbedtls"]
 	path = lib/mbedtls
 	url = https://github.com/Mbed-TLS/mbedtls.git
 [submodule "lib/btstack"]
 	path = lib/btstack
 	url = https://github.com/bluekitchen/btstack.git
+[submodule "lib/cJSON"]
+	path = lib/cJSON
+	url = https://github.com/DaveGamble/cJSON.git

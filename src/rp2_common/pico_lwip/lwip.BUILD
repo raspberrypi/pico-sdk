@@ -97,7 +97,12 @@ cc_library(
 
 cc_library(
     name = "pico_lwip_http",
-    srcs = glob(["src/apps/http/*.c"]),
+    srcs = glob(
+        ["src/apps/http/*.c"],
+        # fsdata.c is #included by fs.c (HTTPD_FSDATA_FILE), not compiled on its own.
+        exclude = ["src/apps/http/fsdata.c"],
+    ),
+    textual_hdrs = ["src/apps/http/fsdata.c"],
     deps = [":pico_lwip_core"],
 )
 

@@ -233,6 +233,7 @@ if (EXISTS ${PICO_MBEDTLS_PATH}/${MBEDTLS_TEST_PATH})
             ${PICO_MBEDTLS_PATH}/library/ssl_srvx.c
             ${PICO_MBEDTLS_PATH}/library/x509_crt.c
             ${PICO_MBEDTLS_PATH}/library/pk_ecc.c
+            ${PICO_MBEDTLS_PATH}/library/pkwrite.c
             ${PICO_MBEDTLS_PATH}/library/ssl_tls12_server.c
             ${PICO_MBEDTLS_PATH}/library/ssl_tls.c
             PROPERTIES
