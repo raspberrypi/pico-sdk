@@ -844,14 +844,29 @@ int rom_pick_ab_partition_during_update(uint32_t *workarea_base, uint32_t workar
  * \ingroup pico_bootrom
  *
  * Returns the index of the B partition of partition A if a partition table is present and loaded, and there is a partition A with a B partition;
- * otherwise returns BOOTROM_ERROR_NOT_FOUND.
+ * otherwise returns a negative error code.
  * 
  * \param pi_a the A partition number
+ * \return >= 0 the index of the B partition
+ *         BOOTROM_ERROR_NOT_FOUND if the partition number does not have a B partition
  */
 static inline int rom_get_b_partition(uint pi_a) {
     rom_get_b_partition_fn func = (rom_get_b_partition_fn) rom_func_lookup_inline(ROM_FUNC_GET_B_PARTITION);
     return func(pi_a);
 }
+
+/*!
+ * \brief Get Owned Partition
+ * \ingroup pico_bootrom
+ *
+ * Returns the index of the matching owned partition if a partition table is present and loaded, and the partition number has an owned
+ * partition; otherwise returns a negative error code.
+ * 
+ * \param partition_num the partition number
+ * \return >= 0 the index of the matching owned partition
+ *         BOOTROM_ERROR_NOT_FOUND if the partition number does not have an owned partition
+ */
+int rom_get_owned_partition(uint partition_num);
 
 // todo SECURE only
 /*!
@@ -1061,6 +1076,37 @@ static inline intptr_t rom_set_rom_callback(uint callback_num, bootrom_api_callb
     rom_set_rom_callback_fn func = (rom_set_rom_callback_fn) rom_func_lookup_inline(ROM_FUNC_SET_ROM_CALLBACK);
     return func(callback_num, funcptr);
 }
+
+#if (!defined(__riscv) || PICO_NONSECURE) || PICO_COMBINED_DOCS
+/*!
+ * \brief Call a Secure method from Non-secure code
+ * \ingroup pico_bootrom
+ * 
+ * This method provides the ability to decouple the Non-secure code from the Secure code, allowing the former to call methods
+ * in the latter without needing to know the location of the methods.
+ * 
+ * This call will always return `BOOTROM_ERROR_INVALID_STATE` unless Secure Arm code has provided a handler function via
+ * \ref rom_set_rom_callback(). If there is a handler function, this method will return the return code that the handler returns,
+ * with the convention that `BOOTROM_ERROR_INVALID_ARG` should be returned if the "function selector" is not supported.
+ * 
+ * Certain well-known "function selectors" will be pre-defined to facilitate interaction between Secure and Non-secure SDK code,
+ * or indeed with other environments (for example, logging to secure UART/USB CDC, launch of core 1 from NS code, watchdog reboot
+ * from NS code back into NS code, etc.).
+ * 
+ * To avoid conflicts the following bit patterns are used for "function selectors":
+ * 
+ * - `0b0xxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx` is a "well known" function selector; don't use for your own methods
+ * - `0b10xx xxxx xxxx xxxx xxxx xxxx xxxx xxxx` is a "unique" function selector intended to be unlikely to clash with others'. The lower 30 bits should be chosen at random
+ * - `0b11xx xxxx xxxx xxxx xxxx xxxx xxxx xxxx` is a "private" function selector intended for use by tightly coupled NS and S code
+ * 
+ * \param a first argument
+ * \param b second argument
+ * \param c third argument
+ * \param d fourth argument
+ * \param func the "function selector"
+ */
+int rom_secure_call(uint a, uint b, uint c, uint d, uint func);
+#endif
 
 /*!
  * \brief Get system information

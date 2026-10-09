@@ -58,7 +58,12 @@ void runtime_run_per_core_initializers(void);
 #define PICO_RUNTIME_INIT_FUNC(func, priority_string) __pre_init func, priority_string
 #endif
 #endif
+#if PICO_NONSECURE
+// hw init cannot be done by non-secure
+#define PICO_RUNTIME_INIT_FUNC_HW(func, priority_string)
+#else
 #define PICO_RUNTIME_INIT_FUNC_HW(func, priority_string) PICO_RUNTIME_INIT_FUNC(func, priority_string)
+#endif
 #define PICO_RUNTIME_INIT_FUNC_RUNTIME(func, priority_string) PICO_RUNTIME_INIT_FUNC(func, priority_string)
 // priority strings are of the form 00000->99999; we want the per core stuff all at the end, so prefix with ZZZZZ which is clearly after 99999
 #define PICO_RUNTIME_INIT_FUNC_PER_CORE(func, priority_string) PICO_RUNTIME_INIT_FUNC(func, "ZZZZZ." priority_string)

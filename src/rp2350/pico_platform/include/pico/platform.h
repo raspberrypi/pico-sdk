@@ -71,6 +71,11 @@
 #define PICO_CLKDIV_ROUND_NEAREST 1
 #endif
 
+// PICO_CONFIG: PICO_ADD_NONSECURE_PADS_HELPER, Add non-secure helper functions for PADS_BANK0, type=bool, default=1 on RP2350A A2 if PICO_ALLOW_NONSECURE_GPIO, group=hardware_gpio
+#ifndef PICO_ADD_NONSECURE_PADS_HELPER
+#define PICO_ADD_NONSECURE_PADS_HELPER ((PICO_RP2350A && PICO_RP2350_A2_SUPPORTED) && PICO_ALLOW_NONSECURE_GPIO)
+#endif
+
 #ifndef __ASSEMBLER__
 
 #ifdef __cplusplus

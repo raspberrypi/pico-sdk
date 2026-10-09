@@ -1,0 +1,63 @@
+{
+    "$schema": "https://raw.githubusercontent.com/raspberrypi/picotool/master/json/schemas/partition-table-schema.json",
+    "version": [1, 0],
+    "unpartitioned": {
+        "families": ["absolute"],
+        "permissions": {
+            "secure": "rw",
+            "nonsecure": "rw",
+            "bootloader": "rw"
+        }
+    },
+    "partitions": [
+        {
+            "name": "Secure A",
+            "size": "64K",
+            "families": ["rp2350-arm-s"],
+            "permissions": {
+                "secure": "rw",
+                "bootloader": "rw"
+            }
+        },
+        {
+            "name": "Secure B",
+            "size": "64K",
+            "families": ["rp2350-arm-s"],
+            "permissions": {
+                "secure": "rw",
+                "bootloader": "rw"
+            },
+            "link": ["a", 0]
+        },
+        {
+            "name": "NonSecure A",
+            "size": "700K",
+            "families": ["rp2350-arm-ns"],
+            "permissions": {
+                "secure": "rw",
+                "nonsecure": "rw",
+                "bootloader": "rw"
+            },
+            "link": ["owner", 0],
+            "ab_non_bootable_owner_affinity": true,
+            "no_reboot_on_uf2_download": true,
+            "ignored_during_arm_boot": true,
+            "ignored_during_riscv_boot": true
+        },
+        {
+            "name": "NonSecure B",
+            "size": "700K",
+            "families": ["rp2350-arm-ns"],
+            "permissions": {
+                "secure": "rw",
+                "nonsecure": "rw",
+                "bootloader": "rw"
+            },
+            "link": ["a", 2],
+            "ab_non_bootable_owner_affinity": true,
+            "no_reboot_on_uf2_download": true,
+            "ignored_during_arm_boot": true,
+            "ignored_during_riscv_boot": true
+        }
+    ]
+}

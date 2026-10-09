@@ -209,3 +209,20 @@ pico_set_linker_script = declare_transtion(
         "@pico-sdk//bazel/config:PICO_DEFAULT_LINKER_SCRIPT": "linker_script",
     },
 )
+
+pico_set_stdio_enabled = declare_transtion(
+    attrs = {
+        "uart": attr.bool(default = True),
+        "usb": attr.bool(default = False),
+        "extra_copts": attr.string_list(),
+        # This could be shared, but we don't in order to make it clearer that
+        # a transition is in use.
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+    },
+    flag_overrides = {
+        "@pico-sdk//bazel/config:PICO_STDIO_UART": "uart",
+        "@pico-sdk//bazel/config:PICO_STDIO_USB": "usb",
+    },
+)
