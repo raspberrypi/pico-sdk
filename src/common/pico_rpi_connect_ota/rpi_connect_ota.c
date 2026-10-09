@@ -706,6 +706,12 @@ int rpi_connect_ota_try_booting_to_flash_update(void) {
         return -1;
     }
 
+    if (0 == update_start_addr) {
+        // All the images were written to no_reboot_on_uf2_download partitions
+        RPI_CONNECT_OTA_INFO("Flash update complete, no reboot required\n");
+        return 1;
+    }
+
     RPI_CONNECT_OTA_INFO("Rebooting to flash update at 0x%08x\n", (unsigned)update_start_addr);
     rc = rom_reboot(REBOOT2_FLAG_REBOOT_TYPE_FLASH_UPDATE, 500, update_start_addr, 0);
     if (rc != PICO_OK)

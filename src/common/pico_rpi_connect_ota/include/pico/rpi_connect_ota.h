@@ -408,6 +408,11 @@ int rpi_connect_ota_handle_boot(void);
 
 /*! \brief Reboot into a downloaded flash update (try-before-you-buy)
  *  \ingroup pico_rpi_connect_ota
+ *
+ * Does not return if the reboot is started.
+ *
+ * \return 1 if the update is complete, but no reboot is required because all the images were
+ *         written to partitions with the `no_reboot_on_uf2_download` flag, otherwise a negative error code
  */
 int rpi_connect_ota_try_booting_to_flash_update(void);
 

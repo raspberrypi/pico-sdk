@@ -834,7 +834,7 @@ function(picotool_postprocess_binary TARGET)
 endfunction()
 
 
-# pico_combine_uf2_outputs(COMBINED_TARGET ROOT_TARGET <TARGETS>... [PARTITIONS <partitions>...] [OFFSETS <offsets>...] [FAMILY <family>)
+# pico_combine_uf2_outputs(COMBINED_TARGET ROOT_TARGET <TARGETS>... [PARTITIONS <partitions>...] [OFFSETS <offsets>...] [FAMILY <family>] [OUTFILE <file>])
 # \brief_nodesc\ Combine UF2 outputs into a single UF2 file
 #
 # Combine UF2 outputs from multiple targets into a single UF2 file with a single family ID
@@ -857,14 +857,19 @@ endfunction()
 # \param\ PARTITIONS The partitions to place those targets in (use 'n' to not place a specific target in a partition)
 # \param\ OFFSETS The offsets to place those targets at (use 'n' to not place a specific target at an offset)
 # \param\ FAMILY Specify the family for the output UF2 (default is the same family as ROOT_TARGET)
+# \param\ OUTFILE Specify the filename to output (default is ${CMAKE_CURRENT_BINARY_DIR}/<COMBINED_TARGET>.uf2)
 function(pico_combine_uf2_outputs COMBINED_TARGET ROOT_TARGET)
     pico_init_picotool()
     if (picotool_FOUND)
-        set(oneValueArgs FAMILY)
+        set(oneValueArgs FAMILY OUTFILE)
         set(multiValueArgs PARTITIONS OFFSETS)
         cmake_parse_arguments(PARSE_ARGV 2 UF2 "" "${oneValueArgs}" "${multiValueArgs}")
 
         set(UF2_TARGETS ${UF2_UNPARSED_ARGUMENTS})
+
+        if (NOT UF2_OUTFILE)
+            set(UF2_OUTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}.uf2)
+        endif()
 
         list(LENGTH UF2_TARGETS NUM_UF2S)
 
@@ -928,7 +933,7 @@ function(pico_combine_uf2_outputs COMBINED_TARGET ROOT_TARGET)
                 set(ROOTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}_${IDX_PREV}.uf2)
             endif()
             if (IDX EQUAL IDX_LAST)
-                set(OUTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}.uf2)
+                set(OUTFILE ${UF2_OUTFILE})
             else()
                 set(OUTFILE ${CMAKE_CURRENT_BINARY_DIR}/${COMBINED_TARGET}_${IDX}.uf2)
             endif()
@@ -944,6 +949,10 @@ function(pico_combine_uf2_outputs COMBINED_TARGET ROOT_TARGET)
             if (IDX EQUAL IDX_LAST)
                 add_custom_target(${COMBINED_TARGET} ALL
                     DEPENDS ${OUTFILE})
+
+                set_target_properties(${COMBINED_TARGET} PROPERTIES
+                    PICO_UF2_FILE ${OUTFILE}
+                )
             endif()
         endforeach()
     endif()
