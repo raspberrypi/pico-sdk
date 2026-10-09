@@ -7,7 +7,7 @@
 #include "pico/rpi_connect_ota.h"
 #include "pico/rpi_connect.h"
 #include "pico/rpi_connect_util.h"
-#include "pico/rpi_connect/internal/connect_crypto.h"
+#include "pico/rpi_connect_identity.h"
 
 #if PICO_ON_DEVICE
 #include "boot/picoboot.h"
@@ -19,28 +19,10 @@
 #define PICO_FLASH_IMAGE_WORKAREA_SIZE 5248
 #endif
 
-#if __has_include("device_identity_keys.h")
-#include "device_identity_keys.h"
-#endif
-
 static const char *g_client_id;
 static const char *g_serial_number;
 static char *g_active_auth_token;
 static uint8_t g_ota_workarea[PICO_FLASH_IMAGE_WORKAREA_SIZE];
-
-#if defined(RPI_CONNECT_DEVICE_IDENTITY_PRIVKEY_HEX)
-static int hex_to_bytes(const char *hex, unsigned char *out, size_t out_len) {
-    if (strlen(hex) != out_len * 2)
-        return -1;
-    for (size_t i = 0; i < out_len; i++) {
-        unsigned int byte;
-        if (sscanf(&hex[i * 2], "%2x", &byte) != 1)
-            return -1;
-        out[i] = (unsigned char)byte;
-    }
-    return 0;
-}
-#endif
 
 int rpi_connect_ota_get_workarea(uint8_t **buffer, size_t *size) {
     if (!buffer || !size) {
@@ -52,31 +34,6 @@ int rpi_connect_ota_get_workarea(uint8_t **buffer, size_t *size) {
 }
 
 static int ffs_update_string_with_error(uint8_t file_id, const char *data);
-
-// Run a device-identity-exchange using the supplied raw P-256 private key.
-// Derives the matching public key, calls the exchange, returns a strdup of
-// the resulting access token (caller frees) or NULL on failure.
-static char *sign_in_with_identity_key(const char *client_id,
-                                       const char *serial_number,
-                                       const char *hostname,
-                                       const unsigned char *privkey) {
-    char *pubkey_pem = rpi_connect_crypto_ecdsa_p256_pubkey_pem(privkey);
-    if (!pubkey_pem) {
-        RPI_CONNECT_OTA_ERROR("Failed to derive public key from private key\n");
-        return NULL;
-    }
-
-    char *token = NULL;
-    int rc = rpi_connect_ota_device_identity_exchange(
-        client_id, serial_number, hostname, privkey, pubkey_pem, &token);
-    free(pubkey_pem);
-
-    if (rc != 0 || !token) {
-        free(token);
-        return NULL;
-    }
-    return token;
-}
 
 int rpi_connect_ota_init(const char *client_id, const char *serial_number,
                          const char *hostname) {
@@ -101,34 +58,18 @@ int rpi_connect_ota_init(const char *client_id, const char *serial_number,
         return 0;
     }
 
-    // Priority 2 (debug): build-time PEM key overrides the OTP one.
-    unsigned char privkey[RPI_CONNECT_CRYPTO_P256_PRIVKEY_SIZE];
-    const char *key_source = NULL;
-
-#if defined(RPI_CONNECT_DEVICE_IDENTITY_PRIVKEY_HEX)
-    if (hex_to_bytes(RPI_CONNECT_DEVICE_IDENTITY_PRIVKEY_HEX, privkey, sizeof(privkey)) == 0) {
-        key_source = "build-time PEM";
-    }
-#endif
-
-    // Priority 3: OTP-programmed identity key.
-#if PICO_ON_DEVICE
-    if (!key_source && rpi_connect_ota_identity_key_programmed()) {
-        rpi_connect_ota_read_identity_key_otp(RPI_CONNECT_IDENTITY_OTP_ROW, privkey);
-        key_source = "OTP";
-    }
-#endif
-
-    if (!key_source) {
+    // Priority 2: exchange the device identity key (a build-time debug key, or
+    // OTP-programmed) for a token. The private key is only handled by the identity
+    // key functions.
+    if (!rpi_connect_identity_key_available()) {
         RPI_CONNECT_OTA_ERROR("No auth token and no identity key available\n");
         return 1;
     }
 
-    RPI_CONNECT_OTA_DEBUG("Signing in with identity key from %s\n", key_source);
-    g_active_auth_token = sign_in_with_identity_key(
-        client_id, serial_number, hostname, privkey);
-    if (!g_active_auth_token) {
-        RPI_CONNECT_OTA_ERROR("Device identity exchange failed (%s)\n", key_source);
+    RPI_CONNECT_OTA_DEBUG("Signing in with device identity key\n");
+    if (rpi_connect_ota_device_identity_exchange(client_id, serial_number, hostname,
+                                                 &g_active_auth_token) != 0) {
+        RPI_CONNECT_OTA_ERROR("Device identity exchange failed\n");
         return -1;
     }
     RPI_CONNECT_OTA_DEBUG("Caching new auth token in FFS\n");
@@ -617,20 +558,18 @@ int rpi_connect_ota_device_identity_exchange(
     const char *client_id,
     const char *serial_number,
     const char *hostname,
-    const unsigned char *private_key_32,
-    const char *public_key_pem,
     char **out_token) {
     if (out_token)
         *out_token = NULL;
 
-    if (!client_id || !serial_number || !hostname || !private_key_32 || !public_key_pem) {
+    if (!client_id || !serial_number || !hostname) {
         RPI_CONNECT_OTA_ERROR("device_identity_exchange: missing required argument\n");
         return -1;
     }
 
     char *device_id = NULL;
     char *token = rpi_connect_device_identity_exchange(
-        client_id, private_key_32, public_key_pem, hostname, serial_number, &device_id);
+        client_id, hostname, serial_number, &device_id);
 
     if (!token) {
         RPI_CONNECT_OTA_ERROR("device_identity_exchange: failed\n");
@@ -846,31 +785,6 @@ int rpi_connect_ota_install_update(const char *uri, const char *expected_checksu
 
     rpi_connect_ota_install_update_stop(ctx);
     return rc > 0 ? 0 : -1;
-}
-
-int rpi_connect_ota_read_identity_key_otp(unsigned int start_row, unsigned char out_key[32]) {
-    volatile uint16_t *otp_data = (volatile uint16_t *)OTP_DATA_GUARDED_BASE;
-    size_t key_offset = 0;
-    unsigned int rows = 32 / 2; // 16 rows of 2 bytes
-
-    for (unsigned int i = 0; i < rows && key_offset < 32; i++) {
-        uint16_t row = otp_data[start_row + i];
-        for (int b = 0; b < 2 && key_offset < 32; b++) {
-            out_key[key_offset++] = (unsigned char)(row & 0xff);
-            row >>= 8;
-        }
-    }
-    return 0;
-}
-
-bool rpi_connect_ota_identity_key_programmed(void) {
-    unsigned char key[32];
-    rpi_connect_ota_read_identity_key_otp(RPI_CONNECT_IDENTITY_OTP_ROW, key);
-    for (size_t i = 0; i < sizeof(key); i++) {
-        if (key[i] != 0)
-            return true;
-    }
-    return false;
 }
 
 #endif

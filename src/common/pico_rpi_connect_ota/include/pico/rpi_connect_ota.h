@@ -424,37 +424,16 @@ int rpi_connect_ota_try_booting_to_flash_update(void);
  */
 bool rpi_connect_ota_boot_is_flash_update(void);
 
-#if PICO_ON_DEVICE
-#ifndef RPI_CONNECT_IDENTITY_OTP_ROW
-#define RPI_CONNECT_IDENTITY_OTP_ROW 0xc0
-#endif
-/*! \brief Read the 32-byte device identity private key from OTP
- *  \ingroup pico_rpi_connect_ota
- *
- * \param start_row first OTP row of the key
- * \param out_key receives the key
- */
-int rpi_connect_ota_read_identity_key_otp(unsigned int start_row, unsigned char out_key[32]);
-
-/*! \brief True if a non-zero device identity private key is programmed into OTP
- *  \ingroup pico_rpi_connect_ota
- *
- * The key is read from RPI_CONNECT_IDENTITY_OTP_ROW.
- */
-bool rpi_connect_ota_identity_key_programmed(void);
-#endif
-
 /*! \brief Run a /client/device-identity-exchange against the Connect API
  *  \ingroup pico_rpi_connect_ota
  *
- * Uses the supplied raw 32-byte P-256 private key and matching PEM public
- * key.
+ * Uses the device identity key (see pico/rpi_connect_identity.h): the request
+ * carries its public key and is signed with its private key, which is never
+ * handled by this library.
  *
  * \param client_id Connect client UUID
  * \param serial_number device serial number
  * \param hostname used as device name when the identity has none set
- * \param private_key_32 32-byte raw P-256 private key
- * \param public_key_pem PEM-encoded public key matching a registered identity
  * \param out_token on success, set to a strdup() of the access token
  *                  (caller frees)
  * \return 0 on success, non-zero on failure
@@ -463,8 +442,6 @@ int rpi_connect_ota_device_identity_exchange(
     const char *client_id,
     const char *serial_number,
     const char *hostname,
-    const unsigned char *private_key_32,
-    const char *public_key_pem,
     char **out_token);
 
 /*! \brief Callback invoked from rpi_connect_ota_event_listen when a DEPLOY event is received
