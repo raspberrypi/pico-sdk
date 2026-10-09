@@ -158,7 +158,7 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
     // On RISC-V we also need to initialise the global pointer
     stack_ptr -= 4;
     uint32_t vector_table = riscv_read_csr(mtvec);
-    asm volatile ("mv %0, gp" : "=r"(stack_ptr[3]));
+    pico_default_asm_volatile("mv %0, gp" : "=r"(stack_ptr[3]));
 #else
     stack_ptr -= 3;
     uint32_t vector_table = scb_hw->vtor;
