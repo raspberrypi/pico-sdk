@@ -264,10 +264,10 @@ cc_binary(
     tags = ["manual"],  # Built via kitchen_sink_lwip_poll
     deps = [
         ":kitchen_sink_common",
+        "//src/common/pico_lwip:pico_lwip_mbedtls",
+        "//src/common/pico_mbedtls",
         "//src/rp2_common/pico_btstack",
         "//src/rp2_common/pico_cyw43_arch:pico_cyw43_arch_lwip_poll",
-        "//src/rp2_common/pico_lwip:pico_lwip_mbedtls",
-        "//src/rp2_common/pico_mbedtls",
     ],
 )
 
@@ -278,10 +278,10 @@ cc_binary(
     tags = ["manual"],  # Built via kitchen_sink_lwip_background
     deps = [
         ":kitchen_sink_common",
+        "//src/common/pico_lwip:pico_lwip_mbedtls",
+        "//src/common/pico_mbedtls",
         "//src/rp2_common/pico_btstack",
         "//src/rp2_common/pico_cyw43_arch:pico_cyw43_arch_lwip_threadsafe_background",
-        "//src/rp2_common/pico_lwip:pico_lwip_mbedtls",
-        "//src/rp2_common/pico_mbedtls",
     ],
 )
 
