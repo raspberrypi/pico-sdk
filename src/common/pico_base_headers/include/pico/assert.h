@@ -8,12 +8,11 @@
 #define _PICO_ASSERT_H
 
 #include <stdbool.h>
+#include <assert.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <assert.h>
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLE_ALL, Global assert enable, type=bool, default=0, group=pico_base
 // PICO_CONFIG: PARAM_ASSERTIONS_DISABLE_ALL, Global assert disable, type=bool, default=0, group=pico_base
