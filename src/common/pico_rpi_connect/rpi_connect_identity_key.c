@@ -5,17 +5,21 @@
  */
 
 // Device implementation of the device identity key functions. These are the only functions which
-// handle the private key.
+// handle the private key. Also has the device (mbedtls) implementations of the helpers used by
+// rpi_connect_identity.c.
 
 #include <stdlib.h>
 #include <string.h>
 
 #include "pico/rpi_connect_identity.h"
+#include "pico/rpi_connect/internal/connect_identity.h"
 
 #include "mbedtls/ecdsa.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/platform_util.h"
+#include "mbedtls/pk.h"
+#include "mbedtls/sha256.h"
 
 #if !PICO_RP2040
 #include "hardware/regs/addressmap.h"
@@ -146,4 +150,30 @@ int rpi_connect_identity_sign_hash(const uint8_t hash[RPI_CONNECT_IDENTITY_HASH_
         *out_sig_len = sig_len;
     identity_key_free(ctx);
     return ret == 0 ? 0 : -1;
+}
+
+int rpi_connect_identity_pubkey_to_pem(const uint8_t pubkey[RPI_CONNECT_IDENTITY_PUBKEY_SIZE], char *out, size_t size) {
+    mbedtls_pk_context pk;
+    mbedtls_ecp_group grp;
+    mbedtls_ecp_point q;
+    mbedtls_pk_init(&pk);
+    mbedtls_ecp_group_init(&grp);
+    mbedtls_ecp_point_init(&q);
+
+    int ret = -1;
+    if (mbedtls_pk_setup(&pk, mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY)) == 0 &&
+        mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) == 0 &&
+        mbedtls_ecp_point_read_binary(&grp, &q, pubkey, RPI_CONNECT_IDENTITY_PUBKEY_SIZE) == 0 &&
+        mbedtls_ecp_set_public_key(MBEDTLS_ECP_DP_SECP256R1, mbedtls_pk_ec(pk), &q) == 0 &&
+        mbedtls_pk_write_pubkey_pem(&pk, (unsigned char *)out, size) == 0)
+        ret = 0;
+
+    mbedtls_ecp_point_free(&q);
+    mbedtls_ecp_group_free(&grp);
+    mbedtls_pk_free(&pk);
+    return ret;
+}
+
+int rpi_connect_identity_sha256(const char *data, size_t len, uint8_t out[RPI_CONNECT_IDENTITY_HASH_SIZE]) {
+    return mbedtls_sha256((const unsigned char *)data, len, out, 0);
 }

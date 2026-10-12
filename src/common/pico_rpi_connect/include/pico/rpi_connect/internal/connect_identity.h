@@ -15,6 +15,15 @@ extern "C" {
 
 #define RPI_CONNECT_IDENTITY_EXCHANGE_ENDPOINT "/client/device-identity-exchange"
 
+// Room for the PEM of a P-256 SubjectPublicKeyInfo (~180 bytes)
+#define RPI_CONNECT_IDENTITY_PEM_SIZE 256
+
+// Host or device specific (rpi_connect_identity_key_host.c or rpi_connect_identity_key.c)
+// Write the PEM of a raw public key to out
+int rpi_connect_identity_pubkey_to_pem(const uint8_t pubkey[RPI_CONNECT_IDENTITY_PUBKEY_SIZE], char *out, size_t size);
+// SHA-256 hash of data
+int rpi_connect_identity_sha256(const char *data, size_t len, uint8_t out[RPI_CONNECT_IDENTITY_HASH_SIZE]);
+
 // Check the inputs of a device identity exchange request are valid, so the body can be built
 int rpi_connect_identity_exchange_validate(const rpi_connect_identity_exchange_t *exchange);
 
