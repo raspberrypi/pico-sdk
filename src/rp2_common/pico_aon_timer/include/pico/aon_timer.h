@@ -21,8 +21,10 @@
  * \if rp2040_specific
  * This library uses the RTC on RP2040.
  * \endif
+ * 
  * \if rp2350_specific
- * This library uses the Powman Timer on RP2350.
+ * This library uses the Powman Timer on RP2350, which keeps running across most warm reboots (e.g. \ref reset_usb_boot, \ref rom_reboot,
+ * \ref watchdog_reboot, `picotool reboot`, etc.) - see Chip-level resets in the RP2350 datasheet for more details.
  * \endif
  *
  * This library supports both `aon_timer_xxx_calendar()` methods which use a calendar date/time (as struct tm),
