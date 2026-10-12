@@ -5,13 +5,15 @@
  */
 
 // Host implementation of the device identity key functions, over OpenSSL. The key is loaded from a
-// PEM file with rpi_connect_identity_load_key_pem_file(), or from a build-time debug key.
+// PEM file with rpi_connect_identity_load_key_pem_file(), or from a build-time debug key. Also has
+// the host (OpenSSL) implementations of the helpers used by rpi_connect_identity.c.
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "pico/rpi_connect_identity.h"
+#include "pico/rpi_connect/internal/connect_identity.h"
 #include "pico/rpi_connect_util.h"
 
 #include <openssl/evp.h>
@@ -173,4 +175,50 @@ int rpi_connect_identity_sign_hash(const uint8_t hash[RPI_CONNECT_IDENTITY_HASH_
     }
     EVP_PKEY_CTX_free(sign_ctx);
     return ret;
+}
+
+int rpi_connect_identity_pubkey_to_pem(const uint8_t pubkey[RPI_CONNECT_IDENTITY_PUBKEY_SIZE], char *out, size_t size) {
+    OSSL_PARAM_BLD *bld = NULL;
+    OSSL_PARAM *params = NULL;
+    EVP_PKEY_CTX *pctx = NULL;
+    EVP_PKEY *pkey = NULL;
+    BIO *bio = NULL;
+    int ret = -1;
+
+    bld = OSSL_PARAM_BLD_new();
+    if (!bld ||
+        !OSSL_PARAM_BLD_push_utf8_string(bld, OSSL_PKEY_PARAM_GROUP_NAME, "prime256v1", 0) ||
+        !OSSL_PARAM_BLD_push_octet_string(bld, OSSL_PKEY_PARAM_PUB_KEY, pubkey, RPI_CONNECT_IDENTITY_PUBKEY_SIZE))
+        goto cleanup;
+    params = OSSL_PARAM_BLD_to_param(bld);
+    if (!params) goto cleanup;
+
+    pctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL);
+    if (!pctx) goto cleanup;
+    if (EVP_PKEY_fromdata_init(pctx) <= 0) goto cleanup;
+    if (EVP_PKEY_fromdata(pctx, &pkey, EVP_PKEY_PUBLIC_KEY, params) <= 0) goto cleanup;
+
+    bio = BIO_new(BIO_s_mem());
+    if (!bio) goto cleanup;
+    if (1 != PEM_write_bio_PUBKEY(bio, pkey)) goto cleanup;
+
+    char *bio_data;
+    long pem_len = BIO_get_mem_data(bio, &bio_data);
+    if (pem_len > 0 && (size_t)pem_len < size) {
+        memcpy(out, bio_data, (size_t)pem_len);
+        out[pem_len] = '\0';
+        ret = 0;
+    }
+
+cleanup:
+    BIO_free(bio);
+    EVP_PKEY_free(pkey);
+    EVP_PKEY_CTX_free(pctx);
+    OSSL_PARAM_free(params);
+    OSSL_PARAM_BLD_free(bld);
+    return ret;
+}
+
+int rpi_connect_identity_sha256(const char *data, size_t len, uint8_t out[RPI_CONNECT_IDENTITY_HASH_SIZE]) {
+    return EVP_Digest(data, len, out, NULL, EVP_sha256(), NULL) == 1 ? 0 : -1;
 }
