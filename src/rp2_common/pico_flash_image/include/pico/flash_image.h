@@ -15,8 +15,8 @@ extern "C" {
 
 // FIXME HERE TODO  Post integration, the `FIMG_DEBUG_PRINTF()` debug mechanism
 // will be removed entirely.  For now, it provides essential insight into this
-// module's internal operation.
-#define DBG_PIO_UART_OUTPUT_GPIO        16  // Define to enable PIO UART output on gpio
+// module's internal operation. Off by default as it may conflict with the app.
+// #define DBG_PIO_UART_OUTPUT_GPIO        16
 
 #ifdef DBG_PIO_UART_OUTPUT_GPIO
 extern void flashlog_printf(const char *fmt, ...)  __attribute__ ((format (gnu_printf, 1, 2)));
