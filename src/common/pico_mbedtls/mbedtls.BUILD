@@ -19,6 +19,6 @@ cc_library(
     target_compatible_with = incompatible_with_config("@pico-sdk//bazel/constraint:pico_mbedtls_config_unset"),
     deps = [
         "@pico-sdk//bazel/config:PICO_MBEDTLS_CONFIG",
-        "@pico-sdk//src/rp2_common/pico_mbedtls:pico_mbedtls_config",
+        "@pico-sdk//src/common/pico_mbedtls:pico_mbedtls_config",
     ],
 )
