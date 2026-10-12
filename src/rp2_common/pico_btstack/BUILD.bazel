@@ -87,8 +87,8 @@ cc_library(
     includes = ["include"],
     target_compatible_with = compatible_with_pico_w(),
     deps = [
+        "//src/common/pico_async_context",
         "//src/rp2_common/hardware_sync",
-        "//src/rp2_common/pico_async_context",
         "@btstack//:pico_btstack_base",
     ],
 )
