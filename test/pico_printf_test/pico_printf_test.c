@@ -82,6 +82,22 @@ int main(void) {
     CHECK("4294967296|-4294967296", "%llu|%lld", 4294967296ull, -4294967296ll);
     CHECK("deadbeefcafe|100000000", "%llx|%llx", 0xdeadbeefcafeull, 0x100000000ull);
 
+    // unsupported conversions print their letter, but still consume their argument
+    int count = 7;
+    CHECK("a|A|5", "%a|%A|%d", 1.5, 1.5, 5);
+    CHECK("n|5", "%n|%d", &count, 5);
+    if (count != 7) {
+        printf("FAIL %%n wrote %d\n", count);
+        failures++;
+    }
+    // long double is double on Arm; where it is wider (RISC-V) it is consumed but not printed
+#if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+    CHECK("1.500000|1.500000e+00|5", "%Lf|%Le|%d", 1.5L, 1.5L, 5);
+#else
+    CHECK("||5", "%Lf|%Le|%d", 1.5L, 1.5L, 5);
+#endif
+    CHECK("a|5", "%La|%d", 1.5L, 5);
+
     // truncation: the return value is the length that would have been written
     {
         char buf[8];

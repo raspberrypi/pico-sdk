@@ -99,6 +99,7 @@
 #define FLAGS_LONG_LONG (1U <<  9U)
 #define FLAGS_PRECISION (1U << 10U)
 #define FLAGS_ADAPT_EXP (1U << 11U)
+#define FLAGS_LONG_DOUBLE (1U << 12U)
 
 // import float.h for DBL_MAX
 #if PICO_PRINTF_SUPPORT_FLOAT
@@ -652,6 +653,13 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
         }
 
         // evaluate length field
+        if (*format == 'L') {
+#if __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__
+            // a long double wider than double (RISC-V) is consumed but not printed
+            flags |= FLAGS_LONG_DOUBLE;
+#endif
+            format++;
+        }
         switch (*format) {
             case 'l' :
                 flags |= FLAGS_LONG;
@@ -769,10 +777,15 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
             case 'f' :
             case 'F' :
 #if PICO_PRINTF_SUPPORT_FLOAT
+                if (flags & FLAGS_LONG_DOUBLE) {
+                    va_arg(va, long double);
+                    format++;
+                    break;
+                }
                 if (*format == 'F') flags |= FLAGS_UPPERCASE;
                 idx = _ftoa(out, buffer, idx, maxlen, va_arg(va, double), precision, width, flags);
 #else
-                for(int i=0;i<2;i++) out('?', buffer, idx++, maxlen);
+                out('?', buffer, idx++, maxlen);
                 va_arg(va, double);
 #endif
                 format++;
@@ -782,11 +795,16 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
             case 'g':
             case 'G':
 #if PICO_PRINTF_SUPPORT_FLOAT && PICO_PRINTF_SUPPORT_EXPONENTIAL
+                if (flags & FLAGS_LONG_DOUBLE) {
+                    va_arg(va, long double);
+                    format++;
+                    break;
+                }
                 if ((*format == 'g') || (*format == 'G')) flags |= FLAGS_ADAPT_EXP;
                 if ((*format == 'E') || (*format == 'G')) flags |= FLAGS_UPPERCASE;
                 idx = _etoa(out, buffer, idx, maxlen, va_arg(va, double), precision, width, flags);
 #else
-                for(int i=0;i<2;i++) out('?', buffer, idx++, maxlen);
+                out('?', buffer, idx++, maxlen);
                 va_arg(va, double);
 #endif
                 format++;
@@ -860,6 +878,16 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
                 break;
 
             default :
+                // unsupported conversions that take an argument must still consume it
+                if (*format == 'n') {
+                    va_arg(va, void *);
+#if __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__
+                } else if (flags & FLAGS_LONG_DOUBLE) {
+                    va_arg(va, long double);
+#endif
+                } else if ((*format | 0x20) == 'a') {
+                    va_arg(va, double);
+                }
                 out(*format, buffer, idx++, maxlen);
                 format++;
                 break;
