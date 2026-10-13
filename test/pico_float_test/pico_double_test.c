@@ -27,6 +27,11 @@
 #include <sys/types.h>
 #include "inttypes.h"
 
+#if defined(__LLVM_LIBC__) && defined(__llvm__)
+// LLVM libc doesn't declare asinh, but the SDK implementation provides it
+double asinh(double);
+#endif
+
 #if !LIB_PICO_DOUBLE_COMPILER
 #define TEST_SATURATION 1
 #endif
@@ -362,7 +367,7 @@ int main() {
 
     bool fail = false;
 
-#if !(defined(__LLVM_LIBC__) && defined(__llvm__))
+#if !(defined(__LLVM_LIBC__) && defined(__llvm__) && LIB_PICO_DOUBLE_COMPILER)
     // asinh(+0) must keep its sign
     {
         volatile double zero = 0.0;
