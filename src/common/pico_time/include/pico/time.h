@@ -240,30 +240,52 @@ static inline bool is_nil_time(absolute_time_t t) {
 /*! \brief Wait until after the given timestamp to return
  * \ingroup sleep
  *
- * \note  This method attempts to perform a lower power (WFE) sleep
+ * This is a lower power (WFE) sleep using the default alarm pool, or a busy wait if the default alarm pool is
+ * disabled (or full).
+ *
+ * \note Using the default alarm pool causes IRQs on its core (generally core 0), even when this is called from the
+ * other core. If that matters, use \ref alarm_pool_sleep_until with a pool created on the calling core, or
+ * \ref busy_wait_until.
  *
  * \param target the time after which to return
  * \sa sleep_us()
  * \sa busy_wait_until()
+ * \sa alarm_pool_sleep_until()
+ * \sa #PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
  * */
 void sleep_until(absolute_time_t target);
 
 /*! \brief Wait for the given number of microseconds before returning
  * \ingroup sleep
  *
- * \note This method attempts to perform a lower power (WFE) sleep
+ * This is a lower power (WFE) sleep using the default alarm pool, or a busy wait if the default alarm pool is
+ * disabled (or full).
+ *
+ * \note Using the default alarm pool causes IRQs on its core (generally core 0), even when this is called from the
+ * other core. If that matters, use \ref alarm_pool_sleep_us with a pool created on the calling core, or
+ * \ref busy_wait_us.
  *
  * \param us the number of microseconds to sleep
  * \sa busy_wait_us()
+ * \sa alarm_pool_sleep_us()
+ * \sa #PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
  */
 void sleep_us(uint64_t us);
 
 /*! \brief Wait for the given number of milliseconds before returning
  * \ingroup sleep
  *
- * \note This method attempts to perform a lower power sleep (using WFE) as much as possible.
+ * This is a lower power (WFE) sleep using the default alarm pool, or a busy wait if the default alarm pool is
+ * disabled (or full).
+ *
+ * \note Using the default alarm pool causes IRQs on its core (generally core 0), even when this is called from the
+ * other core. If that matters, use \ref alarm_pool_sleep_ms with a pool created on the calling core, or
+ * \ref busy_wait_ms.
  *
  * \param ms the number of milliseconds to sleep
+ * \sa busy_wait_ms()
+ * \sa alarm_pool_sleep_ms()
+ * \sa #PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
  */
 void sleep_ms(uint32_t ms);
 
@@ -615,6 +637,49 @@ int32_t alarm_pool_remaining_alarm_time_ms(alarm_pool_t *pool, alarm_id_t alarm_
  * \sa alarm_id_t for a note on reuse of IDs
  */
 bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id);
+
+/*! \brief Wait until after the given timestamp to return, using the given alarm pool
+ * \ingroup sleep
+ *
+ * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It causes IRQs on the core of
+ * \p pool (the core that created it), so, for example, a core can sleep without interrupting the other core by using
+ * a pool it created itself.
+ *
+ * \note \p pool must use the default timer (see \ref alarm_pool_get_default_timer).
+ *
+ * \param pool the alarm pool to use
+ * \param target the time after which to return
+ * \sa sleep_until()
+ */
+void alarm_pool_sleep_until(alarm_pool_t *pool, absolute_time_t target);
+
+/*! \brief Wait for the given number of microseconds before returning, using the given alarm pool
+ * \ingroup sleep
+ *
+ * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It causes IRQs on the core of
+ * \p pool (the core that created it).
+ *
+ * \note \p pool must use the default timer (see \ref alarm_pool_get_default_timer).
+ *
+ * \param pool the alarm pool to use
+ * \param us the number of microseconds to sleep
+ * \sa alarm_pool_sleep_until()
+ */
+void alarm_pool_sleep_us(alarm_pool_t *pool, uint64_t us);
+
+/*! \brief Wait for the given number of milliseconds before returning, using the given alarm pool
+ * \ingroup sleep
+ *
+ * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It causes IRQs on the core of
+ * \p pool (the core that created it).
+ *
+ * \note \p pool must use the default timer (see \ref alarm_pool_get_default_timer).
+ *
+ * \param pool the alarm pool to use
+ * \param ms the number of milliseconds to sleep
+ * \sa alarm_pool_sleep_until()
+ */
+void alarm_pool_sleep_ms(alarm_pool_t *pool, uint32_t ms);
 
 #if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 /*!

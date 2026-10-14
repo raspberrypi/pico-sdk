@@ -30,7 +30,7 @@ uint32_t time_us_32();
 uint64_t time_us_64();
 void busy_wait_us_32(uint32_t delay_us);
 void busy_wait_us(uint64_t delay_us);
-void busy_wait_ms(uint32_t delay_m);
+void busy_wait_ms(uint32_t delay_ms);
 void busy_wait_until(absolute_time_t t);
 bool time_reached(absolute_time_t t);
 typedef void (*hardware_alarm_callback_t)(uint alarm_num);
