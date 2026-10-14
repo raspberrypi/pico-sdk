@@ -224,6 +224,12 @@ bool PICO_WEAK_FUNCTION_IMPL_NAME(gpio_get)(uint gpio) {
     return 0;
 }
 
+PICO_WEAK_FUNCTION_DEF(gpio_get_pad)
+int PICO_WEAK_FUNCTION_IMPL_NAME(gpio_get_pad)(uint gpio) {
+    check_gpio_param(gpio);
+    return 0;
+}
+
 PICO_WEAK_FUNCTION_DEF(gpio_get_all)
 uint32_t PICO_WEAK_FUNCTION_IMPL_NAME(gpio_get_all)(void) {
     return 0;

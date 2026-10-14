@@ -158,6 +158,9 @@ void gpio_init_mask64(uint64_t gpio_mask);
 // Get the value of a single GPIO
 bool gpio_get(uint gpio);
 
+// Get the raw input level at the pad of a single GPIO
+int gpio_get_pad(uint gpio);
+
 // Get raw value of all
 uint32_t gpio_get_all(void);
 
