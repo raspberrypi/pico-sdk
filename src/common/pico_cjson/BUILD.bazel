@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "pico_cjson",
+    actual = "@cJSON//:cJSON_library",
+)

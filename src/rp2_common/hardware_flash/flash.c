@@ -6,6 +6,7 @@
 
 #include "hardware/flash.h"
 #include "pico/bootrom.h"
+#include "boot/picobin.h"
 
 #if PICO_RP2040
 #include "hardware/structs/io_qspi.h"
@@ -456,6 +457,30 @@ void flash_devinfo_set_cs_gpio(uint cs, uint gpio) {
         ((uint16_t)gpio) << OTP_DATA_FLASH_DEVINFO_CS1_GPIO_LSB,
         OTP_DATA_FLASH_DEVINFO_CS1_GPIO_BITS
     );
+}
+
+int flash_program_invalid_block_to_b_partition(uint pi_a) {
+    int pi_b = rom_get_b_partition(pi_a);
+    invalid_params_if_and_return(HARDWARE_FLASH, pi_b < 0, pi_b);
+
+    uint32_t buffer[4 + 1] = {}; // single partition, with maximum of 4 words returned, plus 1
+    int ret = rom_get_partition_table_info(buffer, count_of(buffer), PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION | ((uint32_t)pi_b << 24));
+    hard_assert(buffer[0] == (PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION));
+    hard_assert(ret == 3);
+
+    uint32_t location_and_permissions = buffer[1];
+    uint32_t saddr = ((location_and_permissions >> PICOBIN_PARTITION_LOCATION_FIRST_SECTOR_LSB) & 0x1fffu) * FLASH_SECTOR_SIZE;
+
+    uint32_t invalid_block[FLASH_PAGE_SIZE/sizeof(uint32_t)] = PICOBIN_INVALID_BLOCK;
+
+    saddr += XIP_BASE;
+    cflash_flags_t flags = {
+        (CFLASH_OP_VALUE_PROGRAM << CFLASH_OP_LSB)
+        | (CFLASH_SECLEVEL_VALUE_SECURE << CFLASH_SECLEVEL_LSB)
+        | (CFLASH_ASPACE_VALUE_STORAGE << CFLASH_ASPACE_LSB)
+    };
+    ret = rom_flash_op(flags, saddr, sizeof(invalid_block), (uint8_t*)invalid_block);
+    return ret;
 }
 
 #endif // !PICO_RP2040

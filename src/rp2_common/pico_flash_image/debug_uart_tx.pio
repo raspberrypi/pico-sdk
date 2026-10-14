@@ -1,0 +1,38 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program uart_tx
+.side_set 1 opt
+
+; OUT pin 0 and side-set pin 0 are both mapped to UART TX pin.
+
+; NOTE! There is a sleight of hand in respect of the FIFO pack/unpacking.
+; 0x00 is used as a FIFO word padder during flushing and the PIO program will
+; wait on a new word from the FIFO *once* the Output Shift Register is 0
+; but only *after* the first character from the FIFO has been transmitted.
+; If you need to send arbitrarily placed 0x00 characters, the code will need
+; to send those as the first character in a FIFO word and pad the rest of the
+; word with zeros (or non-zero data if that is next).
+
+.wrap_target
+next_pull:
+    pull       side 1 [4]   ; Assert stop bit, or stall with line in idle state
+                            ; The 4 is for the correct inter-fifo spacing ...
+                            ; the first character has long time before it anyway
+    set y, 3                ; Preload the byte counter
+
+byteloop:
+    set x, 7   side 0 [7]   ; Preload bit counter, assert start bit for 8 clocks
+
+bitloop:                    ; This loop will run 8 times (8n1 UART)
+    out pins, 1             ; Shift 1 bit from OSR to the first OUT pin
+    jmp x-- bitloop  [6]    ; Each loop iteration is 8 cycles.
+
+    mov x, osr side 1       ; Start the stop bit!
+    jmp !x next_pull        ; Remaining bytes are zero, it was a flush
+
+    jmp y-- byteloop [5]
+.wrap

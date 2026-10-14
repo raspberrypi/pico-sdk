@@ -830,6 +830,9 @@ static inline int rom_pick_ab_partition(uint8_t *workarea_base, uint32_t workare
  * This function also checks that the chosen partition contained a valid image (e.g. a signed image when using secure boot), and returns
  * `BOOTROM_ERROR_NOT_FOUND` if it does not.
  *
+ * If there is no block loop in the B partition it will return `BOOTROM_ERROR_INVALID_DATA`, as the \ref rom_pick_ab_partition() function does
+ * not verify the A partition in that case.
+ *
  * \param workarea_base base address of work area
  * \param workarea_size size of work area
  * \param partition_a_num the A partition of the pair
