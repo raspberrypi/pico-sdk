@@ -167,12 +167,16 @@
 /*! \brief Section attribute macro for data that is to be left uninitialized
  *  \ingroup pico_platform
  *
- * Data marked this way will retain its value across a reset (normally uninitialized data - in the .bss
- * section) is initialized to zero during runtime initialization
+ * Data marked this way isn't initialized during runtime initialization (normally uninitialized data, in the .bss
+ * section, is set to zero), so it keeps its value across a reset that leaves the SRAM powered, such as a watchdog
+ * reset or a reset requested by software or a debugger.
  *
- * For example a `uint32_t` foo that will retain its value if the program is restarted by reset.
+ * For example a `uint32_t` foo that will retain its value if the program is restarted by such a reset.
  *
  *     uint32_t __uninitialized_ram(foo);
+ *
+ * \note The RUN pin is a full chip reset, so values only survive it on RP2040, as its SRAM has no power
+ * gating. On RP2350, the SRAM is powered down while RUN is asserted, so values are lost.
  *
  * The section attribute is `.uninitialized_data.<group>`
  *
