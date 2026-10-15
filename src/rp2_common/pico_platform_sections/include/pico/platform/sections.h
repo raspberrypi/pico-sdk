@@ -175,9 +175,8 @@
  *
  *     uint32_t __uninitialized_ram(foo);
  *
- * \note The RUN pin is a full chip reset, so don't rely on values surviving it. On RP2350, the SRAM is
- * powered down while RUN is asserted, so values are lost. RP2040 happens to keep them, as its SRAM has no
- * power gating.
+ * \note The RUN pin is a full chip reset, so values only survive it on RP2040, as its SRAM has no power
+ * gating. On RP2350, the SRAM is powered down while RUN is asserted, so values are lost.
  *
  * The section attribute is `.uninitialized_data.<group>`
  *
