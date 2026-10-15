@@ -25,40 +25,40 @@ extern "C" {
 
 #define _riscv_read_csr(csrname) ({ \
     uint32_t __csr_tmp_u32; \
-    asm volatile ("csrr %0, " #csrname : "=r" (__csr_tmp_u32)); \
+    pico_default_asm_volatile("csrr %0, " #csrname : "=r" (__csr_tmp_u32)); \
     __csr_tmp_u32; \
 })
 
 #define _riscv_write_csr(csrname, data) ({ \
     if (__builtin_constant_p(data) && !((data) & -32u)) { \
-        asm volatile ("csrwi " #csrname ", %0" : : "i" (data)); \
+        pico_default_asm_volatile("csrwi " #csrname ", %0" : : "i" (data)); \
     } else { \
-        asm volatile ("csrw " #csrname ", %0" : : "r" (data)); \
+        pico_default_asm_volatile("csrw " #csrname ", %0" : : "r" (data)); \
     } \
 })
 
 #define _riscv_set_csr(csrname, data) ({ \
     if (__builtin_constant_p(data) && !((data) & -32u)) { \
-        asm volatile ("csrsi " #csrname ", %0" : : "i" (data)); \
+        pico_default_asm_volatile("csrsi " #csrname ", %0" : : "i" (data)); \
     } else { \
-        asm volatile ("csrs " #csrname ", %0" : : "r" (data)); \
+        pico_default_asm_volatile("csrs " #csrname ", %0" : : "r" (data)); \
     } \
 })
 
 #define _riscv_clear_csr(csrname, data) ({ \
     if (__builtin_constant_p(data) && !((data) & -32u)) { \
-        asm volatile ("csrci " #csrname ", %0" : : "i" (data)); \
+        pico_default_asm_volatile("csrci " #csrname ", %0" : : "i" (data)); \
     } else { \
-        asm volatile ("csrc " #csrname ", %0" : : "r" (data)); \
+        pico_default_asm_volatile("csrc " #csrname ", %0" : : "r" (data)); \
     } \
 })
 
 #define _riscv_read_write_csr(csrname, data) ({ \
     uint32_t __csr_tmp_u32; \
     if (__builtin_constant_p(data) && !((data) & -32u)) { \
-        asm volatile ("csrrwi %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "i" (data)); \
+        pico_default_asm_volatile("csrrwi %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "i" (data)); \
     } else { \
-        asm volatile ("csrrw %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "r" (data)); \
+        pico_default_asm_volatile("csrrw %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "r" (data)); \
     } \
     __csr_tmp_u32; \
 })
@@ -66,9 +66,9 @@ extern "C" {
 #define _riscv_read_set_csr(csrname, data) ({ \
     uint32_t __csr_tmp_u32; \
     if (__builtin_constant_p(data) && !((data) & -32u)) { \
-        asm volatile ("csrrsi %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "i" (data)); \
+        pico_default_asm_volatile("csrrsi %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "i" (data)); \
     } else { \
-        asm volatile ("csrrs %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "r" (data)); \
+        pico_default_asm_volatile("csrrs %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "r" (data)); \
     } \
     __csr_tmp_u32; \
 })
@@ -76,9 +76,9 @@ extern "C" {
 #define _riscv_read_clear_csr(csrname, data) ({ \
     uint32_t __csr_tmp_u32; \
     if (__builtin_constant_p(data) && !((data) & -32u)) { \
-        asm volatile ("csrrci %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "i" (data)); \
+        pico_default_asm_volatile("csrrci %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "i" (data)); \
     } else { \
-        asm volatile ("csrrc %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "r" (data)); \
+        pico_default_asm_volatile("csrrc %0, " #csrname ", %1": "=r" (__csr_tmp_u32) : "r" (data)); \
     } \
     __csr_tmp_u32; \
 })
