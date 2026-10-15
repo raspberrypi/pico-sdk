@@ -385,8 +385,11 @@ raw_encoding instr_out::raw_encode(program& program) {
 
 raw_encoding instr_set::raw_encode(program& program) {
     int v = value->resolve(program);
+    if (v == -1 && (dest == in_out_set::in_out_set_x || dest == in_out_set::in_out_set_y)) {
+        return {inst_type::mov, (uint) dest, (uint) mov::null | ((uint) mov_op::invert << 3u)};
+    }
     if (v < 0 || v > 31) {
-        throw syntax_error(value->location, "'set' bit count must be >= 0 and <= 31");
+        throw syntax_error(value->location, "'set' value must be >= 0 and <= 31 (or -1 for x and y)");
     }
     return {inst_type::set, (uint) dest, (uint) v};
 }
