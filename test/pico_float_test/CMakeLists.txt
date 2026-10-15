@@ -35,27 +35,34 @@ foreach (FLOAT_TYPE IN LISTS FLOAT_TYPES)
     if (NOT PICO_RISCV)
         # keep default as pico_float_test for backwards compatibility
         if (FLOAT_TYPE STREQUAL "pico")
-            set(PICO_FLOAT_TEST "pico_float_test")
+            set(PICO_FLOAT_TEST_BASE "pico_float_test")
         else()
-            set(PICO_FLOAT_TEST "pico_float_test_${FLOAT_TYPE}")
+            set(PICO_FLOAT_TEST_BASE "pico_float_test_${FLOAT_TYPE}")
         endif()
-        add_executable(${PICO_FLOAT_TEST}
-                pico_float_test.c
-                llvm/call_apsr.S
-        )
+        # NaN propagation is opt-in, so test both with and without it
+        foreach (NAN_SUFFIX IN ITEMS "" "_nan")
+            set(PICO_FLOAT_TEST ${PICO_FLOAT_TEST_BASE}${NAN_SUFFIX})
+            add_executable(${PICO_FLOAT_TEST}
+                    pico_float_test.c
+                    llvm/call_apsr.S
+            )
+            if (NAN_SUFFIX)
+                target_compile_definitions(${PICO_FLOAT_TEST} PRIVATE PICO_FLOAT_PROPAGATE_NANS=1)
+            endif()
 
-        #todo split out variants with different flags
-        target_compile_definitions(${PICO_FLOAT_TEST} PRIVATE
-                #        PICO_FLOAT_PROPAGATE_NANS=1
-                #        PICO_DIVIDER_DISABLE_INTERRUPTS=1
-        )
-
-        # handy for testing we aren't pulling in extra stuff
-        #target_link_options(${PICO_FLOAT_TEST} PRIVATE -nodefaultlibs)
-        target_include_directories(${PICO_FLOAT_TEST} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/llvm)
-        target_link_libraries(${PICO_FLOAT_TEST} pico_float pico_stdlib m)
-        pico_add_extra_outputs(${PICO_FLOAT_TEST})
-        pico_set_float_implementation(${PICO_FLOAT_TEST} ${FLOAT_TYPE})
+            # handy for testing we aren't pulling in extra stuff
+            #target_link_options(${PICO_FLOAT_TEST} PRIVATE -nodefaultlibs)
+            target_include_directories(${PICO_FLOAT_TEST} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/llvm)
+            target_link_libraries(${PICO_FLOAT_TEST} pico_float pico_stdlib m)
+            pico_add_extra_outputs(${PICO_FLOAT_TEST})
+            pico_set_float_implementation(${PICO_FLOAT_TEST} ${FLOAT_TYPE})
+            if (PICO_C_COMPILER_IS_CLANG)
+                # llvm by default will treat our out of range float->int conversions as undefined behavior
+                # and may just decide the function is too broken to bother even with the function epilogue, so we
+                # force it to accept out of range values (since we support them in our versions today)
+                target_compile_options(${PICO_FLOAT_TEST} PRIVATE -fno-strict-float-cast-overflow)
+            endif()
+        endforeach()
     endif()
 
     add_executable(custom_float_funcs_test_${FLOAT_TYPE} custom_float_funcs_test.c)
@@ -73,7 +80,6 @@ foreach (FLOAT_TYPE IN LISTS FLOAT_TYPES)
         # llvm by default will treat our out of range float->int conversions as undefined behavior
         # and may just decide the function is too broken to bother even with the function epilogue, so we
         # force it to accept out of range values (since we support them in our versions today)
-        target_compile_options(${PICO_FLOAT_TEST} PRIVATE -fno-strict-float-cast-overflow)
         target_compile_options(custom_float_funcs_test_${FLOAT_TYPE} PRIVATE -fno-strict-float-cast-overflow)
     endif()
 
@@ -93,31 +99,41 @@ foreach (DOUBLE_TYPE IN LISTS DOUBLE_TYPES)
     if (NOT PICO_RISCV)
         # keep default as pico_float_test for backwards compatibility
         if (DOUBLE_TYPE STREQUAL "pico")
-            set(PICO_DOUBLE_TEST "pico_double_test")
+            set(PICO_DOUBLE_TEST_BASE "pico_double_test")
         else()
-            set(PICO_DOUBLE_TEST "pico_double_test_${DOUBLE_TYPE}")
+            set(PICO_DOUBLE_TEST_BASE "pico_double_test_${DOUBLE_TYPE}")
         endif()
 
-        add_executable(${PICO_DOUBLE_TEST}
-                pico_double_test.c
-                llvm/call_apsr.S
-        )
+        # NaN propagation is opt-in, so test both with and without it
+        foreach (NAN_SUFFIX IN ITEMS "" "_nan")
+            set(PICO_DOUBLE_TEST ${PICO_DOUBLE_TEST_BASE}${NAN_SUFFIX})
+            add_executable(${PICO_DOUBLE_TEST}
+                    pico_double_test.c
+                    llvm/call_apsr.S
+            )
 
-        target_include_directories(${PICO_DOUBLE_TEST} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/llvm)
-        target_link_libraries(${PICO_DOUBLE_TEST} pico_double pico_stdlib m)
-        pico_add_extra_outputs(${PICO_DOUBLE_TEST})
-        pico_set_double_implementation(${PICO_DOUBLE_TEST} ${DOUBLE_TYPE})
-        #todo split out variants with different flags
-        target_compile_definitions(${PICO_DOUBLE_TEST} PRIVATE
-                PICO_USE_CRT_PRINTF=1 # want full precision output
-                PICO_FLOAT_PROPAGATE_NANS=1
-                PICO_DOUBLE_PROPAGATE_NANS=1
-                #PICO_DIVIDER_DISABLE_INTERRUPTS=1
-        )
-        if (NOT PICO_CLIB STREQUAL "llvm_libc")
-            # raw compiler printf on llvm_libc doesn't currently have floating point
-            pico_set_printf_implementation(${PICO_DOUBLE_TEST} compiler) # want full precision output
-        endif()
+            target_include_directories(${PICO_DOUBLE_TEST} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/llvm)
+            target_link_libraries(${PICO_DOUBLE_TEST} pico_double pico_stdlib m)
+            pico_add_extra_outputs(${PICO_DOUBLE_TEST})
+            pico_set_double_implementation(${PICO_DOUBLE_TEST} ${DOUBLE_TYPE})
+            target_compile_definitions(${PICO_DOUBLE_TEST} PRIVATE
+                    PICO_USE_CRT_PRINTF=1 # want full precision output
+            )
+            if (NAN_SUFFIX)
+                target_compile_definitions(${PICO_DOUBLE_TEST} PRIVATE
+                        PICO_FLOAT_PROPAGATE_NANS=1
+                        PICO_DOUBLE_PROPAGATE_NANS=1
+                )
+            endif()
+            if (NOT PICO_CLIB STREQUAL "llvm_libc")
+                # raw compiler printf on llvm_libc doesn't currently have floating point
+                pico_set_printf_implementation(${PICO_DOUBLE_TEST} compiler) # want full precision output
+            endif()
+            if (PICO_C_COMPILER_IS_CLANG)
+                # see pico_float_test above
+                target_compile_options(${PICO_DOUBLE_TEST} PRIVATE -fno-strict-float-cast-overflow)
+            endif()
+        endforeach()
 
         add_executable(custom_double_funcs_test_${DOUBLE_TYPE} custom_double_funcs_test.c)
         pico_set_double_implementation(custom_double_funcs_test_${DOUBLE_TYPE} ${DOUBLE_TYPE})
@@ -132,7 +148,6 @@ foreach (DOUBLE_TYPE IN LISTS DOUBLE_TYPES)
             # llvm by default will treat our out of range float->int conversions as undefined behavior
             # and may just decide the function is too broken to bother even with the function epilogue, so we
             # force it to accept out of range values (since we support them in our versions today)
-            target_compile_options(${PICO_DOUBLE_TEST} PRIVATE -fno-strict-float-cast-overflow)
             target_compile_options(custom_double_funcs_test_${DOUBLE_TYPE} PRIVATE -fno-strict-float-cast-overflow)
         endif()
     endif()
