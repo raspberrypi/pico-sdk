@@ -1,0 +1,186 @@
+// run: pioasm input.pio
+// Test origin edge cases - what happens when programs are loaded at specific addresses
+
+.program origin_zero_with_jumps
+.origin 0
+start:
+    jmp start   ; Jump to address 0
+    jmp end     ; Jump to address 1
+end:
+    nop
+
+.program origin_at_end
+.origin 29
+    nop
+    nop
+    nop  ; Will be at addresses 29, 30, 31
+
+.program origin_with_wrap_target
+.origin 15
+.wrap_target
+    nop
+    nop
+.wrap
+
+.program origin_affects_jmp
+.origin 10
+start:
+    jmp start   ; Will encode as jmp 10 (absolute)
+    nop
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ---------------------- //
+// // origin_zero_with_jumps //
+// // ---------------------- //
+// 
+// #define origin_zero_with_jumps_wrap_target 0
+// #define origin_zero_with_jumps_wrap 2
+// #define origin_zero_with_jumps_pio_version 0
+// 
+// static __pio_const uint16_t origin_zero_with_jumps_program_instructions[] = {
+//             //     .wrap_target
+//     0x0000, //  0: jmp    0
+//     0x0002, //  1: jmp    2
+//     0xa042, //  2: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program origin_zero_with_jumps_program = {
+//     .instructions = origin_zero_with_jumps_program_instructions,
+//     .length = 3,
+//     .origin = 0,
+//     .pio_version = origin_zero_with_jumps_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config origin_zero_with_jumps_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + origin_zero_with_jumps_wrap_target, offset + origin_zero_with_jumps_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // ------------- //
+// // origin_at_end //
+// // ------------- //
+// 
+// #define origin_at_end_wrap_target 0
+// #define origin_at_end_wrap 2
+// #define origin_at_end_pio_version 0
+// 
+// static __pio_const uint16_t origin_at_end_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xa042, //  1: nop
+//     0xa042, //  2: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program origin_at_end_program = {
+//     .instructions = origin_at_end_program_instructions,
+//     .length = 3,
+//     .origin = 29,
+//     .pio_version = origin_at_end_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config origin_at_end_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + origin_at_end_wrap_target, offset + origin_at_end_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // ----------------------- //
+// // origin_with_wrap_target //
+// // ----------------------- //
+// 
+// #define origin_with_wrap_target_wrap_target 0
+// #define origin_with_wrap_target_wrap 1
+// #define origin_with_wrap_target_pio_version 0
+// 
+// static __pio_const uint16_t origin_with_wrap_target_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xa042, //  1: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program origin_with_wrap_target_program = {
+//     .instructions = origin_with_wrap_target_program_instructions,
+//     .length = 2,
+//     .origin = 15,
+//     .pio_version = origin_with_wrap_target_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config origin_with_wrap_target_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + origin_with_wrap_target_wrap_target, offset + origin_with_wrap_target_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------ //
+// // origin_affects_jmp //
+// // ------------------ //
+// 
+// #define origin_affects_jmp_wrap_target 0
+// #define origin_affects_jmp_wrap 1
+// #define origin_affects_jmp_pio_version 0
+// 
+// static __pio_const uint16_t origin_affects_jmp_program_instructions[] = {
+//             //     .wrap_target
+//     0x0000, //  0: jmp    0
+//     0xa042, //  1: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program origin_affects_jmp_program = {
+//     .instructions = origin_affects_jmp_program_instructions,
+//     .length = 2,
+//     .origin = 10,
+//     .pio_version = origin_affects_jmp_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config origin_affects_jmp_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + origin_affects_jmp_wrap_target, offset + origin_affects_jmp_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

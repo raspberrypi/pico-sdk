@@ -1,0 +1,138 @@
+// run: pioasm input.pio
+.program sideset_1
+.side_set 1
+    nop side 0
+    nop side 1
+
+.program sideset_opt
+.side_set 2 opt
+    nop
+    nop side 3
+
+.program sideset_pindirs
+.side_set 3 opt pindirs
+    nop side 7
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // --------- //
+// // sideset_1 //
+// // --------- //
+// 
+// #define sideset_1_wrap_target 0
+// #define sideset_1_wrap 1
+// #define sideset_1_pio_version 0
+// 
+// static __pio_const uint16_t sideset_1_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop                    side 0
+//     0xb042, //  1: nop                    side 1
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program sideset_1_program = {
+//     .instructions = sideset_1_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = sideset_1_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config sideset_1_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + sideset_1_wrap_target, offset + sideset_1_wrap);
+//     sm_config_set_sideset(&c, 1, false, false);
+//     return c;
+// }
+// #endif
+// 
+// // ----------- //
+// // sideset_opt //
+// // ----------- //
+// 
+// #define sideset_opt_wrap_target 0
+// #define sideset_opt_wrap 1
+// #define sideset_opt_pio_version 0
+// 
+// static __pio_const uint16_t sideset_opt_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xbc42, //  1: nop                    side 3
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program sideset_opt_program = {
+//     .instructions = sideset_opt_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = sideset_opt_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config sideset_opt_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + sideset_opt_wrap_target, offset + sideset_opt_wrap);
+//     sm_config_set_sideset(&c, 3, true, false);
+//     return c;
+// }
+// #endif
+// 
+// // --------------- //
+// // sideset_pindirs //
+// // --------------- //
+// 
+// #define sideset_pindirs_wrap_target 0
+// #define sideset_pindirs_wrap 0
+// #define sideset_pindirs_pio_version 0
+// 
+// static __pio_const uint16_t sideset_pindirs_program_instructions[] = {
+//             //     .wrap_target
+//     0xbe42, //  0: nop                    side 7
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program sideset_pindirs_program = {
+//     .instructions = sideset_pindirs_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = sideset_pindirs_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config sideset_pindirs_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + sideset_pindirs_wrap_target, offset + sideset_pindirs_wrap);
+//     sm_config_set_sideset(&c, 4, true, true);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

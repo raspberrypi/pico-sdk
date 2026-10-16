@@ -1,0 +1,69 @@
+// run: pioasm input.pio
+.program symbol_test
+.define PUBLIC entry_point 0
+.define local_const 2
+start:
+    jmp middle
+middle:
+    jmp end
+end:
+    jmp start
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ----------- //
+// // symbol_test //
+// // ----------- //
+// 
+// #define symbol_test_wrap_target 0
+// #define symbol_test_wrap 2
+// #define symbol_test_pio_version 0
+// 
+// #define symbol_test_entry_point 0
+// 
+// static __pio_const uint16_t symbol_test_program_instructions[] = {
+//             //     .wrap_target
+//     0x0001, //  0: jmp    1
+//     0x0002, //  1: jmp    2
+//     0x0000, //  2: jmp    0
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program symbol_test_program = {
+//     .instructions = symbol_test_program_instructions,
+//     .length = 3,
+//     .origin = -1,
+//     .pio_version = symbol_test_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config symbol_test_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + symbol_test_wrap_target, offset + symbol_test_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

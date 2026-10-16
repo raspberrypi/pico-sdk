@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program mov_status_missing
+.mov_status
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:2.28: expected 'txfifo < N', 'rxfifo < N' or 'irq set N'
+//     2 | .program mov_status_missing
+//       |                            ^
+// 

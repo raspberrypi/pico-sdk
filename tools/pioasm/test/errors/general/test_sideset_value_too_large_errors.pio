@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program sideset_value_too_large
+.side_set 2
+    nop side 4
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.14: the maximum side set value is 3 based on the configuration specified at input.pio:3.1-11
+//     4 |     nop side 4
+//       |              ^
+// 

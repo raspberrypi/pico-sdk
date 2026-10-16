@@ -1,0 +1,105 @@
+// run: pioasm input.pio
+.program wrap_begin
+.wrap_target
+wrap_begin:
+    nop
+    jmp wrap_begin
+.wrap
+
+.program wrap_mid
+wrap_mid:
+    nop
+.wrap_target
+    nop
+    jmp wrap_mid
+.wrap
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ---------- //
+// // wrap_begin //
+// // ---------- //
+// 
+// #define wrap_begin_wrap_target 0
+// #define wrap_begin_wrap 1
+// #define wrap_begin_pio_version 0
+// 
+// static __pio_const uint16_t wrap_begin_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0x0000, //  1: jmp    0
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program wrap_begin_program = {
+//     .instructions = wrap_begin_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = wrap_begin_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config wrap_begin_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + wrap_begin_wrap_target, offset + wrap_begin_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // -------- //
+// // wrap_mid //
+// // -------- //
+// 
+// #define wrap_mid_wrap_target 1
+// #define wrap_mid_wrap 2
+// #define wrap_mid_pio_version 0
+// 
+// static __pio_const uint16_t wrap_mid_program_instructions[] = {
+//     0xa042, //  0: nop
+//             //     .wrap_target
+//     0xa042, //  1: nop
+//     0x0000, //  2: jmp    0
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program wrap_mid_program = {
+//     .instructions = wrap_mid_program_instructions,
+//     .length = 3,
+//     .origin = -1,
+//     .pio_version = wrap_mid_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config wrap_mid_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + wrap_mid_wrap_target, offset + wrap_mid_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

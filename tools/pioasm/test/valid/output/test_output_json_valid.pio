@@ -1,0 +1,45 @@
+// run: pioasm -o json input.pio
+.program format_test
+    nop
+
+// -- Output
+// Command: pioasm -o json input.pio
+// Exit code: 0
+// Stdout:
+// {
+// 	"pioASMVersion": "2.2.1-develop",
+// 	"publicSymbols": {
+// 	},
+// 	"programs": [
+// 		{
+// 			"name": "format_test",
+// 			"pioVersion": 0,
+// 			"wrapTarget": 0,
+// 			"wrap": 0,
+// 			"origin": -1,
+// 			"usedGPIORanges": 0,
+// 			"publicSymbols": {
+// 			},
+// 			"publicLabels": {
+// 			},
+// 			"in": null,
+// 			"out": null,
+// 			"setCount": null,
+// 			"sideset": null,
+// 			"movStatus": null,
+// 			"fifoConfig": null,
+// 			"clockDiv": null,
+// 			"instructions": [
+// 				{"hex": "A042", "instruction": "nop"}
+// 			],
+// 			"codeBlocks": [
+// 
+// 			],
+// 			"langOpts": [
+// 
+// 			]
+// 		}
+// 	]
+// }
+// 
+// Stderr:

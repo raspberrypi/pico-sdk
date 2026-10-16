@@ -1,0 +1,27 @@
+// run: pioasm -o hex input.pio
+.program all_basic
+    wait 0 gpio 0      ; WAIT instruction  
+    in pins, 8         ; IN instruction
+    out pins, 8        ; OUT instruction
+    push               ; PUSH instruction
+    pull               ; PULL instruction
+    mov x, y           ; MOV instruction
+    irq 0              ; IRQ instruction
+    set pins, 0        ; SET instruction
+    jmp 0              ; JMP instruction (back to start)
+
+// -- Output
+// Command: pioasm -o hex input.pio
+// Exit code: 0
+// Stdout:
+// 2000
+// 4008
+// 6008
+// 8020
+// 80a0
+// a022
+// c000
+// e000
+// 0000
+// 
+// Stderr:

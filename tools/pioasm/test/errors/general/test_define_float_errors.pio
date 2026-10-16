@@ -1,0 +1,14 @@
+// run: pioasm input.pio
+.program define_float_error
+.define PUBLIC bad_val 1.5
+    nop
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.24-26: syntax error, unexpected float
+//     3 | .define PUBLIC bad_val 1.5
+//       |                        ^~~
+// 

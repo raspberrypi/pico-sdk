@@ -1,0 +1,120 @@
+// run: pioasm input.pio
+.program delay_all
+    nop [0]
+    nop [1]
+    nop [2]
+    nop [3]
+    nop [4]
+    nop [5]
+    nop [6]
+    nop [7]
+    nop [8]
+    nop [9]
+    nop [10]
+    nop [11]
+    nop [12]
+    nop [13]
+    nop [14]
+    nop [15]
+    nop [16]
+    nop [17]
+    nop [18]
+    nop [19]
+    nop [20]
+    nop [21]
+    nop [22]
+    nop [23]
+    nop [24]
+    nop [25]
+    nop [26]
+    nop [27]
+    nop [28]
+    nop [29]
+    nop [30]
+    nop [31]
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // --------- //
+// // delay_all //
+// // --------- //
+// 
+// #define delay_all_wrap_target 0
+// #define delay_all_wrap 31
+// #define delay_all_pio_version 0
+// 
+// static __pio_const uint16_t delay_all_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xa142, //  1: nop                           [1]
+//     0xa242, //  2: nop                           [2]
+//     0xa342, //  3: nop                           [3]
+//     0xa442, //  4: nop                           [4]
+//     0xa542, //  5: nop                           [5]
+//     0xa642, //  6: nop                           [6]
+//     0xa742, //  7: nop                           [7]
+//     0xa842, //  8: nop                           [8]
+//     0xa942, //  9: nop                           [9]
+//     0xaa42, // 10: nop                           [10]
+//     0xab42, // 11: nop                           [11]
+//     0xac42, // 12: nop                           [12]
+//     0xad42, // 13: nop                           [13]
+//     0xae42, // 14: nop                           [14]
+//     0xaf42, // 15: nop                           [15]
+//     0xb042, // 16: nop                           [16]
+//     0xb142, // 17: nop                           [17]
+//     0xb242, // 18: nop                           [18]
+//     0xb342, // 19: nop                           [19]
+//     0xb442, // 20: nop                           [20]
+//     0xb542, // 21: nop                           [21]
+//     0xb642, // 22: nop                           [22]
+//     0xb742, // 23: nop                           [23]
+//     0xb842, // 24: nop                           [24]
+//     0xb942, // 25: nop                           [25]
+//     0xba42, // 26: nop                           [26]
+//     0xbb42, // 27: nop                           [27]
+//     0xbc42, // 28: nop                           [28]
+//     0xbd42, // 29: nop                           [29]
+//     0xbe42, // 30: nop                           [30]
+//     0xbf42, // 31: nop                           [31]
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program delay_all_program = {
+//     .instructions = delay_all_program_instructions,
+//     .length = 32,
+//     .origin = -1,
+//     .pio_version = delay_all_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config delay_all_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + delay_all_wrap_target, offset + delay_all_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:
