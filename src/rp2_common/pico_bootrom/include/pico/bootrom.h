@@ -1120,9 +1120,9 @@ typedef struct {
 } boot_info_t;
 
 static inline int rom_get_boot_info(boot_info_t *info) {
-    uint32_t result[5];
-    int words_returned = rom_get_sys_info(result, 5, SYS_INFO_BOOT_INFO);
-    if (words_returned == (sizeof(result)/sizeof(result[0])) && result[0] == SYS_INFO_BOOT_INFO) {
+    uint32_t result[SYS_INFO_BOOT_INFO_WORD_COUNT + 1];
+    int words_returned = rom_get_sys_info(result, count_of(result), SYS_INFO_BOOT_INFO);
+    if (words_returned == (SYS_INFO_BOOT_INFO_WORD_COUNT + 1) && result[0] == SYS_INFO_BOOT_INFO) {
         memcpy(info, &result[1], sizeof(boot_info_t));
         return true;
     } else {
@@ -1131,9 +1131,9 @@ static inline int rom_get_boot_info(boot_info_t *info) {
 }
 
 static inline int rom_get_last_boot_type_with_chained_flag(void) {
-    uint32_t result[5];
-    int words_returned = rom_get_sys_info(result, 5, SYS_INFO_BOOT_INFO);
-    if (words_returned == count_of(result) && result[0] == SYS_INFO_BOOT_INFO) {
+    uint32_t result[SYS_INFO_BOOT_INFO_WORD_COUNT + 1];
+    int words_returned = rom_get_sys_info(result, count_of(result), SYS_INFO_BOOT_INFO);
+    if (words_returned == (SYS_INFO_BOOT_INFO_WORD_COUNT + 1) && result[0] == SYS_INFO_BOOT_INFO) {
         // todo use struct
         return (int)((result[1] & 0xff00u) >> 8);
     } else {
