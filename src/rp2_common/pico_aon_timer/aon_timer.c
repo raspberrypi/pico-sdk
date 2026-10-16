@@ -197,8 +197,7 @@ bool aon_timer_start(const struct timespec *ts) {
     rtc_init();
     return aon_timer_set_time(ts);
 #elif HAS_POWMAN_TIMER
-    // todo how best to allow different configurations; this should just be the default
-    powman_timer_set_1khz_tick_source_xosc();
+    powman_timer_set_1khz_tick_source_default();
     bool ok = aon_timer_set_time(ts);
     if (ok) {
         powman_timer_set_ms(timespec_to_ms(ts));
@@ -215,8 +214,7 @@ bool aon_timer_start_calendar(const struct tm *tm) {
     rtc_init();
     return aon_timer_set_time_calendar(tm);
 #elif HAS_POWMAN_TIMER
-    // todo how best to allow different configurations; this should just be the default
-    powman_timer_set_1khz_tick_source_xosc();
+    powman_timer_set_1khz_tick_source_default();
     bool ok = aon_timer_set_time_calendar(tm);
     if (ok) {
         powman_timer_start();
