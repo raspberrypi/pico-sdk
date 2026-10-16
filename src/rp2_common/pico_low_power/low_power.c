@@ -680,30 +680,43 @@ static pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate) {
     return pstate;
 }
 
+#if !PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC // otherwise it is static inline in the header
 pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
-    pstate_bitset_remove_all(pstate);
+#if PICO_RP2350 // Copied from RP2350 section_platform_end.incl, with syntax fixups
+    /* Convert into bits */
+    uint32_t POWMAN_POWER_DOMAIN_XIP_CACHE_BITS  = 1 << POWMAN_POWER_DOMAIN_XIP_CACHE;
+    uint32_t POWMAN_POWER_DOMAIN_SRAM_BANK0_BITS = 1 << POWMAN_POWER_DOMAIN_SRAM_BANK0;
+    uint32_t POWMAN_POWER_DOMAIN_SRAM_BANK1_BITS = 1 << POWMAN_POWER_DOMAIN_SRAM_BANK1;
 
-    if ((uint32_t)__persistent_data_start__ == (uint32_t)__persistent_data_end__) {
-        // No persistent data, so power down everything
-        return pstate;
-    }
+    /* Assert the maximum size, to ensure it doesn't cross from xip cache into main sram */
+    assert((uint32_t)__persistent_data_end__ - (uint32_t)__persistent_data_start__ <= SRAM_STRIPED_END - SRAM_BASE);
 
-    // Keep __persistent_data_start__ on
-    if ((uint32_t)__persistent_data_start__ < SRAM_BASE) {
-        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_XIP_CACHE);
-    } else if ((uint32_t)__persistent_data_start__ < SRAM4_BASE) {
-        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK0);
+    /* Assert end is in striped sram */
+    assert((uint32_t)__persistent_data_end__ <= SRAM_STRIPED_END);
 
-        // Keep __persistent_data_end__ on too, if it is in SRAM bank 1
-        if ((uint32_t)__persistent_data_end__ >= SRAM4_BASE) {
-            pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1);
-        }
-    } else {
-        pstate_bitset_add(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1);
-    }
+    /* Start at 0 */
+    uint32_t __persistent_data_pstate__ = 0;
+
+    /* start in xip cache, so xip cache only */
+    __persistent_data_pstate__ = ((uint32_t)__persistent_data_start__ < XIP_SRAM_END) ? POWMAN_POWER_DOMAIN_XIP_CACHE_BITS : 0;
+
+    /* start in sram0, so OR that in */
+    __persistent_data_pstate__ |= ((uint32_t)__persistent_data_start__ >= SRAM_BASE && (uint32_t)__persistent_data_start__ < SRAM4_BASE) ? POWMAN_POWER_DOMAIN_SRAM_BANK0_BITS : 0;
+
+    /* start or end in sram1, so OR that in */
+    __persistent_data_pstate__ |= ((uint32_t)__persistent_data_start__ >= SRAM4_BASE || (uint32_t)__persistent_data_end__ > SRAM4_BASE) ? POWMAN_POWER_DOMAIN_SRAM_BANK1_BITS : 0;
+
+    /* Reset to 0 if size is 0 */
+    __persistent_data_pstate__ = ((uint32_t)__persistent_data_start__ == (uint32_t)__persistent_data_end__) ? 0 : __persistent_data_pstate__;
+#else
+    #error Unknown processor
+#endif
+
+    pstate_bitset_from_uint32(pstate, (uint32_t)__persistent_data_pstate__);
 
     return pstate;
 }
+#endif
 
 static int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_func resume_func) {
     pstate_bitset_t default_pstate = pstate_bitset_none();
@@ -729,7 +742,7 @@ static int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_
     powman_hw->boot[3] = 0;
 
     // Store the low power state and resume function for use after reboot
-    powman_hw->scratch[6] = pstate_bitset_to_powman_power_state(pstate);
+    powman_hw->scratch[6] = pstate_bitset_to_uint32(pstate);
     powman_hw->scratch[7] = (uint32_t)resume_func;
 
     // Switch to required power state
@@ -785,7 +798,7 @@ void __weak runtime_init_low_power_reboot_check(void) {
         pstate_bitset_t persistent_pstate = pstate_bitset_none();
         low_power_persistent_pstate_get(&persistent_pstate);
         pstate_bitset_t pstate = pstate_bitset_none();
-        pstate_bitset_from_powman_power_state(&pstate, powman_hw->scratch[6]);
+        pstate_bitset_from_uint32(&pstate, powman_hw->scratch[6]);
 
         // check if persistent data was turned off
         if (!pstate_bitset_none_set(&persistent_pstate)) {

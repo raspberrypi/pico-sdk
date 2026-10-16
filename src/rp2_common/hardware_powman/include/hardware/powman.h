@@ -247,6 +247,17 @@ static inline powman_power_state pstate_bitset_to_powman_power_state(pstate_bits
     return fixed_bitset_read_word(&domains->bitset, 0);
 }
 
+static inline uint32_t pstate_bitset_to_uint32(pstate_bitset_t *domains) {
+    static_assert(POWMAN_POWER_DOMAIN_COUNT <= 32);
+    return fixed_bitset_read_word(&domains->bitset, 0);
+}
+
+static inline pstate_bitset_t *pstate_bitset_from_uint32(pstate_bitset_t *domains, uint32_t value) {
+    static_assert(POWMAN_POWER_DOMAIN_COUNT <= 32);
+    fixed_bitset_write_word(&domains->bitset, 0, value);
+    return domains;
+}
+
 /*! \brief Get the current power state
  *  \ingroup hardware_powman
  */
