@@ -11,5 +11,6 @@ cc_library(
     deps = [
         "//src/common/pico_base_headers",
         "//src/rp2_common:hardware_structs",
+        "//src/rp2_common/pico_bootrom",
     ],
 )
