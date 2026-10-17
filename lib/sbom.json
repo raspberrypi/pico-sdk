@@ -1,0 +1,48 @@
+[
+    {
+        "name": "tinyusb",
+        "path": "tinyusb",
+        "license": "MIT",
+        "supplier": "Person: Ha Thach",
+        "url": "https://github.com/hathach/tinyusb",
+        "description": "TinyUSB USB host/device stack",
+        "purl": "pkg:github/hathach/tinyusb@{}"
+    },
+    {
+        "name": "lwip",
+        "path": "lwip",
+        "license": "BSD-3-Clause",
+        "url": "https://github.com/lwip-tcpip/lwip",
+        "description": "lwIP TCP/IP stack",
+        "cpe": "cpe:2.3:a:lwip_project:lwip:{}:*:*:*:*:*:*:*",
+        "purl": "pkg:github/lwip-tcpip/lwip@{}"
+    },
+    {
+        "name": "mbedtls",
+        "path": "mbedtls",
+        "license": "Apache-2.0 OR GPL-2.0-or-later",
+        "url": "https://github.com/Mbed-TLS/mbedtls",
+        "description": "Mbed TLS cryptography and TLS library",
+        "cpe": "cpe:2.3:a:arm:mbed_tls:{}:*:*:*:*:*:*:*",
+        "purl": "pkg:github/Mbed-TLS/mbedtls@{}"
+    },
+    {
+        "name": "btstack",
+        "path": "btstack",
+        "license": "LicenseRef-BTstack-RaspberryPi",
+        "license_file": "../src/rp2_common/pico_btstack/LICENSE.RP",
+        "supplier": "Organization: BlueKitchen GmbH",
+        "url": "https://github.com/bluekitchen/btstack",
+        "description": "BTstack Bluetooth stack, licensed for use with Raspberry Pi wireless products",
+        "purl": "pkg:github/bluekitchen/btstack@{}"
+    },
+    {
+        "name": "cyw43-driver",
+        "path": "cyw43-driver",
+        "license": "LicenseRef-cyw43-driver",
+        "license_file": "cyw43-driver/LICENSE.RP",
+        "url": "https://github.com/georgerobotics/cyw43-driver",
+        "description": "Driver for the CYW43xx wireless chips; check the license terms of the driver and of the firmware blobs",
+        "purl": "pkg:github/georgerobotics/cyw43-driver@{}"
+    }
+]

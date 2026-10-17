@@ -212,4 +212,9 @@ endfunction()
 
 include(${PICO_PLATFORM_CMAKE_FILE})
 
+# binary directory of the SDK, used by pico_add_sbom() to relate build tree paths to source paths
+get_filename_component(_pico_sdk_binary_dir "${CMAKE_CURRENT_BINARY_DIR}/.." ABSOLUTE)
+set_property(GLOBAL PROPERTY PICO_SDK_BINARY_DIR "${_pico_sdk_binary_dir}")
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/pico_sbom.cmake)
+
 pico_promote_common_scope_vars()

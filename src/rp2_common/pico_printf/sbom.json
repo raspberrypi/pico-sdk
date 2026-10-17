@@ -1,0 +1,8 @@
+{
+    "name": "printf",
+    "path": ".",
+    "license": "MIT",
+    "supplier": "Person: Marco Paland",
+    "url": "https://github.com/mpaland/printf",
+    "description": "Tiny printf implementation, modified for the Pico SDK"
+}
