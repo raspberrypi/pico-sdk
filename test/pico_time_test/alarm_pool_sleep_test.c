@@ -30,12 +30,14 @@ int main(void) {
 
     alarm_pool_t *pool = alarm_pool_create_with_unused_hardware_alarm(4);
     PICOTEST_CHECK_AND_ABORT(pool, "failed to create alarm pool");
-    picotest_error_code |= wake_time_test(pool);
+    // each section starts by clearing picotest_error_code, so collect the results here
+    int rc = wake_time_test(pool);
     alarm_pool_destroy(pool);
 
-    picotest_error_code |= full_pool_test();
-    picotest_error_code |= other_core_test();
+    rc |= full_pool_test();
+    rc |= other_core_test();
 
+    picotest_error_code = rc;
     PICOTEST_END_TEST();
 }
 
@@ -53,6 +55,8 @@ static int wake_time_test(alarm_pool_t *pool) {
     PICOTEST_START_SECTION("alarm_pool_sleep_* wake at the right time");
     // the shortest ones are shorter than PICO_TIME_SLEEP_OVERHEAD_ADJUST_US, so are busy waits
     static const uint32_t durations_us[] = {0, 1, 5, 10, 100, 1000, 5000};
+    // the first sleep runs the alarm code cold from flash, which is slow on RP2040
+    alarm_pool_sleep_us(pool, 100);
     for (uint i = 0; i < count_of(durations_us); i++) {
         uint32_t us = durations_us[i];
         absolute_time_t start = get_absolute_time();
