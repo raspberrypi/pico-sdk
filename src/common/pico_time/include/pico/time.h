@@ -641,8 +641,8 @@ bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id);
 /*! \brief Wait until after the given timestamp to return, using the given alarm pool
  * \ingroup sleep
  *
- * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It causes IRQs on the core of
- * \p pool (the core that created it), so, for example, a core can sleep without interrupting the other core by using
+ * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It only causes IRQs on the core that created 
+ * \p pool, so, for example, a core can sleep without interrupting the other core by using
  * a pool it created itself.
  *
  * \note \p pool must use the default timer (see \ref alarm_pool_get_default_timer).
