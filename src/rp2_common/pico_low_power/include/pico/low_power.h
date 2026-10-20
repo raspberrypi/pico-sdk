@@ -97,6 +97,11 @@ extern "C" {
 #define PICO_LOW_POWER_MIN_PSTATE_TIME_MS 10
 #endif
 
+// PICO_CONFIG: PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC, Use persistent pstate bitset calculated at link time instead of calculating it at runtime, type=bool, default=1, group=pico_low_power
+#ifndef PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC
+#define PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC 1
+#endif
+
 #include "hardware/clocks.h"
 #if HAS_RP2040_RTC
 #include "hardware/rtc.h"
@@ -341,10 +346,22 @@ int low_power_pstate_until_gpio_pin_state(uint gpio_pin, bool edge, bool high, p
 /*! \brief  Get Pstate which keeps persistent data powered on
  *  \ingroup pico_low_power
  *
+ * By default, this Pstate is calculated at link time in section_platform_end.incl,
+ * and provided as __persistent_data_pstate__ - to calculate it at runtime instead
+ * (e.g. when using a custom linker script that doesn't provide __persistent_data_pstate__)
+ * set PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC=0
+ *
  * \param pstate Pointer to the Pstate to write the result to.
  * \return The Pstate.
  */
+#if PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC
+static inline pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate)  {
+    extern unsigned char __persistent_data_pstate__[]; // linker script provides this
+    return pstate_bitset_from_uint32(pstate, (uint32_t)__persistent_data_pstate__);
+}
+#else
 pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate);
+#endif
 #endif
 
 
