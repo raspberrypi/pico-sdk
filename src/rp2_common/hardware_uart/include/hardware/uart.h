@@ -393,7 +393,7 @@ static inline void uart_set_irqs_enabled(uart_inst_t *uart, bool rx_has_data, bo
                               (bool_to_bit(rx_has_data) << UART_UARTIMSC_RXIM_LSB) |
                               (bool_to_bit(rx_has_data) << UART_UARTIMSC_RTIM_LSB);
     if (rx_has_data) {
-        // Set minimum threshold
+        // RX FIFO threshold of 1/8 full
         hw_write_masked(&uart_get_hw(uart)->ifls, 0 << UART_UARTIFLS_RXIFLSEL_LSB,
                         UART_UARTIFLS_RXIFLSEL_BITS);
     }
