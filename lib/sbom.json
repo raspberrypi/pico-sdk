@@ -42,7 +42,7 @@
         "license": "LicenseRef-cyw43-driver",
         "license_file": "cyw43-driver/LICENSE",
         "url": "https://github.com/georgerobotics/cyw43-driver",
-        "description": "Driver for the CYW43xx wireless chips, under a custom license (see the embedded license text); the wireless firmware it loads is licensed separately",
+        "description": "Driver for the CYW43xx wireless chips. The wireless firmware it loads is licensed separately",
         "purl": "pkg:github/georgerobotics/cyw43-driver@{}"
     }
 ]
