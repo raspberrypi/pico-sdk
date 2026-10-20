@@ -25,7 +25,8 @@
 #   supplier    e.g. "Organization: Raspberry Pi Ltd"
 #   url         home page / repository
 #   description, cpe, purl, comment
-# Where components are nested the most specific (deepest) path wins.
+# Where components are nested the most specific (deepest) path wins. A directory can only be described
+# once; if several manifests claim it, the first one found wins (the SDK is searched before --manifest).
 
 import argparse
 import datetime
@@ -78,9 +79,14 @@ def sdk_version(sdk_path):
     return version
 
 
-def git_version(comp_dir, repo_root):
+def git_version(comp_dir):
     """Version (and commit) of a git submodule, which may not be checked out; None for plain directories."""
-    rel = os.path.relpath(comp_dir, repo_root)
+    # the superproject is the repository containing the parent directory; for a submodule that is
+    # not checked out this still works, as the parent is part of the superproject
+    repo_root = git(os.path.dirname(comp_dir), "rev-parse", "--show-toplevel")
+    if not repo_root:
+        return None, None
+    rel = os.path.relpath(comp_dir, os.path.realpath(repo_root))
     tree = git(repo_root, "ls-tree", "HEAD", rel)
     fields = tree.split() if tree else []
     if len(fields) < 3 or fields[0] != "160000":
@@ -107,9 +113,10 @@ class Component:
             if self.is_sdk:
                 self.version = sdk_version(sdk_path)
             else:
-                self.version, self.commit = git_version(self.directory, sdk_path)
+                self.version, self.commit = git_version(self.directory)
         self.license = info.get("license", NOASSERTION)
         self.used = False
+        self.ref = None  # unique CycloneDX bom-ref, assigned by load_manifests
 
 
 def load_manifests(search_roots, sdk_path):
@@ -134,7 +141,23 @@ def load_manifests(search_roots, sdk_path):
                 if "name" not in info:
                     warn("{}: entry without a name ignored".format(manifest))
                     continue
-                components.append(Component(info, manifest, sdk_path))
+                comp = Component(info, manifest, sdk_path)
+                # a directory is described once: the first manifest found wins, so the SDK's own
+                # manifests (searched first, shallowest first) take precedence over later ones
+                existing = next((c for c in components if c.directory == comp.directory), None)
+                if existing:
+                    warn("{}: ignoring '{}', {} is already described as '{}'".format(
+                        manifest, comp.name, comp.directory, existing.name))
+                    continue
+                # two components may share a name (e.g. different directories), but bom-refs must be unique
+                base = bom_ref(comp.name)
+                refs = set(c.ref for c in components)
+                comp.ref = base
+                n = 2
+                while comp.ref in refs:
+                    comp.ref = "{}-{}".format(base, n)
+                    n += 1
+                components.append(comp)
     return components
 
 
@@ -167,7 +190,7 @@ def resolve_path(path, project_dir, path_maps):
         if project_dir:
             candidates.append(norm(os.path.join(project_dir, path)))
         return candidates
-    path = norm(os.path.abspath(path))  # archives are relative to the build directory (our cwd)
+    path = norm(os.path.realpath(path))  # archives are relative to the build directory (our cwd)
     for build_dir, source_dir in path_maps:
         if is_under(path, build_dir):
             return [norm(os.path.join(source_dir, os.path.relpath(path, build_dir)))]
@@ -222,7 +245,7 @@ def license_text(comp):
 
 def component_entry(comp):
     info = comp.info
-    entry = {"type": "library", "bom-ref": bom_ref(comp.name), "name": comp.name}
+    entry = {"type": "library", "bom-ref": comp.ref, "name": comp.name}
     if comp.version:
         entry["version"] = comp.version
     if info.get("supplier"):
@@ -235,7 +258,7 @@ def component_entry(comp):
     # a CPE is only useful for vulnerability matching with a real release version, not a commit or a
     # "tag-N-gHASH" description of a commit between releases
     if info.get("cpe") and comp.version and re.fullmatch(r"v?\d+(\.\d+)*", comp.version):
-        entry["cpe"] = info["cpe"].replace("{}", re.sub(r"^v", "", comp.version or "*"))
+        entry["cpe"] = info["cpe"].replace("{}", re.sub(r"^v", "", comp.version))
     if info.get("purl"):
         # without a version a purl cannot be matched against vulnerability data, so drop the "@"
         entry["purl"] = info["purl"].replace("@{}", "@" + comp.version if comp.version else "")
@@ -272,8 +295,8 @@ def build_document(args, used):
             "component": app,
         },
         "components": [component_entry(c) for c in used],
-        "dependencies": [{"ref": app_ref, "dependsOn": [bom_ref(c.name) for c in used]}]
-                        + [{"ref": bom_ref(c.name), "dependsOn": []} for c in used],
+        "dependencies": [{"ref": app_ref, "dependsOn": [c.ref for c in used]}]
+                        + [{"ref": c.ref, "dependsOn": []} for c in used],
     }
 
 

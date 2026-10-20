@@ -30,7 +30,10 @@ All arguments except the target are optional. Python 3 is required.
 1. `pico_add_sbom` enables linker map output and adds a post-build step that runs `pico_sbom.py`.
 2. The script reads the linker map and collects every object file and archive member that was linked.
 3. It loads the `sbom.json` manifests (see below) and matches each linked file to the component whose
-   directory contains it; the deepest matching directory wins.
+   directory contains it; the deepest matching directory wins. A directory can only be described once: if two
+   manifests claim the same directory the first one found is used and a warning is printed. The SDK is searched
+   before `MANIFEST`, so the manifests shipped in the SDK take precedence over a manifest added later, for
+   example by a submodule or by your project.
 4. Every component with at least one linked file is written to the SBOM. Components that are not linked, for
    example btstack in a project that does not use Bluetooth, are left out.
 
