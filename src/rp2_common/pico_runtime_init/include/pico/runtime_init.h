@@ -259,7 +259,7 @@ void runtime_init_post_clock_resets(void);
 // RP2040 IE disable for GPIO 26-29
 // ----------------------------------------
 
-// PICO_CONFIG: PICO_IE_26_29_UNCHANGED_ON_RESET, Leave the input enable of GPIOs 26-29 unchanged after reset even when RP2040 B0 or B1 is supported. Only those revisions need it disabling (RP2040-E6) as later chips already have the correct reset state, type=bool, default=0, advanced=true, group=pico_runtime_init
+// PICO_CONFIG: PICO_IE_26_29_UNCHANGED_ON_RESET, Leave the input enable of GPIOs 26-29 unchanged after reset even when RP2040 B0 or B1 is supported. Only those revisions need it disabling (see erratum RP2040-E6) as later chips already have the correct reset state, type=bool, default=0, advanced=true, group=pico_runtime_init
 #ifndef PICO_IE_26_29_UNCHANGED_ON_RESET
 #define PICO_IE_26_29_UNCHANGED_ON_RESET 0
 #endif
