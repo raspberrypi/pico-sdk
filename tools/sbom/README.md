@@ -18,7 +18,7 @@ pico_add_sbom(my_app
     VERSION  1.2.3                                   # application version
     LICENSE  MIT                                     # SPDX license expression of the application
     SUPPLIER "Organization: Example Ltd"
-    OUTPUT   ${CMAKE_BINARY_DIR}/my_app.cdx.json     # default: <binary>.cdx.json
+    OUTPUT   ${CMAKE_BINARY_DIR}/my_app.cdx.json     # default: <target>.elf.cdx.json next to the binary
     MANIFEST ${CMAKE_CURRENT_LIST_DIR}/third_party   # extra sbom.json files or directories, see below
 )
 ```

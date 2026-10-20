@@ -13,7 +13,7 @@
 #
 # Usage (normally invoked by pico_add_sbom() from CMake):
 #
-# tools/sbom/pico_sbom.py --map app.elf.map --sdk-path <pico-sdk> --name app -o app.cdx.json
+# tools/sbom/pico_sbom.py --map app.elf.map --sdk-path <pico-sdk> --name app -o app.elf.cdx.json
 #
 # Component manifests (sbom.json) may be an object or a list of objects with keys:
 #   name        (required) package name

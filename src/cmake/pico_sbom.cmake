@@ -11,7 +11,7 @@
 # \param\ VERSION Application version
 # \param\ LICENSE SPDX license expression of the application
 # \param\ SUPPLIER Supplier of the application, e.g. "Organization: Example Ltd"
-# \param\ OUTPUT SBOM file to create (default: <target>.cdx.json next to the binary)
+# \param\ OUTPUT SBOM file to create (default: the binary file name plus .cdx.json, e.g. <target>.elf.cdx.json, next to the binary)
 # \param\ MANIFEST Extra sbom.json files or directories to search for them
 function(pico_add_sbom TARGET)
     cmake_parse_arguments(SBOM "" "NAME;VERSION;LICENSE;SUPPLIER;OUTPUT" "MANIFEST" ${ARGN})
