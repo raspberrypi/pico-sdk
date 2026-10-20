@@ -306,14 +306,14 @@ float WRAPPER_FUNC(asinhf)(float x) {
         if(!fisneg(x)) return      logf(     x )+LOG2f;  // 1/x^2 << 1
         else           return fneg(logf(fneg(x))+LOG2f); // 1/x^2 << 1
     }
-    if(x>0) return      (float)log(sqrt((double)x*(double)x+1.0)+(double)x);
+    if(!fisneg(x)) return (float)log(sqrt((double)x*(double)x+1.0)+(double)x);
     else    return fneg((float)log(sqrt((double)x*(double)x+1.0)-(double)x));
 }
 
 float WRAPPER_FUNC(acoshf)(float x) {
     check_nan_f1(x);
     int e;
-    if(fisneg(x)) x=fneg(x);
+    if(x<1) return fnan_or(FPINF);
     e=fgetexp(x);
     if(e>=16+0x7f) return logf(x)+LOG2f;           // |x|>=2^16?
     return (float)log(sqrt(((double)x+1.0)*((double)x-1.0))+(double)x);

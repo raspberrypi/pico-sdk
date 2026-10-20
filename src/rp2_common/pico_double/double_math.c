@@ -309,14 +309,14 @@ double WRAPPER_FUNC(asinh)(double x) {
         if(!disneg(x)) return      log(     x )+LOG2;  // 1/x^2 << 1
         else           return dneg(log(dneg(x))+LOG2); // 1/x^2 << 1
     }
-    if(x>0) return      log(sqrt(x*x+1)+x);
+    if(!disneg(x)) return log(sqrt(x*x+1)+x);
     else    return dneg(log(sqrt(x*x+1)-x));
 }
 
 double WRAPPER_FUNC(acosh)(double x) {
     check_nan_d1(x);
     int e;
-    if(disneg(x)) x=dneg(x);
+    if(x<1) return dnan_or(PINF);
     e=dgetexp(x);
     if(e>=32+0x3ff) return log(x)+LOG2;           // |x|>=2^32?
     return log(sqrt((x-1)*(x+1))+x);

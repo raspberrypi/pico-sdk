@@ -134,6 +134,11 @@
 #define PICO_DOUBLE_IN_RAM 0
 #endif
 
+// PICO_CONFIG: PICO_DOUBLE_PROPAGATE_NANS, Return NaN for NaN inputs and domain errors from SDK double-precision floating point functions. Otherwise such inputs may give other results where that makes the code smaller or faster, type=bool, default=0, group=pico_double
+#ifndef PICO_DOUBLE_PROPAGATE_NANS
+#define PICO_DOUBLE_PROPAGATE_NANS 0
+#endif
+
 #if !(LIB_PICO_DOUBLE_COMPILER || defined(__riscv)) || PICO_DOCS
 // private define to simplify this header only - it is undefined at the end
 #define __PICO_DOUBLE_ARM_OPTIMIZED 1
