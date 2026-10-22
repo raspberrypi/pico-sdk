@@ -81,8 +81,13 @@ static void async_context_freertos_wake_up(async_context_t *self_base) {
     async_context_freertos_t *self = (async_context_freertos_t *)self_base;
     if (self->task_handle) {
         if (portCHECK_IF_IN_ISR()) {
-            vTaskNotifyGiveFromISR(self->task_handle, NULL);
-            xSemaphoreGiveFromISR(self->work_needed_sem, NULL);
+            // Ask for a context switch on the way out. Without this the woken
+            // task is merely made ready and does not run until the next tick,
+            // adding up to a whole tick period to every wake.
+            BaseType_t higher_priority_woken = pdFALSE;
+            vTaskNotifyGiveFromISR(self->task_handle, &higher_priority_woken);
+            xSemaphoreGiveFromISR(self->work_needed_sem, &higher_priority_woken);
+            portYIELD_FROM_ISR(higher_priority_woken);
         } else {
             // we don't want to wake ourselves up (we will only ever be called
             // from the async_context_task if we own the lock, in which case processing

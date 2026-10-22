@@ -367,12 +367,13 @@ static inline bool low_power_start_aon_timer_at_time_ms(uint64_t ms) {
     return aon_timer_start(&ts);
 }
 
-/*! \brief  Start the AON timer at the current system time
+/*! \brief  Start the AON timer if it's not already running
  *  \ingroup pico_low_power
  *
- * See \ref aon_timer_start for more information.
+ * If the AON timer is already running, this function will leave it
+ * running at it's current time. Otherwise, it starts it at time 0.
  *
- * If the AON timer is already running, this function will not restart it.
+ * See \ref aon_timer_start for more information.
  *
  * \return true on success, false on failure.
  */
@@ -414,6 +415,9 @@ static inline int low_power_sleep_for_ms(uint32_t ms, const clock_dest_bitset_t 
  *  \ingroup pico_low_power
  *
  * See \ref low_power_dormant_until_aon_timer for more information.
+ * 
+ * NOTE: This calls \ref low_power_start_aon_timer() to ensure the
+ * AON timer is running.
  *
  * \param ms The number of milliseconds to go dormant for.
  * \param dormant_clock_source The clock source to use for dormant.
@@ -430,6 +434,9 @@ static inline int low_power_dormant_for_ms(uint32_t ms, dormant_clock_source_t d
  *  \ingroup pico_low_power
  *
  * See \ref low_power_pstate_until_aon_timer for more information.
+ * 
+ * NOTE: This calls \ref low_power_start_aon_timer() to ensure the
+ * AON timer is running.
  *
  * \param ms The number of milliseconds to go to Pstate for.
  * \param pstate The Pstate to use.

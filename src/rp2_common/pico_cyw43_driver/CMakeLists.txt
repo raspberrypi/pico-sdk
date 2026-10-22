@@ -212,6 +212,7 @@ if (EXISTS ${PICO_CYW43_DRIVER_PATH}/${CYW43_DRIVER_TEST_FILE})
         add_custom_target(${TARGET}_firmware_blob DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S)
         add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S
                 COMMAND ${Python3_EXECUTABLE} ${PICO_CYW43_DRIVER_CURRENT_PATH}/cyw43_firmware.py ${PICO_CYW43_DRIVER_PATH}/firmware/wb43439A0_7_95_49_00_combined.h ${CMAKE_CURRENT_BINARY_DIR}/firmware_blob.S
+                DEPENDS ${PICO_CYW43_DRIVER_CURRENT_PATH}/cyw43_firmware.py ${PICO_CYW43_DRIVER_PATH}/firmware/wb43439A0_7_95_49_00_combined.h
                 )
 
         # Create UF2s for regular and TBYB firmwares

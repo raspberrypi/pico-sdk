@@ -903,6 +903,19 @@ static inline bool gpio_get(uint gpio) {
 #endif
 }
 
+/*! \brief Get the raw input level at the pad of a single specified GPIO
+ *  \ingroup hardware_gpio
+ *
+ * This reads the signal coming from the pad, before any GPIO function muxing or input override
+ * (see \ref gpio_set_inover) is applied, so it reflects the state of the pin even when it is not assigned to SIO.
+ *
+ * \note As a side effect this enables input on the pad (see \ref gpio_set_input_enabled) and leaves it enabled.
+ *
+ * \param gpio GPIO number
+ * \return 1 if the pad input is high, 0 if it is low
+ */
+int gpio_get_pad(uint gpio);
+
 /*! \brief Get raw value of all GPIOs
  *  \ingroup hardware_gpio
  *
