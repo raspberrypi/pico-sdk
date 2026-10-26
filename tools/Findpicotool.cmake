@@ -58,6 +58,12 @@ if (NOT TARGET picotool)
             ${CMAKE_COMMAND} -E touch_nocreate "${CMAKE_SOURCE_DIR}/CMakeLists.txt"
             VERBATIM)
 
+        if (CMAKE_VERSION VERSION_GREATER_EQUAL "4.4")
+            set(_NO_WARN_UNUSED_CLI "-Wno-unused-cli")
+        else()
+            set(_NO_WARN_UNUSED_CLI "--no-warn-unused-cli")
+        endif()
+
         ExternalProject_Add(${picotool_BUILD_TARGET}
                 PREFIX picotool
                 SOURCE_DIR ${picotool_SOURCE_DIR}
@@ -65,7 +71,7 @@ if (NOT TARGET picotool)
                 INSTALL_DIR ${picotool_INSTALL_DIR}
                 DEPENDS picotoolForceReconfigure
                 CMAKE_ARGS
-                    "--no-warn-unused-cli"
+                    "${_NO_WARN_UNUSED_CLI}"
                     "-DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}"
                     "-DPICO_SDK_PATH:FILEPATH=${PICO_SDK_PATH}"
                     "-DPICOTOOL_NO_LIBUSB=1"

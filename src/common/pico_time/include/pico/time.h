@@ -253,6 +253,10 @@ void sleep_until(absolute_time_t target);
  *
  * \note This method attempts to perform a lower power (WFE) sleep
  *
+ * \note The wake-up uses an alarm in the default alarm pool, whose IRQ runs on the core that created it
+ * (usually core 0), so sleeping on one core briefly interrupts that core. \ref busy_wait_us doesn't have this
+ * problem, if you don't need the lower power sleep.
+ *
  * \param us the number of microseconds to sleep
  * \sa busy_wait_us()
  */

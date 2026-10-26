@@ -73,6 +73,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/sync_interop_test:sync_interop_test",
                 "//test/sync_interop_test:sync_interop_test_sw",
                 "//test/pico_unaligned_string_test:pico_unaligned_string_test",
+                "//test/pico_printf_test:pico_printf_test",
 
                 # Pretty much only Picotool and pioasm build on Windows.
                 "//..." if os.name == "nt" else "",

@@ -62,4 +62,6 @@ embedded_block_end:
 
 #include "firmware_blob.S"
 
+// The load map length must be a whole number of words
+.p2align 2
 firmware_end:
