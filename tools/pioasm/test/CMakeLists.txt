@@ -4,7 +4,10 @@
 #
 # To regenerate an expected file after an intentional output change, run
 # pioasm by hand and check the result carefully before committing it:
-#   pioasm -o c-sdk clock_div.pio clock_div.expected.h
+#   pioasm -o c-sdk clock_div.pio clock_div.c-sdk.expected
+#
+# The expected files deliberately avoid C/C++ extensions so that the Bazel
+# source-coverage check does not mistake them for headers.
 
 function(pioasm_add_output_test NAME INPUT FORMAT EXPECTED)
     add_test(NAME ${NAME}
@@ -18,5 +21,5 @@ function(pioasm_add_output_test NAME INPUT FORMAT EXPECTED)
     )
 endfunction()
 
-pioasm_add_output_test(clock_div_c_sdk clock_div.pio c-sdk clock_div.expected.h)
-pioasm_add_output_test(clock_div_json  clock_div.pio json  clock_div.expected.json)
+pioasm_add_output_test(clock_div_c_sdk clock_div.pio c-sdk clock_div.c-sdk.expected)
+pioasm_add_output_test(clock_div_json  clock_div.pio json  clock_div.json.expected)
