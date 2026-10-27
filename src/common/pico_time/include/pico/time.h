@@ -445,7 +445,7 @@ static inline alarm_pool_t *alarm_pool_create(uint timer_alarm_num, uint max_tim
 alarm_pool_t *alarm_pool_create_on_timer_with_unused_hardware_alarm(alarm_pool_timer_t *timer, uint max_timers);
 
 /**
- * \brief Create an alarm pool, claiming an used timer_alarm to back it.
+ * \brief Create an alarm pool, claiming an unused timer_alarm to back it.
  *
  * The alarm pool will call callbacks from an alarm IRQ Handler on the core of this function is called from.
  *
