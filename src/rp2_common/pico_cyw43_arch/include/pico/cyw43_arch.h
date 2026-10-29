@@ -154,6 +154,12 @@ extern "C" {
 #define PICO_CYW43_ARCH_DEFAULT_COUNTRY_CODE CYW43_COUNTRY_WORLDWIDE
 #endif
 
+// PICO_CONFIG: PICO_CYW43_ARCH_DEFAULT_INTERFERENCE_MODE, Interference mitigation mode set when STA or AP mode is enabled or -1 to leave unchanged, type=int, min=-1, max=4, default=CYW43_INTERFERE_AUTO, group=pico_cyw43_arch
+// The firmware default (CYW43_INTERFERE_AUTO_NOISE) can stop the receiver hearing strong, valid frames under sustained traffic
+#ifndef PICO_CYW43_ARCH_DEFAULT_INTERFERENCE_MODE
+#define PICO_CYW43_ARCH_DEFAULT_INTERFERENCE_MODE CYW43_INTERFERE_AUTO
+#endif
+
 /*!
  * \brief Initialize the CYW43 architecture
  * \ingroup pico_cyw43_arch
@@ -359,6 +365,9 @@ uint32_t cyw43_arch_get_country_code(void);
  * \ingroup pico_cyw43_arch
  *
  * This enables the Wi-Fi in \em Station mode such that connections can be made to other Wi-Fi Access Points
+ *
+ * \note This also sets the interference mitigation mode to \c PICO_CYW43_ARCH_DEFAULT_INTERFERENCE_MODE,
+ * see \ref cyw43_wifi_set_interference_mode
  */
 void cyw43_arch_enable_sta_mode(void);
 
@@ -380,6 +389,9 @@ void cyw43_arch_disable_sta_mode(void);
  * \param password the password to use or NULL for no password.
  * \param auth the authorization type to use when the password is enabled. Values are \ref CYW43_AUTH_WPA_TKIP_PSK,
  *             \ref CYW43_AUTH_WPA2_AES_PSK, or \ref CYW43_AUTH_WPA2_MIXED_PSK (see \ref CYW43_AUTH_)
+ *
+ * \note This also sets the interference mitigation mode to \c PICO_CYW43_ARCH_DEFAULT_INTERFERENCE_MODE,
+ * see \ref cyw43_wifi_set_interference_mode
  */
 void cyw43_arch_enable_ap_mode(const char *ssid, const char *password, uint32_t auth);
 
