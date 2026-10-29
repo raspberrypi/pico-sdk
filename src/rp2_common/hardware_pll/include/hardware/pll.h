@@ -19,8 +19,8 @@ extern "C" {
  *
  * \brief Phase Locked Loop control APIs
  *
- * There are two PLLs in RP2040. They are:
- *   - pll_sys - Used to generate up to a 133MHz system clock
+ * There are two PLLs in both RP2040 and RP2350. They are:
+ *   - pll_sys - Used to generate up to a 133MHz system clock on RP2040, or 150MHz on RP2350
  *   - pll_usb - Used to generate a 48MHz USB reference clock
  *
  * For details on how the PLLs are calculated, please refer to the RP2040 datasheet.
