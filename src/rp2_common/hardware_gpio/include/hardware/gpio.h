@@ -55,7 +55,7 @@ extern "C" {
  * All GPIOs support digital input and output, but a subset can also be used as inputs to the chip’s Analogue to Digital
  * Converter (ADC). The allocation of GPIO pins to the ADC depends on the packaging.
  *
- * RP2040 and RP2350 QFN-60 GPIO, ADC pins are 26-29.
+ * RP2040 and RP2350 QFN-60, ADC pins are 26-29.
  * RP2350 QFN-80, ADC pins are 40-47.
  *
  * Each GPIO can be controlled directly by software running on the processors, or by a number of other functional blocks.
