@@ -75,7 +75,7 @@ pico_board_cmake_set(PICO_PLATFORM, rp2040)
 #define WAVESHARE_LCD_TX_PIN 11
 #endif
 #ifndef WAVESHARE_LCD_RST_PIN
-#define WAVESHARE_LCD_RST_PIN 12
+#define WAVESHARE_LCD_RST_PIN 13
 #endif
 #ifndef WAVESHARE_LCD_BL_PIN
 #define WAVESHARE_LCD_BL_PIN 25
