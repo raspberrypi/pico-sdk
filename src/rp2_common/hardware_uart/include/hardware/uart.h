@@ -375,6 +375,14 @@ void uart_set_format(uart_inst_t *uart, uint data_bits, uint stop_bits, uart_par
  * \param uart UART instance. \ref uart0 or \ref uart1
  * \param rx_has_data If true an interrupt will be fired when the RX FIFO contains data.
  * \param tx_needs_data If true an interrupt will be fired when the TX FIFO needs data.
+ *
+ * \note The TX interrupt fires when the TX FIFO level falls to the threshold set here (1/8 full, i.e. 4 of
+ * the 32 entries), not whenever the level is already at or below it, so setting \p tx_needs_data with an empty
+ * FIFO doesn't fire it. To make it fire, write at least 6 characters: 1 goes straight to the transmitter, 4 fill
+ * the FIFO to the threshold, and 1 more takes it above, so the level falls to the threshold when the first
+ * finishes sending. Alternatively, calling \ref irq_set_pending with \ref UART_IRQ_NUM runs the handler
+ * straight away, but the UART's own TX interrupt status isn't set, so the handler must check
+ * \ref uart_is_writable rather than that status.
  */
 static inline void uart_set_irqs_enabled(uart_inst_t *uart, bool rx_has_data, bool tx_needs_data) {
     // Both UARTRXINTR (RX) and UARTRTINTR (RX timeout) interrupts are
@@ -385,12 +393,12 @@ static inline void uart_set_irqs_enabled(uart_inst_t *uart, bool rx_has_data, bo
                               (bool_to_bit(rx_has_data) << UART_UARTIMSC_RXIM_LSB) |
                               (bool_to_bit(rx_has_data) << UART_UARTIMSC_RTIM_LSB);
     if (rx_has_data) {
-        // Set minimum threshold
+        // RX FIFO threshold of 1/8 full
         hw_write_masked(&uart_get_hw(uart)->ifls, 0 << UART_UARTIFLS_RXIFLSEL_LSB,
                         UART_UARTIFLS_RXIFLSEL_BITS);
     }
     if (tx_needs_data) {
-        // Set maximum threshold
+        // TX FIFO threshold of 1/8 full
         hw_write_masked(&uart_get_hw(uart)->ifls, 0 << UART_UARTIFLS_TXIFLSEL_LSB,
                         UART_UARTIFLS_TXIFLSEL_BITS);
     }
