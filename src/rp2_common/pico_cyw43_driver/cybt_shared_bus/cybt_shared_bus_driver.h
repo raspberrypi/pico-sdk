@@ -9,8 +9,6 @@
 
 #define BTSDIO_FWBUF_SIZE                     (0x1000)
 #define BTFW_MAX_STR_LEN            (600)
-#define BTFW_SD_ALIGN               (32)
-#define BTFW_DOWNLOAD_BLK_SIZE      (((BTFW_MAX_STR_LEN) / 2) + 8)
 
 typedef enum {
     CYBT_SUCCESS = 0,
@@ -65,7 +63,7 @@ cybt_result_t cybt_reg_write_idx(cybt_addr_idx_t reg_idx, uint32_t value);
 cybt_result_t cybt_mem_write_idx(cybt_addr_idx_t mem_idx, uint32_t offset, const uint8_t *p_data, uint32_t data_len);
 cybt_result_t cybt_mem_read_idx(cybt_addr_idx_t mem_idx, uint32_t offset, uint8_t *p_data, uint32_t data_len);
 
-cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware, uint32_t bt_firmware_len, uint8_t *p_write_buf, uint8_t *p_hex_buf);
+cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware, uint32_t bt_firmware_len);
 
 int cybt_ready(void);
 int cybt_awake(void);
