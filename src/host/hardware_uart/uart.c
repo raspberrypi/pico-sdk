@@ -48,12 +48,24 @@ void _inittty(void) {
     //_tty.c_oflag &= ~ONLCR;
     tcsetattr(STDIN_FILENO, TCSANOW, &_tty);
 
-    fcntl(STDIN_FILENO, F_SETFL, FNONBLOCK);
     atexit(_resettty);
+}
+
+static int non_blocking_getchar(void) {
+    fcntl(STDIN_FILENO, F_SETFL, FNONBLOCK);
+
+    int c = getchar();
+
+    int old = fcntl(STDIN_FILENO, F_GETFL);
+
+    fcntl(STDIN_FILENO, F_SETFL, old & ~FNONBLOCK);
+
+    return c;
 }
 
 #else
 void _inittty() {}
+static int non_blocking_getchar(void) { return getchar(); }
 #endif
 
 typedef struct {
@@ -67,7 +79,7 @@ static int _nextchar = EOF;
 
 static bool _peekchar() {
     if (_nextchar == EOF) {
-        _nextchar = getchar();
+        _nextchar = non_blocking_getchar();
     }
     return _nextchar != EOF;
 }
