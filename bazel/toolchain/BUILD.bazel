@@ -1,3 +1,4 @@
+load("@bazel_lib//:bzl_library.bzl", "bzl_library")
 load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
 load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 load("@rules_cc//cc/toolchains:feature.bzl", "cc_feature")
@@ -343,3 +344,20 @@ _HOST_CPU_CONSTRAINTS = {
     }),
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 ) for host_os, host_cpu in HOSTS]
+
+bzl_library(
+    name = "configurable_feature",
+    srcs = ["configurable_feature.bzl"],
+    deps = [
+        "@rules_cc//cc/toolchains:toolchain_rules",
+    ],
+)
+
+bzl_library(
+    name = "objcopy",
+    srcs = ["objcopy.bzl"],
+    deps = [
+        "@bazel_tools//tools/build_defs/cc:action_names",
+        "@rules_cc//cc:find_cc_toolchain_bzl",
+    ]
+)
