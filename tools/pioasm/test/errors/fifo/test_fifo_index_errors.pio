@@ -1,0 +1,14 @@
+// run: pioasm -v 1 input.pio
+.program fifo_index_invalid
+.pio_version 1
+.fifo putget
+    mov rxfifo[8], isr
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:5.16: FIFO index myst be between 0 and 7
+//     5 |     mov rxfifo[8], isr
+//       |                ^
+// 

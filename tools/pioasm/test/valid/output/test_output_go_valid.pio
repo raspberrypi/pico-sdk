@@ -1,0 +1,29 @@
+// run: pioasm -o go input.pio
+.program format_test
+    nop
+
+// -- Output
+// Command: pioasm -o go input.pio
+// Exit code: 0
+// Stdout:
+//?
+// 
+// // format_test
+// 
+// const format_testWrapTarget = 0
+// const format_testWrap = 0
+// 
+// var format_testInstructions = []uint16{
+// 		//     .wrap_target
+// 		0xa042, //  0: nop
+// 		//     .wrap
+// }
+// const format_testOrigin = -1
+// func format_testProgramDefaultConfig(offset uint8) pio.StateMachineConfig {
+// 	cfg := pio.DefaultStateMachineConfig()
+// 	cfg.SetWrap(offset+format_testWrapTarget, offset+format_testWrap)
+// 	return cfg;
+// }
+// 
+// 
+// Stderr:

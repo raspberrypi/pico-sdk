@@ -1,0 +1,17 @@
+// run: pioasm input.pio
+// expects an error
+.program error_test
+    in pins, 0         ; invalid:  bit count must be 1-32
+    in pins, 33        ; invalid: bit count too large
+    jmp 99             ; invalid: address out of range
+    irq 8              ; invalid: IRQ number too large
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.14: 'in' bit count must be >= 1 and <= 32
+//     4 |     in pins, 0         ; invalid:  bit count must be 1-32
+//       |              ^
+// 

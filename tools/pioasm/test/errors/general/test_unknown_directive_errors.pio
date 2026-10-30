@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program unknown_directive
+.bogus 1
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.1-6: unknown directive .bogus
+//     3 | .bogus 1
+//       | ^~~~~~
+// 

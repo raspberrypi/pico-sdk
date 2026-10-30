@@ -1,0 +1,91 @@
+// run: pioasm -v 1 input.pio
+// Test program combining ALL configuration directives at once
+.program everything_kitchen_sink
+.pio_version 1
+.clock_div 4.25
+.side_set 2 opt pindirs
+.origin 10
+.define PUBLIC test_constant 42
+.mov_status txfifo < 16
+.fifo txrx
+.out 8 right auto 28
+.in 12 right auto 20
+.set 3
+.wrap_target
+    set pins, 3 side 2 [3]
+    out pins, 8 side 1 [2]
+    in pins, 12 [3]
+    mov x, status side 3
+    push block
+    pull block side 0 [1]
+.wrap
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ----------------------- //
+// // everything_kitchen_sink //
+// // ----------------------- //
+// 
+// #define everything_kitchen_sink_wrap_target 0
+// #define everything_kitchen_sink_wrap 5
+// #define everything_kitchen_sink_pio_version 1
+// 
+// #define everything_kitchen_sink_test_constant 42
+// 
+// static __pio_const uint16_t everything_kitchen_sink_program_instructions[] = {
+//             //     .wrap_target
+//     0xfb03, //  0: set    pins, 3         side 2 [3]
+//     0x7608, //  1: out    pins, 8         side 1 [2]
+//     0x430c, //  2: in     pins, 12               [3]
+//     0xbc25, //  3: mov    x, status       side 3
+//     0x8020, //  4: push   block
+//     0x91a0, //  5: pull   block           side 0 [1]
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program everything_kitchen_sink_program = {
+//     .instructions = everything_kitchen_sink_program_instructions,
+//     .length = 6,
+//     .origin = 10,
+//     .pio_version = everything_kitchen_sink_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config everything_kitchen_sink_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + everything_kitchen_sink_wrap_target, offset + everything_kitchen_sink_wrap);
+//     sm_config_set_in_pin_count(&c, 12);
+//     sm_config_set_in_shift(&c, 1, 1, 20);
+//     sm_config_set_out_pin_count(&c, 8);
+//     sm_config_set_out_shift(&c, 1, 1, 28);
+//     sm_config_set_set_pin_count(&c, 3);
+//     sm_config_set_sideset(&c, 3, true, true);
+//     sm_config_set_mov_status(&c, STATUS_TX_LESSTHAN, 16);
+//     sm_config_set_clkdiv_int_frac(&c, 4, 64);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

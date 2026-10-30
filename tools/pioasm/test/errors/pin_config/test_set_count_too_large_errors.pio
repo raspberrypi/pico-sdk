@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program set_count_too_large
+.set 6
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.1-6: set pin count should be >= 0 and <= 5
+//     3 | .set 6
+//       | ^~~~~~
+// 

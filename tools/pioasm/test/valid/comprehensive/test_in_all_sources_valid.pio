@@ -1,0 +1,70 @@
+// run: pioasm input.pio
+.program in_sources
+    in pins, 4
+    in x, 8
+    in y, 16
+    in null, 32
+    in isr, 1
+    in osr, 24
+    in status, 5
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ---------- //
+// // in_sources //
+// // ---------- //
+// 
+// #define in_sources_wrap_target 0
+// #define in_sources_wrap 6
+// #define in_sources_pio_version 0
+// 
+// static __pio_const uint16_t in_sources_program_instructions[] = {
+//             //     .wrap_target
+//     0x4004, //  0: in     pins, 4
+//     0x4028, //  1: in     x, 8
+//     0x4050, //  2: in     y, 16
+//     0x4060, //  3: in     null, 32
+//     0x40c1, //  4: in     isr, 1
+//     0x40f8, //  5: in     osr, 24
+//     0x40a5, //  6: in     status, 5
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program in_sources_program = {
+//     .instructions = in_sources_program_instructions,
+//     .length = 7,
+//     .origin = -1,
+//     .pio_version = in_sources_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config in_sources_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + in_sources_wrap_target, offset + in_sources_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

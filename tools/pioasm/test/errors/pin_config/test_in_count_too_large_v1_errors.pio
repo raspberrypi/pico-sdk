@@ -1,0 +1,14 @@
+// run: pioasm -v 1 input.pio
+.program in_count_too_large_v1
+.pio_version 1
+.in 33
+    nop
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.5-6: in pin count should be >= 1 and <= 32
+//     4 | .in 33
+//       |     ^~
+// 
