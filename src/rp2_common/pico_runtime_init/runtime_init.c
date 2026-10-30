@@ -163,14 +163,12 @@ PICO_RUNTIME_INIT_FUNC_HW(runtime_init_post_clock_resets, PICO_RUNTIME_INIT_POST
 #if !PICO_RUNTIME_NO_INIT_RP2040_GPIO_IE_DISABLE
 #include "hardware/structs/pads_bank0.h"
 void __weak runtime_init_rp2040_gpio_ie_disable(void) {
-#if PICO_RP2040 && !PICO_IE_26_29_UNCHANGED_ON_RESET
     // after resetting BANK0 we should disable IE on 26-29 as these may have mid-rail voltages when
     // ADC is in use (on RP2040 B2 and later, and non-RP2040 chips, ADC pins should already have
     // the correct reset state):
     pads_bank0_hw_t *pads_bank0_hw_clear = (pads_bank0_hw_t *)hw_clear_alias_untyped(pads_bank0_hw);
     pads_bank0_hw_clear->io[26] = pads_bank0_hw_clear->io[27] =
             pads_bank0_hw_clear->io[28] = pads_bank0_hw_clear->io[29] = PADS_BANK0_GPIO0_IE_BITS;
-#endif
 }
 #endif
 
