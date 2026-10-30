@@ -1,0 +1,13 @@
+load("//bazel/util:pico_linker_scripts.bzl", "linker_scripts")
+
+package(default_visibility = ["//test/pico_secure_test:__pkg__"])
+
+linker_scripts(
+    name = "pico_secure_test_s_scripts",
+    link_scripts = ["memmap_s.ld"],
+)
+
+linker_scripts(
+    name = "pico_secure_test_ns_scripts",
+    link_scripts = ["memmap_ns.ld"],
+)
