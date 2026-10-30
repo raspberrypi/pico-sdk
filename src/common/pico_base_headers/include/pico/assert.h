@@ -8,14 +8,11 @@
 #define _PICO_ASSERT_H
 
 #include <stdbool.h>
+#include <assert.h>
 
 #ifdef __cplusplus
-
-#include <cassert>
-
 extern "C" {
 #else
-#include <assert.h>
 #if !defined(static_assert) && __STDC_VERSION__ < 201112L
 // C99 has no static_assert, but GCC and Clang accept _Static_assert
 #define static_assert _Static_assert
