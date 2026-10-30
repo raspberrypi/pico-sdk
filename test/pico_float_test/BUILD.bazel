@@ -45,6 +45,16 @@ cc_binary(
     ],
 )
 
+# NaN propagation is opt-in, so also test with it enabled.
+pico_float_test_binary(
+    name = "pico_float_test_nan",
+    testonly = True,
+    src = ":pico_float_test",
+    extra_copts = ["-DPICO_FLOAT_PROPAGATE_NANS=1"],
+    pico_printf_impl = "pico",
+    target_compatible_with = compatible_with_rp2(),
+)
+
 cc_binary(
     name = "pico_double_test_actual",
     testonly = True,
@@ -63,8 +73,24 @@ cc_binary(
     ],
 )
 
+DOUBLE_TEST_PRINTF_IMPL = select({
+    # raw compiler printf on llvm_libc doesn't currently have floating point
+    "//bazel/constraint:pico_clib_llvm_libc_enabled": "pico",
+    "//bazel/constraint:pico_toolchain_clang_enabled": "pico",
+    "//conditions:default": "compiler",
+})
+
 pico_float_test_binary(
     name = "pico_double_test",
+    testonly = True,
+    src = ":pico_double_test_actual",
+    extra_copts = ["-DPICO_USE_CRT_PRINTF=1"],
+    pico_printf_impl = DOUBLE_TEST_PRINTF_IMPL,
+    target_compatible_with = compatible_with_rp2(),
+)
+
+pico_float_test_binary(
+    name = "pico_double_test_nan",
     testonly = True,
     src = ":pico_double_test_actual",
     extra_copts = [
@@ -72,12 +98,7 @@ pico_float_test_binary(
         "-DPICO_FLOAT_PROPAGATE_NANS=1",
         "-DPICO_DOUBLE_PROPAGATE_NANS=1",
     ],
-    pico_printf_impl = select({
-        # raw compiler printf on llvm_libc doesn't currently have floating point
-        "//bazel/constraint:pico_clib_llvm_libc_enabled": "pico",
-        "//bazel/constraint:pico_toolchain_clang_enabled": "pico",
-        "//conditions:default": "compiler",
-    }),
+    pico_printf_impl = DOUBLE_TEST_PRINTF_IMPL,
     target_compatible_with = compatible_with_rp2(),
 )
 
