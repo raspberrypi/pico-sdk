@@ -302,6 +302,32 @@ gpio_function_t gpio_get_function(uint gpio);
  */
 void gpio_set_pulls(uint gpio, bool up, bool down);
 
+/*! \brief Select up and down pulls on multiple GPIOs
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_set_pulls
+ * \param gpio_mask Mask with 1 bit per GPIO number to set pulls for
+ * \param up If true set a pull up on the GPIOs
+ * \param down If true set a pull down on the GPIOs
+ */
+void gpio_set_pulls_masked(uint32_t gpio_mask, bool up, bool down);
+
+/*! \brief Select up and down pulls on multiple GPIOs
+ *  \ingroup hardware_gpio
+ *
+ * \sa gpio_set_pulls
+ * \param gpio_mask Mask with 1 bit per GPIO number to set pulls for
+ * \param up If true set a pull up on the GPIOs
+ * \param down If true set a pull down on the GPIOs
+ */
+#if NUM_BANK0_GPIOS <= 32
+static inline void gpio_set_pulls_masked64(uint64_t gpio_mask, bool up, bool down) {
+    gpio_set_pulls_masked((uint32_t)gpio_mask, up, down);
+}
+#else
+void gpio_set_pulls_masked64(uint64_t gpio_mask, bool up, bool down);
+#endif
+
 /*! \brief Set specified GPIO to be pulled up.
  *  \ingroup hardware_gpio
  *

@@ -80,6 +80,8 @@ void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn);
 gpio_function_t gpio_get_function(uint gpio);
 
 void gpio_set_pulls(uint gpio, bool up, bool down);
+void gpio_set_pulls_masked(uint32_t gpio_mask, bool up, bool down);
+void gpio_set_pulls_masked64(uint64_t gpio_mask, bool up, bool down);
 
 void gpio_pull_up(uint gpio);
 
