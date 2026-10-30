@@ -2,12 +2,19 @@
 
 if (NOT TARGET pico_platform_headers)
     add_library(pico_platform_headers INTERFACE)
-
     target_compile_definitions(pico_platform_headers INTERFACE
             PICO_NO_HARDWARE=1
             PICO_ON_DEVICE=0
             PICO_BUILD=1
     )
+
+    if (DEFINED PICO_RP2040 AND ${PICO_RP2040})
+        target_compile_definitions(pico_platform_headers INTERFACE PICO_RP2040=1)
+    endif()
+
+    if (DEFINED PICO_RP2350 AND ${PICO_RP2350})
+        target_compile_definitions(pico_platform_headers INTERFACE PICO_RP2350=1)
+    endif()
 
     target_include_directories(pico_platform_headers SYSTEM INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 endif()
