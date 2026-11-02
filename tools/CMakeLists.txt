@@ -457,6 +457,9 @@ endfunction()
 # (BIN file containing the hash to sign), SIG (file to write the DER signature),
 # and PUBKEY (file to write the public key), and write files to SIG and PUBKEY
 # (PUBKEY can be a PEM or DER format file, but will end with extension .pubkey).
+# A good default file can be found at ${PICO_SDK_PATH}/tools/default_external_sign.cmake
+# which uses openssl or pkcs11-tool for signing, passing pins/keys/passwords as
+# environment variables.
 #
 # \param\ SIGFILE The PEM signature file to use, or a cmake script for external signing
 function(pico_sign_binary TARGET)
