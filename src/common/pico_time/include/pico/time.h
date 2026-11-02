@@ -656,8 +656,8 @@ void alarm_pool_sleep_until(alarm_pool_t *pool, absolute_time_t target);
 /*! \brief Wait for the given number of microseconds before returning, using the given alarm pool
  * \ingroup sleep
  *
- * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It causes IRQs on the core of
- * \p pool (the core that created it).
+ * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It only causes IRQs on the core that
+ * created \p pool.
  *
  * \note \p pool must use the default timer (see \ref alarm_pool_get_default_timer).
  *
@@ -670,8 +670,8 @@ void alarm_pool_sleep_us(alarm_pool_t *pool, uint64_t us);
 /*! \brief Wait for the given number of milliseconds before returning, using the given alarm pool
  * \ingroup sleep
  *
- * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It causes IRQs on the core of
- * \p pool (the core that created it).
+ * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It only causes IRQs on the core that
+ * created \p pool.
  *
  * \note \p pool must use the default timer (see \ref alarm_pool_get_default_timer).
  *
