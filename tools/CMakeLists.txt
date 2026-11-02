@@ -529,7 +529,9 @@ endfunction()
 # one subdirectory per device in MULTI_DEVICES, containing the privateaes.bin and
 # ivsalt.bin files for that device. The UF2s will be output to one subdirectory
 # per device under MULTI_OUTPUT_DIR.
-# This sets the target properties 
+# This sets the target properties PICOTOOL_ENCRYPT_KEY_DIR to MULTI_KEY_DIR,
+# PICOTOOL_ENCRYPT_OUTPUT_DIR to MULTI_OUTPUT_DIR, and PICOTOOL_ENCRYPT_DEVICES
+# to MULTI_DEVICES.
 #
 # Optionally, use EMBED to embed a decryption stage into the encrypted binary.
 # This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
@@ -624,7 +626,6 @@ function(pico_encrypt_binary TARGET AESFILE IVFILE)
         set_property(TARGET ${TARGET} APPEND PROPERTY
             PICOTOOL_ENCRYPT_DEVICES ${ENC_MULTI_DEVICES}
         )
-        message(${ENC_MULTI_DEVICES})
     elseif(ENC_MULTI_KEY_DIR OR ENC_MULTI_OUTPUT_DIR OR ENC_MULTI_DEVICES)
         message(FATAL_ERROR "Must specify MULTI_KEY_DIR, MULTI_OUTPUT_DIR and MULTI_DEVICES when encrypting per-device")
     endif()
@@ -898,10 +899,10 @@ function(picotool_postprocess_binary TARGET)
                 get_target_property(picotool_enc_devices ${TARGET} PICOTOOL_ENCRYPT_DEVICES)
                 foreach(device IN LISTS picotool_enc_devices)
                     set(tmp_external_sign FALSE)
+                    set(otpfile_arg "${picotool_output_dir}/${device}/${TARGET}.otp.json")
                     if (EXISTS ${picotool_key_dir}/${device}/private.pem)
                         # Using per-device private keys for signing the encrypted binary
                         set(sigfile_arg "${picotool_key_dir}/${device}/private.pem")
-                        set(otpfile_arg "${picotool_output_dir}/${device}/${TARGET}.otp.json")
                         if (enc_external_sign)
                             list(FIND picotool_encrypt_args "--external-sign" external_sign_idx)
                             list(REMOVE_ITEM picotool_encrypt_args "--external-sign")
@@ -913,10 +914,8 @@ function(picotool_postprocess_binary TARGET)
                         set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.pubkey)
                         set(SCRIPT ${picotool_enc_sigfile})
                         set(sigfile_arg ${HASH})
-                        set(otpfile_arg "")
                     else()
                         set(sigfile_arg ${picotool_enc_sigfile})
-                        set(otpfile_arg "${picotool_output_dir}/${device}/${TARGET}.otp.json")
                     endif()
 
                     add_custom_command(TARGET ${TARGET} POST_BUILD
@@ -935,7 +934,7 @@ function(picotool_postprocess_binary TARGET)
                     if (tmp_external_sign)
                         picotool_reseal_binary(${TARGET} "${picotool_output_dir}/${device}/${TARGET}.elf"
                             ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} "${picotool_output_dir}/${device}/${TARGET}.otp.json")
-                    elseif(external_sign) # external signing being used, but not for this device
+                    elseif(enc_external_sign) # external signing being used, but not for this device
                         # Put --external-sign back in the list
                         list(INSERT picotool_encrypt_args ${external_sign_idx} "--external-sign")
                     endif()
@@ -950,11 +949,10 @@ function(picotool_postprocess_binary TARGET)
                 set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.enc.pubkey)
                 set(SCRIPT ${picotool_enc_sigfile})
                 set(sigfile_arg ${HASH})
-                set(otpfile_arg "")
             else()
                 set(sigfile_arg ${picotool_enc_sigfile})
-                set(otpfile_arg ${otp_file})
             endif()
+            set(otpfile_arg ${otp_file})
 
             add_custom_command(TARGET ${TARGET} POST_BUILD
                 COMMAND picotool
