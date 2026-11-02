@@ -375,11 +375,48 @@ void alarm_pool_destroy(alarm_pool_t *pool) {
     free(pool);
 }
 
+// a pool's absolute times are in the time base of its own timer, which with one timer is the default one
+#if TA_NUM_TIMERS == 1
+static inline absolute_time_t pool_get_absolute_time(__unused alarm_pool_t *pool) {
+    return get_absolute_time();
+}
+
+static inline bool pool_time_reached(__unused alarm_pool_t *pool, absolute_time_t t) {
+    return time_reached(t);
+}
+
+static inline void pool_busy_wait_until(__unused alarm_pool_t *pool, absolute_time_t t) {
+    busy_wait_until(t);
+}
+#else
+static inline absolute_time_t pool_get_absolute_time(alarm_pool_t *pool) {
+    absolute_time_t t;
+    update_us_since_boot(&t, ta_time_us_64(pool->timer));
+    return t;
+}
+
+static inline bool pool_time_reached(alarm_pool_t *pool, absolute_time_t t) {
+    return (int64_t)(ta_time_us_64(pool->timer) - to_us_since_boot(t)) >= 0;
+}
+
+static inline void pool_busy_wait_until(alarm_pool_t *pool, absolute_time_t t) {
+    while (!pool_time_reached(pool, t)) tight_loop_contents();
+}
+#endif
+
+// time.h takes NUM_GENERIC_TIMERS == 1 to mean every pool is on the default timer
+static_assert(TA_NUM_TIMERS <= NUM_GENERIC_TIMERS, "");
+
+#if NUM_GENERIC_TIMERS > 1
+absolute_time_t alarm_pool_get_absolute_time(alarm_pool_t *pool) {
+    return pool_get_absolute_time(pool);
+}
+#endif
+
 alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, alarm_callback_t callback,
                                    void *user_data, bool fire_if_past) {
     if (!fire_if_past) {
-        absolute_time_t t = get_absolute_time();
-        if (absolute_time_diff_us(t, time) < 0) return 0;
+        if (absolute_time_diff_us(pool_get_absolute_time(pool), time) < 0) return 0;
     }
     return alarm_pool_add_alarm_at_force_in_context(pool, time, callback, user_data);
 }
@@ -468,18 +505,16 @@ static void check_not_in_exception(void) {
 
 void alarm_pool_sleep_until(alarm_pool_t *pool, absolute_time_t t) {
     check_not_in_exception();
-    // the pool's alarm times are only comparable with get_absolute_time() if it uses the default timer
-    invalid_params_if(PICO_TIME, pool->timer != alarm_pool_get_default_timer());
     uint64_t t_us = to_us_since_boot(t);
     uint64_t t_before_us = t_us - PICO_TIME_SLEEP_OVERHEAD_ADJUST_US;
     // needs to work in the first PICO_TIME_SLEEP_OVERHEAD_ADJUST_US of boot
     if (t_before_us > t_us) t_before_us = 0;
     absolute_time_t t_before;
     update_us_since_boot(&t_before, t_before_us);
-    if (absolute_time_diff_us(get_absolute_time(), t_before) > 0) {
+    if (absolute_time_diff_us(pool_get_absolute_time(pool), t_before) > 0) {
         if (alarm_pool_add_alarm_at(pool, t_before, sleep_until_callback, NULL, false) >= 0) {
             // able to add alarm for just before the time
-            while (!time_reached(t_before)) {
+            while (!pool_time_reached(pool, t_before)) {
 #if PICO_TIME_USE_SLEEP_NOTIFIER
                 uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
                 lock_internal_spin_unlock_with_wait(&sleep_notifier, save);
@@ -493,11 +528,11 @@ void alarm_pool_sleep_until(alarm_pool_t *pool, absolute_time_t t) {
         }
     }
     // now wait until the exact time
-    busy_wait_until(t);
+    pool_busy_wait_until(pool, t);
 }
 
 void alarm_pool_sleep_us(alarm_pool_t *pool, uint64_t us) {
-    alarm_pool_sleep_until(pool, make_timeout_time_us(us));
+    alarm_pool_sleep_until(pool, delayed_by_us(pool_get_absolute_time(pool), us));
 }
 
 void alarm_pool_sleep_ms(alarm_pool_t *pool, uint32_t ms) {
@@ -607,7 +642,7 @@ bool alarm_pool_add_repeating_timer_us(alarm_pool_t *pool, int64_t delay_us, rep
     out->callback = callback;
     out->delay_us = delay_us;
     out->user_data = user_data;
-    out->alarm_id = alarm_pool_add_alarm_at(pool, make_timeout_time_us((uint64_t)(delay_us >= 0 ? delay_us : -delay_us)),
+    out->alarm_id = alarm_pool_add_alarm_at(pool, delayed_by_us(pool_get_absolute_time(pool), (uint64_t)(delay_us >= 0 ? delay_us : -delay_us)),
                                             repeating_timer_marker, out, true);
     return out->alarm_id > 0;
 }

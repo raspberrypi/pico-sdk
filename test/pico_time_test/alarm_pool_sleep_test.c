@@ -23,6 +23,9 @@ PICOTEST_MODULE_NAME("alarm_pool_sleep", "alarm_pool_sleep test harness");
 static int wake_time_test(alarm_pool_t *pool);
 static int full_pool_test(void);
 static int other_core_test(void);
+#if NUM_GENERIC_TIMERS > 1
+static int other_timer_test(void);
+#endif
 
 int main(void) {
     setup_default_uart();
@@ -36,6 +39,9 @@ int main(void) {
 
     rc |= full_pool_test();
     rc |= other_core_test();
+#if NUM_GENERIC_TIMERS > 1
+    rc |= other_timer_test();
+#endif
 
     picotest_error_code = rc;
     PICOTEST_END_TEST();
@@ -181,3 +187,57 @@ static int other_core_test(void) {
     PICOTEST_END_SECTION();
     return picotest_error_code;
 }
+
+#if NUM_GENERIC_TIMERS > 1
+static volatile absolute_time_t fired_at;
+
+static int64_t record_fire(__unused alarm_id_t id, __unused void *user_data) {
+    fired_at = get_absolute_time();
+    return 0;
+}
+
+static void set_timer_time(timer_hw_t *timer, uint64_t us) {
+    // timelw must be written first
+    timer->timelw = (uint32_t)us;
+    timer->timehw = (uint32_t)(us >> 32);
+}
+
+static int other_timer_test(void) {
+    PICOTEST_START_SECTION("alarm_pool_* on a pool on the other timer use that timer's time");
+    uint timer_num = PICO_DEFAULT_TIMER ^ 1;
+    timer_hw_t *other = timer_get_instance(timer_num);
+    // an hour apart, so any mixing of the two timers' times shows
+    const uint64_t ahead_us = 3600ull * 1000000;
+    set_timer_time(other, to_us_since_boot(get_absolute_time()) + ahead_us);
+    alarm_pool_t *pool = alarm_pool_create_on_timer_with_unused_hardware_alarm(alarm_pool_timer_for_timer_num(timer_num), 4);
+    PICOTEST_CHECK_AND_ABORT(pool, "failed to create alarm pool");
+
+    int64_t diff = absolute_time_diff_us(get_absolute_time(), alarm_pool_get_absolute_time(pool));
+    printf("  the pool's timer is %lldus ahead\n", diff);
+    PICOTEST_CHECK(diff > (int64_t)ahead_us - 1000 && diff < (int64_t)ahead_us + 1000, "alarm_pool_get_absolute_time didn't read the pool's timer");
+
+    absolute_time_t start = get_absolute_time();
+    alarm_pool_sleep_us(pool, 1000);
+    PICOTEST_CHECK(check_elapsed(start, 1000, "alarm_pool_sleep_us"), "alarm_pool_sleep_us woke at the wrong time");
+
+    start = get_absolute_time();
+    alarm_pool_sleep_until(pool, delayed_by_us(alarm_pool_get_absolute_time(pool), 1000));
+    PICOTEST_CHECK(check_elapsed(start, 1000, "alarm_pool_sleep_until"), "alarm_pool_sleep_until woke at the wrong time");
+
+    fired_at = nil_time;
+    start = get_absolute_time();
+    alarm_id_t id = alarm_pool_add_alarm_in_us(pool, 2000, record_fire, NULL, false);
+    PICOTEST_CHECK(id > 0, "failed to add alarm");
+    absolute_time_t timeout = make_timeout_time_ms(100);
+    while (is_nil_time(fired_at) && !time_reached(timeout)) tight_loop_contents();
+    PICOTEST_CHECK_AND_ABORT(!is_nil_time(fired_at), "alarm didn't fire");
+    int64_t late = absolute_time_diff_us(delayed_by_us(start, 2000), fired_at);
+    printf("  alarm_pool_add_alarm_in_us(2000) fired %lldus late\n", late);
+    PICOTEST_CHECK(late >= 0 && late <= MAX_LATE_US, "alarm fired at the wrong time");
+
+    alarm_pool_destroy(pool);
+    set_timer_time(other, to_us_since_boot(get_absolute_time()));
+    PICOTEST_END_SECTION();
+    return picotest_error_code;
+}
+#endif

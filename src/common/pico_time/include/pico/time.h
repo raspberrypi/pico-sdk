@@ -434,6 +434,25 @@ alarm_pool_t *alarm_pool_get_default(void);
 
 alarm_pool_t *alarm_pool_create_on_timer(alarm_pool_timer_t *timer, uint timer_alarm_num, uint max_timers);
 
+/*!
+ * \brief Return the current time on an alarm pool's timer
+ * \ingroup alarm
+ *
+ * The absolute times passed to the alarm_pool functions are in the time base of the pool's timer. For a pool on the
+ * default timer (see \ref alarm_pool_get_default_timer), including the default alarm pool, this is the same as
+ * \ref get_absolute_time.
+ *
+ * \param pool the alarm pool
+ * \return the current time on \p pool's timer
+ */
+#if NUM_GENERIC_TIMERS == 1
+static inline absolute_time_t alarm_pool_get_absolute_time(__unused alarm_pool_t *pool) {
+    return get_absolute_time();
+}
+#else
+absolute_time_t alarm_pool_get_absolute_time(alarm_pool_t *pool);
+#endif
+
 alarm_pool_timer_t *alarm_pool_timer_for_timer_num(uint timer_num);
 
 alarm_pool_timer_t *alarm_pool_get_default_timer(void);
@@ -524,7 +543,7 @@ void alarm_pool_destroy(alarm_pool_t *pool);
  * \note It is safe to call this method from an IRQ handler (including alarm callbacks), and from either core.
  *
  * @param pool the alarm pool to use for scheduling the callback (this determines which timer_alarm is used, and which core calls the callback)
- * @param time the timestamp when (after which) the callback should fire
+ * @param time the timestamp when (after which) the callback should fire, on \p pool's timer (see \ref alarm_pool_get_absolute_time)
  * @param callback the callback function
  * @param user_data user data to pass to the callback function
  * @param fire_if_past if true, and the alarm time falls before or during this call before the alarm can be set,
@@ -576,7 +595,7 @@ alarm_id_t alarm_pool_add_alarm_at_force_in_context(alarm_pool_t *pool, absolute
  * @return <0 if there were no alarm slots available, or other error occurred
  */
 static inline alarm_id_t alarm_pool_add_alarm_in_us(alarm_pool_t *pool, uint64_t us, alarm_callback_t callback, void *user_data, bool fire_if_past) {
-    return alarm_pool_add_alarm_at(pool, delayed_by_us(get_absolute_time(), us), callback, user_data, fire_if_past);
+    return alarm_pool_add_alarm_at(pool, delayed_by_us(alarm_pool_get_absolute_time(pool), us), callback, user_data, fire_if_past);
 }
 
 /*!
@@ -601,7 +620,7 @@ static inline alarm_id_t alarm_pool_add_alarm_in_us(alarm_pool_t *pool, uint64_t
  * @return <0 if there were no alarm slots available, or other error occurred
  */
 static inline alarm_id_t alarm_pool_add_alarm_in_ms(alarm_pool_t *pool, uint32_t ms, alarm_callback_t callback, void *user_data, bool fire_if_past) {
-    return alarm_pool_add_alarm_at(pool, delayed_by_ms(get_absolute_time(), ms), callback, user_data, fire_if_past);
+    return alarm_pool_add_alarm_at(pool, delayed_by_ms(alarm_pool_get_absolute_time(pool), ms), callback, user_data, fire_if_past);
 }
 
 /*!
@@ -645,10 +664,8 @@ bool alarm_pool_cancel_alarm(alarm_pool_t *pool, alarm_id_t alarm_id);
  * \p pool, so, for example, a core can sleep without interrupting the other core by using
  * a pool it created itself.
  *
- * \note \p pool must use the default timer (see \ref alarm_pool_get_default_timer).
- *
  * \param pool the alarm pool to use
- * \param target the time after which to return
+ * \param target the time after which to return, on \p pool's timer (see \ref alarm_pool_get_absolute_time)
  * \sa sleep_until()
  */
 void alarm_pool_sleep_until(alarm_pool_t *pool, absolute_time_t target);
@@ -658,8 +675,6 @@ void alarm_pool_sleep_until(alarm_pool_t *pool, absolute_time_t target);
  *
  * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It only causes IRQs on the core that
  * created \p pool.
- *
- * \note \p pool must use the default timer (see \ref alarm_pool_get_default_timer).
  *
  * \param pool the alarm pool to use
  * \param us the number of microseconds to sleep
@@ -672,8 +687,6 @@ void alarm_pool_sleep_us(alarm_pool_t *pool, uint64_t us);
  *
  * This is a lower power (WFE) sleep using \p pool, or a busy wait if \p pool is full. It only causes IRQs on the core that
  * created \p pool.
- *
- * \note \p pool must use the default timer (see \ref alarm_pool_get_default_timer).
  *
  * \param pool the alarm pool to use
  * \param ms the number of milliseconds to sleep
@@ -727,7 +740,8 @@ static inline alarm_id_t add_alarm_at(absolute_time_t time, alarm_callback_t cal
  * @return <0 if there were no alarm slots available, or other error occurred
  */
 static inline alarm_id_t add_alarm_in_us(uint64_t us, alarm_callback_t callback, void *user_data, bool fire_if_past) {
-    return alarm_pool_add_alarm_in_us(alarm_pool_get_default(), us, callback, user_data, fire_if_past);
+    // the default pool is on the default timer
+    return alarm_pool_add_alarm_at(alarm_pool_get_default(), delayed_by_us(get_absolute_time(), us), callback, user_data, fire_if_past);
 }
 
 /*!
@@ -751,7 +765,8 @@ static inline alarm_id_t add_alarm_in_us(uint64_t us, alarm_callback_t callback,
  * @return <0 if there were no alarm slots available, or other error occurred
  */
 static inline alarm_id_t add_alarm_in_ms(uint32_t ms, alarm_callback_t callback, void *user_data, bool fire_if_past) {
-    return alarm_pool_add_alarm_in_ms(alarm_pool_get_default(), ms, callback, user_data, fire_if_past);
+    // the default pool is on the default timer
+    return alarm_pool_add_alarm_at(alarm_pool_get_default(), delayed_by_ms(get_absolute_time(), ms), callback, user_data, fire_if_past);
 }
 /*!
  * \brief Cancel an alarm from the default alarm pool
