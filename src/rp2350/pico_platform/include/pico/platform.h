@@ -46,11 +46,6 @@
 #define PICO_RP2350_A2_SUPPORTED 1
 #endif
 
-// PICO_CONFIG: PICO_SUPPORT_QSPI_GPIOS, Enable/disable support for using QSPI GPIOs, type=bool, default=0, group=hardware_gpio
-#ifndef PICO_SUPPORT_QSPI_GPIOS
-#define PICO_SUPPORT_QSPI_GPIOS 0
-#endif
-
 // PICO_CONFIG: PICO_STACK_SIZE, Minimum amount of stack space reserved in the linker script for each core. See also PICO_CORE1_STACK_SIZE, min=0x100, default=0x800, advanced=true, group=pico_platform
 #ifndef PICO_STACK_SIZE
 #define PICO_STACK_SIZE _u(0x800)

@@ -15,7 +15,7 @@
 #include "hardware/structs/io_qspi.h"
 #include "hardware/irq.h"
 
-// PICO_CONFIG: PICO_SUPPORT_GT32_GPIOS, Enable/disable support for >32 GPIOs, type=bool, default=1 if NUM_BANK0_GPIOS > 32 or PICO_SUPPORT_QSPI_GPIOS=1, group=hardware_gpio
+// PICO_CONFIG: PICO_SUPPORT_GT32_GPIOS, Enable/disable support for >32 GPIOs, type=bool, default=1 if NUM_BANK0_GPIOS > 32 or PICO_SUPPORT_QSPI_GPIOS is 1, group=hardware_gpio
 #ifndef PICO_SUPPORT_GT32_GPIOS
 #define PICO_SUPPORT_GT32_GPIOS ((NUM_BANK0_GPIOS > 32) || PICO_SUPPORT_QSPI_GPIOS)
 #endif
