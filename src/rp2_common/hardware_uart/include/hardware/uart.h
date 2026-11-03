@@ -202,7 +202,7 @@ static_assert(DREQ_UART1_TX == DREQ_UART0_TX + 2, "");
  * \def UART_CLK_DEST_SYS(uart)
  * \ingroup hardware_uart
  * \hideinitializer
- * \brief Returns \ref clock_dest_num_t of the clk_peri dest for the given UART instance
+ * \brief Returns \ref clock_dest_num_t of the clk_sys dest for the given UART instance
  *
  * Note this macro is intended to resolve at compile time, and does no parameter checking
  */

@@ -98,7 +98,7 @@ void stdout_uart_deinit(void);
 /*! \brief Explicitly deinitialize stdin only (no stdout) over UART and remove it from the current set of stdin drivers
  *  \ingroup pico_stdio_uart
  *
- * This method disables PICO_DEFAULT_UART_RX_PIN for UART input (if defined), and leaves the pads isolated
+ * This method disables PICO_DEFAULT_UART_RX_PIN for UART input (if defined), and leaves the pad isolated
  * 
  * See \ref stdin_uart_init() for the inverse function
  */
