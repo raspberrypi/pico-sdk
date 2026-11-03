@@ -41,7 +41,7 @@ extra_copts_for_all_deps(
     testonly = True,
     src = ":low_power_test_persistent_actual",
     extra_copts = [
-        "-DPICO_LOW_POWER_PERSISTENT_PSTATE_STATIC=0",
+        "-DPICO_LOW_POWER_PERSISTENT_PSTATE_RUN_TIME=1",
     ],
     target_compatible_with = compatible_with_rp2() + incompatible_with_config("//bazel/constraint:rp2040"),
 )

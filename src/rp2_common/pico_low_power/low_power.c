@@ -680,7 +680,7 @@ static pstate_bitset_t *low_power_pstate_get(pstate_bitset_t *pstate) {
     return pstate;
 }
 
-#if !PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC // otherwise it is static inline in the header
+#if PICO_LOW_POWER_PERSISTENT_PSTATE_RUN_TIME // otherwise it is static inline in the header
 pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
 #if PICO_RP2350 // Copied from RP2350 section_platform_end.incl, with syntax fixups
     /* Convert into bits */

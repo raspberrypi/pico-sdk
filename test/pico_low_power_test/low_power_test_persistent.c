@@ -25,7 +25,7 @@ int main() {
 
     pstate_bitset_t pstate = pstate_bitset_none();
 
-    // Runtime check because PICO_LOW_POWER_PERSISTENT_PSTATE_STATIC=0
+    // Runtime check because PICO_LOW_POWER_PERSISTENT_PSTATE_RUN_TIME=1
     low_power_persistent_pstate_get(&pstate);
     pstate_resume_func_common(&pstate, powman_last_pwrup, powman_last_pstate_runtime);
     printf("Persistent data would keep (%s) memory on\n", powman_last_pstate_runtime);
