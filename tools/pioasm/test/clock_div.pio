@@ -1,0 +1,25 @@
+; Regression fixture for the .clock_div directive.
+;
+; pioasm used to compute the fractional part of the divider from the whole
+; divider rather than from its fractional part alone, so `.clock_div 3.6`
+; produced a fraction of 921 instead of 153 (0.6 * 256, truncated).
+; Both output formats emitted the bad value. The generated C code happened to
+; work for this case only because sm_config_set_clkdiv_int_frac() takes a
+; uint8_t, which truncated 921 to the correct 153; the JSON output kept 921.
+
+.program div_3_6
+.clock_div 3.6
+    nop
+
+.program div_2_5
+.clock_div 2.5
+    nop
+
+.program div_50
+.clock_div 50
+    nop
+
+; A divider of 1 is the default and should not produce a clkdiv call at all.
+.program div_1
+.clock_div 1
+    nop
