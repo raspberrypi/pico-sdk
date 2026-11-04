@@ -97,7 +97,7 @@ void rtc_enable_alarm(void);
 void rtc_disable_alarm(void);
 
 /*! \brief Run the RTC from an external clock source through GPIO
- *  \ingroup hardware_sleep
+ *  \ingroup hardware_rtc
  *
  * \note This function will return false if the external clock source is not running.
  *

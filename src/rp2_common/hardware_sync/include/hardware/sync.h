@@ -51,6 +51,12 @@ extern "C" {
  * 14,15       | (\ref PICO_SPINLOCK_ID_OS1 and \ref PICO_SPINLOCK_ID_OS2). Currently reserved for exclusive use by an operating system (or other system level software) co-existing with the SDK.
  * 16-23       | (\ref PICO_SPINLOCK_ID_STRIPED_FIRST - \ref PICO_SPINLOCK_ID_STRIPED_LAST). Spin locks from this range are assigned in a round-robin fashion via \ref next_striped_spin_lock_num(). These spin locks are shared, but assigning numbers from a range reduces the probability that two higher level locking primitives using _striped_ spin locks will actually be using the same spin lock.
  * 24-31       | (\ref PICO_SPINLOCK_ID_CLAIM_FREE_FIRST - \ref PICO_SPINLOCK_ID_CLAIM_FREE_LAST). These are reserved for exclusive use and are allocated on a first come first served basis at runtime via \ref spin_lock_claim_unused()
+ *
+ * \if rp2350_specific
+ * On RP2350, when PICO_USE_SW_SPIN_LOCKS=0, the default lock numbering is altered to avoid locks
+ * affected by erratum RP2350-E2. The OS pair becomes 18-19, the striped range 20-25, and the
+ * claimable range 26-31. The PICO_SPINLOCK_ID_* macros reflect the actual numbering.
+ * \endif
  */
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLED_HARDWARE_SYNC, Enable/disable assertions in the hardware_sync module, type=bool, default=0, group=hardware_sync

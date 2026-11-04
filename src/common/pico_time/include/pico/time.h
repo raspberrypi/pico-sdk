@@ -253,6 +253,10 @@ void sleep_until(absolute_time_t target);
  *
  * \note This method attempts to perform a lower power (WFE) sleep
  *
+ * \note The wake-up uses an alarm in the default alarm pool, whose IRQ runs on the core that created it
+ * (usually core 0), so sleeping on one core briefly interrupts that core. \ref busy_wait_us doesn't have this
+ * problem, if you don't need the lower power sleep.
+ *
  * \param us the number of microseconds to sleep
  * \sa busy_wait_us()
  */
@@ -441,7 +445,7 @@ static inline alarm_pool_t *alarm_pool_create(uint timer_alarm_num, uint max_tim
 alarm_pool_t *alarm_pool_create_on_timer_with_unused_hardware_alarm(alarm_pool_timer_t *timer, uint max_timers);
 
 /**
- * \brief Create an alarm pool, claiming an used timer_alarm to back it.
+ * \brief Create an alarm pool, claiming an unused timer_alarm to back it.
  *
  * The alarm pool will call callbacks from an alarm IRQ Handler on the core of this function is called from.
  *
@@ -483,6 +487,9 @@ uint alarm_pool_core_num(alarm_pool_t *pool);
 /**
  * \brief Destroy the alarm pool, cancelling all alarms and freeing up the underlying timer_alarm
  * \ingroup alarm
+ *
+ * Must be called on the same core that created the pool, to avoid racing its own callbacks.
+ *
  * \param pool the pool
  */
 void alarm_pool_destroy(alarm_pool_t *pool);

@@ -118,7 +118,7 @@ int __not_in_flash_func(spi_write_blocking)(spi_inst_t *spi, const uint8_t *src,
     // TX FIFO drains), then drain RX FIFO again
     while (spi_is_readable(spi))
         (void)spi_get_hw(spi)->dr;
-    while (spi_get_hw(spi)->sr & SPI_SSPSR_BSY_BITS)
+    while (spi_is_busy(spi))
         tight_loop_contents();
     while (spi_is_readable(spi))
         (void)spi_get_hw(spi)->dr;
@@ -187,7 +187,7 @@ int __not_in_flash_func(spi_write16_blocking)(spi_inst_t *spi, const uint16_t *s
 
     while (spi_is_readable(spi))
         (void)spi_get_hw(spi)->dr;
-    while (spi_get_hw(spi)->sr & SPI_SSPSR_BSY_BITS)
+    while (spi_is_busy(spi))
         tight_loop_contents();
     while (spi_is_readable(spi))
         (void)spi_get_hw(spi)->dr;

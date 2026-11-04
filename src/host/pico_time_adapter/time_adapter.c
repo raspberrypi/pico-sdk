@@ -47,6 +47,10 @@ PICO_WEAK_FUNCTION_DEF(ta_hardware_alarm_claim_unused)
 int PICO_WEAK_FUNCTION_IMPL_NAME(ta_hardware_alarm_claim_unused)(alarm_pool_timer_t *timer, bool required) {
     panic_unsupported();
 }
+PICO_WEAK_FUNCTION_DEF(ta_hardware_alarm_unclaim)
+void PICO_WEAK_FUNCTION_IMPL_NAME(ta_hardware_alarm_unclaim)(alarm_pool_timer_t *timer, uint hardware_alaram_num) {
+    panic_unsupported();
+}
 
 PICO_WEAK_FUNCTION_DEF(ta_from_current_irq);
 alarm_pool_timer_t *PICO_WEAK_FUNCTION_IMPL_NAME(ta_from_current_irq)(uint *alarm_num) {

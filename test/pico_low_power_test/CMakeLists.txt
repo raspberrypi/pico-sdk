@@ -137,6 +137,27 @@ if (TARGET pico_low_power)
         # create map/bin/hex file etc.
         pico_add_extra_outputs(low_power_test_gpio_usb)
 
+        add_executable(low_power_test_timers_gpio
+                low_power_test_timers_gpio.c
+        )
+        target_link_libraries(low_power_test_timers_gpio low_power_test_common)
+        set_target_properties(low_power_test_timers_gpio PROPERTIES PICO_TEST_TIMEOUT 30)
+        set_target_properties(low_power_test_timers_gpio PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
+        set_target_properties(low_power_test_timers_gpio PROPERTIES PICO_TEST_BUDDY_FILE external_sleep_timer.elf)
+        # create map/bin/hex file etc.
+        pico_add_extra_outputs(low_power_test_timers_gpio)
+
+        add_executable(low_power_test_timers_gpio_usb
+                low_power_test_timers_gpio.c
+        )
+        target_link_libraries(low_power_test_timers_gpio_usb low_power_test_common)
+        pico_enable_stdio_usb(low_power_test_timers_gpio_usb 1)
+        set_target_properties(low_power_test_timers_gpio_usb PROPERTIES PICO_TEST_TIMEOUT 30)
+        set_target_properties(low_power_test_timers_gpio_usb PROPERTIES PICO_TEST_FAILURE_STRING "ERROR:")
+        set_target_properties(low_power_test_timers_gpio_usb PROPERTIES PICO_TEST_BUDDY_FILE external_sleep_timer.elf)
+        # create map/bin/hex file etc.
+        pico_add_extra_outputs(low_power_test_timers_gpio_usb)
+
         add_executable(low_power_test_simple
                 low_power_test_simple.c
         )

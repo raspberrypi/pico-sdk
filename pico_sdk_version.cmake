@@ -7,7 +7,7 @@ if (NOT DEFINED PICO_SDK_VERSION_MAJOR)
     set(PICO_SDK_VERSION_MINOR 3)
     # PICO_BUILD_DEFINE: PICO_SDK_VERSION_REVISION, SDK version revision, type=int, default=Current SDK revision, group=pico_base
     # PICO_CMAKE_CONFIG: PICO_SDK_VERSION_REVISION, SDK version revision, type=int, default=Current SDK revision, group=pico_base
-    set(PICO_SDK_VERSION_REVISION 1)
+    set(PICO_SDK_VERSION_REVISION 2)
     # PICO_BUILD_DEFINE: PICO_SDK_VERSION_PRE_RELEASE_ID, Optional SDK pre-release version identifier, default=Current SDK pre-release identifier, type=string, group=pico_base
     # PICO_CMAKE_CONFIG: PICO_SDK_VERSION_PRE_RELEASE_ID, Optional SDK pre-release version identifier, default=Current SDK pre-release identifier, type=string, group=pico_base
     set(PICO_SDK_VERSION_PRE_RELEASE_ID develop)

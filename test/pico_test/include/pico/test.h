@@ -29,8 +29,8 @@ but not sure that is implemented yet.
                                     printf("Module %s: Section %s : Passed\n", picotest_module, picotest_section_name); \
                                }
 
-#define PICOTEST_CHECK(COND, MESSAGE) if (!(COND)) {                                               \
-                                        printf("Module %s: %s\n", picotest_module, MESSAGE);       \
+#define PICOTEST_CHECK(COND, MESSAGE, ...) if (!(COND)) {                                               \
+                                        printf("Module %s: ", picotest_module); printf(MESSAGE, ## __VA_ARGS__); printf("\n");       \
                                         picotest_error_code = -1;                                   \
                                     }
 #define PICOTEST_CHECK_CHANNEL(CHANNEL, COND, MESSAGE) if (!(COND)) {                              \
@@ -38,8 +38,8 @@ but not sure that is implemented yet.
                                         picotest_error_code = -1;                                   \
                                     }
 
-#define PICOTEST_CHECK_AND_ABORT(COND, MESSAGE) if (!(COND)) {                                     \
-                                        printf("Module %s: %s\n", picotest_module, MESSAGE);       \
+#define PICOTEST_CHECK_AND_ABORT(COND, MESSAGE, ...) if (!(COND)) {                                     \
+                                        printf("Module %s: ", picotest_module); printf(MESSAGE, ## __VA_ARGS__); printf("\n");       \
                                         picotest_error_code = -1;                                   \
                                         return -1;                                                  \
                                     }

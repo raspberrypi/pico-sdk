@@ -30,6 +30,12 @@ SECTIONS
         *(.data*)
         *(.sdata*)
 
+	    /* Linking against non PIC archives, or using TLS without -ftls-model=local-exec (which we shouldn't),
+	       generate dynamic data relocations via got sections, so include them explicitly to avoid surprises.
+	       Ideally these are always 0 sized */
+        *(.got)
+        *(.got.*)
+
         . = ALIGN(4);
         *(.after_data.*)
         . = ALIGN(4);

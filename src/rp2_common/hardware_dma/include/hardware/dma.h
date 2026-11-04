@@ -726,7 +726,6 @@ static inline void dma_channel_start(uint channel) {
  * in-flight (i.e. an individual read has taken place but the corresponding write has not), the ABORT
  * status bit will clear prematurely, and subsequently the in-flight
  * transfers will trigger a completion interrupt once they complete.
- *\endif
  *
  * The effect of this is that you \em may see a spurious completion interrupt
  * on the channel as a result of calling this method.
@@ -748,6 +747,7 @@ static inline void dma_channel_start(uint channel) {
  *  // re-enable the channel on IRQ0
  *  dma_channel_set_irq0_enabled(channel, true);
  *\endcode
+ *\endif
  *
  * \if rp2350_specific
  * RP2350 only: Due to errata RP2350-E5 (see the RP2350 datasheet for further detail), it is necessary to clear the enable bit of

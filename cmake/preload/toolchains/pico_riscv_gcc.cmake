@@ -2,11 +2,16 @@ set(CMAKE_SYSTEM_PROCESSOR hazard3)
 
 set(PICO_DEFAULT_GCC_TRIPLE riscv32-pico-elf riscv32-unknown-elf riscv32-corev-elf riscv-none-elf)
 
+# PICO_CMAKE_CONFIG: PICO_NO_STRICT_ALIGN, Disable -mstrict-align for Risc-V, type=bool, default=0, group=build, docref=cmake-toolchain-config
+if (NOT PICO_NO_STRICT_ALIGN)
+    set(PICO_RISCV_LANG_FLAGS_EXTRA "${PICO_RISCV_LANG_FLAGS_EXTRA} -mstrict-align")
+endif()
+
 # ordered list of preferred flags to support
 set(PICO_COMMON_LANG_FLAGS_LIST
-        " -mcpu=hazard3-rp2350"
-        " -march=rv32ima_zicsr_zifencei_zba_zbb_zbs_zbkb_zca_zcb_zcmp -mabi=ilp32"
-        " -march=rv32imac_zicsr_zifencei_zba_zbb_zbs_zbkb -mabi=ilp32")
+        " -mcpu=hazard3-rp2350 ${PICO_RISCV_LANG_FLAGS_EXTRA}"
+        " -march=rv32ima_zicsr_zifencei_zba_zbb_zbs_zbkb_zca_zcb_zcmp -mabi=ilp32 ${PICO_RISCV_LANG_FLAGS_EXTRA}"
+        " -march=rv32imac_zicsr_zifencei_zba_zbb_zbs_zbkb -mabi=ilp32 ${PICO_RISCV_LANG_FLAGS_EXTRA}")
 
 # C file used to test the flags listed above. There needs to be an equal number
 # of entries in PICO_COMMON_LANG_FLAGS_LIST and PICO_COMMON_LANG_FLAGS_TEST_FILES.

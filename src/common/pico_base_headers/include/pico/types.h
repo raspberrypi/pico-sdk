@@ -28,7 +28,7 @@ typedef unsigned int uint;
  * The type is used instead of a raw uint64_t to prevent accidentally passing relative times or times in the wrong
  * time units where an absolute time is required.
  *
- * note: As of SDK 2.0.0 this type defaults to being a uin64_t (i.e. no protection); it is enabled
+ * note: As of SDK 2.0.0 this type defaults to being a uint64_t (i.e. no protection); it is enabled
  * by setting PICO_OPAQUE_ABSOLUTE_TIME_T to 1
  *
  * \see to_us_since_boot()

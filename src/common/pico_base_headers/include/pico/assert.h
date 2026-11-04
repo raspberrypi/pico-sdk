@@ -16,6 +16,10 @@
 extern "C" {
 #else
 #include <assert.h>
+#if !defined(static_assert) && __STDC_VERSION__ < 201112L
+// C99 has no static_assert, but GCC and Clang accept _Static_assert
+#define static_assert _Static_assert
+#endif
 #endif
 
 // PICO_CONFIG: PARAM_ASSERTIONS_ENABLE_ALL, Global assert enable, type=bool, default=0, group=pico_base

@@ -174,6 +174,13 @@ if (TARGET hardware_pio)
     pico_generate_pio_header(kitchen_sink ${CMAKE_CURRENT_LIST_DIR}/trivial.pio)
 endif()
 
+add_executable(kitchen_sink_c99 ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
+target_link_libraries(kitchen_sink_c99 kitchen_sink_libs kitchen_sink_options)
+# C_EXTENSIONS OFF gives -std=c99 rather than -std=gnu99, so no asm or typeof keywords
+set_target_properties(kitchen_sink_c99 PROPERTIES C_STANDARD 99 C_EXTENSIONS OFF)
+pico_add_extra_outputs(kitchen_sink_c99)
+target_compile_definitions(kitchen_sink_c99 PRIVATE KITCHEN_SINK_ID="c99 binary")
+
 add_executable(kitchen_sink_extra_stdio ${CMAKE_CURRENT_LIST_DIR}/kitchen_sink.c)
 if (COMMAND suppress_tinyusb_warnings)
     # Explicitly suppress warnings in TinyUSB files which have them (this has to be done

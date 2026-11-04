@@ -172,7 +172,7 @@ static void replace_null_enable_values(const clock_dest_bitset_t *keep_enabled,
     }
 }
 
-static void add_library_clocks(clock_dest_bitset_t *local_keep_enabled) {
+static void add_library_clocks(__unused clock_dest_bitset_t *local_keep_enabled) {
 #if LIB_PICO_STDIO_USB || LIB_TINYUSB_HOST || LIB_TINYUSB_DEVICE
     // this is necessary to prevent dropping the connection
     #if PICO_RP2040
@@ -186,7 +186,7 @@ static void add_library_clocks(clock_dest_bitset_t *local_keep_enabled) {
     #endif
 #endif
 
-#if LIB_PICO_STDIO_UART
+#if LIB_PICO_STDIO_UART && defined(PICO_DEFAULT_UART)
     // this is only needed to prevent losing stdin while sleeping
     clock_dest_bitset_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_PERI_UART1 : CLK_DEST_PERI_UART0);
     clock_dest_bitset_add(local_keep_enabled, PICO_DEFAULT_UART ? CLK_DEST_SYS_UART1 : CLK_DEST_SYS_UART0);
@@ -619,6 +619,8 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
 
     low_power_wake_from_dormant();
 
+    aon_timer_disable_alarm();
+
 #if PICO_RP2350
     if (dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC)
         // Switch powman timer back to default
@@ -795,6 +797,9 @@ void __weak runtime_init_low_power_reboot_check(void) {
                 }
             }
         }
+
+        // disable whatever woke us up
+        powman_disable_all_wakeups();
 
         // execute the resume function, if present
         if (powman_hw->scratch[7]) {

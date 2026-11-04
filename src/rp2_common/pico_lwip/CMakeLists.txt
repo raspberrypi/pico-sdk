@@ -265,7 +265,7 @@ if (EXISTS ${PICO_LWIP_PATH}/${LWIP_TEST_PATH})
             )
 
     # All LWIP files without apps
-    pico_add_library(pico_lwip NOFLAG)
+    pico_add_library(pico_lwip)
     pico_mirrored_target_link_libraries(pico_lwip INTERFACE
         pico_lwip_core
         pico_lwip_core4

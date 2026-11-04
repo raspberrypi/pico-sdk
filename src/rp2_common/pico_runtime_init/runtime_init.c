@@ -124,7 +124,7 @@ void __weak runtime_init_per_core_enable_coprocessors(void) {
 #endif
     arm_cpu_hw->cpacr |= cpacr;
 #if HAS_DOUBLE_COPROCESSOR
-    asm volatile ("mrc p4,#0,r0,c0,c0,#1" : : : "r0"); // clear engaged flag via RCMP
+    pico_default_asm_volatile("mrc p4,#0,r0,c0,c0,#1" : : : "r0"); // clear engaged flag via RCMP
 #endif
 }
 #endif
@@ -218,6 +218,8 @@ void runtime_init_install_ram_vector_table(void) {
     extern uint32_t __vectors_end;
     uint32_t stored_words = ((uintptr_t)&__vectors_end - (uintptr_t)&__vectors) / sizeof(uint32_t);
     __builtin_memcpy(ram_vector_table, &__vectors, 4 * MIN(stored_words, PICO_RAM_VECTOR_TABLE_SIZE));
+    // only runs for a truncated stored table, so keep it a loop
+    Clang_Pragma("clang loop unroll(disable)")
     for(uint i = stored_words; i<count_of(ram_vector_table); i++) {
         ram_vector_table[i] = (uintptr_t)__unhandled_user_irq;
     }

@@ -358,7 +358,7 @@ static inline void interp_set_base(interp_hw_t *interp, uint index, uint32_t val
  *  \ingroup hardware_interp
  *
  * \param interp Interpolator instance, interp0 or interp1.
- * \param lane The base register index, 0 or 1 or 2
+ * \param index The base register index, 0 or 1 or 2
  * \return  The current content of the base register
  */
 static inline uint32_t interp_get_base(interp_hw_t *interp, uint index) {

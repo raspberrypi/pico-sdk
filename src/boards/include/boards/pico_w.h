@@ -75,7 +75,7 @@ pico_board_cmake_set_default(PICO_FLASH_SIZE_BYTES, (2 * 1024 * 1024))
 #ifndef PICO_FLASH_SIZE_BYTES
 #define PICO_FLASH_SIZE_BYTES (2 * 1024 * 1024)
 #endif
-// note the SMSP mode pin is on WL_GPIO1
+// note the SMPS mode pin is on WL_GPIO1
 // #define PICO_SMPS_MODE_PIN
 
 #ifndef PICO_RP2040_B0_SUPPORTED

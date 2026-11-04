@@ -158,7 +158,7 @@ void multicore_launch_core1_with_stack(void (*entry)(void), uint32_t *stack_bott
     // On RISC-V we also need to initialise the global pointer
     stack_ptr -= 4;
     uint32_t vector_table = riscv_read_csr(mtvec);
-    asm volatile ("mv %0, gp" : "=r"(stack_ptr[3]));
+    pico_default_asm_volatile("mv %0, gp" : "=r"(stack_ptr[3]));
 #else
     stack_ptr -= 3;
     uint32_t vector_table = scb_hw->vtor;
@@ -419,12 +419,14 @@ static bool multicore_doorbell_claim_under_lock(uint doorbell_num, uint core_mas
 
 void multicore_doorbell_claim(uint doorbell_num, uint core_mask) {
     check_doorbell_num_param(doorbell_num);
+    check_core_mask_param(core_mask);
     uint32_t save = hw_claim_lock();
     multicore_doorbell_claim_under_lock(doorbell_num, core_mask, true);
     hw_claim_unlock(save);
 }
 
 int multicore_doorbell_claim_unused(uint core_mask, bool required) {
+    check_core_mask_param(core_mask);
     int rc = PICO_ERROR_INSUFFICIENT_RESOURCES;
     uint32_t save = hw_claim_lock();
     for(int i=NUM_DOORBELLS-1; i>=0; i--) {
@@ -442,6 +444,7 @@ int multicore_doorbell_claim_unused(uint core_mask, bool required) {
 
 void multicore_doorbell_unclaim(uint doorbell_num, uint core_mask) {
     check_doorbell_num_param(doorbell_num);
+    check_core_mask_param(core_mask);
     uint32_t save = hw_claim_lock();
     for(uint i=0; i < NUM_CORES; i++) {
         if (core_mask & (1u << i)) {

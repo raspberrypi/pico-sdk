@@ -68,6 +68,11 @@ CMAKE_ONLY_ALLOWLIST = (
     "PICO_TOOLCHAIN_PATH",
     # Bazel uses native --platforms mechanics.
     "PICO_PLATFORM",
+    # The string form of PICO_PLATFORM, so CMake-only for the same reason. Bazel could
+    # only offer the chip (host/rp2040/rp2350) from its constraints, not the full platform,
+    # and a value that silently omitted arm-s vs riscv would defeat the point of it -
+    # which is to identify precisely which build a captured log came from.
+    "PICO_PLATFORM_STRING",
     "PICO_DEFAULT_PLATFORM",
     "PICO_DEFAULT_RP2350_PLATFORM",
     # Named PICO_TOOLCHAIN in Bazel.

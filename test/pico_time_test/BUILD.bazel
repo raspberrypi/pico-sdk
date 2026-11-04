@@ -22,7 +22,21 @@ extra_copts_for_all_deps(
     name = "pico_time_test",
     testonly = True,
     src = ":pico_time_test_actual",
-    extra_copts = ["-DPICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS=250"],
+    extra_copts = [
+        "-DPICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS=250",
+        "-DPICO_USE_SW_SPIN_LOCKS=0",
+    ],
     # Host doesn't support PICO_TIME_NO_ALARM_SUPPORT without pico_host_sdl.
     target_compatible_with = compatible_with_rp2(),
+)
+
+extra_copts_for_all_deps(
+    name = "pico_time_test_sw",
+    testonly = True,
+    src = ":pico_time_test_actual",
+    extra_copts = [
+        "-DPICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS=250",
+        "-DPICO_USE_SW_SPIN_LOCKS=1",
+    ],
+    target_compatible_with = ["//bazel/constraint:rp2350"],
 )

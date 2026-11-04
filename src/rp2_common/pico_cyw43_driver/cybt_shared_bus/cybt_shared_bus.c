@@ -49,36 +49,6 @@ typedef enum {
     HCI_PACKET_TYPE_LOOPBACK = 0xFF
 } hci_packet_type_t;
 
-static cybt_result_t cybt_fw_download_prepare(uint8_t **p_write_buf, uint8_t **p_hex_buf) {
-    *p_write_buf = NULL;
-    *p_hex_buf = NULL;
-
-    *p_write_buf = cyw43_malloc(BTFW_DOWNLOAD_BLK_SIZE + BTFW_SD_ALIGN);
-    if (NULL == *p_write_buf) {
-        return CYBT_ERR_OUT_OF_MEMORY;
-    }
-
-    *p_hex_buf = cyw43_malloc(BTFW_MAX_STR_LEN);
-    if (NULL == *p_hex_buf) {
-        cyw43_free(*p_write_buf);
-        return CYBT_ERR_OUT_OF_MEMORY;
-    }
-
-    return CYBT_SUCCESS;
-}
-
-static cybt_result_t cybt_fw_download_finish(uint8_t *p_write_buf, uint8_t *p_hex_buf) {
-    if (p_write_buf) {
-        cyw43_free(p_write_buf);
-    }
-
-    if (p_hex_buf) {
-        cyw43_free(p_hex_buf);
-    }
-
-    return CYBT_SUCCESS;
-}
-
 static cybt_result_t cybt_wait_bt_ready(uint32_t max_polling_times) {
     cyw43_delay_ms(BTFW_WAIT_TIME_MS);
     do {
@@ -103,16 +73,7 @@ static cybt_result_t cybt_wait_bt_awake(uint32_t max_polling_times) {
 int cyw43_btbus_init(cyw43_ll_t *self) {
     cybt_result_t ret;
 
-    uint8_t *p_write_buf = NULL;
-    uint8_t *p_hex_buf = NULL;
-
     cybt_sharedbus_driver_init(self);
-
-    ret = cybt_fw_download_prepare(&p_write_buf, &p_hex_buf);
-    if (CYBT_SUCCESS != ret) {
-        cybt_error("Could not allocate memory\n");
-        return ret;
-    }
 
     cybt_debug("cybt_fw_download\n");
     const uint8_t *fw_data_buf;
@@ -128,14 +89,7 @@ int cyw43_btbus_init(cyw43_ll_t *self) {
     fw_data_len = cyw43_btfw_43439_len;
     fw_data_buf = cyw43_btfw_43439;
 #endif
-    ret = cybt_fw_download(fw_data_buf,
-                           fw_data_len,
-                           p_write_buf,
-                           p_hex_buf
-    );
-
-    cybt_debug("cybt_fw_download_finish\n");
-    cybt_fw_download_finish(p_write_buf, p_hex_buf);
+    ret = cybt_fw_download(fw_data_buf, fw_data_len);
 
     if (CYBT_SUCCESS != ret) {
         cybt_error("hci_open(): FW download failed (0x%x)\n", ret);
