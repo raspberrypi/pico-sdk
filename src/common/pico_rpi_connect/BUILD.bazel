@@ -3,12 +3,33 @@ load("//bazel:defs.bzl", "compatible_with_rp2")
 
 package(default_visibility = ["//visibility:public"])
 
+# The only code which handles the device identity private key.
+cc_library(
+    name = "pico_rpi_connect_identity_key",
+    srcs = [
+        "include/pico/rpi_connect/internal/connect_identity.h",
+        "rpi_connect_identity.c",
+        "rpi_connect_identity_key.c",
+    ],
+    hdrs = ["include/pico/rpi_connect_identity.h"],
+    includes = ["include"],
+    # OTP row holding the 32-byte P-256 device identity private key.
+    # Override on the command line with
+    # --copt=-DRPI_CONNECT_IDENTITY_OTP_ROW=0x... (a later -D wins).
+    local_defines = ["RPI_CONNECT_IDENTITY_OTP_ROW=0xc0"],
+    target_compatible_with = compatible_with_rp2(),
+    deps = [
+        "//src/rp2_common/pico_mbedtls",
+    ],
+)
+
 cc_library(
     name = "pico_rpi_connect",
     srcs = [
         "connect_crypto.c",
         "connect_time.c",
         "include/pico/rpi_connect/internal/connect_http.h",
+        "include/pico/rpi_connect/internal/connect_identity.h",
         "include/pico/rpi_connect/internal/connect_time.h",
         "include/pico/rpi_connect/internal/request.h",
         "include/pico/rpi_connect/internal/request_internal.h",
@@ -22,9 +43,10 @@ cc_library(
     ],
     hdrs = [
         "include/pico/rpi_connect.h",
+        "include/pico/rpi_connect_identity.h",
         "include/pico/rpi_connect_util.h",
-        # Internal header, but the OTA library uses it for deriving the public
-        # key during the device-identity-exchange, so it is exported here.
+        # Internal header, but exported for tools such as the host
+        # registration CLI.
         "include/pico/rpi_connect/internal/connect_crypto.h",
     ],
     includes = ["include"],
@@ -34,6 +56,7 @@ cc_library(
     # cyw43_arch_async_context()), so this library does not depend on any
     # particular pico_cyw43_arch flavour.
     deps = [
+        ":pico_rpi_connect_identity_key",
         "//src/common/pico_cjson",
         "//src/rp2_common/pico_async_context",
         "//src/rp2_common/pico_lwip",
@@ -52,6 +75,7 @@ cc_library(
     srcs = [
         "connect_crypto.c",
         "connect_time.c",
+        "include/pico/rpi_connect/internal/connect_identity.h",
         "include/pico/rpi_connect/internal/connect_time.h",
         "include/pico/rpi_connect/internal/request.h",
         "include/pico/rpi_connect/internal/request_internal.h",
@@ -60,11 +84,14 @@ cc_library(
         "request.c",
         "request_curl.c",
         "rpi_connect.c",
+        "rpi_connect_identity.c",
+        "rpi_connect_identity_key_host.c",
         "slist.c",
     ],
     hdrs = [
         "include/pico/rpi_connect.h",
         "include/pico/rpi_connect/internal/connect_crypto.h",
+        "include/pico/rpi_connect_identity.h",
         "include/pico/rpi_connect_util.h",
     ],
     includes = ["include"],

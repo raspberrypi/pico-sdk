@@ -33,6 +33,25 @@
     ((void *)(XIP_NOCACHE_NOALLOC_NOTRANSLATE_BASE + (uint32_t)(_o)))
 #endif
 
+#ifndef PICO_RP2040
+// On RP2350 flash is programmed & erased via the bootrom, which takes addresses
+// rather than offsets. The ffs offsets are flash *storage* offsets (to match the
+// untranslated reads).
+#define FL_OFFSET_TO_ROM_ADDR(_o)       (XIP_BASE + (uint32_t)(_o))
+
+static const cflash_flags_t cflash_erase = {
+    .flags = (CFLASH_OP_VALUE_ERASE << CFLASH_OP_LSB) |
+             (CFLASH_SECLEVEL_VALUE_SECURE << CFLASH_SECLEVEL_LSB) |
+             (CFLASH_ASPACE_VALUE_STORAGE << CFLASH_ASPACE_LSB)
+};
+
+static const cflash_flags_t cflash_program = {
+    .flags = (CFLASH_OP_VALUE_PROGRAM << CFLASH_OP_LSB) |
+             (CFLASH_SECLEVEL_VALUE_SECURE << CFLASH_SECLEVEL_LSB) |
+             (CFLASH_ASPACE_VALUE_STORAGE << CFLASH_ASPACE_LSB)
+};
+#endif // !PICO_RP2040
+
 // Convert an unaligned flash offset into its page start offset
 #define ALIGN_TO_START(_o, _a)          ((_o) & ~((_a)-1))
 #define FL_OFFSET_TO_PAGE_START(_o)     ALIGN_TO_START((_o), FLASH_PAGE_SIZE)
@@ -140,6 +159,7 @@ static uint32_t calc_next_chunk_start(uint32_t offset) {
 }
 
 
+#ifdef PICO_RP2040
 static void call_flash_range_erase(void *param) {
 
     uint32_t offset = ((uintptr_t*)param)[0];
@@ -174,6 +194,25 @@ static int flash_program_a_page(uint32_t offset, const void *page) {
 
     return ret;
 }
+#else
+// Note: rom_flash_op() uses flash_safe_execute() internally
+static int flash_erase_chunk_sectors(uint32_t offset) {
+
+    return rom_flash_op(cflash_erase,
+                        FL_OFFSET_TO_ROM_ADDR(offset),
+                        ffs_data.chunk_size,
+                        NULL);
+}
+
+
+static int flash_program_a_page(uint32_t offset, const void *page) {
+
+    return rom_flash_op(cflash_program,
+                        FL_OFFSET_TO_ROM_ADDR(offset),
+                        FLASH_PAGE_SIZE,
+                        (uint8_t *)(uintptr_t)page);
+}
+#endif
 
 
 static inline void flash_read_into_cache(uint32_t offset) {
