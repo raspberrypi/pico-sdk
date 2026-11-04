@@ -13,6 +13,10 @@
  *  
  * \brief async_context_freertos provides an implementation of \ref async_context that handles asynchronous
  * work in a separate FreeRTOS task.
+ *
+ * Because the locking uses FreeRTOS mutexes and semaphores, the context must only be used from FreeRTOS
+ * tasks: not from \c main() before the scheduler starts, and not from a core that isn't running FreeRTOS.
+ * The exception is, \ref async_context_set_work_pending, which may also be called from an IRQ handler on the FreeRTOS core.
  */
 #include "pico/async_context.h"
 

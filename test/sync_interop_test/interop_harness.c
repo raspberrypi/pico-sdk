@@ -167,7 +167,25 @@ int harness_yield_pct(uint32_t spinner_delta, uint32_t window_ms) {
  * Hence the calibration runs on the agent core too, not here.
  */
 
-#ifdef __riscv
+/* Set where the part has no usable cycle counter at all. On RISC-V the counters are optional:
+ * an implementation may omit mcycle and mcountinhibit entirely, in which case both reading and
+ * enabling raise an illegal instruction (mcause 2), and there is no way to probe for them that
+ * does not itself fault. Nothing's verdict depends on the counter - it feeds D0's calibration
+ * and the occupancy figures - so its absence is reported, not failed. */
+#ifndef INTEROP_NO_CYCLE_COUNTER
+#define INTEROP_NO_CYCLE_COUNTER 0
+#endif
+
+#if INTEROP_NO_CYCLE_COUNTER
+#define HARNESS_HAS_CYCLE_COUNTER 0
+#define HARNESS_CYCLE_BITS 32
+uint32_t harness_cycles(void) { return 0; }
+static void cycles_enable(void) {}
+static uint32_t cycle_delta(uint32_t before, uint32_t after) { (void)before; (void)after; return 0; }
+uint32_t harness_sleep_counter(void) { return 0; }
+bool harness_sleep_counter_present(void) { return false; }
+
+#elif defined(__riscv)
 #define HARNESS_HAS_CYCLE_COUNTER 1
 #define HARNESS_CYCLE_BITS 32
 uint32_t harness_cycles(void) {
@@ -178,7 +196,9 @@ uint32_t harness_cycles(void) {
 static void cycles_enable(void) {
     /* mcycle does NOT run by default on Hazard3: RVCSR_MCOUNTINHIBIT resets to 0x5, i.e. the
      * CY (cycle) and IR (instret) inhibit bits are both set. Clear CY so mcycle advances,
-     * otherwise every reading is 0 and the calibration correctly declares it unusable. */
+     * otherwise every reading is 0 and the calibration correctly declares it unusable.
+     *
+     * Where this CSR is not implemented, use INTEROP_NO_CYCLE_COUNTER above. */
     __asm volatile ("csrci %0, %1" :: "i" (RVCSR_MCOUNTINHIBIT_OFFSET),
                                       "i" (RVCSR_MCOUNTINHIBIT_CY_BITS));
 }
@@ -282,6 +302,7 @@ void harness_set_agent_calibration(const harness_cal_t *cal) {
 }
 
 bool harness_agent_calibrated(void) { return agent_cal_valid; }
+bool harness_cycle_counter_present(void) { return HARNESS_HAS_CYCLE_COUNTER; }
 
 uint32_t harness_agent_dwt_ctrl(void) { return agent_cal.dwt_ctrl; }
 uint32_t harness_agent_demcr(void)    { return agent_cal.demcr; }

@@ -292,6 +292,12 @@ static inline void multicore_fifo_clear_irq(void) {
  * 1 | Value is 1 if this core’s TX FIFO is not full (i.e. if FIFO_WR is ready for more data)
  * 0 | Value is 1 if this core’s RX FIFO is not empty (i.e. if FIFO_RD is valid)
  *
+ * Bits 0 and 1 are returned by \ref multicore_fifo_rvalid and \ref multicore_fifo_wready. The push and pop
+ * functions wait for these. ROE or WOF are only set by the hardware, and can be cleared by \ref multicore_fifo_clear_irq.
+ *
+ * \note multicore_fifo_push_ and multicore_fifo_pop_ function families always check \ref multicore_fifo_wready and
+ * \ref multicore_fifo_rvalid respectively, so don't cause the sticky flags to be set.
+ *
  * See the note in the \ref multicore_fifo section for considerations regarding use of the inter-core FIFOs
  *
 */
@@ -312,6 +318,10 @@ static inline uint32_t multicore_fifo_get_status(void) {
 #if NUM_DOORBELLS
 static inline void check_doorbell_num_param(__unused uint doorbell_num) {
     invalid_params_if(PICO_MULTICORE, doorbell_num >= NUM_DOORBELLS);
+}
+
+static inline void check_core_mask_param(__unused uint core_mask) {
+    invalid_params_if(PICO_MULTICORE, core_mask >= (1u << NUM_CORES));
 }
 
 /*! \brief Cooperatively claim the use of this doorbell

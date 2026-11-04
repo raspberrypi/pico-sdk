@@ -10,6 +10,10 @@ endif()
 get_property(IS_IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)
 foreach(LANG IN ITEMS C CXX ASM)
     set(CMAKE_${LANG}_FLAGS_INIT "${PICO_COMMON_LANG_FLAGS}")
+
+    # all thread-local variables are in the executable so never use GOT entries
+    set(CMAKE_${LANG}_FLAGS_INIT "${CMAKE_${LANG}_FLAGS_INIT} -ftls-model=local-exec")
+
     unset(CMAKE_${LANG}_FLAGS_DEBUG CACHE)
     if (PICO_DEOPTIMIZED_DEBUG)
         set(CMAKE_${LANG}_FLAGS_DEBUG_INIT "-O0")

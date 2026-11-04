@@ -99,6 +99,7 @@
 #define FLAGS_LONG_LONG (1U <<  9U)
 #define FLAGS_PRECISION (1U << 10U)
 #define FLAGS_ADAPT_EXP (1U << 11U)
+#define FLAGS_LONG_DOUBLE (1U << 12U)
 
 // import float.h for DBL_MAX
 #if PICO_PRINTF_SUPPORT_FLOAT
@@ -154,7 +155,7 @@ static inline void _out_fct(char character, void *buffer, size_t idx, size_t max
 // \return The length of the string (excluding the terminating 0) limited by 'maxsize'
 static inline unsigned int _strnlen_s(const char *str, size_t maxsize) {
     const char *s;
-    for (s = str; *s && maxsize--; ++s);
+    for (s = str; maxsize-- && *s; ++s);
     return (unsigned int) (s - str);
 }
 
@@ -560,7 +561,10 @@ static size_t _etoa(out_fct_type out, char *buffer, size_t idx, size_t maxlen, d
 // internal vsnprintf
 static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const char *format, va_list va) {
 #if !PICO_PRINTF_ALWAYS_INCLUDED
-    lazy_vsnprintf = _vsnprintf;
+    int (*vsnprintf_fn)(out_fct_type, char *, const size_t, const char *, va_list) = _vsnprintf;
+    // stop the compiler (Clang does) turning lazy_vsnprintf into a flag plus a direct call, which links printf into panic
+    __asm__ ("" : "+r" (vsnprintf_fn));
+    lazy_vsnprintf = vsnprintf_fn;
 #endif
     unsigned int flags, width, precision, n;
     size_t idx = 0U;
@@ -641,12 +645,24 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
                 precision = _atoi(&format);
             } else if (*format == '*') {
                 const int prec = (int) va_arg(va, int);
-                precision = prec > 0 ? (unsigned int) prec : 0U;
+                if (prec >= 0) {
+                    precision = (unsigned int) prec;
+                } else {
+                    // a negative precision is taken as if it were omitted
+                    flags &= ~FLAGS_PRECISION;
+                }
                 format++;
             }
         }
 
         // evaluate length field
+        if (*format == 'L') {
+#if __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__
+            // a long double wider than double (RISC-V) is consumed but not printed
+            flags |= FLAGS_LONG_DOUBLE;
+#endif
+            format++;
+        }
         switch (*format) {
             case 'l' :
                 flags |= FLAGS_LONG;
@@ -764,10 +780,15 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
             case 'f' :
             case 'F' :
 #if PICO_PRINTF_SUPPORT_FLOAT
+                if (flags & FLAGS_LONG_DOUBLE) {
+                    va_arg(va, long double);
+                    format++;
+                    break;
+                }
                 if (*format == 'F') flags |= FLAGS_UPPERCASE;
                 idx = _ftoa(out, buffer, idx, maxlen, va_arg(va, double), precision, width, flags);
 #else
-                for(int i=0;i<2;i++) out('?', buffer, idx++, maxlen);
+                out('?', buffer, idx++, maxlen);
                 va_arg(va, double);
 #endif
                 format++;
@@ -777,11 +798,16 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
             case 'g':
             case 'G':
 #if PICO_PRINTF_SUPPORT_FLOAT && PICO_PRINTF_SUPPORT_EXPONENTIAL
+                if (flags & FLAGS_LONG_DOUBLE) {
+                    va_arg(va, long double);
+                    format++;
+                    break;
+                }
                 if ((*format == 'g') || (*format == 'G')) flags |= FLAGS_ADAPT_EXP;
                 if ((*format == 'E') || (*format == 'G')) flags |= FLAGS_UPPERCASE;
                 idx = _etoa(out, buffer, idx, maxlen, va_arg(va, double), precision, width, flags);
 #else
-                for(int i=0;i<2;i++) out('?', buffer, idx++, maxlen);
+                out('?', buffer, idx++, maxlen);
                 va_arg(va, double);
 #endif
                 format++;
@@ -808,18 +834,16 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
 
             case 's' : {
                 const char *p = va_arg(va, char*);
-                unsigned int l = _strnlen_s(p, precision ? precision : (size_t) -1);
+                unsigned int l = _strnlen_s(p, flags & FLAGS_PRECISION ? precision : (size_t) -1);
+                const char *end = p + l;
                 // pre padding
-                if (flags & FLAGS_PRECISION) {
-                    l = (l < precision ? l : precision);
-                }
                 if (!(flags & FLAGS_LEFT)) {
                     while (l++ < width) {
                         out(' ', buffer, idx++, maxlen);
                     }
                 }
                 // string output
-                while ((*p != 0) && (!(flags & FLAGS_PRECISION) || precision--)) {
+                while (p != end) {
                     out(*(p++), buffer, idx++, maxlen);
                 }
                 // post padding
@@ -857,6 +881,16 @@ static int _vsnprintf(out_fct_type out, char *buffer, const size_t maxlen, const
                 break;
 
             default :
+                // unsupported conversions that take an argument must still consume it
+                if (*format == 'n') {
+                    va_arg(va, void *);
+#if __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__
+                } else if (flags & FLAGS_LONG_DOUBLE) {
+                    va_arg(va, long double);
+#endif
+                } else if ((*format | 0x20) == 'a') {
+                    va_arg(va, double);
+                }
                 out(*format, buffer, idx++, maxlen);
                 format++;
                 break;

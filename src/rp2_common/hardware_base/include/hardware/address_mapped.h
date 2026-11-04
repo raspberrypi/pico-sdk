@@ -119,12 +119,12 @@ __force_inline static uint32_t xip_alias_check_addr(const void *addr) {
 #endif
 
 // Typed conversion alias pointer generation macros
-#define hw_set_alias(p) ((typeof(p))hw_set_alias_untyped(p))
-#define hw_clear_alias(p) ((typeof(p))hw_clear_alias_untyped(p))
-#define hw_xor_alias(p) ((typeof(p))hw_xor_alias_untyped(p))
-#define xip_noalloc_alias(p) ((typeof(p))xip_noalloc_alias_untyped(p))
-#define xip_nocache_alias(p) ((typeof(p))xip_nocache_alias_untyped(p))
-#define xip_nocache_noalloc_alias(p) ((typeof(p))xip_nocache_noalloc_alias_untyped(p))
+#define hw_set_alias(p) ((__typeof__(p))hw_set_alias_untyped(p))
+#define hw_clear_alias(p) ((__typeof__(p))hw_clear_alias_untyped(p))
+#define hw_xor_alias(p) ((__typeof__(p))hw_xor_alias_untyped(p))
+#define xip_noalloc_alias(p) ((__typeof__(p))xip_noalloc_alias_untyped(p))
+#define xip_nocache_alias(p) ((__typeof__(p))xip_nocache_alias_untyped(p))
+#define xip_nocache_noalloc_alias(p) ((__typeof__(p))xip_nocache_noalloc_alias_untyped(p))
 
 /*! \brief Atomically set the specified bits to 1 in a HW register
  *  \ingroup hardware_base

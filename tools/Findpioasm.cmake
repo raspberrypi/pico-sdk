@@ -17,6 +17,12 @@ if (NOT TARGET pioasm)
 
     set(pioasmBuild_TARGET pioasmBuild)
     set(pioasm_TARGET pioasm)
+    
+    if (CMAKE_VERSION VERSION_GREATER_EQUAL "4.4")
+        set(_NO_WARN_UNUSED_CLI "-Wno-unused-cli")
+    else()
+        set(_NO_WARN_UNUSED_CLI "--no-warn-unused-cli")
+    endif()
 
     if (NOT TARGET ${pioasmBuild_TARGET})
         pico_message_debug("PIOASM will need to be built")
@@ -27,7 +33,7 @@ if (NOT TARGET pioasm)
                 BINARY_DIR ${PIOASM_BINARY_DIR}
                 INSTALL_DIR ${PIOASM_INSTALL_DIR}
                 CMAKE_ARGS
-                    "--no-warn-unused-cli"
+                    "${_NO_WARN_UNUSED_CLI}"
                     "-DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}"
                     "-DPIOASM_FLAT_INSTALL=1"
                     "-DCMAKE_INSTALL_PREFIX=${PIOASM_INSTALL_DIR}"

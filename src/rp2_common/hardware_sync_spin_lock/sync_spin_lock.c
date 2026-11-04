@@ -6,6 +6,8 @@
 #include "hardware/sync/spin_lock.h"
 
 void spin_locks_reset(void) {
+    // keep it a loop, as this runs once at startup
+    Clang_Pragma("clang loop unroll(disable)")
     for (uint i = 0; i < NUM_SPIN_LOCKS; i++) {
         spin_unlock_unsafe(spin_lock_instance(i));
     }

@@ -53,6 +53,7 @@ static bool queue_add_internal(queue_t *q, const void *data, bool block) {
         }
         if (block) {
             lock_internal_spin_unlock_with_wait(&q->core, save);
+            blocked_waiter_wakeup(false);
         } else {
             spin_unlock(q->core.spin_lock, save);
             return false;
@@ -73,6 +74,7 @@ static bool queue_remove_internal(queue_t *q, void *data, bool block) {
         }
         if (block) {
             lock_internal_spin_unlock_with_wait(&q->core, save);
+            blocked_waiter_wakeup(false);
         } else {
             spin_unlock(q->core.spin_lock, save);
             return false;
@@ -92,6 +94,7 @@ static bool queue_peek_internal(queue_t *q, void *data, bool block) {
         }
         if (block) {
             lock_internal_spin_unlock_with_wait(&q->core, save);
+            blocked_waiter_wakeup(false);
         } else {
             spin_unlock(q->core.spin_lock, save);
             return false;

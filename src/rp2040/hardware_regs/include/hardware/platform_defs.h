@@ -56,7 +56,7 @@
 #define FPGA_CLK_REF_HZ (12 * MHZ)
 #endif
 
-// PICO_CONFIG: XOSC_HZ, Crystal oscillator frequency in Hz, type=int, default=12000000, advanced=true, group=hardware_base
+// PICO_CONFIG: XOSC_HZ, Crystal oscillator frequency in Hz, type=int, min=1000000, max=50000000, default=12000000, advanced=true, group=hardware_base
 // NOTE:  The system and USB clocks are generated from the frequency using two PLLs.
 // If you override this define, or SYS_CLK_HZ/USB_CLK_HZ below, you will *also* need to add your own adjusted PLL set-up defines to
 // override the defaults which live in src/rp2_common/hardware_clocks/include/hardware/clocks.h

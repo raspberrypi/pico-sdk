@@ -86,15 +86,20 @@ void plat_delay_ms(uint32_t ms);
  */
 void plat_hold_for_ms(uint32_t ms);
 
-/* ---- counted copies of the SDK primitives ------------------------------------------
- * Faithful copies of mutex_enter_blocking() / mutex_enter_block_until() with the wait
- * iterations counted. Counting is the only reliable way to tell sleeping from spinning:
- * a timeout that fires exactly on time looks the same either way. Available locally as
- * well as via the agent, so the driving core's waits can be judged too.
- * NOTE: keep in step with src/common/pico_sync/mutex.c.
+/* ---- counted calls of the SDK primitives -------------------------------------------
+ * mutex_enter_blocking() / mutex_enter_block_until() with the wait iterations counted, via
+ * the blocked_waiter_wakeup hook those primitives call. Counting is the only reliable way to tell
+ * sleeping from spinning: a timeout that fires exactly on time looks the same either way.
+ * Available locally as well as via the agent, so the driving core's waits can be judged too.
+ * Not reentrant, and it counts every contended wait in the program, so nothing else may wait
+ * while one of these is in progress.
  */
 uint32_t counted_mutex_enter_blocking(mutex_t *mtx);
 uint32_t counted_mutex_enter_block_until(mutex_t *mtx, absolute_time_t until, bool *acquired);
+
+/* The same for a semaphore with no permits available, which is a different call site in
+ * pico_sync even though it uses the same lock_core macro. */
+uint32_t counted_sem_acquire_block_until(semaphore_t *sem, absolute_time_t until, bool *acquired);
 
 /*
  * The same loop, but using the BARE `spin_unlock(); __wfe()` pattern instead of
@@ -146,6 +151,8 @@ enum {
     AGENT_CANCEL_BURST,               /* add arg alarms and cancel them all as fast as possible,
                                        * so that several are marked before the pool's core gets
                                        * to scan them */
+    AGENT_SEM_TIMED_COUNTED,          /* timed acquire on a semaphore with no permits, so it
+                                       * waits the whole deadline out; arg = ms */
 };
 
 /* How many alarms AGENT_CANCEL_BURST adds and cancels per round, and how many rounds D2.15
@@ -185,6 +192,10 @@ enum {
 void     plat_sdk_core_hold_for_ms(uint32_t ms);
 void     agent_start(uint32_t cmd, uint32_t arg);
 bool     agent_wait(uint32_t timeout_ms);
+/* Wait for the agent by blocking on a semaphore instead of polling, so this core is itself in a
+ * lock_core wait while the agent runs. Call agent_wait_blocking_arm() before agent_start(). */
+void     agent_wait_blocking_arm(void);
+bool     agent_wait_blocking(uint32_t timeout_ms);
 bool     agent_run(uint32_t cmd, uint32_t arg, uint32_t timeout_ms);
 bool     agent_result(void);
 uint32_t agent_elapsed_us(void);

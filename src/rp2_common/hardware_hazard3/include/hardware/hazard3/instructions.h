@@ -107,7 +107,7 @@ extern "C" {
 #ifdef __hazard3_extension_xh3bextm
 #define __hazard3_bextm(nbits, rs1, rs2) ({\
     uint32_t __h3_bextm_rd; \
-    asm (".insn r 0x0b, 0, %3, %0, %1, %2"\
+    pico_default_asm(".insn r 0x0b, 0, %3, %0, %1, %2"\
         : "=r" (__h3_bextm_rd) \
         : "r" (rs1), "r" (rs2), "i" ((((nbits) - 1) & 0x7) << 1)\
     ); \
@@ -121,7 +121,7 @@ extern "C" {
 #ifdef __hazard3_extension_xh3bextm
 #define __hazard3_bextmi(nbits, rs1, shamt) ({\
     uint32_t __h3_bextmi_rd; \
-    asm (".insn i 0x0b, 0x4, %0, %1, %2"\
+    pico_default_asm(".insn i 0x0b, 0x4, %0, %1, %2"\
         : "=r" (__h3_bextmi_rd) \
         : "r" (rs1), "i" ((((nbits) - 1) & 0x7) << 6 | ((shamt) & 0x1f)) \
     ); \
@@ -132,13 +132,13 @@ extern "C" {
 #endif
 
 #ifdef __hazard3_extension_xh3power
-#define __hazard3_block() asm volatile ("slt x0, x0, x0" : : : "memory")
+#define __hazard3_block() pico_default_asm_volatile("slt x0, x0, x0" : : : "memory")
 #else
 #define __hazard3_block() do {} while (0)
 #endif
 
 #ifdef __hazard3_extension_xh3power
-#define __hazard3_unblock() asm volatile ("slt x0, x0, x1" : : : "memory")
+#define __hazard3_unblock() pico_default_asm_volatile("slt x0, x0, x1" : : : "memory")
 #else
 #define __hazard3_unblock() do {} while (0)
 #endif

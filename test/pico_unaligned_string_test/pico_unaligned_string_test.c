@@ -286,7 +286,5 @@ int main(void) {
         printf("all functions handled every alignment correctly\n");
         printf("PASSED\n");
     }
-    while (true) {
-        tight_loop_contents();
-    }
+    return 0;
 }

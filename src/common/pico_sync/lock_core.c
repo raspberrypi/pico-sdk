@@ -6,7 +6,7 @@
 
 #include "pico/lock_core.h"
 
-#if PICO_SYNC_RP2350_SPIN_LOCK_WORKAROUND
+#if PICO_SYNC_EXCLUSIVE_ACCESS_EVENT_WORKAROUND
 // Global rolling counter used to disambiguate ordering of SEV events. See definitions of:
 // lock_internal_spin_unlock_with_wait(), lock_internal_spin_unlock_with_notify().
 //

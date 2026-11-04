@@ -18,7 +18,7 @@ int __persistent_data(some_data);
 PICOTEST_MODULE_NAME("XIP_SRAM", "critical xip sram test");
 
 
-int __time_critical_func(test_func_xip)(void) {
+int __no_inline_time_critical_func(test_func_xip)(void) {
 #if PICO_RP2040
     systick_hw->rvr = 0x00ffffff;
     systick_hw->cvr = 0;
