@@ -623,7 +623,8 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
 
 #if PICO_RP2350
     if (dormant_clock_source == DORMANT_CLOCK_SOURCE_LPOSC)
-        powman_timer_set_1khz_tick_source_xosc();
+        // Switch powman timer back to default
+        powman_timer_set_1khz_tick_source_default();
 #endif
 
     return 0;
@@ -809,8 +810,8 @@ void __weak runtime_init_low_power_reboot_check(void) {
         powman_hw->scratch[6] = 0;
         powman_hw->scratch[7] = 0;
 
-        // Switch powman timer back to xosc
-        powman_timer_set_1khz_tick_source_xosc();
+        // Switch powman timer back to default
+        powman_timer_set_1khz_tick_source_default();
     } else {
         // not a powman reboot, so clear persistent data
         reset_persistent_data();

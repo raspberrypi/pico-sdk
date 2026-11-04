@@ -32,6 +32,16 @@ extern "C" {
 #define PICO_POWMAN_CALIBRATE_LPOSC_FROM_OTP 1
 #endif
 
+// PICO_CONFIG: PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC, Use the XOSC by default for the powman tick source, type=bool, default=1, group=hardware_powman
+#ifndef PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC
+#define PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC 1
+#endif
+
+// PICO_CONFIG: PICO_POWMAN_DEFAULT_TICK_SOURCE_LPOSC, Use the LPOSC by default for the powman tick source, type=bool, default=!PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC, group=hardware_powman
+#ifndef PICO_POWMAN_DEFAULT_TICK_SOURCE_LPOSC
+#define PICO_POWMAN_DEFAULT_TICK_SOURCE_LPOSC !PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC
+#endif
+
 /*! \brief Get the calibrated frequency of the low power oscillator
  *  \ingroup hardware_powman
  *
@@ -70,6 +80,21 @@ void powman_timer_set_1khz_tick_source_xosc(void);
  *  \param xosc_freq_hz specify a crystal frequency
  */
 void powman_timer_set_1khz_tick_source_xosc_with_hz(uint32_t xosc_freq_hz);
+
+static inline void powman_timer_set_1khz_tick_source_default(void) {
+#if PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC + PICO_POWMAN_DEFAULT_TICK_SOURCE_LPOSC != 1
+    #error Exactly one of PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC and PICO_POWMAN_DEFAULT_TICK_SOURCE_LPOSC must be specified
+#endif
+
+#if PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC
+    powman_timer_set_1khz_tick_source_xosc();
+#elif PICO_POWMAN_DEFAULT_TICK_SOURCE_LPOSC
+    powman_timer_set_1khz_tick_source_lposc();
+#else
+    // should be caught by the #error above, but panic anyway
+    panic("Exactly one of PICO_POWMAN_DEFAULT_TICK_SOURCE_XOSC and PICO_POWMAN_DEFAULT_TICK_SOURCE_LPOSC must be specified to call powman_timer_set_1khz_tick_source_default")
+#endif
+}
 
 /*! \brief Use a 1KHz external tick as the powman timer source
  *  \ingroup hardware_powman
