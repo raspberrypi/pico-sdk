@@ -1,5 +1,47 @@
+/* Defines the following symbols for use by code:
+    __persistent_data_pstate__
+*/
+
 SECTIONS
 {
     ASSERT( __binary_info_header_end - __logical_binary_start <= 1024, "Binary info must be in first 1024 bytes of the binary")
     ASSERT( __embedded_block_end - __logical_binary_start <= 4096, "Embedded block must be in first 4096 bytes of the binary")
+
+    /* Calculate persistent data pstate bits */
+    /* From addressmap.h */
+    XIP_SRAM_END        = 0x14000000;
+    SRAM_BASE           = 0x20000000;
+    SRAM4_BASE          = 0x20040000;
+    SRAM_STRIPED_END    = 0x20080000;
+
+    /* From powman.h */
+    POWMAN_POWER_DOMAIN_XIP_CACHE   = 2;
+    POWMAN_POWER_DOMAIN_SRAM_BANK0  = 1;
+    POWMAN_POWER_DOMAIN_SRAM_BANK1  = 0;
+
+    /* Convert into bits */
+    POWMAN_POWER_DOMAIN_XIP_CACHE_BITS  = 1 << POWMAN_POWER_DOMAIN_XIP_CACHE;
+    POWMAN_POWER_DOMAIN_SRAM_BANK0_BITS = 1 << POWMAN_POWER_DOMAIN_SRAM_BANK0;
+    POWMAN_POWER_DOMAIN_SRAM_BANK1_BITS = 1 << POWMAN_POWER_DOMAIN_SRAM_BANK1;
+
+    /* Assert the maximum size, to ensure it doesn't cross from xip cache into main sram */
+    ASSERT(__persistent_data_end__ - __persistent_data_start__ <= SRAM_STRIPED_END - SRAM_BASE, "Persistent data is too large")
+
+    /* Assert end is in striped sram */
+    ASSERT(__persistent_data_end__ <= SRAM_STRIPED_END, "Persistent data ends outside striped sram")
+
+    /* Start at 0 */
+    __persistent_data_pstate__ = 0;
+
+    /* start in xip cache, so xip cache only */
+    __persistent_data_pstate__ = (__persistent_data_start__ < XIP_SRAM_END) ? POWMAN_POWER_DOMAIN_XIP_CACHE_BITS : 0;
+
+    /* start in sram0, so OR that in */
+    __persistent_data_pstate__ |= (__persistent_data_start__ >= SRAM_BASE && __persistent_data_start__ < SRAM4_BASE) ? POWMAN_POWER_DOMAIN_SRAM_BANK0_BITS : 0;
+
+    /* start or end in sram1, so OR that in */
+    __persistent_data_pstate__ |= (__persistent_data_start__ >= SRAM4_BASE || __persistent_data_end__ > SRAM4_BASE) ? POWMAN_POWER_DOMAIN_SRAM_BANK1_BITS : 0;
+
+    /* Reset to 0 if size is 0 */
+    __persistent_data_pstate__ = (__persistent_data_start__ == __persistent_data_end__) ? 0 : __persistent_data_pstate__;
 }
