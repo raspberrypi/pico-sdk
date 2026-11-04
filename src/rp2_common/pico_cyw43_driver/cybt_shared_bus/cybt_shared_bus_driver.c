@@ -103,7 +103,10 @@ typedef struct hex_file_data {
     int addr_mode;
     uint16_t hi_addr;
     uint32_t dest_addr;
-    uint8_t *p_ds;
+    const uint8_t *p_ds;
+#if CYW43_USE_HEX_BTFW
+    uint8_t ds_buf[255]; // decoded data from one hex record
+#endif
 } hex_file_data_t;
 
 static cyw43_ll_t *cyw43_ll = NULL;
@@ -179,9 +182,11 @@ static uint32_t cybt_fw_get_data(cybt_fw_cb_t *p_btfw_cb,
     uint32_t data_len = 0;
     const char *p_line_start = NULL;
 
-    if (NULL == p_btfw_cb || NULL == hfd->p_ds) {
+    if (NULL == p_btfw_cb) {
         return data_len;
     }
+
+    hfd->p_ds = hfd->ds_buf;
 
     while (data_len == 0) {
         line_len = cybt_fw_hex_read_line(p_btfw_cb, &p_line_start, BTFW_MAX_STR_LEN);
@@ -203,7 +208,7 @@ static uint32_t cybt_fw_get_data(cybt_fw_cb_t *p_btfw_cb,
             for (idx = 0; idx < num_bytes; idx++)
             {
                 octet = (uint16_t)read_hex(p_line_start + data_pos, 2);
-                hfd->p_ds[idx] = (uint8_t)(octet & 0x00FF);
+                hfd->ds_buf[idx] = (uint8_t)(octet & 0x00FF);
                 data_pos += 2;
             }
 
@@ -249,8 +254,8 @@ static uint32_t cybt_fw_get_data(cybt_fw_cb_t *p_btfw_cb, hex_file_data_t *hfd) 
         // No data?
         if (num_bytes == 0) break;
 
-        // Copy the data
-        memcpy(hfd->p_ds, p_btfw_cb->p_next_line_start, num_bytes);
+        // Reference the data in place
+        hfd->p_ds = p_btfw_cb->p_next_line_start;
         p_btfw_cb->p_next_line_start += num_bytes;
 
         // Adjust address based on type
@@ -281,20 +286,45 @@ static uint32_t cybt_fw_get_data(cybt_fw_cb_t *p_btfw_cb, hex_file_data_t *hfd) 
 
 #endif
 
-cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware,
-                               uint32_t bt_firmware_len,
-                               uint8_t *p_write_buf,
-                               uint8_t *p_hex_buf) {
+// Write data to an arbitrary address. The bus needs 4 byte aligned addresses and lengths,
+// so a partial word at either end is merged with the existing contents of that word
+static void cybt_fw_mem_write(uint32_t mem_addr, const uint8_t *p_data, uint32_t data_len) {
+    uint32_t word;
+    uint32_t pad = mem_addr % 4;
+    if (pad) {
+        uint32_t len = (data_len < 4 - pad) ? data_len : 4 - pad;
+        mem_addr = ROUNDDN(mem_addr, 4);
+        cybt_mem_read(mem_addr, (uint8_t *) &word, sizeof(word));
+        memcpy((uint8_t *) &word + pad, p_data, len);
+        cybt_mem_write(mem_addr, (uint8_t *) &word, sizeof(word));
+        mem_addr += sizeof(word);
+        p_data += len;
+        data_len -= len;
+    }
+    uint32_t aligned_len = ROUNDDN(data_len, 4);
+    if (aligned_len) {
+        cybt_mem_write(mem_addr, p_data, aligned_len);
+        mem_addr += aligned_len;
+        p_data += aligned_len;
+        data_len -= aligned_len;
+    }
+    if (data_len) {
+        cybt_mem_read(mem_addr, (uint8_t *) &word, sizeof(word));
+        memcpy(&word, p_data, data_len);
+        cybt_mem_write(mem_addr, (uint8_t *) &word, sizeof(word));
+    }
+}
+
+cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware, uint32_t bt_firmware_len) {
     cybt_fw_cb_t btfw_cb;
-    hex_file_data_t hfd = {BTFW_ADDR_MODE_EXTENDED, 0, 0, NULL};
-    uint8_t *p_mem_ptr;
+    hex_file_data_t hfd = { .addr_mode = BTFW_ADDR_MODE_EXTENDED };
     uint32_t data_len;
 
     if (cyw43_ll == NULL) {
         return CYBT_ERR_BADARG;
     }
 
-    if (NULL == p_bt_firmware || 0 == bt_firmware_len || NULL == p_write_buf || NULL == p_hex_buf) {
+    if (NULL == p_bt_firmware || 0 == bt_firmware_len) {
         return CYBT_ERR_BADARG;
     }
 
@@ -309,13 +339,6 @@ cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware,
     p_bt_firmware += 1; // skip over record count
 #endif
 
-    p_mem_ptr = p_write_buf;
-    if ((uint32_t) (uintptr_t) p_mem_ptr % BTFW_SD_ALIGN) {
-        p_mem_ptr += (BTFW_SD_ALIGN - ((uint32_t) (uintptr_t) p_mem_ptr % BTFW_SD_ALIGN));
-    }
-
-    hfd.p_ds = p_hex_buf;
-
     btfw_cb.p_fw_mem_start = p_bt_firmware;
     btfw_cb.fw_len = bt_firmware_len;
     btfw_cb.p_next_line_start = p_bt_firmware;
@@ -323,53 +346,7 @@ cybt_result_t cybt_fw_download(const uint8_t *p_bt_firmware,
     cybt_reg_write(BTFW_MEM_OFFSET + BT2WLAN_PWRUP_ADDR, BT2WLAN_PWRUP_WAKE);
 
     while ((data_len = cybt_fw_get_data(&btfw_cb, &hfd)) > 0) {
-        uint32_t fwmem_start_addr, fwmem_start_data, fwmem_end_addr, fwmem_end_data;
-        uint32_t write_data_len, idx, pad;
-
-        fwmem_start_addr = BTFW_MEM_OFFSET + hfd.dest_addr;
-        write_data_len = 0;
-
-        /**
-         * Make sure the start address is 4 byte aligned to avoid alignment issues
-         * with SD host controllers
-         */
-        if (!ISALIGNED(fwmem_start_addr, 4)) {
-            pad = fwmem_start_addr % 4;
-            fwmem_start_addr = ROUNDDN(fwmem_start_addr, 4);
-
-            cybt_mem_read(fwmem_start_addr, (uint8_t *) &fwmem_start_data, sizeof(uint32_t));
-
-            for (idx = 0; idx < pad; idx++, write_data_len++) {
-                p_mem_ptr[write_data_len] = (uint8_t) ((uint8_t *) &fwmem_start_data)[idx];
-            }
-        }
-        memcpy(&(p_mem_ptr[write_data_len]), hfd.p_ds, data_len);
-        write_data_len += data_len;
-
-        /**
-         * Make sure the length is multiple of 4bytes to avoid alignment issues
-         * with SD host controllers
-         */
-        fwmem_end_addr = fwmem_start_addr + write_data_len;
-        if (!ISALIGNED(fwmem_end_addr, 4)) {
-            cybt_mem_read(ROUNDDN(fwmem_end_addr, 4), (uint8_t *) &fwmem_end_data, sizeof(uint32_t));
-            for (idx = (fwmem_end_addr % 4); idx < 4; idx++, write_data_len++) {
-                p_mem_ptr[write_data_len] = (uint8_t) ((uint8_t *) &fwmem_end_data)[idx];
-            }
-        }
-
-        /*
-         *  write ram
-         */
-        if (((fwmem_start_addr & 0xFFF) + write_data_len) <= 0x1000) {
-            cybt_mem_write(fwmem_start_addr, p_mem_ptr, write_data_len);
-        } else {
-            uint32_t first_write_len = 0x1000 - (fwmem_start_addr & 0xFFF);
-            cybt_mem_write(fwmem_start_addr, p_mem_ptr, first_write_len);
-            cybt_mem_write(fwmem_start_addr + first_write_len,
-                           p_mem_ptr + first_write_len,
-                           write_data_len - first_write_len);
-        }
+        cybt_fw_mem_write(BTFW_MEM_OFFSET + hfd.dest_addr, hfd.p_ds, data_len);
     }
 
     return CYBT_SUCCESS;
