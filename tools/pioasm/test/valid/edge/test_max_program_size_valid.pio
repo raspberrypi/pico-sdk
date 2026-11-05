@@ -1,0 +1,122 @@
+// run: pioasm input.pio
+.program max_program
+.wrap_target
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+.wrap
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ----------- //
+// // max_program //
+// // ----------- //
+// 
+// #define max_program_wrap_target 0
+// #define max_program_wrap 31
+// #define max_program_pio_version 0
+// 
+// static __pio_const uint16_t max_program_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xa042, //  1: nop
+//     0xa042, //  2: nop
+//     0xa042, //  3: nop
+//     0xa042, //  4: nop
+//     0xa042, //  5: nop
+//     0xa042, //  6: nop
+//     0xa042, //  7: nop
+//     0xa042, //  8: nop
+//     0xa042, //  9: nop
+//     0xa042, // 10: nop
+//     0xa042, // 11: nop
+//     0xa042, // 12: nop
+//     0xa042, // 13: nop
+//     0xa042, // 14: nop
+//     0xa042, // 15: nop
+//     0xa042, // 16: nop
+//     0xa042, // 17: nop
+//     0xa042, // 18: nop
+//     0xa042, // 19: nop
+//     0xa042, // 20: nop
+//     0xa042, // 21: nop
+//     0xa042, // 22: nop
+//     0xa042, // 23: nop
+//     0xa042, // 24: nop
+//     0xa042, // 25: nop
+//     0xa042, // 26: nop
+//     0xa042, // 27: nop
+//     0xa042, // 28: nop
+//     0xa042, // 29: nop
+//     0xa042, // 30: nop
+//     0xa042, // 31: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program max_program_program = {
+//     .instructions = max_program_program_instructions,
+//     .length = 32,
+//     .origin = -1,
+//     .pio_version = max_program_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config max_program_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + max_program_wrap_target, offset + max_program_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

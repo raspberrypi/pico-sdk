@@ -1,0 +1,58 @@
+// run: pioasm input.pio
+.program minimal
+    nop
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ------- //
+// // minimal //
+// // ------- //
+// 
+// #define minimal_wrap_target 0
+// #define minimal_wrap 0
+// #define minimal_pio_version 0
+// 
+// static __pio_const uint16_t minimal_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program minimal_program = {
+//     .instructions = minimal_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = minimal_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config minimal_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + minimal_wrap_target, offset + minimal_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

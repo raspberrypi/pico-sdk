@@ -1,0 +1,14 @@
+// run: pioasm input.pio
+.program wrap_duplicate
+    nop
+.wrap
+.wrap
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:5.1-5: .wrap was already specified at input.pio:4.1-5
+//     5 | .wrap
+//       | ^~~~~
+// 

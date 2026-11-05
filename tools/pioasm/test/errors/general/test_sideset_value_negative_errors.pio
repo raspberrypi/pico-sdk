@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program sideset_value_negative
+.side_set 2
+    nop side -1
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.14: syntax error, unexpected -, expecting ( or identifier or integer
+//     4 |     nop side -1
+//       |              ^
+// 

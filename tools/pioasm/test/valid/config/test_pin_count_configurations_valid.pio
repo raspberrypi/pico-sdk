@@ -1,0 +1,298 @@
+// run: pioasm -v 1 input.pio
+.program pin_config_comprehensive
+.pio_version 1
+.set 5
+.in 8 right auto 24
+.out 4 right auto 20
+    set pins, 5
+    in pins, 8
+    out pins, 4
+
+.program pin_config_set_zero
+.set 0
+    nop
+
+.program pin_config_set_max
+.set 5
+    set pins, 31
+
+.program pin_config_in_min
+.in 1
+    in pins, 1
+
+.program pin_config_in_max
+.pio_version 1
+.in 32
+    in pins, 32
+
+.program pin_config_out_zero
+.out 0
+    nop
+
+.program pin_config_out_max
+.out 32
+    out pins, 32
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ------------------------ //
+// // pin_config_comprehensive //
+// // ------------------------ //
+// 
+// #define pin_config_comprehensive_wrap_target 0
+// #define pin_config_comprehensive_wrap 2
+// #define pin_config_comprehensive_pio_version 1
+// 
+// static __pio_const uint16_t pin_config_comprehensive_program_instructions[] = {
+//             //     .wrap_target
+//     0xe005, //  0: set    pins, 5
+//     0x4008, //  1: in     pins, 8
+//     0x6004, //  2: out    pins, 4
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program pin_config_comprehensive_program = {
+//     .instructions = pin_config_comprehensive_program_instructions,
+//     .length = 3,
+//     .origin = -1,
+//     .pio_version = pin_config_comprehensive_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config pin_config_comprehensive_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + pin_config_comprehensive_wrap_target, offset + pin_config_comprehensive_wrap);
+//     sm_config_set_in_pin_count(&c, 8);
+//     sm_config_set_in_shift(&c, 1, 1, 24);
+//     sm_config_set_out_pin_count(&c, 4);
+//     sm_config_set_out_shift(&c, 1, 1, 20);
+//     sm_config_set_set_pin_count(&c, 5);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------- //
+// // pin_config_set_zero //
+// // ------------------- //
+// 
+// #define pin_config_set_zero_wrap_target 0
+// #define pin_config_set_zero_wrap 0
+// #define pin_config_set_zero_pio_version 1
+// 
+// static __pio_const uint16_t pin_config_set_zero_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program pin_config_set_zero_program = {
+//     .instructions = pin_config_set_zero_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = pin_config_set_zero_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config pin_config_set_zero_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + pin_config_set_zero_wrap_target, offset + pin_config_set_zero_wrap);
+//     sm_config_set_set_pin_count(&c, 0);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------ //
+// // pin_config_set_max //
+// // ------------------ //
+// 
+// #define pin_config_set_max_wrap_target 0
+// #define pin_config_set_max_wrap 0
+// #define pin_config_set_max_pio_version 1
+// 
+// static __pio_const uint16_t pin_config_set_max_program_instructions[] = {
+//             //     .wrap_target
+//     0xe01f, //  0: set    pins, 31
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program pin_config_set_max_program = {
+//     .instructions = pin_config_set_max_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = pin_config_set_max_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config pin_config_set_max_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + pin_config_set_max_wrap_target, offset + pin_config_set_max_wrap);
+//     sm_config_set_set_pin_count(&c, 5);
+//     return c;
+// }
+// #endif
+// 
+// // ----------------- //
+// // pin_config_in_min //
+// // ----------------- //
+// 
+// #define pin_config_in_min_wrap_target 0
+// #define pin_config_in_min_wrap 0
+// #define pin_config_in_min_pio_version 1
+// 
+// static __pio_const uint16_t pin_config_in_min_program_instructions[] = {
+//             //     .wrap_target
+//     0x4001, //  0: in     pins, 1
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program pin_config_in_min_program = {
+//     .instructions = pin_config_in_min_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = pin_config_in_min_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config pin_config_in_min_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + pin_config_in_min_wrap_target, offset + pin_config_in_min_wrap);
+//     sm_config_set_in_pin_count(&c, 1);
+//     sm_config_set_in_shift(&c, 1, 0, 32);
+//     return c;
+// }
+// #endif
+// 
+// // ----------------- //
+// // pin_config_in_max //
+// // ----------------- //
+// 
+// #define pin_config_in_max_wrap_target 0
+// #define pin_config_in_max_wrap 0
+// #define pin_config_in_max_pio_version 1
+// 
+// static __pio_const uint16_t pin_config_in_max_program_instructions[] = {
+//             //     .wrap_target
+//     0x4000, //  0: in     pins, 32
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program pin_config_in_max_program = {
+//     .instructions = pin_config_in_max_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = pin_config_in_max_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config pin_config_in_max_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + pin_config_in_max_wrap_target, offset + pin_config_in_max_wrap);
+//     sm_config_set_in_pin_count(&c, 32);
+//     sm_config_set_in_shift(&c, 1, 0, 32);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------- //
+// // pin_config_out_zero //
+// // ------------------- //
+// 
+// #define pin_config_out_zero_wrap_target 0
+// #define pin_config_out_zero_wrap 0
+// #define pin_config_out_zero_pio_version 1
+// 
+// static __pio_const uint16_t pin_config_out_zero_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program pin_config_out_zero_program = {
+//     .instructions = pin_config_out_zero_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = pin_config_out_zero_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config pin_config_out_zero_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + pin_config_out_zero_wrap_target, offset + pin_config_out_zero_wrap);
+//     sm_config_set_out_pin_count(&c, 0);
+//     sm_config_set_out_shift(&c, 1, 0, 32);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------ //
+// // pin_config_out_max //
+// // ------------------ //
+// 
+// #define pin_config_out_max_wrap_target 0
+// #define pin_config_out_max_wrap 0
+// #define pin_config_out_max_pio_version 1
+// 
+// static __pio_const uint16_t pin_config_out_max_program_instructions[] = {
+//             //     .wrap_target
+//     0x6000, //  0: out    pins, 32
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program pin_config_out_max_program = {
+//     .instructions = pin_config_out_max_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = pin_config_out_max_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config pin_config_out_max_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + pin_config_out_max_wrap_target, offset + pin_config_out_max_wrap);
+//     sm_config_set_out_pin_count(&c, 32);
+//     sm_config_set_out_shift(&c, 1, 0, 32);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

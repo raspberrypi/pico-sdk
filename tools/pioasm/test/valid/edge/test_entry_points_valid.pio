@@ -1,0 +1,281 @@
+// run: pioasm input.pio
+// Test public labels as entry points
+
+.program entry_at_start
+public entry_start:
+    nop
+    nop
+
+.program entry_in_middle
+    nop
+public entry_middle:
+    nop
+    nop
+
+.program entry_at_end
+    nop
+    nop
+public entry_end:
+    nop
+
+.program multiple_entries
+public init:
+    nop
+public process:
+    nop
+public cleanup:
+    nop
+
+.program entry_with_wrap
+.wrap_target
+public loop_start:
+    nop
+    nop
+.wrap
+
+.program entry_outside_wrap
+public setup:
+    nop
+.wrap_target
+    nop
+    nop
+.wrap
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // -------------- //
+// // entry_at_start //
+// // -------------- //
+// 
+// #define entry_at_start_wrap_target 0
+// #define entry_at_start_wrap 1
+// #define entry_at_start_pio_version 0
+// 
+// #define entry_at_start_offset_entry_start 0u
+// 
+// static __pio_const uint16_t entry_at_start_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xa042, //  1: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program entry_at_start_program = {
+//     .instructions = entry_at_start_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = entry_at_start_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config entry_at_start_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + entry_at_start_wrap_target, offset + entry_at_start_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // --------------- //
+// // entry_in_middle //
+// // --------------- //
+// 
+// #define entry_in_middle_wrap_target 0
+// #define entry_in_middle_wrap 2
+// #define entry_in_middle_pio_version 0
+// 
+// #define entry_in_middle_offset_entry_middle 1u
+// 
+// static __pio_const uint16_t entry_in_middle_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xa042, //  1: nop
+//     0xa042, //  2: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program entry_in_middle_program = {
+//     .instructions = entry_in_middle_program_instructions,
+//     .length = 3,
+//     .origin = -1,
+//     .pio_version = entry_in_middle_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config entry_in_middle_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + entry_in_middle_wrap_target, offset + entry_in_middle_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // ------------ //
+// // entry_at_end //
+// // ------------ //
+// 
+// #define entry_at_end_wrap_target 0
+// #define entry_at_end_wrap 2
+// #define entry_at_end_pio_version 0
+// 
+// #define entry_at_end_offset_entry_end 2u
+// 
+// static __pio_const uint16_t entry_at_end_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xa042, //  1: nop
+//     0xa042, //  2: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program entry_at_end_program = {
+//     .instructions = entry_at_end_program_instructions,
+//     .length = 3,
+//     .origin = -1,
+//     .pio_version = entry_at_end_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config entry_at_end_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + entry_at_end_wrap_target, offset + entry_at_end_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // ---------------- //
+// // multiple_entries //
+// // ---------------- //
+// 
+// #define multiple_entries_wrap_target 0
+// #define multiple_entries_wrap 2
+// #define multiple_entries_pio_version 0
+// 
+// #define multiple_entries_offset_init 0u
+// #define multiple_entries_offset_process 1u
+// #define multiple_entries_offset_cleanup 2u
+// 
+// static __pio_const uint16_t multiple_entries_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xa042, //  1: nop
+//     0xa042, //  2: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program multiple_entries_program = {
+//     .instructions = multiple_entries_program_instructions,
+//     .length = 3,
+//     .origin = -1,
+//     .pio_version = multiple_entries_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config multiple_entries_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + multiple_entries_wrap_target, offset + multiple_entries_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // --------------- //
+// // entry_with_wrap //
+// // --------------- //
+// 
+// #define entry_with_wrap_wrap_target 0
+// #define entry_with_wrap_wrap 1
+// #define entry_with_wrap_pio_version 0
+// 
+// #define entry_with_wrap_offset_loop_start 0u
+// 
+// static __pio_const uint16_t entry_with_wrap_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//     0xa042, //  1: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program entry_with_wrap_program = {
+//     .instructions = entry_with_wrap_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = entry_with_wrap_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config entry_with_wrap_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + entry_with_wrap_wrap_target, offset + entry_with_wrap_wrap);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------ //
+// // entry_outside_wrap //
+// // ------------------ //
+// 
+// #define entry_outside_wrap_wrap_target 1
+// #define entry_outside_wrap_wrap 2
+// #define entry_outside_wrap_pio_version 0
+// 
+// #define entry_outside_wrap_offset_setup 0u
+// 
+// static __pio_const uint16_t entry_outside_wrap_program_instructions[] = {
+//     0xa042, //  0: nop
+//             //     .wrap_target
+//     0xa042, //  1: nop
+//     0xa042, //  2: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program entry_outside_wrap_program = {
+//     .instructions = entry_outside_wrap_program_instructions,
+//     .length = 3,
+//     .origin = -1,
+//     .pio_version = entry_outside_wrap_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config entry_outside_wrap_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + entry_outside_wrap_wrap_target, offset + entry_outside_wrap_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

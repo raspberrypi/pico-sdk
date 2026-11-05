@@ -1,0 +1,23 @@
+// run: pioasm -v 1 input.pio
+.program clock_div_too_small
+.pio_version 1
+.clock_div 0.5
+    nop
+
+.program clock_div_too_large
+.pio_version 1
+.clock_div 65536.0
+    nop
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.1-14: clock divider must be between 1 and 65535
+//     4 | .clock_div 0.5
+//       | ^~~~~~~~~~~~~~
+// input.pio:9.1-18: clock divider must be between 1 and 65535
+//     9 | .clock_div 65536.0
+//       | ^~~~~~~~~~~~~~~~~~
+// 
