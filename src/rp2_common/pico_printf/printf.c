@@ -283,6 +283,26 @@ static size_t _ntoa_long(out_fct_type out, char *buffer, size_t idx, size_t maxl
 // internal itoa for 'long long' type
 #if PICO_PRINTF_SUPPORT_LONG_LONG
 
+// RP2040 has a fast/small software implementation for C divide using the hardware divider already
+#if PICO_32BIT && !PICO_RP2040
+#define USE_DIVMOD_U64_BY_SMALL 1
+#endif
+
+#if USE_DIVMOD_U64_BY_SMALL
+// divide by a small base using 32-bit divides, avoiding a software 64-bit divide
+static unsigned int _divmod_u64_by_small(unsigned long long *value, unsigned int base) {
+    uint32_t hi = (uint32_t) (*value >> 32u);
+    uint32_t lo = (uint32_t) *value;
+    uint32_t q_hi = hi / base;
+    uint32_t t = ((hi % base) << 16u) | (lo >> 16u);
+    uint32_t q_mid = t / base;
+    t = ((t % base) << 16u) | (lo & 0xffffu);
+    uint32_t q_lo = t / base;
+    *value = ((unsigned long long) q_hi << 32u) | (q_mid << 16u) | q_lo;
+    return t % base;
+}
+#endif
+
 static size_t _ntoa_long_long(out_fct_type out, char *buffer, size_t idx, size_t maxlen, unsigned long long value,
                               bool negative, unsigned long long base, unsigned int prec, unsigned int width,
                               unsigned int flags) {
@@ -297,9 +317,13 @@ static size_t _ntoa_long_long(out_fct_type out, char *buffer, size_t idx, size_t
     // write if precision != 0 and value is != 0
     if (!(flags & FLAGS_PRECISION) || value) {
         do {
+#if !USE_DIVMOD_U64_BY_SMALL
             const char digit = (char) (value % base);
-            buf[len++] = (char)(digit < 10 ? '0' + digit : (flags & FLAGS_UPPERCASE ? 'A' : 'a') + digit - 10);
             value /= base;
+#else
+            const char digit = (char) _divmod_u64_by_small(&value, (unsigned int) base);
+#endif
+            buf[len++] = (char)(digit < 10 ? '0' + digit : (flags & FLAGS_UPPERCASE ? 'A' : 'a') + digit - 10);
         } while (value && (len < PICO_PRINTF_NTOA_BUFFER_SIZE));
     }
 
