@@ -41,6 +41,11 @@
 #endif
 #endif
 
+// PICO_CONFIG: PICO_SUPPORT_QSPI_GPIOS, Enable/disable support for using QSPI GPIOs, type=bool, default=0, group=hardware_gpio
+#ifndef PICO_SUPPORT_QSPI_GPIOS
+#define PICO_SUPPORT_QSPI_GPIOS 0
+#endif
+
 #ifndef __ASSEMBLER__
 
 // PICO_CONFIG: PICO_NO_FPGA_CHECK, Remove the FPGA platform check for small code size reduction, type=bool, default=1, advanced=true, group=pico_runtime

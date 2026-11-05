@@ -11,7 +11,18 @@
 #include "hardware/structs/sio.h"
 #include "hardware/structs/pads_bank0.h"
 #include "hardware/structs/io_bank0.h"
+#include "hardware/structs/pads_qspi.h"
+#include "hardware/structs/io_qspi.h"
 #include "hardware/irq.h"
+
+// PICO_CONFIG: PICO_SUPPORT_GT32_GPIOS, Enable/disable support for >32 GPIOs, type=bool, default=1 if NUM_BANK0_GPIOS > 32 or PICO_SUPPORT_QSPI_GPIOS is 1, group=hardware_gpio
+#ifndef PICO_SUPPORT_GT32_GPIOS
+#define PICO_SUPPORT_GT32_GPIOS ((NUM_BANK0_GPIOS > 32) || PICO_SUPPORT_QSPI_GPIOS)
+#endif
+
+#if PICO_SUPPORT_QSPI_GPIOS && !PICO_SUPPORT_GT32_GPIOS
+#error "Cannot have PICO_SUPPORT_QSPI_GPIOS=1 with PICO_SUPPORT_GT32_GPIOS=0, as QSPI GPIO numbers are >32"
+#endif
 
 // PICO_CONFIG: PICO_USE_GPIO_COPROCESSOR, Enable/disable use of the GPIO coprocessor for GPIO access, type=bool, default=1, group=hardware_gpio
 #if !defined(PICO_USE_GPIO_COPROCESSOR) && HAS_GPIO_COPROCESSOR
@@ -21,6 +32,11 @@
 #if PICO_USE_GPIO_COPROCESSOR
 #include "hardware/gpio_coproc.h"
 #endif
+
+#define pads_bank0_set_bits(gpio, bits) hw_set_bits(&pads_bank0_hw->io[gpio], bits)
+#define pads_bank0_clear_bits(gpio, bits) hw_clear_bits(&pads_bank0_hw->io[gpio], bits)
+#define pads_bank0_write_masked(gpio, bits, mask) hw_write_masked(&pads_bank0_hw->io[gpio], bits, mask)
+#define pads_bank0_read(gpio) pads_bank0_hw->io[gpio]
 
 #ifdef __cplusplus
 extern "C" {
@@ -245,6 +261,69 @@ static inline void check_gpio_param(__unused uint gpio) {
     invalid_params_if(HARDWARE_GPIO, gpio >= NUM_BANK0_GPIOS);
 }
 
+// QSPI GPIO numbers, for use with the GPIO functions when PICO_SUPPORT_QSPI_GPIOS is set
+#if PICO_RP2040
+#define QSPI_GPIO_SCLK (32+0)
+#define QSPI_GPIO_SS (32+1)
+#define QSPI_GPIO_SD0 (32+2)
+#define QSPI_GPIO_SD1 (32+3)
+#define QSPI_GPIO_SD2 (32+4)
+#define QSPI_GPIO_SD3 (32+5)
+#define QSPI_GPIO_MIN QSPI_GPIO_SCLK
+#define QSPI_GPIO_PAD_MIN QSPI_GPIO_SCLK
+#define QSPI_GPIO_MAX QSPI_GPIO_SD3
+#else
+#define QSPI_GPIO_USB_DP (32+SIO_GPIO_HI_IN_USB_DP_LSB)
+#define QSPI_GPIO_USB_DM (32+SIO_GPIO_HI_IN_USB_DM_LSB)
+#define QSPI_GPIO_SCLK (32+SIO_GPIO_HI_IN_QSPI_SCK_LSB)
+#define QSPI_GPIO_SS (32+SIO_GPIO_HI_IN_QSPI_CSN_LSB)
+#define QSPI_GPIO_SD0 (32+SIO_GPIO_HI_IN_QSPI_SD_LSB+0)
+#define QSPI_GPIO_SD1 (32+SIO_GPIO_HI_IN_QSPI_SD_LSB+1)
+#define QSPI_GPIO_SD2 (32+SIO_GPIO_HI_IN_QSPI_SD_LSB+2)
+#define QSPI_GPIO_SD3 (32+SIO_GPIO_HI_IN_QSPI_SD_LSB+3)
+#define QSPI_GPIO_MIN QSPI_GPIO_USB_DP
+#define QSPI_GPIO_PAD_MIN QSPI_GPIO_SCLK
+#define QSPI_GPIO_MAX QSPI_GPIO_SD3
+#endif
+
+static inline bool check_is_qspi_gpio(uint gpio) {
+    return gpio >= QSPI_GPIO_MIN;
+}
+
+static inline void check_qspi_gpio_param(__unused uint gpio) {
+    invalid_params_if(HARDWARE_GPIO, gpio < QSPI_GPIO_MIN || gpio > QSPI_GPIO_MAX);
+}
+
+// USB DP/DM have no pads in PADS_QSPI (their pad controls are in the USB PHY)
+static inline bool check_qspi_gpio_has_pad(uint gpio) {
+    return gpio >= QSPI_GPIO_PAD_MIN;
+}
+
+static inline uint get_qspi_gpio_pad_index(uint gpio) {
+    invalid_params_if(HARDWARE_GPIO, gpio < QSPI_GPIO_PAD_MIN || gpio > QSPI_GPIO_MAX);
+    gpio -= QSPI_GPIO_PAD_MIN;
+    if (gpio == 1) { // SS moved to end
+        gpio = 5;
+    } else if (gpio > 1) { // SDx moved down one
+        gpio -= 1;
+    }
+    return gpio;
+}
+
+static inline io_rw_32 * get_qspi_gpio_io_reg(uint gpio, bool ctrl) {
+    invalid_params_if(HARDWARE_GPIO, gpio < QSPI_GPIO_MIN || gpio > QSPI_GPIO_MAX);
+    // The status/ctrl register pairs for all QSPI GPIOs (including USB DP/DM on RP2350) are
+    // contiguous from the start of IO_QSPI, in the same order as the QSPI GPIO numbers
+    io_qspi_status_ctrl_hw_t *regs = &((io_qspi_status_ctrl_hw_t *)io_qspi_hw)[gpio - QSPI_GPIO_MIN];
+    return ctrl ? &regs->ctrl : (io_rw_32 *)&regs->status;
+}
+
+static inline uint get_qspi_gpio_io_offset(uint gpio) {
+    invalid_params_if(HARDWARE_GPIO, gpio < QSPI_GPIO_MIN || gpio > QSPI_GPIO_MAX);
+    gpio -= QSPI_GPIO_MIN;
+    return gpio;
+}
+
 // ----------------------------------------------------------------------------
 // Pad Controls + IO Muxing
 // ----------------------------------------------------------------------------
@@ -257,6 +336,21 @@ static inline void check_gpio_param(__unused uint gpio) {
  * \param fn Which GPIO function select to use from list \ref gpio_function_t
  */
 void gpio_set_function(uint gpio, gpio_function_t fn);
+
+#if PICO_SUPPORT_QSPI_GPIOS
+/*! \brief Select QSPI GPIO function
+ *  \ingroup hardware_gpio
+ *
+ * This is equivalent to \ref gpio_set_function, but takes a QSPI pin function from \ref gpio_function1_t
+ *
+ * \param gpio QSPI GPIO number, e.g. QSPI_GPIO_SD0
+ * \param fn Which QSPI GPIO function select to use from list \ref gpio_function1_t
+ */
+static inline void gpio_set_function_qspi(uint gpio, gpio_function1_t fn) {
+    check_qspi_gpio_param(gpio);
+    gpio_set_function(gpio, (gpio_function_t)fn);
+}
+#endif
 
 /*! \brief Select the function for multiple GPIOs
  *  \ingroup hardware_gpio
@@ -274,7 +368,7 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn);
  * \param gpio_mask Mask with 1 bit per GPIO number to set the function for
  * \param fn Which GPIO function select to use from list \ref gpio_function_t
 */
-#if NUM_BANK0_GPIOS <= 32
+#if !PICO_SUPPORT_GT32_GPIOS
 static inline void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
     gpio_set_function_masked((uint32_t)gpio_mask, fn);
 }
@@ -318,7 +412,12 @@ static inline void gpio_pull_up(uint gpio) {
  * \return true if the GPIO is pulled up
  */
 static inline bool gpio_is_pulled_up(uint gpio) {
-    return (pads_bank0_hw->io[gpio] & PADS_BANK0_GPIO0_PUE_BITS) != 0;
+#if PICO_SUPPORT_QSPI_GPIOS
+    if (check_is_qspi_gpio(gpio)) {
+        return (pads_qspi_hw->io[get_qspi_gpio_pad_index(gpio)] & PADS_BANK0_GPIO0_PUE_BITS) != 0;
+    }
+#endif
+    return (pads_bank0_read(gpio) & PADS_BANK0_GPIO0_PUE_BITS) != 0;
 }
 
 /*! \brief Set specified GPIO to be pulled down.
@@ -337,7 +436,12 @@ static inline void gpio_pull_down(uint gpio) {
  * \return true if the GPIO is pulled down
  */
 static inline bool gpio_is_pulled_down(uint gpio) {
-    return (pads_bank0_hw->io[gpio] & PADS_BANK0_GPIO0_PDE_BITS) != 0;
+#if PICO_SUPPORT_QSPI_GPIOS
+    if (check_is_qspi_gpio(gpio)) {
+        return (pads_qspi_hw->io[get_qspi_gpio_pad_index(gpio)] & PADS_BANK0_GPIO0_PDE_BITS) != 0;
+    }
+#endif
+    return (pads_bank0_read(gpio) & PADS_BANK0_GPIO0_PDE_BITS) != 0;
 }
 
 /*! \brief Disable pulls on specified GPIO
@@ -551,6 +655,10 @@ static __force_inline io_bank0_irq_ctrl_hw_t *get_core_irq_ctrl(uint core_num) {
     return &io_bank0_hw->irq_ctrl[core_num];
 }
 
+static __force_inline io_qspi_irq_ctrl_hw_t *get_qspi_core_irq_ctrl(uint core_num) {
+    return &io_qspi_hw->irq_ctrl[core_num];
+}
+
 /*! \brief Return the current interrupt status (pending events) for the given GPIO
  *  \ingroup hardware_gpio
  *
@@ -559,6 +667,13 @@ static __force_inline io_bank0_irq_ctrl_hw_t *get_core_irq_ctrl(uint core_num) {
  * \sa gpio_acknowledge_irq
  */
 static inline uint32_t gpio_get_irq_event_mask(uint gpio) {
+#if PICO_SUPPORT_QSPI_GPIOS
+    if (check_is_qspi_gpio(gpio)) {
+        check_qspi_gpio_param(gpio);
+        io_qspi_irq_ctrl_hw_t *irq_ctrl_base = get_qspi_core_irq_ctrl(get_core_num());
+        return (irq_ctrl_base->ints >> (4 * get_qspi_gpio_io_offset(gpio))) & 0xfu;
+    }
+#endif
     check_gpio_param(gpio);
     io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_irq_ctrl(get_core_num());
     io_ro_32 *status_reg = &irq_ctrl_base->ints[gpio >> 3u];
@@ -580,6 +695,13 @@ static inline uint32_t gpio_get_irq_event_mask(uint gpio) {
  * \param event_mask Bitmask of events to clear. See \ref gpio_irq_level for details.
  */
 static inline void gpio_acknowledge_irq(uint gpio, uint32_t event_mask) {
+#if PICO_SUPPORT_QSPI_GPIOS
+    if (check_is_qspi_gpio(gpio)) {
+        check_qspi_gpio_param(gpio);
+        io_qspi_hw->intr = event_mask << (4 * get_qspi_gpio_io_offset(gpio));
+        return;
+    }
+#endif
     check_gpio_param(gpio);
     io_bank0_hw->intr[gpio / 8] = event_mask << (4 * (gpio % 8));
 }
@@ -684,6 +806,13 @@ void gpio_add_raw_irq_handler_with_order_priority_masked64(uint64_t gpio_mask, i
  * @param order_priority the priority order to determine the relative position of the handler in the list of GPIO IRQ handlers for this core.
  */
 static inline void gpio_add_raw_irq_handler_with_order_priority(uint gpio, irq_handler_t handler, uint8_t order_priority) {
+#if PICO_SUPPORT_QSPI_GPIOS
+    if (check_is_qspi_gpio(gpio)) {
+        check_qspi_gpio_param(gpio);
+        gpio_add_raw_irq_handler_with_order_priority_masked64(1ull << gpio, handler, order_priority);
+        return;
+    }
+#endif
     check_gpio_param(gpio);
 #if NUM_BANK0_GPIOS > 32
     gpio_add_raw_irq_handler_with_order_priority_masked64(1ull << gpio, handler, order_priority);
@@ -783,6 +912,13 @@ void gpio_add_raw_irq_handler_masked64(uint64_t gpio_mask, irq_handler_t handler
  * @param handler the handler to add to the list of GPIO IRQ handlers for this core
  */
 static inline void gpio_add_raw_irq_handler(uint gpio, irq_handler_t handler) {
+#if PICO_SUPPORT_QSPI_GPIOS
+    if (check_is_qspi_gpio(gpio)) {
+        check_qspi_gpio_param(gpio);
+        gpio_add_raw_irq_handler_masked64(1ull << gpio, handler);
+        return;
+    }
+#endif
     check_gpio_param(gpio);
 #if NUM_BANK0_GPIOS > 32
     gpio_add_raw_irq_handler_masked64(1ull << gpio, handler);
@@ -831,6 +967,13 @@ void gpio_remove_raw_irq_handler_masked64(uint64_t gpio_mask, irq_handler_t hand
  * @param handler the handler to remove from the list of GPIO IRQ handlers for this core
  */
 static inline void gpio_remove_raw_irq_handler(uint gpio, irq_handler_t handler) {
+#if PICO_SUPPORT_QSPI_GPIOS
+    if (check_is_qspi_gpio(gpio)) {
+        check_qspi_gpio_param(gpio);
+        gpio_remove_raw_irq_handler_masked64(1ull << gpio, handler);
+        return;
+    }
+#endif
     check_gpio_param(gpio);
 #if NUM_BANK0_GPIOS > 32
     gpio_remove_raw_irq_handler_masked64(1ull << gpio, handler);
@@ -874,7 +1017,7 @@ void gpio_init_mask(uint32_t gpio_mask);
  *
  * \param gpio_mask Mask with 1 bit per GPIO number to initialize
  */
-#if NUM_BANK0_GPIOS <= 32
+#if !PICO_SUPPORT_GT32_GPIOS
 static inline void gpio_init_mask64(uint64_t gpio_mask) {
     gpio_init_mask((uint32_t)gpio_mask);
 }
@@ -892,7 +1035,7 @@ void gpio_init_mask64(uint64_t gpio_mask);
  * \return Current state of the GPIO. 0 for low, non-zero for high
  */
 static inline bool gpio_get(uint gpio) {
-#if NUM_BANK0_GPIOS <= 32
+#if !PICO_SUPPORT_GT32_GPIOS
     return sio_hw->gpio_in & (1u << gpio);
 #else
     if (gpio < 32) {
@@ -937,7 +1080,7 @@ static inline uint32_t gpio_get_all(void) {
 static inline uint64_t gpio_get_all64(void) {
 #if PICO_USE_GPIO_COPROCESSOR
     return gpioc_hilo_in_get();
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     return sio_hw->gpio_in;
 #else
     return sio_hw->gpio_in | (((uint64_t)sio_hw->gpio_hi_in) << 32u);
@@ -969,7 +1112,7 @@ static inline void gpio_set_mask(uint32_t mask) {
 static inline void gpio_set_mask64(uint64_t mask) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_hilo_out_set(mask);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     sio_hw->gpio_set = (uint32_t)mask;
 #else
     sio_hw->gpio_set = (uint32_t)mask;
@@ -989,7 +1132,7 @@ static inline void gpio_set_mask_n(uint n, uint32_t mask) {
     } else if (n == 1) {
 #if PICO_USE_GPIO_COPROCESSOR
         gpioc_hi_out_set(mask);
-#elif NUM_BANK0_GPIOS >= 32
+#elif PICO_SUPPORT_GT32_GPIOS
         sio_hw->gpio_hi_set = mask;
 #endif
     }
@@ -1016,7 +1159,7 @@ static inline void gpio_clr_mask(uint32_t mask) {
 static inline void gpio_clr_mask64(uint64_t mask) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_hilo_out_clr(mask);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     sio_hw->gpio_clr = (uint32_t)mask;
 #else
     sio_hw->gpio_clr = (uint32_t)mask;
@@ -1037,7 +1180,7 @@ static inline void gpio_clr_mask_n(uint n, uint32_t mask) {
     } else if (n == 1) {
 #if PICO_USE_GPIO_COPROCESSOR
         gpioc_hi_out_clr(mask);
-#elif NUM_BANK0_GPIOS >= 32
+#elif PICO_SUPPORT_GT32_GPIOS
         sio_hw->gpio_hi_clr = mask;
 #endif
     }
@@ -1064,7 +1207,7 @@ static inline void gpio_xor_mask(uint32_t mask) {
 static inline void gpio_xor_mask64(uint64_t mask) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_hilo_out_xor(mask);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     sio_hw->gpio_togl = (uint32_t)mask;
 #else
     sio_hw->gpio_togl = (uint32_t)mask;
@@ -1084,7 +1227,7 @@ static inline void gpio_xor_mask_n(uint n, uint32_t mask) {
     } else if (n == 1) {
 #if PICO_USE_GPIO_COPROCESSOR
         gpioc_hi_out_xor(mask);
-#elif NUM_BANK0_GPIOS >= 32
+#elif PICO_SUPPORT_GT32_GPIOS
         sio_hw->gpio_hi_togl = mask;
 #endif
     }
@@ -1123,7 +1266,7 @@ static inline void gpio_put_masked(uint32_t mask, uint32_t value) {
 static inline void gpio_put_masked64(uint64_t mask, uint64_t value) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_hilo_out_xor((gpioc_hilo_out_get() ^ value) & mask);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     sio_hw->gpio_togl = (sio_hw->gpio_out ^ (uint32_t)value) & (uint32_t)mask;
 #else
     sio_hw->gpio_togl = (sio_hw->gpio_out ^ (uint32_t)value) & (uint32_t)mask;
@@ -1176,7 +1319,7 @@ static inline void gpio_put_all(uint32_t value) {
 static inline void gpio_put_all64(uint64_t value) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_hilo_out_put(value);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     sio_hw->gpio_out = (uint32_t)value;
 #else
     sio_hw->gpio_out = (uint32_t)value;
@@ -1193,7 +1336,7 @@ static inline void gpio_put_all64(uint64_t value) {
 static inline void gpio_put(uint gpio, bool value) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_bit_out_put(gpio, value);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     uint32_t mask = 1ul << gpio;
     if (value)
         gpio_set_mask(mask);
@@ -1234,7 +1377,7 @@ static inline void gpio_put(uint gpio, bool value) {
  * \return true if the GPIO output level is high, false if low.
  */
 static inline bool gpio_get_out_level(uint gpio) {
-#if NUM_BANK0_GPIOS <= 32
+#if !PICO_SUPPORT_GT32_GPIOS
     return sio_hw->gpio_out & (1u << gpio);
 #else
     uint32_t bits = gpio < 32 ? sio_hw->gpio_out : sio_hw->gpio_hi_out;
@@ -1271,7 +1414,7 @@ static inline void gpio_set_dir_out_masked(uint32_t mask) {
 static inline void gpio_set_dir_out_masked64(uint64_t mask) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_hilo_oe_set(mask);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     sio_hw->gpio_oe_set = mask;
 #else
     sio_hw->gpio_oe_set = (uint32_t)mask;
@@ -1300,7 +1443,7 @@ static inline void gpio_set_dir_in_masked(uint32_t mask) {
 static inline void gpio_set_dir_in_masked64(uint64_t mask) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_hilo_oe_clr(mask);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     sio_hw->gpio_oe_clr = mask;
 #else
     sio_hw->gpio_oe_clr = (uint32_t)mask;
@@ -1341,7 +1484,7 @@ static inline void gpio_set_dir_masked(uint32_t mask, uint32_t value) {
 static inline void gpio_set_dir_masked64(uint64_t mask, uint64_t value) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_hilo_oe_xor((gpioc_hilo_oe_get() ^ value) & mask);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     sio_hw->gpio_oe_togl = (sio_hw->gpio_oe ^ (uint32_t)value) & (uint32_t)mask;
 #else
     sio_hw->gpio_oe_togl = (sio_hw->gpio_oe ^ (uint32_t)value) & (uint32_t)mask;
@@ -1371,7 +1514,7 @@ static inline void gpio_set_dir_all_bits(uint32_t values) {
 static inline void gpio_set_dir_all_bits64(uint64_t values) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_hilo_oe_put(values);
-#elif NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     sio_hw->gpio_oe = (uint32_t)values;
 #else
     sio_hw->gpio_oe = (uint32_t)values;
@@ -1388,7 +1531,7 @@ static inline void gpio_set_dir_all_bits64(uint64_t values) {
 static inline void gpio_set_dir(uint gpio, bool out) {
 #if PICO_USE_GPIO_COPROCESSOR
     gpioc_bit_oe_put(gpio, out);
-#elif PICO_RP2040 || NUM_BANK0_GPIOS <= 32
+#elif !PICO_SUPPORT_GT32_GPIOS
     uint32_t mask = 1ul << gpio;
     if (out)
         gpio_set_dir_out_masked(mask);
@@ -1419,7 +1562,7 @@ static inline void gpio_set_dir(uint gpio, bool out) {
  * \return true if the direction for the pin is OUT
  */
 static inline bool gpio_is_dir_out(uint gpio) {
-#if NUM_BANK0_GPIOS <= 32
+#if !PICO_SUPPORT_GT32_GPIOS
     return sio_hw->gpio_oe & (1u << (gpio));
 #else
     uint32_t bits = gpio < 32 ? sio_hw->gpio_oe : sio_hw->gpio_hi_oe;
@@ -1439,6 +1582,14 @@ static inline uint gpio_get_dir(uint gpio) {
 
 #if PICO_SECURE
 static inline void gpio_assign_to_ns(uint gpio, bool ns) {
+#if PICO_SUPPORT_QSPI_GPIOS
+    if (check_is_qspi_gpio(gpio)) {
+        check_qspi_gpio_param(gpio);
+        if (ns) hw_set_bits(&accessctrl_hw->gpio_nsmask[1], 1u << (gpio - 32));
+        else hw_clear_bits(&accessctrl_hw->gpio_nsmask[1], 1u << (gpio - 32));
+        return;
+    }
+#endif
     check_gpio_param(gpio);
     if (ns) hw_set_bits(&accessctrl_hw->gpio_nsmask[gpio/32], 1u << (gpio & 0x1fu));
     else hw_clear_bits(&accessctrl_hw->gpio_nsmask[gpio/32], 1u << (gpio & 0x1fu));

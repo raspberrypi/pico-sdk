@@ -176,7 +176,7 @@ static const struct _binary_info_named_group __bi_lineno_var_name = { \
 
 
 #ifndef PICO_BINARY_INFO_USE_PINS_64
-#define PICO_BINARY_INFO_USE_PINS_64 (NUM_BANK0_GPIOS > 32)
+#define PICO_BINARY_INFO_USE_PINS_64 ((NUM_BANK0_GPIOS > 32) || PICO_SUPPORT_QSPI_GPIOS)
 #endif
 
 #if !PICO_BINARY_INFO_USE_PINS_64
