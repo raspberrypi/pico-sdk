@@ -98,7 +98,7 @@ __force_inline static uint32_t xip_alias_check_addr(const void *addr) {
 #if PICO_RP2040
     valid_params_if(ADDRESS_ALIAS, rc >= XIP_BASE && rc < XIP_NOALLOC_BASE);
 #else
-    valid_params_if(ADDRESS_ALIAS, rc >= XIP_BASE && rc < XIP_SRAM_BASE);
+    valid_params_if(ADDRESS_ALIAS, rc >= XIP_BASE && rc < XIP_END);
 #endif
     return rc;
 }
@@ -108,9 +108,8 @@ __force_inline static uint32_t xip_alias_check_addr(const void *addr) {
 #define hw_clear_alias_untyped(addr) ((void *)(REG_ALIAS_CLR_BITS + hw_alias_check_addr(addr)))
 #define hw_xor_alias_untyped(addr) ((void *)(REG_ALIAS_XOR_BITS + hw_alias_check_addr(addr)))
 
-// XIP window aliases of an address in the cached XIP window (XIP_BASE; XIP_MAIN_BASE in the RP2040
-// headers is the same). RP2350 only has the uncached non-allocating window, so the separate
-// no-allocate and uncached aliases are RP2040 only.
+// XIP window aliases of an address in the cached XIP window (XIP_BASE). RP2350 only has the uncached
+// non-allocating window, so the separate no-allocate and uncached aliases are RP2040 only.
 #if PICO_RP2040
 #define xip_noalloc_alias_untyped(addr) ((void *)(XIP_NOALLOC_BASE | xip_alias_check_addr(addr)))
 #define xip_nocache_alias_untyped(addr) ((void *)(XIP_NOCACHE_BASE | xip_alias_check_addr(addr)))
