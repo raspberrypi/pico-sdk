@@ -24,7 +24,7 @@ SECTIONS
     POWMAN_POWER_DOMAIN_SRAM_BANK0_BITS = 1 << POWMAN_POWER_DOMAIN_SRAM_BANK0;
     POWMAN_POWER_DOMAIN_SRAM_BANK1_BITS = 1 << POWMAN_POWER_DOMAIN_SRAM_BANK1;
 
-    /* Assert the maximum size, to ensure it doesn't cross from xip cache into main sram */
+    /* Assert size is less than the maximum size, to ensure it doesn't cross from xip cache into main sram */
     ASSERT(__persistent_data_end__ - __persistent_data_start__ <= SRAM_STRIPED_END - SRAM_BASE, "Persistent data is too large")
 
     /* Assert end is in striped sram */
@@ -34,7 +34,7 @@ SECTIONS
     __persistent_data_pstate__ = 0;
 
     /* start in xip cache, so xip cache only */
-    __persistent_data_pstate__ = (__persistent_data_start__ < XIP_SRAM_END) ? POWMAN_POWER_DOMAIN_XIP_CACHE_BITS : 0;
+    __persistent_data_pstate__ |= (__persistent_data_start__ < XIP_SRAM_END) ? POWMAN_POWER_DOMAIN_XIP_CACHE_BITS : 0;
 
     /* start in sram0, so OR that in */
     __persistent_data_pstate__ |= (__persistent_data_start__ >= SRAM_BASE && __persistent_data_start__ < SRAM4_BASE) ? POWMAN_POWER_DOMAIN_SRAM_BANK0_BITS : 0;

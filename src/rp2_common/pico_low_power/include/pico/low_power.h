@@ -97,7 +97,7 @@ extern "C" {
 #define PICO_LOW_POWER_MIN_PSTATE_TIME_MS 10
 #endif
 
-// PICO_CONFIG: PICO_LOW_POWER_PERSISTENT_PSTATE_RUN_TIME, Calculate persistent pstate bitset at runtime instead of calculating it at link time , type=bool, default=0, group=pico_low_power
+// PICO_CONFIG: PICO_LOW_POWER_PERSISTENT_PSTATE_RUN_TIME, Calculate persistent pstate bitset at runtime instead of calculating it at link time, type=bool, default=0, group=pico_low_power
 #ifndef PICO_LOW_POWER_PERSISTENT_PSTATE_RUN_TIME
 #define PICO_LOW_POWER_PERSISTENT_PSTATE_RUN_TIME 0
 #endif
@@ -362,7 +362,7 @@ static inline pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *
 #else
 pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate);
 #endif
-#endif
+#endif // HAS_POWMAN_TIMER
 
 
 // Convenience functions to avoid needing the correct absolute_time_t
