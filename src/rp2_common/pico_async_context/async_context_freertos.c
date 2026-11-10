@@ -221,7 +221,7 @@ void async_context_freertos_deinit(async_context_t *self_base) {
     }
     // Now the task has exited its loop, it will neither call worker functions nor re-arm
     // the timer. At this point though both:
-    // a. The task may still be running on core (having not yet made it to the vTaskSuspend(NULL).
+    // a. The task may still be running on core (having not yet made it to the vTaskSuspend(NULL)).
     // b. Be targeted for notifications by the timer which is still active. This is fine though
     //    as the task either is, or is about to be in vTaskSuspend(NULL) which isn't woken by notifications.
 
