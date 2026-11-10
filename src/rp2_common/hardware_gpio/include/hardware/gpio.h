@@ -295,8 +295,12 @@ static inline void check_qspi_gpio_param(__unused uint gpio) {
 }
 
 // USB DP/DM have no pads in PADS_QSPI (their pad controls are in the USB PHY)
-static inline bool check_qspi_gpio_has_pad(uint gpio) {
+static inline bool check_qspi_gpio_has_pad(__unused uint gpio) {
+#if QSPI_GPIO_PAD_MIN == QSPI_GPIO_MIN
+    return true;
+#else
     return gpio >= QSPI_GPIO_PAD_MIN;
+#endif
 }
 
 static inline uint get_qspi_gpio_pad_index(uint gpio) {
@@ -308,14 +312,6 @@ static inline uint get_qspi_gpio_pad_index(uint gpio) {
         gpio -= 1;
     }
     return gpio;
-}
-
-static inline io_rw_32 * get_qspi_gpio_io_reg(uint gpio, bool ctrl) {
-    invalid_params_if(HARDWARE_GPIO, gpio < QSPI_GPIO_MIN || gpio > QSPI_GPIO_MAX);
-    // The status/ctrl register pairs for all QSPI GPIOs (including USB DP/DM on RP2350) are
-    // contiguous from the start of IO_QSPI, in the same order as the QSPI GPIO numbers
-    io_qspi_status_ctrl_hw_t *regs = &((io_qspi_status_ctrl_hw_t *)io_qspi_hw)[gpio - QSPI_GPIO_MIN];
-    return ctrl ? &regs->ctrl : (io_rw_32 *)&regs->status;
 }
 
 static inline uint get_qspi_gpio_io_offset(uint gpio) {
@@ -414,7 +410,7 @@ static inline void gpio_pull_up(uint gpio) {
 static inline bool gpio_is_pulled_up(uint gpio) {
 #if PICO_SUPPORT_QSPI_GPIOS
     if (check_is_qspi_gpio(gpio)) {
-        return (pads_qspi_hw->io[get_qspi_gpio_pad_index(gpio)] & PADS_BANK0_GPIO0_PUE_BITS) != 0;
+        return check_qspi_gpio_has_pad(gpio) && (pads_qspi_hw->io[get_qspi_gpio_pad_index(gpio)] & PADS_BANK0_GPIO0_PUE_BITS) != 0;
     }
 #endif
     return (pads_bank0_read(gpio) & PADS_BANK0_GPIO0_PUE_BITS) != 0;
@@ -438,7 +434,7 @@ static inline void gpio_pull_down(uint gpio) {
 static inline bool gpio_is_pulled_down(uint gpio) {
 #if PICO_SUPPORT_QSPI_GPIOS
     if (check_is_qspi_gpio(gpio)) {
-        return (pads_qspi_hw->io[get_qspi_gpio_pad_index(gpio)] & PADS_BANK0_GPIO0_PDE_BITS) != 0;
+        return check_qspi_gpio_has_pad(gpio) && (pads_qspi_hw->io[get_qspi_gpio_pad_index(gpio)] & PADS_BANK0_GPIO0_PDE_BITS) != 0;
     }
 #endif
     return (pads_bank0_read(gpio) & PADS_BANK0_GPIO0_PDE_BITS) != 0;

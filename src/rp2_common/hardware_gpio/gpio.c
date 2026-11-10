@@ -69,7 +69,7 @@ static io_rw_32 *gpio_lookup_qspi_pad_reg(uint gpio) {
 
 static void gpio_pads_set_bits(uint gpio, uint32_t bits) {
     if (check_is_qspi_gpio(gpio)) {
-        hw_set_bits(gpio_lookup_qspi_pad_reg(gpio), bits);
+        if (check_qspi_gpio_has_pad(gpio)) hw_set_bits(gpio_lookup_qspi_pad_reg(gpio), bits);
         return;
     }
     check_gpio_param(gpio);
@@ -78,7 +78,7 @@ static void gpio_pads_set_bits(uint gpio, uint32_t bits) {
 
 static void gpio_pads_clear_bits(uint gpio, uint32_t bits) {
     if (check_is_qspi_gpio(gpio)) {
-        hw_clear_bits(gpio_lookup_qspi_pad_reg(gpio), bits);
+        if (check_qspi_gpio_has_pad(gpio)) hw_clear_bits(gpio_lookup_qspi_pad_reg(gpio), bits);
         return;
     }
     check_gpio_param(gpio);
@@ -87,7 +87,7 @@ static void gpio_pads_clear_bits(uint gpio, uint32_t bits) {
 
 static void gpio_pads_write_masked(uint gpio, uint32_t values, uint32_t write_mask) {
     if (check_is_qspi_gpio(gpio)) {
-        hw_write_masked(gpio_lookup_qspi_pad_reg(gpio), values, write_mask);
+        if (check_qspi_gpio_has_pad(gpio)) hw_write_masked(gpio_lookup_qspi_pad_reg(gpio), values, write_mask);
         return;
     }
     check_gpio_param(gpio);
@@ -96,7 +96,7 @@ static void gpio_pads_write_masked(uint gpio, uint32_t values, uint32_t write_ma
 
 static uint32_t gpio_pads_read(uint gpio) {
     if (check_is_qspi_gpio(gpio)) {
-        return *gpio_lookup_qspi_pad_reg(gpio);
+        return check_qspi_gpio_has_pad(gpio) ? *gpio_lookup_qspi_pad_reg(gpio) : 0;
     }
     check_gpio_param(gpio);
     return pads_bank0_read(gpio);
@@ -117,8 +117,6 @@ static_assert(IO_QSPI_GPIO_QSPI_SD3_CTRL_OFFSET == (QSPI_GPIO_SD3 - QSPI_GPIO_MI
 
 #define check_gpio_any_param(gpio) ((void)0) // checked by the accessors/lookups
 #define gpio_io_reg(gpio) (*gpio_lookup_io_reg(gpio))
-// USB DP/DM have no pads in PADS_QSPI (their pad controls are in the USB PHY)
-#define gpio_has_pad(gpio) (!check_is_qspi_gpio(gpio) || check_qspi_gpio_has_pad(gpio))
 #else
 #define check_gpio_any_param(gpio) check_gpio_param(gpio)
 #define gpio_pads_set_bits(gpio, bits) pads_bank0_set_bits(gpio, bits)
@@ -126,15 +124,12 @@ static_assert(IO_QSPI_GPIO_QSPI_SD3_CTRL_OFFSET == (QSPI_GPIO_SD3 - QSPI_GPIO_MI
 #define gpio_pads_write_masked(gpio, values, write_mask) pads_bank0_write_masked(gpio, values, write_mask)
 #define gpio_pads_read(gpio) pads_bank0_read(gpio)
 #define gpio_io_reg(gpio) (io_bank0_hw->io[gpio])
-#define gpio_has_pad(gpio) true
 #endif
 
 // Get the raw value from the pin, bypassing any muxing or overrides.
 int gpio_get_pad(uint gpio) {
     check_gpio_any_param(gpio);
-    if (gpio_has_pad(gpio)) {
-        gpio_pads_set_bits(gpio, PADS_BANK0_GPIO0_IE_BITS);
-    }
+    gpio_pads_set_bits(gpio, PADS_BANK0_GPIO0_IE_BITS);
     return (gpio_io_reg(gpio).status & IO_BANK0_GPIO0_STATUS_INFROMPAD_BITS)
             >> IO_BANK0_GPIO0_STATUS_INFROMPAD_LSB;
 }
@@ -146,20 +141,16 @@ void gpio_set_function(uint gpio, gpio_function_t fn) {
     check_gpio_any_param(gpio);
     invalid_params_if(HARDWARE_GPIO, ((uint32_t)fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB) & ~IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS);
     // Set input enable on, output disable off
-    if (gpio_has_pad(gpio)) {
-        gpio_pads_write_masked(gpio,
-                               PADS_BANK0_GPIO0_IE_BITS,
-                               PADS_BANK0_GPIO0_IE_BITS | PADS_BANK0_GPIO0_OD_BITS
-        );
-    }
+    gpio_pads_write_masked(gpio,
+                           PADS_BANK0_GPIO0_IE_BITS,
+                           PADS_BANK0_GPIO0_IE_BITS | PADS_BANK0_GPIO0_OD_BITS
+    );
     // Zero all fields apart from fsel; we want this IO to do what the peripheral tells it.
     // This doesn't affect e.g. pullup/pulldown, as these are in pad controls.
     gpio_io_reg(gpio).ctrl = fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB;
 #if HAS_PADS_BANK0_ISOLATION
     // Remove pad isolation now that the correct peripheral is in control of the pad
-    if (gpio_has_pad(gpio)) {
-        gpio_pads_clear_bits(gpio, PADS_BANK0_GPIO0_ISO_BITS);
-    }
+    gpio_pads_clear_bits(gpio, PADS_BANK0_GPIO0_ISO_BITS);
 #endif
 }
 /// \end::gpio_set_function[]
