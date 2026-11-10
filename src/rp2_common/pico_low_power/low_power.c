@@ -698,7 +698,7 @@ pstate_bitset_t *low_power_persistent_pstate_get(pstate_bitset_t *pstate) {
     uint32_t __persistent_data_pstate__ = 0;
 
     /* start in xip cache, so xip cache only */
-    __persistent_data_pstate__ = ((uint32_t)__persistent_data_start__ < XIP_SRAM_END) ? POWMAN_POWER_DOMAIN_XIP_CACHE_BITS : 0;
+    __persistent_data_pstate__ |= ((uint32_t)__persistent_data_start__ < XIP_SRAM_END) ? POWMAN_POWER_DOMAIN_XIP_CACHE_BITS : 0;
 
     /* start in sram0, so OR that in */
     __persistent_data_pstate__ |= ((uint32_t)__persistent_data_start__ >= SRAM_BASE && (uint32_t)__persistent_data_start__ < SRAM4_BASE) ? POWMAN_POWER_DOMAIN_SRAM_BANK0_BITS : 0;
