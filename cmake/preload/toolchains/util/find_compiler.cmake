@@ -19,7 +19,7 @@ function(pico_find_compiler compiler_path compiler_exes)
     # If not then search system paths.
     if ("${${compiler_path}}" STREQUAL "${compiler_path}-NOTFOUND")
         if (DEFINED ENV{PICO_TOOLCHAIN_PATH})
-            message(WARNING "PICO_TOOLCHAIN_PATH specified ($ENV{PICO_TOOLCHAIN_PATH}), but ${compiler_exe} not found there")
+            message(WARNING "PICO_TOOLCHAIN_PATH specified ($ENV{PICO_TOOLCHAIN_PATH}), but ${compiler_exes} not found there")
         endif()
         find_program(${compiler_path} NAMES ${compiler_exes})
     endif ()
