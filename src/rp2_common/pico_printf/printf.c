@@ -289,7 +289,7 @@ static size_t _ntoa_long(out_fct_type out, char *buffer, size_t idx, size_t maxl
 #endif
 
 #if USE_DIVMOD_U64_BY_SMALL
-// divide by a small base using 32-bit divides, avoiding a software 64-bit divide
+// divide by a small base (< 16-bit) using 32-bit divides, avoiding a software 64-bit divide
 static unsigned int _divmod_u64_by_small(unsigned long long *value, unsigned int base) {
     uint32_t hi = (uint32_t) (*value >> 32u);
     uint32_t lo = (uint32_t) *value;
