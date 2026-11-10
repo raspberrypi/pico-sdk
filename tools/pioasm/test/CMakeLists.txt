@@ -5,6 +5,7 @@
 # To regenerate an expected file after an intentional output change, run
 # pioasm by hand and check the result carefully before committing it:
 #   pioasm -o c-sdk clock_div.pio clock_div.c-sdk.expected
+#   pioasm -o json  clock_div.pio clock_div.json.expected
 #
 # The expected files deliberately avoid C/C++ extensions so that the Bazel
 # source-coverage check does not mistake them for headers.
