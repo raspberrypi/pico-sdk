@@ -62,10 +62,10 @@ static alarm_pool_t default_alarm_pool = {
 static inline bool default_alarm_pool_initialized(void) {
     return default_alarm_pool.lock != NULL;
 }
+#endif
 
 #if PICO_TIME_USE_SLEEP_NOTIFIER
 static lock_core_t sleep_notifier;
-#endif
 #endif
 
 #include "pico/time_adapter.h"
@@ -98,9 +98,6 @@ void __weak runtime_init_default_alarm_pool(void) {
                                    PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM,
                                    PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS);
     }
-#if PICO_TIME_USE_SLEEP_NOTIFIER
-    lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
-#endif
 #endif
 }
 #endif
@@ -354,6 +351,10 @@ void alarm_pool_post_alloc_init(alarm_pool_t *pool, alarm_pool_timer_t *timer, u
         pool->entries[i].next = (int16_t)(i-1);
     }
     pools[ta_timer_num(timer)][hardware_alarm_num] = pool;
+#if PICO_TIME_USE_SLEEP_NOTIFIER
+    // any pool can be used to sleep; lock_init is idempotent, so repeating it for each pool is harmless
+    lock_init(&sleep_notifier, PICO_SPINLOCK_ID_TIMER);
+#endif
 
     ta_enable_irq_handler(timer, hardware_alarm_num, alarm_pool_irq_handler);
 }
@@ -374,11 +375,48 @@ void alarm_pool_destroy(alarm_pool_t *pool) {
     free(pool);
 }
 
+// a pool's absolute times are in the time base of its own timer, which with one timer is the default one
+#if TA_NUM_TIMERS == 1
+static inline absolute_time_t pool_get_absolute_time(__unused alarm_pool_t *pool) {
+    return get_absolute_time();
+}
+
+static inline bool pool_time_reached(__unused alarm_pool_t *pool, absolute_time_t t) {
+    return time_reached(t);
+}
+
+static inline void pool_busy_wait_until(__unused alarm_pool_t *pool, absolute_time_t t) {
+    busy_wait_until(t);
+}
+#else
+static inline absolute_time_t pool_get_absolute_time(alarm_pool_t *pool) {
+    absolute_time_t t;
+    update_us_since_boot(&t, ta_time_us_64(pool->timer));
+    return t;
+}
+
+static inline bool pool_time_reached(alarm_pool_t *pool, absolute_time_t t) {
+    return (int64_t)(ta_time_us_64(pool->timer) - to_us_since_boot(t)) >= 0;
+}
+
+static inline void pool_busy_wait_until(alarm_pool_t *pool, absolute_time_t t) {
+    while (!pool_time_reached(pool, t)) tight_loop_contents();
+}
+#endif
+
+// time.h takes NUM_GENERIC_TIMERS == 1 to mean every pool is on the default timer
+static_assert(TA_NUM_TIMERS <= NUM_GENERIC_TIMERS, "");
+
+#if NUM_GENERIC_TIMERS > 1
+absolute_time_t alarm_pool_get_absolute_time(alarm_pool_t *pool) {
+    return pool_get_absolute_time(pool);
+}
+#endif
+
 alarm_id_t alarm_pool_add_alarm_at(alarm_pool_t *pool, absolute_time_t time, alarm_callback_t callback,
                                    void *user_data, bool fire_if_past) {
     if (!fire_if_past) {
-        absolute_time_t t = get_absolute_time();
-        if (absolute_time_diff_us(t, time) < 0) return 0;
+        if (absolute_time_diff_us(pool_get_absolute_time(pool), time) < 0) return 0;
     }
     return alarm_pool_add_alarm_at_force_in_context(pool, time, callback, user_data);
 }
@@ -446,7 +484,6 @@ uint alarm_pool_core_num(alarm_pool_t *pool) {
     return pool->core_num;
 }
 
-#if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
 static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_data) {
 #if PICO_TIME_USE_SLEEP_NOTIFIER
     uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
@@ -457,25 +494,27 @@ static int64_t sleep_until_callback(__unused alarm_id_t id, __unused void *user_
 #endif
     return 0;
 }
-#endif
 
-void sleep_until(absolute_time_t t) {
+static void check_not_in_exception(void) {
 #if PICO_ON_DEVICE && !defined(NDEBUG)
     if (__get_current_exception()) {
         panic("Attempted to sleep inside of an exception handler; use busy_wait if you must");
     }
 #endif
-#if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
+}
+
+void alarm_pool_sleep_until(alarm_pool_t *pool, absolute_time_t t) {
+    check_not_in_exception();
     uint64_t t_us = to_us_since_boot(t);
     uint64_t t_before_us = t_us - PICO_TIME_SLEEP_OVERHEAD_ADJUST_US;
     // needs to work in the first PICO_TIME_SLEEP_OVERHEAD_ADJUST_US of boot
     if (t_before_us > t_us) t_before_us = 0;
     absolute_time_t t_before;
     update_us_since_boot(&t_before, t_before_us);
-    if (absolute_time_diff_us(get_absolute_time(), t_before) > 0) {
-        if (add_alarm_at(t_before, sleep_until_callback, NULL, false) >= 0) {
+    if (absolute_time_diff_us(pool_get_absolute_time(pool), t_before) > 0) {
+        if (alarm_pool_add_alarm_at(pool, t_before, sleep_until_callback, NULL, false) >= 0) {
             // able to add alarm for just before the time
-            while (!time_reached(t_before)) {
+            while (!pool_time_reached(pool, t_before)) {
 #if PICO_TIME_USE_SLEEP_NOTIFIER
                 uint32_t save = spin_lock_blocking(sleep_notifier.spin_lock);
                 lock_internal_spin_unlock_with_wait(&sleep_notifier, save);
@@ -488,12 +527,28 @@ void sleep_until(absolute_time_t t) {
             }
         }
     }
+    // now wait until the exact time
+    pool_busy_wait_until(pool, t);
+}
+
+void alarm_pool_sleep_us(alarm_pool_t *pool, uint64_t us) {
+    alarm_pool_sleep_until(pool, delayed_by_us(pool_get_absolute_time(pool), us));
+}
+
+void alarm_pool_sleep_ms(alarm_pool_t *pool, uint32_t ms) {
+    alarm_pool_sleep_us(pool, ms * 1000ull);
+}
+
+void sleep_until(absolute_time_t t) {
+#if !PICO_TIME_DEFAULT_ALARM_POOL_DISABLED
+    alarm_pool_sleep_until(alarm_pool_get_default(), t);
 #else
+    check_not_in_exception();
     // hook in case we're in RTOS; note we assume using the alarm pool is better always if available.
     sync_internal_yield_until_before(t);
-#endif
     // now wait until the exact time
     busy_wait_until(t);
+#endif
 }
 
 void sleep_us(uint64_t us) {
@@ -587,7 +642,7 @@ bool alarm_pool_add_repeating_timer_us(alarm_pool_t *pool, int64_t delay_us, rep
     out->callback = callback;
     out->delay_us = delay_us;
     out->user_data = user_data;
-    out->alarm_id = alarm_pool_add_alarm_at(pool, make_timeout_time_us((uint64_t)(delay_us >= 0 ? delay_us : -delay_us)),
+    out->alarm_id = alarm_pool_add_alarm_at(pool, delayed_by_us(pool_get_absolute_time(pool), (uint64_t)(delay_us >= 0 ? delay_us : -delay_us)),
                                             repeating_timer_marker, out, true);
     return out->alarm_id > 0;
 }
