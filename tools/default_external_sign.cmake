@@ -1,3 +1,8 @@
+# ALLOW_EXAMPLE_KEYS is passed in by the SDK, so default it when the script is run on its own
+if (NOT DEFINED ALLOW_EXAMPLE_KEYS)
+    set(ALLOW_EXAMPLE_KEYS 0)
+endif()
+
 # Delete existing sig if present
 file(REMOVE ${SIG})
 
@@ -31,6 +36,7 @@ elseif(DEFINED ENV{PKCS11_PIN} AND DEFINED ENV{PKCS11_ID})
     # Set the PKCS11_PIN environment variable to the pin to unlock the HSM,
     # and the PKCS11_ID environment variable to the key ID to use
     # Optionally set PKCS11_SLOT to the slot to use, if you have multiple
+    # Optionally set PKCS11_MODULE to the module for your HSM, if not supported by the default module
 
     message(STATUS "Signing ${HASH} with pkcs11")
 
@@ -39,9 +45,14 @@ elseif(DEFINED ENV{PKCS11_PIN} AND DEFINED ENV{PKCS11_ID})
         set(SLOT_NUM "$ENV{PKCS11_SLOT}")
     endif()
 
+    if (DEFINED ENV{PKCS11_MODULE})
+        set(MODULE_ARG "--module")
+        set(MODULE_PATH "$ENV{PKCS11_MODULE}")
+    endif()
+
     # Get public key from HSM
     execute_process(COMMAND
-        pkcs11-tool --read-object --type pubkey ${SLOT_ARG} ${SLOT_NUM} --id $ENV{PKCS11_ID} --output-file ${PUBKEY}
+        pkcs11-tool ${MODULE_ARG} ${MODULE_PATH} --read-object --type pubkey ${SLOT_ARG} ${SLOT_NUM} --id $ENV{PKCS11_ID} --output-file ${PUBKEY}
         RESULT_VARIABLE res
     )
     if (res)
@@ -50,7 +61,7 @@ elseif(DEFINED ENV{PKCS11_PIN} AND DEFINED ENV{PKCS11_ID})
 
     # Use pkcs11-tool to sign
     execute_process(COMMAND
-        pkcs11-tool --sign ${SLOT_ARG} ${SLOT_NUM} --id $ENV{PKCS11_ID} --mechanism ECDSA --input-file ${HASH} --output-file ${SIG} --signature-format openssl --pin env:PKCS11_PIN
+        pkcs11-tool ${MODULE_ARG} ${MODULE_PATH} --sign ${SLOT_ARG} ${SLOT_NUM} --id $ENV{PKCS11_ID} --mechanism ECDSA --input-file ${HASH} --output-file ${SIG} --signature-format openssl --pin env:PKCS11_PIN
         RESULT_VARIABLE res
     )
     if (res)
@@ -66,7 +77,7 @@ else()
     configure_file(${CMAKE_CURRENT_LIST_DIR}/example_keys/public.pem ${PUBKEY} COPYONLY)
 
     # Warn whenever this default is used, as it's using the example key, unless example keys are allowed
-    if (NOT ${ALLOW_EXAMPLE_KEYS})
+    if (NOT ALLOW_EXAMPLE_KEYS)
         message(WARNING "You are using example key files for external signing - do not use these for production")
     endif()
 

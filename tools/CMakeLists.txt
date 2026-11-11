@@ -543,9 +543,12 @@ endfunction()
 # PICOTOOL_ENCRYPT_OUTPUT_DIR to MULTI_OUTPUT_DIR, and PICOTOOL_ENCRYPT_DEVICES
 # to MULTI_DEVICES.
 #
-# Setting both SIGFILE (PICOTOOL_ENC_SIGFILE) and MULTI_KEY_DIR (PICOTOOL_ENCRYPT_KEY_DIR)
-# is not supported - instead place per-device post-encryption signing keys in the
-# per-device key directories.
+# When using MULTI_KEY_DIR, a separate encryption SIGFILE cannot be specified. Each
+# device's encrypted binary is signed with the private.pem in its key directory if
+# present, else with the default signing key set by pico_sign_binary (PICOTOOL_SIGFILE).
+#
+# The contents of MULTI_KEY_DIR are not tracked as build dependencies, so you must
+# clean and reconfigure after making any changes in those directories.
 #
 # Optionally, use EMBED to embed a decryption stage into the encrypted binary.
 # This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
@@ -641,7 +644,7 @@ function(pico_encrypt_binary TARGET AESFILE IVFILE)
     endif()
 
     if (ENC_MULTI_KEY_DIR AND ENC_MULTI_OUTPUT_DIR AND ENC_MULTI_DEVICES)
-        set_target_properties(${TARGET} PROPERTIES 
+        set_target_properties(${TARGET} PROPERTIES
             PICOTOOL_ENCRYPT_KEY_DIR ${ENC_MULTI_KEY_DIR}
         )
         set_target_properties(${TARGET} PROPERTIES
@@ -954,7 +957,7 @@ function(picotool_postprocess_binary TARGET)
                         COMMAND_EXPAND_LISTS
                         VERBATIM
                         BYPRODUCTS "${picotool_output_dir}/${device}/${TARGET}.elf" "${picotool_output_dir}/${device}/${TARGET}.otp.json")
-                    
+
                     if (tmp_external_sign)
                         picotool_reseal_binary(${TARGET} "${picotool_output_dir}/${device}/${TARGET}.elf"
                             ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} "${picotool_output_dir}/${device}/${TARGET}.otp.json" ${PICO_ALLOW_EXAMPLE_KEYS})
@@ -988,7 +991,7 @@ function(picotool_postprocess_binary TARGET)
                     ${picotool_aesfile} ${picotool_ivfile} ${sigfile_arg} ${otpfile_arg}
                 COMMAND_EXPAND_LISTS
                 VERBATIM)
-            
+
             if (enc_external_sign)
                 picotool_reseal_binary(${TARGET} $<TARGET_FILE:${TARGET}>
                     ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} ${otp_file} ${PICO_ALLOW_EXAMPLE_KEYS})
