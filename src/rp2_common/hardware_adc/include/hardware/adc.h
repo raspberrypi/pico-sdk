@@ -84,6 +84,13 @@ extern "C" {
  */
 void adc_init(void);
 
+/*! \brief  DeInitialise the ADC HW (Power Down the ADC)
+ *  \ingroup hardware_adc
+ *
+ */
+void adc_deinit(void);
+
+
 /*! \brief  Initialise the gpio for use as an ADC pin
  *  \ingroup hardware_adc
  *
