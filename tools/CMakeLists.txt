@@ -48,6 +48,24 @@ define_property(TARGET
     FULL_DOCS "IV OTP salt for encrypting"
 )
 define_property(TARGET
+    PROPERTY PICOTOOL_ENCRYPT_KEY_DIR
+    INHERITED
+    BRIEF_DOCS "Directory with per-device AES keys and IV OTP salts for encrypting"
+    FULL_DOCS "Directory with per-device AES keys and IV OTP salts for encrypting"
+)
+define_property(TARGET
+    PROPERTY PICOTOOL_ENCRYPT_OUTPUT_DIR
+    INHERITED
+    BRIEF_DOCS "Directory to output per-device encrypted files"
+    FULL_DOCS "Directory to output per-device encrypted files"
+)
+define_property(TARGET
+    PROPERTY PICOTOOL_ENCRYPT_DEVICES
+    INHERITED
+    BRIEF_DOCS "Devices to output per-device encrypted files for"
+    FULL_DOCS "Devices to output per-device encrypted files for"
+)
+define_property(TARGET
     PROPERTY PICOTOOL_EMBED_DECRYPTION
     INHERITED
     BRIEF_DOCS "Embed decryption stage into encrypted binary"
@@ -143,7 +161,7 @@ endfunction()
 
 # Check picotool is installed, or download and build it if not installed
 function(pico_init_picotool)
-    set(picotool_VERSION_REQUIRED 2.3.0)
+    set(picotool_VERSION_REQUIRED 2.3.2)
     if (NOT TARGET picotool AND NOT DEFINED picotool_FOUND)
         # Build path of local install dir
         if (DEFINED ENV{PICOTOOL_FETCH_FROM_GIT_PATH} AND (NOT PICOTOOL_FETCH_FROM_GIT_PATH))
@@ -440,7 +458,16 @@ endfunction()
 # To specify a common SIGFILE for multiple targets, the SIGFILE property can be
 # set for a given scope, and then the SIGFILE argument is optional.
 #
-# \param\ SIGFILE The PEM signature file to use
+# To sign the binary externally (so you don't have to expose your SIGFILE to
+# the SDK), pass a CMake script instead. This script should take the inputs HASH
+# (BIN file containing the hash to sign), SIG (file to write the DER signature),
+# and PUBKEY (file to write the public key), and write files to SIG and PUBKEY
+# (PUBKEY can be a PEM or DER format file, but will end with extension .pubkey).
+# A good default file can be found at ${PICO_SDK_PATH}/tools/default_external_sign.cmake
+# which uses openssl or pkcs11-tool for signing, passing pins/keys/passwords as
+# environment variables.
+#
+# \param\ SIGFILE The PEM signature file to use, or a cmake script for external signing
 function(pico_sign_binary TARGET)
     picotool_check_configurable(${TARGET})
     # Enforce signing through target properties
@@ -493,7 +520,7 @@ function(pico_embed_pt_in_binary TARGET PTFILE)
     )
 endfunction()
 
-# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [MBEDTLS] [OTP_KEY_PAGE <page>] [NO_CLEAR])
+# pico_encrypt_binary(TARGET AESFILE IVFILE [SIGFILE <file>] [EMBED] [MBEDTLS] [OTP_KEY_PAGE <page>] [NO_CLEAR] [MULTI_KEY_DIR <dir>] [MULTI_OUTPUT_DIR <dir>] [MULTI_DEVICES <devices...>])
 # \brief_nodesc\ Encrypt the taget binary
 #
 # Encrypt the target binary with the given AES key (should be a binary
@@ -505,6 +532,23 @@ endfunction()
 #
 # This sets the target properties PICOTOOL_AESFILE to AESFILE, PICOTOOL_IVFILE to IVFILE, and
 # PICOTOOL_ENC_SIGFILE to SIGFILE if specified, else PICOTOOL_SIGFILE.
+#
+# Optionally, also specify MULTI_KEY_DIR, MULTI_OUTPUT_DIR and MULTI_DEVICES
+# to encrypt the same binary with multiple keys. The MULTI_KEY_DIR should contain
+# one subdirectory per device in MULTI_DEVICES, containing the privateaes.bin and
+# ivsalt.bin files for that device. The UF2s will be output to one subdirectory
+# per device under MULTI_OUTPUT_DIR. The MULTI_KEY_DIR can also optionally contain
+# per device private.pem signing keys, for signing post encryption.
+# This sets the target properties PICOTOOL_ENCRYPT_KEY_DIR to MULTI_KEY_DIR,
+# PICOTOOL_ENCRYPT_OUTPUT_DIR to MULTI_OUTPUT_DIR, and PICOTOOL_ENCRYPT_DEVICES
+# to MULTI_DEVICES.
+#
+# When using MULTI_KEY_DIR, a separate encryption SIGFILE cannot be specified. Each
+# device's encrypted binary is signed with the private.pem in its key directory if
+# present, else with the default signing key set by pico_sign_binary (PICOTOOL_SIGFILE).
+#
+# The contents of MULTI_KEY_DIR are not tracked as build dependencies, so you must
+# clean and reconfigure after making any changes in those directories.
 #
 # Optionally, use EMBED to embed a decryption stage into the encrypted binary.
 # This sets the target property PICOTOOL_EMBED_DECRYPTION to TRUE.
@@ -524,10 +568,13 @@ endfunction()
 # \param\ MBEDTLS Use MbedTLS based decryption stage (faster, but less secure)
 # \param\ OTP_KEY_PAGE The OTP page storing the AES key
 # \param\ NO_CLEAR Do not clear SRAM when loading encrypted binary
+# \param\ MULTI_KEY_DIR Directory containing per-device key subdirectories
+# \param\ MULTI_OUTPUT_DIR Directory to output per-device encrypted files to
+# \param\ MULTI_DEVICES List of devices to output per-device encrypted files for
 function(pico_encrypt_binary TARGET AESFILE IVFILE)
     set(options EMBED MBEDTLS NO_CLEAR)
-    set(oneValueArgs OTP_KEY_PAGE SIGFILE)
-    # set(multiValueArgs )
+    set(oneValueArgs OTP_KEY_PAGE SIGFILE MULTI_KEY_DIR MULTI_OUTPUT_DIR)
+    set(multiValueArgs MULTI_DEVICES)
     cmake_parse_arguments(PARSE_ARGV 3 ENC "${options}" "${oneValueArgs}" "${multiValueArgs}")
     picotool_check_configurable(${TARGET})
     set_target_properties(${TARGET} PROPERTIES
@@ -569,6 +616,10 @@ function(pico_encrypt_binary TARGET AESFILE IVFILE)
         )
     endif()
 
+    if (ENC_SIGFILE AND (ENC_MULTI_KEY_DIR OR ENC_MULTI_OUTPUT_DIR OR ENC_MULTI_DEVICES))
+        message(FATAL_ERROR "Cannot specify both SIGFILE and MULTI_KEY_DIR/MULTI_OUTPUT_DIR/MULTI_DEVICES for ${TARGET}")
+    endif()
+
     if (ENC_SIGFILE)
         set_target_properties(${TARGET} PROPERTIES
             PICOTOOL_ENC_SIGFILE ${ENC_SIGFILE}
@@ -586,26 +637,46 @@ function(pico_encrypt_binary TARGET AESFILE IVFILE)
             endif()
         endif()
     endif()
+
+    get_target_property(otp_file ${TARGET} PICOTOOL_OTP_FILE)
+    if (NOT otp_file)
+        message(FATAL_ERROR "OTP file not set for ${TARGET}")
+    endif()
+
+    if (ENC_MULTI_KEY_DIR AND ENC_MULTI_OUTPUT_DIR AND ENC_MULTI_DEVICES)
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENCRYPT_KEY_DIR ${ENC_MULTI_KEY_DIR}
+        )
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENCRYPT_OUTPUT_DIR ${ENC_MULTI_OUTPUT_DIR}
+        )
+        set_target_properties(${TARGET} PROPERTIES
+            PICOTOOL_ENCRYPT_DEVICES "${ENC_MULTI_DEVICES}"
+        )
+    elseif(ENC_MULTI_KEY_DIR OR ENC_MULTI_OUTPUT_DIR OR ENC_MULTI_DEVICES)
+        message(FATAL_ERROR "Must specify MULTI_KEY_DIR, MULTI_OUTPUT_DIR and MULTI_DEVICES when encrypting per-device")
+    endif()
 endfunction()
 
-# pico_add_uf2_output(TARGET)
-# \brief_nodesc\ Add a UF2 output using picotool
+# pico_create_uf2_output(TARGET INFILE OUTFILE [OUTFILE_NOGEN])
+# \brief_nodesc\ Create a UF2 output using picotool
 #
-# Add a UF2 output using picotool - must be called after
-# all required properties have been set
-function(pico_add_uf2_output TARGET)
-    pico_init_picotool()
-    get_target_property(${TARGET}_archive_directory ${TARGET} ARCHIVE_OUTPUT_DIRECTORY)
-    if (${TARGET}_archive_directory)
-        get_filename_component(output_path "${${TARGET}_archive_directory}"
-                REALPATH BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-        file(MAKE_DIRECTORY "${output_path}")
-        set(output_path "${output_path}/")
+# Create a UF2 output using picotool - must be called after
+# all required properties have been set on TARGET
+#
+# If OUTFILE contains generator expressions, must also pass the best guess
+# without using generator expressions as OUTFILE_NOGEN, for use in BYPRODUCTS
+#
+# \param\ TARGET Target to read the properties from (e.g. PICOTOOL_EXTRA_UF2_ARGS)
+# \param\ INFILE Input ELF/BIN file (can contain generator expressions)
+# \param\ OUTFILE Output UF2 file (can contain generator expressions)
+# \param\ OUTFILE_NOGEN Output UF2 file without generator expressions
+function(pico_create_uf2_output TARGET INFILE OUTFILE)
+    if (ARGC EQUAL 4)
+        set(OUTFILE_NOGEN ${ARGV3})
     else()
-        set(output_path "")
+        set(OUTFILE_NOGEN ${OUTFILE})
     endif()
-    pico_get_output_name(${TARGET} output_name)
-
     get_target_property(${TARGET}_uf2_package_addr ${TARGET} PICOTOOL_UF2_PACKAGE_ADDR)
     if (${TARGET}_uf2_package_addr)
         set(uf2_package_args "-o;${${TARGET}_uf2_package_addr}")
@@ -624,6 +695,7 @@ function(pico_add_uf2_output TARGET)
         endif()
     endif()
 
+    pico_init_picotool()
     if (picotool_FOUND)
         get_target_property(picotool_family ${TARGET} PICOTOOL_UF2_FAMILY)
         if (NOT picotool_family)
@@ -647,15 +719,67 @@ function(pico_add_uf2_output TARGET)
             ARGS uf2 convert
                 --quiet
                 ${uf2_package_args}
-                $<TARGET_FILE:${TARGET}>
-                ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2
+                ${INFILE}
+                ${OUTFILE}
                 --family ${picotool_family}
                 --platform ${picotool_platform}
                 ${extra_uf2_args}
             COMMAND_EXPAND_LISTS
             VERBATIM
-            BYPRODUCTS "${output_path}${output_name}.uf2")
+            BYPRODUCTS ${OUTFILE_NOGEN})
     endif()
+endfunction()
+
+# pico_add_uf2_output(TARGET)
+# \brief_nodesc\ Add a UF2 output using picotool
+#
+# Add a UF2 output for TARGET using picotool - must be called after
+# all required properties have been set
+#
+# Calls pico_create_uf2_output internally
+function(pico_add_uf2_output TARGET)
+    get_target_property(${TARGET}_archive_directory ${TARGET} ARCHIVE_OUTPUT_DIRECTORY)
+    if (${TARGET}_archive_directory)
+        get_filename_component(output_path "${${TARGET}_archive_directory}"
+                REALPATH BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+        file(MAKE_DIRECTORY "${output_path}")
+        set(output_path "${output_path}/")
+    else()
+        set(output_path "")
+    endif()
+    pico_get_output_name(${TARGET} output_name)
+
+    pico_create_uf2_output(${TARGET}
+        $<TARGET_FILE:${TARGET}>
+        ${output_path}$<IF:$<BOOL:$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>>,$<TARGET_PROPERTY:${TARGET},OUTPUT_NAME>,$<TARGET_PROPERTY:${TARGET},NAME>>.uf2
+        ${output_path}${output_name}.uf2)
+endfunction()
+
+function(picotool_reseal_binary TARGET FILE HASH SIG PUBKEY SCRIPT OTP_FILE ALLOW_EXAMPLE_KEYS)
+    add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+        ARGS
+            -DHASH=${HASH}
+            -DSIG=${SIG}
+            -DPUBKEY=${PUBKEY}
+            -DALLOW_EXAMPLE_KEYS=${ALLOW_EXAMPLE_KEYS}
+            -P ${SCRIPT}
+        VERBATIM)
+    add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND picotool
+        ARGS reseal
+            --quiet
+            ${FILE}
+            ${SIG}
+            ${PUBKEY}
+            ${OTP_FILE}
+        COMMAND_EXPAND_LISTS
+        VERBATIM)
+    add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+        ARGS
+            -E remove -f ${HASH} ${SIG} ${PUBKEY}
+        VERBATIM)
 endfunction()
 
 # Run picotool post-processing on the binary - must be called after
@@ -671,6 +795,7 @@ function(picotool_postprocess_binary TARGET)
 
     # PICO_CMAKE_CONFIG: PICO_ALLOW_EXAMPLE_KEYS, Don't raise a warning when using default signing/encryption keys, type=bool, default=0, group=build
     if (NOT PICO_ALLOW_EXAMPLE_KEYS)
+        set(PICO_ALLOW_EXAMPLE_KEYS 0) # ensure it's never empty, as it's passed to picotool_reseal_binary
         picotool_check_default_keys(${TARGET})
     endif()
 
@@ -680,6 +805,11 @@ function(picotool_postprocess_binary TARGET)
         list(APPEND picotool_args "--sign")
         get_target_property(picotool_sigfile ${TARGET} PICOTOOL_SIGFILE)
         pico_add_link_depend(${TARGET} ${picotool_sigfile})
+        get_filename_component(sigfile_ext "${picotool_sigfile}" LAST_EXT)
+        if (sigfile_ext AND "${sigfile_ext}" STREQUAL ".cmake")
+            set(external_sign TRUE)
+            list(APPEND picotool_args "--external-sign")
+        endif()
     endif()
 
     get_target_property(picotool_hash_output ${TARGET} PICOTOOL_HASH_OUTPUT)
@@ -711,6 +841,10 @@ function(picotool_postprocess_binary TARGET)
     get_target_property(picotool_enc_sigfile ${TARGET} PICOTOOL_ENC_SIGFILE)
     if (picotool_enc_sigfile)
         pico_add_link_depend(${TARGET} ${picotool_enc_sigfile})
+        get_filename_component(enc_sigfile_ext "${picotool_enc_sigfile}" LAST_EXT)
+        if (enc_sigfile_ext AND "${enc_sigfile_ext}" STREQUAL ".cmake")
+            set(enc_external_sign TRUE)
+        endif()
     endif()
 
     # Extra args
@@ -734,21 +868,40 @@ function(picotool_postprocess_binary TARGET)
             extra_process_args)
             # We don't need the extra end block, as picotool seal will add one
             target_compile_definitions(${TARGET} PRIVATE PICO_CRT0_INCLUDE_PICOBIN_END_BLOCK=0)
+
+            if (external_sign)
+                set(HASH ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.hash.bin)
+                set(SIG ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.sig.der)
+                set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.pubkey)
+                set(SCRIPT ${picotool_sigfile})
+                set(sigfile_arg ${HASH})
+                set(otpfile_arg "")
+            else()
+                set(sigfile_arg ${picotool_sigfile})
+                set(otpfile_arg ${otp_file})
+            endif()
+
             add_custom_command(TARGET ${TARGET} POST_BUILD
                 COMMAND picotool
                 ARGS seal
                     --quiet
                     $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
-                    ${picotool_sigfile} ${otp_file}
+                    ${sigfile_arg} ${otpfile_arg}
                     ${picotool_args}
                 COMMAND_EXPAND_LISTS
                 VERBATIM)
+
+            if (external_sign)
+                picotool_reseal_binary(${TARGET} $<TARGET_FILE:${TARGET}>
+                    ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} "${otp_file}" ${PICO_ALLOW_EXAMPLE_KEYS})
+            endif()
 
             # tag that this binary will be sealed
             target_compile_definitions(${TARGET} PRIVATE PICO_PICOTOOL_SEALED=1)
         endif()
         # Encryption
         if (picotool_aesfile AND picotool_ivfile)
+            # picotool requires the Signing Configuration options to be adjacent, so --no-clear must come first
             get_target_property(enc_no_clear ${TARGET} PICOTOOL_ENC_NO_CLEAR)
             if (enc_no_clear)
                 list(APPEND picotool_encrypt_args "--no-clear")
@@ -769,15 +922,80 @@ function(picotool_postprocess_binary TARGET)
                 list(APPEND picotool_encrypt_args "--otp-key-page" ${otp_key_page})
             endif()
 
+            get_target_property(picotool_key_dir ${TARGET} PICOTOOL_ENCRYPT_KEY_DIR)
+            get_target_property(picotool_output_dir ${TARGET} PICOTOOL_ENCRYPT_OUTPUT_DIR)
+            if (picotool_key_dir AND picotool_output_dir)
+                get_target_property(picotool_enc_devices ${TARGET} PICOTOOL_ENCRYPT_DEVICES)
+                foreach(device IN LISTS picotool_enc_devices)
+                    set(tmp_external_sign FALSE)
+                    set(ext_sign_arg "")
+                    set(otpfile_arg "${picotool_output_dir}/${device}/${TARGET}.otp.json")
+                    if (EXISTS ${picotool_key_dir}/${device}/private.pem)
+                        # Using per-device private keys for signing the encrypted binary
+                        set(sigfile_arg "${picotool_key_dir}/${device}/private.pem")
+                    elseif (enc_external_sign)
+                        set(tmp_external_sign TRUE) # using external signing for this device
+                        set(ext_sign_arg "--external-sign")
+                        set(HASH ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.hash.bin)
+                        set(SIG ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.sig.der)
+                        set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${device}.pubkey)
+                        set(SCRIPT ${picotool_enc_sigfile})
+                        set(sigfile_arg ${HASH})
+                    else()
+                        set(sigfile_arg ${picotool_enc_sigfile})
+                    endif()
+
+                    add_custom_command(TARGET ${TARGET} POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E make_directory "${picotool_output_dir}/${device}"
+                        COMMAND ${CMAKE_COMMAND} -E copy ${otp_file} "${picotool_output_dir}/${device}/${TARGET}.otp.json"
+                        COMMAND picotool
+                        ARGS encrypt
+                            --quiet --hash --sign ${ext_sign_arg}
+                            ${picotool_encrypt_args}
+                            $<TARGET_FILE:${TARGET}> "${picotool_output_dir}/${device}/${TARGET}.elf"
+                            "${picotool_key_dir}/${device}/privateaes.bin" "${picotool_key_dir}/${device}/ivsalt.bin" ${sigfile_arg} ${otpfile_arg}
+                        COMMAND_EXPAND_LISTS
+                        VERBATIM
+                        BYPRODUCTS "${picotool_output_dir}/${device}/${TARGET}.elf" "${picotool_output_dir}/${device}/${TARGET}.otp.json")
+
+                    if (tmp_external_sign)
+                        picotool_reseal_binary(${TARGET} "${picotool_output_dir}/${device}/${TARGET}.elf"
+                            ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} "${picotool_output_dir}/${device}/${TARGET}.otp.json" ${PICO_ALLOW_EXAMPLE_KEYS})
+                    endif()
+
+                    if (NOT PICO_NO_UF2)
+                        pico_create_uf2_output(${TARGET} "${picotool_output_dir}/${device}/${TARGET}.elf" "${picotool_output_dir}/${device}/${TARGET}.uf2")
+                    endif()
+                endforeach()
+            endif()
+
+            set(ext_sign_arg "")
+            if (enc_external_sign)
+                set(ext_sign_arg "--external-sign")
+                set(HASH ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.enc.hash.bin)
+                set(SIG ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.enc.sig.der)
+                set(PUBKEY ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.enc.pubkey)
+                set(SCRIPT ${picotool_enc_sigfile})
+                set(sigfile_arg ${HASH})
+            else()
+                set(sigfile_arg ${picotool_enc_sigfile})
+            endif()
+            set(otpfile_arg ${otp_file})
+
             add_custom_command(TARGET ${TARGET} POST_BUILD
                 COMMAND picotool
                 ARGS encrypt
-                    --quiet --hash --sign
+                    --quiet --hash --sign ${ext_sign_arg}
                     ${picotool_encrypt_args}
                     $<TARGET_FILE:${TARGET}> $<TARGET_FILE:${TARGET}>
-                    ${picotool_aesfile} ${picotool_ivfile} ${picotool_enc_sigfile} ${otp_file}
+                    ${picotool_aesfile} ${picotool_ivfile} ${sigfile_arg} ${otpfile_arg}
                 COMMAND_EXPAND_LISTS
                 VERBATIM)
+
+            if (enc_external_sign)
+                picotool_reseal_binary(${TARGET} $<TARGET_FILE:${TARGET}>
+                    ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} "${otp_file}" ${PICO_ALLOW_EXAMPLE_KEYS})
+            endif()
             if (ARGC EQUAL 2)
                 set(${ARGV1} TRUE PARENT_SCOPE)
             endif()
