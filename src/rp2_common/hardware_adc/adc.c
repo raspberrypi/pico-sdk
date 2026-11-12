@@ -20,3 +20,8 @@ void adc_init(void) {
         tight_loop_contents();
     }
 }
+
+void adc_deinit(void) {
+    // Power off the ADC and disable its clock. // TS also turned off 
+    adc_hw->cs = 0x00;
+}
