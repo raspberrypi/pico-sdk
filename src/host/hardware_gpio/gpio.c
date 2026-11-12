@@ -64,6 +64,16 @@ void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_set_pulls)(uint gpio, __unused bool up, _
     check_gpio_param(gpio);
 }
 
+PICO_WEAK_FUNCTION_DEF(gpio_set_pulls_masked)
+void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_set_pulls_masked)(__unused uint32_t gpio_mask, __unused bool up, __unused bool down) {
+
+}
+
+PICO_WEAK_FUNCTION_DEF(gpio_set_pulls_masked64)
+void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_set_pulls_masked64)(__unused uint64_t gpio_mask, __unused bool up, __unused bool down) {
+
+}
+
 PICO_WEAK_FUNCTION_DEF(gpio_set_irqover)
 void PICO_WEAK_FUNCTION_IMPL_NAME(gpio_set_irqover)(uint gpio, __unused uint value) {
     check_gpio_param(gpio);

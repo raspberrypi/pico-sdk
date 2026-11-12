@@ -291,6 +291,16 @@ void gpio_set_function_masked(uint32_t gpio_mask, gpio_function_t fn) {
     }
 }
 
+void gpio_set_pulls_masked(uint32_t gpio_mask, bool up, bool down) {
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
+        if (gpio_mask & 1u) {
+            gpio_set_pulls(i, up, down);
+        }
+        gpio_mask >>= 1;
+        if (!gpio_mask) break;
+    }
+}
+
 void gpio_init_mask(uint32_t gpio_mask) {
     gpio_set_dir_in_masked(gpio_mask);
     gpio_clr_mask(gpio_mask);
@@ -303,6 +313,16 @@ void gpio_set_function_masked64(uint64_t gpio_mask, gpio_function_t fn) {
     for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
         if (gpio_mask & 1u) {
             gpio_set_function(i, fn);
+        }
+        gpio_mask >>= 1;
+        if (!gpio_mask) break;
+    }
+}
+
+void gpio_set_pulls_masked64(uint64_t gpio_mask, bool up, bool down) {
+    for (uint i = 0; i < NUM_BANK0_GPIOS; i++) {
+        if (gpio_mask & 1u) {
+            gpio_set_pulls(i, up, down);
         }
         gpio_mask >>= 1;
         if (!gpio_mask) break;
