@@ -67,7 +67,13 @@ if (PICO_CYW43_SUPPORTED) # set by BOARD=pico-w
                     pico_cyw43_arch_sys_freertos)
             target_compile_definitions(pico_cyw43_arch_lwip_sys_freertos_headers INTERFACE
                     CYW43_LWIP=1
-                    LWIP_PROVIDE_ERRNO=1
+                    # FreeRTOS+lwIP uses newlib, which provides a thread-local errno
+                    # via <errno.h>. LWIP_PROVIDE_ERRNO=1 would declare lwIP's own
+                    # `extern int errno` global, diverging from newlib's storage and
+                    # silently breaking mbedTLS BIO shims (and any code reading errno
+                    # via <errno.h>) that miss the EWOULDBLOCK lwIP wrote.
+                    # LWIP_ERRNO_STDINCLUDE=1 routes lwIP through <errno.h> instead.
+                    LWIP_ERRNO_STDINCLUDE=1
                     # now the default
                     #PICO_LWIP_CUSTOM_LOCK_TCPIP_CORE=1 # we want to override the lwip locking mechanism to use our mutex
                     )
