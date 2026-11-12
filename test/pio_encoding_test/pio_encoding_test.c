@@ -33,6 +33,9 @@ int main() {
     PICOTEST_CHECK(0xa081 == pio_encode_mov(pio_exec_mov, pio_x), "pio_encode_mov(pio_exec_mov, pio_x)");
     PICOTEST_CHECK(0xa041 == encodings_program_instructions[encodings_offset_mov_y_x], "mov y, x");
     PICOTEST_CHECK(0xa041 == pio_encode_mov(pio_y, pio_x), "pio_encode_mov(pio_y, pio_x)");
+    PICOTEST_CHECK(0xa02b == encodings_program_instructions[encodings_offset_set_x_minus_one], "set x, (-1)");
+    PICOTEST_CHECK(0xa04b == encodings_program_instructions[encodings_offset_set_y_expression_minus_one],
+                   "set y, (n - 1)");
     PICOTEST_END_SECTION();
 
     PICOTEST_END_TEST();

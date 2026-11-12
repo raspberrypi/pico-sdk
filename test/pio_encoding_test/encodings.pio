@@ -10,3 +10,9 @@ public mov_exec_x:
     mov exec, x
 public mov_y_x:
     mov y, x
+
+.define n 0
+public set_x_minus_one:
+    set x, (-1)
+public set_y_expression_minus_one:
+    set y, (n - 1)
