@@ -6,6 +6,7 @@
 
 #include "hardware/flash.h"
 #include "pico/bootrom.h"
+#include "boot/picobin.h"
 
 #if PICO_RP2040
 #include "hardware/structs/io_qspi.h"
@@ -456,6 +457,36 @@ void flash_devinfo_set_cs_gpio(uint cs, uint gpio) {
         ((uint16_t)gpio) << OTP_DATA_FLASH_DEVINFO_CS1_GPIO_LSB,
         OTP_DATA_FLASH_DEVINFO_CS1_GPIO_BITS
     );
+}
+
+int flash_roll_qmi_to_partition(uint partition_num) {
+    uint32_t buffer[2 + 1] = {}; // 2 words for the partition location and flags, plus 1
+    int ret = rom_get_partition_table_info(buffer, count_of(buffer), PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION | (partition_num << 24));
+    if (ret < 0) return ret;
+
+    uint32_t location_and_permissions = buffer[1];
+    uint32_t saddr = ((location_and_permissions >> PICOBIN_PARTITION_LOCATION_FIRST_SECTOR_LSB) & 0x1fffu) * FLASH_SECTOR_SIZE;
+    uint32_t eaddr = (((location_and_permissions >> PICOBIN_PARTITION_LOCATION_LAST_SECTOR_LSB) & 0x1fffu) + 1) * FLASH_SECTOR_SIZE;
+
+    int32_t roll = (int32_t)saddr;
+    if (roll) {
+        if ((uint32_t)roll & (FLASH_SECTOR_SIZE - 1u)) return BOOTROM_ERROR_BAD_ALIGNMENT;
+        roll >>= FLASH_SECTOR_SHIFT;
+        int32_t size = (int32_t)((eaddr - saddr) >> FLASH_SECTOR_SHIFT);
+        for (uint i = 0; i < 4; i++) {
+            static_assert(4 * 1024 * 1024 / FLASH_SECTOR_SIZE == 0x400, "Expected 4 MiB / FLASH_SECTOR_SIZE = 0x400");
+            if (roll < 0) {
+                roll += 0x400;
+                qmi_hw->atrans[i] = 0;
+            } else {
+                int32_t this_size = MIN(size, 0x400);
+                qmi_hw->atrans[i] = (uint)((this_size << 16) | roll);
+                size -= this_size;
+                roll += this_size;
+            }
+        }
+    }
+    return BOOTROM_OK;
 }
 
 #endif // !PICO_RP2040

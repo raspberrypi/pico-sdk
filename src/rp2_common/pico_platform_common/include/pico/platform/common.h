@@ -43,6 +43,48 @@
 
 #ifndef __ASSEMBLER__
 
+// PICO_SECURE/PICO_NONSECURE configs - placed here as needed in header files that don't include pico/secure.h
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_STDIO, Allow non-secure to use stdio, type=bool, default=0, group=pico_bootrom
+#ifndef PICO_ALLOW_NONSECURE_STDIO
+#define PICO_ALLOW_NONSECURE_STDIO 0
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_RAND, Allow non-secure to request random numbers, type=bool, default=0, group=pico_bootrom
+#ifndef PICO_ALLOW_NONSECURE_RAND
+#define PICO_ALLOW_NONSECURE_RAND 0
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_DMA, Allow non-secure to request DMA channels, type=bool, default=0, group=hardware_dma
+#ifndef PICO_ALLOW_NONSECURE_DMA
+#define PICO_ALLOW_NONSECURE_DMA 0
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_GPIO, Allow non-secure to access GPIO, type=bool, default=0, group=hardware_gpio
+#ifndef PICO_ALLOW_NONSECURE_GPIO
+#define PICO_ALLOW_NONSECURE_GPIO 0
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_RESETS, Allow non-secure to access RESETS, type=bool, default=0, group=hardware_resets
+#ifndef PICO_ALLOW_NONSECURE_RESETS
+#define PICO_ALLOW_NONSECURE_RESETS 0
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_USER_IRQ, Allow non-secure to request user IRQs, type=bool, default=0, group=hardware_irq
+#ifndef PICO_ALLOW_NONSECURE_USER_IRQ
+#define PICO_ALLOW_NONSECURE_USER_IRQ 0
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_PIO, Allow non-secure to request PIOs, type=bool, default=0, group=hardware_pio
+#ifndef PICO_ALLOW_NONSECURE_PIO
+#define PICO_ALLOW_NONSECURE_PIO 0
+#endif
+
+// PICO_CONFIG: PICO_ALLOW_NONSECURE_USB, Allow non-secure to access USB, type=bool, default=0, group=hardware_usb
+#ifndef PICO_ALLOW_NONSECURE_USB
+#define PICO_ALLOW_NONSECURE_USB 0
+#endif
+
 // PICO_CONFIG: PICO_NO_FPGA_CHECK, Remove the FPGA platform check for small code size reduction, type=bool, default=1, advanced=true, group=pico_runtime
 #ifndef PICO_NO_FPGA_CHECK
 #define PICO_NO_FPGA_CHECK 1

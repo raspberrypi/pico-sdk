@@ -18,8 +18,30 @@
 #define PICO_USE_GPIO_COPROCESSOR 1
 #endif
 
+
+#if PICO_NONSECURE
+#define DEFAULT_IO_IRQ_BANK0 IO_IRQ_BANK0_NS
+#else
+#define DEFAULT_IO_IRQ_BANK0 IO_IRQ_BANK0
+#endif
+
+
 #if PICO_USE_GPIO_COPROCESSOR
 #include "hardware/gpio_coproc.h"
+#endif
+
+#if PICO_ADD_NONSECURE_PADS_HELPER && PICO_NONSECURE
+#include "pico/bootrom.h"
+// These all return BOOTROM_ERROR_NOT_PERMITTED if NonSecure doesn't have access to the GPIO
+#define pads_bank0_set_bits(gpio, bits) rom_secure_call(gpio, bits, 0, 0, SECURE_CALL_pads_bank0_set_bits)
+#define pads_bank0_clear_bits(gpio, bits) rom_secure_call(gpio, bits, 0, 0, SECURE_CALL_pads_bank0_clear_bits)
+#define pads_bank0_write_masked(gpio, bits, mask) rom_secure_call(gpio, bits, mask, 0, SECURE_CALL_pads_bank0_write_masked)
+#define pads_bank0_read(gpio) rom_secure_call(gpio, 0, 0, 0, SECURE_CALL_pads_bank0_read)
+#else
+#define pads_bank0_set_bits(gpio, bits) hw_set_bits(&pads_bank0_hw->io[gpio], bits)
+#define pads_bank0_clear_bits(gpio, bits) hw_clear_bits(&pads_bank0_hw->io[gpio], bits)
+#define pads_bank0_write_masked(gpio, bits, mask) hw_write_masked(&pads_bank0_hw->io[gpio], bits, mask)
+#define pads_bank0_read(gpio) pads_bank0_hw->io[gpio]
 #endif
 
 #ifdef __cplusplus
@@ -318,7 +340,7 @@ static inline void gpio_pull_up(uint gpio) {
  * \return true if the GPIO is pulled up
  */
 static inline bool gpio_is_pulled_up(uint gpio) {
-    return (pads_bank0_hw->io[gpio] & PADS_BANK0_GPIO0_PUE_BITS) != 0;
+    return (pads_bank0_read(gpio) & PADS_BANK0_GPIO0_PUE_BITS) != 0;
 }
 
 /*! \brief Set specified GPIO to be pulled down.
@@ -337,7 +359,7 @@ static inline void gpio_pull_down(uint gpio) {
  * \return true if the GPIO is pulled down
  */
 static inline bool gpio_is_pulled_down(uint gpio) {
-    return (pads_bank0_hw->io[gpio] & PADS_BANK0_GPIO0_PDE_BITS) != 0;
+    return (pads_bank0_read(gpio) & PADS_BANK0_GPIO0_PDE_BITS) != 0;
 }
 
 /*! \brief Disable pulls on specified GPIO

@@ -209,4 +209,63 @@ int rom_pick_ab_partition_during_update(uint32_t *workarea_base, uint32_t workar
 
     return rc;
 }
+
+int rom_get_owned_partition(uint partition_num) {
+    int ret;
+    uint32_t buffer[(16 * 2) + 1] = {}; // maximum of 16 partitions, each with 2 words returned, plus 1
+    // Initially assume that the partition_num is the A partition
+    int partition_a_num = partition_num;
+    ret = rom_get_b_partition(partition_num);
+
+    if (ret < 0) {
+        // partition_num is actually the B partition, so read the A partition
+        ret = rom_get_partition_table_info(buffer, count_of(buffer), PT_INFO_PARTITION_LOCATION_AND_FLAGS | PT_INFO_SINGLE_PARTITION | (partition_num << 24));
+        if (ret < 0) return ret;
+
+        uint32_t flags_and_permissions = buffer[2];
+        if ((flags_and_permissions & PICOBIN_PARTITION_FLAGS_LINK_TYPE_BITS) >> PICOBIN_PARTITION_FLAGS_LINK_TYPE_LSB != PICOBIN_PARTITION_FLAGS_LINK_TYPE_A_PARTITION) return BOOTROM_ERROR_NOT_FOUND;
+        partition_a_num = (flags_and_permissions & PICOBIN_PARTITION_FLAGS_LINK_VALUE_BITS) >> PICOBIN_PARTITION_FLAGS_LINK_VALUE_LSB;
+    }
+
+    ret = rom_get_partition_table_info(buffer, count_of(buffer), PT_INFO_PARTITION_LOCATION_AND_FLAGS);
+    if (ret < 0) return ret;
+
+    int num_partitions = (ret - 1) / 2;
+
+    int owned_a_num;
+    for (owned_a_num = 0; owned_a_num < num_partitions; owned_a_num++) {
+        uint32_t flags_and_permissions = buffer[owned_a_num * 2 + 2];
+        if (
+            (flags_and_permissions & PICOBIN_PARTITION_FLAGS_LINK_TYPE_BITS) >> PICOBIN_PARTITION_FLAGS_LINK_TYPE_LSB == PICOBIN_PARTITION_FLAGS_LINK_TYPE_OWNER_PARTITION &&
+            (flags_and_permissions & PICOBIN_PARTITION_FLAGS_LINK_VALUE_BITS) >> PICOBIN_PARTITION_FLAGS_LINK_VALUE_LSB == partition_a_num
+        ) {
+            break;
+        }
+    }
+
+    if (owned_a_num == num_partitions) return BOOTROM_ERROR_NOT_FOUND;
+
+    if (partition_num == partition_a_num)
+        return owned_a_num;
+    else
+        return rom_get_b_partition(owned_a_num);
+}
+
+#if (!defined(__riscv) || PICO_NONSECURE) || PICO_COMBINED_DOCS
+int __noinline rom_secure_call(uint a, uint b, uint c, uint d, uint func) {
+    uint32_t secure_call = (uintptr_t)rom_func_lookup_inline(ROM_FUNC_SECURE_CALL);
+    register uint32_t r0 asm("r0") = a;
+    register uint32_t r1 asm("r1") = b;
+    register uint32_t r2 asm("r2") = c;
+    register uint32_t r3 asm("r3") = d;
+    register uint32_t r4 asm("r4") = func;
+    pico_default_asm_volatile(
+            "push {lr}\n"
+            "blx %0\n"
+            "pop {lr}\n"
+            : : "r" (secure_call), "r"(r0), "r"(r1), "r"(r2), "r"(r3), "r"(r4));
+    return (int)r0;
+}
 #endif
+
+#endif // !PICO_RP2040
