@@ -61,6 +61,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/pico_time_test:pico_time_test_sw",
                 "//test/pico_time_test:alarm_pool_sleep_test",
                 "//test/pico_low_power_test:low_power_test_timers",
+                "//test/pico_low_power_test:low_power_test_persistent",
                 "//test/pico_low_power_test:low_power_test_gpio",
                 "//test/pico_low_power_test:low_power_test_timers_gpio",
                 "//test/pico_low_power_test:low_power_test_simple",
@@ -105,6 +106,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_time_test:pico_time_test_sw",
+                "//test/pico_low_power_test:low_power_test_persistent",
                 "//test/short_sleep_test:short_sleep_test_sw",
                 "//test/sync_interop_test:sync_interop_test_sw",
             )
@@ -152,6 +154,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_time_test:pico_time_test_sw",
+                "//test/pico_low_power_test:low_power_test_persistent",
                 "//test/short_sleep_test:short_sleep_test_sw",
                 "//test/sync_interop_test:sync_interop_test_sw",
             )
@@ -200,6 +203,7 @@ BUILD_CONFIGURATIONS = (
                 "//test/hardware_sync_spin_lock_test:hardware_sync_spin_lock_test_sw",
                 "//test/pico_sync_test:pico_sync_test_sw",
                 "//test/pico_time_test:pico_time_test_sw",
+                "//test/pico_low_power_test:low_power_test_persistent",
                 "//test/short_sleep_test:short_sleep_test_sw",
                 "//test/sync_interop_test:sync_interop_test_sw",
             )

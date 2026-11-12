@@ -30,24 +30,7 @@ static char powman_last_pstate[100];
 
 void pstate_resume_func(pstate_bitset_t *pstate) {
     came_from_pstate = true;
-    memset(powman_last_pwrup, 0, sizeof(powman_last_pwrup));
-    memset(powman_last_pstate, 0, sizeof(powman_last_pstate));
-    switch (powman_hw->last_swcore_pwrup) {
-        //               0 = chip reset, for the source of the last reset see
-        case 1 << 0: strcpy(powman_last_pwrup, "Chip reset"); break;
-        case 1 << 1: strcpy(powman_last_pwrup, "Pwrup0"); break;
-        case 1 << 2: strcpy(powman_last_pwrup, "Pwrup1"); break;
-        case 1 << 3: strcpy(powman_last_pwrup, "Pwrup2"); break;
-        case 1 << 4: strcpy(powman_last_pwrup, "Pwrup3"); break;
-        case 1 << 5: strcpy(powman_last_pwrup, "Coresight_pwrup"); break;
-        case 1 << 6: strcpy(powman_last_pwrup, "Alarm_pwrup"); break;
-        default: strcpy(powman_last_pwrup, "Unknown pwrup"); break;
-    }
-
-    if (pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_XIP_CACHE)) strcat(powman_last_pstate, "XIP_CACHE, ");
-    if (pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK0)) strcat(powman_last_pstate, "SRAM_BANK0, ");
-    if (pstate_bitset_is_set(pstate, POWMAN_POWER_DOMAIN_SRAM_BANK1)) strcat(powman_last_pstate, "SRAM_BANK1, ");
-    if (pstate_bitset_none_set(pstate)) strcat(powman_last_pstate, "NONE, ");
+    pstate_resume_func_common(pstate, powman_last_pwrup, powman_last_pstate);
 }
 #endif
 
