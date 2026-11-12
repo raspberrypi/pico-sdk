@@ -1,0 +1,12 @@
+// run: pioasm input.pio
+.program delay_negative
+    nop [-1]
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.10-11: instruction delay must be positive
+//     3 |     nop [-1]
+//       |          ^~
+// 

@@ -1,0 +1,93 @@
+// run: pioasm -o json input.pio
+.define public GLOBAL_CONST 2
+.program json_cov
+.pio_version 1
+.lang_opt json some_option = 1
+.side_set 2 opt pindirs
+.define public LOCAL_CONST 3
+public entry:
+    nop side 0
+    jmp entry
+
+.program json_no_sideset
+.origin 5
+    nop
+// -- Output
+// Command: pioasm -o json input.pio
+// Exit code: 0
+// Stdout:
+// {
+// 	"pioASMVersion": "2.2.1-develop",
+// 	"publicSymbols": {
+// 		"GLOBAL_CONST": 2
+// 	},
+// 	"programs": [
+// 		{
+// 			"name": "json_cov",
+// 			"pioVersion": 1,
+// 			"wrapTarget": 0,
+// 			"wrap": 1,
+// 			"origin": -1,
+// 			"usedGPIORanges": 0,
+// 			"publicSymbols": {
+// 				"LOCAL_CONST": 3
+// 			},
+// 			"publicLabels": {
+// 				"entry": 0
+// 			},
+// 			"in": null,
+// 			"out": null,
+// 			"setCount": null,
+// 			"sideset": {"size": 3, "optional": true, "pindirs": true},
+// 			"movStatus": null,
+// 			"fifoConfig": null,
+// 			"clockDiv": null,
+// 			"instructions": [
+// 				{"hex": "B042", "instruction": "nop                    side 0"},
+// 				{"hex": "0000", "instruction": "jmp    0"}
+// 			],
+// 			"codeBlocks": [
+// 
+// 			],
+// 			"langOpts": [
+// 				{
+// 					"lang": "json",
+// 					"name": "some_option",
+// 					"value": "1"
+// 				}
+// 			]
+// 		},
+// 		{
+// 			"name": "json_no_sideset",
+// 			"pioVersion": 0,
+// 			"wrapTarget": 0,
+// 			"wrap": 0,
+// 			"origin": 5,
+// 			"usedGPIORanges": 0,
+// 			"publicSymbols": {
+// 			},
+// 			"publicLabels": {
+// 			},
+// 			"in": null,
+// 			"out": null,
+// 			"setCount": null,
+// 			"sideset": null,
+// 			"movStatus": null,
+// 			"fifoConfig": null,
+// 			"clockDiv": null,
+// 			"instructions": [
+// 				{"hex": "A042", "instruction": "nop"}
+// 			],
+// 			"codeBlocks": [
+// 
+// 			],
+// 			"langOpts": [
+// 
+// 			]
+// 		}
+// 	]
+// }
+// 
+// Stderr:
+// warning: json does not support output options; json lang_opt ignored.
+// 

@@ -1,0 +1,12 @@
+// run: pioasm input.pio
+.program jmp_out_of_range
+    jmp 5
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.9: jmp target address 5 is beyond the end of the program
+//     3 |     jmp 5
+//       |         ^
+// 

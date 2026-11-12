@@ -1,0 +1,13 @@
+// run: pioasm -v 1 input.pio
+.program wait_gpio_range
+.pio_version 1
+    wait 0 gpio 48
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.17-18: absolute GPIO number must be must be >= 0 and <= 47
+//     4 |     wait 0 gpio 48
+//       |                 ^~
+// 

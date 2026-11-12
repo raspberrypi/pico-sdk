@@ -1,0 +1,33 @@
+// run: pioasm -o ada -p format_test input.pio
+.program format_test
+    nop
+
+// -- Output
+// Command: pioasm -o ada -p format_test input.pio
+// Exit code: 0
+// Stdout:
+// ------------------------------------------------------------------------------
+//?
+// ------------------------------------------------------------------------------
+// 
+// pragma Style_Checks (Off);
+// 
+// with RP.PIO;
+// 
+// package format_test is
+// 
+//    -----------------
+//    -- Format_Test --
+//    -----------------
+// 
+//    Format_Test_Wrap_Target : constant := 0;
+//    Format_Test_Wrap        : constant := 0;
+// 
+//    Format_Test_Program_Instructions : RP.PIO.Program := (
+//                     --  .wrap_target
+//          16#a042#); --   0: nop
+//                     --  .wrap
+// 
+// end format_test;
+// 
+// Stderr:
