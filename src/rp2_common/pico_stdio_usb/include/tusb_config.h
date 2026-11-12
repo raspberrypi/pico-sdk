@@ -29,6 +29,15 @@
 
 #include "pico/stdio_usb.h"
 
+// CFG_TUSB_OS=OPT_OS_PICO is set by tinyusb_common_base
+// Newer versions of tinyusb remove it again in family_configure_example
+// Presumably this is to avoid issues when setting CFG_TUSB_OS=OPT_OS_FREERTOS
+// Because of this CFG_TUSB_OS can end up being set to OPT_OS_NONE
+// Make sure CFG_TUSB_OS=OPT_OS_PICO if it's undefined
+#ifndef CFG_TUSB_OS
+#define CFG_TUSB_OS             OPT_OS_PICO
+#endif
+
 #if !defined(LIB_TINYUSB_HOST) && !defined(LIB_TINYUSB_DEVICE)
 #define CFG_TUSB_RHPORT0_MODE   (OPT_MODE_DEVICE)
 
