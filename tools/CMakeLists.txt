@@ -161,7 +161,7 @@ endfunction()
 
 # Check picotool is installed, or download and build it if not installed
 function(pico_init_picotool)
-    set(picotool_VERSION_REQUIRED 2.3.0)
+    set(picotool_VERSION_REQUIRED 2.3.2)
     if (NOT TARGET picotool AND NOT DEFINED picotool_FOUND)
         # Build path of local install dir
         if (DEFINED ENV{PICOTOOL_FETCH_FROM_GIT_PATH} AND (NOT PICOTOOL_FETCH_FROM_GIT_PATH))
@@ -893,7 +893,7 @@ function(picotool_postprocess_binary TARGET)
 
             if (external_sign)
                 picotool_reseal_binary(${TARGET} $<TARGET_FILE:${TARGET}>
-                    ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} ${otp_file} ${PICO_ALLOW_EXAMPLE_KEYS})
+                    ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} "${otp_file}" ${PICO_ALLOW_EXAMPLE_KEYS})
             endif()
 
             # tag that this binary will be sealed
@@ -994,7 +994,7 @@ function(picotool_postprocess_binary TARGET)
 
             if (enc_external_sign)
                 picotool_reseal_binary(${TARGET} $<TARGET_FILE:${TARGET}>
-                    ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} ${otp_file} ${PICO_ALLOW_EXAMPLE_KEYS})
+                    ${HASH} ${SIG} ${PUBKEY} ${SCRIPT} "${otp_file}" ${PICO_ALLOW_EXAMPLE_KEYS})
             endif()
             if (ARGC EQUAL 2)
                 set(${ARGV1} TRUE PARENT_SCOPE)
