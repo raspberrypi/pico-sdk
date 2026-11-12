@@ -1,0 +1,9 @@
+{
+    "name": "pico-sdk",
+    "path": ".",
+    "license": "BSD-3-Clause",
+    "supplier": "Organization: Raspberry Pi Ltd",
+    "url": "https://github.com/raspberrypi/pico-sdk",
+    "description": "Raspberry Pi Pico SDK",
+    "purl": "pkg:github/raspberrypi/pico-sdk@{}"
+}
