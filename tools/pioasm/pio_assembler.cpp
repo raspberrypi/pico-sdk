@@ -161,6 +161,17 @@ void program::set_wrap(const yy::location &l) {
     wrap = resolvable_int(l, instructions.size() - 1);
 }
 
+void program::set_wrap(const yy::location &l, rvalue target) {
+    set_wrap(l);
+
+    if (wrap_target) {
+        std::stringstream msg;
+        msg << ".wrap_target was already specified at " << wrap_target->location;
+        throw syntax_error(l, msg.str());
+    }
+    wrap_target = std::move(target);
+}
+
 void program::set_wrap_target(const yy::location &l) {
     if (wrap_target) {
         std::stringstream msg;
@@ -292,6 +303,7 @@ uint instruction::encode(program &program) {
         }
     }
     // note we store the 6th bit of arg2 above the 16 bits of instruction
+    // note (raw.arg2 >> 5) can also include type/delay/sideset from .word
     return (((uint) raw.type) << 13u) | (((uint) _delay | (uint) _sideset) << 8u) | (raw.arg1 << 5u) | (raw.arg2 & 0x1fu) | ((raw.arg2 >> 5) << 16);
 }
 
@@ -299,12 +311,13 @@ raw_encoding instruction::raw_encode(program& program) {
     throw syntax_error(location, "internal error");
 }
 
-uint instr_word::encode(program &program) {
+raw_encoding instr_word::raw_encode(program& program) {
     uint value = encoding->resolve(program);
     if (value > 0xffffu) {
         throw syntax_error(location, ".word value must be a positive 16 bit value");
     }
-    return value;
+    // note value can also include type/delay/sideset
+    return {inst_type(0), value >> 5, value & 0x1fu};
 }
 
 uint instr_mov::get_push_get_index(const program &program, extended_mov index) {
