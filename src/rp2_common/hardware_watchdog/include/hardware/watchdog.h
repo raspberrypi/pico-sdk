@@ -151,7 +151,14 @@ uint32_t watchdog_get_time_remaining_us(void);
  */
 uint32_t watchdog_get_time_remaining_ms(void);
 
-// backwards compatibility with SDK < 2.0.0
+/**
+ * \brief Alias for \ref watchdog_get_time_remaining_us for backwards compatibility with SDK < 2.0.0
+ * \ingroup hardware_watchdog
+ *
+ * \if rp2040_specific
+ * See \ref watchdog_get_time_remaining_us for the limitation on RP2040.
+ * \endif
+ */
 static inline uint32_t watchdog_get_count(void) {
     return watchdog_get_time_remaining_us();
 }
