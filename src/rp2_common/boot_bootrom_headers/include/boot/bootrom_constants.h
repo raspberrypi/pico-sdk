@@ -239,18 +239,25 @@ typedef int (*bootrom_api_callback_generic_t)(uint32_t r0, uint32_t r1, uint32_t
 // items are returned in order
 // 3 words package_id, device_id_lo, device_id_hi
 #define SYS_INFO_CHIP_INFO                      0x0001
+#define SYS_INFO_CHIP_INFO_WORD_COUNT           _u(3)
 // 1 word: chip specific critical bits
 #define SYS_INFO_CRITICAL                       0x0002
+#define SYS_INFO_CRITICAL_WORD_COUNT            _u(1)
 // 1 word: bytes: cpu_type, supported_cpu_type_bitfield
 #define SYS_INFO_CPU_INFO                       0x0004
+#define SYS_INFO_CPU_INFO_WORD_COUNT            _u(1)
 // 1 word: same as FLASH_DEVINFO row in OTP
 #define SYS_INFO_FLASH_DEV_INFO                 0x0008
+#define SYS_INFO_FLASH_DEV_INFO_WORD_COUNT      _u(1)
 // 4 words
 #define SYS_INFO_BOOT_RANDOM                    0x0010
+#define SYS_INFO_BOOT_RANDOM_WORD_COUNT         _u(4)
 // 2 words lsb first
 #define SYS_INFO_NONCE                          0x0020
+#define SYS_INFO_NONCE_WORD_COUNT              _u(2)
 // 4 words boot_info, boot_diagnostic, boot_param0, boot_param1
 #define SYS_INFO_BOOT_INFO                      0x0040
+#define SYS_INFO_BOOT_INFO_WORD_COUNT           _u(4)
 
 #define BOOTROM_NS_API_get_sys_info 0
 #define BOOTROM_NS_API_checked_flash_op 1
