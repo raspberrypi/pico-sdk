@@ -47,11 +47,6 @@ static_assert((CYW43_PIN_WL_DATA_OUT < 32 && CYW43_PIN_WL_DATA_IN < 32 && CYW43_
 #else
 static uint32_t cyw43_pio_clock_div_int = CYW43_PIO_CLOCK_DIV_INT;
 static uint8_t cyw43_pio_clock_div_frac8 = CYW43_PIO_CLOCK_DIV_FRAC8;
-
-void cyw43_set_pio_clkdiv_int_frac8(uint32_t clock_div_int, uint8_t clock_div_frac8) {
-    cyw43_pio_clock_div_int = clock_div_int;
-    cyw43_pio_clock_div_frac8 = clock_div_frac8;
-}
 #endif
 
 #define PADS_DRIVE_STRENGTH PADS_BANK0_GPIO0_DRIVE_VALUE_12MA
@@ -102,6 +97,18 @@ typedef struct {
 } bus_data_t;
 
 static bus_data_t bus_data_instance;
+
+#if CYW43_PIO_CLOCK_DIV_DYNAMIC
+void cyw43_set_pio_clkdiv_int_frac8(uint32_t clock_div_int, uint8_t clock_div_frac8) {
+    cyw43_pio_clock_div_int = clock_div_int;
+    cyw43_pio_clock_div_frac8 = clock_div_frac8;
+    // Apply it now if the driver is already running. The SM is idle between transfers, and each
+    // transfer restarts its clock divider.
+    if (bus_data_instance.pio) {
+        pio_sm_set_clkdiv_int_frac8(bus_data_instance.pio, bus_data_instance.pio_sm, clock_div_int, clock_div_frac8);
+    }
+}
+#endif
 
 int cyw43_spi_init(cyw43_int_t *self) {
     // Only does something if CYW43_LOGIC_DEBUG=1
