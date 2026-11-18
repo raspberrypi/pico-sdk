@@ -86,6 +86,7 @@ static int issue_2118_test(void);
 static int issue_2148_test(void);
 static int issue_2186_test(void);
 static int issue_2374_test(void);
+static int issue_3294_test(void);
 static int batch_cancel_test(void);
 
 int main() {
@@ -268,6 +269,8 @@ int main() {
     rc |= issue_2186_test();
 
     rc |= issue_2374_test();
+
+    rc |= issue_3294_test();
 
     // todo currently fails with pico_host_sdl
 #if PICO_ON_DEVICE
@@ -485,6 +488,18 @@ static int issue_2186_test(void) {
 
     PICOTEST_END_SECTION();
     return 0;
+}
+
+static int issue_3294_test(void) {
+    PICOTEST_START_SECTION("Issue #3294 - us_to_ms without a 64-bit divide");
+    for (uint i = 0; i < 10000; i++) {
+        uint64_t us = ((uint64_t)rand() << 62) ^ ((uint64_t)rand() << 31) ^ (uint64_t)rand();
+        // vary the magnitude, so small values are covered too
+        us >>= rand() & 63;
+        PICOTEST_CHECK(us_to_ms(us) == (uint32_t)(us / 1000u), "us_to_ms(%" PRIu64 ") returned %" PRIu32, us, us_to_ms(us));
+    }
+    PICOTEST_END_SECTION();
+    return picotest_error_code;
 }
 
 static int issue_2148_test(void) {

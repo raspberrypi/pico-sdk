@@ -70,11 +70,25 @@ static inline absolute_time_t get_absolute_time(void) {
 }
 
 static inline uint32_t us_to_ms(uint64_t us) {
+#if PICO_RP2040
+    // the hardware divider makes this faster than the multiply below, which has no 32x32->64 instruction
     if (us >> 32u) {
         return (uint32_t)(us / 1000u);
     } else {
         return ((uint32_t)us) / 1000u;
     }
+#else
+    // us / 1000 is (us >> 3) / 125, and for n < 2^61, n / 125 is exactly (n * ceil(2^70 / 125)) >> 70,
+    // which avoids a 64-bit divide (done in software on RP2350)
+    const uint32_t m_lo = 0x8d4fdf3c;
+    const uint32_t m_hi = 0x83126e97;
+    uint32_t n_lo = (uint32_t)(us >> 3);
+    uint32_t n_hi = (uint32_t)(us >> 35);
+    // the high 64 bits of n * m; n_hi < 2^29, so the middle terms cannot overflow
+    uint64_t mid = (uint64_t)n_hi * m_lo + (uint64_t)n_lo * m_hi + (((uint64_t)n_lo * m_lo) >> 32);
+    uint64_t hi = (uint64_t)n_hi * m_hi + (mid >> 32);
+    return (uint32_t)(hi >> 6);
+#endif
 }
 
 /*! fn to_ms_since_boot
