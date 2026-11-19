@@ -186,7 +186,7 @@ void multicore_fifo_push_blocking(uint32_t data);
  *
  * \param data A 32 bit value to push on to the FIFO
  */
-static inline void multicore_fifo_push_blocking_inline(uint32_t data) {
+static __force_inline void multicore_fifo_push_blocking_inline(uint32_t data) {
     // We wait for the fifo to have some space
     while (!multicore_fifo_wready())
         tight_loop_contents();
