@@ -1,0 +1,12 @@
+// run: pioasm input.pio
+.program word_too_large
+    .word 0x1ffff
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.5-17: .word value must be a positive 16 bit value
+//     3 |     .word 0x1ffff
+//       |     ^~~~~~~~~~~~~
+// 

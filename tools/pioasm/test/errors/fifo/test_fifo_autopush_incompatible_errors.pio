@@ -1,0 +1,14 @@
+// run: pioasm input.pio
+.program fifo_autopush_incompatible
+.fifo txput
+.in 1 auto
+    in pins, 1
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.7-11: PIO version 1 is required for 'txput'
+//     3 | .fifo txput
+//       |       ^~~~~
+// 

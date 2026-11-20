@@ -1,0 +1,91 @@
+// run: pioasm input.pio
+.program define_values
+.define PUBLIC literal_val 7
+.define base_val 6
+.define PUBLIC ref_val base_val
+.define PUBLIC add_val 10 + 5
+.define PUBLIC sub_val 20 - 3
+.define PUBLIC mul_val 3 * 5
+.define PUBLIC div_val 20 / 4
+.define PUBLIC or_val 0x3 | 0x4
+.define PUBLIC and_val 0x7 & 0x3
+.define PUBLIC xor_val 0x6 ^ 0x3
+.define PUBLIC shl_val 1 << 4
+.define PUBLIC shr_val 16 >> 2
+.define PUBLIC neg_val -5
+.define PUBLIC rev_val ::1
+.define PUBLIC paren_val (10 + 5) * 2
+.define * star_val 9
+start:
+    nop
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ------------- //
+// // define_values //
+// // ------------- //
+// 
+// #define define_values_wrap_target 0
+// #define define_values_wrap 0
+// #define define_values_pio_version 0
+// 
+// #define define_values_literal_val 7
+// #define define_values_ref_val 6
+// #define define_values_add_val 15
+// #define define_values_sub_val 17
+// #define define_values_mul_val 15
+// #define define_values_div_val 5
+// #define define_values_or_val 7
+// #define define_values_and_val 3
+// #define define_values_xor_val 5
+// #define define_values_shl_val 16
+// #define define_values_shr_val 4
+// #define define_values_neg_val -5
+// #define define_values_rev_val -2147483648
+// #define define_values_paren_val 30
+// #define define_values_star_val 9
+// 
+// static __pio_const uint16_t define_values_program_instructions[] = {
+//             //     .wrap_target
+//     0xa042, //  0: nop
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program define_values_program = {
+//     .instructions = define_values_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = define_values_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config define_values_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + define_values_wrap_target, offset + define_values_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

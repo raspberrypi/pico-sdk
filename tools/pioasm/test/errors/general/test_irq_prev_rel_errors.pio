@@ -1,0 +1,13 @@
+// run: pioasm -v 1 input.pio
+.program irq_prev_rel
+.pio_version 1
+    irq prev set 0 rel
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.20-22: 'rel' is not supported for 'irq prev'
+//     4 |     irq prev set 0 rel
+//       |                    ^~~
+// 

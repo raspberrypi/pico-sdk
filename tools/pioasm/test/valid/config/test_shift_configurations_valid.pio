@@ -1,0 +1,387 @@
+// run: pioasm -v 1 input.pio
+.program shift_left
+.pio_version 1
+.in 8
+    in pins, 8
+
+.program shift_right
+.pio_version 1
+.in 8 right
+    in pins, 8
+
+.program shift_autopush
+.pio_version 1
+.in 16 auto
+    in pins, 8
+    in pins, 8
+
+.program shift_autopush_threshold
+.pio_version 1
+.in 8 auto 24
+    in pins, 8
+    in pins, 8
+
+.program shift_out_left
+.pio_version 1
+.out 4
+    out pins, 4
+
+.program shift_out_right
+.pio_version 1
+.out 4 right
+    out pins, 4
+
+.program shift_out_autopull
+.pio_version 1
+.out 16 auto
+    out pins, 8
+    out pins, 8
+
+.program shift_out_autopull_threshold
+.pio_version 1
+.out 8 auto 20
+    out pins, 8
+    out pins, 8
+
+.program shift_combined
+.pio_version 1
+.in 8 right auto 16
+.out 4 right auto 24
+    in pins, 8
+    out pins, 4
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ---------- //
+// // shift_left //
+// // ---------- //
+// 
+// #define shift_left_wrap_target 0
+// #define shift_left_wrap 0
+// #define shift_left_pio_version 1
+// 
+// static __pio_const uint16_t shift_left_program_instructions[] = {
+//             //     .wrap_target
+//     0x4008, //  0: in     pins, 8
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program shift_left_program = {
+//     .instructions = shift_left_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = shift_left_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config shift_left_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + shift_left_wrap_target, offset + shift_left_wrap);
+//     sm_config_set_in_pin_count(&c, 8);
+//     sm_config_set_in_shift(&c, 1, 0, 32);
+//     return c;
+// }
+// #endif
+// 
+// // ----------- //
+// // shift_right //
+// // ----------- //
+// 
+// #define shift_right_wrap_target 0
+// #define shift_right_wrap 0
+// #define shift_right_pio_version 1
+// 
+// static __pio_const uint16_t shift_right_program_instructions[] = {
+//             //     .wrap_target
+//     0x4008, //  0: in     pins, 8
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program shift_right_program = {
+//     .instructions = shift_right_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = shift_right_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config shift_right_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + shift_right_wrap_target, offset + shift_right_wrap);
+//     sm_config_set_in_pin_count(&c, 8);
+//     sm_config_set_in_shift(&c, 1, 0, 32);
+//     return c;
+// }
+// #endif
+// 
+// // -------------- //
+// // shift_autopush //
+// // -------------- //
+// 
+// #define shift_autopush_wrap_target 0
+// #define shift_autopush_wrap 1
+// #define shift_autopush_pio_version 1
+// 
+// static __pio_const uint16_t shift_autopush_program_instructions[] = {
+//             //     .wrap_target
+//     0x4008, //  0: in     pins, 8
+//     0x4008, //  1: in     pins, 8
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program shift_autopush_program = {
+//     .instructions = shift_autopush_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = shift_autopush_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config shift_autopush_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + shift_autopush_wrap_target, offset + shift_autopush_wrap);
+//     sm_config_set_in_pin_count(&c, 16);
+//     sm_config_set_in_shift(&c, 1, 1, 32);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------------ //
+// // shift_autopush_threshold //
+// // ------------------------ //
+// 
+// #define shift_autopush_threshold_wrap_target 0
+// #define shift_autopush_threshold_wrap 1
+// #define shift_autopush_threshold_pio_version 1
+// 
+// static __pio_const uint16_t shift_autopush_threshold_program_instructions[] = {
+//             //     .wrap_target
+//     0x4008, //  0: in     pins, 8
+//     0x4008, //  1: in     pins, 8
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program shift_autopush_threshold_program = {
+//     .instructions = shift_autopush_threshold_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = shift_autopush_threshold_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config shift_autopush_threshold_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + shift_autopush_threshold_wrap_target, offset + shift_autopush_threshold_wrap);
+//     sm_config_set_in_pin_count(&c, 8);
+//     sm_config_set_in_shift(&c, 1, 1, 24);
+//     return c;
+// }
+// #endif
+// 
+// // -------------- //
+// // shift_out_left //
+// // -------------- //
+// 
+// #define shift_out_left_wrap_target 0
+// #define shift_out_left_wrap 0
+// #define shift_out_left_pio_version 1
+// 
+// static __pio_const uint16_t shift_out_left_program_instructions[] = {
+//             //     .wrap_target
+//     0x6004, //  0: out    pins, 4
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program shift_out_left_program = {
+//     .instructions = shift_out_left_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = shift_out_left_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config shift_out_left_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + shift_out_left_wrap_target, offset + shift_out_left_wrap);
+//     sm_config_set_out_pin_count(&c, 4);
+//     sm_config_set_out_shift(&c, 1, 0, 32);
+//     return c;
+// }
+// #endif
+// 
+// // --------------- //
+// // shift_out_right //
+// // --------------- //
+// 
+// #define shift_out_right_wrap_target 0
+// #define shift_out_right_wrap 0
+// #define shift_out_right_pio_version 1
+// 
+// static __pio_const uint16_t shift_out_right_program_instructions[] = {
+//             //     .wrap_target
+//     0x6004, //  0: out    pins, 4
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program shift_out_right_program = {
+//     .instructions = shift_out_right_program_instructions,
+//     .length = 1,
+//     .origin = -1,
+//     .pio_version = shift_out_right_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config shift_out_right_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + shift_out_right_wrap_target, offset + shift_out_right_wrap);
+//     sm_config_set_out_pin_count(&c, 4);
+//     sm_config_set_out_shift(&c, 1, 0, 32);
+//     return c;
+// }
+// #endif
+// 
+// // ------------------ //
+// // shift_out_autopull //
+// // ------------------ //
+// 
+// #define shift_out_autopull_wrap_target 0
+// #define shift_out_autopull_wrap 1
+// #define shift_out_autopull_pio_version 1
+// 
+// static __pio_const uint16_t shift_out_autopull_program_instructions[] = {
+//             //     .wrap_target
+//     0x6008, //  0: out    pins, 8
+//     0x6008, //  1: out    pins, 8
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program shift_out_autopull_program = {
+//     .instructions = shift_out_autopull_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = shift_out_autopull_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config shift_out_autopull_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + shift_out_autopull_wrap_target, offset + shift_out_autopull_wrap);
+//     sm_config_set_out_pin_count(&c, 16);
+//     sm_config_set_out_shift(&c, 1, 1, 32);
+//     return c;
+// }
+// #endif
+// 
+// // ---------------------------- //
+// // shift_out_autopull_threshold //
+// // ---------------------------- //
+// 
+// #define shift_out_autopull_threshold_wrap_target 0
+// #define shift_out_autopull_threshold_wrap 1
+// #define shift_out_autopull_threshold_pio_version 1
+// 
+// static __pio_const uint16_t shift_out_autopull_threshold_program_instructions[] = {
+//             //     .wrap_target
+//     0x6008, //  0: out    pins, 8
+//     0x6008, //  1: out    pins, 8
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program shift_out_autopull_threshold_program = {
+//     .instructions = shift_out_autopull_threshold_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = shift_out_autopull_threshold_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config shift_out_autopull_threshold_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + shift_out_autopull_threshold_wrap_target, offset + shift_out_autopull_threshold_wrap);
+//     sm_config_set_out_pin_count(&c, 8);
+//     sm_config_set_out_shift(&c, 1, 1, 20);
+//     return c;
+// }
+// #endif
+// 
+// // -------------- //
+// // shift_combined //
+// // -------------- //
+// 
+// #define shift_combined_wrap_target 0
+// #define shift_combined_wrap 1
+// #define shift_combined_pio_version 1
+// 
+// static __pio_const uint16_t shift_combined_program_instructions[] = {
+//             //     .wrap_target
+//     0x4008, //  0: in     pins, 8
+//     0x6004, //  1: out    pins, 4
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program shift_combined_program = {
+//     .instructions = shift_combined_program_instructions,
+//     .length = 2,
+//     .origin = -1,
+//     .pio_version = shift_combined_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config shift_combined_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + shift_combined_wrap_target, offset + shift_combined_wrap);
+//     sm_config_set_in_pin_count(&c, 8);
+//     sm_config_set_in_shift(&c, 1, 1, 16);
+//     sm_config_set_out_pin_count(&c, 4);
+//     sm_config_set_out_shift(&c, 1, 1, 24);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

@@ -1,0 +1,68 @@
+// run: pioasm input.pio
+.program boundary_test
+    in pins, 1         ; min bit count
+    in pins, 32        ; max bit count
+    set pins, 0        ; min value
+    set pins, 31       ; max value
+    irq 0              ; min IRQ
+    irq 7              ; max IRQ
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ------------- //
+// // boundary_test //
+// // ------------- //
+// 
+// #define boundary_test_wrap_target 0
+// #define boundary_test_wrap 5
+// #define boundary_test_pio_version 0
+// 
+// static __pio_const uint16_t boundary_test_program_instructions[] = {
+//             //     .wrap_target
+//     0x4001, //  0: in     pins, 1
+//     0x4000, //  1: in     pins, 32
+//     0xe000, //  2: set    pins, 0
+//     0xe01f, //  3: set    pins, 31
+//     0xc000, //  4: irq    nowait 0
+//     0xc007, //  5: irq    nowait 7
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program boundary_test_program = {
+//     .instructions = boundary_test_program_instructions,
+//     .length = 6,
+//     .origin = -1,
+//     .pio_version = boundary_test_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config boundary_test_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + boundary_test_wrap_target, offset + boundary_test_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

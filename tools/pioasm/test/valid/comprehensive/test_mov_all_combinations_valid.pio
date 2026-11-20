@@ -1,0 +1,79 @@
+// run: pioasm -v 1 input.pio
+.program mov_combo
+.pio_version 1
+    mov x, y
+    mov y, x
+    mov isr, osr
+    mov osr, isr
+    mov pins, x
+    mov x, pins
+    mov pindirs, x
+    mov pc, x
+    mov exec, y
+    mov x, null
+    mov y, status
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // --------- //
+// // mov_combo //
+// // --------- //
+// 
+// #define mov_combo_wrap_target 0
+// #define mov_combo_wrap 10
+// #define mov_combo_pio_version 1
+// 
+// static __pio_const uint16_t mov_combo_program_instructions[] = {
+//             //     .wrap_target
+//     0xa022, //  0: mov    x, y
+//     0xa041, //  1: mov    y, x
+//     0xa0c7, //  2: mov    isr, osr
+//     0xa0e6, //  3: mov    osr, isr
+//     0xa001, //  4: mov    pins, x
+//     0xa020, //  5: mov    x, pins
+//     0xa061, //  6: mov    pindirs, x
+//     0xa0a1, //  7: mov    pc, x
+//     0xa082, //  8: mov    exec, y
+//     0xa023, //  9: mov    x, null
+//     0xa045, // 10: mov    y, status
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_combo_program = {
+//     .instructions = mov_combo_program_instructions,
+//     .length = 11,
+//     .origin = -1,
+//     .pio_version = mov_combo_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_combo_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_combo_wrap_target, offset + mov_combo_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:
