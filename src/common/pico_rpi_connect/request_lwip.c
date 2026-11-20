@@ -5,6 +5,8 @@
  */
 
 #include "pico/rpi_connect.h"
+#include <string.h>
+#include <strings.h>
 
 #include "lwip/altcp.h"
 #include "lwip/altcp_tls.h"
@@ -254,6 +256,22 @@ static struct altcp_tls_session *tls_session_for_host(const char *host) {
 }
 
 #if RPI_CONNECT_DEBUG_ENABLE
+// Log request headers without the credential in Authorization
+static void dump_headers(const struct curl_slist *headers) {
+    RPI_CONNECT_DEBUG("HEADERS:\n");
+    for (const struct curl_slist *h = headers; h; h = h->next) {
+        if (strncasecmp(h->data, "Authorization:", 14) == 0)
+            RPI_CONNECT_DEBUG("Authorization: <redacted>\n");
+        else
+            RPI_CONNECT_DEBUG("%s\n", h->data);
+    }
+}
+
+// Bodies sent to these carry a credential (a provisioning auth key, a device code)
+static bool body_is_secret(const char *endpoint) {
+    return strcmp(endpoint, "/client/auth-key-exchange") == 0 || strcmp(endpoint, "/client/token") == 0;
+}
+
 static void dump_binary_data(const void *data, uint32_t len) {
     const uint8_t *bptr = data;
     unsigned int i = 0;
@@ -329,7 +347,9 @@ long rpi_connect_request_perform_http(
         ctx->http_req->extra_headers_fn = http_extra_headers_fn;
         ctx->extra_headers_buffer = curl_slist_to_string(ctx->headers);
         ctx->http_req->extra_headers_arg = ctx->extra_headers_buffer;
-        RPI_CONNECT_DEBUG("HEADERS: \r\n%s\r\n", ctx->extra_headers_buffer);
+#if RPI_CONNECT_DEBUG_ENABLE
+        dump_headers(ctx->headers);
+#endif
     }
 
     // Snapshot the CA for this request: a concurrent rpi_connect_set_ca_cert
@@ -386,7 +406,10 @@ long rpi_connect_request_perform_http(
         post_data_len = (int)data_size;
         RPI_CONNECT_DEBUG("POST DATA: %d bytes\n", post_data_len);
 #if RPI_CONNECT_DEBUG_ENABLE
-        dump_binary_data(post_data, post_data_len);
+        if (body_is_secret(endpoint))
+            RPI_CONNECT_DEBUG(" <redacted>\n");
+        else
+            dump_binary_data(post_data, post_data_len);
 #endif
     }
 

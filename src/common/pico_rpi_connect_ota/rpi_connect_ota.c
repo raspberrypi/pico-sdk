@@ -638,8 +638,9 @@ int rpi_connect_ota_device_identity_exchange(
         return -1;
     }
 
-    RPI_CONNECT_OTA_INFO("device_identity_exchange: device_id=%s token=%s\n",
-                     device_id ? device_id : "(null)", token);
+    // Not the token: it is a credential, and logs end up in captures and bug reports
+    RPI_CONNECT_OTA_INFO("device_identity_exchange: device_id=%s\n",
+                     device_id ? device_id : "(null)");
     free(device_id);
 
     if (out_token)
