@@ -97,6 +97,9 @@ void cyw43_driver_deinit(struct async_context *context);
  * If the system clock is changed it may be necessary to adjust for this to allow communications to succeed.
  * This function is only available if \ref CYW43_PIO_CLOCK_DIV_DYNAMIC is true
  *
+ * \note If the driver is already initialised, the new divisor takes effect immediately. The caller must
+ * hold the cyw43 lock (cyw43_thread_enter()) across the system clock change and this call.
+ *
  * \param clock_div_int Integer part of the divisor
  * \param clock_div_frac8 Fractional part in 1/256ths
 */
