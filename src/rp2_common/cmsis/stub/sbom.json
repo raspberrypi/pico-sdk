@@ -1,0 +1,8 @@
+{
+    "name": "cmsis-stub",
+    "path": "CMSIS",
+    "license": "Apache-2.0",
+    "supplier": "Organization: Arm Limited",
+    "url": "https://github.com/ARM-software/CMSIS_6",
+    "description": "Stub subset of the CMSIS headers"
+}
