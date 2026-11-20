@@ -123,11 +123,11 @@ int cyw43_spi_init(cyw43_int_t *self) {
     pio_sm_config config = SPI_PROGRAM_GET_DEFAULT_CONFIG_FUNC(bus_data->pio_offset);
 
     sm_config_set_clkdiv_int_frac8(&config, cyw43_pio_clock_div_int, cyw43_pio_clock_div_frac8);
-    hw_write_masked(&pads_bank0_hw->io[CYW43_PIN_WL_CLOCK],
+    pads_bank0_write_masked(CYW43_PIN_WL_CLOCK,
                     (uint)PADS_DRIVE_STRENGTH << PADS_BANK0_GPIO0_DRIVE_LSB,
                     PADS_BANK0_GPIO0_DRIVE_BITS
     );
-    hw_write_masked(&pads_bank0_hw->io[CYW43_PIN_WL_CLOCK],
+    pads_bank0_write_masked(CYW43_PIN_WL_CLOCK,
                     (uint)1 << PADS_BANK0_GPIO0_SLEWFAST_LSB,
                     PADS_BANK0_GPIO0_SLEWFAST_BITS
     );

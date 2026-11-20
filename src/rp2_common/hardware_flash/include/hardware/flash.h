@@ -42,9 +42,12 @@
 #define PARAM_ASSERTIONS_ENABLED_HARDWARE_FLASH 0
 #endif
 #endif
-#define FLASH_PAGE_SIZE (1u << 8)
-#define FLASH_SECTOR_SIZE (1u << 12)
-#define FLASH_BLOCK_SIZE (1u << 16)
+#define FLASH_PAGE_SHIFT 8u
+#define FLASH_PAGE_SIZE (1u << FLASH_PAGE_SHIFT)
+#define FLASH_SECTOR_SHIFT 12u
+#define FLASH_SECTOR_SIZE (1u << FLASH_SECTOR_SHIFT)
+#define FLASH_BLOCK_SHIFT 16u
+#define FLASH_BLOCK_SIZE (1u << FLASH_BLOCK_SHIFT)
 
 #ifndef FLASH_UNIQUE_ID_SIZE_BYTES
 #define FLASH_UNIQUE_ID_SIZE_BYTES 8
@@ -302,6 +305,20 @@ uint flash_devinfo_get_cs_gpio(uint cs);
  * \param gpio GPIO index (must be less than NUM_BANK0_GPIOS)
  */
 void flash_devinfo_set_cs_gpio(uint cs, uint gpio);
+
+/*!
+ * \brief Roll QMI to a partition
+ * \ingroup pico_bootrom
+ *
+ * Rolls the QMI to the specified partition, enabling access to the partition via the translated XIP windows.
+ *
+ * This is necessary when the partition is not stored at the flash address it was linked at, e.g. when
+ * using A/B partitions.
+ * 
+ * \param partition_num the partition number
+ * \return BOOTROM_OK on success, otherwise a negative error code
+ */
+int flash_roll_qmi_to_partition(uint partition_num);
 
 #endif // !PICO_RP2040 || PICO_COMBINED_DOCS
 
