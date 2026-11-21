@@ -21,20 +21,12 @@ bool repeater(repeating_timer_t *timer) {
 
 #if HAS_POWMAN_TIMER
 static bool came_from_pstate = false;
+static char powman_last_pwrup[100];
+static char powman_last_pstate[100];
 
 void pstate_resume_func(__unused pstate_bitset_t *pstate) {
     came_from_pstate = true;
-    switch (powman_hw->last_swcore_pwrup) {
-        //               0 = chip reset, for the source of the last reset see
-        case 1 << 0: printf("Came from powerup: Chip reset\n"); break;
-        case 1 << 1: printf("Came from powerup: Pwrup0\n"); break;
-        case 1 << 2: printf("Came from powerup: Pwrup1\n"); break;
-        case 1 << 3: printf("Came from powerup: Pwrup2\n"); break;
-        case 1 << 4: printf("Came from powerup: Pwrup3\n"); break;
-        case 1 << 5: printf("Came from powerup: Coresight_pwrup\n"); break;
-        case 1 << 6: printf("Came from powerup: Alarm_pwrup\n"); break;
-        default: printf("Came from powerup: Unknown pwrup\n"); break;
-    }
+    pstate_resume_func_common(pstate, powman_last_pwrup, powman_last_pstate);
 }
 #endif
 
@@ -52,6 +44,7 @@ int main() {
 
 #if HAS_POWMAN_TIMER
     if (came_from_pstate) {
+        printf("Came from powerup %s with (%s) memory kept on - skipping to end\n", powman_last_pwrup, powman_last_pstate);
         if (powman_hw->scratch[5] == 0) {
             goto pstate_gpio_test;
         }
