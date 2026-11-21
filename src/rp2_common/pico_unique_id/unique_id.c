@@ -8,7 +8,12 @@
 #include "pico/bootrom.h"
 #include "pico/unique_id.h"
 
-static_assert(PICO_UNIQUE_BOARD_ID_SIZE_BYTES <= FLASH_UNIQUE_ID_SIZE_BYTES, "Board ID size must at least be the size of flash ID");
+#if PICO_RP2040
+static_assert(PICO_UNIQUE_BOARD_ID_SIZE_BYTES <= FLASH_UNIQUE_ID_SIZE_BYTES, "Board ID size cannot be greater than the size of flash ID");
+#else
+#define SYS_INFO_DEVICE_ID_SIZE_BYTES 8
+static_assert(PICO_UNIQUE_BOARD_ID_SIZE_BYTES <= SYS_INFO_DEVICE_ID_SIZE_BYTES, "Board ID size cannot be greater than the size of device ID");
+#endif
 
 static pico_unique_board_id_t retrieved_id;
 
@@ -38,16 +43,22 @@ static void __attribute__((PICO_UNIQUE_BOARD_ID_INIT_ATTRIBUTES)) _retrieve_uniq
         #error unique board ID size is greater than flash unique ID size
     #endif
 #else
-    rom_get_sys_info_fn func = (rom_get_sys_info_fn) rom_func_lookup(ROM_FUNC_GET_SYS_INFO);
-    union {
-        uint32_t words[9];
-        uint8_t bytes[9 * 4];
-    } out;
-    __unused int rc = func(out.words, 9, SYS_INFO_CHIP_INFO);
-    assert(rc == 4);
-    for (int i = 0; i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES; i++) {
-        retrieved_id.id[i] = out.bytes[PICO_UNIQUE_BOARD_ID_SIZE_BYTES - 1 + 2 * 4 - i];
-    }
+    #if PICO_UNIQUE_BOARD_ID_SIZE_BYTES <= SYS_INFO_DEVICE_ID_SIZE_BYTES
+        union {
+            uint32_t words[SYS_INFO_CHIP_INFO_WORD_COUNT + 1];
+            uint8_t bytes[(SYS_INFO_CHIP_INFO_WORD_COUNT + 1) * 4];
+        } out;
+        int words_returned = rom_get_sys_info(out.words, count_of(out.words), SYS_INFO_CHIP_INFO);
+        assert(words_returned == SYS_INFO_CHIP_INFO_WORD_COUNT + 1);
+        if (words_returned == (SYS_INFO_CHIP_INFO_WORD_COUNT + 1) && out.words[0] == SYS_INFO_CHIP_INFO) {
+            for (int i = 0; i < PICO_UNIQUE_BOARD_ID_SIZE_BYTES; i++) {
+                // The device ID is in words 3 and 4, so skip the first two words (i.e. the first 8 bytes)
+                retrieved_id.id[i] = out.bytes[PICO_UNIQUE_BOARD_ID_SIZE_BYTES - 1 + 2 * 4 - i];
+            }
+        }
+    #else
+        #error unique board ID size is greater than device unique ID size
+    #endif
 #endif
 }
 
