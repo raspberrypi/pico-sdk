@@ -31,7 +31,7 @@ struct hex_output : public output_format {
             return 1;
         }
         for (const auto &i : source.programs[0].instructions) {
-            fprintf(out, "%04x\n", i);
+            fprintf(out, "%04x\n", (uint16_t)i);
         }
         if (out != stdout) { fclose(out); }
         return 0;

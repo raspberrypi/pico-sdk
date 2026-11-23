@@ -215,7 +215,7 @@ struct json_output : public output_format {
                 // but that will likely wait for now. A dissasembly string instruction is added
                 // for the time being.
                 fprintf(out, "%s\t{\"hex\": \"%04X\", \"instruction\": \"%s\"}",
-                        tabs, inst,
+                        tabs, (uint16_t)inst,
                         json_escape(disassemble(inst, program.sideset_bits_including_opt.get(), program.sideset_opt)).c_str()
                         );
             }

@@ -99,7 +99,7 @@ struct go_output : public output_format {
                 if (i == program.wrap_target) {
                     fprintf(out, "\t\t//     .wrap_target\n");
                 }
-                fprintf(out, "\t\t0x%04x, // %2d: %s\n", inst, i,
+                fprintf(out, "\t\t0x%04x, // %2d: %s\n", (uint16_t)inst, i,
                         disassemble(inst, program.sideset_bits_including_opt.get(), program.sideset_opt).c_str());
                 if (i == program.wrap) {
                     fprintf(out, "\t\t//     .wrap\n");
