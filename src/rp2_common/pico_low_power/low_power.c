@@ -617,6 +617,8 @@ int low_power_dormant_until_aon_timer(absolute_time_t until,
     //Go dormant
     low_power_go_dormant(dormant_clock_source);
 
+    low_power_disable_processor_deep_sleep();
+
     low_power_wake_from_dormant();
 
     aon_timer_disable_alarm();
@@ -662,6 +664,8 @@ int low_power_dormant_until_gpio_pin_state(uint gpio_pin, bool edge, bool high,
 
     //Go dormant
     low_power_go_dormant(dormant_clock_source);
+
+    low_power_disable_processor_deep_sleep();
 
     // Clear the irq so we can go back to dormant mode again if we want
     gpio_acknowledge_irq(gpio_pin, event);
