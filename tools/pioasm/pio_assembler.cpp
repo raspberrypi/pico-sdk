@@ -186,7 +186,7 @@ void program::finalize() {
             if (n > 7) throw syntax_error(mov_status.n->location, "irq number should be >= 0 and <= 7");
             mov_status.final_n = mov_status.param * 8 + n;
         } else {
-            if (n > 31) throw syntax_error(mov_status.n->location, "fido depth should be >= 0 and <= 31");
+            if (n > 31) throw syntax_error(mov_status.n->location, "fifo depth should be >= 0 and <= 31");
             mov_status.final_n = n;
         }
     }
@@ -400,31 +400,31 @@ raw_encoding instr_wait::raw_encode(program& program) {
     uint arg2 = source->param->resolve(program);
     switch (source->target) {
         case wait_source::irq:
-            if (arg2 > 7) throw syntax_error(source->param->location, "irq number must be must be >= 0 and <= 7");
+            if (arg2 > 7) throw syntax_error(source->param->location, "irq number must be >= 0 and <= 7");
             break;
         case wait_source::gpio: {
             if (!program.pio_version) {
                 if (arg2 > 31)
-                    throw syntax_error(source->param->location, "absolute GPIO number must be must be >= 0 and <= 31");
+                    throw syntax_error(source->param->location, "absolute GPIO number must be >= 0 and <= 31");
             } else {
                 if (arg2 > 47)
-                    throw syntax_error(source->param->location, "absolute GPIO number must be must be >= 0 and <= 47");
+                    throw syntax_error(source->param->location, "absolute GPIO number must be >= 0 and <= 47");
             }
             int bitmap = 1u << (arg2 >> 4);
             if (bitmap == 4 && program.used_gpio_ranges & 1) {
-                throw syntax_error(source->param->location, "absolute GPIO number must be must be >= 0 and <= 31 as a GPIO number <16 has already been used");
+                throw syntax_error(source->param->location, "absolute GPIO number must be >= 0 and <= 31 as a GPIO number <16 has already been used");
             }
             if (bitmap == 1 && program.used_gpio_ranges & 4) {
-                throw syntax_error(source->param->location, "absolute GPIO number must be must be >= 16 and <= 47 as a GPIO number >32 has already been used");
+                throw syntax_error(source->param->location, "absolute GPIO number must be >= 16 and <= 47 as a GPIO number >32 has already been used");
             }
             program.used_gpio_ranges |= bitmap;
             break;
         }
         case wait_source::pin:
-            if (arg2 > 31) throw syntax_error(source->param->location, "pin number must be must be >= 0 and <= 31");
+            if (arg2 > 31) throw syntax_error(source->param->location, "pin number must be >= 0 and <= 31");
             break;
         case wait_source::jmppin:
-            if (arg2 > 3) throw syntax_error(source->param->location, "jmppin offset must be must be >= 0 and <= 3");
+            if (arg2 > 3) throw syntax_error(source->param->location, "jmppin offset must be >= 0 and <= 3");
             break;
     }
     return {inst_type::wait, (pol << 2u) | (uint) source->target, arg2 | (source->irq_type << 3)};
@@ -432,7 +432,7 @@ raw_encoding instr_wait::raw_encode(program& program) {
 
 raw_encoding instr_irq::raw_encode(program& program) {
     uint arg2 = num->resolve(program);
-    if (arg2 > 7) throw syntax_error(num->location, "irq number must be must be >= 0 and <= 7");
+    if (arg2 > 7) throw syntax_error(num->location, "irq number must be >= 0 and <= 7");
     arg2 |= irq_type << 3;
     return {inst_type::irq, (uint)modifiers, arg2};
 }
@@ -530,7 +530,7 @@ int pio_assembler::write_output() {
         cprogram.symbols = public_symbols(program);
     }
     if (programs.empty()) {
-        std::cout << "warning: input contained no programs" << std::endl;
+        std::cerr << "warning: input contained no programs" << std::endl;
     }
     if (list_names) {
         for (auto &program : programs) {

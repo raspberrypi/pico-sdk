@@ -11,7 +11,7 @@
 
 #include <string>
 #include <cstdint>
-#include "pio_types.h"
+#include <vector>
 
 typedef unsigned int uint;
 

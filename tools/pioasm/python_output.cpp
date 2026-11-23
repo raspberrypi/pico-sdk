@@ -9,7 +9,6 @@
 #include <sstream>
 #include <iomanip>
 #include "output_format.h"
-#include "pio_disassembler.h"
 #include "version.h"
 
 struct python_output : public output_format {
