@@ -21,11 +21,12 @@ pio_assembler::pio_assembler() {
 }
 
 int pio_assembler::generate(std::shared_ptr<output_format> _format, const std::string &_source,
-                            const std::string &_dest, const std::vector<std::string> &_options) {
+                            const std::string &_dest, bool _list_names, const std::vector<std::string> &_options) {
     format = _format;
     source = _source;
     dest = _dest;
     options = _options;
+    list_names = _list_names;
     location.initialize(&source);
     scan_begin();
     yy::parser parse(*this);
@@ -531,7 +532,14 @@ int pio_assembler::write_output() {
     if (programs.empty()) {
         std::cout << "warning: input contained no programs" << std::endl;
     }
-    return format->output(dest, options, source);
+    if (list_names) {
+        for (auto &program : programs) {
+            std::cout << program.name << std::endl;
+        }
+        return 0;
+    } else {
+        return format->output(dest, options, source);
+    }
 }
 
 FILE *output_format::open_single_output(std::string destination) {

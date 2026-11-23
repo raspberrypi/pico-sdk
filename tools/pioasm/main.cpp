@@ -25,6 +25,7 @@ void usage() {
     }
     std::cerr << "  -p <output_param>    add a parameter to be passed to the output format generator" << std::endl;
     std::cerr << "  -v <version>         specify the default PIO version (0 or 1)" << std::endl;
+    std::cerr << "  --list               print program names found in <input>" << std::endl;
     std::cerr << "  --version            print pioasm version information" << std::endl;
     std::cerr << "  -?, --help           print this help and exit\n";
 }
@@ -35,6 +36,7 @@ int main(int argc, char *argv[]) {
     std::string format(DEFAULT_OUTPUT_FORMAT);
     const char *input = nullptr;
     const char *output = nullptr;
+    bool list_names = false;
     std::vector<std::string> options;
     int i = 1;
     for (; !res && i < argc; i++) {
@@ -68,6 +70,8 @@ int main(int argc, char *argv[]) {
         } else if (argv[i] == std::string("-?") || argv[i] == std::string("--help")) {
             usage();
             return 1;
+        } else if (argv[i] == std::string("--list")) {
+            list_names = true;
         } else if (argv[i] == std::string("--version")) {
             std::cout << "pioasm version: " << PIOASM_VERSION_STRING << std::endl;
             return 0;
@@ -112,7 +116,7 @@ int main(int argc, char *argv[]) {
         std::cerr << std::endl;
         usage();
     } else {
-        res = pioasm.generate(oformat, input, output, options);
+        res = pioasm.generate(oformat, input, output, list_names, options);
     }
     return res;
 }

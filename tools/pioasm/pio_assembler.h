@@ -34,6 +34,8 @@ public:
     std::string source;
     // name of the output file or "-" for stdout
     std::string dest;
+    // only display program names
+    bool list_names;
     std::vector<std::string> options;
     int default_pio_version = 0;
 
@@ -116,7 +118,7 @@ public:
     }
 
     std::vector<compiled_source::symbol> public_symbols(program &program);
-    int generate(std::shared_ptr<output_format> _format, const std::string &_source, const std::string &_dest,
+    int generate(std::shared_ptr<output_format> _format, const std::string &_source, const std::string &_dest, bool _list_names,
                  const std::vector<std::string> &_options = std::vector<std::string>());
 
     // Handling the scanner.
