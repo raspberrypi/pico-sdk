@@ -123,4 +123,17 @@
 #endif
 #endif
 
+// Aliases for the pre-2.3.0 names. The blocks above only honour the old names
+// when callers *define* them; code that merely references them also needs to
+// keep compiling.
+#ifndef PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE
+#define PICO_STDIO_USB_RESET_MAGIC_BAUD_RATE PICO_USB_RESET_MAGIC_BAUD_RATE
+#endif
+#ifndef PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK
+#define PICO_STDIO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK PICO_USB_RESET_BOOTSEL_INTERFACE_DISABLE_MASK
+#endif
+#ifndef PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS
+#define PICO_STDIO_USB_RESET_RESET_TO_FLASH_DELAY_MS PICO_USB_RESET_RESET_TO_FLASH_DELAY_MS
+#endif
+
 #endif
