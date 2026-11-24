@@ -92,6 +92,17 @@ extern i2c_inst_t i2c1_inst;
 #define i2c_default PICO_DEFAULT_I2C_INSTANCE()
 #endif
 
+/**
+ * \def PICO_I2C_BUS_CLEAR_TIMEOUT_US
+ * \ingroup hardware_i2c
+ * \hideinitializer
+ * \brief The timeout used to clear the bus on a mid-transmission read timeout 
+ */
+#ifndef PICO_I2C_BUS_CLEAR_TIMEOUT_US
+// leaves sufficient time to send 9 bits on the slowest speed (10 kHz)
+#define PICO_I2C_BUS_CLEAR_TIMEOUT_US 1000
+#endif
+
 /** @} */
 
 // ----------------------------------------------------------------------------
