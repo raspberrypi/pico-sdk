@@ -170,7 +170,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
         // was set in i2c_init.
         do {
             if (timeout_check) {
-                timeout = timeout_check(ts, false);
+                timeout = timeout_check(ts, false) && !(i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_EMPTY_BITS);
                 abort |= timeout;
             }
             tight_loop_contents();
@@ -196,7 +196,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
                 // to take care of the abort.
                 do {
                     if (timeout_check) {
-                        timeout = timeout_check(ts, false);
+                        timeout = timeout_check(ts, false) && !(i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS);
                         abort |= timeout;
                     }
                     tight_loop_contents();
@@ -306,7 +306,7 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
                 i2c->hw->clr_tx_abrt;
             }
             if (timeout_check) {
-                timeout = timeout_check(ts, false);
+                timeout = timeout_check(ts, false) && !i2c_get_read_available(i2c);
                 abort |= timeout;
             }
         } while (!abort && !i2c_get_read_available(i2c));
