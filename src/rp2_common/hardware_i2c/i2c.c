@@ -176,7 +176,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
             tight_loop_contents();
         } while (!timeout && !(i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_EMPTY_BITS));
 
-        // If there was a timeout, don't attempt to do anything else.
+        // If there was a timeout, don't attempt to do anything else, but see if the byte transmission finishes
         if (!timeout) {
             abort_reason = i2c->hw->tx_abrt_source;
             if (abort_reason) {
@@ -206,6 +206,18 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
                 if (!timeout) {
                     i2c->hw->clr_stop_det;
                 }
+            }
+        } else {
+            // Wait and see if the current byte transmission finishes.
+            // Otherwise, the bus can lock up while the peripheral is sending its ACK
+            absolute_time_t until = make_timeout_time_us(PICO_I2C_BUS_CLEAR_TIMEOUT_US);
+            while (!(i2c->hw->raw_intr_stat & (I2C_IC_RAW_INTR_STAT_TX_EMPTY_BITS | I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS)) && !time_reached(until)) {
+                tight_loop_contents();
+            }
+            
+            // An abort flushes the FIFO and blocks it
+            if (i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+                i2c->hw->clr_tx_abrt;
             }
         }
 
@@ -239,7 +251,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
     }
 
     // nostop means we are now at the end of a *message* but not the end of a *transfer*
-    i2c->restart_on_next = nostop;
+    i2c->restart_on_next = nostop && !timeout;
     return rval;
 }
 
