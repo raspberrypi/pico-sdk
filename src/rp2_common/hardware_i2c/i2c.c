@@ -8,6 +8,7 @@
 #include "hardware/resets.h"
 #include "hardware/clocks.h"
 #include "pico/timeout_helper.h"
+#include "pico/time.h"
 
 check_hw_layout(i2c_hw_t, enable, I2C_IC_ENABLE_OFFSET);
 check_hw_layout(i2c_hw_t, clr_restart_det, I2C_IC_CLR_RESTART_DET_OFFSET);
@@ -169,13 +170,13 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
         // was set in i2c_init.
         do {
             if (timeout_check) {
-                timeout = timeout_check(ts, false);
+                timeout = timeout_check(ts, false) && !(i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_EMPTY_BITS);
                 abort |= timeout;
             }
             tight_loop_contents();
         } while (!timeout && !(i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_EMPTY_BITS));
 
-        // If there was a timeout, don't attempt to do anything else.
+        // If there was a timeout, don't attempt to do anything else, but see if the byte transmission finishes
         if (!timeout) {
             abort_reason = i2c->hw->tx_abrt_source;
             if (abort_reason) {
@@ -195,7 +196,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
                 // to take care of the abort.
                 do {
                     if (timeout_check) {
-                        timeout = timeout_check(ts, false);
+                        timeout = timeout_check(ts, false) && !(i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS);
                         abort |= timeout;
                     }
                     tight_loop_contents();
@@ -205,6 +206,18 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
                 if (!timeout) {
                     i2c->hw->clr_stop_det;
                 }
+            }
+        } else {
+            // Wait and see if the current byte transmission finishes.
+            // Otherwise, the bus can lock up while the peripheral is sending its ACK
+            absolute_time_t until = make_timeout_time_us(PICO_I2C_BUS_CLEAR_TIMEOUT_US);
+            while (!(i2c->hw->raw_intr_stat & (I2C_IC_RAW_INTR_STAT_TX_EMPTY_BITS | I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS)) && !time_reached(until)) {
+                tight_loop_contents();
+            }
+            
+            // An abort flushes the FIFO and blocks it
+            if (i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+                i2c->hw->clr_tx_abrt;
             }
         }
 
@@ -238,7 +251,7 @@ static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint
     }
 
     // nostop means we are now at the end of a *message* but not the end of a *transfer*
-    i2c->restart_on_next = nostop;
+    i2c->restart_on_next = nostop && !timeout;
     return rval;
 }
 
@@ -277,6 +290,7 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
     i2c->hw->enable = 1;
 
     bool abort = false;
+    bool tx_abort = false;
     bool timeout = false;
     uint32_t abort_reason;
     int byte_ctr;
@@ -300,10 +314,11 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
             abort_reason = i2c->hw->tx_abrt_source;
             if (i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
                 abort = true;
+                tx_abort = true;
                 i2c->hw->clr_tx_abrt;
             }
             if (timeout_check) {
-                timeout = timeout_check(ts, false);
+                timeout = timeout_check(ts, false) && !i2c_get_read_available(i2c);
                 abort |= timeout;
             }
         } while (!abort && !i2c_get_read_available(i2c));
@@ -312,6 +327,45 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
             break;
 
         *dst++ = (uint8_t) i2c->hw->data_cmd;
+    }
+
+    // Clear an in-flight transmission that timed out by reading an additional byte and sending the STOP condition
+    bool last = byte_ctr == ilen - 1;
+    if (timeout && !tx_abort) {
+        if (!(last && !nostop)) {
+            // A stop_det left over from an earlier read would end the wait below prematurely
+            i2c->hw->clr_stop_det;
+            i2c->hw->data_cmd = I2C_IC_DATA_CMD_STOP_BITS | I2C_IC_DATA_CMD_CMD_BITS; // -> 1 for read
+
+            absolute_time_t until = make_timeout_time_us(PICO_I2C_BUS_CLEAR_TIMEOUT_US);
+            bool stopped;
+            while (!(stopped = i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS)) {
+                if (time_reached(until)) {
+                    // The caller may have been preempted beyond the deadline, check once more
+                    stopped = i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS;
+                    break;
+                }
+                tight_loop_contents();
+            }
+            
+            // Don't do anything on an additional timeout
+            if (stopped) {
+                i2c->hw->clr_stop_det;
+            }
+            if (i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+                i2c->hw->clr_tx_abrt;
+            }
+        } else {
+            // wait for byte to finish
+            absolute_time_t until = make_timeout_time_us(PICO_I2C_BUS_CLEAR_TIMEOUT_US);
+            while (!(i2c->hw->raw_intr_stat & (I2C_IC_RAW_INTR_STAT_RX_FULL_BITS | I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS))
+                    && !time_reached(until))
+                tight_loop_contents();
+
+            if (i2c->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+                i2c->hw->clr_tx_abrt;
+            }
+        }
     }
 
     int rval;
@@ -331,7 +385,7 @@ static int i2c_read_blocking_internal(i2c_inst_t *i2c, uint8_t addr, uint8_t *ds
         rval = byte_ctr;
     }
 
-    i2c->restart_on_next = nostop;
+    i2c->restart_on_next = nostop && !timeout;
     return rval;
 }
 
