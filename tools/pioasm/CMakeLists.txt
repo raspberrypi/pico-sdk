@@ -62,6 +62,12 @@ if (MSVC)
     target_compile_options(pioasm PRIVATE "/std:c++latest")
 endif()
 
+option(PIOASM_BUILD_TESTS "Build pioasm tests (run them with ctest)" OFF)
+if (PIOASM_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
+
 
 # allow installing to flat dir
 include(GNUInstallDirs)
