@@ -24,6 +24,12 @@
  * vector table in flash, so you must disable interrupts before calling in
  * this case.
  *
+ * Flash operations that temporarily disable XIP still execute using the
+ * caller's stack. Avoid invoking them from unusually deep call chains or with
+ * large stack frames. In the default RP2040 linker layout, the core 0 stack is
+ * placed in the 4 KiB SCRATCH_Y region, so stack pressure from the caller and
+ * interrupt handlers must fit within that space.
+ *
  * If PICO_NO_FLASH=1 is not defined (i.e. if the program is built to run from
  * flash) then these functions will make a static copy of the second stage
  * bootloader in SRAM, and use this to reenter execute-in-place mode after
