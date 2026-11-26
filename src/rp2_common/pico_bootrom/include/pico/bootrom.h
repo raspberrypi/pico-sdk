@@ -263,6 +263,9 @@ static __force_inline void *rom_data_lookup_inline(uint32_t code) {
  * Facilities are provided to enable an "activity light" via GPIO attached LED for the USB Mass Storage Device,
  * and to limit the USB interfaces exposed.
  *
+ * \note If the watchdog is enabled, the watchdog reboot can take precedence and the device may halt without
+ *       entering BOOTSEL mode. Disable the watchdog before calling this function.
+ *
  * \if rp2350_specific
  * \note On RP2350A-A2 chips, errata RP2350-E3 prevents the activity LED working under Arm.
  *       PICO_BOOTROM_WORKAROUND_RP2350_A2_ACTIVITY_LED_BUG=1 is defined by default to have this method reboot to
@@ -290,6 +293,9 @@ static inline void __attribute__((noreturn)) reset_usb_boot(uint32_t usb_activit
  *
  * Facilities are provided to enable an "activity light" via GPIO attached LED for the USB Mass Storage Device,
  * and to limit the USB interfaces exposed.
+ *
+ * \note If the watchdog is enabled, the watchdog reboot can take precedence and the device may halt without
+ *       entering BOOTSEL mode. Disable the watchdog before calling this function.
  *
  * \if rp2350_specific
  * \note On RP2350A-A2 chips, errata RP2350-E3 prevents the activity LED working under Arm.
