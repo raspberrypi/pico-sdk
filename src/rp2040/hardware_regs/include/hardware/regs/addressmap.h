@@ -20,6 +20,9 @@
 #define REG_ALIAS_SET_BITS (_u(0x2) << _u(12))
 #define REG_ALIAS_CLR_BITS (_u(0x3) << _u(12))
 
+// Register address offsets for narrow write aliases
+#define REG_ALIAS_NARROW_REPL_BITS (_u(0x0) << _u(14))
+
 #define ROM_BASE _u(0x00000000)
 #define XIP_BASE _u(0x10000000)
 #define XIP_MAIN_BASE _u(0x10000000)
