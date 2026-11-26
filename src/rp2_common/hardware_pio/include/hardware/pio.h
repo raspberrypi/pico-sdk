@@ -2021,6 +2021,23 @@ void pio_sm_set_pindirs_with_mask64(PIO pio, uint sm, uint64_t pin_dirs, uint64_
  */
 int pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pins_base, uint pin_count, bool is_out);
 
+/*! \brief Use a state machine to set multiple consecutive pins high or low for the PIO instance
+ *  \ingroup hardware_pio
+ *
+ * This method repeatedly reconfigures the target state machine's pin configuration and executes 'set' instructions to set consecutive pins,
+ * before restoring the state machine's pin configuration to what it was.
+ *
+ * This method is provided as a convenience to set initial pin values, and should not be used against a state machine that is enabled.
+ *
+ * \param pio The PIO instance; e.g. \ref pio0, \ref pio1 etc.
+ * \param sm State machine index (0..3) to use
+ * \param pins_base the first pin to set. See \ref pio_sm_pins "pio_sm_pins" for more detail on pin arguments
+ * \param pin_count the count of consecutive pins to set
+ * \param is_high the value to set; true = high, false = low
+ * \return PICO_OK (0) on success, error code otherwise
+ */
+int pio_sm_set_consecutive_pins(PIO pio, uint sm, uint pins_base, uint pin_count, bool is_high);
+
 /*! \brief Enable/disable the input synchronizer bypass for multiple pins for the PIO instance
  *  \ingroup hardware_pio
  *

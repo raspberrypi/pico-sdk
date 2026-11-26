@@ -369,7 +369,8 @@ void pio_set_input_sync_bypass_with_mask64(PIO pio, uint64_t bypass_enables, uin
     pio_set_input_sync_bypass_with_mask_internal(pio, (uint32_t)bypass_enables, (uint32_t)pin_mask);
 }
 
-int pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pin, uint count, bool is_out) {
+static int pio_sm_set_consecutive_in_out(PIO pio, uint sm, uint pin, uint count,
+                                         enum pio_src_dest dest, uint value) {
     check_pio_param(pio);
     check_sm_param(sm);
 #if PICO_PIO_USE_GPIO_BASE
@@ -379,18 +380,25 @@ int pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pin, uint count, bool 
     uint32_t pinctrl_saved = pio->sm[sm].pinctrl;
     uint32_t execctrl_saved = pio->sm[sm].execctrl;
     hw_clear_bits(&pio->sm[sm].execctrl, 1u << PIO_SM0_EXECCTRL_OUT_STICKY_LSB);
-    uint pindir_val = is_out ? 0x1f : 0;
     while (count > 5) {
         pio->sm[sm].pinctrl = (5u << PIO_SM0_PINCTRL_SET_COUNT_LSB) | (pin << PIO_SM0_PINCTRL_SET_BASE_LSB);
-        pio_sm_exec(pio, sm, pio_encode_set(pio_pindirs, pindir_val));
+        pio_sm_exec(pio, sm, pio_encode_set(dest, value));
         count -= 5;
         pin = (pin + 5) & 0x1f;
     }
     pio->sm[sm].pinctrl = (count << PIO_SM0_PINCTRL_SET_COUNT_LSB) | (pin << PIO_SM0_PINCTRL_SET_BASE_LSB);
-    pio_sm_exec(pio, sm, pio_encode_set(pio_pindirs, pindir_val));
+    pio_sm_exec(pio, sm, pio_encode_set(dest, value));
     pio->sm[sm].pinctrl = pinctrl_saved;
     pio->sm[sm].execctrl = execctrl_saved;
     return PICO_OK;
+}
+
+int pio_sm_set_consecutive_pindirs(PIO pio, uint sm, uint pin, uint count, bool is_out) {
+    return pio_sm_set_consecutive_in_out(pio, sm, pin, count, pio_pindirs, is_out ? 0x1f : 0);
+}
+
+int pio_sm_set_consecutive_pins(PIO pio, uint sm, uint pin, uint count, bool is_high) {
+    return pio_sm_set_consecutive_in_out(pio, sm, pin, count, pio_pins, is_high ? 0x1f : 0);
 }
 
 int pio_sm_init(PIO pio, uint sm, uint initial_pc, const pio_sm_config *config) {
