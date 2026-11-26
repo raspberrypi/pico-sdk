@@ -408,7 +408,7 @@ static inline void rom_flash_range_erase(uint32_t addr, size_t count, uint32_t b
  * \endif
  * 
  * \param addr the offset from start of flash to be erased
- * \param data buffer containing the data to be written
+ * \param data buffer containing the data to be written. Must be in RAM, not XIP flash.
  * \param count number of bytes to erase
  */
 static inline void rom_flash_range_program(uint32_t addr, const uint8_t *data, size_t count) {
