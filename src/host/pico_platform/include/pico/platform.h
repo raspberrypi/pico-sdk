@@ -170,6 +170,11 @@ static inline void blocked_waiter_wakeup(__unused bool timed_out) {}
 #define PICO_NUM_VTABLE_IRQS NUM_IRQS
 #endif
 
+// PICO_CONFIG: PICO_SUPPORT_QSPI_GPIOS, Enable/disable support for using QSPI GPIOs, type=bool, default=0, group=hardware_gpio
+#ifndef PICO_SUPPORT_QSPI_GPIOS
+#define PICO_SUPPORT_QSPI_GPIOS 0
+#endif
+
 #ifdef __cplusplus
 }
 #endif
