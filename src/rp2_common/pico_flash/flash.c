@@ -72,12 +72,27 @@ bool flash_safe_execute_core_deinit(void) {
     return helper ? helper->core_init_deinit(false) : false;
 }
 
+// Set while this core is inside flash_safe_execute(), so a nested call can be
+// rejected instead of overwriting the saved interrupt state of the outer call.
+// Each core has its own slot and interrupts are disabled while it is set, so no
+// additional synchronisation is needed.
+static volatile bool in_flash_safe_zone[NUM_CORES];
+
 int flash_safe_execute(void (*func)(void *), void *param, uint32_t enter_exit_timeout_ms) {
+    uint core = get_core_num();
+    if (in_flash_safe_zone[core]) {
+#if PICO_FLASH_ASSERT_ON_UNSAFE
+        assert(false); // nested flash_safe_execute() is not supported
+#endif
+        return PICO_ERROR_INVALID_STATE;
+    }
     flash_safety_helper_t *helper = get_flash_safety_helper();
     if (!helper) return PICO_ERROR_NOT_PERMITTED;
     int rc = helper->enter_safe_zone_timeout_ms(enter_exit_timeout_ms);
     if (!rc) {
+        in_flash_safe_zone[core] = true;
         func(param);
+        in_flash_safe_zone[core] = false;
         rc = helper->exit_safe_zone_timeout_ms(enter_exit_timeout_ms);
     }
     return rc;
