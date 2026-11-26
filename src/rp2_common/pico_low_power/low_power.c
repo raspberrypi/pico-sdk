@@ -127,6 +127,12 @@ static void prepare_for_pstate_change(void) {
 }
 
 static void post_pstate_change(void) {
+    // Undo prepare_for_pstate_change(), so callers can safely carry on after
+    // an error instead of being left with interrupts disabled and USB deinit.
+    hw_clear_bits(&powman_hw->vreg_ctrl, POWMAN_PASSWORD_BITS | POWMAN_VREG_CTRL_UNLOCK_BITS);
+    powman_timer_set_1khz_tick_source_default();
+    powman_set_debug_power_request_ignored(false);
+    post_clock_switch();
 }
 #endif
 
@@ -713,15 +719,16 @@ static int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_
         low_power_persistent_pstate_get(pstate);
     }
 
-    prepare_for_pstate_change();
-
-    // Configure the wakeup state
+    // Configure the wakeup state before prepare_for_pstate_change(), so a
+    // failure here does not need any undo (no clocks/USB/interrupts touched).
     pstate_bitset_t current_pstate = pstate_bitset_none();
     low_power_pstate_get(&current_pstate);
     bool valid_state = powman_configure_wakeup_state(pstate_bitset_to_powman_power_state(pstate), pstate_bitset_to_powman_power_state(&current_pstate));
     if (!valid_state) {
         return PICO_ERROR_INVALID_STATE;
     }
+
+    prepare_for_pstate_change();
 
     // reboot to main
     powman_hw->boot[0] = 0;
@@ -736,14 +743,12 @@ static int low_power_go_pstate(pstate_bitset_t *pstate, low_power_pstate_resume_
     // Switch to required power state
     int rc = powman_set_power_state(pstate_bitset_to_powman_power_state(pstate));
     if (rc != PICO_OK) {
+        post_pstate_change();
         return rc;
     }
 
     // Power down
     while (true) __wfi();
-
-    // Should not reach here
-    post_pstate_change();
 
     return rc;
 }
