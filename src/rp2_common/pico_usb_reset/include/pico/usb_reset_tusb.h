@@ -7,6 +7,8 @@
 #ifndef _PICO_USB_RESET_TUSB_H
 #define _PICO_USB_RESET_TUSB_H
 
+#include "pico/usb_reset_interface.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
