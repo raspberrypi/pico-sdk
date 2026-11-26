@@ -749,6 +749,12 @@ static inline void dma_channel_start(uint channel) {
  *\endcode
  *\endif
  *
+ * \if rp2040_specific
+ * On RP2040 this function waits for the channel's CTRL.BUSY bit to clear rather than the
+ * CHAN_ABORT bit, as required by errata RP2040-E13 (see the RP2040 datasheet). Polling
+ * CHAN_ABORT is not sufficient to guarantee the channel is in a safe state.
+ * \endif
+ *
  * \if rp2350_specific
  * RP2350 only: Due to errata RP2350-E5 (see the RP2350 datasheet for further detail), it is necessary to clear the enable bit of
  * the aborted channel and any chained channels prior to the abort to prevent re-triggering.
@@ -759,8 +765,9 @@ static inline void dma_channel_start(uint channel) {
 static inline void dma_channel_abort(uint channel) {
     check_dma_channel_param(channel);
     dma_hw->abort = 1u << channel;
-    // Bit will go 0 once channel has reached safe state
-    // (i.e. any in-flight transfers have retired)
+    // Wait for the channel to reach a safe state (any in-flight transfers
+    // have retired). On RP2040, errata RP2040-E13 requires polling CTRL.BUSY
+    // rather than the CHAN_ABORT bit here.
     while (dma_hw->ch[channel].ctrl_trig & DMA_CH0_CTRL_TRIG_BUSY_BITS) tight_loop_contents();
 }
 
