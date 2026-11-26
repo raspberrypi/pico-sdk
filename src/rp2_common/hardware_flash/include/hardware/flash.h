@@ -103,7 +103,9 @@ void flash_range_erase(uint32_t flash_offs, size_t count);
  *  \ingroup hardware_flash
  *
  * \param flash_offs Flash address of the first byte to be programmed. Must be aligned to a 256-byte flash page.
- * \param data Pointer to the data to program into flash
+ * \param data Pointer to the data to program into flash. Must point to RAM; passing an address
+ * in the XIP flash address range will lock up, since the flash cannot be read while it is
+ * being programmed.
  * \param count Number of bytes to program. Must be a multiple of 256 bytes (one page).
  *
  * @note: Programming a flash page effectively changes some of the bits from one to zero.

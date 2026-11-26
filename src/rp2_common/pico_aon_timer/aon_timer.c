@@ -132,10 +132,10 @@ aon_timer_alarm_handler_t aon_timer_enable_alarm(const struct timespec *ts, aon_
     }
     if (ts_adjusted.tv_nsec) ts_adjusted.tv_sec++;
     if (wakeup_from_low_power) {
-        powman_enable_alarm_wakeup_at_ms(timespec_to_ms(ts));
+        powman_enable_alarm_wakeup_at_ms(timespec_to_ms(&ts_adjusted));
     } else {
         powman_disable_alarm_wakeup();
-        powman_timer_enable_alarm_at_ms(timespec_to_ms(ts));
+        powman_timer_enable_alarm_at_ms(timespec_to_ms(&ts_adjusted));
     }
     if (handler) {
         irq_set_exclusive_handler(irq_num, powman_timer_irq_handler);
@@ -197,7 +197,14 @@ bool aon_timer_start(const struct timespec *ts) {
     rtc_init();
     return aon_timer_set_time(ts);
 #elif HAS_POWMAN_TIMER
-    powman_timer_set_1khz_tick_source_default();
+    // Generate ticks from whichever clock currently drives CLK_REF. Using
+    // the XOSC when it is not running leaves the AON timer without ticks.
+    if (clocks_hw->clk[clk_ref].selected &
+        (1u << CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC)) {
+        powman_timer_set_1khz_tick_source_xosc();
+    } else {
+        powman_timer_set_1khz_tick_source_lposc();
+    }
     bool ok = aon_timer_set_time(ts);
     if (ok) {
         powman_timer_set_ms(timespec_to_ms(ts));
@@ -214,7 +221,12 @@ bool aon_timer_start_calendar(const struct tm *tm) {
     rtc_init();
     return aon_timer_set_time_calendar(tm);
 #elif HAS_POWMAN_TIMER
-    powman_timer_set_1khz_tick_source_default();
+    if (clocks_hw->clk[clk_ref].selected &
+        (1u << CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC)) {
+        powman_timer_set_1khz_tick_source_xosc();
+    } else {
+        powman_timer_set_1khz_tick_source_lposc();
+    }
     bool ok = aon_timer_set_time_calendar(tm);
     if (ok) {
         powman_timer_start();
