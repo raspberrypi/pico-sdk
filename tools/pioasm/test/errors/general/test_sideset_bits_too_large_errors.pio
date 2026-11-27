@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program sideset_bits_too_large
+.side_set 6
+    nop side 0
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.11: maximum number of side set bits is 5
+//     3 | .side_set 6
+//       |           ^
+// 

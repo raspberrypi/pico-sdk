@@ -1,0 +1,71 @@
+// run: pioasm input.pio
+.program complex_prog
+.side_set 1 opt
+.wrap_target
+start:
+    pull
+    out pins, 8 side 1
+    in pins, 8
+    mov x, osr
+    jmp x--, start
+.wrap
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // ------------ //
+// // complex_prog //
+// // ------------ //
+// 
+// #define complex_prog_wrap_target 0
+// #define complex_prog_wrap 4
+// #define complex_prog_pio_version 0
+// 
+// static __pio_const uint16_t complex_prog_program_instructions[] = {
+//             //     .wrap_target
+//     0x80a0, //  0: pull   block
+//     0x7808, //  1: out    pins, 8         side 1
+//     0x4008, //  2: in     pins, 8
+//     0xa027, //  3: mov    x, osr
+//     0x0040, //  4: jmp    x--, 0
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program complex_prog_program = {
+//     .instructions = complex_prog_program_instructions,
+//     .length = 5,
+//     .origin = -1,
+//     .pio_version = complex_prog_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config complex_prog_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + complex_prog_wrap_target, offset + complex_prog_wrap);
+//     sm_config_set_sideset(&c, 2, true, false);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

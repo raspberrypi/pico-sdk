@@ -1,0 +1,12 @@
+// run: pioasm input.pio
+.program wait_missing_source
+    wait 0
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:3.10: expected irq, gpio or pin
+//     3 |     wait 0
+//       |          ^
+// 

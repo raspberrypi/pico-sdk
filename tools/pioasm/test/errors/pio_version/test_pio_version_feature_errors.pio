@@ -1,0 +1,26 @@
+// run: pioasm -v 0 input.pio
+.program pio_v0_jmppin_error
+.pio_version 0
+    wait 0 jmppin
+
+.program pio_v0_irq_next_error
+.pio_version 0
+    irq next 0
+
+.program pio_v0_fifo_error
+.pio_version 0
+.fifo tx
+    pull
+
+// -- Output
+// Command: pioasm -v 0 input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.12-17: PIO version 1 is required for 'wait jmppin'
+//     4 |     wait 0 jmppin
+//       |            ^~~~~~
+// input.pio:8.5-14: PIO version 1 is required for 'irq next'
+//     8 |     irq next 0
+//       |     ^~~~~~~~~~
+// 

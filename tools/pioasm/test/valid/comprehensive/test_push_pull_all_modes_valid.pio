@@ -1,0 +1,76 @@
+// run: pioasm input.pio
+.program push_pull_test
+    push
+    push block
+    push noblock
+    push iffull
+    push iffull block
+    pull
+    pull block
+    pull noblock
+    pull ifempty
+    pull ifempty noblock
+
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // -------------- //
+// // push_pull_test //
+// // -------------- //
+// 
+// #define push_pull_test_wrap_target 0
+// #define push_pull_test_wrap 9
+// #define push_pull_test_pio_version 0
+// 
+// static __pio_const uint16_t push_pull_test_program_instructions[] = {
+//             //     .wrap_target
+//     0x8020, //  0: push   block
+//     0x8020, //  1: push   block
+//     0x8000, //  2: push   noblock
+//     0x8060, //  3: push   iffull block
+//     0x8060, //  4: push   iffull block
+//     0x80a0, //  5: pull   block
+//     0x80a0, //  6: pull   block
+//     0x8080, //  7: pull   noblock
+//     0x80e0, //  8: pull   ifempty block
+//     0x80c0, //  9: pull   ifempty noblock
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program push_pull_test_program = {
+//     .instructions = push_pull_test_program_instructions,
+//     .length = 10,
+//     .origin = -1,
+//     .pio_version = push_pull_test_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config push_pull_test_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + push_pull_test_wrap_target, offset + push_pull_test_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

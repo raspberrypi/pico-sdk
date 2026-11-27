@@ -1,0 +1,10 @@
+// run: pioasm -o ada -p First -p Second input.pio
+.program too_many_options
+    nop
+// -- Output
+// Command: pioasm -o ada -p First -p Second input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// error: too many options for Ada format
+// 

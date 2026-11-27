@@ -1,0 +1,13 @@
+// run: pioasm input.pio
+.program sideset_missing
+.side_set 1
+    nop
+// -- Output
+// Command: pioasm input.pio
+// Exit code: 1
+// Stdout:
+// Stderr:
+// input.pio:4.5-7: instruction requires 'side' to specify side set value for the instruction because non optional sideset was specified for the program at input.pio:3.1-11
+//     4 |     nop
+//       |     ^~~
+// 

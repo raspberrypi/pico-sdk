@@ -1,0 +1,74 @@
+// run: pioasm -v 1 input.pio
+.program mov_test
+    mov x, y
+    mov x, !y          ; bitwise NOT
+    mov x, :: y         ; bit reverse
+    mov pins, x
+    mov x, pins
+    mov y, status      ; read status
+    mov osr, isr
+    mov isr, osr
+    mov pc, x          ; computed jump
+
+// -- Output
+// Command: pioasm -v 1 input.pio
+// Exit code: 0
+// Stdout:
+// // ------------------------------------------------------------------------ //
+//?
+// // ------------------------------------------------------------------------ //
+// 
+// #pragma once
+// 
+// #if !PICO_NO_HARDWARE
+// #include "hardware/pio.h"
+// #endif
+// 
+// #ifdef __cpp_constexpr
+// #define __pio_const constexpr
+// #else
+// #define __pio_const const
+// #endif
+// 
+// // -------- //
+// // mov_test //
+// // -------- //
+// 
+// #define mov_test_wrap_target 0
+// #define mov_test_wrap 8
+// #define mov_test_pio_version 1
+// 
+// static __pio_const uint16_t mov_test_program_instructions[] = {
+//             //     .wrap_target
+//     0xa022, //  0: mov    x, y
+//     0xa02a, //  1: mov    x, ~y
+//     0xa032, //  2: mov    x, ::y
+//     0xa001, //  3: mov    pins, x
+//     0xa020, //  4: mov    x, pins
+//     0xa045, //  5: mov    y, status
+//     0xa0e6, //  6: mov    osr, isr
+//     0xa0c7, //  7: mov    isr, osr
+//     0xa0a1, //  8: mov    pc, x
+//             //     .wrap
+// };
+// 
+// #if !PICO_NO_HARDWARE
+// static __pio_const struct pio_program mov_test_program = {
+//     .instructions = mov_test_program_instructions,
+//     .length = 9,
+//     .origin = -1,
+//     .pio_version = mov_test_pio_version,
+// #if PICO_PIO_VERSION > 0
+//     .used_gpio_ranges = 0x0
+// #endif
+// };
+// 
+// static inline pio_sm_config mov_test_program_get_default_config(uint offset) {
+//     pio_sm_config c = pio_get_default_sm_config();
+//     sm_config_set_wrap(&c, offset + mov_test_wrap_target, offset + mov_test_wrap);
+//     return c;
+// }
+// #endif
+// 
+// 
+// Stderr:

@@ -1,0 +1,44 @@
+// run: pioasm -o ada -p AdaPkg input.pio
+.define PUBLIC global_const 5
+.program ada_symbols
+.lang_opt ada custom_opt = 3
+.define PUBLIC local_const 6
+public entry:
+    nop
+// -- Output
+// Command: pioasm -o ada -p AdaPkg input.pio
+// Exit code: 0
+// Stdout:
+// ------------------------------------------------------------------------------
+//?
+// ------------------------------------------------------------------------------
+// 
+// pragma Style_Checks (Off);
+// 
+// with RP.PIO;
+// 
+// package AdaPkg is
+// 
+//    -----------------
+//    -- Ada_Symbols --
+//    -----------------
+// 
+// global_const : constant := 5;
+// 
+//    Ada_Symbols_Wrap_Target : constant := 0;
+//    Ada_Symbols_Wrap        : constant := 0;
+// 
+// local_const : constant := 6;
+// 
+//    Offset_entry : constant := 0;
+// 
+//    Ada_Symbols_Program_Instructions : RP.PIO.Program := (
+//                     --  .wrap_target
+//          16#a042#); --   0: nop
+//                     --  .wrap
+// 
+// end AdaPkg;
+// 
+// Stderr:
+// warning: ada does not support output options; ada lang_opt ignored.
+// 
