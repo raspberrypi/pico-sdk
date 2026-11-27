@@ -108,6 +108,18 @@ extern "C" {
 
 static_assert(RESET_COUNT == NUM_RESETS, "");
 
+#if PICO_ALLOW_NONSECURE_RESETS && PICO_NONSECURE
+#include "pico/bootrom.h"
+static inline int reset_block_reg_mask(__unused io_rw_32 *reset, uint32_t mask) {
+    return rom_secure_call(mask, 0, 0, 0, SECURE_CALL_reset_block_mask);
+}
+static inline int unreset_block_reg_mask(__unused io_rw_32 *reset, uint32_t mask) {
+    return rom_secure_call(mask, 0, 0, 0, SECURE_CALL_unreset_block_mask);
+}
+static inline int unreset_block_reg_mask_wait_blocking(__unused io_rw_32 *reset, __unused io_ro_32 *reset_done, uint32_t mask) {
+    return rom_secure_call(mask, 0, 0, 0, SECURE_CALL_unreset_block_mask_wait_blocking);
+}
+#else
 static __force_inline  void reset_block_reg_mask(io_rw_32 *reset, uint32_t mask) {
     hw_set_bits(reset, mask);
 }
@@ -121,6 +133,7 @@ static __force_inline void unreset_block_reg_mask_wait_blocking(io_rw_32 *reset,
     while (~*reset_done & mask)
         tight_loop_contents();
 }
+#endif
 
 /// \tag::reset_funcs[]
 
