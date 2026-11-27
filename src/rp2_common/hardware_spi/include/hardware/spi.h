@@ -273,6 +273,12 @@ static inline const spi_hw_t *spi_get_const_hw(const spi_inst_t *spi) {
  *
  * Configure how the SPI serialises and deserialises data on the wire
  *
+ * \note With CPHA=0 the SPI returns to idle between frames, even when the TX FIFO never empties: it pulses
+ * the hardware chip select (CS) high and leaves 1.5 SCK periods between consecutive frames. Sustained
+ * throughput is therefore data_bits / (data_bits + 1.5) of the SCK rate, about 84% with 8-bit frames and
+ * 91% with 16-bit frames. With CPHA=1, frames are sent back to back. If the device supports it, CPHA=1
+ * (SPI mode 1 or 3) avoids the gap.
+ *
  * \param spi SPI instance specifier, either \ref spi0 or \ref spi1
  * \param data_bits Number of data bits per transfer. Valid values 4..16.
  * \param cpol SSPCLKOUT polarity, applicable to Motorola SPI frame format only.
